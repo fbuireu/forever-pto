@@ -23,8 +23,8 @@ Runs on pushes to `main` and PRs targeting `main`. `cancel-in-progress` is condi
 
 - **changes** — derives from `git diff` whether `apps/web` (or anything the app build depends on) was touched, and exposes it as an output. It uses `git diff` rather than a filter action because every third-party action here is SHA-pinned and an unpinnable one trips zizmor. It fails open.
 - **Lint** — `pnpm lint:all` (Biome), at the repo root, over both packages.
-- **Typecheck** — `pnpm lint:ts:typecheck` at the repo root, which chains the root program (`tests/`, `commitlint.config.ts`) and then `apps/web`.
-- **Unit tests** — `pnpm test:coverage` with `working-directory: apps/web`, then `pnpm test:docs` at the root, then coverage upload to Codecov (`fail_ci_if_error: false`, so Codecov outages never block CI).
+- **Typecheck** — `pnpm typecheck` at the repo root, which chains the root program (`tests/`, `commitlint.config.ts`) and then `apps/web`.
+- **Unit tests** — `pnpm test:ut:coverage` with `working-directory: apps/web`, then `pnpm test:docs` at the root, then coverage upload to Codecov (`fail_ci_if_error: false`, so Codecov outages never block CI).
 - **deploy-production → release-web → docs-refresh** on `main`, or **deploy-development → comment / e2e** on a PR. The first three are gated on the `changes` output; the quality jobs are not.
 
 The quality jobs are what branch protection gates PRs on. Unlike the arrangement this replaced, they also gate *deploying*: `deploy-production` `needs` all three, and `release-web` `needs` the deploy, so a tag means the version is live. Package scoping uses step-level `working-directory`; a job-level default would not reach a `uses:` step, which is why every `nick-fields/retry` command begins with an explicit `cd`.

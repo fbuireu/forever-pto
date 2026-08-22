@@ -1,106 +1,106 @@
-'use client';
+"use client";
 
-import type { HolidayDTO } from '@application/dto/holiday/types';
-import { logClientError } from '@application/shared/utils/clientLog';
-import { formatDate } from '@application/shared/utils/dates';
-import { useHolidaysStore } from '@application/stores/holidays';
+import type { HolidayDTO } from "@application/dto/holiday/types";
+import { logClientError } from "@application/shared/utils/clientLog";
+import { formatDate } from "@application/shared/utils/dates";
+import { useHolidaysStore } from "@application/stores/holidays";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@ui/modules/core/animate/base/Dialog';
-import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
-import { Trash2 } from '@ui/modules/core/animate/icons/Trash2';
-import { Button } from '@ui/modules/core/primitives/Button';
-import { AlertTriangle } from 'lucide-react';
-import type { Locale } from 'next-intl';
-import { useTranslations } from 'next-intl';
-import { useTransition } from 'react';
-import { toast } from 'sonner';
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "@ui/modules/core/animate/base/Dialog";
+import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
+import { Trash2 } from "@ui/modules/core/animate/icons/Trash2";
+import { Button } from "@ui/modules/core/primitives/Button";
+import { AlertTriangle } from "lucide-react";
+import type { Locale } from "next-intl";
+import { useTranslations } from "next-intl";
+import { useTransition } from "react";
+import { toast } from "sonner";
 
 interface DeleteHolidayModalProps {
-  open: boolean;
-  onClose: () => void;
-  locale: Locale;
-  holidays: HolidayDTO[];
+	open: boolean;
+	onClose: () => void;
+	locale: Locale;
+	holidays: HolidayDTO[];
 }
 
 export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHolidayModalProps) => {
-  const t = useTranslations('modals.deleteHoliday');
-  const tA11y = useTranslations('a11y');
-  const removeHoliday = useHolidaysStore((state) => state.removeHoliday);
-  const [isPending, startTransition] = useTransition();
-  const isMultiple = holidays.length > 1;
+	const t = useTranslations("modals.deleteHoliday");
+	const tA11y = useTranslations("a11y");
+	const removeHoliday = useHolidaysStore((state) => state.removeHoliday);
+	const [isPending, startTransition] = useTransition();
+	const isMultiple = holidays.length > 1;
 
-  const handleDelete = () => {
-    startTransition(() => {
-      try {
-        holidays.forEach((holiday) => {
-          removeHoliday(holiday.id);
-        });
+	const handleDelete = () => {
+		startTransition(() => {
+			try {
+				holidays.forEach((holiday) => {
+					removeHoliday(holiday.id);
+				});
 
-        toast.success(isMultiple ? t('successTitle') : t('successTitleSingular'), {
-          description: isMultiple
-            ? t('successDescription', { count: holidays.length })
-            : t('successDescriptionSingular'),
-        });
+				toast.success(isMultiple ? t("successTitle") : t("successTitleSingular"), {
+					description: isMultiple
+						? t("successDescription", { count: holidays.length })
+						: t("successDescriptionSingular"),
+				});
 
-        onClose();
-      } catch (error) {
-        logClientError('Error deleting holiday', error, { component: 'DeleteHolidayModal' });
-        toast.error(t('errorTitle'), {
-          description: t('errorDescription'),
-        });
-      }
-    });
-  };
+				onClose();
+			} catch (error) {
+				logClientError("Error deleting holiday", error, { component: "DeleteHolidayModal" });
+				toast.error(t("errorTitle"), {
+					description: t("errorDescription"),
+				});
+			}
+		});
+	};
 
-  return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className='sm:max-w-sm' closeLabel={tA11y('closeDialog')}>
-        <DialogHeader>
-          <DialogTitle className='flex items-center gap-2 text-destructive'>
-            <AlertTriangle className='size-5' />
-            {isMultiple ? t('title') : t('titleSingular')}
-          </DialogTitle>
-          <DialogDescription className='sr-only'>
-            {isMultiple ? t('description', { count: holidays.length }) : t('descriptionSingular')}
-          </DialogDescription>
-          <div className='space-y-3'>
-            <span className='block my-2 text-sm text-muted-foreground'>
-              {isMultiple ? t('description', { count: holidays.length }) : t('descriptionSingular')}
-            </span>
-            <div className='bg-[var(--surface-panel-soft)] rounded-[10px] border-[3px] border-[var(--frame)] p-3 max-h-32 overflow-y-auto shadow-[var(--shadow-brutal-xs)]'>
-              <div className='space-y-2'>
-                {holidays.map((holiday) => (
-                  <div key={holiday.id} className='flex items-center justify-between text-sm'>
-                    <span className='font-medium'>{holiday.name}</span>
-                    <span className='text-muted-foreground'>
-                      {formatDate({ date: holiday.date, locale, format: 'MMM d, yyyy' })}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </DialogHeader>
-        <DialogFooter>
-          <div className='flex gap-2 pt-4'>
-            <AnimateIcon animateOnHover>
-              <Button variant='destructive' onClick={handleDelete} className='flex-1' disabled={isPending}>
-                <Trash2 className='size-4 mr-2' />
-                {isPending ? t('submitting') : t('submit')}
-              </Button>
-            </AnimateIcon>
-            <Button variant='destructive' onClick={onClose} className='flex-1' disabled={isPending}>
-              {t('cancel')}
-            </Button>
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
+	return (
+		<Dialog open={open} onOpenChange={onClose}>
+			<DialogContent className="sm:max-w-sm" closeLabel={tA11y("closeDialog")}>
+				<DialogHeader>
+					<DialogTitle className="flex items-center gap-2 text-destructive">
+						<AlertTriangle className="size-5" />
+						{isMultiple ? t("title") : t("titleSingular")}
+					</DialogTitle>
+					<DialogDescription className="sr-only">
+						{isMultiple ? t("description", { count: holidays.length }) : t("descriptionSingular")}
+					</DialogDescription>
+					<div className="space-y-3">
+						<span className="block my-2 text-sm text-muted-foreground">
+							{isMultiple ? t("description", { count: holidays.length }) : t("descriptionSingular")}
+						</span>
+						<div className="bg-[var(--surface-panel-soft)] rounded-[10px] border-[3px] border-[var(--frame)] p-3 max-h-32 overflow-y-auto shadow-[var(--shadow-brutal-xs)]">
+							<div className="space-y-2">
+								{holidays.map((holiday) => (
+									<div key={holiday.id} className="flex items-center justify-between text-sm">
+										<span className="font-medium">{holiday.name}</span>
+										<span className="text-muted-foreground">
+											{formatDate({ date: holiday.date, locale, format: "MMM d, yyyy" })}
+										</span>
+									</div>
+								))}
+							</div>
+						</div>
+					</div>
+				</DialogHeader>
+				<DialogFooter>
+					<div className="flex gap-2 pt-4">
+						<AnimateIcon animateOnHover>
+							<Button variant="destructive" onClick={handleDelete} className="flex-1" disabled={isPending}>
+								<Trash2 className="size-4 mr-2" />
+								{isPending ? t("submitting") : t("submit")}
+							</Button>
+						</AnimateIcon>
+						<Button variant="destructive" onClick={onClose} className="flex-1" disabled={isPending}>
+							{t("cancel")}
+						</Button>
+					</div>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
+	);
 };

@@ -9,9 +9,9 @@ sidebar:
 
 A single `biome.json` at the repo root lints and formats the whole workspace, `apps/docs/` included. Highlights:
 
-- Formatter: 120-char lines, LF, spaces, single quotes (JS and JSX), es5 trailing commas.
+- Formatter: 120-char lines, LF, tabs, double quotes, trailing commas everywhere — Biome's own defaults bar the line width. The config declares no `javascript.formatter` block at all, which is what keeps it identical to the sibling repos'.
 - `assist.actions.source.organizeImports: on` — import sorting is automated, don't hand-sort.
-- Recommended rules plus `suspicious.noConsole` as a warning (only `console.warn`/`console.error` allowed).
+- Recommended rules plus `suspicious.noConsole` as an **error** with no allowlist: no `console` at any level. The one exception is scoped in `overrides` rather than hidden in a suppression comment — the BetterStack client's own unconfigured warning, which has no logger left to call.
 - `apps/docs/src/styles` is excluded from formatting, because it carries Tailwind directives; the app's own style layers are not excluded, since `css.parser.tailwindDirectives` handles them in place. `*.d.ts` and `*.astro` files are excluded from linting — Biome parses only an Astro file's frontmatter, so every import used in the template body would read as unused, and `astro check` covers those files instead.
 - VCS integration is on (`useIgnoreFile`, default branch `main`), which is what powers the `--changed` script variants.
 
@@ -25,7 +25,7 @@ Installed by the `prepare` script on `pnpm install`. Three hooks in `.husky/`:
 | --- | --- | --- |
 | `pre-commit` | `pnpm lint-staged` | Format + lint staged files; run unit tests for staged test files |
 | `commit-msg` | `pnpm commitlint --edit` | Enforce conventional commits (see [conventions](/contributing/conventions/)) |
-| `pre-push` | `pnpm lint:ts:typecheck` | Full `tsc --noEmit` before anything leaves your machine |
+| `pre-push` | `pnpm verify` | Format check, typecheck and the coverage run — the same command the CI Check job runs |
 
 ### lint-staged
 

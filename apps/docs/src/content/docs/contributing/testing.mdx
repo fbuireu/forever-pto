@@ -12,9 +12,9 @@ Configured in `vitest.config.ts` with `resolve.tsconfigPaths: true`, so all the 
 - **Environment**: happy-dom.
 - **Setup** (`vitest.setup.ts`): mocks `next/cache` (`cacheLife`, `cacheTag`) — required because the app enables Cache Components — and runs Testing Library's `cleanup` after each test.
 - **Excluded from the runner**: `apps/web/e2e/**`, `apps/docs/**`, generated bones, icon directories and i18n message JSON.
-- **Coverage**: v8 provider over `apps/web/src/**/*.{ts,tsx}` (tests, `*.d.ts`, `types.ts` files and generated code excluded), reported as text + lcov. `ci.yml` runs `pnpm test:coverage` and uploads `coverage/lcov.info` to Codecov on every push and PR.
+- **Coverage**: v8 provider over `apps/web/src/**/*.{ts,tsx}` (tests, `*.d.ts`, `types.ts` files and generated code excluded), reported as text + lcov. `ci.yml` runs `pnpm test:ut:coverage` and uploads `coverage/lcov.info` to Codecov on every push and PR.
 
-Run locally with `pnpm test:ut` (or `pnpm test:coverage`).
+Run locally with `pnpm test:ut` (or `pnpm test:ut:coverage`).
 
 ## End-to-end tests (Playwright)
 

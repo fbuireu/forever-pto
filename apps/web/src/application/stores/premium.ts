@@ -1,177 +1,177 @@
-import { logClient, logClientError } from '@application/shared/utils/clientLog';
-import { emailDomain } from '@application/shared/utils/redact';
-import { track } from '@infrastructure/clients/logging/better-stack/tracking';
-import { getExistingSession, verifyPremiumEmail } from '@ui/adapters/session/checkSession';
-import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
-import { obfuscatedStorage } from './crypto';
-import { onRehydrateFailure } from './rehydration';
-import { TWENTY_FOUR_HOURS } from './utils/crypto';
+import { logClient, logClientError } from "@application/shared/utils/clientLog";
+import { emailDomain } from "@application/shared/utils/redact";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
+import { getExistingSession, verifyPremiumEmail } from "@ui/adapters/session/checkSession";
+import { create } from "zustand";
+import { devtools, persist } from "zustand/middleware";
+import { obfuscatedStorage } from "./crypto";
+import { onRehydrateFailure } from "./rehydration";
+import { TWENTY_FOUR_HOURS } from "./utils/crypto";
 
 interface PremiumState {
-  premiumKey: string | null;
-  userEmail: string | null;
-  lastVerified: number | null;
-  isLoading: boolean;
-  modalOpen: boolean;
-  currentFeature: string;
-  needsSessionCheck: boolean;
+	premiumKey: string | null;
+	userEmail: string | null;
+	lastVerified: number | null;
+	isLoading: boolean;
+	modalOpen: boolean;
+	currentFeature: string;
+	needsSessionCheck: boolean;
 }
 
 interface SetPremiumStatusParams {
-  email: string;
-  premiumKey: string | null;
+	email: string;
+	premiumKey: string | null;
 }
 
 interface PremiumActions {
-  verifyEmail: (email: string) => Promise<boolean>;
-  checkExistingSession: (options?: { force?: boolean }) => Promise<void>;
-  showUpgradeModal: (feature: string) => void;
-  closeModal: () => void;
-  setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => void;
-  refreshPremiumStatus: () => Promise<void>;
-  setEmail: (email: string) => void;
-  resetPremiumStore: () => void;
+	verifyEmail: (email: string) => Promise<boolean>;
+	checkExistingSession: (options?: { force?: boolean }) => Promise<void>;
+	showUpgradeModal: (feature: string) => void;
+	closeModal: () => void;
+	setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => void;
+	refreshPremiumStatus: () => Promise<void>;
+	setEmail: (email: string) => void;
+	resetPremiumStore: () => void;
 }
 
 type PremiumStore = PremiumState & PremiumActions;
 
-const STORAGE_NAME = 'premium-store';
+const STORAGE_NAME = "premium-store";
 const STORAGE_VERSION = 1;
 
 let sessionCheckInFlight: Promise<void> | null = null;
 
 const premiumInitialState: PremiumState = {
-  premiumKey: null,
-  userEmail: null,
-  lastVerified: null,
-  isLoading: false,
-  modalOpen: false,
-  currentFeature: '',
-  needsSessionCheck: false,
+	premiumKey: null,
+	userEmail: null,
+	lastVerified: null,
+	isLoading: false,
+	modalOpen: false,
+	currentFeature: "",
+	needsSessionCheck: false,
 };
 
 export const usePremiumStore = create<PremiumStore>()(
-  devtools(
-    persist(
-      (set, get) => ({
-        ...premiumInitialState,
+	devtools(
+		persist(
+			(set, get) => ({
+				...premiumInitialState,
 
-        verifyEmail: async (email: string) => {
-          set({ isLoading: true });
-          try {
-            const result = await verifyPremiumEmail(email);
-            if (result) {
-              get().setPremiumStatus({ email, premiumKey: result.premiumKey });
-              set({ isLoading: false });
-              return true;
-            }
-            set({ isLoading: false });
-            return false;
-          } catch (error) {
-            logClientError('Error verifying premium email in premium store', error, {
-              emailDomain: emailDomain(email),
-              hasEmail: !!email,
-            });
-            set({ isLoading: false });
-            return false;
-          }
-        },
+				verifyEmail: async (email: string) => {
+					set({ isLoading: true });
+					try {
+						const result = await verifyPremiumEmail(email);
+						if (result) {
+							get().setPremiumStatus({ email, premiumKey: result.premiumKey });
+							set({ isLoading: false });
+							return true;
+						}
+						set({ isLoading: false });
+						return false;
+					} catch (error) {
+						logClientError("Error verifying premium email in premium store", error, {
+							emailDomain: emailDomain(email),
+							hasEmail: !!email,
+						});
+						set({ isLoading: false });
+						return false;
+					}
+				},
 
-        checkExistingSession: async ({ force }: { force?: boolean } = {}) => {
-          const { needsSessionCheck } = get();
-          if (!needsSessionCheck && !force) return;
-          if (sessionCheckInFlight) return sessionCheckInFlight;
+				checkExistingSession: async ({ force }: { force?: boolean } = {}) => {
+					const { needsSessionCheck } = get();
+					if (!needsSessionCheck && !force) return;
+					if (sessionCheckInFlight) return sessionCheckInFlight;
 
-          sessionCheckInFlight = (async () => {
-            try {
-              const session = await getExistingSession();
-              set({
-                premiumKey: session?.premiumKey ?? null,
-                userEmail: session?.email ?? null,
-                lastVerified: Date.now(),
-                needsSessionCheck: false,
-              });
-            } catch (error) {
-              logClientError('Error checking existing session in premium store', error, { needsSessionCheck });
-              set({ lastVerified: Date.now(), needsSessionCheck: false });
-            } finally {
-              sessionCheckInFlight = null;
-            }
-          })();
+					sessionCheckInFlight = (async () => {
+						try {
+							const session = await getExistingSession();
+							set({
+								premiumKey: session?.premiumKey ?? null,
+								userEmail: session?.email ?? null,
+								lastVerified: Date.now(),
+								needsSessionCheck: false,
+							});
+						} catch (error) {
+							logClientError("Error checking existing session in premium store", error, { needsSessionCheck });
+							set({ lastVerified: Date.now(), needsSessionCheck: false });
+						} finally {
+							sessionCheckInFlight = null;
+						}
+					})();
 
-          return sessionCheckInFlight;
-        },
+					return sessionCheckInFlight;
+				},
 
-        setEmail: (email: string) => {
-          set({ userEmail: email });
-        },
+				setEmail: (email: string) => {
+					set({ userEmail: email });
+				},
 
-        setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => {
-          const wasPremium = !!get().premiumKey;
+				setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => {
+					const wasPremium = !!get().premiumKey;
 
-          set({
-            premiumKey,
-            userEmail: email,
-            lastVerified: Date.now(),
-            needsSessionCheck: false,
-          });
+					set({
+						premiumKey,
+						userEmail: email,
+						lastVerified: Date.now(),
+						needsSessionCheck: false,
+					});
 
-          if (!wasPremium && premiumKey) {
-            track('premium_activated', { plan: 'premium' });
-          }
-        },
+					if (!wasPremium && premiumKey) {
+						track("premium_activated", { plan: "premium" });
+					}
+				},
 
-        resetPremiumStore: () => {
-          set({ ...premiumInitialState });
-        },
+				resetPremiumStore: () => {
+					set({ ...premiumInitialState });
+				},
 
-        refreshPremiumStatus: async () => {
-          const { userEmail } = get();
-          if (userEmail) {
-            await get().verifyEmail(userEmail);
-          }
-        },
+				refreshPremiumStatus: async () => {
+					const { userEmail } = get();
+					if (userEmail) {
+						await get().verifyEmail(userEmail);
+					}
+				},
 
-        showUpgradeModal: (feature: string) => {
-          set({ currentFeature: feature, modalOpen: true });
-          track('upgrade_modal_opened', { feature });
-        },
+				showUpgradeModal: (feature: string) => {
+					set({ currentFeature: feature, modalOpen: true });
+					track("upgrade_modal_opened", { feature });
+				},
 
-        closeModal: () => {
-          set({ modalOpen: false, currentFeature: '' });
-        },
-      }),
-      {
-        name: STORAGE_NAME,
-        version: STORAGE_VERSION,
-        storage: obfuscatedStorage,
-        partialize: (state) => ({
-          premiumKey: state.premiumKey,
-          userEmail: state.userEmail,
-          lastVerified: state.lastVerified,
-          needsSessionCheck: state.needsSessionCheck,
-        }),
-        onRehydrateStorage: () => (state, error) => {
-          if (error) {
-            onRehydrateFailure({ storeName: STORAGE_NAME, error, state });
-          }
+				closeModal: () => {
+					set({ modalOpen: false, currentFeature: "" });
+				},
+			}),
+			{
+				name: STORAGE_NAME,
+				version: STORAGE_VERSION,
+				storage: obfuscatedStorage,
+				partialize: (state) => ({
+					premiumKey: state.premiumKey,
+					userEmail: state.userEmail,
+					lastVerified: state.lastVerified,
+					needsSessionCheck: state.needsSessionCheck,
+				}),
+				onRehydrateStorage: () => (state, error) => {
+					if (error) {
+						onRehydrateFailure({ storeName: STORAGE_NAME, error, state });
+					}
 
-          if (!state) {
-            logClient((logger) =>
-              logger.warn('No state to rehydrate in premium store', {
-                storeName: STORAGE_NAME,
-              })
-            );
-            return;
-          }
+					if (!state) {
+						logClient((logger) =>
+							logger.warn("No state to rehydrate in premium store", {
+								storeName: STORAGE_NAME,
+							}),
+						);
+						return;
+					}
 
-          if (error || !state.lastVerified || Date.now() - state.lastVerified > TWENTY_FOUR_HOURS) {
-            state.needsSessionCheck = true;
-          }
-        },
-      }
-    ),
-    { name: STORAGE_NAME }
-  )
+					if (error || !state.lastVerified || Date.now() - state.lastVerified > TWENTY_FOUR_HOURS) {
+						state.needsSessionCheck = true;
+					}
+				},
+			},
+		),
+		{ name: STORAGE_NAME },
+	),
 );

@@ -61,7 +61,7 @@ Twenty-one folders under `src/` carry their own `CLAUDE.md`. They are the detail
 
 ```bash
 pnpm test:ut          # 1770 unit tests, co-located with the code
-pnpm test:coverage    # the same, with coverage
+pnpm test:ut:coverage    # the same, with coverage
 pnpm test:e2e         # Playwright, against BASE_URL
 ```
 

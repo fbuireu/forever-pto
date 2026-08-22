@@ -1,141 +1,141 @@
-import { getPublicEnv } from '@infrastructure/services/env/getPublicEnv';
-import { createRichLink } from '@ui/modules/core/primitives/RichLink';
-import { LegalLayout } from '@ui/modules/layout/LegalLayout';
-import { Address } from '@ui/modules/pages/legal/Address';
-import { Me } from '@ui/modules/pages/legal/Me';
-import { Nif } from '@ui/modules/pages/legal/Nif';
-import { getLastUpdatedDate } from '@ui/utils/getLastUpdatedDate';
+import { getPublicEnv } from "@infrastructure/services/env/getPublicEnv";
+import { createRichLink } from "@ui/modules/core/primitives/RichLink";
+import { LegalLayout } from "@ui/modules/layout/LegalLayout";
+import { Address } from "@ui/modules/pages/legal/Address";
+import { Me } from "@ui/modules/pages/legal/Me";
+import { Nif } from "@ui/modules/pages/legal/Nif";
+import { getLastUpdatedDate } from "@ui/utils/getLastUpdatedDate";
 
-const githubLink = createRichLink('https://github.com/fbuireu/forever-pto', { external: true });
+const githubLink = createRichLink("https://github.com/fbuireu/forever-pto", { external: true });
 
-import type { Locale } from 'next-intl';
-import { getTranslations } from 'next-intl/server';
+import type { Locale } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
-export { generateMetadata } from './metadata';
+export { generateMetadata } from "./metadata";
 
 interface LegalNoticePageProps {
-  params: Promise<{ locale: Locale }>;
+	params: Promise<{ locale: Locale }>;
 }
 
 export default async function LegalNoticePage({ params }: LegalNoticePageProps) {
-  const { locale } = await params;
-  const [{ siteUrl, contactEmail }, t] = await Promise.all([
-    getPublicEnv(),
-    getTranslations({ locale, namespace: 'legalNotice' }),
-  ]);
-  const lastUpdatedDate = getLastUpdatedDate(locale);
+	const { locale } = await params;
+	const [{ siteUrl, contactEmail }, t] = await Promise.all([
+		getPublicEnv(),
+		getTranslations({ locale, namespace: "legalNotice" }),
+	]);
+	const lastUpdatedDate = getLastUpdatedDate(locale);
 
-  return (
-    <LegalLayout title={t('title')} lastUpdated={t('lastUpdated', { date: lastUpdatedDate })}>
-      <section>
-        <h2 className='text-2xl font-semibold mt-6 mb-4'>{t('sections.identification.title')}</h2>
-        <p>{t('sections.identification.description')}</p>
-        <ul className='list-disc pl-6 mt-4 space-y-2'>
-          <li>
-            <span className='inline-flex items-center gap-1'>
-              <strong>{t('sections.identification.items.owner.label')}</strong>{' '}
-              <Me ariaLabel={t('sections.identification.items.owner.label')} />
-            </span>
-          </li>
-          <li>
-            <span className='inline-flex items-center gap-1'>
-              <strong>{t('sections.identification.items.nif.label')}</strong>{' '}
-              <Nif ariaLabel={t('sections.identification.items.nif.label')} />
-            </span>
-          </li>
-          <li>
-            <span className='inline-flex items-center gap-1'>
-              <strong>{t('sections.identification.items.address.label')}</strong>{' '}
-              <Address ariaLabel={t('sections.identification.items.address.label')} />
-            </span>
-          </li>
-          <li>
-            <strong>{t('sections.identification.items.email.label')}</strong>{' '}
-            {t('sections.identification.items.email.value', { supportEmail: contactEmail })}
-          </li>
-          <li>
-            <strong>{t('sections.identification.items.website.label')}</strong>{' '}
-            {t('sections.identification.items.website.value', { siteUrl })}
-          </li>
-        </ul>
-      </section>
+	return (
+		<LegalLayout title={t("title")} lastUpdated={t("lastUpdated", { date: lastUpdatedDate })}>
+			<section>
+				<h2 className="text-2xl font-semibold mt-6 mb-4">{t("sections.identification.title")}</h2>
+				<p>{t("sections.identification.description")}</p>
+				<ul className="list-disc pl-6 mt-4 space-y-2">
+					<li>
+						<span className="inline-flex items-center gap-1">
+							<strong>{t("sections.identification.items.owner.label")}</strong>{" "}
+							<Me ariaLabel={t("sections.identification.items.owner.label")} />
+						</span>
+					</li>
+					<li>
+						<span className="inline-flex items-center gap-1">
+							<strong>{t("sections.identification.items.nif.label")}</strong>{" "}
+							<Nif ariaLabel={t("sections.identification.items.nif.label")} />
+						</span>
+					</li>
+					<li>
+						<span className="inline-flex items-center gap-1">
+							<strong>{t("sections.identification.items.address.label")}</strong>{" "}
+							<Address ariaLabel={t("sections.identification.items.address.label")} />
+						</span>
+					</li>
+					<li>
+						<strong>{t("sections.identification.items.email.label")}</strong>{" "}
+						{t("sections.identification.items.email.value", { supportEmail: contactEmail })}
+					</li>
+					<li>
+						<strong>{t("sections.identification.items.website.label")}</strong>{" "}
+						{t("sections.identification.items.website.value", { siteUrl })}
+					</li>
+				</ul>
+			</section>
 
-      <section>
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.purpose.title')}</h2>
-        <p>{t('sections.purpose.description')}</p>
-        <p className='mt-4'>{t('sections.purpose.offers')}</p>
-        <ul className='list-disc pl-6 mt-2 space-y-2'>
-          <li>
-            <strong>{t('sections.purpose.items.freeVersion.label')}</strong>{' '}
-            {t('sections.purpose.items.freeVersion.description')}
-          </li>
-          <li>
-            <strong>{t('sections.purpose.items.premiumVersion.label')}</strong>{' '}
-            {t('sections.purpose.items.premiumVersion.description')}
-          </li>
-        </ul>
-      </section>
+			<section>
+				<h2 className="text-2xl font-semibold mt-8 mb-4">{t("sections.purpose.title")}</h2>
+				<p>{t("sections.purpose.description")}</p>
+				<p className="mt-4">{t("sections.purpose.offers")}</p>
+				<ul className="list-disc pl-6 mt-2 space-y-2">
+					<li>
+						<strong>{t("sections.purpose.items.freeVersion.label")}</strong>{" "}
+						{t("sections.purpose.items.freeVersion.description")}
+					</li>
+					<li>
+						<strong>{t("sections.purpose.items.premiumVersion.label")}</strong>{" "}
+						{t("sections.purpose.items.premiumVersion.description")}
+					</li>
+				</ul>
+			</section>
 
-      <section>
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.accessConditions.title')}</h2>
-        <p>{t('sections.accessConditions.description')}</p>
-        <p className='mt-4'>{t('sections.accessConditions.userAgreement')}</p>
-        <ul className='list-disc pl-6 mt-2 space-y-2'>
-          <li>{t('sections.accessConditions.items.correctUse')}</li>
-          <li>{t('sections.accessConditions.items.noIllegal')}</li>
-          <li>{t('sections.accessConditions.items.noVirus')}</li>
-          <li>{t('sections.accessConditions.items.noUnauthorized')}</li>
-          <li>{t('sections.accessConditions.items.noShareKey')}</li>
-        </ul>
-      </section>
+			<section>
+				<h2 className="text-2xl font-semibold mt-8 mb-4">{t("sections.accessConditions.title")}</h2>
+				<p>{t("sections.accessConditions.description")}</p>
+				<p className="mt-4">{t("sections.accessConditions.userAgreement")}</p>
+				<ul className="list-disc pl-6 mt-2 space-y-2">
+					<li>{t("sections.accessConditions.items.correctUse")}</li>
+					<li>{t("sections.accessConditions.items.noIllegal")}</li>
+					<li>{t("sections.accessConditions.items.noVirus")}</li>
+					<li>{t("sections.accessConditions.items.noUnauthorized")}</li>
+					<li>{t("sections.accessConditions.items.noShareKey")}</li>
+				</ul>
+			</section>
 
-      <section>
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.liability.title')}</h2>
-        <p>{t('sections.liability.description')}</p>
-        <ul className='list-disc pl-6 mt-2 space-y-2'>
-          <li>{t('sections.liability.items.accuracy')}</li>
-          <li>{t('sections.liability.items.decisions')}</li>
-          <li>{t('sections.liability.items.interruptions')}</li>
-          <li>{t('sections.liability.items.misuse')}</li>
-          <li>{t('sections.liability.items.thirdParty')}</li>
-        </ul>
-        <p className='mt-4'>{t('sections.liability.disclaimer')}</p>
-      </section>
+			<section>
+				<h2 className="text-2xl font-semibold mt-8 mb-4">{t("sections.liability.title")}</h2>
+				<p>{t("sections.liability.description")}</p>
+				<ul className="list-disc pl-6 mt-2 space-y-2">
+					<li>{t("sections.liability.items.accuracy")}</li>
+					<li>{t("sections.liability.items.decisions")}</li>
+					<li>{t("sections.liability.items.interruptions")}</li>
+					<li>{t("sections.liability.items.misuse")}</li>
+					<li>{t("sections.liability.items.thirdParty")}</li>
+				</ul>
+				<p className="mt-4">{t("sections.liability.disclaimer")}</p>
+			</section>
 
-      <section>
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.intellectualProperty.title')}</h2>
-        <p>{t('sections.intellectualProperty.p1')}</p>
-        <p className='mt-4'>{t('sections.intellectualProperty.p2')}</p>
-        <p className='mt-4'>{t.rich('sections.intellectualProperty.p3', { link: githubLink })}</p>
-      </section>
+			<section>
+				<h2 className="text-2xl font-semibold mt-8 mb-4">{t("sections.intellectualProperty.title")}</h2>
+				<p>{t("sections.intellectualProperty.p1")}</p>
+				<p className="mt-4">{t("sections.intellectualProperty.p2")}</p>
+				<p className="mt-4">{t.rich("sections.intellectualProperty.p3", { link: githubLink })}</p>
+			</section>
 
-      <section>
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.thirdPartyLinks.title')}</h2>
-        <p>{t('sections.thirdPartyLinks.p1')}</p>
-        <p className='mt-4'>{t('sections.thirdPartyLinks.p2')}</p>
-      </section>
+			<section>
+				<h2 className="text-2xl font-semibold mt-8 mb-4">{t("sections.thirdPartyLinks.title")}</h2>
+				<p>{t("sections.thirdPartyLinks.p1")}</p>
+				<p className="mt-4">{t("sections.thirdPartyLinks.p2")}</p>
+			</section>
 
-      <section>
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.modifications.title')}</h2>
-        <p>{t('sections.modifications.p1')}</p>
-        <p className='mt-4'>{t('sections.modifications.p2')}</p>
-      </section>
+			<section>
+				<h2 className="text-2xl font-semibold mt-8 mb-4">{t("sections.modifications.title")}</h2>
+				<p>{t("sections.modifications.p1")}</p>
+				<p className="mt-4">{t("sections.modifications.p2")}</p>
+			</section>
 
-      <section>
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.applicableLaw.title')}</h2>
-        <p>{t('sections.applicableLaw.description')}</p>
-      </section>
+			<section>
+				<h2 className="text-2xl font-semibold mt-8 mb-4">{t("sections.applicableLaw.title")}</h2>
+				<p>{t("sections.applicableLaw.description")}</p>
+			</section>
 
-      <section>
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>{t('sections.contact.title')}</h2>
-        <p>{t('sections.contact.description')}</p>
-        <ul className='list-disc pl-6 mt-2 space-y-2'>
-          <li>
-            <strong>{t('sections.contact.items.email.label')}</strong>{' '}
-            {t('sections.contact.items.email.value', { supportEmail: contactEmail })}
-          </li>
-        </ul>
-      </section>
-    </LegalLayout>
-  );
+			<section>
+				<h2 className="text-2xl font-semibold mt-8 mb-4">{t("sections.contact.title")}</h2>
+				<p>{t("sections.contact.description")}</p>
+				<ul className="list-disc pl-6 mt-2 space-y-2">
+					<li>
+						<strong>{t("sections.contact.items.email.label")}</strong>{" "}
+						{t("sections.contact.items.email.value", { supportEmail: contactEmail })}
+					</li>
+				</ul>
+			</section>
+		</LegalLayout>
+	);
 }

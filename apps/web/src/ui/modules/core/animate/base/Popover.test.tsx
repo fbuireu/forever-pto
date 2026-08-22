@@ -1,97 +1,97 @@
-import { render } from '@testing-library/react';
-import type { ComponentProps, ReactNode } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { render } from "@testing-library/react";
+import type { ComponentProps, ReactNode } from "react";
+import { describe, expect, it, vi } from "vitest";
 
-vi.mock('../primitives/base/Popover', () => ({
-  Popover: ({ children, ...props }: ComponentProps<'div'>) => (
-    <div data-primitive='popover' {...props}>
-      {children}
-    </div>
-  ),
-  PopoverTrigger: ({ children, ...props }: ComponentProps<'button'>) => (
-    <button data-primitive='popover-trigger' {...props}>
-      {children}
-    </button>
-  ),
-  PopoverPortal: ({ children }: { children?: ReactNode }) => <>{children}</>,
-  PopoverPositioner: ({
-    children,
-    align,
-    sideOffset,
-    className,
-    ...props
-  }: ComponentProps<'div'> & { align?: string; sideOffset?: number }) => (
-    <div
-      data-primitive='popover-positioner'
-      data-align={align}
-      data-side-offset={sideOffset}
-      className={className}
-      {...props}
-    >
-      {children}
-    </div>
-  ),
-  PopoverPopup: ({
-    children,
-    className,
-    initialFocus: _if,
-    finalFocus: _ff,
-    style,
-    ...props
-  }: ComponentProps<'div'> & { initialFocus?: unknown; finalFocus?: unknown }) => (
-    <div data-primitive='popover-popup' className={className} style={style} {...props}>
-      {children}
-    </div>
-  ),
+vi.mock("../primitives/base/Popover", () => ({
+	Popover: ({ children, ...props }: ComponentProps<"div">) => (
+		<div data-primitive="popover" {...props}>
+			{children}
+		</div>
+	),
+	PopoverTrigger: ({ children, ...props }: ComponentProps<"button">) => (
+		<button data-primitive="popover-trigger" {...props}>
+			{children}
+		</button>
+	),
+	PopoverPortal: ({ children }: { children?: ReactNode }) => <>{children}</>,
+	PopoverPositioner: ({
+		children,
+		align,
+		sideOffset,
+		className,
+		...props
+	}: ComponentProps<"div"> & { align?: string; sideOffset?: number }) => (
+		<div
+			data-primitive="popover-positioner"
+			data-align={align}
+			data-side-offset={sideOffset}
+			className={className}
+			{...props}
+		>
+			{children}
+		</div>
+	),
+	PopoverPopup: ({
+		children,
+		className,
+		initialFocus: _if,
+		finalFocus: _ff,
+		style,
+		...props
+	}: ComponentProps<"div"> & { initialFocus?: unknown; finalFocus?: unknown }) => (
+		<div data-primitive="popover-popup" className={className} style={style} {...props}>
+			{children}
+		</div>
+	),
 }));
 
-import { Popover, PopoverContent, PopoverTrigger } from './Popover';
+import { Popover, PopoverContent, PopoverTrigger } from "./Popover";
 
-describe('Popover', () => {
-  it('renders without throwing', () => {
-    expect(() =>
-      render(
-        <Popover>
-          <span />
-        </Popover>
-      )
-    ).not.toThrow();
-  });
+describe("Popover", () => {
+	it("renders without throwing", () => {
+		expect(() =>
+			render(
+				<Popover>
+					<span />
+				</Popover>,
+			),
+		).not.toThrow();
+	});
 });
 
-describe('PopoverTrigger', () => {
-  it('renders without throwing', () => {
-    expect(() => render(<PopoverTrigger>open</PopoverTrigger>)).not.toThrow();
-  });
+describe("PopoverTrigger", () => {
+	it("renders without throwing", () => {
+		expect(() => render(<PopoverTrigger>open</PopoverTrigger>)).not.toThrow();
+	});
 });
 
-describe('PopoverContent', () => {
-  it('renders without throwing', () => {
-    expect(() => render(<PopoverContent>content</PopoverContent>)).not.toThrow();
-  });
+describe("PopoverContent", () => {
+	it("renders without throwing", () => {
+		expect(() => render(<PopoverContent>content</PopoverContent>)).not.toThrow();
+	});
 
-  it('applies className onto the popup', () => {
-    const { container } = render(<PopoverContent className='custom-class'>content</PopoverContent>);
-    expect(container.querySelector('[data-primitive="popover-popup"]')?.className).toContain('custom-class');
-  });
+	it("applies className onto the popup", () => {
+		const { container } = render(<PopoverContent className="custom-class">content</PopoverContent>);
+		expect(container.querySelector('[data-primitive="popover-popup"]')?.className).toContain("custom-class");
+	});
 
-  it('passes align to the positioner (default center)', () => {
-    const { container } = render(<PopoverContent>content</PopoverContent>);
-    expect(container.querySelector<HTMLElement>('[data-primitive="popover-positioner"]')?.dataset.align).toBe('center');
-  });
+	it("passes align to the positioner (default center)", () => {
+		const { container } = render(<PopoverContent>content</PopoverContent>);
+		expect(container.querySelector<HTMLElement>('[data-primitive="popover-positioner"]')?.dataset.align).toBe("center");
+	});
 
-  it('passes sideOffset to the positioner (default 4)', () => {
-    const { container } = render(<PopoverContent>content</PopoverContent>);
-    expect(container.querySelector<HTMLElement>('[data-primitive="popover-positioner"]')?.dataset.sideOffset).toBe('4');
-  });
+	it("passes sideOffset to the positioner (default 4)", () => {
+		const { container } = render(<PopoverContent>content</PopoverContent>);
+		expect(container.querySelector<HTMLElement>('[data-primitive="popover-positioner"]')?.dataset.sideOffset).toBe("4");
+	});
 
-  it('respects a custom align', () => {
-    const { container } = render(<PopoverContent align='start'>content</PopoverContent>);
-    expect(container.querySelector<HTMLElement>('[data-primitive="popover-positioner"]')?.dataset.align).toBe('start');
-  });
+	it("respects a custom align", () => {
+		const { container } = render(<PopoverContent align="start">content</PopoverContent>);
+		expect(container.querySelector<HTMLElement>('[data-primitive="popover-positioner"]')?.dataset.align).toBe("start");
+	});
 
-  it('applies positionerClassName to the positioner', () => {
-    const { container } = render(<PopoverContent positionerClassName='positioner-class'>content</PopoverContent>);
-    expect(container.querySelector('[data-primitive="popover-positioner"]')?.className).toContain('positioner-class');
-  });
+	it("applies positionerClassName to the positioner", () => {
+		const { container } = render(<PopoverContent positionerClassName="positioner-class">content</PopoverContent>);
+		expect(container.querySelector('[data-primitive="popover-positioner"]')?.className).toContain("positioner-class");
+	});
 });

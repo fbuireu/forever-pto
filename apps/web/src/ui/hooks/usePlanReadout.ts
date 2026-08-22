@@ -1,53 +1,53 @@
-'use client';
+"use client";
 
-import { useFiltersStore } from '@application/stores/filters';
-import { useHolidaysStore } from '@application/stores/holidays';
-import { measureBudget } from '@domain/calendar/utils/budget';
-import { resolveSelectedDays } from '@domain/calendar/utils/selection';
-import { useEffect, useRef } from 'react';
-import { useShallow } from 'zustand/react/shallow';
+import { useFiltersStore } from "@application/stores/filters";
+import { useHolidaysStore } from "@application/stores/holidays";
+import { measureBudget } from "@domain/calendar/utils/budget";
+import { resolveSelectedDays } from "@domain/calendar/utils/selection";
+import { useEffect, useRef } from "react";
+import { useShallow } from "zustand/react/shallow";
 
 export const usePlanReadout = () => {
-  const ptoDays = useFiltersStore((state) => state.ptoDays);
-  const { currentSelection, suggestion, manuallySelectedDays, removedSuggestedDays, isCalculating } = useHolidaysStore(
-    useShallow((state) => ({
-      currentSelection: state.currentSelection,
-      suggestion: state.suggestion,
-      manuallySelectedDays: state.manuallySelectedDays,
-      removedSuggestedDays: state.removedSuggestedDays,
-      isCalculating: state.isCalculating,
-    }))
-  );
+	const ptoDays = useFiltersStore((state) => state.ptoDays);
+	const { currentSelection, suggestion, manuallySelectedDays, removedSuggestedDays, isCalculating } = useHolidaysStore(
+		useShallow((state) => ({
+			currentSelection: state.currentSelection,
+			suggestion: state.suggestion,
+			manuallySelectedDays: state.manuallySelectedDays,
+			removedSuggestedDays: state.removedSuggestedDays,
+			isCalculating: state.isCalculating,
+		})),
+	);
 
-  const activeSuggestion = currentSelection ?? suggestion;
-  const budget = measureBudget({
-    ptoDays,
-    days: activeSuggestion?.days,
-    manuallySelectedDays,
-    removedSuggestedDays,
-  });
+	const activeSuggestion = currentSelection ?? suggestion;
+	const budget = measureBudget({
+		ptoDays,
+		days: activeSuggestion?.days,
+		manuallySelectedDays,
+		removedSuggestedDays,
+	});
 
-  const lastSettledRemaining = useRef(budget.remaining);
-  useEffect(() => {
-    if (!isCalculating) lastSettledRemaining.current = budget.remaining;
-  });
+	const lastSettledRemaining = useRef(budget.remaining);
+	useEffect(() => {
+		if (!isCalculating) lastSettledRemaining.current = budget.remaining;
+	});
 
-  const placedDays = resolveSelectedDays({
-    days: activeSuggestion?.days ?? [],
-    manuallySelectedDays,
-    removedSuggestedDays,
-  });
+	const placedDays = resolveSelectedDays({
+		days: activeSuggestion?.days ?? [],
+		manuallySelectedDays,
+		removedSuggestedDays,
+	});
 
-  return {
-    activeSuggestion,
-    placedDays,
-    ptoDays,
-    manuallySelectedDays,
-    removedSuggestedDays,
-    suggested: budget.suggested,
-    manual: budget.manual,
-    spent: budget.spent,
-    remaining: isCalculating ? lastSettledRemaining.current : budget.remaining,
-    hasManualChanges: budget.manual > 0 || removedSuggestedDays.length > 0,
-  };
+	return {
+		activeSuggestion,
+		placedDays,
+		ptoDays,
+		manuallySelectedDays,
+		removedSuggestedDays,
+		suggested: budget.suggested,
+		manual: budget.manual,
+		spent: budget.spent,
+		remaining: isCalculating ? lastSettledRemaining.current : budget.remaining,
+		hasManualChanges: budget.manual > 0 || removedSuggestedDays.length > 0,
+	};
 };

@@ -45,10 +45,10 @@ pnpm deploy             # cf:build && opennextjs-cloudflare deploy
 pnpm cf:typegen         # regenerate cloudflare-env.d.ts from wrangler.toml (reference only)
 
 pnpm lint:all           # biome lint over this package
-pnpm lint:ts:typecheck  # tsc --noEmit
+pnpm typecheck  # tsc --noEmit
 
 pnpm test:ut            # vitest run
-pnpm test:coverage      # vitest run --coverage
+pnpm test:ut:coverage      # vitest run --coverage
 pnpm test:e2e           # playwright
 ```
 

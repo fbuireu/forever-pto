@@ -1,3 +1,3 @@
-import { routeMetadata } from '@infrastructure/seo/routeMetadata';
+import { routeMetadata } from "@infrastructure/seo/routeMetadata";
 
-export const generateMetadata = routeMetadata('/legal/legal-notice');
+export const generateMetadata = routeMetadata("/legal/legal-notice");

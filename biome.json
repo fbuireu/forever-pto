@@ -1,53 +1,53 @@
 {
-  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "files": {
-    "includes": ["**", "!apps/web/next-env.d.ts", "!apps/docs/src/styles"]
-  },
-  "css": {
-    "parser": {
-      "tailwindDirectives": true
-    }
-  },
-  "assist": {
-    "actions": {
-      "source": {
-        "organizeImports": "on"
-      }
-    }
-  },
-  "vcs": {
-    "enabled": true,
-    "useIgnoreFile": true,
-    "clientKind": "git",
-    "defaultBranch": "main"
-  },
-  "formatter": {
-    "lineWidth": 120,
-    "lineEnding": "lf",
-    "indentStyle": "space"
-  },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "single",
-      "jsxQuoteStyle": "single",
-      "trailingCommas": "es5"
-    }
-  },
-  "linter": {
-    "includes": ["**", "!**/*.d.ts*", "!**/*.astro"],
-    "rules": {
-      "preset": "recommended",
-      "complexity": {
-        "noImportantStyles": "off"
-      },
-      "suspicious": {
-        "noConsole": {
-          "level": "warn",
-          "options": {
-            "allow": ["warn", "error"]
-          }
-        }
-      }
-    }
-  }
+	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+	"files": {
+		"includes": ["**", "!apps/web/next-env.d.ts", "!apps/docs/src/styles"]
+	},
+	"vcs": {
+		"enabled": true,
+		"useIgnoreFile": true,
+		"clientKind": "git",
+		"defaultBranch": "main"
+	},
+	"assist": {
+		"actions": {
+			"source": {
+				"organizeImports": "on"
+			}
+		}
+	},
+	"formatter": {
+		"lineWidth": 120,
+		"indentStyle": "tab",
+		"lineEnding": "lf"
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
+	},
+	"linter": {
+		"includes": ["**", "!**/*.d.ts*", "!**/*.astro"],
+		"rules": {
+			"preset": "recommended",
+			"complexity": {
+				"noImportantStyles": "off"
+			},
+			"suspicious": {
+				"noConsole": "error"
+			}
+		}
+	},
+	"overrides": [
+		{
+			"includes": ["**/apps/web/src/infrastructure/clients/logging/better-stack/client.ts"],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noConsole": "off"
+					}
+				}
+			}
+		}
+	]
 }

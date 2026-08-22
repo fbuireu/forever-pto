@@ -1,82 +1,82 @@
-import { Temporal } from 'temporal-polyfill';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { Temporal } from "temporal-polyfill";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockCookieStoreSet = vi.fn();
 
 beforeEach(() => {
-  vi.stubGlobal('cookieStore', { set: mockCookieStoreSet });
-  mockCookieStoreSet.mockResolvedValue(undefined);
+	vi.stubGlobal("cookieStore", { set: mockCookieStoreSet });
+	mockCookieStoreSet.mockResolvedValue(undefined);
 });
 
 afterEach(() => {
-  vi.unstubAllGlobals();
-  vi.clearAllMocks();
+	vi.unstubAllGlobals();
+	vi.clearAllMocks();
 });
 
-const { setCookie } = await import('./cookie');
+const { setCookie } = await import("./cookie");
 
-describe('setCookie', () => {
-  it('calls cookieStore.set with name and value', async () => {
-    await setCookie({ name: 'foo', value: 'bar' });
-    expect(mockCookieStoreSet).toHaveBeenCalledWith(expect.objectContaining({ name: 'foo', value: 'bar' }));
-  });
+describe("setCookie", () => {
+	it("calls cookieStore.set with name and value", async () => {
+		await setCookie({ name: "foo", value: "bar" });
+		expect(mockCookieStoreSet).toHaveBeenCalledWith(expect.objectContaining({ name: "foo", value: "bar" }));
+	});
 
-  it('defaults path to /', async () => {
-    await setCookie({ name: 'foo', value: 'bar' });
-    expect(mockCookieStoreSet).toHaveBeenCalledWith(expect.objectContaining({ path: '/' }));
-  });
+	it("defaults path to /", async () => {
+		await setCookie({ name: "foo", value: "bar" });
+		expect(mockCookieStoreSet).toHaveBeenCalledWith(expect.objectContaining({ path: "/" }));
+	});
 
-  it('defaults sameSite to lax', async () => {
-    await setCookie({ name: 'foo', value: 'bar' });
-    expect(mockCookieStoreSet).toHaveBeenCalledWith(expect.objectContaining({ sameSite: 'lax' }));
-  });
+	it("defaults sameSite to lax", async () => {
+		await setCookie({ name: "foo", value: "bar" });
+		expect(mockCookieStoreSet).toHaveBeenCalledWith(expect.objectContaining({ sameSite: "lax" }));
+	});
 
-  it('converts maxAge (seconds) to expires (ms timestamp)', async () => {
-    const fakeInstant = Temporal.Instant.fromEpochMilliseconds(1_000_000_000_000);
-    vi.spyOn(Temporal.Now, 'instant').mockReturnValue(fakeInstant);
-    await setCookie({ name: 'foo', value: 'bar', maxAge: 60 });
-    expect(mockCookieStoreSet).toHaveBeenCalledWith(
-      expect.objectContaining({ expires: fakeInstant.add({ seconds: 60 }).epochMilliseconds })
-    );
-    vi.restoreAllMocks();
-  });
+	it("converts maxAge (seconds) to expires (ms timestamp)", async () => {
+		const fakeInstant = Temporal.Instant.fromEpochMilliseconds(1_000_000_000_000);
+		vi.spyOn(Temporal.Now, "instant").mockReturnValue(fakeInstant);
+		await setCookie({ name: "foo", value: "bar", maxAge: 60 });
+		expect(mockCookieStoreSet).toHaveBeenCalledWith(
+			expect.objectContaining({ expires: fakeInstant.add({ seconds: 60 }).epochMilliseconds }),
+		);
+		vi.restoreAllMocks();
+	});
 
-  it('sets expires to undefined when maxAge is not provided', async () => {
-    await setCookie({ name: 'foo', value: 'bar' });
-    expect(mockCookieStoreSet).toHaveBeenCalledWith(expect.objectContaining({ expires: undefined }));
-  });
+	it("sets expires to undefined when maxAge is not provided", async () => {
+		await setCookie({ name: "foo", value: "bar" });
+		expect(mockCookieStoreSet).toHaveBeenCalledWith(expect.objectContaining({ expires: undefined }));
+	});
 
-  it('respects a custom sameSite option', async () => {
-    await setCookie({ name: 'foo', value: 'bar', sameSite: 'strict' });
-    expect(mockCookieStoreSet).toHaveBeenCalledWith(expect.objectContaining({ sameSite: 'strict' }));
-  });
+	it("respects a custom sameSite option", async () => {
+		await setCookie({ name: "foo", value: "bar", sameSite: "strict" });
+		expect(mockCookieStoreSet).toHaveBeenCalledWith(expect.objectContaining({ sameSite: "strict" }));
+	});
 
-  it('respects a custom path option', async () => {
-    await setCookie({ name: 'foo', value: 'bar', path: '/admin' });
-    expect(mockCookieStoreSet).toHaveBeenCalledWith(expect.objectContaining({ path: '/admin' }));
-  });
+	it("respects a custom path option", async () => {
+		await setCookie({ name: "foo", value: "bar", path: "/admin" });
+		expect(mockCookieStoreSet).toHaveBeenCalledWith(expect.objectContaining({ path: "/admin" }));
+	});
 
-  it('does not include a secure property (handled automatically by the browser)', async () => {
-    await setCookie({ name: 'foo', value: 'bar' });
-    const call = mockCookieStoreSet.mock.calls[0][0] as Record<string, unknown>;
-    expect(call).not.toHaveProperty('secure');
-  });
+	it("does not include a secure property (handled automatically by the browser)", async () => {
+		await setCookie({ name: "foo", value: "bar" });
+		const call = mockCookieStoreSet.mock.calls[0][0] as Record<string, unknown>;
+		expect(call).not.toHaveProperty("secure");
+	});
 });
 
-describe('setCookie without the Cookie Store API', () => {
-  beforeEach(() => {
-    vi.stubGlobal('cookieStore', undefined);
-    // biome-ignore lint/suspicious/noDocumentCookie: clearing the jar is the point of this block's setup
-    document.cookie = '';
-  });
+describe("setCookie without the Cookie Store API", () => {
+	beforeEach(() => {
+		vi.stubGlobal("cookieStore", undefined);
+		// biome-ignore lint/suspicious/noDocumentCookie: clearing the jar is the point of this block's setup
+		document.cookie = "";
+	});
 
-  it('still writes the cookie through document.cookie', async () => {
-    await setCookie({ name: 'sidebar_state', value: 'false', maxAge: 604_800 });
+	it("still writes the cookie through document.cookie", async () => {
+		await setCookie({ name: "sidebar_state", value: "false", maxAge: 604_800 });
 
-    expect(document.cookie).toContain('sidebar_state=false');
-  });
+		expect(document.cookie).toContain("sidebar_state=false");
+	});
 
-  it('does not throw when the global is absent', async () => {
-    await expect(setCookie({ name: 'foo', value: 'bar' })).resolves.toBeUndefined();
-  });
+	it("does not throw when the global is absent", async () => {
+		await expect(setCookie({ name: "foo", value: "bar" })).resolves.toBeUndefined();
+	});
 });

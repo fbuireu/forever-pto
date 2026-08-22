@@ -1,7 +1,7 @@
-import { cacheLife } from 'next/cache';
+import { cacheLife } from "next/cache";
 
 export async function getCurrentYear() {
-  'use cache';
-  cacheLife('days');
-  return new Date().getFullYear();
+	"use cache";
+	cacheLife("days");
+	return new Date().getFullYear();
 }

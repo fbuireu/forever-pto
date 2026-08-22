@@ -1,14 +1,14 @@
-import type { CreatePaymentInput } from '@application/dto/payment/schema';
-import { createPaymentRequest } from '@infrastructure/api/operations/payment';
-import { resolveClientIp } from '@infrastructure/api/operations/types';
-import { parseJsonBody } from '@infrastructure/api/parseJsonBody';
-import { type NextRequest, NextResponse } from 'next/server';
+import type { CreatePaymentInput } from "@application/dto/payment/schema";
+import { createPaymentRequest } from "@infrastructure/api/operations/payment";
+import { resolveClientIp } from "@infrastructure/api/operations/types";
+import { parseJsonBody } from "@infrastructure/api/parseJsonBody";
+import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  const { status, body } = await createPaymentRequest(parseJsonBody<CreatePaymentInput>(request), {
-    userAgent: request.headers.get('user-agent'),
-    ipAddress: resolveClientIp(request.headers),
-  });
+	const { status, body } = await createPaymentRequest(parseJsonBody<CreatePaymentInput>(request), {
+		userAgent: request.headers.get("user-agent"),
+		ipAddress: resolveClientIp(request.headers),
+	});
 
-  return NextResponse.json(body, { status });
+	return NextResponse.json(body, { status });
 }

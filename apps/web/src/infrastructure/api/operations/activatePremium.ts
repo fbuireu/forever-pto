@@ -1,67 +1,67 @@
-import { ApiError, describeFailure } from '@infrastructure/api/errors';
-import type { TursoService } from '@infrastructure/clients/db/turso/service';
-import { LoggerService } from '@infrastructure/clients/logging/better-stack/service';
-import type { StripeServerService } from '@infrastructure/clients/payments/stripe/serverService';
+import { ApiError, describeFailure } from "@infrastructure/api/errors";
+import type { TursoService } from "@infrastructure/clients/db/turso/service";
+import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
+import type { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import type {
-  DatabaseError,
-  PaymentError,
-  RateLimitError,
-  SessionError,
-  ValidationError,
-} from '@infrastructure/errors';
-import { ApplicationLayer } from '@infrastructure/layers';
-import { checkRateLimit } from '@infrastructure/services/payments/rateLimit';
-import { Effect } from 'effect';
-import { after } from 'next/server';
-import { type RequestContext, UNKNOWN_IP } from './types';
+	DatabaseError,
+	PaymentError,
+	RateLimitError,
+	SessionError,
+	ValidationError,
+} from "@infrastructure/errors";
+import { ApplicationLayer } from "@infrastructure/layers";
+import { checkRateLimit } from "@infrastructure/services/payments/rateLimit";
+import { Effect } from "effect";
+import { after } from "next/server";
+import { type RequestContext, UNKNOWN_IP } from "./types";
 
 interface ActivationResult {
-  email: string;
-  premiumKey: string;
-  token: string;
-  deferred: Effect.Effect<void, never, TursoService>;
+	email: string;
+	premiumKey: string;
+	token: string;
+	deferred: Effect.Effect<void, never, TursoService>;
 }
 
 type ActivationFailure = RateLimitError | ValidationError | SessionError | PaymentError | DatabaseError;
 
 export type ActivationOutcome =
-  | { status: 200; token: string; email: string; premiumKey: string; error: null }
-  | { status: 400 | 429 | 500; token: null; email: null; premiumKey: null; error: string };
+	| { status: 200; token: string; email: string; premiumKey: string; error: null }
+	| { status: 400 | 429 | 500; token: null; email: null; premiumKey: null; error: string };
 
 const refused = (status: 400 | 429 | 500, error: string): ActivationOutcome => ({
-  status,
-  token: null,
-  email: null,
-  premiumKey: null,
-  error,
+	status,
+	token: null,
+	email: null,
+	premiumKey: null,
+	error,
 });
 
 export const activatePremiumRequest = (
-  { ipAddress }: Pick<RequestContext, 'ipAddress'>,
-  program: Effect.Effect<ActivationResult, ActivationFailure, StripeServerService | LoggerService | TursoService>
+	{ ipAddress }: Pick<RequestContext, "ipAddress">,
+	program: Effect.Effect<ActivationResult, ActivationFailure, StripeServerService | LoggerService | TursoService>,
 ): Promise<ActivationOutcome> =>
-  Effect.runPromise(
-    checkRateLimit(ipAddress ?? UNKNOWN_IP).pipe(
-      Effect.andThen(() => program),
-      Effect.map(({ email, premiumKey, token, deferred }): ActivationOutcome => {
-        after(() => Effect.runPromise(deferred.pipe(Effect.provide(ApplicationLayer))));
-        return { status: 200, token, email, premiumKey, error: null };
-      }),
-      Effect.catchAll((failure) =>
-        Effect.gen(function* () {
-          const logger = yield* LoggerService;
-          const { status, error } = describeFailure(failure);
+	Effect.runPromise(
+		checkRateLimit(ipAddress ?? UNKNOWN_IP).pipe(
+			Effect.andThen(() => program),
+			Effect.map(({ email, premiumKey, token, deferred }): ActivationOutcome => {
+				after(() => Effect.runPromise(deferred.pipe(Effect.provide(ApplicationLayer))));
+				return { status: 200, token, email, premiumKey, error: null };
+			}),
+			Effect.catchAll((failure) =>
+				Effect.gen(function* () {
+					const logger = yield* LoggerService;
+					const { status, error } = describeFailure(failure);
 
-          if (status >= 500) {
-            logger.error('Premium activation failed', { tag: failure._tag, reason: failure.message });
-          } else {
-            logger.warn('Premium activation refused', { tag: failure._tag, reason: failure.message });
-          }
+					if (status >= 500) {
+						logger.error("Premium activation failed", { tag: failure._tag, reason: failure.message });
+					} else {
+						logger.warn("Premium activation refused", { tag: failure._tag, reason: failure.message });
+					}
 
-          return refused(status as 400 | 429 | 500, error);
-        })
-      ),
-      Effect.provide(ApplicationLayer),
-      Effect.catchAll(() => Effect.succeed(refused(500, ApiError.INTERNAL_ERROR)))
-    )
-  );
+					return refused(status as 400 | 429 | 500, error);
+				}),
+			),
+			Effect.provide(ApplicationLayer),
+			Effect.catchAll(() => Effect.succeed(refused(500, ApiError.INTERNAL_ERROR))),
+		),
+	);

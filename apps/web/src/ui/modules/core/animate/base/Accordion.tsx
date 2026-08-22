@@ -1,174 +1,174 @@
-'use client';
+"use client";
 
-import { Accordion as AccordionPrimitive } from '@base-ui/react/accordion';
-import { cn } from '@ui/utils/cn';
-import { AnimatePresence, type HTMLMotionProps, m, type Transition } from 'motion/react';
+import { Accordion as AccordionPrimitive } from "@base-ui/react/accordion";
+import { cn } from "@ui/utils/cn";
+import { AnimatePresence, type HTMLMotionProps, m, type Transition } from "motion/react";
 import {
-  type ComponentProps,
-  createContext,
-  type ReactNode,
-  use,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+	type ComponentProps,
+	createContext,
+	type ReactNode,
+	use,
+	useEffect,
+	useImperativeHandle,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 
 type AccordionItemContextType = {
-  isOpen: boolean;
-  setIsOpen: (open: boolean) => void;
+	isOpen: boolean;
+	setIsOpen: (open: boolean) => void;
 };
 
 const AccordionItemContext = createContext<AccordionItemContextType | undefined>(undefined);
 
 const useAccordionItem = () => {
-  const context = use(AccordionItemContext);
-  if (!context) {
-    throw new Error('useAccordionItem must be used within an AccordionItem');
-  }
-  return context;
+	const context = use(AccordionItemContext);
+	if (!context) {
+		throw new Error("useAccordionItem must be used within an AccordionItem");
+	}
+	return context;
 };
 
 type AccordionProps = ComponentProps<typeof AccordionPrimitive.Root>;
 
 function Accordion(props: Readonly<AccordionProps>) {
-  return <AccordionPrimitive.Root data-slot='accordion' {...props} />;
+	return <AccordionPrimitive.Root data-slot="accordion" {...props} />;
 }
 
 type AccordionItemProps = ComponentProps<typeof AccordionPrimitive.Item> & {
-  children: ReactNode;
+	children: ReactNode;
 };
 
 function AccordionItem({ className, children, ...props }: AccordionItemProps) {
-  const [isOpen, setIsOpen] = useState(false);
+	const [isOpen, setIsOpen] = useState(false);
 
-  const contextValue = useMemo(() => ({ isOpen, setIsOpen }), [isOpen]);
+	const contextValue = useMemo(() => ({ isOpen, setIsOpen }), [isOpen]);
 
-  return (
-    <AccordionItemContext.Provider value={contextValue}>
-      <AccordionPrimitive.Item
-        data-slot='accordion-item'
-        className={cn('border-b-2 border-(--frame)/18', className)}
-        {...props}
-      >
-        {children}
-      </AccordionPrimitive.Item>
-    </AccordionItemContext.Provider>
-  );
+	return (
+		<AccordionItemContext.Provider value={contextValue}>
+			<AccordionPrimitive.Item
+				data-slot="accordion-item"
+				className={cn("border-b-2 border-(--frame)/18", className)}
+				{...props}
+			>
+				{children}
+			</AccordionPrimitive.Item>
+		</AccordionItemContext.Provider>
+	);
 }
 
 type AccordionTriggerProps = ComponentProps<typeof AccordionPrimitive.Trigger> & {
-  transition?: Transition;
-  chevron?: boolean;
+	transition?: Transition;
+	chevron?: boolean;
 };
 
 function AccordionTrigger({
-  ref,
-  className,
-  children,
-  transition = { type: 'spring', stiffness: 150, damping: 22 },
-  chevron = true,
-  ...props
+	ref,
+	className,
+	children,
+	transition = { type: "spring", stiffness: 150, damping: 22 },
+	chevron = true,
+	...props
 }: AccordionTriggerProps) {
-  const triggerRef = useRef<HTMLButtonElement | null>(null);
-  useImperativeHandle(ref, () => triggerRef.current as HTMLButtonElement);
-  const { isOpen, setIsOpen } = useAccordionItem();
+	const triggerRef = useRef<HTMLButtonElement | null>(null);
+	useImperativeHandle(ref, () => triggerRef.current as HTMLButtonElement);
+	const { isOpen, setIsOpen } = useAccordionItem();
 
-  useEffect(() => {
-    const node = triggerRef.current;
-    if (!node) return;
-    const observer = new MutationObserver((mutationsList) => {
-      mutationsList.forEach((mutation) => {
-        if (mutation.attributeName === 'data-panel-open') {
-          const currentState = node.dataset.panelOpen;
-          setIsOpen(currentState === '');
-        }
-      });
-    });
-    observer.observe(node, {
-      attributes: true,
-      attributeFilter: ['data-panel-open'],
-    });
-    const initialState = node.dataset.panelOpen;
-    setIsOpen(initialState === '');
-    return () => observer.disconnect();
-  }, [setIsOpen]);
+	useEffect(() => {
+		const node = triggerRef.current;
+		if (!node) return;
+		const observer = new MutationObserver((mutationsList) => {
+			mutationsList.forEach((mutation) => {
+				if (mutation.attributeName === "data-panel-open") {
+					const currentState = node.dataset.panelOpen;
+					setIsOpen(currentState === "");
+				}
+			});
+		});
+		observer.observe(node, {
+			attributes: true,
+			attributeFilter: ["data-panel-open"],
+		});
+		const initialState = node.dataset.panelOpen;
+		setIsOpen(initialState === "");
+		return () => observer.disconnect();
+	}, [setIsOpen]);
 
-  return (
-    <AccordionPrimitive.Header data-slot='accordion-header' className='flex'>
-      <AccordionPrimitive.Trigger
-        ref={triggerRef}
-        data-slot='accordion-trigger'
-        className={cn(
-          'flex flex-1 text-start items-center justify-between py-4 font-semibold cursor-pointer outline-none',
-          className
-        )}
-        {...props}
-      >
-        {children}
+	return (
+		<AccordionPrimitive.Header data-slot="accordion-header" className="flex">
+			<AccordionPrimitive.Trigger
+				ref={triggerRef}
+				data-slot="accordion-trigger"
+				className={cn(
+					"flex flex-1 text-start items-center justify-between py-4 font-semibold cursor-pointer outline-none",
+					className,
+				)}
+				{...props}
+			>
+				{children}
 
-        {chevron && (
-          <m.div
-            data-slot='accordion-trigger-chevron'
-            animate={{ rotate: isOpen ? 45 : 0 }}
-            transition={transition}
-            className={cn(
-              'relative hit-area-stable size-7 flex items-center justify-center shrink-0 rounded-md border-[2.5px] border-(--frame) font-black text-lg leading-none select-none transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-(--shadow-brutal-sm)',
-              isOpen ? 'bg-(--frame) text-background' : 'bg-accent text-(--color-brand-ink)'
-            )}
-          >
-            +
-          </m.div>
-        )}
-      </AccordionPrimitive.Trigger>
-    </AccordionPrimitive.Header>
-  );
+				{chevron && (
+					<m.div
+						data-slot="accordion-trigger-chevron"
+						animate={{ rotate: isOpen ? 45 : 0 }}
+						transition={transition}
+						className={cn(
+							"relative hit-area-stable size-7 flex items-center justify-center shrink-0 rounded-md border-[2.5px] border-(--frame) font-black text-lg leading-none select-none transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-(--shadow-brutal-sm)",
+							isOpen ? "bg-(--frame) text-background" : "bg-accent text-(--color-brand-ink)",
+						)}
+					>
+						+
+					</m.div>
+				)}
+			</AccordionPrimitive.Trigger>
+		</AccordionPrimitive.Header>
+	);
 }
 
 type AccordionPanelProps = ComponentProps<typeof AccordionPrimitive.Panel> & {
-  motionProps?: HTMLMotionProps<'div'>;
-  transition?: Transition;
+	motionProps?: HTMLMotionProps<"div">;
+	transition?: Transition;
 };
 
 function AccordionPanel({
-  className,
-  children,
-  transition = { type: 'spring', stiffness: 150, damping: 22 },
-  motionProps,
-  ...props
+	className,
+	children,
+	transition = { type: "spring", stiffness: 150, damping: 22 },
+	motionProps,
+	...props
 }: AccordionPanelProps) {
-  const { isOpen } = useAccordionItem();
+	const { isOpen } = useAccordionItem();
 
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <AccordionPrimitive.Panel
-          hidden={false}
-          keepMounted
-          render={
-            <m.div
-              key='accordion-panel'
-              data-slot='accordion-panel'
-              initial={{ height: 0, opacity: 0, '--mask-stop': '0%' }}
-              animate={{ height: 'auto', opacity: 1, '--mask-stop': '100%' }}
-              exit={{ height: 0, opacity: 0, '--mask-stop': '0%' }}
-              transition={transition}
-              style={{
-                maskImage: 'linear-gradient(black var(--mask-stop), transparent var(--mask-stop))',
-                WebkitMaskImage: 'linear-gradient(black var(--mask-stop), transparent var(--mask-stop))',
-              }}
-              className='overflow-hidden'
-              {...motionProps}
-            >
-              <div className={cn('pb-4 pt-0 text-sm', className)}>{children}</div>
-            </m.div>
-          }
-          {...props}
-        />
-      )}
-    </AnimatePresence>
-  );
+	return (
+		<AnimatePresence>
+			{isOpen && (
+				<AccordionPrimitive.Panel
+					hidden={false}
+					keepMounted
+					render={
+						<m.div
+							key="accordion-panel"
+							data-slot="accordion-panel"
+							initial={{ height: 0, opacity: 0, "--mask-stop": "0%" }}
+							animate={{ height: "auto", opacity: 1, "--mask-stop": "100%" }}
+							exit={{ height: 0, opacity: 0, "--mask-stop": "0%" }}
+							transition={transition}
+							style={{
+								maskImage: "linear-gradient(black var(--mask-stop), transparent var(--mask-stop))",
+								WebkitMaskImage: "linear-gradient(black var(--mask-stop), transparent var(--mask-stop))",
+							}}
+							className="overflow-hidden"
+							{...motionProps}
+						>
+							<div className={cn("pb-4 pt-0 text-sm", className)}>{children}</div>
+						</m.div>
+					}
+					{...props}
+				/>
+			)}
+		</AnimatePresence>
+	);
 }
 
 export { Accordion, AccordionItem, AccordionPanel, AccordionTrigger };

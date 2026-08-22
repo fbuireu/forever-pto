@@ -1,6 +1,3 @@
 {
-  "apps/*/src/**/*.{ts,tsx,js,jsx}": ["pnpm format:changed", "pnpm lint:changed"],
-  "apps/*/e2e/**/*.{ts,tsx,js,jsx}": ["pnpm format:changed", "pnpm lint:changed"],
-  "apps/web/src/**/*.{test,spec}.{ts,tsx,js,jsx}": ["pnpm test:ut:changed"],
-  "tests/**/*.ts": ["pnpm format:changed", "pnpm lint:changed"]
+	"*.{ts,tsx,js,jsx,astro,css,json,jsonc}": "pnpm format"
 }

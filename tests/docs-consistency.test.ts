@@ -1,24 +1,24 @@
-import { execFileSync } from 'node:child_process';
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
-import ts from 'typescript';
-import { describe, expect, it } from 'vitest';
+import { execFileSync } from "node:child_process";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import ts from "typescript";
+import { describe, expect, it } from "vitest";
 
-const ROOT = resolve(__dirname, '..');
-const WEB = 'apps/web';
-const DOCS = 'apps/docs';
+const ROOT = resolve(__dirname, "..");
+const WEB = "apps/web";
+const DOCS = "apps/docs";
 const WORKSPACE_PACKAGES = [WEB, DOCS];
 const PACKAGE_GUIDES = WORKSPACE_PACKAGES.map((pkg) => `${pkg}/CLAUDE.md`);
-const LAYER_ROOTS = ['app', 'application', 'domain', 'infrastructure', 'ui'].map((layer) => `${WEB}/src/${layer}`);
+const LAYER_ROOTS = ["app", "application", "domain", "infrastructure", "ui"].map((layer) => `${WEB}/src/${layer}`);
 const LOCALES_DIR = `${WEB}/src/ui/i18n/messages`;
-const ADR_DIR = 'adr';
-const ADR_TEMPLATE = '0000-adr-template.md';
+const ADR_DIR = "adr";
+const ADR_TEMPLATE = "0000-adr-template.md";
 // Written by `pnpm cf:typegen` into the web package, so it is absent from the tracked tree by design.
-const GENERATED_ENV_TYPES = 'cloudflare-env.d.ts';
+const GENERATED_ENV_TYPES = "cloudflare-env.d.ts";
 const GENERATED_MARKDOWN = new Set([`${WEB}/CHANGELOG.md`]);
 
 // `pnpm <word>` occurrences in a guide that are not package scripts.
-const NON_SCRIPT_PNPM = new Set(['install', 'lint-staged', 'commitlint', 'vitest', 'dlx', 'exec']);
+const NON_SCRIPT_PNPM = new Set(["install", "lint-staged", "commitlint", "vitest", "dlx", "exec"]);
 
 const SOURCE_FILE = /\.(ts|tsx)$/;
 const CODE_SHAPED_SUFFIX = /\.(ts|tsx|json|md)$/;
@@ -40,33 +40,33 @@ const WORKSPACE_PACKAGE_GLOB = /^\s*-\s*['"]?([^'"\s#]+)['"]?\s*$/gm;
 // Everything the repo would ship, staged or not, so a rule fires before the offending file is committed.
 // Ignored paths and vendored tooling under dotfolders are excluded — they are not ours to fix.
 // The index can lie — a stash cycle leaves deleted paths cached — so every entry is confirmed on disk.
-const trackedFiles = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard'], {
-  cwd: ROOT,
-  encoding: 'utf8',
+const trackedFiles = execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard"], {
+	cwd: ROOT,
+	encoding: "utf8",
 })
-  .split('\n')
-  .filter((path) => path.length > 0 && !path.startsWith('.') && existsSync(join(ROOT, path)));
+	.split("\n")
+	.filter((path) => path.length > 0 && !path.startsWith(".") && existsSync(join(ROOT, path)));
 
-const markdownFiles = trackedFiles.filter((path) => path.endsWith('.md'));
-const contentFiles = trackedFiles.filter((path) => path.endsWith('.mdx'));
+const markdownFiles = trackedFiles.filter((path) => path.endsWith(".md"));
+const contentFiles = trackedFiles.filter((path) => path.endsWith(".mdx"));
 const authoredMarkdown = markdownFiles.filter((path) => !GENERATED_MARKDOWN.has(path));
 const sourceFiles = trackedFiles.filter((path) => SOURCE_FILE.test(path));
-const read = (path: string) => readFileSync(join(ROOT, path), 'utf8');
-const readIfPresent = (path: string) => (existsSync(join(ROOT, path)) ? read(path) : '');
+const read = (path: string) => readFileSync(join(ROOT, path), "utf8");
+const readIfPresent = (path: string) => (existsSync(join(ROOT, path)) ? read(path) : "");
 const readJson = (path: string) => JSON.parse(read(path));
 
 const isGitIgnored = (path: string) => {
-  try {
-    execFileSync('git', ['check-ignore', '--no-index', '-q', '--', path], { cwd: ROOT });
-    return true;
-  } catch {
-    return false;
-  }
+	try {
+		execFileSync("git", ["check-ignore", "--no-index", "-q", "--", path], { cwd: ROOT });
+		return true;
+	} catch {
+		return false;
+	}
 };
 
-const rootGuide = read('CLAUDE.md');
+const rootGuide = read("CLAUDE.md");
 const webGuide = readIfPresent(`${WEB}/CLAUDE.md`);
-const rootManifest = readJson('package.json');
+const rootManifest = readJson("package.json");
 const rootScripts: Record<string, string> = rootManifest.scripts ?? {};
 const webScripts: Record<string, string> = readJson(`${WEB}/package.json`).scripts ?? {};
 const webTsconfig = readJson(`${WEB}/tsconfig.json`);
@@ -74,668 +74,668 @@ const webTsconfigOptions: Record<string, unknown> = webTsconfig.compilerOptions;
 const webTsconfigExclude: string[] = webTsconfig.exclude ?? [];
 const webTsconfigPaths: Record<string, string[]> = webTsconfigOptions.paths as Record<string, string[]>;
 
-describe('CONTEXT.md is the domain glossary and nothing else', () => {
-  const glossary = read('CONTEXT.md');
+describe("CONTEXT.md is the domain glossary and nothing else", () => {
+	const glossary = read("CONTEXT.md");
 
-  it('lives only at the repo root', () => {
-    expect(markdownFiles.filter((path) => path.endsWith('/CONTEXT.md'))).toEqual([]);
-  });
+	it("lives only at the repo root", () => {
+		expect(markdownFiles.filter((path) => path.endsWith("/CONTEXT.md"))).toEqual([]);
+	});
 
-  it('is linked from CLAUDE.md so it is discoverable', () => {
-    expect(rootGuide).toContain('CONTEXT.md');
-  });
+	it("is linked from CLAUDE.md so it is discoverable", () => {
+		expect(rootGuide).toContain("CONTEXT.md");
+	});
 
-  it('carries no file paths, identifiers or call signatures', () => {
-    const codeShaped = [...glossary.matchAll(BACKTICKED_TOKEN)]
-      .map((match) => match[1])
-      .filter((token) => token.includes('/') || token.includes('(') || CODE_SHAPED_SUFFIX.test(token));
-    expect(codeShaped).toEqual([]);
-  });
+	it("carries no file paths, identifiers or call signatures", () => {
+		const codeShaped = [...glossary.matchAll(BACKTICKED_TOKEN)]
+			.map((match) => match[1])
+			.filter((token) => token.includes("/") || token.includes("(") || CODE_SHAPED_SUFFIX.test(token));
+		expect(codeShaped).toEqual([]);
+	});
 
-  it('gives every term a definition', () => {
-    const terms = [...glossary.matchAll(GLOSSARY_TERM)];
-    expect(terms.length).toBeGreaterThan(0);
-    const undefined_ = terms.filter(([, , definition]) => {
-      const text = definition.trim();
-      return text.length === 0 || text.startsWith('_Avoid_:');
-    });
-    expect(undefined_.map(([, term]) => term)).toEqual([]);
-  });
+	it("gives every term a definition", () => {
+		const terms = [...glossary.matchAll(GLOSSARY_TERM)];
+		expect(terms.length).toBeGreaterThan(0);
+		const undefined_ = terms.filter(([, , definition]) => {
+			const text = definition.trim();
+			return text.length === 0 || text.startsWith("_Avoid_:");
+		});
+		expect(undefined_.map(([, term]) => term)).toEqual([]);
+	});
 
-  it('never leaves an _Avoid_ list empty', () => {
-    const empty = [...glossary.matchAll(GLOSSARY_AVOID_LINE)].filter(([, list]) => list.trim().length === 0);
-    expect(empty).toEqual([]);
-  });
+	it("never leaves an _Avoid_ list empty", () => {
+		const empty = [...glossary.matchAll(GLOSSARY_AVOID_LINE)].filter(([, list]) => list.trim().length === 0);
+		expect(empty).toEqual([]);
+	});
 
-  it('never lists a term as its own alternative', () => {
-    const selfAvoiding: string[] = [];
-    for (const [, term, , avoided] of glossary.matchAll(GLOSSARY_TERM_WITH_AVOID)) {
-      const alternatives = avoided.split(',').map((entry) => entry.trim().toLowerCase());
-      if (alternatives.includes(term.toLowerCase())) selfAvoiding.push(term);
-    }
-    expect(selfAvoiding).toEqual([]);
-  });
+	it("never lists a term as its own alternative", () => {
+		const selfAvoiding: string[] = [];
+		for (const [, term, , avoided] of glossary.matchAll(GLOSSARY_TERM_WITH_AVOID)) {
+			const alternatives = avoided.split(",").map((entry) => entry.trim().toLowerCase());
+			if (alternatives.includes(term.toLowerCase())) selfAvoiding.push(term);
+		}
+		expect(selfAvoiding).toEqual([]);
+	});
 });
 
-describe('the workspace is shaped the way the guides describe it', () => {
-  const workspaceGlobs = [...read('pnpm-workspace.yaml').matchAll(WORKSPACE_PACKAGE_GLOB)].map(([, glob]) => glob);
+describe("the workspace is shaped the way the guides describe it", () => {
+	const workspaceGlobs = [...read("pnpm-workspace.yaml").matchAll(WORKSPACE_PACKAGE_GLOB)].map(([, glob]) => glob);
 
-  it('declares package globs that match a directory holding a manifest', () => {
-    const dangling = workspaceGlobs.filter((glob) => {
-      const [base] = glob.split('/*');
-      return !existsSync(join(ROOT, base ?? '')) || !statSync(join(ROOT, base ?? '')).isDirectory();
-    });
-    expect(dangling).toEqual([]);
-  });
+	it("declares package globs that match a directory holding a manifest", () => {
+		const dangling = workspaceGlobs.filter((glob) => {
+			const [base] = glob.split("/*");
+			return !existsSync(join(ROOT, base ?? "")) || !statSync(join(ROOT, base ?? "")).isDirectory();
+		});
+		expect(dangling).toEqual([]);
+	});
 
-  it.each(WORKSPACE_PACKAGES)('%s is a workspace member with its own manifest', (pkg) => {
-    expect(existsSync(join(ROOT, pkg, 'package.json'))).toBe(true);
-    expect(workspaceGlobs.some((glob) => pkg.startsWith(glob.replace(/\*$/, '')))).toBe(true);
-  });
+	it.each(WORKSPACE_PACKAGES)("%s is a workspace member with its own manifest", (pkg) => {
+		expect(existsSync(join(ROOT, pkg, "package.json"))).toBe(true);
+		expect(workspaceGlobs.some((glob) => pkg.startsWith(glob.replace(/\*$/, "")))).toBe(true);
+	});
 
-  it.each(WORKSPACE_PACKAGES)('%s explains itself to a human and to an agent', (pkg) => {
-    expect(existsSync(join(ROOT, pkg, 'README.md'))).toBe(true);
-    expect(existsSync(join(ROOT, pkg, 'CLAUDE.md'))).toBe(true);
-    expect(read('README.md')).toContain(`(${pkg}/README.md)`);
-  });
+	it.each(WORKSPACE_PACKAGES)("%s explains itself to a human and to an agent", (pkg) => {
+		expect(existsSync(join(ROOT, pkg, "README.md"))).toBe(true);
+		expect(existsSync(join(ROOT, pkg, "CLAUDE.md"))).toBe(true);
+		expect(read("README.md")).toContain(`(${pkg}/README.md)`);
+	});
 
-  it('keeps the root private, unversioned and dependency-free', () => {
-    expect(rootManifest.private).toBe(true);
-    expect(rootManifest.version).toBe('0.0.0');
-    expect(rootManifest.dependencies).toBeUndefined();
-  });
+	it("keeps the root private, unversioned and dependency-free", () => {
+		expect(rootManifest.private).toBe(true);
+		expect(rootManifest.version).toBe("0.0.0");
+		expect(rootManifest.dependencies).toBeUndefined();
+	});
 
-  it.each(WORKSPACE_PACKAGES)('%s carries no biome config and no lockfile of its own', (pkg) => {
-    expect(existsSync(join(ROOT, pkg, 'biome.json'))).toBe(false);
-    expect(existsSync(join(ROOT, pkg, 'pnpm-lock.yaml'))).toBe(false);
-  });
+	it.each(WORKSPACE_PACKAGES)("%s carries no biome config and no lockfile of its own", (pkg) => {
+		expect(existsSync(join(ROOT, pkg, "biome.json"))).toBe(false);
+		expect(existsSync(join(ROOT, pkg, "pnpm-lock.yaml"))).toBe(false);
+	});
 
-  it("resolves every repo-relative path biome's includes list excludes", () => {
-    const includes: string[] = readJson('biome.json').files.includes;
-    const dangling = includes
-      .filter((entry) => entry.startsWith('!') && !entry.includes('*'))
-      .map((entry) => entry.slice(1))
-      .filter((path) => !existsSync(join(ROOT, path)));
-    expect(dangling).toEqual([]);
-  });
+	it("resolves every repo-relative path biome's includes list excludes", () => {
+		const includes: string[] = readJson("biome.json").files.includes;
+		const dangling = includes
+			.filter((entry) => entry.startsWith("!") && !entry.includes("*"))
+			.map((entry) => entry.slice(1))
+			.filter((path) => !existsSync(join(ROOT, path)));
+		expect(dangling).toEqual([]);
+	});
 
-  it('keeps the web tsconfig beside the next config it is rewritten by', () => {
-    expect(existsSync(join(ROOT, WEB, 'next.config.ts'))).toBe(true);
-    expect(existsSync(join(ROOT, WEB, 'tsconfig.json'))).toBe(true);
-  });
+	it("keeps the web tsconfig beside the next config it is rewritten by", () => {
+		expect(existsSync(join(ROOT, WEB, "next.config.ts"))).toBe(true);
+		expect(existsSync(join(ROOT, WEB, "tsconfig.json"))).toBe(true);
+	});
 });
 
-describe('folder guides exist where they are promised', () => {
-  const nestedGuides = markdownFiles.filter((path) => path !== 'CLAUDE.md' && path.endsWith('CLAUDE.md'));
-  const webSrcGuides = nestedGuides.filter((path) => path.startsWith(`${WEB}/src/`));
+describe("folder guides exist where they are promised", () => {
+	const nestedGuides = markdownFiles.filter((path) => path !== "CLAUDE.md" && path.endsWith("CLAUDE.md"));
+	const webSrcGuides = nestedGuides.filter((path) => path.startsWith(`${WEB}/src/`));
 
-  it.each(LAYER_ROOTS)('%s has a CLAUDE.md', (layer) => {
-    expect(existsSync(join(ROOT, layer, 'CLAUDE.md'))).toBe(true);
-  });
+	it.each(LAYER_ROOTS)("%s has a CLAUDE.md", (layer) => {
+		expect(existsSync(join(ROOT, layer, "CLAUDE.md"))).toBe(true);
+	});
 
-  it.each(PACKAGE_GUIDES)('%s exists', (guide) => {
-    expect(existsSync(join(ROOT, guide))).toBe(true);
-  });
+	it.each(PACKAGE_GUIDES)("%s exists", (guide) => {
+		expect(existsSync(join(ROOT, guide))).toBe(true);
+	});
 
-  // The reverse direction of the link check, in two levels: a guide no index points at will not be read.
-  it('lists every package guide in the root CLAUDE.md', () => {
-    expect(PACKAGE_GUIDES.filter((guide) => !rootGuide.includes(`./${guide}`))).toEqual([]);
-  });
+	// The reverse direction of the link check, in two levels: a guide no index points at will not be read.
+	it("lists every package guide in the root CLAUDE.md", () => {
+		expect(PACKAGE_GUIDES.filter((guide) => !rootGuide.includes(`./${guide}`))).toEqual([]);
+	});
 
-  it('lists every web source guide in the apps/web CLAUDE.md table', () => {
-    expect(webSrcGuides.length).toBeGreaterThan(LAYER_ROOTS.length);
-    const missing = webSrcGuides.filter((path) => !webGuide.includes(`./${path.slice(`${WEB}/`.length)}`));
-    expect(missing).toEqual([]);
-  });
+	it("lists every web source guide in the apps/web CLAUDE.md table", () => {
+		expect(webSrcGuides.length).toBeGreaterThan(LAYER_ROOTS.length);
+		const missing = webSrcGuides.filter((path) => !webGuide.includes(`./${path.slice(`${WEB}/`.length)}`));
+		expect(missing).toEqual([]);
+	});
 
-  // The heading is the guide's only self-identification; a wrong one sends a reader to another folder.
-  it('titles every nested guide with its own folder path, then a body', () => {
-    const malformed = nestedGuides.filter((path) => {
-      const [heading, , body] = read(path).split('\n');
-      return heading !== `# ${dirname(path)}` || !body?.trim();
-    });
-    expect(malformed).toEqual([]);
-  });
+	// The heading is the guide's only self-identification; a wrong one sends a reader to another folder.
+	it("titles every nested guide with its own folder path, then a body", () => {
+		const malformed = nestedGuides.filter((path) => {
+			const [heading, , body] = read(path).split("\n");
+			return heading !== `# ${dirname(path)}` || !body?.trim();
+		});
+		expect(malformed).toEqual([]);
+	});
 });
 
-describe('architecture decision records', () => {
-  const adrs = readdirSync(join(ROOT, ADR_DIR)).filter((file) => file.endsWith('.md'));
-  const decisions = adrs.filter((file) => file !== ADR_TEMPLATE);
+describe("architecture decision records", () => {
+	const adrs = readdirSync(join(ROOT, ADR_DIR)).filter((file) => file.endsWith(".md"));
+	const decisions = adrs.filter((file) => file !== ADR_TEMPLATE);
 
-  it('ships the template the contract tells you to copy', () => {
-    expect(adrs).toContain(ADR_TEMPLATE);
-  });
+	it("ships the template the contract tells you to copy", () => {
+		expect(adrs).toContain(ADR_TEMPLATE);
+	});
 
-  it('are all named NNNN-slug.md', () => {
-    expect(adrs.filter((file) => !ADR_FILENAME.test(file))).toEqual([]);
-  });
+	it("are all named NNNN-slug.md", () => {
+		expect(adrs.filter((file) => !ADR_FILENAME.test(file))).toEqual([]);
+	});
 
-  it('are numbered contiguously from 0001', () => {
-    const numbers = decisions.map((file) => Number(file.slice(0, 4))).sort((a, b) => a - b);
-    expect(numbers).toEqual(numbers.map((_, index) => index + 1));
-  });
+	it("are numbered contiguously from 0001", () => {
+		const numbers = decisions.map((file) => Number(file.slice(0, 4))).sort((a, b) => a - b);
+		expect(numbers).toEqual(numbers.map((_, index) => index + 1));
+	});
 
-  it('carry every section of the template', () => {
-    const incomplete: string[] = [];
-    for (const file of adrs) {
-      const body = read(`${ADR_DIR}/${file}`);
-      const missing = ['## Status', '## Context', '## Decision', '## Consequences'].filter(
-        (section) => !body.includes(`\n${section}\n`)
-      );
-      if (missing.length > 0) incomplete.push(`${file} -> ${missing.join(', ')}`);
-    }
-    expect(incomplete).toEqual([]);
-  });
+	it("carry every section of the template", () => {
+		const incomplete: string[] = [];
+		for (const file of adrs) {
+			const body = read(`${ADR_DIR}/${file}`);
+			const missing = ["## Status", "## Context", "## Decision", "## Consequences"].filter(
+				(section) => !body.includes(`\n${section}\n`),
+			);
+			if (missing.length > 0) incomplete.push(`${file} -> ${missing.join(", ")}`);
+		}
+		expect(incomplete).toEqual([]);
+	});
 
-  it('open with a numbered title matching the filename, then a date', () => {
-    const malformed: string[] = [];
-    for (const file of adrs) {
-      const [heading = '', blank, date = ''] = read(`${ADR_DIR}/${file}`).split('\n');
-      const numbered = ADR_NUMBERED_HEADING.exec(heading);
-      if (!numbered || Number(numbered[1]) !== Number(file.slice(0, 4))) {
-        malformed.push(`${file} -> heading: ${heading}`);
-        continue;
-      }
-      if (blank !== '' || !ADR_DATE_LINE.test(date)) malformed.push(`${file} -> date: ${date}`);
-    }
-    expect(malformed).toEqual([]);
-  });
+	it("open with a numbered title matching the filename, then a date", () => {
+		const malformed: string[] = [];
+		for (const file of adrs) {
+			const [heading = "", blank, date = ""] = read(`${ADR_DIR}/${file}`).split("\n");
+			const numbered = ADR_NUMBERED_HEADING.exec(heading);
+			if (!numbered || Number(numbered[1]) !== Number(file.slice(0, 4))) {
+				malformed.push(`${file} -> heading: ${heading}`);
+				continue;
+			}
+			if (blank !== "" || !ADR_DATE_LINE.test(date)) malformed.push(`${file} -> date: ${date}`);
+		}
+		expect(malformed).toEqual([]);
+	});
 
-  // An ADR only its own folder points at will not be read.
-  it('are each linked from a document outside adr/', () => {
-    const elsewhere = authoredMarkdown.filter((path) => !path.startsWith(`${ADR_DIR}/`)).map(read);
-    const orphaned = decisions.filter((file) => !elsewhere.some((body) => body.includes(file)));
-    expect(orphaned).toEqual([]);
-  });
+	// An ADR only its own folder points at will not be read.
+	it("are each linked from a document outside adr/", () => {
+		const elsewhere = authoredMarkdown.filter((path) => !path.startsWith(`${ADR_DIR}/`)).map(read);
+		const orphaned = decisions.filter((file) => !elsewhere.some((body) => body.includes(file)));
+		expect(orphaned).toEqual([]);
+	});
 });
 
-describe('documentation does not point at things that are gone', () => {
-  const IGNORED_LINK = /^(https?:|mailto:|#|webcal:)/;
+describe("documentation does not point at things that are gone", () => {
+	const IGNORED_LINK = /^(https?:|mailto:|#|webcal:)/;
 
-  it('resolves every relative markdown link', () => {
-    const broken: string[] = [];
-    for (const file of authoredMarkdown) {
-      for (const [, , target] of read(file).matchAll(MARKDOWN_LINK)) {
-        if (IGNORED_LINK.test(target)) continue;
-        const [path] = target.split('#');
-        if (!path) continue;
-        if (!existsSync(resolve(ROOT, dirname(file), path))) broken.push(`${file} -> ${target}`);
-      }
-    }
-    expect(broken).toEqual([]);
-  });
+	it("resolves every relative markdown link", () => {
+		const broken: string[] = [];
+		for (const file of authoredMarkdown) {
+			for (const [, , target] of read(file).matchAll(MARKDOWN_LINK)) {
+				if (IGNORED_LINK.test(target)) continue;
+				const [path] = target.split("#");
+				if (!path) continue;
+				if (!existsSync(resolve(ROOT, dirname(file), path))) broken.push(`${file} -> ${target}`);
+			}
+		}
+		expect(broken).toEqual([]);
+	});
 
-  // Absent from the tracked tree by design, yet the guides have to name it.
-  const GENERATED = new Set([GENERATED_ENV_TYPES]);
+	// Absent from the tracked tree by design, yet the guides have to name it.
+	const GENERATED = new Set([GENERATED_ENV_TYPES]);
 
-  const exists = (token: string) => sourceFiles.some((path) => path === token || path.endsWith(`/${token}`));
-  const citedSourceFiles = (files: string[]) => {
-    const missing: string[] = [];
-    for (const file of files) {
-      for (const [, token] of read(file).matchAll(BACKTICKED_SOURCE_FILE)) {
-        if (token.includes('*') || token.startsWith('.') || GENERATED.has(token)) continue;
-        if (!exists(token)) missing.push(`${file} -> ${token}`);
-      }
-    }
-    return missing;
-  };
+	const exists = (token: string) => sourceFiles.some((path) => path === token || path.endsWith(`/${token}`));
+	const citedSourceFiles = (files: string[]) => {
+		const missing: string[] = [];
+		for (const file of files) {
+			for (const [, token] of read(file).matchAll(BACKTICKED_SOURCE_FILE)) {
+				if (token.includes("*") || token.startsWith(".") || GENERATED.has(token)) continue;
+				if (!exists(token)) missing.push(`${file} -> ${token}`);
+			}
+		}
+		return missing;
+	};
 
-  it('names only source files that still exist somewhere', () => {
-    expect(citedSourceFiles(authoredMarkdown)).toEqual([]);
-  });
+	it("names only source files that still exist somewhere", () => {
+		expect(citedSourceFiles(authoredMarkdown)).toEqual([]);
+	});
 
-  it('names only source files that still exist, in the published wiki too', () => {
-    expect(contentFiles.length).toBeGreaterThan(50);
-    expect(citedSourceFiles(contentFiles)).toEqual([]);
-  });
+	it("names only source files that still exist, in the published wiki too", () => {
+		expect(contentFiles.length).toBeGreaterThan(50);
+		expect(citedSourceFiles(contentFiles)).toEqual([]);
+	});
 
-  // A guide may write `src/…` because it sits inside the package it describes, and the rules above
-  // match a citation by suffix so both forms resolve. The wiki has no such context: `workers/tail`
-  // is a different directory from `src/infrastructure/workers`, and `src/` alone names neither
-  // package. Every repo path it prints has to carry its own prefix.
-  // The root guide forbids a nested CONTEXT.md outright — the name would mean two things, and the
-  // domain-modeling skill reads it as vocabulary. The wiki taught the opposite under a heading of
-  // "CONTEXT.md per folder" and cited five paths that have never existed. A relative-link rule cannot
-  // catch it, because these are prose citations rather than links.
-  it('never teaches a nested CONTEXT.md, which the root guide forbids', () => {
-    const offenders: string[] = [];
-    for (const file of [...authoredMarkdown, ...contentFiles]) {
-      for (const [, token] of read(file).matchAll(NESTED_CONTEXT_CITATION)) {
-        offenders.push(`${file} -> ${token}`);
-      }
-    }
-    expect(offenders).toEqual([]);
-  });
+	// A guide may write `src/…` because it sits inside the package it describes, and the rules above
+	// match a citation by suffix so both forms resolve. The wiki has no such context: `workers/tail`
+	// is a different directory from `src/infrastructure/workers`, and `src/` alone names neither
+	// package. Every repo path it prints has to carry its own prefix.
+	// The root guide forbids a nested CONTEXT.md outright — the name would mean two things, and the
+	// domain-modeling skill reads it as vocabulary. The wiki taught the opposite under a heading of
+	// "CONTEXT.md per folder" and cited five paths that have never existed. A relative-link rule cannot
+	// catch it, because these are prose citations rather than links.
+	it("never teaches a nested CONTEXT.md, which the root guide forbids", () => {
+		const offenders: string[] = [];
+		for (const file of [...authoredMarkdown, ...contentFiles]) {
+			for (const [, token] of read(file).matchAll(NESTED_CONTEXT_CITATION)) {
+				offenders.push(`${file} -> ${token}`);
+			}
+		}
+		expect(offenders).toEqual([]);
+	});
 
-  // `astro check` does not resolve a `@ui/…` specifier that points at nothing: moving Switch from
-  // animate/primitives/base/ to animate/base/ left SwitchDemo importing the old path, `astro check`
-  // reported zero errors, and only `astro build` failed — in the Docs workflow, after the app's own CI
-  // had gone green. The guides claim the `astro check` tail covers this seam; for a missing module it
-  // does not, and this is the cheaper place to catch it than a build is.
-  it('resolves every @ui specifier the docs sources import to a file that exists', () => {
-    const UI_SPECIFIER = /from\s*['"](@ui\/[^'"]+)['"]/g;
-    const dangling: string[] = [];
+	// `astro check` does not resolve a `@ui/…` specifier that points at nothing: moving Switch from
+	// animate/primitives/base/ to animate/base/ left SwitchDemo importing the old path, `astro check`
+	// reported zero errors, and only `astro build` failed — in the Docs workflow, after the app's own CI
+	// had gone green. The guides claim the `astro check` tail covers this seam; for a missing module it
+	// does not, and this is the cheaper place to catch it than a build is.
+	it("resolves every @ui specifier the docs sources import to a file that exists", () => {
+		const UI_SPECIFIER = /from\s*['"](@ui\/[^'"]+)['"]/g;
+		const dangling: string[] = [];
 
-    for (const file of trackedFiles.filter((path) => path.startsWith(`${DOCS}/src/`))) {
-      for (const [, specifier] of read(file).matchAll(UI_SPECIFIER)) {
-        const base = join(ROOT, WEB, 'src/ui', specifier.replace('@ui/', ''));
-        const resolved = [`${base}.tsx`, `${base}.ts`, `${base}/index.tsx`, `${base}/index.ts`, base].some(
-          (candidate) => existsSync(candidate)
-        );
-        if (!resolved) dangling.push(`${file} -> ${specifier}`);
-      }
-    }
+		for (const file of trackedFiles.filter((path) => path.startsWith(`${DOCS}/src/`))) {
+			for (const [, specifier] of read(file).matchAll(UI_SPECIFIER)) {
+				const base = join(ROOT, WEB, "src/ui", specifier.replace("@ui/", ""));
+				const resolved = [`${base}.tsx`, `${base}.ts`, `${base}/index.tsx`, `${base}/index.ts`, base].some(
+					(candidate) => existsSync(candidate),
+				);
+				if (!resolved) dangling.push(`${file} -> ${specifier}`);
+			}
+		}
 
-    expect(dangling).toEqual([]);
-  });
+		expect(dangling).toEqual([]);
+	});
 
-  // The wiki's copy-pasteable Usage blocks are the largest slice of the cross-package seam and the only
-  // one nothing checked: `astro check` registers no MDX plugin, and the citation rules above match file
-  // paths rather than exported symbols. A rename in apps/web silently published a wrong import.
-  it('imports only symbols apps/web still exports, in the published wiki fences', () => {
-    const FENCE = /```(?:tsx?|ts)\n([\s\S]*?)```/g;
-    const UI_IMPORT = /import\s*\{([^}]+)\}\s*from\s*'(@ui\/[^']+)'/g;
+	// The wiki's copy-pasteable Usage blocks are the largest slice of the cross-package seam and the only
+	// one nothing checked: `astro check` registers no MDX plugin, and the citation rules above match file
+	// paths rather than exported symbols. A rename in apps/web silently published a wrong import.
+	it("imports only symbols apps/web still exports, in the published wiki fences", () => {
+		const FENCE = /```(?:tsx?|ts)\n([\s\S]*?)```/g;
+		const UI_IMPORT = /import\s*\{([^}]+)\}\s*from\s*["'](@ui\/[^"']+)["']/g;
 
-    const exportsOf = (specifier: string): Set<string> | null => {
-      const base = join(ROOT, 'apps/web/src/ui', specifier.replace('@ui/', ''));
-      const path = [`${base}.tsx`, `${base}.ts`].find((candidate) => existsSync(candidate));
-      if (!path) return null;
+		const exportsOf = (specifier: string): Set<string> | null => {
+			const base = join(ROOT, "apps/web/src/ui", specifier.replace("@ui/", ""));
+			const path = [`${base}.tsx`, `${base}.ts`].find((candidate) => existsSync(candidate));
+			if (!path) return null;
 
-      const source = readFileSync(path, 'utf8');
-      const names = new Set<string>();
+			const source = readFileSync(path, "utf8");
+			const names = new Set<string>();
 
-      for (const [, name] of source.matchAll(
-        /export\s+(?:declare\s+)?(?:const|let|function|class|interface|type|enum)\s+(\w+)/g
-      )) {
-        names.add(name);
-      }
-      for (const [, group] of source.matchAll(/export\s*\{([^}]+)\}/g)) {
-        for (const entry of group.split(',')) {
-          const alias = entry
-            .trim()
-            .split(/\s+as\s+/)
-            .at(-1);
-          if (alias) names.add(alias.replace(/^type\s+/, '').trim());
-        }
-      }
+			for (const [, name] of source.matchAll(
+				/export\s+(?:declare\s+)?(?:const|let|function|class|interface|type|enum)\s+(\w+)/g,
+			)) {
+				names.add(name);
+			}
+			for (const [, group] of source.matchAll(/export\s*\{([^}]+)\}/g)) {
+				for (const entry of group.split(",")) {
+					const alias = entry
+						.trim()
+						.split(/\s+as\s+/)
+						.at(-1);
+					if (alias) names.add(alias.replace(/^type\s+/, "").trim());
+				}
+			}
 
-      return names;
-    };
+			return names;
+		};
 
-    const offenders: string[] = [];
-    let checked = 0;
+		const offenders: string[] = [];
+		let checked = 0;
 
-    for (const file of contentFiles) {
-      for (const [, fence] of read(file).matchAll(FENCE)) {
-        for (const [, names, specifier] of fence.matchAll(UI_IMPORT)) {
-          const exported = exportsOf(specifier);
-          if (!exported) {
-            offenders.push(`${file} -> ${specifier} (no such module)`);
-            continue;
-          }
-          for (const name of names.split(',').map((entry) => entry.replace(/^type\s+/, '').trim())) {
-            if (!name) continue;
-            checked += 1;
-            if (!exported.has(name)) offenders.push(`${file} -> ${specifier} has no ${name}`);
-          }
-        }
-      }
-    }
+		for (const file of contentFiles) {
+			for (const [, fence] of read(file).matchAll(FENCE)) {
+				for (const [, names, specifier] of fence.matchAll(UI_IMPORT)) {
+					const exported = exportsOf(specifier);
+					if (!exported) {
+						offenders.push(`${file} -> ${specifier} (no such module)`);
+						continue;
+					}
+					for (const name of names.split(",").map((entry) => entry.replace(/^type\s+/, "").trim())) {
+						if (!name) continue;
+						checked += 1;
+						if (!exported.has(name)) offenders.push(`${file} -> ${specifier} has no ${name}`);
+					}
+				}
+			}
+		}
 
-    expect(checked).toBeGreaterThan(50);
-    expect(offenders).toEqual([]);
-  });
+		expect(checked).toBeGreaterThan(50);
+		expect(offenders).toEqual([]);
+	});
 
-  // The docs site imports app sources, so a change under apps/web has to retrigger the docs workflow or
-  // the published site keeps serving the old build. docs.yml enumerates that reach by hand, in two
-  // identical trigger blocks, and nothing compared the list against what the site actually imports.
-  it('triggers the docs workflow on every apps/web path the docs site reaches into', () => {
-    const workflow = read('.github/workflows/docs.yml');
-    const watched = [...workflow.matchAll(/^\s+-\s+'([^']+)'$/gm)]
-      .map(([, path]) => path)
-      .filter((path) => path.startsWith('apps/web'))
-      .map((path) => path.replace(/\/\*\*$/, '').replace(SOURCE_FILE, ''));
+	// The docs site imports app sources, so a change under apps/web has to retrigger the docs workflow or
+	// the published site keeps serving the old build. docs.yml enumerates that reach by hand, in two
+	// identical trigger blocks, and nothing compared the list against what the site actually imports.
+	it("triggers the docs workflow on every apps/web path the docs site reaches into", () => {
+		const workflow = read(".github/workflows/docs.yml");
+		const watched = [...workflow.matchAll(/^\s+-\s+'([^']+)'$/gm)]
+			.map(([, path]) => path)
+			.filter((path) => path.startsWith("apps/web"))
+			.map((path) => path.replace(/\/\*\*$/, "").replace(SOURCE_FILE, ""));
 
-    const docsSources = trackedFiles.filter((path) => path.startsWith(`${DOCS}/src/`));
-    const reached = new Set<string>();
+		const docsSources = trackedFiles.filter((path) => path.startsWith(`${DOCS}/src/`));
+		const reached = new Set<string>();
 
-    for (const file of docsSources) {
-      const source = read(file);
-      for (const [, specifier] of source.matchAll(/from\s+'@ui\/([^']+)'/g)) {
-        reached.add(`${WEB}/src/ui/${specifier}`);
-      }
-      for (const [, specifier] of source.matchAll(/['"(]((?:\.\.\/)+web\/[^'")]+)['")]/g)) {
-        reached.add(join(dirname(file), specifier).replace(/\\/g, '/'));
-      }
-    }
+		for (const file of docsSources) {
+			const source = read(file);
+			for (const [, specifier] of source.matchAll(/from\s+["']@ui\/([^"']+)["']/g)) {
+				reached.add(`${WEB}/src/ui/${specifier}`);
+			}
+			for (const [, specifier] of source.matchAll(/['"(]((?:\.\.\/)+web\/[^'")]+)['")]/g)) {
+				reached.add(join(dirname(file), specifier).replace(/\\/g, "/"));
+			}
+		}
 
-    expect(reached.size).toBeGreaterThan(10);
+		expect(reached.size).toBeGreaterThan(10);
 
-    const unwatched = [...reached].filter((path) => !watched.some((prefix) => path.startsWith(prefix)));
-    expect(unwatched).toEqual([]);
-  });
+		const unwatched = [...reached].filter((path) => !watched.some((prefix) => path.startsWith(prefix)));
+		expect(unwatched).toEqual([]);
+	});
 
-  // An output the `changes` job declares but never writes is the empty string, and a job guarded on
-  // `== 'true'` then never runs — silently, with a green tick, forever. `deploy-tail` shipped that way: the
-  // Filter step wrote `tail=false` on its no-base-commit early exit and nothing at all on the normal path,
-  // so the tail consumer Worker was never deployed while four documents said it was. Nothing catches this
-  // by reading the workflow, because both halves are individually well-formed.
-  it('writes every output the changes job declares, on both paths through its Filter step', () => {
-    const workflow = read('.github/workflows/ci.yml');
-    const declared = [
-      ...(workflow.match(/outputs:\n((?:\s+\w+: \$\{\{ steps\.filter\.outputs\.\w+ \}\}\n)+)/)?.[1] ?? '').matchAll(
-        /^\s+(\w+):/gm
-      ),
-    ].map(([, name]) => name);
-    const script = workflow.slice(workflow.indexOf('        run: |'), workflow.indexOf('\n  lint:'));
-    const [earlyExit, mainPath] = script.split('exit 0');
+	// An output the `changes` job declares but never writes is the empty string, and a job guarded on
+	// `== 'true'` then never runs — silently, with a green tick, forever. `deploy-tail` shipped that way: the
+	// Filter step wrote `tail=false` on its no-base-commit early exit and nothing at all on the normal path,
+	// so the tail consumer Worker was never deployed while four documents said it was. Nothing catches this
+	// by reading the workflow, because both halves are individually well-formed.
+	it("writes every output the changes job declares, on both paths through its Filter step", () => {
+		const workflow = read(".github/workflows/ci.yml");
+		const declared = [
+			...(workflow.match(/outputs:\n((?:\s+\w+: \$\{\{ steps\.filter\.outputs\.\w+ \}\}\n)+)/)?.[1] ?? "").matchAll(
+				/^\s+(\w+):/gm,
+			),
+		].map(([, name]) => name);
+		const script = workflow.slice(workflow.indexOf("        run: |"), workflow.indexOf("\n  lint:"));
+		const [earlyExit, mainPath] = script.split("exit 0");
 
-    expect(declared.length).toBeGreaterThan(1);
-    expect(mainPath, 'the Filter step has no code after its early exit').toBeTruthy();
+		expect(declared.length).toBeGreaterThan(1);
+		expect(mainPath, "the Filter step has no code after its early exit").toBeTruthy();
 
-    const missingFromEarlyExit = declared.filter((name) => !earlyExit.includes(`echo '${name}=`));
-    expect(missingFromEarlyExit, 'not written before the early exit, so it stays empty there').toEqual([]);
+		const missingFromEarlyExit = declared.filter((name) => !earlyExit.includes(`echo '${name}=`));
+		expect(missingFromEarlyExit, "not written before the early exit, so it stays empty there").toEqual([]);
 
-    // Checking the whole script rather than this half is what let the original defect through: `tail` was
-    // written once, on the early-exit path, and a substring search over the script found it there.
-    const missingFromMainPath = declared.filter((name) => !mainPath?.includes(`echo '${name}=`));
-    expect(missingFromMainPath, 'never written on the normal path, so it stays empty on every real run').toEqual([]);
-  });
+		// Checking the whole script rather than this half is what let the original defect through: `tail` was
+		// written once, on the early-exit path, and a substring search over the script found it there.
+		const missingFromMainPath = declared.filter((name) => !mainPath?.includes(`echo '${name}=`));
+		expect(missingFromMainPath, "never written on the normal path, so it stays empty on every real run").toEqual([]);
+	});
 
-  // `cloudflare/wrangler-action` installs the version its `wranglerVersion` input names, so the docs deploy
-  // runs a CLI the manifest does not pin. Renovate bumps the manifest — it is an npm devDependency — and
-  // nothing touches the two workflow literals, so the first bump silently desynchronises them. `apps/web`
-  // has no equivalent exposure: `_deploy-web.yml` runs `pnpm exec wrangler`, which is the pinned one.
-  it('pins wrangler-action to the same wrangler the docs package declares', () => {
-    const declared = readJson(`${DOCS}/package.json`).devDependencies.wrangler;
-    const inputs = [...read('.github/workflows/docs.yml').matchAll(/wranglerVersion: '([^']+)'/g)].map(
-      ([, version]) => version
-    );
+	// `cloudflare/wrangler-action` installs the version its `wranglerVersion` input names, so the docs deploy
+	// runs a CLI the manifest does not pin. Renovate bumps the manifest — it is an npm devDependency — and
+	// nothing touches the two workflow literals, so the first bump silently desynchronises them. `apps/web`
+	// has no equivalent exposure: `_deploy-web.yml` runs `pnpm exec wrangler`, which is the pinned one.
+	it("pins wrangler-action to the same wrangler the docs package declares", () => {
+		const declared = readJson(`${DOCS}/package.json`).devDependencies.wrangler;
+		const inputs = [...read(".github/workflows/docs.yml").matchAll(/wranglerVersion: ["']([^"']+)["']/g)].map(
+			([, version]) => version,
+		);
 
-    expect(inputs.length).toBeGreaterThan(0);
-    expect(inputs.filter((version) => version !== declared)).toEqual([]);
-  });
+		expect(inputs.length).toBeGreaterThan(0);
+		expect(inputs.filter((version) => version !== declared)).toEqual([]);
+	});
 
-  // CONTEXT.md names one canonical term per concept and lists the retired ones, and the root guide says to
-  // use those names "in code, copy and docs". The published wiki is the one place that was unenforced: it
-  // kept a second, diverged glossary that headed a section `FilterStrategy` (Avoid: filter) and described
-  // a Donation as "a premium purchase" (Avoid: purchase).
-  it('heads the published glossary with canonical terms, never retired ones', () => {
-    const glossary = read('CONTEXT.md');
-    const canonical = new Set([...glossary.matchAll(GLOSSARY_TERM)].map(([, term]) => term.toLowerCase()));
-    const retired = new Set(
-      [...glossary.matchAll(GLOSSARY_AVOID_LINE)].flatMap(([, list]) =>
-        list.split(',').map((entry) => entry.trim().toLowerCase())
-      )
-    );
+	// CONTEXT.md names one canonical term per concept and lists the retired ones, and the root guide says to
+	// use those names "in code, copy and docs". The published wiki is the one place that was unenforced: it
+	// kept a second, diverged glossary that headed a section `FilterStrategy` (Avoid: filter) and described
+	// a Donation as "a premium purchase" (Avoid: purchase).
+	it("heads the published glossary with canonical terms, never retired ones", () => {
+		const glossary = read("CONTEXT.md");
+		const canonical = new Set([...glossary.matchAll(GLOSSARY_TERM)].map(([, term]) => term.toLowerCase()));
+		const retired = new Set(
+			[...glossary.matchAll(GLOSSARY_AVOID_LINE)].flatMap(([, list]) =>
+				list.split(",").map((entry) => entry.trim().toLowerCase()),
+			),
+		);
 
-    const wikiGlossary = contentFiles.find((path) => path.endsWith('reference/glossary.mdx'));
-    expect(wikiGlossary).toBeDefined();
+		const wikiGlossary = contentFiles.find((path) => path.endsWith("reference/glossary.mdx"));
+		expect(wikiGlossary).toBeDefined();
 
-    const headings = [...read(wikiGlossary as string).matchAll(/^#{2,4} (.+)$/gm)].map(([, heading]) => heading.trim());
-    expect(headings.length).toBeGreaterThan(3);
+		const headings = [...read(wikiGlossary as string).matchAll(/^#{2,4} (.+)$/gm)].map(([, heading]) => heading.trim());
+		expect(headings.length).toBeGreaterThan(3);
 
-    expect(headings.filter((heading) => retired.has(heading.toLowerCase()))).toEqual([]);
-    expect(headings.filter((heading) => !canonical.has(heading.toLowerCase()))).toEqual([]);
-  });
+		expect(headings.filter((heading) => retired.has(heading.toLowerCase()))).toEqual([]);
+		expect(headings.filter((heading) => !canonical.has(heading.toLowerCase()))).toEqual([]);
+	});
 
-  // IconsGalleryDemo says it is exhaustive, and a rename does break the build through import resolution —
-  // but an addition does not, because ICONS is a hand-written array rather than a union over the directory.
-  // The 23rd icon would simply be absent from the published gallery.
-  it('shows every animated icon in the published gallery', () => {
-    const ICONS_DIR = `${WEB}/src/ui/modules/core/animate/icons`;
-    const shipped = trackedFiles
-      .filter((path) => path.startsWith(`${ICONS_DIR}/`) && path.endsWith('.tsx') && !path.includes('.test.'))
-      .map((path) => path.slice(ICONS_DIR.length + 1).replace('.tsx', ''))
-      .filter((name) => name !== 'Icon');
+	// IconsGalleryDemo says it is exhaustive, and a rename does break the build through import resolution —
+	// but an addition does not, because ICONS is a hand-written array rather than a union over the directory.
+	// The 23rd icon would simply be absent from the published gallery.
+	it("shows every animated icon in the published gallery", () => {
+		const ICONS_DIR = `${WEB}/src/ui/modules/core/animate/icons`;
+		const shipped = trackedFiles
+			.filter((path) => path.startsWith(`${ICONS_DIR}/`) && path.endsWith(".tsx") && !path.includes(".test."))
+			.map((path) => path.slice(ICONS_DIR.length + 1).replace(".tsx", ""))
+			.filter((name) => name !== "Icon");
 
-    const gallery = read(`${DOCS}/src/components/demos/IconsGalleryDemo.tsx`);
-    const listed = new Set(
-      [...gallery.matchAll(/from '@ui\/modules\/core\/animate\/icons\/([^']+)'/g)].map(([, module]) => module)
-    );
+		const gallery = read(`${DOCS}/src/components/demos/IconsGalleryDemo.tsx`);
+		const listed = new Set(
+			[...gallery.matchAll(/from ["']@ui\/modules\/core\/animate\/icons\/([^"']+)["']/g)].map(([, module]) => module),
+		);
 
-    expect(shipped.length).toBeGreaterThan(15);
-    expect(shipped.filter((name) => !listed.has(name))).toEqual([]);
-  });
+		expect(shipped.length).toBeGreaterThan(15);
+		expect(shipped.filter((name) => !listed.has(name))).toEqual([]);
+	});
 
-  // TokenSwatch takes string[], so a renamed token renders `background: var(--gone)` — transparent, which
-  // reads as a legitimate pale colour rather than an error. Nothing else checks these: astro check does not
-  // see .mdx, and the citation rules match file paths.
-  it('names only design tokens the stylesheets still declare', () => {
-    const styles = trackedFiles
-      .filter((path) => path.startsWith(`${WEB}/src/ui/styles/`) && path.endsWith('.css'))
-      .map((path) => read(path))
-      .join('\n');
-    const fontVariables = [...read(`${WEB}/src/app/fonts.ts`).matchAll(/variable: '(--[\w-]+)'/g)].map(
-      ([, token]) => token
-    );
-    const declared = new Set([
-      ...[...styles.matchAll(/^\s*(--[\w-]+)\s*:/gm)].map(([, token]) => token),
-      ...fontVariables,
-    ]);
+	// TokenSwatch takes string[], so a renamed token renders `background: var(--gone)` — transparent, which
+	// reads as a legitimate pale colour rather than an error. Nothing else checks these: astro check does not
+	// see .mdx, and the citation rules match file paths.
+	it("names only design tokens the stylesheets still declare", () => {
+		const styles = trackedFiles
+			.filter((path) => path.startsWith(`${WEB}/src/ui/styles/`) && path.endsWith(".css"))
+			.map((path) => read(path))
+			.join("\n");
+		const fontVariables = [...read(`${WEB}/src/app/fonts.ts`).matchAll(/variable: ["'](--[\w-]+)["']/g)].map(
+			([, token]) => token,
+		);
+		const declared = new Set([
+			...[...styles.matchAll(/^\s*(--[\w-]+)\s*:/gm)].map(([, token]) => token),
+			...fontVariables,
+		]);
 
-    const designSystemPages = contentFiles.filter((path) => path.includes('/design-system/'));
-    const cited = new Set(
-      designSystemPages.flatMap((path) => [...read(path).matchAll(/var\((--[\w-]+)\)/g)].map(([, token]) => token))
-    );
+		const designSystemPages = contentFiles.filter((path) => path.includes("/design-system/"));
+		const cited = new Set(
+			designSystemPages.flatMap((path) => [...read(path).matchAll(/var\((--[\w-]+)\)/g)].map(([, token]) => token)),
+		);
 
-    expect(declared.size).toBeGreaterThan(20);
-    expect([...cited].filter((token) => !declared.has(token))).toEqual([]);
-  });
+		expect(declared.size).toBeGreaterThan(20);
+		expect([...cited].filter((token) => !declared.has(token))).toEqual([]);
+	});
 
-  it('prints repo-relative paths in the published wiki, never package-relative ones', () => {
-    const ambiguous = /^(src|e2e|workers|public)\//;
-    const offenders: string[] = [];
-    for (const file of contentFiles) {
-      for (const [, token] of read(file).matchAll(BACKTICKED_TOKEN)) {
-        if (ambiguous.test(token)) offenders.push(`${file} -> ${token}`);
-      }
-    }
-    expect(offenders).toEqual([]);
-  });
+	it("prints repo-relative paths in the published wiki, never package-relative ones", () => {
+		const ambiguous = /^(src|e2e|workers|public)\//;
+		const offenders: string[] = [];
+		for (const file of contentFiles) {
+			for (const [, token] of read(file).matchAll(BACKTICKED_TOKEN)) {
+				if (ambiguous.test(token)) offenders.push(`${file} -> ${token}`);
+			}
+		}
+		expect(offenders).toEqual([]);
+	});
 });
 
-describe('apps/web/src carries no explanatory comments', () => {
-  // A suppression changes what the linter does, and a generated file's banner is not ours to delete.
-  // Both comment forms count: a11y suppressions on JSX are written `{/* biome-ignore … */}`.
-  const ALLOWED = /(?:\/\/|\/\*)\s*(biome-ignore\b|Auto-generated by\b)/;
-  const webSources = sourceFiles.filter((path) => path.startsWith(`${WEB}/src/`));
+describe("apps/web/src carries no explanatory comments", () => {
+	// A suppression changes what the linter does, and a generated file's banner is not ours to delete.
+	// Both comment forms count: a11y suppressions on JSX are written `{/* biome-ignore … */}`.
+	const ALLOWED = /(?:\/\/|\/\*)\s*(biome-ignore\b|Auto-generated by\b)/;
+	const webSources = sourceFiles.filter((path) => path.startsWith(`${WEB}/src/`));
 
-  // This parses the file rather than matching comment delimiters by hand. Four hand-rolled versions were
-  // written and every one was wrong somewhere: a URL inside a multi-line template read as a comment; a stray
-  // backtick switched the rule off for the rest of the file; an escaped backtick did the same by flipping a
-  // parity count; a character class swallowed the delimiter it was meant to protect. JavaScript's lexical
-  // grammar is not a regular language. Scanning alone is not enough either — only the parser knows whether a
-  // slash opens a regex or divides, which is why `/^\//` in images/loader.ts reads as a comment to a bare
-  // scanner. Comments are trivia, so they hang off node boundaries rather than appearing in the tree.
-  const commentsIn = (path: string, source: string) => {
-    const parsed = ts.createSourceFile(path, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
-    const seen = new Set<number>();
-    const found: { line: number; text: string }[] = [];
+	// This parses the file rather than matching comment delimiters by hand. Four hand-rolled versions were
+	// written and every one was wrong somewhere: a URL inside a multi-line template read as a comment; a stray
+	// backtick switched the rule off for the rest of the file; an escaped backtick did the same by flipping a
+	// parity count; a character class swallowed the delimiter it was meant to protect. JavaScript's lexical
+	// grammar is not a regular language. Scanning alone is not enough either — only the parser knows whether a
+	// slash opens a regex or divides, which is why `/^\//` in images/loader.ts reads as a comment to a bare
+	// scanner. Comments are trivia, so they hang off node boundaries rather than appearing in the tree.
+	const commentsIn = (path: string, source: string) => {
+		const parsed = ts.createSourceFile(path, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+		const seen = new Set<number>();
+		const found: { line: number; text: string }[] = [];
 
-    const collect = (ranges: ts.CommentRange[] | undefined) => {
-      for (const range of ranges ?? []) {
-        if (seen.has(range.pos)) continue;
-        seen.add(range.pos);
-        found.push({
-          line: parsed.getLineAndCharacterOfPosition(range.pos).line + 1,
-          text: source.slice(range.pos, range.end),
-        });
-      }
-    };
+		const collect = (ranges: ts.CommentRange[] | undefined) => {
+			for (const range of ranges ?? []) {
+				if (seen.has(range.pos)) continue;
+				seen.add(range.pos);
+				found.push({
+					line: parsed.getLineAndCharacterOfPosition(range.pos).line + 1,
+					text: source.slice(range.pos, range.end),
+				});
+			}
+		};
 
-    const walk = (node: ts.Node) => {
-      collect(ts.getLeadingCommentRanges(source, node.pos));
-      collect(ts.getTrailingCommentRanges(source, node.end));
-      // `{/* … */}` holds its comment between the braces, so it is trivia of nothing the walk reaches. It
-      // has to be asked for as *trailing* — TypeScript only calls a comment leading when a line break comes
-      // first, and here the brace does. This is the shape every a11y suppression on JSX takes.
-      if (ts.isJsxExpression(node)) collect(ts.getTrailingCommentRanges(source, node.getStart() + 1));
-      // `forEachChild` yields nodes but never punctuation tokens, so a comment sitting against a `{`, `}`,
-      // `]` or `)` is trivia of nothing it reaches — the last line inside a block escaped entirely, which
-      // is how a probe file with an explanatory comment was committed under `src/` while this was green.
-      // `getChildren` includes the tokens, and needs the `setParentNodes` argument above to be true.
-      for (const child of node.getChildren(parsed)) walk(child);
-    };
+		const walk = (node: ts.Node) => {
+			collect(ts.getLeadingCommentRanges(source, node.pos));
+			collect(ts.getTrailingCommentRanges(source, node.end));
+			// `{/* … */}` holds its comment between the braces, so it is trivia of nothing the walk reaches. It
+			// has to be asked for as *trailing* — TypeScript only calls a comment leading when a line break comes
+			// first, and here the brace does. This is the shape every a11y suppression on JSX takes.
+			if (ts.isJsxExpression(node)) collect(ts.getTrailingCommentRanges(source, node.getStart() + 1));
+			// `forEachChild` yields nodes but never punctuation tokens, so a comment sitting against a `{`, `}`,
+			// `]` or `)` is trivia of nothing it reaches — the last line inside a block escaped entirely, which
+			// is how a probe file with an explanatory comment was committed under `src/` while this was green.
+			// `getChildren` includes the tokens, and needs the `setParentNodes` argument above to be true.
+			for (const child of node.getChildren(parsed)) walk(child);
+		};
 
-    walk(parsed);
-    return found.sort((a, b) => a.line - b.line);
-  };
+		walk(parsed);
+		return found.sort((a, b) => a.line - b.line);
+	};
 
-  it('has app sources to check at all', () => {
-    expect(webSources.length).toBeGreaterThan(100);
-  });
+	it("has app sources to check at all", () => {
+		expect(webSources.length).toBeGreaterThan(100);
+	});
 
-  it('leaves the rationale in the folder guides instead', () => {
-    const offenders: string[] = [];
-    for (const file of webSources) {
-      const source = read(file);
-      // parsing every file is what made this rule time out under parallel load; a file holding neither
-      // delimiter anywhere cannot hold a comment, and that is most of them
-      if (!source.includes('//') && !source.includes('/*')) continue;
+	it("leaves the rationale in the folder guides instead", () => {
+		const offenders: string[] = [];
+		for (const file of webSources) {
+			const source = read(file);
+			// parsing every file is what made this rule time out under parallel load; a file holding neither
+			// delimiter anywhere cannot hold a comment, and that is most of them
+			if (!source.includes("//") && !source.includes("/*")) continue;
 
-      for (const { line, text } of commentsIn(file, source)) {
-        if (!ALLOWED.test(text)) offenders.push(`${file}:${line}`);
-      }
-    }
-    expect(offenders).toEqual([]);
-  });
+			for (const { line, text } of commentsIn(file, source)) {
+				if (!ALLOWED.test(text)) offenders.push(`${file}:${line}`);
+			}
+		}
+		expect(offenders).toEqual([]);
+	});
 });
 
-describe('directives sit where the compiler can see them', () => {
-  // A directive is a bare string literal as the file's first statement. Wrap it in parentheses or let an
-  // import sort above it and it silently becomes an ordinary expression: `'use client'` stops applying, the
-  // module is treated as a Server Component, and nothing here notices. Typecheck passes, Biome passes, every
-  // unit test passes — only `next build` fails, in CI, on a full production build. Six planner files spent
-  // several commits in that state after an added import was hoisted over the directive and the formatter
-  // parenthesised what was left behind.
-  const DIRECTIVES = new Set(['use client', 'use server', 'use cache', 'use strict']);
-  const packageSources = sourceFiles.filter(
-    (path) => path.startsWith(`${WEB}/src/`) || path.startsWith(`${DOCS}/src/`)
-  );
+describe("directives sit where the compiler can see them", () => {
+	// A directive is a bare string literal as the file's first statement. Wrap it in parentheses or let an
+	// import sort above it and it silently becomes an ordinary expression: `'use client'` stops applying, the
+	// module is treated as a Server Component, and nothing here notices. Typecheck passes, Biome passes, every
+	// unit test passes — only `next build` fails, in CI, on a full production build. Six planner files spent
+	// several commits in that state after an added import was hoisted over the directive and the formatter
+	// parenthesised what was left behind.
+	const DIRECTIVES = new Set(["use client", "use server", "use cache", "use strict"]);
+	const packageSources = sourceFiles.filter(
+		(path) => path.startsWith(`${WEB}/src/`) || path.startsWith(`${DOCS}/src/`),
+	);
 
-  it('has sources to check at all', () => {
-    expect(packageSources.length).toBeGreaterThan(100);
-  });
+	it("has sources to check at all", () => {
+		expect(packageSources.length).toBeGreaterThan(100);
+	});
 
-  it('keeps every directive a bare string literal in first position', () => {
-    const offenders: string[] = [];
+	it("keeps every directive a bare string literal in first position", () => {
+		const offenders: string[] = [];
 
-    for (const file of packageSources) {
-      const source = read(file);
-      if (!/['"]use (client|server|cache|strict)['"]/.test(source)) continue;
+		for (const file of packageSources) {
+			const source = read(file);
+			if (!/['"]use (client|server|cache|strict)['"]/.test(source)) continue;
 
-      const parsed = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+			const parsed = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
 
-      parsed.statements.forEach((statement, index) => {
-        if (!ts.isExpressionStatement(statement)) return;
+			parsed.statements.forEach((statement, index) => {
+				if (!ts.isExpressionStatement(statement)) return;
 
-        let expression = statement.expression;
-        let parenthesised = false;
-        while (ts.isParenthesizedExpression(expression)) {
-          parenthesised = true;
-          expression = expression.expression;
-        }
-        if (!ts.isStringLiteral(expression) || !DIRECTIVES.has(expression.text)) return;
+				let expression = statement.expression;
+				let parenthesised = false;
+				while (ts.isParenthesizedExpression(expression)) {
+					parenthesised = true;
+					expression = expression.expression;
+				}
+				if (!ts.isStringLiteral(expression) || !DIRECTIVES.has(expression.text)) return;
 
-        const line = parsed.getLineAndCharacterOfPosition(statement.getStart(parsed)).line + 1;
-        if (parenthesised)
-          offenders.push(`${file}:${line} '${expression.text}' is parenthesised, so it is not a directive`);
-        else if (index !== 0) offenders.push(`${file}:${line} '${expression.text}' is not the first statement`);
-      });
-    }
+				const line = parsed.getLineAndCharacterOfPosition(statement.getStart(parsed)).line + 1;
+				if (parenthesised)
+					offenders.push(`${file}:${line} '${expression.text}' is parenthesised, so it is not a directive`);
+				else if (index !== 0) offenders.push(`${file}:${line} '${expression.text}' is not the first statement`);
+			});
+		}
 
-    expect(offenders).toEqual([]);
-  });
+		expect(offenders).toEqual([]);
+	});
 });
 
-describe('the guides describe the project as it is configured', () => {
-  // Backticked `foo/*` tokens are aliases; the dot filter drops the wrangler route pattern
-  // `forever-pto.com/*`. Whole backticked tokens, not substrings: the rule this replaced stripped the
-  // `/*` and searched the raw file, so `@app` matched inside `@application` and `src/*` reduced to `src`,
-  // and either alias could be deleted from the guide with every assertion still green.
-  const documentedAliases = new Set([...webGuide.matchAll(BACKTICKED_ALIAS)].map(([, alias]) => alias));
-  const citedScripts = (guide: string) =>
-    [...new Set([...guide.matchAll(CITED_PNPM_SCRIPT)].map(([, script]) => script))].filter(
-      (script) => !NON_SCRIPT_PNPM.has(script)
-    );
+describe("the guides describe the project as it is configured", () => {
+	// Backticked `foo/*` tokens are aliases; the dot filter drops the wrangler route pattern
+	// `forever-pto.com/*`. Whole backticked tokens, not substrings: the rule this replaced stripped the
+	// `/*` and searched the raw file, so `@app` matched inside `@application` and `src/*` reduced to `src`,
+	// and either alias could be deleted from the guide with every assertion still green.
+	const documentedAliases = new Set([...webGuide.matchAll(BACKTICKED_ALIAS)].map(([, alias]) => alias));
+	const citedScripts = (guide: string) =>
+		[...new Set([...guide.matchAll(CITED_PNPM_SCRIPT)].map(([, script]) => script))].filter(
+			(script) => !NON_SCRIPT_PNPM.has(script),
+		);
 
-  it('cites only root scripts that the root manifest has', () => {
-    expect(citedScripts(rootGuide).filter((script) => !(script in rootScripts))).toEqual([]);
-  });
+	it("cites only root scripts that the root manifest has", () => {
+		expect(citedScripts(rootGuide).filter((script) => !(script in rootScripts))).toEqual([]);
+	});
 
-  // A README is where someone copies a command from, so a script it names has to exist somewhere
-  // a reader could run it: the root, or the package the README belongs to.
-  it.each([
-    ['README.md', rootScripts],
-    [`${WEB}/README.md`, { ...rootScripts, ...webScripts }],
-    [`${DOCS}/README.md`, { ...rootScripts, ...readJson(`${DOCS}/package.json`).scripts }],
-  ])('%s cites only scripts a reader could run', (file, available) => {
-    expect(citedScripts(readIfPresent(file)).filter((script) => !(script in available))).toEqual([]);
-  });
+	// A README is where someone copies a command from, so a script it names has to exist somewhere
+	// a reader could run it: the root, or the package the README belongs to.
+	it.each([
+		["README.md", rootScripts],
+		[`${WEB}/README.md`, { ...rootScripts, ...webScripts }],
+		[`${DOCS}/README.md`, { ...rootScripts, ...readJson(`${DOCS}/package.json`).scripts }],
+	])("%s cites only scripts a reader could run", (file, available) => {
+		expect(citedScripts(readIfPresent(file)).filter((script) => !(script in available))).toEqual([]);
+	});
 
-  it('cites only web scripts that resolve in the web or root manifest', () => {
-    const unknown = citedScripts(webGuide).filter((script) => !(script in webScripts) && !(script in rootScripts));
-    expect(unknown).toEqual([]);
-  });
+	it("cites only web scripts that resolve in the web or root manifest", () => {
+		const unknown = citedScripts(webGuide).filter((script) => !(script in webScripts) && !(script in rootScripts));
+		expect(unknown).toEqual([]);
+	});
 
-  it('documents every path alias the web tsconfig declares', () => {
-    expect(Object.keys(webTsconfigPaths).filter((alias) => !documentedAliases.has(alias))).toEqual([]);
-  });
+	it("documents every path alias the web tsconfig declares", () => {
+		expect(Object.keys(webTsconfigPaths).filter((alias) => !documentedAliases.has(alias))).toEqual([]);
+	});
 
-  it('documents no path alias the web tsconfig does not declare', () => {
-    expect([...documentedAliases].filter((alias) => !(alias in webTsconfigPaths))).toEqual([]);
-  });
+	it("documents no path alias the web tsconfig does not declare", () => {
+		expect([...documentedAliases].filter((alias) => !(alias in webTsconfigPaths))).toEqual([]);
+	});
 
-  it('declares no alias pointing at a directory that does not exist', () => {
-    const dangling = Object.entries(webTsconfigPaths).filter(([, [target]]) => {
-      const path = resolve(ROOT, WEB, (target ?? '').replace(ALIAS_WILDCARD_SUFFIX, ''));
-      return !existsSync(path) || !statSync(path).isDirectory();
-    });
-    expect(dangling.map(([alias]) => alias)).toEqual([]);
-  });
+	it("declares no alias pointing at a directory that does not exist", () => {
+		const dangling = Object.entries(webTsconfigPaths).filter(([, [target]]) => {
+			const path = resolve(ROOT, WEB, (target ?? "").replace(ALIAS_WILDCARD_SUFFIX, ""));
+			return !existsSync(path) || !statSync(path).isDirectory();
+		});
+		expect(dangling.map(([alias]) => alias)).toEqual([]);
+	});
 
-  // `next build` rewrites apps/web/tsconfig.json on every run and fills in its own defaults for any key
-  // that is absent — `strict: false` and `allowJs: true`. Both would land at the next build rather than at
-  // the deletion site, so neither is safe to drop as redundant.
-  it('keeps strict on, because next build writes it false when the key is missing', () => {
-    expect(webTsconfigOptions.strict).toBe(true);
-  });
+	// `next build` rewrites apps/web/tsconfig.json on every run and fills in its own defaults for any key
+	// that is absent — `strict: false` and `allowJs: true`. Both would land at the next build rather than at
+	// the deletion site, so neither is safe to drop as redundant.
+	it("keeps strict on, because next build writes it false when the key is missing", () => {
+		expect(webTsconfigOptions.strict).toBe(true);
+	});
 
-  it('keeps JavaScript out, because next build writes allowJs true when the key is missing', () => {
-    expect(webTsconfigOptions.allowJs).toBe(false);
-  });
+	it("keeps JavaScript out, because next build writes allowJs true when the key is missing", () => {
+		expect(webTsconfigOptions.allowJs).toBe(false);
+	});
 
-  // `include` is `**/*.ts`, so a generated .d.ts at the package root joins the program and the workerd
-  // globals in it replace lib.dom's Response. Both halves of the guard are asserted because either alone
-  // is useless. The ignore half is asked of git rather than matched against .gitignore as a substring,
-  // so an unanchored pattern that stops covering the file is caught.
-  it('keeps the generated Cloudflare env types out of the program and out of git', () => {
-    expect(webTsconfigExclude).toContain(GENERATED_ENV_TYPES);
-    expect(isGitIgnored(`${WEB}/${GENERATED_ENV_TYPES}`)).toBe(true);
-  });
+	// `include` is `**/*.ts`, so a generated .d.ts at the package root joins the program and the workerd
+	// globals in it replace lib.dom's Response. Both halves of the guard are asserted because either alone
+	// is useless. The ignore half is asked of git rather than matched against .gitignore as a substring,
+	// so an unanchored pattern that stops covering the file is caught.
+	it("keeps the generated Cloudflare env types out of the program and out of git", () => {
+		expect(webTsconfigExclude).toContain(GENERATED_ENV_TYPES);
+		expect(isGitIgnored(`${WEB}/${GENERATED_ENV_TYPES}`)).toBe(true);
+	});
 });
 
-describe('translation bundles stay in step', () => {
-  const localeFiles = readdirSync(join(ROOT, LOCALES_DIR)).filter((file) => file.endsWith('.json'));
-  const flatten = (value: unknown, path = '', out: string[] = []) => {
-    if (value && typeof value === 'object' && !Array.isArray(value)) {
-      for (const [key, child] of Object.entries(value)) flatten(child, path ? `${path}.${key}` : key, out);
-    } else out.push(path);
-    return out;
-  };
-  const keysOf = (file: string) => flatten(JSON.parse(read(`${LOCALES_DIR}/${file}`))).sort();
-  const reference = keysOf('en.json');
+describe("translation bundles stay in step", () => {
+	const localeFiles = readdirSync(join(ROOT, LOCALES_DIR)).filter((file) => file.endsWith(".json"));
+	const flatten = (value: unknown, path = "", out: string[] = []) => {
+		if (value && typeof value === "object" && !Array.isArray(value)) {
+			for (const [key, child] of Object.entries(value)) flatten(child, path ? `${path}.${key}` : key, out);
+		} else out.push(path);
+		return out;
+	};
+	const keysOf = (file: string) => flatten(JSON.parse(read(`${LOCALES_DIR}/${file}`))).sort();
+	const reference = keysOf("en.json");
 
-  it('ships more than one locale', () => {
-    expect(localeFiles.length).toBeGreaterThan(1);
-  });
+	it("ships more than one locale", () => {
+		expect(localeFiles.length).toBeGreaterThan(1);
+	});
 
-  it.each(localeFiles.filter((file) => file !== 'en.json'))('%s has exactly the keys en.json has', (file) => {
-    const keys = keysOf(file);
-    expect({
-      missing: reference.filter((key) => !keys.includes(key)),
-      extra: keys.filter((key) => !reference.includes(key)),
-    }).toEqual({ missing: [], extra: [] });
-  });
+	it.each(localeFiles.filter((file) => file !== "en.json"))("%s has exactly the keys en.json has", (file) => {
+		const keys = keysOf(file);
+		expect({
+			missing: reference.filter((key) => !keys.includes(key)),
+			extra: keys.filter((key) => !reference.includes(key)),
+		}).toEqual({ missing: [], extra: [] });
+	});
 });

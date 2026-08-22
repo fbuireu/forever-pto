@@ -1,1 +1,1 @@
-export const emailDomain = (email: string | null | undefined): string | undefined => email?.split('@')[1];
+export const emailDomain = (email: string | null | undefined): string | undefined => email?.split("@")[1];

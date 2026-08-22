@@ -1,188 +1,188 @@
-import type { HolidayDTO } from '@application/dto/holiday/types';
-import { addDays, differenceInDays, isWeekend, startOfToday } from '@application/shared/utils/dates';
-import { Temporal } from 'temporal-polyfill';
-import { PTO_CONSTANTS } from '../const';
-import type { Bridge } from '../types';
-import { createHolidaySet, getCombinationKey, getKey } from './cache';
+import type { HolidayDTO } from "@application/dto/holiday/types";
+import { addDays, differenceInDays, isWeekend, startOfToday } from "@application/shared/utils/dates";
+import { Temporal } from "temporal-polyfill";
+import { PTO_CONSTANTS } from "../const";
+import type { Bridge } from "../types";
+import { createHolidaySet, getCombinationKey, getKey } from "./cache";
 
 interface AnalyzePotentialBridgesParams {
-  ptoDays: Date[];
-  holidaySet: Set<string>;
+	ptoDays: Date[];
+	holidaySet: Set<string>;
 }
 
 function analyzePotentialBridge({ ptoDays, holidaySet }: AnalyzePotentialBridgesParams) {
-  if (ptoDays.length === 0) return null;
-  const {
-    SAFETY_LIMIT,
-    EFFICIENCY: { MINIMUM },
-  } = PTO_CONSTANTS;
+	if (ptoDays.length === 0) return null;
+	const {
+		SAFETY_LIMIT,
+		EFFICIENCY: { MINIMUM },
+	} = PTO_CONSTANTS;
 
-  const sortedDays = ptoDays.toSorted((a, b) => a.getTime() - b.getTime());
-  const firstDay = sortedDays[0];
-  const lastDay = sortedDays[sortedDays.length - 1];
+	const sortedDays = ptoDays.toSorted((a, b) => a.getTime() - b.getTime());
+	const firstDay = sortedDays[0];
+	const lastDay = sortedDays[sortedDays.length - 1];
 
-  let hasAdjacentFreeDay = false;
+	let hasAdjacentFreeDay = false;
 
-  for (const day of sortedDays) {
-    const prevDay = addDays(day, -1);
-    const nextDay = addDays(day, 1);
+	for (const day of sortedDays) {
+		const prevDay = addDays(day, -1);
+		const nextDay = addDays(day, 1);
 
-    const prevIsFree = isWeekend(prevDay) || holidaySet.has(getKey(prevDay));
-    const nextIsFree = isWeekend(nextDay) || holidaySet.has(getKey(nextDay));
+		const prevIsFree = isWeekend(prevDay) || holidaySet.has(getKey(prevDay));
+		const nextIsFree = isWeekend(nextDay) || holidaySet.has(getKey(nextDay));
 
-    if (prevIsFree || nextIsFree) {
-      hasAdjacentFreeDay = true;
-      break;
-    }
-  }
+		if (prevIsFree || nextIsFree) {
+			hasAdjacentFreeDay = true;
+			break;
+		}
+	}
 
-  if (!hasAdjacentFreeDay) {
-    return null;
-  }
+	if (!hasAdjacentFreeDay) {
+		return null;
+	}
 
-  let effectiveStart = firstDay;
-  let effectiveEnd = lastDay;
+	let effectiveStart = firstDay;
+	let effectiveEnd = lastDay;
 
-  let current = addDays(firstDay, -1);
-  let expansionCount = 0;
+	let current = addDays(firstDay, -1);
+	let expansionCount = 0;
 
-  while ((isWeekend(current) || holidaySet.has(getKey(current))) && expansionCount < SAFETY_LIMIT) {
-    effectiveStart = current;
-    current = addDays(current, -1);
-    expansionCount++;
-  }
+	while ((isWeekend(current) || holidaySet.has(getKey(current))) && expansionCount < SAFETY_LIMIT) {
+		effectiveStart = current;
+		current = addDays(current, -1);
+		expansionCount++;
+	}
 
-  current = addDays(lastDay, 1);
-  expansionCount = 0;
+	current = addDays(lastDay, 1);
+	expansionCount = 0;
 
-  while ((isWeekend(current) || holidaySet.has(getKey(current))) && expansionCount < SAFETY_LIMIT) {
-    effectiveEnd = current;
-    current = addDays(current, 1);
-    expansionCount++;
-  }
+	while ((isWeekend(current) || holidaySet.has(getKey(current))) && expansionCount < SAFETY_LIMIT) {
+		effectiveEnd = current;
+		current = addDays(current, 1);
+		expansionCount++;
+	}
 
-  const effectiveDays = differenceInDays(effectiveEnd, effectiveStart) + 1;
-  const efficiency = effectiveDays / ptoDays.length;
+	const effectiveDays = differenceInDays(effectiveEnd, effectiveStart) + 1;
+	const efficiency = effectiveDays / ptoDays.length;
 
-  if (efficiency >= MINIMUM) {
-    return {
-      startDate: effectiveStart,
-      endDate: effectiveEnd,
-      ptoDaysNeeded: ptoDays.length,
-      effectiveDays,
-      efficiency,
-      ptoDays: sortedDays,
-    };
-  }
+	if (efficiency >= MINIMUM) {
+		return {
+			startDate: effectiveStart,
+			endDate: effectiveEnd,
+			ptoDaysNeeded: ptoDays.length,
+			effectiveDays,
+			efficiency,
+			ptoDays: sortedDays,
+		};
+	}
 
-  return null;
+	return null;
 }
 
 export const compareByEfficiency = (a: Bridge, b: Bridge) => {
-  const difference = b.efficiency - a.efficiency;
+	const difference = b.efficiency - a.efficiency;
 
-  if (Math.abs(difference) > PTO_CONSTANTS.BRIDGE_GENERATION.EFFICIENCY_COMPARISON_THRESHOLD) {
-    return difference;
-  }
+	if (Math.abs(difference) > PTO_CONSTANTS.BRIDGE_GENERATION.EFFICIENCY_COMPARISON_THRESHOLD) {
+		return difference;
+	}
 
-  return b.effectiveDays - a.effectiveDays;
+	return b.effectiveDays - a.effectiveDays;
 };
 
 function deduplicateBridges(bridges: Bridge[]) {
-  const seen = new Map<string, Bridge>();
+	const seen = new Map<string, Bridge>();
 
-  for (const bridge of bridges) {
-    const key = getCombinationKey(bridge.ptoDays);
-    const existing = seen.get(key);
+	for (const bridge of bridges) {
+		const key = getCombinationKey(bridge.ptoDays);
+		const existing = seen.get(key);
 
-    if (!existing || bridge.efficiency > existing.efficiency) {
-      seen.set(key, bridge);
-    }
-  }
+		if (!existing || bridge.efficiency > existing.efficiency) {
+			seen.set(key, bridge);
+		}
+	}
 
-  return Array.from(seen.values());
+	return Array.from(seen.values());
 }
 
 interface GetAvailableWorkdaysParams {
-  months: Date[];
-  holidays: HolidayDTO[];
-  allowPastDays: boolean;
-  removedDays?: Date[];
+	months: Date[];
+	holidays: HolidayDTO[];
+	allowPastDays: boolean;
+	removedDays?: Date[];
 }
 
 export function getAvailableWorkdays({
-  months,
-  holidays,
-  allowPastDays,
-  removedDays = [],
+	months,
+	holidays,
+	allowPastDays,
+	removedDays = [],
 }: GetAvailableWorkdaysParams) {
-  const todayTime = startOfToday().getTime();
+	const todayTime = startOfToday().getTime();
 
-  const holidaySet = createHolidaySet(holidays);
-  const removedSet = new Set(removedDays.map((day) => getKey(day)));
-  const workdays: Date[] = [];
+	const holidaySet = createHolidaySet(holidays);
+	const removedSet = new Set(removedDays.map((day) => getKey(day)));
+	const workdays: Date[] = [];
 
-  for (const month of months) {
-    const year = month.getFullYear();
-    const monthNum = month.getMonth();
-    const daysInMonth = Temporal.PlainYearMonth.from({ year, month: monthNum + 1 }).daysInMonth;
+	for (const month of months) {
+		const year = month.getFullYear();
+		const monthNum = month.getMonth();
+		const daysInMonth = Temporal.PlainYearMonth.from({ year, month: monthNum + 1 }).daysInMonth;
 
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(year, monthNum, day);
+		for (let day = 1; day <= daysInMonth; day++) {
+			const date = new Date(year, monthNum, day);
 
-      if (!allowPastDays && date.getTime() < todayTime) continue;
-      if (isWeekend(date)) continue;
-      if (holidaySet.has(getKey(date))) continue;
-      if (removedSet.has(getKey(date))) continue;
+			if (!allowPastDays && date.getTime() < todayTime) continue;
+			if (isWeekend(date)) continue;
+			if (holidaySet.has(getKey(date))) continue;
+			if (removedSet.has(getKey(date))) continue;
 
-      workdays.push(date);
-    }
-  }
+			workdays.push(date);
+		}
+	}
 
-  return workdays;
+	return workdays;
 }
 
 interface FindBridgesParams {
-  availableWorkdays: Date[];
-  holidays: HolidayDTO[];
+	availableWorkdays: Date[];
+	holidays: HolidayDTO[];
 }
 
 export const findBridges = ({ availableWorkdays, holidays }: FindBridgesParams) => {
-  if (availableWorkdays.length === 0) return [];
-  const { MAX_MULTI_DAY_SIZE, MIN_MULTI_DAY_SIZE } = PTO_CONSTANTS.BRIDGE_SEARCH;
+	if (availableWorkdays.length === 0) return [];
+	const { MAX_MULTI_DAY_SIZE, MIN_MULTI_DAY_SIZE } = PTO_CONSTANTS.BRIDGE_SEARCH;
 
-  const holidaySet = createHolidaySet(holidays);
-  const bridges: Bridge[] = [];
+	const holidaySet = createHolidaySet(holidays);
+	const bridges: Bridge[] = [];
 
-  const sortedWorkdays = availableWorkdays.toSorted((a, b) => a.getTime() - b.getTime());
-  const workdaySet = new Set(sortedWorkdays.map((d) => d.getTime()));
+	const sortedWorkdays = availableWorkdays.toSorted((a, b) => a.getTime() - b.getTime());
+	const workdaySet = new Set(sortedWorkdays.map((d) => d.getTime()));
 
-  for (const workday of sortedWorkdays) {
-    const singleBridge = analyzePotentialBridge({ ptoDays: [workday], holidaySet });
-    if (singleBridge) {
-      bridges.push(singleBridge);
-    }
+	for (const workday of sortedWorkdays) {
+		const singleBridge = analyzePotentialBridge({ ptoDays: [workday], holidaySet });
+		if (singleBridge) {
+			bridges.push(singleBridge);
+		}
 
-    for (let size = MIN_MULTI_DAY_SIZE; size <= MAX_MULTI_DAY_SIZE; size++) {
-      const multiDays: Date[] = [workday];
+		for (let size = MIN_MULTI_DAY_SIZE; size <= MAX_MULTI_DAY_SIZE; size++) {
+			const multiDays: Date[] = [workday];
 
-      for (let i = 1; i < size; i++) {
-        const nextDay = addDays(workday, i);
-        if (workdaySet.has(nextDay.getTime())) {
-          multiDays.push(nextDay);
-        } else {
-          break;
-        }
-      }
+			for (let i = 1; i < size; i++) {
+				const nextDay = addDays(workday, i);
+				if (workdaySet.has(nextDay.getTime())) {
+					multiDays.push(nextDay);
+				} else {
+					break;
+				}
+			}
 
-      if (multiDays.length === size) {
-        const multiBridge = analyzePotentialBridge({ ptoDays: multiDays, holidaySet });
-        if (multiBridge) {
-          bridges.push(multiBridge);
-        }
-      }
-    }
-  }
+			if (multiDays.length === size) {
+				const multiBridge = analyzePotentialBridge({ ptoDays: multiDays, holidaySet });
+				if (multiBridge) {
+					bridges.push(multiBridge);
+				}
+			}
+		}
+	}
 
-  return deduplicateBridges(bridges).sort(compareByEfficiency);
+	return deduplicateBridges(bridges).sort(compareByEfficiency);
 };

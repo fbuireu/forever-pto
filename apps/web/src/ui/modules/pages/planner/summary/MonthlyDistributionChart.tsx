@@ -1,92 +1,92 @@
-'use client';
+"use client";
 
-import { formatDate } from '@application/shared/utils/dates';
-import { MONTHS_IN_YEAR } from '@domain/calendar/window';
-import { Card, CardContent, CardHeader, CardTitle } from '@ui/modules/core/primitives/Card';
-import { PremiumFeature } from '@ui/modules/premium/PremiumFeature';
-import { TrendingUp } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
-import { useMemo } from 'react';
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { getMonthNames } from '../utils/helpers';
-import { COLOR_SCHEMES } from './const';
+import { formatDate } from "@application/shared/utils/dates";
+import { MONTHS_IN_YEAR } from "@domain/calendar/window";
+import { Card, CardContent, CardHeader, CardTitle } from "@ui/modules/core/primitives/Card";
+import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
+import { TrendingUp } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { useMemo } from "react";
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { getMonthNames } from "../utils/helpers";
+import { COLOR_SCHEMES } from "./const";
 
 interface MonthlyDistributionChartProps {
-  monthlyDist: number[];
-  year: number;
-  carryOverMonths: number;
+	monthlyDist: number[];
+	year: number;
+	carryOverMonths: number;
 }
 
 export const MonthlyDistributionChart = ({ monthlyDist, year, carryOverMonths }: MonthlyDistributionChartProps) => {
-  const locale = useLocale();
-  const t = useTranslations('charts');
-  const { monthNames, timelineData, monthLabelMap } = useMemo(() => {
-    const totalMonths = MONTHS_IN_YEAR + carryOverMonths;
-    const names = getMonthNames({ locale, monthCount: totalMonths, startYear: year });
-    const paddedMonthlyDist = [...monthlyDist, ...Array(Math.max(0, totalMonths - monthlyDist.length)).fill(0)];
-    const data = paddedMonthlyDist.map((value, index) => ({
-      mes: names[index] || `Month ${index + 1}`,
-      days: value,
-    }));
-    const labelMap = new Map(
-      names.map((name, idx) => [name, formatDate({ date: new Date(year, idx, 1), locale, format: 'LLLL yyyy' })])
-    );
-    return { monthNames: names, timelineData: data, monthLabelMap: labelMap };
-  }, [locale, carryOverMonths, year, monthlyDist]);
+	const locale = useLocale();
+	const t = useTranslations("charts");
+	const { monthNames, timelineData, monthLabelMap } = useMemo(() => {
+		const totalMonths = MONTHS_IN_YEAR + carryOverMonths;
+		const names = getMonthNames({ locale, monthCount: totalMonths, startYear: year });
+		const paddedMonthlyDist = [...monthlyDist, ...Array(Math.max(0, totalMonths - monthlyDist.length)).fill(0)];
+		const data = paddedMonthlyDist.map((value, index) => ({
+			mes: names[index] || `Month ${index + 1}`,
+			days: value,
+		}));
+		const labelMap = new Map(
+			names.map((name, idx) => [name, formatDate({ date: new Date(year, idx, 1), locale, format: "LLLL yyyy" })]),
+		);
+		return { monthNames: names, timelineData: data, monthLabelMap: labelMap };
+	}, [locale, carryOverMonths, year, monthlyDist]);
 
-  const totalDays = monthlyDist.reduce((sum, days) => sum + days, 0);
-  const activeMonths = monthlyDist.filter((days) => days > 0).length;
-  const peakMonthIndex = monthlyDist.indexOf(Math.max(...monthlyDist));
-  const peakMonth = monthNames[peakMonthIndex];
-  const peakDays = Math.max(...monthlyDist);
+	const totalDays = monthlyDist.reduce((sum, days) => sum + days, 0);
+	const activeMonths = monthlyDist.filter((days) => days > 0).length;
+	const peakMonthIndex = monthlyDist.indexOf(Math.max(...monthlyDist));
+	const peakMonth = monthNames[peakMonthIndex];
+	const peakDays = Math.max(...monthlyDist);
 
-  const description = t('timelineDescription', { totalDays, activeMonths, peakMonth, peakDays });
+	const description = t("timelineDescription", { totalDays, activeMonths, peakMonth, peakDays });
 
-  return (
-    <PremiumFeature feature={t('annualTimelineFeature')} description={description} iconSize='size-7' inlineDescription>
-      <Card className='shadow-[var(--shadow-brutal-md)] [contain:layout]'>
-        <CardHeader className='pb-3'>
-          <CardTitle className='flex items-center gap-2 text-base font-display font-semibold'>
-            <TrendingUp className='size-5 text-[var(--color-brand-green)]' />
-            {t('annualTimeline')}
-          </CardTitle>
-          <div className='text-xs text-muted-foreground mt-1'>{description}</div>
-        </CardHeader>
-        <CardContent className='h-64'>
-          <ResponsiveContainer width='100%' height='100%'>
-            <AreaChart data={timelineData} margin={{ top: 20, right: 20, left: 10, bottom: 30 }}>
-              <CartesianGrid strokeDasharray='3 3' stroke='color-mix(in srgb, var(--frame) 20%, transparent)' />
-              <XAxis dataKey='mes' axisLine={false} tickLine={false} fontSize={14} />
-              <YAxis axisLine={false} tickLine={false} fontSize={14} allowDecimals={false} />
-              <Area
-                type={'monotone'}
-                dataKey='days'
-                stroke={COLOR_SCHEMES[3]}
-                fill={COLOR_SCHEMES[3]}
-                fillOpacity={0.3}
-                strokeWidth={3}
-                dot={{ r: 4 }}
-                activeDot={{ r: 6, stroke: COLOR_SCHEMES[3], strokeWidth: 2 }}
-              />
-              <Tooltip
-                formatter={(value) => [`${value} ${t('days')}`, t('daysOffLabel')]}
-                contentStyle={{
-                  backgroundColor: 'var(--primary)',
-                  border: '3px solid var(--frame)',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  color: 'var(--primary-foreground)',
-                  boxShadow: '3px 3px 0 0 var(--accent)',
-                }}
-                itemStyle={{ color: 'var(--primary-foreground)' }}
-                cursor={{ fill: 'color-mix(in srgb, var(--frame) 8%, transparent)' }}
-                labelStyle={{ color: 'var(--primary-foreground)', fontWeight: 700 }}
-                labelFormatter={(label) => monthLabelMap.get(label as string) ?? (label as string)}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-    </PremiumFeature>
-  );
+	return (
+		<PremiumFeature feature={t("annualTimelineFeature")} description={description} iconSize="size-7" inlineDescription>
+			<Card className="shadow-[var(--shadow-brutal-md)] [contain:layout]">
+				<CardHeader className="pb-3">
+					<CardTitle className="flex items-center gap-2 text-base font-display font-semibold">
+						<TrendingUp className="size-5 text-[var(--color-brand-green)]" />
+						{t("annualTimeline")}
+					</CardTitle>
+					<div className="text-xs text-muted-foreground mt-1">{description}</div>
+				</CardHeader>
+				<CardContent className="h-64">
+					<ResponsiveContainer width="100%" height="100%">
+						<AreaChart data={timelineData} margin={{ top: 20, right: 20, left: 10, bottom: 30 }}>
+							<CartesianGrid strokeDasharray="3 3" stroke="color-mix(in srgb, var(--frame) 20%, transparent)" />
+							<XAxis dataKey="mes" axisLine={false} tickLine={false} fontSize={14} />
+							<YAxis axisLine={false} tickLine={false} fontSize={14} allowDecimals={false} />
+							<Area
+								type={"monotone"}
+								dataKey="days"
+								stroke={COLOR_SCHEMES[3]}
+								fill={COLOR_SCHEMES[3]}
+								fillOpacity={0.3}
+								strokeWidth={3}
+								dot={{ r: 4 }}
+								activeDot={{ r: 6, stroke: COLOR_SCHEMES[3], strokeWidth: 2 }}
+							/>
+							<Tooltip
+								formatter={(value) => [`${value} ${t("days")}`, t("daysOffLabel")]}
+								contentStyle={{
+									backgroundColor: "var(--primary)",
+									border: "3px solid var(--frame)",
+									borderRadius: "8px",
+									fontSize: "14px",
+									color: "var(--primary-foreground)",
+									boxShadow: "3px 3px 0 0 var(--accent)",
+								}}
+								itemStyle={{ color: "var(--primary-foreground)" }}
+								cursor={{ fill: "color-mix(in srgb, var(--frame) 8%, transparent)" }}
+								labelStyle={{ color: "var(--primary-foreground)", fontWeight: 700 }}
+								labelFormatter={(label) => monthLabelMap.get(label as string) ?? (label as string)}
+							/>
+						</AreaChart>
+					</ResponsiveContainer>
+				</CardContent>
+			</Card>
+		</PremiumFeature>
+	);
 };

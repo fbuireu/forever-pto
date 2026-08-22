@@ -55,11 +55,11 @@ pnpm cf:typegen         # regenerate apps/web/cloudflare-env.d.ts (reference onl
 
 pnpm lint:all           # biome lint over both packages (:fix to autofix)
 pnpm format:all         # biome check --write over both packages
-pnpm lint:ts:typecheck  # the root program, then apps/web, then apps/docs (astro check)
+pnpm typecheck  # the root program, then apps/web, then apps/docs (astro check)
 
 pnpm test:ut            # apps/web unit tests, then the contract suite
 pnpm test:docs          # the contract suite alone
-pnpm test:coverage      # apps/web with coverage
+pnpm test:ut:coverage      # apps/web with coverage
 pnpm test:e2e           # apps/web playwright
 ```
 
@@ -220,9 +220,10 @@ tests run against the build artifact before the preview Worker exists.
 version from `apps/web/package.json`; without a dispatch after a web release, the published site keeps
 advertising the previous one.
 
-Husky runs `lint-staged` on `pre-commit`, `commitlint` on `commit-msg` and `lint:ts:typecheck` on `pre-push`.
+Husky runs `lint-staged` on `pre-commit`, `commitlint` on `commit-msg` and `verify` on `pre-push` — the same
+command the CI Check job runs, so a green push is a green check.
 
-**`lint:ts:typecheck` ends with `astro check`, and that tail is what puts the cross-package seam in front of
+**`typecheck` ends with `astro check`, and that tail is what puts the cross-package seam in front of
 the author.** The docs site typechecks the 32 demo components against `apps/web`'s real props — a renamed
 `Button` variant fails there because `ButtonDemo`'s `Record<ButtonVariant, string>` is exhaustive — but the
 check used to run only inside `docs.yml`'s `build` job. So an app PR that broke the docs passed `pre-push`,
@@ -319,8 +320,9 @@ relative-link rule could not catch because they were prose rather than links.
 
 ## Gotchas
 
-- **Biome's `noConsole` is a warning with `warn`/`error` allowed**, not an error — `console.log` will not
-  fail the build, so it is on you not to leave one behind.
+- **Biome's `noConsole` is an error with no allowlist** — no `console` at any level, so a stray `console.log`
+  fails the build rather than shipping. The BetterStack client's own unconfigured warning is the single
+  exception, scoped in `biome.json`'s `overrides`: it is the logger, so it has nothing else to call.
 - **`format:changed` and `lint:changed` pass `--changed`, which means "changed against `main`".** On a
   branch that moves or renames a large number of files that is every one of them, and a `pre-commit` hook
   will happily reformat and stage files the commit was never about.

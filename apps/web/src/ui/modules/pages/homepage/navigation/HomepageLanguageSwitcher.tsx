@@ -1,60 +1,60 @@
-'use client';
+"use client";
 
-import { usePathname, useRouter } from '@application/i18n/navigation';
-import type { LocaleCode } from '@infrastructure/i18n/locales';
-import { useLanguages } from '@ui/hooks/useLanguages';
+import { usePathname, useRouter } from "@application/i18n/navigation";
+import type { LocaleCode } from "@infrastructure/i18n/locales";
+import { useLanguages } from "@ui/hooks/useLanguages";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@ui/modules/core/animate/base/DropdownMenu';
-import { Check } from '@ui/modules/core/animate/icons/Check';
-import { Button } from '@ui/modules/core/primitives/Button';
-import { useLocale, useTranslations } from 'next-intl';
-import { useCallback, useMemo } from 'react';
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@ui/modules/core/animate/base/DropdownMenu";
+import { Check } from "@ui/modules/core/animate/icons/Check";
+import { Button } from "@ui/modules/core/primitives/Button";
+import { useLocale, useTranslations } from "next-intl";
+import { useCallback, useMemo } from "react";
 
 export const HomepageLanguageSwitcher = () => {
-  const locale = useLocale();
-  const { push } = useRouter();
-  const pathname = usePathname();
-  const languages = useLanguages();
-  const t = useTranslations('a11y');
+	const locale = useLocale();
+	const { push } = useRouter();
+	const pathname = usePathname();
+	const languages = useLanguages();
+	const t = useTranslations("a11y");
 
-  const handleLanguageChange = useCallback(
-    (newLocale: LocaleCode) => {
-      const newPathname = pathname.replace(`/${locale}`, `/${newLocale}`);
-      push(newPathname, { locale: newLocale, scroll: false });
-    },
-    [pathname, locale, push]
-  );
+	const handleLanguageChange = useCallback(
+		(newLocale: LocaleCode) => {
+			const newPathname = pathname.replace(`/${locale}`, `/${newLocale}`);
+			push(newPathname, { locale: newLocale, scroll: false });
+		},
+		[pathname, locale, push],
+	);
 
-  const currentLanguage = useMemo(() => languages.find(({ code }) => code === locale), [languages, locale]);
+	const currentLanguage = useMemo(() => languages.find(({ code }) => code === locale), [languages, locale]);
 
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant='outline'
-          size='sm'
-          className='focus-visible:ring-1'
-          aria-label={t('selectLanguage', { current: currentLanguage?.label ?? locale })}
-        >
-          <span className='capitalize'>{currentLanguage?.label}</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align='end'>
-        {languages.map((language) => (
-          <DropdownMenuItem
-            key={language.code}
-            className='flex justify-between'
-            onClick={() => handleLanguageChange(language.code)}
-          >
-            <span>{language.label}</span>
-            {language.code === locale && <Check className='size-4' />}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<Button
+					variant="outline"
+					size="sm"
+					className="focus-visible:ring-1"
+					aria-label={t("selectLanguage", { current: currentLanguage?.label ?? locale })}
+				>
+					<span className="capitalize">{currentLanguage?.label}</span>
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="end">
+				{languages.map((language) => (
+					<DropdownMenuItem
+						key={language.code}
+						className="flex justify-between"
+						onClick={() => handleLanguageChange(language.code)}
+					>
+						<span>{language.label}</span>
+						{language.code === locale && <Check className="size-4" />}
+					</DropdownMenuItem>
+				))}
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
 };

@@ -1,9 +1,9 @@
 .dashed-card svg rect {
-  stroke: var(--foreground);
-  stroke-dasharray: 10;
-  stroke-dashoffset: 0;
+	stroke: var(--foreground);
+	stroke-dasharray: 10;
+	stroke-dashoffset: 0;
 }
 
 .dashed-card:hover svg rect {
-  animation: march 1s linear infinite;
+	animation: march 1s linear infinite;
 }

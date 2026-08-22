@@ -1,18 +1,18 @@
 {
-  "include": ["tests/**/*.ts", "commitlint.config.ts", "vitest.config.ts"],
-  "exclude": ["node_modules", "apps"],
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "lib": ["esnext"],
-    "types": ["node"],
-    "strict": true,
-    "allowJs": false,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "skipLibCheck": true
-  }
+	"include": ["tests/**/*.ts", "commitlint.config.ts", "vitest.config.ts"],
+	"exclude": ["node_modules", "apps"],
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "esnext",
+		"moduleResolution": "bundler",
+		"lib": ["esnext"],
+		"types": ["node"],
+		"strict": true,
+		"allowJs": false,
+		"noEmit": true,
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"skipLibCheck": true
+	}
 }

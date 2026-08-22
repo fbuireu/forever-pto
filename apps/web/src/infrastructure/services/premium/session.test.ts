@@ -1,147 +1,147 @@
-import { Effect } from 'effect';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { Effect } from "effect";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const { mockSign, mockSetProtectedHeader, mockSetIssuedAt, mockSetExpirationTime, MockSignJWT, mockJwtVerify } =
-  vi.hoisted(() => {
-    const mockSign = vi.fn();
-    const mockSetProtectedHeader = vi.fn();
-    const mockSetIssuedAt = vi.fn();
-    const mockSetExpirationTime = vi.fn();
-    const MockSignJWT = vi.fn();
-    const mockJwtVerify = vi.fn();
-    return { mockSign, mockSetProtectedHeader, mockSetIssuedAt, mockSetExpirationTime, MockSignJWT, mockJwtVerify };
-  });
+	vi.hoisted(() => {
+		const mockSign = vi.fn();
+		const mockSetProtectedHeader = vi.fn();
+		const mockSetIssuedAt = vi.fn();
+		const mockSetExpirationTime = vi.fn();
+		const MockSignJWT = vi.fn();
+		const mockJwtVerify = vi.fn();
+		return { mockSign, mockSetProtectedHeader, mockSetIssuedAt, mockSetExpirationTime, MockSignJWT, mockJwtVerify };
+	});
 
-vi.mock('jose', () => ({ SignJWT: MockSignJWT, jwtVerify: mockJwtVerify }));
+vi.mock("jose", () => ({ SignJWT: MockSignJWT, jwtVerify: mockJwtVerify }));
 
-const { createSession, verifySession } = await import('./session');
-const { PREMIUM_SESSION_LIFETIME_SECONDS } = await import('./cookie');
+const { createSession, verifySession } = await import("./session");
+const { PREMIUM_SESSION_LIFETIME_SECONDS } = await import("./cookie");
 
-const SESSION_DATA = { email: 'user@example.com', paymentIntentId: 'pi_abc123' };
+const SESSION_DATA = { email: "user@example.com", paymentIntentId: "pi_abc123" };
 
 beforeEach(() => {
-  vi.clearAllMocks();
-  vi.stubEnv('JWT_SECRET', 'test-jwt-secret');
+	vi.clearAllMocks();
+	vi.stubEnv("JWT_SECRET", "test-jwt-secret");
 
-  const instance = {
-    setProtectedHeader: mockSetProtectedHeader,
-    setIssuedAt: mockSetIssuedAt,
-    setExpirationTime: mockSetExpirationTime,
-    sign: mockSign,
-  };
-  mockSetProtectedHeader.mockReturnValue(instance);
-  mockSetIssuedAt.mockReturnValue(instance);
-  mockSetExpirationTime.mockReturnValue(instance);
-  // biome-ignore lint/complexity/useArrowFunction: called with `new`; arrow fn is not a constructor
-  MockSignJWT.mockImplementation(function () {
-    return instance;
-  });
+	const instance = {
+		setProtectedHeader: mockSetProtectedHeader,
+		setIssuedAt: mockSetIssuedAt,
+		setExpirationTime: mockSetExpirationTime,
+		sign: mockSign,
+	};
+	mockSetProtectedHeader.mockReturnValue(instance);
+	mockSetIssuedAt.mockReturnValue(instance);
+	mockSetExpirationTime.mockReturnValue(instance);
+	// biome-ignore lint/complexity/useArrowFunction: called with `new`; arrow fn is not a constructor
+	MockSignJWT.mockImplementation(function () {
+		return instance;
+	});
 });
 
 afterEach(() => {
-  vi.unstubAllEnvs();
+	vi.unstubAllEnvs();
 });
 
-describe('createSession', () => {
-  it('returns a signed JWT string on success', async () => {
-    mockSign.mockResolvedValue('signed.jwt.token');
+describe("createSession", () => {
+	it("returns a signed JWT string on success", async () => {
+		mockSign.mockResolvedValue("signed.jwt.token");
 
-    const result = await Effect.runPromise(createSession(SESSION_DATA));
+		const result = await Effect.runPromise(createSession(SESSION_DATA));
 
-    expect(result).toBe('signed.jwt.token');
-  });
+		expect(result).toBe("signed.jwt.token");
+	});
 
-  it('passes email and paymentIntentId to SignJWT constructor', async () => {
-    mockSign.mockResolvedValue('token');
+	it("passes email and paymentIntentId to SignJWT constructor", async () => {
+		mockSign.mockResolvedValue("token");
 
-    await Effect.runPromise(createSession(SESSION_DATA));
+		await Effect.runPromise(createSession(SESSION_DATA));
 
-    expect(MockSignJWT).toHaveBeenCalledWith({
-      email: SESSION_DATA.email,
-      paymentIntentId: SESSION_DATA.paymentIntentId,
-    });
-  });
+		expect(MockSignJWT).toHaveBeenCalledWith({
+			email: SESSION_DATA.email,
+			paymentIntentId: SESSION_DATA.paymentIntentId,
+		});
+	});
 
-  it('sets HS256 header, issuedAt, and expiration', async () => {
-    mockSign.mockResolvedValue('token');
+	it("sets HS256 header, issuedAt, and expiration", async () => {
+		mockSign.mockResolvedValue("token");
 
-    await Effect.runPromise(createSession(SESSION_DATA));
+		await Effect.runPromise(createSession(SESSION_DATA));
 
-    expect(mockSetProtectedHeader).toHaveBeenCalledWith({ alg: 'HS256' });
-    expect(mockSetIssuedAt).toHaveBeenCalled();
-    expect(mockSetExpirationTime).toHaveBeenCalledWith(expect.any(Number));
-  });
+		expect(mockSetProtectedHeader).toHaveBeenCalledWith({ alg: "HS256" });
+		expect(mockSetIssuedAt).toHaveBeenCalled();
+		expect(mockSetExpirationTime).toHaveBeenCalledWith(expect.any(Number));
+	});
 
-  it('expires the token one session duration from now', async () => {
-    mockSign.mockResolvedValue('token');
-    const before = Math.floor(Date.now() / 1000);
+	it("expires the token one session duration from now", async () => {
+		mockSign.mockResolvedValue("token");
+		const before = Math.floor(Date.now() / 1000);
 
-    await Effect.runPromise(createSession(SESSION_DATA));
+		await Effect.runPromise(createSession(SESSION_DATA));
 
-    const [expiration] = mockSetExpirationTime.mock.calls[0] as [number];
-    expect(expiration).toBeGreaterThanOrEqual(before + PREMIUM_SESSION_LIFETIME_SECONDS);
-    expect(expiration).toBeLessThanOrEqual(Math.floor(Date.now() / 1000) + PREMIUM_SESSION_LIFETIME_SECONDS);
-  });
+		const [expiration] = mockSetExpirationTime.mock.calls[0] as [number];
+		expect(expiration).toBeGreaterThanOrEqual(before + PREMIUM_SESSION_LIFETIME_SECONDS);
+		expect(expiration).toBeLessThanOrEqual(Math.floor(Date.now() / 1000) + PREMIUM_SESSION_LIFETIME_SECONDS);
+	});
 
-  it('passes encoded JWT_SECRET to sign', async () => {
-    mockSign.mockResolvedValue('token');
+	it("passes encoded JWT_SECRET to sign", async () => {
+		mockSign.mockResolvedValue("token");
 
-    await Effect.runPromise(createSession(SESSION_DATA));
+		await Effect.runPromise(createSession(SESSION_DATA));
 
-    expect(mockSign).toHaveBeenCalledWith(expect.any(Uint8Array));
-  });
+		expect(mockSign).toHaveBeenCalledWith(expect.any(Uint8Array));
+	});
 
-  it('returns SessionError when signing fails with an Error', async () => {
-    mockSign.mockRejectedValue(new Error('sign failure'));
+	it("returns SessionError when signing fails with an Error", async () => {
+		mockSign.mockRejectedValue(new Error("sign failure"));
 
-    const result = await Effect.runPromise(Effect.flip(createSession(SESSION_DATA)));
+		const result = await Effect.runPromise(Effect.flip(createSession(SESSION_DATA)));
 
-    expect(result._tag).toBe('SessionError');
-    expect(result.message).toBe('sign failure');
-  });
+		expect(result._tag).toBe("SessionError");
+		expect(result.message).toBe("sign failure");
+	});
 
-  it('returns SessionError with stringified message for non-Error rejection', async () => {
-    mockSign.mockRejectedValue('unexpected');
+	it("returns SessionError with stringified message for non-Error rejection", async () => {
+		mockSign.mockRejectedValue("unexpected");
 
-    const result = await Effect.runPromise(Effect.flip(createSession(SESSION_DATA)));
+		const result = await Effect.runPromise(Effect.flip(createSession(SESSION_DATA)));
 
-    expect(result._tag).toBe('SessionError');
-    expect(result.message).toBe('unexpected');
-  });
+		expect(result._tag).toBe("SessionError");
+		expect(result.message).toBe("unexpected");
+	});
 });
 
-describe('verifySession', () => {
-  it('returns email and paymentIntentId from verified payload', async () => {
-    mockJwtVerify.mockResolvedValue({ payload: { email: 'user@example.com', paymentIntentId: 'pi_abc123' } });
+describe("verifySession", () => {
+	it("returns email and paymentIntentId from verified payload", async () => {
+		mockJwtVerify.mockResolvedValue({ payload: { email: "user@example.com", paymentIntentId: "pi_abc123" } });
 
-    const result = await Effect.runPromise(verifySession('valid.jwt.token'));
+		const result = await Effect.runPromise(verifySession("valid.jwt.token"));
 
-    expect(result).toEqual({ email: 'user@example.com', paymentIntentId: 'pi_abc123' });
-  });
+		expect(result).toEqual({ email: "user@example.com", paymentIntentId: "pi_abc123" });
+	});
 
-  it('calls jwtVerify with the token and encoded secret', async () => {
-    mockJwtVerify.mockResolvedValue({ payload: { email: 'a', paymentIntentId: 'b' } });
+	it("calls jwtVerify with the token and encoded secret", async () => {
+		mockJwtVerify.mockResolvedValue({ payload: { email: "a", paymentIntentId: "b" } });
 
-    await Effect.runPromise(verifySession('my.token'));
+		await Effect.runPromise(verifySession("my.token"));
 
-    expect(mockJwtVerify).toHaveBeenCalledWith('my.token', expect.any(Uint8Array));
-  });
+		expect(mockJwtVerify).toHaveBeenCalledWith("my.token", expect.any(Uint8Array));
+	});
 
-  it('returns SessionError when verification fails with an Error', async () => {
-    mockJwtVerify.mockRejectedValue(new Error('invalid signature'));
+	it("returns SessionError when verification fails with an Error", async () => {
+		mockJwtVerify.mockRejectedValue(new Error("invalid signature"));
 
-    const result = await Effect.runPromise(Effect.flip(verifySession('bad.token')));
+		const result = await Effect.runPromise(Effect.flip(verifySession("bad.token")));
 
-    expect(result._tag).toBe('SessionError');
-    expect(result.message).toBe('invalid signature');
-  });
+		expect(result._tag).toBe("SessionError");
+		expect(result.message).toBe("invalid signature");
+	});
 
-  it('returns SessionError with stringified message for non-Error rejection', async () => {
-    mockJwtVerify.mockRejectedValue('token expired');
+	it("returns SessionError with stringified message for non-Error rejection", async () => {
+		mockJwtVerify.mockRejectedValue("token expired");
 
-    const result = await Effect.runPromise(Effect.flip(verifySession('expired.token')));
+		const result = await Effect.runPromise(Effect.flip(verifySession("expired.token")));
 
-    expect(result._tag).toBe('SessionError');
-    expect(result.message).toBe('token expired');
-  });
+		expect(result._tag).toBe("SessionError");
+		expect(result.message).toBe("token expired");
+	});
 });

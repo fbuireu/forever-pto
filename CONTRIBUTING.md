@@ -74,13 +74,13 @@ Everything CI runs, you can run locally:
 ```bash
 pnpm lint:all           # biome lint (append :fix to autofix)
 pnpm format:all         # biome check --write
-pnpm lint:ts:typecheck  # tsc --noEmit
+pnpm typecheck  # tsc --noEmit
 pnpm test:ut            # unit tests (vitest)
 pnpm test:e2e           # end-to-end tests (playwright)
 ```
 
-Husky runs lint-staged on pre-commit, commitlint on commit-msg and the
-typecheck on pre-push.
+Husky runs lint-staged on pre-commit, commitlint on commit-msg and
+`pnpm verify` on pre-push — the same command CI runs.
 
 ## Conventions that will bite you if you skip them
 

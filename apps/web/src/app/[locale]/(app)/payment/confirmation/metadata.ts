@@ -1,3 +1,3 @@
-import { routeMetadata } from '@infrastructure/seo/routeMetadata';
+import { routeMetadata } from "@infrastructure/seo/routeMetadata";
 
-export const generateMetadata = routeMetadata('/payment/confirmation');
+export const generateMetadata = routeMetadata("/payment/confirmation");

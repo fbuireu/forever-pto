@@ -1,135 +1,135 @@
-import deMessages from '@i18n/messages/de.json';
-import esMessages from '@i18n/messages/es.json';
-import { render } from '@testing-library/react';
-import { type Locale, NextIntlClientProvider } from 'next-intl';
-import type { ReactNode } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import deMessages from "@i18n/messages/de.json";
+import esMessages from "@i18n/messages/es.json";
+import { render } from "@testing-library/react";
+import { type Locale, NextIntlClientProvider } from "next-intl";
+import type { ReactNode } from "react";
+import { describe, expect, it, vi } from "vitest";
 
 const holidaysState = {
-  alternatives: [],
-  suggestion: null,
-  currentSelection: null,
-  setPreviewAlternativeSelection: vi.fn(),
-  setCurrentAlternativeSelection: vi.fn(),
-  previewAlternativeIndex: 0,
-  currentSelectionIndex: 0,
+	alternatives: [],
+	suggestion: null,
+	currentSelection: null,
+	setPreviewAlternativeSelection: vi.fn(),
+	setCurrentAlternativeSelection: vi.fn(),
+	previewAlternativeIndex: 0,
+	currentSelectionIndex: 0,
 };
 
-vi.mock('@application/stores/holidays', () => ({
-  useHolidaysStore: (selector: (state: typeof holidaysState) => unknown) => selector(holidaysState),
+vi.mock("@application/stores/holidays", () => ({
+	useHolidaysStore: (selector: (state: typeof holidaysState) => unknown) => selector(holidaysState),
 }));
-vi.mock('@ui/hooks/useMobile', () => ({ useIsMobile: () => true }));
+vi.mock("@ui/hooks/useMobile", () => ({ useIsMobile: () => true }));
 const readyState = { areStoresReady: false };
-vi.mock('@ui/hooks/useStoresReady', () => ({ useStoresReady: () => readyState }));
-vi.mock('@ui/modules/core/animate/base/Sidebar', () => ({ useSidebar: () => ({ openMobile: false }) }));
-vi.mock('@ui/modules/core/animate/base/Drawer', () => ({
-  Drawer: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-  DrawerContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-  DrawerTitle: ({ children }: { children: ReactNode }) => <h2 data-testid='drawer-title'>{children}</h2>,
+vi.mock("@ui/hooks/useStoresReady", () => ({ useStoresReady: () => readyState }));
+vi.mock("@ui/modules/core/animate/base/Sidebar", () => ({ useSidebar: () => ({ openMobile: false }) }));
+vi.mock("@ui/modules/core/animate/base/Drawer", () => ({
+	Drawer: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+	DrawerContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+	DrawerTitle: ({ children }: { children: ReactNode }) => <h2 data-testid="drawer-title">{children}</h2>,
 }));
-vi.mock('boneyard-js/react', () => ({ Skeleton: ({ children }: { children: ReactNode }) => <div>{children}</div> }));
-vi.mock('sonner', () => ({ toast: { success: vi.fn() } }));
-vi.mock('./Legend', () => ({ LegendItems: () => null }));
-vi.mock('./PlannerPanel', () => ({ PlannerPanel: () => null }));
-vi.mock('./PlannerPanelFixture', () => ({ PlannerPanelFixture: () => null }));
+vi.mock("boneyard-js/react", () => ({ Skeleton: ({ children }: { children: ReactNode }) => <div>{children}</div> }));
+vi.mock("sonner", () => ({ toast: { success: vi.fn() } }));
+vi.mock("./Legend", () => ({ LegendItems: () => null }));
+vi.mock("./PlannerPanel", () => ({ PlannerPanel: () => null }));
+vi.mock("./PlannerPanelFixture", () => ({ PlannerPanelFixture: () => null }));
 
-import { ManagementBar } from './ManagementBar';
+import { ManagementBar } from "./ManagementBar";
 
 const renderBar = (locale: Locale, messages: object) =>
-  render(
-    <NextIntlClientProvider locale={locale} messages={messages}>
-      <ManagementBar />
-    </NextIntlClientProvider>
-  );
+	render(
+		<NextIntlClientProvider locale={locale} messages={messages}>
+			<ManagementBar />
+		</NextIntlClientProvider>,
+	);
 
-describe('ManagementBar mobile drawer', () => {
-  it('announces the localised planner heading in German', () => {
-    const { getByTestId } = renderBar('de', deMessages);
-    expect(getByTestId('drawer-title').textContent).toBe(deMessages.planner.heading);
-  });
+describe("ManagementBar mobile drawer", () => {
+	it("announces the localised planner heading in German", () => {
+		const { getByTestId } = renderBar("de", deMessages);
+		expect(getByTestId("drawer-title").textContent).toBe(deMessages.planner.heading);
+	});
 
-  it('announces the localised planner heading in Spanish', () => {
-    const { getByTestId } = renderBar('es', esMessages);
-    expect(getByTestId('drawer-title').textContent).toBe('Planificador');
-  });
+	it("announces the localised planner heading in Spanish", () => {
+		const { getByTestId } = renderBar("es", esMessages);
+		expect(getByTestId("drawer-title").textContent).toBe("Planificador");
+	});
 });
 
-describe('ManagementBar empty plan', () => {
-  it('stops pretending to load once the engine has settled on no plan at all', () => {
-    readyState.areStoresReady = true;
-    holidaysState.suggestion = null;
-    holidaysState.currentSelection = null;
-    holidaysState.alternatives = [];
-    (holidaysState as { isCalculating?: boolean; hasCalculated?: boolean }).isCalculating = false;
-    (holidaysState as { hasCalculated?: boolean }).hasCalculated = true;
+describe("ManagementBar empty plan", () => {
+	it("stops pretending to load once the engine has settled on no plan at all", () => {
+		readyState.areStoresReady = true;
+		holidaysState.suggestion = null;
+		holidaysState.currentSelection = null;
+		holidaysState.alternatives = [];
+		(holidaysState as { isCalculating?: boolean; hasCalculated?: boolean }).isCalculating = false;
+		(holidaysState as { hasCalculated?: boolean }).hasCalculated = true;
 
-    const { container } = renderBar('es', esMessages);
+		const { container } = renderBar("es", esMessages);
 
-    expect(container.querySelector('[data-tutorial="planner-drawer"]')).toBeNull();
-    expect(container.textContent).not.toContain(esMessages.planner.heading);
+		expect(container.querySelector('[data-tutorial="planner-drawer"]')).toBeNull();
+		expect(container.textContent).not.toContain(esMessages.planner.heading);
 
-    readyState.areStoresReady = false;
-    (holidaysState as { hasCalculated?: boolean }).hasCalculated = false;
-  });
+		readyState.areStoresReady = false;
+		(holidaysState as { hasCalculated?: boolean }).hasCalculated = false;
+	});
 
-  it('keeps the panel on a cold load, before any calculation has ever completed', () => {
-    readyState.areStoresReady = true;
-    holidaysState.suggestion = null;
-    holidaysState.currentSelection = null;
-    (holidaysState as { isCalculating?: boolean; hasCalculated?: boolean }).isCalculating = false;
-    (holidaysState as { hasCalculated?: boolean }).hasCalculated = false;
+	it("keeps the panel on a cold load, before any calculation has ever completed", () => {
+		readyState.areStoresReady = true;
+		holidaysState.suggestion = null;
+		holidaysState.currentSelection = null;
+		(holidaysState as { isCalculating?: boolean; hasCalculated?: boolean }).isCalculating = false;
+		(holidaysState as { hasCalculated?: boolean }).hasCalculated = false;
 
-    const { container } = renderBar('es', esMessages);
+		const { container } = renderBar("es", esMessages);
 
-    expect(container.textContent).toContain(esMessages.planner.heading);
+		expect(container.textContent).toContain(esMessages.planner.heading);
 
-    readyState.areStoresReady = false;
-  });
+		readyState.areStoresReady = false;
+	});
 
-  it('still shows the skeleton while a calculation is genuinely in flight', () => {
-    readyState.areStoresReady = true;
-    holidaysState.suggestion = null;
-    holidaysState.currentSelection = null;
-    (holidaysState as { isCalculating?: boolean }).isCalculating = true;
+	it("still shows the skeleton while a calculation is genuinely in flight", () => {
+		readyState.areStoresReady = true;
+		holidaysState.suggestion = null;
+		holidaysState.currentSelection = null;
+		(holidaysState as { isCalculating?: boolean }).isCalculating = true;
 
-    const { container } = renderBar('es', esMessages);
+		const { container } = renderBar("es", esMessages);
 
-    expect(container.textContent).toContain(esMessages.planner.heading);
+		expect(container.textContent).toContain(esMessages.planner.heading);
 
-    readyState.areStoresReady = false;
-    (holidaysState as { isCalculating?: boolean }).isCalculating = false;
-  });
+		readyState.areStoresReady = false;
+		(holidaysState as { isCalculating?: boolean }).isCalculating = false;
+	});
 });
 
-describe('ManagementBar drawer header', () => {
-  const makeSuggestion = (effectiveDays: number, efficiency: number) => ({
-    days: [new Date(2026, 0, 5)],
-    bridges: [],
-    metrics: { totalEffectiveDays: effectiveDays, averageEfficiency: efficiency },
-  });
+describe("ManagementBar drawer header", () => {
+	const makeSuggestion = (effectiveDays: number, efficiency: number) => ({
+		days: [new Date(2026, 0, 5)],
+		bridges: [],
+		metrics: { totalEffectiveDays: effectiveDays, averageEfficiency: efficiency },
+	});
 
-  const applied = makeSuggestion(4, 2);
-  const previewed = makeSuggestion(9, 4.5);
+	const applied = makeSuggestion(4, 2);
+	const previewed = makeSuggestion(9, 4.5);
 
-  it('numbers the option the metrics beside it belong to, not the applied one', () => {
-    readyState.areStoresReady = true;
-    holidaysState.suggestion = applied as never;
-    holidaysState.currentSelection = applied as never;
-    holidaysState.alternatives = [previewed] as never;
-    holidaysState.currentSelectionIndex = 0;
-    holidaysState.previewAlternativeIndex = 1;
+	it("numbers the option the metrics beside it belong to, not the applied one", () => {
+		readyState.areStoresReady = true;
+		holidaysState.suggestion = applied as never;
+		holidaysState.currentSelection = applied as never;
+		holidaysState.alternatives = [previewed] as never;
+		holidaysState.currentSelectionIndex = 0;
+		holidaysState.previewAlternativeIndex = 1;
 
-    const { container } = renderBar('es', esMessages);
-    const text = container.textContent ?? '';
+		const { container } = renderBar("es", esMessages);
+		const text = container.textContent ?? "";
 
-    expect(text).toContain(`${esMessages.alternativesManager.option} 2`);
-    expect(text).toContain('9');
-    expect(text).toContain('4.5x');
+		expect(text).toContain(`${esMessages.alternativesManager.option} 2`);
+		expect(text).toContain("9");
+		expect(text).toContain("4.5x");
 
-    readyState.areStoresReady = false;
-    holidaysState.suggestion = null;
-    holidaysState.currentSelection = null;
-    holidaysState.alternatives = [];
-    holidaysState.previewAlternativeIndex = 0;
-  });
+		readyState.areStoresReady = false;
+		holidaysState.suggestion = null;
+		holidaysState.currentSelection = null;
+		holidaysState.alternatives = [];
+		holidaysState.previewAlternativeIndex = 0;
+	});
 });

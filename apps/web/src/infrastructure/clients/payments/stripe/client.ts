@@ -1,169 +1,169 @@
-import { logClientError } from '@application/shared/utils/clientLog';
-import { loadStripe, type PaymentIntent, type Stripe, type StripeError } from '@stripe/stripe-js';
-import { Effect } from 'effect';
+import { logClientError } from "@application/shared/utils/clientLog";
+import { loadStripe, type PaymentIntent, type Stripe, type StripeError } from "@stripe/stripe-js";
+import { Effect } from "effect";
 
 const StripeClientErrors = {
-  CARD_DECLINED: 'card_declined',
-  INVALID_REQUEST: 'invalid_request',
-  AUTH_ERROR: 'auth_error',
-  GENERIC: 'payment_failed',
+	CARD_DECLINED: "card_declined",
+	INVALID_REQUEST: "invalid_request",
+	AUTH_ERROR: "auth_error",
+	GENERIC: "payment_failed",
 } as const;
 
 interface PaymentParams {
-  clientSecret: string;
-  returnUrl?: string;
-  alwaysRedirect?: boolean;
+	clientSecret: string;
+	returnUrl?: string;
+	alwaysRedirect?: boolean;
 }
 
 class StripeClient {
-  private stripePromise: Promise<Stripe | null> | null = null;
-  private stripe: Stripe | null = null;
-  private readonly publishableKey: string;
+	private stripePromise: Promise<Stripe | null> | null = null;
+	private stripe: Stripe | null = null;
+	private readonly publishableKey: string;
 
-  constructor(publishableKey: string) {
-    this.publishableKey = publishableKey;
-  }
+	constructor(publishableKey: string) {
+		this.publishableKey = publishableKey;
+	}
 
-  getStripePromise() {
-    this.stripePromise ??= loadStripe(this.publishableKey);
-    return this.stripePromise;
-  }
+	getStripePromise() {
+		this.stripePromise ??= loadStripe(this.publishableKey);
+		return this.stripePromise;
+	}
 
-  async getStripe() {
-    if (!this.stripe) {
-      this.stripePromise ??= loadStripe(this.publishableKey);
-      this.stripe = await this.stripePromise;
-    }
+	async getStripe() {
+		if (!this.stripe) {
+			this.stripePromise ??= loadStripe(this.publishableKey);
+			this.stripe = await this.stripePromise;
+		}
 
-    if (!this.stripe) {
-      throw new Error('Stripe failed to load');
-    }
+		if (!this.stripe) {
+			throw new Error("Stripe failed to load");
+		}
 
-    return this.stripe;
-  }
+		return this.stripe;
+	}
 
-  async confirmPayment(params: PaymentParams) {
-    return Effect.runPromise(
-      Effect.tryPromise(() => this.getStripe()).pipe(
-        Effect.andThen((stripe) =>
-          Effect.tryPromise({
-            try: () =>
-              stripe.confirmPayment({
-                clientSecret: params.clientSecret,
-                confirmParams: { return_url: params.returnUrl ?? globalThis.location.href },
-                redirect: params.alwaysRedirect ? 'always' : undefined,
-              }),
-            catch: (e) => e,
-          })
-        ),
-        Effect.andThen((result) => Effect.sync(() => this.handlePaymentResult(result))),
-        Effect.catchAll((error) => {
-          this.logError('Stripe confirmPayment failed', error, {
-            hasClientSecret: !!params.clientSecret,
-            hasReturnUrl: !!params.returnUrl,
-            alwaysRedirect: params.alwaysRedirect,
-            location: globalThis.location.href,
-          });
-          return Effect.succeed(this.handleError(error));
-        })
-      )
-    );
-  }
+	async confirmPayment(params: PaymentParams) {
+		return Effect.runPromise(
+			Effect.tryPromise(() => this.getStripe()).pipe(
+				Effect.andThen((stripe) =>
+					Effect.tryPromise({
+						try: () =>
+							stripe.confirmPayment({
+								clientSecret: params.clientSecret,
+								confirmParams: { return_url: params.returnUrl ?? globalThis.location.href },
+								redirect: params.alwaysRedirect ? "always" : undefined,
+							}),
+						catch: (e) => e,
+					}),
+				),
+				Effect.andThen((result) => Effect.sync(() => this.handlePaymentResult(result))),
+				Effect.catchAll((error) => {
+					this.logError("Stripe confirmPayment failed", error, {
+						hasClientSecret: !!params.clientSecret,
+						hasReturnUrl: !!params.returnUrl,
+						alwaysRedirect: params.alwaysRedirect,
+						location: globalThis.location.href,
+					});
+					return Effect.succeed(this.handleError(error));
+				}),
+			),
+		);
+	}
 
-  async confirmCardPayment(clientSecret: string) {
-    return Effect.runPromise(
-      Effect.tryPromise(() => this.getStripe()).pipe(
-        Effect.andThen((stripe) =>
-          Effect.tryPromise({ try: () => stripe.confirmCardPayment(clientSecret), catch: (e) => e })
-        ),
-        Effect.andThen((result) => Effect.sync(() => this.handlePaymentResult(result))),
-        Effect.catchAll((error) => {
-          this.logError('Stripe confirmCardPayment failed', error, { hasClientSecret: !!clientSecret });
-          return Effect.succeed(this.handleError(error));
-        })
-      )
-    );
-  }
+	async confirmCardPayment(clientSecret: string) {
+		return Effect.runPromise(
+			Effect.tryPromise(() => this.getStripe()).pipe(
+				Effect.andThen((stripe) =>
+					Effect.tryPromise({ try: () => stripe.confirmCardPayment(clientSecret), catch: (e) => e }),
+				),
+				Effect.andThen((result) => Effect.sync(() => this.handlePaymentResult(result))),
+				Effect.catchAll((error) => {
+					this.logError("Stripe confirmCardPayment failed", error, { hasClientSecret: !!clientSecret });
+					return Effect.succeed(this.handleError(error));
+				}),
+			),
+		);
+	}
 
-  isLoaded() {
-    return this.stripe !== null;
-  }
+	isLoaded() {
+		return this.stripe !== null;
+	}
 
-  private logError(message: string, error: unknown, context: Record<string, unknown>) {
-    logClientError(message, error, context);
-  }
+	private logError(message: string, error: unknown, context: Record<string, unknown>) {
+		logClientError(message, error, context);
+	}
 
-  private handlePaymentResult(result: { error: StripeError } | { paymentIntent: PaymentIntent }) {
-    if (this.isErrorResult(result)) {
-      return {
-        success: false as const,
-        error: result.error.message ?? '',
-      };
-    }
+	private handlePaymentResult(result: { error: StripeError } | { paymentIntent: PaymentIntent }) {
+		if (this.isErrorResult(result)) {
+			return {
+				success: false as const,
+				error: result.error.message ?? "",
+			};
+		}
 
-    const { paymentIntent } = result;
+		const { paymentIntent } = result;
 
-    if (paymentIntent?.status === 'succeeded') {
-      return {
-        success: true as const,
-        paymentIntentId: paymentIntent.id,
-      };
-    }
+		if (paymentIntent?.status === "succeeded") {
+			return {
+				success: true as const,
+				paymentIntentId: paymentIntent.id,
+			};
+		}
 
-    return {
-      success: false as const,
-      error: `Payment status: ${paymentIntent?.status ?? 'unknown'}`,
-    };
-  }
+		return {
+			success: false as const,
+			error: `Payment status: ${paymentIntent?.status ?? "unknown"}`,
+		};
+	}
 
-  private isErrorResult(
-    result: { error: StripeError } | { paymentIntent: PaymentIntent }
-  ): result is { error: StripeError } {
-    return 'error' in result;
-  }
+	private isErrorResult(
+		result: { error: StripeError } | { paymentIntent: PaymentIntent },
+	): result is { error: StripeError } {
+		return "error" in result;
+	}
 
-  private handleError(error: unknown) {
-    const stripeError = error as StripeError;
+	private handleError(error: unknown) {
+		const stripeError = error as StripeError;
 
-    if (stripeError?.type === 'card_error') {
-      return {
-        success: false as const,
-        error: stripeError.message ?? StripeClientErrors.CARD_DECLINED,
-      };
-    }
+		if (stripeError?.type === "card_error") {
+			return {
+				success: false as const,
+				error: stripeError.message ?? StripeClientErrors.CARD_DECLINED,
+			};
+		}
 
-    if (stripeError?.type === 'invalid_request_error') {
-      return {
-        success: false as const,
-        error: StripeClientErrors.INVALID_REQUEST,
-      };
-    }
+		if (stripeError?.type === "invalid_request_error") {
+			return {
+				success: false as const,
+				error: StripeClientErrors.INVALID_REQUEST,
+			};
+		}
 
-    if (stripeError?.type === 'authentication_error') {
-      return {
-        success: false as const,
-        error: StripeClientErrors.AUTH_ERROR,
-      };
-    }
+		if (stripeError?.type === "authentication_error") {
+			return {
+				success: false as const,
+				error: StripeClientErrors.AUTH_ERROR,
+			};
+		}
 
-    return {
-      success: false as const,
-      error: stripeError?.message ?? StripeClientErrors.GENERIC,
-    };
-  }
+		return {
+			success: false as const,
+			error: stripeError?.message ?? StripeClientErrors.GENERIC,
+		};
+	}
 }
 
 let stripeClientInstance: StripeClient | null = null;
 
 export const getStripeClientInstance = () => {
-  if (!stripeClientInstance) {
-    const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+	if (!stripeClientInstance) {
+		const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
-    if (!publishableKey) {
-      throw new Error('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not defined');
-    }
+		if (!publishableKey) {
+			throw new Error("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not defined");
+		}
 
-    stripeClientInstance = new StripeClient(publishableKey);
-  }
-  return stripeClientInstance;
+		stripeClientInstance = new StripeClient(publishableKey);
+	}
+	return stripeClientInstance;
 };
