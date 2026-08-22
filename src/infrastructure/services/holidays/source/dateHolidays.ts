@@ -13,7 +13,10 @@ export const dateHolidaysSource: HolidaySource = {
     const configuration = { languages: [locale] };
     const national = forYears(new Holidays(country, configuration), year);
     const regional = region
-      ? forYears(new Holidays(country, region, configuration), year).map((holiday) => ({ ...holiday, location: region }))
+      ? forYears(new Holidays(country, region, configuration), year).map((holiday) => ({
+          ...holiday,
+          location: region,
+        }))
       : [];
 
     return resolveObservedHolidays({ national, regional, hasRegion: Boolean(region) });

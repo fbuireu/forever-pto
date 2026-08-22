@@ -1,5 +1,5 @@
-import { expect, test } from '@playwright/test';
 import { ES } from '@infrastructure/i18n/locales';
+import { expect, test } from '@playwright/test';
 
 const CONFIRMATION_PATH = '/payment/confirmation';
 

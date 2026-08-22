@@ -52,11 +52,13 @@ pnpm cf:typegen         # regenerate cloudflare-env.d.ts from wrangler.toml (ref
 
 pnpm lint:all           # biome lint over the repo (:fix to autofix)
 pnpm format:all         # biome check --write over the repo
-pnpm lint:ts:typecheck  # tsc --noEmit
+pnpm format:check       # biome check, no writes — what verify runs
+pnpm typecheck          # tsc --noEmit
 
 pnpm test:ut            # vitest run (unit)
 pnpm test:docs          # docs ⟷ code consistency alone (also runs inside test:ut)
-pnpm test:coverage      # vitest run --coverage
+pnpm test:ut:coverage   # vitest run --coverage
+pnpm verify             # format:check && typecheck && test:ut:coverage — the CI gate and pre-push
 pnpm test:e2e           # playwright
 ```
 
@@ -321,7 +323,7 @@ dependabot/renovate auto-merges and a `zizmor` audit. Every job that needs a too
 `.github/actions/prepare-env` composite — pnpm, the `.nvmrc` Node, `setup-node`'s dependency cache and
 `pnpm install --frozen-lockfile` — rather than repeating five steps six times; `checkout` stays in the job,
 because `release` needs its own (`fetch-depth: 0` and the PAT). Husky runs `lint-staged` on `pre-commit`,
-`commitlint` on `commit-msg` and `lint:ts:typecheck` on `pre-push`.
+`commitlint` on `commit-msg` and `pnpm verify` on `pre-push`.
 
 **There is no `deploy-production.yml` and no `deploy-development.yml`, and that is the point.** They were
 separate workflows on the same triggers, so they *raced* `ci.yml` instead of following it: semantic-release

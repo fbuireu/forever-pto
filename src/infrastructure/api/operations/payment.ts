@@ -31,7 +31,8 @@ export const createPaymentRequest = (
       Effect.catchTags({
         RateLimitError: () =>
           Effect.succeed({ status: 429, body: { success: false as const, error: ApiError.RATE_LIMIT_EXCEEDED } }),
-        ValidationError: (error) => Effect.succeed({ status: 400, body: { success: false as const, error: error.message } }),
+        ValidationError: (error) =>
+          Effect.succeed({ status: 400, body: { success: false as const, error: error.message } }),
         PromoCodeError: (error) =>
           Effect.succeed({
             status: 400,

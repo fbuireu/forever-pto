@@ -47,8 +47,11 @@ All scripts live in the root `package.json` (which is the source of truth if thi
 | `bones:build` / `bones:watch` | Generate skeleton components into `src/ui/modules/bones` (boneyard-js, config in `boneyard.config.json`) |
 | `format` / `format:changed` / `format:all` | Biome check with fixes (base / VCS-changed files / whole repo) |
 | `lint` / `lint:changed` / `lint:all` | Biome lint (base / changed with fixes / whole repo) |
-| `lint:ts:typecheck` | `tsc --noEmit` — also runs on pre-push |
-| `test:ut` / `test:coverage` | Vitest unit tests / with v8 coverage |
+| `format:check` | Biome check with no writes — the read-only gate `verify` runs |
+| `typecheck` | `tsc --noEmit` |
+| `test:ut` / `test:ut:coverage` | Vitest unit tests / with v8 coverage |
+| `test:ut:changed` | Vitest over what changed |
+| `verify` | `format:check` + `typecheck` + `test:ut:coverage` — one gate, shared by CI and pre-push |
 | `test:e2e` / `test:e2e:ui` | Playwright end-to-end tests / UI mode |
 
 The docs package has its own scripts (`docs/package.json`): `dev`, `check`, `build`, `preview`, `test:e2e`, `deploy`.

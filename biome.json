@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "includes": ["**", "!next-env.d.ts", "!docs/src/styles"]
+    "includes": ["**", "!next-env.d.ts", "!docs/src/styles", "!used.json"]
   },
   "css": {
     "parser": {

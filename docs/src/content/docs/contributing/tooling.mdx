@@ -25,17 +25,17 @@ Installed by the `prepare` script on `pnpm install`. Three hooks in `.husky/`:
 | --- | --- | --- |
 | `pre-commit` | `pnpm lint-staged` | Format + lint staged files; run unit tests for staged test files |
 | `commit-msg` | `pnpm exec commitlint --edit` | Enforce conventional commits (see [conventions](/contributing/conventions/)) |
-| `pre-push` | `pnpm lint:ts:typecheck` | Full `tsc --noEmit` before anything leaves your machine |
+| `pre-push` | `pnpm verify` | The full gate — `format:check`, `tsc --noEmit` and the coverage run — before anything leaves your machine |
 
 ### lint-staged
 
-The active config is `.lintstagedrc.json`. It scopes to `src/**` and `e2e/**`: JS/TS files get `format:changed` + `lint:changed`, and staged `*.test.*`/`*.spec.*` files additionally run `test:ut:changed` (Vitest with `--bail 1`). Note that `docs/**` files are not covered by these globs — the docs CI workflow is the safety net there.
+The active config is `.lintstagedrc.json`, and it does one thing: Biome formats and fixes every staged file it recognises. Tests are deliberately not here — `pre-push` runs the full `pnpm verify`, so a commit stays fast and nothing reaches the remote unverified.
 
 ## CI-side scanners
 
 - **zizmor** (`.github/workflows/zizmor.yml`) — lints the GitHub Actions workflows themselves for security issues and reports to code scanning. This is why every action in the repo is SHA-pinned with `persist-credentials: false`; follow that pattern when touching workflows.
 - **Codecov** — `ci.yml` uploads Vitest coverage (`coverage/lcov.info`) on every push/PR. See [testing](/contributing/testing/).
-- **CodeQL** (`.github/workflows/codeql.yml`) — scans the JS/TS sources and the workflows on pushes and PRs to `main` plus a weekly cron, configured by `.github/codeql/codeql-config.yml`. It replaces the repository-level "default setup": that toggle must stay off in GitHub settings or these runs are rejected.
+- **CodeQL** — code scanning runs from GitHub's repository-level default setup, not from a workflow in the tree. There is deliberately no `codeql.yml` here: the two cannot coexist, and the default setup is what every repo in the family uses.
 - **Dependency Review** (`.github/workflows/dependency-review.yml`) — fails a PR that introduces dependencies with known vulnerabilities.
 
 ## Dependency management

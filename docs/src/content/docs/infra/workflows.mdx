@@ -23,12 +23,10 @@ All workflows live in `.github/workflows/`. Two repo-wide conventions, enforced 
 
 Runs on pushes to `main` and PRs targeting `main`. Concurrency is per-ref with `cancel-in-progress: true`, so a force-push cancels the stale run.
 
-- **Lint** — `pnpm lint:all` (Biome).
-- **Typecheck** — `pnpm lint:ts:typecheck` (`tsc --noEmit` over the app project).
-- **Unit tests** — `pnpm test:coverage` (Vitest), then coverage upload to Codecov (`fail_ci_if_error: false`, so Codecov outages never block CI).
-- **Semantic Release** — `needs` all three, and only on push to `main`. Covered in depth on the [release](/infra/release/) page.
+- **Check** — one job running `pnpm verify`: `format:check` (Biome, no writes), `typecheck` (`tsc --noEmit` over the app project) and `test:ut:coverage` (Vitest), then coverage upload to Codecov (`fail_ci_if_error: false`, so Codecov outages never block CI). The same command is what `pre-push` runs, so a green push is a green CI.
+- **Semantic Release** — `needs: [check]`, and only on push to `main`. Covered in depth on the [release](/infra/release/) page.
 
-The three quality jobs are what branch protection gates PRs on. Note they gate *merging*, not *deploying*: `deploy-production.yml` (below) runs in parallel with CI on the same push.
+That single quality job is what branch protection gates PRs on. Note they gate *merging*, not *deploying*: `deploy-production.yml` (below) runs in parallel with CI on the same push.
 
 ## `_deploy.yml` — Deploy (reusable)
 
