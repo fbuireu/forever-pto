@@ -1,3 +1,10 @@
+## [1.8.3](https://github.com/fbuireu/forever-pto/compare/v1.8.2...v1.8.3) (2026-08-22)
+
+
+### Bug Fixes
+
+* **deps:** update dependency next to v16.3.1 ([#350](https://github.com/fbuireu/forever-pto/issues/350)) ([a4d7446](https://github.com/fbuireu/forever-pto/commit/a4d7446408f633175d9c379f475385189a400665))
+
 ## [1.8.2](https://github.com/fbuireu/forever-pto/compare/v1.8.1...v1.8.2) (2026-08-15)
 
 
