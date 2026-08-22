@@ -56,7 +56,7 @@ On `main`, the deploy job reuses the build job's `docs/dist` artifact and runs `
 
 ## Accepted cost: docs PRs still run app CI
 
-The app's workflows (`ci.yml`, `deploy-development.yml`, `deploy-production.yml`) have **no path filters**, so a docs-only PR still runs the full app lint/typecheck/test suite, deploys an app preview Worker and runs app E2E — wasted minutes, accepted for now.
+The app's workflow (`ci.yml`, which carries the deploy jobs too) has **no path filters**, so a docs-only PR still runs the full app `pnpm verify`, deploys an app preview Worker and runs app E2E — wasted minutes, accepted for now.
 
 The obvious fix, `paths-ignore: ['docs/**']` on the app workflows, has a branch-protection caveat: required status checks that never run **never report**, and GitHub blocks the merge waiting for them. Adopting path filters therefore also means restructuring the required checks (e.g. a summary job that always runs, or `paths`-aware required checks). Tracked as a follow-up; until then the redundancy is the price of simple branch protection.
 

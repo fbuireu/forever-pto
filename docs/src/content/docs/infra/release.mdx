@@ -11,35 +11,33 @@ Releases are fully automated by [semantic-release](https://semantic-release.gitb
 
 ```text
  push to main
-   ├────────────────────────────┬─────────────────────────────┐
-   ▼                            ▼                             ▼
- ci.yml                    deploy-production.yml         zizmor.yml
-   ├─ lint ─┐                (deploys the merge
-   ├─ typecheck ─┼─ all green ─┐   commit immediately,
-   └─ unit tests ┘             │   NOT gated on CI)
-                               ▼
-                         semantic-release
-                           ├─ analyze commits since last tag
-                           ├─ CHANGELOG.md + version bump
-                           ├─ commit "chore(release): x.y.z [skip ci]"
-                           ├─ git tag vX.Y.Z + GitHub Release
-                           └─ force-move floating major tag (vX)
+   ├──────────────────────────────────────────────────────────┐
+   ▼                                                          ▼
+ ci.yml                                                   zizmor.yml
+   └─ Check (pnpm verify)
+        └─ Deploy to production
+             └─ Semantic Release
+                  ├─ analyze commits since last tag
+                  ├─ CHANGELOG.md + version bump
+                  ├─ commit "chore(release): x.y.z [skip ci]"
+                  ├─ git tag vX.Y.Z + GitHub Release
+                  └─ force-move floating major tag (vX)
 ```
 
-1. **Quality gates.** The `release` job `needs` lint, typecheck and unit tests, and only runs on a push to `main` (not on PRs). Its concurrency group is `release` with `cancel-in-progress: false`, so releases queue instead of racing.
+1. **Quality gates.** The `release` job `needs` `check` — the one job running `pnpm verify` — and `deploy-production`, and only runs on a push to `main` (not on PRs). Its concurrency group is `release` with `cancel-in-progress: false`, so releases queue instead of racing.
 2. **semantic-release** analyzes conventional commits since the last tag (`@semantic-release/commit-analyzer`): `fix:` → patch, `feat:` → minor, `BREAKING CHANGE` → major; `docs:`, `chore:`, `ci:` etc. produce **no release**.
 3. Plugins run in the order declared in `.releaserc.json`: release notes → `CHANGELOG.md` (`@semantic-release/changelog`) → version bump in `package.json` (`@semantic-release/npm` with `npmPublish: false` — the package is private, only the version field matters) → a git commit of `package.json`, `pnpm-lock.yaml` and `CHANGELOG.md` with the message `chore(release): <version> [skip ci]` → a GitHub Release.
 4. **Floating major tag.** A final workflow step force-moves the major tag (e.g. `v1`) to the new release tag and force-pushes it, using the `PAT` secret (a plain `GITHUB_TOKEN` push would not re-trigger anything and lacks tag-force rights on protected refs).
 
-The `[skip ci]` marker on the release commit is load-bearing: without it, the version-bump push to `main` would trigger `ci.yml` *and* `deploy-production.yml` again, in an infinite-ish loop.
+The `[skip ci]` marker on the release commit is load-bearing: without it, the version-bump push to `main` would trigger `ci.yml` again — Check, deploy and release — in an infinite-ish loop.
 
-## Deploys are parallel, not sequenced
+## Deploys are gated, and sequenced
 
-`deploy-production.yml` triggers on the same push event as `ci.yml`. Production deploys the merge commit **immediately and unconditionally** — it does not wait for tests, and it does not wait for (or care about) the release. A red `main` still ships. The safety net is that branch protection makes CI green *before* merge; the trade-off is faster deploys at the cost of no post-merge gate. Keep this in mind when reading the [environments lifecycle](/infra/environments/).
+`deploy-production` is a job inside `ci.yml`, not a workflow of its own, and it `needs: [check]` — so a red `main` does not ship. The release then `needs: [check, deploy-production]`, which is why a failed deploy leaves the version untouched rather than tagging something that never went out. Keep this in mind when reading the [environments lifecycle](/infra/environments/).
 
 ## Squash merge: the PR title is the commit
 
-`main` receives squash merges, so the **PR title becomes the conventional commit** that semantic-release analyzes. Individual commit messages inside the PR are irrelevant to releasing (though `commitlint` via Husky still enforces the convention locally — see `commitlint.config.ts`).
+`main` receives squash merges and the repository sets the squash title to `PR_TITLE`, so the **PR title becomes the conventional commit** that semantic-release analyzes. Individual commit messages inside the PR are irrelevant to releasing: the Husky `commit-msg` hook validates them, and the squash then discards them. That is what `commit-message.yml` is for — it runs commitlint on the title itself, which is otherwise unguarded, and GitHub pre-fills that title from the *branch name* whenever a PR carries more than one commit.
 
 Consequences:
 

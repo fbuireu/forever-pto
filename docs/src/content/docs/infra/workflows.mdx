@@ -9,13 +9,13 @@ All workflows live in `.github/workflows/`. Two repo-wide conventions, enforced 
 
 | Workflow | Trigger | Purpose |
 | --- | --- | --- |
-| `ci.yml` | push to `main`, PRs to `main` | Lint, typecheck, unit tests; release on `main` |
+| `ci.yml` | push to `main`, PRs to `main` | One `Check` job running `pnpm verify`, both deploys, the E2E run and the release |
 | `_deploy.yml` | `workflow_call` | Reusable OpenNext build + deploy + secret push |
-| `deploy-development.yml` | PR opened/reopened/synchronize | Per-PR preview Worker + comment + E2E |
-| `deploy-production.yml` | push to `main` | Production deploy |
 | `cleanup-development.yml` | PR closed | Delete the per-PR preview Worker |
 | `docs.yml` | push / PR touching `docs/**` | This site's build, checks and deploy |
 | `zizmor.yml` | push to `main`, all PRs | Workflow security linting |
+| `dependency-review.yml` | all PRs | Fails a PR that introduces a dependency with a known vulnerability |
+| `commit-message.yml` | PR opened/edited/reopened/synchronize | commitlint on the **pull request title** — the string a squash merge commits |
 | `renovate-auto-approve.yml` | Renovate PRs (by label) | Auto-approve safe dependency PRs |
 | `dependabot-auto-merge.yml` | Dependabot PRs | Dormant — Renovate is the active bot |
 
@@ -26,7 +26,7 @@ Runs on pushes to `main` and PRs targeting `main`. Concurrency is per-ref with `
 - **Check** — one job running `pnpm verify`: `format:check` (Biome, no writes), `typecheck` (`tsc --noEmit` over the app project) and `test:ut:coverage` (Vitest), then coverage upload to Codecov (`fail_ci_if_error: false`, so Codecov outages never block CI). The same command is what `pre-push` runs, so a green push is a green CI.
 - **Semantic Release** — `needs: [check]`, and only on push to `main`. Covered in depth on the [release](/infra/release/) page.
 
-That single quality job is what branch protection gates PRs on. Note they gate *merging*, not *deploying*: `deploy-production.yml` (below) runs in parallel with CI on the same push.
+That single quality job is what the ruleset gates PRs on. It gates *deploying* too: `deploy-production` is a job of this same workflow and `needs: [check]`, so a red `main` does not ship.
 
 ## `_deploy.yml` — Deploy (reusable)
 
@@ -36,13 +36,13 @@ A `workflow_call` workflow shared by both deploy entry points. Inputs: `environm
 2. `pnpm exec wrangler deploy --env <wrangler_env>`, adding `--name <worker_name>` when set — the name override is what creates a fresh per-PR Worker.
 3. Push the five runtime secrets with `wrangler secret bulk` (targeting `--name` for previews, `--env` otherwise). A small Node guard fails the job if any secret is missing rather than deploying a half-configured Worker. See [secrets](/infra/secrets/).
 
-## `deploy-development.yml` — Deploy - Development
+## `deploy-development` — the preview job of `ci.yml`
 
-Per-PR preview creation; the full lifecycle is on the [environments](/infra/environments/) page. Three jobs: `deploy` (calls `_deploy.yml` with the `pr-<n>-forever-pto-development` name), `comment` (upserts a sticky preview-URL comment keyed on a hidden HTML marker) and `e2e` (Playwright chromium against the live preview through a Cloudflare Access service token, report uploaded as an artifact). Concurrency is per-PR with `cancel-in-progress: true`, so rapid pushes only deploy the latest commit.
+Per-PR preview creation; the full lifecycle is on the [environments](/infra/environments/) page. Three jobs of `ci.yml`: `deploy-development` (calls `_deploy.yml` with the `pr-<n>-forever-pto-development` name), `comment` (upserts a sticky preview-URL comment keyed on a hidden HTML marker) and `e2e` (Playwright chromium against the live preview through a Cloudflare Access service token, report uploaded as an artifact). Concurrency is per-PR with `cancel-in-progress: true`, so rapid pushes only deploy the latest commit.
 
-## `deploy-production.yml` — Deploy - Production
+## `deploy-production` — the production job of `ci.yml`
 
-Push to `main` → `_deploy.yml` with `environment: production`, `wrangler_env: production` and `url: https://forever-pto.com`. No `worker_name` override, so it updates the `forever-pto` Worker in place. Concurrency group `deploy-production` with `cancel-in-progress: false`: deploys queue rather than cancel. It is **not** gated on CI passing — see [release](/infra/release/) for the implications.
+Push to `main`, after `check` → `_deploy.yml` with `environment: production`, `wrangler_env: production` and `url: https://forever-pto.com`. No `worker_name` override, so it updates the `forever-pto` Worker in place. Concurrency group `deploy-production` with `cancel-in-progress: false`: deploys queue rather than cancel. It `needs: [check]`, so it is gated on CI passing — see [release](/infra/release/).
 
 ## `cleanup-development.yml` — Cleanup - Development
 
@@ -51,6 +51,16 @@ On `pull_request: closed`, runs `cloudflare/wrangler-action` with `delete pr-<n>
 ## `docs.yml` — Docs
 
 CI/CD for this documentation site, path-filtered to `docs/**` plus the app UI surfaces the demos import (`src/ui/modules/core/**`, `src/ui/styles/**`, `src/ui/utils/**`…). Note the asymmetry: the app workflows have **no** path filters, so docs changes still run the full app CI. Build & test, versioned PR previews and production deploy of the `forever-pto-docs` Worker — the full walkthrough is on [docs CI](/infra/docs-ci/).
+
+## `commit-message.yml` — Commit Message
+
+Runs commitlint on the **pull request title**, not on the branch's commits. `main` takes squash merges and the repository sets the squash title to `PR_TITLE`, so that title is the message that lands and the one semantic-release parses. The `commit-msg` hook validates commits the squash then discards, which makes this the only guard on the string that ships — and GitHub pre-fills the title from the *branch name* whenever a PR carries more than one commit, so the default is rarely conventional.
+
+It re-runs on `synchronize` even though a push cannot change the title: required status checks are evaluated against the head SHA, so without it a new commit would leave the check unreported and block the PR.
+
+## `dependency-review.yml` — Dependency Review
+
+Fails a PR that introduces a dependency with a known vulnerability, reading the lockfile diff. Runs on every PR and needs no secrets.
 
 ## `zizmor.yml` — Security Analysis with zizmor
 
