@@ -1,42 +1,42 @@
-import ca from '@i18n/messages/ca.json';
-import de from '@i18n/messages/de.json';
-import en from '@i18n/messages/en.json';
-import es from '@i18n/messages/es.json';
-import fr from '@i18n/messages/fr.json';
-import it from '@i18n/messages/it.json';
-import { CA, DE, EN, ES, FR, IT } from '@infrastructure/i18n/locales';
-import { getLocaleFromPathname, localePath } from '@infrastructure/i18n/utils/url';
-import { createTranslator } from 'next-intl';
-import pkg from '../../../package.json';
+import ca from "@i18n/messages/ca.json";
+import de from "@i18n/messages/de.json";
+import en from "@i18n/messages/en.json";
+import es from "@i18n/messages/es.json";
+import fr from "@i18n/messages/fr.json";
+import it from "@i18n/messages/it.json";
+import { CA, DE, EN, ES, FR, IT } from "@infrastructure/i18n/locales";
+import { getLocaleFromPathname, localePath } from "@infrastructure/i18n/utils/url";
+import { createTranslator } from "next-intl";
+import pkg from "../../../package.json";
 
 const MESSAGES: Record<string, typeof en> = {
-  [CA]: ca,
-  [DE]: de,
-  [EN]: en,
-  [ES]: es,
-  [FR]: fr,
-  [IT]: it,
+	[CA]: ca,
+	[DE]: de,
+	[EN]: en,
+	[ES]: es,
+	[FR]: fr,
+	[IT]: it,
 };
 
 const MARKDOWN_ROUTES = [
-  { path: '/legal/cookie-policy', title: 'cookiePolicy.title', description: 'cookiePolicy.description' },
-  { path: '/legal/privacy-policy', title: 'privacyPolicy.title', description: 'privacyPolicy.description' },
-  { path: '/legal/terms-of-service', title: 'termsOfService.title', description: 'termsOfService.description' },
-  { path: '/legal/legal-notice', title: 'legalNotice.title', description: 'legalNotice.description' },
-  { path: '/payment/confirmation', title: 'paymentConfirmation.title', description: undefined },
+	{ path: "/legal/cookie-policy", title: "cookiePolicy.title", description: "cookiePolicy.description" },
+	{ path: "/legal/privacy-policy", title: "privacyPolicy.title", description: "privacyPolicy.description" },
+	{ path: "/legal/terms-of-service", title: "termsOfService.title", description: "termsOfService.description" },
+	{ path: "/legal/legal-notice", title: "legalNotice.title", description: "legalNotice.description" },
+	{ path: "/payment/confirmation", title: "paymentConfirmation.title", description: undefined },
 ] as const;
 
 export async function buildMarkdownPage(baseUrl: string, pathname: string) {
-  const locale = getLocaleFromPathname(pathname);
-  const messages = MESSAGES[locale];
-  const t = createTranslator({ locale, messages, namespace: 'metadata' });
+	const locale = getLocaleFromPathname(pathname);
+	const messages = MESSAGES[locale];
+	const t = createTranslator({ locale, messages, namespace: "metadata" });
 
-  const route = MARKDOWN_ROUTES.find(({ path }) => pathname.includes(path));
+	const route = MARKDOWN_ROUTES.find(({ path }) => pathname.includes(path));
 
-  if (route) {
-    return `# ${t(route.title)}
+	if (route) {
+		return `# ${t(route.title)}
 
-${route.description ? `${t(route.description)}\n` : ''}
+${route.description ? `${t(route.description)}\n` : ""}
 ## Version
 
 ${pkg.version}
@@ -45,18 +45,18 @@ ${pkg.version}
 
 ${baseUrl}${localePath(locale, route.path)}
 `;
-  }
+	}
 
-  if (pathname.includes('/planner')) {
-    const tPlanner = createTranslator({ locale, messages, namespace: 'planner' });
+	if (pathname.includes("/planner")) {
+		const tPlanner = createTranslator({ locale, messages, namespace: "planner" });
 
-    return `# ${t('planner.title')}
+		return `# ${t("planner.title")}
 
-${t('planner.description')}
+${t("planner.description")}
 
-## ${tPlanner('title')}
+## ${tPlanner("title")}
 
-${tPlanner('description')}
+${tPlanner("description")}
 
 ## Features
 
@@ -80,13 +80,13 @@ ${pkg.version}
 
 ## URL
 
-${baseUrl}${localePath(locale, '/planner')}
+${baseUrl}${localePath(locale, "/planner")}
 `;
-  }
+	}
 
-  return `# ${t('title')}
+	return `# ${t("title")}
 
-${t('description')}
+${t("description")}
 
 ## Features
 
@@ -99,7 +99,7 @@ ${t('description')}
 
 ## How It Works
 
-1. Open the planner at ${baseUrl}${localePath(locale, '/planner')}
+1. Open the planner at ${baseUrl}${localePath(locale, "/planner")}
 2. Your country is detected automatically; adjust country and region if needed
 3. Select a year and optimization strategy
 4. The planner generates a list of suggested PTO days that bridge holidays

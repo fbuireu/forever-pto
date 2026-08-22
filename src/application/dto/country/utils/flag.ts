@@ -1,5 +1,5 @@
 export function getFlagCode(countryCode: string): string {
-  if (!countryCode) return '';
+	if (!countryCode) return "";
 
-  return countryCode.toLowerCase();
+	return countryCode.toLowerCase();
 }

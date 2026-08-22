@@ -1,67 +1,67 @@
-import type { IconProps } from '@ui/modules/core/animate/icons/Icon';
-import { cn } from '@ui/utils/cn';
-import type { LucideIcon } from 'lucide-react';
-import type { ComponentType, ReactNode } from 'react';
+import type { IconProps } from "@ui/modules/core/animate/icons/Icon";
+import { cn } from "@ui/utils/cn";
+import type { LucideIcon } from "lucide-react";
+import type { ComponentType, ReactNode } from "react";
 
 interface BannerProps {
-  icon: LucideIcon | ComponentType<IconProps<never>>;
-  title: string;
-  children: ReactNode;
-  action?: ReactNode;
-  colorScheme: keyof typeof COLOR_SCHEMES;
-  className?: string;
+	icon: LucideIcon | ComponentType<IconProps<never>>;
+	title: string;
+	children: ReactNode;
+	action?: ReactNode;
+	colorScheme: keyof typeof COLOR_SCHEMES;
+	className?: string;
 }
 
 const COLOR_SCHEMES = {
-  orange: {
-    bg: 'bg-[color-mix(in_srgb,var(--color-brand-orange)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-orange)_16%,black_84%)]',
-    icon: 'text-[var(--color-brand-orange-deep)] dark:text-orange-300',
-    title: 'text-[var(--color-brand-orange-deep)] dark:text-orange-200',
-    message: 'text-[var(--color-brand-ink)] dark:text-orange-100',
-  },
-  blue: {
-    bg: 'bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_16%,black_84%)]',
-    icon: 'text-[var(--color-brand-teal-deep)] dark:text-teal-300',
-    title: 'text-[var(--color-brand-teal-deep)] dark:text-teal-200',
-    message: 'text-[var(--color-brand-ink)] dark:text-teal-100',
-  },
-  indigo: {
-    bg: 'bg-[color-mix(in_srgb,var(--color-brand-purple)_20%,white_80%)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]',
-    icon: 'text-[var(--color-brand-purple-deep)] dark:text-purple-300',
-    title: 'text-[var(--color-brand-purple-deep)] dark:text-purple-200',
-    message: 'text-[var(--color-brand-ink)] dark:text-purple-100',
-  },
-  green: {
-    bg: 'bg-[color-mix(in_srgb,var(--color-brand-green)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-green)_16%,black_84%)]',
-    icon: 'text-[#3f6212] dark:text-[var(--color-brand-green)]',
-    title: 'text-[#3f6212] dark:text-[var(--color-brand-green)]',
-    message: 'text-[var(--color-brand-ink)] dark:text-green-100',
-  },
+	orange: {
+		bg: "bg-[color-mix(in_srgb,var(--color-brand-orange)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-orange)_16%,black_84%)]",
+		icon: "text-[var(--color-brand-orange-deep)] dark:text-orange-300",
+		title: "text-[var(--color-brand-orange-deep)] dark:text-orange-200",
+		message: "text-[var(--color-brand-ink)] dark:text-orange-100",
+	},
+	blue: {
+		bg: "bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_16%,black_84%)]",
+		icon: "text-[var(--color-brand-teal-deep)] dark:text-teal-300",
+		title: "text-[var(--color-brand-teal-deep)] dark:text-teal-200",
+		message: "text-[var(--color-brand-ink)] dark:text-teal-100",
+	},
+	indigo: {
+		bg: "bg-[color-mix(in_srgb,var(--color-brand-purple)_20%,white_80%)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]",
+		icon: "text-[var(--color-brand-purple-deep)] dark:text-purple-300",
+		title: "text-[var(--color-brand-purple-deep)] dark:text-purple-200",
+		message: "text-[var(--color-brand-ink)] dark:text-purple-100",
+	},
+	green: {
+		bg: "bg-[color-mix(in_srgb,var(--color-brand-green)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-green)_16%,black_84%)]",
+		icon: "text-[#3f6212] dark:text-[var(--color-brand-green)]",
+		title: "text-[#3f6212] dark:text-[var(--color-brand-green)]",
+		message: "text-[var(--color-brand-ink)] dark:text-green-100",
+	},
 };
 
-export const Banner = ({ icon: Icon, title, children, action, colorScheme, className = '' }: BannerProps) => {
-  const colors = COLOR_SCHEMES[colorScheme];
+export const Banner = ({ icon: Icon, title, children, action, colorScheme, className = "" }: BannerProps) => {
+	const colors = COLOR_SCHEMES[colorScheme];
 
-  return (
-    <div
-      role='note'
-      aria-label={title}
-      className={cn(
-        'rounded-[10px] border-[3px] border-[var(--frame)] p-4 shadow-[var(--shadow-brutal-sm)]',
-        colors.bg,
-        className
-      )}
-    >
-      <div className='flex items-center gap-2 mb-2'>
-        <Icon aria-hidden='true' className={cn('size-4 shrink-0', colors.icon)} />
-        <span className={cn('text-[0.72rem] font-display font-black uppercase tracking-[0.08em]', colors.title)}>
-          {title}
-        </span>
-      </div>
-      <div className={cn('flex flex-wrap items-baseline gap-x-1 text-sm font-medium leading-snug', colors.message)}>
-        {children}
-      </div>
-      {action && <div className='mt-3'>{action}</div>}
-    </div>
-  );
+	return (
+		<div
+			role="note"
+			aria-label={title}
+			className={cn(
+				"rounded-[10px] border-[3px] border-[var(--frame)] p-4 shadow-[var(--shadow-brutal-sm)]",
+				colors.bg,
+				className,
+			)}
+		>
+			<div className="flex items-center gap-2 mb-2">
+				<Icon aria-hidden="true" className={cn("size-4 shrink-0", colors.icon)} />
+				<span className={cn("text-[0.72rem] font-display font-black uppercase tracking-[0.08em]", colors.title)}>
+					{title}
+				</span>
+			</div>
+			<div className={cn("flex flex-wrap items-baseline gap-x-1 text-sm font-medium leading-snug", colors.message)}>
+				{children}
+			</div>
+			{action && <div className="mt-3">{action}</div>}
+		</div>
+	);
 };

@@ -270,8 +270,9 @@ one above the highest existing file, and link it from wherever it bites — a go
 - **The Cloudflare context is request-scoped.** Route handlers and server actions may read it; use-cases may
   not, and must receive configuration as plain values.
   [ADR 0004](./docs/adr/0004-cloudflare-workers-as-deployment-target.md).
-- **Biome's `noConsole` is a warning with `warn`/`error` allowed**, not an error — `console.log` will not fail
-  the build, so it is on you not to leave one behind.
+- **Biome's `noConsole` is an error with no allowlist** — no `console` at any level; log through
+  `src/infrastructure/clients/logging`. The single exception is the BetterStack client's own unconfigured
+  warning, scoped in `biome.json`'s `overrides`: it is the logger, so it has nothing else to call.
 - **The planning pipeline exists once, and used to exist twice.** `runPlanningPipeline` under
   `src/domain/calendar/` is the whole run — caches, pseudo-Holidays, budget, both planning calls, the Metrics.
   The Web Worker and the holidays store's own action are its two callers and add only transport. They were two

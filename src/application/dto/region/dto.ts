@@ -1,11 +1,11 @@
-import type { BaseDTO } from '@application/shared/dto/baseDTO';
-import type { RawRegion, RegionDTO } from './types';
+import type { BaseDTO } from "@application/shared/dto/baseDTO";
+import type { RawRegion, RegionDTO } from "./types";
 
 export const regionDTO: BaseDTO<RawRegion, RegionDTO[]> = {
-  create: ({ raw }) => {
-    return Object.entries(raw).map(([code, name]) => ({
-      value: code,
-      label: name,
-    }));
-  },
+	create: ({ raw }) => {
+		return Object.entries(raw).map(([code, name]) => ({
+			value: code,
+			label: name,
+		}));
+	},
 };

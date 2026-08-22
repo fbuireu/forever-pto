@@ -1,11 +1,11 @@
-import { LOCALES } from '@infrastructure/i18n/locales';
-import { useTranslations } from 'next-intl';
+import { LOCALES } from "@infrastructure/i18n/locales";
+import { useTranslations } from "next-intl";
 
 export function useLanguages() {
-  const t = useTranslations('languages');
+	const t = useTranslations("languages");
 
-  return LOCALES.map((code) => ({
-    code,
-    label: t(code as Parameters<typeof t>[0]),
-  }));
+	return LOCALES.map((code) => ({
+		code,
+		label: t(code as Parameters<typeof t>[0]),
+	}));
 }

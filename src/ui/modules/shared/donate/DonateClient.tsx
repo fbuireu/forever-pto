@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 
 const Donate = dynamic(
-  () => import('@ui/modules/shared/donate/Donate').then((module) => ({ default: module.Donate })),
-  {
-    ssr: false,
-  }
+	() => import("@ui/modules/shared/donate/Donate").then((module) => ({ default: module.Donate })),
+	{
+		ssr: false,
+	},
 );
 
 export function DonateClient({ bottomClassName }: { bottomClassName?: string }) {
-  return <Donate bottomClassName={bottomClassName} />;
+	return <Donate bottomClassName={bottomClassName} />;
 }

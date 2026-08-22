@@ -1,75 +1,75 @@
-import type { HolidayDTO } from '@application/dto/holiday/types';
-import { ArrowDown } from '@ui/modules/core/animate/icons/ArrowDown';
-import { ArrowUp } from '@ui/modules/core/animate/icons/ArrowUp';
-import { AnimateIcon } from '@ui/modules/core/animate/icons/Icon';
-import { TableHeader as BaseTableHeader, TableHead, TableRow } from '@ui/modules/core/primitives/Table';
-import { cn } from '@ui/utils/cn';
-import { ArrowUpDown } from 'lucide-react';
-import { useTranslations } from 'next-intl';
-import { memo, type ReactNode } from 'react';
+import type { HolidayDTO } from "@application/dto/holiday/types";
+import { ArrowDown } from "@ui/modules/core/animate/icons/ArrowDown";
+import { ArrowUp } from "@ui/modules/core/animate/icons/ArrowUp";
+import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
+import { TableHeader as BaseTableHeader, TableHead, TableRow } from "@ui/modules/core/primitives/Table";
+import { cn } from "@ui/utils/cn";
+import { ArrowUpDown } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { memo, type ReactNode } from "react";
 
 interface HolidayTableHeaderProps {
-  selectAllButton: ReactNode;
-  sortConfig: {
-    key: keyof HolidayDTO | null;
-    direction: 'asc' | 'desc';
-  };
-  onSort: (key: keyof HolidayDTO) => void;
+	selectAllButton: ReactNode;
+	sortConfig: {
+		key: keyof HolidayDTO | null;
+		direction: "asc" | "desc";
+	};
+	onSort: (key: keyof HolidayDTO) => void;
 }
 
 interface TableHeaderProps {
-  children: ReactNode;
-  sortKey: keyof HolidayDTO;
-  currentSort: { key: keyof HolidayDTO | null; direction: 'asc' | 'desc' };
-  onSort: (key: keyof HolidayDTO) => void;
-  className?: string;
+	children: ReactNode;
+	sortKey: keyof HolidayDTO;
+	currentSort: { key: keyof HolidayDTO | null; direction: "asc" | "desc" };
+	onSort: (key: keyof HolidayDTO) => void;
+	className?: string;
 }
 
-const TableHeader = ({ children, sortKey, currentSort, onSort, className = '' }: TableHeaderProps) => {
-  const isActive = currentSort.key === sortKey;
-  const Icon = isActive ? (currentSort.direction === 'asc' ? ArrowUp : ArrowDown) : ArrowUpDown;
+const TableHeader = ({ children, sortKey, currentSort, onSort, className = "" }: TableHeaderProps) => {
+	const isActive = currentSort.key === sortKey;
+	const Icon = isActive ? (currentSort.direction === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
 
-  return (
-    <TableHead
-      className={cn('select-none p-0', className)}
-      aria-sort={isActive ? (currentSort.direction === 'asc' ? 'ascending' : 'descending') : 'none'}
-    >
-      <AnimateIcon animateOnHover asChild>
-        <button
-          type='button'
-          onClick={() => onSort(sortKey)}
-          className='flex h-11 w-full cursor-pointer items-center gap-x-1 px-3 text-left text-foreground transition-colors hover:bg-muted/50'
-        >
-          <span>{children}</span>
-          <Icon className='size-4' />
-        </button>
-      </AnimateIcon>
-    </TableHead>
-  );
+	return (
+		<TableHead
+			className={cn("select-none p-0", className)}
+			aria-sort={isActive ? (currentSort.direction === "asc" ? "ascending" : "descending") : "none"}
+		>
+			<AnimateIcon animateOnHover asChild>
+				<button
+					type="button"
+					onClick={() => onSort(sortKey)}
+					className="flex h-11 w-full cursor-pointer items-center gap-x-1 px-3 text-left text-foreground transition-colors hover:bg-muted/50"
+				>
+					<span>{children}</span>
+					<Icon className="size-4" />
+				</button>
+			</AnimateIcon>
+		</TableHead>
+	);
 };
 
 const HolidayTableHeaderComponent = ({ selectAllButton, sortConfig, onSort }: HolidayTableHeaderProps) => {
-  const t = useTranslations('holidayTableHeader');
+	const t = useTranslations("holidayTableHeader");
 
-  return (
-    <BaseTableHeader className='sticky top-0 z-10'>
-      <TableRow>
-        <TableHead>{selectAllButton}</TableHead>
-        <TableHeader sortKey='name' currentSort={sortConfig} onSort={onSort}>
-          {t('holiday')}
-        </TableHeader>
-        <TableHeader sortKey='date' currentSort={sortConfig} onSort={onSort}>
-          {t('date')}
-        </TableHeader>
-        <TableHead className='text-foreground'>{t('day')}</TableHead>
-        <TableHeader sortKey='type' currentSort={sortConfig} onSort={onSort}>
-          {t('type')}
-        </TableHeader>
-        <TableHead className='text-foreground'>{t('status')}</TableHead>
-      </TableRow>
-    </BaseTableHeader>
-  );
+	return (
+		<BaseTableHeader className="sticky top-0 z-10">
+			<TableRow>
+				<TableHead>{selectAllButton}</TableHead>
+				<TableHeader sortKey="name" currentSort={sortConfig} onSort={onSort}>
+					{t("holiday")}
+				</TableHeader>
+				<TableHeader sortKey="date" currentSort={sortConfig} onSort={onSort}>
+					{t("date")}
+				</TableHeader>
+				<TableHead className="text-foreground">{t("day")}</TableHead>
+				<TableHeader sortKey="type" currentSort={sortConfig} onSort={onSort}>
+					{t("type")}
+				</TableHeader>
+				<TableHead className="text-foreground">{t("status")}</TableHead>
+			</TableRow>
+		</BaseTableHeader>
+	);
 };
 
 export const HolidayTableHeader = memo(HolidayTableHeaderComponent);
-HolidayTableHeader.displayName = 'HolidayTableHeader';
+HolidayTableHeader.displayName = "HolidayTableHeader";

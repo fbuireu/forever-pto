@@ -1,19 +1,19 @@
-import type { SvgIcon } from '@ui/assets/icons/types';
-import { getViewBoxFromSvg } from '@ui/modules/shared/utils/helpers';
+import type { SvgIcon } from "@ui/assets/icons/types";
+import { getViewBoxFromSvg } from "@ui/modules/shared/utils/helpers";
 
 interface IconProps {
-  icon: SvgIcon;
-  size?: number;
-  className?: string;
+	icon: SvgIcon;
+	size?: number;
+	className?: string;
 }
 
-export const Icon = ({ icon, size = 24, className = '' }: IconProps) => {
-  const viewBox = getViewBoxFromSvg(icon.svg);
+export const Icon = ({ icon, size = 24, className = "" }: IconProps) => {
+	const viewBox = getViewBoxFromSvg(icon.svg);
 
-  return (
-    <svg role='img' viewBox={viewBox} width={size} height={size} className={className} fill='currentColor'>
-      <title>{icon.title}</title>
-      <path d={icon.path} />
-    </svg>
-  );
+	return (
+		<svg role="img" viewBox={viewBox} width={size} height={size} className={className} fill="currentColor">
+			<title>{icon.title}</title>
+			<path d={icon.path} />
+		</svg>
+	);
 };

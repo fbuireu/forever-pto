@@ -1,12 +1,12 @@
-import Script from 'next/script';
+import Script from "next/script";
 
 const GA_ID = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
 
 export const Analytics = () => {
-  return (
-    <>
-      <Script id='gtag-consent' strategy='afterInteractive'>
-        {`
+	return (
+		<>
+			<Script id="gtag-consent" strategy="afterInteractive">
+				{`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
 
@@ -17,18 +17,18 @@ export const Analytics = () => {
             'ad_personalization': 'denied'
           });
         `}
-      </Script>
+			</Script>
 
-      <Script id='gtag-js' strategy='afterInteractive' src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
+			<Script id="gtag-js" strategy="afterInteractive" src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
 
-      <Script id='gtag-config' strategy='afterInteractive'>
-        {`
+			<Script id="gtag-config" strategy="afterInteractive">
+				{`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           gtag('config', '${GA_ID}');
         `}
-      </Script>
-    </>
-  );
+			</Script>
+		</>
+	);
 };

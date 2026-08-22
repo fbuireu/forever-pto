@@ -1,75 +1,75 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockFetch = vi.fn();
-vi.stubGlobal('fetch', mockFetch);
+vi.stubGlobal("fetch", mockFetch);
 
-const { verifyPremiumEmail, getExistingSession } = await import('./checkSession');
+const { verifyPremiumEmail, getExistingSession } = await import("./checkSession");
 
 beforeEach(() => {
-  mockFetch.mockReset();
+	mockFetch.mockReset();
 });
 
-describe('verifyPremiumEmail', () => {
-  it('returns null when response is not ok', async () => {
-    mockFetch.mockResolvedValue({ ok: false });
+describe("verifyPremiumEmail", () => {
+	it("returns null when response is not ok", async () => {
+		mockFetch.mockResolvedValue({ ok: false });
 
-    expect(await verifyPremiumEmail('user@example.com')).toBeNull();
-  });
+		expect(await verifyPremiumEmail("user@example.com")).toBeNull();
+	});
 
-  it('returns null when premiumKey is absent in response', async () => {
-    mockFetch.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue({}) });
+	it("returns null when premiumKey is absent in response", async () => {
+		mockFetch.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue({}) });
 
-    expect(await verifyPremiumEmail('user@example.com')).toBeNull();
-  });
+		expect(await verifyPremiumEmail("user@example.com")).toBeNull();
+	});
 
-  it('returns premiumKey when present', async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockResolvedValue({ premiumKey: 'pk_abc' }),
-    });
+	it("returns premiumKey when present", async () => {
+		mockFetch.mockResolvedValue({
+			ok: true,
+			json: vi.fn().mockResolvedValue({ premiumKey: "pk_abc" }),
+		});
 
-    expect(await verifyPremiumEmail('user@example.com')).toEqual({ premiumKey: 'pk_abc' });
-  });
+		expect(await verifyPremiumEmail("user@example.com")).toEqual({ premiumKey: "pk_abc" });
+	});
 
-  it('sends email in request body', async () => {
-    mockFetch.mockResolvedValue({ ok: false });
+	it("sends email in request body", async () => {
+		mockFetch.mockResolvedValue({ ok: false });
 
-    await verifyPremiumEmail('test@domain.com');
+		await verifyPremiumEmail("test@domain.com");
 
-    const [, options] = mockFetch.mock.calls[0] as [string, RequestInit];
-    expect(JSON.parse(options.body as string)).toEqual({ email: 'test@domain.com' });
-  });
+		const [, options] = mockFetch.mock.calls[0] as [string, RequestInit];
+		expect(JSON.parse(options.body as string)).toEqual({ email: "test@domain.com" });
+	});
 });
 
-describe('getExistingSession', () => {
-  it('throws when the check itself failed, so a server blip is never read as an absent session', async () => {
-    mockFetch.mockResolvedValue({ ok: false, status: 500 });
+describe("getExistingSession", () => {
+	it("throws when the check itself failed, so a server blip is never read as an absent session", async () => {
+		mockFetch.mockResolvedValue({ ok: false, status: 500 });
 
-    await expect(getExistingSession()).rejects.toThrow('500');
-  });
+		await expect(getExistingSession()).rejects.toThrow("500");
+	});
 
-  it('returns null when premiumKey is absent in response', async () => {
-    mockFetch.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue({ email: 'user@example.com' }) });
+	it("returns null when premiumKey is absent in response", async () => {
+		mockFetch.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue({ email: "user@example.com" }) });
 
-    expect(await getExistingSession()).toBeNull();
-  });
+		expect(await getExistingSession()).toBeNull();
+	});
 
-  it('returns full SessionData when premiumKey is present', async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockResolvedValue({ premiumKey: 'pk_abc', email: 'user@example.com' }),
-    });
+	it("returns full SessionData when premiumKey is present", async () => {
+		mockFetch.mockResolvedValue({
+			ok: true,
+			json: vi.fn().mockResolvedValue({ premiumKey: "pk_abc", email: "user@example.com" }),
+		});
 
-    expect(await getExistingSession()).toEqual({ premiumKey: 'pk_abc', email: 'user@example.com' });
-  });
+		expect(await getExistingSession()).toEqual({ premiumKey: "pk_abc", email: "user@example.com" });
+	});
 
-  it('uses a GET request with credentials included', async () => {
-    mockFetch.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue({}) });
+	it("uses a GET request with credentials included", async () => {
+		mockFetch.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue({}) });
 
-    await getExistingSession();
+		await getExistingSession();
 
-    const [url, options] = mockFetch.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe('/api/check-session');
-    expect(options).toEqual({ credentials: 'include' });
-  });
+		const [url, options] = mockFetch.mock.calls[0] as [string, RequestInit];
+		expect(url).toBe("/api/check-session");
+		expect(options).toEqual({ credentials: "include" });
+	});
 });

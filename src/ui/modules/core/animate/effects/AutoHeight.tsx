@@ -1,57 +1,57 @@
-'use client';
+"use client";
 
-import { useAutoHeight } from '@ui/hooks/useAutoHeight';
-import { type HTMLMotionProps, m, type TargetAndTransition } from 'motion/react';
-import type { DependencyList, ReactNode } from 'react';
-import { MotionSlot, type WithAsChild } from '../primitives/animate/MotionSlot';
+import { useAutoHeight } from "@ui/hooks/useAutoHeight";
+import { type HTMLMotionProps, m, type TargetAndTransition } from "motion/react";
+import type { DependencyList, ReactNode } from "react";
+import { MotionSlot, type WithAsChild } from "../primitives/animate/MotionSlot";
 
 type AutoHeightProps = WithAsChild<
-  {
-    children: ReactNode;
-    deps?: DependencyList;
-  } & Omit<HTMLMotionProps<'div'>, 'children'>
+	{
+		children: ReactNode;
+		deps?: DependencyList;
+	} & Omit<HTMLMotionProps<"div">, "children">
 >;
 
-function isTargetAnimation(animate: HTMLMotionProps<'div'>['animate']): animate is TargetAndTransition {
-  return typeof animate === 'object' && animate !== null && !Array.isArray(animate) && !('start' in animate);
+function isTargetAnimation(animate: HTMLMotionProps<"div">["animate"]): animate is TargetAndTransition {
+	return typeof animate === "object" && animate !== null && !Array.isArray(animate) && !("start" in animate);
 }
 
 const EMPTY_DEPS: DependencyList = [];
 
 function AutoHeight({
-  children,
-  deps = EMPTY_DEPS,
-  transition = {
-    type: 'spring',
-    stiffness: 300,
-    damping: 30,
-    bounce: 0,
-    restDelta: 0.01,
-  },
-  className,
-  style,
-  animate,
-  asChild = false,
-  ...props
+	children,
+	deps = EMPTY_DEPS,
+	transition = {
+		type: "spring",
+		stiffness: 300,
+		damping: 30,
+		bounce: 0,
+		restDelta: 0.01,
+	},
+	className,
+	style,
+	animate,
+	asChild = false,
+	...props
 }: AutoHeightProps) {
-  const { ref, height } = useAutoHeight<HTMLDivElement>(deps);
-  const mergedAnimate = isTargetAnimation(animate) ? { height, ...animate } : { height };
+	const { ref, height } = useAutoHeight<HTMLDivElement>(deps);
+	const mergedAnimate = isTargetAnimation(animate) ? { height, ...animate } : { height };
 
-  const content = <div ref={ref}>{children}</div>;
+	const content = <div ref={ref}>{children}</div>;
 
-  if (asChild) {
-    return (
-      <MotionSlot className={className} style={style} animate={mergedAnimate} transition={transition} {...props}>
-        {content}
-      </MotionSlot>
-    );
-  }
+	if (asChild) {
+		return (
+			<MotionSlot className={className} style={style} animate={mergedAnimate} transition={transition} {...props}>
+				{content}
+			</MotionSlot>
+		);
+	}
 
-  return (
-    <m.div className={className} style={style} animate={mergedAnimate} transition={transition} {...props}>
-      {content}
-    </m.div>
-  );
+	return (
+		<m.div className={className} style={style} animate={mergedAnimate} transition={transition} {...props}>
+			{content}
+		</m.div>
+	);
 }
 
 export { AutoHeight };

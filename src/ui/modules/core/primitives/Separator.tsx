@@ -1,20 +1,20 @@
-import { cn } from '@ui/utils/cn';
-import type { ComponentProps } from 'react';
+import { cn } from "@ui/utils/cn";
+import type { ComponentProps } from "react";
 
-interface SeparatorProps extends ComponentProps<'div'> {
-  orientation?: 'horizontal' | 'vertical';
-  decorative?: boolean;
+interface SeparatorProps extends ComponentProps<"div"> {
+	orientation?: "horizontal" | "vertical";
+	decorative?: boolean;
 }
 
-function Separator({ className, orientation = 'horizontal', decorative = true, ...props }: SeparatorProps) {
-  return (
-    <div
-      role={decorative ? 'none' : 'separator'}
-      {...(!decorative && { 'aria-orientation': orientation })}
-      className={cn('shrink-0 bg-border', orientation === 'horizontal' ? 'h-px w-full' : 'h-full w-px', className)}
-      {...props}
-    />
-  );
+function Separator({ className, orientation = "horizontal", decorative = true, ...props }: SeparatorProps) {
+	return (
+		<div
+			role={decorative ? "none" : "separator"}
+			{...(!decorative && { "aria-orientation": orientation })}
+			className={cn("shrink-0 bg-border", orientation === "horizontal" ? "h-px w-full" : "h-full w-px", className)}
+			{...props}
+		/>
+	);
 }
 
 export { Separator };

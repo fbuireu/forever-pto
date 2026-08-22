@@ -9,13 +9,13 @@ sidebar:
 
 A single `biome.json` at the repo root lints and formats the whole workspace, `docs/` included. Highlights:
 
-- Formatter: 120-char lines, LF, spaces, single quotes (JS and JSX), es5 trailing commas.
+- Formatter: 120-char lines, LF, tabs, double quotes, trailing commas everywhere — Biome's own defaults, bar the line width. The config declares no `javascript.formatter` block at all, which is what keeps it identical to the sibling repos'.
 - `assist.actions.source.organizeImports: on` — import sorting is automated, don't hand-sort.
-- Recommended rules plus `suspicious.noConsole` as a warning (only `console.warn`/`console.error` allowed).
+- Recommended rules plus `suspicious.noConsole` as an **error** with no allowlist: no `console` at any level, log through `src/infrastructure/clients/logging` instead. The one exception is scoped in `overrides` rather than hidden in a suppression comment — the BetterStack client's own unconfigured warning, which has no logger left to call.
 - Generated or vendored CSS layers (`src/ui/styles/base|theme|utilities`, `docs/src/styles`) are excluded from formatting; `*.d.ts` files are excluded from linting.
 - VCS integration is on (`useIgnoreFile`, default branch `main`), which is what powers the `--changed` script variants.
 
-Run `pnpm format:changed` before pushing if you bypassed the hooks; `pnpm lint:all` is what CI runs.
+Run `pnpm format:changed` before pushing if you bypassed the hooks; `pnpm verify` is what CI and `pre-push` both run.
 
 ## Git hooks (husky)
 

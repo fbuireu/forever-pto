@@ -1,8 +1,8 @@
 export interface VariantRow {
-  axis: string;
-  values: readonly string[];
-  defaultValue?: string;
-  notes?: string;
+	axis: string;
+	values: readonly string[];
+	defaultValue?: string;
+	notes?: string;
 }
 
 /**
@@ -13,34 +13,34 @@ export interface VariantRow {
  * documentation drift.
  */
 export const VariantsTable = ({ rows }: { rows: VariantRow[] }) => {
-  return (
-    <table>
-      <thead>
-        <tr>
-          <th>Axis</th>
-          <th>Values</th>
-          <th>Default</th>
-          <th>Notes</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map(({ axis, values, defaultValue, notes }) => (
-          <tr key={axis}>
-            <td>
-              <code>{axis}</code>
-            </td>
-            <td>
-              {values.map((value) => (
-                <code key={value} style={{ marginRight: '0.5rem', whiteSpace: 'nowrap' }}>
-                  {value}
-                </code>
-              ))}
-            </td>
-            <td>{defaultValue ? <code>{defaultValue}</code> : '—'}</td>
-            <td>{notes ?? ''}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
+	return (
+		<table>
+			<thead>
+				<tr>
+					<th>Axis</th>
+					<th>Values</th>
+					<th>Default</th>
+					<th>Notes</th>
+				</tr>
+			</thead>
+			<tbody>
+				{rows.map(({ axis, values, defaultValue, notes }) => (
+					<tr key={axis}>
+						<td>
+							<code>{axis}</code>
+						</td>
+						<td>
+							{values.map((value) => (
+								<code key={value} style={{ marginRight: "0.5rem", whiteSpace: "nowrap" }}>
+									{value}
+								</code>
+							))}
+						</td>
+						<td>{defaultValue ? <code>{defaultValue}</code> : "—"}</td>
+						<td>{notes ?? ""}</td>
+					</tr>
+				))}
+			</tbody>
+		</table>
+	);
 };
