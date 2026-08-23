@@ -38,8 +38,8 @@ const ALIAS_WILDCARD_SUFFIX = /\/\*$/;
 const WORKSPACE_PACKAGE_GLOB = /^\s*-\s*['"]?([^'"\s#]+)['"]?\s*$/gm;
 
 // Everything the repo would ship, staged or not, so a rule fires before the offending file is committed.
-// Ignored paths and vendored tooling under dotfolders are excluded — they are not ours to fix.
-// The index can lie — a stash cycle leaves deleted paths cached — so every entry is confirmed on disk.
+// Ignored paths and vendored tooling under dotfolders are excluded; they are not ours to fix.
+// The index can lie, because a stash cycle leaves deleted paths cached, so every entry is confirmed on disk.
 const trackedFiles = execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard"], {
 	cwd: ROOT,
 	encoding: "utf8",
@@ -293,7 +293,7 @@ describe("documentation does not point at things that are gone", () => {
 	// match a citation by suffix so both forms resolve. The wiki has no such context: `workers/tail`
 	// is a different directory from `src/infrastructure/workers`, and `src/` alone names neither
 	// package. Every repo path it prints has to carry its own prefix.
-	// The root guide forbids a nested CONTEXT.md outright — the name would mean two things, and the
+	// The root guide forbids a nested CONTEXT.md outright: the name would mean two things, and the
 	// domain-modeling skill reads it as vocabulary. The wiki taught the opposite under a heading of
 	// "CONTEXT.md per folder" and cited five paths that have never existed. A relative-link rule cannot
 	// catch it, because these are prose citations rather than links.
@@ -309,7 +309,7 @@ describe("documentation does not point at things that are gone", () => {
 
 	// `astro check` does not resolve a `@ui/…` specifier that points at nothing: moving Switch from
 	// animate/primitives/base/ to animate/base/ left SwitchDemo importing the old path, `astro check`
-	// reported zero errors, and only `astro build` failed — in the Docs workflow, after the app's own CI
+	// reported zero errors, and only `astro build` failed, in the Docs workflow, after the app's own CI
 	// had gone green. The guides claim the `astro check` tail covers this seam; for a missing module it
 	// does not, and this is the cheaper place to catch it than a build is.
 	it("resolves every @ui specifier the docs sources import to a file that exists", () => {
@@ -416,7 +416,7 @@ describe("documentation does not point at things that are gone", () => {
 	});
 
 	// An output the `changes` job declares but never writes is the empty string, and a job guarded on
-	// `== 'true'` then never runs — silently, with a green tick, forever. `deploy-tail` shipped that way: the
+	// `== 'true'` then never runs, silently, with a green tick, forever. `deploy-tail` shipped that way: the
 	// Filter step wrote `tail=false` on its no-base-commit early exit and nothing at all on the normal path,
 	// so the tail consumer Worker was never deployed while four documents said it was. Nothing catches this
 	// by reading the workflow, because both halves are individually well-formed.
@@ -443,7 +443,7 @@ describe("documentation does not point at things that are gone", () => {
 	});
 
 	// `cloudflare/wrangler-action` installs the version its `wranglerVersion` input names, so the docs deploy
-	// runs a CLI the manifest does not pin. Renovate bumps the manifest — it is an npm devDependency — and
+	// runs a CLI the manifest does not pin. Renovate bumps the manifest, which is an npm devDependency, and
 	// nothing touches the two workflow literals, so the first bump silently desynchronises them. `apps/web`
 	// has no equivalent exposure: `_deploy-web.yml` runs `pnpm exec wrangler`, which is the pinned one.
 	it("pins wrangler-action to the same wrangler the docs package declares", () => {
@@ -479,7 +479,7 @@ describe("documentation does not point at things that are gone", () => {
 		expect(headings.filter((heading) => !canonical.has(heading.toLowerCase()))).toEqual([]);
 	});
 
-	// IconsGalleryDemo says it is exhaustive, and a rename does break the build through import resolution —
+	// IconsGalleryDemo says it is exhaustive, and a rename does break the build through import resolution,
 	// but an addition does not, because ICONS is a hand-written array rather than a union over the directory.
 	// The 23rd icon would simply be absent from the published gallery.
 	it("shows every animated icon in the published gallery", () => {
@@ -498,7 +498,7 @@ describe("documentation does not point at things that are gone", () => {
 		expect(shipped.filter((name) => !listed.has(name))).toEqual([]);
 	});
 
-	// TokenSwatch takes string[], so a renamed token renders `background: var(--gone)` — transparent, which
+	// TokenSwatch takes string[], so a renamed token renders `background: var(--gone)`: transparent, which
 	// reads as a legitimate pale colour rather than an error. Nothing else checks these: astro check does not
 	// see .mdx, and the citation rules match file paths.
 	it("names only design tokens the stylesheets still declare", () => {
@@ -545,7 +545,7 @@ describe("apps/web/src carries no explanatory comments", () => {
 	// written and every one was wrong somewhere: a URL inside a multi-line template read as a comment; a stray
 	// backtick switched the rule off for the rest of the file; an escaped backtick did the same by flipping a
 	// parity count; a character class swallowed the delimiter it was meant to protect. JavaScript's lexical
-	// grammar is not a regular language. Scanning alone is not enough either — only the parser knows whether a
+	// grammar is not a regular language. Scanning alone is not enough either, since only the parser knows whether a
 	// slash opens a regex or divides, which is why `/^\//` in images/loader.ts reads as a comment to a bare
 	// scanner. Comments are trivia, so they hang off node boundaries rather than appearing in the tree.
 	interface CommentsInParams {
@@ -573,11 +573,11 @@ describe("apps/web/src carries no explanatory comments", () => {
 			collect(ts.getLeadingCommentRanges(source, node.pos));
 			collect(ts.getTrailingCommentRanges(source, node.end));
 			// `{/* … */}` holds its comment between the braces, so it is trivia of nothing the walk reaches. It
-			// has to be asked for as *trailing* — TypeScript only calls a comment leading when a line break comes
+			// has to be asked for as *trailing*, because TypeScript only calls a comment leading when a line break comes
 			// first, and here the brace does. This is the shape every a11y suppression on JSX takes.
 			if (ts.isJsxExpression(node)) collect(ts.getTrailingCommentRanges(source, node.getStart() + 1));
 			// `forEachChild` yields nodes but never punctuation tokens, so a comment sitting against a `{`, `}`,
-			// `]` or `)` is trivia of nothing it reaches — the last line inside a block escaped entirely, which
+			// `]` or `)` is trivia of nothing it reaches, so the last line inside a block escaped entirely, which
 			// is how a probe file with an explanatory comment was committed under `src/` while this was green.
 			// `getChildren` includes the tokens, and needs the `setParentNodes` argument above to be true.
 			for (const child of node.getChildren(parsed)) walk(child);
@@ -611,7 +611,7 @@ describe("directives sit where the compiler can see them", () => {
 	// A directive is a bare string literal as the file's first statement. Wrap it in parentheses or let an
 	// import sort above it and it silently becomes an ordinary expression: `'use client'` stops applying, the
 	// module is treated as a Server Component, and nothing here notices. Typecheck passes, Biome passes, every
-	// unit test passes — only `next build` fails, in CI, on a full production build. Six planner files spent
+	// unit test passes, and only `next build` fails, in CI, on a full production build. Six planner files spent
 	// several commits in that state after an added import was hoisted over the directive and the formatter
 	// parenthesised what was left behind.
 	const DIRECTIVES = new Set(["use client", "use server", "use cache", "use strict"]);
@@ -701,7 +701,8 @@ describe("the guides describe the project as it is configured", () => {
 	});
 
 	// `next build` rewrites apps/web/tsconfig.json on every run and fills in its own defaults for any key
-	// that is absent — `strict: false` and `allowJs: true`. Both would land at the next build rather than at
+	// that is absent: `strict: false` and `allowJs: true`. Both would land at the next build rather than at
+
 	// the deletion site, so neither is safe to drop as redundant.
 	it("keeps strict on, because next build writes it false when the key is missing", () => {
 		expect(webTsconfigOptions.strict).toBe(true);

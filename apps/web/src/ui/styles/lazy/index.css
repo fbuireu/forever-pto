@@ -110,7 +110,7 @@
 
 	/*
    * Hand-written copy of the `hit-area-stable` utility in `../utilities/index.css`. driver.js owns this
-   * markup, so no class of ours reaches it, and this file is compiled on its own — it never imports
+   * markup, so no class of ours reaches it, and this file is compiled on its own: it never imports
    * Tailwind, so `@apply` has nothing to resolve either. Keep the three insets below in step with the
    * utility; nothing fails if they drift.
    */
