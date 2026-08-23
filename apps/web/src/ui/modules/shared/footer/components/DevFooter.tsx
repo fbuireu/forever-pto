@@ -66,7 +66,7 @@ export const DevFooter = () => {
 				<RotatingText text={currentEmoji} transition={{ type: "spring", bounce: 0.5, stiffness: 300, duration: 2 }} />
 				{t("by")}
 				<span className="font-medium text-foreground hover:text-primary p-0 h-auto min-w-0">
-					<Me ariaLabel="Ferran Buireu" />
+					<Me />
 				</span>
 			</div>
 			<p className="text-sm text-muted-foreground text-center">{t("findMeOn")}</p>

@@ -467,7 +467,7 @@
 		"paymentSuccess": "Zahlung erfolgreich!",
 		"paymentSuccessDescription": "Vielen Dank für deine Unterstützung! Du hast jetzt Premium-Zugang.",
 		"promoApplied": "Aktionscode angewendet!",
-		"promoSavedDescription": "Du hast €{saved} gespart (Original: €{original}, Endpreis: €{final})",
+		"promoSavedDescription": "Du hast {saved} gespart (Original: {original}, Endpreis: {final})",
 		"promoCodeError": "Fehler beim Gutscheincode",
 		"promoCodeErrors": {
 			"invalid_or_expired": "Ungültiger oder abgelaufener Gutscheincode",
@@ -677,7 +677,7 @@
 		"continueToPayment": "Weiter zur Zahlung",
 		"processing": "Wird verarbeitet..."
 	},
-	"upgrade": {
+	"premiumModal": {
 		"premiumRequired": "Premium-Funktion erforderlich",
 		"featureRequiresPremium": "erfordert Premium-Zugang",
 		"verifyDescription": "Wenn du bereits gespendet oder bezahlt hast, gleichen wir deine E-Mail mit unserer Liste ab und schalten deinen Zugang frei. Bei Problemen meld dich einfach bei uns.",
@@ -879,7 +879,7 @@
 		"unlockFeature": "Premium-Funktion freischalten: {feature}",
 		"premiumFeature": "Premium-Funktion",
 		"unlockDescription": "Mit Premium kannst du Vorschläge manuell anpassen und verbleibende Tage frei vergeben oder entfernen.",
-		"upgrade": "Upgraden"
+		"becomePremium": "Premium freischalten"
 	},
 	"calendar": {
 		"previousMonth": "Vorheriger Monat",
@@ -1311,8 +1311,7 @@
 				"description": "Der für deine personenbezogenen Daten Verantwortliche ist:",
 				"items": {
 					"name": {
-						"label": "Name:",
-						"value": "{author}"
+						"label": "Name:"
 					},
 					"email": {
 						"label": "E-Mail:",
@@ -1863,8 +1862,7 @@
 				"description": "Gemäß dem Gesetz 34/2002 vom 11. Juli über Dienste der Informationsgesellschaft und elektronischen Handel (LSSI-CE) werden folgende Angaben bereitgestellt:",
 				"items": {
 					"owner": {
-						"label": "Betreiber:",
-						"value": "{author}"
+						"label": "Betreiber:"
 					},
 					"nif": {
 						"label": "NIF:"

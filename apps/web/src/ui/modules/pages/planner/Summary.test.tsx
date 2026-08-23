@@ -39,6 +39,7 @@ vi.mock("@application/stores/location", () => ({
 }));
 vi.mock("@application/stores/premium", () => ({
 	usePremiumStore: (selector: (state: { premiumKey: string | null }) => unknown) => selector({ premiumKey: "key" }),
+	PremiumFeatureId: { ADVANCED_METRICS: "advancedMetrics", YEAR_SUMMARY: "yearSummary" },
 }));
 vi.mock("@ui/hooks/useStoresReady", () => ({ useStoresReady: () => ({ areStoresReady: true }) }));
 vi.mock("@application/i18n/navigation", () => ({

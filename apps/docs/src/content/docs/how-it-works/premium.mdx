@@ -51,4 +51,4 @@ A premium session is a JWT (jose, HS256, signed with `JWT_SECRET`, 30-day expiry
 
 ## Gating features
 
-`apps/web/src/ui/modules/premium/PremiumFeature.tsx` wraps premium-only UI: for free users it blurs the children, overlays a lock icon and opens `UpgradeModal` via the store's `showUpgradeModal(feature)`. Current premium surfaces include [calendar exports](/how-it-works/exports/) and advanced metrics.
+`apps/web/src/ui/modules/premium/PremiumFeature.tsx` wraps premium-only UI: for free users it blurs the children, overlays a lock icon and opens `PremiumRequiredModal` via the store's `showPremiumModal(feature)`, which takes a `PremiumFeatureId` rather than a display string. Current premium surfaces include [calendar exports](/how-it-works/exports/) and advanced metrics.

@@ -6,6 +6,7 @@ import { confirmation } from "@infrastructure/services/payments/confirmation";
 import { ACTIVATION_FAILED } from "@infrastructure/services/premium/activation";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@ui/modules/core/primitives/Card";
+import { MAIN_CONTENT_ID } from "@ui/modules/layout/SkipToContent";
 import { PremiumSessionSync } from "@ui/modules/premium/PremiumSessionSync";
 import { Effect } from "effect";
 import { CheckCircle2, XCircle } from "lucide-react";
@@ -31,7 +32,7 @@ async function PaymentError({ charged }: { charged: boolean }) {
 
 	if (charged) {
 		return (
-			<div className="min-h-screen flex items-center justify-center p-4 bg-background">
+			<main id={MAIN_CONTENT_ID} className="min-h-screen flex items-center justify-center p-4 bg-background">
 				<Card className="w-full max-w-md border-amber-500/50">
 					<CardHeader className="text-center">
 						<div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-amber-500/10">
@@ -46,12 +47,12 @@ async function PaymentError({ charged }: { charged: boolean }) {
 						</Button>
 					</CardContent>
 				</Card>
-			</div>
+			</main>
 		);
 	}
 
 	return (
-		<div className="min-h-screen flex items-center justify-center p-4 bg-background">
+		<main id={MAIN_CONTENT_ID} className="min-h-screen flex items-center justify-center p-4 bg-background">
 			<Card className="w-full max-w-md border-destructive/50">
 				<CardHeader className="text-center">
 					<div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-destructive/10">
@@ -76,7 +77,7 @@ async function PaymentError({ charged }: { charged: boolean }) {
 					</div>
 				</CardContent>
 			</Card>
-		</div>
+		</main>
 	);
 }
 
@@ -112,7 +113,7 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
 	});
 
 	return (
-		<div className="min-h-screen flex items-center justify-center p-4 bg-background m-auto">
+		<main id={MAIN_CONTENT_ID} className="min-h-screen flex items-center justify-center p-4 bg-background m-auto">
 			<Card className="w-full max-w-md border-green-500/50">
 				<CardHeader className="text-center">
 					<div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-green-500/10">
@@ -153,6 +154,6 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
 					</Button>
 				</CardContent>
 			</Card>
-		</div>
+		</main>
 	);
 }

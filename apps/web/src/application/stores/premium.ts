@@ -8,13 +8,31 @@ import { obfuscatedStorage } from "./crypto";
 import { onRehydrateFailure } from "./rehydration";
 import { TWENTY_FOUR_HOURS } from "./utils/crypto";
 
+export const PremiumFeatureId = {
+	EDIT_HOLIDAYS: "editHolidays",
+	SELECT_HOLIDAY: "selectHoliday",
+	SELECT_ALL_HOLIDAYS: "selectAllHolidays",
+	CUSTOM_HOLIDAYS: "customHolidays",
+	ADVANCED_METRICS: "advancedMetrics",
+	YEAR_SUMMARY: "yearSummary",
+	DAYS_OFF_COMPOSITION: "daysOffComposition",
+	QUARTER_DISTRIBUTION: "quarterDistribution",
+	LONG_BLOCKS: "longBlocks",
+	ANNUAL_TIMELINE: "annualTimeline",
+	ALLOW_PAST_DAYS: "allowPastDays",
+	CARRY_OVER_MONTHS: "carryOverMonths",
+	CALENDAR_EXPORT: "calendarExport",
+} as const;
+
+export type PremiumFeatureId = (typeof PremiumFeatureId)[keyof typeof PremiumFeatureId];
+
 interface PremiumState {
 	premiumKey: string | null;
 	userEmail: string | null;
 	lastVerified: number | null;
 	isLoading: boolean;
 	modalOpen: boolean;
-	currentFeature: string;
+	currentFeature: PremiumFeatureId | null;
 	needsSessionCheck: boolean;
 }
 
@@ -26,7 +44,7 @@ interface SetPremiumStatusParams {
 interface PremiumActions {
 	verifyEmail: (email: string) => Promise<boolean>;
 	checkExistingSession: (options?: { force?: boolean }) => Promise<void>;
-	showUpgradeModal: (feature: string) => void;
+	showPremiumModal: (feature: PremiumFeatureId) => void;
 	closeModal: () => void;
 	setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => void;
 	refreshPremiumStatus: () => Promise<void>;
@@ -47,7 +65,7 @@ const premiumInitialState: PremiumState = {
 	lastVerified: null,
 	isLoading: false,
 	modalOpen: false,
-	currentFeature: "",
+	currentFeature: null,
 	needsSessionCheck: false,
 };
 
@@ -141,13 +159,13 @@ export const usePremiumStore = create<PremiumStore>()(
 					}
 				},
 
-				showUpgradeModal: (feature: string) => {
+				showPremiumModal: (feature: PremiumFeatureId) => {
 					set({ currentFeature: feature, modalOpen: true });
 					track("upgrade_modal_opened", { feature });
 				},
 
 				closeModal: () => {
-					set({ modalOpen: false, currentFeature: "" });
+					set({ modalOpen: false, currentFeature: null });
 				},
 			}),
 			{

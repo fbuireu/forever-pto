@@ -11,9 +11,9 @@ Every React component the product renders. Nothing else in `src/ui/` holds compo
 | `core/` | The design system: `primitives/` plus the `animate/` layer. See [core/CLAUDE.md](./core/CLAUDE.md) | Yes, everywhere |
 | `pages/` | One folder per screen — `homepage/`, `planner/`, `legal/`, `error/`, `not-found/`. See [pages/planner/CLAUDE.md](./pages/planner/CLAUDE.md) | No, by definition |
 | `shared/` | Cross-page pieces that are not primitives: footer, donate, contact, cookie consent, JSON-LD, [`shared/Logo.tsx`](./shared/Logo.tsx), [`shared/Icon.tsx`](./shared/Icon.tsx), [`shared/FormButtons.tsx`](./shared/FormButtons.tsx), [`shared/StepOutcome.tsx`](./shared/StepOutcome.tsx), [`shared/SupportButton.tsx`](./shared/SupportButton.tsx), [`shared/ConditionalWrapper.tsx`](./shared/ConditionalWrapper.tsx), [`shared/WebMCP.tsx`](./shared/WebMCP.tsx), plus [`shared/utils/helpers.ts`](./shared/utils/helpers.ts) for the helpers those pieces need | Yes |
-| `layout/` | [`layout/LegalLayout.tsx`](./layout/LegalLayout.tsx) only — the card chrome the four legal pages share | Between sibling routes |
+| `layout/` | [`layout/LegalLayout.tsx`](./layout/LegalLayout.tsx), the card chrome the four legal pages share, and [`layout/SkipToContent.tsx`](./layout/SkipToContent.tsx), which owns the skip link **and** the `MAIN_CONTENT_ID` every route shell's landmark is keyed on | Between sibling routes |
 | `sidebar/` | [`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) and its controls: country, region, year, Strategy, PTO Day budget, the calculators, calendar export | One screen, but not a page section |
-| `premium/` | The Premium gate and the Donation checkout: [`premium/PremiumFeature.tsx`](./premium/PremiumFeature.tsx), [`premium/PremiumModal.tsx`](./premium/PremiumModal.tsx), [`premium/UpgradeModal.tsx`](./premium/UpgradeModal.tsx), [`premium/CheckoutForm.tsx`](./premium/CheckoutForm.tsx) | Yes |
+| `premium/` | The Premium gate and the Donation checkout: [`premium/PremiumFeature.tsx`](./premium/PremiumFeature.tsx), [`premium/featureLabels.ts`](./premium/featureLabels.ts), [`premium/PremiumModal.tsx`](./premium/PremiumModal.tsx), [`premium/PremiumRequiredModal.tsx`](./premium/PremiumRequiredModal.tsx), [`premium/CheckoutForm.tsx`](./premium/CheckoutForm.tsx) | Yes |
 | `providers/` | Context wrappers mounted once in the locale layout: [`providers/AppThemeProvider.tsx`](./providers/AppThemeProvider.tsx), [`providers/BonesProvider.tsx`](./providers/BonesProvider.tsx) | Once |
 | `stores/` | [`stores/StoresInitializer.tsx`](./stores/StoresInitializer.tsx) — a render-nothing component that seeds the filters store from the `user-country` cookie | Once |
 | `tutorial/` | [`tutorial/DriverStyles.tsx`](./tutorial/DriverStyles.tsx) only — a render-nothing component whose single job is to make the driver.js stylesheet import lazy | Once |
@@ -81,21 +81,21 @@ planner itself is client-side end to end — [ADR 0001](../../../../../adr/0001-
 
 ## A three-step form modal
 
-`shared/StepOutcome.tsx` holds what `premium/UpgradeModal.tsx` and
+`shared/StepOutcome.tsx` holds what `premium/PremiumRequiredModal.tsx` and
 [`shared/contact/ContactModal.tsx`](./shared/contact/ContactModal.tsx) were writing out twice: the `Step`
 (`INPUT | SUCCESS | ERROR`) const both declared identically, and the success and
 error panels they both render once the form is done.
 
 The panels had **drifted visually**, not just structurally. `ContactModal` used the
 neo-brutalist treatment — a 64px tile with a 3px frame and hard shadow, and an
-uppercase mono badge over the description — while `UpgradeModal` rendered a plain
+uppercase mono badge over the description — while the Premium modal rendered a plain
 centred icon and heading. They are both brutalist now; `StepOutcome` takes a `tone`
 (`SUCCESS` or `ERROR`), an icon, a title, a description, and an `onTryAgain` whose
 presence is what decides between one Close button and the Try-again/Close pair.
 
 Three other things the two disagreed about are gone with it:
 
-- **`UpgradeModal` hand-wrote the submit row**, including a verbatim copy of
+- **The Premium modal hand-wrote the submit row**, including a verbatim copy of
   `FormButtons`' own `<Loader2 className='size-4 mr-2 animate-spin' />`, while
   `FormButtons` exists for exactly that. It uses it now.
 - **It reported one failure twice** — `form.setError('email', …)` *and* the ERROR
@@ -105,10 +105,19 @@ Three other things the two disagreed about are gone with it:
 - **`setTimeout(handleClose, 5000)` sat beside `t('welcomeToPremium', { seconds: 5 })`**
   with nothing tying the two numbers together. Both read `AUTO_CLOSE_MS` now.
 
-`tryAgain` and `close` moved from the `contact` and `upgrade` namespaces into
+`tryAgain` and `close` moved from the `contact` and Premium modal namespaces into
 `formButtons`, where `submit`, `processing` and `cancel` already live. They were
 character-identical in all six locales, so that is twelve translations recovered and
 one place left to edit.
+
+**Its auto-close is held in a ref and cleared twice, and it used to be held nowhere.** The modal is mounted
+for the life of the planner by [`app/[locale]/(app)/planner/layout.tsx`](../../app/[locale]/(app)/planner/layout.tsx),
+so a `setTimeout(handleClose, AUTO_CLOSE_MS)` nobody kept a handle to outlived the panel that scheduled it:
+close the success panel, reopen the modal within five seconds, and the orphaned timer shut it again and
+`form.reset()` wiped the address that had just been typed. `handleClose` and an unmount cleanup both call
+`cancelAutoClose` now. [`premium/PremiumRequiredModal.test.tsx`](./premium/PremiumRequiredModal.test.tsx)
+drives the three steps on fake timers and counts `onClose`, which is what goes red if the handle is dropped
+again.
 
 ## Skeletons and bones
 
@@ -199,6 +208,32 @@ When a component is mocked in a sibling's test, mock the module path it actually
 leaving either real drags the Stripe element tree into the test.
 
 ## Gotchas
+
+**The skip link and every landmark it can reach read one const.** `layout/SkipToContent.tsx` exports
+`MAIN_CONTENT_ID` and builds its own `href` from it; the six route shells interpolate the same const onto
+their landmark. It was a string literal on both sides, and four shells did not hold up their end:
+`pages/error/ErrorContent.tsx` rendered a `<main>` with no `id` — reached from `[locale]/error.tsx`,
+`[locale]/(marketing)/error.tsx` and `global-error.tsx`, the first two inside the layout that emits the link
+— and `app/[locale]/(app)/payment/confirmation/page.tsx` opened all three of its branches with a bare
+`<div>` and had **no `main` landmark at all**. Pressing Tab then Enter did nothing on any of them, which is
+the same class as the `htmlFor='remaining-days'` and `AllowPastDays` defects below: a promise to a screen
+reader that never resolves. [`layout/SkipToContent.test.tsx`](./layout/SkipToContent.test.tsx) renders each
+shell it can and asserts the landmark is in the tree, and scans `src/` for the declaring files so the list
+cannot silently shrink or grow a duplicate. `app/[locale]/(marketing)/page.tsx` is the one shell still on the
+literal; the scan covers it, and it moves onto the const the next time that file is touched.
+
+**The three legal identity modules derive their own accessible name; they do not take one.**
+`pages/legal/Me.tsx`, `pages/legal/Nif.tsx` and `pages/legal/Address.tsx` are a `{ character, order }` table
+rendered into flexbox-`order`-scrambled spans, so the DOM text is nonsense and `role="img"` makes the
+`aria-label` the *only* thing announced. The prop was called `ariaLabel` and four of the five call sites
+passed the field **label** — a screen reader on the legal notice heard "NIF: NIF:" and never the number, and
+the same on the address and the owner's name on the privacy policy. Both pages exist to state that identity.
+[`pages/legal/ScrambledText.tsx`](./pages/legal/ScrambledText.tsx) now holds the single render and
+`decodeScrambledText`, which sorts the table by `order`; each module is its data plus a one-line render and
+there is no prop to get wrong. [`pages/legal/identity.test.tsx`](./pages/legal/identity.test.tsx) pins the
+three decoded strings, so a transposed `order` on a compliance page fails red instead of shipping a wrong
+NIF. `legalNotice.…items.owner.value` and `privacyPolicy.…dataController.items.name.value` were `"{author}"`
+in all six bundles with no caller and no `author` source; those twelve entries are deleted.
 
 **vanilla-cookieconsent dispatches its `cc:*` events on `window`, never on `document`.** Its emitter is a
 bare `dispatchEvent(new CustomEvent(...))`, which resolves to `window`, and an event dispatched on `window`
@@ -299,6 +334,30 @@ this key is only known at runtime, which is the question `has` exists to answer.
 Payment analytics send the machine code, never the rendered message. `premium/CheckoutForm.tsx` shows
 the user `resolveApiErrorMessage(...)` and passes the raw `result.error` to `track`; a translated
 string would split one failure mode across six locales.
+
+**The Premium gate broke that same rule for every one of its thirteen call sites, and the fix is a second
+type.** `PremiumFeature` took `feature: string`, showed it to the user *and* handed it to
+`showPremiumModal`, which is what `track('upgrade_modal_opened', { feature })` reports. Every producer was a
+`useTranslations` call — `t('editHolidays')`, `t('metrics.advancedMetrics')`, `t('title')` from three
+different namespaces — so thirteen gates over six locales were up to seventy-eight values in one dimension
+and no two locales' funnels could be compared. The prop is a `PremiumFeatureId` now, declared beside the
+state it sets in [`../../application/stores/premium.ts`](../../application/stores/premium.ts): the gate takes
+the id, the store tracks the id, and `premium/featureLabels.ts` maps each id to the message key that already
+held its label, so no translation moved and the modal still names the feature in the reader's language.
+[`premium/PremiumFeature.test.tsx`](./premium/PremiumFeature.test.tsx) clicks the gate in en and in de and
+asserts the store receives the same value both times.
+
+The label map is the one place where an id and a message path meet, and it resolves through a
+**namespace-less** `useTranslations()` because the thirteen labels live in seven different namespaces.
+`satisfies Record<PremiumFeatureId, string>` is what makes a new id a compile error rather than a blank
+banner.
+
+**The analytics event is still called `upgrade_modal_opened`, and that is deliberate.** `CONTEXT.md` retires
+*upgrade* as a word for Premium, and the identifiers went with it — `PremiumRequiredModal`,
+`showPremiumModal`, the `premiumModal` message namespace, `premium.becomePremium`. The event id did not,
+because it is a key in a Better Stack funnel that this repo cannot see: renaming it splits the series in two
+with no way to stitch them. It is the one surviving instance of the retired word, in
+[`../../infrastructure/clients/logging/better-stack/tracking.ts`](../../infrastructure/clients/logging/better-stack/tracking.ts)'s event union.
 
 The Stripe Elements appearance in [`shared/donate/Donate.tsx`](./shared/donate/Donate.tsx) repeats the theme as hex literals. The
 Elements iframe cannot read this app's CSS custom properties, so the light and dark objects mirror

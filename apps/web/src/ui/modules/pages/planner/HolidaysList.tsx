@@ -2,6 +2,7 @@
 
 import { HolidayVariant } from "@application/dto/holiday/types";
 import { useHolidaysStore } from "@application/stores/holidays";
+import { PremiumFeatureId } from "@application/stores/premium";
 import { useStoresReady } from "@ui/hooks/useStoresReady";
 import {
 	Tabs,
@@ -53,7 +54,7 @@ export const HolidaysList = () => {
 							</div>
 						)}
 						<PremiumFeature
-							feature={t("customHolidaysFeature")}
+							feature={PremiumFeatureId.CUSTOM_HOLIDAYS}
 							description={t("customHolidaysDescription")}
 							className="p-0"
 						>

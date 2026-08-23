@@ -477,6 +477,14 @@ dependencies at module scope, so a top-level import would bind the real ones.
 
 ## Gotchas
 
+- **Every route shell owes the skip link a landmark.** `[locale]/layout.tsx` renders `SkipToContent` on
+  every page, and its `href` is built from `MAIN_CONTENT_ID` in
+  [`../ui/modules/layout/SkipToContent.tsx`](../ui/modules/layout/SkipToContent.tsx). Six shells carry that
+  id: `[locale]/(marketing)/page.tsx`, `[locale]/(marketing)/legal/layout.tsx`,
+  `[locale]/(app)/payment/confirmation/page.tsx`, and — through the modules they compose —
+  `ErrorContent.tsx`, `NotFoundContent.tsx` and `AppSidebar.tsx`. A new shell that renders its own top-level
+  container needs it too, or the link is dead on that route; `SkipToContent.test.tsx` scans for the
+  declaring files and fails when the set changes.
 - **Two guards protect the confirmation page.** The middleware redirects when `payment_intent` is missing
   *and* `page.tsx` redirects again. Removing either leaves the Effect program running with `undefined`.
 - **That redirect sets `pathname` on a parsed URL; it must never resolve a path as a relative reference.**

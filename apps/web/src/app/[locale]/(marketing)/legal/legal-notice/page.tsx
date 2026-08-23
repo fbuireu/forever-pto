@@ -34,20 +34,17 @@ export default async function LegalNoticePage({ params }: LegalNoticePageProps) 
 				<ul className="list-disc pl-6 mt-4 space-y-2">
 					<li>
 						<span className="inline-flex items-center gap-1">
-							<strong>{t("sections.identification.items.owner.label")}</strong>{" "}
-							<Me ariaLabel={t("sections.identification.items.owner.label")} />
+							<strong>{t("sections.identification.items.owner.label")}</strong> <Me />
 						</span>
 					</li>
 					<li>
 						<span className="inline-flex items-center gap-1">
-							<strong>{t("sections.identification.items.nif.label")}</strong>{" "}
-							<Nif ariaLabel={t("sections.identification.items.nif.label")} />
+							<strong>{t("sections.identification.items.nif.label")}</strong> <Nif />
 						</span>
 					</li>
 					<li>
 						<span className="inline-flex items-center gap-1">
-							<strong>{t("sections.identification.items.address.label")}</strong>{" "}
-							<Address ariaLabel={t("sections.identification.items.address.label")} />
+							<strong>{t("sections.identification.items.address.label")}</strong> <Address />
 						</span>
 					</li>
 					<li>

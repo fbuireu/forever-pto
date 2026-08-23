@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 const filtersState = { allowPastDays: false, setAllowPastDays: vi.fn() };
 const premiumState = {
 	premiumKey: null as string | null,
-	showUpgradeModal: vi.fn(),
+	showPremiumModal: vi.fn(),
 	checkExistingSession: vi.fn(),
 };
 
@@ -15,6 +15,7 @@ vi.mock("@application/stores/filters", () => ({
 }));
 vi.mock("@application/stores/premium", () => ({
 	usePremiumStore: (selector: (state: typeof premiumState) => unknown) => selector(premiumState),
+	PremiumFeatureId: { ALLOW_PAST_DAYS: "allowPastDays" },
 }));
 
 import { AllowPastDays } from "./AllowPastDays";

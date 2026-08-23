@@ -14,6 +14,7 @@ import {
 import { ChevronDown } from "@ui/modules/core/animate/icons/ChevronDown";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
 import { Settings } from "@ui/modules/core/animate/icons/Settings";
+import { MAIN_CONTENT_ID } from "@ui/modules/layout/SkipToContent";
 import { Logo } from "@ui/modules/shared/Logo";
 import { TUTORIAL_ANCHOR } from "@ui/modules/tutorial/anchors";
 import { getCurrentYear } from "@ui/utils/getCurrentYear";
@@ -189,7 +190,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
 				</SidebarContent>
 				<SidebarFooterButtons />
 			</Sidebar>
-			<SidebarInset id="main-content" tabIndex={-1} className="outline-none">
+			<SidebarInset id={MAIN_CONTENT_ID} tabIndex={-1} className="outline-none">
 				<SidebarTrigger className={"cursor-pointer size-11 fixed m-3 z-51 p-1"} label={tA11y("toggleSidebar")} />
 				{children}
 			</SidebarInset>

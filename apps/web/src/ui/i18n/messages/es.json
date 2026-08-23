@@ -467,7 +467,7 @@
 		"paymentSuccess": "Pago completado",
 		"paymentSuccessDescription": "Gracias por tu apoyo. Ya tienes acceso premium.",
 		"promoApplied": "¡Código promocional aplicado!",
-		"promoSavedDescription": "Ahorraste €{saved} (Original: €{original}, Final: €{final})",
+		"promoSavedDescription": "Ahorraste {saved} (Original: {original}, Final: {final})",
 		"promoCodeError": "Error en el código promocional",
 		"promoCodeErrors": {
 			"invalid_or_expired": "Código promocional inválido o caducado",
@@ -677,7 +677,7 @@
 		"continueToPayment": "Continuar al pago",
 		"processing": "Procesando..."
 	},
-	"upgrade": {
+	"premiumModal": {
 		"premiumRequired": "Se requiere premium",
 		"featureRequiresPremium": "Requiere acceso premium",
 		"verifyDescription": "Si ya has donado, comprobamos tu email y te damos acceso enseguida. Si hay algún problema, escríbenos.",
@@ -879,7 +879,7 @@
 		"unlockFeature": "Función premium: {feature}",
 		"premiumFeature": "Función premium",
 		"unlockDescription": "Hazte premium para editar las sugerencias y ajustar los días restantes manualmente.",
-		"upgrade": "Hazte premium"
+		"becomePremium": "Hazte premium"
 	},
 	"calendar": {
 		"previousMonth": "Mes anterior",
@@ -1311,8 +1311,7 @@
 				"description": "El responsable del tratamiento de tus datos personales es:",
 				"items": {
 					"name": {
-						"label": "Nombre:",
-						"value": "{author}"
+						"label": "Nombre:"
 					},
 					"email": {
 						"label": "Email:",
@@ -1863,8 +1862,7 @@
 				"description": "En cumplimiento de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE), se facilita la siguiente información:",
 				"items": {
 					"owner": {
-						"label": "Titular:",
-						"value": "{author}"
+						"label": "Titular:"
 					},
 					"nif": {
 						"label": "NIF:"

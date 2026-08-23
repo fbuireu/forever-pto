@@ -15,6 +15,7 @@ vi.mock("@application/stores/holidays", () => ({
 }));
 vi.mock("@application/stores/premium", () => ({
 	usePremiumStore: (selector: (state: { premiumKey: string }) => unknown) => selector({ premiumKey: "unlocked" }),
+	PremiumFeatureId: { SELECT_HOLIDAY: "selectHoliday", SELECT_ALL_HOLIDAYS: "selectAllHolidays" },
 }));
 vi.mock("@ui/hooks/useDebounce", () => ({ useDebounce: ({ value }: { value: string }) => [value] }));
 vi.mock("@ui/modules/premium/PremiumFeature", () => ({

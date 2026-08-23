@@ -436,7 +436,7 @@
 			"subject_too_long": "Le sujet est trop long.",
 			"message_too_short": "Ton message doit contenir au moins 10 caractères.",
 			"message_too_long": "Ton message est trop long.",
-			"contact_already_received": "Tu m'as deja ecrit recemment. Laisse-moi un peu de temps pour te repondre."
+			"contact_already_received": "Tu m'as déjà écrit récemment. Laisse-moi un peu de temps pour te répondre."
 		}
 	},
 	"alternativesManager": {
@@ -467,7 +467,7 @@
 		"paymentSuccess": "Paiement réussi !",
 		"paymentSuccessDescription": "Merci pour ton soutien ! Tu as maintenant un accès premium.",
 		"promoApplied": "Code promo appliqué !",
-		"promoSavedDescription": "Tu as économisé €{saved} (Original : €{original}, Final : €{final})",
+		"promoSavedDescription": "Tu as économisé {saved} (Original : {original}, Final : {final})",
 		"promoCodeError": "Erreur de code promotionnel",
 		"promoCodeErrors": {
 			"invalid_or_expired": "Code promotionnel invalide ou expiré",
@@ -677,7 +677,7 @@
 		"continueToPayment": "Continuer vers le paiement",
 		"processing": "Traitement en cours..."
 	},
-	"upgrade": {
+	"premiumModal": {
 		"premiumRequired": "Fonctionnalité premium requise",
 		"featureRequiresPremium": "nécessite un accès premium",
 		"verifyDescription": "Si tu as déjà fait un don, on vérifie ton e-mail et on te donne l'accès. Si tu as un problème, contacte-nous.",
@@ -879,7 +879,7 @@
 		"unlockFeature": "Débloquer la fonctionnalité premium : {feature}",
 		"premiumFeature": "Fonctionnalité premium",
 		"unlockDescription": "Passe à premium pour modifier manuellement les suggestions et gérer tes jours restants.",
-		"upgrade": "Passer à premium"
+		"becomePremium": "Passer à premium"
 	},
 	"calendar": {
 		"previousMonth": "Mois précédent",
@@ -1311,8 +1311,7 @@
 				"description": "Le responsable du traitement de tes données personnelles est :",
 				"items": {
 					"name": {
-						"label": "Nom :",
-						"value": "{author}"
+						"label": "Nom :"
 					},
 					"email": {
 						"label": "E-mail :",
@@ -1863,8 +1862,7 @@
 				"description": "Conformément à la loi 34/2002 du 11 juillet relative aux services de la société de l'information et du commerce électronique (LSSI-CE), les informations suivantes sont fournies :",
 				"items": {
 					"owner": {
-						"label": "Propriétaire :",
-						"value": "{author}"
+						"label": "Propriétaire :"
 					},
 					"nif": {
 						"label": "NIF :"

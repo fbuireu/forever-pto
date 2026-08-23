@@ -1,5 +1,6 @@
 "use client";
 
+import type { PremiumFeatureId } from "@application/stores/premium";
 import { usePremiumStore } from "@application/stores/premium";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@ui/modules/core/animate/base/Tooltip";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
@@ -8,6 +9,7 @@ import { cn } from "@ui/utils/cn";
 import { useTranslations } from "next-intl";
 import { type ReactNode, useEffect } from "react";
 import { useShallow } from "zustand/react/shallow";
+import { usePremiumFeatureLabel } from "./featureLabels";
 
 export const PremiumFeatureVariant = {
 	DEFAULT: "default",
@@ -17,7 +19,7 @@ export const PremiumFeatureVariant = {
 export type PremiumFeatureVariant = (typeof PremiumFeatureVariant)[keyof typeof PremiumFeatureVariant];
 
 interface PremiumFeatureProps {
-	feature: string;
+	feature: PremiumFeatureId;
 	children: ReactNode;
 	className?: string;
 	description?: string;
@@ -36,10 +38,11 @@ export const PremiumFeature = ({
 	inlineDescription = false,
 }: PremiumFeatureProps) => {
 	const t = useTranslations("premium");
-	const { premiumKey, showUpgradeModal, checkExistingSession } = usePremiumStore(
+	const featureLabel = usePremiumFeatureLabel();
+	const { premiumKey, showPremiumModal, checkExistingSession } = usePremiumStore(
 		useShallow((state) => ({
 			premiumKey: state.premiumKey,
-			showUpgradeModal: state.showUpgradeModal,
+			showPremiumModal: state.showPremiumModal,
 			checkExistingSession: state.checkExistingSession,
 		})),
 	);
@@ -62,12 +65,12 @@ export const PremiumFeature = ({
 					variant === PremiumFeatureVariant.STACK ? "w-fit" : "w-full backdrop-blur-sm",
 					className,
 				)}
-				aria-label={description ?? t("unlockFeature", { feature })}
-				onClick={() => showUpgradeModal(feature)}
+				aria-label={description ?? t("unlockFeature", { feature: featureLabel(feature) })}
+				onClick={() => showPremiumModal(feature)}
 				onKeyDown={(e) => {
 					if (e.key === "Enter" || e.key === " ") {
 						e.preventDefault();
-						showUpgradeModal(feature);
+						showPremiumModal(feature);
 					}
 				}}
 			>

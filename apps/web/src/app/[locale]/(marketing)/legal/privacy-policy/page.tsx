@@ -38,8 +38,7 @@ export default async function PrivacyPolicyPage({ params }: Readonly<PrivacyPoli
 				<ul className="list-disc pl-6 mt-4 space-y-2">
 					<li>
 						<span className="inline-flex items-center gap-1">
-							<strong>{t("sections.dataController.items.name.label")}</strong>{" "}
-							<Me ariaLabel={t("sections.dataController.items.name.label")} />
+							<strong>{t("sections.dataController.items.name.label")}</strong> <Me />
 						</span>
 					</li>
 					<li>

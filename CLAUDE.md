@@ -234,7 +234,7 @@ required while `web-development` cannot authenticate blocks every merge.
 The alternative to all of it is to revert the rename in `ci.yml`, `docs.yml` and `cleanup-development.yml`
 and keep one shared pair, which is what the split exists to stop.
 
-**`deploy-tail` is gated on the files its bundle is built from, which is wider than its own folder.** The tail consumer is a second Worker with its own `wrangler.toml`; the app declares it in `[[tail_consumers]]` but does not carry it. It changes rarely, so `TAIL_PATHS` gates it — but `workers/tail/index.ts` imports the log-level contract from `apps/web/src/infrastructure/clients/logging/`, and while the filter named only `apps/web/workers/tail/**` a change to that contract redeployed the app and left the Worker running the old bundled copy. The Worker's own unit test reads the source module, so it could not see the split. `tests/docs-consistency.test.ts` resolves every relative import out of `workers/tail/` against `TAIL_PATHS` now.
+**`deploy-tail` is gated on the files its bundle is built from, which is wider than its own folder.** The tail consumer is a second Worker with its own `wrangler.toml`; the app declares it in `[[tail_consumers]]` but does not carry it. It changes rarely, so `TAIL_PATHS` gates it — but `workers/tail/index.ts` imports the log-level contract from `apps/web/src/infrastructure/clients/logging/`, and while the filter named only `apps/web/workers/tail/**` a change to that contract redeployed the app and left the Worker running the old bundled copy. The Worker's own unit test reads the source module, so it could not see the split. `tests/docs-consistency.test.ts` walks that import graph **transitively** against `TAIL_PATHS` now — one level is not enough, because whatever the contract itself imports is bundled too — and asserts at least one resolved path lands outside `workers/tail/`, since the Worker test's own `./index` import would otherwise make an empty walk look like a successful one.
 
 **`cross-package-notice` is advisory, not a gate.** A pull request touching both packages lands in both
 changelogs, because attribution is by path and `main` takes squash merges. Sometimes that is what you
@@ -345,18 +345,25 @@ wiki names exists somewhere in `apps/web`; that the `@ui` seam target is declare
 restating it; that the wiki's prose uses the canonical name rather than a retired one;
 that [`apps/web/tsconfig.json`](./apps/web/tsconfig.json) keeps the two settings `next build` would otherwise fill in for it — `strict`
 on and `allowJs` off — that it sits beside the [`next.config.ts`](./apps/web/next.config.ts) that rewrites it, and that
-`cloudflare-env.d.ts` stays both excluded from the program and ignored by git; that every `'use client'`,
-`'use server'` and `'use cache'` under either package's `src/` is a bare string literal in first position;
-that the same `typescript` version is pinned in all three manifests; that
-[`apps/web/next.config.ts`](./apps/web/next.config.ts) still answers `/(.*)` from exactly one header rule
-carrying all nine security headers, with `frame-ancestors 'none'`, `object-src 'none'` and `base-uri 'self'`
-in the CSP — the three whose absence is invisible in a browser, and the whole policy sits outside `src/`
-where the co-located-test convention does not reach it; that every binding
-[`apps/web/environment.d.ts`](./apps/web/environment.d.ts)'s `CloudflareEnv` declares is present in **each** of
-`wrangler.toml`'s three environments with the payment rate limiter identically bounded in all of them; that no
+`cloudflare-env.d.ts` stays both excluded from the program and ignored by git, and that
+[`apps/web/environment.d.ts`](./apps/web/environment.d.ts) references no identifier it does not import —
+`skipLibCheck` is on and that file is a `.d.ts`, so `pnpm typecheck` reads no name inside it; that every
+`'use client'`, `'use server'` and `'use cache'` under either package's `src/` is a bare string literal in
+first position;
+that the same **exact** `typescript` version is pinned in all three manifests — three dotted numbers, so a
+`rangeStrategy` flip to `^6.0.3` in every manifest at once fails rather than passing as "equal"; that
+[`apps/web/next.config.ts`](./apps/web/next.config.ts)'s own `headers()` — imported and awaited, not regexed
+out of the source — returns exactly one rule, for `/(.*)`, carrying all nine security headers **with their
+values**: a year of HSTS with `includeSubDomains`, `X-Frame-Options` refusing the frame, `nosniff`, and
+`frame-ancestors 'none'`, `object-src 'none'` and `base-uri 'self'` in the CSP — the three whose absence is
+invisible in a browser, and the whole policy sits outside `src/`
+where the co-located-test convention does not reach it; that every binding `CloudflareEnv` declares is present
+in **each** of `wrangler.toml`'s three environments, that each named environment declares every binding
+*kind* the top level declares, and that the payment rate limiter is identically bounded in all of them; that no
 `wrangler deploy` step in any workflow is wrapped in `nick-fields/retry`, counted rather than named one file
-at a time; that `TAIL_PATHS` matches every relative import
-[`apps/web/workers/tail/`](./apps/web/workers/tail/) reaches out to; that the cleanup workflow's concurrency
+at a time; that `TAIL_PATHS` matches every relative import reachable **transitively** from
+[`apps/web/workers/tail/`](./apps/web/workers/tail/), at least one of which has to land outside that folder;
+that the cleanup workflow's concurrency
 group still equals `ci.yml`'s with its `name:` substituted in;
 and that every locale bundle has exactly the keys [`en.json`](./apps/web/src/ui/i18n/messages/en.json) has.
 

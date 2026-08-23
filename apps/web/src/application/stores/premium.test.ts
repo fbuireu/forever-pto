@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { usePremiumStore } from "./premium";
+import { PremiumFeatureId, usePremiumStore } from "./premium";
 
 const { mockLogError, mockWarn } = vi.hoisted(() => ({ mockLogError: vi.fn(), mockWarn: vi.fn() }));
 
@@ -30,7 +30,7 @@ const INITIAL = {
 	lastVerified: null,
 	isLoading: false,
 	modalOpen: false,
-	currentFeature: "",
+	currentFeature: null,
 	needsSessionCheck: false,
 };
 
@@ -78,21 +78,25 @@ describe("setPremiumStatus", () => {
 	});
 });
 
-describe("showUpgradeModal / closeModal", () => {
-	it("showUpgradeModal opens modal with feature", async () => {
-		const { track } = await import("@infrastructure/clients/logging/better-stack/tracking");
-		usePremiumStore.getState().showUpgradeModal("export");
+describe("showPremiumModal / closeModal", () => {
+	it("showPremiumModal opens modal with feature", () => {
+		usePremiumStore.getState().showPremiumModal(PremiumFeatureId.CALENDAR_EXPORT);
 		const state = usePremiumStore.getState();
 		expect(state.modalOpen).toBe(true);
-		expect(state.currentFeature).toBe("export");
-		expect(track).toHaveBeenCalledWith("upgrade_modal_opened", { feature: "export" });
+		expect(state.currentFeature).toBe(PremiumFeatureId.CALENDAR_EXPORT);
+	});
+
+	it("sends the gate id to analytics, never the label the gate shows", async () => {
+		const { track } = await import("@infrastructure/clients/logging/better-stack/tracking");
+		usePremiumStore.getState().showPremiumModal(PremiumFeatureId.ADVANCED_METRICS);
+		expect(track).toHaveBeenCalledWith("upgrade_modal_opened", { feature: "advancedMetrics" });
 	});
 
 	it("closeModal closes modal and clears feature", () => {
-		usePremiumStore.setState({ modalOpen: true, currentFeature: "export" });
+		usePremiumStore.setState({ modalOpen: true, currentFeature: PremiumFeatureId.CALENDAR_EXPORT });
 		usePremiumStore.getState().closeModal();
 		expect(usePremiumStore.getState().modalOpen).toBe(false);
-		expect(usePremiumStore.getState().currentFeature).toBe("");
+		expect(usePremiumStore.getState().currentFeature).toBeNull();
 	});
 });
 
@@ -109,14 +113,14 @@ describe("resetPremiumStore", () => {
 			premiumKey: "key",
 			userEmail: "user@example.com",
 			modalOpen: true,
-			currentFeature: "export",
+			currentFeature: PremiumFeatureId.CALENDAR_EXPORT,
 		});
 		usePremiumStore.getState().resetPremiumStore();
 		const state = usePremiumStore.getState();
 		expect(state.premiumKey).toBeNull();
 		expect(state.userEmail).toBeNull();
 		expect(state.modalOpen).toBe(false);
-		expect(state.currentFeature).toBe("");
+		expect(state.currentFeature).toBeNull();
 	});
 });
 

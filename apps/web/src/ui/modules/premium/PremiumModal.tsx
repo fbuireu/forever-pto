@@ -4,7 +4,9 @@ import { usePremiumStore } from "@application/stores/premium";
 import dynamic from "next/dynamic";
 import { useShallow } from "zustand/react/shallow";
 
-const UpgradeModal = dynamic(() => import("./UpgradeModal").then((module) => ({ default: module.UpgradeModal })));
+const PremiumRequiredModal = dynamic(() =>
+	import("./PremiumRequiredModal").then((module) => ({ default: module.PremiumRequiredModal })),
+);
 
 export const PremiumModal = () => {
 	const { closeModal, verifyEmail, modalOpen, currentFeature, isLoading } = usePremiumStore(
@@ -18,7 +20,7 @@ export const PremiumModal = () => {
 	);
 
 	return (
-		<UpgradeModal
+		<PremiumRequiredModal
 			open={modalOpen}
 			onClose={closeModal}
 			feature={currentFeature}

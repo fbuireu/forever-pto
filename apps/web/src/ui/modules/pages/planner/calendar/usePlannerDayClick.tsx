@@ -28,7 +28,7 @@ export const usePlannerDayClick = (onDayToggle: (date: Date) => DayOutcome) => {
 					icon: <LockIcon size="16" />,
 					action: (
 						<SupportButton
-							label={tPremium("upgrade")}
+							label={tPremium("becomePremium")}
 							className="w-full py-3 px-2 !bg-[var(--color-brand-ink)] !text-white !border-transparent !shadow-[var(--shadow-brutal-btn-orange)] hover:!shadow-[var(--shadow-brutal-btn-orange-hover)] active:!shadow-[var(--shadow-brutal-btn-orange-active)]"
 						/>
 					),

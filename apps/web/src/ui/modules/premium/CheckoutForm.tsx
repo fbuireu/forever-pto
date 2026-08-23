@@ -9,10 +9,10 @@ import { ChevronLeft } from "@ui/modules/core/animate/icons/ChevronLeft";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { resolveApiErrorMessage } from "@ui/modules/shared/utils/helpers";
-import { DEFAULT_CURRENCY } from "@ui/utils/currencies";
+import { useCurrencyFormatter } from "@ui/utils/currencies";
 import { Skeleton } from "boneyard-js/react";
 import { AlertCircle } from "lucide-react";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { type FormEvent, useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import { ExpressCheckoutFixture } from "./ExpressCheckoutFixture";
 
@@ -48,7 +48,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 	const locale = useLocale();
 	const t = useTranslations("checkout");
 	const tErrors = useTranslations("errors");
-	const format = useFormatter();
+	const formatCurrency = useCurrencyFormatter();
 	const [isExpressReady, setIsExpressReady] = useState(false);
 	const [hasExpressOptions, setHasExpressOptions] = useState<boolean | null>(null);
 	const [isPending, startTransition] = useTransition();
@@ -58,12 +58,6 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 	useEffect(() => {
 		void import("canvas-confetti");
 	}, []);
-
-	const formatCurrency = useCallback(
-		(value: number) =>
-			format.number(value, { style: "currency", currency: DEFAULT_CURRENCY, minimumFractionDigits: 2 }),
-		[format],
-	);
 
 	const formattedAmount = useMemo(() => formatCurrency(amount), [amount, formatCurrency]);
 	const discountText = useMemo(() => {

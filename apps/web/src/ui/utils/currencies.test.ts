@@ -1,5 +1,14 @@
+import caMessages from "@i18n/messages/ca.json";
+import deMessages from "@i18n/messages/de.json";
+import enMessages from "@i18n/messages/en.json";
+import esMessages from "@i18n/messages/es.json";
+import frMessages from "@i18n/messages/fr.json";
+import itMessages from "@i18n/messages/it.json";
+import { renderHook } from "@testing-library/react";
+import { type Locale, NextIntlClientProvider } from "next-intl";
+import { createElement, type ReactNode } from "react";
 import { describe, expect, it } from "vitest";
-import { amountFormatter, DEFAULT_CURRENCY, DEFAULT_CURRENCY_SYMBOL } from "./currencies";
+import { amountFormatter, DEFAULT_CURRENCY, DEFAULT_CURRENCY_SYMBOL, useCurrencyFormatter } from "./currencies";
 
 describe("the currency constants", () => {
 	it.each(["en", "es", "ca", "it", "de", "fr"])(
@@ -40,4 +49,51 @@ describe("amountFormatter", () => {
 		const second = amountFormatter("fr");
 		expect(first).toBe(second);
 	});
+});
+
+describe("useCurrencyFormatter", () => {
+	const NON_BREAKING_SPACES = /[  ]/g;
+
+	const formatCharge = (locale: Locale, value: number) => {
+		const { result } = renderHook(() => useCurrencyFormatter(), {
+			wrapper: ({ children }: { children: ReactNode }) =>
+				createElement(NextIntlClientProvider, { locale, messages: {}, children }),
+		});
+
+		return result.current(value).replace(NON_BREAKING_SPACES, " ");
+	};
+
+	it("leads with the symbol and separates the cents with a point in English", () => {
+		expect(formatCharge("en", 3.5)).toBe("€3.50");
+	});
+
+	it("trails the symbol and separates the cents with a comma in German, which a baked-in € cannot do", () => {
+		expect(formatCharge("de", 3.5)).toBe("3,50 €");
+	});
+
+	it("trails the symbol in French too, so five of the six locales disagree with a leading one", () => {
+		expect(formatCharge("fr", 3.5)).toBe("3,50 €");
+	});
+
+	it("always shows the cents, because this is an amount about to be taken", () => {
+		expect(formatCharge("en", 10)).toBe("€10.00");
+	});
+});
+
+describe("the promo toast", () => {
+	const bundles = {
+		en: enMessages,
+		es: esMessages,
+		ca: caMessages,
+		it: itMessages,
+		de: deMessages,
+		fr: frMessages,
+	};
+
+	it.each(Object.entries(bundles))(
+		"carries no currency in %s, because the message cannot place the symbol the locale wants",
+		(_locale, messages) => {
+			expect(messages.toasts.promoSavedDescription).not.toContain(DEFAULT_CURRENCY_SYMBOL);
+		},
+	);
 });

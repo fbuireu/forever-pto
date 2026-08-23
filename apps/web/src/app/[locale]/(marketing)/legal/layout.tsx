@@ -1,3 +1,4 @@
+import { MAIN_CONTENT_ID } from "@ui/modules/layout/SkipToContent";
 import type { Locale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import type { ReactNode } from "react";
@@ -12,7 +13,7 @@ const LegalLayout = async ({ children, params }: Readonly<LegalLayoutProps>) => 
 	setRequestLocale(locale);
 
 	return (
-		<main id="main-content" className="flex-1">
+		<main id={MAIN_CONTENT_ID} className="flex-1">
 			{children}
 		</main>
 	);

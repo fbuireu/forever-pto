@@ -3,6 +3,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import ts from "typescript";
 import { describe, expect, it } from "vitest";
+import webNextConfig from "../apps/web/next.config";
 
 const ROOT = resolve(__dirname, "..");
 const WEB = "apps/web";
@@ -15,6 +16,8 @@ const ADR_DIR = "adr";
 const ADR_TEMPLATE = "0000-adr-template.md";
 // Written by `pnpm cf:typegen` into the web package, so it is absent from the tracked tree by design.
 const GENERATED_ENV_TYPES = "cloudflare-env.d.ts";
+const HAND_WRITTEN_ENV_TYPES = "environment.d.ts";
+const UNDECLARED_NAME = 2304;
 const GENERATED_MARKDOWN = new Set([`${WEB}/CHANGELOG.md`]);
 
 // `pnpm <word>` occurrences in a guide that are not package scripts.
@@ -25,6 +28,7 @@ const CODE_SHAPED_SUFFIX = /\.(ts|tsx|json|md)$/;
 const GLOSSARY_TERM = /^\*\*(.+?)\*\*:[ \t]*\n(.*)$/gm;
 const GLOSSARY_AVOID_LINE = /^_Avoid_:(.*)$/gm;
 const GLOSSARY_TERM_WITH_AVOID = /^\*\*(.+?)\*\*:[ \t]*\n((?:.+\n)*?)_Avoid_:(.*)$/gm;
+const EXACT_VERSION = /^\d+\.\d+\.\d+$/;
 const ADR_FILENAME = /^\d{4}-[a-z0-9-]+\.md$/;
 const ADR_NUMBERED_HEADING = /^# (\d+)\. \S/;
 const ADR_DATE_LINE = /^Date: \d{4}-\d{2}-\d{2}$/;
@@ -170,18 +174,45 @@ const tomlSections = (source: string) => {
 
 const webWrangler = tomlSections(read(`${WEB}/wrangler.toml`));
 const WRANGLER_ENVIRONMENTS = ["", "env.development", "env.production"];
+const NAMED_WRANGLER_ENVIRONMENTS = WRANGLER_ENVIRONMENTS.filter((environment) => environment !== "");
+const WRANGLER_NAMED_BINDING_TABLES = [
+	"ratelimits",
+	"r2_buckets",
+	"kv_namespaces",
+	"d1_databases",
+	"durable_objects",
+	"queues",
+	"tail_consumers",
+	"services",
+	"hyperdrive",
+	"vectorize",
+	"analytics_engine_datasets",
+	"mtls_certificates",
+	"send_email",
+	"workflows",
+	"pipelines",
+];
+const WRANGLER_BINDING_TABLES = ["vars", ...WRANGLER_NAMED_BINDING_TABLES];
 const wranglerSection = (environment: string, table: string) =>
 	webWrangler.filter((section) => section.path === (environment ? `${environment}.${table}` : table));
+const wranglerBindingTables = (environment: string) =>
+	new Set(WRANGLER_BINDING_TABLES.filter((table) => wranglerSection(environment, table).length > 0));
 const wranglerBindings = (environment: string) => {
 	const [vars] = wranglerSection(environment, "vars");
-	const named = ["ratelimits", "r2_buckets", "kv_namespaces", "d1_databases", "durable_objects", "queues"]
-		.flatMap((table) => wranglerSection(environment, table))
-		.flatMap((section) => [section.entries.binding, section.entries.name])
+	const named = WRANGLER_NAMED_BINDING_TABLES.flatMap((table) => wranglerSection(environment, table))
+		.flatMap((section) => [section.entries.binding, section.entries.name, section.entries.service])
 		.filter((value): value is string => Boolean(value))
 		.map((value) => value.replace(/^["']|["']$/g, ""));
 
 	return new Set([...Object.keys(vars?.entries ?? {}), ...named]);
 };
+
+interface HeaderRule {
+	source: string;
+	headers: { key: string; value: string }[];
+}
+
+const webHeaderRules = ((await webNextConfig.headers?.()) ?? []) as HeaderRule[];
 
 const cloudflareEnvBindings = [
 	...(/interface CloudflareEnv \{([\s\S]*?)\n\t\}/.exec(read(`${WEB}/environment.d.ts`))?.[1] ?? "").matchAll(
@@ -285,12 +316,12 @@ describe("the workspace is shaped the way the guides describe it", () => {
 			.filter(([, version]) => Boolean(version));
 
 		expect(declared.length).toBe(3);
+		expect(declared.filter(([, version]) => !EXACT_VERSION.test(version))).toEqual([]);
 		expect(new Set(declared.map(([, version]) => version)).size).toBe(1);
 	});
 });
 
 describe("the security header policy covers every request", () => {
-	const nextConfig = read(`${WEB}/next.config.ts`);
 	const REQUIRED_HEADERS = [
 		"Content-Security-Policy",
 		"Strict-Transport-Security",
@@ -303,20 +334,32 @@ describe("the security header policy covers every request", () => {
 		"Cross-Origin-Resource-Policy",
 	];
 	const REQUIRED_CSP_DIRECTIVES = ["frame-ancestors 'none'", "object-src 'none'", "base-uri 'self'"];
+	const HSTS_MINIMUM_MAX_AGE = 31536000;
+	const FRAMING_REFUSALS = ["DENY", "SAMEORIGIN"];
+	const sent = new Map(webHeaderRules.flatMap(({ headers }) => headers.map(({ key, value }) => [key, value])));
 
 	it("matches every path, from exactly one rule", () => {
-		expect([...nextConfig.matchAll(/source: "([^"]+)"/g)].map(([, source]) => source)).toEqual(["/(.*)"]);
+		expect(webHeaderRules.map(({ source }) => source)).toEqual(["/(.*)"]);
 	});
 
 	it("sends every header a browser cannot be told about later", () => {
-		const declared = new Set([...nextConfig.matchAll(/key: "([^"]+)"/g)].map(([, key]) => key));
-		expect(REQUIRED_HEADERS.filter((header) => !declared.has(header))).toEqual([]);
+		expect(REQUIRED_HEADERS.filter((header) => !sent.get(header))).toEqual([]);
 	});
 
 	it("states the three CSP directives whose absence is invisible in a browser", () => {
-		const csp = /const CSP = \[([\s\S]*?)\n\]\.join/.exec(nextConfig)?.[1] ?? "";
-		expect(csp).not.toBe("");
-		expect(REQUIRED_CSP_DIRECTIVES.filter((directive) => !csp.includes(`"${directive}"`))).toEqual([]);
+		const directives = (sent.get("Content-Security-Policy") ?? "").split(";").map((directive) => directive.trim());
+		expect(REQUIRED_CSP_DIRECTIVES.filter((directive) => !directives.includes(directive))).toEqual([]);
+	});
+
+	it("holds a browser to HTTPS for a year, subdomains included", () => {
+		const hsts = sent.get("Strict-Transport-Security") ?? "";
+		expect(Number(/max-age=(\d+)/.exec(hsts)?.[1] ?? 0)).toBeGreaterThanOrEqual(HSTS_MINIMUM_MAX_AGE);
+		expect(hsts).toContain("includeSubDomains");
+	});
+
+	it("refuses framing and content sniffing outright", () => {
+		expect(FRAMING_REFUSALS).toContain(sent.get("X-Frame-Options"));
+		expect(sent.get("X-Content-Type-Options")).toBe("nosniff");
 	});
 });
 
@@ -324,6 +367,7 @@ describe("every wrangler environment carries the whole binding set", () => {
 	it("reads a binding surface out of the web package at all", () => {
 		expect(cloudflareEnvBindings.length).toBeGreaterThan(2);
 		expect(webWrangler.length).toBeGreaterThan(5);
+		expect(wranglerBindingTables("").size).toBeGreaterThan(2);
 	});
 
 	it.each(WRANGLER_ENVIRONMENTS.map((environment) => [environment || "the top level", environment] as const))(
@@ -333,6 +377,11 @@ describe("every wrangler environment carries the whole binding set", () => {
 			expect(cloudflareEnvBindings.filter((name) => !bound.has(name))).toEqual([]);
 		},
 	);
+
+	it.each(NAMED_WRANGLER_ENVIRONMENTS)("declares every binding kind the top level declares in %s", (environment) => {
+		const declared = wranglerBindingTables(environment);
+		expect([...wranglerBindingTables("")].filter((table) => !declared.has(table))).toEqual([]);
+	});
 
 	it("gives the payment rate limiter identical bounds in every environment", () => {
 		const limiters = WRANGLER_ENVIRONMENTS.map((environment) =>
@@ -846,7 +895,7 @@ describe("apps/web/src carries no explanatory comments", () => {
 	// backtick switched the rule off for the rest of the file; an escaped backtick did the same by flipping a
 	// parity count; a character class swallowed the delimiter it was meant to protect. JavaScript's lexical
 	// grammar is not a regular language. Scanning alone is not enough either — only the parser knows whether a
-	// slash opens a regex or divides, which is why `/^\//` in images/loader.ts reads as a comment to a bare
+	// slash opens a regex or divides, so a regex literal holding an escaped slash reads as a comment to a bare
 	// scanner. Comments are trivia, so they hang off node boundaries rather than appearing in the tree.
 	const commentsIn = (path: string, source: string) => {
 		const parsed = ts.createSourceFile(path, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
@@ -1034,17 +1083,24 @@ describe("the guides describe the project as it is configured", () => {
 		const pattern = new RegExp(filter);
 		const sources = trackedFiles.filter((path) => path.startsWith(`${tailRoot}/`) && SOURCE_FILE.test(path));
 		const reached = new Set<string>();
+		const pending = [...sources];
 
-		for (const file of sources) {
+		while (pending.length > 0) {
+			const file = pending.pop() as string;
+			if (!existsSync(join(ROOT, file))) continue;
+
 			for (const [, specifier] of read(file).matchAll(/from\s+["'](\.[^"']+)["']/g)) {
 				const target = join(dirname(file), specifier as string).replace(/\\/g, "/");
-				reached.add(SOURCE_FILE.test(target) ? target : `${target}.ts`);
+				const resolved = SOURCE_FILE.test(target) ? target : `${target}.ts`;
+				if (reached.has(resolved)) continue;
+				reached.add(resolved);
+				pending.push(resolved);
 			}
 		}
 
 		expect(filter).not.toBe("");
 		expect(sources.length).toBeGreaterThan(0);
-		expect(reached.size).toBeGreaterThan(0);
+		expect([...reached].filter((path) => !path.startsWith(`${tailRoot}/`))).not.toEqual([]);
 		expect([...reached].filter((path) => existsSync(join(ROOT, path)) && !pattern.test(path))).toEqual([]);
 	});
 
@@ -1120,6 +1176,26 @@ describe("the guides describe the project as it is configured", () => {
 	it("keeps the generated Cloudflare env types out of the program and out of git", () => {
 		expect(webTsconfigExclude).toContain(GENERATED_ENV_TYPES);
 		expect(isGitIgnored(`${WEB}/${GENERATED_ENV_TYPES}`)).toBe(true);
+	});
+
+	it("references no identifier the web environment types do not import", () => {
+		const entry = join(ROOT, WEB, HAND_WRITTEN_ENV_TYPES);
+		const program = ts.createProgram([entry], {
+			noResolve: true,
+			noEmit: true,
+			skipLibCheck: false,
+			strict: true,
+			target: ts.ScriptTarget.ESNext,
+			lib: ["lib.esnext.d.ts", "lib.dom.d.ts"],
+		});
+		const unbound = ts
+			.getPreEmitDiagnostics(program)
+			.filter(
+				(diagnostic) => diagnostic.code === UNDECLARED_NAME && diagnostic.file?.fileName === entry.replace(/\\/g, "/"),
+			)
+			.map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, " "));
+
+		expect(unbound).toEqual([]);
 	});
 });
 

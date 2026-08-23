@@ -1,5 +1,6 @@
 "use client";
 
+import { PremiumFeatureId } from "@application/stores/premium";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/modules/core/primitives/Card";
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
 import { Calendar } from "lucide-react";
@@ -27,7 +28,12 @@ export const BlocksPerQuarterChart = ({ blocksPerQuarter }: BlockPerQuarterChart
 	const description = t("blocksDescription", { totalBlocks, bestQuarterPart });
 
 	return (
-		<PremiumFeature feature={t("longBlocksFeature")} description={description} iconSize="size-7" inlineDescription>
+		<PremiumFeature
+			feature={PremiumFeatureId.LONG_BLOCKS}
+			description={description}
+			iconSize="size-7"
+			inlineDescription
+		>
 			<Card className="shadow-[var(--shadow-brutal-md)] [contain:layout]">
 				<CardHeader className="pb-3">
 					<CardTitle className="flex items-center gap-2 text-base font-display font-semibold">

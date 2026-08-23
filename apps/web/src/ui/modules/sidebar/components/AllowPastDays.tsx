@@ -1,6 +1,7 @@
 "use client";
 
 import { useFiltersStore } from "@application/stores/filters";
+import { PremiumFeatureId } from "@application/stores/premium";
 import { Switch } from "@ui/modules/core/animate/base/Switch";
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
 import { SidebarFieldLabel } from "@ui/modules/sidebar/components/SidebarFieldLabel";
@@ -24,7 +25,7 @@ export const AllowPastDays = () => {
 				title={t("title")}
 				tooltip={{ label: t("tooltipLabel"), content: t("tooltip") }}
 			/>
-			<PremiumFeature feature={t("title")}>
+			<PremiumFeature feature={PremiumFeatureId.ALLOW_PAST_DAYS}>
 				<div className="flex gap-2 w-full items-center">
 					<Switch checked={allowPastDays} aria-label={t("title")} onCheckedChange={setAllowPastDays} />
 					<p className="font-normal text-sm">{allowPastDays ? t("enabled") : t("disabled")}</p>

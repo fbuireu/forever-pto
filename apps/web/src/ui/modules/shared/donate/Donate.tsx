@@ -20,7 +20,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@ui/modules/core/animat
 import { Star } from "@ui/modules/core/animate/icons/Star";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { cn } from "@ui/utils/cn";
-import { DEFAULT_CURRENCY, DEFAULT_CURRENCY_SYMBOL } from "@ui/utils/currencies";
+import { DEFAULT_CURRENCY, DEFAULT_CURRENCY_SYMBOL, useCurrencyFormatter } from "@ui/utils/currencies";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
@@ -47,6 +47,7 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 	const tValidation = useTranslations("validation.payment");
 	const tEmail = useTranslations("validation.email");
 	const { resolvedTheme } = useTheme();
+	const formatCurrency = useCurrencyFormatter();
 	const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
 	const [isPending, startTransition] = useTransition();
 
@@ -106,12 +107,11 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 					});
 
 					if (result.discountInfo) {
-						const saved = (result.discountInfo.originalAmount - result.discountInfo.finalAmount).toFixed(2);
 						toast.success(t("promoApplied"), {
 							description: t("promoSavedDescription", {
-								saved,
-								original: result.discountInfo.originalAmount.toFixed(2),
-								final: result.discountInfo.finalAmount.toFixed(2),
+								saved: formatCurrency(result.discountInfo.originalAmount - result.discountInfo.finalAmount),
+								original: formatCurrency(result.discountInfo.originalAmount),
+								final: formatCurrency(result.discountInfo.finalAmount),
 							}),
 						});
 						track("promo_code_applied", {
@@ -161,7 +161,7 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 				}
 			});
 		},
-		[setEmail, locale, t],
+		[setEmail, locale, t, formatCurrency],
 	);
 
 	const handlePaymentSuccess = useCallback(() => {

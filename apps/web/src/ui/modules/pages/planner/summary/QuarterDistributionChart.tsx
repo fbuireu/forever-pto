@@ -1,5 +1,6 @@
 "use client";
 
+import { PremiumFeatureId } from "@application/stores/premium";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/modules/core/primitives/Card";
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
 import { BarChart3 } from "lucide-react";
@@ -26,7 +27,7 @@ export const QuarterDistributionChart = ({ quarterDist }: QuarterDistributionCha
 
 	return (
 		<PremiumFeature
-			feature={t("quarterDistributionFeature")}
+			feature={PremiumFeatureId.QUARTER_DISTRIBUTION}
 			description={description}
 			iconSize="size-7"
 			inlineDescription

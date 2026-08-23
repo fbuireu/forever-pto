@@ -56,6 +56,16 @@ Env: copy `.env.example`. Local Worker secrets go in `.dev.vars`. The typed surf
 [`environment.d.ts`](./environment.d.ts) and nothing else — it hand-declares both `ProcessEnv` and the global `CloudflareEnv` the
 Cloudflare context is read through, and it is tracked.
 
+**Nothing type-checks the names inside it.** `skipLibCheck: true` plus the `.d.ts` extension means
+`pnpm typecheck` never looks at a single identifier there, so an unbound one sits in a type the whole build
+trusts. `Formats: typeof getRequestConfig` did, for as long as it took someone to run
+`tsc --skipLibCheck false` over the file by hand: the identifier was never imported, and the augmentation was
+dead besides, because the `getRequestConfig` callback in [`src/infrastructure/i18n/config.ts`](./src/infrastructure/i18n/config.ts)
+returns no `formats` and every formatter call site passes its options inline.
+`tests/docs-consistency.test.ts` compiles the file on its own now, with `skipLibCheck` off, and fails on any
+`Cannot find name`. It leaves the imports unresolved on purpose, so the check stays local to this file: an
+unresolved module still binds the names imported from it, and only a genuinely undeclared identifier surfaces.
+
 `pnpm cf:typegen` writes wrangler's own inference to `cloudflare-env.d.ts` in this folder. It is reference
 material, not part of the program: read it when adding a binding, then widen `environment.d.ts` by hand. Two
 lines keep it that way and both are load-bearing — `.gitignore` so it never gets committed, and an explicit
@@ -125,9 +135,10 @@ a config error on 16.2 — it must stay out while Next is pinned. And
 compiler-API parsing; under TypeScript 7 that import has to become `@typescript/typescript6`, Microsoft's
 compatibility package pinning the 6.x API, so the two move together too. The pin now appears in three
 manifests — this one, the repo root and `apps/docs` — and only this one is load-bearing for `next build`.
-`tests/docs-consistency.test.ts` asserts the three stay equal, on the same reasoning as the `wrangler` rule
-beside it: Renovate opens a pull request per manifest, so without the rule the first bump desynchronises them
-silently.
+`tests/docs-consistency.test.ts` asserts the three stay equal **and stay exact**, on the same reasoning as
+the `wrangler` rule beside it: Renovate opens a pull request per manifest, so without the rule the first bump
+desynchronises them silently. Equality alone was not enough — a `rangeStrategy` flip writes `^6.0.3` into all
+three at once, which is equal and no longer a pin — so each version has to match three dotted numbers too.
 
 Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.tsx` for components).
 
@@ -242,8 +253,10 @@ from it — `pr-<number>-forever-pto-development.fbuireu.workers.dev`, deleted w
 [`src/infrastructure/clients/logging/better-stack/contract.ts`](./src/infrastructure/clients/logging/better-stack/contract.ts), so `TAIL_PATHS` in `ci.yml` has to watch that
 client too. While it named only `apps/web/workers/tail/`, editing the contract redeployed the app and left the
 Worker on the previous bundled copy — and [`workers/tail/index.test.ts`](./workers/tail/index.test.ts) reads the *source* module, so
-nothing in the suite could see the split. `tests/docs-consistency.test.ts` resolves every relative import out
-of `workers/tail/` against that filter now.
+nothing in the suite could see the split. `tests/docs-consistency.test.ts` walks that import graph
+**transitively** against the filter now, because whatever the contract itself imports is bundled too, and it
+asserts at least one resolved path lands outside `workers/tail/` — `index.test.ts` imports `./index`, so a walk
+that crossed no folder boundary at all still looked like a successful one.
 
 Every path in `wrangler.toml` is relative to the file itself, so the deploy runs with this package as the
 working directory. Build config lives in `next.config.ts` and [`open-next.config.ts`](./open-next.config.ts).
@@ -258,7 +271,9 @@ open **by design for errors** — `Effect.catchAll` turns a throwing `.limit()` 
 right for a flaky binding and catastrophic for a missing one: `POST /api/payment` and `POST /api/check-session`
 go unbounded in front of Stripe, silently. `tests/docs-consistency.test.ts` asserts every binding name
 `environment.d.ts` declares is present in all three environments, and that the rate limiter is bounded
-identically in each.
+identically in each. It also asserts each named environment declares every binding **kind** the top level
+declares — `CloudflareEnv` names three bindings and neither `r2_buckets` nor `tail_consumers` is one of them,
+so deleting either block from `env.production` passed the name check untouched.
 
 **`NEXT_PUBLIC_SITE_URL` is resolved twice, and the two resolutions disagree on a preview.** No file reads
 `process.env.NEXT_PUBLIC_SITE_URL`; every read goes through the Cloudflare context. But that context resolves

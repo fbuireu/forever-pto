@@ -4,6 +4,7 @@ import type { HolidayDTO } from "@application/dto/holiday/types";
 import { HolidayVariant } from "@application/dto/holiday/types";
 import { formatDate, isWeekend } from "@application/shared/utils/dates";
 import { useHolidaysStore } from "@application/stores/holidays";
+import { PremiumFeatureId } from "@application/stores/premium";
 import { useDebounce } from "@ui/hooks/useDebounce";
 import { Checkbox } from "@ui/modules/core/animate/base/Checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@ui/modules/core/animate/base/Collapsible";
@@ -50,14 +51,12 @@ const HolidayCard = ({
 	locale,
 	onToggle,
 	t,
-	tPremium,
 }: {
 	holiday: HolidayDTO;
 	isSelected: boolean;
 	locale: string;
 	onToggle: (holiday: HolidayDTO) => void;
 	t: ReturnType<typeof useTranslations<"holidaysTable">>;
-	tPremium: ReturnType<typeof useTranslations<"premium">>;
 }) => {
 	const dateFormatted = formatDate({ date: holiday.date, locale, format: "EEEE, MMMM d, yyyy" });
 
@@ -70,7 +69,11 @@ const HolidayCard = ({
 		>
 			<div className="flex items-start justify-between gap-2">
 				<div className="flex items-start gap-3 flex-1 min-w-0">
-					<PremiumFeature feature={tPremium("selectHoliday")} variant={PremiumFeatureVariant.STACK} iconSize="size-4">
+					<PremiumFeature
+						feature={PremiumFeatureId.SELECT_HOLIDAY}
+						variant={PremiumFeatureVariant.STACK}
+						iconSize="size-4"
+					>
 						<Checkbox checked={isSelected} onCheckedChange={() => onToggle(holiday)} className="mt-1 shrink-0" />
 					</PremiumFeature>
 					<div className="flex-1 min-w-0">
@@ -102,7 +105,6 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 
 	const locale = useLocale();
 	const t = useTranslations("holidaysTable");
-	const tPremium = useTranslations("premium");
 	const [searchTerm, setSearchTerm] = useState("");
 	const [showAddModal, setShowAddModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
@@ -263,7 +265,11 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 		};
 
 		return (
-			<PremiumFeature feature={tPremium("selectAllHolidays")} variant={PremiumFeatureVariant.STACK} iconSize="size-4">
+			<PremiumFeature
+				feature={PremiumFeatureId.SELECT_ALL_HOLIDAYS}
+				variant={PremiumFeatureVariant.STACK}
+				iconSize="size-4"
+			>
 				<Checkbox
 					checked={type === "all"}
 					indeterminate={type === "some"}
@@ -273,7 +279,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 				/>
 			</PremiumFeature>
 		);
-	}, [selectionState, toggleSelectAll, t, tPremium]);
+	}, [selectionState, toggleSelectAll, t]);
 
 	const selectedCount = selectedHolidaysList.length;
 	const weekendCount = variantHolidays.filter((h) => isWeekend(h.date)).length;
@@ -426,7 +432,6 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 												locale={locale}
 												onToggle={toggleSelectHoliday}
 												t={t}
-												tPremium={tPremium}
 											/>
 										);
 									})

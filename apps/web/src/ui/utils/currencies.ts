@@ -1,6 +1,9 @@
 import type { Locale } from "next-intl";
+import { useFormatter } from "next-intl";
+import { useCallback } from "react";
 
 const CURRENCY_PART = "currency" as const;
+const CHARGE_FRACTION_DIGITS = 2;
 
 export const DEFAULT_CURRENCY = "EUR";
 export const DEFAULT_CURRENCY_SYMBOL = "€";
@@ -22,4 +25,18 @@ export const amountFormatter = (locale: Locale): Intl.NumberFormat => {
 	formatterCache.set(locale, formatter);
 
 	return formatter;
+};
+
+export const useCurrencyFormatter = () => {
+	const format = useFormatter();
+
+	return useCallback(
+		(value: number) =>
+			format.number(value, {
+				style: CURRENCY_PART,
+				currency: DEFAULT_CURRENCY,
+				minimumFractionDigits: CHARGE_FRACTION_DIGITS,
+			}),
+		[format],
+	);
 };

@@ -2,6 +2,7 @@
 
 import { logClientError } from "@application/shared/utils/clientLog";
 import { Button } from "@ui/modules/core/primitives/Button";
+import { MAIN_CONTENT_ID } from "@ui/modules/layout/SkipToContent";
 import { ArrowUpRight, RotateCcw } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
@@ -138,6 +139,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
 	return (
 		<>
 			<main
+				id={MAIN_CONTENT_ID}
 				data-testid="error-boundary"
 				className="flex-1 py-[60px]"
 				style={{

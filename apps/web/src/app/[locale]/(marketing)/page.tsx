@@ -1,5 +1,6 @@
 import { LOCALES } from "@infrastructure/i18n/locales";
 import { routeMetadata } from "@infrastructure/seo/routeMetadata";
+import { MAIN_CONTENT_ID } from "@ui/modules/layout/SkipToContent";
 import { Comparison } from "@ui/modules/pages/homepage/sections/Comparison";
 import { Faq } from "@ui/modules/pages/homepage/sections/Faq";
 import { Features } from "@ui/modules/pages/homepage/sections/Features";
@@ -30,7 +31,7 @@ const HomePage = async ({ params }: PageProps) => {
 	setRequestLocale(locale);
 
 	return (
-		<main id="main-content" className="flex-1">
+		<main id={MAIN_CONTENT_ID} className="flex-1">
 			<Hero />
 			<Marquee />
 			<HowItWorks />

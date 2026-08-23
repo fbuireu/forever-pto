@@ -467,7 +467,7 @@
 		"paymentSuccess": "Payment successful!",
 		"paymentSuccessDescription": "Premium access is now active.",
 		"promoApplied": "Promo code applied!",
-		"promoSavedDescription": "You saved €{saved} (Original: €{original}, Final: €{final})",
+		"promoSavedDescription": "You saved {saved} (Original: {original}, Final: {final})",
 		"promoCodeError": "Promo code error",
 		"promoCodeErrors": {
 			"invalid_or_expired": "Invalid or expired promo code",
@@ -677,7 +677,7 @@
 		"continueToPayment": "Continue to payment",
 		"processing": "Processing..."
 	},
-	"upgrade": {
+	"premiumModal": {
 		"premiumRequired": "Premium feature required",
 		"featureRequiresPremium": "requires premium access",
 		"verifyDescription": "If you've already donated or paid, we'll check your email and grant access right away. If you run into any trouble, reach out and we'll sort it.",
@@ -878,8 +878,8 @@
 		"selectAllHolidays": "Select all holidays",
 		"unlockFeature": "Unlock premium feature: {feature}",
 		"premiumFeature": "Premium feature",
-		"unlockDescription": "Upgrade to premium to manually add or remove suggestions and manage your remaining days.",
-		"upgrade": "Upgrade"
+		"unlockDescription": "Get premium to manually add or remove suggestions and manage your remaining days.",
+		"becomePremium": "Get premium"
 	},
 	"calendar": {
 		"previousMonth": "Previous month",
@@ -1311,8 +1311,7 @@
 				"description": "The data controller responsible for your personal data is:",
 				"items": {
 					"name": {
-						"label": "Name:",
-						"value": "{author}"
+						"label": "Name:"
 					},
 					"email": {
 						"label": "Email:",
@@ -1863,8 +1862,7 @@
 				"description": "In compliance with Law 34/2002, of July 11, on Information Society Services and Electronic Commerce (LSSI-CE), the following information is provided:",
 				"items": {
 					"owner": {
-						"label": "Owner:",
-						"value": "{author}"
+						"label": "Owner:"
 					},
 					"nif": {
 						"label": "NIF:"

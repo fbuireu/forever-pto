@@ -16,7 +16,7 @@ The rest of the application layer contract is in [`../CLAUDE.md`](../CLAUDE.md).
 | [`filters.ts`](./filters.ts) | `useFiltersStore` — the planning inputs |
 | [`holidays.ts`](./holidays.ts) | `useHolidaysStore` — the calendar, the plan, and the user's edits to it |
 | [`location.ts`](./location.ts) | `useLocationStore` — the Country and Region option lists |
-| [`premium.ts`](./premium.ts) | `usePremiumStore` — the Premium session and the upgrade modal |
+| [`premium.ts`](./premium.ts) | `usePremiumStore` — the Premium session and the Premium-required modal |
 | [`ui.ts`](./ui.ts) | `useUIStore` — donate popover and currency; the one store with no persistence |
 | [`crypto.ts`](./crypto.ts) | `obfuscatedStorage`, the zustand `PersistStorage` the four persisted stores share. Not a store |
 | [`utils/crypto.ts`](./utils/crypto.ts) | `obfuscate` / `deobfuscate` / `base64Encode` / `base64Decode`, plus `TWENTY_FOUR_HOURS` and `BASE64_PATTERN`. Not a store |

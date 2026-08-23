@@ -1,5 +1,6 @@
 import { Link } from "@application/i18n/navigation";
 import { Button } from "@ui/modules/core/primitives/Button";
+import { MAIN_CONTENT_ID } from "@ui/modules/layout/SkipToContent";
 import { Header } from "@ui/modules/pages/homepage/navigation/Navigation";
 import { Footer } from "@ui/modules/shared/footer/Footer";
 import { cn } from "@ui/utils/cn";
@@ -24,7 +25,7 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
 		<div className="min-h-screen flex flex-col bg-background text-foreground">
 			<Header />
 
-			<main id="main-content" className="flex-1 py-[60px]">
+			<main id={MAIN_CONTENT_ID} className="flex-1 py-[60px]">
 				<div className="max-w-[1320px] mx-auto grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-[60px] px-7 items-center">
 					<div className="flex items-start justify-center">
 						<div className="flex items-start gap-[10px] font-display font-extrabold tracking-[-0.06em] leading-[0.82] text-[clamp(120px,18vw,280px)]">

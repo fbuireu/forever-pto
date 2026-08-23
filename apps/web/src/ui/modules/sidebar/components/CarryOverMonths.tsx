@@ -1,6 +1,7 @@
 "use client";
 
 import { MAX_CARRY_OVER_MONTHS, MIN_CARRY_OVER_MONTHS, useFiltersStore } from "@application/stores/filters";
+import { PremiumFeatureId } from "@application/stores/premium";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
 import { SlidersHorizontal } from "@ui/modules/core/animate/icons/SlidersHorizontal";
 import { SlidingNumber } from "@ui/modules/core/animate/text/SlidingNumber";
@@ -60,7 +61,7 @@ export const CarryOverMonths = () => {
 					title={t("title")}
 					tooltip={{ label: t("tooltipLabel"), content: t("tooltip") }}
 				/>
-				<PremiumFeature feature={t("title")}>
+				<PremiumFeature feature={PremiumFeatureId.CARRY_OVER_MONTHS}>
 					<div className="flex gap-4 items-center w-full">
 						<p className="font-normal text-sm">{MIN_VALUE}</p>
 						<div className="relative flex-1">

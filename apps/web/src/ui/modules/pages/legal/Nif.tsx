@@ -1,4 +1,6 @@
-const CHARS = [
+import { type ScrambledChar, ScrambledText } from "@ui/modules/pages/legal/ScrambledText";
+
+const CHARS: readonly ScrambledChar[] = [
 	{ character: "2", order: 4 },
 	{ character: "4", order: 0 },
 	{ character: "7", order: 7 },
@@ -10,18 +12,4 @@ const CHARS = [
 	{ character: "2", order: 5 },
 ];
 
-interface NifProps {
-	ariaLabel: string;
-}
-
-export const Nif = ({ ariaLabel }: NifProps) => {
-	return (
-		<span className="inline-flex select-none" role="img" aria-label={ariaLabel}>
-			{CHARS.map(({ character, order }) => (
-				<span key={order} style={{ order }}>
-					{character}
-				</span>
-			))}
-		</span>
-	);
-};
+export const Nif = () => <ScrambledText chars={CHARS} />;

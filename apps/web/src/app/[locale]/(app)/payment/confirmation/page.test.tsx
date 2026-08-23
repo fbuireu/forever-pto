@@ -158,12 +158,12 @@ describe("payment/confirmation page", () => {
 	});
 
 	describe("success state", () => {
-		it("returns a div wrapper on success", async () => {
+		it("returns a main landmark on success", async () => {
 			const element = await PaymentSuccessPage(makeSuccessParams());
-			expect(element.type).toBe("div");
+			expect(element.type).toBe("main");
 		});
 
-		it("success wrapper has m-auto class", async () => {
+		it("success landmark has m-auto class", async () => {
 			const element = await PaymentSuccessPage(makeSuccessParams());
 			expect(element.props.className).toContain("m-auto");
 		});

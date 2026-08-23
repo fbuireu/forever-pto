@@ -6,7 +6,7 @@ import { Link } from "@application/i18n/navigation";
 import { useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
 import { useLocationStore } from "@application/stores/location";
-import { usePremiumStore } from "@application/stores/premium";
+import { PremiumFeatureId, usePremiumStore } from "@application/stores/premium";
 import { measureGain } from "@domain/calendar/utils/budget";
 import { usePlanReadout } from "@ui/hooks/usePlanReadout";
 import { useStoresReady } from "@ui/hooks/useStoresReady";
@@ -247,7 +247,7 @@ export const Summary = () => {
 							/>
 						</div>
 						<div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-							<PremiumFeature feature={t("metrics.advancedMetrics")} iconSize="size-7">
+							<PremiumFeature feature={PremiumFeatureId.ADVANCED_METRICS} iconSize="size-7">
 								<MetricCard
 									label={t("metrics.longWeekends")}
 									value={metrics.longWeekends}
@@ -256,7 +256,7 @@ export const Summary = () => {
 									size={MetricCardSize.COMPACT}
 								/>
 							</PremiumFeature>
-							<PremiumFeature feature={t("metrics.advancedMetrics")} iconSize="size-7">
+							<PremiumFeature feature={PremiumFeatureId.ADVANCED_METRICS} iconSize="size-7">
 								<MetricCard
 									label={t("metrics.restBlocks")}
 									value={metrics.restBlocks}
@@ -274,7 +274,7 @@ export const Summary = () => {
 								colorScheme="amber"
 								size={MetricCardSize.COMPACT}
 							/>
-							<PremiumFeature feature={t("metrics.advancedMetrics")} iconSize="size-7">
+							<PremiumFeature feature={PremiumFeatureId.ADVANCED_METRICS} iconSize="size-7">
 								<MetricCard
 									label={t("metrics.bridgesUsed")}
 									value={metrics.bridgesUsed}
@@ -302,7 +302,7 @@ export const Summary = () => {
 						</div>
 						{metrics.firstLastBreak && (
 							<PremiumFeature
-								feature={t("yearSummary.feature")}
+								feature={PremiumFeatureId.YEAR_SUMMARY}
 								description={t("yearSummary.featureDescription")}
 								iconSize="size-7"
 								inlineDescription

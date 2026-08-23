@@ -1,6 +1,7 @@
 "use client";
 
 import { formatDate } from "@application/shared/utils/dates";
+import { PremiumFeatureId } from "@application/stores/premium";
 import { MONTHS_IN_YEAR } from "@domain/calendar/window";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/modules/core/primitives/Card";
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
@@ -43,7 +44,12 @@ export const MonthlyDistributionChart = ({ monthlyDist, year, carryOverMonths }:
 	const description = t("timelineDescription", { totalDays, activeMonths, peakMonth, peakDays });
 
 	return (
-		<PremiumFeature feature={t("annualTimelineFeature")} description={description} iconSize="size-7" inlineDescription>
+		<PremiumFeature
+			feature={PremiumFeatureId.ANNUAL_TIMELINE}
+			description={description}
+			iconSize="size-7"
+			inlineDescription
+		>
 			<Card className="shadow-[var(--shadow-brutal-md)] [contain:layout]">
 				<CardHeader className="pb-3">
 					<CardTitle className="flex items-center gap-2 text-base font-display font-semibold">

@@ -1,4 +1,6 @@
-const CHARS = [
+import { type ScrambledChar, ScrambledText } from "@ui/modules/pages/legal/ScrambledText";
+
+const CHARS: readonly ScrambledChar[] = [
 	{ character: "B", order: 7 },
 	{ character: "r", order: 3 },
 	{ character: "e", order: 11 },
@@ -14,18 +16,4 @@ const CHARS = [
 	{ character: "r", order: 10 },
 ];
 
-interface MeProps {
-	ariaLabel: string;
-}
-
-export const Me = ({ ariaLabel }: MeProps) => {
-	return (
-		<span className="inline-flex select-none" role="img" aria-label={ariaLabel}>
-			{CHARS.map(({ character, order }) => (
-				<span key={order} style={{ order }}>
-					{character}
-				</span>
-			))}
-		</span>
-	);
-};
+export const Me = () => <ScrambledText chars={CHARS} />;

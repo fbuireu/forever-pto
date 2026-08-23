@@ -2,6 +2,7 @@
 
 import type { HolidayDTO } from "@application/dto/holiday/types";
 import { formatDate, isWeekend } from "@application/shared/utils/dates";
+import { PremiumFeatureId } from "@application/stores/premium";
 import { Checkbox } from "@ui/modules/core/animate/base/Checkbox";
 import { Badge } from "@ui/modules/core/primitives/Badge";
 import { TableCell, TableRow } from "@ui/modules/core/primitives/Table";
@@ -36,7 +37,7 @@ const HolidayRowComponent = ({ holiday, isSelected, locale, onToggle }: HolidayR
 		<TableRow className={cn("hover:bg-muted/50 [contain:layout]", isSelected && "bg-muted/25")}>
 			<TableCell>
 				<PremiumFeature
-					feature={t("editHolidays")}
+					feature={PremiumFeatureId.EDIT_HOLIDAYS}
 					variant={PremiumFeatureVariant.STACK}
 					iconSize="size-4"
 					className="bg-none"

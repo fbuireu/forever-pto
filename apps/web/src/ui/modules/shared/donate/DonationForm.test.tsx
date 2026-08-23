@@ -29,11 +29,27 @@ const enabledControls = () =>
 		.concat(screen.getAllByRole("spinbutton"), screen.getAllByRole("button"))
 		.filter((control) => !control.hasAttribute("disabled"));
 
+const PRESET_LABELS = ["€5", "€10", "€15"];
+
+const chargingControls = () => [
+	screen.getByPlaceholderText(enMessages.donationForm.emailPlaceholder),
+	screen.getByPlaceholderText(enMessages.donationForm.enterAmount),
+	...PRESET_LABELS.map((label) => screen.getByRole("button", { name: label })),
+	screen.getByRole("button", { name: enMessages.donationForm.continueToPayment }),
+];
+
 describe("DonationForm", () => {
 	it("leaves every control usable while nothing is in flight", () => {
 		render(<Harness isPending={false} />);
 
-		expect(enabledControls().length).toBeGreaterThan(0);
+		expect(chargingControls().map((control) => control.hasAttribute("disabled"))).toEqual([
+			false,
+			false,
+			false,
+			false,
+			false,
+			false,
+		]);
 	});
 
 	it("disables the email field with the rest of the form, not on its own clock", () => {

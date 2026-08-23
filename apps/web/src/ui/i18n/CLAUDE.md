@@ -79,7 +79,7 @@ go hunting for a key:
   nothing and no test could tell. Now it turns a case red.
 
 - **Two validation messages live in `validation.email` because three forms need them.** `invalid` and
-  `required` were written out in `validation.contact`, `validation.payment` **and** `upgrade` — six strings
+  `required` were written out in `validation.contact`, `validation.payment` **and** `premiumModal` — six strings
   across six locales for two messages. **Two had already drifted**: Catalan and French `validation.payment`
   said "a valid email is required" where every other copy, and the English, say "enter a valid email
   address". The imperative form is canonical and the payment copies were replaced, so merging fixed two

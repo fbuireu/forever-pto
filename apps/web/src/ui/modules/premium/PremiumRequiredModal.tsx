@@ -1,5 +1,6 @@
 "use client";
 
+import type { PremiumFeatureId } from "@application/stores/premium";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
 	Dialog,
@@ -16,14 +17,15 @@ import { FormButtons } from "@ui/modules/shared/FormButtons";
 import { Step, StepOutcome, StepOutcomeTone } from "@ui/modules/shared/StepOutcome";
 import { AlertCircle, Crown } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { usePremiumFeatureLabel } from "./featureLabels";
 
-interface UpgradeModalProps {
+interface PremiumRequiredModalProps {
 	open: boolean;
 	onClose: () => void;
-	feature: string;
+	feature: PremiumFeatureId | null;
 	onVerifyEmail: (email: string) => Promise<boolean>;
 	isLoading: boolean;
 }
@@ -38,11 +40,19 @@ const createEmailSchema = ({ invalid, required }: { invalid: string; required: s
 
 type EmailFormData = z.infer<ReturnType<typeof createEmailSchema>>;
 
-export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading }: UpgradeModalProps) => {
-	const t = useTranslations("upgrade");
+export const PremiumRequiredModal = ({
+	open,
+	onClose,
+	feature,
+	onVerifyEmail,
+	isLoading,
+}: PremiumRequiredModalProps) => {
+	const t = useTranslations("premiumModal");
 	const tA11y = useTranslations("a11y");
 	const tEmail = useTranslations("validation.email");
+	const featureLabel = usePremiumFeatureLabel();
 	const [step, setStep] = useState<Step>(Step.INPUT);
+	const autoCloseRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
 	const emailSchema = useMemo(
 		() => createEmailSchema({ invalid: tEmail("invalid"), required: tEmail("required") }),
@@ -56,18 +66,26 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
 		},
 	});
 
-	const handleClose = () => {
+	const cancelAutoClose = useCallback(() => {
+		clearTimeout(autoCloseRef.current);
+		autoCloseRef.current = undefined;
+	}, []);
+
+	useEffect(() => cancelAutoClose, [cancelAutoClose]);
+
+	const handleClose = useCallback(() => {
+		cancelAutoClose();
 		form.reset();
 		setStep(Step.INPUT);
 		onClose();
-	};
+	}, [cancelAutoClose, form, onClose]);
 
 	const onSubmit = async (data: EmailFormData) => {
 		const success = await onVerifyEmail(data.email);
 
 		if (success) {
 			setStep(Step.SUCCESS);
-			setTimeout(handleClose, AUTO_CLOSE_MS);
+			autoCloseRef.current = setTimeout(handleClose, AUTO_CLOSE_MS);
 			return;
 		}
 
@@ -89,7 +107,7 @@ export const UpgradeModal = ({ open, onClose, feature, onVerifyEmail, isLoading 
 					</DialogTitle>
 					<Banner icon={Lock} title={t("premiumRequired")} colorScheme="indigo">
 						<span>
-							<strong className="capitalize">{feature}</strong> {t("featureRequiresPremium")}
+							{feature && <strong className="capitalize">{featureLabel(feature)}</strong>} {t("featureRequiresPremium")}
 						</span>
 					</Banner>
 					<DialogDescription>{t("verifyDescription")}</DialogDescription>

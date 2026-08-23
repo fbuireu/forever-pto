@@ -467,7 +467,7 @@
 		"paymentSuccess": "Pagament realitzat!",
 		"paymentSuccessDescription": "Gràcies pel teu suport! Ja tens accés premium.",
 		"promoApplied": "Codi promocional aplicat!",
-		"promoSavedDescription": "Has estalviat €{saved} (Original: €{original}, Final: €{final})",
+		"promoSavedDescription": "Has estalviat {saved} (Original: {original}, Final: {final})",
 		"promoCodeError": "Error en el codi promocional",
 		"promoCodeErrors": {
 			"invalid_or_expired": "Codi promocional no vàlid o caducat",
@@ -677,7 +677,7 @@
 		"continueToPayment": "Continuar al pagament",
 		"processing": "Processant..."
 	},
-	"upgrade": {
+	"premiumModal": {
 		"premiumRequired": "Es requereix premium",
 		"featureRequiresPremium": "Requereix accés premium",
 		"verifyDescription": "No et preocupis, si ja has donat o pagat comprovarem el teu email a la nostra llista i et concedirem accés premium. Si tens algun problema no dubtis en contactar-nos.",
@@ -879,7 +879,7 @@
 		"unlockFeature": "Desbloquejar funció premium: {feature}",
 		"premiumFeature": "Funció premium",
 		"unlockDescription": "Passa a premium per editar els suggeriments i gestionar els dies restants manualment.",
-		"upgrade": "Actualitzar a premium"
+		"becomePremium": "Fes-te premium"
 	},
 	"calendar": {
 		"previousMonth": "Mes anterior",
@@ -1311,8 +1311,7 @@
 				"description": "El responsable del tractament de les teves dades personals és:",
 				"items": {
 					"name": {
-						"label": "Nom:",
-						"value": "{author}"
+						"label": "Nom:"
 					},
 					"email": {
 						"label": "Email:",
@@ -1863,8 +1862,7 @@
 				"description": "En compliment de la Llei 34/2002, d'11 de juliol, de Serveis de la Societat de la Informació i de Comerç Electrònic (LSSI-CE), es facilita la informació següent:",
 				"items": {
 					"owner": {
-						"label": "Titular:",
-						"value": "{author}"
+						"label": "Titular:"
 					},
 					"nif": {
 						"label": "NIF:"
