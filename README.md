@@ -11,7 +11,7 @@
 
 [![CI](https://img.shields.io/github/actions/workflow/status/fbuireu/forever-pto/ci.yml?style=flat-square&logo=github&label=CI)](https://github.com/fbuireu/forever-pto/actions/workflows/ci.yml)
 [![Uptime](https://uptime.betterstack.com/status-badges/v1/monitor/272ww.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
-[![License: Private](https://img.shields.io/badge/License-Private-lightgrey?style=flat-square)](#license)
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL%20v3-blue?style=flat-square)](./LICENSE)
 
 **[forever-pto.com](https://forever-pto.com)** · **[Documentation](https://docs.forever-pto.com)** · **[Getting Started](#getting-started)** · **[Stack](#stack)** · **[Contributing](./CONTRIBUTING.md)**
 
@@ -152,4 +152,6 @@ Conventional commits required. Run `pnpm prepare` to set up git hooks.
 
 ## License
 
-Private — © Ferran Buireu
+[AGPL-3.0-only](./LICENSE) © Ferran Buireu
+
+Running a modified copy as a network service obliges you to offer its source to the people using it.
