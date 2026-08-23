@@ -5,7 +5,7 @@
 The six translation catalogues, and nothing else. This folder holds no code — `messages/` contains one
 JSON file per locale and the folder has no `.ts` file at all. Everything that decides *which* locale a
 request gets lives elsewhere: the locale list and request config in `@infrastructure/i18n`
-([`locales.ts`](../../infrastructure/i18n/locales.ts), `config.ts`, [`routing.ts`](../../infrastructure/i18n/routing.ts), `cookie.ts`), and the locale-aware `Link` / `useRouter` /
+([`locales.ts`](../../infrastructure/i18n/locales.ts), [`config.ts`](../../infrastructure/i18n/config.ts), [`routing.ts`](../../infrastructure/i18n/routing.ts), [`cookie.ts`](../../infrastructure/i18n/cookie.ts)), and the locale-aware `Link` / `useRouter` /
 `usePathname` in `@application/i18n/navigation` ([`navigation.ts`](../../application/i18n/navigation.ts)).
 
 Aliased `@i18n/*`. Excluded from the Vitest run and from coverage in [`vitest.config.ts`](../../../vitest.config.ts) — it is data.

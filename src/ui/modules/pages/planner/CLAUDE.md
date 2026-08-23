@@ -296,7 +296,7 @@ between this screen and the homepage used to be crossed and are not any more:
 
 - [`SupportButton.tsx`](../../shared/SupportButton.tsx) — mounted by `calendar/Calendar.tsx` inside the "this is a Premium feature" toast
   *and* by [`pages/homepage/sections/Pricing.tsx`](../homepage/sections/Pricing.tsx) — lives in `shared/`.
-- [`FaqTabs.tsx`](../homepage/support/FaqTabs.tsx), `Troubleshooting.tsx` and their `types.ts` sat here while [`pages/homepage/sections/Faq.tsx`](../homepage/sections/Faq.tsx)
+- [`FaqTabs.tsx`](../homepage/support/FaqTabs.tsx), `Troubleshooting.tsx` and their [`types.ts`](../homepage/support/types.ts) sat here while [`pages/homepage/sections/Faq.tsx`](../homepage/sections/Faq.tsx)
   was their only consumer; they now live under `pages/homepage/support/`.
 - `getViewBoxFromSvg` moved out of `calendar/utils/helpers.ts` into [`shared/utils/helpers.ts`](../../shared/utils/helpers.ts), so
   [`shared/Icon.tsx`](../../shared/Icon.tsx) no longer reaches into this screen.
