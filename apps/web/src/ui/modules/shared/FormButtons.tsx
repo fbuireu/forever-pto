@@ -2,7 +2,6 @@ import { Button } from "@ui/modules/core/primitives/Button";
 import { cn } from "@ui/utils/cn";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useFormStatus } from "react-dom";
 
 interface FormButtonsProps {
 	onCancel?: () => void;
@@ -13,7 +12,7 @@ interface FormButtonsProps {
 	submitClassName?: string;
 	cancelClassName?: string;
 	submitVariant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "success";
-	pending?: boolean;
+	pending: boolean;
 }
 
 export const FormButtons = ({
@@ -25,14 +24,12 @@ export const FormButtons = ({
 	submitClassName,
 	cancelClassName,
 	submitVariant = "success",
-	pending: pendingProp,
+	pending: isPending,
 }: FormButtonsProps) => {
 	const t = useTranslations("formButtons");
 	const resolvedSubmitText = submitText ?? t("submit");
 	const resolvedLoadingText = loadingText ?? t("processing");
 	const resolvedCancelText = cancelText ?? t("cancel");
-	const { pending: pendingStatus } = useFormStatus();
-	const isPending = pendingProp ?? pendingStatus;
 
 	return (
 		<div className="flex gap-2 pt-2">

@@ -5,33 +5,21 @@ const CURRENCY_PART = "currency" as const;
 export const DEFAULT_CURRENCY = "EUR";
 export const DEFAULT_CURRENCY_SYMBOL = "€";
 
-interface FormatterKey {
-	locale: string;
-	currency: string;
-	fractionDigits?: number;
-}
-
 const formatterCache = new Map<string, Intl.NumberFormat>();
 
-const formatterFor = ({ locale, currency, fractionDigits }: FormatterKey): Intl.NumberFormat => {
-	const key = `${locale}|${currency}|${fractionDigits ?? "auto"}`;
-	const cached = formatterCache.get(key);
+export const amountFormatter = (locale: Locale): Intl.NumberFormat => {
+	const cached = formatterCache.get(locale);
 
 	if (cached) return cached;
 
 	const formatter = new Intl.NumberFormat(locale, {
 		style: CURRENCY_PART,
-		currency,
-		...(fractionDigits !== undefined && {
-			minimumFractionDigits: fractionDigits,
-			maximumFractionDigits: fractionDigits,
-		}),
+		currency: DEFAULT_CURRENCY,
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 0,
 	});
 
-	formatterCache.set(key, formatter);
+	formatterCache.set(locale, formatter);
 
 	return formatter;
 };
-
-export const amountFormatter = (locale: Locale) =>
-	formatterFor({ locale, currency: DEFAULT_CURRENCY, fractionDigits: 0 });

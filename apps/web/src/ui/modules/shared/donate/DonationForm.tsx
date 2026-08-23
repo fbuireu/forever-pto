@@ -13,7 +13,6 @@ import { amountFormatter } from "@ui/utils/currencies";
 import type { Locale } from "next-intl";
 import { useTranslations } from "next-intl";
 import { useCallback, useMemo, useState } from "react";
-import { useFormStatus } from "react-dom";
 import type { UseFormReturn } from "react-hook-form";
 import { FormButtons } from "../FormButtons";
 
@@ -26,7 +25,7 @@ interface DonationFormProps {
 	locale: Locale;
 	currency: string;
 	currencySymbol: string;
-	isPending?: boolean;
+	isPending: boolean;
 }
 
 export function DonationForm({
@@ -41,8 +40,6 @@ export function DonationForm({
 	const t = useTranslations("donationForm");
 	const [showPromoCode, setShowPromoCode] = useState(false);
 	const { setValue } = form;
-	const { pending } = useFormStatus();
-	const loading = pending || isPending;
 
 	const amount = useMemo(() => amountFormatter(locale), [locale]);
 
@@ -66,7 +63,7 @@ export function DonationForm({
 								<Input
 									type="email"
 									placeholder={t("emailPlaceholder")}
-									disabled={pending}
+									disabled={isPending}
 									{...field}
 									className="h-10"
 									autoComplete="email"
@@ -86,7 +83,7 @@ export function DonationForm({
 								variant={currentAmount === preset ? "default" : "outline"}
 								size="sm"
 								onClick={() => handlePresetClick(preset)}
-								disabled={loading}
+								disabled={isPending}
 								className="flex-1 [filter:none]"
 							>
 								{amount.format(preset)}
@@ -114,7 +111,7 @@ export function DonationForm({
 										step="1"
 										min="1"
 										max="10000"
-										disabled={loading}
+										disabled={isPending}
 										aria-invalid={!!fieldState.error}
 										{...field}
 										value={field.value ?? ""}
@@ -155,7 +152,7 @@ export function DonationForm({
 											<Input
 												type="text"
 												placeholder={t("promoCodePlaceholder")}
-												disabled={loading}
+												disabled={isPending}
 												{...field}
 												className="h-10 uppercase"
 											/>
@@ -173,7 +170,7 @@ export function DonationForm({
 					hideCancel
 					submitVariant="success"
 					submitClassName="w-full"
-					pending={loading}
+					pending={isPending}
 				/>
 			</form>
 		</Form>

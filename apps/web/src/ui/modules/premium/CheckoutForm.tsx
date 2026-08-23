@@ -2,7 +2,6 @@
 
 import type { DiscountInfo } from "@application/dto/payment/types";
 import { usePremiumStore } from "@application/stores/premium";
-import { useUIStore } from "@application/stores/ui";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { ExpressCheckoutElement, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { ConfirmPaymentOutcome, confirmPayment } from "@ui/adapters/payments/checkout";

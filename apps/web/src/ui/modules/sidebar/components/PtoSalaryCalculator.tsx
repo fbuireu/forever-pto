@@ -1,6 +1,5 @@
 "use client";
 
-import { useUIStore } from "@application/stores/ui";
 import { SlidingNumber } from "@ui/modules/core/animate/text/SlidingNumber";
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@ui/modules/core/primitives/InputGroup";
 import { ConditionalWrapper } from "@ui/modules/shared/ConditionalWrapper";
@@ -9,7 +8,6 @@ import { DEFAULT_CURRENCY, DEFAULT_CURRENCY_SYMBOL } from "@ui/utils/currencies"
 import { Euro } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
-import { useShallow } from "zustand/react/shallow";
 
 const WORKING_DAYS_PER_YEAR = 252;
 const HOURS_PER_DAY = 8;

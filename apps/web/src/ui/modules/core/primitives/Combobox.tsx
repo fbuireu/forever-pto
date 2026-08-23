@@ -6,7 +6,7 @@ import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { cn } from "@ui/utils/cn";
 import { Check } from "lucide-react";
-import { type HTMLProps, useState } from "react";
+import { useState } from "react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "./Command";
 import { FlagIcon } from "./FlagIcon";
 import { hasFlag } from "./utils/helpers";
@@ -17,7 +17,11 @@ interface ComboboxOption<TValue extends string> {
 	flag?: string;
 }
 
-interface ComboboxProps<TValue extends string> extends Omit<HTMLProps<HTMLInputElement>, "onChange"> {
+interface ComboboxProps<TValue extends string> {
+	id?: string;
+	className?: string;
+	disabled?: boolean;
+	placeholder?: string;
 	searchPlaceholder?: string;
 	notFoundText?: string;
 	options?: ComboboxOption<TValue>[];

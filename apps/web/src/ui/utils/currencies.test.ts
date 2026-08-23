@@ -18,10 +18,6 @@ describe("formatter reuse", () => {
 	it("hands back the same formatter for one locale, so the cache is shared rather than per function", () => {
 		expect(amountFormatter("en")).toBe(amountFormatter("en"));
 	});
-
-	it("keeps the zero-digit and the default-digit formatters apart, which one cache key must not collapse", () => {
-		expect(amountFormatter("en").format(10)).not.toContain(".");
-	});
 });
 
 describe("amountFormatter", () => {

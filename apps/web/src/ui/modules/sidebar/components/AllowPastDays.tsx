@@ -20,14 +20,13 @@ export const AllowPastDays = () => {
 	return (
 		<div className="space-y-2 w-full">
 			<SidebarFieldLabel
-				controlId="allow-past-days"
 				icon={<Undo2 size={16} />}
 				title={t("title")}
 				tooltip={{ label: t("tooltipLabel"), content: t("tooltip") }}
 			/>
 			<PremiumFeature feature={t("title")}>
 				<div className="flex gap-2 w-full items-center">
-					<Switch checked={allowPastDays} id="allow-past-days" onCheckedChange={setAllowPastDays} />
+					<Switch checked={allowPastDays} aria-label={t("title")} onCheckedChange={setAllowPastDays} />
 					<p className="font-normal text-sm">{allowPastDays ? t("enabled") : t("disabled")}</p>
 				</div>
 			</PremiumFeature>

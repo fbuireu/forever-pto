@@ -100,9 +100,13 @@ codebase of a function kept alive by its test suite. It is gone.
 the formatter with `DEFAULT_CURRENCY`, so that read could only ever answer `'EUR'` — an elaborate way to
 return a constant beside a localised glyph.
 
-The single cache is keyed on locale, currency **and** fraction digits, and that third component is
-load-bearing rather than defensive: dropping it makes the zero-digit donation formatter and the
-default-digit symbol lookup share one entry, which a test now catches.
+**The cache is keyed on locale alone, because there is one formatter shape.** It was keyed on locale,
+currency and fraction digits, with a paragraph here calling the third component load-bearing because it kept
+the zero-digit donation formatter and the default-digit symbol lookup apart. That second consumer is
+`getCurrencySymbol`, which the paragraph above says is gone — so the key had two axes its one remaining
+producer pins, the `?? "auto"` branch was unreachable, and the test named for the collision could not fail:
+delete the fraction-digits component and the only key ever written is still unique. If a second formatter
+shape returns, the key grows back **with** the caller that needs it.
 
 **A fourth formatting path in `modules/premium/CheckoutForm.tsx` is not part of this and should stay.** It
 uses next-intl's own `useFormatter()` with the currency from the UI store and two fraction digits, because

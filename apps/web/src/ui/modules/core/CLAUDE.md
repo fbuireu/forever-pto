@@ -259,3 +259,12 @@ test is usually a decision rather than an omission:
 - `animate/icons/` is excluded from the **coverage report** only, and the glob already spares `Icon.tsx`.
   The 22 icons are mechanical wrappers around SVG path data; `Icon.tsx` is not, and its co-located
   [`Icon.test.tsx`](./animate/icons/Icon.test.tsx) runs with everything else. Nothing under `core/` is excluded from the test run.
+
+**`Combobox` declares the nine props it honours, and used to declare the whole `<input>` surface.** It
+extended `Omit<HTMLProps<HTMLInputElement>, "onChange">` while rendering a `<button>`, destructured four
+inherited props and spread nothing, so every other prop the type advertised was silently discarded — and
+several it advertised (`type`, `checked`, `multiple`, a numeric `size`) mean nothing on the element it
+renders. No call site lost a prop, because all four pass only handled ones; the interface was what invited
+the next caller to pass `aria-label` and watch it vanish. This is the defect recorded for `RadialNav` one
+section up, and the same instruction applies: if a caller needs another prop, widen the destructure and
+forward it to the `Button`.

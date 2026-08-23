@@ -339,6 +339,30 @@ keeps `font-medium` with no vertical margin, both passed through `className` so 
 That drift is real but cosmetic, and flattening it silently would have been a visual change hiding inside a
 refactor.
 
+**`useFormStatus` cannot report anything in this app, and one field had already drifted onto it.** React
+reports `pending` only for a parent `<form>` submitted through a form **action**; all five forms here submit
+through `onSubmit` and none has an `action`, so `pending` was a constant `false` — invisibly, because the type
+is `boolean` either way. In `shared/donate/DonationForm.tsx` it was doubly dead: the hook was called by the
+same module that renders the `<form>`, which React documents as never reporting. The drift it produced is the
+part a payer met: the email field took `disabled={pending}` while the amount, the presets, the promo code and
+the submit all took the real transition, so during the charge the one control still editable was the address
+the receipt goes to — and the value being charged was the one captured at submit, so an edit mid-flight was
+discarded without a word. `shared/FormButtons.tsx` had the same call behind a `pendingProp ?? pendingStatus`
+fallback that every one of its three callers already satisfied. Both are gone and `pending` is a **required**
+`boolean`, so a fourth form cannot forget to say whose transition it is on.
+
+**One module owns the locale switch, and the line that looked like the mechanism was dead.**
+`sidebar/components/LanguageSelector.tsx` and `pages/homepage/navigation/HomepageLanguageSwitcher.tsx` wrote
+out the same policy character for character. `hooks/useLanguageSwitch.ts` holds it now; the two keep only
+their triggers, which genuinely differ (the sidebar's collapses to a code and wraps in `AnimateIcon`).
+
+Both copies carried `push(pathname.replace(`/${locale}`, `/${newLocale}`), { locale: newLocale })`, and the
+`replace` could never match: `usePathname` from `@application/i18n/navigation` is next-intl's
+`useBasePathname`, which returns the pathname **already unprefixed**. `push(…, { locale })` is what performs
+the switch. Worse than useless — a route with a locale-looking segment, `/es-guide`, would have been rewritten
+to `/en-guide`, which is the case the hook's test pins. `LanguageSelector` also held a `useState` mirroring
+the menu's own uncontrolled open state, read by nothing but the props it fed back.
+
 **`shared/ConditionalWrapper.tsx` has one arm, and it used to advertise two.** The second took `as` and
 `wrapperProps` and rendered `<Component {...wrapperProps}>`, behind a `<T extends ElementType>` generic that
 existed only to type it. Nothing ever called it: both call sites — `pages/planner/calendar/Calendar.tsx` for
