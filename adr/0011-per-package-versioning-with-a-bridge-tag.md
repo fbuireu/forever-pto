@@ -24,8 +24,8 @@ Each package runs its own semantic-release through `semantic-release-monorepo`, 
 
 | Package | `tagFormat` | Writes | Runs in |
 | --- | --- | --- | --- |
-| `apps/web` | `web-v${version}` | [`package.json`](../package.json), [`CHANGELOG.md`](../apps/web/CHANGELOG.md), a GitHub release | `ci.yml`, after `deploy-production` |
-| `apps/docs` | `docs-v${version}` | a tag and a GitHub release only | [`docs.yml`](../.github/workflows/docs.yml), after `deploy` |
+| [`apps/web`](../apps/web) | `web-v${version}` | [`package.json`](../package.json), [`CHANGELOG.md`](../apps/web/CHANGELOG.md), a GitHub release | `ci.yml`, after `deploy-production` |
+| [`apps/docs`](../apps/docs) | `docs-v${version}` | a tag and a GitHub release only | [`docs.yml`](../.github/workflows/docs.yml), after `deploy` |
 
 `tagFormat` is stated explicitly in both. Left out, `semantic-release-monorepo` derives it from the package name and would produce `forever-pto-v${version}` — and `tagFormat` is used both to *find* the previous release and to write the new one, so the derived form would not match the history.
 

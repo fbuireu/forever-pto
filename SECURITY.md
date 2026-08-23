@@ -22,7 +22,8 @@ If you discover a security vulnerability, please report it privately:
 
 ### Alternative: Email
 
-Send an email to **fbuireu@gmail.com** with:
+If you cannot use private reporting, write to **contact@forever-pto.com**, or use the
+contact form in the app, with:
 
 - Type of issue (e.g., payment bypass, cookie forgery, injection, etc.)
 - The affected route or component, and the location of the relevant source

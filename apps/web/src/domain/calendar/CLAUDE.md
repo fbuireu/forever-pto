@@ -76,7 +76,7 @@ this rather than subtracting two lengths.
 input, and [`CalendarExport.tsx`](../../ui/modules/sidebar/components/CalendarExport.tsx) applies it again so the exported calendar contains exactly the days the
 Metrics were computed from. It matches on `toDateString()`, so a `Date` carrying a time component still
 lines up, and it returns the original array unchanged when there are no Manual or Removed Days. Everything
-else under `utils/` and `suggestions/utils/` is internal.
+else under `utils/` and [`suggestions/utils/`](./suggestions/utils) is internal.
 
 **Both `manuallySelectedDays` and `removedSuggestedDays` are required, and neither defaults.** They used to
 default to `[]`, and a caller that omitted them got Metrics measured against the days

@@ -13,7 +13,7 @@ The repository held two things and treated only one of them as a package. [`pnpm
 That asymmetry was not free, and every cost it imposed was already visible in the tree:
 
 - `tsconfig.json` needed `"exclude": ["docs/**/*"]`, and [`vitest.config.ts`](../vitest.config.ts) needed `exclude: ['docs/e2e/**']`, purely because the root `include` of `**/*.ts` swallowed a sibling package.
-- `.gitignore` carried five separate `docs/`-anchored patterns, and every one of them silently stopped matching the moment anything moved.
+- [`.gitignore`](../.gitignore) carried five separate `docs/`-anchored patterns, and every one of them silently stopped matching the moment anything moved.
 - [`docs/astro.config.ts`](../apps/docs/astro.config.ts) reached *upward* into the root with `@ui` → `../src/ui`. The set of app paths it depends on was enumerated by hand in [`docs.yml`](../.github/workflows/docs.yml)'s trigger filter — `src/ui/modules/core/**`, `src/ui/modules/pages/homepage/sections/**`, `src/ui/styles/**`, `src/ui/utils/**` — which is the public surface of a shared library that no package declared.
 - `docs/` meant three unrelated things at once: the Astro package, the ADR directory (decisions about the repository, not content of the site), and the consistency suite that asserts contracts across the whole tree.
 - Most consequentially, one [`package.json`](../package.json) at the root meant one version and one release line for both deliverables. A documentation dependency bump cut an app release. The workaround was a rule requiring docs pull requests to use the `docs:` commit type, plus a matching `semanticCommitType` override in [`renovate.json`](../.github/renovate.json) — two pieces of configuration whose only job was to stop the versioning model from doing the wrong thing.
@@ -33,7 +33,7 @@ adr/         repository decisions
 tests/       repo-wide contract assertions
 ```
 
-The workspace glob is `apps/*`. **There is no `packages/` directory**, and one is not created until a real shared package exists — an empty tier is speculative structure, and the extraction that would fill it is blocked on separate work: the components `apps/docs` consumes reach `next-intl` and `next-themes`, which the docs site currently supplies by wrapping demos in `LazyMotionProvider` and `DemoIntlProvider`. Turning that into a package is a design task, deliberately not bundled with a file move.
+The workspace glob is `apps/*`. **There is no `packages/` directory**, and one is not created until a real shared package exists — an empty tier is speculative structure, and the extraction that would fill it is blocked on separate work: the components [`apps/docs`](../apps/docs) consumes reach `next-intl` and `next-themes`, which the docs site currently supplies by wrapping demos in `LazyMotionProvider` and `DemoIntlProvider`. Turning that into a package is a design task, deliberately not bundled with a file move.
 
 The repository root is the workspace root and nothing else: `forever-pto-monorepo`, private, `0.0.0`, no dependencies. It owns only the tooling that spans both packages — Biome, commitlint, husky, lint-staged, semantic-release, and the Vitest that runs `tests/`.
 

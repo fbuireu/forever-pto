@@ -18,7 +18,7 @@
 ## What it is
 
 The documentation site for Forever PTO: architecture, runtime flows, the CI/CD lifecycle, and a design
-system section that hydrates the **real** components from `apps/web` as React islands, styled by the
+system section that hydrates the **real** components from [`apps/web`](../web) as React islands, styled by the
 app's own tokens. Nothing here is a copy of a component — the demos import the originals through the
 `@ui` alias, so a rename in the app breaks `astro check` here.
 
@@ -63,7 +63,7 @@ this package stays at `0.0.0` permanently and nothing reads it.
 
 ## Writing
 
-- Pages live in `src/content/docs/`. The root locale is English with pathless URLs; `es/` mirrors
+- Pages live in [`src/content/docs/`](./src/content/docs). The root locale is English with pathless URLs; `es/` mirrors
   filenames and anything untranslated falls back to English automatically.
 - **Prose names a file, never a volatile literal.** Where the app exports a constant, import it and
   interpolate, so a rename breaks the build instead of rotting the page.

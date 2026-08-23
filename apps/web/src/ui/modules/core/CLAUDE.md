@@ -10,8 +10,8 @@ under *Layer rules* — the one folder that imports nothing back.
 ## Structure
 
 Two stacks share the folder: the flat `primitives/`, and the three-deep `animate/` tower where
-`animate/primitives/` wraps the headless library, `animate/base/` styles and animates those wrappers,
-and `animate/components/` composes them. Knowing which layer you are editing tells you how far the
+[`animate/primitives/`](./animate/primitives) wraps the headless library, [`animate/base/`](./animate/base) styles and animates those wrappers,
+and [`animate/components/`](./animate/components) composes them. Knowing which layer you are editing tells you how far the
 change reaches.
 
 | Folder | Contents |
@@ -20,10 +20,10 @@ change reaches.
 | `animate/primitives/` | Unstyled wrappers over `@base-ui/react`, the bottom of the animated stack, and internal to `animate/`: [`animate/primitives/base/Dialog.tsx`](./animate/primitives/base/Dialog.tsx), `Popover.tsx`, `Tooltip.tsx`; [`animate/primitives/animate/MotionSlot.tsx`](./animate/primitives/animate/MotionSlot.tsx) |
 | `animate/base/` | The styled, motion-aware components built on the layer above or directly on `@base-ui/react`: [`Accordion.tsx`](./animate/base/Accordion.tsx), [`Checkbox.tsx`](./animate/base/Checkbox.tsx), [`Collapsible.tsx`](./animate/base/Collapsible.tsx), `Dialog.tsx`, [`DropdownMenu.tsx`](./animate/base/DropdownMenu.tsx), [`Popover.tsx`](./animate/base/Popover.tsx), [`Tooltip.tsx`](./animate/base/Tooltip.tsx), [`Sidebar.tsx`](./animate/base/Sidebar.tsx), plus [`animate/base/Drawer.tsx`](./animate/base/Drawer.tsx) (vaul) and [`animate/base/Slot.tsx`](./animate/base/Slot.tsx) |
 | `animate/components/` | Compositions with their own behaviour: [`Counter.tsx`](./animate/components/Counter.tsx), [`Tabs.tsx`](./animate/components/Tabs.tsx), [`FeatureList.tsx`](./animate/components/FeatureList.tsx), [`RadialNav.tsx`](./animate/components/RadialNav.tsx) |
-| `animate/effects/` | [`AutoHeight.tsx`](./animate/effects/AutoHeight.tsx) and [`MotionHighlight.tsx`](./animate/effects/MotionHighlight.tsx) — behaviour applied to someone else's children |
-| `animate/icons/` | 22 animated SVG icons plus [`animate/icons/Icon.tsx`](./animate/icons/Icon.tsx), which exports `AnimateIcon`, `IconWrapper` and `useVariants`. Excluded from the coverage report; `Icon.tsx` beside them is tested |
-| `animate/text/` | [`SlidingNumber.tsx`](./animate/text/SlidingNumber.tsx) and [`animate/text/Rotating.tsx`](./animate/text/Rotating.tsx) |
-| `animate/providers/` | [`LazyMotionProvider.tsx`](./animate/providers/LazyMotionProvider.tsx) — a nine-line `LazyMotion` wrapper, mounted once in the locale layout |
+| [`animate/effects/`](./animate/effects) | [`AutoHeight.tsx`](./animate/effects/AutoHeight.tsx) and [`MotionHighlight.tsx`](./animate/effects/MotionHighlight.tsx) — behaviour applied to someone else's children |
+| [`animate/icons/`](./animate/icons) | 22 animated SVG icons plus [`animate/icons/Icon.tsx`](./animate/icons/Icon.tsx), which exports `AnimateIcon`, `IconWrapper` and `useVariants`. Excluded from the coverage report; `Icon.tsx` beside them is tested |
+| [`animate/text/`](./animate/text) | [`SlidingNumber.tsx`](./animate/text/SlidingNumber.tsx) and [`animate/text/Rotating.tsx`](./animate/text/Rotating.tsx) |
+| [`animate/providers/`](./animate/providers) | [`LazyMotionProvider.tsx`](./animate/providers/LazyMotionProvider.tsx) — a nine-line `LazyMotion` wrapper, mounted once in the locale layout |
 
 There is no `Switch` in `primitives/`; the only one is [`animate/base/Switch.tsx`](./animate/base/Switch.tsx).
 
@@ -71,7 +71,7 @@ Coupling back into the rest of the app is small, but it is not zero. The complet
   from `document.cookie` on mount. It exports `SIDEBAR_COOKIE_NAME`, and **nothing in this package imports
   it** — no server layout reads the cookie and passes a `defaultOpen`, so the rail always renders expanded
   and then collapses once the effect runs. Either wire the layout up or stop describing the export as
-  shared; what is not true today is that anything in `apps/web` uses the key. The docs site does: two wiki
+  shared; what is not true today is that anything in [`apps/web`](../../../..) uses the key. The docs site does: two wiki
   pages import it to document the cookie's name, which is also why `temporal-polyfill` ends up in the docs
   dependency list to render a string. This bullet said "nothing outside that file" until that reach was
   derived mechanically — the seam is invisible from this side, which is the reason to check rather than
@@ -248,7 +248,7 @@ country is still the lower-cased one the old code wrote or the `user-country` co
 handed back is exact; the question of whether it *changed* is not.
 
 **Its `PopoverContent` carried `id='combobox-listbox'` and nothing referenced it.** No `aria-controls`
-anywhere in `apps/web/src` named it, so it bought no accessibility — and `PopoverContent` spreads its rest
+anywhere in [`apps/web/src`](../../..) named it, so it bought no accessibility — and `PopoverContent` spreads its rest
 props onto the *positioner*, not the popup, so it was not even labelling the list. What it did do is put a
 literal id on a component the sidebar mounts four times: open two of them and the document holds two
 `#combobox-listbox`. It is gone. If a listbox relationship is wanted here it has to be a generated id

@@ -71,10 +71,10 @@ Four modules here are not services at all, for the reasons given below.
 
 | Folder | SDK | Tag | Required env |
 | --- | --- | --- | --- |
-| `db/turso/` | `@tursodatabase/serverless` | `TursoService` | `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` |
-| `email/resend/` | `resend` | `ResendService` | `RESEND_API_KEY` |
-| `logging/better-stack/` | `@logtail/edge` | `LoggerService` | `NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN`, `NEXT_PUBLIC_BETTER_STACK_INGESTING_URL` |
-| `payments/stripe/` | `stripe` | `StripeServerService` | `STRIPE_SECRET_KEY` (plus `STRIPE_WEBHOOK_SECRET`, see below) |
+| [`db/turso/`](./db/turso) | `@tursodatabase/serverless` | `TursoService` | `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` |
+| [`email/resend/`](./email/resend) | `resend` | `ResendService` | `RESEND_API_KEY` |
+| [`logging/better-stack/`](./logging/better-stack) | `@logtail/edge` | `LoggerService` | `NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN`, `NEXT_PUBLIC_BETTER_STACK_INGESTING_URL` |
+| [`payments/stripe/`](./payments/stripe) | `stripe` | `StripeServerService` | `STRIPE_SECRET_KEY` (plus `STRIPE_WEBHOOK_SECRET`, see below) |
 
 All four are merged into `ApplicationLayer` in [`src/infrastructure/layers.ts`](../layers.ts). There is no partial layer: an
 entry point providing `ApplicationLayer` builds every client — which is why none of them may need anything at

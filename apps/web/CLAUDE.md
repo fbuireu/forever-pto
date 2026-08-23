@@ -52,7 +52,7 @@ pnpm test:ut:coverage      # vitest run --coverage
 pnpm test:e2e           # playwright
 ```
 
-Env: copy `.env.example`. Local Worker secrets go in `.dev.vars`. The typed surface the build uses is
+Env: copy [`.env.example`](./.env.example). Local Worker secrets go in `.dev.vars`. The typed surface the build uses is
 [`environment.d.ts`](./environment.d.ts) and nothing else — it hand-declares both `ProcessEnv` and the global `CloudflareEnv` the
 Cloudflare context is read through, and it is tracked.
 
@@ -68,7 +68,7 @@ unresolved module still binds the names imported from it, and only a genuinely u
 
 `pnpm cf:typegen` writes wrangler's own inference to `cloudflare-env.d.ts` in this folder. It is reference
 material, not part of the program: read it when adding a binding, then widen `environment.d.ts` by hand. Two
-lines keep it that way and both are load-bearing — `.gitignore` so it never gets committed, and an explicit
+lines keep it that way and both are load-bearing — [`.gitignore`](../../.gitignore) so it never gets committed, and an explicit
 `cloudflare-env.d.ts` entry in [`tsconfig.json`](./tsconfig.json)'s `exclude`, because `include` is `**/*.ts` and would
 otherwise pull a package-root `.d.ts` straight into the program.
 
@@ -94,8 +94,8 @@ public/               # static assets
 ```
 
 Path aliases (`tsconfig.json` `compilerOptions.paths`): `src/*`, `@app/*`, `@application/*`, `@domain/*`,
-`@infrastructure/*`, `@ui/*`, `@assets/*` (→ `src/ui/assets`), `@styles/*` (→ `src/ui/styles`), `@i18n/*`
-(→ `src/ui/i18n`). Prefer aliases over relative paths for cross-layer imports; keep same-folder imports
+`@infrastructure/*`, `@ui/*`, `@assets/*` (→ [`src/ui/assets`](./src/ui/assets)), `@styles/*` (→ [`src/ui/styles`](./src/ui/styles)), `@i18n/*`
+(→ [`src/ui/i18n`](./src/ui/i18n)). Prefer aliases over relative paths for cross-layer imports; keep same-folder imports
 relative. There is no `baseUrl`, so every target resolves against this `tsconfig.json` — the aliases needed
 no edit when the package moved. [`vitest.config.ts`](./vitest.config.ts) sets `resolve.tsconfigPaths`, so a new alias needs exactly
 one edit, in `tsconfig.json`.
@@ -134,7 +134,7 @@ a config error on 16.2 — it must stay out while Next is pinned. And
 [`tests/docs-consistency.test.ts`](../../tests/docs-consistency.test.ts) imports `typescript` directly for its
 compiler-API parsing; under TypeScript 7 that import has to become `@typescript/typescript6`, Microsoft's
 compatibility package pinning the 6.x API, so the two move together too. The pin now appears in three
-manifests — this one, the repo root and `apps/docs` — and only this one is load-bearing for `next build`.
+manifests — this one, the repo root and [`apps/docs`](../docs) — and only this one is load-bearing for `next build`.
 `tests/docs-consistency.test.ts` asserts the three stay equal **and stay exact**, on the same reasoning as
 the `wrangler` rule beside it: Renovate opens a pull request per manifest, so without the rule the first bump
 desynchronises them silently. Equality alone was not enough — a `rangeStrategy` flip writes `^6.0.3` into all
@@ -220,7 +220,7 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
   oversight — do not "harden" either in passing. There *is* a session layer: the entitlement travels in a
   signed HTTP-only cookie.
   [ADR 0008](../../adr/0008-premium-derived-from-payment.md).
-- **The two bounded contexts under `src/domain/` follow different rules.** `calendar/` is pure because it runs
+- **The two bounded contexts under [`src/domain/`](./src/domain) follow different rules.** `calendar/` is pure because it runs
   in a Web Worker; `payment/` composes Effect against infrastructure tags. Neither is lint-enforced.
   [ADR 0003](../../adr/0003-pure-calendar-domain-effectful-payment-domain.md).
 - **Logging is the one external call that does not go through Effect.** BetterStack has both a service tag and
@@ -230,7 +230,7 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
   not, and must receive configuration as plain values.
   [ADR 0004](../../adr/0004-cloudflare-workers-as-deployment-target.md).
 - **The planning pipeline exists once, and used to exist twice.** `runPlanningPipeline` under
-  `src/domain/calendar/` is the whole run — caches, pseudo-Holidays, budget, both planning calls, the Metrics.
+  [`src/domain/calendar/`](./src/domain/calendar) is the whole run — caches, pseudo-Holidays, budget, both planning calls, the Metrics.
   The Web Worker and the holidays store's own action are its two callers and add only transport. They were two
   copies held together by mirrored test blocks, they drifted, and the symptom was one Planning Window
   producing two different plans depending on which path ran. Do not reintroduce orchestration at a caller.
@@ -244,7 +244,8 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
 Cloudflare Workers via wrangler ([`wrangler.toml`](./wrangler.toml)): `.open-next/worker.js` as the entrypoint,
 `.open-next/assets` served through the `ASSETS` binding, an R2 bucket for the incremental cache, a
 `PAYMENT_RATE_LIMITER` `[[ratelimits]]` binding for the payment limiter, smart placement, and a
-`forever-pto-tail` tail consumer, which is its own Worker under `workers/tail/`. Only `env.production` binds a
+`forever-pto-tail` tail consumer, which is its own Worker under [`workers/tail/`](./workers/tail) and is deployed by the `deploy-tail`
+job when the files its bundle is built from change. Only `env.production` binds a
 route (`forever-pto.com/*`); `env.development` supplies the preview bindings and CI deploys one worker per PR
 from it — `pr-<number>-forever-pto-development.fbuireu.workers.dev`, deleted when the PR closes.
 

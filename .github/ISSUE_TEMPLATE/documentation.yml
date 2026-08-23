@@ -2,6 +2,7 @@ name: Documentation Request
 description: Suggest improvements or additions to the documentation
 title: '[Docs]: '
 labels: ['documentation', 'triage']
+assignees: ['fbuireu']
 body:
   - type: markdown
     attributes:
@@ -14,9 +15,12 @@ body:
       description: What kind of documentation needs improvement?
       options:
         - README
+        - docs.forever-pto.com
+        - CLAUDE.md guides
+        - CONTEXT.md glossary
+        - An ADR
         - Contributing guide
-        - Code comments
-        - FAQ
+        - The in-app FAQ
         - Other
     validations:
       required: true

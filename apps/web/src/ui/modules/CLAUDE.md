@@ -176,7 +176,7 @@ Vitest, `happy-dom`, co-located `.test.tsx`. Two exclusions in [`vitest.config.t
   `Icon.tsx`, whose co-located test runs with everything else.
 
 Coverage is deliberately uneven and you should not read a missing test as an oversight to fix in
-passing. `core/animate/` is tested close to exhaustively; `core/primitives/` has no tests at all;
+passing. [`core/animate/`](./core/animate) is tested close to exhaustively; [`core/primitives/`](./core/primitives) has no tests at all;
 `pages/`, `shared/` and `sidebar/` have tests only where logic lives (`ManagementBar`, `Summary` charts,
 homepage sections, `shared/utils/helpers.ts`, the two forms that render an API failure, and — because both
 held a defect that no type or lint rule can catch — [`sidebar/components/PtoCalculator.tsx`](./sidebar/components/PtoCalculator.tsx) and
@@ -295,14 +295,14 @@ which is `0` — React wrote that `0` straight back into the box and re-applied 
 placeholder could never return. Hold a text field as a string and parse at the point of use; the numeric
 state is derived, not stored.
 
-`core/animate/primitives/` is a second, lower layer under `core/animate/` — the unstyled wrappers over
+[`core/animate/primitives/`](./core/animate/primitives) is a second, lower layer under `core/animate/` — the unstyled wrappers over
 `@base-ui/react` that `core/animate/base/*` builds on. [`MotionSlot.tsx`](./core/animate/primitives/animate/MotionSlot.tsx) there is the shared `asChild`
 mechanism used by [`core/animate/effects/AutoHeight.tsx`](./core/animate/effects/AutoHeight.tsx) and [`core/animate/icons/Icon.tsx`](./core/animate/icons/Icon.tsx).
 
 It is internal to `core/animate/`, and that is now true rather than aspirational — it has zero importers
 from outside. It had three. `DevFooter` took `RotatingTextContainer`, which turned out to publish into a
 context nothing read; it is deleted. `CookieConsentDialog` and `AllowPastDays` took `Switch`, which was never
-unstyled — it carried the full frame and shadow — so it moved up to `core/animate/base/` rather than getting
+unstyled — it carried the full frame and shadow — so it moved up to [`core/animate/base/`](./core/animate/base) rather than getting
 a wrapper. Promote what a feature needs; do not reach in.
 
 `tutorial/DriverStyles.tsx` renders `null` and exists solely to make its CSS import lazy — [`useTutorial.tsx`](../hooks/useTutorial.tsx)
@@ -314,7 +314,7 @@ styles are `StyleSheet.create` objects, so Tailwind classes and `cn()` do nothin
 through a dynamic import inside an Effect program in [`sidebar/components/CalendarExport.tsx`](./sidebar/components/CalendarExport.tsx); importing
 it statically would pull the whole PDF renderer into the client bundle.
 
-`data-tutorial` attributes scattered through `sidebar/` and `pages/planner/` are the tutorial's anchors, and
+`data-tutorial` attributes scattered through `sidebar/` and [`pages/planner/`](./pages/planner) are the tutorial's anchors, and
 both sides now name them through `TUTORIAL_ANCHOR` in [`tutorial/anchors.ts`](./tutorial/anchors.ts) rather than as strings. They look
 like dead attributes and are not — **but nine of them were**. The components declared nineteen anchors while
 `useTutorial` targeted ten, and the gap was invisible in either direction: a step whose anchor is not

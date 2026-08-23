@@ -11,7 +11,7 @@
 
 [![CI](https://img.shields.io/github/actions/workflow/status/fbuireu/forever-pto/ci.yml?style=flat-square&logo=github&label=CI)](https://github.com/fbuireu/forever-pto/actions/workflows/ci.yml)
 [![Uptime](https://uptime.betterstack.com/status-badges/v1/monitor/272ww.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
-[![License: Private](https://img.shields.io/badge/License-Private-lightgrey?style=flat-square)](#license)
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL%20v3-blue?style=flat-square)](./LICENSE)
 
 **[forever-pto.com](https://forever-pto.com)** · **[Documentation](https://docs.forever-pto.com)** · **[Getting Started](#getting-started)** · **[Stack](#stack)** · **[Contributing](./CONTRIBUTING.md)**
 
@@ -73,7 +73,7 @@ pnpm --filter forever-pto-docs dev   # docs dev server
 
 ## Getting started
 
-**Requirements:** Node.js 26.7.0 (`.nvmrc`, mirrored in `engines.node`), pnpm 11.22.0 (`packageManager`) — pinned, match exactly
+**Requirements:** Node.js 26.7.0 ([`.nvmrc`](./.nvmrc), mirrored in `engines.node`), pnpm 11.22.0 (`packageManager`) — pinned, match exactly
 
 ```bash
 # Install dependencies
@@ -130,7 +130,7 @@ See [`apps/web/.env.example`](apps/web/.env.example) for the full list. Key vari
 | [`CONTEXT.md`](CONTEXT.md) | The domain glossary — one canonical name per concept |
 | [`adr/`](adr/) | Why it is like this. One hard-to-reverse decision per file |
 
-Selected folders under `apps/web/src/` carry their own `CLAUDE.md` with the detail for that folder — the five layer roots plus sixteen sub-folders, all listed in [`apps/web/CLAUDE.md`](apps/web/CLAUDE.md).
+Selected folders under [`apps/web/src/`](./apps/web/src) carry their own `CLAUDE.md` with the detail for that folder — the five layer roots plus sixteen sub-folders, all listed in [`apps/web/CLAUDE.md`](apps/web/CLAUDE.md).
 [`tests/docs-consistency.test.ts`](tests/docs-consistency.test.ts) runs with the unit suite and fails the build
 when the docs and the code disagree.
 
@@ -152,4 +152,6 @@ Conventional commits required. Run `pnpm prepare` to set up git hooks.
 
 ## License
 
-Private — © Ferran Buireu
+[AGPL-3.0-only](./LICENSE) © Ferran Buireu
+
+Running a modified copy as a network service obliges you to offer its source to the people using it.
