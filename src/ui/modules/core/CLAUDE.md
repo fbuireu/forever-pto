@@ -109,7 +109,7 @@ primitive bare unless a `delay`/`delayDuration` is passed to it directly, so the
 that counts. A component in this layer that wraps its subtree in a context provider has to ask whether it is
 overriding one the caller set.
 
-**`utils/cookie.ts` feature-detects the Cookie Store API and falls back to `document.cookie`.** The bare
+**[`utils/cookie.ts`](../../utils/cookie.ts) feature-detects the Cookie Store API and falls back to `document.cookie`.** The bare
 `cookieStore` global does not exist in Firefox, in Safari before 18.4, or in any insecure context, so the
 write threw a `ReferenceError` that `SidebarProvider.setOpen`'s `.catch(() => {})` swallowed — the sidebar
 silently forgot its collapsed state on every reload in those browsers, with nothing logged. The `typeof`
@@ -124,13 +124,13 @@ re-export — the no-barrel convention has no exception here.
 
 **There are two `Rotating.tsx` files and they are different components.**
 `animate/text/Rotating.tsx` exports `RotatingText`, a self-contained `AnimatePresence` cycle over a
-string array — that is the one `pages/planner/Summary.tsx` uses. `animate/primitives/texts/Rotating.tsx`
-exports only `RotatingTextContainer`, a context provider with no visual output. `shared/footer/components/DevFooter.tsx`
+string array — that is the one [`pages/planner/Summary.tsx`](../pages/planner/Summary.tsx) uses. `animate/primitives/texts/Rotating.tsx`
+exports only `RotatingTextContainer`, a context provider with no visual output. [`shared/footer/components/DevFooter.tsx`](../shared/footer/components/DevFooter.tsx)
 imports one from each and nests them. Check the import path before assuming which you have.
 
 **`animate/primitives/` is reachable from outside, and is reached.** Nothing there is styled, so it
 was meant to stay internal to `animate/`, but `Switch` has no wrapper in `animate/base/` and so
-`sidebar/components/AllowPastDays.tsx` and `shared/cookie-consent/CookieConsentDialog.tsx` both import
+[`sidebar/components/AllowPastDays.tsx`](../sidebar/components/AllowPastDays.tsx) and [`shared/cookie-consent/CookieConsentDialog.tsx`](../shared/cookie-consent/CookieConsentDialog.tsx) both import
 it directly. Giving Switch a styled wrapper in `animate/base/` is the fix; importing from
 `animate/primitives/` for anything else is not.
 

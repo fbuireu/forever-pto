@@ -18,7 +18,7 @@ The largest single thing in here is a browser file — the Web Worker.
 | `actions/` | The two `'use server'` entry points: `payment.ts` and `contact.ts`. They read request-scoped config and hand it to the matching operation under `api/operations/` |
 | `api/` | The wire vocabulary for failures, the no-store response helper, and the operations both transports terminate. See [`api/CLAUDE.md`](./api/CLAUDE.md) |
 | `clients/` | SDK wrappers — four Effect service tags plus four modules that are deliberately not services. See [`clients/CLAUDE.md`](./clients/CLAUDE.md) |
-| `i18n/` | [`routing.ts`](./i18n/routing.ts) (next-intl routing, `localePrefix: 'as-needed'`), `config.ts` (request config + message loading), [`locales.ts`](./i18n/locales.ts) (the six codes), `cookie.ts` (`NEXT_LOCALE`), `utils/url.ts` (`localePath`, `getLocaleFromPathname`, `localeAlternates`) |
+| `i18n/` | [`routing.ts`](./i18n/routing.ts) (next-intl routing, `localePrefix: 'as-needed'`), [`config.ts`](./i18n/config.ts) (request config + message loading), [`locales.ts`](./i18n/locales.ts) (the six codes), `cookie.ts` (`NEXT_LOCALE`), [`utils/url.ts`](./i18n/utils/url.ts) (`localePath`, `getLocaleFromPathname`, `localeAlternates`) |
 | `images/` | [`loader.ts`](./images/loader.ts) — rewrites an image src to `/cdn-cgi/image/...`, the Cloudflare optimiser used in place of Next's built-in one ([ADR 0004](../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)) |
 | `markdown/` | [`buildMarkdownPage.ts`](./markdown/buildMarkdownPage.ts) — the Markdown twin of a page, served when the request asks for `text/markdown`. Translates through `createTranslator` over statically imported bundles, never `next-intl/server` — see *Gotchas* |
 | `seo/` | [`buildMetadata.ts`](./seo/buildMetadata.ts) — the `Metadata` shape every route's `generateMetadata` fills in; [`routes.ts`](./seo/routes.ts) — `SITE_ROUTES`, the one list of pages and whether each is indexable |
@@ -39,7 +39,7 @@ May import from `@application/*` (DTO types and schemas, use-cases) and — in `
 
 **Nothing here imports from `@ui/*`, and that is newly true.** [`clients/tutorial/driver/client.tsx`](./clients/tutorial/driver/client.tsx) used to
 import two animated icons so the driver.js popover could render the app's own close button; it now takes the
-element as an injected `closeIcon` config prop, and `hooks/useTutorial.tsx` in the UI layer — already on the
+element as an injected `closeIcon` config prop, and [`hooks/useTutorial.tsx`](../ui/hooks/useTutorial.tsx) in the UI layer — already on the
 other side of the boundary — builds it and passes it to `start()`. A component import creeping back into the driver client
 is the regression to watch for.
 

@@ -115,7 +115,7 @@ exercises. Adding a method here means adding its caller and its error mapping in
 | --- | --- |
 | `payments/stripe/client.ts` | Runs in the browser, where there is no layer to provide |
 | [`logging/better-stack/client.ts`](./logging/better-stack/client.ts) | Deliberate exception — `getBetterStackInstance()` is what stores, lookups and components use ([ADR 0002](../../../docs/adr/0002-effect-for-external-service-boundaries.md)) |
-| [`logging/better-stack/tracking.ts`](./logging/better-stack/tracking.ts) | Not a logger at all: `track()` and `identifyUser()` push to the `window.betterstack` snippet injected by the UI layer's `modules/tracking/BetterStackTracking.tsx`. Both no-op when the snippet has not loaded |
+| [`logging/better-stack/tracking.ts`](./logging/better-stack/tracking.ts) | Not a logger at all: `track()` and `identifyUser()` push to the `window.betterstack` snippet injected by the UI layer's [`modules/tracking/BetterStackTracking.tsx`](../../ui/modules/tracking/BetterStackTracking.tsx). Both no-op when the snippet has not loaded |
 | [`tutorial/driver/client.tsx`](./tutorial/driver/client.tsx) | Wraps driver.js, a DOM library. It renders a close icon into the popover, but never imports one: the icon arrives as the injected `closeIcon?: ReactNode` config field, so nothing here reaches into `@ui/*` |
 
 `logging/better-stack/client.ts` is the one to read before touching. **A log call cannot fail its caller, and
@@ -153,7 +153,7 @@ detached container, with the animated close icon's motion controls and in-view o
 delegating, and the array is reset so the hook path calling it a second time is a no-op.
 
 `DriverClient` mounts a close button only when a `closeIcon` was injected — `onPopoverRender` leaves
-driver.js's own markup alone otherwise. The caller supplies it: the UI layer's `hooks/useTutorial.tsx` passes the
+driver.js's own markup alone otherwise. The caller supplies it: the UI layer's [`hooks/useTutorial.tsx`](../../ui/hooks/useTutorial.tsx) passes the
 element in the overrides argument to `start()`, which is what keeps the icon components on the `@ui` side of
 the layer boundary. Do not import a component here to "fix" a missing icon; pass one in.
 

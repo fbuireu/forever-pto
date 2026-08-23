@@ -34,7 +34,7 @@ read by the premium activation path as well as by the payment one.
 | [`activatePremium.ts`](../../../application/use-cases/activatePremium.ts) (use-case) | `getPaymentByEmail`, `getPaymentById`, `savePayment`, `updatePaymentStatus` |
 | [`webhook.ts`](../../../application/use-cases/webhook.ts) (use-case) | `getPaymentById`, `savePayment` |
 | [`paymentSucceeded.ts`](../../../domain/payment/handlers/paymentSucceeded.ts) / [`paymentFailed.ts`](../../../domain/payment/handlers/paymentFailed.ts) (domain handlers) | `getPaymentById`, `updatePaymentStatus`, `updatePaymentCharge`, `retrieveCharge` |
-| [`src/app/api/payment/route.ts`](../../../app/api/payment/route.ts), `actions/payment.ts` and [`src/app/api/payment/activate/route.ts`](../../../app/api/payment/activate/route.ts) | `checkRateLimit` |
+| [`src/app/api/payment/route.ts`](../../../app/api/payment/route.ts), [`actions/payment.ts`](../../actions/payment.ts) and [`src/app/api/payment/activate/route.ts`](../../../app/api/payment/activate/route.ts) | `checkRateLimit` |
 | The confirmation page | `confirmation` |
 
 The domain handlers importing infrastructure directly is the deliberate asymmetry in

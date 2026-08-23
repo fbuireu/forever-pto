@@ -97,7 +97,7 @@ a `Date`, which only surfaces at render.
 `currentSelectionIndex` and `previewAlternativeIndex` address one flat list: **index 0 is `suggestion`, index
 *n* is `alternatives[n - 1]`**. There is no separate index space for Alternatives. `setCalculationResult`
 builds `[suggestion, ...alternatives]` and indexes into it; `resetManualSelection` and
-`utils/modifiers.ts` in the planner both re-derive with the `index === 0 ? suggestion : alternatives[index - 1]`
+[`utils/modifiers.ts`](../../ui/modules/pages/planner/utils/modifiers.ts) in the planner both re-derive with the `index === 0 ? suggestion : alternatives[index - 1]`
 form. Introducing an off-by-one here silently applies the wrong plan rather than throwing.
 
 The rehydration guard `currentSelectionIndex > alternatives.length` exists because `maxAlternatives` can
@@ -139,7 +139,7 @@ re-fetches Holidays) and would otherwise strand it, spending budget with no way 
 `DayOutcome` and `addHoliday`/`editHoliday` return a `HolidayOutcome` — both declared in `types.ts`, both
 either `{ applied: true }` or `{ applied: false, reason }`, with `HolidayOutcome` additionally carrying
 `heldBy` so a caller can name the Holiday already on the date without looking it up. They used to answer
-`boolean` (or nothing at all), which is why `calendar/Calendar.tsx`, [`AddHolidayModal.tsx`](../../ui/modules/pages/planner/holidays/components/AddHolidayModal.tsx) and
+`boolean` (or nothing at all), which is why [`calendar/Calendar.tsx`](../../ui/modules/pages/planner/calendar/Calendar.tsx), [`AddHolidayModal.tsx`](../../ui/modules/pages/planner/holidays/components/AddHolidayModal.tsx) and
 [`EditHolidayModal.tsx`](../../ui/modules/pages/planner/holidays/components/EditHolidayModal.tsx) each reimplemented the occupancy check purely to pick a toast — four hand-rolled
 `toDateString()` comparisons for one rule, kept in agreement by review. The reasons are the distinctions the
 copy actually needs: a weekend, a National or Regional Holiday and a Custom Holiday are three different
@@ -254,7 +254,7 @@ otherwise pull in. Converting one to a static import is not a tidy-up.
 
 **`generateMetrics` is the exception, and it is imported statically.** `toggleDaySelection` is synchronous and
 returns a `boolean`, so it cannot await an import without changing its signature and every call site with it.
-The cost is real — that import drags `metrics/utils/helpers.ts` and `temporal-polyfill` behind it into any
+The cost is real — that import drags [`metrics/utils/helpers.ts`](../../domain/calendar/metrics/utils/helpers.ts) and `temporal-polyfill` behind it into any
 chunk that reads this store — and making it dynamic is not a tidy-up either.
 
 ## Logging is reached through a dynamic import
@@ -263,7 +263,7 @@ chunk that reads this store — and making it dynamic is not a tidy-up either.
 client's own top-level imports pull in `@logtail/edge` and `@opennextjs/cloudflare`, so a static import lands
 both in the client chunk of every component that reads a store — which is every planner and marketing screen.
 Each of `crypto.ts`, `filters.ts`, `holidays.ts`, `location.ts` and `premium.ts` therefore declares the same
-local helper, the one the UI layer's `adapters/payments/checkout.ts` uses
+local helper, the one the UI layer's [`adapters/payments/checkout.ts`](../../ui/adapters/payments/checkout.ts) uses
 ([`../../ui/CLAUDE.md`](../../ui/CLAUDE.md)):
 
 ```ts
@@ -281,7 +281,7 @@ beside it is erased, so it costs nothing.
 `addHoliday`, `toggleDaySelection`, every `onRehydrateStorage` listener — so awaiting would turn a
 synchronous action asynchronous and change its return type. The consequence is that a log lands a microtask
 after the action returns, and a log emitted during a teardown may never be flushed. That is the accepted
-trade for the bundle: `logging/better-stack/tracking.ts`, which `premium.ts` does import statically, is a
+trade for the bundle: [`logging/better-stack/tracking.ts`](../../infrastructure/clients/logging/better-stack/tracking.ts), which `premium.ts` does import statically, is a
 different module with no SDK behind it.
 
 ## Gotchas

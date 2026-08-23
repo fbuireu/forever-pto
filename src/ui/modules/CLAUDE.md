@@ -173,7 +173,7 @@ mechanisms for one question is exactly how the category-versus-service bug below
 library keeps true while *any* service in the category is on. Turning Google Analytics off and leaving Better
 Stack on therefore granted `analytics_storage` and fired a `page_view` — Google Analytics writing `_ga` for a
 user who had just refused it, and the mirror case mounting Better Stack for someone who had refused *that*.
-Both now read `acceptedService(id, 'analytics')`. A new service in `config/config.ts` needs its own gate; the
+Both now read `acceptedService(id, 'analytics')`. A new service in [`config/config.ts`](./shared/cookie-consent/config/config.ts) needs its own gate; the
 category is not a proxy for it.
 
 **The footer's "Manage cookies" was dead while the first-visit banner was up.** `CookieButton` dispatches

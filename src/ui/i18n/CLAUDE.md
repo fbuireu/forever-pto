@@ -32,12 +32,12 @@ Namespaces map to a feature or a surface, not to a component tree, so more than 
 the same namespace and one component often reads several. Two consequences worth knowing before you
 go hunting for a key:
 
-- The namespace name does not always match the component. `pages/planner/Contact.tsx` reads
-  `roadmap`, not `contact` — `contact` belongs to the contact form in `shared/contact/ContactModal.tsx`.
+- The namespace name does not always match the component. [`pages/planner/Contact.tsx`](../modules/pages/planner/Contact.tsx) reads
+  `roadmap`, not `contact` — `contact` belongs to the contact form in [`shared/contact/ContactModal.tsx`](../modules/shared/contact/ContactModal.tsx).
 - `metadata` is read through `getTranslations({ locale, namespace: 'metadata' })` in four places, none of
   them a `'use client'` component: the two route `metadata.ts` files, [`buildMarkdownPage.ts`](../../infrastructure/markdown/buildMarkdownPage.ts) under
   `@infrastructure/markdown` (the Markdown twin's title and description), and the async server component
-  `modules/shared/seo/JsonLd.tsx`, which interpolates `title` and `description` into the WebApplication
+  [`modules/shared/seo/JsonLd.tsx`](../modules/shared/seo/JsonLd.tsx), which interpolates `title` and `description` into the WebApplication
   JSON-LD. Renaming a `metadata` key means checking all four — miss the last two and the structured data or
   the Markdown twin degrades silently, with every page still rendering correctly.
 
@@ -46,9 +46,9 @@ go hunting for a key:
 - Keys are camelCase, with three deliberate snake_case exceptions — all of them for the same reason: the key
   *is* a machine code, looked up by a value that arrives from elsewhere, so renaming it breaks the lookup
   silently rather than at compile time. `toasts.promoCodeErrors.*` mirrors the Stripe promotion-code error
-  codes, indexed in `shared/donate/Donate.tsx`. `contact.errors.*` and `checkout.errors.*` mirror the
+  codes, indexed in [`shared/donate/Donate.tsx`](../modules/shared/donate/Donate.tsx). `contact.errors.*` and `checkout.errors.*` mirror the
   `ApiError` constants and the Zod codes baked into the contact schema, indexed by `resolveApiErrorMessage`
-  in `shared/utils/helpers.ts`. Do not "fix" any of the three to camelCase.
+  in [`shared/utils/helpers.ts`](../modules/shared/utils/helpers.ts). Do not "fix" any of the three to camelCase.
 - A code with no key is not a bug on its own — `resolveApiErrorMessage` falls back to the namespace's generic
   message, which is why a missing key shows plausible copy rather than an error. That makes the omission
   invisible: if you add a code a user can reach, add its key in the same change.
@@ -62,7 +62,7 @@ go hunting for a key:
   component owns belongs in that feature's namespace, next to the copy it sits beside.
 - Interpolation is `{variable}`; plurals use ICU (`{count, plural, one {…} other {…}}`); inline markup
   uses rich-text tags (`<b>`, `<link>`, `<em>`) that the component supplies as render functions.
-  `createRichLink` in `core/primitives/RichLink.tsx` is the helper for the `<link>` case.
+  `createRichLink` in [`core/primitives/RichLink.tsx`](../modules/core/primitives/RichLink.tsx) is the helper for the `<link>` case.
 - Values are always strings. There are no arrays anywhere in the bundles: a list is a numbered or
   named set of sibling keys, because `next-intl` cannot interpolate into an array.
 - `en.json` is the reference. Add a key there first, then to the other five in the same commit.
@@ -117,5 +117,5 @@ not it is a locale.
 
 Locale routing, detection and the cookie (`@infrastructure/i18n`, see
 [`infrastructure/CLAUDE.md`](../../infrastructure/CLAUDE.md)); transactional email copy, which is
-hard-coded English in `application/email/templates/Contact.tsx` and has no locale plumbing at all; log
+hard-coded English in [`application/email/templates/Contact.tsx`](../../application/email/templates/Contact.tsx) and has no locale plumbing at all; log
 and error-report strings, which are never translated.

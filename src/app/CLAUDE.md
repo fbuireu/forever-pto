@@ -121,7 +121,7 @@ Shared conventions across them:
   never rejects.
 - Error bodies use the `ApiError` constants from [`src/infrastructure/api/errors.ts`](../infrastructure/api/errors.ts), never a raw message,
   except `ValidationError` and `PromoCodeError` whose messages are already user-facing.
-- A JSON body is read with `parseJsonBody` (`api/parseJsonBody.ts`) **inside** the Effect program, never with
+- A JSON body is read with `parseJsonBody` ([`api/parseJsonBody.ts`](../infrastructure/api/parseJsonBody.ts)) **inside** the Effect program, never with
   a bare `await request.json()` before it. A malformed, empty or non-object body then fails as a
   `ValidationError` carrying `invalid_body` and maps onto the same 400 as a schema violation; parsing outside
   the program rejects before any `catchTags` map exists and Next answers a bare 500. The Stripe webhook is
@@ -138,7 +138,7 @@ payer to their bank instead of confirming inline. Stripe then resolves `confirmP
 `PaymentIntent`, so [`src/ui/adapters/payments/checkout.ts`](../ui/adapters/payments/checkout.ts) cannot activate anything: the browser has already
 navigated away. Everything those payers get, they get on the way back.
 
-`api/payment/activate/route.ts` is that way back. It is the `return_url` (`premium/CheckoutForm.tsx` builds
+`api/payment/activate/route.ts` is that way back. It is the `return_url` ([`premium/CheckoutForm.tsx`](../ui/modules/premium/CheckoutForm.tsx) builds
 it), so Stripe appends `payment_intent`, `payment_intent_client_secret` and `redirect_status` to it. The
 handler activates Premium, sets the cookie on a redirect response and sends the payer on to
 `payment/confirmation`. The cookie is therefore already set when that page renders — which is why the page

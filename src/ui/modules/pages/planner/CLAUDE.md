@@ -23,7 +23,7 @@ this order; the layout adds [`SiteTitle.tsx`](./SiteTitle.tsx) and [`SiteSubtitl
 | [`Legend.tsx`](./Legend.tsx) | Explains the day colours. Exports `Legend` *and* `LegendItems`, which `ManagementBar` reuses inside the mobile drawer |
 | [`Summary.tsx`](./Summary.tsx) | Metric cards plus five charts, all five `dynamic()`-imported from here rather than from the route |
 | [`Roadmap.tsx`](./Roadmap.tsx) | Feature map over `RadialNav` and `FeatureList` from `core/animate/components/` |
-| [`Contact.tsx`](./Contact.tsx) | The feedback prompt; opens `shared/contact/ContactModal.tsx` |
+| [`Contact.tsx`](./Contact.tsx) | The feedback prompt; opens [`shared/contact/ContactModal.tsx`](../../shared/contact/ContactModal.tsx) |
 
 ## Subdirectories
 
@@ -120,7 +120,7 @@ today marker and no past-day dimming on purpose. Every predicate taking `today` 
 **The remaining-days counter freezes during a recalculation.** `Status` in `PlannerPanel.tsx` keeps a
 `lastSettledRemaining` ref updated by an effect *with no dependency array* — it runs every render and
 snapshots the value only while `isCalculating` is false. That looks like a mistake and is not: without
-it the budget readout drops to zero for the length of every worker round-trip. `sidebar/components/PtoDays.tsx`
+it the budget readout drops to zero for the length of every worker round-trip. [`sidebar/components/PtoDays.tsx`](../../sidebar/components/PtoDays.tsx)
 holds the same ref for the same reason; they are two readouts of one number, so they freeze together or they
 disagree on screen.
 
@@ -271,7 +271,7 @@ belongs here; the same narrowing applied to `generateMetrics` was tried and reve
 
 **`data-tutorial` attributes are load-bearing.** `calendar-list`, `holidays-list`, `planner-drawer`,
 `alternatives-manager` and `pto-status` are the driver.js anchors. `ManagementBar` additionally listens
-for a `tutorial:expand-drawer` window event dispatched by `hooks/useTutorial.tsx` — a deliberately
+for a `tutorial:expand-drawer` window event dispatched by [`hooks/useTutorial.tsx`](../../../hooks/useTutorial.tsx) — a deliberately
 loose coupling so the tutorial does not import planner state, and invisible to a search for the
 listener's caller.
 
@@ -284,7 +284,7 @@ listener's caller.
 - Motion configuration lives at module scope (`STAT_CARD_MOTION_CONFIG`, `LABEL_VARIANTS`,
   `BADGE_VARIANTS` in `PlannerPanel.tsx`), so the object identity is stable across renders.
 - `<Skeleton name='…' fixture={…} fallback={…}>` for loading states, never a hand-rolled shimmer. The
-  bones `calendar-list`, `planner-panel` and `summary` are registered in `modules/bones/registry.ts`.
+  bones `calendar-list`, `planner-panel` and `summary` are registered in [`modules/bones/registry.ts`](../../bones/registry.ts).
   Both props take the same fixture component and both are required: `fixture` is read only by the
   capture CLI, `fallback` is what renders when no bone resolves, so passing `fixture` alone shows an
   empty container. See [`../../CLAUDE.md`](../../CLAUDE.md).
@@ -295,14 +295,14 @@ Anything two screens share belongs in `shared/`, never in the other screen's fol
 between this screen and the homepage used to be crossed and are not any more:
 
 - [`SupportButton.tsx`](../../shared/SupportButton.tsx) — mounted by `calendar/Calendar.tsx` inside the "this is a Premium feature" toast
-  *and* by `pages/homepage/sections/Pricing.tsx` — lives in `shared/`.
-- [`FaqTabs.tsx`](../homepage/support/FaqTabs.tsx), `Troubleshooting.tsx` and their `types.ts` sat here while `pages/homepage/sections/Faq.tsx`
+  *and* by [`pages/homepage/sections/Pricing.tsx`](../homepage/sections/Pricing.tsx) — lives in `shared/`.
+- [`FaqTabs.tsx`](../homepage/support/FaqTabs.tsx), `Troubleshooting.tsx` and their `types.ts` sat here while [`pages/homepage/sections/Faq.tsx`](../homepage/sections/Faq.tsx)
   was their only consumer; they now live under `pages/homepage/support/`.
-- `getViewBoxFromSvg` moved out of `calendar/utils/helpers.ts` into `shared/utils/helpers.ts`, so
-  `shared/Icon.tsx` no longer reaches into this screen.
+- `getViewBoxFromSvg` moved out of `calendar/utils/helpers.ts` into [`shared/utils/helpers.ts`](../../shared/utils/helpers.ts), so
+  [`shared/Icon.tsx`](../../shared/Icon.tsx) no longer reaches into this screen.
 
 One import still points the other way, and it is a util rather than a component: `Troubleshooting.tsx`
-and `pages/homepage/sections/Hero.tsx` both read from this screen's `utils/`, for `getTotalMonths` and
+and [`pages/homepage/sections/Hero.tsx`](../homepage/sections/Hero.tsx) both read from this screen's `utils/`, for `getTotalMonths` and
 `MODIFIERS_CLASS_NAMES` respectively. Promote either to `shared/` before a third caller appears.
 
 ## Testing
