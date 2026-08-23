@@ -10,7 +10,7 @@ sidebar:
 Configured in `vitest.config.ts` with `resolve.tsconfigPaths: true`, so all the app's path aliases (`@ui`, `@domain`, …) work in tests without extra mapping.
 
 - **Environment**: happy-dom.
-- **Setup** (`vitest.setup.ts`): mocks `next/cache` (`cacheLife`, `cacheTag`) — required because the app enables Cache Components — and runs Testing Library's `cleanup` after each test.
+- **Setup** (`vitest.setup.ts`): mocks `next/cache` (`cacheLife`, `cacheTag`), required because the app enables Cache Components, and runs Testing Library's `cleanup` after each test.
 - **Excluded from the runner**: `apps/web/e2e/**`, `apps/docs/**`, generated bones, icon directories and i18n message JSON.
 - **Coverage**: v8 provider over `apps/web/src/**/*.{ts,tsx}` (tests, `*.d.ts`, `types.ts` files and generated code excluded), reported as text + lcov. `ci.yml` runs `pnpm test:ut:coverage` and uploads `coverage/lcov.info` to Codecov on every push and PR.
 
@@ -20,7 +20,7 @@ Run locally with `pnpm test:ut` (or `pnpm test:ut:coverage`).
 
 There are **two independent suites**:
 
-### App suite — root `apps/web/e2e/`
+### App suite, root `apps/web/e2e/`
 
 Configured in the root `playwright.config.ts`. Specs mirror the app's route structure (`apps/web/e2e/[locale]/(app)/planner/planner.spec.ts`, `apps/web/e2e/api/health.spec.ts`, …), which makes it obvious which route a failing spec covers.
 
@@ -28,7 +28,7 @@ Configured in the root `playwright.config.ts`. Specs mirror the app's route stru
 - In CI these tests run **against the live per-PR preview deployment**, authenticating through Cloudflare Access with a service token (`CF_ACCESS_CLIENT_ID`/`CF_ACCESS_CLIENT_SECRET` injected as headers by the config). See [environments](/infra/environments/).
 - CI runs chromium only with retries; locally you get chromium, firefox and webkit.
 
-### Docs suite — `apps/docs/e2e/`
+### Docs suite, `apps/docs/e2e/`
 
 Configured in `apps/docs/playwright.config.ts`: a small smoke suite (`apps/docs/e2e/docs.spec.ts`) that builds the site and runs it via `astro preview` (`webServer` block), chromium only. It runs in `.github/workflows/docs.yml` after the build.
 

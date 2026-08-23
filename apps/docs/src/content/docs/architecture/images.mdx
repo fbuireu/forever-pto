@@ -5,7 +5,7 @@ sidebar:
   order: 7
 ---
 
-The app does not use Next.js's built-in image optimizer — there is no Node server to run it on Cloudflare Workers. Instead, `next.config.ts` configures a custom loader:
+The app does not use Next.js's built-in image optimizer, because there is no Node server to run it on Cloudflare Workers. Instead, `next.config.ts` configures a custom loader:
 
 ```ts
 images: {
@@ -27,13 +27,13 @@ images: {
 - `format=auto` lets Cloudflare negotiate AVIF/WebP per browser.
 - The leading slash is stripped from `src` so the origin path nests cleanly inside the `/cdn-cgi/image/` prefix.
 
-The `/cdn-cgi/image/` endpoint is handled by Cloudflare at the zone edge: it fetches the original asset from the Worker, transforms it, and caches the result — the app itself never sees these requests. Being a pure function with zero imports, the loader is trivially unit-testable (`apps/web/src/infrastructure/images/loader.test.ts` sits next to it).
+The `/cdn-cgi/image/` endpoint is handled by Cloudflare at the zone edge: it fetches the original asset from the Worker, transforms it, and caches the result, so the app itself never sees these requests. Being a pure function with zero imports, the loader is trivially unit-testable (`apps/web/src/infrastructure/images/loader.test.ts` sits next to it).
 
 ## Static assets
 
-- Original image files live in `apps/web/public/static/images/` and are addressed with root-relative paths, e.g. the logo in `apps/web/src/ui/modules/shared/Logo.tsx` renders `next/image` with `src='/static/images/forever-pto-logo.png'` — which the loader then turns into a `/cdn-cgi/image/...` URL.
+- Original image files live in `apps/web/public/static/images/` and are addressed with root-relative paths, e.g. the logo in `apps/web/src/ui/modules/shared/Logo.tsx` renders `next/image` with `src='/static/images/forever-pto-logo.png'`, which the loader then turns into a `/cdn-cgi/image/...` URL.
 - At deploy time OpenNext copies `apps/web/public/` into `.open-next/assets`, served by the Workers static `ASSETS` binding declared in `wrangler.toml`. Static assets therefore never invoke the Worker.
-- Transformed variants are cached by Cloudflare per the Image Resizing defaults; the originals get standard static-asset caching. Page-level caching is a separate concern — see [caching](/architecture/caching/).
+- Transformed variants are cached by Cloudflare per the Image Resizing defaults; the originals get standard static-asset caching. Page-level caching is a separate concern; see [caching](/architecture/caching/).
 
 ## What is not an image
 

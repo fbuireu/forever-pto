@@ -7,8 +7,8 @@ sidebar:
 
 ## Prerequisites
 
-- **Node** — the exact version is pinned in `.nvmrc` (use `nvm use` / `fnm use`). CI reads the same file.
-- **pnpm** — the exact version is pinned in the `packageManager` field of `package.json`; `corepack enable` picks it up automatically.
+- **Node**: the exact version is pinned in `.nvmrc` (use `nvm use` / `fnm use`). CI reads the same file.
+- **pnpm**: the exact version is pinned in the `packageManager` field of `package.json`; `corepack enable` picks it up automatically.
 
 The repo is a pnpm workspace (`pnpm-workspace.yaml`) with two packages: the app at the root and this wiki in `apps/docs/`.
 
@@ -47,12 +47,12 @@ All scripts live in the root `package.json` (which is the source of truth if thi
 | `bones:build` / `bones:watch` | Generate skeleton components into `apps/web/src/ui/modules/bones` (boneyard-js, config in `boneyard.config.json`) |
 | `format` / `format:changed` / `format:all` | Biome check with fixes (base / VCS-changed files / whole repo) |
 | `lint` / `lint:changed` / `lint:all` | Biome lint (base / changed with fixes / whole repo) |
-| `typecheck` | `tsc --noEmit` — also runs on pre-push |
+| `typecheck` | `tsc --noEmit`, which also runs on pre-push |
 | `test:ut` / `test:ut:coverage` | Vitest unit tests / with v8 coverage |
 | `test:e2e` / `test:e2e:ui` | Playwright end-to-end tests / UI mode |
 
 The docs package has its own scripts (`apps/docs/package.json`): `dev`, `check`, `build`, `preview`, `test:e2e`, `deploy`.
 
 :::note[Windows]
-`cf:build` (the OpenNext Cloudflare build) is known not to work on Windows. Use WSL, or rely on CI — deploys run on Linux runners anyway (see [environments](/infra/environments/)).
+`cf:build` (the OpenNext Cloudflare build) is known not to work on Windows. Use WSL, or rely on CI, since deploys run on Linux runners anyway (see [environments](/infra/environments/)).
 :::

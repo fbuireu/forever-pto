@@ -1,6 +1,6 @@
 ---
 title: Routing
-description: The app/[locale] route tree — marketing and app route groups, API routes, the .well-known catch-all and the error surfaces.
+description: The app/[locale] route tree, covering marketing and app route groups, API routes, the .well-known catch-all and the error surfaces.
 sidebar:
   order: 2
 ---
@@ -33,8 +33,8 @@ src/app/
 
 ## Route groups
 
-- **`(marketing)`** — the public homepage (`apps/web/src/app/[locale]/(marketing)/page.tsx`, composed from sections in `apps/web/src/ui/modules/pages/homepage/sections/`) and the four legal pages, each with a colocated `metadata.ts`. The group has its own `layout.tsx` and `error.tsx`.
-- **`(app)`** — the product itself. `planner/page.tsx` renders the planner; `planner/layout.tsx` wraps it in the sidebar shell (`SidebarProvider`, `AppSidebar`, store initialisation, premium modal, donate widget, footer). `payment/confirmation/page.tsx` reads the `payment_intent` search param and shows the Stripe payment result; requests without that param never reach it — the [middleware](/architecture/middleware/) redirects them home.
+- **`(marketing)`** holds the public homepage (`apps/web/src/app/[locale]/(marketing)/page.tsx`, composed from sections in `apps/web/src/ui/modules/pages/homepage/sections/`) and the four legal pages, each with a colocated `metadata.ts`. The group has its own `layout.tsx` and `error.tsx`.
+- **`(app)`** holds the product itself. `planner/page.tsx` renders the planner; `planner/layout.tsx` wraps it in the sidebar shell (`SidebarProvider`, `AppSidebar`, store initialisation, premium modal, donate widget, footer). `payment/confirmation/page.tsx` reads the `payment_intent` search param and shows the Stripe payment result; requests without that param never reach it, because the [middleware](/architecture/middleware/) redirects them home.
 
 Route groups affect layouts only, not URLs: `/planner` and `/payment/confirmation` have no group segment in the path.
 
@@ -57,7 +57,7 @@ API routes live outside `[locale]` and are excluded from the middleware matcher 
 
 ## Error and not-found surfaces
 
-There are per-locale boundaries (`apps/web/src/app/[locale]/error.tsx`, `apps/web/src/app/[locale]/not-found.tsx`) plus root-level `apps/web/src/app/global-error.tsx` and `apps/web/src/app/global-not-found.tsx`. The latter requires `experimental.globalNotFound: true` in `next.config.ts` and handles URLs that never match the `[locale]` segment. All four render the shared brutal designs — see [error pages](/architecture/error-pages/) for the full breakdown.
+There are per-locale boundaries (`apps/web/src/app/[locale]/error.tsx`, `apps/web/src/app/[locale]/not-found.tsx`) plus root-level `apps/web/src/app/global-error.tsx` and `apps/web/src/app/global-not-found.tsx`. The latter requires `experimental.globalNotFound: true` in `next.config.ts` and handles URLs that never match the `[locale]` segment. All four render the shared brutal designs; see [error pages](/architecture/error-pages/) for the full breakdown.
 
 ## Everything else at the app root
 

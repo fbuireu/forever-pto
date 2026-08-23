@@ -14,13 +14,13 @@ The app sets four first-party cookies. The sidebar cookie name below is imported
 | `user-country` | Detected ISO country code, used to pre-select the holiday calendar | no | yes | `strict` | 7 days (`ONE_WEEK`) |
 | `NEXT_LOCALE` | The user's resolved locale for i18n routing | yes | yes | `lax` | session |
 | `premium-token` | JWT proving an active premium session | yes | production only | `strict` | 30 days |
-| <code>{SIDEBAR_COOKIE_NAME}</code> | Persists whether the sidebar is expanded or collapsed | no | — | `lax` | 7 days |
+| <code>{SIDEBAR_COOKIE_NAME}</code> | Persists whether the sidebar is expanded or collapsed | no | not set | `lax` | 7 days |
 
 All four are scoped to `path: '/'`.
 
 ## `user-country`
 
-Exported as `USER_COUNTRY_COOKIE` in `apps/web/src/infrastructure/proxy/cookie.ts`, which also defines `setLocationCookie()` and the attributes above. It is written by the middleware chain: `apps/web/src/middleware.ts` → `apps/web/src/infrastructure/proxy/location.ts`, which detects the country from the request and sets the cookie on the response. It is deliberately **not** `httpOnly` — `apps/web/src/ui/modules/stores/StoresInitializer.tsx` reads it on the client to seed the location store. See [country detection](/how-it-works/country-detection/).
+Exported as `USER_COUNTRY_COOKIE` in `apps/web/src/infrastructure/proxy/cookie.ts`, which also defines `setLocationCookie()` and the attributes above. It is written by the middleware chain: `apps/web/src/middleware.ts` → `apps/web/src/infrastructure/proxy/location.ts`, which detects the country from the request and sets the cookie on the response. It is deliberately **not** `httpOnly`, because `apps/web/src/ui/modules/stores/StoresInitializer.tsx` reads it on the client to seed the location store. See [country detection](/how-it-works/country-detection/).
 
 ## `NEXT_LOCALE`
 
@@ -36,4 +36,4 @@ The only client-set cookie of the four. `apps/web/src/ui/modules/core/animate/ba
 
 ## Third-party cookies
 
-Cookies set by Stripe, Google Analytics and Better Stack are not controlled by app code. They are catalogued — names, providers and expiries — in `apps/web/src/ui/modules/shared/cookie-consent/config/config.ts`, which drives the cookie-consent dialog.
+Cookies set by Stripe, Google Analytics and Better Stack are not controlled by app code. They are catalogued, with names, providers and expiries, in `apps/web/src/ui/modules/shared/cookie-consent/config/config.ts`, which drives the cookie-consent dialog.
