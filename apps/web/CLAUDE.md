@@ -53,7 +53,7 @@ pnpm test:e2e           # playwright
 ```
 
 Env: copy `.env.example`. Local Worker secrets go in `.dev.vars`. The typed surface the build uses is
-[`environment.d.ts`](./environment.d.ts) and nothing else — it hand-declares both `ProcessEnv` and the global `CloudflareEnv` the
+[`environment.d.ts`](./environment.d.ts) and nothing else: it hand-declares both `ProcessEnv` and the global `CloudflareEnv` the
 Cloudflare context is read through, and it is tracked.
 
 `pnpm cf:typegen` writes wrangler's own inference to `cloudflare-env.d.ts` in this folder. It is reference
@@ -238,7 +238,7 @@ differently depending on when it is asked:
   `[locale]` shells carry it in `canonical`, `hrefLang` and `og:url` until their 24-hour revalidation.
 
 So a preview's `robots.txt` advertises the production sitemap. That is tolerated rather than fixed because
-previews sit behind Cloudflare Access — nothing crawls them, which is why [`playwright.config.ts`](./playwright.config.ts) has to send
+previews sit behind Cloudflare Access and nothing crawls them, which is why [`playwright.config.ts`](./playwright.config.ts) has to send
 `CF-Access-Client-Id`/`Secret` to reach one. Do not "fix" it by giving the build step the override without
 first checking whether the value is still correct for production, which shares that build path. The
 `NEXT_PUBLIC_SITE_URL` line inside `[env.development.vars]` is the fallback for a hand-run

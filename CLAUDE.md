@@ -131,9 +131,9 @@ app builds from, but it means "the repo root" is not the boundary; the regex is.
 
 **`ci.yml` holds the whole app graph**: `changes`, then `lint`, `typecheck` and `test` in parallel, then
 `deploy-production` → `release-web` → `docs-refresh` on `main`, or `deploy-development` → `comment` / `e2e`
-on a PR. Both deploy jobs call the shared [`_deploy-web.yml`](./.github/workflows/_deploy-web.yml). `docs.yml` holds the docs graph — `build`, then
+on a PR. Both deploy jobs call the shared [`_deploy-web.yml`](./.github/workflows/_deploy-web.yml). `docs.yml` holds the docs graph: `build`, then
 `preview` on a PR or `deploy` → `release-docs` on `main`. The rest are [`cleanup-development.yml`](./.github/workflows/cleanup-development.yml), the
-renovate auto-merge, a `zizmor` audit, and [`dependabot-auto-merge.yml`](./.github/workflows/dependabot-auto-merge.yml) — which is **dormant**: there is no
+renovate auto-merge, a `zizmor` audit, and [`dependabot-auto-merge.yml`](./.github/workflows/dependabot-auto-merge.yml), which is **dormant**: there is no
 `.github/dependabot.yml` in the tree, so nothing ever triggers it. It is kept for the day one appears.
 
 Every job that needs a toolchain uses the `.github/actions/prepare-env` composite (pnpm, the `.nvmrc` Node,
@@ -300,8 +300,8 @@ module they name (that last one is the largest slice of the cross-package seam a
 because `astro check` registers no MDX plugin and the citation rules match paths rather than symbols); that
 every script this file
 documents exists in the root manifest and every script the web guide documents exists in one of the two;
-that [`apps/web/tsconfig.json`](./apps/web/tsconfig.json) keeps the two settings `next build` would otherwise fill in for it — `strict`
-on and `allowJs` off — that it sits beside the [`next.config.ts`](./apps/web/next.config.ts) that rewrites it, and that
+that [`apps/web/tsconfig.json`](./apps/web/tsconfig.json) keeps the two settings `next build` would otherwise fill in for it (`strict`
+on and `allowJs` off), that it sits beside the [`next.config.ts`](./apps/web/next.config.ts) that rewrites it, and that
 `cloudflare-env.d.ts` stays both excluded from the program and ignored by git; that every `'use client'`,
 `'use server'` and `'use cache'` under either package's `src/` is a bare string literal in first position;
 and that every locale bundle has exactly the keys [`en.json`](./apps/web/src/ui/i18n/messages/en.json) has.
