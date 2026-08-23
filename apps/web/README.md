@@ -65,7 +65,7 @@ pnpm test:ut:coverage    # the same, with coverage
 pnpm test:e2e         # Playwright, against BASE_URL
 ```
 
-The end-to-end suite runs against a deployed preview, not a local server. `not-found.spec.ts` is
+The end-to-end suite runs against a deployed preview, not a local server. [`not-found.spec.ts`](./e2e/[locale]/not-found.spec.ts) is
 load-bearing: `/_not-found` is the only page rendered per request, so it is the only one that catches the
 Worker failing to boot.
 
@@ -75,6 +75,6 @@ This package versions itself: tags are `web-vX.Y.Z`, and a commit belongs to it 
 `apps/web/`. The release runs after the production deploy, so a tag means the version is live. See
 [ADR 0011](../../adr/0011-per-package-versioning-with-a-bridge-tag.md).
 
-`version` in `package.json` is read at runtime by seven source files to render the footer, the hero, the
+`version` in [`package.json`](./package.json) is read at runtime by seven source files to render the footer, the hero, the
 error page, the `/api/markdown` output and the `.well-known` agent-skills index — and by the docs site
 for its header badge. It is not only a release number.

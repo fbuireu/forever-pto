@@ -9,13 +9,13 @@ Amended twice.
 **2026-08-16.** The second paragraph of the Context below asserted a premise that has stopped being true:
 that "a run calls the suggestion generator and the alternatives generator separately, and both must see the
 same memoised holiday set". They no longer see it separately. `findPlanningCandidates` under
-`utils/candidates.ts` enumerates the Workdays and finds the Bridges once, and `runPlanningPipeline` hands the
+[`utils/candidates.ts`](../apps/web/src/domain/calendar/utils/candidates.ts) enumerates the Workdays and finds the Bridges once, and `runPlanningPipeline` hands the
 same candidate set to both generators — so the sharing the memoised holiday set existed to provide is now
 structural, not incidental.
 
 Two things follow, and only the first is settled. The caches are no longer what makes the two generators
 agree, so the clear-on-entry rule is the only part still load-bearing: `runPlanningPipeline` still calls
-`clearDateKeyCache` and `clearHolidayCache` first, and `pipeline.test.ts` still pins that behaviourally by
+`clearDateKeyCache` and `clearHolidayCache` first, and [`pipeline.test.ts`](../apps/web/src/domain/calendar/pipeline.test.ts) still pins that behaviourally by
 running twice with different Holidays. Whether `HOLIDAY_CACHE` now earns its keep at all is **unsettled** —
 a probe alternating cold and warm runs measured 104/67, 59/52, 49/57 and 100/47 ms, which is warm being no
 faster than cold, but four iterations on one fixture is not a measurement. Deleting it needs a probe on a
