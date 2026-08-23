@@ -1,3 +1,5 @@
+import { readdirSync, readFileSync } from "node:fs";
+import { join, relative, resolve } from "node:path";
 import { renderHook } from "@testing-library/react";
 import type { ComponentProps, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -93,5 +95,32 @@ describe("SidebarProvider", () => {
 	it("provides openMobile=false initially", () => {
 		const { result } = renderHook(() => useSidebar(), { wrapper });
 		expect(result.current.openMobile).toBe(false);
+	});
+});
+
+const SRC_ROOT = resolve(__dirname, "../../../../..");
+const MOUNT = /<SidebarProvider[\s/>]/g;
+
+const sourceFiles = (directory: string): string[] =>
+	readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+		const path = join(directory, entry.name);
+		if (entry.isDirectory()) return sourceFiles(path);
+		return entry.name.endsWith(".tsx") && !entry.name.endsWith(".test.tsx") ? [path] : [];
+	});
+
+const mounts = sourceFiles(SRC_ROOT).flatMap((path) => {
+	const found = readFileSync(path, "utf8").match(MOUNT) ?? [];
+	return found.map(() => relative(SRC_ROOT, path).replaceAll("\\", "/"));
+});
+
+describe("SidebarProvider mount sites", () => {
+	it("is mounted exactly once, so no consumer can resolve the wrong sidebar", () => {
+		expect(mounts).toEqual(["app/[locale]/(app)/planner/layout.tsx"]);
+	});
+});
+
+describe("Sidebar body styles", () => {
+	it("writes no document-level style, so it cannot fight another module over the same global", () => {
+		expect(readFileSync(join(__dirname, "Sidebar.tsx"), "utf8")).not.toMatch(/document\.body\.style/);
 	});
 });

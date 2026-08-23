@@ -14,7 +14,7 @@ const makeHoliday = (date: Date): HolidayDTO => ({
 	date,
 	name: "New Year",
 	variant: HolidayVariant.NATIONAL,
-	isInSelectedRange: true,
+	isInPlanningWindow: true,
 });
 
 const makeBridge = (): Bridge => ({
@@ -59,7 +59,7 @@ describe("serializeHolidays", () => {
 		const result = serializeHolidays([holiday]);
 		expect(result[0].id).toBe("h-1");
 		expect(result[0].name).toBe("New Year");
-		expect(result[0].isInSelectedRange).toBe(true);
+		expect(result[0].isInPlanningWindow).toBe(true);
 	});
 
 	it("returns an empty array for empty input", () => {
@@ -132,7 +132,7 @@ describe("deserializeHolidays", () => {
 	it("converts date ISO strings back to Dates", () => {
 		const date = new Date(2025, 0, 1);
 		const result = deserializeHolidays([
-			{ id: "h-1", date: date.toISOString(), name: "New Year", variant: "national", isInSelectedRange: true },
+			{ id: "h-1", date: date.toISOString(), name: "New Year", variant: "national", isInPlanningWindow: true },
 		]);
 		expect(result[0].date).toBeInstanceOf(Date);
 		expect(result[0].date.getFullYear()).toBe(2025);
@@ -145,7 +145,7 @@ describe("deserializeHolidays", () => {
 				date: new Date(2025, 0, 1).toISOString(),
 				name: "New Year",
 				variant: "national",
-				isInSelectedRange: true,
+				isInPlanningWindow: true,
 			},
 		]);
 		expect(result[0].variant).toBe("national");

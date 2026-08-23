@@ -445,3 +445,27 @@ and six keyed by testimonial.
 `BRIDGE_WEEK` in [`pages/homepage/sections/Features.tsx`](./pages/homepage/sections/Features.tsx) is the shape the card's copy describes:
 Workdays Monday to Wednesday, a Thursday Holiday, a Friday PTO Day, then the weekend — a Bridge.
 Reordering the array desyncs the illustration from the translated text beside it.
+
+**[`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) mounts no `SidebarProvider` and must not grow one back.** It returns a
+fragment of `Sidebar` plus `SidebarInset` and reads the context from `app/[locale]/(app)/planner/layout.tsx`,
+the app's only mount site. It used to open a second provider inside the layout's, which gave the tree two
+independent `open`/`openMobile` pairs and two nested `div.flex.min-h-svh.w-full` wrappers; consumers agreed
+with each other only because they all happened to render inside the inner one. `Sidebar.test.tsx` fails on a
+second mount anywhere under `src/`. It also means `AppSidebar` is not self-contained: a host other than that
+layout has to supply the provider.
+
+**[`shared/donate/Donate.tsx`](./shared/donate/Donate.tsx)'s trigger is a `fixed` band, and the band is `pointer-events-none` while the
+button inside it is `pointer-events-auto`.** Below `md` the container is `w-full` and the `Button` inside
+carries `w-full` too, so the two edges coincide and the band is the button — that is the full-bleed mobile
+CTA and deleting the `w-full` would shrink it to its text. What the guards buy is the gap the container can
+open without anyone editing it: `donate-brutal`'s `nudge` keyframes translate the button up to 3px sideways
+for the last 12% of every four-second cycle, and `md:w-auto` reverses the coincidence outright the moment a
+caller passes a narrower child. A `fixed` element at `z-50` spanning the viewport is worth making inert by
+construction rather than by measurement.
+
+**The `bottom-[calc(15dvh+8px)]` default in the same file is the mobile planner drawer's collapsed snap
+point, written out by hand.** `DRAWER_SNAP.COLLAPSED` in [`pages/planner/ManagementBar.tsx`](./pages/planner/ManagementBar.tsx) is `0.15` and
+nothing keeps the two in step: change the snap point and the donate button either rides on top of the drawer
+or floats away from it. The marketing page already overrides the whole value with `bottomClassName`, which is
+the seam a fix would use — the planner layout passing its own offset, rather than a shared component holding
+one screen's number as its default.

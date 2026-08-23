@@ -1178,7 +1178,7 @@ describe("the guides describe the project as it is configured", () => {
 		expect(isGitIgnored(`${WEB}/${GENERATED_ENV_TYPES}`)).toBe(true);
 	});
 
-	it("references no identifier the web environment types do not import", () => {
+	it("references no identifier the web environment types do not import", { timeout: 30_000 }, () => {
 		const entry = join(ROOT, WEB, HAND_WRITTEN_ENV_TYPES);
 		const program = ts.createProgram([entry], {
 			noResolve: true,

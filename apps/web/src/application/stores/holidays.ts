@@ -1,4 +1,4 @@
-import { holidayDTO, isInPlanningWindow, planningWindowInterval } from "@application/dto/holiday/dto";
+import { holidayDTO } from "@application/dto/holiday/dto";
 import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
 import { logClient, logClientError } from "@application/shared/utils/clientLog";
 import { fromStoredInstant, type Stored } from "@application/shared/utils/dateIntake";
@@ -6,6 +6,7 @@ import { isSameDay, isWeekend } from "@application/shared/utils/dates";
 import { generateMetrics } from "@domain/calendar/metrics/generateMetrics";
 import type { MeasuredSuggestion, Suggestion } from "@domain/calendar/types";
 import { measureBudget } from "@domain/calendar/utils/budget";
+import { isInPlanningWindow, planningWindowInterval } from "@domain/calendar/window";
 import type { Locale } from "next-intl";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
@@ -122,7 +123,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 						.filter((h) => h.variant === HolidayVariant.CUSTOM)
 						.map((h) => ({
 							...h,
-							isInSelectedRange: isInPlanningWindow({ date: h.date, window: planningWindow }),
+							isInPlanningWindow: isInPlanningWindow({ date: h.date, window: planningWindow }),
 						}));
 
 					try {

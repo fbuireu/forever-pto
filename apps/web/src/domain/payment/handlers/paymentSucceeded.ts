@@ -3,7 +3,7 @@ import { LoggerService } from "@infrastructure/clients/logging/better-stack/serv
 import type { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import type { DatabaseError } from "@infrastructure/errors";
 import { retrieveCharge } from "@infrastructure/services/payments/provider/charge";
-import { getPaymentById, updatePaymentCharge, updatePaymentStatus } from "@infrastructure/services/payments/repository";
+import { updatePaymentCharge, updatePaymentStatus } from "@infrastructure/services/payments/repository";
 import { Effect } from "effect";
 import type { PaymentSucceededEvent } from "../events/types";
 
@@ -64,14 +64,13 @@ export const handlePaymentSucceeded = (
 	Effect.gen(function* () {
 		const logger = yield* LoggerService;
 
-		const existing = yield* getPaymentById(event.paymentId).pipe(Effect.catchAll(() => Effect.succeed(undefined)));
+		const updated = yield* updatePaymentStatus({ paymentIntentId: event.paymentId, status: event.status });
 
-		if (!existing) {
-			logger.warn("Payment not found after creation attempt", { paymentId: event.paymentId });
-			return;
+		if (!updated) {
+			logger.warn("Succeeded-payment event wrote no status: the payment is absent or already succeeded", {
+				paymentId: event.paymentId,
+			});
 		}
-
-		yield* updatePaymentStatus({ paymentIntentId: event.paymentId, status: event.status });
 
 		yield* updateCharge(event);
 	});

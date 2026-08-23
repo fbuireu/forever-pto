@@ -8,7 +8,6 @@ import {
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
-	SidebarProvider,
 	SidebarTrigger,
 } from "@ui/modules/core/animate/base/Sidebar";
 import { ChevronDown } from "@ui/modules/core/animate/icons/ChevronDown";
@@ -56,7 +55,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
 	]);
 
 	return (
-		<SidebarProvider>
+		<>
 			<Sidebar collapsible="icon" variant="inset" landmarkLabel={tA11y("sidebarLandmark")}>
 				<SidebarHeader className="group-data-[collapsible=icon]:p-0 mb-2.5">
 					<SidebarMenu>
@@ -194,6 +193,6 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
 				<SidebarTrigger className={"cursor-pointer size-11 fixed m-3 z-51 p-1"} label={tA11y("toggleSidebar")} />
 				{children}
 			</SidebarInset>
-		</SidebarProvider>
+		</>
 	);
 };

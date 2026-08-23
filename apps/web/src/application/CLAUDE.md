@@ -112,8 +112,10 @@ header.
 `differenceInDays` — both operate on `PlainDate`, so there is no partial day for them to disagree about — and
 had one caller, kept only so a call site read the way its date-fns predecessor did. `isInSelectedRange` was a
 pure alias of `isWithinInterval` with the two bounds renamed, had **no** caller outside its own five tests,
-and actively misled: `HolidayDTO.isInSelectedRange` is computed by `isInPlanningWindow` in
-[`dto/holiday/dto.ts`](./dto/holiday/dto.ts), not by this. A rename of two parameters is not a module.
+and actively misled: the `HolidayDTO` flag is computed by `isInPlanningWindow` in
+[`../domain/calendar/window.ts`](../domain/calendar/window.ts), not by this. A rename of two parameters is
+not a module. The flag has since taken that name too, so nothing in the tree spells the retired term any
+more; this paragraph keeps it only to name what was deleted.
 
 ## Gotchas
 

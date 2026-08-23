@@ -168,6 +168,16 @@ so `payment/confirmation/` deliberately renders bare — a Stripe return should 
 planner chrome. The confirmation route is the one dynamic page in the tree: it reads `searchParams`, runs
 the `confirmation` Effect program and has a `loading.tsx` for the round trip.
 
+**`planner/layout.tsx` mounts the app's only `SidebarProvider`, and [`AppSidebar.tsx`](../ui/modules/sidebar/AppSidebar.tsx) deliberately
+mounts none.** It used to open a second one inside this one, so the tree carried two independent
+`open`/`openMobile` states and two nested `div.flex.min-h-svh.w-full` wrappers. Every consumer that
+happened to sit inside `AppSidebar` — `SidebarTrigger`, `Logo`, `ManagementBar` through the `SidebarInset`
+children — resolved to the *inner* provider and so agreed with each other by render position alone, while
+the outer provider's `openMobile` was state nothing could ever toggle. `StoresInitializer`, which sits
+between the two, would have read the dead one. `AppSidebar` returns a fragment now and takes the context
+from here; a consumer added between the provider and `Sidebar` reads the same sidebar as everything else.
+`Sidebar.test.tsx` asserts the mount site is unique.
+
 ## Metadata
 
 **A route that needs metadata declares it in its own `page.tsx`, in one line:**
@@ -217,7 +227,7 @@ competing for the same ranking; the required `route` parameter is what prevents 
 | [`api/payment/route.ts`](./api/payment/route.ts) | POST | Creates a Stripe PaymentIntent for a Donation. Rate-limits on `cf-connecting-ip` before anything else |
 | [`api/payment/activate/route.ts`](./api/payment/activate/route.ts) | GET | Stripe's `return_url`. Activates Premium and redirects to the confirmation page with the cookie already set — see *The redirect hand-off* below |
 | [`api/webhooks/stripe/route.ts`](./api/webhooks/stripe/route.ts) | POST | Verifies the `stripe-signature` header, then hands the event to `processWebhookEvent`. Reads the **raw** body via `request.text()` — parsing it as JSON would break signature verification |
-| [`api/check-session/route.ts`](./api/check-session/route.ts) | GET, POST | GET verifies the premium cookie; POST activates Premium from an email, optionally with a payment key, and sets the cookie |
+| [`api/check-session/route.ts`](./api/check-session/route.ts) | GET, POST | GET verifies the premium cookie; POST activates Premium from an email, optionally with a payment key, and sets the cookie. GET treats "did not verify" and "could not verify" differently: see *The GET half of check-session distinguishes two failures* below |
 | [`api/contact/route.ts`](./api/contact/route.ts) | POST | Contact form submission |
 | `api/markdown/route.ts` | GET | Renders the Markdown twin of a page via [`buildMarkdownPage.ts`](../infrastructure/markdown/buildMarkdownPage.ts). Only reached through the middleware rewrite, and now only *drivable* through it — the pathname comes from the `x-markdown-path` header, never the query string |
 | [`api/health/route.ts`](./api/health/route.ts) | GET | Liveness probe. Answers `status` and `timestamp` and nothing else |
@@ -243,6 +253,50 @@ Shared conventions across them:
   the double unused and every case green — a test made vacuous by its fixture rather than its assertion. The
   mock is gone and all five branches assert `no-store`; verified by returning a bare `NextResponse.json` from
   the no-token branch and watching that one case, and only that one, go red.
+
+## The GET half of check-session distinguishes two failures
+
+`api/check-session`'s `GET` answers 200 with `{ premiumKey: null, email: null }` on a `SessionError` rather
+than a status, because an expired token is a normal state and not a failure. That is true of *one* of the
+conditions `verifySession` can hit. It was one branch for four: an expired token, a bad signature, a rotated
+`JWT_SECRET` and an **absent** `JWT_SECRET`, the last because `getJWTSecret()` throws synchronously inside
+the `Effect.tryPromise` thunk and Effect routes a sync throw through the same `catch`. So a variable dropped
+from the environment logged every live session holder out, **deleted their cookie on the way**, and emitted
+nothing. It is the same silence the *Failure used to be silent to the operator* paragraph below records for
+`api/payment/activate`, and both WRITE transports were routed through `activatePremiumRequest` to fix it. The
+READ transport was not, and it is the one that destroys the credential.
+
+The split is made at the source rather than in the route.
+[`session.ts`](../infrastructure/services/premium/session.ts) throws `MissingJWTSecret` out of
+`getJWTSecret`, and [`sessionErrors.ts`](../infrastructure/services/premium/sessionErrors.ts) beside it owns
+the whole vocabulary: that sentinel, `SessionConfigurationError`, `isSessionConfigurationError` and the
+`wrapSessionError` both `Effect.tryPromise` blocks hand to `catch`. `SessionConfigurationError` is a subclass
+of `SessionError` adding no members, the same shape
+[`serverService.ts`](../infrastructure/clients/payments/stripe/serverService.ts) uses for
+`WebhookConfigurationError`, and for the same reason: the `_tag` is unchanged, so every caller's error
+channel, `TaggedFailure` and `describeFailure` are untouched, and `isSessionConfigurationError` narrows where
+the difference matters. It sits in its own file because the classification is what the route reads, and
+importing it should not pull `jose` and the signing path in behind it. Two policies follow from it:
+
+- **did not verify**: the token is expired, malformed or signed by something else. Clear the cookie, stay
+  silent, answer 200. Normal.
+- **could not verify**: `JWT_SECRET` is absent, so nothing about the token was established either way.
+  **Keep the cookie** and log at error. Keeping it is the point: the moment the variable comes back the
+  session works again, and the operator gets a line instead of a support ticket.
+
+This changes nothing about what the cookie gates.
+[ADR 0007](../../../../adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md) is about the threat
+model, not observability.
+
+**A rotated secret lands in the silent branch and cannot be lifted out of it.** Rotation makes every live
+token fail the MAC, which is byte-for-byte the failure a forged token produces, so no per-token evidence
+separates them. And `GET` carries no rate limiter, so logging signature failures at error would hand an
+anonymous caller the log budget. The configuration branch catches the absent variable, which is the half that
+is decidable. Do not "complete" the split by promoting a signature failure to `SessionConfigurationError`.
+
+**The `GET` now provides `ApplicationLayer`**, which it did not before, because the log line goes through the
+`LoggerService` tag like every other route's. All four Live layers are `Layer.sync` and read no environment
+at construction, so providing them costs a closure each.
 
 ## The redirect hand-off
 

@@ -3,7 +3,7 @@ import { addDays, differenceInDays, isWeekend, startOfToday } from "@application
 import { Temporal } from "temporal-polyfill";
 import { PTO_CONSTANTS } from "../const";
 import type { Bridge } from "../types";
-import { createHolidaySet, getCombinationKey, getKey } from "./cache";
+import { createHolidaySet, getKey } from "./cache";
 
 interface AnalyzePotentialBridgesParams {
 	ptoDays: Date[];
@@ -93,21 +93,6 @@ export const compareByEfficiency = ({ a, b }: CompareByEfficiencyParams) => {
 	return b.effectiveDays - a.effectiveDays;
 };
 
-function deduplicateBridges(bridges: Bridge[]) {
-	const seen = new Map<string, Bridge>();
-
-	for (const bridge of bridges) {
-		const key = getCombinationKey(bridge.ptoDays);
-		const existing = seen.get(key);
-
-		if (!existing || bridge.efficiency > existing.efficiency) {
-			seen.set(key, bridge);
-		}
-	}
-
-	return Array.from(seen.values());
-}
-
 interface GetAvailableWorkdaysParams {
 	months: Date[];
 	holidays: HolidayDTO[];
@@ -189,5 +174,5 @@ export const findBridges = ({ availableWorkdays, holidays }: FindBridgesParams) 
 		}
 	}
 
-	return deduplicateBridges(bridges).sort((a, b) => compareByEfficiency({ a, b }));
+	return bridges.sort((a, b) => compareByEfficiency({ a, b }));
 };

@@ -132,7 +132,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 	}, [open]);
 
 	const variantHolidays = useMemo(
-		() => holidays.filter((holiday) => holiday.variant === variant && holiday.isInSelectedRange),
+		() => holidays.filter((holiday) => holiday.variant === variant && holiday.isInPlanningWindow),
 		[variant, holidays],
 	);
 

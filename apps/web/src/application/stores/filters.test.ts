@@ -1,6 +1,7 @@
 import { FilterStrategy } from "@domain/calendar/types";
+import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { MAX_CARRY_OVER_MONTHS, MAX_PTO_DAYS, MIN_CARRY_OVER_MONTHS, MIN_PTO_DAYS, useFiltersStore } from "./filters";
+import { MAX_PTO_DAYS, MIN_CARRY_OVER_MONTHS, MIN_PTO_DAYS, useFiltersStore } from "./filters";
 
 const { mockLogError, mockWarn } = vi.hoisted(() => ({ mockLogError: vi.fn(), mockWarn: vi.fn() }));
 

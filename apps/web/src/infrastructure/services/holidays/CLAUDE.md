@@ -87,11 +87,20 @@ through a dynamic `import()`. Holiday data ships in the client bundle and is com
 
 ## Invariants
 
-**Two years are always fetched, and 12 is the number that makes that safe.** The adapter asks
-for `year` and `year + 1` regardless of `carryOverMonths`; `holidayDTO.create` then drops anything past the
-end of `year + 1` and flags only the Planning Window as `isInSelectedRange`. The Carry-over Months slider
-is capped at 12 in [`CarryOverMonths.tsx`](../../../ui/modules/sidebar/components/CarryOverMonths.tsx), so the widest possible window ends exactly at the last day
-fetched. Raise that cap and the extra months arrive empty, with no error anywhere.
+**Two years are always fetched, and `MAX_CARRY_OVER_MONTHS` is the number that makes that safe.** The adapter
+asks for `year` and `year + 1` regardless of `carryOverMonths`; `holidayDTO.create` then drops anything past
+the end of the widest window that bound allows, and flags only the actual Planning Window as
+`isInPlanningWindow`. That bound lives in
+[`../../../domain/calendar/window.ts`](../../../domain/calendar/window.ts) now, and both the slider's clamp
+and the mapper's keep window derive from it, so the widest possible window ends exactly at the last day
+fetched.
+
+It used to be a literal 12 in the filters store next to a literal `year + 1` in the mapper, with nothing
+relating either to this adapter. Raising the clamp alone made the extra months arrive empty, with no error
+anywhere and every Bridge there scored against a blank calendar.
+[`window.test.ts`](../../../domain/calendar/window.test.ts) pins that the widest window still ends inside
+`year + 1`. **`forYears` here is the third statement of the same fact and is still a literal**, so raising
+`MAX_CARRY_OVER_MONTHS` past 12 means widening this adapter too.
 
 **Only `public` and `bank` entries survive.** `date-holidays` classifies every entry it emits with a `type` —
 `public`, `bank`, `school`, `optional` or `observance` — and the adapter keeps the first two and

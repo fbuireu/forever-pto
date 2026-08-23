@@ -21,7 +21,7 @@ const {
 	},
 	mockHolidaysState: {
 		holidays: [
-			{ id: "h1", date: new Date(2026, 0, 1), name: "New Year", variant: "national", isInSelectedRange: true },
+			{ id: "h1", date: new Date(2026, 0, 1), name: "New Year", variant: "national", isInPlanningWindow: true },
 		],
 		alternatives: [],
 		suggestion: null,
@@ -81,7 +81,7 @@ beforeEach(() => {
 	mockFiltersState.year = 2026;
 	mockFiltersState.carryOverMonths = 0;
 	mockHolidaysState.holidays = [
-		{ id: "h1", date: new Date(2026, 0, 1), name: "New Year", variant: "national", isInSelectedRange: true },
+		{ id: "h1", date: new Date(2026, 0, 1), name: "New Year", variant: "national", isInPlanningWindow: true },
 	] as never;
 	mockHolidaysState.suggestion = null;
 	(mockHolidaysState as { planRevision?: number }).planRevision = 0;

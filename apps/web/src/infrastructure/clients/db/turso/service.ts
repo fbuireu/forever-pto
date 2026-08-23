@@ -1,5 +1,5 @@
 import { DatabaseError } from "@infrastructure/errors";
-import { connect } from "@tursodatabase/serverless";
+import { type Connection, connect } from "@tursodatabase/serverless";
 import type { InValue } from "@tursodatabase/serverless/compat";
 import { Context, Effect, Layer } from "effect";
 
@@ -23,6 +23,16 @@ export const TursoServiceLive = Layer.sync(TursoService, () => {
 		return connect({ url, authToken });
 	};
 
+	const withConnection = async <T>(use: (connection: Connection) => Promise<T>): Promise<T> => {
+		const connection = createConnection();
+
+		try {
+			return await use(connection);
+		} finally {
+			await connection.close();
+		}
+	};
+
 	const wrapError = (error: unknown): DatabaseError =>
 		new DatabaseError({
 			message: error instanceof Error ? error.message : String(error),
@@ -32,23 +42,17 @@ export const TursoServiceLive = Layer.sync(TursoService, () => {
 	return {
 		query: <T = unknown>(sql: string, args?: InValue[]): Effect.Effect<T[], DatabaseError> =>
 			Effect.tryPromise({
-				try: async () => {
-					const conn = createConnection();
-					const stmt = await conn.prepare(sql);
-					const rows = await stmt.all(args ?? []);
-					return rows as T[];
-				},
+				try: () => withConnection(async (connection) => (await connection.all(sql, args ?? [])) as T[]),
 				catch: wrapError,
 			}),
 
 		execute: (sql: string, args?: InValue[]): Effect.Effect<number, DatabaseError> =>
 			Effect.tryPromise({
-				try: async () => {
-					const conn = createConnection();
-					const stmt = await conn.prepare(sql);
-					const result = await stmt.run(args ?? []);
-					return result.rowsAffected;
-				},
+				try: () =>
+					withConnection(async (connection) => {
+						const { changes } = await connection.run(sql, args ?? []);
+						return Number(changes ?? 0);
+					}),
 				catch: wrapError,
 			}),
 	};

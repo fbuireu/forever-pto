@@ -7,7 +7,7 @@ const holiday = (date: Date): HolidayDTO => ({
 	date,
 	name: "Holiday",
 	variant: HolidayVariant.NATIONAL,
-	isInSelectedRange: true,
+	isInPlanningWindow: true,
 });
 
 describe("dayOffKeys", () => {

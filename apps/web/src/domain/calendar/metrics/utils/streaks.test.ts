@@ -9,7 +9,7 @@ const holiday = (day: number): HolidayDTO => ({
 	date: JAN(day),
 	name: `Holiday ${day}`,
 	variant: HolidayVariant.NATIONAL,
-	isInSelectedRange: true,
+	isInPlanningWindow: true,
 });
 
 describe("freeStreaks", () => {

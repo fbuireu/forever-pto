@@ -10,7 +10,7 @@ const holiday = (id: string, date: Date): HolidayDTO => ({
 	date,
 	name: id,
 	variant: HolidayVariant.NATIONAL,
-	isInSelectedRange: true,
+	isInPlanningWindow: true,
 });
 
 const baseInput = {
@@ -57,7 +57,7 @@ describe("runPlanningPipeline", () => {
 			date: manual,
 			name: "Manual day",
 			variant: HolidayVariant.CUSTOM,
-			isInSelectedRange: true,
+			isInPlanningWindow: true,
 		});
 		expect(args?.removedDays).toEqual([removed]);
 		expect(args?.holidays.some(({ date }) => date.getTime() === removed.getTime())).toBe(false);
@@ -147,20 +147,36 @@ describe("runPlanningPipeline", () => {
 			expect(suggestion.metrics.monthlyDist.every((count) => count === 0)).toBe(true);
 		});
 
-		it("refuses to plan when there is nothing free to bridge", () => {
-			expect(runPlanningPipeline({ ...baseInput, holidays: [] }).planned).toBe(false);
+		it("plans a calendar with no Holidays at all, because a weekend is a Free Day a Bridge can lean on", () => {
+			const result = runPlanningPipeline({ ...baseInput, holidays: [] });
+
+			expect(result.planned).toBe(true);
+			expect(result.suggestion.days.length).toBeGreaterThan(0);
 		});
 
-		it("refuses to plan when the only blocked dates are Removed Days, which never become Holidays", () => {
+		it("refuses to plan when no Workday survives, so there is no candidate to spend the budget on", () => {
 			const result = runPlanningPipeline({
 				...baseInput,
-				holidays: [],
-				removedSuggestedDays: [new Date(YEAR, 3, 20)],
+				window: { year: 2000, carryOverMonths: 0 },
+				allowPastDays: false,
 			});
 
 			expect(result.planned).toBe(false);
 			expect(result.suggestion.days).toEqual([]);
 			expect(result.alternatives).toEqual([]);
+		});
+
+		it("plans without Holidays and still never places a Removed Day, which is not a Free Day either", () => {
+			const removed = new Date(YEAR, 3, 18);
+
+			const result = runPlanningPipeline({
+				...baseInput,
+				holidays: [],
+				removedSuggestedDays: [removed],
+			});
+
+			expect(result.planned).toBe(true);
+			expect(result.suggestion.days.some((day) => day.getTime() === removed.getTime())).toBe(false);
 		});
 
 		it("refuses to plan when the Manual Days have consumed the whole budget", () => {

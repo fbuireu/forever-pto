@@ -28,8 +28,12 @@ parameters written out explicitly rather than inferred. That signature is the co
   type error instead of a silent 500 ([ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md)).
 - Success values are plain objects. Nothing here builds a `NextResponse`.
 
-Failures the flow is expected to survive are absorbed in place rather than widening `E`: a repository read
-that only guards an idempotency check is `Effect.catchAll`-ed to `undefined`.
+Failures the flow is expected to survive are absorbed in place rather than widening `E`: a deferred write
+that no longer has a response to fail, a charge lookup that only adds reporting detail. **A database failure
+on the critical path is not one of them.** `handlePaymentSucceeded` absorbed its read to `undefined` and read
+that as "no such row", which turned an unreachable Turso into a 200 Stripe never redelivered; see
+[`../../domain/payment/CLAUDE.md`](../../domain/payment/CLAUDE.md). Absorb a failure only where the answer
+you substitute is one the flow could genuinely have got.
 
 Logging comes in three shapes here and the choice is about *when* the line runs, never about safety. A log
 attached to a failure sits in `Effect.sync` inside `tapError` (`webhook.ts`, `payment.ts`) or inside
@@ -86,17 +90,20 @@ minting the same 30-day session token via `createSession` in [`session.ts`](../.
 
 The two paths are deliberately asymmetric, and this is the trap:
 
-- `activateWithPayment` (straight after a Donation) **verifies**. It retrieves the payment intent from
-  Stripe, rejects anything not `succeeded`, and takes the payer's address from `metadata.email` or
-  `receipt_email`. An intent carrying neither was not created by the Donation flow and cannot prove the
-  caller owns it, so it is refused rather than trusted. Its two optional parameters each add a check and
-  neither weakens the flow when absent: `expectedEmail` must match the intent's address, and `clientSecret`
-  must match the intent's own — the callers differ because they can prove different things. `POST
-  /api/check-session` holds an email the browser typed and passes `expectedEmail`; `GET
-  /api/payment/activate` holds the secret Stripe appended to the `return_url` and passes `clientSecret`,
-  which is the stronger of the two since only someone who completed the payment has it. Deriving the email
-  from the intent is what lets the redirect path activate at all — the payer may come back in a browser
-  that never held their address.
+- `activateWithPayment` and `activateWithClaimedPayment` (straight after a Donation) **verify**. Both are
+  thin entry points over one private `activateFromDonation`, which retrieves the payment intent from Stripe,
+  rejects anything not `succeeded`, and takes the payer's address from `metadata.email` or `receipt_email`.
+  An intent carrying neither was not created by the Donation flow and cannot prove the caller owns it, so it
+  is refused rather than trusted. **The extra check each entry point adds is a required parameter of that
+  entry point, not an optional one on a shared function**: `activateWithPayment({ paymentIntentId,
+  clientSecret })` for `GET /api/payment/activate`, which holds the secret Stripe appended to the
+  `return_url`; `activateWithClaimedPayment({ paymentIntentId, expectedEmail })` for `POST
+  /api/check-session`, which holds an email the browser typed. The secret is the stronger of the two, since
+  only someone who completed the payment has it. It was one function with both fields optional and a body
+  reading `if (clientSecret && …)`, so omitting the field skipped the guard. No caller did, but nothing said
+  they could not, and half the tests called it with no guard at all. Deriving the email from the intent is
+  what lets the redirect path activate at all, since the payer may come back in a browser that never held
+  their address. See [`../../app/CLAUDE.md`](../../app/CLAUDE.md).
 - `activateWithEmail` (the "I already donated" recovery path) **does not verify**. It looks up a succeeded
   payment by email and grants access. That is accepted, not overlooked — do not "fix" it in passing.
 

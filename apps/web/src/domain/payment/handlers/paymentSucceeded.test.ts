@@ -57,7 +57,7 @@ const EVENT: PaymentSucceededEvent = {
 beforeEach(() => vi.clearAllMocks());
 
 describe("handlePaymentSucceeded", () => {
-	it("resolves without error when payment exists", async () => {
+	it("resolves without error", async () => {
 		await expect(run(handlePaymentSucceeded(EVENT))).resolves.toBeUndefined();
 	});
 
@@ -67,9 +67,15 @@ describe("handlePaymentSucceeded", () => {
 		expect(updatePaymentStatus).toHaveBeenCalledWith({ paymentIntentId: "pi_test", status: "succeeded" });
 	});
 
-	it("still calls updatePaymentStatus for an already-succeeded row — the WHERE clause is the guard", async () => {
-		const { getPaymentById, updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
-		vi.mocked(getPaymentById).mockReturnValueOnce(Effect.succeed({ id: "pi_test", status: "succeeded" } as never));
+	it("never reads the row first, so an unreadable database cannot look like an absent payment", async () => {
+		const { getPaymentById } = await import("@infrastructure/services/payments/repository");
+		await run(handlePaymentSucceeded(EVENT));
+		expect(getPaymentById).not.toHaveBeenCalled();
+	});
+
+	it("calls updatePaymentStatus exactly once, whatever the row holds — the WHERE clause is the guard", async () => {
+		const { updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
+		vi.mocked(updatePaymentStatus).mockReturnValueOnce(Effect.succeed(false));
 		await run(handlePaymentSucceeded(EVENT));
 		expect(updatePaymentStatus).toHaveBeenCalledExactlyOnceWith({ paymentIntentId: "pi_test", status: "succeeded" });
 	});
@@ -88,14 +94,32 @@ describe("handlePaymentSucceeded", () => {
 		expect(retrieveCharge).not.toHaveBeenCalled();
 	});
 
-	it("logs warning and resolves when payment is not found", async () => {
-		const { getPaymentById } = await import("@infrastructure/services/payments/repository");
-		vi.mocked(getPaymentById).mockReturnValueOnce(Effect.succeed(undefined as never));
+	it("warns and resolves when the write touched no row", async () => {
+		const { updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
+		vi.mocked(updatePaymentStatus).mockReturnValueOnce(Effect.succeed(false));
 		await expect(run(handlePaymentSucceeded(EVENT))).resolves.toBeUndefined();
 		expect(mockLogger.warn).toHaveBeenCalledWith(
-			"Payment not found after creation attempt",
+			"Succeeded-payment event wrote no status: the payment is absent or already succeeded",
 			expect.objectContaining({ paymentId: "pi_test" }),
 		);
+	});
+
+	it("does not warn when the write touched a row", async () => {
+		await run(handlePaymentSucceeded(EVENT));
+		expect(mockLogger.warn).not.toHaveBeenCalled();
+	});
+
+	it("still enriches the charge when the write touched no row, so a redelivery can repair it", async () => {
+		const { updatePaymentStatus, updatePaymentCharge } = await import("@infrastructure/services/payments/repository");
+		vi.mocked(updatePaymentStatus).mockReturnValueOnce(Effect.succeed(false));
+		await run(handlePaymentSucceeded(EVENT));
+		expect(updatePaymentCharge).toHaveBeenCalledOnce();
+	});
+
+	it("fails with the DatabaseError when the status write cannot be made, so the webhook answers 500", async () => {
+		const { updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
+		vi.mocked(updatePaymentStatus).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "turso down" })));
+		await expect(run(handlePaymentSucceeded(EVENT))).rejects.toThrow("turso down");
 	});
 
 	it("resolves even when retrieveCharge fails", async () => {

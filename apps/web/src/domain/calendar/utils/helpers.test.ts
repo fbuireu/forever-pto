@@ -11,7 +11,7 @@ const makeHoliday = (date: Date) => ({
 	date,
 	name: "Test Holiday",
 	variant: HolidayVariant.NATIONAL,
-	isInSelectedRange: true,
+	isInPlanningWindow: true,
 });
 
 describe("getAvailableWorkdays", () => {
@@ -152,7 +152,7 @@ describe("findBridges", () => {
 		expect(bridge?.effectiveDays).toBe(4);
 	});
 
-	it("deduplicates bridges with identical PTO day sets", () => {
+	it("emits each PTO-day set once, so no dedupe pass is needed to keep them distinct", () => {
 		const workdays = getAvailableWorkdays({ months: [makeDate(2025, 1, 1)], holidays: [], allowPastDays: true });
 		const bridges = findBridges({ availableWorkdays: workdays, holidays: [] });
 		const keys = bridges.map((b) =>
@@ -162,6 +162,10 @@ describe("findBridges", () => {
 				.join(","),
 		);
 		expect(keys.length).toBe(new Set(keys).size);
+	});
+
+	it("owes that to MIN_MULTI_DAY_SIZE staying above one, which is what stops the size loop re-emitting the single-day candidate", () => {
+		expect(PTO_CONSTANTS.BRIDGE_SEARCH.MIN_MULTI_DAY_SIZE).toBeGreaterThan(1);
 	});
 
 	it("places higher-efficiency bridges before lower-efficiency ones", () => {

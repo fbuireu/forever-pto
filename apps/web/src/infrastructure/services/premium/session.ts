@@ -1,12 +1,13 @@
 import type { PremiumSessionData } from "@application/dto/premium/types";
-import { SessionError } from "@infrastructure/errors";
+import type { SessionError } from "@infrastructure/errors";
 import { Effect } from "effect";
 import { jwtVerify, SignJWT } from "jose";
 import { PREMIUM_SESSION_LIFETIME_SECONDS } from "./cookie";
+import { MissingJWTSecret, wrapSessionError } from "./sessionErrors";
 
 const getJWTSecret = () => {
 	const secret = process.env.JWT_SECRET;
-	if (!secret) throw new Error("JWT_SECRET environment variable is not set");
+	if (!secret) throw new MissingJWTSecret("JWT_SECRET environment variable is not set");
 	return new TextEncoder().encode(secret);
 };
 
@@ -18,11 +19,7 @@ export const createSession = (data: PremiumSessionData): Effect.Effect<string, S
 				.setIssuedAt()
 				.setExpirationTime(Math.floor(Date.now() / 1000) + PREMIUM_SESSION_LIFETIME_SECONDS)
 				.sign(getJWTSecret()),
-		catch: (error) =>
-			new SessionError({
-				message: error instanceof Error ? error.message : String(error),
-				cause: error,
-			}),
+		catch: wrapSessionError,
 	});
 
 export const verifySession = (token: string): Effect.Effect<{ email: string; paymentIntentId: string }, SessionError> =>
@@ -34,9 +31,5 @@ export const verifySession = (token: string): Effect.Effect<{ email: string; pay
 				paymentIntentId: payload.paymentIntentId as string,
 			};
 		},
-		catch: (error) =>
-			new SessionError({
-				message: error instanceof Error ? error.message : String(error),
-				cause: error,
-			}),
+		catch: wrapSessionError,
 	});

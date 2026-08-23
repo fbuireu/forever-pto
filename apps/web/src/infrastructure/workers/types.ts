@@ -29,7 +29,7 @@ export interface SerializedHolidayDTO {
 	type?: string;
 	location?: string;
 	variant: string;
-	isInSelectedRange: boolean;
+	isInPlanningWindow: boolean;
 }
 
 export interface SerializedBridge {

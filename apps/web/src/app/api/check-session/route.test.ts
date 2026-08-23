@@ -2,8 +2,9 @@ import { ApiError } from "@infrastructure/api/errors";
 import { INVALID_BODY } from "@infrastructure/api/parseJsonBody";
 import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import { SessionError, ValidationError } from "@infrastructure/errors";
+import { SessionConfigurationError } from "@infrastructure/services/premium/sessionErrors";
 import { Effect, Layer } from "effect";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockVerifySession = vi.hoisted(() =>
 	vi.fn<(token: string) => Effect.Effect<{ email: string; paymentIntentId: string }, SessionError>>(),
@@ -24,6 +25,7 @@ const mockActivateWithClaimedPayment = vi.hoisted(() =>
 	>(),
 );
 const mockClearPremiumCookie = vi.hoisted(() => vi.fn());
+const mockLogError = vi.hoisted(() => vi.fn());
 const mockSetPremiumCookie = vi.hoisted(() => vi.fn());
 const mockCookiesGet = vi.hoisted(() => vi.fn());
 
@@ -52,7 +54,7 @@ vi.mock("@infrastructure/layers", () => ({
 		info: vi.fn(),
 		warn: vi.fn(),
 		error: vi.fn(),
-		logError: vi.fn(),
+		logError: mockLogError,
 	}),
 }));
 
@@ -62,6 +64,8 @@ vi.mock("next/server", async (importOriginal) => {
 });
 
 const { GET, POST } = await import("./route");
+
+beforeEach(() => vi.clearAllMocks());
 
 function makeRequest(body: unknown): Request {
 	return new Request("http://localhost/api/check-session", {
@@ -104,6 +108,26 @@ describe("GET /api/check-session", () => {
 		const body = await response.json();
 		expect(body).toEqual({ premiumKey: null, email: null });
 		expect(mockClearPremiumCookie).toHaveBeenCalled();
+		expect(response.headers.get("Cache-Control")).toBe("no-store");
+	});
+
+	it("stays silent when the token itself did not verify", async () => {
+		mockCookiesGet.mockReturnValue({ value: "bad-token" });
+		mockVerifySession.mockReturnValue(Effect.fail(new SessionError({ message: "invalid" })));
+		await GET(new Request("http://localhost/api/check-session") as never);
+		expect(mockLogError).not.toHaveBeenCalled();
+	});
+
+	it("keeps the cookie and logs when the session could not be verified at all", async () => {
+		mockCookiesGet.mockReturnValue({ value: "good-token" });
+		mockVerifySession.mockReturnValue(
+			Effect.fail(new SessionConfigurationError({ message: "JWT_SECRET environment variable is not set" })),
+		);
+		const response = await GET(new Request("http://localhost/api/check-session") as never);
+		const body = await response.json();
+		expect(body).toEqual({ premiumKey: null, email: null });
+		expect(mockClearPremiumCookie).not.toHaveBeenCalled();
+		expect(mockLogError).toHaveBeenCalledOnce();
 		expect(response.headers.get("Cache-Control")).toBe("no-store");
 	});
 });

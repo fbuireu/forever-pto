@@ -127,25 +127,35 @@ read never guarded anything: `TursoService` opens a connection per call, so a re
 could have both reads see `processing`. See
 [`../../infrastructure/services/payments/CLAUDE.md`](../../infrastructure/services/payments/CLAUDE.md).
 
-`handlePaymentSucceeded` still reads, and the read now earns its keep for one branch only: 0 rows affected
-cannot distinguish "already succeeded" from "no such row", and a missing row has to warn and skip the charge
-enrichment. Once the row is known present the handler calls `updatePaymentStatus` unconditionally and lets
-the `WHERE` clause decide. It used to guard that call with `existing.status !== PAYMENT_SUCCEEDED` as well,
-which put the same rule in two places — a predicate in TypeScript over a row read on a different connection,
-and the `AND status != 'succeeded'` that actually holds. Only the SQL can be right about a redelivery racing
-the original, so only the SQL states it. `paymentSucceeded.test.ts` pins that an already-succeeded row is
-still passed to `updatePaymentStatus`; that case goes red the moment the `if` comes back.
+**Neither handler reads before it writes, and `handlePaymentSucceeded` was the last one that did.** It ran
+`getPaymentById` absorbed to `undefined` and returned early on a falsy answer. The only reachable way that
+answer was falsy was the read itself failing, because `processWebhookEvent` runs `savePayment`, an
+`INSERT OR IGNORE`, immediately before calling in, so the row exists by then. So an unreachable database
+looked exactly like a payment that was never created: the handler warned, returned, `processWebhookEvent`
+completed with no error, the route answered 200 and Stripe never redelivered. The row kept whatever status
+the insert wrote, `getSucceededPaymentByEmail` filters `AND status = 'succeeded'`, and by
+[ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md) that row *is* the entitlement, so that
+donor's recovery path was dead for good, with one warning line to show for it.
+
+`updatePaymentStatus` answers the same question in one fewer round trip and cannot lie about it. Its `WHERE`
+is `id = ? AND status != 'succeeded'` and it returns whether it wrote, so `false` means "absent or already
+succeeded" and a `DatabaseError` propagates as "we could not tell". Both handlers branch on that one boolean
+now; they used to disagree, `handlePaymentFailed` reading it and `handlePaymentSucceeded` discarding it.
+The two branches are no longer distinguished and do not need to be. `updatePaymentCharge`'s own
+`WHERE id = ?` touches nothing when the row is absent, and a redelivery landing on an already-succeeded row
+is exactly when charge enrichment is worth retrying. `paymentSucceeded.test.ts` pins that `getPaymentById`
+is never called; that case goes red the moment the read comes back.
 
 **A Donation with no email is dropped, loudly, by the caller.** `processWebhookEvent` catches
 `MissingDonorEmailError`, logs it through `logger.logError` and returns without touching the payments table,
 so Stripe gets its 2xx. That is deliberate: the condition is permanent, and a 500 would have Stripe redeliver
 an event that can never succeed. The log line is the only signal, which is why it is at error level.
 
-**A missing payment row is not this folder's problem.** `handlePaymentSucceeded` logs a warning and returns
-when `getPaymentById` finds nothing. Creating the row from the webhook happens *before* the handler is
-called, in `webhook.ts`, because it needs `paymentDataDTO` from the application layer and the raw
-`PaymentIntent` the handler no longer has. Do not move that fallback in here to make the handler
-self-sufficient.
+**A missing payment row is not this folder's problem.** Creating the row from the webhook happens *before*
+either handler is called, in `webhook.ts`, because it needs `paymentDataDTO` from the application layer and
+the raw `PaymentIntent` the handlers no longer have. Do not move that fallback in here to make a handler
+self-sufficient, and do not add a read to tell a missing row from an already-succeeded one: the write already
+reports that it touched nothing, and a read cannot report why.
 
 **Charge enrichment must never fail the webhook.** `updateCharge` fetches the charge from Stripe and writes
 receipt URL, card brand, fees and address onto the row. It is typed `Effect<void, never, …>` and ends in
@@ -156,18 +166,19 @@ the payment record. It also returns `Effect.void` immediately when `latestCharge
 surfaces as `DatabaseError`, the route answers 500, and Stripe redelivers. Swallowing it drops the event
 permanently and the user keeps their Donation without Premium.
 
-**Reads that only guard an idempotency check are absorbed.** Both handlers wrap `getPaymentById` in
-`Effect.catchAll(() => Effect.succeed(undefined))`, so an unreadable row is treated as an absent one. That
-is the reason a read failure and a genuinely missing payment are indistinguishable in the logs.
+**Nothing in here absorbs a database failure any more.** There is no `Effect.catchAll` over a repository
+call in either handler, and adding one back re-creates the defect above: an absorbed read failure is
+indistinguishable from a row that is not there, and the difference decides whether Stripe redelivers.
+`updateCharge` is the single exception and is not a repository guard — see *Charge enrichment* below.
 
 **Error-path logs go in `Effect.sync` inside `tapError`; the two guard-path logs do not.** The wrapper is
 about *when* the line runs, not about safety: `tapError` fires only on the failure it is attached to, and each
 one must sit on the step it names — in `updateCharge` the retrieval log is piped directly onto
 `retrieveCharge`, before the `Effect.flatMap`, because on the composed pipeline it would also fire for a
 failed write and log it a second time as a retrieval failure that never happened. The two early-return
-warnings (`handlePaymentSucceeded` on a missing row, `handlePaymentFailed` on an already-succeeded one) are
+warnings (both handlers, on a write that touched no row) are
 bare statements in the generator body, because there is no failure to tap: the condition is a successful
-read. That is safe only because `BetterStackClient` cannot throw — see
+write that touched no row. That is safe only because `BetterStackClient` cannot throw — see
 [`../../infrastructure/clients/CLAUDE.md`](../../infrastructure/clients/CLAUDE.md). `Effect.sync` would not
 buy safety anyway; a throw inside it is a defect just the same.
 
@@ -206,3 +217,5 @@ disagrees with its subject's return type cannot falsify anything the subject doe
 `getPaymentById` is never reached, and then carried two cases below it setting up `mockReturnValueOnce` on
 that same function — a no-op, leaving both byte-identical in effect to the plain "calls updatePaymentStatus"
 case above. They are deleted; the never-called assertion is the one that means something.
+`paymentSucceeded.test.ts` carries the same assertion for the same reason, and its `getPaymentById` entry in
+the `vi.mock` factory exists only so that assertion has something to be about.

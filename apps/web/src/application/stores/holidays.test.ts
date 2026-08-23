@@ -37,17 +37,14 @@ vi.mock("./location", () => ({
 	useLocationStore: { getState: vi.fn().mockReturnValue({ regions: [] }) },
 }));
 
-vi.mock("@application/dto/holiday/dto", async (importOriginal) => ({
-	isInPlanningWindow: (await importOriginal<typeof import("@application/dto/holiday/dto")>()).isInPlanningWindow,
-	planningWindowInterval: (await importOriginal<typeof import("@application/dto/holiday/dto")>())
-		.planningWindowInterval,
+vi.mock("@application/dto/holiday/dto", () => ({
 	holidayDTO: {
 		createCustom: vi.fn(({ name, date }: { name: string; date: Date }) => ({
 			id: `custom-${date.toISOString()}`,
 			name,
 			date,
 			variant: HolidayVariant.CUSTOM,
-			isInSelectedRange: true,
+			isInPlanningWindow: true,
 		})),
 	},
 }));
@@ -61,7 +58,7 @@ const makeHoliday = (id: string, dateStr: string, variant: HolidayVariant = Holi
 	date: new Date(dateStr),
 	name: `Holiday ${id}`,
 	variant,
-	isInSelectedRange: true,
+	isInPlanningWindow: true,
 });
 
 const makeBridge = (start: Date, end: Date, ptoDays: Date[]) => ({
@@ -752,7 +749,7 @@ describe("resetToDefaults", () => {
 describe("fetchHolidays", () => {
 	const FETCH_PARAMS = { year: 2026, country: "ES", region: "", carryOverMonths: 1, locale: "en" as const };
 
-	it("recomputes isInSelectedRange on carried-over Custom Holidays, since only flagged ones can anchor a Bridge", async () => {
+	it("recomputes isInPlanningWindow on carried-over Custom Holidays, since only flagged ones can anchor a Bridge", async () => {
 		const custom = makeHoliday("custom-1", "2026-06-15", HolidayVariant.CUSTOM);
 		useHolidaysStore.setState({ holidays: [custom] });
 		mockGetHolidays.mockResolvedValueOnce([]);
@@ -760,13 +757,13 @@ describe("fetchHolidays", () => {
 		await useHolidaysStore.getState().fetchHolidays({ ...FETCH_PARAMS, year: 2027 });
 
 		const carried = useHolidaysStore.getState().holidays.find((h) => h.id === "custom-1");
-		expect(carried?.isInSelectedRange).toBe(false);
+		expect(carried?.isInPlanningWindow).toBe(false);
 	});
 
 	it("flags a Custom Holiday the window has moved back onto", async () => {
 		const custom: HolidayDTO = {
 			...makeHoliday("custom-1", "2026-06-15", HolidayVariant.CUSTOM),
-			isInSelectedRange: false,
+			isInPlanningWindow: false,
 		};
 		useHolidaysStore.setState({ holidays: [custom] });
 		mockGetHolidays.mockResolvedValueOnce([]);
@@ -774,7 +771,7 @@ describe("fetchHolidays", () => {
 		await useHolidaysStore.getState().fetchHolidays(FETCH_PARAMS);
 
 		const carried = useHolidaysStore.getState().holidays.find((h) => h.id === "custom-1");
-		expect(carried?.isInSelectedRange).toBe(true);
+		expect(carried?.isInPlanningWindow).toBe(true);
 	});
 
 	it("sets fetched holidays sorted by date", async () => {

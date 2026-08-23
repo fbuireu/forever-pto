@@ -145,6 +145,28 @@ one, so every tooltip depends on a provider some ancestor happened to mint. All 
 `delayDuration={200}` by hand; the default carries it now and the call sites say nothing. Passing a delay
 still overrides it, which is what `Tooltip.test.tsx` pins.
 
+**`SidebarProvider` is mounted exactly once in the app, and `Sidebar.test.tsx` reaches outside `core/` to
+prove it.** The provider is the only context in this folder that the product mounts by hand, and a second one
+nested inside the first is invisible: `useSidebar` resolves to the nearest, so every consumer inside the inner
+provider agrees with every other and the outer one's state simply goes dead. The test walks every `.tsx` under
+`src/` and asserts one mount site, `app/[locale]/(app)/planner/layout.tsx`. It is the one test here that reads
+the rest of the app; that is deliberate, because the defect it catches cannot be seen from inside this folder.
+
+**`animate/base/Sidebar.tsx` writes nothing to `document.body`, and it used to.** Its mobile branch wrapped
+the drawer in `<AnimatePresence onExitComplete={() => { document.body.style.pointerEvents = ''; }}>`, which
+is a counter-hack: `vaul` sets `document.body.style.pointerEvents = 'auto'` on a `requestAnimationFrame`
+whenever a `Drawer` is mounted with `modal={false}`, and `pages/planner/ManagementBar.tsx` keeps one mounted
+for the life of the planner screen on mobile. Two modules were writing the same global from opposite
+directions with no ordering between them, and the sidebar's half only ran when an exit animation *completed*
+— a route change or an unmount mid-spring skipped it.
+
+The reset went rather than becoming an unmount cleanup, because there was nothing to reset. This module never
+applies a body-level pointer lock: the mobile drawer is `aria-modal='false'` on purpose and its backdrop is a
+real `fixed inset-0 z-51` element with its own `onClick`, so it blocks by itself. Nothing else in `apps/web`
+writes body pointer events, and `vaul`'s value is `auto`, which is the initial value — permanent, benign, and
+not ours to undo. `Sidebar.test.tsx` fails on any `document.body.style` in this file. If a component here ever
+does need a body-level lock, it owns the restore in the same effect's cleanup, not in an animation callback.
+
 **[`utils/cookie.ts`](../../utils/cookie.ts) feature-detects the Cookie Store API and falls back to `document.cookie`.** The bare
 `cookieStore` global does not exist in Firefox, in Safari before 18.4, or in any insecure context, so the
 write threw a `ReferenceError` that `SidebarProvider.setOpen`'s `.catch(() => {})` swallowed — the sidebar

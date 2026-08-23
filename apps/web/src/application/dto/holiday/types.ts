@@ -11,7 +11,7 @@ export interface HolidayDTO {
 	type?: string;
 	location?: string;
 	variant: HolidayVariant;
-	isInSelectedRange: boolean;
+	isInPlanningWindow: boolean;
 }
 
 export const HolidayVariant = {

@@ -4,9 +4,12 @@ import { activatePremiumRequest } from "@infrastructure/api/operations/activateP
 import { resolveClientIp } from "@infrastructure/api/operations/types";
 import { parseJsonBody } from "@infrastructure/api/parseJsonBody";
 import { noStore } from "@infrastructure/api/response";
+import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import { ValidationError } from "@infrastructure/errors";
+import { ApplicationLayer } from "@infrastructure/layers";
 import { clearPremiumCookie, PREMIUM_COOKIE, setPremiumCookie } from "@infrastructure/services/premium/cookie";
 import { verifySession as verifySessionEffect } from "@infrastructure/services/premium/session";
+import { isSessionConfigurationError } from "@infrastructure/services/premium/sessionErrors";
 import { Effect } from "effect";
 import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
@@ -20,11 +23,23 @@ export async function GET(_request: NextRequest) {
 	const response = await Effect.runPromise(
 		verifySessionEffect(token).pipe(
 			Effect.map((data) => noStore({ premiumKey: data.paymentIntentId, email: data.email })),
-			Effect.catchTag("SessionError", () => {
-				const res = noStore({ premiumKey: null, email: null });
-				clearPremiumCookie(res);
-				return Effect.succeed(res);
-			}),
+			Effect.catchTag("SessionError", (failure) =>
+				Effect.gen(function* () {
+					const res = noStore({ premiumKey: null, email: null });
+
+					if (isSessionConfigurationError(failure)) {
+						const logger = yield* LoggerService;
+						logger.logError("Premium session could not be verified, keeping the cookie", failure);
+
+						return res;
+					}
+
+					clearPremiumCookie(res);
+
+					return res;
+				}),
+			),
+			Effect.provide(ApplicationLayer),
 		),
 	);
 

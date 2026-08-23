@@ -8,7 +8,7 @@ const makeHoliday = (overrides: Partial<HolidayDTO> = {}): HolidayDTO => ({
 	date: new Date("2025-01-01"),
 	name: "New Year",
 	variant: HolidayVariant.NATIONAL,
-	isInSelectedRange: true,
+	isInPlanningWindow: true,
 	...overrides,
 });
 

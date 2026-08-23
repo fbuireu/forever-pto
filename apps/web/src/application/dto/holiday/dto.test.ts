@@ -1,3 +1,5 @@
+import { addDays } from "@application/shared/utils/dates";
+import { MAX_CARRY_OVER_MONTHS, planningWindowInterval } from "@domain/calendar/window";
 import { describe, expect, it } from "vitest";
 import { holidayDTO } from "./dto";
 import type { RawHoliday } from "./types";
@@ -15,6 +17,9 @@ const makeRaw = (overrides: Partial<RawHoliday> & { date: string; name: string }
 	}) as RawHoliday;
 
 const BASE_PARAMS = { year: 2024, carryOverMonths: 0, regions: REGIONS };
+
+const calendarDay = (date: Date) =>
+	`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
 describe("holidayDTO", () => {
 	it("returns an empty array for empty input", () => {
@@ -101,6 +106,19 @@ describe("holidayDTO", () => {
 		expect(result[0]?.name).toBe("This Year");
 	});
 
+	it("keeps exactly what the widest Planning Window covers, rather than a literal next year", () => {
+		const lastKeptDay = planningWindowInterval({
+			year: BASE_PARAMS.year,
+			carryOverMonths: MAX_CARRY_OVER_MONTHS,
+		}).end;
+		const raw = [
+			makeRaw({ date: calendarDay(lastKeptDay), name: "Last Kept" }),
+			makeRaw({ date: calendarDay(addDays({ date: lastKeptDay, days: 1 })), name: "One Day Too Far" }),
+		];
+
+		expect(holidayDTO.create({ raw, params: BASE_PARAMS }).map(({ name }) => name)).toEqual(["Last Kept"]);
+	});
+
 	it("includes holidays in the next year (carry-over window)", () => {
 		const raw = [makeRaw({ date: "2025-03-01", name: "Next Year Holiday" })];
 		const result = holidayDTO.create({ raw, params: BASE_PARAMS });
@@ -108,26 +126,26 @@ describe("holidayDTO", () => {
 		expect(result).toHaveLength(1);
 	});
 
-	it("marks holiday as isInSelectedRange=true when within the year", () => {
+	it("marks holiday as isInPlanningWindow=true when within the year", () => {
 		const raw = [makeRaw({ date: "2024-06-15", name: "Summer Holiday" })];
 		const [result] = holidayDTO.create({ raw, params: BASE_PARAMS });
 
-		expect(result?.isInSelectedRange).toBe(true);
+		expect(result?.isInPlanningWindow).toBe(true);
 	});
 
-	it("marks holiday as isInSelectedRange=false when in next year with carryOverMonths=0", () => {
+	it("marks holiday as isInPlanningWindow=false when in next year with carryOverMonths=0", () => {
 		const raw = [makeRaw({ date: "2025-01-15", name: "January Next Year" })];
 		const [result] = holidayDTO.create({ raw, params: BASE_PARAMS });
 
-		expect(result?.isInSelectedRange).toBe(false);
+		expect(result?.isInPlanningWindow).toBe(false);
 	});
 
-	it("marks carry-over holiday as isInSelectedRange=true when within carryOverMonths", () => {
+	it("marks carry-over holiday as isInPlanningWindow=true when within carryOverMonths", () => {
 		const raw = [makeRaw({ date: "2025-02-01", name: "February Holiday" })];
 		const params = { ...BASE_PARAMS, carryOverMonths: 3 };
 		const [result] = holidayDTO.create({ raw, params });
 
-		expect(result?.isInSelectedRange).toBe(true);
+		expect(result?.isInPlanningWindow).toBe(true);
 	});
 
 	it("returns holidays sorted by date ascending", () => {
@@ -168,18 +186,18 @@ describe("holidayDTO.createCustom", () => {
 		expect(result.name).toBe("Custom Holiday");
 	});
 
-	it("marks isInSelectedRange=true for a date within the year", () => {
+	it("marks isInPlanningWindow=true for a date within the year", () => {
 		const result = holidayDTO.createCustom(BASE);
-		expect(result.isInSelectedRange).toBe(true);
+		expect(result.isInPlanningWindow).toBe(true);
 	});
 
-	it("marks isInSelectedRange=false for a date outside the year with carryOverMonths=0", () => {
+	it("marks isInPlanningWindow=false for a date outside the year with carryOverMonths=0", () => {
 		const result = holidayDTO.createCustom({ ...BASE, date: new Date("2025-03-01") });
-		expect(result.isInSelectedRange).toBe(false);
+		expect(result.isInPlanningWindow).toBe(false);
 	});
 
-	it("marks isInSelectedRange=true for a carry-over date within carryOverMonths", () => {
+	it("marks isInPlanningWindow=true for a carry-over date within carryOverMonths", () => {
 		const result = holidayDTO.createCustom({ ...BASE, date: new Date("2025-02-01"), carryOverMonths: 3 });
-		expect(result.isInSelectedRange).toBe(true);
+		expect(result.isInPlanningWindow).toBe(true);
 	});
 });

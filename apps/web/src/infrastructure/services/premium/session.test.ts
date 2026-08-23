@@ -15,6 +15,7 @@ const { mockSign, mockSetProtectedHeader, mockSetIssuedAt, mockSetExpirationTime
 vi.mock("jose", () => ({ SignJWT: MockSignJWT, jwtVerify: mockJwtVerify }));
 
 const { createSession, verifySession } = await import("./session");
+const { isSessionConfigurationError } = await import("./sessionErrors");
 const { PREMIUM_SESSION_LIFETIME_SECONDS } = await import("./cookie");
 
 const SESSION_DATA = { email: "user@example.com", paymentIntentId: "pi_abc123" };
@@ -143,5 +144,33 @@ describe("verifySession", () => {
 
 		expect(result._tag).toBe("SessionError");
 		expect(result.message).toBe("token expired");
+	});
+});
+
+describe("could not verify, as against did not verify", () => {
+	it("reports an absent JWT_SECRET as a configuration failure", async () => {
+		vi.stubEnv("JWT_SECRET", "");
+
+		const result = await Effect.runPromise(Effect.flip(verifySession("any.token")));
+
+		expect(isSessionConfigurationError(result)).toBe(true);
+		expect(mockJwtVerify).not.toHaveBeenCalled();
+	});
+
+	it("reports an expired token as an ordinary session failure", async () => {
+		mockJwtVerify.mockRejectedValue(new Error('"exp" claim timestamp check failed'));
+
+		const result = await Effect.runPromise(Effect.flip(verifySession("expired.token")));
+
+		expect(isSessionConfigurationError(result)).toBe(false);
+	});
+
+	it("reports an absent JWT_SECRET as a configuration failure when signing too", async () => {
+		vi.stubEnv("JWT_SECRET", "");
+		mockSign.mockResolvedValue("token");
+
+		const result = await Effect.runPromise(Effect.flip(createSession(SESSION_DATA)));
+
+		expect(isSessionConfigurationError(result)).toBe(true);
 	});
 });

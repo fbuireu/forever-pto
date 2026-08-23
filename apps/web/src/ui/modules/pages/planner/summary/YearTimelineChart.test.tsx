@@ -12,7 +12,7 @@ const makeHoliday = (date: Date, variant: HolidayVariant = HolidayVariant.NATION
 	date,
 	name: "Test Holiday",
 	variant,
-	isInSelectedRange: true,
+	isInPlanningWindow: true,
 });
 
 const renderChart = (props: Partial<Parameters<typeof YearTimelineChart>[0]> = {}) =>

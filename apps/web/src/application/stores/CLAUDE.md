@@ -51,8 +51,8 @@ silently.
 leaving a stale one produces a plan with holidays from the wrong place.
 
 **The numeric filters are clamped in the store, because the controls are not the only writers.** `MIN_PTO_DAYS`,
-`MAX_PTO_DAYS`, `MIN_CARRY_OVER_MONTHS` and `MAX_CARRY_OVER_MONTHS` live in `filters.ts` and the setters hold
-them; [`PtoDays.tsx`](../../ui/modules/sidebar/components/PtoDays.tsx) and [`CarryOverMonths.tsx`](../../ui/modules/sidebar/components/CarryOverMonths.tsx) import the same constants rather than declaring their own. Each
+`MAX_PTO_DAYS` and `MIN_CARRY_OVER_MONTHS` live in `filters.ts` and the setters hold them;
+[`PtoDays.tsx`](../../ui/modules/sidebar/components/PtoDays.tsx) and [`CarryOverMonths.tsx`](../../ui/modules/sidebar/components/CarryOverMonths.tsx) import the same constants rather than declaring their own. Each
 setter used to clamp the floor and nothing else, and the ceiling was enforced only by the control that owned
 it — `PtoDays`'s increment button going disabled at 365. That left two ways past it: the accrual calculator
 in [`PtoCalculator.tsx`](../../ui/modules/sidebar/components/PtoCalculator.tsx), which writes a computed budget straight through `setPtoDays` (its `max='8'` is an
@@ -60,6 +60,14 @@ HTML attribute, which stops the stepper and not a typed number), and a persisted
 previous version allowed. `onRehydrateStorage` clamps as well for the second case — `migrate` only runs on a
 version change, so a stored out-of-range value would otherwise outlive the bound for ever. A ceiling enforced
 at one control is not an invariant; put it where every writer passes.
+
+**`MAX_CARRY_OVER_MONTHS` is the one bound that is not declared here, because it is not a UI preference.**
+The Holiday source fetches `year` and `year + 1` and nothing else, so a Planning Window wider than twelve
+Carry-over Months enumerates months whose Holiday set is provably empty and scores every Bridge there against
+a blank calendar. It lives in [`../../domain/calendar/window.ts`](../../domain/calendar/window.ts) beside the
+Planning Window it constrains; `holidayDTO.create` derives its keep window from the same value, this store
+imports it as its clamp ceiling, and so does `CarryOverMonths.tsx`. It was a literal 12 here next to a
+literal `year + 1` in the mapper, with nothing relating them.
 
 ## Persistence is obfuscated, not encrypted
 
@@ -330,14 +338,24 @@ does with what this store hands it, and getting the *inputs* wrong still produce
   field on the worker's params that nothing there reads.
 - **Both pass the Planning Window's `year` to `generateMetrics`.** It used to be inferred from the earliest
   placed PTO Day, which measured a plan starting in the Carry-over Months against the following year.
-- **Both guard on `holidaysWithManual.length === 0`.** A calendar with no Holidays and only Removed Days now
-  short-circuits, which it did not when the Removed Days padded the array the guard counted.
+- **Neither guards on the Holiday count any more, and the guard that did was wrong.** It read
+  `holidaysWithManual.length === 0`, which refused to plan a Holiday-free calendar. A weekend is a Free Day,
+  so a Bridge needs no Holiday at all: with none, a Friday still returns three Effective Days at an
+  Efficiency of 3.0. The pipeline short-circuits on an empty *candidate* set instead, which is the condition
+  the run cannot proceed without. See [`@domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md).
 
 The `describe('generateSuggestions agrees with the worker')` block in `holidays.test.ts` still mirrors
 [`worker.test.ts`](../../infrastructure/workers/worker.test.ts), and both now assert the same thing from opposite sides: that each caller hands the pipeline
 the right inputs. The pipeline's own behaviour is tested once, in [`pipeline.test.ts`](../../domain/calendar/pipeline.test.ts), against the real engine.
 
-**The two sides still differ on what "nothing to plan" means, and that is the one deliberate difference
+**"Nothing to plan" is the pipeline's own judgement, and this store must not second-guess it.** It means an
+exhausted budget or an empty candidate set, nothing about how many Holidays arrived.
+[`../../ui/modules/pages/planner/CalendarList.tsx`](../../ui/modules/pages/planner/CalendarList.tsx) still
+gates the worker path on `holidays.length > 0`, which is the deleted guard living on one layer up: it is why
+the defect was never user-visible on the normal path, and why the Troubleshooting reset, which calls
+`generateSuggestions` with no gate, was.
+
+**The two sides still differ on what "nothing to plan" *writes*, and that is the one deliberate difference
 left.** The pipeline answers `planned: false` with an empty Suggestion whose Metrics are real; the worker
 forwards it as-is, because the wire type has no null, while this store maps it to `null` across `suggestion`,
 `alternatives` and `currentSelection` — its existing "no plan" state, which the calendar already renders.
@@ -392,7 +410,7 @@ the three lines instead, and it was nonetheless the only copy with tests. It is 
 fix, not a regression to restore.
 
 **`getFreeDaysForMonth` was the second instance of that pattern, and it was worse than uncalled.** It
-counted the Holidays in a month carrying `isInSelectedRange` and answered that as a month's "free days" —
+counted the Holidays in a month carrying `isInPlanningWindow` and answered that as a month's "free days" —
 but [`CONTEXT.md`](../../../../../CONTEXT.md) defines a **Free Day** as any non-working day, weekends
 included, so the action published a store-level name for a rule the glossary contradicts. Its only
 references were its own line in the actions interface, its implementation and one `describe` block, and it

@@ -139,7 +139,7 @@ A body that parses but is not an object — a bare JSON string, a number, `null`
 
 `INVALID_BODY` lives in `parseJsonBody.ts` beside the schema codes rather than in `ApiError` because that is where it belongs semantically: it reaches the client as a `ValidationError` message, exactly like `email_required` and the rest of the DTO codes, not as an `error` value the handler picked.
 
-The `GET` half of check-session is the odd one out: a `SessionError` there is not an error response at all. It returns `200` with `{ premiumKey: null, email: null }` and clears the premium cookie, because an expired token is a normal state, not a failure.
+The `GET` half of check-session is the odd one out: a `SessionError` there is not an error response at all. It returns `200` with `{ premiumKey: null, email: null }`, because an expired token is a normal state, not a failure. Whether it also clears the premium cookie depends on which `SessionError` it is: `isSessionConfigurationError` from [`../services/premium/sessionErrors.ts`](../services/premium/sessionErrors.ts) narrows off the "could not verify" case, `JWT_SECRET` absent, which keeps the cookie and logs at error, because nothing about the token was established either way. See [`../../app/CLAUDE.md`](../../app/CLAUDE.md).
 
 ## What the typed error channel actually buys
 

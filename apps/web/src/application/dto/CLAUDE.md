@@ -107,38 +107,56 @@ That is what lets `HolidayDTO` cross into the domain. The pure calendar context 
 
 **`holidayDTO.create` sorts twice, and the first sort is not chronological.** It compares nothing but the `location` flag, so Regional entries land after National ones and the `processedDates` dedupe keeps the National Holiday when both fall on the same date. Because that comparator is a real ordering, the sort stays stable: two entries of the same variant on the same date survive in the order upstream listed them, whatever the length of the list. The chronological sort happens at the end of the reduce.
 
-**`isInSelectedRange` is a snapshot of the Planning Window, so whoever carries a Holiday across a window
-change has to recompute it.** `isInPlanningWindow` is exported beside the mapper for exactly that: `create`
-and `createCustom` both call it, and so does the holidays store, which preserves Custom Holidays verbatim
-through a `fetchHolidays` and would otherwise keep the flag from the year they were created in. Only a
-flagged Holiday can anchor a Bridge, so a stale `true` lets a Custom Holiday from another year anchor one,
-and a stale `false` hides a Custom Holiday the window has since moved back onto.
+**`HolidayDTO.isInPlanningWindow` is a snapshot, so whoever carries a Holiday across a window change has to
+recompute it.** `isInPlanningWindow` the predicate is called by `create` and `createCustom`, and by the
+holidays store, which preserves Custom Holidays verbatim through a `fetchHolidays` and would otherwise keep
+the flag from the year they were created in.
 
-**It is also the only definition of those bounds, which took a second pass.** The holidays store imported
-`isInPlanningWindow` on its first line and then declared a private `getPlanningWindow` that recomputed the
-identical interval by hand for `pruneDaysOutsideWindow`. The two spellings differed twice: the store used a
-bare `new Date(year, 0, 1)` where this one uses `startOfYear` (a no-op on 1 January), and it wrapped the end
-in an extra `endOfMonth`.
+**The reason to recompute it is display, not Bridge anchoring, and this paragraph said otherwise for a long
+time.** It claimed "only a flagged Holiday can anchor a Bridge", which the engine falsifies: `createHolidaySet`
+applies no window filter, and no code under `@domain/calendar/` reads the flag at all. The one write is
+`runPlanningPipeline` stamping `true` on each `manual-N` pseudo-Holiday.
+[`../../domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md) states the opposite, correctly, under
+*Invariants and traps*: the Metrics see the whole unfiltered two-year set, and narrowing them to the flag was
+tried and reverted. So two guides contradicted each other, and this one was using the false half to justify a
+store behaviour that is in fact justified by the UI. What a stale flag actually breaks is the Summary's
+Holiday count, the composition pie and the Holidays table, all of which filter on it.
 
-That `endOfMonth` is the interesting half. `addMonths` on 31 December already lands on the last day of the
-target month — Temporal constrains the day when the month is shorter — so the wrapper could never change the
-answer. Which means the two agreed only because of the polyfill's overflow behaviour, and the extra call is
-evidence that whoever wrote it was not sure of that. Checked across four years and seven carry-over counts
-before deleting it: the two ends are identical at every boundary.
+**The field carried a retired glossary term until it was renamed.** It was `isInSelectedRange`, and
+[`CONTEXT.md`](../../../../../CONTEXT.md) retires "selected range" and "date range" under Planning Window. The
+name crossed into the domain and onto the worker's wire type, and one file held both spellings at once. It is
+`isInPlanningWindow` everywhere now, matching the predicate that computes it.
 
-`holidays.test.ts` now pins the last day of the last carry-over month, which is the date the two definitions
-could have disagreed on and nothing covered.
+**The bounds themselves are no longer defined here.** `planningWindowInterval` and `isInPlanningWindow` live
+in [`../../domain/calendar/window.ts`](../../domain/calendar/window.ts), beside `planningWindowMonths`, which
+is the other projection of the same `{ year, carryOverMonths }` and has to describe the same span. They were
+here, one layer up from it, with nothing relating the two. This section used to narrate exactly that risk for
+a *different* duplicate it had deleted: the holidays store's private `getPlanningWindow` wrapped the end in an
+extra `endOfMonth`, which could never change the answer because `addMonths` on 31 December already lands on
+the shorter month's last day. The two agreed on Temporal's overflow behaviour rather than on a shared
+definition, and so did the month array. `window.test.ts` relates them now.
+
+**`create`'s keep window is derived, not written twice.** It kept anything inside the chosen year plus the
+whole of the following one, as a literal `year + 1`, while `filters.ts` capped Carry-over Months at 12 as a UI
+clamp. Those are the same bound, stated in two layers, and raising the clamp alone would have widened the
+Planning Window past the data. `MAX_CARRY_OVER_MONTHS` is declared in `window.ts` now, and this mapper builds
+its keep window as `planningWindowInterval({ year, carryOverMonths: MAX_CARRY_OVER_MONTHS })`.
+
+[`dto.test.ts`](./holiday/dto.test.ts) pins that coupling with a Holiday on the last day the widest window
+covers and one on the day after. **Changing the constant cannot falsify it**, because the fixture derives its
+dates from the same constant the mapper reads, and both move together. Only breaking the mapper's derivation
+turns it red, which is what it was verified against. That is the point of the case rather than a weakness in
+it: what it guards is the mapper going back to a literal, and the *value* of the bound is pinned in
+[`window.test.ts`](../../domain/calendar/window.test.ts) instead.
 
 **The bounds are a value, and the predicate takes one.** `isInPlanningWindow` used to take
 `{ date, year, carryOverMonths }` and rebuild the interval on every call, so the one definition of the bounds
 was recomputed once per Holiday rather than once per window: three `Date` allocations and four
 `Temporal.PlainDate` conversions inside a reduce that runs over every raw Holiday, and again per Custom
 Holiday, Manual Day and Removed Day. `planningWindowInterval({ year, carryOverMonths })` is that definition
-now, and each of the three call sites builds it once, which is the shape `create` already used ten lines up
-for the wider two-year window. The `startOfYear` on the start went with it: it was kept only so the two
-spellings matched, and the second spelling had already been deleted.
+now, and each call site builds it once.
 
-**Two date windows, not one.** `create` drops anything outside the chosen year plus the whole of the following year, then sets `isInSelectedRange` from the narrower Planning Window (the year plus its Carry-over Months). Holidays between the two are kept so the UI can show them for context; only those flagged `isInSelectedRange` can anchor a Bridge.
+**Two date windows, not one.** `create` drops anything outside the widest Planning Window the data supports (`MAX_CARRY_OVER_MONTHS`, so the chosen year plus the whole of the following one), then sets `isInPlanningWindow` from the *actual* Planning Window (the year plus its Carry-over Months). Holidays between the two are kept so the UI can show them for context. They are not hidden from the engine: it plans against the unfiltered set on purpose, and the flag is read only by the display filters listed above.
 
 **Schemas carry message keys, not messages.** `contactSchema` and `createPaymentSchema` are pre-bound with keys such as `invalid_email` for server-side validation. The UI calls `createContactSchema` / `createPaymentSchemaWithMessages` with translated strings instead. Adding a validation rule means adding it to the messages interface too, or the localised form silently loses the message.
 

@@ -205,11 +205,7 @@ function Sidebar({
 
 	if (isMobile) {
 		return (
-			<AnimatePresence
-				onExitComplete={() => {
-					document.body.style.pointerEvents = "";
-				}}
-			>
+			<AnimatePresence>
 				{openMobile && (
 					<>
 						<m.div

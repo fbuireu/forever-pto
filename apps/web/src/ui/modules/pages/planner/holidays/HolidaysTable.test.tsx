@@ -73,7 +73,7 @@ const holiday = (id: string, name: string, date: Date) => ({
 	name,
 	date,
 	variant: HolidayVariant.NATIONAL,
-	isInSelectedRange: true,
+	isInPlanningWindow: true,
 });
 
 const renderTable = () => {

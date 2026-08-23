@@ -13,7 +13,7 @@ const HOLIDAY: HolidayDTO = {
 	date: new Date(2026, 5, 24),
 	name: "Sant Joan",
 	variant: HolidayVariant.REGIONAL,
-	isInSelectedRange: true,
+	isInPlanningWindow: true,
 };
 
 const renderCalendar = (props: Partial<Parameters<typeof Calendar>[0]> = {}) =>

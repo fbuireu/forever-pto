@@ -49,7 +49,7 @@ export function runPlanningPipeline({
 		date,
 		name: MANUAL_DAY_NAME,
 		variant: HolidayVariant.CUSTOM,
-		isInSelectedRange: true,
+		isInPlanningWindow: true,
 	}));
 	const holidaysWithManual = [...holidays, ...manualPseudoHolidays];
 	const effectivePtoDays = autoSuggestCount ?? measureBudget({ ptoDays, manuallySelectedDays }).remaining;
@@ -67,9 +67,13 @@ export function runPlanningPipeline({
 		}),
 	});
 
-	if (effectivePtoDays <= 0 || holidaysWithManual.length === 0) {
-		return { planned: false, suggestion: measure({ days: [], bridges: [], strategy }), alternatives: [] };
-	}
+	const unplanned = (): PlanningResult => ({
+		planned: false,
+		suggestion: measure({ days: [], bridges: [], strategy }),
+		alternatives: [],
+	});
+
+	if (effectivePtoDays <= 0) return unplanned();
 
 	const candidates = findPlanningCandidates({
 		holidays: holidaysWithManual,
@@ -77,6 +81,8 @@ export function runPlanningPipeline({
 		allowPastDays,
 		removedDays: removedSuggestedDays,
 	});
+
+	if (candidates.bridges.length === 0) return unplanned();
 
 	const baseSuggestion = generateSuggestions({ ptoDays: effectivePtoDays, candidates, strategy });
 

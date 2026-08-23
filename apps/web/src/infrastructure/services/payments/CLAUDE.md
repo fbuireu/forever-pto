@@ -35,7 +35,7 @@ read by the premium activation path as well as by the payment one.
 | `payment.ts` (use-case) | `validatePromoCode`, `createPaymentIntent`, `savePayment` (deferred) |
 | `activatePremium.ts` (use-case) | `getSucceededPaymentByEmail`, `savePayment`, `updatePaymentStatus` |
 | [`webhook.ts`](../../../application/use-cases/webhook.ts) (use-case) | `getPaymentById`, `savePayment` |
-| [`paymentSucceeded.ts`](../../../domain/payment/handlers/paymentSucceeded.ts) / [`paymentFailed.ts`](../../../domain/payment/handlers/paymentFailed.ts) (domain handlers) | `getPaymentById`, `updatePaymentStatus`, `updatePaymentCharge`, `retrieveCharge` |
+| [`paymentSucceeded.ts`](../../../domain/payment/handlers/paymentSucceeded.ts) / [`paymentFailed.ts`](../../../domain/payment/handlers/paymentFailed.ts) (domain handlers) | `updatePaymentStatus`, `updatePaymentCharge`, `retrieveCharge` |
 | [`api/operations/payment.ts`](../../api/operations/payment.ts) and [`api/operations/activatePremium.ts`](../../api/operations/activatePremium.ts) | `checkRateLimit` |
 | The confirmation page | `confirmation` |
 
@@ -67,13 +67,16 @@ anyway — `TursoService` opens a connection per call, so nothing spanned the re
 webhook deliveries could both read `processing` and both write. The rule is now one predicate the database
 evaluates atomically.
 
-Three callers lost their read entirely. `handlePaymentFailed` writes and warns when `rowsAffected` is 0;
-`processWebhookEvent` inserts unconditionally and logs a creation only when the insert reports one — which
+Every caller lost its read. `handlePaymentFailed` writes and warns when nothing was touched;
+`processWebhookEvent` inserts unconditionally and logs a creation only when the insert reports one, which
 also fixed a lie, since the old read-then-insert could be beaten to the row and still claim it had created
 it; and the donation activation path's deferred is now insert-or-ignore followed by the guarded update, correct
-whether or not the row was already there. **`handlePaymentSucceeded` keeps its read**, because 0 rows cannot
-tell "already succeeded" from "no such row" and that handler treats them differently — a missing row skips
-the charge enrichment and warns.
+whether or not the row was already there. **`handlePaymentSucceeded` was the last to keep one**, on the
+grounds that 0 rows cannot tell "already succeeded" from "no such row". It cannot, and the handler no longer
+needs to: `savePayment` runs immediately before it in `processWebhookEvent`, so "no such row" was
+unreachable and the read only ever answered it when the read itself had failed, laundering an unreachable
+database into a 200 Stripe would never retry. See
+[`../../../domain/payment/CLAUDE.md`](../../../domain/payment/CLAUDE.md).
 
 **Amounts are in Stripe minor units everywhere except `confirmation.ts`.** `createPaymentIntent` multiplies
 by 100 on the way in, `paymentDataDTO` keeps minor units for the table, and `confirmation` divides by 100

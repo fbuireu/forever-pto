@@ -1,4 +1,5 @@
 import { DEFAULT_FILTER_STRATEGY, type FilterStrategy } from "@domain/calendar/types";
+import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { obfuscatedStorage } from "./crypto";
@@ -33,7 +34,6 @@ const STORAGE_VERSION = 2;
 export const MIN_PTO_DAYS = 1;
 export const MAX_PTO_DAYS = 365;
 export const MIN_CARRY_OVER_MONTHS = 1;
-export const MAX_CARRY_OVER_MONTHS = 12;
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 

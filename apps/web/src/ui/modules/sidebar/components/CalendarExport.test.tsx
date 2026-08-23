@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const { mockGenerateIcs, holidaysState } = vi.hoisted(() => ({
 	mockGenerateIcs: vi.fn((_params: { holidays: { id: string }[] }) => "BEGIN:VCALENDAR"),
 	holidaysState: {
-		holidays: [] as { id: string; date: Date; name: string; isInSelectedRange: boolean }[],
+		holidays: [] as { id: string; date: Date; name: string; isInPlanningWindow: boolean }[],
 		suggestion: null as { days: Date[] } | null,
 		currentSelection: null as { days: Date[] } | null,
 		manuallySelectedDays: [] as Date[],
@@ -35,11 +35,11 @@ vi.mock("next-intl", () => ({
 
 const { CalendarExport } = await import("./CalendarExport");
 
-const makeHoliday = (id: string, date: string, isInSelectedRange: boolean) => ({
+const makeHoliday = (id: string, date: string, isInPlanningWindow: boolean) => ({
 	id,
 	date: new Date(date),
 	name: `Holiday ${id}`,
-	isInSelectedRange,
+	isInPlanningWindow,
 });
 
 beforeEach(() => {

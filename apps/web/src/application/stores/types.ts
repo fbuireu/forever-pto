@@ -23,7 +23,7 @@ export interface FetchHolidaysParams extends Pick<FiltersState, "year" | "countr
 export type PlanningWindowParams = Pick<FiltersState, "year" | "carryOverMonths">;
 
 export interface AddHolidayParams {
-	holiday: Omit<HolidayDTO, "id" | "variant" | "isInSelectedRange">;
+	holiday: Omit<HolidayDTO, "id" | "variant" | "isInPlanningWindow">;
 	year: FiltersState["year"];
 	carryOverMonths: FiltersState["carryOverMonths"];
 }

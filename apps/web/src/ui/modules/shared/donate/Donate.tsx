@@ -364,11 +364,14 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 		<Popover open={isOpen} onOpenChange={handleOpenChange}>
 			<div
 				className={cn(
-					"donate-trigger fixed w-full right-0 md:w-auto md:right-4 z-50",
+					"donate-trigger pointer-events-none fixed w-full right-0 md:w-auto md:right-4 z-50",
 					bottomClassName ?? "bottom-[calc(15dvh+8px)] md:bottom-4",
 				)}
 			>
-				<div className="donate-brutal" style={{ animationPlayState: isOpen ? "paused" : "running" }}>
+				<div
+					className="donate-brutal pointer-events-auto"
+					style={{ animationPlayState: isOpen ? "paused" : "running" }}
+				>
 					<PopoverTrigger asChild>
 						<Button className="donate-brutal-btn w-full py-3">{tDonate("donateAndUnblock")}</Button>
 					</PopoverTrigger>

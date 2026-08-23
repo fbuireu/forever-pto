@@ -185,17 +185,34 @@ already drifted over how a missing IP header was recorded.
   Writing back a value it already has is not redundant: it slides the week-long expiry forward on every
   visit, so the chain stays off the hot path for as long as the visitor keeps coming back. Do not
   "simplify" that branch away.
+- **`verifySession` fails two ways under one tag, and the vocabulary lives in
+  [`services/premium/sessionErrors.ts`](./services/premium/sessionErrors.ts) rather than in `session.ts`.**
+  "Did not verify", meaning expired, malformed or signed by something else, is a `SessionError`, and the
+  check-session `GET` clears the cookie and stays quiet. "Could not verify", meaning `JWT_SECRET` is absent, is a
+  `SessionConfigurationError`, a subclass adding no members, so the `_tag`, `TaggedFailure` and
+  `describeFailure` are all unchanged and only `isSessionConfigurationError` sees the difference. That branch
+  keeps the cookie and logs at error. It is the
+  [`serverService.ts`](./clients/payments/stripe/serverService.ts) `WebhookConfigurationError` shape, copied
+  deliberately. `session.ts` keeps only the two Effects and hands `wrapSessionError` to both `catch`
+  handlers, so the route can import the classification without importing `jose`. A rotated secret is not
+  separable from a forged token and stays in the silent branch; [`../app/CLAUDE.md`](../app/CLAUDE.md)
+  records why that is the end of it.
 - **`PREMIUM_SESSION_LIFETIME_SECONDS` in `cookie.ts` is the single source of truth for how long Premium
   lasts.** [`session.ts`](./services/premium/session.ts) derives the JWT expiry from it, so a cookie can never outlive the token it carries.
   It lives beside the cookie rather than beside the token because the cookie's `maxAge` is what fixes the
   unit — seconds — for both. Do not reintroduce a second constant: they were separate before, and nothing
   would have caught them drifting apart.
-- **`execute` answers with `rowsAffected`, which is what makes a guarded write usable.** It returned `void`,
-  so a caller wanting to know whether its `UPDATE ... WHERE <guard>` matched had to read the row first — and
-  with a connection per call, that read guarded nothing. The payments repository is the consumer: see
-  [`services/payments/CLAUDE.md`](./services/payments/CLAUDE.md).
-- **Turso opens a connection per call.** `query` and `execute` each call `connect()` themselves, so
-  two calls are two connections and nothing spans them transactionally.
+- **`execute` answers with the number of rows the statement touched, which is what makes a guarded write
+  usable.** It returned `void`, so a caller wanting to know whether its `UPDATE ... WHERE <guard>` matched had
+  to read the row first, and with a connection per call that read guarded nothing. The count comes off the
+  SDK's `changes`, **not** `rowsAffected`, which is not a field on what `run` answers and read as `undefined`
+  for as long as it was there. The payments repository is the consumer: see
+  [`services/payments/CLAUDE.md`](./services/payments/CLAUDE.md) and
+  [`clients/CLAUDE.md`](./clients/CLAUDE.md).
+- **Turso opens a connection per call, and every call closes the one it opened.** `query` and `execute` each
+  call `connect()` themselves, so two calls are two connections and nothing spans them transactionally. Each
+  also releases its server-side stream in a `finally`; nothing did before, and a Worker has no process exit to
+  do it instead.
 - **A route handler must not translate through `next-intl/server`.** `getTranslations` memoises its message
   loading, and on Cloudflare that cache outlives the request that filled it — the second request onward throws
   `Cannot perform I/O on behalf of a different request`, which is workerd refusing to let one request touch an

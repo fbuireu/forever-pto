@@ -133,6 +133,30 @@ no ORM and no schema layer in the repo — SQL is written by hand in `services/*
 Both call `connect()` themselves, so every call is its own connection and nothing spans them. If you need two
 writes to succeed together, that guarantee does not exist here today.
 
+**Both go through `withConnection`, and the release is structural because nothing else would remember it.**
+`connect()` allocates a config object, but the first statement opens a server-side stream that the SDK holds
+open until `close()` sends a close request for it. Nothing in the repo ever called `close()`, and this is a
+Worker, so there is no process exit to sweep up behind it and every query and every execute leaked one stream.
+`withConnection` closes in a `finally`, so the release survives a rejection and cannot be forgotten by the
+next method added here. `Connection.close()` swallows its own transport errors and cannot reject, which is
+what makes it safe in a `finally` that would otherwise replace a real failure with a closing one.
+
+**They call `conn.all` and `conn.run`, never `conn.prepare`.** `prepare(sql)` fetches column metadata over a
+`describe` round trip that neither method reads; the SDK documents `all` and `run` as "like
+`prepare(sql).run(args)` but in a single round trip, skips describe". The webhook's succeeded path was eight
+round trips from a Worker to a remote database where four do.
+
+**`run` answers `{ changes, lastInsertRowid }`, so there is no `rowsAffected` on it, and reading one is
+silent.** `execute` read `result.rowsAffected` off a statement that has never carried that field, so it
+answered `undefined` through a signature promising `number`, and every `rowsAffected > 0` in
+[`services/payments/repository.ts`](../services/payments/repository.ts) was `undefined > 0`, which is `false`.
+`savePayment` therefore never reported creating a row and `updatePaymentStatus` never reported writing one,
+so `handlePaymentFailed` warned on every single delivery. Nothing caught it because `service.test.ts` built
+its double from the same misreading: the run double resolved `{ rowsAffected: 1 }`, a shape the SDK does not
+produce. The double resolves the SDK's own shape now, and the count case goes red against `rowsAffected`.
+`rowsAffected` *is* the field on the raw Hrana result and on a `batch` `ResultSet`, which is where the
+misreading came from. It is not the field on `run`.
+
 The tag carried a third method, `batch`, until nothing was found calling it. It ran its statements without a
 locking mode, so a failure part-way through left the earlier ones committed — a partial-failure hazard on a
 seam no caller used. Adding it back means adding a caller in the same commit.

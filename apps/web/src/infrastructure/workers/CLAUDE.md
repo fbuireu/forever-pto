@@ -15,7 +15,8 @@ Cloudflare Worker that hosts the app is configured in `wrangler.toml`, not here.
 **This folder holds no planning rule.** [`worker.ts`](./worker.ts) deserialises a request, calls `runPlanningPipeline` from
 `@domain/calendar`, serialises the result and posts it. Everything the handler used to do around those calls —
 clearing the caches, building the `manual-N` pseudo-Holidays, deriving `carryOverMonths`, computing the
-budget, short-circuiting an empty plan, measuring each Suggestion — moved into that module, because the
+budget, short-circuiting when there is no budget or no candidate, measuring each Suggestion — moved into
+that module, because the
 holidays store had its own copy of all of it and the two were kept in step by a pair of hand-mirrored test
 suites. A rule you want to change is in the domain; what lives here is the boundary.
 
@@ -199,6 +200,10 @@ What it pins, and should keep pinning: that this side hands the pipeline the rig
 all, `generateMetrics` gets the request's `year`, manual days are deducted from the budget — that an
 over-committed budget short-circuits to an empty result whose `Metrics` came from the engine rather than a
 literal, and that a throw becomes `WORKER_ERROR` rather than an unhandled rejection.
+
+An empty *Holiday* list is **not** one of those short circuits, and a test asserting it was would be wrong. A
+weekend is a Free Day and a Bridge only needs one beside it, so a Holiday-free calendar plans normally. The
+pipeline short-circuits on an empty candidate set instead.
 
 Those input assertions reach through the pipeline to the mocked generators, which is why the mocks are keyed
 on the engine modules and not on the pipeline: mocking the pipeline would assert only that the worker called

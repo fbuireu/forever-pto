@@ -40,7 +40,7 @@ const makeHoliday = (date: Date) => ({
 	date,
 	name: "Test Holiday",
 	variant: HolidayVariant.NATIONAL,
-	isInSelectedRange: true,
+	isInPlanningWindow: true,
 });
 
 const BASE = {

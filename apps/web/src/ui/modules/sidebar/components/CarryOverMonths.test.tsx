@@ -6,10 +6,11 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@application/stores/filters", () => ({
 	MIN_CARRY_OVER_MONTHS: 0,
-	MAX_CARRY_OVER_MONTHS: 6,
 	useFiltersStore: (selector: (state: unknown) => unknown) =>
 		selector({ carryOverMonths: 1, setCarryOverMonths: vi.fn() }),
 }));
+
+vi.mock("@domain/calendar/window", () => ({ MAX_CARRY_OVER_MONTHS: 6 }));
 
 vi.mock("@ui/modules/premium/PremiumFeature", () => ({
 	PremiumFeature: ({ children }: { children: ReactNode }) => children,

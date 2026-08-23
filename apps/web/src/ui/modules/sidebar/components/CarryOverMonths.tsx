@@ -1,7 +1,8 @@
 "use client";
 
-import { MAX_CARRY_OVER_MONTHS, MIN_CARRY_OVER_MONTHS, useFiltersStore } from "@application/stores/filters";
+import { MIN_CARRY_OVER_MONTHS, useFiltersStore } from "@application/stores/filters";
 import { PremiumFeatureId } from "@application/stores/premium";
+import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
 import { SlidersHorizontal } from "@ui/modules/core/animate/icons/SlidersHorizontal";
 import { SlidingNumber } from "@ui/modules/core/animate/text/SlidingNumber";

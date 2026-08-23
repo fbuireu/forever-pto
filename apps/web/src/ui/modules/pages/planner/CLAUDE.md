@@ -389,7 +389,7 @@ opacity class. `||` is what makes a caller's explicit `disabled` and the past-da
 
 **The Summary counts Holidays inside the Planning Window only.** The store holds two years so the UI can
 show the extra ones for context, so the Holidays metric card, the composition pie, the "specific to your
-region" line and the custom-Holiday banner all read a list filtered on `isInSelectedRange` — otherwise the
+region" line and the custom-Holiday banner all read a list filtered on `isInPlanningWindow` — otherwise the
 headline figure is roughly double what the Holidays table beside it lists. This is a *display* filter and
 belongs here; the same narrowing applied to `generateMetrics` was tried and reverted, for the reason in
 [`@domain/calendar/CLAUDE.md`](../../../../domain/calendar/CLAUDE.md).

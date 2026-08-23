@@ -178,7 +178,7 @@ export function Calendar({
 	const monthLabel = useMemo(() => formatDate({ date: currentMonth, locale, format: "MMMM" }), [currentMonth, locale]);
 	const yearLabel = useMemo(() => formatDate({ date: currentMonth, locale, format: "yyyy" }), [currentMonth, locale]);
 	const monthFreeDays = useMemo(
-		() => holidays.filter((h) => isSameMonth({ a: h.date, b: currentMonth }) && h.isInSelectedRange).length,
+		() => holidays.filter((h) => isSameMonth({ a: h.date, b: currentMonth }) && h.isInPlanningWindow).length,
 		[holidays, currentMonth],
 	);
 	const calendarDays = useMemo(

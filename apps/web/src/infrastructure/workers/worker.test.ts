@@ -49,7 +49,7 @@ const sendMessage = (payload: Partial<CalculateSuggestionsRequest["payload"]> = 
 					date: new Date(2025, 0, 1).toISOString(),
 					name: "New Year",
 					variant: "national",
-					isInSelectedRange: true,
+					isInPlanningWindow: true,
 				},
 			],
 			allowPastDays: false,
@@ -121,7 +121,7 @@ describe("worker onmessage", () => {
 		sendMessage();
 
 		expect(planningInput()?.holidays).toEqual([
-			{ id: "h-1", date, name: "New Year", variant: "national", isInSelectedRange: true },
+			{ id: "h-1", date, name: "New Year", variant: "national", isInPlanningWindow: true },
 		]);
 	});
 

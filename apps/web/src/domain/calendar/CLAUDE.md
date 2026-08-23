@@ -22,7 +22,7 @@ in [`CONTEXT.md`](../../../../../CONTEXT.md).
 | [`utils/budget.ts`](./utils/budget.ts) | `measureBudget` — how much of the PTO budget a plan has spent, and the Remaining Budget |
 | [`suggestions/generateSuggestions.ts`](./suggestions/generateSuggestions.ts) | The entry point: Workdays → Bridges → Strategy selector → Suggestion |
 | [`suggestions/utils/selectors.ts`](./suggestions/utils/selectors.ts) | `STRATEGY_ORDERING` — one `Ordering` per Strategy — plus `selectGreedily`, the single walk they all feed and the one owner of the chronological day order, and `selectBridgesForStrategy` which composes the two |
-| [`window.ts`](./window.ts) | `PlanningWindow`, `planningWindowMonths`, `MONTHS_IN_YEAR`, `MONTHS_IN_QUARTER` and `windowMonthCount`/`windowQuarterCount` |
+| [`window.ts`](./window.ts) | `PlanningWindow` and both of its projections — `planningWindowMonths` (the month array) and `planningWindowInterval`/`isInPlanningWindow` (the interval) — plus `MONTHS_IN_YEAR`, `MONTHS_IN_QUARTER`, `MAX_CARRY_OVER_MONTHS` and `windowMonthCount`/`windowQuarterCount` |
 | [`pipeline.ts`](./pipeline.ts) | `runPlanningPipeline` — the whole run: caches, pseudo-Holidays, budget, the two planning calls and the Metrics |
 | [`alternatives/generateAlternatives.ts`](./alternatives/generateAlternatives.ts) | Re-runs selection under seven different Bridge orderings to produce distinct Alternatives |
 | [`metrics/generateMetrics.ts`](./metrics/generateMetrics.ts) | Assembles the `Metrics` object for a Suggestion or an Alternative |
@@ -42,8 +42,8 @@ runPlanningPipeline({ window, ptoDays, autoSuggestCount?, holidays, manuallySele
 
 It owns everything a run needs and a caller used to have to remember: clearing both caches, turning Manual
 Days into `manual-N` pseudo-Holidays, expanding the Planning Window into months, computing
-`effectivePtoDays`, short-circuiting when there is nothing to plan, and measuring the Suggestion and every
-Alternative with the same arguments. `planned: false` is the short circuit — the suggestion it carries is
+`effectivePtoDays`, short-circuiting when there is no budget or no candidate to spend it on, and measuring
+the Suggestion and every Alternative with the same arguments. `planned: false` is the short circuit — the suggestion it carries is
 empty but its Metrics are real, measured by the engine, so no caller has to invent a zeroed object.
 
 **`PlanningResult` is a discriminated union, and everything in it is a `MeasuredSuggestion`.** `Suggestion`
@@ -89,6 +89,34 @@ Efficiency figures depending on which path had last written the Metrics — togg
 enough to make the number jump. The mirrored blocks in [`worker.test.ts`](../../infrastructure/workers/worker.test.ts) and [`holidays.test.ts`](../../application/stores/holidays.test.ts) pin it on both
 sides.
 
+**The short circuit is the empty candidate set, and it used to be the empty Holiday list.** The guard read
+`effectivePtoDays <= 0 || holidaysWithManual.length === 0`, and the second half was wrong on its own terms:
+`analyzePotentialBridge` asks `isWeekend(prevDay) || holidaySet.has(...)`, so a weekend is a Free Day and a
+Bridge needs nothing else beside it. With no Holidays at all a Friday still expands into Saturday and
+Sunday for three Effective Days at 3.0, and a Thursday-Friday pair reaches Sunday at 4/2, exactly
+`EFFICIENCY.MINIMUM`. A Holiday-free year is full of admissible Bridges, which
+[`utils/helpers.test.ts`](./utils/helpers.test.ts) had already pinned one module away while
+[`pipeline.test.ts`](./pipeline.test.ts) asserted the opposite rationale at the call site. The pipeline now returns
+`planned: false` for no budget, computes `findPlanningCandidates`, and returns it again when
+`candidates.bridges` is empty, which is the condition the rest of the run genuinely cannot proceed without.
+
+**That fixed a defect the UI was hiding, not one users were hitting.**
+[`CalendarList.tsx`](../../ui/modules/pages/planner/CalendarList.tsx) gates the Web Worker path on `canCalculate = ptoDays > 0 && holidays.length > 0 && months.length > 0`, so the normal
+planner never handed the pipeline a Holiday-free calendar. The Troubleshooting reset does: it calls the
+store's `generateSuggestions` with no such gate, and `fetchHolidays`'s catch sets `holidays` to the Custom
+Holidays alone, which is empty after a reset. The UI gate is a second copy of the same wrong belief and is
+worth removing on its own merits; it is not what made the guard correct.
+
+**Each candidate `findBridges` emits already has a distinct PTO-day set, so there is no dedupe pass.** It
+emits, per starting Workday W, exactly `{W}`, `{W,W+1}` and `{W,W+1,W+2}`: a different minimum element across
+different W, a different cardinality within one W, so `getCombinationKey` can never collide. A
+`deduplicateBridges` helper sat on that hot path building a `Map` and a joined key string per candidate and
+could not fire, and the test for it re-derived the key by hand and asserted the *output* was unique, which
+holds whether or not the function exists. Both are gone. The property is real but conditional: it holds only
+while `BRIDGE_SEARCH.MIN_MULTI_DAY_SIZE` is above 1, because at 1 the size loop re-emits `{W}` a second
+time. [`utils/helpers.test.ts`](./utils/helpers.test.ts) asserts that constant directly beside the
+uniqueness case, and both go red together when it is lowered, verified at 27 keys where 18 are distinct.
+
 **The Planning Window is two numbers, and `window.ts` is where they become months.** `PlanningWindow` is
 `{ year, carryOverMonths }` — the glossary term, with the shape it has always had — and
 `planningWindowMonths` expands it. `runPlanningPipeline` takes the window and expands it itself.
@@ -104,6 +132,24 @@ the other, with no error and no way to see it. That is now unrepresentable. `ser
 
 [`window.test.ts`](./window.test.ts) pins that the expansion and `windowMonthCount` agree, which is the property the two
 constants made possible to break; verified by desyncing them.
+
+**The window has a second projection, and it lives here too.** `planningWindowInterval` turns the same
+`{ year, carryOverMonths }` into `{ start, end }`, and `isInPlanningWindow` tests a date against it. They
+were in [`../../application/dto/holiday/dto.ts`](../../application/dto/holiday/dto.ts), one layer up from the
+month array they have to agree with, and nothing related the two. `planningWindowInterval(w).end` and
+`endOfMonth(planningWindowMonths(w).at(-1))` describe the same last day only because `addMonths` on 31
+December constrains the day to the shorter month's end. That is Temporal's overflow behaviour doing the work,
+not a shared definition. `window.test.ts` now asserts both ends agree at every `carryOverMonths` the slider
+allows, verified by adding a month to one of them.
+
+**`MAX_CARRY_OVER_MONTHS` is a domain bound, not a slider setting.** The Holiday source fetches `year` and
+`year + 1` and nothing else, so a Planning Window wider than twelve Carry-over Months enumerates months whose
+Holiday set is provably empty and scores every Bridge there against a blank calendar, silently, with no
+error and a wrong plan. It sat in [`../../application/stores/filters.ts`](../../application/stores/filters.ts)
+as a UI clamp while `holidayDTO.create` wrote the matching bound as a literal `year + 1`. It is declared here
+now; `filters.ts` imports it as its clamp ceiling and `holidayDTO.create` derives its keep window from
+`planningWindowInterval({ year, carryOverMonths: MAX_CARRY_OVER_MONTHS })`, so the two cannot part company.
+`window.test.ts` pins that the widest window still ends inside `year + 1`, verified by raising it to 13.
 
 `generateMetrics` takes the `PlanningWindow` whole. It used to take `year` and `carryOverMonths` separately,
 defended here on the grounds that Max Work Streak and Worked Days per month are scoped to a single calendar
@@ -132,8 +178,8 @@ point.
    expansion has one owner and callers no longer hand one in.
 3. `findBridges` generates candidates of 1, 2 and 3 consecutive Workdays, expands each candidate outwards
    through the Free Days on either side, computes `effectiveDays / ptoDaysNeeded`, and keeps the candidate
-   only if that ratio reaches `EFFICIENCY.MINIMUM`. Duplicates are collapsed by their PTO-day set, keeping
-   the most efficient. The result is sorted by Efficiency, with differences under
+   only if that ratio reaches `EFFICIENCY.MINIMUM`. Every candidate it emits already has a distinct PTO-day
+   set, for the reason in the trap below. The result is sorted by Efficiency, with differences under
    `EFFICIENCY_COMPARISON_THRESHOLD` treated as a tie and broken by `effectiveDays` — the ratio is a float
    division, so an exact comparison would order equivalent Bridges on rounding noise.
 4. The Strategy selector walks that order greedily, taking any Bridge that fits the remaining budget and
@@ -210,7 +256,7 @@ third pass used to run after the other two and could select nothing at all.
 ## Invariants and traps
 
 **`generateMetrics` must see exactly the Holiday list the engine planned against — the whole two-year set,
-unfiltered.** It is tempting to narrow it to `isInSelectedRange`, and that was tried and reverted. The
+unfiltered.** It is tempting to narrow it to `isInPlanningWindow`, and that was tried and reverted. The
 planning calls receive the unfiltered list, `createHolidaySet` applies no window filter, and
 `analyzePotentialBridge` expands a Bridge's span straight through a next-year Holiday; `getTotalEffectiveDays`
 then reports that expanded span. Filtering only the *Metrics* input leaves Longest Vacation, Long Weekends
