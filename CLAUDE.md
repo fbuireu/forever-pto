@@ -88,13 +88,14 @@ all three properties.
   style preference — the vocabulary is the only thing keeping four names for the same number apart.
 - **No re-export barrel files.** Import from the source module; a pass-through `index.ts` hides the real
   dependency graph and defeats the layer rules.
-- **Named parameters for two or more arguments.** A function taking two or more arguments takes one
-  destructured object typed by an **interface** named `<FunctionName>Params`:
-  `function sendContactEmail({ data, config }: SendContactEmailParams)`. One argument stays positional.
-  Two adjacent same-typed arguments are the shape a caller transposes with nothing to catch it, and the
-  parameter names then travel to the call site. The exceptions are functions a runtime calls back —
-  a `sort`/`toSorted` comparator like `compareByEfficiency`, or a class handed to `vi.stubGlobal` — which
-  are invoked positionally and must stay that way.
+- **One argument is positional; two or more are one object, typed `<FunctionName>Params`.**
+  `detectCountry(request)`, `emailDomain(email)`, `resolveLocale(requested)`;
+  `sendContactEmail({ data, config }): SendContactEmailParams`,
+  `localePath({ locale, path }): LocalePathParams`. The interface is named after the function, not after
+  the concept, so a reader landing on the type knows what takes it. Two adjacent arguments of the same
+  type are what a caller transposes with nothing to catch it. The exception is a function a *runtime*
+  calls back and hands its arguments one at a time — the `toSorted` comparators `compareByEfficiency` and
+  `compareGrouped`, and `MockResizeObserver`, which `vi.stubGlobal` constructs.
 - **Conventional commits** (commitlint + husky). semantic-release owns versioning. Do NOT add a
   Co-Authored-By / Claude trailer to commits or PRs.
 - **One package per pull request.** The repo squash-merges, and a release is attributed to a package by the

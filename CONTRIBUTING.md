@@ -89,11 +89,10 @@ Husky runs lint-staged on pre-commit, commitlint on commit-msg and
   after a retired term is a defect, not a style preference.
 - **No explanatory comments in TypeScript sources under `src/`.** The folder's
   `CLAUDE.md` carries the explanation instead.
-- **Two or more arguments means one named object.** Declare it as an interface
-  called `<FunctionName>Params` and destructure it:
-  `function localePath({ locale, path }: LocalePathParams)`. A single argument
-  stays positional. Comparators passed to `sort`/`toSorted`, and anything else a
-  runtime calls back, are the exception — those are invoked positionally.
+- **One argument is positional and two or more are a single object typed
+  `<FunctionName>Params`** — `localePath({ locale, path }: LocalePathParams)`.
+  The exception is a function a runtime calls back, such as a `toSorted`
+  comparator, which is handed its arguments one at a time.
 - **`Temporal` comes from `temporal-polyfill`, never the global** — the global
   does not resolve in the deployed Workers runtime.
 - **Cross-layer imports use the path aliases; same-folder imports stay

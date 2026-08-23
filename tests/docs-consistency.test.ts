@@ -751,3 +751,67 @@ describe("translation bundles stay in step", () => {
 		}).toEqual({ missing: [], extra: [] });
 	});
 });
+
+describe("two or more arguments are one object typed after the function", () => {
+	// A runtime that calls a function back hands it arguments one at a time, so these three cannot take an
+	// object: the two toSorted comparators, and the class vi.stubGlobal constructs.
+	const CALLED_BACK_POSITIONALLY = new Set(["compareByEfficiency", "compareGrouped", "MockResizeObserver"]);
+
+	interface PositionalIn {
+		path: string;
+		source: string;
+	}
+
+	// Parsed rather than matched: a default value can hold a comma, a generic can hold one, and an arrow in a
+	// parameter list holds both. Only the parser knows where one parameter ends and the next begins.
+	const positionalIn = ({ path, source }: PositionalIn) => {
+		const parsed = ts.createSourceFile(path, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+		const found: string[] = [];
+
+		const walk = (node: ts.Node) => {
+			let name: string | undefined;
+			let parameters: readonly ts.ParameterDeclaration[] | undefined;
+
+			if (ts.isFunctionDeclaration(node) && node.name) {
+				name = node.name.text;
+				parameters = node.parameters;
+			} else if (
+				ts.isVariableDeclaration(node) &&
+				node.initializer &&
+				(ts.isArrowFunction(node.initializer) || ts.isFunctionExpression(node.initializer)) &&
+				ts.isIdentifier(node.name)
+			) {
+				name = node.name.text;
+				parameters = node.initializer.parameters;
+			}
+
+			const isComponent = path.endsWith(".tsx") && /^[A-Z]/.test(name ?? "");
+
+			if (
+				name &&
+				parameters &&
+				parameters.length > 1 &&
+				!isComponent &&
+				!CALLED_BACK_POSITIONALLY.has(name) &&
+				parameters.every((parameter) => ts.isIdentifier(parameter.name))
+			) {
+				found.push(`${path}: ${name}`);
+			}
+
+			ts.forEachChild(node, walk);
+		};
+
+		walk(parsed);
+		return found;
+	};
+
+	it("is the rule the root guide states", () => {
+		expect(rootGuide).toContain("One argument is positional; two or more are one object");
+	});
+
+	it("holds everywhere, fixtures and tests included", () => {
+		const positional = sourceFiles.flatMap((path) => positionalIn({ path, source: read(path) }));
+
+		expect(positional).toEqual([]);
+	});
+});
