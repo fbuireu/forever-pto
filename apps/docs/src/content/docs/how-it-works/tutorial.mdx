@@ -1,6 +1,6 @@
 ---
 title: Onboarding tutorial
-description: The driver.js guided tour — the DriverClient singleton, data-tutorial anchors, lazy-loaded styling and when it runs.
+description: The driver.js guided tour, covering the DriverClient singleton, data-tutorial anchors, lazy-loaded styling and when it runs.
 sidebar:
   order: 13
 ---
@@ -9,7 +9,7 @@ The planner ships a guided tour built on `driver.js`. It never auto-starts: it r
 
 ## The client: a wrapped singleton
 
-`apps/web/src/infrastructure/clients/tutorial/driver/client.tsx` wraps `driver.js` in a `DriverClient` class, exposed through `getDriverClientInstance()` (singleton — one driver, one overlay). Defaults: progress indicator on, `next`/`previous`/`close` buttons, smooth scroll, `stagePadding: 10`, `stageRadius: 12`.
+`apps/web/src/infrastructure/clients/tutorial/driver/client.tsx` wraps `driver.js` in a `DriverClient` class, exposed through `getDriverClientInstance()` (a singleton: one driver, one overlay). Defaults: progress indicator on, `next`/`previous`/`close` buttons, smooth scroll, `stagePadding: 10`, `stageRadius: 12`.
 
 Two customizations happen in `onPopoverRender`:
 
@@ -22,7 +22,7 @@ Two customizations happen in `onPopoverRender`:
 
 - Steps target elements by `data-tutorial` attributes: `sidebar-step-1` through `sidebar-step-4`, `sidebar-tools`, `alternatives-manager`, `pto-status`, `holidays-list`, `calendar-list`, plus a final unanchored step. Titles and descriptions come from the `tutorial.steps` i18n namespace; button labels and the progress text from `tutorial` (see [internationalization](/how-it-works/i18n/)).
 - **Mobile** (`useIsMobile`) inserts an extra `planner-drawer` step, and the alternatives step dispatches a `tutorial:expand-drawer` custom event so the drawer opens before it is highlighted.
-- If the sidebar is closed, the hook toggles it first and waits for the container's `transitionend` before starting — otherwise the first highlights would target collapsed elements.
+- If the sidebar is closed, the hook toggles it first and waits for the container's `transitionend` before starting; otherwise the first highlights would target collapsed elements.
 
 ## Styling
 
@@ -30,4 +30,4 @@ Two customizations happen in `onPopoverRender`:
 
 ## Adding a step
 
-Add a `data-tutorial="..."` attribute to the target element, a step entry in `useTutorial`, and `step*Title`/`step*Description` keys to every locale's `tutorial.steps` namespace. Nothing else registers steps — the attribute is the contract.
+Add a `data-tutorial="..."` attribute to the target element, a step entry in `useTutorial`, and `step*Title`/`step*Description` keys to every locale's `tutorial.steps` namespace. Nothing else registers steps: the attribute is the contract.

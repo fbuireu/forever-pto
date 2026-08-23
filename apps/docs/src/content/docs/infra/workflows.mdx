@@ -1,6 +1,6 @@
 ---
 title: GitHub workflows
-description: Reference for every workflow in .github/workflows — triggers, jobs and what each one gates.
+description: Reference for every workflow in .github/workflows: triggers, jobs and what each one gates.
 sidebar:
   order: 2
 ---
@@ -15,26 +15,26 @@ All workflows live in `.github/workflows/`. Two repo-wide conventions, enforced 
 | `docs.yml` | push / PR touching `apps/docs/**` | This site's build, checks and deploy |
 | `zizmor.yml` | push to `main`, all PRs | Workflow security linting |
 | `renovate-auto-approve.yml` | Renovate PRs (by label) | Auto-approve safe dependency PRs |
-| `dependabot-auto-merge.yml` | Dependabot PRs | Dormant — Renovate is the active bot |
+| `dependabot-auto-merge.yml` | Dependabot PRs | Dormant; Renovate is the active bot |
 
-## `ci.yml` — CI
+## `ci.yml` (CI)
 
 Runs on pushes to `main` and PRs targeting `main`. `cancel-in-progress` is conditional on `pull_request`: cancelling a superseded PR run is free, cancelling a `main` run would kill a deploy or a release halfway.
 
-- **changes** — derives from `git diff` whether `apps/web` (or anything the app build depends on) was touched, and exposes it as an output. It uses `git diff` rather than a filter action because every third-party action here is SHA-pinned and an unpinnable one trips zizmor. It fails open.
-- **Lint** — `pnpm lint:all` (Biome), at the repo root, over both packages.
-- **Typecheck** — `pnpm typecheck` at the repo root, which chains the root program (`tests/`, `commitlint.config.ts`) and then `apps/web`.
-- **Unit tests** — `pnpm test:ut:coverage` with `working-directory: apps/web`, then `pnpm test:docs` at the root, then coverage upload to Codecov (`fail_ci_if_error: false`, so Codecov outages never block CI).
+- **changes** derives from `git diff` whether `apps/web` (or anything the app build depends on) was touched, and exposes it as an output. It uses `git diff` rather than a filter action because every third-party action here is SHA-pinned and an unpinnable one trips zizmor. It fails open.
+- **Lint** runs `pnpm lint:all` (Biome), at the repo root, over both packages.
+- **Typecheck** runs `pnpm typecheck` at the repo root, which chains the root program (`tests/`, `commitlint.config.ts`) and then `apps/web`.
+- **Unit tests** run `pnpm test:ut:coverage` with `working-directory: apps/web`, then `pnpm test:docs` at the root, then coverage upload to Codecov (`fail_ci_if_error: false`, so Codecov outages never block CI).
 - **deploy-production → release-web → docs-refresh** on `main`, or **deploy-development → comment / e2e** on a PR. The first three are gated on the `changes` output; the quality jobs are not.
 
 The quality jobs are what branch protection gates PRs on. Unlike the arrangement this replaced, they also gate *deploying*: `deploy-production` `needs` all three, and `release-web` `needs` the deploy, so a tag means the version is live. Package scoping uses step-level `working-directory`; a job-level default would not reach a `uses:` step, which is why every `nick-fields/retry` command begins with an explicit `cd`.
 
-## `_deploy-web.yml` — Deploy web (reusable)
+## `_deploy-web.yml` (Deploy web, reusable)
 
 A `workflow_call` workflow shared by both deploy entry points. Inputs: `environment` (GitHub environment name), `wrangler_env` (`--env` for wrangler), optional `url` (shown on the PR/deployments UI) and optional `worker_name` (the per-PR override). Steps:
 
-1. Install deps, then build with `pnpm run cf:build` (OpenNext). The build step receives the `NEXT_PUBLIC_*` GitHub environment *variables* — these are baked into the client bundle at build time.
-2. `pnpm exec wrangler deploy --env <wrangler_env>`, adding `--name <worker_name>` when set — the name override is what creates a fresh per-PR Worker.
+1. Install deps, then build with `pnpm run cf:build` (OpenNext). The build step receives the `NEXT_PUBLIC_*` GitHub environment *variables*, and these are baked into the client bundle at build time.
+2. `pnpm exec wrangler deploy --env <wrangler_env>`, adding `--name <worker_name>` when set; the name override is what creates a fresh per-PR Worker.
 3. Push the five runtime secrets with `wrangler secret bulk` (targeting `--name` for previews, `--env` otherwise). A small Node guard fails the job if any secret is missing rather than deploying a half-configured Worker. See [secrets](/infra/secrets/).
 
 ### The deploy jobs
@@ -43,17 +43,17 @@ A `workflow_call` workflow shared by both deploy entry points. Inputs: `environm
 
 `deploy-production` calls the same reusable workflow with `environment: web-production`, `wrangler_env: production` and `url: https://forever-pto.com`, and no `worker_name` override, so it updates the `forever-pto` Worker in place.
 
-## `cleanup-development.yml` — Cleanup - Development
+## `cleanup-development.yml` (Cleanup - Development)
 
-On `pull_request: closed`, runs `cloudflare/wrangler-action` with `delete pr-<n>-forever-pto-development --force`. Nothing else — shared dev R2/KV/Turso state is intentionally left alone.
+On `pull_request: closed`, runs `cloudflare/wrangler-action` with `delete pr-<n>-forever-pto-development --force`. Nothing else: shared dev R2/KV/Turso state is intentionally left alone.
 
-## `docs.yml` — Docs
+## `docs.yml` (Docs)
 
-CI/CD for this documentation site, path-filtered to `apps/docs/**` plus the app UI surfaces the demos import (`apps/web/src/ui/modules/core/**`, `apps/web/src/ui/styles/**`, `apps/web/src/ui/utils/**`…). It also carries `release-docs`, which runs after the docs deploy so a `docs-v*` tag only exists once the site is live. Build & test, versioned PR previews and production deploy of the `forever-pto-docs` Worker — the full walkthrough is on [docs CI](/infra/docs-ci/).
+CI/CD for this documentation site, path-filtered to `apps/docs/**` plus the app UI surfaces the demos import (`apps/web/src/ui/modules/core/**`, `apps/web/src/ui/styles/**`, `apps/web/src/ui/utils/**`…). It also carries `release-docs`, which runs after the docs deploy so a `docs-v*` tag only exists once the site is live. Build & test, versioned PR previews and production deploy of the `forever-pto-docs` Worker; the full walkthrough is on [docs CI](/infra/docs-ci/).
 
-## `zizmor.yml` — Security Analysis with zizmor
+## `zizmor.yml` (Security Analysis with zizmor)
 
-Runs the zizmor GitHub Actions security linter on pushes to `main` and every PR, reporting to GitHub code scanning (`security-events: write` is its only permission). This is what makes the SHA-pinning and `persist-credentials: false` conventions stick — any new workflow (including docs ones) gets linted too.
+Runs the zizmor GitHub Actions security linter on pushes to `main` and every PR, reporting to GitHub code scanning (`security-events: write` is its only permission). This is what makes the SHA-pinning and `persist-credentials: false` conventions stick: any new workflow (including docs ones) gets linted too.
 
 ## `renovate-auto-approve.yml`
 
@@ -61,4 +61,4 @@ Approves Renovate PRs so their automerge can proceed. Gated on the PR author bei
 
 ## `dependabot-auto-merge.yml`
 
-Legacy: approves and auto-squash-merges Dependabot patch/minor/dev-dependency PRs and labels them by update type. There is no `.github/dependabot.yml` in the repo, so this workflow's `if: user.login == 'dependabot[bot]'` guard never matches — Renovate is the active dependency bot. Kept dormant; safe to ignore.
+Legacy: approves and auto-squash-merges Dependabot patch/minor/dev-dependency PRs and labels them by update type. There is no `.github/dependabot.yml` in the repo, so this workflow's `if: user.login == 'dependabot[bot]'` guard never matches, because Renovate is the active dependency bot. Kept dormant; safe to ignore.

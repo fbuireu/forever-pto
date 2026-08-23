@@ -6,7 +6,7 @@
  * 1. App theme first: its @custom-variant (dark, hover) get defined...
  * 2. ...then @astrojs/starlight-tailwind re-declares `dark` (root + descendants,
  *    a superset of the app's descendants-only variant) and wins.
- * 3. Tailwind theme + utilities WITHOUT preflight — Starlight owns base styles;
+ * 3. Tailwind theme + utilities WITHOUT preflight, since Starlight owns base styles;
  *    importing 'tailwindcss' wholesale would double the preflight.
  * Never import apps/web/src/ui/styles/index.css here (full tailwindcss + app layers).
  */
@@ -27,11 +27,12 @@
 @import '@fontsource/instrument-serif/400-italic.css';
 
 /* Generate the Tailwind utilities used by the app components living outside
-   the docs root. @source only extracts class strings — scanning Next-coupled
+   the docs root. @source only extracts class strings, so scanning Next-coupled
    files (Sonner, RichLink...) is harmless. */
 @source '../../../web/src/ui/modules/core';
 /* Homepage pattern constants (brutCard, dayCell) demoed on
-   design-system/patterns/homepage — their classes live outside core. */
+   design-system/patterns/homepage; their classes live outside core. */
+
 @source '../../../web/src/ui/modules/pages/homepage/sections/shared.ts';
 
 /* The app sets these via next/font; here @fontsource self-hosts the same

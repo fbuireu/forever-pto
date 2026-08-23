@@ -1,6 +1,6 @@
 ---
 title: Calendar exports
-description: PDF and ICS exports — the CalendarExport component, @react-pdf rendering, the hand-rolled ICS generator and premium gating.
+description: PDF and ICS exports, covering the CalendarExport component, @react-pdf rendering, the hand-rolled ICS generator and premium gating.
 sidebar:
   order: 7
 ---
@@ -9,9 +9,9 @@ Users can take their plan with them in two formats: a printable **PDF** and an *
 
 ## The component
 
-`apps/web/src/ui/modules/sidebar/components/CalendarExport.tsx` (a sidebar tool, tutorial anchor `data-tutorial='calendar-export'`) reads `year` from the filters store and `holidays` + the active suggestion from the holidays store (`currentSelection ?? suggestion` — manual edits win over the raw suggestion). Two toggle buttons choose what to include: holidays, PTO days, or both; the download buttons disable when the resulting selection is empty.
+`apps/web/src/ui/modules/sidebar/components/CalendarExport.tsx` (a sidebar tool, tutorial anchor `data-tutorial='calendar-export'`) reads `year` from the filters store and `holidays` + the active suggestion from the holidays store (`currentSelection ?? suggestion`, so manual edits win over the raw suggestion). Two toggle buttons choose what to include: holidays, PTO days, or both; the download buttons disable when the resulting selection is empty.
 
-The download buttons — and only the buttons — are wrapped in `PremiumFeature` (`apps/web/src/ui/modules/premium/PremiumFeature.tsx`), so free users see the tool blurred with a lock and get the upgrade modal on interaction. See [premium](/how-it-works/premium/).
+The download buttons, and only the buttons, are wrapped in `PremiumFeature` (`apps/web/src/ui/modules/premium/PremiumFeature.tsx`), so free users see the tool blurred with a lock and get the upgrade modal on interaction. See [premium](/how-it-works/premium/).
 
 ## PDF export
 
@@ -19,14 +19,14 @@ The PDF path is fully lazy: neither `@react-pdf/renderer` nor the document compo
 
 Two details worth copying elsewhere:
 
-- The object URL is managed with `Effect.acquireRelease` + `Effect.scoped`, so `URL.revokeObjectURL` runs even on failure — no leaked blob URLs.
+- The object URL is managed with `Effect.acquireRelease` + `Effect.scoped`, so `URL.revokeObjectURL` runs even on failure, with no leaked blob URLs.
 - All labels (`pdf.holidays`, `pdf.vacationDays`, ...) are passed in from the `calendarExport` i18n namespace; the document component itself stays translation-agnostic.
 
 Success and failure surface as `sonner` toasts.
 
 ## ICS export
 
-`generateIcs` (`apps/web/src/application/export/generateIcs.ts`) is a small hand-rolled generator — no calendar dependency. Each holiday and each PTO day becomes an all-day `VEVENT` (`DTSTART;VALUE=DATE` / `DTEND` next day) with a `CATEGORIES` of `HOLIDAY` or `PTO` and a deterministic `UID` (`holiday-{id}@forever-pto`, `pto-{yyyymmdd}@forever-pto`). Summaries pass through `sanitize` (`apps/web/src/application/export/utils/sanitizer.ts`) to escape ICS-reserved characters, lines join with `\r\n` per RFC 5545, and the calendar carries a localized `X-WR-CALNAME` plus the year. The component wraps the string in a `text/calendar` blob and downloads it as `forever-pto-{year}.ics`.
+`generateIcs` (`apps/web/src/application/export/generateIcs.ts`) is a small hand-rolled generator with no calendar dependency. Each holiday and each PTO day becomes an all-day `VEVENT` (`DTSTART;VALUE=DATE` / `DTEND` next day) with a `CATEGORIES` of `HOLIDAY` or `PTO` and a deterministic `UID` (`holiday-{id}@forever-pto`, `pto-{yyyymmdd}@forever-pto`). Summaries pass through `sanitize` (`apps/web/src/application/export/utils/sanitizer.ts`) to escape ICS-reserved characters, lines join with `\r\n` per RFC 5545, and the calendar carries a localized `X-WR-CALNAME` plus the year. The component wraps the string in a `text/calendar` blob and downloads it as `forever-pto-{year}.ics`.
 
 Because UIDs are deterministic, re-importing a regenerated file updates events in place in most calendar clients instead of duplicating them.
 

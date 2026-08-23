@@ -14,14 +14,14 @@ The app is localized with `next-intl`. The supported locales are defined once in
 `apps/web/src/infrastructure/i18n/routing.ts` calls `defineRouting` with:
 
 - `locales: LOCALES`, `defaultLocale: EN`.
-- `localePrefix: 'as-needed'` — English lives at `/`, every other locale gets a prefix (`/es/...`, `/ca/...`).
+- `localePrefix: 'as-needed'` means English lives at `/` and every other locale gets a prefix (`/es/...`, `/ca/...`).
 - `localeCookie: { secure: true, sameSite: 'lax' }`.
 
 The `next-intl` middleware (`createMiddleware(routing)` in `apps/web/src/middleware.ts`) resolves the locale per request. Unknown locales hit `notFound()` in the root layout, which renders `generateStaticParams` over all locales.
 
 ## The NEXT_LOCALE cookie
 
-`next-intl` persists the resolved locale in the `NEXT_LOCALE` cookie (constant `LOCALE_COOKIE` in `apps/web/src/infrastructure/i18n/config.ts`). The middleware then **re-sets** that same cookie through `setLocaleCookie()` (`apps/web/src/infrastructure/i18n/cookie.ts`) to harden it: `httpOnly: true`, `secure: true`, `sameSite: 'lax'`, `path: '/'`, and no `maxAge` — a session cookie. See [cookies](/reference/cookies/).
+`next-intl` persists the resolved locale in the `NEXT_LOCALE` cookie (constant `LOCALE_COOKIE` in `apps/web/src/infrastructure/i18n/config.ts`). The middleware then **re-sets** that same cookie through `setLocaleCookie()` (`apps/web/src/infrastructure/i18n/cookie.ts`) to harden it: `httpOnly: true`, `secure: true`, `sameSite: 'lax'`, `path: '/'`, and no `maxAge`, making it a session cookie. See [cookies](/reference/cookies/).
 
 ## Messages
 
@@ -47,4 +47,4 @@ Everything imports these from `@application/i18n/navigation`, so hrefs stay loca
 
 - Components use namespaced hooks: `useTranslations('sidebar')`, `useTranslations('donate')`, `useTranslations('tutorial.steps')`. Cross-namespace access means multiple hooks, not one giant namespace.
 - Translation strings never contain ALL-CAPS text; uppercase is applied with CSS in the component.
-- Server code uses `getTranslations({ locale, namespace })` — see the [markdown API](/how-it-works/markdown-api/) and [SEO](/how-it-works/seo/) pages for examples.
+- Server code uses `getTranslations({ locale, namespace })`; see the [markdown API](/how-it-works/markdown-api/) and [SEO](/how-it-works/seo/) pages for examples.

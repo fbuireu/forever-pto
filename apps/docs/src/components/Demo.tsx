@@ -12,7 +12,7 @@ interface DemoProps {
  * Frame for live component demos: renders children on the app's real page
  * background so tokens, shadows and dark mode look exactly like production,
  * and supplies the two app contexts a real component may reach for. A demo
- * that needs one must not have to remember it — see apps/docs/CLAUDE.md.
+ * that needs one must not have to remember it; see apps/docs/CLAUDE.md.
  */
 export const Demo = ({ children, className }: DemoProps) => {
 	return (
