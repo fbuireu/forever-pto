@@ -45,11 +45,13 @@ A `workflow_call` workflow shared by both deploy entry points. Inputs: `environm
 
 ## `cleanup-development.yml` — Cleanup - Development
 
-On `pull_request: closed`, runs `cloudflare/wrangler-action` with `delete pr-<n>-forever-pto-development --force`. Nothing else — shared dev R2/KV/Turso state is intentionally left alone.
+On `pull_request: closed`, two jobs: `cleanup-web` deletes `pr-<n>-forever-pto-development` and `cleanup-docs` deletes `pr-<n>-forever-pto-docs-development`, both through `nick-fields/retry` wrapping `pnpm exec wrangler delete --force`. Shared dev R2/KV/Turso state is intentionally left alone.
+
+It declares `group: CI-${{ github.ref }}` with `cancel-in-progress: false`, which is what stops it deleting a Worker the E2E job is still driving — see [environments](/infra/environments/).
 
 ## `docs.yml` — Docs
 
-CI/CD for this documentation site, path-filtered to `apps/docs/**` plus the app UI surfaces the demos import (`apps/web/src/ui/modules/core/**`, `apps/web/src/ui/styles/**`, `apps/web/src/ui/utils/**`…). It also carries `release-docs`, which runs after the docs deploy so a `docs-v*` tag only exists once the site is live. Build & test, versioned PR previews and production deploy of the `forever-pto-docs` Worker — the full walkthrough is on [docs CI](/infra/docs-ci/).
+CI/CD for this documentation site, path-filtered to `apps/docs/**` plus everything the site reaches into the app for: `apps/web/src/ui/**`, `apps/web/package.json` (the version the site displays), `apps/web/src/domain/calendar/types.ts` and `apps/web/src/infrastructure/i18n/locales.ts`. It also answers `workflow_dispatch`, which is how `ci.yml`'s `docs-refresh` job rebuilds the site after a web release — the release commit carries `[skip ci]`, so without the dispatch the published site keeps advertising the previous version. It also carries `release-docs`, which runs after the docs deploy so a `docs-v*` tag only exists once the site is live. Build & test, versioned PR previews and production deploy of the `forever-pto-docs` Worker — the full walkthrough is on [docs CI](/infra/docs-ci/).
 
 ## `commit-message.yml` — Commit Message
 

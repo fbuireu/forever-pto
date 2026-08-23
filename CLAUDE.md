@@ -126,9 +126,17 @@ builds from — but it means "the repo root" is not the boundary; the regex is.
 **`ci.yml` holds the whole app graph**: `changes`, then `lint`, `typecheck` and `test` in parallel, then
 `deploy-production` → `release-web` → `docs-refresh` on `main`, or `deploy-development` → `comment` / `e2e`
 on a PR. Both deploy jobs call the shared [`_deploy-web.yml`](./.github/workflows/_deploy-web.yml). `docs.yml` holds the docs graph — `build`, then
-`preview` on a PR or `deploy` → `release-docs` on `main`. The rest are [`cleanup-development.yml`](./.github/workflows/cleanup-development.yml), the
-renovate auto-merge, a `zizmor` audit, and [`dependabot-auto-merge.yml`](./.github/workflows/dependabot-auto-merge.yml) — which is **dormant**: there is no
+`preview` on a PR or `deploy` → `release-docs` on `main`. The rest are [`cleanup-development.yml`](./.github/workflows/cleanup-development.yml),
+[`renovate-auto-approve.yml`](./.github/workflows/renovate-auto-approve.yml) (the auto-merge, whose file is
+named for approving rather than merging), a [`zizmor.yml`](./.github/workflows/zizmor.yml) audit,
+[`dependency-review.yml`](./.github/workflows/dependency-review.yml), [`commit-message.yml`](./.github/workflows/commit-message.yml), and
+[`dependabot-auto-merge.yml`](./.github/workflows/dependabot-auto-merge.yml) — which is **dormant**: there is no
 `.github/dependabot.yml` in the tree, so nothing ever triggers it. It is kept for the day one appears.
+
+**`commit-message.yml` lints the pull request *title*, which is the guard the two rules above depend on.**
+`main` takes squash merges, so the title becomes the commit semantic-release parses — the *Conventional
+commits* convention and the *One package per pull request* release rule are both enforced there and nowhere
+else. It was missing from this list, which is how a rule can look enforced and not be.
 
 Every job that needs a toolchain uses the `.github/actions/prepare-env` composite — pnpm, the `.nvmrc` Node,
 `setup-node`'s dependency cache and `pnpm install --frozen-lockfile` — rather than repeating five steps.
