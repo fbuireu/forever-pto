@@ -1,13 +1,13 @@
 ---
 title: Separator
-description: Hairline divider — horizontal or vertical, decorative by default with an accessible mode.
+description: Hairline divider, horizontal or vertical, decorative by default with an accessible mode.
 sidebar:
   order: 17
 ---
 
 import { SeparatorDemo } from '../../../../components/demos/SeparatorDemo';
 
-Source: `apps/web/src/ui/modules/core/primitives/Separator.tsx`. A `bg-border` hairline div. The only primitive in the system deliberately without the brutal border treatment — it separates, it does not frame.
+Source: `apps/web/src/ui/modules/core/primitives/Separator.tsx`. A `bg-border` hairline div. The only primitive in the system deliberately without the brutal border treatment: it separates, it does not frame.
 
 <SeparatorDemo client:visible />
 
@@ -35,4 +35,4 @@ import { Separator } from '@ui/modules/core/primitives/Separator';
 ## Conventions
 
 - Keep `decorative` (the default) for purely visual dividers; set `decorative={false}` only when the separation is semantically meaningful (e.g. between toolbar groups).
-- It is a plain div — all `ComponentProps<'div'>` pass through, and `className` merges via `cn()`.
+- It is a plain div, so all `ComponentProps<'div'>` pass through, and `className` merges via `cn()`.

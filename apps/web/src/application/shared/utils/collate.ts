@@ -16,7 +16,12 @@ const collatorFor = (locale?: Locale) => {
 	return collator;
 };
 
-export const collateByLabel = <T extends LabelledOption>(options: T[], locale?: Locale): T[] => {
+export interface CollateByLabelParams<T extends LabelledOption> {
+	options: T[];
+	locale?: Locale;
+}
+
+export const collateByLabel = <T extends LabelledOption>({ options, locale }: CollateByLabelParams<T>): T[] => {
 	const collator = collatorFor(locale);
 	return options.toSorted((a, b) => collator.compare(a.label, b.label));
 };

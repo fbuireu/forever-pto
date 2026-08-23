@@ -7,7 +7,7 @@ import { Me } from "@ui/modules/pages/legal/Me";
 import { Nif } from "@ui/modules/pages/legal/Nif";
 import { getLastUpdatedDate } from "@ui/utils/getLastUpdatedDate";
 
-const githubLink = createRichLink("https://github.com/fbuireu/forever-pto", { external: true });
+const githubLink = createRichLink({ href: "https://github.com/fbuireu/forever-pto", options: { external: true } });
 
 import type { Locale } from "next-intl";
 import { getTranslations } from "next-intl/server";

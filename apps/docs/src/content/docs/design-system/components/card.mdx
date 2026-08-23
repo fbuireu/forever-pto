@@ -1,13 +1,13 @@
 ---
 title: Card
-description: The surface container — Card with Header, Title, Description and Content sub-components.
+description: The surface container, Card with Header, Title, Description and Content sub-components.
 sidebar:
   order: 5
 ---
 
 import { CardDemo, CardPartsDemo } from '../../../../components/demos/CardDemo';
 
-Source: `apps/web/src/ui/modules/core/primitives/Card.tsx`. A `bg-card` column with `rounded-[14px]`, the 3px frame border and the medium brutal shadow. No variants — composition happens through the sub-components. Framework-clean, so this page renders the real component.
+Source: `apps/web/src/ui/modules/core/primitives/Card.tsx`. A `bg-card` column with `rounded-[14px]`, the 3px frame border and the medium brutal shadow. No variants: composition happens through the sub-components. Framework-clean, so this page renders the real component.
 
 <CardDemo client:visible />
 
@@ -23,7 +23,7 @@ Source: `apps/web/src/ui/modules/core/primitives/Card.tsx`. A `bg-card` column w
 | `CardDescription` | Muted small text. |
 | `CardContent` | Body area, horizontal padding matching the header. |
 
-Only these five are exported. The source also defines `_CardAction` and `_CardFooter`, currently private — check `apps/web/src/ui/modules/core/primitives/Card.tsx` before reaching for them.
+Only these five are exported. The source also defines `_CardAction` and `_CardFooter`, currently private, so check `apps/web/src/ui/modules/core/primitives/Card.tsx` before reaching for them.
 
 ## Usage
 
@@ -43,4 +43,4 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/m
 
 - Every part sets a `data-slot` attribute (`card`, `card-header`, `card-title`, …) for CSS containment hooks.
 - Vertical rhythm comes from the container's `gap-6`; parts only own horizontal padding (`px-6`).
-- The homepage sections use their own heavier `brutCard` class (4px border) from `apps/web/src/ui/modules/pages/homepage/sections/shared.ts` — that is a page-level pattern, not this primitive.
+- The homepage sections use their own heavier `brutCard` class (4px border) from `apps/web/src/ui/modules/pages/homepage/sections/shared.ts`; that is a page-level pattern, not this primitive.

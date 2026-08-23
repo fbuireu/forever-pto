@@ -120,10 +120,12 @@ function useAnimateIconContext() {
 	return context;
 }
 
-function composeEventHandlers<E extends SyntheticEvent<unknown>>(
-	theirs?: (event: E) => void,
-	ours?: (event: E) => void,
-) {
+interface ComposeEventHandlersParams<E extends SyntheticEvent<unknown>> {
+	theirs?: (event: E) => void;
+	ours?: (event: E) => void;
+}
+
+function composeEventHandlers<E extends SyntheticEvent<unknown>>({ theirs, ours }: ComposeEventHandlersParams<E> = {}) {
 	return (event: E) => {
 		theirs?.(event);
 		ours?.(event);
@@ -229,10 +231,13 @@ function AnimateIcon({
 	}, []);
 
 	const viewOuterRef = useRef<HTMLElement>(null);
-	const { ref: inViewRef, isInView } = useIsInView(viewOuterRef, {
-		inView: !!animateOnView,
-		inViewOnce: animateOnViewOnce,
-		inViewMargin: animateOnViewMargin,
+	const { ref: inViewRef, isInView } = useIsInView({
+		ref: viewOuterRef,
+		options: {
+			inView: !!animateOnView,
+			inViewOnce: animateOnViewOnce,
+			inViewMargin: animateOnViewMargin,
+		},
 	});
 
 	const startAnim = useCallback(
@@ -367,22 +372,34 @@ function AnimateIcon({
 
 	const childProps = (isValidElement(children) ? (children as ReactElement).props : {}) as AnyProps;
 
-	const handlePointerEnter = composeEventHandlers<PointerEvent<HTMLElement>>(childProps.onPointerEnter, (event) => {
-		if (event.pointerType !== "mouse") return;
-		if (animateOnHover) startAnimation(animateOnHover);
+	const handlePointerEnter = composeEventHandlers<PointerEvent<unknown>>({
+		theirs: childProps.onPointerEnter,
+		ours: (event) => {
+			if (event.pointerType !== "mouse") return;
+			if (animateOnHover) startAnimation(animateOnHover);
+		},
 	});
 
-	const handlePointerLeave = composeEventHandlers<PointerEvent<HTMLElement>>(childProps.onPointerLeave, (event) => {
-		if (event.pointerType !== "mouse") return;
-		if (animateOnHover || animateOnTap) stopAnimation();
+	const handlePointerLeave = composeEventHandlers<PointerEvent<unknown>>({
+		theirs: childProps.onPointerLeave,
+		ours: (event) => {
+			if (event.pointerType !== "mouse") return;
+			if (animateOnHover || animateOnTap) stopAnimation();
+		},
 	});
 
-	const handlePointerDown = composeEventHandlers<PointerEvent<HTMLElement>>(childProps.onPointerDown, () => {
-		if (animateOnTap) startAnimation(animateOnTap);
+	const handlePointerDown = composeEventHandlers({
+		theirs: childProps.onPointerDown,
+		ours: () => {
+			if (animateOnTap) startAnimation(animateOnTap);
+		},
 	});
 
-	const handlePointerUp = composeEventHandlers<PointerEvent<HTMLElement>>(childProps.onPointerUp, () => {
-		if (animateOnTap) stopAnimation();
+	const handlePointerUp = composeEventHandlers({
+		theirs: childProps.onPointerUp,
+		ours: () => {
+			if (animateOnTap) stopAnimation();
+		},
 	});
 
 	const dataProps = Object.fromEntries(

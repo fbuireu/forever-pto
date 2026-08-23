@@ -2,7 +2,12 @@ import { hasLocale, type Locale } from "next-intl";
 import { LOCALES } from "../locales";
 import { routing } from "../routing";
 
-export function localePath(locale: string, path = "") {
+export interface LocalePathParams {
+	locale: string;
+	path?: string;
+}
+
+export function localePath({ locale, path = "" }: LocalePathParams) {
 	return locale === routing.defaultLocale ? path || "/" : `/${locale}${path}`;
 }
 
@@ -31,7 +36,7 @@ export function routePathFromPathname(pathname: string): string {
 
 export function localeAlternates(path = ""): Record<string, string> {
 	return {
-		...Object.fromEntries(LOCALES.map((l) => [l, localePath(l, path)])),
-		"x-default": localePath(routing.defaultLocale, path),
+		...Object.fromEntries(LOCALES.map((l) => [l, localePath({ locale: l, path })])),
+		"x-default": localePath({ locale: routing.defaultLocale, path }),
 	};
 }

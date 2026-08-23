@@ -38,20 +38,20 @@ describe("getRegions", () => {
 	it("returns empty array when getStates returns null", () => {
 		mockGetStates.mockReturnValue(null);
 
-		expect(getRegions(ES)).toEqual([]);
+		expect(getRegions({ countryCode: ES })).toEqual([]);
 	});
 
 	it("returns empty array when getStates returns an empty object", () => {
 		mockGetStates.mockReturnValue({});
 
-		expect(getRegions(ES)).toEqual([]);
+		expect(getRegions({ countryCode: ES })).toEqual([]);
 	});
 
 	it("passes countryCode to Holidays constructor", () => {
 		mockGetStates.mockReturnValue({ CAT: "Catalonia" });
 		mockRegionDTOCreate.mockReturnValue([{ value: "CAT", label: "Catalonia" }]);
 
-		getRegions(ES);
+		getRegions({ countryCode: ES });
 
 		expect(MockHolidays).toHaveBeenCalledWith(ES);
 	});
@@ -60,7 +60,7 @@ describe("getRegions", () => {
 		mockGetStates.mockReturnValue({ CAT: "Catalonia" });
 		mockRegionDTOCreate.mockReturnValue([{ value: "CAT", label: "Catalonia" }]);
 
-		getRegions(ES);
+		getRegions({ countryCode: ES });
 
 		expect(mockGetStates).toHaveBeenCalledWith(ES);
 	});
@@ -73,7 +73,7 @@ describe("getRegions", () => {
 			{ value: "MAD", label: "Madrid" },
 		]);
 
-		getRegions(ES);
+		getRegions({ countryCode: ES });
 
 		expect(mockRegionDTOCreate).toHaveBeenCalledWith({ raw });
 	});
@@ -86,7 +86,7 @@ describe("getRegions", () => {
 			{ value: "AND", label: "Andalucia" },
 		]);
 
-		const result = getRegions(ES);
+		const result = getRegions({ countryCode: ES });
 
 		expect(result[0].label).toBe("Andalucia");
 		expect(result[1].label).toBe("Catalonia");
@@ -98,7 +98,7 @@ describe("getRegions", () => {
 			throw new Error("holidays failure");
 		});
 
-		const result = getRegions(ES);
+		const result = getRegions({ countryCode: ES });
 
 		expect(result).toEqual([]);
 		expect(mockLogError).toHaveBeenCalledWith("Error in getRegions", expect.any(Error), { countryCode: ES });

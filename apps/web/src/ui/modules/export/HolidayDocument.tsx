@@ -134,19 +134,40 @@ const s = StyleSheet.create({
 	},
 });
 
-const fmtDay = (date: Date, locale: string) => formatDate({ date, locale, format: "EE, MMM d" });
+interface FmtDayParams {
+	date: Date;
+	locale: string;
+}
 
-const fmtMonth = (date: Date, locale: string) => formatDate({ date, locale, format: "LLLL yyyy" });
+const fmtDay = ({ date, locale }: FmtDayParams) => formatDate({ date, locale, format: "EE, MMM d" });
 
-const fmtDate = (date: Date, locale: string) => formatDate({ date, locale, format: "MMMM d, yyyy" });
+interface FmtMonthParams {
+	date: Date;
+	locale: string;
+}
 
-function groupByMonth<T>(items: T[], getDate: (item: T) => Date, locale: string) {
+const fmtMonth = ({ date, locale }: FmtMonthParams) => formatDate({ date, locale, format: "LLLL yyyy" });
+
+interface FmtDateParams {
+	date: Date;
+	locale: string;
+}
+
+const fmtDate = ({ date, locale }: FmtDateParams) => formatDate({ date, locale, format: "MMMM d, yyyy" });
+
+interface GroupByMonthParams<T> {
+	items: T[];
+	getDate: (item: T) => Date;
+	locale: string;
+}
+
+function groupByMonth<T>({ items, getDate, locale }: GroupByMonthParams<T>) {
 	const map = new Map<string, { month: string; items: T[] }>();
 
 	for (const item of items) {
 		const d = getDate(item);
 		const key = `${getYear(d)}-${String(getMonth(d)).padStart(2, "0")}`;
-		if (!map.has(key)) map.set(key, { month: fmtMonth(d, locale), items: [] });
+		if (!map.has(key)) map.set(key, { month: fmtMonth({ date: d, locale }), items: [] });
 		map.get(key)?.items.push(item);
 	}
 
@@ -179,8 +200,8 @@ export function HolidayDocument({
 	locale,
 	labels,
 }: HolidayDocumentProps) {
-	const holidayGroups = includeHolidays ? groupByMonth(holidays, (h) => h.date, locale) : [];
-	const ptoGroups = includePto ? groupByMonth(ptoDays, (d) => d, locale) : [];
+	const holidayGroups = includeHolidays ? groupByMonth({ items: holidays, getDate: (h) => h.date, locale }) : [];
+	const ptoGroups = includePto ? groupByMonth({ items: ptoDays, getDate: (d) => d, locale }) : [];
 	const today = new Date();
 
 	return (
@@ -202,7 +223,7 @@ export function HolidayDocument({
 								<Text style={s.monthLabel}>{group.month}</Text>
 								{group.items.map((h) => (
 									<View key={h.id} style={s.row}>
-										<Text style={s.rowDate}>{fmtDay(h.date, locale)}</Text>
+										<Text style={s.rowDate}>{fmtDay({ date: h.date, locale })}</Text>
 										<Text style={s.rowName}>{h.name}</Text>
 									</View>
 								))}
@@ -224,7 +245,7 @@ export function HolidayDocument({
 								<Text style={s.monthLabel}>{group.month}</Text>
 								{group.items.map((d) => (
 									<View key={d.toISOString()} style={s.row}>
-										<Text style={s.rowDate}>{fmtDay(d, locale)}</Text>
+										<Text style={s.rowDate}>{fmtDay({ date: d, locale })}</Text>
 										<Text style={s.rowName}>{labels.ptoDay}</Text>
 									</View>
 								))}
@@ -236,7 +257,7 @@ export function HolidayDocument({
 				<View style={s.footer}>
 					<Text style={s.footerText}>forever-pto.com</Text>
 					<Text style={s.footerText}>
-						{labels.generatedOn} {fmtDate(today, locale)}
+						{labels.generatedOn} {fmtDate({ date: today, locale })}
 					</Text>
 				</View>
 			</Page>

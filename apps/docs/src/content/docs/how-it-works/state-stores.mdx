@@ -1,6 +1,6 @@
 ---
 title: State stores
-description: The Zustand stores — filters, holidays, location, premium and ui — their shapes, encrypted localStorage persistence and the useShallow convention.
+description: The Zustand stores (filters, holidays, location, premium and ui), their shapes, encrypted localStorage persistence and the useShallow convention.
 sidebar:
   order: 3
 ---
@@ -11,7 +11,7 @@ All client state lives in Zustand stores under `apps/web/src/application/stores/
 
 Persisted stores share `encryptedStorage` from `apps/web/src/application/stores/crypto.ts`, a `createJSONStorage` wrapper over `localStorage`:
 
-- In production with `NEXT_PUBLIC_STORAGE_KEY` set, values are encrypted (XOR + base64, `encrypt`/`decrypt` in `apps/web/src/application/stores/utils/crypto.ts`) before hitting `localStorage`. This is obfuscation, not cryptography — it keeps casual tampering out, nothing more.
+- In production with `NEXT_PUBLIC_STORAGE_KEY` set, values are encrypted (XOR + base64, `encrypt`/`decrypt` in `apps/web/src/application/stores/utils/crypto.ts`) before hitting `localStorage`. This is obfuscation, not cryptography: it keeps casual tampering out, nothing more.
 - In development, or when the key is missing, it falls back to plain `localStorage`.
 - On the server it is a no-op storage, so SSR never touches `localStorage`.
 
@@ -29,9 +29,9 @@ This prevents re-renders when unrelated fields change. Stores never fetch data t
 
 ## `filters` (`useFiltersStore`, storage `filters-store`)
 
-User-facing planner configuration: `ptoDays`, `allowPastDays`, `country`, `region`, `year`, `carryOverMonths`, `strategy` (a `FilterStrategy`, defaulting to grouped — see [holidays engine](/how-it-works/holidays-engine/)). Two quirks:
+User-facing planner configuration: `ptoDays`, `allowPastDays`, `country`, `region`, `year`, `carryOverMonths`, `strategy` (a `FilterStrategy`, defaulting to grouped; see [holidays engine](/how-it-works/holidays-engine/)). Two quirks:
 
-- `partialize` persists everything **except `year`** — the year deliberately resets to the current year on every visit.
+- `partialize` persists everything **except `year`**, since the year deliberately resets to the current year on every visit.
 - `setCountry` resets `region` to `''`, since regions belong to a country.
 
 ## `holidays` (`useHolidaysStore`, storage `holidays-store`)
@@ -40,7 +40,7 @@ The largest store: `holidays` (the `HolidayDTO[]`), the current `suggestion`, `a
 
 - `fetchHolidays` dynamic-imports `@infrastructure/services/holidays/getHolidays`, preserves user-created (`CUSTOM`) holidays and dedupes by date.
 - `generateSuggestions` / `generateAlternatives` dynamic-import the domain functions for the synchronous path; `setCalculationResult` is the entry point used by the [Web Worker path](/how-it-works/calculation-worker/), preserving the selected alternative index across recalculations.
-- `addHoliday` / `editHoliday` / `removeHoliday` manage custom holidays, and all three ask one predicate — `heldOn` — whether the date is already taken and by what; `toggleDaySelection` implements manual day editing with PTO-budget enforcement; `trimManualDays` supports the calendar UI. Remaining Budget comes from `measureBudget` in the calendar domain rather than from a store action.
+- `addHoliday` / `editHoliday` / `removeHoliday` manage custom holidays, and all three ask one predicate, `heldOn`, whether the date is already taken and by what; `toggleDaySelection` implements manual day editing with PTO-budget enforcement; `trimManualDays` supports the calendar UI. Remaining Budget comes from `measureBudget` in the calendar domain rather than from a store action.
 
 Because `Date` does not survive JSON, `partialize` serializes every date (including nested bridge dates) to ISO strings and `onRehydrateStorage` revives them.
 

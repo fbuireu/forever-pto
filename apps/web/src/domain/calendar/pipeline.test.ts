@@ -5,7 +5,12 @@ import { FilterStrategy } from "./types";
 
 const YEAR = 2025;
 
-const holiday = (id: string, date: Date): HolidayDTO => ({
+interface HolidayParams {
+	id: string;
+	date: Date;
+}
+
+const holiday = ({ id, date }: HolidayParams): HolidayDTO => ({
 	id,
 	date,
 	name: id,
@@ -16,7 +21,10 @@ const holiday = (id: string, date: Date): HolidayDTO => ({
 const baseInput = {
 	window: { year: YEAR, carryOverMonths: 0 },
 	ptoDays: 5,
-	holidays: [holiday("new-year", new Date(YEAR, 0, 1)), holiday("epiphany", new Date(YEAR, 0, 6))],
+	holidays: [
+		holiday({ id: "new-year", date: new Date(YEAR, 0, 1) }),
+		holiday({ id: "epiphany", date: new Date(YEAR, 0, 6) }),
+	],
 	allowPastDays: true,
 	strategy: FilterStrategy.GROUPED,
 	locale: "en" as const,
@@ -197,7 +205,10 @@ describe("runPlanningPipeline", () => {
 
 		const second = runPlanningPipeline({
 			...baseInput,
-			holidays: [holiday("assumption", new Date(YEAR, 7, 15)), holiday("all-saints", new Date(YEAR, 10, 1))],
+			holidays: [
+				holiday({ id: "assumption", date: new Date(YEAR, 7, 15) }),
+				holiday({ id: "all-saints", date: new Date(YEAR, 10, 1) }),
+			],
 		});
 
 		const firstMonths = new Set(first.suggestion.days.map((day) => day.getMonth()));

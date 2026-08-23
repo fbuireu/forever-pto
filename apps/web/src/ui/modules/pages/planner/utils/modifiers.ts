@@ -24,7 +24,12 @@ export const isPast = ({ allowPastDays, today }: IsPastParams) => {
 
 export const isToday = (today: Date | null) => (date: Date) => (today ? isSameDay({ a: date, b: today }) : false);
 
-export const isSuggestion = (currentSelection: Suggestion | null, removedSuggestedDays: Date[] = []) => {
+export interface IsSuggestionParams {
+	currentSelection: Suggestion | null;
+	removedSuggestedDays?: Date[];
+}
+
+export const isSuggestion = ({ currentSelection, removedSuggestedDays = [] }: IsSuggestionParams) => {
 	return (date: Date) => {
 		if (!currentSelection) return false;
 

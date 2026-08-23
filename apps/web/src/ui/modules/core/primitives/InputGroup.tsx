@@ -55,7 +55,7 @@ function InputGroupAddon({
 	...props
 }: ComponentProps<"div"> & VariantProps<typeof inputGroupAddonVariants>) {
 	return (
-		// biome-ignore lint/a11y/noStaticElementInteractions: click-to-focus is cosmetic mouse UX — keyboard/AT users access the inner input directly
+		// biome-ignore lint/a11y/noStaticElementInteractions: click-to-focus is cosmetic mouse UX; keyboard/AT users access the inner input directly
 		<div
 			data-slot="input-group-addon"
 			data-align={align}

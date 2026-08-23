@@ -20,7 +20,12 @@ function makeRequest(country: string | null) {
 	return { headers: { get: (header: string) => (header === CLOUDFLARE_COUNTRY_HEADER ? country : null) } } as never;
 }
 
-function makeResponse(ok: boolean, body: unknown) {
+interface MakeResponseParams {
+	ok: boolean;
+	body: unknown;
+}
+
+function makeResponse({ ok, body }: MakeResponseParams) {
 	return {
 		ok,
 		text: () => Promise.resolve(body as string),
@@ -60,22 +65,25 @@ describe("detectCountryFromCDN", () => {
 	});
 
 	it("returns the country code parsed from the CDN trace", async () => {
-		vi.stubGlobal("fetch", vi.fn().mockResolvedValue(makeResponse(true, `fl=123\nloc=${ES.toUpperCase()}\nts=1234`)));
+		vi.stubGlobal(
+			"fetch",
+			vi.fn().mockResolvedValue(makeResponse({ ok: true, body: `fl=123\nloc=${ES.toUpperCase()}\nts=1234` })),
+		);
 		expect(await detectCountryFromCDN()).toBe(ES);
 	});
 
 	it("lowercases the country code", async () => {
-		vi.stubGlobal("fetch", vi.fn().mockResolvedValue(makeResponse(true, `loc=${DE.toUpperCase()}\n`)));
+		vi.stubGlobal("fetch", vi.fn().mockResolvedValue(makeResponse({ ok: true, body: `loc=${DE.toUpperCase()}\n` })));
 		expect(await detectCountryFromCDN()).toBe(DE);
 	});
 
 	it("returns empty string when response is not ok", async () => {
-		vi.stubGlobal("fetch", vi.fn().mockResolvedValue(makeResponse(false, "")));
+		vi.stubGlobal("fetch", vi.fn().mockResolvedValue(makeResponse({ ok: false, body: "" })));
 		expect(await detectCountryFromCDN()).toBe("");
 	});
 
 	it("returns empty string when loc= line is absent", async () => {
-		vi.stubGlobal("fetch", vi.fn().mockResolvedValue(makeResponse(true, "fl=123\nts=456")));
+		vi.stubGlobal("fetch", vi.fn().mockResolvedValue(makeResponse({ ok: true, body: "fl=123\nts=456" })));
 		expect(await detectCountryFromCDN()).toBe("");
 	});
 
@@ -90,7 +98,7 @@ describe("detectCountryFromCDN", () => {
 	});
 
 	it("never lets the per-visitor trace be served from a cache", async () => {
-		const mockFetch = vi.fn().mockResolvedValue(makeResponse(true, `loc=${ES.toUpperCase()}\n`));
+		const mockFetch = vi.fn().mockResolvedValue(makeResponse({ ok: true, body: `loc=${ES.toUpperCase()}\n` }));
 		vi.stubGlobal("fetch", mockFetch);
 		await detectCountryFromCDN();
 		expect(mockFetch).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({ cache: "no-store" }));
@@ -107,8 +115,8 @@ describe("detectCountryFromEgressIP", () => {
 			"fetch",
 			vi
 				.fn()
-				.mockResolvedValueOnce(makeResponse(true, { ip: "1.2.3.4" }))
-				.mockResolvedValueOnce(makeResponse(true, { country: FR.toUpperCase() })),
+				.mockResolvedValueOnce(makeResponse({ ok: true, body: { ip: "1.2.3.4" } }))
+				.mockResolvedValueOnce(makeResponse({ ok: true, body: { country: FR.toUpperCase() } })),
 		);
 		expect(await detectCountryFromEgressIP()).toBe(FR);
 	});
@@ -116,8 +124,8 @@ describe("detectCountryFromEgressIP", () => {
 	it("never lets either per-caller lookup be served from a cache", async () => {
 		const mockFetch = vi
 			.fn()
-			.mockResolvedValueOnce(makeResponse(true, { ip: "1.2.3.4" }))
-			.mockResolvedValueOnce(makeResponse(true, { country: FR.toUpperCase() }));
+			.mockResolvedValueOnce(makeResponse({ ok: true, body: { ip: "1.2.3.4" } }))
+			.mockResolvedValueOnce(makeResponse({ ok: true, body: { country: FR.toUpperCase() } }));
 		vi.stubGlobal("fetch", mockFetch);
 
 		await detectCountryFromEgressIP();
@@ -128,12 +136,12 @@ describe("detectCountryFromEgressIP", () => {
 	});
 
 	it("returns empty string when ipify response is not ok", async () => {
-		vi.stubGlobal("fetch", vi.fn().mockResolvedValue(makeResponse(false, {})));
+		vi.stubGlobal("fetch", vi.fn().mockResolvedValue(makeResponse({ ok: false, body: {} })));
 		expect(await detectCountryFromEgressIP()).toBe("");
 	});
 
 	it("returns empty string when ip field is missing", async () => {
-		vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(makeResponse(true, {})));
+		vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(makeResponse({ ok: true, body: {} })));
 		expect(await detectCountryFromEgressIP()).toBe("");
 	});
 
@@ -142,8 +150,8 @@ describe("detectCountryFromEgressIP", () => {
 			"fetch",
 			vi
 				.fn()
-				.mockResolvedValueOnce(makeResponse(true, { ip: "1.2.3.4" }))
-				.mockResolvedValueOnce(makeResponse(false, {})),
+				.mockResolvedValueOnce(makeResponse({ ok: true, body: { ip: "1.2.3.4" } }))
+				.mockResolvedValueOnce(makeResponse({ ok: false, body: {} })),
 		);
 		expect(await detectCountryFromEgressIP()).toBe("");
 	});
@@ -153,8 +161,8 @@ describe("detectCountryFromEgressIP", () => {
 			"fetch",
 			vi
 				.fn()
-				.mockResolvedValueOnce(makeResponse(true, { ip: "1.2.3.4" }))
-				.mockResolvedValueOnce(makeResponse(true, {})),
+				.mockResolvedValueOnce(makeResponse({ ok: true, body: { ip: "1.2.3.4" } }))
+				.mockResolvedValueOnce(makeResponse({ ok: true, body: {} })),
 		);
 		expect(await detectCountryFromEgressIP()).toBe("");
 	});

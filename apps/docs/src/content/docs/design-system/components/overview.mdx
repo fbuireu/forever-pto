@@ -1,6 +1,6 @@
 ---
 title: Components overview
-description: Catalog of the core primitives — what each one does and whether these docs can render it live.
+description: Catalog of the core primitives, what each one does and whether these docs can render it live.
 sidebar:
   order: 0
 ---
@@ -9,9 +9,9 @@ All core components live in `apps/web/src/ui/modules/core/` and follow the conve
 
 These docs import the real components through the `@ui` alias and render them as Astro islands. Portability determines what a page can show:
 
-- **Live** — framework-clean module (no Next.js in its import graph); the docs render the real component.
-- **Live (motion)** — also portable, but built on `motion`'s `m.*` components, so demos wrap it in `LazyMotionProvider` (`apps/web/src/ui/modules/core/animate/providers/LazyMotionProvider.tsx`).
-- **Reference-only** — the module (or a transitive import) touches Next.js or app layers; documented without importing it.
+- **Live** means a framework-clean module (no Next.js in its import graph); the docs render the real component.
+- **Live (motion)** is also portable, but built on `motion`'s `m.*` components,, so demos wrap it in `LazyMotionProvider` (`apps/web/src/ui/modules/core/animate/providers/LazyMotionProvider.tsx`).
+- **Reference-only** means the module (or a transitive import) touches Next.js or app layers; documented without importing it.
 
 ## Catalog
 
@@ -43,7 +43,7 @@ These docs import the real components through the `@ui` alias and render them as
 
 ## Reference-only components
 
-These cannot be imported by the docs site — each drags Next.js or app-layer code into the bundle. They are documented by reading their source instead:
+These cannot be imported by the docs site, because each drags Next.js or app-layer code into the bundle. They are documented by reading their source instead:
 
 | Component | Source | Why it is coupled |
 | --- | --- | --- |
@@ -51,5 +51,5 @@ These cannot be imported by the docs site — each drags Next.js or app-layer co
 | `Sonner` (Toaster) | `apps/web/src/ui/modules/core/primitives/Sonner.tsx` | Reads the active theme with `useTheme` from `next-themes`. |
 | `Combobox` | `apps/web/src/ui/modules/core/primitives/Combobox.tsx` | Typed against app DTOs (`@application/dto/*`) and `@domain/calendar/types`; composes `FlagIcon`. |
 | `Sidebar` | `apps/web/src/ui/modules/core/animate/base/Sidebar.tsx` | App-shell component: cookie persistence via `apps/web/src/ui/utils/cookie.ts`, `useIsMobile` hook, keyboard shortcut wiring. |
-| `Form` | `apps/web/src/ui/modules/core/primitives/Form.tsx` | react-hook-form binding (`FormProvider`, `Controller`) — the dependency is not shipped with the docs site and the component only makes sense around app form flows. |
+| `Form` | `apps/web/src/ui/modules/core/primitives/Form.tsx` | react-hook-form binding (`FormProvider`, `Controller`). The dependency is not shipped with the docs site and the component only makes sense around app form flows. |
 | `FlagIcon` | `apps/web/src/ui/modules/core/primitives/FlagIcon.tsx` | Renders `fi fi-{code}` spans that require the `flag-icons` stylesheet loaded by the app. |

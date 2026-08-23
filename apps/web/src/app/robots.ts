@@ -9,7 +9,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
 
 	const disallow = [
 		"/_next/static/",
-		...LOCALES.flatMap((locale) => privateRoutes().map(({ path }) => localePath(locale, path))),
+		...LOCALES.flatMap((locale) => privateRoutes().map(({ path }) => localePath({ locale, path }))),
 	];
 
 	return {

@@ -10,27 +10,27 @@ import { getLocaleFromPathname, localeAlternates, localeFromAcceptLanguage, loca
 
 describe("localePath", () => {
 	it("returns the path as-is for the default locale", () => {
-		expect(localePath("en", "/planner")).toBe("/planner");
+		expect(localePath({ locale: "en", path: "/planner" })).toBe("/planner");
 	});
 
 	it('returns "/" for the default locale with no path argument', () => {
-		expect(localePath("en")).toBe("/");
+		expect(localePath({ locale: "en" })).toBe("/");
 	});
 
 	it('returns "/" for the default locale with an empty path', () => {
-		expect(localePath("en", "")).toBe("/");
+		expect(localePath({ locale: "en", path: "" })).toBe("/");
 	});
 
 	it("prefixes non-default locale to the path", () => {
-		expect(localePath("es", "/planner")).toBe("/es/planner");
+		expect(localePath({ locale: "es", path: "/planner" })).toBe("/es/planner");
 	});
 
 	it('returns "/locale" for a non-default locale with no path argument', () => {
-		expect(localePath("ca")).toBe("/ca");
+		expect(localePath({ locale: "ca" })).toBe("/ca");
 	});
 
 	it('returns "/locale" for a non-default locale with an empty path', () => {
-		expect(localePath("fr", "")).toBe("/fr");
+		expect(localePath({ locale: "fr", path: "" })).toBe("/fr");
 	});
 });
 

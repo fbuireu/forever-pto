@@ -15,7 +15,7 @@ const FORMAT = "json";
 
 const detectCountryFromCDNEffect = Effect.gen(function* () {
 	const { env } = yield* Effect.tryPromise(() => getCloudflareContext({ async: true }));
-	const response = yield* Effect.tryPromise(() => noStoreFetch(`${env.NEXT_PUBLIC_SITE_URL}/${CDN_TRACE}`));
+	const response = yield* Effect.tryPromise(() => noStoreFetch({ url: `${env.NEXT_PUBLIC_SITE_URL}/${CDN_TRACE}` }));
 
 	if (!response.ok) {
 		return yield* Effect.fail(new Error("Error while getting information from the CDN"));
@@ -43,7 +43,7 @@ export function detectCountryFromHeaders(request: NextRequest) {
 }
 
 const detectCountryFromEgressIPEffect = Effect.gen(function* () {
-	const ipResponse = yield* Effect.tryPromise(() => noStoreFetch(`${IP_SERVICE}?format=${FORMAT}`));
+	const ipResponse = yield* Effect.tryPromise(() => noStoreFetch({ url: `${IP_SERVICE}?format=${FORMAT}` }));
 
 	if (!ipResponse.ok) return "";
 
@@ -51,7 +51,7 @@ const detectCountryFromEgressIPEffect = Effect.gen(function* () {
 	if (!ip) return "";
 
 	const geoResponse = yield* Effect.tryPromise(() =>
-		noStoreFetch(`${GEO_SERVICE}/${ip}/${FORMAT}`, { headers: { Accept: "application/json" } }),
+		noStoreFetch({ url: `${GEO_SERVICE}/${ip}/${FORMAT}`, init: { headers: { Accept: "application/json" } } }),
 	);
 
 	if (!geoResponse.ok) return "";

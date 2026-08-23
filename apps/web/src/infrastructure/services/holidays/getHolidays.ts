@@ -29,7 +29,7 @@ export async function getHolidays({
 }: GetHolidaysParams) {
 	if (!country) return [];
 
-	const regions = getRegions(country, source);
+	const regions = getRegions({ countryCode: country, source });
 
 	const program = Effect.try(() =>
 		holidayDTO.create({

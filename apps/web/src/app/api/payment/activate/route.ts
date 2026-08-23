@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 	const requested = searchParams.get("locale");
 	const locale = resolveLocale(requested);
 
-	const destination = new URL(localePath(locale, "/payment/confirmation"), origin);
+	const destination = new URL(localePath({ locale, path: "/payment/confirmation" }), origin);
 	if (paymentIntentId) destination.searchParams.set("payment_intent", paymentIntentId);
 
 	const redirectTo = (activated: boolean) => {

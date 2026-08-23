@@ -7,7 +7,7 @@ sidebar:
 
 import { PopoverDemo } from '../../../../components/demos/PopoverDemo';
 
-Source: `apps/web/src/ui/modules/core/animate/base/Popover.tsx` — the styling layer. The motion lives one level down in `apps/web/src/ui/modules/core/animate/primitives/base/Popover.tsx` (Base UI popover + `AnimatePresence`). Needs a `LazyMotionProvider` ancestor.
+Source: `apps/web/src/ui/modules/core/animate/base/Popover.tsx`, the styling layer. The motion lives one level down in `apps/web/src/ui/modules/core/animate/primitives/base/Popover.tsx` (Base UI popover + `AnimatePresence`). Needs a `LazyMotionProvider` ancestor.
 
 Exports: `Popover`, `PopoverTrigger`, `PopoverContent`.
 
@@ -15,8 +15,8 @@ Exports: `Popover`, `PopoverTrigger`, `PopoverContent`.
 
 ## How it works
 
-- The popup enters with `opacity 0 → 1` and `scale 0.5 → 1` on a spring (`stiffness: 300, damping: 25` in the motion primitive), growing out of the trigger thanks to `origin-(--transform-origin)` — Base UI computes the transform origin from the anchor side.
-- `PopoverContent` bundles portal + positioner + popup: a `w-72`, `rounded-[12px]`, 3px-frame-border panel with `shadow-brutal-md`. Positioning props go on it directly — `align` (default `'center'`), `sideOffset` (default 4) — and `positionerClassName` styles the positioner (default `z-52`) separately from the panel.
+- The popup enters with `opacity 0 → 1` and `scale 0.5 → 1` on a spring (`stiffness: 300, damping: 25` in the motion primitive), growing out of the trigger thanks to `origin-(--transform-origin)`; Base UI computes the transform origin from the anchor side.
+- `PopoverContent` bundles portal + positioner + popup: a `w-72`, `rounded-[12px]`, 3px-frame-border panel with `shadow-brutal-md`. Positioning props go on it directly, namely `align` (default `'center'`) and `sideOffset` (default 4), and `positionerClassName` styles the positioner (default `z-52`) separately from the panel.
 - Focus management passes through: `initialFocus` / `finalFocus` forward to the Base UI popup.
 - `PopoverTrigger asChild` renders your element as the trigger via Base UI's `render`.
 

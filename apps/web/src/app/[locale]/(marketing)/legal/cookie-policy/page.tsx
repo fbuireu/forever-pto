@@ -18,7 +18,7 @@ export default async function CookiePolicyPage({ params }: Readonly<CookiePolicy
 		getPublicEnv(),
 		getTranslations({ locale, namespace: "cookiePolicy" }),
 	]);
-	const siteLink = createRichLink(siteUrl);
+	const siteLink = createRichLink({ href: siteUrl });
 	const lastUpdatedDate = getLastUpdatedDate(locale);
 
 	return (

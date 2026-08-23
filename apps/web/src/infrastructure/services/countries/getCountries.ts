@@ -23,7 +23,7 @@ for (const data of localeData.values()) {
 
 export function getCountries(locale: Locale): CountryDTO[] {
 	try {
-		return collateByLabel(countryDTO.create({ raw: countries.getNames(locale) }), locale);
+		return collateByLabel({ options: countryDTO.create({ raw: countries.getNames(locale) }), locale });
 	} catch (error) {
 		logger.logError("Error in getCountries", error, { locale });
 		return [];

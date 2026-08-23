@@ -38,7 +38,7 @@ describe("robots", () => {
 	it("disallows every private route, in every locale", () => {
 		for (const locale of LOCALES) {
 			for (const { path } of privateRoutes()) {
-				expect(rule.disallow).toContain(localePath(locale, path));
+				expect(rule.disallow).toContain(localePath({ locale, path }));
 			}
 		}
 	});
@@ -48,7 +48,7 @@ describe("robots", () => {
 
 		for (const locale of LOCALES) {
 			for (const { path } of indexable) {
-				expect(rule.disallow).not.toContain(localePath(locale, path));
+				expect(rule.disallow).not.toContain(localePath({ locale, path }));
 			}
 		}
 	});

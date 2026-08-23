@@ -107,12 +107,12 @@ describe("startOfMonth / endOfMonth", () => {
 
 describe("startOfWeek", () => {
 	it("defaults to Sunday as week start", () => {
-		const d = startOfWeek(new Date(2024, 0, 10));
+		const d = startOfWeek({ date: new Date(2024, 0, 10) });
 		expect(d.getDay()).toBe(0);
 	});
 
 	it("respects weekStartsOn option", () => {
-		const d = startOfWeek(new Date(2024, 0, 10), { weekStartsOn: 1 });
+		const d = startOfWeek({ date: new Date(2024, 0, 10), options: { weekStartsOn: 1 } });
 		expect(d.getDay()).toBe(1);
 	});
 });

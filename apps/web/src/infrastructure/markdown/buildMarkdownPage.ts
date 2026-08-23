@@ -48,7 +48,7 @@ ${pkg.version}
 
 ## URL
 
-${baseUrl}${localePath(locale, route.path)}
+${baseUrl}${localePath({ locale, path: route.path })}
 `;
 	}
 
@@ -85,7 +85,7 @@ ${pkg.version}
 
 ## URL
 
-${baseUrl}${localePath(locale, "/planner")}
+${baseUrl}${localePath({ locale, path: "/planner" })}
 `;
 	}
 
@@ -104,7 +104,7 @@ ${t("description")}
 
 ## How It Works
 
-1. Open the planner at ${baseUrl}${localePath(locale, "/planner")}
+1. Open the planner at ${baseUrl}${localePath({ locale, path: "/planner" })}
 2. Your country is detected automatically; adjust country and region if needed
 3. Select a year and optimization strategy
 4. The planner generates a list of suggested PTO days that bridge holidays

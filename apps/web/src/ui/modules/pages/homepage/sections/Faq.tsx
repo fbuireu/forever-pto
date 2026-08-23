@@ -11,10 +11,13 @@ const GITHUB_ISSUE_URL =
 
 const FAQ_NAV_CLASS = "text-sm font-medium px-1.5 py-0.5 quiet-link";
 
-const privacyPolicyLink = createRichLink("/legal/privacy-policy", { className: FAQ_NAV_CLASS });
-const githubIssueLink = createRichLink(GITHUB_ISSUE_URL, {
-	external: true,
-	className: `font-semibold ${FAQ_NAV_CLASS}`,
+const privacyPolicyLink = createRichLink({ href: "/legal/privacy-policy", options: { className: FAQ_NAV_CLASS } });
+const githubIssueLink = createRichLink({
+	href: GITHUB_ISSUE_URL,
+	options: {
+		external: true,
+		className: `font-semibold ${FAQ_NAV_CLASS}`,
+	},
 });
 
 export const Faq = async () => {

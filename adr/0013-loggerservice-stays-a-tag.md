@@ -10,16 +10,16 @@ Accepted.
 
 `LoggerServiceLive` is `Layer.sync(LoggerService, () => getBetterStackInstance())`. The tag's interface is
 five method signatures; its implementation is one call returning the module singleton. There is one production
-adapter and no second one in prospect, so by the usual rule — one adapter is a hypothetical seam, two is a
-real one — it reads as pure ceremony.
+adapter and no second one in prospect, so by the usual rule (one adapter is a hypothetical seam, two is a
+real one) it reads as pure ceremony.
 
 The cost is real and spread across the tree. Eleven production modules carry `LoggerService` in their `R`:
 both payment handlers, four use-cases, `zodParse`, the webhook route, the payments confirmation service and
 the Premium activation operation. Twelve test files build a five-method `Layer.succeed(LoggerService, { … })`
 stub. [`api/operations/activatePremium.ts`](../apps/web/src/infrastructure/api/operations/activatePremium.ts) opens an `Effect.gen` inside its `catchAll` for no reason other
 than to `yield*` a logger. And [ADR 0002](./0002-effect-for-external-service-boundaries.md) already places
-logging *outside* Effect — BetterStack has both a tag and a plain singleton, and the singleton is what the
-stores, the lookups and the components use — so deleting the tag would be that decision carried to
+logging *outside* Effect: BetterStack has both a tag and a plain singleton, and the singleton is what the
+stores, the lookups and the components use, so deleting the tag would be that decision carried to
 completion rather than a challenge to it.
 
 The clearest symptom that it is not behaving like a boundary: `[locale]/(app)/payment/confirmation/page.tsx`
@@ -46,7 +46,7 @@ the place it was introduced.
 The rejected alternative is replacing it with the `getBetterStackInstance()` singleton everywhere, which
 would delete the tag, the Live layer and twelve stub layers. It is rejected because the guarantee above only
 exists while logging is a *requirement*: the twelve `Layer.succeed` blocks would become twelve
-`vi.mock('…/better-stack/client')` calls — no cheaper — and the compile-time signal would be gone with
+`vi.mock('…/better-stack/client')` calls, no cheaper, and the compile-time signal would be gone with
 nothing to replace it.
 
 **The guarantee is the tag *and* an explicit return-type annotation together.** A use-case whose `R` is
@@ -60,7 +60,8 @@ than stylistic on any Effect program under `@application/use-cases`.
   permits a logger. The four use-cases annotate theirs today; a fifth that does not gets no protection and
   looks identical.
 - **The tag is not a substitution seam and must not be treated as one.** Providing a stub in a test does not
-  silence a module that calls `getBetterStackInstance()` directly, and several do — see
+  silence a module that calls `getBetterStackInstance()` directly, and several do. See
+
   [`../apps/web/src/infrastructure/clients/CLAUDE.md`](../apps/web/src/infrastructure/clients/CLAUDE.md).
   A test asserting "nothing logged" is only meaningful for code that reaches the tag.
 - **Twelve test files pay a five-method stub, and that stays.** It is the price of the signal. Shrinking the

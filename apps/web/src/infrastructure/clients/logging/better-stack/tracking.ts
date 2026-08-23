@@ -14,7 +14,12 @@ interface TrackProperties {
 	[key: string]: unknown;
 }
 
-export const track = (event: TrackEventName, properties?: TrackProperties) => {
+export interface TrackParams {
+	event: TrackEventName;
+	properties?: TrackProperties;
+}
+
+export const track = ({ event, properties }: TrackParams) => {
 	if (globalThis.window === undefined || !globalThis.window.betterstack) return;
 	globalThis.window.betterstack("track", event, properties);
 };

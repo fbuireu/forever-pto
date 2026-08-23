@@ -2,7 +2,12 @@ import type StripeNode from "stripe";
 import { describe, expect, it } from "vitest";
 import { clampMetadata, readDonationMetadata } from "./metadata";
 
-const intent = (metadata: Record<string, string>, receiptEmail: string | null = null) =>
+interface IntentParams {
+	metadata: Record<string, string>;
+	receiptEmail?: string | null;
+}
+
+const intent = ({ metadata, receiptEmail = null }: IntentParams) =>
 	({ metadata, receipt_email: receiptEmail }) as unknown as StripeNode.PaymentIntent;
 
 describe("readDonationMetadata", () => {
@@ -13,15 +18,15 @@ describe("readDonationMetadata", () => {
 		["a blank metadata email is not an address", { email: "   " }, "receipt@example.com", "receipt@example.com"],
 		["an empty metadata email is not an address", { email: "" }, "receipt@example.com", "receipt@example.com"],
 	])("%s", (_, metadata, receiptEmail, expected) => {
-		expect(readDonationMetadata(intent(metadata, receiptEmail)).email).toBe(expected);
+		expect(readDonationMetadata(intent({ metadata, receiptEmail })).email).toBe(expected);
 	});
 
 	it("reports no address when neither yields one", () => {
-		expect(readDonationMetadata(intent({ email: "  " }, null)).email).toBeUndefined();
+		expect(readDonationMetadata(intent({ metadata: { email: "  " }, receiptEmail: null })).email).toBeUndefined();
 	});
 
 	it("normalises the three optional fields to null rather than undefined", () => {
-		expect(readDonationMetadata(intent({ email: "a@b.com" }))).toEqual({
+		expect(readDonationMetadata(intent({ metadata: { email: "a@b.com" } }))).toEqual({
 			email: "a@b.com",
 			promoCode: null,
 			userAgent: null,
@@ -31,7 +36,7 @@ describe("readDonationMetadata", () => {
 
 	it("carries the three optional fields through when present", () => {
 		const metadata = { email: "a@b.com", promoCode: "SUMMER", userAgent: "Firefox", ipAddress: "1.2.3.4" };
-		expect(readDonationMetadata(intent(metadata))).toEqual({
+		expect(readDonationMetadata(intent({ metadata }))).toEqual({
 			email: "a@b.com",
 			promoCode: "SUMMER",
 			userAgent: "Firefox",

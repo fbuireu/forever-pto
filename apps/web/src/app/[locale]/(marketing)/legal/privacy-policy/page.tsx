@@ -2,7 +2,7 @@ import { routeMetadata } from "@infrastructure/seo/routeMetadata";
 import { getPublicEnv } from "@infrastructure/services/env/getPublicEnv";
 import { createRichLink } from "@ui/modules/core/primitives/RichLink";
 
-const cookiePolicyLink = createRichLink("/legal/cookie-policy");
+const cookiePolicyLink = createRichLink({ href: "/legal/cookie-policy" });
 
 import { LegalLayout } from "@ui/modules/layout/LegalLayout";
 import { Me } from "@ui/modules/pages/legal/Me";

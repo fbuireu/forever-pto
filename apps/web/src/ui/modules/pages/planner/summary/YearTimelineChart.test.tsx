@@ -7,7 +7,12 @@ import { YearTimelineChart } from "./YearTimelineChart";
 
 const YEAR = 2026;
 
-const makeHoliday = (date: Date, variant: HolidayVariant = HolidayVariant.NATIONAL) => ({
+interface MakeHolidayParams {
+	date: Date;
+	variant?: HolidayVariant;
+}
+
+const makeHoliday = ({ date, variant = HolidayVariant.NATIONAL }: MakeHolidayParams) => ({
 	id: `h-${date.toISOString()}`,
 	date,
 	name: "Test Holiday",
@@ -46,11 +51,11 @@ describe("YearTimelineChart", () => {
 	it("does not fold a Carry-over Month date onto the same year January", () => {
 		const january = renderChart({
 			carryOverMonths: 1,
-			holidays: [makeHoliday(new Date(YEAR, 0, 15))],
+			holidays: [makeHoliday({ date: new Date(YEAR, 0, 15) })],
 		});
 		const carryOver = renderChart({
 			carryOverMonths: 1,
-			holidays: [makeHoliday(new Date(YEAR + 1, 0, 15))],
+			holidays: [makeHoliday({ date: new Date(YEAR + 1, 0, 15) })],
 		});
 
 		const januaryLeft = leftPercents(january.container).at(0);
@@ -64,7 +69,7 @@ describe("YearTimelineChart", () => {
 	it("places 1 January of the Carry-over year on the thirteenth column, not the first", () => {
 		const { container } = renderChart({
 			carryOverMonths: 1,
-			holidays: [makeHoliday(new Date(YEAR + 1, 0, 1))],
+			holidays: [makeHoliday({ date: new Date(YEAR + 1, 0, 1) })],
 		});
 
 		expect(leftPercents(container).at(0)).toBeCloseTo((12 / 13) * 100, 4);
@@ -73,7 +78,7 @@ describe("YearTimelineChart", () => {
 	it("places 1 January of the planning year at the very start", () => {
 		const { container } = renderChart({
 			carryOverMonths: 1,
-			holidays: [makeHoliday(new Date(YEAR, 0, 1))],
+			holidays: [makeHoliday({ date: new Date(YEAR, 0, 1) })],
 		});
 
 		expect(leftPercents(container).at(0)).toBe(0);

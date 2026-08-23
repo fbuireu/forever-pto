@@ -5,8 +5,8 @@ import { LegalLayout } from "@ui/modules/layout/LegalLayout";
 import { getLastUpdatedDate } from "@ui/utils/getLastUpdatedDate";
 import type { Locale } from "next-intl";
 
-const githubLink = createRichLink("https://github.com/fbuireu/forever-pto", { external: true });
-const odrLink = createRichLink("https://ec.europa.eu/consumers/odr", { external: true });
+const githubLink = createRichLink({ href: "https://github.com/fbuireu/forever-pto", options: { external: true } });
+const odrLink = createRichLink({ href: "https://ec.europa.eu/consumers/odr", options: { external: true } });
 
 import { getTranslations } from "next-intl/server";
 

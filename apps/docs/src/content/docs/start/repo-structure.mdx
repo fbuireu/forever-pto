@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-The repository is a pnpm workspace with two sibling packages under `apps/` — the Next.js app and this wiki — declared in `pnpm-workspace.yaml` by the glob `apps/*`. The root is the workspace root and nothing else: `forever-pto-monorepo`, private, `0.0.0`, with no dependencies of its own.
+The repository is a pnpm workspace with two sibling packages under `apps/`, the Next.js app and this wiki, declared in `pnpm-workspace.yaml` by the glob `apps/*`. The root is the workspace root and nothing else: `forever-pto-monorepo`, private, `0.0.0`, with no dependencies of its own.
 
 ```
 forever-pto/
@@ -29,12 +29,12 @@ There is no `packages/` tier; one is added the day a real shared package exists.
 
 ## `apps/web/src/` layers
 
-The app follows a layered architecture — each directory has a `CLAUDE.md` describing its purpose and boundaries, and the details are covered in the [architecture overview](/architecture/overview/).
+The app follows a layered architecture: each directory has a `CLAUDE.md` describing its purpose and boundaries,, and the details are covered in the [architecture overview](/architecture/overview/).
 
 | Directory | Role |
 | --- | --- |
 | `apps/web/src/app/` | Next.js App Router routes: `[locale]` pages and `api/` route handlers |
-| `apps/web/src/application/` | Use-cases, DTOs and Zustand stores — orchestration between UI and domain |
+| `apps/web/src/application/` | Use-cases, DTOs and Zustand stores: orchestration between UI and domain |
 | `apps/web/src/domain/` | Pure business logic: the calendar suggestion engine, payment domain events |
 | `apps/web/src/infrastructure/` | External-world adapters: DB and API clients, services, i18n config, proxy helpers |
 | `apps/web/src/ui/` | Components, styles, hooks, utils and i18n messages |

@@ -18,7 +18,7 @@ interface BuildMetadataParams {
 }
 
 export function buildMetadata({ baseUrl, locale, route, title, description, keywords }: BuildMetadataParams): Metadata {
-	const url = localePath(locale, route);
+	const url = localePath({ locale, path: route });
 	const indexable = isIndexable(route);
 
 	return {

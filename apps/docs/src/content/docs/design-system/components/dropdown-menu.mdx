@@ -9,7 +9,7 @@ import { DropdownMenuDemo } from '../../../../components/demos/DropdownMenuDemo'
 
 Source: `apps/web/src/ui/modules/core/animate/base/DropdownMenu.tsx`. Base UI menu plus Motion; needs a `LazyMotionProvider` ancestor.
 
-Public exports: `DropdownMenu`, `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`. The file also contains underscore-prefixed sub/checkbox/radio/label/separator/shortcut variants that are deliberately unexported until something needs them — check the source before reinventing one.
+Public exports: `DropdownMenu`, `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`. The file also contains underscore-prefixed sub/checkbox/radio/label/separator/shortcut variants that are deliberately unexported until something needs them, so check the source before reinventing one.
 
 <DropdownMenuDemo client:visible />
 
@@ -36,7 +36,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 </DropdownMenu>
 ```
 
-For free-form anchored content (forms, explanations) use [Popover](/design-system/components/popover/) — DropdownMenu is for lists of actions with menu semantics and keyboard navigation.
+For free-form anchored content (forms, explanations) use [Popover](/design-system/components/popover/); DropdownMenu is for lists of actions with menu semantics and keyboard navigation.
 
 ## Conventions
 

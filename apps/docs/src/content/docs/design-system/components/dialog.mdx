@@ -7,7 +7,7 @@ sidebar:
 
 import { DialogDemo, DialogNoCloseButtonDemo } from '../../../../components/demos/DialogDemo';
 
-Source: `apps/web/src/ui/modules/core/animate/base/Dialog.tsx` — a styling layer over the Motion dialog primitive at `apps/web/src/ui/modules/core/animate/primitives/base/Dialog.tsx` (Base UI dialog + `AnimatePresence`). Import from `animate/base/Dialog`, which is what the demo on this page does; the inner layer is an implementation detail. Needs a `LazyMotionProvider` ancestor.
+Source: `apps/web/src/ui/modules/core/animate/base/Dialog.tsx`, a styling layer over the Motion dialog primitive at `apps/web/src/ui/modules/core/animate/primitives/base/Dialog.tsx` (Base UI dialog + `AnimatePresence`). Import from `animate/base/Dialog`, which is what the demo on this page does; the inner layer is an implementation detail. Needs a `LazyMotionProvider` ancestor.
 
 Exports: `Dialog`, `DialogTrigger`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogFooter`.
 
@@ -17,7 +17,7 @@ Exports: `Dialog`, `DialogTrigger`, `DialogContent`, `DialogHeader`, `DialogTitl
 
 - `DialogContent` (an alias of the internal `DialogPopup`) renders the portal, backdrop and popup in one go: a centered `bg-card` panel with 3px frame border, `rounded-[14px]` and `shadow-brutal-xl`, capped at `sm:max-w-lg`.
 - The backdrop is a fixed vertical gradient of near-black ink with `backdrop-blur-[2px]`, at `z-200` together with the popup.
-- `showCloseButton` (default `true`) controls the top-right X — a brutal mini-button with `hit-area-stable` and hover lift. With it off, Esc and backdrop click still dismiss.
+- `showCloseButton` (default `true`) controls the top-right X, a brutal mini-button with `hit-area-stable` and hover lift. With it off, Esc and backdrop click still dismiss.
 - The root supports uncontrolled and controlled use (`open` / `onOpenChange`); the motion layer gates the portal behind `AnimatePresence` with `keepMounted` so exit animations complete before unmount.
 - `DialogTrigger` supports `asChild` (via Base UI's `render`) so a [Button](/design-system/components/button/) can be the trigger without nesting buttons.
 
@@ -48,4 +48,4 @@ For a mobile-first bottom sheet use [Drawer](/design-system/components/drawer/);
 
 - `DialogHeader` draws the standard 2px bottom hairline (frame color at 18% opacity); `DialogFooter` stacks buttons column-reverse on mobile, row-end on desktop.
 - `DialogTitle` is `font-black` with tight tracking, matching the app's display type.
-- Always include `DialogTitle` (and ideally `DialogDescription`) for accessible labelling — Base UI wires the aria attributes.
+- Always include `DialogTitle` (and ideally `DialogDescription`) for accessible labelling; Base UI wires the aria attributes.

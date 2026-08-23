@@ -11,7 +11,12 @@ vi.mock("./SiteTitleYear", () => ({ SiteTitleYear: () => <span>2026</span> }));
 
 import { SiteTitle } from "./SiteTitle";
 
-const renderTitle = async (locale: Locale, messages: typeof esMessages) => {
+interface RenderTitleParams {
+	locale: Locale;
+	messages: typeof esMessages;
+}
+
+const renderTitle = async ({ locale, messages }: RenderTitleParams) => {
 	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "planner" }));
 	const { container } = render(await SiteTitle());
 	return container.querySelector("h1")?.textContent ?? "";
@@ -23,11 +28,11 @@ describe("SiteTitle", () => {
 	});
 
 	it("renders the localised heading in Spanish", async () => {
-		expect(await renderTitle("es", esMessages)).toContain("Planificador");
+		expect(await renderTitle({ locale: "es", messages: esMessages })).toContain("Planificador");
 	});
 
 	it("renders the localised heading in Italian", async () => {
-		const heading = await renderTitle("it", itMessages);
+		const heading = await renderTitle({ locale: "it", messages: itMessages });
 		expect(heading).toContain("Pianificatore");
 		expect(heading).not.toContain("Planner");
 	});

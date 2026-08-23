@@ -25,13 +25,18 @@ async function fireConfetti() {
 		origin: { y: 0.7 },
 		colors: ["#10b981", "#059669", "#047857", "#065f46", "#fbbf24", "#f59e0b", "#d97706", "#b45309"],
 	};
-	const fire = (particleRatio: number, opts: Record<string, unknown>) =>
+	interface FireParams {
+		particleRatio: number;
+		opts: Record<string, unknown>;
+	}
+
+	const fire = ({ particleRatio, opts }: FireParams) =>
 		confetti({ ...defaults, ...opts, particleCount: Math.floor(count * particleRatio) });
-	fire(0.25, { spread: 26, startVelocity: 55 });
-	fire(0.2, { spread: 60 });
-	fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
-	fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
-	fire(0.1, { spread: 120, startVelocity: 45 });
+	fire({ particleRatio: 0.25, opts: { spread: 26, startVelocity: 55 } });
+	fire({ particleRatio: 0.2, opts: { spread: 60 } });
+	fire({ particleRatio: 0.35, opts: { spread: 100, decay: 0.91, scalar: 0.8 } });
+	fire({ particleRatio: 0.1, opts: { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 } });
+	fire({ particleRatio: 0.1, opts: { spread: 120, startVelocity: 45 } });
 }
 
 interface CheckoutFormProps {
@@ -80,14 +85,14 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 		switch (result.outcome) {
 			case ConfirmPaymentOutcome.FAILED_AFTER_CHARGE:
 				setErrorMessage(t("activationFailed"));
-				track("payment_activation_failed", { error: result.error || UNKNOWN_PAYMENT_ERROR });
+				track({ event: "payment_activation_failed", properties: { error: result.error || UNKNOWN_PAYMENT_ERROR } });
 				return;
 
 			case ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE:
 				setErrorMessage(
 					resolveApiErrorMessage({ code: result.error, t, shared: tErrors, fallback: t("paymentFailed") }),
 				);
-				track("payment_failed", { error: result.error || UNKNOWN_PAYMENT_ERROR });
+				track({ event: "payment_failed", properties: { error: result.error || UNKNOWN_PAYMENT_ERROR } });
 				return;
 
 			case ConfirmPaymentOutcome.HANDED_OFF_TO_ISSUER:
@@ -95,7 +100,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 
 			case ConfirmPaymentOutcome.SUCCEEDED:
 				setPremiumStatus({ email: result.sessionData.email, premiumKey: result.sessionData.premiumKey });
-				track("payment_completed", { amount });
+				track({ event: "payment_completed", properties: { amount } });
 				void fireConfetti();
 				setTimeout(() => {
 					onSuccess();

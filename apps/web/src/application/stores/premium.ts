@@ -144,7 +144,7 @@ export const usePremiumStore = create<PremiumStore>()(
 					});
 
 					if (!wasPremium && premiumKey) {
-						track("premium_activated", { plan: "premium" });
+						track({ event: "premium_activated", properties: { plan: "premium" } });
 					}
 				},
 
@@ -161,7 +161,7 @@ export const usePremiumStore = create<PremiumStore>()(
 
 				showPremiumModal: (feature: PremiumFeatureId) => {
 					set({ currentFeature: feature, modalOpen: true });
-					track("upgrade_modal_opened", { feature });
+					track({ event: "upgrade_modal_opened", properties: { feature } });
 				},
 
 				closeModal: () => {

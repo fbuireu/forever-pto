@@ -13,17 +13,26 @@ vi.mock("@infrastructure/clients/logging/better-stack/client", () => ({
 
 const { getHolidays } = await import("./getHolidays");
 
-const raw = (date: string, name: string, type = "public") => ({ date, name, type }) as RawHoliday;
+interface RawParams {
+	date: string;
+	name: string;
+	type?: string;
+}
+
+const raw = ({ date, name, type = "public" }: RawParams) => ({ date, name, type }) as RawHoliday;
 
 const CALENDAR = {
 	national: [
-		raw("2027-01-01 00:00:00", "New Year"),
-		raw("2027-10-11 00:00:00", "Columbus Day"),
-		raw("2027-02-14 00:00:00", "Valentine's Day", "observance"),
-		raw("2027-07-04 00:00:00", "Independence Day", "bank"),
+		raw({ date: "2027-01-01 00:00:00", name: "New Year" }),
+		raw({ date: "2027-10-11 00:00:00", name: "Columbus Day" }),
+		raw({ date: "2027-02-14 00:00:00", name: "Valentine's Day", type: "observance" }),
+		raw({ date: "2027-07-04 00:00:00", name: "Independence Day", type: "bank" }),
 	],
 	regional: {
-		CA: [raw("2027-01-01 00:00:00", "New Year"), raw("2027-03-31 00:00:00", "Cesar Chavez Day")],
+		CA: [
+			raw({ date: "2027-01-01 00:00:00", name: "New Year" }),
+			raw({ date: "2027-03-31 00:00:00", name: "Cesar Chavez Day" }),
+		],
 	},
 	regions: { US: { CA: "California" } },
 };

@@ -72,7 +72,12 @@ const METRICS = {
 	workedDaysPerMonth: 20,
 };
 
-const renderSummary = (locale: Locale = "en", messages: object = enMessages) =>
+interface RenderSummaryParams {
+	locale?: Locale;
+	messages?: object;
+}
+
+const renderSummary = ({ locale = "en", messages = enMessages }: RenderSummaryParams = {}) =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<Summary />
@@ -116,7 +121,7 @@ describe("Summary budget badges at a budget of one", () => {
 	it("says one day, not one days, in Spanish", () => {
 		singleDayPlan();
 
-		const { container } = renderSummary("es", esMessages);
+		const { container } = renderSummary({ locale: "es", messages: esMessages });
 
 		expect(container.textContent).toContain("presupuesto de 1 día");
 		expect(container.textContent).not.toContain("presupuesto de 1 días");
@@ -127,7 +132,7 @@ describe("Summary budget badges at a budget of one", () => {
 	it("says one Tag, not one Tagen, in German", () => {
 		singleDayPlan();
 
-		const { container } = renderSummary("de", deMessages);
+		const { container } = renderSummary({ locale: "de", messages: deMessages });
 
 		expect(container.textContent).toContain("Budget von 1 Tag");
 		expect(container.textContent).not.toContain("Budget von 1 Tagen");

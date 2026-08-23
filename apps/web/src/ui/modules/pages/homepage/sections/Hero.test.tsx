@@ -32,7 +32,12 @@ import { Hero } from "./Hero";
 
 const NON_BREAKING_SPACES = /[  ]/g;
 
-const renderHero = async (locale: Locale, messages: typeof enMessages) => {
+interface RenderHeroParams {
+	locale: Locale;
+	messages: typeof enMessages;
+}
+
+const renderHero = async ({ locale, messages }: RenderHeroParams) => {
 	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "homepage" }));
 	mockGetFormatter.mockResolvedValue(createFormatter({ locale }));
 	mockGetLocale.mockResolvedValue(locale);
@@ -46,21 +51,21 @@ describe("Hero social proof", () => {
 	});
 
 	it("groups the user count with the German convention", async () => {
-		expect(await renderHero("de", deMessages)).toContain("12.847");
+		expect(await renderHero({ locale: "de", messages: deMessages })).toContain("12.847");
 	});
 
 	it("groups the user count with the English convention", async () => {
-		expect(await renderHero("en", enMessages)).toContain("12,847");
+		expect(await renderHero({ locale: "en", messages: enMessages })).toContain("12,847");
 	});
 
 	it("groups the user count with the French convention", async () => {
-		const text = await renderHero("fr", frMessages);
+		const text = await renderHero({ locale: "fr", messages: frMessages });
 		expect(text).toContain("12 847");
 		expect(text).not.toContain("12.847");
 	});
 
 	it("formats the rating with the locale decimal separator", async () => {
-		expect(await renderHero("fr", frMessages)).toContain("4,9");
-		expect(await renderHero("en", enMessages)).toContain("4.9");
+		expect(await renderHero({ locale: "fr", messages: frMessages })).toContain("4,9");
+		expect(await renderHero({ locale: "en", messages: enMessages })).toContain("4.9");
 	});
 });

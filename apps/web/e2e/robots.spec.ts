@@ -25,8 +25,8 @@ test.describe("robots.txt", () => {
 	test("disallows legal and payment paths for all locales", async ({ request }) => {
 		const body = await (await request.get(ROBOTS_URL)).text();
 		for (const locale of LOCALES) {
-			expect(body).toContain(`Disallow: ${localePath(locale, "/legal/")}`);
-			expect(body).toContain(`Disallow: ${localePath(locale, "/payment/")}`);
+			expect(body).toContain(`Disallow: ${localePath({ locale, path: "/legal/" })}`);
+			expect(body).toContain(`Disallow: ${localePath({ locale, path: "/payment/" })}`);
 		}
 	});
 

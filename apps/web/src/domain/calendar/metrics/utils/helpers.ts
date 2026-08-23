@@ -66,7 +66,12 @@ export function getLongBlocksPerQuarter({ streaks, window }: GetLongBlocksPerQua
 	return longBlocksPerQuarter;
 }
 
-export function getValidBridges(days: Date[], bridges?: Bridge[]) {
+export interface GetValidBridgesParams {
+	days: Date[];
+	bridges?: Bridge[];
+}
+
+export function getValidBridges({ days, bridges }: GetValidBridgesParams) {
 	if (!bridges || bridges.length === 0) return [];
 
 	const daysSet = new Set(days.map(dayKey));
@@ -74,8 +79,14 @@ export function getValidBridges(days: Date[], bridges?: Bridge[]) {
 	return bridges.filter((bridge) => bridge.ptoDays.every((ptoDay) => daysSet.has(dayKey(ptoDay))));
 }
 
-export function getTotalEffectiveDays(days: Date[], bridges?: Bridge[], holidays: HolidayDTO[] = []) {
-	const validBridges = getValidBridges(days, bridges);
+export interface GetTotalEffectiveDaysParams {
+	days: Date[];
+	bridges?: Bridge[];
+	holidays?: HolidayDTO[];
+}
+
+export function getTotalEffectiveDays({ days, bridges, holidays = [] }: GetTotalEffectiveDaysParams) {
+	const validBridges = getValidBridges({ days, bridges });
 
 	if (validBridges.length === 0) {
 		return days.length;

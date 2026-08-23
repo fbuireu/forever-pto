@@ -68,7 +68,13 @@ vi.mock("next/dynamic", () => ({
 
 const { HolidaysTable } = await import("./HolidaysTable");
 
-const holiday = (id: string, name: string, date: Date) => ({
+interface HolidayParams {
+	id: string;
+	name: string;
+	date: Date;
+}
+
+const holiday = ({ id, name, date }: HolidayParams) => ({
 	id,
 	name,
 	date,
@@ -88,9 +94,9 @@ const renderTable = () => {
 
 beforeEach(() => {
 	holidaysState.holidays = [
-		holiday("national-2026-01-01", "Alpha", new Date(2026, 0, 1)),
-		holiday("national-2026-06-01", "Beta", new Date(2026, 5, 1)),
-		holiday("national-2026-12-01", "Gamma", new Date(2026, 11, 1)),
+		holiday({ id: "national-2026-01-01", name: "Alpha", date: new Date(2026, 0, 1) }),
+		holiday({ id: "national-2026-06-01", name: "Beta", date: new Date(2026, 5, 1) }),
+		holiday({ id: "national-2026-12-01", name: "Gamma", date: new Date(2026, 11, 1) }),
 	];
 });
 

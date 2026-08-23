@@ -50,7 +50,7 @@ type MotionHighlightContextType<T extends string> = {
 	forceUpdateBounds?: boolean;
 };
 
-// biome-ignore lint/suspicious/noExplicitAny: generic context — T is contravariant in setActiveValue, string does not satisfy all subtypes of T
+// biome-ignore lint/suspicious/noExplicitAny: generic context; T is contravariant in setActiveValue, string does not satisfy all subtypes of T
 const MotionHighlightContext = createContext<MotionHighlightContextType<any> | undefined>(undefined);
 
 function useMotionHighlight<T extends string>(): MotionHighlightContextType<T> {
@@ -318,7 +318,12 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
 	);
 }
 
-function getNonOverridingDataAttributes(element: ReactElement, dataAttributes: Record<string, unknown>) {
+interface GetNonOverridingDataAttributesParams {
+	element: ReactElement;
+	dataAttributes: Record<string, unknown>;
+}
+
+function getNonOverridingDataAttributes({ element, dataAttributes }: GetNonOverridingDataAttributesParams) {
 	return Object.keys(dataAttributes).reduce<Record<string, unknown>>((acc, key) => {
 		if ((element.props as Record<string, unknown>)[key] === undefined) {
 			acc[key] = dataAttributes[key];
@@ -473,9 +478,12 @@ function MotionHighlightItem({
 					key: childValue,
 					ref: localRef,
 					className: cn("relative", element.props.className),
-					...getNonOverridingDataAttributes(element, {
-						...dataAttributes,
-						"data-slot": "motion-highlight-item-container",
+					...getNonOverridingDataAttributes({
+						element,
+						dataAttributes: {
+							...dataAttributes,
+							"data-slot": "motion-highlight-item-container",
+						},
 					}),
 					...commonHandlers,
 					...props,
@@ -511,9 +519,12 @@ function MotionHighlightItem({
 
 		return cloneElement(element, {
 			ref: localRef,
-			...getNonOverridingDataAttributes(element, {
-				...dataAttributes,
-				"data-slot": "motion-highlight-item",
+			...getNonOverridingDataAttributes({
+				element,
+				dataAttributes: {
+					...dataAttributes,
+					"data-slot": "motion-highlight-item",
+				},
 			}),
 			...commonHandlers,
 		});
@@ -554,9 +565,12 @@ function MotionHighlightItem({
 
 			{cloneElement(element, {
 				className: cn("relative z-[1]", element.props.className),
-				...getNonOverridingDataAttributes(element, {
-					...dataAttributes,
-					"data-slot": "motion-highlight-item",
+				...getNonOverridingDataAttributes({
+					element,
+					dataAttributes: {
+						...dataAttributes,
+						"data-slot": "motion-highlight-item",
+					},
 				}),
 			})}
 		</div>

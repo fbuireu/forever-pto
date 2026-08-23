@@ -108,7 +108,7 @@ export function getAvailableWorkdays({
 }: GetAvailableWorkdaysParams) {
 	const todayTime = startOfToday().getTime();
 
-	const holidaySet = createHolidaySet(holidays);
+	const holidaySet = createHolidaySet({ holidays });
 	const removedSet = new Set(removedDays.map((day) => getKey(day)));
 	const workdays: Date[] = [];
 
@@ -141,7 +141,7 @@ export const findBridges = ({ availableWorkdays, holidays }: FindBridgesParams) 
 	if (availableWorkdays.length === 0) return [];
 	const { MAX_MULTI_DAY_SIZE, MIN_MULTI_DAY_SIZE } = PTO_CONSTANTS.BRIDGE_SEARCH;
 
-	const holidaySet = createHolidaySet(holidays);
+	const holidaySet = createHolidaySet({ holidays });
 	const bridges: Bridge[] = [];
 
 	const sortedWorkdays = availableWorkdays.toSorted((a, b) => a.getTime() - b.getTime());
