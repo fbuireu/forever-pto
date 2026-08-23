@@ -73,7 +73,7 @@ failure channel onto a status code. Business logic that lands here is in the wro
 4. Runs the `next-intl` middleware, which negotiates the locale and fills the `[locale]` segment.
 5. Re-writes the `NEXT_LOCALE` cookie next-intl just set, through `setLocaleCookie`
    ([`src/infrastructure/i18n/cookie.ts`](../infrastructure/i18n/cookie.ts)), which adds `httpOnly`, `secure`, `sameSite: 'lax'` and `path: '/'`.
-   It looks redundant and is not — next-intl's own cookie carries none of those. [`middleware.test.ts`](../middleware.test.ts) guards
+   It looks redundant and is not: next-intl's own cookie carries none of those. [`middleware.test.ts`](../middleware.test.ts) guards
    it under `describe('locale cookie hardening')`.
 6. Hands the response to the location proxy ([`src/infrastructure/proxy/location.ts`](../infrastructure/proxy/location.ts)), which sets the
    detected-country cookie.
@@ -153,7 +153,7 @@ the `confirmation` Effect program and has a `loading.tsx` for the round trip.
 
 Every route that needs metadata keeps a sibling `metadata.ts` exporting `generateMetadata`, which the
 page re-exports (`export { generateMetadata } from './metadata';`). The split is what makes the metadata
-unit-testable on its own — hence the [`metadata.test.ts`](../infrastructure/services/payments/provider/metadata.test.ts) next to each one.
+unit-testable on its own, hence the [`metadata.test.ts`](../infrastructure/services/payments/provider/metadata.test.ts) next to each one.
 
 **The shape lives in one module; each file supplies only what its route knows.** `buildMetadata` under
 `@infrastructure/seo` owns `metadataBase`, the `alternates` pair, `openGraph`, `twitter`, the `robots` block
@@ -187,11 +187,11 @@ competing for the same ranking; the required `route` parameter is what prevents 
 | Route | Method | What it does |
 | --- | --- | --- |
 | [`api/payment/route.ts`](./api/payment/route.ts) | POST | Creates a Stripe PaymentIntent for a Donation. Rate-limits on `cf-connecting-ip` before anything else |
-| [`api/payment/activate/route.ts`](./api/payment/activate/route.ts) | GET | Stripe's `return_url`. Activates Premium and redirects to the confirmation page with the cookie already set — see *The redirect hand-off* below |
-| [`api/webhooks/stripe/route.ts`](./api/webhooks/stripe/route.ts) | POST | Verifies the `stripe-signature` header, then hands the event to `processWebhookEvent`. Reads the **raw** body via `request.text()` — parsing it as JSON would break signature verification |
+| [`api/payment/activate/route.ts`](./api/payment/activate/route.ts) | GET | Stripe's `return_url`. Activates Premium and redirects to the confirmation page with the cookie already set; see *The redirect hand-off* below |
+| [`api/webhooks/stripe/route.ts`](./api/webhooks/stripe/route.ts) | POST | Verifies the `stripe-signature` header, then hands the event to `processWebhookEvent`. Reads the **raw** body via `request.text()`, since parsing it as JSON would break signature verification |
 | [`api/check-session/route.ts`](./api/check-session/route.ts) | GET, POST | GET verifies the premium cookie; POST activates Premium from an email, optionally with a payment key, and sets the cookie |
 | [`api/contact/route.ts`](./api/contact/route.ts) | POST | Contact form submission |
-| `api/markdown/route.ts` | GET | Renders the Markdown twin of a page via [`buildMarkdownPage.ts`](../infrastructure/markdown/buildMarkdownPage.ts). Only reached through the middleware rewrite, and now only *drivable* through it — the pathname comes from the `x-markdown-path` header, never the query string |
+| `api/markdown/route.ts` | GET | Renders the Markdown twin of a page via [`buildMarkdownPage.ts`](../infrastructure/markdown/buildMarkdownPage.ts). Only reached through the middleware rewrite, and now only *drivable* through it: the pathname comes from the `x-markdown-path` header, never the query string |
 | [`api/health/route.ts`](./api/health/route.ts) | GET | Liveness probe. Answers `status` and `timestamp` and nothing else |
 
 Shared conventions across them:
@@ -406,7 +406,7 @@ engines expect the marked-up questions to be visible on the page carrying the ma
 emitted on the planner, which has no FAQ on it at all.
 
 The Premium offer states a `priceSpecification` with a `minPrice`, not a fixed price. Premium is unlocked by
-a Donation the payer chooses — [`src/application/dto/payment/schema.ts`](../application/dto/payment/schema.ts) accepts 1 to 10000 — so the fixed
+a Donation the payer chooses ([`src/application/dto/payment/schema.ts`](../application/dto/payment/schema.ts) accepts 1 to 10000), so the fixed
 4.99 it used to advertise was simply untrue. `MINIMUM_DONATION` reads `AMOUNT_MIN` out of that schema now, so
 the two cannot drift; this sentence used to ask the reader to move them together by hand.
 

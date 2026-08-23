@@ -8,7 +8,7 @@ Every stylesheet the app ships. Tailwind CSS v4 is configured entirely in CSS; t
 custom utilities are all declared here in CSS at-rules.
 
 `index.css` is the entry point, imported through the `@styles/*` alias by `layout.tsx`,
-[`global-error.tsx`](../../app/global-error.tsx) and [`global-not-found.tsx`](../../app/global-not-found.tsx). [`lazy/index.css`](./lazy/index.css) is the deliberate exception — it is
+[`global-error.tsx`](../../app/global-error.tsx) and [`global-not-found.tsx`](../../app/global-not-found.tsx). [`lazy/index.css`](./lazy/index.css) is the deliberate exception: it is
 imported by [`DriverStyles.tsx`](../modules/tutorial/DriverStyles.tsx) so the tutorial CSS only loads when the tutorial does.
 
 ## Files
@@ -16,12 +16,12 @@ imported by [`DriverStyles.tsx`](../modules/tutorial/DriverStyles.tsx) so the tu
 | File | Role |
 | --- | --- |
 | `index.css` | Declares the cascade layer order, then imports Tailwind, `tw-animate-css` and every partial below |
-| [`base/index.css`](./base/index.css) | `@layer base` — element defaults: border/outline colour, body background and glow, scrollbar styling, the shared transition on buttons and shadcn slots |
-| [`theme/index.css`](./theme/index.css) | `@theme inline` — bridges the design tokens into Tailwind's namespaces; also the `dark` and `hover` custom variants |
+| [`base/index.css`](./base/index.css) | `@layer base`: element defaults: border/outline colour, body background and glow, scrollbar styling, the shared transition on buttons and shadcn slots |
+| [`theme/index.css`](./theme/index.css) | `@theme inline` bridges the design tokens into Tailwind's namespaces; also the `dark` and `hover` custom variants |
 | [`utilities/index.css`](./utilities/index.css) | `@utility hit-area-stable`, `hit-area-stable-tilt` and `quiet-link` |
-| [`animations/index.css`](./animations/index.css) | `@layer animations` — keyframes, the root view-transition, the reduced-motion block |
+| [`animations/index.css`](./animations/index.css) | `@layer animations`: keyframes, the root view-transition, the reduced-motion block |
 | [`global/index.css`](./global/index.css) | The design tokens: `:root` and the `[data-theme="dark"]` overrides. Deliberately unlayered |
-| [`vendor/index.css`](./vendor/index.css) | `@layer vendor` — `flag-icons`, cookie-consent and boneyard-js overrides, `::selection` |
+| [`vendor/index.css`](./vendor/index.css) | `@layer vendor`: `flag-icons`, cookie-consent and boneyard-js overrides, `::selection` |
 | `lazy/index.css` | driver.js tutorial styling, loaded on demand |
 | [`index.test.ts`](./index.test.ts) | Reads the stylesheets as text and guards the invariants a reader is most likely to "tidy away" |
 
@@ -90,8 +90,8 @@ Fonts come from [`fonts.ts`](../../app/fonts.ts) (next/font), which exposes `--f
 ## quiet-link
 
 The nav-and-footer link treatment: a transparent 3px border that fills with `--accent` and `--frame` on
-hover, over 75ms. It was written out by hand **eleven times** — six in [`Footer.tsx`](../modules/shared/footer/Footer.tsx) alone, plus
-`ContactButton`, `CookieButton`, `Navigation`, `Faq` and the planner's `Contact` — as a 190-character class
+hover, over 75ms. It was written out by hand **eleven times**, six of them in [`Footer.tsx`](../modules/shared/footer/Footer.tsx) alone, plus
+`ContactButton`, `CookieButton`, `Navigation`, `Faq` and the planner's `Contact`, as a 190-character class
 string, and [`Faq.tsx`](../modules/pages/homepage/sections/Faq.tsx) had already started fixing it locally by hoisting the string to a module const, which
 made a seventh place for the value to live.
 

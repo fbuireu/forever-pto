@@ -29,10 +29,10 @@ this order; the layout adds [`SiteTitle.tsx`](./SiteTitle.tsx) and [`SiteSubtitl
 
 | Directory | Contents |
 | --- | --- |
-| `calendar/` | [`calendar/Calendar.tsx`](./calendar/Calendar.tsx) — one month grid, four selection modes, and nothing that knows what a planner is; [`calendar/usePlannerDayClick.tsx`](./calendar/usePlannerDayClick.tsx) — the planner's click policy, which used to live inside it; [`calendar/utils/helpers.ts`](./calendar/utils/helpers.ts) — `MODIFIERS_CLASS_NAMES` and `getDayClassNames`; [`calendar/utils/refusals.ts`](./calendar/utils/refusals.ts); [`calendar/CalendarListFixture.tsx`](./calendar/CalendarListFixture.tsx) |
-| `holidays/` | `holidays/HolidaysTable.tsx` plus `holidays/components/` — [`HolidayRow.tsx`](./holidays/components/HolidayRow.tsx), [`HolidayTableHeader.tsx`](./holidays/components/HolidayTableHeader.tsx), [`HolidayFormModal.tsx`](./holidays/components/HolidayFormModal.tsx) and the two thin callers that configure it, [`DeleteHolidayModal.tsx`](./holidays/components/DeleteHolidayModal.tsx), and the Zod factory in [`holidays/components/schema.ts`](./holidays/components/schema.ts) |
+| `calendar/` | [`calendar/Calendar.tsx`](./calendar/Calendar.tsx): one month grid, four selection modes, and nothing that knows what a planner is; [`calendar/usePlannerDayClick.tsx`](./calendar/usePlannerDayClick.tsx): the planner's click policy, which used to live inside it; [`calendar/utils/helpers.ts`](./calendar/utils/helpers.ts): `MODIFIERS_CLASS_NAMES` and `getDayClassNames`; [`calendar/utils/refusals.ts`](./calendar/utils/refusals.ts); [`calendar/CalendarListFixture.tsx`](./calendar/CalendarListFixture.tsx) |
+| `holidays/` | `holidays/HolidaysTable.tsx` plus `holidays/components/`: [`HolidayRow.tsx`](./holidays/components/HolidayRow.tsx), [`HolidayTableHeader.tsx`](./holidays/components/HolidayTableHeader.tsx), [`HolidayFormModal.tsx`](./holidays/components/HolidayFormModal.tsx) and the two thin callers that configure it, [`DeleteHolidayModal.tsx`](./holidays/components/DeleteHolidayModal.tsx), and the Zod factory in [`holidays/components/schema.ts`](./holidays/components/schema.ts) |
 | `summary/` | The five charts, [`summary/MetricCard.tsx`](./summary/MetricCard.tsx), [`summary/SummaryFixture.tsx`](./summary/SummaryFixture.tsx) and [`summary/const.ts`](./summary/const.ts) |
-| `utils/` | [`utils/helpers.ts`](./utils/helpers.ts) — Planning Window and calendar-grid construction, workday/weekend counting, and the `MONTHS_IN_YEAR` constant every `12 + carryOverMonths` on this screen is built from; [`utils/modifiers.ts`](./utils/modifiers.ts) — the day predicates |
+| `utils/` | [`utils/helpers.ts`](./utils/helpers.ts): Planning Window and calendar-grid construction, workday/weekend counting, and the `MONTHS_IN_YEAR` constant every `12 + carryOverMonths` on this screen is built from; [`utils/modifiers.ts`](./utils/modifiers.ts): the day predicates |
 
 **Adding and editing a Holiday are one form, `HolidayFormModal`.** They were two 200-line components sharing
 their imports, the schema construction, the `useForm` setup, `handleClose`, the date-select narrowing, the
@@ -206,7 +206,7 @@ entry animations replay when the user pages through Alternatives. Any state adde
 is therefore discarded on every Alternative change.
 
 **`Contact.tsx` reads the `roadmap` namespace, not `contact`.** The `contact` namespace belongs to the
-modal in `shared/contact/`. It also imports [`contact.css`](./contact.css), which is global CSS, not a module — the
+modal in `shared/contact/`. It also imports [`contact.css`](./contact.css), which is global CSS, not a module: the
 `.dashed-card` class it defines is visible to the whole app.
 
 **`Summary.tsx` measures against two different denominators, and three of its numbers depend on which.**
@@ -238,7 +238,7 @@ first placed it, for ever. Efficiency is `totalEffectiveDays / resolveSelectedDa
 reading the raw array named the wrong number the moment anything was hand-edited, which is precisely when a
 label naming the baseline earns its place: with no Manual or Removed Days the two agree and nobody needed
 the label. `Summary` therefore reads `placedDays` off `usePlanReadout`, which applies `resolveSelectedDays`
-with the same two lists the store holds. [`sidebar/components/CalendarExport.tsx`](../../sidebar/components/CalendarExport.tsx) reads the same field — it
+with the same two lists the store holds. [`sidebar/components/CalendarExport.tsx`](../../sidebar/components/CalendarExport.tsx) reads the same field, and it
 wants the array rather than the count, so the exported calendar carries exactly the days the Metrics were
 measured from. Anything else on this screen that wants "the days spent" takes it from the hook; those two
 used to fold it themselves and this sentence was the whole mechanism keeping them in step.
@@ -341,7 +341,7 @@ consumes the attribute**, not in a cross-screen component reaching in by DOM id.
 `HOLIDAYS_LIST`, `PLANNER_DRAWER`, `ALTERNATIVES_MANAGER` and `PTO_STATUS` are this screen's driver.js
 anchors; the const in [`../../tutorial/anchors.ts`](../../tutorial/anchors.ts) is the only place their
 strings are written, so a rename is a compile error rather than a step that silently highlights nothing. `ManagementBar` additionally listens
-for a `tutorial:expand-drawer` window event dispatched by [`hooks/useTutorial.tsx`](../../../hooks/useTutorial.tsx) — a deliberately
+for a `tutorial:expand-drawer` window event dispatched by [`hooks/useTutorial.tsx`](../../../hooks/useTutorial.tsx), a deliberately
 loose coupling so the tutorial does not import planner state, and invisible to a search for the
 listener's caller.
 
@@ -364,8 +364,8 @@ listener's caller.
 Anything two screens share belongs in `shared/`, never in the other screen's folder. Both directions
 between this screen and the homepage used to be crossed and are not any more:
 
-- [`SupportButton.tsx`](../../shared/SupportButton.tsx) — mounted by `calendar/usePlannerDayClick.tsx` inside the "this is a Premium feature" toast
-  *and* by [`pages/homepage/sections/Pricing.tsx`](../homepage/sections/Pricing.tsx) — lives in `shared/`.
+- [`SupportButton.tsx`](../../shared/SupportButton.tsx), mounted by `calendar/usePlannerDayClick.tsx` inside the "this is a Premium feature" toast
+  *and* by [`pages/homepage/sections/Pricing.tsx`](../homepage/sections/Pricing.tsx), lives in `shared/`.
 - [`FaqTabs.tsx`](../homepage/support/FaqTabs.tsx), `Troubleshooting.tsx` and their [`types.ts`](../homepage/support/types.ts) sat here while [`pages/homepage/sections/Faq.tsx`](../homepage/sections/Faq.tsx)
   was their only consumer; they now live under `pages/homepage/support/`.
 - `getViewBoxFromSvg` moved out of `calendar/utils/helpers.ts` into [`shared/utils/helpers.ts`](../../shared/utils/helpers.ts), so

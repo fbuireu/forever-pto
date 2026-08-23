@@ -8,7 +8,7 @@ request gets lives elsewhere: the locale list and request config in `@infrastruc
 ([`locales.ts`](../../infrastructure/i18n/locales.ts), [`config.ts`](../../infrastructure/i18n/config.ts), [`routing.ts`](../../infrastructure/i18n/routing.ts), [`cookie.ts`](../../infrastructure/i18n/cookie.ts)), and the locale-aware `Link` / `useRouter` /
 `usePathname` in `@application/i18n/navigation` ([`navigation.ts`](../../application/i18n/navigation.ts)).
 
-Aliased `@i18n/*`. Excluded from the Vitest run and from coverage in [`vitest.config.ts`](../../../../../vitest.config.ts) — it is data.
+Aliased `@i18n/*`. Excluded from the Vitest run and from coverage in [`vitest.config.ts`](../../../../../vitest.config.ts), because it is data.
 
 ## Languages
 
@@ -33,7 +33,7 @@ the same namespace and one component often reads several. Two consequences worth
 go hunting for a key:
 
 - The namespace name does not always match the component. [`pages/planner/Contact.tsx`](../modules/pages/planner/Contact.tsx) reads
-  `roadmap`, not `contact` — `contact` belongs to the contact form in [`shared/contact/ContactModal.tsx`](../modules/shared/contact/ContactModal.tsx).
+  `roadmap`, not `contact`; `contact` belongs to the contact form in [`shared/contact/ContactModal.tsx`](../modules/shared/contact/ContactModal.tsx).
 - `metadata` is read through `getTranslations({ locale, namespace: 'metadata' })` in four places, none of
   them a `'use client'` component: the two route `metadata.ts` files, [`buildMarkdownPage.ts`](../../infrastructure/markdown/buildMarkdownPage.ts) under
   `@infrastructure/markdown` (the Markdown twin's title and description), and the async server component
@@ -105,7 +105,7 @@ and diffs it against the reference, so a half-finished translation fails the uni
 rendering a raw key in production. It reads unstaged files, so it fires before you commit.
 
 **There is no fallback chain to English.** `config.ts` supplies `locale` and `messages` and nothing
-else — no `onError`, no `getMessageFallback` — so a key present in `en.json` and missing from [`de.json`](./messages/de.json)
+else, no `onError` and no `getMessageFallback`, so a key present in `en.json` and missing from [`de.json`](./messages/de.json)
 does not quietly fall back: it takes `next-intl`'s default handling, which surfaces the key path in the
 UI rather than the copy. The parity test above is what keeps that from reaching production.
 
