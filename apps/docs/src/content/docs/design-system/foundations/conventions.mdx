@@ -1,6 +1,6 @@
 ---
 title: Conventions
-description: The rules every core component follows — CVA with exported variants, data-slot hooks, asChild via the local Slot, named exports, and cn().
+description: The rules every core component follows: CVA with exported variants, data-slot hooks, asChild via the local Slot, named exports, and cn().
 sidebar:
   order: 6
 ---
@@ -9,7 +9,7 @@ The design system lives in `apps/web/src/ui/modules/core/` and its governing rul
 
 ## CVA variants, always exported
 
-Every primitive with visual variants uses [CVA](https://cva.style) (`class-variance-authority`), and the CVA object is **exported alongside the component** — `buttonVariants`, `badgeVariants`, `sidebarMenuButtonVariants`, and so on:
+Every primitive with visual variants uses [CVA](https://cva.style) (`class-variance-authority`), and the CVA object is **exported alongside the component**, as `buttonVariants`, `badgeVariants`, `sidebarMenuButtonVariants`, and so on:
 
 ```tsx
 export { Button, buttonVariants };
@@ -18,7 +18,7 @@ export { Button, buttonVariants };
 Two reasons:
 
 1. Other components can reuse the exact class recipe without importing the component (e.g. styling a link as a button).
-2. `VariantProps<typeof buttonVariants>` gives consumers — including these docs — the variant union as a *type*. The demo wrappers here build exhaustive `Record<Variant, …>` maps from it, so renaming a variant in the app breaks `astro check` instead of letting the [Button page](/design-system/components/button/) drift.
+2. `VariantProps<typeof buttonVariants>` gives consumers, including these docs, the variant union as a *type*. The demo wrappers here build exhaustive `Record<Variant, …>` maps from it, so renaming a variant in the app breaks `astro check` instead of letting the [Button page](/design-system/components/button/) drift.
 
 ## `data-slot` attributes
 
@@ -40,19 +40,19 @@ Polymorphism uses the `asChild` pattern, but the `Slot` is **local**: `apps/web/
 </Button>
 ```
 
-Note the headless layer throughout core is **Base UI** (`@base-ui/react`) — that guide named Radix for a while, but no Radix packages are installed; the accessibility primitives (Dialog, Popover, Tooltip, Menu, Accordion…) all come from `@base-ui/react/*`. A motion-aware sibling, `MotionSlot` (`apps/web/src/ui/modules/core/animate/primitives/animate/MotionSlot.tsx`), does the same job for `m.*` components. Do not reinvent either.
+Note the headless layer throughout core is **Base UI** (`@base-ui/react`). That guide named Radix for a while,, but no Radix packages are installed; the accessibility primitives (Dialog, Popover, Tooltip, Menu, Accordion…) all come from `@base-ui/react/*`. A motion-aware sibling, `MotionSlot` (`apps/web/src/ui/modules/core/animate/primitives/animate/MotionSlot.tsx`), does the same job for `m.*` components. Do not reinvent either.
 
 ## Named exports only
 
-No `default export` anywhere in core — named exports improve tree-shaking and autocomplete, and make renames traceable. Sub-components that exist only for internal composition are prefixed with `_` and left unexported (e.g. `_CardFooter` in `apps/web/src/ui/modules/core/primitives/Card.tsx`).
+No `default export` anywhere in core: named exports improve tree-shaking and autocomplete,, and make renames traceable. Sub-components that exist only for internal composition are prefixed with `_` and left unexported (e.g. `_CardFooter` in `apps/web/src/ui/modules/core/primitives/Card.tsx`).
 
 ## No business logic in core
 
 Core components are presentational:
 
 - No store access, no API calls, no data fetching.
-- No translation keys — components accept strings; `useTranslations` lives in the feature modules that render them.
-- App-domain types don't belong here. The exceptions that break this rule (`Combobox` with its DTO props, `RichLink` with the next-intl `Link`, `Toaster` with `next-themes`) are exactly the components these docs cannot render live — they are documented reference-only.
+- No translation keys: components accept strings, and `useTranslations` lives in the feature modules that render them.
+- App-domain types don't belong here. The exceptions that break this rule (`Combobox` with its DTO props, `RichLink` with the next-intl `Link`, `Toaster` with `next-themes`) are exactly the components these docs cannot render live, so they are documented reference-only.
 
 ## `cn()`
 
@@ -68,4 +68,4 @@ export function cn(...inputs: ClassValue[]) {
 
 ## Client/server split
 
-Roughly 52 of the ~60 core files are `'use client'` — everything animated needs Motion's `m.*` components, which in turn require an ancestor `LazyMotionProvider` (`apps/web/src/ui/modules/core/animate/providers/LazyMotionProvider.tsx`). The server-safe set (no directive, no hooks) is the plain primitives: Badge, Banner, Button, Card, Input, Textarea, Label, Separator, FlagIcon, plus the Slot. Keep new primitives server-safe unless they genuinely need state or motion.
+Roughly 52 of the ~60 core files are `'use client'`, because everything animated needs Motion's `m.*` components,, which in turn require an ancestor `LazyMotionProvider` (`apps/web/src/ui/modules/core/animate/providers/LazyMotionProvider.tsx`). The server-safe set (no directive, no hooks) is the plain primitives: Badge, Banner, Button, Card, Input, Textarea, Label, Separator, FlagIcon, plus the Slot. Keep new primitives server-safe unless they genuinely need state or motion.

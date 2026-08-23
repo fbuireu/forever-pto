@@ -7,7 +7,7 @@ sidebar:
 
 import { DarkModeDemo } from '../../../../components/demos/DarkModeDemo';
 
-Theming is a single attribute: `data-theme='dark'` on a root element. No duplicate component styles, no context providers in the design system — components reference semantic tokens, and the tokens flip.
+Theming is a single attribute: `data-theme='dark'` on a root element. No duplicate component styles, no context providers in the design system: components reference semantic tokens, and the tokens flip.
 
 <DarkModeDemo client:visible />
 
@@ -19,11 +19,11 @@ Dark values are declared in `apps/web/src/ui/styles/global/index.css` under a `[
 
 The `[data-theme="dark"]` block overrides:
 
-- **Page tokens** — `--background`, `--foreground`, `--card`, `--popover`, `--input`, and the whole `--sidebar-*` family.
-- **The frame** — `--frame` and `--border` invert from ink to cream. Every `--shadow-brutal-*` token references `--frame` (or `--background` for the inverted set), so all [shadows](/design-system/foundations/shadows/) re-theme without their own dark declarations.
-- **Surfaces** — `--surface-panel`, `--surface-panel-alt`, `--surface-panel-soft` move from warm creams to warm near-blacks.
+- **Page tokens**: `--background`, `--foreground`, `--card`, `--popover`, `--input`, and the whole `--sidebar-*` family.
+- **The frame**: `--frame` and `--border` invert from ink to cream. Every `--shadow-brutal-*` token references `--frame` (or `--background` for the inverted set), so all [shadows](/design-system/foundations/shadows/) re-theme without their own dark declarations.
+- **Surfaces**: `--surface-panel`, `--surface-panel-alt` and `--surface-panel-soft` move from warm creams to warm near-blacks.
 - **Muted/secondary pairs** and `--accent-foreground` (re-pinned to brand ink so text on yellow stays readable).
-- **Effects** — `--grid-color` and `--page-glow` get slightly stronger to survive the dark background.
+- **Effects**: `--grid-color` and `--page-glow` get slightly stronger to survive the dark background.
 
 What does **not** flip: the brand palette (`--color-brand-*`), `--accent` (brand yellow in both themes), `--destructive`, and `--radius`. The identity colors are constants; only the paper and ink swap.
 
@@ -35,10 +35,10 @@ What does **not** flip: the brand palette (`--color-brand-*`), `--accent` (brand
 @custom-variant dark (&:is([data-theme="dark"] *));
 ```
 
-This redefines Tailwind v4's `dark:` variant to match *descendants of* the themed root instead of the default `prefers-color-scheme` media query. Components rarely need it — the token flip covers most cases — but it exists for one-off dark adjustments (e.g. the color-mix schemes in `apps/web/src/ui/modules/core/primitives/Banner.tsx`).
+This redefines Tailwind v4's `dark:` variant to match *descendants of* the themed root instead of the default `prefers-color-scheme` media query. Components rarely need it, since the token flip covers most cases, but it exists for one-off dark adjustments (e.g. the color-mix schemes in `apps/web/src/ui/modules/core/primitives/Banner.tsx`).
 
 ## Why Starlight's toggle just works
 
-Starlight persists its theme by setting the same `data-theme` attribute on `<html>`. Since the app's dark block and the `@custom-variant` both key off that attribute selector — matched on *any* ancestor, not a specific element — the docs' theme toggle drives every embedded app component with zero adaptation. The import order in `apps/docs/src/styles/global.css` lets `@astrojs/starlight-tailwind` re-declare the `dark` variant as a superset (root *or* descendants), which stays compatible with the app's descendants-only definition.
+Starlight persists its theme by setting the same `data-theme` attribute on `<html>`. Since the app's dark block and the `@custom-variant` both key off that attribute selector, matched on *any* ancestor rather than a specific element, the docs' theme toggle drives every embedded app component with zero adaptation. The import order in `apps/docs/src/styles/global.css` lets `@astrojs/starlight-tailwind` re-declare the `dark` variant as a superset (root *or* descendants), which stays compatible with the app's descendants-only definition.
 
-The one component that would need more is `Toaster` (`apps/web/src/ui/modules/core/primitives/Sonner.tsx`): it reads the active theme via `next-themes`' `useTheme` hook, which is why it is reference-only in these docs — see [conventions](/design-system/foundations/conventions/) for the portability rules.
+The one component that would need more is `Toaster` (`apps/web/src/ui/modules/core/primitives/Sonner.tsx`): it reads the active theme via `next-themes`' `useTheme` hook, which is why it is reference-only in these docs; see [conventions](/design-system/foundations/conventions/) for the portability rules.

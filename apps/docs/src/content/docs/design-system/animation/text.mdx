@@ -1,13 +1,13 @@
 ---
 title: Text animations
-description: SlidingNumber — the odometer-style digit roller — and RotatingText, the interval word rotator.
+description: SlidingNumber, the odometer-style digit roller, and RotatingText, the interval word rotator.
 sidebar:
   order: 3
 ---
 
 import { RotatingTextDemo, SlidingNumberDemo } from '../../../../components/demos/TextDemo';
 
-Source: `apps/web/src/ui/modules/core/animate/text/`. Both components are client-only Motion consumers and require a `LazyMotionProvider` ancestor. `SlidingNumber` additionally reads the active locale through `next-intl` to pick its decimal separator, so its demo adds a `DemoIntlProvider` — the same pattern as the Motion provider, an app context the component needs to run at all.
+Source: `apps/web/src/ui/modules/core/animate/text/`. Both components are client-only Motion consumers and require a `LazyMotionProvider` ancestor. `SlidingNumber` additionally reads the active locale through `next-intl` to pick its decimal separator, so its demo adds a `DemoIntlProvider`, the same pattern as the Motion provider, an app context the component needs to run at all.
 
 ## SlidingNumber
 
@@ -15,7 +15,7 @@ Source: `apps/web/src/ui/modules/core/animate/text/`. Both components are client
 
 <SlidingNumberDemo client:visible />
 
-Props beyond `number`: `padStart` zero-pads single-digit integers, `decimalPlaces`/`decimalSeparator` control fractions, `transition` overrides the spring, and `inView` (+ `inViewMargin`, `inViewOnce`) holds the value at `0` until the element scrolls into view — useful for stats that should count up on first sight. Negative numbers render a leading minus sign.
+Props beyond `number`: `padStart` zero-pads single-digit integers, `decimalPlaces`/`decimalSeparator` control fractions, `transition` overrides the spring, and `inView` (+ `inViewMargin`, `inViewOnce`) holds the value at `0` until the element scrolls into view, which is useful for stats that should count up on first sight. Negative numbers render a leading minus sign.
 
 This is the number display inside [Counter](/design-system/animation/components/), which the sidebar uses for the PTO-days stepper (`apps/web/src/ui/modules/sidebar/components/PtoDays.tsx`).
 
@@ -38,6 +38,7 @@ import { RotatingText } from '@ui/modules/core/animate/text/Rotating';
 
 ## Conventions
 
-- `SlidingNumber` renders `tabular-nums` rollers — keep the surrounding type style on the component itself (`className`) so the measurement matches the render.
+- `SlidingNumber` renders `tabular-nums` rollers, so keep the surrounding type style on the component itself
+ (`className`) so the measurement matches the render.
 - Both components expose `data-slot` attributes (`sliding-number`, `sliding-number-roller`, `sliding-number-display`) for CSS containment hooks.
 - Related: [animated components](/design-system/animation/components/), [effects](/design-system/animation/effects/).

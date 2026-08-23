@@ -1,6 +1,6 @@
 ---
 title: Badge
-description: Compact uppercase pill for statuses and counts — four CVA variants, hover lift only when rendered as a link.
+description: Compact uppercase pill for statuses and counts, with four CVA variants and a hover lift only when rendered as a link.
 sidebar:
   order: 3
 ---
@@ -8,7 +8,7 @@ sidebar:
 import { BADGE_VARIANT_ROWS, BadgeAsLinkDemo, BadgeVariantsDemo } from '../../../../components/demos/BadgeDemo';
 import { VariantsTable } from '../../../../components/VariantsTable';
 
-Source: `apps/web/src/ui/modules/core/primitives/Badge.tsx`. A rounded-full pill with the 3px frame border and the smallest brutal shadow. Text is styled uppercase by CSS (`uppercase tracking-[0.08em]`) — pass normal-case children. Framework-clean, so this page renders the real component.
+Source: `apps/web/src/ui/modules/core/primitives/Badge.tsx`. A rounded-full pill with the 3px frame border and the smallest brutal shadow. Text is styled uppercase by CSS (`uppercase tracking-[0.08em]`), so pass normal-case children. Framework-clean, so this page renders the real component.
 
 ## Variants
 
@@ -18,7 +18,7 @@ Source: `apps/web/src/ui/modules/core/primitives/Badge.tsx`. A rounded-full pill
 
 ## Interactive only as a link
 
-The hover lift (translate `-0.5, -0.5` plus a bigger shadow) is gated behind the `[a&]:` Tailwind selector, so it fires only when the badge renders as an `<a>` element — typically through `asChild`. A plain `<span>` badge stays inert.
+The hover lift (translate `-0.5, -0.5` plus a bigger shadow) is gated behind the `[a&]:` Tailwind selector, so it fires only when the badge renders as an `<a>` element, typically through `asChild`. A plain `<span>` badge stays inert.
 
 <BadgeAsLinkDemo client:visible />
 
@@ -29,7 +29,7 @@ import { Badge } from '@ui/modules/core/primitives/Badge';
 
 <Badge variant='destructive'>3 conflicts</Badge>
 
-// Render as a link — unlocks the hover lift
+// Render as a link, which unlocks the hover lift
 <Badge asChild>
   <a href='/planner'>Open planner</a>
 </Badge>
@@ -40,5 +40,5 @@ import { Badge } from '@ui/modules/core/primitives/Badge';
 - The CVA object is exported alongside the component (`badgeVariants`), per the core conventions in `apps/web/src/ui/modules/core/CLAUDE.md`.
 - `asChild` composes through the local `Slot` (`apps/web/src/ui/modules/core/animate/base/Slot.tsx`), same as [Button](/design-system/components/button/).
 - `data-slot='badge'` is set for CSS containment hooks.
-- `hit-area-stable` keeps the pointer hit-area steady during the link hover lift — see [Hit-area stability](/design-system/foundations/hit-area-stable/).
+- `hit-area-stable` keeps the pointer hit-area steady during the link hover lift; see [Hit-area stability](/design-system/foundations/hit-area-stable/).
 - SVG children are auto-sized to `size-3` and get `pointer-events: none`.

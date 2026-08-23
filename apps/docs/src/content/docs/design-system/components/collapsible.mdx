@@ -16,7 +16,7 @@ Exports: `Collapsible`, `CollapsibleTrigger`, `CollapsibleContent`.
 ## How it works
 
 - `CollapsibleContent` animates `height: 0 ↔ 'auto'` plus opacity with a spring (default `stiffness: 150, damping: 22`, `transition` prop to override). The panel is `keepMounted` and rendered through Base UI's `render` callback, which the component uses to strip DOM drag handlers that would collide with Motion's gesture props.
-- The default `CollapsibleTrigger` is a full-width brutal button: 3px frame border, `shadow-brutal-btn`, hover lift, and — the distinctive bit — `aria-expanded` keeps the trigger in the lifted "pressed" style while the panel is open, so open state reads at a glance.
+- The default `CollapsibleTrigger` is a full-width brutal button: 3px frame border, `shadow-brutal-btn`, hover lift, and, the distinctive bit, `aria-expanded` keeps the trigger in the lifted "pressed" style while the panel is open, so open state reads at a glance.
 - `CollapsibleTrigger asChild` swaps in your own element via Base UI's `render`, skipping the default styling entirely.
 
 <CollapsibleAsChildDemo client:visible />

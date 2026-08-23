@@ -1,6 +1,6 @@
 ---
 title: Effects
-description: MotionHighlight — the shared hover/active pill behind DropdownMenu, Sidebar and Tabs — and AutoHeight for animated container resizing.
+description: MotionHighlight, the shared hover/active pill behind DropdownMenu, Sidebar and Tabs, plus AutoHeight for animated container resizing.
 sidebar:
   order: 2
 ---
@@ -11,11 +11,11 @@ Source: `apps/web/src/ui/modules/core/animate/effects/`. Two reusable motion beh
 
 ## MotionHighlight
 
-`MotionHighlight` renders the animated background pill that follows the hovered or selected item. It is the workhorse behind `DropdownMenu` and `Sidebar` (`apps/web/src/ui/modules/core/animate/base/`) and `Tabs` (`apps/web/src/ui/modules/core/animate/components/Tabs.tsx`) — any place where a highlight glides between siblings.
+`MotionHighlight` renders the animated background pill that follows the hovered or selected item. It is the workhorse behind `DropdownMenu` and `Sidebar` (`apps/web/src/ui/modules/core/animate/base/`) and `Tabs` (`apps/web/src/ui/modules/core/animate/components/Tabs.tsx`), any place where a highlight glides between siblings.
 
 ### Modes
 
-**`mode='children'`** (default): each item renders its own absolutely-positioned background `m.div` sharing a `layoutId`, so Motion morphs the pill between items as the active one changes. Hover an item below — the pill travels with the pointer:
+**`mode='children'`** (default): each item renders its own absolutely-positioned background `m.div` sharing a `layoutId`, so Motion morphs the pill between items as the active one changes. Hover an item below and the pill travels with the pointer:
 
 <MotionHighlightChildrenDemo client:visible />
 
@@ -26,7 +26,7 @@ Source: `apps/web/src/ui/modules/core/animate/effects/`. Two reusable motion beh
 ### Controlled vs uncontrolled items
 
 - **Uncontrolled** (`controlledItems` unset): pass plain elements as children and `MotionHighlight` wraps each one in a `MotionHighlightItem` automatically, keyed by an internal id. Combine with `hover` for pointer-following highlights.
-- **Controlled** (`controlledItems`): you place `MotionHighlightItem` yourself and give each a `value`. Drive the active item with `value`/`onValueChange` (or seed with `defaultValue`). This is what `Tabs` and `Sidebar` do — the parent-mode demo above is controlled.
+- **Controlled** (`controlledItems`): you place `MotionHighlightItem` yourself and give each a `value`. Drive the active item with `value`/`onValueChange` (or seed with `defaultValue`). This is what `Tabs` and `Sidebar` do; the parent-mode demo above is controlled.
 
 ### Key props
 
@@ -34,7 +34,7 @@ Source: `apps/web/src/ui/modules/core/animate/effects/`. Two reusable motion beh
 
 ## AutoHeight
 
-`AutoHeight` animates a container's height to match its content. It measures the inner content with a `ResizeObserver` (via `useAutoHeight` in `apps/web/src/ui/hooks/useAutoHeight.tsx`) and springs the outer `m.div` to the new height — pass `deps` to force a re-measure when content changes for reasons the observer cannot see:
+`AutoHeight` animates a container's height to match its content. It measures the inner content with a `ResizeObserver` (via `useAutoHeight` in `apps/web/src/ui/hooks/useAutoHeight.tsx`) and springs the outer `m.div` to the new height. Pass `deps` to force a re-measure when content changes for reasons the observer cannot see:
 
 <AutoHeightDemo client:visible />
 
@@ -60,6 +60,6 @@ import { AutoHeight } from '@ui/modules/core/animate/effects/AutoHeight';
 
 ## Conventions
 
-- Never hand-roll a moving highlight in a new component — compose `MotionHighlight` like `DropdownMenu`, `Sidebar` and `Tabs` do.
+- Never hand-roll a moving highlight in a new component; compose `MotionHighlight` like `DropdownMenu`, `Sidebar` and `Tabs` do.
 - The pill defaults to `bg-muted rounded-md`; pass `className` to restyle it (the app usually uses the accent with a 2px frame).
 - Related: [animated components](/design-system/animation/components/), [animated icons](/design-system/animation/icons/).

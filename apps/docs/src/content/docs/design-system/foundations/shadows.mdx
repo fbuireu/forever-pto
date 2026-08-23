@@ -1,6 +1,6 @@
 ---
 title: Shadows
-description: The brutal shadow scale — hard offset shadows, the btn/btn-hover/btn-active trio, and the hover/active choreography.
+description: The brutal shadow scale of hard offset shadows, the btn/btn-hover/btn-active trio, and the hover/active choreography.
 sidebar:
   order: 2
 ---
@@ -11,7 +11,7 @@ Brutal shadows are solid, blur-free copies of the frame offset down-right: `Npx 
 
 ## The elevation scale
 
-Named sizes for static elements — cards, panels, popovers:
+Named sizes for static elements such as cards, panels and popovers:
 
 <ShadowScale tokens={[
   '--shadow-brutal-xs',
@@ -38,11 +38,11 @@ Interactive elements use a dedicated three-state set:
 
 The choreography, as implemented in `apps/web/src/ui/modules/core/primitives/Button.tsx`:
 
-- **Rest** — `--shadow-brutal-btn` (5px offset).
-- **Hover** — the element translates `-2px, -2px` (up-left) while the shadow grows to `--shadow-brutal-btn-hover` (7px). The two changes cancel out at the shadow's outer edge, so the silhouette stays anchored and the element appears to *rise* off the page.
-- **Active** — the element translates `+2px, +2px` while the shadow collapses to `--shadow-brutal-btn-active` (1px): the element drops onto its own shadow, reading as a physical press.
+- **Rest** uses `--shadow-brutal-btn` (5px offset).
+- **Hover**: the element translates `-2px, -2px` (up-left) while the shadow grows to `--shadow-brutal-btn-hover` (7px). The two changes cancel out at the shadow's outer edge, so the silhouette stays anchored and the element appears to *rise* off the page.
+- **Active**: the element translates `+2px, +2px` while the shadow collapses to `--shadow-brutal-btn-active` (1px): the element drops onto its own shadow, reading as a physical press.
 
-The movement is eased by the shared 80ms linear `transition` block on `[data-slot]` elements in `apps/web/src/ui/styles/base/index.css`. Because the element slides out from under the pointer on hover, every element using this trio must also apply the `hit-area-stable` utility — see [hit-area stability](/design-system/foundations/hit-area-stable/).
+The movement is eased by the shared 80ms linear `transition` block on `[data-slot]` elements in `apps/web/src/ui/styles/base/index.css`. Because the element slides out from under the pointer on hover, every element using this trio must also apply the `hit-area-stable` utility; see [hit-area stability](/design-system/foundations/hit-area-stable/).
 
 ## Colored trios
 
@@ -58,7 +58,7 @@ The same three-state pattern exists with the accent and orange brand colors stan
   '--shadow-brutal-3-accent',
 ]} />
 
-Two singles complete the colored set — a destructive small shadow and a layered hero shadow that stacks orange under a frame outline:
+Two singles complete the colored set: a destructive small shadow and a layered hero shadow that stacks orange under a frame outline:
 
 <ShadowScale tokens={[
   '--shadow-brutal-sm-destructive',
@@ -76,7 +76,7 @@ For elements sitting on ink surfaces (e.g. `bg-primary` blocks), the shadow colo
   '--shadow-brutal-btn-inverted-active',
 ]} />
 
-These look invisible above — the demo canvas is `bg-background`, the exact color the inverted shadows are made of. That is the point: they only read on inverted surfaces.
+These look invisible above, because the demo canvas is `bg-background`, the exact color the inverted shadows are made of. That is the point: they only read on inverted surfaces.
 
 ## Usage
 

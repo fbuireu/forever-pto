@@ -1,6 +1,6 @@
 ---
 title: Homepage patterns
-description: brutCard and dayCell — the shared class-string constants that keep the marketing homepage sections visually consistent.
+description: brutCard and dayCell, the shared class-string constants that keep the marketing homepage sections visually consistent.
 sidebar:
   order: 1
 ---
@@ -9,7 +9,7 @@ import { brutCard } from '@ui/modules/pages/homepage/sections/shared';
 import { BrutCardDemo, DayCellsDemo, DAY_TYPE_ROWS } from '../../../../components/demos/HomepagePatternsDemo';
 import { VariantsTable } from '../../../../components/VariantsTable';
 
-Source: `apps/web/src/ui/modules/pages/homepage/sections/shared.ts`. The homepage sections (`Hero`, `Features`, `Comparison`, `HowItWorks`, `Pricing`, `Testimonials` under `apps/web/src/ui/modules/pages/homepage/sections/`) do not share components — they share **class-string constants**. This file is pure data (a type, two class maps, a fixture array), which is why this page can import it and render the real styles live.
+Source: `apps/web/src/ui/modules/pages/homepage/sections/shared.ts`. The homepage sections (`Hero`, `Features`, `Comparison`, `HowItWorks`, `Pricing`, `Testimonials` under `apps/web/src/ui/modules/pages/homepage/sections/`) do not share components; they share **class-string constants**. This file is pure data (a type, two class maps, a fixture array), which is why this page can import it and render the real styles live.
 
 ## brutCard
 
@@ -25,7 +25,7 @@ Note the **deliberate 4px border**: core primitives like [Button](/design-system
 
 ## dayCell
 
-`dayCell` is a `Record<DayType, string>` mapping each calendar day type to its cell classes. `Hero` and `Features` use it together with `CAL_ENTRIES` — a 28-entry fake month exported from the same file — to render the illustrative mini-calendars:
+`dayCell` is a `Record<DayType, string>` mapping each calendar day type to its cell classes. `Hero` and `Features` use it together with `CAL_ENTRIES`, a 28-entry fake month exported from the same file, to render the illustrative mini-calendars:
 
 <DayCellsDemo client:visible />
 
@@ -48,6 +48,6 @@ import { brutCard, CAL_ENTRIES, dayCell } from './shared';
 
 ## Conventions
 
-- These constants are homepage-scoped. App surfaces (planner, sidebar) style day cells through `apps/web/src/ui/modules/pages/planner/calendar/utils/helpers.ts` instead — do not import `shared.ts` outside `apps/web/src/ui/modules/pages/homepage/`.
-- Extend the pattern by adding to `shared.ts`, not by copying class strings into a section — the constants exist precisely so the sections cannot drift apart.
+- These constants are homepage-scoped. App surfaces (planner, sidebar) style day cells through `apps/web/src/ui/modules/pages/planner/calendar/utils/helpers.ts` instead, and do not import `shared.ts` outside `apps/web/src/ui/modules/pages/homepage/`.
+- Extend the pattern by adding to `shared.ts`, not by copying class strings into a section: the constants exist precisely so the sections cannot drift apart.
 - Related: [charts](/design-system/patterns/charts/), [reference components](/design-system/patterns/reference-components/).

@@ -9,7 +9,7 @@ import { TextareaStatesDemo } from '../../../../components/demos/TextareaDemo';
 
 Source: `apps/web/src/ui/modules/core/primitives/Textarea.tsx`. The multi-line sibling of [Input](/design-system/components/input/): same `bg-input` surface, 3px frame border, and the same shadow-driven states (hover → extra-small shadow, focus → small shadow, `aria-invalid` → destructive border and focus shadow).
 
-Sizing is handled by CSS alone: `field-sizing-content` lets the field grow with its content from a `min-h-24` baseline — no JS resize logic and no manual `rows` management.
+Sizing is handled by CSS alone: `field-sizing-content` lets the field grow with its content from a `min-h-24` baseline, with no JS resize logic and no manual `rows` management.
 
 <TextareaStatesDemo client:visible />
 
