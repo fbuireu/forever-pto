@@ -7,6 +7,6 @@ interface RehydrateFailureParams {
 }
 
 export const onRehydrateFailure = ({ storeName, error, state }: RehydrateFailureParams): void => {
-	logClientError(`Error rehydrating ${storeName}`, error, { storeName, hasState: !!state });
+	logClientError({ message: `Error rehydrating ${storeName}`, error, context: { storeName, hasState: !!state } });
 	globalThis.localStorage?.removeItem(storeName);
 };

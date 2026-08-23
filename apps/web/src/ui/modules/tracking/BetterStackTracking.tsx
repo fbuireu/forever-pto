@@ -38,7 +38,7 @@ export const BetterStackTracking = () => {
 
 	useEffect(() => {
 		if (!analyticsEnabled || !userEmail) return;
-		identifyUser(userEmail, premiumKey ? "premium" : "free");
+		identifyUser({ email: userEmail, plan: premiumKey ? "premium" : "free" });
 	}, [analyticsEnabled, userEmail, premiumKey]);
 
 	if (!TRACKING_TOKEN || !analyticsEnabled) return null;

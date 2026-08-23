@@ -8,23 +8,23 @@ const REGIONS = [
 
 describe("getRegionName", () => {
 	it("returns the label for a matching region code (exact case)", () => {
-		expect(getRegionName("CAT", REGIONS)).toBe("Catalonia");
+		expect(getRegionName({ regionCode: "CAT", regions: REGIONS })).toBe("Catalonia");
 	});
 
 	it("is case-insensitive", () => {
-		expect(getRegionName("cat", REGIONS)).toBe("Catalonia");
-		expect(getRegionName("Cat", REGIONS)).toBe("Catalonia");
+		expect(getRegionName({ regionCode: "cat", regions: REGIONS })).toBe("Catalonia");
+		expect(getRegionName({ regionCode: "Cat", regions: REGIONS })).toBe("Catalonia");
 	});
 
 	it("falls back to the original code when no region matches", () => {
-		expect(getRegionName("UNKNOWN", REGIONS)).toBe("UNKNOWN");
+		expect(getRegionName({ regionCode: "UNKNOWN", regions: REGIONS })).toBe("UNKNOWN");
 	});
 
 	it("returns empty string for an empty regionCode", () => {
-		expect(getRegionName("", REGIONS)).toBe("");
+		expect(getRegionName({ regionCode: "", regions: REGIONS })).toBe("");
 	});
 
 	it("falls back to code when regions array is empty", () => {
-		expect(getRegionName("CAT", [])).toBe("CAT");
+		expect(getRegionName({ regionCode: "CAT", regions: [] })).toBe("CAT");
 	});
 });

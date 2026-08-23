@@ -14,12 +14,22 @@ interface TrackProperties {
 	[key: string]: unknown;
 }
 
-export const track = (event: TrackEventName, properties?: TrackProperties) => {
+export interface TrackParams {
+	event: TrackEventName;
+	properties?: TrackProperties;
+}
+
+export const track = ({ event, properties }: TrackParams) => {
 	if (globalThis.window === undefined || !globalThis.window.betterstack) return;
 	globalThis.window.betterstack("track", event, properties);
 };
 
-export const identifyUser = (email: string, plan: "premium" | "free") => {
+export interface IdentifyUserParams {
+	email: string;
+	plan: "premium" | "free";
+}
+
+export const identifyUser = ({ email, plan }: IdentifyUserParams) => {
 	if (globalThis.window === undefined || !globalThis.window.betterstack) return;
 	globalThis.window.betterstack("user", { email, plan });
 };

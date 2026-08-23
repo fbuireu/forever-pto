@@ -26,14 +26,17 @@ beforeEach(() => {
 
 describe("sendContactRequest", () => {
 	it("answers 200 on success, whichever transport called it", async () => {
-		const outcome = await sendContactRequest(Effect.succeed(INPUT), CONFIG);
+		const outcome = await sendContactRequest({ input: Effect.succeed(INPUT), config: CONFIG });
 
 		expect(outcome).toEqual({ status: 200, body: { success: true } });
-		expect(mockSendContactEmail).toHaveBeenCalledWith(INPUT, CONFIG);
+		expect(mockSendContactEmail).toHaveBeenCalledWith({ data: INPUT, config: CONFIG });
 	});
 
 	it("maps a malformed body to 400 carrying the code the parser raised", async () => {
-		const outcome = await sendContactRequest(Effect.fail(new ValidationError({ message: "invalid_body" })), CONFIG);
+		const outcome = await sendContactRequest({
+			input: Effect.fail(new ValidationError({ message: "invalid_body" })),
+			config: CONFIG,
+		});
 
 		expect(outcome).toEqual({ status: 400, body: { success: false, error: "invalid_body" } });
 		expect(mockSendContactEmail).not.toHaveBeenCalled();
@@ -42,7 +45,7 @@ describe("sendContactRequest", () => {
 	it("maps a rejected field to 400 carrying the schema code", async () => {
 		mockSendContactEmail.mockReturnValue(Effect.fail(new ValidationError({ message: "email_required" })));
 
-		const outcome = await sendContactRequest(Effect.succeed(INPUT), CONFIG);
+		const outcome = await sendContactRequest({ input: Effect.succeed(INPUT), config: CONFIG });
 
 		expect(outcome).toEqual({ status: 400, body: { success: false, error: "email_required" } });
 	});
@@ -50,7 +53,7 @@ describe("sendContactRequest", () => {
 	it("maps a mail failure to 500 without leaking the reason", async () => {
 		mockSendContactEmail.mockReturnValue(Effect.fail(new EmailError({ message: "resend exploded" })));
 
-		const outcome = await sendContactRequest(Effect.succeed(INPUT), CONFIG);
+		const outcome = await sendContactRequest({ input: Effect.succeed(INPUT), config: CONFIG });
 
 		expect(outcome).toEqual({ status: 500, body: { success: false, error: ApiError.INTERNAL_ERROR } });
 	});
@@ -59,7 +62,7 @@ describe("sendContactRequest", () => {
 		const sent = vi.fn();
 		mockSendContactEmail.mockReturnValue(Effect.succeed({ deferred: Effect.sync(sent) }));
 
-		await sendContactRequest(Effect.succeed(INPUT), CONFIG);
+		await sendContactRequest({ input: Effect.succeed(INPUT), config: CONFIG });
 
 		expect(mockAfter).toHaveBeenCalled();
 		expect(sent).toHaveBeenCalled();

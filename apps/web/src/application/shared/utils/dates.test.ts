@@ -19,21 +19,21 @@ import {
 
 describe("isSameDay", () => {
 	it("returns true for the same date", () => {
-		expect(isSameDay(new Date(2024, 0, 1), new Date(2024, 0, 1))).toBe(true);
+		expect(isSameDay({ a: new Date(2024, 0, 1), b: new Date(2024, 0, 1) })).toBe(true);
 	});
 
 	it("returns false for different dates", () => {
-		expect(isSameDay(new Date(2024, 0, 1), new Date(2024, 0, 2))).toBe(false);
+		expect(isSameDay({ a: new Date(2024, 0, 1), b: new Date(2024, 0, 2) })).toBe(false);
 	});
 });
 
 describe("isSameMonth", () => {
 	it("returns true for dates in the same month", () => {
-		expect(isSameMonth(new Date(2024, 0, 1), new Date(2024, 0, 31))).toBe(true);
+		expect(isSameMonth({ a: new Date(2024, 0, 1), b: new Date(2024, 0, 31) })).toBe(true);
 	});
 
 	it("returns false for different months", () => {
-		expect(isSameMonth(new Date(2024, 0, 1), new Date(2024, 1, 1))).toBe(false);
+		expect(isSameMonth({ a: new Date(2024, 0, 1), b: new Date(2024, 1, 1) })).toBe(false);
 	});
 });
 
@@ -53,12 +53,12 @@ describe("isWeekend", () => {
 
 describe("addDays", () => {
 	it("adds days correctly", () => {
-		const result = addDays(new Date(2024, 0, 1), 5);
+		const result = addDays({ date: new Date(2024, 0, 1), days: 5 });
 		expect(result.getDate()).toBe(6);
 	});
 
 	it("handles month boundaries", () => {
-		const result = addDays(new Date(2024, 0, 31), 1);
+		const result = addDays({ date: new Date(2024, 0, 31), days: 1 });
 		expect(result.getMonth()).toBe(1);
 		expect(result.getDate()).toBe(1);
 	});
@@ -66,13 +66,13 @@ describe("addDays", () => {
 
 describe("addMonths", () => {
 	it("adds months correctly", () => {
-		const result = addMonths(new Date(2024, 0, 15), 2);
+		const result = addMonths({ date: new Date(2024, 0, 15), months: 2 });
 		expect(result.getMonth()).toBe(2);
 		expect(result.getDate()).toBe(15);
 	});
 
 	it("constrains to last day when target month is shorter", () => {
-		const result = addMonths(new Date(2024, 0, 31), 1);
+		const result = addMonths({ date: new Date(2024, 0, 31), months: 1 });
 		expect(result.getMonth()).toBe(1);
 		expect(result.getDate()).toBe(29);
 	});
@@ -82,7 +82,7 @@ describe("differenceInDays", () => {
 	it("returns positive when left is after right", () => {
 		const left = new Date(2024, 0, 10);
 		const right = new Date(2024, 0, 5);
-		expect(differenceInDays(left, right)).toBe(5);
+		expect(differenceInDays({ dateLeft: left, dateRight: right })).toBe(5);
 	});
 });
 
@@ -107,12 +107,12 @@ describe("startOfMonth / endOfMonth", () => {
 
 describe("startOfWeek", () => {
 	it("defaults to Sunday as week start", () => {
-		const d = startOfWeek(new Date(2024, 0, 10));
+		const d = startOfWeek({ date: new Date(2024, 0, 10) });
 		expect(d.getDay()).toBe(0);
 	});
 
 	it("respects weekStartsOn option", () => {
-		const d = startOfWeek(new Date(2024, 0, 10), { weekStartsOn: 1 });
+		const d = startOfWeek({ date: new Date(2024, 0, 10), options: { weekStartsOn: 1 } });
 		expect(d.getDay()).toBe(1);
 	});
 });
@@ -126,7 +126,7 @@ describe("eachDayOfInterval", () => {
 
 describe("isBefore", () => {
 	it("returns true when date is earlier", () => {
-		expect(isBefore(new Date(2024, 0, 1), new Date(2024, 0, 2))).toBe(true);
+		expect(isBefore({ date: new Date(2024, 0, 1), dateToCompare: new Date(2024, 0, 2) })).toBe(true);
 	});
 });
 

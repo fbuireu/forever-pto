@@ -22,7 +22,12 @@ vi.mock("react-use-measure", () => ({ default: () => [vi.fn(), { height: 0 }] })
 
 import { SlidingNumber } from "./SlidingNumber";
 
-const renderIn = (locale: Locale, children: ReactNode) =>
+interface RenderInParams {
+	locale: Locale;
+	children: ReactNode;
+}
+
+const renderIn = ({ locale, children }: RenderInParams) =>
 	render(<NextIntlClientProvider locale={locale}>{children}</NextIntlClientProvider>);
 
 const separatorOf = (container: HTMLElement) =>
@@ -30,24 +35,27 @@ const separatorOf = (container: HTMLElement) =>
 
 describe("SlidingNumber", () => {
 	it("uses the comma decimal separator in a comma-decimal locale", () => {
-		const { container } = renderIn("es", <SlidingNumber number={2.4} decimalPlaces={1} />);
+		const { container } = renderIn({ locale: "es", children: <SlidingNumber number={2.4} decimalPlaces={1} /> });
 		expect(separatorOf(container)).toContain(",");
 	});
 
 	it("uses the dot decimal separator in a dot-decimal locale", () => {
-		const { container } = renderIn("en", <SlidingNumber number={2.4} decimalPlaces={1} />);
+		const { container } = renderIn({ locale: "en", children: <SlidingNumber number={2.4} decimalPlaces={1} /> });
 		expect(separatorOf(container)).toContain(".");
 		expect(separatorOf(container)).not.toContain(",");
 	});
 
 	it("honours an explicit decimalSeparator over the locale default", () => {
-		const { container } = renderIn("es", <SlidingNumber number={2.4} decimalPlaces={1} decimalSeparator="·" />);
+		const { container } = renderIn({
+			locale: "es",
+			children: <SlidingNumber number={2.4} decimalPlaces={1} decimalSeparator="·" />,
+		});
 		expect(separatorOf(container)).toContain("·");
 		expect(separatorOf(container)).not.toContain(",");
 	});
 
 	it("renders no separator when there are no decimals", () => {
-		const { container } = renderIn("de", <SlidingNumber number={2026} />);
+		const { container } = renderIn({ locale: "de", children: <SlidingNumber number={2026} /> });
 		expect(separatorOf(container)).not.toContain(",");
 		expect(separatorOf(container)).not.toContain(".");
 	});

@@ -27,13 +27,21 @@ const submitMessage = async (messages: object) => {
 		</NextIntlClientProvider>,
 	);
 
-	const fill = (placeholder: string, value: string) =>
+	interface FillParams {
+		placeholder: string;
+		value: string;
+	}
+
+	const fill = ({ placeholder, value }: FillParams) =>
 		fireEvent.change(screen.getByPlaceholderText(placeholder), { target: { value } });
 
-	fill(enMessages.contact.namePlaceholder, "Ada Lovelace");
-	fill(enMessages.contact.emailPlaceholder, "ada@example.com");
-	fill(enMessages.contact.subjectPlaceholder, "A question about Bridges");
-	fill(enMessages.contact.messagePlaceholder, "How does the planner pick which Bridges to build?");
+	fill({ placeholder: enMessages.contact.namePlaceholder, value: "Ada Lovelace" });
+	fill({ placeholder: enMessages.contact.emailPlaceholder, value: "ada@example.com" });
+	fill({ placeholder: enMessages.contact.subjectPlaceholder, value: "A question about Bridges" });
+	fill({
+		placeholder: enMessages.contact.messagePlaceholder,
+		value: "How does the planner pick which Bridges to build?",
+	});
 
 	fireEvent.click(screen.getByText(enMessages.contact.sendMessage));
 };

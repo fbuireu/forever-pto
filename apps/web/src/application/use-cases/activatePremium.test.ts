@@ -87,7 +87,7 @@ describe("activateWithPayment", () => {
 
 		expect(getPaymentById).not.toHaveBeenCalled();
 		expect(savePayment).toHaveBeenCalledOnce();
-		expect(updatePaymentStatus).toHaveBeenCalledWith("pi_test", "succeeded");
+		expect(updatePaymentStatus).toHaveBeenCalledWith({ paymentIntentId: "pi_test", status: "succeeded" });
 	});
 
 	it("still marks the row succeeded when the insert was ignored (deferred)", async () => {
@@ -98,7 +98,7 @@ describe("activateWithPayment", () => {
 		);
 		await runDeferred(deferred);
 
-		expect(updatePaymentStatus).toHaveBeenCalledWith("pi_test", "succeeded");
+		expect(updatePaymentStatus).toHaveBeenCalledWith({ paymentIntentId: "pi_test", status: "succeeded" });
 	});
 
 	it("lets a Stripe failure stay a PaymentError, so its message never reaches the payer", async () => {

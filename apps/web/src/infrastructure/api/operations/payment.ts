@@ -18,7 +18,10 @@ export const createPaymentRequest = (
 			yield* checkRateLimit(ipAddress ?? UNKNOWN_IP);
 
 			const body = yield* input;
-			const { clientSecret, discountInfo, deferred } = yield* createPayment(body, { userAgent, ipAddress });
+			const { clientSecret, discountInfo, deferred } = yield* createPayment({
+				params: body,
+				context: { userAgent, ipAddress },
+			});
 
 			after(() => Effect.runPromise(deferred.pipe(Effect.provide(ApplicationLayer))));
 

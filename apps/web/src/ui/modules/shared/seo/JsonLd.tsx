@@ -22,7 +22,7 @@ export async function JsonLd({ locale }: JsonLdProps) {
 		"@type": "WebApplication",
 		name: t("title"),
 		description: t("description"),
-		url: `${baseUrl}${localePath(locale, "/planner")}`,
+		url: `${baseUrl}${localePath({ locale, path: "/planner" })}`,
 		applicationCategory: "ProductivityApplication",
 		operatingSystem: "Any",
 		browserRequirements: "Requires JavaScript. Requires HTML5.",

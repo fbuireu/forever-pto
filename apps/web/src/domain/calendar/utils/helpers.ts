@@ -24,8 +24,8 @@ function analyzePotentialBridge({ ptoDays, holidaySet }: AnalyzePotentialBridges
 	let hasAdjacentFreeDay = false;
 
 	for (const day of sortedDays) {
-		const prevDay = addDays(day, -1);
-		const nextDay = addDays(day, 1);
+		const prevDay = addDays({ date: day, days: -1 });
+		const nextDay = addDays({ date: day, days: 1 });
 
 		const prevIsFree = isWeekend(prevDay) || holidaySet.has(getKey(prevDay));
 		const nextIsFree = isWeekend(nextDay) || holidaySet.has(getKey(nextDay));
@@ -43,25 +43,25 @@ function analyzePotentialBridge({ ptoDays, holidaySet }: AnalyzePotentialBridges
 	let effectiveStart = firstDay;
 	let effectiveEnd = lastDay;
 
-	let current = addDays(firstDay, -1);
+	let current = addDays({ date: firstDay, days: -1 });
 	let expansionCount = 0;
 
 	while ((isWeekend(current) || holidaySet.has(getKey(current))) && expansionCount < SAFETY_LIMIT) {
 		effectiveStart = current;
-		current = addDays(current, -1);
+		current = addDays({ date: current, days: -1 });
 		expansionCount++;
 	}
 
-	current = addDays(lastDay, 1);
+	current = addDays({ date: lastDay, days: 1 });
 	expansionCount = 0;
 
 	while ((isWeekend(current) || holidaySet.has(getKey(current))) && expansionCount < SAFETY_LIMIT) {
 		effectiveEnd = current;
-		current = addDays(current, 1);
+		current = addDays({ date: current, days: 1 });
 		expansionCount++;
 	}
 
-	const effectiveDays = differenceInDays(effectiveEnd, effectiveStart) + 1;
+	const effectiveDays = differenceInDays({ dateLeft: effectiveEnd, dateRight: effectiveStart }) + 1;
 	const efficiency = effectiveDays / ptoDays.length;
 
 	if (efficiency >= MINIMUM) {
@@ -118,7 +118,7 @@ export function getAvailableWorkdays({
 }: GetAvailableWorkdaysParams) {
 	const todayTime = startOfToday().getTime();
 
-	const holidaySet = createHolidaySet(holidays);
+	const holidaySet = createHolidaySet({ holidays });
 	const removedSet = new Set(removedDays.map((day) => getKey(day)));
 	const workdays: Date[] = [];
 
@@ -151,7 +151,7 @@ export const findBridges = ({ availableWorkdays, holidays }: FindBridgesParams) 
 	if (availableWorkdays.length === 0) return [];
 	const { MAX_MULTI_DAY_SIZE, MIN_MULTI_DAY_SIZE } = PTO_CONSTANTS.BRIDGE_SEARCH;
 
-	const holidaySet = createHolidaySet(holidays);
+	const holidaySet = createHolidaySet({ holidays });
 	const bridges: Bridge[] = [];
 
 	const sortedWorkdays = availableWorkdays.toSorted((a, b) => a.getTime() - b.getTime());
@@ -167,7 +167,7 @@ export const findBridges = ({ availableWorkdays, holidays }: FindBridgesParams) 
 			const multiDays: Date[] = [workday];
 
 			for (let i = 1; i < size; i++) {
-				const nextDay = addDays(workday, i);
+				const nextDay = addDays({ date: workday, days: i });
 				if (workdaySet.has(nextDay.getTime())) {
 					multiDays.push(nextDay);
 				} else {

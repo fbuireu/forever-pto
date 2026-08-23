@@ -50,7 +50,12 @@ vi.mock("@ui/modules/core/animate/icons/Icon", () => ({
 
 const { PtoCalculator } = await import("./PtoCalculator");
 
-const setDaysPerMonth = async (user: ReturnType<typeof userEvent.setup>, value: string) => {
+interface SetDaysPerMonthParams {
+	user: ReturnType<typeof userEvent.setup>;
+	value: string;
+}
+
+const setDaysPerMonth = async ({ user, value }: SetDaysPerMonthParams) => {
 	const input = screen.getByRole("spinbutton");
 	await user.clear(input);
 	await user.type(input, value);
@@ -63,13 +68,13 @@ describe("PtoCalculator", () => {
 		const calculate = screen.getByRole("button", { name: "calculate" });
 		const breakdown = () => container.querySelector(".bg-muted p")?.textContent?.replace(/\s+/g, " ").trim() ?? "";
 
-		await setDaysPerMonth(user, "2");
+		await setDaysPerMonth({ user, value: "2" });
 		await user.selectOptions(screen.getByLabelText("month"), "6");
 		await user.click(calculate);
 
 		expect(breakdown()).toBe("2 daysMonth × 6 months");
 
-		await setDaysPerMonth(user, "1");
+		await setDaysPerMonth({ user, value: "1" });
 		await user.selectOptions(screen.getByLabelText("month"), "12");
 		await user.click(calculate);
 

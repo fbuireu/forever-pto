@@ -16,31 +16,31 @@ function makeResponse() {
 describe("setLocaleCookie", () => {
 	it("sets the cookie with the correct name and value", () => {
 		const { response, cookiesSet } = makeResponse();
-		setLocaleCookie(response, ES);
+		setLocaleCookie({ response, value: ES });
 		expect(cookiesSet).toHaveBeenCalledWith(expect.objectContaining({ name: LOCALE_COOKIE, value: ES }));
 	});
 
 	it("sets httpOnly", () => {
 		const { response, cookiesSet } = makeResponse();
-		setLocaleCookie(response, ES);
+		setLocaleCookie({ response, value: ES });
 		expect(cookiesSet).toHaveBeenCalledWith(expect.objectContaining({ httpOnly: true }));
 	});
 
 	it("sets secure", () => {
 		const { response, cookiesSet } = makeResponse();
-		setLocaleCookie(response, ES);
+		setLocaleCookie({ response, value: ES });
 		expect(cookiesSet).toHaveBeenCalledWith(expect.objectContaining({ secure: true }));
 	});
 
 	it("sets sameSite lax", () => {
 		const { response, cookiesSet } = makeResponse();
-		setLocaleCookie(response, ES);
+		setLocaleCookie({ response, value: ES });
 		expect(cookiesSet).toHaveBeenCalledWith(expect.objectContaining({ sameSite: "lax" }));
 	});
 
 	it('sets path to "/"', () => {
 		const { response, cookiesSet } = makeResponse();
-		setLocaleCookie(response, ES);
+		setLocaleCookie({ response, value: ES });
 		expect(cookiesSet).toHaveBeenCalledWith(expect.objectContaining({ path: "/" }));
 	});
 });

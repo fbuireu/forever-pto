@@ -52,9 +52,9 @@ export const getDayClassNames = ({
 	modifiers,
 }: GetDayClassNamesParams) => {
 	const classes: string[] = [];
-	const isOutsideMonth = !isSameMonth(date, month);
-	const isSelected = selectedDates.some((d) => isSameDay(d, date));
-	const isPastDay = today ? isBefore(startOfDay(date), startOfDay(today)) : false;
+	const isOutsideMonth = !isSameMonth({ a: date, b: month });
+	const isSelected = selectedDates.some((d) => isSameDay({ a: d, b: date }));
+	const isPastDay = today ? isBefore({ date: startOfDay(date), dateToCompare: startOfDay(today) }) : false;
 	const shouldShowAsPast = isPastDay && !allowPastDays;
 
 	classes.push(

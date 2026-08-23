@@ -30,7 +30,12 @@ afterEach(() => {
 	vi.unstubAllGlobals();
 });
 
-const attachRef = (result: { ref: RefObject<HTMLElement | null> }, rectHeight = 0) => {
+interface AttachRefParams {
+	result: { ref: RefObject<HTMLElement | null> };
+	rectHeight?: number;
+}
+
+const attachRef = ({ result, rectHeight = 0 }: AttachRefParams) => {
 	const el = document.createElement("div");
 	document.body.appendChild(el);
 	el.getBoundingClientRect = () => ({ height: rectHeight }) as DOMRect;
@@ -62,7 +67,7 @@ describe("useAutoHeight", () => {
 		let deps = [1];
 		const { result, rerender } = renderHook(() => useAutoHeight(deps));
 
-		const el = attachRef(result.current);
+		const el = attachRef({ result: result.current });
 
 		act(() => {
 			deps = [2];
@@ -77,7 +82,7 @@ describe("useAutoHeight", () => {
 		let deps = [1];
 		const { result, rerender, unmount } = renderHook(() => useAutoHeight(deps));
 
-		const el = attachRef(result.current);
+		const el = attachRef({ result: result.current });
 
 		act(() => {
 			deps = [2];
@@ -93,7 +98,7 @@ describe("useAutoHeight", () => {
 		let deps = [1];
 		const { result, rerender } = renderHook(() => useAutoHeight(deps));
 
-		const el = attachRef(result.current);
+		const el = attachRef({ result: result.current });
 
 		act(() => {
 			deps = [2];
@@ -115,7 +120,7 @@ describe("useAutoHeight", () => {
 		let deps = [1];
 		const { result, rerender } = renderHook(() => useAutoHeight(deps));
 
-		const el = attachRef(result.current, 50);
+		const el = attachRef({ result: result.current, rectHeight: 50 });
 
 		act(() => {
 			deps = [2];
@@ -131,7 +136,7 @@ describe("useAutoHeight", () => {
 		let deps = [1];
 		const { result, rerender } = renderHook(() => useAutoHeight(deps));
 
-		const el = attachRef(result.current, 50);
+		const el = attachRef({ result: result.current, rectHeight: 50 });
 
 		act(() => {
 			deps = [2];
@@ -148,7 +153,7 @@ describe("useAutoHeight", () => {
 		let deps = [1];
 		const { result, rerender } = renderHook(() => useAutoHeight(deps));
 
-		const el = attachRef(result.current, 50.1);
+		const el = attachRef({ result: result.current, rectHeight: 50.1 });
 
 		act(() => {
 			deps = [2];
@@ -163,7 +168,7 @@ describe("useAutoHeight", () => {
 		stubBox("border-box");
 		const { result, rerender } = renderHook(() => useAutoHeight([1]));
 
-		const el = attachRef(result.current, 50);
+		const el = attachRef({ result: result.current, rectHeight: 50 });
 		expect(result.current.height).toBe(0);
 
 		act(() => {

@@ -6,7 +6,12 @@ import type { HolidaySource } from "@infrastructure/services/holidays/source/typ
 
 const logger = getBetterStackInstance();
 
-export function getRegions(countryCode?: string, source: HolidaySource = dateHolidaysSource) {
+export interface GetRegionsParams {
+	countryCode?: string;
+	source?: HolidaySource;
+}
+
+export function getRegions({ countryCode, source = dateHolidaysSource }: GetRegionsParams = {}) {
 	if (!countryCode) return [];
 
 	try {
@@ -14,7 +19,7 @@ export function getRegions(countryCode?: string, source: HolidaySource = dateHol
 
 		if (!regions || !Object.values(regions).length) return [];
 
-		return collateByLabel(regionDTO.create({ raw: regions }));
+		return collateByLabel({ options: regionDTO.create({ raw: regions }) });
 	} catch (error) {
 		logger.logError("Error in getRegions", error, { countryCode });
 		return [];

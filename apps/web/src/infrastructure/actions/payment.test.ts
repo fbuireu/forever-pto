@@ -80,7 +80,10 @@ describe("createPaymentAction", () => {
 	it("passes userAgent and ipAddress from headers to createPayment", async () => {
 		mockCreatePayment.mockReturnValue(Effect.succeed({ clientSecret: "pi_secret", discountInfo: null }));
 		await createPaymentAction(validInput);
-		expect(mockCreatePayment).toHaveBeenCalledWith(validInput, { userAgent: "test-agent", ipAddress: "1.2.3.4" });
+		expect(mockCreatePayment).toHaveBeenCalledWith({
+			params: validInput,
+			context: { userAgent: "test-agent", ipAddress: "1.2.3.4" },
+		});
 	});
 
 	it("returns success:false with message on ValidationError", async () => {

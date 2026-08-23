@@ -6,7 +6,7 @@ import { getRequestPublicEnv } from "@infrastructure/services/env/getRequestPubl
 import { Effect } from "effect";
 
 export async function sendContactEmailAction(data: ContactFormData) {
-	const { body } = await sendContactRequest(Effect.succeed(data), getRequestPublicEnv());
+	const { body } = await sendContactRequest({ input: Effect.succeed(data), config: getRequestPublicEnv() });
 
 	return body;
 }

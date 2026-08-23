@@ -12,7 +12,12 @@ interface ResolveApiErrorMessageParams {
 
 const MACHINE_CODE = /^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$/;
 
-const messageFrom = (translator: ApiErrorTranslator, key: string) => {
+interface MessageFromParams {
+	translator: ApiErrorTranslator;
+	key: string;
+}
+
+const messageFrom = ({ translator, key }: MessageFromParams) => {
 	if (!translator.has(key as never)) return undefined;
 
 	const message = translator.raw(key as never);
@@ -23,7 +28,8 @@ const messageFrom = (translator: ApiErrorTranslator, key: string) => {
 export const resolveApiErrorMessage = ({ code, t, shared, fallback }: ResolveApiErrorMessageParams) => {
 	if (!code) return fallback;
 
-	const message = messageFrom(t, `errors.${code}`) ?? messageFrom(shared, code);
+	const message =
+		messageFrom({ translator: t, key: `errors.${code}` }) ?? messageFrom({ translator: shared, key: code });
 
 	if (message !== undefined) return message;
 

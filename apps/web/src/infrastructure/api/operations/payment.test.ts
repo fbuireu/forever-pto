@@ -59,7 +59,7 @@ describe("createPaymentRequest", () => {
 		await createPaymentRequest(Effect.succeed(INPUT), { userAgent: null, ipAddress: null });
 
 		expect(mockCheckRateLimit).toHaveBeenCalledWith("unknown");
-		expect(mockCreatePayment).toHaveBeenCalledWith(INPUT, { userAgent: null, ipAddress: null });
+		expect(mockCreatePayment).toHaveBeenCalledWith({ params: INPUT, context: { userAgent: null, ipAddress: null } });
 	});
 
 	it("never reads the body before the limiter has spoken", async () => {

@@ -17,5 +17,5 @@ export const windowQuarterCount = (window: Pick<PlanningWindow, "carryOverMonths
 export const planningWindowMonths = (window: PlanningWindow): Date[] => {
 	const start = startOfMonth(new Date(window.year, 0, 1));
 
-	return Array.from({ length: windowMonthCount(window) }, (_, index) => addMonths(start, index));
+	return Array.from({ length: windowMonthCount(window) }, (_, index) => addMonths({ date: start, months: index }));
 };

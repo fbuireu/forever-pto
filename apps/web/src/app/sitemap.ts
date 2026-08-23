@@ -9,7 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
 	return LOCALES.flatMap((locale) =>
 		indexableRoutes().map(({ path, changeFrequency, priority }) => ({
-			url: `${baseUrl}${localePath(locale, path)}`,
+			url: `${baseUrl}${localePath({ locale, path })}`,
 			lastModified: new Date(),
 			changeFrequency,
 			priority,

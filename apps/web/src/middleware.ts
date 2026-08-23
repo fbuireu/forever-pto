@@ -42,7 +42,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
 	const localeCookie = i18nResponse.cookies.get(LOCALE_COOKIE);
 	if (localeCookie) {
-		setLocaleCookie(i18nResponse, localeCookie.value);
+		setLocaleCookie({ response: i18nResponse, value: localeCookie.value });
 	}
 
 	return await locationProxy({ request, response: i18nResponse });

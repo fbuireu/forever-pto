@@ -72,7 +72,7 @@ export const handlePaymentSucceeded = (
 		}
 
 		if (existing.status !== PAYMENT_SUCCEEDED) {
-			yield* updatePaymentStatus(event.paymentId, event.status);
+			yield* updatePaymentStatus({ paymentIntentId: event.paymentId, status: event.status });
 		}
 
 		yield* updateCharge(event);

@@ -25,7 +25,12 @@ export const getCombinationKey = (days: Date[]) => {
 		.join(",");
 };
 
-export const createHolidaySet = (holidays: HolidayDTO[], cacheKey?: string) => {
+export interface CreateHolidaySetParams {
+	holidays: HolidayDTO[];
+	cacheKey?: string;
+}
+
+export const createHolidaySet = ({ holidays, cacheKey }: CreateHolidaySetParams) => {
 	const key = cacheKey ?? "default";
 	const cached = HOLIDAY_CACHE.get(key);
 

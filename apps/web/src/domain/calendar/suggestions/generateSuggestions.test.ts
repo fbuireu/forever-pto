@@ -35,7 +35,13 @@ vi.mock("./utils/selectors", async (importOriginal) => {
 	};
 });
 
-const makeDate = (year: number, month: number, day: number) => new Date(year, month - 1, day);
+interface MakeDateParams {
+	year: number;
+	month: number;
+	day: number;
+}
+
+const makeDate = ({ year, month, day }: MakeDateParams) => new Date(year, month - 1, day);
 
 const makeHoliday = (date: Date) => ({
 	id: `h-${date.toISOString()}`,
@@ -48,7 +54,7 @@ const makeHoliday = (date: Date) => ({
 const BASE = {
 	holidays: [] as ReturnType<typeof makeHoliday>[],
 	allowPastDays: true,
-	months: [makeDate(2025, 1, 1)],
+	months: [makeDate({ year: 2025, month: 1, day: 1 })],
 };
 
 describe("generateSuggestions", () => {
@@ -72,7 +78,7 @@ describe("generateSuggestions", () => {
 		const result = planSuggestions({
 			...BASE,
 			ptoDays: 5,
-			months: [makeDate(2020, 1, 1)],
+			months: [makeDate({ year: 2020, month: 1, day: 1 })],
 			allowPastDays: false,
 			strategy: FilterStrategy.GROUPED,
 		});
@@ -92,13 +98,15 @@ describe("generateSuggestions", () => {
 	});
 
 	it("never suggests a day that is already a holiday", () => {
-		const holiday = makeHoliday(makeDate(2025, 1, 6));
+		const holiday = makeHoliday(makeDate({ year: 2025, month: 1, day: 6 }));
 		const result = planSuggestions({ ...BASE, ptoDays: 5, holidays: [holiday], strategy: FilterStrategy.GROUPED });
-		expect(result.days.some((day) => day.toDateString() === makeDate(2025, 1, 6).toDateString())).toBe(false);
+		expect(
+			result.days.some((day) => day.toDateString() === makeDate({ year: 2025, month: 1, day: 6 }).toDateString()),
+		).toBe(false);
 	});
 
 	it("ignores weekend holidays (they are not workdays)", () => {
-		const weekendHoliday = makeHoliday(makeDate(2025, 1, 4));
+		const weekendHoliday = makeHoliday(makeDate({ year: 2025, month: 1, day: 4 }));
 		const result = planSuggestions({
 			...BASE,
 			ptoDays: 5,
@@ -126,7 +134,7 @@ describe("generateSuggestions", () => {
 	);
 
 	it("never places a Removed Day", () => {
-		const removed = makeDate(2025, 1, 6);
+		const removed = makeDate({ year: 2025, month: 1, day: 6 });
 		const result = planSuggestions({
 			...BASE,
 			ptoDays: 5,
@@ -137,7 +145,7 @@ describe("generateSuggestions", () => {
 	});
 
 	it("does not let a Removed Day lengthen a neighbouring bridge", () => {
-		const removed = makeDate(2025, 1, 6);
+		const removed = makeDate({ year: 2025, month: 1, day: 6 });
 		const result = planSuggestions({
 			...BASE,
 			ptoDays: 5,

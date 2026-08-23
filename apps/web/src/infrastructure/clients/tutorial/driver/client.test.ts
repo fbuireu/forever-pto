@@ -100,7 +100,7 @@ describe("DriverClient.destroy", () => {
 
 	it("unmounts the close-button roots, which driver.js own destroy() never triggers", () => {
 		const { client, onPopoverRender } = getCallbacks();
-		onPopoverRender(makePopover({ appendChild: vi.fn() }), { config: {}, state: {} });
+		onPopoverRender(makePopover({ closeButton: { appendChild: vi.fn() } }), { config: {}, state: {} });
 		expect(mockCreateRoot).toHaveBeenCalledOnce();
 
 		client.destroy();
@@ -110,7 +110,7 @@ describe("DriverClient.destroy", () => {
 
 	it("does not unmount the same root twice when a second tour starts", () => {
 		const { client, onPopoverRender } = getCallbacks();
-		onPopoverRender(makePopover({ appendChild: vi.fn() }), { config: {}, state: {} });
+		onPopoverRender(makePopover({ closeButton: { appendChild: vi.fn() } }), { config: {}, state: {} });
 
 		client.start();
 		client.destroy();
@@ -133,7 +133,12 @@ function getCallbacks(clientConfig: ConstructorParameters<typeof DriverClient>[0
 	return { client, onPopoverRender: config.onPopoverRender, onDestroyStarted: config.onDestroyStarted };
 }
 
-function makePopover(closeButton: unknown = null, nextButton: unknown = null) {
+interface MakePopoverParams {
+	closeButton?: unknown;
+	nextButton?: unknown;
+}
+
+function makePopover({ closeButton = null, nextButton = null }: MakePopoverParams = {}) {
 	return { wrapper: { querySelector: vi.fn().mockReturnValue(closeButton) }, nextButton };
 }
 
@@ -160,7 +165,10 @@ describe("DriverClient - onPopoverRender", () => {
 	it("renders the injected close icon into the button when a close button exists", () => {
 		const { onPopoverRender } = getCallbacks();
 		const mockCloseButton = { innerHTML: "", appendChild: vi.fn() };
-		onPopoverRender(makePopover(mockCloseButton), { state: { activeIndex: 0 }, config: { steps: [{}, {}] } });
+		onPopoverRender(makePopover({ closeButton: mockCloseButton }), {
+			state: { activeIndex: 0 },
+			config: { steps: [{}, {}] },
+		});
 		expect(mockCreateRoot).toHaveBeenCalled();
 		expect(mockRender).toHaveBeenCalledWith(CLOSE_ICON);
 	});
@@ -168,13 +176,16 @@ describe("DriverClient - onPopoverRender", () => {
 	it("does not call createRoot when no close icon is injected", () => {
 		const { onPopoverRender } = getCallbacks({});
 		const mockCloseButton = { innerHTML: "", appendChild: vi.fn() };
-		onPopoverRender(makePopover(mockCloseButton), { state: { activeIndex: 0 }, config: { steps: [{}, {}] } });
+		onPopoverRender(makePopover({ closeButton: mockCloseButton }), {
+			state: { activeIndex: 0 },
+			config: { steps: [{}, {}] },
+		});
 		expect(mockCreateRoot).not.toHaveBeenCalled();
 	});
 
 	it("does not call createRoot when close button is absent", () => {
 		const { onPopoverRender } = getCallbacks();
-		onPopoverRender(makePopover(null), { state: { activeIndex: 0 }, config: {} });
+		onPopoverRender(makePopover({ closeButton: null }), { state: { activeIndex: 0 }, config: {} });
 		expect(mockCreateRoot).not.toHaveBeenCalled();
 	});
 
@@ -182,7 +193,10 @@ describe("DriverClient - onPopoverRender", () => {
 		const { onPopoverRender } = getCallbacks();
 		const steps = [{}, {}];
 		const mockNextButton = { classList: { add: vi.fn() } };
-		onPopoverRender(makePopover(null, mockNextButton), { state: { activeIndex: 1 }, config: { steps } });
+		onPopoverRender(makePopover({ closeButton: null, nextButton: mockNextButton }), {
+			state: { activeIndex: 1 },
+			config: { steps },
+		});
 		expect(mockNextButton.classList.add).toHaveBeenCalledWith("driver-popover-done-btn");
 	});
 
@@ -190,7 +204,10 @@ describe("DriverClient - onPopoverRender", () => {
 		const { onPopoverRender } = getCallbacks();
 		const steps = [{}, {}];
 		const mockNextButton = { classList: { add: vi.fn() } };
-		onPopoverRender(makePopover(null, mockNextButton), { state: { activeIndex: 0 }, config: { steps } });
+		onPopoverRender(makePopover({ closeButton: null, nextButton: mockNextButton }), {
+			state: { activeIndex: 0 },
+			config: { steps },
+		});
 		expect(mockNextButton.classList.add).not.toHaveBeenCalled();
 	});
 });
@@ -218,7 +235,7 @@ describe("DriverClient - onDestroyStarted", () => {
 	it("unmounts all tracked close button roots", () => {
 		const { onPopoverRender, onDestroyStarted } = getCallbacks();
 		const mockCloseButton = { innerHTML: "", appendChild: vi.fn() };
-		onPopoverRender(makePopover(mockCloseButton), { state: { activeIndex: 0 }, config: {} });
+		onPopoverRender(makePopover({ closeButton: mockCloseButton }), { state: { activeIndex: 0 }, config: {} });
 		onDestroyStarted(null, null, null);
 		expect(mockUnmount).toHaveBeenCalledOnce();
 	});

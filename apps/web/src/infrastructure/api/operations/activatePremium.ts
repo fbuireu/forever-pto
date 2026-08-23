@@ -28,7 +28,12 @@ export type ActivationOutcome =
 	| { status: 200; token: string; email: string; premiumKey: string; error: null }
 	| { status: 400 | 429 | 500; token: null; email: null; premiumKey: null; error: string };
 
-const refused = (status: 400 | 429 | 500, error: string): ActivationOutcome => ({
+interface RefusedParams {
+	status: 400 | 429 | 500;
+	error: string;
+}
+
+const refused = ({ status, error }: RefusedParams): ActivationOutcome => ({
 	status,
 	token: null,
 	email: null,
@@ -58,10 +63,10 @@ export const activatePremiumRequest = (
 						logger.warn("Premium activation refused", { tag: failure._tag, reason: failure.message });
 					}
 
-					return refused(status as 400 | 429 | 500, error);
+					return refused({ status: status as 400 | 429 | 500, error });
 				}),
 			),
 			Effect.provide(ApplicationLayer),
-			Effect.catchAll(() => Effect.succeed(refused(500, ApiError.INTERNAL_ERROR))),
+			Effect.catchAll(() => Effect.succeed(refused({ status: 500, error: ApiError.INTERNAL_ERROR }))),
 		),
 	);

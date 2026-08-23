@@ -9,9 +9,20 @@ beforeEach(() => {
 	clearHolidayCache();
 });
 
-const makeDate = (year: number, month: number, day: number) => new Date(year, month - 1, day);
+interface MakeDateParams {
+	year: number;
+	month: number;
+	day: number;
+}
 
-const makeBridge = (ptoDays: Date[], effectiveDays: number): Bridge => ({
+const makeDate = ({ year, month, day }: MakeDateParams) => new Date(year, month - 1, day);
+
+interface MakeBridgeParams {
+	ptoDays: Date[];
+	effectiveDays: number;
+}
+
+const makeBridge = ({ ptoDays, effectiveDays }: MakeBridgeParams): Bridge => ({
 	startDate: ptoDays[0],
 	endDate: ptoDays[ptoDays.length - 1],
 	ptoDaysNeeded: ptoDays.length,
@@ -20,12 +31,22 @@ const makeBridge = (ptoDays: Date[], effectiveDays: number): Bridge => ({
 	ptoDays,
 });
 
-const bridgeA = makeBridge([makeDate(2025, 1, 6)], 3);
-const bridgeB = makeBridge([makeDate(2025, 1, 9), makeDate(2025, 1, 10)], 4);
-const bridgeC = makeBridge([makeDate(2025, 1, 7)], 3);
-const bridgeShortHigh = makeBridge([makeDate(2025, 1, 13)], 2.7);
-const bridgeLong = makeBridge([makeDate(2025, 1, 20), makeDate(2025, 1, 21), makeDate(2025, 1, 22)], 8);
-const bridgeShortTop = makeBridge([makeDate(2025, 1, 13)], 3);
+const bridgeA = makeBridge({ ptoDays: [makeDate({ year: 2025, month: 1, day: 6 })], effectiveDays: 3 });
+const bridgeB = makeBridge({
+	ptoDays: [makeDate({ year: 2025, month: 1, day: 9 }), makeDate({ year: 2025, month: 1, day: 10 })],
+	effectiveDays: 4,
+});
+const bridgeC = makeBridge({ ptoDays: [makeDate({ year: 2025, month: 1, day: 7 })], effectiveDays: 3 });
+const bridgeShortHigh = makeBridge({ ptoDays: [makeDate({ year: 2025, month: 1, day: 13 })], effectiveDays: 2.7 });
+const bridgeLong = makeBridge({
+	ptoDays: [
+		makeDate({ year: 2025, month: 1, day: 20 }),
+		makeDate({ year: 2025, month: 1, day: 21 }),
+		makeDate({ year: 2025, month: 1, day: 22 }),
+	],
+	effectiveDays: 8,
+});
+const bridgeShortTop = makeBridge({ ptoDays: [makeDate({ year: 2025, month: 1, day: 13 })], effectiveDays: 3 });
 
 describe("selectBridgesForStrategy", () => {
 	it("returns empty result for empty bridges", () => {
@@ -41,7 +62,9 @@ describe("selectBridgesForStrategy", () => {
 			strategy: FilterStrategy.GROUPED,
 		});
 		expect(result.bridges).toContain(bridgeB);
-		expect(result.days.some((day) => day.toDateString() === makeDate(2025, 1, 9).toDateString())).toBe(true);
+		expect(
+			result.days.some((day) => day.toDateString() === makeDate({ year: 2025, month: 1, day: 9 }).toDateString()),
+		).toBe(true);
 	});
 
 	it("OPTIMIZED prefers high-efficiency bridges", () => {
@@ -115,7 +138,10 @@ describe("selectBridgesForStrategy", () => {
 	});
 
 	it("does not select conflicting bridges", () => {
-		const conflicting = makeBridge([makeDate(2025, 1, 6), makeDate(2025, 1, 7)], 5);
+		const conflicting = makeBridge({
+			ptoDays: [makeDate({ year: 2025, month: 1, day: 6 }), makeDate({ year: 2025, month: 1, day: 7 })],
+			effectiveDays: 5,
+		});
 		const result = selectBridgesForStrategy({
 			bridges: [bridgeA, conflicting],
 			targetPtoDays: 3,
@@ -155,7 +181,7 @@ describe("selectBridgesForStrategy, BALANCED", () => {
 	});
 
 	it("does not select conflicting bridges", () => {
-		const overlap = makeBridge([makeDate(2025, 1, 6)], 3);
+		const overlap = makeBridge({ ptoDays: [makeDate({ year: 2025, month: 1, day: 6 })], effectiveDays: 3 });
 		const result = selectBridgesForStrategy({
 			bridges: [bridgeA, overlap],
 			targetPtoDays: 2,
@@ -179,8 +205,15 @@ describe("selectBridgesForStrategy, BALANCED", () => {
 	});
 
 	it("leaves the budget unspent when every remaining single-day bridge is already taken", () => {
-		const highValue = makeBridge([makeDate(2025, 1, 20), makeDate(2025, 1, 21), makeDate(2025, 1, 22)], 9);
-		const conflicting = makeBridge([makeDate(2025, 1, 20)], 3);
+		const highValue = makeBridge({
+			ptoDays: [
+				makeDate({ year: 2025, month: 1, day: 20 }),
+				makeDate({ year: 2025, month: 1, day: 21 }),
+				makeDate({ year: 2025, month: 1, day: 22 }),
+			],
+			effectiveDays: 9,
+		});
+		const conflicting = makeBridge({ ptoDays: [makeDate({ year: 2025, month: 1, day: 20 })], effectiveDays: 3 });
 		const result = selectBridgesForStrategy({
 			bridges: [highValue, conflicting],
 			targetPtoDays: 4,
@@ -204,13 +237,17 @@ describe("selectBridgesForStrategy, BALANCED", () => {
 
 describe("the BALANCED ordering, high-value first", () => {
 	it("takes the high-value block before the crowd of cheap bridges that would exhaust the budget", () => {
-		const highValueThreeDaysNineEffective = makeBridge(
-			[makeDate(2025, 4, 14), makeDate(2025, 4, 15), makeDate(2025, 4, 16)],
-			9,
-		);
-		const cheapOne = makeBridge([makeDate(2025, 2, 3)], 3);
-		const cheapTwo = makeBridge([makeDate(2025, 3, 3)], 3);
-		const cheapThree = makeBridge([makeDate(2025, 5, 5)], 3);
+		const highValueThreeDaysNineEffective = makeBridge({
+			ptoDays: [
+				makeDate({ year: 2025, month: 4, day: 14 }),
+				makeDate({ year: 2025, month: 4, day: 15 }),
+				makeDate({ year: 2025, month: 4, day: 16 }),
+			],
+			effectiveDays: 9,
+		});
+		const cheapOne = makeBridge({ ptoDays: [makeDate({ year: 2025, month: 2, day: 3 })], effectiveDays: 3 });
+		const cheapTwo = makeBridge({ ptoDays: [makeDate({ year: 2025, month: 3, day: 3 })], effectiveDays: 3 });
+		const cheapThree = makeBridge({ ptoDays: [makeDate({ year: 2025, month: 5, day: 5 })], effectiveDays: 3 });
 
 		const { bridges: selected } = selectBridgesForStrategy({
 			bridges: [cheapOne, cheapTwo, cheapThree, highValueThreeDaysNineEffective],
@@ -223,8 +260,19 @@ describe("the BALANCED ordering, high-value first", () => {
 	});
 
 	it("rescues a long block the score alone would have lost to three cheaper bridges", () => {
-		const block = makeBridge([makeDate(2025, 4, 14), makeDate(2025, 4, 15), makeDate(2025, 4, 16)], 9);
-		const cheap = [makeDate(2025, 2, 3), makeDate(2025, 3, 3), makeDate(2025, 5, 5)].map((day) => makeBridge([day], 6));
+		const block = makeBridge({
+			ptoDays: [
+				makeDate({ year: 2025, month: 4, day: 14 }),
+				makeDate({ year: 2025, month: 4, day: 15 }),
+				makeDate({ year: 2025, month: 4, day: 16 }),
+			],
+			effectiveDays: 9,
+		});
+		const cheap = [
+			makeDate({ year: 2025, month: 2, day: 3 }),
+			makeDate({ year: 2025, month: 3, day: 3 }),
+			makeDate({ year: 2025, month: 5, day: 5 }),
+		].map((day) => makeBridge({ ptoDays: [day], effectiveDays: 6 }));
 
 		const { bridges: selected } = selectBridgesForStrategy({
 			bridges: [...cheap, block],
@@ -243,35 +291,55 @@ describe("BALANCED scoring formula", () => {
 		);
 
 	it("divides the span by ten so a long low-efficiency bridge cannot outscore a short efficient one", () => {
-		const efficient = makeBridge([makeDate(2025, 2, 3)], 4);
-		const long = makeBridge([makeDate(2025, 3, 3), makeDate(2025, 3, 4), makeDate(2025, 3, 5)], 8);
+		const efficient = makeBridge({ ptoDays: [makeDate({ year: 2025, month: 2, day: 3 })], effectiveDays: 4 });
+		const long = makeBridge({
+			ptoDays: [
+				makeDate({ year: 2025, month: 3, day: 3 }),
+				makeDate({ year: 2025, month: 3, day: 4 }),
+				makeDate({ year: 2025, month: 3, day: 5 }),
+			],
+			effectiveDays: 8,
+		});
 
 		expect(orderOf([long, efficient])).toEqual([4, 8]);
 	});
 
 	it("weights efficiency at 0.6 over span at 0.4, so 5.40 beats 5.04 where a swap would make it 4.35 against 4.56", () => {
-		const sharper = makeBridge([makeDate(2025, 2, 3), makeDate(2025, 2, 4), makeDate(2025, 2, 5)], 15);
-		const broader = makeBridge(
-			[
-				makeDate(2025, 4, 7),
-				makeDate(2025, 4, 8),
-				makeDate(2025, 4, 9),
-				makeDate(2025, 4, 10),
-				makeDate(2025, 4, 11),
-				makeDate(2025, 4, 14),
+		const sharper = makeBridge({
+			ptoDays: [
+				makeDate({ year: 2025, month: 2, day: 3 }),
+				makeDate({ year: 2025, month: 2, day: 4 }),
+				makeDate({ year: 2025, month: 2, day: 5 }),
 			],
-			24,
-		);
+			effectiveDays: 15,
+		});
+		const broader = makeBridge({
+			ptoDays: [
+				makeDate({ year: 2025, month: 4, day: 7 }),
+				makeDate({ year: 2025, month: 4, day: 8 }),
+				makeDate({ year: 2025, month: 4, day: 9 }),
+				makeDate({ year: 2025, month: 4, day: 10 }),
+				makeDate({ year: 2025, month: 4, day: 11 }),
+				makeDate({ year: 2025, month: 4, day: 14 }),
+			],
+			effectiveDays: 24,
+		});
 
 		expect(orderOf([broader, sharper])).toEqual([15, 24]);
 	});
 
 	it("bonuses a long 2.4-efficiency bridge the high-value pass skips, lifting 1.92 to 2.88 over a 2.56 rival", () => {
-		const longButOrdinary = makeBridge(
-			[makeDate(2025, 5, 5), makeDate(2025, 5, 6), makeDate(2025, 5, 7), makeDate(2025, 5, 8), makeDate(2025, 5, 9)],
-			12,
-		);
-		const sharpAndSmall = makeBridge([makeDate(2025, 6, 2)], 4);
+		const longButOrdinary = makeBridge({
+			ptoDays: [
+				makeDate({ year: 2025, month: 5, day: 5 }),
+				makeDate({ year: 2025, month: 5, day: 6 }),
+				makeDate({ year: 2025, month: 5, day: 7 }),
+				makeDate({ year: 2025, month: 5, day: 8 }),
+				makeDate({ year: 2025, month: 5, day: 9 }),
+			],
+			effectiveDays: 12,
+		});
+		const sharpAndSmall = makeBridge({ ptoDays: [makeDate({ year: 2025, month: 6, day: 2 })], effectiveDays: 4 });
 
 		expect(orderOf([sharpAndSmall, longButOrdinary])).toEqual([12, 4]);
 	});

@@ -1,7 +1,12 @@
 import { LOCALE_COOKIE } from "@infrastructure/i18n/locales";
 import type { NextResponse } from "next/server";
 
-export function setLocaleCookie(response: NextResponse, value: string) {
+export interface SetLocaleCookieParams {
+	response: NextResponse;
+	value: string;
+}
+
+export function setLocaleCookie({ response, value }: SetLocaleCookieParams) {
 	response.cookies.set({
 		name: LOCALE_COOKIE,
 		value,

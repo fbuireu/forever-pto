@@ -74,9 +74,12 @@ describe("sendContactEmailAction", () => {
 	it("passes env config to sendContactEmail", async () => {
 		mockSendContactEmail.mockReturnValue(Effect.succeed({ deferred: Effect.void }));
 		await sendContactEmailAction(validData);
-		expect(mockSendContactEmail).toHaveBeenCalledWith(validData, {
-			siteUrl: "https://example.com",
-			contactEmail: "contact@example.com",
+		expect(mockSendContactEmail).toHaveBeenCalledWith({
+			data: validData,
+			config: {
+				siteUrl: "https://example.com",
+				contactEmail: "contact@example.com",
+			},
 		});
 	});
 });

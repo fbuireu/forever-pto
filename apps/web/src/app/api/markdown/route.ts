@@ -10,7 +10,7 @@ export async function GET(request: Request) {
 	if (pathname === null) return notFound();
 
 	const { env } = await getCloudflareContext({ async: true });
-	const body = await buildMarkdownPage(env.NEXT_PUBLIC_SITE_URL, pathname);
+	const body = await buildMarkdownPage({ baseUrl: env.NEXT_PUBLIC_SITE_URL, pathname });
 
 	if (body === null) return notFound();
 

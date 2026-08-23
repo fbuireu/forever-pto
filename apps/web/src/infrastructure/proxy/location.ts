@@ -11,7 +11,7 @@ export async function location({ request, response }: MiddlewareParams) {
 	const knownCountry = request.cookies.get(USER_COUNTRY_COOKIE)?.value;
 
 	if (knownCountry) {
-		setLocationCookie(response, knownCountry);
+		setLocationCookie({ response, country: knownCountry });
 
 		return response;
 	}
@@ -19,7 +19,7 @@ export async function location({ request, response }: MiddlewareParams) {
 	const userCountry = await detectCountry(request);
 
 	if (userCountry) {
-		setLocationCookie(response, userCountry);
+		setLocationCookie({ response, country: userCountry });
 	}
 
 	return response;

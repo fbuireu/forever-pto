@@ -10,7 +10,13 @@ export const logClient = (write: (logger: BetterStackClient) => void): void => {
 		.catch(() => {});
 };
 
-export const logClientError = (message: string, error: unknown, context?: LogContext): void => {
+export interface LogClientErrorParams {
+	message: string;
+	error: unknown;
+	context?: LogContext;
+}
+
+export const logClientError = ({ message, error, context }: LogClientErrorParams): void => {
 	logClient((logger) => {
 		logger.logError(message, error, context);
 	});

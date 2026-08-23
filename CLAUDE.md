@@ -88,6 +88,13 @@ all three properties.
   style preference — the vocabulary is the only thing keeping four names for the same number apart.
 - **No re-export barrel files.** Import from the source module; a pass-through `index.ts` hides the real
   dependency graph and defeats the layer rules.
+- **Named parameters for two or more arguments.** A function taking two or more arguments takes one
+  destructured object typed by an **interface** named `<FunctionName>Params`:
+  `function sendContactEmail({ data, config }: SendContactEmailParams)`. One argument stays positional.
+  Two adjacent same-typed arguments are the shape a caller transposes with nothing to catch it, and the
+  parameter names then travel to the call site. The exceptions are functions a runtime calls back —
+  a `sort`/`toSorted` comparator like `compareByEfficiency`, or a class handed to `vi.stubGlobal` — which
+  are invoked positionally and must stay that way.
 - **Conventional commits** (commitlint + husky). semantic-release owns versioning. Do NOT add a
   Co-Authored-By / Claude trailer to commits or PRs.
 - **One package per pull request.** The repo squash-merges, and a release is attributed to a package by the

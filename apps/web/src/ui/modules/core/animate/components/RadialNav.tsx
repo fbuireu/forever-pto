@@ -71,7 +71,12 @@ const LABEL_TRANSITION: Transition = {
 	damping: 25,
 };
 
-function getPolarCoordinates(angleDeg: number, r: number) {
+interface GetPolarCoordinatesParams {
+	angleDeg: number;
+	r: number;
+}
+
+function getPolarCoordinates({ angleDeg, r }: GetPolarCoordinatesParams) {
 	const rad = ((angleDeg - 90) * Math.PI) / 180;
 	return { x: r * Math.cos(rad), y: r * Math.sin(rad) };
 }
@@ -91,7 +96,12 @@ function calculateIconOffset({
 	return centerOffset - buttonPadding + bias;
 }
 
-function withDefaults<T extends Record<string, unknown>>(defaults: T, overrides?: Partial<T>) {
+type WithDefaultsParams<T extends Record<string, unknown>> = {
+	defaults: T;
+	overrides?: Partial<T>;
+};
+
+function withDefaults<T extends Record<string, unknown>>({ defaults, overrides }: WithDefaultsParams<T>) {
 	return { ...defaults, ...overrides };
 }
 
@@ -99,7 +109,12 @@ function normalizeDeg(a: number) {
 	return ((a % 360) + 360) % 360;
 }
 
-function toNearestTurn(prev: number | undefined, target: number) {
+interface ToNearestTurnParams {
+	prev: number | undefined;
+	target: number;
+}
+
+function toNearestTurn({ prev, target }: ToNearestTurnParams) {
 	const b = normalizeDeg(target);
 	if (prev === undefined) return b;
 	const k = Math.round((prev - b) / 360);
@@ -109,7 +124,7 @@ function toNearestTurn(prev: number | undefined, target: number) {
 function useShortestRotation(target: number) {
 	const prevRef = useRef<number | undefined>(undefined);
 	return useMemo(() => {
-		const next = toNearestTurn(prevRef.current, target);
+		const next = toNearestTurn({ prev: prevRef.current, target });
 		prevRef.current = next;
 		return next;
 	}, [target]);
@@ -192,7 +207,7 @@ function RadialNav({
 	const baseAngle = (items.find((it) => it.id === activeId)?.angle ?? 0) + POINTER_BASE_DEG;
 	const rotateAngle = useShortestRotation(baseAngle);
 
-	const resolvedMenuButtonConfig = withDefaults(defaultMenuButtonConfig, menuButtonConfig);
+	const resolvedMenuButtonConfig = withDefaults({ defaults: defaultMenuButtonConfig, overrides: menuButtonConfig });
 
 	return (
 		<div
@@ -216,7 +231,7 @@ function RadialNav({
 			</m.div>
 			{items.map((item) => {
 				const { id, angle } = item;
-				const { x, y } = getPolarCoordinates(angle, orbitRadius);
+				const { x, y } = getPolarCoordinates({ angleDeg: angle, r: orbitRadius });
 				return (
 					<div
 						key={id}

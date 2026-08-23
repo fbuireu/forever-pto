@@ -19,10 +19,15 @@ const getCouponValidationError = (coupon: Stripe.Coupon): PromoCodeErrorCode | n
 	return null;
 };
 
-const getPromotionCodeValidationError = (
-	promotionCode: Stripe.PromotionCode,
-	amount: number,
-): PromoCodeErrorCode | null => {
+interface GetPromotionCodeValidationErrorParams {
+	promotionCode: Stripe.PromotionCode;
+	amount: number;
+}
+
+const getPromotionCodeValidationError = ({
+	promotionCode,
+	amount,
+}: GetPromotionCodeValidationErrorParams): PromoCodeErrorCode | null => {
 	if (promotionCode.active === false) return PromoCodeErrors.INVALID_OR_EXPIRED;
 	if (promotionCode.expires_at && promotionCode.expires_at < Math.floor(Date.now() / 1000)) {
 		return PromoCodeErrors.COUPON_EXPIRED;
@@ -43,16 +48,26 @@ const getPromotionCodeValidationError = (
 
 const toCents = (value: number) => Math.round(value * 100) / 100;
 
-const calculateFinalAmount = (coupon: Stripe.Coupon, amount: number) => {
+interface CalculateFinalAmountParams {
+	coupon: Stripe.Coupon;
+	amount: number;
+}
+
+const calculateFinalAmount = ({ coupon, amount }: CalculateFinalAmountParams) => {
 	if (coupon.percent_off) return toCents(amount * (1 - coupon.percent_off / 100));
 	if (coupon.amount_off) return toCents(amount - coupon.amount_off / 100);
 	return amount;
 };
 
-export const validatePromoCode = (
-	code: string,
-	amount: number,
-): Effect.Effect<DiscountInfo, PromoCodeError, StripeServerService | TursoService> =>
+export interface ValidatePromoCodeParams {
+	code: string;
+	amount: number;
+}
+
+export const validatePromoCode = ({
+	code,
+	amount,
+}: ValidatePromoCodeParams): Effect.Effect<DiscountInfo, PromoCodeError, StripeServerService | TursoService> =>
 	Effect.gen(function* () {
 		const stripe = yield* StripeServerService;
 
@@ -70,7 +85,8 @@ export const validatePromoCode = (
 			return yield* Effect.fail(new PromoCodeError({ code: PromoCodeErrors.FAILED_TO_LOAD }));
 		}
 
-		const validationError = getPromotionCodeValidationError(promotionCode, amount) ?? getCouponValidationError(coupon);
+		const validationError =
+			getPromotionCodeValidationError({ promotionCode, amount }) ?? getCouponValidationError(coupon);
 		if (validationError) return yield* Effect.fail(new PromoCodeError({ code: validationError }));
 
 		if (promotionCode.max_redemptions) {
@@ -80,7 +96,7 @@ export const validatePromoCode = (
 			}
 		}
 
-		const finalAmount = calculateFinalAmount(coupon, amount);
+		const finalAmount = calculateFinalAmount({ coupon, amount });
 		if (finalAmount < MIN_FINAL_AMOUNT) {
 			return yield* Effect.fail(new PromoCodeError({ code: PromoCodeErrors.MIN_AMOUNT_EXCEEDED }));
 		}

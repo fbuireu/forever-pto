@@ -35,7 +35,12 @@ vi.mock("./PlannerPanelFixture", () => ({ PlannerPanelFixture: () => null }));
 
 import { ManagementBar } from "./ManagementBar";
 
-const renderBar = (locale: Locale, messages: object) =>
+interface RenderBarParams {
+	locale: Locale;
+	messages: object;
+}
+
+const renderBar = ({ locale, messages }: RenderBarParams) =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<ManagementBar />
@@ -44,12 +49,12 @@ const renderBar = (locale: Locale, messages: object) =>
 
 describe("ManagementBar mobile drawer", () => {
 	it("announces the localised planner heading in German", () => {
-		const { getByTestId } = renderBar("de", deMessages);
+		const { getByTestId } = renderBar({ locale: "de", messages: deMessages });
 		expect(getByTestId("drawer-title").textContent).toBe(deMessages.planner.heading);
 	});
 
 	it("announces the localised planner heading in Spanish", () => {
-		const { getByTestId } = renderBar("es", esMessages);
+		const { getByTestId } = renderBar({ locale: "es", messages: esMessages });
 		expect(getByTestId("drawer-title").textContent).toBe("Planificador");
 	});
 });
@@ -63,7 +68,7 @@ describe("ManagementBar empty plan", () => {
 		(holidaysState as { isCalculating?: boolean; hasCalculated?: boolean }).isCalculating = false;
 		(holidaysState as { hasCalculated?: boolean }).hasCalculated = true;
 
-		const { container } = renderBar("es", esMessages);
+		const { container } = renderBar({ locale: "es", messages: esMessages });
 
 		expect(container.querySelector('[data-tutorial="planner-drawer"]')).toBeNull();
 		expect(container.textContent).not.toContain(esMessages.planner.heading);
@@ -79,7 +84,7 @@ describe("ManagementBar empty plan", () => {
 		(holidaysState as { isCalculating?: boolean; hasCalculated?: boolean }).isCalculating = false;
 		(holidaysState as { hasCalculated?: boolean }).hasCalculated = false;
 
-		const { container } = renderBar("es", esMessages);
+		const { container } = renderBar({ locale: "es", messages: esMessages });
 
 		expect(container.textContent).toContain(esMessages.planner.heading);
 
@@ -92,7 +97,7 @@ describe("ManagementBar empty plan", () => {
 		holidaysState.currentSelection = null;
 		(holidaysState as { isCalculating?: boolean }).isCalculating = true;
 
-		const { container } = renderBar("es", esMessages);
+		const { container } = renderBar({ locale: "es", messages: esMessages });
 
 		expect(container.textContent).toContain(esMessages.planner.heading);
 
@@ -102,14 +107,19 @@ describe("ManagementBar empty plan", () => {
 });
 
 describe("ManagementBar drawer header", () => {
-	const makeSuggestion = (effectiveDays: number, efficiency: number) => ({
+	interface MakeSuggestionParams {
+		effectiveDays: number;
+		efficiency: number;
+	}
+
+	const makeSuggestion = ({ effectiveDays, efficiency }: MakeSuggestionParams) => ({
 		days: [new Date(2026, 0, 5)],
 		bridges: [],
 		metrics: { totalEffectiveDays: effectiveDays, averageEfficiency: efficiency },
 	});
 
-	const applied = makeSuggestion(4, 2);
-	const previewed = makeSuggestion(9, 4.5);
+	const applied = makeSuggestion({ effectiveDays: 4, efficiency: 2 });
+	const previewed = makeSuggestion({ effectiveDays: 9, efficiency: 4.5 });
 
 	it("numbers the option the metrics beside it belong to, not the applied one", () => {
 		readyState.areStoresReady = true;
@@ -119,7 +129,7 @@ describe("ManagementBar drawer header", () => {
 		holidaysState.currentSelectionIndex = 0;
 		holidaysState.previewAlternativeIndex = 1;
 
-		const { container } = renderBar("es", esMessages);
+		const { container } = renderBar({ locale: "es", messages: esMessages });
 		const text = container.textContent ?? "";
 
 		expect(text).toContain(`${esMessages.alternativesManager.option} 2`);

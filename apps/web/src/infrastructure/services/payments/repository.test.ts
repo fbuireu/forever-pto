@@ -113,7 +113,12 @@ const updatedColumns = (sql: string) => [
 	"id",
 ];
 
-const boundRow = (columns: string[], args: unknown[]) =>
+interface BoundRowParams {
+	columns: string[];
+	args: unknown[];
+}
+
+const boundRow = ({ columns, args }: BoundRowParams) =>
 	Object.fromEntries(columns.map((column, index) => [column, args[index]]));
 
 describe("savePayment", () => {
@@ -134,7 +139,7 @@ describe("savePayment", () => {
 	it("binds every value under the column the INSERT names at that position", async () => {
 		await runEffect(savePayment(BASE_PAYMENT));
 		const [sql, args] = mockExecute.mock.calls[0] as [string, unknown[]];
-		expect(boundRow(insertedColumns(sql), args)).toEqual({
+		expect(boundRow({ columns: insertedColumns(sql), args })).toEqual({
 			id: "pi_test",
 			stripe_created_at: "2024-01-15T10:00:00.000Z",
 			stripe_customer_id: "cus_123",
@@ -170,7 +175,7 @@ describe("savePayment", () => {
 	it("passes null for optional fields when they are null", async () => {
 		await runEffect(savePayment({ ...BASE_PAYMENT, customerId: null, chargeId: null, promoCode: null }));
 		const [sql, args] = mockExecute.mock.calls[0] as [string, unknown[]];
-		const row = boundRow(insertedColumns(sql), args);
+		const row = boundRow({ columns: insertedColumns(sql), args });
 		expect(row.stripe_customer_id).toBeNull();
 		expect(row.stripe_charge_id).toBeNull();
 		expect(row.promo_code).toBeNull();
@@ -185,14 +190,14 @@ describe("savePayment", () => {
 
 describe("updatePaymentStatus", () => {
 	it("executes an UPDATE payments SET status", async () => {
-		await runEffect(updatePaymentStatus("pi_test", "succeeded"));
+		await runEffect(updatePaymentStatus({ paymentIntentId: "pi_test", status: "succeeded" }));
 		const [sql] = mockExecute.mock.calls[0] as [string, unknown[]];
 		expect(sql).toContain("UPDATE payments");
 		expect(sql).toContain("SET status");
 	});
 
 	it("refuses to overwrite a succeeded row, in the WHERE clause rather than at the caller", async () => {
-		await runEffect(updatePaymentStatus("pi_test", "canceled"));
+		await runEffect(updatePaymentStatus({ paymentIntentId: "pi_test", status: "canceled" }));
 		const [sql] = mockExecute.mock.calls[0] as [string, unknown[]];
 		const where = sql.slice(sql.indexOf("WHERE"));
 
@@ -201,28 +206,32 @@ describe("updatePaymentStatus", () => {
 
 	it("answers whether it wrote, so no caller has to read the row first", async () => {
 		mockExecute.mockReturnValueOnce(Effect.succeed(0));
-		await expect(runEffect(updatePaymentStatus("pi_test", "canceled"))).resolves.toBe(false);
+		await expect(runEffect(updatePaymentStatus({ paymentIntentId: "pi_test", status: "canceled" }))).resolves.toBe(
+			false,
+		);
 
 		mockExecute.mockReturnValueOnce(Effect.succeed(1));
-		await expect(runEffect(updatePaymentStatus("pi_test", "canceled"))).resolves.toBe(true);
+		await expect(runEffect(updatePaymentStatus({ paymentIntentId: "pi_test", status: "canceled" }))).resolves.toBe(
+			true,
+		);
 	});
 
 	it("passes status and paymentIntentId as arguments", async () => {
-		await runEffect(updatePaymentStatus("pi_test", "succeeded"));
+		await runEffect(updatePaymentStatus({ paymentIntentId: "pi_test", status: "succeeded" }));
 		const [, args] = mockExecute.mock.calls[0] as [string, unknown[]];
 		expect(args[0]).toBe("succeeded");
 		expect(args[2]).toBe("pi_test");
 	});
 
 	it("stamps succeeded_at against the same literal the domain calls the entitlement", async () => {
-		await runEffect(updatePaymentStatus("pi_test", PAYMENT_SUCCEEDED));
+		await runEffect(updatePaymentStatus({ paymentIntentId: "pi_test", status: PAYMENT_SUCCEEDED }));
 		const [sql] = mockExecute.mock.calls[0] as [string, unknown[]];
 		expect(sql).toContain(`WHEN ? = '${PAYMENT_SUCCEEDED}'`);
 	});
 
 	it("propagates DatabaseError when execute fails", async () => {
 		mockExecute.mockReturnValue(Effect.fail(new DatabaseError({ message: "update failed" })));
-		const error = await runFlipEffect(updatePaymentStatus("pi_test", "succeeded"));
+		const error = await runFlipEffect(updatePaymentStatus({ paymentIntentId: "pi_test", status: "succeeded" }));
 		expect(error).toBeInstanceOf(DatabaseError);
 	});
 });
@@ -255,7 +264,7 @@ describe("updatePaymentCharge", () => {
 		await runEffect(updatePaymentCharge(chargeData));
 		const [sql, args] = mockExecute.mock.calls[0] as [string, unknown[]];
 		expect(sql.split("?")).toHaveLength(args.length + 1);
-		expect(boundRow(updatedColumns(sql), args)).toEqual({
+		expect(boundRow({ columns: updatedColumns(sql), args })).toEqual({
 			stripe_charge_id: "ch_abc",
 			receipt_url: "https://receipt.url",
 			payment_method_type: "card",

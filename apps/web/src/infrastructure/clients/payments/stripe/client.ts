@@ -90,7 +90,7 @@ class StripeClient {
 	}
 
 	private logError(message: string, error: unknown, context: Record<string, unknown>) {
-		logClientError(message, error, context);
+		logClientError({ message, error, context });
 	}
 
 	private handlePaymentResult(result: { error: StripeError } | { paymentIntent: PaymentIntent }) {

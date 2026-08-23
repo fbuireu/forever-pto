@@ -35,7 +35,13 @@ export const MAX_PTO_DAYS = 365;
 export const MIN_CARRY_OVER_MONTHS = 1;
 export const MAX_CARRY_OVER_MONTHS = 12;
 
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+interface ClampParams {
+	value: number;
+	min: number;
+	max: number;
+}
+
+const clamp = ({ value, min, max }: ClampParams) => Math.min(max, Math.max(min, value));
 
 const initialState: FiltersState = {
 	ptoDays: 22,
@@ -64,14 +70,24 @@ export const useFiltersStore = create<FiltersStore>()(
 			(set) => ({
 				...initialState,
 				setPtoDays: (days: number) =>
-					set({ ptoDays: clamp(Math.round(days), MIN_PTO_DAYS, MAX_PTO_DAYS) }, false, "setPtoDays"),
+					set(
+						{ ptoDays: clamp({ value: Math.round(days), min: MIN_PTO_DAYS, max: MAX_PTO_DAYS }) },
+						false,
+						"setPtoDays",
+					),
 				setCountry: (country: string) => set({ country, region: "" }, false, "setCountry"),
 				setRegion: (region: string) => set({ region }, false, "setRegion"),
 				setAllowPastDays: (allow: boolean) => set({ allowPastDays: allow }, false, "setAllowPastDays"),
 				setYear: (year: number) => set({ year }, false, "setYear"),
 				setCarryOverMonths: (months: number) =>
 					set(
-						{ carryOverMonths: clamp(Math.round(months), MIN_CARRY_OVER_MONTHS, MAX_CARRY_OVER_MONTHS) },
+						{
+							carryOverMonths: clamp({
+								value: Math.round(months),
+								min: MIN_CARRY_OVER_MONTHS,
+								max: MAX_CARRY_OVER_MONTHS,
+							}),
+						},
 						false,
 						"setCarryOverMonths",
 					),
@@ -94,12 +110,12 @@ export const useFiltersStore = create<FiltersStore>()(
 					}
 
 					if (state) {
-						state.ptoDays = clamp(Math.round(state.ptoDays), MIN_PTO_DAYS, MAX_PTO_DAYS);
-						state.carryOverMonths = clamp(
-							Math.round(state.carryOverMonths),
-							MIN_CARRY_OVER_MONTHS,
-							MAX_CARRY_OVER_MONTHS,
-						);
+						state.ptoDays = clamp({ value: Math.round(state.ptoDays), min: MIN_PTO_DAYS, max: MAX_PTO_DAYS });
+						state.carryOverMonths = clamp({
+							value: Math.round(state.carryOverMonths),
+							min: MIN_CARRY_OVER_MONTHS,
+							max: MAX_CARRY_OVER_MONTHS,
+						});
 					}
 				},
 			},

@@ -90,7 +90,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
 
 				if (result.success) {
 					setEmail(data.email);
-					track("contact_form_submitted");
+					track({ event: "contact_form_submitted" });
 					setStep(Step.SUCCESS);
 				} else {
 					setErrorMessage(

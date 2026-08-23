@@ -23,7 +23,12 @@ const MESSAGES: Record<LocaleCode, typeof en> = {
 const HOME_PATH = "";
 const PLANNER_PATH = "/planner";
 
-export async function buildMarkdownPage(baseUrl: string, pathname: string): Promise<string | null> {
+export interface BuildMarkdownPageParams {
+	baseUrl: string;
+	pathname: string;
+}
+
+export async function buildMarkdownPage({ baseUrl, pathname }: BuildMarkdownPageParams): Promise<string | null> {
 	const locale = getLocaleFromPathname(pathname);
 	const messages = MESSAGES[locale];
 	const t = createTranslator({ locale, messages, namespace: "metadata" });
@@ -43,7 +48,7 @@ ${pkg.version}
 
 ## URL
 
-${baseUrl}${localePath(locale, route.path)}
+${baseUrl}${localePath({ locale, path: route.path })}
 `;
 	}
 
@@ -80,7 +85,7 @@ ${pkg.version}
 
 ## URL
 
-${baseUrl}${localePath(locale, "/planner")}
+${baseUrl}${localePath({ locale, path: "/planner" })}
 `;
 	}
 
@@ -99,7 +104,7 @@ ${t("description")}
 
 ## How It Works
 
-1. Open the planner at ${baseUrl}${localePath(locale, "/planner")}
+1. Open the planner at ${baseUrl}${localePath({ locale, path: "/planner" })}
 2. Your country is detected automatically; adjust country and region if needed
 3. Select a year and optimization strategy
 4. The planner generates a list of suggested PTO days that bridge holidays

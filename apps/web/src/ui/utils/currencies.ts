@@ -33,12 +33,20 @@ const formatterFor = ({ locale, currency, fractionDigits }: FormatterKey): Intl.
 	return formatter;
 };
 
-const symbolOf = (formatter: Intl.NumberFormat, fallback: string) =>
+interface SymbolOfParams {
+	formatter: Intl.NumberFormat;
+	fallback: string;
+}
+
+const symbolOf = ({ formatter, fallback }: SymbolOfParams) =>
 	formatter.formatToParts(0).find(({ type }) => type === CURRENCY_PART)?.value ?? fallback;
 
 export const getCurrencyForLocale = (locale: Locale) => ({
 	currency: DEFAULT_CURRENCY,
-	currencySymbol: symbolOf(formatterFor({ locale, currency: DEFAULT_CURRENCY }), DEFAULT_CURRENCY),
+	currencySymbol: symbolOf({
+		formatter: formatterFor({ locale, currency: DEFAULT_CURRENCY }),
+		fallback: DEFAULT_CURRENCY,
+	}),
 });
 
 export const amountFormatter = (locale: Locale) =>

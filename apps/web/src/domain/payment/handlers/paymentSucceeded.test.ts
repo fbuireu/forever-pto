@@ -69,7 +69,7 @@ describe("handlePaymentSucceeded", () => {
 	it("calls updatePaymentStatus when existing payment is not succeeded", async () => {
 		const { updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
 		await run(handlePaymentSucceeded(EVENT));
-		expect(updatePaymentStatus).toHaveBeenCalledWith("pi_test", "succeeded");
+		expect(updatePaymentStatus).toHaveBeenCalledWith({ paymentIntentId: "pi_test", status: "succeeded" });
 	});
 
 	it("does not call updatePaymentStatus when existing payment is already succeeded", async () => {

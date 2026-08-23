@@ -39,7 +39,7 @@ export const useLocationStore = create<LocationStore>()(
 				},
 
 				fetchRegions: (countryCode: string) => {
-					set({ regions: getRegions(countryCode) });
+					set({ regions: getRegions({ countryCode }) });
 				},
 			}),
 			{

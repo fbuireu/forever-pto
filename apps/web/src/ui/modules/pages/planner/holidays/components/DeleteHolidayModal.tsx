@@ -50,7 +50,7 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
 
 				onClose();
 			} catch (error) {
-				logClientError("Error deleting holiday", error, { component: "DeleteHolidayModal" });
+				logClientError({ message: "Error deleting holiday", error, context: { component: "DeleteHolidayModal" } });
 				toast.error(t("errorTitle"), {
 					description: t("errorDescription"),
 				});

@@ -39,7 +39,12 @@ function mergeRefs<T>(...refs: (Ref<T> | undefined)[]): RefCallback<T> {
 	};
 }
 
-function mergeProps<T extends HTMLElement>(childProps: AnyProps, slotProps: DOMMotionProps<T>) {
+interface MergePropsParams<T extends HTMLElement> {
+	childProps: AnyProps;
+	slotProps: DOMMotionProps<T>;
+}
+
+function mergeProps<T extends HTMLElement>({ childProps, slotProps }: MergePropsParams<T>) {
 	const merged: AnyProps = { ...childProps, ...slotProps };
 
 	if (childProps.className || slotProps.className) {
@@ -69,7 +74,7 @@ function MotionSlot<T extends HTMLElement = HTMLElement>({ children, ref, ...pro
 
 	const { ref: childRef, ...childProps } = children.props as AnyProps;
 
-	const mergedProps = mergeProps(childProps, props);
+	const mergedProps = mergeProps({ childProps, slotProps: props });
 
 	return <Base {...mergedProps} ref={mergeRefs(childRef as Ref<T>, ref)} />;
 }

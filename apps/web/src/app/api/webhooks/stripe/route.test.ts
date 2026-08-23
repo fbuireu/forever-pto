@@ -44,7 +44,12 @@ vi.mock("@infrastructure/layers", async () => {
 
 const { POST } = await import("./route");
 
-function makeRequest(body: string, headers?: Record<string, string>): Request {
+interface MakeRequestParams {
+	body: string;
+	headers?: Record<string, string>;
+}
+
+function makeRequest({ body, headers }: MakeRequestParams): Request {
 	return new Request("http://localhost/api/webhooks/stripe", {
 		method: "POST",
 		headers: { "Content-Type": "application/json", ...headers },
@@ -59,7 +64,7 @@ beforeEach(() => {
 describe("POST /api/webhooks/stripe", () => {
 	it("returns 400 when stripe-signature header is missing", async () => {
 		mockHeadersGet.mockReturnValue(null);
-		const response = await POST(makeRequest("{}") as never);
+		const response = await POST(makeRequest({ body: "{}" }) as never);
 		expect(response.status).toBe(400);
 		const body = await response.json();
 		expect(body.error).toBe(ApiError.MISSING_SIGNATURE);
@@ -69,7 +74,7 @@ describe("POST /api/webhooks/stripe", () => {
 		mockHeadersGet.mockImplementation((name) => (name === "stripe-signature" ? "t=123,v1=abc" : null));
 		mockConstructEvent.mockReturnValue(Effect.succeed({ type: "payment_intent.succeeded" }));
 		mockProcessWebhookEvent.mockReturnValue(Effect.succeed(undefined));
-		const response = await POST(makeRequest(JSON.stringify({ type: "payment_intent.succeeded" })) as never);
+		const response = await POST(makeRequest({ body: JSON.stringify({ type: "payment_intent.succeeded" }) }) as never);
 		expect(response.status).toBe(200);
 		const body = await response.json();
 		expect(body.received).toBe(true);
@@ -81,7 +86,7 @@ describe("POST /api/webhooks/stripe", () => {
 		mockConstructEvent.mockReturnValue(Effect.succeed({ type: "payment_intent.succeeded" }));
 		mockProcessWebhookEvent.mockReturnValue(Effect.succeed(undefined));
 
-		await POST(makeRequest(raw) as never);
+		await POST(makeRequest({ body: raw }) as never);
 
 		expect(mockConstructEvent).toHaveBeenCalledWith(raw, "sig-1");
 	});
@@ -91,7 +96,7 @@ describe("POST /api/webhooks/stripe", () => {
 		mockConstructEvent.mockReturnValue(
 			Effect.fail(new WebhookError({ message: "Signature mismatch", isSignatureError: true })),
 		);
-		const response = await POST(makeRequest("{}") as never);
+		const response = await POST(makeRequest({ body: "{}" }) as never);
 		expect(response.status).toBe(400);
 		const body = await response.json();
 		expect(body.error).toBe(ApiError.INVALID_SIGNATURE);
@@ -103,7 +108,7 @@ describe("POST /api/webhooks/stripe", () => {
 		mockProcessWebhookEvent.mockReturnValue(
 			Effect.fail(new WebhookError({ message: "Processing failed", isSignatureError: false })),
 		);
-		const response = await POST(makeRequest("{}") as never);
+		const response = await POST(makeRequest({ body: "{}" }) as never);
 		expect(response.status).toBe(500);
 		const body = await response.json();
 		expect(body.error).toBe(ApiError.WEBHOOK_PROCESSING_FAILED);
@@ -115,7 +120,7 @@ describe("POST /api/webhooks/stripe", () => {
 		mockProcessWebhookEvent.mockReturnValue(
 			Effect.fail(new WebhookError({ message: "Processing failed", isSignatureError: false })),
 		);
-		await POST(makeRequest("{}") as never);
+		await POST(makeRequest({ body: "{}" }) as never);
 		expect(mockLogError).not.toHaveBeenCalled();
 	});
 
@@ -126,7 +131,7 @@ describe("POST /api/webhooks/stripe", () => {
 				new WebhookConfigurationError({ message: "STRIPE_WEBHOOK_SECRET is not defined", isSignatureError: false }),
 			),
 		);
-		const response = await POST(makeRequest("{}") as never);
+		const response = await POST(makeRequest({ body: "{}" }) as never);
 		expect(response.status).toBe(400);
 		const body = await response.json();
 		expect(body.error).toBe(ApiError.WEBHOOK_MISCONFIGURED);
@@ -139,7 +144,7 @@ describe("POST /api/webhooks/stripe", () => {
 				new WebhookConfigurationError({ message: "STRIPE_WEBHOOK_SECRET is not defined", isSignatureError: false }),
 			),
 		);
-		await POST(makeRequest("{}") as never);
+		await POST(makeRequest({ body: "{}" }) as never);
 		expect(mockLogError).toHaveBeenCalledWith(
 			"Stripe webhook is misconfigured, rejecting the delivery as non-retryable",
 			expect.any(WebhookConfigurationError),
@@ -151,7 +156,7 @@ describe("POST /api/webhooks/stripe", () => {
 		mockConstructEvent.mockReturnValue(
 			Effect.fail(new Error("unexpected")) as unknown as Effect.Effect<{ type: string }, WebhookError>,
 		);
-		const response = await POST(makeRequest("{}") as never);
+		const response = await POST(makeRequest({ body: "{}" }) as never);
 		expect(response.status).toBe(500);
 		const body = await response.json();
 		expect(body.error).toBe(ApiError.WEBHOOK_PROCESSING_FAILED);

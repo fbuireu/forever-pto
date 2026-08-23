@@ -16,12 +16,12 @@ const toUidToken = (value: string) => value.replace(/[^a-zA-Z0-9-]/g, "");
 function buildEvent({ uid, stamp, start, summary, categories }: IcsEvent) {
 	return [
 		"BEGIN:VEVENT",
-		contentLine("DTSTAMP", stamp),
-		contentLine("DTSTART;VALUE=DATE", toIcsDate(start)),
-		contentLine("DTEND;VALUE=DATE", toIcsDate(addDays(start, 1))),
-		contentLine("SUMMARY", summary),
-		contentLine("CATEGORIES", categories),
-		contentLine("UID", `${uid}@forever-pto`),
+		contentLine({ name: "DTSTAMP", value: stamp }),
+		contentLine({ name: "DTSTART;VALUE=DATE", value: toIcsDate(start) }),
+		contentLine({ name: "DTEND;VALUE=DATE", value: toIcsDate(addDays({ date: start, days: 1 })) }),
+		contentLine({ name: "SUMMARY", value: summary }),
+		contentLine({ name: "CATEGORIES", value: categories }),
+		contentLine({ name: "UID", value: `${uid}@forever-pto` }),
 		"END:VEVENT",
 	].join("\r\n");
 }
@@ -87,7 +87,7 @@ export function generateIcs({
 		"PRODID:-//Forever PTO//EN",
 		"CALSCALE:GREGORIAN",
 		"METHOD:PUBLISH",
-		contentLine("X-WR-CALNAME", `${calendarName} ${year}`),
+		contentLine({ name: "X-WR-CALNAME", value: `${calendarName} ${year}` }),
 		...events,
 		"END:VCALENDAR",
 	].join("\r\n");

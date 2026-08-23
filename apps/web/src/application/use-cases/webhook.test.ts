@@ -46,7 +46,12 @@ const TestLayer = Layer.mergeAll(
 type WebhookR = LoggerService | TursoService | StripeServerService;
 const run = <E>(eff: Effect.Effect<void, E, WebhookR>) => Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
 
-const makeEvent = (type: string, object: unknown): Stripe.Event =>
+interface MakeEventParams {
+	type: string;
+	object: unknown;
+}
+
+const makeEvent = ({ type, object }: MakeEventParams): Stripe.Event =>
 	({ type, data: { object }, id: "evt_test", object: "event" }) as Stripe.Event;
 
 beforeEach(() => vi.clearAllMocks());
@@ -54,14 +59,14 @@ beforeEach(() => vi.clearAllMocks());
 describe("processWebhookEvent", () => {
 	it("calls handlePaymentSucceeded for payment_intent.succeeded", async () => {
 		const { handlePaymentSucceeded } = await import("@domain/payment/handlers/paymentSucceeded");
-		await run(processWebhookEvent(makeEvent("payment_intent.succeeded", { id: "pi_test" })));
+		await run(processWebhookEvent(makeEvent({ type: "payment_intent.succeeded", object: { id: "pi_test" } })));
 		expect(handlePaymentSucceeded).toHaveBeenCalledOnce();
 	});
 
 	it("calls createPaymentSucceededEvent with the payment intent object", async () => {
 		const { createPaymentSucceededEvent } = await import("@domain/payment/events/factory/events");
 		const intent = { id: "pi_test", status: "succeeded" };
-		await run(processWebhookEvent(makeEvent("payment_intent.succeeded", intent)));
+		await run(processWebhookEvent(makeEvent({ type: "payment_intent.succeeded", object: intent })));
 		expect(createPaymentSucceededEvent).toHaveBeenCalledWith(intent);
 	});
 
@@ -69,7 +74,7 @@ describe("processWebhookEvent", () => {
 		const { savePayment, getPaymentById } = await import("@infrastructure/services/payments/repository");
 		vi.mocked(savePayment).mockReturnValueOnce(Effect.succeed(false) as never);
 
-		await run(processWebhookEvent(makeEvent("payment_intent.succeeded", { id: "pi_test" })));
+		await run(processWebhookEvent(makeEvent({ type: "payment_intent.succeeded", object: { id: "pi_test" } })));
 
 		expect(getPaymentById).not.toHaveBeenCalled();
 		expect(savePayment).toHaveBeenCalledOnce();
@@ -82,7 +87,7 @@ describe("processWebhookEvent", () => {
 	it("reports a created row on the answer the insert itself gave", async () => {
 		const { savePayment } = await import("@infrastructure/services/payments/repository");
 		vi.mocked(savePayment).mockReturnValueOnce(Effect.succeed(true) as never);
-		await run(processWebhookEvent(makeEvent("payment_intent.succeeded", { id: "pi_test" })));
+		await run(processWebhookEvent(makeEvent({ type: "payment_intent.succeeded", object: { id: "pi_test" } })));
 		expect(savePayment).toHaveBeenCalledOnce();
 	});
 
@@ -90,14 +95,16 @@ describe("processWebhookEvent", () => {
 		const { handlePaymentSucceeded } = await import("@domain/payment/handlers/paymentSucceeded");
 		vi.mocked(handlePaymentSucceeded).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "db down" })));
 		await expect(
-			run(processWebhookEvent(makeEvent("payment_intent.succeeded", { id: "pi_test" }))),
+			run(processWebhookEvent(makeEvent({ type: "payment_intent.succeeded", object: { id: "pi_test" } }))),
 		).rejects.toBeDefined();
 	});
 
 	it("logs the error when handlePaymentSucceeded fails", async () => {
 		const { handlePaymentSucceeded } = await import("@domain/payment/handlers/paymentSucceeded");
 		vi.mocked(handlePaymentSucceeded).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "db down" })));
-		await run(processWebhookEvent(makeEvent("payment_intent.succeeded", { id: "pi_test" }))).catch(() => undefined);
+		await run(processWebhookEvent(makeEvent({ type: "payment_intent.succeeded", object: { id: "pi_test" } }))).catch(
+			() => undefined,
+		);
 		expect(mockLogger.logError).toHaveBeenCalledWith(
 			"Error handling successful payment",
 			expect.anything(),
@@ -111,7 +118,7 @@ describe("processWebhookEvent", () => {
 			Effect.fail(new MissingDonorEmailError({ paymentId: "pi_test" })),
 		);
 		await expect(
-			run(processWebhookEvent(makeEvent("payment_intent.succeeded", { id: "pi_test" }))),
+			run(processWebhookEvent(makeEvent({ type: "payment_intent.succeeded", object: { id: "pi_test" } }))),
 		).resolves.toBeUndefined();
 	});
 
@@ -122,7 +129,7 @@ describe("processWebhookEvent", () => {
 		vi.mocked(createPaymentSucceededEvent).mockReturnValueOnce(
 			Effect.fail(new MissingDonorEmailError({ paymentId: "pi_test" })),
 		);
-		await run(processWebhookEvent(makeEvent("payment_intent.succeeded", { id: "pi_test" })));
+		await run(processWebhookEvent(makeEvent({ type: "payment_intent.succeeded", object: { id: "pi_test" } })));
 		expect(mockLogger.logError).toHaveBeenCalledWith(
 			"Payment succeeded with no donor email, Premium can never be recovered",
 			expect.any(MissingDonorEmailError),
@@ -136,25 +143,25 @@ describe("processWebhookEvent", () => {
 		const { handlePaymentFailed } = await import("@domain/payment/handlers/paymentFailed");
 		vi.mocked(handlePaymentFailed).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "db down" })));
 		await expect(
-			run(processWebhookEvent(makeEvent("payment_intent.payment_failed", { id: "pi_test" }))),
+			run(processWebhookEvent(makeEvent({ type: "payment_intent.payment_failed", object: { id: "pi_test" } }))),
 		).rejects.toBeDefined();
 	});
 
 	it("calls handlePaymentFailed for payment_intent.payment_failed", async () => {
 		const { handlePaymentFailed } = await import("@domain/payment/handlers/paymentFailed");
-		await run(processWebhookEvent(makeEvent("payment_intent.payment_failed", { id: "pi_test" })));
+		await run(processWebhookEvent(makeEvent({ type: "payment_intent.payment_failed", object: { id: "pi_test" } })));
 		expect(handlePaymentFailed).toHaveBeenCalledOnce();
 	});
 
 	it("calls createPaymentFailedEvent with the payment intent object", async () => {
 		const { createPaymentFailedEvent } = await import("@domain/payment/events/factory/events");
 		const intent = { id: "pi_test" };
-		await run(processWebhookEvent(makeEvent("payment_intent.payment_failed", intent)));
+		await run(processWebhookEvent(makeEvent({ type: "payment_intent.payment_failed", object: intent })));
 		expect(createPaymentFailedEvent).toHaveBeenCalledWith(intent);
 	});
 
 	it("logs a warning for unhandled event types", async () => {
-		await run(processWebhookEvent(makeEvent("customer.created", {})));
+		await run(processWebhookEvent(makeEvent({ type: "customer.created", object: {} })));
 		expect(mockLogger.warn).toHaveBeenCalledWith(
 			"Unhandled webhook event type",
 			expect.objectContaining({ eventType: "customer.created" }),
@@ -164,7 +171,7 @@ describe("processWebhookEvent", () => {
 	it("does not call any handler for unhandled event types", async () => {
 		const { handlePaymentSucceeded } = await import("@domain/payment/handlers/paymentSucceeded");
 		const { handlePaymentFailed } = await import("@domain/payment/handlers/paymentFailed");
-		await run(processWebhookEvent(makeEvent("customer.created", {})));
+		await run(processWebhookEvent(makeEvent({ type: "customer.created", object: {} })));
 		expect(handlePaymentSucceeded).not.toHaveBeenCalled();
 		expect(handlePaymentFailed).not.toHaveBeenCalled();
 	});

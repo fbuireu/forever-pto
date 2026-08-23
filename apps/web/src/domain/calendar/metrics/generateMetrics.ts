@@ -61,11 +61,11 @@ export const generateMetrics = ({
 			longestVacation: 0,
 		};
 	}
-	const monthlyDist = getMonthlyDist(days, planningWindow);
+	const monthlyDist = getMonthlyDist({ days, window: planningWindow });
 	const streaks = freeStreaks({ placedDays: days, holidays });
 	const longBlocksPerQuarter = getLongBlocksPerQuarter({ streaks, window: planningWindow });
-	const totalEffectiveDays = getTotalEffectiveDays(days, bridges, holidays);
-	const bridgesUsed = getValidBridges(days, bridges).length;
+	const totalEffectiveDays = getTotalEffectiveDays({ days, bridges, holidays });
+	const bridgesUsed = getValidBridges({ days, bridges }).length;
 	const longWeekends = calculateLongWeekends(streaks);
 	const longestVacation = calculateLongestVacation(streaks);
 
@@ -77,7 +77,7 @@ export const generateMetrics = ({
 		year,
 	});
 	const firstLastBreak = getFirstLastBreak({ dates: days, locale });
-	const quarterDist = calculateQuarterDistribution(days, planningWindow);
+	const quarterDist = calculateQuarterDistribution({ dates: days, window: planningWindow });
 	const workedDaysPerMonth = getWorkedDaysPerMonth({
 		ptoDays: days,
 		holidays,

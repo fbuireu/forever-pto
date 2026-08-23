@@ -15,13 +15,13 @@ export async function GET(_request: NextRequest) {
 	const cookieStore = await cookies();
 	const token = cookieStore.get(PREMIUM_COOKIE)?.value;
 
-	if (!token) return noStore({ premiumKey: null, email: null });
+	if (!token) return noStore({ body: { premiumKey: null, email: null } });
 
 	const response = await Effect.runPromise(
 		verifySessionEffect(token).pipe(
-			Effect.map((data) => noStore({ premiumKey: data.paymentIntentId, email: data.email })),
+			Effect.map((data) => noStore({ body: { premiumKey: data.paymentIntentId, email: data.email } })),
 			Effect.catchTag("SessionError", () => {
-				const res = noStore({ premiumKey: null, email: null });
+				const res = noStore({ body: { premiumKey: null, email: null } });
 				clearPremiumCookie(res);
 				return Effect.succeed(res);
 			}),
@@ -47,10 +47,10 @@ export async function POST(request: NextRequest) {
 		}),
 	);
 
-	if (outcome.error !== null) return noStore({ error: outcome.error }, { status: outcome.status });
+	if (outcome.error !== null) return noStore({ body: { error: outcome.error }, init: { status: outcome.status } });
 
-	const response = noStore({ success: true, premiumKey: outcome.premiumKey, email: outcome.email });
-	setPremiumCookie(response, outcome.token);
+	const response = noStore({ body: { success: true, premiumKey: outcome.premiumKey, email: outcome.email } });
+	setPremiumCookie({ response, token: outcome.token });
 
 	return response;
 }

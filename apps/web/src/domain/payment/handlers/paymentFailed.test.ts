@@ -35,7 +35,7 @@ describe("handlePaymentFailed", () => {
 	it("calls updatePaymentStatus with paymentId and status", async () => {
 		const { updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
 		await run(handlePaymentFailed(EVENT));
-		expect(updatePaymentStatus).toHaveBeenCalledWith("pi_test", "requires_payment_method");
+		expect(updatePaymentStatus).toHaveBeenCalledWith({ paymentIntentId: "pi_test", status: "requires_payment_method" });
 	});
 
 	it("resolves on success", async () => {
@@ -71,14 +71,14 @@ describe("handlePaymentFailed", () => {
 		const { getPaymentById, updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
 		vi.mocked(getPaymentById).mockReturnValueOnce(Effect.succeed(undefined as never));
 		await run(handlePaymentFailed(EVENT));
-		expect(updatePaymentStatus).toHaveBeenCalledWith("pi_test", "requires_payment_method");
+		expect(updatePaymentStatus).toHaveBeenCalledWith({ paymentIntentId: "pi_test", status: "requires_payment_method" });
 	});
 
 	it("still writes the failure when the status read fails", async () => {
 		const { getPaymentById, updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
 		vi.mocked(getPaymentById).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "db error" })) as never);
 		await run(handlePaymentFailed(EVENT));
-		expect(updatePaymentStatus).toHaveBeenCalledWith("pi_test", "requires_payment_method");
+		expect(updatePaymentStatus).toHaveBeenCalledWith({ paymentIntentId: "pi_test", status: "requires_payment_method" });
 	});
 
 	it("calls logError when updatePaymentStatus fails", async () => {

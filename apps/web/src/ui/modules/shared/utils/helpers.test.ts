@@ -59,29 +59,38 @@ const bundleTranslator = (namespace: "contact" | "checkout") => translatorOver(e
 const sharedBundle = translatorOver(en.errors);
 
 describe("resolveApiErrorMessage against the shipped en.json bundle", () => {
-	const resolveIn = (namespace: "contact" | "checkout", code: string) =>
+	interface ResolveInParams {
+		namespace: "contact" | "checkout";
+		code: string;
+	}
+
+	const resolveIn = ({ namespace, code }: ResolveInParams) =>
 		resolveApiErrorMessage({ code, t: bundleTranslator(namespace), shared: sharedBundle, fallback: "Failed" });
 
 	it("resolves invalid_body from the shared base for both namespaces", () => {
 		const expected = "We could not read that request. Please try again.";
 
-		expect(resolveIn("contact", "invalid_body")).toBe(expected);
-		expect(resolveIn("checkout", "invalid_body")).toBe(expected);
+		expect(resolveIn({ namespace: "contact", code: "invalid_body" })).toBe(expected);
+		expect(resolveIn({ namespace: "checkout", code: "invalid_body" })).toBe(expected);
 	});
 
 	it("lets a namespace override the shared copy, which is the whole reason for the precedence", () => {
-		expect(resolveIn("contact", "internal_error")).toBe("Something went wrong on our side. Please try again later.");
-		expect(resolveIn("checkout", "internal_error")).toBe(
+		expect(resolveIn({ namespace: "contact", code: "internal_error" })).toBe(
+			"Something went wrong on our side. Please try again later.",
+		);
+		expect(resolveIn({ namespace: "checkout", code: "internal_error" })).toBe(
 			"Something went wrong on our side. Your card has not been charged.",
 		);
 	});
 
 	it("resolves rate_limit_exceeded on the payment path", () => {
-		expect(resolveIn("checkout", "rate_limit_exceeded")).toBe("Too many attempts. Please wait a moment and try again.");
+		expect(resolveIn({ namespace: "checkout", code: "rate_limit_exceeded" })).toBe(
+			"Too many attempts. Please wait a moment and try again.",
+		);
 	});
 
 	it("leaves rate_limit_exceeded out of the contact namespace, which never rate-limits", () => {
-		expect(resolveIn("contact", "rate_limit_exceeded")).toBe("Failed");
+		expect(resolveIn({ namespace: "contact", code: "rate_limit_exceeded" })).toBe("Failed");
 	});
 });
 

@@ -1,7 +1,12 @@
 export const ACTIVATION_PARAM = "activation";
 export const ACTIVATION_FAILED = "failed";
 
-export function matchesClientSecret(expected: string | null, provided: string): boolean {
+export interface MatchesClientSecretParams {
+	expected: string | null;
+	provided: string;
+}
+
+export function matchesClientSecret({ expected, provided }: MatchesClientSecretParams): boolean {
 	if (!expected || expected.length !== provided.length) return false;
 
 	let difference = 0;

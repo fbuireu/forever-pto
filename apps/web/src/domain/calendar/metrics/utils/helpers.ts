@@ -26,7 +26,12 @@ import type { FreeStreak } from "./streaks";
 export const windowMonthIndex = (date: Date, { year }: Pick<PlanningWindow, "year">) =>
 	(getYear(date) - year) * MONTHS_IN_YEAR + getMonth(date);
 
-export function getMonthlyDist(days: Date[], window: PlanningWindow) {
+export interface GetMonthlyDistParams {
+	days: Date[];
+	window: PlanningWindow;
+}
+
+export function getMonthlyDist({ days, window }: GetMonthlyDistParams) {
 	const monthlyDist = new Array(windowMonthCount(window)).fill(0);
 	days.forEach((date) => {
 		const index = windowMonthIndex(date, window);
@@ -56,7 +61,12 @@ export function getLongBlocksPerQuarter({ streaks, window }: GetLongBlocksPerQua
 	return longBlocksPerQuarter;
 }
 
-export function getValidBridges(days: Date[], bridges?: Bridge[]) {
+export interface GetValidBridgesParams {
+	days: Date[];
+	bridges?: Bridge[];
+}
+
+export function getValidBridges({ days, bridges }: GetValidBridgesParams) {
 	if (!bridges || bridges.length === 0) return [];
 
 	const daysSet = new Set(days.map(dayKey));
@@ -64,8 +74,14 @@ export function getValidBridges(days: Date[], bridges?: Bridge[]) {
 	return bridges.filter((bridge) => bridge.ptoDays.every((ptoDay) => daysSet.has(dayKey(ptoDay))));
 }
 
-export function getTotalEffectiveDays(days: Date[], bridges?: Bridge[], holidays: HolidayDTO[] = []) {
-	const validBridges = getValidBridges(days, bridges);
+export interface GetTotalEffectiveDaysParams {
+	days: Date[];
+	bridges?: Bridge[];
+	holidays?: HolidayDTO[];
+}
+
+export function getTotalEffectiveDays({ days, bridges, holidays = [] }: GetTotalEffectiveDaysParams) {
+	const validBridges = getValidBridges({ days, bridges });
 
 	if (validBridges.length === 0) {
 		return days.length;
@@ -98,7 +114,7 @@ export const calculateRestBlocks = (dates: Date[]) => {
 		const curr = sorted[i];
 		const prev = sorted[i - 1];
 		if (curr === undefined || prev === undefined) continue;
-		const daysDiff = differenceInDays(curr, prev);
+		const daysDiff = differenceInDays({ dateLeft: curr, dateRight: prev });
 		if (daysDiff > PTO_CONSTANTS.METRICS.REST_BLOCK_SEPARATION_DAYS) blocks++;
 	}
 
@@ -156,7 +172,12 @@ export const getFirstLastBreak = ({ dates, locale }: GetFirstLastBreak) => {
 	};
 };
 
-export const calculateQuarterDistribution = (dates: Date[], window: PlanningWindow) => {
+export interface CalculateQuarterDistributionParams {
+	dates: Date[];
+	window: PlanningWindow;
+}
+
+export const calculateQuarterDistribution = ({ dates, window }: CalculateQuarterDistributionParams) => {
 	const quarters = new Array(windowQuarterCount(window)).fill(0);
 
 	dates?.forEach((date) => {

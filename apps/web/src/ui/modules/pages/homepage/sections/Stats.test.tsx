@@ -14,7 +14,12 @@ vi.mock("next-intl/server", () => ({
 
 import { Stats } from "./Stats";
 
-const renderStats = async (locale: Locale, messages: typeof enMessages) => {
+interface RenderStatsParams {
+	locale: Locale;
+	messages: typeof enMessages;
+}
+
+const renderStats = async ({ locale, messages }: RenderStatsParams) => {
 	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "homepage" }));
 	mockGetFormatter.mockResolvedValue(createFormatter({ locale }));
 	const { container } = render(await Stats());
@@ -27,15 +32,15 @@ describe("Stats", () => {
 	});
 
 	it("formats the multiplier with the German decimal separator", async () => {
-		expect(await renderStats("de", deMessages)).toContain("2,14×");
+		expect(await renderStats({ locale: "de", messages: deMessages })).toContain("2,14×");
 	});
 
 	it("formats the multiplier with the English decimal separator", async () => {
-		expect(await renderStats("en", enMessages)).toContain("2.14×");
+		expect(await renderStats({ locale: "en", messages: enMessages })).toContain("2.14×");
 	});
 
 	it("takes the abbreviated plan count from the locale bundle", async () => {
-		expect(await renderStats("de", deMessages)).toContain(deMessages.homepage.stats.plansValue);
-		expect(await renderStats("en", enMessages)).toContain(enMessages.homepage.stats.plansValue);
+		expect(await renderStats({ locale: "de", messages: deMessages })).toContain(deMessages.homepage.stats.plansValue);
+		expect(await renderStats({ locale: "en", messages: enMessages })).toContain(enMessages.homepage.stats.plansValue);
 	});
 });

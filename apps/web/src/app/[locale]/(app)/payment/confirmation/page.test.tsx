@@ -64,12 +64,17 @@ vi.mock("lucide-react", () => ({
 
 const { default: PaymentSuccessPage } = await import("./page");
 
-const makeParams = (locale = EN, paymentIntent?: string) => ({
+interface MakeParamsParams {
+	locale?: unknown;
+	paymentIntent?: string;
+}
+
+const makeParams = ({ locale = EN, paymentIntent }: MakeParamsParams = {}) => ({
 	searchParams: Promise.resolve(paymentIntent ? { payment_intent: paymentIntent } : {}),
 	params: Promise.resolve({ locale: locale as never }),
 });
 
-const makeSuccessParams = () => makeParams(EN, PAYMENT_INTENT_ID);
+const makeSuccessParams = () => makeParams({ locale: EN, paymentIntent: PAYMENT_INTENT_ID });
 
 const renderErrorPage = async () => {
 	const element = await PaymentSuccessPage(makeSuccessParams());
@@ -102,7 +107,7 @@ describe("payment/confirmation page", () => {
 			mockRedirect.mockImplementation(() => {
 				throw new Error("NEXT_REDIRECT");
 			});
-			await expect(PaymentSuccessPage(makeParams(EN))).rejects.toThrow("NEXT_REDIRECT");
+			await expect(PaymentSuccessPage(makeParams({ locale: EN }))).rejects.toThrow("NEXT_REDIRECT");
 			expect(mockRedirect).toHaveBeenCalledWith(`/${EN}`);
 		});
 	});
@@ -174,7 +179,7 @@ describe("payment/confirmation page", () => {
 		});
 
 		it("builds the formatter for the requested locale", async () => {
-			await PaymentSuccessPage(makeParams(DE, PAYMENT_INTENT_ID));
+			await PaymentSuccessPage(makeParams({ locale: DE, paymentIntent: PAYMENT_INTENT_ID }));
 			expect(mockGetFormatter).toHaveBeenCalledWith({ locale: DE });
 		});
 
@@ -192,25 +197,31 @@ describe("payment/confirmation page", () => {
 	});
 
 	describe("amount formatting", () => {
-		const renderAmount = async (locale: Locale, currency: string, amount: number) => {
+		interface RenderAmountParams {
+			locale: Locale;
+			currency: string;
+			amount: number;
+		}
+
+		const renderAmount = async ({ locale, currency, amount }: RenderAmountParams) => {
 			mockGetFormatter.mockResolvedValue(createFormatter({ locale }));
 			mockConfirmation.mockReturnValueOnce(
 				Effect.succeed({ id: PAYMENT_INTENT_ID, status: "succeeded", amount, currency }),
 			);
-			const { container } = render(await PaymentSuccessPage(makeParams(locale, PAYMENT_INTENT_ID)));
+			const { container } = render(await PaymentSuccessPage(makeParams({ locale, paymentIntent: PAYMENT_INTENT_ID })));
 			return (container.textContent ?? "").replace(NON_BREAKING_SPACES, " ");
 		};
 
 		it("renders a German amount with comma decimals and a trailing symbol", async () => {
-			expect(await renderAmount(DE, "eur", 12.5)).toContain("12,50 €");
+			expect(await renderAmount({ locale: DE, currency: "eur", amount: 12.5 })).toContain("12,50 €");
 		});
 
 		it("renders an English amount with a leading symbol and dot decimals", async () => {
-			expect(await renderAmount(EN, "usd", 12.5)).toContain("$12.50");
+			expect(await renderAmount({ locale: EN, currency: "usd", amount: 12.5 })).toContain("$12.50");
 		});
 
 		it("groups thousands in the amount", async () => {
-			expect(await renderAmount(EN, "usd", 1234.5)).toContain("$1,234.50");
+			expect(await renderAmount({ locale: EN, currency: "usd", amount: 1234.5 })).toContain("$1,234.50");
 		});
 	});
 });

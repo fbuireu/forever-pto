@@ -3,7 +3,12 @@ import { ValidationError } from "@infrastructure/errors";
 import { Effect } from "effect";
 import { z } from "zod";
 
-export function zodParse<T>(schema: z.ZodType<T>, data: unknown): Effect.Effect<T, ValidationError, LoggerService> {
+export interface ZodParseParams<T> {
+	schema: z.ZodType<T>;
+	data: unknown;
+}
+
+export function zodParse<T>({ schema, data }: ZodParseParams<T>): Effect.Effect<T, ValidationError, LoggerService> {
 	return Effect.gen(function* () {
 		const logger = yield* LoggerService;
 		return yield* Effect.try({

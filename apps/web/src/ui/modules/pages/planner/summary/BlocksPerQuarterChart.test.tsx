@@ -26,7 +26,13 @@ vi.mock("@ui/modules/premium/PremiumFeature", () => ({
 
 import { BlocksPerQuarterChart } from "./BlocksPerQuarterChart";
 
-const renderChart = (locale: Locale, messages: object, blocksPerQuarter: number[]) =>
+interface RenderChartParams {
+	locale: Locale;
+	messages: object;
+	blocksPerQuarter: number[];
+}
+
+const renderChart = ({ locale, messages, blocksPerQuarter }: RenderChartParams) =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<BlocksPerQuarterChart blocksPerQuarter={blocksPerQuarter} />
@@ -35,17 +41,17 @@ const renderChart = (locale: Locale, messages: object, blocksPerQuarter: number[
 
 describe("BlocksPerQuarterChart", () => {
 	it("pluralises the block count with Italian plural rules", () => {
-		const { container } = renderChart("it", itMessages, [2, 1, 0, 0]);
+		const { container } = renderChart({ locale: "it", messages: itMessages, blocksPerQuarter: [2, 1, 0, 0] });
 		expect(container.textContent).toContain("2 blocchi");
 	});
 
 	it("pluralises the block count with German plural rules", () => {
-		const { container } = renderChart("de", deMessages, [2, 1, 0, 0]);
+		const { container } = renderChart({ locale: "de", messages: deMessages, blocksPerQuarter: [2, 1, 0, 0] });
 		expect(container.textContent).toContain("2 Blöcke");
 	});
 
 	it("uses the singular form for a single block", () => {
-		const { container } = renderChart("it", itMessages, [1, 0, 0, 0]);
+		const { container } = renderChart({ locale: "it", messages: itMessages, blocksPerQuarter: [1, 0, 0, 0] });
 		expect(container.textContent).toContain("con 1 blocco.");
 		expect(container.textContent).not.toContain("con 1 blocchi");
 	});

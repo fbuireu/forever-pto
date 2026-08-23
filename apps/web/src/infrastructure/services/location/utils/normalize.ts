@@ -12,5 +12,10 @@ export const normalizeCountryCode = (raw: string | null | undefined): string => 
 	return code;
 };
 
-export const noStoreFetch = (url: string, init?: RequestInit) =>
+export interface NoStoreFetchParams {
+	url: string;
+	init?: RequestInit;
+}
+
+export const noStoreFetch = ({ url, init }: NoStoreFetchParams) =>
 	fetch(url, { ...init, cache: "no-store", signal: AbortSignal.timeout(5000) });

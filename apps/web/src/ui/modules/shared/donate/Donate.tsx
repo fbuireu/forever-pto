@@ -115,15 +115,21 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 								final: result.discountInfo.finalAmount.toFixed(2),
 							}),
 						});
-						track("promo_code_applied", {
-							discountType: result.discountInfo.type,
-							discountValue: result.discountInfo.value,
-							originalAmount: result.discountInfo.originalAmount,
-							finalAmount: result.discountInfo.finalAmount,
+						track({
+							event: "promo_code_applied",
+							properties: {
+								discountType: result.discountInfo.type,
+								discountValue: result.discountInfo.value,
+								originalAmount: result.discountInfo.originalAmount,
+								finalAmount: result.discountInfo.finalAmount,
+							},
 						});
 					}
 
-					track("payment_started", { amount: data.amount, currency, hasPromoCode: !!data.promoCode });
+					track({
+						event: "payment_started",
+						properties: { amount: data.amount, currency, hasPromoCode: !!data.promoCode },
+					});
 
 					setPaymentState({
 						clientSecret: result.clientSecret,
@@ -131,12 +137,16 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 						discountInfo: result.discountInfo ?? null,
 					});
 				} catch (error) {
-					logClientError("Payment initialization failed in Donate component", error, {
-						amount: data.amount,
-						hasPromoCode: !!data.promoCode,
-						promoCodeLength: data.promoCode?.length,
-						currency,
-						locale,
+					logClientError({
+						message: "Payment initialization failed in Donate component",
+						error,
+						context: {
+							amount: data.amount,
+							hasPromoCode: !!data.promoCode,
+							promoCodeLength: data.promoCode?.length,
+							currency,
+							locale,
+						},
 					});
 					if (error instanceof PromoCodeError) {
 						const descriptions = {

@@ -5,7 +5,10 @@ import { getRequestPublicEnv } from "@infrastructure/services/env/getRequestPubl
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-	const { status, body } = await sendContactRequest(parseJsonBody<ContactFormData>(request), getRequestPublicEnv());
+	const { status, body } = await sendContactRequest({
+		input: parseJsonBody<ContactFormData>(request),
+		config: getRequestPublicEnv(),
+	});
 
 	return NextResponse.json(body, { status });
 }

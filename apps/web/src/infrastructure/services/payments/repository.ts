@@ -56,10 +56,15 @@ export const savePayment = (data: NewPayment): Effect.Effect<boolean, DatabaseEr
 		return rowsAffected > 0;
 	});
 
-export const updatePaymentStatus = (
-	paymentIntentId: string,
-	status: PaymentStatus,
-): Effect.Effect<boolean, DatabaseError, TursoService> =>
+export interface UpdatePaymentStatusParams {
+	paymentIntentId: string;
+	status: PaymentStatus;
+}
+
+export const updatePaymentStatus = ({
+	paymentIntentId,
+	status,
+}: UpdatePaymentStatusParams): Effect.Effect<boolean, DatabaseError, TursoService> =>
 	Effect.gen(function* () {
 		const turso = yield* TursoService;
 		const rowsAffected = yield* turso.execute(

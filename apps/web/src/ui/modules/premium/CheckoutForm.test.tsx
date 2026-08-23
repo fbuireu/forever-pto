@@ -48,7 +48,14 @@ const NON_BREAKING_SPACES = /[  ]/g;
 
 const DISCOUNT = { originalAmount: 15, finalAmount: 12.5, code: "LAUNCH50", percentOff: 50 };
 
-const renderForm = (locale: Locale, messages: object, amount: number, discountInfo: unknown = null) => {
+interface RenderFormParams {
+	locale: Locale;
+	messages: object;
+	amount: number;
+	discountInfo?: unknown;
+}
+
+const renderForm = ({ locale, messages, amount, discountInfo = null }: RenderFormParams) => {
 	const { container } = render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<CheckoutForm
@@ -65,20 +72,20 @@ const renderForm = (locale: Locale, messages: object, amount: number, discountIn
 
 describe("CheckoutForm amount rendering", () => {
 	it("renders the German amount with comma decimals and a trailing symbol", () => {
-		expect(renderForm("de", deMessages, 12.5)).toContain("12,50 €");
+		expect(renderForm({ locale: "de", messages: deMessages, amount: 12.5 })).toContain("12,50 €");
 	});
 
 	it("renders the English amount with a leading symbol and dot decimals", () => {
-		expect(renderForm("en", enMessages, 12.5)).toContain("€12.50");
+		expect(renderForm({ locale: "en", messages: enMessages, amount: 12.5 })).toContain("€12.50");
 	});
 
 	it("formats the amount on the pay button too", () => {
-		const text = renderForm("de", deMessages, 12.5);
+		const text = renderForm({ locale: "de", messages: deMessages, amount: 12.5 });
 		expect(text).toContain(`${deMessages.checkout.pay} 12,50 €`);
 	});
 
 	it("formats the promo saving instead of prefixing a hardcoded euro sign", () => {
-		const text = renderForm("de", deMessages, 12.5, DISCOUNT);
+		const text = renderForm({ locale: "de", messages: deMessages, amount: 12.5, discountInfo: DISCOUNT });
 		expect(text).toContain("Sie haben 2,50 € gespart!");
 	});
 });
@@ -162,7 +169,12 @@ describe("CheckoutForm failure reporting", () => {
 
 		await submitPayment(messagesWithErrors);
 
-		await waitFor(() => expect(vi.mocked(track)).toHaveBeenCalledWith("payment_failed", { error: "internal_error" }));
+		await waitFor(() =>
+			expect(vi.mocked(track)).toHaveBeenCalledWith({
+				event: "payment_failed",
+				properties: { error: "internal_error" },
+			}),
+		);
 	});
 
 	it("reports a stable code to analytics when the failure carries none", async () => {
@@ -170,6 +182,11 @@ describe("CheckoutForm failure reporting", () => {
 
 		await submitPayment(messagesWithErrors);
 
-		await waitFor(() => expect(vi.mocked(track)).toHaveBeenCalledWith("payment_failed", { error: "unknown_error" }));
+		await waitFor(() =>
+			expect(vi.mocked(track)).toHaveBeenCalledWith({
+				event: "payment_failed",
+				properties: { error: "unknown_error" },
+			}),
+		);
 	});
 });

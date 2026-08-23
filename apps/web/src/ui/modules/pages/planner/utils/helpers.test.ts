@@ -54,8 +54,8 @@ describe("the range counters", () => {
 	const range = { from: new Date(2025, 0, 1), to: new Date(2025, 0, 7) };
 
 	it("counts Workdays, excluding weekends and Holidays", () => {
-		expect(calculateWorkdays(range, [])).toBe(5);
-		expect(calculateWorkdays(range, [holiday(new Date(2025, 0, 1))])).toBe(4);
+		expect(calculateWorkdays({ range, holidays: [] })).toBe(5);
+		expect(calculateWorkdays({ range, holidays: [holiday(new Date(2025, 0, 1))] })).toBe(4);
 	});
 
 	it("counts weekend days, not weekends", () => {
@@ -64,7 +64,7 @@ describe("the range counters", () => {
 
 	it("counts only the Holidays that fall on a Workday", () => {
 		const onSaturday = holiday(new Date(2025, 0, 4));
-		expect(calculateHolidaysInRange(range, [onSaturday])).toBe(0);
-		expect(calculateHolidaysInRange(range, [holiday(new Date(2025, 0, 2))])).toBe(1);
+		expect(calculateHolidaysInRange({ range, holidays: [onSaturday] })).toBe(0);
+		expect(calculateHolidaysInRange({ range, holidays: [holiday(new Date(2025, 0, 2))] })).toBe(1);
 	});
 });

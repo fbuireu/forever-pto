@@ -2,12 +2,18 @@ import type { RawHoliday } from "@application/dto/holiday/types";
 import { describe, expect, it } from "vitest";
 import { resolveObservedHolidays } from "./observed";
 
-const raw = (date: string, name: string, location?: string) => ({ date, name, type: "public", location }) as RawHoliday;
+interface RawParams {
+	date: string;
+	name: string;
+	location?: string;
+}
 
-const NEW_YEAR = raw("2027-01-01 00:00:00", "New Year");
-const COLUMBUS = raw("2027-10-11 00:00:00", "Columbus Day");
-const NEW_YEAR_CA = raw("2027-01-01 00:00:00", "New Year", "CA");
-const CHAVEZ_CA = raw("2027-03-31 00:00:00", "Cesar Chavez Day", "CA");
+const raw = ({ date, name, location }: RawParams) => ({ date, name, type: "public", location }) as RawHoliday;
+
+const NEW_YEAR = raw({ date: "2027-01-01 00:00:00", name: "New Year" });
+const COLUMBUS = raw({ date: "2027-10-11 00:00:00", name: "Columbus Day" });
+const NEW_YEAR_CA = raw({ date: "2027-01-01 00:00:00", name: "New Year", location: "CA" });
+const CHAVEZ_CA = raw({ date: "2027-03-31 00:00:00", name: "Cesar Chavez Day", location: "CA" });
 
 describe("resolveObservedHolidays", () => {
 	it("keeps every National Holiday when no Region is chosen", () => {

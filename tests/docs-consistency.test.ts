@@ -548,7 +548,12 @@ describe("apps/web/src carries no explanatory comments", () => {
 	// grammar is not a regular language. Scanning alone is not enough either — only the parser knows whether a
 	// slash opens a regex or divides, which is why `/^\//` in images/loader.ts reads as a comment to a bare
 	// scanner. Comments are trivia, so they hang off node boundaries rather than appearing in the tree.
-	const commentsIn = (path: string, source: string) => {
+	interface CommentsInParams {
+		path: string;
+		source: string;
+	}
+
+	const commentsIn = ({ path, source }: CommentsInParams) => {
 		const parsed = ts.createSourceFile(path, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
 		const seen = new Set<number>();
 		const found: { line: number; text: string }[] = [];
@@ -594,7 +599,7 @@ describe("apps/web/src carries no explanatory comments", () => {
 			// delimiter anywhere cannot hold a comment, and that is most of them
 			if (!source.includes("//") && !source.includes("/*")) continue;
 
-			for (const { line, text } of commentsIn(file, source)) {
+			for (const { line, text } of commentsIn({ path: file, source })) {
 				if (!ALLOWED.test(text)) offenders.push(`${file}:${line}`);
 			}
 		}
@@ -718,13 +723,20 @@ describe("the guides describe the project as it is configured", () => {
 
 describe("translation bundles stay in step", () => {
 	const localeFiles = readdirSync(join(ROOT, LOCALES_DIR)).filter((file) => file.endsWith(".json"));
-	const flatten = (value: unknown, path = "", out: string[] = []) => {
+	interface FlattenParams {
+		value: unknown;
+		path?: string;
+		out?: string[];
+	}
+
+	const flatten = ({ value, path = "", out = [] }: FlattenParams) => {
 		if (value && typeof value === "object" && !Array.isArray(value)) {
-			for (const [key, child] of Object.entries(value)) flatten(child, path ? `${path}.${key}` : key, out);
+			for (const [key, child] of Object.entries(value))
+				flatten({ value: child, path: path ? `${path}.${key}` : key, out });
 		} else out.push(path);
 		return out;
 	};
-	const keysOf = (file: string) => flatten(JSON.parse(read(`${LOCALES_DIR}/${file}`))).sort();
+	const keysOf = (file: string) => flatten({ value: JSON.parse(read(`${LOCALES_DIR}/${file}`)) }).sort();
 	const reference = keysOf("en.json");
 
 	it("ships more than one locale", () => {

@@ -49,10 +49,12 @@ export const WorkdayCounter = () => {
 		setSelectedRange(undefined);
 	};
 
-	const workdayCount = selectedRange ? calculateWorkdays(selectedRange, holidays) : 0;
-	const totalDays = selectedRange ? differenceInDays(selectedRange.to, selectedRange.from) + 1 : 0;
+	const workdayCount = selectedRange ? calculateWorkdays({ range: selectedRange, holidays }) : 0;
+	const totalDays = selectedRange
+		? differenceInDays({ dateLeft: selectedRange.to, dateRight: selectedRange.from }) + 1
+		: 0;
 	const weekendDays = selectedRange ? calculateWeekends(selectedRange) : 0;
-	const holidayDays = selectedRange ? calculateHolidaysInRange(selectedRange, holidays) : 0;
+	const holidayDays = selectedRange ? calculateHolidaysInRange({ range: selectedRange, holidays }) : 0;
 
 	const knownHolidayYears = useMemo(() => {
 		const years = holidays.map((holiday) => holiday.date.getFullYear());

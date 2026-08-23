@@ -31,7 +31,12 @@ interface CreateRichLinkOptions {
 	external?: boolean;
 }
 
-export function createRichLink(href: string, options?: CreateRichLinkOptions) {
+export interface CreateRichLinkParams {
+	href: string;
+	options?: CreateRichLinkOptions;
+}
+
+export function createRichLink({ href, options }: CreateRichLinkParams) {
 	return function RichLinkTag(chunks: ReactNode) {
 		return (
 			<RichLink href={href} className={options?.className} external={options?.external}>

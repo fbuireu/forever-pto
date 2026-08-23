@@ -153,8 +153,8 @@ export function Calendar({
 		const holidayFn = isHoliday(holidays);
 		const customFn = isCustomFn(holidays);
 		const nationalOrRegionalHolidayFn = isNationalOrRegionalHolidayFn(holidays);
-		const isPastFn = isPast(allowPastDays, today);
-		const isSuggestionFn = isSuggestion(currentSelection, removedSuggestedDays);
+		const isPastFn = isPast({ allowPastDays, today });
+		const isSuggestionFn = isSuggestion({ currentSelection, removedSuggestedDays });
 		const isAlternativeFn = isAlternative({ alternatives, suggestion, previewAlternativeIndex, currentSelection });
 		const isManuallySelectedFn = isManuallySelected(manuallySelectedDays);
 		const isSelectedModifier =
@@ -210,7 +210,7 @@ export function Calendar({
 	const monthLabel = useMemo(() => formatDate({ date: currentMonth, locale, format: "MMMM" }), [currentMonth, locale]);
 	const yearLabel = useMemo(() => formatDate({ date: currentMonth, locale, format: "yyyy" }), [currentMonth, locale]);
 	const monthFreeDays = useMemo(
-		() => holidays.filter((h) => isSameMonth(h.date, currentMonth) && h.isInSelectedRange).length,
+		() => holidays.filter((h) => isSameMonth({ a: h.date, b: currentMonth }) && h.isInSelectedRange).length,
 		[holidays, currentMonth],
 	);
 	const calendarDays = useMemo(
@@ -228,11 +228,11 @@ export function Calendar({
 	}, [holidays]);
 
 	const handlePreviousMonth = useCallback(() => {
-		setCurrentMonth(subMonths(currentMonth, 1));
+		setCurrentMonth(subMonths({ date: currentMonth, months: 1 }));
 	}, [currentMonth]);
 
 	const handleNextMonth = useCallback(() => {
-		setCurrentMonth(addMonths(currentMonth, 1));
+		setCurrentMonth(addMonths({ date: currentMonth, months: 1 }));
 	}, [currentMonth]);
 
 	const handleDayClick = useCallback(
@@ -246,8 +246,10 @@ export function Calendar({
 
 			switch (mode) {
 				case CalendarSelectionMode.MULTIPLE: {
-					const isSelected = selectedDates.some((d) => isSameDay(d, date));
-					const newSelection = isSelected ? selectedDates.filter((d) => !isSameDay(d, date)) : [...selectedDates, date];
+					const isSelected = selectedDates.some((d) => isSameDay({ a: d, b: date }));
+					const newSelection = isSelected
+						? selectedDates.filter((d) => !isSameDay({ a: d, b: date }))
+						: [...selectedDates, date];
 
 					setSelectedDates(newSelection);
 					onSelect?.(newSelection);
@@ -408,7 +410,7 @@ export function Calendar({
 					const isSuggestedDay = modifiers.suggested(date);
 
 					const isDisabled = disabled || (isPastDay && !isManualDay && !isSuggestedDay);
-					const isOutsideMonth = !isSameMonth(date, currentMonth);
+					const isOutsideMonth = !isSameMonth({ a: date, b: currentMonth });
 
 					if (!showOutsideDays && isOutsideMonth) {
 						return <div key={date.toISOString()} className="size-8" />;

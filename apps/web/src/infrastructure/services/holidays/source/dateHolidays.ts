@@ -2,7 +2,12 @@ import type { RawHoliday } from "@application/dto/holiday/types";
 import Holidays from "date-holidays";
 import type { HolidayLookup, HolidaySource } from "./types";
 
-const forYears = (holidays: Holidays, year: number): RawHoliday[] => [
+interface ForYearsParams {
+	holidays: Holidays;
+	year: number;
+}
+
+const forYears = ({ holidays, year }: ForYearsParams): RawHoliday[] => [
 	...holidays.getHolidays(year),
 	...holidays.getHolidays(year + 1),
 ];
@@ -12,8 +17,8 @@ export const dateHolidaysSource: HolidaySource = {
 		const configuration = { languages: [locale] };
 
 		return {
-			national: forYears(new Holidays(country, configuration), year),
-			regional: region ? forYears(new Holidays(country, region, configuration), year) : [],
+			national: forYears({ holidays: new Holidays(country, configuration), year }),
+			regional: region ? forYears({ holidays: new Holidays(country, region, configuration), year }) : [],
 		};
 	},
 

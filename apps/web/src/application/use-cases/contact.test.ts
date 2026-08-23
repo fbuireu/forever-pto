@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { sendContactEmail } from "./contact";
 
 vi.mock("@application/shared/utils/zodParse", () => ({
-	zodParse: vi.fn((_, data) => Effect.succeed(data)),
+	zodParse: vi.fn(({ data }) => Effect.succeed(data)),
 }));
 
 vi.mock("@infrastructure/services/contact/repository", () => ({
@@ -49,37 +49,37 @@ beforeEach(() => vi.clearAllMocks());
 
 describe("sendContactEmail", () => {
 	it("resolves with a deferred effect on success", async () => {
-		const result = await run(sendContactEmail(VALID_DATA, CONFIG));
+		const result = await run(sendContactEmail({ data: VALID_DATA, config: CONFIG }));
 		expect(result.deferred).toBeDefined();
 	});
 
 	it("does not persist the contact during the critical path", async () => {
 		const { saveContact } = await import("@infrastructure/services/contact/repository");
-		await run(sendContactEmail(VALID_DATA, CONFIG));
+		await run(sendContactEmail({ data: VALID_DATA, config: CONFIG }));
 		expect(saveContact).not.toHaveBeenCalled();
 	});
 
 	it("persists the contact when the deferred effect runs", async () => {
 		const { saveContact } = await import("@infrastructure/services/contact/repository");
-		const { deferred } = await run(sendContactEmail(VALID_DATA, CONFIG));
+		const { deferred } = await run(sendContactEmail({ data: VALID_DATA, config: CONFIG }));
 		await runDeferred(deferred);
 		expect(saveContact).toHaveBeenCalledOnce();
 	});
 
 	it("calls resend.send once", async () => {
-		await run(sendContactEmail(VALID_DATA, CONFIG));
+		await run(sendContactEmail({ data: VALID_DATA, config: CONFIG }));
 		expect(mockSend).toHaveBeenCalledOnce();
 	});
 
 	it("sends from and to contactEmail", async () => {
-		await run(sendContactEmail(VALID_DATA, CONFIG));
+		await run(sendContactEmail({ data: VALID_DATA, config: CONFIG }));
 		expect(mockSend).toHaveBeenCalledWith(
 			expect.objectContaining({ to: "contact@example.com", from: expect.stringContaining("contact@example.com") }),
 		);
 	});
 
 	it("passes siteUrl to the email template", async () => {
-		await run(sendContactEmail(VALID_DATA, CONFIG));
+		await run(sendContactEmail({ data: VALID_DATA, config: CONFIG }));
 		const { ContactFormEmail } = await import("@application/email/templates/Contact");
 		expect(vi.mocked(ContactFormEmail)).toHaveBeenCalledWith(
 			expect.objectContaining({ baseUrl: "https://example.com" }),
@@ -87,7 +87,7 @@ describe("sendContactEmail", () => {
 	});
 
 	it("includes the subject in the email", async () => {
-		await run(sendContactEmail(VALID_DATA, CONFIG));
+		await run(sendContactEmail({ data: VALID_DATA, config: CONFIG }));
 		expect(mockSend).toHaveBeenCalledWith(
 			expect.objectContaining({ subject: expect.stringContaining("Test subject") }),
 		);
@@ -96,7 +96,7 @@ describe("sendContactEmail", () => {
 	it("fails with ValidationError when zodParse fails", async () => {
 		const { zodParse } = await import("@application/shared/utils/zodParse");
 		vi.mocked(zodParse).mockReturnValueOnce(Effect.fail(new ValidationError({ message: "invalid" })));
-		const err = await runFail(sendContactEmail(VALID_DATA, CONFIG));
+		const err = await runFail(sendContactEmail({ data: VALID_DATA, config: CONFIG }));
 		expect(err).toBeInstanceOf(ValidationError);
 		expect(mockSend).not.toHaveBeenCalled();
 	});
@@ -104,21 +104,21 @@ describe("sendContactEmail", () => {
 	it("fails with EmailError when render throws", async () => {
 		const { render } = await import("@react-email/render");
 		vi.mocked(render).mockRejectedValueOnce(new Error("template error"));
-		const err = await runFail(sendContactEmail(VALID_DATA, CONFIG));
+		const err = await runFail(sendContactEmail({ data: VALID_DATA, config: CONFIG }));
 		expect(err).toBeInstanceOf(EmailError);
 		expect(mockSend).not.toHaveBeenCalled();
 	});
 
 	it("fails with EmailError when send fails", async () => {
 		mockSend.mockReturnValueOnce(Effect.fail(new EmailError({ message: "send failed" })) as never);
-		const err = await runFail(sendContactEmail(VALID_DATA, CONFIG));
+		const err = await runFail(sendContactEmail({ data: VALID_DATA, config: CONFIG }));
 		expect(err).toBeInstanceOf(EmailError);
 	});
 
 	it("deferred effect recovers and logs when saveContact fails", async () => {
 		const { saveContact } = await import("@infrastructure/services/contact/repository");
 		vi.mocked(saveContact).mockReturnValueOnce(Effect.fail({ _tag: "DatabaseError", message: "db error" } as never));
-		const { deferred } = await run(sendContactEmail(VALID_DATA, CONFIG));
+		const { deferred } = await run(sendContactEmail({ data: VALID_DATA, config: CONFIG }));
 		await expect(runDeferred(deferred)).resolves.toBeUndefined();
 		expect(mockLogger.error).toHaveBeenCalledOnce();
 	});

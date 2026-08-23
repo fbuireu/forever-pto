@@ -35,7 +35,13 @@ vi.mock("next-intl", () => ({
 
 const { CalendarExport } = await import("./CalendarExport");
 
-const makeHoliday = (id: string, date: string, isInSelectedRange: boolean) => ({
+interface MakeHolidayParams {
+	id: string;
+	date: string;
+	isInSelectedRange: boolean;
+}
+
+const makeHoliday = ({ id, date, isInSelectedRange }: MakeHolidayParams) => ({
 	id,
 	date: new Date(date),
 	name: `Holiday ${id}`,
@@ -57,10 +63,10 @@ beforeEach(() => {
 describe("CalendarExport", () => {
 	it("exports only the Holidays inside the Planning Window, not the extra year the store keeps for context", async () => {
 		holidaysState.holidays = [
-			makeHoliday("in-1", "2026-01-01", true),
-			makeHoliday("in-2", "2026-12-25", true),
-			makeHoliday("out-1", "2027-01-01", false),
-			makeHoliday("out-2", "2027-12-25", false),
+			makeHoliday({ id: "in-1", date: "2026-01-01", isInSelectedRange: true }),
+			makeHoliday({ id: "in-2", date: "2026-12-25", isInSelectedRange: true }),
+			makeHoliday({ id: "out-1", date: "2027-01-01", isInSelectedRange: false }),
+			makeHoliday({ id: "out-2", date: "2027-12-25", isInSelectedRange: false }),
 		];
 
 		render(<CalendarExport />);
@@ -72,7 +78,7 @@ describe("CalendarExport", () => {
 	});
 
 	it("treats a window with no Holidays in it as nothing to export", () => {
-		holidaysState.holidays = [makeHoliday("out-1", "2027-01-01", false)];
+		holidaysState.holidays = [makeHoliday({ id: "out-1", date: "2027-01-01", isInSelectedRange: false })];
 
 		render(<CalendarExport />);
 

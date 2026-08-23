@@ -12,12 +12,12 @@ export const paymentConfirmationDTO: BaseDTO<Stripe.PaymentIntent, PaymentConfir
 	}),
 };
 
-type PaymentDataDTOParams = {
+interface PaymentDataDTOParams {
 	email: string;
 	promoCode: string | null;
 	userAgent: string | null;
 	ipAddress: string | null;
-};
+}
 
 export const paymentDataDTO: BaseDTO<Stripe.PaymentIntent, NewPayment, PaymentDataDTOParams> = {
 	create: ({ raw, params }) => {

@@ -38,7 +38,12 @@ vi.mock("next/server", async (importOriginal) => {
 
 const { POST } = await import("./route");
 
-function makeRequest(body: unknown, headers?: Record<string, string>): Request {
+interface MakeRequestParams {
+	body: unknown;
+	headers?: Record<string, string>;
+}
+
+function makeRequest({ body, headers }: MakeRequestParams): Request {
 	return new Request("http://localhost/api/payment", {
 		method: "POST",
 		headers: { "Content-Type": "application/json", ...headers },
@@ -66,7 +71,7 @@ describe("POST /api/payment", () => {
 			}),
 		);
 
-		const response = await POST(makeRequest({ amount: 9.99, email: "user@example.com" }) as never);
+		const response = await POST(makeRequest({ body: { amount: 9.99, email: "user@example.com" } }) as never);
 
 		expect(response.status).toBe(200);
 		expect(mockAfter).toHaveBeenCalledTimes(1);
@@ -78,7 +83,7 @@ describe("POST /api/payment", () => {
 		mockCreatePayment.mockReturnValue(
 			Effect.succeed({ clientSecret: "client-secret-abc", discountInfo: null, deferred: Effect.void }),
 		);
-		const response = await POST(makeRequest({ amount: 9.99, email: "user@example.com" }) as never);
+		const response = await POST(makeRequest({ body: { amount: 9.99, email: "user@example.com" } }) as never);
 		expect(response.status).toBe(200);
 		const body = await response.json();
 		expect(body.success).toBe(true);
@@ -91,13 +96,13 @@ describe("POST /api/payment", () => {
 		mockCreatePayment.mockReturnValue(
 			Effect.succeed({ clientSecret: "pi_secret", discountInfo: null, deferred: Effect.void }),
 		);
-		await POST(makeRequest({}, { "cf-connecting-ip": "1.2.3.4" }) as never);
+		await POST(makeRequest({ body: {}, headers: { "cf-connecting-ip": "1.2.3.4" } }) as never);
 		expect(mockCheckRateLimit).toHaveBeenCalledWith("1.2.3.4");
 	});
 
 	it("returns 429 on RateLimitError", async () => {
 		mockCheckRateLimit.mockReturnValue(Effect.fail(new RateLimitError({ ip: "1.2.3.4" })));
-		const response = await POST(makeRequest({}) as never);
+		const response = await POST(makeRequest({ body: {} }) as never);
 		expect(response.status).toBe(429);
 		const body = await response.json();
 		expect(body.success).toBe(false);
@@ -107,7 +112,7 @@ describe("POST /api/payment", () => {
 	it("returns 400 on ValidationError", async () => {
 		mockCheckRateLimit.mockReturnValue(Effect.succeed(undefined));
 		mockCreatePayment.mockReturnValue(Effect.fail(new ValidationError({ message: "Amount is required" })));
-		const response = await POST(makeRequest({}) as never);
+		const response = await POST(makeRequest({ body: {} }) as never);
 		expect(response.status).toBe(400);
 		const body = await response.json();
 		expect(body.success).toBe(false);
@@ -134,7 +139,7 @@ describe("POST /api/payment", () => {
 	it("returns 400 on PromoCodeError with code and isPromoCodeError", async () => {
 		mockCheckRateLimit.mockReturnValue(Effect.succeed(undefined));
 		mockCreatePayment.mockReturnValue(Effect.fail(new PromoCodeError({ code: PromoCodeErrors.INVALID_OR_EXPIRED })));
-		const response = await POST(makeRequest({ promoCode: "NOPE" }) as never);
+		const response = await POST(makeRequest({ body: { promoCode: "NOPE" } }) as never);
 		expect(response.status).toBe(400);
 		const body = await response.json();
 		expect(body.error).toBe(PromoCodeErrors.INVALID_OR_EXPIRED);
@@ -144,7 +149,7 @@ describe("POST /api/payment", () => {
 	it("returns 500 on PaymentError", async () => {
 		mockCheckRateLimit.mockReturnValue(Effect.succeed(undefined));
 		mockCreatePayment.mockReturnValue(Effect.fail(new PaymentError({ message: "Stripe error" })));
-		const response = await POST(makeRequest({}) as never);
+		const response = await POST(makeRequest({ body: {} }) as never);
 		expect(response.status).toBe(500);
 		const body = await response.json();
 		expect(body.error).toBe(ApiError.INTERNAL_ERROR);
@@ -158,7 +163,7 @@ describe("POST /api/payment", () => {
 				ValidationError | PaymentError | PromoCodeError
 			>,
 		);
-		const response = await POST(makeRequest({}) as never);
+		const response = await POST(makeRequest({ body: {} }) as never);
 		expect(response.status).toBe(500);
 		const body = await response.json();
 		expect(body.error).toBe(ApiError.INTERNAL_ERROR);

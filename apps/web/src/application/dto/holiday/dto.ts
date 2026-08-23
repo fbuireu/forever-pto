@@ -12,11 +12,11 @@ import {
 } from "@application/shared/utils/dates";
 import { type HolidayDTO, HolidayVariant, type RawHoliday } from "./types";
 
-type HolidayDTOParams = {
+interface HolidayDTOParams {
 	year: number;
 	carryOverMonths: number;
 	regions: RegionDTO[];
-};
+}
 
 export interface CreateCustomHolidayParams {
 	name: string;
@@ -38,7 +38,7 @@ export interface PlanningWindowBounds {
 export const isInPlanningWindow = ({ date, year, carryOverMonths }: PlanningWindowBounds): boolean =>
 	isWithinInterval(date, {
 		start: startOfYear(new Date(year, 0, 1)),
-		end: addMonths(endOfYear(new Date(year, 0, 1)), carryOverMonths),
+		end: addMonths({ date: endOfYear(new Date(year, 0, 1)), months: carryOverMonths }),
 	});
 
 export const holidayDTO: HolidayDTOShape = {
@@ -63,12 +63,12 @@ export const holidayDTO: HolidayDTOShape = {
 					name: holiday.name,
 					type: holiday.type,
 					variant: holiday.location ? HolidayVariant.REGIONAL : HolidayVariant.NATIONAL,
-					...(holiday.location && { location: getRegionName(holiday.location, regions) }),
+					...(holiday.location && { location: getRegionName({ regionCode: holiday.location, regions }) }),
 					isInSelectedRange: isInPlanningWindow({ date: holidayDate, year, carryOverMonths }),
 				});
 				return acc;
 			}, [])
-			.toSorted((a, b) => compareAsc(a.date, b.date));
+			.toSorted((a, b) => compareAsc({ a: a.date, b: b.date }));
 	},
 
 	createCustom: ({ name, date, year, carryOverMonths }: CreateCustomHolidayParams) => ({

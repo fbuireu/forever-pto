@@ -43,7 +43,13 @@ const getExecutionContext = () => {
 	}
 };
 
-const send = (level: LogLevel, message: string, context: LogContext) => {
+interface SendParams {
+	level: LogLevel;
+	message: string;
+	context: LogContext;
+}
+
+const send = ({ level, message, context }: SendParams) => {
 	try {
 		void getLogtail()?.[level](message, context, getExecutionContext());
 	} catch {
@@ -70,19 +76,19 @@ export class BetterStackClient {
 	}
 
 	debug(message: string, context?: LogContext) {
-		send("debug", message, this.getFullContext(context));
+		send({ level: "debug", message, context: this.getFullContext(context) });
 	}
 
 	info(message: string, context?: LogContext) {
-		send("info", message, this.getFullContext(context));
+		send({ level: "info", message, context: this.getFullContext(context) });
 	}
 
 	warn(message: string, context?: LogContext) {
-		send("warn", message, this.getFullContext(context));
+		send({ level: "warn", message, context: this.getFullContext(context) });
 	}
 
 	error(message: string, context?: LogContext) {
-		send("error", message, this.getFullContext(context));
+		send({ level: "error", message, context: this.getFullContext(context) });
 	}
 
 	logError(message: string, error: unknown, context?: LogContext) {
