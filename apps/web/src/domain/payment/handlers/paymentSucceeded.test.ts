@@ -48,15 +48,10 @@ type R = LoggerService | TursoService | StripeServerService;
 const run = <E>(eff: Effect.Effect<void, E, R>) => Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
 
 const EVENT: PaymentSucceededEvent = {
-	type: "payment_succeeded",
 	paymentId: "pi_test",
 	email: "test@example.com",
-	amount: 999,
 	status: "succeeded",
 	latestChargeId: "ch_test",
-	promoCode: null,
-	userAgent: null,
-	ipAddress: null,
 };
 
 beforeEach(() => vi.clearAllMocks());

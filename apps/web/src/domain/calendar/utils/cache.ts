@@ -2,10 +2,12 @@ import type { HolidayDTO } from "@application/dto/holiday/types";
 import { isWeekend } from "@application/shared/utils/dates";
 
 const DATE_KEY_CACHE = new Map<number, string>();
-const HOLIDAY_CACHE = new Map<string, Set<string>>();
+let holidaySetMemo: Set<string> | null = null;
 
 export const clearDateKeyCache = () => DATE_KEY_CACHE.clear();
-export const clearHolidayCache = () => HOLIDAY_CACHE.clear();
+export const clearHolidayCache = () => {
+	holidaySetMemo = null;
+};
 
 export const getKey = (date: Date) => {
 	const time = date.getTime();
@@ -25,19 +27,15 @@ export const getCombinationKey = (days: Date[]) => {
 		.join(",");
 };
 
-export const createHolidaySet = (holidays: HolidayDTO[], cacheKey?: string) => {
-	const key = cacheKey ?? "default";
-	const cached = HOLIDAY_CACHE.get(key);
+export const createHolidaySet = (holidays: HolidayDTO[]) => {
+	if (holidaySetMemo !== null) return holidaySetMemo;
 
-	if (cached !== undefined) return cached;
-
-	const holidaySet = new Set(
+	holidaySetMemo = new Set(
 		holidays.reduce<string[]>((acc, { date }) => {
 			if (!isWeekend(date)) acc.push(getKey(date));
 			return acc;
 		}, []),
 	);
 
-	HOLIDAY_CACHE.set(key, holidaySet);
-	return holidaySet;
+	return holidaySetMemo;
 };

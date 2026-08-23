@@ -22,6 +22,7 @@ export const handlePaymentFailed = (
 		if (!updated) {
 			logger.warn("Ignoring failed-payment event for an already-succeeded or absent payment", {
 				paymentId: event.paymentId,
+				reason: event.errorMessage,
 			});
 		}
 	});

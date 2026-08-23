@@ -17,29 +17,48 @@ const LOCALE = "en" as const;
 const YEAR = 2025;
 
 describe("generateMetrics", () => {
-	it("returns all-zero metrics when suggestion has no days", () => {
-		const result = generateMetrics({
-			suggestion: { days: [] },
-			locale: LOCALE,
-			planningWindow: { year: YEAR, carryOverMonths: 0 },
-			holidays: [],
-			allowPastDays: true,
-			manuallySelectedDays: [],
-			removedSuggestedDays: [],
+	describe("a plan that placed nothing", () => {
+		const emptyPlan = () =>
+			generateMetrics({
+				suggestion: { days: [] },
+				locale: LOCALE,
+				planningWindow: { year: YEAR, carryOverMonths: 0 },
+				holidays: [],
+				allowPastDays: true,
+				manuallySelectedDays: [],
+				removedSuggestedDays: [],
+			});
+
+		it("reports zero for everything the plan produces, because it produced nothing", () => {
+			const result = emptyPlan();
+
+			expect(result.longWeekends).toBe(0);
+			expect(result.restBlocks).toBe(0);
+			expect(result.firstLastBreak).toBeNull();
+			expect(result.bonusDays).toBe(0);
+			expect(result.bridgesUsed).toBe(0);
+			expect(result.totalEffectiveDays).toBe(0);
+			expect(result.longestVacation).toBe(0);
 		});
-		expect(result.longWeekends).toBe(0);
-		expect(result.restBlocks).toBe(0);
-		expect(result.maxWorkStreak).toBe(0);
-		expect(result.firstLastBreak).toBeNull();
-		expect(result.averageEfficiency).toBe(0);
-		expect(result.bonusDays).toBe(0);
-		expect(result.quarterDist).toEqual([0, 0, 0, 0]);
-		expect(result.bridgesUsed).toBe(0);
-		expect(result.workedDaysPerMonth).toBe(0);
-		expect(result.totalEffectiveDays).toBe(0);
-		expect(result.monthlyDist).toEqual(new Array(12).fill(0));
-		expect(result.longBlocksPerQuarter).toEqual(new Array(4).fill(0));
-		expect(result.longestVacation).toBe(0);
+
+		it("answers 0 rather than NaN for Efficiency, which is the one field the division needs a guard for", () => {
+			expect(emptyPlan().averageEfficiency).toBe(0);
+		});
+
+		it("sizes every bucketed metric from the Planning Window, not from the days it placed", () => {
+			const result = emptyPlan();
+
+			expect(result.monthlyDist).toEqual(new Array(12).fill(0));
+			expect(result.quarterDist).toEqual([0, 0, 0, 0]);
+			expect(result.longBlocksPerQuarter).toEqual(new Array(4).fill(0));
+		});
+
+		it("reports the whole year still standing for the two metrics scoped to the year, not zero", () => {
+			const result = emptyPlan();
+
+			expect(result.maxWorkStreak).toBeGreaterThan(200);
+			expect(result.workedDaysPerMonth).toBeGreaterThan(20);
+		});
 	});
 
 	it("returns non-zero metrics for a populated suggestion", () => {

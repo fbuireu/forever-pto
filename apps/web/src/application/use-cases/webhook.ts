@@ -6,6 +6,7 @@ import type { TursoService } from "@infrastructure/clients/db/turso/service";
 import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import type { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import type { DatabaseError } from "@infrastructure/errors";
+import { readDonationMetadata } from "@infrastructure/services/payments/provider/metadata";
 import { savePayment } from "@infrastructure/services/payments/repository";
 import { Effect } from "effect";
 import type Stripe from "stripe";
@@ -37,15 +38,11 @@ export const processWebhookEvent = (
 
 				if (!paymentEvent) break;
 
+				const { promoCode, userAgent, ipAddress } = readDonationMetadata(paymentIntent);
 				const created = yield* savePayment(
 					paymentDataDTO.create({
 						raw: paymentIntent,
-						params: {
-							email: paymentEvent.email,
-							promoCode: paymentEvent.promoCode,
-							userAgent: paymentEvent.userAgent,
-							ipAddress: paymentEvent.ipAddress,
-						},
+						params: { email: paymentEvent.email, promoCode, userAgent, ipAddress },
 					}),
 				);
 

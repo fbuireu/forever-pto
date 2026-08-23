@@ -78,36 +78,28 @@ describe("createHolidaySet", () => {
 		expect(createHolidaySet([])).toEqual(new Set());
 	});
 
-	it("returns the same Set instance for the same cacheKey", () => {
+	it("hands the second caller the first caller's Set, which is what makes it free", () => {
 		const holiday = makeHoliday(makeDate(2025, 1, 6));
-		const s1 = createHolidaySet([holiday], "key");
-		const s2 = createHolidaySet([holiday], "key");
-		expect(s1).toBe(s2);
+
+		expect(createHolidaySet([holiday])).toBe(createHolidaySet([holiday]));
 	});
 
-	it("returns distinct Set instances for different cacheKeys", () => {
+	it("clearHolidayCache invalidates the memo", () => {
 		const holiday = makeHoliday(makeDate(2025, 1, 6));
-		const s1 = createHolidaySet([holiday], "a");
-		const s2 = createHolidaySet([holiday], "b");
-		expect(s1).not.toBe(s2);
-	});
-
-	it("clearHolidayCache invalidates the cache", () => {
-		const holiday = makeHoliday(makeDate(2025, 1, 6));
-		const before = createHolidaySet([holiday], "key");
+		const before = createHolidaySet([holiday]);
 		clearHolidayCache();
-		const after = createHolidaySet([holiday], "key");
-		expect(before).not.toBe(after);
+
+		expect(createHolidaySet([holiday])).not.toBe(before);
 	});
 
-	it("ignores a new holidays array when no cacheKey is given and the cache was not cleared", () => {
+	it("ignores a new holidays array while the memo stands", () => {
 		const first = createHolidaySet([makeHoliday(makeDate(2025, 1, 6))]);
 		const second = createHolidaySet([makeHoliday(makeDate(2025, 2, 3))]);
 		expect(second).toBe(first);
 		expect(second.has(getKey(makeDate(2025, 2, 3)))).toBe(false);
 	});
 
-	it("picks up a new holidays array on the default key once the cache is cleared", () => {
+	it("picks up a new holidays array once the memo is cleared", () => {
 		createHolidaySet([makeHoliday(makeDate(2025, 1, 6))]);
 		clearHolidayCache();
 		const second = createHolidaySet([makeHoliday(makeDate(2025, 2, 3))]);

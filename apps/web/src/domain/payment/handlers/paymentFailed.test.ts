@@ -23,7 +23,6 @@ const runFail = <E>(eff: Effect.Effect<void, E, R>) =>
 	Effect.runPromise(Effect.flip(eff).pipe(Effect.provide(TestLayer)));
 
 const EVENT: PaymentFailedEvent = {
-	type: "payment_failed",
 	paymentId: "pi_test",
 	status: "requires_payment_method",
 	errorMessage: "Your card was declined.",
@@ -57,7 +56,7 @@ describe("handlePaymentFailed", () => {
 		await run(handlePaymentFailed(EVENT));
 		expect(mockLogger.warn).toHaveBeenCalledWith(
 			"Ignoring failed-payment event for an already-succeeded or absent payment",
-			expect.objectContaining({ paymentId: "pi_test" }),
+			{ paymentId: "pi_test", reason: "Your card was declined." },
 		);
 	});
 

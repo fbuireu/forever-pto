@@ -8,10 +8,19 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { processWebhookEvent } from "./webhook";
 
 vi.mock("@domain/payment/events/factory/events", () => ({
-	createPaymentSucceededEvent: vi
-		.fn()
-		.mockReturnValue(Effect.succeed({ type: "payment_succeeded", paymentId: "pi_test" })),
-	createPaymentFailedEvent: vi.fn().mockReturnValue({ type: "payment_failed", paymentId: "pi_test" }),
+	createPaymentSucceededEvent: vi.fn().mockReturnValue(
+		Effect.succeed({
+			paymentId: "pi_test",
+			email: "donor@example.com",
+			status: "succeeded",
+			latestChargeId: "ch_test",
+		}),
+	),
+	createPaymentFailedEvent: vi.fn().mockReturnValue({
+		paymentId: "pi_test",
+		status: "requires_payment_method",
+		errorMessage: "Your card was declined.",
+	}),
 }));
 
 vi.mock("@domain/payment/handlers/paymentSucceeded", () => ({
@@ -20,6 +29,15 @@ vi.mock("@domain/payment/handlers/paymentSucceeded", () => ({
 
 vi.mock("@domain/payment/handlers/paymentFailed", () => ({
 	handlePaymentFailed: vi.fn(() => Effect.succeed(undefined)),
+}));
+
+vi.mock("@infrastructure/services/payments/provider/metadata", () => ({
+	readDonationMetadata: vi.fn(() => ({
+		email: "donor@example.com",
+		promoCode: "SAVE20",
+		userAgent: "Mozilla/5.0",
+		ipAddress: "1.2.3.4",
+	})),
 }));
 
 vi.mock("@infrastructure/services/payments/repository", () => ({
@@ -109,6 +127,21 @@ describe("processWebhookEvent", () => {
 			"Payment was missing from the DB and was created from the webhook",
 			expect.objectContaining({ paymentId: "pi_test" }),
 		);
+	});
+
+	it("reads the transport metadata off the intent, not off the domain event", async () => {
+		const { paymentDataDTO } = await import("@application/dto/payment/dto");
+		await run(processWebhookEvent(succeededEvent({ id: "pi_test" })));
+
+		expect(paymentDataDTO.create).toHaveBeenCalledWith({
+			raw: expect.objectContaining({ id: "pi_test" }),
+			params: {
+				email: "donor@example.com",
+				promoCode: "SAVE20",
+				userAgent: "Mozilla/5.0",
+				ipAddress: "1.2.3.4",
+			},
+		});
 	});
 
 	it("propagates a handlePaymentSucceeded failure so Stripe retries the delivery", async () => {

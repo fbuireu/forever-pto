@@ -60,6 +60,29 @@ success channel of its Effect), so a field dropped from `events/types.ts` — or
 — is a compile error in `events/factory/events.ts` itself rather than at the call site in another layer. Keep
 the annotations when adding a field.
 
+## An event carries what a handler acts on, not a copy of the intent
+
+`PaymentSucceededEvent` is four fields — `paymentId`, `email`, `status`, `latestChargeId` — and
+`handlePaymentSucceeded` reads all four. It used to be eight. The other four were not extra detail; they were
+the `Stripe.PaymentIntent` leaking through the seam in pieces:
+
+- `amount` had **no reader at all** in production. `paymentDataDTO.create` takes the intent as `raw` and reads
+  `raw.amount` itself.
+- `promoCode`, `userAgent` and `ipAddress` existed so `processWebhookEvent` could hand them to a mapper that
+  already held the intent they came from. A domain event carrying a user agent and an IP address is transport
+  detail crossing into the domain, which is the one thing this folder exists to stop. `webhook.ts` calls
+  `readDonationMetadata` for them now, beside the `raw` it passes.
+- `type` discriminated nothing. Nothing switched on it; `processWebhookEvent` switches on Stripe's own
+  discriminated union and calls one handler per branch. `PaymentFailedEvent` had the same field with the same
+  zero readers.
+
+`email` stays because the factory's `MissingDonorEmailError` guard is what proves it resolved, and a caller
+must not have to re-derive that.
+
+**`errorMessage` was captured and thrown away.** `handlePaymentFailed`'s warn logged `paymentId` alone, so
+Stripe's decline reason reached the domain and stopped there. It goes in the log as `reason` now — that is
+the only field on `PaymentFailedEvent` whose reason to exist is the log line.
+
 ## The entitlement value is typed where it can be proved, and named where it cannot
 
 `PaymentStatus` restates Stripe's seven `PaymentIntent.Status` members by hand — it is not imported from the

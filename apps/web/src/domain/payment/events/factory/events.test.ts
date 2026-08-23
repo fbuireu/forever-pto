@@ -55,10 +55,8 @@ describe("createPaymentSucceededEvent", () => {
 		expect(error).toBeInstanceOf(MissingDonorEmailError);
 	});
 
-	it("maps amount and status", () => {
-		const event = succeeded(makeIntent());
-		expect(event.amount).toBe(999);
-		expect(event.status).toBe("succeeded");
+	it("maps status", () => {
+		expect(succeeded(makeIntent()).status).toBe("succeeded");
 	});
 
 	it("resolves latestChargeId from a string charge", () => {
@@ -75,23 +73,8 @@ describe("createPaymentSucceededEvent", () => {
 		expect(succeeded(makeIntent({ latest_charge: null })).latestChargeId).toBeNull();
 	});
 
-	it("extracts promoCode, userAgent, ipAddress from metadata", () => {
-		const event = succeeded(makeIntent());
-		expect(event.promoCode).toBe("SAVE20");
-		expect(event.userAgent).toBe("Mozilla/5.0");
-		expect(event.ipAddress).toBe("1.2.3.4");
-	});
-
-	it("returns null for absent metadata fields", () => {
-		const intent = makeIntent({ metadata: {}, receipt_email: "fallback@example.com" });
-		const event = succeeded(intent);
-		expect(event.promoCode).toBeNull();
-		expect(event.userAgent).toBeNull();
-		expect(event.ipAddress).toBeNull();
-	});
-
-	it("sets type discriminant", () => {
-		expect(succeeded(makeIntent()).type).toBe("payment_succeeded");
+	it("carries only what a handler acts on, not a copy of the intent", () => {
+		expect(Object.keys(succeeded(makeIntent())).toSorted()).toEqual(["email", "latestChargeId", "paymentId", "status"]);
 	});
 });
 
@@ -116,7 +99,11 @@ describe("createPaymentFailedEvent", () => {
 		expect(createPaymentFailedEvent(makeIntent({ last_payment_error: null })).errorMessage).toBe("Unknown error");
 	});
 
-	it("sets type discriminant", () => {
-		expect(createPaymentFailedEvent(makeIntent()).type).toBe("payment_failed");
+	it("carries only what a handler acts on, not a copy of the intent", () => {
+		expect(Object.keys(createPaymentFailedEvent(makeIntent())).toSorted()).toEqual([
+			"errorMessage",
+			"paymentId",
+			"status",
+		]);
 	});
 });

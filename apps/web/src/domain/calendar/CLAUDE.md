@@ -422,24 +422,51 @@ Monday is one four-day Long Block rather than two isolated PTO Days.
 **A Long Block is filed under the first of its days that lies *inside* the window, not its first day.** The
 scan starts seven days before the earliest date, so a block can open in December of `year - 1` — every
 planning year whose 1 January is a Monday or a Sunday does it, with a PTO Day on the adjacent January
-workday. Anchoring on `currentBlock.at(0)` then gave `windowMonthIndex` a negative index, `Math.floor(-1 / 3)`
+workday. Anchoring on the run's first day then gave `windowMonthIndex` a negative index, `Math.floor(-1 / 3)`
 is `-1`, and the `quarter >= 0` guard threw away a Long Block the plan had paid for — while
 `calculateLongWeekends` counted the same stretch and `calculateQuarterDistribution` put the placed day in Q1,
-so the Summary's two quarter charts disagreed about the same quarter. `closeBlock` now anchors on
-`currentBlock.find((day) => windowMonthIndex(day, window) >= 0)`; the guard stays, so a block lying wholly
-outside the window is still dropped.
+so the Summary's two quarter charts disagreed about the same quarter. `getLongBlocksPerQuarter` anchors on
+`streak.days.find((day) => windowMonthIndex(day, window) >= 0)` instead, and skips the run when that finds
+nothing, so a block lying wholly outside the window is still dropped.
+
+**The `quarter >= 0` half of that guard is gone, and the `find` is why.** Once the anchor is a day whose
+`windowMonthIndex` is already `>= 0`, the floor of a non-negative over three cannot be negative — the
+comparison could not fail. Only the upper bound does real work now. The two other `>= 0` checks in this file,
+at the top of `getMonthlyDist` and in `calculateQuarterDistribution`, are **live**: those read a raw day, not
+one the `find` has already vetted. This paragraph named `closeBlock` and `currentBlock` for a while, which
+have never existed under `src/`; the rule survived a refactor and the prose did not.
 
 **Rest Blocks are separated by more than seven days.** Two PTO Days five days apart are one Rest Block even
 with Workdays between them. Long Weekends, Longest Vacation and Long Blocks use a different rule entirely —
 they scan the real calendar from seven days before the first date to seven days after the last, so a
 stretch straddling the edge of the data is still counted whole.
 
+**`generateMetrics` has one construction of `Metrics`, and used to have two.** A zero-day guard hand-built
+all thirteen fields, of which eleven were byte-for-byte what the helpers already answer for an empty day
+list: `getMonthlyDist`, `calculateQuarterDistribution` and `getLongBlocksPerQuarter` size themselves from
+the Planning Window and fill zeros, `freeStreaks` short-circuits to `[]`, `getValidBridges` filters
+everything out, `calculateRestBlocks` and `getFirstLastBreak` have their own empty answers. Only the
+Efficiency division needs a guard, because `0 / 0` is `NaN`.
+
+The other two fields were **wrong**. Max Work Streak and Worked Days per month are scoped to the calendar
+year, not to the plan, so with nothing placed they are the whole year still standing — around 261 and 21.8,
+not 0. `CONTEXT.md` defines Max Work Streak as the longest run of Workdays *left standing after the plan is
+applied*, and a plan that placed nothing leaves all of them standing. The guard reported 0 for both and the
+test pinned the zeros. A second construction of a shape is a place for it to disagree with the first, and
+this one did.
+
 ## The cache protocol
 
-`utils/cache.ts` memoises date keys and the Holiday set in module-level maps that are never evicted, and
-every production call site stores the Holiday set under the same fixed `'default'` key. A second run
-therefore reuses the first run's Holidays unless someone clears it — silently, because a stale Holiday set
-is structurally valid.
+`utils/cache.ts` memoises date keys in a module-level map that is never evicted, and the Holiday set in a
+single module-level slot. A second run therefore reuses the first run's Holidays unless someone clears it —
+silently, because a stale Holiday set is structurally valid.
+
+**The Holiday set used to be a keyed `Map` with one key.** `createHolidaySet(holidays, cacheKey?)` fell back
+to `'default'`, and that fallback was the only key any production call site ever wrote; the second argument
+existed on the interface, in the type, and in three test cases that were its only callers. This guide stated
+the fact without drawing the conclusion. It is one slot and `clearHolidayCache()` is one assignment, which
+reads as what it is — a memo the pipeline resets, not a cache anyone keys into. If a second Holiday list ever
+needs to coexist, the key comes back **with** the caller that needs it.
 
 **`runPlanningPipeline` owns the clear, and nothing else in production calls it.** `clearDateKeyCache()` and
 `clearHolidayCache()` open the pipeline. The pipeline is the right owner because it is the only code that

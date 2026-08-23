@@ -50,7 +50,7 @@ export function getLongBlocksPerQuarter({ streaks, window }: GetLongBlocksPerQua
 		if (start === undefined) continue;
 
 		const quarter = Math.floor(windowMonthIndex(start, window) / MONTHS_IN_QUARTER);
-		if (quarter >= 0 && quarter < longBlocksPerQuarter.length) longBlocksPerQuarter[quarter]++;
+		if (quarter < longBlocksPerQuarter.length) longBlocksPerQuarter[quarter]++;
 	}
 
 	return longBlocksPerQuarter;
