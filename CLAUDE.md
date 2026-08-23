@@ -94,7 +94,7 @@ all three properties.
   `localePath({ locale, path }): LocalePathParams`. The interface is named after the function, not after
   the concept, so a reader landing on the type knows what takes it. Two adjacent arguments of the same
   type are what a caller transposes with nothing to catch it. The exception is a function a *runtime*
-  calls back and hands its arguments one at a time — the `toSorted` comparators `compareByEfficiency` and
+  calls back and hands its arguments one at a time: the `toSorted` comparators `compareByEfficiency` and
   `compareGrouped`, and `MockResizeObserver`, which `vi.stubGlobal` constructs.
 - **Conventional commits** (commitlint + husky). semantic-release owns versioning. Do NOT add a
   Co-Authored-By / Claude trailer to commits or PRs.
