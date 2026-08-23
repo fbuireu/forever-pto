@@ -78,10 +78,14 @@ reads a SQLite `TEXT` column. Nothing constrains what that column holds — an o
 narrowing the field would need an `as` at the read, which buys a claim the code cannot check in exchange for
 nothing: no consumer switches on the status, they all test it against one value.
 
-That is what `PAYMENT_SUCCEEDED` is for. It is redundant where the union already applies, and it is the only
-check available at the four sites that compare a `PaymentData.status` — `activatePremium` twice, and both
-handlers. `PaymentConfirmationDTO.status` is narrowed instead of named, since its single producer is the
-Stripe read.
+That is what `PAYMENT_SUCCEEDED` is for. It is redundant where the union already applies, and it is the
+spelling to reach for wherever a `PaymentData.status` meets the entitlement value. **No handler compares
+against it any more** — the `WHERE` clause owns that rule, see below — so its two remaining live uses are
+`activatePremium`, which passes it to `updatePaymentStatus` as the value to write, and
+`repository.test.ts`, which ties the `succeeded_at` `CASE` to it by assertion. `activatePremium` also tests a
+raw `Stripe.PaymentIntent.status` against the bare literal at its guard, which is correct: that value is
+Stripe's, not the payments table's. `PaymentConfirmationDTO.status` is narrowed instead of named, since its
+single producer is the Stripe read.
 
 **Three copies of the literal remain, all inside SQL, and none of them can take the constant.**
 `repository.ts` spells `'succeeded'` in the `succeeded_at` `CASE`, in `getSucceededPaymentByEmail`'s `WHERE` and in
@@ -100,9 +104,14 @@ read never guarded anything: `TursoService` opens a connection per call, so a re
 could have both reads see `processing`. See
 [`../../infrastructure/services/payments/CLAUDE.md`](../../infrastructure/services/payments/CLAUDE.md).
 
-`handlePaymentSucceeded` still reads, and that is deliberate: 0 rows affected cannot distinguish "already
-succeeded" from "no such row", and this handler owes a different answer to each — a missing row warns and
-skips the charge enrichment.
+`handlePaymentSucceeded` still reads, and the read now earns its keep for one branch only: 0 rows affected
+cannot distinguish "already succeeded" from "no such row", and a missing row has to warn and skip the charge
+enrichment. Once the row is known present the handler calls `updatePaymentStatus` unconditionally and lets
+the `WHERE` clause decide. It used to guard that call with `existing.status !== PAYMENT_SUCCEEDED` as well,
+which put the same rule in two places — a predicate in TypeScript over a row read on a different connection,
+and the `AND status != 'succeeded'` that actually holds. Only the SQL can be right about a redelivery racing
+the original, so only the SQL states it. `paymentSucceeded.test.ts` pins that an already-succeeded row is
+still passed to `updatePaymentStatus`; that case goes red the moment the `if` comes back.
 
 **A Donation with no email is dropped, loudly, by the caller.** `processWebhookEvent` catches
 `MissingDonorEmailError`, logs it through `logger.logError` and returns without touching the payments table,
@@ -159,6 +168,18 @@ The factory needs no layer — it requires nothing — so `events.test.ts` drive
 
 Handler tests build a `Layer.succeed(Tag, mock)` for every tag in the requirement channel and run the
 program over it — no Stripe or Turso client is ever constructed. The repository and provider modules are
-`vi.mock`-ed to return `Effect.succeed(...)`, and the assertions worth copying are the negative ones:
-that `updatePaymentStatus` was *not* called for an already-succeeded payment, and that a failing charge
-retrieval leaves the handler's success channel intact.
+`vi.mock`-ed to return `Effect.succeed(...)`, and the assertions worth copying are the negative ones: that a
+failing charge retrieval leaves the handler's success channel intact, and that `handlePaymentFailed` does
+*not* warn when the write reports it touched a row.
+
+**`updatePaymentStatus`'s double must succeed with `true`, not `undefined`.** The real function is
+`Effect<boolean, DatabaseError, TursoService>` and `handlePaymentFailed` branches on the value. Both handler
+suites mocked it as `Effect.succeed(undefined)`, which is falsy, so every case using the default double took
+the "nothing was written" branch — the warn fired throughout, the case that mocks `Effect.succeed(false)`
+would have passed with the branch deleted, and nothing covered a successful write at all. A double that
+disagrees with its subject's return type cannot falsify anything the subject does with it.
+
+**Do not drive a function the same file has pinned as never called.** `paymentFailed.test.ts` asserts
+`getPaymentById` is never reached, and then carried two cases below it setting up `mockReturnValueOnce` on
+that same function — a no-op, leaving both byte-identical in effect to the plain "calls updatePaymentStatus"
+case above. They are deleted; the never-called assertion is the one that means something.

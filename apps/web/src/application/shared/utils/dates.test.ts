@@ -1,5 +1,5 @@
 import { EN } from "@infrastructure/i18n/locales";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
 	addDays,
 	addMonths,
@@ -130,9 +130,69 @@ describe("isBefore", () => {
 	});
 });
 
+const countConstructions = (run: () => void): number => {
+	const Original = Intl.DateTimeFormat;
+	let built = 0;
+	// biome-ignore lint/complexity/useArrowFunction: an arrow is not a constructor, and formatDate calls this with new
+	const spy = vi.spyOn(Intl, "DateTimeFormat").mockImplementation(function (
+		...args: ConstructorParameters<typeof Intl.DateTimeFormat>
+	) {
+		built += 1;
+		return new Original(...args);
+	} as unknown as typeof Intl.DateTimeFormat);
+
+	try {
+		run();
+	} finally {
+		spy.mockRestore();
+	}
+
+	return built;
+};
+
 describe("formatDate", () => {
+	const FRIDAY = new Date(2024, 0, 5);
+
 	it("formats as ISO date", () => {
-		expect(formatDate({ date: new Date(2024, 0, 5), locale: EN, format: "yyyy-MM-dd" })).toBe("2024-01-05");
+		expect(formatDate({ date: FRIDAY, locale: EN, format: "yyyy-MM-dd" })).toBe("2024-01-05");
+	});
+
+	it("formats as ISO date and time", () => {
+		expect(formatDate({ date: new Date(2024, 0, 5, 9, 7, 3), locale: EN, format: "yyyy-MM-dd HH:mm:ss" })).toBe(
+			"2024-01-05 09:07:03",
+		);
+	});
+
+	it.each([
+		["yyyy", "2024"],
+		["MMM", "Jan"],
+		["MMMM", "January"],
+		["d", "5"],
+		["EEEE", "Friday"],
+		["EE", "Fri"],
+		["EEEEE", "F"],
+		["MMM d, yyyy", "Jan 5, 2024"],
+	] as const)("routes %s through the whitelist", (format, expected) => {
+		expect(formatDate({ date: FRIDAY, locale: "en-US", format })).toBe(expected);
+	});
+
+	it("answers the same locale and format from one memoised Intl.DateTimeFormat", () => {
+		formatDate({ date: FRIDAY, locale: "en-GB", format: "MMMM d, yyyy" });
+		const constructions = countConstructions(() => {
+			formatDate({ date: new Date(2024, 5, 9), locale: "en-GB", format: "MMMM d, yyyy" });
+		});
+
+		expect(constructions).toBe(0);
+	});
+
+	it("keys the cache on the locale, so a second locale is a miss", () => {
+		formatDate({ date: FRIDAY, locale: "en-AU", format: "MMMM" });
+		const constructions = countConstructions(() => {
+			formatDate({ date: FRIDAY, locale: "en-AU", format: "MMMM" });
+			formatDate({ date: FRIDAY, locale: "en-NZ", format: "MMMM" });
+		});
+
+		expect(constructions).toBe(1);
 	});
 });
 
@@ -145,5 +205,23 @@ describe("getWeekdayNames", () => {
 	it("starts on Monday when weekStartsOn is 1", () => {
 		const names = getWeekdayNames({ locale: "en-US", weekStartsOn: 1, format: "long" });
 		expect(names[0].toLowerCase()).toContain("mon");
+	});
+
+	it.each([
+		["narrow", "M"],
+		["short", "Mon"],
+		["long", "Monday"],
+	] as const)("renders %s weekdays through formatDate's whitelist", (format, expected) => {
+		expect(getWeekdayNames({ locale: "en-US", weekStartsOn: 1, format })[0]).toBe(expected);
+	});
+
+	it("shares formatDate's cache instead of keeping one of its own", () => {
+		getWeekdayNames({ locale: "en-IE", weekStartsOn: 1, format: "long" });
+		const constructions = countConstructions(() => {
+			getWeekdayNames({ locale: "en-IE", weekStartsOn: 1, format: "long" });
+			formatDate({ date: new Date(2024, 0, 5), locale: "en-IE", format: "EEEE" });
+		});
+
+		expect(constructions).toBe(0);
 	});
 });

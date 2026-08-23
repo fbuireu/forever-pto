@@ -17,21 +17,23 @@ import { matchesClientSecret } from "@infrastructure/services/premium/activation
 import { createSession } from "@infrastructure/services/premium/session";
 import { Effect } from "effect";
 
-interface ActivateWithPaymentParams {
+interface DonationActivationParams {
 	paymentIntentId: string;
-	expectedEmail?: string;
-	clientSecret?: string;
+	expectedEmail: string | undefined;
+	clientSecret: string | undefined;
 }
 
-export const activateWithPayment = ({
-	paymentIntentId,
-	expectedEmail,
-	clientSecret,
-}: ActivateWithPaymentParams): Effect.Effect<
+type DonationActivation = Effect.Effect<
 	{ email: string; premiumKey: string; token: string; deferred: Effect.Effect<void, never, TursoService> },
 	ValidationError | SessionError | PaymentError,
 	StripeServerService | LoggerService
-> =>
+>;
+
+const activateFromDonation = ({
+	paymentIntentId,
+	expectedEmail,
+	clientSecret,
+}: DonationActivationParams): DonationActivation =>
 	Effect.gen(function* () {
 		const logger = yield* LoggerService;
 		const stripe = yield* StripeServerService;
@@ -94,6 +96,22 @@ export const activateWithPayment = ({
 
 		return { email, premiumKey: paymentIntentId, token, deferred };
 	});
+
+export const activateWithPayment = ({
+	paymentIntentId,
+	clientSecret,
+}: {
+	paymentIntentId: string;
+	clientSecret: string;
+}): DonationActivation => activateFromDonation({ paymentIntentId, clientSecret, expectedEmail: undefined });
+
+export const activateWithClaimedPayment = ({
+	paymentIntentId,
+	expectedEmail,
+}: {
+	paymentIntentId: string;
+	expectedEmail: string;
+}): DonationActivation => activateFromDonation({ paymentIntentId, expectedEmail, clientSecret: undefined });
 
 export const activateWithEmail = (
 	email: string,

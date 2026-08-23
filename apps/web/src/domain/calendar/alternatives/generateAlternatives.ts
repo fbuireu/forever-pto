@@ -1,4 +1,4 @@
-import { selectBridgesForStrategy } from "../suggestions/utils/selectors";
+import { selectGreedily } from "../suggestions/utils/selectors";
 import type { Bridge, FilterStrategy, Suggestion } from "../types";
 import { getCombinationKey } from "../utils/cache";
 import type { PlanningCandidates } from "../utils/candidates";
@@ -47,15 +47,10 @@ export function generateAlternatives(params: GenerateAlternativesParams) {
 			const rotateBy = attempt - sortingStrategies.length + 1;
 			shuffledBridges.push(...shuffledBridges.splice(0, rotateBy % Math.max(shuffledBridges.length, 1)));
 		}
-		const selection = selectBridgesForStrategy({
-			bridges: shuffledBridges,
-			targetPtoDays: ptoDays,
-			strategy,
-			presorted: true,
-		});
+		const selection = selectGreedily({ orderedBridges: shuffledBridges, targetPtoDays: ptoDays });
 		if (selection.days.length > 0) {
 			const alternative: Suggestion = {
-				days: selection.days.toSorted((a, b) => a.getTime() - b.getTime()),
+				days: selection.days,
 				bridges: selection.bridges,
 				strategy,
 			};
@@ -68,9 +63,5 @@ export function generateAlternatives(params: GenerateAlternativesParams) {
 		}
 	}
 
-	return alternatives.map((alt) => ({
-		days: alt.days.toSorted((a, b) => a.getTime() - b.getTime()),
-		bridges: alt.bridges,
-		strategy: alt.strategy,
-	}));
+	return alternatives;
 }

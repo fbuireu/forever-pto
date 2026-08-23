@@ -2,7 +2,7 @@ import type { Bridge } from "@domain/calendar/types";
 import { FilterStrategy } from "@domain/calendar/types";
 import { clearDateKeyCache, clearHolidayCache } from "@domain/calendar/utils/cache";
 import { beforeEach, describe, expect, it } from "vitest";
-import { selectBridgesForStrategy } from "./selectors";
+import { selectBridgesForStrategy, selectGreedily } from "./selectors";
 
 beforeEach(() => {
 	clearDateKeyCache();
@@ -91,15 +91,10 @@ describe("selectBridgesForStrategy", () => {
 		expect(balanced.days).toHaveLength(2);
 	});
 
-	it("presorted keeps the caller ordering instead of re-sorting", () => {
+	it("applies the strategy ordering, where selectGreedily keeps the caller's", () => {
 		const bridges = [bridgeA, bridgeC, bridgeB];
 		const resorted = selectBridgesForStrategy({ bridges, targetPtoDays: 2, strategy: FilterStrategy.GROUPED });
-		const kept = selectBridgesForStrategy({
-			bridges,
-			targetPtoDays: 2,
-			strategy: FilterStrategy.GROUPED,
-			presorted: true,
-		});
+		const kept = selectGreedily({ orderedBridges: bridges, targetPtoDays: 2 });
 		expect(resorted.bridges).toEqual([bridgeB]);
 		expect(kept.bridges).toEqual([bridgeA, bridgeC]);
 	});
@@ -165,15 +160,10 @@ describe("selectBridgesForStrategy, BALANCED", () => {
 		expect(jan6Count).toBe(1);
 	});
 
-	it("presorted keeps the caller ordering instead of re-scoring", () => {
+	it("re-scores, where selectGreedily takes the caller's order as given", () => {
 		const bridges = [bridgeB, bridgeA];
 		const rescored = selectBridgesForStrategy({ bridges, targetPtoDays: 2, strategy: FilterStrategy.BALANCED });
-		const kept = selectBridgesForStrategy({
-			bridges,
-			targetPtoDays: 2,
-			presorted: true,
-			strategy: FilterStrategy.BALANCED,
-		});
+		const kept = selectGreedily({ orderedBridges: bridges, targetPtoDays: 2 });
 		expect(rescored.days).toEqual(bridgeA.ptoDays);
 		expect(kept.days).toEqual(bridgeB.ptoDays);
 	});

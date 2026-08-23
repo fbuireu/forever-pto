@@ -126,13 +126,16 @@ describe("getLongBlocksPerQuarter", () => {
 		).toEqual([0, 0, 0, 0]);
 	});
 
-	it("ignores holidays when no PTO day is placed", () => {
-		expect(
-			getLongBlocksPerQuarter({
-				streaks: freeStreaks({ placedDays: [], holidays: [makeHoliday(makeDate(2025, 1, 6))] }),
-				window: WINDOW,
-			}),
-		).toEqual([0, 0, 0, 0]);
+	it("does not count a run of Free Days the plan placed nothing in, and agrees with Long Weekends", () => {
+		const streaks = freeStreaks({
+			placedDays: [makeDate(2025, 6, 10)],
+			holidays: [makeHoliday(makeDate(2025, 1, 3))],
+		});
+		const unpaid = streaks.filter((streak) => !streak.hasPlacedDay && streak.length >= 3);
+
+		expect(unpaid).toHaveLength(1);
+		expect(calculateLongWeekends(streaks)).toBe(0);
+		expect(getLongBlocksPerQuarter({ streaks, window: WINDOW })).toEqual([0, 0, 0, 0]);
 	});
 });
 

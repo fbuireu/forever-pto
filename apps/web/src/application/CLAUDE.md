@@ -90,6 +90,15 @@ Two consequences worth holding on to:
   entries already in the map. The map gained `'MMM'` and `'EE, MMM d'`, which is all the six needed, and the
   caches are gone. A caller wanting a new combination adds a row here rather than a sixth cache.
 
+  **That sentence was untrue in its own file for a while.** `getWeekdayNames` kept a sixth cache one screen
+  below `formatDate`, and its options duplicated two rows of the very map that replaced the other five —
+  `EEEE` and `EE` were already there, and only `narrow` was genuinely new. It is a row now (`EEEEE`), and
+  `getWeekdayNames` is a caller of `formatDate` through the private `WEEKDAY_FORMAT` map, which is the only
+  thing that translates its public `'narrow' | 'short' | 'long'` into a pattern. The whitelist and the
+  memoisation had no test at all until then: the single `formatDate` case asked for `'yyyy-MM-dd'`, which
+  returns before either is reached. Both are pinned now, the cache by counting `Intl.DateTimeFormat`
+  constructions through a passthrough spy.
+
 Weekday numbers are ISO throughout: `Temporal.PlainDate`'s `dayOfWeek` runs 1 (Monday) to 7 (Sunday), which
 is why `isWeekend` tests for 6 and 7. The `weekStartsOn` option is the date-fns convention instead — 0 for
 Sunday through 6 for Saturday — so `startOfWeek` and `endOfWeek` normalise it with

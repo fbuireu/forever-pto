@@ -2,9 +2,10 @@ import { describe, expect, it } from "vitest";
 import { fromStoredInstant, fromUpstreamCalendarDay } from "./dateIntake";
 
 describe("fromStoredInstant", () => {
-	it("passes a Date through untouched, because the instant is the thing being round-tripped", () => {
-		const date = new Date(2024, 0, 1);
-		expect(fromStoredInstant(date)).toBe(date);
+	it("round-trips the instant this app wrote, to the millisecond", () => {
+		const date = new Date(2024, 0, 1, 13, 47, 9, 512);
+
+		expect(fromStoredInstant(date.toISOString()).getTime()).toBe(date.getTime());
 	});
 
 	it("revives an ISO string this app wrote", () => {

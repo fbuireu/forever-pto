@@ -215,8 +215,22 @@ deliberately the same act, and `toggleDaySelection` called `fromStoredInstant` o
 signature types `Date`.
 
 The answer is that a stored date is always a `Date` by the time an action runs: `onRehydrateStorage` maps
-`state.holidays` through `fromStoredInstant` before anything can read it. So the coercions were decoration,
-and they are gone.
+`state.holidays` through `fromStoredInstant` before anything can read it. So the coercions were decoration.
+
+**Saying that did not make them go away, and for a while three survived the sentence that declared them
+dead.** `fetchHolidays` still wrapped `h.date`, `toggleDaySelection` still wrapped its own `Date` parameter,
+and `holidayDTO.createCustom` had a third the paragraph never mentioned, coercing `date` on one line while
+using it raw on the line above. Prose cannot enforce this; the signature can. `fromStoredInstant` takes a
+`string` now, not `Date | string`, so those three are compile errors rather than decoration, and the
+rehydration seam is its only caller in this layer.
+
+That narrowing needs the persisted shape to be honest about itself, which is the fix
+[`dto/CLAUDE.md`](../dto/CLAUDE.md) already named. Zustand types the `onRehydrateStorage` argument as the
+live store, where every date field is a `Date`, while what actually arrives is whatever `JSON.parse`
+produced — strings. `Stored<T>` in [`dateIntake.ts`](../shared/utils/dateIntake.ts) maps a shape's `Date`s to
+`string`s, and the callback casts **once**, to `Stored<PersistedHolidays>`, then reads from `stored` and
+writes back into `state`. One named cast at the seam that knows it is a seam, instead of a union that let
+every caller downstream pretend it might be either.
 
 `heldOn({ date, exceptHolidayIndex? })` answers `{ holiday?, manualDay }` — is this date taken, and by what.
 `addHoliday` asks without an index, `editHoliday` with its own (a Holiday cannot collide with itself, which

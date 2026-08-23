@@ -115,6 +115,7 @@ const INTL_FORMAT_MAP = {
 	"EEEE, MMMM d, yyyy": { weekday: "long", month: "long", day: "numeric", year: "numeric" },
 	EEEE: { weekday: "long" },
 	EE: { weekday: "short" },
+	EEEEE: { weekday: "narrow" },
 	d: { day: "numeric" },
 } satisfies Record<string, Intl.DateTimeFormatOptions>;
 
@@ -145,22 +146,23 @@ export const formatDate = ({ date, locale, format }: FormatDateParams): string =
 	return fmt.format(date);
 };
 
+const WEEKDAY_FORMAT = {
+	narrow: "EEEEE",
+	short: "EE",
+	long: "EEEE",
+} satisfies Record<string, DateFormat>;
+
 export interface GetWeekdayNamesParams {
 	locale: string;
 	weekStartsOn?: Day;
-	format?: "narrow" | "short" | "long";
+	format?: keyof typeof WEEKDAY_FORMAT;
 }
-
-const weekdayFmtCache = new Map<string, Intl.DateTimeFormat>();
 
 export const getWeekdayNames = ({ locale, weekStartsOn = 0, format = "short" }: GetWeekdayNamesParams): string[] => {
 	const anchor = new Date(2023, 0, 2);
 	const weekStart = startOfWeek(anchor, { weekStartsOn });
-	const key = `${locale}-${weekStartsOn}-${format}`;
-	let fmt = weekdayFmtCache.get(key);
-	if (!fmt) {
-		fmt = new Intl.DateTimeFormat(locale, { weekday: format });
-		weekdayFmtCache.set(key, fmt);
-	}
-	return Array.from({ length: 7 }, (_, i) => fmt.format(addDays(weekStart, i)));
+
+	return Array.from({ length: 7 }, (_, i) =>
+		formatDate({ date: addDays(weekStart, i), locale, format: WEEKDAY_FORMAT[format] }),
+	);
 };

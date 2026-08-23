@@ -24,7 +24,7 @@ export function generateSuggestions({ ptoDays, candidates, strategy }: GenerateS
 	const selection = selectBridgesForStrategy({ bridges, targetPtoDays: effectivePtoDays, strategy });
 
 	return {
-		days: selection.days.toSorted((a, b) => a.getTime() - b.getTime()),
+		days: selection.days,
 		bridges: selection.bridges,
 		strategy,
 	};

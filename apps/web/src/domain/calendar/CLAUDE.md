@@ -21,7 +21,7 @@ in [`CONTEXT.md`](../../../../../CONTEXT.md).
 | [`utils/selection.ts`](./utils/selection.ts) | `resolveSelectedDays` — folds Manual Days in and Removed Days out of a Suggestion's day list |
 | [`utils/budget.ts`](./utils/budget.ts) | `measureBudget` — how much of the PTO budget a plan has spent, and the Remaining Budget |
 | [`suggestions/generateSuggestions.ts`](./suggestions/generateSuggestions.ts) | The entry point: Workdays → Bridges → Strategy selector → Suggestion |
-| [`suggestions/utils/selectors.ts`](./suggestions/utils/selectors.ts) | `STRATEGY_ORDERING` — one `Ordering` per Strategy — plus `selectGreedily`, the single walk they all feed, and `selectBridgesForStrategy` which composes the two |
+| [`suggestions/utils/selectors.ts`](./suggestions/utils/selectors.ts) | `STRATEGY_ORDERING` — one `Ordering` per Strategy — plus `selectGreedily`, the single walk they all feed and the one owner of the chronological day order, and `selectBridgesForStrategy` which composes the two |
 | [`window.ts`](./window.ts) | `PlanningWindow`, `planningWindowMonths`, `MONTHS_IN_YEAR`, `MONTHS_IN_QUARTER` and `windowMonthCount`/`windowQuarterCount` |
 | [`pipeline.ts`](./pipeline.ts) | `runPlanningPipeline` — the whole run: caches, pseudo-Holidays, budget, the two planning calls and the Metrics |
 | [`alternatives/generateAlternatives.ts`](./alternatives/generateAlternatives.ts) | Re-runs selection under seven different Bridge orderings to produce distinct Alternatives |
@@ -61,7 +61,7 @@ calls them directly:
 
 - `generateSuggestions({ ptoDays, candidates, strategy })` → `{ days, bridges?, strategy }`
 - `generateAlternatives({ ptoDays, candidates, maxAlternatives, existingSuggestion, strategy })` → `Suggestion[]`
-- `generateMetrics({ suggestion, locale, year, bridges, holidays, allowPastDays, manuallySelectedDays, removedSuggestedDays, carryOverMonths? })` → `Metrics`
+- `generateMetrics({ suggestion, locale, planningWindow, holidays, allowPastDays, manuallySelectedDays, removedSuggestedDays })` → `Metrics`
 
 **`measureBudget` is the one place the budget arithmetic lives, and it is built on `resolveSelectedDays` so it
 cannot disagree with the Metrics.** It answers `{ suggested, manual, spent, remaining }` for a budget and a
@@ -105,8 +105,22 @@ the other, with no error and no way to see it. That is now unrepresentable. `ser
 [`window.test.ts`](./window.test.ts) pins that the expansion and `windowMonthCount` agree, which is the property the two
 constants made possible to break; verified by desyncing them.
 
-`generateMetrics` still takes `year` and `carryOverMonths` separately, because Max Work Streak and Worked
-Days per month are scoped to a single calendar year — see the trap below.
+`generateMetrics` takes the `PlanningWindow` whole. It used to take `year` and `carryOverMonths` separately,
+defended here on the grounds that Max Work Streak and Worked Days per month are scoped to a single calendar
+year — but that is an argument for reading `window.year` inside, not for letting a caller supply the two
+halves independently. `carryOverMonths` was still optional and still defaulted to `0`, which is the shape the
+two inputs beside it were made required to escape: omit it for a 15-month window and every bucketed metric is
+built at 12 months and 4 quarters, `windowMonthIndex` silently drops every Carry-over Month date, and nothing
+errors. Both production callers already had the window in hand.
+
+**It reads the Bridges off the Suggestion it was handed, and no longer takes them beside it.** The interface
+used to take a whole `Suggestion` *and* a separate `bridges` array, then read `days` from one and `bridges`
+from the other and never `suggestion.bridges`. Both production callers passed the same object's own field
+straight back in, and nothing stopped the two disagreeing: `bridgesUsed` and `totalEffectiveDays` could be
+measured against Bridges that did not belong to the days being measured, which is the precise pairing
+`getValidBridges` exists to keep together. One fixture in the test file was already built that way, a
+`suggestion` with no `bridges` beside a top-level `bridges`. That fixture no longer compiles, which is the
+point.
 
 ## The pipeline, in order
 
@@ -145,9 +159,24 @@ It then partitions that order so high-value Bridges come first, which is what st
 Bridges squeezing out a long block — [`selectors.test.ts`](./suggestions/utils/selectors.test.ts) pins that with three 6-effective single-day Bridges
 that outscore a 3-day/9-effective block and lose to it anyway.
 
+**The scoring bonus and the high-value partition test the same shape and then part company, on purpose.**
+Both ask `isBlockShaped` — several PTO Days spent for a long enough stretch, the two `HIGH_VALUE_THRESHOLD_*`
+tunables. `isHighValue`, which drives the partition, adds `efficiency >= EFFICIENCY.ACCEPTABLE` on top; the
+bonus does not, so a long Bridge the partition skips is still lifted by the multiplier. That is what
+`selectors.test.ts`'s "bonuses a long 2.4-efficiency bridge the high-value pass skips" case is for, and
+folding the efficiency floor into `isBlockShaped` turns it red. The conjunction was spelled out twice, in
+`isHighValue` and in `scoreOf`, which read as a copy rather than as a shared premise with one extra clause.
+
 **A Strategy is an `Ordering`, and the greedy walk is written once.** `STRATEGY_ORDERING` maps each
 `FilterStrategy` to a `(bridges: Bridge[]) => Bridge[]`; `selectGreedily` walks whatever it is given, taking
 any Bridge that fits the remaining budget and reuses no date. That is the whole of selection.
+
+**`selectGreedily` returns its days chronologically, and it is the only place that promises it.** The walk
+takes Bridges in Strategy order, so the days it flattens out of them are not, and it sorts once before
+returning. Both generators used to re-sort what it handed back — `generateAlternatives` twice, the second
+time inside a trailing `map` that rebuilt each `Suggestion` out of the three fields it already had. All of
+that was inert. A caller that sorts the result again is not being careful, it is hiding where the guarantee
+lives; `selectors.test.ts` pins it, and the two generator suites pin that it survives the trip out.
 
 It was three dispatch sites over two functions: a lookup table in `generateSuggestions`, a `switch` in
 `selectors.ts` whose `default` *was* the BALANCED branch, and a ternary in `generateAlternatives`. A fourth
@@ -204,7 +233,8 @@ a predicate over an array the caller already holds, and costs no scan at all.
 `freeStreaks` builds the placed-day set, unions it with the Holidays, expands seven days either side of the data and yields each unbroken run of Free
 Days with two facts attached: whether it contains a day the plan placed, and whether it contains a weekend.
 Longest Vacation, Long Weekends and Long Blocks are then predicates over that sequence — `hasPlacedDay`,
-`length >= 3 && hasWeekend && hasPlacedDay`, and `length >= 3` anchored on the first day inside the window.
+`length >= 3 && hasWeekend && hasPlacedDay`, and `length >= 3 && hasPlacedDay` anchored on the first day
+inside the window.
 
 Each used to own its copy: three near-identical loops and five separate constructions of the same
 "placed days ∪ Holidays" set. That is how the placed-day rule below came to be applied by one and not the
@@ -223,13 +253,19 @@ on `Date.getTime()` and distinguishes noon from midnight, which is right for the
 wrong here, where a Holiday carrying a time component still has to line up with a placed day at local
 midnight. Two conventions, both correct, and conflating them is the failure mode to watch for.
 
-**`calculateLongWeekends` and `calculateLongestVacation` both apply it, and for a while only the first did.**
+**All three streak metrics apply it, and for a while only `calculateLongWeekends` did.**
 Longest Vacation folded every free run into its maximum as the streak grew, so it reported whatever the
 longest holiday-and-weekend run in the two-year set happened to be — including one lying entirely in
 `year + 1`, on which the plan spends nothing. A Catalan 2026 plan placing a single July day reported a
 Longest Vacation of 4, from Good Friday to Easter Monday 2027. It now tracks whether the current streak has
 touched a placed day and folds the streak in only on close, which is also why the final streak has to be
 closed after the loop rather than inside it.
+
+`getLongBlocksPerQuarter` was the last to get it, and the test that was supposed to pin the rule could not
+fail: it passed `placedDays: []`, which `freeStreaks` short-circuits to `[]` before any predicate runs, so
+it exercised the empty-plan guard instead. A Holiday falling on a Friday counted as a Long Block the plan
+never paid for, while `calculateLongWeekends` — same streak, same window — answered zero. The replacement
+case places a PTO Day far away from the Holiday, so the unpaid run genuinely reaches the predicate.
 
 **The distributions are bucketed by the Planning Window, not the calendar year.** `getMonthlyDist`,
 `calculateQuarterDistribution` and `getLongBlocksPerQuarter` all take the window and size themselves from
@@ -283,25 +319,25 @@ inert (both selectors add a Bridge only when its PTO Days are unused, so a selec
 distinct available Workdays) and giving it to `generateAlternatives` for symmetry would be a behaviour change
 wearing a tidy-up's clothes.
 
-**`presorted` is load-bearing, and it now means what it says.** `selectBridgesForStrategy` applies the
-Strategy's `Ordering` unless the caller sets `presorted: true`.
+**`generateAlternatives` calls `selectGreedily`, not `selectBridgesForStrategy`, and there is no `presorted`
+flag.** The two functions are the seam: `selectBridgesForStrategy` = "order by this Strategy, then walk",
+`selectGreedily` = "walk exactly this array". A generator that already holds the order it wants asks for the
+walk directly.
 
-**That is a behaviour change for BALANCED Alternatives, and it is deliberate.** The flag used to skip only
-the scoring sort; the high-value partition ran regardless, inside the selector. So `generateAlternatives`
-supplied a diverse ordering for BALANCED and had it partly reordered underneath — the opposite of what the
-flag exists for, and it reduced the distinctness those Alternatives are generated to produce. The ordering
-is respected whole now. The set of BALANCED Alternatives a user sees shifts as a result; none of them
-becomes wrong. `generateAlternatives` exists to impose its own
-orderings, so without the flag every ordering would collapse back to the same greedy result and all seven
-"alternatives" would be identical.
+There used to be a `presorted?: boolean` on `selectBridgesForStrategy`, whose only `true` caller was
+`generateAlternatives`. It computed `STRATEGY_ORDERING[strategy]` and then threw the result away, so two
+parameters described four states and two of them meant nothing. Passing an `Ordering` in place of the boolean
+does not work either and should not be re-proposed: past the seventh comparator `generateAlternatives`
+**rotates** an already-sorted array rather than sorting again, and a rotation is not expressible as a
+comparator. Calling the export that does the walk says the same thing with no parameter at all.
 
-It is a precondition the callee cannot check, which normally argues for taking the *ordering* instead of a
-claim about it — and that does not work here, so do not re-propose it. Past the seventh comparator
-`generateAlternatives` **rotates** an already-sorted array rather than sorting again, and a rotation is not
-expressible as a comparator: `presorted: true` is the only way to say "walk exactly this array". The
-alternatives are a branded ordered-array type, which buys type safety at the cost of ceremony on the hottest
-path in the engine, or a renamed flag, which is the same boolean wearing better clothes. The flag has one
-caller and [`generateAlternatives.test.ts`](./alternatives/generateAlternatives.test.ts) pins the distinctness it protects.
+**The Alternatives ignore the Strategy for ordering, and stamp it on the result.** Each Alternative carries
+`strategy` because it *is* a Suggestion and applying it makes it the Suggestion — but its day set comes from
+the diversity comparators alone, so GROUPED and BALANCED Alternatives over the same inputs are the same sets
+under different labels. [`generateAlternatives.test.ts`](./alternatives/generateAlternatives.test.ts) pins
+exactly that. Routing them back through the Strategy's `Ordering` collapses all seven comparators onto one
+greedy result and the distinct Alternatives disappear — which is what makes that test red rather than merely
+different.
 
 **The seventh Alternative ordering sorts on `Math.sin` on purpose.** Six of the comparators in
 `generateAlternatives.ts` bias selection along a real axis — Efficiency, span, PTO cost, month, and

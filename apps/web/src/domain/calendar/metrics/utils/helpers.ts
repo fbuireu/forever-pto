@@ -44,7 +44,7 @@ export function getLongBlocksPerQuarter({ streaks, window }: GetLongBlocksPerQua
 	const longBlocksPerQuarter = new Array(windowQuarterCount(window)).fill(0);
 
 	for (const streak of streaks) {
-		if (streak.length < PTO_CONSTANTS.METRICS.LONG_BLOCK_MINIMUM_DAYS) continue;
+		if (streak.length < PTO_CONSTANTS.METRICS.LONG_BLOCK_MINIMUM_DAYS || !streak.hasPlacedDay) continue;
 
 		const start = streak.days.find((day) => windowMonthIndex(day, window) >= 0);
 		if (start === undefined) continue;

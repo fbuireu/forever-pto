@@ -192,7 +192,7 @@ describe("worker onmessage", () => {
 
 	it("scopes the metrics to the requested year, not the 2025 the mocked suggestion would infer", () => {
 		sendMessage({ year: 2026 });
-		expect(mockGenerateMetrics.mock.lastCall?.[0].year).toBe(2026);
+		expect(mockGenerateMetrics.mock.lastCall?.[0].planningWindow.year).toBe(2026);
 	});
 
 	it("short-circuits when the only blocked dates are Removed Days", () => {

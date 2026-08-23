@@ -21,7 +21,7 @@ describe("generateMetrics", () => {
 		const result = generateMetrics({
 			suggestion: { days: [] },
 			locale: LOCALE,
-			year: YEAR,
+			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
 			allowPastDays: true,
 			manuallySelectedDays: [],
@@ -46,7 +46,7 @@ describe("generateMetrics", () => {
 		const result = generateMetrics({
 			suggestion: { days: [makeDate(2025, 1, 6)], strategy: FilterStrategy.GROUPED },
 			locale: LOCALE,
-			year: YEAR,
+			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
 			allowPastDays: true,
 			manuallySelectedDays: [],
@@ -62,7 +62,7 @@ describe("generateMetrics", () => {
 		const result = generateMetrics({
 			suggestion: { days: [makeDate(2025, 1, 6), makeDate(2025, 1, 7)] },
 			locale: LOCALE,
-			year: YEAR,
+			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
 			allowPastDays: true,
 			manuallySelectedDays: [],
@@ -76,7 +76,7 @@ describe("generateMetrics", () => {
 		const result = generateMetrics({
 			suggestion: { days: [makeDate(2025, 1, 6), makeDate(2025, 3, 10)] },
 			locale: LOCALE,
-			year: YEAR,
+			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
 			allowPastDays: true,
 			manuallySelectedDays: [],
@@ -99,8 +99,7 @@ describe("generateMetrics", () => {
 		const result = generateMetrics({
 			suggestion: { days: [makeDate(2025, 1, 6)], bridges: [bridge] },
 			locale: LOCALE,
-			year: YEAR,
-			bridges: [bridge],
+			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
 			allowPastDays: true,
 			manuallySelectedDays: [],
@@ -116,7 +115,7 @@ describe("generateMetrics", () => {
 		const result = generateMetrics({
 			suggestion: { days: [makeDate(2025, 1, 6)] },
 			locale: LOCALE,
-			year: YEAR,
+			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
 			allowPastDays: true,
 			manuallySelectedDays: [makeDate(2025, 1, 7)],
@@ -129,7 +128,7 @@ describe("generateMetrics", () => {
 		const result = generateMetrics({
 			suggestion: { days: [makeDate(2025, 1, 6), makeDate(2025, 1, 7)] },
 			locale: LOCALE,
-			year: YEAR,
+			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
 			allowPastDays: true,
 			removedSuggestedDays: [makeDate(2025, 1, 6)],
@@ -142,7 +141,7 @@ describe("generateMetrics", () => {
 		const result = generateMetrics({
 			suggestion: { days: [makeDate(2025, 1, 3), makeDate(2025, 1, 6)] },
 			locale: LOCALE,
-			year: YEAR,
+			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
 			allowPastDays: true,
 			manuallySelectedDays: [],
@@ -155,7 +154,7 @@ describe("generateMetrics", () => {
 		const result = generateMetrics({
 			suggestion: { days: [makeDate(2025, 1, 8), makeDate(2025, 1, 9)] },
 			locale: LOCALE,
-			year: YEAR,
+			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [makeHoliday(makeDate(2025, 1, 10))],
 			allowPastDays: true,
 			manuallySelectedDays: [],
@@ -172,8 +171,18 @@ describe("generateMetrics", () => {
 			holidays: [],
 			allowPastDays: true,
 		};
-		const planned = generateMetrics({ ...params, year: 2025, manuallySelectedDays: [], removedSuggestedDays: [] });
-		const inferred = generateMetrics({ ...params, year: 2026, manuallySelectedDays: [], removedSuggestedDays: [] });
+		const planned = generateMetrics({
+			...params,
+			planningWindow: { year: 2025, carryOverMonths: 0 },
+			manuallySelectedDays: [],
+			removedSuggestedDays: [],
+		});
+		const inferred = generateMetrics({
+			...params,
+			planningWindow: { year: 2026, carryOverMonths: 0 },
+			manuallySelectedDays: [],
+			removedSuggestedDays: [],
+		});
 
 		expect(planned.workedDaysPerMonth).toBe(21.8);
 		expect(inferred.workedDaysPerMonth).toBe(21.7);
@@ -185,7 +194,7 @@ describe("generateMetrics", () => {
 		const result = generateMetrics({
 			suggestion: { days: [makeDate(2025, 1, 6)] },
 			locale: LOCALE,
-			year: YEAR,
+			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
 			allowPastDays: true,
 			removedSuggestedDays: [makeDate(2025, 1, 6)],
@@ -218,10 +227,9 @@ describe("generateMetrics", () => {
 		];
 
 		const result = generateMetrics({
-			suggestion: { days: [kept, ...dropped] },
+			suggestion: { days: [kept, ...dropped], bridges },
 			locale: LOCALE,
-			year: YEAR,
-			bridges,
+			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
 			allowPastDays: true,
 			removedSuggestedDays: [dropped[0] as Date],

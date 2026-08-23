@@ -1,7 +1,7 @@
 import { holidayDTO, isInPlanningWindow } from "@application/dto/holiday/dto";
 import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
 import { logClient, logClientError } from "@application/shared/utils/clientLog";
-import { fromStoredInstant } from "@application/shared/utils/dateIntake";
+import { fromStoredInstant, type Stored } from "@application/shared/utils/dateIntake";
 import { isSameDay, isWeekend } from "@application/shared/utils/dates";
 import { generateMetrics } from "@domain/calendar/metrics/generateMetrics";
 import type { MeasuredSuggestion, Suggestion } from "@domain/calendar/types";
@@ -95,6 +95,8 @@ const holidaysInitialState: HolidaysState = {
 	planRevision: 0,
 };
 
+export type PersistedHolidays = ReturnType<typeof partializeHolidays>;
+
 const partializeHolidays = (state: HolidaysStore) => ({
 	holidays: state.holidays,
 	suggestion: state.suggestion,
@@ -119,7 +121,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 						.map((h) => ({
 							...h,
 							isInSelectedRange: isInPlanningWindow({
-								date: fromStoredInstant(h.date),
+								date: h.date,
 								year: params.year,
 								carryOverMonths: params.carryOverMonths,
 							}),
@@ -398,21 +400,18 @@ export const useHolidaysStore = create<HolidaysStore>()(
 							return { applied: false, reason: DayRefusal.BUDGET_EXHAUSTED };
 						}
 
-						updatedManualDays = [...manuallySelectedDays, fromStoredInstant(date)].toSorted(
-							(a, b) => a.getTime() - b.getTime(),
-						);
+						updatedManualDays = [...manuallySelectedDays, date].toSorted((a, b) => a.getTime() - b.getTime());
 					}
 
+					const { year, carryOverMonths } = useFiltersStore.getState();
 					const updatedMetrics = generateMetrics({
 						suggestion: currentSelection,
 						locale,
-						year: useFiltersStore.getState().year,
-						bridges: currentSelection.bridges,
+						planningWindow: { year, carryOverMonths },
 						holidays,
 						allowPastDays,
 						manuallySelectedDays: updatedManualDays,
 						removedSuggestedDays: updatedRemovedDays,
-						carryOverMonths: useFiltersStore.getState().carryOverMonths,
 					});
 
 					set({
@@ -503,12 +502,15 @@ export const useHolidaysStore = create<HolidaysStore>()(
 					}
 
 					if (state) {
-						const reviveSuggestion = (s: Suggestion | null): MeasuredSuggestion | null => {
+						const stored = state as unknown as Stored<PersistedHolidays>;
+
+						const reviveSuggestion = (s: Stored<Suggestion> | null): MeasuredSuggestion | null => {
 							if (!s?.metrics) return null;
 
 							return {
 								...s,
 								metrics: s.metrics,
+								strategy: s.strategy,
 								days: s.days.map(fromStoredInstant),
 								bridges: s.bridges?.map((b) => ({
 									...b,
@@ -519,33 +521,33 @@ export const useHolidaysStore = create<HolidaysStore>()(
 							};
 						};
 
-						if (state.holidays) {
-							state.holidays = state.holidays.map((h) => ({
+						if (stored.holidays) {
+							state.holidays = stored.holidays.map((h) => ({
 								...h,
 								date: fromStoredInstant(h.date),
 							}));
 						}
 
-						if (state.suggestion) {
-							state.suggestion = reviveSuggestion(state.suggestion);
+						if (stored.suggestion) {
+							state.suggestion = reviveSuggestion(stored.suggestion);
 						}
 
-						if (state.alternatives) {
-							state.alternatives = state.alternatives
+						if (stored.alternatives) {
+							state.alternatives = stored.alternatives
 								.map(reviveSuggestion)
 								.filter((alt): alt is MeasuredSuggestion => alt !== null);
 						}
 
-						if (state.currentSelection) {
-							state.currentSelection = reviveSuggestion(state.currentSelection);
+						if (stored.currentSelection) {
+							state.currentSelection = reviveSuggestion(stored.currentSelection);
 						}
 
-						if (state.manuallySelectedDays) {
-							state.manuallySelectedDays = state.manuallySelectedDays.map(fromStoredInstant);
+						if (stored.manuallySelectedDays) {
+							state.manuallySelectedDays = stored.manuallySelectedDays.map(fromStoredInstant);
 						}
 
-						if (state.removedSuggestedDays) {
-							state.removedSuggestedDays = state.removedSuggestedDays.map(fromStoredInstant);
+						if (stored.removedSuggestedDays) {
+							state.removedSuggestedDays = stored.removedSuggestedDays.map(fromStoredInstant);
 						}
 
 						if (state.currentSelectionIndex > (state.alternatives?.length ?? 0)) {

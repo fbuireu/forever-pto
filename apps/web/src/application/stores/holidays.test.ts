@@ -624,7 +624,7 @@ describe("toggleDaySelection", () => {
 			removedSuggestedDays: [],
 		});
 		useHolidaysStore.getState().toggleDaySelection({ date: baseDate, ...PARAMS });
-		expect(vi.mocked(generateMetrics).mock.lastCall?.[0].year).toBe(2029);
+		expect(vi.mocked(generateMetrics).mock.lastCall?.[0].planningWindow.year).toBe(2029);
 	});
 
 	it("returns false and does not add a day when no remaining budget", () => {
@@ -1102,7 +1102,7 @@ describe("generateSuggestions agrees with the worker", () => {
 
 		await useHolidaysStore.getState().generateSuggestions(PARAMS);
 
-		expect(vi.mocked(generateMetrics).mock.calls[0][0].year).toBe(2026);
+		expect(vi.mocked(generateMetrics).mock.calls[0][0].planningWindow.year).toBe(2026);
 	});
 
 	it("clears the plan without running the engine when only removed days block the calendar", async () => {
@@ -1176,7 +1176,7 @@ describe("every Metrics writer measures against the same Planning Window", () =>
 		});
 
 		const [args] = vi.mocked(generateMetrics).mock.lastCall ?? [];
-		expect(args?.carryOverMonths).toBe(2);
+		expect(args?.planningWindow.carryOverMonths).toBe(2);
 	});
 
 	it("the store pipeline forwards it to every Alternative too", async () => {
@@ -1196,6 +1196,6 @@ describe("every Metrics writer measures against the same Planning Window", () =>
 
 		const calls = vi.mocked(generateMetrics).mock.calls;
 		expect(calls.length).toBeGreaterThan(0);
-		for (const [args] of calls) expect(args.carryOverMonths).toBe(2);
+		for (const [args] of calls) expect(args.planningWindow.carryOverMonths).toBe(2);
 	});
 });

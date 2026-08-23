@@ -9,7 +9,7 @@ import { handlePaymentSucceeded } from "./paymentSucceeded";
 
 vi.mock("@infrastructure/services/payments/repository", () => ({
 	getPaymentById: vi.fn(() => Effect.succeed({ id: "pi_test", status: "pending" })),
-	updatePaymentStatus: vi.fn(() => Effect.succeed(undefined)),
+	updatePaymentStatus: vi.fn(() => Effect.succeed(true)),
 	updatePaymentCharge: vi.fn(() => Effect.succeed(undefined)),
 }));
 
@@ -72,11 +72,11 @@ describe("handlePaymentSucceeded", () => {
 		expect(updatePaymentStatus).toHaveBeenCalledWith("pi_test", "succeeded");
 	});
 
-	it("does not call updatePaymentStatus when existing payment is already succeeded", async () => {
+	it("still calls updatePaymentStatus for an already-succeeded row — the WHERE clause is the guard", async () => {
 		const { getPaymentById, updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
 		vi.mocked(getPaymentById).mockReturnValueOnce(Effect.succeed({ id: "pi_test", status: "succeeded" } as never));
 		await run(handlePaymentSucceeded(EVENT));
-		expect(updatePaymentStatus).not.toHaveBeenCalled();
+		expect(updatePaymentStatus).toHaveBeenCalledExactlyOnceWith("pi_test", "succeeded");
 	});
 
 	it("calls retrieveCharge and updatePaymentCharge when latestChargeId is present", async () => {

@@ -10,7 +10,6 @@ interface SelectBridgesForStrategyParams {
 	bridges: Bridge[];
 	targetPtoDays: number;
 	strategy: FilterStrategy;
-	presorted?: boolean;
 }
 
 const compareGrouped = (a: Bridge, b: Bridge) => {
@@ -20,29 +19,23 @@ const compareGrouped = (a: Bridge, b: Bridge) => {
 	return b.efficiency - a.efficiency;
 };
 
-const isHighValue = (bridge: Bridge) => {
+const isBlockShaped = (bridge: Bridge) => {
 	const {
-		EFFICIENCY: { ACCEPTABLE },
 		SELECTION_WEIGHTS: { HIGH_VALUE_THRESHOLD_EFFECTIVE, HIGH_VALUE_THRESHOLD_DAYS },
 	} = PTO_CONSTANTS;
 
-	return (
-		bridge.ptoDaysNeeded >= HIGH_VALUE_THRESHOLD_DAYS &&
-		bridge.effectiveDays >= HIGH_VALUE_THRESHOLD_EFFECTIVE &&
-		bridge.efficiency >= ACCEPTABLE
-	);
+	return bridge.ptoDaysNeeded >= HIGH_VALUE_THRESHOLD_DAYS && bridge.effectiveDays >= HIGH_VALUE_THRESHOLD_EFFECTIVE;
 };
+
+const isHighValue = (bridge: Bridge) =>
+	isBlockShaped(bridge) && bridge.efficiency >= PTO_CONSTANTS.EFFICIENCY.ACCEPTABLE;
 
 const scoreOf = (bridge: Bridge) => {
 	const {
 		SCORING: { BASE_SCORE, MULTI_DAY_BONUS, EFFICIENCY, TOTAL_VALUE, VALUE_DIVISOR },
-		SELECTION_WEIGHTS: { HIGH_VALUE_THRESHOLD_EFFECTIVE, HIGH_VALUE_THRESHOLD_DAYS },
 	} = PTO_CONSTANTS;
 
-	const multiDayBonus =
-		bridge.ptoDaysNeeded >= HIGH_VALUE_THRESHOLD_DAYS && bridge.effectiveDays >= HIGH_VALUE_THRESHOLD_EFFECTIVE
-			? MULTI_DAY_BONUS
-			: BASE_SCORE;
+	const multiDayBonus = isBlockShaped(bridge) ? MULTI_DAY_BONUS : BASE_SCORE;
 
 	return (bridge.efficiency * EFFICIENCY + (bridge.effectiveDays / VALUE_DIVISOR) * TOTAL_VALUE) * multiDayBonus;
 };
@@ -90,13 +83,8 @@ export const selectGreedily = ({ orderedBridges, targetPtoDays }: SelectGreedily
 	};
 };
 
-export const selectBridgesForStrategy = ({
-	bridges,
-	targetPtoDays,
-	strategy,
-	presorted = false,
-}: SelectBridgesForStrategyParams) => {
+export const selectBridgesForStrategy = ({ bridges, targetPtoDays, strategy }: SelectBridgesForStrategyParams) => {
 	const order = STRATEGY_ORDERING[strategy] ?? STRATEGY_ORDERING[FilterStrategy.GROUPED];
 
-	return selectGreedily({ orderedBridges: presorted ? bridges : order(bridges), targetPtoDays });
+	return selectGreedily({ orderedBridges: order(bridges), targetPtoDays });
 };

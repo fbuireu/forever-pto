@@ -84,11 +84,23 @@ describe("generateSuggestions", () => {
 		expect(result.strategy).toBe(FilterStrategy.OPTIMIZED);
 	});
 
-	it("returns days sorted chronologically", () => {
-		const result = planSuggestions({ ...BASE, ptoDays: 5, strategy: FilterStrategy.GROUPED });
+	it("returns days sorted chronologically even where the Strategy picks a later Bridge first", () => {
+		const months = Array.from({ length: 12 }, (_, index) => makeDate(2025, index + 1, 1));
+		const holidays = [makeDate(2025, 1, 1), makeDate(2025, 5, 1), makeDate(2025, 12, 25)].map(makeHoliday);
+		const result = planSuggestions({
+			...BASE,
+			months,
+			holidays,
+			ptoDays: 10,
+			strategy: FilterStrategy.GROUPED,
+		});
+		const bridgeOrder = (result.bridges ?? []).flatMap((bridge) => bridge.ptoDays);
+
+		expect(result.days).toHaveLength(10);
 		for (let i = 1; i < result.days.length; i++) {
 			expect(result.days[i - 1].getTime()).toBeLessThanOrEqual(result.days[i].getTime());
 		}
+		expect(bridgeOrder.map((day) => day.getTime())).not.toEqual(result.days.map((day) => day.getTime()));
 	});
 
 	it("never suggests a day that is already a holiday", () => {
@@ -164,7 +176,7 @@ describe("generateSuggestions", () => {
 			},
 		);
 
-		it("plans an unknown strategy as GROUPED, in the suggestion and in the alternatives alike", () => {
+		it("plans an unknown strategy as GROUPED", () => {
 			const unknown = planSuggestions({ ...BASE, ptoDays: 3, strategy: "unknown" as FilterStrategy });
 			const grouped = planSuggestions({ ...BASE, ptoDays: 3, strategy: FilterStrategy.GROUPED });
 

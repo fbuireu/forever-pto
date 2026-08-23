@@ -58,13 +58,11 @@ export function runPlanningPipeline({
 		metrics: generateMetrics({
 			suggestion,
 			locale,
-			year: window.year,
-			bridges: suggestion.bridges,
+			planningWindow: window,
 			holidays: holidaysWithManual,
 			allowPastDays,
 			manuallySelectedDays,
 			removedSuggestedDays,
-			carryOverMonths: window.carryOverMonths,
 		}),
 	});
 

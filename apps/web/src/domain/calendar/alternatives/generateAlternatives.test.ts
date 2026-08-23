@@ -134,18 +134,28 @@ describe("generateAlternatives", () => {
 		expect(keys.length).toBe(new Set(keys).size);
 	});
 
-	it("each alternative has days sorted chronologically", () => {
+	it("each alternative has days sorted chronologically even where its comparator picks a later Bridge first", () => {
 		const result = planAlternatives({
 			...BASE,
-			ptoDays: 5,
+			months: Array.from({ length: 12 }, (_, index) => makeDate(2025, index + 1, 1)),
+			holidays: [makeDate(2025, 1, 1), makeDate(2025, 5, 1), makeDate(2025, 12, 25)].map(makeHoliday),
+			ptoDays: 10,
 			maxAlternatives: 3,
-			existingSuggestion: [makeDate(2025, 1, 6)],
+			existingSuggestion: [makeDate(2025, 1, 3)],
 		});
+
+		expect(result).toHaveLength(3);
 		for (const alt of result) {
 			for (let i = 1; i < alt.days.length; i++) {
 				expect(alt.days[i - 1].getTime()).toBeLessThanOrEqual(alt.days[i].getTime());
 			}
 		}
+		expect(
+			result.some((alt) => {
+				const bridgeOrder = (alt.bridges ?? []).flatMap((bridge) => bridge.ptoDays);
+				return bridgeOrder.map((day) => day.getTime()).join() !== alt.days.map((day) => day.getTime()).join();
+			}),
+		).toBe(true);
 	});
 
 	it("never places a Removed Day and does not let it lengthen a neighbouring bridge", () => {
@@ -168,15 +178,25 @@ describe("generateAlternatives", () => {
 		}
 	});
 
-	it("works with BALANCED strategy", () => {
-		const result = planAlternatives({
+	it("stamps the Strategy on every Alternative but orders by the diversity comparators, not by it", () => {
+		const shared = {
 			...BASE,
-			strategy: FilterStrategy.BALANCED,
-			ptoDays: 3,
-			maxAlternatives: 2,
-			existingSuggestion: [makeDate(2025, 1, 6)],
-		});
-		expect(Array.isArray(result)).toBe(true);
+			months: Array.from({ length: 12 }, (_, index) => makeDate(2025, index + 1, 1)),
+			holidays: [makeDate(2025, 1, 1), makeDate(2025, 5, 1), makeDate(2025, 12, 25)].map(makeHoliday),
+			ptoDays: 10,
+			maxAlternatives: 4,
+			existingSuggestion: [makeDate(2025, 1, 3)],
+		};
+		const daySets = (result: ReturnType<typeof planAlternatives>) =>
+			result.map((alt) => alt.days.map((day) => day.toDateString()).join(","));
+
+		const balanced = planAlternatives({ ...shared, strategy: FilterStrategy.BALANCED });
+		const grouped = planAlternatives({ ...shared, strategy: FilterStrategy.GROUPED });
+
+		expect(balanced).toHaveLength(4);
+		expect(balanced.map((alt) => alt.strategy)).toEqual(new Array(4).fill(FilterStrategy.BALANCED));
+		expect(daySets(balanced)).toEqual(daySets(grouped));
+		expect(new Set(daySets(balanced)).size).toBe(4);
 	});
 
 	it("returns no alternatives when no workdays are available (past months, allowPastDays=false)", () => {

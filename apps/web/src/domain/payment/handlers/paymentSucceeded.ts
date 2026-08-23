@@ -5,7 +5,7 @@ import type { DatabaseError } from "@infrastructure/errors";
 import { retrieveCharge } from "@infrastructure/services/payments/provider/charge";
 import { getPaymentById, updatePaymentCharge, updatePaymentStatus } from "@infrastructure/services/payments/repository";
 import { Effect } from "effect";
-import { PAYMENT_SUCCEEDED, type PaymentSucceededEvent } from "../events/types";
+import type { PaymentSucceededEvent } from "../events/types";
 
 const updateCharge = (
 	event: PaymentSucceededEvent,
@@ -71,9 +71,7 @@ export const handlePaymentSucceeded = (
 			return;
 		}
 
-		if (existing.status !== PAYMENT_SUCCEEDED) {
-			yield* updatePaymentStatus(event.paymentId, event.status);
-		}
+		yield* updatePaymentStatus(event.paymentId, event.status);
 
 		yield* updateCharge(event);
 	});

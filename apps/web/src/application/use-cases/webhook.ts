@@ -18,7 +18,7 @@ export const processWebhookEvent = (
 
 		switch (event.type) {
 			case "payment_intent.succeeded": {
-				const paymentIntent = event.data.object as Stripe.PaymentIntent;
+				const paymentIntent = event.data.object;
 				logger.info("Processing payment_intent.succeeded", {
 					paymentIntentId: paymentIntent.id,
 					status: paymentIntent.status,
@@ -65,7 +65,7 @@ export const processWebhookEvent = (
 				break;
 			}
 			case "payment_intent.payment_failed": {
-				const paymentEvent = createPaymentFailedEvent(event.data.object as Stripe.PaymentIntent);
+				const paymentEvent = createPaymentFailedEvent(event.data.object);
 				yield* handlePaymentFailed(paymentEvent);
 				break;
 			}

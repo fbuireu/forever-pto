@@ -1,7 +1,7 @@
 import type { RegionDTO } from "@application/dto/region/types";
 import { getRegionName } from "@application/dto/region/utils/helpers";
 import type { BaseDTO } from "@application/shared/dto/baseDTO";
-import { fromStoredInstant, fromUpstreamCalendarDay } from "@application/shared/utils/dateIntake";
+import { fromUpstreamCalendarDay } from "@application/shared/utils/dateIntake";
 import {
 	addMonths,
 	compareAsc,
@@ -74,7 +74,7 @@ export const holidayDTO: HolidayDTOShape = {
 	createCustom: ({ name, date, year, carryOverMonths }: CreateCustomHolidayParams) => ({
 		id: `custom-${isoDateTime(date)}`,
 		name,
-		date: fromStoredInstant(date),
+		date,
 		variant: HolidayVariant.CUSTOM,
 		isInSelectedRange: isInPlanningWindow({ date, year, carryOverMonths }),
 	}),

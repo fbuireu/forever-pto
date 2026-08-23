@@ -124,7 +124,16 @@ three conditions this file decides for itself: secret mismatch, not succeeded, e
 `processWebhookEvent` receives an already-verified `Stripe.Event` — signature checking happens at the route,
 because it needs the raw body and the signature header. The use-case switches on `event.type`, builds a
 domain event through the `@domain/payment` factory, and delegates to `handlePaymentSucceeded` /
-`handlePaymentFailed`. Unknown types are logged and ignored, never rejected: Stripe sends event types nobody
+`handlePaymentFailed`.
+
+**The `switch` is the narrowing, and nothing re-asserts the payload type.** `Stripe.Event` is a discriminated
+union, so inside `case "payment_intent.succeeded"` the compiler already knows `event.data.object` is a
+`Stripe.PaymentIntent`. Both branches used to write `event.data.object as Stripe.PaymentIntent`, which threw
+that away: relabelling either case to `charge.succeeded` compiled cleanly and handed a `Stripe.Charge` to
+`paymentDataDTO.create` and into the payments row. The test could not catch it because its event helper took
+`type: string` and cast the whole literal to `Stripe.Event`, so it laundered the same misreading. The helpers
+are per-member now (`succeededEvent`, `failedEvent`, `unhandledEvent`) and take a
+`Partial<Stripe.PaymentIntent>`. Do not reintroduce a cast on `event.data.object`. Unknown types are logged and ignored, never rejected: Stripe sends event types nobody
 subscribed to and a non-2xx would put them into retry.
 
 Genuine failures must propagate. A handler error is logged *and* re-raised as `DatabaseError` so the route

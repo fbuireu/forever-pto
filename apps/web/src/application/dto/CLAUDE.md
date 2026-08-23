@@ -15,7 +15,7 @@ Each concept gets its own folder, and the file names inside it are fixed:
 | `types.ts` | The canonical shape, plus the `Raw*` alias for the foreign one it is built from | every folder |
 | `dto.ts` | The mapper — the object implementing `BaseDTO` | `country/`, `holiday/`, `payment/`, `region/` |
 | `schema.ts` | A Zod schema for a shape the *user* submits, and the `z.infer` type derived from it | `contact/`, `payment/` |
-| `utils/` | Helpers the mapper needs and nobody else should reach for | `country/`, `payment/`, `region/` |
+| `utils/` | Helpers the mapper needs and nobody else should reach for | `payment/`, `region/` |
 
 Not every folder needs every file. `email/` and `premium/` are `types.ts` alone: `SendEmailParams` and `PremiumSessionData` are contracts between our own layers, with no foreign shape to normalise and therefore no mapper to write. Do not add an empty `dto.ts` to satisfy the pattern.
 
@@ -75,7 +75,9 @@ The invariant that replaces it is pinned where it is actually established: `holi
 persisted Holiday through real `JSON.parse(JSON.stringify(...))` and asserts `state.holidays[0].date` comes
 back `instanceof Date`. That is a boundary test over the real serialiser rather than a coercion applied on
 the way past. If a producer is ever added that hands back a string, the fix is to type the persisted shape,
-not to reinstate a runtime sweep.
+not to reinstate a runtime sweep. That is what happened: `Stored<T>` types it, and `fromStoredInstant` takes
+a `string`, so `createCustom` no longer coerces a `date` its own `CreateCustomHolidayParams` declares a
+`Date` — on the line below the one that already used it raw.
 
 `Raw*` types must not escape this folder. If a `RawHoliday` shows up in a store or a component, a mapping step was skipped.
 

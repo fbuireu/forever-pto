@@ -1,8 +1,8 @@
 import type { HolidayDTO } from "@application/dto/holiday/types";
 import type { Locale } from "next-intl";
-import type { Bridge, Suggestion } from "../types";
+import type { Suggestion } from "../types";
 import { resolveSelectedDays } from "../utils/selection";
-import { windowMonthCount, windowQuarterCount } from "../window";
+import { type PlanningWindow, windowMonthCount, windowQuarterCount } from "../window";
 import {
 	calculateLongestVacation,
 	calculateLongWeekends,
@@ -21,27 +21,24 @@ import { freeStreaks } from "./utils/streaks";
 interface GenerateMetricsParams {
 	suggestion: Omit<Suggestion, "metrics">;
 	locale: Locale;
-	year: number;
-	bridges?: Bridge[];
+	planningWindow: PlanningWindow;
 	holidays: HolidayDTO[];
 	allowPastDays: boolean;
 	manuallySelectedDays: Date[];
 	removedSuggestedDays: Date[];
-	carryOverMonths?: number;
 }
 
 export const generateMetrics = ({
 	suggestion,
 	locale,
-	year,
-	bridges,
+	planningWindow,
 	holidays,
 	allowPastDays,
 	manuallySelectedDays,
 	removedSuggestedDays,
-	carryOverMonths = 0,
 }: GenerateMetricsParams) => {
-	const planningWindow = { year, carryOverMonths };
+	const { bridges } = suggestion;
+	const { year } = planningWindow;
 	const days = resolveSelectedDays({ days: suggestion.days, manuallySelectedDays, removedSuggestedDays });
 
 	if (days.length === 0) {
