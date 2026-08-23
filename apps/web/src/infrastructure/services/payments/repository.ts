@@ -2,6 +2,7 @@ import type { NewPayment, PaymentData } from "@application/dto/payment/types";
 import type { PaymentStatus } from "@domain/payment/events/types";
 import { TursoService } from "@infrastructure/clients/db/turso/service";
 import type { DatabaseError } from "@infrastructure/errors";
+import { normalizePromoCode } from "@infrastructure/services/payments/normalForms";
 import { normalizeEmail } from "@infrastructure/services/payments/normalizeEmail";
 import { Effect } from "effect";
 
@@ -205,8 +206,6 @@ export const getSucceededPaymentByEmail = (
 		const row = rows[0];
 		return row ? toPaymentData(row) : undefined;
 	});
-
-export const normalizePromoCode = (code: string): string => code.trim().toUpperCase();
 
 export const countPromoCodeRedemptions = (code: string): Effect.Effect<number, DatabaseError, TursoService> =>
 	Effect.gen(function* () {

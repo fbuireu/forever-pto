@@ -70,17 +70,55 @@ describe("activatePremiumRequest", () => {
 	});
 
 	it.each([
-		[new RateLimitError({ ip: "1.2.3.4" }), 429, ApiError.RATE_LIMIT_EXCEEDED, "warn"],
-		[new ValidationError({ message: "Client secret mismatch" }), 400, "Client secret mismatch", "warn"],
-		[new PaymentError({ message: "No such payment_intent: 'pi_3ABC'" }), 500, ApiError.INTERNAL_ERROR, "error"],
-		[new SessionError({ message: "jwt malformed" }), 500, ApiError.INTERNAL_ERROR, "error"],
-		[new DatabaseError({ message: "turso down" }), 500, ApiError.INTERNAL_ERROR, "error"],
-	])("maps %s to its own status and logs it", async (failure, status, error, level) => {
-		const outcome = await activatePremiumRequest(IP, Effect.fail(failure) as never);
+		[
+			new RateLimitError({ ip: "1.2.3.4" }),
+			429,
+			ApiError.RATE_LIMIT_EXCEEDED,
+			"warn",
+			"Premium activation refused",
+			{ tag: "RateLimitError", ip: "1.2.3.4" },
+		],
+		[
+			new ValidationError({ message: "Client secret mismatch" }),
+			400,
+			"Client secret mismatch",
+			"warn",
+			"Premium activation refused",
+			{ tag: "ValidationError", reason: "Client secret mismatch" },
+		],
+		[
+			new PaymentError({ message: "No such payment_intent: 'pi_3ABC'" }),
+			500,
+			ApiError.INTERNAL_ERROR,
+			"error",
+			"Premium activation failed",
+			{ tag: "PaymentError", reason: "No such payment_intent: 'pi_3ABC'" },
+		],
+		[
+			new SessionError({ message: "jwt malformed" }),
+			500,
+			ApiError.INTERNAL_ERROR,
+			"error",
+			"Premium activation failed",
+			{ tag: "SessionError", reason: "jwt malformed" },
+		],
+		[
+			new DatabaseError({ message: "turso down" }),
+			500,
+			ApiError.INTERNAL_ERROR,
+			"error",
+			"Premium activation failed",
+			{ tag: "DatabaseError", reason: "turso down" },
+		],
+	])(
+		"maps %s to its own status and logs the fields it actually carries",
+		async (failure, status, error, level, message, context) => {
+			const outcome = await activatePremiumRequest(IP, Effect.fail(failure) as never);
 
-		expect(outcome).toMatchObject({ status, error, token: null });
-		expect(logger[level as "warn" | "error"]).toHaveBeenCalledOnce();
-	});
+			expect(outcome).toMatchObject({ status, error, token: null });
+			expect(logger[level as "warn" | "error"]).toHaveBeenCalledExactlyOnceWith(message, context);
+		},
+	);
 
 	it("never leaks a Stripe message to the caller", async () => {
 		const outcome = await activatePremiumRequest(

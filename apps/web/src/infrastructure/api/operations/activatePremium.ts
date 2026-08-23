@@ -1,4 +1,4 @@
-import { ApiError, describeFailure } from "@infrastructure/api/errors";
+import { describeFailure } from "@infrastructure/api/errors";
 import type { TursoService } from "@infrastructure/clients/db/turso/service";
 import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import type { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
@@ -28,6 +28,12 @@ export type ActivationOutcome =
 	| { status: 200; token: string; email: string; premiumKey: string; error: null }
 	| { status: 400 | 429 | 500; token: null; email: null; premiumKey: null; error: string };
 
+const failureContext = (failure: ActivationFailure): Record<string, unknown> => {
+	const { _tag, ...fields } = failure as unknown as Record<string, unknown>;
+
+	return { tag: failure._tag, ...fields, ...(failure.message ? { reason: failure.message } : {}) };
+};
+
 const refused = (status: 400 | 429 | 500, error: string): ActivationOutcome => ({
 	status,
 	token: null,
@@ -53,15 +59,14 @@ export const activatePremiumRequest = (
 					const { status, error } = describeFailure(failure);
 
 					if (status >= 500) {
-						logger.error("Premium activation failed", { tag: failure._tag, reason: failure.message });
+						logger.error("Premium activation failed", failureContext(failure));
 					} else {
-						logger.warn("Premium activation refused", { tag: failure._tag, reason: failure.message });
+						logger.warn("Premium activation refused", failureContext(failure));
 					}
 
 					return refused(status as 400 | 429 | 500, error);
 				}),
 			),
 			Effect.provide(ApplicationLayer),
-			Effect.catchAll(() => Effect.succeed(refused(500, ApiError.INTERNAL_ERROR))),
 		),
 	);

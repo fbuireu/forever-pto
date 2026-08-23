@@ -15,6 +15,18 @@ The wire vocabulary for failures, the response helper that opts out of caching, 
 | [`operations/contact.ts`](./operations/contact.ts) | `sendContactRequest` — the same shape for the contact form |
 | [`operations/activatePremium.ts`](./operations/activatePremium.ts) | `activatePremiumRequest` — the rate limit, the deferred hand-off, the status map and a log line per failure, for the two transports that grant Premium |
 
+**The log line carries the failure's own fields, not one field every failure was assumed to have.** It read
+`failure.message`, and `RateLimitError` is `Data.TaggedError("RateLimitError")<{ ip: string }>` — no `message`
+prop, so `Error.prototype.message` answered `''` and the one endpoint an attacker would enumerate against
+logged `reason: ""` with the address nowhere in the entry. `failureContext` takes the error's own enumerable
+properties instead, adds `reason` only when there is a message, and keeps `cause` out because Effect leaves it
+non-enumerable — which is what stops a raw SDK error object reaching the log. The payload is asserted per tag
+in the `it.each`, which the old `toHaveBeenCalledOnce()` could not do.
+
+**There is no trailing `catchAll` after `Effect.provide` there, and adding one back is dead code.** The
+`catchAll` above it closes the error channel to `never` and `ApplicationLayer` is four `Layer.sync`s that
+cannot fail, so nothing could ever reach it — a defect would not, either, since `catchAll` does not see one.
+
 ## The Premium activation operation owns its rate limit now
 
 `activatePremiumRequest` takes `{ ipAddress }` and the *use-case* program, and runs `checkRateLimit` itself.
@@ -180,4 +192,4 @@ whose outcome is `FAILED_AFTER_CHARGE` bypasses the lookup entirely — see
 
 [`response.test.ts`](./response.test.ts) covers `noStore` directly: body, default and custom status, the header, and that custom headers survive alongside it. [`parseJsonBody.test.ts`](./parseJsonBody.test.ts) pins the three outcomes: an object body succeeds, a malformed body fails with `INVALID_BODY`, and so does a non-object one.
 
-`errors.ts` has no test of its own. Its contract lives in the route tests, which compare response bodies against `ApiError.*` rather than string literals — with three exceptions, all in `e2e/`, which deliberately imports no app source: `'email_required'` in [`check-session.spec.ts`](../../../e2e/api/check-session.spec.ts), and `'missing_signature'` and `'invalid_signature'` in [`webhooks-stripe.spec.ts`](../../../e2e/api/webhooks-stripe.spec.ts). Change a code's value and that assertion is the one that will not follow you.
+[`errors.test.ts`](./errors.test.ts) owns the tag→status table, and it is the *only* place that table is asserted. This file used to say `errors.ts` had no test and that its contract lived in the route tests; both halves were false, and the second one was the expensive half — every transport re-asserted all five rows through its own mock stack, so `actions/payment.ts`, nineteen lines long, carried a 156-line test. A transport test now covers what the transport alone decides: the route puts the operation's body and status on a `NextResponse` and hands it `parseJsonBody`; the action drops the status; each maps the request's own headers or config onto the operation's input. The ordering, the deferral and the body shapes stay in [`operations/`](./operations/), and the statuses stay here. Route tests still compare against `ApiError.*` rather than string literals — with three exceptions, all in `e2e/`, which deliberately imports no app source: `'email_required'` in [`check-session.spec.ts`](../../../e2e/api/check-session.spec.ts), and `'missing_signature'` and `'invalid_signature'` in [`webhooks-stripe.spec.ts`](../../../e2e/api/webhooks-stripe.spec.ts). Change a code's value and that assertion is the one that will not follow you.

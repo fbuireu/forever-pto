@@ -96,8 +96,27 @@ describe("createPaymentRequest", () => {
 		});
 	});
 
+	it("carries a discount through to the body, where a null one is dropped", async () => {
+		const discountInfo = { finalAmount: 7.99, originalAmount: 9.99, percentOff: 20, code: "SAVE20" };
+		mockCreatePayment.mockReturnValue(
+			Effect.succeed({ clientSecret: "pi_secret", discountInfo, deferred: Effect.void } as never),
+		);
+
+		const outcome = await createPaymentRequest(Effect.succeed(INPUT), CONTEXT);
+
+		expect(outcome.body).toEqual({ success: true, clientSecret: "pi_secret", discountInfo });
+	});
+
 	it("maps a payment failure to 500 without leaking the reason", async () => {
 		mockCreatePayment.mockReturnValue(Effect.fail(new PaymentError({ message: "stripe exploded" })));
+
+		const outcome = await createPaymentRequest(Effect.succeed(INPUT), CONTEXT);
+
+		expect(outcome).toEqual({ status: 500, body: { success: false, error: ApiError.INTERNAL_ERROR } });
+	});
+
+	it("still answers 500 for a failure that arrived lying about its tag", async () => {
+		mockCreatePayment.mockReturnValue(Effect.fail(new Error("boom")) as never);
 
 		const outcome = await createPaymentRequest(Effect.succeed(INPUT), CONTEXT);
 

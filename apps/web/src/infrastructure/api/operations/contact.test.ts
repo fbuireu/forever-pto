@@ -55,6 +55,14 @@ describe("sendContactRequest", () => {
 		expect(outcome).toEqual({ status: 500, body: { success: false, error: ApiError.INTERNAL_ERROR } });
 	});
 
+	it("still answers 500 for a failure that arrived lying about its tag", async () => {
+		mockSendContactEmail.mockReturnValue(Effect.fail(new Error("boom")) as never);
+
+		const outcome = await sendContactRequest(Effect.succeed(INPUT), CONFIG);
+
+		expect(outcome).toEqual({ status: 500, body: { success: false, error: ApiError.INTERNAL_ERROR } });
+	});
+
 	it("defers sending so it cannot delay the reply", async () => {
 		const sent = vi.fn();
 		mockSendContactEmail.mockReturnValue(Effect.succeed({ deferred: Effect.sync(sent) }));

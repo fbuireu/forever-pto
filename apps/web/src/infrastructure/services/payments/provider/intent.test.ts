@@ -1,5 +1,6 @@
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import { PaymentError } from "@infrastructure/errors";
+import { PAYMENT_CURRENCY } from "@infrastructure/services/payments/normalForms";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -36,9 +37,10 @@ describe("createPaymentIntent", () => {
 		expect(params.amount).toBe(999);
 	});
 
-	it("sets currency to eur", async () => {
+	it("prices the intent in the same currency the promo-code checks compare against", async () => {
 		await run({ amount: 10, email: "user@example.com", discountInfo: null });
 		const [params] = mockIntentsCreate.mock.calls[0] as [Record<string, unknown>];
+		expect(params.currency).toBe(PAYMENT_CURRENCY);
 		expect(params.currency).toBe("eur");
 	});
 

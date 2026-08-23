@@ -33,6 +33,15 @@ that Worker is deployed once and receives events from every app Worker, so a fix
 filter on `level` silently missed them. `toLogLevel` folds anything unrecognised onto `info`; `index.test.ts`
 pins `['log', 'warn', 'trace'] → ['info', 'warn', 'info']`.
 
+**The app side reads that union rather than restating it.** [`client.ts`](./logging/better-stack/client.ts) already imported `LOG_SERVICE` from
+the contract and then declared its own `type LogLevel = 'debug' | 'info' | 'warn' | 'error'` beside it — the
+same four names, written twice, with nothing holding them together. It imports `LOG_LEVEL` and `LogLevel`
+now and its four methods dispatch through the constant, so a fifth level added to the contract fails to
+compile here: `send` indexes the Logtail transport by the level, and Logtail has no method for a name it
+does not know. On the tail Worker's side the same addition would keep folding onto `info`, silently — which
+is why the compile error has to live on this side. `client.test.ts` iterates `LOG_LEVEL` and asserts each
+level reaches the transport method of its own name and no other.
+
 `stripQuery` is still local to the tail Worker, and it is the one thing that arguably should not be: it
 encodes "a URL logged off-worker must not carry its query string, because Stripe appends
 `payment_intent_client_secret` to the return URL" — a statement about this app's payment flow, living in a
@@ -122,14 +131,21 @@ Two clients, and the split is the trap:
   and `StripeNode.createFetchHttpClient()` because the Workers runtime has no Node HTTP stack
   ([ADR 0004](../../../../../adr/0004-cloudflare-workers-as-deployment-target.md)). Every server-side Stripe
   call goes through this tag. It also exports `WebhookConfigurationError` and `isWebhookConfigurationError`.
-- [`payments/stripe/client.ts`](./payments/stripe/client.ts) — browser only, `@stripe/stripe-js`. The `StripeClient` class is **not**
-  exported; the module's only export is `getStripeClientInstance()`, a lazy singleton that throws if
-  `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is absent. It uses Effect internally to sequence the fallible
-  `loadStripe` → `confirmPayment` chain, but it never fails: `Effect.catchAll` turns everything into
-  `{ success: false, error }`, with `handleError` narrowing the Stripe error type to one of four codes. Its
-  own failures are logged through a **dynamic** `import()` of the BetterStack client, never a static one —
-  that module's top-level imports of `@logtail/edge` and `@opennextjs/cloudflare` would otherwise land in the
-  client chunk of every `'use client'` component that touches Stripe.
+- [`payments/stripe/client.ts`](./payments/stripe/client.ts) — browser only, `@stripe/stripe-js`, and it does exactly one thing:
+  memoise `loadStripe(publishableKey)`. The `StripeClient` class is **not** exported; the module's only
+  export is `getStripeClientInstance()`, a lazy singleton that throws if
+  `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is absent, and its only method is `getStripePromise()` — which is
+  all [`Donate.tsx`](../../ui/modules/shared/donate/Donate.tsx) needs to hand a promise to Stripe's `<Elements>` provider.
+
+  **It used to be 137 lines behind that one-function interface, and the other 110 had no caller.**
+  `confirmPayment`, `confirmCardPayment`, `getStripe`, `isLoaded`, `handlePaymentResult`, `handleError` and
+  a `StripeClientErrors` map were reached only from `client.test.ts`, which spent ~216 lines holding them
+  up. The confirm-and-classify path that actually runs is a *second* implementation in
+  [`../../ui/adapters/payments/checkout.ts`](../../ui/adapters/payments/checkout.ts): it takes the `stripe` instance from Elements and calls
+  `stripe.confirmPayment` itself, classifying the outcome as `ConfirmPaymentOutcome` rather than as one of
+  the four codes here — none of which had a `checkout.errors.*` key in [`en.json`](../../ui/i18n/messages/en.json), so none of them could
+  ever have been shown to a payer. Deleting the dead half also removed this module's only reason to reach
+  for the logger and for Effect.
 
 **The pinned API version decides object *shapes*, not just endpoints, and the tag hides that from the
 compiler.** The tag's methods are typed from `StripeNode.*`, which the SDK generates for the version it
@@ -175,7 +191,8 @@ The price is that a lost log is silent, and `getExecutionContext()` reads the Cl
 `try` returning `undefined`, so logging off-request works but loses `waitUntil`.
 
 Both `DriverClient` and `StripeClient` keep mutable instance state behind a module-level singleton, so a
-second `getDriverClientInstance()` returns the same tour. `DriverClient.start()` destroys a live driver before
+second `getDriverClientInstance()` returns the same tour — and a second `getStripeClientInstance()` returns
+a client that has already started loading Stripe.js, which is the whole point of the memoised promise. `DriverClient.start()` destroys a live driver before
 building a new one, and the React roots it created for the close buttons are unmounted by
 `unmountCloseButtonRoots` — skipping either leaks a root per tour.
 

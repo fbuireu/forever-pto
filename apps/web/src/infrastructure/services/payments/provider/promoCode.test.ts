@@ -1,6 +1,7 @@
 import { TursoService } from "@infrastructure/clients/db/turso/service";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import { PromoCodeError, PromoCodeErrors } from "@infrastructure/errors";
+import { normalizePromoCode } from "@infrastructure/services/payments/normalForms";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -282,6 +283,16 @@ describe("validatePromoCode", () => {
 	});
 
 	describe("the shape it asks Stripe for", () => {
+		it("looks the code up under the same normal form the redemption count is keyed by", async () => {
+			setupMocks(makeCoupon(), { max_redemptions: 5 });
+
+			await run("  save20 ", 10);
+
+			const [params] = mockList.mock.calls[0] as [{ code?: string }];
+			expect(params.code).toBe(normalizePromoCode("  save20 "));
+			expect(mockQuery.mock.calls[0]?.[1]).toEqual([normalizePromoCode("  save20 ")]);
+		});
+
 		it("asks for the coupon expanded, since a promotion code carries only its id", async () => {
 			setupMocks(makeCoupon());
 

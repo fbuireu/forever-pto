@@ -1,6 +1,7 @@
 import type { DiscountInfo } from "@application/dto/payment/types";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import type { PaymentError } from "@infrastructure/errors";
+import { PAYMENT_CURRENCY } from "@infrastructure/services/payments/normalForms";
 import { Effect } from "effect";
 import type StripeNode from "stripe";
 import { clampMetadata } from "./metadata";
@@ -23,7 +24,7 @@ export const createPaymentIntent = (
 
 		return yield* stripe.paymentIntents.create({
 			amount: Math.round(amount * 100),
-			currency: "eur",
+			currency: PAYMENT_CURRENCY,
 			description: discountInfo ? `Donation from ${email} (${promoCode} applied)` : `Donation from ${email}`,
 			receipt_email: email,
 			metadata: {

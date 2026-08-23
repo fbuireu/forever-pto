@@ -1,12 +1,10 @@
 import { Logtail } from "@logtail/edge";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { LOG_SERVICE } from "./contract";
+import { LOG_LEVEL, LOG_SERVICE, type LogLevel } from "./contract";
 
 interface LogContext {
 	[key: string]: unknown;
 }
-
-type LogLevel = "debug" | "info" | "warn" | "error";
 
 const UNCONFIGURED_WARNING =
 	"BetterStack logging is disabled: NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN and NEXT_PUBLIC_BETTER_STACK_INGESTING_URL are not both defined";
@@ -70,19 +68,19 @@ export class BetterStackClient {
 	}
 
 	debug(message: string, context?: LogContext) {
-		send("debug", message, this.getFullContext(context));
+		send(LOG_LEVEL.DEBUG, message, this.getFullContext(context));
 	}
 
 	info(message: string, context?: LogContext) {
-		send("info", message, this.getFullContext(context));
+		send(LOG_LEVEL.INFO, message, this.getFullContext(context));
 	}
 
 	warn(message: string, context?: LogContext) {
-		send("warn", message, this.getFullContext(context));
+		send(LOG_LEVEL.WARN, message, this.getFullContext(context));
 	}
 
 	error(message: string, context?: LogContext) {
-		send("error", message, this.getFullContext(context));
+		send(LOG_LEVEL.ERROR, message, this.getFullContext(context));
 	}
 
 	logError(message: string, error: unknown, context?: LogContext) {

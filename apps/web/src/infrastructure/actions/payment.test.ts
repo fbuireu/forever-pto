@@ -1,5 +1,4 @@
-import { ApiError } from "@infrastructure/api/errors";
-import { PaymentError, PromoCodeError, PromoCodeErrors, RateLimitError, ValidationError } from "@infrastructure/errors";
+import { type PaymentError, type PromoCodeError, RateLimitError, type ValidationError } from "@infrastructure/errors";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -59,98 +58,28 @@ describe("createPaymentAction", () => {
 		mockCheckRateLimit.mockReturnValue(Effect.void);
 	});
 
-	it("returns success:true with clientSecret on success", async () => {
+	it("returns the operation's body", async () => {
 		mockCreatePayment.mockReturnValue(Effect.succeed({ clientSecret: "client-secret-abc", discountInfo: null }));
+
 		const result = await createPaymentAction(validInput);
-		expect(result.success).toBe(true);
-		if (result.success) {
-			expect(result.clientSecret).toBe("client-secret-abc");
-			expect(result.discountInfo).toBeUndefined();
-		}
+
+		expect(result).toEqual({ success: true, clientSecret: "client-secret-abc" });
 	});
 
-	it("maps non-null discountInfo to result", async () => {
-		const discountInfo = { finalAmount: 7.99, originalAmount: 9.99, percentOff: 20, code: "SAVE20" };
-		mockCreatePayment.mockReturnValue(Effect.succeed({ clientSecret: "pi_secret", discountInfo }));
-		const result = await createPaymentAction(validInput);
-		expect(result.success).toBe(true);
-		if (result.success) expect(result.discountInfo).toEqual(discountInfo);
-	});
-
-	it("passes userAgent and ipAddress from headers to createPayment", async () => {
+	it("builds the RequestContext from the request headers", async () => {
 		mockCreatePayment.mockReturnValue(Effect.succeed({ clientSecret: "pi_secret", discountInfo: null }));
+
 		await createPaymentAction(validInput);
+
 		expect(mockCreatePayment).toHaveBeenCalledWith(validInput, { userAgent: "test-agent", ipAddress: "1.2.3.4" });
 	});
 
-	it("returns success:false with message on ValidationError", async () => {
-		mockCreatePayment.mockReturnValue(Effect.fail(new ValidationError({ message: "Amount is required" })));
-		const result = await createPaymentAction(validInput);
-		expect(result.success).toBe(false);
-		if (!result.success) expect(result.error).toBe("Amount is required");
-	});
-
-	it("returns success:false with code and isPromoCodeError on PromoCodeError", async () => {
-		mockCreatePayment.mockReturnValue(Effect.fail(new PromoCodeError({ code: PromoCodeErrors.INVALID_OR_EXPIRED })));
-		const result = await createPaymentAction({ ...validInput, promoCode: "NOPE" });
-		expect(result.success).toBe(false);
-		if (!result.success) {
-			expect(result.error).toBe(PromoCodeErrors.INVALID_OR_EXPIRED);
-			expect(result.isPromoCodeError).toBe(true);
-		}
-	});
-
-	it("returns success:false with INTERNAL_ERROR on PaymentError, matching the payment route", async () => {
-		mockCreatePayment.mockReturnValue(Effect.fail(new PaymentError({ message: "Stripe declined" })));
-		const result = await createPaymentAction(validInput);
-		expect(result.success).toBe(false);
-		if (!result.success) expect(result.error).toBe(ApiError.INTERNAL_ERROR);
-	});
-
-	it("rate-limits before reaching the payment use-case", async () => {
+	it("drops the status, which is the only thing it does differently from the route", async () => {
 		mockCheckRateLimit.mockReturnValue(Effect.fail(new RateLimitError({ ip: "1.2.3.4" })));
+
 		const result = await createPaymentAction(validInput);
+
+		expect(result).not.toHaveProperty("status");
 		expect(result.success).toBe(false);
-		if (!result.success) expect(result.error).toBe(ApiError.RATE_LIMIT_EXCEEDED);
-		expect(mockCreatePayment).not.toHaveBeenCalled();
-	});
-
-	it("keys the rate limit on the request IP", async () => {
-		mockCreatePayment.mockReturnValue(Effect.succeed({ clientSecret: "pi_secret", discountInfo: null }));
-		await createPaymentAction(validInput);
-		expect(mockCheckRateLimit).toHaveBeenCalledWith("1.2.3.4");
-	});
-
-	it("prefers cf-connecting-ip over x-forwarded-for for the rate limit key", async () => {
-		mockHeaders.mockResolvedValueOnce({
-			get: vi.fn((key: string) => {
-				if (key === "user-agent") return "test-agent";
-				if (key === "cf-connecting-ip") return "9.9.9.9";
-				if (key === "x-forwarded-for") return "spoofed";
-				return null;
-			}),
-		});
-		mockCreatePayment.mockReturnValue(Effect.succeed({ clientSecret: "pi_secret", discountInfo: null }));
-		await createPaymentAction(validInput);
-		expect(mockCheckRateLimit).toHaveBeenCalledWith("9.9.9.9");
-	});
-
-	it('falls back to "unknown" when no IP header is present', async () => {
-		mockHeaders.mockResolvedValueOnce({ get: vi.fn(() => null) });
-		mockCreatePayment.mockReturnValue(Effect.succeed({ clientSecret: "pi_secret", discountInfo: null }));
-		await createPaymentAction(validInput);
-		expect(mockCheckRateLimit).toHaveBeenCalledWith("unknown");
-	});
-
-	it("returns success:false with INTERNAL_ERROR on unexpected error", async () => {
-		mockCreatePayment.mockReturnValue(
-			Effect.fail(new Error("boom")) as unknown as Effect.Effect<
-				{ clientSecret: string; discountInfo: null },
-				ValidationError | PaymentError | PromoCodeError
-			>,
-		);
-		const result = await createPaymentAction(validInput);
-		expect(result.success).toBe(false);
-		if (!result.success) expect(result.error).toBe(ApiError.INTERNAL_ERROR);
 	});
 });

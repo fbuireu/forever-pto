@@ -1,46 +1,46 @@
 import { describe, expect, it, vi } from "vitest";
-import { setLocaleCookie } from "./cookie";
-import { ES } from "./locales";
-
-vi.mock("@infrastructure/i18n/config", () => ({
-	LOCALE_COOKIE: "NEXT_LOCALE",
-}));
-
-import { LOCALE_COOKIE } from "@infrastructure/i18n/locales";
+import { LOCALE_COOKIE_POLICY, setLocaleCookie } from "./cookie";
+import { ES, LOCALE_COOKIE } from "./locales";
+import { routing } from "./routing";
 
 function makeResponse() {
 	const cookiesSet = vi.fn();
 	return { response: { cookies: { set: cookiesSet } } as never, cookiesSet };
 }
 
-describe("setLocaleCookie", () => {
-	it("sets the cookie with the correct name and value", () => {
+describe("the NEXT_LOCALE policy", () => {
+	it("writes the whole policy and nothing besides the value", () => {
 		const { response, cookiesSet } = makeResponse();
+
 		setLocaleCookie(response, ES);
-		expect(cookiesSet).toHaveBeenCalledWith(expect.objectContaining({ name: LOCALE_COOKIE, value: ES }));
+
+		expect(cookiesSet).toHaveBeenCalledWith({
+			name: LOCALE_COOKIE,
+			value: ES,
+			secure: true,
+			sameSite: "lax",
+			path: "/",
+		});
 	});
 
-	it("sets httpOnly", () => {
+	it("hands next-intl the same attributes the middleware writes, so a soft locale switch round-trips", () => {
 		const { response, cookiesSet } = makeResponse();
+
 		setLocaleCookie(response, ES);
-		expect(cookiesSet).toHaveBeenCalledWith(expect.objectContaining({ httpOnly: true }));
+		const [written] = cookiesSet.mock.calls[0] as [Record<string, unknown>];
+		const { value, ...attributes } = written;
+
+		expect(value).toBe(ES);
+		expect(attributes).toEqual({ ...LOCALE_COOKIE_POLICY });
+		expect(routing.localeCookie).toEqual(LOCALE_COOKIE_POLICY);
 	});
 
-	it("sets secure", () => {
+	it("is not httpOnly, because a browser drops a document.cookie write to a name already httpOnly", () => {
 		const { response, cookiesSet } = makeResponse();
-		setLocaleCookie(response, ES);
-		expect(cookiesSet).toHaveBeenCalledWith(expect.objectContaining({ secure: true }));
-	});
 
-	it("sets sameSite lax", () => {
-		const { response, cookiesSet } = makeResponse();
 		setLocaleCookie(response, ES);
-		expect(cookiesSet).toHaveBeenCalledWith(expect.objectContaining({ sameSite: "lax" }));
-	});
 
-	it('sets path to "/"', () => {
-		const { response, cookiesSet } = makeResponse();
-		setLocaleCookie(response, ES);
-		expect(cookiesSet).toHaveBeenCalledWith(expect.objectContaining({ path: "/" }));
+		expect(cookiesSet).toHaveBeenCalledWith(expect.not.objectContaining({ httpOnly: expect.anything() }));
+		expect(routing.localeCookie).toEqual(expect.not.objectContaining({ httpOnly: expect.anything() }));
 	});
 });

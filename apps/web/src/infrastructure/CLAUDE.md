@@ -18,7 +18,7 @@ The largest single thing in here is a browser file — the Web Worker.
 | `actions/` | The two `'use server'` entry points: `payment.ts` and `contact.ts`. They read request-scoped config and hand it to the matching operation under `api/operations/` |
 | `api/` | The wire vocabulary for failures, the no-store response helper, and the operations both transports terminate. See [`api/CLAUDE.md`](./api/CLAUDE.md) |
 | `clients/` | SDK wrappers — four Effect service tags plus four modules that are deliberately not services. See [`clients/CLAUDE.md`](./clients/CLAUDE.md) |
-| `i18n/` | [`routing.ts`](./i18n/routing.ts) (next-intl routing, `localePrefix: 'as-needed'`), [`config.ts`](./i18n/config.ts) (request config + message loading), [`locales.ts`](./i18n/locales.ts) (the six codes and `LOCALE_COOKIE`), [`cookie.ts`](./i18n/cookie.ts) (writes `NEXT_LOCALE` with the flags next-intl's own cookie lacks), [`utils/url.ts`](./i18n/utils/url.ts) (`localePath`, `resolveLocale`, `getLocaleFromPathname`, `routePathFromPathname`, `localeFromAcceptLanguage`, `localeAlternates`) |
+| `i18n/` | [`routing.ts`](./i18n/routing.ts) (next-intl routing, `localePrefix: 'as-needed'`), [`config.ts`](./i18n/config.ts) (request config + message loading), [`locales.ts`](./i18n/locales.ts) (the six codes and `LOCALE_COOKIE`), [`cookie.ts`](./i18n/cookie.ts) (`LOCALE_COOKIE_POLICY`, the one statement of the `NEXT_LOCALE` attributes, plus `setLocaleCookie`), [`utils/url.ts`](./i18n/utils/url.ts) (`localePath`, `resolveLocale`, `getLocaleFromPathname`, `routePathFromPathname`, `localeFromAcceptLanguage`, `localeAlternates`) |
 
 **`LOCALES` is `as const`, and until it was, `Locale` was `string`.** The array was an unannotated literal,
 so TypeScript widened it to `string[]`, and `AppConfig['Locale']` in [`environment.d.ts`](../../environment.d.ts) reads
@@ -38,6 +38,23 @@ hiding. `SITE_ROUTES` already had this discipline; the locales never did.
 it and `resolveLocale` pulls `routing`. The worker narrows the incoming `locale` with it exactly as it
 already narrows `strategy` with `isFilterStrategy` — the wire value is genuinely unvalidated there, which is
 the one place `string` is the honest type.
+
+**`NEXT_LOCALE`'s attributes are stated once, in `cookie.ts`, and `routing.ts` hands that same object to
+next-intl.** It has to be one object because *two* writers use it: the middleware writes the cookie on the
+response, and next-intl's `syncLocaleCookie` writes it from `document.cookie` when a language switcher
+navigates without a round trip — [`application/i18n/navigation.ts`](../application/i18n/navigation.ts)'s `createNavigation(routing)` passes
+`routing.localeCookie` straight into it. The two were written separately and disagreed on two flags, and
+one of them was fatal: `setLocaleCookie` added `httpOnly`, which a browser honours by **discarding** any
+later `document.cookie` write to that name on a matching domain and path. So a soft locale switch never
+persisted. The es→en direction could not recover either, because `en` is the unprefixed default under
+`localePrefix: 'as-needed'` — with no prefix to read, next-intl's `resolveLocale` fell to the stale cookie
+and redirected back to `/es`. `httpOnly` is gone; there is nothing secret in a language preference.
+
+`path: '/'` is the half that is still load-bearing. next-intl's middleware defaults it to
+`request.nextUrl.basePath || undefined`, which on this app is `undefined` — and a cookie set with no `path`
+takes the request's own directory, so a switch made on `/es/planner` would have been scoped to `/es` while
+the client-side write scoped itself to `/`. Two cookies, one name. Naming `path` in the policy is what makes
+both writers produce the same one.
 
 **`resolveLocale` is the one place a candidate becomes a locale.** `hasLocale(LOCALES, x) ? x : routing.defaultLocale`
 was written out verbatim at three sites — the request config, the activate route's `?locale=` and the
@@ -96,8 +113,9 @@ immediate result and a `deferred` Effect, hand the deferred half to `after()` an
 its requirements with it and would not compile otherwise.
 
 **Logging is the documented exception.** BetterStack has a tag *and* a plain singleton, and the singleton is
-what [`getCountries.ts`](./services/countries/getCountries.ts), [`getRegions.ts`](./services/regions/getRegions.ts), the country-detection strategies and the browser Stripe client use —
-anywhere there is no layer to provide. "All external calls go through Effect" is false for logging, on
+what [`getCountries.ts`](./services/countries/getCountries.ts), [`getRegions.ts`](./services/regions/getRegions.ts), the country-detection strategies and the Zustand stores use —
+anywhere there is no layer to provide. The browser Stripe client was on that list until it stopped logging
+at all: it is now a memoised `loadStripe` and nothing else. "All external calls go through Effect" is false for logging, on
 purpose ([ADR 0002](../../../../adr/0002-effect-for-external-service-boundaries.md)).
 
 ## The Cloudflare context is request-scoped
@@ -191,11 +209,15 @@ already drifted over how a missing IP header was recorded.
 
 ## Testing
 
-Every module with behaviour has a co-located `.test.ts`. Five files have none, and each is one of three
-things: types only ([`workers/types.ts`](./workers/types.ts), [`services/holidays/source/types.ts`](./services/holidays/source/types.ts)); a const map whose contract is asserted through the route tests instead
-([`api/errors.ts`](./api/errors.ts) — see [`api/CLAUDE.md`](./api/CLAUDE.md)); or itself a test double
+Every module with behaviour has a co-located `.test.ts`. Four files have none, and each is one of two
+things: types only ([`workers/types.ts`](./workers/types.ts), [`services/holidays/source/types.ts`](./services/holidays/source/types.ts)); or itself a test double
 ([`services/holidays/source/fixture.ts`](./services/holidays/source/fixture.ts), the second adapter at the `HolidaySource` seam, exercised by every
 test that uses it).
+
+**[`api/errors.ts`](./api/errors.ts) was listed here as a third kind — a const map asserted through the route tests — and it is
+not.** It has [`api/errors.test.ts`](./api/errors.test.ts) beside it, which is the only place the tag→status table belongs; the route
+and action tests that restated it row by row have been cut back to what each transport alone decides. See
+[`api/CLAUDE.md`](./api/CLAUDE.md).
 
 **`seo/buildMetadata.ts` and [`services/holidays/source/dateHolidays.ts`](./services/holidays/source/dateHolidays.ts) were a fourth kind — untested — and
 are not any more.** `buildMetadata` was reached only through the seven route `metadata.test.ts` files, and

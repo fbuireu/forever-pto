@@ -1,7 +1,6 @@
-import { ApiError } from "@infrastructure/api/errors";
-import { EmailError, ValidationError } from "@infrastructure/errors";
+import { EmailError, type ValidationError } from "@infrastructure/errors";
 import { Effect, Layer } from "effect";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockSendContactEmail = vi.hoisted(() =>
 	vi.fn<
@@ -39,44 +38,32 @@ const { sendContactEmailAction } = await import("./contact");
 const validData = { name: "Test", email: "test@example.com", subject: "Hello", message: "World" };
 
 describe("sendContactEmailAction", () => {
-	it("returns success:true when email is sent", async () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
 		mockSendContactEmail.mockReturnValue(Effect.succeed({ deferred: Effect.void }));
-		const result = await sendContactEmailAction(validData);
-		expect(result.success).toBe(true);
 	});
 
-	it("returns success:false with error message on ValidationError", async () => {
-		mockSendContactEmail.mockReturnValue(Effect.fail(new ValidationError({ message: "Email is required" })));
+	it("returns the operation's body", async () => {
 		const result = await sendContactEmailAction(validData);
-		expect(result.success).toBe(false);
-		if (!result.success) expect(result.error).toBe("Email is required");
+
+		expect(result).toEqual({ success: true });
 	});
 
-	it("returns success:false with INTERNAL_ERROR on EmailError, matching the contact route", async () => {
-		mockSendContactEmail.mockReturnValue(Effect.fail(new EmailError({ message: "SMTP failed" })));
-		const result = await sendContactEmailAction(validData);
-		expect(result.success).toBe(false);
-		if (!result.success) expect(result.error).toBe(ApiError.INTERNAL_ERROR);
-	});
-
-	it("returns success:false with INTERNAL_ERROR on unexpected error", async () => {
-		mockSendContactEmail.mockReturnValue(
-			Effect.fail(new Error("boom")) as unknown as Effect.Effect<
-				{ deferred: Effect.Effect<void, never, never> },
-				ValidationError | EmailError
-			>,
-		);
-		const result = await sendContactEmailAction(validData);
-		expect(result.success).toBe(false);
-		if (!result.success) expect(result.error).toBe(ApiError.INTERNAL_ERROR);
-	});
-
-	it("passes env config to sendContactEmail", async () => {
-		mockSendContactEmail.mockReturnValue(Effect.succeed({ deferred: Effect.void }));
+	it("hands the operation the request-scoped site URL and contact address", async () => {
 		await sendContactEmailAction(validData);
+
 		expect(mockSendContactEmail).toHaveBeenCalledWith(validData, {
 			siteUrl: "https://example.com",
 			contactEmail: "contact@example.com",
 		});
+	});
+
+	it("drops the status, which is the only thing it does differently from the route", async () => {
+		mockSendContactEmail.mockReturnValue(Effect.fail(new EmailError({ message: "SMTP failed" })));
+
+		const result = await sendContactEmailAction(validData);
+
+		expect(result).not.toHaveProperty("status");
+		expect(result.success).toBe(false);
 	});
 });

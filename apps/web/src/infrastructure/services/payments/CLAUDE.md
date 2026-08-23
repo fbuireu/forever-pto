@@ -15,8 +15,9 @@ read by the premium activation path as well as by the payment one.
 
 | File | Exports | Requires |
 | --- | --- | --- |
-| `repository.ts` | `savePayment`, `updatePaymentStatus`, `updatePaymentCharge`, `getPaymentById`, `getSucceededPaymentByEmail`, `countPromoCodeRedemptions`, `normalizePromoCode`, the `PaymentChargeData` shape | `TursoService` |
+| `repository.ts` | `savePayment`, `updatePaymentStatus`, `updatePaymentCharge`, `getPaymentById`, `getSucceededPaymentByEmail`, `countPromoCodeRedemptions`, the `PaymentChargeData` shape | `TursoService` |
 | [`normalizeEmail.ts`](./normalizeEmail.ts) | `normalizeEmail(email)` — trim and lower-case, applied on both sides of every address comparison | — |
+| [`normalForms.ts`](./normalForms.ts) | `PAYMENT_CURRENCY` and `normalizePromoCode(code)` — the two forms every payment value has to be written in, at every site that writes one | — |
 | [`confirmation.ts`](./confirmation.ts) | `confirmation(paymentIntentId)` — a `PaymentConfirmationDTO`, or `null` on any failure | `StripeServerService`, `LoggerService` |
 | [`rateLimit.ts`](./rateLimit.ts) | `checkRateLimit(ip)` — fails with `RateLimitError` | the Cloudflare `PAYMENT_RATE_LIMITER` binding |
 | [`provider/intent.ts`](./provider/intent.ts) | `createPaymentIntent(params)` — the Stripe intent behind a Donation | `StripeServerService` |
@@ -32,10 +33,10 @@ read by the premium activation path as well as by the payment one.
 | Caller | Uses |
 | --- | --- |
 | `payment.ts` (use-case) | `validatePromoCode`, `createPaymentIntent`, `savePayment` (deferred) |
-| `activatePremium.ts` (use-case) | `getSucceededPaymentByEmail`, `getPaymentById`, `savePayment`, `updatePaymentStatus` |
+| `activatePremium.ts` (use-case) | `getSucceededPaymentByEmail`, `savePayment`, `updatePaymentStatus` |
 | [`webhook.ts`](../../../application/use-cases/webhook.ts) (use-case) | `getPaymentById`, `savePayment` |
 | [`paymentSucceeded.ts`](../../../domain/payment/handlers/paymentSucceeded.ts) / [`paymentFailed.ts`](../../../domain/payment/handlers/paymentFailed.ts) (domain handlers) | `getPaymentById`, `updatePaymentStatus`, `updatePaymentCharge`, `retrieveCharge` |
-| [`src/app/api/payment/route.ts`](../../../app/api/payment/route.ts), [`actions/payment.ts`](../../actions/payment.ts) and [`src/app/api/payment/activate/route.ts`](../../../app/api/payment/activate/route.ts) | `checkRateLimit` |
+| [`api/operations/payment.ts`](../../api/operations/payment.ts) and [`api/operations/activatePremium.ts`](../../api/operations/activatePremium.ts) | `checkRateLimit` |
 | The confirmation page | `confirmation` |
 
 The domain handlers importing infrastructure directly is the deliberate asymmetry in
@@ -44,17 +45,17 @@ The domain handlers importing infrastructure directly is the deliberate asymmetr
 
 ## Invariants
 
-**Payment creation rate-limits first, in one place.** The route handler and the `createPaymentAction` server
-action are two transports over one operation — `createPaymentRequest` under
-[`@infrastructure/api/operations`](../../api/CLAUDE.md) — and `checkRateLimit` is the first thing it yields,
-before the request body is even read. `src/app/api/payment/activate/route.ts` is
-the third caller and the only one outside payment creation: it is a public GET that mints a Premium
-session, so it is limited on the same `cf-connecting-ip` key and shares the same window. Nothing else is —
-not the webhook, and not the `POST /api/check-session` half of session activation.
+**`checkRateLimit` has no caller outside `api/operations/`, and which endpoints that covers is the API
+guide's to state.** Both operations that reach it — `createPaymentRequest` and `activatePremiumRequest` —
+yield it first, before the request body is even read, and every transport over them inherits the limit
+whether it asks for one or not. That is the property this folder owns; the endpoint list belongs to
+[`../../api/CLAUDE.md`](../../api/CLAUDE.md), and this file kept a second copy of it that had gone stale —
+it still said the `POST /api/check-session` half of session activation was unlimited, which stopped being
+true when the limiter moved into `activatePremiumRequest`.
 
 **`savePayment` is idempotent by SQL, not by check.** `INSERT OR IGNORE` on the primary key is what lets
-the webhook re-create a row the deferred write may have lost, and lets `activateWithPayment` write one for
-a Donation the webhook has not caught up with yet. Nothing reads before writing, and nothing merges: a
+the webhook re-create a row the deferred write may have lost, and lets the donation activation path write
+one for a Donation the webhook has not caught up with yet. Nothing reads before writing, and nothing merges: a
 second insert for the same intent is dropped whole, including any column the first one left null.
 
 **`updatePaymentStatus` is guarded the same way, and both answer whether they wrote.** Its `WHERE` carries
@@ -69,7 +70,7 @@ evaluates atomically.
 Three callers lost their read entirely. `handlePaymentFailed` writes and warns when `rowsAffected` is 0;
 `processWebhookEvent` inserts unconditionally and logs a creation only when the insert reports one — which
 also fixed a lie, since the old read-then-insert could be beaten to the row and still claim it had created
-it; and `activateWithPayment`'s deferred is now insert-or-ignore followed by the guarded update, correct
+it; and the donation activation path's deferred is now insert-or-ignore followed by the guarded update, correct
 whether or not the row was already there. **`handlePaymentSucceeded` keeps its read**, because 0 rows cannot
 tell "already succeeded" from "no such row" and that handler treats them differently — a missing row skips
 the charge enrichment and warns.
@@ -78,9 +79,17 @@ the charge enrichment and warns.
 by 100 on the way in, `paymentDataDTO` keeps minor units for the table, and `confirmation` divides by 100
 because its output feeds a screen. Two payment shapes with an `amount` field, two different units.
 
-**The currency is hard-coded to `eur`** in `createPaymentIntent`, and `provider/promoCode.ts` names the same
-constant so it can refuse to compare a promotion-code minimum priced in anything else. Those two constants
-have to move together.
+**The currency is `PAYMENT_CURRENCY` from [`normalForms.ts`](./normalForms.ts)**, imported by `createPaymentIntent` — which
+prices the intent — and by `provider/promoCode.ts`, which refuses to compare a promotion-code minimum
+priced in anything else. They were two separate literals with a sentence here saying they had to move
+together, and nothing enforcing it; one import each is what makes that sentence a compile-time fact.
+
+`normalizePromoCode` sits beside it for the same reason. It was exported from `repository.ts` with
+`repository.ts` as its only importer, while `provider/promoCode.ts` re-spelled it as
+`code.toUpperCase().trim()` — the same two operations in the opposite order. The order is not observable
+(no character uppercases into or out of whitespace, so the two compose commutatively over every input), but
+the duplication is: the code sent to Stripe's `promotionCodes.list` and the code the redemption count is
+keyed by have to be the same string, and only one of them was reading a shared definition.
 
 `PAYMENT_CURRENCY` guards **two** places in that file and both are load-bearing. The promotion-code
 `minimum_amount` in another currency is *ignored* — the restriction cannot be evaluated, so it is not
@@ -102,8 +111,8 @@ is the other reason the filter belongs in the name rather than at the caller.
 
 **The payer's address is compared normalised, never raw.** `normalizeEmail.ts` trims and lower-cases, and
 it is applied on both sides of every comparison: `getSucceededPaymentByEmail` matches `lower(trim(email))` against a
-normalised parameter, and `activateWithPayment` normalises the intent's address and the caller's before
-testing them for equality. Email is the only key Premium can be recovered by
+normalised parameter, and `activateWithClaimedPayment` normalises the intent's address and the caller's
+before testing them for equality. Email is the only key Premium can be recovered by
 ([ADR 0008](../../../../../../adr/0008-premium-derived-from-payment.md)), and SQLite's `=` on `TEXT` is
 case-sensitive, so a payer who typed `Name@Example.com` at checkout and `name@example.com` on the way back
 was refused access they had paid for. The `lower(trim(...))` on the **column** is what makes rows written
@@ -111,16 +120,16 @@ before this normalisation still match; it forgoes an index on `email`, which is 
 table of this size. Do not "optimise" it back to a bare `email = ?` without first migrating the stored
 values.
 
-**Every field the entitlement later depends on travels in the intent's `metadata`.** `activateWithPayment`
-matches on `metadata.email`, and `paymentDataDTO` reads `promoCode`, `userAgent` and `ipAddress` from there.
+**Every field the entitlement later depends on travels in the intent's `metadata`.** Both donation entry
+points read the payer address from `metadata.email`, and `paymentDataDTO` reads `promoCode`, `userAgent` and `ipAddress` from there.
 Stripe metadata values must be strings, which is why the builder is full of `?? ''` and `.toFixed(2)` — a
 value dropped here cannot be recovered from Stripe afterwards.
 
 **`provider/metadata.ts` is both halves of that format, and it exists because they had drifted.**
 `createPaymentIntent` is the only writer of the donation metadata block, and the read was open-coded twice —
-in `@domain/payment`'s event factory and in `activateWithPayment`. They did not agree. The factory took the
-first non-blank of `metadata.email` and `receipt_email` after trimming; `activateWithPayment` used `??`
-alone, which accepts the empty string Stripe allows. So an intent carrying `metadata.email = '   '` and a
+in `@domain/payment`'s event factory and in the donation activation path. They did not agree. The factory
+took the first non-blank of `metadata.email` and `receipt_email` after trimming; the activation path used
+`??` alone, which accepts the empty string Stripe allows. So an intent carrying `metadata.email = '   '` and a
 valid `receipt_email` had the webhook record the row correctly while the redirect path refused it with
 `'Email mismatch'` and sent the payer to `activation=failed` — for a Donation that had cleared. Both callers
 now read through `readDonationMetadata`, and `clampMetadata` moved beside it. The reader returns
@@ -135,8 +144,8 @@ reject the whole call — so a header the donor never chose failed the Donation,
 `if (validated.promoCode?.trim())`, so `'   '` skips `validatePromoCode` and is written verbatim.
 
 **`email` is deliberately *not* clamped, and must not be.** It is the only key Premium can ever be recovered
-by ([ADR 0008](../../../../../../adr/0008-premium-derived-from-payment.md)) and `activateWithPayment` matches
-on it exactly, so a truncated address would silently orphan the payer — the same class of failure as writing
+by ([ADR 0008](../../../../../../adr/0008-premium-derived-from-payment.md)) and `activateWithClaimedPayment`
+matches on it exactly, so a truncated address would silently orphan the payer — the same class of failure as writing
 a blank one. An over-long address is refused earlier instead, by the `.max(254)` on
 `createPaymentSchemaWithMessages`, so it fails as a `ValidationError` and a 400 rather than reaching Stripe.
 `promoCode` carries a `.max()` there too, which is what stops the whitespace bypass carrying an arbitrarily

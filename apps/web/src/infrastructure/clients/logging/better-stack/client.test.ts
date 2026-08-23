@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { LOG_LEVEL, type LogLevel } from "./contract";
 
 const { mockLogtail, MockLogtail } = vi.hoisted(() => {
 	const mockLogtail = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() };
@@ -37,6 +38,31 @@ describe("getBetterStackInstance", () => {
 
 	it("returns a BetterStackClient", () => {
 		expect(getBetterStackInstance()).toBeInstanceOf(BetterStackClient);
+	});
+});
+
+describe("the level vocabulary", () => {
+	it.each(Object.values(LOG_LEVEL))("emits %s under its own name, so no level folds onto another", (level) => {
+		const client = new BetterStackClient();
+
+		client[level as LogLevel]("test event", { field: 1 });
+
+		expect(mockLogtail[level as LogLevel]).toHaveBeenCalledWith(
+			"test event",
+			expect.objectContaining({ field: 1 }),
+			expect.anything(),
+		);
+		for (const other of Object.values(LOG_LEVEL)) {
+			if (other !== level) expect(mockLogtail[other as LogLevel]).not.toHaveBeenCalled();
+		}
+	});
+
+	it("has a method for every level the tail Worker's contract names", () => {
+		const client = new BetterStackClient();
+
+		for (const level of Object.values(LOG_LEVEL)) {
+			expect(typeof client[level as LogLevel]).toBe("function");
+		}
 	});
 });
 

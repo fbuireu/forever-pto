@@ -3,12 +3,12 @@ import type { TursoService } from "@infrastructure/clients/db/turso/service";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import type { PromoCodeErrorCode } from "@infrastructure/errors";
 import { PromoCodeError, PromoCodeErrors } from "@infrastructure/errors";
+import { normalizePromoCode, PAYMENT_CURRENCY } from "@infrastructure/services/payments/normalForms";
 import { countPromoCodeRedemptions } from "@infrastructure/services/payments/repository";
 import { Effect } from "effect";
 import type Stripe from "stripe";
 
 const MIN_FINAL_AMOUNT = 0.5;
-const PAYMENT_CURRENCY: string = "eur";
 
 const getCouponValidationError = (coupon: Stripe.Coupon): PromoCodeErrorCode | null => {
 	if (!coupon.valid) return PromoCodeErrors.COUPON_INVALID;
@@ -57,7 +57,7 @@ export const validatePromoCode = (
 		const stripe = yield* StripeServerService;
 
 		const promotionCodes = yield* stripe.promotionCodes
-			.list({ code: code.toUpperCase().trim(), active: true, limit: 1, expand: ["data.promotion.coupon"] })
+			.list({ code: normalizePromoCode(code), active: true, limit: 1, expand: ["data.promotion.coupon"] })
 			.pipe(Effect.mapError((e) => new PromoCodeError({ code: PromoCodeErrors.FAILED_TO_LOAD, message: e.message })));
 
 		if (promotionCodes.data.length === 0) {

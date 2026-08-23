@@ -201,8 +201,8 @@ describe("middleware", () => {
 		});
 	});
 
-	describe("locale cookie hardening", () => {
-		it("upgrades the locale cookie to httpOnly + secure + sameSite lax", async () => {
+	describe("locale cookie policy", () => {
+		it("pins the locale cookie to the one policy, and leaves it writable from the client", async () => {
 			mockI18nResponse.cookies.get.mockReturnValue({ value: ES });
 			const request = makeRequest(`/${ES}`);
 
@@ -211,14 +211,13 @@ describe("middleware", () => {
 			expect(mockI18nResponse.cookies.set).toHaveBeenCalledWith({
 				name: LOCALE_COOKIE,
 				value: ES,
-				httpOnly: true,
 				secure: true,
 				sameSite: "lax",
 				path: "/",
 			});
 		});
 
-		it("skips cookie hardening when no locale cookie is set", async () => {
+		it("writes no locale cookie of its own when next-intl set none", async () => {
 			mockI18nResponse.cookies.get.mockReturnValue(null);
 			const request = makeRequest("/");
 
