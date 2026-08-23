@@ -73,7 +73,7 @@ pnpm --filter forever-pto-docs dev   # docs dev server
 
 ## Getting started
 
-**Requirements:** Node.js 26.3.0 (`.nvmrc`, mirrored in `engines.node`), pnpm 11.21.0 (`packageManager`) — pinned, match exactly
+**Requirements:** Node.js 26.7.0 (`.nvmrc`, mirrored in `engines.node`), pnpm 11.22.0 (`packageManager`) — pinned, match exactly
 
 ```bash
 # Install dependencies

@@ -35,8 +35,8 @@ not before — see [ADR 0010](./adr/0010-apps-web-and-apps-docs-monorepo-layout.
 
 ## Versions (pinned — match exactly)
 
-- Node **26.3.0** (`.nvmrc`, mirrored in `engines.node`) — `.nvmrc` is what every CI job installs
-- pnpm **11.21.0** (`packageManager`) — always use pnpm, never npm/yarn
+- Node **26.7.0** (`.nvmrc`, mirrored in `engines.node`) — `.nvmrc` is what every CI job installs
+- pnpm **11.22.0** (`packageManager`) — always use pnpm, never npm/yarn
 - TypeScript **6** and Next **16.2** — pinned as a pair by the Cloudflare adapter. That constraint belongs
   to the app; the reasoning is in [`./apps/web/CLAUDE.md`](./apps/web/CLAUDE.md) and
   [ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)
