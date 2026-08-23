@@ -42,7 +42,7 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/prepare-env
       - name: Typecheck
-        run: pnpm --filter forever-pto-docs check
+        run: pnpm --filter forever-pto-docs typecheck
       - name: Build
         run: pnpm --filter forever-pto-docs build
       - name: Install Playwright browsers
