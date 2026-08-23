@@ -52,7 +52,7 @@ type BaseDTO<INPUT, OUTPUT, PARAMS = unknown> = {
 
 Nothing here fetches, writes, logs or reads a clock it was not handed. `create` is a pure function of `raw` and `params`. `stripe`, `date-holidays` and `i18n-iso-countries` appear only as `import type` — no SDK is constructed, so nothing in this folder pulls a runtime dependency in behind it.
 
-That is what lets `HolidayDTO` cross into the domain. The pure calendar context imports `@application/dto/holiday/types` directly, which is a layering inversion on paper: the type describes a Holiday, so it belongs in the domain. It is a known pragmatic exception — moving it means touching every calendar module and its tests — and it is safe only because the file is types and one const object, evaluable inside a Web Worker with no DOM. See [ADR 0003](../../../docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md) and [`../../domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md). If anything with a runtime dependency is ever added to `holiday/types.ts`, the planner breaks in the worker and no server-side test will catch it.
+That is what lets `HolidayDTO` cross into the domain. The pure calendar context imports `@application/dto/holiday/types` directly, which is a layering inversion on paper: the type describes a Holiday, so it belongs in the domain. It is a known pragmatic exception — moving it means touching every calendar module and its tests — and it is safe only because the file is types and one const object, evaluable inside a Web Worker with no DOM. See [ADR 0003](../../../docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md) and [`../../domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md). If anything with a runtime dependency is ever added to [`holiday/types.ts`](./holiday/types.ts), the planner breaks in the worker and no server-side test will catch it.
 
 `RegionDTO` also crosses outwards, but downwards only: `holidayDTO.create` takes the region list so `getRegionName` can turn a region code into a display label. No domain code imports it.
 
@@ -73,7 +73,7 @@ and a stale `false` hides a Custom Holiday the window has since moved back onto.
 
 **Schemas carry message keys, not messages.** `contactSchema` and `createPaymentSchema` are pre-bound with keys such as `invalid_email` for server-side validation. The UI calls `createContactSchema` / `createPaymentSchemaWithMessages` with translated strings instead. Adding a validation rule means adding it to the messages interface too, or the localised form silently loses the message.
 
-**`calculateFinalAmount` in `payment/utils/helpers.ts` is not the one in the promo-code service.** This one just unwraps an already-computed `DiscountInfo` for display; the identically named private function in `@infrastructure/services/payments/provider/promoCode` is what actually applies a Stripe coupon.
+**`calculateFinalAmount` in [`payment/utils/helpers.ts`](./payment/utils/helpers.ts) is not the one in the promo-code service.** This one just unwraps an already-computed `DiscountInfo` for display; the identically named private function in `@infrastructure/services/payments/provider/promoCode` is what actually applies a Stripe coupon.
 
 ## Testing
 

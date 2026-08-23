@@ -44,7 +44,7 @@ ideas are already being talked about.
 ### Improving documentation
 
 Use the [documentation template](.github/ISSUE_TEMPLATE/documentation.yml), or
-just open a PR. Note that the agent-facing guides (`CLAUDE.md` and friends)
+just open a PR. Note that the agent-facing guides ([`CLAUDE.md`](./CLAUDE.md) and friends)
 are held to the code by a test — see *The docs are part of the change* below.
 
 ## Getting started
@@ -103,7 +103,7 @@ typecheck on pre-push.
 ## The docs are part of the change
 
 This repo treats its documentation as part of the code: change one, update the
-other **in the same commit**. `docs/docs-consistency.test.ts` runs with the
+other **in the same commit**. [`docs/docs-consistency.test.ts`](./docs/docs-consistency.test.ts) runs with the
 unit tests and fails the build when the mechanical half of that contract is
 broken — scripts that no longer exist, links that no longer resolve, aliases
 that moved. [CLAUDE.md](./CLAUDE.md) has the full table of what to update for

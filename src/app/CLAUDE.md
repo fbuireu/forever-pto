@@ -3,7 +3,7 @@
 ## Purpose
 
 The Next.js App Router tree: every URL the app answers, plus the file-convention entry points Next.js
-discovers by name (`sitemap.ts`, `robots.ts`, `global-error.tsx`, `global-not-found.tsx`, `favicon.ico`).
+discovers by name ([`sitemap.ts`](./sitemap.ts), [`robots.ts`](./robots.ts), [`global-error.tsx`](./global-error.tsx), [`global-not-found.tsx`](./global-not-found.tsx), `favicon.ico`).
 
 This folder is a thin shell. Pages compose components from `@ui/*`; route handlers parse the request,
 run an Effect program from `@application/use-cases/*` against `ApplicationLayer`, and map the typed
@@ -20,13 +20,13 @@ failure channel onto a status code. Business logic that lands here is in the wro
 | `[locale]/(marketing)/legal/` | Privacy policy, cookie policy, terms of service, legal notice |
 | `api/` | Seven route handlers — see below |
 | `.well-known/[...slug]/` | Catch-all serving three static JSON documents |
-| `fonts.ts` | The four `next/font/google` families, exported as CSS-variable handles |
+| [`fonts.ts`](./fonts.ts) | The four `next/font/google` families, exported as CSS-variable handles |
 | `sitemap.ts`, `robots.ts` | SEO file conventions |
 | `global-error.tsx`, `global-not-found.tsx` | Last-resort boundaries that render their own document |
 
 ## How a request reaches a page
 
-`src/middleware.ts` runs first, and its `config.matcher` decides what it sees: everything except `/api`,
+[`src/middleware.ts`](../middleware.ts) runs first, and its `config.matcher` decides what it sees: everything except `/api`,
 `/_next`, `/_vercel` and any path containing a dot, plus `/api/markdown` explicitly. In order it:
 
 1. Serves `/api/markdown` (only to attach `Cache-Control` and `Vary: Accept`).
@@ -40,22 +40,22 @@ failure channel onto a status code. Business logic that lands here is in the wro
 3. Redirects `**/payment/confirmation` to the locale home when `payment_intent` is absent.
 4. Runs the `next-intl` middleware, which negotiates the locale and fills the `[locale]` segment.
 5. Re-writes the `NEXT_LOCALE` cookie next-intl just set, through `setLocaleCookie`
-   (`src/infrastructure/i18n/cookie.ts`), which adds `httpOnly`, `secure`, `sameSite: 'lax'` and `path: '/'`.
-   It looks redundant and is not — next-intl's own cookie carries none of those. `middleware.test.ts` guards
+   ([`src/infrastructure/i18n/cookie.ts`](../infrastructure/i18n/cookie.ts)), which adds `httpOnly`, `secure`, `sameSite: 'lax'` and `path: '/'`.
+   It looks redundant and is not — next-intl's own cookie carries none of those. [`middleware.test.ts`](../middleware.test.ts) guards
    it under `describe('locale cookie hardening')`.
-6. Hands the response to the location proxy (`src/infrastructure/proxy/location.ts`), which sets the
+6. Hands the response to the location proxy ([`src/infrastructure/proxy/location.ts`](../infrastructure/proxy/location.ts)), which sets the
    detected-country cookie.
 
-Security headers are **not** set here. They are the `SECURITY_HEADERS` array in `next.config.ts`, applied
+Security headers are **not** set here. They are the `SECURITY_HEADERS` array in [`next.config.ts`](../../next.config.ts), applied
 through `async headers()` on `source: '/(.*)'` — which, unlike this matcher, really does cover every request.
 
 Both Markdown branches set `Vary: Accept` next to `Cache-Control`. The body served under an HTML URL
 depends on the `Accept` header, so a shared cache keyed on the URL alone would hand the Markdown twin to
 the next visitor asking for HTML.
 
-`localePrefix` is `as-needed` with `en` as the default (`src/infrastructure/i18n/routing.ts`), so English
+`localePrefix` is `as-needed` with `en` as the default ([`src/infrastructure/i18n/routing.ts`](../infrastructure/i18n/routing.ts)), so English
 URLs carry **no** `/en` prefix while the other five do. Anything building a URL must go through
-`localePath` / `localeAlternates` in `src/infrastructure/i18n/utils/url.ts` rather than concatenating the
+`localePath` / `localeAlternates` in [`src/infrastructure/i18n/utils/url.ts`](../infrastructure/i18n/utils/url.ts) rather than concatenating the
 locale itself.
 
 `[locale]/layout.tsx` re-validates the segment with `hasLocale` and calls `notFound()` — the middleware is
@@ -90,7 +90,7 @@ unit-testable on its own — hence the `metadata.test.ts` next to each one.
 
 **The shape lives in one module; each file supplies only what its route knows.** `buildMetadata` under
 `@infrastructure/seo` owns `metadataBase`, the `alternates` pair, `openGraph`, `twitter`, the `robots` block
-and `other`. A route file resolves `siteUrl` through `getPublicEnv.ts`, pulls its copy from a `metadata.*`
+and `other`. A route file resolves `siteUrl` through [`getPublicEnv.ts`](../infrastructure/services/env/getPublicEnv.ts), pulls its copy from a `metadata.*`
 namespace, and passes strings: `title`, optional `description` and `keywords`, an optional `path`, and
 `indexable`. Two rules are derived rather than repeated — `openGraph` appears when there is a description,
 and `images`/`twitter`/`keywords` only when the route is indexable — which is exactly what the seven files
@@ -106,20 +106,20 @@ competing for the same ranking — passing `path` is what prevents it.
 
 | Route | Method | What it does |
 | --- | --- | --- |
-| `api/payment/route.ts` | POST | Creates a Stripe PaymentIntent for a Donation. Rate-limits on `cf-connecting-ip` before anything else |
-| `api/payment/activate/route.ts` | GET | Stripe's `return_url`. Activates Premium and redirects to the confirmation page with the cookie already set — see *The redirect hand-off* below |
-| `api/webhooks/stripe/route.ts` | POST | Verifies the `stripe-signature` header, then hands the event to `processWebhookEvent`. Reads the **raw** body via `request.text()` — parsing it as JSON would break signature verification |
-| `api/check-session/route.ts` | GET, POST | GET verifies the premium cookie; POST activates Premium from an email, optionally with a payment key, and sets the cookie |
-| `api/contact/route.ts` | POST | Contact form submission |
-| `api/markdown/route.ts` | GET | Renders the Markdown twin of a page via `buildMarkdownPage.ts`. Only reached through the middleware rewrite |
-| `api/health/route.ts` | GET | Liveness probe. Answers `status` and `timestamp` and nothing else |
+| [`api/payment/route.ts`](./api/payment/route.ts) | POST | Creates a Stripe PaymentIntent for a Donation. Rate-limits on `cf-connecting-ip` before anything else |
+| [`api/payment/activate/route.ts`](./api/payment/activate/route.ts) | GET | Stripe's `return_url`. Activates Premium and redirects to the confirmation page with the cookie already set — see *The redirect hand-off* below |
+| [`api/webhooks/stripe/route.ts`](./api/webhooks/stripe/route.ts) | POST | Verifies the `stripe-signature` header, then hands the event to `processWebhookEvent`. Reads the **raw** body via `request.text()` — parsing it as JSON would break signature verification |
+| [`api/check-session/route.ts`](./api/check-session/route.ts) | GET, POST | GET verifies the premium cookie; POST activates Premium from an email, optionally with a payment key, and sets the cookie |
+| [`api/contact/route.ts`](./api/contact/route.ts) | POST | Contact form submission |
+| [`api/markdown/route.ts`](./api/markdown/route.ts) | GET | Renders the Markdown twin of a page via [`buildMarkdownPage.ts`](../infrastructure/markdown/buildMarkdownPage.ts). Only reached through the middleware rewrite |
+| [`api/health/route.ts`](./api/health/route.ts) | GET | Liveness probe. Answers `status` and `timestamp` and nothing else |
 
 Shared conventions across them:
 
 - The Effect program is run at the boundary — `Effect.runPromise(program.pipe(Effect.provide(ApplicationLayer)))`
   — and every tagged failure is caught into a `NextResponse`. `Effect.catchAll` closes the tail so a route
   never rejects.
-- Error bodies use the `ApiError` constants from `src/infrastructure/api/errors.ts`, never a raw message,
+- Error bodies use the `ApiError` constants from [`src/infrastructure/api/errors.ts`](../infrastructure/api/errors.ts), never a raw message,
   except `ValidationError` and `PromoCodeError` whose messages are already user-facing.
 - A JSON body is read with `parseJsonBody` (`api/parseJsonBody.ts`) **inside** the Effect program, never with
   a bare `await request.json()` before it. A malformed, empty or non-object body then fails as a
@@ -128,14 +128,14 @@ Shared conventions across them:
   the exception — it needs the raw text.
 - Work that must not delay the response (persisting the payment record, sending the email) is returned by
   the use-case as a `deferred` Effect and run inside Next's `after()`.
-- `check-session` and `health` respond through `noStore` (`src/infrastructure/api/response.ts`). Anything
+- `check-session` and `health` respond through `noStore` ([`src/infrastructure/api/response.ts`](../infrastructure/api/response.ts)). Anything
   carrying Premium state must keep doing so.
 
 ## The redirect hand-off
 
 Some payment methods — iDEAL, Bancontact, P24, EPS, and any card that needs a redirect for 3DS — send the
 payer to their bank instead of confirming inline. Stripe then resolves `confirmPayment` with **no**
-`PaymentIntent`, so `src/ui/adapters/payments/checkout.ts` cannot activate anything: the browser has already
+`PaymentIntent`, so [`src/ui/adapters/payments/checkout.ts`](../ui/adapters/payments/checkout.ts) cannot activate anything: the browser has already
 navigated away. Everything those payers get, they get on the way back.
 
 `api/payment/activate/route.ts` is that way back. It is the `return_url` (`premium/CheckoutForm.tsx` builds
@@ -149,7 +149,7 @@ route handler or a server action can, and that constraint is what decides this s
 four guards:
 
 - **The client secret is required and verified.** `activateWithPayment` compares it against the retrieved
-  intent's own `client_secret` through `matchesClientSecret` (`src/infrastructure/services/premium/activation.ts`),
+  intent's own `client_secret` through `matchesClientSecret` ([`src/infrastructure/services/premium/activation.ts`](../infrastructure/services/premium/activation.ts)),
   in constant time and length-first. Without it, anyone holding a leaked payment intent id could mint a
   session. The length check is not tidiness: `charCodeAt` past the end returns `NaN`, `NaN | 0` is `0`, so a
   length-blind loop accepts any prefix.
@@ -172,10 +172,10 @@ being present — the payer arrives through a chain that started cross-site and 
 that hop. The `activation` query parameter is the signal; the cookie is the entitlement.
 
 **The store does not pick that cookie up on its own, which is why the page mounts
-`src/ui/modules/premium/PremiumSessionSync.tsx`.** `checkExistingSession()` returns early unless
+[`src/ui/modules/premium/PremiumSessionSync.tsx`](../ui/modules/premium/PremiumSessionSync.tsx).** `checkExistingSession()` returns early unless
 `needsSessionCheck` is set, and only rehydration raises that flag, only when `lastVerified` is missing or
 over 24 hours old — false for any donor who opened the planner before donating, since `PremiumFeature`'s own
-mount stamps it. `PremiumFeature.tsx` calling `checkExistingSession()` unconditionally therefore does
+mount stamps it. [`PremiumFeature.tsx`](../ui/modules/premium/PremiumFeature.tsx) calling `checkExistingSession()` unconditionally therefore does
 nothing for the payer who has just come back. `PremiumSessionSync` renders `null` and calls
 `checkExistingSession({ force: true })` once; it activates nothing — the cookie is already set, server side,
 before this page renders — it only invalidates a client-side cache, which is the one thing a server
@@ -186,7 +186,7 @@ valid cookie, is told Premium is active, and finds every feature blurred.
 
 `.well-known/[...slug]/route.ts` is a lookup table, not a router: it joins the slug segments and matches
 against three exact keys — `api-catalog`, `mcp/server-card.json`, `agent-skills/index.json` — delegating
-to `apiCatalog.ts`, `mcpServerCard.ts` and `agentSkillsIndex.ts` in `@infrastructure/well-known`. Anything
+to [`apiCatalog.ts`](../infrastructure/well-known/apiCatalog.ts), [`mcpServerCard.ts`](../infrastructure/well-known/mcpServerCard.ts) and [`agentSkillsIndex.ts`](../infrastructure/well-known/agentSkillsIndex.ts) in `@infrastructure/well-known`. Anything
 else is a 404. Add a document by adding a key; do not branch inside the handler.
 
 **That table is a `Map`, and it has to stay one.** As a plain object it answered `/.well-known/constructor`
@@ -215,7 +215,7 @@ first.
 | `[locale]/not-found.tsx` | `notFound()` raised inside a matched locale segment |
 | `global-not-found.tsx` | URLs that match no route at all, so no layout ran. Enabled by `experimental.globalNotFound` in `next.config.ts`; it re-detects the locale itself from the `x-next-intl-locale` header, then the locale cookie, then `Accept-Language` |
 
-`global-error.tsx` bundles **only** `en.json` and hard-codes `lang="en"` on the document. That is
+`global-error.tsx` bundles **only** [`en.json`](../ui/i18n/messages/en.json) and hard-codes `lang="en"` on the document. That is
 deliberate: pulling all six catalogues into the root bundle would cost every route roughly 500 KB for a
 page most users never see. Do not "fix" the mismatch between the URL locale and the rendered language by
 importing the other five.
@@ -249,8 +249,8 @@ That used to be three edits in three files — a `ROUTES` entry, a `DISALLOWED_P
 `robots: { index: false }` — with nothing tying them together. It also closed a hole: `DISALLOWED_PAGES`
 blocked the prefixes `/legal/` and `/payment/`, so a private route anywhere else was disallowed by nobody.
 `isIndexable` **fails closed** — a path with no row is treated as private — so the failure mode of forgetting
-the table is a page missing from the sitemap, not a private page advertised to crawlers. `routes.test.ts`
-pins that, and `robots.test.ts` additionally pins that nothing the sitemap advertises is disallowed.
+the table is a page missing from the sitemap, not a private page advertised to crawlers. [`routes.test.ts`](../infrastructure/seo/routes.test.ts)
+pins that, and [`robots.test.ts`](./robots.test.ts) additionally pins that nothing the sitemap advertises is disallowed.
 
 Both files resolve the base URL from the Cloudflare env rather than a constant. Only `sitemap.ts` gets the
 host it is actually served from, though: `robots.ts` is prerendered, so it bakes whatever the build resolved
@@ -258,14 +258,14 @@ host it is actually served from, though: `robots.ts` is prerendered, so it bakes
 
 ## Structured data
 
-`src/ui/modules/shared/seo/JsonLd.tsx` exports two components, mounted on different pages on purpose.
+[`src/ui/modules/shared/seo/JsonLd.tsx`](../ui/modules/shared/seo/JsonLd.tsx) exports two components, mounted on different pages on purpose.
 `JsonLd` carries the `WebApplication` and `Organization` schemas and sits on `/planner`; `FaqJsonLd` carries
 the `FAQPage` schema and sits on the homepage, **because that is the page that renders the FAQ**. Search
 engines expect the marked-up questions to be visible on the page carrying the markup, and the FAQ schema was
 emitted on the planner, which has no FAQ on it at all.
 
 The Premium offer states a `priceSpecification` with a `minPrice`, not a fixed price. Premium is unlocked by
-a Donation the payer chooses — `src/application/dto/payment/schema.ts` accepts 1 to 10000 — so the fixed
+a Donation the payer chooses — [`src/application/dto/payment/schema.ts`](../application/dto/payment/schema.ts) accepts 1 to 10000 — so the fixed
 4.99 it used to advertise was simply untrue. If the minimum moves, `MINIMUM_DONATION` and that Zod bound
 move together.
 
@@ -284,7 +284,7 @@ Every route file has a co-located test: `.test.ts` for handlers, `sitemap.ts`, `
 the exceptions — neither has behaviour worth asserting.
 
 Handler tests mock the infrastructure module rather than the Effect layer where it is cheaper to do so
-(`api/health/route.test.ts` stubs `@infrastructure/api/response`), and reach for `vi.stubEnv` when a route
+([`api/health/route.test.ts`](./api/health/route.test.ts) stubs `@infrastructure/api/response`), and reach for `vi.stubEnv` when a route
 reads the environment. Keep the `await import('./route')` after the mocks: route modules read their
 dependencies at module scope, so a top-level import would bind the real ones.
 

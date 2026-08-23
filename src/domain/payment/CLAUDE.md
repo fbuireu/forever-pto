@@ -16,11 +16,11 @@ keeping that row honest.
 
 | File | Contents |
 | --- | --- |
-| `events/types.ts` | `PaymentSucceededEvent` and `PaymentFailedEvent` — plain interfaces, no Stripe types |
-| `events/factory/events.ts` | `createPaymentSucceededEvent` (an Effect, it can fail), `createPaymentFailedEvent` — the only place a `Stripe.PaymentIntent` is read |
-| `events/factory/resolvers.ts` | `resolveChargeId` — flattens `latest_charge`, which Stripe returns as an id, an expanded object or nothing |
-| `handlers/paymentSucceeded.ts` | `handlePaymentSucceeded` — status reconciliation plus best-effort charge enrichment |
-| `handlers/paymentFailed.ts` | `handlePaymentFailed` — status reconciliation, with `succeeded` treated as terminal |
+| [`events/types.ts`](./events/types.ts) | `PaymentSucceededEvent` and `PaymentFailedEvent` — plain interfaces, no Stripe types |
+| [`events/factory/events.ts`](./events/factory/events.ts) | `createPaymentSucceededEvent` (an Effect, it can fail), `createPaymentFailedEvent` — the only place a `Stripe.PaymentIntent` is read |
+| [`events/factory/resolvers.ts`](./events/factory/resolvers.ts) | `resolveChargeId` — flattens `latest_charge`, which Stripe returns as an id, an expanded object or nothing |
+| [`handlers/paymentSucceeded.ts`](./handlers/paymentSucceeded.ts) | `handlePaymentSucceeded` — status reconciliation plus best-effort charge enrichment |
+| [`handlers/paymentFailed.ts`](./handlers/paymentFailed.ts) | `handlePaymentFailed` — status reconciliation, with `succeeded` treated as terminal |
 
 ## Public API
 
@@ -33,7 +33,7 @@ handlePaymentFailed(event):    Effect<void, DatabaseError, TursoService | Logger
 ```
 
 `handlePaymentSucceeded` needs Stripe because it goes back for the charge; `handlePaymentFailed` does not.
-The only caller is `processWebhookEvent`, in `webhook.ts` under `@application/use-cases`, which builds the
+The only caller is `processWebhookEvent`, in [`webhook.ts`](../../application/use-cases/webhook.ts) under `@application/use-cases`, which builds the
 event through the factory; the layer is provided at the route.
 
 ## Stripe stops at the factory
@@ -108,14 +108,14 @@ buy safety anyway; a throw inside it is a defect just the same.
 | --- | --- |
 | Webhook signature verification and event dispatch | the route handler under `src/app/api/`, then `webhook.ts` |
 | Creating a missing payment row from the webhook | `webhook.ts` |
-| Granting Premium and minting the session | `activatePremium.ts` and `@infrastructure/services/premium` |
+| Granting Premium and minting the session | [`activatePremium.ts`](../../application/use-cases/activatePremium.ts) and `@infrastructure/services/premium` |
 | Creating the intent, promo codes, rate limiting | `@infrastructure/services/payments` |
 | Anything the payer sees | `@ui/adapters/payments` and the payment pages |
 
 ## Testing
 
 `events.ts`, `paymentSucceeded.ts` and `paymentFailed.ts` each have a co-located `.test.ts`;
-`events/types.ts` has none and should not grow one. `resolvers.ts` is covered through `events.test.ts`.
+`events/types.ts` has none and should not grow one. `resolvers.ts` is covered through [`events.test.ts`](./events/factory/events.test.ts).
 
 The factory needs no layer — it requires nothing — so `events.test.ts` drives it with `Effect.runSync`, and
 `Effect.runSync(… .pipe(Effect.flip))` where the assertion is about `MissingDonorEmailError`.

@@ -13,14 +13,14 @@ The rest of the application layer contract is in [`../CLAUDE.md`](../CLAUDE.md).
 
 | File | Holds |
 | --- | --- |
-| `filters.ts` | `useFiltersStore` — the planning inputs |
-| `holidays.ts` | `useHolidaysStore` — the calendar, the plan, and the user's edits to it |
-| `location.ts` | `useLocationStore` — the Country and Region option lists |
-| `premium.ts` | `usePremiumStore` — the Premium session and the upgrade modal |
-| `ui.ts` | `useUIStore` — donate popover and currency; the one store with no persistence |
-| `crypto.ts` | `obfuscatedStorage`, the zustand `PersistStorage` the four persisted stores share. Not a store |
-| `utils/crypto.ts` | `obfuscate` / `deobfuscate` / `base64Encode` / `base64Decode`, plus `TWENTY_FOUR_HOURS` and `BASE64_PATTERN`. Not a store |
-| `types.ts` | The action parameter objects shared between the stores and their callers — `GenerateSuggestionsParams`, `MainThreadSuggestionsParams`, `FetchHolidaysParams`, `PlanningWindowParams`, `AddHolidayParams`, `EditHolidayParams`, `AlternativeSelectionBaseParams` — plus the outcomes the actions answer with: `DayRefusal`/`DayOutcome` and `HolidayRefusal`/`HolidayOutcome` |
+| [`filters.ts`](./filters.ts) | `useFiltersStore` — the planning inputs |
+| [`holidays.ts`](./holidays.ts) | `useHolidaysStore` — the calendar, the plan, and the user's edits to it |
+| [`location.ts`](./location.ts) | `useLocationStore` — the Country and Region option lists |
+| [`premium.ts`](./premium.ts) | `usePremiumStore` — the Premium session and the upgrade modal |
+| [`ui.ts`](./ui.ts) | `useUIStore` — donate popover and currency; the one store with no persistence |
+| [`crypto.ts`](./crypto.ts) | `obfuscatedStorage`, the zustand `PersistStorage` the four persisted stores share. Not a store |
+| [`utils/crypto.ts`](./utils/crypto.ts) | `obfuscate` / `deobfuscate` / `base64Encode` / `base64Decode`, plus `TWENTY_FOUR_HOURS` and `BASE64_PATTERN`. Not a store |
+| [`types.ts`](./types.ts) | The action parameter objects shared between the stores and their callers — `GenerateSuggestionsParams`, `MainThreadSuggestionsParams`, `FetchHolidaysParams`, `PlanningWindowParams`, `AddHolidayParams`, `EditHolidayParams`, `AlternativeSelectionBaseParams` — plus the outcomes the actions answer with: `DayRefusal`/`DayOutcome` and `HolidayRefusal`/`HolidayOutcome` |
 
 ## The five stores
 
@@ -37,10 +37,10 @@ leaving a stale one produces a plan with holidays from the wrong place.
 
 **The numeric filters are clamped in the store, because the controls are not the only writers.** `MIN_PTO_DAYS`,
 `MAX_PTO_DAYS`, `MIN_CARRY_OVER_MONTHS` and `MAX_CARRY_OVER_MONTHS` live in `filters.ts` and the setters hold
-them; `PtoDays.tsx` and `CarryOverMonths.tsx` import the same constants rather than declaring their own. Each
+them; [`PtoDays.tsx`](../../ui/modules/sidebar/components/PtoDays.tsx) and [`CarryOverMonths.tsx`](../../ui/modules/sidebar/components/CarryOverMonths.tsx) import the same constants rather than declaring their own. Each
 setter used to clamp the floor and nothing else, and the ceiling was enforced only by the control that owned
 it — `PtoDays`'s increment button going disabled at 365. That left two ways past it: the accrual calculator
-in `PtoCalculator.tsx`, which writes a computed budget straight through `setPtoDays` (its `max='8'` is an
+in [`PtoCalculator.tsx`](../../ui/modules/sidebar/components/PtoCalculator.tsx), which writes a computed budget straight through `setPtoDays` (its `max='8'` is an
 HTML attribute, which stops the stepper and not a typed number), and a persisted blob carrying whatever a
 previous version allowed. `onRehydrateStorage` clamps as well for the second case — `migrate` only runs on a
 version change, so a stored out-of-range value would otherwise outlive the bound for ever. A ceiling enforced
@@ -74,8 +74,8 @@ design, and three of those omissions are load-bearing:
   persisted `true` would rehydrate into a permanently frozen calendar.
 - **`previewAlternativeIndex` is not persisted.** It is hover state and is re-derived from
   `currentSelectionIndex` on rehydration.
-- **`location` persists nothing at all, and its `migrate` drops whatever it finds.** `CountriesClient.tsx`
-  pushes the server-rendered Country list into the store on mount and `Regions.tsx` re-derives the Regions
+- **`location` persists nothing at all, and its `migrate` drops whatever it finds.** [`CountriesClient.tsx`](../../ui/modules/sidebar/components/CountriesClient.tsx)
+  pushes the server-rendered Country list into the store on mount and [`Regions.tsx`](../../ui/modules/sidebar/components/Regions.tsx) re-derives the Regions
   from the persisted Country, so both fields were overwritten before anything could read the stored copy —
   paying to serialise, obfuscate and base64 roughly 250 localised entries on every write for nothing.
   `STORAGE_VERSION` went to 3 to retire the v2 blobs that still carry those lists, and `migrate` returns an
@@ -108,12 +108,12 @@ shrink between sessions, leaving a persisted index that names nothing. It resets
 There are two ways a plan gets calculated, and they are two *callers* of `runPlanningPipeline` under
 `@domain/calendar` — not two implementations:
 
-- **The normal path** is the Web Worker. `useCalculationsWorker.ts` posts to `worker.ts`, which deserialises
+- **The normal path** is the Web Worker. [`useCalculationsWorker.ts`](../../ui/hooks/useCalculationsWorker.ts) posts to [`worker.ts`](../../infrastructure/workers/worker.ts), which deserialises
   the request, calls the pipeline off the main thread, serialises the result and hands it back through
   `setCalculationResult`. See
   [`../../infrastructure/workers/CLAUDE.md`](../../infrastructure/workers/CLAUDE.md).
 - **The store's own `generateSuggestions` action** calls the same pipeline on the main thread. Its
-  one caller is the Troubleshooting reset in `Troubleshooting.tsx`, which fires it after `resetToDefaults()`
+  one caller is the Troubleshooting reset in [`Troubleshooting.tsx`](../../ui/modules/pages/homepage/support/Troubleshooting.tsx), which fires it after `resetToDefaults()`
   has cleared the manual edits.
 
 Everything that used to be restated on both sides — clearing the caches, building the `manual-N`
@@ -139,8 +139,8 @@ re-fetches Holidays) and would otherwise strand it, spending budget with no way 
 `DayOutcome` and `addHoliday`/`editHoliday` return a `HolidayOutcome` — both declared in `types.ts`, both
 either `{ applied: true }` or `{ applied: false, reason }`, with `HolidayOutcome` additionally carrying
 `heldBy` so a caller can name the Holiday already on the date without looking it up. They used to answer
-`boolean` (or nothing at all), which is why `calendar/Calendar.tsx`, `AddHolidayModal.tsx` and
-`EditHolidayModal.tsx` each reimplemented the occupancy check purely to pick a toast — four hand-rolled
+`boolean` (or nothing at all), which is why `calendar/Calendar.tsx`, [`AddHolidayModal.tsx`](../../ui/modules/pages/planner/holidays/components/AddHolidayModal.tsx) and
+[`EditHolidayModal.tsx`](../../ui/modules/pages/planner/holidays/components/EditHolidayModal.tsx) each reimplemented the occupancy check purely to pick a toast — four hand-rolled
 `toDateString()` comparisons for one rule, kept in agreement by review. The reasons are the distinctions the
 copy actually needs: a weekend, a National or Regional Holiday and a Custom Holiday are three different
 refusals because the UI says three different things. Adding a refusal branch means adding a reason, not a
@@ -236,9 +236,9 @@ does with what this store hands it, and getting the *inputs* wrong still produce
 - **Both guard on `holidaysWithManual.length === 0`.** A calendar with no Holidays and only Removed Days now
   short-circuits, which it did not when the Removed Days padded the array the guard counted.
 
-The `describe('generateSuggestions agrees with the worker')` block in `holidays.test.ts` still mirrors
-`worker.test.ts`, and both now assert the same thing from opposite sides: that each caller hands the pipeline
-the right inputs. The pipeline's own behaviour is tested once, in `pipeline.test.ts`, against the real engine.
+The `describe('generateSuggestions agrees with the worker')` block in [`holidays.test.ts`](./holidays.test.ts) still mirrors
+[`worker.test.ts`](../../infrastructure/workers/worker.test.ts), and both now assert the same thing from opposite sides: that each caller hands the pipeline
+the right inputs. The pipeline's own behaviour is tested once, in [`pipeline.test.ts`](../../domain/calendar/pipeline.test.ts), against the real engine.
 
 **The two sides still differ on what "nothing to plan" means, and that is the one deliberate difference
 left.** The pipeline answers `planned: false` with an empty Suggestion whose Metrics are real; the worker
@@ -248,7 +248,7 @@ forwards it as-is, because the wire type has no null, while this store maps it t
 Cache clearing is no longer either caller's job — `runPlanningPipeline` does it, per the 2026-08-14 amendment
 to [ADR 0006](../../../docs/adr/0006-caller-owned-calculation-caches.md).
 
-The pipeline and `getHolidays.ts` are reached through `await import(...)` inside the actions, not top-level
+The pipeline and [`getHolidays.ts`](../../infrastructure/services/holidays/getHolidays.ts) are reached through `await import(...)` inside the actions, not top-level
 imports. That keeps the bulk of the planner out of the bundle any page that merely touches the store would
 otherwise pull in. Converting one to a static import is not a tidy-up.
 
@@ -287,7 +287,7 @@ different module with no SDK behind it.
 ## Gotchas
 
 **`fetchHolidays` and `fetchRegions` do no network I/O.** Both resolve out of the bundled `date-holidays`
-dataset in the browser — `getHolidays.ts` is `async` but local, and `getRegions.ts` is outright synchronous.
+dataset in the browser — `getHolidays.ts` is `async` but local, and [`getRegions.ts`](../../infrastructure/services/regions/getRegions.ts) is outright synchronous.
 The names are historical. Nothing in this folder makes an HTTP request except `premium.ts`, which calls
 `/api/check-session` through `@ui/adapters/session/checkSession`.
 
@@ -356,5 +356,5 @@ assertion is worth its two lines.
 Anything the store reaches through `await import(...)` — the two planning entry points, the cache module,
 `getHolidays.ts` — is mocked by module path, which is also how `holidays.test.ts` asserts that both cache
 clears happen before a run. `generateMetrics` is mocked the same way despite being a static import; the path
-is what the mock keys on, not the import style. `crypto.test.ts` is the exception that has to re-import: it uses `vi.resetModules()` with
+is what the mock keys on, not the import style. [`crypto.test.ts`](./crypto.test.ts) is the exception that has to re-import: it uses `vi.resetModules()` with
 `vi.stubGlobal('window', …)` and `vi.stubEnv`, because the storage branch is decided once at module load.

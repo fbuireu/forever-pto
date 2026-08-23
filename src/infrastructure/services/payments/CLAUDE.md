@@ -8,7 +8,7 @@ else — a use-case, a webhook handler, a route — provides `ApplicationLayer` 
 ([ADR 0002](../../../../docs/adr/0002-effect-for-external-service-boundaries.md)).
 
 The payments table is also the entitlement store. A succeeded row *is* Premium
-([ADR 0008](../../../../docs/adr/0008-premium-derived-from-payment.md)), which is why `repository.ts` is
+([ADR 0008](../../../../docs/adr/0008-premium-derived-from-payment.md)), which is why [`repository.ts`](./repository.ts) is
 read by the premium activation path as well as by the payment one.
 
 ## Files
@@ -16,12 +16,12 @@ read by the premium activation path as well as by the payment one.
 | File | Exports | Requires |
 | --- | --- | --- |
 | `repository.ts` | `savePayment`, `updatePaymentStatus`, `updatePaymentCharge`, `getPaymentById`, `getPaymentByEmail`, `countPromoCodeRedemptions`, `normalizePromoCode`, the `PaymentChargeData` shape | `TursoService` |
-| `normalizeEmail.ts` | `normalizeEmail(email)` — trim and lower-case, applied on both sides of every address comparison | — |
-| `confirmation.ts` | `confirmation(paymentIntentId)` — a `PaymentConfirmationDTO`, or `null` on any failure | `StripeServerService`, `LoggerService` |
-| `rateLimit.ts` | `checkRateLimit(ip)` — fails with `RateLimitError` | the Cloudflare `PAYMENT_RATE_LIMITER` binding |
-| `provider/intent.ts` | `createPaymentIntent(params)` — the Stripe intent behind a Donation | `StripeServerService` |
-| `provider/charge.ts` | `retrieveCharge(chargeId)` — normalises a Stripe `Charge` into flat, nullable fields | `StripeServerService` |
-| `provider/promoCode.ts` | `validatePromoCode(code, amount)` — a `DiscountInfo`, or a `PromoCodeError` | `StripeServerService`, `TursoService` |
+| [`normalizeEmail.ts`](./normalizeEmail.ts) | `normalizeEmail(email)` — trim and lower-case, applied on both sides of every address comparison | — |
+| [`confirmation.ts`](./confirmation.ts) | `confirmation(paymentIntentId)` — a `PaymentConfirmationDTO`, or `null` on any failure | `StripeServerService`, `LoggerService` |
+| [`rateLimit.ts`](./rateLimit.ts) | `checkRateLimit(ip)` — fails with `RateLimitError` | the Cloudflare `PAYMENT_RATE_LIMITER` binding |
+| [`provider/intent.ts`](./provider/intent.ts) | `createPaymentIntent(params)` — the Stripe intent behind a Donation | `StripeServerService` |
+| [`provider/charge.ts`](./provider/charge.ts) | `retrieveCharge(chargeId)` — normalises a Stripe `Charge` into flat, nullable fields | `StripeServerService` |
+| [`provider/promoCode.ts`](./provider/promoCode.ts) | `validatePromoCode(code, amount)` — a `DiscountInfo`, or a `PromoCodeError` | `StripeServerService`, `TursoService` |
 
 `provider/` is the Stripe side; at the root sit the database, the rate limiter and the address normaliser, and
 `confirmation.ts` sits between: a Stripe read that exists only to render the post-checkout page.
@@ -31,10 +31,10 @@ read by the premium activation path as well as by the payment one.
 | Caller | Uses |
 | --- | --- |
 | `payment.ts` (use-case) | `validatePromoCode`, `createPaymentIntent`, `savePayment` (deferred) |
-| `activatePremium.ts` (use-case) | `getPaymentByEmail`, `getPaymentById`, `savePayment`, `updatePaymentStatus` |
-| `webhook.ts` (use-case) | `getPaymentById`, `savePayment` |
-| `paymentSucceeded.ts` / `paymentFailed.ts` (domain handlers) | `getPaymentById`, `updatePaymentStatus`, `updatePaymentCharge`, `retrieveCharge` |
-| `src/app/api/payment/route.ts`, `actions/payment.ts` and `src/app/api/payment/activate/route.ts` | `checkRateLimit` |
+| [`activatePremium.ts`](../../../application/use-cases/activatePremium.ts) (use-case) | `getPaymentByEmail`, `getPaymentById`, `savePayment`, `updatePaymentStatus` |
+| [`webhook.ts`](../../../application/use-cases/webhook.ts) (use-case) | `getPaymentById`, `savePayment` |
+| [`paymentSucceeded.ts`](../../../domain/payment/handlers/paymentSucceeded.ts) / [`paymentFailed.ts`](../../../domain/payment/handlers/paymentFailed.ts) (domain handlers) | `getPaymentById`, `updatePaymentStatus`, `updatePaymentCharge`, `retrieveCharge` |
+| [`src/app/api/payment/route.ts`](../../../app/api/payment/route.ts), `actions/payment.ts` and [`src/app/api/payment/activate/route.ts`](../../../app/api/payment/activate/route.ts) | `checkRateLimit` |
 | The confirmation page | `confirmation` |
 
 The domain handlers importing infrastructure directly is the deliberate asymmetry in
@@ -145,7 +145,7 @@ parallel `POST /api/payment` from one IP — which is exactly the shape of card-
 counter by an amount unrelated to the burst and admitted almost all of them to
 `stripe.paymentIntents.create`. Two KV properties widened the window rather than narrowing it: a `get` is
 served from a per-colo cache whose minimum TTL is 60 s, the same as the window, and writes to one key are
-throttled to roughly one per second. `simple = { limit = 10, period = 60 }` in `wrangler.toml` now owns both
+throttled to roughly one per second. `simple = { limit = 10, period = 60 }` in [`wrangler.toml`](../../../../wrangler.toml) now owns both
 bounds — `period` accepts only 10 or 60 — so there is no `LIMIT`, no `WINDOW_SECONDS` and no `rl:payment:`
 key in this file. This is distinct from the fail-open stance above, which covers errors only, and from the
 "best-effort, not atomic" caveat granted to the promo-code cap below: that one is a marketing control, this
@@ -218,7 +218,7 @@ only in the logs.
 
 Every file has a co-located `.test.ts`, all built the same way: `Layer.succeed(Tag, mock)` for each tag in
 `R`, a local `run` helper that provides the merged layer, and `Effect.flip` where the assertion is about the
-failure. `rateLimit.test.ts` mocks `@opennextjs/cloudflare` instead, since the rate-limiting binding is its only
+failure. [`rateLimit.test.ts`](./rateLimit.test.ts) mocks `@opennextjs/cloudflare` instead, since the rate-limiting binding is its only
 dependency; its burst case drives 200 concurrent `checkRateLimit` calls to pin that the count is the
 platform’s and not a local read-modify-write.
 
@@ -226,10 +226,10 @@ No test constructs a Stripe or Turso client — and that is exactly how the prom
 unnoticed for as long as it did. A mock is written from the same reading of the API the code was written
 from, so when the reading is wrong the mock agrees with it and the suite proves nothing. Where a shape
 matters, build the fixture from a response the real account actually returned, and say in the test what
-about it is load-bearing: `promoCode.test.ts` now nests the coupon under `promotion` and carries a case
+about it is load-bearing: [`promoCode.test.ts`](./provider/promoCode.test.ts) now nests the coupon under `promotion` and carries a case
 asserting the code never reaches for a top-level `coupon`.
 
-`repository.test.ts` asserts positionally — one statement
+[`repository.test.ts`](./repository.test.ts) asserts positionally — one statement
 keyword via `toContain`, then each value by its index in the argument array — so reordering a column without
 reordering its value is caught, while rewording the SQL is not. Add a column at the end or the indices in
 that file stop meaning what they say.

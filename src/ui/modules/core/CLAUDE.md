@@ -16,14 +16,14 @@ change reaches.
 
 | Folder | Contents |
 | --- | --- |
-| `primitives/` | The plain layer: `Button.tsx`, `Card.tsx`, `Badge.tsx`, `Input.tsx`, `Textarea.tsx`, `Label.tsx`, `Table.tsx`, `Separator.tsx`, `Banner.tsx`, `Form.tsx` (react-hook-form context), `InputGroup.tsx`, `Command.tsx` (cmdk), `Combobox.tsx`, `FlagIcon.tsx`, `Progress.tsx`, `Slider.tsx`, `Sonner.tsx` (the toaster), `RichLink.tsx`. Plus `primitives/utils/helpers.ts` — one predicate, `hasFlag` |
-| `animate/primitives/` | Unstyled wrappers over `@base-ui/react`, the bottom of the animated stack: `animate/primitives/base/Dialog.tsx`, `Popover.tsx`, `Tooltip.tsx`, `Switch.tsx`; `animate/primitives/animate/MotionSlot.tsx`; `animate/primitives/texts/Rotating.tsx` |
-| `animate/base/` | The styled, motion-aware components built on the layer above or directly on `@base-ui/react`: `Accordion.tsx`, `Checkbox.tsx`, `Collapsible.tsx`, `Dialog.tsx`, `DropdownMenu.tsx`, `Popover.tsx`, `Tooltip.tsx`, `Sidebar.tsx`, plus `animate/base/Drawer.tsx` (vaul) and `animate/base/Slot.tsx` |
-| `animate/components/` | Compositions with their own behaviour: `Counter.tsx`, `Tabs.tsx`, `FeatureList.tsx`, `RadialNav.tsx` |
-| `animate/effects/` | `AutoHeight.tsx` and `MotionHighlight.tsx` — behaviour applied to someone else's children |
-| `animate/icons/` | 22 animated SVG icons plus `animate/icons/Icon.tsx`, which exports `AnimateIcon`, `IconWrapper` and `useVariants`. Excluded from the coverage report; `Icon.tsx` beside them is tested |
-| `animate/text/` | `SlidingNumber.tsx` and `animate/text/Rotating.tsx` |
-| `animate/providers/` | `LazyMotionProvider.tsx` — a nine-line `LazyMotion` wrapper, mounted once in the locale layout |
+| `primitives/` | The plain layer: [`Button.tsx`](./primitives/Button.tsx), [`Card.tsx`](./primitives/Card.tsx), [`Badge.tsx`](./primitives/Badge.tsx), [`Input.tsx`](./primitives/Input.tsx), [`Textarea.tsx`](./primitives/Textarea.tsx), [`Label.tsx`](./primitives/Label.tsx), [`Table.tsx`](./primitives/Table.tsx), [`Separator.tsx`](./primitives/Separator.tsx), [`Banner.tsx`](./primitives/Banner.tsx), [`Form.tsx`](./primitives/Form.tsx) (react-hook-form context), [`InputGroup.tsx`](./primitives/InputGroup.tsx), [`Command.tsx`](./primitives/Command.tsx) (cmdk), [`Combobox.tsx`](./primitives/Combobox.tsx), [`FlagIcon.tsx`](./primitives/FlagIcon.tsx), [`Progress.tsx`](./primitives/Progress.tsx), [`Slider.tsx`](./primitives/Slider.tsx), [`Sonner.tsx`](./primitives/Sonner.tsx) (the toaster), [`RichLink.tsx`](./primitives/RichLink.tsx). Plus [`primitives/utils/helpers.ts`](./primitives/utils/helpers.ts) — one predicate, `hasFlag` |
+| `animate/primitives/` | Unstyled wrappers over `@base-ui/react`, the bottom of the animated stack: [`animate/primitives/base/Dialog.tsx`](./animate/primitives/base/Dialog.tsx), `Popover.tsx`, `Tooltip.tsx`, [`Switch.tsx`](./animate/primitives/base/Switch.tsx); [`animate/primitives/animate/MotionSlot.tsx`](./animate/primitives/animate/MotionSlot.tsx); [`animate/primitives/texts/Rotating.tsx`](./animate/primitives/texts/Rotating.tsx) |
+| `animate/base/` | The styled, motion-aware components built on the layer above or directly on `@base-ui/react`: [`Accordion.tsx`](./animate/base/Accordion.tsx), [`Checkbox.tsx`](./animate/base/Checkbox.tsx), [`Collapsible.tsx`](./animate/base/Collapsible.tsx), `Dialog.tsx`, [`DropdownMenu.tsx`](./animate/base/DropdownMenu.tsx), `Popover.tsx`, `Tooltip.tsx`, [`Sidebar.tsx`](./animate/base/Sidebar.tsx), plus [`animate/base/Drawer.tsx`](./animate/base/Drawer.tsx) (vaul) and [`animate/base/Slot.tsx`](./animate/base/Slot.tsx) |
+| `animate/components/` | Compositions with their own behaviour: [`Counter.tsx`](./animate/components/Counter.tsx), [`Tabs.tsx`](./animate/components/Tabs.tsx), [`FeatureList.tsx`](./animate/components/FeatureList.tsx), [`RadialNav.tsx`](./animate/components/RadialNav.tsx) |
+| `animate/effects/` | [`AutoHeight.tsx`](./animate/effects/AutoHeight.tsx) and [`MotionHighlight.tsx`](./animate/effects/MotionHighlight.tsx) — behaviour applied to someone else's children |
+| `animate/icons/` | 22 animated SVG icons plus [`animate/icons/Icon.tsx`](./animate/icons/Icon.tsx), which exports `AnimateIcon`, `IconWrapper` and `useVariants`. Excluded from the coverage report; `Icon.tsx` beside them is tested |
+| `animate/text/` | [`SlidingNumber.tsx`](./animate/text/SlidingNumber.tsx) and [`animate/text/Rotating.tsx`](./animate/text/Rotating.tsx) |
+| `animate/providers/` | [`LazyMotionProvider.tsx`](./animate/providers/LazyMotionProvider.tsx) — a nine-line `LazyMotion` wrapper, mounted once in the locale layout |
 
 There is no `Switch` in `primitives/`; the only one is `animate/primitives/base/Switch.tsx`.
 
@@ -39,8 +39,8 @@ There is no `Switch` in `primitives/`; the only one is `animate/primitives/base/
   `@base-ui/react/merge-props` and composes refs. `Button`, `Badge` and `Form` use it. Do not write
   another one. The motion equivalent is `MotionSlot`.
 - **Design tokens, not literals.** 3px frames (`border-[3px] border-[var(--frame)]`), the
-  `--shadow-brutal-*` scale and `--color-brand-*` are all defined in `src/ui/styles/global/index.css`;
-  `hit-area-stable` is a Tailwind `@utility` in `src/ui/styles/utilities/index.css`. See
+  `--shadow-brutal-*` scale and `--color-brand-*` are all defined in [`src/ui/styles/global/index.css`](../../styles/global/index.css);
+  `hit-area-stable` is a Tailwind `@utility` in [`src/ui/styles/utilities/index.css`](../../styles/utilities/index.css). See
   [`styles/CLAUDE.md`](../../styles/CLAUDE.md).
 
 **CVA is not the rule.** Only four files use `class-variance-authority` — `Button.tsx`, `Badge.tsx`,
@@ -65,8 +65,8 @@ folder is a dependency added to the client bundle of every screen.
 
 Coupling back into the rest of the app is small, but it is not zero. The complete list:
 
-- `@ui/hooks/*` is fair game — `useControlledState.tsx`, `useIsInView.tsx`, `useAutoHeight.tsx`,
-  `useMobile.ts`. These are generic React utilities, not product state.
+- `@ui/hooks/*` is fair game — [`useControlledState.tsx`](../../hooks/useControlledState.tsx), [`useIsInView.tsx`](../../hooks/useIsInView.tsx), [`useAutoHeight.tsx`](../../hooks/useAutoHeight.tsx),
+  [`useMobile.ts`](../../hooks/useMobile.ts). These are generic React utilities, not product state.
 - `animate/base/Sidebar.tsx` writes the `sidebar_state` cookie through `@ui/utils/cookie` and reads it back
   from `document.cookie` on mount. It exports `SIDEBAR_COOKIE_NAME`, but **nothing outside that file imports
   it** — no server layout reads the cookie and passes a `defaultOpen`, so the rail always renders expanded
@@ -118,7 +118,7 @@ identifier that is not defined throws rather than evaluating to `undefined`. `co
 global in its `beforeEach`, which is exactly what hid this, so the fallback has its own block that stubs it
 away.
 
-**The dialog lives in `animate/base/Dialog.tsx` and nowhere else.** `primitives/` used to carry a
+**The dialog lives in [`animate/base/Dialog.tsx`](./animate/base/Dialog.tsx) and nowhere else.** `primitives/` used to carry a
 pure re-export of it; the seven callers now import the implementation directly. Do not reintroduce a
 re-export — the no-barrel convention has no exception here.
 
@@ -158,11 +158,11 @@ Vitest with `happy-dom`, co-located `*.test.tsx`. Coverage here is deliberately 
 test is usually a decision rather than an omission:
 
 - `animate/base/` is covered file for file, and so are `animate/components/`, `animate/effects/`,
-  `animate/text/SlidingNumber.tsx` and `animate/primitives/base/Tooltip.tsx`. These carry state
+  `animate/text/SlidingNumber.tsx` and [`animate/primitives/base/Tooltip.tsx`](./animate/primitives/base/Tooltip.tsx). These carry state
   machines, controlled/uncontrolled fallbacks and event composition — the parts that break silently.
 - `primitives/` has **no tests at all**. Those files are markup plus `cn()`, and the Playwright suite in
   `e2e/` only proves the pages holding them render — see [`../CLAUDE.md`](../CLAUDE.md) for what those specs
   actually assert, which is less than the word "covered" suggests.
 - `animate/icons/` is excluded from the **coverage report** only, and the glob already spares `Icon.tsx`.
   The 22 icons are mechanical wrappers around SVG path data; `Icon.tsx` is not, and its co-located
-  `Icon.test.tsx` runs with everything else. Nothing under `core/` is excluded from the test run.
+  [`Icon.test.tsx`](./animate/icons/Icon.test.tsx) runs with everything else. Nothing under `core/` is excluded from the test run.

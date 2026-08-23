@@ -15,7 +15,7 @@ site was affected, and the failure never showed locally.
 
 The asymmetry is the whole story. Every other page is fully prerendered and served from the incremental cache,
 so on Cloudflare it executes no application code at all. `/_not-found` is the one page rendered at request
-time, because `global-not-found.tsx` detects the locale through `headers()` and `cookies()` inside a
+time, because [`global-not-found.tsx`](../../src/app/global-not-found.tsx) detects the locale through `headers()` and `cookies()` inside a
 `<Suspense>` boundary. It is therefore the only page in a position to throw, and it did.
 
 Four bisect pull requests narrowed it, each ruling one thing out: the tree from immediately before
@@ -46,8 +46,8 @@ type-checks anything.
 Next is pinned to **16.2.12** and TypeScript to **6.0.3**, and they move as a pair, Next first. Neither is
 raised until `@opennextjs/cloudflare` publishes a release that supports Next 16.3.
 
-`partialPrefetching` stays out of `next.config.ts`: it is a 16.3 option and a config error on 16.2. The
-`@typescript/typescript6` compatibility package is not a dependency, and `docs/docs-consistency.test.ts`
+`partialPrefetching` stays out of [`next.config.ts`](../../next.config.ts): it is a 16.3 option and a config error on 16.2. The
+`@typescript/typescript6` compatibility package is not a dependency, and [`docs/docs-consistency.test.ts`](../docs-consistency.test.ts)
 imports `typescript` directly for its compiler-API parsing — under TypeScript 7 that import has to become the
 compatibility package, which is why the two versions travel together.
 
@@ -72,6 +72,6 @@ does not control the traffic to, in order to keep a toolchain version the app ga
   upstream. Until then the diagnosis is "16.3.x breaks request-time rendering on 1.20.2", which is where the
   evidence stops.
 - **`/[locale]/payment/confirmation` renders at request time too**, and escapes the e2e suite only because
-  `middleware.ts` redirects it away when `payment_intent` is absent. It was never confirmed broken or
+  [`middleware.ts`](../../src/middleware.ts) redirects it away when `payment_intent` is absent. It was never confirmed broken or
   healthy under 16.3; whoever revisits this pin should check it with a real payment intent first.
 - Recorded in [`CLAUDE.md`](../../CLAUDE.md) under *Versions* and *Structure & aliases*.

@@ -8,11 +8,11 @@ alternatives and metrics for each of them — is the one piece of work in the ap
 slider drag if it stayed on the main thread.
 
 This is a **Web Worker**, not a Cloudflare Worker. Nothing in this folder runs on the server, and the
-Cloudflare Worker that hosts the app is configured in `wrangler.toml`, not here.
+Cloudflare Worker that hosts the app is configured in [`wrangler.toml`](../../../wrangler.toml), not here.
 
 ## Files
 
-**This folder holds no planning rule.** `worker.ts` deserialises a request, calls `runPlanningPipeline` from
+**This folder holds no planning rule.** [`worker.ts`](./worker.ts) deserialises a request, calls `runPlanningPipeline` from
 `@domain/calendar`, serialises the result and posts it. Everything the handler used to do around those calls —
 clearing the caches, building the `manual-N` pseudo-Holidays, deriving `carryOverMonths`, computing the
 budget, short-circuiting an empty plan, measuring each Suggestion — moved into that module, because the
@@ -22,10 +22,10 @@ suites. A rule you want to change is in the domain; what lives here is the bound
 | File | Contents |
 | --- | --- |
 | `worker.ts` | The entry point. Registers `globalThis.onmessage`, calls the pipeline, replies with `self.postMessage` |
-| `types.ts` | `WORKER_MESSAGE_TYPE`, `CalculateSuggestionsRequest`, `WorkerResponse`, and the `Serialized*` wire types |
-| `utils/serializers.ts` | Both directions of the boundary conversion, in one file so they cannot drift apart |
+| [`types.ts`](./types.ts) | `WORKER_MESSAGE_TYPE`, `CalculateSuggestionsRequest`, `WorkerResponse`, and the `Serialized*` wire types |
+| [`utils/serializers.ts`](./utils/serializers.ts) | Both directions of the boundary conversion, in one file so they cannot drift apart |
 
-The other half of the contract lives outside this folder: `useCalculationsWorker.ts` under `@ui/hooks/` spawns
+The other half of the contract lives outside this folder: [`useCalculationsWorker.ts`](../../ui/hooks/useCalculationsWorker.ts) under `@ui/hooks/` spawns
 the worker, builds the request and deserialises the reply. Change `types.ts` and you are changing both.
 
 ## The protocol
@@ -122,7 +122,7 @@ counting. Every other Metric touching both lists already built a set. A new Metr
 The engine drops a `removedDays` date from the Workday list and stops there: it does not become a Free Day
 for Bridge expansion or scoring. Folding them back into the holidays array would restore exactly the bias the
 parameter exists to remove — see the traps in
-[`@domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md). Tests in `worker.test.ts` pin both halves:
+[`@domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md). Tests in [`worker.test.ts`](./worker.test.ts) pin both halves:
 that `removedDays` arrives as dates on the planner calls, and that no Removed Day appears in any
 holidays array.
 
@@ -173,5 +173,5 @@ it. The pipeline's own behaviour is pinned once, against the real engine, in
 testable as behaviour (run twice, check the second run answers for its own Holidays) rather than as two spy
 calls in no particular order.
 
-`utils/serializers.test.ts` covers the round trip. It is the cheaper place to catch a new `Date` field than a
+[`utils/serializers.test.ts`](./utils/serializers.test.ts) covers the round trip. It is the cheaper place to catch a new `Date` field than a
 worker test is.

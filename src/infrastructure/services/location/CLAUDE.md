@@ -13,8 +13,8 @@ costs one interaction. Nothing downstream should treat the result as authoritati
 
 | File | Role |
 | --- | --- |
-| `detectCountry.ts` | Runs the chain. The ordering and nothing else |
-| `utils/strategies.ts` | The three strategies plus the constants they share (`CLOUDFLARE_COUNTRY_HEADER`, `UNIDENTIFIED_COUNTRY`, `TOR_COUNTRY`) |
+| [`detectCountry.ts`](./detectCountry.ts) | Runs the chain. The ordering and nothing else |
+| [`utils/strategies.ts`](./utils/strategies.ts) | The three strategies plus the constants they share (`CLOUDFLARE_COUNTRY_HEADER`, `UNIDENTIFIED_COUNTRY`, `TOR_COUNTRY`) |
 
 ## The chain
 
@@ -32,7 +32,7 @@ costs one interaction. Nothing downstream should treat the result as authoritati
 errors and returns `''`, and `detectCountry` returns `''` when all three come up empty. `proxy/location.ts`
 treats that as "no cookie to set" and moves on.
 
-**The only caller is the middleware.** `proxy/location.ts` calls `detectCountry` from `src/middleware.ts`, so
+**The only caller is the middleware.** `proxy/location.ts` calls `detectCountry` from [`src/middleware.ts`](../../../middleware.ts), so
 everything here runs server-side inside a Cloudflare Worker request — including the fetches, which read like
 browser calls and are not. It also short-circuits on an existing `user-country` cookie, which is what keeps
 this chain off the hot path for returning visitors. Between that cookie and the header running first, the two
@@ -81,11 +81,11 @@ is not evidence.
 
 ## Testing
 
-Both files have a co-located test. `detectCountry.test.ts` mocks `./utils/strategies` outright and asserts
+Both files have a co-located test. [`detectCountry.test.ts`](./detectCountry.test.ts) mocks `./utils/strategies` outright and asserts
 only the fallthrough — including that a later strategy is *not* called once an earlier one answers.
-`utils/strategies.test.ts` stubs `getCloudflareContext` and the global `fetch`, and covers each failure mode
+[`utils/strategies.test.ts`](./utils/strategies.test.ts) stubs `getCloudflareContext` and the global `fetch`, and covers each failure mode
 separately, since every one of them has to produce `''` rather than an exception.
 
-Both use the locale constants from `locales.ts` as country codes, which is a coincidence of spelling (`es`,
+Both use the locale constants from [`locales.ts`](../../i18n/locales.ts) as country codes, which is a coincidence of spelling (`es`,
 `de`, `fr`) and not a claim that locale and Country are the same thing — they are not, and the Country is
 never inferred from the language.

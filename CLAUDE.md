@@ -13,7 +13,7 @@ longest stretches off, and reports how well it did. **The whole planner runs in 
 holds payment and contact records and nothing else ([ADR 0001](./docs/adr/0001-planner-runs-in-the-browser.md)).
 The server side is six API route handlers (`check-session`, `contact`, `health`, `markdown`, `payment`,
 `payment/activate`), the
-Stripe webhook, a `.well-known` catch-all, `middleware.ts`, and some static rendering.
+Stripe webhook, a `.well-known` catch-all, [`middleware.ts`](./src/middleware.ts), and some static rendering.
 
 Premium (advanced metrics, manual editing of a Suggestion) is unlocked by a Donation. There are no accounts:
 the payment record *is* the entitlement ([ADR 0008](./docs/adr/0008-premium-derived-from-payment.md)).
@@ -63,13 +63,13 @@ pnpm test:e2e           # playwright
 ```
 
 Env: copy `.env.example`. Local Worker secrets go in `.dev.vars`. The typed surface the build uses is
-`environment.d.ts` and nothing else — it hand-declares both `ProcessEnv` and the global `CloudflareEnv` the
+[`environment.d.ts`](./environment.d.ts) and nothing else — it hand-declares both `ProcessEnv` and the global `CloudflareEnv` the
 Cloudflare context is read through, and it is tracked.
 
 `pnpm cf:typegen` writes wrangler's own inference to `cloudflare-env.d.ts` at the repo root. It is reference
 material, not part of the program: read it when adding a binding, then widen `environment.d.ts` by hand. Two
 lines keep it that way and both are load-bearing — `.gitignore` so it never gets committed, and an explicit
-`cloudflare-env.d.ts` entry in `tsconfig.json`'s `exclude`, because `include` is `**/*.ts` and would otherwise
+`cloudflare-env.d.ts` entry in [`tsconfig.json`](./tsconfig.json)'s `exclude`, because `include` is `**/*.ts` and would otherwise
 pull a root-level `.d.ts` straight into the program.
 
 Letting it in does not fail the way you would expect. It declares `CloudflareEnv` a second time, with `[vars]`
@@ -92,7 +92,7 @@ e2e/                  # Playwright specs
 docs/                 # adr/ and docs-consistency.test.ts
 ```
 
-**Next owns `next-env.d.ts` outright, and it flaps.** A production build points its route import at
+**Next owns [`next-env.d.ts`](./next-env.d.ts) outright, and it flaps.** A production build points its route import at
 `.next/types/`, a dev run at `.next/dev/types/`, so the file shows as modified depending on which ran
 last. It is generated and says so; leave whichever version is committed alone rather than committing the
 flip back and forth.
@@ -100,7 +100,7 @@ flip back and forth.
 **`next build` fills in `tsconfig.json`, so two settings there are not redundant.** It rewrites the file on
 every run and writes its own default for any key that is absent — `strict: false` and `allowJs: true`. Both
 land at the *next build* rather than at the deletion site, so deleting either as noise turns strict mode off,
-or lets JavaScript into a TypeScript-only codebase, a long way from the change. `docs/docs-consistency.test.ts`
+or lets JavaScript into a TypeScript-only codebase, a long way from the change. [`docs/docs-consistency.test.ts`](./docs/docs-consistency.test.ts)
 asserts both, and asserts that `cloudflare-env.d.ts` stays in `exclude` and `.gitignore` for the reason below.
 
 **TypeScript stays on 6 and Next stays on 16.2, and the pair is one decision, forced by Cloudflare.** Next 16.3
@@ -116,7 +116,7 @@ and no `lib/typescript.js`, and Next's type-checking path loads exactly that fil
 `next build` shell out to the project-local `tsc` instead. So raising TypeScript to 7 while Next is 16.2 kills
 `pnpm build` before it type-checks anything. Raise Next first, and only once the adapter supports it.
 
-Two things follow that are easy to trip over. `partialPrefetching` in `next.config.ts` is a 16.3 option and is
+Two things follow that are easy to trip over. `partialPrefetching` in [`next.config.ts`](./next.config.ts) is a 16.3 option and is
 a config error on 16.2 — it must stay out while Next is pinned. And
 [`docs/docs-consistency.test.ts`](./docs/docs-consistency.test.ts) imports `typescript` directly for its
 compiler-API parsing; under TypeScript 7 that import has to become `@typescript/typescript6`, Microsoft's
@@ -125,7 +125,7 @@ compatibility package pinning the 6.x API, so the two move together too.
 Path aliases (`tsconfig.json` `compilerOptions.paths`): `src/*`, `@app/*`, `@application/*`, `@domain/*`,
 `@infrastructure/*`, `@ui/*`, `@assets/*` (→ `src/ui/assets`), `@styles/*` (→ `src/ui/styles`), `@i18n/*`
 (→ `src/ui/i18n`). Prefer aliases over relative paths for cross-layer imports; keep same-folder imports
-relative. `vitest.config.ts` sets `resolve.tsconfigPaths`, so a new alias needs exactly one edit — in
+relative. [`vitest.config.ts`](./vitest.config.ts) sets `resolve.tsconfigPaths`, so a new alias needs exactly one edit — in
 `tsconfig.json`, not in the test config.
 
 Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.tsx` for components). The one
@@ -169,7 +169,7 @@ test covering no single module is `docs/docs-consistency.test.ts`, colocated wit
   is touched, and `docs/docs-consistency.test.ts` does check it. Directives (`'use client'`, `'use server'`,
   `'use cache'`) are strings, not comments, and are unaffected. Two things are **not** explanatory comments
   and stay: a `biome-ignore` suppression, which changes what the linter does and must carry its reason on the
-  same line; and the do-not-edit banner on generated output (`src/ui/modules/bones/registry.ts`). A
+  same line; and the do-not-edit banner on generated output ([`src/ui/modules/bones/registry.ts`](./src/ui/modules/bones/registry.ts)). A
   suppression counts in either form, including the `{/* biome-ignore … */}` shape JSX forces. The rule is
   asserted wherever a comment sits — opening a line, trailing code, or inside JSX — and it stops at `src/`,
   because `docs/docs-consistency.test.ts` explains itself inline: it is the one source file with no folder
@@ -200,7 +200,7 @@ Four artefacts, four jobs:
 | [`docs/adr/`](./docs/adr/) | *Why is it like this?* One decision per file | You make a decision that is hard to reverse, surprising without context, **and** the result of a real trade-off. If any of the three is missing, skip the ADR |
 | [`README.md`](./README.md) | *What is this product and how do I run it?* The human-facing front page | The product's capabilities, the stack table, the scripts or the required versions change |
 
-`CONTEXT.md` is reserved for the root glossary. **Never create a nested one** — the name would mean two
+[`CONTEXT.md`](./CONTEXT.md) is reserved for the root glossary. **Never create a nested one** — the name would mean two
 things, and the `domain-modeling` skill reads it as vocabulary and would rewrite a layer contract as a term
 list.
 
@@ -210,7 +210,7 @@ list.
 | A folder's layout, the files a concept is made of, or a rule its guide states | that folder's nested `CLAUDE.md` (table above) |
 | A behaviour a doc states as an invariant or a gotcha | that bullet, or delete it if it stopped being true |
 | A layer's allowed imports | that layer's `CLAUDE.md`, and the ADR that decided the boundary |
-| A package script, a path alias, or the folder tree | the *Commands* / *Structure & aliases* sections here, and `README.md` if it lists the script |
+| A package script, a path alias, or the folder tree | the *Commands* / *Structure & aliases* sections here, and [`README.md`](./README.md) if it lists the script |
 | A translation key | all six bundles under `src/ui/i18n/messages/` — parity is asserted |
 | A decision an ADR records | that ADR — amend it, or supersede it and say so in both `## Status` blocks |
 
@@ -223,11 +223,11 @@ every folder in the *Nested guides* table has a `CLAUDE.md`; that ADRs are named
 contiguously from `0001`, carry the template's sections, and are each linked from some document **outside**
 `docs/adr/` — an ADR nothing points at will not be read; that every relative markdown link resolves and every
 `.ts`/`.tsx` file named in backticks still exists; that every script this file documents exists in
-`package.json`, that every alias `tsconfig.json` declares is documented here and every alias documented here
+[`package.json`](./package.json), that every alias `tsconfig.json` declares is documented here and every alias documented here
 is declared there, and that no alias points at a missing directory; that `tsconfig.json` keeps the two settings
 `next build` would otherwise fill in for it — `strict` on and `allowJs` off — and that
 `cloudflare-env.d.ts` stays in both `exclude` and `.gitignore`;
-and that every locale bundle has exactly the keys `en.json` has.
+and that every locale bundle has exactly the keys [`en.json`](./src/ui/i18n/messages/en.json) has.
 
 It reads staged *and* unstaged files, so a rule fires before the offending file is committed. **Each rule was
 verified by breaking it and confirming the matching case fails** — keep that property when you add one. A
@@ -246,7 +246,7 @@ one above the highest existing file, and link it from wherever it bites — a go
 ## Gotchas
 
 - **The calculation caches are cleared by the pipeline, not the engine and no longer by each caller.**
-  `cache.ts` memoises the holiday set under one fixed key and never evicts it, so a second run silently reuses
+  [`cache.ts`](./src/domain/calendar/utils/cache.ts) memoises the holiday set under one fixed key and never evicts it, so a second run silently reuses
   the first run's holidays. `runPlanningPipeline` clears both on entry; a generator still must not.
   [ADR 0006](./docs/adr/0006-caller-owned-calculation-caches.md), amended 2026-08-14.
 - **`Temporal` comes from `temporal-polyfill`, never the global.** The global does not resolve in the deployed
@@ -272,7 +272,7 @@ one above the highest existing file, and link it from wherever it bites — a go
   [ADR 0004](./docs/adr/0004-cloudflare-workers-as-deployment-target.md).
 - **Biome's `noConsole` is an error with no allowlist** — no `console` at any level; log through
   `src/infrastructure/clients/logging`. The single exception is the BetterStack client's own unconfigured
-  warning, scoped in `biome.json`'s `overrides`: it is the logger, so it has nothing else to call.
+  warning, scoped in [`biome.json`](./biome.json)'s `overrides`: it is the logger, so it has nothing else to call.
 - **The planning pipeline exists once, and used to exist twice.** `runPlanningPipeline` under
   `src/domain/calendar/` is the whole run — caches, pseudo-Holidays, budget, both planning calls, the Metrics.
   The Web Worker and the holidays store's own action are its two callers and add only transport. They were two
@@ -282,7 +282,7 @@ one above the highest existing file, and link it from wherever it bites — a go
 
 ## Deploy
 
-Cloudflare Workers via wrangler (`wrangler.toml`): `.open-next/worker.js` as the entrypoint, `.open-next/assets`
+Cloudflare Workers via wrangler ([`wrangler.toml`](./wrangler.toml)): `.open-next/worker.js` as the entrypoint, `.open-next/assets`
 served through the `ASSETS` binding, an R2 bucket for the incremental cache, a `PAYMENT_RATE_LIMITER`
 `[[ratelimits]]` binding for the payment limiter, smart placement, and a `forever-pto-tail` tail consumer. Only `env.production` binds
 a route (`forever-pto.com/*`); `env.development` supplies the preview bindings and CI deploys one worker per
@@ -292,7 +292,7 @@ PR from it — `pr-<number>-forever-pto-development.fbuireu.workers.dev`, delete
 `process.env.NEXT_PUBLIC_SITE_URL`; every read goes through the Cloudflare context. But that context resolves
 differently depending on when it is asked:
 
-- **Per request**, on the deployed worker, it is the Worker's runtime var. `_deploy.yml` passes
+- **Per request**, on the deployed worker, it is the Worker's runtime var. [`_deploy.yml`](./.github/workflows/_deploy.yml) passes
   `--var NEXT_PUBLIC_SITE_URL:<inputs.url>`, so `sitemap.xml`, the API routes and the `.well-known` handler
   all name the host actually being served — a per-PR preview names itself.
 - **During `next build`**, there is no request, so `getCloudflareContext({ async: true })` falls back to
@@ -302,7 +302,7 @@ differently depending on when it is asked:
   `[locale]` shells carry it in `canonical`, `hrefLang` and `og:url` until their 24-hour revalidation.
 
 So a preview's `robots.txt` advertises the production sitemap. That is tolerated rather than fixed because
-previews sit behind Cloudflare Access — nothing crawls them, which is why `playwright.config.ts` has to send
+previews sit behind Cloudflare Access — nothing crawls them, which is why [`playwright.config.ts`](./playwright.config.ts) has to send
 `CF-Access-Client-Id`/`Secret` to reach one. Do not "fix" it by giving the build step the override without
 first checking whether the value is still correct for production, which shares that build path. The
 `NEXT_PUBLIC_SITE_URL` line inside `[env.development.vars]` is the fallback for a hand-run
@@ -315,11 +315,11 @@ binding set and only then overwrites the individual keys the flag names. `_deplo
 per-PR worker straight from `wrangler.toml`. Only the site URL is dead weight there, and it is not
 removable either — without it a hand-run development deploy would fall through to the top-level `[vars]`
 and advertise itself as `forever-pto.com`. Read the whole block as configuration, not residue. Build config
-lives in `next.config.ts` and `open-next.config.ts`.
+lives in `next.config.ts` and [`open-next.config.ts`](./open-next.config.ts).
 
-GitHub Actions: **`ci.yml` holds the entire graph** — `lint`, `typecheck` and `test` in parallel, then
+GitHub Actions: **[`ci.yml`](./.github/workflows/ci.yml) holds the entire graph** — `lint`, `typecheck` and `test` in parallel, then
 `deploy-production` → `release` on `main`, or `deploy-development` → `comment` / `e2e` on a PR. Both deploy
-jobs call the shared `_deploy.yml`. The only other workflows are `cleanup-development.yml`, the
+jobs call the shared `_deploy.yml`. The only other workflows are [`cleanup-development.yml`](./.github/workflows/cleanup-development.yml), the
 dependabot/renovate auto-merges and a `zizmor` audit. Every job that needs a toolchain uses the
 `.github/actions/prepare-env` composite — pnpm, the `.nvmrc` Node, `setup-node`'s dependency cache and
 `pnpm install --frozen-lockfile` — rather than repeating five steps six times; `checkout` stays in the job,

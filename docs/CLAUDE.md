@@ -6,10 +6,10 @@ The Forever PTO documentation wiki (docs.forever-pto.com). An Astro Starlight si
 
 ## Boundaries
 
-- Independent workspace package (`forever-pto-docs`) with its own CI (`.github/workflows/docs.yml`) and Cloudflare Worker (static assets). It never imports app code as a workspace dependency — only raw sources via the `@ui` alias (vite + tsconfig paths).
+- Independent workspace package (`forever-pto-docs`) with its own CI ([`.github/workflows/docs.yml`](../.github/workflows/docs.yml)) and Cloudflare Worker (static assets). It never imports app code as a workspace dependency — only raw sources via the `@ui` alias (vite + tsconfig paths).
 - Only Next-free modules may be imported into demos. Anything touching `next/*`, `next-themes`, `@application`, `@domain` or `@infrastructure` is reference-only: document it, do not import it.
 - **A component that needs an app context gets the context, not a note saying it cannot be rendered.** Demos already wrap in `LazyMotionProvider` because every `m.*` consumer needs it; `DemoIntlProvider` is the same move for the one `next-intl` consumer in `core/` — `SlidingNumber`, which reads the locale to pick its decimal separator, and `Counter`, which wraps it. Both would otherwise throw during prerender, since `client:visible` still renders on the server. Add a provider here rather than deleting the demo.
-- Never import `src/ui/styles/index.css` (double preflight + layer collision with Starlight). The allowed style imports live in `src/styles/global.css` and are ordered deliberately — read its header comment before touching it.
+- Never import [`src/ui/styles/index.css`](../src/ui/styles/index.css) (double preflight + layer collision with Starlight). The allowed style imports live in [`src/styles/global.css`](./src/styles/global.css) and are ordered deliberately — read its header comment before touching it.
 
 ## Conventions
 
@@ -22,5 +22,5 @@ The Forever PTO documentation wiki (docs.forever-pto.com). An Astro Starlight si
 ## Deploy
 
 - PRs: `wrangler versions upload --preview-alias pr-<n>` → deterministic preview URL on workers.dev; versions are immutable, no teardown exists or is needed.
-- main: `wrangler deploy` → docs.forever-pto.com (custom domain declared in `wrangler.toml`).
+- main: `wrangler deploy` → docs.forever-pto.com (custom domain declared in [`wrangler.toml`](./wrangler.toml)).
 - Bootstrap: `versions upload` cannot create the Worker, so the preview job probes with `versions list` and skips gracefully until the first production deploy has created `forever-pto-docs` (done 2026-07-12).
