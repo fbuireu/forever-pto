@@ -8,7 +8,8 @@ Accepted. A consequence of [ADR 0004](./0004-cloudflare-workers-as-deployment-ta
 
 ## Context
 
-The calendar engine is written against `Temporal`. It has to evaluate in three places: the browser main thread, the Web Worker the planner offloads to, and the server. `Temporal` did not resolve in the deployed Cloudflare Workers runtime, and the failure surfaced only after deploy — a local run and a preview build both looked fine.
+The calendar engine is written against `Temporal`. It has to evaluate in three places: the browser main thread, the Web Worker the planner offloads to, and the server. `Temporal` did not resolve in the deployed Cloudflare Workers runtime, and the failure surfaced only after deploy: a local run and a preview build both looked fine.
+
 
 An explicit polyfill import looks exactly like scaffolding left behind after native support landed, which is precisely why it needs recording: the next reader to tidy it away will not be able to tell the difference, and the test suite will not stop them.
 

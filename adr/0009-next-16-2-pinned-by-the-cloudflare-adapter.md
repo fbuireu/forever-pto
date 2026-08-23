@@ -20,10 +20,10 @@ time, because `global-not-found.tsx` detects the locale through `headers()` and 
 
 Four bisect pull requests narrowed it, each ruling one thing out: the tree from immediately before
 `81222a48` runs the full suite green; `partialPrefetching: false` on its own does not help; reverting the
-four dependency bumps that participate in rendering that page — `motion`, `@base-ui/react`, `next-intl`,
-`lucide-react` — does not help; and Next 16.3.1 does not help either, so the fault spans 16.3.x rather than
+four dependency bumps that participate in rendering that page (`motion`, `@base-ui/react`, `next-intl`,
+`lucide-react`) does not help; and Next 16.3.1 does not help either, so the fault spans 16.3.x rather than
 being a single bad release. What remained was the Next bump itself, against
-[`@opennextjs/cloudflare`](https://github.com/opennextjs/opennextjs-cloudflare) **1.20.2** — which is the
+[`@opennextjs/cloudflare`](https://github.com/opennextjs/opennextjs-cloudflare) **1.20.2**, which is the
 `latest` tag, has no beta or canary alongside it, and was published 2026-08-01, two days before 16.3.0
 existed.
 
@@ -48,7 +48,7 @@ raised until `@opennextjs/cloudflare` publishes a release that supports Next 16.
 
 `partialPrefetching` stays out of `next.config.ts`: it is a 16.3 option and a config error on 16.2. The
 `@typescript/typescript6` compatibility package is not a dependency, and `tests/docs-consistency.test.ts`
-imports `typescript` directly for its compiler-API parsing — under TypeScript 7 that import has to become the
+imports `typescript` directly for its compiler-API parsing, and under TypeScript 7 that import has to become the
 compatibility package, which is why the two versions travel together.
 
 The rejected alternative worth naming is upgrading anyway and working around the crash in application code,
@@ -61,14 +61,15 @@ does not control the traffic to, in order to keep a toolchain version the app ga
   production.** A dependency bot proposing Next 16.3 is proposing to reintroduce a 500 on every unknown URL.
   The e2e suite catches it, but only after a preview deploy, so the pin should be read before the failure is
   re-diagnosed.
-- **The repo stays on a TypeScript version behind the ecosystem.** Anything that requires 7 — its speed, and
-  eventually its type-level features — is unavailable, and `next build` keeps type-checking through Next's
+- **The repo stays on a TypeScript version behind the ecosystem.** Anything that requires 7, its speed and
+  eventually its type-level features, is unavailable, and `next build` keeps type-checking through Next's
   compiler-API path rather than the project's own `tsc`.
 - **`global-not-found.tsx` is why the failure is visible at all, and it must not be deleted as a fix.** With
   no root layout in a `[locale]`-only app, removing it hands 404s to Next's built-in page. Removing the
   `experimental.globalNotFound` flag is separately a no-op on 16.3, where the file's presence is what counts.
-- **The exception itself is still unknown.** Closing this properly means capturing the Worker's stack trace —
-  `wrangler tail` against a live preview, or the `forever-pto-tail` consumer's output — and reporting it
+- **The exception itself is still unknown.** Closing this properly means capturing the Worker's stack trace
+  (`wrangler tail` against a live preview, or the `forever-pto-tail` consumer's output) and reporting it
+
   upstream. Until then the diagnosis is "16.3.x breaks request-time rendering on 1.20.2", which is where the
   evidence stops.
 - **`/[locale]/payment/confirmation` renders at request time too**, and escapes the e2e suite only because
