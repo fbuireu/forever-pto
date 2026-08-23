@@ -42,10 +42,24 @@ does not know. On the tail Worker's side the same addition would keep folding on
 is why the compile error has to live on this side. `client.test.ts` iterates `LOG_LEVEL` and asserts each
 level reaches the transport method of its own name and no other.
 
-`stripQuery` is still local to the tail Worker, and it is the one thing that arguably should not be: it
-encodes "a URL logged off-worker must not carry its query string, because Stripe appends
-`payment_intent_client_secret` to the return URL" — a statement about this app's payment flow, living in a
-Worker that shares no other module with it. Nothing on the app side enforces the same rule.
+**`stripQuery` is in the contract, and both sides read it.** It encodes "a URL logged off-worker must not
+carry its query string, because Stripe appends `payment_intent_client_secret` to the return URL" — a
+statement about this app's payment flow, and it used to be a private function in the tail Worker where
+nothing on the app side could reach it. That was one added log context away from a live leak:
+[`api/payment/activate/route.ts`](../../app/api/payment/activate/route.ts) reads `payment_intent_client_secret` off the query, already emits a log line
+per failure, and `matchesClientSecret` is the only guard on a GET that mints a Premium session — so
+`{ url: request.url }` added while debugging would have shipped the secret to the sink.
+
+It sits in `contract.ts` rather than beside the client because that module is types and constants only,
+which is what keeps the Worker's bundle free of `@logtail/edge` and `@opennextjs/cloudflare`. The rule is
+enforced at the seam rather than at call sites: `BetterStackClient.getFullContext` strips a string `url` on
+every entry, whichever method emitted it and whether it arrived in the call or on the base context, so no
+caller has to remember. A caller that genuinely wants a query string has to name the field something other
+than `url`, which is the point — the redaction is keyed on the field name, not on who wrote it.
+
+`index.test.ts` asserts the Worker imports `stripQuery` rather than declaring its own, because a second
+local copy would pass every behavioural test in that file while drifting from the one the app enforces.
+
 ## Purpose
 
 One folder per external SDK, and nothing else in the repo constructs one. Four of them are Effect services —

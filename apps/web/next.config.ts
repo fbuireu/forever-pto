@@ -84,10 +84,6 @@ const nextConfig: NextConfig = {
 			},
 		];
 	},
-	images: {
-		loader: "custom",
-		loaderFile: "./src/infrastructure/images/loader.ts",
-	},
 	transpilePackages: ["prettier"],
 	experimental: {
 		globalNotFound: true,

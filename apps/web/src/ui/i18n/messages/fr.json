@@ -397,9 +397,9 @@
 			"ptoDay": "Jour de congé",
 			"generatedOn": "Généré le",
 			"successTitle": "PDF téléchargé",
-			"successDescription": "Votre calendrier a été exporté avec succès.",
+			"successDescription": "Ton calendrier a été exporté avec succès.",
 			"errorTitle": "Échec du téléchargement",
-			"errorDescription": "Impossible de générer le PDF. Veuillez réessayer."
+			"errorDescription": "Impossible de générer le PDF. Réessaie."
 		}
 	},
 	"ptoStatus": {
@@ -435,7 +435,8 @@
 			"subject_too_short": "Le sujet doit contenir au moins 5 caractères.",
 			"subject_too_long": "Le sujet est trop long.",
 			"message_too_short": "Ton message doit contenir au moins 10 caractères.",
-			"message_too_long": "Ton message est trop long."
+			"message_too_long": "Ton message est trop long.",
+			"contact_already_received": "Tu m'as deja ecrit recemment. Laisse-moi un peu de temps pour te repondre."
 		}
 	},
 	"alternativesManager": {
@@ -466,7 +467,7 @@
 		"paymentSuccess": "Paiement réussi !",
 		"paymentSuccessDescription": "Merci pour ton soutien ! Tu as maintenant un accès premium.",
 		"promoApplied": "Code promo appliqué !",
-		"promoSavedDescription": "Vous avez économisé €{saved} (Original : €{original}, Final : €{final})",
+		"promoSavedDescription": "Tu as économisé €{saved} (Original : €{original}, Final : €{final})",
 		"promoCodeError": "Erreur de code promotionnel",
 		"promoCodeErrors": {
 			"invalid_or_expired": "Code promotionnel invalide ou expiré",
@@ -651,7 +652,7 @@
 		"paymentFailed": "Le paiement a échoué",
 		"processing": "Traitement en cours...",
 		"pay": "Payer",
-		"promoSaved": "Vous avez économisé {saved} !",
+		"promoSaved": "Tu as économisé {saved} !",
 		"errors": {
 			"internal_error": "Quelque chose s'est mal passé de notre côté. Ta carte n'a pas été débitée.",
 			"rate_limit_exceeded": "Trop de tentatives. Patiente un instant et réessaie.",

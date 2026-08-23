@@ -38,6 +38,7 @@ const CITED_FILTERED_PNPM_SCRIPT = /\bpnpm --filter (\S+) (?:run )?([a-z][a-z0-9
 const WORKFLOW_SHELL_STEP = /^(\s*)-?[ \t]*(?:run|command):[ \t]*(\|[-+]?)?[ \t]*(.*)$/;
 const ALIAS_WILDCARD_SUFFIX = /\/\*$/;
 const WORKSPACE_PACKAGE_GLOB = /^\s*-\s*['"]?([^'"\s#]+)['"]?\s*$/gm;
+const GITHUB_WORKFLOW_EXPRESSION = /\$\{\{\s*github\.workflow\s*\}\}/;
 
 // Everything the repo would ship, staged or not, so a rule fires before the offending file is committed.
 // Ignored paths and vendored tooling under dotfolders are excluded — they are not ours to fix.
@@ -128,6 +129,66 @@ const runCommands = (workflow: string) => {
 	return collected.join("\n");
 };
 
+const yamlBlock = (workflow: string, key: string) => {
+	const lines = workflow.split(/\r?\n/);
+	const start = lines.findIndex((line) => line.trim() === `${key}:`);
+	const body: Record<string, string> = {};
+	if (start < 0) return body;
+
+	for (const line of lines.slice(start + 1)) {
+		if (line.trim().length === 0 || !/^\s/.test(line)) break;
+		const entry = /^\s+([\w-]+):\s*(.+)$/.exec(line);
+		if (entry) body[entry[1] as string] = (entry[2] as string).trim();
+	}
+
+	return body;
+};
+
+interface TomlSection {
+	path: string;
+	entries: Record<string, string>;
+}
+
+const tomlSections = (source: string) => {
+	const sections: TomlSection[] = [];
+	let current: TomlSection | undefined;
+
+	for (const raw of source.split(/\r?\n/)) {
+		const line = raw.trim();
+		const header = /^\[\[?([^\]]+)\]\]?$/.exec(line);
+		if (header) {
+			current = { path: header[1] as string, entries: {} };
+			sections.push(current);
+			continue;
+		}
+		const entry = /^([A-Za-z0-9_.-]+)\s*=\s*(.+)$/.exec(line);
+		if (entry && current) current.entries[entry[1] as string] = (entry[2] as string).trim();
+	}
+
+	return sections;
+};
+
+const webWrangler = tomlSections(read(`${WEB}/wrangler.toml`));
+const WRANGLER_ENVIRONMENTS = ["", "env.development", "env.production"];
+const wranglerSection = (environment: string, table: string) =>
+	webWrangler.filter((section) => section.path === (environment ? `${environment}.${table}` : table));
+const wranglerBindings = (environment: string) => {
+	const [vars] = wranglerSection(environment, "vars");
+	const named = ["ratelimits", "r2_buckets", "kv_namespaces", "d1_databases", "durable_objects", "queues"]
+		.flatMap((table) => wranglerSection(environment, table))
+		.flatMap((section) => [section.entries.binding, section.entries.name])
+		.filter((value): value is string => Boolean(value))
+		.map((value) => value.replace(/^["']|["']$/g, ""));
+
+	return new Set([...Object.keys(vars?.entries ?? {}), ...named]);
+};
+
+const cloudflareEnvBindings = [
+	...(/interface CloudflareEnv \{([\s\S]*?)\n\t\}/.exec(read(`${WEB}/environment.d.ts`))?.[1] ?? "").matchAll(
+		/^\t\t(\w+)\??:/gm,
+	),
+].map(([, name]) => name as string);
+
 describe("CONTEXT.md is the domain glossary and nothing else", () => {
 	const glossary = read("CONTEXT.md");
 
@@ -216,6 +277,70 @@ describe("the workspace is shaped the way the guides describe it", () => {
 	it("keeps the web tsconfig beside the next config it is rewritten by", () => {
 		expect(existsSync(join(ROOT, WEB, "next.config.ts"))).toBe(true);
 		expect(existsSync(join(ROOT, WEB, "tsconfig.json"))).toBe(true);
+	});
+
+	it("pins the same typescript in every manifest that declares one", () => {
+		const declared = ["package.json", ...WORKSPACE_PACKAGES.map((pkg) => `${pkg}/package.json`)]
+			.map((file) => [file, readJson(file).devDependencies?.typescript] as const)
+			.filter(([, version]) => Boolean(version));
+
+		expect(declared.length).toBe(3);
+		expect(new Set(declared.map(([, version]) => version)).size).toBe(1);
+	});
+});
+
+describe("the security header policy covers every request", () => {
+	const nextConfig = read(`${WEB}/next.config.ts`);
+	const REQUIRED_HEADERS = [
+		"Content-Security-Policy",
+		"Strict-Transport-Security",
+		"X-Content-Type-Options",
+		"X-Frame-Options",
+		"X-XSS-Protection",
+		"Referrer-Policy",
+		"Permissions-Policy",
+		"Cross-Origin-Opener-Policy",
+		"Cross-Origin-Resource-Policy",
+	];
+	const REQUIRED_CSP_DIRECTIVES = ["frame-ancestors 'none'", "object-src 'none'", "base-uri 'self'"];
+
+	it("matches every path, from exactly one rule", () => {
+		expect([...nextConfig.matchAll(/source: "([^"]+)"/g)].map(([, source]) => source)).toEqual(["/(.*)"]);
+	});
+
+	it("sends every header a browser cannot be told about later", () => {
+		const declared = new Set([...nextConfig.matchAll(/key: "([^"]+)"/g)].map(([, key]) => key));
+		expect(REQUIRED_HEADERS.filter((header) => !declared.has(header))).toEqual([]);
+	});
+
+	it("states the three CSP directives whose absence is invisible in a browser", () => {
+		const csp = /const CSP = \[([\s\S]*?)\n\]\.join/.exec(nextConfig)?.[1] ?? "";
+		expect(csp).not.toBe("");
+		expect(REQUIRED_CSP_DIRECTIVES.filter((directive) => !csp.includes(`"${directive}"`))).toEqual([]);
+	});
+});
+
+describe("every wrangler environment carries the whole binding set", () => {
+	it("reads a binding surface out of the web package at all", () => {
+		expect(cloudflareEnvBindings.length).toBeGreaterThan(2);
+		expect(webWrangler.length).toBeGreaterThan(5);
+	});
+
+	it.each(WRANGLER_ENVIRONMENTS.map((environment) => [environment || "the top level", environment] as const))(
+		"binds every CloudflareEnv name in %s",
+		(_label, environment) => {
+			const bound = wranglerBindings(environment);
+			expect(cloudflareEnvBindings.filter((name) => !bound.has(name))).toEqual([]);
+		},
+	);
+
+	it("gives the payment rate limiter identical bounds in every environment", () => {
+		const limiters = WRANGLER_ENVIRONMENTS.map((environment) =>
+			wranglerSection(environment, "ratelimits").find((section) => section.entries.name === '"PAYMENT_RATE_LIMITER"'),
+		);
+
+		expect(limiters.filter((limiter) => !limiter)).toEqual([]);
+		expect(new Set(limiters.map((limiter) => JSON.stringify(limiter?.entries))).size).toBe(1);
 	});
 });
 
@@ -873,12 +998,54 @@ describe("the guides describe the project as it is configured", () => {
 		},
 	);
 
-	it("runs the web deploy without a retry wrapper, so an argv error reports on the first attempt", () => {
-		const steps = read(`${WORKFLOW_DIR}/_deploy-web.yml`).split("- name:");
-		const deployStep = steps.find((step) => step.includes("wrangler deploy"));
+	it("runs every wrangler deploy without a retry wrapper, so an argv error reports on the first attempt", () => {
+		const wrapped: string[] = [];
+		let deploySteps = 0;
 
-		expect(deployStep).toBeDefined();
-		expect(deployStep).not.toContain("nick-fields/retry");
+		for (const file of workflowFiles) {
+			for (const step of read(file).split("- name:")) {
+				if (!step.includes("wrangler deploy")) continue;
+				deploySteps += 1;
+				if (step.includes("nick-fields/retry")) wrapped.push(`${file} ->${step.split(/\r?\n/)[0] ?? ""}`);
+			}
+		}
+
+		expect(deploySteps).toBeGreaterThan(1);
+		expect(wrapped).toEqual([]);
+	});
+
+	it("queues the development cleanup behind the CI run whose preview Worker it deletes", () => {
+		const ci = read(`${WORKFLOW_DIR}/ci.yml`);
+		const ciConcurrency = yamlBlock(ci, "concurrency");
+		const cleanupConcurrency = yamlBlock(read(`${WORKFLOW_DIR}/cleanup-development.yml`), "concurrency");
+		const workflowName = /^name:[ \t]*(.+)$/m.exec(ci)?.[1]?.trim() ?? "";
+
+		expect(workflowName).not.toBe("");
+		expect(ciConcurrency.group).toBeDefined();
+		expect(cleanupConcurrency.group).toBe(
+			(ciConcurrency.group ?? "").replace(GITHUB_WORKFLOW_EXPRESSION, workflowName),
+		);
+		expect(cleanupConcurrency["cancel-in-progress"]).toBe("false");
+	});
+
+	it("gates the tail Worker deploy on every path its bundle is built from", () => {
+		const tailRoot = `${WEB}/workers/tail`;
+		const filter = /TAIL_PATHS: '([^']+)'/.exec(read(`${WORKFLOW_DIR}/ci.yml`))?.[1] ?? "";
+		const pattern = new RegExp(filter);
+		const sources = trackedFiles.filter((path) => path.startsWith(`${tailRoot}/`) && SOURCE_FILE.test(path));
+		const reached = new Set<string>();
+
+		for (const file of sources) {
+			for (const [, specifier] of read(file).matchAll(/from\s+["'](\.[^"']+)["']/g)) {
+				const target = join(dirname(file), specifier as string).replace(/\\/g, "/");
+				reached.add(SOURCE_FILE.test(target) ? target : `${target}.ts`);
+			}
+		}
+
+		expect(filter).not.toBe("");
+		expect(sources.length).toBeGreaterThan(0);
+		expect(reached.size).toBeGreaterThan(0);
+		expect([...reached].filter((path) => existsSync(join(ROOT, path)) && !pattern.test(path))).toEqual([]);
 	});
 
 	// The filtered form names its own package, so it can be checked wherever it is written — including the
@@ -977,5 +1144,48 @@ describe("translation bundles stay in step", () => {
 			missing: reference.filter((key) => !keys.includes(key)),
 			extra: keys.filter((key) => !reference.includes(key)),
 		}).toEqual({ missing: [], extra: [] });
+	});
+
+	const FORMAL_ADDRESS: Record<string, RegExp> = {
+		"de.json": /\b(?:Sie|Ihr|Ihre|Ihrem|Ihren|Ihrer|Ihres|Ihnen)\b/,
+		"fr.json": /\b(?:vous|votre|vos|veuillez)\b/i,
+	};
+
+	const FORMAL_ADDRESS_ALLOWED = new Set([
+		"de.json cookiePolicy.sections.whatAreCookies.p1",
+		"de.json legalNotice.sections.accessConditions.items.noIllegal",
+		"fr.json faq.sections.security.data.question",
+		"fr.json faq.sections.security.tracking.question",
+	]);
+
+	const entriesOf = (file: string) => {
+		const out: Array<[string, string]> = [];
+		const walk = (value: unknown, path: string) => {
+			if (typeof value === "string") out.push([path, value]);
+			else if (value && typeof value === "object")
+				for (const [key, child] of Object.entries(value)) walk(child, path ? `${path}.${key}` : key);
+		};
+		walk(JSON.parse(read(`${LOCALES_DIR}/${file}`)), "");
+		return out;
+	};
+
+	it.each(Object.keys(FORMAL_ADDRESS))("%s addresses the user informally, like every other bundle", (file) => {
+		const pattern = FORMAL_ADDRESS[file] as RegExp;
+		const formal = entriesOf(file)
+			.filter(([path, value]) => pattern.test(value) && !FORMAL_ADDRESS_ALLOWED.has(`${file} ${path}`))
+			.map(([path, value]) => `${path} -> ${value}`);
+
+		expect(formal).toEqual([]);
+	});
+
+	it("allows only formal-address hits that still exist and are still third person", () => {
+		const stale = [...FORMAL_ADDRESS_ALLOWED].filter((entry) => {
+			const [file = "", path = ""] = entry.split(" ");
+			const pattern = FORMAL_ADDRESS[file];
+			const found = entriesOf(file).find(([key]) => key === path);
+			return !pattern || !found || !pattern.test(found[1]);
+		});
+
+		expect(stale).toEqual([]);
 	});
 });

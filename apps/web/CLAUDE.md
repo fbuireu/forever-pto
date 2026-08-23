@@ -125,7 +125,9 @@ a config error on 16.2 — it must stay out while Next is pinned. And
 compiler-API parsing; under TypeScript 7 that import has to become `@typescript/typescript6`, Microsoft's
 compatibility package pinning the 6.x API, so the two move together too. The pin now appears in three
 manifests — this one, the repo root and `apps/docs` — and only this one is load-bearing for `next build`.
-Nothing asserts they stay equal.
+`tests/docs-consistency.test.ts` asserts the three stay equal, on the same reasoning as the `wrangler` rule
+beside it: Renovate opens a pull request per manifest, so without the rule the first bump desynchronises them
+silently.
 
 Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.tsx` for components).
 
@@ -231,12 +233,32 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
 Cloudflare Workers via wrangler ([`wrangler.toml`](./wrangler.toml)): `.open-next/worker.js` as the entrypoint,
 `.open-next/assets` served through the `ASSETS` binding, an R2 bucket for the incremental cache, a
 `PAYMENT_RATE_LIMITER` `[[ratelimits]]` binding for the payment limiter, smart placement, and a
-`forever-pto-tail` tail consumer, which is its own Worker under `workers/tail/` and is deployed by the `deploy-tail` job when its own files change. Only `env.production` binds a route (`forever-pto.com/*`);
-`env.development` supplies the preview bindings and CI deploys one worker per PR from it —
-`pr-<number>-forever-pto-development.fbuireu.workers.dev`, deleted when the PR closes.
+`forever-pto-tail` tail consumer, which is its own Worker under `workers/tail/`. Only `env.production` binds a
+route (`forever-pto.com/*`); `env.development` supplies the preview bindings and CI deploys one worker per PR
+from it — `pr-<number>-forever-pto-development.fbuireu.workers.dev`, deleted when the PR closes.
+
+**The tail Worker is gated on what its bundle is built from, which is wider than `workers/tail/`.**
+[`workers/tail/index.ts`](./workers/tail/index.ts) imports the log-level contract out of
+[`src/infrastructure/clients/logging/better-stack/contract.ts`](./src/infrastructure/clients/logging/better-stack/contract.ts), so `TAIL_PATHS` in `ci.yml` has to watch that
+client too. While it named only `apps/web/workers/tail/`, editing the contract redeployed the app and left the
+Worker on the previous bundled copy — and [`workers/tail/index.test.ts`](./workers/tail/index.test.ts) reads the *source* module, so
+nothing in the suite could see the split. `tests/docs-consistency.test.ts` resolves every relative import out
+of `workers/tail/` against that filter now.
 
 Every path in `wrangler.toml` is relative to the file itself, so the deploy runs with this package as the
 working directory. Build config lives in `next.config.ts` and [`open-next.config.ts`](./open-next.config.ts).
+
+**Wrangler inherits configuration into a named environment but never a binding, so the three `[[ratelimits]]`
+blocks are not duplication.** `[assets]`, `[placement]` and `[observability]` are declared once at the top
+level and every environment gets them — which is the pattern `apps/docs/CLAUDE.md` teaches — but `vars`,
+`ratelimits`, `r2_buckets` and `tail_consumers` are bindings: an environment that does not declare one does
+not have it. Deleting `[[env.production.ratelimits]]` as a copy of the top-level block is the most ordinary
+tidy-up in the file, and it makes `env.PAYMENT_RATE_LIMITER` `undefined` in production. The limiter fails
+open **by design for errors** — `Effect.catchAll` turns a throwing `.limit()` into "not limited" — which is
+right for a flaky binding and catastrophic for a missing one: `POST /api/payment` and `POST /api/check-session`
+go unbounded in front of Stripe, silently. `tests/docs-consistency.test.ts` asserts every binding name
+`environment.d.ts` declares is present in all three environments, and that the rate limiter is bounded
+identically in each.
 
 **`NEXT_PUBLIC_SITE_URL` is resolved twice, and the two resolutions disagree on a preview.** No file reads
 `process.env.NEXT_PUBLIC_SITE_URL`; every read goes through the Cloudflare context. But that context resolves
@@ -275,7 +297,9 @@ contains no spaces at all and so cannot split. That diagnosis was made against w
 has since moved to **4.121.0**; nothing has been re-verified, so treat the mechanism as recorded rather than
 retested, and reintroduce any multi-word form from a PR where the preview deploy exercises the same file.
 
-The deploy is the one wrangler call **not** wrapped in `nick-fields/retry`'s usual forgiveness for argument
-errors: a wrapper that retries every failure cannot tell a bad argument from a bad network, and this failure
-burned three identical attempts per run before reporting. The secret upload and the preview delete keep their
-retry — both are idempotent and both fail for reasons that a second attempt can fix.
+**No `wrangler deploy` in this repo is wrapped in `nick-fields/retry`'s usual forgiveness for argument
+errors** — not the app's in `_deploy-web.yml`, and not the tail Worker's in `ci.yml`. A wrapper that retries
+every failure cannot tell a bad argument from a bad network, and this failure burned three identical attempts
+per run before reporting. The secret uploads and the preview delete keep their retry — all are idempotent and
+all fail for reasons that a second attempt can fix. `tests/docs-consistency.test.ts` counts the deploy steps
+rather than naming one workflow, so a third deploy is covered the day it appears.

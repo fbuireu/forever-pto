@@ -95,6 +95,22 @@ go hunting for a key:
 - Values are always strings. There are no arrays anywhere in the bundles: a list is a numbered or
   named set of sibling keys, because `next-intl` cannot interpolate into an array.
 - `en.json` is the reference. Add a key there first, then to the other five in the same commit.
+- **A string that describes an icon is coupled to the module that draws it, and moves with it.**
+  `tutorial.steps.alternativesDescription` tells the user the recommended alternative is "marked with a
+  sparkle" — and [`pages/planner/PlannerPanel.tsx`](../modules/pages/planner/PlannerPanel.tsx) draws a `Sparkles` from `lucide-react`. The Catalan copy
+  said **llamp** (a lightning bolt) and carried a `⚡` besides, so one locale in six described a badge the
+  app has never rendered. Nothing catches this: key parity compares key sets, and no test reads an icon
+  name out of a sentence. When you change an icon, grep the six bundles for its old name; when you write
+  copy that names one, name the component that renders it.
+- **The product addresses the user informally, in every locale.** `du` in German, `tu` in French, `tú` in
+  Spanish, and the same throughout Catalan and Italian. Eight strings did not — the calendar-export toast
+  and the promo confirmation in `de` and `fr` used `Sie`/`Ihr` and `vous`/`votre`/`veuillez` while the
+  sibling key one line away stayed informal, so a single user journey switched register mid-sentence.
+  [`tests/docs-consistency.test.ts`](../../../../../tests/docs-consistency.test.ts) scans [`de.json`](./messages/de.json) and [`fr.json`](./messages/fr.json) for the formal pronouns now,
+  against a named allow-list. Two kinds of hit are legitimate and are listed there by key path: the
+  `faq.sections.security` questions, which quote the user addressing **the operator**, and third-person
+  `sie` in `cookiePolicy` and `legalNotice`, which means "they"/"it" and is not address at all. Add to that
+  list only after checking which of the two you have.
 
 ## Invariants
 

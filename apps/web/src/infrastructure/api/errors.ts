@@ -1,5 +1,6 @@
 import type {
 	DatabaseError,
+	DuplicateContactError,
 	EmailError,
 	PaymentError,
 	PromoCodeError,
@@ -12,6 +13,7 @@ export const ApiError = {
 	INTERNAL_ERROR: "internal_error",
 	NOT_FOUND: "not_found",
 	RATE_LIMIT_EXCEEDED: "rate_limit_exceeded",
+	CONTACT_ALREADY_RECEIVED: "contact_already_received",
 	EMAIL_REQUIRED: "email_required",
 	MISSING_SIGNATURE: "missing_signature",
 	INVALID_SIGNATURE: "invalid_signature",
@@ -21,6 +23,7 @@ export const ApiError = {
 
 export type TaggedFailure =
 	| RateLimitError
+	| DuplicateContactError
 	| ValidationError
 	| PromoCodeError
 	| PaymentError
@@ -39,6 +42,7 @@ const FAILURE_RESPONSES: {
 	[TAG in TaggedFailure["_tag"]]: (failure: Extract<TaggedFailure, { _tag: TAG }>) => FailureDescriptor;
 } = {
 	RateLimitError: () => ({ status: 429, error: ApiError.RATE_LIMIT_EXCEEDED }),
+	DuplicateContactError: () => ({ status: 429, error: ApiError.CONTACT_ALREADY_RECEIVED }),
 	ValidationError: (failure) => ({ status: 400, error: failure.message }),
 	PromoCodeError: (failure) => ({ status: 400, error: failure.code }),
 	PaymentError: () => OPAQUE,

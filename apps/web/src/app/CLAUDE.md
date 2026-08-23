@@ -105,6 +105,20 @@ fallback to the query — the fallback is the vulnerability, not a convenience. 
 the overwrite and the strip; `route.test.ts` asserts the header wins over a disagreeing query and that an
 absent header never reaches the builder. Verified by restoring the `??` fallback and watching the case fail.
 
+**[`markdown.spec.ts`](../../e2e/api/markdown.spec.ts) drives the twin the way a client does, and it is the only place the middleware,
+the route and the header are proven to line up.** It used to request `/api/markdown` directly and assert
+200, `text/markdown` and `public, max-age=3600` — the three things the route refuses on exactly that path,
+so all five cases were red on every pull request and the `e2e` job with them. The sharp one asserted the
+*defect*: `?path=/en/planner` expecting 200, which `route.test.ts` pins as a 404, so making the spec green
+the obvious way would have put the query fallback back. It now requests the **page** route with
+`Accept: text/markdown` and asserts what the twin produces on each branch, plus the two claims no unit test
+can reach — a bare `GET /api/markdown` 404s, so the strip is live end to end, and
+`/planner?path=/legal/terms-of-service` serves the planner. It imports `MARKDOWN_ACCEPT`,
+`MARKDOWN_PATH_HEADER` and `MARKDOWN_ROUTE` from [`src/infrastructure/markdown/twin.ts`](../infrastructure/markdown/twin.ts) rather than repeating
+the strings, because the spoofed-header case asserts a **404** and a stale header name would let it pass for
+the wrong reason. The cache assertions are directional — the hit must not carry `no-store`, the miss must not
+carry `max-age=3600` — so an intermediary appending a directive cannot turn the job red for nothing.
+
 **One module states the cache policy, and it is the one that knows the outcome.**
 [`src/infrastructure/markdown/twin.ts`](../infrastructure/markdown/twin.ts) owns `MARKDOWN_ROUTE`, `MARKDOWN_ACCEPT`, `MARKDOWN_PATH_HEADER` and
 `markdownTwinHeaders({ found })` — content type, `Cache-Control` and `Vary` together. It was written in two
@@ -223,7 +237,12 @@ Shared conventions across them:
 - Work that must not delay the response (persisting the payment record, sending the email) is returned by
   the use-case as a `deferred` Effect and run inside Next's `after()`.
 - `check-session` and `health` respond through `noStore` ([`src/infrastructure/api/response.ts`](../infrastructure/api/response.ts)). Anything
-  carrying Premium state must keep doing so.
+  carrying Premium state must keep doing so. **Assert the header, and assert it against the real
+  `noStore`.** [`check-session/route.test.ts`](./api/check-session/route.test.ts) mocked that module with a double that set
+  `Cache-Control` itself and then checked only the body, so dropping the call from the route would have left
+  the double unused and every case green — a test made vacuous by its fixture rather than its assertion. The
+  mock is gone and all five branches assert `no-store`; verified by returning a bare `NextResponse.json` from
+  the no-token branch and watching that one case, and only that one, go red.
 
 ## The redirect hand-off
 

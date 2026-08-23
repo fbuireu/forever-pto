@@ -156,6 +156,12 @@ quotes throughout, LF, 120 columns — Biome's defaults, applied by the tool rat
   [`CookieConsentDialog.tsx`](../modules/shared/cookie-consent/CookieConsentDialog.tsx). Do not "fix" this by disabling the library.
 - `[data-boneyard] > div:not([data-boneyard-overlay]) { display: contents }` unwraps the boneyard-js
   skeleton wrapper so it does not break the grid or flex layout it sits inside.
+- **`animations/index.css` declares no `shimmer` keyframe, and must not grow one back.** It carried a
+  `background-position` sweep under that name which nothing could reach: no rule writes `animation: shimmer`,
+  `theme/index.css` declares no `--animate-*` variable so Tailwind can generate no `animate-shimmer` utility,
+  and `boneyard-js` injects its own `@keyframes bs-<uid>` at runtime for `animate: 'shimmer'` — never one
+  called `shimmer`. Every other keyframe in the file has a named caller. It read like the skeleton animation
+  and was not one, which is exactly what makes the next reader wire a component to it.
 - `--container-8xl` in `theme/index.css` exists for one class, `max-w-8xl` in `planner/page.tsx`.
   Tailwind resolves `max-w-*` from `--max-width-*`, then `--spacing-*`, then `--container-*`, so the
   `--max-width-8xl` mirror that used to sit beside it was shadowing an identical value and has been

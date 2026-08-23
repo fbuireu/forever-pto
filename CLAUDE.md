@@ -234,7 +234,7 @@ required while `web-development` cannot authenticate blocks every merge.
 The alternative to all of it is to revert the rename in `ci.yml`, `docs.yml` and `cleanup-development.yml`
 and keep one shared pair, which is what the split exists to stop.
 
-**`deploy-tail` is gated on its own files.** The tail consumer is a second Worker with its own `wrangler.toml`; the app declares it in `[[tail_consumers]]` but does not carry it. It changes rarely, so it deploys only when `apps/web/workers/tail/**` does.
+**`deploy-tail` is gated on the files its bundle is built from, which is wider than its own folder.** The tail consumer is a second Worker with its own `wrangler.toml`; the app declares it in `[[tail_consumers]]` but does not carry it. It changes rarely, so `TAIL_PATHS` gates it — but `workers/tail/index.ts` imports the log-level contract from `apps/web/src/infrastructure/clients/logging/`, and while the filter named only `apps/web/workers/tail/**` a change to that contract redeployed the app and left the Worker running the old bundled copy. The Worker's own unit test reads the source module, so it could not see the split. `tests/docs-consistency.test.ts` resolves every relative import out of `workers/tail/` against `TAIL_PATHS` now.
 
 **`cross-package-notice` is advisory, not a gate.** A pull request touching both packages lands in both
 changelogs, because attribution is by path and `main` takes squash merges. Sometimes that is what you
@@ -252,7 +252,9 @@ The fix is a queue, not a wait loop: the cleanup declares `group: CI-${{ github.
 `pull_request` event carries the same `refs/pull/<number>/merge` whichever activity type fired it, so the two
 strings match and GitHub holds the cleanup pending until the CI run completes. A pending run occupies no
 runner, so this costs nothing. **The coupling is by workflow *name*** — renaming `ci.yml`'s `name: CI`
-silently unqueues the cleanup and the race comes back. A concurrency group is per run, so the whole workflow
+silently unqueues the cleanup and the race comes back, which is why `tests/docs-consistency.test.ts`
+substitutes `ci.yml`'s own `name:` into its group expression and compares the result with the literal the
+cleanup hardcodes. A concurrency group is per run, so the whole workflow
 queues and `cleanup-docs` rides along; that is harmless, and it needs no wait of its own since the docs smoke
 tests run against the build artifact before the preview Worker exists.
 
@@ -345,6 +347,17 @@ that [`apps/web/tsconfig.json`](./apps/web/tsconfig.json) keeps the two settings
 on and `allowJs` off — that it sits beside the [`next.config.ts`](./apps/web/next.config.ts) that rewrites it, and that
 `cloudflare-env.d.ts` stays both excluded from the program and ignored by git; that every `'use client'`,
 `'use server'` and `'use cache'` under either package's `src/` is a bare string literal in first position;
+that the same `typescript` version is pinned in all three manifests; that
+[`apps/web/next.config.ts`](./apps/web/next.config.ts) still answers `/(.*)` from exactly one header rule
+carrying all nine security headers, with `frame-ancestors 'none'`, `object-src 'none'` and `base-uri 'self'`
+in the CSP — the three whose absence is invisible in a browser, and the whole policy sits outside `src/`
+where the co-located-test convention does not reach it; that every binding
+[`apps/web/environment.d.ts`](./apps/web/environment.d.ts)'s `CloudflareEnv` declares is present in **each** of
+`wrangler.toml`'s three environments with the payment rate limiter identically bounded in all of them; that no
+`wrangler deploy` step in any workflow is wrapped in `nick-fields/retry`, counted rather than named one file
+at a time; that `TAIL_PATHS` matches every relative import
+[`apps/web/workers/tail/`](./apps/web/workers/tail/) reaches out to; that the cleanup workflow's concurrency
+group still equals `ci.yml`'s with its `name:` substituted in;
 and that every locale bundle has exactly the keys [`en.json`](./apps/web/src/ui/i18n/messages/en.json) has.
 
 It reads staged *and* unstaged files, so a rule fires before the offending file is committed. **Each rule was

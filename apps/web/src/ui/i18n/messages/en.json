@@ -435,7 +435,8 @@
 			"subject_too_short": "The subject needs at least 5 characters.",
 			"subject_too_long": "The subject is too long.",
 			"message_too_short": "Your message needs at least 10 characters.",
-			"message_too_long": "Your message is too long."
+			"message_too_long": "Your message is too long.",
+			"contact_already_received": "I have already heard from you recently. Please give me a little time to reply."
 		}
 	},
 	"alternativesManager": {

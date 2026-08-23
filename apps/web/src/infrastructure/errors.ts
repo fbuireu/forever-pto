@@ -35,6 +35,10 @@ export class PromoCodeError extends Data.TaggedError("PromoCodeError")<{
 	message?: string;
 }> {}
 
+export class DuplicateContactError extends Data.TaggedError("DuplicateContactError")<{
+	reason: "cooldown" | "repeated";
+}> {}
+
 export class RateLimitError extends Data.TaggedError("RateLimitError")<{
 	ip: string;
 }> {}

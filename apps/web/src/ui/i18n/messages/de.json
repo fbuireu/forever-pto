@@ -397,9 +397,9 @@
 			"ptoDay": "PTO-Tag",
 			"generatedOn": "Erstellt am",
 			"successTitle": "PDF heruntergeladen",
-			"successDescription": "Ihr Kalender wurde erfolgreich exportiert.",
+			"successDescription": "Dein Kalender wurde erfolgreich exportiert.",
 			"errorTitle": "Download fehlgeschlagen",
-			"errorDescription": "Das PDF konnte nicht erstellt werden. Bitte versuchen Sie es erneut."
+			"errorDescription": "Das PDF konnte nicht erstellt werden. Versuch es nochmal."
 		}
 	},
 	"ptoStatus": {
@@ -435,7 +435,8 @@
 			"subject_too_short": "Der Betreff braucht mindestens 5 Zeichen.",
 			"subject_too_long": "Der Betreff ist zu lang.",
 			"message_too_short": "Deine Nachricht braucht mindestens 10 Zeichen.",
-			"message_too_long": "Deine Nachricht ist zu lang."
+			"message_too_long": "Deine Nachricht ist zu lang.",
+			"contact_already_received": "Du hast mir vor Kurzem schon geschrieben. Gib mir etwas Zeit zum Antworten."
 		}
 	},
 	"alternativesManager": {
@@ -466,7 +467,7 @@
 		"paymentSuccess": "Zahlung erfolgreich!",
 		"paymentSuccessDescription": "Vielen Dank für deine Unterstützung! Du hast jetzt Premium-Zugang.",
 		"promoApplied": "Aktionscode angewendet!",
-		"promoSavedDescription": "Sie haben €{saved} gespart (Original: €{original}, Endpreis: €{final})",
+		"promoSavedDescription": "Du hast €{saved} gespart (Original: €{original}, Endpreis: €{final})",
 		"promoCodeError": "Fehler beim Gutscheincode",
 		"promoCodeErrors": {
 			"invalid_or_expired": "Ungültiger oder abgelaufener Gutscheincode",
@@ -651,7 +652,7 @@
 		"paymentFailed": "Zahlung fehlgeschlagen",
 		"processing": "Wird verarbeitet...",
 		"pay": "Bezahlen",
-		"promoSaved": "Sie haben {saved} gespart!",
+		"promoSaved": "Du hast {saved} gespart!",
 		"errors": {
 			"internal_error": "Bei uns ist etwas schiefgelaufen. Deine Karte wurde nicht belastet.",
 			"rate_limit_exceeded": "Zu viele Versuche. Warte einen Moment und versuche es noch einmal.",

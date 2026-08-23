@@ -119,6 +119,28 @@ there was nothing to retry. `PaymentError` now travels in `activateWithPayment`'
 `check-session` maps it beside `SessionError` and `DatabaseError`. `ValidationError` is reserved for the
 three conditions this file decides for itself: secret mismatch, not succeeded, email mismatch.
 
+## The contact guard runs before the send, and it is not an IP rate limit
+
+`sendContactEmail` refuses in two cases before it renders or sends anything, so a refusal costs no Resend
+call and no `contacts` row:
+
+- **A cooldown.** The same sender wrote inside the last `CONTACT_COOLDOWN_HOURS`.
+- **A repeat.** The same sender sent this exact message before, whatever the window says.
+
+Both lookups run concurrently against the `contacts` table the flow already writes, so this needs no new
+binding and no new store. Both are keyed on `contactSenderKey`, which strips a `+alias` — see
+[`../dto/CLAUDE.md`](../dto/CLAUDE.md) for why that normaliser is separate from the payments one.
+
+**Why not `checkRateLimit`.** The platform limiter keys on the IP, which is the right shape for the card
+processor in front of `POST /api/payment`: there the attacker is anonymous and the cost is Stripe's. Here
+the sender identifies themselves, the cost is an email in the operator's inbox and a row, and an IP limit
+would punish everyone behind one office NAT while letting a mobile connection through on every reconnect.
+The cooldown is keyed on the thing the product actually has.
+
+**The refusal answers 429 with `contact_already_received`.** `DuplicateContactError` is a tagged failure with
+a `reason` of `cooldown` or `repeated`, and `describeFailure` maps it, so both transports — the route handler
+and the server action — report it the same way without either deciding the policy.
+
 ## Webhook
 
 `processWebhookEvent` receives an already-verified `Stripe.Event` — signature checking happens at the route,

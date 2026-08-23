@@ -193,3 +193,31 @@ describe("BetterStackClient.withContext", () => {
 		expect(ctx.traceId).toBe("abc");
 	});
 });
+
+describe("url redaction", () => {
+	it("strips the query string off a url in the log context, so a credential in it never reaches the sink", () => {
+		new BetterStackClient().error("activation failed", {
+			url: "https://forever-pto.com/api/payment/activate?payment_intent_client_secret=redacted-in-fixture",
+		});
+
+		const [, ctx] = mockLogtail.error.mock.calls[0];
+		expect(ctx.url).toBe("https://forever-pto.com/api/payment/activate");
+		expect(JSON.stringify(ctx)).not.toContain("redacted-in-fixture");
+	});
+
+	it("strips a url carried on the base context too", () => {
+		new BetterStackClient()
+			.withContext({ url: "https://forever-pto.com/en/payment/confirmation?payment_intent=pi_3Abc" })
+			.warn("slow confirmation");
+
+		const [, ctx] = mockLogtail.warn.mock.calls[0];
+		expect(ctx.url).toBe("https://forever-pto.com/en/payment/confirmation");
+	});
+
+	it("leaves a non-string url alone", () => {
+		new BetterStackClient().info("no url", { url: 42 });
+
+		const [, ctx] = mockLogtail.info.mock.calls[0];
+		expect(ctx.url).toBe(42);
+	});
+});

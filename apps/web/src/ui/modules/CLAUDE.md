@@ -127,6 +127,10 @@ Loading states go through `boneyard-js`, not hand-rolled shimmer divs. Three pie
   Order matters: the registry's call runs first (imports are hoisted), so the provider's config is the
   one that wins. Change the provider, not the generated file.
 
+The `animate: 'shimmer'` in that config names a boneyard-js animation style, not a stylesheet keyframe.
+The library injects `@keyframes bs-<uid>` beside each skeleton at runtime, so no CSS under `ui/styles/`
+declares — or should declare — a keyframe called `shimmer`.
+
 **`fixture` and `fallback` are not two names for the same thing, and passing only the first renders
 nothing.** `Skeleton` computes `showFallback = loading && !activeBones` and then renders
 `showFallback ? fallback : children` — `fixture` appears nowhere in that path. It is build-time only:

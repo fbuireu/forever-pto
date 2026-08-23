@@ -1,6 +1,6 @@
 import { Logtail } from "@logtail/edge";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { LOG_LEVEL, LOG_SERVICE, type LogLevel } from "./contract";
+import { LOG_LEVEL, LOG_SERVICE, type LogLevel, stripQuery } from "./contract";
 
 interface LogContext {
 	[key: string]: unknown;
@@ -61,10 +61,12 @@ export class BetterStackClient {
 	}
 
 	private getFullContext(context?: LogContext) {
-		return {
+		const merged: LogContext = {
 			...this.baseContext,
 			...context,
 		};
+
+		return typeof merged.url === "string" ? { ...merged, url: stripQuery(merged.url) } : merged;
 	}
 
 	debug(message: string, context?: LogContext) {

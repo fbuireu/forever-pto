@@ -345,7 +345,7 @@
 			"toolsTitle": "Calculadores i eines",
 			"toolsDescription": "Des d'aquí pots accedir a les calculadores: estima el PTO acumulat segons el teu historial, calcula el valor econòmic dels dies no usats o compta dies laborables entre dates.",
 			"alternativesTitle": "Gestor d'alternatives",
-			"alternativesDescription": "Navega pels suggeriments de PTO que hem generat per a tu. Compara eficiència i dies lliures totals. La primera opció és la recomanada (marcada amb un llamp ⚡). Usa les fletxes per explorar alternatives i clica 'Aplicar alternativa' per canviar.",
+			"alternativesDescription": "Navega pels suggeriments de PTO que hem generat per a tu. Compara eficiència i dies lliures totals. La primera opció és la recomanada (marcada amb una icona d'espurnes). Usa les fletxes per explorar alternatives i clica 'Aplicar alternativa' per canviar.",
 			"statusTitle": "Seguiment d'estat de PTO",
 			"statusDescription": "Consulta la teva assignació de PTO en temps real. Veu els dies auto-assignats (suggerits pel nostre sistema), dies seleccionats manualment i dies restants disponibles. Pots restablir canvis manuals en qualsevol moment per tornar al suggeriment automàtic.",
 			"calendarTitle": "El teu calendari de PTO interactiu",
@@ -435,7 +435,8 @@
 			"subject_too_short": "L'assumpte necessita almenys 5 caràcters.",
 			"subject_too_long": "L'assumpte és massa llarg.",
 			"message_too_short": "El teu missatge necessita almenys 10 caràcters.",
-			"message_too_long": "El teu missatge és massa llarg."
+			"message_too_long": "El teu missatge és massa llarg.",
+			"contact_already_received": "Ja m'has escrit fa poc. Dona'm una mica de temps per respondre't."
 		}
 	},
 	"alternativesManager": {

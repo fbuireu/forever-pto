@@ -56,17 +56,6 @@ vi.mock("@infrastructure/layers", () => ({
 	}),
 }));
 
-vi.mock("@infrastructure/api/response", async () => {
-	const { NextResponse } = await import("next/server");
-	return {
-		noStore: (body: object, init?: ResponseInit) => {
-			const res = NextResponse.json(body, init);
-			res.headers.set("Cache-Control", "no-store");
-			return res;
-		},
-	};
-});
-
 vi.mock("next/server", async (importOriginal) => {
 	const actual = await importOriginal<typeof import("next/server")>();
 	return { ...actual, after: vi.fn() };
@@ -96,6 +85,7 @@ describe("GET /api/check-session", () => {
 		const response = await GET(new Request("http://localhost/api/check-session") as never);
 		const body = await response.json();
 		expect(body).toEqual({ premiumKey: null, email: null });
+		expect(response.headers.get("Cache-Control")).toBe("no-store");
 	});
 
 	it("returns session data when token is valid", async () => {
@@ -104,6 +94,7 @@ describe("GET /api/check-session", () => {
 		const response = await GET(new Request("http://localhost/api/check-session") as never);
 		const body = await response.json();
 		expect(body).toEqual({ premiumKey: "pi_abc", email: "user@example.com" });
+		expect(response.headers.get("Cache-Control")).toBe("no-store");
 	});
 
 	it("clears cookie and returns null fields when session is invalid", async () => {
@@ -113,6 +104,7 @@ describe("GET /api/check-session", () => {
 		const body = await response.json();
 		expect(body).toEqual({ premiumKey: null, email: null });
 		expect(mockClearPremiumCookie).toHaveBeenCalled();
+		expect(response.headers.get("Cache-Control")).toBe("no-store");
 	});
 });
 
@@ -122,6 +114,7 @@ describe("POST /api/check-session", () => {
 		expect(response.status).toBe(400);
 		const body = await response.json();
 		expect(body.error).toBe(ApiError.EMAIL_REQUIRED);
+		expect(response.headers.get("Cache-Control")).toBe("no-store");
 	});
 
 	it("activates with email only when no premiumKey provided", async () => {
@@ -134,6 +127,7 @@ describe("POST /api/check-session", () => {
 		expect(body.email).toBe("user@example.com");
 		expect(mockActivateWithEmail).toHaveBeenCalledWith("user@example.com");
 		expect(mockSetPremiumCookie).toHaveBeenCalled();
+		expect(response.headers.get("Cache-Control")).toBe("no-store");
 	});
 
 	it("routes a body carrying a premiumKey to the claimed-payment entry point", async () => {

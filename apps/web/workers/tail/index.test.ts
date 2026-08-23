@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import worker from "./index";
 
@@ -142,6 +144,14 @@ describe("tail worker", () => {
 			const body = JSON.parse(options.body as string);
 			expect(body[0].url).toBe("https://forever-pto.com/en/payment/confirmation");
 			expect(options.body as string).not.toContain("redacted-in-fixture");
+		});
+
+		it("reads stripQuery from the shared log contract rather than declaring its own", () => {
+			const source = readFileSync(join(__dirname, "index.ts"), "utf8");
+			const contractImport = /import[^;]*\bstripQuery\b[^;]*better-stack\/contract";/;
+
+			expect(source).toMatch(contractImport);
+			expect(source).not.toMatch(/(?:function|const)\s+stripQuery/);
 		});
 
 		it("sets url to undefined when the request url is unparseable", async () => {

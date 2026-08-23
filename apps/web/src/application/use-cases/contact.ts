@@ -1,3 +1,4 @@
+import { contactCooldownStart, contactSenderKey } from "@application/dto/contact/rules";
 import type { ContactFormData } from "@application/dto/contact/schema";
 import { contactSchema } from "@application/dto/contact/schema";
 import { ContactFormEmail } from "@application/email/templates/Contact";
@@ -6,8 +7,12 @@ import { zodParse } from "@application/shared/utils/zodParse";
 import type { TursoService } from "@infrastructure/clients/db/turso/service";
 import { ResendService } from "@infrastructure/clients/email/resend/service";
 import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
-import { EmailError, type ValidationError } from "@infrastructure/errors";
-import { saveContact } from "@infrastructure/services/contact/repository";
+import { type DatabaseError, DuplicateContactError, EmailError, type ValidationError } from "@infrastructure/errors";
+import {
+	findContactWithMessage,
+	findLatestContactSince,
+	saveContact,
+} from "@infrastructure/services/contact/repository";
 import { render } from "@react-email/render";
 import { Effect } from "effect";
 
@@ -26,13 +31,32 @@ export const sendContactEmail = ({
 	config,
 }: SendContactEmailParams): Effect.Effect<
 	{ deferred: Effect.Effect<void, never, TursoService> },
-	ValidationError | EmailError,
-	ResendService | LoggerService
+	ValidationError | EmailError | DuplicateContactError | DatabaseError,
+	ResendService | LoggerService | TursoService
 > =>
 	Effect.gen(function* () {
 		const logger = yield* LoggerService;
 
 		const validated = yield* zodParse({ schema: contactSchema, data });
+		const senderKey = contactSenderKey(validated.email);
+
+		const [withinCooldown, repeated] = yield* Effect.all(
+			[
+				findLatestContactSince({ senderKey, since: contactCooldownStart({ now: new Date() }) }),
+				findContactWithMessage({ senderKey, message: validated.message }),
+			],
+			{ concurrency: "unbounded" },
+		);
+
+		if (withinCooldown || repeated) {
+			const reason = repeated ? "repeated" : "cooldown";
+			logger.info("Contact refused before sending", {
+				reason,
+				emailDomain: emailDomain(validated.email),
+			});
+
+			return yield* Effect.fail(new DuplicateContactError({ reason }));
+		}
 
 		const emailHtml = yield* Effect.tryPromise({
 			try: () => render(ContactFormEmail({ ...validated, baseUrl: config.siteUrl })),

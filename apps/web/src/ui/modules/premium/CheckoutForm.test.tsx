@@ -79,7 +79,7 @@ describe("CheckoutForm amount rendering", () => {
 
 	it("formats the promo saving instead of prefixing a hardcoded euro sign", () => {
 		const text = renderForm("de", deMessages, 12.5, DISCOUNT);
-		expect(text).toContain("Sie haben 2,50 € gespart!");
+		expect(text).toContain(deMessages.checkout.promoSaved.replace("{saved}", "2,50 €"));
 	});
 });
 

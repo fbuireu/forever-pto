@@ -16,12 +16,13 @@ Each concept gets its own folder, and the file names inside it are fixed:
 | `dto.ts` | The mapper — the object implementing `BaseDTO` | `country/`, `holiday/`, `payment/`, `region/` |
 | `schema.ts` | A Zod schema for a shape the *user* submits, and the `z.infer` type derived from it | `contact/`, `payment/` |
 | `utils/` | Helpers the mapper needs and nobody else should reach for | `payment/`, `region/` |
+| `rules.ts` | Pure predicates over the concept that are not a mapping | `contact/` |
 
 Not every folder needs every file. `email/` and `premium/` are `types.ts` alone: `SendEmailParams` and `PremiumSessionData` are contracts between our own layers, with no foreign shape to normalise and therefore no mapper to write. Do not add an empty `dto.ts` to satisfy the pattern.
 
 | Folder | Canonical shape | Built from |
 | --- | --- | --- |
-| `contact/` | `ContactData`, `ContactFormData` | the contact form |
+| `contact/` | `ContactData`, `ContactFormData`, plus `rules.ts` | the contact form |
 | `country/` | `CountryDTO` | `i18n-iso-countries` localised names |
 | `email/` | `SendEmailParams` | — |
 | `holiday/` | `HolidayDTO` | `date-holidays` |
@@ -80,6 +81,17 @@ a `string`, so `createCustom` no longer coerces a `date` its own `CreateCustomHo
 `Date` — on the line below the one that already used it raw.
 
 `Raw*` types must not escape this folder. If a `RawHoliday` shows up in a store or a component, a mapping step was skipped.
+
+**`contact/rules.ts` holds the sender identity, and it is not `normalizeEmail`.** The contact guard keys on
+`contactSenderKey`, which lowercases, trims **and strips a `+alias` from the local part** — so
+`someone+forever-pto@example.com` and `someone@example.com` are one sender. That last step is the whole
+point: without it, the guard is bypassed by typing a different alias, which costs the sender nothing.
+
+It deliberately does **not** widen `@infrastructure/services/payments/normalizeEmail`, which only lowercases
+and trims. Premium recovery is keyed by email through `getSucceededPaymentByEmail`'s
+`lower(trim(email)) = ?`, so stripping aliases there would change who can recover an entitlement — a
+different decision, on a different table, that this one must not smuggle in. Two normalisers, two reasons,
+and this paragraph is why neither should be collapsed into the other.
 
 ## A DTO does no I/O
 

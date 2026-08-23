@@ -1,4 +1,9 @@
-import { LOG_LEVEL, LOG_SERVICE, toLogLevel } from "../../src/infrastructure/clients/logging/better-stack/contract";
+import {
+	LOG_LEVEL,
+	LOG_SERVICE,
+	stripQuery,
+	toLogLevel,
+} from "../../src/infrastructure/clients/logging/better-stack/contract";
 
 interface Env {
 	BETTER_STACK_SOURCE_TOKEN: string;
@@ -15,20 +20,6 @@ interface TailEvent {
 	exceptions: Array<{ name: string; message: string; timestamp: number }>;
 	outcome: string;
 	scriptName: string;
-}
-
-// Query strings carry credentials (Stripe appends payment_intent_client_secret to the confirmation
-// return URL), so only origin + path is ever shipped off-worker.
-function stripQuery(url: string | undefined): string | undefined {
-	if (!url) return undefined;
-
-	try {
-		const parsed = new URL(url);
-
-		return `${parsed.origin}${parsed.pathname}`;
-	} catch {
-		return undefined;
-	}
 }
 
 export default {

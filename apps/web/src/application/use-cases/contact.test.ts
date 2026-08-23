@@ -1,7 +1,7 @@
 import { TursoService } from "@infrastructure/clients/db/turso/service";
 import { ResendService } from "@infrastructure/clients/email/resend/service";
 import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
-import { EmailError, ValidationError } from "@infrastructure/errors";
+import { DuplicateContactError, EmailError, ValidationError } from "@infrastructure/errors";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { sendContactEmail } from "./contact";
@@ -12,6 +12,8 @@ vi.mock("@application/shared/utils/zodParse", () => ({
 
 vi.mock("@infrastructure/services/contact/repository", () => ({
 	saveContact: vi.fn(() => Effect.succeed(undefined)),
+	findLatestContactSince: vi.fn(() => Effect.succeed(false)),
+	findContactWithMessage: vi.fn(() => Effect.succeed(false)),
 }));
 
 vi.mock("@application/email/templates/Contact", () => ({
@@ -121,5 +123,46 @@ describe("sendContactEmail", () => {
 		const { deferred } = await run(sendContactEmail({ data: VALID_DATA, config: CONFIG }));
 		await expect(runDeferred(deferred)).resolves.toBeUndefined();
 		expect(mockLogger.error).toHaveBeenCalledOnce();
+	});
+});
+
+describe("the guard in front of the send", () => {
+	it("refuses a second message from the same sender inside the cooldown window", async () => {
+		const { findLatestContactSince } = await import("@infrastructure/services/contact/repository");
+		vi.mocked(findLatestContactSince).mockReturnValueOnce(Effect.succeed(true));
+
+		const err = await runFail(sendContactEmail({ data: VALID_DATA, config: CONFIG }));
+
+		expect(err).toBeInstanceOf(DuplicateContactError);
+		expect((err as DuplicateContactError).reason).toBe("cooldown");
+	});
+
+	it("refuses the same message again whatever the window says", async () => {
+		const { findContactWithMessage } = await import("@infrastructure/services/contact/repository");
+		vi.mocked(findContactWithMessage).mockReturnValueOnce(Effect.succeed(true));
+
+		const err = await runFail(sendContactEmail({ data: VALID_DATA, config: CONFIG }));
+
+		expect(err).toBeInstanceOf(DuplicateContactError);
+		expect((err as DuplicateContactError).reason).toBe("repeated");
+	});
+
+	it("refuses before spending the send, so a refusal costs no email and no row", async () => {
+		const { findLatestContactSince, saveContact } = await import("@infrastructure/services/contact/repository");
+		vi.mocked(findLatestContactSince).mockReturnValueOnce(Effect.succeed(true));
+
+		await runFail(sendContactEmail({ data: VALID_DATA, config: CONFIG }));
+
+		expect(mockSend).not.toHaveBeenCalled();
+		expect(saveContact).not.toHaveBeenCalled();
+	});
+
+	it("keys the lookups on the sender with its plus-alias stripped, so an alias is not a new sender", async () => {
+		const { findLatestContactSince } = await import("@infrastructure/services/contact/repository");
+		await run(
+			sendContactEmail({ data: { ...VALID_DATA, email: "  Someone+forever-pto@Example.com " }, config: CONFIG }),
+		);
+
+		expect(findLatestContactSince).toHaveBeenCalledWith(expect.objectContaining({ senderKey: "someone@example.com" }));
 	});
 });
