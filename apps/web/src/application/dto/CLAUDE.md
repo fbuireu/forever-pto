@@ -117,6 +117,15 @@ before deleting it: the two ends are identical at every boundary.
 `holidays.test.ts` now pins the last day of the last carry-over month, which is the date the two definitions
 could have disagreed on and nothing covered.
 
+**The bounds are a value, and the predicate takes one.** `isInPlanningWindow` used to take
+`{ date, year, carryOverMonths }` and rebuild the interval on every call, so the one definition of the bounds
+was recomputed once per Holiday rather than once per window: three `Date` allocations and four
+`Temporal.PlainDate` conversions inside a reduce that runs over every raw Holiday, and again per Custom
+Holiday, Manual Day and Removed Day. `planningWindowInterval({ year, carryOverMonths })` is that definition
+now, and each of the three call sites builds it once, which is the shape `create` already used ten lines up
+for the wider two-year window. The `startOfYear` on the start went with it: it was kept only so the two
+spellings matched, and the second spelling had already been deleted.
+
 **Two date windows, not one.** `create` drops anything outside the chosen year plus the whole of the following year, then sets `isInSelectedRange` from the narrower Planning Window (the year plus its Carry-over Months). Holidays between the two are kept so the UI can show them for context; only those flagged `isInSelectedRange` can anchor a Bridge.
 
 **Schemas carry message keys, not messages.** `contactSchema` and `createPaymentSchema` are pre-bound with keys such as `invalid_email` for server-side validation. The UI calls `createContactSchema` / `createPaymentSchemaWithMessages` with translated strings instead. Adding a validation rule means adding it to the messages interface too, or the localised form silently loses the message.

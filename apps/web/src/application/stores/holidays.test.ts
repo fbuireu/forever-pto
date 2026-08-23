@@ -52,6 +52,8 @@ vi.mock("./location", () => ({
 
 vi.mock("@application/dto/holiday/dto", async (importOriginal) => ({
 	isInPlanningWindow: (await importOriginal<typeof import("@application/dto/holiday/dto")>()).isInPlanningWindow,
+	planningWindowInterval: (await importOriginal<typeof import("@application/dto/holiday/dto")>())
+		.planningWindowInterval,
 	holidayDTO: {
 		createCustom: vi.fn(({ name, date }: { name: string; date: Date }) => ({
 			id: `custom-${date.toISOString()}`,

@@ -4,6 +4,7 @@ import { generateAlternatives } from "./alternatives/generateAlternatives";
 import { generateMetrics } from "./metrics/generateMetrics";
 import { generateSuggestions } from "./suggestions/generateSuggestions";
 import type { FilterStrategy, MeasuredSuggestion, Suggestion } from "./types";
+import { measureBudget } from "./utils/budget";
 import { clearDateKeyCache, clearHolidayCache } from "./utils/cache";
 import { findPlanningCandidates } from "./utils/candidates";
 import { type PlanningWindow, planningWindowMonths } from "./window";
@@ -51,7 +52,7 @@ export function runPlanningPipeline({
 		isInSelectedRange: true,
 	}));
 	const holidaysWithManual = [...holidays, ...manualPseudoHolidays];
-	const effectivePtoDays = Math.max(0, autoSuggestCount ?? ptoDays - manuallySelectedDays.length);
+	const effectivePtoDays = autoSuggestCount ?? measureBudget({ ptoDays, manuallySelectedDays }).remaining;
 
 	const measure = (suggestion: Suggestion): MeasuredSuggestion => ({
 		...suggestion,

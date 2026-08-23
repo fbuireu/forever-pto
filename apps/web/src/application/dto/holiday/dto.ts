@@ -30,16 +30,22 @@ type HolidayDTOShape = BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> & {
 };
 
 export interface PlanningWindowBounds {
-	date: Date;
 	year: number;
 	carryOverMonths: number;
 }
 
-export const isInPlanningWindow = ({ date, year, carryOverMonths }: PlanningWindowBounds): boolean =>
-	isWithinInterval(date, {
-		start: startOfYear(new Date(year, 0, 1)),
-		end: addMonths(endOfYear(new Date(year, 0, 1)), carryOverMonths),
-	});
+export interface PlanningWindowInterval {
+	start: Date;
+	end: Date;
+}
+
+export const planningWindowInterval = ({ year, carryOverMonths }: PlanningWindowBounds): PlanningWindowInterval => ({
+	start: new Date(year, 0, 1),
+	end: addMonths(endOfYear(new Date(year, 0, 1)), carryOverMonths),
+});
+
+export const isInPlanningWindow = (date: Date, window: PlanningWindowInterval): boolean =>
+	isWithinInterval(date, window);
 
 export const holidayDTO: HolidayDTOShape = {
 	create: ({ raw, params }: { raw: RawHoliday[]; params: HolidayDTOParams }) => {
@@ -48,6 +54,7 @@ export const holidayDTO: HolidayDTOShape = {
 
 		const yearStart = startOfYear(new Date(year, 0, 1));
 		const nextYearEnd = endOfYear(new Date(year + 1, 0, 1));
+		const planningWindow = planningWindowInterval({ year, carryOverMonths });
 
 		return raw
 			.toSorted((a, b) => Number(!!a.location) - Number(!!b.location))
@@ -64,7 +71,7 @@ export const holidayDTO: HolidayDTOShape = {
 					type: holiday.type,
 					variant: holiday.location ? HolidayVariant.REGIONAL : HolidayVariant.NATIONAL,
 					...(holiday.location && { location: getRegionName(holiday.location, regions) }),
-					isInSelectedRange: isInPlanningWindow({ date: holidayDate, year, carryOverMonths }),
+					isInSelectedRange: isInPlanningWindow(holidayDate, planningWindow),
 				});
 				return acc;
 			}, [])
@@ -76,7 +83,7 @@ export const holidayDTO: HolidayDTOShape = {
 		name,
 		date,
 		variant: HolidayVariant.CUSTOM,
-		isInSelectedRange: isInPlanningWindow({ date, year, carryOverMonths }),
+		isInSelectedRange: isInPlanningWindow(date, planningWindowInterval({ year, carryOverMonths })),
 	}),
 };
 

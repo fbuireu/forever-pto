@@ -2,6 +2,7 @@
 
 import { useHolidaysStore } from "@application/stores/holidays";
 import type { GenerateSuggestionsParams } from "@application/stores/types";
+import { measureBudget } from "@domain/calendar/utils/budget";
 import {
 	type CalculateSuggestionsRequest,
 	WORKER_MESSAGE_TYPE,
@@ -69,7 +70,7 @@ export function useCalculationsWorker() {
 
 			const { removedSuggestedDays, currentSelection, manuallySelectedDays } = useHolidaysStore.getState();
 
-			const budgetForAutoSuggest = params.ptoDays - manuallySelectedDays.length;
+			const budgetForAutoSuggest = measureBudget({ ptoDays: params.ptoDays, manuallySelectedDays }).remaining;
 			const hasRemovedDays = removedSuggestedDays.length > 0;
 			const activeSuggestedDays =
 				currentSelection && hasRemovedDays

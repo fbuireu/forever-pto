@@ -1,4 +1,4 @@
-import { holidayDTO, isInPlanningWindow } from "@application/dto/holiday/dto";
+import { holidayDTO, isInPlanningWindow, planningWindowInterval } from "@application/dto/holiday/dto";
 import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
 import { logClient, logClientError } from "@application/shared/utils/clientLog";
 import { fromStoredInstant, type Stored } from "@application/shared/utils/dateIntake";
@@ -116,15 +116,12 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
 				fetchHolidays: async (params: FetchHolidaysParams) => {
 					const { holidays: currentHolidays } = get();
+					const planningWindow = planningWindowInterval(params);
 					const customHolidays = currentHolidays
 						.filter((h) => h.variant === HolidayVariant.CUSTOM)
 						.map((h) => ({
 							...h,
-							isInSelectedRange: isInPlanningWindow({
-								date: h.date,
-								year: params.year,
-								carryOverMonths: params.carryOverMonths,
-							}),
+							isInSelectedRange: isInPlanningWindow(h.date, planningWindow),
 						}));
 
 					try {
@@ -427,7 +424,8 @@ export const useHolidaysStore = create<HolidaysStore>()(
 					const { year, carryOverMonths } = params ?? useFiltersStore.getState();
 					const { manuallySelectedDays, removedSuggestedDays } = get();
 
-					const isInWindow = (date: Date) => isInPlanningWindow({ date, year, carryOverMonths });
+					const planningWindow = planningWindowInterval({ year, carryOverMonths });
+					const isInWindow = (date: Date) => isInPlanningWindow(date, planningWindow);
 					const prunedManualDays = manuallySelectedDays.filter(isInWindow);
 					const prunedRemovedDays = removedSuggestedDays.filter(isInWindow);
 
