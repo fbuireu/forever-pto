@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
-import { dirname, join, relative, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import ts from "typescript";
 import { describe, expect, it } from "vitest";
 import webNextConfig from "../apps/web/next.config";
@@ -44,6 +44,7 @@ const BUILD_COMMAND = /\bpnpm (?:run |--filter \S+ )*(?:cf:)?build\b/;
 const ALIAS_WILDCARD_SUFFIX = /\/\*$/;
 const WORKSPACE_PACKAGE_GLOB = /^\s*-\s*['"]?([^'"\s#]+)['"]?\s*$/gm;
 const GITHUB_WORKFLOW_EXPRESSION = /\$\{\{\s*github\.workflow\s*\}\}/;
+const FONT_VARIABLE = /variable: ["'](--[\w-]+)["']/g;
 
 // Everything the repo would ship, staged or not, so a rule fires before the offending file is committed.
 // Ignored paths and vendored tooling under dotfolders are excluded: they are not ours to fix.
@@ -655,6 +656,29 @@ describe("documentation does not point at things that are gone", () => {
 		expect(dangling).toEqual([]);
 	});
 
+	// The same seam, one file type over, and nothing resolved it at all: `astro check` does not read CSS, and
+	// the docs workflow's trigger list proves only that a change under `apps/web/src/ui/` rebuilds this site,
+	// not that what `global.css` reaches for still exists. A renamed `@import` target fails `astro build`
+	// loudly but late, in the Docs workflow, after the app's own CI has gone green. A renamed `@source` target
+	// does not fail at all: Tailwind extracts no class from a path matching nothing, the build stays green and
+	// the demos ship unstyled, which `demos.spec.ts` cannot see because it asserts a 200, a child count and a
+	// silent console. Bare package specifiers are the resolver's problem, so only the relative reaches count.
+	it("resolves every relative @import and @source the docs stylesheets reach for", () => {
+		const CSS_REACH = /@(?:import|source)\s+['"](\.[^'"]+)['"]/g;
+		const dangling: string[] = [];
+		let checked = 0;
+
+		for (const file of trackedFiles.filter((path) => path.startsWith(`${DOCS}/src/styles/`) && path.endsWith(".css"))) {
+			for (const [, specifier] of read(file).matchAll(CSS_REACH)) {
+				checked += 1;
+				if (!existsSync(resolve(ROOT, dirname(file), specifier))) dangling.push(`${file} -> ${specifier}`);
+			}
+		}
+
+		expect(checked).toBeGreaterThanOrEqual(5);
+		expect(dangling).toEqual([]);
+	});
+
 	// The wiki's copy-pasteable Usage blocks are the largest slice of the cross-package seam and the only
 	// one nothing checked: `astro check` registers no MDX plugin, and the citation rules above match file
 	// paths rather than exported symbols. A rename in apps/web silently published a wrong import.
@@ -890,29 +914,94 @@ describe("documentation does not point at things that are gone", () => {
 		expect(shipped.filter((name) => !listed.has(name))).toEqual([]);
 	});
 
-	// TokenSwatch takes string[], so a renamed token renders `background: var(--gone)`, transparent, which
-	// reads as a legitimate pale colour rather than an error. Nothing else checks these: astro check does not
-	// see .mdx, and the citation rules match file paths.
+	// TokenSwatch and ShadowScale take string[], so a renamed token renders `background: var(--gone)`,
+	// transparent, which reads as a legitimate pale colour rather than an error. Nothing else checks these:
+	// astro check does not see .mdx, and the citation rules match file paths.
+	//
+	// Matching `var(--x)` alone read 5 of the 66 tokens those two visualizers actually render: every swatch on
+	// the colors and shadows pages arrives as a bare string inside a `tokens={[…]}` array, so the whole brand
+	// palette and every `--shadow-brutal-*` sat outside the one rule written for them, and the docs' own
+	// components were outside the file set entirely. The floor is on both sides now: with one only on the
+	// declared side, prose that stopped naming tokens would empty the citation set and pass this vacuously.
 	it("names only design tokens the stylesheets still declare", () => {
-		const styles = trackedFiles
-			.filter((path) => path.startsWith(`${WEB}/src/ui/styles/`) && path.endsWith(".css"))
-			.map((path) => read(path))
-			.join("\n");
-		const fontVariables = [...read(`${WEB}/src/app/fonts.ts`).matchAll(/variable: ["'](--[\w-]+)["']/g)].map(
-			([, token]) => token,
+		const stylesheets = trackedFiles.filter(
+			(path) =>
+				path.endsWith(".css") && (path.startsWith(`${WEB}/src/ui/styles/`) || path.startsWith(`${DOCS}/src/styles/`)),
 		);
+		const fontVariables = [...read(`${WEB}/src/app/fonts.ts`).matchAll(FONT_VARIABLE)].map(([, token]) => token);
 		const declared = new Set([
-			...[...styles.matchAll(/^\s*(--[\w-]+)\s*:/gm)].map(([, token]) => token),
+			...stylesheets.flatMap((path) => [...read(path).matchAll(/^\s*(--[\w-]+)\s*:/gm)].map(([, token]) => token)),
 			...fontVariables,
 		]);
 
-		const designSystemPages = contentFiles.filter((path) => path.includes("/design-system/"));
+		const citing = [
+			...contentFiles.filter((path) => path.includes("/design-system/")),
+			...trackedFiles.filter((path) => path.startsWith(`${DOCS}/src/components/`) && path.endsWith(".tsx")),
+		];
 		const cited = new Set(
-			designSystemPages.flatMap((path) => [...read(path).matchAll(/var\((--[\w-]+)\)/g)].map(([, token]) => token)),
+			citing.flatMap((path) => {
+				const source = read(path);
+				return [
+					...[...source.matchAll(/var\((--[\w-]+)\)/g)].map(([, token]) => token),
+					...[...source.matchAll(/tokens=\{\[([\s\S]*?)\]\}/g)].flatMap(([, list]) =>
+						[...list.matchAll(/["'](--[\w-]+)["']/g)].map(([, token]) => token),
+					),
+					...[...source.matchAll(/token: ["'](--[\w-]+)["']/g)].map(([, token]) => token),
+				];
+			}),
 		);
 
 		expect(declared.size).toBeGreaterThan(20);
+		expect(cited.size).toBeGreaterThan(60);
 		expect([...cited].filter((token) => !declared.has(token))).toEqual([]);
+	});
+
+	// The four families are spelled in three places and nothing tied them: `next/font/google`'s `variable:` in
+	// the app, this site's `:root`, which points those same names at the self-hosted @fontsource faces, and
+	// `TypeSpecimen`'s human-readable label. Swap a family over there and `theme/index.css` repoints
+	// `--font-sans` at a variable the docs never declare, so the wiki renders in the browser default while the
+	// specimen beside it still prints the old family name. The label half stays prose; nothing mechanises it.
+	it("declares every font variable the app registers in the docs stylesheet's :root", () => {
+		const rootBlocks = [...read(`${DOCS}/src/styles/global.css`).matchAll(/:root\s*\{([^}]*)\}/g)].map(
+			([, body]) => body,
+		);
+		const declared = new Set(
+			rootBlocks.flatMap((body) => [...body.matchAll(/^\s*(--[\w-]+)\s*:/gm)].map(([, token]) => token)),
+		);
+		const registered = [...read(`${WEB}/src/app/fonts.ts`).matchAll(FONT_VARIABLE)].map(([, token]) => token);
+
+		expect(registered.length).toBeGreaterThan(3);
+		expect(registered.filter((token) => !declared.has(token))).toEqual([]);
+	});
+
+	// An override restating the vendor string byte for byte is worse than no override: it pins a value
+	// upstream may later correct, and it buries the handful that are real. This file carried eleven keys, of
+	// which four were deliberate shortenings; six were copies of Starlight's own Spanish bundle, and the
+	// eleventh was the reason the rule exists. `search.ctrlKey` read "Ctrl K" where `Search.astro` renders
+	// `<kbd>{ctrlKey}</kbd><kbd>K</kbd>`, so all 76 Spanish pages shipped a search box labelled "Ctrl K K".
+	// The vendor bundle is the baseline, so what is left in the file is exactly what this site changes.
+	it("overrides only the Starlight strings the docs site actually changes", () => {
+		const overrides = trackedFiles.filter(
+			(path) => path.startsWith(`${DOCS}/src/content/i18n/`) && path.endsWith(".json"),
+		);
+		const restated: string[] = [];
+		let checked = 0;
+
+		expect(overrides.length).toBeGreaterThan(0);
+
+		for (const file of overrides) {
+			const vendor = `${DOCS}/node_modules/@astrojs/starlight/translations/${basename(file, ".json")}.json`;
+			expect(existsSync(join(ROOT, vendor)), `${vendor} is absent, so this rule would read nothing`).toBe(true);
+
+			const defaults: Record<string, string> = readJson(vendor);
+			for (const [key, value] of Object.entries(readJson(file) as Record<string, string>)) {
+				checked += 1;
+				if (defaults[key] === value) restated.push(`${file} -> ${key} restates the Starlight default`);
+			}
+		}
+
+		expect(checked).toBeGreaterThan(0);
+		expect(restated).toEqual([]);
 	});
 
 	it("prints repo-relative paths in the published wiki, never package-relative ones", () => {
@@ -1345,5 +1434,80 @@ describe("translation bundles stay in step", () => {
 		});
 
 		expect(stale).toEqual([]);
+	});
+
+	const UPPERCASE_RUN = /(?<![\p{L}\p{N}])\p{Lu}{2,}(?![\p{L}\p{N}])/gu;
+
+	const ACRONYMS = new Set([
+		"AEPD",
+		"AI",
+		"APDCAT",
+		"API",
+		"CDN",
+		"CE",
+		"CNIL",
+		"DSGVO",
+		"EE",
+		"EEA",
+		"EEE",
+		"ES",
+		"EU",
+		"EUA",
+		"EWR",
+		"FAQ",
+		"FR",
+		"GDPR",
+		"GPDP",
+		"HH",
+		"HR",
+		"HTTPS",
+		"IA",
+		"ID",
+		"IT",
+		"KI",
+		"LSSI",
+		"NIF",
+		"PDF",
+		"PTO",
+		"QA",
+		"RGPD",
+		"RH",
+		"ROI",
+		"RR",
+		"RRHH",
+		"RTT",
+		"SEE",
+		"TLS",
+		"UE",
+		"URL",
+		"US",
+		"USA",
+		"UTC",
+		"UU",
+		"UX",
+		"XOR",
+	]);
+
+	it.each(localeFiles)("%s shouts nothing an acronym does not explain", (file) => {
+		const shouted = entriesOf(file)
+			.flatMap(([path, value]) =>
+				[...value.matchAll(UPPERCASE_RUN)]
+					.map(([run]) => run)
+					.filter((run) => !ACRONYMS.has(run))
+					.map((run) => `${path} -> ${run}`),
+			)
+			.sort();
+
+		expect([...new Set(shouted)]).toEqual([]);
+	});
+
+	it("keeps the acronym allow-list to names the bundles still use", () => {
+		const used = new Set(
+			localeFiles.flatMap((file) =>
+				entriesOf(file).flatMap(([, value]) => [...value.matchAll(UPPERCASE_RUN)].map(([run]) => run)),
+			),
+		);
+
+		expect([...ACRONYMS].filter((acronym) => !used.has(acronym))).toEqual([]);
 	});
 });

@@ -9,6 +9,13 @@
  * 3. Tailwind theme + utilities WITHOUT preflight, since Starlight owns base styles;
  *    importing 'tailwindcss' wholesale would double the preflight.
  * Never import apps/web/src/ui/styles/index.css here (full tailwindcss + app layers).
+ *
+ * The @layer statement below reads as if it were dropped: the emitted bundle carries
+ * only `@layer starlight,theme,components;`. It is not. Lightning CSS prunes the names
+ * it can already see declared in the right position, and the shipped first appearances
+ * are base, then that statement, then utilities, which is this line exactly. Delete it
+ * and the bundle changes: the @theme variables land unlayered and the order becomes
+ * base, utilities, theme, starlight, so Starlight outranks the app's own utilities.
  */
 @layer base, starlight, theme, components, utilities;
 

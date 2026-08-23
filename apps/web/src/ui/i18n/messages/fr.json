@@ -39,7 +39,6 @@
 		"title": "Forever PTO",
 		"heading": "Planificateur",
 		"description": "Ton planificateur PTO intelligent. Configure tes jours de congé, pays et stratégie pour profiter au maximum de chaque jour férié.",
-		"subtitle": "Ton optimiseur de congés intelligent. Arrête de perdre des jours.",
 		"titleHighlight1": "Ton année",
 		"titleHighlight2": "libre",
 		"instructions": "Commence par ajouter tes jours dans la barre latérale gauche et le reste de ta configuration. Encore des doutes ?",
@@ -104,31 +103,22 @@
 		"notifications": {
 			"canImprove": {
 				"title": "On peut faire mieux",
-				"message": "Il existe des alternatives qui ajoutent",
-				"moreDays": "jours supplémentaires",
-				"toYourPlan": "à ton planning.",
-				"reviewOptions": "Consulte les options disponibles.",
+				"message": "{count, plural, one {Il existe des alternatives qui ajoutent <b><n>#</n> jour supplémentaire</b> à ta suggestion.} other {Il existe des alternatives qui ajoutent <b><n>#</n> jours supplémentaires</b> à ta suggestion.}}",
+				"reviewOptions": "Consulte les alternatives disponibles.",
 				"considerPremium": "Envisage Premium pour plus d'analyses."
 			},
 			"manualAdjustments": {
 				"title": "Ajustements manuels",
-				"added": "Tu as ajouté",
-				"day": "jour",
-				"days": "jours",
-				"and": "et",
-				"removed": "supprimé",
-				"fromOriginal": "de la suggestion d'origine."
+				"addedOnly": "{added, plural, one {Tu as ajouté <b><a>#</a> jour</b> à la suggestion d'origine.} other {Tu as ajouté <b><a>#</a> jours</b> à la suggestion d'origine.}}",
+				"removedOnly": "{removed, plural, one {Tu as supprimé <b><r>#</r> jour</b> de la suggestion d'origine.} other {Tu as supprimé <b><r>#</r> jours</b> de la suggestion d'origine.}}",
+				"addedAndRemoved": "{added, plural, one {Tu as ajouté <b><a>#</a> jour</b>} other {Tu as ajouté <b><a>#</a> jours</b>}} et {removed, plural, one {supprimé <b><r>#</r> jour</b>} other {supprimé <b><r>#</r> jours</b>}} de la suggestion d'origine."
 			},
 			"customHolidays": {
 				"title": "Jours fériés personnalisés",
-				"youHave": "Tu as",
-				"holiday": "jour férié personnalisé",
-				"holidays": "jours fériés personnalisés",
-				"improvesPlan": "qui améliorent ton planning."
+				"message": "{count, plural, one {Tu as <b><n>#</n> jour férié personnalisé</b> qui améliore ta suggestion.} other {Tu as <b><n>#</n> jours fériés personnalisés</b> qui améliorent ta suggestion.}}"
 			}
 		},
 		"yearTimeline": {
-			"title": "Vue annuelle condensée",
 			"rows": {
 				"national": "National",
 				"regional": "Régional",
@@ -146,14 +136,11 @@
 				"title": "Général",
 				"whatIsPto": {
 					"question": "C'est quoi le PTO ?",
-					"answer": "PTO signifie Paid Time Off (congés payés): le nombre de jours de vacances que ton employeur te donne chaque année à utiliser comme tu veux. Contrairement aux arrêts maladie ou aux jours fériés, les jours de PTO sont les tiens à planifier librement. Le problème c'est que la plupart des gens les utilisent au hasard et gâchent beaucoup de repos potentiel. Forever PTO t'aide à placer ces jours stratégiquement autour des jours fériés pour transformer, par exemple, 5 jours de PTO en 12 jours consécutifs de repos."
+					"answer": "PTO signifie Paid Time Off (jours de congés payés): le nombre de jours de congés payés que ton employeur te donne chaque année à utiliser comme tu veux. Contrairement aux arrêts maladie ou aux jours fériés, les jours de PTO sont les tiens à planifier librement. Le problème c'est que la plupart des gens les utilisent au hasard et gâchent beaucoup de repos potentiel. Forever PTO t'aide à placer ces jours stratégiquement autour des jours fériés pour transformer, par exemple, 5 jours de PTO en 12 jours consécutifs de repos."
 				},
 				"whatIs": {
 					"question": "Qu'est-ce que c'est ?",
 					"answer": "Forever PTO est un outil pour t'aider à planifier et optimiser tes jours de congé en suggérant les meilleures dates à poser en fonction des jours fériés et de tes préférences. Vu la complexité de la planification des vacances, Forever PTO vise à simplifier le processus et maximiser ton temps libre. Tu peux choisir différentes stratégies pour équilibrer tes jours de repos tout au long de l'année afin de maximiser ton temps libre. Tu peux aussi personnaliser entièrement les jours fériés, les noms des fêtes et même ajouter des jours fériés spécifiques à ton entreprise ou ta région."
-				},
-				"howWorks": {
-					"question": "Comment ça marche ?"
 				},
 				"whyNotSeeingCountry": {
 					"question": "Pourquoi je ne vois pas mon pays ou mes jours fériés correctement ?",
@@ -162,9 +149,6 @@
 				"pricing": {
 					"question": "Pourquoi y a-t-il un modèle payant ?",
 					"answer": "Forever PTO est gratuit. Cependant, nous utilisons un modèle payant pour couvrir les coûts de maintenance des données, de l'infrastructure et des améliorations continues. Le modèle payant finance les mises à jour, le support et l'hébergement. Nous proposons également un niveau gratuit avec les fonctionnalités essentielles pour que tout le monde puisse bénéficier d'une meilleure planification de ses congés."
-				},
-				"restartTutorial": {
-					"question": "Comment revoir le tutoriel interactif ?"
 				}
 			},
 			"technical": {
@@ -229,7 +213,7 @@
 		"weekendDays": "Jours de week-end",
 		"holidays": "Jours fériés",
 		"holidaysOutsideRange": "Nous ne connaissons les jours fériés que pour {from}–{to} ; ceux en dehors comptent comme des jours ouvrés.",
-		"dateRange": "Plage de dates",
+		"dateRange": "Dates sélectionnées",
 		"from": "Du",
 		"to": "au"
 	},
@@ -336,7 +320,6 @@
 		}
 	},
 	"tutorial": {
-		"description": "Configure ton plan en 2 étapes : d'abord ta localisation, puis tes jours et ta stratégie. Clique sur le bouton pour un tutoriel interactif.",
 		"nextBtn": "Suivant",
 		"prevBtn": "Précédent",
 		"doneBtn": "Terminé",
@@ -345,7 +328,7 @@
 			"toolsTitle": "Calculateurs et outils",
 			"toolsDescription": "Accède à des calculateurs utiles ici : estime tes congés selon ton historique professionnel, calcule la valeur monétaire de tes congés non utilisés, ou compte les jours ouvrés entre deux dates.",
 			"alternativesTitle": "Gestionnaire d'alternatives",
-			"alternativesDescription": "Navigue parmi différentes suggestions de congés qu'on a calculées pour toi. Compare les métriques d'efficacité, le total de jours de repos et trouve l'équilibre parfait. La première option est toujours la suggestion recommandée, marquée d'une étoile. Utilise les flèches pour explorer les alternatives et clique sur \"Appliquer l'alternative\" pour en choisir une différente.",
+			"alternativesDescription": "Navigue parmi différentes suggestions de congés qu'on a calculées pour toi. Compare les métriques d'efficacité, le total de jours effectifs et trouve l'équilibre parfait. La première alternative est toujours la suggestion recommandée, marquée d'une étincelle. Utilise les flèches pour explorer les alternatives et clique sur \"Appliquer l'alternative\" pour en choisir une différente.",
 			"statusTitle": "Suivi du statut des congés",
 			"statusDescription": "Suis l'utilisation de tes congés en temps réel. Tu vois les jours attribués automatiquement (suggérés par l'app), les jours sélectionnés manuellement et les jours restants. Tu peux réinitialiser les modifications manuelles à tout moment pour revenir à la suggestion d'origine.",
 			"calendarTitle": "Ton calendrier interactif de congés",
@@ -356,7 +339,7 @@
 			"holidaysListDescription": "Ici tu peux affiner les données des jours fériés pour qu'elles correspondent exactement à ta situation. Modifie ou supprime n'importe quel jour férié national ou régional, et ajoute tes propres jours de repos: jours fériés d'entreprise, fêtes locales, ou toute date qui compte pour toi. Plus les données sont précises, meilleures sont les suggestions.",
 			"step1Title": "Ton contexte",
 			"step1Description": "Sélectionne ton pays, ta région et l'année que tu veux planifier. Cela configure ton calendrier de jours fériés pour trouver les meilleurs ponts.",
-			"step2Title": "Tes jours disponibles",
+			"step2Title": "Tes jours de PTO",
 			"step2Description": "Indique combien de jours de congé tu as. C'est la base de tous les calculs.",
 			"step3Title": "Ta configuration",
 			"step3Description": "Choisis ta stratégie d'optimisation et configure les jours passés et les mois de report pour affiner ton plan.",
@@ -440,7 +423,7 @@
 		}
 	},
 	"alternativesManager": {
-		"option": "Option",
+		"option": "Alternative",
 		"recommended": "Recommandée",
 		"totalOff": "Jours effectifs",
 		"efficiency": "Efficacité",
@@ -490,7 +473,6 @@
 	},
 	"sidebar": {
 		"configuration": "Configuration",
-		"filters": "Filtres",
 		"tools": "Outils",
 		"calculators": "Calculateurs",
 		"loading": "Chargement...",
@@ -673,7 +655,7 @@
 		"enterAmount": "Saisir un montant",
 		"basePriceNote": "Prix de base en {currency}. Le montant final sera converti dans ta devise locale au taux de change actuel.",
 		"havePromoCode": "Tu as un code promo ?",
-		"promoCodePlaceholder": "SI_SEULEMENT_C'ÉTAIT_SI_SIMPLE",
+		"promoCodePlaceholder": "Si seulement c'était si simple",
 		"continueToPayment": "Continuer vers le paiement",
 		"processing": "Traitement en cours..."
 	},
@@ -757,7 +739,7 @@
 			"weatherIntegration": "Intégration météo",
 			"weatherIntegrationDescription": "Consulte les prévisions météo pour tes dates de vacances planifiées",
 			"blockedPeriods": "Périodes bloquées",
-			"blockedPeriodsDescription": "Marque des plages de dates où tu ne veux aucune suggestion de PTO: conférences, voyages, arrêts maladie ou tout moment où tu sais que tu seras occupé",
+			"blockedPeriodsDescription": "Marque des périodes où tu ne veux aucune suggestion de PTO: conférences, voyages, arrêts maladie ou tout moment où tu sais que tu seras occupé",
 			"performanceOptimization": "Optimisation des performances",
 			"performanceOptimizationDescription": "Calculs plus rapides et expérience plus fluide grâce aux Web Workers",
 			"customWeekends": "Week-ends personnalisés",
@@ -812,9 +794,6 @@
 	},
 	"workdayCounterModal": {
 		"selectDateRange": "Sélectionner des dates"
-	},
-	"command": {
-		"searchPlaceholder": "Rechercher une commande à exécuter..."
 	},
 	"legal": {
 		"lastUpdated": "Dernière mise à jour : {date}"
@@ -965,8 +944,8 @@
 			"efficiencyLabel": "Efficacité moyenne",
 			"daysLabel": "Jours libres avec {days} congés",
 			"countriesLabel": "Pays couverts",
-			"plansLabel": "Plans générés",
-			"plansValue": "12 k+"
+			"plansLabel": "Suggestions générées",
+			"plansValue": "{value}+"
 		},
 		"features": {
 			"badge": "astuces du moteur",
@@ -1062,7 +1041,7 @@
 			"description": "Pas de SaaS. Pas d'abonnement. Pas d'\"essai gratuit qui se renouvelle automatiquement\".",
 			"freeName": "gratuit pour toujours",
 			"freeTagline": "Essaie-le. Il te convaincra.",
-			"freePrice": "€0",
+			"freePrice": "{amount}",
 			"freePer": "/toujours",
 			"freeNote": "Pas de carte. Pas d'email. Rien.",
 			"freeFeatures": {
@@ -1073,8 +1052,8 @@
 			},
 			"freeCta": "Commencer gratuitement",
 			"lifetimeName": "Pass Soutien",
-			"lifetimeTagline": "Don minimum de 1€. Utilise-le pour toujours.",
-			"lifetimePrice": "Dès 1€",
+			"lifetimeTagline": "Don minimum de {amount}. Utilise-le pour toujours.",
+			"lifetimePrice": "Dès {amount}",
 			"lifetimePer": " une fois",
 			"lifetimeNote": "100% facultatif. Maintient le projet en vie.",
 			"lifetimeFeatures": {
@@ -1640,7 +1619,7 @@
 				},
 				"exclusions": {
 					"title": "Exclusions de remboursement",
-					"description": "Les remboursements NE seront PAS accordés dans les cas suivants :",
+					"description": "Les remboursements <b>ne</b> seront <b>pas</b> accordés dans les cas suivants :",
 					"items": {
 						"timePassed": "Plus de 14 jours se sont écoulés depuis l'achat (sauf droits légaux applicables)",
 						"violatedTerms": "Tu as violé ces Conditions générales d'utilisation",
@@ -1715,7 +1694,7 @@
 					"interruptions": "Interruptions ou erreurs du Service",
 					"unauthorizedAccess": "Accès non autorisé à tes données stockées localement"
 				},
-				"maxLiability": "Notre responsabilité totale pour toute réclamation découlant de ou liée à ces Conditions ou au Service ne pourra excéder le montant que tu as payé pour l'accès Premium (le cas échéant) ou 50 €, le montant le plus élevé étant retenu."
+				"maxLiability": "Notre responsabilité totale pour toute réclamation découlant de ou liée à ces Conditions ou au Service ne pourra excéder le montant que tu as payé pour l'accès Premium (le cas échéant) ou {amount}, le montant le plus élevé étant retenu."
 			},
 			"intellectualProperty": {
 				"title": "Propriété intellectuelle",

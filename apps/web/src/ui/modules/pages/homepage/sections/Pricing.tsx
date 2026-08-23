@@ -3,11 +3,16 @@ import { Badge } from "@ui/modules/core/primitives/Badge";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { SupportButton } from "@ui/modules/shared/SupportButton";
 import { cn } from "@ui/utils/cn";
-import { getTranslations } from "next-intl/server";
+import { amountFormatter } from "@ui/utils/currencies";
+import { getLocale, getTranslations } from "next-intl/server";
 import { brutCard } from "./shared";
 
+const FREE_AMOUNT = 0;
+const MINIMUM_DONATION = 1;
+
 export const Pricing = async () => {
-	const t = await getTranslations("homepage");
+	const [t, locale] = await Promise.all([getTranslations("homepage"), getLocale()]);
+	const money = amountFormatter(locale);
 
 	return (
 		<section className="px-7 py-24 bg-[var(--surface-panel-alt)] border-y-[4px] border-[var(--frame)]" id="pricing">
@@ -31,7 +36,7 @@ export const Pricing = async () => {
 					<h3 className="font-display font-semibold text-[28px] tracking-[-0.02em] mb-2">{t("pricing.freeName")}</h3>
 					<p className="text-[14px] text-muted-foreground mb-4">{t("pricing.freeTagline")}</p>
 					<div className="font-display font-extrabold text-[64px] leading-none tracking-[-0.04em] mb-1.5">
-						{t("pricing.freePrice")}
+						{t("pricing.freePrice", { amount: money.format(FREE_AMOUNT) })}
 						<span className="text-[18px] text-muted-foreground font-semibold">{t("pricing.freePer")}</span>
 					</div>
 					<p className="font-mono text-[12px] text-muted-foreground mb-5">{t("pricing.freeNote")}</p>
@@ -70,9 +75,11 @@ export const Pricing = async () => {
 					<h3 className="font-display font-semibold text-[28px] tracking-[-0.02em] mb-2">
 						{t("pricing.lifetimeName")}
 					</h3>
-					<p className="text-[14px] text-[var(--color-brand-ink)]/60 mb-4">{t("pricing.lifetimeTagline")}</p>
+					<p className="text-[14px] text-[var(--color-brand-ink)]/60 mb-4">
+						{t("pricing.lifetimeTagline", { amount: money.format(MINIMUM_DONATION) })}
+					</p>
 					<div className="font-display font-extrabold text-[64px] leading-none tracking-[-0.04em] mb-1.5">
-						{t("pricing.lifetimePrice")}
+						{t("pricing.lifetimePrice", { amount: money.format(MINIMUM_DONATION) })}
 						<span className="text-[18px] text-[var(--color-brand-ink)]/60 font-semibold">
 							{t("pricing.lifetimePer")}
 						</span>

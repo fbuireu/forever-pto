@@ -20,7 +20,7 @@ breaks the dynamic import in `config.ts` at request time.
 
 ## Namespaces
 
-[`en.json`](./messages/en.json) has 49 top-level namespaces and roughly 1,250 leaf keys. A namespace is the scope passed to
+[`en.json`](./messages/en.json) has 48 top-level namespaces and roughly 1,270 leaf keys. A namespace is the scope passed to
 `useTranslations` in a client component or `getTranslations` in a server one:
 
 ```typescript
@@ -52,8 +52,19 @@ go hunting for a key:
 - A code with no key is not a bug on its own; `resolveApiErrorMessage` falls back to the namespace's generic
   message, which is why a missing key shows plausible copy rather than an error. That makes the omission
   invisible: if you add a code a user can reach, add its key in the same change.
-- Never write a string in ALL CAPS. If an element must render uppercase, apply the `uppercase` class
-  in the component; otherwise the copy is unreadable to screen readers and unfixable per locale.
+- **Never write a string in ALL CAPS, and [`tests/docs-consistency.test.ts`](../../../../../tests/docs-consistency.test.ts) now checks it.** If an element must render
+  uppercase, apply the `uppercase` class in the component; otherwise the copy is unreadable to screen
+  readers and unfixable per locale. Two keys shouted in all six bundles and the rule had nothing behind it:
+  `donationForm.promoCodePlaceholder`, whose input already carries `className="... uppercase"`, so the joke
+  renders exactly as before from sentence-case copy; and
+  `termsOfService.sections.refundPolicy.exclusions.description`, which capitalised the negation for emphasis
+  (French escalated to two words) and now marks it with `<b>`, the rich-text tag the bundles already use.
+  Emphasis is markup, the same way uppercasing is a class.
+
+  The scan matches a run of two or more uppercase letters that is a whole token, against a named acronym
+  allow-list. Whole-token matching is what keeps `iOS` and `BfDI` out of it: a bare `\p{Lu}{2,}` reads `OS`
+  and `DI` inside them and reports both. A second case asserts every name on the allow-list is still used,
+  so the list shrinks with the copy instead of accumulating.
 - **`a11y` holds accessible names, and it is the only namespace that does.** Two kinds live here. Names a
   `core/` component cannot translate for itself, because those files may not call `useTranslations`
   ([`../modules/core/CLAUDE.md`](../modules/core/CLAUDE.md)); each takes its label as a prop and the *caller*
@@ -92,6 +103,33 @@ go hunting for a key:
 - Interpolation is `{variable}`; plurals use ICU (`{count, plural, one {…} other {…}}`); inline markup
   uses rich-text tags (`<b>`, `<link>`, `<em>`) that the component supplies as render functions.
   `createRichLink` in [`core/primitives/RichLink.tsx`](../modules/core/primitives/RichLink.tsx) is the helper for the `<link>` case.
+- **A sentence is one key. A component may not assemble one out of several.** Six keys under
+  `summary.notifications` were glued together at the render site: `canImprove.message` + a number +
+  `moreDays` + `toYourPlan`, and the same shape for `manualAdjustments.*` and `customHolidays.*`. Two things
+  follow from that and neither is fixable by a translator. The singular/plural choice was an `if` in
+  [`pages/planner/Summary.tsx`](../modules/pages/planner/Summary.tsx), so no locale could express a form
+  other than *one* and *other*, and none could reorder: German had to smear one verb across two fragments
+  and Catalan had to end a clause where English ends it. They are one `{count, plural, …}` message each now,
+  the pattern `calendar.daysOff`, `holidaysTable.deleteHolidays` and `calendarExport.description` already
+  used. `manualAdjustments` is three messages rather than one because the banner has three shapes, added,
+  removed and both; each is a whole sentence, so `addedAndRemoved` is where German puts *Du hast* first and
+  *entfernt* last.
+- **A rich-text tag can hold the number, which is how an animated counter survives the move to ICU.** Those
+  banners render the count through `SlidingNumber`, and a plain `{count}` would have dropped the animation.
+  The messages write `<b><n>#</n> more days</b>`: `b` is the bold wrapper, `n` renders the counter and
+  ignores its chunks, and `#` is the plural's own number, so the tag is still positioned by the translator.
+  `manualAdjustments.addedAndRemoved` carries two counts and therefore two tags, `a` and `r`. Tags nest, and
+  `#` resolves inside one; both were checked against the real bundles rather than assumed.
+- **No currency symbol in any message, and [`../utils/currencies.test.ts`](../utils/currencies.test.ts)
+  asserts it over the whole catalogue.** Five of the six locales write `1 €` and only `en` writes `€1`, so a
+  glyph baked into a string is on the wrong side for most readers and no translator can move it. The value
+  arrives already formatted, as `{amount}`: `amountFormatter` for a whole-euro price in a server component
+  (`homepage.pricing.*`, `termsOfService.…maxLiability`) and `useCurrencyFormatter` for a charge in a client
+  one. The rule used to be one assertion on `toasts.promoSavedDescription` alone, and four more keys carried
+  a glyph the whole time it was green; it walks every bundle now. `homepage.stats.plansValue` was the same
+  defect without the symbol, a hand-abbreviated `12k+` written six different ways, and takes
+  `format.number(12000, { notation: "compact" })` instead. German reads `12.000+` there, because German CLDR
+  has no short form at that magnitude; that is the locale being right, not the formatter being wrong.
 - Values are always strings. There are no arrays anywhere in the bundles: a list is a numbered or
   named set of sibling keys, because `next-intl` cannot interpolate into an array.
 - `en.json` is the reference. Add a key there first, then to the other five in the same commit.
@@ -102,6 +140,12 @@ go hunting for a key:
   app has never rendered. Nothing catches this: key parity compares key sets, and no test reads an icon
   name out of a sentence. When you change an icon, grep the six bundles for its old name; when you write
   copy that names one, name the component that renders it.
+
+  **Catalan was not the only one, because fixing the locale that was reported is not the same as checking
+  the other five.** Italian said *icona stellata* and French *marquée d'une étoile*, both a star, on the same
+  string; they say *icona a scintilla* and *marquée d'une étincelle* now. German's *Funkelsymbol* was right
+  all along. Three of six described an icon the app does not draw, and the earlier fix looked complete
+  because it named the locale someone happened to read.
 - **The product addresses the user informally, in every locale.** `du` in German, `tu` in French, `tú` in
   Spanish, and the same throughout Catalan and Italian. Eight strings did not: the calendar-export toast
   and the promo confirmation in `de` and `fr` used `Sie`/`Ihr` and `vous`/`votre`/`veuillez` while the
@@ -127,9 +171,11 @@ UI rather than the copy. The parity test above is what keeps that from reaching 
 ## Key names may carry a retired term; the strings may not
 
 [`CONTEXT.md`](../../../../../CONTEXT.md) governs the words the product says, and the root guide calls a retired
-name in code or copy a defect. A few **key names** still hold retired terms (`alternativesManager.totalOff`
-and `totalDaysOff` for Effective Day, `ptoStatus.autoAssigned` for Suggested Day), while the strings behind
-them say Effective Day and Suggested Day, in all six languages. That split is deliberate: a key is an
+name in code or copy a defect. A few **key names** still hold retired terms (`alternativesManager.option` and
+`summary.notifications.canImprove.reviewOptions` for Alternative, `alternativesManager.totalOff`
+and `totalDaysOff` for Effective Day, `ptoStatus.autoAssigned` for Suggested Day,
+`workdayCounter.dateRange` for Planning Window), while the strings behind
+them say Alternative, Effective Day, Suggested Day and the selected dates, in all six languages. That split is deliberate: a key is an
 identifier no user reads, renaming one means
 editing six bundles and every call site, and `tests/docs-consistency.test.ts` asserts key parity across all
 six, so a half-finished rename fails the suite rather than the eye. Rename a key only as its own change, all
@@ -146,6 +192,25 @@ weighing rather than adding by reflex. Trimming this by rendering more copy on t
 available either: the planner is client-side end to end
 ([ADR 0001](../../../../../adr/0001-planner-runs-in-the-browser.md)), so most of the catalogue has to
 reach the browser one way or another.
+
+**A key nothing reads still ships, and nothing fails when it stops being read.** Nine were found orphaned at
+once, 54 strings across the six bundles: the whole `command` namespace, whose only key
+`searchPlaceholder` no component could ever have read, because
+[`core/primitives/Command.tsx`](../modules/core/primitives/Command.tsx) is a `core/` file and may not call
+`useTranslations` (its input takes the placeholder as a prop, and every caller passes one from its own
+namespace); `sidebar.filters`, `planner.subtitle`, `summary.yearTimeline.title`, `tutorial.description`; and
+three FAQ entries. Two of those, `faq.sections.general.howWorks` and `restartTutorial`, were a `question`
+with no `answer`: half-deleted, and key parity could not see it because all six bundles were half-deleted
+identically. All of the above are gone.
+
+`faq.sections.general.whatIsPto` was the exception and was **wired in rather than deleted**: a complete,
+well-written Q and A that [`pages/homepage/sections/Faq.tsx`](../modules/pages/homepage/sections/Faq.tsx)
+and [`shared/seo/JsonLd.tsx`](../modules/shared/seo/JsonLd.tsx) simply never listed. It leads the *General*
+section now, in both, because the two lists are written out by hand and an entry added to one and not the
+other degrades the structured data silently. `planner.subtitle` is the trap in that sweep: it reads like a
+duplicate of `planner.description`, which **is** read, by `createTranslator` in
+[`buildMarkdownPage.ts`](../../infrastructure/markdown/buildMarkdownPage.ts) for the Markdown twin. Check
+which of a near-identical pair has the reader before deleting either.
 
 **[`src/app/global-error.tsx`](../../app/global-error.tsx) is English-only, on purpose.** It static-imports `en.json` alone and sets
 `<html lang='en'>` even when the URL says `/de/…`, because global-error sits above the `[locale]`

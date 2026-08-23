@@ -140,3 +140,41 @@ describe("Summary budget badges at a budget of one", () => {
 		filtersState.ptoDays = 3;
 	});
 });
+
+describe("Summary manual-adjustment banner", () => {
+	const adjustedPlan = ({ added, removed }: { added: Date[]; removed: Date[] }) => {
+		filtersState.ptoDays = 5;
+		holidaysState.suggestion = { days: [JAN(6), JAN(7), JAN(8)], bridges: [], strategy: "grouped", metrics: METRICS };
+		holidaysState.currentSelection = null;
+		holidaysState.manuallySelectedDays = added;
+		holidaysState.removedSuggestedDays = removed;
+	};
+
+	it("says one day, not one days, when a single day was added", () => {
+		adjustedPlan({ added: [JAN(20)], removed: [] });
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain("You added 1 day to the original suggestion.");
+	});
+
+	it("pluralises the removed side on its own count", () => {
+		adjustedPlan({ added: [], removed: [JAN(6), JAN(7)] });
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain("You removed 2 days from the original suggestion.");
+	});
+
+	it("lets German put the verb at the end of each half, which fragments could not", () => {
+		adjustedPlan({ added: [JAN(20)], removed: [JAN(6), JAN(7)] });
+
+		const { container } = renderSummary({ locale: "de", messages: deMessages });
+
+		expect(container.textContent).toContain(
+			"Du hast 1 Tag hinzugefügt und 2 Tage aus dem ursprünglichen Vorschlag entfernt.",
+		);
+
+		filtersState.ptoDays = 3;
+	});
+});

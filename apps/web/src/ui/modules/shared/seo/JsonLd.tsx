@@ -92,6 +92,14 @@ export async function FaqJsonLd({ locale }: JsonLdProps) {
 		mainEntity: [
 			{
 				"@type": "Question",
+				name: tFaq("sections.general.whatIsPto.question"),
+				acceptedAnswer: {
+					"@type": "Answer",
+					text: tFaq("sections.general.whatIsPto.answer"),
+				},
+			},
+			{
+				"@type": "Question",
 				name: tFaq("sections.general.whatIs.question"),
 				acceptedAnswer: {
 					"@type": "Answer",

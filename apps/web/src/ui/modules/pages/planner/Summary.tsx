@@ -24,7 +24,7 @@ import { Skeleton } from "boneyard-js/react";
 import { Award, BarChart3, Calendar, CalendarDays, Palmtree, TrendingUp, Zap } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { MetricCard, MetricCardSize } from "./summary/MetricCard";
 import { SummaryFixture } from "./summary/SummaryFixture";
@@ -54,6 +54,10 @@ const YearTimelineChart = dynamic(() =>
 		default: module.YearTimelineChart,
 	})),
 );
+
+function BoldText(chunks: ReactNode) {
+	return <strong className="inline-flex items-baseline gap-x-1">{chunks}</strong>;
+}
 
 export const Summary = () => {
 	const t = useTranslations("summary");
@@ -137,6 +141,11 @@ export const Summary = () => {
 			canImprove,
 		};
 	}, [activeSuggestion, ptoDays, alternatives, placedDays.length]);
+
+	const manualAdjustmentsCase = (() => {
+		if (manuallySelectedDays.length > 0 && removedSuggestedDays.length > 0) return "addedAndRemoved";
+		return manuallySelectedDays.length > 0 ? "addedOnly" : "removedOnly";
+	})();
 
 	const content = (() => {
 		if (!metricsData) return null;
@@ -365,12 +374,11 @@ export const Summary = () => {
 									</Link>
 								}
 							>
-								<span>{t("notifications.canImprove.message")}</span>
-								<strong className="inline-flex items-baseline gap-x-1">
-									<SlidingNumber number={canImprove} />
-									<span>{t("notifications.canImprove.moreDays")}</span>
-								</strong>
-								<span>{t("notifications.canImprove.toYourPlan")}</span>
+								{t.rich("notifications.canImprove.message", {
+									count: canImprove,
+									b: BoldText,
+									n: () => <SlidingNumber number={canImprove} />,
+								})}
 							</Banner>
 						)}
 						{(manuallySelectedDays.length > 0 || removedSuggestedDays.length > 0) && (
@@ -380,44 +388,22 @@ export const Summary = () => {
 								colorScheme="indigo"
 								className="mt-2"
 							>
-								{manuallySelectedDays.length > 0 && (
-									<>
-										{t("notifications.manualAdjustments.added")}{" "}
-										<strong className="flex gap-1 mx-1">
-											<SlidingNumber number={manuallySelectedDays.length} />{" "}
-											{manuallySelectedDays.length !== 1
-												? t("notifications.manualAdjustments.days")
-												: t("notifications.manualAdjustments.day")}
-										</strong>
-									</>
-								)}
-								{manuallySelectedDays.length > 0 &&
-									removedSuggestedDays.length > 0 &&
-									` ${t("notifications.manualAdjustments.and")} `}
-								{removedSuggestedDays.length > 0 && (
-									<>
-										{t("notifications.manualAdjustments.removed")}{" "}
-										<strong className="flex gap-1 mx-1">
-											<SlidingNumber number={removedSuggestedDays.length} />{" "}
-											{removedSuggestedDays.length !== 1
-												? t("notifications.manualAdjustments.days")
-												: t("notifications.manualAdjustments.day")}
-										</strong>
-									</>
-								)}
-								{` ${t("notifications.manualAdjustments.fromOriginal")}`}
+								{t.rich(`notifications.manualAdjustments.${manualAdjustmentsCase}`, {
+									added: manuallySelectedDays.length,
+									removed: removedSuggestedDays.length,
+									b: BoldText,
+									a: () => <SlidingNumber number={manuallySelectedDays.length} />,
+									r: () => <SlidingNumber number={removedSuggestedDays.length} />,
+								})}
 							</Banner>
 						)}
 						{holidayMetrics.customDays > 0 && (
 							<Banner icon={CalendarDays} title={t("notifications.customHolidays.title")} colorScheme="blue">
-								{t("notifications.customHolidays.youHave")}{" "}
-								<strong className="flex gap-1 mx-1">
-									<SlidingNumber number={holidayMetrics.customDays} />{" "}
-									{holidayMetrics.customDays !== 1
-										? t("notifications.customHolidays.holidays")
-										: t("notifications.customHolidays.holiday")}
-								</strong>{" "}
-								{t("notifications.customHolidays.improvesPlan")}
+								{t.rich("notifications.customHolidays.message", {
+									count: holidayMetrics.customDays,
+									b: BoldText,
+									n: () => <SlidingNumber number={holidayMetrics.customDays} />,
+								})}
 							</Banner>
 						)}
 					</CardContent>

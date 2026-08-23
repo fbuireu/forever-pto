@@ -28,6 +28,11 @@ export const Faq = async () => {
 			id: "general",
 			title: t("sections.general.title"),
 			items: [
+				{
+					id: "what-is-pto",
+					question: t("sections.general.whatIsPto.question"),
+					answer: t("sections.general.whatIsPto.answer"),
+				},
 				{ id: "what-is", question: t("sections.general.whatIs.question"), answer: t("sections.general.whatIs.answer") },
 				{
 					id: "why",

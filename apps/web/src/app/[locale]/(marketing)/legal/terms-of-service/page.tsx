@@ -2,11 +2,19 @@ import { routeMetadata } from "@infrastructure/seo/routeMetadata";
 import { getPublicEnv } from "@infrastructure/services/env/getPublicEnv";
 import { createRichLink } from "@ui/modules/core/primitives/RichLink";
 import { LegalLayout } from "@ui/modules/layout/LegalLayout";
+import { amountFormatter } from "@ui/utils/currencies";
 import { getLastUpdatedDate } from "@ui/utils/getLastUpdatedDate";
 import type { Locale } from "next-intl";
+import type { ReactNode } from "react";
 
 const githubLink = createRichLink({ href: "https://github.com/fbuireu/forever-pto", options: { external: true } });
 const odrLink = createRichLink({ href: "https://ec.europa.eu/consumers/odr", options: { external: true } });
+
+const MAXIMUM_LIABILITY = 50;
+
+function BoldText(chunks: ReactNode) {
+	return <strong>{chunks}</strong>;
+}
 
 import { getTranslations } from "next-intl/server";
 
@@ -116,7 +124,7 @@ export default async function TermsOfServicePage({ params }: Readonly<TermsOfSer
 				</ul>
 
 				<h3 className="text-xl font-semibold mt-6 mb-3">{t("sections.refundPolicy.exclusions.title")}</h3>
-				<p>{t("sections.refundPolicy.exclusions.description")}</p>
+				<p>{t.rich("sections.refundPolicy.exclusions.description", { b: BoldText })}</p>
 				<ul className="list-disc pl-6 mt-2 space-y-2">
 					<li>{t("sections.refundPolicy.exclusions.items.timePassed")}</li>
 					<li>{t("sections.refundPolicy.exclusions.items.violatedTerms")}</li>
@@ -190,7 +198,11 @@ export default async function TermsOfServicePage({ params }: Readonly<TermsOfSer
 					<li>{t("sections.limitationOfLiability.items.interruptions")}</li>
 					<li>{t("sections.limitationOfLiability.items.unauthorizedAccess")}</li>
 				</ul>
-				<p className="mt-4">{t("sections.limitationOfLiability.maxLiability")}</p>
+				<p className="mt-4">
+					{t("sections.limitationOfLiability.maxLiability", {
+						amount: amountFormatter(locale).format(MAXIMUM_LIABILITY),
+					})}
+				</p>
 			</section>
 
 			<section>

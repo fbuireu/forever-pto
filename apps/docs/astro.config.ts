@@ -75,20 +75,24 @@ export default defineConfig({
 					items: [
 						{
 							label: "Foundations",
+							translations: { es: "Fundamentos" },
 							items: [{ autogenerate: { directory: "design-system/foundations" } }],
 						},
 						{
 							label: "Components",
+							translations: { es: "Componentes" },
 							collapsed: true,
 							items: [{ autogenerate: { directory: "design-system/components" } }],
 						},
 						{
 							label: "Animation",
+							translations: { es: "Animación" },
 							collapsed: true,
 							items: [{ autogenerate: { directory: "design-system/animation" } }],
 						},
 						{
 							label: "Patterns",
+							translations: { es: "Patrones" },
 							collapsed: true,
 							items: [{ autogenerate: { directory: "design-system/patterns" } }],
 						},

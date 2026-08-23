@@ -9,6 +9,8 @@ not_found_handling = "404-page"
 
 [env.production]
 name = "forever-pto-docs"
+workers_dev = false
+preview_urls = false
 
 [[env.production.routes]]
 pattern = "docs.forever-pto.com"
@@ -16,5 +18,3 @@ custom_domain = true
 
 [env.development]
 name = "forever-pto-docs-development"
-workers_dev = true
-preview_urls = true

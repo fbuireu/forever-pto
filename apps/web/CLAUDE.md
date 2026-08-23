@@ -237,6 +237,9 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
   bending to a runtime contract it does not own.
 - **No ALL-CAPS in translation strings.** Uppercasing is a presentation choice; do it with a CSS class in the
   component, so the six bundles stay comparable and other scripts are not mangled.
+  `tests/docs-consistency.test.ts` scans all six for it now, against a named acronym allow-list; the same
+  bullet in [`./src/ui/i18n/CLAUDE.md`](./src/ui/i18n/CLAUDE.md) says what the two keys that shouted were and
+  why whole-token matching is what keeps `iOS` out of the report.
 - **`typeof window`/`typeof document` guards stay.** They look redundant to a linter but are required under
   SSR: the bare identifier throws `ReferenceError` on the server.
 - **Cross-layer imports use the alias, same-folder imports stay relative.** Mixed forms of the same module

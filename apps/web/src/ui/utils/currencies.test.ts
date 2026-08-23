@@ -85,7 +85,7 @@ describe("useCurrencyFormatter", () => {
 	});
 });
 
-describe("the promo toast", () => {
+describe("the catalogue writes no currency symbol", () => {
 	const bundles = {
 		en: enMessages,
 		es: esMessages,
@@ -95,10 +95,25 @@ describe("the promo toast", () => {
 		fr: frMessages,
 	};
 
+	interface CollectParams {
+		value: unknown;
+		path: string;
+		out: string[];
+	}
+
+	const collect = ({ value, path, out }: CollectParams) => {
+		if (typeof value === "string") {
+			if (value.includes(DEFAULT_CURRENCY_SYMBOL)) out.push(`${path} -> ${value}`);
+		} else if (value && typeof value === "object")
+			for (const [key, child] of Object.entries(value))
+				collect({ value: child, path: path ? `${path}.${key}` : key, out });
+		return out;
+	};
+
 	it.each(Object.entries(bundles))(
-		"carries no currency in %s, because the message cannot place the symbol the locale wants",
+		"places no %s message's symbol for it, because only the locale knows which side it goes on",
 		(_locale, messages) => {
-			expect(messages.toasts.promoSavedDescription).not.toContain(DEFAULT_CURRENCY_SYMBOL);
+			expect(collect({ value: messages, path: "", out: [] })).toEqual([]);
 		},
 	);
 });

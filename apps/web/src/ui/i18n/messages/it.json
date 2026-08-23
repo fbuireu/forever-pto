@@ -39,7 +39,6 @@
 		"title": "Forever PTO",
 		"heading": "Pianificatore",
 		"description": "Il tuo pianificatore PTO intelligente. Configura i tuoi giorni di PTO, paese e strategia per sfruttare al massimo ogni festività.",
-		"subtitle": "Il tuo ottimizzatore di ferie intelligente. Smetti di sprecare giorni.",
 		"titleHighlight1": "Il tuo anno",
 		"titleHighlight2": "libero",
 		"instructions": "Inizia aggiungendo i tuoi giorni nella barra laterale sinistra e il resto delle configurazioni. Hai ancora dubbi?",
@@ -104,31 +103,22 @@
 		"notifications": {
 			"canImprove": {
 				"title": "Puoi migliorare",
-				"message": "Esistono alternative che aggiungono",
-				"moreDays": "giorni in più",
-				"toYourPlan": "alla tua pianificazione.",
-				"reviewOptions": "Rivedi le opzioni disponibili.",
+				"message": "{count, plural, one {Esistono alternative che aggiungono <b><n>#</n> giorno in più</b> al tuo suggerimento.} other {Esistono alternative che aggiungono <b><n>#</n> giorni in più</b> al tuo suggerimento.}}",
+				"reviewOptions": "Rivedi le alternative disponibili.",
 				"considerPremium": "Passa a Premium per analisi più dettagliate."
 			},
 			"manualAdjustments": {
 				"title": "Modifiche manuali",
-				"added": "Hai aggiunto",
-				"day": "giorno",
-				"days": "giorni",
-				"and": "e",
-				"removed": "rimosso",
-				"fromOriginal": "dal suggerimento originale."
+				"addedOnly": "{added, plural, one {Hai aggiunto <b><a>#</a> giorno</b> al suggerimento originale.} other {Hai aggiunto <b><a>#</a> giorni</b> al suggerimento originale.}}",
+				"removedOnly": "{removed, plural, one {Hai rimosso <b><r>#</r> giorno</b> dal suggerimento originale.} other {Hai rimosso <b><r>#</r> giorni</b> dal suggerimento originale.}}",
+				"addedAndRemoved": "{added, plural, one {Hai aggiunto <b><a>#</a> giorno</b>} other {Hai aggiunto <b><a>#</a> giorni</b>}} e {removed, plural, one {rimosso <b><r>#</r> giorno</b>} other {rimosso <b><r>#</r> giorni</b>}} dal suggerimento originale."
 			},
 			"customHolidays": {
 				"title": "Festivi personalizzati",
-				"youHave": "Hai",
-				"holiday": "festivo personalizzato",
-				"holidays": "festivi personalizzati",
-				"improvesPlan": "che arricchiscono il tuo piano."
+				"message": "{count, plural, one {Hai <b><n>#</n> festivo personalizzato</b> che arricchisce il tuo suggerimento.} other {Hai <b><n>#</n> festivi personalizzati</b> che arricchiscono il tuo suggerimento.}}"
 			}
 		},
 		"yearTimeline": {
-			"title": "Vista annuale condensata",
 			"rows": {
 				"national": "Nazionale",
 				"regional": "Regionale",
@@ -146,14 +136,11 @@
 				"title": "Generale",
 				"whatIsPto": {
 					"question": "Cos'è il PTO?",
-					"answer": "PTO sta per Paid Time Off (ferie retribuite): il numero di giorni di ferie che il tuo datore di lavoro ti assegna ogni anno da usare come preferisci. A differenza della malattia o dei giorni festivi, i giorni di PTO sono tuoi da programmare liberamente. Il problema è che la maggior parte delle persone li usa in modo casuale e spreca molto riposo potenziale. Forever PTO ti aiuta a posizionare quei giorni strategicamente intorno ai giorni festivi per trasformare, ad esempio, 5 giorni di PTO in 12 giorni consecutivi liberi."
+					"answer": "PTO sta per Paid Time Off (giorni liberi retribuiti): il numero di giorni liberi retribuiti che il tuo datore di lavoro ti assegna ogni anno da usare come preferisci. A differenza della malattia o dei giorni festivi, i giorni di PTO sono tuoi da programmare liberamente. Il problema è che la maggior parte delle persone li usa in modo casuale e spreca molto riposo potenziale. Forever PTO ti aiuta a posizionare quei giorni strategicamente intorno ai giorni festivi per trasformare, ad esempio, 5 giorni di PTO in 12 giorni consecutivi liberi."
 				},
 				"whatIs": {
 					"question": "Cos'è questo?",
 					"answer": "Forever PTO è uno strumento per aiutarti a pianificare e ottimizzare i tuoi giorni liberi (PTO) suggerendo le date migliori basandosi sui festivi e le tue preferenze. Ti permette di scegliere diverse strategie per bilanciare il tuo tempo libero durante l'anno. Puoi anche personalizzare completamente i festivi, i nomi delle festività e persino aggiungere festivi specifici della tua azienda o regione."
-				},
-				"howWorks": {
-					"question": "Come funziona?"
 				},
 				"whyNotSeeingCountry": {
 					"question": "Perché non vedo il mio paese o i festivi correttamente?",
@@ -162,9 +149,6 @@
 				"pricing": {
 					"question": "Perché c'è un modello a pagamento?",
 					"answer": "Forever PTO è gratuito. Tuttavia, utilizziamo un modello a pagamento per coprire i costi di mantenimento dei dati, infrastruttura e miglioramenti continui. Il modello a pagamento finanzia aggiornamenti, supporto e hosting. Se vuoi sostenere il progetto, puoi fare una donazione volontaria che sblocca le funzioni premium. Offriamo anche un piano gratuito con le funzioni principali affinché tutti possano pianificare meglio il proprio PTO."
-				},
-				"restartTutorial": {
-					"question": "Come posso vedere di nuovo il tutorial interattivo?"
 				}
 			},
 			"technical": {
@@ -229,7 +213,7 @@
 		"weekendDays": "Fine settimana",
 		"holidays": "Festivi",
 		"holidaysOutsideRange": "Conosciamo le festività solo per {from}–{to}, quindi quelle fuori da questo intervallo contano come giorni lavorativi.",
-		"dateRange": "Intervallo di date",
+		"dateRange": "Date selezionate",
 		"from": "Dal",
 		"to": "al"
 	},
@@ -336,7 +320,6 @@
 		}
 	},
 	"tutorial": {
-		"description": "Configura il tuo piano in 2 passi: prima la tua posizione, poi i tuoi giorni e la strategia. Clicca il pulsante per un tutorial interattivo.",
 		"nextBtn": "Avanti",
 		"prevBtn": "Indietro",
 		"doneBtn": "Fatto",
@@ -345,7 +328,7 @@
 			"toolsTitle": "Calcolatori e strumenti",
 			"toolsDescription": "Qui trovi calcolatori utili: stima i tuoi giorni PTO in base all'anzianità lavorativa, calcola il valore economico del PTO non usato o conta i giorni lavorativi tra due date.",
 			"alternativesTitle": "Gestore alternative",
-			"alternativesDescription": "Naviga tra i suggerimenti PTO generati. Confronta efficienza, totale giorni liberi e trova l'equilibrio che preferisci. La prima opzione è quella consigliata (con icona stellata). Usa le frecce per esplorare le alternative e clicca 'Applica alternativa' per usarla.",
+			"alternativesDescription": "Naviga tra i suggerimenti PTO generati. Confronta efficienza, giorni effettivi e trova l'equilibrio che preferisci. La prima alternativa è quella consigliata (con icona a scintilla). Usa le frecce per esplorare le alternative e clicca 'Applica alternativa' per usarla.",
 			"statusTitle": "Stato PTO",
 			"statusDescription": "Monitora il tuo utilizzo PTO in tempo reale. Vedi i giorni auto-assegnati (suggeriti dal nostro sistema), i giorni selezionati manualmente e quelli rimanenti. Puoi ripristinare le modifiche manuali in qualsiasi momento per tornare al suggerimento automatico.",
 			"calendarTitle": "Il tuo calendario PTO interattivo",
@@ -356,7 +339,7 @@
 			"holidaysListDescription": "Qui puoi perfezionare i dati sulle festività per adattarli alla tua situazione. Modifica o elimina qualsiasi festività nazionale o regionale e aggiungi i tuoi giorni personalizzati: festività aziendali, celebrazioni locali o qualsiasi data che conti per te. Più accurati sono i dati, migliori saranno i suggerimenti.",
 			"step1Title": "Il tuo contesto",
 			"step1Description": "Seleziona il tuo paese, regione e l'anno che vuoi pianificare. Questo configura il tuo calendario delle festività per trovare i migliori ponti.",
-			"step2Title": "I tuoi giorni disponibili",
+			"step2Title": "I tuoi giorni di PTO",
 			"step2Description": "Indica quanti giorni di PTO hai. Questa è la base per tutti i calcoli.",
 			"step3Title": "La tua configurazione",
 			"step3Description": "Scegli la tua strategia di ottimizzazione e configura i giorni passati e i mesi di riporto per affinare il tuo piano.",
@@ -440,7 +423,7 @@
 		}
 	},
 	"alternativesManager": {
-		"option": "Opzione",
+		"option": "Alternativa",
 		"recommended": "Consigliato",
 		"totalOff": "Giorni effettivi",
 		"efficiency": "Efficienza",
@@ -490,7 +473,6 @@
 	},
 	"sidebar": {
 		"configuration": "Configurazione",
-		"filters": "Filtri",
 		"tools": "Strumenti",
 		"calculators": "Calcolatori",
 		"loading": "Caricamento...",
@@ -673,7 +655,7 @@
 		"enterAmount": "Inserisci importo",
 		"basePriceNote": "Prezzo base in {currency}. L'importo finale sarà convertito nella tua valuta locale ai tassi di cambio correnti.",
 		"havePromoCode": "Hai un codice promozionale?",
-		"promoCodePlaceholder": "MAGARI_FOSSE_COSÌ_FACILE",
+		"promoCodePlaceholder": "Magari fosse così facile",
 		"continueToPayment": "Continua al pagamento",
 		"processing": "Elaborando..."
 	},
@@ -757,7 +739,7 @@
 			"weatherIntegration": "Integrazione meteo",
 			"weatherIntegrationDescription": "Visualizza le previsioni meteo per le tue date di ferie pianificate",
 			"blockedPeriods": "Periodi bloccati",
-			"blockedPeriodsDescription": "Segna intervalli di date in cui non vuoi suggerimenti di PTO: conferenze, viaggi, malattie o qualsiasi momento in cui sai che sarai impegnato",
+			"blockedPeriodsDescription": "Segna periodi in cui non vuoi suggerimenti di PTO: conferenze, viaggi, malattie o qualsiasi momento in cui sai che sarai impegnato",
 			"performanceOptimization": "Ottimizzazione delle prestazioni",
 			"performanceOptimizationDescription": "Calcoli più veloci ed esperienza più fluida grazie ai Web Workers",
 			"customWeekends": "Weekend personalizzati",
@@ -812,9 +794,6 @@
 	},
 	"workdayCounterModal": {
 		"selectDateRange": "Seleziona date"
-	},
-	"command": {
-		"searchPlaceholder": "Cerca un comando da eseguire..."
 	},
 	"legal": {
 		"lastUpdated": "Ultimo aggiornamento: {date}"
@@ -965,8 +944,8 @@
 			"efficiencyLabel": "Efficienza media",
 			"daysLabel": "Giorni liberi con {days} PTO",
 			"countriesLabel": "Paesi supportati",
-			"plansLabel": "Piani generati",
-			"plansValue": "12mila+"
+			"plansLabel": "Suggerimenti generati",
+			"plansValue": "{value}+"
 		},
 		"features": {
 			"badge": "Trucchi del motore",
@@ -1062,7 +1041,7 @@
 			"description": "Niente SaaS. Niente abbonamento. Niente \"prova gratuita che si rinnova da sola\".",
 			"freeName": "Gratis per sempre",
 			"freeTagline": "Provalo. Ti convincerà.",
-			"freePrice": "€0",
+			"freePrice": "{amount}",
 			"freePer": "/sempre",
 			"freeNote": "Niente carta. Niente email. Niente.",
 			"freeFeatures": {
@@ -1073,8 +1052,8 @@
 			},
 			"freeCta": "Inizia gratis",
 			"lifetimeName": "Pass Sostenitore",
-			"lifetimeTagline": "Donazione minima di €1. Usalo per sempre.",
-			"lifetimePrice": "Da €1",
+			"lifetimeTagline": "Donazione minima di {amount}. Usalo per sempre.",
+			"lifetimePrice": "Da {amount}",
 			"lifetimePer": " una tantum",
 			"lifetimeNote": "100% facoltativo. Mantiene il progetto in vita.",
 			"lifetimeFeatures": {
@@ -1147,7 +1126,7 @@
 						},
 						"premiumKey": {
 							"label": "Archiviazione chiave Premium:",
-							"description": "Memorizza in modo sicuro la tua chiave di accesso Premium quando esegui l'upgrade a Premium."
+							"description": "Memorizza in modo sicuro la tua chiave di accesso Premium quando attivi Premium."
 						},
 						"theme": {
 							"label": "Preferenza tema:",
@@ -1640,7 +1619,7 @@
 				},
 				"exclusions": {
 					"title": "Esclusioni dal rimborso",
-					"description": "I rimborsi NON verranno concessi nei seguenti casi:",
+					"description": "I rimborsi <b>non</b> verranno concessi nei seguenti casi:",
 					"items": {
 						"timePassed": "Sono trascorsi più di 14 giorni dall'acquisto (salvo diritti previsti dalla legge)",
 						"violatedTerms": "Hai violato i presenti Termini di servizio",
@@ -1715,7 +1694,7 @@
 					"interruptions": "Interruzioni o errori nel Servizio",
 					"unauthorizedAccess": "Accesso non autorizzato ai tuoi dati memorizzati localmente"
 				},
-				"maxLiability": "La nostra responsabilità totale per qualsiasi reclamo derivante da o correlato ai presenti Termini o al Servizio non supererà l'importo pagato per l'accesso Premium (se applicabile) o €50, a seconda di quale sia maggiore."
+				"maxLiability": "La nostra responsabilità totale per qualsiasi reclamo derivante da o correlato ai presenti Termini o al Servizio non supererà l'importo pagato per l'accesso Premium (se applicabile) o {amount}, a seconda di quale sia maggiore."
 			},
 			"intellectualProperty": {
 				"title": "Proprietà intellettuale",

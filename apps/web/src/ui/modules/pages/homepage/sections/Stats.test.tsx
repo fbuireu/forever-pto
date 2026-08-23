@@ -39,8 +39,8 @@ describe("Stats", () => {
 		expect(await renderStats({ locale: "en", messages: enMessages })).toContain("2.14×");
 	});
 
-	it("takes the abbreviated plan count from the locale bundle", async () => {
-		expect(await renderStats({ locale: "de", messages: deMessages })).toContain(deMessages.homepage.stats.plansValue);
-		expect(await renderStats({ locale: "en", messages: enMessages })).toContain(enMessages.homepage.stats.plansValue);
+	it("abbreviates the suggestion count the way the locale does, which German does not", async () => {
+		expect(await renderStats({ locale: "de", messages: deMessages })).toContain("12.000+");
+		expect(await renderStats({ locale: "en", messages: enMessages })).toContain("12K+");
 	});
 });

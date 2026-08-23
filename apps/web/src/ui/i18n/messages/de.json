@@ -39,7 +39,6 @@
 		"title": "Forever PTO",
 		"heading": "Planer",
 		"description": "Dein intelligenter PTO-Planer. Konfiguriere deine PTO-Tage, dein Land und deine Strategie, um jeden Feiertag optimal zu nutzen.",
-		"subtitle": "Dein intelligenter Urlaubsoptimierer. Hör auf, Tage zu verschwenden.",
 		"titleHighlight1": "Dein Jahr",
 		"titleHighlight2": "frei",
 		"instructions": "Trag deine Tage in der Seitenleiste ein und passe deine Einstellungen an. Noch Fragen?",
@@ -104,31 +103,22 @@
 		"notifications": {
 			"canImprove": {
 				"title": "Verbesserung möglich",
-				"message": "Es gibt Alternativen, die",
-				"moreDays": "mehr Tage",
-				"toYourPlan": "zu deinem Plan hinzufügen.",
-				"reviewOptions": "Verfügbare Optionen prüfen.",
+				"message": "{count, plural, one {Es gibt Alternativen, die <b><n>#</n> Tag mehr</b> zu deinem Vorschlag hinzufügen.} other {Es gibt Alternativen, die <b><n>#</n> Tage mehr</b> zu deinem Vorschlag hinzufügen.}}",
+				"reviewOptions": "Verfügbare Alternativen prüfen.",
 				"considerPremium": "Hol dir Premium für tiefere Einblicke."
 			},
 			"manualAdjustments": {
 				"title": "Manuelle Anpassungen",
-				"added": "Du hast",
-				"day": "Tag",
-				"days": "Tage",
-				"and": "und",
-				"removed": "entfernt",
-				"fromOriginal": "vom ursprünglichen Vorschlag."
+				"addedOnly": "{added, plural, one {Du hast <b><a>#</a> Tag</b> zum ursprünglichen Vorschlag hinzugefügt.} other {Du hast <b><a>#</a> Tage</b> zum ursprünglichen Vorschlag hinzugefügt.}}",
+				"removedOnly": "{removed, plural, one {Du hast <b><r>#</r> Tag</b> aus dem ursprünglichen Vorschlag entfernt.} other {Du hast <b><r>#</r> Tage</b> aus dem ursprünglichen Vorschlag entfernt.}}",
+				"addedAndRemoved": "Du hast {added, plural, one {<b><a>#</a> Tag</b>} other {<b><a>#</a> Tage</b>}} hinzugefügt und {removed, plural, one {<b><r>#</r> Tag</b>} other {<b><r>#</r> Tage</b>}} aus dem ursprünglichen Vorschlag entfernt."
 			},
 			"customHolidays": {
 				"title": "Eigene Feiertage",
-				"youHave": "Du hast",
-				"holiday": "eigenen Feiertag",
-				"holidays": "eigene Feiertage",
-				"improvesPlan": "die deinen Plan verbessern."
+				"message": "{count, plural, one {Du hast <b><n>#</n> eigenen Feiertag</b>, der deinen Vorschlag verbessert.} other {Du hast <b><n>#</n> eigene Feiertage</b>, die deinen Vorschlag verbessern.}}"
 			}
 		},
 		"yearTimeline": {
-			"title": "Kompakte Jahresansicht",
 			"rows": {
 				"national": "National",
 				"regional": "Regional",
@@ -146,14 +136,11 @@
 				"title": "Allgemein",
 				"whatIsPto": {
 					"question": "Was ist PTO?",
-					"answer": "PTO steht für Paid Time Off (bezahlter Urlaub): die Anzahl der Urlaubstage, die dein Arbeitgeber dir jedes Jahr gibt, um sie nach Belieben zu nutzen. Im Gegensatz zu Krankentagen oder gesetzlichen Feiertagen kannst du PTO-Tage frei einplanen. Das Problem ist, dass die meisten Menschen sie zufällig nutzen und viel Erholungspotenzial verschenken. Forever PTO hilft dir, diese Tage strategisch rund um Feiertage zu platzieren, um beispielsweise 5 PTO-Tage in 12 aufeinanderfolgende freie Tage zu verwandeln."
+					"answer": "PTO steht für Paid Time Off (bezahlte freie Tage): die Anzahl der bezahlten freien Tage, die dein Arbeitgeber dir jedes Jahr gibt, um sie nach Belieben zu nutzen. Im Gegensatz zu Krankentagen oder gesetzlichen Feiertagen kannst du PTO-Tage frei einplanen. Das Problem ist, dass die meisten Menschen sie zufällig nutzen und viel Erholungspotenzial verschenken. Forever PTO hilft dir, diese Tage strategisch rund um Feiertage zu platzieren, um beispielsweise 5 PTO-Tage in 12 aufeinanderfolgende freie Tage zu verwandeln."
 				},
 				"whatIs": {
 					"question": "Was ist das?",
 					"answer": "Forever PTO ist ein Tool, das dir hilft, deine PTO-Tage optimal zu planen. Es schlägt dir basierend auf Feiertagen und deinen Präferenzen die besten freien Tage vor. Du kannst verschiedene Strategien wählen und Feiertage – inklusive eigener Firmen- oder Regionsfeiertage – vollständig anpassen."
-				},
-				"howWorks": {
-					"question": "Wie funktioniert es?"
 				},
 				"whyNotSeeingCountry": {
 					"question": "Warum wird mein Land oder meine Feiertage nicht korrekt angezeigt?",
@@ -162,9 +149,6 @@
 				"pricing": {
 					"question": "Warum gibt es ein kostenpflichtiges Modell?",
 					"answer": "Forever PTO ist kostenlos. Allerdings nutzen wir ein kostenpflichtiges Modell, um die Kosten für Datenpflege, Infrastruktur und kontinuierliche Verbesserungen zu decken. Das kostenpflichtige Modell finanziert Updates, Support und Hosting. Wir bieten auch eine kostenlose Version mit den wichtigsten Funktionen an, damit jeder von einer besseren Urlaubsplanung profitieren kann."
-				},
-				"restartTutorial": {
-					"question": "Wie kann ich das interaktive Tutorial erneut sehen?"
 				}
 			},
 			"technical": {
@@ -229,7 +213,7 @@
 		"weekendDays": "Wochenendtage",
 		"holidays": "Feiertage",
 		"holidaysOutsideRange": "Feiertage sind nur für {from}–{to} bekannt, alle außerhalb zählen daher als Arbeitstage.",
-		"dateRange": "Datumsbereich",
+		"dateRange": "Ausgewählte Daten",
 		"from": "Von",
 		"to": "bis"
 	},
@@ -336,7 +320,6 @@
 		}
 	},
 	"tutorial": {
-		"description": "Richte deinen Plan in 2 Schritten ein: zuerst deinen Standort, dann deine Tage und Strategie. Klicke den Button für ein interaktives Tutorial.",
 		"nextBtn": "Weiter",
 		"prevBtn": "Zurück",
 		"doneBtn": "Fertig",
@@ -345,7 +328,7 @@
 			"toolsTitle": "Rechner & Werkzeuge",
 			"toolsDescription": "Greife hier auf hilfreiche Rechner zu: Schätze deine PTO-Tage basierend auf deiner Berufserfahrung, berechne den Geldwert ungenutzter PTO-Tage oder zähle Arbeitstage zwischen zwei Daten.",
 			"alternativesTitle": "Alternativen-Manager",
-			"alternativesDescription": "Sieh dir verschiedene Urlaubsvorschläge an, die wir für dich berechnet haben. Vergleiche Effizienzkennzahlen, Gesamttage frei und finde die perfekte Balance. Die erste Option ist immer unser Empfehlungsvorschlag, markiert mit einem Funkelsymbol. Nutze die Pfeile, um Alternativen zu erkunden, und klicke auf \"Alternative anwenden\", um einen anderen Vorschlag zu übernehmen.",
+			"alternativesDescription": "Sieh dir verschiedene Urlaubsvorschläge an, die wir für dich berechnet haben. Vergleiche Effizienzkennzahlen, effektive Tage und finde die perfekte Balance. Die erste Alternative ist immer unser Empfehlungsvorschlag, markiert mit einem Funkelsymbol. Nutze die Pfeile, um Alternativen zu erkunden, und klicke auf \"Alternative anwenden\", um einen anderen Vorschlag zu übernehmen.",
 			"statusTitle": "Urlaubsstatus-Tracker",
 			"statusDescription": "Verfolge deine Urlaubszuweisung in Echtzeit. Sieh automatisch zugewiesene Tage (von unserem System vorgeschlagen), manuell ausgewählte Tage und verbleibende verfügbare Tage. Du kannst manuelle Änderungen jederzeit zurücksetzen, um zum automatischen Vorschlag zurückzukehren.",
 			"calendarTitle": "Dein interaktiver Urlaubskalender",
@@ -356,7 +339,7 @@
 			"holidaysListDescription": "Hier kannst du die Feiertagsdaten an deine genaue Situation anpassen. Bearbeite oder lösche nationale oder regionale Feiertage und füge eigene freie Tage hinzu – Firmenfeiertage, lokale Bräuche oder jedes Datum, das dir wichtig ist. Je genauer die Daten, desto besser die Vorschläge.",
 			"step1Title": "Dein Kontext",
 			"step1Description": "Wähle dein Land, deine Region und das Jahr, für das du planen möchtest. Dies konfiguriert deinen Feiertagskalender, damit wir die besten Brückentage finden.",
-			"step2Title": "Deine verfügbaren Tage",
+			"step2Title": "Deine PTO-Tage",
 			"step2Description": "Gib an, wie viele PTO-Tage du hast. Dies ist die Grundlage für alle Berechnungen.",
 			"step3Title": "Deine Konfiguration",
 			"step3Description": "Wähle deine Optimierungsstrategie und konfiguriere vergangene Tage und Übertragsmonate, um deinen Plan zu verfeinern.",
@@ -440,7 +423,7 @@
 		}
 	},
 	"alternativesManager": {
-		"option": "Option",
+		"option": "Alternative",
 		"recommended": "Empfohlen",
 		"totalOff": "Effektive Tage",
 		"efficiency": "Effizienz",
@@ -490,7 +473,6 @@
 	},
 	"sidebar": {
 		"configuration": "Konfiguration",
-		"filters": "Filter",
 		"tools": "Werkzeuge",
 		"calculators": "Rechner",
 		"loading": "Wird geladen...",
@@ -512,7 +494,7 @@
 			"search": "Strategien suchen...",
 			"hide": "Ausblenden",
 			"expand": "Erweitern",
-			"strategyDetails": "details",
+			"strategyDetails": "Details",
 			"grouped": {
 				"label": "Gruppiert",
 				"description": "Priorisiert lange, zusammenhängende Urlaube",
@@ -673,7 +655,7 @@
 		"enterAmount": "Betrag eingeben",
 		"basePriceNote": "Grundpreis in {currency}. Der Endbetrag wird zum aktuellen Wechselkurs in deine lokale Währung umgerechnet.",
 		"havePromoCode": "Hast du einen Promo-Code?",
-		"promoCodePlaceholder": "WÄRE_ES_DOCH_SO_EINFACH",
+		"promoCodePlaceholder": "Wäre es doch so einfach",
 		"continueToPayment": "Weiter zur Zahlung",
 		"processing": "Wird verarbeitet..."
 	},
@@ -757,7 +739,7 @@
 			"weatherIntegration": "Wetter-Integration",
 			"weatherIntegrationDescription": "Wettervorhersagen für deine geplanten PTO-Tage.",
 			"blockedPeriods": "Gesperrte Zeiträume",
-			"blockedPeriodsDescription": "Markiere Datumsbereiche, in denen du keine PTO-Vorschläge möchtest: Konferenzen, Reisen, Krankschreibungen oder Zeiten, von denen du weißt, dass du beschäftigt sein wirst.",
+			"blockedPeriodsDescription": "Markiere Zeiträume, in denen du keine PTO-Vorschläge möchtest: Konferenzen, Reisen, Krankschreibungen oder Zeiten, von denen du weißt, dass du beschäftigt sein wirst.",
 			"performanceOptimization": "Performance-Optimierung",
 			"performanceOptimizationDescription": "Schnellere Berechnungen und flüssigeres Erlebnis dank Web Workers.",
 			"customWeekends": "Individuelle Wochenenden",
@@ -812,9 +794,6 @@
 	},
 	"workdayCounterModal": {
 		"selectDateRange": "Daten auswählen"
-	},
-	"command": {
-		"searchPlaceholder": "Suche nach einem Befehl zum Ausführen..."
 	},
 	"legal": {
 		"lastUpdated": "Zuletzt aktualisiert: {date}"
@@ -965,8 +944,8 @@
 			"efficiencyLabel": "Durchschnittliche Effizienz",
 			"daysLabel": "Freie Tage mit {days} PTO-Tagen",
 			"countriesLabel": "Unterstützte Länder",
-			"plansLabel": "Generierte Pläne",
-			"plansValue": "12 Tsd.+"
+			"plansLabel": "Generierte Vorschläge",
+			"plansValue": "{value}+"
 		},
 		"features": {
 			"badge": "engine-tricks",
@@ -1062,7 +1041,7 @@
 			"description": "Kein SaaS. Kein Abo. Kein \"7-Tage-Test, der sich automatisch verlängert\".",
 			"freeName": "Kostenlos für immer",
 			"freeTagline": "Probier es aus. Es wird dich überzeugen.",
-			"freePrice": "€0",
+			"freePrice": "{amount}",
 			"freePer": "/immer",
 			"freeNote": "Keine Karte. Keine E-Mail. Nichts.",
 			"freeFeatures": {
@@ -1073,8 +1052,8 @@
 			},
 			"freeCta": "Kostenlos starten",
 			"lifetimeName": "Unterstützer-Pass",
-			"lifetimeTagline": "Mindestspende von 1€. Nutze es für immer.",
-			"lifetimePrice": "Ab 1€",
+			"lifetimeTagline": "Mindestspende von {amount}. Nutze es für immer.",
+			"lifetimePrice": "Ab {amount}",
 			"lifetimePer": " einmalig",
 			"lifetimeNote": "100% freiwillig. Hält das Projekt am Leben.",
 			"lifetimeFeatures": {
@@ -1147,7 +1126,7 @@
 						},
 						"premiumKey": {
 							"label": "Premium-Schlüssel-Speicher:",
-							"description": "Speichert sicher deinen Premium-Zugangsschlüssel, wenn du auf Premium upgradest."
+							"description": "Speichert sicher deinen Premium-Zugangsschlüssel, wenn du Premium freischaltest."
 						},
 						"theme": {
 							"label": "Theme-Einstellung:",
@@ -1640,7 +1619,7 @@
 				},
 				"exclusions": {
 					"title": "Ausschlüsse von Rückerstattungen",
-					"description": "Rückerstattungen werden in folgenden Fällen NICHT gewährt:",
+					"description": "Rückerstattungen werden in folgenden Fällen <b>nicht</b> gewährt:",
 					"items": {
 						"timePassed": "Mehr als 14 Tage sind seit dem Kauf vergangen (sofern nicht durch gesetzliche Rechte abgedeckt)",
 						"violatedTerms": "Du hast gegen diese Nutzungsbedingungen verstoßen",
@@ -1715,7 +1694,7 @@
 					"interruptions": "Unterbrechungen oder Fehler im Dienst",
 					"unauthorizedAccess": "Unbefugter Zugriff auf deine lokal gespeicherten Daten"
 				},
-				"maxLiability": "Unsere Gesamthaftung für Ansprüche, die sich aus diesen Bedingungen oder dem Dienst ergeben, ist auf den Betrag beschränkt, den du für den Premium-Zugang bezahlt hast (falls zutreffend), oder auf 50 €, je nachdem, welcher Betrag höher ist."
+				"maxLiability": "Unsere Gesamthaftung für Ansprüche, die sich aus diesen Bedingungen oder dem Dienst ergeben, ist auf den Betrag beschränkt, den du für den Premium-Zugang bezahlt hast (falls zutreffend), oder auf {amount}, je nachdem, welcher Betrag höher ist."
 			},
 			"intellectualProperty": {
 				"title": "Geistiges Eigentum",

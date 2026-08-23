@@ -72,6 +72,8 @@ documents it as a repo-level command.
 
 **One Biome config, at the root, for both packages.** `--changed` needs the git root to compare against,
 and a single pass is what lints `apps/docs` now that its workflow no longer has a Biome step of its own.
+The docs manifest carries no Biome scripts either: it held a copy of the root's eight, nothing ran them, and
+the two `--changed` ones could not have worked from a package directory.
 Its `files.includes` exclusions are repo-relative paths, so any future move has to re-prefix them;
 `tests/docs-consistency.test.ts` asserts every one that names a literal path still resolves. `.astro` files are excluded from the **linter** only: Biome parses just
 their frontmatter, so every import used in the template body reads as unused. `astro check` covers them.
@@ -379,7 +381,16 @@ documents exists in the root manifest, every script the web guide documents exis
 script a workflow runs exists in one of the three manifests; that every backticked constant the published
 wiki names exists somewhere in `apps/web`; that the `@ui` seam target is declared once, in
 [`apps/docs/tsconfig.json`](./apps/docs/tsconfig.json), with the vite alias deriving from it rather than
-restating it; that the wiki's prose uses the canonical name rather than a retired one;
+restating it; that every relative `@import` and `@source` in [`apps/docs/src/styles`](./apps/docs/src/styles) resolves
+to a path that exists, which nothing did before: `astro check` does not read CSS, a renamed `@import` target fails only
+`astro build` and a renamed `@source` target fails nothing at all, leaving the demos unstyled on a green build; that
+every font variable [`apps/web/src/app/fonts.ts`](./apps/web/src/app/fonts.ts) registers is declared in the docs
+stylesheet's `:root`, since the app's role tokens point at those names and there is no Next in the wiki to inject them;
+that every design token the wiki's swatches name is still declared, counting the bare strings in a `tokens={[…]}` array
+and the docs' own visualiser components rather than only `var(--x)` in prose, with a floor on both sides so an emptied
+citation set cannot pass it vacuously; that no locale override under
+[`apps/docs/src/content/i18n`](./apps/docs/src/content/i18n) restates the Starlight bundle it overrides byte for byte;
+that the wiki's prose uses the canonical name rather than a retired one;
 that [`apps/web/tsconfig.json`](./apps/web/tsconfig.json) keeps the two settings `next build` would otherwise fill in for it (`strict`
 on and `allowJs` off), that it sits beside the [`next.config.ts`](./apps/web/next.config.ts) that rewrites it, and that
 `cloudflare-env.d.ts` stays both excluded from the program and ignored by git, and that
@@ -405,7 +416,7 @@ than named one file at a time; that `TAIL_PATHS` matches every relative import r
 [`apps/web/workers/tail/`](./apps/web/workers/tail/), at least one of which has to land outside that folder;
 that the cleanup workflow's concurrency
 group still equals `ci.yml`'s with its `name:` substituted in;
-and that every locale bundle has exactly the keys [`en.json`](./apps/web/src/ui/i18n/messages/en.json) has.
+and that every locale bundle has exactly the keys [`en.json`](./apps/web/src/ui/i18n/messages/en.json) has and shouts nothing outside a named acronym allow-list. Key parity compares key *sets*, so it can see neither a value that drifted nor one written in capitals; the allow-list is itself asserted to hold only names the bundles still use.
 
 It reads staged *and* unstaged files, so a rule fires before the offending file is committed. **Each rule was
 verified by breaking it and confirming the matching case fails**; keep that property when you add one.

@@ -1,5 +1,7 @@
 import { getFormatter, getTranslations } from "next-intl/server";
 
+const PLANS_GENERATED = 12_000;
+
 export const Stats = async () => {
 	const [t, format] = await Promise.all([getTranslations("homepage"), getFormatter()]);
 
@@ -10,7 +12,11 @@ export const Stats = async () => {
 					{ num: `${format.number(2.14)}×`, label: t("stats.efficiencyLabel"), bg: "var(--color-brand-yellow)" },
 					{ num: format.number(47), label: t("stats.daysLabel", { days: 22 }), bg: "var(--color-brand-teal)" },
 					{ num: format.number(203), label: t("stats.countriesLabel"), bg: "var(--color-brand-orange)" },
-					{ num: t("stats.plansValue"), label: t("stats.plansLabel"), bg: "var(--color-brand-purple)" },
+					{
+						num: t("stats.plansValue", { value: format.number(PLANS_GENERATED, { notation: "compact" }) }),
+						label: t("stats.plansLabel"),
+						bg: "var(--color-brand-purple)",
+					},
 				].map(({ num, label, bg }) => (
 					<div
 						key={label}

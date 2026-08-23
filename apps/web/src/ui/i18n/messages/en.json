@@ -39,7 +39,6 @@
 		"title": "Forever PTO",
 		"heading": "Planner",
 		"description": "Your smart PTO planner. Configure your PTO days, country and strategy to get the most out of every public holiday.",
-		"subtitle": "Your smart vacation optimizer. Stop leaving days on the table.",
 		"titleHighlight1": "Your year",
 		"titleHighlight2": "free",
 		"instructions": "Start by adding your days on the left sidebar and the rest of your configurations. Still have questions?",
@@ -104,31 +103,22 @@
 		"notifications": {
 			"canImprove": {
 				"title": "You can improve",
-				"message": "There are alternatives that add",
-				"moreDays": "more days",
-				"toYourPlan": "to your plan.",
-				"reviewOptions": "Review available options.",
+				"message": "{count, plural, one {There are alternatives that add <b><n>#</n> more day</b> to your suggestion.} other {There are alternatives that add <b><n>#</n> more days</b> to your suggestion.}}",
+				"reviewOptions": "Review the alternatives.",
 				"considerPremium": "Get premium for deeper analysis."
 			},
 			"manualAdjustments": {
 				"title": "Manual adjustments",
-				"added": "You added",
-				"day": "day",
-				"days": "days",
-				"and": "and",
-				"removed": "removed",
-				"fromOriginal": "from the original suggestion."
+				"addedOnly": "{added, plural, one {You added <b><a>#</a> day</b> to the original suggestion.} other {You added <b><a>#</a> days</b> to the original suggestion.}}",
+				"removedOnly": "{removed, plural, one {You removed <b><r>#</r> day</b> from the original suggestion.} other {You removed <b><r>#</r> days</b> from the original suggestion.}}",
+				"addedAndRemoved": "{added, plural, one {You added <b><a>#</a> day</b>} other {You added <b><a>#</a> days</b>}} and {removed, plural, one {removed <b><r>#</r> day</b>} other {removed <b><r>#</r> days</b>}} from the original suggestion."
 			},
 			"customHolidays": {
 				"title": "Custom holidays",
-				"youHave": "You have",
-				"holiday": "custom holiday",
-				"holidays": "custom holidays",
-				"improvesPlan": "that improve your plan."
+				"message": "{count, plural, one {You have <b><n>#</n> custom holiday</b> that improves your suggestion.} other {You have <b><n>#</n> custom holidays</b> that improve your suggestion.}}"
 			}
 		},
 		"yearTimeline": {
-			"title": "Condensed annual view",
 			"rows": {
 				"national": "National",
 				"regional": "Regional",
@@ -146,14 +136,11 @@
 				"title": "General",
 				"whatIsPto": {
 					"question": "What is PTO?",
-					"answer": "PTO stands for Paid Time Off: the number of vacation days your employer gives you each year to use however you want. Unlike sick leave or public holidays, PTO days are yours to schedule freely. The challenge is that most people use them randomly and leave a lot of potential rest on the table. Forever PTO helps you place those days strategically around public holidays to turn, say, 5 PTO days into 12 consecutive days off."
+					"answer": "PTO stands for Paid Time Off: the number of paid days off your employer gives you each year to use however you want. Unlike sick leave or public holidays, PTO days are yours to schedule freely. The challenge is that most people use them randomly and leave a lot of potential rest on the table. Forever PTO helps you place those days strategically around public holidays to turn, say, 5 PTO days into 12 consecutive days off."
 				},
 				"whatIs": {
 					"question": "What is this?",
 					"answer": "Forever PTO helps you plan and optimize your paid time off by suggesting the best dates to request based on public holidays and your preferences. Holiday planning can get complicated, and Forever PTO simplifies it so you get the most out of every day. You can choose different strategies to spread time off across the year, customize holiday names, and add company-specific or regional holidays."
-				},
-				"howWorks": {
-					"question": "How does it work?"
 				},
 				"whyNotSeeingCountry": {
 					"question": "Why am I not seeing my country or holidays correctly?",
@@ -162,9 +149,6 @@
 				"pricing": {
 					"question": "Why is there a paid model?",
 					"answer": "Forever PTO is free. The paid model covers the cost of data, hosting, and ongoing improvements. It funds updates, support, and infrastructure. Core features remain free so anyone can plan smarter without paying."
-				},
-				"restartTutorial": {
-					"question": "How can I see the interactive tutorial again?"
 				}
 			},
 			"technical": {
@@ -229,7 +213,7 @@
 		"weekendDays": "Weekend days",
 		"holidays": "Holidays",
 		"holidaysOutsideRange": "Holidays are only known for {from}–{to}, so any outside that span are counted as workdays.",
-		"dateRange": "Date range",
+		"dateRange": "Selected dates",
 		"from": "From",
 		"to": "to"
 	},
@@ -336,7 +320,6 @@
 		}
 	},
 	"tutorial": {
-		"description": "Set up your plan in 2 steps: your location first, then your days and strategy. Click below for an interactive walkthrough.",
 		"nextBtn": "Next",
 		"prevBtn": "Previous",
 		"doneBtn": "Done",
@@ -345,7 +328,7 @@
 			"toolsTitle": "Calculators & tools",
 			"toolsDescription": "Calculators live here: estimate how many PTO days you've accrued, see what unused days cost you in salary, or count workdays between two dates.",
 			"alternativesTitle": "Alternatives manager",
-			"alternativesDescription": "Browse the different plans we generated. Compare efficiency and total days off to find your ideal balance. The first option is always our top pick, marked with a sparkle. Use the arrows to explore, then click \"Apply alternative\" to switch.",
+			"alternativesDescription": "Browse the different suggestions we generated. Compare efficiency and effective days to find your ideal balance. The first alternative is always our top pick, marked with a sparkle. Use the arrows to explore, then click \"Apply alternative\" to switch.",
 			"statusTitle": "PTO status tracker",
 			"statusDescription": "Track your PTO at a glance: auto-assigned days, manually selected days, and how many are left. Reset manual changes anytime to go back to the suggested plan.",
 			"calendarTitle": "Your interactive PTO calendar",
@@ -356,7 +339,7 @@
 			"holidaysListDescription": "Here you can fine-tune the holiday data to match your exact situation. Edit or delete any national or regional holiday, and add your own custom days off: company holidays, local observances, or any date that matters to you. The more accurate the data, the better the suggestions.",
 			"step1Title": "Your context",
 			"step1Description": "Select your country, region, and the year you want to plan. This sets up your holiday calendar so we can find the best bridges.",
-			"step2Title": "Your available days",
+			"step2Title": "Your PTO days",
 			"step2Description": "Enter how many PTO days you have. This is the base for all calculations.",
 			"step3Title": "Your configuration",
 			"step3Description": "Choose your optimization strategy and configure past days and carryover months to fine-tune your plan.",
@@ -440,7 +423,7 @@
 		}
 	},
 	"alternativesManager": {
-		"option": "Option",
+		"option": "Alternative",
 		"recommended": "Recommended",
 		"totalOff": "Effective days",
 		"efficiency": "Efficiency",
@@ -490,7 +473,6 @@
 	},
 	"sidebar": {
 		"configuration": "Configuration",
-		"filters": "Filters",
 		"tools": "Tools",
 		"calculators": "Calculators",
 		"loading": "Loading...",
@@ -673,7 +655,7 @@
 		"enterAmount": "Enter amount",
 		"basePriceNote": "Base price in {currency}. The final amount will be converted to your local currency at current exchange rates.",
 		"havePromoCode": "Have a promo code?",
-		"promoCodePlaceholder": "YOU_WISH_IT_WAS_THAT_EASY",
+		"promoCodePlaceholder": "You wish it was that easy",
 		"continueToPayment": "Continue to payment",
 		"processing": "Processing..."
 	},
@@ -757,7 +739,7 @@
 			"weatherIntegration": "Weather integration",
 			"weatherIntegrationDescription": "See weather forecasts for your planned vacation dates",
 			"blockedPeriods": "Blocked periods",
-			"blockedPeriodsDescription": "Mark date ranges where you don't want any PTO suggestions: conferences, trips, medical leave, or any time you know you'll be busy",
+			"blockedPeriodsDescription": "Mark periods where you don't want any PTO suggestions: conferences, trips, medical leave, or any time you know you'll be busy",
 			"performanceOptimization": "Performance optimization",
 			"performanceOptimizationDescription": "Faster calculations and smoother experience powered by Web Workers",
 			"customWeekends": "Custom weekends",
@@ -812,9 +794,6 @@
 	},
 	"workdayCounterModal": {
 		"selectDateRange": "Select dates"
-	},
-	"command": {
-		"searchPlaceholder": "Search for a command to run..."
 	},
 	"legal": {
 		"lastUpdated": "Last updated: {date}"
@@ -965,8 +944,8 @@
 			"efficiencyLabel": "Average efficiency",
 			"daysLabel": "Days off with {days} PTO",
 			"countriesLabel": "Supported countries",
-			"plansLabel": "Plans generated",
-			"plansValue": "12k+"
+			"plansLabel": "Suggestions generated",
+			"plansValue": "{value}+"
 		},
 		"features": {
 			"badge": "engine tricks",
@@ -1062,7 +1041,7 @@
 			"description": "No SaaS. No subscription. No \"7-day trial that auto-renews\".",
 			"freeName": "Free Forever",
 			"freeTagline": "Try it. It will convince you.",
-			"freePrice": "€0",
+			"freePrice": "{amount}",
 			"freePer": "/always",
 			"freeNote": "No credit card. No email. Nothing.",
 			"freeFeatures": {
@@ -1073,8 +1052,8 @@
 			},
 			"freeCta": "Start for free",
 			"lifetimeName": "Supporter Pass",
-			"lifetimeTagline": "Minimum donation of €1. Use it forever.",
-			"lifetimePrice": "From €1",
+			"lifetimeTagline": "Minimum donation of {amount}. Use it forever.",
+			"lifetimePrice": "From {amount}",
 			"lifetimePer": " one time",
 			"lifetimeNote": "100% optional. Keeps the project alive.",
 			"lifetimeFeatures": {
@@ -1147,7 +1126,7 @@
 						},
 						"premiumKey": {
 							"label": "Premium key storage:",
-							"description": "Securely stores your premium access key when you upgrade to Premium."
+							"description": "Securely stores your premium access key when you unlock Premium."
 						},
 						"theme": {
 							"label": "Theme preference:",
@@ -1640,7 +1619,7 @@
 				},
 				"exclusions": {
 					"title": "Refund exclusions",
-					"description": "Refunds will NOT be granted in the following cases:",
+					"description": "Refunds will <b>not</b> be granted in the following cases:",
 					"items": {
 						"timePassed": "More than 14 days have passed since the purchase (unless covered by statutory rights)",
 						"violatedTerms": "You have violated these Terms of Service",
@@ -1715,7 +1694,7 @@
 					"interruptions": "Interruptions or errors in the Service",
 					"unauthorizedAccess": "Unauthorized access to your locally stored data"
 				},
-				"maxLiability": "Our total liability for any claims arising out of or related to these Terms or the Service shall not exceed the amount you paid for Premium access (if applicable) or €50, whichever is greater."
+				"maxLiability": "Our total liability for any claims arising out of or related to these Terms or the Service shall not exceed the amount you paid for Premium access (if applicable) or {amount}, whichever is greater."
 			},
 			"intellectualProperty": {
 				"title": "Intellectual property",
