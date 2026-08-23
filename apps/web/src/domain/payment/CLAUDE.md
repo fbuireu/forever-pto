@@ -16,11 +16,11 @@ keeping that row honest.
 
 | File | Contents |
 | --- | --- |
-| [`events/types.ts`](./events/types.ts) | `PaymentSucceededEvent` and `PaymentFailedEvent` — plain interfaces, no Stripe types — plus the `PaymentStatus` union and the `PAYMENT_SUCCEEDED` constant |
-| [`events/factory/events.ts`](./events/factory/events.ts) | `createPaymentSucceededEvent` (an Effect, it can fail), `createPaymentFailedEvent` — the only place a `Stripe.PaymentIntent` is read |
-| [`events/factory/resolvers.ts`](./events/factory/resolvers.ts) | `resolveChargeId` — flattens `latest_charge`, which Stripe returns as an id, an expanded object or nothing |
-| [`handlers/paymentSucceeded.ts`](./handlers/paymentSucceeded.ts) | `handlePaymentSucceeded` — status reconciliation plus best-effort charge enrichment |
-| [`handlers/paymentFailed.ts`](./handlers/paymentFailed.ts) | `handlePaymentFailed` — status reconciliation, with `succeeded` treated as terminal |
+| [`events/types.ts`](./events/types.ts) | `PaymentSucceededEvent` and `PaymentFailedEvent` (plain interfaces, no Stripe types), plus the `PaymentStatus` union and the `PAYMENT_SUCCEEDED` constant |
+| [`events/factory/events.ts`](./events/factory/events.ts) | `createPaymentSucceededEvent` (an Effect, it can fail), `createPaymentFailedEvent`: the only place a `Stripe.PaymentIntent` is read |
+| [`events/factory/resolvers.ts`](./events/factory/resolvers.ts) | `resolveChargeId` flattens `latest_charge`, which Stripe returns as an id, an expanded object or nothing |
+| [`handlers/paymentSucceeded.ts`](./handlers/paymentSucceeded.ts) | `handlePaymentSucceeded`: status reconciliation plus best-effort charge enrichment |
+| [`handlers/paymentFailed.ts`](./handlers/paymentFailed.ts) | `handlePaymentFailed`: status reconciliation, with `succeeded` treated as terminal |
 
 ## Public API
 

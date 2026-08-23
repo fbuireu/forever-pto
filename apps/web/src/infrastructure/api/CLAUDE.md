@@ -7,13 +7,13 @@ The wire vocabulary for failures, the response helper that opts out of caching, 
 
 | File | Contents |
 | --- | --- |
-| [`errors.ts`](./errors.ts) | `ApiError` — the machine-readable failure codes that go on the wire — and `describeFailure`, the one tag→status table |
-| [`response.ts`](./response.ts) | `noStore(body, init?)` — `NextResponse.json` with `Cache-Control: no-store` |
-| [`parseJsonBody.ts`](./parseJsonBody.ts) | `parseJsonBody<T>(request)` — `request.json()` as an Effect, plus the `INVALID_BODY` code |
+| [`errors.ts`](./errors.ts) | `ApiError`, the machine-readable failure codes that go on the wire, plus `describeFailure`, the one tag→status table |
+| [`response.ts`](./response.ts) | `noStore(body, init?)`: `NextResponse.json` with `Cache-Control: no-store` |
+| [`parseJsonBody.ts`](./parseJsonBody.ts) | `parseJsonBody<T>(request)`: `request.json()` as an Effect, plus the `INVALID_BODY` code |
 | [`operations/types.ts`](./operations/types.ts) | `ApiOutcome<BODY>` (`{ status, body }`), `RequestContext`, `resolveClientIp`, `UNKNOWN_IP` |
-| [`operations/payment.ts`](./operations/payment.ts) | `createPaymentRequest` — rate limit, use-case, deferred write and failure mapping, transport-free |
-| [`operations/contact.ts`](./operations/contact.ts) | `sendContactRequest` — the same shape for the contact form |
-| [`operations/activatePremium.ts`](./operations/activatePremium.ts) | `activatePremiumRequest` — the rate limit, the deferred hand-off, the status map and a log line per failure, for the two transports that grant Premium |
+| [`operations/payment.ts`](./operations/payment.ts) | `createPaymentRequest`: rate limit, use-case, deferred write and failure mapping, transport-free |
+| [`operations/contact.ts`](./operations/contact.ts) | `sendContactRequest`: the same shape for the contact form |
+| [`operations/activatePremium.ts`](./operations/activatePremium.ts) | `activatePremiumRequest`: the rate limit, the deferred hand-off, the status map and a log line per failure, for the two transports that grant Premium |
 
 ## The Premium activation operation owns its rate limit now
 
@@ -70,7 +70,7 @@ know the address rather than claim it is called "unknown".
 
 ## From a typed failure to a status code
 
-A use-case fails with a tagged error declared in [`src/infrastructure/errors.ts`](../errors.ts) (`DatabaseError`, `EmailError`, `MissingDonorEmailError`, `PaymentError`, `PromoCodeError`, `RateLimitError`, `SessionError`, `ValidationError`, `WebhookError`). The entry point — the only place the program is run — turns each tag into a status and a body. That mapping is the whole reason this folder exists; see [ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md).
+A use-case fails with a tagged error declared in [`src/infrastructure/errors.ts`](../errors.ts) (`DatabaseError`, `EmailError`, `MissingDonorEmailError`, `PaymentError`, `PromoCodeError`, `RateLimitError`, `SessionError`, `ValidationError`, `WebhookError`). The entry point, the only place the program is run, turns each tag into a status and a body. That mapping is the whole reason this folder exists; see [ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md).
 
 What the code does today:
 
@@ -97,7 +97,7 @@ under a value that arrived lying about its type, which a test injecting an off-u
 | `EmailError` | 500 | `INTERNAL_ERROR` | `errors.ts` |
 | `SessionError`, `DatabaseError` | 500 | `INTERNAL_ERROR` | `errors.ts` |
 | `WebhookError` | 400 or 500 | `INVALID_SIGNATURE` when `isSignatureError`, `WEBHOOK_MISCONFIGURED` (400) when the secret is missing, else `WEBHOOK_PROCESSING_FAILED` (500) | [`src/app/api/webhooks/stripe/route.ts`](../../app/api/webhooks/stripe/route.ts) |
-| `MissingDonorEmailError` | — | never reaches the wire: absorbed and logged in [`webhook.ts`](../../application/use-cases/webhook.ts) | `src/application/use-cases/webhook.ts` |
+| `MissingDonorEmailError` | none | never reaches the wire: absorbed and logged in [`webhook.ts`](../../application/use-cases/webhook.ts) | `src/application/use-cases/webhook.ts` |
 
 A `WebhookConfigurationError`, meaning Stripe is not configured, carries the `WebhookError` tag, so the handler
 narrows on `isWebhookConfigurationError` from [`serverService.ts`](../clients/payments/stripe/serverService.ts) and answers **400 `WEBHOOK_MISCONFIGURED`**,
@@ -160,7 +160,7 @@ only when nobody added a key for it. Add the key when you add the code, and note
 whose outcome is `FAILED_AFTER_CHARGE` bypasses the lookup entirely; see
 [`../../ui/CLAUDE.md`](../../ui/CLAUDE.md).
 
-`ValidationError` messages are the sharpest edge. Server-side parsing uses the default schemas in [`src/application/dto/payment/schema.ts`](../../application/dto/payment/schema.ts) and [`src/application/dto/contact/schema.ts`](../../application/dto/contact/schema.ts), whose messages are themselves codes (`email_required`, `amount_too_low`). The UI rebuilds the same schemas with translated messages for client-side validation, so a user normally sees prose — but a request that reaches the server unvalidated gets the code back and displays it. If you add a code a user can see, give it a lookup of its own; do not assume the code is presentable.
+`ValidationError` messages are the sharpest edge. Server-side parsing uses the default schemas in [`src/application/dto/payment/schema.ts`](../../application/dto/payment/schema.ts) and [`src/application/dto/contact/schema.ts`](../../application/dto/contact/schema.ts), whose messages are themselves codes (`email_required`, `amount_too_low`). The UI rebuilds the same schemas with translated messages for client-side validation, so a user normally sees prose, but a request that reaches the server unvalidated gets the code back and displays it. If you add a code a user can see, give it a lookup of its own; do not assume the code is presentable.
 
 ## Response shapes the handlers depend on
 
@@ -180,4 +180,4 @@ whose outcome is `FAILED_AFTER_CHARGE` bypasses the lookup entirely; see
 
 [`response.test.ts`](./response.test.ts) covers `noStore` directly: body, default and custom status, the header, and that custom headers survive alongside it. [`parseJsonBody.test.ts`](./parseJsonBody.test.ts) pins the three outcomes: an object body succeeds, a malformed body fails with `INVALID_BODY`, and so does a non-object one.
 
-`errors.ts` has no test of its own. Its contract lives in the route tests, which compare response bodies against `ApiError.*` rather than string literals — with three exceptions, all in `e2e/`, which deliberately imports no app source: `'email_required'` in [`check-session.spec.ts`](../../../e2e/api/check-session.spec.ts), and `'missing_signature'` and `'invalid_signature'` in [`webhooks-stripe.spec.ts`](../../../e2e/api/webhooks-stripe.spec.ts). Change a code's value and that assertion is the one that will not follow you.
+`errors.ts` has no test of its own. Its contract lives in the route tests, which compare response bodies against `ApiError.*` rather than string literals, with three exceptions, all in `e2e/`, which deliberately imports no app source: `'email_required'` in [`check-session.spec.ts`](../../../e2e/api/check-session.spec.ts), and `'missing_signature'` and `'invalid_signature'` in [`webhooks-stripe.spec.ts`](../../../e2e/api/webhooks-stripe.spec.ts). Change a code's value and that assertion is the one that will not follow you.

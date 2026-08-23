@@ -28,8 +28,8 @@ A reader who finds two contracts inside one layer assumes one is a mistake. Both
   [ADR 0012](../../../../adr/0012-shared-date-helpers-stay-in-the-application-layer.md) records why. **The
   test for a fifth entry on this list is the runtime, not the layer**: does the module resolve inside a Web
   Worker with no DOM and no server context
-- `temporal-polyfill` — in `utils/helpers.ts` only, for `PlainYearMonth.daysInMonth`
-- `next-intl` — the `Locale` type alone, threaded through [`pipeline.ts`](./calendar/pipeline.ts) to the Metrics, where it formats month names
+- `temporal-polyfill`, in `utils/helpers.ts` only, for `PlainYearMonth.daysInMonth`
+- `next-intl`, the `Locale` type alone, threaded through [`pipeline.ts`](./calendar/pipeline.ts) to the Metrics, where it formats month names
 
 No `@infrastructure/*`, no `@ui/*`, no Effect. The reason is the runtime rather than taste: the planner
 evaluates this code inside a Web Worker with no DOM and no server context

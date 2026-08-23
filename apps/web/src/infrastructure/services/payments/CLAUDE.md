@@ -16,13 +16,13 @@ read by the premium activation path as well as by the payment one.
 | File | Exports | Requires |
 | --- | --- | --- |
 | `repository.ts` | `savePayment`, `updatePaymentStatus`, `updatePaymentCharge`, `getPaymentById`, `getSucceededPaymentByEmail`, `countPromoCodeRedemptions`, `normalizePromoCode`, the `PaymentChargeData` shape | `TursoService` |
-| [`normalizeEmail.ts`](./normalizeEmail.ts) | `normalizeEmail(email)` — trim and lower-case, applied on both sides of every address comparison | — |
-| [`confirmation.ts`](./confirmation.ts) | `confirmation(paymentIntentId)` — a `PaymentConfirmationDTO`, or `null` on any failure | `StripeServerService`, `LoggerService` |
-| [`rateLimit.ts`](./rateLimit.ts) | `checkRateLimit(ip)` — fails with `RateLimitError` | the Cloudflare `PAYMENT_RATE_LIMITER` binding |
-| [`provider/intent.ts`](./provider/intent.ts) | `createPaymentIntent(params)` — the Stripe intent behind a Donation | `StripeServerService` |
-| [`provider/metadata.ts`](./provider/metadata.ts) | `readDonationMetadata(intent)` and `clampMetadata(value)` — the two halves of the donation metadata format | — |
-| [`provider/charge.ts`](./provider/charge.ts) | `retrieveCharge(chargeId)` — normalises a Stripe `Charge` into flat, nullable fields | `StripeServerService` |
-| [`provider/promoCode.ts`](./provider/promoCode.ts) | `validatePromoCode(code, amount)` — a `DiscountInfo`, or a `PromoCodeError` | `StripeServerService`, `TursoService` |
+| [`normalizeEmail.ts`](./normalizeEmail.ts) | `normalizeEmail(email)`: trim and lower-case, applied on both sides of every address comparison | none |
+| [`confirmation.ts`](./confirmation.ts) | `confirmation(paymentIntentId)`: a `PaymentConfirmationDTO`, or `null` on any failure | `StripeServerService`, `LoggerService` |
+| [`rateLimit.ts`](./rateLimit.ts) | `checkRateLimit(ip)` fails with `RateLimitError` | the Cloudflare `PAYMENT_RATE_LIMITER` binding |
+| [`provider/intent.ts`](./provider/intent.ts) | `createPaymentIntent(params)`: the Stripe intent behind a Donation | `StripeServerService` |
+| [`provider/metadata.ts`](./provider/metadata.ts) | `readDonationMetadata(intent)` and `clampMetadata(value)`: the two halves of the donation metadata format | none |
+| [`provider/charge.ts`](./provider/charge.ts) | `retrieveCharge(chargeId)` normalises a Stripe `Charge` into flat, nullable fields | `StripeServerService` |
+| [`provider/promoCode.ts`](./provider/promoCode.ts) | `validatePromoCode(code, amount)`: a `DiscountInfo`, or a `PromoCodeError` | `StripeServerService`, `TursoService` |
 
 `provider/` is the Stripe side; at the root sit the database, the rate limiter and the address normaliser, and
 `confirmation.ts` sits between: a Stripe read that exists only to render the post-checkout page.

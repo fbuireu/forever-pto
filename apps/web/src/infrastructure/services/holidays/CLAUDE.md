@@ -14,11 +14,11 @@ are not non-working days, tags and hands over.
 | File | Role |
 | --- | --- |
 | [`getHolidays.ts`](./getHolidays.ts) | Asks the Holiday source what is observed and maps it through `holidayDTO`. That is all it does |
-| [`source/types.ts`](./source/types.ts) | `HolidaySource` — the seam: `rawHolidays(lookup)` and `regionsOf(country)`, and nothing else |
+| [`source/types.ts`](./source/types.ts) | `HolidaySource`, the seam: `rawHolidays(lookup)` and `regionsOf(country)`, and nothing else |
 | [`source/dateHolidays.ts`](./source/dateHolidays.ts) | The production adapter. The **only** place in the app that constructs `Holidays` |
-| [`source/fixture.ts`](./source/fixture.ts) | `createFixtureHolidaySource(calendar)` — the test adapter, plain data in |
-| [`source/observedHolidays.ts`](./source/observedHolidays.ts) | `observedHolidays(source, lookup)` — the three rules, composed **above** the seam so both adapters go through them |
-| [`source/utils/observed.ts`](./source/utils/observed.ts) | `resolveObservedHolidays` — the Region-over-Country rule, pure |
+| [`source/fixture.ts`](./source/fixture.ts) | `createFixtureHolidaySource(calendar)`: the test adapter, plain data in |
+| [`source/observedHolidays.ts`](./source/observedHolidays.ts) | `observedHolidays(source, lookup)`: the three rules, composed **above** the seam so both adapters go through them |
+| [`source/utils/observed.ts`](./source/utils/observed.ts) | `resolveObservedHolidays`, the Region-over-Country rule, pure |
 | [`source/utils/nonWorking.ts`](./source/utils/nonWorking.ts) | `keepNonWorking` (the `public`/`bank` filter) and `stampRegion` (the `location` stamp), pure |
 
 ## The seam is the source, not the mapper
@@ -38,8 +38,8 @@ it, which is what makes it a real seam rather than a hypothetical one:
 **The seam used to sit one level higher, and two of the three rules were stranded above the fixture.**
 `HolidaySource.observedHolidays` promised "already filtered, already stamped", so `keepNonWorking` and
 `stampRegion` ran inside `dateHolidaysSource` only. The consequence was visible in the very test this guide
-holds up as the end-to-end one: [`getHolidays.test.ts`](./getHolidays.test.ts) hand-wrote `location: 'CA'` on its regional fixtures —
-exactly what `stampRegion` would have set — and every entry was `type: 'public'` because nothing on that path
+holds up as the end-to-end one: [`getHolidays.test.ts`](./getHolidays.test.ts) hand-wrote `location: 'CA'` on its regional fixtures,
+exactly what `stampRegion` would have set, and every entry was `type: 'public'` because nothing on that path
 filtered. Deleting `keepNonWorking` from the adapter left that suite green. Both rules are now reachable
 from it, and the fixtures stop performing them as ritual: an `observance` entry proves the filter and the
 regional entries carry no `location` of their own.
@@ -61,7 +61,7 @@ its own dependency on the package.
 - `locale` is passed on as `{ languages: [locale] }`, so the package returns translated Holiday names.
 - **The Region *list* is derived here, from the same `source`, and is not a parameter.** The DTO needs it
   only to render a region code as a label; it plays no part in the lookup. It used to arrive as a `regions`
-  argument that `fetchHolidays` read out of the location store — a store populated by [`Regions.tsx`](../../../ui/modules/sidebar/components/Regions.tsx)'s effect,
+  argument that `fetchHolidays` read out of the location store, a store populated by [`Regions.tsx`](../../../ui/modules/sidebar/components/Regions.tsx)'s effect,
   a different `dynamic()` component. Nothing ordered the two, and `regions` sits in no dependency array, so
   whenever this ran first the label stayed the raw code, `CA` instead of `California`, for the rest of the
   session. `getRegions` is a pure synchronous function of the Country over this same adapter, so deriving it
@@ -147,7 +147,7 @@ DTO's is incidental.
 **Regional entries are appended after national ones on purpose.** `resolveObservedHolidays` returns
 national first, and the DTO's first sort relies on regional entries being distinguishable so the dedupe
 resolves in favour of the national one. The ordering is part of the contract with
-[`src/application/dto/holiday/dto.ts`](../../../application/dto/holiday/dto.ts), not an implementation detail — which is why it is a rule inside the
+[`src/application/dto/holiday/dto.ts`](../../../application/dto/holiday/dto.ts), not an implementation detail, which is why it is a rule inside the
 source rather than the shape of a concatenation at a call site, and why `observed.test.ts` asserts it.
 
 **The two lookups agree on the raw date string, which is what makes the filter above safe.** The DTO dedupes
@@ -168,8 +168,8 @@ whole point.** Holiday data is upstream's: the version bundled is the version sh
 ([ADR 0001](../../../../../../adr/0001-planner-runs-in-the-browser.md)), so an assertion about what
 `date-holidays` returns for a given date would break on every dependency bump and would prove only that the
 fixture agreed with whoever wrote it. What the adapter decides for itself is *how the package is asked*, and
-that a mock can answer honestly: [`dateHolidays.test.ts`](./source/dateHolidays.test.ts) pins that both `year` and `year + 1` are fetched —
-the Planning Window reaches into the following year — that a second, Region-scoped `Holidays` is constructed
+that a mock can answer honestly: [`dateHolidays.test.ts`](./source/dateHolidays.test.ts) pins that both `year` and `year + 1` are fetched,
+because the Planning Window reaches into the following year, that a second, Region-scoped `Holidays` is constructed
 only when a Region is given, that the locale travels as `languages: [locale]`, and that `regionsOf`
 lower-cases the Country and normalises the package's absent answer to `null`.
 

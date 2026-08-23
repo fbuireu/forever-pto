@@ -15,7 +15,7 @@ costs one interaction. Nothing downstream should treat the result as authoritati
 | --- | --- |
 | [`detectCountry.ts`](./detectCountry.ts) | Runs the chain. The ordering and nothing else |
 | [`utils/strategies.ts`](./utils/strategies.ts) | The three strategies and `CLOUDFLARE_COUNTRY_HEADER` |
-| [`utils/normalize.ts`](./utils/normalize.ts) | `normalizeCountryCode` — the one exit rule — plus `noStoreFetch` and the `UNIDENTIFIED_COUNTRY` / `TOR_COUNTRY` sentinels |
+| [`utils/normalize.ts`](./utils/normalize.ts) | `normalizeCountryCode`, the one exit rule, plus `noStoreFetch` and the `UNIDENTIFIED_COUNTRY` / `TOR_COUNTRY` sentinels |
 
 ## The chain
 
