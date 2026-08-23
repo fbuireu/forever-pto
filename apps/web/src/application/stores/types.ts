@@ -40,6 +40,8 @@ export interface AlternativeSelectionBaseParams {
 	index: number;
 }
 
+export type AlternativePreviewParams = Pick<AlternativeSelectionBaseParams, "index">;
+
 export const DayRefusal = {
 	NO_PLAN: "no_plan",
 	DAY_IS_WEEKEND: "day_is_weekend",

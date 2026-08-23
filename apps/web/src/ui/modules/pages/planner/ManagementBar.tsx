@@ -56,7 +56,7 @@ export const ManagementBar = () => {
 
 	const handlePreviewChange = useCallback(
 		(index: number) => {
-			setPreviewAlternativeSelection({ suggestion: null, index });
+			setPreviewAlternativeSelection({ index });
 		},
 		[setPreviewAlternativeSelection],
 	);

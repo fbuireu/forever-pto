@@ -12,7 +12,7 @@ returns. It never runs itself, never reaches for a request, and never decides an
 | File | Exports | Combines |
 | --- | --- | --- |
 | [`payment.ts`](./payment.ts) | `createPayment` | promo-code validation, Stripe intent creation, deferred persistence |
-| [`activatePremium.ts`](./activatePremium.ts) | `activateWithPayment`, `activateWithEmail` | Stripe intent lookup, payment repository, session minting |
+| [`activatePremium.ts`](./activatePremium.ts) | `activateWithPayment`, `activateWithClaimedPayment`, `activateWithEmail` | Stripe intent lookup, payment repository, session minting |
 | [`webhook.ts`](./webhook.ts) | `processWebhookEvent` | payment repository, the `@domain/payment` event factory and handlers |
 | [`contact.ts`](./contact.ts) | `sendContactEmail` | Zod validation, React Email render, Resend, deferred persistence |
 

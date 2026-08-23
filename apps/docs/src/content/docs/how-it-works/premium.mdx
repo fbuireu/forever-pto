@@ -43,7 +43,8 @@ A premium session is a JWT (jose, HS256, signed with `JWT_SECRET`, 30-day expiry
 
 - **GET** — reads the cookie, verifies the JWT, returns `{ premiumKey: paymentIntentId, email }`. On `SessionError` it clears the cookie and returns nulls. Responses are `noStore` (never cached).
 - **POST** `{ email, premiumKey? }` — the two activation paths in `apps/web/src/application/use-cases/activatePremium.ts`:
-  - `activateWithPayment(email, paymentIntentId)` — used right after checkout. Retrieves the PaymentIntent from Stripe, requires `status === 'succeeded'` and that the metadata email matches, then upserts the payment row (deferred via `after()`).
+  - `activateWithPayment({ paymentIntentId, clientSecret })` — used right after checkout, when Stripe redirects back. Both fields are required, so the client-secret check cannot be skipped by omitting it. Retrieves the PaymentIntent from Stripe, requires `status === 'succeeded'`, then upserts the payment row (deferred via `after()`).
+  - `activateWithClaimedPayment({ paymentIntentId, expectedEmail })` — the "I already donated" recovery path, which has no client secret to check and verifies the donor address instead. It is a separate entry point precisely so neither caller can end up running no guard at all.
   - `activateWithEmail(email)` — used on a new device. Looks up the latest succeeded payment for that email in Turso.
 
   Both mint the JWT and set the cookie; the browser side mirrors the result into the [premium store](/how-it-works/state-stores/), which re-checks the session after 24 hours.

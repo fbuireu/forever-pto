@@ -10,13 +10,13 @@ export interface GenerateSuggestionsParams {
 
 export function generateSuggestions({ ptoDays, candidates, strategy }: GenerateSuggestionsParams) {
 	if (ptoDays <= 0) {
-		return { days: [], strategy };
+		return { days: [], bridges: [], strategy };
 	}
 
 	const { availableWorkdays, bridges } = candidates;
 
 	if (availableWorkdays.length === 0) {
-		return { days: [], strategy };
+		return { days: [], bridges: [], strategy };
 	}
 
 	const effectivePtoDays = Math.min(availableWorkdays.length, ptoDays);

@@ -1,9 +1,10 @@
-import type { generateMetrics } from "@domain/calendar/metrics/generateMetrics";
+import type { PlanningResult, runPlanningPipeline } from "@domain/calendar/pipeline";
+import { FilterStrategy, type MeasuredSuggestion, type Metrics } from "@domain/calendar/types";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { CalculateSuggestionsRequest } from "./types";
 import { WORKER_MESSAGE_TYPE } from "./types";
 
-const METRICS = {
+const METRICS: Metrics = {
 	longWeekends: 0,
 	restBlocks: 0,
 	maxWorkStreak: 0,
@@ -19,18 +20,17 @@ const METRICS = {
 	longestVacation: 0,
 };
 
-const mockFindPlanningCandidates = vi.hoisted(() => vi.fn());
-const mockGenerateSuggestions = vi.hoisted(() => vi.fn());
-const mockGenerateAlternatives = vi.hoisted(() => vi.fn());
-const mockGenerateMetrics = vi.hoisted(() => vi.fn<typeof generateMetrics>());
+const measured = (days: Date[]): MeasuredSuggestion => ({
+	days,
+	bridges: [],
+	strategy: FilterStrategy.GROUPED,
+	metrics: METRICS,
+});
+
+const mockRunPlanningPipeline = vi.hoisted(() => vi.fn<typeof runPlanningPipeline>());
 const mockPostMessage = vi.hoisted(() => vi.fn());
 
-vi.mock("@domain/calendar/utils/candidates", () => ({ findPlanningCandidates: mockFindPlanningCandidates }));
-vi.mock("@domain/calendar/suggestions/generateSuggestions", () => ({ generateSuggestions: mockGenerateSuggestions }));
-vi.mock("@domain/calendar/alternatives/generateAlternatives", () => ({
-	generateAlternatives: mockGenerateAlternatives,
-}));
-vi.mock("@domain/calendar/metrics/generateMetrics", () => ({ generateMetrics: mockGenerateMetrics }));
+vi.mock("@domain/calendar/pipeline", () => ({ runPlanningPipeline: mockRunPlanningPipeline }));
 
 vi.stubGlobal("self", { postMessage: mockPostMessage });
 
@@ -66,19 +66,24 @@ const sendMessage = (payload: Partial<CalculateSuggestionsRequest["payload"]> = 
 	} as MessageEvent<CalculateSuggestionsRequest>);
 };
 
+const planningInput = () => mockRunPlanningPipeline.mock.lastCall?.[0];
+
 describe("worker onmessage", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		mockFindPlanningCandidates.mockReturnValue({ availableWorkdays: [], bridges: [] });
-		mockGenerateSuggestions.mockReturnValue({ days: [new Date(2025, 2, 10)], bridges: [] });
-		mockGenerateAlternatives.mockReturnValue([]);
-		mockGenerateMetrics.mockReturnValue(METRICS);
+		mockRunPlanningPipeline.mockReturnValue({
+			planned: true,
+			suggestion: measured([new Date(2025, 2, 10)]),
+			alternatives: [],
+		});
 	});
 
 	it("ignores messages with unknown type", () => {
 		(globalThis.onmessage as ((e: MessageEvent) => void) | null)?.({
 			data: { type: "UNKNOWN", requestId: "r", payload: {} },
 		} as MessageEvent);
+
+		expect(mockRunPlanningPipeline).not.toHaveBeenCalled();
 		expect(mockPostMessage).not.toHaveBeenCalled();
 	});
 
@@ -96,141 +101,91 @@ describe("worker onmessage", () => {
 		expect(typeof response.payload.suggestion.days[0]).toBe("string");
 	});
 
-	it("passes a recognised strategy through to both generators", () => {
-		sendMessage({ strategy: "optimized" });
-		expect(mockGenerateSuggestions).toHaveBeenCalledWith(expect.objectContaining({ strategy: "optimized" }));
-		expect(mockGenerateAlternatives).toHaveBeenCalledWith(expect.objectContaining({ strategy: "optimized" }));
-	});
+	it("carries the pipeline's own Metrics onto the wire rather than a literal of its own", () => {
+		mockRunPlanningPipeline.mockReturnValue({
+			planned: false,
+			suggestion: measured([]),
+			alternatives: [],
+		} satisfies PlanningResult);
 
-	it("replaces an unrecognised strategy with the default, so the two generators cannot disagree", () => {
-		sendMessage({ strategy: "balanced-ish" as never });
-		expect(mockGenerateSuggestions).toHaveBeenCalledWith(expect.objectContaining({ strategy: "grouped" }));
-		expect(mockGenerateAlternatives).toHaveBeenCalledWith(expect.objectContaining({ strategy: "grouped" }));
-	});
-
-	it("posts an empty result when effectivePtoDays is 0", () => {
 		sendMessage({ ptoDays: 0 });
+
 		const response = mockPostMessage.mock.calls[0][0];
 		expect(response.type).toBe(WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT);
 		expect(response.payload.suggestion.days).toEqual([]);
+		expect(response.payload.suggestion.metrics).toEqual(METRICS);
 	});
 
-	it("posts an empty result when holidays list is empty", () => {
-		sendMessage({ holidays: [], manualDays: [] });
-		const response = mockPostMessage.mock.calls[0][0];
-		expect(response.type).toBe(WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT);
-		expect(response.payload.suggestion.days).toEqual([]);
-	});
-
-	it("posts WORKER_ERROR when pipeline throws", () => {
-		mockGenerateSuggestions.mockImplementation(() => {
-			throw new Error("pipeline crash");
-		});
+	it("deserialises the Holidays into the PlanningInput as Dates", () => {
+		const date = new Date(2025, 0, 1);
 		sendMessage();
-		const response = mockPostMessage.mock.calls[0][0];
-		expect(response.type).toBe(WORKER_MESSAGE_TYPE.WORKER_ERROR);
-		expect(response.requestId).toBe("req-1");
-		expect(response.error).toContain("pipeline crash");
+
+		expect(planningInput()?.holidays).toEqual([
+			{ id: "h-1", date, name: "New Year", variant: "national", isInSelectedRange: true },
+		]);
 	});
 
-	it("maps manualDays into pseudo-holidays with CUSTOM variant", () => {
-		sendMessage({ manualDays: [new Date(2025, 2, 5).toISOString()] });
-		const callArgs = mockFindPlanningCandidates.mock.lastCall?.[0];
-		const manualEntry = callArgs.holidays.find((h: { id: string }) => h.id === "manual-0");
-		expect(manualEntry).toBeDefined();
-		expect(manualEntry.variant).toBe("custom");
-	});
-
-	it("respects autoSuggestCount over ptoDays when provided", () => {
-		sendMessage({ ptoDays: 10, autoSuggestCount: 3 });
-		const callArgs = mockGenerateSuggestions.mock.lastCall?.[0];
-		expect(callArgs.ptoDays).toBe(3);
-	});
-
-	it("hands removedDays to the planner as dates, never as holidays", () => {
-		const removed = new Date(2025, 2, 20);
-		sendMessage({ removedDays: [removed.toISOString()] });
-		const carriesRemovedDay = (holidays: { date: Date }[]) =>
-			holidays.some((h) => h.date.toDateString() === removed.toDateString());
-
-		const candidateArgs = mockFindPlanningCandidates.mock.lastCall?.[0];
-		expect(candidateArgs.removedDays).toEqual([removed]);
-		expect(carriesRemovedDay(candidateArgs.holidays)).toBe(false);
-	});
-
-	it("keeps removedDays out of the metrics holidays, since they are days the user works", () => {
-		sendMessage({
-			removedDays: [new Date(2025, 2, 20).toISOString()],
-			manualDays: [new Date(2025, 2, 5).toISOString()],
-		});
-		const [metricsArgs] = mockGenerateMetrics.mock.lastCall ?? [];
-		const removed = new Date(2025, 2, 20);
-		expect(metricsArgs?.holidays.some(({ date }) => date.toDateString() === removed.toDateString())).toBe(false);
-		expect(metricsArgs?.holidays.some(({ id }) => id === "manual-0")).toBe(true);
-	});
-
-	it("measures the metrics against the Manual Days too, not just the days it placed itself", () => {
+	it("deserialises the hand-edited days into the two lists the pipeline names them by", () => {
 		const manual = new Date(2025, 2, 5);
 		const removed = new Date(2025, 2, 20);
 		sendMessage({ manualDays: [manual.toISOString()], removedDays: [removed.toISOString()] });
 
-		const [metricsArgs] = mockGenerateMetrics.mock.lastCall ?? [];
-		expect(metricsArgs?.manuallySelectedDays?.map((day) => day.toDateString())).toEqual([manual.toDateString()]);
-		expect(metricsArgs?.removedSuggestedDays?.map((day) => day.toDateString())).toEqual([removed.toDateString()]);
+		expect(planningInput()?.manuallySelectedDays).toEqual([manual]);
+		expect(planningInput()?.removedSuggestedDays).toEqual([removed]);
 	});
 
-	it("gives the alternatives the same day set as the base suggestion, so their metrics stay comparable", () => {
-		const manual = new Date(2025, 2, 5);
-		sendMessage({ manualDays: [manual.toISOString()] });
+	it("defaults both hand-edited lists to empty when the request omits them", () => {
+		sendMessage({ manualDays: undefined as never, removedDays: undefined });
 
-		const everyCall = mockGenerateMetrics.mock.calls.map(([args]) => args.manuallySelectedDays);
-		expect(everyCall.length).toBeGreaterThan(0);
-		for (const days of everyCall) {
-			expect(days.map((d: Date) => d.toDateString())).toEqual([manual.toDateString()]);
-		}
+		expect(planningInput()?.manuallySelectedDays).toEqual([]);
+		expect(planningInput()?.removedSuggestedDays).toEqual([]);
 	});
 
-	it("scopes the metrics to the requested year, not the 2025 the mocked suggestion would infer", () => {
-		sendMessage({ year: 2026 });
-		expect(mockGenerateMetrics.mock.lastCall?.[0].planningWindow.year).toBe(2026);
+	it("builds the Planning Window out of the request's year and carryOverMonths", () => {
+		sendMessage({ year: 2026, carryOverMonths: 3 });
+
+		expect(planningInput()?.window).toEqual({ year: 2026, carryOverMonths: 3 });
 	});
 
-	it("short-circuits when the only blocked dates are Removed Days", () => {
-		sendMessage({ holidays: [], manualDays: [], removedDays: [new Date(2025, 2, 20).toISOString()] });
-		expect(mockGenerateSuggestions).not.toHaveBeenCalled();
-		const response = mockPostMessage.mock.calls[0][0];
-		expect(response.type).toBe(WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT);
-		expect(response.payload.suggestion.days).toEqual([]);
-	});
+	it("forwards the budget, the auto-suggest cap and the rest of the request verbatim", () => {
+		sendMessage({ ptoDays: 10, autoSuggestCount: 3, allowPastDays: true, maxAlternatives: 2 });
 
-	it("deducts manualDays from the budget when no autoSuggestCount is given", () => {
-		sendMessage({ ptoDays: 10, manualDays: [new Date(2025, 2, 5).toISOString(), new Date(2025, 2, 6).toISOString()] });
-		expect(mockGenerateSuggestions.mock.lastCall?.[0].ptoDays).toBe(8);
-		expect(mockGenerateAlternatives.mock.lastCall?.[0].ptoDays).toBe(8);
-	});
-
-	it("derives the empty result Metrics from the engine rather than a hand-written constant", () => {
-		sendMessage({ ptoDays: 0 });
-		const { metrics } = mockPostMessage.mock.calls[0][0].payload.suggestion;
-
-		expect(mockGenerateMetrics).toHaveBeenCalledWith(
-			expect.objectContaining({ suggestion: expect.objectContaining({ days: [], bridges: [] }) }),
-		);
-		expect(metrics).toEqual(mockGenerateMetrics.mock.results[0]?.value);
-	});
-
-	it("posts an empty result when manualDays exceed the budget", () => {
-		sendMessage({
-			ptoDays: 2,
-			manualDays: [
-				new Date(2025, 2, 5).toISOString(),
-				new Date(2025, 2, 6).toISOString(),
-				new Date(2025, 2, 7).toISOString(),
-			],
+		expect(planningInput()).toMatchObject({
+			ptoDays: 10,
+			autoSuggestCount: 3,
+			allowPastDays: true,
+			maxAlternatives: 2,
 		});
-		expect(mockGenerateSuggestions).not.toHaveBeenCalled();
+	});
+
+	it("passes a recognised strategy through to the pipeline", () => {
+		sendMessage({ strategy: "optimized" });
+		expect(planningInput()?.strategy).toBe(FilterStrategy.OPTIMIZED);
+	});
+
+	it("replaces an unrecognised strategy with the default, so the pipeline never dispatches on a bad string", () => {
+		sendMessage({ strategy: "balanced-ish" as never });
+		expect(planningInput()?.strategy).toBe(FilterStrategy.GROUPED);
+	});
+
+	it("replaces an unrecognised locale with English, since the Metrics format month names with it", () => {
+		sendMessage({ locale: "es" });
+		expect(planningInput()?.locale).toBe("es");
+
+		sendMessage({ locale: "xx" });
+		expect(planningInput()?.locale).toBe("en");
+	});
+
+	it("posts WORKER_ERROR when the pipeline throws", () => {
+		mockRunPlanningPipeline.mockImplementation(() => {
+			throw new Error("pipeline crash");
+		});
+
+		sendMessage();
+
 		const response = mockPostMessage.mock.calls[0][0];
-		expect(response.type).toBe(WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT);
-		expect(response.payload.suggestion.days).toEqual([]);
+		expect(response.type).toBe(WORKER_MESSAGE_TYPE.WORKER_ERROR);
+		expect(response.requestId).toBe("req-1");
+		expect(response.error).toContain("pipeline crash");
 	});
 });

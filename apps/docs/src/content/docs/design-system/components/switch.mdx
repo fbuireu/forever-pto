@@ -33,5 +33,10 @@ Use Switch for immediate on/off settings; use [Checkbox](/design-system/componen
 
 ## Conventions
 
+- **An accessible name is required, and the type says so.** The props are intersected with
+  `{ id: string } | { "aria-label": string } | { "aria-labelledby": string }`, so a `Switch` with none of the
+  three does not compile. It renders a `button` with no text inside it, so without one it reaches a screen
+  reader as "switch, not pressed" and nothing else. Pass `id` when a visible `Label` names it (the `Label`
+  needs the matching `htmlFor`, which is also required), and `aria-label` when there is no visible label.
 - `data-slot` hooks: `switch`, `switch-thumb`.
 - Form integration comes from Base UI: `name`, `required`, `readOnly` and `inputRef` forward to a hidden input.

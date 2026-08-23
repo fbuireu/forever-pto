@@ -42,6 +42,82 @@ describe("runPlanningPipeline", () => {
 		expect(result.suggestion.days.some((day) => day.getTime() === manual[0].getTime())).toBe(false);
 	});
 
+	it("blocks each Manual Day as a CUSTOM pseudo-Holiday, so the engine cannot re-suggest a day already paid for", async () => {
+		const candidates = await import("./utils/candidates");
+		const findPlanningCandidates = vi.spyOn(candidates, "findPlanningCandidates").mockClear();
+		const manual = new Date(YEAR, 6, 7);
+		const removed = new Date(YEAR, 6, 21);
+
+		runPlanningPipeline({ ...baseInput, manuallySelectedDays: [manual], removedSuggestedDays: [removed] });
+
+		const [args] = findPlanningCandidates.mock.lastCall ?? [];
+		expect(args?.holidays.map(({ id }) => id)).toEqual(["new-year", "epiphany", "manual-0"]);
+		expect(args?.holidays.at(-1)).toEqual({
+			id: "manual-0",
+			date: manual,
+			name: "Manual day",
+			variant: HolidayVariant.CUSTOM,
+			isInSelectedRange: true,
+		});
+		expect(args?.removedDays).toEqual([removed]);
+		expect(args?.holidays.some(({ date }) => date.getTime() === removed.getTime())).toBe(false);
+		findPlanningCandidates.mockRestore();
+	});
+
+	it("lets autoSuggestCount win over the budget it would otherwise derive", async () => {
+		const suggestions = await import("./suggestions/generateSuggestions");
+		const alternatives = await import("./alternatives/generateAlternatives");
+		const generateSuggestions = vi.spyOn(suggestions, "generateSuggestions").mockClear();
+		const generateAlternatives = vi.spyOn(alternatives, "generateAlternatives").mockClear();
+
+		runPlanningPipeline({
+			...baseInput,
+			ptoDays: 10,
+			manuallySelectedDays: [new Date(YEAR, 6, 7)],
+			autoSuggestCount: 2,
+		});
+
+		expect(generateSuggestions.mock.lastCall?.[0].ptoDays).toBe(2);
+		expect(generateAlternatives.mock.lastCall?.[0].ptoDays).toBe(2);
+		generateSuggestions.mockRestore();
+		generateAlternatives.mockRestore();
+	});
+
+	it("measures every Suggestion with the Manual Days, not only the days it placed itself", async () => {
+		const metrics = await import("./metrics/generateMetrics");
+		const generateMetrics = vi.spyOn(metrics, "generateMetrics").mockClear();
+		const manual = new Date(YEAR, 6, 7);
+		const removed = new Date(YEAR, 6, 21);
+
+		const result = runPlanningPipeline({
+			...baseInput,
+			manuallySelectedDays: [manual],
+			removedSuggestedDays: [removed],
+		});
+
+		expect(generateMetrics.mock.calls).toHaveLength(1 + result.alternatives.length);
+		for (const [args] of generateMetrics.mock.calls) {
+			expect(args.manuallySelectedDays).toEqual([manual]);
+			expect(args.removedSuggestedDays).toEqual([removed]);
+			expect(args.holidays.some(({ id }) => id === "manual-0")).toBe(true);
+			expect(args.holidays.some(({ date }) => date.getTime() === removed.getTime())).toBe(false);
+		}
+		generateMetrics.mockRestore();
+	});
+
+	it("measures every Suggestion against the Planning Window it was given, Alternatives included", async () => {
+		const metrics = await import("./metrics/generateMetrics");
+		const generateMetrics = vi.spyOn(metrics, "generateMetrics").mockClear();
+		const window = { year: YEAR, carryOverMonths: 2 };
+
+		const result = runPlanningPipeline({ ...baseInput, window });
+
+		expect(result.alternatives.length).toBeGreaterThan(0);
+		expect(generateMetrics.mock.calls).toHaveLength(1 + result.alternatives.length);
+		for (const [args] of generateMetrics.mock.calls) expect(args.planningWindow).toEqual(window);
+		generateMetrics.mockRestore();
+	});
+
 	describe("the empty result", () => {
 		it("reports it did not plan, rather than an empty plan that looks calculated", () => {
 			const result = runPlanningPipeline({ ...baseInput, ptoDays: 0 });
@@ -73,6 +149,30 @@ describe("runPlanningPipeline", () => {
 
 		it("refuses to plan when there is nothing free to bridge", () => {
 			expect(runPlanningPipeline({ ...baseInput, holidays: [] }).planned).toBe(false);
+		});
+
+		it("refuses to plan when the only blocked dates are Removed Days, which never become Holidays", () => {
+			const result = runPlanningPipeline({
+				...baseInput,
+				holidays: [],
+				removedSuggestedDays: [new Date(YEAR, 3, 20)],
+			});
+
+			expect(result.planned).toBe(false);
+			expect(result.suggestion.days).toEqual([]);
+			expect(result.alternatives).toEqual([]);
+		});
+
+		it("refuses to plan when the Manual Days have consumed the whole budget", () => {
+			const result = runPlanningPipeline({
+				...baseInput,
+				ptoDays: 2,
+				manuallySelectedDays: [new Date(YEAR, 2, 5), new Date(YEAR, 2, 6), new Date(YEAR, 2, 7)],
+			});
+
+			expect(result.planned).toBe(false);
+			expect(result.suggestion.days).toEqual([]);
+			expect(result.alternatives).toEqual([]);
 		});
 	});
 

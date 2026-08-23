@@ -137,7 +137,7 @@ which touches no context and is why the common path needs no geolocation service
 
 **There are two readers of the same two variables, and the difference is *when* they are asked.**
 `getPublicEnv` is the cached, build-safe one — `'use cache'`, `cacheLife('days')`, the `{ async: true }`
-context — and [`sitemap.ts`](../app/sitemap.ts), [`robots.ts`](../app/robots.ts) and the `metadata.ts` files use it because they are evaluated outside
+context — and [`sitemap.ts`](../app/sitemap.ts), [`robots.ts`](../app/robots.ts) and every route's `generateMetadata` use it because they are evaluated outside
 a request. `getRequestPublicEnv` beside it is the synchronous, per-request one, and the two contact
 transports use it. They each hand-mapped those four lines before, which is the residue of exactly the drift
 `operations/` exists to prevent.
@@ -220,7 +220,7 @@ and action tests that restated it row by row have been cut back to what each tra
 [`api/CLAUDE.md`](./api/CLAUDE.md).
 
 **`seo/buildMetadata.ts` and [`services/holidays/source/dateHolidays.ts`](./services/holidays/source/dateHolidays.ts) were a fourth kind — untested — and
-are not any more.** `buildMetadata` was reached only through the seven route `metadata.test.ts` files, and
+are not any more.** `buildMetadata` was reached only through the seven route `metadata.test.ts` files that existed then, and
 every twitter/images assertion in them was positive and lived in the two indexable routes, so both
 `indexable &&` guards could be deleted and the suite stayed green while a noindex legal page began
 advertising an Open Graph image and a `summary_large_image` card. `dateHolidays` is the adapter that decides

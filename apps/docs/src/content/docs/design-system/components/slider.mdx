@@ -49,5 +49,5 @@ For discrete numeric stepping the app also has the animated `Counter` (`apps/web
 ## Conventions
 
 - **`label` is required**, and it is the only required prop. It becomes the thumb's `aria-label`: a slider with no visible text label is unusable with a screen reader, so the type refuses to let one ship rather than leaving it to a review.
-- The rest of the prop surface is a deliberate subset (`className`, `value`, `defaultValue`, `min`, `max`, `step`, the two callbacks, `disabled`, `id`) — extend the interface in the source if you need more of Base UI's API rather than reaching for the primitive directly.
+- The rest of the prop surface is a deliberate subset (`className`, `value`, `defaultValue`, `min`, `max`, `step`, the two callbacks, `disabled`) — extend the interface in the source if you need more of Base UI's API rather than reaching for the primitive directly. `id` is gone: it landed on the wrapper `div` Base UI renders, so a `<label for>` pointing at it named nothing, which is why `label` is required instead.
 - Defaults: `min=0`, `max=100`, `step=1`.

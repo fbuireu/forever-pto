@@ -226,7 +226,11 @@ Husky runs `lint-staged` on `pre-commit`, `commitlint` on `commit-msg` and `veri
 command the CI Check job runs, so a green push is a green check.
 
 **`typecheck` ends with `astro check`, and that tail is what puts the cross-package seam in front of
-the author.** The docs site typechecks the 32 demo components against `apps/web`'s real props — a renamed
+the author.** (Do not "fix" that command by pointing it at `tsc`: a raw `tsc --noEmit -p apps/docs` reports
+four errors `astro check` correctly does not, all artefacts of Astro's JSX namespace being applied to the
+app's React components — `keyof HTMLElements` against `keyof HTMLElementTagNameMap`, and motion's
+`DOMMotionProps`. `astro check` does catch a real prop break, verified by deleting a required `label` from
+`SliderDemo` and watching it fail.) The docs site typechecks the 32 demo components against `apps/web`'s real props — a renamed
 `Button` variant fails there because `ButtonDemo`'s `Record<ButtonVariant, string>` is exhaustive — but the
 check used to run only inside `docs.yml`'s `build` job. So an app PR that broke the docs passed `pre-push`,
 passed the `CI` workflow, and failed in a workflow called **Docs** that does not read as blocking. Whether it
@@ -293,7 +297,12 @@ link resolves, every `.ts`/`.tsx` file named in backticks still exists, no docum
 module they name — that last one is the largest slice of the cross-package seam and had nothing checking it,
 because `astro check` registers no MDX plugin and the citation rules match paths rather than symbols; that
 every script this file
-documents exists in the root manifest and every script the web guide documents exists in one of the two;
+documents exists in the root manifest, every script the web guide documents exists in one of the two, every
+`pnpm --filter <pkg> <script>` citation resolves against the manifest of the package it names, and every bare
+script a workflow runs exists in one of the three manifests; that every backticked constant the published
+wiki names exists somewhere in `apps/web`; that the `@ui` seam target is declared once, in
+[`apps/docs/tsconfig.json`](./apps/docs/tsconfig.json), with the vite alias deriving from it rather than
+restating it; that the wiki's prose uses the canonical name rather than a retired one;
 that [`apps/web/tsconfig.json`](./apps/web/tsconfig.json) keeps the two settings `next build` would otherwise fill in for it — `strict`
 on and `allowJs` off — that it sits beside the [`next.config.ts`](./apps/web/next.config.ts) that rewrites it, and that
 `cloudflare-env.d.ts` stays both excluded from the program and ignored by git; that every `'use client'`,
@@ -301,7 +310,19 @@ on and `allowJs` off — that it sits beside the [`next.config.ts`](./apps/web/n
 and that every locale bundle has exactly the keys [`en.json`](./apps/web/src/ui/i18n/messages/en.json) has.
 
 It reads staged *and* unstaged files, so a rule fires before the offending file is committed. **Each rule was
-verified by breaking it and confirming the matching case fails** — keep that property when you add one. A
+verified by breaking it and confirming the matching case fails** — keep that property when you add one.
+
+Three traps that have each cost a rule its teeth, all found by breaking one:
+
+- **A regex anchored on `$` reads nothing in a working-tree file with CRLF.** The index is all LF —
+  `.gitattributes` carries `* text=auto eol=lf` and no tracked blob is CRLF — but the *checkout* on Windows
+  is not, and the suite reads the working tree. The first version of the workflow-script rule silently
+  checked zero lines of `_deploy-web.yml` for exactly this reason. Split on `/?
+/`.
+- **Three backticks pair one at a time**, so a rule that scans a wiki page without stripping fenced blocks
+  first is off by one after the page's first fence and reads the rest inverted.
+- **A `run:` key does not see every command a workflow runs.** Every wrangler and OpenNext call here is
+  wrapped in `nick-fields/retry`, which takes its script on `command:`. A
 failure means the docs and the code disagree; fix whichever is wrong. It cannot check rationale — whether an
 explanation is honest — and that part is on you.
 

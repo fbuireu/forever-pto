@@ -1,35 +1,22 @@
 import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
+import type { runPlanningPipeline } from "@domain/calendar/pipeline";
 import { FilterStrategy, type MeasuredSuggestion } from "@domain/calendar/types";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useFiltersStore } from "./filters";
 import { type HolidaysState, useHolidaysStore } from "./holidays";
 import { DayRefusal, HolidayRefusal } from "./types";
 
-const {
-	mockGetHolidays,
-	mockGenerateSuggestionsImpl,
-	mockGenerateAlternativesImpl,
-	mockFindPlanningCandidates,
-	mockStorageGetItem,
-} = vi.hoisted(() => ({
+const { mockGetHolidays, mockRunPlanningPipeline, mockStorageGetItem } = vi.hoisted(() => ({
 	mockGetHolidays: vi.fn().mockResolvedValue([]),
-	mockGenerateSuggestionsImpl: vi.fn().mockReturnValue({ days: [], bridges: [] }),
-	mockGenerateAlternativesImpl: vi.fn().mockReturnValue([]),
-	mockFindPlanningCandidates: vi.fn().mockReturnValue({ availableWorkdays: [], bridges: [] }),
+	mockRunPlanningPipeline: vi.fn<typeof runPlanningPipeline>(),
 	mockStorageGetItem: vi.fn().mockResolvedValue(null),
 }));
 
 vi.mock("@infrastructure/services/holidays/getHolidays", () => ({
 	getHolidays: mockGetHolidays,
 }));
-vi.mock("@domain/calendar/suggestions/generateSuggestions", () => ({
-	generateSuggestions: mockGenerateSuggestionsImpl,
-}));
-vi.mock("@domain/calendar/alternatives/generateAlternatives", () => ({
-	generateAlternatives: mockGenerateAlternativesImpl,
-}));
-vi.mock("@domain/calendar/utils/candidates", () => ({
-	findPlanningCandidates: mockFindPlanningCandidates,
+vi.mock("@domain/calendar/pipeline", () => ({
+	runPlanningPipeline: mockRunPlanningPipeline,
 }));
 
 const { mockLogError, mockWarn } = vi.hoisted(() => ({ mockLogError: vi.fn(), mockWarn: vi.fn() }));
@@ -108,6 +95,7 @@ const INITIAL = {
 beforeEach(() => {
 	useHolidaysStore.setState(INITIAL);
 	vi.clearAllMocks();
+	mockRunPlanningPipeline.mockReturnValue({ planned: true, suggestion: makeSuggestion([]), alternatives: [] });
 });
 
 describe("toggleDaySelection refuses days that are already off", () => {
@@ -721,8 +709,7 @@ describe("setCurrentAlternativeSelection", () => {
 
 describe("setPreviewAlternativeSelection", () => {
 	it("sets previewAlternativeIndex", () => {
-		const suggestion = makeSuggestion([new Date("2026-08-01")]);
-		useHolidaysStore.getState().setPreviewAlternativeSelection({ suggestion, index: 1 });
+		useHolidaysStore.getState().setPreviewAlternativeSelection({ index: 1 });
 		expect(useHolidaysStore.getState().previewAlternativeIndex).toBe(1);
 	});
 
@@ -732,9 +719,7 @@ describe("setPreviewAlternativeSelection", () => {
 			currentSelection: currentSuggestion,
 			manuallySelectedDays: [new Date("2026-01-10")],
 		});
-		useHolidaysStore
-			.getState()
-			.setPreviewAlternativeSelection({ suggestion: makeSuggestion([new Date("2026-08-01")]), index: 1 });
+		useHolidaysStore.getState().setPreviewAlternativeSelection({ index: 1 });
 		const state = useHolidaysStore.getState();
 		expect(state.currentSelection).toBe(currentSuggestion);
 		expect(state.manuallySelectedDays).toHaveLength(1);
@@ -997,45 +982,80 @@ describe("generateSuggestions", () => {
 		locale: "en" as const,
 	};
 
-	it("measures the metrics against the Manual Days too, mirroring the worker", async () => {
-		const { generateMetrics } = await import("@domain/calendar/metrics/generateMetrics");
+	const planningInput = () => mockRunPlanningPipeline.mock.lastCall?.[0];
+
+	it("hands the pipeline the calendar and the hand edits it holds in state", async () => {
+		const holiday = makeHoliday("h1", "2026-01-01");
 		const manual = new Date(2026, 2, 11);
 		const removed = new Date(2026, 2, 12);
 		useHolidaysStore.setState({
-			holidays: [makeHoliday("h1", "2026-01-01")],
+			holidays: [holiday],
 			manuallySelectedDays: [manual],
 			removedSuggestedDays: [removed],
+			maxAlternatives: 2,
 		});
 
-		await useHolidaysStore.getState().generateSuggestions({ ...PARAMS, ptoDays: 5 });
-
-		const calls = vi.mocked(generateMetrics).mock.calls;
-		expect(calls.length).toBeGreaterThan(0);
-		for (const [args] of calls) {
-			expect(args.manuallySelectedDays).toEqual([manual]);
-			expect(args.removedSuggestedDays).toEqual([removed]);
-		}
-	});
-
-	it("clears suggestions when ptoDays is 0", async () => {
-		useHolidaysStore.setState({ holidays: [makeHoliday("h1", "2026-01-01")], suggestion: makeSuggestion([]) });
-		await useHolidaysStore.getState().generateSuggestions({ ...PARAMS, ptoDays: 0 });
-		expect(useHolidaysStore.getState().suggestion).toBeNull();
-		expect(useHolidaysStore.getState().alternatives).toHaveLength(0);
-	});
-
-	it("clears suggestions when holidays list is empty", async () => {
-		useHolidaysStore.setState({ holidays: [], suggestion: makeSuggestion([]) });
 		await useHolidaysStore.getState().generateSuggestions(PARAMS);
-		expect(useHolidaysStore.getState().suggestion).toBeNull();
+
+		expect(planningInput()).toMatchObject({
+			holidays: [holiday],
+			manuallySelectedDays: [manual],
+			removedSuggestedDays: [removed],
+			maxAlternatives: 2,
+		});
+	});
+
+	it("hands the pipeline the planning inputs its caller passed, budget and cap included", async () => {
+		useHolidaysStore.setState({ holidays: [makeHoliday("h1", "2026-01-01")] });
+
+		await useHolidaysStore.getState().generateSuggestions({
+			...PARAMS,
+			ptoDays: 10,
+			carryOverMonths: 2,
+			autoSuggestCount: 3,
+			allowPastDays: true,
+			strategy: FilterStrategy.OPTIMIZED,
+		});
+
+		expect(planningInput()).toMatchObject({
+			window: { year: 2026, carryOverMonths: 2 },
+			ptoDays: 10,
+			autoSuggestCount: 3,
+			allowPastDays: true,
+			strategy: FilterStrategy.OPTIMIZED,
+			locale: "en",
+		});
+	});
+
+	it("clears the plan when the pipeline reports it did not plan, since this store has a null state and the wire does not", async () => {
+		useHolidaysStore.setState({ holidays: [], suggestion: makeSuggestion([new Date("2026-06-01")]) });
+		mockRunPlanningPipeline.mockReturnValueOnce({
+			planned: false,
+			suggestion: makeSuggestion([]),
+			alternatives: [],
+		});
+
+		await useHolidaysStore.getState().generateSuggestions(PARAMS);
+
+		const state = useHolidaysStore.getState();
+		expect(state.suggestion).toBeNull();
+		expect(state.alternatives).toHaveLength(0);
+		expect(state.currentSelection).toBeNull();
+		expect(state.currentSelectionIndex).toBe(0);
+		expect(state.previewAlternativeIndex).toBe(0);
 	});
 
 	it("sets suggestion, alternatives, and currentSelection on success", async () => {
 		useHolidaysStore.setState({ holidays: [makeHoliday("h1", "2026-01-01")], maxAlternatives: 1 });
 		const days = [new Date("2026-06-01")];
-		mockGenerateSuggestionsImpl.mockReturnValueOnce({ days, bridges: [] });
-		mockGenerateAlternativesImpl.mockReturnValueOnce([{ days: [new Date("2026-07-01")], bridges: [] }]);
+		mockRunPlanningPipeline.mockReturnValueOnce({
+			planned: true,
+			suggestion: makeSuggestion(days),
+			alternatives: [makeSuggestion([new Date("2026-07-01")])],
+		});
+
 		await useHolidaysStore.getState().generateSuggestions(PARAMS);
+
 		const state = useHolidaysStore.getState();
 		expect(state.suggestion).toMatchObject({ days });
 		expect(state.alternatives).toHaveLength(1);
@@ -1046,114 +1066,12 @@ describe("generateSuggestions", () => {
 
 	it("clears suggestions on error", async () => {
 		useHolidaysStore.setState({ holidays: [makeHoliday("h1", "2026-01-01")], suggestion: makeSuggestion([]) });
-		mockGenerateSuggestionsImpl.mockImplementationOnce(() => {
+		mockRunPlanningPipeline.mockImplementationOnce(() => {
 			throw new Error("calc error");
 		});
-		await useHolidaysStore.getState().generateSuggestions(PARAMS);
-		expect(useHolidaysStore.getState().suggestion).toBeNull();
-		expect(useHolidaysStore.getState().alternatives).toHaveLength(0);
-	});
-});
-
-describe("generateSuggestions agrees with the worker", () => {
-	const PARAMS = {
-		year: 2026,
-		ptoDays: 5,
-		allowPastDays: false,
-		carryOverMonths: 0,
-		strategy: FilterStrategy.GROUPED,
-		locale: "en" as const,
-	};
-
-	const ids = (holidays: HolidayDTO[]) => holidays.map((holiday) => holiday.id);
-
-	it("blocks manual days as holidays and removed days as removedDays", async () => {
-		const { generateMetrics } = await import("@domain/calendar/metrics/generateMetrics");
-		const removed = new Date("2026-04-20");
-		useHolidaysStore.setState({
-			holidays: [makeHoliday("h1", "2026-01-01")],
-			manuallySelectedDays: [new Date("2026-03-10")],
-			removedSuggestedDays: [removed],
-		});
 
 		await useHolidaysStore.getState().generateSuggestions(PARAMS);
 
-		expect(ids(mockFindPlanningCandidates.mock.calls[0][0].holidays)).toEqual(["h1", "manual-0"]);
-		expect(mockFindPlanningCandidates.mock.calls[0][0].removedDays).toEqual([removed]);
-		expect(ids(vi.mocked(generateMetrics).mock.calls[0][0].holidays)).toEqual(["h1", "manual-0"]);
-	});
-
-	it("marks the manual pseudo-holidays as custom so the planner treats them as blocked dates", async () => {
-		useHolidaysStore.setState({
-			holidays: [],
-			manuallySelectedDays: [new Date("2026-03-10")],
-			removedSuggestedDays: [new Date("2026-04-20")],
-		});
-
-		await useHolidaysStore.getState().generateSuggestions(PARAMS);
-
-		const blockedHolidays: HolidayDTO[] = mockFindPlanningCandidates.mock.calls[0][0].holidays;
-		expect(blockedHolidays.every((holiday) => holiday.variant === HolidayVariant.CUSTOM)).toBe(true);
-		expect(blockedHolidays.every((holiday) => holiday.isInSelectedRange)).toBe(true);
-	});
-
-	it("scopes the metrics to the planning year rather than the first placed day", async () => {
-		const { generateMetrics } = await import("@domain/calendar/metrics/generateMetrics");
-		useHolidaysStore.setState({ holidays: [makeHoliday("h1", "2026-01-01")] });
-		mockGenerateSuggestionsImpl.mockReturnValueOnce({ days: [new Date(2027, 0, 4)], bridges: [] });
-
-		await useHolidaysStore.getState().generateSuggestions(PARAMS);
-
-		expect(vi.mocked(generateMetrics).mock.calls[0][0].planningWindow.year).toBe(2026);
-	});
-
-	it("clears the plan without running the engine when only removed days block the calendar", async () => {
-		useHolidaysStore.setState({
-			holidays: [],
-			manuallySelectedDays: [],
-			removedSuggestedDays: [new Date("2026-04-20")],
-			suggestion: makeSuggestion([new Date("2026-06-01")]),
-		});
-
-		await useHolidaysStore.getState().generateSuggestions(PARAMS);
-
-		expect(mockGenerateSuggestionsImpl).not.toHaveBeenCalled();
-		expect(useHolidaysStore.getState().suggestion).toBeNull();
-	});
-
-	it("deducts manual days from the PTO budget", async () => {
-		useHolidaysStore.setState({
-			holidays: [makeHoliday("h1", "2026-01-01")],
-			manuallySelectedDays: [new Date("2026-03-10"), new Date("2026-03-11")],
-		});
-
-		await useHolidaysStore.getState().generateSuggestions(PARAMS);
-
-		expect(mockGenerateSuggestionsImpl).toHaveBeenCalledWith(expect.objectContaining({ ptoDays: 3 }));
-		expect(mockGenerateAlternativesImpl).toHaveBeenCalledWith(expect.objectContaining({ ptoDays: 3 }));
-	});
-
-	it("lets autoSuggestCount win over the manual-day deduction", async () => {
-		useHolidaysStore.setState({
-			holidays: [makeHoliday("h1", "2026-01-01")],
-			manuallySelectedDays: [new Date("2026-03-10")],
-		});
-
-		await useHolidaysStore.getState().generateSuggestions({ ...PARAMS, autoSuggestCount: 2 });
-
-		expect(mockGenerateSuggestionsImpl).toHaveBeenCalledWith(expect.objectContaining({ ptoDays: 2 }));
-	});
-
-	it("clears the plan without running the engine when manual days consume the whole budget", async () => {
-		useHolidaysStore.setState({
-			holidays: [makeHoliday("h1", "2026-01-01")],
-			suggestion: makeSuggestion([new Date("2026-06-01")]),
-			manuallySelectedDays: Array.from({ length: 5 }, (_, i) => new Date(2026, 2, i + 1)),
-		});
-
-		await useHolidaysStore.getState().generateSuggestions(PARAMS);
-
-		expect(mockGenerateSuggestionsImpl).not.toHaveBeenCalled();
 		expect(useHolidaysStore.getState().suggestion).toBeNull();
 		expect(useHolidaysStore.getState().alternatives).toHaveLength(0);
 	});
@@ -1179,25 +1097,5 @@ describe("every Metrics writer measures against the same Planning Window", () =>
 
 		const [args] = vi.mocked(generateMetrics).mock.lastCall ?? [];
 		expect(args?.planningWindow.carryOverMonths).toBe(2);
-	});
-
-	it("the store pipeline forwards it to every Alternative too", async () => {
-		const { generateMetrics } = await import("@domain/calendar/metrics/generateMetrics");
-		vi.mocked(generateMetrics).mockClear();
-		mockGenerateAlternativesImpl.mockReturnValueOnce([{ days: [new Date(2026, 0, 5)], bridges: [] }]);
-		useHolidaysStore.setState({ holidays: [makeHoliday("h1", "2026-01-01")] });
-
-		await useHolidaysStore.getState().generateSuggestions({
-			year: 2026,
-			ptoDays: 5,
-			allowPastDays: false,
-			carryOverMonths: 2,
-			strategy: FilterStrategy.GROUPED,
-			locale: "en" as const,
-		});
-
-		const calls = vi.mocked(generateMetrics).mock.calls;
-		expect(calls.length).toBeGreaterThan(0);
-		for (const [args] of calls) expect(args.planningWindow.carryOverMonths).toBe(2);
 	});
 });

@@ -14,6 +14,7 @@ import { useFiltersStore } from "./filters";
 import { onRehydrateFailure } from "./rehydration";
 import {
 	type AddHolidayParams,
+	type AlternativePreviewParams,
 	type AlternativeSelectionBaseParams,
 	type DayOutcome,
 	DayRefusal,
@@ -57,7 +58,7 @@ interface HolidaysActions {
 	setCalculationResult: (result: { suggestion: MeasuredSuggestion; alternatives: MeasuredSuggestion[] }) => void;
 	setMaxAlternatives: (max: number) => void;
 	setCurrentAlternativeSelection: (params: AlternativeSelectionBaseParams) => void;
-	setPreviewAlternativeSelection: (params: AlternativeSelectionBaseParams) => void;
+	setPreviewAlternativeSelection: (params: AlternativePreviewParams) => void;
 	resetToDefaults: () => void;
 	heldOn: (params: HeldOnParams) => DateHolder;
 	addHoliday: (params: AddHolidayParams) => HolidayOutcome;
@@ -252,7 +253,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 					});
 				},
 
-				setPreviewAlternativeSelection: ({ index }: AlternativeSelectionBaseParams) => {
+				setPreviewAlternativeSelection: ({ index }: AlternativePreviewParams) => {
 					set({ previewAlternativeIndex: index });
 				},
 

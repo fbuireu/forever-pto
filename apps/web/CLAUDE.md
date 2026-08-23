@@ -7,7 +7,7 @@ away from work. The user picks a Country, an optional Region, a year and a PTO b
 Bridges that turn that budget into the longest stretches off, and reports how well it did.
 
 **The whole planner runs in the browser** — the server holds payment and contact records and nothing else
-([ADR 0001](../../adr/0001-planner-runs-in-the-browser.md)). The server side is six API route handlers
+([ADR 0001](../../adr/0001-planner-runs-in-the-browser.md)). The server side is seven API route handlers
 (`check-session`, `contact`, `health`, `markdown`, `payment`, `payment/activate`), the Stripe webhook, a
 `.well-known` catch-all, [`middleware.ts`](./src/middleware.ts), and some static rendering.
 
