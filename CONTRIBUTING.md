@@ -2,7 +2,7 @@
 
 Thanks for considering it. Forever PTO is a Next.js App Router app deployed to
 Cloudflare Workers, and the one fact that shapes everything else is that **the
-whole planner runs in the browser** — the server holds payment and contact
+whole planner runs in the browser**: the server holds payment and contact
 records and nothing else. Read this before your first pull request; it will
 save you a rejected commit.
 
@@ -27,7 +27,7 @@ By participating you are expected to uphold the
 
 Check the existing issues first, then use the
 [bug report template](.github/ISSUE_TEMPLATE/bug_report.yml). Include what you
-did, what you expected, and what actually happened — and for planner bugs, the
+did, what you expected, and what actually happened. For planner bugs, add the
 Country, Region, year and PTO budget you were looking at, since the whole
 calculation depends on them.
 
@@ -38,14 +38,14 @@ issue.
 
 Use the [feature request template](.github/ISSUE_TEMPLATE/feature_request.yml).
 Describe the problem before the solution, and check
-[Discussions](https://github.com/fbuireu/forever-pto/discussions) first — some
+[Discussions](https://github.com/fbuireu/forever-pto/discussions) first; some
 ideas are already being talked about.
 
 ### Improving documentation
 
 Use the [documentation template](.github/ISSUE_TEMPLATE/documentation.yml), or
 just open a PR. Note that the agent-facing guides (`CLAUDE.md` and friends)
-are held to the code by a test — see *The docs are part of the change* below.
+are held to the code by a test; see *The docs are part of the change* below.
 
 ## Getting started
 
@@ -80,24 +80,24 @@ pnpm test:e2e           # end-to-end tests (playwright)
 ```
 
 Husky runs lint-staged on pre-commit, commitlint on commit-msg and
-`pnpm verify` on pre-push — the same command CI runs.
+`pnpm verify` on pre-push, the same command CI runs.
 
 ## Conventions that will bite you if you skip them
 
 - **Use the glossary's words.** [CONTEXT.md](./CONTEXT.md) names one canonical
-  term per concept — PTO Day, Bridge, Suggestion, Donation. A variable named
+  term per concept: PTO Day, Bridge, Suggestion, Donation. A variable named
   after a retired term is a defect, not a style preference.
 - **No explanatory comments in TypeScript sources under `src/`.** The folder's
   `CLAUDE.md` carries the explanation instead.
 - **One argument is positional and two or more are a single object typed
-  `<FunctionName>Params`** — `localePath({ locale, path }: LocalePathParams)`.
+  `<FunctionName>Params`**: `localePath({ locale, path }: LocalePathParams)`.
   The exception is a function a runtime calls back, such as a `toSorted`
   comparator, which is handed its arguments one at a time.
-- **`Temporal` comes from `temporal-polyfill`, never the global** — the global
+- **`Temporal` comes from `temporal-polyfill`, never the global**: the global
   does not resolve in the deployed Workers runtime.
 - **Cross-layer imports use the path aliases; same-folder imports stay
   relative.**
-- **Conventional commits are mandatory** — semantic-release derives versions
+- **Conventional commits are mandatory**: semantic-release derives versions
   and the changelog from them, and commitlint rejects anything else.
 - **Don't bump Next or TypeScript.** They are pinned as a pair by the
   Cloudflare adapter; the *Structure & aliases* section of
@@ -109,7 +109,7 @@ Husky runs lint-staged on pre-commit, commitlint on commit-msg and
 This repo treats its documentation as part of the code: change one, update the
 other **in the same commit**. `tests/docs-consistency.test.ts` runs with the
 unit tests and fails the build when the mechanical half of that contract is
-broken — scripts that no longer exist, links that no longer resolve, aliases
+broken: scripts that no longer exist, links that no longer resolve, aliases
 that moved. [CLAUDE.md](./CLAUDE.md) has the full table of what to update for
 a given change.
 
@@ -119,7 +119,7 @@ a given change.
 2. Run the checks above; fill in the PR template.
 3. Every PR gets its own preview Worker deployed by CI, so reviewers can try
    the change live.
-4. After merge to `main`, semantic-release versions and deploys automatically —
+4. After merge to `main`, semantic-release versions and deploys automatically;
    there is no manual release step.
 
 Thanks for contributing! 🎉

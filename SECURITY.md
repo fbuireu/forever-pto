@@ -5,7 +5,7 @@
 Forever PTO is a continuously deployed web application, not a versioned
 library: [forever-pto.com](https://forever-pto.com) always runs the latest
 `main`, and that deployment is the only supported version. There is nothing
-older to patch — fixes ship by deploying.
+older to patch; fixes ship by deploying.
 
 ## Reporting a Vulnerability
 
@@ -47,20 +47,20 @@ The attack surface is deliberately small. The planner itself runs entirely in
 the browser; the server holds payment and contact records and nothing else.
 The parts worth a security researcher's attention:
 
-- **The API route handlers** under `src/app/api/` — `check-session`,
-  `contact`, `health`, `markdown`, `payment`, `payment/activate` — and the
+- **The API route handlers** under `src/app/api/` (`check-session`,
+  `contact`, `health`, `markdown`, `payment`, `payment/activate`) and the
   Stripe webhook. Payment routes sit behind a Cloudflare rate limiter.
 - **The Premium entitlement**, which travels in a signed HTTP-only cookie.
   Forging that signature would be a real finding.
 - **The external service boundaries**: Stripe, Turso, and Resend.
 
-## Known Design Decisions — Not Vulnerabilities
+## Known Design Decisions (Not Vulnerabilities)
 
 Some behavior that looks reportable is a documented, deliberate trade-off.
 Please check these before reporting:
 
 - **Persisted client state is obfuscated, not encrypted** (XOR + base64 with a
-  bundled key). It protects against nothing but casual inspection, on purpose —
+  bundled key). It protects against nothing but casual inspection, on purpose:
   nothing confidential is stored behind it. See
   [ADR 0007](./adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md).
 - **The "I already donated" recovery path is unverified, and Premium is never
@@ -68,6 +68,6 @@ Please check these before reporting:
   Both follow from that decision. See
   [ADR 0008](./adr/0008-premium-derived-from-payment.md).
 
-A report that one of these exposes something *beyond* its documented scope —
-confidential data behind the obfuscation, or an entitlement without any
-payment record at all — is very much welcome.
+A report that one of these exposes something *beyond* its documented scope
+(confidential data behind the obfuscation, or an entitlement without any
+payment record at all) is very much welcome.

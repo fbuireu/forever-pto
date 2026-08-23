@@ -5,7 +5,7 @@ Forever PTO turns a fixed budget of paid days off into the longest possible stre
 ## Planning inputs
 
 **PTO Day**:
-One day from the user's annual budget of paid days off. It is a unit of budget, not a date on the calendar — a PTO Day only becomes a specific date once a Suggestion places it.
+One day from the user's annual budget of paid days off. It is a unit of budget, not a date on the calendar; a PTO Day only becomes a specific date once a Suggestion places it.
 _Avoid_: vacation day, day off, holiday
 
 **Country**:
@@ -13,7 +13,7 @@ The territory whose Holiday calendar drives the plan. It is detected on first vi
 _Avoid_: locale
 
 **Region**:
-An administrative subdivision of a Country with its own calendar: it may add Holidays the Country does not have, and it may drop national ones it does not observe. Optional — a plan without a Region uses the national calendar whole.
+An administrative subdivision of a Country with its own calendar: it may add Holidays the Country does not have, and it may drop national ones it does not observe. Optional: a plan without a Region uses the national calendar whole.
 _Avoid_: state
 
 **Carry-over Months**:
@@ -30,7 +30,7 @@ _Avoid_: filter, algorithm
 ## The calendar
 
 **Holiday**:
-A public non-working day that the user does not have to spend a PTO Day on. In this product "holiday" never means time off taken voluntarily — that is a PTO Day. English user-facing copy may say "public holiday", and only there: the bare word means vacation in British English, which is the one thing a Holiday is not, so the qualifier is what keeps the sentence unambiguous. Every other language has a single word for it and needs no qualifier. In code, in identifiers and in these documents the term is Holiday.
+A public non-working day that the user does not have to spend a PTO Day on. In this product "holiday" never means time off taken voluntarily; that is a PTO Day. English user-facing copy may say "public holiday", and only there: the bare word means vacation in British English, which is the one thing a Holiday is not, so the qualifier is what keeps the sentence unambiguous. Every other language has a single word for it and needs no qualifier. In code, in identifiers and in these documents the term is Holiday.
 _Avoid_: bank holiday, vacation, day off
 
 **Holiday Variant**:
@@ -52,7 +52,7 @@ A Workday the plan leaves standing: one the user will actually spend working, on
 _Avoid_: actual working day, business day
 
 **Free Day**:
-Any date the user is already off — a weekend or a Holiday — without spending any budget. Free Days are what make Bridges worth building.
+Any date the user is already off (a weekend or a Holiday) without spending any budget. Free Days are what make Bridges worth building.
 _Avoid_: rest day
 
 ## The plan
@@ -82,7 +82,7 @@ A Suggested Day the user has taken back, returning its budget without rejecting 
 _Avoid_: excluded day
 
 **Remaining Budget**:
-The PTO Days the user still has to spend: their budget less every Suggested Day the plan still holds and every Manual Day they added, with Removed Days handed back. It never reads below zero — a plan that overspends reports nothing left rather than a negative allowance, because the user cannot owe days.
+The PTO Days the user still has to spend: their budget less every Suggested Day the plan still holds and every Manual Day they added, with Removed Days handed back. It never reads below zero: a plan that overspends reports nothing left rather than a negative allowance, because the user cannot owe days.
 _Avoid_: remaining days, available days, unused days
 
 ## Measuring a plan
@@ -92,15 +92,15 @@ One day of the continuous stretch off that a plan actually produces, counting th
 _Avoid_: actual day off, total off, day off
 
 **Bonus Day**:
-An Effective Day that cost no budget — the difference between the stretch the user gets and the PTO Days they spent. Zero Bonus Days means the plan achieved nothing a naive placement would not have.
+An Effective Day that cost no budget: the difference between the stretch the user gets and the PTO Days they spent. Zero Bonus Days means the plan achieved nothing a naive placement would not have.
 _Avoid_: extra day, gained day, free day
 
 **Efficiency**:
-Effective Days divided by the PTO Days spent to get them. It is the single quality score for a Bridge, a Suggestion or an Alternative, and it is always a ratio — never a percentage. It answers "what did each PTO Day return?"
+Effective Days divided by the PTO Days spent to get them. It is the single quality score for a Bridge, a Suggestion or an Alternative, and it is always a ratio, never a percentage. It answers "what did each PTO Day return?"
 _Avoid_: multiplier, ratio, performance
 
 **Gain**:
-The Effective Days a plan produces beyond the user's whole PTO budget, divided by that budget and shown as a percentage. It answers "how much more did optimising get me than spending my allowance naively?", where Efficiency answers "what did each PTO Day I actually placed return?". The two are measured against different denominators — the budget, against the days actually placed — so they coincide only when the plan spends the budget in full, and part company by whatever it leaves unspent.
+The Effective Days a plan produces beyond the user's whole PTO budget, divided by that budget and shown as a percentage. It answers "how much more did optimising get me than spending my allowance naively?", where Efficiency answers "what did each PTO Day I actually placed return?". The two are measured against different denominators (the budget, against the days actually placed), so they coincide only when the plan spends the budget in full, and part company by whatever it leaves unspent.
 _Avoid_: improvement, multiplier, performance
 
 **Long Weekend**:
@@ -111,7 +111,7 @@ One separated period of time off within the year, however long. Counting them te
 _Avoid_: vacation period, period, break
 
 **Long Block**:
-A Rest Block of three or more consecutive days — the shape most people mean by "a proper holiday". Reported per quarter to expose seasonal imbalance.
+A Rest Block of three or more consecutive days: the shape most people mean by "a proper holiday". Reported per quarter to expose seasonal imbalance.
 
 **Longest Vacation**:
 The single longest unbroken stretch of Free Days the plan produces. The headline number when a user wants one real trip rather than many small breaks.
