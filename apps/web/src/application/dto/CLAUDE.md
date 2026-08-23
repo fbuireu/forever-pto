@@ -83,7 +83,7 @@ not to reinstate a runtime sweep.
 
 Nothing here fetches, writes, logs or reads a clock it was not handed. `create` is a pure function of `raw` and `params`. `stripe`, `date-holidays` and `i18n-iso-countries` appear only as `import type`, so no SDK is constructed and nothing in this folder pulls a runtime dependency in behind it.
 
-That is what lets `HolidayDTO` cross into the domain. The pure calendar context imports `@application/dto/holiday/types` directly, which is a layering inversion on paper: the type describes a Holiday, so it belongs in the domain. It is a known pragmatic exception — moving it means touching every calendar module and its tests — and it is safe only because the file is types and one const object, evaluable inside a Web Worker with no DOM. See [ADR 0003](../../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md) and [`../../domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md). If anything with a runtime dependency is ever added to [`holiday/types.ts`](./holiday/types.ts), the planner breaks in the worker and no server-side test will catch it.
+That is what lets `HolidayDTO` cross into the domain. The pure calendar context imports `@application/dto/holiday/types` directly, which is a layering inversion on paper: the type describes a Holiday, so it belongs in the domain. It is a known pragmatic exception (moving it means touching every calendar module and its tests), and it is safe only because the file is types and one const object, evaluable inside a Web Worker with no DOM. See [ADR 0003](../../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md) and [`../../domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md). If anything with a runtime dependency is ever added to [`holiday/types.ts`](./holiday/types.ts), the planner breaks in the worker and no server-side test will catch it.
 
 `RegionDTO` also crosses outwards, but downwards only: `holidayDTO.create` takes the region list so `getRegionName` can turn a region code into a display label. No domain code imports it.
 
@@ -125,10 +125,10 @@ the message it explains move together. They did not: [`payment/schema.ts`](./pay
 hand-written strings said "Maximum amount is 10,000", one per bound per locale, each with its own grouping
 separator (`10.000`, `10 000`, `10,000`). Raising the cap made every bundle lie. The keys are
 `{max, number}` now, so ICU does the grouping per locale and the number comes from the schema.
-[`JsonLd.tsx`](../../ui/modules/shared/seo/JsonLd.tsx)'s `MINIMUM_DONATION` reads `AMOUNT_MIN` for the same reason — the structured data advertises a
+[`JsonLd.tsx`](../../ui/modules/shared/seo/JsonLd.tsx)'s `MINIMUM_DONATION` reads `AMOUNT_MIN` for the same reason: the structured data advertises a
 `minPrice`, and the app guide used to say the two "move together" as an instruction to the reader.
 
-**There is one `calculateFinalAmount` now, and it is the private one in `@infrastructure/services/payments/provider/promoCode` that actually applies a Stripe coupon.** This folder used to export a second function of the same name whose whole body was `discountInfo?.finalAmount ?? baseAmount` — one caller, three tests, and a paragraph here whose only job was to stop a reader confusing it with the one that does the work. [`Donate.tsx`](../../ui/modules/shared/donate/Donate.tsx) reads the field directly.
+**There is one `calculateFinalAmount` now, and it is the private one in `@infrastructure/services/payments/provider/promoCode` that actually applies a Stripe coupon.** This folder used to export a second function of the same name whose whole body was `discountInfo?.finalAmount ?? baseAmount`: one caller, three tests, and a paragraph here whose only job was to stop a reader confusing it with the one that does the work. [`Donate.tsx`](../../ui/modules/shared/donate/Donate.tsx) reads the field directly.
 
 ## Testing
 

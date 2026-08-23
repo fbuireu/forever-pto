@@ -7,9 +7,9 @@ the thing it happens to, and `@domain/*` holds the rules. Nothing here construct
 socket or reads a request.
 
 It is unusual in one respect: it has a server half and a browser half, and they share almost nothing. The
-server half — `use-cases/`, the Zod schemas in `dto/`, [`shared/utils/zodParse.ts`](./shared/utils/zodParse.ts), `email/` — is Effect
-programs run at a route handler or a server action. The browser half — `stores/`, `export/`,
-[`i18n/navigation.ts`](./i18n/navigation.ts) — is Zustand and plain functions, and it is where most of the product actually lives,
+server half (`use-cases/`, the Zod schemas in `dto/`, [`shared/utils/zodParse.ts`](./shared/utils/zodParse.ts), `email/`) is Effect
+programs run at a route handler or a server action. The browser half (`stores/`, `export/`,
+[`i18n/navigation.ts`](./i18n/navigation.ts)) is Zustand and plain functions, and it is where most of the product actually lives,
 because the planner runs client-side ([ADR 0001](../../../../adr/0001-planner-runs-in-the-browser.md)). The
 two halves are joined only by `dto/` and [`shared/utils/dates.ts`](./shared/utils/dates.ts).
 
@@ -22,9 +22,9 @@ two halves are joined only by `dto/` and [`shared/utils/dates.ts`](./shared/util
 | `use-cases/` | The four Effect programs that combine more than one service. See [`use-cases/CLAUDE.md`](./use-cases/CLAUDE.md) | server |
 | `email/templates/` | `Contact.tsx`, the React Email document `sendContactEmail` renders to HTML | server |
 | `export/` | [`generateIcs.ts`](./export/generateIcs.ts) builds an RFC 5545 calendar string from Holidays and PTO Days; `utils/sanitizer.ts` escapes the four characters that would break a line; [`utils/serializers.ts`](./export/utils/serializers.ts) holds the two ICS date formats, which live here rather than in the shared date library because nothing else speaks them | browser |
-| `i18n/` | `navigation.ts` — `Link`, `useRouter`, `usePathname` bound to the next-intl routing config, so every internal link carries the locale prefix | browser |
-| `shared/dto/` | [`baseDTO.ts`](./shared/dto/baseDTO.ts) — the `BaseDTO<INPUT, OUTPUT, PARAMS>` contract every mapper implements | both |
-| `shared/utils/` | `dates.ts` — calendar arithmetic, comparison and formatting; [`dateIntake.ts`](./shared/utils/dateIntake.ts) — the two ways a date arrives from outside; `zodParse.ts` — Zod validation lifted into an Effect that fails with `ValidationError`; [`collate.ts`](./shared/utils/collate.ts) — `collateByLabel`, the one place a localised option list is ordered | `dates.ts`, `dateIntake.ts` and `collate.ts` both, `zodParse.ts` server |
+| `i18n/` | `navigation.ts`: `Link`, `useRouter`, `usePathname` bound to the next-intl routing config, so every internal link carries the locale prefix | browser |
+| `shared/dto/` | [`baseDTO.ts`](./shared/dto/baseDTO.ts) holds the `BaseDTO<INPUT, OUTPUT, PARAMS>` contract every mapper implements | both |
+| `shared/utils/` | `dates.ts`: calendar arithmetic, comparison and formatting; [`dateIntake.ts`](./shared/utils/dateIntake.ts): the two ways a date arrives from outside; `zodParse.ts`: Zod validation lifted into an Effect that fails with `ValidationError`; [`collate.ts`](./shared/utils/collate.ts): `collateByLabel`, the one place a localised option list is ordered | `dates.ts`, `dateIntake.ts` and `collate.ts` both, `zodParse.ts` server |
 
 ## Layer rules
 
@@ -45,7 +45,7 @@ than a tag, because a Zustand action has no Effect context to yield one out of. 
 because that client's own top-level imports would land in the client chunk of every component that reads a
 store. Both halves of that exception are deliberate; see [`stores/CLAUDE.md`](./stores/CLAUDE.md).
 
-**[`email/templates/Contact.tsx`](./email/templates/Contact.tsx) is the only React in the layer**, and it is not DOM React — its elements
+**[`email/templates/Contact.tsx`](./email/templates/Contact.tsx) is the only React in the layer**, and it is not DOM React: its elements
 come from `@react-email/components` and it is rendered to a string by `render()` inside `sendContactEmail`.
 Tailwind classes on it are compiled by React Email's own `Tailwind` wrapper, not by the app's stylesheet.
 

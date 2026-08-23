@@ -13,14 +13,14 @@ The rest of the application layer contract is in [`../CLAUDE.md`](../CLAUDE.md).
 
 | File | Holds |
 | --- | --- |
-| [`filters.ts`](./filters.ts) | `useFiltersStore` — the planning inputs |
-| [`holidays.ts`](./holidays.ts) | `useHolidaysStore` — the calendar, the plan, and the user's edits to it |
-| [`location.ts`](./location.ts) | `useLocationStore` — the Country and Region option lists |
-| [`premium.ts`](./premium.ts) | `usePremiumStore` — the Premium session and the upgrade modal |
-| [`ui.ts`](./ui.ts) | `useUIStore` — donate popover and currency; the one store with no persistence |
+| [`filters.ts`](./filters.ts) | `useFiltersStore`, the planning inputs |
+| [`holidays.ts`](./holidays.ts) | `useHolidaysStore`, the calendar, the plan, and the user's edits to it |
+| [`location.ts`](./location.ts) | `useLocationStore`, the Country and Region option lists |
+| [`premium.ts`](./premium.ts) | `usePremiumStore`, the Premium session and the upgrade modal |
+| [`ui.ts`](./ui.ts) | `useUIStore`: donate popover and currency; the one store with no persistence |
 | [`crypto.ts`](./crypto.ts) | `obfuscatedStorage`, the zustand `PersistStorage` the four persisted stores share. Not a store |
 | [`utils/crypto.ts`](./utils/crypto.ts) | `obfuscate` / `deobfuscate` / `base64Encode` / `base64Decode`, plus `TWENTY_FOUR_HOURS` and `BASE64_PATTERN`. Not a store |
-| [`types.ts`](./types.ts) | The action parameter objects shared between the stores and their callers — `GenerateSuggestionsParams`, `MainThreadSuggestionsParams`, `FetchHolidaysParams`, `PlanningWindowParams`, `AddHolidayParams`, `EditHolidayParams`, `AlternativeSelectionBaseParams` — plus the outcomes the actions answer with: `DayRefusal`/`DayOutcome` and `HolidayRefusal`/`HolidayOutcome` |
+| [`types.ts`](./types.ts) | The action parameter objects shared between the stores and their callers (`GenerateSuggestionsParams`, `MainThreadSuggestionsParams`, `FetchHolidaysParams`, `PlanningWindowParams`, `AddHolidayParams`, `EditHolidayParams`, `AlternativeSelectionBaseParams`), plus the outcomes the actions answer with: `DayRefusal`/`DayOutcome` and `HolidayRefusal`/`HolidayOutcome` |
 
 ## The five stores
 
@@ -198,7 +198,7 @@ re-fetches Holidays) and would otherwise strand it, spending budget with no way 
 either `{ applied: true }` or `{ applied: false, reason }`, with `HolidayOutcome` additionally carrying
 `heldBy` so a caller can name the Holiday already on the date without looking it up. They used to answer
 `boolean` (or nothing at all), which is why [`calendar/Calendar.tsx`](../../ui/modules/pages/planner/calendar/Calendar.tsx), [`AddHolidayModal.tsx`](../../ui/modules/pages/planner/holidays/components/AddHolidayModal.tsx) and
-[`EditHolidayModal.tsx`](../../ui/modules/pages/planner/holidays/components/EditHolidayModal.tsx) each reimplemented the occupancy check purely to pick a toast — four hand-rolled
+[`EditHolidayModal.tsx`](../../ui/modules/pages/planner/holidays/components/EditHolidayModal.tsx) each reimplemented the occupancy check purely to pick a toast: four hand-rolled
 `toDateString()` comparisons for one rule, kept in agreement by review. The reasons are the distinctions the
 copy actually needs: a weekend, a National or Regional Holiday and a Custom Holiday are three different
 refusals because the UI says three different things. Adding a refusal branch means adding a reason, not a
@@ -332,8 +332,8 @@ otherwise pull in. Converting one to a static import is not a tidy-up.
 
 **`generateMetrics` is the exception, and it is imported statically.** `toggleDaySelection` is synchronous and
 returns a `boolean`, so it cannot await an import without changing its signature and every call site with it.
-The cost is real — that import drags [`metrics/utils/helpers.ts`](../../domain/calendar/metrics/utils/helpers.ts) and `temporal-polyfill` behind it into any
-chunk that reads this store — and making it dynamic is not a tidy-up either.
+The cost is real (that import drags [`metrics/utils/helpers.ts`](../../domain/calendar/metrics/utils/helpers.ts) and `temporal-polyfill` behind it into any
+chunk that reads this store), and making it dynamic is not a tidy-up either.
 
 ## Logging is reached through a dynamic import
 
@@ -357,7 +357,7 @@ different module with no SDK behind it.
 ## Gotchas
 
 **`fetchHolidays` and `fetchRegions` do no network I/O.** Both resolve out of the bundled `date-holidays`
-dataset in the browser — `getHolidays.ts` is `async` but local, and [`getRegions.ts`](../../infrastructure/services/regions/getRegions.ts) is outright synchronous.
+dataset in the browser: `getHolidays.ts` is `async` but local, and [`getRegions.ts`](../../infrastructure/services/regions/getRegions.ts) is outright synchronous.
 The names are historical. Nothing in this folder makes an HTTP request except `premium.ts`, which calls
 `/api/check-session` through `@ui/adapters/session/checkSession`.
 
