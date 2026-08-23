@@ -33,7 +33,7 @@ pnpm build            # next build
 pnpm preview          # the real Workers runtime, via OpenNext
 ```
 
-Or from this directory with `pnpm <script>` directly. Copy `.env.example` to `.env.development` and fill
+Or from this directory with `pnpm <script>` directly. Copy [`.env.example`](./.env.example) to `.env.development` and fill
 it in; Worker secrets for a local run go in `.dev.vars`.
 
 **Node 26.3.0 and pnpm 11.21.0 are pinned and must match exactly.** So are Next 16.2 and TypeScript 6,

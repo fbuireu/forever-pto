@@ -377,7 +377,7 @@ counted the Holidays in a month carrying `isInSelectedRange` and answered that a
 but [`CONTEXT.md`](../../../../../CONTEXT.md) defines a **Free Day** as any non-working day, weekends
 included, so the action published a store-level name for a rule the glossary contradicts. Its only
 references were its own line in the actions interface, its implementation and one `describe` block, and it
-never had a caller in `src/`, in `apps/docs/src` or in `e2e/`. A wrong domain word on the public surface of
+never had a caller in `src/`, in [`apps/docs/src`](../../../../docs/src) or in `e2e/`. A wrong domain word on the public surface of
 a store is a liability even at zero call sites, because the next reader will believe it; the deletion is
 again the fix. Anything that genuinely needs a per-month count derives it from `holidays` at the call site,
 under a name the glossary agrees with.

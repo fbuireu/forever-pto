@@ -175,5 +175,5 @@ lower-cases the Country and normalises the package's absent answer to `null`.
 
 It carried the `public`/`bank` filter and the `location` stamp until those became `keepNonWorking` and
 `stampRegion` — and then carried them again by *calling* them, which is what put them out of the fixture's
-reach. They are applied in `observedHolidays` now, above the seam. A new rule goes in `source/utils/` and is
+reach. They are applied in `observedHolidays` now, above the seam. A new rule goes in [`source/utils/`](./source/utils) and is
 composed there; putting it in the adapter makes it unreachable from every test that uses the fixture.

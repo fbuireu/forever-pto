@@ -15,7 +15,7 @@ The largest single thing in here is a browser file — the Web Worker.
 
 | Directory | Contents |
 | --- | --- |
-| `actions/` | The two `'use server'` entry points: `payment.ts` and `contact.ts`. They read request-scoped config and hand it to the matching operation under `api/operations/` |
+| `actions/` | The two `'use server'` entry points: `payment.ts` and `contact.ts`. They read request-scoped config and hand it to the matching operation under [`api/operations/`](./api/operations) |
 | `api/` | The wire vocabulary for failures, the no-store response helper, and the operations both transports terminate. See [`api/CLAUDE.md`](./api/CLAUDE.md) |
 | `clients/` | SDK wrappers — four Effect service tags plus four modules that are deliberately not services. See [`clients/CLAUDE.md`](./clients/CLAUDE.md) |
 | `i18n/` | [`routing.ts`](./i18n/routing.ts) (next-intl routing, `localePrefix: 'as-needed'`), [`config.ts`](./i18n/config.ts) (request config + message loading), [`locales.ts`](./i18n/locales.ts) (the six codes and `LOCALE_COOKIE`), [`cookie.ts`](./i18n/cookie.ts) (writes `NEXT_LOCALE` with the flags next-intl's own cookie lacks), [`utils/url.ts`](./i18n/utils/url.ts) (`localePath`, `resolveLocale`, `getLocaleFromPathname`, `routePathFromPathname`, `localeFromAcceptLanguage`, `localeAlternates`) |

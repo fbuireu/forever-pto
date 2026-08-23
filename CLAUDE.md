@@ -13,8 +13,8 @@ omits.
 
 | Package | Guide | What it is |
 | --- | --- | --- |
-| `apps/web` (`forever-pto`) | [`./apps/web/CLAUDE.md`](./apps/web/CLAUDE.md) | The planner. Next 16 App Router on Cloudflare Workers through OpenNext |
-| `apps/docs` (`forever-pto-docs`) | [`./apps/docs/CLAUDE.md`](./apps/docs/CLAUDE.md) | docs.forever-pto.com. Astro Starlight, rendering the app's real components |
+| [`apps/web`](./apps/web) (`forever-pto`) | [`./apps/web/CLAUDE.md`](./apps/web/CLAUDE.md) | The planner. Next 16 App Router on Cloudflare Workers through OpenNext |
+| [`apps/docs`](./apps/docs) (`forever-pto-docs`) | [`./apps/docs/CLAUDE.md`](./apps/docs/CLAUDE.md) | docs.forever-pto.com. Astro Starlight, rendering the app's real components |
 
 ## Layout
 
@@ -35,7 +35,7 @@ not before — see [ADR 0010](./adr/0010-apps-web-and-apps-docs-monorepo-layout.
 
 ## Versions (pinned — match exactly)
 
-- Node **26.3.0** (`.nvmrc`, mirrored in `engines.node`) — `.nvmrc` is what every CI job installs
+- Node **26.3.0** ([`.nvmrc`](./.nvmrc), mirrored in `engines.node`) — `.nvmrc` is what every CI job installs
 - pnpm **11.21.0** (`packageManager`) — always use pnpm, never npm/yarn
 - TypeScript **6** and Next **16.2** — pinned as a pair by the Cloudflare adapter. That constraint belongs
   to the app; the reasoning is in [`./apps/web/CLAUDE.md`](./apps/web/CLAUDE.md) and
@@ -74,7 +74,7 @@ Its `files.includes` exclusions are repo-relative paths, so any future move has 
 `tests/docs-consistency.test.ts` asserts every one that names a literal path still resolves. `.astro` files are excluded from the **linter** only: Biome parses just
 their frontmatter, so every import used in the template body reads as unused. `astro check` covers them.
 
-**One lockfile, at the root.** `.gitignore` carries `apps/*/pnpm-lock.yaml` so a stray per-package lockfile
+**One lockfile, at the root.** [`.gitignore`](./.gitignore) carries `apps/*/pnpm-lock.yaml` so a stray per-package lockfile
 cannot shadow the workspace resolution.
 
 **The root package is `forever-pto-monorepo`, private, at `0.0.0`, with no dependencies.** A dependency
@@ -115,8 +115,8 @@ app release publishes `web-v1.0.0` over a 1.8.x line, which cannot be recalled f
 
 **A change confined to the repo root releases nothing** — `adr/`, `tests/`, `README.md`, `CONTEXT.md`, this
 file. That is correct and occasionally surprising. **It is narrower than it reads**: `WEB_PATHS` in `ci.yml`
-also matches [`package.json`](./package.json), `pnpm-workspace.yaml`, [`biome.json`](./biome.json), `.npmrc`, `.nvmrc` and
-`.github/actions/`, all of which do cut a release. That is deliberate — each of them changes what the app
+also matches [`package.json`](./package.json), `pnpm-workspace.yaml`, [`biome.json`](./biome.json), [`.npmrc`](./.npmrc), `.nvmrc` and
+[`.github/actions/`](./.github/actions), all of which do cut a release. That is deliberate — each of them changes what the app
 builds from — but it means "the repo root" is not the boundary; the regex is.
 
 ## CI
@@ -128,7 +128,7 @@ on a PR. Both deploy jobs call the shared [`_deploy-web.yml`](./.github/workflow
 renovate auto-merge, a `zizmor` audit, and [`dependabot-auto-merge.yml`](./.github/workflows/dependabot-auto-merge.yml) — which is **dormant**: there is no
 `.github/dependabot.yml` in the tree, so nothing ever triggers it. It is kept for the day one appears.
 
-Every job that needs a toolchain uses the `.github/actions/prepare-env` composite — pnpm, the `.nvmrc` Node,
+Every job that needs a toolchain uses the [`.github/actions/prepare-env`](./.github/actions/prepare-env) composite — pnpm, the `.nvmrc` Node,
 `setup-node`'s dependency cache and `pnpm install --frozen-lockfile` — rather than repeating five steps.
 `checkout` stays in the job, because the release jobs need their own (`fetch-depth: 0` and the PAT).
 
@@ -231,7 +231,7 @@ passed the `CI` workflow, and failed in a workflow called **Docs** that does not
 *was* blocking depended on branch protection, and this repo has already been bitten once by the required
 checks not including the one that mattered.
 
-**What that tail does *not* cover is a `@ui/…` specifier pointing at nothing.** Moving a component between folders under `apps/web/src/ui/` left a demo importing the old path; `astro check` reported zero errors and only `astro build` failed, in the Docs workflow, after the app's CI had gone green. `tests/docs-consistency.test.ts` resolves every one of those specifiers now.
+**What that tail does *not* cover is a `@ui/…` specifier pointing at nothing.** Moving a component between folders under [`apps/web/src/ui/`](./apps/web/src/ui) left a demo importing the old path; `astro check` reported zero errors and only `astro build` failed, in the Docs workflow, after the app's CI had gone green. `tests/docs-consistency.test.ts` resolves every one of those specifiers now.
 
 ## Deploy
 
@@ -273,7 +273,7 @@ promise, not a fix.
 | A behaviour a doc states as an invariant or a gotcha | that bullet, or delete it if it stopped being true |
 | A layer's allowed imports | that layer's `CLAUDE.md`, and the ADR that decided the boundary |
 | A package script, a path alias, or the folder tree | the *Commands* section here or in the package guide, and `README.md` if it lists the script |
-| A translation key | all six bundles under `apps/web/src/ui/i18n/messages/` — parity is asserted |
+| A translation key | all six bundles under [`apps/web/src/ui/i18n/messages/`](./apps/web/src/ui/i18n/messages) — parity is asserted |
 | A decision an ADR records | that ADR — amend it, or supersede it and say so in both `## Status` blocks |
 
 [`tests/docs-consistency.test.ts`](./tests/docs-consistency.test.ts) makes the mechanical half of that
@@ -283,7 +283,7 @@ call signature or a source-file name, every term defined, no empty `_Avoid_` lis
 its own alternative; that the workspace globs resolve, both packages are members with their own manifests,
 the root stays private and dependency-free at `0.0.0`, neither package carries its own Biome config or
 lockfile, and every literal path Biome's `files.includes` excludes still resolves; that every layer root has a `CLAUDE.md`, that both package guides exist and are listed here, and
-that every guide under `apps/web/src` is listed in the web package's own table; that ADRs are named
+that every guide under [`apps/web/src`](./apps/web/src) is listed in the web package's own table; that ADRs are named
 `NNNN-slug.md`, numbered contiguously from `0001`, carry the template's sections, and are each linked from
 some document **outside** `adr/` — an ADR nothing points at will not be read; that every relative markdown
 link resolves, every `.ts`/`.tsx` file named in backticks still exists, no document cites a nested

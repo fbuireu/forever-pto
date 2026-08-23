@@ -26,8 +26,8 @@ the app, or a real `packages/` workspace member. Neither is as cheap as it looks
   [`tests/docs-consistency.test.ts`](../tests/docs-consistency.test.ts) (which asserts every layer root has a `CLAUDE.md`), and an answer to the
   question of what else belongs there — a tier with one file in it invites everything.
 - A `packages/` member contradicts [ADR 0010](./0010-apps-web-and-apps-docs-monorepo-layout.md), which says
-  the tier appears the day a real shared package exists. One file that only `apps/web` imports is not that
-  day; `apps/docs` reaches app sources through the `@ui` alias and does not import this module at all.
+  the tier appears the day a real shared package exists. One file that only [`apps/web`](../apps/web) imports is not that
+  day; [`apps/docs`](../apps/docs) reaches app sources through the `@ui` alias and does not import this module at all.
 - Moving it *down* into `domain/` is worse than the problem. `domain/` holds two bounded contexts and
   nothing else, so the file would either become a third thing that is not a context, or land inside
   `calendar/` — from where the UI, the export and the DTOs would all import planning-engine internals to get

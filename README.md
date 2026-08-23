@@ -73,7 +73,7 @@ pnpm --filter forever-pto-docs dev   # docs dev server
 
 ## Getting started
 
-**Requirements:** Node.js 26.3.0 (`.nvmrc`, mirrored in `engines.node`), pnpm 11.21.0 (`packageManager`) — pinned, match exactly
+**Requirements:** Node.js 26.3.0 ([`.nvmrc`](./.nvmrc), mirrored in `engines.node`), pnpm 11.21.0 (`packageManager`) — pinned, match exactly
 
 ```bash
 # Install dependencies
@@ -130,7 +130,7 @@ See [`apps/web/.env.example`](apps/web/.env.example) for the full list. Key vari
 | [`CONTEXT.md`](CONTEXT.md) | The domain glossary — one canonical name per concept |
 | [`adr/`](adr/) | Why it is like this. One hard-to-reverse decision per file |
 
-Selected folders under `apps/web/src/` carry their own `CLAUDE.md` with the detail for that folder — the five layer roots plus sixteen sub-folders, all listed in [`apps/web/CLAUDE.md`](apps/web/CLAUDE.md).
+Selected folders under [`apps/web/src/`](./apps/web/src) carry their own `CLAUDE.md` with the detail for that folder — the five layer roots plus sixteen sub-folders, all listed in [`apps/web/CLAUDE.md`](apps/web/CLAUDE.md).
 [`tests/docs-consistency.test.ts`](tests/docs-consistency.test.ts) runs with the unit suite and fails the build
 when the docs and the code disagree.
 
