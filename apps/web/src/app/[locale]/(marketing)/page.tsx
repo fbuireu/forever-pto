@@ -1,4 +1,5 @@
 import { LOCALES } from "@infrastructure/i18n/locales";
+import { routeMetadata } from "@infrastructure/seo/routeMetadata";
 import { Comparison } from "@ui/modules/pages/homepage/sections/Comparison";
 import { Faq } from "@ui/modules/pages/homepage/sections/Faq";
 import { Features } from "@ui/modules/pages/homepage/sections/Features";
@@ -14,7 +15,7 @@ import { FaqJsonLd } from "@ui/modules/shared/seo/JsonLd";
 import type { Locale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 
-export { generateMetadata } from "./metadata";
+export const generateMetadata = routeMetadata("");
 
 interface PageProps {
 	params: Promise<{ locale: Locale }>;

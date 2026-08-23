@@ -1,6 +1,7 @@
 import { Link } from "@application/i18n/navigation";
 import { getBetterStackInstance } from "@infrastructure/clients/logging/better-stack/client";
 import { ApplicationLayer } from "@infrastructure/layers";
+import { routeMetadata } from "@infrastructure/seo/routeMetadata";
 import { confirmation } from "@infrastructure/services/payments/confirmation";
 import { ACTIVATION_FAILED } from "@infrastructure/services/premium/activation";
 import { Button } from "@ui/modules/core/primitives/Button";
@@ -12,7 +13,7 @@ import { redirect } from "next/navigation";
 import type { Locale } from "next-intl";
 import { getFormatter, getTranslations } from "next-intl/server";
 
-export { generateMetadata } from "./metadata";
+export const generateMetadata = routeMetadata("/payment/confirmation");
 
 interface PaymentSuccessParams {
 	searchParams: Promise<{

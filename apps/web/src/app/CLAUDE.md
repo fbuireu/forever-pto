@@ -72,9 +72,14 @@ failure channel onto a status code. Business logic that lands here is in the wro
 3. Redirects `**/payment/confirmation` to the locale home when `payment_intent` is absent.
 4. Runs the `next-intl` middleware, which negotiates the locale and fills the `[locale]` segment.
 5. Re-writes the `NEXT_LOCALE` cookie next-intl just set, through `setLocaleCookie`
-   ([`src/infrastructure/i18n/cookie.ts`](../infrastructure/i18n/cookie.ts)), which adds `httpOnly`, `secure`, `sameSite: 'lax'` and `path: '/'`.
-   It looks redundant and is not — next-intl's own cookie carries none of those. [`middleware.test.ts`](../middleware.test.ts) guards
-   it under `describe('locale cookie hardening')`.
+   ([`src/infrastructure/i18n/cookie.ts`](../infrastructure/i18n/cookie.ts)), which applies `LOCALE_COOKIE_POLICY` — `secure`,
+   `sameSite: 'lax'`, `path: '/'`. **It is the same object `routing.ts` gives next-intl**, which is the
+   point: the client-side language switcher writes this cookie too, from `document.cookie`, and the two
+   writers have to agree. This step used to say next-intl's own cookie "carries none of those", which was
+   wrong about `secure` and `sameSite` — and it used to add `httpOnly`, which silently broke every soft
+   locale switch. See [`src/infrastructure/CLAUDE.md`](../infrastructure/CLAUDE.md). [`middleware.test.ts`](../middleware.test.ts) guards the step under
+   `describe('locale cookie policy')`; the policy itself is asserted in
+   [`src/infrastructure/i18n/cookie.test.ts`](../infrastructure/i18n/cookie.test.ts).
 6. Hands the response to the location proxy ([`src/infrastructure/proxy/location.ts`](../infrastructure/proxy/location.ts)), which sets the
    detected-country cookie.
 
@@ -141,8 +146,8 @@ render for it to opt out of. Copy the explicit-locale form or the `setRequestLoc
 Groups do not affect the URL — `(app)` and `(marketing)` exist purely to give two different chromes.
 
 **`(marketing)`** has a group-level `layout.tsx` (header, footer, toaster) and its own `error.tsx`. Its
-pages are fully static: `page.tsx` declares `generateStaticParams`, and `metadata.ts` marks the homepage
-indexable while every `legal/` page sets `robots: { index: false }`.
+pages are fully static: `page.tsx` declares `generateStaticParams`, and indexability comes off `SITE_ROUTES`
+rather than out of the page — the homepage's row says indexable, every `legal/` row says it is not.
 
 **`(app)`** has *no* group-level layout. The sidebar shell lives one level down in `planner/layout.tsx`,
 so `payment/confirmation/` deliberately renders bare — a Stripe return should not come back into the
@@ -151,9 +156,18 @@ the `confirmation` Effect program and has a `loading.tsx` for the round trip.
 
 ## Metadata
 
-Every route that needs metadata keeps a sibling `metadata.ts` exporting `generateMetadata`, which the
-page re-exports (`export { generateMetadata } from './metadata';`). The split is what makes the metadata
-unit-testable on its own — hence the [`metadata.test.ts`](../infrastructure/services/payments/provider/metadata.test.ts) next to each one.
+**A route that needs metadata declares it in its own `page.tsx`, in one line:**
+
+```ts
+export const generateMetadata = routeMetadata('/legal/privacy-policy');
+```
+
+There were seven sibling `metadata.ts` files, each three lines long — an import of `routeMetadata` and that
+same export — plus seven `export { generateMetadata } from './metadata';` edges re-exporting them. The split
+was there to make the metadata unit-testable on its own; once `routeMetadata` existed there was nothing
+route-specific left in those files to test, and [`routeMetadata.test.ts`](../infrastructure/seo/routeMetadata.test.ts) covers the one behaviour they
+had. `metadata.ts` is not a Next file convention — only `page.tsx` is read for `generateMetadata` — so the
+separate file bought a second module and an indirection, and nothing else. Do not reintroduce one.
 
 **The shape lives in one module; each file supplies only what its route knows.** `buildMetadata` under
 `@infrastructure/seo` owns `metadataBase`, the `alternates` pair, `openGraph`, `twitter`, the `robots` block
@@ -228,11 +242,24 @@ route handler or a server action can, and that constraint is what decides this s
 **It is a GET that grants an entitlement**, which is exactly the thing to be careful about, so it carries
 four guards:
 
-- **The client secret is required and verified.** `activateWithPayment` compares it against the retrieved
-  intent's own `client_secret` through `matchesClientSecret` ([`src/infrastructure/services/premium/activation.ts`](../infrastructure/services/premium/activation.ts)),
-  in constant time and length-first. Without it, anyone holding a leaked payment intent id could mint a
-  session. The length check is not tidiness: `charCodeAt` past the end returns `NaN`, `NaN | 0` is `0`, so a
-  length-blind loop accepts any prefix.
+- **The client secret is required and verified — and that is now true of the *type*, not just of this
+  route.** `activateWithPayment` takes `{ paymentIntentId, clientSecret }` with both required, and compares
+  the secret against the retrieved intent's own `client_secret` through `matchesClientSecret`
+  ([`src/infrastructure/services/premium/activation.ts`](../infrastructure/services/premium/activation.ts)), in constant time and length-first. Without it,
+  anyone holding a leaked payment intent id could mint a session. The length check is not tidiness:
+  `charCodeAt` past the end returns `NaN`, `NaN | 0` is `0`, so a length-blind loop accepts any prefix.
+
+  This paragraph used to be a claim about the route rather than about the use-case. One function served
+  both activation paths with `expectedEmail?` **and** `clientSecret?` optional, and its body read
+  `if (clientSecret && !matchesClientSecret(...))` — omit the field and the guard did not run. Neither
+  call site did omit it, but nothing said they could not, and half the use-case's own tests called it with
+  no guard at all. It is two total entry points now, one per caller:
+  [`activatePremium.ts`](../application/use-cases/activatePremium.ts) exports `activateWithPayment({ paymentIntentId, clientSecret })` for this route
+  and `activateWithClaimedPayment({ paymentIntentId, expectedEmail })` for the `POST /api/check-session`
+  recovery path, over one private implementation. **This is not a new exposure and does not close an old
+  one** — [ADR 0008](../../../../adr/0008-premium-derived-from-payment.md) already accepts that the recovery path grants Premium to whoever types
+  an address with a succeeded payment behind it. What changed is that the interface no longer implies
+  otherwise.
 - **`redirect_status` short-circuits.** Stripe says whether the redirect succeeded; if it did not, the
   handler never calls Stripe at all.
 - **Rate-limited on `cf-connecting-ip`**, through the same `checkRateLimit` the payment route uses.
@@ -335,7 +362,7 @@ importing the other five.
 [ADR 0004](../../../../adr/0004-cloudflare-workers-as-deployment-target.md). In this folder the only direct readers are
 `api/markdown/route.ts` and `.well-known/[...slug]/route.ts`. `api/contact/route.ts` reaches it through
 [`getRequestPublicEnv.ts`](../infrastructure/services/env/getRequestPublicEnv.ts), the per-request reader it shares with the contact server action; `sitemap.ts`,
-`robots.ts` and the `metadata.ts` files reach it through `getPublicEnv.ts`, the cached one.
+`robots.ts` and `routeMetadata` reach it through `getPublicEnv.ts`, the cached one.
 
 The `{ async: true }` form is not interchangeable with the bare call, but the split is not request versus
 no-request. Only the async form works where there may be no request, so everything evaluable outside one —
@@ -371,8 +398,8 @@ rather than `row | undefined`. The one cast in [`routes.ts`](../infrastructure/s
 because the table is the only source of both its keys and its values.
 
 **The per-route tests could not fail for the reason they existed.** Each mocked `getTranslations` as
-`(key) => \`t:${key}\`` — discarding the namespace — so `privacy-policy/metadata.ts` could have read
-`metadata.termsOfService` and stayed green, and the namespace was the only thing those files decided for
+`(key) => \`t:${key}\`` — discarding the namespace — so the privacy policy's own metadata module could have
+read `metadata.termsOfService` and stayed green, and the namespace was the only thing those files decided for
 themselves. Everything else they asserted was `buildMetadata` behaviour, which [`buildMetadata.test.ts`](../infrastructure/seo/buildMetadata.test.ts) owns.
 
 Their replacement had to avoid the opposite trap, and the first draft did not: asserting
@@ -419,9 +446,10 @@ by the Tailwind theme in `@styles`, never by class names in this folder.
 
 ## Testing
 
-Every route file has a co-located test: `.test.ts` for handlers, `sitemap.ts`, `robots.ts` and the
-`metadata.ts` files, `.test.tsx` for pages, layouts and error boundaries. `loading.tsx` and `fonts.ts` are
-the exceptions — neither has behaviour worth asserting.
+Every route file has a co-located test: `.test.ts` for handlers, `sitemap.ts` and `robots.ts`, `.test.tsx`
+for pages, layouts and error boundaries. `loading.tsx` and `fonts.ts` are the exceptions — neither has
+behaviour worth asserting. Metadata is not tested here at all: it is one `routeMetadata(path)` call per page
+now, and `routeMetadata.test.ts` owns the behaviour — see *Metadata* above for why the per-route tests went.
 
 Handler tests mock the infrastructure module rather than the Effect layer where it is cheaper to do so
 ([`api/health/route.test.ts`](./api/health/route.test.ts) stubs `@infrastructure/api/response`), and reach for `vi.stubEnv` when a route

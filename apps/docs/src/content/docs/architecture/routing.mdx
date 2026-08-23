@@ -45,15 +45,20 @@ API routes live outside `[locale]` and are excluded from the middleware matcher 
 | Route | File | Purpose |
 | --- | --- | --- |
 | `POST /api/payment` | `apps/web/src/app/api/payment/route.ts` | Creates a Stripe PaymentIntent (rate-limited, Effect-based) |
+| `GET /api/payment/activate` | `apps/web/src/app/api/payment/activate/route.ts` | Stripe's `return_url`. Activates Premium and redirects to the confirmation page with the cookie already set |
 | `GET/POST /api/check-session` | `apps/web/src/app/api/check-session/route.ts` | Verifies / mints the premium JWT cookie |
 | `POST /api/contact` | `apps/web/src/app/api/contact/route.ts` | Contact form → Resend email + Turso record |
 | `POST /api/webhooks/stripe` | `apps/web/src/app/api/webhooks/stripe/route.ts` | Stripe webhook (payment succeeded/failed fallback) |
-| `GET /api/markdown` | `apps/web/src/app/api/markdown/route.ts` | Markdown rendition of any page, used by the middleware rewrite |
+| `GET /api/markdown` | `apps/web/src/app/api/markdown/route.ts` | Markdown rendition of a listed page. Only reachable — and only drivable — through the middleware rewrite |
 | `GET /api/health` | `apps/web/src/app/api/health/route.ts` | Health check |
+
+`GET /api/payment/activate` is the one that grants an entitlement, so it carries four guards: the Stripe client secret is required and compared against the retrieved intent's own in constant time, `redirect_status` short-circuits before Stripe is called at all, the request is rate-limited on `cf-connecting-ip`, and the redirect is explicitly `no-store` because it carries a `Set-Cookie`. Failure redirects with `activation=failed` rather than letting the confirmation page claim Premium is active.
 
 ## The `.well-known` catch-all
 
-`apps/web/src/app/.well-known/[...slug]/route.ts` maps a fixed set of slugs to handlers in `apps/web/src/infrastructure/well-known/`: `api-catalog`, `mcp/server-card.json` and `agent-skills/index.json`. Each handler receives the base URL from the Cloudflare environment (`getCloudflareContext`) and anything else returns a 404. Together with the markdown rewrite in the middleware, this is the app's agent-facing surface.
+`apps/web/src/app/.well-known/[...slug]/route.ts` is a lookup table, not a router. It joins the slug segments and asks `lookupWellKnownDocument` (`apps/web/src/infrastructure/well-known/documents.ts`) for one of three exact keys — `api-catalog`, `mcp/server-card.json` and `agent-skills/index.json` — and anything else is a 404. That table is a `Map`: as a plain object it answered `/.well-known/constructor` with an inherited `Object.prototype` function, which passed the presence guard and was then called as a handler.
+
+**The three document modules return plain objects; the route owns the envelope.** Each builder takes the base URL from the Cloudflare environment (`getCloudflareContext`) and returns a value; the route serialises it and sets the per-document `Content-Type` and the shared `WELL_KNOWN_CACHE_CONTROL` (`apps/web/src/infrastructure/well-known/slugs.ts`). A fourth document is a fourth entry in the map and nothing else. Together with the markdown rewrite in the middleware, this is the app's agent-facing surface.
 
 ## Error and not-found surfaces
 

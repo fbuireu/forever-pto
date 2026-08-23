@@ -15,7 +15,7 @@ const mockActivateWithEmail = vi.hoisted(() =>
 		) => Effect.Effect<{ email: string; premiumKey: string; token: string }, ValidationError | SessionError>
 	>(),
 );
-const mockActivateWithPayment = vi.hoisted(() =>
+const mockActivateWithClaimedPayment = vi.hoisted(() =>
 	vi.fn<
 		(
 			email: string,
@@ -33,7 +33,7 @@ vi.mock("@infrastructure/services/premium/session", () => ({
 
 vi.mock("@application/use-cases/activatePremium", () => ({
 	activateWithEmail: mockActivateWithEmail,
-	activateWithPayment: mockActivateWithPayment,
+	activateWithClaimedPayment: mockActivateWithClaimedPayment,
 }));
 
 vi.mock("@infrastructure/services/premium/cookie", () => ({
@@ -136,14 +136,14 @@ describe("POST /api/check-session", () => {
 		expect(mockSetPremiumCookie).toHaveBeenCalled();
 	});
 
-	it("activates with premiumKey when provided", async () => {
-		mockActivateWithPayment.mockReturnValue(
+	it("routes a body carrying a premiumKey to the claimed-payment entry point", async () => {
+		mockActivateWithClaimedPayment.mockReturnValue(
 			Effect.succeed({ email: "user@example.com", premiumKey: "pi_abc", token: "tok" }),
 		);
 		const response = await POST(makeRequest({ email: "user@example.com", premiumKey: "pi_abc" }) as never);
 		const body = await response.json();
 		expect(body.success).toBe(true);
-		expect(mockActivateWithPayment).toHaveBeenCalledWith({
+		expect(mockActivateWithClaimedPayment).toHaveBeenCalledWith({
 			paymentIntentId: "pi_abc",
 			expectedEmail: "user@example.com",
 		});

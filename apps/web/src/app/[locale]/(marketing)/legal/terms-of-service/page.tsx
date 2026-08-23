@@ -1,3 +1,4 @@
+import { routeMetadata } from "@infrastructure/seo/routeMetadata";
 import { getPublicEnv } from "@infrastructure/services/env/getPublicEnv";
 import { createRichLink } from "@ui/modules/core/primitives/RichLink";
 import { LegalLayout } from "@ui/modules/layout/LegalLayout";
@@ -9,7 +10,7 @@ const odrLink = createRichLink("https://ec.europa.eu/consumers/odr", { external:
 
 import { getTranslations } from "next-intl/server";
 
-export { generateMetadata } from "./metadata";
+export const generateMetadata = routeMetadata("/legal/terms-of-service");
 
 interface TermsOfServicePageProps {
 	params: Promise<{ locale: Locale }>;

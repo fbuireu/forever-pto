@@ -13,24 +13,43 @@ curl -H 'Accept: text/markdown' https://forever-pto.com/planner
 
 ## The rewrite
 
-Markdown negotiation is the **first** check in `apps/web/src/middleware.ts`:
+Markdown negotiation is the **first** thing `apps/web/src/middleware.ts` decides, and the matcher is what keeps it safe: `/api/*` and every dotted path (so all of `/.well-known/*`) never reach the middleware at all, which is why the rewrite branch carries no exclusion list of its own.
 
-- If the request's `Accept` header contains `text/markdown` and the path is not internal (`/api/*`, `/.well-known/*`), the middleware issues `NextResponse.rewrite` to `/api/markdown?path=<pathname>`. A rewrite, not a redirect — the URL the agent requested stays canonical.
-- Both the rewrite response and direct hits on `/api/markdown` get `Cache-Control: public, max-age=3600` (`MARKDOWN_CACHE_CONTROL` in the middleware), so repeated agent traffic is served from cache for an hour.
-- The middleware matcher explicitly includes `/api/markdown` (the only API path it touches) so the cache header applies there too.
+- A direct hit on `/api/markdown` passes through with the path header **deleted**. That branch is not decoration: without it a direct request carrying `Accept: text/markdown` would match the next rule and rewrite the route onto itself.
+- Any other request whose `Accept` header contains `text/markdown` is rewritten to `/api/markdown` — a rewrite, not a redirect, so the URL the agent asked for stays canonical.
+- **The pathname travels in a request header, not a query string.** The middleware `set`s `x-markdown-path` (`MARKDOWN_PATH_HEADER` in `apps/web/src/infrastructure/markdown/twin.ts`), which overwrites anything inbound. A rewrite does not change what a route handler reads from the URL — inside the handler `request.url` is still the URL the *visitor* asked for — so a `?path=` query never arrived, and a query the visitor appended themselves would have decided which page they were served.
+- **The middleware states no cache policy.** It cannot: it runs before the lookup, so anything it set would be a guess about a page it had not looked up yet.
 
 ## The route
 
-`apps/web/src/app/api/markdown/route.ts` is thin: it resolves `NEXT_PUBLIC_SITE_URL` from the Cloudflare context, reads the `path` query param (defaulting to `/`) and returns `buildMarkdownPage(baseUrl, pathname)` as `text/markdown; charset=utf-8`.
+`apps/web/src/app/api/markdown/route.ts` is thin, and reads *only* the header:
+
+- No `x-markdown-path` header → **404**. There is no fallback to the query string; the fallback is the vulnerability, not a convenience.
+- Otherwise it resolves `NEXT_PUBLIC_SITE_URL` from the Cloudflare context and calls `buildMarkdownPage(baseUrl, pathname)`.
+- `buildMarkdownPage` answering `null` — an unlisted path — is also a **404**, so the two representations of one URL agree. A 200 with the homepage's body would have told a crawler that `/does-not-exist` exists.
+
+## The headers
+
+One module states the cache policy, and it is the one that knows the outcome: `markdownTwinHeaders({ found })` in `apps/web/src/infrastructure/markdown/twin.ts` returns the content type, `Cache-Control` and `Vary` together.
+
+| | Found | Not found |
+| --- | --- | --- |
+| `Content-Type` | `text/markdown; charset=utf-8` | `text/plain; charset=utf-8` |
+| `Cache-Control` | `public, max-age=3600` | `no-store` |
+| `Vary` | `Accept` | `Accept` |
+
+A miss is `no-store` because it used to inherit the hit's hour, and a shared cache would then answer "Not Found" to everyone for that hour. `Vary: Accept` is on both branches: the body served under an HTML URL depends on the `Accept` header, so a cache keyed on the URL alone would hand the Markdown twin to the next visitor asking for HTML.
 
 ## Building the page
 
-`apps/web/src/infrastructure/markdown/buildMarkdownPage.ts` produces one of two documents:
+`apps/web/src/infrastructure/markdown/buildMarkdownPage.ts` reads `SITE_ROUTES` — the same table the sitemap, `robots.txt` and every `generateMetadata` read, with `titleKey` and `descriptionKey` on the row. It strips the locale segment with `routePathFromPathname` and looks the result up with `findRoute`, on an **exact** match:
 
-- **Planner** (paths containing `/planner`) — title and description from the `metadata` and `planner` i18n namespaces, a feature list, step-by-step usage, the app version (read from the root `package.json`) and the locale-prefixed planner URL.
-- **Everything else** — a site-level document: features, how it works, a pointer to `GET /api/health`, version and site URL.
+- **No row** — `null`, which the route turns into a 404. The lookup was once `pathname.includes(path)`, which resolved `/planner-comparison` *as* the planner and `/legal/privacy-policy-2024` as the privacy policy.
+- **`/planner`** — title and description from the `metadata` and `planner` i18n namespaces, a feature list, step-by-step usage, the app version (read from `apps/web/package.json`) and the locale-prefixed planner URL.
+- **The homepage** — a site-level document: features, how it works, a pointer to `GET /api/health`, version and site URL.
+- **Every other listed route** — its title, its description when it has one, the version and its URL.
 
-The locale is extracted from the pathname (`getLocaleFromPathname` in `apps/web/src/infrastructure/i18n/utils/url.ts`), so `/es/planner` returns Spanish Markdown. Content is translated with `getTranslations` — the same catalogs the HTML site uses (see [internationalization](/how-it-works/i18n/)).
+The locale is extracted from the pathname (`getLocaleFromPathname` in `apps/web/src/infrastructure/i18n/utils/url.ts`), so `/es/planner` returns Spanish Markdown. Content is translated with `createTranslator` over a statically imported catalog, not `getTranslations` — a route handler must not read the request-locale store through `next-intl/server`, and the locale here comes from the path rather than from the request (see [internationalization](/how-it-works/i18n/)).
 
 ## Related agent surfaces
 

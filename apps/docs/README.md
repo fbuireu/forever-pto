@@ -25,10 +25,10 @@ app's own tokens. Nothing here is a copy of a component — the demos import the
 ## Running it
 
 ```bash
-pnpm install                          # from the repository root, never filtered
-pnpm --filter forever-pto-docs dev    # dev server
-pnpm --filter forever-pto-docs build  # 155 pages
-pnpm --filter forever-pto-docs check  # astro check
+pnpm install                              # from the repository root, never filtered
+pnpm --filter forever-pto-docs dev        # dev server
+pnpm --filter forever-pto-docs build      # 155 pages
+pnpm --filter forever-pto-docs typecheck  # astro check
 ```
 
 **The install must not be filtered.** The demos compile app sources, and their bare imports resolve from

@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import ts from "typescript";
 import { describe, expect, it } from "vitest";
 
@@ -33,7 +33,9 @@ const BACKTICKED_TOKEN = /`([^`]+)`/g;
 const BACKTICKED_SOURCE_FILE = /`([^`\s]+\.(?:ts|tsx))`/g;
 const NESTED_CONTEXT_CITATION = /((?:[\w@-]+\/)+CONTEXT\.md)/g;
 const BACKTICKED_ALIAS = /`([^`.]+\/\*)`/g;
-const CITED_PNPM_SCRIPT = /\bpnpm ([a-z][a-z0-9:-]*)/g;
+const CITED_PNPM_SCRIPT = /\bpnpm (?:run )?([a-z][a-z0-9:-]*)/g;
+const CITED_FILTERED_PNPM_SCRIPT = /\bpnpm --filter (\S+) (?:run )?([a-z][a-z0-9:-]*)/g;
+const WORKFLOW_SHELL_STEP = /^(\s*)-?[ \t]*(?:run|command):[ \t]*(\|[-+]?)?[ \t]*(.*)$/;
 const ALIAS_WILDCARD_SUFFIX = /\/\*$/;
 const WORKSPACE_PACKAGE_GLOB = /^\s*-\s*['"]?([^'"\s#]+)['"]?\s*$/gm;
 
@@ -69,10 +71,62 @@ const webGuide = readIfPresent(`${WEB}/CLAUDE.md`);
 const rootManifest = readJson("package.json");
 const rootScripts: Record<string, string> = rootManifest.scripts ?? {};
 const webScripts: Record<string, string> = readJson(`${WEB}/package.json`).scripts ?? {};
+const docsScripts: Record<string, string> = readJson(`${DOCS}/package.json`).scripts ?? {};
+const scriptsByPackageName = new Map(
+	WORKSPACE_PACKAGES.map((pkg) => {
+		const manifest = readJson(`${pkg}/package.json`);
+		return [manifest.name as string, (manifest.scripts ?? {}) as Record<string, string>];
+	}),
+);
 const webTsconfig = readJson(`${WEB}/tsconfig.json`);
 const webTsconfigOptions: Record<string, unknown> = webTsconfig.compilerOptions;
 const webTsconfigExclude: string[] = webTsconfig.exclude ?? [];
 const webTsconfigPaths: Record<string, string[]> = webTsconfigOptions.paths as Record<string, string[]>;
+
+// The cross-package seam had three declarations of one string — the vite alias, `astro check`'s paths entry
+// and two hardcoded copies down in this file — and nothing compared them. `apps/docs/tsconfig.json` is the
+// declaration now; `astro.config.ts` derives the vite alias from it, and every rule below resolves through
+// this one map rather than spelling `apps/web/src/ui` again.
+const UI_ALIAS = "@ui/*";
+const docsTsconfigPaths: Record<string, string[] | undefined> =
+	readJson(`${DOCS}/tsconfig.json`).compilerOptions?.paths ?? {};
+const UI_ROOT = join(ROOT, DOCS, (docsTsconfigPaths[UI_ALIAS]?.[0] ?? "").replace(ALIAS_WILDCARD_SUFFIX, ""));
+const UI_ROOT_RELATIVE = relative(ROOT, UI_ROOT).replace(/\\/g, "/");
+const resolveUiSpecifier = (specifier: string) => join(UI_ROOT, specifier.replace("@ui/", ""));
+
+// A workflow is not markdown, so nothing above reaches it — and `.github/` sits under a dotfolder, which
+// `trackedFiles` drops wholesale. The commands are read out of it by hand: the value when it is inline, and
+// every line indented under it when it is a block scalar. `command:` counts as well as `run:` — every
+// wrangler and OpenNext call in this repo is wrapped in `nick-fields/retry`, which takes its shell script on
+// that input, so a rule reading only `run:` sees none of them.
+const WORKFLOW_DIR = ".github/workflows";
+const workflowFiles = readdirSync(join(ROOT, WORKFLOW_DIR))
+	.filter((file) => file.endsWith(".yml"))
+	.map((file) => `${WORKFLOW_DIR}/${file}`);
+
+// `_deploy-web.yml` is the one workflow written with CRLF, and `$` in a non-multiline pattern will not match
+// past the carriage return, so splitting on "\n" alone left every line of it unmatched and the rule silently
+// checking nothing there.
+const runCommands = (workflow: string) => {
+	const lines = workflow.split(/\r?\n/);
+	const collected: string[] = [];
+
+	lines.forEach((line, index) => {
+		const match = WORKFLOW_SHELL_STEP.exec(line);
+		if (!match) return;
+		const [, indent = "", block, inline = ""] = match;
+		if (!block) {
+			collected.push(inline);
+			return;
+		}
+		for (const body of lines.slice(index + 1)) {
+			if (body.trim().length > 0 && !body.startsWith(`${indent} `)) break;
+			collected.push(body);
+		}
+	});
+
+	return collected.join("\n");
+};
 
 describe("CONTEXT.md is the domain glossary and nothing else", () => {
 	const glossary = read("CONTEXT.md");
@@ -307,6 +361,61 @@ describe("documentation does not point at things that are gone", () => {
 		expect(offenders).toEqual([]);
 	});
 
+	// The wiki forked from the app and kept teaching behaviour the app had already fixed, and the worst of it
+	// was named in backticks: `MARKDOWN_CACHE_CONTROL` existed in exactly two places in the whole repo, both
+	// of them wiki lines claiming the middleware set a cache policy it does not set; `DISALLOWED_PAGES` and
+	// `RATE_LIMIT_KV` named a prefix list and a KV namespace that had both been replaced. Nothing could catch
+	// them: `astro check` registers no MDX plugin, the source-file rules match paths, and the `tsx`-fence rule
+	// only reaches an identifier that is imported in a fence. A constant is the shape that rots invisibly,
+	// because prose keeps reading correctly around it.
+	//
+	// The bar is existence, not export: `MIN_FINAL_AMOUNT` is module-private and `NEXT_LOCALE` is a cookie's
+	// value rather than its identifier, and the wiki is right to name both. What it may not do is invent one.
+	it("names only constants that exist somewhere in apps/web, in the published wiki", () => {
+		const SCREAMING_SNAKE = /^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+$/;
+		const CONSTANT_NAME = /[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+/g;
+
+		// A binding, a var and a workflow secret are all spelled like a constant and declared outside the
+		// sources, so the corpus is the package plus the workflows rather than `src/` alone.
+		const CONFIGURATION = [
+			`${WEB}/environment.d.ts`,
+			`${WEB}/wrangler.toml`,
+			`${WEB}/.env.example`,
+			`${WEB}/playwright.config.ts`,
+			`${WEB}/workers/tail/wrangler.toml`,
+			...workflowFiles,
+		];
+		const corpus = [
+			...sourceFiles.filter((path) => path.startsWith(`${WEB}/`)),
+			...CONFIGURATION.filter((path) => existsSync(join(ROOT, path))),
+		];
+
+		const declared = new Set<string>();
+		for (const file of corpus) {
+			for (const name of read(file).match(CONSTANT_NAME) ?? []) declared.add(name);
+		}
+
+		const offenders: string[] = [];
+		let checked = 0;
+
+		for (const file of contentFiles) {
+			// A fenced block opens with three backticks, and `BACKTICKED_TOKEN` pairs them one at a time: the
+			// fence body becomes a token and the two backticks left over pair with the next one in prose, so
+			// every span after the first fence on a page is off by one. Nothing downstream of a fence was being
+			// read, which is how a reinstated `MARKDOWN_CACHE_CONTROL` first went unnoticed here.
+			const prose = read(file).replace(/```[\s\S]*?```/g, "");
+			for (const [, token] of prose.matchAll(BACKTICKED_TOKEN)) {
+				if (!SCREAMING_SNAKE.test(token)) continue;
+				checked += 1;
+				if (!declared.has(token)) offenders.push(`${file} -> ${token}`);
+			}
+		}
+
+		expect(corpus.length).toBeGreaterThan(100);
+		expect(checked).toBeGreaterThan(50);
+		expect(offenders).toEqual([]);
+	});
+
 	// `astro check` does not resolve a `@ui/…` specifier that points at nothing: moving Switch from
 	// animate/primitives/base/ to animate/base/ left SwitchDemo importing the old path, `astro check`
 	// reported zero errors, and only `astro build` failed — in the Docs workflow, after the app's own CI
@@ -318,7 +427,7 @@ describe("documentation does not point at things that are gone", () => {
 
 		for (const file of trackedFiles.filter((path) => path.startsWith(`${DOCS}/src/`))) {
 			for (const [, specifier] of read(file).matchAll(UI_SPECIFIER)) {
-				const base = join(ROOT, WEB, "src/ui", specifier.replace("@ui/", ""));
+				const base = resolveUiSpecifier(specifier);
 				const resolved = [`${base}.tsx`, `${base}.ts`, `${base}/index.tsx`, `${base}/index.ts`, base].some(
 					(candidate) => existsSync(candidate),
 				);
@@ -337,7 +446,7 @@ describe("documentation does not point at things that are gone", () => {
 		const UI_IMPORT = /import\s*\{([^}]+)\}\s*from\s*["'](@ui\/[^"']+)["']/g;
 
 		const exportsOf = (specifier: string): Set<string> | null => {
-			const base = join(ROOT, "apps/web/src/ui", specifier.replace("@ui/", ""));
+			const base = resolveUiSpecifier(specifier);
 			const path = [`${base}.tsx`, `${base}.ts`].find((candidate) => existsSync(candidate));
 			if (!path) return null;
 
@@ -396,15 +505,24 @@ describe("documentation does not point at things that are gone", () => {
 			.filter((path) => path.startsWith("apps/web"))
 			.map((path) => path.replace(/\/\*\*$/, "").replace(SOURCE_FILE, ""));
 
-		const docsSources = trackedFiles.filter((path) => path.startsWith(`${DOCS}/src/`));
+		// The scan used to stop at `${DOCS}/src/`, which left the two files that decide where the seam points
+		// — `astro.config.ts` and `tsconfig.json` — outside it, along with `e2e/`. Markdown stays out on
+		// purpose: a guide linking to an app file is a citation, not something the site builds from.
+		const docsSources = trackedFiles.filter(
+			(path) => path.startsWith(`${DOCS}/`) && !path.endsWith(".md") && !path.endsWith(".mdx"),
+		);
 		const reached = new Set<string>();
+
+		// The old form required the segment after the `../` run to be literally `web/`, so an escape written
+		// `../../apps/web/src/…` — the same reach, spelled from one directory deeper — matched nothing at all.
+		const RELATIVE_ESCAPE = /['"(]((?:\.\.\/)+(?:apps\/)?web\/[^'")]+)['")]/g;
 
 		for (const file of docsSources) {
 			const source = read(file);
 			for (const [, specifier] of source.matchAll(/from\s+["']@ui\/([^"']+)["']/g)) {
-				reached.add(`${WEB}/src/ui/${specifier}`);
+				reached.add(`${UI_ROOT_RELATIVE}/${specifier}`);
 			}
-			for (const [, specifier] of source.matchAll(/['"(]((?:\.\.\/)+web\/[^'")]+)['")]/g)) {
+			for (const [, specifier] of source.matchAll(RELATIVE_ESCAPE)) {
 				reached.add(join(dirname(file), specifier).replace(/\\/g, "/"));
 			}
 		}
@@ -413,6 +531,21 @@ describe("documentation does not point at things that are gone", () => {
 
 		const unwatched = [...reached].filter((path) => !watched.some((prefix) => path.startsWith(prefix)));
 		expect(unwatched).toEqual([]);
+	});
+
+	// The seam was declared three times — the vite alias in `astro.config.ts`, the `paths` entry `astro check`
+	// reads, and two hardcoded copies in this file — and nothing compared them, so a move under `apps/web`
+	// could satisfy one and break another. `tsconfig.json` is the declaration; everything else derives.
+	it("declares the @ui seam target once, in the docs tsconfig", () => {
+		expect(docsTsconfigPaths[UI_ALIAS]).toBeDefined();
+		expect(existsSync(UI_ROOT)).toBe(true);
+		expect(statSync(UI_ROOT).isDirectory()).toBe(true);
+
+		const astroConfig = read(`${DOCS}/astro.config.ts`);
+		expect(astroConfig).toContain("tsconfig.json");
+		expect(astroConfig, "the vite alias must derive from tsconfig.json, not restate the path").not.toMatch(
+			/["'][./]*\.\.\/(?:apps\/)?web\//,
+		);
 	});
 
 	// An output the `changes` job declares but never writes is the empty string, and a job guarded on
@@ -477,6 +610,48 @@ describe("documentation does not point at things that are gone", () => {
 
 		expect(headings.filter((heading) => retired.has(heading.toLowerCase()))).toEqual([]);
 		expect(headings.filter((heading) => !canonical.has(heading.toLowerCase()))).toEqual([]);
+	});
+
+	// The rule above reads headings only, and the headings had already been fixed — the prose had not. The
+	// glossary's own Bridge entry ended "a **bridge day** is one of the PTO days inside a bridge", and the
+	// wiki's front page said "vacation days" twice, both under a canonical heading.
+	//
+	// Only the **multi-word** retired names are checked, and only those the glossary does not also declare
+	// canonical somewhere. A blanket scan is unusable: the retired list holds `type`, `state`, `variant`,
+	// `locale`, `filter`, `period` and `break`, which this wiki uses correctly as ordinary technical English
+	// on 90 lines — the glossary retires them as names for a *domain concept*, not as words. A compound like
+	// "bridge day" or "max working period" has no innocent reading here, so it needs no allowlist at all.
+	// `holiday` and `free day` drop out on the canonical test, which is also what lets "public holiday"
+	// through — the one phrasing CONTEXT.md blesses for English user-facing copy.
+	it("writes the canonical name in the published wiki's prose, not a retired one", () => {
+		const glossary = read("CONTEXT.md");
+		const canonical = new Set([...glossary.matchAll(GLOSSARY_TERM)].map(([, term]) => term.toLowerCase()));
+		const compounds = [
+			...new Set(
+				[...glossary.matchAll(GLOSSARY_AVOID_LINE)].flatMap(([, list]) =>
+					list.split(",").map((entry) => entry.trim().toLowerCase()),
+				),
+			),
+		].filter((term) => term.includes(" ") && !canonical.has(term));
+
+		expect(compounds.length).toBeGreaterThan(10);
+
+		const offenders: string[] = [];
+		for (const file of contentFiles) {
+			// Frontmatter is metadata, fenced code and inline code are the app's own identifiers, and neither
+			// is prose the glossary governs.
+			const prose = read(file)
+				.replace(/^---[\s\S]*?\n---\n/, "")
+				.replace(/```[\s\S]*?```/g, "")
+				.replace(/`[^`]*`/g, "");
+
+			for (const term of compounds) {
+				const pattern = new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}s?\\b`, "gi");
+				for (const [match] of prose.matchAll(pattern)) offenders.push(`${file} -> ${match}`);
+			}
+		}
+
+		expect(offenders).toEqual([]);
 	});
 
 	// IconsGalleryDemo says it is exhaustive, and a rename does break the build through import resolution —
@@ -669,9 +844,53 @@ describe("the guides describe the project as it is configured", () => {
 	it.each([
 		["README.md", rootScripts],
 		[`${WEB}/README.md`, { ...rootScripts, ...webScripts }],
-		[`${DOCS}/README.md`, { ...rootScripts, ...readJson(`${DOCS}/package.json`).scripts }],
+		[`${DOCS}/README.md`, { ...rootScripts, ...docsScripts }],
+		[`${DOCS}/CLAUDE.md`, { ...rootScripts, ...docsScripts }],
 	])("%s cites only scripts a reader could run", (file, available) => {
 		expect(citedScripts(readIfPresent(file)).filter((script) => !(script in available))).toEqual([]);
+	});
+
+	// A workflow is the one citation site that fails in CI rather than under a reader, and it was unchecked:
+	// `docs.yml`'s Typecheck step ran `pnpm --filter forever-pto-docs check`, a script the docs manifest has
+	// never had. Every job runs from the repo root or from one of the two packages, so a bare script has to
+	// resolve in one of the three manifests.
+	it.each(workflowFiles)("%s runs only scripts a manifest declares", (file) => {
+		const commands = runCommands(read(file));
+		const available = { ...rootScripts, ...webScripts, ...docsScripts };
+		expect(citedScripts(commands).filter((script) => !(script in available))).toEqual([]);
+	});
+
+	// The filtered form names its own package, so it can be checked wherever it is written — including the
+	// published wiki, where a bare `pnpm build` is ambiguous between three manifests and this one is not.
+	// It was invisible to the rule above: `\bpnpm ` matches and `[a-z]` then meets the `-` of `--filter`, so
+	// the whole match fails and the line yields no script at all.
+	it("resolves every filtered pnpm citation against the package it names", () => {
+		const sources = [
+			"CLAUDE.md",
+			"README.md",
+			"CONTRIBUTING.md",
+			...PACKAGE_GUIDES,
+			...WORKSPACE_PACKAGES.map((pkg) => `${pkg}/README.md`),
+			...contentFiles,
+			...workflowFiles,
+		];
+
+		const offenders: string[] = [];
+		let checked = 0;
+
+		for (const file of sources) {
+			const body = file.startsWith(WORKFLOW_DIR) ? runCommands(read(file)) : readIfPresent(file);
+			for (const [, pkg, script] of body.matchAll(CITED_FILTERED_PNPM_SCRIPT)) {
+				if (NON_SCRIPT_PNPM.has(script as string)) continue;
+				checked += 1;
+				const scripts = scriptsByPackageName.get(pkg as string);
+				if (!scripts) offenders.push(`${file} -> --filter ${pkg} (no such workspace package)`);
+				else if (!(script in scripts)) offenders.push(`${file} -> ${pkg} has no ${script} script`);
+			}
+		}
+
+		expect(checked).toBeGreaterThan(3);
+		expect(offenders).toEqual([]);
 	});
 
 	it("cites only web scripts that resolve in the web or root manifest", () => {

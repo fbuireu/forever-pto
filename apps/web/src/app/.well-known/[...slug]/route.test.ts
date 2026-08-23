@@ -1,23 +1,12 @@
+import { WELL_KNOWN_CACHE_CONTROL } from "@infrastructure/well-known/slugs";
 import { describe, expect, it, vi } from "vitest";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL as string;
 
 vi.mock("@opennextjs/cloudflare", () => ({
 	getCloudflareContext: vi.fn().mockResolvedValue({
 		env: { NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL },
 	}),
-}));
-
-vi.mock("@infrastructure/well-known/apiCatalog", () => ({
-	apiCatalog: vi.fn().mockReturnValue(new Response("api-catalog", { status: 200 })),
-}));
-
-vi.mock("@infrastructure/well-known/mcpServerCard", () => ({
-	mcpServerCard: vi.fn().mockReturnValue(new Response("mcp-server-card", { status: 200 })),
-}));
-
-vi.mock("@infrastructure/well-known/agentSkillsIndex", () => ({
-	agentSkillsIndex: vi.fn().mockReturnValue(new Response("agent-skills", { status: 200 })),
 }));
 
 const { GET } = await import("./route");
@@ -27,25 +16,31 @@ function makeContext(slug: string[]) {
 }
 
 describe("GET /.well-known/[...slug]", () => {
-	it("routes api-catalog to apiCatalog handler", async () => {
-		const { apiCatalog } = await import("@infrastructure/well-known/apiCatalog");
-		const response = await GET(new Request("http://localhost"), makeContext(["api-catalog"]));
+	it.each([
+		[["api-catalog"], "application/linkset+json"],
+		[["mcp", "server-card.json"], "application/json"],
+		[["agent-skills", "index.json"], "application/json"],
+	])("serves %s with the content type its document declares", async (slug, contentType) => {
+		const response = await GET(new Request("http://localhost"), makeContext(slug));
+
 		expect(response.status).toBe(200);
-		expect(apiCatalog).toHaveBeenCalledWith(BASE_URL);
+		expect(response.headers.get("Content-Type")).toBe(contentType);
+		expect(response.headers.get("Cache-Control")).toBe(WELL_KNOWN_CACHE_CONTROL);
 	});
 
-	it("routes mcp/server-card.json to mcpServerCard handler", async () => {
-		const { mcpServerCard } = await import("@infrastructure/well-known/mcpServerCard");
-		const response = await GET(new Request("http://localhost"), makeContext(["mcp", "server-card.json"]));
-		expect(response.status).toBe(200);
-		expect(mcpServerCard).toHaveBeenCalledWith(BASE_URL);
-	});
+	it("builds each document against the site URL from the Cloudflare context", async () => {
+		const catalog = await (await GET(new Request("http://localhost"), makeContext(["api-catalog"]))).json();
+		const card = await (await GET(new Request("http://localhost"), makeContext(["mcp", "server-card.json"]))).json();
+		const index = await (
+			await GET(new Request("http://localhost"), makeContext(["agent-skills", "index.json"]))
+		).json();
 
-	it("routes agent-skills/index.json to agentSkillsIndex handler", async () => {
-		const { agentSkillsIndex } = await import("@infrastructure/well-known/agentSkillsIndex");
-		const response = await GET(new Request("http://localhost"), makeContext(["agent-skills", "index.json"]));
-		expect(response.status).toBe(200);
-		expect(agentSkillsIndex).toHaveBeenCalledWith(BASE_URL);
+		expect(catalog.linkset[0].anchor).toBe(BASE_URL);
+		expect(card.serverInfo.url).toBe(BASE_URL);
+		expect(index.skills.flatMap((skill: { url?: string }) => skill.url ?? [])).not.toHaveLength(0);
+		for (const skill of index.skills as { url?: string }[]) {
+			if (skill.url) expect(skill.url.startsWith(`${BASE_URL}/.well-known/`)).toBe(true);
+		}
 	});
 
 	it("returns 404 for unknown paths", async () => {

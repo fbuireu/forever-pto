@@ -34,6 +34,7 @@ Exports: `Slider`.
 import { Slider } from '@ui/modules/core/primitives/Slider';
 
 <Slider
+  label="PTO days"
   value={[ptoDays]}
   min={0}
   max={30}
@@ -47,5 +48,6 @@ For discrete numeric stepping the app also has the animated `Counter` (`apps/web
 
 ## Conventions
 
-- Prop surface is a deliberate subset (`className`, `value`, `defaultValue`, `min`, `max`, `step`, the two callbacks, `disabled`, `id`) — extend the interface in the source if you need more of Base UI's API rather than reaching for the primitive directly.
+- **`label` is required**, and it is the only required prop. It becomes the thumb's `aria-label`: a slider with no visible text label is unusable with a screen reader, so the type refuses to let one ship rather than leaving it to a review.
+- The rest of the prop surface is a deliberate subset (`className`, `value`, `defaultValue`, `min`, `max`, `step`, the two callbacks, `disabled`, `id`) — extend the interface in the source if you need more of Base UI's API rather than reaching for the primitive directly.
 - Defaults: `min=0`, `max=100`, `step=1`.

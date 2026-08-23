@@ -1,8 +1,7 @@
-import { ApiError } from "@infrastructure/api/errors";
 import { INVALID_BODY } from "@infrastructure/api/parseJsonBody";
-import { EmailError, ValidationError } from "@infrastructure/errors";
+import type { EmailError, ValidationError } from "@infrastructure/errors";
 import { Effect, Layer } from "effect";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockSendContactEmail = vi.hoisted(() =>
 	vi.fn<
@@ -37,15 +36,9 @@ vi.mock("@opennextjs/cloudflare", () => ({
 
 const { POST } = await import("./route");
 
-function makeRequest(body: unknown): Request {
-	return new Request("http://localhost/api/contact", {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify(body),
-	});
-}
+const SUBMISSION = { email: "test@example.com", name: "Test", subject: "Hello", message: "World" };
 
-function makeRawRequest(body: string | null): Request {
+function makeRequest(body: BodyInit | null): Request {
 	return new Request("http://localhost/api/contact", {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
@@ -54,60 +47,32 @@ function makeRawRequest(body: string | null): Request {
 }
 
 describe("POST /api/contact", () => {
-	it("returns 200 with success on valid submission", async () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
 		mockSendContactEmail.mockReturnValue(Effect.succeed({ deferred: Effect.void }));
-		const response = await POST(
-			makeRequest({ email: "test@example.com", name: "Test", subject: "Hello", message: "World" }) as never,
-		);
+	});
+
+	it("puts the operation's body and status on a NextResponse", async () => {
+		const response = await POST(makeRequest(JSON.stringify(SUBMISSION)) as never);
+
 		expect(response.status).toBe(200);
-		const body = await response.json();
-		expect(body.success).toBe(true);
+		expect(await response.json()).toEqual({ success: true });
 	});
 
-	it("returns 400 on ValidationError", async () => {
-		mockSendContactEmail.mockReturnValue(Effect.fail(new ValidationError({ message: "Email is required" })));
-		const response = await POST(makeRequest({ name: "Test" }) as never);
+	it("hands the operation the request-scoped site URL and contact address", async () => {
+		await POST(makeRequest(JSON.stringify(SUBMISSION)) as never);
+
+		expect(mockSendContactEmail).toHaveBeenCalledWith(SUBMISSION, {
+			siteUrl: "https://example.com",
+			contactEmail: "contact@example.com",
+		});
+	});
+
+	it("hands the operation parseJsonBody, so an unreadable body answers 400 rather than a bare 500", async () => {
+		const response = await POST(makeRequest("{not json") as never);
+
 		expect(response.status).toBe(400);
-		const body = await response.json();
-		expect(body.success).toBe(false);
-		expect(body.error).toBe("Email is required");
-	});
-
-	it("returns 400 with the validation shape when the body is malformed", async () => {
-		const response = await POST(makeRawRequest("{not json") as never);
-		expect(response.status).toBe(400);
-		const body = await response.json();
-		expect(body.success).toBe(false);
-		expect(body.error).toBe(INVALID_BODY);
-	});
-
-	it("returns 400 with the validation shape when the body is empty", async () => {
-		const response = await POST(makeRawRequest(null) as never);
-		expect(response.status).toBe(400);
-		const body = await response.json();
-		expect(body.error).toBe(INVALID_BODY);
-	});
-
-	it("returns 500 on EmailError", async () => {
-		mockSendContactEmail.mockReturnValue(Effect.fail(new EmailError({ message: "SMTP failed" })));
-		const response = await POST(makeRequest({ email: "test@example.com" }) as never);
-		expect(response.status).toBe(500);
-		const body = await response.json();
-		expect(body.success).toBe(false);
-		expect(body.error).toBe(ApiError.INTERNAL_ERROR);
-	});
-
-	it("returns 500 on unexpected typed error", async () => {
-		mockSendContactEmail.mockReturnValue(
-			Effect.fail(new Error("unexpected")) as unknown as Effect.Effect<
-				{ deferred: Effect.Effect<void, never, never> },
-				ValidationError | EmailError
-			>,
-		);
-		const response = await POST(makeRequest({}) as never);
-		expect(response.status).toBe(500);
-		const body = await response.json();
-		expect(body.success).toBe(false);
-		expect(body.error).toBe(ApiError.INTERNAL_ERROR);
+		expect(await response.json()).toEqual({ success: false, error: INVALID_BODY });
+		expect(mockSendContactEmail).not.toHaveBeenCalled();
 	});
 });

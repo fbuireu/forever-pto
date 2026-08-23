@@ -13,7 +13,7 @@ One day from the user's annual budget of paid days off — a unit of budget, not
 
 ### Bridge
 
-A block of PTO days that connects weekends and public holidays into one contiguous stretch off. A single PTO day on a Monday before a Tuesday holiday "bridges" the weekend to the holiday, yielding four days off for one day spent. Modeled by the `Bridge` interface: `ptoDaysNeeded`, `effectiveDays`, `efficiency` and the concrete `ptoDays` dates. A **bridge day** is one of the PTO days inside a bridge.
+A block of PTO days that connects weekends and public holidays into one contiguous stretch off. A single PTO day on a Monday before a Tuesday holiday "bridges" the weekend to the holiday, yielding four days off for one day spent. Modeled by the `Bridge` interface: `ptoDaysNeeded`, `effectiveDays`, `efficiency` and the concrete `ptoDays` dates. A Bridge is the unit the planner reasons about; the individual dates inside it are PTO Days, and there is no separate name for them.
 
 ### Effective Day
 

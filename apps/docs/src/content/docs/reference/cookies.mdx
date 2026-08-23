@@ -12,7 +12,7 @@ The app sets four first-party cookies. The sidebar cookie name below is imported
 | Cookie | Purpose | httpOnly | Secure | SameSite | Max age |
 | --- | --- | --- | --- | --- | --- |
 | `user-country` | Detected ISO country code, used to pre-select the holiday calendar | no | yes | `strict` | 7 days (`ONE_WEEK`) |
-| `NEXT_LOCALE` | The user's resolved locale for i18n routing | yes | yes | `lax` | session |
+| `NEXT_LOCALE` | The user's resolved locale for i18n routing | no | yes | `lax` | session |
 | `premium-token` | JWT proving an active premium session | yes | production only | `strict` | 30 days |
 | <code>{SIDEBAR_COOKIE_NAME}</code> | Persists whether the sidebar is expanded or collapsed | no | — | `lax` | 7 days |
 
@@ -24,7 +24,9 @@ Exported as `USER_COUNTRY_COOKIE` in `apps/web/src/infrastructure/proxy/cookie.t
 
 ## `NEXT_LOCALE`
 
-The locale cookie used by next-intl, named by the `LOCALE_COOKIE` export in `apps/web/src/infrastructure/i18n/config.ts`. The next-intl middleware sets it during locale negotiation, and `apps/web/src/middleware.ts` immediately re-sets it via `setLocaleCookie()` (`apps/web/src/infrastructure/i18n/cookie.ts`) to harden the attributes: `httpOnly`, `secure`, `sameSite: 'lax'`. No `maxAge` is set, so it is a session cookie.
+The locale cookie used by next-intl, named by the `LOCALE_COOKIE` export in `apps/web/src/infrastructure/i18n/locales.ts`. The next-intl middleware sets it during locale negotiation, and `apps/web/src/middleware.ts` immediately re-sets it via `setLocaleCookie()` (`apps/web/src/infrastructure/i18n/cookie.ts`), which applies `LOCALE_COOKIE_POLICY`: `secure`, `sameSite: 'lax'`, `path: '/'`. No `maxAge` is set, so it is a session cookie.
+
+It is deliberately **not** `httpOnly`, and that is the same object `routing.ts` hands next-intl. The client-side language switcher writes this cookie too, from `document.cookie`, so the two writers have to agree — adding `httpOnly` here silently broke every soft locale switch.
 
 ## `premium-token`
 

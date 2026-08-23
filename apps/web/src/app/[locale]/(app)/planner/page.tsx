@@ -1,4 +1,5 @@
-﻿import { LOCALES } from "@infrastructure/i18n/locales";
+import { LOCALES } from "@infrastructure/i18n/locales";
+import { routeMetadata } from "@infrastructure/seo/routeMetadata";
 import { JsonLd } from "@ui/modules/shared/seo/JsonLd";
 import dynamic from "next/dynamic";
 import type { Locale } from "next-intl";
@@ -18,7 +19,7 @@ const Summary = dynamic(() => import("@ui/modules/pages/planner/Summary").then((
 const Roadmap = dynamic(() => import("@ui/modules/pages/planner/Roadmap").then((module) => module.Roadmap));
 const Contact = dynamic(() => import("@ui/modules/pages/planner/Contact").then((module) => module.Contact));
 
-export { generateMetadata } from "./metadata";
+export const generateMetadata = routeMetadata("/planner");
 
 interface PageProps {
 	params: Promise<{ locale: Locale }>;

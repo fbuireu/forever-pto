@@ -11,7 +11,7 @@ Source: `apps/web/src/ui/modules/core/animate/components/`. Composite motion com
 
 ## Counter
 
-`Counter` (`Counter.tsx`) is a stepper: minus and plus `m.button`s flanking a [SlidingNumber](/design-system/animation/text/) inside a brutal-framed pill, with `layout` animation so the pill resizes smoothly as digit count changes. It is controlled: pass `number` and `setNumber`. Optional props: `label` (small caption under the number), `slidingNumberProps`, `buttonProps` / `decrementButtonProps` / `incrementButtonProps` (e.g. to `disable` a bound), and `transition`.
+`Counter` (`Counter.tsx`) is a stepper: minus and plus `m.button`s flanking a [SlidingNumber](/design-system/animation/text/) inside a brutal-framed pill, with `layout` animation so the pill resizes smoothly as digit count changes. It is controlled: pass `number` and `setNumber`. **`decrementLabel` and `incrementLabel` are required** — the two buttons render a glyph and nothing else, so without them a screen reader announces "button, button". Optional props: `label` (small caption under the number), `slidingNumberProps`, `buttonProps` / `decrementButtonProps` / `incrementButtonProps` (e.g. to `disable` a bound), and `transition`.
 
 <CounterDemo client:visible />
 
@@ -36,7 +36,13 @@ import { Counter } from '@ui/modules/core/animate/components/Counter';
 import { FeatureList } from '@ui/modules/core/animate/components/FeatureList';
 import { RadialNav } from '@ui/modules/core/animate/components/RadialNav';
 
-<Counter number={days} setNumber={setDays} label='PTO days' />
+<Counter
+  number={days}
+  setNumber={setDays}
+  label='PTO days'
+  decrementLabel='One PTO day fewer'
+  incrementLabel='One more PTO day'
+/>
 
 <FeatureList features={roadmap} categoryLabel='Roadmap' detailedViewLabel='Detailed view' />
 

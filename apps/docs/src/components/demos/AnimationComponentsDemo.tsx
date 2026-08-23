@@ -10,7 +10,13 @@ export const CounterDemo = () => {
 
 	return (
 		<Demo>
-			<Counter number={days} setNumber={setDays} label="PTO days" />
+			<Counter
+				number={days}
+				setNumber={setDays}
+				label="PTO days"
+				decrementLabel="One PTO day fewer"
+				incrementLabel="One more PTO day"
+			/>
 		</Demo>
 	);
 };

@@ -1,3 +1,4 @@
+import { routeMetadata } from "@infrastructure/seo/routeMetadata";
 import { getPublicEnv } from "@infrastructure/services/env/getPublicEnv";
 import { createRichLink } from "@ui/modules/core/primitives/RichLink";
 import { LegalLayout } from "@ui/modules/layout/LegalLayout";
@@ -5,7 +6,7 @@ import { getLastUpdatedDate } from "@ui/utils/getLastUpdatedDate";
 import type { Locale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 
-export { generateMetadata } from "./metadata";
+export const generateMetadata = routeMetadata("/legal/cookie-policy");
 
 interface CookiePolicyPageProps {
 	params: Promise<{ locale: Locale }>;

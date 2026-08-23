@@ -1,4 +1,4 @@
-﻿import { SidebarProvider } from "@ui/modules/core/animate/base/Sidebar";
+import { SidebarProvider } from "@ui/modules/core/animate/base/Sidebar";
 import { Toaster } from "@ui/modules/core/primitives/Sonner";
 import { SiteSubtitle } from "@ui/modules/pages/planner/SiteSubtitle";
 import { SiteTitle } from "@ui/modules/pages/planner/SiteTitle";

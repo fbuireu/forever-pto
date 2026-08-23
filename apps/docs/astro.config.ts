@@ -1,8 +1,22 @@
+import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import react from "@astrojs/react";
 import starlight from "@astrojs/starlight";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
+
+// tsconfig.json is the single declaration of where the app's UI layer sits: `astro check` reads it, and
+// this file derives the build-time alias from the same string rather than spelling it a second time.
+// Both resolve against this directory, so the value needs no adjustment.
+const UI_ALIAS = "@ui/*";
+const tsconfig = JSON.parse(readFileSync(new URL("./tsconfig.json", import.meta.url), "utf8")) as {
+	compilerOptions: { paths: Record<string, string[] | undefined> };
+};
+const uiTarget = tsconfig.compilerOptions.paths[UI_ALIAS]?.[0]?.replace(/\/\*$/, "");
+
+if (!uiTarget) {
+	throw new Error(`tsconfig.json declares no "${UI_ALIAS}" path, so no demo can import an app component`);
+}
 
 export default defineConfig({
 	site: "https://docs.forever-pto.com",
@@ -109,7 +123,7 @@ export default defineConfig({
 		css: { postcss: { plugins: [] } },
 		resolve: {
 			alias: {
-				"@ui": fileURLToPath(new URL("../web/src/ui", import.meta.url)),
+				"@ui": fileURLToPath(new URL(uiTarget, import.meta.url)),
 			},
 		},
 	},

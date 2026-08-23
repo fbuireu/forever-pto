@@ -1,4 +1,4 @@
-import { activateWithEmail, activateWithPayment } from "@application/use-cases/activatePremium";
+import { activateWithClaimedPayment, activateWithEmail } from "@application/use-cases/activatePremium";
 import { ApiError } from "@infrastructure/api/errors";
 import { activatePremiumRequest } from "@infrastructure/api/operations/activatePremium";
 import { resolveClientIp } from "@infrastructure/api/operations/types";
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 			if (!email) return yield* Effect.fail(new ValidationError({ message: ApiError.EMAIL_REQUIRED }));
 
 			return yield* premiumKey
-				? activateWithPayment({ paymentIntentId: premiumKey, expectedEmail: email })
+				? activateWithClaimedPayment({ paymentIntentId: premiumKey, expectedEmail: email })
 				: activateWithEmail(email);
 		}),
 	);

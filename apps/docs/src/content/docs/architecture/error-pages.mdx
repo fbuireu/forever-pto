@@ -24,7 +24,7 @@ Because the root layout is gone when they run, the two global files recreate eve
 They differ in how they pick a locale:
 
 - **`global-error.tsx`** is a client component with no intl request context, so it derives the locale from the pathname (`getLocaleFromPathname` in `apps/web/src/infrastructure/i18n/utils/url.ts`) and falls back to the statically imported English message catalog (`@i18n/messages/en.json`) — an error page must never itself throw on a missing translation.
-- **`global-not-found.tsx`** runs on the server and detects the locale with a three-step chain: the `x-next-intl-locale` header, then the next-intl locale cookie (`LOCALE_COOKIE` from `apps/web/src/infrastructure/i18n/config.ts`), then `Accept-Language`, defaulting to the routing default. Since the `<html>` tag is already rendered with the default locale by the time detection finishes, the small client component `HtmlLangSync` (`apps/web/src/ui/modules/pages/not-found/HtmlLangSync.tsx`) patches `lang` after hydration. It also renders its own skip-link, since the root layout's one is unavailable.
+- **`global-not-found.tsx`** runs on the server and detects the locale with a three-step chain: the `x-next-intl-locale` header, then the next-intl locale cookie (`LOCALE_COOKIE` from `apps/web/src/infrastructure/i18n/locales.ts`), then `Accept-Language`, defaulting to the routing default. Since the `<html>` tag is already rendered with the default locale by the time detection finishes, the small client component `HtmlLangSync` (`apps/web/src/ui/modules/pages/not-found/HtmlLangSync.tsx`) patches `lang` after hydration. It also renders its own skip-link, since the root layout's one is unavailable.
 
 ## ErrorContent — the brutal 500
 
