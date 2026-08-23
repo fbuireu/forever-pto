@@ -1,9 +1,16 @@
 import deMessages from "@i18n/messages/de.json";
 import esMessages from "@i18n/messages/es.json";
-import { render } from "@testing-library/react";
+import { act, render } from "@testing-library/react";
+import { TUTORIAL_EVENT } from "@ui/modules/tutorial/anchors";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
+
+interface DrawerMockProps {
+	children: ReactNode;
+	snapPoints: number[];
+	activeSnapPoint: number | string | null;
+}
 
 const holidaysState = {
 	alternatives: [],
@@ -23,7 +30,11 @@ const readyState = { areStoresReady: false };
 vi.mock("@ui/hooks/useStoresReady", () => ({ useStoresReady: () => readyState }));
 vi.mock("@ui/modules/core/animate/base/Sidebar", () => ({ useSidebar: () => ({ openMobile: false }) }));
 vi.mock("@ui/modules/core/animate/base/Drawer", () => ({
-	Drawer: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+	Drawer: ({ children, snapPoints, activeSnapPoint }: DrawerMockProps) => (
+		<div data-testid="drawer" data-snap-points={JSON.stringify(snapPoints)} data-active-snap={String(activeSnapPoint)}>
+			{children}
+		</div>
+	),
 	DrawerContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 	DrawerTitle: ({ children }: { children: ReactNode }) => <h2 data-testid="drawer-title">{children}</h2>,
 }));
@@ -33,7 +44,7 @@ vi.mock("./Legend", () => ({ LegendItems: () => null }));
 vi.mock("./PlannerPanel", () => ({ PlannerPanel: () => null }));
 vi.mock("./PlannerPanelFixture", () => ({ PlannerPanelFixture: () => null }));
 
-import { ManagementBar } from "./ManagementBar";
+import { DRAWER_SNAP, ManagementBar } from "./ManagementBar";
 
 const renderBar = (locale: Locale, messages: object) =>
 	render(
@@ -131,5 +142,35 @@ describe("ManagementBar drawer header", () => {
 		holidaysState.currentSelection = null;
 		holidaysState.alternatives = [];
 		holidaysState.previewAlternativeIndex = 0;
+	});
+});
+
+describe("ManagementBar drawer extent", () => {
+	it("never expands to the whole viewport, so there is always page left to touch", () => {
+		const { getByTestId } = renderBar("es", esMessages);
+		const points: number[] = JSON.parse(getByTestId("drawer").getAttribute("data-snap-points") ?? "[]");
+
+		expect(points.length).toBeGreaterThan(0);
+		expect(Math.max(...points)).toBeLessThan(1);
+	});
+
+	it("opens at the collapsed snap point rather than the expanded one", () => {
+		const { getByTestId } = renderBar("es", esMessages);
+
+		expect(getByTestId("drawer").getAttribute("data-active-snap")).toBe(String(DRAWER_SNAP.COLLAPSED));
+	});
+
+	it("expands when the tutorial asks and comes back down when the tour ends", () => {
+		const { getByTestId } = renderBar("es", esMessages);
+
+		act(() => {
+			globalThis.dispatchEvent(new CustomEvent(TUTORIAL_EVENT.EXPAND_DRAWER));
+		});
+		expect(getByTestId("drawer").getAttribute("data-active-snap")).toBe(String(DRAWER_SNAP.EXPANDED));
+
+		act(() => {
+			globalThis.dispatchEvent(new CustomEvent(TUTORIAL_EVENT.COLLAPSE_DRAWER));
+		});
+		expect(getByTestId("drawer").getAttribute("data-active-snap")).toBe(String(DRAWER_SNAP.COLLAPSED));
 	});
 });

@@ -6,7 +6,7 @@ import { useIsMobile } from "@ui/hooks/useMobile";
 import { useStoresReady } from "@ui/hooks/useStoresReady";
 import { Drawer, DrawerContent, DrawerTitle } from "@ui/modules/core/animate/base/Drawer";
 import { useSidebar } from "@ui/modules/core/animate/base/Sidebar";
-import { TUTORIAL_ANCHOR } from "@ui/modules/tutorial/anchors";
+import { TUTORIAL_ANCHOR, TUTORIAL_EVENT } from "@ui/modules/tutorial/anchors";
 import { Skeleton } from "boneyard-js/react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
@@ -16,6 +16,11 @@ import { LegendItems } from "./Legend";
 import { PlannerPanel } from "./PlannerPanel";
 import { PlannerPanelFixture } from "./PlannerPanelFixture";
 
+export const DRAWER_SNAP = {
+	COLLAPSED: 0.15,
+	EXPANDED: 0.85,
+} as const;
+
 export const ManagementBar = () => {
 	const t = useTranslations("toasts");
 	const tAlt = useTranslations("alternativesManager");
@@ -23,7 +28,7 @@ export const ManagementBar = () => {
 	const { areStoresReady } = useStoresReady();
 	const isMobile = useIsMobile();
 	const { openMobile } = useSidebar();
-	const [snap, setSnap] = useState<number | string | null>(0.15);
+	const [snap, setSnap] = useState<number | string | null>(DRAWER_SNAP.COLLAPSED);
 	const {
 		alternatives,
 		suggestion,
@@ -49,9 +54,14 @@ export const ManagementBar = () => {
 	);
 
 	useEffect(() => {
-		const expand = () => setSnap(1);
-		window.addEventListener("tutorial:expand-drawer", expand);
-		return () => window.removeEventListener("tutorial:expand-drawer", expand);
+		const expand = () => setSnap(DRAWER_SNAP.EXPANDED);
+		const collapse = () => setSnap(DRAWER_SNAP.COLLAPSED);
+		window.addEventListener(TUTORIAL_EVENT.EXPAND_DRAWER, expand);
+		window.addEventListener(TUTORIAL_EVENT.COLLAPSE_DRAWER, collapse);
+		return () => {
+			window.removeEventListener(TUTORIAL_EVENT.EXPAND_DRAWER, expand);
+			window.removeEventListener(TUTORIAL_EVENT.COLLAPSE_DRAWER, collapse);
+		};
 	}, []);
 
 	const handlePreviewChange = useCallback(
@@ -65,7 +75,7 @@ export const ManagementBar = () => {
 		(params: AlternativeSelectionBaseParams) => {
 			setCurrentAlternativeSelection(params);
 			toast.success(t("suggestionApplied"));
-			setSnap(0.15);
+			setSnap(DRAWER_SNAP.COLLAPSED);
 		},
 		[setCurrentAlternativeSelection, t],
 	);
@@ -111,7 +121,7 @@ export const ManagementBar = () => {
 
 			{isMobile && !isSettledEmpty && (
 				<Drawer
-					snapPoints={[0.15, 1]}
+					snapPoints={[DRAWER_SNAP.COLLAPSED, DRAWER_SNAP.EXPANDED]}
 					activeSnapPoint={snap}
 					setActiveSnapPoint={setSnap}
 					modal={false}

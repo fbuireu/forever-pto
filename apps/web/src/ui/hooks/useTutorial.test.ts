@@ -22,6 +22,8 @@ vi.mock("@infrastructure/clients/tutorial/driver/client", () => ({
 }));
 vi.mock("@ui/modules/tutorial/DriverStyles", () => ({}));
 
+import { TUTORIAL_EVENT } from "@ui/modules/tutorial/anchors";
+
 const { useTutorial } = await import("./useTutorial");
 
 beforeEach(() => {
@@ -164,5 +166,31 @@ describe("useTutorial", () => {
 
 		mockUseIsMobile.mockReturnValue(false);
 		mockUseSidebar.mockReturnValue({ open: true, toggleSidebar: mockToggleSidebar });
+	});
+
+	it("collapses the drawer when the tour ends, since expanding it is what covered the screen", async () => {
+		mockUseIsMobile.mockReturnValue(true);
+		mockUseSidebar.mockReturnValue({ open: true, openMobile: true, toggleSidebar: mockToggleSidebar });
+
+		const { result } = renderHook(() => useTutorial());
+		await act(async () => {
+			await result.current.startTutorial();
+		});
+
+		const collapsed = vi.fn();
+		globalThis.addEventListener(TUTORIAL_EVENT.COLLAPSE_DRAWER, collapsed);
+		mockStart.mock.calls[0][1].onDestroyStarted();
+		globalThis.removeEventListener(TUTORIAL_EVENT.COLLAPSE_DRAWER, collapsed);
+
+		expect(collapsed).toHaveBeenCalledTimes(1);
+	});
+
+	it("leaves the tour end alone on a desktop, where no drawer was ever expanded", async () => {
+		const { result } = renderHook(() => useTutorial());
+		await act(async () => {
+			await result.current.startTutorial();
+		});
+
+		expect(mockStart.mock.calls[0][1].onDestroyStarted).toBeUndefined();
 	});
 });

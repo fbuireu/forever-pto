@@ -11,6 +11,11 @@ export const TUTORIAL_ANCHOR = {
 	CALENDAR_LIST: "calendar-list",
 } as const;
 
+export const TUTORIAL_EVENT = {
+	EXPAND_DRAWER: "tutorial:expand-drawer",
+	COLLAPSE_DRAWER: "tutorial:collapse-drawer",
+} as const;
+
 export type TutorialAnchor = (typeof TUTORIAL_ANCHOR)[keyof typeof TUTORIAL_ANCHOR];
 
 export const tutorialSelector = (anchor: TutorialAnchor) => `[data-tutorial="${anchor}"]`;

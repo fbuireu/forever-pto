@@ -4,7 +4,7 @@ import { useIsMobile } from "@ui/hooks/useMobile";
 import { useSidebar } from "@ui/modules/core/animate/base/Sidebar";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
 import { X } from "@ui/modules/core/animate/icons/X";
-import { TUTORIAL_ANCHOR, tutorialSelector } from "@ui/modules/tutorial/anchors";
+import { TUTORIAL_ANCHOR, TUTORIAL_EVENT, tutorialSelector } from "@ui/modules/tutorial/anchors";
 import type { DriveStep } from "driver.js";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect } from "react";
@@ -58,7 +58,8 @@ export const useTutorial = () => {
 		]);
 		const driverClient = getDriverClientInstance();
 
-		const expandDrawer = () => globalThis.dispatchEvent(new CustomEvent("tutorial:expand-drawer"));
+		const expandDrawer = () => globalThis.dispatchEvent(new CustomEvent(TUTORIAL_EVENT.EXPAND_DRAWER));
+		const collapseDrawer = () => globalThis.dispatchEvent(new CustomEvent(TUTORIAL_EVENT.COLLAPSE_DRAWER));
 
 		const steps: DriveStep[] = [
 			{
@@ -181,6 +182,7 @@ export const useTutorial = () => {
 			prevBtnText: tUi("prevBtn"),
 			doneBtnText: tUi("doneBtn"),
 			progressText: `{{current}} ${tUi("progressTextConnector")} {{total}}`,
+			onDestroyStarted: isMobile ? collapseDrawer : undefined,
 		});
 	}, [open, openMobile, isMobile, t, tUi, toggleSidebar]);
 

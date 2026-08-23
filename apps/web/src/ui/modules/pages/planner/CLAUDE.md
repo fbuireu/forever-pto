@@ -407,9 +407,27 @@ consumes the attribute**, not in a cross-screen component reaching in by DOM id.
 `HOLIDAYS_LIST`, `PLANNER_DRAWER`, `ALTERNATIVES_MANAGER` and `PTO_STATUS` are this screen's driver.js
 anchors; the const in [`../../tutorial/anchors.ts`](../../tutorial/anchors.ts) is the only place their
 strings are written, so a rename is a compile error rather than a step that silently highlights nothing. `ManagementBar` additionally listens
-for a `tutorial:expand-drawer` window event dispatched by [`hooks/useTutorial.tsx`](../../../hooks/useTutorial.tsx) — a deliberately
+for the two window events in `TUTORIAL_EVENT`, dispatched by [`hooks/useTutorial.tsx`](../../../hooks/useTutorial.tsx) — a deliberately
 loose coupling so the tutorial does not import planner state, and invisible to a search for the
 listener's caller.
+
+**The expand event needs a matching collapse, and for a while it had none.** The tutorial expanded the
+drawer at its `ALTERNATIVES_MANAGER` step and nothing ever brought it back down: the only reset was inside
+`handleSelectionChange`, so the drawer stayed expanded until the user applied an Alternative. The tour end
+now dispatches `COLLAPSE_DRAWER` from `onDestroyStarted`, which fires on the done button, the close button
+and an outside click alike. Both events live in `TUTORIAL_EVENT` rather than as literals in two files,
+because a listener and a dispatcher that disagree about a string fail silently in exactly this way.
+
+**`DRAWER_SNAP.EXPANDED` is 0.85 and must stay below 1.** The drawer is `h-[100dvh] max-h-none`, which is
+what makes a snap point mean "this fraction of the viewport is visible" — vaul translates a viewport-sized
+element down by `innerHeight - snap * innerHeight`. At a snap of exactly 1 the translation is zero, so the
+element covers the screen edge to edge; `dismissible={false}`, `overlay={false}` and no close button then
+leave nothing to tap to get out of it, and vaul's own `[data-vaul-drawer] { touch-action: none }` kills
+scrolling wherever it lands. Capping the top snap at 0.85 keeps 15dvh of page reachable above it, which is
+also where the floating sidebar trigger sits. Do not raise it to 1 to "use the whole screen", and do not
+delete `max-h-none` while the height is `100dvh` — the base `max-h-[85dvh]` in
+[`Drawer.tsx`](../../core/animate/base/Drawer.tsx) would clamp the box while vaul kept translating it as
+though it were still full height.
 
 ## Conventions
 
