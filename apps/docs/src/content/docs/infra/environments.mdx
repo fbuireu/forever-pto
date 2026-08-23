@@ -15,7 +15,7 @@ The app runs as a Cloudflare Worker built with OpenNext. There are three kinds o
 
 ## Production
 
-Deployed by the `deploy-production` job of `.github/workflows/ci.yml` on every push to `main`, gated on lint, typecheck and unit tests passing and on the `changes` job finding an `apps/web` change (see [release](/infra/release/)). The Worker is bound to the `forever-pto.com` zone via a route pattern in `wrangler.toml` — a zone route, not a Workers custom domain. It uses the production R2 incremental-cache bucket, KV namespace and Turso database (see [Cloudflare stack](/infra/cloudflare/)).
+Deployed by the `deploy-production` job of `.github/workflows/ci.yml` on every push to `main`, gated on the `Check` job passing and on the `changes` job finding an `apps/web` change (see [release](/infra/release/)). The Worker is bound to the `forever-pto.com` zone via a route pattern in `wrangler.toml` — a zone route, not a Workers custom domain. It uses the production R2 incremental-cache bucket, KV namespace and Turso database (see [Cloudflare stack](/infra/cloudflare/)).
 
 ## Development (stable)
 
@@ -27,7 +27,7 @@ Every pull request gets its own throwaway Worker.
 
 ### Created
 
-the `deploy-development` job of `.github/workflows/ci.yml` fires on `pull_request` (`opened`, `reopened`, `synchronize`) and calls the reusable `.github/workflows/_deploy-web.yml` with `wrangler_env: development` plus a `worker_name` override of `pr-<n>-forever-pto-development`. The `--name` flag on `wrangler deploy` is what mints a brand-new Worker instead of updating the stable one. After deploying:
+The `deploy-development` job of `.github/workflows/ci.yml` fires on `pull_request` (`opened`, `reopened`, `synchronize`) and calls the reusable `.github/workflows/_deploy-web.yml` with `wrangler_env: development` plus a `worker_name` override of `pr-<n>-forever-pto-development`. The `--name` flag on `wrangler deploy` is what mints a brand-new Worker instead of updating the stable one. After deploying:
 
 1. The five runtime secrets are re-pushed to the new Worker with `wrangler secret bulk --name pr-<n>-…` (Worker-attached secrets do not exist until pushed — see [secrets](/infra/secrets/)).
 2. A sticky PR comment (upserted via a hidden marker) posts the preview URL.
@@ -47,7 +47,7 @@ Previews deploy with `--env development`, so they all **share** the development 
  PR opened / synchronized                          PR closed
         │                                              │
         ▼                                              ▼
- the deploy-development job                       cleanup-development.yml
+ ci.yml: deploy-development                       cleanup-development.yml
         │                                              │
         ▼                                              ▼
  _deploy-web.yml                                  wrangler delete
@@ -59,8 +59,8 @@ Previews deploy with `--env development`, so they all **share** the development 
    └─ Playwright E2E via Access token         Shared dev R2 / KV / Turso
                                               persist untouched.
 
- push to main ──► the deploy-production job ──► _deploy-web.yml
-                  (parallel with CI/release)   └─ wrangler deploy --env production
+ push to main ──► ci.yml: changes + Check ──► deploy-production ──► _deploy-web.yml
+                                                                    └─ wrangler deploy --env production
                                                   → Worker forever-pto @ forever-pto.com/*
 ```
 

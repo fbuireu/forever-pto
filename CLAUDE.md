@@ -55,12 +55,14 @@ pnpm cf:typegen         # regenerate apps/web/cloudflare-env.d.ts (reference onl
 
 pnpm lint:all           # biome lint over both packages (:fix to autofix)
 pnpm format:all         # biome check --write over both packages
-pnpm typecheck  # the root program, then apps/web, then apps/docs (astro check)
+pnpm format:check       # biome check, no writes; what verify runs
+pnpm typecheck          # the root program, then apps/web, then apps/docs (astro check)
 
 pnpm test:ut            # apps/web unit tests, then the contract suite
 pnpm test:docs          # the contract suite alone
-pnpm test:ut:coverage      # apps/web with coverage
+pnpm test:ut:coverage   # apps/web with coverage, then the contract suite with coverage
 pnpm test:e2e           # apps/web playwright
+pnpm verify             # format:check && typecheck && test:ut:coverage; the CI Check job and pre-push
 ```
 
 `pnpm --filter forever-pto-docs dev` runs the docs site; it has no root passthrough because nothing else

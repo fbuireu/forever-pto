@@ -74,7 +74,7 @@ Everything CI runs, you can run locally:
 ```bash
 pnpm lint:all           # biome lint (append :fix to autofix)
 pnpm format:all         # biome check --write
-pnpm typecheck  # tsc --noEmit
+pnpm typecheck          # root program, then apps/web, then apps/docs
 pnpm test:ut            # unit tests (vitest)
 pnpm test:e2e           # end-to-end tests (playwright)
 ```

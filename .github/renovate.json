@@ -59,7 +59,9 @@
 			"addLabels": ["patched-dependency"]
 		},
 		{
+			"description": "A docs-only dependency bump must not read as an app change. Attribution is by path, so semantic-release already books it against apps/docs, and the commit type keeps the pull request title saying the same thing. Only the type changes; the automerge rules above still apply.",
 			"matchFileNames": ["apps/docs/package.json"],
+			"semanticCommitType": "docs",
 			"addLabels": ["docs"]
 		}
 	]
