@@ -12,7 +12,7 @@ Cloudflare Worker that hosts the app is configured in `wrangler.toml`, not here.
 
 ## Files
 
-**This folder holds no planning rule.** `worker.ts` deserialises a request, calls `runPlanningPipeline` from
+**This folder holds no planning rule.** [`worker.ts`](./worker.ts) deserialises a request, calls `runPlanningPipeline` from
 `@domain/calendar`, serialises the result and posts it. Everything the handler used to do around those calls,
 from clearing the caches and building the `manual-N` pseudo-Holidays to deriving `carryOverMonths`, computing the
 budget, short-circuiting an empty plan and measuring each Suggestion, moved into that module, because the
@@ -22,10 +22,10 @@ suites. A rule you want to change is in the domain; what lives here is the bound
 | File | Contents |
 | --- | --- |
 | `worker.ts` | The entry point. Registers `globalThis.onmessage`, calls the pipeline, replies with `self.postMessage` |
-| `types.ts` | `WORKER_MESSAGE_TYPE`, `CalculateSuggestionsRequest`, `WorkerResponse`, and the `Serialized*` wire types |
-| `utils/serializers.ts` | Both directions of the boundary conversion, in one file so they cannot drift apart |
+| [`types.ts`](./types.ts) | `WORKER_MESSAGE_TYPE`, `CalculateSuggestionsRequest`, `WorkerResponse`, and the `Serialized*` wire types |
+| [`utils/serializers.ts`](./utils/serializers.ts) | Both directions of the boundary conversion, in one file so they cannot drift apart |
 
-The other half of the contract lives outside this folder: `useCalculationsWorker.ts` under `@ui/hooks/` spawns
+The other half of the contract lives outside this folder: [`useCalculationsWorker.ts`](../../ui/hooks/useCalculationsWorker.ts) under `@ui/hooks/` spawns
 the worker, builds the request and deserialises the reply. Change `types.ts` and you are changing both.
 
 ## The protocol
@@ -93,7 +93,7 @@ touched `metrics` at all, so a new field did not even redden the fixture. A roun
 type claim; only a type can. The fixture is a real, fully populated `Metrics` now, which is separately worth
 having, because it fails to compile when the shape changes.
 
-`worker.test.ts`'s metrics mock is `vi.fn<typeof generateMetrics>()`. It was untyped and returned
+[`worker.test.ts`](./worker.test.ts)'s metrics mock is `vi.fn<typeof generateMetrics>()`. It was untyped and returned
 `{ efficiency: 2, totalDaysOff: 7 }`, where neither field exists on `Metrics`, and `totalDaysOff` is a name
 [`CONTEXT.md`](../../../../../CONTEXT.md) retired under **Effective Day**, so a reader learning the shape
 from that fixture learned two names that are not real. Typing it also typed the recorded arguments, which
@@ -149,7 +149,7 @@ The two kinds of hand-edited day reach the engine by different routes, and that 
 overlap by construction, so any Metric that subtracts Holidays and PTO Days as two independent counts
 subtracts every Manual Day twice. `getWorkedDaysPerMonth` did exactly that and understated Worked Days per
 month by one day per Manual Day. Every Metric touching both lists now goes through one helper,
-`dayOffKeys`, in the calendar domain's `metrics/utils/dayOff.ts`, so a new Metric that reads `holidays` and
+`dayOffKeys`, in the calendar domain's [`metrics/utils/dayOff.ts`](../../domain/calendar/metrics/utils/dayOff.ts), so a new Metric that reads `holidays` and
 `ptoDays` together cannot forget; there is no second way to build the set. That instruction used to live
 here as a note to future readers, which is where a function should have been.
 
@@ -208,5 +208,5 @@ it. The pipeline's own behaviour is pinned once, against the real engine, in
 testable as behaviour (run twice, check the second run answers for its own Holidays) rather than as two spy
 calls in no particular order.
 
-`utils/serializers.test.ts` covers the round trip. It is the cheaper place to catch a new `Date` field than a
+[`utils/serializers.test.ts`](./utils/serializers.test.ts) covers the round trip. It is the cheaper place to catch a new `Date` field than a
 worker test is.

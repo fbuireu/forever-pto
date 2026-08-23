@@ -30,7 +30,7 @@ biome.json            Lint and format for both packages
 CONTEXT.md            The domain glossary, root only
 ```
 
-There is no `packages/` tier. It is added to `pnpm-workspace.yaml` the day a real shared package exists,
+There is no `packages/` tier. It is added to [`pnpm-workspace.yaml`](./pnpm-workspace.yaml) the day a real shared package exists,
 not before. See [ADR 0010](./adr/0010-apps-web-and-apps-docs-monorepo-layout.md).
 
 ## Versions (pinned; match exactly)
@@ -109,8 +109,8 @@ its paths fall under, so a docs change never cuts an app release and vice versa.
 
 | Package | Tags | Writes | Runs in |
 | --- | --- | --- | --- |
-| `apps/web` | `web-vX.Y.Z` | `apps/web/package.json`, `apps/web/CHANGELOG.md`, a GitHub release | `ci.yml`, after the production deploy |
-| `apps/docs` | `docs-vX.Y.Z` | a tag and a GitHub release, nothing else | `docs.yml`, after the docs deploy |
+| `apps/web` | `web-vX.Y.Z` | [`apps/web/package.json`](./apps/web/package.json), [`apps/web/CHANGELOG.md`](./apps/web/CHANGELOG.md), a GitHub release | [`ci.yml`](./.github/workflows/ci.yml), after the production deploy |
+| `apps/docs` | `docs-vX.Y.Z` | a tag and a GitHub release, nothing else | [`docs.yml`](./.github/workflows/docs.yml), after the docs deploy |
 
 `apps/docs` has no changelog, npm or git plugin on purpose: it pushes nothing to `main`, which is what keeps
 the two release jobs from racing each other. Its package version stays `0.0.0` forever and nothing reads it;
@@ -123,7 +123,7 @@ app release publishes `web-v1.0.0` over a 1.8.x line, which cannot be recalled f
 
 **A change confined to the repo root releases nothing**: `adr/`, `tests/`, `README.md`, `CONTEXT.md`, this
 file. That is correct and occasionally surprising. **It is narrower than it reads**: `WEB_PATHS` in `ci.yml`
-also matches `package.json`, `pnpm-workspace.yaml`, `biome.json`, `.npmrc`, `.nvmrc` and
+also matches [`package.json`](./package.json), `pnpm-workspace.yaml`, [`biome.json`](./biome.json), `.npmrc`, `.nvmrc` and
 `.github/actions/`, all of which do cut a release. That is deliberate, because each of them changes what the
 app builds from, but it means "the repo root" is not the boundary; the regex is.
 
@@ -131,9 +131,9 @@ app builds from, but it means "the repo root" is not the boundary; the regex is.
 
 **`ci.yml` holds the whole app graph**: `changes`, then `lint`, `typecheck` and `test` in parallel, then
 `deploy-production` → `release-web` → `docs-refresh` on `main`, or `deploy-development` → `comment` / `e2e`
-on a PR. Both deploy jobs call the shared `_deploy-web.yml`. `docs.yml` holds the docs graph: `build`, then
-`preview` on a PR or `deploy` → `release-docs` on `main`. The rest are `cleanup-development.yml`, the
-renovate auto-merge, a `zizmor` audit, and `dependabot-auto-merge.yml`, which is **dormant**: there is no
+on a PR. Both deploy jobs call the shared [`_deploy-web.yml`](./.github/workflows/_deploy-web.yml). `docs.yml` holds the docs graph — `build`, then
+`preview` on a PR or `deploy` → `release-docs` on `main`. The rest are [`cleanup-development.yml`](./.github/workflows/cleanup-development.yml), the
+renovate auto-merge, a `zizmor` audit, and [`dependabot-auto-merge.yml`](./.github/workflows/dependabot-auto-merge.yml) — which is **dormant**: there is no
 `.github/dependabot.yml` in the tree, so nothing ever triggers it. It is kept for the day one appears.
 
 Every job that needs a toolchain uses the `.github/actions/prepare-env` composite (pnpm, the `.nvmrc` Node,
@@ -300,11 +300,11 @@ module they name (that last one is the largest slice of the cross-package seam a
 because `astro check` registers no MDX plugin and the citation rules match paths rather than symbols); that
 every script this file
 documents exists in the root manifest and every script the web guide documents exists in one of the two;
-that `apps/web/tsconfig.json` keeps the two settings `next build` would otherwise fill in for it (`strict`
-on and `allowJs` off), that it sits beside the `next.config.ts` that rewrites it, and that
+that [`apps/web/tsconfig.json`](./apps/web/tsconfig.json) keeps the two settings `next build` would otherwise fill in for it — `strict`
+on and `allowJs` off — that it sits beside the [`next.config.ts`](./apps/web/next.config.ts) that rewrites it, and that
 `cloudflare-env.d.ts` stays both excluded from the program and ignored by git; that every `'use client'`,
 `'use server'` and `'use cache'` under either package's `src/` is a bare string literal in first position;
-and that every locale bundle has exactly the keys `en.json` has.
+and that every locale bundle has exactly the keys [`en.json`](./apps/web/src/ui/i18n/messages/en.json) has.
 
 It reads staged *and* unstaged files, so a rule fires before the offending file is committed. **Each rule was
 verified by breaking it and confirming the matching case fails**; keep that property when you add one. A
@@ -340,7 +340,7 @@ relative-link rule could not catch because they were prose rather than links.
 - **`boneyard-js` is patched, so Renovate must not automerge it.** `pnpm-workspace.yaml` keys
   `patchedDependencies` by bare name, with no version, so the patch is applied to whatever version resolves.
   A bump that still applies cleanly but no longer patches what the diff was written against is silent: the
-  install succeeds and CI stays green. `.github/renovate.json` therefore carries a `boneyard-js` rule turning
+  install succeeds and CI stays green. [`.github/renovate.json`](./.github/renovate.json) therefore carries a `boneyard-js` rule turning
   `automerge` off, against the blanket patch/minor automerge above it; a human reads the upstream diff. It is
   the only dependency in the tree with a patch, and a second one needs the same rule.
 - **`minimumReleaseAge` is declared twice and nothing keeps the two in step.** `pnpm-workspace.yaml` says

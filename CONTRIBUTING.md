@@ -107,7 +107,7 @@ Husky runs lint-staged on pre-commit, commitlint on commit-msg and
 ## The docs are part of the change
 
 This repo treats its documentation as part of the code: change one, update the
-other **in the same commit**. `tests/docs-consistency.test.ts` runs with the
+other **in the same commit**. [`tests/docs-consistency.test.ts`](./tests/docs-consistency.test.ts) runs with the
 unit tests and fails the build when the mechanical half of that contract is
 broken: scripts that no longer exist, links that no longer resolve, aliases
 that moved. [CLAUDE.md](./CLAUDE.md) has the full table of what to update for

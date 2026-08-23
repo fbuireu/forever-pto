@@ -5,10 +5,10 @@
 The six translation catalogues, and nothing else. This folder holds no code: `messages/` contains one
 JSON file per locale and the folder has no `.ts` file at all. Everything that decides *which* locale a
 request gets lives elsewhere: the locale list and request config in `@infrastructure/i18n`
-(`locales.ts`, `config.ts`, `routing.ts`, `cookie.ts`), and the locale-aware `Link` / `useRouter` /
-`usePathname` in `@application/i18n/navigation` (`navigation.ts`).
+([`locales.ts`](../../infrastructure/i18n/locales.ts), [`config.ts`](../../infrastructure/i18n/config.ts), [`routing.ts`](../../infrastructure/i18n/routing.ts), [`cookie.ts`](../../infrastructure/i18n/cookie.ts)), and the locale-aware `Link` / `useRouter` /
+`usePathname` in `@application/i18n/navigation` ([`navigation.ts`](../../application/i18n/navigation.ts)).
 
-Aliased `@i18n/*`. Excluded from the Vitest run and from coverage in `vitest.config.ts`, because it is data.
+Aliased `@i18n/*`. Excluded from the Vitest run and from coverage in [`vitest.config.ts`](../../../../../vitest.config.ts) — it is data.
 
 ## Languages
 
@@ -20,7 +20,7 @@ breaks the dynamic import in `config.ts` at request time.
 
 ## Namespaces
 
-`en.json` has 49 top-level namespaces and roughly 1,250 leaf keys. A namespace is the scope passed to
+[`en.json`](./messages/en.json) has 49 top-level namespaces and roughly 1,250 leaf keys. A namespace is the scope passed to
 `useTranslations` in a client component or `getTranslations` in a server one:
 
 ```typescript
@@ -32,12 +32,12 @@ Namespaces map to a feature or a surface, not to a component tree, so more than 
 the same namespace and one component often reads several. Two consequences worth knowing before you
 go hunting for a key:
 
-- The namespace name does not always match the component. `pages/planner/Contact.tsx` reads
-  `roadmap`, not `contact`; `contact` belongs to the contact form in `shared/contact/ContactModal.tsx`.
+- The namespace name does not always match the component. [`pages/planner/Contact.tsx`](../modules/pages/planner/Contact.tsx) reads
+  `roadmap`, not `contact` — `contact` belongs to the contact form in [`shared/contact/ContactModal.tsx`](../modules/shared/contact/ContactModal.tsx).
 - `metadata` is read through `getTranslations({ locale, namespace: 'metadata' })` in four places, none of
-  them a `'use client'` component: the two route `metadata.ts` files, `buildMarkdownPage.ts` under
+  them a `'use client'` component: the two route `metadata.ts` files, [`buildMarkdownPage.ts`](../../infrastructure/markdown/buildMarkdownPage.ts) under
   `@infrastructure/markdown` (the Markdown twin's title and description), and the async server component
-  `modules/shared/seo/JsonLd.tsx`, which interpolates `title` and `description` into the WebApplication
+  [`modules/shared/seo/JsonLd.tsx`](../modules/shared/seo/JsonLd.tsx), which interpolates `title` and `description` into the WebApplication
   JSON-LD. Renaming a `metadata` key means checking all four: miss the last two and the structured data or
   the Markdown twin degrades silently, with every page still rendering correctly.
 
@@ -46,9 +46,9 @@ go hunting for a key:
 - Keys are camelCase, with three deliberate snake_case exceptions, all of them for the same reason: the key
   *is* a machine code, looked up by a value that arrives from elsewhere, so renaming it breaks the lookup
   silently rather than at compile time. `toasts.promoCodeErrors.*` mirrors the Stripe promotion-code error
-  codes, indexed in `shared/donate/Donate.tsx`. `contact.errors.*` and `checkout.errors.*` mirror the
+  codes, indexed in [`shared/donate/Donate.tsx`](../modules/shared/donate/Donate.tsx). `contact.errors.*` and `checkout.errors.*` mirror the
   `ApiError` constants and the Zod codes baked into the contact schema, indexed by `resolveApiErrorMessage`
-  in `shared/utils/helpers.ts`. Do not "fix" any of the three to camelCase.
+  in [`shared/utils/helpers.ts`](../modules/shared/utils/helpers.ts). Do not "fix" any of the three to camelCase.
 - A code with no key is not a bug on its own, because `resolveApiErrorMessage` falls back to the namespace's generic
   message, which is why a missing key shows plausible copy rather than an error. That makes the omission
   invisible: if you add a code a user can reach, add its key in the same change.
@@ -92,7 +92,7 @@ go hunting for a key:
   as a parameter object and did not change.
 - Interpolation is `{variable}`; plurals use ICU (`{count, plural, one {…} other {…}}`); inline markup
   uses rich-text tags (`<b>`, `<link>`, `<em>`) that the component supplies as render functions.
-  `createRichLink` in `core/primitives/RichLink.tsx` is the helper for the `<link>` case.
+  `createRichLink` in [`core/primitives/RichLink.tsx`](../modules/core/primitives/RichLink.tsx) is the helper for the `<link>` case.
 - Values are always strings. There are no arrays anywhere in the bundles: a list is a numbered or
   named set of sibling keys, because `next-intl` cannot interpolate into an array.
 - `en.json` is the reference. Add a key there first, then to the other five in the same commit.
@@ -105,7 +105,7 @@ and diffs it against the reference, so a half-finished translation fails the uni
 rendering a raw key in production. It reads unstaged files, so it fires before you commit.
 
 **There is no fallback chain to English.** `config.ts` supplies `locale` and `messages` and nothing
-else, no `onError` and no `getMessageFallback`, so a key present in `en.json` and missing from `de.json`
+else — no `onError`, no `getMessageFallback` — so a key present in `en.json` and missing from [`de.json`](./messages/de.json)
 does not quietly fall back: it takes `next-intl`'s default handling, which surfaces the key path in the
 UI rather than the copy. The parity test above is what keeps that from reaching production.
 
@@ -132,11 +132,11 @@ available either: the planner is client-side end to end
 ([ADR 0001](../../../../../adr/0001-planner-runs-in-the-browser.md)), so most of the catalogue has to
 reach the browser one way or another.
 
-**`src/app/global-error.tsx` is English-only, on purpose.** It static-imports `en.json` alone and sets
+**[`src/app/global-error.tsx`](../../app/global-error.tsx) is English-only, on purpose.** It static-imports `en.json` alone and sets
 `<html lang='en'>` even when the URL says `/de/…`, because global-error sits above the `[locale]`
 segment and cannot reach the request config. Importing all six catalogues to fix that would add them
 
-to the root bundle of every route. A test in `src/app/global-error.test.tsx` greps that file for
+to the root bundle of every route. A test in [`src/app/global-error.test.tsx`](../../app/global-error.test.tsx) greps that file for
 catalogue imports and fails if a second one appears. Do not "complete" the localisation there.
 
 **The server-side import is a template literal.** `config.ts` loads the catalogue with a dynamic
@@ -148,5 +148,5 @@ not it is a locale.
 
 Locale routing, detection and the cookie (`@infrastructure/i18n`, see
 [`infrastructure/CLAUDE.md`](../../infrastructure/CLAUDE.md)); transactional email copy, which is
-hard-coded English in `application/email/templates/Contact.tsx` and has no locale plumbing at all; log
+hard-coded English in [`application/email/templates/Contact.tsx`](../../application/email/templates/Contact.tsx) and has no locale plumbing at all; log
 and error-report strings, which are never translated.
