@@ -110,10 +110,24 @@ its paths fall under, so a docs change never cuts an app release and vice versa.
 the two release jobs from racing each other. Its package version stays `0.0.0` forever and nothing reads it —
 the docs site displays the **app's** version.
 
-**`web-v1.8.2` is a bridge tag and looks like debris.** It sits on the same commit as the older `v1.8.2` and
-carries no annotation. semantic-release finds the last release by `tagFormat`; delete that tag and the next
-app release publishes `web-v1.0.0` over a 1.8.x line, which cannot be recalled from GitHub Releases. The
-`release-web` job fails loudly if no `web-v*` tag exists rather than letting it happen quietly.
+**There are two bridge tags, `web-v1.8.2` and `web-v1.8.3`, and the first looks like debris.** Each sits on
+the same commit as the legacy `v1.8.x` tag of the same number. semantic-release finds the last release by
+`tagFormat`, which is `web-v${version}`; delete the highest one and the next app release publishes
+`web-v1.0.0` over a 1.8.x line, which cannot be recalled from GitHub Releases. The `release-web` job fails
+loudly if no `web-v*` tag exists rather than letting it happen quietly.
+
+`web-v1.8.2` carries no annotation, which is why it reads as debris and why this paragraph exists.
+`web-v1.8.3` is annotated with its own reason, so `git show web-v1.8.3` answers the question without a guide.
+Annotate the next one too.
+
+**`web-v1.8.3`'s number matches what is live and its content does not, deliberately.** The 1.8.3 changelog
+entry lists one fix, the Renovate bump of Next to 16.3.1, and this branch rejects that bump because
+[ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) pins Next to 16.2.12. The tag exists so
+the next release continues from 1.8.3 rather than re-cutting it and writing a second 1.8.3 section into a
+changelog that already has one.
+
+**Both tags are local until someone pushes them.** They have to reach the remote before `release-web` first
+runs on `main`, which is after this branch merges.
 
 **A change confined to the repo root releases nothing** — `adr/`, `tests/`, `README.md`, `CONTEXT.md`, this
 file. That is correct and occasionally surprising. **It is narrower than it reads**: `WEB_PATHS` in `ci.yml`
@@ -188,21 +202,37 @@ Passing the secret explicitly in the caller's `secrets:` block does not rescue i
 declare an `environment:`, so `${{ secrets.CLOUDFLARE_API_TOKEN }}` there resolves against repository
 secrets only. The value that works on `main` comes from the *callee* job's own `environment: production`.
 
-**Before this branch merges, four things have to happen in repo settings and none of them is a code
-change:**
+**Before this branch merges, one thing has to happen in repo settings, and it is the one nobody but the
+owner can do.** Checked against the API on 2026-08-23; three of the four items this list used to carry were
+already done and are recorded here so the next reader does not redo them.
 
-1. Create `web-production` and `docs-production` — they do not exist yet, so `deploy-production` will fail
-   the same way the first time it runs on `main`.
-2. Copy the secrets from `development`/`production` onto all four, plus `CF_ACCESS_CLIENT_ID` and
-   `CF_ACCESS_CLIENT_SECRET` on `web-development`, which `e2e` reads to reach a preview behind Cloudflare
-   Access.
-3. Move the `NEXT_PUBLIC_*` vars onto the two `web-*` environments.
-4. Change ruleset `main` (`required_deployments`) from `development` to `web-development`. It is a merge
-   gate, so even a green deploy to `web-development` leaves the pull request blocked until it names the
-   environment the branch actually deploys to.
+**Outstanding — copy `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` onto all four new environments.**
+They sit on the old `development` and `production` and nowhere else. `gh secret list` returns exactly
+`CODECOV_TOKEN` and `PAT`, so a job naming `web-production`, `web-development`, `docs-production` or
+`docs-development` reads an empty string, wrangler falls back to interactive OAuth, opens a browser on a
+headless runner and times out after 120 seconds per attempt. `web-development` additionally needs
+`CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET`, which `e2e` reads to reach a preview behind Cloudflare
+Access. **A secret's value cannot be read back through the API, so this cannot be scripted from the outside**
+— it is a dashboard or `gh secret set` job with the values in hand.
 
-The alternative is to revert the rename in `ci.yml`, `docs.yml` and `cleanup-development.yml` and keep one
-shared pair, which is what the split exists to stop.
+Already true, and this list said otherwise:
+
+- All four environments exist.
+- The five runtime secrets (`JWT_SECRET`, `RESEND_API_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
+  `TURSO_AUTH_TOKEN`) are on both `web-*`. The `docs-*` pair needs none of them, only the Cloudflare two.
+- The seven `NEXT_PUBLIC_*` vars are on both `web-*`.
+- There is **no `required_deployments` rule** on ruleset `main`, so there is nothing to repoint. Its
+  `required_status_checks` are `Check`, `Run zizmor`, `Lint the pull request title` and `Dependency Review`.
+
+**`E2E tests` is not a required check, and that is the hole two separate incidents came through.** It is what
+catches the Cloudflare Error 1101 the Next pin exists to prevent, and Renovate auto-merged 16.3.1 straight
+past it; it is also why `cleanup-development.yml` had to join `ci.yml`'s concurrency group, because Renovate
+merges on the required checks while `e2e` is still driving the preview Worker. Adding it is the right end
+state and **must come after the Cloudflare secrets**, not before: `e2e` needs a preview deploy, so making it
+required while `web-development` cannot authenticate blocks every merge.
+
+The alternative to all of it is to revert the rename in `ci.yml`, `docs.yml` and `cleanup-development.yml`
+and keep one shared pair, which is what the split exists to stop.
 
 **`deploy-tail` is gated on its own files.** The tail consumer is a second Worker with its own `wrangler.toml`; the app declares it in `[[tail_consumers]]` but does not carry it. It changes rarely, so it deploys only when `apps/web/workers/tail/**` does.
 
@@ -360,6 +390,13 @@ relative-link rule could not catch because they were prose rather than links.
 - **The `v1` floating tag is stale and nothing maintains it.** It diverges between local and remote, which
   makes semantic-release's own `git fetch --tags` fail outright with *would clobber existing tag*. No
   workflow moves it and no ADR records it.
+- **Renovate must not automerge `next`, `typescript` or `@opennextjs/cloudflare`,** and it did once. The three
+  are one decision ([ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)): 16.3.x on adapter
+  1.20.2 answers 500 with Cloudflare Error 1101 on every unknown URL, because the 404 is the one page rendered
+  at request time. A **minor** bump to 16.3.1 auto-merged past the blanket minor rule and shipped that to
+  `main`, and the e2e suite that catches it is not a required check. [`.github/renovate.json`](./.github/renovate.json)
+  now carries an `adapter-pinned` rule turning `automerge` off for all three. The pin is not a preference to
+  be tidied away by a bot.
 - **`boneyard-js` is patched, so Renovate must not automerge it.** `pnpm-workspace.yaml` keys
   `patchedDependencies` by bare name, with no version, so the patch is applied to whatever version resolves.
   A bump that still applies cleanly but no longer patches what the diff was written against is silent — the

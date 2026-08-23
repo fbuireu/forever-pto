@@ -54,6 +54,13 @@
 			"allowedVersions": "/^[0-9]*[02468]\\./"
 		},
 		{
+			"description": "ADR 0009 pins these three as one decision, and the pin is load-bearing: Next 16.3.x on @opennextjs/cloudflare 1.20.2 answers 500 with Cloudflare Error 1101 on every unknown URL, because the 404 is the one page rendered at request time. A minor bump auto-merged straight past that once. Raise them by hand, together, and only once the adapter supports the Next being raised to.",
+			"matchDepNames": ["next", "typescript", "@opennextjs/cloudflare"],
+			"automerge": false,
+			"addLabels": ["adapter-pinned"]
+		},
+		{
+			"description": "Patched through pnpm patchedDependencies, which is keyed by bare name with no version, so a bump that still applies cleanly but no longer patches what the diff was written against is silent. A human reads the upstream diff.",
 			"matchDepNames": ["boneyard-js"],
 			"automerge": false,
 			"addLabels": ["patched-dependency"]
