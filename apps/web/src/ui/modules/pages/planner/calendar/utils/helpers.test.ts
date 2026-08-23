@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { isPast } from "../../utils/modifiers";
 import { getDayClassNames, MODIFIERS_CLASS_NAMES } from "./helpers";
 
 const MONTH = new Date(2025, 0, 1);
@@ -13,7 +14,6 @@ const classesFor = (overrides: Partial<Parameters<typeof getDayClassNames>[0]> =
 		month: MONTH,
 		selectedDates: [],
 		showOutsideDays: true,
-		today: null,
 		modifiers: {},
 		...overrides,
 	});
@@ -92,10 +92,18 @@ describe("getDayClassNames month and past-day handling", () => {
 		expect(classes).toContain("invisible");
 	});
 
-	it("fades a past day only when the past is excluded", () => {
+	it("fades a past day through the same predicate the click handler binds, not a second copy of the rule", () => {
 		const today = new Date(2025, 0, 20);
-		expect(classesFor({ today, allowPastDays: false })).toContain("opacity-60");
-		expect(classesFor({ today, allowPastDays: true })).not.toContain("opacity-60");
+
+		expect(classesFor({ modifiers: { disabled: isPast(false, today) } })).toContain("opacity-60");
+		expect(classesFor({ modifiers: { disabled: isPast(true, today) } })).not.toContain("opacity-60");
+		expect(classesFor({ modifiers: { disabled: isPast(false, null) } })).not.toContain("opacity-60");
+	});
+
+	it("leaves a future day unfaded even while the past is excluded", () => {
+		const today = new Date(2025, 0, 1);
+
+		expect(classesFor({ modifiers: { disabled: isPast(false, today) } })).not.toContain("opacity-60");
 	});
 
 	it("offers the hover lift only to a day that carries no state of its own", () => {

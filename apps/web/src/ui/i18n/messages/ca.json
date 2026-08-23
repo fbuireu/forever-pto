@@ -594,6 +594,8 @@
 		"title": "Dies de PTO",
 		"iHave": "Tinc",
 		"days": "dies",
+		"decrease": "Redueix dies de PTO",
+		"increase": "Augmenta dies de PTO",
 		"status": "Estat de dies PTO",
 		"autoAssigned": "Suggerits:",
 		"manuallySelected": "Seleccionats manualment:",

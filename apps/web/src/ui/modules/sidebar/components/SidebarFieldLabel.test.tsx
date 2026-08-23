@@ -6,12 +6,12 @@ describe("SidebarFieldLabel", () => {
 	it("associates the label with the control the caller named", () => {
 		render(
 			<>
-				<SidebarFieldLabel controlId="pto-days" icon={null} title="PTO days" />
-				<input id="pto-days" />
+				<SidebarFieldLabel controlId="allow-past-days" icon={null} title="Allow past days" />
+				<button type="button" id="allow-past-days" role="switch" aria-checked="false" />
 			</>,
 		);
 
-		expect(screen.getByLabelText("PTO days")).toBe(document.getElementById("pto-days"));
+		expect(screen.getByRole("switch", { name: "Allow past days" })).toBe(document.getElementById("allow-past-days"));
 	});
 
 	it("renders no label element when there is no control to name", () => {

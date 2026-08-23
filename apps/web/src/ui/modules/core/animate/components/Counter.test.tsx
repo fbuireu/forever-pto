@@ -34,61 +34,128 @@ import { Counter } from "./Counter";
 
 describe("Counter", () => {
 	it('renders with data-slot="counter"', () => {
-		const { container } = render(<Counter number={5} setNumber={vi.fn()} />);
+		const { container } = render(
+			<Counter decrementLabel="Fewer PTO days" incrementLabel="More PTO days" number={5} setNumber={vi.fn()} />,
+		);
 		expect(container.querySelector('[data-slot="counter"]')).not.toBeNull();
 	});
 
 	it("displays the current number", () => {
-		const { getByTestId } = render(<Counter number={7} setNumber={vi.fn()} />);
+		const { getByTestId } = render(
+			<Counter decrementLabel="Fewer PTO days" incrementLabel="More PTO days" number={7} setNumber={vi.fn()} />,
+		);
 		expect(getByTestId("sliding-number").textContent).toBe("7");
 	});
 
 	it("calls setNumber with number - 1 on decrement click", () => {
 		const setNumber = vi.fn();
-		const { getByText } = render(<Counter number={5} setNumber={setNumber} />);
+		const { getByText } = render(
+			<Counter decrementLabel="Fewer PTO days" incrementLabel="More PTO days" number={5} setNumber={setNumber} />,
+		);
 		fireEvent.click(getByText("−"));
 		expect(setNumber).toHaveBeenCalledWith(4);
 	});
 
 	it("calls setNumber with number + 1 on increment click", () => {
 		const setNumber = vi.fn();
-		const { getByText } = render(<Counter number={5} setNumber={setNumber} />);
+		const { getByText } = render(
+			<Counter decrementLabel="Fewer PTO days" incrementLabel="More PTO days" number={5} setNumber={setNumber} />,
+		);
 		fireEvent.click(getByText("+"));
 		expect(setNumber).toHaveBeenCalledWith(6);
 	});
 
 	it("renders the label when provided", () => {
-		const { getByText } = render(<Counter number={5} setNumber={vi.fn()} label="days" />);
+		const { getByText } = render(
+			<Counter
+				decrementLabel="Fewer PTO days"
+				incrementLabel="More PTO days"
+				number={5}
+				setNumber={vi.fn()}
+				label="days"
+			/>,
+		);
 		expect(getByText("days")).toBeTruthy();
 	});
 
 	it("does not render a label element when label is omitted", () => {
-		const { container } = render(<Counter number={5} setNumber={vi.fn()} />);
+		const { container } = render(
+			<Counter decrementLabel="Fewer PTO days" incrementLabel="More PTO days" number={5} setNumber={vi.fn()} />,
+		);
 		expect(container.querySelector("small")).toBeNull();
 	});
 
+	it("names both buttons from the props, since a bare glyph names nothing", () => {
+		const { getByRole } = render(
+			<Counter decrementLabel="Fewer PTO days" incrementLabel="More PTO days" number={5} setNumber={vi.fn()} />,
+		);
+
+		expect(getByRole("button", { name: "Fewer PTO days" }).textContent).toBe("−");
+		expect(getByRole("button", { name: "More PTO days" }).textContent).toBe("+");
+	});
+
 	it("applies custom className to the wrapper", () => {
-		const { container } = render(<Counter number={5} setNumber={vi.fn()} className="my-class" />);
+		const { container } = render(
+			<Counter
+				decrementLabel="Fewer PTO days"
+				incrementLabel="More PTO days"
+				number={5}
+				setNumber={vi.fn()}
+				className="my-class"
+			/>,
+		);
 		expect(container.querySelector('[data-slot="counter"]')?.className).toContain("my-class");
 	});
 
 	it("disables decrement button via decrementButtonProps", () => {
-		const { getByText } = render(<Counter number={5} setNumber={vi.fn()} decrementButtonProps={{ disabled: true }} />);
+		const { getByText } = render(
+			<Counter
+				decrementLabel="Fewer PTO days"
+				incrementLabel="More PTO days"
+				number={5}
+				setNumber={vi.fn()}
+				decrementButtonProps={{ disabled: true }}
+			/>,
+		);
 		expect((getByText("−") as HTMLButtonElement).disabled).toBe(true);
 	});
 
 	it("does not disable increment when only decrementButtonProps.disabled is set", () => {
-		const { getByText } = render(<Counter number={5} setNumber={vi.fn()} decrementButtonProps={{ disabled: true }} />);
+		const { getByText } = render(
+			<Counter
+				decrementLabel="Fewer PTO days"
+				incrementLabel="More PTO days"
+				number={5}
+				setNumber={vi.fn()}
+				decrementButtonProps={{ disabled: true }}
+			/>,
+		);
 		expect((getByText("+") as HTMLButtonElement).disabled).toBe(false);
 	});
 
 	it("disables increment button via incrementButtonProps", () => {
-		const { getByText } = render(<Counter number={5} setNumber={vi.fn()} incrementButtonProps={{ disabled: true }} />);
+		const { getByText } = render(
+			<Counter
+				decrementLabel="Fewer PTO days"
+				incrementLabel="More PTO days"
+				number={5}
+				setNumber={vi.fn()}
+				incrementButtonProps={{ disabled: true }}
+			/>,
+		);
 		expect((getByText("+") as HTMLButtonElement).disabled).toBe(true);
 	});
 
 	it("does not disable decrement when only incrementButtonProps.disabled is set", () => {
-		const { getByText } = render(<Counter number={5} setNumber={vi.fn()} incrementButtonProps={{ disabled: true }} />);
+		const { getByText } = render(
+			<Counter
+				decrementLabel="Fewer PTO days"
+				incrementLabel="More PTO days"
+				number={5}
+				setNumber={vi.fn()}
+				incrementButtonProps={{ disabled: true }}
+			/>,
+		);
 		expect((getByText("−") as HTMLButtonElement).disabled).toBe(false);
 	});
 });

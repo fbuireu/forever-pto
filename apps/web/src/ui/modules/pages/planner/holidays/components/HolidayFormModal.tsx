@@ -16,12 +16,18 @@ import {
 import { Button } from "@ui/modules/core/primitives/Button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@ui/modules/core/primitives/Form";
 import { Input } from "@ui/modules/core/primitives/Input";
-import { Calendar, CalendarSelectionMode, type FromTo } from "@ui/modules/pages/planner/calendar/Calendar";
+import {
+	Calendar,
+	CalendarSelectionMode,
+	type DayStates,
+	type FromTo,
+} from "@ui/modules/pages/planner/calendar/Calendar";
 import { describeHolidayRefusal } from "@ui/modules/pages/planner/calendar/utils/refusals";
+import { isSuggestion } from "@ui/modules/pages/planner/utils/modifiers";
 import { CalendarDays, Calendar as CalendarIcon } from "lucide-react";
 import type { Locale } from "next-intl";
 import { useTranslations } from "next-intl";
-import { type ReactNode, useState, useTransition } from "react";
+import { type ReactNode, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useShallow } from "zustand/react/shallow";
@@ -59,14 +65,13 @@ export const HolidayFormModal = ({
 	const tFields = useTranslations(HolidayFormMode.ADD);
 	const tA11y = useTranslations("a11y");
 	const tValidation = useTranslations("validation.holiday");
-	const { holidays, currentSelection, alternatives, suggestion } = useHolidaysStore(
+	const { holidays, currentSelection } = useHolidaysStore(
 		useShallow((state) => ({
 			holidays: state.holidays,
 			currentSelection: state.currentSelection,
-			alternatives: state.alternatives,
-			suggestion: state.suggestion,
 		})),
 	);
+	const dayStates = useMemo<DayStates>(() => ({ suggested: isSuggestion(currentSelection) }), [currentSelection]);
 	const [selectedDate, setSelectedDate] = useState<Date | undefined>(defaultValues?.date);
 	const [isPending, startTransition] = useTransition();
 
@@ -174,9 +179,7 @@ export const HolidayFormModal = ({
 												locale={locale}
 												holidays={holidays}
 												allowPastDays
-												currentSelection={currentSelection}
-												alternatives={alternatives}
-												suggestion={suggestion}
+												dayStates={dayStates}
 												className="w-full"
 												disabled={isPending}
 											/>

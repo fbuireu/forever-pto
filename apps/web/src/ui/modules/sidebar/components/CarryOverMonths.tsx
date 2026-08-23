@@ -56,7 +56,6 @@ export const CarryOverMonths = () => {
 		<AnimateIcon animateOnHover>
 			<div className="space-y-2 w-full pb-4">
 				<SidebarFieldLabel
-					controlId="carry-over-months"
 					icon={<SlidersHorizontal size={16} />}
 					title={t("title")}
 					tooltip={{ label: t("tooltipLabel"), content: t("tooltip") }}
@@ -66,7 +65,7 @@ export const CarryOverMonths = () => {
 						<p className="font-normal text-sm">{MIN_VALUE}</p>
 						<div className="relative flex-1">
 							<Slider
-								id="carry-over-months"
+								label={t("title")}
 								value={[localValue]}
 								max={MAX_VALUE}
 								min={MIN_VALUE}

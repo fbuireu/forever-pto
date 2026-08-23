@@ -97,6 +97,32 @@ that forgets degrades to what it said before rather than to nothing. The callers
 see [`../../i18n/CLAUDE.md`](../../i18n/CLAUDE.md). A brand name is the one thing that stays literal:
 `aria-label='Forever PTO'` is correct in every locale.
 
+**A name the caller can forget is a name that gets forgotten, so four components now demand one.** The
+`closeLabel` shape above — optional, with an English default — degrades to what the component said before,
+and that is only a safe default where the component *said* something. Where it said nothing, the prop is
+required and the compiler is the check:
+
+- [`primitives/Label.tsx`](./primitives/Label.tsx) takes `htmlFor: string`, not the optional one `ComponentProps<'label'>` carries. A
+  `<label>` naming nothing is not inert, it is a promise to a screen reader that never resolves, and four of
+  its five callers made it: two in `shared/cookie-consent/CookieConsentDialog.tsx`, one over the donation
+  presets and one over the Workday counter heading. It also destructures `children` and renders them rather
+  than letting them arrive through the spread — that is what lets Biome see the label has content, and it is
+  why the file no longer carries a `noLabelWithoutControl` suppression.
+- [`animate/base/Switch.tsx`](./animate/base/Switch.tsx) takes `{ id } | { 'aria-label' } | { 'aria-labelledby' }`, intersected with its
+  other props, so one of the three has to be there. Base UI renders it as `<button role='switch'>` with no
+  name of its own: the four switches in the cookie dialog announced as "switch, not pressed" and nothing
+  else.
+- [`primitives/Slider.tsx`](./primitives/Slider.tsx) takes `label: string` and puts it on `Slider.Thumb`, which is where Base UI's
+  real control — a nested `<input type='range'>` — lives. Its `id` prop is gone: it landed on `Slider.Root`,
+  which renders a `<div>`, so the `<label htmlFor>` pointing at it named nothing.
+- [`animate/components/Counter.tsx`](./animate/components/Counter.tsx) takes `decrementLabel` and `incrementLabel`. Its buttons were named by
+  their own text content, `−` and `+`, which announces the operation and never its subject. The existing
+  `label` prop is unrelated — it is the visible caption under the number.
+
+The union on `Switch` proves a caller thought about the name, not that the name exists: `id` only names
+anything if some `<label htmlFor>` points at it. That is the same guarantee `htmlFor: string` gives, and it
+is the most a type can offer here.
+
 **`RadialNav` accepts `HTMLAttributes` and spreads none of them.** It destructures what it uses and drops the
 rest, so `aria-label` had to be named explicitly to be honoured at all. Anything else a caller passes —
 `id`, `data-*`, a handler — is silently discarded today. Widen the destructure rather than assuming the
@@ -166,6 +192,12 @@ context-free branch of `IconWrapper` builds its `AnimateIcon` without `persistOn
 and `onValueCommitted` callbacks a `number | readonly number[]`; every caller in this app wants a
 mutable `number[]`, so the wrapper copies the array or boxes the lone number before calling back.
 Widening the prop type instead would push that fork into each caller.
+
+It also pins where the accessible name goes. Base UI splits the slider into a `Root` that renders a
+`<div>`, a `Thumb` that renders a `<div>` **and a nested `<input type='range'>`**, and a `Slider.Label`
+part this wrapper does not use. The name has to reach the input, so `label` becomes `aria-label` on the
+`Thumb`; `aria-labelledby` on the `Root` would also work and would need a real element id threaded to it.
+Putting it on the `Root` instead is the mistake that looks right.
 
 **`primitives/Combobox.tsx` keys its `CommandItem` by `option.value` and carries the label in `keywords`,
 and the two halves are one decision.** cmdk hands `onSelect` the item's own `value` — trimmed, case intact —

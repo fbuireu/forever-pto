@@ -8,7 +8,6 @@ import { Button } from "@ui/modules/core/primitives/Button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@ui/modules/core/primitives/Form";
 import { Input } from "@ui/modules/core/primitives/Input";
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@ui/modules/core/primitives/InputGroup";
-import { Label } from "@ui/modules/core/primitives/Label";
 import { cn } from "@ui/utils/cn";
 import { amountFormatter } from "@ui/utils/currencies";
 import type { Locale } from "next-intl";
@@ -77,8 +76,8 @@ export function DonationForm({
 						</FormItem>
 					)}
 				/>
-				<div className="space-y-2">
-					<Label>{t("quickAmounts")}</Label>
+				<fieldset className="space-y-2">
+					<legend className="p-0 text-sm font-medium leading-none">{t("quickAmounts")}</legend>
 					<div className="flex gap-2">
 						{PRESET_AMOUNTS.map((preset) => (
 							<Button
@@ -94,7 +93,7 @@ export function DonationForm({
 							</Button>
 						))}
 					</div>
-				</div>
+				</fieldset>
 
 				<FormField
 					control={form.control}

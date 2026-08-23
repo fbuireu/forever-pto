@@ -11,6 +11,8 @@ type CounterButtonProps = Omit<ComponentProps<"button">, "onClick" | "children">
 type CounterProps = Omit<HTMLMotionProps<"div">, "children"> & {
 	number: number;
 	setNumber: (number: number) => void;
+	decrementLabel: string;
+	incrementLabel: string;
 	label?: string;
 	slidingNumberProps?: Omit<SlidingNumberProps, "number">;
 	buttonProps?: CounterButtonProps;
@@ -22,6 +24,8 @@ type CounterProps = Omit<HTMLMotionProps<"div">, "children"> & {
 function Counter({
 	number,
 	setNumber,
+	decrementLabel,
+	incrementLabel,
 	label,
 	className,
 	slidingNumberProps,
@@ -50,6 +54,7 @@ function Counter({
 				whileTap={{ filter: "brightness(0.85)" }}
 				{...(buttonProps as object)}
 				{...(decrementButtonProps as object)}
+				aria-label={decrementLabel}
 				onClick={() => setNumber(number - 1)}
 				className={cn(btnBase, "border-r-[3px] border-(--frame)", decrementButtonProps?.className)}
 			>
@@ -74,6 +79,7 @@ function Counter({
 				whileTap={{ filter: "brightness(0.85)" }}
 				{...(buttonProps as object)}
 				{...(incrementButtonProps as object)}
+				aria-label={incrementLabel}
 				onClick={() => setNumber(number + 1)}
 				className={cn(btnBase, "border-l-[3px] border-(--frame)", incrementButtonProps?.className)}
 			>

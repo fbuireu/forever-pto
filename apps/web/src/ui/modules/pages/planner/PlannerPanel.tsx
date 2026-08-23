@@ -1,6 +1,5 @@
 "use client";
 
-import type { HolidaysState } from "@application/stores/holidays";
 import { useHolidaysStore } from "@application/stores/holidays";
 import type { AlternativeSelectionBaseParams } from "@application/stores/types";
 import type { MeasuredSuggestion } from "@domain/calendar/types";
@@ -15,7 +14,7 @@ import { cn } from "@ui/utils/cn";
 import { BarChart3, CalendarDays, Sparkles, TrendingUp } from "lucide-react";
 import { m, type Transition, type Variants } from "motion/react";
 import { useTranslations } from "next-intl";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 
 const STAT_CARD_MOTION_CONFIG = {
 	initial: "rest",
@@ -56,7 +55,7 @@ const BADGE_VARIANTS: Variants = {
 interface AlternativesProps {
 	allSuggestions: MeasuredSuggestion[];
 	onSelectionChange: (params: AlternativeSelectionBaseParams) => void;
-	onPreviewChange: (params: AlternativeSelectionBaseParams) => void;
+	onPreviewChange: (index: number) => void;
 	selectedIndex: number;
 	currentSelectionIndex: number;
 }
@@ -65,29 +64,21 @@ function Alternatives({
 	allSuggestions,
 	onSelectionChange,
 	onPreviewChange,
-	selectedIndex = 0,
-	currentSelectionIndex = 0,
+	selectedIndex,
+	currentSelectionIndex,
 }: AlternativesProps) {
 	const t = useTranslations("alternativesManager");
-	const [currentIndex, setCurrentIndex] = useState(selectedIndex);
+	const currentIndex = selectedIndex;
 	const totalOptions = allSuggestions.length;
 	const currentSuggestion = allSuggestions[currentIndex];
 
 	const handlePrevious = useCallback(() => {
-		if (currentIndex > 0) {
-			const newIndex = currentIndex - 1;
-			setCurrentIndex(newIndex);
-			onPreviewChange({ suggestion: allSuggestions[newIndex], index: newIndex });
-		}
-	}, [currentIndex, allSuggestions, onPreviewChange]);
+		if (currentIndex > 0) onPreviewChange(currentIndex - 1);
+	}, [currentIndex, onPreviewChange]);
 
 	const handleNext = useCallback(() => {
-		if (currentIndex < totalOptions - 1) {
-			const newIndex = currentIndex + 1;
-			setCurrentIndex(newIndex);
-			onPreviewChange({ suggestion: allSuggestions[newIndex], index: newIndex });
-		}
-	}, [currentIndex, totalOptions, allSuggestions, onPreviewChange]);
+		if (currentIndex < totalOptions - 1) onPreviewChange(currentIndex + 1);
+	}, [currentIndex, totalOptions, onPreviewChange]);
 
 	const effectiveDays = currentSuggestion.metrics.totalEffectiveDays;
 	const efficiency = currentSuggestion.metrics.averageEfficiency;
@@ -350,11 +341,7 @@ function Status() {
 	);
 }
 
-interface PlannerPanelProps extends AlternativesProps {
-	currentSelection: NonNullable<HolidaysState["currentSelection"]>;
-}
-
-export const PlannerPanel = ({ currentSelection, ...alternativesProps }: PlannerPanelProps) => (
+export const PlannerPanel = (alternativesProps: AlternativesProps) => (
 	<div className="w-full rounded-[10px] border-[3px] border-[var(--frame)] bg-card p-3 shadow-[var(--shadow-brutal-md)]">
 		<Alternatives {...alternativesProps} />
 		<div className="mt-3 border-t-[2px] border-[var(--frame)]/15" />

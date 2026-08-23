@@ -82,6 +82,26 @@ builds them into one `modifiers` object and hands it to `getDayClassNames`, whic
 in `MODIFIERS_CLASS_NAMES`. Adding a day state therefore means three edits: the predicate, the entry in
 `modifiers`, and the class-name entry under the same key.
 
+**`Calendar` builds only the states it can answer for itself, and the caller supplies the rest.** Weekend,
+Holiday, Custom, national-or-regional, today, past and the whole range family come from what `Calendar`
+already has: `holidays`, `allowPastDays`, its own `today` and its own selection. The three that describe a
+*plan* (`suggested`, `alternative`, `manuallySelected`) arrive as a `dayStates` prop, which is a
+`Partial<Record<DayStateName, (date: Date) => boolean>>`. `CalendarList.tsx` builds all three from the
+holidays store; [`holidays/components/HolidayFormModal.tsx`](./holidays/components/HolidayFormModal.tsx) supplies `suggested` alone, so its
+single-date picker still shows which dates the plan has already spent;
+[`sidebar/components/WorkdayCounterCalendarModal.tsx`](../../sidebar/components/WorkdayCounterCalendarModal.tsx) supplies none.
+
+That prop replaced six of them: `currentSelection`, `alternatives`, `suggestion`, `previewAlternativeIndex`,
+`manuallySelectedDays` and `removedSuggestedDays`, and with them the two store-type imports that gave a
+component described as knowing "nothing that knows what a planner is" the store's own vocabulary. It also
+removed a sentinel that worked by accident: `previewAlternativeIndex` defaulted to `-1`, and `isAlternative`
+resolved that as `alternatives[-2]`, `undefined`, `false`. No branch said so; the arithmetic happened to
+land outside the array. A caller that omits `dayStates` now paints no plan state because there is no
+predicate, which is a reason rather than a coincidence.
+
+`getDayClassNames` therefore types `modifiers` as `Record<string, ((date: Date) => boolean) | undefined>`,
+and every lookup inside it was already an optional call.
+
 Precedence inside `getDayClassNames` is not the object order, and reading it as such will mislead you:
 
 1. The loop is skipped entirely when the date is in the `selectedDates` prop or the calendar is
@@ -105,6 +125,15 @@ valid SVG `fill` in any case. The fall-throughs are gone.
 
 `isAlternative` deliberately returns `false` for any date already in `currentSelection`: an Alternative
 is only ever painted where it *differs* from the applied Suggestion.
+
+**The past-day rule has one author, and it used to have two.** `isPast(allowPastDays, today)` is what
+`Calendar` binds as `modifiers.disabled` and what its click handler branches on. `getDayClassNames` used to
+take `allowPastDays` and `today` and recompute the same question for its `opacity-60` fade, with the left
+operand normalised differently (`startOfDay(date)` in one, the bare `date` in the other), agreeing only
+because `getCalendarDays` happens to emit midnight dates. It reads `modifiers.disabled?.(date)` now and both
+parameters are gone from `GetDayClassNamesParams`. [`calendar/utils/helpers.test.ts`](./calendar/utils/helpers.test.ts) drives that case
+through the real `isPast` rather than through the parameters, which is why it can tell the difference at
+all.
 
 ## Invariants
 
@@ -163,6 +192,24 @@ have no such short-circuit of their own.
 
 ## Gotchas
 
+**`Calendar` is not a grid, and the `role="grid"` it used to declare was the only ARIA the pattern got.**
+There was no `role="row"`, no `role="gridcell"`, no `columnheader` (the weekday strip is a sibling
+*outside* the day container) and, more to the point, no grid keyboard model: a grid promises arrow-key
+navigation between cells, and every cell here is an ordinary `<button>` in the tab order. Implementing the
+pattern would have meant grouping `getCalendarDays`' flat 42 into weeks, moving the header inside, and
+writing roving focus, for a widget that already gives every day a complete accessible name:
+`Monday, June 1, 2026`, with the Holiday appended. So the role is gone along with its suppression, and the
+labelled buttons stand. The container's `aria-label` went with it: it named the month, which is in every
+button's own name already, and `aria-label` on a role-less `div` is ignored. Reintroducing any of it means
+implementing the whole pattern, and [`calendar/Calendar.test.tsx`](./calendar/Calendar.test.tsx) fails on a bare grid role.
+
+**The month header is one block, not one per `showNavigation` branch.** The two branches rendered a
+character-identical `<h3>` and a Free Day count that differed only by `font-black` against `font-semibold`,
+with nothing distinguishing them, and since `CalendarList` passes no `showNavigation`, `font-semibold` is
+what the product shows on every month calendar while `font-black` reached the two modals alone. The title
+and the count are hoisted out; `showNavigation` now decides only whether the prev/today/next controls
+render. Keep it that way: a second fork here is how the first drift happened.
+
 **`today` is state initialised to `null`, not `new Date()`.** `Calendar` sets it in an effect on
 mount. The server has no "today" that will still be true on the client, so the first paint has no
 today marker and no past-day dimming on purpose. Every predicate taking `today` handles `null`.
@@ -204,6 +251,25 @@ figures. Whatever index the metrics are read from is the one the label has to na
 **`PlannerPanel` is remounted by `key={previewAlternativeIndex}`.** `ManagementBar` does this so the
 entry animations replay when the user pages through Alternatives. Any state added inside `PlannerPanel`
 is therefore discarded on every Alternative change.
+
+**Which is why `Alternatives` holds no index of its own.** It used to keep `useState(selectedIndex)` and
+write it in both handlers *beside* calling `onPreviewChange`, which reaches the store; the remount above then
+re-seeded that state from the prop. The local copy could never hold a value the store did not, so it was a
+second source of truth that happened to agree. `currentIndex` is `selectedIndex` now, and
+[`PlannerPanel.test.tsx`](./PlannerPanel.test.tsx) pins both halves: a click round-trips through a stand-in store, and a change to
+`selectedIndex` with no click still moves the readout. Two dead `= 0` defaults sat on props the same
+interface declared required; they are gone too.
+
+**`onPreviewChange` takes an index, not an `AlternativeSelectionBaseParams`.** The store's
+`setPreviewAlternativeSelection` destructures `{ index }` and ignores `suggestion`, so the component was
+looking up `allSuggestions[newIndex]` to hand over a value nothing read, and paying for it in the handlers'
+dependency arrays. `ManagementBar` passes `{ suggestion: null, index }` at the store seam because the shared
+param type still requires the field; narrowing that type belongs with the store, not here.
+`onSelectionChange` is unchanged, because `setCurrentAlternativeSelection` genuinely uses the Suggestion.
+
+**`PlannerPanel` no longer takes `currentSelection`.** It destructured the prop and never referenced it,
+while `ManagementBar` computed a `currentSelection ?? allSuggestions[currentSelectionIndex]` fallback to
+supply it. Both are gone; the panel's props are exactly `Alternatives`'.
 
 **`Contact.tsx` reads the `roadmap` namespace, not `contact`.** The `contact` namespace belongs to the
 modal in `shared/contact/`. It also imports [`contact.css`](./contact.css), which is global CSS, not a module — the
@@ -379,13 +445,18 @@ at all, because `generateSuggestions` takes the window rather than its expansion
 
 ## Testing
 
-Seven test files: [`ManagementBar.test.tsx`](./ManagementBar.test.tsx), [`SiteTitle.test.tsx`](./SiteTitle.test.tsx), [`Summary.test.tsx`](./Summary.test.tsx),
-[`calendar/utils/helpers.test.ts`](./calendar/utils/helpers.test.ts), [`summary/BlocksPerQuarterChart.test.tsx`](./summary/BlocksPerQuarterChart.test.tsx),
-[`summary/QuarterDistributionChart.test.tsx`](./summary/QuarterDistributionChart.test.tsx) and [`summary/YearTimelineChart.test.tsx`](./summary/YearTimelineChart.test.tsx). That is not an
-oversight to close in passing — the components with tests are the ones holding logic, and the rest are left
+Fifteen test files. The components carrying them are the ones holding logic, and the rest are left
 to the Playwright suite in `e2e/` — which on this screen asserts only that `/planner` answers 200, has a
 title, and does not trip the error boundary. No e2e spec drives a calculation, so nothing outside these
-seven files pins planner *behaviour*.
+files pins planner *behaviour*.
+
+Three are recent, and each covers something no type could. [`utils/modifiers.test.ts`](./utils/modifiers.test.ts) drives the day
+predicates directly: `isAlternative` at index 0, at n, and against a date the applied Suggestion already
+holds, and `isSuggestion` with a Removed Day. Nothing had touched that module before — the only test file
+mentioning `modifiers` was `calendar/utils/helpers.test.ts`, and every one of its modifiers was a synthetic
+`() => true`. [`calendar/Calendar.test.tsx`](./calendar/Calendar.test.tsx) is the component's first test in 466 lines, and covers the two
+decisions above plus what `dayStates` paints. [`PlannerPanel.test.tsx`](./PlannerPanel.test.tsx) covers the Alternative index
+round-trip.
 
 `calendar/utils/helpers.test.ts` is the one that pins the precedence chain documented under *Day
 classification*, which is the only ordering on this screen that a reader is likely to get wrong from the

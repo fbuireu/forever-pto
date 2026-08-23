@@ -11,9 +11,10 @@ import { Skeleton } from "boneyard-js/react";
 import { useLocale } from "next-intl";
 import { useCallback, useEffect, useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
-import { Calendar, CalendarSelectionMode } from "./calendar/Calendar";
+import { Calendar, CalendarSelectionMode, type DayStates } from "./calendar/Calendar";
 import { CalendarListFixture } from "./calendar/CalendarListFixture";
 import { usePlannerDayClick } from "./calendar/usePlannerDayClick";
+import { isAlternative, isManuallySelected, isSuggestion } from "./utils/modifiers";
 
 export const CalendarList = () => {
 	const locale = useLocale();
@@ -65,6 +66,15 @@ export const CalendarList = () => {
 	const { triggerCalculation } = useCalculationsWorker();
 
 	const months = useMemo(() => planningWindowMonths({ carryOverMonths, year }), [carryOverMonths, year]);
+
+	const dayStates = useMemo<DayStates>(
+		() => ({
+			suggested: isSuggestion(currentSelection, removedSuggestedDays),
+			alternative: isAlternative({ alternatives, suggestion, previewAlternativeIndex, currentSelection }),
+			manuallySelected: isManuallySelected(manuallySelectedDays),
+		}),
+		[currentSelection, removedSuggestedDays, alternatives, suggestion, previewAlternativeIndex, manuallySelectedDays],
+	);
 
 	const toggleDay = useCallback(
 		(date: Date) => toggleDaySelection({ date, totalPtoDays: ptoDays, locale, allowPastDays }),
@@ -127,12 +137,7 @@ export const CalendarList = () => {
 						locale={locale}
 						holidays={holidays}
 						allowPastDays={allowPastDays}
-						currentSelection={currentSelection}
-						alternatives={alternatives}
-						suggestion={suggestion}
-						previewAlternativeIndex={previewAlternativeIndex}
-						manuallySelectedDays={manuallySelectedDays}
-						removedSuggestedDays={removedSuggestedDays}
+						dayStates={dayStates}
 						onDayToggle={handleDayToggle}
 						showOutsideDays
 						fixedWeeks

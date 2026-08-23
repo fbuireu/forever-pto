@@ -1,4 +1,4 @@
-import { isBefore, isSameDay, isSameMonth, startOfDay } from "@application/shared/utils/dates";
+import { isSameDay, isSameMonth } from "@application/shared/utils/dates";
 import type { FromTo } from "../Calendar";
 
 interface GetDayClassNamesParams {
@@ -7,9 +7,7 @@ interface GetDayClassNamesParams {
 	selectedDates: Date[];
 	disabled?: boolean;
 	showOutsideDays: boolean;
-	allowPastDays?: boolean;
-	today: Date | null;
-	modifiers: Record<string, (date: Date) => boolean>;
+	modifiers: Record<string, ((date: Date) => boolean) | undefined>;
 }
 
 export const MODIFIERS_CLASS_NAMES = {
@@ -47,15 +45,12 @@ export const getDayClassNames = ({
 	selectedDates,
 	disabled = false,
 	showOutsideDays,
-	allowPastDays = true,
-	today,
 	modifiers,
 }: GetDayClassNamesParams) => {
 	const classes: string[] = [];
 	const isOutsideMonth = !isSameMonth(date, month);
 	const isSelected = selectedDates.some((d) => isSameDay(d, date));
-	const isPastDay = today ? isBefore(startOfDay(date), startOfDay(today)) : false;
-	const shouldShowAsPast = isPastDay && !allowPastDays;
+	const shouldShowAsPast = modifiers.disabled?.(date) ?? false;
 
 	classes.push(
 		"size-8 rounded-lg p-0 font-medium text-sm",

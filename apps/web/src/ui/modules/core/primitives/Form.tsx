@@ -79,7 +79,7 @@ function FormItem({ className, ...props }: ComponentProps<"div">) {
 	);
 }
 
-function FormLabel({ className, ...props }: ComponentProps<"label">) {
+function FormLabel({ className, ...props }: Omit<ComponentProps<"label">, "htmlFor">) {
 	const { error, formItemId } = useFormField();
 
 	return (

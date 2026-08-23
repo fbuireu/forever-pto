@@ -171,6 +171,18 @@ held a defect that no type or lint rule can catch — [`sidebar/components/PtoCa
 actually show). Components whose body is markup plus translation calls are left to the Playwright suite in
 `e2e/` instead.
 
+**An accessible name is behaviour, so the components that grew one grew a test with it.**
+[`shared/cookie-consent/CookieConsentDialog.test.tsx`](./shared/cookie-consent/CookieConsentDialog.test.tsx)
+walks `COOKIE_SECTIONS` and asks for each switch **by name**, so a section or a service added to the config
+without a label fails rather than shipping a nameless toggle;
+[`sidebar/components/PtoDays.test.tsx`](./sidebar/components/PtoDays.test.tsx) and
+[`sidebar/components/CarryOverMonths.test.tsx`](./sidebar/components/CarryOverMonths.test.tsx) assert the
+name through the real widget rather than beside a synthetic `<input>`, which is what
+`SidebarFieldLabel.test.tsx` used to do and what let a label naming a `div` pass.
+[`shared/ConditionalWrapper.test.tsx`](./shared/ConditionalWrapper.test.tsx) and
+[`pages/homepage/sections/Testimonials.test.tsx`](./pages/homepage/sections/Testimonials.test.tsx) are the
+other two additions.
+
 **Be precise about what that buys, because it is less than "covered".** The `e2e/` specs are smoke tests: a
 page answers 200, has a non-empty `<title>`, carries the right `lang`, and a handful of section ids and links
 are visible. Nothing there drives the planner — no budget change, no calculation, no day toggled, no Premium
@@ -304,10 +316,44 @@ written both out by hand, and the copies had drifted in ways nothing could see:
   popover. With the popover open the document held two `#years`, and the label resolved to whichever came
   first. Nothing referenced the second one; it is gone.
 
+**`controlId` may only name a labelable element, and two of the seven call sites named a `<div>`.**
+`<label for>` resolves against the HTML labelable set — `button`, `input`, `select`, `textarea` and a
+couple more — so the five sites pointing at a combobox trigger or a switch button are honest.
+[`PtoDays.tsx`](./sidebar/components/PtoDays.tsx) named `Counter`, whose outer element is an `m.div`, and
+[`CarryOverMonths.tsx`](./sidebar/components/CarryOverMonths.tsx) named `Slider`, whose Base UI `Root` is
+also a `div`; in both cases the `id` was reaching the wrong element through `...props` and the label
+resolved to nothing. Both drop `controlId` and render a heading instead, and the two widgets carry their
+own names — see [`core/CLAUDE.md`](./core/CLAUDE.md).
+
+The alternative was to make `SidebarFieldLabel` emit `aria-labelledby` against a generated id, and it is
+worse: it would strip a working `htmlFor` from the five honest sites and still need every caller to thread
+the id onto its own control, because this module renders no control. Naming the control is one edit in the
+control; naming it from outside is an edit in both.
+
+[`WorkdayCounter.tsx`](./sidebar/components/WorkdayCounter.tsx) was a twelfth hand-written copy — a bare
+`Label` with the icon, the title and a `SidebarFieldTooltip` inside it, over a modal trigger it did not
+name. It uses `SidebarFieldLabel` now, with `className='my-0'` to keep its own spacing.
+
 The tooltip width is the caller's (`w-50` for the fields, `w-60` for the three calculators) and `Strategy`
 keeps `font-medium` with no vertical margin, both passed through `className` so the render is unchanged.
 That drift is real but cosmetic, and flattening it silently would have been a visual change hiding inside a
 refactor.
+
+**`shared/ConditionalWrapper.tsx` has one arm, and it used to advertise two.** The second took `as` and
+`wrapperProps` and rendered `<Component {...wrapperProps}>`, behind a `<T extends ElementType>` generic that
+existed only to type it. Nothing ever called it: both call sites — `pages/planner/calendar/Calendar.tsx` for
+the Holiday tooltip and `sidebar/components/PtoSalaryCalculator.tsx` — pass `wrapper`. The union, the
+generic and the `"wrapper" in props` narrowing are gone; a conditional `<div>` is `doWrap && <div>`, which
+needs no component.
+
+**`pages/homepage/sections/Testimonials.tsx` does not shuffle, and the shuffle it had did nothing three
+ways.** It is a `'use cache'` server component with `cacheLife('days')`, so `TESTIMONIAL_KEYS.toSorted(() =>
+Math.random() - 0.5)` ran once per cache period rather than per visitor — the order every reader saw was
+whatever one render happened to produce. `toSorted` with a random comparator is a biased shuffle regardless,
+and `CARD_STYLES[idx]` keys the avatar colour and the tilt to the *slot*, so a re-render silently repainted
+every testimonial. Rendering `TESTIMONIAL_KEYS` in order makes the colour a property of the person. Bringing
+a real shuffle back means moving it out of the cached body, and choosing between six styles keyed by index
+and six keyed by testimonial.
 
 `BRIDGE_WEEK` in [`pages/homepage/sections/Features.tsx`](./pages/homepage/sections/Features.tsx) is the shape the card's copy describes:
 Workdays Monday to Wednesday, a Thursday Holiday, a Friday PTO Day, then the weekend — a Bridge.

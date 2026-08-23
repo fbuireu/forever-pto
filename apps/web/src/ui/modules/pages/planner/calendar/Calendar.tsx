@@ -1,5 +1,6 @@
 "use client";
 
+import type { HolidayDTO } from "@application/dto/holiday/types";
 import {
 	addMonths,
 	type Day,
@@ -10,8 +11,6 @@ import {
 	isWeekend,
 	subMonths,
 } from "@application/shared/utils/dates";
-import type { FiltersState } from "@application/stores/filters";
-import type { HolidaysState } from "@application/stores/holidays";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@ui/modules/core/animate/base/Tooltip";
 import { ChevronLeft } from "@ui/modules/core/animate/icons/ChevronLeft";
 import { ChevronRight } from "@ui/modules/core/animate/icons/ChevronRight";
@@ -25,18 +24,15 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { getCalendarDays } from "../utils/helpers";
 import {
 	getPreviewRange,
-	isAlternative,
 	isCustom as isCustomFn,
 	isHoliday,
 	isInRange,
-	isManuallySelected,
 	isNationalOrRegionalHoliday as isNationalOrRegionalHolidayFn,
 	isPast,
 	isRangeEnd,
 	isRangeSelected,
 	isRangeStart,
 	isSelected,
-	isSuggestion,
 	isToday,
 } from "../utils/modifiers";
 import { getDayClassNames, isFromToObject } from "./utils/helpers";
@@ -62,6 +58,10 @@ const RangeSelection = {
 
 type RangeSelection = (typeof RangeSelection)[keyof typeof RangeSelection];
 
+export type DayStateName = "suggested" | "alternative" | "manuallySelected";
+
+export type DayStates = Partial<Record<DayStateName, (date: Date) => boolean>>;
+
 interface CalendarProps {
 	mode?: CalendarSelectionMode;
 	selected?: Date | Date[] | FromTo;
@@ -74,14 +74,9 @@ interface CalendarProps {
 	locale: Locale;
 	disabled?: boolean;
 	showOutsideDays?: boolean;
-	holidays: HolidaysState["holidays"];
-	allowPastDays: FiltersState["allowPastDays"];
-	currentSelection?: HolidaysState["currentSelection"];
-	alternatives?: HolidaysState["alternatives"];
-	suggestion?: HolidaysState["suggestion"];
-	previewAlternativeIndex?: HolidaysState["previewAlternativeIndex"];
-	manuallySelectedDays?: Date[];
-	removedSuggestedDays?: Date[];
+	holidays: HolidayDTO[];
+	allowPastDays: boolean;
+	dayStates?: DayStates;
 	onDayToggle?: (date: Date) => void;
 }
 
@@ -91,8 +86,7 @@ interface RangeState {
 	selecting: RangeSelection;
 }
 
-const EMPTY_ALTERNATIVES: HolidaysState["alternatives"] = [];
-const EMPTY_DATES: Date[] = [];
+const NO_DAY_STATES: DayStates = {};
 
 export function Calendar({
 	mode = CalendarSelectionMode.SINGLE,
@@ -108,12 +102,7 @@ export function Calendar({
 	showOutsideDays = true,
 	holidays,
 	allowPastDays = true,
-	currentSelection = null,
-	alternatives = EMPTY_ALTERNATIVES,
-	suggestion = null,
-	previewAlternativeIndex = -1,
-	manuallySelectedDays = EMPTY_DATES,
-	removedSuggestedDays = EMPTY_DATES,
+	dayStates = NO_DAY_STATES,
 	onDayToggle,
 	...props
 }: Readonly<CalendarProps>) {
@@ -154,9 +143,6 @@ export function Calendar({
 		const customFn = isCustomFn(holidays);
 		const nationalOrRegionalHolidayFn = isNationalOrRegionalHolidayFn(holidays);
 		const isPastFn = isPast(allowPastDays, today);
-		const isSuggestionFn = isSuggestion(currentSelection, removedSuggestedDays);
-		const isAlternativeFn = isAlternative({ alternatives, suggestion, previewAlternativeIndex, currentSelection });
-		const isManuallySelectedFn = isManuallySelected(manuallySelectedDays);
 		const isSelectedModifier =
 			mode === CalendarSelectionMode.RANGE ? isRangeSelected(rangeSelection) : isSelected(selectedDates);
 
@@ -166,11 +152,11 @@ export function Calendar({
 			custom: customFn,
 			nationalOrRegionalHoliday: nationalOrRegionalHolidayFn,
 			today: isToday(today),
-			suggested: isSuggestionFn,
-			alternative: isAlternativeFn,
+			suggested: dayStates.suggested,
+			alternative: dayStates.alternative,
 			disabled: isPastFn,
 			selected: isSelectedModifier,
-			manuallySelected: isManuallySelectedFn,
+			manuallySelected: dayStates.manuallySelected,
 		};
 
 		return {
@@ -186,27 +172,9 @@ export function Calendar({
 				}),
 			}),
 		};
-	}, [
-		holidays,
-		allowPastDays,
-		currentSelection,
-		alternatives,
-		suggestion,
-		previewAlternativeIndex,
-		selectedDates,
-		mode,
-		rangeSelection,
-		hoverDate,
-		manuallySelectedDays,
-		removedSuggestedDays,
-		today,
-	]);
+	}, [holidays, allowPastDays, dayStates, selectedDates, mode, rangeSelection, hoverDate, today]);
 
 	const weekdayNames = useMemo(() => getWeekdayNames({ locale, weekStartsOn }), [locale, weekStartsOn]);
-	const monthYearLabel = useMemo(
-		() => formatDate({ date: currentMonth, locale, format: "LLLL yyyy" }),
-		[currentMonth, locale],
-	);
 	const monthLabel = useMemo(() => formatDate({ date: currentMonth, locale, format: "MMMM" }), [currentMonth, locale]);
 	const yearLabel = useMemo(() => formatDate({ date: currentMonth, locale, format: "yyyy" }), [currentMonth, locale]);
 	const monthFreeDays = useMemo(
@@ -326,31 +294,33 @@ export function Calendar({
 			{...props}
 		>
 			<div className="flex items-center justify-between border-b-[3px] border-[var(--frame)] bg-[var(--surface-panel-alt)] px-3 py-2">
-				{showNavigation ? (
-					<>
-						<div className="flex items-center gap-3">
-							<AnimateIcon animateOnHover>
-								<Button
-									variant="ghost"
-									type="button"
-									size="sm"
-									onClick={handlePreviousMonth}
-									className="size-8 p-0 bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-xs)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
-									aria-label={tCalendar("previousMonth")}
-								>
-									<ChevronLeft className="size-4" />
-								</Button>
-							</AnimateIcon>
-							<h3 className="text-sm font-semibold">
-								{monthLabel} <span className="font-serif">{yearLabel}</span>
-							</h3>
-						</div>
-						<div className="flex items-center gap-2">
-							{monthFreeDays > 0 && (
-								<span className="text-xs font-black text-muted-foreground tabular-nums">
-									{tCalendar("daysOff", { count: monthFreeDays })}
-								</span>
-							)}
+				<div className="flex items-center gap-3">
+					{showNavigation && (
+						<AnimateIcon animateOnHover>
+							<Button
+								variant="ghost"
+								type="button"
+								size="sm"
+								onClick={handlePreviousMonth}
+								className="size-8 p-0 bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-xs)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+								aria-label={tCalendar("previousMonth")}
+							>
+								<ChevronLeft className="size-4" />
+							</Button>
+						</AnimateIcon>
+					)}
+					<h3 className="text-sm font-semibold">
+						{monthLabel} <span className="font-serif">{yearLabel}</span>
+					</h3>
+				</div>
+				<div className="flex items-center gap-2">
+					{monthFreeDays > 0 && (
+						<span className="text-xs font-semibold text-muted-foreground tabular-nums">
+							{tCalendar("daysOff", { count: monthFreeDays })}
+						</span>
+					)}
+					{showNavigation && (
+						<>
 							<Button
 								variant="ghost"
 								type="button"
@@ -373,20 +343,9 @@ export function Calendar({
 									<ChevronRight className="size-4" />
 								</Button>
 							</AnimateIcon>
-						</div>
-					</>
-				) : (
-					<div className="flex items-center justify-between w-full">
-						<h3 className="text-sm font-semibold">
-							{monthLabel} <span className="font-serif">{yearLabel}</span>
-						</h3>
-						{monthFreeDays > 0 && (
-							<span className="text-xs font-semibold text-muted-foreground tabular-nums">
-								{tCalendar("daysOff", { count: monthFreeDays })}
-							</span>
-						)}
-					</div>
-				)}
+						</>
+					)}
+				</div>
 			</div>
 
 			<div className="grid grid-cols-7 gap-1 mb-3 px-4 pt-3">
@@ -400,12 +359,11 @@ export function Calendar({
 				))}
 			</div>
 
-			{/* biome-ignore lint/a11y/useSemanticElements: role=grid on div is required for calendar ARIA pattern */}
-			<div className="grid grid-cols-7 gap-2 px-4 pb-4" role="grid" aria-label={monthYearLabel}>
+			<div className="grid grid-cols-7 gap-2 px-4 pb-4">
 				{calendarDays.map((date) => {
 					const isPastDay = modifiers.disabled(date);
-					const isManualDay = modifiers.manuallySelected(date);
-					const isSuggestedDay = modifiers.suggested(date);
+					const isManualDay = modifiers.manuallySelected?.(date) ?? false;
+					const isSuggestedDay = modifiers.suggested?.(date) ?? false;
 
 					const isDisabled = disabled || (isPastDay && !isManualDay && !isSuggestedDay);
 					const isOutsideMonth = !isSameMonth(date, currentMonth);
@@ -422,8 +380,6 @@ export function Calendar({
 						selectedDates: mode === CalendarSelectionMode.RANGE ? [] : selectedDates,
 						disabled: isDisabled,
 						showOutsideDays,
-						allowPastDays,
-						today,
 						modifiers,
 					});
 

@@ -19,8 +19,11 @@ type SwitchContextType = {
 
 const [SwitchProvider, useSwitch] = getStrictContext<SwitchContextType>("SwitchContext");
 
+type SwitchAccessibleName = { id: string } | { "aria-label": string } | { "aria-labelledby": string };
+
 type SwitchProps = Omit<ComponentProps<typeof SwitchPrimitives.Root>, "render"> &
-	Omit<HTMLMotionProps<"button">, "onChange">;
+	Omit<HTMLMotionProps<"button">, "onChange"> &
+	SwitchAccessibleName;
 
 function Switch({
 	name,

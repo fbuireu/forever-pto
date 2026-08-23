@@ -4,14 +4,13 @@ import { differenceInDays, formatDate } from "@application/shared/utils/dates";
 import { useHolidaysStore } from "@application/stores/holidays";
 import { SlidingNumber } from "@ui/modules/core/animate/text/SlidingNumber";
 import { Button } from "@ui/modules/core/primitives/Button";
-import { Label } from "@ui/modules/core/primitives/Label";
 import type { FromTo } from "@ui/modules/pages/planner/calendar/Calendar";
 import {
 	calculateHolidaysInRange,
 	calculateWeekends,
 	calculateWorkdays,
 } from "@ui/modules/pages/planner/utils/helpers";
-import { SidebarFieldTooltip } from "@ui/modules/sidebar/components/SidebarFieldLabel";
+import { SidebarFieldLabel } from "@ui/modules/sidebar/components/SidebarFieldLabel";
 import { CalendarDays } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useLocale, useTranslations } from "next-intl";
@@ -68,12 +67,12 @@ export const WorkdayCounter = () => {
 
 	return (
 		<div className="space-y-2 w-full">
-			<Label className="flex gap-2 text-sm font-mono font-normal">
-				<CalendarDays size={16} /> {t("title")}
-				<SidebarFieldTooltip label={t("tooltipLabel")} className="w-60">
-					{t("tooltip")}
-				</SidebarFieldTooltip>
-			</Label>
+			<SidebarFieldLabel
+				className="my-0"
+				icon={<CalendarDays size={16} />}
+				title={t("title")}
+				tooltip={{ label: t("tooltipLabel"), content: t("tooltip"), className: "w-60" }}
+			/>
 
 			<div className="space-y-2 w-full">
 				<p className="text-xs text-muted-foreground">{t("selectRange")}</p>

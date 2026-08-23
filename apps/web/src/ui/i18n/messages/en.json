@@ -594,6 +594,8 @@
 		"title": "PTO days",
 		"iHave": "I have",
 		"days": "days",
+		"decrease": "Decrease PTO days",
+		"increase": "Increase PTO days",
 		"status": "PTO days status",
 		"autoAssigned": "Suggested:",
 		"manuallySelected": "Manually selected:",

@@ -49,13 +49,14 @@ export const PtoDays = () => {
 
 	return (
 		<div className="space-y-2 w-full">
-			<SidebarFieldLabel controlId="pto-days" icon={<CalendarDays size={16} />} title={t("title")} />
+			<SidebarFieldLabel icon={<CalendarDays size={16} />} title={t("title")} />
 			<div className="flex items-center gap-3 justify-between">
 				<p className="text-sm text-muted-foreground">{t("iHave")}</p>
 				<Counter
-					id="pto-days"
 					number={ptoDays}
 					setNumber={handleChange}
+					decrementLabel={t("decrease")}
+					incrementLabel={t("increase")}
 					label={t("days").toUpperCase()}
 					decrementButtonProps={{
 						disabled: isDecrementDisabled,

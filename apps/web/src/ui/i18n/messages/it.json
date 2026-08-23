@@ -594,6 +594,8 @@
 		"title": "Giorni di PTO",
 		"iHave": "Ho",
 		"days": "giorni",
+		"decrease": "Riduci giorni di PTO",
+		"increase": "Aumenta giorni di PTO",
 		"status": "Stato giorni PTO",
 		"autoAssigned": "Suggeriti:",
 		"manuallySelected": "Selezionati manualmente:",

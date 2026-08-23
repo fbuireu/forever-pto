@@ -27,6 +27,8 @@ interface CookieConsentDialogProps {
 	onSave: () => void;
 }
 
+const switchId = (id: string) => `cookie-consent-${id}`;
+
 export const CookieConsentDialog = ({
 	open,
 	onOpenChange,
@@ -87,13 +89,15 @@ export const CookieConsentDialog = ({
 							>
 								<div className="flex items-start justify-between gap-4">
 									<div className="flex-1">
-										<Label className="text-base font-semibold">{t(`${section.id}Cookies`)}</Label>
+										<Label className="text-base font-semibold" htmlFor={switchId(section.id)}>
+											{t(`${section.id}Cookies`)}
+										</Label>
 										<p className="text-sm text-muted-foreground mt-1">{t(`${section.id}Description`)}</p>
 									</div>
 									{isAnalyticsSection(section.id) ? (
-										<Switch checked={analyticsEnabled} onCheckedChange={onAnalyticsChange} />
+										<Switch id={switchId(section.id)} checked={analyticsEnabled} onCheckedChange={onAnalyticsChange} />
 									) : (
-										<Switch checked disabled />
+										<Switch id={switchId(section.id)} checked disabled />
 									)}
 								</div>
 
@@ -101,8 +105,11 @@ export const CookieConsentDialog = ({
 									<div className="space-y-2 border-t border-border pt-3">
 										{section.services.map((service) => (
 											<div key={service.id} className="flex items-center justify-between pl-2">
-												<Label className="text-sm font-medium cursor-pointer">{t(service.labelKey)}</Label>
+												<Label className="text-sm font-medium cursor-pointer" htmlFor={switchId(service.id)}>
+													{t(service.labelKey)}
+												</Label>
 												<Switch
+													id={switchId(service.id)}
 													checked={serviceStates[service.id] ?? false}
 													onCheckedChange={(checked) => onServiceChange(service.id, checked)}
 												/>

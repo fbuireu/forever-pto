@@ -5,6 +5,7 @@ import { cn } from "@ui/utils/cn";
 import { useCallback } from "react";
 
 interface SliderProps {
+	label: string;
 	className?: string;
 	defaultValue?: number | number[];
 	value?: number | number[];
@@ -14,10 +15,10 @@ interface SliderProps {
 	onValueChange?: (value: number[]) => void;
 	onValueCommitted?: (value: number[]) => void;
 	disabled?: boolean;
-	id?: string;
 }
 
 function Slider({
+	label,
 	className,
 	defaultValue,
 	value,
@@ -27,7 +28,6 @@ function Slider({
 	onValueChange,
 	onValueCommitted,
 	disabled,
-	id,
 	...props
 }: SliderProps) {
 	const handleValueChange = useCallback(
@@ -57,7 +57,6 @@ function Slider({
 
 	return (
 		<SliderPrimitive.Root
-			id={id}
 			defaultValue={normalizedDefaultValue}
 			value={normalizedValue}
 			min={min}
@@ -73,7 +72,10 @@ function Slider({
 				<SliderPrimitive.Track className="relative h-4 w-full grow overflow-hidden rounded-full bg-[var(--surface-panel-alt)] border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-xs)]">
 					<SliderPrimitive.Indicator className="absolute h-full bg-[var(--frame)]" />
 				</SliderPrimitive.Track>
-				<SliderPrimitive.Thumb className="block hit-area-stable size-7 rounded-full border-[3px] border-[var(--frame)] bg-accent shadow-[var(--shadow-brutal-xs)] transition-all duration-75 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] disabled:pointer-events-none disabled:opacity-50" />
+				<SliderPrimitive.Thumb
+					aria-label={label}
+					className="block hit-area-stable size-7 rounded-full border-[3px] border-[var(--frame)] bg-accent shadow-[var(--shadow-brutal-xs)] transition-all duration-75 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] disabled:pointer-events-none disabled:opacity-50"
+				/>
 			</SliderPrimitive.Control>
 		</SliderPrimitive.Root>
 	);

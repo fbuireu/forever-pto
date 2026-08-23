@@ -594,6 +594,8 @@
 		"title": "Jours de congé",
 		"iHave": "J'ai",
 		"days": "jours",
+		"decrease": "Diminuer les jours de congé",
+		"increase": "Augmenter les jours de congé",
 		"status": "Statut des jours de congé",
 		"autoAssigned": "Suggérés :",
 		"manuallySelected": "Sélectionnés manuellement :",
