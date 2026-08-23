@@ -1,4 +1,5 @@
 import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
+import type { generateMetrics } from "@domain/calendar/metrics/generateMetrics";
 import type { runPlanningPipeline } from "@domain/calendar/pipeline";
 import { FilterStrategy, type MeasuredSuggestion } from "@domain/calendar/types";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -50,7 +51,21 @@ vi.mock("@application/dto/holiday/dto", () => ({
 }));
 
 vi.mock("@domain/calendar/metrics/generateMetrics", () => ({
-	generateMetrics: vi.fn().mockReturnValue({ totalDays: 0, efficiency: 0 }),
+	generateMetrics: vi.fn<typeof generateMetrics>().mockReturnValue({
+		longWeekends: 0,
+		restBlocks: 0,
+		maxWorkStreak: 0,
+		firstLastBreak: null,
+		averageEfficiency: 0,
+		bonusDays: 0,
+		quarterDist: [0, 0, 0, 0],
+		bridgesUsed: 0,
+		workedDaysPerMonth: 0,
+		totalEffectiveDays: 0,
+		monthlyDist: Array.from({ length: 12 }, () => 0),
+		longBlocksPerQuarter: [0, 0, 0, 0],
+		longestVacation: 0,
+	}),
 }));
 
 interface MakeHolidayParams {

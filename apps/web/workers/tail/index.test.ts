@@ -122,6 +122,40 @@ describe("tail worker", () => {
 		});
 	});
 
+	describe("ingest failures", () => {
+		it("reports a rejected ingest through the Worker's own console.error", async () => {
+			const reported = vi.spyOn(console, "error").mockImplementation(() => {});
+			mockFetch.mockResolvedValue(new Response(null, { status: 401, statusText: "Unauthorized" }));
+
+			await worker.tail([makeEvent({ logs: [{ message: ["x"], level: "log", timestamp: 1 }] })], ENV);
+
+			expect(reported).toHaveBeenCalledOnce();
+			expect(String(reported.mock.calls[0]?.[0])).toContain("401");
+			reported.mockRestore();
+		});
+
+		it("reports an unreachable ingest rather than throwing out of the tail handler", async () => {
+			const reported = vi.spyOn(console, "error").mockImplementation(() => {});
+			mockFetch.mockRejectedValue(new Error("connection reset"));
+
+			await expect(
+				worker.tail([makeEvent({ logs: [{ message: ["x"], level: "log", timestamp: 1 }] })], ENV),
+			).resolves.toBeUndefined();
+
+			expect(String(reported.mock.calls[0]?.[0])).toContain("connection reset");
+			reported.mockRestore();
+		});
+
+		it("says nothing when the ingest accepts the batch", async () => {
+			const reported = vi.spyOn(console, "error").mockImplementation(() => {});
+
+			await worker.tail([makeEvent({ logs: [{ message: ["x"], level: "log", timestamp: 1 }] })], ENV);
+
+			expect(reported).not.toHaveBeenCalled();
+			reported.mockRestore();
+		});
+	});
+
 	describe("url redaction", () => {
 		it("strips the query string so credentials in it never reach the log sink", async () => {
 			await worker.tail(

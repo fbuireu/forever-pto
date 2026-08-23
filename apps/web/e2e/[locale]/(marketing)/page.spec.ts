@@ -1,5 +1,9 @@
-import { ES } from "@infrastructure/i18n/locales";
+import { LOCALES } from "@infrastructure/i18n/locales";
+import { localePath } from "@infrastructure/i18n/utils/url";
 import { expect, test } from "@playwright/test";
+
+const MAIN = "main#main-content";
+const HOMEPAGE_NAMESPACE = "homepage.";
 
 test.describe("(marketing) homepage", () => {
 	test("returns 200", async ({ page }) => {
@@ -14,7 +18,7 @@ test.describe("(marketing) homepage", () => {
 
 	test("renders main#main-content", async ({ page }) => {
 		await page.goto("/");
-		await expect(page.locator("main#main-content")).toBeVisible();
+		await expect(page.locator(MAIN)).toBeVisible();
 	});
 
 	test("renders the hero section", async ({ page }) => {
@@ -42,13 +46,17 @@ test.describe("(marketing) homepage", () => {
 		await expect(page.locator('a[href="/planner"]').first()).toBeVisible();
 	});
 
-	test("renders in the requested locale", async ({ page }) => {
-		await page.goto(`/${ES}`);
-		await expect(page.locator("html")).toHaveAttribute("lang", ES);
-	});
+	for (const locale of LOCALES) {
+		test(`answers 200 in ${locale} with a rendered heading`, async ({ page }) => {
+			const response = await page.goto(localePath({ locale }));
+			expect(response?.status()).toBe(200);
 
-	test("locale-prefixed homepage returns 200", async ({ page }) => {
-		const response = await page.goto(`/${ES}`);
-		expect(response?.status()).toBe(200);
-	});
+			await expect(page.locator("html")).toHaveAttribute("lang", locale);
+
+			const heading = page.locator(MAIN).getByRole("heading", { level: 1 });
+			await expect(heading).toBeVisible();
+			await expect(heading).toHaveText(/\S/);
+			await expect(heading).not.toContainText(HOMEPAGE_NAMESPACE);
+		});
+	}
 });

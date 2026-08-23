@@ -24,11 +24,6 @@ test.describe("(marketing) cookie-policy", () => {
 		await expect(page.getByRole("heading").first()).toBeVisible();
 	});
 
-	test("does not trigger the error boundary", async ({ page }) => {
-		await page.goto(PATH);
-		await expect(page.locator('[data-testid="error-boundary"]')).not.toBeAttached();
-	});
-
 	test("locale-prefixed cookie-policy returns 200", async ({ page }) => {
 		const response = await page.goto(`/${ES}${PATH}`);
 		expect(response?.status()).toBe(200);

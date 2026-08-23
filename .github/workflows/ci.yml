@@ -99,6 +99,44 @@ jobs:
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
 
+  smoke:
+    name: Production smoke tests
+    needs: [deploy-production]
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/prepare-env
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        working-directory: apps/web
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Install Playwright OS dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        working-directory: apps/web
+        run: pnpm exec playwright install-deps chromium
+      - name: Run smoke tests against production
+        working-directory: apps/web
+        run: pnpm exec playwright test --grep "@smoke"
+        env:
+          BASE_URL: https://forever-pto.com
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: playwright-smoke-report
+          path: apps/web/playwright-report/
+          retention-days: 7
+
   release-web:
     name: Semantic Release (web)
     runs-on: ubuntu-latest
@@ -172,9 +210,15 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/prepare-env
       - name: Deploy to Cloudflare Workers
+        env:
+          BETTER_STACK_INGESTING_URL: ${{ vars.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL }}
         run: |
           cd "$GITHUB_WORKSPACE/apps/web/workers/tail"
-          pnpm exec wrangler deploy
+          if [ -z "$BETTER_STACK_INGESTING_URL" ]; then
+            echo '::error::NEXT_PUBLIC_BETTER_STACK_INGESTING_URL is not set on web-production.'
+            exit 1
+          fi
+          pnpm exec wrangler deploy --var "BETTER_STACK_INGESTING_URL:$BETTER_STACK_INGESTING_URL"
       - name: Set ingest token
         uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         env:

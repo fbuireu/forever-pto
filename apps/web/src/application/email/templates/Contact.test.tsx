@@ -1,6 +1,10 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { render } from "@react-email/render";
 import { describe, expect, it } from "vitest";
 import { ContactFormEmail } from "./Contact";
+
+const PUBLIC_DIR = join(import.meta.dirname, "../../../../public");
 
 const BASE_PROPS = {
 	email: "alice@example.com",
@@ -50,12 +54,20 @@ describe("ContactFormEmail", () => {
 
 	it("logo src uses baseUrl", async () => {
 		const html = await getHtml();
-		expect(html).toContain(`${process.env.NEXT_PUBLIC_SITE_URL}/static/logo/forever-pto-logo.png`);
+		expect(html).toContain(`${process.env.NEXT_PUBLIC_SITE_URL}/static/images/forever-pto-logo.png`);
 	});
 
 	it("logo src updates when baseUrl changes", async () => {
 		const html = await getHtml({ ...BASE_PROPS, baseUrl: "https://staging.example.com" });
-		expect(html).toContain("https://staging.example.com/static/logo/forever-pto-logo.png");
+		expect(html).toContain("https://staging.example.com/static/images/forever-pto-logo.png");
+	});
+
+	it("points the logo at a file that exists under public/, rather than at a path the test restates", async () => {
+		const html = await getHtml();
+		const src = /src="([^"]*\.png)"/.exec(html)?.[1];
+
+		expect(src).toBeDefined();
+		expect(existsSync(join(PUBLIC_DIR, new URL(src ?? "https://example.com").pathname))).toBe(true);
 	});
 
 	it("does not let a crafted subject add headers to the reply", async () => {

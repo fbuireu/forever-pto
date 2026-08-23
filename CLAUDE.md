@@ -138,8 +138,8 @@ builds from), but it means "the repo root" is not the boundary; the regex is.
 ## CI
 
 **`ci.yml` holds the whole app graph**: `changes`, then `lint`, `typecheck` and `test` in parallel, then
-`deploy-production` → `release-web` → `docs-refresh` on `main`, or `deploy-development` → `comment` / `e2e`
-on a PR. Both deploy jobs call the shared [`_deploy-web.yml`](./.github/workflows/_deploy-web.yml). `docs.yml` holds the docs graph: `build`, then
+`deploy-production` → `release-web` → `docs-refresh` and `deploy-production` → `smoke` on `main`, or
+`deploy-development` → `comment` / `e2e` on a PR. Both deploy jobs call the shared [`_deploy-web.yml`](./.github/workflows/_deploy-web.yml). `docs.yml` holds the docs graph: `build`, then
 `preview` on a PR or `deploy` → `release-docs` on `main`. The rest are [`cleanup-development.yml`](./.github/workflows/cleanup-development.yml),
 [`renovate-auto-approve.yml`](./.github/workflows/renovate-auto-approve.yml) (the auto-merge, whose file is
 named for approving rather than merging), a [`zizmor.yml`](./.github/workflows/zizmor.yml) audit,
@@ -238,9 +238,44 @@ and keep one shared pair, which is what the split exists to stop.
 
 **`deploy-tail` is gated on the files its bundle is built from, which is wider than its own folder.** The tail consumer is a second Worker with its own `wrangler.toml`; the app declares it in `[[tail_consumers]]` but does not carry it. It changes rarely, so `TAIL_PATHS` gates it, but `workers/tail/index.ts` imports the log-level contract from `apps/web/src/infrastructure/clients/logging/`, and while the filter named only `apps/web/workers/tail/**` a change to that contract redeployed the app and left the Worker running the old bundled copy. The Worker's own unit test reads the source module, so it could not see the split. `tests/docs-consistency.test.ts` walks that import graph **transitively** against `TAIL_PATHS` now (one level is not enough, because whatever the contract itself imports is bundled too) and asserts at least one resolved path lands outside `workers/tail/`, since the Worker test's own `./index` import would otherwise make an empty walk look like a successful one.
 
+**`smoke` is the only job that ever touches production, and until this branch there was none.** `e2e` needs
+`deploy-development`, which runs on `pull_request` only, so a push to `main` deployed production, cut a tag
+and made no request to `https://forever-pto.com` at all. The suite that catches Cloudflare Error 1101 ran
+against a preview Worker with different bindings and a different `NEXT_PUBLIC_SITE_URL`. `smoke` needs
+`deploy-production`, is gated on `github.event_name == 'push'`, and runs Playwright with
+`BASE_URL: https://forever-pto.com` and no Cloudflare Access headers, which
+[`apps/web/playwright.config.ts`](./apps/web/playwright.config.ts) handles by sending none when neither
+variable is set. It declares no `environment:` on purpose: production is public, so the job needs no secret,
+and naming an environment would hand it ones it has no use for.
+
+**The step calls `pnpm exec playwright test`, not `pnpm run test:e2e -- <flags>`, and the difference is not
+style.** Playwright's parser treats `--` as end-of-options and turns everything after it into positional file
+filters, so `pnpm run test:e2e -- --grep "@smoke"` runs the *whole* suite with the grep silently discarded;
+verified by listing. The two scripts in [`apps/web/package.json`](./apps/web/package.json) written that way,
+`test:e2e:ui` and `test:e2e:changed`, have the same defect and are not fixed here.
+
+**Nothing carries the `@smoke` tag yet, which is why the step passes `--pass-with-no-tests`.** The grep
+matches an empty set today and Playwright exits 1 on an empty set, so without the flag the job would go red
+on every push to `main`. Tag the handful of specs that are worth running against the live site (the 404
+route above all, since `/_not-found` is the only page rendered per request and the only one that shows
+Error 1101) and take the flag out in the same commit; while it is there, a typo in the grep is green.
+
+**`smoke` does not block `release-web`, and does not wait on the four-environments secret work either.** It
+needs no Cloudflare credentials, so it is unaffected by the outstanding item above, unlike making
+`E2E tests` required. Leaving the release ungated is deliberate for as long as the grep matches nothing: a
+job that cannot fail is not a gate, and one wired as a gate before it has tests would be a gate on nothing.
+Move `smoke` into `release-web`'s `needs` once the tags exist and the flag is gone.
+
 **`cross-package-notice` is advisory, not a gate.** A pull request touching both packages lands in both
 changelogs, because attribution is by path and `main` takes squash merges. Sometimes that is what you
 want, so the job posts a sticky comment saying what will happen and does not fail the run.
+
+**`deploy-tail` passes the BetterStack host as well as the token, and `workers/tail/wrangler.toml` no longer
+hardcodes it.** The host lived in that file's `[vars]` while the app read
+`vars.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL` in `_deploy-web.yml`, so reissuing the BetterStack source
+moved the app and left the tail Worker posting into a dead endpoint, silently. Both values now come from the
+same two GitHub variables. The details, and the response check that stops the failure being silent, are in
+[`apps/web/CLAUDE.md`](./apps/web/CLAUDE.md).
 
 **`cleanup-development.yml` shares `ci.yml`'s concurrency group, which is what stops it deleting a Worker
 that is still under test.** It fires on `pull_request: closed`, and closing a pull request does not cancel
@@ -358,12 +393,15 @@ that the same **exact** `typescript` version is pinned in all three manifests: t
 out of the source) returns exactly one rule, for `/(.*)`, carrying all nine security headers **with their
 values**: a year of HSTS with `includeSubDomains`, `X-Frame-Options` refusing the frame, `nosniff`, and
 `frame-ancestors 'none'`, `object-src 'none'` and `base-uri 'self'` in the CSP, the three whose absence is
-invisible in a browser, and the whole policy sits outside `src/`
-where the co-located-test convention does not reach it; that every binding `CloudflareEnv` declares is present
+invisible in a browser, and that the policy names no Google font host, because `next/font/google` downloads
+and self-hosts at build time so the two allowances that named them were dead, and the whole policy sits
+outside `src/` where the co-located-test convention does not reach it; that every binding `CloudflareEnv` declares is present
 in **each** of `wrangler.toml`'s three environments, that each named environment declares every binding
-*kind* the top level declares, and that the payment rate limiter is identically bounded in all of them; that no
-`wrangler deploy` step in any workflow is wrapped in `nick-fields/retry`, counted rather than named one file
-at a time; that `TAIL_PATHS` matches every relative import reachable **transitively** from
+*kind* the top level declares, that `[assets]` and `[placement]` are declared once and `[observability]`
+reads identically wherever it is restated, and that the payment rate limiter is identically bounded in all
+of them; that no
+`wrangler deploy` step and no build step in any workflow is wrapped in `nick-fields/retry`, counted rather
+than named one file at a time; that `TAIL_PATHS` matches every relative import reachable **transitively** from
 [`apps/web/workers/tail/`](./apps/web/workers/tail/), at least one of which has to land outside that folder;
 that the cleanup workflow's concurrency
 group still equals `ci.yml`'s with its `name:` substituted in;
@@ -404,8 +442,10 @@ relative-link rule could not catch because they were prose rather than links.
 ## Gotchas
 
 - **Biome's `noConsole` is an error with no allowlist**: no `console` at any level, so a stray `console.log`
-  fails the build rather than shipping. The BetterStack client's own unconfigured warning is the single
-  exception, scoped in `biome.json`'s `overrides`: it is the logger, so it has nothing else to call.
+  fails the build rather than shipping. Two places call it anyway, and both are the log sink itself, which
+  has nothing else to call: the BetterStack client's unconfigured warning, scoped in `biome.json`'s
+  `overrides`, and the two ingest-failure reports in `apps/web/workers/tail/index.ts`, which carry a
+  `biome-ignore` each rather than a second `overrides` entry. Anything else is a defect.
 - **`format:changed` and `lint:changed` pass `--changed`, which means "changed against `main`".** On a
   branch that moves or renames a large number of files that is every one of them, and a `pre-commit` hook
   will happily reformat and stage files the commit was never about.

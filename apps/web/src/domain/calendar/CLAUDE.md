@@ -213,6 +213,20 @@ bonus does not, so a long Bridge the partition skips is still lifted by the mult
 folding the efficiency floor into `isBlockShaped` turns it red. The conjunction was spelled out twice, in
 `isHighValue` and in `scoreOf`, which read as a copy rather than as a shared premise with one extra clause.
 
+**`findBridges`'s own sort is the tie-break input for every Strategy, and it looks like the one line in the
+file safe to delete.** Every `Ordering` re-sorts, so dropping `bridges.sort(...)` at the end of `findBridges`
+reads as an obvious tidy-up. All of those re-sorts are stable, so what `findBridges` hands over is what
+decides the order of every Bridge a Strategy considers equal, and deleting it quietly reshuffles the plan.
+
+Pinning that needs a fixture whose *emission* order differs from its sorted order, and most do not: emission
+is Workday-ascending, and within one Workday the single-day candidate comes before the multi-day one, which is
+usually already the efficient-first order. `helpers.test.ts` uses the three Workdays 6, 7 and 10 January 2025
+for it. Monday the 6th emits a single (efficiency 3, leaning on the preceding weekend) and then the 6-to-7
+pair (efficiency 2); Friday the 10th emits a single (efficiency 3) after both. So emission runs 3, 2, 3 and
+the sorted answer is 3, 3, 2, and the assertion is unconditional over the whole array. The case it replaced
+used Workdays 6 and 7 alone, which emit in sorted order already, and guarded its one `expect` behind an `if`
+that any change stopping multi-day candidates being emitted would have skipped outright.
+
 **A Strategy is an `Ordering`, and the greedy walk is written once.** `STRATEGY_ORDERING` maps each
 `FilterStrategy` to a `(bridges: Bridge[]) => Bridge[]`; `selectGreedily` walks whatever it is given, taking
 any Bridge that fits the remaining budget and reuses no date. That is the whole of selection.

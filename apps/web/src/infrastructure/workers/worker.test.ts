@@ -4,19 +4,39 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { CalculateSuggestionsRequest } from "./types";
 import { WORKER_MESSAGE_TYPE } from "./types";
 
+const CARRY_OVER_MONTHS = 3;
+const WINDOW_MONTHS = 15;
+const WINDOW_QUARTERS = 5;
+
 const METRICS: Metrics = {
+	longWeekends: 3,
+	restBlocks: 2,
+	maxWorkStreak: 9,
+	firstLastBreak: { first: "2025-03-08", last: "2025-03-16" },
+	averageEfficiency: 2.5,
+	bonusDays: 4,
+	quarterDist: [2, 1, 0, 2],
+	bridgesUsed: 3,
+	workedDaysPerMonth: 18,
+	totalEffectiveDays: 7,
+	monthlyDist: [0, 0, 2, 0, 1, 0, 0, 2, 0, 0, 0, 0],
+	longBlocksPerQuarter: [1, 0, 0, 1],
+	longestVacation: 5,
+};
+
+const EMPTY_PLAN_METRICS: Metrics = {
 	longWeekends: 0,
 	restBlocks: 0,
 	maxWorkStreak: 0,
 	firstLastBreak: null,
-	averageEfficiency: 2,
+	averageEfficiency: 0,
 	bonusDays: 0,
-	quarterDist: [],
+	quarterDist: Array.from({ length: WINDOW_QUARTERS }, () => 0),
 	bridgesUsed: 0,
 	workedDaysPerMonth: 0,
-	totalEffectiveDays: 7,
-	monthlyDist: [],
-	longBlocksPerQuarter: [],
+	totalEffectiveDays: 0,
+	monthlyDist: Array.from({ length: WINDOW_MONTHS }, () => 0),
+	longBlocksPerQuarter: Array.from({ length: WINDOW_QUARTERS }, () => 0),
 	longestVacation: 0,
 };
 
@@ -104,16 +124,31 @@ describe("worker onmessage", () => {
 	it("carries the pipeline's own Metrics onto the wire rather than a literal of its own", () => {
 		mockRunPlanningPipeline.mockReturnValue({
 			planned: false,
-			suggestion: measured([]),
+			suggestion: { days: [], bridges: [], strategy: FilterStrategy.GROUPED, metrics: EMPTY_PLAN_METRICS },
 			alternatives: [],
 		} satisfies PlanningResult);
 
-		sendMessage({ ptoDays: 0 });
+		sendMessage({ ptoDays: 0, carryOverMonths: CARRY_OVER_MONTHS });
 
 		const response = mockPostMessage.mock.calls[0][0];
 		expect(response.type).toBe(WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT);
 		expect(response.payload.suggestion.days).toEqual([]);
-		expect(response.payload.suggestion.metrics).toEqual(METRICS);
+		expect(response.payload.suggestion.metrics).toEqual(EMPTY_PLAN_METRICS);
+	});
+
+	it("sizes that empty-plan Metrics to the Planning Window, which a literal of its own could not", () => {
+		mockRunPlanningPipeline.mockReturnValue({
+			planned: false,
+			suggestion: { days: [], bridges: [], strategy: FilterStrategy.GROUPED, metrics: EMPTY_PLAN_METRICS },
+			alternatives: [],
+		} satisfies PlanningResult);
+
+		sendMessage({ ptoDays: 0, carryOverMonths: CARRY_OVER_MONTHS });
+
+		const { metrics } = mockPostMessage.mock.calls[0][0].payload.suggestion;
+		expect(metrics.monthlyDist).toHaveLength(WINDOW_MONTHS);
+		expect(metrics.quarterDist).toHaveLength(WINDOW_QUARTERS);
+		expect(metrics.longBlocksPerQuarter).toHaveLength(WINDOW_QUARTERS);
 	});
 
 	it("deserialises the Holidays into the PlanningInput as Dates", () => {
@@ -132,6 +167,14 @@ describe("worker onmessage", () => {
 
 		expect(planningInput()?.manuallySelectedDays).toEqual([manual]);
 		expect(planningInput()?.removedSuggestedDays).toEqual([removed]);
+	});
+
+	it("hands no Removed Day over as a Holiday, which would make the day it excludes a Free Day instead", () => {
+		const removed = new Date(2025, 2, 20);
+		sendMessage({ removedDays: [removed.toISOString()] });
+
+		expect(planningInput()?.holidays).toHaveLength(1);
+		expect(planningInput()?.holidays.some((holiday) => holiday.date.getTime() === removed.getTime())).toBe(false);
 	});
 
 	it("defaults both hand-edited lists to empty when the request omits them", () => {

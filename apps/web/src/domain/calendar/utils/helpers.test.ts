@@ -214,14 +214,15 @@ describe("findBridges", () => {
 		expect(PTO_CONSTANTS.BRIDGE_SEARCH.MIN_MULTI_DAY_SIZE).toBeGreaterThan(1);
 	});
 
-	it("places higher-efficiency bridges before lower-efficiency ones", () => {
-		const workdays = [makeDate({ year: 2025, month: 1, day: 6 }), makeDate({ year: 2025, month: 1, day: 7 })];
-		const bridges = findBridges({ availableWorkdays: workdays, holidays: [] });
-		const singleIdx = bridges.findIndex((b) => b.ptoDaysNeeded === 1);
-		const multiIdx = bridges.findIndex((b) => b.ptoDaysNeeded === 2);
-		if (singleIdx !== -1 && multiIdx !== -1) {
-			expect(singleIdx).toBeLessThan(multiIdx);
-		}
+	it("places higher-efficiency bridges before lower-efficiency ones, whatever order they were emitted in", () => {
+		const monday = makeDate({ year: 2025, month: 1, day: 6 });
+		const tuesday = makeDate({ year: 2025, month: 1, day: 7 });
+		const friday = makeDate({ year: 2025, month: 1, day: 10 });
+
+		const bridges = findBridges({ availableWorkdays: [monday, tuesday, friday], holidays: [] });
+
+		expect(bridges.map((bridge) => bridge.efficiency)).toEqual([3, 3, 2]);
+		expect(bridges.map((bridge) => bridge.ptoDays)).toEqual([[monday], [friday], [monday, tuesday]]);
 	});
 });
 

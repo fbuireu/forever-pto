@@ -40,6 +40,7 @@ const BACKTICKED_ALIAS = /`([^`.]+\/\*)`/g;
 const CITED_PNPM_SCRIPT = /\bpnpm (?:run )?([a-z][a-z0-9:-]*)/g;
 const CITED_FILTERED_PNPM_SCRIPT = /\bpnpm --filter (\S+) (?:run )?([a-z][a-z0-9:-]*)/g;
 const WORKFLOW_SHELL_STEP = /^(\s*)-?[ \t]*(?:run|command):[ \t]*(\|[-+]?)?[ \t]*(.*)$/;
+const BUILD_COMMAND = /\bpnpm (?:run |--filter \S+ )*(?:cf:)?build\b/;
 const ALIAS_WILDCARD_SUFFIX = /\/\*$/;
 const WORKSPACE_PACKAGE_GLOB = /^\s*-\s*['"]?([^'"\s#]+)['"]?\s*$/gm;
 const GITHUB_WORKFLOW_EXPRESSION = /\$\{\{\s*github\.workflow\s*\}\}/;
@@ -371,6 +372,14 @@ describe("the security header policy covers every request", () => {
 		expect(FRAMING_REFUSALS).toContain(sent.get("X-Frame-Options"));
 		expect(sent.get("X-Content-Type-Options")).toBe("nosniff");
 	});
+
+	// `next/font/google` downloads and self-hosts at build time, so no runtime request reaches a Google font
+	// host. The two allowances that named them were dead, and a dead allowance reads as evidence that the app
+	// fetches fonts cross-origin, which is the opposite of what it does.
+	it("allows no font CDN, because next/font/google self-hosts at build time", () => {
+		expect(read(`${WEB}/src/app/fonts.ts`)).toContain('from "next/font/google"');
+		expect(sent.get("Content-Security-Policy") ?? "").not.toMatch(/fonts\.(?:googleapis|gstatic)\.com/);
+	});
 });
 
 describe("every wrangler environment carries the whole binding set", () => {
@@ -391,6 +400,28 @@ describe("every wrangler environment carries the whole binding set", () => {
 	it.each(NAMED_WRANGLER_ENVIRONMENTS)("declares every binding kind the top level declares in %s", (environment) => {
 		const declared = wranglerBindingTables(environment);
 		expect([...wranglerBindingTables("")].filter((table) => !declared.has(table))).toEqual([]);
+	});
+
+	// The guide teaches which blocks may be deleted as duplication, and it used `[observability]` as its
+	// example of the safe-to-inherit kind while the file restated it in both named environments. `[assets]`
+	// and `[placement]` are the blocks that really are written once. A reader trusting the old sentence would
+	// delete the wrong one, and observability is the setting whose absence hides every other symptom.
+	it.each(["assets", "placement"])("declares [%s] once, at the top level, and lets inheritance carry it", (table) => {
+		expect(wranglerSection({ environment: "", table }).length).toBe(1);
+		const restated = NAMED_WRANGLER_ENVIRONMENTS.filter(
+			(environment) => wranglerSection({ environment, table }).length > 0,
+		);
+		expect(restated).toEqual([]);
+	});
+
+	it("restates the same observability settings in every environment that restates them at all", () => {
+		const tables = ["observability", "observability.logs", "observability.traces"];
+		const blocks = WRANGLER_ENVIRONMENTS.map((environment) =>
+			tables.map((table) => wranglerSection({ environment, table }).map((section) => section.entries)),
+		);
+
+		expect(blocks[0]?.flat().length).toBe(tables.length);
+		expect(new Set(blocks.map((block) => JSON.stringify(block))).size).toBe(1);
 	});
 
 	it("gives the payment rate limiter identical bounds in every environment", () => {
@@ -1077,6 +1108,25 @@ describe("the guides describe the project as it is configured", () => {
 		}
 
 		expect(deploySteps).toBeGreaterThan(1);
+		expect(wrapped).toEqual([]);
+	});
+
+	// The same reasoning one command over. A build fails deterministically far more often than it fails for a
+	// reason a second attempt can fix, and the web build carried `max_attempts: 3` with `timeout_minutes: 10`,
+	// so a type error or a config error burned up to half an hour before it reported.
+	it("runs every build without a retry wrapper, so a deterministic failure reports on the first attempt", () => {
+		const wrapped: string[] = [];
+		let buildSteps = 0;
+
+		for (const file of workflowFiles) {
+			for (const step of read(file).split("- name:")) {
+				if (!BUILD_COMMAND.test(step)) continue;
+				buildSteps += 1;
+				if (step.includes("nick-fields/retry")) wrapped.push(`${file} ->${step.split(/\r?\n/)[0] ?? ""}`);
+			}
+		}
+
+		expect(buildSteps).toBeGreaterThan(1);
 		expect(wrapped).toEqual([]);
 	});
 

@@ -5,8 +5,8 @@ import type { Locale } from "next-intl";
 
 const SITE_NAME = "Forever PTO";
 const OG_IMAGE = "/static/images/forever-pto-logo.png";
-const OG_IMAGE_WIDTH = 1200;
-const OG_IMAGE_HEIGHT = 630;
+const OG_IMAGE_WIDTH = 256;
+const OG_IMAGE_HEIGHT = 256;
 
 interface BuildMetadataParams {
 	baseUrl: string;
@@ -45,7 +45,7 @@ export function buildMetadata({ baseUrl, locale, route, title, description, keyw
 		}),
 		...(indexable &&
 			description && {
-				twitter: { card: "summary_large_image", title, description, images: [OG_IMAGE] },
+				twitter: { card: "summary", title, description, images: [OG_IMAGE] },
 			}),
 		robots: indexable
 			? {

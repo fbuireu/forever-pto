@@ -53,13 +53,25 @@ export default {
 
 		if (entries.length === 0) return;
 
-		await fetch(env.BETTER_STACK_INGESTING_URL, {
-			method: "POST",
-			headers: {
-				Authorization: `Bearer ${env.BETTER_STACK_SOURCE_TOKEN}`,
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(entries),
-		});
+		try {
+			const response = await fetch(env.BETTER_STACK_INGESTING_URL, {
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${env.BETTER_STACK_SOURCE_TOKEN}`,
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(entries),
+			});
+
+			if (!response.ok) {
+				// biome-ignore lint/suspicious/noConsole: the tail consumer is the log sink, so its own failures have nowhere else to go
+				console.error(
+					`${LOG_SERVICE}-tail: ingest rejected ${entries.length} entries with ${response.status} ${response.statusText}`,
+				);
+			}
+		} catch (error) {
+			// biome-ignore lint/suspicious/noConsole: the tail consumer is the log sink, so its own failures have nowhere else to go
+			console.error(`${LOG_SERVICE}-tail: ingest unreachable, dropped ${entries.length} entries: ${String(error)}`);
+		}
 	},
 };

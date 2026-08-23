@@ -48,7 +48,7 @@ export const ContactFormEmail = ({ email, name, subject, message, baseUrl }: Con
 						<Section className="mt-2 mb-6 text-center">
 							<Heading className="inline-block m-0 mr-2 text-[28px] font-bold align-middle">Forever</Heading>
 							<Img
-								src={`${baseUrl}/static/logo/forever-pto-logo.png`}
+								src={`${baseUrl}/static/images/forever-pto-logo.png`}
 								width="48"
 								height="44"
 								alt="Forever PTO Logo"

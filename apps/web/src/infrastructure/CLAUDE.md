@@ -185,6 +185,16 @@ already drifted over how a missing IP header was recorded.
   Writing back a value it already has is not redundant: it slides the week-long expiry forward on every
   visit, so the chain stays off the hot path for as long as the visitor keeps coming back. Do not
   "simplify" that branch away.
+- **The Open Graph block declares the logo's real size, 256x256, and the Twitter card is `summary` because
+  of it.** `buildMetadata` advertised 1200x630 for a file that has always been 256 pixels square, so any
+  consumer trusting the declaration stretched a small square across a wide box, and `summary_large_image`
+  needs at least 300 pixels of width, so the card actually rendered was never the card declared. There is no
+  1200x630 asset in the tree to point at; until someone authors one, the file's own size is the only honest
+  declaration. The two numbers are kept rather than dropped precisely because a declaration is the only thing
+  a test can tie back to the asset: [`seo/buildMetadata.test.ts`](./seo/buildMetadata.test.ts) reads the PNG's
+  IHDR (two big-endian `uint32`s at byte 16) from whatever `OG_IMAGE` names, resolved against `public/`, and
+  asserts both the declared dimensions and the card that width can carry. Drop a real social card in and the
+  card assertion goes red rather than leaving `summary` behind on a 1200-pixel image.
 - **`verifySession` fails two ways under one tag, and the vocabulary lives in
   [`services/premium/sessionErrors.ts`](./services/premium/sessionErrors.ts) rather than in `session.ts`.**
   "Did not verify", meaning expired, malformed or signed by something else, is a `SessionError`, and the
@@ -239,7 +249,7 @@ and action tests that restated it row by row have been cut back to what each tra
 are not any more.** `buildMetadata` was reached only through the seven route `metadata.test.ts` files that existed then, and
 every twitter/images assertion in them was positive and lived in the two indexable routes, so both
 `indexable &&` guards could be deleted and the suite stayed green while a noindex legal page began
-advertising an Open Graph image and a `summary_large_image` card. `dateHolidays` is the adapter that decides
+advertising an Open Graph image and a Twitter card. `dateHolidays` is the adapter that decides
 the two-year Planning Window and whether a Region-scoped lookup is constructed at all; its co-located test
 asserts the *call pattern* (which years are asked for, how many `Holidays` are built, that `getStates` is
 given the lower-cased Country) rather than the shape `date-holidays` returns, which is the only kind of

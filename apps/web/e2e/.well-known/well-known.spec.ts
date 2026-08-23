@@ -1,6 +1,8 @@
+import { ApiError } from "@infrastructure/api/errors";
 import { expect, test } from "@playwright/test";
 
 const BASE = "/.well-known";
+const PROTOTYPE_KEYS = ["constructor", "toString", "valueOf", "hasOwnProperty"];
 
 test.describe(".well-known", () => {
 	test.describe("api-catalog", () => {
@@ -48,5 +50,20 @@ test.describe(".well-known", () => {
 	test("returns 404 for unknown paths", async ({ request }) => {
 		const res = await request.get(`${BASE}/unknown`);
 		expect(res.status()).toBe(404);
+	});
+
+	for (const key of PROTOTYPE_KEYS) {
+		test(`returns 404 for the Object.prototype key ${key}`, async ({ request }) => {
+			const res = await request.get(`${BASE}/${key}`);
+			expect(res.status()).toBe(404);
+			expect((await res.json()).error).toBe(ApiError.NOT_FOUND);
+		});
+	}
+
+	test("serves security.txt from the static assets, not the catch-all", async ({ request }) => {
+		const res = await request.get(`${BASE}/security.txt`);
+		expect(res.status()).toBe(200);
+		expect(res.headers()["content-type"]).toContain("text/plain");
+		expect(await res.text()).toContain("Contact:");
 	});
 });

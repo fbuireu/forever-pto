@@ -84,12 +84,21 @@ describe("createSession", () => {
 		expect(expiration).toBeLessThanOrEqual(Math.floor(Date.now() / 1000) + PREMIUM_SESSION_LIFETIME_SECONDS);
 	});
 
-	it("passes encoded JWT_SECRET to sign", async () => {
+	it("signs with the whole JWT_SECRET, encoded, and not a prefix of it", async () => {
 		mockSign.mockResolvedValue("token");
 
 		await Effect.runPromise(createSession(SESSION_DATA));
 
-		expect(mockSign).toHaveBeenCalledWith(expect.any(Uint8Array));
+		expect(mockSign).toHaveBeenCalledWith(new TextEncoder().encode("test-jwt-secret"));
+	});
+
+	it("reads the secret per call, so a rotated JWT_SECRET signs with the new key", async () => {
+		vi.stubEnv("JWT_SECRET", "rotated-jwt-secret");
+		mockSign.mockResolvedValue("token");
+
+		await Effect.runPromise(createSession(SESSION_DATA));
+
+		expect(mockSign).toHaveBeenCalledWith(new TextEncoder().encode("rotated-jwt-secret"));
 	});
 
 	it("returns SessionError when signing fails with an Error", async () => {
@@ -120,12 +129,12 @@ describe("verifySession", () => {
 		expect(result).toEqual({ email: "user@example.com", paymentIntentId: "pi_abc123" });
 	});
 
-	it("calls jwtVerify with the token and encoded secret", async () => {
+	it("verifies with the whole JWT_SECRET, encoded, and not a prefix of it", async () => {
 		mockJwtVerify.mockResolvedValue({ payload: { email: "a", paymentIntentId: "b" } });
 
 		await Effect.runPromise(verifySession("my.token"));
 
-		expect(mockJwtVerify).toHaveBeenCalledWith("my.token", expect.any(Uint8Array));
+		expect(mockJwtVerify).toHaveBeenCalledWith("my.token", new TextEncoder().encode("test-jwt-secret"));
 	});
 
 	it("returns SessionError when verification fails with an Error", async () => {

@@ -43,4 +43,4 @@ All copy comes from the `error` translation namespace, so the page is localised 
 
 ## Testing
 
-Each boundary has a colocated test (`error.test.tsx`, `not-found.test.tsx`, `global-error.test.tsx`), and Playwright covers the rendered pages in `apps/web/e2e/[locale]/error.spec.ts` and `apps/web/e2e/[locale]/not-found.spec.ts`.
+Each boundary has a colocated test (`error.test.tsx`, `not-found.test.tsx`, `global-error.test.tsx`). Playwright covers the rendered 404 in `apps/web/e2e/[locale]/not-found.spec.ts`; the error boundaries have no end-to-end case, because no URL provokes one. See the *Commands* section of `apps/web/CLAUDE.md`.

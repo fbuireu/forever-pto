@@ -49,8 +49,37 @@ pnpm typecheck  # tsc --noEmit
 
 pnpm test:ut            # vitest run
 pnpm test:ut:coverage      # vitest run --coverage
-pnpm test:e2e           # playwright
+pnpm test:e2e           # playwright, against BASE_URL (see below)
 ```
+
+**`pnpm test:e2e` needs `BASE_URL`, and [`playwright.config.ts`](./playwright.config.ts) has no `webServer` to fall back on.** With the
+variable unset, `use.baseURL` becomes `http://localhost:3000` and the run silently tests whatever is
+answering on that port, or reports connection errors that read like application failures. Set it to a
+deployed preview, which is what CI does: `ci.yml` passes the same URL to the `e2e` job's `BASE_URL` as
+[`_deploy-web.yml`](../../.github/workflows/_deploy-web.yml) passes to `--var NEXT_PUBLIC_SITE_URL`, so `e2e/sitemap.spec.ts` can assert that the
+sitemap names the host it is served from. A preview also needs `CF_ACCESS_CLIENT_ID` and
+`CF_ACCESS_CLIENT_SECRET`, which the config turns into request headers.
+
+```bash
+BASE_URL=https://pr-123-forever-pto-development.fbuireu.workers.dev pnpm test:e2e
+```
+
+A `webServer` was considered and rejected rather than forgotten. This suite exists to exercise the Workers
+runtime, so `next dev` is the wrong local target and `pnpm preview` is the right one; a `webServer` would
+only ever run when `BASE_URL` is unset, and `cf:build` fails on the maintainer's Windows machine
+([ADR 0009](../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) records the same limitation blocking a local reproduction), so on the one machine that would
+reach it, it would fail. Revisit the day `cf:build` runs there.
+
+**The `e2e/` suite has no case that renders an error boundary, and no longer pretends otherwise.**
+A spec of its own under `e2e/[locale]/` plus six copies of a `[data-testid="error-boundary"]`
+`not.toBeAttached()` assertion asserted the absence of a selector nothing in the suite ever makes
+present, so renaming the `data-testid` on
+[`src/ui/modules/pages/error/ErrorContent.tsx`](./src/ui/modules/pages/error/ErrorContent.tsx) would have left every one of them green.
+They were deleted; the pages they sat on already assert a 200 and their own content, which is what a
+thrown server component would break. Reinstating the check means first finding a URL that provokes a
+boundary. `/payment/confirmation?payment_intent=<unknown>` is not one: `confirmation` in
+[`src/infrastructure/services/payments/confirmation.ts`](./src/infrastructure/services/payments/confirmation.ts) types its error channel `never` and returns `null`, so the
+page renders its own failure card.
 
 Env: copy [`.env.example`](./.env.example). Local Worker secrets go in `.dev.vars`. The typed surface the build uses is
 [`environment.d.ts`](./environment.d.ts) and nothing else; it hand-declares both `ProcessEnv` and the global `CloudflareEnv` the
@@ -270,11 +299,34 @@ nothing in the suite could see the split. `tests/docs-consistency.test.ts` walks
 asserts at least one resolved path lands outside `workers/tail/`: `index.test.ts` imports `./index`, so a walk
 that crossed no folder boundary at all still looked like a successful one.
 
+**The tail Worker checks the ingest response and retains its own invocation logs, because it is the one
+Worker whose whole job is telling you what happened.** Its `tail()` handler used to `await fetch(...)` and
+discard the result: a 401 from a rotated or absent `BETTER_STACK_SOURCE_TOKEN`, or any 5xx, resolved to a
+`Response` nobody read, so logging stopped and nothing said so. That is the failure shape
+[`src/app/CLAUDE.md`](./src/app/CLAUDE.md) spends two paragraphs on for `api/payment/activate`, reproduced in
+the observability path. It now reports a non-`ok` status and a thrown `fetch` through its own
+`console.error`, which the Workers runtime captures only because `workers/tail/wrangler.toml` declares
+`[observability]` with `invocation_logs` and no sampling; without that block there was no second place to
+look. The two `console.error` calls carry a `biome-ignore` each, on the same reasoning as the BetterStack
+client's: the log sink has nothing else to call. `workers/tail/index.test.ts` covers the rejected batch, the
+unreachable host and the silence on success.
+
+**`BETTER_STACK_INGESTING_URL` reaches the tail Worker from the same GitHub variable the app build reads,
+and is no longer written in `workers/tail/wrangler.toml`.** The file hardcoded the host in `[vars]` while
+`_deploy-web.yml` read `vars.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL` for the app, so changing the BetterStack
+source, which reissues the host and not only the token, updated the app on the next deploy and left the tail
+Worker posting to a dead endpoint. `deploy-tail` was already reading
+`vars.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN` for the token, so the split was per value rather than per
+Worker; the deploy step now passes `--var BETTER_STACK_INGESTING_URL:<host>` the way `_deploy-web.yml`
+overrides `NEXT_PUBLIC_SITE_URL`, and fails loudly when the variable is unset. A hand-run
+`wrangler deploy` from `workers/tail/` therefore leaves the host unbound, which the handler reports rather
+than swallowing; pass the same `--var` when you deploy it by hand.
+
 Every path in `wrangler.toml` is relative to the file itself, so the deploy runs with this package as the
 working directory. Build config lives in `next.config.ts` and [`open-next.config.ts`](./open-next.config.ts).
 
 **Wrangler inherits configuration into a named environment but never a binding, so the three `[[ratelimits]]`
-blocks are not duplication.** `[assets]`, `[placement]` and `[observability]` are declared once at the top
+blocks are not duplication.** `[assets]` and `[placement]` are declared once at the top
 level and every environment gets them, which is the pattern `apps/docs/CLAUDE.md` teaches, but `vars`,
 `ratelimits`, `r2_buckets` and `tail_consumers` are bindings: an environment that does not declare one does
 not have it. Deleting `[[env.production.ratelimits]]` as a copy of the top-level block is the most ordinary
@@ -286,6 +338,14 @@ go unbounded in front of Stripe, silently. `tests/docs-consistency.test.ts` asse
 identically in each. It also asserts each named environment declares every binding **kind** the top level
 declares: `CloudflareEnv` names three bindings and neither `r2_buckets` nor `tail_consumers` is one of them,
 so deleting either block from `env.production` passed the name check untouched.
+
+**`[observability]` is inheritable too, and this file writes it out three times anyway.** It was the example
+the paragraph above used for the safe-to-inherit kind while the file restated it in both named environments,
+so a reader who trusted the sentence and tidied the copies away would have deleted the wrong block. The three
+copies are kept rather than collapsed because sampling is the setting whose wrong value hides every other
+symptom, and reading it per environment costs nothing; `tests/docs-consistency.test.ts` now asserts that the
+three are identical, and separately that `[assets]` and `[placement]` are written once and nowhere else. If
+you would rather collapse them, change the assertion in the same commit.
 
 **`NEXT_PUBLIC_SITE_URL` is resolved twice, and the two resolutions disagree on a preview.** No file reads
 `process.env.NEXT_PUBLIC_SITE_URL`; every read goes through the Cloudflare context. But that context resolves
@@ -330,3 +390,12 @@ every failure cannot tell a bad argument from a bad network, and this failure bu
 per run before reporting. The secret uploads and the preview delete keep their retry; all are idempotent and
 all fail for reasons that a second attempt can fix. `tests/docs-consistency.test.ts` counts the deploy steps
 rather than naming one workflow, so a third deploy is covered the day it appears.
+
+**The same now goes for the build, which was the rule's largest exception and was never on its list.**
+`_deploy-web.yml`'s `Build` step wrapped `pnpm run cf:build` in `nick-fields/retry` with `max_attempts: 3`
+and `timeout_minutes: 10`, so a type error, or the `partialPrefetching`-on-16.2 config error
+[ADR 0009](../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) warns about, burned up to half an
+hour across three identical attempts before reporting. `next build` fails deterministically far more often
+than it fails for a reason a second attempt can fix, so the wrapper is gone and the step is a plain `run:`
+scoped with `working-directory`. The contract suite counts build steps the same way it counts deploys, so
+`docs.yml`'s build is covered too.

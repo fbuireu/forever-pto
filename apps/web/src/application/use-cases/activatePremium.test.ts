@@ -2,6 +2,7 @@ import { TursoService } from "@infrastructure/clients/db/turso/service";
 import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import { PaymentError, ValidationError } from "@infrastructure/errors";
+import type * as Repository from "@infrastructure/services/payments/repository";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { activateWithClaimedPayment, activateWithEmail, activateWithPayment } from "./activatePremium";
@@ -11,10 +12,10 @@ vi.mock("@application/dto/payment/dto", () => ({
 }));
 
 vi.mock("@infrastructure/services/payments/repository", () => ({
-	getPaymentById: vi.fn(() => Effect.succeed(undefined)),
-	getSucceededPaymentByEmail: vi.fn(() => Effect.succeed(undefined)),
-	savePayment: vi.fn(() => Effect.succeed(undefined)),
-	updatePaymentStatus: vi.fn(() => Effect.succeed(undefined)),
+	getPaymentById: vi.fn<typeof Repository.getPaymentById>(() => Effect.succeed(undefined)),
+	getSucceededPaymentByEmail: vi.fn<typeof Repository.getSucceededPaymentByEmail>(() => Effect.succeed(undefined)),
+	savePayment: vi.fn<typeof Repository.savePayment>(() => Effect.succeed(true)),
+	updatePaymentStatus: vi.fn<typeof Repository.updatePaymentStatus>(() => Effect.succeed(true)),
 }));
 
 vi.mock("@infrastructure/services/premium/session", () => ({
@@ -92,15 +93,28 @@ describe("the two donation entry points", () => {
 		expect(updatePaymentStatus).toHaveBeenCalledWith({ paymentIntentId: "pi_test", status: "succeeded" });
 	});
 
-	it("still marks the row succeeded when the insert was ignored (deferred)", async () => {
+	it("still marks the row succeeded when the insert was ignored, and says nothing about creating one (deferred)", async () => {
 		const { savePayment, updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
-		vi.mocked(savePayment).mockReturnValueOnce(Effect.succeed(false) as never);
+		vi.mocked(savePayment).mockReturnValueOnce(Effect.succeed(false));
 		const { deferred } = await run(
 			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" }),
 		);
 		await runDeferred(deferred);
 
 		expect(updatePaymentStatus).toHaveBeenCalledWith({ paymentIntentId: "pi_test", status: "succeeded" });
+		expect(mockLogger.info).not.toHaveBeenCalledWith("Payment created successfully", expect.anything());
+	});
+
+	it("reports a created row on the answer the insert itself gave (deferred)", async () => {
+		const { savePayment } = await import("@infrastructure/services/payments/repository");
+		vi.mocked(savePayment).mockReturnValueOnce(Effect.succeed(true));
+		const { deferred } = await run(
+			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" }),
+		);
+		await runDeferred(deferred);
+
+		expect(savePayment).toHaveBeenCalledOnce();
+		expect(mockLogger.info).toHaveBeenCalledWith("Payment created successfully", { paymentIntentId: "pi_test" });
 	});
 
 	it("lets a Stripe failure stay a PaymentError, so its message never reaches the payer", async () => {

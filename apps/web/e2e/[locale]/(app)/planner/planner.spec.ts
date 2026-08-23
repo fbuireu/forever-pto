@@ -14,11 +14,6 @@ test.describe("(app) planner", () => {
 		await expect(page).toHaveTitle(/.+/);
 	});
 
-	test("does not trigger the error boundary", async ({ page }) => {
-		await page.goto(PLANNER_PATH);
-		await expect(page.locator('[data-testid="error-boundary"]')).not.toBeAttached();
-	});
-
 	test("locale-prefixed planner returns 200", async ({ page }) => {
 		const response = await page.goto(`/${ES}${PLANNER_PATH}`);
 		expect(response?.status()).toBe(200);

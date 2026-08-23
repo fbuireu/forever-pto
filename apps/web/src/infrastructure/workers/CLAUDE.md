@@ -94,11 +94,11 @@ touched `metrics` at all, so a new field did not even redden the fixture. A roun
 type claim; only a type can. The fixture is a real, fully populated `Metrics` now, which is separately worth
 having; it fails to compile when the shape changes.
 
-[`worker.test.ts`](./worker.test.ts)'s metrics mock is `vi.fn<typeof generateMetrics>()`. It was untyped and returned
-`{ efficiency: 2, totalDaysOff: 7 }`: neither field exists on `Metrics`, and `totalDaysOff` is a name
-[`CONTEXT.md`](../../../../../CONTEXT.md) retired under **Effective Day**, so a reader learning the shape
-from that fixture learned two names that are not real. Typing it also typed the recorded arguments, which
-removed four hand-written `(h: { date: Date })` casts from the assertions below.
+[`worker.test.ts`](./worker.test.ts) has no metrics mock left to type: it mocks `runPlanningPipeline`, and its
+`Metrics` fixtures are plain values annotated `Metrics`. The annotation is the load-bearing part. The fixture
+was once an untyped `{ efficiency: 2, totalDaysOff: 7 }`, and neither field exists on `Metrics`, while
+`totalDaysOff` is a name [`CONTEXT.md`](../../../../../CONTEXT.md) retired under **Effective Day**, so a reader
+learning the shape from that fixture learned two names that are not real.
 
 **`SerializedSuggestion.metrics` is required, not optional, and the serialisers speak `MeasuredSuggestion`.**
 The pipeline measures both of its branches, so a Suggestion crossing this boundary always has Metrics; saying
@@ -191,26 +191,45 @@ stale *work*.
 
 ## Testing
 
-`worker.test.ts` stubs `self` with `vi.stubGlobal`, mocks the four engine modules, then `await import('./worker')`
-for its registration side effect; the import must come after the stubs, and the mocks are `vi.hoisted` for the
+`worker.test.ts` stubs `self` with `vi.stubGlobal`, mocks `runPlanningPipeline`, then `await import('./worker')`
+for its registration side effect; the import must come after the stubs, and the mock is `vi.hoisted` for the
 same reason. Messages are driven by invoking `globalThis.onmessage` directly.
 
-What it pins, and should keep pinning: that this side hands the pipeline the right inputs (manual days become
-`CUSTOM` pseudo-holidays, Removed Days reach the planner as `removedDays` and appear in no holidays array at
-all, `generateMetrics` gets the request's `year`, manual days are deducted from the budget), that an
-over-committed budget short-circuits to an empty result whose `Metrics` came from the engine rather than a
-literal, and that a throw becomes `WORKER_ERROR` rather than an unhandled rejection.
+**The mock is keyed on the pipeline, and this section used to say it must be keyed on the four engine modules
+instead.** That instruction was right while `worker.ts` held the orchestration: the input assertions had to
+reach *through* the handler to the generators, because the handler was where the rules lived.
+`runPlanningPipeline` holds them now, so reaching through it from here would restate domain behaviour inside
+the boundary's test, which is the pair of mirrored suites the extraction exists to have removed. Three of the
+four claims that paragraph listed are pinned against the real engine in
+[`pipeline.test.ts`](../../domain/calendar/pipeline.test.ts) instead: Manual Days becoming `CUSTOM`
+pseudo-Holidays, Manual Days coming out of the budget, and the Metrics being sized to the Planning Window they
+were given. Re-mocking the engine here would buy a weaker copy of each and nothing else.
+
+The fourth claim is genuinely this side's, because this side builds the array it is about: a Removed Day
+reaches the pipeline as `removedSuggestedDays` and appears in `holidays` not at all. `worker.test.ts` keeps
+that one, asserted against the recorded `PlanningInput`.
+
+What it pins: the message-type guard, deserialisation into the pipeline's own input names, the two wire
+narrowings (`isFilterStrategy` and `isLocale`), serialisation of the reply, that an unplanned result reaches
+the wire carrying the pipeline's own `Metrics` rather than a literal, and that a throw becomes `WORKER_ERROR`
+rather than an unhandled rejection.
+
+**The unplanned case asserts the `Metrics` *shape*, and it has to, because the values alone cannot fail it.**
+The defect it guards is the deleted `EMPTY_METRICS` constant: twelve monthly buckets and four quarterly ones,
+written by hand, where the engine sizes both to the Planning Window. A case sent with `carryOverMonths: 0`
+cannot tell the two apart, since twelve and four are the right answer there, and the fixture that made the old
+case go red did so only by carrying empty arrays and a seven-day "empty" plan, which no engine produces. So
+the case sends `carryOverMonths: 3` and its fixture carries fifteen monthly buckets and five quarterly ones,
+zeroed. Verified by reintroducing the constant and watching both halves go red.
 
 An empty *Holiday* list is **not** one of those short circuits, and a test asserting it was would be wrong. A
 weekend is a Free Day and a Bridge only needs one beside it, so a Holiday-free calendar plans normally. The
 pipeline short-circuits on an empty candidate set instead.
 
-Those input assertions reach through the pipeline to the mocked generators, which is why the mocks are keyed
-on the engine modules and not on the pipeline: mocking the pipeline would assert only that the worker called
-it. The pipeline's own behaviour is pinned once, against the real engine, in
-[`pipeline.test.ts`](../../domain/calendar/pipeline.test.ts), including the cache clearing, which is now
-testable as behaviour (run twice, check the second run answers for its own Holidays) rather than as two spy
-calls in no particular order.
+The pipeline's own behaviour is pinned once, against the real engine, in
+[`pipeline.test.ts`](../../domain/calendar/pipeline.test.ts), including the cache clearing, which is testable
+there as behaviour (run twice, check the second run answers for its own Holidays) rather than as two spy calls
+in no particular order.
 
 [`utils/serializers.test.ts`](./utils/serializers.test.ts) covers the round trip. It is the cheaper place to catch a new `Date` field than a
 worker test is.

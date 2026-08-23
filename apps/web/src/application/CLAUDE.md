@@ -166,6 +166,15 @@ in both, so a document-wide `expect(html).not.toContain('&bcc=')` passes whateve
 button's `href` with a regex and asserts on that string alone. Both assertions were checked by reverting the
 template and watching them go red.
 
+**The logo `src` is `/static/images/…`, and it was `/static/logo/…` for as long as its own test restated the
+same wrong literal.** `public/static/` holds exactly one subdirectory, `images/`, and
+[`next.config.ts`](../../next.config.ts) declares no rewrite, so every contact notification rendered a broken
+image while both assertions on that `src` passed: they were written from the template, not from the tree, and
+that is the vacuous-fixture pattern [`../app/CLAUDE.md`](../app/CLAUDE.md) already records for `check-session`
+and `health`. A third assertion
+resolves the rendered `src` against `public/` on disk now, so a path naming no file fails whatever literal the
+other two hold. Every other consumer of the logo already used `images/`; the template was the single outlier.
+
 ## Logging a failed write
 
 **Never log an email address; log `emailDomain(email)`.** That rule was written out at nine sites as

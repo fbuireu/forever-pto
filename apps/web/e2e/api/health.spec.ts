@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 const URL = "/api/health";
 
 test.describe("GET /api/health", () => {
-	test("returns 200", async ({ request }) => {
+	test("returns 200", { tag: "@smoke" }, async ({ request }) => {
 		const response = await request.get(URL);
 		expect(response.status()).toBe(200);
 	});
