@@ -125,8 +125,10 @@ builds from — but it means "the repo root" is not the boundary; the regex is.
 `deploy-production` → `release-web` → `docs-refresh` on `main`, or `deploy-development` → `comment` / `e2e`
 on a PR. Both deploy jobs call the shared [`_deploy-web.yml`](./.github/workflows/_deploy-web.yml). `docs.yml` holds the docs graph — `build`, then
 `preview` on a PR or `deploy` → `release-docs` on `main`. The rest are [`cleanup-development.yml`](./.github/workflows/cleanup-development.yml), the
-renovate auto-merge, a `zizmor` audit, and [`dependabot-auto-merge.yml`](./.github/workflows/dependabot-auto-merge.yml) — which is **dormant**: there is no
-`.github/dependabot.yml` in the tree, so nothing ever triggers it. It is kept for the day one appears.
+renovate auto-merge, a `zizmor` audit, and [`dependabot-auto-merge.yml`](./.github/workflows/dependabot-auto-merge.yml), which
+**does fire, and only for security updates**: there is no `.github/dependabot.yml` in the tree, so Dependabot opens no
+version-update pull requests here — Renovate does that — but the security updates GitHub raises from the alerts need no
+config file, and they are what that workflow merges.
 
 Every job that needs a toolchain uses the [`.github/actions/prepare-env`](./.github/actions/prepare-env) composite — pnpm, the `.nvmrc` Node,
 `setup-node`'s dependency cache and `pnpm install --frozen-lockfile` — rather than repeating five steps.
