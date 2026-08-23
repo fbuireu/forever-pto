@@ -1,8 +1,8 @@
 const SPECIMENS = [
-	{ token: "--font-display", label: "Display — Bricolage Grotesque", sample: "Take every day off you deserve" },
-	{ token: "--font-sans", label: "Body — Space Grotesk", sample: "Combine PTO days with public holidays." },
-	{ token: "--font-serif", label: "Serif — Instrument Serif", sample: "Forever is a long time…", italic: true },
-	{ token: "--font-mono", label: "Mono — JetBrains Mono", sample: 'strategy: "optimized"' },
+	{ token: "--font-display", label: "Display, Bricolage Grotesque", sample: "Take every day off you deserve" },
+	{ token: "--font-sans", label: "Body, Space Grotesk", sample: "Combine PTO days with public holidays." },
+	{ token: "--font-serif", label: "Serif, Instrument Serif", sample: "Forever is a long time…", italic: true },
+	{ token: "--font-mono", label: "Mono, JetBrains Mono", sample: 'strategy: "optimized"' },
 ] as const;
 
 /**

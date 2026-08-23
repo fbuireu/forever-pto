@@ -91,8 +91,12 @@ describe("generateSuggestions", () => {
 	});
 
 	it("returns days sorted chronologically even where the Strategy picks a later Bridge first", () => {
-		const months = Array.from({ length: 12 }, (_, index) => makeDate(2025, index + 1, 1));
-		const holidays = [makeDate(2025, 1, 1), makeDate(2025, 5, 1), makeDate(2025, 12, 25)].map(makeHoliday);
+		const months = Array.from({ length: 12 }, (_, index) => makeDate({ year: 2025, month: index + 1, day: 1 }));
+		const holidays = [
+			makeDate({ year: 2025, month: 1, day: 1 }),
+			makeDate({ year: 2025, month: 5, day: 1 }),
+			makeDate({ year: 2025, month: 12, day: 25 }),
+		].map(makeHoliday);
 		const result = planSuggestions({
 			...BASE,
 			months,

@@ -12,7 +12,7 @@ export function WebMCP() {
 				{
 					name: "get_site_info",
 					description:
-						"Get information about Forever PTO — its features, supported locales, and optimization strategies.",
+						"Get information about Forever PTO: its features, supported locales, and optimization strategies.",
 					inputSchema: {
 						type: "object",
 						properties: {},

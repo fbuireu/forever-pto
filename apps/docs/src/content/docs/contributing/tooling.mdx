@@ -33,10 +33,10 @@ The active config is [`.lintstagedrc.json`](https://github.com/fbuireu/forever-p
 
 ## CI-side scanners
 
-- **zizmor** (`.github/workflows/zizmor.yml`) — lints the GitHub Actions workflows themselves for security issues and reports to code scanning. This is why every action in the repo is SHA-pinned with `persist-credentials: false`; follow that pattern when touching workflows.
-- **Codecov** — `ci.yml` uploads Vitest coverage (`coverage/lcov.info`) on every push/PR. See [testing](/contributing/testing/).
-- **CodeQL** — code scanning runs from GitHub's repository-level default setup, not from a workflow in the tree. There is deliberately no `codeql.yml` here: the two cannot coexist, and the default setup is what every repo in the family uses.
-- **Dependency Review** (`.github/workflows/dependency-review.yml`) — fails a PR that introduces dependencies with known vulnerabilities.
+- **zizmor** (`.github/workflows/zizmor.yml`): lints the GitHub Actions workflows themselves for security issues and reports to code scanning. This is why every action in the repo is SHA-pinned with `persist-credentials: false`; follow that pattern when touching workflows.
+- **Codecov**: `ci.yml` uploads Vitest coverage (`coverage/lcov.info`) on every push/PR. See [testing](/contributing/testing/).
+- **CodeQL**: code scanning runs from GitHub's repository-level default setup, not from a workflow in the tree. There is deliberately no `codeql.yml` here: the two cannot coexist, and the default setup is what every repo in the family uses.
+- **Dependency Review** (`.github/workflows/dependency-review.yml`): fails a PR that introduces dependencies with known vulnerabilities.
 
 ## Dependency management
 

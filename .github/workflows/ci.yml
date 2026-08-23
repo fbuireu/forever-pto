@@ -220,7 +220,7 @@ jobs:
             ### This pull request touches both packages
 
             Releases are attributed by the paths a commit touches, and `main` takes squash
-            merges — so this will be listed in **both** the `apps/web` and the `apps/docs`
+            merges, so this will be listed in **both** the `apps/web` and the `apps/docs`
             changelog, under whatever type the PR title carries.
 
             That is sometimes what you want (a change that genuinely spans both). If it is

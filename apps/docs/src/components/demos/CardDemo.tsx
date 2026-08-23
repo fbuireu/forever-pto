@@ -22,10 +22,10 @@ export const CardPartsDemo = () => (
 		<Card className="max-w-sm">
 			<CardHeader>
 				<CardTitle>CardTitle</CardTitle>
-				<CardDescription>CardDescription — muted, small.</CardDescription>
+				<CardDescription>CardDescription: muted, small.</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<p className="text-sm">CardContent — the body area, padded to match the header.</p>
+				<p className="text-sm">CardContent: the body area, padded to match the header.</p>
 			</CardContent>
 		</Card>
 	</Demo>

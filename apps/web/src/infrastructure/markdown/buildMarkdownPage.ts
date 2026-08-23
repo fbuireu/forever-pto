@@ -95,12 +95,12 @@ ${t("description")}
 
 ## Features
 
-- **Holiday Detection** — Automatic country detection with national and regional holidays
-- **Bridge Day Optimizer** — Identifies the best days to take off to maximize streaks
-- **Three Strategies** — Grouped (fewest trips), Optimized (best efficiency), Balanced
-- **Calculations** — PTO accrual, PTO vs salary, workday counter, date stats
-- **Export** — Send your schedule to Google Calendar, Outlook, or Apple Calendar
-- **Multilingual** — Available in English, Spanish, Catalan, Italian, French, and German
+- **Holiday Detection**: automatic country detection with national and regional holidays
+- **Bridge Day Optimizer**: identifies the best days to take off to maximize streaks
+- **Three Strategies**: Grouped (fewest trips), Optimized (best efficiency), Balanced
+- **Calculations**: PTO accrual, PTO vs salary, workday counter, date stats
+- **Export**: send your schedule to Google Calendar, Outlook, or Apple Calendar
+- **Multilingual**: available in English, Spanish, Catalan, Italian, French, and German
 
 ## How It Works
 
@@ -112,7 +112,7 @@ ${t("description")}
 
 ## API
 
-- \`GET /api/health\` — Service status check
+- \`GET /api/health\`: service status check
 
 ## Version
 

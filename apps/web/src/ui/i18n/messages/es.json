@@ -243,7 +243,7 @@
 		"customHolidaysFeature": "Festivos personalizados",
 		"customHolidaysDescription": "Añade tus propios festivos",
 		"selectAll": "Seleccionar todos",
-		"partialSelection": "Selección parcial — pulsa para seleccionar todos",
+		"partialSelection": "Selección parcial: pulsa para seleccionar todos",
 		"deselectAll": "Deseleccionar todos",
 		"searchPlaceholder": "Buscar festividad...",
 		"noHolidaysFound": "No se encontraron festividades",

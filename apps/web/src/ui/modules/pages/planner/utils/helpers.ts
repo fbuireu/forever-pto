@@ -27,8 +27,8 @@ interface GetCalendarDaysParams {
 export const getCalendarDays = ({ month, weekStartsOn, fixedWeeks }: GetCalendarDaysParams) => {
 	const monthStart = startOfMonth(month);
 	const monthEnd = endOfMonth(month);
-	const calendarStart = startOfWeek(monthStart, { weekStartsOn });
-	const calendarEnd = endOfWeek(monthEnd, { weekStartsOn });
+	const calendarStart = startOfWeek({ date: monthStart, options: { weekStartsOn } });
+	const calendarEnd = endOfWeek({ date: monthEnd, options: { weekStartsOn } });
 
 	const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 

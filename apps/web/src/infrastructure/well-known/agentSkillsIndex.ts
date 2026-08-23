@@ -6,8 +6,7 @@ export function agentSkillsIndex(baseUrl: string) {
 		$schema: "https://agentskills.io/schema/v0.2.0/index.json",
 		name: "Forever PTO",
 		version: pkg.version,
-		description:
-			"PTO optimization tool — maximize vacation days by combining PTO with public holidays and bridge days.",
+		description: "PTO optimization tool: maximize vacation days by combining PTO with public holidays and bridge days.",
 		skills: [
 			{
 				name: "markdown-negotiation",

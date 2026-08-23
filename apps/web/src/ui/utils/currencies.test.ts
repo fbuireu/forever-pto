@@ -54,7 +54,12 @@ describe("amountFormatter", () => {
 describe("useCurrencyFormatter", () => {
 	const NON_BREAKING_SPACES = /[  ]/g;
 
-	const formatCharge = (locale: Locale, value: number) => {
+	interface FormatChargeParams {
+		locale: Locale;
+		value: number;
+	}
+
+	const formatCharge = ({ locale, value }: FormatChargeParams) => {
 		const { result } = renderHook(() => useCurrencyFormatter(), {
 			wrapper: ({ children }: { children: ReactNode }) =>
 				createElement(NextIntlClientProvider, { locale, messages: {}, children }),
@@ -64,19 +69,19 @@ describe("useCurrencyFormatter", () => {
 	};
 
 	it("leads with the symbol and separates the cents with a point in English", () => {
-		expect(formatCharge("en", 3.5)).toBe("€3.50");
+		expect(formatCharge({ locale: "en", value: 3.5 })).toBe("€3.50");
 	});
 
 	it("trails the symbol and separates the cents with a comma in German, which a baked-in € cannot do", () => {
-		expect(formatCharge("de", 3.5)).toBe("3,50 €");
+		expect(formatCharge({ locale: "de", value: 3.5 })).toBe("3,50 €");
 	});
 
 	it("trails the symbol in French too, so five of the six locales disagree with a leading one", () => {
-		expect(formatCharge("fr", 3.5)).toBe("3,50 €");
+		expect(formatCharge({ locale: "fr", value: 3.5 })).toBe("3,50 €");
 	});
 
 	it("always shows the cents, because this is an amount about to be taken", () => {
-		expect(formatCharge("en", 10)).toBe("€10.00");
+		expect(formatCharge({ locale: "en", value: 10 })).toBe("€10.00");
 	});
 });
 

@@ -21,13 +21,13 @@
 
 ## What it does
 
-Given your country, region, year, and number of PTO days, Forever PTO suggests the optimal way to place your PTO days so you get the longest possible stretches of time off — automatically accounting for weekends and public holidays.
+Given your country, region, year, and number of PTO days, Forever PTO suggests the optimal way to place your PTO days so you get the longest possible stretches of time off, automatically accounting for weekends and public holidays.
 
 **Three strategies:**
 
-- **Grouped** — consolidate days into a few long vacations
-- **Optimized** — maximize the total number of days off
-- **Balanced** — a mix of both
+- **Grouped**: consolidate days into a few long vacations
+- **Optimized**: maximize the total number of days off
+- **Balanced**: a mix of both
 
 **Beyond scheduling:**
 
@@ -41,7 +41,7 @@ Given your country, region, year, and number of PTO days, Forever PTO suggests t
 
 ## Documentation
 
-The full wiki lives at **[docs.forever-pto.com](https://docs.forever-pto.com)** — architecture, runtime flows (country detection, premium, holidays engine…), the design system with live component demos, and the complete CI/CD and environments lifecycle.
+The full wiki lives at **[docs.forever-pto.com](https://docs.forever-pto.com)**: architecture, runtime flows (country detection, premium, holidays engine…), the design system with live component demos, and the complete CI/CD and environments lifecycle.
 
 This repo is a workspace with two packages: the app in [`apps/web/`](apps/web/) (`forever-pto`) and the docs site in [`apps/docs/`](apps/docs/) (`forever-pto-docs`, Astro Starlight), which reuses the app's real components and tokens and deploys independently. Each versions itself: a commit is attributed to whichever package its paths fall under, so keep a pull request to one package.
 
@@ -59,11 +59,11 @@ pnpm --filter forever-pto-docs dev   # docs dev server
 | Language | TypeScript 6 |
 | Styling | Tailwind CSS v4 + shadcn/ui |
 | State | Zustand |
-| i18n | next-intl — en, es, ca, it, de, fr |
+| i18n | next-intl: en, es, ca, it, de, fr |
 | Database | Turso (serverless SQLite) |
 | Payments | Stripe |
 | Email | Resend |
-| Premium session | `jose` — a signed, HTTP-only JWT cookie; there are no accounts |
+| Premium session | `jose`: a signed, HTTP-only JWT cookie; there are no accounts |
 | Deployment | Cloudflare Workers via OpenNextJS |
 | Monitoring | BetterStack |
 | Testing | Vitest + Playwright |
@@ -73,7 +73,7 @@ pnpm --filter forever-pto-docs dev   # docs dev server
 
 ## Getting started
 
-**Requirements:** Node.js 26.7.0 ([`.nvmrc`](./.nvmrc), mirrored in `engines.node`), pnpm 11.22.0 (`packageManager`) — pinned, match exactly
+**Requirements:** Node.js 26.7.0 ([`.nvmrc`](./.nvmrc), mirrored in `engines.node`), pnpm 11.22.0 (`packageManager`); pinned, match exactly
 
 ```bash
 # Install dependencies
@@ -127,10 +127,10 @@ See [`apps/web/.env.example`](apps/web/.env.example) for the full list. Key vari
 | [`CLAUDE.md`](CLAUDE.md) | How the repository is put together, and the rules for changing it. Start here |
 | [`apps/web/README.md`](apps/web/README.md) | The planner: what it does, how to run it, how it releases |
 | [`apps/docs/README.md`](apps/docs/README.md) | The wiki: how to run it, and how to write a page |
-| [`CONTEXT.md`](CONTEXT.md) | The domain glossary — one canonical name per concept |
+| [`CONTEXT.md`](CONTEXT.md) | The domain glossary: one canonical name per concept |
 | [`adr/`](adr/) | Why it is like this. One hard-to-reverse decision per file |
 
-Selected folders under [`apps/web/src/`](./apps/web/src) carry their own `CLAUDE.md` with the detail for that folder — the five layer roots plus sixteen sub-folders, all listed in [`apps/web/CLAUDE.md`](apps/web/CLAUDE.md).
+Selected folders under [`apps/web/src/`](./apps/web/src) carry their own `CLAUDE.md` with the detail for that folder: the five layer roots plus sixteen sub-folders, all listed in [`apps/web/CLAUDE.md`](apps/web/CLAUDE.md).
 [`tests/docs-consistency.test.ts`](tests/docs-consistency.test.ts) runs with the unit suite and fails the build
 when the docs and the code disagree.
 
@@ -140,7 +140,7 @@ when the docs and the code disagree.
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup, checks and conventions,
 and the [Code of Conduct](./CODE_OF_CONDUCT.md). Security issues follow the
-[Security Policy](./SECURITY.md) — never a public issue.
+[Security Policy](./SECURITY.md), never a public issue.
 
 - [Open a feature request](https://github.com/fbuireu/forever-pto/issues/new?template=feature_request.yml&labels=enhancement)
 - [Report a bug](https://github.com/fbuireu/forever-pto/issues/new?template=bug_report.yml)

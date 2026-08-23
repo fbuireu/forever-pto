@@ -18,7 +18,12 @@ vi.mock("@application/stores/premium", async (importOriginal) => ({
 import { PremiumFeatureId } from "@application/stores/premium";
 import { PremiumFeature } from "./PremiumFeature";
 
-const renderGate = (locale: Locale, messages: object) =>
+interface RenderGateParams {
+	locale: Locale;
+	messages: object;
+}
+
+const renderGate = ({ locale, messages }: RenderGateParams) =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<PremiumFeature feature={PremiumFeatureId.CALENDAR_EXPORT}>
@@ -34,7 +39,7 @@ beforeEach(() => {
 
 describe("PremiumFeature", () => {
 	it("opens the modal with the gate id, which is what analytics receives", () => {
-		renderGate("en", enMessages);
+		renderGate({ locale: "en", messages: enMessages });
 
 		fireEvent.click(screen.getByRole("button"));
 
@@ -42,7 +47,7 @@ describe("PremiumFeature", () => {
 	});
 
 	it("sends the same id from a German render, so one gate is one value in the funnel", () => {
-		renderGate("de", deMessages);
+		renderGate({ locale: "de", messages: deMessages });
 
 		fireEvent.click(screen.getByRole("button"));
 
@@ -50,7 +55,7 @@ describe("PremiumFeature", () => {
 	});
 
 	it("still names itself in the reader's language, resolving the label from the id", () => {
-		renderGate("de", deMessages);
+		renderGate({ locale: "de", messages: deMessages });
 
 		expect(
 			screen.getByLabelText(deMessages.premium.unlockFeature.replace("{feature}", deMessages.calendarExport.title)),

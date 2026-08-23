@@ -114,15 +114,21 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 								final: formatCurrency(result.discountInfo.finalAmount),
 							}),
 						});
-						track("promo_code_applied", {
-							discountType: result.discountInfo.type,
-							discountValue: result.discountInfo.value,
-							originalAmount: result.discountInfo.originalAmount,
-							finalAmount: result.discountInfo.finalAmount,
+						track({
+							event: "promo_code_applied",
+							properties: {
+								discountType: result.discountInfo.type,
+								discountValue: result.discountInfo.value,
+								originalAmount: result.discountInfo.originalAmount,
+								finalAmount: result.discountInfo.finalAmount,
+							},
 						});
 					}
 
-					track("payment_started", { amount: data.amount, currency: DEFAULT_CURRENCY, hasPromoCode: !!data.promoCode });
+					track({
+						event: "payment_started",
+						properties: { amount: data.amount, currency: DEFAULT_CURRENCY, hasPromoCode: !!data.promoCode },
+					});
 
 					setPaymentState({
 						clientSecret: result.clientSecret,

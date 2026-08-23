@@ -44,7 +44,7 @@ describe("useDebounce", () => {
 		expect(callback).toHaveBeenCalledWith("typed");
 	});
 
-	it("debounces rapid calls — only the last one triggers the callback", () => {
+	it("debounces rapid calls, so only the last one triggers the callback", () => {
 		const callback = vi.fn();
 		const { result } = renderHook(() => useDebounce({ value: "", delay: 300, callback }));
 

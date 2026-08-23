@@ -16,7 +16,7 @@ const ITEMS = [
 	{
 		id: "regions",
 		question: "Are regional holidays supported?",
-		answer: "Yes — pick a region and its holidays are merged with the national calendar.",
+		answer: "Yes: pick a region and its holidays are merged with the national calendar.",
 	},
 ];
 

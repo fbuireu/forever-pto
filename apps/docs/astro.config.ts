@@ -23,7 +23,7 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: "Forever PTO",
-			description: "Documentation and internal wiki for Forever PTO — the PTO optimization tool.",
+			description: "Documentation and internal wiki for Forever PTO, the PTO optimization tool.",
 			logo: {
 				light: "./src/assets/logo-light.svg",
 				dark: "./src/assets/logo-dark.svg",

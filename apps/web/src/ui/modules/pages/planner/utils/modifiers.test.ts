@@ -29,7 +29,12 @@ const THURSDAY = day(4);
 const suggestionOf = (days: Date[]) => ({ days }) as unknown as Suggestion;
 const measuredOf = (days: Date[]) => ({ days }) as unknown as MeasuredSuggestion;
 
-const holidayOf = (date: Date, variant: HolidayDTO["variant"]) => ({ date, variant, name: "A day" }) as HolidayDTO;
+interface HolidayOfParams {
+	date: Date;
+	variant: HolidayDTO["variant"];
+}
+
+const holidayOf = ({ date, variant }: HolidayOfParams) => ({ date, variant, name: "A day" }) as HolidayDTO;
 
 describe("isPast", () => {
 	it("refuses to call anything past while past days are allowed", () => {
@@ -59,18 +64,21 @@ describe("isToday", () => {
 
 describe("isSuggestion", () => {
 	it("paints a day the plan placed", () => {
-		expect(isSuggestion(suggestionOf([MONDAY, TUESDAY]))(MONDAY)).toBe(true);
+		expect(isSuggestion({ currentSelection: suggestionOf([MONDAY, TUESDAY]) })(MONDAY)).toBe(true);
 	});
 
 	it("stops painting a Suggested Day the user took back", () => {
-		const isSuggested = isSuggestion(suggestionOf([MONDAY, TUESDAY]), [MONDAY]);
+		const isSuggested = isSuggestion({
+			currentSelection: suggestionOf([MONDAY, TUESDAY]),
+			removedSuggestedDays: [MONDAY],
+		});
 
 		expect(isSuggested(MONDAY)).toBe(false);
 		expect(isSuggested(TUESDAY)).toBe(true);
 	});
 
 	it("paints nothing while there is no plan", () => {
-		expect(isSuggestion(null)(MONDAY)).toBe(false);
+		expect(isSuggestion({ currentSelection: null })(MONDAY)).toBe(false);
 	});
 });
 
@@ -126,7 +134,10 @@ describe("isAlternative", () => {
 });
 
 describe("the Holiday predicates", () => {
-	const holidays = [holidayOf(MONDAY, HolidayVariant.NATIONAL), holidayOf(TUESDAY, HolidayVariant.CUSTOM)];
+	const holidays = [
+		holidayOf({ date: MONDAY, variant: HolidayVariant.NATIONAL }),
+		holidayOf({ date: TUESDAY, variant: HolidayVariant.CUSTOM }),
+	];
 
 	it("isHoliday matches any Variant", () => {
 		expect(isHoliday(holidays)(MONDAY)).toBe(true);

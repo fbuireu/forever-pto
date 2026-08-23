@@ -5,24 +5,24 @@ sidebar:
   order: 15
 ---
 
-SEO is handled with the App Router's native primitives — `generateMetadata`, `robots.ts`, `sitemap.ts` — plus a JSON-LD component. Everything is locale-aware, driven by the same `LOCALES` constant as the rest of the app (see [internationalization](/how-it-works/i18n/)).
+SEO is handled with the App Router's native primitives (`generateMetadata`, `robots.ts`, `sitemap.ts`) plus a JSON-LD component. Everything is locale-aware, driven by the same `LOCALES` constant as the rest of the app (see [internationalization](/how-it-works/i18n/)).
 
 ## Metadata per locale
 
-The shape lives in one module and each route supplies only its own path. `routeMetadata` in `apps/web/src/infrastructure/seo/routeMetadata.ts` takes a `RoutePath` — the literal union of `SITE_ROUTES`' own `path` values, so a typo is a compile error rather than a silent fallthrough — and builds the whole `generateMetadata` from that row.
+The shape lives in one module and each route supplies only its own path. `routeMetadata` in `apps/web/src/infrastructure/seo/routeMetadata.ts` takes a `RoutePath` (the literal union of `SITE_ROUTES`' own `path` values, so a typo is a compile error rather than a silent fallthrough) and builds the whole `generateMetadata` from that row.
 
 `buildMetadata` (`apps/web/src/infrastructure/seo/buildMetadata.ts`) owns everything derived from it:
 
 - `title`, `description` and `keywords` come from the `metadata` i18n namespace for the request's locale, under the row's own `titleKey` and `descriptionKey`.
-- `metadataBase` from `NEXT_PUBLIC_SITE_URL` (via `getPublicEnv`, `apps/web/src/infrastructure/services/env/getPublicEnv.ts`), a locale-prefixed `canonical`, and `alternates.languages` from `localeAlternates()` (`apps/web/src/infrastructure/i18n/utils/url.ts`) — the hreflang map across all locales. The route is a **required** argument: a route that omitted it canonicalised through the fallback, and six URLs then competed for one ranking.
+- `metadataBase` from `NEXT_PUBLIC_SITE_URL` (via `getPublicEnv`, `apps/web/src/infrastructure/services/env/getPublicEnv.ts`), a locale-prefixed `canonical`, and `alternates.languages` from `localeAlternates()` (`apps/web/src/infrastructure/i18n/utils/url.ts`), the hreflang map across all locales. The route is a **required** argument: a route that omitted it canonicalised through the fallback, and six URLs then competed for one ranking.
 - Open Graph (`type: 'website'`, `siteName`, localized title/description) appears when there is a description; the `summary_large_image` Twitter card, its image and `keywords` appear only when the route is indexable. Both cards currently use `apps/web/public/static/images/forever-pto-logo.png` (declared 1200x630).
-- Explicit `robots` directives including googleBot `max-image-preview: large` and unlimited snippets. Indexability is not a parameter — `buildMetadata` calls `isIndexable(route)` itself, so nothing can declare a legal page indexable by passing a flag.
+- Explicit `robots` directives including googleBot `max-image-preview: large` and unlimited snippets. Indexability is not a parameter: `buildMetadata` calls `isIndexable(route)` itself, so nothing can declare a legal page indexable by passing a flag.
 
 ## Structured data: `JsonLd` and `FaqJsonLd`
 
 `apps/web/src/ui/modules/shared/seo/JsonLd.tsx` exports **two** server components, mounted on different pages on purpose: a search engine expects the marked-up questions to be visible on the page carrying the markup.
 
-- **`JsonLd`** sits on the planner (`apps/web/src/app/[locale]/(app)/planner/page.tsx`) and emits two `application/ld+json` scripts — **WebApplication**, with name and description from translations, `applicationCategory: 'ProductivityApplication'`, `availableLanguage` interpolated from `LOCALES` and the free plus Premium offers; and **Organization**, with name, URL and logo.
+- **`JsonLd`** sits on the planner (`apps/web/src/app/[locale]/(app)/planner/page.tsx`) and emits two `application/ld+json` scripts: **WebApplication**, with name and description from translations, `applicationCategory: 'ProductivityApplication'`, `availableLanguage` interpolated from `LOCALES` and the free plus Premium offers; and **Organization**, with name, URL and logo.
 - **`FaqJsonLd`** sits on the homepage (`apps/web/src/app/[locale]/(marketing)/page.tsx`), beside the `Faq` section it describes, and emits the **FAQPage** schema. Answers come from the `faq` namespace so structured data and visible content stay in sync per locale. It used to be emitted on the planner, which has no FAQ on it at all.
 
 The Premium offer states a `priceSpecification` with a `minPrice` rather than a fixed price. Premium is unlocked by a Donation whose amount the payer chooses, so the minimum is read out of the payment schema instead of being restated here or there.
@@ -31,19 +31,19 @@ The Premium offer states a `priceSpecification` with a `minPrice` rather than a 
 
 ## One table, five readers
 
-`SITE_ROUTES` in `apps/web/src/infrastructure/seo/routes.ts` is the single statement of which routes exist, which are public and what each is called: a `path`, an `indexable` flag, the sitemap hints and the `metadata.*` message keys. Five readers derive from it — `sitemap.ts` emits the cross-product of the locales and `indexableRoutes()`, `robots.ts` disallows every locale-expanded `privateRoutes()` path, `buildMetadata` resolves `isIndexable(route)` for itself, `buildMarkdownPage` looks a title and description up through `findRoute`, and `routeMetadata` builds a whole `generateMetadata` from one row.
+`SITE_ROUTES` in `apps/web/src/infrastructure/seo/routes.ts` is the single statement of which routes exist, which are public and what each is called: a `path`, an `indexable` flag, the sitemap hints and the `metadata.*` message keys. Five readers derive from it: `sitemap.ts` emits the cross-product of the locales and `indexableRoutes()`, `robots.ts` disallows every locale-expanded `privateRoutes()` path, `buildMetadata` resolves `isIndexable(route)` for itself, `buildMarkdownPage` looks a title and description up through `findRoute`, and `routeMetadata` builds a whole `generateMetadata` from one row.
 
-Adding a route is one row here and one line in the route file. It used to be three edits in three places — a routes entry, a disallowed-prefix list and a `robots: { index: false }` block — with nothing tying them together, and the prefix list covered only `/legal/` and `/payment/`, so a private route anywhere else was disallowed by nobody. `isIndexable` **fails closed**: a path with no row counts as private, so forgetting the table costs a page in the sitemap rather than exposing a private one.
+Adding a route is one row here and one line in the route file. It used to be three edits in three places (a routes entry, a disallowed-prefix list and a `robots: { index: false }` block) with nothing tying them together, and the prefix list covered only `/legal/` and `/payment/`, so a private route anywhere else was disallowed by nobody. `isIndexable` **fails closed**: a path with no row counts as private, so forgetting the table costs a page in the sitemap rather than exposing a private one.
 
 ## robots.ts
 
-`apps/web/src/app/robots.ts` allows everything except `/_next/static/` and, per locale, every path `privateRoutes()` returns — the four legal pages and the payment confirmation. It also points crawlers at `${baseUrl}/sitemap.xml`.
+`apps/web/src/app/robots.ts` allows everything except `/_next/static/` and, per locale, every path `privateRoutes()` returns: the four legal pages and the payment confirmation. It also points crawlers at `${baseUrl}/sitemap.xml`.
 
-`robots.txt` is prerendered, so it bakes whatever base URL the build resolved, where `sitemap.ts` gets the host it is actually served from. On a preview Worker that means `robots.txt` advertises the production sitemap — tolerated rather than fixed, because previews sit behind Cloudflare Access and nothing crawls them.
+`robots.txt` is prerendered, so it bakes whatever base URL the build resolved, where `sitemap.ts` gets the host it is actually served from. On a preview Worker that means `robots.txt` advertises the production sitemap, tolerated rather than fixed, because previews sit behind Cloudflare Access and nothing crawls them.
 
 ## sitemap.ts
 
-`apps/web/src/app/sitemap.ts` is the cartesian product of `LOCALES` and `indexableRoutes()` — currently the homepage (`priority 1`, monthly) and `/planner` (`priority 0.9`, weekly) — with URLs built by `localePath`, so English URLs are unprefixed and the rest carry their locale, matching the `as-needed` routing.
+`apps/web/src/app/sitemap.ts` is the cartesian product of `LOCALES` and `indexableRoutes()`, currently the homepage (`priority 1`, monthly) and `/planner` (`priority 0.9`, weekly), with URLs built by `localePath`, so English URLs are unprefixed and the rest carry their locale, matching the `as-needed` routing.
 
 ## Related
 

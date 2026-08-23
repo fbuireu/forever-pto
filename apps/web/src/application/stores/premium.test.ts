@@ -53,7 +53,7 @@ describe("setPremiumStatus", () => {
 	it("tracks premium_activated on the transition into premium", async () => {
 		const { track } = await import("@infrastructure/clients/logging/better-stack/tracking");
 		usePremiumStore.getState().setPremiumStatus({ email: "user@example.com", premiumKey: "key123" });
-		expect(track).toHaveBeenCalledWith("premium_activated", { plan: "premium" });
+		expect(track).toHaveBeenCalledWith({ event: "premium_activated", properties: { plan: "premium" } });
 	});
 
 	it("does not track premium_activated when the same entitlement is re-verified", async () => {
@@ -89,7 +89,7 @@ describe("showPremiumModal / closeModal", () => {
 	it("sends the gate id to analytics, never the label the gate shows", async () => {
 		const { track } = await import("@infrastructure/clients/logging/better-stack/tracking");
 		usePremiumStore.getState().showPremiumModal(PremiumFeatureId.ADVANCED_METRICS);
-		expect(track).toHaveBeenCalledWith("upgrade_modal_opened", { feature: "advancedMetrics" });
+		expect(track).toHaveBeenCalledWith({ event: "upgrade_modal_opened", properties: { feature: "advancedMetrics" } });
 	});
 
 	it("closeModal closes modal and clears feature", () => {
@@ -279,10 +279,12 @@ describe("refreshPremiumStatus", () => {
 });
 
 describe("onRehydrateStorage", () => {
-	const runRehydrate = (
-		state: { lastVerified: number | null; needsSessionCheck: boolean } | undefined,
-		error?: Error,
-	) => {
+	interface RunRehydrateParams {
+		state: { lastVerified: number | null; needsSessionCheck: boolean } | undefined;
+		error?: Error;
+	}
+
+	const runRehydrate = ({ state, error }: RunRehydrateParams) => {
 		const options = usePremiumStore.persist.getOptions();
 		const listener = options.onRehydrateStorage?.(usePremiumStore.getState() as never);
 		listener?.(state as never, error);
@@ -290,31 +292,34 @@ describe("onRehydrateStorage", () => {
 	};
 
 	it("flags a session check when the device has never verified", () => {
-		const state = runRehydrate({ lastVerified: null, needsSessionCheck: false });
+		const state = runRehydrate({ state: { lastVerified: null, needsSessionCheck: false } });
 		expect(state?.needsSessionCheck).toBe(true);
 	});
 
 	it("flags a session check when the last verification is older than 24h", () => {
-		const state = runRehydrate({ lastVerified: Date.now() - 25 * 60 * 60 * 1000, needsSessionCheck: false });
+		const state = runRehydrate({ state: { lastVerified: Date.now() - 25 * 60 * 60 * 1000, needsSessionCheck: false } });
 		expect(state?.needsSessionCheck).toBe(true);
 	});
 
 	it("does not flag a session check when verification is recent", () => {
-		const state = runRehydrate({ lastVerified: Date.now() - 60 * 1000, needsSessionCheck: false });
+		const state = runRehydrate({ state: { lastVerified: Date.now() - 60 * 1000, needsSessionCheck: false } });
 		expect(state?.needsSessionCheck).toBe(false);
 	});
 
 	it("flags a session check when rehydration failed, so the cookie can restore access", () => {
-		const state = runRehydrate({ lastVerified: Date.now(), needsSessionCheck: false }, new Error("deobfuscate failed"));
+		const state = runRehydrate({
+			state: { lastVerified: Date.now(), needsSessionCheck: false },
+			error: new Error("deobfuscate failed"),
+		});
 		expect(state?.needsSessionCheck).toBe(true);
 	});
 
 	it("does not throw when there is no state to rehydrate", () => {
-		expect(() => runRehydrate(undefined)).not.toThrow();
+		expect(() => runRehydrate({ state: undefined })).not.toThrow();
 	});
 
 	it("warns when there is no state, without blocking the listener on the logging client", async () => {
-		runRehydrate(undefined);
+		runRehydrate({ state: undefined });
 
 		expect(mockWarn).not.toHaveBeenCalled();
 		await vi.waitFor(() =>
@@ -325,7 +330,10 @@ describe("onRehydrateStorage", () => {
 	});
 
 	it("logs a rehydration failure", async () => {
-		runRehydrate({ lastVerified: Date.now(), needsSessionCheck: false }, new Error("deobfuscate failed"));
+		runRehydrate({
+			state: { lastVerified: Date.now(), needsSessionCheck: false },
+			error: new Error("deobfuscate failed"),
+		});
 
 		expect(mockLogError).not.toHaveBeenCalled();
 		await vi.waitFor(() =>

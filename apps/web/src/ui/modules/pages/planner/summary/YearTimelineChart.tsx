@@ -15,23 +15,46 @@ interface Seg {
 	end: Date;
 }
 
-function getDaysInMonth(month: number, year: number) {
+interface GetDaysInMonthParams {
+	month: number;
+	year: number;
+}
+
+function getDaysInMonth({ month, year }: GetDaysInMonthParams) {
 	return Temporal.PlainYearMonth.from({ year, month: month + 1 }).daysInMonth;
 }
 
-function segPos(date: Date, year: number, monthCount: number) {
+interface SegPosParams {
+	date: Date;
+	year: number;
+	monthCount: number;
+}
+
+function segPos({ date, year, monthCount }: SegPosParams) {
 	const day = getDayOfMonth(date);
-	const daysInMonth = getDaysInMonth(getMonth(date), getYear(date));
+	const daysInMonth = getDaysInMonth({ month: getMonth(date), year: getYear(date) });
 	return (windowMonthIndex({ date, window: { year } }) + (day - 1) / daysInMonth) / monthCount;
 }
 
-function segWidth(start: Date, end: Date, year: number, monthCount: number) {
-	const daysInMonth = getDaysInMonth(getMonth(end), getYear(end));
-	const endFrac = (windowMonthIndex({ date: end, window: { year } }) + getDayOfMonth(end) / daysInMonth) / monthCount;
-	return Math.max(endFrac - segPos(start, year, monthCount), 0.005);
+interface SegWidthParams {
+	start: Date;
+	end: Date;
+	year: number;
+	monthCount: number;
 }
 
-function groupDates(dates: Date[], maxGapDays: number) {
+function segWidth({ start, end, year, monthCount }: SegWidthParams) {
+	const daysInMonth = getDaysInMonth({ month: getMonth(end), year: getYear(end) });
+	const endFrac = (windowMonthIndex({ date: end, window: { year } }) + getDayOfMonth(end) / daysInMonth) / monthCount;
+	return Math.max(endFrac - segPos({ date: start, year, monthCount }), 0.005);
+}
+
+interface GroupDatesParams {
+	dates: Date[];
+	maxGapDays: number;
+}
+
+function groupDates({ dates, maxGapDays }: GroupDatesParams) {
 	if (!dates.length) return [];
 	const sorted = dates.toSorted((a, b) => a.getTime() - b.getTime());
 	const out: Seg[] = [];
@@ -101,7 +124,7 @@ export const YearTimelineChart = ({
 			else if (h.variant === HolidayVariant.CUSTOM) custom.push(seg);
 		}
 
-		const pto = groupDates(suggestion?.days ?? [], 3);
+		const pto = groupDates({ dates: suggestion?.days ?? [], maxGapDays: 3 });
 
 		const bridges = (suggestion?.bridges ?? []).map((b) => ({
 			start: b.startDate,
@@ -151,8 +174,8 @@ export const YearTimelineChart = ({
 									key={seg.start.toISOString()}
 									className={cn("absolute inset-y-0 rounded-full border-[2px] border-[var(--frame)]", ROW_COLOR[key])}
 									style={{
-										left: `${segPos(seg.start, year, monthCount) * 100}%`,
-										width: `max(8px, ${segWidth(seg.start, seg.end, year, monthCount) * 100}%)`,
+										left: `${segPos({ date: seg.start, year, monthCount }) * 100}%`,
+										width: `max(8px, ${segWidth({ start: seg.start, end: seg.end, year, monthCount }) * 100}%)`,
 									}}
 								/>
 							))}

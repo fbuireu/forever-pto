@@ -7,7 +7,7 @@ export function mcpServerCard(baseUrl: string) {
 			name: "Forever PTO",
 			version: pkg.version,
 			description:
-				"PTO optimization tool — maximize vacation days by combining PTO with public holidays and bridge days.",
+				"PTO optimization tool: maximize vacation days by combining PTO with public holidays and bridge days.",
 			url: baseUrl,
 		},
 		capabilities: {

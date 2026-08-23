@@ -3,7 +3,13 @@ import { describe, expect, it } from "vitest";
 import { FilterStrategy } from "../types";
 import { generateMetrics } from "./generateMetrics";
 
-const makeDate = (year: number, month: number, day: number) => new Date(year, month - 1, day);
+interface MakeDateParams {
+	year: number;
+	month: number;
+	day: number;
+}
+
+const makeDate = ({ year, month, day }: MakeDateParams) => new Date(year, month - 1, day);
 
 const makeHoliday = (date: Date) => ({
 	id: `h-${date.toISOString()}`,
@@ -63,7 +69,7 @@ describe("generateMetrics", () => {
 
 	it("returns non-zero metrics for a populated suggestion", () => {
 		const result = generateMetrics({
-			suggestion: { days: [makeDate(2025, 1, 6)], strategy: FilterStrategy.GROUPED },
+			suggestion: { days: [makeDate({ year: 2025, month: 1, day: 6 })], strategy: FilterStrategy.GROUPED },
 			locale: LOCALE,
 			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
@@ -79,7 +85,7 @@ describe("generateMetrics", () => {
 
 	it("distributes days into the correct month bucket", () => {
 		const result = generateMetrics({
-			suggestion: { days: [makeDate(2025, 1, 6), makeDate(2025, 1, 7)] },
+			suggestion: { days: [makeDate({ year: 2025, month: 1, day: 6 }), makeDate({ year: 2025, month: 1, day: 7 })] },
 			locale: LOCALE,
 			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
@@ -93,7 +99,7 @@ describe("generateMetrics", () => {
 
 	it("returns correct firstLastBreak months", () => {
 		const result = generateMetrics({
-			suggestion: { days: [makeDate(2025, 1, 6), makeDate(2025, 3, 10)] },
+			suggestion: { days: [makeDate({ year: 2025, month: 1, day: 6 }), makeDate({ year: 2025, month: 3, day: 10 })] },
 			locale: LOCALE,
 			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
@@ -108,15 +114,15 @@ describe("generateMetrics", () => {
 
 	it("counts bridges used when bridges are provided", () => {
 		const bridge = {
-			startDate: makeDate(2025, 1, 4),
-			endDate: makeDate(2025, 1, 6),
+			startDate: makeDate({ year: 2025, month: 1, day: 4 }),
+			endDate: makeDate({ year: 2025, month: 1, day: 6 }),
 			ptoDaysNeeded: 1,
 			effectiveDays: 3,
 			efficiency: 3,
-			ptoDays: [makeDate(2025, 1, 6)],
+			ptoDays: [makeDate({ year: 2025, month: 1, day: 6 })],
 		};
 		const result = generateMetrics({
-			suggestion: { days: [makeDate(2025, 1, 6)], bridges: [bridge] },
+			suggestion: { days: [makeDate({ year: 2025, month: 1, day: 6 })], bridges: [bridge] },
 			locale: LOCALE,
 			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
@@ -132,12 +138,12 @@ describe("generateMetrics", () => {
 
 	it("applies manuallySelectedDays by merging with suggestion days", () => {
 		const result = generateMetrics({
-			suggestion: { days: [makeDate(2025, 1, 6)] },
+			suggestion: { days: [makeDate({ year: 2025, month: 1, day: 6 })] },
 			locale: LOCALE,
 			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
 			allowPastDays: true,
-			manuallySelectedDays: [makeDate(2025, 1, 7)],
+			manuallySelectedDays: [makeDate({ year: 2025, month: 1, day: 7 })],
 			removedSuggestedDays: [],
 		});
 		expect(result.monthlyDist[0]).toBe(2);
@@ -145,12 +151,12 @@ describe("generateMetrics", () => {
 
 	it("applies removedSuggestedDays by excluding them", () => {
 		const result = generateMetrics({
-			suggestion: { days: [makeDate(2025, 1, 6), makeDate(2025, 1, 7)] },
+			suggestion: { days: [makeDate({ year: 2025, month: 1, day: 6 }), makeDate({ year: 2025, month: 1, day: 7 })] },
 			locale: LOCALE,
 			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
 			allowPastDays: true,
-			removedSuggestedDays: [makeDate(2025, 1, 6)],
+			removedSuggestedDays: [makeDate({ year: 2025, month: 1, day: 6 })],
 			manuallySelectedDays: [],
 		});
 		expect(result.monthlyDist[0]).toBe(1);
@@ -158,7 +164,7 @@ describe("generateMetrics", () => {
 
 	it("counts the free days a bridge absorbs as one long block", () => {
 		const result = generateMetrics({
-			suggestion: { days: [makeDate(2025, 1, 3), makeDate(2025, 1, 6)] },
+			suggestion: { days: [makeDate({ year: 2025, month: 1, day: 3 }), makeDate({ year: 2025, month: 1, day: 6 })] },
 			locale: LOCALE,
 			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
@@ -171,10 +177,10 @@ describe("generateMetrics", () => {
 
 	it("passes holidays to the long-block scan", () => {
 		const result = generateMetrics({
-			suggestion: { days: [makeDate(2025, 1, 8), makeDate(2025, 1, 9)] },
+			suggestion: { days: [makeDate({ year: 2025, month: 1, day: 8 }), makeDate({ year: 2025, month: 1, day: 9 })] },
 			locale: LOCALE,
 			planningWindow: { year: YEAR, carryOverMonths: 0 },
-			holidays: [makeHoliday(makeDate(2025, 1, 10))],
+			holidays: [makeHoliday(makeDate({ year: 2025, month: 1, day: 10 }))],
 			allowPastDays: true,
 			manuallySelectedDays: [],
 			removedSuggestedDays: [],
@@ -183,7 +189,7 @@ describe("generateMetrics", () => {
 	});
 
 	it("scopes the year-wide metrics to the year passed in, not the year the first day falls in", () => {
-		const carryOverDay = makeDate(2026, 1, 5);
+		const carryOverDay = makeDate({ year: 2026, month: 1, day: 5 });
 		const params = {
 			suggestion: { days: [carryOverDay] },
 			locale: LOCALE,
@@ -211,12 +217,12 @@ describe("generateMetrics", () => {
 
 	it("returns zero metrics when all suggested days are removed", () => {
 		const result = generateMetrics({
-			suggestion: { days: [makeDate(2025, 1, 6)] },
+			suggestion: { days: [makeDate({ year: 2025, month: 1, day: 6 })] },
 			locale: LOCALE,
 			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
 			allowPastDays: true,
-			removedSuggestedDays: [makeDate(2025, 1, 6)],
+			removedSuggestedDays: [makeDate({ year: 2025, month: 1, day: 6 })],
 			manuallySelectedDays: [],
 		});
 		expect(result.bonusDays).toBe(0);
@@ -224,12 +230,12 @@ describe("generateMetrics", () => {
 	});
 
 	it("counts only the Bridges Effective Days kept", () => {
-		const kept = makeDate(2025, 1, 3);
-		const dropped = [makeDate(2025, 1, 9), makeDate(2025, 1, 10)];
+		const kept = makeDate({ year: 2025, month: 1, day: 3 });
+		const dropped = [makeDate({ year: 2025, month: 1, day: 9 }), makeDate({ year: 2025, month: 1, day: 10 })];
 		const bridges = [
 			{
 				startDate: kept,
-				endDate: makeDate(2025, 1, 5),
+				endDate: makeDate({ year: 2025, month: 1, day: 5 }),
 				ptoDaysNeeded: 1,
 				ptoDays: [kept],
 				effectiveDays: 3,
@@ -237,7 +243,7 @@ describe("generateMetrics", () => {
 			},
 			{
 				startDate: dropped[0] as Date,
-				endDate: makeDate(2025, 1, 12),
+				endDate: makeDate({ year: 2025, month: 1, day: 12 }),
 				ptoDaysNeeded: 2,
 				ptoDays: dropped,
 				effectiveDays: 4,

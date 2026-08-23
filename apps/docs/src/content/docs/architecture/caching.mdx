@@ -9,7 +9,7 @@ Caching happens at three levels: Next.js Cache Components inside the rendering l
 
 ## Cache Components
 
-`next.config.ts` enables `cacheComponents: true` (Next 16 Cache Components). `partialPrefetching` is intentionally commented out there — the inline comment records the Next version it is waiting on.
+`next.config.ts` enables `cacheComponents: true` (Next 16 Cache Components). `partialPrefetching` is intentionally commented out there; the inline comment records the Next version it is waiting on.
 
 With Cache Components enabled, anything dynamic must either be wrapped in Suspense or explicitly cached with a `'use cache'` directive plus a `cacheLife` profile. Current cache sites:
 
@@ -31,7 +31,7 @@ export async function getCurrentYear() {
 }
 ```
 
-`getCurrentYear` and `getPublicEnv` exist precisely because `new Date()` and `getCloudflareContext()` are dynamic APIs — hoisting them behind `'use cache'` keeps the pages that call them prerenderable. `Testimonials` caches a whole server component subtree (including its shuffled card order) for the same reason.
+`getCurrentYear` and `getPublicEnv` exist precisely because `new Date()` and `getCloudflareContext()` are dynamic APIs: hoisting them behind `'use cache'` keeps the pages that call them prerenderable. `Testimonials` caches a whole server component subtree (including its shuffled card order) for the same reason.
 
 **Testing consequence:** `vitest.setup.ts` mocks `next/cache` (`cacheLife`, `cacheTag` as no-ops) because the directive is meaningless in a unit-test runtime.
 
@@ -48,7 +48,7 @@ export default defineCloudflareConfig({
 });
 ```
 
-At runtime this is backed by the R2 bucket bound as `NEXT_INC_CACHE_R2_BUCKET` in `wrangler.toml`, with separate buckets per environment (see [environments](/infra/environments/)). Everything Next.js would put in its incremental cache — prerendered pages, `'use cache'` entries, fetch cache — is persisted there, so cache entries survive Worker isolate recycling and are shared across the fleet.
+At runtime this is backed by the R2 bucket bound as `NEXT_INC_CACHE_R2_BUCKET` in `wrangler.toml`, with separate buckets per environment (see [environments](/infra/environments/)). Everything Next.js would put in its incremental cache (prerendered pages, `'use cache'` entries, fetch cache) is persisted there, so cache entries survive Worker isolate recycling and are shared across the fleet.
 
 ## HTTP-level caches
 

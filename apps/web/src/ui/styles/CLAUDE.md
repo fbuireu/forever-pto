@@ -159,7 +159,7 @@ quotes throughout, LF, 120 columns: Biome's defaults, applied by the tool rather
 - **`animations/index.css` declares no `shimmer` keyframe, and must not grow one back.** It carried a
   `background-position` sweep under that name which nothing could reach: no rule writes `animation: shimmer`,
   `theme/index.css` declares no `--animate-*` variable so Tailwind can generate no `animate-shimmer` utility,
-  and `boneyard-js` injects its own `@keyframes bs-<uid>` at runtime for `animate: 'shimmer'` — never one
+  and `boneyard-js` injects its own `@keyframes bs-<uid>` at runtime for `animate: 'shimmer'`, never one
   called `shimmer`. Every other keyframe in the file has a named caller. It read like the skeleton animation
   and was not one, which is exactly what makes the next reader wire a component to it.
 - `--container-8xl` in `theme/index.css` exists for one class, `max-w-8xl` in `planner/page.tsx`.

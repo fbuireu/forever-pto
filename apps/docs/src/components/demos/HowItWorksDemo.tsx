@@ -15,7 +15,7 @@ const STRATEGY_DESCRIPTIONS: Record<FilterStrategy, string> = {
 	grouped:
 		"Prefers the longest consecutive blocks first: fewer, longer breaks. This is the default (initial value of the filters store).",
 	optimized:
-		"Prefers the highest-efficiency bridges first — the best effectiveDays / ptoDaysNeeded ratio — and requires a higher minimum efficiency than the other strategies.",
+		"Prefers the highest-efficiency bridges first (the best effectiveDays / ptoDaysNeeded ratio) and requires a higher minimum efficiency than the other strategies.",
 	balanced:
 		"Two-pass greedy selection over a composite score: (efficiency x 0.6 + normalised span x 0.4) x multi-day bonus. Trades raw efficiency for spread across the year.",
 };

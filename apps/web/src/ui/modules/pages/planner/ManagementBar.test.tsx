@@ -157,7 +157,7 @@ describe("ManagementBar drawer header", () => {
 
 describe("ManagementBar drawer extent", () => {
 	it("never expands to the whole viewport, so there is always page left to touch", () => {
-		const { getByTestId } = renderBar("es", esMessages);
+		const { getByTestId } = renderBar({ locale: "es", messages: esMessages });
 		const points: number[] = JSON.parse(getByTestId("drawer").getAttribute("data-snap-points") ?? "[]");
 
 		expect(points.length).toBeGreaterThan(0);
@@ -165,13 +165,13 @@ describe("ManagementBar drawer extent", () => {
 	});
 
 	it("opens at the collapsed snap point rather than the expanded one", () => {
-		const { getByTestId } = renderBar("es", esMessages);
+		const { getByTestId } = renderBar({ locale: "es", messages: esMessages });
 
 		expect(getByTestId("drawer").getAttribute("data-active-snap")).toBe(String(DRAWER_SNAP.COLLAPSED));
 	});
 
 	it("expands when the tutorial asks and comes back down when the tour ends", () => {
-		const { getByTestId } = renderBar("es", esMessages);
+		const { getByTestId } = renderBar({ locale: "es", messages: esMessages });
 
 		act(() => {
 			globalThis.dispatchEvent(new CustomEvent(TUTORIAL_EVENT.EXPAND_DRAWER));

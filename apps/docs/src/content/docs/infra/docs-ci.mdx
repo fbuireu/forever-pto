@@ -1,6 +1,6 @@
 ---
 title: Docs CI
-description: How this documentation site builds, previews and deploys itself — deliberately simpler than the app's pipeline.
+description: How this documentation site builds, previews and deploys itself, deliberately simpler than the app's pipeline.
 sidebar:
   order: 7
 ---
@@ -9,7 +9,7 @@ This page is self-documenting: it describes the pipeline that published it. The 
 
 ## The workflow
 
-`.github/workflows/docs.yml` follows the repo's workflow conventions (SHA-pinned actions, `persist-credentials: false`, zizmor-linted) and is **path-filtered**. The list is `apps/docs/**`, `apps/web/package.json`, all of `apps/web/src/ui/**`, `apps/web/src/domain/calendar/types.ts`, `apps/web/src/infrastructure/i18n/locales.ts`, `pnpm-lock.yaml`, the workflow file and `.github/actions/prepare-env/**` — written out twice, once per trigger block. Unrelated app changes never build the docs; changes to the reused sources do, on purpose, because they can break the demos.
+`.github/workflows/docs.yml` follows the repo's workflow conventions (SHA-pinned actions, `persist-credentials: false`, zizmor-linted) and is **path-filtered**. The list is `apps/docs/**`, `apps/web/package.json`, all of `apps/web/src/ui/**`, `apps/web/src/domain/calendar/types.ts`, `apps/web/src/infrastructure/i18n/locales.ts`, `pnpm-lock.yaml`, the workflow file and `.github/actions/prepare-env/**` (written out twice, once per trigger block). Unrelated app changes never build the docs; changes to the reused sources do, on purpose, because they can break the demos.
 
 The last three app entries are not decoration. `app-version.ts` reads the app manifest, and `HowItWorksDemo.tsx` reaches `@domain/calendar/types` and `@infrastructure/i18n/locales` by relative path rather than through `@ui`. The app's own contract suite derives that reach from the sources and fails if a path of it is missing from both trigger blocks, so this list cannot drift from what the site imports.
 
@@ -21,13 +21,13 @@ Triggers:
 
 ## Build & test job
 
-Installs the whole workspace (**unfiltered** `pnpm install` — the demos import app sources whose bare imports resolve from the root `node_modules`), then runs, via the scripts in `apps/docs/package.json`:
+Installs the whole workspace (**unfiltered** `pnpm install`: the demos import app sources whose bare imports resolve from the root `node_modules`), then runs, via the scripts in `apps/docs/package.json`:
 
-- `pnpm typecheck` — `astro check`, which typechecks the demo islands. This is the drift tripwire: demos import real app components via the `@ui` alias with exhaustive `Record<Variant, …>` maps, so renaming a CVA variant in the app breaks this build.
-- `pnpm build` — `astro build`; the resulting `apps/docs/dist` is uploaded as an artifact for the deploy jobs.
-- Playwright (`pnpm test:e2e`) runs against a local preview server — `apps/docs/playwright.config.ts` boots `astro preview` itself via `webServer`, so no deployment is needed to test. Seven specs are site-level smoke tests; the rest walk **every** page the build emitted a demo onto, asserting each answers 200, that every `data-demo` frame renders something once scrolled into view, and that the page raises no `pageerror` and logs no `console.error`. That last assertion is the one that matters: a demo can throw during hydration and still build green.
+- `pnpm typecheck`: `astro check`, which typechecks the demo islands. This is the drift tripwire: demos import real app components via the `@ui` alias with exhaustive `Record<Variant, …>` maps, so renaming a CVA variant in the app breaks this build.
+- `pnpm build`: `astro build`; the resulting `apps/docs/dist` is uploaded as an artifact for the deploy jobs.
+- Playwright (`pnpm test:e2e`) runs against a local preview server: `apps/docs/playwright.config.ts` boots `astro preview` itself via `webServer`, so no deployment is needed to test. Seven specs are site-level smoke tests; the rest walk **every** page the build emitted a demo onto, asserting each answers 200, that every `data-demo` frame renders something once scrolled into view, and that the page raises no `pageerror` and logs no `console.error`. That last assertion is the one that matters: a demo can throw during hydration and still build green.
 
-There is no Biome step here. Both packages are linted in one root pass from the app workflow — a second one over `apps/docs` would duplicate it.
+There is no Biome step here. Both packages are linted in one root pass from the app workflow; a second one over `apps/docs` would duplicate it.
 
 ## PR previews: one Worker per pull request
 
@@ -45,7 +45,7 @@ https://pr-<n>-forever-pto-docs-development.fbuireu.workers.dev
 
 The `development` environment carries no custom domain, so a preview cannot answer on docs.forever-pto.com however it is deployed. Every push to the PR redeploys the same name, so the link the job posts once stays valid for the PR's whole life.
 
-What the docs preview does *not* need is what separates it from the app's: no bindings, no `wrangler secret bulk` step, no `--var` override, and no second build — it ships the `docs-dist` artifact.
+What the docs preview does *not* need is what separates it from the app's: no bindings, no `wrangler secret bulk` step, no `--var` override, and no second build; it ships the `docs-dist` artifact.
 
 ### Teardown
 
@@ -55,15 +55,15 @@ The app's job in that workflow has to queue behind the CI run, because app E2E d
 
 ## Production deploy
 
-On `main`, the deploy job reuses the build job's `apps/docs/dist` artifact and runs `wrangler deploy` via `wrangler-action` (the `deploy` script in `apps/docs/package.json` is the local one-shot equivalent), activating a new version of `forever-pto-docs` on `docs.forever-pto.com` (an infrastructure-as-code `custom_domain` route — see [Cloudflare stack](/infra/cloudflare/)). The only credentials involved are `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; the site has no [runtime secrets](/infra/secrets/) at all.
+On `main`, the deploy job reuses the build job's `apps/docs/dist` artifact and runs `wrangler deploy` via `wrangler-action` (the `deploy` script in `apps/docs/package.json` is the local one-shot equivalent), activating a new version of `forever-pto-docs` on `docs.forever-pto.com` (an infrastructure-as-code `custom_domain` route; see [Cloudflare stack](/infra/cloudflare/)). The only credentials involved are `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; the site has no [runtime secrets](/infra/secrets/) at all.
 
 ## Accepted cost: docs PRs still run app CI
 
-`ci.yml` opens with a `changes` job that derives whether `apps/web` was touched, and gates `deploy-production`, `release-web` and `deploy-development` on it — so a docs-only PR no longer deploys an app preview Worker or runs app E2E. Lint, typecheck and unit tests stay unconditional, because the documentation contract suite reads `CONTEXT.md`, `adr/` and every guide and must not be skipped by a markdown-only change.
+`ci.yml` opens with a `changes` job that derives whether `apps/web` was touched, and gates `deploy-production`, `release-web` and `deploy-development` on it, so a docs-only PR no longer deploys an app preview Worker or runs app E2E. Lint, typecheck and unit tests stay unconditional, because the documentation contract suite reads `CONTEXT.md`, `adr/` and every guide and must not be skipped by a markdown-only change.
 
 The obvious fix, `paths-ignore: ['apps/docs/**']` on the app workflows, has a branch-protection caveat: required status checks that never run **never report**, and GitHub blocks the merge waiting for them. Adopting path filters therefore also means restructuring the required checks (e.g. a summary job that always runs, or `paths`-aware required checks). Tracked as a follow-up; until then the redundancy is the price of simple branch protection.
 
 Two related conventions for docs PRs:
 
-- Title them `docs:` or `chore:` — a `feat:`/`fix:` docs PR would [cut an app release](/infra/release/).
+- Title them `docs:` or `chore:`; a `feat:`/`fix:` docs PR would [cut an app release](/infra/release/).
 - Docs dependencies live in `apps/docs/package.json` but share the root `pnpm-lock.yaml`, so [Renovate](/infra/renovate/) manages them under the same policy.

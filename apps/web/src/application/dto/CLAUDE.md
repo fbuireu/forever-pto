@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The translation seam between external shapes and the vocabulary in [`CONTEXT.md`](../../../../../CONTEXT.md). A holiday arrives from `date-holidays` as a `RawHoliday`, a payment arrives from Stripe as a `PaymentIntent`, a country list arrives from `i18n-iso-countries` as a map of code to name. Nothing downstream should have to know any of that. A DTO takes the foreign shape in and hands back the canonical one — `HolidayDTO`, `PaymentData`, `CountryDTO` — so stores, use-cases, the domain and the UI only ever speak the glossary.
+The translation seam between external shapes and the vocabulary in [`CONTEXT.md`](../../../../../CONTEXT.md). A holiday arrives from `date-holidays` as a `RawHoliday`, a payment arrives from Stripe as a `PaymentIntent`, a country list arrives from `i18n-iso-countries` as a map of code to name. Nothing downstream should have to know any of that. A DTO takes the foreign shape in and hands back the canonical one (`HolidayDTO`, `PaymentData`, `CountryDTO`), so stores, use-cases, the domain and the UI only ever speak the glossary.
 
 The rest of the application layer contract is in [`../CLAUDE.md`](../CLAUDE.md).
 
@@ -13,7 +13,7 @@ Each concept gets its own folder, and the file names inside it are fixed:
 | File | Role | Present in |
 | --- | --- | --- |
 | `types.ts` | The canonical shape, plus the `Raw*` alias for the foreign one it is built from | every folder |
-| `dto.ts` | The mapper — the object implementing `BaseDTO` | `country/`, `holiday/`, `payment/`, `region/` |
+| `dto.ts` | The mapper, the object implementing `BaseDTO` | `country/`, `holiday/`, `payment/`, `region/` |
 | `schema.ts` | A Zod schema for a shape the *user* submits, and the `z.infer` type derived from it | `contact/`, `payment/` |
 | `utils/` | Helpers the mapper needs and nobody else should reach for | `payment/`, `region/` |
 | `rules.ts` | Pure predicates over the concept that are not a mapping | `contact/` |
@@ -24,10 +24,10 @@ Not every folder needs every file. `email/` and `premium/` are `types.ts` alone:
 | --- | --- | --- |
 | `contact/` | `ContactData`, `ContactFormData`, plus `rules.ts` | the contact form |
 | `country/` | `CountryDTO` | `i18n-iso-countries` localised names |
-| `email/` | `SendEmailParams` | — |
+| `email/` | `SendEmailParams` | None |
 | `holiday/` | `HolidayDTO` | `date-holidays` |
 | `payment/` | `PaymentConfirmationDTO`, `NewPayment` (what `paymentDataDTO` produces) and `PaymentData` (the stored record it grows into), `CreatePaymentInput`, `DiscountInfo` | Stripe `PaymentIntent`, the donation form |
-| `premium/` | `PremiumSessionData` | — |
+| `premium/` | `PremiumSessionData` | None |
 | `region/` | `RegionDTO` | `i18n-iso-countries` localised names |
 
 ## Public API
@@ -41,19 +41,19 @@ type BaseDTO<INPUT, OUTPUT, PARAMS = undefined> = [PARAMS] extends [undefined]
 ```
 
 **The shape depends on whether the mapper declared a `PARAMS` type, so the requirement is stated once.**
-`holidayDTO` and `paymentDataDTO` need params — there is no sane default for a Planning Window or for the
-request metadata attached to a Donation — and omitting them is a compile error. `countryDTO`, `regionDTO` and
+`holidayDTO` and `paymentDataDTO` need params (there is no sane default for a Planning Window or for the
+request metadata attached to a Donation), and omitting them is a compile error. `countryDTO`, `regionDTO` and
 `paymentConfirmationDTO` declare none and cannot be handed a spurious one.
 
 That used to be `params?: PARAMS` for every mapper, enforced by two hand-written throws with two different
-messages plus a test each — for a condition the compiler had enough information to reject, while the other
+messages plus a test each, for a condition the compiler had enough information to reject, while the other
 three would have accepted an extra argument silently. Both throws and both tests are gone because the case
 is unrepresentable. The trade is real and worth naming: the throw also guarded an untyped call path, and
 there are none today.
 
 `holidayDTO` widens `BaseDTO` with two extra entry points:
 
-- `createCustom` — builds a Custom Holiday from what the user typed, rather than from upstream data. It
+- `createCustom`: builds a Custom Holiday from what the user typed, rather than from upstream data. It
   takes no `locale`: its id is an ISO datetime, built by `isoDateTime` directly rather than through
   `formatDate`, which returned on that format before ever reading a locale.
 **`normalize` is gone, and the paragraph that used to sit here said deleting it "would break the planner,
@@ -62,12 +62,12 @@ Manual Days arrive as pseudo-Holidays built in the store and that rehydrated sta
 strings. Neither holds: `runPlanningPipeline` builds the `manual-N` pseudo-Holidays now, and
 `onRehydrateStorage` revives `state.holidays` through `fromStoredInstant` before anything can read them.
 
-There are exactly four producers of a `HolidayDTO` — `create`, `createCustom`, the worker's
-`deserializeHolidays`, and the rehydration revive — and all four hand back a real `Date`. So `normalize` was
+There are exactly four producers of a `HolidayDTO` (`create`, `createCustom`, the worker's
+`deserializeHolidays`, and the rehydration revive), and all four hand back a real `Date`. So `normalize` was
 the identity function, and its one caller ran it over an array that was already uniform.
 
 **Nothing could have told you that from the tests**, which is the part worth remembering. Its own four cases
-included one asserting the coercion, written as `date: '2024-06-15' as unknown as Date` — a cast whose only
+included one asserting the coercion, written as `date: '2024-06-15' as unknown as Date`, a cast whose only
 purpose is to defeat the type the code does not believe. And [`holidays.test.ts`](../stores/holidays.test.ts) mocked `normalize` to the
 identity function, so the store test could not distinguish "essential" from "no-op" either. Both are gone
 with it.
@@ -78,26 +78,26 @@ back `instanceof Date`. That is a boundary test over the real serialiser rather 
 the way past. If a producer is ever added that hands back a string, the fix is to type the persisted shape,
 not to reinstate a runtime sweep. That is what happened: `Stored<T>` types it, and `fromStoredInstant` takes
 a `string`, so `createCustom` no longer coerces a `date` its own `CreateCustomHolidayParams` declares a
-`Date` — on the line below the one that already used it raw.
+`Date`, on the line below the one that already used it raw.
 
 `Raw*` types must not escape this folder. If a `RawHoliday` shows up in a store or a component, a mapping step was skipped.
 
 **`contact/rules.ts` holds the sender identity, and it is not `normalizeEmail`.** The contact guard keys on
-`contactSenderKey`, which lowercases, trims **and strips a `+alias` from the local part** — so
+`contactSenderKey`, which lowercases, trims **and strips a `+alias` from the local part**, so
 `someone+forever-pto@example.com` and `someone@example.com` are one sender. That last step is the whole
 point: without it, the guard is bypassed by typing a different alias, which costs the sender nothing.
 
 It deliberately does **not** widen `@infrastructure/services/payments/normalizeEmail`, which only lowercases
 and trims. Premium recovery is keyed by email through `getSucceededPaymentByEmail`'s
-`lower(trim(email)) = ?`, so stripping aliases there would change who can recover an entitlement — a
+`lower(trim(email)) = ?`, so stripping aliases there would change who can recover an entitlement: a
 different decision, on a different table, that this one must not smuggle in. Two normalisers, two reasons,
 and this paragraph is why neither should be collapsed into the other.
 
 ## A DTO does no I/O
 
-Nothing here fetches, writes, logs or reads a clock it was not handed. `create` is a pure function of `raw` and `params`. `stripe`, `date-holidays` and `i18n-iso-countries` appear only as `import type` — no SDK is constructed, so nothing in this folder pulls a runtime dependency in behind it.
+Nothing here fetches, writes, logs or reads a clock it was not handed. `create` is a pure function of `raw` and `params`. `stripe`, `date-holidays` and `i18n-iso-countries` appear only as `import type`; no SDK is constructed, so nothing in this folder pulls a runtime dependency in behind it.
 
-That is what lets `HolidayDTO` cross into the domain. The pure calendar context imports `@application/dto/holiday/types` directly, which is a layering inversion on paper: the type describes a Holiday, so it belongs in the domain. It is a known pragmatic exception — moving it means touching every calendar module and its tests — and it is safe only because the file is types and one const object, evaluable inside a Web Worker with no DOM. See [ADR 0003](../../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md) and [`../../domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md). If anything with a runtime dependency is ever added to [`holiday/types.ts`](./holiday/types.ts), the planner breaks in the worker and no server-side test will catch it.
+That is what lets `HolidayDTO` cross into the domain. The pure calendar context imports `@application/dto/holiday/types` directly, which is a layering inversion on paper: the type describes a Holiday, so it belongs in the domain. It is a known pragmatic exception (moving it means touching every calendar module and its tests), and it is safe only because the file is types and one const object, evaluable inside a Web Worker with no DOM. See [ADR 0003](../../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md) and [`../../domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md). If anything with a runtime dependency is ever added to [`holiday/types.ts`](./holiday/types.ts), the planner breaks in the worker and no server-side test will catch it.
 
 `RegionDTO` also crosses outwards, but downwards only: `holidayDTO.create` takes the region list so `getRegionName` can turn a region code into a display label. No domain code imports it.
 
@@ -163,14 +163,14 @@ now, and each call site builds it once.
 **The bounds are exported, and the bundles interpolate them.** `AMOUNT_MIN`/`AMOUNT_MAX` and
 `NAME_MIN_LENGTH`/`SUBJECT_MIN_LENGTH`/`MESSAGE_MIN_LENGTH` come out of the schema modules, so the rule and
 the message it explains move together. They did not: [`payment/schema.ts`](./payment/schema.ts) said `.max(10000)` while twelve
-hand-written strings said "Maximum amount is 10,000" — one per bound per locale, each with its own grouping
+hand-written strings said "Maximum amount is 10,000": one per bound per locale, each with its own grouping
 separator (`10.000`, `10 000`, `10,000`). Raising the cap made every bundle lie. The keys are
 `{max, number}` now, so ICU does the grouping per locale and the number comes from the schema.
-[`JsonLd.tsx`](../../ui/modules/shared/seo/JsonLd.tsx)'s `MINIMUM_DONATION` reads `AMOUNT_MIN` for the same reason — the structured data advertises a
+[`JsonLd.tsx`](../../ui/modules/shared/seo/JsonLd.tsx)'s `MINIMUM_DONATION` reads `AMOUNT_MIN` for the same reason: the structured data advertises a
 `minPrice`, and the app guide used to say the two "move together" as an instruction to the reader.
 
-**There is one `calculateFinalAmount` now, and it is the private one in `@infrastructure/services/payments/provider/promoCode` that actually applies a Stripe coupon.** This folder used to export a second function of the same name whose whole body was `discountInfo?.finalAmount ?? baseAmount` — one caller, three tests, and a paragraph here whose only job was to stop a reader confusing it with the one that does the work. [`Donate.tsx`](../../ui/modules/shared/donate/Donate.tsx) reads the field directly.
+**There is one `calculateFinalAmount` now, and it is the private one in `@infrastructure/services/payments/provider/promoCode` that actually applies a Stripe coupon.** This folder used to export a second function of the same name whose whole body was `discountInfo?.finalAmount ?? baseAmount`: one caller, three tests, and a paragraph here whose only job was to stop a reader confusing it with the one that does the work. [`Donate.tsx`](../../ui/modules/shared/donate/Donate.tsx) reads the field directly.
 
 ## Testing
 
-Every `dto.ts`, `schema.ts` and `utils/*.ts` has a co-located `.test.ts`; the type-only folders have none, and should not grow one. Tests call `create` with a literal `raw` object and assert on the output — no mocks, because there is nothing to mock. When a mapper is exercised from a use-case or a service, that test mocks the DTO module wholesale rather than reasoning about the mapping twice.
+Every `dto.ts`, `schema.ts` and `utils/*.ts` has a co-located `.test.ts`; the type-only folders have none, and should not grow one. Tests call `create` with a literal `raw` object and assert on the output: no mocks, because there is nothing to mock. When a mapper is exercised from a use-case or a service, that test mocks the DTO module wholesale rather than reasoning about the mapping twice.

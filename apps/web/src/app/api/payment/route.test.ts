@@ -37,7 +37,12 @@ vi.mock("next/server", async (importOriginal) => {
 
 const { POST } = await import("./route");
 
-function makeRequest(body: unknown, headers?: Record<string, string>): Request {
+interface MakeRequestParams {
+	body: unknown;
+	headers?: Record<string, string>;
+}
+
+function makeRequest({ body, headers }: MakeRequestParams): Request {
 	return new Request("http://localhost/api/payment", {
 		method: "POST",
 		headers: { "Content-Type": "application/json", ...headers },
@@ -56,7 +61,7 @@ describe("POST /api/payment", () => {
 			Effect.succeed({ clientSecret: "client-secret-abc", discountInfo: null, deferred: Effect.void }),
 		);
 
-		const response = await POST(makeRequest({ amount: 9.99, email: "user@example.com" }) as never);
+		const response = await POST(makeRequest({ body: { amount: 9.99, email: "user@example.com" } }) as never);
 
 		expect(response.status).toBe(200);
 		expect(await response.json()).toEqual({ success: true, clientSecret: "client-secret-abc" });
@@ -68,7 +73,7 @@ describe("POST /api/payment", () => {
 			Effect.succeed({ clientSecret: "pi_secret", discountInfo: null, deferred: Effect.void }),
 		);
 
-		await POST(makeRequest({}, { "cf-connecting-ip": "1.2.3.4", "user-agent": "curl/8" }) as never);
+		await POST(makeRequest({ body: {}, headers: { "cf-connecting-ip": "1.2.3.4", "user-agent": "curl/8" } }) as never);
 
 		expect(mockCreatePayment).toHaveBeenCalledWith({
 			params: {},

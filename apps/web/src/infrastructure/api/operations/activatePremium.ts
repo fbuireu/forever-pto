@@ -34,7 +34,12 @@ const failureContext = (failure: ActivationFailure): Record<string, unknown> => 
 	return { tag: failure._tag, ...fields, ...(failure.message ? { reason: failure.message } : {}) };
 };
 
-const refused = (status: 400 | 429 | 500, error: string): ActivationOutcome => ({
+interface RefusedParams {
+	status: 400 | 429 | 500;
+	error: string;
+}
+
+const refused = ({ status, error }: RefusedParams): ActivationOutcome => ({
 	status,
 	token: null,
 	email: null,
@@ -69,7 +74,7 @@ export const activatePremiumRequest = ({
 						logger.warn("Premium activation refused", failureContext(failure));
 					}
 
-					return refused(status as 400 | 429 | 500, error);
+					return refused({ status: status as 400 | 429 | 500, error });
 				}),
 			),
 			Effect.provide(ApplicationLayer),

@@ -63,7 +63,7 @@ describe("global-error", () => {
 		expect(nextIntl.props.messages.error).toEqual(enMessages.error);
 	});
 
-	it("bundles exactly one catalogue — importing all six costs every route ~500 KB", () => {
+	it("bundles exactly one catalogue, since importing all six costs every route ~500 KB", () => {
 		const source = readFileSync(resolve(process.cwd(), "src/app/global-error.tsx"), "utf8");
 		const catalogues = source.match(/from ["']@i18n\/messages\/\w+\.json["']/g) ?? [];
 		expect(catalogues.map((match) => match.replace(/.*\/(\w+)\.json.*/, "$1"))).toEqual(["en"]);

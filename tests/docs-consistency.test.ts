@@ -45,8 +45,8 @@ const WORKSPACE_PACKAGE_GLOB = /^\s*-\s*['"]?([^'"\s#]+)['"]?\s*$/gm;
 const GITHUB_WORKFLOW_EXPRESSION = /\$\{\{\s*github\.workflow\s*\}\}/;
 
 // Everything the repo would ship, staged or not, so a rule fires before the offending file is committed.
-// Ignored paths and vendored tooling under dotfolders are excluded — they are not ours to fix.
-// The index can lie — a stash cycle leaves deleted paths cached — so every entry is confirmed on disk.
+// Ignored paths and vendored tooling under dotfolders are excluded: they are not ours to fix.
+// The index can lie (a stash cycle leaves deleted paths cached), so every entry is confirmed on disk.
 const trackedFiles = execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard"], {
 	cwd: ROOT,
 	encoding: "utf8",
@@ -88,8 +88,8 @@ const webTsconfigOptions: Record<string, unknown> = webTsconfig.compilerOptions;
 const webTsconfigExclude: string[] = webTsconfig.exclude ?? [];
 const webTsconfigPaths: Record<string, string[]> = webTsconfigOptions.paths as Record<string, string[]>;
 
-// The cross-package seam had three declarations of one string — the vite alias, `astro check`'s paths entry
-// and two hardcoded copies down in this file — and nothing compared them. `apps/docs/tsconfig.json` is the
+// The cross-package seam had three declarations of one string (the vite alias, `astro check`'s paths entry
+// and two hardcoded copies down in this file), and nothing compared them. `apps/docs/tsconfig.json` is the
 // declaration now; `astro.config.ts` derives the vite alias from it, and every rule below resolves through
 // this one map rather than spelling `apps/web/src/ui` again.
 const UI_ALIAS = "@ui/*";
@@ -99,9 +99,9 @@ const UI_ROOT = join(ROOT, DOCS, (docsTsconfigPaths[UI_ALIAS]?.[0] ?? "").replac
 const UI_ROOT_RELATIVE = relative(ROOT, UI_ROOT).replace(/\\/g, "/");
 const resolveUiSpecifier = (specifier: string) => join(UI_ROOT, specifier.replace("@ui/", ""));
 
-// A workflow is not markdown, so nothing above reaches it — and `.github/` sits under a dotfolder, which
+// A workflow is not markdown, so nothing above reaches it, and `.github/` sits under a dotfolder, which
 // `trackedFiles` drops wholesale. The commands are read out of it by hand: the value when it is inline, and
-// every line indented under it when it is a block scalar. `command:` counts as well as `run:` — every
+// every line indented under it when it is a block scalar. `command:` counts as well as `run:`; every
 // wrangler and OpenNext call in this repo is wrapped in `nick-fields/retry`, which takes its shell script on
 // that input, so a rule reading only `run:` sees none of them.
 const WORKFLOW_DIR = ".github/workflows";
@@ -133,7 +133,12 @@ const runCommands = (workflow: string) => {
 	return collected.join("\n");
 };
 
-const yamlBlock = (workflow: string, key: string) => {
+interface YamlBlockParams {
+	workflow: string;
+	key: string;
+}
+
+const yamlBlock = ({ workflow, key }: YamlBlockParams) => {
 	const lines = workflow.split(/\r?\n/);
 	const start = lines.findIndex((line) => line.trim() === `${key}:`);
 	const body: Record<string, string> = {};
@@ -193,13 +198,18 @@ const WRANGLER_NAMED_BINDING_TABLES = [
 	"pipelines",
 ];
 const WRANGLER_BINDING_TABLES = ["vars", ...WRANGLER_NAMED_BINDING_TABLES];
-const wranglerSection = (environment: string, table: string) =>
+interface WranglerSectionParams {
+	environment: string;
+	table: string;
+}
+
+const wranglerSection = ({ environment, table }: WranglerSectionParams) =>
 	webWrangler.filter((section) => section.path === (environment ? `${environment}.${table}` : table));
 const wranglerBindingTables = (environment: string) =>
-	new Set(WRANGLER_BINDING_TABLES.filter((table) => wranglerSection(environment, table).length > 0));
+	new Set(WRANGLER_BINDING_TABLES.filter((table) => wranglerSection({ environment, table }).length > 0));
 const wranglerBindings = (environment: string) => {
-	const [vars] = wranglerSection(environment, "vars");
-	const named = WRANGLER_NAMED_BINDING_TABLES.flatMap((table) => wranglerSection(environment, table))
+	const [vars] = wranglerSection({ environment, table: "vars" });
+	const named = WRANGLER_NAMED_BINDING_TABLES.flatMap((table) => wranglerSection({ environment, table }))
 		.flatMap((section) => [section.entries.binding, section.entries.name, section.entries.service])
 		.filter((value): value is string => Boolean(value))
 		.map((value) => value.replace(/^["']|["']$/g, ""));
@@ -385,7 +395,9 @@ describe("every wrangler environment carries the whole binding set", () => {
 
 	it("gives the payment rate limiter identical bounds in every environment", () => {
 		const limiters = WRANGLER_ENVIRONMENTS.map((environment) =>
-			wranglerSection(environment, "ratelimits").find((section) => section.entries.name === '"PAYMENT_RATE_LIMITER"'),
+			wranglerSection({ environment, table: "ratelimits" }).find(
+				(section) => section.entries.name === '"PAYMENT_RATE_LIMITER"',
+			),
 		);
 
 		expect(limiters.filter((limiter) => !limiter)).toEqual([]);
@@ -521,7 +533,7 @@ describe("documentation does not point at things that are gone", () => {
 	// match a citation by suffix so both forms resolve. The wiki has no such context: `workers/tail`
 	// is a different directory from `src/infrastructure/workers`, and `src/` alone names neither
 	// package. Every repo path it prints has to carry its own prefix.
-	// The root guide forbids a nested CONTEXT.md outright — the name would mean two things, and the
+	// The root guide forbids a nested CONTEXT.md outright: the name would mean two things, and the
 	// domain-modeling skill reads it as vocabulary. The wiki taught the opposite under a heading of
 	// "CONTEXT.md per folder" and cited five paths that have never existed. A relative-link rule cannot
 	// catch it, because these are prose citations rather than links.
@@ -592,7 +604,7 @@ describe("documentation does not point at things that are gone", () => {
 
 	// `astro check` does not resolve a `@ui/…` specifier that points at nothing: moving Switch from
 	// animate/primitives/base/ to animate/base/ left SwitchDemo importing the old path, `astro check`
-	// reported zero errors, and only `astro build` failed — in the Docs workflow, after the app's own CI
+	// reported zero errors, and only `astro build` failed, in the Docs workflow, after the app's own CI
 	// had gone green. The guides claim the `astro check` tail covers this seam; for a missing module it
 	// does not, and this is the cheaper place to catch it than a build is.
 	it("resolves every @ui specifier the docs sources import to a file that exists", () => {
@@ -679,8 +691,8 @@ describe("documentation does not point at things that are gone", () => {
 			.filter((path) => path.startsWith("apps/web"))
 			.map((path) => path.replace(/\/\*\*$/, "").replace(SOURCE_FILE, ""));
 
-		// The scan used to stop at `${DOCS}/src/`, which left the two files that decide where the seam points
-		// — `astro.config.ts` and `tsconfig.json` — outside it, along with `e2e/`. Markdown stays out on
+		// The scan used to stop at `${DOCS}/src/`, which left the two files that decide where the seam points,
+		// (`astro.config.ts` and `tsconfig.json`) outside it, along with `e2e/`. Markdown stays out on
 		// purpose: a guide linking to an app file is a citation, not something the site builds from.
 		const docsSources = trackedFiles.filter(
 			(path) => path.startsWith(`${DOCS}/`) && !path.endsWith(".md") && !path.endsWith(".mdx"),
@@ -688,7 +700,7 @@ describe("documentation does not point at things that are gone", () => {
 		const reached = new Set<string>();
 
 		// The old form required the segment after the `../` run to be literally `web/`, so an escape written
-		// `../../apps/web/src/…` — the same reach, spelled from one directory deeper — matched nothing at all.
+		// `../../apps/web/src/…` (the same reach, spelled from one directory deeper) matched nothing at all.
 		const RELATIVE_ESCAPE = /['"(]((?:\.\.\/)+(?:apps\/)?web\/[^'")]+)['")]/g;
 
 		for (const file of docsSources) {
@@ -707,8 +719,8 @@ describe("documentation does not point at things that are gone", () => {
 		expect(unwatched).toEqual([]);
 	});
 
-	// The seam was declared three times — the vite alias in `astro.config.ts`, the `paths` entry `astro check`
-	// reads, and two hardcoded copies in this file — and nothing compared them, so a move under `apps/web`
+	// The seam was declared three times (the vite alias in `astro.config.ts`, the `paths` entry `astro check`
+	// reads, and two hardcoded copies in this file), and nothing compared them, so a move under `apps/web`
 	// could satisfy one and break another. `tsconfig.json` is the declaration; everything else derives.
 	it("declares the @ui seam target once, in the docs tsconfig", () => {
 		expect(docsTsconfigPaths[UI_ALIAS]).toBeDefined();
@@ -723,7 +735,7 @@ describe("documentation does not point at things that are gone", () => {
 	});
 
 	// An output the `changes` job declares but never writes is the empty string, and a job guarded on
-	// `== 'true'` then never runs — silently, with a green tick, forever. `deploy-tail` shipped that way: the
+	// `== 'true'` then never runs: silently, with a green tick, forever. `deploy-tail` shipped that way: the
 	// Filter step wrote `tail=false` on its no-base-commit early exit and nothing at all on the normal path,
 	// so the tail consumer Worker was never deployed while four documents said it was. Nothing catches this
 	// by reading the workflow, because both halves are individually well-formed.
@@ -750,7 +762,7 @@ describe("documentation does not point at things that are gone", () => {
 	});
 
 	// `cloudflare/wrangler-action` installs the version its `wranglerVersion` input names, so the docs deploy
-	// runs a CLI the manifest does not pin. Renovate bumps the manifest — it is an npm devDependency — and
+	// runs a CLI the manifest does not pin. Renovate bumps the manifest (it is an npm devDependency) and
 	// nothing touches the two workflow literals, so the first bump silently desynchronises them. `apps/web`
 	// has no equivalent exposure: `_deploy-web.yml` runs `pnpm exec wrangler`, which is the pinned one.
 	it("pins wrangler-action to the same wrangler the docs package declares", () => {
@@ -786,17 +798,17 @@ describe("documentation does not point at things that are gone", () => {
 		expect(headings.filter((heading) => !canonical.has(heading.toLowerCase()))).toEqual([]);
 	});
 
-	// The rule above reads headings only, and the headings had already been fixed — the prose had not. The
+	// The rule above reads headings only, and the headings had already been fixed; the prose had not. The
 	// glossary's own Bridge entry ended "a **bridge day** is one of the PTO days inside a bridge", and the
 	// wiki's front page said "vacation days" twice, both under a canonical heading.
 	//
 	// Only the **multi-word** retired names are checked, and only those the glossary does not also declare
 	// canonical somewhere. A blanket scan is unusable: the retired list holds `type`, `state`, `variant`,
 	// `locale`, `filter`, `period` and `break`, which this wiki uses correctly as ordinary technical English
-	// on 90 lines — the glossary retires them as names for a *domain concept*, not as words. A compound like
+	// on 90 lines: the glossary retires them as names for a *domain concept*, not as words. A compound like
 	// "bridge day" or "max working period" has no innocent reading here, so it needs no allowlist at all.
 	// `holiday` and `free day` drop out on the canonical test, which is also what lets "public holiday"
-	// through — the one phrasing CONTEXT.md blesses for English user-facing copy.
+	// through: the one phrasing CONTEXT.md blesses for English user-facing copy.
 	it("writes the canonical name in the published wiki's prose, not a retired one", () => {
 		const glossary = read("CONTEXT.md");
 		const canonical = new Set([...glossary.matchAll(GLOSSARY_TERM)].map(([, term]) => term.toLowerCase()));
@@ -828,7 +840,7 @@ describe("documentation does not point at things that are gone", () => {
 		expect(offenders).toEqual([]);
 	});
 
-	// IconsGalleryDemo says it is exhaustive, and a rename does break the build through import resolution —
+	// IconsGalleryDemo says it is exhaustive, and a rename does break the build through import resolution,
 	// but an addition does not, because ICONS is a hand-written array rather than a union over the directory.
 	// The 23rd icon would simply be absent from the published gallery.
 	it("shows every animated icon in the published gallery", () => {
@@ -847,7 +859,7 @@ describe("documentation does not point at things that are gone", () => {
 		expect(shipped.filter((name) => !listed.has(name))).toEqual([]);
 	});
 
-	// TokenSwatch takes string[], so a renamed token renders `background: var(--gone)` — transparent, which
+	// TokenSwatch takes string[], so a renamed token renders `background: var(--gone)`, transparent, which
 	// reads as a legitimate pale colour rather than an error. Nothing else checks these: astro check does not
 	// see .mdx, and the citation rules match file paths.
 	it("names only design tokens the stylesheets still declare", () => {
@@ -894,10 +906,15 @@ describe("apps/web/src carries no explanatory comments", () => {
 	// written and every one was wrong somewhere: a URL inside a multi-line template read as a comment; a stray
 	// backtick switched the rule off for the rest of the file; an escaped backtick did the same by flipping a
 	// parity count; a character class swallowed the delimiter it was meant to protect. JavaScript's lexical
-	// grammar is not a regular language. Scanning alone is not enough either — only the parser knows whether a
+	// grammar is not a regular language. Scanning alone is not enough either: only the parser knows whether a
 	// slash opens a regex or divides, so a regex literal holding an escaped slash reads as a comment to a bare
 	// scanner. Comments are trivia, so they hang off node boundaries rather than appearing in the tree.
-	const commentsIn = (path: string, source: string) => {
+	interface CommentsInParams {
+		path: string;
+		source: string;
+	}
+
+	const commentsIn = ({ path, source }: CommentsInParams) => {
 		const parsed = ts.createSourceFile(path, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
 		const seen = new Set<number>();
 		const found: { line: number; text: string }[] = [];
@@ -917,11 +934,11 @@ describe("apps/web/src carries no explanatory comments", () => {
 			collect(ts.getLeadingCommentRanges(source, node.pos));
 			collect(ts.getTrailingCommentRanges(source, node.end));
 			// `{/* … */}` holds its comment between the braces, so it is trivia of nothing the walk reaches. It
-			// has to be asked for as *trailing* — TypeScript only calls a comment leading when a line break comes
+			// has to be asked for as *trailing*: TypeScript only calls a comment leading when a line break comes
 			// first, and here the brace does. This is the shape every a11y suppression on JSX takes.
 			if (ts.isJsxExpression(node)) collect(ts.getTrailingCommentRanges(source, node.getStart() + 1));
 			// `forEachChild` yields nodes but never punctuation tokens, so a comment sitting against a `{`, `}`,
-			// `]` or `)` is trivia of nothing it reaches — the last line inside a block escaped entirely, which
+			// `]` or `)` is trivia of nothing it reaches: the last line inside a block escaped entirely, which
 			// is how a probe file with an explanatory comment was committed under `src/` while this was green.
 			// `getChildren` includes the tokens, and needs the `setParentNodes` argument above to be true.
 			for (const child of node.getChildren(parsed)) walk(child);
@@ -943,7 +960,7 @@ describe("apps/web/src carries no explanatory comments", () => {
 			// delimiter anywhere cannot hold a comment, and that is most of them
 			if (!source.includes("//") && !source.includes("/*")) continue;
 
-			for (const { line, text } of commentsIn(file, source)) {
+			for (const { line, text } of commentsIn({ path: file, source })) {
 				if (!ALLOWED.test(text)) offenders.push(`${file}:${line}`);
 			}
 		}
@@ -955,7 +972,7 @@ describe("directives sit where the compiler can see them", () => {
 	// A directive is a bare string literal as the file's first statement. Wrap it in parentheses or let an
 	// import sort above it and it silently becomes an ordinary expression: `'use client'` stops applying, the
 	// module is treated as a Server Component, and nothing here notices. Typecheck passes, Biome passes, every
-	// unit test passes — only `next build` fails, in CI, on a full production build. Six planner files spent
+	// unit test passes; only `next build` fails, in CI, on a full production build. Six planner files spent
 	// several commits in that state after an added import was hoisted over the directive and the formatter
 	// parenthesised what was left behind.
 	const DIRECTIVES = new Set(["use client", "use server", "use cache", "use strict"]);
@@ -1065,8 +1082,11 @@ describe("the guides describe the project as it is configured", () => {
 
 	it("queues the development cleanup behind the CI run whose preview Worker it deletes", () => {
 		const ci = read(`${WORKFLOW_DIR}/ci.yml`);
-		const ciConcurrency = yamlBlock(ci, "concurrency");
-		const cleanupConcurrency = yamlBlock(read(`${WORKFLOW_DIR}/cleanup-development.yml`), "concurrency");
+		const ciConcurrency = yamlBlock({ workflow: ci, key: "concurrency" });
+		const cleanupConcurrency = yamlBlock({
+			workflow: read(`${WORKFLOW_DIR}/cleanup-development.yml`),
+			key: "concurrency",
+		});
 		const workflowName = /^name:[ \t]*(.+)$/m.exec(ci)?.[1]?.trim() ?? "";
 
 		expect(workflowName).not.toBe("");
@@ -1104,7 +1124,7 @@ describe("the guides describe the project as it is configured", () => {
 		expect([...reached].filter((path) => existsSync(join(ROOT, path)) && !pattern.test(path))).toEqual([]);
 	});
 
-	// The filtered form names its own package, so it can be checked wherever it is written — including the
+	// The filtered form names its own package, so it can be checked wherever it is written, including the
 	// published wiki, where a bare `pnpm build` is ambiguous between three manifests and this one is not.
 	// It was invisible to the rule above: `\bpnpm ` matches and `[a-z]` then meets the `-` of `--filter`, so
 	// the whole match fails and the line yields no script at all.
@@ -1159,7 +1179,7 @@ describe("the guides describe the project as it is configured", () => {
 	});
 
 	// `next build` rewrites apps/web/tsconfig.json on every run and fills in its own defaults for any key
-	// that is absent — `strict: false` and `allowJs: true`. Both would land at the next build rather than at
+	// that is absent: `strict: false` and `allowJs: true`. Both would land at the next build rather than at
 	// the deletion site, so neither is safe to drop as redundant.
 	it("keeps strict on, because next build writes it false when the key is missing", () => {
 		expect(webTsconfigOptions.strict).toBe(true);
@@ -1201,13 +1221,20 @@ describe("the guides describe the project as it is configured", () => {
 
 describe("translation bundles stay in step", () => {
 	const localeFiles = readdirSync(join(ROOT, LOCALES_DIR)).filter((file) => file.endsWith(".json"));
-	const flatten = (value: unknown, path = "", out: string[] = []) => {
+	interface FlattenParams {
+		value: unknown;
+		path?: string;
+		out?: string[];
+	}
+
+	const flatten = ({ value, path = "", out = [] }: FlattenParams) => {
 		if (value && typeof value === "object" && !Array.isArray(value)) {
-			for (const [key, child] of Object.entries(value)) flatten(child, path ? `${path}.${key}` : key, out);
+			for (const [key, child] of Object.entries(value))
+				flatten({ value: child, path: path ? `${path}.${key}` : key, out });
 		} else out.push(path);
 		return out;
 	};
-	const keysOf = (file: string) => flatten(JSON.parse(read(`${LOCALES_DIR}/${file}`))).sort();
+	const keysOf = (file: string) => flatten({ value: JSON.parse(read(`${LOCALES_DIR}/${file}`)) }).sort();
 	const reference = keysOf("en.json");
 
 	it("ships more than one locale", () => {
@@ -1236,12 +1263,17 @@ describe("translation bundles stay in step", () => {
 
 	const entriesOf = (file: string) => {
 		const out: Array<[string, string]> = [];
-		const walk = (value: unknown, path: string) => {
+		interface WalkParams {
+			value: unknown;
+			path: string;
+		}
+
+		const walk = ({ value, path }: WalkParams) => {
 			if (typeof value === "string") out.push([path, value]);
 			else if (value && typeof value === "object")
-				for (const [key, child] of Object.entries(value)) walk(child, path ? `${path}.${key}` : key);
+				for (const [key, child] of Object.entries(value)) walk({ value: child, path: path ? `${path}.${key}` : key });
 		};
-		walk(JSON.parse(read(`${LOCALES_DIR}/${file}`)), "");
+		walk({ value: JSON.parse(read(`${LOCALES_DIR}/${file}`)), path: "" });
 		return out;
 	};
 

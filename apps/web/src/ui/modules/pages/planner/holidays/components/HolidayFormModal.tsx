@@ -71,7 +71,7 @@ export const HolidayFormModal = ({
 			currentSelection: state.currentSelection,
 		})),
 	);
-	const dayStates = useMemo<DayStates>(() => ({ suggested: isSuggestion(currentSelection) }), [currentSelection]);
+	const dayStates = useMemo<DayStates>(() => ({ suggested: isSuggestion({ currentSelection }) }), [currentSelection]);
 	const [selectedDate, setSelectedDate] = useState<Date | undefined>(defaultValues?.date);
 	const [isPending, startTransition] = useTransition();
 

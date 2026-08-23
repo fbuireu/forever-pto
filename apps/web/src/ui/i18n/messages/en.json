@@ -150,7 +150,7 @@
 				},
 				"whatIs": {
 					"question": "What is this?",
-					"answer": "Forever PTO helps you plan and optimize your paid time off by suggesting the best dates to request based on public holidays and your preferences. Holiday planning can get complicated — Forever PTO simplifies it so you get the most out of every day. You can choose different strategies to spread time off across the year, customize holiday names, and add company-specific or regional holidays."
+					"answer": "Forever PTO helps you plan and optimize your paid time off by suggesting the best dates to request based on public holidays and your preferences. Holiday planning can get complicated, and Forever PTO simplifies it so you get the most out of every day. You can choose different strategies to spread time off across the year, customize holiday names, and add company-specific or regional holidays."
 				},
 				"howWorks": {
 					"question": "How does it work?"
@@ -190,7 +190,7 @@
 				},
 				"encryption": {
 					"question": "Is my data encrypted?",
-					"answer": "Everything is stored locally in your browser — PTO days, selected dates, custom holidays, preferences. We apply light obfuscation so the data isn't readable at a glance, but the real protection is that we never send it to our servers. Your vacation planning never leaves your device."
+					"answer": "Everything is stored locally in your browser: PTO days, selected dates, custom holidays, preferences. We apply light obfuscation so the data isn't readable at a glance, but the real protection is that we never send it to our servers. Your vacation planning never leaves your device."
 				},
 				"tracking": {
 					"question": "Do you sell my data or track my vacation plans?",
@@ -623,7 +623,7 @@
 	},
 	"ptoSalaryCalculator": {
 		"title": "PTO vs. salary calculator",
-		"tooltip": "See how much paid vacation you're leaving on the table by not using your PTO days. You're still getting paid — you're just working days you didn't have to.",
+		"tooltip": "See how much paid vacation you're leaving on the table by not using your PTO days. You're still getting paid; you're just working days you didn't have to.",
 		"tooltipLabel": "More information about salary calculator",
 		"annualSalary": "Annual salary",
 		"annualSalaryPlaceholder": "{amount}",

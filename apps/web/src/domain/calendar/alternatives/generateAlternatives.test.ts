@@ -33,7 +33,13 @@ const planAlternatives = ({
 		candidates: findPlanningCandidates({ holidays, months, allowPastDays, removedDays }),
 	});
 
-const makeDate = (year: number, month: number, day: number) => new Date(year, month - 1, day);
+interface MakeDateParams {
+	year: number;
+	month: number;
+	day: number;
+}
+
+const makeDate = ({ year, month, day }: MakeDateParams) => new Date(year, month - 1, day);
 
 const makeHoliday = (date: Date) => ({
 	id: `h-${date.toISOString()}`,
@@ -46,7 +52,7 @@ const makeHoliday = (date: Date) => ({
 const BASE = {
 	holidays: [] as ReturnType<typeof makeHoliday>[],
 	allowPastDays: true,
-	months: [makeDate(2025, 1, 1)],
+	months: [makeDate({ year: 2025, month: 1, day: 1 })],
 	strategy: FilterStrategy.GROUPED,
 };
 
@@ -58,19 +64,34 @@ describe("generateAlternatives", () => {
 
 	it("returns empty array when ptoDays is 0", () => {
 		expect(
-			planAlternatives({ ...BASE, ptoDays: 0, maxAlternatives: 3, existingSuggestion: [makeDate(2025, 1, 6)] }),
+			planAlternatives({
+				...BASE,
+				ptoDays: 0,
+				maxAlternatives: 3,
+				existingSuggestion: [makeDate({ year: 2025, month: 1, day: 6 })],
+			}),
 		).toHaveLength(0);
 	});
 
 	it("returns empty array when ptoDays is negative", () => {
 		expect(
-			planAlternatives({ ...BASE, ptoDays: -1, maxAlternatives: 3, existingSuggestion: [makeDate(2025, 1, 6)] }),
+			planAlternatives({
+				...BASE,
+				ptoDays: -1,
+				maxAlternatives: 3,
+				existingSuggestion: [makeDate({ year: 2025, month: 1, day: 6 })],
+			}),
 		).toHaveLength(0);
 	});
 
 	it("returns empty array when maxAlternatives is 0", () => {
 		expect(
-			planAlternatives({ ...BASE, ptoDays: 3, maxAlternatives: 0, existingSuggestion: [makeDate(2025, 1, 6)] }),
+			planAlternatives({
+				...BASE,
+				ptoDays: 3,
+				maxAlternatives: 0,
+				existingSuggestion: [makeDate({ year: 2025, month: 1, day: 6 })],
+			}),
 		).toHaveLength(0);
 	});
 
@@ -83,27 +104,31 @@ describe("generateAlternatives", () => {
 			...BASE,
 			ptoDays: 3,
 			maxAlternatives: 2,
-			existingSuggestion: [makeDate(2025, 1, 6)],
+			existingSuggestion: [makeDate({ year: 2025, month: 1, day: 6 })],
 		});
 		expect(result.length).toBeLessThanOrEqual(2);
 	});
 
 	it("fills maxAlternatives on a full year that has bridges to spare", () => {
-		const months = Array.from({ length: 12 }, (_, i) => makeDate(2025, i + 1, 1));
-		const holidays = [makeDate(2025, 1, 1), makeDate(2025, 5, 1), makeDate(2025, 12, 25)].map(makeHoliday);
+		const months = Array.from({ length: 12 }, (_, i) => makeDate({ year: 2025, month: i + 1, day: 1 }));
+		const holidays = [
+			makeDate({ year: 2025, month: 1, day: 1 }),
+			makeDate({ year: 2025, month: 5, day: 1 }),
+			makeDate({ year: 2025, month: 12, day: 25 }),
+		].map(makeHoliday);
 		const result = planAlternatives({
 			...BASE,
 			months,
 			holidays,
 			ptoDays: 10,
 			maxAlternatives: 4,
-			existingSuggestion: [makeDate(2025, 1, 3)],
+			existingSuggestion: [makeDate({ year: 2025, month: 1, day: 3 })],
 		});
 		expect(result).toHaveLength(4);
 	});
 
 	it("alternatives do not contain days from existingSuggestion", () => {
-		const existingSuggestion = [makeDate(2025, 1, 6)];
+		const existingSuggestion = [makeDate({ year: 2025, month: 1, day: 6 })];
 		const existing = new Set(existingSuggestion.map((day) => day.toDateString()));
 		const result = planAlternatives({
 			...BASE,
@@ -123,7 +148,7 @@ describe("generateAlternatives", () => {
 			...BASE,
 			ptoDays: 5,
 			maxAlternatives: 5,
-			existingSuggestion: [makeDate(2025, 1, 6)],
+			existingSuggestion: [makeDate({ year: 2025, month: 1, day: 6 })],
 		});
 		const keys = result.map((alt) =>
 			alt.days
@@ -137,11 +162,15 @@ describe("generateAlternatives", () => {
 	it("each alternative has days sorted chronologically even where its comparator picks a later Bridge first", () => {
 		const result = planAlternatives({
 			...BASE,
-			months: Array.from({ length: 12 }, (_, index) => makeDate(2025, index + 1, 1)),
-			holidays: [makeDate(2025, 1, 1), makeDate(2025, 5, 1), makeDate(2025, 12, 25)].map(makeHoliday),
+			months: Array.from({ length: 12 }, (_, index) => makeDate({ year: 2025, month: index + 1, day: 1 })),
+			holidays: [
+				makeDate({ year: 2025, month: 1, day: 1 }),
+				makeDate({ year: 2025, month: 5, day: 1 }),
+				makeDate({ year: 2025, month: 12, day: 25 }),
+			].map(makeHoliday),
 			ptoDays: 10,
 			maxAlternatives: 3,
-			existingSuggestion: [makeDate(2025, 1, 3)],
+			existingSuggestion: [makeDate({ year: 2025, month: 1, day: 3 })],
 		});
 
 		expect(result).toHaveLength(3);
@@ -159,12 +188,12 @@ describe("generateAlternatives", () => {
 	});
 
 	it("never places a Removed Day and does not let it lengthen a neighbouring bridge", () => {
-		const removed = makeDate(2025, 1, 6);
+		const removed = makeDate({ year: 2025, month: 1, day: 6 });
 		const result = planAlternatives({
 			...BASE,
 			ptoDays: 5,
 			maxAlternatives: 4,
-			existingSuggestion: [makeDate(2025, 1, 10)],
+			existingSuggestion: [makeDate({ year: 2025, month: 1, day: 10 })],
 			removedDays: [removed],
 		});
 		expect(result.length).toBeGreaterThan(0);
@@ -181,11 +210,15 @@ describe("generateAlternatives", () => {
 	it("stamps the Strategy on every Alternative but orders by the diversity comparators, not by it", () => {
 		const shared = {
 			...BASE,
-			months: Array.from({ length: 12 }, (_, index) => makeDate(2025, index + 1, 1)),
-			holidays: [makeDate(2025, 1, 1), makeDate(2025, 5, 1), makeDate(2025, 12, 25)].map(makeHoliday),
+			months: Array.from({ length: 12 }, (_, index) => makeDate({ year: 2025, month: index + 1, day: 1 })),
+			holidays: [
+				makeDate({ year: 2025, month: 1, day: 1 }),
+				makeDate({ year: 2025, month: 5, day: 1 }),
+				makeDate({ year: 2025, month: 12, day: 25 }),
+			].map(makeHoliday),
 			ptoDays: 10,
 			maxAlternatives: 4,
-			existingSuggestion: [makeDate(2025, 1, 3)],
+			existingSuggestion: [makeDate({ year: 2025, month: 1, day: 3 })],
 		};
 		const daySets = (result: ReturnType<typeof planAlternatives>) =>
 			result.map((alt) => alt.days.map((day) => day.toDateString()).join(","));
@@ -205,8 +238,8 @@ describe("generateAlternatives", () => {
 			ptoDays: 3,
 			maxAlternatives: 3,
 			allowPastDays: false,
-			months: [makeDate(2020, 1, 1)],
-			existingSuggestion: [makeDate(2020, 1, 6)],
+			months: [makeDate({ year: 2020, month: 1, day: 1 })],
+			existingSuggestion: [makeDate({ year: 2020, month: 1, day: 6 })],
 		});
 		expect(result).toHaveLength(0);
 	});

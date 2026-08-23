@@ -1,16 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@infrastructure/api/response", async () => {
-	const { NextResponse } = await import("next/server");
-	return {
-		noStore: ({ body, init }: { body: object; init?: ResponseInit }) => {
-			const res = NextResponse.json(body, init);
-			res.headers.set("Cache-Control", "no-store");
-			return res;
-		},
-	};
-});
-
 const { GET } = await import("./route");
 
 describe("GET /api/health", () => {

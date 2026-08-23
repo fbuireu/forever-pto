@@ -30,14 +30,23 @@ vi.mock("@ui/modules/core/animate/text/SlidingNumber", () => ({
 
 const { PlannerPanel } = await import("./PlannerPanel");
 
-const suggestionOf = (effectiveDays: number, efficiency: number) =>
+interface SuggestionOfParams {
+	effectiveDays: number;
+	efficiency: number;
+}
+
+const suggestionOf = ({ effectiveDays, efficiency }: SuggestionOfParams) =>
 	({
 		days: [new Date(2026, 0, 5)],
 		bridges: [],
 		metrics: { totalEffectiveDays: effectiveDays, averageEfficiency: efficiency, bonusDays: 2 },
 	}) as never;
 
-const ALL_SUGGESTIONS = [suggestionOf(12, 2), suggestionOf(9, 1.8), suggestionOf(7, 1.5)];
+const ALL_SUGGESTIONS = [
+	suggestionOf({ effectiveDays: 12, efficiency: 2 }),
+	suggestionOf({ effectiveDays: 9, efficiency: 1.8 }),
+	suggestionOf({ effectiveDays: 7, efficiency: 1.5 }),
+];
 
 const StoreHost = () => {
 	const [previewAlternativeIndex, setPreviewIndex] = useState(0);

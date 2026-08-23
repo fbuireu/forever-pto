@@ -2,11 +2,11 @@
 
 ## What this is
 
-**forever-pto** — a planner that turns a fixed budget of paid days off into the longest possible stretches
+**forever-pto**: a planner that turns a fixed budget of paid days off into the longest possible stretches
 away from work. The user picks a Country, an optional Region, a year and a PTO budget; the planner finds the
 Bridges that turn that budget into the longest stretches off, and reports how well it did.
 
-**The whole planner runs in the browser** — the server holds payment and contact records and nothing else
+**The whole planner runs in the browser**: the server holds payment and contact records and nothing else
 ([ADR 0001](../../adr/0001-planner-runs-in-the-browser.md)). The server side is seven API route handlers
 (`check-session`, `contact`, `health`, `markdown`, `payment`, `payment/activate`), the Stripe webhook, a
 `.well-known` catch-all, [`middleware.ts`](./src/middleware.ts), and some static rendering.
@@ -14,18 +14,18 @@ Bridges that turn that budget into the longest stretches off, and reports how we
 Premium (advanced metrics, manual editing of a Suggestion) is unlocked by a Donation. There are no accounts:
 the payment record *is* the entitlement ([ADR 0008](../../adr/0008-premium-derived-from-payment.md)).
 
-The vocabulary is the repo glossary's — see [`CONTEXT.md`](../../CONTEXT.md).
+The vocabulary is the repo glossary's; see [`CONTEXT.md`](../../CONTEXT.md).
 
 ## Stack
 
 - **Next.js 16** App Router + **React 19**, `next-intl` for i18n over six locales (en, es, ca, it, de, fr)
 - **Zustand** stores for all client state, persisted to local storage through an obfuscating wrapper
   ([ADR 0007](../../adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md))
-- **Effect 3** on every server path that talks to Stripe, Turso or Resend — typed error channel, dependencies
+- **Effect 3** on every server path that talks to Stripe, Turso or Resend: typed error channel, dependencies
   injected as service tags ([ADR 0002](../../adr/0002-effect-for-external-service-boundaries.md))
 - **Temporal** via `temporal-polyfill`, never the global
   ([ADR 0005](../../adr/0005-temporal-polyfill.md))
-- **Tailwind CSS v4** + shadcn/ui; **Turso** via `@tursodatabase/serverless` — hand-written SQL, no ORM;
+- **Tailwind CSS v4** + shadcn/ui; **Turso** via `@tursodatabase/serverless`: hand-written SQL, no ORM;
   **Stripe**; **Resend**; **BetterStack**
 - **Cloudflare Workers** via `@opennextjs/cloudflare`, R2 for the incremental cache, the platform's own
   rate-limiting binding for the payment limiter
@@ -53,7 +53,7 @@ pnpm test:e2e           # playwright
 ```
 
 Env: copy [`.env.example`](./.env.example). Local Worker secrets go in `.dev.vars`. The typed surface the build uses is
-[`environment.d.ts`](./environment.d.ts) and nothing else — it hand-declares both `ProcessEnv` and the global `CloudflareEnv` the
+[`environment.d.ts`](./environment.d.ts) and nothing else; it hand-declares both `ProcessEnv` and the global `CloudflareEnv` the
 Cloudflare context is read through, and it is tracked.
 
 **Nothing type-checks the names inside it.** `skipLibCheck: true` plus the `.d.ts` extension means
@@ -68,13 +68,13 @@ unresolved module still binds the names imported from it, and only a genuinely u
 
 `pnpm cf:typegen` writes wrangler's own inference to `cloudflare-env.d.ts` in this folder. It is reference
 material, not part of the program: read it when adding a binding, then widen `environment.d.ts` by hand. Two
-lines keep it that way and both are load-bearing — [`.gitignore`](../../.gitignore) so it never gets committed, and an explicit
+lines keep it that way and both are load-bearing: [`.gitignore`](../../.gitignore) so it never gets committed, and an explicit
 `cloudflare-env.d.ts` entry in [`tsconfig.json`](./tsconfig.json)'s `exclude`, because `include` is `**/*.ts` and would
 otherwise pull a package-root `.d.ts` straight into the program.
 
 Letting it in does not fail the way you would expect. It declares `CloudflareEnv` a second time, with `[vars]`
 typed as string literals where `environment.d.ts` says `string`, but `skipLibCheck: true` means those two
-declarations are never compared — that clash only surfaces with `skipLibCheck: false`. What actually breaks is
+declarations are never compared; that clash only surfaces with `skipLibCheck: false`. What actually breaks is
 the other 14,000 lines: the workerd runtime globals replace `lib.dom`'s `Response`, and roughly fifty call
 sites start reporting `'body' is of type 'unknown'`.
 
@@ -84,7 +84,7 @@ sites start reporting `'body' is of type 'unknown'`.
 src/
   middleware.ts       # locale + country cookies, markdown rewrite; skips /api/* except /api/markdown
   app/                # App Router: [locale]/(app|marketing) pages, api/ route handlers, sitemap, robots
-  application/        # use-cases, DTOs, Zustand stores, export, email templates — orchestration, no I/O clients
+  application/        # use-cases, DTOs, Zustand stores, export, email templates. Orchestration, no I/O clients
   domain/             # calendar/ (pure planning engine) and payment/ (Effect programs)
   infrastructure/     # everything outbound: clients, services, workers, proxy, api operations, seo route table
   ui/                 # adapters, hooks, i18n, modules (components), styles, assets
@@ -96,7 +96,7 @@ public/               # static assets
 Path aliases (`tsconfig.json` `compilerOptions.paths`): `src/*`, `@app/*`, `@application/*`, `@domain/*`,
 `@infrastructure/*`, `@ui/*`, `@assets/*` (→ [`src/ui/assets`](./src/ui/assets)), `@styles/*` (→ [`src/ui/styles`](./src/ui/styles)), `@i18n/*`
 (→ [`src/ui/i18n`](./src/ui/i18n)). Prefer aliases over relative paths for cross-layer imports; keep same-folder imports
-relative. There is no `baseUrl`, so every target resolves against this `tsconfig.json` — the aliases needed
+relative. There is no `baseUrl`, so every target resolves against this `tsconfig.json`; the aliases needed
 no edit when the package moved. [`vitest.config.ts`](./vitest.config.ts) sets `resolve.tsconfigPaths`, so a new alias needs exactly
 one edit, in `tsconfig.json`.
 
@@ -110,7 +110,7 @@ last. It is generated and says so; leave whichever version is committed alone ra
 flip back and forth.
 
 **`next build` fills in `tsconfig.json`, so two settings there are not redundant.** It rewrites the file on
-every run and writes its own default for any key that is absent — `strict: false` and `allowJs: true`. Both
+every run and writes its own default for any key that is absent: `strict: false` and `allowJs: true`. Both
 land at the *next build* rather than at the deletion site, so deleting either as noise turns strict mode off,
 or lets JavaScript into a TypeScript-only codebase, a long way from the change.
 `tests/docs-consistency.test.ts` asserts both, asserts that this `tsconfig.json` stays beside the
@@ -121,7 +121,7 @@ crashes the deployed Worker on any route rendered at request time: `@opennextjs/
 latest adapter and shipped 2026-08-01, two days before 16.3.0 existed, and there is no newer version or beta.
 The symptom is the 404 page answering with Cloudflare **Error 1101 (Worker threw exception)** instead of
 itself, which is what `e2e/[locale]/not-found.spec.ts` catches. `/_not-found` is the only page that renders
-per request — everything else is prerendered and served from cache, so nothing else shows it.
+per request; everything else is prerendered and served from cache, so nothing else shows it.
 [ADR 0009](../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md).
 
 TypeScript is pinned to 6 because it cannot move without Next moving first. TypeScript 7 ships the Go compiler
@@ -130,19 +130,19 @@ and no `lib/typescript.js`, and Next's type-checking path loads exactly that fil
 `pnpm build` before it type-checks anything. Raise Next first, and only once the adapter supports it.
 
 Two things follow that are easy to trip over. `partialPrefetching` in `next.config.ts` is a 16.3 option and is
-a config error on 16.2 — it must stay out while Next is pinned. And
+a config error on 16.2; it must stay out while Next is pinned. And
 [`tests/docs-consistency.test.ts`](../../tests/docs-consistency.test.ts) imports `typescript` directly for its
 compiler-API parsing; under TypeScript 7 that import has to become `@typescript/typescript6`, Microsoft's
 compatibility package pinning the 6.x API, so the two move together too. The pin now appears in three
-manifests — this one, the repo root and [`apps/docs`](../docs) — and only this one is load-bearing for `next build`.
+manifests (this one, the repo root and [`apps/docs`](../docs)), and only this one is load-bearing for `next build`.
 `tests/docs-consistency.test.ts` asserts the three stay equal **and stay exact**, on the same reasoning as
 the `wrangler` rule beside it: Renovate opens a pull request per manifest, so without the rule the first bump
-desynchronises them silently. Equality alone was not enough — a `rangeStrategy` flip writes `^6.0.3` into all
-three at once, which is equal and no longer a pin — so each version has to match three dotted numbers too.
+desynchronises them silently. Equality alone was not enough: a `rangeStrategy` flip writes `^6.0.3` into all
+three at once, which is equal and no longer a pin, so each version has to match three dotted numbers too.
 
 Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.tsx` for components).
 
-**Nested guides** — read the one for the folder you are touching; they carry the detail this file omits:
+**Nested guides**. Read the one for the folder you are touching; they carry the detail this file omits:
 
 | Folder | Covers |
 | --- | --- |
@@ -179,23 +179,34 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
   explanatory comments and stay: a `biome-ignore` suppression, which changes what the linter does and must
   carry its reason on the same line; and the do-not-edit banner on generated output
   ([`src/ui/modules/bones/registry.ts`](./src/ui/modules/bones/registry.ts)). A suppression counts in either form, including the
-  `{/* biome-ignore … */}` shape JSX forces. The rule is asserted wherever a comment sits — opening a line,
+  `{/* biome-ignore … */}` shape JSX forces. The rule is asserted wherever a comment sits: opening a line,
   trailing code, or inside JSX.
-- **Two or more *required* parameters means one named object, typed `SomeFunctionParams`.** `formatDate`
-  takes `FormatDateParams`, `matchesClientSecret` takes `MatchesClientSecretParams`. One required parameter is
-  passed directly, with no wrapper and no interface — `createHolidaySet(holidays)`, `amountFormatter(locale)`.
-  **An optional parameter does not make a function "two or more"**: `noStore(body, init?)`,
-  `createRichLink(href, options?)` and `track(event, properties?)` take one thing plus an options tail and
-  stay positional, so `noStore({ premiumKey, email })` is one argument that happens to be an object and
-  wrapping it into `noStore({ body: { … } })` is the mistake. The point is that the *order* of arguments
-  stops being load-bearing: two adjacent positionals of the same type is the classic silent defect, and this
+- **Two or more parameters means one named object, typed `SomeFunctionParams`.** `formatDate` takes
+  `FormatDateParams`, `matchesClientSecret` takes `MatchesClientSecretParams`, `noStore` takes
+  `NoStoreParams`. Exactly one parameter is passed directly, with no wrapper and no interface:
+  `createHolidaySet(holidays)`, `amountFormatter(locale)`. The point is that the *order* of arguments stops
+  being load-bearing: two adjacent positionals of the same type is the classic silent defect, and this
   codebase has got `isBefore` and `differenceInDays` backwards before.
 
-  Two places do not follow it and cannot. `GET(request, context)` under `src/app/` is Next's own route-handler
-  signature, and `compareByEfficiency({ a, b })` is called from `.sort()`/`.toSorted()`, which invoke a
-  comparator with two positional arguments — so its two call sites wrap it, rather than the function bending
-  to a runtime contract it does not own.
-- **No ALL-CAPS in translation strings.** Uppercasing is a presentation choice — do it with a CSS class in the
+  **Count every parameter, including the optional ones.** `noStore(body, init?)` is two, so it takes
+  `NoStoreParams` with `init` optional inside the object, and a caller writes
+  `noStore({ body: { premiumKey, email } })`. That nesting is correct: the payload is the value of `body`.
+  The same goes for `createRichLink(href, options?)`, `track(event, properties?)` and
+  `collateByLabel(options, locale?)`. The threshold is the parameter list's length, not how many of them the
+  caller must supply.
+
+  This guide stated the opposite for a while, as "count the *required* parameters, an optional tail does not
+  count", and several functions were converted back to positional on the strength of it. That reading came
+  from a correction about one call site's double wrapping and was generalised the wrong way.
+  `GET /api/health` is what it cost: the route already passed `noStore({ body: { status, timestamp } })`,
+  `body: object` accepts anything, so it typechecked and the endpoint served
+  `{"body":{"status":"ok","timestamp":…}}` for as long as the declaration stayed positional.
+
+  Two places do not follow the rule and cannot. `GET(request, context)` under `src/app/` is Next's own
+  route-handler signature, and `compareByEfficiency({ a, b })` is called from `.sort()`/`.toSorted()`, which
+  invoke a comparator with two positional arguments, so its two call sites wrap it rather than the function
+  bending to a runtime contract it does not own.
+- **No ALL-CAPS in translation strings.** Uppercasing is a presentation choice; do it with a CSS class in the
   component, so the six bundles stay comparable and other scripts are not mangled.
 - **`typeof window`/`typeof document` guards stay.** They look redundant to a linter but are required under
   SSR: the bare identifier throws `ReferenceError` on the server.
@@ -217,7 +228,7 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
 - **The "I already donated" path is unverified, and Premium is never revoked.** v1 ships with no accounts and
   no user authentication, so the recovery path grants Premium to anyone who types an address with a succeeded
   payment behind it, and there is no revocation path for a donor. Both follow from the decision, not from an
-  oversight — do not "harden" either in passing. There *is* a session layer: the entitlement travels in a
+  oversight; do not "harden" either in passing. There *is* a session layer: the entitlement travels in a
   signed HTTP-only cookie.
   [ADR 0008](../../adr/0008-premium-derived-from-payment.md).
 - **The two bounded contexts under [`src/domain/`](./src/domain) follow different rules.** `calendar/` is pure because it runs
@@ -230,7 +241,7 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
   not, and must receive configuration as plain values.
   [ADR 0004](../../adr/0004-cloudflare-workers-as-deployment-target.md).
 - **The planning pipeline exists once, and used to exist twice.** `runPlanningPipeline` under
-  [`src/domain/calendar/`](./src/domain/calendar) is the whole run — caches, pseudo-Holidays, budget, both planning calls, the Metrics.
+  [`src/domain/calendar/`](./src/domain/calendar) is the whole run: caches, pseudo-Holidays, budget, both planning calls, the Metrics.
   The Web Worker and the holidays store's own action are its two callers and add only transport. They were two
   copies held together by mirrored test blocks, they drifted, and the symptom was one Planning Window
   producing two different plans depending on which path ran. Do not reintroduce orchestration at a caller.
@@ -247,16 +258,16 @@ Cloudflare Workers via wrangler ([`wrangler.toml`](./wrangler.toml)): `.open-nex
 `forever-pto-tail` tail consumer, which is its own Worker under [`workers/tail/`](./workers/tail) and is deployed by the `deploy-tail`
 job when the files its bundle is built from change. Only `env.production` binds a
 route (`forever-pto.com/*`); `env.development` supplies the preview bindings and CI deploys one worker per PR
-from it — `pr-<number>-forever-pto-development.fbuireu.workers.dev`, deleted when the PR closes.
+from it: `pr-<number>-forever-pto-development.fbuireu.workers.dev`, deleted when the PR closes.
 
 **The tail Worker is gated on what its bundle is built from, which is wider than `workers/tail/`.**
 [`workers/tail/index.ts`](./workers/tail/index.ts) imports the log-level contract out of
 [`src/infrastructure/clients/logging/better-stack/contract.ts`](./src/infrastructure/clients/logging/better-stack/contract.ts), so `TAIL_PATHS` in `ci.yml` has to watch that
 client too. While it named only `apps/web/workers/tail/`, editing the contract redeployed the app and left the
-Worker on the previous bundled copy — and [`workers/tail/index.test.ts`](./workers/tail/index.test.ts) reads the *source* module, so
+Worker on the previous bundled copy, and [`workers/tail/index.test.ts`](./workers/tail/index.test.ts) reads the *source* module, so
 nothing in the suite could see the split. `tests/docs-consistency.test.ts` walks that import graph
 **transitively** against the filter now, because whatever the contract itself imports is bundled too, and it
-asserts at least one resolved path lands outside `workers/tail/` — `index.test.ts` imports `./index`, so a walk
+asserts at least one resolved path lands outside `workers/tail/`: `index.test.ts` imports `./index`, so a walk
 that crossed no folder boundary at all still looked like a successful one.
 
 Every path in `wrangler.toml` is relative to the file itself, so the deploy runs with this package as the
@@ -264,16 +275,16 @@ working directory. Build config lives in `next.config.ts` and [`open-next.config
 
 **Wrangler inherits configuration into a named environment but never a binding, so the three `[[ratelimits]]`
 blocks are not duplication.** `[assets]`, `[placement]` and `[observability]` are declared once at the top
-level and every environment gets them — which is the pattern `apps/docs/CLAUDE.md` teaches — but `vars`,
+level and every environment gets them, which is the pattern `apps/docs/CLAUDE.md` teaches, but `vars`,
 `ratelimits`, `r2_buckets` and `tail_consumers` are bindings: an environment that does not declare one does
 not have it. Deleting `[[env.production.ratelimits]]` as a copy of the top-level block is the most ordinary
 tidy-up in the file, and it makes `env.PAYMENT_RATE_LIMITER` `undefined` in production. The limiter fails
-open **by design for errors** — `Effect.catchAll` turns a throwing `.limit()` into "not limited" — which is
+open **by design for errors** (`Effect.catchAll` turns a throwing `.limit()` into "not limited"), which is
 right for a flaky binding and catastrophic for a missing one: `POST /api/payment` and `POST /api/check-session`
 go unbounded in front of Stripe, silently. `tests/docs-consistency.test.ts` asserts every binding name
 `environment.d.ts` declares is present in all three environments, and that the rate limiter is bounded
 identically in each. It also asserts each named environment declares every binding **kind** the top level
-declares — `CloudflareEnv` names three bindings and neither `r2_buckets` nor `tail_consumers` is one of them,
+declares: `CloudflareEnv` names three bindings and neither `r2_buckets` nor `tail_consumers` is one of them,
 so deleting either block from `env.production` passed the name check untouched.
 
 **`NEXT_PUBLIC_SITE_URL` is resolved twice, and the two resolutions disagree on a preview.** No file reads
@@ -282,15 +293,15 @@ differently depending on when it is asked:
 
 - **Per request**, on the deployed worker, it is the Worker's runtime var. [`_deploy-web.yml`](../../.github/workflows/_deploy-web.yml) passes
   `--var NEXT_PUBLIC_SITE_URL:<inputs.url>`, so `sitemap.xml`, the API routes and the `.well-known` handler
-  all name the host actually being served — a per-PR preview names itself.
+  all name the host actually being served; a per-PR preview names itself.
 - **During `next build`**, there is no request, so `getCloudflareContext({ async: true })` falls back to
   `getPlatformProxy`, which reads `wrangler.toml`'s **top-level** `[vars]`. `cf:build` passes no `--env`, so
-  every build — production and preview alike — bakes `https://forever-pto.com` into whatever is prerendered.
+  every build, production and preview alike, bakes `https://forever-pto.com` into whatever is prerendered.
   `robots.txt` is fully static with no revalidation and keeps it for the life of the deployment; the
   `[locale]` shells carry it in `canonical`, `hrefLang` and `og:url` until their 24-hour revalidation.
 
 So a preview's `robots.txt` advertises the production sitemap. That is tolerated rather than fixed because
-previews sit behind Cloudflare Access — nothing crawls them, which is why [`playwright.config.ts`](./playwright.config.ts) has to send
+previews sit behind Cloudflare Access: nothing crawls them, which is why [`playwright.config.ts`](./playwright.config.ts) has to send
 `CF-Access-Client-Id`/`Secret` to reach one. Do not "fix" it by giving the build step the override without
 first checking whether the value is still correct for production, which shares that build path. The
 `NEXT_PUBLIC_SITE_URL` line inside `[env.development.vars]` is the fallback for a hand-run
@@ -301,11 +312,11 @@ them.** `--var` merges, it does not replace: wrangler reads the selected environ
 binding set and only then overwrites the individual keys the flag names. `_deploy-web.yml` passes exactly
 one, `NEXT_PUBLIC_SITE_URL`, so `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXTJS_ENV` and `TURSO_DATABASE_URL` reach every
 per-PR worker straight from `wrangler.toml`. Only the site URL is dead weight there, and it is not removable
-either — without it a hand-run development deploy would fall through to the top-level `[vars]` and advertise
+either: without it a hand-run development deploy would fall through to the top-level `[vars]` and advertise
 itself as `forever-pto.com`. Read the whole block as configuration, not residue.
 
 **The deploy passes `--message`, and the value is one hyphenated token on purpose.** Every form of
-`--message "<sha> <separator> <event>"` tried made wrangler 4.115 fail with `Unknown argument: push` — the
+`--message "<sha> <separator> <event>"` tried made wrangler 4.115 fail with `Unknown argument: push`; the
 last word of the message arrived as a second positional beside `deploy [path]`. It was not the quoting
 (`pnpm exec` passes argv through untouched, and `nick-fields/retry` was wrongly blamed for it first), and not
 the separator character. `_deploy-web.yml` now passes `${{ github.sha }}-${{ github.event_name }}`, which
@@ -314,8 +325,8 @@ has since moved to **4.121.0**; nothing has been re-verified, so treat the mecha
 retested, and reintroduce any multi-word form from a PR where the preview deploy exercises the same file.
 
 **No `wrangler deploy` in this repo is wrapped in `nick-fields/retry`'s usual forgiveness for argument
-errors** — not the app's in `_deploy-web.yml`, and not the tail Worker's in `ci.yml`. A wrapper that retries
+errors**: not the app's in `_deploy-web.yml`, and not the tail Worker's in `ci.yml`. A wrapper that retries
 every failure cannot tell a bad argument from a bad network, and this failure burned three identical attempts
-per run before reporting. The secret uploads and the preview delete keep their retry — all are idempotent and
+per run before reporting. The secret uploads and the preview delete keep their retry; all are idempotent and
 all fail for reasons that a second attempt can fix. `tests/docs-consistency.test.ts` counts the deploy steps
 rather than naming one workflow, so a third deploy is covered the day it appears.

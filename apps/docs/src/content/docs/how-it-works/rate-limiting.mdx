@@ -1,6 +1,6 @@
 ---
 title: Rate limiting
-description: The Cloudflare rate-limiting binding guarding the payment endpoints — platform-counted, fail-open, typed 429s.
+description: The Cloudflare rate-limiting binding guarding the payment endpoints (platform-counted, fail-open, typed 429s).
 sidebar:
   order: 11
 ---
@@ -9,7 +9,7 @@ Two endpoints are rate limited, and they are the two that reach Stripe on an una
 
 ## How it works
 
-`checkRateLimit(ip)` in `apps/web/src/infrastructure/services/payments/rateLimit.ts` is thin on purpose — the counting happens on the platform, not in the app:
+`checkRateLimit(ip)` in `apps/web/src/infrastructure/services/payments/rateLimit.ts` is thin on purpose; the counting happens on the platform, not in the app:
 
 - The IP comes from `resolveClientIp`, which reads `cf-connecting-ip`, then `x-forwarded-for`, then `x-real-ip`.
 - It reads the `PAYMENT_RATE_LIMITER` binding through `getCloudflareContext({ async: true })` and calls `.limit({ key: ip })`. The bounds are `simple = { limit = 10, period = 60 }` in `wrangler.toml`, declared once at the top level and again per environment; `period` accepts only 10 or 60.
@@ -19,7 +19,7 @@ The source file holds no limit, no window length and no cache key: both bounds l
 
 ## Why not a KV counter
 
-This was a read-modify-write over a KV namespace — `get`, compare, `put(count + 1)` — and it did not hold. Workers KV offers neither compare-and-swap nor atomic increment, so every request whose `get` resolved before a peer's `put` landed read the same value and wrote the same number. The bound therefore only ever held for strictly serialised traffic: two hundred parallel `POST /api/payment` from one IP — exactly the shape of card-testing traffic — advanced the counter by an amount unrelated to the burst and admitted almost all of them to `stripe.paymentIntents.create`.
+This was a read-modify-write over a KV namespace (`get`, compare, `put(count + 1)`) and it did not hold. Workers KV offers neither compare-and-swap nor atomic increment, so every request whose `get` resolved before a peer's `put` landed read the same value and wrote the same number. The bound therefore only ever held for strictly serialised traffic: two hundred parallel `POST /api/payment` from one IP, exactly the shape of card-testing traffic, advanced the counter by an amount unrelated to the burst and admitted almost all of them to `stripe.paymentIntents.create`.
 
 Two KV properties widened the window rather than narrowing it: a `get` is served from a per-colo cache whose minimum TTL is 60 seconds, the same length as the window, and writes to a single key are throttled to roughly one per second.
 
@@ -27,8 +27,8 @@ Two KV properties widened the window rather than narrowing it: a `get` is served
 
 The binding call is wrapped in `Effect.catchAll(() => Effect.succeed(false))`: if there is no Cloudflare context or the binding is unavailable, the request is treated as **not** blocked. An outage degrades to "no rate limiting" rather than "nobody can donate".
 
-That stance covers *errors* only. It is not the same as the "best-effort, not atomic" caveat the promo-code cap carries — that one is a marketing control, and this one is the only thing standing in front of the card processor.
+That stance covers *errors* only. It is not the same as the "best-effort, not atomic" caveat the promo-code cap carries: that one is a marketing control, and this one is the only thing standing in front of the card processor.
 
 ## Where it sits in the flow
 
-The limiter is the first step of the payment route, before validation, promo-code checks or PaymentIntent creation. On `GET /api/payment/activate` it runs before the client-secret comparison — see [premium and donations](/how-it-works/premium/) for the rest of the pipeline.
+The limiter is the first step of the payment route, before validation, promo-code checks or PaymentIntent creation. On `GET /api/payment/activate` it runs before the client-secret comparison; see [premium and donations](/how-it-works/premium/) for the rest of the pipeline.

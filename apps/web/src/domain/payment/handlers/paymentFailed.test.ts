@@ -65,7 +65,7 @@ describe("handlePaymentFailed", () => {
 		expect(mockLogger.warn).not.toHaveBeenCalled();
 	});
 
-	it("reads nothing before writing — the succeeded row is protected by the WHERE clause", async () => {
+	it("reads nothing before writing, so the succeeded row is protected by the WHERE clause", async () => {
 		const { getPaymentById } = await import("@infrastructure/services/payments/repository");
 		await run(handlePaymentFailed(EVENT));
 		expect(getPaymentById).not.toHaveBeenCalled();

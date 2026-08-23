@@ -1,6 +1,6 @@
 ---
 title: GitHub workflows
-description: Reference for every workflow in .github/workflows — triggers, jobs and what each one gates.
+description: Reference for every workflow in .github/workflows (triggers, jobs and what each one gates).
 sidebar:
   order: 2
 ---
@@ -15,26 +15,26 @@ All workflows live in `.github/workflows/`. Two repo-wide conventions, enforced 
 | `docs.yml` | push / PR touching `apps/docs/**` | This site's build, checks and deploy |
 | `zizmor.yml` | push to `main`, all PRs | Workflow security linting |
 | `dependency-review.yml` | all PRs | Fails a PR that introduces a dependency with a known vulnerability |
-| `commit-message.yml` | PR opened/edited/reopened/synchronize | commitlint on the **pull request title** — the string a squash merge commits |
+| `commit-message.yml` | PR opened/edited/reopened/synchronize | commitlint on the **pull request title**, the string a squash merge commits |
 | `renovate-auto-approve.yml` | Renovate PRs (by label) | Auto-approve safe dependency PRs |
-| `dependabot-auto-merge.yml` | Dependabot PRs | Dormant — Renovate is the active bot |
+| `dependabot-auto-merge.yml` | Dependabot PRs | Dormant; Renovate is the active bot |
 
-## `ci.yml` — CI
+## `ci.yml`: CI
 
 Runs on pushes to `main` and PRs targeting `main`. `cancel-in-progress` is conditional on `pull_request`: cancelling a superseded PR run is free, cancelling a `main` run would kill a deploy or a release halfway.
 
-- **changes** — derives from `git diff` whether `apps/web` (or anything the app build depends on) was touched, and exposes it as an output. It uses `git diff` rather than a filter action because every third-party action here is SHA-pinned and an unpinnable one trips zizmor. It fails open.
-- **Check** — one job running `pnpm verify`: `format:check` (Biome, no writes), `typecheck` (the root program, then `apps/web`, then `astro check` over `apps/docs`) and `test:ut:coverage` (`apps/web`'s Vitest run, then the contract suite), then coverage upload to Codecov from `apps/web/coverage/lcov.info` (`fail_ci_if_error: false`, so Codecov outages never block CI). The same command is what `pre-push` runs, so a green push is a green CI.
+- **changes**: derives from `git diff` whether `apps/web` (or anything the app build depends on) was touched, and exposes it as an output. It uses `git diff` rather than a filter action because every third-party action here is SHA-pinned and an unpinnable one trips zizmor. It fails open.
+- **Check**, one job running `pnpm verify`: `format:check` (Biome, no writes), `typecheck` (the root program, then `apps/web`, then `astro check` over `apps/docs`) and `test:ut:coverage` (`apps/web`'s Vitest run, then the contract suite), then coverage upload to Codecov from `apps/web/coverage/lcov.info` (`fail_ci_if_error: false`, so Codecov outages never block CI). The same command is what `pre-push` runs, so a green push is a green CI.
 - **deploy-production → release-web → docs-refresh** on `main`, or **deploy-development → comment / e2e** on a PR. `deploy-tail` and `cross-package-notice` hang off `changes` on their own conditions.
 
 `Check` is what the ruleset gates PRs on, and it gates *deploying* too: `deploy-production` `needs: [changes, check]` and `release-web` `needs` the deploy, so a tag means the version is live. `Check` runs unconditionally, because the contract suite reads `CONTEXT.md`, `adr/` and every guide, so a markdown-only change must not slip past it; only the deploy and release jobs consult `changes`. Package scoping uses step-level `working-directory`, because a job-level default would not reach a `uses:` step, which is why every `nick-fields/retry` command begins with an explicit `cd`.
 
-## `_deploy-web.yml` — Deploy web (reusable)
+## `_deploy-web.yml`: Deploy web (reusable)
 
 A `workflow_call` workflow shared by both deploy entry points. Inputs: `environment` (GitHub environment name), `wrangler_env` (`--env` for wrangler), optional `url` (shown on the PR/deployments UI) and optional `worker_name` (the per-PR override). Steps:
 
-1. Install deps, then build with `pnpm run cf:build` (OpenNext). The build step receives the `NEXT_PUBLIC_*` GitHub environment *variables* — these are baked into the client bundle at build time.
-2. `pnpm exec wrangler deploy --env <wrangler_env>`, adding `--name <worker_name>` when set — the name override is what creates a fresh per-PR Worker.
+1. Install deps, then build with `pnpm run cf:build` (OpenNext). The build step receives the `NEXT_PUBLIC_*` GitHub environment *variables*. These are baked into the client bundle at build time.
+2. `pnpm exec wrangler deploy --env <wrangler_env>`, adding `--name <worker_name>` when set; the name override is what creates a fresh per-PR Worker.
 3. Push the five runtime secrets with `wrangler secret bulk` (targeting `--name` for previews, `--env` otherwise). A small Node guard fails the job if any secret is missing rather than deploying a half-configured Worker. See [secrets](/infra/secrets/).
 
 ### The deploy jobs
@@ -43,29 +43,29 @@ A `workflow_call` workflow shared by both deploy entry points. Inputs: `environm
 
 `deploy-production` calls the same reusable workflow with `environment: web-production`, `wrangler_env: production` and `url: https://forever-pto.com`, and no `worker_name` override, so it updates the `forever-pto` Worker in place. It `needs: [changes, check]`, so a red `main` does not ship and a docs-only commit does not redeploy. See [release](/infra/release/).
 
-## `cleanup-development.yml` — Cleanup - Development
+## `cleanup-development.yml`: Cleanup - Development
 
 On `pull_request: closed`, two jobs: `cleanup-web` deletes `pr-<n>-forever-pto-development` and `cleanup-docs` deletes `pr-<n>-forever-pto-docs-development`, both through `nick-fields/retry` wrapping `pnpm exec wrangler delete --force`. Shared dev R2/KV/Turso state is intentionally left alone.
 
-It declares `group: CI-${{ github.ref }}` with `cancel-in-progress: false`, which is what stops it deleting a Worker the E2E job is still driving — see [environments](/infra/environments/).
+It declares `group: CI-${{ github.ref }}` with `cancel-in-progress: false`, which is what stops it deleting a Worker the E2E job is still driving; see [environments](/infra/environments/).
 
-## `docs.yml` — Docs
+## `docs.yml`: Docs
 
-CI/CD for this documentation site, path-filtered to `apps/docs/**` plus everything the site reaches into the app for: `apps/web/src/ui/**`, `apps/web/package.json` (the version the site displays), `apps/web/src/domain/calendar/types.ts` and `apps/web/src/infrastructure/i18n/locales.ts`. It also answers `workflow_dispatch`, which is how `ci.yml`'s `docs-refresh` job rebuilds the site after a web release — the release commit carries `[skip ci]`, so without the dispatch the published site keeps advertising the previous version. It also carries `release-docs`, which runs after the docs deploy so a `docs-v*` tag only exists once the site is live. Build & test, versioned PR previews and production deploy of the `forever-pto-docs` Worker — the full walkthrough is on [docs CI](/infra/docs-ci/).
+CI/CD for this documentation site, path-filtered to `apps/docs/**` plus everything the site reaches into the app for: `apps/web/src/ui/**`, `apps/web/package.json` (the version the site displays), `apps/web/src/domain/calendar/types.ts` and `apps/web/src/infrastructure/i18n/locales.ts`. It also answers `workflow_dispatch`, which is how `ci.yml`'s `docs-refresh` job rebuilds the site after a web release: the release commit carries `[skip ci]`, so without the dispatch the published site keeps advertising the previous version. It also carries `release-docs`, which runs after the docs deploy so a `docs-v*` tag only exists once the site is live. Build & test, versioned PR previews and production deploy of the `forever-pto-docs` Worker; the full walkthrough is on [docs CI](/infra/docs-ci/).
 
-## `commit-message.yml` — Commit Message
+## `commit-message.yml`: Commit Message
 
-Runs commitlint on the **pull request title**, not on the branch's commits. `main` takes squash merges and the repository sets the squash title to `PR_TITLE`, so that title is the message that lands and the one semantic-release parses. The `commit-msg` hook validates commits the squash then discards, which makes this the only guard on the string that ships — and GitHub pre-fills the title from the *branch name* whenever a PR carries more than one commit, so the default is rarely conventional.
+Runs commitlint on the **pull request title**, not on the branch's commits. `main` takes squash merges and the repository sets the squash title to `PR_TITLE`, so that title is the message that lands and the one semantic-release parses. The `commit-msg` hook validates commits the squash then discards, which makes this the only guard on the string that ships, and GitHub pre-fills the title from the *branch name* whenever a PR carries more than one commit, so the default is rarely conventional.
 
 It re-runs on `synchronize` even though a push cannot change the title: required status checks are evaluated against the head SHA, so without it a new commit would leave the check unreported and block the PR.
 
-## `dependency-review.yml` — Dependency Review
+## `dependency-review.yml`: Dependency Review
 
 Fails a PR that introduces a dependency with a known vulnerability, reading the lockfile diff. Runs on every PR and needs no secrets.
 
-## `zizmor.yml` — Security Analysis with zizmor
+## `zizmor.yml`: Security Analysis with zizmor
 
-Runs the zizmor GitHub Actions security linter on pushes to `main` and every PR, reporting to GitHub code scanning (`security-events: write` is its only permission). This is what makes the SHA-pinning and `persist-credentials: false` conventions stick — any new workflow (including docs ones) gets linted too.
+Runs the zizmor GitHub Actions security linter on pushes to `main` and every PR, reporting to GitHub code scanning (`security-events: write` is its only permission). This is what makes the SHA-pinning and `persist-credentials: false` conventions stick: any new workflow (including docs ones) gets linted too.
 
 ## `renovate-auto-approve.yml`
 
@@ -73,4 +73,4 @@ Approves Renovate PRs so their automerge can proceed. Gated on the PR author bei
 
 ## `dependabot-auto-merge.yml`
 
-Legacy: approves and auto-squash-merges Dependabot patch/minor/dev-dependency PRs and labels them by update type. There is no `.github/dependabot.yml` in the repo, so this workflow's `if: user.login == 'dependabot[bot]'` guard never matches — Renovate is the active dependency bot. Kept dormant; safe to ignore.
+Legacy: approves and auto-squash-merges Dependabot patch/minor/dev-dependency PRs and labels them by update type. There is no `.github/dependabot.yml` in the repo, so this workflow's `if: user.login == 'dependabot[bot]'` guard never matches: Renovate is the active dependency bot. Kept dormant; safe to ignore.

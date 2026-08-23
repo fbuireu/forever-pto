@@ -243,7 +243,7 @@
 		"customHolidaysFeature": "Festius personalitzats",
 		"customHolidaysDescription": "Afegeix dies festius propis al teu calendari",
 		"selectAll": "Selecciona-ho tot",
-		"partialSelection": "Selecció parcial — clica per seleccionar-ho tot",
+		"partialSelection": "Selecció parcial: clica per seleccionar-ho tot",
 		"deselectAll": "Desselecciona-ho tot",
 		"searchPlaceholder": "Cercar festivitat...",
 		"noHolidaysFound": "No s'ha trobat cap festivitat",

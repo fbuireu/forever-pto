@@ -21,7 +21,7 @@ export const BADGE_VARIANT_ROWS: VariantRow[] = [
 		axis: "variant",
 		values: VARIANTS,
 		defaultValue: "default",
-		notes: "No size axis — a single fixed pill size.",
+		notes: "No size axis: a single fixed pill size.",
 	},
 ];
 
@@ -40,7 +40,7 @@ export const BadgeAsLinkDemo = () => (
 		<Badge variant="secondary">Static badge</Badge>
 		<Badge variant="secondary" asChild>
 			<a href="https://forever-pto.com" target="_blank" rel="noreferrer">
-				Link badge — hover me
+				Link badge, hover me
 			</a>
 		</Badge>
 	</Demo>

@@ -98,7 +98,7 @@ describe("selectBridgesForStrategy", () => {
 		expect(result.bridges).not.toContain(bridgeLong);
 	});
 
-	it("admits bridges down to the strategy-agnostic minimum efficiency — OPTIMIZED has no higher floor", () => {
+	it("admits bridges down to the strategy-agnostic minimum efficiency, since OPTIMIZED has no higher floor", () => {
 		const optimized = selectBridgesForStrategy({
 			bridges: [bridgeB],
 			targetPtoDays: 2,

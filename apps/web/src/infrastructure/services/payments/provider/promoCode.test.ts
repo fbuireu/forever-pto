@@ -311,9 +311,9 @@ describe("validatePromoCode", () => {
 
 	describe("the shape it asks Stripe for", () => {
 		it("looks the code up under the same normal form the redemption count is keyed by", async () => {
-			setupMocks(makeCoupon(), { max_redemptions: 5 });
+			setupMocks({ coupon: makeCoupon(), promoCodeOverrides: { max_redemptions: 5 } });
 
-			await run("  save20 ", 10);
+			await run({ code: "  save20 ", amount: 10 });
 
 			const [params] = mockList.mock.calls[0] as [{ code?: string }];
 			expect(params.code).toBe(normalizePromoCode("  save20 "));

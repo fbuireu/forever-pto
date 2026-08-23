@@ -73,7 +73,7 @@ describe("handlePaymentSucceeded", () => {
 		expect(getPaymentById).not.toHaveBeenCalled();
 	});
 
-	it("calls updatePaymentStatus exactly once, whatever the row holds — the WHERE clause is the guard", async () => {
+	it("calls updatePaymentStatus exactly once, whatever the row holds, since the WHERE clause is the guard", async () => {
 		const { updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
 		vi.mocked(updatePaymentStatus).mockReturnValueOnce(Effect.succeed(false));
 		await run(handlePaymentSucceeded(EVENT));

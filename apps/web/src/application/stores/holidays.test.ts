@@ -53,7 +53,13 @@ vi.mock("@domain/calendar/metrics/generateMetrics", () => ({
 	generateMetrics: vi.fn().mockReturnValue({ totalDays: 0, efficiency: 0 }),
 }));
 
-const makeHoliday = (id: string, dateStr: string, variant: HolidayVariant = HolidayVariant.NATIONAL): HolidayDTO => ({
+interface MakeHolidayParams {
+	id: string;
+	dateStr: string;
+	variant?: HolidayVariant;
+}
+
+const makeHoliday = ({ id, dateStr, variant = HolidayVariant.NATIONAL }: MakeHolidayParams): HolidayDTO => ({
 	id,
 	date: new Date(dateStr),
 	name: `Holiday ${id}`,
@@ -61,7 +67,13 @@ const makeHoliday = (id: string, dateStr: string, variant: HolidayVariant = Holi
 	isInPlanningWindow: true,
 });
 
-const makeBridge = (start: Date, end: Date, ptoDays: Date[]) => ({
+interface MakeBridgeParams {
+	start: Date;
+	end: Date;
+	ptoDays: Date[];
+}
+
+const makeBridge = ({ start, end, ptoDays }: MakeBridgeParams) => ({
 	startDate: start,
 	endDate: end,
 	ptoDaysNeeded: ptoDays.length,
@@ -72,7 +84,7 @@ const makeBridge = (start: Date, end: Date, ptoDays: Date[]) => ({
 
 const makeSuggestion = (days: Date[]): MeasuredSuggestion => ({
 	days,
-	bridges: days.length ? [makeBridge(days[0], days[days.length - 1], days)] : [],
+	bridges: days.length ? [makeBridge({ start: days[0], end: days[days.length - 1], ptoDays: days })] : [],
 	metrics: { totalDays: days.length } as never,
 });
 
@@ -121,7 +133,9 @@ describe("toggleDaySelection refuses days that are already off", () => {
 
 	it("refuses a day that any Holiday already covers, Custom ones included", () => {
 		const date = new Date(2026, 2, 11);
-		useHolidaysStore.setState({ holidays: [makeHoliday("custom-1", "2026-03-11", HolidayVariant.CUSTOM)] });
+		useHolidaysStore.setState({
+			holidays: [makeHoliday({ id: "custom-1", dateStr: "2026-03-11", variant: HolidayVariant.CUSTOM })],
+		});
 
 		const accepted = useHolidaysStore
 			.getState()
@@ -147,7 +161,7 @@ describe("toggleDaySelection refuses days that are already off", () => {
 		const date = new Date(2026, 2, 11);
 		useHolidaysStore.setState({
 			manuallySelectedDays: [date],
-			holidays: [makeHoliday("national-1", "2026-03-11")],
+			holidays: [makeHoliday({ id: "national-1", dateStr: "2026-03-11" })],
 		});
 
 		const accepted = useHolidaysStore
@@ -169,7 +183,9 @@ describe("toggleDaySelection refuses days that are already off", () => {
 	});
 
 	it("tells a Custom Holiday apart from a National one in the reason", () => {
-		useHolidaysStore.setState({ holidays: [makeHoliday("custom-1", "2026-03-11", HolidayVariant.CUSTOM)] });
+		useHolidaysStore.setState({
+			holidays: [makeHoliday({ id: "custom-1", dateStr: "2026-03-11", variant: HolidayVariant.CUSTOM })],
+		});
 
 		const custom = useHolidaysStore.getState().toggleDaySelection({
 			date: new Date("2026-03-11"),
@@ -180,7 +196,7 @@ describe("toggleDaySelection refuses days that are already off", () => {
 
 		expect(custom).toEqual({ applied: false, reason: DayRefusal.DAY_IS_CUSTOM_HOLIDAY });
 
-		useHolidaysStore.setState({ holidays: [makeHoliday("national-1", "2026-03-11")] });
+		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "national-1", dateStr: "2026-03-11" })] });
 
 		const national = useHolidaysStore.getState().toggleDaySelection({
 			date: new Date("2026-03-11"),
@@ -213,7 +229,7 @@ describe("toggleDaySelection refuses days that are already off", () => {
 describe("editHoliday collisions", () => {
 	it("lets a holiday keep its own date, since it cannot collide with itself", () => {
 		useHolidaysStore.setState({
-			holidays: [makeHoliday("custom-1", "2026-03-11", HolidayVariant.CUSTOM)],
+			holidays: [makeHoliday({ id: "custom-1", dateStr: "2026-03-11", variant: HolidayVariant.CUSTOM })],
 			manuallySelectedDays: [],
 		});
 
@@ -231,7 +247,7 @@ describe("editHoliday collisions", () => {
 
 	it("refuses to move a holiday onto a date already spent as a PTO day", () => {
 		useHolidaysStore.setState({
-			holidays: [makeHoliday("custom-1", "2026-03-11", HolidayVariant.CUSTOM)],
+			holidays: [makeHoliday({ id: "custom-1", dateStr: "2026-03-11", variant: HolidayVariant.CUSTOM })],
 			manuallySelectedDays: [new Date("2026-03-12")],
 		});
 
@@ -248,7 +264,10 @@ describe("editHoliday collisions", () => {
 
 	it("refuses to move a holiday onto another holiday", () => {
 		useHolidaysStore.setState({
-			holidays: [makeHoliday("custom-1", "2026-03-11", HolidayVariant.CUSTOM), makeHoliday("national-1", "2026-03-12")],
+			holidays: [
+				makeHoliday({ id: "custom-1", dateStr: "2026-03-11", variant: HolidayVariant.CUSTOM }),
+				makeHoliday({ id: "national-1", dateStr: "2026-03-12" }),
+			],
 		});
 
 		useHolidaysStore.getState().editHoliday({
@@ -264,7 +283,7 @@ describe("editHoliday collisions", () => {
 
 	it("still moves a holiday onto a free date", () => {
 		useHolidaysStore.setState({
-			holidays: [makeHoliday("custom-1", "2026-03-11", HolidayVariant.CUSTOM)],
+			holidays: [makeHoliday({ id: "custom-1", dateStr: "2026-03-11", variant: HolidayVariant.CUSTOM })],
 			manuallySelectedDays: [new Date("2026-03-12")],
 		});
 
@@ -282,7 +301,7 @@ describe("editHoliday collisions", () => {
 
 describe("the refusal reason crosses the seam", () => {
 	it("hands addHoliday the Holiday that already holds the date, so the caller need not look it up", () => {
-		const held = makeHoliday("custom-1", "2026-03-11", HolidayVariant.CUSTOM);
+		const held = makeHoliday({ id: "custom-1", dateStr: "2026-03-11", variant: HolidayVariant.CUSTOM });
 		useHolidaysStore.setState({ holidays: [held] });
 
 		const outcome = useHolidaysStore.getState().addHoliday({
@@ -357,7 +376,7 @@ describe("addHoliday", () => {
 
 	it("does not add a holiday when one already exists on the same date", () => {
 		const date = new Date("2026-01-01");
-		useHolidaysStore.setState({ holidays: [makeHoliday("h1", "2026-01-01")] });
+		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })] });
 		useHolidaysStore.getState().addHoliday({
 			holiday: { name: "Duplicate", date, type: "public" },
 			year: 2026,
@@ -368,7 +387,7 @@ describe("addHoliday", () => {
 
 	it("warns about the duplicate without blocking the action on the logging client", async () => {
 		const date = new Date("2026-01-01");
-		useHolidaysStore.setState({ holidays: [makeHoliday("h1", "2026-01-01")] });
+		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })] });
 
 		useHolidaysStore.getState().addHoliday({
 			holiday: { name: "Duplicate", date, type: "public" },
@@ -383,7 +402,7 @@ describe("addHoliday", () => {
 	});
 
 	it("sorts holidays by date after adding", () => {
-		useHolidaysStore.setState({ holidays: [makeHoliday("h1", "2026-06-01")] });
+		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "h1", dateStr: "2026-06-01" })] });
 		const earlyDate = new Date("2026-01-15");
 		useHolidaysStore.getState().addHoliday({
 			holiday: { name: "Early", date: earlyDate, type: "public" },
@@ -397,7 +416,9 @@ describe("addHoliday", () => {
 
 describe("removeHoliday", () => {
 	it("removes the holiday with the given id", () => {
-		useHolidaysStore.setState({ holidays: [makeHoliday("h1", "2026-01-01"), makeHoliday("h2", "2026-02-01")] });
+		useHolidaysStore.setState({
+			holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" }), makeHoliday({ id: "h2", dateStr: "2026-02-01" })],
+		});
 		useHolidaysStore.getState().removeHoliday("h1");
 		const { holidays } = useHolidaysStore.getState();
 		expect(holidays).toHaveLength(1);
@@ -405,7 +426,7 @@ describe("removeHoliday", () => {
 	});
 
 	it("does nothing when id does not exist", () => {
-		useHolidaysStore.setState({ holidays: [makeHoliday("h1", "2026-01-01")] });
+		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })] });
 		useHolidaysStore.getState().removeHoliday("nonexistent");
 		expect(useHolidaysStore.getState().holidays).toHaveLength(1);
 	});
@@ -413,7 +434,7 @@ describe("removeHoliday", () => {
 
 describe("editHoliday", () => {
 	it("replaces the holiday at the matching index", () => {
-		useHolidaysStore.setState({ holidays: [makeHoliday("h1", "2026-01-01")] });
+		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })] });
 		const newDate = new Date("2026-03-15");
 		useHolidaysStore.getState().editHoliday({
 			holidayId: "h1",
@@ -427,7 +448,7 @@ describe("editHoliday", () => {
 	});
 
 	it("does nothing when holidayId is not found", () => {
-		useHolidaysStore.setState({ holidays: [makeHoliday("h1", "2026-01-01")] });
+		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })] });
 		useHolidaysStore.getState().editHoliday({
 			holidayId: "missing",
 			updates: { name: "X", date: new Date() },
@@ -726,7 +747,7 @@ describe("setPreviewAlternativeSelection", () => {
 describe("resetToDefaults", () => {
 	it("resets all state to initial values", () => {
 		useHolidaysStore.setState({
-			holidays: [makeHoliday("h1", "2026-01-01")],
+			holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })],
 			maxAlternatives: 8,
 			isCalculating: true,
 			manuallySelectedDays: [new Date("2026-01-05")],
@@ -750,7 +771,7 @@ describe("fetchHolidays", () => {
 	const FETCH_PARAMS = { year: 2026, country: "ES", region: "", carryOverMonths: 1, locale: "en" as const };
 
 	it("recomputes isInPlanningWindow on carried-over Custom Holidays, since only flagged ones can anchor a Bridge", async () => {
-		const custom = makeHoliday("custom-1", "2026-06-15", HolidayVariant.CUSTOM);
+		const custom = makeHoliday({ id: "custom-1", dateStr: "2026-06-15", variant: HolidayVariant.CUSTOM });
 		useHolidaysStore.setState({ holidays: [custom] });
 		mockGetHolidays.mockResolvedValueOnce([]);
 
@@ -762,7 +783,7 @@ describe("fetchHolidays", () => {
 
 	it("flags a Custom Holiday the window has moved back onto", async () => {
 		const custom: HolidayDTO = {
-			...makeHoliday("custom-1", "2026-06-15", HolidayVariant.CUSTOM),
+			...makeHoliday({ id: "custom-1", dateStr: "2026-06-15", variant: HolidayVariant.CUSTOM }),
 			isInPlanningWindow: false,
 		};
 		useHolidaysStore.setState({ holidays: [custom] });
@@ -775,8 +796,8 @@ describe("fetchHolidays", () => {
 	});
 
 	it("sets fetched holidays sorted by date", async () => {
-		const h1 = makeHoliday("h1", "2026-06-01");
-		const h2 = makeHoliday("h2", "2026-01-15");
+		const h1 = makeHoliday({ id: "h1", dateStr: "2026-06-01" });
+		const h2 = makeHoliday({ id: "h2", dateStr: "2026-01-15" });
 		mockGetHolidays.mockResolvedValueOnce([h1, h2]);
 		await useHolidaysStore.getState().fetchHolidays(FETCH_PARAMS);
 		const { holidays } = useHolidaysStore.getState();
@@ -785,9 +806,9 @@ describe("fetchHolidays", () => {
 	});
 
 	it("preserves custom holidays and drops fetched holidays with the same date", async () => {
-		const custom = makeHoliday("custom-1", "2026-05-01", HolidayVariant.CUSTOM);
-		const duplicate = makeHoliday("fetched-1", "2026-05-01");
-		const other = makeHoliday("fetched-2", "2026-06-01");
+		const custom = makeHoliday({ id: "custom-1", dateStr: "2026-05-01", variant: HolidayVariant.CUSTOM });
+		const duplicate = makeHoliday({ id: "fetched-1", dateStr: "2026-05-01" });
+		const other = makeHoliday({ id: "fetched-2", dateStr: "2026-06-01" });
 		useHolidaysStore.setState({ holidays: [custom] });
 		mockGetHolidays.mockResolvedValueOnce([duplicate, other]);
 		await useHolidaysStore.getState().fetchHolidays(FETCH_PARAMS);
@@ -798,15 +819,15 @@ describe("fetchHolidays", () => {
 	});
 
 	it("keeps custom holidays and drops the fetched ones on error", async () => {
-		const custom = makeHoliday("custom-1", "2026-05-01", HolidayVariant.CUSTOM);
-		useHolidaysStore.setState({ holidays: [custom, makeHoliday("national-1", "2026-01-01")] });
+		const custom = makeHoliday({ id: "custom-1", dateStr: "2026-05-01", variant: HolidayVariant.CUSTOM });
+		useHolidaysStore.setState({ holidays: [custom, makeHoliday({ id: "national-1", dateStr: "2026-01-01" })] });
 		mockGetHolidays.mockRejectedValueOnce(new Error("network error"));
 		await useHolidaysStore.getState().fetchHolidays(FETCH_PARAMS);
 		expect(useHolidaysStore.getState().holidays).toEqual([custom]);
 	});
 
 	it("sets holidays to empty on error when there are no custom holidays", async () => {
-		useHolidaysStore.setState({ holidays: [makeHoliday("national-1", "2026-01-01")] });
+		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "national-1", dateStr: "2026-01-01" })] });
 		mockGetHolidays.mockRejectedValueOnce(new Error("network error"));
 		await useHolidaysStore.getState().fetchHolidays(FETCH_PARAMS);
 		expect(useHolidaysStore.getState().holidays).toHaveLength(0);
@@ -896,7 +917,7 @@ describe("persistence", () => {
 
 	it("revives persisted days as Date instances", async () => {
 		const state = await rehydrateFrom({
-			holidays: [makeHoliday("h1", "2026-01-01")],
+			holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })],
 			suggestion: makeSuggestion([new Date(2026, 4, 1)]),
 			currentSelection: makeSuggestion([new Date(2026, 4, 1)]),
 			manuallySelectedDays: [new Date(2026, 6, 15)],
@@ -982,7 +1003,7 @@ describe("generateSuggestions", () => {
 	const planningInput = () => mockRunPlanningPipeline.mock.lastCall?.[0];
 
 	it("hands the pipeline the calendar and the hand edits it holds in state", async () => {
-		const holiday = makeHoliday("h1", "2026-01-01");
+		const holiday = makeHoliday({ id: "h1", dateStr: "2026-01-01" });
 		const manual = new Date(2026, 2, 11);
 		const removed = new Date(2026, 2, 12);
 		useHolidaysStore.setState({
@@ -1003,7 +1024,7 @@ describe("generateSuggestions", () => {
 	});
 
 	it("hands the pipeline the planning inputs its caller passed, budget and cap included", async () => {
-		useHolidaysStore.setState({ holidays: [makeHoliday("h1", "2026-01-01")] });
+		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })] });
 
 		await useHolidaysStore.getState().generateSuggestions({
 			...PARAMS,
@@ -1043,7 +1064,7 @@ describe("generateSuggestions", () => {
 	});
 
 	it("sets suggestion, alternatives, and currentSelection on success", async () => {
-		useHolidaysStore.setState({ holidays: [makeHoliday("h1", "2026-01-01")], maxAlternatives: 1 });
+		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })], maxAlternatives: 1 });
 		const days = [new Date("2026-06-01")];
 		mockRunPlanningPipeline.mockReturnValueOnce({
 			planned: true,
@@ -1062,7 +1083,10 @@ describe("generateSuggestions", () => {
 	});
 
 	it("clears suggestions on error", async () => {
-		useHolidaysStore.setState({ holidays: [makeHoliday("h1", "2026-01-01")], suggestion: makeSuggestion([]) });
+		useHolidaysStore.setState({
+			holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })],
+			suggestion: makeSuggestion([]),
+		});
 		mockRunPlanningPipeline.mockImplementationOnce(() => {
 			throw new Error("calc error");
 		});

@@ -69,7 +69,7 @@ export const CalendarList = () => {
 
 	const dayStates = useMemo<DayStates>(
 		() => ({
-			suggested: isSuggestion(currentSelection, removedSuggestedDays),
+			suggested: isSuggestion({ currentSelection, removedSuggestedDays }),
 			alternative: isAlternative({ alternatives, suggestion, previewAlternativeIndex, currentSelection }),
 			manuallySelected: isManuallySelected(manuallySelectedDays),
 		}),

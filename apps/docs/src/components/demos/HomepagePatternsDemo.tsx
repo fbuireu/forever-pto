@@ -17,7 +17,7 @@ export const DAY_TYPE_ROWS: VariantRow[] = [
 	{
 		axis: "DayType",
 		values: DAY_TYPES,
-		notes: "Cell class strings live in dayCell — imported here, never copied.",
+		notes: "Cell class strings live in dayCell, imported here, never copied.",
 	},
 ];
 

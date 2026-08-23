@@ -37,7 +37,7 @@ Or from this directory with `pnpm <script>` directly. Copy [`.env.example`](./.e
 it in; Worker secrets for a local run go in `.dev.vars`.
 
 **Node 26.7.0 and pnpm 11.22.0 are pinned and must match exactly.** So are Next 16.2 and TypeScript 6,
-as a pair, by the Cloudflare adapter — see [ADR 0009](../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)
+as a pair, by the Cloudflare adapter; see [ADR 0009](../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)
 before raising either.
 
 ## Layout
@@ -76,5 +76,5 @@ This package versions itself: tags are `web-vX.Y.Z`, and a commit belongs to it 
 [ADR 0011](../../adr/0011-per-package-versioning-with-a-bridge-tag.md).
 
 `version` in [`package.json`](./package.json) is read at runtime by seven source files to render the footer, the hero, the
-error page, the `/api/markdown` output and the `.well-known` agent-skills index — and by the docs site
+error page, the `/api/markdown` output and the `.well-known` agent-skills index, and by the docs site
 for its header badge. It is not only a release number.

@@ -88,14 +88,19 @@ export const endOfMonth = (date: Date): Date => {
 	return toDate(pd.with({ day: pd.daysInMonth }));
 };
 
-export const startOfWeek = (date: Date, options?: { weekStartsOn?: Day }): Date => {
+export interface WeekBoundaryParams {
+	date: Date;
+	options?: { weekStartsOn?: Day };
+}
+
+export const startOfWeek = ({ date, options }: WeekBoundaryParams): Date => {
 	const pd = toPlainDate(date);
 	const startDay = options?.weekStartsOn || 7;
 	const diff = (pd.dayOfWeek - startDay + 7) % 7;
 	return toDate(pd.subtract({ days: diff }));
 };
 
-export const endOfWeek = (date: Date, options?: { weekStartsOn?: Day }): Date => {
+export const endOfWeek = ({ date, options }: WeekBoundaryParams): Date => {
 	const pd = toPlainDate(date);
 	const startDay = options?.weekStartsOn || 7;
 	const diff = (pd.dayOfWeek - startDay + 7) % 7;
@@ -192,7 +197,7 @@ export interface GetWeekdayNamesParams {
 
 export const getWeekdayNames = ({ locale, weekStartsOn = 0, format = "short" }: GetWeekdayNamesParams): string[] => {
 	const anchor = new Date(2023, 0, 2);
-	const weekStart = startOfWeek(anchor, { weekStartsOn });
+	const weekStart = startOfWeek({ date: anchor, options: { weekStartsOn } });
 
 	return Array.from({ length: 7 }, (_, i) =>
 		formatDate({ date: addDays({ date: weekStart, days: i }), locale, format: WEEKDAY_FORMAT[format] }),

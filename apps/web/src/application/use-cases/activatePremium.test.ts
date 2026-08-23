@@ -78,7 +78,7 @@ describe("the two donation entry points", () => {
 		expect(savePayment).toHaveBeenCalledOnce();
 	});
 
-	it("reconciles without reading first — insert-or-ignore, then the guarded update (deferred)", async () => {
+	it("reconciles without reading first: insert-or-ignore, then the guarded update (deferred)", async () => {
 		const { getPaymentById, savePayment, updatePaymentStatus } = await import(
 			"@infrastructure/services/payments/repository"
 		);
