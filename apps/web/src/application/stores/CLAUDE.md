@@ -30,17 +30,22 @@ The rest of the application layer contract is in [`../CLAUDE.md`](../CLAUDE.md).
 | `holidays` | `holidays`, `suggestion`, `alternatives`, `maxAlternatives`, `currentSelection`, `currentSelectionIndex`, `previewAlternativeIndex`, `manuallySelectedDays`, `removedSuggestedDays`, `isCalculating`, `hasCalculated`, `planRevision` | all but `previewAlternativeIndex`, `isCalculating`, `hasCalculated` and `planRevision` |
 | `location` | `countries`, `regions` | nothing |
 | `premium` | `premiumKey`, `userEmail`, `lastVerified`, `needsSessionCheck`, `isLoading`, `modalOpen`, `currentFeature` | the first four |
-| `ui` | `donatePopoverOpen`, `donatePopoverIsOpening`, `currency`, `currencySymbol` | nothing |
+| `ui` | `donatePopoverOpen`, `donatePopoverIsOpening` | nothing |
 
-**`ui` persists nothing, so its currency is seeded on every load — once, by `CurrencySync`.** That
-component renders `null`, sits in the `[locale]` root layout inside `NextIntlClientProvider`, and calls
-`getCurrencyFromLocale` with the active locale. The rule used to have four owners and a free-rider: the
-two language switchers, `CheckoutForm` and `Donate` each ran the identical effect, and
-`PtoSalaryCalculator` read `currencySymbol` at six positions while triggering nothing — correct only
-because `LanguageSelector` happens to reach the same sidebar footer and `DonateClient` the same layout.
-Deleting any one of the four changed nothing observable, which is the diagnostic that a rule has no
-owner. The root layout is the home rather than `StoresInitializer`, which is mounted by the planner
-layout alone and would have left the marketing routes on `DEFAULT_CURRENCY`.
+**The `ui` store used to carry a currency, and giving that rule one owner was the wrong fix.** It had four
+owners and a free-rider, so a `CurrencySync` component was written to seed it once from the `[locale]` root
+layout. That was true as far as it went, and it took a second pass to notice the rule had no observable
+output to own: `getCurrencyForLocale` hard-codes `DEFAULT_CURRENCY`, and all six supported locales format
+EUR with the same symbol, so `currency` was `"EUR"` and `currencySymbol` was `"€"` for the whole life of the
+app. Five modules and a `@ui/*` inversion resolved to two constants.
+
+They are two constants now. `CurrencySync`, `getCurrencyFromLocale` and `getCurrencyForLocale` are deleted,
+and the four readers import `DEFAULT_CURRENCY` / `DEFAULT_CURRENCY_SYMBOL` from
+[`currencies.ts`](../../ui/utils/currencies.ts) directly. What is *not* constant is the symbol's **position** —
+`10 €` in es, fr and de against `€10` in en — and `PtoSalaryCalculator` derives that from the locale it
+already has, never from the store. [`currencies.test.ts`](../../ui/utils/currencies.test.ts) pins the
+constants across all six locales, so a seventh that formats EUR differently fails there rather than
+silently.
 
 `setCountry` clears `region` in the same `set` call — a Region code is only meaningful under its Country, and
 leaving a stale one produces a plan with holidays from the wrong place.

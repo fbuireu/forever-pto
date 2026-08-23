@@ -1,22 +1,9 @@
-import { DEFAULT_CURRENCY, DEFAULT_CURRENCY_SYMBOL } from "@ui/utils/currencies";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useUIStore } from "./ui";
-
-vi.mock("@ui/utils/currencies", async (importOriginal) => {
-	const actual = await importOriginal<typeof import("@ui/utils/currencies")>();
-	return {
-		...actual,
-		getCurrencyForLocale: vi
-			.fn()
-			.mockReturnValue({ currency: actual.DEFAULT_CURRENCY, currencySymbol: actual.DEFAULT_CURRENCY_SYMBOL }),
-	};
-});
 
 const INITIAL = {
 	donatePopoverOpen: false,
 	donatePopoverIsOpening: false,
-	currency: DEFAULT_CURRENCY,
-	currencySymbol: DEFAULT_CURRENCY_SYMBOL,
 };
 
 beforeEach(() => {
@@ -74,27 +61,5 @@ describe("donate popover", () => {
 		useUIStore.getState().clearDonatePopoverOpening();
 		expect(useUIStore.getState().donatePopoverOpen).toBe(true);
 		expect(useUIStore.getState().donatePopoverIsOpening).toBe(false);
-	});
-});
-
-describe("getCurrencyFromLocale", () => {
-	it("applies the result of getCurrencyForLocale to the store", async () => {
-		const { getCurrencyForLocale } = await import("@ui/utils/currencies");
-		vi.mocked(getCurrencyForLocale).mockReturnValueOnce({ currency: "USD", currencySymbol: "$" });
-
-		useUIStore.getState().getCurrencyFromLocale("en");
-		expect(useUIStore.getState().currency).toBe("USD");
-		expect(useUIStore.getState().currencySymbol).toBe("$");
-	});
-
-	it("falls back to EUR / € when getCurrencyForLocale throws", async () => {
-		const { getCurrencyForLocale } = await import("@ui/utils/currencies");
-		vi.mocked(getCurrencyForLocale).mockImplementationOnce(() => {
-			throw new Error("unsupported");
-		});
-
-		useUIStore.getState().getCurrencyFromLocale("en");
-		expect(useUIStore.getState().currency).toBe("EUR");
-		expect(useUIStore.getState().currencySymbol).toBe("€");
 	});
 });

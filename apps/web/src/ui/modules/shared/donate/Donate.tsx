@@ -20,6 +20,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@ui/modules/core/animat
 import { Star } from "@ui/modules/core/animate/icons/Star";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { cn } from "@ui/utils/cn";
+import { DEFAULT_CURRENCY, DEFAULT_CURRENCY_SYMBOL } from "@ui/utils/currencies";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
@@ -57,10 +58,8 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 		})),
 	);
 
-	const { currency, currencySymbol, isOpen, isOpening, setDonatePopoverOpen, clearDonatePopoverOpening } = useUIStore(
+	const { isOpen, isOpening, setDonatePopoverOpen, clearDonatePopoverOpening } = useUIStore(
 		useShallow((state) => ({
-			currency: state.currency,
-			currencySymbol: state.currencySymbol,
 			isOpen: state.donatePopoverOpen,
 			isOpening: state.donatePopoverIsOpening,
 			setDonatePopoverOpen: state.setDonatePopoverOpen,
@@ -123,7 +122,7 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 						});
 					}
 
-					track("payment_started", { amount: data.amount, currency, hasPromoCode: !!data.promoCode });
+					track("payment_started", { amount: data.amount, currency: DEFAULT_CURRENCY, hasPromoCode: !!data.promoCode });
 
 					setPaymentState({
 						clientSecret: result.clientSecret,
@@ -135,7 +134,7 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 						amount: data.amount,
 						hasPromoCode: !!data.promoCode,
 						promoCodeLength: data.promoCode?.length,
-						currency,
+						currency: DEFAULT_CURRENCY,
 						locale,
 					});
 					if (error instanceof PromoCodeError) {
@@ -158,7 +157,7 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 				}
 			});
 		},
-		[setEmail, locale, currency, t],
+		[setEmail, locale, t],
 	);
 
 	const handlePaymentSuccess = useCallback(() => {
@@ -392,8 +391,8 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 							onSubmit={onSubmit}
 							currentAmount={currentAmount}
 							locale={locale}
-							currency={currency}
-							currencySymbol={currencySymbol}
+							currency={DEFAULT_CURRENCY}
+							currencySymbol={DEFAULT_CURRENCY_SYMBOL}
 							isPending={isPending}
 						/>
 					) : (

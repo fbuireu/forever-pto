@@ -32,10 +32,11 @@ May import from `@domain/*` and `@infrastructure/*`. Must not import React compo
 `NextResponse`, or reach for `getCloudflareContext()` — configuration arrives as plain values
 ([ADR 0004](../../../../adr/0004-cloudflare-workers-as-deployment-target.md)).
 
-**Two files import from `@ui/*`, inverting the dependency.** [`stores/premium.ts`](./stores/premium.ts) uses
-`@ui/adapters/session/checkSession`, and [`stores/ui.ts`](./stores/ui.ts) uses `@ui/utils/currencies`. Both are noted in
-[`../ui/CLAUDE.md`](../ui/CLAUDE.md) as known and not endorsed; check before moving either target file. Do
-not add a third.
+**One file imports from `@ui/*`, inverting the dependency.** [`stores/premium.ts`](./stores/premium.ts) uses
+`@ui/adapters/session/checkSession`. It is noted in [`../ui/CLAUDE.md`](../ui/CLAUDE.md) as known and not
+endorsed; check before moving that target file. Do not add a second. There were two: `stores/ui.ts` reached
+for `@ui/utils/currencies` to derive a currency that was a constant, and deleting the derivation removed the
+inversion with it.
 
 **No SDK is constructed here.** Stripe, Turso and Resend arrive as Effect service tags that the caller
 provides ([ADR 0002](../../../../adr/0002-effect-for-external-service-boundaries.md)), so a use-case stays

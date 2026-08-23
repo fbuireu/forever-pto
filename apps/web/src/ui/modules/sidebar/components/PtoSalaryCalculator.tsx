@@ -5,6 +5,7 @@ import { SlidingNumber } from "@ui/modules/core/animate/text/SlidingNumber";
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@ui/modules/core/primitives/InputGroup";
 import { ConditionalWrapper } from "@ui/modules/shared/ConditionalWrapper";
 import { SidebarFieldTooltip } from "@ui/modules/sidebar/components/SidebarFieldLabel";
+import { DEFAULT_CURRENCY, DEFAULT_CURRENCY_SYMBOL } from "@ui/utils/currencies";
 import { Euro } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
@@ -50,24 +51,17 @@ export const PtoSalaryCalculator = () => {
 	const [annualSalaryInput, setAnnualSalaryInput] = useState("");
 	const [unusedPTODays, setUnusedPTODays] = useState<number>(5);
 
-	const { currencySymbol, currency } = useUIStore(
-		useShallow((state) => ({
-			currencySymbol: state.currencySymbol,
-			currency: state.currency,
-		})),
-	);
-
 	const currencyPosition = useMemo(() => {
 		try {
 			const formatted = new Intl.NumberFormat(locale, {
 				style: "currency",
-				currency: currency,
+				currency: DEFAULT_CURRENCY,
 			}).format(0);
-			return formatted.startsWith(currencySymbol) ? ("before" as const) : ("after" as const);
+			return formatted.startsWith(DEFAULT_CURRENCY_SYMBOL) ? ("before" as const) : ("after" as const);
 		} catch {
 			return "before" as const;
 		}
-	}, [locale, currency, currencySymbol]);
+	}, [locale]);
 
 	const parsedSalary = Number.parseFloat(annualSalaryInput);
 	const annualSalary = Number.isFinite(parsedSalary) && parsedSalary > 0 ? parsedSalary : 0;
@@ -92,7 +86,7 @@ export const PtoSalaryCalculator = () => {
 				<p className="text-xs text-muted-foreground">{t("annualSalary")}</p>
 				<InputGroup>
 					<InputGroupAddon>
-						<InputGroupText>{currencySymbol}</InputGroupText>
+						<InputGroupText>{DEFAULT_CURRENCY_SYMBOL}</InputGroupText>
 					</InputGroupAddon>
 					<InputGroupInput
 						id="annualSalary"
@@ -135,7 +129,7 @@ export const PtoSalaryCalculator = () => {
 									value={unusedPTOValue}
 									decimalPlaces={0}
 									currencyPosition={currencyPosition}
-									currencySymbol={currencySymbol}
+									currencySymbol={DEFAULT_CURRENCY_SYMBOL}
 								/>
 							</div>
 							<p className="text-muted-foreground">{t("worthOfPaidVacation")}</p>
@@ -148,7 +142,7 @@ export const PtoSalaryCalculator = () => {
 									value={dailyRate}
 									decimalPlaces={0}
 									currencyPosition={currencyPosition}
-									currencySymbol={currencySymbol}
+									currencySymbol={DEFAULT_CURRENCY_SYMBOL}
 								/>
 								<span className="text-muted-foreground">{t("perDay")}</span>
 							</div>
@@ -161,7 +155,7 @@ export const PtoSalaryCalculator = () => {
 									value={normalHourlyRate}
 									decimalPlaces={2}
 									currencyPosition={currencyPosition}
-									currencySymbol={currencySymbol}
+									currencySymbol={DEFAULT_CURRENCY_SYMBOL}
 								/>
 								<span className="text-muted-foreground">{t("perHour")}</span>
 							</div>
@@ -177,7 +171,7 @@ export const PtoSalaryCalculator = () => {
 											value={effectiveHourlyRate}
 											decimalPlaces={2}
 											currencyPosition={currencyPosition}
-											currencySymbol={currencySymbol}
+											currencySymbol={DEFAULT_CURRENCY_SYMBOL}
 										/>
 										<span className="text-muted-foreground">{t("perHour")}</span>
 									</div>
@@ -195,7 +189,7 @@ export const PtoSalaryCalculator = () => {
 														value={unusedPTOValue}
 														decimalPlaces={0}
 														currencyPosition={currencyPosition}
-														currencySymbol={currencySymbol}
+														currencySymbol={DEFAULT_CURRENCY_SYMBOL}
 													/>
 												</span>
 											),

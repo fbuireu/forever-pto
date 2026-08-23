@@ -1,22 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { amountFormatter, DEFAULT_CURRENCY, getCurrencyForLocale } from "./currencies";
+import { amountFormatter, DEFAULT_CURRENCY, DEFAULT_CURRENCY_SYMBOL } from "./currencies";
 
-describe("getCurrencyForLocale", () => {
-	it("returns DEFAULT_CURRENCY as the currency code", () => {
-		const { currency } = getCurrencyForLocale("en");
-		expect(currency).toBe(DEFAULT_CURRENCY);
-	});
+describe("the currency constants", () => {
+	it.each(["en", "es", "ca", "it", "de", "fr"])(
+		"renders DEFAULT_CURRENCY as DEFAULT_CURRENCY_SYMBOL in %s, which is why neither is derived per locale",
+		(locale) => {
+			const symbol = new Intl.NumberFormat(locale, { style: "currency", currency: DEFAULT_CURRENCY })
+				.formatToParts(0)
+				.find(({ type }) => type === "currency")?.value;
 
-	it("returns the euro symbol", () => {
-		const { currencySymbol } = getCurrencyForLocale("en");
-		expect(currencySymbol).toBe("€");
-	});
-
-	it("returns the same object reference on repeated calls (cached)", () => {
-		const first = getCurrencyForLocale("de");
-		const second = getCurrencyForLocale("de");
-		expect(first).toEqual(second);
-	});
+			expect(symbol).toBe(DEFAULT_CURRENCY_SYMBOL);
+		},
+	);
 });
 
 describe("formatter reuse", () => {
@@ -26,7 +21,6 @@ describe("formatter reuse", () => {
 
 	it("keeps the zero-digit and the default-digit formatters apart, which one cache key must not collapse", () => {
 		expect(amountFormatter("en").format(10)).not.toContain(".");
-		expect(getCurrencyForLocale("en").currencySymbol).toBe("€");
 	});
 });
 

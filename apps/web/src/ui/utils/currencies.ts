@@ -33,13 +33,5 @@ const formatterFor = ({ locale, currency, fractionDigits }: FormatterKey): Intl.
 	return formatter;
 };
 
-const symbolOf = (formatter: Intl.NumberFormat, fallback: string) =>
-	formatter.formatToParts(0).find(({ type }) => type === CURRENCY_PART)?.value ?? fallback;
-
-export const getCurrencyForLocale = (locale: Locale) => ({
-	currency: DEFAULT_CURRENCY,
-	currencySymbol: symbolOf(formatterFor({ locale, currency: DEFAULT_CURRENCY }), DEFAULT_CURRENCY),
-});
-
 export const amountFormatter = (locale: Locale) =>
 	formatterFor({ locale, currency: DEFAULT_CURRENCY, fractionDigits: 0 });

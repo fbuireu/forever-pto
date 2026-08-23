@@ -10,6 +10,7 @@ import { ChevronLeft } from "@ui/modules/core/animate/icons/ChevronLeft";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { resolveApiErrorMessage } from "@ui/modules/shared/utils/helpers";
+import { DEFAULT_CURRENCY } from "@ui/utils/currencies";
 import { Skeleton } from "boneyard-js/react";
 import { AlertCircle } from "lucide-react";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
@@ -53,7 +54,6 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 	const [hasExpressOptions, setHasExpressOptions] = useState<boolean | null>(null);
 	const [isPending, startTransition] = useTransition();
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
-	const currency = useUIStore((state) => state.currency);
 	const setPremiumStatus = usePremiumStore((state) => state.setPremiumStatus);
 
 	useEffect(() => {
@@ -61,8 +61,9 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 	}, []);
 
 	const formatCurrency = useCallback(
-		(value: number) => format.number(value, { style: "currency", currency, minimumFractionDigits: 2 }),
-		[format, currency],
+		(value: number) =>
+			format.number(value, { style: "currency", currency: DEFAULT_CURRENCY, minimumFractionDigits: 2 }),
+		[format],
 	);
 
 	const formattedAmount = useMemo(() => formatCurrency(amount), [amount, formatCurrency]);

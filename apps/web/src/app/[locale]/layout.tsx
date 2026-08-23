@@ -8,7 +8,6 @@ import { DOCUMENT_BODY_CLASS } from "@app/fonts";
 import { LazyMotionProvider } from "@ui/modules/core/animate/providers/LazyMotionProvider";
 import { SkipToContent } from "@ui/modules/layout/SkipToContent";
 import { AppThemeProvider } from "@ui/modules/providers/AppThemeProvider";
-import { CurrencySync } from "@ui/modules/stores/CurrencySync";
 import { Analytics } from "@ui/modules/tracking/Analytics";
 import { BetterStackTracking } from "@ui/modules/tracking/BetterStackTracking";
 import { notFound } from "next/navigation";
@@ -39,7 +38,6 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
 				<SkipToContent label={t("skipToMainContent")} />
 				<BonesProvider />
 				<NextIntlClientProvider>
-					<CurrencySync />
 					<AppThemeProvider>
 						<LazyMotionProvider>
 							{children}
