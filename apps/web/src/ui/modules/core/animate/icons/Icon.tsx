@@ -120,10 +120,10 @@ function useAnimateIconContext() {
 	return context;
 }
 
-type ComposeEventHandlersParams<E extends SyntheticEvent<unknown>> = {
+interface ComposeEventHandlersParams<E extends SyntheticEvent<unknown>> {
 	theirs?: (event: E) => void;
 	ours?: (event: E) => void;
-};
+}
 
 function composeEventHandlers<E extends SyntheticEvent<unknown>>({ theirs, ours }: ComposeEventHandlersParams<E> = {}) {
 	return (event: E) => {

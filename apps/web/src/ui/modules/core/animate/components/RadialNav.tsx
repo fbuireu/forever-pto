@@ -96,10 +96,10 @@ function calculateIconOffset({
 	return centerOffset - buttonPadding + bias;
 }
 
-type WithDefaultsParams<T extends Record<string, unknown>> = {
+interface WithDefaultsParams<T extends Record<string, unknown>> {
 	defaults: T;
 	overrides?: Partial<T>;
-};
+}
 
 function withDefaults<T extends Record<string, unknown>>({ defaults, overrides }: WithDefaultsParams<T>) {
 	return { ...defaults, ...overrides };
