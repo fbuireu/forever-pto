@@ -13,21 +13,21 @@ in [`CONTEXT.md`](../../../../../CONTEXT.md).
 
 | File | Contents |
 | --- | --- |
-| `types.ts` | `Bridge`, `Suggestion`, `Metrics`, `FirstLastBreak`, the `FilterStrategy` const object plus its type, and the pair that guards the wire: `isFilterStrategy` and `DEFAULT_FILTER_STRATEGY` |
-| `const.ts` | `PTO_CONSTANTS` — every tunable in the engine; the unit and meaning of each are in [Constants](#constants) below |
-| `utils/cache.ts` | `getKey`, `getCombinationKey`, `createHolidaySet`, and the two `clear*` functions the caller must use |
-| `utils/helpers.ts` | `getAvailableWorkdays` (Workday enumeration) and `findBridges` (candidate generation and ranking) |
-| `utils/candidates.ts` | `findPlanningCandidates` — the Workdays and the Bridges, found once per run and handed to both generators |
-| `utils/selection.ts` | `resolveSelectedDays` — folds Manual Days in and Removed Days out of a Suggestion's day list |
-| `utils/budget.ts` | `measureBudget` — how much of the PTO budget a plan has spent, and the Remaining Budget |
-| `suggestions/generateSuggestions.ts` | The entry point: Workdays → Bridges → Strategy selector → Suggestion |
-| `suggestions/utils/selectors.ts` | `STRATEGY_ORDERING` — one `Ordering` per Strategy — plus `selectGreedily`, the single walk they all feed, and `selectBridgesForStrategy` which composes the two |
-| `window.ts` | `PlanningWindow`, `planningWindowMonths`, `MONTHS_IN_YEAR`, `MONTHS_IN_QUARTER` and `windowMonthCount`/`windowQuarterCount` |
-| `pipeline.ts` | `runPlanningPipeline` — the whole run: caches, pseudo-Holidays, budget, the two planning calls and the Metrics |
-| `alternatives/generateAlternatives.ts` | Re-runs selection under seven different Bridge orderings to produce distinct Alternatives |
-| `metrics/generateMetrics.ts` | Assembles the `Metrics` object for a Suggestion or an Alternative |
-| `metrics/utils/streaks.ts` | `freeStreaks` — the one scan of the free-day runs the plan produces |
-| `metrics/utils/helpers.ts` | One function per metric — Long Weekends, Rest Blocks, Max Work Streak, Longest Vacation, Worked Days per month, quarterly and monthly distribution — plus `windowMonthIndex`, which places a date in one of the buckets `window.ts` sizes |
+| [`types.ts`](./types.ts) | `Bridge`, `Suggestion`, `Metrics`, `FirstLastBreak`, the `FilterStrategy` const object plus its type, and the pair that guards the wire: `isFilterStrategy` and `DEFAULT_FILTER_STRATEGY` |
+| [`const.ts`](./const.ts) | `PTO_CONSTANTS` — every tunable in the engine; the unit and meaning of each are in [Constants](#constants) below |
+| [`utils/cache.ts`](./utils/cache.ts) | `getKey`, `getCombinationKey`, `createHolidaySet`, and the two `clear*` functions the caller must use |
+| [`utils/helpers.ts`](./utils/helpers.ts) | `getAvailableWorkdays` (Workday enumeration) and `findBridges` (candidate generation and ranking) |
+| [`utils/candidates.ts`](./utils/candidates.ts) | `findPlanningCandidates` — the Workdays and the Bridges, found once per run and handed to both generators |
+| [`utils/selection.ts`](./utils/selection.ts) | `resolveSelectedDays` — folds Manual Days in and Removed Days out of a Suggestion's day list |
+| [`utils/budget.ts`](./utils/budget.ts) | `measureBudget` — how much of the PTO budget a plan has spent, and the Remaining Budget |
+| [`suggestions/generateSuggestions.ts`](./suggestions/generateSuggestions.ts) | The entry point: Workdays → Bridges → Strategy selector → Suggestion |
+| [`suggestions/utils/selectors.ts`](./suggestions/utils/selectors.ts) | `STRATEGY_ORDERING` — one `Ordering` per Strategy — plus `selectGreedily`, the single walk they all feed, and `selectBridgesForStrategy` which composes the two |
+| [`window.ts`](./window.ts) | `PlanningWindow`, `planningWindowMonths`, `MONTHS_IN_YEAR`, `MONTHS_IN_QUARTER` and `windowMonthCount`/`windowQuarterCount` |
+| [`pipeline.ts`](./pipeline.ts) | `runPlanningPipeline` — the whole run: caches, pseudo-Holidays, budget, the two planning calls and the Metrics |
+| [`alternatives/generateAlternatives.ts`](./alternatives/generateAlternatives.ts) | Re-runs selection under seven different Bridge orderings to produce distinct Alternatives |
+| [`metrics/generateMetrics.ts`](./metrics/generateMetrics.ts) | Assembles the `Metrics` object for a Suggestion or an Alternative |
+| [`metrics/utils/streaks.ts`](./metrics/utils/streaks.ts) | `freeStreaks` — the one scan of the free-day runs the plan produces |
+| [`metrics/utils/helpers.ts`](./metrics/utils/helpers.ts) | One function per metric — Long Weekends, Rest Blocks, Max Work Streak, Longest Vacation, Worked Days per month, quarterly and monthly distribution — plus `windowMonthIndex`, which places a date in one of the buckets `window.ts` sizes |
 
 ## Public API
 
@@ -73,7 +73,7 @@ sidebar's budget control all route through this now. A new caller asking "how ma
 this rather than subtracting two lengths.
 
 `resolveSelectedDays` is the fourth export the outside world uses: `generateMetrics` applies it to its own
-input, and `CalendarExport.tsx` applies it again so the exported calendar contains exactly the days the
+input, and [`CalendarExport.tsx`](../../ui/modules/sidebar/components/CalendarExport.tsx) applies it again so the exported calendar contains exactly the days the
 Metrics were computed from. It matches on `toDateString()`, so a `Date` carrying a time component still
 lines up, and it returns the original array unchanged when there are no Manual or Removed Days. Everything
 else under `utils/` and `suggestions/utils/` is internal.
@@ -86,7 +86,7 @@ through the Manual Days — the pseudo-Holidays make them Free Days for the expa
 every Manual Day a span covered, and so were the monthly and quarterly distributions. Both planning pipelines
 omitted them once, while `toggleDaySelection` passed them, so the same unchanged plan reported two different
 Efficiency figures depending on which path had last written the Metrics — toggling a day on and off again was
-enough to make the number jump. The mirrored blocks in `worker.test.ts` and `holidays.test.ts` pin it on both
+enough to make the number jump. The mirrored blocks in [`worker.test.ts`](../../infrastructure/workers/worker.test.ts) and [`holidays.test.ts`](../../application/stores/holidays.test.ts) pin it on both
 sides.
 
 **The Planning Window is two numbers, and `window.ts` is where they become months.** `PlanningWindow` is
@@ -102,7 +102,7 @@ the plan in one year and scope Max Work Streak, Worked Days per month and every 
 the other, with no error and no way to see it. That is now unrepresentable. `serializeMonths`,
 `deserializeMonths`, the UI's duplicate constant and the UI's `getTotalMonths` are all gone with it.
 
-`window.test.ts` pins that the expansion and `windowMonthCount` agree, which is the property the two
+[`window.test.ts`](./window.test.ts) pins that the expansion and `windowMonthCount` agree, which is the property the two
 constants made possible to break; verified by desyncing them.
 
 `generateMetrics` still takes `year` and `carryOverMonths` separately, because Max Work Streak and Worked
@@ -142,7 +142,7 @@ only the order the greedy pass walks them in.
 `bonus` is `MULTI_DAY_BONUS` for Bridges meeting both `HIGH_VALUE_THRESHOLD_*` and `BASE_SCORE` otherwise.
 The divisor brings an absolute span onto the same scale as a ratio, so the two weights mean what they say.
 It then partitions that order so high-value Bridges come first, which is what stops a crowd of one-day
-Bridges squeezing out a long block — `selectors.test.ts` pins that with three 6-effective single-day Bridges
+Bridges squeezing out a long block — [`selectors.test.ts`](./suggestions/utils/selectors.test.ts) pins that with three 6-effective single-day Bridges
 that outscore a 3-day/9-effective block and lose to it anyway.
 
 **A Strategy is an `Ordering`, and the greedy walk is written once.** `STRATEGY_ORDERING` maps each
@@ -170,8 +170,8 @@ then fail once the ordering always ran.
 `generateAlternatives` routed anything not `BALANCED` into a `switch` whose default *was* `BALANCED` — so one
 bad string produced a Grouped Suggestion beside Balanced Alternatives. There is one fallback now,
 `STRATEGY_ORDERING[strategy] ?? STRATEGY_ORDERING[GROUPED]`, reached by both, and
-`generateSuggestions.test.ts` pins that an unknown Strategy *plans* identically to `GROUPED` rather than
-merely that it routes somewhere. `worker.ts` narrows with `isFilterStrategy` before any of this and was the
+[`generateSuggestions.test.ts`](./suggestions/generateSuggestions.test.ts) pins that an unknown Strategy *plans* identically to `GROUPED` rather than
+merely that it routes somewhere. [`worker.ts`](../../infrastructure/workers/worker.ts) narrows with `isFilterStrategy` before any of this and was the
 way in; the fallback is depth against a caller that has not been type-checked, not an error path.
 
 Leaving budget unspent is a correct outcome, not a gap to fill: the walk stops short only when every
@@ -210,7 +210,7 @@ Each used to own its copy: three near-identical loops and five separate construc
 "placed days ∪ Holidays" set. That is how the placed-day rule below came to be applied by one and not the
 other. A new metric about stretches of time off belongs here as a predicate, not as a fourth loop.
 
-**That set has one owner now: `dayOffKeys` in `metrics/utils/dayOff.ts`.** It was still being built by hand
+**That set has one owner now: `dayOffKeys` in [`metrics/utils/dayOff.ts`](./metrics/utils/dayOff.ts).** It was still being built by hand
 four times — in `freeStreaks`, `getTotalEffectiveDays`, `calculateMaxWorkStreak` and
 `getWorkedDaysPerMonth`, the fourth with an extra "in this year and not a weekend" filter. That fourth one
 *was* the bug: it subtracted Holidays and PTO Days as two independent counts and understated Worked Days per
@@ -271,7 +271,7 @@ reach it.
 `findPlanningCandidates` enumerates the Workdays and finds the Bridges; `runPlanningPipeline` calls it once
 and hands the result to both. They each carried the same four-step prologue until then — the weekend filter,
 `getAvailableWorkdays`, `findBridges`, then a selector — on identical arguments, so the whole candidate half
-of the engine ran twice per plan. `pipeline.test.ts` pins it: one `findBridges` call per run.
+of the engine ran twice per plan. [`pipeline.test.ts`](./pipeline.test.ts) pins it: one `findBridges` call per run.
 
 The weekend filter is gone from both, not moved: `createHolidaySet` drops weekend Holidays itself, and it is
 the only consumer of the `holidays` argument in either `getAvailableWorkdays` or `findBridges`, so the
@@ -301,7 +301,7 @@ claim about it — and that does not work here, so do not re-propose it. Past th
 expressible as a comparator: `presorted: true` is the only way to say "walk exactly this array". The
 alternatives are a branded ordered-array type, which buys type safety at the cost of ceremony on the hottest
 path in the engine, or a renamed flag, which is the same boolean wearing better clothes. The flag has one
-caller and `generateAlternatives.test.ts` pins the distinctness it protects.
+caller and [`generateAlternatives.test.ts`](./alternatives/generateAlternatives.test.ts) pins the distinctness it protects.
 
 **The seventh Alternative ordering sorts on `Math.sin` on purpose.** Six of the comparators in
 `generateAlternatives.ts` bias selection along a real axis — Efficiency, span, PTO cost, month, and
@@ -326,10 +326,10 @@ supplied and one test existed only to confirm was discarded. Both are gone.
 
 **Gain is the budget-based twin, and it lives in `utils/budget.ts` beside `measureBudget`.** `measureGain`
 answers `{ overBudget, gain }` from `totalEffectiveDays` and the whole budget. It was six characters of
-arithmetic inside a `useMemo` in `Summary.tsx` — a [`CONTEXT.md`](../../../../../CONTEXT.md) term with no
+arithmetic inside a `useMemo` in [`Summary.tsx`](../../ui/modules/pages/planner/Summary.tsx) — a [`CONTEXT.md`](../../../../../CONTEXT.md) term with no
 owner and no test — and the thing that makes it worth naming is the denominator: Gain divides by the
 **budget**, Efficiency by the **days placed**, so the two coincide only when the plan spends the budget in
-full. `budget.test.ts` pins that they part company, verified by swapping the denominator.
+full. [`budget.test.ts`](./utils/budget.test.ts) pins that they part company, verified by swapping the denominator.
 
 `overBudget` is deliberately not called a Bonus Day. It is Gain's numerator measured against the budget,
 which is a different quantity from the glossary's Bonus Day, and the planner guide explains why the badge
@@ -474,12 +474,12 @@ the selector stays assertable.
 
 Any test whose subject reaches `getKey` or `createHolidaySet` **must** call `clearDateKeyCache()` and
 `clearHolidayCache()` in `beforeEach`. Without it a case inherits the previous case's Holiday set and
-passes or fails for reasons that have nothing to do with what it asserts. `cache.test.ts` pins that
+passes or fails for reasons that have nothing to do with what it asserts. [`cache.test.ts`](./utils/cache.test.ts) pins that
 behaviour deliberately, including the case proving a second `createHolidaySet` call ignores its new
 argument.
 
 **The rule is per `describe`, not per file, and one block was missing it.**
-`describe('findBridges efficiency floor')` in `utils/helpers.test.ts` had no `beforeEach`, so every case in
+`describe('findBridges efficiency floor')` in [`utils/helpers.test.ts`](./utils/helpers.test.ts) had no `beforeEach`, so every case in
 it ran against whatever Holiday set the block above had left behind — invisibly, because its cases pass
 `holidays: []` and happened to assert things the stale set did not disturb. The first case added there that
 actually depended on its own Holidays failed with a span truncated by a set it never passed. A new
@@ -490,5 +490,5 @@ That covers `generateSuggestions.test.ts`, `generateAlternatives.test.ts`, `util
 `utils/cache.test.ts` and `suggestions/utils/selectors.test.ts`, which drives selectors that key their
 used-date sets with `getKey`. It does **not** cover the third entry point: nothing under `metrics/` imports
 the cache module, because `generateMetrics` reaches only `utils/selection.ts` and `metrics/utils/helpers.ts`
-and both match dates with `toDateString()`. Adding a clear there would be dead code, so `generateMetrics.test.ts`
-and `metrics/utils/helpers.test.ts` have none — do not "restore" it.
+and both match dates with `toDateString()`. Adding a clear there would be dead code, so [`generateMetrics.test.ts`](./metrics/generateMetrics.test.ts)
+and [`metrics/utils/helpers.test.ts`](./metrics/utils/helpers.test.ts) have none — do not "restore" it.

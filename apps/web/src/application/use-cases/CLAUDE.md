@@ -11,10 +11,10 @@ returns. It never runs itself, never reaches for a request, and never decides an
 
 | File | Exports | Combines |
 | --- | --- | --- |
-| `payment.ts` | `createPayment` | promo-code validation, Stripe intent creation, deferred persistence |
-| `activatePremium.ts` | `activateWithPayment`, `activateWithEmail` | Stripe intent lookup, payment repository, session minting |
-| `webhook.ts` | `processWebhookEvent` | payment repository, the `@domain/payment` event factory and handlers |
-| `contact.ts` | `sendContactEmail` | Zod validation, React Email render, Resend, deferred persistence |
+| [`payment.ts`](./payment.ts) | `createPayment` | promo-code validation, Stripe intent creation, deferred persistence |
+| [`activatePremium.ts`](./activatePremium.ts) | `activateWithPayment`, `activateWithEmail` | Stripe intent lookup, payment repository, session minting |
+| [`webhook.ts`](./webhook.ts) | `processWebhookEvent` | payment repository, the `@domain/payment` event factory and handlers |
+| [`contact.ts`](./contact.ts) | `sendContactEmail` | Zod validation, React Email render, Resend, deferred persistence |
 
 ## The entry-point convention
 
@@ -43,7 +43,7 @@ for protection: a throw inside it is a defect too, so it would buy nothing.
 
 Nothing in this folder calls `Effect.runPromise` or provides a layer. Each entry point — the route handlers
 under `src/app/api/` and the server actions in `@infrastructure/actions` — pipes the program through
-`Effect.provide(ApplicationLayer)` (`layers.ts`), maps the typed errors to a status, adds a
+`Effect.provide(ApplicationLayer)` ([`layers.ts`](../../infrastructure/layers.ts)), maps the typed errors to a status, adds a
 `catchAll` fallback for the untyped remainder, and runs it. Forgetting the layer is a compile error, not a
 runtime one.
 
@@ -82,7 +82,7 @@ caller can treat all four uniformly.
 
 `activatePremium.ts` is the code behind [ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md):
 there is no accounts table, so a succeeded payment record *is* the entitlement, and both exports end by
-minting the same 30-day session token via `createSession` in `session.ts`.
+minting the same 30-day session token via `createSession` in [`session.ts`](../../infrastructure/services/premium/session.ts).
 
 The two paths are deliberately asymmetric, and this is the trap:
 
@@ -150,9 +150,9 @@ Each file has a co-located `.test.ts`. The pattern is identical across the four 
 - Define local `run` / `runFail` / `runDeferred` helpers over that layer. `runFail` uses `Effect.flip` so the
   assertion can be `expect(err).toBeInstanceOf(ValidationError)` rather than a `rejects` matcher.
 - `vi.mock` the repository and service modules so they return `Effect.succeed(...)`; validation via
-  `zodParse.ts` is mocked to a pass-through where the flow under test is not the schema.
+  [`zodParse.ts`](../shared/utils/zodParse.ts) is mocked to a pass-through where the flow under test is not the schema.
 - Assert the deferred separately from the critical path — that persistence was *not* called during `run`,
   and *was* called after `runDeferred`. That split is the invariant, so it is what the tests protect.
-- `activatePremium.test.ts` additionally runs `activateWithEmail` against a layer providing `TursoService`
+- [`activatePremium.test.ts`](./activatePremium.test.ts) additionally runs `activateWithEmail` against a layer providing `TursoService`
   alone. The recovery path never logs, so `LoggerService` must stay out of its requirements channel; that
   test fails to compile — not at runtime — the moment a tag creeps back in.

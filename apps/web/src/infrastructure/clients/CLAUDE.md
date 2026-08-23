@@ -17,10 +17,10 @@ the next architecture pass does not re-propose deleting it.
 
 ## The tail Worker and the app share one log contract
 
-`better-stack/contract.ts` holds `LOG_SERVICE`, the four levels the app emits and `toLogLevel`. It is types
-and constants only — deliberately, because `workers/tail/index.ts` imports it by relative path and must not
+[`better-stack/contract.ts`](./logging/better-stack/contract.ts) holds `LOG_SERVICE`, the four levels the app emits and `toLogLevel`. It is types
+and constants only — deliberately, because [`workers/tail/index.ts`](../../../workers/tail/index.ts) imports it by relative path and must not
 pull `@logtail/edge` or `@opennextjs/cloudflare` into a Worker that has neither. `wrangler deploy --dry-run`
-over `workers/tail/wrangler.toml` confirms the bundle still builds at 1.87 KiB.
+over [`workers/tail/wrangler.toml`](../../../workers/tail/wrangler.toml) confirms the bundle still builds at 1.87 KiB.
 
 Both sides ship to the same BetterStack source and **shared no queryable field**. The app stamps
 `{ environment, service: 'forever-pto' }` on every entry; the tail Worker stamped
@@ -53,7 +53,7 @@ Four modules here are not services at all, for the reasons given below.
 | `logging/better-stack/` | `@logtail/edge` | `LoggerService` | `NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN`, `NEXT_PUBLIC_BETTER_STACK_INGESTING_URL` |
 | `payments/stripe/` | `stripe` | `StripeServerService` | `STRIPE_SECRET_KEY` (plus `STRIPE_WEBHOOK_SECRET`, see below) |
 
-All four are merged into `ApplicationLayer` in `src/infrastructure/layers.ts`. There is no partial layer: an
+All four are merged into `ApplicationLayer` in [`src/infrastructure/layers.ts`](../layers.ts). There is no partial layer: an
 entry point providing `ApplicationLayer` builds every client — which is why none of them may need anything at
 construction time.
 
@@ -81,7 +81,7 @@ export const FooServiceLive = Layer.sync(FooService, () => {
 
 `Layer.sync`, not `Layer.effect` — construction is synchronous in all four, and the SDK instance is captured
 in the closure so it is built once per layer, not once per call. The `catch` handler always maps to a tagged
-error from `src/infrastructure/errors.ts`; a client never lets a raw SDK exception into the error channel.
+error from [`src/infrastructure/errors.ts`](../errors.ts); a client never lets a raw SDK exception into the error channel.
 
 ## Invariants
 
@@ -118,11 +118,11 @@ seam no caller used. Adding it back means adding a caller in the same commit.
 
 Two clients, and the split is the trap:
 
-- `payments/stripe/serverService.ts` — the Effect service. Node SDK, API version pinned to `'2026-07-29.dahlia'`,
+- [`payments/stripe/serverService.ts`](./payments/stripe/serverService.ts) — the Effect service. Node SDK, API version pinned to `'2026-07-29.dahlia'`,
   and `StripeNode.createFetchHttpClient()` because the Workers runtime has no Node HTTP stack
   ([ADR 0004](../../../../../adr/0004-cloudflare-workers-as-deployment-target.md)). Every server-side Stripe
   call goes through this tag. It also exports `WebhookConfigurationError` and `isWebhookConfigurationError`.
-- `payments/stripe/client.ts` — browser only, `@stripe/stripe-js`. The `StripeClient` class is **not**
+- [`payments/stripe/client.ts`](./payments/stripe/client.ts) — browser only, `@stripe/stripe-js`. The `StripeClient` class is **not**
   exported; the module's only export is `getStripeClientInstance()`, a lazy singleton that throws if
   `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is absent. It uses Effect internally to sequence the fallible
   `loadStripe` → `confirmPayment` chain, but it never fails: `Effect.catchAll` turns everything into
@@ -151,9 +151,9 @@ exercises. Adding a method here means adding its caller and its error mapping in
 | Path | Why it is not an Effect service |
 | --- | --- |
 | `payments/stripe/client.ts` | Runs in the browser, where there is no layer to provide |
-| `logging/better-stack/client.ts` | Deliberate exception — `getBetterStackInstance()` is what stores, lookups and components use ([ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md)) |
-| `logging/better-stack/tracking.ts` | Not a logger at all: `track()` and `identifyUser()` push to the `window.betterstack` snippet injected by the UI layer's `modules/tracking/BetterStackTracking.tsx`. Both no-op when the snippet has not loaded |
-| `tutorial/driver/client.tsx` | Wraps driver.js, a DOM library. It renders a close icon into the popover, but never imports one: the icon arrives as the injected `closeIcon?: ReactNode` config field, so nothing here reaches into `@ui/*` |
+| [`logging/better-stack/client.ts`](./logging/better-stack/client.ts) | Deliberate exception — `getBetterStackInstance()` is what stores, lookups and components use ([ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md)) |
+| [`logging/better-stack/tracking.ts`](./logging/better-stack/tracking.ts) | Not a logger at all: `track()` and `identifyUser()` push to the `window.betterstack` snippet injected by the UI layer's [`modules/tracking/BetterStackTracking.tsx`](../../ui/modules/tracking/BetterStackTracking.tsx). Both no-op when the snippet has not loaded |
+| [`tutorial/driver/client.tsx`](./tutorial/driver/client.tsx) | Wraps driver.js, a DOM library. It renders a close icon into the popover, but never imports one: the icon arrives as the injected `closeIcon?: ReactNode` config field, so nothing here reaches into `@ui/*` |
 
 `logging/better-stack/client.ts` is the one to read before touching. **A log call cannot fail its caller, and
 that is the property everything else here leans on.** Three things hold it up, and all three are load-bearing:
@@ -190,7 +190,7 @@ detached container, with the animated close icon's motion controls and in-view o
 delegating, and the array is reset so the hook path calling it a second time is a no-op.
 
 `DriverClient` mounts a close button only when a `closeIcon` was injected — `onPopoverRender` leaves
-driver.js's own markup alone otherwise. The caller supplies it: the UI layer's `hooks/useTutorial.tsx` passes the
+driver.js's own markup alone otherwise. The caller supplies it: the UI layer's [`hooks/useTutorial.tsx`](../../ui/hooks/useTutorial.tsx) passes the
 element in the overrides argument to `start()`, which is what keeps the icon components on the `@ui` side of
 the layer boundary. Do not import a component here to "fix" a missing icon; pass one in.
 
@@ -201,7 +201,7 @@ value, and that a rejection becomes the right tagged error. Nothing here is test
 nothing here should be.
 
 A test that transitively imports `src/infrastructure/layers.ts` must mock the four Live layers with
-`Layer.empty` rather than set environment variables — `layers.test.ts` is the reference.
+`Layer.empty` rather than set environment variables — [`layers.test.ts`](../layers.test.ts) is the reference.
 
 Each of the three configured services also asserts the missing-variable path twice: that the layer still
 builds, and that the first call fails with that service's tagged error. The logger is the fourth and behaves

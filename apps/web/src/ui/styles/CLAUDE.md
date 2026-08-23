@@ -4,26 +4,26 @@
 
 Every stylesheet the app ships. Tailwind CSS v4 is configured entirely in CSS — there is no
 `tailwind.config.*` anywhere in the repo. PostCSS runs a single plugin (`@tailwindcss/postcss`, see
-`postcss.config.mjs`) and `index.css` is the whole configuration surface: tokens, custom variants and
+[`postcss.config.mjs`](../../../postcss.config.mjs)) and [`index.css`](./index.css) is the whole configuration surface: tokens, custom variants and
 custom utilities are all declared here in CSS at-rules.
 
 `index.css` is the entry point, imported through the `@styles/*` alias by `layout.tsx`,
-`global-error.tsx` and `global-not-found.tsx`. `lazy/index.css` is the deliberate exception — it is
-imported by `DriverStyles.tsx` so the tutorial CSS only loads when the tutorial does.
+[`global-error.tsx`](../../app/global-error.tsx) and [`global-not-found.tsx`](../../app/global-not-found.tsx). [`lazy/index.css`](./lazy/index.css) is the deliberate exception — it is
+imported by [`DriverStyles.tsx`](../modules/tutorial/DriverStyles.tsx) so the tutorial CSS only loads when the tutorial does.
 
 ## Files
 
 | File | Role |
 | --- | --- |
 | `index.css` | Declares the cascade layer order, then imports Tailwind, `tw-animate-css` and every partial below |
-| `base/index.css` | `@layer base` — element defaults: border/outline colour, body background and glow, scrollbar styling, the shared transition on buttons and shadcn slots |
-| `theme/index.css` | `@theme inline` — bridges the design tokens into Tailwind's namespaces; also the `dark` and `hover` custom variants |
-| `utilities/index.css` | `@utility hit-area-stable`, `hit-area-stable-tilt` and `quiet-link` |
-| `animations/index.css` | `@layer animations` — keyframes, the root view-transition, the reduced-motion block |
-| `global/index.css` | The design tokens: `:root` and the `[data-theme="dark"]` overrides. Deliberately unlayered |
-| `vendor/index.css` | `@layer vendor` — `flag-icons`, cookie-consent and boneyard-js overrides, `::selection` |
+| [`base/index.css`](./base/index.css) | `@layer base` — element defaults: border/outline colour, body background and glow, scrollbar styling, the shared transition on buttons and shadcn slots |
+| [`theme/index.css`](./theme/index.css) | `@theme inline` — bridges the design tokens into Tailwind's namespaces; also the `dark` and `hover` custom variants |
+| [`utilities/index.css`](./utilities/index.css) | `@utility hit-area-stable`, `hit-area-stable-tilt` and `quiet-link` |
+| [`animations/index.css`](./animations/index.css) | `@layer animations` — keyframes, the root view-transition, the reduced-motion block |
+| [`global/index.css`](./global/index.css) | The design tokens: `:root` and the `[data-theme="dark"]` overrides. Deliberately unlayered |
+| [`vendor/index.css`](./vendor/index.css) | `@layer vendor` — `flag-icons`, cookie-consent and boneyard-js overrides, `::selection` |
 | `lazy/index.css` | driver.js tutorial styling, loaded on demand |
-| `index.test.ts` | Reads the stylesheets as text and guards the invariants a reader is most likely to "tidy away" |
+| [`index.test.ts`](./index.test.ts) | Reads the stylesheets as text and guards the invariants a reader is most likely to "tidy away" |
 
 ## The cascade layer order
 
@@ -66,7 +66,7 @@ All tokens live in `global/index.css`, in three tiers:
    `--frame` flips between ink and cream with the theme, every shadow inverts for free; a shadow
    hard-coded to a hex value will look wrong in one theme.
 
-Dark mode overrides a subset of those under `[data-theme="dark"]`. `AppThemeProvider.tsx` configures
+Dark mode overrides a subset of those under `[data-theme="dark"]`. [`AppThemeProvider.tsx`](../modules/providers/AppThemeProvider.tsx) configures
 next-themes with `attribute='data-theme'`, so the attribute lands on `<html>`.
 
 `theme/index.css` is the bridge from tokens to utility classes. `@theme inline` matters: the generated
@@ -74,7 +74,7 @@ theme variable holds `var(--background)` rather than a resolved colour, so the `
 overrides propagate into `bg-background`, `text-muted-foreground`, `rounded-lg` and the rest at
 runtime. A token added to `global/index.css` is invisible to Tailwind until it is also mapped here.
 
-Fonts come from `fonts.ts` (next/font), which exposes `--font-space-grotesk`, `--font-bricolage`,
+Fonts come from [`fonts.ts`](../../app/fonts.ts) (next/font), which exposes `--font-space-grotesk`, `--font-bricolage`,
 `--font-instrument-serif` and `--font-jetbrains-mono`; `theme/index.css` maps them onto
 `--font-sans`, `--font-display`, `--font-serif` and `--font-mono`. Adding a family means editing both.
 
@@ -90,9 +90,9 @@ Fonts come from `fonts.ts` (next/font), which exposes `--font-space-grotesk`, `-
 ## quiet-link
 
 The nav-and-footer link treatment: a transparent 3px border that fills with `--accent` and `--frame` on
-hover, over 75ms. It was written out by hand **eleven times** — six in `Footer.tsx` alone, plus
+hover, over 75ms. It was written out by hand **eleven times** — six in [`Footer.tsx`](../modules/shared/footer/Footer.tsx) alone, plus
 `ContactButton`, `CookieButton`, `Navigation`, `Faq` and the planner's `Contact` — as a 190-character class
-string, and `Faq.tsx` had already started fixing it locally by hoisting the string to a module const, which
+string, and [`Faq.tsx`](../modules/pages/homepage/sections/Faq.tsx) had already started fixing it locally by hoisting the string to a module const, which
 made a seventh place for the value to live.
 
 It is a `@utility` rather than a `Button` variant because only three of the eleven sites are `Button`s. The
@@ -115,12 +115,12 @@ pins the hit area while the box moves — a transparent `::after` at `inset: 0` 
 (`z-index: -1`) that grows into the vacated space on `:hover` (`inset: 0 -8px -8px 0`) and on
 `:active` (`inset: -8px 0 0 -8px`, mirrored because the press moves the box the other way).
 
-**Add it to any element you give a `hover:-translate-*`.** Current users include `Button.tsx`,
-`Badge.tsx`, `Slider.tsx`, the animate primitives (`Accordion.tsx`, `Collapsible.tsx`, `Dialog.tsx`,
-`Sidebar.tsx`, `Tooltip.tsx`), the planner calendar day cells and the homepage sections.
+**Add it to any element you give a `hover:-translate-*`.** Current users include [`Button.tsx`](../modules/core/primitives/Button.tsx),
+[`Badge.tsx`](../modules/core/primitives/Badge.tsx), [`Slider.tsx`](../modules/core/primitives/Slider.tsx), the animate primitives ([`Accordion.tsx`](../modules/core/animate/base/Accordion.tsx), [`Collapsible.tsx`](../modules/core/animate/base/Collapsible.tsx), [`Dialog.tsx`](../modules/core/animate/base/Dialog.tsx),
+[`Sidebar.tsx`](../modules/core/animate/base/Sidebar.tsx), [`Tooltip.tsx`](../modules/core/animate/base/Tooltip.tsx)), the planner calendar day cells and the homepage sections.
 
 `hit-area-stable-tilt` is the variant for elements that *rotate* on hover rather than translate
-(`rotate-[-1deg]` → `hover:rotate-0`, in `Pricing.tsx` and `Testimonials.tsx`). A rotation moves all
+(`rotate-[-1deg]` → `hover:rotate-0`, in [`Pricing.tsx`](../modules/pages/homepage/sections/Pricing.tsx) and [`Testimonials.tsx`](../modules/pages/homepage/sections/Testimonials.tsx)). A rotation moves all
 four edges, so its hover inset is symmetric (`inset: -16px`) and it has no `:active` case.
 
 Both set `position: relative` through `:where(&)`, which contributes zero specificity, so a component
@@ -135,7 +135,7 @@ track; change the insets here and the copy will not follow.
 
 Biome's CSS parser rejects Tailwind-only at-rules by default — `@apply` in `base/`, `@theme inline` and
 `@custom-variant` in `theme/`, `@utility` in `utilities/` all parse as errors, and a parse error aborts
-formatting for the whole file. `biome.json` used to answer that by excluding those three folders from
+formatting for the whole file. [`biome.json`](../../../../../biome.json) used to answer that by excluding those three folders from
 `files.includes`, which gates the *whole* tool: they fell out of `pnpm format:all` and `pnpm lint:all`
 alike, and their formatting drifted apart — `utilities/index.css` on single quotes, `theme/index.css`
 on CRLF.
@@ -153,7 +153,7 @@ quotes throughout, LF, 120 columns — Biome's defaults, applied by the tool rat
   the content. Setting `background` (rather than `background-color`) anywhere on `body` wipes it.
 - `vendor/index.css` hides `#cc-main` with `display: none !important`. `vanilla-cookieconsent` still
   runs and still owns consent state; only its UI is suppressed, because the app renders its own
-  `CookieConsentDialog.tsx`. Do not "fix" this by disabling the library.
+  [`CookieConsentDialog.tsx`](../modules/shared/cookie-consent/CookieConsentDialog.tsx). Do not "fix" this by disabling the library.
 - `[data-boneyard] > div:not([data-boneyard-overlay]) { display: contents }` unwraps the boneyard-js
   skeleton wrapper so it does not break the grid or flex layout it sits inside.
 - `--container-8xl` in `theme/index.css` exists for one class, `max-w-8xl` in `planner/page.tsx`.

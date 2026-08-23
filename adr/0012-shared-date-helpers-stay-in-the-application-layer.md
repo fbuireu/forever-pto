@@ -13,8 +13,8 @@ take a `Date`, do plain-date arithmetic and hand a `Date` back, plus `formatDate
 which reach `Intl`. There is no I/O in it, no DOM, no framework, no store, and nothing application-specific.
 
 Three layers import it. The UI reads it in a dozen places, `application/` in three, and — the part that
-raises the question — `domain/calendar/` in four: `utils/helpers.ts`, `utils/cache.ts`,
-`metrics/utils/helpers.ts` and `metrics/utils/streaks.ts`. That is the domain importing from the layer above
+raises the question — `domain/calendar/` in four: [`utils/helpers.ts`](../apps/web/src/domain/calendar/utils/helpers.ts), [`utils/cache.ts`](../apps/web/src/domain/calendar/utils/cache.ts),
+[`metrics/utils/helpers.ts`](../apps/web/src/domain/calendar/metrics/utils/helpers.ts) and [`metrics/utils/streaks.ts`](../apps/web/src/domain/calendar/metrics/utils/streaks.ts). That is the domain importing from the layer above
 it, which is the wrong direction for a dependency arrow, and it is one of exactly two such imports the
 calendar domain has (`@application/dto/holiday/types` is the other).
 
@@ -23,7 +23,7 @@ the app, or a real `packages/` workspace member. Neither is as cheap as it looks
 
 - A fourth top-level directory beside `app/`, `application/`, `domain/`, `infrastructure/` and `ui/` needs a
   path alias, an entry in every layer contract that currently enumerates what it may import, a rule in
-  `tests/docs-consistency.test.ts` (which asserts every layer root has a `CLAUDE.md`), and an answer to the
+  [`tests/docs-consistency.test.ts`](../tests/docs-consistency.test.ts) (which asserts every layer root has a `CLAUDE.md`), and an answer to the
   question of what else belongs there — a tier with one file in it invites everything.
 - A `packages/` member contradicts [ADR 0010](./0010-apps-web-and-apps-docs-monorepo-layout.md), which says
   the tier appears the day a real shared package exists. One file that only `apps/web` imports is not that
@@ -36,7 +36,7 @@ the app, or a real `packages/` workspace member. Neither is as cheap as it looks
 What the import actually costs is also worth stating plainly, because it is close to nothing. The rule the
 calendar domain has to keep is *runtime* purity, not layer purity: it is evaluated inside a Web Worker with
 no DOM and no server context ([ADR 0001](./0001-planner-runs-in-the-browser.md)), so an import that touches
-`window`, `process` or a Node built-in breaks the planner in a way no server-side test catches. `dates.ts`
+`window`, `process` or a Node built-in breaks the planner in a way no server-side test catches. [`dates.ts`](../apps/web/src/application/shared/utils/dates.ts)
 touches none of them. The arrow points the wrong way on the diagram and correctly at runtime.
 
 ## Decision

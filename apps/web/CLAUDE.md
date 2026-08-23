@@ -9,7 +9,7 @@ Bridges that turn that budget into the longest stretches off, and reports how we
 **The whole planner runs in the browser** — the server holds payment and contact records and nothing else
 ([ADR 0001](../../adr/0001-planner-runs-in-the-browser.md)). The server side is six API route handlers
 (`check-session`, `contact`, `health`, `markdown`, `payment`, `payment/activate`), the Stripe webhook, a
-`.well-known` catch-all, `middleware.ts`, and some static rendering.
+`.well-known` catch-all, [`middleware.ts`](./src/middleware.ts), and some static rendering.
 
 Premium (advanced metrics, manual editing of a Suggestion) is unlocked by a Donation. There are no accounts:
 the payment record *is* the entitlement ([ADR 0008](../../adr/0008-premium-derived-from-payment.md)).
@@ -53,13 +53,13 @@ pnpm test:e2e           # playwright
 ```
 
 Env: copy `.env.example`. Local Worker secrets go in `.dev.vars`. The typed surface the build uses is
-`environment.d.ts` and nothing else — it hand-declares both `ProcessEnv` and the global `CloudflareEnv` the
+[`environment.d.ts`](./environment.d.ts) and nothing else — it hand-declares both `ProcessEnv` and the global `CloudflareEnv` the
 Cloudflare context is read through, and it is tracked.
 
 `pnpm cf:typegen` writes wrangler's own inference to `cloudflare-env.d.ts` in this folder. It is reference
 material, not part of the program: read it when adding a binding, then widen `environment.d.ts` by hand. Two
 lines keep it that way and both are load-bearing — `.gitignore` so it never gets committed, and an explicit
-`cloudflare-env.d.ts` entry in `tsconfig.json`'s `exclude`, because `include` is `**/*.ts` and would
+`cloudflare-env.d.ts` entry in [`tsconfig.json`](./tsconfig.json)'s `exclude`, because `include` is `**/*.ts` and would
 otherwise pull a package-root `.d.ts` straight into the program.
 
 Letting it in does not fail the way you would expect. It declares `CloudflareEnv` a second time, with `[vars]`
@@ -87,14 +87,14 @@ Path aliases (`tsconfig.json` `compilerOptions.paths`): `src/*`, `@app/*`, `@app
 `@infrastructure/*`, `@ui/*`, `@assets/*` (→ `src/ui/assets`), `@styles/*` (→ `src/ui/styles`), `@i18n/*`
 (→ `src/ui/i18n`). Prefer aliases over relative paths for cross-layer imports; keep same-folder imports
 relative. There is no `baseUrl`, so every target resolves against this `tsconfig.json` — the aliases needed
-no edit when the package moved. `vitest.config.ts` sets `resolve.tsconfigPaths`, so a new alias needs exactly
+no edit when the package moved. [`vitest.config.ts`](./vitest.config.ts) sets `resolve.tsconfigPaths`, so a new alias needs exactly
 one edit, in `tsconfig.json`.
 
-**Backticked paths in this guide and the ones below it are package-relative.** `src/domain/calendar/types.ts`
+**Backticked paths in this guide and the ones below it are package-relative.** [`src/domain/calendar/types.ts`](./src/domain/calendar/types.ts)
 means `apps/web/src/domain/calendar/types.ts`; the contract suite matches source-file citations by suffix, so
 both forms resolve.
 
-**Next owns `next-env.d.ts` outright, and it flaps.** A production build points its route import at
+**Next owns [`next-env.d.ts`](./next-env.d.ts) outright, and it flaps.** A production build points its route import at
 `.next/types/`, a dev run at `.next/dev/types/`, so the file shows as modified depending on which ran
 last. It is generated and says so; leave whichever version is committed alone rather than committing the
 flip back and forth.
@@ -104,7 +104,7 @@ every run and writes its own default for any key that is absent — `strict: fal
 land at the *next build* rather than at the deletion site, so deleting either as noise turns strict mode off,
 or lets JavaScript into a TypeScript-only codebase, a long way from the change.
 `tests/docs-consistency.test.ts` asserts both, asserts that this `tsconfig.json` stays beside the
-`next.config.ts` that rewrites it, and asserts that `cloudflare-env.d.ts` stays excluded and ignored.
+[`next.config.ts`](./next.config.ts) that rewrites it, and asserts that `cloudflare-env.d.ts` stays excluded and ignored.
 
 **TypeScript stays on 6 and Next stays on 16.2, and the pair is one decision, forced by Cloudflare.** Next 16.3
 crashes the deployed Worker on any route rendered at request time: `@opennextjs/cloudflare` 1.20.2 is the
@@ -165,7 +165,7 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
   `'use server'`, `'use cache'`) are strings, not comments, and are unaffected. Two things are **not**
   explanatory comments and stay: a `biome-ignore` suppression, which changes what the linter does and must
   carry its reason on the same line; and the do-not-edit banner on generated output
-  (`src/ui/modules/bones/registry.ts`). A suppression counts in either form, including the
+  ([`src/ui/modules/bones/registry.ts`](./src/ui/modules/bones/registry.ts)). A suppression counts in either form, including the
   `{/* biome-ignore … */}` shape JSX forces. The rule is asserted wherever a comment sits — opening a line,
   trailing code, or inside JSX.
 - **No ALL-CAPS in translation strings.** Uppercasing is a presentation choice — do it with a CSS class in the
@@ -178,7 +178,7 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
 ## Gotchas
 
 - **The calculation caches are cleared by the pipeline, not the engine and no longer by each caller.**
-  `cache.ts` memoises the holiday set under one fixed key and never evicts it, so a second run silently reuses
+  [`cache.ts`](./src/domain/calendar/utils/cache.ts) memoises the holiday set under one fixed key and never evicts it, so a second run silently reuses
   the first run's holidays. `runPlanningPipeline` clears both on entry; a generator still must not.
   [ADR 0006](../../adr/0006-caller-owned-calculation-caches.md), amended 2026-08-14.
 - **`Temporal` comes from `temporal-polyfill`, never the global.** The global does not resolve in the deployed
@@ -209,12 +209,12 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
   producing two different plans depending on which path ran. Do not reintroduce orchestration at a caller.
   See [`./src/application/stores/CLAUDE.md`](./src/application/stores/CLAUDE.md).
 - **The package version is load-bearing at runtime, not just at release time.** Seven source files import
-  `package.json` and read `version` to render the footer, the hero, the error page, the `/api/markdown` output
+  [`package.json`](./package.json) and read `version` to render the footer, the hero, the error page, the `/api/markdown` output
   and the `.well-known` agent-skills index. The docs site reads it too.
 
 ## Deploy
 
-Cloudflare Workers via wrangler (`wrangler.toml`): `.open-next/worker.js` as the entrypoint,
+Cloudflare Workers via wrangler ([`wrangler.toml`](./wrangler.toml)): `.open-next/worker.js` as the entrypoint,
 `.open-next/assets` served through the `ASSETS` binding, an R2 bucket for the incremental cache, a
 `PAYMENT_RATE_LIMITER` `[[ratelimits]]` binding for the payment limiter, smart placement, and a
 `forever-pto-tail` tail consumer, which is its own Worker under `workers/tail/` and is deployed by the `deploy-tail` job when its own files change. Only `env.production` binds a route (`forever-pto.com/*`);
@@ -222,13 +222,13 @@ Cloudflare Workers via wrangler (`wrangler.toml`): `.open-next/worker.js` as the
 `pr-<number>-forever-pto-development.fbuireu.workers.dev`, deleted when the PR closes.
 
 Every path in `wrangler.toml` is relative to the file itself, so the deploy runs with this package as the
-working directory. Build config lives in `next.config.ts` and `open-next.config.ts`.
+working directory. Build config lives in `next.config.ts` and [`open-next.config.ts`](./open-next.config.ts).
 
 **`NEXT_PUBLIC_SITE_URL` is resolved twice, and the two resolutions disagree on a preview.** No file reads
 `process.env.NEXT_PUBLIC_SITE_URL`; every read goes through the Cloudflare context. But that context resolves
 differently depending on when it is asked:
 
-- **Per request**, on the deployed worker, it is the Worker's runtime var. `_deploy-web.yml` passes
+- **Per request**, on the deployed worker, it is the Worker's runtime var. [`_deploy-web.yml`](../../.github/workflows/_deploy-web.yml) passes
   `--var NEXT_PUBLIC_SITE_URL:<inputs.url>`, so `sitemap.xml`, the API routes and the `.well-known` handler
   all name the host actually being served — a per-PR preview names itself.
 - **During `next build`**, there is no request, so `getCloudflareContext({ async: true })` falls back to
@@ -238,7 +238,7 @@ differently depending on when it is asked:
   `[locale]` shells carry it in `canonical`, `hrefLang` and `og:url` until their 24-hour revalidation.
 
 So a preview's `robots.txt` advertises the production sitemap. That is tolerated rather than fixed because
-previews sit behind Cloudflare Access — nothing crawls them, which is why `playwright.config.ts` has to send
+previews sit behind Cloudflare Access — nothing crawls them, which is why [`playwright.config.ts`](./playwright.config.ts) has to send
 `CF-Access-Client-Id`/`Secret` to reach one. Do not "fix" it by giving the build step the override without
 first checking whether the value is still correct for production, which shares that build path. The
 `NEXT_PUBLIC_SITE_URL` line inside `[env.development.vars]` is the fallback for a hand-run

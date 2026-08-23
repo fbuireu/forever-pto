@@ -10,15 +10,15 @@ Every React component the product renders. Nothing else in `src/ui/` holds compo
 | --- | --- | --- |
 | `core/` | The design system: `primitives/` plus the `animate/` layer. See [core/CLAUDE.md](./core/CLAUDE.md) | Yes, everywhere |
 | `pages/` | One folder per screen — `homepage/`, `planner/`, `legal/`, `error/`, `not-found/`. See [pages/planner/CLAUDE.md](./pages/planner/CLAUDE.md) | No, by definition |
-| `shared/` | Cross-page pieces that are not primitives: footer, donate, contact, cookie consent, JSON-LD, `shared/Logo.tsx`, `shared/Icon.tsx`, `shared/FormButtons.tsx`, `shared/StepOutcome.tsx`, `shared/SupportButton.tsx`, `shared/ConditionalWrapper.tsx`, `shared/WebMCP.tsx`, plus `shared/utils/helpers.ts` for the helpers those pieces need | Yes |
-| `layout/` | `layout/LegalLayout.tsx` only — the card chrome the four legal pages share | Between sibling routes |
-| `sidebar/` | `sidebar/AppSidebar.tsx` and its controls: country, region, year, Strategy, PTO Day budget, the calculators, calendar export | One screen, but not a page section |
-| `premium/` | The Premium gate and the Donation checkout: `premium/PremiumFeature.tsx`, `premium/PremiumModal.tsx`, `premium/UpgradeModal.tsx`, `premium/CheckoutForm.tsx` | Yes |
-| `providers/` | Context wrappers mounted once in the locale layout: `providers/AppThemeProvider.tsx`, `providers/BonesProvider.tsx` | Once |
-| `stores/` | `stores/StoresInitializer.tsx` — a render-nothing component that seeds the filters store from the `user-country` cookie | Once |
-| `tutorial/` | `tutorial/DriverStyles.tsx` only — a render-nothing component whose single job is to make the driver.js stylesheet import lazy | Once |
-| `tracking/` | The third-party script mounts: `tracking/Analytics.tsx` (Google gtag consent defaults and config) and `tracking/BetterStackTracking.tsx` (the Better Stack snippet, gated on the cookieconsent `betterStack` **service**, not the category) | Once |
-| `export/` | `export/HolidayDocument.tsx` — the `@react-pdf/renderer` document tree. Not DOM React; it renders in the PDF reconciler only | Once |
+| `shared/` | Cross-page pieces that are not primitives: footer, donate, contact, cookie consent, JSON-LD, [`shared/Logo.tsx`](./shared/Logo.tsx), [`shared/Icon.tsx`](./shared/Icon.tsx), [`shared/FormButtons.tsx`](./shared/FormButtons.tsx), [`shared/StepOutcome.tsx`](./shared/StepOutcome.tsx), [`shared/SupportButton.tsx`](./shared/SupportButton.tsx), [`shared/ConditionalWrapper.tsx`](./shared/ConditionalWrapper.tsx), [`shared/WebMCP.tsx`](./shared/WebMCP.tsx), plus [`shared/utils/helpers.ts`](./shared/utils/helpers.ts) for the helpers those pieces need | Yes |
+| `layout/` | [`layout/LegalLayout.tsx`](./layout/LegalLayout.tsx) only — the card chrome the four legal pages share | Between sibling routes |
+| `sidebar/` | [`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) and its controls: country, region, year, Strategy, PTO Day budget, the calculators, calendar export | One screen, but not a page section |
+| `premium/` | The Premium gate and the Donation checkout: [`premium/PremiumFeature.tsx`](./premium/PremiumFeature.tsx), [`premium/PremiumModal.tsx`](./premium/PremiumModal.tsx), [`premium/UpgradeModal.tsx`](./premium/UpgradeModal.tsx), [`premium/CheckoutForm.tsx`](./premium/CheckoutForm.tsx) | Yes |
+| `providers/` | Context wrappers mounted once in the locale layout: [`providers/AppThemeProvider.tsx`](./providers/AppThemeProvider.tsx), [`providers/BonesProvider.tsx`](./providers/BonesProvider.tsx) | Once |
+| `stores/` | [`stores/StoresInitializer.tsx`](./stores/StoresInitializer.tsx) — a render-nothing component that seeds the filters store from the `user-country` cookie | Once |
+| `tutorial/` | [`tutorial/DriverStyles.tsx`](./tutorial/DriverStyles.tsx) only — a render-nothing component whose single job is to make the driver.js stylesheet import lazy | Once |
+| `tracking/` | The third-party script mounts: [`tracking/Analytics.tsx`](./tracking/Analytics.tsx) (Google gtag consent defaults and config) and [`tracking/BetterStackTracking.tsx`](./tracking/BetterStackTracking.tsx) (the Better Stack snippet, gated on the cookieconsent `betterStack` **service**, not the category) | Once |
+| `export/` | [`export/HolidayDocument.tsx`](./export/HolidayDocument.tsx) — the `@react-pdf/renderer` document tree. Not DOM React; it renders in the PDF reconciler only | Once |
 | `bones/` | Generated skeleton data, see below. Not hand-written | n/a |
 
 `core/` is the only folder allowed to be imported by everything else. It is also the only folder that
@@ -54,20 +54,20 @@ into the other screen.
 hence the `.then((m) => ({ default: m.X }))` dance you will see repeatedly.
 
 **Tests sit next to the component** as `*.test.tsx`, never in a `__tests__/` folder. So do
-co-located stylesheets: `pages/planner/legend.module.css`, `pages/planner/contact.css` and
-`shared/donate/donate.css` live beside the component that imports them. Only cross-cutting CSS belongs
+co-located stylesheets: [`pages/planner/legend.module.css`](./pages/planner/legend.module.css), [`pages/planner/contact.css`](./pages/planner/contact.css) and
+[`shared/donate/donate.css`](./shared/donate/donate.css) live beside the component that imports them. Only cross-cutting CSS belongs
 in `src/ui/styles/`.
 
 **`*Client.tsx` means two different things.** The suffix is not a single convention, and reading it as
 one will mislead you:
 
 - A thin `'use client'` shell that `dynamic()`-imports the real component with `ssr: false`, purely to
-  keep a heavy dependency out of the server bundle — `shared/donate/DonateClient.tsx`,
-  `shared/cookie-consent/CookieConsentClient.tsx`. The shell takes the same props and forwards them.
+  keep a heavy dependency out of the server bundle — [`shared/donate/DonateClient.tsx`](./shared/donate/DonateClient.tsx),
+  [`shared/cookie-consent/CookieConsentClient.tsx`](./shared/cookie-consent/CookieConsentClient.tsx). The shell takes the same props and forwards them.
 - The interactive half of a server/client pair, where the server sibling does the fetching —
-  `sidebar/components/Countries.tsx` awaits `getCountries` and hands the result to
-  `sidebar/components/CountriesClient.tsx`. `pages/homepage/sections/HomepageCta.tsx` and
-  `pages/homepage/sections/CtaShapesClient.tsx` are the same pair for translated strings.
+  [`sidebar/components/Countries.tsx`](./sidebar/components/Countries.tsx) awaits `getCountries` and hands the result to
+  [`sidebar/components/CountriesClient.tsx`](./sidebar/components/CountriesClient.tsx). [`pages/homepage/sections/HomepageCta.tsx`](./pages/homepage/sections/HomepageCta.tsx) and
+  [`pages/homepage/sections/CtaShapesClient.tsx`](./pages/homepage/sections/CtaShapesClient.tsx) are the same pair for translated strings.
 
 Whichever it is, the export carries the file's name. Without barrel files every import site has to spell
 the module path anyway, so a file whose export is named something else just makes it unfindable.
@@ -82,7 +82,7 @@ planner itself is client-side end to end — [ADR 0001](../../../../../adr/0001-
 ## A three-step form modal
 
 `shared/StepOutcome.tsx` holds what `premium/UpgradeModal.tsx` and
-`shared/contact/ContactModal.tsx` were writing out twice: the `Step`
+[`shared/contact/ContactModal.tsx`](./shared/contact/ContactModal.tsx) were writing out twice: the `Step`
 (`INPUT | SUCCESS | ERROR`) const both declared identically, and the success and
 error panels they both render once the form is done.
 
@@ -116,7 +116,7 @@ Loading states go through `boneyard-js`, not hand-rolled shimmer divs. Three pie
 
 - `bones/*.bones.json` — captured DOM shapes, regenerated by `pnpm bones:build`. Output path and
   colours come from [boneyard.config.json](../../../boneyard.config.json).
-- `bones/registry.ts` — generated, carries a "do not edit" banner. It registers every bone under a
+- [`bones/registry.ts`](./bones/registry.ts) — generated, carries a "do not edit" banner. It registers every bone under a
   string name and calls `configureBoneyard`. The banner means *do not hand-author it*, not *never
   touch it*: its whole body is a pure function of the `.bones.json` files present and the config, so
   deleting a descriptor has to be paired with dropping its import and its `registerBones` entry, and
@@ -134,10 +134,10 @@ the component returns early and renders `fixture ?? children` when the CLI sets
 `window.__BONEYARD_BUILD`, so the capture has a shape to measure even when real data cannot be
 reached. So a `<Skeleton>` whose bone is missing and which passes no `fallback` renders an empty
 container for the whole loading window. Pass **both**, pointing at the same fixture component, which is
-what `pages/planner/CalendarList.tsx` and `pages/planner/Summary.tsx` already did and what
-`ManagementBar.tsx` and `premium/CheckoutForm.tsx` now do. The fixtures —
-`pages/planner/calendar/CalendarListFixture.tsx`, `pages/planner/PlannerPanelFixture.tsx`,
-`pages/planner/summary/SummaryFixture.tsx`, `premium/ExpressCheckoutFixture.tsx` — are hand-written
+what [`pages/planner/CalendarList.tsx`](./pages/planner/CalendarList.tsx) and [`pages/planner/Summary.tsx`](./pages/planner/Summary.tsx) already did and what
+[`ManagementBar.tsx`](./pages/planner/ManagementBar.tsx) and `premium/CheckoutForm.tsx` now do. The fixtures —
+[`pages/planner/calendar/CalendarListFixture.tsx`](./pages/planner/calendar/CalendarListFixture.tsx), [`pages/planner/PlannerPanelFixture.tsx`](./pages/planner/PlannerPanelFixture.tsx),
+[`pages/planner/summary/SummaryFixture.tsx`](./pages/planner/summary/SummaryFixture.tsx), [`premium/ExpressCheckoutFixture.tsx`](./premium/ExpressCheckoutFixture.tsx) — are hand-written
 approximations kept beside their component.
 
 **A stale `.bones.json` re-registers itself, so closing a drift means deleting the file.** The CLI
@@ -155,7 +155,7 @@ build would measure.
 
 ## Testing
 
-Vitest, `happy-dom`, co-located `.test.tsx`. Two exclusions in `vitest.config.ts` matter here:
+Vitest, `happy-dom`, co-located `.test.tsx`. Two exclusions in [`vitest.config.ts`](../../../../../vitest.config.ts) matter here:
 
 - `src/ui/modules/bones/**` — excluded from both the test run *and* the coverage report. It is
   generated data; asserting on it would only assert that the generator ran.
@@ -166,8 +166,8 @@ Coverage is deliberately uneven and you should not read a missing test as an ove
 passing. `core/animate/` is tested close to exhaustively; `core/primitives/` has no tests at all;
 `pages/`, `shared/` and `sidebar/` have tests only where logic lives (`ManagementBar`, `Summary` charts,
 homepage sections, `shared/utils/helpers.ts`, the two forms that render an API failure, and — because both
-held a defect that no type or lint rule can catch — `sidebar/components/PtoCalculator.tsx` and
-`PtoSalaryCalculator.tsx`, whose cases drive the real inputs and assert on what the field and the caption
+held a defect that no type or lint rule can catch — [`sidebar/components/PtoCalculator.tsx`](./sidebar/components/PtoCalculator.tsx) and
+[`PtoSalaryCalculator.tsx`](./sidebar/components/PtoSalaryCalculator.tsx), whose cases drive the real inputs and assert on what the field and the caption
 actually show). Components whose body is markup plus translation calls are left to the Playwright suite in
 `e2e/` instead.
 
@@ -179,7 +179,7 @@ nothing more. Reading "covered by e2e" as "its behaviour is asserted somewhere" 
 untested component survives a green suite. If a component has behaviour, it needs a co-located test.
 
 When a component is mocked in a sibling's test, mock the module path it actually imports —
-`premium/CheckoutForm.test.tsx` mocks both `boneyard-js/react` and `./ExpressCheckoutFixture`, because
+[`premium/CheckoutForm.test.tsx`](./premium/CheckoutForm.test.tsx) mocks both `boneyard-js/react` and `./ExpressCheckoutFixture`, because
 leaving either real drags the Stripe element tree into the test.
 
 ## Gotchas
@@ -189,10 +189,10 @@ bare `dispatchEvent(new CustomEvent(...))`, which resolves to `window`, and an e
 does not reach a listener on `document`. `tracking/BetterStackTracking.tsx` listened on `document`, so its
 `cc:onConsent`/`cc:onChange` handlers never fired and the snippet was never injected — `window.betterstack`
 stayed undefined and every `track()` and `identifyUser()` call no-opped for **every** consenting visitor.
-`shared/cookie-consent/CookieConsent.tsx` already used `window` for `cc:showPreferences`; the two now agree.
+[`shared/cookie-consent/CookieConsent.tsx`](./shared/cookie-consent/CookieConsent.tsx) already used `window` for `cc:showPreferences`; the two now agree.
 
 **One module answers what has been consented to, and every reader uses it.**
-`shared/cookie-consent/utils/consent.ts` holds the analytics service ids and three functions over them —
+[`shared/cookie-consent/utils/consent.ts`](./shared/cookie-consent/utils/consent.ts) holds the analytics service ids and three functions over them —
 `isServiceConsented`, `consentedAnalyticsServices`, `allAnalyticsServices`. `CookieConsent.tsx` derived that
 state inline at three separate call sites (the initial read, `onConsent` and `onChange`), and
 `tracking/BetterStackTracking.tsx` answered the same question through a different library call. Two
@@ -219,7 +219,7 @@ Left as is, deliberately, and written down so it does not read as an oversight.
 library keeps true while *any* service in the category is on. Turning Google Analytics off and leaving Better
 Stack on therefore granted `analytics_storage` and fired a `page_view` — Google Analytics writing `_ga` for a
 user who had just refused it, and the mirror case mounting Better Stack for someone who had refused *that*.
-Both now read `acceptedService(id, 'analytics')`. A new service in `config/config.ts` needs its own gate; the
+Both now read `acceptedService(id, 'analytics')`. A new service in [`config/config.ts`](./shared/cookie-consent/config/config.ts) needs its own gate; the
 category is not a proxy for it.
 
 **The footer's "Manage cookies" was dead while the first-visit banner was up.** `CookieButton` dispatches
@@ -245,8 +245,8 @@ placeholder could never return. Hold a text field as a string and parse at the p
 state is derived, not stored.
 
 `core/animate/primitives/` is a second, lower layer under `core/animate/` — the unstyled wrappers over
-`@base-ui/react` that `core/animate/base/*` builds on. `MotionSlot.tsx` there is the shared `asChild`
-mechanism used by `core/animate/effects/AutoHeight.tsx` and `core/animate/icons/Icon.tsx`.
+`@base-ui/react` that `core/animate/base/*` builds on. [`MotionSlot.tsx`](./core/animate/primitives/animate/MotionSlot.tsx) there is the shared `asChild`
+mechanism used by [`core/animate/effects/AutoHeight.tsx`](./core/animate/effects/AutoHeight.tsx) and [`core/animate/icons/Icon.tsx`](./core/animate/icons/Icon.tsx).
 
 It is internal to `core/animate/`, and that is now true rather than aspirational — it has zero importers
 from outside. It had three. `DevFooter` took `RotatingTextContainer`, which turned out to publish into a
@@ -254,22 +254,22 @@ context nothing read; it is deleted. `CookieConsentDialog` and `AllowPastDays` t
 unstyled — it carried the full frame and shadow — so it moved up to `core/animate/base/` rather than getting
 a wrapper. Promote what a feature needs; do not reach in.
 
-`tutorial/DriverStyles.tsx` renders `null` and exists solely to make its CSS import lazy — `useTutorial.tsx`
+`tutorial/DriverStyles.tsx` renders `null` and exists solely to make its CSS import lazy — [`useTutorial.tsx`](../hooks/useTutorial.tsx)
 dynamic-imports it alongside the driver client so the tutorial stylesheet never lands in the initial
 bundle. Deleting the "empty" component silently ships the CSS eagerly.
 
 `export/HolidayDocument.tsx` is JSX but not DOM. Its elements come from `@react-pdf/renderer` and its
 styles are `StyleSheet.create` objects, so Tailwind classes and `cn()` do nothing there. It is loaded
-through a dynamic import inside an Effect program in `sidebar/components/CalendarExport.tsx`; importing
+through a dynamic import inside an Effect program in [`sidebar/components/CalendarExport.tsx`](./sidebar/components/CalendarExport.tsx); importing
 it statically would pull the whole PDF renderer into the client bundle.
 
 `data-tutorial` attributes scattered through `sidebar/` and `pages/planner/` are the tutorial's anchors, and
-both sides now name them through `TUTORIAL_ANCHOR` in `tutorial/anchors.ts` rather than as strings. They look
+both sides now name them through `TUTORIAL_ANCHOR` in [`tutorial/anchors.ts`](./tutorial/anchors.ts) rather than as strings. They look
 like dead attributes and are not — **but nine of them were**. The components declared nineteen anchors while
 `useTutorial` targeted ten, and the gap was invisible in either direction: a step whose anchor is not
 rendered lands on driver.js's dummy-element fallback with nothing highlighted and no error, which is exactly
 how the mobile `open`-vs-`openMobile` bug stayed hidden. The nine unclaimed ones are gone; a future step adds
-its anchor back through the const. `tutorial/anchors.test.ts` reads the component tree and asserts the two
+its anchor back through the const. [`tutorial/anchors.test.ts`](./tutorial/anchors.test.ts) reads the component tree and asserts the two
 sets match in both directions.
 
 `resolveApiErrorMessage` in `shared/utils/helpers.ts` tells a machine code from prose by shape. A
@@ -284,23 +284,23 @@ Payment analytics send the machine code, never the rendered message. `premium/Ch
 the user `resolveApiErrorMessage(...)` and passes the raw `result.error` to `track`; a translated
 string would split one failure mode across six locales.
 
-The Stripe Elements appearance in `shared/donate/Donate.tsx` repeats the theme as hex literals. The
+The Stripe Elements appearance in [`shared/donate/Donate.tsx`](./shared/donate/Donate.tsx) repeats the theme as hex literals. The
 Elements iframe cannot read this app's CSS custom properties, so the light and dark objects mirror
 `--card`, `--input`, `--foreground`, `--frame`, `--accent` (identical in both modes), `--secondary` and
-`--muted-foreground` from `src/ui/styles/global/index.css` by value. Change a token there and this
+`--muted-foreground` from [`src/ui/styles/global/index.css`](../styles/global/index.css) by value. Change a token there and this
 object has to be changed by hand, or the donation form drifts from the page around it.
 
 **One module answers how a sidebar control is labelled, and its interface is where the two accessibility
-defects came from.** `sidebar/components/SidebarFieldLabel.tsx` exports `SidebarFieldLabel` (icon, title,
+defects came from.** [`sidebar/components/SidebarFieldLabel.tsx`](./sidebar/components/SidebarFieldLabel.tsx) exports `SidebarFieldLabel` (icon, title,
 optional tooltip, optional `controlId`) and `SidebarFieldTooltip` (the six-line
 provider/trigger/content block, which four widgets use without a label around it). Eleven call sites had
 written both out by hand, and the copies had drifted in ways nothing could see:
 
-- **`PtoDays.tsx` carried `<label htmlFor='remaining-days'>` over a read-only status group, and no element
+- **[`PtoDays.tsx`](./sidebar/components/PtoDays.tsx) carried `<label htmlFor='remaining-days'>` over a read-only status group, and no element
   in the tree has that id.** A label naming nothing is not inert — it is a promise to a screen reader that
   never resolves. It is a heading, so it takes no `controlId` now and renders a `div`; the module's test
   fails if that branch emits a `<label>` instead.
-- **`Years.tsx` used `id='years'` twice** — on the popover trigger and again on the `Command` inside the
+- **[`Years.tsx`](./sidebar/components/Years.tsx) used `id='years'` twice** — on the popover trigger and again on the `Command` inside the
   popover. With the popover open the document held two `#years`, and the label resolved to whichever came
   first. Nothing referenced the second one; it is gone.
 
@@ -309,6 +309,6 @@ keeps `font-medium` with no vertical margin, both passed through `className` so 
 That drift is real but cosmetic, and flattening it silently would have been a visual change hiding inside a
 refactor.
 
-`BRIDGE_WEEK` in `pages/homepage/sections/Features.tsx` is the shape the card's copy describes:
+`BRIDGE_WEEK` in [`pages/homepage/sections/Features.tsx`](./pages/homepage/sections/Features.tsx) is the shape the card's copy describes:
 Workdays Monday to Wednesday, a Thursday Holiday, a Friday PTO Day, then the weekend — a Bridge.
 Reordering the array desyncs the illustration from the translated text beside it.

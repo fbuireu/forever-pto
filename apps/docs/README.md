@@ -51,7 +51,7 @@ wrangler.toml      two environments: production and development
 
 Read [`CLAUDE.md`](./CLAUDE.md) before changing anything: it carries the boundary rules — which app
 modules may be imported into a demo, why a component that needs an app context gets the context rather
-than a note saying it cannot be rendered, and why `src/ui/styles/index.css` must never be imported here.
+than a note saying it cannot be rendered, and why [`src/ui/styles/index.css`](../web/src/ui/styles/index.css) must never be imported here.
 
 ## Deploying
 
@@ -67,5 +67,5 @@ this package stays at `0.0.0` permanently and nothing reads it.
   filenames and anything untranslated falls back to English automatically.
 - **Prose names a file, never a volatile literal.** Where the app exports a constant, import it and
   interpolate, so a rename breaks the build instead of rotting the page.
-- `tests/docs-consistency.test.ts` checks that every source file these pages cite in backticks still
+- [`tests/docs-consistency.test.ts`](../../tests/docs-consistency.test.ts) checks that every source file these pages cite in backticks still
   exists. It found seven that did not.

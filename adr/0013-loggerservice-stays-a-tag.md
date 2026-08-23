@@ -16,7 +16,7 @@ real one — it reads as pure ceremony.
 The cost is real and spread across the tree. Eleven production modules carry `LoggerService` in their `R`:
 both payment handlers, four use-cases, `zodParse`, the webhook route, the payments confirmation service and
 the Premium activation operation. Twelve test files build a five-method `Layer.succeed(LoggerService, { … })`
-stub. `api/operations/activatePremium.ts` opens an `Effect.gen` inside its `catchAll` for no reason other
+stub. [`api/operations/activatePremium.ts`](../apps/web/src/infrastructure/api/operations/activatePremium.ts) opens an `Effect.gen` inside its `catchAll` for no reason other
 than to `yield*` a logger. And [ADR 0002](./0002-effect-for-external-service-boundaries.md) already places
 logging *outside* Effect — BetterStack has both a tag and a plain singleton, and the singleton is what the
 stores, the lookups and the components use — so deleting the tag would be that decision carried to
