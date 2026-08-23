@@ -53,7 +53,7 @@ const highValueFirst: Ordering = (bridges) => [
 
 export const STRATEGY_ORDERING: Record<FilterStrategy, Ordering> = {
 	[FilterStrategy.GROUPED]: (bridges) => bridges.toSorted(compareGrouped),
-	[FilterStrategy.OPTIMIZED]: (bridges) => bridges.toSorted(compareByEfficiency),
+	[FilterStrategy.OPTIMIZED]: (bridges) => bridges.toSorted((a, b) => compareByEfficiency({ a, b })),
 	[FilterStrategy.BALANCED]: (bridges) => highValueFirst(byScore(bridges)),
 };
 

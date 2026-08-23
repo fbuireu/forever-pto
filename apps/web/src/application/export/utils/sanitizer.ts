@@ -29,4 +29,9 @@ const fold = (line: string) => {
 	return segments.join(CONTINUATION);
 };
 
-export const contentLine = (name: string, value: string) => fold(`${name}:${escapeValue(value)}`);
+export interface ContentLineParams {
+	name: string;
+	value: string;
+}
+
+export const contentLine = ({ name, value }: ContentLineParams) => fold(`${name}:${escapeValue(value)}`);

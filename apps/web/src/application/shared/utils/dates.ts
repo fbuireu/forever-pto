@@ -7,20 +7,37 @@ const toPlainDate = (date: Date): Temporal.PlainDate =>
 
 const toDate = (pd: Temporal.PlainDate): Date => new Date(pd.year, pd.month - 1, pd.day);
 
-export const isSameDay = (a: Date, b: Date): boolean => toPlainDate(a).equals(toPlainDate(b));
+export interface DatePairParams {
+	a: Date;
+	b: Date;
+}
 
-export const isSameMonth = (a: Date, b: Date): boolean => {
+export const isSameDay = ({ a, b }: DatePairParams): boolean => toPlainDate(a).equals(toPlainDate(b));
+
+export const isSameMonth = ({ a, b }: DatePairParams): boolean => {
 	const pa = toPlainDate(a);
 	const pb = toPlainDate(b);
 	return pa.year === pb.year && pa.month === pb.month;
 };
 
-export const isBefore = (date: Date, dateToCompare: Date): boolean =>
+export interface IsBeforeParams {
+	date: Date;
+	dateToCompare: Date;
+}
+
+export const isBefore = ({ date, dateToCompare }: IsBeforeParams): boolean =>
 	Temporal.PlainDate.compare(toPlainDate(date), toPlainDate(dateToCompare)) < 0;
 
-export const compareAsc = (a: Date, b: Date): number => Temporal.PlainDate.compare(toPlainDate(a), toPlainDate(b));
+export const compareAsc = ({ a, b }: DatePairParams): number =>
+	Temporal.PlainDate.compare(toPlainDate(a), toPlainDate(b));
 
-export const isWithinInterval = (date: Date, { start, end }: { start: Date; end: Date }): boolean => {
+export interface IsWithinIntervalParams {
+	date: Date;
+	start: Date;
+	end: Date;
+}
+
+export const isWithinInterval = ({ date, start, end }: IsWithinIntervalParams): boolean => {
 	const pd = toPlainDate(date);
 	return (
 		Temporal.PlainDate.compare(pd, toPlainDate(start)) >= 0 && Temporal.PlainDate.compare(pd, toPlainDate(end)) <= 0
@@ -32,13 +49,28 @@ export const isWeekend = (date: Date): boolean => {
 	return dayOfWeek === 6 || dayOfWeek === 7;
 };
 
-export const addDays = (date: Date, days: number): Date => toDate(toPlainDate(date).add({ days }));
+export interface AddDaysParams {
+	date: Date;
+	days: number;
+}
 
-export const addMonths = (date: Date, months: number): Date => toDate(toPlainDate(date).add({ months }));
+export const addDays = ({ date, days }: AddDaysParams): Date => toDate(toPlainDate(date).add({ days }));
 
-export const subMonths = (date: Date, months: number): Date => toDate(toPlainDate(date).subtract({ months }));
+export interface MonthShiftParams {
+	date: Date;
+	months: number;
+}
 
-export const differenceInDays = (dateLeft: Date, dateRight: Date): number =>
+export const addMonths = ({ date, months }: MonthShiftParams): Date => toDate(toPlainDate(date).add({ months }));
+
+export const subMonths = ({ date, months }: MonthShiftParams): Date => toDate(toPlainDate(date).subtract({ months }));
+
+export interface DifferenceInDaysParams {
+	dateLeft: Date;
+	dateRight: Date;
+}
+
+export const differenceInDays = ({ dateLeft, dateRight }: DifferenceInDaysParams): number =>
 	toPlainDate(dateRight).until(toPlainDate(dateLeft), { largestUnit: "days" }).days;
 
 export const startOfDay = (date: Date): Date => toDate(toPlainDate(date));
@@ -163,6 +195,6 @@ export const getWeekdayNames = ({ locale, weekStartsOn = 0, format = "short" }: 
 	const weekStart = startOfWeek(anchor, { weekStartsOn });
 
 	return Array.from({ length: 7 }, (_, i) =>
-		formatDate({ date: addDays(weekStart, i), locale, format: WEEKDAY_FORMAT[format] }),
+		formatDate({ date: addDays({ date: weekStart, days: i }), locale, format: WEEKDAY_FORMAT[format] }),
 	);
 };

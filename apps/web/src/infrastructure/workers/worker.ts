@@ -41,7 +41,7 @@ globalThis.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
 		const response: WorkerResponse = {
 			type: WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT,
 			requestId,
-			payload: serializeSuggestionResult(suggestion, alternatives),
+			payload: serializeSuggestionResult({ suggestion, alternatives }),
 		};
 
 		self.postMessage(response);

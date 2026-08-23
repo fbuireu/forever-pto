@@ -44,8 +44,8 @@ export function freeStreaks({ placedDays, holidays }: FreeStreaksParams): FreeSt
 	};
 
 	const scan = eachDayOfInterval({
-		start: addDays(firstDate, -PTO_CONSTANTS.METRICS.STREAK_SCAN_MARGIN_DAYS),
-		end: addDays(lastDate, PTO_CONSTANTS.METRICS.STREAK_SCAN_MARGIN_DAYS),
+		start: addDays({ date: firstDate, days: -PTO_CONSTANTS.METRICS.STREAK_SCAN_MARGIN_DAYS }),
+		end: addDays({ date: lastDate, days: PTO_CONSTANTS.METRICS.STREAK_SCAN_MARGIN_DAYS }),
 	});
 
 	for (const day of scan) {

@@ -23,13 +23,23 @@ import {
 import { dayKey, dayOffKeys } from "./dayOff";
 import type { FreeStreak } from "./streaks";
 
-export const windowMonthIndex = (date: Date, { year }: Pick<PlanningWindow, "year">) =>
+export interface WindowMonthIndexParams {
+	date: Date;
+	window: Pick<PlanningWindow, "year">;
+}
+
+export const windowMonthIndex = ({ date, window: { year } }: WindowMonthIndexParams) =>
 	(getYear(date) - year) * MONTHS_IN_YEAR + getMonth(date);
 
-export function getMonthlyDist(days: Date[], window: PlanningWindow) {
+export interface GetMonthlyDistParams {
+	days: Date[];
+	window: PlanningWindow;
+}
+
+export function getMonthlyDist({ days, window }: GetMonthlyDistParams) {
 	const monthlyDist = new Array(windowMonthCount(window)).fill(0);
 	days.forEach((date) => {
-		const index = windowMonthIndex(date, window);
+		const index = windowMonthIndex({ date, window });
 		if (index >= 0 && index < monthlyDist.length) monthlyDist[index]++;
 	});
 	return monthlyDist;
@@ -46,10 +56,10 @@ export function getLongBlocksPerQuarter({ streaks, window }: GetLongBlocksPerQua
 	for (const streak of streaks) {
 		if (streak.length < PTO_CONSTANTS.METRICS.LONG_BLOCK_MINIMUM_DAYS || !streak.hasPlacedDay) continue;
 
-		const start = streak.days.find((day) => windowMonthIndex(day, window) >= 0);
+		const start = streak.days.find((day) => windowMonthIndex({ date: day, window }) >= 0);
 		if (start === undefined) continue;
 
-		const quarter = Math.floor(windowMonthIndex(start, window) / MONTHS_IN_QUARTER);
+		const quarter = Math.floor(windowMonthIndex({ date: start, window }) / MONTHS_IN_QUARTER);
 		if (quarter < longBlocksPerQuarter.length) longBlocksPerQuarter[quarter]++;
 	}
 
@@ -98,7 +108,7 @@ export const calculateRestBlocks = (dates: Date[]) => {
 		const curr = sorted[i];
 		const prev = sorted[i - 1];
 		if (curr === undefined || prev === undefined) continue;
-		const daysDiff = differenceInDays(curr, prev);
+		const daysDiff = differenceInDays({ dateLeft: curr, dateRight: prev });
 		if (daysDiff > PTO_CONSTANTS.METRICS.REST_BLOCK_SEPARATION_DAYS) blocks++;
 	}
 
@@ -156,11 +166,16 @@ export const getFirstLastBreak = ({ dates, locale }: GetFirstLastBreak) => {
 	};
 };
 
-export const calculateQuarterDistribution = (dates: Date[], window: PlanningWindow) => {
+export interface CalculateQuarterDistributionParams {
+	dates: Date[];
+	window: PlanningWindow;
+}
+
+export const calculateQuarterDistribution = ({ dates, window }: CalculateQuarterDistributionParams) => {
 	const quarters = new Array(windowQuarterCount(window)).fill(0);
 
 	dates?.forEach((date) => {
-		const quarter = Math.floor(windowMonthIndex(date, window) / MONTHS_IN_QUARTER);
+		const quarter = Math.floor(windowMonthIndex({ date, window }) / MONTHS_IN_QUARTER);
 		if (quarter >= 0 && quarter < quarters.length) quarters[quarter]++;
 	});
 

@@ -130,12 +130,16 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 						discountInfo: result.discountInfo ?? null,
 					});
 				} catch (error) {
-					logClientError("Payment initialization failed in Donate component", error, {
-						amount: data.amount,
-						hasPromoCode: !!data.promoCode,
-						promoCodeLength: data.promoCode?.length,
-						currency: DEFAULT_CURRENCY,
-						locale,
+					logClientError({
+						message: "Payment initialization failed in Donate component",
+						error,
+						context: {
+							amount: data.amount,
+							hasPromoCode: !!data.promoCode,
+							promoCodeLength: data.promoCode?.length,
+							currency: DEFAULT_CURRENCY,
+							locale,
+						},
 					});
 					if (error instanceof PromoCodeError) {
 						const descriptions = {

@@ -120,7 +120,11 @@ export const HolidayFormModal = ({
 				toast.success(t("successTitle"), { description: successDescription(data, formattedDate) });
 				handleClose();
 			} catch (error) {
-				logClientError("Error committing holiday", error, { component: "HolidayFormModal", mode });
+				logClientError({
+					message: "Error committing holiday",
+					error,
+					context: { component: "HolidayFormModal", mode },
+				});
 				toast.error(t("errorTitle"), { description: t("errorDescription") });
 			}
 		});

@@ -71,7 +71,7 @@ export const handlePaymentSucceeded = (
 			return;
 		}
 
-		yield* updatePaymentStatus(event.paymentId, event.status);
+		yield* updatePaymentStatus({ paymentIntentId: event.paymentId, status: event.status });
 
 		yield* updateCharge(event);
 	});

@@ -34,7 +34,7 @@ describe("handlePaymentFailed", () => {
 	it("calls updatePaymentStatus with paymentId and status", async () => {
 		const { updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
 		await run(handlePaymentFailed(EVENT));
-		expect(updatePaymentStatus).toHaveBeenCalledWith("pi_test", "requires_payment_method");
+		expect(updatePaymentStatus).toHaveBeenCalledWith({ paymentIntentId: "pi_test", status: "requires_payment_method" });
 	});
 
 	it("resolves on success", async () => {

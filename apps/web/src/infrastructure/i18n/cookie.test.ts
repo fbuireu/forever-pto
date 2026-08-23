@@ -12,7 +12,7 @@ describe("the NEXT_LOCALE policy", () => {
 	it("writes the whole policy and nothing besides the value", () => {
 		const { response, cookiesSet } = makeResponse();
 
-		setLocaleCookie(response, ES);
+		setLocaleCookie({ response, value: ES });
 
 		expect(cookiesSet).toHaveBeenCalledWith({
 			name: LOCALE_COOKIE,
@@ -26,7 +26,7 @@ describe("the NEXT_LOCALE policy", () => {
 	it("hands next-intl the same attributes the middleware writes, so a soft locale switch round-trips", () => {
 		const { response, cookiesSet } = makeResponse();
 
-		setLocaleCookie(response, ES);
+		setLocaleCookie({ response, value: ES });
 		const [written] = cookiesSet.mock.calls[0] as [Record<string, unknown>];
 		const { value, ...attributes } = written;
 
@@ -38,7 +38,7 @@ describe("the NEXT_LOCALE policy", () => {
 	it("is not httpOnly, because a browser drops a document.cookie write to a name already httpOnly", () => {
 		const { response, cookiesSet } = makeResponse();
 
-		setLocaleCookie(response, ES);
+		setLocaleCookie({ response, value: ES });
 
 		expect(cookiesSet).toHaveBeenCalledWith(expect.not.objectContaining({ httpOnly: expect.anything() }));
 		expect(routing.localeCookie).toEqual(expect.not.objectContaining({ httpOnly: expect.anything() }));

@@ -26,7 +26,10 @@ describe("GET /api/markdown", () => {
 	it("takes the path from the header the middleware set", async () => {
 		await GET(request("/en/planner"));
 
-		expect(buildMarkdownPage).toHaveBeenCalledWith(process.env.NEXT_PUBLIC_SITE_URL, "/en/planner");
+		expect(buildMarkdownPage).toHaveBeenCalledWith({
+			baseUrl: process.env.NEXT_PUBLIC_SITE_URL,
+			pathname: "/en/planner",
+		});
 	});
 
 	it("ignores a path in the query string, which the visitor controls and the rewrite does not carry", async () => {
@@ -39,7 +42,7 @@ describe("GET /api/markdown", () => {
 	it("prefers the header over a query string that disagrees with it", async () => {
 		await GET(request("/planner", "http://localhost/api/markdown?path=/legal/terms-of-service"));
 
-		expect(buildMarkdownPage).toHaveBeenCalledWith(process.env.NEXT_PUBLIC_SITE_URL, "/planner");
+		expect(buildMarkdownPage).toHaveBeenCalledWith({ baseUrl: process.env.NEXT_PUBLIC_SITE_URL, pathname: "/planner" });
 	});
 
 	it("answers 404 without reaching the builder when the header is absent", async () => {

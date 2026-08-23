@@ -23,7 +23,12 @@ const MESSAGES: Record<LocaleCode, typeof en> = {
 const HOME_PATH = "";
 const PLANNER_PATH = "/planner";
 
-export async function buildMarkdownPage(baseUrl: string, pathname: string): Promise<string | null> {
+export interface BuildMarkdownPageParams {
+	baseUrl: string;
+	pathname: string;
+}
+
+export async function buildMarkdownPage({ baseUrl, pathname }: BuildMarkdownPageParams): Promise<string | null> {
 	const locale = getLocaleFromPathname(pathname);
 	const messages = MESSAGES[locale];
 	const t = createTranslator({ locale, messages, namespace: "metadata" });

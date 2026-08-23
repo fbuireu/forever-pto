@@ -42,10 +42,15 @@ const refused = (status: 400 | 429 | 500, error: string): ActivationOutcome => (
 	error,
 });
 
-export const activatePremiumRequest = (
-	{ ipAddress }: Pick<RequestContext, "ipAddress">,
-	program: Effect.Effect<ActivationResult, ActivationFailure, StripeServerService | LoggerService | TursoService>,
-): Promise<ActivationOutcome> =>
+export interface ActivatePremiumRequestParams {
+	context: Pick<RequestContext, "ipAddress">;
+	program: Effect.Effect<ActivationResult, ActivationFailure, StripeServerService | LoggerService | TursoService>;
+}
+
+export const activatePremiumRequest = ({
+	context: { ipAddress },
+	program,
+}: ActivatePremiumRequestParams): Promise<ActivationOutcome> =>
 	Effect.runPromise(
 		checkRateLimit(ipAddress ?? UNKNOWN_IP).pipe(
 			Effect.andThen(() => program),

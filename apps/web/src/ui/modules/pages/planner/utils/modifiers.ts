@@ -5,34 +5,39 @@ import type { Suggestion } from "@domain/calendar/types";
 import type { FromTo } from "../calendar/Calendar";
 
 export const isHoliday = (holidays: HolidaysState["holidays"]) => (date: Date) =>
-	holidays.some((holiday) => isSameDay(date, holiday.date));
+	holidays.some((holiday) => isSameDay({ a: date, b: holiday.date }));
 
-export const isPast = (allowPastDays: boolean, today: Date | null) => {
+export interface IsPastParams {
+	allowPastDays: boolean;
+	today: Date | null;
+}
+
+export const isPast = ({ allowPastDays, today }: IsPastParams) => {
 	if (allowPastDays || !today) {
 		return () => false;
 	}
 
 	const todayStart = startOfDay(today);
 
-	return (date: Date) => isBefore(date, todayStart);
+	return (date: Date) => isBefore({ date, dateToCompare: todayStart });
 };
 
-export const isToday = (today: Date | null) => (date: Date) => (today ? isSameDay(date, today) : false);
+export const isToday = (today: Date | null) => (date: Date) => (today ? isSameDay({ a: date, b: today }) : false);
 
 export const isSuggestion = (currentSelection: Suggestion | null, removedSuggestedDays: Date[] = []) => {
 	return (date: Date) => {
 		if (!currentSelection) return false;
 
-		const wasRemoved = removedSuggestedDays.some((d) => isSameDay(d, date));
+		const wasRemoved = removedSuggestedDays.some((d) => isSameDay({ a: d, b: date }));
 		if (wasRemoved) return false;
 
-		return currentSelection.days.some((d) => isSameDay(d, date));
+		return currentSelection.days.some((d) => isSameDay({ a: d, b: date }));
 	};
 };
 
 export const isManuallySelected = (manuallySelectedDays: Date[]) => {
 	return (date: Date) => {
-		return manuallySelectedDays.some((d) => isSameDay(d, date));
+		return manuallySelectedDays.some((d) => isSameDay({ a: d, b: date }));
 	};
 };
 
@@ -50,7 +55,7 @@ export const isAlternative = ({
 	currentSelection,
 }: IsAlternativeParams) => {
 	return (date: Date) => {
-		if (currentSelection?.days.some((d) => isSameDay(d, date))) {
+		if (currentSelection?.days.some((d) => isSameDay({ a: d, b: date }))) {
 			return false;
 		}
 
@@ -58,23 +63,26 @@ export const isAlternative = ({
 
 		if (!targetSuggestion?.days) return false;
 
-		return targetSuggestion?.days.some((d) => isSameDay(d, date)) ?? false;
+		return targetSuggestion?.days.some((d) => isSameDay({ a: d, b: date })) ?? false;
 	};
 };
 
 export const isCustom = (holidays: HolidayDTO[]) => (date: Date) => {
-	return holidays.some((holiday) => isSameDay(holiday.date, date) && holiday.variant === HolidayVariant.CUSTOM);
+	return holidays.some(
+		(holiday) => isSameDay({ a: holiday.date, b: date }) && holiday.variant === HolidayVariant.CUSTOM,
+	);
 };
 
 export const isNationalOrRegionalHoliday = (holidays: HolidayDTO[]) => (date: Date) => {
 	return holidays.some(
 		(holiday) =>
-			isSameDay(holiday.date, date) &&
+			isSameDay({ a: holiday.date, b: date }) &&
 			(holiday.variant === HolidayVariant.NATIONAL || holiday.variant === HolidayVariant.REGIONAL),
 	);
 };
 
-export const isSelected = (selectedDates: Date[]) => (date: Date) => selectedDates.some((d) => isSameDay(d, date));
+export const isSelected = (selectedDates: Date[]) => (date: Date) =>
+	selectedDates.some((d) => isSameDay({ a: d, b: date }));
 
 export const isInRange =
 	({ from, to }: Partial<FromTo>) =>
@@ -85,12 +93,12 @@ export const isInRange =
 
 export const isRangeStart = (range?: Partial<FromTo>) => (date: Date) => {
 	if (!range?.from) return false;
-	return isSameDay(date, range.from);
+	return isSameDay({ a: date, b: range.from });
 };
 
 export const isRangeEnd = (range?: Partial<FromTo>) => (date: Date) => {
 	if (!range?.to) return false;
-	return isSameDay(date, range.to);
+	return isSameDay({ a: date, b: range.to });
 };
 
 export const isRangeSelected = (range?: Partial<FromTo>) => (date: Date) => {

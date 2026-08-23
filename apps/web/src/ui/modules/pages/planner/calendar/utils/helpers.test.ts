@@ -95,15 +95,19 @@ describe("getDayClassNames month and past-day handling", () => {
 	it("fades a past day through the same predicate the click handler binds, not a second copy of the rule", () => {
 		const today = new Date(2025, 0, 20);
 
-		expect(classesFor({ modifiers: { disabled: isPast(false, today) } })).toContain("opacity-60");
-		expect(classesFor({ modifiers: { disabled: isPast(true, today) } })).not.toContain("opacity-60");
-		expect(classesFor({ modifiers: { disabled: isPast(false, null) } })).not.toContain("opacity-60");
+		expect(classesFor({ modifiers: { disabled: isPast({ allowPastDays: false, today }) } })).toContain("opacity-60");
+		expect(classesFor({ modifiers: { disabled: isPast({ allowPastDays: true, today }) } })).not.toContain("opacity-60");
+		expect(classesFor({ modifiers: { disabled: isPast({ allowPastDays: false, today: null }) } })).not.toContain(
+			"opacity-60",
+		);
 	});
 
 	it("leaves a future day unfaded even while the past is excluded", () => {
 		const today = new Date(2025, 0, 1);
 
-		expect(classesFor({ modifiers: { disabled: isPast(false, today) } })).not.toContain("opacity-60");
+		expect(classesFor({ modifiers: { disabled: isPast({ allowPastDays: false, today }) } })).not.toContain(
+			"opacity-60",
+		);
 	});
 
 	it("offers the hover lift only to a day that carries no state of its own", () => {

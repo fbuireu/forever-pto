@@ -41,7 +41,7 @@ describe("activatePremiumRequest", () => {
 		mockCheckRateLimit.mockReturnValue(Effect.fail(new RateLimitError({ ip: "1.2.3.4" })));
 		const program = vi.fn(() => succeeds);
 
-		const outcome = await activatePremiumRequest(IP, Effect.suspend(program) as never);
+		const outcome = await activatePremiumRequest({ context: IP, program: Effect.suspend(program) as never });
 
 		expect(program).not.toHaveBeenCalled();
 		expect(outcome.status).toBe(429);
@@ -49,15 +49,15 @@ describe("activatePremiumRequest", () => {
 	});
 
 	it("limits on the caller IP, and falls back to a fixed key rather than an empty one", async () => {
-		await activatePremiumRequest(IP, succeeds as never);
+		await activatePremiumRequest({ context: IP, program: succeeds as never });
 		expect(mockCheckRateLimit).toHaveBeenCalledWith("1.2.3.4");
 
-		await activatePremiumRequest({ ipAddress: null }, succeeds as never);
+		await activatePremiumRequest({ context: { ipAddress: null }, program: succeeds as never });
 		expect(mockCheckRateLimit).toHaveBeenLastCalledWith("unknown");
 	});
 
 	it("answers 200 with the token and hands the deferred to after()", async () => {
-		const outcome = await activatePremiumRequest(IP, succeeds as never);
+		const outcome = await activatePremiumRequest({ context: IP, program: succeeds as never });
 
 		expect(outcome).toEqual({
 			status: 200,
@@ -113,7 +113,7 @@ describe("activatePremiumRequest", () => {
 	])(
 		"maps %s to its own status and logs the fields it actually carries",
 		async (failure, status, error, level, message, context) => {
-			const outcome = await activatePremiumRequest(IP, Effect.fail(failure) as never);
+			const outcome = await activatePremiumRequest({ context: IP, program: Effect.fail(failure) as never });
 
 			expect(outcome).toMatchObject({ status, error, token: null });
 			expect(logger[level as "warn" | "error"]).toHaveBeenCalledExactlyOnceWith(message, context);
@@ -121,17 +121,20 @@ describe("activatePremiumRequest", () => {
 	);
 
 	it("never leaks a Stripe message to the caller", async () => {
-		const outcome = await activatePremiumRequest(
-			IP,
-			Effect.fail(new PaymentError({ message: "No such payment_intent: 'pi_3ABC'" })) as never,
-		);
+		const outcome = await activatePremiumRequest({
+			context: IP,
+			program: Effect.fail(new PaymentError({ message: "No such payment_intent: 'pi_3ABC'" })) as never,
+		});
 
 		expect(outcome.error).toBe(ApiError.INTERNAL_ERROR);
 		expect(outcome.error).not.toContain("pi_3ABC");
 	});
 
 	it("does not schedule the deferred when activation refuses", async () => {
-		await activatePremiumRequest(IP, Effect.fail(new ValidationError({ message: "Email mismatch" })) as never);
+		await activatePremiumRequest({
+			context: IP,
+			program: Effect.fail(new ValidationError({ message: "Email mismatch" })) as never,
+		});
 		expect(mockAfter).not.toHaveBeenCalled();
 	});
 });

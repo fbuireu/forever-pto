@@ -30,14 +30,14 @@ export async function GET(request: NextRequest) {
 	if (!paymentIntentId || !clientSecret) return redirectTo(false);
 	if (redirectStatus && redirectStatus !== SUCCEEDED_REDIRECT_STATUS) return redirectTo(false);
 
-	const { token } = await activatePremiumRequest(
-		{ ipAddress: resolveClientIp(request.headers) },
-		activateWithPayment({ paymentIntentId, clientSecret }),
-	);
+	const { token } = await activatePremiumRequest({
+		context: { ipAddress: resolveClientIp(request.headers) },
+		program: activateWithPayment({ paymentIntentId, clientSecret }),
+	});
 
 	if (!token) return redirectTo(false);
 
 	const response = redirectTo(true);
-	setPremiumCookie(response, token);
+	setPremiumCookie({ response, token });
 	return response;
 }

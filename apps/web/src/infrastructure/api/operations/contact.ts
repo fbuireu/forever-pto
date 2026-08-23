@@ -10,13 +10,15 @@ import type { ApiOutcome } from "./types";
 
 type ContactBody = { success: true } | { success: false; error: string };
 
-export const sendContactRequest = (
-	input: Effect.Effect<ContactFormData, ValidationError>,
-	config: PublicEnv,
-): Promise<ApiOutcome<ContactBody>> =>
+export interface SendContactRequestParams {
+	input: Effect.Effect<ContactFormData, ValidationError>;
+	config: PublicEnv;
+}
+
+export const sendContactRequest = ({ input, config }: SendContactRequestParams): Promise<ApiOutcome<ContactBody>> =>
 	Effect.runPromise(
 		input.pipe(
-			Effect.flatMap((body) => sendContactEmail(body, config)),
+			Effect.flatMap((body) => sendContactEmail({ data: body, config })),
 			Effect.map(({ deferred }) => {
 				after(() => Effect.runPromise(deferred.pipe(Effect.provide(ApplicationLayer))));
 				return { status: 200, body: { success: true as const } };

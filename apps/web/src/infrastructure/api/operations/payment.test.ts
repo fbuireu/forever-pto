@@ -37,7 +37,7 @@ beforeEach(() => {
 
 describe("createPaymentRequest", () => {
 	it("answers 200 and the client secret on success", async () => {
-		const outcome = await createPaymentRequest(Effect.succeed(INPUT), CONTEXT);
+		const outcome = await createPaymentRequest({ input: Effect.succeed(INPUT), context: CONTEXT });
 
 		expect(outcome).toEqual({
 			status: 200,
@@ -48,7 +48,7 @@ describe("createPaymentRequest", () => {
 	it("rate-limits before it reaches the use-case, whichever transport called it", async () => {
 		mockCheckRateLimit.mockReturnValue(Effect.fail(new RateLimitError({ ip: "1.2.3.4" })));
 
-		const outcome = await createPaymentRequest(Effect.succeed(INPUT), CONTEXT);
+		const outcome = await createPaymentRequest({ input: Effect.succeed(INPUT), context: CONTEXT });
 
 		expect(outcome.status).toBe(429);
 		expect(outcome.body).toEqual({ success: false, error: ApiError.RATE_LIMIT_EXCEEDED });
@@ -56,29 +56,32 @@ describe("createPaymentRequest", () => {
 	});
 
 	it("keys the limiter on a resolved address and still hands the use-case the unresolved one", async () => {
-		await createPaymentRequest(Effect.succeed(INPUT), { userAgent: null, ipAddress: null });
+		await createPaymentRequest({ input: Effect.succeed(INPUT), context: { userAgent: null, ipAddress: null } });
 
 		expect(mockCheckRateLimit).toHaveBeenCalledWith("unknown");
-		expect(mockCreatePayment).toHaveBeenCalledWith(INPUT, { userAgent: null, ipAddress: null });
+		expect(mockCreatePayment).toHaveBeenCalledWith({ params: INPUT, context: { userAgent: null, ipAddress: null } });
 	});
 
 	it("never reads the body before the limiter has spoken", async () => {
 		const read = vi.fn();
 		mockCheckRateLimit.mockReturnValue(Effect.fail(new RateLimitError({ ip: "1.2.3.4" })));
 
-		await createPaymentRequest(
-			Effect.sync(() => {
+		await createPaymentRequest({
+			input: Effect.sync(() => {
 				read();
 				return INPUT;
 			}),
-			CONTEXT,
-		);
+			context: CONTEXT,
+		});
 
 		expect(read).not.toHaveBeenCalled();
 	});
 
 	it("maps a malformed body to 400 carrying the code the parser raised", async () => {
-		const outcome = await createPaymentRequest(Effect.fail(new ValidationError({ message: "invalid_body" })), CONTEXT);
+		const outcome = await createPaymentRequest({
+			input: Effect.fail(new ValidationError({ message: "invalid_body" })),
+			context: CONTEXT,
+		});
 
 		expect(outcome).toEqual({ status: 400, body: { success: false, error: "invalid_body" } });
 	});
@@ -88,7 +91,7 @@ describe("createPaymentRequest", () => {
 			Effect.fail(new PromoCodeError({ code: PromoCodeErrors.USAGE_LIMIT_REACHED })) as never,
 		);
 
-		const outcome = await createPaymentRequest(Effect.succeed(INPUT), CONTEXT);
+		const outcome = await createPaymentRequest({ input: Effect.succeed(INPUT), context: CONTEXT });
 
 		expect(outcome).toEqual({
 			status: 400,
@@ -102,7 +105,7 @@ describe("createPaymentRequest", () => {
 			Effect.succeed({ clientSecret: "pi_secret", discountInfo, deferred: Effect.void } as never),
 		);
 
-		const outcome = await createPaymentRequest(Effect.succeed(INPUT), CONTEXT);
+		const outcome = await createPaymentRequest({ input: Effect.succeed(INPUT), context: CONTEXT });
 
 		expect(outcome.body).toEqual({ success: true, clientSecret: "pi_secret", discountInfo });
 	});
@@ -110,7 +113,7 @@ describe("createPaymentRequest", () => {
 	it("maps a payment failure to 500 without leaking the reason", async () => {
 		mockCreatePayment.mockReturnValue(Effect.fail(new PaymentError({ message: "stripe exploded" })));
 
-		const outcome = await createPaymentRequest(Effect.succeed(INPUT), CONTEXT);
+		const outcome = await createPaymentRequest({ input: Effect.succeed(INPUT), context: CONTEXT });
 
 		expect(outcome).toEqual({ status: 500, body: { success: false, error: ApiError.INTERNAL_ERROR } });
 	});
@@ -118,7 +121,7 @@ describe("createPaymentRequest", () => {
 	it("still answers 500 for a failure that arrived lying about its tag", async () => {
 		mockCreatePayment.mockReturnValue(Effect.fail(new Error("boom")) as never);
 
-		const outcome = await createPaymentRequest(Effect.succeed(INPUT), CONTEXT);
+		const outcome = await createPaymentRequest({ input: Effect.succeed(INPUT), context: CONTEXT });
 
 		expect(outcome).toEqual({ status: 500, body: { success: false, error: ApiError.INTERNAL_ERROR } });
 	});
@@ -129,7 +132,7 @@ describe("createPaymentRequest", () => {
 			Effect.succeed({ clientSecret: "pi_secret", discountInfo: null, deferred: Effect.sync(persisted) }),
 		);
 
-		await createPaymentRequest(Effect.succeed(INPUT), CONTEXT);
+		await createPaymentRequest({ input: Effect.succeed(INPUT), context: CONTEXT });
 
 		expect(mockAfter).toHaveBeenCalled();
 		expect(persisted).toHaveBeenCalled();

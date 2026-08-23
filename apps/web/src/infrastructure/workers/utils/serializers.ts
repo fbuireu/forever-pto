@@ -19,7 +19,12 @@ function serializeBridge(bridge: Bridge) {
 	};
 }
 
-export function serializeSuggestionResult(suggestion: MeasuredSuggestion, alternatives: MeasuredSuggestion[]) {
+export interface SerializeSuggestionResultParams {
+	suggestion: MeasuredSuggestion;
+	alternatives: MeasuredSuggestion[];
+}
+
+export function serializeSuggestionResult({ suggestion, alternatives }: SerializeSuggestionResultParams) {
 	return {
 		suggestion: serializeSuggestion(suggestion),
 		alternatives: alternatives.map(serializeSuggestion),

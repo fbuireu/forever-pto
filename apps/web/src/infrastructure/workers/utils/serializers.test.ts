@@ -70,20 +70,20 @@ describe("serializeHolidays", () => {
 describe("serializeSuggestionResult", () => {
 	it("serializes the main suggestion days to ISO strings", () => {
 		const day = new Date(2025, 2, 10);
-		const result = serializeSuggestionResult(makeSuggestion([day]), []);
+		const result = serializeSuggestionResult({ suggestion: makeSuggestion([day]), alternatives: [] });
 		expect(result.suggestion.days[0]).toBe(day.toISOString());
 	});
 
 	it("serializes alternatives", () => {
 		const day = new Date(2025, 3, 15);
-		const result = serializeSuggestionResult(makeSuggestion(), [makeSuggestion([day])]);
+		const result = serializeSuggestionResult({ suggestion: makeSuggestion(), alternatives: [makeSuggestion([day])] });
 		expect(result.alternatives[0].days[0]).toBe(day.toISOString());
 	});
 
 	it("serializes bridge dates when present", () => {
 		const bridge = makeBridge();
 		const suggestion: MeasuredSuggestion = { days: [], bridges: [bridge], metrics: EMPTY_METRICS };
-		const result = serializeSuggestionResult(suggestion, []);
+		const result = serializeSuggestionResult({ suggestion, alternatives: [] });
 		const serializedBridge = result.suggestion.bridges?.[0];
 		expect(serializedBridge?.startDate).toBe(bridge.startDate.toISOString());
 		expect(serializedBridge?.endDate).toBe(bridge.endDate.toISOString());

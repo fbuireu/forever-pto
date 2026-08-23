@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createPayment } from "./payment";
 
 vi.mock("@application/shared/utils/zodParse", () => ({
-	zodParse: vi.fn((_, data) => Effect.succeed(data)),
+	zodParse: vi.fn(({ data }) => Effect.succeed(data)),
 }));
 
 vi.mock("@application/dto/payment/dto", () => ({
@@ -55,64 +55,64 @@ beforeEach(() => vi.clearAllMocks());
 
 describe("createPayment", () => {
 	it("resolves with clientSecret on success", async () => {
-		const result = await run(createPayment(PARAMS, CONTEXT));
+		const result = await run(createPayment({ params: PARAMS, context: CONTEXT }));
 		expect(result.clientSecret).toBe("cs_test_secret");
 	});
 
 	it("resolves with null discountInfo when no promo code", async () => {
-		const result = await run(createPayment(PARAMS, CONTEXT));
+		const result = await run(createPayment({ params: PARAMS, context: CONTEXT }));
 		expect(result.discountInfo).toBeNull();
 	});
 
 	it("does not call validatePromoCode when promoCode is empty", async () => {
 		const { validatePromoCode } = await import("@infrastructure/services/payments/provider/promoCode");
-		await run(createPayment({ ...PARAMS, promoCode: "" }, CONTEXT));
+		await run(createPayment({ params: { ...PARAMS, promoCode: "" }, context: CONTEXT }));
 		expect(validatePromoCode).not.toHaveBeenCalled();
 	});
 
 	it("applies promo code discount when promoCode is provided", async () => {
 		const { validatePromoCode } = await import("@infrastructure/services/payments/provider/promoCode");
 		const { createPaymentIntent } = await import("@infrastructure/services/payments/provider/intent");
-		await run(createPayment({ ...PARAMS, promoCode: "SAVE20" }, CONTEXT));
-		expect(validatePromoCode).toHaveBeenCalledWith("SAVE20", 999);
+		await run(createPayment({ params: { ...PARAMS, promoCode: "SAVE20" }, context: CONTEXT }));
+		expect(validatePromoCode).toHaveBeenCalledWith({ code: "SAVE20", amount: 999 });
 		expect(createPaymentIntent).toHaveBeenCalledWith(expect.objectContaining({ amount: 799 }));
 	});
 
 	it("returns discountInfo when promo code is applied", async () => {
-		const result = await run(createPayment({ ...PARAMS, promoCode: "SAVE20" }, CONTEXT));
+		const result = await run(createPayment({ params: { ...PARAMS, promoCode: "SAVE20" }, context: CONTEXT }));
 		expect(result.discountInfo).not.toBeNull();
 	});
 
 	it("fails with ValidationError when zodParse fails", async () => {
 		const { zodParse } = await import("@application/shared/utils/zodParse");
 		vi.mocked(zodParse).mockReturnValueOnce(Effect.fail(new ValidationError({ message: "invalid input" })));
-		const err = await runFail(createPayment(PARAMS, CONTEXT));
+		const err = await runFail(createPayment({ params: PARAMS, context: CONTEXT }));
 		expect(err).toBeInstanceOf(ValidationError);
 	});
 
 	it("fails with PaymentError when createPaymentIntent fails", async () => {
 		const { createPaymentIntent } = await import("@infrastructure/services/payments/provider/intent");
 		vi.mocked(createPaymentIntent).mockReturnValueOnce(Effect.fail(new PaymentError({ message: "Stripe error" })));
-		const err = await runFail(createPayment(PARAMS, CONTEXT));
+		const err = await runFail(createPayment({ params: PARAMS, context: CONTEXT }));
 		expect(err).toBeInstanceOf(PaymentError);
 	});
 
 	it("fails with PaymentError when client_secret is missing", async () => {
 		const { createPaymentIntent } = await import("@infrastructure/services/payments/provider/intent");
 		vi.mocked(createPaymentIntent).mockReturnValueOnce(Effect.succeed({ id: "pi_test", client_secret: null } as never));
-		const err = await runFail(createPayment(PARAMS, CONTEXT));
+		const err = await runFail(createPayment({ params: PARAMS, context: CONTEXT }));
 		expect(err).toBeInstanceOf(PaymentError);
 	});
 
 	it("does not persist the payment during the critical path", async () => {
 		const { savePayment } = await import("@infrastructure/services/payments/repository");
-		await run(createPayment(PARAMS, CONTEXT));
+		await run(createPayment({ params: PARAMS, context: CONTEXT }));
 		expect(savePayment).not.toHaveBeenCalled();
 	});
 
 	it("persists the payment when the deferred effect runs", async () => {
 		const { savePayment } = await import("@infrastructure/services/payments/repository");
-		const { deferred } = await run(createPayment(PARAMS, CONTEXT));
+		const { deferred } = await run(createPayment({ params: PARAMS, context: CONTEXT }));
 		await runDeferred(deferred);
 		expect(savePayment).toHaveBeenCalledOnce();
 	});
@@ -120,7 +120,7 @@ describe("createPayment", () => {
 	it("deferred effect recovers and warns when savePayment fails", async () => {
 		const { savePayment } = await import("@infrastructure/services/payments/repository");
 		vi.mocked(savePayment).mockReturnValueOnce(Effect.fail({ _tag: "DatabaseError", message: "db error" } as never));
-		const result = await run(createPayment(PARAMS, CONTEXT));
+		const result = await run(createPayment({ params: PARAMS, context: CONTEXT }));
 		expect(result.clientSecret).toBe("cs_test_secret");
 		await expect(runDeferred(result.deferred)).resolves.toBeUndefined();
 		expect(mockLogger.warn).toHaveBeenCalledOnce();

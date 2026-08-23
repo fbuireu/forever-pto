@@ -55,7 +55,7 @@ export const Troubleshooting = () => {
 					description: t("successDescription"),
 				});
 			} catch (error) {
-				logClientError("Error resetting to defaults", error, { component: "Troubleshooting" });
+				logClientError({ message: "Error resetting to defaults", error, context: { component: "Troubleshooting" } });
 				toast.error(t("errorTitle"), {
 					description: t("errorDescription"),
 				});

@@ -9,16 +9,24 @@ import { Effect } from "effect";
 import { after } from "next/server";
 import { type ApiOutcome, type RequestContext, UNKNOWN_IP } from "./types";
 
-export const createPaymentRequest = (
-	input: Effect.Effect<CreatePaymentInput, ValidationError>,
-	{ userAgent, ipAddress }: RequestContext,
-): Promise<ApiOutcome<CreatePaymentResult>> =>
+export interface CreatePaymentRequestParams {
+	input: Effect.Effect<CreatePaymentInput, ValidationError>;
+	context: RequestContext;
+}
+
+export const createPaymentRequest = ({
+	input,
+	context: { userAgent, ipAddress },
+}: CreatePaymentRequestParams): Promise<ApiOutcome<CreatePaymentResult>> =>
 	Effect.runPromise(
 		Effect.gen(function* () {
 			yield* checkRateLimit(ipAddress ?? UNKNOWN_IP);
 
 			const body = yield* input;
-			const { clientSecret, discountInfo, deferred } = yield* createPayment(body, { userAgent, ipAddress });
+			const { clientSecret, discountInfo, deferred } = yield* createPayment({
+				params: body,
+				context: { userAgent, ipAddress },
+			});
 
 			after(() => Effect.runPromise(deferred.pipe(Effect.provide(ApplicationLayer))));
 

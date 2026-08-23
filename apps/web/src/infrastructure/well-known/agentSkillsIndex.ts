@@ -18,13 +18,13 @@ export function agentSkillsIndex(baseUrl: string) {
 				name: "api-catalog",
 				type: "skill",
 				description: "Publishes an RFC 9727 API catalog at /.well-known/api-catalog.",
-				url: wellKnownUrl(baseUrl, API_CATALOG_SLUG),
+				url: wellKnownUrl({ baseUrl, slug: API_CATALOG_SLUG }),
 			},
 			{
 				name: "mcp-server-card",
 				type: "skill",
 				description: "Serves an MCP Server Card (SEP-1649) at /.well-known/mcp/server-card.json.",
-				url: wellKnownUrl(baseUrl, MCP_SERVER_CARD_SLUG),
+				url: wellKnownUrl({ baseUrl, slug: MCP_SERVER_CARD_SLUG }),
 			},
 			{
 				name: "webmcp",

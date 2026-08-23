@@ -11,7 +11,7 @@ export const handlePaymentFailed = (
 	Effect.gen(function* () {
 		const logger = yield* LoggerService;
 
-		const updated = yield* updatePaymentStatus(event.paymentId, event.status).pipe(
+		const updated = yield* updatePaymentStatus({ paymentIntentId: event.paymentId, status: event.status }).pipe(
 			Effect.tapError((e) =>
 				Effect.sync(() => {
 					logger.logError("Error handling failed payment", e, { paymentId: event.paymentId });

@@ -71,7 +71,10 @@ describe("createPaymentAction", () => {
 
 		await createPaymentAction(validInput);
 
-		expect(mockCreatePayment).toHaveBeenCalledWith(validInput, { userAgent: "test-agent", ipAddress: "1.2.3.4" });
+		expect(mockCreatePayment).toHaveBeenCalledWith({
+			params: validInput,
+			context: { userAgent: "test-agent", ipAddress: "1.2.3.4" },
+		});
 	});
 
 	it("drops the status, which is the only thing it does differently from the route", async () => {

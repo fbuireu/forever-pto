@@ -168,6 +168,20 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
   ([`src/ui/modules/bones/registry.ts`](./src/ui/modules/bones/registry.ts)). A suppression counts in either form, including the
   `{/* biome-ignore … */}` shape JSX forces. The rule is asserted wherever a comment sits — opening a line,
   trailing code, or inside JSX.
+- **Two or more *required* parameters means one named object, typed `SomeFunctionParams`.** `formatDate`
+  takes `FormatDateParams`, `matchesClientSecret` takes `MatchesClientSecretParams`. One required parameter is
+  passed directly, with no wrapper and no interface — `createHolidaySet(holidays)`, `amountFormatter(locale)`.
+  **An optional parameter does not make a function "two or more"**: `noStore(body, init?)`,
+  `createRichLink(href, options?)` and `track(event, properties?)` take one thing plus an options tail and
+  stay positional, so `noStore({ premiumKey, email })` is one argument that happens to be an object and
+  wrapping it into `noStore({ body: { … } })` is the mistake. The point is that the *order* of arguments
+  stops being load-bearing: two adjacent positionals of the same type is the classic silent defect, and this
+  codebase has got `isBefore` and `differenceInDays` backwards before.
+
+  Two places do not follow it and cannot. `GET(request, context)` under `src/app/` is Next's own route-handler
+  signature, and `compareByEfficiency({ a, b })` is called from `.sort()`/`.toSorted()`, which invoke a
+  comparator with two positional arguments — so its two call sites wrap it, rather than the function bending
+  to a runtime contract it does not own.
 - **No ALL-CAPS in translation strings.** Uppercasing is a presentation choice — do it with a CSS class in the
   component, so the six bundles stay comparable and other scripts are not mangled.
 - **`typeof window`/`typeof document` guards stay.** They look redundant to a linter but are required under

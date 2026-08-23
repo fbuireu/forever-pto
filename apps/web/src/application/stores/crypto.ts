@@ -33,7 +33,7 @@ export const obfuscatedStorage = createJSONStorage(() => {
 			try {
 				return deobfuscate({ text: obfuscatedValue, key: obfuscationKey });
 			} catch (error) {
-				logClientError("Failed to deobfuscate storage value", error, { key });
+				logClientError({ message: "Failed to deobfuscate storage value", error, context: { key } });
 				return null;
 			}
 		},
@@ -41,14 +41,14 @@ export const obfuscatedStorage = createJSONStorage(() => {
 			try {
 				localStorage.setItem(key, obfuscate({ text: value, key: obfuscationKey }));
 			} catch (error) {
-				logClientError("Failed to set item in obfuscated storage", error, { key });
+				logClientError({ message: "Failed to set item in obfuscated storage", error, context: { key } });
 			}
 		},
 		removeItem: (key: string) => {
 			try {
 				localStorage.removeItem(key);
 			} catch (error) {
-				logClientError("Failed to remove item from obfuscated storage", error, { key });
+				logClientError({ message: "Failed to remove item from obfuscated storage", error, context: { key } });
 			}
 		},
 	};

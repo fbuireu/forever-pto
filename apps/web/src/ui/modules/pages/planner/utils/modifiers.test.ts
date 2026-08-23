@@ -33,15 +33,15 @@ const holidayOf = (date: Date, variant: HolidayDTO["variant"]) => ({ date, varia
 
 describe("isPast", () => {
 	it("refuses to call anything past while past days are allowed", () => {
-		expect(isPast(true, day(10))(MONDAY)).toBe(false);
+		expect(isPast({ allowPastDays: true, today: day(10) })(MONDAY)).toBe(false);
 	});
 
 	it("refuses to call anything past before the client knows what today is", () => {
-		expect(isPast(false, null)(MONDAY)).toBe(false);
+		expect(isPast({ allowPastDays: false, today: null })(MONDAY)).toBe(false);
 	});
 
 	it("counts a day before today as past, and today itself as not", () => {
-		const isPastDay = isPast(false, WEDNESDAY);
+		const isPastDay = isPast({ allowPastDays: false, today: WEDNESDAY });
 
 		expect(isPastDay(TUESDAY)).toBe(true);
 		expect(isPastDay(WEDNESDAY)).toBe(false);

@@ -85,9 +85,13 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
 	const terminalRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		logClientError("Unhandled error caught by error boundary", error, {
-			component: "ErrorPage",
-			digest: error.digest,
+		logClientError({
+			message: "Unhandled error caught by error boundary",
+			error,
+			context: {
+				component: "ErrorPage",
+				digest: error.digest,
+			},
 		});
 	}, [error]);
 

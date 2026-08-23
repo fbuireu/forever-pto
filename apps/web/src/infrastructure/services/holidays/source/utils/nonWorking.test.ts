@@ -28,17 +28,17 @@ describe("keepNonWorking", () => {
 
 describe("stampRegion", () => {
 	it("marks every entry with the region it came from", () => {
-		const stamped = stampRegion([raw("Sant Jordi", "public"), raw("Sant Joan", "public")], "CT");
+		const stamped = stampRegion({ raw: [raw("Sant Jordi", "public"), raw("Sant Joan", "public")], region: "CT" });
 		expect(stamped.every(({ location }) => location === "CT")).toBe(true);
 	});
 
 	it("leaves the original entries untouched", () => {
 		const original = raw("Sant Jordi", "public");
-		stampRegion([original], "CT");
+		stampRegion({ raw: [original], region: "CT" });
 		expect(original.location).toBeUndefined();
 	});
 
 	it("returns an empty list unchanged", () => {
-		expect(stampRegion([], "CT")).toEqual([]);
+		expect(stampRegion({ raw: [], region: "CT" })).toEqual([]);
 	});
 });

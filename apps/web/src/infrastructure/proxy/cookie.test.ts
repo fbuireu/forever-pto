@@ -21,37 +21,37 @@ describe("USER_COUNTRY_COOKIE", () => {
 describe("setLocationCookie", () => {
 	it("sets the cookie with the correct name and country value", () => {
 		const { response, cookiesSet } = makeResponse();
-		setLocationCookie(response, "ES");
+		setLocationCookie({ response, country: "ES" });
 		expect(cookiesSet).toHaveBeenCalledWith(USER_COUNTRY_COOKIE, "ES", expect.any(Object));
 	});
 
 	it("sets httpOnly to false", () => {
 		const { response, cookiesSet } = makeResponse();
-		setLocationCookie(response, "ES");
+		setLocationCookie({ response, country: "ES" });
 		expect(cookiesSet).toHaveBeenCalledWith(USER_COUNTRY_COOKIE, "ES", expect.objectContaining({ httpOnly: false }));
 	});
 
 	it("sets secure", () => {
 		const { response, cookiesSet } = makeResponse();
-		setLocationCookie(response, "ES");
+		setLocationCookie({ response, country: "ES" });
 		expect(cookiesSet).toHaveBeenCalledWith(USER_COUNTRY_COOKIE, "ES", expect.objectContaining({ secure: true }));
 	});
 
 	it("sets sameSite strict", () => {
 		const { response, cookiesSet } = makeResponse();
-		setLocationCookie(response, "ES");
+		setLocationCookie({ response, country: "ES" });
 		expect(cookiesSet).toHaveBeenCalledWith(USER_COUNTRY_COOKIE, "ES", expect.objectContaining({ sameSite: "strict" }));
 	});
 
 	it("sets maxAge to ONE_WEEK", () => {
 		const { response, cookiesSet } = makeResponse();
-		setLocationCookie(response, "ES");
+		setLocationCookie({ response, country: "ES" });
 		expect(cookiesSet).toHaveBeenCalledWith(USER_COUNTRY_COOKIE, "ES", expect.objectContaining({ maxAge: ONE_WEEK }));
 	});
 
 	it('sets path to "/"', () => {
 		const { response, cookiesSet } = makeResponse();
-		setLocationCookie(response, "ES");
+		setLocationCookie({ response, country: "ES" });
 		expect(cookiesSet).toHaveBeenCalledWith(USER_COUNTRY_COOKIE, "ES", expect.objectContaining({ path: "/" }));
 	});
 });

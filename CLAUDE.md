@@ -390,13 +390,6 @@ relative-link rule could not catch because they were prose rather than links.
 - **The `v1` floating tag is stale and nothing maintains it.** It diverges between local and remote, which
   makes semantic-release's own `git fetch --tags` fail outright with *would clobber existing tag*. No
   workflow moves it and no ADR records it.
-- **Renovate must not automerge `next`, `typescript` or `@opennextjs/cloudflare`,** and it did once. The three
-  are one decision ([ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)): 16.3.x on adapter
-  1.20.2 answers 500 with Cloudflare Error 1101 on every unknown URL, because the 404 is the one page rendered
-  at request time. A **minor** bump to 16.3.1 auto-merged past the blanket minor rule and shipped that to
-  `main`, and the e2e suite that catches it is not a required check. [`.github/renovate.json`](./.github/renovate.json)
-  now carries an `adapter-pinned` rule turning `automerge` off for all three. The pin is not a preference to
-  be tidied away by a bot.
 - **`boneyard-js` is patched, so Renovate must not automerge it.** `pnpm-workspace.yaml` keys
   `patchedDependencies` by bare name, with no version, so the patch is applied to whatever version resolves.
   A bump that still applies cleanly but no longer patches what the diff was written against is silent — the

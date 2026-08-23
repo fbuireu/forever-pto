@@ -185,14 +185,14 @@ describe("savePayment", () => {
 
 describe("updatePaymentStatus", () => {
 	it("executes an UPDATE payments SET status", async () => {
-		await runEffect(updatePaymentStatus("pi_test", "succeeded"));
+		await runEffect(updatePaymentStatus({ paymentIntentId: "pi_test", status: "succeeded" }));
 		const [sql] = mockExecute.mock.calls[0] as [string, unknown[]];
 		expect(sql).toContain("UPDATE payments");
 		expect(sql).toContain("SET status");
 	});
 
 	it("refuses to overwrite a succeeded row, in the WHERE clause rather than at the caller", async () => {
-		await runEffect(updatePaymentStatus("pi_test", "canceled"));
+		await runEffect(updatePaymentStatus({ paymentIntentId: "pi_test", status: "canceled" }));
 		const [sql] = mockExecute.mock.calls[0] as [string, unknown[]];
 		const where = sql.slice(sql.indexOf("WHERE"));
 
@@ -201,28 +201,32 @@ describe("updatePaymentStatus", () => {
 
 	it("answers whether it wrote, so no caller has to read the row first", async () => {
 		mockExecute.mockReturnValueOnce(Effect.succeed(0));
-		await expect(runEffect(updatePaymentStatus("pi_test", "canceled"))).resolves.toBe(false);
+		await expect(runEffect(updatePaymentStatus({ paymentIntentId: "pi_test", status: "canceled" }))).resolves.toBe(
+			false,
+		);
 
 		mockExecute.mockReturnValueOnce(Effect.succeed(1));
-		await expect(runEffect(updatePaymentStatus("pi_test", "canceled"))).resolves.toBe(true);
+		await expect(runEffect(updatePaymentStatus({ paymentIntentId: "pi_test", status: "canceled" }))).resolves.toBe(
+			true,
+		);
 	});
 
 	it("passes status and paymentIntentId as arguments", async () => {
-		await runEffect(updatePaymentStatus("pi_test", "succeeded"));
+		await runEffect(updatePaymentStatus({ paymentIntentId: "pi_test", status: "succeeded" }));
 		const [, args] = mockExecute.mock.calls[0] as [string, unknown[]];
 		expect(args[0]).toBe("succeeded");
 		expect(args[2]).toBe("pi_test");
 	});
 
 	it("stamps succeeded_at against the same literal the domain calls the entitlement", async () => {
-		await runEffect(updatePaymentStatus("pi_test", PAYMENT_SUCCEEDED));
+		await runEffect(updatePaymentStatus({ paymentIntentId: "pi_test", status: PAYMENT_SUCCEEDED }));
 		const [sql] = mockExecute.mock.calls[0] as [string, unknown[]];
 		expect(sql).toContain(`WHEN ? = '${PAYMENT_SUCCEEDED}'`);
 	});
 
 	it("propagates DatabaseError when execute fails", async () => {
 		mockExecute.mockReturnValue(Effect.fail(new DatabaseError({ message: "update failed" })));
-		const error = await runFlipEffect(updatePaymentStatus("pi_test", "succeeded"));
+		const error = await runFlipEffect(updatePaymentStatus({ paymentIntentId: "pi_test", status: "succeeded" }));
 		expect(error).toBeInstanceOf(DatabaseError);
 	});
 });

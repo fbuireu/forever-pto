@@ -41,7 +41,7 @@ export const generateMetrics = ({
 	const { year } = planningWindow;
 	const days = resolveSelectedDays({ days: suggestion.days, manuallySelectedDays, removedSuggestedDays });
 
-	const monthlyDist = getMonthlyDist(days, planningWindow);
+	const monthlyDist = getMonthlyDist({ days, window: planningWindow });
 	const streaks = freeStreaks({ placedDays: days, holidays });
 	const longBlocksPerQuarter = getLongBlocksPerQuarter({ streaks, window: planningWindow });
 	const totalEffectiveDays = getTotalEffectiveDays(days, bridges, holidays);
@@ -57,7 +57,7 @@ export const generateMetrics = ({
 		year,
 	});
 	const firstLastBreak = getFirstLastBreak({ dates: days, locale });
-	const quarterDist = calculateQuarterDistribution(days, planningWindow);
+	const quarterDist = calculateQuarterDistribution({ dates: days, window: planningWindow });
 	const workedDaysPerMonth = getWorkedDaysPerMonth({
 		ptoDays: days,
 		holidays,

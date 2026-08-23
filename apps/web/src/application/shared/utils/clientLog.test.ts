@@ -20,13 +20,13 @@ describe("a client log never makes its caller asynchronous", () => {
 	it("returns undefined, not a promise the caller would have to await", () => {
 		mockGetBetterStackInstance.mockReturnValue({ logError: mockLogError });
 		expect(logClient(() => {})).toBeUndefined();
-		expect(logClientError("boom", new Error("x"))).toBeUndefined();
+		expect(logClientError({ message: "boom", error: new Error("x") })).toBeUndefined();
 	});
 
 	it("has not written by the time it returns, so a test must wait for the import", async () => {
 		mockGetBetterStackInstance.mockReturnValue({ logError: mockLogError });
 
-		logClientError("boom", new Error("x"), { component: "Probe" });
+		logClientError({ message: "boom", error: new Error("x"), context: { component: "Probe" } });
 		expect(mockLogError).not.toHaveBeenCalled();
 
 		await vi.waitFor(() => {
@@ -41,7 +41,7 @@ describe("a client log never fails its caller", () => {
 			throw new Error("logger unavailable");
 		});
 
-		expect(() => logClientError("boom", new Error("x"))).not.toThrow();
+		expect(() => logClientError({ message: "boom", error: new Error("x") })).not.toThrow();
 		await vi.waitFor(() => {
 			expect(mockGetBetterStackInstance).toHaveBeenCalled();
 		});

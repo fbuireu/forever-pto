@@ -860,16 +860,6 @@ describe("the guides describe the project as it is configured", () => {
 		expect(citedScripts(commands).filter((script) => !(script in available))).toEqual([]);
 	});
 
-	// `apps/web/CLAUDE.md` records a decision that lived only in prose: the deploy is the one wrangler call
-	// NOT wrapped in `nick-fields/retry`, because a wrapper that retries every failure cannot tell a bad
-	// argument from a bad network, and the `Unknown argument: push` failure burned three five-minute attempts
-	// per run before reporting. The workflow had the wrapper back. A decision this cheap to reverse by
-	// accident belongs in a rule.
-	// The `infra/` subtree of the wiki is nine pages describing CI, and nothing compared a word of it to CI.
-	// Both omissions this caught arrived the same way: a workflow was added and neither document was told.
-	// `commit-message.yml` is the sharp one — it lints the PR title, which under squash merge is the string
-	// semantic-release parses, so it is the guard the conventional-commits and one-package-per-PR rules both
-	// depend on, and the root guide's exhaustive "the rest are" list did not mention it.
 	it.each(workflowFiles.map((file) => file.slice(WORKFLOW_DIR.length + 1)))(
 		"%s is documented in both places that claim to list every workflow",
 		(name) => {

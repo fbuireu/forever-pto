@@ -70,7 +70,10 @@ describe("POST /api/payment", () => {
 
 		await POST(makeRequest({}, { "cf-connecting-ip": "1.2.3.4", "user-agent": "curl/8" }) as never);
 
-		expect(mockCreatePayment).toHaveBeenCalledWith({}, { userAgent: "curl/8", ipAddress: "1.2.3.4" });
+		expect(mockCreatePayment).toHaveBeenCalledWith({
+			params: {},
+			context: { userAgent: "curl/8", ipAddress: "1.2.3.4" },
+		});
 	});
 
 	it("hands the operation parseJsonBody, so an unreadable body answers 400 rather than a bare 500", async () => {

@@ -10,9 +10,12 @@ import { headers } from "next/headers";
 export async function createPaymentAction(params: CreatePaymentInput): Promise<CreatePaymentResult> {
 	const headersList = await headers();
 
-	const { body } = await createPaymentRequest(Effect.succeed(params), {
-		userAgent: headersList.get("user-agent"),
-		ipAddress: resolveClientIp(headersList),
+	const { body } = await createPaymentRequest({
+		input: Effect.succeed(params),
+		context: {
+			userAgent: headersList.get("user-agent"),
+			ipAddress: resolveClientIp(headersList),
+		},
 	});
 
 	return body;

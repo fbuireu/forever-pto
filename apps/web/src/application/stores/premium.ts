@@ -69,9 +69,13 @@ export const usePremiumStore = create<PremiumStore>()(
 						set({ isLoading: false });
 						return false;
 					} catch (error) {
-						logClientError("Error verifying premium email in premium store", error, {
-							emailDomain: emailDomain(email),
-							hasEmail: !!email,
+						logClientError({
+							message: "Error verifying premium email in premium store",
+							error,
+							context: {
+								emailDomain: emailDomain(email),
+								hasEmail: !!email,
+							},
 						});
 						set({ isLoading: false });
 						return false;
@@ -93,7 +97,11 @@ export const usePremiumStore = create<PremiumStore>()(
 								needsSessionCheck: false,
 							});
 						} catch (error) {
-							logClientError("Error checking existing session in premium store", error, { needsSessionCheck });
+							logClientError({
+								message: "Error checking existing session in premium store",
+								error,
+								context: { needsSessionCheck },
+							});
 							set({ lastVerified: Date.now(), needsSessionCheck: false });
 						} finally {
 							sessionCheckInFlight = null;

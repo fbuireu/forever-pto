@@ -19,7 +19,7 @@ describe("setPremiumCookie", () => {
 		const { setPremiumCookie, PREMIUM_COOKIE } = await import("./cookie");
 		const response = makeMockResponse();
 
-		setPremiumCookie(response, "my-token");
+		setPremiumCookie({ response, token: "my-token" });
 
 		expect(response.cookies.set).toHaveBeenCalledWith(PREMIUM_COOKIE, "my-token", {
 			httpOnly: true,
@@ -34,7 +34,7 @@ describe("setPremiumCookie", () => {
 		const { setPremiumCookie, PREMIUM_COOKIE, PREMIUM_SESSION_LIFETIME_SECONDS } = await import("./cookie");
 		const response = makeMockResponse();
 
-		setPremiumCookie(response, "my-token");
+		setPremiumCookie({ response, token: "my-token" });
 
 		expect(response.cookies.set).toHaveBeenCalledWith(
 			PREMIUM_COOKIE,
@@ -48,7 +48,7 @@ describe("setPremiumCookie", () => {
 		const { setPremiumCookie, PREMIUM_COOKIE } = await import("./cookie");
 		const response = makeMockResponse();
 
-		setPremiumCookie(response, "my-token");
+		setPremiumCookie({ response, token: "my-token" });
 
 		expect(response.cookies.set).toHaveBeenCalledWith(
 			PREMIUM_COOKIE,

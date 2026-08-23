@@ -29,7 +29,7 @@ type HolidayDTOShape = BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> & {
 	createCustom: (params: CreateCustomHolidayParams) => HolidayDTO;
 };
 
-export interface PlanningWindowBounds {
+export interface PlanningWindowIntervalParams {
 	year: number;
 	carryOverMonths: number;
 }
@@ -39,13 +39,21 @@ export interface PlanningWindowInterval {
 	end: Date;
 }
 
-export const planningWindowInterval = ({ year, carryOverMonths }: PlanningWindowBounds): PlanningWindowInterval => ({
+export const planningWindowInterval = ({
+	year,
+	carryOverMonths,
+}: PlanningWindowIntervalParams): PlanningWindowInterval => ({
 	start: new Date(year, 0, 1),
-	end: addMonths(endOfYear(new Date(year, 0, 1)), carryOverMonths),
+	end: addMonths({ date: endOfYear(new Date(year, 0, 1)), months: carryOverMonths }),
 });
 
-export const isInPlanningWindow = (date: Date, window: PlanningWindowInterval): boolean =>
-	isWithinInterval(date, window);
+export interface IsInPlanningWindowParams {
+	date: Date;
+	window: PlanningWindowInterval;
+}
+
+export const isInPlanningWindow = ({ date, window }: IsInPlanningWindowParams): boolean =>
+	isWithinInterval({ date, ...window });
 
 export const holidayDTO: HolidayDTOShape = {
 	create: ({ raw, params }: { raw: RawHoliday[]; params: HolidayDTOParams }) => {
@@ -60,7 +68,7 @@ export const holidayDTO: HolidayDTOShape = {
 			.toSorted((a, b) => Number(!!a.location) - Number(!!b.location))
 			.reduce<HolidayDTO[]>((acc, holiday) => {
 				const holidayDate = fromUpstreamCalendarDay(holiday.date);
-				if (!isWithinInterval(holidayDate, { start: yearStart, end: nextYearEnd })) return acc;
+				if (!isWithinInterval({ date: holidayDate, start: yearStart, end: nextYearEnd })) return acc;
 				const dateKey = holiday.date;
 				if (processedDates.has(dateKey)) return acc;
 				processedDates.add(dateKey);
@@ -70,12 +78,12 @@ export const holidayDTO: HolidayDTOShape = {
 					name: holiday.name,
 					type: holiday.type,
 					variant: holiday.location ? HolidayVariant.REGIONAL : HolidayVariant.NATIONAL,
-					...(holiday.location && { location: getRegionName(holiday.location, regions) }),
-					isInSelectedRange: isInPlanningWindow(holidayDate, planningWindow),
+					...(holiday.location && { location: getRegionName({ regionCode: holiday.location, regions }) }),
+					isInSelectedRange: isInPlanningWindow({ date: holidayDate, window: planningWindow }),
 				});
 				return acc;
 			}, [])
-			.toSorted((a, b) => compareAsc(a.date, b.date));
+			.toSorted((a, b) => compareAsc({ a: a.date, b: b.date }));
 	},
 
 	createCustom: ({ name, date, year, carryOverMonths }: CreateCustomHolidayParams) => ({
@@ -83,7 +91,7 @@ export const holidayDTO: HolidayDTOShape = {
 		name,
 		date,
 		variant: HolidayVariant.CUSTOM,
-		isInSelectedRange: isInPlanningWindow(date, planningWindowInterval({ year, carryOverMonths })),
+		isInSelectedRange: isInPlanningWindow({ date, window: planningWindowInterval({ year, carryOverMonths }) }),
 	}),
 };
 

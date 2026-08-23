@@ -122,14 +122,15 @@ export const useHolidaysStore = create<HolidaysStore>()(
 						.filter((h) => h.variant === HolidayVariant.CUSTOM)
 						.map((h) => ({
 							...h,
-							isInSelectedRange: isInPlanningWindow(h.date, planningWindow),
+							isInSelectedRange: isInPlanningWindow({ date: h.date, window: planningWindow }),
 						}));
 
 					try {
 						const { getHolidays } = await import("@infrastructure/services/holidays/getHolidays");
 						const holidays = await getHolidays(params);
 						const filteredHolidays = holidays.filter(
-							(fetchedHoliday) => !customHolidays.some((custom) => isSameDay(custom.date, fetchedHoliday.date)),
+							(fetchedHoliday) =>
+								!customHolidays.some((custom) => isSameDay({ a: custom.date, b: fetchedHoliday.date })),
 						);
 						set({
 							holidays: [...customHolidays, ...filteredHolidays].toSorted(
@@ -137,10 +138,14 @@ export const useHolidaysStore = create<HolidaysStore>()(
 							),
 						});
 					} catch (error) {
-						logClientError("Error fetching holidays in holidays store", error, {
-							year: params.year,
-							country: params.country,
-							region: params.region,
+						logClientError({
+							message: "Error fetching holidays in holidays store",
+							error,
+							context: {
+								year: params.year,
+								country: params.country,
+								region: params.region,
+							},
 						});
 						set({ holidays: customHolidays });
 					}
@@ -192,13 +197,17 @@ export const useHolidaysStore = create<HolidaysStore>()(
 							currentSelectionIndex: 0,
 						});
 					} catch (error) {
-						logClientError("Error generating suggestions in holidays store", error, {
-							year,
-							ptoDays,
-							holidaysCount: holidays.length,
-							allowPastDays,
-							strategy,
-							locale,
+						logClientError({
+							message: "Error generating suggestions in holidays store",
+							error,
+							context: {
+								year,
+								ptoDays,
+								holidaysCount: holidays.length,
+								allowPastDays,
+								strategy,
+								locale,
+							},
 						});
 						set({
 							suggestion: null,
@@ -265,8 +274,10 @@ export const useHolidaysStore = create<HolidaysStore>()(
 					const { holidays, manuallySelectedDays } = get();
 
 					return {
-						holiday: holidays.find((holiday, index) => index !== exceptHolidayIndex && isSameDay(holiday.date, date)),
-						manualDay: manuallySelectedDays.some((day) => isSameDay(day, date)),
+						holiday: holidays.find(
+							(holiday, index) => index !== exceptHolidayIndex && isSameDay({ a: holiday.date, b: date }),
+						),
+						manualDay: manuallySelectedDays.some((day) => isSameDay({ a: day, b: date })),
 					};
 				},
 
@@ -353,8 +364,8 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
 					if (!currentSelection) return { applied: false, reason: DayRefusal.NO_PLAN };
 
-					const isSuggested = currentSelection.days.some((day) => isSameDay(day, date));
-					const wasRemoved = removedSuggestedDays.some((day) => isSameDay(day, date));
+					const isSuggested = currentSelection.days.some((day) => isSameDay({ a: day, b: date }));
+					const wasRemoved = removedSuggestedDays.some((day) => isSameDay({ a: day, b: date }));
 
 					const { holiday: holidayOnDate, manualDay: isManuallySelected } = get().heldOn({ date });
 
@@ -378,9 +389,9 @@ export const useHolidaysStore = create<HolidaysStore>()(
 					let updatedRemovedDays = removedSuggestedDays;
 
 					if (isManuallySelected) {
-						updatedManualDays = manuallySelectedDays.filter((day) => !isSameDay(day, date));
+						updatedManualDays = manuallySelectedDays.filter((day) => !isSameDay({ a: day, b: date }));
 					} else if (isSuggested && wasRemoved) {
-						updatedRemovedDays = removedSuggestedDays.filter((day) => !isSameDay(day, date));
+						updatedRemovedDays = removedSuggestedDays.filter((day) => !isSameDay({ a: day, b: date }));
 					} else if (isSuggested && !wasRemoved) {
 						updatedRemovedDays = [...removedSuggestedDays, date].toSorted((a, b) => a.getTime() - b.getTime());
 					} else {
@@ -426,7 +437,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 					const { manuallySelectedDays, removedSuggestedDays } = get();
 
 					const planningWindow = planningWindowInterval({ year, carryOverMonths });
-					const isInWindow = (date: Date) => isInPlanningWindow(date, planningWindow);
+					const isInWindow = (date: Date) => isInPlanningWindow({ date, window: planningWindow });
 					const prunedManualDays = manuallySelectedDays.filter(isInWindow);
 					const prunedRemovedDays = removedSuggestedDays.filter(isInWindow);
 

@@ -16,10 +16,15 @@ interface ContactEmailConfig {
 	contactEmail: string;
 }
 
-export const sendContactEmail = (
-	data: ContactFormData,
-	config: ContactEmailConfig,
-): Effect.Effect<
+export interface SendContactEmailParams {
+	data: ContactFormData;
+	config: ContactEmailConfig;
+}
+
+export const sendContactEmail = ({
+	data,
+	config,
+}: SendContactEmailParams): Effect.Effect<
 	{ deferred: Effect.Effect<void, never, TursoService> },
 	ValidationError | EmailError,
 	ResendService | LoggerService
@@ -27,7 +32,7 @@ export const sendContactEmail = (
 	Effect.gen(function* () {
 		const logger = yield* LoggerService;
 
-		const validated = yield* zodParse(contactSchema, data);
+		const validated = yield* zodParse({ schema: contactSchema, data });
 
 		const emailHtml = yield* Effect.tryPromise({
 			try: () => render(ContactFormEmail({ ...validated, baseUrl: config.siteUrl })),

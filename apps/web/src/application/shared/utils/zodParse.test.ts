@@ -18,17 +18,17 @@ beforeEach(() => vi.clearAllMocks());
 
 describe("zodParse", () => {
 	it("resolves with the parsed value for valid data", async () => {
-		const result = await run(zodParse(schema, { name: "Alice", age: 30 }));
+		const result = await run(zodParse({ schema, data: { name: "Alice", age: 30 } }));
 		expect(result).toEqual({ name: "Alice", age: 30 });
 	});
 
 	it("rejects with ValidationError for a Zod violation", async () => {
-		const err = await runFail(zodParse(schema, { name: "A", age: 30 }));
+		const err = await runFail(zodParse({ schema, data: { name: "A", age: 30 } }));
 		expect(err).toBeInstanceOf(ValidationError);
 	});
 
 	it("logs the failing field and message on ZodError", async () => {
-		await runFail(zodParse(schema, { name: "A", age: 30 }));
+		await runFail(zodParse({ schema, data: { name: "A", age: 30 } }));
 		expect(mockLogger.warn).toHaveBeenCalledWith(
 			"Validation error",
 			expect.objectContaining({ field: "name", message: expect.any(String) }),
@@ -36,7 +36,7 @@ describe("zodParse", () => {
 	});
 
 	it("carries the Zod message in the ValidationError", async () => {
-		const err = await runFail(zodParse(schema, { name: "A", age: 30 }));
+		const err = await runFail(zodParse({ schema, data: { name: "A", age: 30 } }));
 		expect(err.message).toBeTruthy();
 	});
 
@@ -46,7 +46,7 @@ describe("zodParse", () => {
 				throw new Error("unexpected");
 			},
 		} as unknown as z.ZodType<string>;
-		const err = await runFail(zodParse(badSchema, "data"));
+		const err = await runFail(zodParse({ schema: badSchema, data: "data" }));
 		expect(err).toBeInstanceOf(ValidationError);
 	});
 
@@ -56,7 +56,7 @@ describe("zodParse", () => {
 				throw new Error("unexpected");
 			},
 		} as unknown as z.ZodType<string>;
-		await runFail(zodParse(badSchema, "data"));
+		await runFail(zodParse({ schema: badSchema, data: "data" }));
 		expect(mockLogger.logError).toHaveBeenCalledOnce();
 		expect(mockLogger.warn).not.toHaveBeenCalled();
 	});

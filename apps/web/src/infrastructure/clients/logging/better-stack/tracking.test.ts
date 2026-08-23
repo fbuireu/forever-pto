@@ -32,18 +32,18 @@ describe("track", () => {
 
 describe("identifyUser", () => {
 	it("is a no-op when window is undefined (SSR)", () => {
-		expect(() => identifyUser("a@b.com", "premium")).not.toThrow();
+		expect(() => identifyUser({ email: "a@b.com", plan: "premium" })).not.toThrow();
 	});
 
 	it("is a no-op when window.betterstack is undefined", () => {
 		vi.stubGlobal("window", {});
-		expect(() => identifyUser("a@b.com", "free")).not.toThrow();
+		expect(() => identifyUser({ email: "a@b.com", plan: "free" })).not.toThrow();
 	});
 
 	it('calls window.betterstack with "user", email and plan', () => {
 		const betterstack = vi.fn();
 		vi.stubGlobal("window", { betterstack });
-		identifyUser("user@example.com", "premium");
+		identifyUser({ email: "user@example.com", plan: "premium" });
 		expect(betterstack).toHaveBeenCalledWith("user", { email: "user@example.com", plan: "premium" });
 	});
 });

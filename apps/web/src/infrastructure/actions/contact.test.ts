@@ -52,9 +52,9 @@ describe("sendContactEmailAction", () => {
 	it("hands the operation the request-scoped site URL and contact address", async () => {
 		await sendContactEmailAction(validData);
 
-		expect(mockSendContactEmail).toHaveBeenCalledWith(validData, {
-			siteUrl: "https://example.com",
-			contactEmail: "contact@example.com",
+		expect(mockSendContactEmail).toHaveBeenCalledWith({
+			data: validData,
+			config: { siteUrl: "https://example.com", contactEmail: "contact@example.com" },
 		});
 	});
 

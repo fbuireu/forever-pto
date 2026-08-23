@@ -33,7 +33,7 @@ export async function getHolidays({
 
 	const program = Effect.try(() =>
 		holidayDTO.create({
-			raw: observedHolidays(source, { country, region, year, locale }),
+			raw: observedHolidays({ source, lookup: { country, region, year, locale } }),
 			params: { year, carryOverMonths, regions },
 		}),
 	).pipe(

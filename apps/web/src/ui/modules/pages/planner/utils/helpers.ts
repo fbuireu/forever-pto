@@ -37,7 +37,7 @@ export const getCalendarDays = ({ month, weekStartsOn, fixedWeeks }: GetCalendar
 
 		const lastDay = days[days.length - 1];
 		for (let i = 1; i <= additionalDays; i++) {
-			const nextDay = addDays(lastDay, i);
+			const nextDay = addDays({ date: lastDay, days: i });
 			days.push(nextDay);
 		}
 	}
@@ -45,7 +45,12 @@ export const getCalendarDays = ({ month, weekStartsOn, fixedWeeks }: GetCalendar
 	return days;
 };
 
-export function calculateWorkdays(range: FromTo, holidays: HolidayDTO[]) {
+export interface DateRangeCountParams {
+	range: FromTo;
+	holidays: HolidayDTO[];
+}
+
+export function calculateWorkdays({ range, holidays }: DateRangeCountParams) {
 	const days = eachDayOfInterval({
 		start: range.from,
 		end: range.to,
@@ -70,7 +75,7 @@ export function calculateWeekends(range: FromTo) {
 	return weekendDays.length;
 }
 
-export function calculateHolidaysInRange(range: FromTo, holidays: HolidayDTO[]) {
+export function calculateHolidaysInRange({ range, holidays }: DateRangeCountParams) {
 	const days = eachDayOfInterval({
 		start: range.from,
 		end: range.to,

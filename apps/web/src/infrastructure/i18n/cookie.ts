@@ -8,6 +8,11 @@ export const LOCALE_COOKIE_POLICY = {
 	path: "/",
 } as const;
 
-export function setLocaleCookie(response: NextResponse, value: string) {
+export interface SetLocaleCookieParams {
+	response: NextResponse;
+	value: string;
+}
+
+export function setLocaleCookie({ response, value }: SetLocaleCookieParams) {
 	response.cookies.set({ ...LOCALE_COOKIE_POLICY, value });
 }

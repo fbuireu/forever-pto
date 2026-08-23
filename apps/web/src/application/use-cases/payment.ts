@@ -24,10 +24,15 @@ interface PaymentResult {
 	deferred: Effect.Effect<void, never, TursoService>;
 }
 
-export const createPayment = (
-	params: CreatePaymentInput,
-	context: PaymentContext,
-): Effect.Effect<
+export interface CreatePaymentParams {
+	params: CreatePaymentInput;
+	context: PaymentContext;
+}
+
+export const createPayment = ({
+	params,
+	context,
+}: CreatePaymentParams): Effect.Effect<
 	PaymentResult,
 	ValidationError | PaymentError | PromoCodeError,
 	StripeServerService | LoggerService | TursoService
@@ -36,13 +41,13 @@ export const createPayment = (
 		const { userAgent, ipAddress } = context;
 		const logger = yield* LoggerService;
 
-		const validated = yield* zodParse(createPaymentSchema, params);
+		const validated = yield* zodParse({ schema: createPaymentSchema, data: params });
 
 		let finalAmount = validated.amount;
 		let discountInfo: DiscountInfo | null = null;
 
 		if (validated.promoCode?.trim()) {
-			discountInfo = yield* validatePromoCode(validated.promoCode, validated.amount);
+			discountInfo = yield* validatePromoCode({ code: validated.promoCode, amount: validated.amount });
 			finalAmount = discountInfo.finalAmount;
 		}
 

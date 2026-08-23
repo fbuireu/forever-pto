@@ -62,9 +62,9 @@ describe("POST /api/contact", () => {
 	it("hands the operation the request-scoped site URL and contact address", async () => {
 		await POST(makeRequest(JSON.stringify(SUBMISSION)) as never);
 
-		expect(mockSendContactEmail).toHaveBeenCalledWith(SUBMISSION, {
-			siteUrl: "https://example.com",
-			contactEmail: "contact@example.com",
+		expect(mockSendContactEmail).toHaveBeenCalledWith({
+			data: SUBMISSION,
+			config: { siteUrl: "https://example.com", contactEmail: "contact@example.com" },
 		});
 	});
 

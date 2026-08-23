@@ -32,9 +32,9 @@ export async function GET(_request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-	const outcome = await activatePremiumRequest(
-		{ ipAddress: resolveClientIp(request.headers) },
-		Effect.gen(function* () {
+	const outcome = await activatePremiumRequest({
+		context: { ipAddress: resolveClientIp(request.headers) },
+		program: Effect.gen(function* () {
 			const body = yield* parseJsonBody<Record<string, unknown>>(request);
 			const email = typeof body.email === "string" ? body.email : undefined;
 			const premiumKey = typeof body.premiumKey === "string" ? body.premiumKey : undefined;
@@ -45,12 +45,12 @@ export async function POST(request: NextRequest) {
 				? activateWithClaimedPayment({ paymentIntentId: premiumKey, expectedEmail: email })
 				: activateWithEmail(email);
 		}),
-	);
+	});
 
 	if (outcome.error !== null) return noStore({ error: outcome.error }, { status: outcome.status });
 
 	const response = noStore({ success: true, premiumKey: outcome.premiumKey, email: outcome.email });
-	setPremiumCookie(response, outcome.token);
+	setPremiumCookie({ response, token: outcome.token });
 
 	return response;
 }

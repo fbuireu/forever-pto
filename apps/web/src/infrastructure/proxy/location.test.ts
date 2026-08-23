@@ -41,7 +41,7 @@ describe("location", () => {
 	it("calls setLocationCookie with the detected country", async () => {
 		const { request, response } = makeParams("ES");
 		await location({ request, response } as never);
-		expect(mockSetLocationCookie).toHaveBeenCalledWith(response, "ES");
+		expect(mockSetLocationCookie).toHaveBeenCalledWith({ response, country: "ES" });
 	});
 
 	it("does not call setLocationCookie when no country is detected", async () => {
@@ -65,7 +65,7 @@ describe("location", () => {
 		it("re-sets the cookie so the expiry window slides", async () => {
 			const { request, response } = makeParams("FR", "ES");
 			await location({ request, response } as never);
-			expect(mockSetLocationCookie).toHaveBeenCalledWith(response, "ES");
+			expect(mockSetLocationCookie).toHaveBeenCalledWith({ response, country: "ES" });
 		});
 
 		it("returns the response", async () => {

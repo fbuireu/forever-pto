@@ -37,19 +37,19 @@ const makeHoliday = (date: Date) => ({
 
 describe("getMonthlyDist", () => {
 	it("returns 12 zeros for empty input", () => {
-		expect(getMonthlyDist([], WINDOW)).toEqual(new Array(12).fill(0));
+		expect(getMonthlyDist({ days: [], window: WINDOW })).toEqual(new Array(12).fill(0));
 	});
 
 	it("counts dates into correct month buckets", () => {
 		const days = [makeDate(2025, 1, 6), makeDate(2025, 1, 7), makeDate(2025, 3, 1)];
-		const dist = getMonthlyDist(days, WINDOW);
+		const dist = getMonthlyDist({ days, window: WINDOW });
 		expect(dist[0]).toBe(2);
 		expect(dist[1]).toBe(0);
 		expect(dist[2]).toBe(1);
 	});
 
 	it("uses 0-indexed months", () => {
-		const dist = getMonthlyDist([makeDate(2025, 12, 1)], WINDOW);
+		const dist = getMonthlyDist({ days: [makeDate(2025, 12, 1)], window: WINDOW });
 		expect(dist[11]).toBe(1);
 	});
 });
@@ -197,20 +197,20 @@ describe("calculateRestBlocks", () => {
 
 describe("calculateQuarterDistribution", () => {
 	it("returns 4 zeros for empty input", () => {
-		expect(calculateQuarterDistribution([], WINDOW)).toEqual([0, 0, 0, 0]);
+		expect(calculateQuarterDistribution({ dates: [], window: WINDOW })).toEqual([0, 0, 0, 0]);
 	});
 
 	it("assigns dates to the correct quarter", () => {
 		const dates = [makeDate(2025, 1, 1), makeDate(2025, 4, 1), makeDate(2025, 7, 1), makeDate(2025, 10, 1)];
-		expect(calculateQuarterDistribution(dates, WINDOW)).toEqual([1, 1, 1, 1]);
+		expect(calculateQuarterDistribution({ dates, window: WINDOW })).toEqual([1, 1, 1, 1]);
 	});
 
 	it("places January-March in Q1 (index 0)", () => {
-		expect(calculateQuarterDistribution([makeDate(2025, 3, 31)], WINDOW)[0]).toBe(1);
+		expect(calculateQuarterDistribution({ dates: [makeDate(2025, 3, 31)], window: WINDOW })[0]).toBe(1);
 	});
 
 	it("places October-December in Q4 (index 3)", () => {
-		expect(calculateQuarterDistribution([makeDate(2025, 12, 1)], WINDOW)[3]).toBe(1);
+		expect(calculateQuarterDistribution({ dates: [makeDate(2025, 12, 1)], window: WINDOW })[3]).toBe(1);
 	});
 });
 
@@ -440,24 +440,24 @@ describe("the Planning Window shapes the distributions", () => {
 	const CARRY_OVER = { year: 2025, carryOverMonths: 2 };
 
 	it("gives the monthly distribution one bucket per month of the window, not per calendar month", () => {
-		expect(getMonthlyDist([], CARRY_OVER)).toHaveLength(14);
+		expect(getMonthlyDist({ days: [], window: CARRY_OVER })).toHaveLength(14);
 	});
 
 	it("puts a Carry-over Month in its own bucket instead of folding it into the planning year", () => {
 		const carryOverDay = makeDate(2026, 1, 5);
-		const dist = getMonthlyDist([makeDate(2025, 1, 5), carryOverDay], CARRY_OVER);
+		const dist = getMonthlyDist({ days: [makeDate(2025, 1, 5), carryOverDay], window: CARRY_OVER });
 
 		expect(dist[0]).toBe(1);
 		expect(dist[12]).toBe(1);
 	});
 
 	it("drops a date outside the window rather than folding it in", () => {
-		expect(getMonthlyDist([makeDate(2027, 6, 1)], CARRY_OVER).every((n) => n === 0)).toBe(true);
+		expect(getMonthlyDist({ days: [makeDate(2027, 6, 1)], window: CARRY_OVER }).every((n) => n === 0)).toBe(true);
 	});
 
 	it("extends the quarters to cover the window", () => {
-		expect(calculateQuarterDistribution([], CARRY_OVER)).toHaveLength(5);
-		expect(calculateQuarterDistribution([makeDate(2026, 1, 5)], CARRY_OVER)[4]).toBe(1);
+		expect(calculateQuarterDistribution({ dates: [], window: CARRY_OVER })).toHaveLength(5);
+		expect(calculateQuarterDistribution({ dates: [makeDate(2026, 1, 5)], window: CARRY_OVER })[4]).toBe(1);
 	});
 
 	it("extends the long-block quarters the same way", () => {

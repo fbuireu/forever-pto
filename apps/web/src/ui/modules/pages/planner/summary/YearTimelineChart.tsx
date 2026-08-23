@@ -22,12 +22,12 @@ function getDaysInMonth(month: number, year: number) {
 function segPos(date: Date, year: number, monthCount: number) {
 	const day = getDayOfMonth(date);
 	const daysInMonth = getDaysInMonth(getMonth(date), getYear(date));
-	return (windowMonthIndex(date, { year }) + (day - 1) / daysInMonth) / monthCount;
+	return (windowMonthIndex({ date, window: { year } }) + (day - 1) / daysInMonth) / monthCount;
 }
 
 function segWidth(start: Date, end: Date, year: number, monthCount: number) {
 	const daysInMonth = getDaysInMonth(getMonth(end), getYear(end));
-	const endFrac = (windowMonthIndex(end, { year }) + getDayOfMonth(end) / daysInMonth) / monthCount;
+	const endFrac = (windowMonthIndex({ date: end, window: { year } }) + getDayOfMonth(end) / daysInMonth) / monthCount;
 	return Math.max(endFrac - segPos(start, year, monthCount), 0.005);
 }
 
@@ -38,7 +38,7 @@ function groupDates(dates: Date[], maxGapDays: number) {
 	let s = sorted[0];
 	let e = sorted[0];
 	for (let i = 1; i < sorted.length; i++) {
-		if (differenceInDays(sorted[i], e) <= maxGapDays) {
+		if (differenceInDays({ dateLeft: sorted[i], dateRight: e }) <= maxGapDays) {
 			e = sorted[i];
 		} else {
 			out.push({ start: s, end: e });

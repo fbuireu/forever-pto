@@ -49,10 +49,15 @@ const calculateFinalAmount = (coupon: Stripe.Coupon, amount: number) => {
 	return amount;
 };
 
-export const validatePromoCode = (
-	code: string,
-	amount: number,
-): Effect.Effect<DiscountInfo, PromoCodeError, StripeServerService | TursoService> =>
+export interface ValidatePromoCodeParams {
+	code: string;
+	amount: number;
+}
+
+export const validatePromoCode = ({
+	code,
+	amount,
+}: ValidatePromoCodeParams): Effect.Effect<DiscountInfo, PromoCodeError, StripeServerService | TursoService> =>
 	Effect.gen(function* () {
 		const stripe = yield* StripeServerService;
 
