@@ -13,11 +13,11 @@ All four follow the same skeleton: a core `Card` with an icon-and-title header, 
 
 ### QuarterDistributionChart
 
-`QuarterDistributionChart.tsx` is a `BarChart` of suggested days off per quarter (`quarterDist: number[]`, one bar per Q1–Q4). Bars are colored per quarter from `COLOR_SCHEMES` in `summary/const.ts` (the four brand CSS variables: teal, purple, yellow, green). The description summarizes total days and how many quarters are active.
+`QuarterDistributionChart.tsx` is a `BarChart` of the PTO Days the plan places per quarter (`quarterDist: number[]`, one bar per Q1–Q4). Bars are colored per quarter from `COLOR_SCHEMES` in `summary/const.ts` (the four brand CSS variables: teal, purple, yellow, green). The description summarizes total days and how many quarters are active.
 
 ### MonthlyDistributionChart
 
-`MonthlyDistributionChart.tsx` is an `AreaChart` of days off per month across the plan (`monthlyDist: number[]`, plus `year` and `carryOverMonths`). When carryover months are configured the x-axis extends past December, with month names localized via `useLocale` and `getMonthNames` from `../utils/helpers`. The description calls out the peak month.
+`MonthlyDistributionChart.tsx` is an `AreaChart` of the PTO Days the plan places per month (`monthlyDist: number[]`, plus `year` and `carryOverMonths`). When carryover months are configured the x-axis extends past December, with month names localized via `useLocale` and `getMonthNames` from `../utils/helpers`. The description calls out the peak month.
 
 ### HolidaysDistributionChart
 

@@ -8,8 +8,8 @@ Bridges that turn that budget into the longest stretches off, and reports how we
 
 **The whole planner runs in the browser**: the server holds payment and contact records and nothing else
 ([ADR 0001](../../adr/0001-planner-runs-in-the-browser.md)). The server side is seven API route handlers
-(`check-session`, `contact`, `health`, `markdown`, `payment`, `payment/activate`), the Stripe webhook, a
-`.well-known` catch-all, [`middleware.ts`](./src/middleware.ts), and some static rendering.
+(`check-session`, `contact`, `health`, `markdown`, `payment`, `payment/activate` and the Stripe webhook at
+`webhooks/stripe`), a `.well-known` catch-all, [`middleware.ts`](./src/middleware.ts), and some static rendering.
 
 Premium (advanced metrics, manual editing of a Suggestion) is unlocked by a Donation. There are no accounts:
 the payment record *is* the entitlement ([ADR 0008](../../adr/0008-premium-derived-from-payment.md)).

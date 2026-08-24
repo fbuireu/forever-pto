@@ -22,7 +22,7 @@ Two customizations happen in `onPopoverRender`:
 
 - Steps target elements by `data-tutorial` attributes: `sidebar-step-1` through `sidebar-step-4`, `sidebar-tools`, `alternatives-manager`, `pto-status`, `holidays-list`, `calendar-list`, plus a final unanchored step. Titles and descriptions come from the `tutorial.steps` i18n namespace; button labels and the progress text from `tutorial` (see [internationalization](/how-it-works/i18n/)).
 - **Mobile** (`useIsMobile`) inserts an extra `planner-drawer` step, and the alternatives step dispatches a `tutorial:expand-drawer` custom event so the drawer opens before it is highlighted.
-- If the sidebar is closed, the hook toggles it first and waits for the container's `transitionend` before starting; otherwise the first highlights would target collapsed elements.
+- If the sidebar is closed, the hook toggles it first and waits for the first anchor to stop moving before starting; otherwise the first highlights would target collapsed elements. It measures the anchor rather than listening for `transitionend`, which was tried and does not fire reliably here.
 
 ## Styling
 
@@ -30,4 +30,6 @@ Two customizations happen in `onPopoverRender`:
 
 ## Adding a step
 
-Add a `data-tutorial="..."` attribute to the target element, a step entry in `useTutorial`, and `step*Title`/`step*Description` keys to every locale's `tutorial.steps` namespace. Nothing else registers steps: the attribute is the contract.
+Add the anchor to `TUTORIAL_ANCHOR` in `apps/web/src/ui/modules/tutorial/anchors.ts`, spread it onto the target element as `data-tutorial={TUTORIAL_ANCHOR.YOUR_ANCHOR}`, add the step in `useTutorial` through `tutorialSelector(TUTORIAL_ANCHOR.YOUR_ANCHOR)`, then add `step*Title` and `step*Description` to every locale's `tutorial.steps` namespace.
+
+`TUTORIAL_ANCHOR` is the contract, not the attribute. `anchors.test.ts` reads the component tree and asserts the two sets match in both directions, so a raw string attribute turns it red and an anchor no element carries does too.

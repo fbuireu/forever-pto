@@ -37,14 +37,48 @@ const BACKTICKED_TOKEN = /`([^`]+)`/g;
 const BACKTICKED_SOURCE_FILE = /`([^`\s]+\.(?:ts|tsx))`/g;
 const NESTED_CONTEXT_CITATION = /((?:[\w@-]+\/)+CONTEXT\.md)/g;
 const BACKTICKED_ALIAS = /`([^`.]+\/\*)`/g;
-const CITED_PNPM_SCRIPT = /\bpnpm (?:run )?([a-z][a-z0-9:-]*)/g;
-const CITED_FILTERED_PNPM_SCRIPT = /\bpnpm --filter (\S+) (?:run )?([a-z][a-z0-9:-]*)/g;
+// `pnpm` spells the package flag four ways and the two rules reading citations knew one of them, so
+// `pnpm -F forever-pto-docs bulid` was invisible to both: the bare pattern met a `-` where it wanted
+// `[a-z]` and yielded nothing at all, and the filtered pattern wanted the literal `--filter`. One parser
+// reads every invocation now, so a flag spelling cannot switch a rule off. `--dir` and `-C` name a
+// directory where `--filter` and `-F` name a package, which is why both forms of ref have to resolve.
+const PNPM_PACKAGE_FLAG = "(?:--filter|-F|--dir|-C)";
+const PNPM_INVOCATION = new RegExp(
+	String.raw`\bpnpm((?:\s+${PNPM_PACKAGE_FLAG}(?:\s+|=)\S+|\s+-{1,2}[\w-]+)*)\s+(?:run\s+)?([a-z][a-z0-9:-]*)`,
+	"g",
+);
+const PNPM_INVOCATION_START = /\bpnpm\s+\S/g;
+const CITED_PACKAGE_REF = new RegExp(String.raw`${PNPM_PACKAGE_FLAG}(?:\s+|=)(\S+)`);
 const WORKFLOW_SHELL_STEP = /^(\s*)-?[ \t]*(?:run|command):[ \t]*(\|[-+]?)?[ \t]*(.*)$/;
-const BUILD_COMMAND = /\bpnpm (?:run |--filter \S+ )*(?:cf:)?build\b/;
+// The two censuses below count steps, and both were counting a spelling rather than a job. `BUILD_COMMAND`
+// read `pnpm … build` and nothing else, so `pnpm -F <pkg> build`, `pnpm exec astro build` and `npx next
+// build` were all invisible; the deploy census substring-matched `wrangler deploy`, which is two of this
+// repo's four deploys. The other two arrive through `cloudflare/wrangler-action`'s `command:` input and
+// through a script name (`apps/docs`'s `deploy` is `astro build && wrangler deploy`). A tool name is what
+// survives a change of runner, so that is what these match, plus the script names that resolve to one.
+const BUILD_TOOL_COMMAND = /\b(?:astro|next|opennextjs-cloudflare|vite|tsc|turbo) build\b/;
+const BUILD_SCRIPT_NAME = /^(?:cf:)?build$/;
+const DEPLOY_TOOL_COMMAND = /\b(?:wrangler|opennextjs-cloudflare) deploy\b/;
+const WRANGLER_ACTION_DEPLOY = /\bcommand:[ \t]*deploy\b/;
 const ALIAS_WILDCARD_SUFFIX = /\/\*$/;
 const WORKSPACE_PACKAGE_GLOB = /^\s*-\s*['"]?([^'"\s#]+)['"]?\s*$/gm;
 const GITHUB_WORKFLOW_EXPRESSION = /\$\{\{\s*github\.workflow\s*\}\}/;
 const FONT_VARIABLE = /variable: ["'](--[\w-]+)["']/g;
+
+const escapeForRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+// A compound noun does not always pluralise on its last word. `term + "s?"` matched "day offs", which
+// nobody writes, and could not match "days off", which the wiki wrote seven times across four pages while
+// this rule reported nothing. Every word takes the optional `s` now, and the gaps take any run of
+// whitespace, so a compound broken across a wrapped line is still read as one term.
+const retiredTermPattern = (term: string) =>
+	new RegExp(
+		`\\b${term
+			.split(/\s+/)
+			.map((word) => `${escapeForRegExp(word)}s?`)
+			.join("\\s+")}\\b`,
+		"gi",
+	);
 
 // Everything the repo would ship, staged or not, so a rule fires before the offending file is committed.
 // Ignored paths and vendored tooling under dotfolders are excluded: they are not ours to fix.
@@ -64,6 +98,34 @@ const read = (path: string) => readFileSync(join(ROOT, path), "utf8");
 const readIfPresent = (path: string) => (existsSync(join(ROOT, path)) ? read(path) : "");
 const readJson = (path: string) => JSON.parse(read(path));
 
+// A relative specifier is not its file name. TypeScript resolves `"./foo"` to `foo.ts` *or* `foo/index.ts`,
+// and NodeNext writes `"./foo.js"` for what is authored as `foo.ts`. Every candidate has to be a source file
+// on disk: `existsSync` alone says yes to the directory a barrel specifier names, which is not a module.
+interface ResolveRelativeImportParams {
+	from: string;
+	specifier: string;
+}
+
+const resolveRelativeImport = ({ from, specifier }: ResolveRelativeImportParams) => {
+	const target = join(dirname(from), specifier).replace(/\\/g, "/");
+	const candidates = SOURCE_FILE.test(target)
+		? [target]
+		: [
+				...(target.endsWith(".js") ? [target.replace(/\.js$/, ".ts"), target.replace(/\.js$/, ".tsx")] : []),
+				`${target}.ts`,
+				`${target}.tsx`,
+				`${target}/index.ts`,
+				`${target}/index.tsx`,
+			];
+
+	return (
+		candidates.find((candidate) => {
+			const absolute = join(ROOT, candidate);
+			return existsSync(absolute) && statSync(absolute).isFile();
+		}) ?? null
+	);
+};
+
 const isGitIgnored = (path: string) => {
 	try {
 		execFileSync("git", ["check-ignore", "--no-index", "-q", "--", path], { cwd: ROOT });
@@ -79,12 +141,50 @@ const rootManifest = readJson("package.json");
 const rootScripts: Record<string, string> = rootManifest.scripts ?? {};
 const webScripts: Record<string, string> = readJson(`${WEB}/package.json`).scripts ?? {};
 const docsScripts: Record<string, string> = readJson(`${DOCS}/package.json`).scripts ?? {};
-const scriptsByPackageName = new Map(
-	WORKSPACE_PACKAGES.map((pkg) => {
+// Keyed by every ref a citation can name a package with: its manifest name for `--filter` and `-F`, and
+// its directory, bare or dot-prefixed, for `--dir` and `-C`.
+const scriptsByPackageRef = new Map(
+	WORKSPACE_PACKAGES.flatMap((pkg) => {
 		const manifest = readJson(`${pkg}/package.json`);
-		return [manifest.name as string, (manifest.scripts ?? {}) as Record<string, string>];
+		const scripts = (manifest.scripts ?? {}) as Record<string, string>;
+		return [manifest.name as string, pkg, `./${pkg}`].map((ref) => [ref, scripts] as [string, Record<string, string>]);
 	}),
 );
+
+interface PnpmCitation {
+	pkg: string | null;
+	script: string;
+}
+
+const pnpmCitations = (body: string): PnpmCitation[] =>
+	[...body.matchAll(PNPM_INVOCATION)]
+		.map(([, flags = "", script = ""]) => ({ pkg: CITED_PACKAGE_REF.exec(flags)?.[1] ?? null, script }))
+		.filter(({ script }) => !NON_SCRIPT_PNPM.has(script));
+
+// A workflow step naming a script runs everything the chain ends in, and the chains here are three deep:
+// root `deploy` is `pnpm --filter forever-pto deploy`, which is `pnpm run cf:build && opennextjs-cloudflare
+// deploy`. A census that reads the step text alone sees the script name and none of that. An unfiltered
+// citation inside a package's own script resolves against that package, which is why the ref is inherited.
+interface ExpandScriptParams {
+	citation: PnpmCitation;
+	seen?: Set<string>;
+}
+
+const expandScript = ({ citation, seen = new Set<string>() }: ExpandScriptParams): string => {
+	const key = `${citation.pkg ?? "<root>"}:${citation.script}`;
+	if (seen.has(key)) return "";
+	seen.add(key);
+
+	const scripts = citation.pkg === null ? rootScripts : (scriptsByPackageRef.get(citation.pkg) ?? {});
+	const body = scripts[citation.script] ?? "";
+
+	return [
+		body,
+		...pnpmCitations(body).map((next) =>
+			expandScript({ citation: { pkg: next.pkg ?? citation.pkg, script: next.script }, seen }),
+		),
+	].join("\n");
+};
 const webTsconfig = readJson(`${WEB}/tsconfig.json`);
 const webTsconfigOptions: Record<string, unknown> = webTsconfig.compilerOptions;
 const webTsconfigExclude: string[] = webTsconfig.exclude ?? [];
@@ -589,7 +689,11 @@ describe("documentation does not point at things that are gone", () => {
 	//
 	// The bar is existence, not export: `MIN_FINAL_AMOUNT` is module-private and `NEXT_LOCALE` is a cookie's
 	// value rather than its identifier, and the wiki is right to name both. What it may not do is invent one.
-	it("names only constants that exist somewhere in apps/web, in the published wiki", () => {
+	//
+	// Prose only, and the title says so. A fenced block is the app's own code quoted verbatim, where a
+	// constant is either real or a compile error in the file it came from; the fence-stripping above is the
+	// point rather than an oversight, so the title had to stop promising the whole page.
+	it("names only constants that exist somewhere in apps/web, in the published wiki's prose", () => {
 		const SCREAMING_SNAKE = /^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+$/;
 		const CONSTANT_NAME = /[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+/g;
 
@@ -664,17 +768,31 @@ describe("documentation does not point at things that are gone", () => {
 	// the demos ship unstyled, which `demos.spec.ts` cannot see because it asserts a 200, a child count and a
 	// silent console. Bare package specifiers are the resolver's problem, so only the relative reaches count.
 	it("resolves every relative @import and @source the docs stylesheets reach for", () => {
+		// The scope was `src/styles/**.css`, which is one file. CSS is not the only place this site writes
+		// CSS: an `.astro` component carries its own scoped `<style>`, and a stylesheet added anywhere else
+		// under the package would have been unscanned. Every `.css` the package tracks counts now, and every
+		// `<style>` body in an `.astro` file, whose relative reaches resolve from the component's own folder.
 		const CSS_REACH = /@(?:import|source)\s+['"](\.[^'"]+)['"]/g;
+		const STYLE_BLOCK = /<style[^>]*>([\s\S]*?)<\/style>/g;
 		const dangling: string[] = [];
 		let checked = 0;
 
-		for (const file of trackedFiles.filter((path) => path.startsWith(`${DOCS}/src/styles/`) && path.endsWith(".css"))) {
-			for (const [, specifier] of read(file).matchAll(CSS_REACH)) {
+		const inPackage = trackedFiles.filter((path) => path.startsWith(`${DOCS}/`));
+		const bodies = [
+			...inPackage.filter((path) => path.endsWith(".css")).map((file) => ({ file, css: read(file) })),
+			...inPackage
+				.filter((path) => path.endsWith(".astro"))
+				.flatMap((file) => [...read(file).matchAll(STYLE_BLOCK)].map(([, css = ""]) => ({ file, css }))),
+		];
+
+		for (const { file, css } of bodies) {
+			for (const [, specifier] of css.matchAll(CSS_REACH)) {
 				checked += 1;
 				if (!existsSync(resolve(ROOT, dirname(file), specifier))) dangling.push(`${file} -> ${specifier}`);
 			}
 		}
 
+		expect(bodies.length).toBeGreaterThan(1);
 		expect(checked).toBeGreaterThanOrEqual(5);
 		expect(dangling).toEqual([]);
 	});
@@ -887,7 +1005,7 @@ describe("documentation does not point at things that are gone", () => {
 				.replace(/`[^`]*`/g, "");
 
 			for (const term of compounds) {
-				const pattern = new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}s?\\b`, "gi");
+				const pattern = retiredTermPattern(term);
 				for (const [match] of prose.matchAll(pattern)) offenders.push(`${file} -> ${match}`);
 			}
 		}
@@ -934,21 +1052,31 @@ describe("documentation does not point at things that are gone", () => {
 			...fontVariables,
 		]);
 
+		// `.astro` was outside the file set, and the reason was `SiteTitle.astro` naming three `--sl-*`
+		// tokens: Starlight declares those, this repo does not, and the whole extension was excluded to keep
+		// them out. That also excluded every token in an `.astro` file that *is* ours, so a typo'd
+		// `var(--color-brand-yelow)` there rendered transparent with nothing to catch it. The carve-out is
+		// the vendor prefix now, which is what was actually meant.
+		const VENDOR_TOKEN = /^--sl-/;
 		const citing = [
 			...contentFiles.filter((path) => path.includes("/design-system/")),
-			...trackedFiles.filter((path) => path.startsWith(`${DOCS}/src/components/`) && path.endsWith(".tsx")),
+			...trackedFiles.filter(
+				(path) => path.startsWith(`${DOCS}/src/components/`) && (path.endsWith(".tsx") || path.endsWith(".astro")),
+			),
 		];
 		const cited = new Set(
-			citing.flatMap((path) => {
-				const source = read(path);
-				return [
-					...[...source.matchAll(/var\((--[\w-]+)\)/g)].map(([, token]) => token),
-					...[...source.matchAll(/tokens=\{\[([\s\S]*?)\]\}/g)].flatMap(([, list]) =>
-						[...list.matchAll(/["'](--[\w-]+)["']/g)].map(([, token]) => token),
-					),
-					...[...source.matchAll(/token: ["'](--[\w-]+)["']/g)].map(([, token]) => token),
-				];
-			}),
+			citing
+				.flatMap((path) => {
+					const source = read(path);
+					return [
+						...[...source.matchAll(/var\((--[\w-]+)\)/g)].map(([, token]) => token),
+						...[...source.matchAll(/tokens=\{\[([\s\S]*?)\]\}/g)].flatMap(([, list]) =>
+							[...list.matchAll(/["'](--[\w-]+)["']/g)].map(([, token]) => token),
+						),
+						...[...source.matchAll(/token: ["'](--[\w-]+)["']/g)].map(([, token]) => token),
+					];
+				})
+				.filter((token) => !VENDOR_TOKEN.test(token as string)),
 		);
 
 		expect(declared.size).toBeGreaterThan(20);
@@ -1002,6 +1130,41 @@ describe("documentation does not point at things that are gone", () => {
 
 		expect(checked).toBeGreaterThan(0);
 		expect(restated).toEqual([]);
+	});
+
+	// The rule above is named for `search.ctrlKey` and cannot see it. It flags an override byte-identical to
+	// the vendor string, and the defect was `"Ctrl K"` against a vendor `"Ctrl"`: not equal, so not flagged,
+	// so re-adding the key would reship "Ctrl K K" on all 76 Spanish pages with the suite green.
+	//
+	// Starlight renders the value in a `<kbd>` of its own beside a literal `<kbd>K</kbd>`, so the only
+	// correct value is a modifier on its own. That is what this asserts, and the vendor markup is read first
+	// so the rule fails loudly rather than quietly if upstream stops rendering the K itself.
+	//
+	// What it does not cover: any other key. There is no general test for "the default plus more" because a
+	// legitimate reword may well contain the default as a substring; this key is checkable because its
+	// rendered shape is fixed, and the others are prose.
+	it("overrides search.ctrlKey with a modifier alone, because Starlight renders the K itself", () => {
+		const SEARCH_SHORTCUT = /<kbd>\{[^}]*search\.ctrlKey[^}]*\}<\/kbd><kbd>K<\/kbd>/;
+		const MODIFIER_ALONE = /^\S{1,5}$/;
+		const search = `${DOCS}/node_modules/@astrojs/starlight/components/Search.astro`;
+
+		expect(existsSync(join(ROOT, search)), `${search} is absent, so this rule would read nothing`).toBe(true);
+		expect(SEARCH_SHORTCUT.test(read(search))).toBe(true);
+
+		// No floor on the count: the key is absent from the overrides today, which is the state this rule
+		// exists to keep. The vendor-markup assertion above is what stops it reading nothing by accident.
+		const offenders: string[] = [];
+
+		for (const file of trackedFiles.filter(
+			(path) => path.startsWith(`${DOCS}/src/content/i18n/`) && path.endsWith(".json"),
+		)) {
+			const value = (readJson(file) as Record<string, string>)["search.ctrlKey"];
+			if (value === undefined) continue;
+			if (!MODIFIER_ALONE.test(value) || /k$/i.test(value))
+				offenders.push(`${file} -> search.ctrlKey is "${value}", and Starlight appends the K`);
+		}
+
+		expect(offenders).toEqual([]);
 	});
 
 	it("prints repo-relative paths in the published wiki, never package-relative ones", () => {
@@ -1141,10 +1304,16 @@ describe("the guides describe the project as it is configured", () => {
 	// `/*` and searched the raw file, so `@app` matched inside `@application` and `src/*` reduced to `src`,
 	// and either alias could be deleted from the guide with every assertion still green.
 	const documentedAliases = new Set([...webGuide.matchAll(BACKTICKED_ALIAS)].map(([, alias]) => alias));
-	const citedScripts = (guide: string) =>
-		[...new Set([...guide.matchAll(CITED_PNPM_SCRIPT)].map(([, script]) => script))].filter(
-			(script) => !NON_SCRIPT_PNPM.has(script),
-		);
+	// The unfiltered citations only. A `--filter`/`-F`/`--dir`/`-C` invocation names the manifest it means,
+	// so it is resolved against that one rather than against whichever of the three happens to have the
+	// script, by the rule further down.
+	const citedScripts = (guide: string) => [
+		...new Set(
+			pnpmCitations(guide)
+				.filter(({ pkg }) => pkg === null)
+				.map(({ script }) => script),
+		),
+	];
 
 	it("cites only root scripts that the root manifest has", () => {
 		expect(citedScripts(rootGuide).filter((script) => !(script in rootScripts))).toEqual([]);
@@ -1165,10 +1334,28 @@ describe("the guides describe the project as it is configured", () => {
 	// `docs.yml`'s Typecheck step ran `pnpm --filter forever-pto-docs check`, a script the docs manifest has
 	// never had. Every job runs from the repo root or from one of the two packages, so a bare script has to
 	// resolve in one of the three manifests.
+	//
+	// `docs.yml` reached this rule asserting `[] === []`, which is the workflow the rule was written for:
+	// all four of its pnpm invocations are filter-form, and the bare pattern this used to read could not see
+	// one. Both forms are checked here now, and the count of invocations the parser could read is compared
+	// with the count present, so the next spelling nobody anticipated fails loudly instead of emptying the
+	// citation list.
 	it.each(workflowFiles)("%s runs only scripts a manifest declares", (file) => {
 		const commands = runCommands(read(file));
 		const available = { ...rootScripts, ...webScripts, ...docsScripts };
-		expect(citedScripts(commands).filter((script) => !(script in available))).toEqual([]);
+
+		const present = (commands.match(PNPM_INVOCATION_START) ?? []).length;
+		const parsed = [...commands.matchAll(PNPM_INVOCATION)].length;
+		expect({ file, parsed }).toEqual({ file, parsed: present });
+
+		const offenders = pnpmCitations(commands).flatMap(({ pkg, script }) => {
+			if (pkg === null) return script in available ? [] : [`pnpm ${script}`];
+			const scripts = scriptsByPackageRef.get(pkg);
+			if (!scripts) return [`pnpm --filter ${pkg} (no such workspace package)`];
+			return script in scripts ? [] : [`pnpm --filter ${pkg} ${script}`];
+		});
+
+		expect(offenders).toEqual([]);
 	});
 
 	it.each(workflowFiles.map((file) => file.slice(WORKFLOW_DIR.length + 1)))(
@@ -1177,26 +1364,43 @@ describe("the guides describe the project as it is configured", () => {
 			const rootGuide = read("CLAUDE.md");
 			const wiki = read(`${DOCS}/src/content/docs/infra/workflows.mdx`);
 
-			expect({ rootGuide: rootGuide.includes(name), wiki: wiki.includes(`## \`${name}\``) }).toEqual({
+			// A bare `includes(name)` was not a listing test: `ci.yml` is named twelve times in that guide,
+			// so deleting the paragraph that documents it and leaving any one incidental mention kept this
+			// green. The guide links every workflow it lists to the file, and the link is what a reader
+			// follows, so that is the thing to require.
+			const linked = new RegExp(String.raw`\]\([^)]*\.github/workflows/${escapeForRegExp(name)}\)`);
+
+			expect({ rootGuide: linked.test(rootGuide), wiki: wiki.includes(`## \`${name}\``) }).toEqual({
 				rootGuide: true,
 				wiki: true,
 			});
 		},
 	);
 
+	// This saw two of the four deploys this repo runs, and its floor of `> 1` was satisfied by both of them,
+	// so the two it could not see were unguarded. `docs.yml` deploys twice through `cloudflare/wrangler-action`,
+	// whose script arrives on a `command:` input rather than in the step text, and a script name reaches a
+	// deploy of its own: `apps/docs`'s `deploy` is `astro build && wrangler deploy`. Replacing the docs
+	// production deploy with a retry-wrapped `pnpm --filter forever-pto-docs deploy` kept the count at two,
+	// kept `wrapped` empty, and retried a wrangler deploy three times on an argv error. The floor tracks the
+	// four the repo actually has, so losing sight of one fails rather than passes.
 	it("runs every wrangler deploy without a retry wrapper, so an argv error reports on the first attempt", () => {
 		const wrapped: string[] = [];
 		let deploySteps = 0;
 
 		for (const file of workflowFiles) {
 			for (const step of read(file).split("- name:")) {
-				if (!step.includes("wrangler deploy")) continue;
+				const deploys =
+					DEPLOY_TOOL_COMMAND.test(step) ||
+					(step.includes("cloudflare/wrangler-action") && WRANGLER_ACTION_DEPLOY.test(step)) ||
+					pnpmCitations(step).some((citation) => DEPLOY_TOOL_COMMAND.test(expandScript({ citation })));
+				if (!deploys) continue;
 				deploySteps += 1;
 				if (step.includes("nick-fields/retry")) wrapped.push(`${file} ->${step.split(/\r?\n/)[0] ?? ""}`);
 			}
 		}
 
-		expect(deploySteps).toBeGreaterThan(1);
+		expect(deploySteps).toBeGreaterThan(3);
 		expect(wrapped).toEqual([]);
 	});
 
@@ -1209,7 +1413,13 @@ describe("the guides describe the project as it is configured", () => {
 
 		for (const file of workflowFiles) {
 			for (const step of read(file).split("- name:")) {
-				if (!BUILD_COMMAND.test(step)) continue;
+				const builds =
+					BUILD_TOOL_COMMAND.test(step) ||
+					pnpmCitations(step).some(
+						(citation) =>
+							BUILD_SCRIPT_NAME.test(citation.script) || BUILD_TOOL_COMMAND.test(expandScript({ citation })),
+					);
+				if (!builds) continue;
 				buildSteps += 1;
 				if (step.includes("nick-fields/retry")) wrapped.push(`${file} ->${step.split(/\r?\n/)[0] ?? ""}`);
 			}
@@ -1244,13 +1454,22 @@ describe("the guides describe the project as it is configured", () => {
 		const reached = new Set<string>();
 		const pending = [...sources];
 
+		// A reach the resolver cannot place is a failure, not an exemption. The first version appended `.ts`
+		// and nothing else, so `"./foo"` meaning `foo/index.ts` and a NodeNext `"./foo.js"` both produced a
+		// path that does not exist; the final filter then guarded itself with `existsSync`, so exactly the
+		// specifiers it could not follow were the ones it let through. The `not.toEqual([])` floor did not
+		// notice either: one unresolvable entry is a non-tail entry and satisfies it on its own.
+		const unresolved: string[] = [];
+
 		while (pending.length > 0) {
 			const file = pending.pop() as string;
-			if (!existsSync(join(ROOT, file))) continue;
 
 			for (const [, specifier] of read(file).matchAll(/from\s+["'](\.[^"']+)["']/g)) {
-				const target = join(dirname(file), specifier as string).replace(/\\/g, "/");
-				const resolved = SOURCE_FILE.test(target) ? target : `${target}.ts`;
+				const resolved = resolveRelativeImport({ from: file, specifier: specifier as string });
+				if (!resolved) {
+					unresolved.push(`${file} -> ${specifier}`);
+					continue;
+				}
 				if (reached.has(resolved)) continue;
 				reached.add(resolved);
 				pending.push(resolved);
@@ -1259,8 +1478,9 @@ describe("the guides describe the project as it is configured", () => {
 
 		expect(filter).not.toBe("");
 		expect(sources.length).toBeGreaterThan(0);
+		expect(unresolved).toEqual([]);
 		expect([...reached].filter((path) => !path.startsWith(`${tailRoot}/`))).not.toEqual([]);
-		expect([...reached].filter((path) => existsSync(join(ROOT, path)) && !pattern.test(path))).toEqual([]);
+		expect([...reached].filter((path) => !pattern.test(path))).toEqual([]);
 	});
 
 	// The filtered form names its own package, so it can be checked wherever it is written, including the
@@ -1283,10 +1503,10 @@ describe("the guides describe the project as it is configured", () => {
 
 		for (const file of sources) {
 			const body = file.startsWith(WORKFLOW_DIR) ? runCommands(read(file)) : readIfPresent(file);
-			for (const [, pkg, script] of body.matchAll(CITED_FILTERED_PNPM_SCRIPT)) {
-				if (NON_SCRIPT_PNPM.has(script as string)) continue;
+			for (const { pkg, script } of pnpmCitations(body)) {
+				if (pkg === null) continue;
 				checked += 1;
-				const scripts = scriptsByPackageName.get(pkg as string);
+				const scripts = scriptsByPackageRef.get(pkg);
 				if (!scripts) offenders.push(`${file} -> --filter ${pkg} (no such workspace package)`);
 				else if (!(script in scripts)) offenders.push(`${file} -> ${pkg} has no ${script} script`);
 			}

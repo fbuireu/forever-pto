@@ -238,7 +238,7 @@ required while `web-development` cannot authenticate blocks every merge.
 The alternative to all of it is to revert the rename in `ci.yml`, `docs.yml` and `cleanup-development.yml`
 and keep one shared pair, which is what the split exists to stop.
 
-**`deploy-tail` is gated on the files its bundle is built from, which is wider than its own folder.** The tail consumer is a second Worker with its own `wrangler.toml`; the app declares it in `[[tail_consumers]]` but does not carry it. It changes rarely, so `TAIL_PATHS` gates it, but `workers/tail/index.ts` imports the log-level contract from `apps/web/src/infrastructure/clients/logging/`, and while the filter named only `apps/web/workers/tail/**` a change to that contract redeployed the app and left the Worker running the old bundled copy. The Worker's own unit test reads the source module, so it could not see the split. `tests/docs-consistency.test.ts` walks that import graph **transitively** against `TAIL_PATHS` now (one level is not enough, because whatever the contract itself imports is bundled too) and asserts at least one resolved path lands outside `workers/tail/`, since the Worker test's own `./index` import would otherwise make an empty walk look like a successful one.
+**`deploy-tail` is gated on the files its bundle is built from, which is wider than its own folder.** The tail consumer is a second Worker with its own `wrangler.toml`; the app declares it in `[[tail_consumers]]` but does not carry it. It changes rarely, so `TAIL_PATHS` gates it, but `workers/tail/index.ts` imports the log-level contract from `apps/web/src/infrastructure/clients/logging/`, and while the filter named only `apps/web/workers/tail/**` a change to that contract redeployed the app and left the Worker running the old bundled copy. The Worker's own unit test reads the source module, so it could not see the split. `tests/docs-consistency.test.ts` walks that import graph **transitively** against `TAIL_PATHS` now (one level is not enough, because whatever the contract itself imports is bundled too) and asserts at least one resolved path lands outside `workers/tail/`, since the Worker test's own `./index` import would otherwise make an empty walk look like a successful one. **A reach the walk cannot resolve fails the rule.** It appended `.ts` and nothing else, so a directory specifier standing for the `index.ts` inside it, and a NodeNext `./foo.js`, each produced a path that does not exist, and the final assertion was guarded by `existsSync`, which exempted precisely those. The floor did not notice either: one unresolvable entry is itself an entry outside `workers/tail/`.
 
 **`smoke` is the only job that ever touches production, and until this branch there was none.** `e2e` needs
 `deploy-development`, which runs on `pull_request` only, so a push to `main` deployed production, cut a tag
@@ -378,19 +378,37 @@ because `astro check` registers no MDX plugin and the citation rules match paths
 every script this file
 documents exists in the root manifest, every script the web guide documents exists in one of the two, every
 `pnpm --filter <pkg> <script>` citation resolves against the manifest of the package it names, and every bare
-script a workflow runs exists in one of the three manifests; that every backticked constant the published
-wiki names exists somewhere in `apps/web`; that the `@ui` seam target is declared once, in
+script a workflow runs exists in one of the three manifests. One parser reads all four spellings of the package
+flag (`--filter`, `-F`, `--dir`, `-C`, with the value attached by a space or an `=`), because a short-flag call with
+a mistyped script name used to be invisible to both rules at once: the bare pattern met a `-` where it wanted a
+letter and yielded nothing, the filtered one wanted the literal `--filter`, and `docs.yml`, whose own historical
+`check` citation against a docs manifest that has never had that script is why the rule exists, reached it citing
+nothing and asserted `[]` against `[]`. Each workflow's `pnpm` calls are counted against the ones the parser read, so the next spelling
+nobody anticipated fails loudly instead of emptying the list; that every backticked constant the published
+wiki names **in prose** exists somewhere in `apps/web`, fenced blocks excluded, since a fence is the app's own
+code quoted verbatim; that the `@ui` seam target is declared once, in
 [`apps/docs/tsconfig.json`](./apps/docs/tsconfig.json), with the vite alias deriving from it rather than
-restating it; that every relative `@import` and `@source` in [`apps/docs/src/styles`](./apps/docs/src/styles) resolves
-to a path that exists, which nothing did before: `astro check` does not read CSS, a renamed `@import` target fails only
-`astro build` and a renamed `@source` target fails nothing at all, leaving the demos unstyled on a green build; that
+restating it; that every relative `@import` and `@source` in any `.css` the docs package tracks, and in any `<style>` block of
+an `.astro` file under it, resolves to a path that exists, which nothing did before: `astro check` does not read CSS,
+a renamed `@import` target fails only
+`astro build` and a renamed `@source` target fails nothing at all, leaving the demos unstyled on a green build.
+The scope was [`apps/docs/src/styles`](./apps/docs/src/styles), which is one file, and a component's scoped
+`<style>` is CSS the same rule has to reach; that
 every font variable [`apps/web/src/app/fonts.ts`](./apps/web/src/app/fonts.ts) registers is declared in the docs
 stylesheet's `:root`, since the app's role tokens point at those names and there is no Next in the wiki to inject them;
 that every design token the wiki's swatches name is still declared, counting the bare strings in a `tokens={[…]}` array
 and the docs' own visualiser components rather than only `var(--x)` in prose, with a floor on both sides so an emptied
-citation set cannot pass it vacuously; that no locale override under
-[`apps/docs/src/content/i18n`](./apps/docs/src/content/i18n) restates the Starlight bundle it overrides byte for byte;
-that the wiki's prose uses the canonical name rather than a retired one;
+citation set cannot pass it vacuously. `.astro` components count too, with the `--sl-*` vendor prefix carved out rather
+than the extension: excluding `.astro` wholesale to keep Starlight's own tokens quiet also hid every token in one that
+is ours, and a typo renders transparent, which reads as a pale colour rather than an error; that no locale override under
+[`apps/docs/src/content/i18n`](./apps/docs/src/content/i18n) restates the Starlight bundle it overrides byte for byte,
+and separately that `search.ctrlKey`, if it is overridden at all, is a modifier on its own: the byte-for-byte rule is
+named for that key and cannot see it, because the defect was `Ctrl K` against a vendor `Ctrl` and those are not equal.
+Starlight renders the value in a `<kbd>` of its own beside a literal `<kbd>K</kbd>`, and the suite reads that markup
+first so the rule fails loudly if upstream stops appending the K;
+that the wiki's prose uses the canonical name rather than a retired one, with a compound allowed to pluralise on
+**either** word: `day off` plus an optional trailing `s` matches `day offs`, which nobody writes, and missed
+`days off`, which the wiki wrote seven times across four pages while the rule reported nothing;
 that [`apps/web/tsconfig.json`](./apps/web/tsconfig.json) keeps the two settings `next build` would otherwise fill in for it (`strict`
 on and `allowJs` off), that it sits beside the [`next.config.ts`](./apps/web/next.config.ts) that rewrites it, and that
 `cloudflare-env.d.ts` stays both excluded from the program and ignored by git, and that
@@ -411,9 +429,18 @@ in **each** of `wrangler.toml`'s three environments, that each named environment
 *kind* the top level declares, that `[assets]` and `[placement]` are declared once and `[observability]`
 reads identically wherever it is restated, and that the payment rate limiter is identically bounded in all
 of them; that no
-`wrangler deploy` step and no build step in any workflow is wrapped in `nick-fields/retry`, counted rather
-than named one file at a time; that `TAIL_PATHS` matches every relative import reachable **transitively** from
-[`apps/web/workers/tail/`](./apps/web/workers/tail/), at least one of which has to land outside that folder;
+deploy step and no build step in any workflow is wrapped in `nick-fields/retry`, counted rather
+than named one file at a time. Both censuses count the job rather than one spelling of it: a deploy also arrives as
+`cloudflare/wrangler-action`'s `command: deploy` input and as a script name that resolves to one (`apps/docs`'s
+`deploy` is `astro build && wrangler deploy`), and a build as `pnpm exec astro build`, `npx next build`, or a
+`build` script reached through the short `-F` flag. The deploy census saw two of this repo's four against a floor of two, so half the corpus satisfied
+it and the other half was unguarded; that `TAIL_PATHS` matches every relative import reachable **transitively** from
+[`apps/web/workers/tail/`](./apps/web/workers/tail/), at least one of which has to land outside that folder, and that
+every one of those reaches **resolves**: a specifier the walk cannot place is a failure, not an exemption. It used to
+append `.ts` and nothing else, so a directory specifier standing for the `index.ts` inside it, and a NodeNext
+`./foo.js`, both produced a path that does not exist, and the assertion then guarded itself with `existsSync`, skipping exactly the reaches it could not follow;
+that every workflow file is **linked** from this guide and carries its own `##` section in the wiki, the link rather
+than a bare mention, since `ci.yml` is named a dozen times here and one incidental mention used to be enough;
 that the cleanup workflow's concurrency
 group still equals `ci.yml`'s with its `name:` substituted in;
 and that every locale bundle has exactly the keys [`en.json`](./apps/web/src/ui/i18n/messages/en.json) has and shouts nothing outside a named acronym allow-list. Key parity compares key *sets*, so it can see neither a value that drifted nor one written in capitals; the allow-list is itself asserted to hold only names the bundles still use.
@@ -421,7 +448,7 @@ and that every locale bundle has exactly the keys [`en.json`](./apps/web/src/ui/
 It reads staged *and* unstaged files, so a rule fires before the offending file is committed. **Each rule was
 verified by breaking it and confirming the matching case fails**; keep that property when you add one.
 
-Three traps that have each cost a rule its teeth, all found by breaking one:
+Four traps that have each cost a rule its teeth, all found by breaking one:
 
 - **A regex anchored on `$` reads nothing in a working-tree file with CRLF.** The index is all LF
   (`.gitattributes` carries `* text=auto eol=lf` and no tracked blob is CRLF), but the *checkout* on Windows
@@ -430,6 +457,9 @@ Three traps that have each cost a rule its teeth, all found by breaking one:
 /`.
 - **Three backticks pair one at a time**, so a rule that scans a wiki page without stripping fenced blocks
   first is off by one after the page's first fence and reads the rest inverted.
+- **A compound noun does not pluralise on its last word.** `term + "s?"` reads `day offs` and cannot read
+  `days off`. Pluralise every word of the compound, and let the gaps take any run of whitespace so a term
+  broken across a wrapped line is still one term.
 - **A `run:` key does not see every command a workflow runs.** Every wrangler and OpenNext call here is
   wrapped in `nick-fields/retry`, which takes its script on `command:`. A
 failure means the docs and the code disagree; fix whichever is wrong. It cannot check rationale (whether an

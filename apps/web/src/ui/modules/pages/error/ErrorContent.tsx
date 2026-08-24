@@ -117,7 +117,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
 			`  at async handler (api/bridges.ts:31:9)`,
 			...(error.stack ? [``, ...error.stack.split("\n")] : []),
 			``,
-			`💥 HTTP 500, caught`,
+			`💥 HTTP 500 (caught)`,
 			``,
 			`[${ts}] OK    alerting on-call · #ops-urgent`,
 			`[${ts}] OK    fallback → cached plan (stale 12m)`,

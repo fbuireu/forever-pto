@@ -9,11 +9,11 @@ The suggestion-engine terms below are defined in code in `apps/web/src/domain/ca
 
 ### PTO Day
 
-One day from the user's annual budget of paid days off: a unit of budget, not a date on the calendar,, until a Suggestion places it (`ptoDays` in the filters store, `apps/web/src/application/stores/filters.ts`). Everything the engine does is about spending this budget as efficiently as possible.
+One day from the user's annual PTO budget: a unit of budget, not a date on the calendar, until a Suggestion places it (`ptoDays` in the filters store, `apps/web/src/application/stores/filters.ts`). Everything the engine does is about spending this budget as efficiently as possible.
 
 ### Bridge
 
-A block of PTO days that connects weekends and public holidays into one contiguous stretch off. A single PTO day on a Monday before a Tuesday holiday "bridges" the weekend to the holiday, yielding four days off for one day spent. Modeled by the `Bridge` interface: `ptoDaysNeeded`, `effectiveDays`, `efficiency` and the concrete `ptoDays` dates. A Bridge is the unit the planner reasons about; the individual dates inside it are PTO Days, and there is no separate name for them.
+A block of PTO days that connects weekends and public holidays into one contiguous stretch off. A single PTO day on a Monday before a Tuesday holiday "bridges" the weekend to the holiday, yielding four Effective Days for one PTO Day spent. Modeled by the `Bridge` interface: `ptoDaysNeeded`, `effectiveDays`, `efficiency` and the concrete `ptoDays` dates. A Bridge is the unit the planner reasons about; the individual dates inside it are PTO Days, and there is no separate name for them.
 
 ### Effective Day
 
@@ -24,7 +24,7 @@ One day of the continuous stretch off a Bridge or Suggestion produces. The total
 The rule that decides which Bridges make it into a Suggestion when the budget cannot cover them all. Three values, exported as the `FilterStrategy` const object in `apps/web/src/domain/calendar/types.ts`:
 
 - **`grouped`** prefers multi-day blocks, with efficiency as the tiebreaker. Fewer, longer breaks.
-- **`optimized`** prefers the highest-efficiency bridges first. Maximum days off per PTO day.
+- **`optimized`** prefers the highest-efficiency bridges first. Maximum Effective Days per PTO Day.
 - **`balanced`** is two-pass greedy scoring that prioritizes high-value long bridges, then fills the remaining budget.
 
 ### Suggestion

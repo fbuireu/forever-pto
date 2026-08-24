@@ -17,7 +17,7 @@ All workflows live in `.github/workflows/`. Two repo-wide conventions, enforced 
 | `dependency-review.yml` | all PRs | Fails a PR that introduces a dependency with a known vulnerability |
 | `commit-message.yml` | PR opened/edited/reopened/synchronize | commitlint on the **pull request title**, the string a squash merge commits |
 | `renovate-auto-approve.yml` | Renovate PRs (by label) | Auto-approve safe dependency PRs |
-| `dependabot-auto-merge.yml` | Dependabot PRs | Dormant; Renovate is the active bot |
+| `dependabot-auto-merge.yml` | Dependabot PRs | Fires for security updates; Renovate handles version updates |
 
 ## `ci.yml`: CI
 
@@ -74,4 +74,4 @@ Approves Renovate PRs so their automerge can proceed. Gated on the PR author bei
 
 ## `dependabot-auto-merge.yml`
 
-Legacy: approves and auto-squash-merges Dependabot patch/minor/dev-dependency PRs and labels them by update type. There is no `.github/dependabot.yml` in the repo, so this workflow's `if: user.login == 'dependabot[bot]'` guard never matches: Renovate is the active dependency bot. Kept dormant; safe to ignore.
+Approves and auto-squash-merges Dependabot patch, minor and dev-dependency PRs, and labels them by update type. **It is not dormant.** There is no `.github/dependabot.yml`, so Dependabot opens no version-update PRs here, which is Renovate's job. But the **security** updates GitHub raises from its own vulnerability alerts need no config file, they arrive as `dependabot[bot]`, and `fetch-metadata` reports them with the same `version-update:semver-patch` and `-minor` types the auto-merge branch accepts. So the guard does match, and this is the repository's only unattended auto-merge path: it runs `gh pr review --approve` and `gh pr merge --auto --squash` under `secrets.PAT`. Do not read it as safe to ignore.
