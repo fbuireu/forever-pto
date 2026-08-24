@@ -53,8 +53,8 @@ and `onmessageerror` handlers, because a worker that fails to *load* never reach
 ## Invariants
 
 **This worker no longer clears the calculation caches, and must not start again.** `runPlanningPipeline`
-clears them on entry, which is what the 2026-08-14 amendment to
-[ADR 0006](../../../../../adr/0006-caller-owned-calculation-caches.md) moved. The pipeline call sits inside the
+clears them on entry, which is what the amendment to
+[ADR 0006](../../../../../adr/0006-caller-owned-calculation-caches.md) moved off this file. The pipeline call sits inside the
 handler's `try`, after the message-type guard, so a throw anywhere in a run still becomes a `WORKER_ERROR` and
 an unrelated message never starts one.
 

@@ -21,13 +21,22 @@ time, because [`global-not-found.tsx`](../apps/web/src/app/global-not-found.tsx)
 Four bisect pull requests narrowed it, each ruling one thing out: the tree from immediately before
 `81222a48` runs the full suite green; `partialPrefetching: false` on its own does not help; reverting the
 four dependency bumps that participate in rendering that page (`motion`, `@base-ui/react`, `next-intl`,
-`lucide-react`) does not help; and Next 16.3.1 does not help either, so the fault spans 16.3.x rather than
-being a single bad release. What remained was the Next bump itself, against
+`lucide-react`) does not help; and Next 16.3.1 does not help either, so the fault survives at least one patch
+release rather than being a single bad build. What remained was the Next bump itself, against
 [`@opennextjs/cloudflare`](https://github.com/opennextjs/opennextjs-cloudflare) **1.20.2**, which is the
-`latest` tag, has no beta or canary alongside it, and was published 2026-08-01, two days before 16.3.0
-existed.
+`latest` tag and has no beta or canary alongside it.
 
-That left no version of the adapter that supports the Next the app was running, and three ways out. Patching
+**The registry dates, checked 2026-08-24.** 1.20.2 was published 2026-07-21; `next@16.3.0` on 2026-08-03,
+thirteen days later; `16.3.1` on 2026-08-13; `16.3.2` on 2026-08-21, and it is `latest`. This ADR first said
+two days, which understated how far behind the adapter is and made the gap read like a release-timing
+accident rather than a version the adapter has never been built against.
+
+**Only 16.3.0 and 16.3.1 were ever put on a preview.** "The fault spans 16.3.x" therefore generalises from
+two releases to an open-ended range, and 16.3.2 is the untested member Renovate proposes next. Treat the pin
+as covering it, and treat a green run on 16.3.2 as evidence rather than as proof the pin was wrong: the
+failure needs a preview deploy to appear at all.
+
+That left no version of the adapter that *works with* the Next the app was running, whatever the peer range says, and three ways out. Patching
 the adapter through `pnpm patch` was rejected because the actual exception has never been captured: no local
 reproduction is possible (`cf:build` fails on the maintainer's Windows machine) and the Worker's stack trace
 was never pulled from the tail consumer, so any patch would be a guess at a fault whose shape is unknown.
@@ -43,8 +52,25 @@ type-checks anything.
 
 ## Decision
 
-Next is pinned to **16.2.12** and TypeScript to **6.0.3**, and they move as a pair, Next first. Neither is
-raised until `@opennextjs/cloudflare` publishes a release that supports Next 16.3.
+Next is pinned to **16.2.12** and TypeScript to **6.0.3**, and they move as a pair, Next first.
+
+**What lifts the pin is evidence, not an adapter release.** An earlier version of this ADR waited for
+`@opennextjs/cloudflare` to "publish a release that supports Next 16.3", and that condition can never be met,
+because it is already claimed. 1.20.2's peer range on `next` is `>=15.5.21 <16 || >=16.2.11`, which admits
+every 16.3 release, and upstream's own documentation says Next 16 is supported. No future release will carry
+the signal, so waiting for one is waiting forever while the evidence that matters goes uncollected.
+
+The pin lifts on either of these, and both are things somebody does rather than waits for:
+
+1. **The exception is captured and explained.** Pull the Worker stack trace for a request-time render on a
+   preview, from `wrangler tail` or the `forever-pto-tail` consumer, and either land the fix upstream or
+   patch against a fault whose shape is known. This is the one that closes the question rather than deferring
+   it, and it is the last Consequence below.
+2. **A preview on the candidate Next version runs the `e2e` suite green**, `e2e/[locale]/not-found.spec.ts`
+   included. That is a per-version result and not a general clearance: a green 16.3.2 says nothing about
+   16.3.3, so record the version the run covered alongside the bump.
+
+Until one of them happens, a bump is reverted on the pin, not re-diagnosed.
 
 `partialPrefetching` stays out of [`next.config.ts`](../apps/web/next.config.ts): it is a 16.3 option and a config error on 16.2. The
 `@typescript/typescript6` compatibility package is not a dependency, and [`tests/docs-consistency.test.ts`](../tests/docs-consistency.test.ts)
@@ -61,6 +87,9 @@ does not control the traffic to, in order to keep a toolchain version the app ga
   production.** A dependency bot proposing Next 16.3 is proposing to reintroduce a 500 on every unknown URL.
   The e2e suite catches it, but only after a preview deploy, so the pin should be read before the failure is
   re-diagnosed.
+- **The adapter's peer range is not a compatibility statement, and reading it as one is how this pin gets
+  quietly lifted.** `>=15.5.21 <16 || >=16.2.11` admits the exact versions that fail. A satisfied peer range
+  means nothing here; a green `e2e` run on a preview means something.
 - **The repo stays on a TypeScript version behind the ecosystem.** Anything that requires 7, its speed and
   eventually its type-level features, is unavailable, and `next build` keeps type-checking through Next's
   compiler-API path rather than the project's own `tsc`.

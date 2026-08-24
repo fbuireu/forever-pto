@@ -532,7 +532,7 @@ needs to coexist, the key comes back **with** the caller that needs it.
 `clearHolidayCache()` open the pipeline. The pipeline is the right owner because it is the only code that
 knows where a run begins; a `clear` anywhere below it would evict a set the same run is still using.
 
-**`HOLIDAY_CACHE` earns its keep inside one `findPlanningCandidates` call, not across the two generators.**
+**The Holiday memo earns its keep inside one `findPlanningCandidates` call, not across the two generators.**
 That is worth stating because the sharing it was written for has moved: the generators no longer touch it at
 all: `createHolidaySet` has exactly two production callers, `getAvailableWorkdays` and `findBridges` in
 `utils/helpers.ts`, and `findPlanningCandidates` calls them one after the other on the same Holiday list.
@@ -540,8 +540,9 @@ The memoisation is what makes the second call free. Deleting the cache after the
 considered on the grounds that the hoist had left it with nothing to share; it would in fact rebuild the
 Holiday set twice on every run. Keep it, and keep the clear where it is.
 
-That is an amendment to [ADR 0006](../../../../../adr/0006-caller-owned-calculation-caches.md), which
-originally put the clear at each caller because the orchestration lived at each caller. It no longer does.
+That is an amendment to [ADR 0006](../../../../../adr/0006-caller-owned-calculation-caches.md), and it is
+written into that ADR's `## Status` block, dated 2026-08-24; the ADR originally put the clear at each caller
+because the orchestration lived at each caller. It no longer does.
 `worker.ts` and the holidays store's `generateSuggestions` action now pass inputs and read a result; neither
 knows the caches exist, and a new entry point cannot forget a step it never had.
 

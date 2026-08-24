@@ -128,8 +128,9 @@ entry lists one fix, the Renovate bump of Next to 16.3.1, and this branch reject
 the next release continues from 1.8.3 rather than re-cutting it and writing a second 1.8.3 section into a
 changelog that already has one.
 
-**Both tags are local until someone pushes them.** They have to reach the remote before `release-web` first
-runs on `main`, which is after this branch merges.
+**Both tags are on the remote**, verified with `git ls-remote --tags origin 'web-v*'` on 2026-08-24. They had
+to reach it before `release-web` first runs on `main`, and they have. This paragraph used to say they were
+still local; that is the shape of claim to re-check rather than copy forward.
 
 **A change confined to the repo root releases nothing**: `adr/`, `tests/`, `README.md`, `CONTEXT.md`, this
 file. That is correct and occasionally surprising. **It is narrower than it reads**: `WEB_PATHS` in `ci.yml`
@@ -370,8 +371,13 @@ the root stays private and dependency-free at `0.0.0`, neither package carries i
 lockfile, and every literal path Biome's `files.includes` excludes still resolves; that every layer root has a `CLAUDE.md`, that both package guides exist and are listed here, and
 that every guide under [`apps/web/src`](./apps/web/src) is listed in the web package's own table; that ADRs are named
 `NNNN-slug.md`, numbered contiguously from `0001`, carry the template's sections, and are each linked from
-some document **outside** `adr/` (an ADR nothing points at will not be read); that every relative markdown
-link resolves, every `.ts`/`.tsx` file named in backticks still exists, no document cites a nested
+some document **outside** `adr/` (an ADR nothing points at will not be read), and that an ADR names back
+every document which ties the word *amend* to it, because twice in one audit a nested guide recorded a
+change and the ADR it amends did not (the guide was right and the ADR was wrong, which is the worse
+direction, since the ADR is what the next agent is told not to re-litigate); that every relative markdown
+link resolves **and points at what it names**, the second half being a table row that names one package and
+then links the root twin of a file that package has its own copy of, which is how ADR 0011's release row
+came to cite the root manifest in the app's row while a resolver passed it; every `.ts`/`.tsx` file named in backticks still exists, no document cites a nested
 `CONTEXT.md`, and every symbol the published wiki's `tsx` fences import from `@ui/…` is still exported by the
 module they name; that last one is the largest slice of the cross-package seam and had nothing checking it,
 because `astro check` registers no MDX plugin and the citation rules match paths rather than symbols; that

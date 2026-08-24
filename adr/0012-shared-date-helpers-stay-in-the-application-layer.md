@@ -8,15 +8,20 @@ Accepted.
 
 ## Context
 
-`application/shared/utils/dates.ts` is a thin wrapper over `temporal-polyfill`: twenty-six functions that
+`application/shared/utils/dates.ts` is a thin wrapper over `temporal-polyfill`: twenty-four functions that
 take a `Date`, do plain-date arithmetic and hand a `Date` back, plus `formatDate` and `getWeekdayNames`,
 which reach `Intl`. There is no I/O in it, no DOM, no framework, no store, and nothing application-specific.
 
-Three layers import it. The UI reads it in a dozen places, `application/` in three, and (the part that
-raises the question) `domain/calendar/` in four: [`utils/helpers.ts`](../apps/web/src/domain/calendar/utils/helpers.ts), [`utils/cache.ts`](../apps/web/src/domain/calendar/utils/cache.ts),
-[`metrics/utils/helpers.ts`](../apps/web/src/domain/calendar/metrics/utils/helpers.ts) and [`metrics/utils/streaks.ts`](../apps/web/src/domain/calendar/metrics/utils/streaks.ts). That is the domain importing from the layer above
-it, which is the wrong direction for a dependency arrow, and it is one of exactly two such imports the
-calendar domain has (`@application/dto/holiday/types` is the other).
+Three layers import it. The UI reads it in seventeen files, `application/` in three, and (the part that
+raises the question) `domain/calendar/` in five: [`window.ts`](../apps/web/src/domain/calendar/window.ts), [`utils/helpers.ts`](../apps/web/src/domain/calendar/utils/helpers.ts),
+[`utils/cache.ts`](../apps/web/src/domain/calendar/utils/cache.ts), [`metrics/utils/helpers.ts`](../apps/web/src/domain/calendar/metrics/utils/helpers.ts) and [`metrics/utils/streaks.ts`](../apps/web/src/domain/calendar/metrics/utils/streaks.ts). That is the domain importing
+from the layer above it, which is the wrong direction for a dependency arrow.
+
+**The number that carries the rule is the specifier count, not the file count, and it is unchanged at four.**
+`domain/CLAUDE.md` enumerates what the calendar domain may import from outside itself, and a new *file*
+reaching an already-listed specifier adds nothing to that list; `window.ts` is exactly that. `dates.ts` is one
+of exactly two upward imports the calendar domain has (`@application/dto/holiday/types` is the other), and
+the other two entries on the list of four are the bare `temporal-polyfill` and `next-intl`.
 
 The obvious repair is to move the file somewhere both layers may legally reach: a `src/shared/` tier under
 the app, or a real `packages/` workspace member. Neither is as cheap as it looks.

@@ -248,9 +248,10 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
 ## Gotchas
 
 - **The calculation caches are cleared by the pipeline, not the engine and no longer by each caller.**
-  [`cache.ts`](./src/domain/calendar/utils/cache.ts) memoises the holiday set under one fixed key and never evicts it, so a second run silently reuses
-  the first run's holidays. `runPlanningPipeline` clears both on entry; a generator still must not.
-  [ADR 0006](../../adr/0006-caller-owned-calculation-caches.md), amended 2026-08-14.
+  [`cache.ts`](./src/domain/calendar/utils/cache.ts) memoises the holiday set in one module-level slot and never evicts it, so a second run silently
+  reuses the first run's holidays. `runPlanningPipeline` clears both on entry; a generator still must not.
+  [ADR 0006](../../adr/0006-caller-owned-calculation-caches.md), as amended; its `## Status` block is the
+  record of how many times, so do not pin a date here.
 - **`Temporal` comes from `temporal-polyfill`, never the global.** The global does not resolve in the deployed
   Workers runtime, and a local run proves nothing. Do not let a codemod "modernise" the import.
   [ADR 0005](../../adr/0005-temporal-polyfill.md).
@@ -278,9 +279,9 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
   copies held together by mirrored test blocks, they drifted, and the symptom was one Planning Window
   producing two different plans depending on which path ran. Do not reintroduce orchestration at a caller.
   See [`./src/application/stores/CLAUDE.md`](./src/application/stores/CLAUDE.md).
-- **The package version is load-bearing at runtime, not just at release time.** Seven source files import
+- **The package version is load-bearing at runtime, not just at release time.** Six source files import
   [`package.json`](./package.json) and read `version` to render the footer, the hero, the error page, the `/api/markdown` output
-  and the `.well-known` agent-skills index. The docs site reads it too.
+  and both `.well-known` documents, the agent-skills index and the MCP server card. The docs site reads it too.
 
 ## Deploy
 

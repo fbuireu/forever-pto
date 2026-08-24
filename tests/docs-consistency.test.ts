@@ -36,6 +36,12 @@ const MARKDOWN_LINK = /\[([^\]]+)\]\(([^)\s]+)\)/g;
 const BACKTICKED_TOKEN = /`([^`]+)`/g;
 const BACKTICKED_SOURCE_FILE = /`([^`\s]+\.(?:ts|tsx))`/g;
 const NESTED_CONTEXT_CITATION = /((?:[\w@-]+\/)+CONTEXT\.md)/g;
+const AMENDMENT_WORD = /amend\w*/gi;
+const ADR_REFERENCE = /adr\/(\d{4})-[a-z0-9-]+\.md|\bADR (\d{4})\b/g;
+const AMENDMENT_PROXIMITY = 200;
+const TABLE_ROW = /^\s*\|(.*)\|\s*$/;
+const TABLE_SEPARATOR_ROW = /^[\s|:-]+$/;
+const PACKAGE_IN_CELL = new RegExp(String.raw`\x60(${WORKSPACE_PACKAGES.join("|")})\x60`);
 const BACKTICKED_ALIAS = /`([^`.]+\/\*)`/g;
 // `pnpm` spells the package flag four ways and the two rules reading citations knew one of them, so
 // `pnpm -F forever-pto-docs bulid` was invisible to both: the bare pattern met a `-` where it wanted
@@ -619,6 +625,41 @@ describe("architecture decision records", () => {
 		const orphaned = decisions.filter((file) => !elsewhere.some((body) => body.includes(file)));
 		expect(orphaned).toEqual([]);
 	});
+
+	// Twice in one audit a nested guide recorded a change and the ADR it amends did not, and both guides
+	// named the ADR they were amending. The maintenance contract's "amend it, or supersede it and say so"
+	// row is the rule that slipped, and it slipped the worse way round: the guide was right and the ADR was
+	// wrong, while the ADR is what every future agent is told not to re-litigate. `domain/calendar/CLAUDE.md`
+	// said outright "That is an amendment to ADR 0006" and then answered, in the opposite direction, a
+	// question ADR 0006 was still asking a reader to settle with a probe on a deployed preview.
+	//
+	// The detectable half is the round trip: a document that ties the word "amend" to an ADR has to be named
+	// back by that ADR. Naming it is what makes the amendment reachable from the file people are pointed at,
+	// and it is also what forces the author to open the ADR, which is where the stale sentence is.
+	//
+	// Proximity rather than grammar, because "an amendment to ADR 0006", "the 2026-08-14 amendment to ADR
+	// 0006" and "ADR 0006, amended" all have to count and no phrasing rule separates a claim from a
+	// citation. Both readings want the same round trip anyway.
+	it("name back every document outside adr/ that ties an amendment to them", () => {
+		const byNumber = new Map(decisions.map((file) => [file.slice(0, 4), read(`${ADR_DIR}/${file}`)]));
+		const unrecorded: string[] = [];
+
+		for (const file of authoredMarkdown.filter((path) => !path.startsWith(`${ADR_DIR}/`))) {
+			const body = read(file);
+			for (const claim of body.matchAll(AMENDMENT_WORD)) {
+				const at = claim.index ?? 0;
+				const window = body.slice(Math.max(0, at - AMENDMENT_PROXIMITY), at + AMENDMENT_PROXIMITY);
+				for (const [, fromLink, fromProse] of window.matchAll(ADR_REFERENCE)) {
+					const number = fromLink ?? fromProse;
+					const adr = number ? byNumber.get(number) : undefined;
+					if (!adr || adr.includes(file)) continue;
+					unrecorded.push(`${file} amends ADR ${number}, which never names ${file}`);
+				}
+			}
+		}
+
+		expect([...new Set(unrecorded)]).toEqual([]);
+	});
 });
 
 describe("documentation does not point at things that are gone", () => {
@@ -635,6 +676,46 @@ describe("documentation does not point at things that are gone", () => {
 			}
 		}
 		expect(broken).toEqual([]);
+	});
+
+	// A resolver cannot tell a right link from a wrong one that happens to resolve. ADR 0011's release table
+	// wrote the app's row as `[`package.json`](../package.json)`, which from `adr/` is the **root** manifest:
+	// the one that same ADR insists stays private at `0.0.0` with no dependencies, and the one semantic-release
+	// does not write. The cell beside it said `../apps/web/CHANGELOG.md` correctly, which is exactly what makes
+	// the wrong one easy to read past, and the relative-link rule above passed it happily because the file is
+	// there.
+	//
+	// The mechanical form of the mistake is a row that names one package and then points outside it at a file
+	// that package has its own copy of. `.github/workflows/docs.yml` in a row about `apps/docs` is fine and has
+	// to stay fine: there is no `apps/docs/docs.yml`, so the link cannot have meant a different file. A root
+	// `package.json` in a row about `apps/web` is not, because `apps/web/package.json` exists and is what the
+	// row is about.
+	it("keeps a table row that names a package from linking the root twin of that package's own file", () => {
+		const mistargeted: string[] = [];
+
+		for (const file of authoredMarkdown) {
+			for (const line of read(file).split(/\r?\n/)) {
+				const row = TABLE_ROW.exec(line);
+				if (!row?.[1] || TABLE_SEPARATOR_ROW.test(row[1])) continue;
+
+				const named = PACKAGE_IN_CELL.exec(row[1])?.[1];
+				if (!named) continue;
+
+				for (const [, , target] of line.matchAll(MARKDOWN_LINK)) {
+					if (!target || IGNORED_LINK.test(target)) continue;
+					const [path] = target.split("#");
+					if (!path) continue;
+
+					const resolved = relative(ROOT, resolve(ROOT, dirname(file), path)).replace(/\\/g, "/");
+					if (resolved === named || resolved.startsWith(`${named}/`)) continue;
+					if (!existsSync(join(ROOT, named, basename(resolved)))) continue;
+
+					mistargeted.push(`${file} -> row about ${named} links ${target}, but ${named}/${basename(resolved)} exists`);
+				}
+			}
+		}
+
+		expect(mistargeted).toEqual([]);
 	});
 
 	// Absent from the tracked tree by design, yet the guides have to name it.

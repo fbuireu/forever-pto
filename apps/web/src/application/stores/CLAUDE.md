@@ -370,8 +370,9 @@ left.** The pipeline answers `planned: false` with an empty Suggestion whose Met
 forwards it as-is, because the wire type has no null, while this store maps it to `null` across `suggestion`,
 `alternatives` and `currentSelection`, its existing "no plan" state, which the calendar already renders.
 
-Cache clearing is no longer either caller's job: `runPlanningPipeline` does it, per the 2026-08-14 amendment
-to [ADR 0006](../../../../../adr/0006-caller-owned-calculation-caches.md).
+Cache clearing is no longer either caller's job: `runPlanningPipeline` does it, per the amendment that moved
+the clear off the callers in [ADR 0006](../../../../../adr/0006-caller-owned-calculation-caches.md). That
+ADR's `## Status` block is the record of how many amendments there have been; do not pin a date here.
 
 The pipeline and [`getHolidays.ts`](../../infrastructure/services/holidays/getHolidays.ts) are reached through `await import(...)` inside the actions, not top-level
 imports. That keeps the bulk of the planner out of the bundle any page that merely touches the store would
