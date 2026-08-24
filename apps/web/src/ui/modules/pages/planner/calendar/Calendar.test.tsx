@@ -2,7 +2,7 @@ import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types"
 import en from "@i18n/messages/en.json";
 import { render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { Calendar, CalendarSelectionMode } from "./Calendar";
 import { MODIFIERS_CLASS_NAMES } from "./utils/helpers";
 
@@ -99,8 +99,8 @@ describe("Calendar day states", () => {
 	it("paints only what the caller's day states claim, since it knows nothing about a plan", () => {
 		renderCalendar({ dayStates: { suggested: isTheFifth } });
 
-		const fifth = screen.getByRole("button", { name: "Friday, June 5, 2026" });
-		const sixth = screen.getByRole("button", { name: "Saturday, June 6, 2026" });
+		const fifth = screen.getByRole("button", { name: /June 5, 2026/ });
+		const sixth = screen.getByRole("button", { name: /June 6, 2026/ });
 
 		expect(fifth.className).toContain(MODIFIERS_CLASS_NAMES.suggested);
 		expect(sixth.className).not.toContain(MODIFIERS_CLASS_NAMES.suggested);
@@ -113,5 +113,54 @@ describe("Calendar day states", () => {
 		expect(markup).not.toContain(MODIFIERS_CLASS_NAMES.suggested);
 		expect(markup).not.toContain(MODIFIERS_CLASS_NAMES.alternative);
 		expect(markup).not.toContain(MODIFIERS_CLASS_NAMES.manuallySelected);
+	});
+});
+
+describe("Calendar day state in the accessible tree", () => {
+	const isTheFifth = (date: Date) => date.getDate() === 5 && date.getMonth() === 5;
+	const isTheEighth = (date: Date) => date.getDate() === 8 && date.getMonth() === 5;
+
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
+	it("names the plan state the colour carries, so a Suggestion is not a teal square and nothing else", () => {
+		renderCalendar({ dayStates: { suggested: isTheFifth, manuallySelected: isTheEighth } });
+
+		expect(screen.getByRole("button", { name: `Friday, June 5, 2026, ${en.legend.suggested}` })).toBeTruthy();
+		expect(screen.getByRole("button", { name: `Monday, June 8, 2026, ${en.legend.manual}` })).toBeTruthy();
+	});
+
+	it("appends the state after the Holiday name rather than replacing it", () => {
+		const isSantJoan = (date: Date) => date.getDate() === 24 && date.getMonth() === 5;
+		renderCalendar({ dayStates: { alternative: isSantJoan } });
+
+		expect(
+			screen.getByRole("button", { name: `Wednesday, June 24, 2026, Sant Joan, ${en.legend.alternatives}` }),
+		).toBeTruthy();
+	});
+
+	it("reports whether a day is spent, so toggling it changes something a reader can hear", () => {
+		renderCalendar({ onDayToggle: vi.fn(), dayStates: { suggested: isTheFifth, manuallySelected: isTheEighth } });
+
+		expect(screen.getByRole("button", { name: /June 5, 2026/ }).getAttribute("aria-pressed")).toBe("true");
+		expect(screen.getByRole("button", { name: /June 8, 2026/ }).getAttribute("aria-pressed")).toBe("true");
+		expect(screen.getByRole("button", { name: "Tuesday, June 9, 2026" }).getAttribute("aria-pressed")).toBe("false");
+	});
+
+	it("leaves aria-pressed off a calendar that picks a date rather than spending one", () => {
+		renderCalendar({ mode: CalendarSelectionMode.SINGLE, dayStates: { suggested: isTheFifth } });
+
+		expect(screen.getByRole("button", { name: /June 5, 2026/ }).getAttribute("aria-pressed")).toBeNull();
+	});
+
+	it("marks today with aria-current, which is the only state the day number itself cannot carry", () => {
+		vi.useFakeTimers({ toFake: ["Date"] });
+		vi.setSystemTime(new Date(2026, 5, 15));
+
+		renderCalendar();
+
+		expect(screen.getByRole("button", { name: "Monday, June 15, 2026" }).getAttribute("aria-current")).toBe("date");
+		expect(screen.getByRole("button", { name: "Tuesday, June 16, 2026" }).getAttribute("aria-current")).toBeNull();
 	});
 });

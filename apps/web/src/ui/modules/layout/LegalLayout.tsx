@@ -15,7 +15,9 @@ export const LegalLayout = async ({ title, lastUpdated, children }: LegalLayoutP
 		<div className="container mx-auto px-4 py-8 max-w-4xl z-1">
 			<Card>
 				<CardHeader>
-					<CardTitle className="text-3xl font-bold">{title}</CardTitle>
+					<CardTitle as="h1" className="text-3xl font-bold">
+						{title}
+					</CardTitle>
 					<p className="text-sm text-muted-foreground">{t("lastUpdated", { date: lastUpdated })}</p>
 				</CardHeader>
 				<CardContent className="prose prose-sm dark:prose-invert max-w-none">{children}</CardContent>

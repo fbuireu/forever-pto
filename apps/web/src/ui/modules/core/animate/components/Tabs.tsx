@@ -9,10 +9,12 @@ import {
 	cloneElement,
 	createContext,
 	isValidElement,
+	type KeyboardEvent,
 	type ReactElement,
 	type ReactNode,
 	use,
 	useCallback,
+	useId,
 	useImperativeHandle,
 	useMemo,
 	useRef,
@@ -23,6 +25,50 @@ import { MotionHighlight, MotionHighlightItem } from "../effects/MotionHighlight
 type TabsContextType = {
 	activeValue: string;
 	handleValueChange: (value: string) => void;
+	triggerId: (value: string) => string;
+	panelId: (value: string) => string;
+};
+
+interface NextTabIndexParams {
+	key: string;
+	current: number;
+	total: number;
+}
+
+const nextTabIndex = ({ key, current, total }: NextTabIndexParams): number | null => {
+	switch (key) {
+		case "ArrowRight":
+			return (current + 1) % total;
+		case "ArrowLeft":
+			return (current - 1 + total) % total;
+		case "Home":
+			return 0;
+		case "End":
+			return total - 1;
+		default:
+			return null;
+	}
+};
+
+interface ActivateSiblingTabParams {
+	from: HTMLElement;
+	key: string;
+}
+
+const activateSiblingTab = ({ from, key }: ActivateSiblingTabParams) => {
+	const list = from.closest('[role="tablist"]');
+	if (!list) return false;
+
+	const tabs = Array.from(list.querySelectorAll<HTMLElement>('[role="tab"]:not([disabled])'));
+	const current = tabs.indexOf(from);
+	if (current === -1) return false;
+
+	const target = nextTabIndex({ key, current, total: tabs.length });
+	if (target === null) return false;
+
+	tabs[target].focus();
+	tabs[target].click();
+	return true;
 };
 
 const TabsContext = createContext<TabsContextType | undefined>(undefined);
@@ -52,7 +98,17 @@ function Tabs({ defaultValue, value, onValueChange, children, className, ...prop
 		[isControlled, onValueChange],
 	);
 
-	const contextValue = useMemo(() => ({ activeValue, handleValueChange }), [activeValue, handleValueChange]);
+	const baseId = useId();
+
+	const contextValue = useMemo(
+		() => ({
+			activeValue,
+			handleValueChange,
+			triggerId: (val: string) => `${baseId}tab-${val}`,
+			panelId: (val: string) => `${baseId}panel-${val}`,
+		}),
+		[activeValue, handleValueChange, baseId],
+	);
 
 	return (
 		<TabsContext.Provider value={contextValue}>
@@ -123,19 +179,30 @@ function TabsHighlightItem({ value, children, className }: Readonly<TabsHighligh
 
 type TabsTriggerProps = HTMLMotionProps<"button"> & { value: string };
 
-function TabsTrigger({ ref, value, children, className, ...props }: TabsTriggerProps) {
-	const { activeValue, handleValueChange } = useTabs();
+function TabsTrigger({ ref, value, children, className, onKeyDown, ...props }: TabsTriggerProps) {
+	const { activeValue, handleValueChange, triggerId, panelId } = useTabs();
 	const localRef = useRef<HTMLButtonElement>(null);
 	useImperativeHandle(ref, () => localRef.current as HTMLButtonElement);
+	const isActive = activeValue === value;
+
+	const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+		if (activateSiblingTab({ from: event.currentTarget, key: event.key })) event.preventDefault();
+		onKeyDown?.(event);
+	};
 
 	return (
 		<m.button
 			ref={localRef}
 			data-slot="tabs-trigger"
 			role="tab"
+			id={triggerId(value)}
+			aria-selected={isActive}
+			aria-controls={isActive ? panelId(value) : undefined}
+			tabIndex={isActive ? 0 : -1}
 			whileTap={{ scale: 0.95 }}
 			onClick={() => handleValueChange(value)}
-			data-state={activeValue === value ? "active" : "inactive"}
+			onKeyDown={handleKeyDown}
+			data-state={isActive ? "active" : "inactive"}
 			className={cn(
 				"inline-flex cursor-pointer items-center size-full justify-center whitespace-nowrap rounded-sm px-2 py-1 text-sm font-medium transition-all duration-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-accent-foreground data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground z-1",
 				className,

@@ -191,9 +191,9 @@ export function Roadmap() {
 	return (
 		<div className="container max-w-4xl py-8 space-y-8 m-auto">
 			<div className="space-y-2 text-center mb-0">
-				<h3 className="font-display font-semibold text-[clamp(28px,4vw,40px)] leading-none tracking-[-0.03em]">
+				<h2 className="font-display font-semibold text-[clamp(28px,4vw,40px)] leading-none tracking-[-0.03em]">
 					{t("title")}
-				</h3>
+				</h2>
 				<p className="text-muted-foreground text-[17px]">{t("subtitle")}</p>
 			</div>
 			<div className="flex flex-col lg:flex-row gap-8 items-center mt-4">

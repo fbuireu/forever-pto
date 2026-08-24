@@ -386,7 +386,7 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 			<PopoverContent className="w-96 bg-card text-card-foreground" positionerClassName="z-[53]">
 				<div className="grid gap-4">
 					<div className="space-y-2">
-						<h4 className="leading-none font-medium">{tDonate("supportAndUnblock")}</h4>
+						<h2 className="leading-none font-medium">{tDonate("supportAndUnblock")}</h2>
 						<p className="text-muted-foreground text-sm">{tDonate("makeDonation")}</p>
 						{premiumKey && (
 							<div className="flex items-center gap-2 p-2 rounded-md bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700">

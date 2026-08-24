@@ -39,6 +39,23 @@ export type DayStateClass = keyof typeof MODIFIERS_CLASS_NAMES;
 
 const RANGE_KEYS: string[] = ["inRange", "rangeStart", "rangeEnd"];
 
+export const DAY_STATE_LABELS = [
+	{ modifier: "manuallySelected", labelKey: "manual" },
+	{ modifier: "suggested", labelKey: "suggested" },
+	{ modifier: "alternative", labelKey: "alternatives" },
+	{ modifier: "custom", labelKey: "custom" },
+] as const;
+
+export type DayStateLabelKey = (typeof DAY_STATE_LABELS)[number]["labelKey"];
+
+interface GetDayStateLabelKeysParams {
+	date: Date;
+	modifiers: Record<string, ((date: Date) => boolean) | undefined>;
+}
+
+export const getDayStateLabelKeys = ({ date, modifiers }: GetDayStateLabelKeysParams): DayStateLabelKey[] =>
+	DAY_STATE_LABELS.filter(({ modifier }) => modifiers[modifier]?.(date) ?? false).map(({ labelKey }) => labelKey);
+
 export const getDayClassNames = ({
 	date,
 	month,

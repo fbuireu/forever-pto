@@ -35,7 +35,7 @@ import {
 	isSelected,
 	isToday,
 } from "../utils/modifiers";
-import { getDayClassNames, isFromToObject } from "./utils/helpers";
+import { getDayClassNames, getDayStateLabelKeys, isFromToObject } from "./utils/helpers";
 
 export interface FromTo {
 	from: Date;
@@ -107,6 +107,7 @@ export function Calendar({
 	...props
 }: Readonly<CalendarProps>) {
 	const tCalendar = useTranslations("calendar");
+	const tLegend = useTranslations("legend");
 	const [currentMonth, setCurrentMonth] = useState(initialMonth ?? new Date());
 	const [hoverDate, setHoverDate] = useState<Date | undefined>();
 	const [today, setToday] = useState<Date | null>(null);
@@ -278,6 +279,8 @@ export function Calendar({
 		setHoverDate(undefined);
 	}, []);
 
+	const isToggleCalendar = mode === CalendarSelectionMode.NONE && !!onDayToggle;
+
 	const handleGoToToday = useCallback(() => {
 		const today = new Date();
 		setCurrentMonth(today);
@@ -375,6 +378,14 @@ export function Calendar({
 					}
 
 					const holidayName = holidaysMap.get(date.toDateString());
+					const isTodayDay = modifiers.today?.(date) ?? false;
+					const dayName = [
+						formatDate({ date, locale, format: "EEEE, MMMM d, yyyy" }),
+						holidayName,
+						...getDayStateLabelKeys({ date, modifiers }).map((labelKey) => tLegend(labelKey)),
+					]
+						.filter(Boolean)
+						.join(", ");
 
 					const baseClasses = getDayClassNames({
 						date,
@@ -406,11 +417,9 @@ export function Calendar({
 									onMouseEnter={() => handleDayHover(date)}
 									onMouseLeave={handleDayLeave}
 									disabled={isDisabled}
-									aria-label={
-										holidayName
-											? `${formatDate({ date, locale, format: "EEEE, MMMM d, yyyy" })}, ${holidayName}`
-											: formatDate({ date, locale, format: "EEEE, MMMM d, yyyy" })
-									}
+									aria-label={dayName}
+									aria-current={isTodayDay ? "date" : undefined}
+									aria-pressed={isToggleCalendar ? isSuggestedDay || isManualDay : undefined}
 								>
 									{formatDate({ date, locale, format: "d" })}
 								</Button>

@@ -27,9 +27,19 @@ function CardHeader({ className, ...props }: ComponentProps<"div">) {
 	);
 }
 
-function CardTitle({ className, ...props }: ComponentProps<"div">) {
+type CardTitleElement = "div" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+
+interface CardTitleProps extends ComponentProps<"div"> {
+	as?: CardTitleElement;
+}
+
+function CardTitle({ as: Element = "div", className, ...props }: CardTitleProps) {
 	return (
-		<div data-slot="card-title" className={cn("leading-none font-black tracking-[-0.03em]", className)} {...props} />
+		<Element
+			data-slot="card-title"
+			className={cn("leading-none font-black tracking-[-0.03em]", className)}
+			{...props}
+		/>
 	);
 }
 

@@ -101,7 +101,10 @@ function Alternatives({
 					<ChevronLeft size={20} />
 				</m.button>
 				<div className="mx-2 flex grow flex-col items-center justify-center relative duration-300 ease-out py-2">
-					<div className="flex items-center gap-x-1 text-sm tabular-nums">
+					<span className="sr-only">
+						{t("option")} {currentIndex + 1} / {totalOptions}
+					</span>
+					<div className="flex items-center gap-x-1 text-sm tabular-nums" aria-hidden="true">
 						<span className="text-xs text-muted-foreground">{t("option")}</span>
 						<SlidingNumber className="text-base font-semibold text-foreground" padStart number={currentIndex + 1} />
 						<span className="text-muted-foreground">/ {totalOptions}</span>
@@ -133,13 +136,15 @@ function Alternatives({
 			<div className="hidden lg:block mx-1 h-9 w-[2px] bg-[var(--frame)]/15 rounded-full" />
 
 			<m.div layout layoutRoot className="flex flex-col gap-2 sm:flex-row sm:flex-nowrap">
-				<m.button
+				<m.div
 					{...STAT_CARD_MOTION_CONFIG}
 					className="flex h-11 items-center gap-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_16%,black_84%)]"
-					aria-label={t("totalDaysOff")}
 				>
-					<CalendarDays size={20} className="text-green-600 dark:text-green-400 shrink-0" />
-					<div className="flex items-center gap-1">
+					<span className="sr-only">
+						{t("totalDaysOff")}: {effectiveDays ?? 0} (+{bonusDays})
+					</span>
+					<CalendarDays size={20} className="text-green-600 dark:text-green-400 shrink-0" aria-hidden="true" />
+					<div className="flex items-center gap-1" aria-hidden="true">
 						<SlidingNumber
 							className="text-sm font-semibold text-green-700 dark:text-green-300"
 							number={effectiveDays ?? 0}
@@ -150,21 +155,25 @@ function Alternatives({
 						</span>
 					</div>
 					<m.span
+						aria-hidden="true"
 						variants={LABEL_VARIANTS}
 						transition={LABEL_TRANSITION}
 						className="invisible text-sm text-green-600 dark:text-green-400"
 					>
 						{t("totalOff")}
 					</m.span>
-				</m.button>
+				</m.div>
 
-				<m.button
+				<m.div
 					{...STAT_CARD_MOTION_CONFIG}
 					className="flex h-11 items-center gap-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_20%,white_80%)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]"
-					aria-label={t("efficiency")}
 				>
-					<TrendingUp size={20} className="text-purple-600 dark:text-purple-400 shrink-0" />
-					<div className="flex items-center gap-1">
+					<span className="sr-only">
+						{t("efficiency")}: {efficiency.toFixed(1)}x
+						{isMainSuggestion ? "" : ` (${efficiencyDiff >= 0 ? "+" : ""}${efficiencyDiff.toFixed(1)})`}
+					</span>
+					<TrendingUp size={20} className="text-purple-600 dark:text-purple-400 shrink-0" aria-hidden="true" />
+					<div className="flex items-center gap-1" aria-hidden="true">
 						<SlidingNumber
 							className="text-sm font-semibold text-purple-700 dark:text-purple-300"
 							number={parseFloat(efficiency.toFixed(1))}
@@ -184,22 +193,25 @@ function Alternatives({
 						)}
 					</div>
 					<m.span
+						aria-hidden="true"
 						variants={LABEL_VARIANTS}
 						transition={LABEL_TRANSITION}
 						className="invisible text-sm text-purple-600 dark:text-purple-400"
 					>
 						{t("efficiency")}
 					</m.span>
-				</m.button>
+				</m.div>
 
 				{!isMainSuggestion && (
-					<m.button
+					<m.div
 						{...STAT_CARD_MOTION_CONFIG}
 						className="flex h-11 items-center gap-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-3 py-2 shadow-[var(--shadow-brutal-xs)]"
-						aria-label={t("comparison")}
 					>
-						<BarChart3 size={20} className="text-neutral-600 dark:text-neutral-400 shrink-0" />
-						<div className="flex items-center gap-1">
+						<span className="sr-only">
+							{t("comparison")}: {Math.round((efficiency / mainEfficiency) * 100)}%
+						</span>
+						<BarChart3 size={20} className="text-neutral-600 dark:text-neutral-400 shrink-0" aria-hidden="true" />
+						<div className="flex items-center gap-1" aria-hidden="true">
 							<SlidingNumber
 								className={cn(
 									"text-sm font-semibold",
@@ -221,13 +233,14 @@ function Alternatives({
 							</span>
 						</div>
 						<m.span
+							aria-hidden="true"
 							variants={LABEL_VARIANTS}
 							transition={LABEL_TRANSITION}
 							className="invisible text-sm text-neutral-600 dark:text-neutral-400"
 						>
 							{t("vsMain")}
 						</m.span>
-					</m.button>
+					</m.div>
 				)}
 			</m.div>
 
@@ -261,24 +274,40 @@ function Status() {
 			<div className="flex items-center justify-between flex-wrap gap-4">
 				<div className="flex items-center gap-4 flex-wrap gap-y-2">
 					<div className="flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_25%,black_75%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]">
-						<div className="size-3 rounded-full bg-teal-500" />
-						<span className="text-sm text-muted-foreground">{t("autoAssigned")}:</span>
+						<span className="sr-only">
+							{t("autoAssigned")}: {activeSuggestedCount}
+						</span>
+						<div className="size-3 rounded-full bg-teal-500" aria-hidden="true" />
+						<span className="text-sm text-muted-foreground" aria-hidden="true">
+							{t("autoAssigned")}:
+						</span>
 						<SlidingNumber
+							aria-hidden="true"
 							number={activeSuggestedCount}
 							className="font-display font-black text-teal-700 dark:text-teal-300"
 						/>
 					</div>
 					<div className="flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_25%,black_75%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]">
-						<div className="size-3 rounded-full bg-blue-500" />
-						<span className="text-sm text-muted-foreground">{t("manual")}:</span>
+						<span className="sr-only">
+							{t("manual")}: {manualSelectedCount}
+						</span>
+						<div className="size-3 rounded-full bg-blue-500" aria-hidden="true" />
+						<span className="text-sm text-muted-foreground" aria-hidden="true">
+							{t("manual")}:
+						</span>
 						<SlidingNumber
+							aria-hidden="true"
 							number={manualSelectedCount}
 							className="font-display font-black text-blue-700 dark:text-blue-300"
 						/>
 					</div>
 					<div className="h-8 w-[2px] bg-[var(--frame)]/15 hidden sm:block" />
 					<div className="flex flex-col items-center rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-alt)] px-3 py-1.5 shadow-[var(--shadow-brutal-xs)]">
-						<div className="flex items-center gap-2">
+						<span role="status" className="sr-only">
+							{t("remaining")}: {remaining}
+							{remaining === 0 && !hasManualChanges ? ` ${t("allAssigned")}` : ""}
+						</span>
+						<div className="flex items-center gap-2" aria-hidden="true">
 							<span className="text-sm font-display font-black uppercase tracking-[0.08em]">{t("remaining")}:</span>
 							<SlidingNumber
 								number={remaining}
@@ -289,7 +318,9 @@ function Status() {
 							/>
 						</div>
 						{remaining === 0 && !hasManualChanges && (
-							<span className="text-[10px] text-green-700 dark:text-green-400 font-medium">✓ {t("allAssigned")}</span>
+							<span className="text-[10px] text-green-700 dark:text-green-400 font-medium" aria-hidden="true">
+								✓ {t("allAssigned")}
+							</span>
 						)}
 					</div>
 				</div>
