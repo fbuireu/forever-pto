@@ -1,10 +1,14 @@
 {
 	"a11y": {
 		"closeDialog": "Fermer",
+		"closeToast": "Fermer la notification",
 		"toggleSidebar": "Afficher ou masquer la barre latérale",
 		"sidebarLandmark": "Réglages du planificateur",
 		"radialNavigation": "Navigation des fonctionnalités",
 		"selectLanguage": "Sélectionner la langue, actuelle : {current}",
+		"calculating": "Calcul de ton plan",
+		"planUpdated": "Plan mis à jour",
+		"noPlan": "Aucun plan pour l'instant. Vérifie tes jours de congés, ton pays et l'année.",
 		"skipToMainContent": "Aller au contenu principal"
 	},
 	"metadata": {
@@ -655,6 +659,7 @@
 		"enterAmount": "Saisir un montant",
 		"basePriceNote": "Prix de base en {currency}. Le montant final sera converti dans ta devise locale au taux de change actuel.",
 		"havePromoCode": "Tu as un code promo ?",
+		"promoCode": "Code promo",
 		"promoCodePlaceholder": "Si seulement c'était si simple",
 		"continueToPayment": "Continuer vers le paiement",
 		"processing": "Traitement en cours..."

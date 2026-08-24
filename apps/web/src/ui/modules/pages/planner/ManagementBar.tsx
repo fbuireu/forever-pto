@@ -25,6 +25,7 @@ export const ManagementBar = () => {
 	const t = useTranslations("toasts");
 	const tAlt = useTranslations("alternativesManager");
 	const tPlanner = useTranslations("planner");
+	const tA11y = useTranslations("a11y");
 	const { areStoresReady } = useStoresReady();
 	const isMobile = useIsMobile();
 	const { openMobile } = useSidebar();
@@ -108,6 +109,9 @@ export const ManagementBar = () => {
 
 	return (
 		<div className="col-span-full sticky top-3 z-10">
+			<span role="status" className="sr-only">
+				{isSettledEmpty ? tA11y("noPlan") : ""}
+			</span>
 			{!isMobile && !isSettledEmpty && (
 				<Skeleton
 					name="planner-panel"
@@ -128,7 +132,7 @@ export const ManagementBar = () => {
 					open={!openMobile}
 					dismissible={false}
 				>
-					<DrawerContent overlay={false} className="h-[100dvh] max-h-none">
+					<DrawerContent overlay={false} role="region" className="h-[100dvh] max-h-none">
 						<DrawerTitle>{tPlanner("heading")}</DrawerTitle>
 						<div data-tutorial={TUTORIAL_ANCHOR.PLANNER_DRAWER} className="px-4 pt-2 pb-3 shrink-0">
 							{isReady ? (

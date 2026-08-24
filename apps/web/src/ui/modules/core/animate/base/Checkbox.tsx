@@ -5,9 +5,11 @@ import { cn } from "@ui/utils/cn";
 import { type HTMLMotionProps, m } from "motion/react";
 import { type ComponentProps, useCallback, useEffect, useState } from "react";
 
+type CheckboxAccessibleName = { id: string } | { "aria-label": string } | { "aria-labelledby": string };
+
 type CheckboxProps = Omit<ComponentProps<typeof CheckboxPrimitive.Root>, "render"> & {
 	motionProps?: HTMLMotionProps<"button">;
-};
+} & CheckboxAccessibleName;
 
 function Checkbox({ className, onCheckedChange, motionProps, ...props }: CheckboxProps) {
 	const [isChecked, setIsChecked] = useState(props?.checked ?? props?.defaultChecked ?? false);

@@ -189,7 +189,11 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
 				</SidebarContent>
 				<SidebarFooterButtons />
 			</Sidebar>
-			<SidebarInset id={MAIN_CONTENT_ID} tabIndex={-1} className="outline-none">
+			<SidebarInset
+				id={MAIN_CONTENT_ID}
+				tabIndex={-1}
+				className="outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-inset"
+			>
 				<SidebarTrigger className={"cursor-pointer size-11 fixed m-3 z-51 p-1"} label={tA11y("toggleSidebar")} />
 				{children}
 			</SidebarInset>

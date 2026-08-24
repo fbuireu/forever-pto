@@ -61,7 +61,7 @@ export const PremiumFeature = ({
 				role="button"
 				tabIndex={0}
 				className={cn(
-					"relative m-0 focus:outline-none p-2 rounded-full cursor-pointer",
+					"relative m-0 outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background p-2 rounded-full cursor-pointer",
 					variant === PremiumFeatureVariant.STACK ? "w-fit" : "w-full backdrop-blur-sm",
 					className,
 				)}

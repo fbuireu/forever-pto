@@ -3,6 +3,7 @@ import type { useTranslations } from "next-intl";
 
 export const DAY_REFUSAL_COPY = {
 	[DayRefusal.NO_PLAN]: null,
+	[DayRefusal.PLAN_IN_FLIGHT]: null,
 	[DayRefusal.DAY_IS_HOLIDAY]: { title: "cannotSelectHoliday", description: "cannotSelectHolidayDescription" },
 	[DayRefusal.DAY_IS_CUSTOM_HOLIDAY]: {
 		title: "cannotSelectFreeDay",

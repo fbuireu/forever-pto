@@ -77,6 +77,28 @@ describe("CalendarExport", () => {
 		expect(passed?.holidays.map((h) => h.id)).toEqual(["in-1", "in-2"]);
 	});
 
+	it("says whether the file will carry the Holidays, rather than only colouring the button", async () => {
+		render(<CalendarExport />);
+		const includeHolidays = screen.getByRole("button", { name: "includeHolidays" });
+
+		expect(includeHolidays.getAttribute("aria-pressed")).toBe("true");
+
+		await userEvent.click(includeHolidays);
+
+		expect(includeHolidays.getAttribute("aria-pressed")).toBe("false");
+	});
+
+	it("says the same about the PTO Days", async () => {
+		render(<CalendarExport />);
+		const includePto = screen.getByRole("button", { name: "includePto" });
+
+		expect(includePto.getAttribute("aria-pressed")).toBe("true");
+
+		await userEvent.click(includePto);
+
+		expect(includePto.getAttribute("aria-pressed")).toBe("false");
+	});
+
 	it("treats a window with no Holidays in it as nothing to export", () => {
 		holidaysState.holidays = [makeHoliday({ id: "out-1", date: "2027-01-01", isInPlanningWindow: false })];
 

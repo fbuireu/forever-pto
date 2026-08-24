@@ -3,7 +3,9 @@
 import { useTheme } from "next-themes";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 
-const Toaster = ({ ...props }: ToasterProps) => {
+type ToasterOwnProps = ToasterProps & { closeLabel?: string };
+
+const Toaster = ({ closeLabel = "Close toast", ...props }: ToasterOwnProps) => {
 	const { theme = "system" } = useTheme();
 
 	return (
@@ -14,6 +16,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
 			position={props.position ?? "bottom-center"}
 			duration={5000}
 			toastOptions={{
+				closeButtonAriaLabel: closeLabel,
 				classNames: {
 					toast:
 						"group toast !rounded-[10px] !border-[3px] !border-[var(--frame)] ![background:var(--toast-bg,var(--surface-panel))] !text-foreground !shadow-[var(--shadow-brutal-btn)]",

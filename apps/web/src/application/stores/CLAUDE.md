@@ -217,6 +217,16 @@ copy actually needs: a weekend, a National or Regional Holiday and a Custom Holi
 refusals because the UI says three different things. Adding a refusal branch means adding a reason, not a
 second copy of the condition.
 
+**One `DayRefusal` is raised by the caller and never by this store.** `PLAN_IN_FLIGHT` is what
+[`CalendarList.tsx`](../../ui/modules/pages/planner/CalendarList.tsx)'s `toggleDay` answers while a worker
+run is outstanding, so `toggleDaySelection` is not reached at all. It lives in `types.ts` with the rest
+because the *shape* is the seam: a caller that refuses on its own grounds still has to answer a `DayOutcome`,
+and `DAY_REFUSAL_COPY` is exhaustive over `DayRefusal`, so a reason with no copy decision is a compile error.
+Why the guard cannot live in the store: the store has no way to know a request is in flight without the
+holidays store reading `isCalculating` inside its own action, and the race is a UI-input problem rather than a
+planning rule. See [`../../ui/modules/pages/planner/CLAUDE.md`](../../ui/modules/pages/planner/CLAUDE.md) for
+what the race produces if the guard is removed.
+
 **`heldOn` is that rule inside the store, and it took a second pass to get there.** The refusal *reasons*
 crossed the seam; the *rule* stayed written out at every action that needed it: thirteen `toDateString()`
 comparisons in one file, where the layer guide says to compare with `isSameDay`. That is untidy but

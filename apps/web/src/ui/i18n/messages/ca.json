@@ -1,10 +1,14 @@
 {
 	"a11y": {
 		"closeDialog": "Tanca",
+		"closeToast": "Tancar notificació",
 		"toggleSidebar": "Mostra o amaga la barra lateral",
 		"sidebarLandmark": "Controls del planificador",
 		"radialNavigation": "Navegació de funcions",
 		"selectLanguage": "Seleccionar idioma, actual: {current}",
+		"calculating": "Calculant el teu pla",
+		"planUpdated": "Pla actualitzat",
+		"noPlan": "Encara no hi ha cap pla. Revisa els teus dies de vacances, país i any.",
 		"skipToMainContent": "Vés al contingut principal"
 	},
 	"metadata": {
@@ -655,6 +659,7 @@
 		"enterAmount": "Introduir quantitat",
 		"basePriceNote": "Preu base en {currency}. La quantitat final es convertirà a la teva moneda local segons les taxes de canvi actuals.",
 		"havePromoCode": "Tens codi promocional?",
+		"promoCode": "Codi promocional",
 		"promoCodePlaceholder": "Ja t'agradaria",
 		"continueToPayment": "Continuar al pagament",
 		"processing": "Processant..."

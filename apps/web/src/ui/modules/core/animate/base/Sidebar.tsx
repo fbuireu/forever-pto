@@ -16,6 +16,7 @@ import {
 	useCallback,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from "react";
 import { MotionHighlight, MotionHighlightItem } from "../effects/MotionHighlight";
@@ -178,6 +179,27 @@ function Sidebar({
 	...props
 }: SidebarProps) {
 	const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+	const drawerRef = useRef<HTMLDivElement>(null);
+	const returnFocusRef = useRef<HTMLElement | null>(null);
+
+	useEffect(() => {
+		if (!isMobile) return;
+
+		if (!openMobile) {
+			returnFocusRef.current?.focus();
+			returnFocusRef.current = null;
+			return;
+		}
+
+		returnFocusRef.current = document.activeElement as HTMLElement | null;
+		drawerRef.current?.focus();
+
+		const closeOnEscape = (event: KeyboardEvent) => {
+			if (event.key === "Escape") setOpenMobile(false);
+		};
+		window.addEventListener("keydown", closeOnEscape);
+		return () => window.removeEventListener("keydown", closeOnEscape);
+	}, [isMobile, openMobile, setOpenMobile]);
 
 	if (collapsible === "none") {
 		return (
@@ -220,6 +242,8 @@ function Sidebar({
 						/>
 						<m.div
 							key="sidebar-drawer"
+							ref={drawerRef}
+							tabIndex={-1}
 							role="dialog"
 							aria-modal="false"
 							aria-label={landmarkLabel}
@@ -227,7 +251,7 @@ function Sidebar({
 							data-slot="sidebar"
 							data-mobile="true"
 							className={cn(
-								"bg-sidebar text-sidebar-foreground fixed inset-y-0 z-51 flex h-full flex-col border-[3px] border-(--frame) shadow-(--shadow-brutal-xl)",
+								"bg-sidebar text-sidebar-foreground fixed inset-y-0 z-51 flex h-full flex-col border-[3px] border-(--frame) shadow-(--shadow-brutal-xl) outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-inset",
 								side === "right" ? "right-0 rounded-l-[14px]" : "left-0 rounded-r-[14px]",
 							)}
 							style={{ "--sidebar-width": SIDEBAR_WIDTH_MOBILE, width: "var(--sidebar-width)" } as CSSProperties}
@@ -273,8 +297,9 @@ function Sidebar({
 						: "group-data-[collapsible=icon]:w-(--sidebar-width-icon)",
 				)}
 			/>
-			<div
+			<aside
 				data-slot="sidebar-container"
+				aria-label={landmarkLabel}
 				className={cn(
 					"fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-400 ease-[cubic-bezier(0.75,0,0.25,1)] md:flex",
 					side === "left"
@@ -300,7 +325,7 @@ function Sidebar({
 						{children}
 					</div>
 				</MotionHighlight>
-			</div>
+			</aside>
 		</div>
 	);
 }

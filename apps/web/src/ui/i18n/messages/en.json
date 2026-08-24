@@ -1,10 +1,14 @@
 {
 	"a11y": {
 		"closeDialog": "Close",
+		"closeToast": "Close notification",
 		"toggleSidebar": "Toggle sidebar",
 		"sidebarLandmark": "Planner controls",
 		"radialNavigation": "Feature navigation",
 		"selectLanguage": "Select language, current: {current}",
+		"calculating": "Calculating your plan",
+		"planUpdated": "Plan updated",
+		"noPlan": "No plan to show yet. Check your PTO days, country and year.",
 		"skipToMainContent": "Skip to main content"
 	},
 	"metadata": {
@@ -655,6 +659,7 @@
 		"enterAmount": "Enter amount",
 		"basePriceNote": "Base price in {currency}. The final amount will be converted to your local currency at current exchange rates.",
 		"havePromoCode": "Have a promo code?",
+		"promoCode": "Promo code",
 		"promoCodePlaceholder": "You wish it was that easy",
 		"continueToPayment": "Continue to payment",
 		"processing": "Processing..."

@@ -2,7 +2,7 @@
 
 import { Label } from "@ui/modules/core/primitives/Label";
 import { cn } from "@ui/utils/cn";
-import { type ComponentProps, createContext, use, useId, useMemo } from "react";
+import { type ComponentProps, createContext, use, useEffect, useId, useMemo, useState } from "react";
 import {
 	Controller,
 	type ControllerProps,
@@ -27,6 +27,8 @@ const FormFieldContext = createContext<FormFieldContextValue>({} as FormFieldCon
 
 type FormItemContextValue = {
 	id: string;
+	hasDescription: boolean;
+	registerDescription: (present: boolean) => void;
 };
 
 const FormItemContext = createContext<FormItemContextValue>({} as FormItemContextValue);
@@ -56,11 +58,13 @@ const useFormField = () => {
 		throw new Error("useFormField should be used within <FormField>");
 	}
 
-	const { id } = itemContext;
+	const { id, hasDescription, registerDescription } = itemContext;
 
 	return {
 		id,
 		name: fieldContext.name,
+		hasDescription,
+		registerDescription,
 		formItemId: `${id}-form-item`,
 		formDescriptionId: `${id}-form-item-description`,
 		formMessageId: `${id}-form-item-message`,
@@ -70,8 +74,12 @@ const useFormField = () => {
 
 function FormItem({ className, ...props }: ComponentProps<"div">) {
 	const id = useId();
+	const [hasDescription, setHasDescription] = useState(false);
 
-	const itemContextValue = useMemo(() => ({ id }), [id]);
+	const itemContextValue = useMemo(
+		() => ({ id, hasDescription, registerDescription: setHasDescription }),
+		[id, hasDescription],
+	);
 	return (
 		<FormItemContext.Provider value={itemContextValue}>
 			<div data-slot="form-item" className={cn("grid gap-2", className)} {...props} />
@@ -94,14 +102,35 @@ function FormLabel({ className, ...props }: Omit<ComponentProps<"label">, "htmlF
 }
 
 function FormControl({ ...props }: ComponentProps<typeof Slot>) {
-	const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
+	const { error, hasDescription, formItemId, formDescriptionId, formMessageId } = useFormField();
+	const describedBy = [hasDescription ? formDescriptionId : null, error ? formMessageId : null]
+		.filter(Boolean)
+		.join(" ");
 
 	return (
 		<Slot
 			data-slot="form-control"
 			id={formItemId}
-			aria-describedby={!error ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`}
+			aria-describedby={describedBy || undefined}
 			aria-invalid={!!error}
+			{...props}
+		/>
+	);
+}
+
+function FormDescription({ className, ...props }: ComponentProps<"p">) {
+	const { formDescriptionId, registerDescription } = useFormField();
+
+	useEffect(() => {
+		registerDescription(true);
+		return () => registerDescription(false);
+	}, [registerDescription]);
+
+	return (
+		<p
+			data-slot="form-description"
+			id={formDescriptionId}
+			className={cn("text-muted-foreground text-xs", className)}
 			{...props}
 		/>
 	);
@@ -128,4 +157,4 @@ function FormMessage({ className, ...props }: ComponentProps<"p">) {
 	);
 }
 
-export { Form, FormControl, FormField, FormItem, FormLabel, FormMessage };
+export { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage };

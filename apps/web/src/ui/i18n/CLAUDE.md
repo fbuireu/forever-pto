@@ -68,11 +68,17 @@ go hunting for a key:
 - **`a11y` holds accessible names, and it is the only namespace that does.** Two kinds live here. Names a
   `core/` component cannot translate for itself, because those files may not call `useTranslations`
   ([`../modules/core/CLAUDE.md`](../modules/core/CLAUDE.md)); each takes its label as a prop and the *caller*
-  supplies it: `closeDialog` for every modal's close button, `toggleSidebar` and `sidebarLandmark` for the
-  sidebar, `radialNavigation` for the roadmap dial, `skipToMainContent` for `SkipToContent`. And names more
-  than one feature needs: `selectLanguage`, read by both the sidebar's `LanguageSelector` and the homepage's
-  switcher. A name only one feature uses still belongs in that feature's namespace, next to the copy it sits
-  beside.
+  supplies it: `closeDialog` for every modal's close button, `closeToast` for the sonner toaster,
+  `toggleSidebar` and `sidebarLandmark` for the sidebar, `radialNavigation` for the roadmap dial,
+  `skipToMainContent` for `SkipToContent`. And names more than one feature needs: `selectLanguage`, read by
+  both the sidebar's `LanguageSelector` and the homepage's switcher. A name only one feature uses still
+  belongs in that feature's namespace, next to the copy it sits beside.
+
+  A third kind joined them: text that exists only to be *announced*, never rendered. `calculating`,
+  `planUpdated` and `noPlan` are the planner's live-region strings, read by `CalendarList.tsx` and
+  `ManagementBar.tsx` into `sr-only` `role="status"` spans. They are here rather than in `planner` because
+  they answer the same question the names do, which is what a screen reader is told and a sighted user never
+  sees, and grouping them keeps that whole surface reviewable in one place.
 
   There was a second namespace called `accessibility` holding exactly those last two keys, and this file did
   not mention it, so an author asking "where does my `aria-label` go" had two plausible answers and no way

@@ -6,7 +6,10 @@ const MockHeader = vi.fn().mockReturnValue(null);
 const MockFooter = vi.fn().mockReturnValue(null);
 const MockToaster = vi.fn().mockReturnValue(null);
 
-vi.mock("next-intl/server", () => ({ setRequestLocale: mockSetRequestLocale }));
+vi.mock("next-intl/server", () => ({
+	setRequestLocale: mockSetRequestLocale,
+	getTranslations: async () => (key: string) => key,
+}));
 vi.mock("@ui/modules/pages/homepage/navigation/Navigation", () => ({ Header: MockHeader }));
 vi.mock("@ui/modules/shared/footer/Footer", () => ({ Footer: MockFooter }));
 vi.mock("@ui/modules/core/primitives/Sonner", () => ({ Toaster: MockToaster }));
@@ -49,5 +52,12 @@ describe("(marketing)/layout", () => {
 		const element = await MarketingLayout({ children: null, params: Promise.resolve({ locale: EN as never }) });
 		const children: unknown[] = [element.props.children].flat();
 		expect(children.some((c: unknown) => (c as { type?: unknown })?.type === MockToaster)).toBe(true);
+	});
+
+	it("hands the Toaster a translated close label, which sonner otherwise hard-codes to English", async () => {
+		const element = await MarketingLayout({ children: null, params: Promise.resolve({ locale: EN as never }) });
+		const children: unknown[] = [element.props.children].flat();
+		const toaster = children.find((c: unknown) => (c as { type?: unknown })?.type === MockToaster);
+		expect((toaster as { props: { closeLabel?: string } }).props.closeLabel).toBe("closeToast");
 	});
 });

@@ -192,6 +192,66 @@ have no such short-circuit of their own.
 
 ## Gotchas
 
+**`pointer-events-none` blocks the mouse and nothing else, so the mid-calculation guard had to move into
+the handler.** `CalendarList.tsx` expressed "a run is in flight" as `isCalculating && "pointer-events-none"`
+on the grid. That removes hit-testing; it does not remove the day buttons from the tab order and does not
+stop Enter or Space firing `click` on a focused one, so the guard did not apply to keyboard users at all.
+What the race produces is specific and silent, and worth knowing before anyone loosens it:
+
+- Removing a Suggested Day mid-run appends to `removedSuggestedDays`, and `setCalculationResult` clears that
+  array unconditionally when the worker answers. The removal is discarded and the day comes back.
+- Adding a Manual Day mid-run appends to `manuallySelectedDays`, which `setCalculationResult` does *not*
+  clear, while the request already in flight was posted with the older list and with `autoSuggestCount`
+  computed from it. The arriving plan therefore spends the full budget alongside a Manual Day it never knew
+  about, and the total spend can exceed `ptoDays`. See the budget-cap notes in
+  [`../../../CLAUDE.md`](../../../CLAUDE.md).
+
+`toggleDay` answers `DayRefusal.PLAN_IN_FLIGHT` while `isCalculating`, so the store is never reached. The
+`Calendar` component's own `disabled` prop was rejected for this: it reaches every day button and a focused
+button that becomes disabled drops focus to `<body>`, on every recalculation, which is worse than the bug.
+`PLAN_IN_FLIGHT` maps to `null` in `calendar/utils/refusals.ts` like `NO_PLAN`, because the live region
+below already says what is happening and a toast per keypress would not.
+
+**The planner had no live region at all, and three states were therefore silent.** `aria-live` across
+`src/ui` returned two hits, both in `premium/CheckoutForm.tsx`, and `role="status"` one, the remaining-budget
+readout in `PlannerPanel.tsx`. Two more exist now:
+
+- `CalendarList.tsx` carries `aria-busy` on the grid and an `sr-only` `role="status"` that says
+  `a11y.calculating` during a run and `a11y.planUpdated` once one has completed. A budget change used to
+  repaint twelve calendars with nothing announced.
+- `ManagementBar.tsx` announces `a11y.noPlan` when `isSettledEmpty`, which used to render nothing at all, so
+  a reader could not tell a finished-and-empty run from a broken page.
+
+**`sidebar/components/PtoDays.tsx` deliberately did *not* get one.** It renders the same remaining figure as
+`PlannerPanel`'s `Status`, and both are on screen together on desktop; a second live region over one number
+means every change is announced twice. Its `role="img"` + `aria-label` spans name the numbers without
+speaking. One readout is live, and it is the one inside the panel.
+
+**The mobile drawer is a `region`, not a `dialog`.** `ManagementBar.tsx` mounts vaul with
+`modal={false} dismissible={false} open={!openMobile}`, so what `DrawerContent` rendered was a `role="dialog"`
+that is permanently open, cannot be dismissed and has no close button: three promises a dialog makes and this
+element keeps none of. It passes `role="region"` through to `DrawerPrimitive.Content`, which works because
+Radix writes its own `role="dialog"` *before* spreading `contentProps`. No `aria-label` goes with it: Radix
+also sets `aria-labelledby` ahead of the spread, pointing at the `DrawerTitle` this file already renders, and
+`aria-labelledby` wins over `aria-label`. Its snap geometry is a separate decision recorded above; leave it
+alone.
+
+**`Legend.tsx` is a real disclosure now, and used to be an invisible checkbox with no name.** The card is a
+CSS-only toggle: an `<input type="checkbox">` with `opacity: 0; pointer-events: none` driving
+`.toggle:checked ~ .section`, and a `<label>` that is `display: none` until the scroll-state container query
+promotes it. `pointer-events: none` does not remove an input from the tab order and a `display: none` label
+contributes nothing to an accessible name, so a keyboard user landed on an invisible control announced as
+"checkbox, not checked", and Space expanded a card elsewhere with no announcement. A checkbox is the wrong
+role for a disclosure besides.
+
+It is a `'use client'` component with a `useState` and a `<button aria-expanded aria-controls>` whose text is
+the label, so the name changes with the state rather than through two spans and a CSS swap. The button keeps
+`display: none` until the container query promotes it, which is what removes the phantom tab stop: a
+`display: none` button is not focusable. `.toggle:checked ~ .section` became `.section.expanded`; the
+`@container` nesting inside it is unchanged. `aria-expanded` reports the button, and the collapsed content
+stays readable (`grid-template-rows: 0fr` clips it rather than hiding it), which is deliberate: only the
+container query knows whether the card is stuck, and JavaScript here does not.
+
 **`Calendar` is not a grid, and the `role="grid"` it used to declare was the only ARIA the pattern got.**
 There was no `role="row"`, no `role="gridcell"`, no `columnheader` (the weekday strip is a sibling
 *outside* the day container) and, more to the point, no grid keyboard model: a grid promises arrow-key

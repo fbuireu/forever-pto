@@ -16,7 +16,7 @@ export function Logo() {
 			<Link
 				href="/"
 				onClick={() => isMobile && setOpenMobile(false)}
-				className="no-underline outline-none w-full p-3 flex justify-center hover:opacity-85 transition-opacity group"
+				className="no-underline outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-[8px] w-full p-3 flex justify-center hover:opacity-85 transition-opacity group"
 				aria-label="Forever PTO"
 			>
 				<div className="flex items-center gap-2">

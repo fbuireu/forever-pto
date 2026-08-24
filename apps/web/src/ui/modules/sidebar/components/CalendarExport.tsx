@@ -129,6 +129,7 @@ export const CalendarExport = () => {
 				<Button
 					type="button"
 					size="sm"
+					aria-pressed={includeHolidays}
 					variant={includeHolidays ? "default" : "outline"}
 					onClick={() => setIncludeHolidays((v) => !v)}
 					className="flex-1 text-[11px]"
@@ -138,6 +139,7 @@ export const CalendarExport = () => {
 				<Button
 					type="button"
 					size="sm"
+					aria-pressed={includePto}
 					variant={includePto ? "default" : "outline"}
 					onClick={() => setIncludePto((v) => !v)}
 					className="flex-1 text-[11px]"

@@ -54,6 +54,14 @@ describe("PremiumFeature", () => {
 		expect(premiumState.showPremiumModal).toHaveBeenCalledWith("calendarExport");
 	});
 
+	it("keeps a focus ring, so tabbing onto a gated chart changes something on screen", () => {
+		renderGate({ locale: "en", messages: enMessages });
+		const gate = screen.getByRole("button").className;
+
+		expect(gate).not.toContain("focus:outline-none");
+		expect(gate).toContain("focus-visible:ring-[3px]");
+	});
+
 	it("still names itself in the reader's language, resolving the label from the id", () => {
 		renderGate({ locale: "de", messages: deMessages });
 

@@ -219,8 +219,45 @@ and `app/[locale]/(app)/payment/confirmation/page.tsx` opened all three of its b
 the same class as the `htmlFor='remaining-days'` and `AllowPastDays` defects below: a promise to a screen
 reader that never resolves. [`layout/SkipToContent.test.tsx`](./layout/SkipToContent.test.tsx) renders each
 shell it can and asserts the landmark is in the tree, and scans `src/` for the declaring files so the list
-cannot silently shrink or grow a duplicate. `app/[locale]/(marketing)/page.tsx` is the one shell still on the
-literal; the scan covers it, and it moves onto the const the next time that file is touched.
+cannot silently shrink or grow a duplicate. All six shells read the const; the scan still accepts the literal
+form, because it is what tells a new shell apart from a renamed one.
+
+**The destination has to show it received focus, and for a while it showed nothing.** `SidebarInset` is the
+skip link's target and carries `tabIndex={-1}` so the fragment jump can land on it; it also carried a bare
+`outline-none`, so taking the link moved focus and changed nothing on screen. Every keyboard user's
+confirmation that the skip link worked was that the next Tab landed somewhere new. It pairs the suppression
+with `focus-visible:ring-[3px] … ring-inset` now, which is the same pairing every primitive in `core/` uses;
+`layout/SkipToContent.test.tsx` reads the `<SidebarInset` opening tag and fails on a suppression with no ring
+beside it.
+
+**`focus:outline-none` is always wrong, and `outline-none` on its own is the house style.** `:focus-visible`
+is a subset of `:focus`, so scoping the suppression to `:focus` kills the focus-visible ring as well, and no
+`focus-visible:ring-*` written afterwards can bring it back. `premium/PremiumFeature.tsx` had it, and that
+gate is rendered at thirteen call sites (every gated chart, every gated Holiday row, the Custom tab, the
+calendar export), so a free user tabbing through the Summary landed on a blurred chart thirteen times with
+nothing on screen changing. `shared/Logo.tsx` had the unconditional form with no ring, and it is the **first**
+focusable element in the planner sidebar, so it was the first thing a keyboard user met after the skip link.
+Both pair `outline-none` with the `focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2`
+treatment now. A panel that is only focused programmatically (`core/animate/base/Drawer.tsx`'s content) is the
+one place a bare suppression is fine, because nothing tabs onto it.
+
+**Two of `shared/donate/DonationForm.tsx`'s controls said nothing about what they were about to charge.**
+The three amount presets were `variant={currentAmount === preset ? "default" : "outline"}` and no
+`aria-pressed`, so a reader heard the same string before and after pressing the button that *decides how much
+money is taken*; `sidebar/components/CalendarExport.tsx`'s two include-toggles had the same shape over the
+contents of a downloaded file. Both carry `aria-pressed` now. A `variant=` that flips on state is the tell:
+if the colour means "on", something has to say so.
+
+**The promo-code field had no label at all, and the amount field's label named a `<div>`.** The promo input
+had only a `placeholder`, which vanishes on the first keystroke, so a payer correcting a half-typed code heard
+"edit, FOREV" and had no click target; it takes a `FormLabel` and a new `donationForm.promoCode` key in all
+six bundles. The amount field had a `FormLabel`, but `FormControl` wrapped the whole `InputGroup`, so its `id`
+and `aria-describedby` landed on the `role="group"` wrapper and the `<label for>` pointed at a `div`.
+`FormControl` sits **inside** `InputGroup`, around `InputGroupInput`, now. `InputGroup`'s `has-[>input]`
+selectors still hold: `Slot` renders its child directly, so the DOM stays `div > input`. The form also sets
+`noValidate` and carried no `required` anywhere, though the Zod schema refuses both email and amount; both
+inputs declare it now, which is what puts `required` in the accessible tree without turning native validation
+back on.
 
 **The three legal identity modules derive their own accessible name; they do not take one.**
 `pages/legal/Me.tsx`, `pages/legal/Nif.tsx` and `pages/legal/Address.tsx` are a `{ character, order }` table

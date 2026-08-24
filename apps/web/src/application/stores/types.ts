@@ -44,6 +44,7 @@ export type AlternativePreviewParams = Pick<AlternativeSelectionBaseParams, "ind
 
 export const DayRefusal = {
 	NO_PLAN: "no_plan",
+	PLAN_IN_FLIGHT: "plan_in_flight",
 	DAY_IS_WEEKEND: "day_is_weekend",
 	DAY_IS_HOLIDAY: "day_is_holiday",
 	DAY_IS_CUSTOM_HOLIDAY: "day_is_custom_holiday",

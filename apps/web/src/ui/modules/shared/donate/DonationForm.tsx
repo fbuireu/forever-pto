@@ -5,7 +5,15 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@ui/modules
 import { ChevronDown } from "@ui/modules/core/animate/icons/ChevronDown";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
 import { Button } from "@ui/modules/core/primitives/Button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@ui/modules/core/primitives/Form";
+import {
+	Form,
+	FormControl,
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@ui/modules/core/primitives/Form";
 import { Input } from "@ui/modules/core/primitives/Input";
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@ui/modules/core/primitives/InputGroup";
 import { cn } from "@ui/utils/cn";
@@ -64,6 +72,7 @@ export function DonationForm({
 									type="email"
 									placeholder={t("emailPlaceholder")}
 									disabled={isPending}
+									required
 									{...field}
 									className="h-10"
 									autoComplete="email"
@@ -80,6 +89,7 @@ export function DonationForm({
 							<Button
 								key={preset}
 								type="button"
+								aria-pressed={currentAmount === preset}
 								variant={currentAmount === preset ? "default" : "outline"}
 								size="sm"
 								onClick={() => handlePresetClick(preset)}
@@ -95,14 +105,14 @@ export function DonationForm({
 				<FormField
 					control={form.control}
 					name="amount"
-					render={({ field, fieldState }) => (
+					render={({ field }) => (
 						<FormItem>
 							<FormLabel>{t("donationAmount")}</FormLabel>
-							<FormControl>
-								<InputGroup>
-									<InputGroupAddon>
-										<InputGroupText>{currencySymbol}</InputGroupText>
-									</InputGroupAddon>
+							<InputGroup>
+								<InputGroupAddon>
+									<InputGroupText>{currencySymbol}</InputGroupText>
+								</InputGroupAddon>
+								<FormControl>
 									<InputGroupInput
 										type="number"
 										inputMode="numeric"
@@ -112,7 +122,7 @@ export function DonationForm({
 										min="1"
 										max="10000"
 										disabled={isPending}
-										aria-invalid={!!fieldState.error}
+										required
 										{...field}
 										value={field.value ?? ""}
 										onChange={(e) => {
@@ -120,9 +130,9 @@ export function DonationForm({
 											field.onChange(value === "" ? 0 : parseFloat(value));
 										}}
 									/>
-								</InputGroup>
-							</FormControl>
-							<p className="text-xs text-muted-foreground mt-1">{t("basePriceNote", { currency })}</p>
+								</FormControl>
+							</InputGroup>
+							<FormDescription className="mt-1">{t("basePriceNote", { currency })}</FormDescription>
 							<FormMessage />
 						</FormItem>
 					)}
@@ -148,6 +158,7 @@ export function DonationForm({
 								name="promoCode"
 								render={({ field }) => (
 									<FormItem>
+										<FormLabel>{t("promoCode")}</FormLabel>
 										<FormControl>
 											<Input
 												type="text"

@@ -58,6 +58,7 @@ const HolidayCard = ({
 	onToggle: (holiday: HolidayDTO) => void;
 	t: ReturnType<typeof useTranslations<"holidaysTable">>;
 }) => {
+	const tRow = useTranslations("holidayRow");
 	const dateFormatted = formatDate({ date: holiday.date, locale, format: "EEEE, MMMM d, yyyy" });
 
 	return (
@@ -74,7 +75,12 @@ const HolidayCard = ({
 						variant={PremiumFeatureVariant.STACK}
 						iconSize="size-4"
 					>
-						<Checkbox checked={isSelected} onCheckedChange={() => onToggle(holiday)} className="mt-1 shrink-0" />
+						<Checkbox
+							checked={isSelected}
+							onCheckedChange={() => onToggle(holiday)}
+							aria-label={tRow("select", { name: holiday.name })}
+							className="mt-1 shrink-0"
+						/>
 					</PremiumFeature>
 					<div className="flex-1 min-w-0">
 						<h4 className="font-medium text-sm leading-tight wrap-break-word">{holiday.name}</h4>

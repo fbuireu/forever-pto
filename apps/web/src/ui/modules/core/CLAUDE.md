@@ -112,6 +112,14 @@ required and the compiler is the check:
   other props, so one of the three has to be there. Base UI renders it as `<button role='switch'>` with no
   name of its own: the four switches in the cookie dialog announced as "switch, not pressed" and nothing
   else.
+- [`animate/base/Checkbox.tsx`](./animate/base/Checkbox.tsx) takes the identical union, and it took nothing at all for a long
+  time, which is exactly how it drifted: Base UI renders it as `<button role='checkbox'>` with no intrinsic
+  name either, the rule above was written for `Switch` alone, and the file sitting beside it never got the
+  same treatment. Two of its three call sites already passed `aria-label`; the mobile Holiday card in
+  `pages/planner/holidays/HolidaysTable.tsx` did not, so on a phone every Holiday row announced as "checkbox,
+  not checked" while the desktop row two hundred lines away announced "Select Christmas Day". A fourth call
+  site cannot repeat it. Its own test carries a `@ts-expect-error` over a nameless `<Checkbox />`, so
+  loosening the type fails `pnpm typecheck` on an unused suppression rather than passing quietly.
 - [`primitives/Slider.tsx`](./primitives/Slider.tsx) takes `label: string` and puts it on `Slider.Thumb`, which is where Base UI's
   real control, a nested `<input type='range'>`, lives. Its `id` prop is gone: it landed on `Slider.Root`,
   which renders a `<div>`, so the `<label htmlFor>` pointing at it named nothing.
@@ -122,6 +130,17 @@ required and the compiler is the check:
 The union on `Switch` proves a caller thought about the name, not that the name exists: `id` only names
 anything if some `<label htmlFor>` points at it. That is the same guarantee `htmlFor: string` gives, and it
 is the most a type can offer here.
+
+**`RadialNav` is a `<fieldset>` now, and it used to declare a `role="menu"` it did not implement.** The
+container said `menu` and each button said `menuitem`, but every button sits inside its own positioning
+`div`, and `menu` requires it to *own* its items, so several readers exposed the menu as empty. There was no
+roving focus either, and, decisively, it is not a menu: it is the Roadmap's category selector and nothing
+navigates. That is the same reasoning that removed the calendar's `role="grid"`, recorded in
+[`../pages/planner/CLAUDE.md`](../pages/planner/CLAUDE.md): do not declare a pattern you have not written. It
+is a group, which promises nothing, and Biome's `useSemanticElements` wants the element rather than the role,
+hence `<fieldset aria-label>`; the label is still the caller's, because this folder cannot translate. Each
+button carries `aria-pressed`, so the selected category is announced and not merely coloured. `aria-current`
+would read correctly too; `aria-pressed` is what the calendar's day cells already use for "this one is on".
 
 **`RadialNav` accepts `HTMLAttributes` and spreads none of them.** It destructures what it uses and drops the
 rest, so `aria-label` had to be named explicitly to be honoured at all. Anything else a caller passes
@@ -210,6 +229,21 @@ values in `animate/icons/Icon.tsx` carry it, so a parent `AnimateIcon` reaches a
 context-free branch of `IconWrapper` builds its `AnimateIcon` without `persistOnAnimateEnd` or
 `initialOnAnimateEnd`: on a standalone icon both are inert. Nothing passes them today.
 
+**`primitives/Form.tsx` names an `aria-describedby` only for an element that exists, and for a long time it
+named one that never did.** `useFormField` builds `formDescriptionId` as `${id}-form-item-description` and
+`FormControl` put it on every control unconditionally; grepping `apps/web/src` for `form-item-description`
+returned exactly one hit, that definition. There is no `FormDescription` in this fork: shadcn's original has
+one, this copy dropped it and kept the reference, so in the no-error case the dangling id was the *only*
+value `aria-describedby` carried. That is the third instance of the defect [`../CLAUDE.md`](../CLAUDE.md)
+names as "a promise to a screen reader that never resolves".
+
+Both halves are fixed rather than one. `FormDescription` exists again, and `FormItem` holds a
+`hasDescription` flag that `FormDescription` sets from an effect, so `FormControl` names the id only when the
+element is on the page and omits `aria-describedby` entirely when there is nothing to describe. The
+registration costs one extra render on a field that has a description; the alternative, always emitting the
+id and requiring every caller to render a description, is what shipped the defect.
+`shared/donate/DonationForm.tsx`'s base-price note was the loose `<p>` that should have been one all along.
+
 **`primitives/Slider.tsx` exists to pin the value type.** `@base-ui/react` hands its `onValueChange`
 and `onValueCommitted` callbacks a `number | readonly number[]`; every caller in this app wants a
 mutable `number[]`, so the wrapper copies the array or boxes the lone number before calling back.
@@ -257,6 +291,52 @@ threaded to a real `aria-controls`, not a constant.
 **`RadialNav`'s `orbitRadius` is `size / 2 - 0.5`, and the half pixel is not slop.** It puts the
 *centre* of each item circle on the parent circle's stroke rather than outside it: the parent radius
 less half the border the child draws. Drop the `0.5` and the ring stops reading as concentric.
+
+**`primitives/Sonner.tsx` takes a `closeLabel`, because the string it needed lived in a dependency.** The
+hard-coded-name rule above closed four components and missed this one: sonner 2.0.8 defaults
+`closeButtonAriaLabel = 'Close toast'` and reads the override from `toastOptions.closeButtonAriaLabel`, so
+every toast in all six locales offered an English close button and nothing in `src/` held a string to grep
+for. `Toaster` now takes `closeLabel`, defaulting to sonner's own wording so a caller that forgets loses
+nothing, and both mount sites (`app/[locale]/(app)/planner/layout.tsx` and
+`app/[locale]/(marketing)/layout.tsx`) pass `a11y.closeToast` through `getTranslations`. A defect can hide in
+a dependency's default; the fix is the same prop shape as `closeLabel` on `Dialog`.
+
+**`animate/providers/LazyMotionProvider.tsx` wraps its `LazyMotion` in `<MotionConfig reducedMotion="user">`,
+and the CSS blanket is why nobody noticed it was missing.** `src/ui/styles/animations/index.css` carries a
+correct global `@media (prefers-reduced-motion: reduce)` override, so the page *looks* covered; motion drives
+transform, opacity and filter through the Web Animations API and inline style writes, which no CSS
+`transition-duration` rule can reach. Sixty-two files in this package import `motion/react` and not one of
+them mentioned `useReducedMotion`, `MotionConfig`, `motion-safe` or `motion-reduce`, so with reduce-motion set
+at OS level a user still got the mobile sidebar sliding a viewport width on a stiff spring, every dialog
+scaling and blurring in, and `SlidingNumber` animating every metric on every recalculation. One provider
+covers all of them, because every render tree passes through one of its three mount sites
+(`app/[locale]/layout.tsx`, `app/global-error.tsx`, `app/global-not-found.tsx`) and `MotionConfig` publishes
+through the same context that every `m.*` component and every `m.create()` reads.
+[`animate/providers/LazyMotionProvider.test.tsx`](./animate/providers/LazyMotionProvider.test.tsx) drives
+motion's own `prefersReducedMotion` value and asserts `useReducedMotionConfig()` follows it in both
+directions.
+
+**`animate/base/Sidebar.tsx`'s mobile drawer manages focus itself, because it is not a Base UI `Dialog`.**
+Every other modal in this package goes through `animate/primitives/base/Dialog.tsx`, which hands Base UI an
+`initialFocus`/`finalFocus`; that branch is a raw `AnimatePresence` plus two `m.div`s. It had no initial
+focus, no return focus and no Escape, so opening it left focus on the trigger now behind the overlay, and Tab
+walked the whole planner underneath without ever reaching the drawer. It takes a `tabIndex={-1}` and a ref
+now, focuses itself on open, remembers `document.activeElement` and restores it on close, and closes on
+Escape from a window-level listener, because focus can legitimately leave the drawer and a local handler
+would miss it.
+
+**There is still no focus trap, and `aria-modal="false"` is why.** The two are one decision: this drawer
+blocks the pointer with a real `fixed inset-0` backdrop rather than a body-level lock (see the
+`document.body.style` note above), and a non-modal dialog does not trap. Setting `aria-modal="true"` while
+the page behind it stays reachable would be the lie; adding a trap while claiming not to be modal would be
+the other one. If the drawer ever becomes genuinely modal, both change together.
+
+**The desktop rail is an `<aside>` and used to be four nested role-less `div`s.** The mobile branch got
+`role="dialog"` and a label; the desktop branch got nothing, while `sidebar/AppSidebar.tsx` puts the entire
+control surface inside it, so pressing the landmark key on the planner cycled between `main` and `footer` and
+nothing else. `sidebar-container` is `<aside aria-label={landmarkLabel}>` now, which is the element Biome's
+`useSemanticElements` demands over a bare `role="complementary"`, and it is the same `landmarkLabel` the
+mobile branch already took.
 
 **`MotionSlot` calls `m.create(children.type)` inside `useMemo`, keyed on the child's type.** A child
 whose component identity changes between renders (anything defined inline) remints the motion

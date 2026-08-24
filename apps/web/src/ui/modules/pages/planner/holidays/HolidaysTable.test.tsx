@@ -92,6 +92,11 @@ const renderTable = () => {
 	return view;
 };
 
+type View = ReturnType<typeof renderTable>;
+
+const desktopRow = (view: View, name: string) => view.getAllByLabelText(`Select ${name}`)[0] as HTMLInputElement;
+const mobileCard = (view: View, name: string) => view.getAllByLabelText(`Select ${name}`)[1] as HTMLInputElement;
+
 beforeEach(() => {
 	holidaysState.holidays = [
 		holiday({ id: "national-2026-01-01", name: "Alpha", date: new Date(2026, 0, 1) }),
@@ -103,21 +108,21 @@ beforeEach(() => {
 describe("HolidaysTable selection survives the rows moving", () => {
 	it("keeps a Holiday selected when a search reorders it under a different row index", () => {
 		const view = renderTable();
-		fireEvent.click(view.getByLabelText("Select Gamma"));
-		expect((view.getByLabelText("Select Gamma") as HTMLInputElement).checked).toBe(true);
+		fireEvent.click(desktopRow(view, "Gamma"));
+		expect(desktopRow(view, "Gamma").checked).toBe(true);
 
 		fireEvent.change(view.getByPlaceholderText(enMessages.holidaysTable.searchPlaceholder), {
 			target: { value: "Gamma" },
 		});
 
-		expect((view.getByLabelText("Select Gamma") as HTMLInputElement).checked).toBe(true);
+		expect(desktopRow(view, "Gamma").checked).toBe(true);
 		expect(view.getByTestId("delete-modal").getAttribute("data-names")).toBe("Gamma");
 		expect(view.getByTestId("edit-modal").getAttribute("data-name")).toBe("Gamma");
 	});
 
 	it("keeps a Holiday selected when sorting by name reorders it", () => {
 		const view = renderTable();
-		fireEvent.click(view.getByLabelText("Select Alpha"));
+		fireEvent.click(desktopRow(view, "Alpha"));
 
 		const sortByName = view.getByRole("button", { name: enMessages.holidayTableHeader.holiday });
 		fireEvent.click(sortByName);
@@ -126,7 +131,7 @@ describe("HolidaysTable selection survives the rows moving", () => {
 		expect(
 			view.getByRole("columnheader", { name: enMessages.holidayTableHeader.holiday }).getAttribute("aria-sort"),
 		).toBe("descending");
-		expect((view.getByLabelText("Select Alpha") as HTMLInputElement).checked).toBe(true);
+		expect(desktopRow(view, "Alpha").checked).toBe(true);
 		expect(view.getByTestId("delete-modal").getAttribute("data-names")).toBe("Alpha");
 	});
 });
@@ -134,8 +139,8 @@ describe("HolidaysTable selection survives the rows moving", () => {
 describe("HolidaysTable toolbar counts what it will act on", () => {
 	it("offers to delete exactly the Holidays the modal will receive", () => {
 		const view = renderTable();
-		fireEvent.click(view.getByLabelText("Select Alpha"));
-		fireEvent.click(view.getByLabelText("Select Beta"));
+		fireEvent.click(desktopRow(view, "Alpha"));
+		fireEvent.click(desktopRow(view, "Beta"));
 
 		expect(view.getByTestId("delete-modal").getAttribute("data-names")).toBe("Alpha,Beta");
 		expect(view.getAllByText("Delete (2)").length).toBeGreaterThan(0);
@@ -143,7 +148,7 @@ describe("HolidaysTable toolbar counts what it will act on", () => {
 
 	it("drops a selected Holiday from the count once it leaves the list entirely", () => {
 		const view = renderTable();
-		fireEvent.click(view.getByLabelText("Select Gamma"));
+		fireEvent.click(desktopRow(view, "Gamma"));
 
 		holidaysState.holidays = holidaysState.holidays.slice(0, 2);
 		fireEvent.change(view.getByPlaceholderText(enMessages.holidaysTable.searchPlaceholder), {
@@ -152,5 +157,21 @@ describe("HolidaysTable toolbar counts what it will act on", () => {
 
 		expect(view.queryByTestId("delete-modal")?.getAttribute("data-names")).toBe("");
 		expect(view.queryByTestId("edit-modal")).toBeNull();
+	});
+});
+
+describe("HolidaysTable names both of its checkboxes", () => {
+	it("names the mobile card's checkbox the way the desktop row names its own", () => {
+		const view = renderTable();
+
+		expect(mobileCard(view, "Gamma").getAttribute("aria-label")).toBe("Select Gamma");
+	});
+
+	it("toggles the same Holiday from the mobile card", () => {
+		const view = renderTable();
+
+		fireEvent.click(mobileCard(view, "Beta"));
+
+		expect(desktopRow(view, "Beta").checked).toBe(true);
 	});
 });

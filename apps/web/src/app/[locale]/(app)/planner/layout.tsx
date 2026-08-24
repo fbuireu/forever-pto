@@ -8,7 +8,7 @@ import { AppSidebar } from "@ui/modules/sidebar/AppSidebar";
 import { StoresInitializer } from "@ui/modules/stores/StoresInitializer";
 import dynamic from "next/dynamic";
 import type { Locale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { ReactNode } from "react";
 
 const PremiumModal = dynamic(() =>
@@ -23,6 +23,7 @@ interface AppLayoutProps {
 const AppLayout = async ({ children, params }: Readonly<AppLayoutProps>) => {
 	const { locale } = await params;
 	setRequestLocale(locale);
+	const tA11y = await getTranslations({ locale, namespace: "a11y" });
 
 	return (
 		<SidebarProvider>
@@ -37,7 +38,7 @@ bg-size-[4rem_4rem]"
 				<SiteTitle />
 				<SiteSubtitle />
 				{children}
-				<Toaster />
+				<Toaster closeLabel={tA11y("closeToast")} />
 				<DonateClient />
 				<PremiumModal />
 				<Footer />

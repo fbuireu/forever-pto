@@ -99,6 +99,14 @@ describe("skip to content", () => {
 		expect(declaring.length).toBe(new Set(declaring).size);
 	});
 
+	it("shows the destination it received focus, so taking the link is not a silent no-op", () => {
+		const shell = readFileSync(join(SRC_ROOT, "ui/modules/sidebar/AppSidebar.tsx"), "utf8");
+		const landmark = shell.slice(shell.indexOf("<SidebarInset"), shell.indexOf(">", shell.indexOf("<SidebarInset")));
+
+		expect(landmark).toContain("outline-none");
+		expect(landmark).toContain("focus-visible:ring-[3px]");
+	});
+
 	it("resolves on the legal shell", async () => {
 		expect(landmark(render(await LegalRouteLayout({ children: null, params: locale })))).not.toBeNull();
 	});

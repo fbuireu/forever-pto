@@ -1,10 +1,12 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
-import { renderHook } from "@testing-library/react";
+import { act, fireEvent, render, renderHook } from "@testing-library/react";
 import type { ComponentProps, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@ui/hooks/useMobile", () => ({ useIsMobile: () => false }));
+const viewport = vi.hoisted(() => ({ isMobile: false }));
+
+vi.mock("@ui/hooks/useMobile", () => ({ useIsMobile: () => viewport.isMobile }));
 vi.mock("@ui/utils/cookie", () => ({ setCookie: vi.fn().mockResolvedValue(undefined) }));
 
 type MotionDivProps = ComponentProps<"div"> & {
@@ -52,7 +54,7 @@ vi.mock("./Tooltip", () => ({
 	TooltipTrigger: ({ children, ...props }: ComponentProps<"button">) => <button {...props}>{children}</button>,
 }));
 
-import { SidebarProvider, useSidebar } from "./Sidebar";
+import { Sidebar, SidebarProvider, SidebarTrigger, useSidebar } from "./Sidebar";
 
 describe("useSidebar", () => {
 	it("throws when used outside SidebarProvider", () => {
@@ -122,5 +124,64 @@ describe("SidebarProvider mount sites", () => {
 describe("Sidebar body styles", () => {
 	it("writes no document-level style, so it cannot fight another module over the same global", () => {
 		expect(readFileSync(join(__dirname, "Sidebar.tsx"), "utf8")).not.toMatch(/document\.body\.style/);
+	});
+});
+
+const MobileHarness = () => (
+	<SidebarProvider>
+		<SidebarTrigger label="Toggle sidebar" />
+		<Sidebar landmarkLabel="Planner controls">
+			<button type="button">Country</button>
+		</Sidebar>
+	</SidebarProvider>
+);
+
+describe("Sidebar landmarks", () => {
+	it("makes the desktop rail a landmark, so it is reachable by the landmark key", () => {
+		viewport.isMobile = false;
+		const { getByRole } = render(<MobileHarness />);
+
+		expect(getByRole("complementary", { name: "Planner controls" })).toBeDefined();
+	});
+});
+
+describe("Sidebar mobile drawer focus", () => {
+	it("moves focus into the drawer it just opened, rather than leaving it on the trigger behind", () => {
+		viewport.isMobile = true;
+		const { getByRole } = render(<MobileHarness />);
+
+		fireEvent.click(getByRole("button", { name: "Toggle sidebar" }));
+
+		expect(document.activeElement).toBe(getByRole("dialog", { name: "Planner controls" }));
+		viewport.isMobile = false;
+	});
+
+	it("closes on Escape, which is the only exit a keyboard has", () => {
+		viewport.isMobile = true;
+		const { getByRole, queryByRole } = render(<MobileHarness />);
+		fireEvent.click(getByRole("button", { name: "Toggle sidebar" }));
+
+		act(() => {
+			fireEvent.keyDown(window, { key: "Escape" });
+		});
+
+		expect(queryByRole("dialog")).toBeNull();
+		viewport.isMobile = false;
+	});
+
+	it("hands focus back to the trigger on close, so the tab order does not restart", () => {
+		viewport.isMobile = true;
+		const { getByRole, queryByRole } = render(<MobileHarness />);
+		const trigger = getByRole("button", { name: "Toggle sidebar" });
+		trigger.focus();
+		fireEvent.click(trigger);
+
+		act(() => {
+			fireEvent.keyDown(window, { key: "Escape" });
+		});
+
+		expect(queryByRole("dialog")).toBeNull();
+		expect(document.activeElement).toBe(trigger);
+		viewport.isMobile = false;
 	});
 });

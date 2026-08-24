@@ -162,7 +162,7 @@ function MenuButton({ item, isActive, onActivate, menuButtonConfig }: MenuButton
 			}}
 			onClick={onActivate}
 			type="button"
-			role="menuitem"
+			aria-pressed={isActive ?? false}
 			aria-label={label}
 		>
 			<Icon
@@ -210,10 +210,9 @@ function RadialNav({
 	const resolvedMenuButtonConfig = withDefaults({ defaults: defaultMenuButtonConfig, overrides: menuButtonConfig });
 
 	return (
-		<div
-			className="relative flex items-center justify-center rounded-full border-[3px] border-(--frame)"
+		<fieldset
+			className="relative flex items-center justify-center rounded-full border-[3px] border-(--frame) min-w-0"
 			style={{ width: size, height: size }}
-			role="menu"
 			aria-label={ariaLabel}
 		>
 			<m.div
@@ -251,7 +250,7 @@ function RadialNav({
 					</div>
 				);
 			})}
-		</div>
+		</fieldset>
 	);
 }
 

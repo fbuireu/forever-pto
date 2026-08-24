@@ -1,10 +1,14 @@
 {
 	"a11y": {
 		"closeDialog": "Chiudi",
+		"closeToast": "Chiudi notifica",
 		"toggleSidebar": "Mostra o nascondi la barra laterale",
 		"sidebarLandmark": "Controlli del pianificatore",
 		"radialNavigation": "Navigazione delle funzioni",
 		"selectLanguage": "Seleziona lingua, attuale: {current}",
+		"calculating": "Calcolo del tuo piano",
+		"planUpdated": "Piano aggiornato",
+		"noPlan": "Ancora nessun piano. Controlla i tuoi giorni di ferie, paese e anno.",
 		"skipToMainContent": "Vai al contenuto principale"
 	},
 	"metadata": {
@@ -655,6 +659,7 @@
 		"enterAmount": "Inserisci importo",
 		"basePriceNote": "Prezzo base in {currency}. L'importo finale sarà convertito nella tua valuta locale ai tassi di cambio correnti.",
 		"havePromoCode": "Hai un codice promozionale?",
+		"promoCode": "Codice promozionale",
 		"promoCodePlaceholder": "Magari fosse così facile",
 		"continueToPayment": "Continua al pagamento",
 		"processing": "Elaborando..."

@@ -9,12 +9,6 @@
 }
 
 .toggle {
-	position: absolute;
-	opacity: 0;
-	pointer-events: none;
-}
-
-.toggle_label {
 	display: none;
 	position: relative;
 	cursor: pointer;
@@ -56,14 +50,6 @@
 	&:active::after {
 		inset: -8px 0 0 -8px;
 	}
-}
-
-.show_label {
-	display: inline;
-}
-
-.hide_label {
-	display: none;
 }
 
 .section {
@@ -164,7 +150,7 @@
 			height: 0;
 		}
 
-		.toggle_label {
+		.toggle {
 			display: inline-block;
 		}
 
@@ -189,22 +175,13 @@
 		}
 	}
 
-	/* When checked while stuck: expand + stagger items */
-	.toggle:checked ~ .section {
+	.section.expanded {
 		@container pto-legend scroll-state(stuck: bottom) {
 			.card_content {
 				grid-template-rows: 1fr;
 				padding-top: calc(var(--spacing) * 2);
 				padding-bottom: calc(var(--spacing) * 2);
 				overflow: visible;
-			}
-
-			.show_label {
-				display: none;
-			}
-
-			.hide_label {
-				display: inline;
 			}
 
 			.item {

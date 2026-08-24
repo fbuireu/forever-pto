@@ -9,6 +9,8 @@ const {
 	mockClearCalculation,
 	mockFetchHolidays,
 	mockTriggerCalculation,
+	mockToggleDaySelection,
+	capturedDayToggle,
 } = vi.hoisted(() => ({
 	mockFiltersState: {
 		carryOverMonths: 0,
@@ -27,6 +29,7 @@ const {
 		suggestion: null,
 		currentSelection: null,
 		isCalculating: false,
+		hasCalculated: false,
 		manuallySelectedDays: [],
 		removedSuggestedDays: [],
 		previewAlternativeIndex: 0,
@@ -36,6 +39,8 @@ const {
 	mockClearCalculation: vi.fn(),
 	mockFetchHolidays: vi.fn(),
 	mockTriggerCalculation: vi.fn(),
+	mockToggleDaySelection: vi.fn(() => ({ applied: true })),
+	capturedDayToggle: { current: null as ((date: Date) => { applied: boolean }) | null },
 }));
 
 vi.mock("@application/stores/filters", () => ({
@@ -47,7 +52,7 @@ vi.mock("@application/stores/holidays", () => ({
 		selector({
 			...mockHolidaysState,
 			fetchHolidays: mockFetchHolidays,
-			toggleDaySelection: vi.fn(),
+			toggleDaySelection: mockToggleDaySelection,
 			pruneDaysOutsideWindow: mockPrune,
 			clearCalculation: mockClearCalculation,
 		}),
@@ -63,10 +68,16 @@ vi.mock("boneyard-js/react", () => ({
 	Skeleton: ({ children }: { children: ReactNode }) => children,
 }));
 
-vi.mock("next-intl", () => ({ useLocale: () => "en" }));
+vi.mock("next-intl", () => ({
+	useLocale: () => "en",
+	useTranslations: () => (key: string) => key,
+}));
 
 vi.mock("./calendar/Calendar", () => ({
-	Calendar: () => null,
+	Calendar: ({ onDayToggle }: { onDayToggle: (date: Date) => { applied: boolean } }) => {
+		capturedDayToggle.current = onDayToggle;
+		return null;
+	},
 	CalendarSelectionMode: { MULTIPLE: "multiple" },
 }));
 
@@ -84,6 +95,9 @@ beforeEach(() => {
 		{ id: "h1", date: new Date(2026, 0, 1), name: "New Year", variant: "national", isInPlanningWindow: true },
 	] as never;
 	mockHolidaysState.suggestion = null;
+	mockHolidaysState.isCalculating = false;
+	mockHolidaysState.hasCalculated = false;
+	capturedDayToggle.current = null;
 	(mockHolidaysState as { planRevision?: number }).planRevision = 0;
 });
 
@@ -153,5 +167,45 @@ describe("CalendarList", () => {
 		render(<CalendarList />);
 
 		expect(mockPrune).toHaveBeenCalledWith({ year: 2026, carryOverMonths: 3 });
+	});
+});
+
+describe("CalendarList says what it is doing", () => {
+	it("announces the run instead of silently repainting twelve calendars", () => {
+		mockHolidaysState.isCalculating = true;
+
+		const { container } = render(<CalendarList />);
+
+		expect(container.querySelector('[role="status"]')?.textContent).toBe("calculating");
+		expect(container.querySelector("#calendar")?.getAttribute("aria-busy")).toBe("true");
+	});
+
+	it("announces the finished run, so a reader knows the numbers settled", () => {
+		mockHolidaysState.hasCalculated = true;
+
+		const { container } = render(<CalendarList />);
+
+		expect(container.querySelector('[role="status"]')?.textContent).toBe("planUpdated");
+		expect(container.querySelector("#calendar")?.getAttribute("aria-busy")).toBe("false");
+	});
+});
+
+describe("CalendarList blocks the keyboard on the same terms as the mouse", () => {
+	it("refuses a day toggle while the worker is running, which pointer-events-none never did", () => {
+		mockHolidaysState.isCalculating = true;
+		render(<CalendarList />);
+
+		const outcome = capturedDayToggle.current?.(new Date(2026, 0, 5));
+
+		expect(outcome).toEqual({ applied: false, reason: "plan_in_flight" });
+		expect(mockToggleDaySelection).not.toHaveBeenCalled();
+	});
+
+	it("lets the toggle through once the run has finished", () => {
+		render(<CalendarList />);
+
+		capturedDayToggle.current?.(new Date(2026, 0, 5));
+
+		expect(mockToggleDaySelection).toHaveBeenCalledTimes(1);
 	});
 });

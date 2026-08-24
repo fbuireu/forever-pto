@@ -12,7 +12,10 @@ const MockFooter = vi.fn().mockReturnValue(null);
 const MockAppSidebar = vi.fn().mockReturnValue(null);
 const MockStoresInitializer = vi.fn().mockReturnValue(null);
 
-vi.mock("next-intl/server", () => ({ setRequestLocale: mockSetRequestLocale }));
+vi.mock("next-intl/server", () => ({
+	setRequestLocale: mockSetRequestLocale,
+	getTranslations: async () => (key: string) => key,
+}));
 
 vi.mock("next/dynamic", () => ({
 	default: vi.fn().mockReturnValue(vi.fn().mockReturnValue(null)),

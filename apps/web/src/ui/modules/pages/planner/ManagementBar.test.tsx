@@ -35,7 +35,9 @@ vi.mock("@ui/modules/core/animate/base/Drawer", () => ({
 			{children}
 		</div>
 	),
-	DrawerContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+	DrawerContent: ({ children, overlay: _overlay, ...rest }: { children: ReactNode; overlay?: boolean }) => (
+		<div {...rest}>{children}</div>
+	),
 	DrawerTitle: ({ children }: { children: ReactNode }) => <h2 data-testid="drawer-title">{children}</h2>,
 }));
 vi.mock("boneyard-js/react", () => ({ Skeleton: ({ children }: { children: ReactNode }) => <div>{children}</div> }));
@@ -86,6 +88,33 @@ describe("ManagementBar empty plan", () => {
 
 		readyState.areStoresReady = false;
 		(holidaysState as { hasCalculated?: boolean }).hasCalculated = false;
+	});
+
+	it("says so out loud, so a finished-and-empty run is not a broken page", () => {
+		readyState.areStoresReady = true;
+		holidaysState.suggestion = null;
+		holidaysState.currentSelection = null;
+		holidaysState.alternatives = [];
+		(holidaysState as { isCalculating?: boolean }).isCalculating = false;
+		(holidaysState as { hasCalculated?: boolean }).hasCalculated = true;
+
+		const { container } = renderBar({ locale: "es", messages: esMessages });
+
+		expect(container.querySelector('[role="status"]')?.textContent).toBe(esMessages.a11y.noPlan);
+
+		readyState.areStoresReady = false;
+		(holidaysState as { hasCalculated?: boolean }).hasCalculated = false;
+	});
+
+	it("stays quiet while there is still a plan on the page", () => {
+		readyState.areStoresReady = true;
+		(holidaysState as { hasCalculated?: boolean }).hasCalculated = false;
+
+		const { container } = renderBar({ locale: "es", messages: esMessages });
+
+		expect(container.querySelector('[role="status"]')?.textContent).toBe("");
+
+		readyState.areStoresReady = false;
 	});
 
 	it("keeps the panel on a cold load, before any calculation has ever completed", () => {
@@ -182,5 +211,14 @@ describe("ManagementBar drawer extent", () => {
 			globalThis.dispatchEvent(new CustomEvent(TUTORIAL_EVENT.COLLAPSE_DRAWER));
 		});
 		expect(getByTestId("drawer").getAttribute("data-active-snap")).toBe(String(DRAWER_SNAP.COLLAPSED));
+	});
+});
+
+describe("ManagementBar drawer role", () => {
+	it("is a region, not a dialog: it is always open, cannot be dismissed and has no close button", () => {
+		const { container } = renderBar({ locale: "es", messages: esMessages });
+
+		expect(container.querySelector('[role="region"]')).not.toBeNull();
+		expect(container.querySelector('[role="dialog"]')).toBeNull();
 	});
 });

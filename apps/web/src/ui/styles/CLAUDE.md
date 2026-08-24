@@ -53,6 +53,15 @@ One consequence worth knowing: `!important` inverts layer precedence, so the red
 `animations/index.css`, an early layer, outranks important declarations from later layers and from
 unlayered rules. That is why it can flatten animations globally from where it sits.
 
+**It flattens CSS animation, and only CSS animation, which made it the most convincing kind of wrong.**
+`motion/react` drives transform, opacity and filter through the Web Animations API and direct inline style
+writes; a `transition-duration: 0.01ms !important` rule reaches neither. Sixty-two files in `apps/web` import
+`motion/react`, so with reduce-motion set at OS level the page still sprang, slid and blurred while this
+block sat there looking like coverage. Twelve review passes walked past it for that reason. The motion half
+is handled by `<MotionConfig reducedMotion="user">` in
+[`../modules/core/animate/providers/LazyMotionProvider.tsx`](../modules/core/animate/providers/LazyMotionProvider.tsx);
+this block still owns everything CSS animates, and the two are not substitutes.
+
 ## Design tokens
 
 All tokens live in `global/index.css`, in three tiers:

@@ -2,13 +2,14 @@
 
 import { useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
+import { type DayOutcome, DayRefusal } from "@application/stores/types";
 import { planningWindowMonths } from "@domain/calendar/window";
 import { useCalculationsWorker } from "@ui/hooks/useCalculationsWorker";
 import { useStoresReady } from "@ui/hooks/useStoresReady";
 import { TUTORIAL_ANCHOR } from "@ui/modules/tutorial/anchors";
 import { cn } from "@ui/utils/cn";
 import { Skeleton } from "boneyard-js/react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { Calendar, CalendarSelectionMode, type DayStates } from "./calendar/Calendar";
@@ -18,6 +19,7 @@ import { isAlternative, isManuallySelected, isSuggestion } from "./utils/modifie
 
 export const CalendarList = () => {
 	const locale = useLocale();
+	const tA11y = useTranslations("a11y");
 	const { areStoresReady } = useStoresReady();
 
 	const { carryOverMonths, year, allowPastDays, country, region, ptoDays, strategy } = useFiltersStore(
@@ -37,6 +39,7 @@ export const CalendarList = () => {
 		suggestion,
 		currentSelection,
 		isCalculating,
+		hasCalculated,
 		manuallySelectedDays,
 		removedSuggestedDays,
 		fetchHolidays,
@@ -52,6 +55,7 @@ export const CalendarList = () => {
 			suggestion: state.suggestion,
 			currentSelection: state.currentSelection,
 			isCalculating: state.isCalculating,
+			hasCalculated: state.hasCalculated,
 			manuallySelectedDays: state.manuallySelectedDays,
 			removedSuggestedDays: state.removedSuggestedDays,
 			fetchHolidays: state.fetchHolidays,
@@ -77,10 +81,18 @@ export const CalendarList = () => {
 	);
 
 	const toggleDay = useCallback(
-		(date: Date) => toggleDaySelection({ date, totalPtoDays: ptoDays, locale, allowPastDays }),
-		[toggleDaySelection, ptoDays, locale, allowPastDays],
+		(date: Date): DayOutcome =>
+			isCalculating
+				? { applied: false, reason: DayRefusal.PLAN_IN_FLIGHT }
+				: toggleDaySelection({ date, totalPtoDays: ptoDays, locale, allowPastDays }),
+		[isCalculating, toggleDaySelection, ptoDays, locale, allowPastDays],
 	);
 	const handleDayToggle = usePlannerDayClick(toggleDay);
+
+	const planStatus = useMemo(() => {
+		if (isCalculating) return tA11y("calculating");
+		return hasCalculated ? tA11y("planUpdated") : "";
+	}, [isCalculating, hasCalculated, tA11y]);
 
 	useEffect(() => {
 		pruneDaysOutsideWindow({ year, carryOverMonths });
@@ -125,8 +137,12 @@ export const CalendarList = () => {
 					isCalculating && "pointer-events-none",
 				)}
 				id="calendar"
+				aria-busy={isCalculating}
 				data-tutorial={TUTORIAL_ANCHOR.CALENDAR_LIST}
 			>
+				<span role="status" className="sr-only">
+					{planStatus}
+				</span>
 				{months.map((month) => (
 					<Calendar
 						key={month.toISOString()}

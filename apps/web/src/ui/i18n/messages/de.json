@@ -1,10 +1,14 @@
 {
 	"a11y": {
 		"closeDialog": "Schließen",
+		"closeToast": "Benachrichtigung schließen",
 		"toggleSidebar": "Seitenleiste ein- oder ausblenden",
 		"sidebarLandmark": "Planer-Einstellungen",
 		"radialNavigation": "Funktionsnavigation",
 		"selectLanguage": "Sprache auswählen, aktuell: {current}",
+		"calculating": "Dein Plan wird berechnet",
+		"planUpdated": "Plan aktualisiert",
+		"noPlan": "Noch kein Plan vorhanden. Prüfe deine Urlaubstage, dein Land und das Jahr.",
 		"skipToMainContent": "Zum Hauptinhalt springen"
 	},
 	"metadata": {
@@ -655,6 +659,7 @@
 		"enterAmount": "Betrag eingeben",
 		"basePriceNote": "Grundpreis in {currency}. Der Endbetrag wird zum aktuellen Wechselkurs in deine lokale Währung umgerechnet.",
 		"havePromoCode": "Hast du einen Promo-Code?",
+		"promoCode": "Promo-Code",
 		"promoCodePlaceholder": "Wäre es doch so einfach",
 		"continueToPayment": "Weiter zur Zahlung",
 		"processing": "Wird verarbeitet..."
