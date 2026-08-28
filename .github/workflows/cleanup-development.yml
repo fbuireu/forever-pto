@@ -15,6 +15,7 @@ jobs:
   cleanup-web:
     name: Delete the web preview Worker
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     concurrency:
       group: CI-${{ github.ref }}
       cancel-in-progress: false
@@ -47,6 +48,7 @@ jobs:
   cleanup-docs:
     name: Delete the docs preview Worker
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     concurrency:
       group: docs-${{ github.ref }}
       cancel-in-progress: false

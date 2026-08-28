@@ -35,6 +35,7 @@ jobs:
   build:
     name: Build & test
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -68,6 +69,7 @@ jobs:
     if: github.event_name == 'pull_request'
     needs: [build]
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment: docs-development
     permissions:
       contents: read
@@ -121,6 +123,7 @@ jobs:
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     needs: [build]
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment:
       name: docs-production
       url: https://docs.forever-pto.com
@@ -148,6 +151,7 @@ jobs:
     if: github.event_name == 'push'
     needs: [deploy]
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: write
       issues: write

@@ -17,6 +17,7 @@ jobs:
   changes:
     name: Detect changed packages
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     outputs:
       web: ${{ steps.filter.outputs.web }}
       tail: ${{ steps.filter.outputs.tail }}
@@ -65,6 +66,7 @@ jobs:
   check:
     name: Check
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -104,6 +106,7 @@ jobs:
     needs: [deploy-production]
     if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -140,6 +143,7 @@ jobs:
   release-web:
     name: Semantic Release (web)
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     needs: [changes, check, deploy-production]
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.web == 'true' }}
     permissions:
@@ -183,6 +187,7 @@ jobs:
   docs-refresh:
     name: Rebuild the docs site on the new app version
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: [release-web]
     if: ${{ needs.release-web.outputs.released == 'true' }}
     permissions:
@@ -197,6 +202,7 @@ jobs:
   deploy-tail:
     name: Deploy the tail Worker
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     needs: [changes, check]
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.tail == 'true' }}
     environment: web-production
@@ -244,6 +250,7 @@ jobs:
     needs: [changes]
     if: ${{ github.event_name == 'pull_request' && needs.changes.outputs.cross_package == 'true' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       pull-requests: write
     env:
@@ -298,6 +305,7 @@ jobs:
     name: Post preview URL
     needs: [deploy-development]
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       pull-requests: write
     env:
@@ -331,6 +339,7 @@ jobs:
     name: E2E tests
     needs: [deploy-development]
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     environment: web-development
     steps:
       - name: Checkout
