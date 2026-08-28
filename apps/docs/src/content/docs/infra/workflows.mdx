@@ -49,7 +49,7 @@ A `workflow_call` workflow shared by both deploy entry points. Inputs: `environm
 
 On `pull_request: closed`, two jobs: `cleanup-web` deletes `pr-<n>-forever-pto-development` and `cleanup-docs` deletes `pr-<n>-forever-pto-docs-development`, both through `nick-fields/retry` wrapping `pnpm exec wrangler delete --force`. That is the one place the retry wrapper is still right: the call is idempotent, its argument is a name the workflow composes rather than a flag, and it already treats *does not exist* as success. Shared dev R2/KV/Turso state is intentionally left alone.
 
-It declares `group: CI-${{ github.ref }}` with `cancel-in-progress: false`, which is what stops it deleting a Worker the E2E job is still driving; see [environments](/infra/environments/).
+Each job declares its **own** group, with `cancel-in-progress: false`, naming the workflow that deployed the Worker it deletes: `CI-${{ github.ref }}` for `cleanup-web`, `docs-${{ github.ref }}` for `cleanup-docs`. That is what stops a delete landing on a Worker a job is still driving. One workflow-level group used to cover both, which queued `cleanup-docs` behind `ci.yml` while its Worker belongs to `docs.yml`; see [environments](/infra/environments/).
 
 ## `docs.yml`: Docs
 

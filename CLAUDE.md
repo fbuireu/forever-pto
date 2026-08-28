@@ -281,23 +281,29 @@ moved the app and left the tail Worker posting into a dead endpoint, silently. B
 same two GitHub variables. The details, and the response check that stops the failure being silent, are in
 [`apps/web/CLAUDE.md`](./apps/web/CLAUDE.md).
 
-**`cleanup-development.yml` shares `ci.yml`'s concurrency group, which is what stops it deleting a Worker
+**`cleanup-development.yml` queues each of its jobs behind the workflow that deployed the Worker that job deletes, which is what stops it deleting a Worker
 that is still under test.** It fires on `pull_request: closed`, and closing a pull request does not cancel
 the run already going: `e2e` needs `deploy-development` and drives the per-PR Worker over the network, so
 the delete raced it and turned every remaining spec into a "There is nothing here yet" placeholder: one run
 on #343 reported 47 failures with nothing wrong in the code. Renovate is how it happens, because it
 auto-merges on the required checks and `e2e` is not one of them.
 
-The fix is a queue, not a wait loop: the cleanup declares `group: CI-${{ github.ref }}` with
+The fix is a queue, not a wait loop: `cleanup-web` declares `group: CI-${{ github.ref }}` with
 `cancel-in-progress: false`. `ci.yml`'s group is `${{ github.workflow }}-${{ github.ref }}`, and a
 `pull_request` event carries the same `refs/pull/<number>/merge` whichever activity type fired it, so the two
-strings match and GitHub holds the cleanup pending until the CI run completes. A pending run occupies no
+strings match and GitHub holds the job pending until the CI run completes. A pending run occupies no
 runner, so this costs nothing. **The coupling is by workflow *name***: renaming `ci.yml`'s `name: CI`
 silently unqueues the cleanup and the race comes back, which is why `tests/docs-consistency.test.ts`
-substitutes `ci.yml`'s own `name:` into its group expression and compares the result with the literal the
-cleanup hardcodes. A concurrency group is per run, so the whole workflow
-queues and `cleanup-docs` rides along; that is harmless, and it needs no wait of its own since the docs smoke
-tests run against the build artifact before the preview Worker exists.
+substitutes each deploying workflow's own `name:` into its group expression and compares the result with the
+literal the matching cleanup job hardcodes.
+
+**The group is per job, and it used to be per workflow, which queued `cleanup-docs` behind the wrong thing.**
+A workflow-level `concurrency` covers every job in the run, so one group meant both deletes waited on `CI`.
+But the Worker `cleanup-docs` deletes is deployed by the `preview` job in `docs.yml`, whose group is
+`docs-${{ github.ref }}`, and nothing in `ci.yml` touches it: the docs preview could be deleted while its own
+workflow was still using it, and `ci.yml` finishing was not evidence that it had stopped. `cleanup-web` keeps
+`CI-…` and `cleanup-docs` takes `docs-…`, each on its own job. This is also why the paragraph above no longer
+says `cleanup-docs` rides along harmlessly: it did not, it rode along behind an unrelated run.
 
 **`docs-refresh` exists because the release commit carries `[skip ci]`.** The docs site renders the app
 version from `apps/web/package.json`; without a dispatch after a web release, the published site keeps

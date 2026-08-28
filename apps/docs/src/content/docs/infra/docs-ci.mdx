@@ -51,7 +51,7 @@ What the docs preview does *not* need is what separates it from the app's: no bi
 
 `cleanup-development.yml` deletes the Worker when the pull request closes, in a `cleanup-docs` job beside the app's. A per-PR Worker that nothing tears down accumulates forever.
 
-The app's job in that workflow has to queue behind the CI run, because app E2E drives the per-PR Worker over the network and deleting it mid-run turns every remaining spec into a placeholder. The docs job rides along on the same workflow-level concurrency group and needs no wait of its own: the docs Playwright suite runs against the build artifact in the `build` job, before the preview Worker exists at all.
+The app's job in that workflow has to queue behind the CI run, because app E2E drives the per-PR Worker over the network and deleting it mid-run turns every remaining spec into a placeholder. The two jobs carry a concurrency group each: `cleanup-web` on `CI-…`, `cleanup-docs` on `docs-…`, the group of the workflow that deployed the Worker each one deletes. They shared one workflow-level group until 2026-08-28, and it was `ci.yml`'s, so `cleanup-docs` waited on a run that has nothing to do with its Worker while the `preview` job that does own it could still be mid-deploy. The docs Playwright suite genuinely needs no wait, since it runs against the build artifact in the `build` job before the preview Worker exists at all; the deploy it must not race is the preview deploy itself.
 
 ## Production deploy
 

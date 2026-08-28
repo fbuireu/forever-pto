@@ -247,6 +247,24 @@ interface YamlBlockParams {
 	key: string;
 }
 
+// `yamlBlock` finds the *first* line whose trim equals the key, which is the workflow-level block when there
+// is one. Once a key is declared per job there is more than one, and reading the first would compare one job
+// against every claim. This narrows to a job's own body first: from `  <job>:` to the next line at that same
+// indent.
+interface JobBodyParams {
+	workflow: string;
+	job: string;
+}
+
+const jobBody = ({ workflow, job }: JobBodyParams) => {
+	const lines = workflow.split(/\r?\n/);
+	const start = lines.findIndex((line) => line === `  ${job}:`);
+	if (start < 0) return "";
+	const end = lines.slice(start + 1).findIndex((line) => /^ {2}[\w-]+:/.test(line));
+
+	return lines.slice(start + 1, end < 0 ? lines.length : start + 1 + end).join("\n");
+};
+
 const yamlBlock = ({ workflow, key }: YamlBlockParams) => {
 	const lines = workflow.split(/\r?\n/);
 	const start = lines.findIndex((line) => line.trim() === `${key}:`);
@@ -1530,19 +1548,27 @@ describe("the guides describe the project as it is configured", () => {
 		expect(wrapped).toEqual([]);
 	});
 
-	it("queues the development cleanup behind the CI run whose preview Worker it deletes", () => {
-		const ci = read(`${WORKFLOW_DIR}/ci.yml`);
-		const ciConcurrency = yamlBlock({ workflow: ci, key: "concurrency" });
+	// The cleanup used to declare one workflow-level group, `ci.yml`'s, over both of its jobs. That queued
+	// `cleanup-docs` behind the wrong workflow: the Worker it deletes is deployed by the `preview` job in
+	// `docs.yml`, which has a group of its own, so the delete could land while that preview was still being
+	// used. Each job carries its own group now, and each is checked against the workflow that actually
+	// deploys the Worker that job deletes.
+	it.each([
+		["cleanup-web", "ci.yml"],
+		["cleanup-docs", "docs.yml"],
+	])("queues %s behind the run whose preview Worker it deletes", (job, file) => {
+		const deployer = read(`${WORKFLOW_DIR}/${file}`);
+		const deployerConcurrency = yamlBlock({ workflow: deployer, key: "concurrency" });
 		const cleanupConcurrency = yamlBlock({
-			workflow: read(`${WORKFLOW_DIR}/cleanup-development.yml`),
+			workflow: jobBody({ workflow: read(`${WORKFLOW_DIR}/cleanup-development.yml`), job }),
 			key: "concurrency",
 		});
-		const workflowName = /^name:[ \t]*(.+)$/m.exec(ci)?.[1]?.trim() ?? "";
+		const workflowName = /^name:[ \t]*(.+)$/m.exec(deployer)?.[1]?.trim() ?? "";
 
 		expect(workflowName).not.toBe("");
-		expect(ciConcurrency.group).toBeDefined();
+		expect(deployerConcurrency.group).toBeDefined();
 		expect(cleanupConcurrency.group).toBe(
-			(ciConcurrency.group ?? "").replace(GITHUB_WORKFLOW_EXPRESSION, workflowName),
+			(deployerConcurrency.group ?? "").replace(GITHUB_WORKFLOW_EXPRESSION, workflowName),
 		);
 		expect(cleanupConcurrency["cancel-in-progress"]).toBe("false");
 	});

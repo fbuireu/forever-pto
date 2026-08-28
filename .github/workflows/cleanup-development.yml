@@ -7,17 +7,17 @@ on:
 permissions:
   contents: read
 
-# Queues behind ci.yml, whose `e2e` job drives this same preview Worker. The
-# group is its `${{ github.workflow }}-${{ github.ref }}`; renaming that workflow
-# silently stops the wait. Full reasoning in the repo guide.
-concurrency:
-  group: CI-${{ github.ref }}
-  cancel-in-progress: false
-
+# Each job queues behind the workflow that deploys the Worker it deletes: ci.yml
+# for the web preview, docs.yml for the docs preview. Each group is that
+# workflow's `${{ github.workflow }}-${{ github.ref }}` with the name substituted
+# in, so renaming either silently stops its wait. Full reasoning in the repo guide.
 jobs:
   cleanup-web:
     name: Delete the web preview Worker
     runs-on: ubuntu-latest
+    concurrency:
+      group: CI-${{ github.ref }}
+      cancel-in-progress: false
     environment: web-development
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -47,6 +47,9 @@ jobs:
   cleanup-docs:
     name: Delete the docs preview Worker
     runs-on: ubuntu-latest
+    concurrency:
+      group: docs-${{ github.ref }}
+      cancel-in-progress: false
     environment: docs-development
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
