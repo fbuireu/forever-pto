@@ -144,7 +144,7 @@ jobs:
     name: Semantic Release (web)
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: [changes, check, deploy-production]
+    needs: [changes, check, deploy-production, smoke]
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.web == 'true' }}
     permissions:
       contents: write

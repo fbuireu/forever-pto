@@ -255,20 +255,22 @@ and naming an environment would hand it ones it has no use for.
 **The step calls `pnpm exec playwright test`, not `pnpm run test:e2e -- <flags>`, and the difference is not
 style.** Playwright's parser treats `--` as end-of-options and turns everything after it into positional file
 filters, so `pnpm run test:e2e -- --grep "@smoke"` runs the *whole* suite with the grep silently discarded;
-verified by listing. The two scripts in [`apps/web/package.json`](./apps/web/package.json) written that way,
-`test:e2e:ui` and `test:e2e:changed`, have the same defect and are not fixed here.
+verified by listing. The two scripts in [`apps/web/package.json`](./apps/web/package.json) that used to be
+written that way, `test:e2e:ui` and `test:e2e:changed`, are not: both invoke `playwright test` with their flag
+directly. This paragraph said they still had the defect long after they stopped.
 
-**Nothing carries the `@smoke` tag yet, which is why the step passes `--pass-with-no-tests`.** The grep
-matches an empty set today and Playwright exits 1 on an empty set, so without the flag the job would go red
-on every push to `main`. Tag the handful of specs that are worth running against the live site (the 404
-route above all, since `/_not-found` is the only page rendered per request and the only one that shows
-Error 1101) and take the flag out in the same commit; while it is there, a typo in the grep is green.
+**Five specs carry `@smoke` and the step passes no `--pass-with-no-tests`, which is the point.** Playwright
+exits 1 on an empty set, so the flag would make a typo in the grep green; without it, a grep that stops
+matching fails the job, which is the only thing that keeps the set honest. The tagged cases are the 404
+route (`/_not-found` is the only page rendered per request, so it is the one that shows Cloudflare Error
+1101), `robots.txt`, the sitemap twice, and `/api/health`. This paragraph used to say nothing carried the
+tag and the flag was there for that reason; both halves outlived the commit that tagged them.
 
-**`smoke` does not block `release-web`, and does not wait on the four-environments secret work either.** It
-needs no Cloudflare credentials, so it is unaffected by the outstanding item above, unlike making
-`E2E tests` required. Leaving the release ungated is deliberate for as long as the grep matches nothing: a
-job that cannot fail is not a gate, and one wired as a gate before it has tests would be a gate on nothing.
-Move `smoke` into `release-web`'s `needs` once the tags exist and the flag is gone.
+**`smoke` gates `release-web`, now that it has tests to gate with.** The rule this repository already runs on
+is that a tag means the version is live: `release-web` needs `deploy-production`, and it needs `smoke` as
+well, so a tag means the version is live *and answering*. It was left ungated while the grep matched nothing,
+because a job that cannot fail is not a gate; that condition no longer holds. `smoke` needs no Cloudflare
+credentials, so unlike making `E2E tests` required it does not wait on the four-environments secret work.
 
 **`cross-package-notice` is advisory, not a gate.** A pull request touching both packages lands in both
 changelogs, because attribution is by path and `main` takes squash merges. Sometimes that is what you

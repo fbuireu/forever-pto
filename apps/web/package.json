@@ -44,7 +44,7 @@
 		"test:ut:changed": "pnpm test:ut --bail 1",
 		"test:e2e": "playwright test",
 		"test:e2e:ui": "playwright test --ui",
-		"test:e2e:changed": "playwright test --only-changed"
+		"test:e2e:changed": "playwright test --only-changed --pass-with-no-tests"
 	},
 	"dependencies": {
 		"@base-ui/react": "1.7.0",
