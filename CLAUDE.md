@@ -529,5 +529,15 @@ relative-link rule could not catch because they were prose rather than links.
   ordinary expression; the module becomes a Server Component. Typecheck, Biome and the whole unit suite
   stay green, because none of them models the RSC boundary. Six planner files sat like that for several
   commits. `tests/docs-consistency.test.ts` parses for it now, in both shapes.
+- **Two `overrides` in `pnpm-workspace.yaml` exist because of the Next pin, and both come off with it.**
+  `next@16.2.12` depends on exactly `postcss@8.4.31` and `sharp@0.34.5`, and both carry high-severity
+  advisories that `main` does not see because it carries Next 16.3.1, which vendors fixed ones. So Dependency
+  Review fails on this branch for a consequence of
+  [ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) rather than for anything in the diff,
+  and it stays failing for as long as that pin holds. The overrides lift both to versions the rest of the tree
+  already resolved (`postcss@8.5.25`, which Tailwind's plugin was on; `sharp@0.35.3`, which `apps/docs`
+  declares outright), so each collapses to one version instead of two. Delete them when Next moves, and check
+  the advisory list rather than assuming: the sharp one was invisible until the postcss one was fixed, because
+  the check reports what it finds and stops.
 - **Never run `lint-staged` by hand.** It stashes the whole tree; interrupting it can revert the working
   copy. Let the hook run it.
