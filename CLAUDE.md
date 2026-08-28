@@ -166,8 +166,9 @@ bare imports resolve from the package the *importing file* sits in. A `--filter 
 would leave `apps/web/node_modules` absent and the docs build would fail on a dependency it never declared.
 
 **Jobs are scoped with step-level `working-directory`, never a job-level default.** A job default does not
-reach a `uses:` step, and `nick-fields/retry` exposes no cwd input, so every command it wraps starts with an
-explicit `cd "$GITHUB_WORKSPACE/apps/web"`. Some steps cannot be scoped at all because they resolve from
+reach a `uses:` step, and `nick-fields/retry` exposes no cwd input, so the two preview deletes in
+`cleanup-development.yml`, the last commands still wrapped in it, each start with an explicit
+`cd "$GITHUB_WORKSPACE/apps/<package>"`. Some steps cannot be scoped at all because they resolve from
 `GITHUB_WORKSPACE` (codecov's `files`, the artifact `path` inputs, `wrangler-action`'s `workingDirectory`),
 and those had their inputs repointed instead.
 
@@ -332,7 +333,7 @@ The app's bindings, environments and the `NEXT_PUBLIC_SITE_URL` resolution are i
 deploys `pr-<number>-forever-pto-development` from `_deploy-web.yml`, `apps/docs` deploys
 `pr-<number>-forever-pto-docs-development` from the `preview` job in `docs.yml`, and
 `cleanup-development.yml` carries a job for each. What differs is only what the docs site does *not* need:
-it has no bindings and no secrets, so its deploy has no `wrangler secret bulk` step and no `--var`
+it has no bindings and no secrets, so its deploy passes no `--secrets-file` and no `--var`
 override, and it ships the `docs-dist` artifact the `build` job already produced rather than building a
 second time.
 
@@ -435,8 +436,10 @@ in **each** of `wrangler.toml`'s three environments, that each named environment
 *kind* the top level declares, that `[assets]` and `[placement]` are declared once and `[observability]`
 reads identically wherever it is restated, and that the payment rate limiter is identically bounded in all
 of them; that no
-deploy step and no build step in any workflow is wrapped in `nick-fields/retry`, counted rather
-than named one file at a time. Both censuses count the job rather than one spelling of it: a deploy also arrives as
+deploy step, no build step and no `wrangler secret` step in any workflow is wrapped in `nick-fields/retry`, counted rather
+than named one file at a time. The secret rule carries **no floor**, unlike the other two: both secret writes are folded into
+their deploy as `--secrets-file` now, so the corpus it reads is empty, and a floor of one would fail on exactly the state the
+repository is trying to hold. Both censuses count the job rather than one spelling of it: a deploy also arrives as
 `cloudflare/wrangler-action`'s `command: deploy` input and as a script name that resolves to one (`apps/docs`'s
 `deploy` is `astro build && wrangler deploy`), and a build as `pnpm exec astro build`, `npx next build`, or a
 `build` script reached through the short `-F` flag. The deploy census saw two of this repo's four against a floor of two, so half the corpus satisfied
@@ -459,15 +462,17 @@ Four traps that have each cost a rule its teeth, all found by breaking one:
 - **A regex anchored on `$` reads nothing in a working-tree file with CRLF.** The index is all LF
   (`.gitattributes` carries `* text=auto eol=lf` and no tracked blob is CRLF), but the *checkout* on Windows
   is not, and the suite reads the working tree. The first version of the workflow-script rule silently
-  checked zero lines of `_deploy-web.yml` for exactly this reason. Split on `/?
+  checked zero lines of `_deploy-web.yml` for exactly this reason. Split on `/
+?
 /`.
 - **Three backticks pair one at a time**, so a rule that scans a wiki page without stripping fenced blocks
   first is off by one after the page's first fence and reads the rest inverted.
 - **A compound noun does not pluralise on its last word.** `term + "s?"` reads `day offs` and cannot read
   `days off`. Pluralise every word of the compound, and let the gaps take any run of whitespace so a term
   broken across a wrapped line is still one term.
-- **A `run:` key does not see every command a workflow runs.** Every wrangler and OpenNext call here is
-  wrapped in `nick-fields/retry`, which takes its script on `command:`. A
+- **A `run:` key does not see every command a workflow runs.** `nick-fields/retry` takes its script on
+  `command:`, and it used to wrap every wrangler and OpenNext call here. Two preview deletes still use it, and
+  a rule that reads only `run:` would call the workflows clean while the wrapper it forbids sat one key over. A
 failure means the docs and the code disagree; fix whichever is wrong. It cannot check rationale (whether an
 explanation is honest), and that part is on you.
 

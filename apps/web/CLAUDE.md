@@ -391,9 +391,28 @@ retested, and reintroduce any multi-word form from a PR where the preview deploy
 **No `wrangler deploy` in this repo is wrapped in `nick-fields/retry`'s usual forgiveness for argument
 errors**: not the app's in `_deploy-web.yml`, and not the tail Worker's in `ci.yml`. A wrapper that retries
 every failure cannot tell a bad argument from a bad network, and this failure burned three identical attempts
-per run before reporting. The secret uploads and the preview delete keep their retry; all are idempotent and
-all fail for reasons that a second attempt can fix. `tests/docs-consistency.test.ts` counts the deploy steps
+per run before reporting. Only the preview delete keeps its retry; it is idempotent, it takes no argument
+built from an input, and it already treats *does not exist* as success.
+`tests/docs-consistency.test.ts` counts the deploy steps
 rather than naming one workflow, so a third deploy is covered the day it appears.
+
+**The secret writes had kept theirs, and now there are no secret writes.** `wrangler secret bulk` in
+`_deploy-web.yml` and `wrangler secret put` in `ci.yml`'s `deploy-tail` were each wrapped, and each began with
+a guard that fails on an empty value: a missing environment secret was therefore reported three attempts and
+thirty seconds late, by a wrapper that could not have fixed it on any of them. Both are folded into the deploy
+as `wrangler deploy --secrets-file`, which uploads them **with the version** rather than as a second one.
+
+That fold is worth more than the wrapper it removes. `wrangler secret bulk` creates a Worker version and a
+deployment of its own, so every deploy here produced two, and between them the freshly deployed code ran
+against the *previous* deploy's secret values. The order was forced rather than chosen: a secret write needs
+the Worker to already exist, so on a new per-PR Worker the reverse order fails with
+`script_not_found [code: 10007]`, which is why the secrets ran after the deploy in the first place.
+`--secrets-file` makes the question moot. It is additive exactly as `secret bulk` was: a key the file omits is
+not deleted. The file is written under `$RUNNER_TEMP`, never inside the workspace where an `upload-artifact`
+step could sweep it up, at mode `600`, and removed by an `if: always()` step. The Node guard survives as the
+step that writes it, and now fails before anything is deployed instead of after.
+`tests/docs-consistency.test.ts` carries a rule for `wrangler secret` with **no floor**, deliberately: a floor
+of one would fail the day the last such step went away, which is the state this repository is now in.
 
 **The same now goes for the build, which was the rule's largest exception and was never on its list.**
 `_deploy-web.yml`'s `Build` step wrapped `pnpm run cf:build` in `nick-fields/retry` with `max_attempts: 3`

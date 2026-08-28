@@ -28,15 +28,16 @@ Runs on pushes to `main` and PRs targeting `main`. `cancel-in-progress` is condi
 - **deploy-production → release-web → docs-refresh** and **deploy-production → smoke** on `main`, or **deploy-development → comment / e2e** on a PR. `deploy-tail` and `cross-package-notice` hang off `changes` on their own conditions.
 - **smoke**: the only job that requests `https://forever-pto.com` itself. `e2e` runs against a per-PR preview and only on `pull_request`, so before this job a push to `main` deployed production and cut a tag without a single request to the live site. It runs Playwright with `--grep "@smoke"`, no Cloudflare Access headers (production is public) and no `environment:` of its own. Nothing carries the tag yet, so the step also passes `--pass-with-no-tests`; tagging the specs and removing that flag is the follow-up, and until then `smoke` is not in `release-web`'s `needs`.
 
-`Check` is what the ruleset gates PRs on, and it gates *deploying* too: `deploy-production` `needs: [changes, check]` and `release-web` `needs` the deploy, so a tag means the version is live. `Check` runs unconditionally, because the contract suite reads `CONTEXT.md`, `adr/` and every guide, so a markdown-only change must not slip past it; only the deploy and release jobs consult `changes`. Package scoping uses step-level `working-directory`, because a job-level default would not reach a `uses:` step, which is why every `nick-fields/retry` command begins with an explicit `cd`.
+`Check` is what the ruleset gates PRs on, and it gates *deploying* too: `deploy-production` `needs: [changes, check]` and `release-web` `needs` the deploy, so a tag means the version is live. `Check` runs unconditionally, because the contract suite reads `CONTEXT.md`, `adr/` and every guide, so a markdown-only change must not slip past it; only the deploy and release jobs consult `changes`. Package scoping uses step-level `working-directory`, because a job-level default would not reach a `uses:` step, which is why the two `nick-fields/retry` commands left in the tree, both in `cleanup-development.yml`, begin with an explicit `cd`.
 
 ## `_deploy-web.yml`: Deploy web (reusable)
 
 A `workflow_call` workflow shared by both deploy entry points. Inputs: `environment` (GitHub environment name), `wrangler_env` (`--env` for wrangler), optional `url` (shown on the PR/deployments UI) and optional `worker_name` (the per-PR override). Steps:
 
 1. Install deps, then build with `pnpm run cf:build` (OpenNext). The build step receives the `NEXT_PUBLIC_*` GitHub environment *variables*. These are baked into the client bundle at build time. It is a plain `run:` step: a build fails deterministically, so wrapping it in `nick-fields/retry` only burned three identical attempts before reporting the same type error.
-2. `pnpm exec wrangler deploy --env <wrangler_env>`, adding `--name <worker_name>` when set; the name override is what creates a fresh per-PR Worker.
-3. Push the five runtime secrets with `wrangler secret bulk` (targeting `--name` for previews, `--env` otherwise). A small Node guard fails the job if any secret is missing rather than deploying a half-configured Worker. See [secrets](/infra/secrets/).
+2. A Node guard fails the job if any of the five runtime secrets is missing, rather than deploying a half-configured Worker, and writes them as JSON to a file under `$RUNNER_TEMP`. See [secrets](/infra/secrets/).
+3. `pnpm exec wrangler deploy --env <wrangler_env> --secrets-file <file>`, adding `--name <worker_name>` when set; the name override is what creates a fresh per-PR Worker. The secrets ride the deploy, so they land on the same Worker version as the code that reads them, where a separate `wrangler secret bulk` call made a second version and left a window in which the new code ran against the old values.
+4. An `if: always()` step removes the file.
 
 ### The deploy jobs
 
@@ -46,7 +47,7 @@ A `workflow_call` workflow shared by both deploy entry points. Inputs: `environm
 
 ## `cleanup-development.yml`: Cleanup - Development
 
-On `pull_request: closed`, two jobs: `cleanup-web` deletes `pr-<n>-forever-pto-development` and `cleanup-docs` deletes `pr-<n>-forever-pto-docs-development`, both through `nick-fields/retry` wrapping `pnpm exec wrangler delete --force`. Shared dev R2/KV/Turso state is intentionally left alone.
+On `pull_request: closed`, two jobs: `cleanup-web` deletes `pr-<n>-forever-pto-development` and `cleanup-docs` deletes `pr-<n>-forever-pto-docs-development`, both through `nick-fields/retry` wrapping `pnpm exec wrangler delete --force`. That is the one place the retry wrapper is still right: the call is idempotent, its argument is a name the workflow composes rather than a flag, and it already treats *does not exist* as success. Shared dev R2/KV/Turso state is intentionally left alone.
 
 It declares `group: CI-${{ github.ref }}` with `cancel-in-progress: false`, which is what stops it deleting a Worker the E2E job is still driving; see [environments](/infra/environments/).
 

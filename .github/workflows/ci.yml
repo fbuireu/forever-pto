@@ -209,32 +209,35 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/prepare-env
-      - name: Deploy to Cloudflare Workers
+      - name: Collect the ingest token
         env:
           BETTER_STACK_INGESTING_URL: ${{ vars.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL }}
+          BETTER_STACK_SOURCE_TOKEN: ${{ vars.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN }}
+          SECRETS_FILE: ${{ runner.temp }}/tail-secrets.json
         run: |
-          cd "$GITHUB_WORKSPACE/apps/web/workers/tail"
           if [ -z "$BETTER_STACK_INGESTING_URL" ]; then
             echo '::error::NEXT_PUBLIC_BETTER_STACK_INGESTING_URL is not set on web-production.'
             exit 1
           fi
-          pnpm exec wrangler deploy --var "BETTER_STACK_INGESTING_URL:$BETTER_STACK_INGESTING_URL"
-      - name: Set ingest token
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
+          if [ -z "$BETTER_STACK_SOURCE_TOKEN" ]; then
+            echo '::error::NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN is not set on web-production.'
+            exit 1
+          fi
+          node -e "
+          const body = JSON.stringify({ BETTER_STACK_SOURCE_TOKEN: process.env.BETTER_STACK_SOURCE_TOKEN });
+          require('node:fs').writeFileSync(process.env.SECRETS_FILE, body, { mode: 0o600 });
+          "
+      - name: Deploy to Cloudflare Workers
+        working-directory: apps/web/workers/tail
         env:
-          BETTER_STACK_SOURCE_TOKEN: ${{ vars.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN }}
-        with:
-          timeout_minutes: 2
-          max_attempts: 3
-          retry_wait_seconds: 15
-          shell: bash
-          command: |
-            cd "$GITHUB_WORKSPACE/apps/web/workers/tail"
-            if [ -z "$BETTER_STACK_SOURCE_TOKEN" ]; then
-              echo '::error::NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN is not set on web-production.'
-              exit 1
-            fi
-            printf '%s' "$BETTER_STACK_SOURCE_TOKEN" | pnpm exec wrangler secret put BETTER_STACK_SOURCE_TOKEN
+          BETTER_STACK_INGESTING_URL: ${{ vars.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL }}
+          SECRETS_FILE: ${{ runner.temp }}/tail-secrets.json
+        run: pnpm exec wrangler deploy --var "BETTER_STACK_INGESTING_URL:$BETTER_STACK_INGESTING_URL" --secrets-file "$SECRETS_FILE"
+      - name: Remove the secrets file
+        if: always()
+        env:
+          SECRETS_FILE: ${{ runner.temp }}/tail-secrets.json
+        run: rm -f "$SECRETS_FILE"
 
   cross-package-notice:
     name: Cross-package pull request

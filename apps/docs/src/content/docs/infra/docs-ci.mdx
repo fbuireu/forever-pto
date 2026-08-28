@@ -45,7 +45,7 @@ https://pr-<n>-forever-pto-docs-development.fbuireu.workers.dev
 
 The `development` environment carries no custom domain, so a preview cannot answer on docs.forever-pto.com however it is deployed. Every push to the PR redeploys the same name, so the link the job posts once stays valid for the PR's whole life.
 
-What the docs preview does *not* need is what separates it from the app's: no bindings, no `wrangler secret bulk` step, no `--var` override, and no second build; it ships the `docs-dist` artifact.
+What the docs preview does *not* need is what separates it from the app's: no bindings, no `--secrets-file` on the deploy, no `--var` override, and no second build; it ships the `docs-dist` artifact.
 
 ### Teardown
 

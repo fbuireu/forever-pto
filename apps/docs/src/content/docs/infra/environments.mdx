@@ -27,11 +27,10 @@ Every pull request gets its own throwaway Worker.
 
 ### Created
 
-The `deploy-development` job of `.github/workflows/ci.yml` fires on `pull_request` (`opened`, `reopened`, `synchronize`) and calls the reusable `.github/workflows/_deploy-web.yml` with `wrangler_env: development` plus a `worker_name` override of `pr-<n>-forever-pto-development`. The `--name` flag on `wrangler deploy` is what mints a brand-new Worker instead of updating the stable one. After deploying:
+The `deploy-development` job of `.github/workflows/ci.yml` fires on `pull_request` (`opened`, `reopened`, `synchronize`) and calls the reusable `.github/workflows/_deploy-web.yml` with `wrangler_env: development` plus a `worker_name` override of `pr-<n>-forever-pto-development`. The `--name` flag on `wrangler deploy` is what mints a brand-new Worker instead of updating the stable one, and `--secrets-file` on the same call is what gives it the five runtime secrets, which do not exist on a Worker until they are uploaded (see [secrets](/infra/secrets/)). After deploying:
 
-1. The five runtime secrets are re-pushed to the new Worker with `wrangler secret bulk --name pr-<n>-…` (Worker-attached secrets do not exist until pushed; see [secrets](/infra/secrets/)).
-2. A sticky PR comment (upserted via a hidden marker) posts the preview URL.
-3. A Playwright E2E job runs against the live preview, authenticating through Cloudflare Access with a service token (`CF_ACCESS_CLIENT_ID` / `CF_ACCESS_CLIENT_SECRET` injected as `CF-Access-Client-Id/Secret` headers by `playwright.config.ts`).
+1. A sticky PR comment (upserted via a hidden marker) posts the preview URL.
+2. A Playwright E2E job runs against the live preview, authenticating through Cloudflare Access with a service token (`CF_ACCESS_CLIENT_ID` / `CF_ACCESS_CLIENT_SECRET` injected as `CF-Access-Client-Id/Secret` headers by `playwright.config.ts`).
 
 ### Destroyed
 
@@ -54,7 +53,7 @@ Previews deploy with `--env development`, so they all **share** the development 
    ├─ cf:build (OpenNext)                     pr-<n>-forever-pto-development
    ├─ wrangler deploy --env development         --force
    │    --name pr-<n>-forever-pto-development         │
-   ├─ wrangler secret bulk --name pr-<n>-…            ▼
+   │    --secrets-file $RUNNER_TEMP/…                 ▼
    ├─ sticky PR comment (preview URL)         Worker + secrets gone.
    └─ Playwright E2E via Access token         Shared dev R2 / KV / Turso
                                               persist untouched.

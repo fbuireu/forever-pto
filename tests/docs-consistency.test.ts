@@ -65,6 +65,7 @@ const WORKFLOW_SHELL_STEP = /^(\s*)-?[ \t]*(?:run|command):[ \t]*(\|[-+]?)?[ \t]
 const BUILD_TOOL_COMMAND = /\b(?:astro|next|opennextjs-cloudflare|vite|tsc|turbo) build\b/;
 const BUILD_SCRIPT_NAME = /^(?:cf:)?build$/;
 const DEPLOY_TOOL_COMMAND = /\b(?:wrangler|opennextjs-cloudflare) deploy\b/;
+const SECRET_TOOL_COMMAND = /\bwrangler secret\b/;
 const WRANGLER_ACTION_DEPLOY = /\bcommand:[ \t]*deploy\b/;
 const ALIAS_WILDCARD_SUFFIX = /\/\*$/;
 const WORKSPACE_PACKAGE_GLOB = /^\s*-\s*['"]?([^'"\s#]+)['"]?\s*$/gm;
@@ -209,9 +210,9 @@ const resolveUiSpecifier = (specifier: string) => join(UI_ROOT, specifier.replac
 
 // A workflow is not markdown, so nothing above reaches it, and `.github/` sits under a dotfolder, which
 // `trackedFiles` drops wholesale. The commands are read out of it by hand: the value when it is inline, and
-// every line indented under it when it is a block scalar. `command:` counts as well as `run:`; every
-// wrangler and OpenNext call in this repo is wrapped in `nick-fields/retry`, which takes its shell script on
-// that input, so a rule reading only `run:` sees none of them.
+// every line indented under it when it is a block scalar. `command:` counts as well as `run:`: no deploy,
+// build or secret write is wrapped in `nick-fields/retry` any more, but the two preview-Worker deletes still
+// are, and that action takes its shell script on `command:`, so a rule reading only `run:` would miss them.
 const WORKFLOW_DIR = ".github/workflows";
 const workflowFiles = readdirSync(join(ROOT, WORKFLOW_DIR))
 	.filter((file) => file.endsWith(".yml"))
@@ -1482,6 +1483,25 @@ describe("the guides describe the project as it is configured", () => {
 		}
 
 		expect(deploySteps).toBeGreaterThan(3);
+		expect(wrapped).toEqual([]);
+	});
+
+	// The deploy census cannot see a secret write, and a secret write is where the wrapper survived the last
+	// pass: `wrangler secret bulk` and `wrangler secret put` each ran inside one, retrying a missing value
+	// three times fifteen seconds apart before saying which variable was empty. Both are folded into the
+	// deploy through `--secrets-file` now, so on most days this rule finds nothing at all: it deliberately
+	// carries no floor, because a floor of one would fail the moment the last `wrangler secret` step went
+	// away, which is the state this repository is trying to be in.
+	it("runs any wrangler secret write without a retry wrapper, whether or not one still exists", () => {
+		const wrapped: string[] = [];
+
+		for (const file of workflowFiles) {
+			for (const step of read(file).split("- name:")) {
+				if (!SECRET_TOOL_COMMAND.test(step)) continue;
+				if (step.includes("nick-fields/retry")) wrapped.push(`${file} ->${step.split(/\r?\n/)[0] ?? ""}`);
+			}
+		}
+
 		expect(wrapped).toEqual([]);
 	});
 
