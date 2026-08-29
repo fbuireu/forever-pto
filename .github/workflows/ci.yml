@@ -140,6 +140,27 @@ jobs:
           path: apps/web/playwright-report/
           retention-days: 7
 
+  rollback:
+    name: Roll back production
+    needs: [deploy-production, smoke]
+    if: ${{ always() && needs.deploy-production.result == 'success' && needs.smoke.result == 'failure' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: web-production
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      ROLLBACK_MESSAGE: Smoke tests failed on ${{ github.sha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/prepare-env
+      - name: Roll back to the previous version
+        working-directory: apps/web
+        run: pnpm exec wrangler rollback --env production --yes --message "$ROLLBACK_MESSAGE"
+
   release-web:
     name: Semantic Release (web)
     runs-on: ubuntu-latest

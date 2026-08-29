@@ -272,6 +272,15 @@ well, so a tag means the version is live *and answering*. It was left ungated wh
 because a job that cannot fail is not a gate; that condition no longer holds. `smoke` needs no Cloudflare
 credentials, so unlike making `E2E tests` required it does not wait on the four-environments secret work.
 
+**A failed `smoke` run rolls production back.** Holding the tag leaves a version that does not answer serving
+traffic, so `rollback` runs `wrangler rollback --env production --yes` from `apps/web` when `deploy-production`
+succeeded and `smoke` failed, returning the Worker to the version that was live before the push. It is a separate
+job, with `environment: web-production`, because it needs the Cloudflare credentials that `smoke` deliberately does
+without, which also means it is the one part of this that waits on the four-environments secret work. The cost is
+worth stating: a smoke case that fails for a reason outside the Worker now reverts a good deploy, so a case whose
+result depends on the caller's address does not belong in this set. Both sibling repositories have lost one to
+exactly that.
+
 **`cross-package-notice` is advisory, not a gate.** A pull request touching both packages lands in both
 changelogs, because attribution is by path and `main` takes squash merges. Sometimes that is what you
 want, so the job posts a sticky comment saying what will happen and does not fail the run.
