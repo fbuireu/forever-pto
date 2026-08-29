@@ -246,8 +246,14 @@ and keep one shared pair, which is what the split exists to stop.
 `deploy-development`, which runs on `pull_request` only, so a push to `main` deployed production, cut a tag
 and made no request to `https://forever-pto.com` at all. The suite that catches Cloudflare Error 1101 ran
 against a preview Worker with different bindings and a different `NEXT_PUBLIC_SITE_URL`. `smoke` needs
-`deploy-production`, is gated on `github.event_name == 'push'`, and runs Playwright with
-`BASE_URL: https://forever-pto.com` and no Cloudflare Access headers, which
+`deploy-production`, is gated on `github.event_name == 'push'`, and runs Playwright with `BASE_URL` taken from the
+**`NEXT_PUBLIC_SITE_URL` repository variable**, the same name the app declares in `environment.d.ts` and the same
+value `_deploy-web.yml` hands the Worker as `--var NEXT_PUBLIC_SITE_URL`, so the address is written once. It has to
+be a **repository** variable rather than one on `web-production`: this job declares no `environment:` and a caller
+job cannot declare one either, so both would read an empty string. A first step fails the job when it is empty,
+because [`apps/web/playwright.config.ts`](./apps/web/playwright.config.ts) falls back to localhost when `BASE_URL`
+is unset, and a smoke run against nothing that reports green is worse than no smoke run at all. It sends no
+Cloudflare Access headers, which
 [`apps/web/playwright.config.ts`](./apps/web/playwright.config.ts) handles by sending none when neither
 variable is set. It declares no `environment:` on purpose: production is public, so the job needs no secret,
 and naming an environment would hand it ones it has no use for.
@@ -283,8 +289,8 @@ exactly that.
 
 **The docs site has the same pair, and it needed a Playwright config that can leave localhost.**
 `docs.yml`'s `smoke` job runs the one `@smoke` case in [`apps/docs/e2e/smoke.spec.ts`](./apps/docs/e2e/smoke.spec.ts)
-against `https://docs.forever-pto.com` after the deploy, `release-docs` needs it so a `docs-v*` tag means the site
-is answering, and `rollback` reverts the Worker when the deploy succeeded and that case failed. One case is enough
+against the **`DOCS_SITE_URL` repository variable**, guarded the same way, after the deploy; `release-docs` needs it
+so a `docs-v*` tag means the site is answering, and `rollback` reverts the Worker when the deploy succeeded and that case failed. One case is enough
 there and five would not be better: the site is static assets, so a homepage that returns 200 with a title and a
 `<main>` is the whole of what a deploy can get wrong. [`apps/docs/playwright.config.ts`](./apps/docs/playwright.config.ts)
 took `BASE_URL` for this: it hardcoded `http://localhost:4321`, always started a `webServer`, and threw at import
