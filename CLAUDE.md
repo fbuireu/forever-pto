@@ -236,7 +236,10 @@ Already true, and this list said otherwise:
 
 **`E2E tests` is not a required check, and that is the hole two separate incidents came through.** It is what
 catches the Cloudflare Error 1101 the Next pin exists to prevent, and Renovate auto-merged 16.3.1 straight
-past it; it is also why `cleanup-development.yml` had to join `ci.yml`'s concurrency group, because Renovate
+past it on 2026-08-22, into the deploy production is **still** running: the site answers Error 1101 to a
+browser, checked 2026-08-29. A version pin does not hold against a bot with automerge rights, which is what
+makes this check the missing half of [ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)
+rather than a nicety; it is also why `cleanup-development.yml` had to join `ci.yml`'s concurrency group, because Renovate
 merges on the required checks while `e2e` is still driving the preview Worker. Adding it is the right end
 state and **must come after the Cloudflare secrets**, not before: `e2e` needs a preview deploy, so making it
 required while `web-development` cannot authenticate blocks every merge.

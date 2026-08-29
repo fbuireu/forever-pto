@@ -127,9 +127,29 @@ on the candidate version, including `e2e/[locale]/not-found.spec.ts`. The previe
 until `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` reach the four `web-*`/`docs-*` environments, which
 is recorded in [`CLAUDE.md`](../CLAUDE.md) as the one outstanding settings item. Condition 1, the captured
 Worker stack trace, was not attempted either: the exception is still unknown, and if 16.3.3 with 1.20.3
-renders `/_not-found` correctly it will stay unknown. **So this bump is staged on evidence about the adapter,
-not on evidence about the fault**, and the first preview run on this branch is what settles it. If that run
+renders `/_not-found` correctly it will stay unknown. The fault itself is no longer in doubt, per the
+paragraph above; what is unverified is whether **this** pair clears it. **So this bump is staged on evidence
+about the adapter, not on evidence about the fix**, and the first preview run on this branch is what settles
+it. If that run
 shows Error 1101 again, revert to 16.2.12 with 1.20.2 and restore this pin rather than re-diagnosing.
+
+**The fault stopped being theoretical while this was being written, and `main` is where it is running.**
+Renovate auto-merged [#350](https://github.com/fbuireu/forever-pto/pull/350) on 2026-08-22, taking `next` to
+**16.3.1** against adapter **1.20.2**, the exact pair this ADR forbids. It merged because `E2E tests` is not
+a required check and 1.20.2's peer range admits 16.3, so nothing in the pull request objected. `main` has
+carried it since — `6614da61`, the 1.8.3 release commit — and it is the last deploy production has had.
+`https://forever-pto.com` answers **Cloudflare Error 1101** to a browser today, checked 2026-08-29 at 10:45
+UTC.
+
+That is worth stating precisely, because it cuts both ways. It **confirms** the fault: the pair fails in a
+real Worker, on a real zone, not only in a preview, and the ADR's central claim needs no further defence. It
+says **nothing** about 16.3.3 with 1.20.3, which is a different adapter built against a different Next; the
+unverified condition below is still unverified. And it exposes what the pin was actually worth: a version
+constraint in a manifest stops nobody when a bot with automerge rights can raise it, which is why making
+`E2E tests` required is not a nicety but the missing half of this decision.
+
+Nothing here rolls production back. That is `wrangler rollback --env production`, or this branch merging,
+and neither belongs in an ADR.
 
 **The production net that did not exist when this was written.** `ci.yml` now runs a smoke suite against
 `https://forever-pto.com` after every production deploy, and one of its `@smoke` cases is the 404 route,
