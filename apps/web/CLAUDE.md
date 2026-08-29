@@ -52,10 +52,8 @@ pnpm test:ut:coverage      # vitest run --coverage
 pnpm test:e2e           # playwright, against BASE_URL (see below)
 ```
 
-**`pnpm test:e2e` needs `BASE_URL`, and [`playwright.config.ts`](./playwright.config.ts) has no `webServer` to fall back on.** With the
-variable unset, `use.baseURL` becomes `http://localhost:3000` and the run silently tests whatever is
-answering on that port, or reports connection errors that read like application failures. Set it to a
-deployed preview, which is what CI does: `ci.yml` passes the same URL to the `e2e` job's `BASE_URL` as
+**`pnpm test:e2e` takes `BASE_URL` when it is set and starts `next dev` when it is not.** CI always sets it, to a
+deployed preview, which is the only place the Workers runtime is real: `ci.yml` passes the same URL to the `e2e` job's `BASE_URL` as
 [`_deploy-web.yml`](../../.github/workflows/_deploy-web.yml) passes to `--var NEXT_PUBLIC_SITE_URL`, so `e2e/sitemap.spec.ts` can assert that the
 sitemap names the host it is served from. A preview also needs `CF_ACCESS_CLIENT_ID` and
 `CF_ACCESS_CLIENT_SECRET`, which the config turns into request headers.
@@ -64,11 +62,16 @@ sitemap names the host it is served from. A preview also needs `CF_ACCESS_CLIENT
 BASE_URL=https://pr-123-forever-pto-development.fbuireu.workers.dev pnpm test:e2e
 ```
 
-A `webServer` was considered and rejected rather than forgotten. This suite exists to exercise the Workers
-runtime, so `next dev` is the wrong local target and `pnpm preview` is the right one; a `webServer` would
-only ever run when `BASE_URL` is unset, and `cf:build` fails on the maintainer's Windows machine
-([ADR 0009](../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) records the same limitation blocking a local reproduction), so on the one machine that would
-reach it, it would fail. Revisit the day `cf:build` runs there.
+The local target is `next dev`, deliberately, and not the faithful one. `pnpm preview` would exercise the
+Workers runtime, but it runs `cf:build` first, which fails on the maintainer's Windows machine
+([ADR 0009](../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) records the same limitation blocking a local reproduction), so on the one machine that
+would reach it, the fallback would not start at all. `next dev` is fast, runs everywhere, and is enough to
+write and debug a spec; what it cannot show is a Workers-only failure such as Cloudflare Error 1101, and
+that is what the preview run in CI is for. `reuseExistingServer` is on, so a dev server you already have
+answering on 3000 is used rather than a second one being started.
+
+This is the shape every sibling repository now uses: `BASE_URL` if set, a locally started server otherwise.
+Only the command differs, because the stacks do.
 
 **The `e2e/` suite has no case that renders an error boundary, and no longer pretends otherwise.**
 A spec of its own under `e2e/[locale]/` plus six copies of a `[data-testid="error-boundary"]`
