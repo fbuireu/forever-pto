@@ -14,12 +14,6 @@ const disallowedPaths = (body: string): string[] =>
 		.map((line) => line.slice(DISALLOW_PREFIX.length).trim());
 
 test.describe("robots.txt", () => {
-	test("returns 200 with correct content-type", { tag: "@smoke" }, async ({ request }) => {
-		const response = await request.get(ROBOTS_URL);
-		expect(response.status()).toBe(200);
-		expect(response.headers()["content-type"]).toContain("text/plain");
-	});
-
 	test("allows all crawlers at root", async ({ request }) => {
 		const body = await (await request.get(ROBOTS_URL)).text();
 		expect(body).toMatch(/^User-agent:\s*\*/im);

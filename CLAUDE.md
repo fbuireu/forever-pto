@@ -287,12 +287,23 @@ verified by listing. The two scripts in [`apps/web/package.json`](./apps/web/pac
 written that way, `test:e2e:ui` and `test:e2e:changed`, are not: both invoke `playwright test` with their flag
 directly. This paragraph said they still had the defect long after they stopped.
 
-**Five specs carry `@smoke` and the step passes no `--pass-with-no-tests`, which is the point.** Playwright
-exits 1 on an empty set, so the flag would make a typo in the grep green; without it, a grep that stops
-matching fails the job, which is the only thing that keeps the set honest. The tagged cases are the 404
-route (`/_not-found` is the only page rendered per request, so it is the one that shows Cloudflare Error
-1101), `robots.txt`, the sitemap twice, and `/api/health`. This paragraph used to say nothing carried the
-tag and the flag was there for that reason; both halves outlived the commit that tagged them.
+**Five cases carry `@smoke`, all of them in [`apps/web/e2e/smoke.spec.ts`](./apps/web/e2e/smoke.spec.ts), and
+the step passes no `--pass-with-no-tests`, which is the point.** Playwright exits 1 on an empty set, so the
+flag would make a typo in the grep green; without it, a grep that stops matching fails the job, which is the
+only thing that keeps the set honest. The cases are the 404 route (`/_not-found` is the only page rendered
+per request, so it is the one that shows Cloudflare Error 1101), `robots.txt`, the sitemap twice, and
+`/api/health`. This paragraph used to say nothing carried the tag and the flag was there for that reason;
+both halves outlived the commit that tagged them.
+
+**They live in one file because this set can revert a deploy.** A failing `@smoke` case does not merely
+withhold the tag, it runs `wrangler rollback`, so what carries the tag has to be readable at a glance rather
+than scattered through the suite. The five sat in four different specs, tagged with the `{ tag: "@smoke" }`
+option rather than in the title, which the `github` reporter does not print: in the preview run, where
+`test:e2e` executes the whole directory, a smoke case and a feature case were indistinguishable in the
+report. Both sibling repositories keep the same shape, and biancafiore has lost a case to a zone rule and
+contribKit another, which is the failure this arrangement is meant to make cheap to reason about. Nothing
+moved but the location: `test:e2e` still runs the directory, so the preview suite covers exactly what it
+covered before.
 
 **`smoke` gates `release-web`, now that it has tests to gate with.** The rule this repository already runs on
 is that a tag means the version is live: `release-web` needs `deploy-production`, and it needs `smoke` as

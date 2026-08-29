@@ -7,11 +7,6 @@ const MAIN = "main#main-content";
 const NOT_FOUND_NAMESPACE = "notFound.";
 
 test.describe("[locale] not-found", () => {
-	test("returns 404 for an unknown path", { tag: "@smoke" }, async ({ page }) => {
-		const response = await page.goto(NONEXISTENT);
-		expect(response?.status()).toBe(404);
-	});
-
 	test("renders the 404 heading", async ({ page }) => {
 		await page.goto(NONEXISTENT);
 		await expect(page.getByRole("heading", { level: 1 })).toContainText("vacation");
