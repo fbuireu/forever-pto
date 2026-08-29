@@ -287,11 +287,16 @@ verified by listing. The two scripts in [`apps/web/package.json`](./apps/web/pac
 written that way, `test:e2e:ui` and `test:e2e:changed`, are not: both invoke `playwright test` with their flag
 directly. This paragraph said they still had the defect long after they stopped.
 
-**Two cases carry `@smoke`, both in [`apps/web/e2e/smoke.spec.ts`](./apps/web/e2e/smoke.spec.ts), and the step
+**Three cases carry `@smoke`, all in [`apps/web/e2e/smoke.spec.ts`](./apps/web/e2e/smoke.spec.ts), and the step
 passes no `--pass-with-no-tests`, which is the point.** Playwright exits 1 on an empty set, so the flag would
 make a typo in the grep green; without it, a grep that stops matching fails the job, which is the only thing
-that keeps the set honest. They are the 404 route — `/_not-found` is the only page rendered per request, so
-it is the one that shows Cloudflare Error 1101 — and `robots.txt`.
+that keeps the set honest. They are the homepage with a non-empty title, the 404 route — `/_not-found` is the
+only page rendered per request, so it is the one that shows Cloudflare Error 1101 — and `robots.txt`.
+
+**That trio is the same in every repository that deploys**, in biancafiore, in contribKit and in the docs site
+below, so a set that differs between them is drift rather than a decision. contribKit carries a fourth that
+earns its place, `/user/<name>.svg`, because that route cannot be prerendered and is the only thing there that
+distinguishes a running Worker from a bucket of assets; here the 404 route already plays that part.
 
 **They live in one file because this set can revert a deploy**, and the first run proved why that matters.
 On 2026-08-29 the merge of the Next 16.3.3 upgrade deployed cleanly and the 404 case passed, confirming the
@@ -329,11 +334,9 @@ result depends on the caller's address does not belong in this set. Both sibling
 exactly that.
 
 **The docs site has the same pair, and it needed a Playwright config that can leave localhost.**
-`docs.yml`'s `smoke` job runs the one `@smoke` case in [`apps/docs/e2e/smoke.spec.ts`](./apps/docs/e2e/smoke.spec.ts)
+`docs.yml`'s `smoke` job runs the three `@smoke` cases in [`apps/docs/e2e/smoke.spec.ts`](./apps/docs/e2e/smoke.spec.ts)
 against the **`DOCS_SITE_URL` repository variable**, guarded the same way, after the deploy; `release-docs` needs it
-so a `docs-v*` tag means the site is answering, and `rollback` reverts the Worker when the deploy succeeded and that case failed. One case is enough
-there and five would not be better: the site is static assets, so a homepage that returns 200 with a title and a
-`<main>` is the whole of what a deploy can get wrong. [`apps/docs/playwright.config.ts`](./apps/docs/playwright.config.ts)
+so a `docs-v*` tag means the site is answering, and `rollback` reverts the Worker when the deploy succeeded and any of them failed. The site is static assets, so the trio is the whole of what a deploy can get wrong there. [`apps/docs/playwright.config.ts`](./apps/docs/playwright.config.ts)
 took `BASE_URL` for this: it hardcoded `http://localhost:4321`, always started a `webServer`, and threw at import
 time when `apps/docs/dist` was missing, which is right for the suite the `build` job runs against a local preview
 and impossible for one that talks to a deployed site. With `BASE_URL` set it skips the `dist` guard and the
