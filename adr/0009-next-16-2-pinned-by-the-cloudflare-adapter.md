@@ -4,7 +4,9 @@ Date: 2026-08-15
 
 ## Status
 
-Accepted.
+Accepted. **Amended 2026-08-29: the pin is lifted.** Next is 16.3.3, `@opennextjs/cloudflare` is 1.20.3,
+wrangler is 4.126.0 and TypeScript is 7.0.2 at the root and in `apps/web`. The amendment is the last section
+of this file, and it says plainly which of the two conditions below was met and which was not.
 
 ## Context
 
@@ -105,3 +107,47 @@ does not control the traffic to, in order to keep a toolchain version the app ga
   [`middleware.ts`](../apps/web/src/middleware.ts) redirects it away when `payment_intent` is absent. It was never confirmed broken or
   healthy under 16.3; whoever revisits this pin should check it with a real payment intent first.
 - Recorded in [`CLAUDE.md`](../apps/web/CLAUDE.md) under *Versions* and *Structure & aliases*.
+
+## Amendment, 2026-08-29: what moved and what is still unverified
+
+**The adapter changed its mind about 16.2, which is the evidence this ADR did not have.** The Decision above
+rejects "wait for an adapter release" on the grounds that 1.20.2's peer range already admitted every 16.3, so
+no future release could carry a signal. That reasoning held for a range that *admits*. It does not hold for
+one that *requires*: `@opennextjs/cloudflare` **1.20.3**, published 2026-08-26, moved its `next` peer to
+`>=15.5.24 <16 || >=16.3.3`, dropping 16.2 from the 16 line entirely, and 1.20.4 the next day kept it. An
+adapter that no longer supports the version this app was pinned to is a different fact from an adapter whose
+range happens to include the version it was never built against.
+
+**What was verified locally, on this branch:** `pnpm typecheck` clean across all three projects, the unit
+suite at 2063 tests and the contract suite at 129, and `pnpm build` producing a full Next 16.3.3 production
+build with `partialPrefetching` and `cacheComponents` both on.
+
+**What was not verified, and it is the bar this ADR set:** condition 2, a green `e2e` run against a preview
+on the candidate version, including `e2e/[locale]/not-found.spec.ts`. The preview deploy cannot authenticate
+until `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` reach the four `web-*`/`docs-*` environments, which
+is recorded in [`CLAUDE.md`](../CLAUDE.md) as the one outstanding settings item. Condition 1, the captured
+Worker stack trace, was not attempted either: the exception is still unknown, and if 16.3.3 with 1.20.3
+renders `/_not-found` correctly it will stay unknown. **So this bump is staged on evidence about the adapter,
+not on evidence about the fault**, and the first preview run on this branch is what settles it. If that run
+shows Error 1101 again, revert to 16.2.12 with 1.20.2 and restore this pin rather than re-diagnosing.
+
+**The production net that did not exist when this was written.** `ci.yml` now runs a smoke suite against
+`https://forever-pto.com` after every production deploy, and one of its `@smoke` cases is the 404 route,
+which is the page this fault appears on. A failure there fails the run, withholds the `web-v*` tag and runs
+`wrangler rollback --env production`. That is a second line, not a replacement for the preview run: it
+catches the fault after users could have seen it, where `e2e` catches it before.
+
+**TypeScript moved with Next, but only two thirds of the way.** `astro check` refuses to run under
+TypeScript 7 and says so itself: the native compiler exposes no programmatic API for the Astro language
+server to load. So `apps/docs` stays on 6.0.3 while the root and `apps/web` take 7.0.2, and
+[`tests/docs-consistency.test.ts`](../tests/docs-consistency.test.ts) asserts exactly that shape. The
+compiler-API import in that suite is `@typescript/typescript6` now, as this ADR anticipated.
+
+**Two pnpm-workspace `overrides` came off with the pin.** `postcss` and `sharp` were lifted there only
+because `next@16.2.12` resolved versions carrying advisories; 16.3.3 vendors fixed ones, so the overrides are
+deleted and Dependency Review stops failing for a consequence of this ADR rather than for the diff.
+
+**The supply-chain policy dictated the adapter version, not preference.** `minimumReleaseAge` is 3 days and
+1.20.4 was published 2026-08-27, so it is not installable yet; 1.20.3 matured on 2026-08-29T11:07Z. The
+lockfile carries 1.20.3 for that reason alone, and Renovate, stricter at 4 days, will propose 1.20.4 when it
+is old enough.

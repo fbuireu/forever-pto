@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
-import ts from "typescript";
+import ts from "@typescript/typescript6";
 import { describe, expect, it } from "vitest";
 import webNextConfig from "../apps/web/next.config";
 
@@ -447,14 +447,17 @@ describe("the workspace is shaped the way the guides describe it", () => {
 		expect(existsSync(join(ROOT, WEB, "tsconfig.json"))).toBe(true);
 	});
 
-	it("pins the same typescript in every manifest that declares one", () => {
+	it("pins typescript exactly everywhere, moves the root with the app, and holds the docs on 6", () => {
 		const declared = ["package.json", ...WORKSPACE_PACKAGES.map((pkg) => `${pkg}/package.json`)]
 			.map((file) => [file, readJson(file).devDependencies?.typescript] as const)
 			.filter(([, version]) => Boolean(version));
 
 		expect(declared.length).toBe(3);
 		expect(declared.filter(([, version]) => !EXACT_VERSION.test(version))).toEqual([]);
-		expect(new Set(declared.map(([, version]) => version)).size).toBe(1);
+
+		const pinned = Object.fromEntries(declared);
+		expect(pinned["package.json"]).toBe(pinned[`${WEB}/package.json`]);
+		expect(pinned[`${DOCS}/package.json`].startsWith("6.")).toBe(true);
 	});
 });
 

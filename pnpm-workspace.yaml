@@ -9,8 +9,5 @@ allowBuilds:
   workerd: true
 minimumReleaseAge: 4320 # 3 days
 blockExoticSubdeps: true
-overrides:
-  postcss: '>=8.5.25'
-  sharp: '>=0.35.3'
 patchedDependencies:
   boneyard-js: patches/boneyard-js.patch

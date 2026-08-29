@@ -37,9 +37,12 @@ not before; see [ADR 0010](./adr/0010-apps-web-and-apps-docs-monorepo-layout.md)
 
 - Node **26.7.0** ([`.nvmrc`](./.nvmrc), mirrored in `engines.node`): `.nvmrc` is what every CI job installs
 - pnpm **11.22.0** (`packageManager`): always use pnpm, never npm/yarn
-- TypeScript **6** and Next **16.2**: pinned as a pair by the Cloudflare adapter. That constraint belongs
-  to the app; the reasoning is in [`./apps/web/CLAUDE.md`](./apps/web/CLAUDE.md) and
-  [ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)
+- TypeScript **7.0.2** at the root and in `apps/web`, **6.0.3** in `apps/docs`: `astro check` refuses to run
+  under 7, because the native compiler ships no programmatic API for it to load. The split is asserted rather
+  than assumed, and it closes the day Astro supports 7
+- Next **16.3.3** with `@opennextjs/cloudflare` **1.20.3**: they move as a pair, and the pair is what lifted
+  the pin [ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) recorded. The reasoning belongs
+  to the app: [`./apps/web/CLAUDE.md`](./apps/web/CLAUDE.md)
 
 ## Commands
 
@@ -123,10 +126,11 @@ loudly if no `web-v*` tag exists rather than letting it happen quietly.
 Annotate the next one too.
 
 **`web-v1.8.3`'s number matches what is live and its content does not, deliberately.** The 1.8.3 changelog
-entry lists one fix, the Renovate bump of Next to 16.3.1, and this branch rejects that bump because
-[ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) pins Next to 16.2.12. The tag exists so
-the next release continues from 1.8.3 rather than re-cutting it and writing a second 1.8.3 section into a
-changelog that already has one.
+entry lists one fix, the Renovate bump of Next to 16.3.1, which this branch reverted for the whole of
+[ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md). The branch carries 16.3.3 now, with the
+adapter that admits it, so the entry and the tree agree again on the major and minor and still not on the
+patch. The tag exists so the next release continues from 1.8.3 rather than re-cutting it and writing a second
+1.8.3 section into a changelog that already has one.
 
 **Both tags are on the remote**, verified with `git ls-remote --tags origin 'web-v*'` on 2026-08-24. They had
 to reach it before `release-web` first runs on `main`, and they have. This paragraph used to say they were
@@ -457,8 +461,11 @@ on and `allowJs` off), that it sits beside the [`next.config.ts`](./apps/web/nex
 `skipLibCheck` is on and that file is a `.d.ts`, so `pnpm typecheck` reads no name inside it; that every
 `'use client'`, `'use server'` and `'use cache'` under either package's `src/` is a bare string literal in
 first position;
-that the same **exact** `typescript` version is pinned in all three manifests: three dotted numbers, so a
-`rangeStrategy` flip to `^6.0.3` in every manifest at once fails rather than passing as "equal"; that
+that `typescript` is pinned **exactly** in all three manifests, that the root and `apps/web` carry the *same*
+pin and that `apps/docs` stays on a `6.` line: three dotted numbers, so a `rangeStrategy` flip to `^7.0.2` in
+every manifest at once fails rather than passing as "equal", and a docs package quietly dragged onto 7 fails
+too, since that is what breaks `astro check`. The rule asked for one version across all three until
+`astro check` made that impossible; that
 [`apps/web/next.config.ts`](./apps/web/next.config.ts)'s own `headers()` (imported and awaited, not regexed
 out of the source) returns exactly one rule, for `/(.*)`, carrying all nine security headers **with their
 values**: a year of HSTS with `includeSubDomains`, `X-Frame-Options` refusing the frame, `nosniff`, and
@@ -555,15 +562,5 @@ relative-link rule could not catch because they were prose rather than links.
   ordinary expression; the module becomes a Server Component. Typecheck, Biome and the whole unit suite
   stay green, because none of them models the RSC boundary. Six planner files sat like that for several
   commits. `tests/docs-consistency.test.ts` parses for it now, in both shapes.
-- **Two `overrides` in `pnpm-workspace.yaml` exist because of the Next pin, and both come off with it.**
-  `next@16.2.12` depends on exactly `postcss@8.4.31` and `sharp@0.34.5`, and both carry high-severity
-  advisories that `main` does not see because it carries Next 16.3.1, which vendors fixed ones. So Dependency
-  Review fails on this branch for a consequence of
-  [ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) rather than for anything in the diff,
-  and it stays failing for as long as that pin holds. The overrides lift both to versions the rest of the tree
-  already resolved (`postcss@8.5.25`, which Tailwind's plugin was on; `sharp@0.35.3`, which `apps/docs`
-  declares outright), so each collapses to one version instead of two. Delete them when Next moves, and check
-  the advisory list rather than assuming: the sharp one was invisible until the postcss one was fixed, because
-  the check reports what it finds and stops.
 - **Never run `lint-staged` by hand.** It stashes the whole tree; interrupting it can revert the working
   copy. Let the hook run it.

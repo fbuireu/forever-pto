@@ -145,29 +145,33 @@ or lets JavaScript into a TypeScript-only codebase, a long way from the change.
 `tests/docs-consistency.test.ts` asserts both, asserts that this `tsconfig.json` stays beside the
 [`next.config.ts`](./next.config.ts) that rewrites it, and asserts that `cloudflare-env.d.ts` stays excluded and ignored.
 
-**TypeScript stays on 6 and Next stays on 16.2, and the pair is one decision, forced by Cloudflare.** Next 16.3
-crashes the deployed Worker on any route rendered at request time: `@opennextjs/cloudflare` 1.20.2 is the
-latest adapter and shipped 2026-08-01, two days before 16.3.0 existed, and there is no newer version or beta.
-The symptom is the 404 page answering with Cloudflare **Error 1101 (Worker threw exception)** instead of
-itself, which is what `e2e/[locale]/not-found.spec.ts` catches. `/_not-found` is the only page that renders
-per request; everything else is prerendered and served from cache, so nothing else shows it.
-[ADR 0009](../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md).
+**Next is 16.3.3 and TypeScript is 7, and they moved together because neither could move alone.** Next 16.3
+used to crash the deployed Worker on any route rendered at request time, which is the whole of
+[ADR 0009](../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md): `@opennextjs/cloudflare` 1.20.2 was
+the newest adapter and predated 16.3.0, and the symptom was the 404 page answering with Cloudflare **Error
+1101 (Worker threw exception)** instead of itself, caught by `e2e/[locale]/not-found.spec.ts`. `/_not-found`
+is the only page that renders per request; everything else is prerendered and served from cache, so nothing
+else shows it. The adapter has since moved: **1.20.3 raised its `next` peer floor to `>=16.3.3` and dropped
+16.2 from the 16 line**, which is the first release built against the version this app needs. The pin came off
+with that, and the ADR records what is verified and what is not.
 
-TypeScript is pinned to 6 because it cannot move without Next moving first. TypeScript 7 ships the Go compiler
-and no `lib/typescript.js`, and Next's type-checking path loads exactly that file; only from 16.3 does
-`next build` shell out to the project-local `tsc` instead. So raising TypeScript to 7 while Next is 16.2 kills
-`pnpm build` before it type-checks anything. Raise Next first, and only once the adapter supports it.
+TypeScript could not move before Next did. TypeScript 7 ships the Go compiler and no `lib/typescript.js`, and
+Next's type-checking path on 16.2 loads exactly that file; only from 16.3 does `next build` shell out to the
+project-local `tsc`. That is why the pair is one decision, and why Next went first.
 
-Two things follow that are easy to trip over. `partialPrefetching` in `next.config.ts` is a 16.3 option and is
-a config error on 16.2; it must stay out while Next is pinned. And
-[`tests/docs-consistency.test.ts`](../../tests/docs-consistency.test.ts) imports `typescript` directly for its
-compiler-API parsing; under TypeScript 7 that import has to become `@typescript/typescript6`, Microsoft's
-compatibility package pinning the 6.x API, so the two move together too. The pin now appears in three
-manifests (this one, the repo root and [`apps/docs`](../docs)), and only this one is load-bearing for `next build`.
-`tests/docs-consistency.test.ts` asserts the three stay equal **and stay exact**, on the same reasoning as
-the `wrangler` rule beside it: Renovate opens a pull request per manifest, so without the rule the first bump
-desynchronises them silently. Equality alone was not enough: a `rangeStrategy` flip writes `^6.0.3` into all
-three at once, which is equal and no longer a pin, so each version has to match three dotted numbers too.
+**`apps/docs` stays on TypeScript 6, and that is not an oversight.** `astro check` refuses to run under 7 and
+says so itself: *the TypeScript module loaded does not expose the programmatic API `astro check` relies on*,
+with a link to the Astro roadmap issue tracking support. So the repo runs two TypeScripts: 7.0.2 at the root
+and here, 6.0.3 in the docs package until Astro can read the native compiler.
+[`tests/docs-consistency.test.ts`](../../tests/docs-consistency.test.ts) asserts that shape rather than plain
+equality now: all three pins **exact**, the root and this package **identical**, and the docs package on a
+`6.` line. Exactness is the part that was already load-bearing, because a `rangeStrategy` flip writes `^7.0.2`
+into every manifest at once, which is equal and no longer a pin.
+
+Two consequences to know. `partialPrefetching` is a 16.3 option and was a config error on 16.2; it is on in
+`next.config.ts` now, beside `cacheComponents`. And that same contract suite imports `typescript` for its
+compiler-API parsing, which under 7 resolves to a module with no API at all: the import is
+`@typescript/typescript6`, the compatibility package pinning the 6.x API, declared at the root.
 
 Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.tsx` for components).
 
@@ -385,7 +389,7 @@ last word of the message arrived as a second positional beside `deploy [path]`. 
 (`pnpm exec` passes argv through untouched, and `nick-fields/retry` was wrongly blamed for it first), and not
 the separator character. `_deploy-web.yml` now passes `${{ github.sha }}-${{ github.event_name }}`, which
 contains no spaces at all and so cannot split. That diagnosis was made against wrangler **4.115** and the pin
-has since moved to **4.121.0**; nothing has been re-verified, so treat the mechanism as recorded rather than
+has since moved to **4.126.0**; nothing has been re-verified, so treat the mechanism as recorded rather than
 retested, and reintroduce any multi-word form from a PR where the preview deploy exercises the same file.
 
 **No `wrangler deploy` in this repo is wrapped in `nick-fields/retry`'s usual forgiveness for argument
