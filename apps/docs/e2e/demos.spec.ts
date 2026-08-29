@@ -3,6 +3,7 @@ import { join, relative } from "node:path";
 import { expect, test } from "@playwright/test";
 
 const DIST = join(import.meta.dirname, "..", "dist");
+const DEPLOYED = Boolean(process.env.BASE_URL);
 
 const DEMO_ATTRIBUTE = /<[^>]*\sdata-demo[=\s>]/;
 
@@ -13,17 +14,20 @@ const pages = (dir: string): string[] =>
 		return entry.name === "index.html" ? [path] : [];
 	});
 
-const demoPages = pages(DIST)
-	.filter((path) => DEMO_ATTRIBUTE.test(readFileSync(path, "utf8")))
-	.map(
-		(path) =>
-			`/${relative(DIST, path)
-				.replaceAll("\\", "/")
-				.replace(/index\.html$/, "")}`,
-	)
-	.sort();
+const demoPages = DEPLOYED
+	? []
+	: pages(DIST)
+			.filter((path) => DEMO_ATTRIBUTE.test(readFileSync(path, "utf8")))
+			.map(
+				(path) =>
+					`/${relative(DIST, path)
+						.replaceAll("\\", "/")
+						.replace(/index\.html$/, "")}`,
+			)
+			.sort();
 
 test("discovers the demo pages from what was built, so this suite cannot silently shrink", () => {
+	test.skip(DEPLOYED, "the page list comes from a local build, which a run against a deployed site has none of");
 	expect(demoPages.length).toBeGreaterThanOrEqual(60);
 });
 

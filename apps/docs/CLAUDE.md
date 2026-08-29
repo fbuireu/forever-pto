@@ -41,7 +41,15 @@ The Forever PTO documentation wiki (docs.forever-pto.com). An Astro Starlight si
   verify it: `astro build` reported 155 pages built, and the suite went red. Asserting on *text* instead does
   not work, and was the first attempt: an `Input` or `Slider` demo legitimately renders no text at all.
 
-  **`test:e2e` does not build, and it needs the build.** `astro preview` serves `dist`, it does not produce it, and
+  **The smoke job does not build either, and that is a different problem with the same root.** Playwright
+collects every spec before it applies `--grep`, so `demos.spec.ts` reading `dist/` at module scope killed
+`Docs production smoke tests` with `ENOENT ... scandir dist` on a job whose whole purpose is to request a
+deployed site. The config's `dist` guard could not help: it deliberately skips when `BASE_URL` is set, which
+is exactly that job. The spec now derives an empty page list and skips its floor assertion when `BASE_URL`
+is set, so it stays a local-build suite and stops breaking a run it was never part of. No sibling repository
+has this shape — nothing in their `e2e/` reads the filesystem while collecting.
+
+**`test:e2e` does not build, and it needs the build.** `astro preview` serves `dist`, it does not produce it, and
   the page list is read off `dist` while the spec file is being collected, so a clean checkout died with
   `ENOENT ... scandir dist` before a single test was reported, and the preview server's own failure named nothing.
   [`playwright.config.ts`](./playwright.config.ts) checks for `dist` when it loads, which is before the web server
