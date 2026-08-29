@@ -274,11 +274,11 @@ jobs:
           require('node:fs').writeFileSync(process.env.SECRETS_FILE, body, { mode: 0o600 });
           "
       - name: Deploy to Cloudflare Workers
-        working-directory: apps/web/workers/tail
+        working-directory: apps/web
         env:
           BETTER_STACK_INGESTING_URL: ${{ vars.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL }}
           SECRETS_FILE: ${{ runner.temp }}/tail-secrets.json
-        run: pnpm exec wrangler deploy --var "BETTER_STACK_INGESTING_URL:$BETTER_STACK_INGESTING_URL" --secrets-file "$SECRETS_FILE"
+        run: pnpm exec wrangler deploy --config workers/tail/wrangler.toml --var "BETTER_STACK_INGESTING_URL:$BETTER_STACK_INGESTING_URL" --secrets-file "$SECRETS_FILE"
       - name: Remove the secrets file
         if: always()
         env:

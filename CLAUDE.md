@@ -287,23 +287,31 @@ verified by listing. The two scripts in [`apps/web/package.json`](./apps/web/pac
 written that way, `test:e2e:ui` and `test:e2e:changed`, are not: both invoke `playwright test` with their flag
 directly. This paragraph said they still had the defect long after they stopped.
 
-**Five cases carry `@smoke`, all of them in [`apps/web/e2e/smoke.spec.ts`](./apps/web/e2e/smoke.spec.ts), and
-the step passes no `--pass-with-no-tests`, which is the point.** Playwright exits 1 on an empty set, so the
-flag would make a typo in the grep green; without it, a grep that stops matching fails the job, which is the
-only thing that keeps the set honest. The cases are the 404 route (`/_not-found` is the only page rendered
-per request, so it is the one that shows Cloudflare Error 1101), `robots.txt`, the sitemap twice, and
-`/api/health`. This paragraph used to say nothing carried the tag and the flag was there for that reason;
-both halves outlived the commit that tagged them.
+**Two cases carry `@smoke`, both in [`apps/web/e2e/smoke.spec.ts`](./apps/web/e2e/smoke.spec.ts), and the step
+passes no `--pass-with-no-tests`, which is the point.** Playwright exits 1 on an empty set, so the flag would
+make a typo in the grep green; without it, a grep that stops matching fails the job, which is the only thing
+that keeps the set honest. They are the 404 route — `/_not-found` is the only page rendered per request, so
+it is the one that shows Cloudflare Error 1101 — and `robots.txt`.
 
-**They live in one file because this set can revert a deploy.** A failing `@smoke` case does not merely
-withhold the tag, it runs `wrangler rollback`, so what carries the tag has to be readable at a glance rather
-than scattered through the suite. The five sat in four different specs, tagged with the `{ tag: "@smoke" }`
-option rather than in the title, which the `github` reporter does not print: in the preview run, where
-`test:e2e` executes the whole directory, a smoke case and a feature case were indistinguishable in the
-report. Both sibling repositories keep the same shape, and biancafiore has lost a case to a zone rule and
-contribKit another, which is the failure this arrangement is meant to make cheap to reason about. Nothing
-moved but the location: `test:e2e` still runs the directory, so the preview suite covers exactly what it
-covered before.
+**They live in one file because this set can revert a deploy**, and the first run proved why that matters.
+On 2026-08-29 the merge of the Next 16.3.3 upgrade deployed cleanly and the 404 case passed, confirming the
+fault this repository had been carrying since 16.3.1 was gone. Then `/sitemap.xml` and `/api/health`
+answered **403** to the runner across all three retries, `smoke` failed, and `rollback` returned production
+to the broken version. A good deploy was reverted by two cases that were never about the Worker.
+
+**So `/sitemap.xml` and `/api/health` are out of the set, and the rule is now explicit: a case whose result
+depends on the caller's address cannot hold the power to revert a release.** Both sibling repositories lost
+a case to the same shape — biancafiore's `/rss.xml` and `/sitemap-index.xml`, contribKit's `/api/health` —
+and in every instance a browser gets the expected response while a datacenter address does not, which points
+at a zone rule rather than at anything in the tree. Cloudflare's **Security Events** log names the rule; the
+fix is a Cloudflare setting. The cases themselves are not deleted: they stay in `sitemap.spec.ts` and
+`api/health.spec.ts`, where the preview run exercises them against a `workers.dev` host the rule does not
+match.
+
+**One of them could not have failed anyway, which is worth knowing before trusting a similar assertion.**
+`names the host under test in every entry` loops over the sitemap's `<loc>` entries and asserts each starts
+with the origin. On a 403 there are no entries, the loop body never runs, and the test passes: it reported
+green in the very run where the sitemap was unreachable. It now asserts the list is non-empty first.
 
 **`smoke` gates `release-web`, now that it has tests to gate with.** The rule this repository already runs on
 is that a tag means the version is live: `release-web` needs `deploy-production`, and it needs `smoke` as

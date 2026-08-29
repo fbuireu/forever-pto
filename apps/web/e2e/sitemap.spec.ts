@@ -11,6 +11,23 @@ const locations = (body: string): string[] => [...body.matchAll(LOCATION)].map((
 const originUnderTest = (baseURL: string | undefined): string => (baseURL ?? "").replace(/\/+$/, "");
 
 test.describe("sitemap.xml", () => {
+	test("returns 200 with an XML content-type", async ({ request }) => {
+		const response = await request.get(SITEMAP_URL);
+		expect(response.status()).toBe(200);
+		expect(response.headers()["content-type"]).toContain("application/xml");
+	});
+
+	test("names the host under test in every entry", async ({ request, baseURL }) => {
+		const origin = originUnderTest(baseURL);
+		expect(origin).not.toBe("");
+
+		const urls = locations(await (await request.get(SITEMAP_URL)).text());
+		expect(urls.length).toBeGreaterThan(0);
+		for (const url of urls) {
+			expect(url.startsWith(`${origin}/`)).toBe(true);
+		}
+	});
+
 	test("emits one entry per locale and indexable route", async ({ request }) => {
 		const body = await (await request.get(SITEMAP_URL)).text();
 		expect(locations(body)).toHaveLength(LOCALES.length * indexableRoutes().length);

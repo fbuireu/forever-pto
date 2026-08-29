@@ -3,6 +3,11 @@ import { expect, test } from "@playwright/test";
 const URL = "/api/health";
 
 test.describe("GET /api/health", () => {
+	test("returns 200", async ({ request }) => {
+		const response = await request.get(URL);
+		expect(response.status()).toBe(200);
+	});
+
 	test("returns JSON content-type", async ({ request }) => {
 		const response = await request.get(URL);
 		expect(response.headers()["content-type"]).toContain("application/json");
