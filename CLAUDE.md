@@ -222,8 +222,23 @@ They sit on the old `development` and `production` and nowhere else. `gh secret 
 `docs-development` reads an empty string, wrangler falls back to interactive OAuth, opens a browser on a
 headless runner and times out after 120 seconds per attempt. `web-development` additionally needs
 `CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET`, which `e2e` reads to reach a preview behind Cloudflare
-Access. **A secret's value cannot be read back through the API, so this cannot be scripted from the outside**.
-It is a dashboard or `gh secret set` job with the values in hand.
+Access; the `docs-*` pair needs neither, because nothing in `docs.yml` requests the docs preview — its
+`PREVIEW_URL` is only written into the pull request comment, and the docs Playwright suite runs against a
+local preview in `build`. **A secret's value cannot be read back through the API, so this cannot be scripted
+from the outside**. It is a dashboard or `gh secret set` job with the values in hand.
+
+**The docs preview needs an Access destination even though it needs no secret, and it was missing one.** The
+Access application matches `pr-*-forever-pto-development`; the docs preview is
+`pr-*-forever-pto-docs-development`, which that pattern does not match, so every docs preview was publicly
+reachable. That is worse than it sounds, because [`apps/docs/public/robots.txt`](./apps/docs/public/robots.txt)
+says `Allow: /` and advertises the **production** sitemap, so each preview invited crawlers to index a
+duplicate of `docs.forever-pto.com`. The published wiki asserted the opposite — *every PR preview sits behind
+Zero Trust Access, which is why nothing crawls a preview* — and that sentence is what made the gap findable.
+The fix is a second destination on the same Access application, so the docs preview inherits the `Allow` and
+`Service Auth` policies already on it. It cannot be fixed in this tree: `build` produces one `docs-dist`
+artifact that both `preview` and `deploy` ship, the docs build reads no environment variable, and
+`apps/docs` serves static assets with no Worker, so there is no build-time switch and no per-environment
+header to fall back on.
 
 Already true, and this list said otherwise:
 
