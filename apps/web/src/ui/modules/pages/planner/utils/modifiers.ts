@@ -1,0 +1,131 @@
+import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
+import { isBefore, isSameDay, startOfDay } from "@application/shared/utils/dates";
+import type { HolidaysState } from "@application/stores/holidays";
+import type { Suggestion } from "@domain/calendar/types";
+import type { FromTo } from "../calendar/Calendar";
+
+export const isHoliday = (holidays: HolidaysState["holidays"]) => (date: Date) =>
+	holidays.some((holiday) => isSameDay({ a: date, b: holiday.date }));
+
+export interface IsPastParams {
+	allowPastDays: boolean;
+	today: Date | null;
+}
+
+export const isPast = ({ allowPastDays, today }: IsPastParams) => {
+	if (allowPastDays || !today) {
+		return () => false;
+	}
+
+	const todayStart = startOfDay(today);
+
+	return (date: Date) => isBefore({ date, dateToCompare: todayStart });
+};
+
+export const isToday = (today: Date | null) => (date: Date) => (today ? isSameDay({ a: date, b: today }) : false);
+
+export interface IsSuggestionParams {
+	currentSelection: Suggestion | null;
+	removedSuggestedDays?: Date[];
+}
+
+export const isSuggestion = ({ currentSelection, removedSuggestedDays = [] }: IsSuggestionParams) => {
+	return (date: Date) => {
+		if (!currentSelection) return false;
+
+		const wasRemoved = removedSuggestedDays.some((d) => isSameDay({ a: d, b: date }));
+		if (wasRemoved) return false;
+
+		return currentSelection.days.some((d) => isSameDay({ a: d, b: date }));
+	};
+};
+
+export const isManuallySelected = (manuallySelectedDays: Date[]) => {
+	return (date: Date) => {
+		return manuallySelectedDays.some((d) => isSameDay({ a: d, b: date }));
+	};
+};
+
+interface IsAlternativeParams {
+	alternatives: HolidaysState["alternatives"];
+	suggestion: Suggestion | null;
+	previewAlternativeIndex: number;
+	currentSelection?: Suggestion | null;
+}
+
+export const isAlternative = ({
+	alternatives,
+	suggestion,
+	previewAlternativeIndex,
+	currentSelection,
+}: IsAlternativeParams) => {
+	return (date: Date) => {
+		if (currentSelection?.days.some((d) => isSameDay({ a: d, b: date }))) {
+			return false;
+		}
+
+		const targetSuggestion = previewAlternativeIndex === 0 ? suggestion : alternatives[previewAlternativeIndex - 1];
+
+		if (!targetSuggestion?.days) return false;
+
+		return targetSuggestion?.days.some((d) => isSameDay({ a: d, b: date })) ?? false;
+	};
+};
+
+export const isCustom = (holidays: HolidayDTO[]) => (date: Date) => {
+	return holidays.some(
+		(holiday) => isSameDay({ a: holiday.date, b: date }) && holiday.variant === HolidayVariant.CUSTOM,
+	);
+};
+
+export const isNationalOrRegionalHoliday = (holidays: HolidayDTO[]) => (date: Date) => {
+	return holidays.some(
+		(holiday) =>
+			isSameDay({ a: holiday.date, b: date }) &&
+			(holiday.variant === HolidayVariant.NATIONAL || holiday.variant === HolidayVariant.REGIONAL),
+	);
+};
+
+export const isSelected = (selectedDates: Date[]) => (date: Date) =>
+	selectedDates.some((d) => isSameDay({ a: d, b: date }));
+
+export const isInRange =
+	({ from, to }: Partial<FromTo>) =>
+	(date: Date) => {
+		if (!from || !to) return false;
+		return date >= from && date <= to;
+	};
+
+export const isRangeStart = (range?: Partial<FromTo>) => (date: Date) => {
+	if (!range?.from) return false;
+	return isSameDay({ a: date, b: range.from });
+};
+
+export const isRangeEnd = (range?: Partial<FromTo>) => (date: Date) => {
+	if (!range?.to) return false;
+	return isSameDay({ a: date, b: range.to });
+};
+
+export const isRangeSelected = (range?: Partial<FromTo>) => (date: Date) => {
+	return isRangeStart(range)(date) || isRangeEnd(range)(date);
+};
+
+interface GetPreviewRangeParams {
+	range?: Partial<FromTo>;
+	isSelectingTo?: boolean;
+	hoverDate?: Date;
+}
+
+export const getPreviewRange =
+	({ range, isSelectingTo, hoverDate }: GetPreviewRangeParams) =>
+	(date: Date) => {
+		if (!range?.from || !isSelectingTo || !hoverDate) return false;
+
+		const start = range.from;
+		const end = hoverDate;
+
+		const minDate = start <= end ? start : end;
+		const maxDate = start <= end ? end : start;
+
+		return date >= minDate && date <= maxDate;
+	};

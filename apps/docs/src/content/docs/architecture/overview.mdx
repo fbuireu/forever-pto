@@ -1,0 +1,64 @@
+---
+title: Architecture overview
+description: The layered src/ architecture (app, application, domain, infrastructure and ui) plus dependency rules, nested CLAUDE.md guides and path aliases.
+sidebar:
+  order: 1
+---
+
+Forever PTO is a Next.js App Router application organized into five layers under `apps/web/src/`, plus `apps/web/src/middleware.ts` at the root of the tree. Each layer has a single responsibility and a deliberate dependency direction.
+
+## The layers
+
+| Layer | Path | Responsibility |
+| --- | --- | --- |
+| App | `apps/web/src/app/` | Next.js App Router: routes, layouts, API handlers, metadata, sitemap/robots. Composition only; see [routing](/architecture/routing/). |
+| Application | `apps/web/src/application/` | Data contracts (DTOs), Zustand stores, Effect use-cases, `next-intl` navigation glue (`apps/web/src/application/i18n/navigation.ts`), email templates and export generators. |
+| Domain | `apps/web/src/domain/` | Pure business logic: the calendar suggestion engine (`apps/web/src/domain/calendar/`) and payment domain events/handlers (`apps/web/src/domain/payment/`). |
+| Infrastructure | `apps/web/src/infrastructure/` | Everything that talks to the outside world: SDK clients, services, the middleware proxy helpers, the calculation Web Worker (`apps/web/src/infrastructure/workers/`), i18n runtime config and `.well-known` payloads. |
+| UI | `apps/web/src/ui/` | React modules (`apps/web/src/ui/modules/`), hooks, styles (`apps/web/src/ui/styles/`), assets and i18n message catalogs (`apps/web/src/ui/i18n/messages/`). |
+
+## Dependency direction
+
+The intended flow points inwards, towards the domain:
+
+```text
+app  →  ui  →  application  →  domain
+         ↘        ↓
+        infrastructure  (reached through use-cases, services and adapters)
+```
+
+- `apps/web/src/domain/calendar/` is fully pure, with no framework, browser or SDK imports. Its one documented exception is consuming `HolidayDTO` from `@application/dto/holiday/types` (see `apps/web/src/domain/calendar/CLAUDE.md`).
+- `apps/web/src/domain/payment/handlers/` is the pragmatic outlier: the webhook handlers consume infrastructure services (Turso repository, Stripe provider) through Effect context rather than instantiating them; see [Effect layers](/architecture/effect-layers/).
+- Stores in `apps/web/src/application/stores/` never call SDK clients directly; they delegate to `apps/web/src/infrastructure/services/*`.
+- Server-side composition of external dependencies happens once, in `apps/web/src/infrastructure/layers.ts` (`ApplicationLayer`).
+
+## A CLAUDE.md per folder
+
+Per the repo's root `CLAUDE.md`, every significant folder carries its own `CLAUDE.md` describing what may be changed there and what its rules are; read it before touching the folder. Examples: `apps/web/src/domain/CLAUDE.md` (layer rules and allowed imports), `apps/web/src/infrastructure/clients/CLAUDE.md` (the Effect client pattern), `apps/web/src/application/stores/CLAUDE.md` (store conventions). Those files are the source of truth for layer boundaries; this page summarizes them. `CONTEXT.md` is a different document and exists **only** at the repo root, where it is the domain glossary. A nested one is forbidden, because the name would mean two things.
+
+## Path aliases
+
+Defined in the root `tsconfig.json` (`compilerOptions.paths`); Vitest resolves them natively via `resolve.tsconfigPaths` and the docs site replicates the ones it needs.
+
+| Alias | Target |
+| --- | --- |
+| `apps/web/src/*` | `./src/*` |
+| `@app/*` | `./src/app/*` |
+| `@infrastructure/*` | `./src/infrastructure/*` |
+| `@domain/*` | `./src/domain/*` |
+| `@ui/*` | `./src/ui/*` |
+| `@application/*` | `./src/application/*` |
+| `@assets/*` | `./src/ui/assets/*` |
+| `@styles/*` | `./src/ui/styles/*` |
+| `@i18n/*` | `./src/ui/i18n/*` |
+| `@mocks/*` | `./src/mocks/*` |
+| `@types/*` | `./src/types/*` |
+
+Note that `@assets`, `@styles` and `@i18n` all point inside `apps/web/src/ui/`: they are shorthands, not separate layers. Each package has its own `tsconfig.json`, so the two type-check independently; the app's aliases carry no `baseUrl` and resolve against that file.
+
+## Related pages
+
+- [Routing](/architecture/routing/) covers how `apps/web/src/app/` is laid out.
+- [Middleware](/architecture/middleware/) covers the per-request chain.
+- [Effect layers](/architecture/effect-layers/) covers server-side dependency injection.
+- [Caching](/architecture/caching/) covers Cache Components and the R2 incremental cache.

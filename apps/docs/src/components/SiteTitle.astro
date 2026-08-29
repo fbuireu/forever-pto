@@ -1,0 +1,34 @@
+---
+import Default from "@astrojs/starlight/components/SiteTitle.astro";
+import { APP_VERSION } from "../lib/app-version";
+---
+
+<div class="site-title-with-version">
+  <Default><slot /></Default>
+  <span class="app-version" title="Forever PTO app version">v{APP_VERSION}</span>
+</div>
+
+<style>
+  .site-title-with-version {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  .app-version {
+    flex-shrink: 0;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 999px;
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-xs);
+    line-height: 1;
+    padding: 0.2em 0.6em;
+  }
+
+  @media (max-width: 50rem) {
+    .app-version {
+      display: none;
+    }
+  }
+</style>

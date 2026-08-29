@@ -1,0 +1,39 @@
+---
+title: Conventions
+description: Commit types, code style and component rules.
+sidebar:
+  order: 0
+---
+
+## Commits
+
+Commit messages follow **conventional commits**, enforced locally by commitlint (`commitlint.config.ts`, extending `@commitlint/config-conventional`) via the husky `commit-msg` hook.
+
+PRs are **squash-merged**, so the **PR title becomes the commit that lands on `main`**, and that title is what semantic-release (`.releaserc.json`) analyzes. Get the type right on the PR title, not just on intermediate commits:
+
+| PR title type | Release effect |
+| --- | --- |
+| `feat: …` | Minor version bump, changelog entry, deploy |
+| `fix: …` / `perf: …` | Patch version bump, changelog entry, deploy |
+| `feat!: …` or a `BREAKING CHANGE:` footer | Major version bump |
+| `docs: …`, `chore: …`, `ci: …`, `refactor: …`, `test: …` | **No release** |
+
+Each package versions itself, and a commit is attributed to whichever package its paths fall under, so the type no longer has to compensate for the layout. Three rules follow:
+
+- **One package per pull request.** The repo squash-merges, so a PR touching both `apps/web` and `apps/docs` lands in both changelogs.
+- **The title describes the package it touches.** A `fix:` on a wiki-only PR releases the wiki, not the app.
+- **A change confined to the repo root releases nothing**: `.github/`, `biome.json`, `adr/`, `tests/`, the root manifest.
+
+The release commits are created by semantic-release as `chore(release): web x.y.z [skip ci]`; the docs package writes no commit at all.
+
+## Code conventions
+
+- **No barrel files.** Import directly from the source module; never create pass-through `index.ts` re-export files.
+- **Named exports.** Default exports are used only where Next.js requires them (route files, config files). Everything else exports by name, including the CVA variants object next to its component.
+- **CVA pattern.** Styled primitives define a `cva()` object and export it alongside the component (e.g. `buttonVariants` in `apps/web/src/ui/modules/core/primitives/Button.tsx`) so variants stay reusable and type-derivable. See the [Button page](/design-system/components/button/) for how the docs exploit this.
+- **A `CLAUDE.md` per folder.** Significant directories carry a `CLAUDE.md` describing what may be changed there, its public API, invariants and gotchas. Read it before modifying a folder; update it in the same commit when the rules change. The convention is declared in the root `CLAUDE.md`. `CONTEXT.md` is the domain glossary and lives at the repo root only; never create a nested one.
+- **No uppercase in i18n strings.** Translation strings in `apps/web/src/ui/i18n/messages/` are written in normal casing; if a design calls for uppercase, apply it with a CSS `uppercase` class in the component. Casing is presentation, not content.
+
+## Formatting
+
+Formatting is not a convention you follow by hand: Biome formats staged files on every commit. See [tooling](/contributing/tooling/) for the hook chain and [testing](/contributing/testing/) for test-file conventions.

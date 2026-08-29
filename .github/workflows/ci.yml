@@ -14,9 +14,59 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  changes:
+    name: Detect changed packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      web: ${{ steps.filter.outputs.web }}
+      tail: ${{ steps.filter.outputs.tail }}
+      cross_package: ${{ steps.filter.outputs.cross_package }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Filter changed paths
+        id: filter
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+          WEB_PATHS: '^(apps/web/|patches/|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$|biome\.json$|\.npmrc$|\.nvmrc$|\.github/actions/|\.github/workflows/(ci|_deploy-web)\.yml$)'
+          TAIL_PATHS: '^(apps/web/workers/tail/|apps/web/src/infrastructure/clients/logging/|\.github/workflows/ci\.yml$)'
+        run: |
+          if [ -z "$BASE_SHA" ] || ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
+            echo 'web=true' >> "$GITHUB_OUTPUT"
+            echo 'tail=true' >> "$GITHUB_OUTPUT"
+            echo 'cross_package=false' >> "$GITHUB_OUTPUT"
+            echo "::notice::No usable base commit, treating this as a web change."
+            exit 0
+          fi
+          changed=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+          echo "$changed"
+          if printf '%s\n' "$changed" | grep -qE "$WEB_PATHS"; then
+            echo 'web=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'web=false' >> "$GITHUB_OUTPUT"
+            echo "::notice::No apps/web change in this range; the web deploy and release are skipped."
+          fi
+          if printf '%s\n' "$changed" | grep -qE "$TAIL_PATHS"; then
+            echo 'tail=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'tail=false' >> "$GITHUB_OUTPUT"
+          fi
+          if printf '%s\n' "$changed" | grep -qE '^apps/web/' && printf '%s\n' "$changed" | grep -qE '^apps/docs/'; then
+            echo 'cross_package=true' >> "$GITHUB_OUTPUT"
+            echo "::warning::This range touches both apps/web and apps/docs. Releases are attributed by path, so a squash merge of this will appear in both changelogs. See adr/0011."
+          else
+            echo 'cross_package=false' >> "$GITHUB_OUTPUT"
+          fi
+
   check:
     name: Check
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -30,18 +80,18 @@ jobs:
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage/lcov.info
+          files: ./apps/web/coverage/lcov.info
           fail_ci_if_error: false
 
   deploy-production:
     name: Deploy to production
-    needs: [check]
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-    uses: ./.github/workflows/_deploy.yml
+    needs: [changes, check]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.web == 'true' }}
+    uses: ./.github/workflows/_deploy-web.yml
     with:
-      environment: production
+      environment: web-production
       wrangler_env: production
-      url: https://forever-pto.com
+      url: ${{ vars.NEXT_PUBLIC_SITE_URL }}
     secrets:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -51,11 +101,91 @@ jobs:
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
 
-  release:
-    name: Semantic Release
+  smoke:
+    name: Production smoke tests
+    needs: [deploy-production]
+    if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
-    needs: [check, deploy-production]
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/prepare-env
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        working-directory: apps/web
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Install Playwright OS dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        working-directory: apps/web
+        run: pnpm exec playwright install-deps chromium
+      - name: Require the production URL
+        env:
+          BASE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+        run: |
+          if [ -z "$BASE_URL" ]; then
+            echo "The production URL is empty, so Playwright would fall back to localhost and pass against it"
+            exit 1
+          fi
+      - name: Label the smoke report
+        if: ${{ !cancelled() }}
+        env:
+          BASE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+        run: |
+          {
+            echo "## Production smoke tests"
+            echo
+            echo "Playwright ran the \`@smoke\` cases against <$BASE_URL> after deploying \`$GITHUB_SHA\`."
+            echo "The Playwright Run Summary annotation on this run belongs to this job. The preview E2E suite does not run on \`main\`."
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Run smoke tests against production
+        working-directory: apps/web
+        run: pnpm exec playwright test --grep "@smoke"
+        env:
+          BASE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: playwright-smoke-report
+          path: apps/web/playwright-report/
+          retention-days: 7
+
+  rollback:
+    name: Roll back production
+    needs: [deploy-production, smoke]
+    if: ${{ always() && needs.deploy-production.result == 'success' && needs.smoke.result == 'failure' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: web-production
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      ROLLBACK_MESSAGE: Smoke tests failed on ${{ github.sha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/prepare-env
+      - name: Roll back to the previous version
+        working-directory: apps/web
+        run: pnpm exec wrangler rollback --env production --yes --message "$ROLLBACK_MESSAGE"
+
+  release-web:
+    name: Semantic Release (web)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [changes, check, deploy-production, smoke]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.web == 'true' }}
     permissions:
       contents: write
       issues: write
@@ -63,6 +193,8 @@ jobs:
     concurrency:
       group: release
       cancel-in-progress: false
+    outputs:
+      released: ${{ steps.release.outputs.released }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -71,18 +203,132 @@ jobs:
           token: ${{ secrets.PAT }}
           persist-credentials: false
       - uses: ./.github/actions/prepare-env
+      - name: Verify web release tag exists
+        run: |
+          if [ -z "$(git tag --list 'web-v*')" ]; then
+            echo '::error::No web-v* tag found. semantic-release would restart the web line at 1.0.0.'
+            exit 1
+          fi
       - name: Semantic Release
+        id: release
+        working-directory: apps/web
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
-        run: npx semantic-release
+        run: |
+          before=$(git tag --list 'web-v*' | wc -l)
+          pnpm exec semantic-release
+          after=$(git tag --list 'web-v*' | wc -l)
+          if [ "$after" -gt "$before" ]; then
+            echo 'released=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'released=false' >> "$GITHUB_OUTPUT"
+          fi
+
+  docs-refresh:
+    name: Rebuild the docs site on the new app version
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [release-web]
+    if: ${{ needs.release-web.outputs.released == 'true' }}
+    permissions:
+      actions: write
+    steps:
+      - name: Dispatch docs workflow
+        env:
+          GH_TOKEN: ${{ secrets.PAT }}
+          GH_REPO: ${{ github.repository }}
+        run: gh workflow run docs.yml --ref main
+
+  deploy-tail:
+    name: Deploy the tail Worker
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [changes, check]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.tail == 'true' }}
+    environment: web-production
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/prepare-env
+      - name: Collect the ingest token
+        env:
+          BETTER_STACK_INGESTING_URL: ${{ vars.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL }}
+          BETTER_STACK_SOURCE_TOKEN: ${{ vars.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN }}
+          SECRETS_FILE: ${{ runner.temp }}/tail-secrets.json
+        run: |
+          if [ -z "$BETTER_STACK_INGESTING_URL" ]; then
+            echo '::error::NEXT_PUBLIC_BETTER_STACK_INGESTING_URL is not set on web-production.'
+            exit 1
+          fi
+          if [ -z "$BETTER_STACK_SOURCE_TOKEN" ]; then
+            echo '::error::NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN is not set on web-production.'
+            exit 1
+          fi
+          node -e "
+          const body = JSON.stringify({ BETTER_STACK_SOURCE_TOKEN: process.env.BETTER_STACK_SOURCE_TOKEN });
+          require('node:fs').writeFileSync(process.env.SECRETS_FILE, body, { mode: 0o600 });
+          "
+      - name: Deploy to Cloudflare Workers
+        working-directory: apps/web/workers/tail
+        env:
+          BETTER_STACK_INGESTING_URL: ${{ vars.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL }}
+          SECRETS_FILE: ${{ runner.temp }}/tail-secrets.json
+        run: pnpm exec wrangler deploy --var "BETTER_STACK_INGESTING_URL:$BETTER_STACK_INGESTING_URL" --secrets-file "$SECRETS_FILE"
+      - name: Remove the secrets file
+        if: always()
+        env:
+          SECRETS_FILE: ${{ runner.temp }}/tail-secrets.json
+        run: rm -f "$SECRETS_FILE"
+
+  cross-package-notice:
+    name: Cross-package pull request
+    needs: [changes]
+    if: ${{ github.event_name == 'pull_request' && needs.changes.outputs.cross_package == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      pull-requests: write
+    env:
+      MARKER: '<!-- cross-package -->'
+    steps:
+      - name: Find existing comment
+        uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4.0.0
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: github-actions[bot]
+          body-includes: ${{ env.MARKER }}
+      - name: Upsert cross-package comment
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5.0.0
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            ${{ env.MARKER }}
+            ### This pull request touches both packages
+
+            Releases are attributed by the paths a commit touches, and `main` takes squash
+            merges, so this will be listed in **both** the `apps/web` and the `apps/docs`
+            changelog, under whatever type the PR title carries.
+
+            That is sometimes what you want (a change that genuinely spans both). If it is
+            not, split it. See [adr/0011](../blob/main/adr/0011-per-package-versioning-with-a-bridge-tag.md).
+
+            This is advisory. It does not block the merge.
 
   deploy-development:
     name: Deploy to development
-    needs: [check]
-    if: ${{ github.event_name == 'pull_request' }}
-    uses: ./.github/workflows/_deploy.yml
+    needs: [changes, check]
+    if: ${{ github.event_name == 'pull_request' && needs.changes.outputs.web == 'true' }}
+    uses: ./.github/workflows/_deploy-web.yml
     with:
-      environment: development
+      environment: web-development
       wrangler_env: development
       worker_name: pr-${{ github.event.pull_request.number }}-forever-pto-development
       url: https://pr-${{ github.event.pull_request.number }}-forever-pto-development.fbuireu.workers.dev
@@ -99,6 +345,7 @@ jobs:
     name: Post preview URL
     needs: [deploy-development]
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       pull-requests: write
     env:
@@ -132,7 +379,8 @@ jobs:
     name: E2E tests
     needs: [deploy-development]
     runs-on: ubuntu-latest
-    environment: development
+    timeout-minutes: 30
+    environment: web-development
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -144,14 +392,17 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
+        working-directory: apps/web
         run: pnpm exec playwright install --with-deps chromium
       - name: Install Playwright OS dependencies
         if: steps.playwright-cache.outputs.cache-hit == 'true'
+        working-directory: apps/web
         run: pnpm exec playwright install-deps chromium
       - name: Run E2E tests
+        working-directory: apps/web
         run: pnpm test:e2e
         env:
           BASE_URL: https://pr-${{ github.event.pull_request.number }}-forever-pto-development.fbuireu.workers.dev
@@ -162,5 +413,5 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: playwright-report
-          path: playwright-report/
+          path: apps/web/playwright-report/
           retention-days: 7

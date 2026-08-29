@@ -1,0 +1,125 @@
+import { DEFAULT_FILTER_STRATEGY, type FilterStrategy } from "@domain/calendar/types";
+import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
+import { create } from "zustand";
+import { devtools, persist } from "zustand/middleware";
+import { obfuscatedStorage } from "./crypto";
+import { onRehydrateFailure } from "./rehydration";
+
+export interface FiltersState {
+	ptoDays: number;
+	allowPastDays: boolean;
+	country: string;
+	region: string;
+	year: number;
+	carryOverMonths: number;
+	strategy: FilterStrategy;
+}
+
+interface FilterActions {
+	setPtoDays: (days: number) => void;
+	setAllowPastDays: (allow: boolean) => void;
+	setCountry: (country: string) => void;
+	setRegion: (region: string) => void;
+	setYear: (year: number) => void;
+	setCarryOverMonths: (months: number) => void;
+	setStrategy: (strategy: FilterStrategy) => void;
+	resetToDefaults: () => void;
+}
+
+type FiltersStore = FiltersState & FilterActions;
+
+const STORAGE_NAME = "filters-store";
+const STORAGE_VERSION = 2;
+
+export const MIN_PTO_DAYS = 1;
+export const MAX_PTO_DAYS = 365;
+export const MIN_CARRY_OVER_MONTHS = 1;
+
+interface ClampParams {
+	value: number;
+	min: number;
+	max: number;
+}
+
+const clamp = ({ value, min, max }: ClampParams) => Math.min(max, Math.max(min, value));
+
+const initialState: FiltersState = {
+	ptoDays: 22,
+	allowPastDays: false,
+	country: "",
+	region: "",
+	year: new Date().getFullYear(),
+	carryOverMonths: 1,
+	strategy: DEFAULT_FILTER_STRATEGY,
+};
+
+const partializeFilters = (state: FiltersStore) => ({
+	ptoDays: state.ptoDays,
+	allowPastDays: state.allowPastDays,
+	country: state.country,
+	region: state.region,
+	carryOverMonths: state.carryOverMonths,
+	strategy: state.strategy,
+});
+
+type PersistedFiltersState = ReturnType<typeof partializeFilters>;
+
+export const useFiltersStore = create<FiltersStore>()(
+	devtools(
+		persist(
+			(set) => ({
+				...initialState,
+				setPtoDays: (days: number) =>
+					set(
+						{ ptoDays: clamp({ value: Math.round(days), min: MIN_PTO_DAYS, max: MAX_PTO_DAYS }) },
+						false,
+						"setPtoDays",
+					),
+				setCountry: (country: string) => set({ country, region: "" }, false, "setCountry"),
+				setRegion: (region: string) => set({ region }, false, "setRegion"),
+				setAllowPastDays: (allow: boolean) => set({ allowPastDays: allow }, false, "setAllowPastDays"),
+				setYear: (year: number) => set({ year }, false, "setYear"),
+				setCarryOverMonths: (months: number) =>
+					set(
+						{
+							carryOverMonths: clamp({
+								value: Math.round(months),
+								min: MIN_CARRY_OVER_MONTHS,
+								max: MAX_CARRY_OVER_MONTHS,
+							}),
+						},
+						false,
+						"setCarryOverMonths",
+					),
+				setStrategy: (strategy: FilterStrategy) => set({ strategy }, false, "setStrategy"),
+				resetToDefaults: () => set(initialState, false, "resetToDefaults"),
+			}),
+			{
+				name: STORAGE_NAME,
+				version: STORAGE_VERSION,
+				storage: obfuscatedStorage,
+				partialize: partializeFilters,
+				migrate: (persisted) => {
+					const { year: _staleYear, ...rest } = (persisted ?? {}) as Partial<FiltersState>;
+					return rest as PersistedFiltersState;
+				},
+				onRehydrateStorage: () => (state, error) => {
+					if (error) {
+						onRehydrateFailure({ storeName: STORAGE_NAME, error, state });
+						return;
+					}
+
+					if (state) {
+						state.ptoDays = clamp({ value: Math.round(state.ptoDays), min: MIN_PTO_DAYS, max: MAX_PTO_DAYS });
+						state.carryOverMonths = clamp({
+							value: Math.round(state.carryOverMonths),
+							min: MIN_CARRY_OVER_MONTHS,
+							max: MAX_CARRY_OVER_MONTHS,
+						});
+					}
+				},
+			},
+		),
+		{ name: STORAGE_NAME },
+	),
+);

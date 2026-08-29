@@ -1,0 +1,308 @@
+import { TursoService } from "@infrastructure/clients/db/turso/service";
+import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
+import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
+import { PaymentError, ValidationError } from "@infrastructure/errors";
+import type * as Repository from "@infrastructure/services/payments/repository";
+import { Effect, Layer } from "effect";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { activateWithClaimedPayment, activateWithEmail, activateWithPayment } from "./activatePremium";
+
+vi.mock("@application/dto/payment/dto", () => ({
+	paymentDataDTO: { create: vi.fn().mockReturnValue({ id: "pi_test", email: "test@example.com" }) },
+}));
+
+vi.mock("@infrastructure/services/payments/repository", () => ({
+	getPaymentById: vi.fn<typeof Repository.getPaymentById>(() => Effect.succeed(undefined)),
+	getSucceededPaymentByEmail: vi.fn<typeof Repository.getSucceededPaymentByEmail>(() => Effect.succeed(undefined)),
+	savePayment: vi.fn<typeof Repository.savePayment>(() => Effect.succeed(true)),
+	updatePaymentStatus: vi.fn<typeof Repository.updatePaymentStatus>(() => Effect.succeed(true)),
+}));
+
+vi.mock("@infrastructure/services/premium/session", () => ({
+	createSession: vi.fn(() => Effect.succeed("jwt-token")),
+}));
+
+const CLIENT_SECRET = "fixture-client-secret";
+
+const SUCCEEDED_INTENT = {
+	id: "pi_test",
+	status: "succeeded" as string,
+	metadata: { email: "test@example.com" },
+	receipt_email: null,
+	client_secret: CLIENT_SECRET as string | null,
+};
+
+const mockStripe = {
+	paymentIntents: { retrieve: vi.fn(() => Effect.succeed(SUCCEEDED_INTENT) as never), create: vi.fn() },
+	charges: { retrieve: vi.fn() },
+	promotionCodes: { list: vi.fn() },
+	webhooks: { constructEvent: vi.fn() },
+};
+
+const mockLogger = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
+const TestLayer = Layer.mergeAll(
+	Layer.succeed(LoggerService, mockLogger),
+	Layer.succeed(TursoService, { query: vi.fn(), execute: vi.fn() }),
+	Layer.succeed(StripeServerService, mockStripe),
+);
+
+type PremiumR = LoggerService | TursoService | StripeServerService;
+const run = <A, E>(eff: Effect.Effect<A, E, PremiumR>) => Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
+const runFail = <A, E>(eff: Effect.Effect<A, E, PremiumR>) =>
+	Effect.runPromise(Effect.flip(eff).pipe(Effect.provide(TestLayer)));
+const runDeferred = (deferred: Effect.Effect<void, never, TursoService>) =>
+	Effect.runPromise(deferred.pipe(Effect.provide(TestLayer)));
+
+beforeEach(() => vi.clearAllMocks());
+
+describe("the two donation entry points", () => {
+	it("returns email, premiumKey and token on success", async () => {
+		const result = await run(
+			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" }),
+		);
+		expect(result).toMatchObject({ email: "test@example.com", premiumKey: "pi_test", token: "jwt-token" });
+	});
+
+	it("does not touch the payment record during the critical path", async () => {
+		const { getPaymentById, savePayment } = await import("@infrastructure/services/payments/repository");
+		await run(activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" }));
+		expect(getPaymentById).not.toHaveBeenCalled();
+		expect(savePayment).not.toHaveBeenCalled();
+	});
+
+	it("saves payment when no existing record (deferred)", async () => {
+		const { savePayment } = await import("@infrastructure/services/payments/repository");
+		const { deferred } = await run(
+			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" }),
+		);
+		await runDeferred(deferred);
+		expect(savePayment).toHaveBeenCalledOnce();
+	});
+
+	it("reconciles without reading first: insert-or-ignore, then the guarded update (deferred)", async () => {
+		const { getPaymentById, savePayment, updatePaymentStatus } = await import(
+			"@infrastructure/services/payments/repository"
+		);
+		const { deferred } = await run(
+			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" }),
+		);
+		await runDeferred(deferred);
+
+		expect(getPaymentById).not.toHaveBeenCalled();
+		expect(savePayment).toHaveBeenCalledOnce();
+		expect(updatePaymentStatus).toHaveBeenCalledWith({ paymentIntentId: "pi_test", status: "succeeded" });
+	});
+
+	it("still marks the row succeeded when the insert was ignored, and says nothing about creating one (deferred)", async () => {
+		const { savePayment, updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
+		vi.mocked(savePayment).mockReturnValueOnce(Effect.succeed(false));
+		const { deferred } = await run(
+			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" }),
+		);
+		await runDeferred(deferred);
+
+		expect(updatePaymentStatus).toHaveBeenCalledWith({ paymentIntentId: "pi_test", status: "succeeded" });
+		expect(mockLogger.info).not.toHaveBeenCalledWith("Payment created successfully", expect.anything());
+	});
+
+	it("reports a created row on the answer the insert itself gave (deferred)", async () => {
+		const { savePayment } = await import("@infrastructure/services/payments/repository");
+		vi.mocked(savePayment).mockReturnValueOnce(Effect.succeed(true));
+		const { deferred } = await run(
+			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" }),
+		);
+		await runDeferred(deferred);
+
+		expect(savePayment).toHaveBeenCalledOnce();
+		expect(mockLogger.info).toHaveBeenCalledWith("Payment created successfully", { paymentIntentId: "pi_test" });
+	});
+
+	it("lets a Stripe failure stay a PaymentError, so its message never reaches the payer", async () => {
+		mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
+			Effect.fail(new PaymentError({ message: "No such payment_intent: 'pi_3ABC'" })) as never,
+		);
+		const err = await runFail(activateWithPayment({ paymentIntentId: "pi_test", clientSecret: CLIENT_SECRET }));
+
+		expect(err).toBeInstanceOf(PaymentError);
+		expect(err).not.toBeInstanceOf(ValidationError);
+	});
+
+	it("fails with ValidationError when payment intent is not succeeded", async () => {
+		mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
+			Effect.succeed({ ...SUCCEEDED_INTENT, status: "requires_payment_method" }) as never,
+		);
+		const err = await runFail(
+			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" }),
+		);
+		expect(err).toBeInstanceOf(ValidationError);
+	});
+
+	it("fails with ValidationError on email mismatch", async () => {
+		mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
+			Effect.succeed({ ...SUCCEEDED_INTENT, metadata: { email: "other@example.com" }, receipt_email: null }) as never,
+		);
+		const err = await runFail(
+			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" }),
+		);
+		expect(err).toBeInstanceOf(ValidationError);
+	});
+
+	it("accepts the payer address retyped with different capitalisation, the only key Premium is recoverable by", async () => {
+		const result = await run(
+			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "  TEST@Example.com " }),
+		);
+		expect(result).toMatchObject({ email: "test@example.com" });
+	});
+
+	it("still refuses an address that differs by more than case", async () => {
+		const err = await runFail(
+			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "attacker@example.com" }),
+		);
+		expect(err).toBeInstanceOf(ValidationError);
+	});
+
+	it("normalises the address Stripe recorded before it becomes the session key", async () => {
+		mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
+			Effect.succeed({ ...SUCCEEDED_INTENT, metadata: { email: "Payer@Example.COM" } }) as never,
+		);
+		const result = await run(activateWithPayment({ paymentIntentId: "pi_test", clientSecret: CLIENT_SECRET }));
+		expect(result.email).toBe("payer@example.com");
+	});
+
+	it("falls through a blank metadata email to receipt_email, as the webhook does", async () => {
+		mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
+			Effect.succeed({
+				...SUCCEEDED_INTENT,
+				metadata: { email: "   " },
+				receipt_email: "payer@example.com",
+			}) as never,
+		);
+		const result = await run(activateWithPayment({ paymentIntentId: "pi_test", clientSecret: CLIENT_SECRET }));
+		expect(result.email).toBe("payer@example.com");
+	});
+
+	it("derives the payer email from the payment intent, the only address the Stripe return carries", async () => {
+		const result = await run(activateWithPayment({ paymentIntentId: "pi_test", clientSecret: CLIENT_SECRET }));
+		expect(result).toMatchObject({ email: "test@example.com", premiumKey: "pi_test" });
+	});
+
+	it("cannot be reached without a guard: activateWithPayment always runs the client-secret check", async () => {
+		const err = await runFail(
+			activateWithPayment({ paymentIntentId: "pi_test", clientSecret: "fixture-client-WRONGx" }),
+		);
+
+		expect(err).toBeInstanceOf(ValidationError);
+		expect((err as ValidationError).message).toBe("Client secret mismatch");
+	});
+
+	it("cannot be reached without a guard: activateWithClaimedPayment always runs the email check", async () => {
+		const err = await runFail(
+			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "attacker@example.com" }),
+		);
+
+		expect(err).toBeInstanceOf(ValidationError);
+		expect((err as ValidationError).message).toBe("Email mismatch");
+	});
+
+	it("accepts the client secret Stripe appended to the return url", async () => {
+		const result = await run(activateWithPayment({ paymentIntentId: "pi_test", clientSecret: CLIENT_SECRET }));
+		expect(result).toMatchObject({ premiumKey: "pi_test", token: "jwt-token" });
+	});
+
+	it("rejects a client secret that does not belong to the payment intent", async () => {
+		const err = await runFail(
+			activateWithPayment({ paymentIntentId: "pi_test", clientSecret: "fixture-client-WRONGx" }),
+		);
+		expect(err).toBeInstanceOf(ValidationError);
+	});
+
+	it("does not mint a session for a mismatched client secret", async () => {
+		const { createSession } = await import("@infrastructure/services/premium/session");
+		await runFail(activateWithPayment({ paymentIntentId: "pi_test", clientSecret: "fixture-client-WRONGx" }));
+		expect(createSession).not.toHaveBeenCalled();
+	});
+
+	it("rejects a client secret when the intent has none to compare against", async () => {
+		mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
+			Effect.succeed({ ...SUCCEEDED_INTENT, client_secret: null }) as never,
+		);
+		const err = await runFail(activateWithPayment({ paymentIntentId: "pi_test", clientSecret: CLIENT_SECRET }));
+		expect(err).toBeInstanceOf(ValidationError);
+	});
+
+	it("fails with ValidationError when the payment intent carries no email", async () => {
+		mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
+			Effect.succeed({ ...SUCCEEDED_INTENT, metadata: {}, receipt_email: null }) as never,
+		);
+		const err = await runFail(
+			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "attacker@example.com" }),
+		);
+		expect(err).toBeInstanceOf(ValidationError);
+	});
+
+	it("does not mint a session for a payment intent that carries no email", async () => {
+		const { createSession } = await import("@infrastructure/services/premium/session");
+		mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
+			Effect.succeed({ ...SUCCEEDED_INTENT, metadata: {}, receipt_email: null }) as never,
+		);
+		await runFail(activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "attacker@example.com" }));
+		expect(createSession).not.toHaveBeenCalled();
+	});
+
+	it("accepts when receipt_email matches the provided email", async () => {
+		mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
+			Effect.succeed({ ...SUCCEEDED_INTENT, metadata: {}, receipt_email: "test@example.com" }) as never,
+		);
+		await expect(
+			run(activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" })),
+		).resolves.toBeDefined();
+	});
+
+	it("accepts when metadata email matches the provided email", async () => {
+		await expect(
+			run(activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" })),
+		).resolves.toBeDefined();
+	});
+});
+
+describe("activateWithEmail", () => {
+	it("returns email, premiumKey and token on success", async () => {
+		const { getSucceededPaymentByEmail } = await import("@infrastructure/services/payments/repository");
+		vi.mocked(getSucceededPaymentByEmail).mockReturnValueOnce(
+			Effect.succeed({ id: "pi_found", status: "succeeded" } as never),
+		);
+		const result = await run(activateWithEmail("test@example.com"));
+		expect(result).toMatchObject({ email: "test@example.com", premiumKey: "pi_found", token: "jwt-token" });
+	});
+
+	it("fails with ValidationError when no payment found", async () => {
+		const err = await runFail(activateWithEmail("test@example.com"));
+		expect(err).toBeInstanceOf(ValidationError);
+	});
+
+	it("asks for a succeeded payment rather than filtering one out afterwards", async () => {
+		const { getSucceededPaymentByEmail } = await import("@infrastructure/services/payments/repository");
+		await runFail(activateWithEmail("test@example.com"));
+		expect(getSucceededPaymentByEmail).toHaveBeenCalledWith("test@example.com");
+	});
+
+	it("runs on a layer providing TursoService alone", async () => {
+		const { getSucceededPaymentByEmail } = await import("@infrastructure/services/payments/repository");
+		vi.mocked(getSucceededPaymentByEmail).mockReturnValueOnce(
+			Effect.succeed({ id: "pi_found", status: "succeeded" } as never),
+		);
+		const TursoOnlyLayer = Layer.succeed(TursoService, { query: vi.fn(), execute: vi.fn() });
+		const result = await Effect.runPromise(activateWithEmail("test@example.com").pipe(Effect.provide(TursoOnlyLayer)));
+		expect(result).toMatchObject({ premiumKey: "pi_found", token: "jwt-token" });
+	});
+
+	it("calls createSession with the payment id", async () => {
+		const { getSucceededPaymentByEmail } = await import("@infrastructure/services/payments/repository");
+		const { createSession } = await import("@infrastructure/services/premium/session");
+		vi.mocked(getSucceededPaymentByEmail).mockReturnValueOnce(
+			Effect.succeed({ id: "pi_found", status: "succeeded" } as never),
+		);
+		await run(activateWithEmail("test@example.com"));
+		expect(createSession).toHaveBeenCalledWith(expect.objectContaining({ paymentIntentId: "pi_found" }));
+	});
+});

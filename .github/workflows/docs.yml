@@ -3,23 +3,25 @@ name: Docs
 on:
   pull_request:
     paths:
-      - 'docs/**'
-      - 'src/ui/modules/core/**'
-      - 'src/ui/modules/pages/homepage/sections/**'
-      - 'src/ui/styles/**'
-      - 'src/ui/utils/**'
+      - 'apps/docs/**'
+      - 'apps/web/package.json'
+      - 'apps/web/src/ui/**'
+      - 'apps/web/src/domain/calendar/types.ts'
+      - 'apps/web/src/infrastructure/i18n/locales.ts'
       - 'pnpm-lock.yaml'
       - '.github/workflows/docs.yml'
+      - '.github/actions/prepare-env/**'
   push:
     branches: [main]
     paths:
-      - 'docs/**'
-      - 'src/ui/modules/core/**'
-      - 'src/ui/modules/pages/homepage/sections/**'
-      - 'src/ui/styles/**'
-      - 'src/ui/utils/**'
+      - 'apps/docs/**'
+      - 'apps/web/package.json'
+      - 'apps/web/src/ui/**'
+      - 'apps/web/src/domain/calendar/types.ts'
+      - 'apps/web/src/infrastructure/i18n/locales.ts'
       - 'pnpm-lock.yaml'
       - '.github/workflows/docs.yml'
+      - '.github/actions/prepare-env/**'
   workflow_dispatch:
 
 permissions:
@@ -33,45 +35,43 @@ jobs:
   build:
     name: Build & test
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Setup pnpm
-        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
-      - name: Setup Node.js
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      # Unfiltered: the docs site imports app sources via the @ui alias, whose
-      # bare imports (react-use-measure, motion...) resolve from the ROOT
-      # node_modules — a --filter install would leave them missing.
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Lint
-        run: pnpm --filter forever-pto-docs lint
+      - uses: ./.github/actions/prepare-env
       - name: Typecheck
-        run: pnpm --filter forever-pto-docs check
+        run: pnpm --filter forever-pto-docs typecheck
       - name: Build
         run: pnpm --filter forever-pto-docs build
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
       - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: pnpm --filter forever-pto-docs exec playwright install --with-deps chromium
-      - name: Smoke tests
+      - name: Install Playwright OS dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: pnpm --filter forever-pto-docs exec playwright install-deps chromium
+      - name: Run E2E tests
         run: pnpm --filter forever-pto-docs test:e2e
       - name: Upload Playwright report
         if: ${{ failure() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: docs-playwright-report
-          path: docs/playwright-report/
+          path: apps/docs/playwright-report/
           retention-days: 7
-      - name: Upload site
+      - name: Upload artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: docs-dist
-          path: docs/dist/
+          path: apps/docs/dist/
           retention-days: 1
 
   preview:
@@ -79,50 +79,33 @@ jobs:
     if: github.event_name == 'pull_request'
     needs: [build]
     runs-on: ubuntu-latest
-    environment: development
+    timeout-minutes: 20
+    environment: docs-development
     permissions:
       contents: read
       pull-requests: write
     env:
       PREVIEW_MARKER: '<!-- docs-preview -->'
-      PREVIEW_URL: https://pr-${{ github.event.pull_request.number }}-forever-pto-docs.fbuireu.workers.dev
+      PREVIEW_URL: https://pr-${{ github.event.pull_request.number }}-forever-pto-docs-development.fbuireu.workers.dev
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Download site
+      - name: Download artifact
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: docs-dist
-          path: docs/dist
-      # Probe: versions upload cannot create the Worker, and the production
-      # environment is branch-protected, so before the first main deploy there
-      # is nothing to preview against — skip gracefully instead of failing.
-      - name: Check Worker exists
-        id: worker
-        continue-on-error: true
+          path: apps/docs/dist
+      - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: docs
-          wranglerVersion: '4.107.1'
-          command: versions list
-      - name: Upload preview version
-        if: steps.worker.outcome == 'success'
-        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: docs
-          wranglerVersion: '4.107.1'
-          command: versions upload --preview-alias pr-${{ github.event.pull_request.number }}
-      - name: Bootstrap notice
-        if: steps.worker.outcome != 'success'
-        run: echo "::notice::forever-pto-docs Worker does not exist yet — preview skipped. It is created by the first deploy from main."
+          workingDirectory: apps/docs
+          wranglerVersion: '4.126.0'
+          command: deploy --env development --name pr-${{ github.event.pull_request.number }}-forever-pto-docs-development
       - name: Find existing comment
-        if: steps.worker.outcome == 'success'
         uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4.0.0
         id: find-comment
         with:
@@ -130,7 +113,6 @@ jobs:
           comment-author: github-actions[bot]
           body-includes: ${{ env.PREVIEW_MARKER }}
       - name: Upsert preview comment
-        if: steps.worker.outcome == 'success'
         uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5.0.0
         with:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
@@ -151,24 +133,125 @@ jobs:
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     needs: [build]
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment:
-      name: production
-      url: https://docs.forever-pto.com
+      name: docs-production
+      url: ${{ vars.DOCS_SITE_URL }}
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Download site
+      - name: Download artifact
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: docs-dist
-          path: docs/dist
-      - name: Deploy to Cloudflare
+          path: apps/docs/dist
+      - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: docs
-          wranglerVersion: '4.107.1'
-          command: deploy
+          workingDirectory: apps/docs
+          wranglerVersion: '4.126.0'
+          command: deploy --env production
+
+  smoke:
+    name: Docs production smoke tests
+    needs: [deploy]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BASE_URL: ${{ vars.DOCS_SITE_URL }}
+    steps:
+      - name: Require the production URL
+        run: |
+          if [ -z "$BASE_URL" ]; then
+            echo "The docs production URL is empty, so Playwright would fall back to localhost and pass against it"
+            exit 1
+          fi
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/prepare-env
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm --filter forever-pto-docs exec playwright install --with-deps chromium
+      - name: Install Playwright OS dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: pnpm --filter forever-pto-docs exec playwright install-deps chromium
+      - name: Label the smoke report
+        if: ${{ !cancelled() }}
+        run: |
+          {
+            echo "## Docs production smoke tests"
+            echo
+            echo "Playwright ran the \`@smoke\` case against <$BASE_URL> after deploying \`$GITHUB_SHA\`."
+            echo "The Playwright Run Summary annotation on this run belongs to this job, not to the docs suite the build job runs against a local preview."
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Run smoke tests against production
+        working-directory: apps/docs
+        run: pnpm exec playwright test --grep "@smoke"
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: docs-playwright-smoke-report
+          path: apps/docs/playwright-report/
+          retention-days: 7
+
+  rollback:
+    name: Roll back the docs site
+    needs: [deploy, smoke]
+    if: ${{ always() && needs.deploy.result == 'success' && needs.smoke.result == 'failure' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: docs-production
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      ROLLBACK_MESSAGE: Smoke tests failed on ${{ github.sha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/prepare-env
+      - name: Roll back to the previous version
+        working-directory: apps/docs
+        run: pnpm exec wrangler rollback --env production --yes --message "$ROLLBACK_MESSAGE"
+
+  release-docs:
+    name: Semantic Release (docs)
+    if: github.event_name == 'push'
+    needs: [deploy, smoke]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    concurrency:
+      group: release
+      cancel-in-progress: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT }}
+          persist-credentials: false
+      - uses: ./.github/actions/prepare-env
+      - name: Semantic Release
+        working-directory: apps/docs
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+        run: pnpm exec semantic-release

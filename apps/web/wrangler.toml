@@ -1,0 +1,108 @@
+name = "forever-pto"
+main = ".open-next/worker.js"
+compatibility_date = "2025-11-25"
+compatibility_flags = ["nodejs_compat", "enable_nodejs_process_v2"]
+keep_names = false
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[observability]
+enabled = true
+
+[observability.logs]
+invocation_logs = true
+head_sampling_rate = 0.2
+
+[observability.traces]
+enabled = true
+head_sampling_rate = 0.2
+
+[[tail_consumers]]
+service = "forever-pto-tail"
+
+[placement]
+mode = "smart"
+
+[[r2_buckets]]
+binding = "NEXT_INC_CACHE_R2_BUCKET"
+bucket_name = "forever-pto-next-inc-cache"
+
+[[ratelimits]]
+name = "PAYMENT_RATE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 10, period = 60 }
+
+[vars]
+NEXT_PUBLIC_SITE_URL = "https://forever-pto.com"
+NEXT_PUBLIC_CONTACT_EMAIL = "contact@forever-pto.com"
+
+
+[env.development]
+name = "forever-pto-development"
+
+[[env.development.tail_consumers]]
+service = "forever-pto-tail"
+
+[env.development.observability]
+enabled = true
+
+[env.development.observability.logs]
+invocation_logs = true
+head_sampling_rate = 0.2
+
+[env.development.observability.traces]
+enabled = true
+head_sampling_rate = 0.2
+
+[env.development.vars]
+NEXT_PUBLIC_SITE_URL = "https://forever-pto-development.fbuireu.workers.dev"
+NEXT_PUBLIC_CONTACT_EMAIL = "contact@forever-pto.com"
+NEXTJS_ENV = "development"
+TURSO_DATABASE_URL = "libsql://forever-pto-development-fbuireu.aws-eu-west-1.turso.io"
+
+[[env.development.r2_buckets]]
+binding = "NEXT_INC_CACHE_R2_BUCKET"
+bucket_name = "forever-pto-next-inc-cache-dev"
+
+[[env.development.ratelimits]]
+name = "PAYMENT_RATE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 10, period = 60 }
+
+[env.production]
+name = "forever-pto"
+
+[env.production.observability]
+enabled = true
+
+[env.production.observability.logs]
+invocation_logs = true
+head_sampling_rate = 0.2
+
+[env.production.observability.traces]
+enabled = true
+head_sampling_rate = 0.2
+
+[[env.production.tail_consumers]]
+service = "forever-pto-tail"
+
+[env.production.vars]
+NEXT_PUBLIC_SITE_URL = "https://forever-pto.com"
+NEXT_PUBLIC_CONTACT_EMAIL = "contact@forever-pto.com"
+NEXTJS_ENV = "production"
+TURSO_DATABASE_URL = "libsql://forever-pto-fbuireu.aws-eu-west-1.turso.io"
+
+[[env.production.routes]]
+pattern = "forever-pto.com/*"
+zone_name = "forever-pto.com"
+
+[[env.production.r2_buckets]]
+binding = "NEXT_INC_CACHE_R2_BUCKET"
+bucket_name = "forever-pto-next-inc-cache"
+
+[[env.production.ratelimits]]
+name = "PAYMENT_RATE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 10, period = 60 }

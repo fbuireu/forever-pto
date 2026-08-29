@@ -1,0 +1,9 @@
+name = "forever-pto-tail"
+main = "index.ts"
+compatibility_date = "2025-11-25"
+
+[observability]
+enabled = true
+
+[observability.logs]
+invocation_logs = true

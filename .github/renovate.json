@@ -54,8 +54,14 @@
 			"allowedVersions": "/^[0-9]*[02468]\\./"
 		},
 		{
-			"description": "The repo squash-merges and the PR title becomes the commit on main, so renovate's default fix(deps) on a docs-only dependency cuts an app release for a change the app never saw. Only the commit type changes; the automerge rules above still apply.",
-			"matchFileNames": ["docs/package.json"],
+			"description": "Patched through pnpm patchedDependencies, which is keyed by bare name with no version, so a bump that still applies cleanly but no longer patches what the diff was written against is silent. A human reads the upstream diff.",
+			"matchDepNames": ["boneyard-js"],
+			"automerge": false,
+			"addLabels": ["patched-dependency"]
+		},
+		{
+			"description": "A docs-only dependency bump must not read as an app change. Attribution is by path, so semantic-release already books it against apps/docs, and the commit type keeps the pull request title saying the same thing. Only the type changes; the automerge rules above still apply.",
+			"matchFileNames": ["apps/docs/package.json"],
 			"semanticCommitType": "docs",
 			"addLabels": ["docs"]
 		}

@@ -1,0 +1,44 @@
+---
+title: Glossary
+description: The domain vocabulary used across the app and this wiki.
+sidebar:
+  order: 2
+---
+
+The suggestion-engine terms below are defined in code in `apps/web/src/domain/calendar/types.ts` and explained in depth in `apps/web/src/domain/calendar/CLAUDE.md`.
+
+### PTO Day
+
+One day from the user's annual PTO budget: a unit of budget, not a date on the calendar, until a Suggestion places it (`ptoDays` in the filters store, `apps/web/src/application/stores/filters.ts`). Everything the engine does is about spending this budget as efficiently as possible.
+
+### Bridge
+
+A block of PTO days that connects weekends and public holidays into one contiguous stretch off. A single PTO day on a Monday before a Tuesday holiday "bridges" the weekend to the holiday, yielding four Effective Days for one PTO Day spent. Modeled by the `Bridge` interface: `ptoDaysNeeded`, `effectiveDays`, `efficiency` and the concrete `ptoDays` dates. A Bridge is the unit the planner reasons about; the individual dates inside it are PTO Days, and there is no separate name for them.
+
+### Effective Day
+
+One day of the continuous stretch off a Bridge or Suggestion produces. The total counts PTO days plus the weekends and holidays they absorb. **Efficiency** is `effectiveDays / ptoDaysNeeded`; the engine discards bridges below a minimum efficiency threshold (tunables in `apps/web/src/domain/calendar/const.ts`).
+
+### Strategy
+
+The rule that decides which Bridges make it into a Suggestion when the budget cannot cover them all. Three values, exported as the `FilterStrategy` const object in `apps/web/src/domain/calendar/types.ts`:
+
+- **`grouped`** prefers multi-day blocks, with efficiency as the tiebreaker. Fewer, longer breaks.
+- **`optimized`** prefers the highest-efficiency bridges first. Maximum Effective Days per PTO Day.
+- **`balanced`** is two-pass greedy scoring that prioritizes high-value long bridges, then fills the remaining budget.
+
+### Suggestion
+
+The engine's output for a given budget, calendar and strategy: the set of recommended PTO dates plus the bridges and metrics behind them (`Suggestion` interface, produced by `apps/web/src/domain/calendar/suggestions/generateSuggestions.ts`). Users can hand-edit the suggested days afterwards.
+
+### Alternative
+
+A genuinely distinct plan for the same inputs, produced by `apps/web/src/domain/calendar/alternatives/generateAlternatives.ts` using different bridge-ordering strategies, so the user can compare plans rather than accept a single answer.
+
+### Carry-over Months
+
+Months of the following year included in the planning window (`carryOverMonths` in the filters store). It lets a plan spill unused PTO past the year boundary, for example bridging the winter holidays into January.
+
+### Premium
+
+The tier unlocked by a Donation. Its key is the Stripe PaymentIntent id, surfaced as `premiumKey` (see `apps/web/src/application/use-cases/activatePremium.ts` and the premium store `apps/web/src/application/stores/premium.ts`). The active session itself is carried by the `premium-token` JWT cookie; see [cookies](/reference/cookies/).

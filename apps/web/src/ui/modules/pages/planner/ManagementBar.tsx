@@ -1,0 +1,169 @@
+"use client";
+
+import { useHolidaysStore } from "@application/stores/holidays";
+import type { AlternativeSelectionBaseParams } from "@application/stores/types";
+import { useIsMobile } from "@ui/hooks/useMobile";
+import { useStoresReady } from "@ui/hooks/useStoresReady";
+import { Drawer, DrawerContent, DrawerTitle } from "@ui/modules/core/animate/base/Drawer";
+import { useSidebar } from "@ui/modules/core/animate/base/Sidebar";
+import { TUTORIAL_ANCHOR, TUTORIAL_EVENT } from "@ui/modules/tutorial/anchors";
+import { Skeleton } from "boneyard-js/react";
+import { useTranslations } from "next-intl";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useShallow } from "zustand/react/shallow";
+import { LegendItems } from "./Legend";
+import { PlannerPanel } from "./PlannerPanel";
+import { PlannerPanelFixture } from "./PlannerPanelFixture";
+
+export const DRAWER_SNAP = {
+	COLLAPSED: 0.15,
+	EXPANDED: 0.85,
+} as const;
+
+export const ManagementBar = () => {
+	const t = useTranslations("toasts");
+	const tAlt = useTranslations("alternativesManager");
+	const tPlanner = useTranslations("planner");
+	const tA11y = useTranslations("a11y");
+	const { areStoresReady } = useStoresReady();
+	const isMobile = useIsMobile();
+	const { openMobile } = useSidebar();
+	const [snap, setSnap] = useState<number | string | null>(DRAWER_SNAP.COLLAPSED);
+	const {
+		alternatives,
+		suggestion,
+		currentSelection,
+		setPreviewAlternativeSelection,
+		setCurrentAlternativeSelection,
+		previewAlternativeIndex,
+		currentSelectionIndex,
+		isCalculating,
+		hasCalculated,
+	} = useHolidaysStore(
+		useShallow((state) => ({
+			alternatives: state.alternatives,
+			suggestion: state.suggestion,
+			currentSelection: state.currentSelection,
+			setPreviewAlternativeSelection: state.setPreviewAlternativeSelection,
+			setCurrentAlternativeSelection: state.setCurrentAlternativeSelection,
+			previewAlternativeIndex: state.previewAlternativeIndex,
+			isCalculating: state.isCalculating,
+			hasCalculated: state.hasCalculated,
+			currentSelectionIndex: state.currentSelectionIndex,
+		})),
+	);
+
+	useEffect(() => {
+		const expand = () => setSnap(DRAWER_SNAP.EXPANDED);
+		const collapse = () => setSnap(DRAWER_SNAP.COLLAPSED);
+		window.addEventListener(TUTORIAL_EVENT.EXPAND_DRAWER, expand);
+		window.addEventListener(TUTORIAL_EVENT.COLLAPSE_DRAWER, collapse);
+		return () => {
+			window.removeEventListener(TUTORIAL_EVENT.EXPAND_DRAWER, expand);
+			window.removeEventListener(TUTORIAL_EVENT.COLLAPSE_DRAWER, collapse);
+		};
+	}, []);
+
+	const handlePreviewChange = useCallback(
+		(index: number) => {
+			setPreviewAlternativeSelection({ index });
+		},
+		[setPreviewAlternativeSelection],
+	);
+
+	const handleSelectionChange = useCallback(
+		(params: AlternativeSelectionBaseParams) => {
+			setCurrentAlternativeSelection(params);
+			toast.success(t("suggestionApplied"));
+			setSnap(DRAWER_SNAP.COLLAPSED);
+		},
+		[setCurrentAlternativeSelection, t],
+	);
+
+	const baseSuggestions = [suggestion, ...alternatives].filter(
+		(suggestion): suggestion is NonNullable<typeof suggestion> => !!suggestion,
+	);
+
+	const allSuggestions = baseSuggestions.map((sug, index) =>
+		index === currentSelectionIndex && currentSelection ? currentSelection : sug,
+	);
+
+	const hasValidSuggestions = allSuggestions.length > 0 && allSuggestions[0].days && allSuggestions[0].days.length > 0;
+	const hasValidCurrentSelection = currentSelection?.days && currentSelection.days.length > 0;
+
+	const isReady = areStoresReady && hasValidSuggestions && hasValidCurrentSelection;
+	const isSettledEmpty = areStoresReady && hasCalculated && !isCalculating && !isReady;
+
+	const plannerPanelProps = {
+		currentSelectionIndex,
+		allSuggestions,
+		onSelectionChange: handleSelectionChange,
+		onPreviewChange: handlePreviewChange,
+		selectedIndex: previewAlternativeIndex,
+	};
+
+	const previewSuggestion = allSuggestions[previewAlternativeIndex] ?? allSuggestions[0];
+	const effectiveDays = previewSuggestion?.metrics.totalEffectiveDays ?? 0;
+	const efficiency = previewSuggestion?.metrics.averageEfficiency ?? 0;
+
+	return (
+		<div className="col-span-full sticky top-3 z-10">
+			<span role="status" className="sr-only">
+				{isSettledEmpty ? tA11y("noPlan") : ""}
+			</span>
+			{!isMobile && !isSettledEmpty && (
+				<Skeleton
+					name="planner-panel"
+					loading={!isReady}
+					fixture={<PlannerPanelFixture />}
+					fallback={<PlannerPanelFixture />}
+				>
+					{isReady && currentSelection && <PlannerPanel key={previewAlternativeIndex} {...plannerPanelProps} />}
+				</Skeleton>
+			)}
+
+			{isMobile && !isSettledEmpty && (
+				<Drawer
+					snapPoints={[DRAWER_SNAP.COLLAPSED, DRAWER_SNAP.EXPANDED]}
+					activeSnapPoint={snap}
+					setActiveSnapPoint={setSnap}
+					modal={false}
+					open={!openMobile}
+					dismissible={false}
+				>
+					<DrawerContent overlay={false} role="region" className="h-[100dvh] max-h-none">
+						<DrawerTitle>{tPlanner("heading")}</DrawerTitle>
+						<div data-tutorial={TUTORIAL_ANCHOR.PLANNER_DRAWER} className="px-4 pt-2 pb-3 shrink-0">
+							{isReady ? (
+								<div className="flex items-center justify-between gap-2 flex-wrap">
+									<span className="text-sm font-black shrink-0">
+										{tAlt("option")} {previewAlternativeIndex + 1}
+										<span className="font-normal text-muted-foreground"> / {allSuggestions.length}</span>
+									</span>
+									<div className="flex items-center gap-2 shrink-0">
+										<span className="font-mono text-sm font-semibold text-green-600 dark:text-green-400">
+											{effectiveDays} {tAlt("daysUnit")}
+										</span>
+										<span className="font-mono text-sm font-semibold text-purple-600 dark:text-purple-400">
+											{efficiency.toFixed(1)}x
+										</span>
+									</div>
+								</div>
+							) : (
+								<div className="h-8 animate-pulse rounded-[8px] bg-[var(--surface-panel-soft)]" />
+							)}
+						</div>
+
+						<div className="border-t-[2px] border-[var(--frame)]/15 mx-4 shrink-0" />
+						<div data-vaul-no-drag className="flex-1 overflow-y-auto px-3 pt-3 pb-6 select-text">
+							{isReady && currentSelection && <PlannerPanel key={previewAlternativeIndex} {...plannerPanelProps} />}
+							<div className="border-t-[2px] border-[var(--frame)]/15 my-4" />
+							<LegendItems />
+						</div>
+					</DrawerContent>
+				</Drawer>
+			)}
+		</div>
+	);
+};

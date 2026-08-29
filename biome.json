@@ -1,7 +1,7 @@
 {
 	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
 	"files": {
-		"includes": ["**", "!next-env.d.ts", "!docs/src/styles", "!used.json"]
+		"includes": ["**", "!apps/web/next-env.d.ts", "!apps/docs/src/styles"]
 	},
 	"vcs": {
 		"enabled": true,
@@ -27,7 +27,7 @@
 		}
 	},
 	"linter": {
-		"includes": ["**", "!**/*.d.ts*"],
+		"includes": ["**", "!**/*.d.ts*", "!**/*.astro"],
 		"rules": {
 			"preset": "recommended",
 			"complexity": {
@@ -40,7 +40,7 @@
 	},
 	"overrides": [
 		{
-			"includes": ["**/src/infrastructure/clients/logging/better-stack/client.ts"],
+			"includes": ["**/apps/web/src/infrastructure/clients/logging/better-stack/client.ts"],
 			"linter": {
 				"rules": {
 					"suspicious": {
