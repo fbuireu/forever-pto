@@ -106,7 +106,7 @@ its paths fall under, so a docs change never cuts an app release and vice versa.
 | Package | Tags | Writes | Runs in |
 | --- | --- | --- | --- |
 | `apps/web` | `web-vX.Y.Z` | [`apps/web/package.json`](./apps/web/package.json), [`apps/web/CHANGELOG.md`](./apps/web/CHANGELOG.md), a GitHub release | [`ci.yml`](./.github/workflows/ci.yml), after the production deploy |
-| `apps/docs` | `docs-vX.Y.Z` | a tag and a GitHub release, nothing else | [`docs.yml`](./.github/workflows/docs.yml), after the docs deploy |
+| `apps/docs` | `docs-vX.Y.Z` | a tag and a GitHub release, nothing else | [`docs.yml`](./.github/workflows/docs.yml), after the docs deploy and its smoke run |
 
 `apps/docs` has no changelog, npm or git plugin on purpose: it pushes nothing to `main`, which is what keeps
 the two release jobs from racing each other. Its package version stays `0.0.0` forever and nothing reads it:
@@ -143,7 +143,7 @@ builds from), but it means "the repo root" is not the boundary; the regex is.
 **`ci.yml` holds the whole app graph**: `changes`, then `lint`, `typecheck` and `test` in parallel, then
 `deploy-production` → `release-web` → `docs-refresh` and `deploy-production` → `smoke` on `main`, or
 `deploy-development` → `comment` / `e2e` on a PR. Both deploy jobs call the shared [`_deploy-web.yml`](./.github/workflows/_deploy-web.yml). `docs.yml` holds the docs graph: `build`, then
-`preview` on a PR or `deploy` → `release-docs` on `main`. The rest are [`cleanup-development.yml`](./.github/workflows/cleanup-development.yml),
+`preview` on a PR or `deploy` → `smoke` → `release-docs` on `main`, with `rollback` when that smoke run fails. The rest are [`cleanup-development.yml`](./.github/workflows/cleanup-development.yml),
 [`renovate-auto-approve.yml`](./.github/workflows/renovate-auto-approve.yml) (the auto-merge, whose file is
 named for approving rather than merging), a [`zizmor.yml`](./.github/workflows/zizmor.yml) audit,
 [`dependency-review.yml`](./.github/workflows/dependency-review.yml), [`commit-message.yml`](./.github/workflows/commit-message.yml), and
@@ -280,6 +280,17 @@ without, which also means it is the one part of this that waits on the four-envi
 worth stating: a smoke case that fails for a reason outside the Worker now reverts a good deploy, so a case whose
 result depends on the caller's address does not belong in this set. Both sibling repositories have lost one to
 exactly that.
+
+**The docs site has the same pair, and it needed a Playwright config that can leave localhost.**
+`docs.yml`'s `smoke` job runs the one `@smoke` case in [`apps/docs/e2e/smoke.spec.ts`](./apps/docs/e2e/smoke.spec.ts)
+against `https://docs.forever-pto.com` after the deploy, `release-docs` needs it so a `docs-v*` tag means the site
+is answering, and `rollback` reverts the Worker when the deploy succeeded and that case failed. One case is enough
+there and five would not be better: the site is static assets, so a homepage that returns 200 with a title and a
+`<main>` is the whole of what a deploy can get wrong. [`apps/docs/playwright.config.ts`](./apps/docs/playwright.config.ts)
+took `BASE_URL` for this: it hardcoded `http://localhost:4321`, always started a `webServer`, and threw at import
+time when `apps/docs/dist` was missing, which is right for the suite the `build` job runs against a local preview
+and impossible for one that talks to a deployed site. With `BASE_URL` set it skips the `dist` guard and the
+`webServer` both.
 
 **`cross-package-notice` is advisory, not a gate.** A pull request touching both packages lands in both
 changelogs, because attribution is by path and `main` takes squash merges. Sometimes that is what you

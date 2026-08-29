@@ -156,10 +156,77 @@ jobs:
           wranglerVersion: '4.121.0'
           command: deploy --env production
 
+  smoke:
+    name: Docs production smoke tests
+    needs: [deploy]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BASE_URL: https://docs.forever-pto.com
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/prepare-env
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm --filter forever-pto-docs exec playwright install --with-deps chromium
+      - name: Install Playwright OS dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: pnpm --filter forever-pto-docs exec playwright install-deps chromium
+      - name: Label the smoke report
+        if: ${{ !cancelled() }}
+        run: |
+          {
+            echo "## Docs production smoke tests"
+            echo
+            echo "Playwright ran the \`@smoke\` case against <$BASE_URL> after deploying \`$GITHUB_SHA\`."
+            echo "The Playwright Run Summary annotation on this run belongs to this job, not to the docs suite the build job runs against a local preview."
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Run smoke tests against production
+        working-directory: apps/docs
+        run: pnpm exec playwright test --grep "@smoke"
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: docs-playwright-smoke-report
+          path: apps/docs/playwright-report/
+          retention-days: 7
+
+  rollback:
+    name: Roll back the docs site
+    needs: [deploy, smoke]
+    if: ${{ always() && needs.deploy.result == 'success' && needs.smoke.result == 'failure' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: docs-production
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      ROLLBACK_MESSAGE: Smoke tests failed on ${{ github.sha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/prepare-env
+      - name: Roll back to the previous version
+        working-directory: apps/docs
+        run: pnpm exec wrangler rollback --env production --yes --message "$ROLLBACK_MESSAGE"
+
   release-docs:
     name: Semantic Release (docs)
     if: github.event_name == 'push'
-    needs: [deploy]
+    needs: [deploy, smoke]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:

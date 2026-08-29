@@ -38,7 +38,7 @@ Each package releases itself. [semantic-release](https://semantic-release.gitboo
                              shows the new app version
 ```
 
-1. **A release means the version is live.** `release-web` `needs: deploy-production`, so nothing is tagged until the deploy has succeeded. `release-docs` sits behind the docs deploy for the same reason. Both share the concurrency group `release` with `cancel-in-progress: false`, so they queue instead of racing.
+1. **A release means the version is live.** `release-web` `needs: deploy-production`, so nothing is tagged until the deploy has succeeded. `release-docs` sits behind the docs deploy and its smoke run for the same reason. Both share the concurrency group `release` with `cancel-in-progress: false`, so they queue instead of racing.
 2. **Attribution is by path.** `fix:` → patch, `feat:` → minor, `BREAKING CHANGE` → major; `docs:`, `chore:`, `ci:` and friends produce no release. But the type only decides *how big* the bump is; *which* package it lands in is decided by the files the commit touched.
 3. **`apps/web` runs the full plugin chain**: release notes → `CHANGELOG.md` → version bump in `package.json` (`@semantic-release/npm` with `npmPublish: false`; the package is private, only the version field matters) → a git commit of `package.json` and `CHANGELOG.md` → a GitHub Release. The lockfile is not in the asset list: it lives two levels above the package and nothing in this chain dirties it.
 4. **`apps/docs` runs commit-analyzer, release notes and GitHub only.** No changelog, no npm, no git plugin: it pushes nothing to `main`, which is what keeps the two release jobs from competing for the branch. Its own version stays `0.0.0` and nothing reads it: the site displays the **app's** version.
