@@ -127,6 +127,14 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         working-directory: apps/web
         run: pnpm exec playwright install-deps chromium
+      - name: Require the production URL
+        env:
+          BASE_URL: https://forever-pto.com
+        run: |
+          if [ -z "$BASE_URL" ]; then
+            echo "The production URL is empty, so Playwright would fall back to localhost and pass against it"
+            exit 1
+          fi
       - name: Label the smoke report
         if: ${{ !cancelled() }}
         env:

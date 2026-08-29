@@ -165,6 +165,12 @@ jobs:
     env:
       BASE_URL: https://docs.forever-pto.com
     steps:
+      - name: Require the production URL
+        run: |
+          if [ -z "$BASE_URL" ]; then
+            echo "The docs production URL is empty, so Playwright would fall back to localhost and pass against it"
+            exit 1
+          fi
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
