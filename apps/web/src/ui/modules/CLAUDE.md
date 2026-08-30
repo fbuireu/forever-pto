@@ -211,6 +211,16 @@ gate), so a component reached only through `e2e/` is proven to *mount inside a p
 nothing more. Reading "covered by e2e" as "its behaviour is asserted somewhere" is how a defect in an
 untested component survives a green suite. If a component has behaviour, it needs a co-located test.
 
+**A motion value read straight after the event that changed it reads the old number, and against a baseline
+of nought that passes vacuously.** `useTransform` does not recompute when its source is set; motion
+propagates on its own frame loop, so `raw.set(1)` followed by `mapped.get()` in the same tick answers whatever
+`mapped` held before. [`pages/homepage/sections/CtaShapesClient.test.tsx`](./pages/homepage/sections/CtaShapesClient.test.tsx)
+is the case that needs this: the parallax it asserts rests at nought, so every reading agreed with the
+expectation until the frame was flushed and the real offsets appeared. Await a frame (`act` around a short
+`setTimeout`) between the event and the read, and assert the moved state before asserting the return to
+centre, or the reset case cannot fail. Subscribing to the value does not substitute for the flush; verified
+by trying it.
+
 When a component is mocked in a sibling's test, mock the module path it actually imports:
 [`premium/CheckoutForm.test.tsx`](./premium/CheckoutForm.test.tsx) mocks both `boneyard-js/react` and `./ExpressCheckoutFixture`, because
 leaving either real drags the Stripe element tree into the test.
