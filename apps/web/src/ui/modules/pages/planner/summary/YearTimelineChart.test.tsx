@@ -84,3 +84,91 @@ describe("YearTimelineChart", () => {
 		expect(leftPercents(container).at(0)).toBe(0);
 	});
 });
+
+const day = (month: number, date: number) => new Date(YEAR, month, date);
+
+const rowLabels = (container: HTMLElement) =>
+	[...container.querySelectorAll<HTMLElement>(".w-\\[70px\\]")]
+		.map((node) => node.textContent ?? "")
+		.filter((text) => text !== "");
+
+const rowFor = (container: HTMLElement, label: string) => {
+	const cell = [...container.querySelectorAll<HTMLElement>(".w-\\[70px\\]")].find((node) => node.textContent === label);
+	return cell?.nextElementSibling as HTMLElement;
+};
+
+const segmentCount = (container: HTMLElement, label: string) =>
+	rowFor(container, label).querySelectorAll('[style*="left"]').length;
+
+const suggestionOf = (days: Date[], bridges: { startDate: Date; endDate: Date }[] = []) => ({ days, bridges }) as never;
+
+describe("YearTimelineChart rows", () => {
+	it("shows only the rows it has something to draw on", () => {
+		const { container } = renderChart({ holidays: [makeHoliday({ date: day(0, 1) })] });
+
+		expect(rowLabels(container)).toStrictEqual([enMessages.summary.yearTimeline.rows.national]);
+	});
+
+	it("keeps each Holiday Variant on its own row", () => {
+		const { container } = renderChart({
+			holidays: [
+				makeHoliday({ date: day(0, 1) }),
+				makeHoliday({ date: day(1, 1), variant: HolidayVariant.REGIONAL }),
+				makeHoliday({ date: day(2, 1), variant: HolidayVariant.CUSTOM }),
+			],
+		});
+
+		expect(rowLabels(container)).toStrictEqual([
+			enMessages.summary.yearTimeline.rows.national,
+			enMessages.summary.yearTimeline.rows.regional,
+			enMessages.summary.yearTimeline.rows.custom,
+		]);
+	});
+
+	it("draws a Bridge as the stretch it spans, not as its two ends", () => {
+		const { container } = renderChart({
+			suggestion: suggestionOf([], [{ startDate: day(5, 1), endDate: day(5, 7) }]),
+		});
+
+		expect(segmentCount(container, enMessages.summary.yearTimeline.rows.bridges)).toBe(1);
+	});
+
+	it("draws each hand-picked day on its own", () => {
+		const { container } = renderChart({ manuallySelectedDays: [day(5, 1), day(8, 12)] });
+
+		expect(segmentCount(container, enMessages.summary.yearTimeline.rows.manual)).toBe(2);
+	});
+});
+
+describe("the PTO Days the chart groups into stretches", () => {
+	const ptoSegments = (days: Date[]) => {
+		const { container } = renderChart({ suggestion: suggestionOf(days) });
+		return segmentCount(container, enMessages.summary.yearTimeline.rows.pto);
+	};
+
+	it("draws consecutive days as one stretch rather than as a row of dots", () => {
+		expect(ptoSegments([day(5, 1), day(5, 2), day(5, 3)])).toBe(1);
+	});
+
+	it("bridges a weekend-sized gap, which is what makes a stretch read as time off", () => {
+		expect(ptoSegments([day(5, 5), day(5, 8)])).toBe(1);
+	});
+
+	it("splits once the gap is wider than that", () => {
+		expect(ptoSegments([day(5, 1), day(5, 9)])).toBe(2);
+	});
+
+	it("groups days handed to it out of order", () => {
+		expect(ptoSegments([day(5, 3), day(5, 1), day(5, 2)])).toBe(1);
+	});
+
+	it("draws a single day as a stretch of one", () => {
+		expect(ptoSegments([day(5, 1)])).toBe(1);
+	});
+
+	it("draws no row at all when the plan placed nothing", () => {
+		const { container } = renderChart({ suggestion: suggestionOf([]) });
+
+		expect(rowLabels(container)).toStrictEqual([]);
+	});
+});
