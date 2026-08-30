@@ -402,7 +402,9 @@ Worker posting to a dead endpoint. `deploy-tail` was already reading
 Worker; the deploy step now passes `--var BETTER_STACK_INGESTING_URL:<host>` the way `_deploy-web.yml`
 overrides `NEXT_PUBLIC_SITE_URL`, and fails loudly when the variable is unset. A hand-run
 `wrangler deploy` from `workers/tail/` therefore leaves the host unbound, which the handler reports rather
-than swallowing; pass the same `--var` when you deploy it by hand.
+than swallowing; pass the same `--var` when you deploy it by hand. Rotating either variable requires no
+hand-run at all: `ci.yml` answers `workflow_dispatch`, and a manual dispatch on `main` runs `deploy-tail`
+with the current values.
 
 Every path in `wrangler.toml` is relative to the file itself, so the deploy runs with this package as the
 working directory. Build config lives in `next.config.ts` and [`open-next.config.ts`](./open-next.config.ts).

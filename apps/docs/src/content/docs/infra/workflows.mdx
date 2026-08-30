@@ -44,6 +44,8 @@ A `workflow_call` workflow shared by both deploy entry points. Inputs: `environm
 
 `deploy-development` calls `_deploy-web.yml` with the `pr-<n>-forever-pto-development` name override, then `comment` upserts a sticky preview-URL comment keyed on a hidden HTML marker and `e2e` runs Playwright chromium against the live preview through a Cloudflare Access service token, uploading its report as an artifact. The workflow's concurrency group cancels in progress on a `pull_request` event only, so rapid pushes deploy just the latest commit while a `main` run is never killed halfway. The full lifecycle is on the [environments](/infra/environments/) page.
 
+`ci.yml` also answers `workflow_dispatch`: a manual dispatch on `main` runs `deploy-tail` unconditionally, which is how the tail Worker picks up a rotated BetterStack token or host — those are read at deploy time, so rotating the variables changes no file and matches no path filter. The push-triggered jobs keep their gates.
+
 `deploy-production` calls the same reusable workflow with `environment: web-production`, `wrangler_env: production` and `url: https://forever-pto.com`, and no `worker_name` override, so it updates the `forever-pto` Worker in place. It `needs: [changes, check]`, so a red `main` does not ship and a docs-only commit does not redeploy. See [release](/infra/release/).
 
 ## `cleanup-development.yml`: Cleanup - Development
