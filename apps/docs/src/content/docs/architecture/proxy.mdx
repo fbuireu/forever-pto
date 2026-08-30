@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-`apps/web/src/proxy.ts` is the single per-request entry point. Next 16 renamed middleware to proxy, and the file followed; this page keeps its old address so links to it stay alive. It runs a short, strictly ordered chain and returns as early as it can. Each step delegates to a focused helper; the proxy file itself is orchestration only.
+`apps/web/src/proxy.ts` is the single per-request entry point: what Next called middleware until 16, running on the Node.js runtime under its new name. The old `/architecture/middleware/` address redirects here. It runs a short, strictly ordered chain and returns as early as it can. Each step delegates to a focused helper; the proxy file itself is orchestration only.
 
 ## The matcher
 

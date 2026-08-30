@@ -20,6 +20,9 @@ if (!uiTarget) {
 
 export default defineConfig({
 	site: "https://docs.forever-pto.com",
+	redirects: {
+		"/architecture/middleware/": "/architecture/proxy/",
+	},
 	integrations: [
 		starlight({
 			title: "Forever PTO",

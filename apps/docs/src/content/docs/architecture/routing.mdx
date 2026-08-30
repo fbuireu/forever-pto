@@ -34,7 +34,7 @@ src/app/
 ## Route groups
 
 - **`(marketing)`** holds the public homepage (`apps/web/src/app/[locale]/(marketing)/page.tsx`, composed from sections in `apps/web/src/ui/modules/pages/homepage/sections/`) and the four legal pages, each with a colocated `metadata.ts`. The group has its own `layout.tsx` and `error.tsx`.
-- **`(app)`** holds the product itself. `planner/page.tsx` renders the planner; `planner/layout.tsx` wraps it in the sidebar shell (`SidebarProvider`, `AppSidebar`, store initialisation, premium modal, donate widget, footer). `payment/confirmation/page.tsx` reads the `payment_intent` search param and shows the Stripe payment result; requests without that param never reach it, because the [proxy](/architecture/middleware/) redirects them home.
+- **`(app)`** holds the product itself. `planner/page.tsx` renders the planner; `planner/layout.tsx` wraps it in the sidebar shell (`SidebarProvider`, `AppSidebar`, store initialisation, premium modal, donate widget, footer). `payment/confirmation/page.tsx` reads the `payment_intent` search param and shows the Stripe payment result; requests without that param never reach it, because the [proxy](/architecture/proxy/) redirects them home.
 
 Route groups affect layouts only, not URLs: `/planner` and `/payment/confirmation` have no group segment in the path.
 

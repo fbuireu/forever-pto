@@ -52,7 +52,7 @@ At runtime this is backed by the R2 bucket bound as `NEXT_INC_CACHE_R2_BUCKET` i
 
 ## HTTP-level caches
 
-- **Markdown renditions**: the [proxy](/architecture/middleware/) sets a one-hour public `Cache-Control` header on `/api/markdown` responses and on the `Accept: text/markdown` rewrites that target it.
+- **Markdown renditions**: the [proxy](/architecture/proxy/) sets a one-hour public `Cache-Control` header on `/api/markdown` responses and on the `Accept: text/markdown` rewrites that target it.
 
 ## What is deliberately not cached
 
