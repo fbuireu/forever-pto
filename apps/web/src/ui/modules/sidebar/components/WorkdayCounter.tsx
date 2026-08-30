@@ -5,6 +5,7 @@ import { useHolidaysStore } from "@application/stores/holidays";
 import { SlidingNumber } from "@ui/modules/core/animate/text/SlidingNumber";
 import { Button } from "@ui/modules/core/primitives/Button";
 import type { FromTo } from "@ui/modules/pages/planner/calendar/Calendar";
+import { isFromToObject } from "@ui/modules/pages/planner/calendar/utils/helpers";
 import {
 	calculateHolidaysInRange,
 	calculateWeekends,
@@ -34,14 +35,17 @@ export const WorkdayCounter = () => {
 	);
 
 	const handleRangeSelect = (date: Date | Date[] | FromTo | undefined) => {
-		if (date && typeof date === "object" && "from" in date && "to" in date) {
-			setSelectedRange(date);
-			if (date.from && date.to) {
-				setIsCalendarOpen(false);
-			}
-		} else if (!date) {
+		if (!date) {
 			setSelectedRange(undefined);
+			return;
 		}
+
+		if (!isFromToObject(date)) {
+			return;
+		}
+
+		setSelectedRange(date);
+		setIsCalendarOpen(false);
 	};
 
 	const clearSelection = () => {

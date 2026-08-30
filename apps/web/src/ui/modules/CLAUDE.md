@@ -340,6 +340,20 @@ which is `0`; React wrote that `0` straight back into the box and re-applied it 
 placeholder could never return. Hold a text field as a string and parse at the point of use; the numeric
 state is derived, not stored.
 
+**`"to" in date` is true for a `to` that is present and undefined, which is exactly what a range picker
+emits mid-selection.** `sidebar/components/WorkdayCounter.tsx` guarded its `onSelect` with
+`"from" in date && "to" in date`, narrowing to `FromTo` a value whose `to` was `undefined`, stored it, and
+then ran `calculateWorkdays`, `differenceInDays`, `calculateWeekends` and `calculateHolidaysInRange` against
+it on the very next render: `Temporal.PlainDate.from({ year: undefined, … })` throws, so clicking the first
+date of a range crashed the counter. The component already half-knew, because the line below it tested
+`date.from && date.to` before closing the calendar; the guard declined to close and stored the range anyway.
+It uses [`isFromToObject`](./pages/planner/calendar/utils/helpers.ts) now, which is the predicate `Calendar`
+itself narrows with and checks both ends are really `Date`s, so the incomplete value is simply ignored and
+the close becomes unconditional. Nothing is lost by dropping it: `Calendar` holds its own `rangeSelection`
+while a range is being picked and paints the first end from that, never from the `selected` prop.
+An `in` check is a test for a **key**, not for a value; where the value is what you are about to use, narrow
+on the value.
+
 [`core/animate/primitives/`](./core/animate/primitives) is a second, lower layer under `core/animate/`: the unstyled wrappers over
 `@base-ui/react` that `core/animate/base/*` builds on. [`MotionSlot.tsx`](./core/animate/primitives/animate/MotionSlot.tsx) there is the shared `asChild`
 mechanism used by [`core/animate/effects/AutoHeight.tsx`](./core/animate/effects/AutoHeight.tsx) and [`core/animate/icons/Icon.tsx`](./core/animate/icons/Icon.tsx).
