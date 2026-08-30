@@ -84,6 +84,13 @@ boundary. `/payment/confirmation?payment_intent=<unknown>` is not one: `confirma
 [`src/infrastructure/services/payments/confirmation.ts`](./src/infrastructure/services/payments/confirmation.ts) types its error channel `never` and returns `null`, so the
 page renders its own failure card.
 
+What the boundary *does* once something reaches it is pinned by
+[`src/ui/modules/pages/error/ErrorContent.test.tsx`](./src/ui/modules/pages/error/ErrorContent.test.tsx), which is a unit
+test rather than a substitute for the e2e case above: it renders the component directly, so it can assert the
+report that goes out (the log call carrying the digest, and the running version in the kicker) and the terminal
+that types the failure out a line at a time, including the error's own message and stack. Finding a URL that
+provokes a real boundary is still open.
+
 Env: copy [`.env.example`](./.env.example). Local Worker secrets go in `.dev.vars`. The typed surface the build uses is
 [`environment.d.ts`](./environment.d.ts) and nothing else; it hand-declares both `ProcessEnv` and the global `CloudflareEnv` the
 Cloudflare context is read through, and it is tracked.
