@@ -56,13 +56,44 @@ vi.mock("@ui/modules/core/animate/icons/Icon", () => ({
 	AnimateIcon: ({ children }: { children: ReactNode }) => children,
 	IconWrapper: () => null,
 }));
+interface ModalMockProps {
+	open?: boolean;
+	onClose?: () => void;
+	holiday?: { name: string };
+	holidays?: { name: string }[];
+}
+
 vi.mock("next/dynamic", () => ({
-	default: () => (props: { open?: boolean; holiday?: { name: string }; holidays?: { name: string }[] }) => {
+	default: () => (props: ModalMockProps) => {
 		if (props.holidays) {
-			return <div data-testid="delete-modal" data-names={props.holidays.map((h) => h.name).join(",")} />;
+			return (
+				<div
+					data-testid="delete-modal"
+					data-names={props.holidays.map((h) => h.name).join(",")}
+					data-open={String(props.open)}
+				>
+					<button type="button" onClick={props.onClose}>
+						close delete
+					</button>
+				</div>
+			);
 		}
-		if (props.holiday) return <div data-testid="edit-modal" data-name={props.holiday.name} />;
-		return null;
+		if (props.holiday) {
+			return (
+				<div data-testid="edit-modal" data-name={props.holiday.name} data-open={String(props.open)}>
+					<button type="button" onClick={props.onClose}>
+						close edit
+					</button>
+				</div>
+			);
+		}
+		return (
+			<div data-testid="add-modal" data-open={String(props.open)}>
+				<button type="button" onClick={props.onClose}>
+					close add
+				</button>
+			</div>
+		);
 	},
 }));
 
@@ -270,5 +301,97 @@ describe("HolidaysTable clears the selection when a modal is done with it", () =
 
 		expect(names(view)).toBe("");
 		expect(desktopRow(view, "Alpha").checked).toBe(false);
+	});
+});
+
+const renderCustomTable = () => {
+	holidaysState.holidays = [
+		{ ...holiday({ id: "custom-1", name: "Shutdown", date: new Date(2026, 0, 2) }), variant: HolidayVariant.CUSTOM },
+	];
+	const view = render(
+		<NextIntlClientProvider locale="en" messages={enMessages}>
+			<HolidaysTable title="Custom holidays" variant={HolidayVariant.CUSTOM} open />
+		</NextIntlClientProvider>,
+	);
+	fireEvent.click(view.getByTestId("trigger"));
+	return view;
+};
+
+const press = (view: View, name: RegExp) => fireEvent.click(view.getByRole("button", { name }));
+
+const ADD = new RegExp(enMessages.holidaysTable.addHoliday);
+const EDIT = new RegExp(enMessages.holidaysTable.editHoliday);
+const DELETE_TWO = /Delete \(2\)/;
+
+describe("HolidaysTable toolbar", () => {
+	it("offers to add one on the tab that owns Custom Holidays", () => {
+		expect(renderCustomTable().getByRole("button", { name: ADD })).toBeTruthy();
+	});
+
+	it("offers no add button on a tab whose Holidays come from the country", () => {
+		expect(renderTable().queryByRole("button", { name: ADD })).toBeNull();
+	});
+
+	it("offers to edit exactly one Holiday, never a pair", () => {
+		const view = renderTable();
+		expect(view.queryByRole("button", { name: EDIT })).toBeNull();
+
+		fireEvent.click(desktopRow(view, "Alpha"));
+		expect(view.getByRole("button", { name: EDIT })).toBeTruthy();
+
+		fireEvent.click(desktopRow(view, "Beta"));
+		expect(view.queryByRole("button", { name: EDIT })).toBeNull();
+	});
+});
+
+describe("HolidaysTable modals", () => {
+	it("opens the add form and clears the selection when it closes", () => {
+		const view = renderCustomTable();
+		fireEvent.click(desktopRow(view, "Shutdown"));
+
+		press(view, ADD);
+		expect(view.getByTestId("add-modal").dataset.open).toBe("true");
+
+		fireEvent.click(view.getByRole("button", { name: "close add" }));
+
+		expect(view.getByTestId("add-modal").dataset.open).toBe("false");
+		expect(names(view)).toBe("");
+	});
+
+	it("opens the edit form on the Holiday that is selected, and clears it on close", () => {
+		const view = renderTable();
+		fireEvent.click(desktopRow(view, "Beta"));
+
+		press(view, EDIT);
+		expect(view.getByTestId("edit-modal").dataset.name).toBe("Beta");
+
+		fireEvent.click(view.getByRole("button", { name: "close edit" }));
+
+		expect(names(view)).toBe("");
+	});
+
+	it("clears the selection when the delete form closes, so the count cannot outlive it", () => {
+		const view = renderTable();
+		fireEvent.click(desktopRow(view, "Alpha"));
+		fireEvent.click(desktopRow(view, "Beta"));
+
+		press(view, DELETE_TWO);
+		expect(view.getByTestId("delete-modal").dataset.open).toBe("true");
+
+		fireEvent.click(view.getByRole("button", { name: "close delete" }));
+
+		expect(names(view)).toBe("");
+		expect(view.getByTestId("delete-modal").dataset.open).toBe("false");
+	});
+});
+
+describe("HolidaysTable with nothing to show", () => {
+	it("says so, and offers a select-all that selects nothing", () => {
+		const view = renderTable();
+
+		search(view, "no such holiday");
+
+		expect(selectAllBoxes(view, enMessages.holidaysTable.selectAll)[0]?.checked).toBe(false);
+		expect(view.getAllByText(enMessages.holidaysTable.noHolidaysFound).length).toBeGreaterThan(0);
 	});
 });
