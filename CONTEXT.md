@@ -110,8 +110,12 @@ A stretch of three or more consecutive Free Days that includes both a weekend an
 One separated period of time off within the year, however long. Counting them tells the user whether their rest is concentrated or scattered.
 _Avoid_: vacation period, period, break
 
+**Quarter**:
+Three consecutive months of the Planning Window, counted from its start rather than from January. A Planning Window is the year plus its Carry-over Months, so it holds five Quarters at the default of one Carry-over Month and up to eight at the maximum of twelve. A Quarter is therefore not a calendar quarter and the fifth one is not an error.
+_Avoid_: trimester
+
 **Long Block**:
-A Rest Block of three or more consecutive days: the shape most people mean by "a proper holiday". Reported per quarter to expose seasonal imbalance.
+A Rest Block of three or more consecutive days: the shape most people mean by "a proper holiday". Reported per Quarter to expose imbalance across the Planning Window.
 
 **Longest Vacation**:
 The single longest unbroken stretch of Free Days the plan produces. The headline number when a user wants one real trip rather than many small breaks.

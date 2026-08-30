@@ -404,6 +404,26 @@ describe("CONTEXT.md is the domain glossary and nothing else", () => {
 		expect(undefined_.map(([, term]) => term)).toEqual([]);
 	});
 
+	// A glossary is the ubiquitous language only while the rest of the tree speaks it. A term nothing outside
+	// this file uses is either a concept that was renamed and left a headstone, or one that was never real:
+	// either way the next reader is told a word is canonical when nothing canonical uses it. Prose is the
+	// scope, because that is where a term appears as a term; the same word inside an identifier is checked by
+	// the retired-name rules instead. Compound terms pluralise on every word, for the reason the header of
+	// this file records: `Carry-over Month` has to match `Carry-over Months`.
+	it("uses every term it defines somewhere outside itself", () => {
+		const elsewhere = authoredMarkdown
+			.filter((path) => path !== "CONTEXT.md")
+			.concat(contentFiles)
+			.map((path) => read(path))
+			.join("\n");
+
+		const defined = [...glossary.matchAll(GLOSSARY_TERM)].map(([, term]) => term);
+		const unused = defined.filter((term) => !retiredTermPattern(term).test(elsewhere));
+
+		expect(defined.length).toBeGreaterThan(20);
+		expect(unused).toEqual([]);
+	});
+
 	it("never leaves an _Avoid_ list empty", () => {
 		const empty = [...glossary.matchAll(GLOSSARY_AVOID_LINE)].filter(([, list]) => list.trim().length === 0);
 		expect(empty).toEqual([]);

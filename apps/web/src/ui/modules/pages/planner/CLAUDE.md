@@ -192,6 +192,16 @@ have no such short-circuit of their own.
 
 ## Gotchas
 
+**A Quarter here is a Quarter of the Planning Window, so the default plan shows five of them and `Q5` is
+not a bug.** `QuarterDistributionChart` and `BlocksPerQuarterChart` both label their bars `Q${index + 1}`
+over an array the engine sizes with `windowQuarterCount`, which is `ceil((12 + carryOverMonths) / 3)`. The
+default Carry-over Month count is 1, so the default window is thirteen months and five buckets, and the
+maximum of twelve gives eight. Both charts already read the array's length rather than a literal four, and
+the copy already says *of your planning window*; what was missing was the word in
+[`CONTEXT.md`](../../../../../../../CONTEXT.md), which now defines Quarter and says it is not a calendar
+quarter. Do not "fix" either chart to four buckets, and do not relabel them with month names: the count is
+correct and the glossary is where the question is answered.
+
 **`pointer-events-none` blocks the mouse and nothing else, so the mid-calculation guard had to move into
 the handler.** `CalendarList.tsx` expressed "a run is in flight" as `isCalculating && "pointer-events-none"`
 on the grid. That removes hit-testing; it does not remove the day buttons from the tab order and does not
