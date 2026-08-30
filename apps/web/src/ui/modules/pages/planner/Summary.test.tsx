@@ -178,3 +178,98 @@ describe("Summary manual-adjustment banner", () => {
 		filtersState.ptoDays = 3;
 	});
 });
+
+const planOf = (days: Date[], totalEffectiveDays = 5) => ({
+	days,
+	bridges: [],
+	strategy: "grouped",
+	metrics: { ...METRICS, totalEffectiveDays },
+});
+
+const resetPlan = () => {
+	filtersState.ptoDays = 3;
+	holidaysState.suggestion = planOf([JAN(6), JAN(7), JAN(8)]);
+	holidaysState.currentSelection = null;
+	holidaysState.alternatives = [];
+	holidaysState.manuallySelectedDays = [];
+	holidaysState.removedSuggestedDays = [];
+	holidaysState.holidays = [];
+};
+
+describe("the banner that says a better plan exists", () => {
+	it("stays quiet when no Alternative beats the applied plan", () => {
+		resetPlan();
+		holidaysState.alternatives = [planOf([JAN(6)], 4), planOf([JAN(7)], 5)];
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).not.toContain(enMessages.summary.notifications.canImprove.title);
+	});
+
+	it("says how many days the best Alternative would add, not how many Alternatives there are", () => {
+		resetPlan();
+		holidaysState.alternatives = [planOf([JAN(6)], 6), planOf([JAN(7)], 8), planOf([JAN(8)], 7)];
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain(enMessages.summary.notifications.canImprove.title);
+		expect(container.textContent).toContain("3 more days");
+	});
+
+	it("reads in the singular when the best Alternative adds one day", () => {
+		resetPlan();
+		holidaysState.alternatives = [planOf([JAN(6)], 6)];
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain("1 more day");
+		expect(container.textContent).not.toContain("1 more days");
+	});
+
+	it("ignores an Alternative carrying no metrics rather than counting it as nought", () => {
+		resetPlan();
+		holidaysState.alternatives = [null, planOf([JAN(6)], 7)];
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain("2 more days");
+	});
+});
+
+describe("the banner about Custom Holidays", () => {
+	const custom = (day: number, isInPlanningWindow = true) => ({
+		id: `c-${day}`,
+		date: JAN(day),
+		name: "Company shutdown",
+		variant: "custom",
+		isInPlanningWindow,
+	});
+
+	it("stays quiet when the reader has added none", () => {
+		resetPlan();
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).not.toContain(enMessages.summary.notifications.customHolidays.title);
+	});
+
+	it("counts the ones inside the Planning Window", () => {
+		resetPlan();
+		holidaysState.holidays = [custom(10), custom(11)];
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain(enMessages.summary.notifications.customHolidays.title);
+		expect(container.textContent).toContain("2 custom holidays");
+	});
+
+	it("reads in the singular for one, and leaves out the ones outside the window", () => {
+		resetPlan();
+		holidaysState.holidays = [custom(10), custom(11, false)];
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain("1 custom holiday");
+		expect(container.textContent).not.toContain("1 custom holidays");
+	});
+});
