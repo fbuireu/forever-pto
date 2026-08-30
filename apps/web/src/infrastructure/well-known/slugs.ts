@@ -1,4 +1,5 @@
 export const WELL_KNOWN_CACHE_CONTROL = "public, max-age=86400";
+export const WELL_KNOWN_MISSING_CACHE_CONTROL = "no-store";
 
 export const API_CATALOG_SLUG = "api-catalog";
 export const MCP_SERVER_CARD_SLUG = "mcp/server-card.json";

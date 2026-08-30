@@ -1,4 +1,4 @@
-import { WELL_KNOWN_CACHE_CONTROL } from "@infrastructure/well-known/slugs";
+import { WELL_KNOWN_CACHE_CONTROL, WELL_KNOWN_MISSING_CACHE_CONTROL } from "@infrastructure/well-known/slugs";
 import { describe, expect, it, vi } from "vitest";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL as string;
@@ -55,6 +55,16 @@ describe("GET /.well-known/[...slug]", () => {
 		async (slug) => {
 			const response = await GET(new Request("http://localhost"), makeContext([slug]));
 			expect(response.status).toBe(404);
+		},
+	);
+
+	it.each([["unknown"], ["mcp", "gone.json"], ["__proto__"]])(
+		"states a cache policy on the 404 for %s, so no cache is left to guess a heuristic lifetime",
+		async (...slug) => {
+			const response = await GET(new Request("http://localhost"), makeContext(slug));
+
+			expect(response.status).toBe(404);
+			expect(response.headers.get("Cache-Control")).toBe(WELL_KNOWN_MISSING_CACHE_CONTROL);
 		},
 	);
 });

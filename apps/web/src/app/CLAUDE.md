@@ -414,6 +414,20 @@ key, verified by pointing one at `api-catalogue` and watching it fail.
 meant remembering both headers and every test had to `await res.json()` to reach a value the module had
 computed synchronously.
 
+**Both branches state a cache policy, and for a while only the hit did.** The 200 carried
+`WELL_KNOWN_CACHE_CONTROL` (`public, max-age=86400`) and the 404 carried no `Cache-Control` at all, which is
+not the same as carrying `no-store`: a 404 is heuristically cacheable under RFC 9111, and this one offers no
+`Last-Modified` to bound the guess, so a shared cache or a browser is entitled to invent a lifetime for it.
+The set of served slugs changes on deploy and nowhere else, so the answer that gets remembered is exactly the
+one a new document has to overturn. `slugs.ts` declares the pair together, `WELL_KNOWN_CACHE_CONTROL` beside
+`WELL_KNOWN_MISSING_CACHE_CONTROL`, so the two branches are one decision.
+
+This is the same defect the Markdown twin had, in the same shape, two sections above: a hit with an explicit
+policy and a miss with an implicit one. That one was found because a stale header was measurably wrong; this
+one was invisible because the absent header looks like nothing rather than like a value. **Not declaring a
+policy is not declaring "no"**, and a route with a cacheable happy path has to answer the question on every
+branch.
+
 ## Error and not-found boundaries
 
 | File | Catches |
