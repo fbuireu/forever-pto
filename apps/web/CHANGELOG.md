@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.9.2](https://github.com/fbuireu/forever-pto/compare/web-v1.9.1...web-v1.9.2) (2026-08-30)
+
+
+### Bug Fixes
+
+* **web:** patch vaul so a non-modal drawer stops locking the page ([2989768](https://github.com/fbuireu/forever-pto/commit/29897680dcf01f116bde90ec22a7a5c94e0f27fb))
+
 # [forever-pto-v1.9.1](https://github.com/fbuireu/forever-pto/compare/web-v1.9.0...web-v1.9.1) (2026-08-30)
 
 
