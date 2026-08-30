@@ -1,3 +1,10 @@
+# [forever-pto-v1.9.1](https://github.com/fbuireu/forever-pto/compare/web-v1.9.0...web-v1.9.1) (2026-08-30)
+
+
+### Bug Fixes
+
+* **web:** reload instead of failing when a deploy renamed the action ([5f344b8](https://github.com/fbuireu/forever-pto/commit/5f344b82bfdec7f0c116e5f406d266e93033078c))
+
 # [forever-pto-v1.9.0](https://github.com/fbuireu/forever-pto/compare/web-v1.8.3...web-v1.9.0) (2026-08-30)
 
 
