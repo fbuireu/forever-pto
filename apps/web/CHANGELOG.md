@@ -1,3 +1,16 @@
+# [forever-pto-v1.9.0](https://github.com/fbuireu/forever-pto/compare/web-v1.8.3...web-v1.9.0) (2026-08-30)
+
+
+### Bug Fixes
+
+* **ci:** stop a zone rule from reverting a good production deploy ([ae8c180](https://github.com/fbuireu/forever-pto/commit/ae8c180edb6b15dc95fb06c5abffb4d1dd61eef3))
+* **web:** fail the build when a public variable the client needs is empty ([23cb742](https://github.com/fbuireu/forever-pto/commit/23cb742dc0bbf420cde638bae008a9c42a51ad6a))
+
+
+### Features
+
+* monorepo apps layout ([#369](https://github.com/fbuireu/forever-pto/issues/369)) ([f9dc900](https://github.com/fbuireu/forever-pto/commit/f9dc900f2a2b93471023941a51d081d079adcae2))
+
 ## [1.8.3](https://github.com/fbuireu/forever-pto/compare/v1.8.2...v1.8.3) (2026-08-22)
 
 
