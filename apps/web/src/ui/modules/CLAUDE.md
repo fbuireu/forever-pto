@@ -182,7 +182,11 @@ the third, [`core/primitives/utils/helpers.test.ts`](./core/primitives/utils/hel
 rather than counted: it is the whole of the logic in that folder, `hasFlag`, and the reason an empty `flag`
 string has to read as no flag is that a Region has none and the picker would otherwise render a blank slot;
 `pages/`, `shared/` and `sidebar/` have tests only where logic lives (`ManagementBar`, `Summary` charts,
-homepage sections, `shared/utils/helpers.ts`, the two forms that render an API failure, and, because both
+homepage sections, `shared/utils/helpers.ts`, the two forms that render an API failure,
+[`sidebar/components/WorkdayCounter.tsx`](./sidebar/components/WorkdayCounter.tsx), which is the one component
+in that folder that *counts* rather than renders and whose cases pin that a Holiday leaves the workday total
+and enters the Holiday one, and that a range reaching past the years it has Holidays for says so rather than
+counting the gap as workdays, and, because both
 held a defect that no type or lint rule can catch, [`sidebar/components/PtoCalculator.tsx`](./sidebar/components/PtoCalculator.tsx) and
 [`PtoSalaryCalculator.tsx`](./sidebar/components/PtoSalaryCalculator.tsx), whose cases drive the real inputs and assert on what the field and the caption
 actually show). Components whose body is markup plus translation calls are left to the Playwright suite in
