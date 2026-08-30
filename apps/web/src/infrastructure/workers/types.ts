@@ -1,4 +1,5 @@
-import type { Metrics } from "@domain/calendar/types";
+import type { HolidayVariant } from "@application/dto/holiday/types";
+import type { FilterStrategy, Metrics } from "@domain/calendar/types";
 
 type DateFields<T> = {
 	[KEY in keyof T]-?: NonNullable<T[KEY]> extends Date
@@ -28,7 +29,7 @@ export interface SerializedHolidayDTO {
 	name: string;
 	type?: string;
 	location?: string;
-	variant: string;
+	variant: HolidayVariant;
 	isInPlanningWindow: boolean;
 }
 
@@ -44,7 +45,7 @@ export interface SerializedBridge {
 export interface SerializedSuggestion {
 	days: string[];
 	bridges?: SerializedBridge[];
-	strategy?: string;
+	strategy?: FilterStrategy;
 	metrics: Metrics;
 }
 

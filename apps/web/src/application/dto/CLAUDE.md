@@ -80,6 +80,26 @@ not to reinstate a runtime sweep. That is what happened: `Stored<T>` types it, a
 a `string`, so `createCustom` no longer coerces a `date` its own `CreateCustomHolidayParams` declares a
 `Date`, on the line below the one that already used it raw.
 
+**`isHolidayVariant` is where the sealed union is re-established, and it exists because `HolidayVariant`
+crosses a boundary the app does not control.** Persisted store state is obfuscated, not encrypted
+([ADR 0007](../../../../../adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md)), so the `variant`
+of a stored Holiday is a string a user can edit and a string an older build may have written. Eight files
+read it outside this folder: [`../stores/holidays.ts`](../stores/holidays.ts),
+[`HolidayRow.tsx`](../../ui/modules/pages/planner/holidays/components/HolidayRow.tsx),
+[`HolidaysTable.tsx`](../../ui/modules/pages/planner/holidays/HolidaysTable.tsx),
+[`HolidaysList.tsx`](../../ui/modules/pages/planner/HolidaysList.tsx),
+[`Summary.tsx`](../../ui/modules/pages/planner/Summary.tsx),
+[`HolidaysDistributionChart.tsx`](../../ui/modules/pages/planner/summary/HolidaysDistributionChart.tsx),
+[`YearTimelineChart.tsx`](../../ui/modules/pages/planner/summary/YearTimelineChart.tsx) and
+[`modifiers.ts`](../../ui/modules/pages/planner/utils/modifiers.ts). Seven of the eight compare against a
+member of the union, so every branch answers *no* for a value outside it and an unrecognised variant does not
+fail anywhere: the Holiday drops out of the counts, the pie, the timeline and the table while still occupying
+its date and still blocking a PTO Day. The eighth, `HolidayRow.tsx`, renders `holiday.type ?? holiday.variant`
+straight into the row, so the one thing the value can do is appear on screen. `onRehydrateStorage` in
+[`../stores/holidays.ts`](../stores/holidays.ts) drops the entry instead. It lives beside the union rather than in a
+`rules.ts` because it is the union's own membership test, which is what `isFilterStrategy` is to
+`FilterStrategy` in [`../../domain/calendar/types.ts`](../../domain/calendar/types.ts).
+
 `Raw*` types must not escape this folder. If a `RawHoliday` shows up in a store or a component, a mapping step was skipped.
 
 **`contact/rules.ts` holds the sender identity, and it is not `normalizeEmail`.** The contact guard keys on
@@ -97,7 +117,7 @@ and this paragraph is why neither should be collapsed into the other.
 
 Nothing here fetches, writes, logs or reads a clock it was not handed. `create` is a pure function of `raw` and `params`. `stripe`, `date-holidays` and `i18n-iso-countries` appear only as `import type`; no SDK is constructed, so nothing in this folder pulls a runtime dependency in behind it.
 
-That is what lets `HolidayDTO` cross into the domain. The pure calendar context imports `@application/dto/holiday/types` directly, which is a layering inversion on paper: the type describes a Holiday, so it belongs in the domain. It is a known pragmatic exception (moving it means touching every calendar module and its tests), and it is safe only because the file is types and one const object, evaluable inside a Web Worker with no DOM. See [ADR 0003](../../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md) and [`../../domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md). If anything with a runtime dependency is ever added to [`holiday/types.ts`](./holiday/types.ts), the planner breaks in the worker and no server-side test will catch it.
+That is what lets `HolidayDTO` cross into the domain. The pure calendar context imports `@application/dto/holiday/types` directly, which is a layering inversion on paper: the type describes a Holiday, so it belongs in the domain. It is a known pragmatic exception (moving it means touching every calendar module and its tests), and it is safe only because everything in the file is evaluable inside a Web Worker with no DOM: two types, one const object, and `isHolidayVariant`, which is `Object.values` over that object and reaches nothing else. See [ADR 0003](../../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md) and [`../../domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md). If anything with a runtime dependency is ever added to [`holiday/types.ts`](./holiday/types.ts), the planner breaks in the worker and no server-side test will catch it.
 
 `RegionDTO` also crosses outwards, but downwards only: `holidayDTO.create` takes the region list so `getRegionName` can turn a region code into a display label. No domain code imports it.
 

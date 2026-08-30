@@ -1,5 +1,5 @@
 import { holidayDTO } from "@application/dto/holiday/dto";
-import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
+import { type HolidayDTO, HolidayVariant, isHolidayVariant } from "@application/dto/holiday/types";
 import { logClient, logClientError } from "@application/shared/utils/clientLog";
 import { fromStoredInstant, type Stored } from "@application/shared/utils/dateIntake";
 import { isSameDay, isWeekend } from "@application/shared/utils/dates";
@@ -533,10 +533,12 @@ export const useHolidaysStore = create<HolidaysStore>()(
 						};
 
 						if (stored.holidays) {
-							state.holidays = stored.holidays.map((h) => ({
-								...h,
-								date: fromStoredInstant(h.date),
-							}));
+							state.holidays = stored.holidays
+								.filter((h) => isHolidayVariant(h.variant))
+								.map((h) => ({
+									...h,
+									date: fromStoredInstant(h.date),
+								}));
 						}
 
 						if (stored.suggestion) {

@@ -23,7 +23,7 @@ suites. A rule you want to change is in the domain; what lives here is the bound
 | File | Contents |
 | --- | --- |
 | `worker.ts` | The entry point. Registers `globalThis.onmessage`, calls the pipeline, replies with `self.postMessage` |
-| [`types.ts`](./types.ts) | `WORKER_MESSAGE_TYPE`, `CalculateSuggestionsRequest`, `WorkerResponse`, and the `Serialized*` wire types |
+| [`types.ts`](./types.ts) | `WORKER_MESSAGE_TYPE`, `CalculateSuggestionsRequest`, `WorkerResponse`, and the `Serialized*` wire types. Every field that is a sealed union in the domain is that union here too, except `CalculateSuggestionsPayload.strategy` |
 | [`utils/serializers.ts`](./utils/serializers.ts) | Both directions of the boundary conversion, in one file so they cannot drift apart |
 
 The other half of the contract lives outside this folder: [`useCalculationsWorker.ts`](../../ui/hooks/useCalculationsWorker.ts) under `@ui/hooks/` spawns
@@ -103,16 +103,21 @@ learning the shape from that fixture learned two names that are not real.
 **`SerializedSuggestion.metrics` is required, not optional, and the serialisers speak `MeasuredSuggestion`.**
 The pipeline measures both of its branches, so a Suggestion crossing this boundary always has Metrics; saying
 so on the wire type is what lets the store hold `MeasuredSuggestion` and the planner screen stop
-optional-chaining. `deserializeSuggestion` returns `MeasuredSuggestion` on that strength; it still casts
-rather than validates, so a wire message genuinely missing `metrics` would arrive as a lie. Nothing else
-produces these messages, which is what makes the claim safe.
+optional-chaining. `deserializeSuggestion` returns `MeasuredSuggestion` on that strength; it does not
+check that the field is present, so a wire message genuinely missing `metrics` would arrive as a lie. Nothing
+else produces these messages, which is what makes the claim safe.
 
-**Deserialisation casts, it does not validate (with one exception, and that one had teeth).**
-`deserializeHolidays` casts `variant` to `HolidayDTO['variant']` and `deserializeSuggestion` casts `strategy`
-to `Suggestion['strategy']`. Both are on the way *back* from the worker, over values the worker itself
-produced.
+**Neither direction of `serializers.ts` casts any more, because the wire type stopped lying.**
+`SerializedHolidayDTO.variant` was `string` and `SerializedSuggestion.strategy` was `string`, so
+`deserializeHolidays` and `deserializeSuggestion` each ended in an `as` that widened a sealed union on the way
+out and narrowed it back on the way in, with nothing in between deciding anything. Both fields are typed
+`HolidayVariant` and `FilterStrategy` now and both casts are deleted: the values on this leg were produced by
+`serializeHolidays` and `serializeSuggestionResult` from types that were already sealed, so the honest wire
+type costs nothing and a bare string in either serialiser is a compile error rather than a cast that absorbs
+it. `CalculateSuggestionsPayload.strategy` stays `string`, deliberately: that is the *inbound* leg, and it is
+where a value out of persisted storage arrives.
 
-`worker.ts` is the inbound direction and now parses: `isFilterStrategy` from
+`worker.ts` is the inbound direction and parses: `isFilterStrategy` from
 [`@domain/calendar/types`](../../domain/calendar/types.ts) narrows the incoming string, falling back to
 `DEFAULT_FILTER_STRATEGY`, which is also what the filters store initialises to: one declaration, so the wire
 default and the store default cannot drift. It used to be `strategy as FilterStrategy`, and an unrecognised

@@ -1,4 +1,4 @@
-import { FilterStrategy } from "@domain/calendar/types";
+import { DEFAULT_FILTER_STRATEGY, FilterStrategy } from "@domain/calendar/types";
 import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MAX_PTO_DAYS, MIN_CARRY_OVER_MONTHS, MIN_PTO_DAYS, useFiltersStore } from "./filters";
@@ -193,6 +193,25 @@ describe("onRehydrateStorage", () => {
 
 		expect(useFiltersStore.getState().ptoDays).toBe(MAX_PTO_DAYS);
 		expect(useFiltersStore.getState().carryOverMonths).toBe(MAX_CARRY_OVER_MONTHS);
+	});
+
+	it.each(["efficient", "", "GROUPED"])(
+		"replaces the stored strategy %s, which names no Strategy, with the default the worker would fall back to",
+		(stored) => {
+			useFiltersStore.setState({ strategy: stored as FilterStrategy });
+
+			runRehydrate();
+
+			expect(useFiltersStore.getState().strategy).toBe(DEFAULT_FILTER_STRATEGY);
+		},
+	);
+
+	it("keeps a stored strategy that does name one", () => {
+		useFiltersStore.setState({ strategy: FilterStrategy.BALANCED });
+
+		runRehydrate();
+
+		expect(useFiltersStore.getState().strategy).toBe(FilterStrategy.BALANCED);
 	});
 });
 

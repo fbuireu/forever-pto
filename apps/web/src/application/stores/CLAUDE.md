@@ -126,6 +126,27 @@ deletion on the serialise side could not do.
 `onRehydrateStorage` runs where `localStorage` may be absent, so its error branch reaches it as
 `globalThis.localStorage?.` rather than the bare global.
 
+**A rehydrated sealed union is narrowed there too, and only the numbers used to be.** The blob is obfuscated,
+not encrypted ([ADR 0007](../../../../../adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md)), so
+every persisted field is user-editable, and `migrate` runs only on a version change. `filters.ts` clamped
+`ptoDays` and `carryOverMonths` and let `strategy` through untouched; `holidays.ts` revived the `Date`s and
+let each Holiday's `variant` through untouched. Both are sealed unions, and both had a membership test
+available and unused.
+
+The `strategy` half is the one that produced a visible disagreement. `worker.ts` already narrowed the
+incoming string with `isFilterStrategy` and fell back to `DEFAULT_FILTER_STRATEGY`, so a stale value planned
+as **Grouped** while this store still held the stale string and
+[`Summary.tsx`](../../ui/modules/pages/planner/Summary.tsx) asked next-intl for
+`sidebar.strategy.<stale>.label` at three call sites and
+[`Strategy.tsx`](../../ui/modules/sidebar/components/Strategy.tsx)'s `strategies.find` matched nothing. The
+engine and the screen answered differently and neither reported it. Narrowing at the near end rather than
+only at the far one is what makes them agree, and the fallback is the same constant on both sides.
+
+The `variant` half drops the entry rather than coercing it, on the same precedent `alternatives` already sets
+by filtering out whatever `reviveSuggestion` cannot revive: there is no safe variant to pick for it, and a
+Holiday nothing can classify is one the tables and the charts count differently from each other. See
+[`../dto/CLAUDE.md`](../dto/CLAUDE.md) for what each of the eight readers does with a value outside the union.
+
 ## Selection indices
 
 `currentSelectionIndex` and `previewAlternativeIndex` address one flat list: **index 0 is `suggestion`, index

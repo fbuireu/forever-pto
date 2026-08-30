@@ -1,4 +1,4 @@
-import { DEFAULT_FILTER_STRATEGY, type FilterStrategy } from "@domain/calendar/types";
+import { DEFAULT_FILTER_STRATEGY, type FilterStrategy, isFilterStrategy } from "@domain/calendar/types";
 import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
@@ -116,6 +116,7 @@ export const useFiltersStore = create<FiltersStore>()(
 							min: MIN_CARRY_OVER_MONTHS,
 							max: MAX_CARRY_OVER_MONTHS,
 						});
+						state.strategy = isFilterStrategy(state.strategy) ? state.strategy : DEFAULT_FILTER_STRATEGY;
 					}
 				},
 			},

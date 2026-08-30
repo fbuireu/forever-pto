@@ -986,6 +986,28 @@ describe("persistence", () => {
 		expect(state.currentSelection?.days).toEqual(suggestion.days);
 	});
 
+	it.each(["bank", "", "NATIONAL"])(
+		"drops a stored holiday whose variant %s names no Holiday Variant, so the tables and the charts count the same set",
+		async (variant) => {
+			const state = await rehydrateFrom({
+				holidays: [
+					makeHoliday({ id: "keep", dateStr: "2026-01-01" }),
+					{ ...makeHoliday({ id: "drop", dateStr: "2026-01-06" }), variant: variant as HolidayVariant },
+				],
+			});
+
+			expect(state.holidays.map((holiday) => holiday.id)).toEqual(["keep"]);
+		},
+	);
+
+	it.each(Object.values(HolidayVariant))("keeps a stored holiday whose variant is %s", async (variant) => {
+		const state = await rehydrateFrom({
+			holidays: [{ ...makeHoliday({ id: "keep", dateStr: "2026-01-01" }), variant }],
+		});
+
+		expect(state.holidays.map((holiday) => holiday.id)).toEqual(["keep"]);
+	});
+
 	it("prunes days belonging to another planning window", async () => {
 		const state = await rehydrateFrom({
 			manuallySelectedDays: [new Date(2026, 6, 15), new Date(2027, 6, 15)],

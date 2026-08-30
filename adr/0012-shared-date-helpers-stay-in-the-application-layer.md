@@ -72,7 +72,9 @@ and no server context.
   furthest this file goes, and `Intl` exists in workerd.
 - **The same reasoning covers `@application/dto/holiday/types`**, the calendar domain's other upward import,
   which [`../apps/web/src/application/dto/CLAUDE.md`](../apps/web/src/application/dto/CLAUDE.md) records as a
-  known exception safe only while that file stays types plus one const object.
+  known exception safe only while everything in that file stays evaluable inside a Web Worker with no DOM
+  and no server context: today two types, one const object and `isHolidayVariant`, the union's own membership
+  test.
 - If a second app ever needs these helpers, this decision is superseded rather than amended: at that point
   the `packages/` tier ADR 0010 defers is genuinely warranted, and the move becomes a workspace change rather
   than a directory shuffle.

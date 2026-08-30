@@ -1,6 +1,6 @@
 import type { HolidayDTO } from "@application/dto/holiday/types";
 import { fromStoredInstant } from "@application/shared/utils/dateIntake";
-import type { Bridge, MeasuredSuggestion, Suggestion } from "@domain/calendar/types";
+import type { Bridge, MeasuredSuggestion } from "@domain/calendar/types";
 import type { SerializedBridge, SerializedHolidayDTO, SerializedSuggestion } from "../types";
 
 export function serializeHolidays(holidays: HolidayDTO[]) {
@@ -53,7 +53,7 @@ export function deserializeSuggestion(serialized: SerializedSuggestion): Measure
 		...serialized,
 		days: serialized.days.map(fromStoredInstant),
 		bridges: serialized.bridges?.map(deserializeBridge),
-		strategy: serialized.strategy as Suggestion["strategy"],
+		strategy: serialized.strategy,
 	};
 }
 
@@ -61,6 +61,5 @@ export function deserializeHolidays(holidays: SerializedHolidayDTO[]) {
 	return holidays.map((holiday) => ({
 		...holiday,
 		date: fromStoredInstant(holiday.date),
-		variant: holiday.variant as HolidayDTO["variant"],
 	}));
 }
