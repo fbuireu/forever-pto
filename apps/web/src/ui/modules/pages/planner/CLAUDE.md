@@ -533,10 +533,20 @@ at all, because `generateSuggestions` takes the window rather than its expansion
 
 ## Testing
 
-Fifteen test files. The components carrying them are the ones holding logic, and the rest are left
+Eighteen test files. The components carrying them are the ones holding logic, and the rest are left
 to the Playwright suite in `e2e/`, which on this screen asserts only that `/planner` answers 200, has a
 title, and does not trip the error boundary. No e2e spec drives a calculation, so nothing outside these
-files pins planner *behaviour*.
+files pins planner *behaviour*. **That count is worth recounting rather than trusting**: it said fifteen while
+the tree held sixteen, which is the failure mode a number in prose has.
+
+Two of the eighteen cover this screen's remaining pure modules.
+[`calendar/utils/refusals.test.ts`](./calendar/utils/refusals.test.ts) asserts `DAY_REFUSAL_COPY` against
+`DayRefusal` itself, key set for key set, so a refusal added to the stores without copy fails here rather
+than rendering nothing on the calendar; it also pins that `describeHolidayRefusal` answers `null` for the one
+refusal with no copy of its own, which is the branch both Holiday modals fall through to. `HOLIDAY_NOT_FOUND`
+is a compile error to add a case for and a silent gap to omit copy for, and only the second half needed a
+test. [`holidays/components/schema.test.ts`](./holidays/components/schema.test.ts) drives the Custom Holiday
+factory at both ends of the name length and on a date that is not one.
 
 Three are recent, and each covers something no type could. [`utils/modifiers.test.ts`](./utils/modifiers.test.ts) drives the day
 predicates directly: `isAlternative` at index 0, at n, and against a date the applied Suggestion already
