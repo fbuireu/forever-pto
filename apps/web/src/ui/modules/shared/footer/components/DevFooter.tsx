@@ -77,7 +77,7 @@ export const DevFooter = () => {
 						href={`${network.BASE_URL}/${network.USERNAME}`}
 						target="_blank"
 						rel="noopener noreferrer"
-						aria-label={`Visit my ${key.toLowerCase().replace("_", " ")} profile`}
+						aria-label={`Visit my ${key.toLowerCase().replaceAll("_", " ")} profile`}
 						className="inline-flex items-center justify-center min-w-11 min-h-11 transition-transform duration-200 hover:scale-110"
 						style={{ "--hover-color": network.COLOR } as CSSProperties & { "--hover-color": string }}
 					>

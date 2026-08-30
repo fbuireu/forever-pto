@@ -259,6 +259,13 @@ Both pair `outline-none` with the `focus-visible:ring-[3px] focus-visible:ring-r
 treatment now. A panel that is only focused programmatically (`core/animate/base/Drawer.tsx`'s content) is the
 one place a bare suppression is fine, because nothing tabs onto it.
 
+**`String.replace` with a string pattern replaces the first match only, and one accessible name was built
+that way.** [`shared/footer/components/DevFooter.tsx`](./shared/footer/components/DevFooter.tsx) derives each
+social link's name from its config key, `key.toLowerCase().replace("_", " ")`, so three of the four read
+correctly and `BUY_ME_A_COFFEE` announced as *Visit my buy me_a_coffee profile*. It is `replaceAll` now.
+A name assembled from an identifier is the kind that nobody reads aloud in review, which is why
+[`DevFooter.test.tsx`](./shared/footer/components/DevFooter.test.tsx) asks for each link **by name**.
+
 **Two of `shared/donate/DonationForm.tsx`'s controls said nothing about what they were about to charge.**
 The three amount presets were `variant={currentAmount === preset ? "default" : "outline"}` and no
 `aria-pressed`, so a reader heard the same string before and after pressing the button that *decides how much
