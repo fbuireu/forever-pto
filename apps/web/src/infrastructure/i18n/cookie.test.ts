@@ -23,7 +23,7 @@ describe("the NEXT_LOCALE policy", () => {
 		});
 	});
 
-	it("hands next-intl the same attributes the middleware writes, so a soft locale switch round-trips", () => {
+	it("hands next-intl the same attributes the proxy writes, so a soft locale switch round-trips", () => {
 		const { response, cookiesSet } = makeResponse();
 
 		setLocaleCookie({ response, value: ES });

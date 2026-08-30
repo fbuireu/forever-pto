@@ -33,7 +33,7 @@ costs one interaction. Nothing downstream should treat the result as authoritati
 errors and returns `''`, and `detectCountry` returns `''` when all three come up empty. [`proxy/location.ts`](../../proxy/location.ts)
 treats that as "no cookie to set" and moves on.
 
-**The only caller is the middleware.** `proxy/location.ts` calls `detectCountry` from [`src/middleware.ts`](../../../middleware.ts), so
+**The only caller is the proxy.** `proxy/location.ts` calls `detectCountry` from [`src/proxy.ts`](../../../proxy.ts), so
 everything here runs server-side inside a Cloudflare Worker request, including the fetches, which read like
 browser calls and are not. It also short-circuits on an existing `user-country` cookie, which is what keeps
 this chain off the hot path for returning visitors. Between that cookie and the header running first, the two
@@ -52,7 +52,7 @@ week-long `user-country` cookie by `proxy/location.ts`. Nothing in the chain re-
 setting is no storage at all.
 
 **`detectCountryFromEgressIP` does not measure the visitor, and its name says so.** Both of its fetches
-originate inside the middleware Worker, so `api.ipify.org` reports the runtime's *egress* address and
+originate inside the proxy Worker, so `api.ipify.org` reports the runtime's *egress* address and
 `ipinfo.io` returns that address's country. On Cloudflare that is the colo the request landed in: usually
 near the visitor, never derived from their connection; off Cloudflare it is whatever network the process
 sits on. It is kept as the last resort precisely because it is the only strategy that still answers when
@@ -79,7 +79,7 @@ re-typed at all three fetches, and the cache mode is a privacy invariant, not a 
 strategy must not be able to forget it.
 
 **Effect is used here but never escapes.** Both async strategies are `Effect.gen` programs terminated inside
-their own wrapper with `Effect.runPromise`, because the middleware has no `ApplicationLayer` to provide. For
+their own wrapper with `Effect.runPromise`, because the proxy has no `ApplicationLayer` to provide. For
 the same reason logging goes through the `getBetterStackInstance()` singleton rather than `LoggerService`,
 the documented logging exception in
 [ADR 0002](../../../../../../adr/0002-effect-for-external-service-boundaries.md).

@@ -3,7 +3,7 @@
 ## Purpose
 
 The only layer that reaches outward. Everything that talks to a network, a database, a cookie jar, the
-Cloudflare runtime or another thread lives here: SDK wrappers, server actions, middleware helpers, locale
+Cloudflare runtime or another thread lives here: SDK wrappers, server actions, proxy helpers, locale
 routing, the `.well-known` endpoints and the calculations Web Worker. It holds no planning rule and no
 orchestration: a use-case decides *what* happens, this layer knows *how* to reach the thing it happens to.
 
@@ -40,7 +40,7 @@ already narrows `strategy` with `isFilterStrategy`; the wire value is genuinely 
 the one place `string` is the honest type.
 
 **`NEXT_LOCALE`'s attributes are stated once, in `cookie.ts`, and `routing.ts` hands that same object to
-next-intl.** It has to be one object because *two* writers use it: the middleware writes the cookie on the
+next-intl.** It has to be one object because *two* writers use it: the proxy writes the cookie on the
 response, and next-intl's `syncLocaleCookie` writes it from `document.cookie` when a language switcher
 navigates without a round trip: [`application/i18n/navigation.ts`](../application/i18n/navigation.ts)'s `createNavigation(routing)` passes
 `routing.localeCookie` straight into it. The two were written separately and disagreed on two flags, and
@@ -62,7 +62,7 @@ path-segment reader), and a fourth, [`global-not-found.tsx`](../app/global-not-f
 chain that existed nowhere else and was reachable only through a page most users never see. The
 `Accept-Language` half is `localeFromAcceptLanguage` now and answers `undefined` rather than the default, so
 the caller decides the fallback and the precedence is assertable without rendering a document.
-| `markdown/` | `buildMarkdownPage.ts`: the Markdown twin of a page, served when the request asks for `text/markdown`. Translates through `createTranslator` over statically imported bundles, never `next-intl/server`; see *Gotchas*. [`twin.ts`](./markdown/twin.ts) beside it holds how the twin is *requested* and *cached*: the route path, the `Accept` token, the `x-markdown-path` header the middleware sets, and `markdownTwinHeaders({ found })`. Both the middleware and the route read it, which is what stopped the policy being a guess made before the lookup; see [`../app/CLAUDE.md`](../app/CLAUDE.md) |
+| `markdown/` | `buildMarkdownPage.ts`: the Markdown twin of a page, served when the request asks for `text/markdown`. Translates through `createTranslator` over statically imported bundles, never `next-intl/server`; see *Gotchas*. [`twin.ts`](./markdown/twin.ts) beside it holds how the twin is *requested* and *cached*: the route path, the `Accept` token, the `x-markdown-path` header the proxy sets, and `markdownTwinHeaders({ found })`. Both the proxy and the route read it, which is what stopped the policy being a guess made before the lookup; see [`../app/CLAUDE.md`](../app/CLAUDE.md) |
 | `seo/` | [`buildMetadata.ts`](./seo/buildMetadata.ts): the `Metadata` shape every route's `generateMetadata` fills in; [`routeMetadata.ts`](./seo/routeMetadata.ts): that `generateMetadata`, built from a route's own row so a route file is one line; [`routes.ts`](./seo/routes.ts): `SITE_ROUTES`, the one list of pages and whether each is indexable, plus `routeFor`, the total lookup keyed by the table's own literal paths |
 | `proxy/` | Middleware helpers: `location.ts` (country detection + cookie) and [`cookie.ts`](./proxy/cookie.ts) (`user-country`, one week) |
 | `services/` | Everything with a purpose but no SDK of its own: `contact/`, `countries/`, `env/`, `holidays/`, `location/`, `payments/`, `premium/`, `regions/`. Three carry their own guides: [holidays](./services/holidays/CLAUDE.md), [location](./services/location/CLAUDE.md), [payments](./services/payments/CLAUDE.md) |

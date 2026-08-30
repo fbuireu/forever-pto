@@ -104,7 +104,7 @@ does not control the traffic to, in order to keep a toolchain version the app ga
   upstream. Until then the diagnosis is "16.3.x breaks request-time rendering on 1.20.2", which is where the
   evidence stops.
 - **`/[locale]/payment/confirmation` renders at request time too**, and escapes the e2e suite only because
-  [`middleware.ts`](../apps/web/src/middleware.ts) redirects it away when `payment_intent` is absent. It was never confirmed broken or
+  [`proxy.ts`](../apps/web/src/proxy.ts), at the time still the middleware, redirects it away when `payment_intent` is absent. It was never confirmed broken or
   healthy under 16.3; whoever revisits this pin should check it with a real payment intent first.
 - Recorded in [`CLAUDE.md`](../apps/web/CLAUDE.md) under *Versions* and *Structure & aliases*.
 

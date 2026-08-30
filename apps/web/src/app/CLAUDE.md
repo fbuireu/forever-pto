@@ -26,7 +26,7 @@ failure channel onto a status code. Business logic that lands here is in the wro
 
 ## How a request reaches a page
 
-[`src/middleware.ts`](../middleware.ts) runs first, and its `config.matcher` decides what it sees: everything except `/api`,
+[`src/proxy.ts`](../proxy.ts) runs first, and its `config.matcher` decides what it sees: everything except `/api`,
 `/_next`, `/_vercel` and any path containing a dot, plus `/api/markdown` explicitly. In order it:
 
 1. Lets a direct `/api/markdown` request through, and **strips the path header** on the way; see below.
@@ -77,7 +77,7 @@ failure channel onto a status code. Business logic that lands here is in the wro
    point: the client-side language switcher writes this cookie too, from `document.cookie`, and the two
    writers have to agree. This step used to say next-intl's own cookie "carries none of those", which was
    wrong about `secure` and `sameSite`, and it used to add `httpOnly`, which silently broke every soft
-   locale switch. See [`src/infrastructure/CLAUDE.md`](../infrastructure/CLAUDE.md). [`middleware.test.ts`](../middleware.test.ts) guards the step under
+   locale switch. See [`src/infrastructure/CLAUDE.md`](../infrastructure/CLAUDE.md). [`proxy.test.ts`](../proxy.test.ts) guards the step under
    `describe('locale cookie policy')`; the policy itself is asserted in
    [`src/infrastructure/i18n/cookie.test.ts`](../infrastructure/i18n/cookie.test.ts).
 6. Hands the response to the location proxy ([`src/infrastructure/proxy/location.ts`](../infrastructure/proxy/location.ts)), which sets the
@@ -99,13 +99,13 @@ The same defect had a second half. Since the only `path` the handler could ever 
 `Cache-Control: public, max-age=3600` on it. So the representation of a URL was decided by a query parameter
 anyone could append.
 
-Both halves close the same way: the middleware `set`s the header, which overwrites anything inbound, and the
+Both halves close the same way: the proxy `set`s the header, which overwrites anything inbound, and the
 direct-hit branch `delete`s it. The route reads *only* the header and 404s when it is absent, with no
-fallback to the query: the fallback is the vulnerability, not a convenience. `middleware.test.ts` asserts
+fallback to the query: the fallback is the vulnerability, not a convenience. `proxy.test.ts` asserts
 the overwrite and the strip; `route.test.ts` asserts the header wins over a disagreeing query and that an
 absent header never reaches the builder. Verified by restoring the `??` fallback and watching the case fail.
 
-**[`markdown.spec.ts`](../../e2e/api/markdown.spec.ts) drives the twin the way a client does, and it is the only place the middleware,
+**[`markdown.spec.ts`](../../e2e/api/markdown.spec.ts) drives the twin the way a client does, and it is the only place the proxy,
 the route and the header are proven to line up.** It used to request `/api/markdown` directly and assert
 200, `text/markdown` and `public, max-age=3600`: the three things the route refuses on exactly that path,
 so all five cases were red on every pull request and the `e2e` job with them. The sharp one asserted the
@@ -122,17 +122,17 @@ carry `max-age=3600`), so an intermediary appending a directive cannot turn the 
 **One module states the cache policy, and it is the one that knows the outcome.**
 [`src/infrastructure/markdown/twin.ts`](../infrastructure/markdown/twin.ts) owns `MARKDOWN_ROUTE`, `MARKDOWN_ACCEPT`, `MARKDOWN_PATH_HEADER` and
 `markdownTwinHeaders({ found })`: content type, `Cache-Control` and `Vary` together. It was written in two
-modules with three copies of `max-age=3600`, and the middleware's copy was applied *before*
+modules with three copies of `max-age=3600`, and the proxy's copy was applied *before*
 `buildMarkdownPage` had run, so it could only ever be a guess about a page it had not looked up. The
 measurable consequence: a 404 went out with `public, max-age=3600` on it, because the route set only `Vary`
-on that branch and the middleware supplied the rest. A shared cache would answer "Not Found" for an hour to
-everyone. A miss is `no-store` now, and the middleware states no cache policy at all.
+on that branch and the proxy supplied the rest. A shared cache would answer "Not Found" for an hour to
+everyone. A miss is `no-store` now, and the proxy states no cache policy at all.
 
 `Vary: Accept` is on both branches. The body served under an HTML URL depends on the `Accept` header, so a
 shared cache keyed on the URL alone would hand the Markdown twin to the next visitor asking for HTML.
 
 **The HTML half of that pair does *not* carry `Vary: Accept`, and that is a known gap rather than an
-oversight.** The app itself is safe: the middleware runs before any cache lookup, so a markdown request is
+oversight.** The app itself is safe: the proxy runs before any cache lookup, so a markdown request is
 rewritten and never reaches the HTML cache entry, but an intermediary cache could store the HTML for
 `/planner` keyed on the URL alone and then serve it to a client asking for markdown. Closing it means adding
 `Vary: Accept` to `SECURITY_HEADERS`' `source: '/(.*)'` in `next.config.ts`, which applies to every asset and
@@ -144,7 +144,7 @@ URLs carry **no** `/en` prefix while the other five do. Anything building a URL 
 `localePath` / `localeAlternates` in [`src/infrastructure/i18n/utils/url.ts`](../infrastructure/i18n/utils/url.ts) rather than concatenating the
 locale itself.
 
-`[locale]/layout.tsx` re-validates the segment with `hasLocale` and calls `notFound()`: the middleware is
+`[locale]/layout.tsx` re-validates the segment with `hasLocale` and calls `notFound()`: the proxy is
 not treated as the only gate, because a statically rendered path can arrive without it.
 
 Every page and layout under `[locale]/` that reads translations **from the request locale** calls
@@ -229,7 +229,7 @@ competing for the same ranking; the required `route` parameter is what prevents 
 | [`api/webhooks/stripe/route.ts`](./api/webhooks/stripe/route.ts) | POST | Verifies the `stripe-signature` header, then hands the event to `processWebhookEvent`. Reads the **raw** body via `request.text()`; parsing it as JSON would break signature verification |
 | [`api/check-session/route.ts`](./api/check-session/route.ts) | GET, POST | GET verifies the premium cookie; POST activates Premium from an email, optionally with a payment key, and sets the cookie. GET treats "did not verify" and "could not verify" differently: see *The GET half of check-session distinguishes two failures* below |
 | [`api/contact/route.ts`](./api/contact/route.ts) | POST | Contact form submission |
-| `api/markdown/route.ts` | GET | Renders the Markdown twin of a page via [`buildMarkdownPage.ts`](../infrastructure/markdown/buildMarkdownPage.ts). Only reached through the middleware rewrite, and now only *drivable* through it: the pathname comes from the `x-markdown-path` header, never the query string |
+| `api/markdown/route.ts` | GET | Renders the Markdown twin of a page via [`buildMarkdownPage.ts`](../infrastructure/markdown/buildMarkdownPage.ts). Only reached through the proxy rewrite, and now only *drivable* through it: the pathname comes from the `x-markdown-path` header, never the query string |
 | [`api/health/route.ts`](./api/health/route.ts) | GET | Liveness probe. Answers `status` and `timestamp` and nothing else |
 
 Shared conventions across them:
@@ -394,7 +394,7 @@ with `noUncheckedIndexedAccess` off a second consumer indexing it directly would
 enumerates. Nothing indexable leaves the module. Verified by swapping the `Map` back for an object literal:
 four prototype-key cases go red.
 
-These paths contain a dot, so the middleware matcher excludes them; they never see locale negotiation.
+These paths contain a dot, so the proxy matcher excludes them; they never see locale negotiation.
 
 **The skills index advertises only what this handler serves, and that is now one list rather than a rule.**
 `agentSkillsIndex.ts` used to give all five entries a `url` under `/.well-known/agent-skills/<name>/SKILL.md`
@@ -547,7 +547,7 @@ mock is gone and the real `noStore` runs, which is what makes the three body ass
   `ErrorContent.tsx`, `NotFoundContent.tsx` and `AppSidebar.tsx`. A new shell that renders its own top-level
   container needs it too, or the link is dead on that route; `SkipToContent.test.tsx` scans for the
   declaring files and fails when the set changes.
-- **Two guards protect the confirmation page.** The middleware redirects when `payment_intent` is missing
+- **Two guards protect the confirmation page.** The proxy redirects when `payment_intent` is missing
   *and* `page.tsx` redirects again. Removing either leaves the Effect program running with `undefined`.
 - **That redirect sets `pathname` on a parsed URL; it must never resolve a path as a relative reference.**
   The target is the request path with `/payment/confirmation` sliced off, and it was built as
@@ -557,13 +557,13 @@ mock is gone and the real `noStore` runs, which is what makes the three body ass
   carries none, and a leading `/%2e` is stripped as a dot segment after the match, leaving the doubled slash
   behind. A visitor following a `/payment/` link on this domain was answered `307` to whatever host the path
   spelled. `homePath` is now forced to a single leading slash and assigned to `new URL(request.url).pathname`,
-  which cannot change the origin whatever it contains. `src/middleware.test.ts` asserts the origin survives.
+  which cannot change the origin whatever it contains. `src/proxy.test.ts` asserts the origin survives.
 - **`api/health/route.ts` is public and unauthenticated**, and `.well-known/api-catalog` advertises it, so
   the body says the app is up and nothing else. Do not add configuration to it: not which secrets are set,
   not the `NODE_ENV`, not a dependency check that names a host.
-- **The middleware's Markdown rewrite trusts `config.matcher` to keep internal paths out.** The matcher
+- **The proxy's Markdown rewrite trusts `config.matcher` to keep internal paths out.** The matcher
   excludes `/api` and every dotted path, so `/.well-known/*` and the other route handlers never reach the
-  middleware at all; the rewrite branch has no guard of its own. Widening the matcher means adding one back,
-  which is what the `config matcher` block in `src/middleware.test.ts` is there to catch.
+  proxy at all; the rewrite branch has no guard of its own. Widening the matcher means adding one back,
+  which is what the `config matcher` block in `src/proxy.test.ts` is there to catch.
 - **The planner page imports its sections through `next/dynamic`.** That is a bundle-size decision, not an
   accident; a static import of `CalendarList` or `Summary` pulls the whole planning UI into the first load.

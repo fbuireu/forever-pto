@@ -28,7 +28,7 @@ beforeEach(() => {
 });
 
 describe("GET /api/markdown", () => {
-	it("takes the path from the header the middleware set", async () => {
+	it("takes the path from the header the proxy set", async () => {
 		await GET(request({ pathname: "/en/planner" }));
 
 		expect(buildMarkdownPage).toHaveBeenCalledWith({

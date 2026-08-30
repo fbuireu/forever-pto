@@ -10,7 +10,7 @@ const i18nProxy = createMiddleware(routing);
 
 const PAYMENT_CONFIRMATION_PATH = "/payment/confirmation";
 
-export async function middleware(request: NextRequest): Promise<NextResponse> {
+export async function proxy(request: NextRequest): Promise<NextResponse> {
 	const accept = request.headers.get("accept") ?? "";
 	const pathname = request.nextUrl.pathname;
 	const isMarkdownRequest = accept.includes(MARKDOWN_ACCEPT);
