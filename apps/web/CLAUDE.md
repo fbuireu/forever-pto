@@ -89,11 +89,18 @@ Env: copy [`.env.example`](./.env.example). Local Worker secrets go in `.dev.var
 Cloudflare context is read through, and it is tracked.
 
 **A `NEXT_PUBLIC_*` is inlined at build time, and until this branch nothing noticed when one was empty.**
+The deploy's preflight covers the five Worker **secrets**; the public variables had no equivalent, so an
+empty one would compile, deploy, pass the smoke run and reach a browser. What it costs is not hypothetical:
 `getStripeClientInstance` throws when `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is missing, and
 [`Donate.tsx`](./src/ui/modules/shared/donate/Donate.tsx) calls it in module scope, so an empty variable does
-not degrade the checkout, it throws while the chunk is being evaluated. Nothing caught it: the deploy's
-preflight covers the five Worker **secrets** and the public variables had no equivalent, so a build with an
-empty key compiled, deployed, passed the smoke run and served a checkout that could not open.
+not degrade the checkout, it throws while the chunk is being evaluated. Reproduced against a local
+production build, which reports `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not defined` at module evaluation.
+
+**That is the hazard the guard closes, and it is not the explanation for any failure this repository has
+seen.** A checkout that would not open in production was what sent someone looking here, and the guard
+answered the question on its first run: the `Build` step passed, so the key is set and non-empty on
+`web-production`. Whatever breaks that checkout is something else, and this paragraph is not evidence about
+it. Do not read the guard as a fix for a bug; it is a guard for a hole that was open and is measured now.
 
 `PUBLIC_ENV` in [`next.config.ts`](./next.config.ts) is that equivalent, and it names three kinds because the
 variables are not read in one place: `required` is inlined into the client bundle and blocks the build,
