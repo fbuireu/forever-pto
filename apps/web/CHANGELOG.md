@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.9.4](https://github.com/fbuireu/forever-pto/compare/web-v1.9.3...web-v1.9.4) (2026-08-30)
+
+
+### Bug Fixes
+
+* **web:** stop the workday counter crashing on a half-picked range ([07eac6e](https://github.com/fbuireu/forever-pto/commit/07eac6efdc191b7bba7f4c4234ed4405bcc5f722))
+
 # [forever-pto-web-v1.9.3](https://github.com/fbuireu/forever-pto/compare/web-v1.9.2...web-v1.9.3) (2026-08-30)
 
 
