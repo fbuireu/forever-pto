@@ -263,10 +263,13 @@ The alternative to all of it is to revert the rename in `ci.yml`, `docs.yml` and
 and keep one shared pair, which is what the split exists to stop.
 
 **`deploy-tail` is gated on the files its bundle is built from, which is wider than its own folder.** The tail consumer is a second Worker with its own `wrangler.toml`; the app declares it in `[[tail_consumers]]` but does not carry it. It changes rarely, so `TAIL_PATHS` gates it, but `workers/tail/index.ts` imports the log-level contract from `apps/web/src/infrastructure/clients/logging/`, and while the filter named only `apps/web/workers/tail/**` a change to that contract redeployed the app and left the Worker running the old bundled copy. The Worker's own unit test reads the source module, so it could not see the split. `tests/docs-consistency.test.ts` walks that import graph **transitively** against `TAIL_PATHS` now (one level is not enough, because whatever the contract itself imports is bundled too) and asserts at least one resolved path lands outside `workers/tail/`, since the Worker test's own `./index` import would otherwise make an empty walk look like a successful one. **A reach the walk cannot resolve fails the rule.** It appended `.ts` and nothing else, so a directory specifier standing for the `index.ts` inside it, and a NodeNext `./foo.js`, each produced a path that does not exist, and the final assertion was guarded by `existsSync`, which exempted precisely those. The floor did not notice either: one unresolvable entry is itself an entry outside `workers/tail/`. `ci.yml` also answers
-`workflow_dispatch`, and a manual dispatch on `main` runs `deploy-tail` unconditionally: the Worker reads the
-BetterStack token and host at deploy time, so rotating those variables changes no file, matches no path
-filter, and used to leave the Worker posting with dead credentials until an unrelated tail commit came along.
-A dispatch is the redeploy that rotation needs. The push-triggered gate is unchanged.
+`workflow_dispatch`, and a manual dispatch on `main` is the credential-rotation path: it runs `deploy-tail`
+unconditionally and `deploy-production` with `smoke` behind it, because every credential is read at build or
+deploy time — the Worker secrets ride `--secrets-file`, the public variables are inlined by the build, and
+the tail Worker takes its token and host as deploy arguments — so rotating any of them changes no file,
+matches no path filter, and used to leave the old value live until an unrelated commit came along.
+`release-web` stays push-gated: a dispatch redeploys the same sha and there is nothing to version. The
+push-triggered gates are unchanged.
 
 **`smoke` is the only job that ever touches production, and until this branch there was none.** `e2e` needs
 `deploy-development`, which runs on `pull_request` only, so a push to `main` deployed production, cut a tag
