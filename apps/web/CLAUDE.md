@@ -102,12 +102,22 @@ answered the question on its first run: the `Build` step passed, so the key is s
 `web-production`. Whatever breaks that checkout is something else, and this paragraph is not evidence about
 it. Do not read the guard as a fix for a bug; it is a guard for a hole that was open and is measured now.
 
-`PUBLIC_ENV` in [`next.config.ts`](./next.config.ts) is that equivalent, and it names three kinds because the
-variables are not read in one place: `required` is inlined into the client bundle and blocks the build,
-`optional` is inlined and only warns (missing analytics is not worth failing a release over, the same reason
-the smoke set stays small), and `runtime` is *not* inlined at all: `NEXT_PUBLIC_SITE_URL` and
+`PUBLIC_ENV` in [`next.config.ts`](./next.config.ts) is that equivalent. Each name maps to a zod schema, or
+to the `RUNTIME_ONLY` sentinel for the two that are never inlined: `NEXT_PUBLIC_SITE_URL` and
 `NEXT_PUBLIC_CONTACT_EMAIL` are read server-side off `CloudflareEnv`, which is why `wrangler.toml` declares
-them in `[vars]` and the build step deliberately does not pass them.
+them in `[vars]` and the build step deliberately passes neither. Everything else is parsed against its
+schema at build, and a rejection lists every offender rather than the first.
+
+**The schema is the statement, which is why there is no `required` flag beside it.** A variable that may be
+absent says so with `.optional()`, and one that may not says `.min(1)`; a label and a schema can disagree,
+and only one of them is what actually runs. zod is already a direct dependency of this package and is used
+in five modules, so this borrows the tool the app already validates with rather than adding one.
+
+**What earns the schema over a truthiness check is `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().startsWith("pk_")`.**
+An empty variable breaks the checkout, which is bad and visible. Pasting the **secret** key into the public
+one is worse and invisible: it compiles, it deploys, and it ships `sk_live_…` inside a bundle any visitor can
+read. The guard refuses it with *Invalid string: must start with `pk_`*, verified by building with an `sk_`
+value. Nothing else in the tree would have caught that.
 
 **Both sibling Astro repositories already had this, which is why only this package needed a hand-rolled
 one.** `env.schema` in their `astro.config.ts` is Astro's own typed surface, and it fails the build on a
@@ -128,7 +138,7 @@ empty string is still a `string`; it would also duplicate the surface `environme
 `reportSystemEnvInlining` is Turbopack-only and is the opposite concern, flagging *system* variables that
 leak into the bundle rather than declared ones that are missing. The off-the-shelf option is
 `@t3-oss/env-nextjs`, which is `env.schema` ported, and it buys a dependency and a zod tree to replace
-fifteen lines the contract already polices.
+fifteen lines the contract already polices, on top of the zod this package already depends on.
 
 The guard sits in the config rather than in `_deploy-web.yml` on purpose: it runs on **every** build, not
 only the one CI does, so a local `pnpm build` and a fork are covered too. It is gated on `isProd`, so a fresh

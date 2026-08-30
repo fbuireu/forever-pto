@@ -2,6 +2,7 @@ import { withBetterStack } from "@logtail/next";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import { z } from "zod";
 
 const withNextIntl = createNextIntlPlugin({
 	requestConfig: "./src/infrastructure/i18n/config.ts",
@@ -17,24 +18,30 @@ const withNextIntl = createNextIntlPlugin({
 
 const isProd = process.env.NODE_ENV === "production";
 
+export const RUNTIME_ONLY = "runtime-only";
+
 export const PUBLIC_ENV = {
-	NEXT_PUBLIC_BETTER_STACK_INGESTING_URL: "optional",
-	NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN: "optional",
-	NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN: "optional",
-	NEXT_PUBLIC_CONTACT_EMAIL: "runtime",
-	NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: "optional",
-	NEXT_PUBLIC_SITE_URL: "runtime",
-	NEXT_PUBLIC_STORAGE_KEY: "required",
-	NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: "required",
+	NEXT_PUBLIC_BETTER_STACK_INGESTING_URL: z.url().optional(),
+	NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN: z.string().optional(),
+	NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN: z.string().optional(),
+	NEXT_PUBLIC_CONTACT_EMAIL: RUNTIME_ONLY,
+	NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: z.string().optional(),
+	NEXT_PUBLIC_SITE_URL: RUNTIME_ONLY,
+	NEXT_PUBLIC_STORAGE_KEY: z.string().min(1),
+	NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().startsWith("pk_"),
 } as const;
 
 if (isProd) {
-	const missing = Object.entries(PUBLIC_ENV)
-		.filter(([name, kind]) => kind === "required" && !process.env[name]?.trim())
-		.map(([name]) => name);
+	const rejected = Object.entries(PUBLIC_ENV).flatMap(([name, schema]) => {
+		if (schema === RUNTIME_ONLY) return [];
 
-	if (missing.length > 0) {
-		throw new Error(`Missing public env the client bundle inlines: ${missing.join(", ")}`);
+		const parsed = schema.safeParse(process.env[name] || undefined);
+
+		return parsed.success ? [] : [`${name}: ${parsed.error.issues[0].message}`];
+	});
+
+	if (rejected.length > 0) {
+		throw new Error(`Public env the client bundle inlines is unusable:\n  ${rejected.join("\n  ")}`);
 	}
 }
 

@@ -503,8 +503,9 @@ on and `allowJs` off), that it sits beside the [`next.config.ts`](./apps/web/nex
 first position; that `PUBLIC_ENV` in [`apps/web/next.config.ts`](./apps/web/next.config.ts), imported rather
 than regexed out of the source, classifies exactly the `NEXT_PUBLIC_*` names
 [`apps/web/environment.d.ts`](./apps/web/environment.d.ts) declares, in both directions, and that each one is
-wired where its kind says it is read: an inlined one in the build step's `env:`, a `runtime` one in
-`wrangler.toml`'s `[vars]`, since those two are read off `CloudflareEnv` and never reach the client bundle;
+wired where it is actually read: one carrying a zod schema in the build step's `env:`, one carrying the
+`RUNTIME_ONLY` sentinel in `wrangler.toml`'s `[vars]`, since those two are read off `CloudflareEnv` and
+never reach the client bundle;
 that `typescript` is pinned **exactly** in all three manifests, that the root and `apps/web` carry the *same*
 pin and that `apps/docs` stays on a `6.` line: three dotted numbers, so a `rangeStrategy` flip to `^7.0.2` in
 every manifest at once fails rather than passing as "equal", and a docs package quietly dragged onto 7 fails

@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import ts from "@typescript/typescript6";
 import { describe, expect, it } from "vitest";
-import webNextConfig, { PUBLIC_ENV } from "../apps/web/next.config";
+import webNextConfig, { PUBLIC_ENV, RUNTIME_ONLY } from "../apps/web/next.config";
 
 const ROOT = resolve(__dirname, "..");
 const WEB = "apps/web";
@@ -473,9 +473,11 @@ describe("the workspace is shaped the way the guides describe it", () => {
 		const deployWorkflow = read(`${WORKFLOW_DIR}/_deploy-web.yml`);
 		const buildStep = stepBody({ workflow: deployWorkflow, name: "Build" });
 		const wrangler = read(`${WEB}/wrangler.toml`);
-		const unwired = Object.entries(PUBLIC_ENV).flatMap(([name, kind]) => {
-			const wired = kind === "runtime" ? wrangler.includes(name) : buildStep.includes(name);
-			return wired ? [] : [`${name} (${kind})`];
+		const unwired = Object.entries(PUBLIC_ENV).flatMap(([name, schema]) => {
+			const runtimeOnly = schema === RUNTIME_ONLY;
+			const wired = runtimeOnly ? wrangler.includes(name) : buildStep.includes(name);
+
+			return wired ? [] : [`${name} (${runtimeOnly ? "runtime" : "inlined"})`];
 		});
 
 		expect(unwired.sort()).toEqual([]);
