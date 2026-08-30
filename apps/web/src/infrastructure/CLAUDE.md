@@ -76,16 +76,47 @@ there, not here.
 
 ## Layer rules
 
-May import from `@application/*` (DTO types and schemas, use-cases) and, in `workers/` only, from
-`@domain/calendar/*`. Must not import from `@ui/*`.
+May import from `@application/*` (DTO types and schemas, use-cases) and from `@domain/*`, which is narrower in
+practice than it reads and is enumerated below. Must not import a React component, a style or an asset out of
+`@ui/*`.
 
-**Nothing here imports from `@ui/*`, and that is newly true.** [`clients/tutorial/driver/client.tsx`](./clients/tutorial/driver/client.tsx) used to
-import two animated icons so the driver.js popover could render the app's own close button; it now takes the
-element as an injected `closeIcon` config prop, and [`hooks/useTutorial.tsx`](../ui/hooks/useTutorial.tsx) in the UI layer, already on the
-other side of the boundary, builds it and passes it to `start()`. A component import creeping back into the driver client
-is the regression to watch for.
+**Both halves of that rule used to be stated more tightly than the tree keeps them, and both were checked
+against the tree rather than against the sentence.** What it said was *in `workers/` only, from
+`@domain/calendar/*`* and *must not import from `@ui/*`*, with a paragraph asserting that nothing here did.
+Neither survived a walk of the imports.
 
-None of this is lint-enforced. Biome has no import-boundary rule; these are conventions upheld in review.
+**`@domain/*` is reached from four files, and one of them is neither in `workers/` nor from `calendar/`.**
+[`workers/types.ts`](./workers/types.ts), [`workers/utils/serializers.ts`](./workers/utils/serializers.ts) and
+[`workers/worker.ts`](./workers/worker.ts) take the calendar types and `runPlanningPipeline`, which is the
+documented case. [`services/payments/repository.ts`](./services/payments/repository.ts) takes
+`PaymentStatus` from `@domain/payment/events/types`, as `import type`, because the column it writes is that
+union and the alternative is a second declaration of the same seven strings one layer down. That is the whole
+of the exception: a **type** out of the payment context, into the module that persists it. Anything with a
+runtime dependency, or anything out of `@domain/calendar/` outside `workers/`, is not covered by it.
+
+**Seven imports across two files reach `apps/web/src/ui/`, through the `@i18n` shorthand.**
+[`i18n/config.ts`](./i18n/config.ts) loads a locale bundle dynamically and
+[`markdown/buildMarkdownPage.ts`](./markdown/buildMarkdownPage.ts) imports all six statically, both as
+`@i18n/messages/<locale>.json`. `@i18n/*` resolves to `./src/ui/i18n/*`, so those are `infrastructure -> ui`
+edges; the old rule read the literal specifier `@ui/` and the shorthand walked straight past it. They are
+tolerated rather than endorsed: the bundles are translation **data**, not UI, no component is pulled in
+behind them, and the alternative is moving `src/ui/i18n/messages/` to a fourth top-level tier, which is the
+move [ADR 0012](../../../../adr/0012-shared-date-helpers-stay-in-the-application-layer.md) already weighed
+and rejected for the date helpers. The rule that matters is the one the sentence was reaching for: **no
+component, no style, no asset**. `tests/docs-consistency.test.ts` reads all four aliases that land inside
+`src/ui/` (`@ui/`, `@i18n/`, `@styles/`, `@assets/`) and fails on any importer here outside those two files.
+
+**No React component reaches this layer, and that part is newly true.**
+[`clients/tutorial/driver/client.tsx`](./clients/tutorial/driver/client.tsx) used to import two animated
+icons so the driver.js popover could render the app's own close button; it now takes the element as an
+injected `closeIcon` config prop, and [`hooks/useTutorial.tsx`](../ui/hooks/useTutorial.tsx) in the UI layer,
+already on the other side of the boundary, builds it and passes it to `start()`. A component import creeping
+back into the driver client is the regression to watch for, and it is the one the suite now catches rather
+than review.
+
+Biome still has no import-boundary rule, so everything above holds by review except the two shapes the
+contract suite reads: the `src/ui/` reach listed here, and the layer graph as a whole, which
+`tests/docs-consistency.test.ts` compares against the table published in the architecture overview.
 
 ## Effect, and where it stops
 

@@ -101,6 +101,16 @@ all three properties.
 - **Use the glossary's words.** [CONTEXT.md](./CONTEXT.md) names one canonical term per concept and lists
   the retired ones. A variable called `vacationDays` where the glossary says PTO Day is a defect, not a
   style preference; the vocabulary is the only thing keeping four names for the same number apart.
+- **The strategic half of domain-driven design is a constraint here; the tactical half is a technique.**
+  The glossary rules the names, the two bounded contexts under [`apps/web/src/domain`](./apps/web/src/domain)
+  stay separate, the layer boundaries hold, and the dependency graph is *measured* against the tree rather
+  than drawn from the intent. Everything tactical is applied only where it pays, decided by three questions
+  in order: is the illegal state reachable, does anyone read it, does it cross a boundary. Three "no" means
+  writing the rule rather than encoding it, and the written rule is finished work. Which practices are taken,
+  which are taken in part and which are rejected is
+  [ADR 0014](./adr/0014-ddd-where-it-pays.md), with six worked examples out of this
+  repository and the reason each was decided the way it was. The absences are deliberate: no aggregates, no
+  repository pattern, no entities, no event bus, and a domain that imports upward in two documented places.
 - **No re-export barrel files.** Import from the source module; a pass-through `index.ts` hides the real
   dependency graph and defeats the layer rules.
 - **Conventional commits** (commitlint + husky). semantic-release owns versioning. Do NOT add a

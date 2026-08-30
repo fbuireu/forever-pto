@@ -19,18 +19,66 @@ Forever PTO is a Next.js App Router application organized into five layers under
 
 ## Dependency direction
 
-The intended flow points inwards, towards the domain:
+This section used to draw `app → ui → application → domain` with two side arrows, and that picture was read
+off the intent rather than off the tree. Walking every `import`, `import type`, dynamic `import()` and
+`vi.mock` specifier under `apps/web/src` gives **fifteen** production edges between the five layers plus
+`proxy.ts`, and the old figure drew five of them. The largest one it left out was `app → infrastructure`, at
+63 imports across 20 files, the third-heaviest edge in the package. It also mixed two relations under one
+arrow head, labelling infrastructure as *reached through use-cases, services and adapters*: that is a call
+path, not an import, and a diagram whose arrows mean `imports` cannot carry both.
 
-```text
-app  →  ui  →  application  →  domain
-         ↘        ↓
-        infrastructure  (reached through use-cases, services and adapters)
-```
+The table below is the graph, counted from the tree with tests excluded, as `imports/files`. An empty cell is
+an edge that does not exist. `tests/docs-consistency.test.ts` fails when this table and the tree disagree in
+either direction, so it is a measurement rather than a drawing.
 
-- `apps/web/src/domain/calendar/` is fully pure, with no framework, browser or SDK imports. Its one documented exception is consuming `HolidayDTO` from `@application/dto/holiday/types` (see `apps/web/src/domain/calendar/CLAUDE.md`).
-- `apps/web/src/domain/payment/handlers/` is the pragmatic outlier: the webhook handlers consume infrastructure services (Turso repository, Stripe provider) through Effect context rather than instantiating them; see [Effect layers](/architecture/effect-layers/).
-- Stores in `apps/web/src/application/stores/` never call SDK clients directly; they delegate to `apps/web/src/infrastructure/services/*`.
-- Server-side composition of external dependencies happens once, in `apps/web/src/infrastructure/layers.ts` (`ApplicationLayer`).
+| from / to | `app` | `ui` | `application` | `domain` | `infrastructure` |
+| --- | --- | --- | --- | --- | --- |
+| `app` | | 81/16 | 6/6 | | 63/20 |
+| `ui` | | | 137/69 | 14/11 | 23/15 |
+| `application` | | 1/1 | | 14/7 | 35/10 |
+| `domain` | | | 13/9 | | 12/3 |
+| `infrastructure` | | 7/2 | 33/23 | 5/4 | |
+| `proxy.ts` | | | | | 5/1 |
+
+Read the shape rather than the numbers. Four things are worth naming, and three of them are arrows the old
+figure said were not there:
+
+- **`app` never imports `domain`.** It is the only empty cell a reader would expect to be full, and it is the
+  layering claim this package actually keeps: a route handler or a page reaches a business rule through
+  `@application/use-cases/*` or through the calculations worker, never directly.
+- **`domain` imports upwards, in both directions.** `domain → application` is the calendar context reaching
+  `HolidayDTO` and the shared date helpers; that arrow points the wrong way on purpose, and
+  [ADR 0012](https://github.com/fbuireu/forever-pto/blob/main/adr/0012-shared-date-helpers-stay-in-the-application-layer.md)
+  records what every alternative costs. `domain → infrastructure` is the payment context composing Effect
+  programs against service tags, which is
+  [ADR 0003](https://github.com/fbuireu/forever-pto/blob/main/adr/0003-pure-calendar-domain-effectful-payment-domain.md).
+- **`infrastructure` imports upwards too**, and one of those edges was undocumented until this page was
+  corrected: seven imports across two files reach `apps/web/src/ui/i18n/messages/*.json` through the `@i18n`
+  shorthand. The infrastructure guide said nothing there imports from `@ui/*`, which was true of the literal
+  specifier and false of the layer.
+- **`application → ui` is a single import**, recorded as a known inversion in
+  `apps/web/src/application/CLAUDE.md`. One is the number; a second is a regression.
+
+The normative statements stay with the code, in the layer contracts, and this page links rather than restates
+them:
+
+- `apps/web/src/domain/CLAUDE.md` enumerates exactly what the pure calendar context may import from outside
+  itself, and why the test for a fifth entry is the runtime rather than the layer.
+- `apps/web/src/application/CLAUDE.md` carries the orchestration rules and the one `@ui/*` inversion.
+- `apps/web/src/infrastructure/CLAUDE.md` carries what the outward-facing layer may reach back into.
+- `apps/web/src/ui/CLAUDE.md` lists the short set of pure value helpers the UI may take from
+  `@domain/calendar`, and why it must not reach the planning engine itself.
+
+Two facts about the system that no import arrow carries, and that the old figure tried to put on one:
+
+- Stores in `apps/web/src/application/stores/` never call SDK clients directly; they delegate to
+  `apps/web/src/infrastructure/services/*`.
+- Server-side composition of external dependencies happens once, in `apps/web/src/infrastructure/layers.ts`
+  (`ApplicationLayer`). That is runtime wiring, not an import direction; see
+  [Effect layers](/architecture/effect-layers/).
+
+Which practices this tree takes from domain-driven design, which it takes in part and which it rejects, is
+[ADR 0014](https://github.com/fbuireu/forever-pto/blob/main/adr/0014-ddd-where-it-pays.md).
 
 ## A CLAUDE.md per folder
 
@@ -38,11 +86,14 @@ Per the repo's root `CLAUDE.md`, every significant folder carries its own `CLAUD
 
 ## Path aliases
 
-Defined in the root `tsconfig.json` (`compilerOptions.paths`); Vitest resolves them natively via `resolve.tsconfigPaths` and the docs site replicates the ones it needs.
+Declared in `apps/web/tsconfig.json` (`compilerOptions.paths`), not at the repo root: the root
+`tsconfig.json` covers `tests/` and excludes `apps/` outright. `apps/web/vitest.config.ts` sets
+`resolve.tsconfigPaths`, so a new alias is one edit; the docs site replicates the single one it needs,
+`@ui/*`, in `apps/docs/tsconfig.json`.
 
 | Alias | Target |
 | --- | --- |
-| `apps/web/src/*` | `./src/*` |
+| `src/*` | `./src/*` |
 | `@app/*` | `./src/app/*` |
 | `@infrastructure/*` | `./src/infrastructure/*` |
 | `@domain/*` | `./src/domain/*` |
@@ -51,10 +102,16 @@ Defined in the root `tsconfig.json` (`compilerOptions.paths`); Vitest resolves t
 | `@assets/*` | `./src/ui/assets/*` |
 | `@styles/*` | `./src/ui/styles/*` |
 | `@i18n/*` | `./src/ui/i18n/*` |
-| `@mocks/*` | `./src/mocks/*` |
-| `@types/*` | `./src/types/*` |
 
-Note that `@assets`, `@styles` and `@i18n` all point inside `apps/web/src/ui/`: they are shorthands, not separate layers. Each package has its own `tsconfig.json`, so the two type-check independently; the app's aliases carry no `baseUrl` and resolve against that file.
+That is the whole list. This page carried two more, `@mocks/*` and `@types/*`, pointing at
+`apps/web/src/mocks` and `apps/web/src/types`; neither alias is declared and neither directory exists. The
+rule keeping the same table honest in `apps/web/CLAUDE.md` read only that file, so the published copy could
+drift and did. It reads both now.
+
+`@assets`, `@styles` and `@i18n` all point inside `apps/web/src/ui/`: they are shorthands, not separate
+layers, which is why an `@i18n/...` import from `apps/web/src/infrastructure/` is an `infrastructure → ui`
+edge and appears as one in the table above. Each package has its own `tsconfig.json`, so the two type-check
+independently; the app's aliases carry no `baseUrl` and resolve against that file.
 
 ## Related pages
 

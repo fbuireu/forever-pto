@@ -130,6 +130,13 @@ See [`apps/web/.env.example`](apps/web/.env.example) for the full list. Key vari
 | [`CONTEXT.md`](CONTEXT.md) | The domain glossary: one canonical name per concept |
 | [`adr/`](adr/) | Why it is like this. One hard-to-reverse decision per file |
 
+**The architecture is domain-driven in its strategic half and deliberately not in its tactical half.** The
+glossary rules the names, the two bounded contexts and the layer boundaries are constraints, and the
+dependency graph is measured rather than drawn; aggregates, repositories, entities and an event bus are all
+absent on purpose. Which practices are taken, which are taken in part and which are rejected, with the reason
+for each and six worked examples from this tree, is
+[ADR 0014](adr/0014-ddd-where-it-pays.md). Read it before proposing that anything here be "finished".
+
 Selected folders under [`apps/web/src/`](./apps/web/src) carry their own `CLAUDE.md` with the detail for that folder: the five layer roots plus sixteen sub-folders, all listed in [`apps/web/CLAUDE.md`](apps/web/CLAUDE.md).
 [`tests/docs-consistency.test.ts`](tests/docs-consistency.test.ts) runs with the unit suite and fails the build
 when the docs and the code disagree.

@@ -100,7 +100,19 @@ straight into the row, so the one thing the value can do is appear on screen. `o
 `rules.ts` because it is the union's own membership test, which is what `isFilterStrategy` is to
 `FilterStrategy` in [`../../domain/calendar/types.ts`](../../domain/calendar/types.ts).
 
-`Raw*` types must not escape this folder. If a `RawHoliday` shows up in a store or a component, a mapping step was skipped.
+**`Raw*` types reach exactly one place outside this folder, and the rule used to be stated as if they
+reached none.** It said they "must not escape this folder", then illustrated it with a store or a component,
+and the tree keeps the second sentence rather than the first: `RawHoliday` is named in eight files under
+[`../../infrastructure/services/holidays/source/`](../../infrastructure/services/holidays/source), which is
+the adapter that *produces* the shape and hands it to `holidayDTO.create`. That is the upstream side of this
+seam, and a foreign type has to be spellable there or the adapter cannot type its own output. `RawCountry`
+and `RawRegion` reach nothing outside this folder at all.
+
+Where a `Raw*` may not go is everything on the other side of the mapper: a store, a component, a page, a
+route handler, a use-case or the domain. One showing up there means a mapping step was skipped, and it is the
+one half of this rule that is mechanically checked:
+[`tests/docs-consistency.test.ts`](../../../../../tests/docs-consistency.test.ts) fails on any `Raw*` name
+under `application/stores/`, `ui/`, `app/`, `application/use-cases/` or `domain/`.
 
 **`contact/rules.ts` holds the sender identity, and it is not `normalizeEmail`.** The contact guard keys on
 `contactSenderKey`, which lowercases, trims **and strips a `+alias` from the local part**, so

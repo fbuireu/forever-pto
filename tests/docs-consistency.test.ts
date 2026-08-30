@@ -1328,7 +1328,10 @@ describe("documentation does not point at things that are gone", () => {
 	});
 
 	it("prints repo-relative paths in the published wiki, never package-relative ones", () => {
-		const ambiguous = /^(src|e2e|workers|public)\//;
+		// A trailing `/*` makes the token a path-alias specifier rather than a path: `src/*` is the ninth entry
+		// in the web tsconfig's `paths` and is spelled exactly that way there, so the alias table has to print
+		// it verbatim. No file is named `*`, so exempting the wildcard form costs this rule nothing.
+		const ambiguous = /^(src|e2e|workers|public)\/(?!\*$)/;
 		const offenders: string[] = [];
 		for (const file of contentFiles) {
 			for (const [, token] of read(file).matchAll(BACKTICKED_TOKEN)) {
@@ -1500,12 +1503,222 @@ describe("directives sit where the compiler can see them", () => {
 	});
 });
 
+describe("the published layer graph is the one the imports make", () => {
+	// The overview page drew `app -> ui -> application -> domain` for as long as nobody walked the tree. Five
+	// of the sixteen production edges were on it, `app -> infrastructure` (63 imports across 20 files) was not,
+	// and one arrow head carried a call path rather than an import. A diagram read off the intent will always
+	// drift back to the intent, so the page publishes a counted table and this rule counts the same thing.
+	//
+	// Tests are excluded on both sides: a `vi.mock` of another layer is a fact about the test, not about what
+	// ships. Every alias that resolves inside `apps/web/src` is followed, which is the half the old prose rule
+	// missed: `@i18n/`, `@styles/` and `@assets/` all land in `src/ui/`, so an `@i18n/...` import is a
+	// `ui` edge however little it looks like one.
+	const WEB_SRC = `${WEB}/src`;
+	const LAYER_NAMES = ["app", "application", "domain", "infrastructure", "ui"];
+	const PROXY_NODE = "proxy.ts";
+	const OVERVIEW = `${DOCS}/src/content/docs/architecture/overview.mdx`;
+	const GRAPH_TABLE_HEADER = "from / to";
+	const IMPORT_SPECIFIER =
+		/from\s*["']([^"']+)["']|import\s*\(\s*["'`]([^"'`]+)["'`]\s*\)|(?:^|\n)\s*import\s*["']([^"']+)["']|require\s*\(\s*["']([^"']+)["']\s*\)|vi\.mock\(\s*["']([^"']+)["']/g;
+
+	// Derived from the tsconfig rather than restated, so a new alias is followed the day it is declared.
+	const aliasTargets = Object.entries(webTsconfigPaths).map(
+		([alias, [target]]) =>
+			[
+				alias.replace(ALIAS_WILDCARD_SUFFIX, ""),
+				`${WEB}/${(target ?? "").replace(ALIAS_WILDCARD_SUFFIX, "").replace(/^\.\//, "")}`,
+			] as const,
+	);
+
+	const nodeOf = (path: string): string | null => {
+		if (!path.startsWith(`${WEB_SRC}/`)) return null;
+		const rest = path.slice(WEB_SRC.length + 1);
+		if (rest === PROXY_NODE) return PROXY_NODE;
+		const [head] = rest.split("/");
+		return head && LAYER_NAMES.includes(head) ? head : null;
+	};
+
+	interface Edge {
+		from: string;
+		to: string;
+	}
+
+	const productionSources = sourceFiles.filter((path) => path.startsWith(`${WEB_SRC}/`) && !/\.test\.tsx?$/.test(path));
+
+	const reaches: (Edge & { file: string })[] = [];
+	for (const file of productionSources) {
+		const from = nodeOf(file);
+		if (!from) continue;
+		const source = read(file);
+		IMPORT_SPECIFIER.lastIndex = 0;
+		let match: RegExpExecArray | null = IMPORT_SPECIFIER.exec(source);
+		while (match !== null) {
+			const specifier = match[1] ?? match[2] ?? match[3] ?? match[4] ?? match[5];
+			const alias = specifier ? aliasTargets.find(([prefix]) => specifier.startsWith(prefix)) : undefined;
+			const target = alias && specifier ? `${alias[1]}${specifier.slice(alias[0].length)}` : null;
+			const to = target ? nodeOf(target) : null;
+			if (to && to !== from) reaches.push({ from, to, file });
+			match = IMPORT_SPECIFIER.exec(source);
+		}
+	}
+
+	const measured = new Map<string, string>();
+	for (const { from, to } of reaches) {
+		const key = `${from} -> ${to}`;
+		const all = reaches.filter((edge) => edge.from === from && edge.to === to);
+		measured.set(key, `${all.length}/${new Set(all.map((edge) => edge.file)).size}`);
+	}
+
+	// The table is read as data: the header names the columns, every later row names its own source node.
+	const publishedGraph = () => {
+		// One contiguous run of rows, not every table row on the page: the alias table further down is also a
+		// table, and a filter over the whole file swallowed it and invented ten edges out of its cells.
+		const lines = read(OVERVIEW).split(/\r?\n/);
+		const header = lines.findIndex(
+			(line) => TABLE_ROW.test(line) && line.split("|")[1]?.trim().replace(/`/g, "") === GRAPH_TABLE_HEADER,
+		);
+		if (header < 0) return null;
+
+		const run = [lines[header] ?? ""];
+		for (const line of lines.slice(header + 1)) {
+			if (!TABLE_ROW.test(line)) break;
+			run.push(line);
+		}
+		const rows = run.map((line) =>
+			line
+				.trim()
+				.slice(1, -1)
+				.split("|")
+				.map((cell) => cell.trim().replace(/`/g, "")),
+		);
+
+		const columns = rows[0]?.slice(1) ?? [];
+		const published = new Map<string, string>();
+		for (const row of rows.slice(1)) {
+			const [from, ...cells] = row;
+			if (!from || TABLE_SEPARATOR_ROW.test(row.join("|"))) continue;
+			cells.forEach((cell, index) => {
+				const to = columns[index];
+				if (to && cell) published.set(`${from} -> ${to}`, cell);
+			});
+		}
+
+		return published;
+	};
+
+	it("finds the counted table on the architecture overview at all", () => {
+		expect(publishedGraph()?.size ?? 0).toBeGreaterThan(10);
+		expect(measured.size).toBeGreaterThan(10);
+	});
+
+	it("draws every edge the tree has, with the counts the tree has", () => {
+		const published = publishedGraph() ?? new Map<string, string>();
+		const wrong = [...measured.entries()]
+			.filter(([edge, counts]) => published.get(edge) !== counts)
+			.map(([edge, counts]) => `${edge} is ${counts}, published as ${published.get(edge) ?? "no edge"}`);
+
+		expect(wrong).toEqual([]);
+	});
+
+	it("draws no edge the tree does not have", () => {
+		const published = publishedGraph() ?? new Map<string, string>();
+		const invented = [...published.keys()].filter((edge) => !measured.has(edge));
+
+		expect(invented).toEqual([]);
+	});
+
+	// The layer contract this replaced said "must not import from `@ui/*`" and asserted that nothing did.
+	// `@i18n/`, `@styles/` and `@assets/` all resolve inside `src/ui/`, so seven imports walked past the rule
+	// while it read as enforced. Two files reach the locale bundles and are named here; a third, or a reach
+	// into anything but `i18n/messages/`, is what this catches.
+	const UI_DATA_IMPORTERS = new Set([
+		`${WEB_SRC}/infrastructure/i18n/config.ts`,
+		`${WEB_SRC}/infrastructure/markdown/buildMarkdownPage.ts`,
+	]);
+	const LOCALE_BUNDLE = `${WEB_SRC}/ui/i18n/messages/`;
+
+	// The anti-corruption layer only works while the foreign shape stops at it. `Raw*` is spellable in
+	// `application/dto/` and in the adapter that produces it (`services/holidays/source/`, eight files);
+	// anywhere past the mapper means a mapping step was skipped. The dto guide stated the rule as if it
+	// reached nowhere outside the folder, which the adapter has always contradicted, so the half that is
+	// true is the half asserted here.
+	const RAW_TYPE = /\bRaw[A-Z]\w*/;
+	const PAST_THE_MAPPER = [
+		`${WEB_SRC}/app/`,
+		`${WEB_SRC}/domain/`,
+		`${WEB_SRC}/ui/`,
+		`${WEB_SRC}/application/stores/`,
+		`${WEB_SRC}/application/use-cases/`,
+	];
+
+	it("keeps every foreign Raw shape on the upstream side of the DTO seam", () => {
+		const checked = sourceFiles.filter((path) => PAST_THE_MAPPER.some((prefix) => path.startsWith(prefix)));
+		const offenders = checked.filter((path) => RAW_TYPE.test(read(path)));
+
+		expect(checked.length).toBeGreaterThan(100);
+		expect(offenders).toEqual([]);
+	});
+
+	it("lets infrastructure reach nothing under src/ui but the two locale-bundle readers", () => {
+		const offenders = reaches
+			.filter(({ from, to }) => from === "infrastructure" && to === "ui")
+			.filter(({ file }) => !UI_DATA_IMPORTERS.has(file))
+			.map(({ file }) => file);
+
+		expect([...new Set(offenders)]).toEqual([]);
+	});
+
+	it("keeps those two on the locale bundles and nothing else in the ui layer", () => {
+		const strayed: string[] = [];
+		for (const file of UI_DATA_IMPORTERS) {
+			const source = read(file);
+			IMPORT_SPECIFIER.lastIndex = 0;
+			let match: RegExpExecArray | null = IMPORT_SPECIFIER.exec(source);
+			while (match !== null) {
+				const specifier = match[1] ?? match[2] ?? match[3] ?? match[4] ?? match[5];
+				const alias = specifier ? aliasTargets.find(([prefix]) => specifier.startsWith(prefix)) : undefined;
+				const target = alias && specifier ? `${alias[1]}${specifier.slice(alias[0].length)}` : null;
+				if (target && nodeOf(target) === "ui" && !target.startsWith(LOCALE_BUNDLE)) {
+					strayed.push(`${file} -> ${specifier}`);
+				}
+				match = IMPORT_SPECIFIER.exec(source);
+			}
+		}
+
+		expect(strayed).toEqual([]);
+	});
+});
+
 describe("the guides describe the project as it is configured", () => {
 	// Backticked `foo/*` tokens are aliases; the dot filter drops the wrangler route pattern
 	// `forever-pto.com/*`. Whole backticked tokens, not substrings: the rule this replaced stripped the
 	// `/*` and searched the raw file, so `@app` matched inside `@application` and `src/*` reduced to `src`,
 	// and either alias could be deleted from the guide with every assertion still green.
 	const documentedAliases = new Set([...webGuide.matchAll(BACKTICKED_ALIAS)].map(([, alias]) => alias));
+	// The same table is published on the architecture overview, and this rule read only the guide, so the wiki
+	// copy carried `@mocks/*` and `@types/*` (neither declared, neither directory existing) for as long as
+	// nobody opened the tsconfig beside it. Both copies are held to the declaration now.
+	//
+	// The page's table is read as a table rather than scanned like the guide: the prose around it names the
+	// two aliases it is explaining are *gone*, and a whole-page scan reads those as declarations, along with
+	// every backticked `<something>/*` in a sentence. The first column of the run under the `Alias` header is
+	// the list; nothing else on the page is.
+	const OVERVIEW_PAGE = `${DOCS}/src/content/docs/architecture/overview.mdx`;
+	const ALIAS_TABLE_HEADER = "Alias";
+	const publishedAliases = (() => {
+		const lines = read(OVERVIEW_PAGE).split(/\r?\n/);
+		const header = lines.findIndex((line) => TABLE_ROW.test(line) && line.split("|")[1]?.trim() === ALIAS_TABLE_HEADER);
+		if (header < 0) return new Set<string>();
+
+		const found = new Set<string>();
+		for (const line of lines.slice(header + 1)) {
+			if (!TABLE_ROW.test(line)) break;
+			const cell = line.split("|")[1]?.trim() ?? "";
+			for (const [, alias] of cell.matchAll(BACKTICKED_ALIAS)) found.add(alias);
+		}
+
+		return found;
+	})();
 	// The unfiltered citations only. A `--filter`/`-F`/`--dir`/`-C` invocation names the manifest it means,
 	// so it is resolved against that one rather than against whichever of the three happens to have the
 	// script, by the rule further down.
@@ -1756,6 +1969,14 @@ describe("the guides describe the project as it is configured", () => {
 
 	it("documents no path alias the web tsconfig does not declare", () => {
 		expect([...documentedAliases].filter((alias) => !(alias in webTsconfigPaths))).toEqual([]);
+	});
+
+	it("publishes every path alias the web tsconfig declares", () => {
+		expect(Object.keys(webTsconfigPaths).filter((alias) => !publishedAliases.has(alias))).toEqual([]);
+	});
+
+	it("publishes no path alias the web tsconfig does not declare", () => {
+		expect([...publishedAliases].filter((alias) => !(alias in webTsconfigPaths))).toEqual([]);
 	});
 
 	it("declares no alias pointing at a directory that does not exist", () => {

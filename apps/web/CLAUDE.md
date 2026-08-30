@@ -342,6 +342,13 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
   oversight; do not "harden" either in passing. There *is* a session layer: the entitlement travels in a
   signed HTTP-only cookie.
   [ADR 0008](../../adr/0008-premium-derived-from-payment.md).
+- **The layer graph is published as a counted table, not drawn.** The five layers plus
+  [`src/proxy.ts`](./src/proxy.ts) make fifteen production import edges, and the figure that used to stand
+  for them had five. The table on the documentation site's architecture overview is asserted against the tree in
+  both directions by [`tests/docs-consistency.test.ts`](../../tests/docs-consistency.test.ts), so a new
+  cross-layer import fails the contract suite until the table is updated. What is a constraint here and what
+  is a technique applied only where it pays is
+  [ADR 0014](../../adr/0014-ddd-where-it-pays.md).
 - **The two bounded contexts under [`src/domain/`](./src/domain) follow different rules.** `calendar/` is pure because it runs
   in a Web Worker; `payment/` composes Effect against infrastructure tags. Neither is lint-enforced.
   [ADR 0003](../../adr/0003-pure-calendar-domain-effectful-payment-domain.md).
