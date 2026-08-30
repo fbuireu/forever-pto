@@ -176,7 +176,11 @@ Vitest, `happy-dom`, co-located `.test.tsx`. Two exclusions in [`vitest.config.t
   `Icon.tsx`, whose co-located test runs with everything else.
 
 Coverage is deliberately uneven and you should not read a missing test as an oversight to fix in
-passing. [`core/animate/`](./core/animate) is tested close to exhaustively; [`core/primitives/`](./core/primitives) has no tests at all;
+passing. [`core/animate/`](./core/animate) is tested close to exhaustively; [`core/primitives/`](./core/primitives) carries three, and
+this sentence said it carried none long after `Sonner.test.tsx` and `Combobox.test.tsx` landed, which is why
+the third, [`core/primitives/utils/helpers.test.ts`](./core/primitives/utils/helpers.test.ts), is named here
+rather than counted: it is the whole of the logic in that folder, `hasFlag`, and the reason an empty `flag`
+string has to read as no flag is that a Region has none and the picker would otherwise render a blank slot;
 `pages/`, `shared/` and `sidebar/` have tests only where logic lives (`ManagementBar`, `Summary` charts,
 homepage sections, `shared/utils/helpers.ts`, the two forms that render an API failure, and, because both
 held a defect that no type or lint rule can catch, [`sidebar/components/PtoCalculator.tsx`](./sidebar/components/PtoCalculator.tsx) and
