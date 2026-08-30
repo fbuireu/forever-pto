@@ -54,7 +54,7 @@ vi.mock("./Tooltip", () => ({
 	TooltipTrigger: ({ children, ...props }: ComponentProps<"button">) => <button {...props}>{children}</button>,
 }));
 
-import { Sidebar, SidebarProvider, SidebarTrigger, useSidebar } from "./Sidebar";
+import { Sidebar, SidebarMenuButton, SidebarProvider, SidebarTrigger, useSidebar } from "./Sidebar";
 
 describe("useSidebar", () => {
 	it("throws when used outside SidebarProvider", () => {
@@ -182,6 +182,210 @@ describe("Sidebar mobile drawer focus", () => {
 
 		expect(queryByRole("dialog")).toBeNull();
 		expect(document.activeElement).toBe(trigger);
+		viewport.isMobile = false;
+	});
+});
+
+const StateHarness = ({ children }: { children?: ReactNode }) => {
+	const { state, open, openMobile } = useSidebar();
+	return (
+		<span data-testid="state" data-state={state} data-open={String(open)} data-open-mobile={String(openMobile)}>
+			{children}
+		</span>
+	);
+};
+
+const readState = (view: ReturnType<typeof render>) => view.getByTestId("state").dataset;
+
+describe("the rail remembers whether it was collapsed", () => {
+	it("reopens collapsed when that is what the cookie says", () => {
+		vi.spyOn(document, "cookie", "get").mockReturnValue("sidebar_state=false");
+
+		const view = render(
+			<SidebarProvider>
+				<StateHarness />
+			</SidebarProvider>,
+		);
+
+		expect(readState(view).state).toBe("collapsed");
+		vi.restoreAllMocks();
+	});
+
+	it("finds its own cookie among the others rather than only as the first", () => {
+		vi.spyOn(document, "cookie", "get").mockReturnValue("NEXT_LOCALE=en; sidebar_state=false; user-country=ES");
+
+		const view = render(
+			<SidebarProvider>
+				<StateHarness />
+			</SidebarProvider>,
+		);
+
+		expect(readState(view).state).toBe("collapsed");
+		vi.restoreAllMocks();
+	});
+
+	it("stays open on any value that is not the word false", () => {
+		vi.spyOn(document, "cookie", "get").mockReturnValue("sidebar_state=true");
+
+		const view = render(
+			<SidebarProvider>
+				<StateHarness />
+			</SidebarProvider>,
+		);
+
+		expect(readState(view).state).toBe("expanded");
+		vi.restoreAllMocks();
+	});
+
+	it("leaves a caller that owns the state alone, cookie or no cookie", () => {
+		vi.spyOn(document, "cookie", "get").mockReturnValue("sidebar_state=false");
+
+		const view = render(
+			<SidebarProvider open onOpenChange={vi.fn()}>
+				<StateHarness />
+			</SidebarProvider>,
+		);
+
+		expect(readState(view).state).toBe("expanded");
+		vi.restoreAllMocks();
+	});
+});
+
+describe("the keyboard shortcut", () => {
+	const renderShortcutHarness = () =>
+		render(
+			<SidebarProvider>
+				<StateHarness />
+			</SidebarProvider>,
+		);
+
+	it("collapses the rail on the modifier and the key together", () => {
+		const view = renderShortcutHarness();
+
+		act(() => {
+			fireEvent.keyDown(window, { key: "b", metaKey: true });
+		});
+
+		expect(readState(view).state).toBe("collapsed");
+	});
+
+	it("takes the control key too, since not every keyboard has a command key", () => {
+		const view = renderShortcutHarness();
+
+		act(() => {
+			fireEvent.keyDown(window, { key: "b", ctrlKey: true });
+		});
+
+		expect(readState(view).state).toBe("collapsed");
+	});
+
+	it("leaves a bare press of the same key alone, so typing is not a shortcut", () => {
+		const view = renderShortcutHarness();
+
+		act(() => {
+			fireEvent.keyDown(window, { key: "b" });
+		});
+
+		expect(readState(view).state).toBe("expanded");
+	});
+
+	it("opens the drawer rather than the rail on a phone", () => {
+		viewport.isMobile = true;
+		const view = renderShortcutHarness();
+
+		act(() => {
+			fireEvent.keyDown(window, { key: "b", metaKey: true });
+		});
+
+		expect(readState(view).openMobile).toBe("true");
+		expect(readState(view).state).toBe("expanded");
+		viewport.isMobile = false;
+	});
+
+	it("tells a caller that owns the state instead of writing its own", () => {
+		const onOpenChange = vi.fn();
+		render(
+			<SidebarProvider open onOpenChange={onOpenChange}>
+				<StateHarness />
+			</SidebarProvider>,
+		);
+
+		act(() => {
+			fireEvent.keyDown(window, { key: "b", metaKey: true });
+		});
+
+		expect(onOpenChange).toHaveBeenCalledExactlyOnceWith(false);
+	});
+
+	it("stops listening once the provider goes away", () => {
+		const { unmount } = renderShortcutHarness();
+
+		unmount();
+
+		expect(() => fireEvent.keyDown(window, { key: "b", metaKey: true })).not.toThrow();
+	});
+});
+
+describe("a menu button in a collapsed rail", () => {
+	const renderMenu = ({ defaultOpen = true, tooltip }: { defaultOpen?: boolean; tooltip?: string } = {}) => {
+		const onClick = vi.fn();
+		const view = render(
+			<SidebarProvider defaultOpen={defaultOpen}>
+				<StateHarness />
+				<SidebarMenuButton tooltip={tooltip} onClick={onClick}>
+					Countries
+				</SidebarMenuButton>
+			</SidebarProvider>,
+		);
+		return { ...view, onClick };
+	};
+
+	it("opens the rail before it forwards the click, so the control it just revealed is usable", () => {
+		const view = renderMenu({ defaultOpen: false });
+
+		fireEvent.click(view.getByRole("button", { name: "Countries" }));
+
+		expect(readState(view).state).toBe("expanded");
+		expect(view.onClick).toHaveBeenCalledOnce();
+	});
+
+	it("leaves an already open rail alone and just forwards", () => {
+		const view = renderMenu();
+
+		fireEvent.click(view.getByRole("button", { name: "Countries" }));
+
+		expect(readState(view).state).toBe("expanded");
+		expect(view.onClick).toHaveBeenCalledOnce();
+	});
+
+	it("does not reach for the rail on a phone, where there is none to open", () => {
+		viewport.isMobile = true;
+		const view = renderMenu({ defaultOpen: false });
+
+		fireEvent.click(view.getByRole("button", { name: "Countries" }));
+
+		expect(readState(view).state).toBe("collapsed");
+		expect(view.onClick).toHaveBeenCalledOnce();
+		viewport.isMobile = false;
+	});
+
+	it("names itself with a tooltip once the rail is collapsed and the label is gone", () => {
+		const view = renderMenu({ defaultOpen: false, tooltip: "Countries" });
+
+		expect(view.getAllByText("Countries")).toHaveLength(2);
+	});
+
+	it("needs no tooltip while the label is on screen", () => {
+		const view = renderMenu({ defaultOpen: true, tooltip: "Countries" });
+
+		expect(view.getAllByText("Countries")).toHaveLength(1);
+	});
+
+	it("needs none on a phone either, where a tooltip has nothing to hover", () => {
+		viewport.isMobile = true;
+		const view = renderMenu({ defaultOpen: false, tooltip: "Countries" });
+
+		expect(view.getAllByText("Countries")).toHaveLength(1);
 		viewport.isMobile = false;
 	});
 });
