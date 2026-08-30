@@ -5,6 +5,15 @@
 
 * **web:** narrow the two sealed unions the persisted stores rehydrate ([821d69f](https://github.com/fbuireu/forever-pto/commit/821d69f284f3bbf1bfd72b0c684094b88c279df8))
 * **web:** state a cache policy on the .well-known miss, not only on the hit ([f2e9e46](https://github.com/fbuireu/forever-pto/commit/f2e9e465291a58a38182a79b133e8e74989d5d14))
+* **web:** stop the workday counter crashing on a half-picked range ([07eac6e](https://github.com/fbuireu/forever-pto/commit/07eac6efdc191b7bba7f4c4234ed4405bcc5f722))
+
+# [forever-pto-web-v1.9.3](https://github.com/fbuireu/forever-pto/compare/web-v1.9.2...web-v1.9.3) (2026-08-30)
+
+
+### Bug Fixes
+
+* **web:** narrow the two sealed unions the persisted stores rehydrate ([821d69f](https://github.com/fbuireu/forever-pto/commit/821d69f284f3bbf1bfd72b0c684094b88c279df8))
+* **web:** state a cache policy on the .well-known miss, not only on the hit ([f2e9e46](https://github.com/fbuireu/forever-pto/commit/f2e9e465291a58a38182a79b133e8e74989d5d14))
 
 # [forever-pto-web-v1.9.2](https://github.com/fbuireu/forever-pto/compare/web-v1.9.1...web-v1.9.2) (2026-08-30)
 
