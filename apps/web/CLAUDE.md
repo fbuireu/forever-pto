@@ -119,6 +119,17 @@ unset variable makes that default `undefined`, the field stays required and the 
 three lines are a no-op, not a gap. Next ships no equivalent of `env.schema`, and that absence is the whole
 reason `PUBLIC_ENV` exists here and nowhere else.
 
+**Checked against the installed Next rather than assumed, so it does not need re-litigating.** `env` in
+`next.config.ts` is a `Record<string, string | undefined>` inlined at build: a flat map with no schema, no
+required/optional and no client/server split, which is the four things `envField` gives Astro.
+`experimental.typedEnv` reads as the answer and is not one: it calls `createEnvDefinitions` from the dev
+bundler to emit a `.d.ts` of the names in the `.env` files, so it generates types, never validates, and an
+empty string is still a `string`; it would also duplicate the surface `environment.d.ts` declares by hand.
+`reportSystemEnvInlining` is Turbopack-only and is the opposite concern, flagging *system* variables that
+leak into the bundle rather than declared ones that are missing. The off-the-shelf option is
+`@t3-oss/env-nextjs`, which is `env.schema` ported, and it buys a dependency and a zod tree to replace
+fifteen lines the contract already polices.
+
 The guard sits in the config rather than in `_deploy-web.yml` on purpose: it runs on **every** build, not
 only the one CI does, so a local `pnpm build` and a fork are covered too. It is gated on `isProd`, so a fresh
 clone still runs `pnpm dev` without a Stripe key. `tests/docs-consistency.test.ts` imports `PUBLIC_ENV`
