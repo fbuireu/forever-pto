@@ -4,6 +4,7 @@ import { basename, dirname, join, relative, resolve } from "node:path";
 import ts from "@typescript/typescript6";
 import { describe, expect, it } from "vitest";
 import webNextConfig, { PUBLIC_ENV, RUNTIME_ONLY } from "../apps/web/next.config";
+import { PAYMENT_SUCCEEDED } from "../apps/web/src/domain/payment/events/types";
 
 const ROOT = resolve(__dirname, "..");
 const WEB = "apps/web";
@@ -1406,6 +1407,48 @@ describe("apps/web/src carries no explanatory comments", () => {
 				if (!ALLOWED.test(text)) offenders.push(`${file}:${line}`);
 			}
 		}
+		expect(offenders).toEqual([]);
+	});
+});
+
+describe("the succeeded-payment status is one value in both languages", () => {
+	// A payments row *is* the Premium entitlement (ADR 0008), so `succeeded` is the whole of the access rule.
+	// It is declared once in the domain, as `PAYMENT_SUCCEEDED`, and written four more times as a bare literal
+	// inside the repository's SQL, which is the half no typechecker reads: rename the union member, or write a
+	// fifth predicate against a different spelling, and every gate stays green while
+	// `getSucceededPaymentByEmail` quietly stops matching and no donor recovers Premium again.
+	//
+	// Stripe owns the value, so nothing in this tree can produce a divergent one and the illegal state is not
+	// reachable today. That makes it a guard rather than a defect, and an assertion the proportionate answer:
+	// interpolating the constant into four SQL strings would buy a coupling to a word Stripe cannot change and
+	// pay for it by making the statements less readable than the SQL they are.
+	const PAYMENTS_REPOSITORY = `${WEB}/src/infrastructure/services/payments/repository.ts`;
+	const SQL_STATUS_COMPARISON = /status\s*(?:!=|=)\s*'([^']*)'|WHEN \? = '([^']*)'/g;
+	const SUCCEEDED_LITERAL = /['"]succeeded['"]/;
+	const PAYMENT_STATUS_MODULE = `${WEB}/src/domain/payment/events/types.ts`;
+
+	it("compares the status column against that value and no other, in every SQL predicate", () => {
+		const compared = [...read(PAYMENTS_REPOSITORY).matchAll(SQL_STATUS_COMPARISON)].map(
+			([, quoted, whenQuoted]) => quoted ?? whenQuoted,
+		);
+
+		// A floor, because a rewritten statement that stops matching the pattern would otherwise satisfy an
+		// empty set: the rule has to fail when it can no longer see the predicates it exists to compare.
+		expect(compared.length).toBeGreaterThanOrEqual(4);
+		expect([...new Set(compared)]).toEqual([PAYMENT_SUCCEEDED]);
+	});
+
+	// Production sources only. A test asserting the SQL has to write the wire value out, and
+	// `repository.test.ts` does exactly that, deliberately.
+	it("lets no production module that imports the constant spell the literal beside it", () => {
+		const offenders = sourceFiles
+			.filter((path) => path.startsWith(`${WEB}/src/`) && path !== PAYMENT_STATUS_MODULE)
+			.filter((path) => !/\.test\.tsx?$/.test(path))
+			.filter((path) => {
+				const source = read(path);
+				return source.includes("PAYMENT_SUCCEEDED") && SUCCEEDED_LITERAL.test(source);
+			});
+
 		expect(offenders).toEqual([]);
 	});
 });

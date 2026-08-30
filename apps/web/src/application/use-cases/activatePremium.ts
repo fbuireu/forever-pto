@@ -44,7 +44,7 @@ const activateFromDonation = ({
 			return yield* Effect.fail(new ValidationError({ message: "Client secret mismatch" }));
 		}
 
-		if (paymentIntent.status !== "succeeded") {
+		if (paymentIntent.status !== PAYMENT_SUCCEEDED) {
 			return yield* Effect.fail(new ValidationError({ message: "Payment not completed" }));
 		}
 

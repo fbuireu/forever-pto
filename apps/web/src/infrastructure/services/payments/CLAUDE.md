@@ -323,6 +323,28 @@ payload whose middle is entirely nullable strings and numbers, where a one-place
 falsifications were run: swapping two column names in the `INSERT`, and dropping one placeholder along with
 its value.
 
-`updatePaymentStatus`'s test also pins the SQL's `WHEN ? = 'succeeded'` against `PAYMENT_SUCCEEDED`. That
-literal is the one copy of the entitlement value the type system cannot reach; see
+`updatePaymentStatus`'s test also pins the SQL's `WHEN ? = 'succeeded'` against `PAYMENT_SUCCEEDED`.
+
+**That sentence used to end "that literal is the one copy of the entitlement value the type system cannot
+reach", and the count was wrong.** [`repository.ts`](./repository.ts) writes it four times, not once:
+`CASE WHEN ? = 'succeeded'` and `WHERE id = ? AND status != 'succeeded'` inside `updatePaymentStatus`,
+`AND status = 'succeeded'` in `getSucceededPaymentByEmail`, and `AND status = 'succeeded'` in
+`countPromoCodeRedemptions`. One of the four is pinned here; the other three had nothing, and the third of
+them is the query that decides whether a returning donor recovers Premium at all.
+
+They are not consolidated, and that is the decision rather than the backlog. Stripe owns the value, so
+nothing in this tree can produce a divergent one and the illegal state is not reachable from any code path:
+it is a guard, not a defect. Binding the constant as a fourth parameter in four statements would couple this
+SQL to a word Stripe cannot change and pay for it in statements that read less like the SQL they are.
+[`tests/docs-consistency.test.ts`](../../../../../../tests/docs-consistency.test.ts) asserts instead that every
+`status` comparison in this file names `PAYMENT_SUCCEEDED`'s value and no other, with a floor of four so a
+rewritten statement the pattern stops matching fails the rule rather than emptying it. Verified by misspelling
+one predicate.
+
+The same rule's second half is why `activateFromDonation`, the private helper `activateWithPayment` and
+`activateWithClaimedPayment` both delegate to, compares `paymentIntent.status !== PAYMENT_SUCCEEDED` rather
+than against a literal. It already imported the constant and passed it to `updatePaymentStatus` further down
+its own body, while the comparison that decides whether the Donation counts at all was a bare string: one
+rule, one function, two spellings. No production module that imports the constant may also spell the value.
+See
 [`../../../domain/payment/CLAUDE.md`](../../../domain/payment/CLAUDE.md).
