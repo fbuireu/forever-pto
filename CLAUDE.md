@@ -13,7 +13,7 @@ omits.
 
 | Package | Guide | What it is |
 | --- | --- | --- |
-| [`apps/web`](./apps/web) (`forever-pto`) | [`./apps/web/CLAUDE.md`](./apps/web/CLAUDE.md) | The planner. Next 16 App Router on Cloudflare Workers through OpenNext |
+| [`apps/web`](./apps/web) (`forever-pto-web`) | [`./apps/web/CLAUDE.md`](./apps/web/CLAUDE.md) | The planner. Next 16 App Router on Cloudflare Workers through OpenNext |
 | [`apps/docs`](./apps/docs) (`forever-pto-docs`) | [`./apps/docs/CLAUDE.md`](./apps/docs/CLAUDE.md) | docs.forever-pto.com. Astro Starlight, rendering the app's real components |
 
 ## Layout

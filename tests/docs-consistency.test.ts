@@ -187,7 +187,7 @@ const pnpmCitations = (body: string): PnpmCitation[] =>
 		.filter(({ script }) => !NON_SCRIPT_PNPM.has(script));
 
 // A workflow step naming a script runs everything the chain ends in, and the chains here are three deep:
-// root `deploy` is `pnpm --filter forever-pto deploy`, which is `pnpm run cf:build && opennextjs-cloudflare
+// root `deploy` is `pnpm --filter forever-pto-web deploy`, which is `pnpm run cf:build && opennextjs-cloudflare
 // deploy`. A census that reads the step text alone sees the script name and none of that. An unfiltered
 // citation inside a package's own script resolves against that package, which is why the ref is inherited.
 interface ExpandScriptParams {
