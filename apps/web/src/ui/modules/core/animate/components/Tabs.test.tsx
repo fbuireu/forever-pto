@@ -1,4 +1,4 @@
-import { fireEvent, render } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import type { ComponentProps, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -208,5 +208,105 @@ describe("TabsContent", () => {
 		fireEvent.click(getByText("B"));
 		expect(queryByText("Panel A")).toBeNull();
 		expect(getByText("Panel B")).toBeTruthy();
+	});
+});
+
+describe("moving between tabs from the keyboard", () => {
+	const renderTabs = () =>
+		render(
+			<Tabs defaultValue="a">
+				<TabsList>
+					<TabsTrigger value="a">A</TabsTrigger>
+					<TabsTrigger value="b">B</TabsTrigger>
+					<TabsTrigger value="c">C</TabsTrigger>
+				</TabsList>
+				<TabsContents>
+					<TabsContent value="a">Panel A</TabsContent>
+					<TabsContent value="b">Panel B</TabsContent>
+					<TabsContent value="c">Panel C</TabsContent>
+				</TabsContents>
+			</Tabs>,
+		);
+
+	const press = (label: string, key: string) => fireEvent.keyDown(screen.getByRole("tab", { name: label }), { key });
+
+	const openPanel = () => screen.getByRole("tabpanel").textContent;
+
+	const focused = () => document.activeElement?.textContent;
+
+	it("goes to the next tab on the right arrow", () => {
+		renderTabs();
+
+		press("A", "ArrowRight");
+
+		expect(openPanel()).toBe("Panel B");
+		expect(focused()).toBe("B");
+	});
+
+	it("goes to the previous tab on the left arrow", () => {
+		renderTabs();
+		press("A", "ArrowRight");
+
+		press("B", "ArrowLeft");
+
+		expect(openPanel()).toBe("Panel A");
+	});
+
+	it("wraps round the end rather than stopping there", () => {
+		renderTabs();
+		press("A", "ArrowLeft");
+
+		expect(openPanel()).toBe("Panel C");
+	});
+
+	it("wraps round the start too", () => {
+		renderTabs();
+		press("A", "ArrowRight");
+		press("B", "ArrowRight");
+
+		press("C", "ArrowRight");
+
+		expect(openPanel()).toBe("Panel A");
+	});
+
+	it("jumps to the first tab on Home and the last on End", () => {
+		renderTabs();
+
+		press("A", "End");
+		expect(openPanel()).toBe("Panel C");
+
+		press("C", "Home");
+		expect(openPanel()).toBe("Panel A");
+	});
+
+	it("leaves any other key to the browser", () => {
+		renderTabs();
+
+		press("A", "ArrowDown");
+
+		expect(openPanel()).toBe("Panel A");
+	});
+
+	it("steps over a tab that cannot be reached", () => {
+		render(
+			<Tabs defaultValue="a">
+				<TabsList>
+					<TabsTrigger value="a">A</TabsTrigger>
+					<TabsTrigger value="b" disabled>
+						B
+					</TabsTrigger>
+					<TabsTrigger value="c">C</TabsTrigger>
+				</TabsList>
+				<TabsContents>
+					<TabsContent value="a">Panel A</TabsContent>
+					<TabsContent value="b">Panel B</TabsContent>
+					<TabsContent value="c">Panel C</TabsContent>
+				</TabsContents>
+			</Tabs>,
+		);
+
+		fireEvent.keyDown(screen.getByRole("tab", { name: "A" }), { key: "ArrowRight" });
+
+		expect(screen.getByRole("tabpanel").textContent).toBe("Panel C");
 	});
 });
