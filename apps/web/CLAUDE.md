@@ -312,6 +312,21 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
 
 ## Gotchas
 
+- **Server logs and the tail Worker are two independent pipelines, and as of 2026-08-30 nothing arrives in
+  BetterStack from either.** `LoggerService` sends HTTP straight to BetterStack through `@logtail/edge`; the
+  tail Worker forwards only `console.*` output and uncaught exceptions. So a `logger.logError` never passes
+  through the tail Worker, and the tail Worker forwarding nothing says nothing about the logger. Checked
+  when a payment failure produced no log anywhere: the smoke run's requests of 05:54 UTC, which verifiably
+  reached the production Worker, are absent from the source too, so the outage is real and spans both
+  pipelines. What is ruled out, by building with a marker token and reading `.next/server`: the code path,
+  since Turbopack inlines `NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN` into the server bundle and the built
+  chunks reference no runtime `process.env` read. What is not ruled out: an empty GitHub variable, which the
+  env guard deliberately lets through because the BetterStack fields are `optional` — losing telemetry was
+  judged not worth failing a release over, and this outage is that trade-off collecting its price; or a
+  token that no longer matches the source. Undiagnosed and parked on purpose; delete this bullet when the
+  fix lands, and remember the debugging consequence while it stands: a server-side failure currently logs
+  **nowhere**, so diagnosing one needs the Cloudflare dashboard's live log stream (unsampled, unlike the
+  stored logs at `head_sampling_rate = 0.2`) or Stripe's own request log.
 - **The calculation caches are cleared by the pipeline, not the engine and no longer by each caller.**
   [`cache.ts`](./src/domain/calendar/utils/cache.ts) memoises the holiday set in one module-level slot and never evicts it, so a second run silently
   reuses the first run's holidays. `runPlanningPipeline` clears both on entry; a generator still must not.
