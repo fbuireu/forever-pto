@@ -31,6 +31,8 @@ on:
         required: true
       TURSO_AUTH_TOKEN:
         required: true
+      NEXT_SERVER_ACTIONS_ENCRYPTION_KEY:
+        required: false
 permissions:
   contents: read
 
@@ -72,13 +74,15 @@ jobs:
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+          NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
           SECRETS_FILE: ${{ runner.temp }}/worker-secrets.json
         run: |
           node -e "
           const required = ['JWT_SECRET','STRIPE_SECRET_KEY','STRIPE_WEBHOOK_SECRET','RESEND_API_KEY','TURSO_AUTH_TOKEN'];
           const missing = required.filter(k => !process.env[k]);
           if (missing.length) { console.error('Missing required secrets: ' + missing.join(', ')); process.exit(1); }
-          const body = JSON.stringify(Object.fromEntries(required.map(k => [k, process.env[k]])));
+          const optional = ['NEXT_SERVER_ACTIONS_ENCRYPTION_KEY'].filter(k => process.env[k]);
+          const body = JSON.stringify(Object.fromEntries([...required, ...optional].map(k => [k, process.env[k]])));
           require('node:fs').writeFileSync(process.env.SECRETS_FILE, body, { mode: 0o600 });
           "
       - name: Deploy to Cloudflare Workers

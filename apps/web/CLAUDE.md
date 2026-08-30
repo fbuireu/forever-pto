@@ -312,6 +312,19 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
 
 ## Gotchas
 
+- **Every build renames every Server Action, so a page from the previous deploy cannot call the current
+  one.** Action ids are per-build; a tab, a cached page or a prerendered shell served before a deploy carries
+  the old id, and the new Worker answers it with `NEXT_ACTION_NOT_FOUND` — the action never runs, and the
+  visitor saw a generic payment-failed toast for a problem a reload fixes. Found from a breakpoint in
+  production: the checkout POST returned that header while every layer below it measured clean.
+  [`recoverFromStaleDeployment`](./src/ui/adapters/navigation/staleDeployment.ts) closes the visible half: it
+  wraps `unstable_isUnrecognizedActionError` from `next/navigation` — Next's own detector for exactly this,
+  not a string match — and reloads, so the visitor lands on the current build instead of an error. The
+  invisible half is the closure encryption key, which also rotates per build unless
+  `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` pins it: `_deploy-web.yml` passes that secret through to the Worker
+  **optionally**, so deploys keep working while it is unset, and setting it on both `web-*` environments
+  (`openssl rand -base64 32`, the same value on both) is what closes the window. This repository deploys on
+  every push to `main`, so the window is not rare; it reopens on each deploy for every page served before it.
 - **The calculation caches are cleared by the pipeline, not the engine and no longer by each caller.**
   [`cache.ts`](./src/domain/calendar/utils/cache.ts) memoises the holiday set in one module-level slot and never evicts it, so a second run silently
   reuses the first run's holidays. `runPlanningPipeline` clears both on entry; a generator still must not.

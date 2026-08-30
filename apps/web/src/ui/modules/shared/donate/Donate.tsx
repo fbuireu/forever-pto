@@ -30,6 +30,7 @@ import { useShallow } from "zustand/react/shallow";
 import { DonationForm } from "./DonationForm";
 import "./donate.css";
 import { logClientError } from "@application/shared/utils/clientLog";
+import { recoverFromStaleDeployment } from "@ui/adapters/navigation/staleDeployment";
 import { CheckoutForm } from "@ui/modules/premium/CheckoutForm";
 
 interface PaymentState {
@@ -136,6 +137,7 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 						discountInfo: result.discountInfo ?? null,
 					});
 				} catch (error) {
+					if (recoverFromStaleDeployment(error)) return;
 					logClientError({
 						message: "Payment initialization failed in Donate component",
 						error,
