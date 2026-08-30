@@ -211,6 +211,18 @@ away.
 pure re-export of it; the seven callers now import the implementation directly. Do not reintroduce a
 re-export: the no-barrel convention has no exception here.
 
+**`animate/base/DropdownMenu.tsx` exports four components and used to define fifteen.** The other eleven
+came with the vendored menu (`Group`, `Portal`, `Sub`, `SubTrigger`, `SubContent`, `RadioGroup`,
+`CheckboxItem`, `RadioItem`, `Label`, `Separator`, `Shortcut`), each prefixed with an underscore so Biome
+would not report it, each referenced exactly once in the whole tree: by its own definition. That is the same
+shape as `getCurrencySymbol` and `RotatingTextContainer` above, minus even the test suite keeping them alive,
+and it made the file's coverage read as a gap when the gap was code nothing rendered. They are gone, with
+their `Props` types and the three imports that only they used. The three call sites
+(`sidebar/components/LanguageSelector.tsx`, `sidebar/components/ThemeSelector.tsx`,
+`pages/homepage/navigation/HomepageLanguageSwitcher.tsx`) take `DropdownMenu`, `DropdownMenuTrigger`,
+`DropdownMenuContent` and `DropdownMenuItem` and nothing else. A submenu or a checkable item comes back from
+`@base-ui/react` when something needs one, wired the way the four that survived are.
+
 **There is one `Rotating.tsx` now, and there used to be two.** `animate/text/Rotating.tsx` exports
 `RotatingText`, a self-contained `AnimatePresence` cycle over a string array, and it supplies its own
 `overflow-hidden py-1` wrapper. A second file under `animate/primitives/texts/` exported `RotatingTextContainer`,
