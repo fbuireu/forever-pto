@@ -484,6 +484,20 @@ describe("the workspace is shaped the way the guides describe it", () => {
 		expect(buildStep).not.toBe("");
 	});
 
+	it("pairs every patched dependency with a Renovate rule a human merges", () => {
+		const patched = [...read("pnpm-workspace.yaml").matchAll(/^ {2}"?([^\s:"]+)"?: (patches\/\S+)$/gm)].map(
+			([, name, file]) => ({ name: name.replace(/@[\d.]+$/, ""), file }),
+		);
+		const humanMerged = readJson(".github/renovate.json")
+			.packageRules.filter((rule: { automerge?: boolean }) => rule.automerge === false)
+			.flatMap((rule: { matchDepNames?: string[] }) => rule.matchDepNames ?? []);
+
+		expect(patched.map(({ file }) => file).filter((file) => !existsSync(join(ROOT, file)))).toEqual([]);
+		expect(readdirSync(join(ROOT, "patches")).length).toBe(patched.length);
+		expect(patched.map(({ name }) => name).filter((name) => !humanMerged.includes(name))).toEqual([]);
+		expect(patched.length).toBeGreaterThan(0);
+	});
+
 	it("keeps the web tsconfig beside the next config it is rewritten by", () => {
 		expect(existsSync(join(ROOT, WEB, "next.config.ts"))).toBe(true);
 		expect(existsSync(join(ROOT, WEB, "tsconfig.json"))).toBe(true);

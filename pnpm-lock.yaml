@@ -6,6 +6,7 @@ settings:
 
 patchedDependencies:
   boneyard-js: 5b7320a219b0350fc1f42d0da2b963f805d50b7d5c0df65163591ca6e7883602
+  vaul@1.1.2: 161068fd77e96d9faa1254dda4ccf00dd0152c2f8b2e95d1be7f3c8644d060e8
 
 importers:
 
@@ -133,7 +134,7 @@ importers:
         version: 1.0.3
       vaul:
         specifier: 1.1.2
-        version: 1.1.2(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 1.1.2(patch_hash=161068fd77e96d9faa1254dda4ccf00dd0152c2f8b2e95d1be7f3c8644d060e8)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       zustand:
         specifier: 5.0.14
         version: 5.0.14(@types/react@19.2.18)(immer@11.1.15)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))
@@ -275,7 +276,7 @@ importers:
         version: 3.1.0
       vaul:
         specifier: 1.1.2
-        version: 1.1.2(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 1.1.2(patch_hash=161068fd77e96d9faa1254dda4ccf00dd0152c2f8b2e95d1be7f3c8644d060e8)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       zod:
         specifier: 4.4.3
         version: 4.4.3
@@ -15469,7 +15470,7 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vaul@1.1.2(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
+  vaul@1.1.2(patch_hash=161068fd77e96d9faa1254dda4ccf00dd0152c2f8b2e95d1be7f3c8644d060e8)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
     dependencies:
       '@radix-ui/react-dialog': 1.1.19(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       react: 19.2.8

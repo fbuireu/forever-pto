@@ -138,7 +138,7 @@ still local; that is the shape of claim to re-check rather than copy forward.
 
 **A change confined to the repo root releases nothing**: `adr/`, `tests/`, `README.md`, `CONTEXT.md`, this
 file. That is correct and occasionally surprising. **It is narrower than it reads**: `WEB_PATHS` in `ci.yml`
-also matches [`package.json`](./package.json), `pnpm-workspace.yaml`, [`biome.json`](./biome.json), [`.npmrc`](./.npmrc), `.nvmrc` and
+also matches [`package.json`](./package.json), `pnpm-workspace.yaml`, [`patches/`](./patches), [`biome.json`](./biome.json), [`.npmrc`](./.npmrc), `.nvmrc` and
 [`.github/actions/`](./.github/actions), all of which do cut a release. That is deliberate (each of them changes what the app
 builds from), but it means "the repo root" is not the boundary; the regex is.
 
@@ -597,12 +597,15 @@ relative-link rule could not catch because they were prose rather than links.
 - **The `v1` floating tag is stale and nothing maintains it.** It diverges between local and remote, which
   makes semantic-release's own `git fetch --tags` fail outright with *would clobber existing tag*. No
   workflow moves it and no ADR records it.
-- **`boneyard-js` is patched, so Renovate must not automerge it.** `pnpm-workspace.yaml` keys
-  `patchedDependencies` by bare name, with no version, so the patch is applied to whatever version resolves.
-  A bump that still applies cleanly but no longer patches what the diff was written against is silent: the
-  install succeeds and CI stays green. [`.github/renovate.json`](./.github/renovate.json) therefore carries a `boneyard-js` rule turning
-  `automerge` off, against the blanket patch/minor automerge above it; a human reads the upstream diff. It is
-  the only dependency in the tree with a patch, and a second one needs the same rule.
+- **Two dependencies are patched, and Renovate must not automerge either.** `pnpm-workspace.yaml` keys
+  `boneyard-js` by bare name, with no version, so that patch is applied to whatever version resolves: a bump
+  that still applies cleanly but no longer patches what the diff was written against is silent, the install
+  succeeds and CI stays green. `vaul` is keyed as `vaul@1.1.2`, so there a bump fails the install loudly
+  instead; what the patch does and why is [`src/ui/modules/core/CLAUDE.md`](./apps/web/src/ui/modules/core/CLAUDE.md)'s
+  to explain. [`.github/renovate.json`](./.github/renovate.json) carries one rule naming both and turning
+  `automerge` off, against the blanket patch/minor automerge above it; a human reads the upstream diff and
+  regenerates the patch. `tests/docs-consistency.test.ts` asserts the pairing, so a third patch without its
+  Renovate entry fails rather than automerging past the diff nobody read.
 - **`minimumReleaseAge` is declared twice and nothing keeps the two in step.** `pnpm-workspace.yaml` says
   4320 minutes (3 days), `.github/renovate.json` says 4 days. Renovate being the stricter of the two is what
   makes it safe: it cannot open a pull request for a release the installer would then refuse. Lower it below

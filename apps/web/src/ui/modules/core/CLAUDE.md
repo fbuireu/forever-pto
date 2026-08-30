@@ -186,6 +186,18 @@ writes body pointer events, and `vaul`'s value is `auto`, which is the initial v
 not ours to undo. `Sidebar.test.tsx` fails on any `document.body.style` in this file. If a component here ever
 does need a body-level lock, it owns the restore in the same effect's cleanup, not in an animation callback.
 
+**`vaul` is patched to forward `modal` to the Radix `Dialog.Root` it wraps, because 1.1.2 does not.**
+Unpatched, every vaul drawer mounts a *modal* Radix dialog whatever its `modal` prop says, and Radix's
+content effect then sets `document.body.style.pointerEvents = 'none'` and `aria-hidden` on everything
+outside the drawer. The `requestAnimationFrame` counter-hack above is vaul's own answer to that, and it only
+fires at `Drawer.Root` mount or on an `open` *transition*; `ManagementBar`'s drawer is mounted with
+`open={true}` from its first render and its content commits later (a `dynamic()` chunk), so the lock landed
+after the hack and stayed. The symptom was the whole mobile planner ignoring taps while only the drawer's
+visible band answered, plus the entire page hidden from screen readers. The patch
+([`patches/vaul@1.1.2.patch`](../../../../../../patches/vaul@1.1.2.patch)) makes `modal={false}` reach Radix,
+so no lock is ever taken and the counter-hack becomes a harmless no-op; a vaul bump that drops the patch
+fails the install loudly, and the root guide's patched-dependencies gotcha owns the Renovate side.
+
 **[`utils/cookie.ts`](../../utils/cookie.ts) feature-detects the Cookie Store API and falls back to `document.cookie`.** The bare
 `cookieStore` global does not exist in Firefox, in Safari before 18.4, or in any insecure context, so the
 write threw a `ReferenceError` that `SidebarProvider.setOpen`'s `.catch(() => {})` swallowed; the sidebar

@@ -11,3 +11,4 @@ minimumReleaseAge: 4320 # 3 days
 blockExoticSubdeps: true
 patchedDependencies:
   boneyard-js: patches/boneyard-js.patch
+  vaul@1.1.2: patches/vaul@1.1.2.patch
