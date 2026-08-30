@@ -1,4 +1,5 @@
 import { defineConfig } from "vitest/config";
+import { summaryLabel } from "../../vitest.config";
 
 export default defineConfig({
 	resolve: {
@@ -6,6 +7,9 @@ export default defineConfig({
 	},
 	test: {
 		environment: "happy-dom",
+		reporters: process.env.GITHUB_ACTIONS
+			? ["default", summaryLabel("Unit suite (forever-pto-web)"), "github-actions"]
+			: ["default"],
 		env: {
 			NEXT_PUBLIC_SITE_URL: "https://forever-pto.com",
 		},
