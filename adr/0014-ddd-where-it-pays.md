@@ -92,6 +92,54 @@ a deferred refactor.
 | Domain events | **Taken in part** | `PaymentSucceededEvent` and `PaymentFailedEvent` are real: they are built by a factory from a Stripe `PaymentIntent`, consumed by handlers that know nothing about webhooks, and they are the reason the payment rules are testable without a network. What is *not* taken is the machinery: no event bus, no store, no subscribers, no replay. `processWebhookEvent` is a `switch` with two cases, and two cases do not need a dispatcher |
 | Framework-free domain types | **Taken in one context, rejected in the other** | `calendar/` may not touch Effect, `@infrastructure/*` or anything unresolvable in a Web Worker. `payment/` composes Effect directly against infrastructure tags and holds `import type Stripe` in its event factory. Two rules inside one layer, on purpose; [ADR 0003](./0003-pure-calendar-domain-effectful-payment-domain.md) is the whole argument |
 
+### What the "ish" is, measured against the two sibling repositories
+
+The suffix is not a hedge and not an apology. It has a size, and the cheapest way to see it is that the same
+maintainer runs two other repositories on the same conventions (the same `CONTEXT.md` glossary, the same
+nested `CLAUDE.md` per folder, the same contract suite, the same Cloudflare Workers deploy), and each takes a
+*different* amount of tactical DDD. Read against them, the "ish" here is a number rather than a mood.
+
+| | forever-pto | biancafiore | contribKit |
+| --- | --- | --- | --- |
+| Implementations of the domain | one, TypeScript | one, TypeScript | **two: TypeScript on the web, Dart in the Flutter app** |
+| Shape of `domain/` | two bounded contexts, `calendar` and `payment` | one folder per concept (article, author, city, project, tag, testimonial), plus a `shared` one | `entities`, `value-objects`, `repositories`, `services` and `failures`, **mirrored in both languages** |
+| Value objects | none | none | **21: seven on the web, fourteen in the app**, including `Year`, `Username`, `Palette` and its own `Color` rather than Flutter's |
+| Repository interfaces in `domain/` | rejected, [ADR 0003](./0003-pure-calendar-domain-effectful-payment-domain.md) | none | **taken, in both clients** |
+| A neutral `shared/` tier | rejected, [ADR 0012](./0012-shared-date-helpers-stay-in-the-application-layer.md) | **taken**, holding three modules: dates, strings and a UI type | none |
+| Layering recorded as a decision | this file | nothing in its ADR set | its own ADR, on both clients |
+
+**The line that prices all of it is contribKit's, in its layering ADR:** *"A layered architecture is heavier
+than a project of this size would normally justify. The reason to take that weight is the second
+implementation, not the first."* That is the whole of the "ish". The ceremony is not paid for by the domain
+being complicated; it is paid for by the number of implementations that have to stay comparable. contribKit
+has two, in two languages, and a value object is what lets `Year` mean the same thing on both sides of that
+gap; its ADR names the cost in the same breath, that a one-line change there can touch a value object, a
+repository interface and its implementation. forever-pto has one implementation, so there is no gap to hold
+open and nothing for the wrapper to keep honest.
+
+**The one place this tree does have a second implementation, it took the weight.** The planning pipeline runs
+on the main thread and inside a Web Worker, and those two callers used to be two copies of the orchestration,
+kept in step by a pair of mirrored test suites, until they drifted and one Planning Window produced two
+different plans depending on which path ran. The answer was not a value object; it was collapsing them onto
+one `runPlanningPipeline` so the second implementation stopped existing. That is the same reasoning as
+contribKit's, arriving at the opposite artefact because deleting the gap was available here and is not
+available across TypeScript and Dart.
+
+**biancafiore is the honest counter-example, and it is worth naming rather than hiding.** It has the neutral
+`shared/` tier that ADR 0012 refused to create here, holding almost exactly what ADR 0012 said would move
+into one. So the same maintainer put the same kind of module in two different places in two repositories, and
+the reason is not taste: the tier costs a path alias, an entry in every layer contract that enumerates what
+it may import, a rule in the contract suite, and an answer to what else belongs there. biancafiore had none
+of those contracts to update; this repository has all four. A reader who finds the two trees side by side
+should read that as the decision it is.
+
+**One misreading to close before it starts, because the folder name invites it.** biancafiore has an
+`application/entities/` folder and those are **not** DDD entities: they are Astro content collections, built
+with `defineCollection`. The word there is the framework's, not the pattern's, and reading it as evidence
+that the sibling models entities would be reading a directory listing instead of a file. contribKit's
+`domain/entities` is a different matter and is genuinely part of its tactical kit; what it holds has not been
+read for this comparison, so no claim is made about it beyond its existence.
+
 ### Six worked examples from this repository
 
 Each ran the three questions in order. Three came out "encode it", three came out "write the rule". The
@@ -153,6 +201,11 @@ rejections matter as much as the fixes: a rule is only as clear as the cases it 
   will find no aggregates, no repositories, no entities and no event bus, and will find that the domain
   imports upward in two places. That is the intended state, and the practice table above is the answer to
   every one of those observations.
+- **A reader coming from contribKit will find this tree noticeably lighter, and that is the same rule, not a
+  different one.** The sibling comparison above is the check to re-run if this repository ever grows a second
+  implementation of the planning engine in another language or another runtime that cannot be collapsed into
+  the first. At that point the value objects and the repository interfaces start paying, and this ADR is
+  superseded rather than amended.
 - **The cost that is harder to see: a rule written and mechanically checked can still be the wrong rule.**
   The contract suite can tell you that the graph table matches the tree. It cannot tell you that an edge
   should not exist. That judgement stays with the layer contracts under
