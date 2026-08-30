@@ -71,6 +71,14 @@ pnpm verify             # format:check && typecheck && test:ut:coverage; the CI 
 `pnpm --filter forever-pto-docs dev` runs the docs site; it has no root passthrough because nothing else
 documents it as a repo-level command.
 
+**The Check job's summary shows two Vitest reports, and they are two different suites.** `test:ut:coverage`
+is a chain: the app package's unit suite first, then the root Vitest, which collects only
+`tests/docs-consistency.test.ts`. Each invocation appends its own *Vitest Test Report* block to the job
+summary, under a heading that is a constant inside Vitest's `github-actions` reporter with no option to
+rename it, so both configs register `summaryLabel` from the root [`vitest.config.ts`](./vitest.config.ts),
+a reporter whose whole job is writing the suite's own heading above its block, on CI only. Neither block
+duplicates the other; the labels are what say so without counting tests.
+
 ## Shared tooling
 
 **One Biome config, at the root, for both packages.** `--changed` needs the git root to compare against,
