@@ -38,7 +38,7 @@ The app follows a layered architecture: each directory has a `CLAUDE.md` describ
 | `apps/web/src/domain/` | Pure business logic: the calendar suggestion engine, payment domain events |
 | `apps/web/src/infrastructure/` | External-world adapters: DB and API clients, services, i18n config, proxy helpers |
 | `apps/web/src/ui/` | Components, styles, hooks, utils and i18n messages |
-| `apps/web/src/middleware.ts` | Edge middleware: i18n routing, locale cookie hardening, country detection, markdown rewrites |
+| `apps/web/src/proxy.ts` | The proxy (Next 16's rename of middleware; it runs on the Node.js runtime now): i18n routing, locale cookie hardening, country detection, markdown rewrites |
 
 ## `apps/web/e2e/`
 

@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-Forever PTO is a Next.js App Router application organized into five layers under `apps/web/src/`, plus `apps/web/src/middleware.ts` at the root of the tree. Each layer has a single responsibility and a deliberate dependency direction.
+Forever PTO is a Next.js App Router application organized into five layers under `apps/web/src/`, plus `apps/web/src/proxy.ts` at the root of the tree. Each layer has a single responsibility and a deliberate dependency direction.
 
 ## The layers
 
@@ -14,7 +14,7 @@ Forever PTO is a Next.js App Router application organized into five layers under
 | App | `apps/web/src/app/` | Next.js App Router: routes, layouts, API handlers, metadata, sitemap/robots. Composition only; see [routing](/architecture/routing/). |
 | Application | `apps/web/src/application/` | Data contracts (DTOs), Zustand stores, Effect use-cases, `next-intl` navigation glue (`apps/web/src/application/i18n/navigation.ts`), email templates and export generators. |
 | Domain | `apps/web/src/domain/` | Pure business logic: the calendar suggestion engine (`apps/web/src/domain/calendar/`) and payment domain events/handlers (`apps/web/src/domain/payment/`). |
-| Infrastructure | `apps/web/src/infrastructure/` | Everything that talks to the outside world: SDK clients, services, the middleware proxy helpers, the calculation Web Worker (`apps/web/src/infrastructure/workers/`), i18n runtime config and `.well-known` payloads. |
+| Infrastructure | `apps/web/src/infrastructure/` | Everything that talks to the outside world: SDK clients, services, the proxy proxy helpers, the calculation Web Worker (`apps/web/src/infrastructure/workers/`), i18n runtime config and `.well-known` payloads. |
 | UI | `apps/web/src/ui/` | React modules (`apps/web/src/ui/modules/`), hooks, styles (`apps/web/src/ui/styles/`), assets and i18n message catalogs (`apps/web/src/ui/i18n/messages/`). |
 
 ## Dependency direction
@@ -59,6 +59,6 @@ Note that `@assets`, `@styles` and `@i18n` all point inside `apps/web/src/ui/`: 
 ## Related pages
 
 - [Routing](/architecture/routing/) covers how `apps/web/src/app/` is laid out.
-- [Middleware](/architecture/middleware/) covers the per-request chain.
+- [Proxy](/architecture/middleware/) covers the per-request chain.
 - [Effect layers](/architecture/effect-layers/) covers server-side dependency injection.
 - [Caching](/architecture/caching/) covers Cache Components and the R2 incremental cache.

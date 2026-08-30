@@ -13,12 +13,12 @@ curl -H 'Accept: text/markdown' https://forever-pto.com/planner
 
 ## The rewrite
 
-Markdown negotiation is the **first** thing `apps/web/src/middleware.ts` decides, and the matcher is what keeps it safe: `/api/*` and every dotted path (so all of `/.well-known/*`) never reach the middleware at all, which is why the rewrite branch carries no exclusion list of its own.
+Markdown negotiation is the **first** thing `apps/web/src/proxy.ts` decides, and the matcher is what keeps it safe: `/api/*` and every dotted path (so all of `/.well-known/*`) never reach the proxy at all, which is why the rewrite branch carries no exclusion list of its own.
 
 - A direct hit on `/api/markdown` passes through with the path header **deleted**. That branch is not decoration: without it a direct request carrying `Accept: text/markdown` would match the next rule and rewrite the route onto itself.
 - Any other request whose `Accept` header contains `text/markdown` is rewritten to `/api/markdown`: a rewrite, not a redirect, so the URL the agent asked for stays canonical.
-- **The pathname travels in a request header, not a query string.** The middleware `set`s `x-markdown-path` (`MARKDOWN_PATH_HEADER` in `apps/web/src/infrastructure/markdown/twin.ts`), which overwrites anything inbound. A rewrite does not change what a route handler reads from the URL (inside the handler `request.url` is still the URL the *visitor* asked for), so a `?path=` query never arrived, and a query the visitor appended themselves would have decided which page they were served.
-- **The middleware states no cache policy.** It cannot: it runs before the lookup, so anything it set would be a guess about a page it had not looked up yet.
+- **The pathname travels in a request header, not a query string.** The proxy `set`s `x-markdown-path` (`MARKDOWN_PATH_HEADER` in `apps/web/src/infrastructure/markdown/twin.ts`), which overwrites anything inbound. A rewrite does not change what a route handler reads from the URL (inside the handler `request.url` is still the URL the *visitor* asked for), so a `?path=` query never arrived, and a query the visitor appended themselves would have decided which page they were served.
+- **The proxy states no cache policy.** It cannot: it runs before the lookup, so anything it set would be a guess about a page it had not looked up yet.
 
 ## The route
 
