@@ -533,13 +533,13 @@ at all, because `generateSuggestions` takes the window rather than its expansion
 
 ## Testing
 
-Eighteen test files. The components carrying them are the ones holding logic, and the rest are left
+Twenty test files. The components carrying them are the ones holding logic, and the rest are left
 to the Playwright suite in `e2e/`, which on this screen asserts only that `/planner` answers 200, has a
 title, and does not trip the error boundary. No e2e spec drives a calculation, so nothing outside these
 files pins planner *behaviour*. **That count is worth recounting rather than trusting**: it said fifteen while
 the tree held sixteen, which is the failure mode a number in prose has.
 
-Two of the eighteen cover this screen's remaining pure modules.
+Two of the twenty cover this screen's remaining pure modules.
 [`calendar/utils/refusals.test.ts`](./calendar/utils/refusals.test.ts) asserts `DAY_REFUSAL_COPY` against
 `DayRefusal` itself, key set for key set, so a refusal added to the stores without copy fails here rather
 than rendering nothing on the calendar; it also pins that `describeHolidayRefusal` answers `null` for the one
