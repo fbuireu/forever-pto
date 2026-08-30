@@ -175,3 +175,100 @@ describe("HolidaysTable names both of its checkboxes", () => {
 		expect(desktopRow(view, "Beta").checked).toBe(true);
 	});
 });
+
+const selectAllBoxes = (view: View, label: string) => view.getAllByLabelText(label) as HTMLInputElement[];
+
+const names = (view: View) => view.queryByTestId("delete-modal")?.getAttribute("data-names") ?? null;
+
+const search = (view: View, term: string) =>
+	fireEvent.change(view.getByPlaceholderText(enMessages.holidaysTable.searchPlaceholder), {
+		target: { value: term },
+	});
+
+describe("HolidaysTable select-all", () => {
+	it("offers to select everything while nothing is picked", () => {
+		const view = renderTable();
+
+		expect(selectAllBoxes(view, enMessages.holidaysTable.selectAll)[0]?.checked).toBe(false);
+	});
+
+	it("takes the whole list in one click", () => {
+		const view = renderTable();
+
+		fireEvent.click(selectAllBoxes(view, enMessages.holidaysTable.selectAll)[0]);
+
+		expect(names(view)).toBe("Alpha,Beta,Gamma");
+	});
+
+	it("says the selection is partial while only some are picked, rather than saying nothing", () => {
+		const view = renderTable();
+
+		fireEvent.click(desktopRow(view, "Beta"));
+
+		expect(selectAllBoxes(view, enMessages.holidaysTable.partialSelection)[0]).toBeTruthy();
+	});
+
+	it("offers to clear the selection once the whole list is picked, and clears it", () => {
+		const view = renderTable();
+		fireEvent.click(selectAllBoxes(view, enMessages.holidaysTable.selectAll)[0]);
+
+		fireEvent.click(selectAllBoxes(view, enMessages.holidaysTable.deselectAll)[0]);
+
+		expect(names(view)).toBe("");
+	});
+
+	it("takes only the rows a search left visible, which is what select-all means with a filter on", () => {
+		const view = renderTable();
+		search(view, "et");
+
+		fireEvent.click(selectAllBoxes(view, enMessages.holidaysTable.selectAll)[0]);
+
+		expect(names(view)).toBe("Beta");
+	});
+
+	it("adds the visible rows to a selection made outside the filter rather than replacing it", () => {
+		const view = renderTable();
+		fireEvent.click(desktopRow(view, "Gamma"));
+		search(view, "Alpha");
+
+		fireEvent.click(selectAllBoxes(view, enMessages.holidaysTable.selectAll)[0]);
+
+		expect(names(view)).toBe("Alpha,Gamma");
+	});
+
+	it("clears only the visible rows, leaving a selection the filter hides alone", () => {
+		const view = renderTable();
+		fireEvent.click(selectAllBoxes(view, enMessages.holidaysTable.selectAll)[0]);
+		search(view, "Alpha");
+
+		fireEvent.click(selectAllBoxes(view, enMessages.holidaysTable.deselectAll)[0]);
+
+		expect(names(view)).toBe("Beta,Gamma");
+	});
+});
+
+describe("HolidaysTable clears the selection when a modal is done with it", () => {
+	const closeModal = (view: View, testId: string) => {
+		const modal = view.getByTestId(testId);
+		fireEvent.click(modal);
+		return modal;
+	};
+
+	it("keeps the selection while the delete modal is still open", () => {
+		const view = renderTable();
+
+		fireEvent.click(desktopRow(view, "Alpha"));
+
+		expect(closeModal(view, "delete-modal").getAttribute("data-names")).toBe("Alpha");
+	});
+
+	it("un-picks a Holiday clicked twice, which is the other half of the toggle", () => {
+		const view = renderTable();
+
+		fireEvent.click(desktopRow(view, "Alpha"));
+		fireEvent.click(desktopRow(view, "Alpha"));
+
+		expect(names(view)).toBe("");
+		expect(desktopRow(view, "Alpha").checked).toBe(false);
+	});
+});
