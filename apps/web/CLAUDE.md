@@ -88,6 +88,36 @@ Env: copy [`.env.example`](./.env.example). Local Worker secrets go in `.dev.var
 [`environment.d.ts`](./environment.d.ts) and nothing else; it hand-declares both `ProcessEnv` and the global `CloudflareEnv` the
 Cloudflare context is read through, and it is tracked.
 
+**A `NEXT_PUBLIC_*` is inlined at build time, and until this branch nothing noticed when one was empty.**
+`getStripeClientInstance` throws when `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is missing, and
+[`Donate.tsx`](./src/ui/modules/shared/donate/Donate.tsx) calls it in module scope, so an empty variable does
+not degrade the checkout, it throws while the chunk is being evaluated. Nothing caught it: the deploy's
+preflight covers the five Worker **secrets** and the public variables had no equivalent, so a build with an
+empty key compiled, deployed, passed the smoke run and served a checkout that could not open.
+
+`PUBLIC_ENV` in [`next.config.ts`](./next.config.ts) is that equivalent, and it names three kinds because the
+variables are not read in one place: `required` is inlined into the client bundle and blocks the build,
+`optional` is inlined and only warns (missing analytics is not worth failing a release over, the same reason
+the smoke set stays small), and `runtime` is *not* inlined at all: `NEXT_PUBLIC_SITE_URL` and
+`NEXT_PUBLIC_CONTACT_EMAIL` are read server-side off `CloudflareEnv`, which is why `wrangler.toml` declares
+them in `[vars]` and the build step deliberately does not pass them.
+
+**Both sibling Astro repositories already had this, which is why only this package needed a hand-rolled
+one.** `env.schema` in their `astro.config.ts` is Astro's own typed surface, and it fails the build on a
+missing field: `isOptional` there is `options.optional || options.default !== undefined`, read from Astro's
+validator rather than assumed, so contribKit's three `PUBLIC_*` fields, which declare neither, are required
+and stop a build that would otherwise ship them empty. biancafiore's `SITE_URL`, `BIANCA_EMAIL` and
+`TWITTER_HANDLE` carry `default: import.meta.env.<the same name>`, which reads as a hole and is not one: an
+unset variable makes that default `undefined`, the field stays required and the build still fails. Those
+three lines are a no-op, not a gap. Next ships no equivalent of `env.schema`, and that absence is the whole
+reason `PUBLIC_ENV` exists here and nowhere else.
+
+The guard sits in the config rather than in `_deploy-web.yml` on purpose: it runs on **every** build, not
+only the one CI does, so a local `pnpm build` and a fork are covered too. It is gated on `isProd`, so a fresh
+clone still runs `pnpm dev` without a Stripe key. `tests/docs-consistency.test.ts` imports `PUBLIC_ENV`
+rather than reading the source, holds it to exactly the `NEXT_PUBLIC_*` names `environment.d.ts` declares in
+both directions, and asserts each one is wired where its kind says it is read.
+
 **Nothing type-checks the names inside it.** `skipLibCheck: true` plus the `.d.ts` extension means
 `pnpm typecheck` never looks at a single identifier there, so an unbound one sits in a type the whole build
 trusts. `Formats: typeof getRequestConfig` did, for as long as it took someone to run

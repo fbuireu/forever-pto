@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import ts from "@typescript/typescript6";
 import { describe, expect, it } from "vitest";
-import webNextConfig from "../apps/web/next.config";
+import webNextConfig, { PUBLIC_ENV } from "../apps/web/next.config";
 
 const ROOT = resolve(__dirname, "..");
 const WEB = "apps/web";
@@ -102,6 +102,24 @@ const contentFiles = trackedFiles.filter((path) => path.endsWith(".mdx"));
 const authoredMarkdown = markdownFiles.filter((path) => !GENERATED_MARKDOWN.has(path));
 const sourceFiles = trackedFiles.filter((path) => SOURCE_FILE.test(path));
 const read = (path: string) => readFileSync(join(ROOT, path), "utf8");
+
+const PUBLIC_ENV_NAME = /\bNEXT_PUBLIC_[A-Z0-9_]+/g;
+
+interface StepBodyParams {
+	workflow: string;
+	name: string;
+}
+
+const stepBody = ({ workflow, name }: StepBodyParams): string => {
+	const lines = workflow.split(/\r?\n/);
+	const start = lines.findIndex((line) => line.trimStart().startsWith(`- name: ${name}`));
+	if (start < 0) return "";
+
+	const rest = lines.slice(start + 1);
+	const end = rest.findIndex((line) => /^\s*- name: /.test(line));
+
+	return (end < 0 ? rest : rest.slice(0, end)).join("\n");
+};
 const readIfPresent = (path: string) => (existsSync(join(ROOT, path)) ? read(path) : "");
 const readJson = (path: string) => JSON.parse(read(path));
 
@@ -440,6 +458,28 @@ describe("the workspace is shaped the way the guides describe it", () => {
 			.map((entry) => entry.slice(1))
 			.filter((path) => !existsSync(join(ROOT, path)));
 		expect(dangling).toEqual([]);
+	});
+
+	it("classifies every public variable the app declares, and no other", () => {
+		const declared = [...new Set([...read(`${WEB}/environment.d.ts`).matchAll(PUBLIC_ENV_NAME)].map(([name]) => name))];
+		const classified = Object.keys(PUBLIC_ENV);
+
+		expect(declared.filter((name) => !classified.includes(name)).sort()).toEqual([]);
+		expect(classified.filter((name) => !declared.includes(name)).sort()).toEqual([]);
+		expect(declared.length).toBeGreaterThan(0);
+	});
+
+	it("wires every public variable where its kind says it is read", () => {
+		const deployWorkflow = read(`${WORKFLOW_DIR}/_deploy-web.yml`);
+		const buildStep = stepBody({ workflow: deployWorkflow, name: "Build" });
+		const wrangler = read(`${WEB}/wrangler.toml`);
+		const unwired = Object.entries(PUBLIC_ENV).flatMap(([name, kind]) => {
+			const wired = kind === "runtime" ? wrangler.includes(name) : buildStep.includes(name);
+			return wired ? [] : [`${name} (${kind})`];
+		});
+
+		expect(unwired.sort()).toEqual([]);
+		expect(buildStep).not.toBe("");
 	});
 
 	it("keeps the web tsconfig beside the next config it is rewritten by", () => {

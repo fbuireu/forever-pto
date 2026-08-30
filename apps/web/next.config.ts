@@ -17,6 +17,27 @@ const withNextIntl = createNextIntlPlugin({
 
 const isProd = process.env.NODE_ENV === "production";
 
+export const PUBLIC_ENV = {
+	NEXT_PUBLIC_BETTER_STACK_INGESTING_URL: "optional",
+	NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN: "optional",
+	NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN: "optional",
+	NEXT_PUBLIC_CONTACT_EMAIL: "runtime",
+	NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: "optional",
+	NEXT_PUBLIC_SITE_URL: "runtime",
+	NEXT_PUBLIC_STORAGE_KEY: "required",
+	NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: "required",
+} as const;
+
+if (isProd) {
+	const missing = Object.entries(PUBLIC_ENV)
+		.filter(([name, kind]) => kind === "required" && !process.env[name]?.trim())
+		.map(([name]) => name);
+
+	if (missing.length > 0) {
+		throw new Error(`Missing public env the client bundle inlines: ${missing.join(", ")}`);
+	}
+}
+
 const CSP = [
 	"default-src 'self'",
 	"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com https://betterstack.net https://static.cloudflareinsights.com",
