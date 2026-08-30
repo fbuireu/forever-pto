@@ -108,6 +108,36 @@ describe("WorkdayCounter", () => {
 		expect(readout()).toContain("1");
 	});
 
+	it("keeps counting nothing while only one end has been picked", () => {
+		renderCounter();
+		fireEvent.click(screen.getByRole("button", { name: "open" }));
+
+		range.value = { from: day("2026-06-01"), to: undefined };
+		fireEvent.click(screen.getByRole("button", { name: "pick" }));
+
+		expect(screen.getByTestId("calendar-modal").dataset.open).toBe("true");
+		expect(screen.queryByText(en.workdayCounter.workdays)).toBeNull();
+	});
+
+	it("ignores a single date, which is what the other selection modes hand it", () => {
+		renderCounter();
+
+		range.value = day("2026-06-01");
+		fireEvent.click(screen.getByRole("button", { name: "pick" }));
+
+		expect(screen.queryByText(en.workdayCounter.workdays)).toBeNull();
+	});
+
+	it("keeps the range it already counted when a half-picked one arrives after it", () => {
+		renderCounter();
+		pick("2026-06-01", "2026-06-07");
+
+		range.value = { from: day("2026-07-01"), to: undefined };
+		fireEvent.click(screen.getByRole("button", { name: "pick" }));
+
+		expect(readout()).toContain("June 1, 2026");
+	});
+
 	it("closes the calendar once both ends are picked", () => {
 		renderCounter();
 		fireEvent.click(screen.getByRole("button", { name: "open" }));
