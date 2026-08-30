@@ -154,6 +154,22 @@ patch. The tag exists so the next release continues from 1.8.3 rather than re-cu
 to reach it before `release-web` first runs on `main`, and they have. This paragraph used to say they were
 still local; that is the shape of claim to re-check rather than copy forward.
 
+**A `web-v*` tag on a commit `main` cannot reach is worse than a missing one, and `web-v1.9.3` was one.**
+semantic-release finds the last release with `git tag --merged`, so a tag whose commit is not an ancestor of
+the release branch is invisible to it: it read the last release as 1.9.2, computed 1.9.3 again, and then died
+on `fatal: tag 'web-v1.9.3' already exists`, because the tag it could not *see* is still one `git tag` refuses
+to overwrite. That is a permanent stop rather than one bad run: every later push repeats it, and `release-web`
+is what `docs-refresh` hangs off. It happens when the release commit `@semantic-release/git` pushes is later
+rebased away while its tag stays put, which is exactly what a force-push to `main` under a release does.
+
+**It could not be repaired by moving the tag**, and that is worth knowing before reaching for the obvious fix:
+the GitHub Release carrying it is `immutable`, so the API answers `403` to a force-update of the ref and to a
+delete. What repaired it is a `git merge -s ours` of the orphaned release commit into `main`, which makes the
+tag reachable and changes no file, since `main` already carried the same work under a different sha. The
+alternative was a bridge tag one patch higher, which would have skipped a version number and claimed a release
+that never happened; grafting keeps the numbers honest. Prefer it, and never force-push `main` while a release
+is in flight.
+
 **A change confined to the repo root releases nothing**: `adr/`, `tests/`, `README.md`, `CONTEXT.md`, this
 file. That is correct and occasionally surprising. **It is narrower than it reads**: `WEB_PATHS` in `ci.yml`
 also matches [`package.json`](./package.json), `pnpm-workspace.yaml`, [`patches/`](./patches), [`biome.json`](./biome.json), [`.npmrc`](./.npmrc), `.nvmrc` and
