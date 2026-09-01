@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.9.5](https://github.com/fbuireu/forever-pto/compare/web-v1.9.4...web-v1.9.5) (2026-09-01)
+
+
+### Bug Fixes
+
+* **web:** put the per-request chain back on middleware.ts, and on edge ([50d90e6](https://github.com/fbuireu/forever-pto/commit/50d90e673ef589c6a631fe936ee0e7c77f573528)), closes [opennextjs-cloudflare#1309](https://github.com/opennextjs-cloudflare/issues/1309)
+
 # [forever-pto-web-v1.9.4](https://github.com/fbuireu/forever-pto/compare/web-v1.9.3...web-v1.9.4) (2026-08-30)
 
 
