@@ -17,7 +17,7 @@ The app is localized with `next-intl`. The supported locales are defined once in
 - `localePrefix: 'as-needed'`. English lives at `/`, every other locale gets a prefix (`/es/...`, `/ca/...`).
 - `localeCookie: { secure: true, sameSite: 'lax' }`.
 
-The `next-intl` middleware (`createMiddleware(routing)` in `apps/web/src/proxy.ts`) resolves the locale per request. Unknown locales hit `notFound()` in the root layout, which renders `generateStaticParams` over all locales.
+The `next-intl` middleware (`createMiddleware(routing)` in `apps/web/src/middleware.ts`) resolves the locale per request. Unknown locales hit `notFound()` in the root layout, which renders `generateStaticParams` over all locales.
 
 ## The NEXT_LOCALE cookie
 

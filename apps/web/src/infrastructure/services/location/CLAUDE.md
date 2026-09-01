@@ -33,7 +33,7 @@ costs one interaction. Nothing downstream should treat the result as authoritati
 errors and returns `''`, and `detectCountry` returns `''` when all three come up empty. [`proxy/location.ts`](../../proxy/location.ts)
 treats that as "no cookie to set" and moves on.
 
-**The only caller is the proxy.** `proxy/location.ts` calls `detectCountry` from [`src/proxy.ts`](../../../proxy.ts), so
+**The only caller is the proxy.** `proxy/location.ts` calls `detectCountry` from [`src/middleware.ts`](../../../middleware.ts), so
 everything here runs server-side inside a Cloudflare Worker request, including the fetches, which read like
 browser calls and are not. It also short-circuits on an existing `user-country` cookie, which is what keeps
 this chain off the hot path for returning visitors. Between that cookie and the header running first, the two

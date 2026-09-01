@@ -9,7 +9,7 @@ When you open Forever PTO, the planner already knows your country. That value tr
 
 ## The chain
 
-1. `apps/web/src/proxy.ts` runs the last step of the proxy, (after markdown negotiation, the payment-confirmation guard and i18n) calls the location proxy with the `next-intl` response.
+1. `apps/web/src/middleware.ts` runs the last step of the proxy, (after markdown negotiation, the payment-confirmation guard and i18n) calls the location proxy with the `next-intl` response.
 2. `apps/web/src/infrastructure/proxy/location.ts`: `location()` runs `detectCountry(request)` and, only if a country came back, calls `setLocationCookie()`.
 3. `apps/web/src/infrastructure/services/location/detectCountry.ts` tries three strategies in order and returns the first non-empty result.
 4. `apps/web/src/infrastructure/services/location/utils/strategies.ts` implements the strategies as Effect programs.

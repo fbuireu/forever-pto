@@ -26,7 +26,7 @@ failure channel onto a status code. Business logic that lands here is in the wro
 
 ## How a request reaches a page
 
-[`src/proxy.ts`](../proxy.ts) runs first, and its `config.matcher` decides what it sees: everything except `/api`,
+[`src/middleware.ts`](../middleware.ts) runs first, and its `config.matcher` decides what it sees: everything except `/api`,
 `/_next`, `/_vercel` and any path containing a dot, plus `/api/markdown` explicitly. In order it:
 
 1. Lets a direct `/api/markdown` request through, and **strips the path header** on the way; see below.
@@ -77,7 +77,7 @@ failure channel onto a status code. Business logic that lands here is in the wro
    point: the client-side language switcher writes this cookie too, from `document.cookie`, and the two
    writers have to agree. This step used to say next-intl's own cookie "carries none of those", which was
    wrong about `secure` and `sameSite`, and it used to add `httpOnly`, which silently broke every soft
-   locale switch. See [`src/infrastructure/CLAUDE.md`](../infrastructure/CLAUDE.md). [`proxy.test.ts`](../proxy.test.ts) guards the step under
+   locale switch. See [`src/infrastructure/CLAUDE.md`](../infrastructure/CLAUDE.md). [`middleware.test.ts`](../middleware.test.ts) guards the step under
    `describe('locale cookie policy')`; the policy itself is asserted in
    [`src/infrastructure/i18n/cookie.test.ts`](../infrastructure/i18n/cookie.test.ts).
 6. Hands the response to the location proxy ([`src/infrastructure/proxy/location.ts`](../infrastructure/proxy/location.ts)), which sets the
@@ -101,7 +101,7 @@ anyone could append.
 
 Both halves close the same way: the proxy `set`s the header, which overwrites anything inbound, and the
 direct-hit branch `delete`s it. The route reads *only* the header and 404s when it is absent, with no
-fallback to the query: the fallback is the vulnerability, not a convenience. `proxy.test.ts` asserts
+fallback to the query: the fallback is the vulnerability, not a convenience. `middleware.test.ts` asserts
 the overwrite and the strip; `route.test.ts` asserts the header wins over a disagreeing query and that an
 absent header never reaches the builder. Verified by restoring the `??` fallback and watching the case fail.
 
@@ -571,13 +571,13 @@ mock is gone and the real `noStore` runs, which is what makes the three body ass
   carries none, and a leading `/%2e` is stripped as a dot segment after the match, leaving the doubled slash
   behind. A visitor following a `/payment/` link on this domain was answered `307` to whatever host the path
   spelled. `homePath` is now forced to a single leading slash and assigned to `new URL(request.url).pathname`,
-  which cannot change the origin whatever it contains. `src/proxy.test.ts` asserts the origin survives.
+  which cannot change the origin whatever it contains. `src/middleware.test.ts` asserts the origin survives.
 - **`api/health/route.ts` is public and unauthenticated**, and `.well-known/api-catalog` advertises it, so
   the body says the app is up and nothing else. Do not add configuration to it: not which secrets are set,
   not the `NODE_ENV`, not a dependency check that names a host.
 - **The proxy's Markdown rewrite trusts `config.matcher` to keep internal paths out.** The matcher
   excludes `/api` and every dotted path, so `/.well-known/*` and the other route handlers never reach the
   proxy at all; the rewrite branch has no guard of its own. Widening the matcher means adding one back,
-  which is what the `config matcher` block in `src/proxy.test.ts` is there to catch.
+  which is what the `config matcher` block in `src/middleware.test.ts` is there to catch.
 - **The planner page imports its sections through `next/dynamic`.** That is a bundle-size decision, not an
   accident; a static import of `CalendarList` or `Summary` pulls the whole planning UI into the first load.

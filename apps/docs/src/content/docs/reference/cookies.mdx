@@ -20,11 +20,11 @@ All four are scoped to `path: '/'`.
 
 ## `user-country`
 
-Exported as `USER_COUNTRY_COOKIE` in `apps/web/src/infrastructure/proxy/cookie.ts`, which also defines `setLocationCookie()` and the attributes above. It is written by the proxy chain: `apps/web/src/proxy.ts` → `apps/web/src/infrastructure/proxy/location.ts`, which detects the country from the request and sets the cookie on the response. It is deliberately **not** `httpOnly`, because `apps/web/src/ui/modules/stores/StoresInitializer.tsx` reads it on the client to seed the location store. See [country detection](/how-it-works/country-detection/).
+Exported as `USER_COUNTRY_COOKIE` in `apps/web/src/infrastructure/proxy/cookie.ts`, which also defines `setLocationCookie()` and the attributes above. It is written by the proxy chain: `apps/web/src/middleware.ts` → `apps/web/src/infrastructure/proxy/location.ts`, which detects the country from the request and sets the cookie on the response. It is deliberately **not** `httpOnly`, because `apps/web/src/ui/modules/stores/StoresInitializer.tsx` reads it on the client to seed the location store. See [country detection](/how-it-works/country-detection/).
 
 ## `NEXT_LOCALE`
 
-The locale cookie used by next-intl, named by the `LOCALE_COOKIE` export in `apps/web/src/infrastructure/i18n/locales.ts`. The next-intl middleware sets it during locale negotiation, and `apps/web/src/proxy.ts` immediately re-sets it via `setLocaleCookie()` (`apps/web/src/infrastructure/i18n/cookie.ts`), which applies `LOCALE_COOKIE_POLICY`: `secure`, `sameSite: 'lax'`, `path: '/'`. No `maxAge` is set, so it is a session cookie.
+The locale cookie used by next-intl, named by the `LOCALE_COOKIE` export in `apps/web/src/infrastructure/i18n/locales.ts`. The next-intl middleware sets it during locale negotiation, and `apps/web/src/middleware.ts` immediately re-sets it via `setLocaleCookie()` (`apps/web/src/infrastructure/i18n/cookie.ts`), which applies `LOCALE_COOKIE_POLICY`: `secure`, `sameSite: 'lax'`, `path: '/'`. No `maxAge` is set, so it is a session cookie.
 
 It is deliberately **not** `httpOnly`, and that is the same object `routing.ts` hands next-intl. The client-side language switcher writes this cookie too, from `document.cookie`, so the two writers have to agree: adding `httpOnly` here silently broke every soft locale switch.
 

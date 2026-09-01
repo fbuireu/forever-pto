@@ -5,8 +5,12 @@ Date: 2026-08-15
 ## Status
 
 Accepted. **Amended 2026-08-29: the pin is lifted.** Next is 16.3.3, `@opennextjs/cloudflare` is 1.20.3,
-wrangler is 4.126.0 and TypeScript is 7.0.2 at the root and in `apps/web`. The amendment is the last section
-of this file, and it says plainly which of the two conditions below was met and which was not.
+wrangler is 4.126.0 and TypeScript is 7.0.2 at the root and in `apps/web`. That amendment says plainly which
+of the two conditions below was met and which was not.
+
+**Amended 2026-09-01: the per-request chain stays at `middleware.ts`, on the edge runtime.** The file name is
+not cosmetic on this host; it picks the runtime, and the Node.js one loses request-header edits. That
+amendment is the last section of this file.
 
 ## Context
 
@@ -104,7 +108,7 @@ does not control the traffic to, in order to keep a toolchain version the app ga
   upstream. Until then the diagnosis is "16.3.x breaks request-time rendering on 1.20.2", which is where the
   evidence stops.
 - **`/[locale]/payment/confirmation` renders at request time too**, and escapes the e2e suite only because
-  [`proxy.ts`](../apps/web/src/proxy.ts), at the time still the middleware, redirects it away when `payment_intent` is absent. It was never confirmed broken or
+  [`middleware.ts`](../apps/web/src/middleware.ts) redirects it away when `payment_intent` is absent. It was never confirmed broken or
   healthy under 16.3; whoever revisits this pin should check it with a real payment intent first.
 - Recorded in [`CLAUDE.md`](../apps/web/CLAUDE.md) under *Versions* and *Structure & aliases*.
 
@@ -171,3 +175,42 @@ deleted and Dependency Review stops failing for a consequence of this ADR rather
 1.20.4 was published 2026-08-27, so it is not installable yet; 1.20.3 matured on 2026-08-29T11:07Z. The
 lockfile carries 1.20.3 for that reason alone, and Renovate, stricter at 4 days, will propose 1.20.4 when it
 is old enough.
+
+## Amendment, 2026-09-01: `proxy.ts` reverted to `middleware.ts`
+
+`0803eb1` renamed `apps/web/src/middleware.ts` to `proxy.ts`, which is Next 16's name for the same artefact.
+It reads as a rename and is not one: **`proxy.ts` always runs on the Node.js runtime**, where `middleware.ts`
+runs on the edge. On Cloudflare that switches which of two OpenNext code paths bundles the chain, and the
+Node.js one is new and explicitly unsupported. `bundle-node-middleware.js` says so in its own header, and the
+build prints it on every run:
+
+```
+WARN Node.js middleware support is experimental in cloudflare, and not officially maintained
+     by OpenNext maintainers. Use at your own risk.
+```
+
+Support for it landed in [#1309](https://github.com/opennextjs/opennextjs-cloudflare/pull/1309), merged
+2026-08-25, five days before the rename.
+
+**What it broke, and what it did not.** The chain still ran; only the branches that edit request headers
+stopped taking effect, which is why the build, the deploy and the smoke run all stayed green:
+
+| Branch | Mechanism | On the Node.js path |
+| --- | --- | --- |
+| The payment-confirmation guard | `NextResponse.redirect` | works |
+| The markdown twin | `NextResponse.rewrite`, header **set** | works |
+| The direct `/api/markdown` guard | `NextResponse.next`, header **deleted** | **the caller's header survives**: 200, not 404 |
+| `x-next-intl-locale` into `global-not-found` | header into a per-request render | **never arrives**: every locale answers `lang="en"` |
+
+Eight `E2E tests` cases caught exactly those two, and nothing else in the suite moved. Nothing in the unit
+suite could have: `middleware.test.ts` calls the exported function directly, so it passes under either name.
+
+**Upgrading is not the fix.** `@opennextjs/cloudflare` 1.20.5 was the latest on 2026-09-01 and its
+`bundle-node-middleware.js` and `useNodeMiddleware` are byte-identical to 1.20.3's. Next 16.3.4 was the latest
+and changes nothing here either. This is the same shape as the original decision: the adapter is behind the
+framework, and the framework's new default is the one that is not carried.
+
+**So the file keeps the old name on purpose.** Next nags on it; take the nag. Renaming it back to `proxy.ts`
+is a runtime change, not a tidy-up, and it must not be done again until a `proxy.ts` build passes the two
+cases in the table above on a preview. The published docs page keeps the `/architecture/proxy/` address, since
+the concept is Next's and only the file name is ours.

@@ -9,7 +9,7 @@ Bridges that turn that budget into the longest stretches off, and reports how we
 **The whole planner runs in the browser**: the server holds payment and contact records and nothing else
 ([ADR 0001](../../adr/0001-planner-runs-in-the-browser.md)). The server side is seven API route handlers
 (`check-session`, `contact`, `health`, `markdown`, `payment`, `payment/activate` and the Stripe webhook at
-`webhooks/stripe`), a `.well-known` catch-all, [`proxy.ts`](./src/proxy.ts), and some static rendering.
+`webhooks/stripe`), a `.well-known` catch-all, [`middleware.ts`](./src/middleware.ts), and some static rendering.
 
 Premium (advanced metrics, manual editing of a Suggestion) is unlocked by a Donation. There are no accounts:
 the payment record *is* the entitlement ([ADR 0008](../../adr/0008-premium-derived-from-payment.md)).
@@ -179,7 +179,7 @@ sites start reporting `'body' is of type 'unknown'`.
 
 ```
 src/
-  proxy.ts            # locale + country cookies, markdown rewrite; skips /api/* except /api/markdown
+  middleware.ts            # locale + country cookies, markdown rewrite; skips /api/* except /api/markdown
   app/                # App Router: [locale]/(app|marketing) pages, api/ route handlers, sitemap, robots
   application/        # use-cases, DTOs, Zustand stores, export, email templates. Orchestration, no I/O clients
   domain/             # calendar/ (pure planning engine) and payment/ (Effect programs)
@@ -350,7 +350,7 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
   signed HTTP-only cookie.
   [ADR 0008](../../adr/0008-premium-derived-from-payment.md).
 - **The layer graph is published as a counted table, not drawn.** The five layers plus
-  [`src/proxy.ts`](./src/proxy.ts) make fifteen production import edges, and the figure that used to stand
+  [`src/middleware.ts`](./src/middleware.ts) make fifteen production import edges, and the figure that used to stand
   for them had five. The table on the documentation site's architecture overview is asserted against the tree in
   both directions by [`tests/docs-consistency.test.ts`](../../tests/docs-consistency.test.ts), so a new
   cross-layer import fails the contract suite until the table is updated. What is a constraint here and what

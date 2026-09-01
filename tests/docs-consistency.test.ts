@@ -820,12 +820,19 @@ describe("documentation does not point at things that are gone", () => {
 	// Absent from the tracked tree by design, yet the guides have to name it.
 	const GENERATED = new Set([GENERATED_ENV_TYPES]);
 
+	// Absent because a decision put it there. ADR 0009 records why the per-request chain is at `middleware.ts`
+	// and not at `proxy.ts`, which is a statement about a file that does not exist and cannot be written
+	// without naming it. Everything else in this rule stays as strict as it was: a name lands here only when
+	// the absence is the point, never to quiet a citation that has merely rotted.
+	const DELIBERATELY_ABSENT = new Set(["proxy.ts"]);
+
 	const exists = (token: string) => sourceFiles.some((path) => path === token || path.endsWith(`/${token}`));
 	const citedSourceFiles = (files: string[]) => {
 		const missing: string[] = [];
 		for (const file of files) {
 			for (const [, token] of read(file).matchAll(BACKTICKED_SOURCE_FILE)) {
-				if (token.includes("*") || token.startsWith(".") || GENERATED.has(token)) continue;
+				if (token.includes("*") || token.startsWith(".") || GENERATED.has(token) || DELIBERATELY_ABSENT.has(token))
+					continue;
 				if (!exists(token)) missing.push(`${file} -> ${token}`);
 			}
 		}
@@ -1535,7 +1542,7 @@ describe("the published layer graph is the one the imports make", () => {
 	// `ui` edge however little it looks like one.
 	const WEB_SRC = `${WEB}/src`;
 	const LAYER_NAMES = ["app", "application", "domain", "infrastructure", "ui"];
-	const PROXY_NODE = "proxy.ts";
+	const MIDDLEWARE_NODE = "middleware.ts";
 	const OVERVIEW = `${DOCS}/src/content/docs/architecture/overview.mdx`;
 	const GRAPH_TABLE_HEADER = "from / to";
 	const IMPORT_SPECIFIER =
@@ -1553,7 +1560,7 @@ describe("the published layer graph is the one the imports make", () => {
 	const nodeOf = (path: string): string | null => {
 		if (!path.startsWith(`${WEB_SRC}/`)) return null;
 		const rest = path.slice(WEB_SRC.length + 1);
-		if (rest === PROXY_NODE) return PROXY_NODE;
+		if (rest === MIDDLEWARE_NODE) return MIDDLEWARE_NODE;
 		const [head] = rest.split("/");
 		return head && LAYER_NAMES.includes(head) ? head : null;
 	};

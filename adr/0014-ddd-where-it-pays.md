@@ -52,7 +52,7 @@ deliberate and named, the second because the claims become measurements.
 2. **Bounded contexts.** `domain/calendar/` and `domain/payment/` share no code and no types, and there is no
    reason for one to import the other. Premium is the only thing that connects them and that connection
    lives in the application layer.
-3. **Layer boundaries.** Five layers under `apps/web/src/` plus `proxy.ts`. Each has a `CLAUDE.md` stating
+3. **Layer boundaries.** Five layers under `apps/web/src/` plus `middleware.ts`. Each has a `CLAUDE.md` stating
    what it may reach.
 4. **Dependency direction, as measured rather than as intended.** The graph is published as a counted table
    on the architecture overview and

@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-Forever PTO is a Next.js App Router application organized into five layers under `apps/web/src/`, plus `apps/web/src/proxy.ts` at the root of the tree. Each layer has a single responsibility and a deliberate dependency direction.
+Forever PTO is a Next.js App Router application organized into five layers under `apps/web/src/`, plus `apps/web/src/middleware.ts` at the root of the tree. Each layer has a single responsibility and a deliberate dependency direction.
 
 ## The layers
 
@@ -22,7 +22,7 @@ Forever PTO is a Next.js App Router application organized into five layers under
 This section used to draw `app → ui → application → domain` with two side arrows, and that picture was read
 off the intent rather than off the tree. Walking every `import`, `import type`, dynamic `import()` and
 `vi.mock` specifier under `apps/web/src` gives **fifteen** production edges between the five layers plus
-`proxy.ts`, and the old figure drew five of them. The largest one it left out was `app → infrastructure`, at
+`middleware.ts`, and the old figure drew five of them. The largest one it left out was `app → infrastructure`, at
 63 imports across 20 files, the third-heaviest edge in the package. It also mixed two relations under one
 arrow head, labelling infrastructure as *reached through use-cases, services and adapters*: that is a call
 path, not an import, and a diagram whose arrows mean `imports` cannot carry both.
@@ -38,7 +38,7 @@ either direction, so it is a measurement rather than a drawing.
 | `application` | | 1/1 | | 14/7 | 35/10 |
 | `domain` | | | 13/9 | | 12/3 |
 | `infrastructure` | | 7/2 | 33/23 | 5/4 | |
-| `proxy.ts` | | | | | 5/1 |
+| `middleware.ts` | | | | | 5/1 |
 
 Read the shape rather than the numbers. Four things are worth naming, and three of them are arrows the old
 figure said were not there:

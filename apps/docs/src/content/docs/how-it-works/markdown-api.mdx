@@ -13,7 +13,7 @@ curl -H 'Accept: text/markdown' https://forever-pto.com/planner
 
 ## The rewrite
 
-Markdown negotiation is the **first** thing `apps/web/src/proxy.ts` decides, and the matcher is what keeps it safe: `/api/*` and every dotted path (so all of `/.well-known/*`) never reach the proxy at all, which is why the rewrite branch carries no exclusion list of its own.
+Markdown negotiation is the **first** thing `apps/web/src/middleware.ts` decides, and the matcher is what keeps it safe: `/api/*` and every dotted path (so all of `/.well-known/*`) never reach the proxy at all, which is why the rewrite branch carries no exclusion list of its own.
 
 - A direct hit on `/api/markdown` passes through with the path header **deleted**. That branch is not decoration: without it a direct request carrying `Accept: text/markdown` would match the next rule and rewrite the route onto itself.
 - Any other request whose `Accept` header contains `text/markdown` is rewritten to `/api/markdown`: a rewrite, not a redirect, so the URL the agent asked for stays canonical.
