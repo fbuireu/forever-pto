@@ -68,7 +68,7 @@ the caller decides the fallback and the precedence is assertable without renderi
 | `services/` | Everything with a purpose but no SDK of its own: `contact/`, `countries/`, `env/`, `holidays/`, `location/`, `payments/`, `premium/`, `regions/`. Three carry their own guides: [holidays](./services/holidays/CLAUDE.md), [location](./services/location/CLAUDE.md), [payments](./services/payments/CLAUDE.md) |
 | `well-known/` | [`slugs.ts`](./well-known/slugs.ts) (the three slugs, the shared cache header, `wellKnownUrl`), [`documents.ts`](./well-known/documents.ts) (slug → content type and builder), and the builders [`apiCatalog.ts`](./well-known/apiCatalog.ts) (RFC 9727 linkset), [`mcpServerCard.ts`](./well-known/mcpServerCard.ts) (SEP-1649) and [`agentSkillsIndex.ts`](./well-known/agentSkillsIndex.ts), each returning a plain object, with the route owning the response envelope |
 | `workers/` | The calculations Web Worker and its message contract. See [`workers/CLAUDE.md`](./workers/CLAUDE.md) |
-| [`errors.ts`](./errors.ts) | Every tagged error in the app: `DatabaseError`, `EmailError`, `MissingDonorEmailError`, `PaymentError`, `PromoCodeError`, `RateLimitError`, `SessionError`, `ValidationError`, `WebhookError` |
+| [`errors.ts`](./errors.ts) | Every tagged error in the app: `DatabaseError`, `EmailError`, `MissingDonorEmailError`, `PaymentError` and its `PaymentRequestError` subclass, `PromoCodeError`, `RateLimitError`, `SessionError`, `ValidationError`, `WebhookError` |
 | [`layers.ts`](./layers.ts) | `ApplicationLayer`: the four Live layers merged, provided at every entry point |
 
 There is no `services/calendar/`. The planning engine is `@domain/calendar/`, and `FilterStrategy` is declared

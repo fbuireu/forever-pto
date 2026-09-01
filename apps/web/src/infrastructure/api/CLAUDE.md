@@ -105,11 +105,21 @@ under a value that arrived lying about its type, which a test injecting an off-u
 | `RateLimitError` | 429 | `RATE_LIMIT_EXCEEDED` | `errors.ts` |
 | `ValidationError` | 400 | the error's own `message`, verbatim | `errors.ts` |
 | `PromoCodeError` | 400 | the error's `code`, plus `isPromoCodeError: true` | `errors.ts` |
-| `PaymentError` | 500 | `INTERNAL_ERROR` | `errors.ts` |
+| `PaymentError` | 400 or 500 | `INVALID_PAYMENT_REFERENCE` (400) when the provider rejected the reference the caller supplied, else `INTERNAL_ERROR` (500) | `errors.ts` |
 | `EmailError` | 500 | `INTERNAL_ERROR` | `errors.ts` |
 | `SessionError`, `DatabaseError` | 500 | `INTERNAL_ERROR` | `errors.ts` |
 | `WebhookError` | 400 or 500 | `INVALID_SIGNATURE` when `isSignatureError`, `WEBHOOK_MISCONFIGURED` (400) when the secret is missing, else `WEBHOOK_PROCESSING_FAILED` (500) | [`src/app/api/webhooks/stripe/route.ts`](../../app/api/webhooks/stripe/route.ts) |
 | `MissingDonorEmailError` | None | never reaches the wire: absorbed and logged in [`webhook.ts`](../../application/use-cases/webhook.ts) | `src/application/use-cases/webhook.ts` |
+
+A `PaymentRequestError` carries the `PaymentError` tag for the same reason, and is the one payment failure
+that is the caller's fault rather than the system's. `wrapError` in [`serverService.ts`](../clients/payments/stripe/serverService.ts) raised every Stripe
+rejection as a plain `PaymentError`, so `pi_invalid` — a reference the visitor typed — answered **500
+`INTERNAL_ERROR`**, the same as Stripe being down. It now narrows on `StripeInvalidRequestError`, which is
+what Stripe raises for a malformed or unknown id, and `describeFailure` narrows back on
+`isPaymentRequestError` to answer **400 `INVALID_PAYMENT_REFERENCE`**. The body still carries a fixed code
+rather than the provider's message, so nothing about which references exist reaches the wire; only the
+status stops lying about whose fault it was. A transport failure stays a plain `PaymentError` and a 500,
+which is the distinction the single wrapper could not express.
 
 A `WebhookConfigurationError` (Stripe is not configured) carries the `WebhookError` tag, so the handler
 narrows on `isWebhookConfigurationError` from [`serverService.ts`](../clients/payments/stripe/serverService.ts) and answers **400 `WEBHOOK_MISCONFIGURED`**,
