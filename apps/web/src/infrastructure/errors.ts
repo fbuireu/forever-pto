@@ -19,6 +19,11 @@ export class PaymentError extends Data.TaggedError("PaymentError")<{
 	cause?: unknown;
 }> {}
 
+export class PaymentRequestError extends PaymentError {}
+
+export const isPaymentRequestError = (error: PaymentError): error is PaymentRequestError =>
+	error instanceof PaymentRequestError;
+
 export const PromoCodeErrors = {
 	INVALID_OR_EXPIRED: "invalid_or_expired",
 	USAGE_LIMIT_REACHED: "usage_limit_reached",

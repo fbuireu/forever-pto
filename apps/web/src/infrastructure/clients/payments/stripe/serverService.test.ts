@@ -1,9 +1,10 @@
-import { PaymentError, WebhookError } from "@infrastructure/errors";
+import { PaymentError, PaymentRequestError, WebhookError } from "@infrastructure/errors";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const {
 	StripeSignatureVerificationError,
+	StripeInvalidRequestError,
 	mockPaymentIntentsCreate,
 	mockPaymentIntentsRetrieve,
 	mockChargesRetrieve,
@@ -15,6 +16,12 @@ const {
 		constructor(message: string) {
 			super(message);
 			this.name = "StripeSignatureVerificationError";
+		}
+	}
+	class StripeInvalidRequestError extends Error {
+		constructor(message: string) {
+			super(message);
+			this.name = "StripeInvalidRequestError";
 		}
 	}
 	const mockPaymentIntentsCreate = vi.fn();
@@ -32,11 +39,12 @@ const {
 		vi.fn().mockImplementation(MockStripe as unknown as () => InstanceType<typeof MockStripe>),
 		{
 			createFetchHttpClient: vi.fn().mockReturnValue({}),
-			errors: { StripeSignatureVerificationError },
+			errors: { StripeSignatureVerificationError, StripeInvalidRequestError },
 		},
 	);
 	return {
 		StripeSignatureVerificationError,
+		StripeInvalidRequestError,
 		mockPaymentIntentsCreate,
 		mockPaymentIntentsRetrieve,
 		mockChargesRetrieve,
@@ -102,6 +110,28 @@ describe("StripeServerService.paymentIntents.retrieve", () => {
 			}).pipe(Effect.provide(StripeServerServiceLive)),
 		);
 		expect(error).toBeInstanceOf(PaymentError);
+	});
+
+	it("wraps a rejected reference as PaymentRequestError, which the API maps to 400 rather than 500", async () => {
+		mockPaymentIntentsRetrieve.mockRejectedValue(new StripeInvalidRequestError("No such payment_intent: 'pi_invalid'"));
+		const error = await Effect.runPromise(
+			Effect.gen(function* () {
+				const stripe = yield* StripeServerService;
+				return yield* stripe.paymentIntents.retrieve("pi_invalid").pipe(Effect.flip);
+			}).pipe(Effect.provide(StripeServerServiceLive)),
+		);
+		expect(error).toBeInstanceOf(PaymentRequestError);
+	});
+
+	it("leaves a transport failure as a plain PaymentError, so an outage stays a 500", async () => {
+		mockPaymentIntentsRetrieve.mockRejectedValue(new Error("network error"));
+		const error = await Effect.runPromise(
+			Effect.gen(function* () {
+				const stripe = yield* StripeServerService;
+				return yield* stripe.paymentIntents.retrieve("pi_bad").pipe(Effect.flip);
+			}).pipe(Effect.provide(StripeServerServiceLive)),
+		);
+		expect(error).not.toBeInstanceOf(PaymentRequestError);
 	});
 });
 

@@ -8,6 +8,7 @@ import type {
 	SessionError,
 	ValidationError,
 } from "@infrastructure/errors";
+import { isPaymentRequestError } from "@infrastructure/errors";
 
 export const ApiError = {
 	INTERNAL_ERROR: "internal_error",
@@ -15,6 +16,7 @@ export const ApiError = {
 	RATE_LIMIT_EXCEEDED: "rate_limit_exceeded",
 	CONTACT_ALREADY_RECEIVED: "contact_already_received",
 	EMAIL_REQUIRED: "email_required",
+	INVALID_PAYMENT_REFERENCE: "invalid_payment_reference",
 	MISSING_SIGNATURE: "missing_signature",
 	INVALID_SIGNATURE: "invalid_signature",
 	WEBHOOK_PROCESSING_FAILED: "webhook_processing_failed",
@@ -45,7 +47,8 @@ const FAILURE_RESPONSES: {
 	DuplicateContactError: () => ({ status: 429, error: ApiError.CONTACT_ALREADY_RECEIVED }),
 	ValidationError: (failure) => ({ status: 400, error: failure.message }),
 	PromoCodeError: (failure) => ({ status: 400, error: failure.code }),
-	PaymentError: () => OPAQUE,
+	PaymentError: (failure) =>
+		isPaymentRequestError(failure) ? { status: 400, error: ApiError.INVALID_PAYMENT_REFERENCE } : OPAQUE,
 	EmailError: () => OPAQUE,
 	SessionError: () => OPAQUE,
 	DatabaseError: () => OPAQUE,

@@ -2,6 +2,7 @@ import {
 	DatabaseError,
 	EmailError,
 	PaymentError,
+	PaymentRequestError,
 	PromoCodeError,
 	RateLimitError,
 	SessionError,
@@ -23,6 +24,19 @@ describe("describeFailure", () => {
 			expect(describeFailure(failure)).toEqual({ status: 500, error: ApiError.INTERNAL_ERROR });
 			expect(describeFailure(failure).error).not.toContain(failure.message);
 		}
+	});
+
+	it("returns a PaymentRequestError as 400, because the provider refused the caller's reference, not the request", () => {
+		expect(describeFailure(new PaymentRequestError({ message: "No such payment_intent: 'pi_invalid'" }))).toEqual({
+			status: 400,
+			error: ApiError.INVALID_PAYMENT_REFERENCE,
+		});
+	});
+
+	it("keeps the provider's message off a PaymentRequestError response, same as the opaque tags", () => {
+		const failure = new PaymentRequestError({ message: "No such payment_intent: 'pi_invalid'" });
+
+		expect(describeFailure(failure).error).not.toContain(failure.message);
 	});
 
 	it("returns a ValidationError message verbatim, which is the one message that is safe to show", () => {

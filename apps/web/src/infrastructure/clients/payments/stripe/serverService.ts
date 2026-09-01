@@ -1,4 +1,4 @@
-import { PaymentError, WebhookError } from "@infrastructure/errors";
+import { PaymentError, PaymentRequestError, WebhookError } from "@infrastructure/errors";
 import { Context, Effect, Layer } from "effect";
 import StripeNode from "stripe";
 
@@ -47,11 +47,15 @@ export const StripeServerServiceLive = Layer.sync(StripeServerService, () => {
 		return stripe;
 	};
 
-	const wrapError = (error: unknown): PaymentError =>
-		new PaymentError({
-			message: error instanceof Error ? error.message : String(error),
-			cause: error,
-		});
+	const wrapError = (error: unknown): PaymentError => {
+		const message = error instanceof Error ? error.message : String(error);
+
+		if (error instanceof StripeNode.errors.StripeInvalidRequestError) {
+			return new PaymentRequestError({ message, cause: error });
+		}
+
+		return new PaymentError({ message, cause: error });
+	};
 
 	const wrapWebhookError = (error: unknown): WebhookError => {
 		const message = error instanceof Error ? error.message : String(error);
