@@ -233,6 +233,8 @@ const resolveUiSpecifier = (specifier: string) => join(UI_ROOT, specifier.replac
 // build or secret write is wrapped in `nick-fields/retry` any more, but the two preview-Worker deletes still
 // are, and that action takes its shell script on `command:`, so a rule reading only `run:` would miss them.
 const WORKFLOW_DIR = ".github/workflows";
+const COMPOSITE_ACTION_DIR = ".github/actions";
+const REPINNED_RUNTIME = /^\s*(?:node-version|version):\s*["']?\d/m;
 const workflowFiles = readdirSync(join(ROOT, WORKFLOW_DIR))
 	.filter((file) => file.endsWith(".yml"))
 	.map((file) => `${WORKFLOW_DIR}/${file}`);
@@ -535,6 +537,49 @@ describe("the workspace is shaped the way the guides describe it", () => {
 		const pinned = Object.fromEntries(declared);
 		expect(pinned["package.json"]).toBe(pinned[`${WEB}/package.json`]);
 		expect(pinned[`${DOCS}/package.json`].startsWith("6.")).toBe(true);
+	});
+});
+
+// A pinned version is the one fact in a guide that a bot rewrites on its own, and both ways of writing it
+// down have failed in this family of repositories. contribKit asserted the digit in prose against the
+// manifest, so every Renovate bump failed on `CLAUDE.md does not state Flutter 3.47.2`: a documentation edit
+// the bot cannot make, punishing the bump instead of the drift. The guides that dropped the assertion and
+// kept the digit rotted instead, this one included. So the Versions section names the file each runtime is
+// pinned in and never what the pin says, and nothing here reads a digit out of prose. What is asserted is
+// the shape a bump cannot change, which is the same thing the typescript rule above already does.
+describe("pinned runtimes", () => {
+	const manifest = readJson("package.json");
+	const [packageManagerName, packageManagerVersion] = manifest.packageManager.split("@");
+
+	it("names every runtime it pins, whatever the manifest carries", () => {
+		const guide = read("CLAUDE.md");
+
+		expect(["Node", "pnpm"].filter((runtime) => !guide.includes(runtime))).toEqual([]);
+	});
+
+	it("pins Node once: .nvmrc and engines.node are one fact, so they say the same thing", () => {
+		expect(read(".nvmrc").trim()).toBe(manifest.engines.node);
+	});
+
+	it("pins pnpm once, through packageManager", () => {
+		expect(packageManagerName).toBe("pnpm");
+		expect(WORKSPACE_PACKAGES.filter((pkg) => readJson(`${pkg}/package.json`).packageManager)).toEqual([]);
+	});
+
+	it("pins every runtime to an exact version, never a range", () => {
+		expect(manifest.engines.node).toMatch(EXACT_VERSION);
+		expect(packageManagerVersion).toMatch(EXACT_VERSION);
+	});
+
+	it("lets no workflow pin a runtime the manifest already pins", () => {
+		const composites = readdirSync(join(ROOT, COMPOSITE_ACTION_DIR)).map(
+			(action) => `${COMPOSITE_ACTION_DIR}/${action}/action.yml`,
+		);
+		const candidates = [...workflowFiles, ...composites];
+		const repinned = candidates.filter((file) => REPINNED_RUNTIME.test(read(file)));
+
+		expect(candidates.length).toBeGreaterThan(workflowFiles.length);
+		expect(repinned).toEqual([]);
 	});
 });
 
