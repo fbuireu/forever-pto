@@ -1,7 +1,12 @@
 import { setLocaleCookie } from "@infrastructure/i18n/cookie";
 import { LOCALE_COOKIE } from "@infrastructure/i18n/locales";
 import { routing } from "@infrastructure/i18n/routing";
-import { MARKDOWN_ACCEPT, MARKDOWN_PATH_HEADER, MARKDOWN_ROUTE } from "@infrastructure/markdown/twin";
+import {
+	MARKDOWN_ACCEPT,
+	MARKDOWN_PATH_HEADER,
+	MARKDOWN_ROUTE,
+	NEUTRALISED_MARKDOWN_PATH,
+} from "@infrastructure/markdown/twin";
 import { location as locationProxy } from "@infrastructure/proxy/location";
 import { type NextRequest, NextResponse } from "next/server";
 import createMiddleware from "next-intl/middleware";
@@ -17,7 +22,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
 	if (pathname === MARKDOWN_ROUTE) {
 		const headers = new Headers(request.headers);
-		headers.delete(MARKDOWN_PATH_HEADER);
+		headers.set(MARKDOWN_PATH_HEADER, NEUTRALISED_MARKDOWN_PATH);
 
 		return NextResponse.next({ request: { headers } });
 	}

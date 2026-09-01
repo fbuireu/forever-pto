@@ -1,5 +1,10 @@
 import { ES, LOCALE_COOKIE } from "@infrastructure/i18n/locales";
-import { MARKDOWN_PATH_HEADER, MARKDOWN_ROUTE } from "@infrastructure/markdown/twin";
+import {
+	isProxiedMarkdownPath,
+	MARKDOWN_PATH_HEADER,
+	MARKDOWN_ROUTE,
+	NEUTRALISED_MARKDOWN_PATH,
+} from "@infrastructure/markdown/twin";
 import { type NextRequest, NextResponse } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -138,7 +143,7 @@ describe("middleware", () => {
 	});
 
 	describe("direct requests to the markdown route", () => {
-		it("strips the path header, so the route cannot be driven from outside the rewrite", async () => {
+		it("overwrites the path header, so the route cannot be driven from outside the rewrite", async () => {
 			const spy = vi.spyOn(NextResponse, "next");
 
 			await middleware(
@@ -150,7 +155,23 @@ describe("middleware", () => {
 				}),
 			);
 
-			expect(passedThroughRequestHeaders(spy).get(MARKDOWN_PATH_HEADER)).toBeNull();
+			expect(passedThroughRequestHeaders(spy).get(MARKDOWN_PATH_HEADER)).toBe(NEUTRALISED_MARKDOWN_PATH);
+		});
+
+		it("overwrites rather than deleting, because the adapter merges request headers instead of replacing them", async () => {
+			const spy = vi.spyOn(NextResponse, "next");
+
+			await middleware(
+				makeRequest({
+					pathname: MARKDOWN_ROUTE,
+					accept: "",
+					search: "",
+					extraHeaders: { [MARKDOWN_PATH_HEADER]: "/planner" },
+				}),
+			);
+
+			expect(passedThroughRequestHeaders(spy).has(MARKDOWN_PATH_HEADER)).toBe(true);
+			expect(isProxiedMarkdownPath(passedThroughRequestHeaders(spy).get(MARKDOWN_PATH_HEADER))).toBe(false);
 		});
 
 		it("does not run the i18n proxy", async () => {

@@ -29,7 +29,7 @@ failure channel onto a status code. Business logic that lands here is in the wro
 [`src/middleware.ts`](../middleware.ts) runs first, and its `config.matcher` decides what it sees: everything except `/api`,
 `/_next`, `/_vercel` and any path containing a dot, plus `/api/markdown` explicitly. In order it:
 
-1. Lets a direct `/api/markdown` request through, and **strips the path header** on the way; see below.
+1. Lets a direct `/api/markdown` request through, and **overwrites the path header** on the way; see below.
    The branch is not decoration: without it a direct hit carrying `Accept: text/markdown` would match the
    next rule and rewrite the route onto itself. This file used to say the branch existed "only to attach
    `Cache-Control` and `Vary: Accept`", which was both its least important effect and the one that turned out
@@ -100,10 +100,24 @@ The same defect had a second half. Since the only `path` the handler could ever 
 anyone could append.
 
 Both halves close the same way: the proxy `set`s the header, which overwrites anything inbound, and the
-direct-hit branch `delete`s it. The route reads *only* the header and 404s when it is absent, with no
-fallback to the query: the fallback is the vulnerability, not a convenience. `middleware.test.ts` asserts
-the overwrite and the strip; `route.test.ts` asserts the header wins over a disagreeing query and that an
-absent header never reaches the builder. Verified by restoring the `??` fallback and watching the case fail.
+direct-hit branch `set`s it to `NEUTRALISED_MARKDOWN_PATH`. The route reads *only* the header and 404s
+unless `isProxiedMarkdownPath` accepts it, with no fallback to the query: the fallback is the
+vulnerability, not a convenience. `middleware.test.ts` asserts both overwrites; `route.test.ts` asserts the
+header wins over a disagreeing query and that neither an absent nor a neutralised header reaches the
+builder. Verified by restoring the `??` fallback and watching the case fail.
+
+**The direct-hit branch overwrites because deleting does not survive the adapter, and that is not a style
+choice.** It called `headers.delete(MARKDOWN_PATH_HEADER)` for months. Next serialises
+`NextResponse.next({ request: { headers } })` as `x-middleware-override-headers` plus one
+`x-middleware-request-<key>` per header, and Next's own router applies it by *deleting* every original
+header absent from that list. `@opennextjs/aws` does not: `dist/core/routing/middleware.js` ends on
+`headers: { ...internalEvent.headers, ...reqHeaders }`, a merge, so a deleted header is simply not
+overridden and the caller's value survives. On Cloudflare the guard therefore never ran, in either runtime —
+the merge is the same code on the edge and Node.js middleware paths, so [ADR 0009](../../../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) blamed the wrong
+thing for this one. Overwriting is expressible in the mechanism that does exist, which is why the sentinel
+lives in `twin.ts` beside the header name rather than being an empty string spelled twice. Only
+[`markdown.spec.ts`](../../e2e/api/markdown.spec.ts) can catch a regression here: `middleware.test.ts` calls the exported function and reads
+what was handed to `NextResponse.next`, so it sees the intent and never the runtime.
 
 **[`markdown.spec.ts`](../../e2e/api/markdown.spec.ts) drives the twin the way a client does, and it is the only place the proxy,
 the route and the header are proven to line up.** It used to request `/api/markdown` directly and assert
@@ -112,7 +126,7 @@ so all five cases were red on every pull request and the `e2e` job with them. Th
 *defect*: `?path=/en/planner` expecting 200, which `route.test.ts` pins as a 404, so making the spec green
 the obvious way would have put the query fallback back. It now requests the **page** route with
 `Accept: text/markdown` and asserts what the twin produces on each branch, plus the two claims no unit test
-can reach: a bare `GET /api/markdown` 404s, so the strip is live end to end, and
+can reach: a bare `GET /api/markdown` 404s, so the overwrite is live end to end, and
 `/planner?path=/legal/terms-of-service` serves the planner. It imports `MARKDOWN_ACCEPT`,
 `MARKDOWN_PATH_HEADER` and `MARKDOWN_ROUTE` from [`src/infrastructure/markdown/twin.ts`](../infrastructure/markdown/twin.ts) rather than repeating
 the strings, because the spoofed-header case asserts a **404** and a stale header name would let it pass for

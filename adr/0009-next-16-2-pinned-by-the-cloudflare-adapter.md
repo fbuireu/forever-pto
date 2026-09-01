@@ -199,11 +199,22 @@ stopped taking effect, which is why the build, the deploy and the smoke run all 
 | --- | --- | --- |
 | The payment-confirmation guard | `NextResponse.redirect` | works |
 | The markdown twin | `NextResponse.rewrite`, header **set** | works |
-| The direct `/api/markdown` guard | `NextResponse.next`, header **deleted** | **the caller's header survives**: 200, not 404 |
+| The direct `/api/markdown` guard | `NextResponse.next`, header **deleted** | **the caller's header survives**: 200, not 404 — but see the correction below |
 | `x-next-intl-locale` into `global-not-found` | header into a per-request render | **never arrives**: every locale answers `lang="en"` |
 
 Eight `E2E tests` cases caught exactly those two, and nothing else in the suite moved. Nothing in the unit
 suite could have: `middleware.test.ts` calls the exported function directly, so it passes under either name.
+
+**Correction, 2026-09-01: the third row was not the rename's doing.** Reverting to `middleware.ts` cleared
+the six locale cases and left the `/api/markdown` one red, which is what a runtime-specific failure does not
+do. `@opennextjs/aws` reconstructs the request in `dist/core/routing/middleware.js` as
+`headers: { ...internalEvent.headers, ...reqHeaders }` — a merge. A header the middleware *deleted* is
+absent from `reqHeaders`, so the caller's value survives; Next's own router deletes every original header
+missing from the override list, and the adapter never implemented that half. It is one code path for both
+the edge and Node.js middleware, so the guard had never run on Cloudflare under either name, and the table
+above credited the rename with a hole that predated it. The fix is in `middleware.ts`, not in the adapter:
+the branch overwrites the header with a sentinel instead of deleting it, which the override mechanism does
+carry. Only the `E2E` suite can see the difference, per [`src/app/CLAUDE.md`](../apps/web/src/app/CLAUDE.md).
 
 **Upgrading is not the fix.** `@opennextjs/cloudflare` 1.20.5 was the latest on 2026-09-01 and its
 `bundle-node-middleware.js` and `useNodeMiddleware` are byte-identical to 1.20.3's. Next 16.3.4 was the latest
