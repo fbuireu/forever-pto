@@ -35,14 +35,23 @@ not before; see [ADR 0010](./adr/0010-apps-web-and-apps-docs-monorepo-layout.md)
 
 ## Versions (pinned, match exactly)
 
-- Node **26.7.0** ([`.nvmrc`](./.nvmrc), mirrored in `engines.node`): `.nvmrc` is what every CI job installs
-- pnpm **11.22.0** (`packageManager`): always use pnpm, never npm/yarn
-- TypeScript **7.0.2** at the root and in `apps/web`, **6.0.3** in `apps/docs`: `astro check` refuses to run
-  under 7, because the native compiler ships no programmatic API for it to load. The split is asserted rather
-  than assumed, and it closes the day Astro supports 7
-- Next **16.3.3** with `@opennextjs/cloudflare` **1.20.3**: they move as a pair, and the pair is what lifted
-  the pin [ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) recorded. The reasoning belongs
-  to the app: [`./apps/web/CLAUDE.md`](./apps/web/CLAUDE.md)
+**This section names where each version is pinned and never what the pin says.** A digit written here is a
+claim a bot invalidates on its own, and neither way of defending it works: contribKit asserted the digit
+against the manifest and failed every dependency pull request on `CLAUDE.md does not state Flutter 3.47.2`, a
+line the bot cannot edit; this guide did not assert it and carried two stale pins instead, Node and pnpm.
+Read the manifest. What `tests/docs-consistency.test.ts` asserts is the shape a bump cannot change.
+
+- Node ([`.nvmrc`](./.nvmrc), mirrored in `engines.node`): `.nvmrc` is what every CI job installs, and the
+  two spellings are asserted equal
+- pnpm (`packageManager`, and in no workspace manifest): always use pnpm, never npm/yarn
+- TypeScript at the root and in `apps/web` moves as one; `apps/docs` stays on **6**, because `astro check`
+  refuses to run under 7: the native compiler ships no programmatic API for it to load. The split is asserted
+  rather than assumed, and it closes the day Astro supports 7
+- Next with `@opennextjs/cloudflare` ([`apps/web/package.json`](./apps/web/package.json)): they move as a
+  pair, and the pair is what lifted the pin
+  [ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) recorded. That ADR is dated and quotes
+  the versions it decided on, which is what an ADR is for. The reasoning belongs to the app:
+  [`./apps/web/CLAUDE.md`](./apps/web/CLAUDE.md)
 
 ## Commands
 
