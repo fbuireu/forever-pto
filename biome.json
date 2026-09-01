@@ -27,7 +27,7 @@
 		}
 	},
 	"linter": {
-		"includes": ["**", "!**/*.d.ts*", "!**/*.astro"],
+		"includes": ["**", "!**/*.d.ts*"],
 		"rules": {
 			"preset": "recommended",
 			"complexity": {
@@ -39,6 +39,17 @@
 		}
 	},
 	"overrides": [
+		{
+			"includes": ["**/*.astro"],
+			"linter": {
+				"rules": {
+					"correctness": {
+						"noUnusedImports": "off",
+						"noUnusedVariables": "off"
+					}
+				}
+			}
+		},
 		{
 			"includes": ["**/apps/web/src/infrastructure/clients/logging/better-stack/client.ts"],
 			"linter": {
