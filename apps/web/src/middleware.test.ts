@@ -26,7 +26,7 @@ vi.mock("@infrastructure/proxy/location", () => ({
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
-const { config, proxy } = await import("./proxy");
+const { config, middleware } = await import("./middleware");
 
 interface MakeRequestParams {
 	pathname: string;
@@ -79,7 +79,7 @@ describe("config matcher", () => {
 	});
 });
 
-describe("proxy", () => {
+describe("middleware", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		mockI18nResponse.cookies.get.mockReturnValue(null);
@@ -90,7 +90,7 @@ describe("proxy", () => {
 			const spy = vi.spyOn(NextResponse, "rewrite");
 			const request = makeRequest({ pathname: "/some-page", accept: "text/markdown" });
 
-			await proxy(request);
+			await middleware(request);
 
 			expect(spy).toHaveBeenCalledOnce();
 			const url = spy.mock.calls[0][0] as URL;
@@ -101,7 +101,7 @@ describe("proxy", () => {
 		it("passes the path as a request header, which is the only thing the route reads", async () => {
 			const spy = vi.spyOn(NextResponse, "rewrite");
 
-			await proxy(makeRequest({ pathname: "/es/planner", accept: "text/markdown" }));
+			await middleware(makeRequest({ pathname: "/es/planner", accept: "text/markdown" }));
 
 			expect(rewrittenRequestHeaders(spy).get(MARKDOWN_PATH_HEADER)).toBe("/es/planner");
 		});
@@ -109,7 +109,7 @@ describe("proxy", () => {
 		it("overwrites a path header the visitor sent, so the pathname cannot be spoofed", async () => {
 			const spy = vi.spyOn(NextResponse, "rewrite");
 
-			await proxy(
+			await middleware(
 				makeRequest({
 					pathname: "/planner",
 					accept: "text/markdown",
@@ -125,13 +125,13 @@ describe("proxy", () => {
 			const spy = vi.spyOn(NextResponse, "rewrite");
 			const request = makeRequest({ pathname: "/some-page", accept: "text/html" });
 
-			await proxy(request);
+			await middleware(request);
 
 			expect(spy).not.toHaveBeenCalled();
 		});
 
 		it("states no cache policy of its own, because only the route knows whether the page exists", async () => {
-			const response = await proxy(makeRequest({ pathname: "/some-page", accept: "text/markdown" }));
+			const response = await middleware(makeRequest({ pathname: "/some-page", accept: "text/markdown" }));
 
 			expect(response.headers.get("Cache-Control")).toBeNull();
 		});
@@ -141,7 +141,7 @@ describe("proxy", () => {
 		it("strips the path header, so the route cannot be driven from outside the rewrite", async () => {
 			const spy = vi.spyOn(NextResponse, "next");
 
-			await proxy(
+			await middleware(
 				makeRequest({
 					pathname: MARKDOWN_ROUTE,
 					accept: "",
@@ -156,7 +156,7 @@ describe("proxy", () => {
 		it("does not run the i18n proxy", async () => {
 			const request = makeRequest({ pathname: MARKDOWN_ROUTE, accept: "", search: "path=/" });
 
-			await proxy(request);
+			await middleware(request);
 
 			expect(mockI18nProxy).not.toHaveBeenCalled();
 		});
@@ -164,7 +164,7 @@ describe("proxy", () => {
 		it("does not rewrite onto itself when the request also asks for markdown", async () => {
 			const spy = vi.spyOn(NextResponse, "rewrite");
 
-			await proxy(makeRequest({ pathname: MARKDOWN_ROUTE, accept: "text/markdown" }));
+			await middleware(makeRequest({ pathname: MARKDOWN_ROUTE, accept: "text/markdown" }));
 
 			expect(spy).not.toHaveBeenCalled();
 		});
@@ -175,7 +175,7 @@ describe("proxy", () => {
 			const spy = vi.spyOn(NextResponse, "redirect");
 			const request = makeRequest({ pathname: "/payment/confirmation" });
 
-			await proxy(request);
+			await middleware(request);
 
 			expect(spy).toHaveBeenCalledOnce();
 			const url = spy.mock.calls[0][0] as URL;
@@ -186,7 +186,7 @@ describe("proxy", () => {
 			const spy = vi.spyOn(NextResponse, "redirect");
 			const request = makeRequest({ pathname: `/${ES}/payment/confirmation` });
 
-			await proxy(request);
+			await middleware(request);
 
 			expect(spy).toHaveBeenCalledOnce();
 			const url = spy.mock.calls[0][0] as URL;
@@ -201,7 +201,7 @@ describe("proxy", () => {
 				search: "payment_intent=pi_123&redirect_status=succeeded",
 			});
 
-			await proxy(request);
+			await middleware(request);
 
 			expect(spy).not.toHaveBeenCalled();
 		});
@@ -210,7 +210,7 @@ describe("proxy", () => {
 			const spy = vi.spyOn(NextResponse, "redirect");
 			const request = makeRequest({ pathname: "//1234567890/payment/confirmation" });
 
-			await proxy(request);
+			await middleware(request);
 
 			expect(spy).toHaveBeenCalledOnce();
 			const url = spy.mock.calls[0][0] as URL;
@@ -224,7 +224,7 @@ describe("proxy", () => {
 			mockI18nResponse.cookies.get.mockReturnValue({ value: ES });
 			const request = makeRequest({ pathname: `/${ES}` });
 
-			await proxy(request);
+			await middleware(request);
 
 			expect(mockI18nResponse.cookies.set).toHaveBeenCalledWith({
 				name: LOCALE_COOKIE,
@@ -239,7 +239,7 @@ describe("proxy", () => {
 			mockI18nResponse.cookies.get.mockReturnValue(null);
 			const request = makeRequest({ pathname: "/" });
 
-			await proxy(request);
+			await middleware(request);
 
 			expect(mockI18nResponse.cookies.set).not.toHaveBeenCalled();
 		});
