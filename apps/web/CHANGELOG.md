@@ -1,3 +1,11 @@
+# [forever-pto-web-v1.9.6](https://github.com/fbuireu/forever-pto/compare/web-v1.9.5...web-v1.9.6) (2026-09-01)
+
+
+### Bug Fixes
+
+* **web:** answer 400 rather than 500 when Stripe rejects the caller's payment reference ([56202f3](https://github.com/fbuireu/forever-pto/commit/56202f37b951882c487a7a9af6eb52bf0b7d365d))
+* **web:** overwrite the markdown path header on a direct hit, since the adapter cannot delete one ([3c27a8e](https://github.com/fbuireu/forever-pto/commit/3c27a8ec2aa9abc8329845f339e937bbeae98165))
+
 # [forever-pto-web-v1.9.5](https://github.com/fbuireu/forever-pto/compare/web-v1.9.4...web-v1.9.5) (2026-09-01)
 
 
