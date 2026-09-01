@@ -1,3 +1,11 @@
+# [forever-pto-web-v1.9.7](https://github.com/fbuireu/forever-pto/compare/web-v1.9.6...web-v1.9.7) (2026-09-01)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @opennextjs/cloudflare to v1.20.4 ([#383](https://github.com/fbuireu/forever-pto/issues/383)) ([6f25b1d](https://github.com/fbuireu/forever-pto/commit/6f25b1dd725ebbbf4776514d2f6a1eacdcc48d0c))
+* **deps:** update dependency @stripe/react-stripe-js to v6.8.2 ([#384](https://github.com/fbuireu/forever-pto/issues/384)) ([29c3f0e](https://github.com/fbuireu/forever-pto/commit/29c3f0ef6c1a17017c6dd19bd17d2291bb506c5e))
+
 # [forever-pto-web-v1.9.6](https://github.com/fbuireu/forever-pto/compare/web-v1.9.5...web-v1.9.6) (2026-09-01)
 
 
