@@ -50,12 +50,12 @@
 		"@semantic-release/npm": "13.1.5",
 		"@types/node": "26.2.0",
 		"@typescript/typescript6": "6.0.2",
-		"@vitest/ui": "4.1.10",
+		"@vitest/ui": "4.1.11",
 		"husky": "9.1.7",
 		"lint-staged": "17.3.0",
 		"semantic-release": "25.0.9",
 		"semantic-release-monorepo": "8.0.2",
 		"typescript": "7.0.2",
-		"vitest": "4.1.10"
+		"vitest": "4.1.11"
 	}
 }
