@@ -1,5 +1,5 @@
 import { buildMarkdownPage } from "@infrastructure/markdown/buildMarkdownPage";
-import { MARKDOWN_PATH_HEADER } from "@infrastructure/markdown/twin";
+import { MARKDOWN_PATH_HEADER, NEUTRALISED_MARKDOWN_PATH } from "@infrastructure/markdown/twin";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@opennextjs/cloudflare", () => ({
@@ -54,6 +54,20 @@ describe("GET /api/markdown", () => {
 
 	it("answers 404 without reaching the builder when the header is absent", async () => {
 		const response = await GET(request());
+
+		expect(response.status).toBe(404);
+		expect(buildMarkdownPage).not.toHaveBeenCalled();
+	});
+
+	it("answers 404 without reaching the builder when the proxy neutralised the header", async () => {
+		const response = await GET(request({ pathname: NEUTRALISED_MARKDOWN_PATH }));
+
+		expect(response.status).toBe(404);
+		expect(buildMarkdownPage).not.toHaveBeenCalled();
+	});
+
+	it("answers 404 without reaching the builder for a header value that is not a path", async () => {
+		const response = await GET(request({ pathname: "planner" }));
 
 		expect(response.status).toBe(404);
 		expect(buildMarkdownPage).not.toHaveBeenCalled();
