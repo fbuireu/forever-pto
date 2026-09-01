@@ -235,6 +235,8 @@ const resolveUiSpecifier = (specifier: string) => join(UI_ROOT, specifier.replac
 const WORKFLOW_DIR = ".github/workflows";
 const COMPOSITE_ACTION_DIR = ".github/actions";
 const REPINNED_RUNTIME = /^\s*(?:node-version|version):\s*["']?\d/m;
+const VERSIONS_SECTION = /^## Versions$([\s\S]*?)^## /m;
+const QUOTED_VERSION = /\d+\.\d+/;
 const workflowFiles = readdirSync(join(ROOT, WORKFLOW_DIR))
 	.filter((file) => file.endsWith(".yml"))
 	.map((file) => `${WORKFLOW_DIR}/${file}`);
@@ -551,10 +553,24 @@ describe("pinned runtimes", () => {
 	const manifest = readJson("package.json");
 	const [packageManagerName, packageManagerVersion] = manifest.packageManager.split("@");
 
-	it("names every runtime it pins, whatever the manifest carries", () => {
-		const guide = read("CLAUDE.md");
+	it("names every runtime it pins", () => {
+		const named = ["Node", "pnpm"].flatMap((runtime) =>
+			["CLAUDE.md", "CONTRIBUTING.md"].filter((doc) => !read(doc).includes(runtime)).map((doc) => `${doc}: ${runtime}`),
+		);
 
-		expect(["Node", "pnpm"].filter((runtime) => !guide.includes(runtime))).toEqual([]);
+		expect(named).toEqual([]);
+	});
+
+	// The rules around this one hold the pins to each other and none of them reads the section the digits
+	// were removed from, so a bullet could quote a version again and everything would still pass. Only the
+	// line that opens a bullet is checked: the prose beneath narrates the versions this guide used to state
+	// wrongly, and that history is the reason the decision exists.
+	it("quotes a version for none of them, since nothing here would keep one current", () => {
+		const section = read("CLAUDE.md").match(VERSIONS_SECTION)?.[1] ?? "";
+		const quoting = section.split("\n").filter((line) => line.startsWith("- ") && QUOTED_VERSION.test(line));
+
+		expect(section).not.toBe("");
+		expect(quoting).toEqual([]);
 	});
 
 	it("pins Node once: .nvmrc and engines.node are one fact, so they say the same thing", () => {
@@ -571,7 +587,7 @@ describe("pinned runtimes", () => {
 		expect(packageManagerVersion).toMatch(EXACT_VERSION);
 	});
 
-	it("lets no workflow pin a runtime the manifest already pins", () => {
+	it("lets no workflow or composite action pin a runtime the manifest already pins", () => {
 		const composites = readdirSync(join(ROOT, COMPOSITE_ACTION_DIR)).map(
 			(action) => `${COMPOSITE_ACTION_DIR}/${action}/action.yml`,
 		);

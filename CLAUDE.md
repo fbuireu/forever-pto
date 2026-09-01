@@ -33,7 +33,7 @@ CONTEXT.md            The domain glossary, root only
 There is no `packages/` tier. It is added to [`pnpm-workspace.yaml`](./pnpm-workspace.yaml) the day a real shared package exists,
 not before; see [ADR 0010](./adr/0010-apps-web-and-apps-docs-monorepo-layout.md).
 
-## Versions (pinned, match exactly)
+## Versions
 
 **This section names where each version is pinned and never what the pin says.** A digit written here is a
 claim a bot invalidates on its own, and neither way of defending it works: contribKit asserted the digit
