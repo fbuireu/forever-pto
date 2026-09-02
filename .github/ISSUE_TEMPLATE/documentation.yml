@@ -1,5 +1,5 @@
 name: Documentation Request
-description: Suggest improvements or additions to the documentation
+description: Report a gap, a mistake or an improvement in the documentation
 title: '[Docs]: '
 labels: ['documentation', 'triage']
 assignees: ['fbuireu']
@@ -7,20 +7,18 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for helping improve our documentation! Clear docs make the project better for everyone.
+        Thanks for helping improve the documentation! A document that describes code that no longer exists is a bug here, not a nit.
   - type: dropdown
     id: doc-type
     attributes:
       label: Documentation Type
-      description: What kind of documentation needs improvement?
+      description: Which document is it about?
       options:
         - README
-        - docs.forever-pto.com
         - CLAUDE.md guides
         - CONTEXT.md glossary
         - An ADR
-        - Contributing guide
-        - The in-app FAQ
+        - The docs site (docs.forever-pto.com)
         - Other
     validations:
       required: true
@@ -28,7 +26,7 @@ body:
     id: current
     attributes:
       label: Current Documentation
-      description: What is currently documented (if anything)?
+      description: What is currently documented (if anything)? Quote it.
       placeholder: The current documentation says...
   - type: textarea
     id: problem
@@ -46,26 +44,6 @@ body:
       placeholder: The documentation should include...
     validations:
       required: true
-  - type: dropdown
-    id: audience
-    attributes:
-      label: Target Audience
-      description: Who would benefit from this documentation?
-      options:
-        - Beginners
-        - Intermediate users
-        - Advanced users
-        - Contributors
-        - All users
-    validations:
-      required: true
-  - type: textarea
-    id: references
-    attributes:
-      label: References
-      description: Link to any relevant external documentation or resources
-      placeholder: |
-        - https://example.com/similar-docs
   - type: checkboxes
     id: contribution
     attributes:

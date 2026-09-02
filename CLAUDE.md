@@ -187,12 +187,10 @@ builds from), but it means "the repo root" is not the boundary; the regex is.
 
 ## CI
 
-**`ci.yml` holds the whole app graph**: `changes`, then `lint`, `typecheck` and `test` in parallel, then
+**`ci.yml` holds the whole app graph**: `changes` and `verify` in parallel, then
 `deploy-production` → `release-web` → `docs-refresh` and `deploy-production` → `smoke` on `main`, or
-`deploy-development` → `comment` / `e2e` on a PR. Both deploy jobs call the shared [`_deploy-web.yml`](./.github/workflows/_deploy-web.yml). `docs.yml` holds the docs graph: `build`, then
-`preview` on a PR or `deploy` → `smoke` → `release-docs` on `main`, with `rollback` when that smoke run fails. The rest are [`cleanup-development.yml`](./.github/workflows/cleanup-development.yml),
-[`renovate-auto-approve.yml`](./.github/workflows/renovate-auto-approve.yml) (the auto-merge, whose file is
-named for approving rather than merging), a [`zizmor.yml`](./.github/workflows/zizmor.yml) audit,
+`deploy-development` → `comment` / `e2e` on a PR, and a final `check` job that aggregates every one of them. Both deploy jobs call the shared [`_deploy-web.yml`](./.github/workflows/_deploy-web.yml). `docs.yml` holds the docs graph: its own `changes`, then `build`, then
+`preview` on a PR or `deploy` → `smoke` → `release-docs` on `main`, with `rollback` when that smoke run fails, and its own aggregate, `Check (docs)`. The rest are [`cleanup-development.yml`](./.github/workflows/cleanup-development.yml), a [`zizmor.yml`](./.github/workflows/zizmor.yml) audit,
 [`dependency-review.yml`](./.github/workflows/dependency-review.yml), [`commit-message.yml`](./.github/workflows/commit-message.yml), and
 [`dependabot-auto-merge.yml`](./.github/workflows/dependabot-auto-merge.yml), which **does fire, and only for
 security updates**. There is no `.github/dependabot.yml` in the tree, so Dependabot opens no version-update pull
@@ -255,20 +253,7 @@ Passing the secret explicitly in the caller's `secrets:` block does not rescue i
 declare an `environment:`, so `${{ secrets.CLOUDFLARE_API_TOKEN }}` there resolves against repository
 secrets only. The value that works on `main` comes from the *callee* job's own `environment: production`.
 
-**Before this branch merges, one thing has to happen in repo settings, and it is the one nobody but the
-owner can do.** Checked against the API on 2026-08-23; three of the four items this list used to carry were
-already done and are recorded here so the next reader does not redo them.
-
-**Outstanding: copy `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` onto all four new environments.**
-They sit on the old `development` and `production` and nowhere else. `gh secret list` returns exactly
-`CODECOV_TOKEN` and `PAT`, so a job naming `web-production`, `web-development`, `docs-production` or
-`docs-development` reads an empty string, wrangler falls back to interactive OAuth, opens a browser on a
-headless runner and times out after 120 seconds per attempt. `web-development` additionally needs
-`CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET`, which `e2e` reads to reach a preview behind Cloudflare
-Access; the `docs-*` pair needs neither, because nothing in `docs.yml` requests the docs preview — its
-`PREVIEW_URL` is only written into the pull request comment, and the docs Playwright suite runs against a
-local preview in `build`. **A secret's value cannot be read back through the API, so this cannot be scripted
-from the outside**. It is a dashboard or `gh secret set` job with the values in hand.
+**All four environments carry what their jobs read, and this guide said otherwise for a week.** The Cloudflare token and account id are on every one of them, `CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET` are on `web-development`, and the evidence is the runs rather than a settings page nobody can read from outside: `deploy-development` and `e2e` succeed on pull requests, and `deploy-production` shipped 1.9.7. The `docs-*` pair needs no Access secret, because nothing in `docs.yml` requests the docs preview — its `PREVIEW_URL` is only written into the pull request comment, and the docs Playwright suite runs against a local preview in `build`. This paragraph used to be an *Outstanding* item saying the secrets were missing; a claim like that is the kind to re-check against a run rather than copy forward.
 
 **The docs preview needs an Access destination even though it needs no secret, and it was missing one.** The
 Access application matches `pr-*-forever-pto-development`; the docs preview is
@@ -290,20 +275,13 @@ Already true, and this list said otherwise:
   `TURSO_AUTH_TOKEN`) are on both `web-*`. The `docs-*` pair needs none of them, only the Cloudflare two.
 - The seven `NEXT_PUBLIC_*` vars are on both `web-*`.
 - There is **no `required_deployments` rule** on ruleset `main`, so there is nothing to repoint. Its
-  `required_status_checks` are `Check`, `Run zizmor`, `Lint the pull request title` and `Dependency Review`.
+  `required_status_checks` are `Check`, `Check (docs)`, `zizmor`, `Lint the pull request title` and `Dependency Review`, the same set every sibling repository names, plus the docs aggregate this one has because it deploys two sites. `zizmor` is the check run the action publishes through code scanning, not the `Run zizmor` job: the job passes whatever it finds, and only the code-scanning check turns red on a finding. No approval is required, which is why `renovate-auto-approve.yml` is gone: the owner is the only reviewer, the checks are the gate, and Renovate merges through the platform once they are green.
 
-**`E2E tests` is not a required check, and that is the hole two separate incidents came through.** It is what
+**`E2E (preview)` gates a merge through `Check`, and for a month it did not, which is the hole two separate incidents came through.** It is what
 catches the Cloudflare Error 1101 the Next pin exists to prevent, and Renovate auto-merged 16.3.1 straight
-past it on 2026-08-22, into the deploy production is **still** running: the site answers Error 1101 to a
-browser, checked 2026-08-29. A version pin does not hold against a bot with automerge rights, which is what
+past it on 2026-08-22, into the deploy production ran until 1.9.x; pull request 384 merged on 2026-09-01 while the suite was still red. A version pin does not hold against a bot with automerge rights, which is what
 makes this check the missing half of [ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)
-rather than a nicety; it is also why `cleanup-development.yml` had to join `ci.yml`'s concurrency group, because Renovate
-merges on the required checks while `e2e` is still driving the preview Worker. Adding it is the right end
-state and **must come after the Cloudflare secrets**, not before: `e2e` needs a preview deploy, so making it
-required while `web-development` cannot authenticate blocks every merge.
-
-The alternative to all of it is to revert the rename in `ci.yml`, `docs.yml` and `cleanup-development.yml`
-and keep one shared pair, which is what the split exists to stop.
+rather than a nicety. It cannot be named in the ruleset directly: every job in `ci.yml` is conditional on the event, and a required check that never reports blocks the merge forever. So `check` is an aggregate under `always()` that needs `verify`, both deploys, `e2e`, `deploy-tail`, `smoke` and `release-web`, fails when any of them failed or was cancelled, and counts a skipped one as success. `docs.yml` has the same shape as `Check (docs)`, over its own `changes`, `build`, `preview`, `deploy`, `smoke` and `release-docs`, which is what made the docs pipeline requireable at all: a path-filtered workflow never reports on a pull request outside its paths, so `docs.yml` carries no `paths:` any more and its `changes` job gates `build` on the same list, `DOCS_PATHS`, instead. **The suite has to be green to hold that power**, and its one flaky case was environmental: the per-request `/_not-found` route on a preview Worker that had never been hit timed out at 30 s. [`apps/web/e2e/warm-up.ts`](./apps/web/e2e/warm-up.ts) is Playwright's `globalSetup`: with `BASE_URL` set it requests the homepage and one unknown path once, with a long timeout, before any worker starts, so the first render a spec sees is not the Worker's first ever.
 
 **`deploy-tail` is gated on the files its bundle is built from, which is wider than its own folder.** The tail consumer is a second Worker with its own `wrangler.toml`; the app declares it in `[[tail_consumers]]` but does not carry it. It changes rarely, so `TAIL_PATHS` gates it, but `workers/tail/index.ts` imports the log-level contract from `apps/web/src/infrastructure/clients/logging/`, and while the filter named only `apps/web/workers/tail/**` a change to that contract redeployed the app and left the Worker running the old bundled copy. The Worker's own unit test reads the source module, so it could not see the split. `tests/docs-consistency.test.ts` walks that import graph **transitively** against `TAIL_PATHS` now (one level is not enough, because whatever the contract itself imports is bundled too) and asserts at least one resolved path lands outside `workers/tail/`, since the Worker test's own `./index` import would otherwise make an empty walk look like a successful one. **A reach the walk cannot resolve fails the rule.** It appended `.ts` and nothing else, so a directory specifier standing for the `index.ts` inside it, and a NodeNext `./foo.js`, each produced a path that does not exist, and the final assertion was guarded by `existsSync`, which exempted precisely those. The floor did not notice either: one unresolvable entry is itself an entry outside `workers/tail/`. `ci.yml` also answers
 `workflow_dispatch`, and a manual dispatch on `main` is the credential-rotation path: it runs `deploy-tail`
@@ -372,7 +350,7 @@ green in the very run where the sitemap was unreachable. It now asserts the list
 is that a tag means the version is live: `release-web` needs `deploy-production`, and it needs `smoke` as
 well, so a tag means the version is live *and answering*. It was left ungated while the grep matched nothing,
 because a job that cannot fail is not a gate; that condition no longer holds. `smoke` needs no Cloudflare
-credentials, so unlike making `E2E tests` required it does not wait on the four-environments secret work.
+credentials and declares no environment.
 
 **A failed `smoke` run rolls production back.** Holding the tag leaves a version that does not answer serving
 traffic, so `rollback` runs `wrangler rollback --env production --yes` from `apps/web` when `deploy-production`
@@ -410,21 +388,20 @@ the delete raced it and turned every remaining spec into a "There is nothing her
 on #343 reported 47 failures with nothing wrong in the code. Renovate is how it happens, because it
 auto-merges on the required checks and `e2e` is not one of them.
 
-The fix is a queue, not a wait loop: `cleanup-web` declares `group: CI-${{ github.ref }}` with
-`cancel-in-progress: false`. `ci.yml`'s group is `${{ github.workflow }}-${{ github.ref }}`, and a
-`pull_request` event carries the same `refs/pull/<number>/merge` whichever activity type fired it, so the two
+The fix is a queue, not a wait loop: `cleanup-web` declares `group: CI-refs/pull/${{ github.event.pull_request.number }}/merge` with
+`cancel-in-progress: false`. `ci.yml`'s group is `${{ github.workflow }}-${{ github.ref }}`, which on that pull request's run is exactly `CI-refs/pull/<number>/merge`, so the two
 strings match and GitHub holds the job pending until the CI run completes. A pending run occupies no
-runner, so this costs nothing. **The coupling is by workflow *name***: renaming `ci.yml`'s `name: CI`
+runner, so this costs nothing. **The group is spelled from the number and not from `github.ref`, and the difference is the whole fix.** It said `CI-${{ github.ref }}` first, on the assumption that a closed event carries the same merge ref as an open one. On a merged pull request it does not: `github.ref` resolves to `refs/heads/main`, so the cleanup joined the group of the *push* to `main`, ran while the E2E was still driving the Worker, and, because a group holds one pending run and the newer replaces the older, was cancelled whenever two merges came close together; eight cleanups were cancelled in one week and left their Workers alive. **The coupling is still by workflow *name***: renaming `ci.yml`'s `name: CI`
 silently unqueues the cleanup and the race comes back, which is why `tests/docs-consistency.test.ts`
-substitutes each deploying workflow's own `name:` into its group expression and compares the result with the
-literal the matching cleanup job hardcodes.
+substitutes each deploying workflow's own `name:` into its group expression, replaces its `github.ref` with the pull request's merge ref, and compares the result with the
+literal the matching cleanup job hardcodes. A third job, `sweep`, runs weekly and on dispatch: it lists the account's Workers through the Cloudflare API, keeps every `pr-<n>-forever-pto-development` and `pr-<n>-forever-pto-docs-development` whose pull request is still open, and deletes the rest, so a cleanup lost to a token or an outage does not leave a Worker behind for good.
 
 **The group is per job, and it used to be per workflow, which queued `cleanup-docs` behind the wrong thing.**
 A workflow-level `concurrency` covers every job in the run, so one group meant both deletes waited on `CI`.
 But the Worker `cleanup-docs` deletes is deployed by the `preview` job in `docs.yml`, whose group is
 `docs-${{ github.ref }}`, and nothing in `ci.yml` touches it: the docs preview could be deleted while its own
 workflow was still using it, and `ci.yml` finishing was not evidence that it had stopped. `cleanup-web` keeps
-`CI-…` and `cleanup-docs` takes `docs-…`, each on its own job. This is also why the paragraph above no longer
+`CI-…` and `cleanup-docs` takes `docs-…`, each on its own job and each spelled from the pull request number. This is also why the paragraph above no longer
 says `cleanup-docs` rides along harmlessly: it did not, it rode along behind an unrelated run.
 
 **`docs-refresh` exists because the release commit carries `[skip ci]`.** The docs site renders the app
@@ -432,7 +409,7 @@ version from `apps/web/package.json`; without a dispatch after a web release, th
 advertising the previous one.
 
 Husky runs `lint-staged` on `pre-commit`, `commitlint` on `commit-msg` and `verify` on `pre-push`, the same
-command the CI Check job runs, so a green push is a green check.
+command the CI `Verify` job runs, so a green push is a green check.
 
 **`typecheck` ends with `astro check`, and that tail is what puts the cross-package seam in front of
 the author.** (Do not "fix" that command by pointing it at `tsc`: a raw `tsc --noEmit -p apps/docs` reports
@@ -587,7 +564,7 @@ append `.ts` and nothing else, so a directory specifier standing for the `index.
 that every workflow file is **linked** from this guide and carries its own `##` section in the wiki, the link rather
 than a bare mention, since `ci.yml` is named a dozen times here and one incidental mention used to be enough;
 that the cleanup workflow's concurrency
-group still equals `ci.yml`'s with its `name:` substituted in;
+group still equals `ci.yml`'s with its `name:` substituted in and the pull request's merge ref in place of `github.ref`, and that each of `ci.yml` and `docs.yml` aggregates its gated jobs, the preview E2E among them, under a `Check` job;
 and that every locale bundle has exactly the keys [`en.json`](./apps/web/src/ui/i18n/messages/en.json) has and shouts nothing outside a named acronym allow-list. Key parity compares key *sets*, so it can see neither a value that drifted nor one written in capitals; the allow-list is itself asserted to hold only names the bundles still use.
 
 It reads staged *and* unstaged files, so a rule fires before the offending file is committed. **Each rule was

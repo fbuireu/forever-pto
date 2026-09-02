@@ -1,8 +1,11 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Question or Discussion
+  - name: The live planner
+    url: https://forever-pto.com
+    about: See the app the issue is about
+  - name: The documentation site
+    url: https://docs.forever-pto.com
+    about: Usage guides and the reference for every setting
+  - name: Question, idea or discussion
     url: https://github.com/fbuireu/forever-pto/discussions
-    about: Ask questions or discuss ideas with the community
-  - name: Documentation
-    url: https://github.com/fbuireu/forever-pto#readme
-    about: Check out the documentation for usage guides and examples
+    about: Ask a question, or propose something before opening a feature request.

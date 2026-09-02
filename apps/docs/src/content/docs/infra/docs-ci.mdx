@@ -9,15 +9,15 @@ This page is self-documenting: it describes the pipeline that published it. The 
 
 ## The workflow
 
-`.github/workflows/docs.yml` follows the repo's workflow conventions (SHA-pinned actions, `persist-credentials: false`, zizmor-linted) and is **path-filtered**. The list is `apps/docs/**`, `apps/web/package.json`, all of `apps/web/src/ui/**`, `apps/web/src/domain/calendar/types.ts`, `apps/web/src/infrastructure/i18n/locales.ts`, `pnpm-lock.yaml`, the workflow file and `.github/actions/prepare-env/**` (written out twice, once per trigger block). Unrelated app changes never build the docs; changes to the reused sources do, on purpose, because they can break the demos.
+`.github/workflows/docs.yml` follows the repo's workflow conventions (SHA-pinned actions, `persist-credentials: false`, zizmor-linted). It runs on every push and pull request, and a `changes` job gates `build` on the `DOCS_PATHS` list: `apps/docs/**`, `apps/web/package.json`, all of `apps/web/src/ui/**`, `apps/web/src/domain/calendar/types.ts`, `apps/web/src/infrastructure/i18n/locales.ts`, `pnpm-lock.yaml`, the workflow file and `.github/actions/**`. Unrelated app changes never build the docs; changes to the reused sources do, on purpose, because they can break the demos. The list used to be a `paths:` trigger filter, written out twice, and a filtered workflow never reports on a pull request outside its paths, which is why nothing in it could be a required check.
 
-The last three app entries are not decoration. `app-version.ts` reads the app manifest, and `HowItWorksDemo.tsx` reaches `@domain/calendar/types` and `@infrastructure/i18n/locales` by relative path rather than through `@ui`. The app's own contract suite derives that reach from the sources and fails if a path of it is missing from both trigger blocks, so this list cannot drift from what the site imports.
+The last three app entries are not decoration. `app-version.ts` reads the app manifest, and `HowItWorksDemo.tsx` reaches `@domain/calendar/types` and `@infrastructure/i18n/locales` by relative path rather than through `@ui`. The app's own contract suite derives that reach from the sources and fails if a path of it is missing from `DOCS_PATHS`, so this list cannot drift from what the site imports.
 
 Triggers:
 
-- `pull_request` touching those paths → build & test + versioned preview.
-- `push` to `main` touching those paths → build & test + production deploy.
-- `workflow_dispatch` → manual bootstrap run, used for the first deploy (a path-filtered workflow otherwise never fires until the paths change again) and for redeploying without a commit.
+- `pull_request` → `changes`, then build & test + versioned preview when the range touches the list, and always `Check (docs)`, the aggregate the ruleset requires.
+- `push` to `main` → build & test + production deploy + smoke run + release when the range touches the list.
+- `workflow_dispatch` → treated as a docs change: build, deploy and smoke, which is how `ci.yml`'s `docs-refresh` rebuilds the site after a web release and how a redeploy without a commit is done.
 
 ## Build & test job
 
@@ -61,7 +61,7 @@ On `main`, the deploy job reuses the build job's `apps/docs/dist` artifact and r
 
 `ci.yml` opens with a `changes` job that derives whether `apps/web` was touched, and gates `deploy-production`, `release-web` and `deploy-development` on it, so a docs-only PR no longer deploys an app preview Worker or runs app E2E. Lint, typecheck and unit tests stay unconditional, because the documentation contract suite reads `CONTEXT.md`, `adr/` and every guide and must not be skipped by a markdown-only change.
 
-The obvious fix, `paths-ignore: ['apps/docs/**']` on the app workflows, has a branch-protection caveat: required status checks that never run **never report**, and GitHub blocks the merge waiting for them. Adopting path filters therefore also means restructuring the required checks (e.g. a summary job that always runs, or `paths`-aware required checks). Tracked as a follow-up; until then the redundancy is the price of simple branch protection.
+The obvious fix, `paths-ignore: ['apps/docs/**']` on the app workflows, has a branch-protection caveat: required status checks that never run **never report**, and GitHub blocks the merge waiting for them. That is why neither workflow carries a path filter: each has a `changes` job that gates its own jobs with `if:`, and an aggregate job that always reports, `Check` in `ci.yml` and `Check (docs)` in `docs.yml`, is what the ruleset requires. The redundancy that remains, the contract suite running on every pull request, is deliberate.
 
 Two related conventions for docs PRs:
 

@@ -32,7 +32,7 @@ Package rules label each PR by update type, and those labels drive the approval 
 
 Automerge uses squash (`automergeStrategy: squash`), which matters for [releases](/infra/release/): Renovate's PR titles are conventional (`chore(deps): …` / `fix(deps): …`), so most dependency merges do not cut a release.
 
-Renovate cannot merge without a review, so `.github/workflows/renovate-auto-approve.yml` closes the loop: on Renovate PRs carrying one of the four automerge labels it submits an approval with the `PAT` secret (checking for an existing approval first to stay idempotent). GitHub's auto-merge then completes once CI is green, and automerged updates still pass the full lint/typecheck/test gauntlet and get a [preview deploy](/infra/environments/).
+The ruleset on `main` requires no approval, only the checks, so Renovate merges through GitHub's auto-merge on its own once they are green. A `renovate-auto-approve.yml` workflow used to submit an approval first with the `PAT` secret; it is gone with the approval requirement. Automerged updates still pass the full lint/typecheck/test gauntlet, the preview E2E run, and get a [preview deploy](/infra/environments/).
 
 ## Lockfile maintenance
 

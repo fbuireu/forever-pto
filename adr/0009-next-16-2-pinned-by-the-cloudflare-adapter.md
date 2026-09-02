@@ -8,6 +8,8 @@ Accepted. **Amended 2026-08-29: the pin is lifted.** Next is 16.3.3, `@opennextj
 wrangler is 4.126.0 and TypeScript is 7.0.2 at the root and in `apps/web`. That amendment says plainly which
 of the two conditions below was met and which was not.
 
+**Amended 2026-09-02: `E2E (preview)` gates a merge.** The missing half named below is in place: `ci.yml`'s `Check` job aggregates the preview E2E run, so a bump like #350 cannot merge while the suite is red. The job was called `E2E tests` when this was written.
+
 **Amended 2026-09-01: the per-request chain stays at `middleware.ts`, on the edge runtime.** The file name is
 not cosmetic on this host; it picks the runtime, and the Node.js one loses request-header edits. That
 amendment is the last section of this file.
