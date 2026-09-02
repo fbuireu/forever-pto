@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   changes:
-    name: Detect changes
+    name: Detect changes (docs)
     runs-on: ubuntu-latest
     timeout-minutes: 15
     outputs:
@@ -93,7 +93,7 @@ jobs:
           retention-days: 1
 
   preview:
-    name: Deploy to development
+    name: Deploy to development (docs)
     if: ${{ github.event_name == 'pull_request' }}
     needs: [build]
     runs-on: ubuntu-latest
@@ -147,7 +147,7 @@ jobs:
             | **Commit** | `${{ github.event.pull_request.head.sha }}` |
 
   deploy:
-    name: Deploy to production
+    name: Deploy to production (docs)
     if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' }}
     needs: [build]
     runs-on: ubuntu-latest
@@ -175,7 +175,7 @@ jobs:
           command: deploy --env production
 
   smoke:
-    name: Production smoke tests
+    name: Production smoke tests (docs)
     needs: [deploy]
     if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
