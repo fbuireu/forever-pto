@@ -115,13 +115,16 @@ jobs:
         with:
           name: docs-dist
           path: apps/docs/dist
+      - name: Read the wrangler version the docs package pins
+        id: wrangler
+        run: echo "version=$(node -p "require('./apps/docs/package.json').devDependencies.wrangler")" >> "$GITHUB_OUTPUT"
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/docs
-          wranglerVersion: '4.126.0'
+          wranglerVersion: ${{ steps.wrangler.outputs.version }}
           command: deploy --env development --name pr-${{ github.event.pull_request.number }}-forever-pto-docs-development
       - name: Find existing comment
         uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4.0.0
@@ -165,13 +168,16 @@ jobs:
         with:
           name: docs-dist
           path: apps/docs/dist
+      - name: Read the wrangler version the docs package pins
+        id: wrangler
+        run: echo "version=$(node -p "require('./apps/docs/package.json').devDependencies.wrangler")" >> "$GITHUB_OUTPUT"
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/docs
-          wranglerVersion: '4.126.0'
+          wranglerVersion: ${{ steps.wrangler.outputs.version }}
           command: deploy --env production
 
   smoke:

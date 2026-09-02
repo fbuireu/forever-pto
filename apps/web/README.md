@@ -7,7 +7,7 @@
 
 # forever-pto
 
-**The planner.** Next.js 16 on Cloudflare Workers through OpenNext.
+**The planner.** Next.js on Cloudflare Workers through OpenNext.
 
 **[forever-pto.com](https://forever-pto.com)** · **[Repository README](../../README.md)** · **[Agent guide](./CLAUDE.md)** · **[Glossary](../../CONTEXT.md)**
 
@@ -36,9 +36,11 @@ pnpm preview          # the real Workers runtime, via OpenNext
 Or from this directory with `pnpm <script>` directly. Copy [`.env.example`](./.env.example) to `.env.development` and fill
 it in; Worker secrets for a local run go in `.dev.vars`.
 
-**Node 26.7.0 and pnpm 11.22.0 are pinned and must match exactly.** So are Next 16.2 and TypeScript 6,
-as a pair, by the Cloudflare adapter; see [ADR 0009](../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)
-before raising either.
+**Both runtimes are pinned exactly and must match:** Node in [`.nvmrc`](../../.nvmrc), mirrored in
+`engines.node`; pnpm, in the root `packageManager`. Next and `@opennextjs/cloudflare` move as a pair, and the
+docs package stays on an older TypeScript line than this one; see
+[ADR 0009](../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) and [`CLAUDE.md`](./CLAUDE.md) before
+raising any of them.
 
 ## Layout
 

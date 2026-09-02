@@ -237,7 +237,7 @@ const resolveUiSpecifier = (specifier: string) => join(UI_ROOT, specifier.replac
 // are, and that action takes its shell script on `command:`, so a rule reading only `run:` would miss them.
 const WORKFLOW_DIR = ".github/workflows";
 const COMPOSITE_ACTION_DIR = ".github/actions";
-const REPINNED_RUNTIME = /^\s*(?:node-version|version):\s*["']?\d/m;
+const REPINNED_RUNTIME = /^\s*(?:node-version|version|ruby-version|wranglerVersion):\s*["']?\d/m;
 const VERSIONS_SECTION = /^## Versions$([\s\S]*?)^## /m;
 const QUOTED_VERSION = /\d+\.\d+/;
 const workflowFiles = readdirSync(join(ROOT, WORKFLOW_DIR))
@@ -1190,18 +1190,23 @@ describe("documentation does not point at things that are gone", () => {
 		expect(missingFromMainPath, "never written on the normal path, so it stays empty on every real run").toEqual([]);
 	});
 
-	// `cloudflare/wrangler-action` installs the version its `wranglerVersion` input names, so the docs deploy
-	// runs a CLI the manifest does not pin. Renovate bumps the manifest (it is an npm devDependency) and
-	// nothing touches the two workflow literals, so the first bump silently desynchronises them. `apps/web`
-	// has no equivalent exposure: `_deploy-web.yml` runs `pnpm exec wrangler`, which is the pinned one.
-	it("pins wrangler-action to the same wrangler the docs package declares", () => {
-		const declared = readJson(`${DOCS}/package.json`).devDependencies.wrangler;
-		const inputs = [...read(".github/workflows/docs.yml").matchAll(/wranglerVersion: ["']([^"']+)["']/g)].map(
-			([, version]) => version,
-		);
+	// `cloudflare/wrangler-action` installs the version its `wranglerVersion` input names, and that input used
+	// to be a literal in two places. Renovate bumps the manifest (wrangler is an npm devDependency) and nothing
+	// touches a workflow literal, so the first bump desynchronised them, and the rule that compared the two
+	// then failed the bump rather than the drift: a workflow edit the bot cannot make. The workflow reads the
+	// version out of the docs manifest now, so what is asserted is the shape: every input is that expression,
+	// and each is preceded by the step that reads the manifest. `apps/web` has no equivalent exposure:
+	// `_deploy-web.yml` runs `pnpm exec wrangler`, which is the pinned one.
+	it("hands wrangler-action the wrangler the docs manifest pins, read from the manifest rather than written twice", () => {
+		const workflow = read(".github/workflows/docs.yml");
+		const inputs = workflow.match(/^\s+wranglerVersion: .+$/gm) ?? [];
+		const derived = workflow.match(/^\s+wranglerVersion: \$\{\{ steps\.wrangler\.outputs\.version \}\}$/gm) ?? [];
+		const readers =
+			workflow.match(/^\s+id: wrangler\n\s+run: .*apps\/docs\/package\.json.*devDependencies\.wrangler.*$/gm) ?? [];
 
 		expect(inputs.length).toBeGreaterThan(0);
-		expect(inputs.filter((version) => version !== declared)).toEqual([]);
+		expect(derived.length).toBe(inputs.length);
+		expect(readers.length).toBe(inputs.length);
 	});
 
 	// CONTEXT.md names one canonical term per concept and lists the retired ones, and the root guide says to
@@ -2298,5 +2303,35 @@ describe("translation bundles stay in step", () => {
 		);
 
 		expect([...ACRONYMS].filter((acronym) => !used.has(acronym))).toEqual([]);
+	});
+});
+
+// A version written into prose is a claim a bot invalidates on its own, and the rule above reads one section
+// of one guide. This one reads every document: a tool named beside a version states what its manifest already
+// states, and the manifest is the only copy Renovate keeps current. ADRs are exempt because a decision is
+// dated and quotes the versions it decided on; the entries below are the sentences that narrate a past bump
+// or a past mistake by its number, which is history rather than a claim about the tree.
+const STATED_VERSION =
+	/\b(?:Node(?:\.js)?|pnpm|TypeScript|Astro|Next(?:\.js)?|React|Effect|Flutter|Dart|[Ww]rangler|Ruby|Starlight)\s+(?:v|@)?\d+(?:\.\d+)*\b/g;
+const NARRATED_VERSIONS: Record<string, string[]> = {
+	"CLAUDE.md": ["Flutter 3.47.2", "Next 16.3.3"],
+	"apps/web/CLAUDE.md": ["Next 16.3", "TypeScript 7", "TypeScript 6", "wrangler 4.115"],
+};
+
+describe("stated versions", () => {
+	it("states the current version of nothing a bot moves, outside the ADRs", () => {
+		const documents = trackedFiles.filter(
+			(file) =>
+				(file.endsWith(".md") || file.endsWith(".mdx")) && !file.startsWith("adr/") && !file.endsWith("CHANGELOG.md"),
+		);
+		const stated = documents.flatMap((file) =>
+			[...read(file).matchAll(STATED_VERSION)]
+				.map(([match]) => match)
+				.filter((match) => !(NARRATED_VERSIONS[file] ?? []).includes(match))
+				.map((match) => `${file}: ${match}`),
+		);
+
+		expect(documents.length).toBeGreaterThan(0);
+		expect(stated).toEqual([]);
 	});
 });

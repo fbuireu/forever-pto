@@ -9,7 +9,7 @@ Caching happens at three levels: Next.js Cache Components inside the rendering l
 
 ## Cache Components
 
-`next.config.ts` enables `cacheComponents: true` (Next 16 Cache Components). `partialPrefetching` is intentionally commented out there; the inline comment records the Next version it is waiting on.
+`next.config.ts` enables `cacheComponents: true` (Next's Cache Components). `partialPrefetching` is intentionally commented out there; the inline comment records the Next version it is waiting on.
 
 With Cache Components enabled, anything dynamic must either be wrapped in Suspense or explicitly cached with a `'use cache'` directive plus a `cacheLife` profile. Current cache sites:
 

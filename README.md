@@ -55,9 +55,9 @@ pnpm --filter forever-pto-docs dev   # docs dev server
 
 | Layer | Tech |
 | --- | --- |
-| Framework | Next.js 16 (App Router) + React 19 |
-| Language | TypeScript 6 |
-| Styling | Tailwind CSS v4 + shadcn/ui |
+| Framework | Next.js (App Router) + React |
+| Language | TypeScript |
+| Styling | Tailwind CSS + shadcn/ui |
 | State | Zustand |
 | i18n | next-intl: en, es, ca, it, de, fr |
 | Database | Turso (serverless SQLite) |
@@ -73,7 +73,7 @@ pnpm --filter forever-pto-docs dev   # docs dev server
 
 ## Getting started
 
-**Requirements:** Node.js 26.7.0 ([`.nvmrc`](./.nvmrc), mirrored in `engines.node`), pnpm 11.22.0 (`packageManager`); pinned, match exactly
+**Requirements:** Node.js at the version [`.nvmrc`](./.nvmrc) declares (mirrored in `engines.node`) and pnpm, at the version `packageManager` declares; both are exact pins, so match them exactly. No version is repeated here: the manifests are the only copy Renovate keeps current
 
 ```bash
 # Install dependencies
