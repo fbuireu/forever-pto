@@ -13,14 +13,14 @@ omits.
 
 | Package | Guide | What it is |
 | --- | --- | --- |
-| [`apps/web`](./apps/web) (`forever-pto-web`) | [`./apps/web/CLAUDE.md`](./apps/web/CLAUDE.md) | The planner. Next 16 App Router on Cloudflare Workers through OpenNext |
+| [`apps/web`](./apps/web) (`forever-pto-web`) | [`./apps/web/CLAUDE.md`](./apps/web/CLAUDE.md) | The planner. Next App Router on Cloudflare Workers through OpenNext |
 | [`apps/docs`](./apps/docs) (`forever-pto-docs`) | [`./apps/docs/CLAUDE.md`](./apps/docs/CLAUDE.md) | docs.forever-pto.com. Astro Starlight, rendering the app's real components |
 
 ## Layout
 
 ```
 apps/
-  web/                Next 16 + React 19 + OpenNext → Cloudflare Workers
+  web/                Next + React + OpenNext → Cloudflare Workers
   docs/               Astro Starlight → Cloudflare Workers (static assets)
 adr/                  Architecture decision records, one decision per file
 tests/                docs-consistency, which asserts repo-wide contracts
@@ -39,7 +39,7 @@ not before; see [ADR 0010](./adr/0010-apps-web-and-apps-docs-monorepo-layout.md)
 claim a bot invalidates on its own, and neither way of defending it works: contribKit asserted the digit
 against the manifest and failed every dependency pull request on `CLAUDE.md does not state Flutter 3.47.2`, a
 line the bot cannot edit; this guide did not assert it and carried two stale pins instead, Node and pnpm.
-Read the manifest. What `tests/docs-consistency.test.ts` asserts is the shape a bump cannot change.
+Read the manifest. What `tests/docs-consistency.test.ts` asserts is the shape a bump cannot change, and that reaches every document now: none outside `adr/` names a runtime or a framework beside a version, with the handful of sentences that narrate a past bump by its number allow-listed by name. The two `wrangler-action` inputs in `docs.yml` that used to carry a wrangler literal read it out of `apps/docs/package.json` at run time, which is what turned the rule that compared the two from a check that failed every wrangler bump into one that cannot.
 
 - Node ([`.nvmrc`](./.nvmrc), mirrored in `engines.node`): `.nvmrc` is what every CI job installs, and the
   two spellings are asserted equal

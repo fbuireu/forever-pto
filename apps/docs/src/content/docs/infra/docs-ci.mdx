@@ -55,7 +55,7 @@ The app's job in that workflow has to queue behind the CI run, because app E2E d
 
 ## Production deploy
 
-On `main`, the deploy job reuses the build job's `apps/docs/dist` artifact and runs `wrangler deploy` via `wrangler-action` (the `deploy` script in `apps/docs/package.json` is the local one-shot, though it passes no `--env`, so it deploys the top-level config to the production Worker's name without its route block), activating a new version of `forever-pto-docs` on `docs.forever-pto.com` (an infrastructure-as-code `custom_domain` route; see [Cloudflare stack](/infra/cloudflare/)). The only credentials involved are `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; the site has no [runtime secrets](/infra/secrets/) at all.
+On `main`, the deploy job reuses the build job's `apps/docs/dist` artifact and runs `wrangler deploy` via `wrangler-action`, handing it the wrangler version a step reads out of `apps/docs/package.json` so the two never diverge (the `deploy` script in `apps/docs/package.json` is the local one-shot, though it passes no `--env`, so it deploys the top-level config to the production Worker's name without its route block), activating a new version of `forever-pto-docs` on `docs.forever-pto.com` (an infrastructure-as-code `custom_domain` route; see [Cloudflare stack](/infra/cloudflare/)). The only credentials involved are `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; the site has no [runtime secrets](/infra/secrets/) at all.
 
 ## Accepted cost: docs PRs still run app CI
 

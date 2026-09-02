@@ -56,7 +56,7 @@ has this shape — nothing in their `e2e/` reads the filesystem while collecting
   starts and before any spec is collected, and throws a message naming the build command. CI already builds first,
   so making the script build would have built the site twice per run.
 
-  **Under a coding agent, `astro preview` puts itself in the background**, because Astro 7 routes the command
+  **Under a coding agent, `astro preview` puts itself in the background**, because Astro routes the command
   through `am-i-vibing` and switches to a daemon plus JSON logs when it detects one. The foreground process then
   exits at once and Playwright reports `Process from config.webServer exited early`. Run it a second time, which
   reuses the daemon, or `pnpm exec astro preview stop` first. A stale daemon started before a rebuild serves the

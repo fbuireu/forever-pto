@@ -18,10 +18,10 @@ The vocabulary is the repo glossary's; see [`CONTEXT.md`](../../CONTEXT.md).
 
 ## Stack
 
-- **Next.js 16** App Router + **React 19**, `next-intl` for i18n over six locales (en, es, ca, it, de, fr)
+- **Next.js** App Router + **React**, `next-intl` for i18n over six locales (en, es, ca, it, de, fr)
 - **Zustand** stores for all client state, persisted to local storage through an obfuscating wrapper
   ([ADR 0007](../../adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md))
-- **Effect 3** on every server path that talks to Stripe, Turso or Resend: typed error channel, dependencies
+- **Effect** on every server path that talks to Stripe, Turso or Resend: typed error channel, dependencies
   injected as service tags ([ADR 0002](../../adr/0002-effect-for-external-service-boundaries.md))
 - **Temporal** via `temporal-polyfill`, never the global
   ([ADR 0005](../../adr/0005-temporal-polyfill.md))
@@ -213,7 +213,7 @@ or lets JavaScript into a TypeScript-only codebase, a long way from the change.
 `tests/docs-consistency.test.ts` asserts both, asserts that this `tsconfig.json` stays beside the
 [`next.config.ts`](./next.config.ts) that rewrites it, and asserts that `cloudflare-env.d.ts` stays excluded and ignored.
 
-**Next is 16.3.3 and TypeScript is 7, and they moved together because neither could move alone.** Next 16.3
+**Next and TypeScript moved together, to the 16.3 line and to 7, because neither could move alone.** Next 16.3
 used to crash the deployed Worker on any route rendered at request time, which is the whole of
 [ADR 0009](../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md): `@opennextjs/cloudflare` 1.20.2 was
 the newest adapter and predated 16.3.0, and the symptom was the 404 page answering with Cloudflare **Error
@@ -229,8 +229,8 @@ project-local `tsc`. That is why the pair is one decision, and why Next went fir
 
 **`apps/docs` stays on TypeScript 6, and that is not an oversight.** `astro check` refuses to run under 7 and
 says so itself: *the TypeScript module loaded does not expose the programmatic API `astro check` relies on*,
-with a link to the Astro roadmap issue tracking support. So the repo runs two TypeScripts: 7.0.2 at the root
-and here, 6.0.3 in the docs package until Astro can read the native compiler.
+with a link to the Astro roadmap issue tracking support. So the repo runs two TypeScripts: one exact pin at the root
+and here, and a `6.` line in the docs package until Astro can read the native compiler.
 [`tests/docs-consistency.test.ts`](../../tests/docs-consistency.test.ts) asserts that shape rather than plain
 equality now: all three pins **exact**, the root and this package **identical**, and the docs package on a
 `6.` line. Exactness is the part that was already load-bearing, because a `rangeStrategy` flip writes `^7.0.2`
