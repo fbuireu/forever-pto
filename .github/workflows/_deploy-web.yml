@@ -6,9 +6,10 @@ on:
       environment:
         required: true
         type: string
-      wrangler_env:
-        required: true
-        type: string
+        description: >-
+          The GitHub Environment, namespaced <component>-<stage>. The wrangler environment
+          is the stage half, derived here rather than passed, so a caller cannot pair
+          web-production with development.
       url:
         required: false
         type: string
@@ -37,7 +38,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: deploy-${{ inputs.wrangler_env }}-${{ inputs.worker_name }}
+  group: deploy-${{ inputs.environment }}-${{ inputs.worker_name }}
   cancel-in-progress: false
 
 jobs:
@@ -57,6 +58,11 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/prepare-env
+      - name: Resolve the wrangler environment from the GitHub Environment
+        id: stage
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
+        run: echo "wrangler_env=${ENVIRONMENT##*-}" >> "$GITHUB_OUTPUT"
       - name: Build
         working-directory: apps/web
         env:
@@ -89,9 +95,9 @@ jobs:
         working-directory: apps/web
         env:
           INPUTS_WORKER_NAME: ${{ inputs.worker_name }}
-          INPUTS_WRANGLER_ENV: ${{ inputs.wrangler_env }}
+          WRANGLER_ENV: ${{ steps.stage.outputs.wrangler_env }}
           INPUTS_URL: ${{ inputs.url }}
-          DEPLOY_MESSAGE: ${{ github.sha }}-${{ github.event_name }}
+          DEPLOY_MESSAGE: ${{ github.sha }} (${{ github.event_name }})
           SECRETS_FILE: ${{ runner.temp }}/worker-secrets.json
         run: |
           NAME_FLAG=""
@@ -102,7 +108,7 @@ jobs:
           if [ -n "${INPUTS_URL}" ]; then
             VAR_FLAG="--var NEXT_PUBLIC_SITE_URL:${INPUTS_URL}"
           fi
-          pnpm exec wrangler deploy --env "${INPUTS_WRANGLER_ENV}" --message "$DEPLOY_MESSAGE" --secrets-file "$SECRETS_FILE" $NAME_FLAG $VAR_FLAG
+          pnpm exec wrangler deploy --env "$WRANGLER_ENV" --message "$DEPLOY_MESSAGE" --secrets-file "$SECRETS_FILE" $NAME_FLAG $VAR_FLAG
       - name: Remove the secrets file
         if: always()
         env:

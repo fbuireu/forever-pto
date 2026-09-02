@@ -71,6 +71,9 @@ const WRANGLER_ACTION_DEPLOY = /\bcommand:[ \t]*deploy\b/;
 const ALIAS_WILDCARD_SUFFIX = /\/\*$/;
 const WORKSPACE_PACKAGE_GLOB = /^\s*-\s*['"]?([^'"\s#]+)['"]?\s*$/gm;
 const GITHUB_WORKFLOW_EXPRESSION = /\$\{\{\s*github\.workflow\s*\}\}/;
+const GITHUB_REF_EXPRESSION = /\$\{\{\s*github\.ref\s*\}\}/;
+const PULL_REQUEST_MERGE_REF = `refs/pull/\${{ github.event.pull_request.number }}/merge`;
+const AGGREGATE_NEEDS = /name: Check(?: \(docs\))?\n\s+needs: \[([^\]]+)\]\n\s+if: \$\{\{ always\(\) \}\}/;
 const FONT_VARIABLE = /variable: ["'](--[\w-]+)["']/g;
 
 const escapeForRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -1102,15 +1105,20 @@ describe("documentation does not point at things that are gone", () => {
 		expect(offenders).toEqual([]);
 	});
 
-	// The docs site imports app sources, so a change under apps/web has to retrigger the docs workflow or
-	// the published site keeps serving the old build. docs.yml enumerates that reach by hand, in two
-	// identical trigger blocks, and nothing compared the list against what the site actually imports.
+	// The docs site imports app sources, so a change under apps/web has to retrigger the docs jobs or the
+	// published site keeps serving the old build. docs.yml enumerates that reach by hand, as the DOCS_PATHS
+	// regex its `changes` job gates on (it used to be two identical `paths:` trigger blocks, which made the
+	// workflow impossible to require), and nothing compared the list against what the site actually imports.
 	it("triggers the docs workflow on every apps/web path the docs site reaches into", () => {
 		const workflow = read(".github/workflows/docs.yml");
-		const watched = [...workflow.matchAll(/^\s+-\s+'([^']+)'$/gm)]
-			.map(([, path]) => path)
+		const filter = /DOCS_PATHS: '\^\(([^']+)\)'/.exec(workflow)?.[1] ?? "";
+		const watched = filter
+			.split("|")
+			.map((pattern) => pattern.replace(/\$$/, "").replace(/\\\./g, ".").replace(/\/$/, ""))
 			.filter((path) => path.startsWith("apps/web"))
-			.map((path) => path.replace(/\/\*\*$/, "").replace(SOURCE_FILE, ""));
+			.map((path) => path.replace(SOURCE_FILE, ""));
+
+		expect(filter).not.toBe("");
 
 		// The scan used to stop at `${DOCS}/src/`, which left the two files that decide where the seam points,
 		// (`astro.config.ts` and `tsconfig.json`) outside it, along with `e2e/`. Markdown stays out on
@@ -1956,6 +1964,12 @@ describe("the guides describe the project as it is configured", () => {
 	// `docs.yml`, which has a group of its own, so the delete could land while that preview was still being
 	// used. Each job carries its own group now, and each is checked against the workflow that actually
 	// deploys the Worker that job deletes.
+	//
+	// The group is spelled from the pull request number rather than from `github.ref`. On a merged pull
+	// request the closed event's `github.ref` is the base branch, not `refs/pull/<n>/merge`, so a group built
+	// from it joined the push's run instead of the pull request's, ran the delete under the E2E job and was
+	// cancelled whenever two merges came close together. The expected group is therefore the deployer's with
+	// its workflow name substituted and its `github.ref` replaced by the merge ref of the pull request.
 	it.each([
 		["cleanup-web", "ci.yml"],
 		["cleanup-docs", "docs.yml"],
@@ -1971,9 +1985,26 @@ describe("the guides describe the project as it is configured", () => {
 		expect(workflowName).not.toBe("");
 		expect(deployerConcurrency.group).toBeDefined();
 		expect(cleanupConcurrency.group).toBe(
-			(deployerConcurrency.group ?? "").replace(GITHUB_WORKFLOW_EXPRESSION, workflowName),
+			(deployerConcurrency.group ?? "")
+				.replace(GITHUB_WORKFLOW_EXPRESSION, workflowName)
+				.replace(GITHUB_REF_EXPRESSION, PULL_REQUEST_MERGE_REF),
 		);
 		expect(cleanupConcurrency["cancel-in-progress"]).toBe("false");
+	});
+
+	// `Check` is the one context the ruleset names in each workflow, and it is an aggregate under `always()`
+	// so that a job skipped by its own `if:` counts as success. It gates a merge only on what it needs, so the
+	// preview E2E job has to be in the list: it was not a required check, and Renovate merged pull requests
+	// while the suite was still red.
+	it.each([
+		["ci.yml", ["verify", "deploy-development", "e2e", "deploy-production", "smoke", "release-web"]],
+		["docs.yml", ["build", "preview", "deploy", "smoke", "release-docs"]],
+	])("aggregates every gated job of %s under Check, so the preview E2E run gates a merge", (file, gated) => {
+		const needs = (read(`${WORKFLOW_DIR}/${file}`).match(AGGREGATE_NEEDS)?.[1] ?? "")
+			.split(",")
+			.map((job) => job.trim());
+
+		expect(needs).toEqual(expect.arrayContaining(gated));
 	});
 
 	it("gates the tail Worker deploy on every path its bundle is built from", () => {

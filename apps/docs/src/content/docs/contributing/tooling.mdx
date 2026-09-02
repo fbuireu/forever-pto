@@ -40,4 +40,4 @@ The active config is [`.lintstagedrc.json`](https://github.com/fbuireu/forever-p
 
 ## Dependency management
 
-Renovate (`.github/renovate.json`) pins everything (including action SHAs), runs twice a month and automerges patch/minor updates via labels that `renovate-auto-approve.yml` keys on. pnpm policy lives in `pnpm-workspace.yaml`: an `allowBuilds` whitelist for postinstall scripts, a minimum release age for new versions, and `patchedDependencies` for the boneyard-js patch.
+Renovate (`.github/renovate.json`) pins everything (including action SHAs), runs twice a month and automerges patch/minor updates once the required checks pass; no approval is required, so no workflow has to approve them first. pnpm policy lives in `pnpm-workspace.yaml`: an `allowBuilds` whitelist for postinstall scripts, a minimum release age for new versions, and `patchedDependencies` for the boneyard-js patch.

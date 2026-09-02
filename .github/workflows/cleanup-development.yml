@@ -3,21 +3,21 @@ name: Cleanup - Development
 on:
   pull_request:
     types: [closed]
+  schedule:
+    - cron: 0 3 * * 1
+  workflow_dispatch:
 
 permissions:
   contents: read
 
-# Each job queues behind the workflow that deploys the Worker it deletes: ci.yml
-# for the web preview, docs.yml for the docs preview. Each group is that
-# workflow's `${{ github.workflow }}-${{ github.ref }}` with the name substituted
-# in, so renaming either silently stops its wait. Full reasoning in the repo guide.
 jobs:
   cleanup-web:
     name: Delete the web preview Worker
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     concurrency:
-      group: CI-${{ github.ref }}
+      group: CI-refs/pull/${{ github.event.pull_request.number }}/merge
       cancel-in-progress: false
     environment: web-development
     env:
@@ -47,10 +47,11 @@ jobs:
 
   cleanup-docs:
     name: Delete the docs preview Worker
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     concurrency:
-      group: docs-${{ github.ref }}
+      group: docs-refs/pull/${{ github.event.pull_request.number }}/merge
       cancel-in-progress: false
     environment: docs-development
     env:
@@ -77,3 +78,46 @@ jobs:
             echo "$output"
             echo "$output" | grep -qi "does not exist" && exit 0
             exit 1
+
+  sweep:
+    name: Sweep orphaned preview Workers
+    if: ${{ github.event_name != 'pull_request' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: read
+    environment: web-development
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      WORKER_PATTERN: ^pr-([0-9]+)-forever-pto-(docs-)?development$
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/prepare-env
+      - name: Delete the preview Workers whose pull request is closed
+        working-directory: apps/web
+        run: |
+          scripts=$(curl -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts" \
+            | jq -r '.result[].id')
+          for name in $scripts; do
+            [[ "$name" =~ $WORKER_PATTERN ]] || continue
+            number="${BASH_REMATCH[1]}"
+            state=$(gh pr view "$number" --json state --jq .state 2>/dev/null || echo "UNKNOWN")
+            if [ "$state" = "OPEN" ]; then
+              echo "Keeping $name: pull request #$number is open"
+              continue
+            fi
+            if [ "$state" = "UNKNOWN" ]; then
+              echo "Keeping $name: could not read pull request #$number"
+              continue
+            fi
+            echo "Deleting $name: pull request #$number is $state"
+            pnpm exec wrangler delete "$name" --force
+          done

@@ -5,6 +5,7 @@ const BASE_URL = process.env.BASE_URL ?? LOCAL_URL;
 
 export default defineConfig({
 	testDir: "./e2e",
+	globalSetup: "./e2e/warm-up.ts",
 	fullyParallel: true,
 	forbidOnly: !!process.env.CI,
 	retries: process.env.CI ? 2 : 0,

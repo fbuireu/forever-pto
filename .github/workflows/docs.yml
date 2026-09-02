@@ -2,26 +2,9 @@ name: Docs
 
 on:
   pull_request:
-    paths:
-      - 'apps/docs/**'
-      - 'apps/web/package.json'
-      - 'apps/web/src/ui/**'
-      - 'apps/web/src/domain/calendar/types.ts'
-      - 'apps/web/src/infrastructure/i18n/locales.ts'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/docs.yml'
-      - '.github/actions/prepare-env/**'
+    branches: [main]
   push:
     branches: [main]
-    paths:
-      - 'apps/docs/**'
-      - 'apps/web/package.json'
-      - 'apps/web/src/ui/**'
-      - 'apps/web/src/domain/calendar/types.ts'
-      - 'apps/web/src/infrastructure/i18n/locales.ts'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/docs.yml'
-      - '.github/actions/prepare-env/**'
   workflow_dispatch:
 
 permissions:
@@ -32,8 +15,43 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      docs: ${{ steps.filter.outputs.docs }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Filter changed paths
+        id: filter
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+          DOCS_PATHS: '^(apps/docs/|apps/web/package\.json$|apps/web/src/ui/|apps/web/src/domain/calendar/types\.ts$|apps/web/src/infrastructure/i18n/locales\.ts$|pnpm-lock\.yaml$|\.github/workflows/docs\.yml$|\.github/actions/)'
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] || [ -z "$BASE_SHA" ] || ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
+            echo 'docs=true' >> "$GITHUB_OUTPUT"
+            echo "::notice::No usable base commit, or a manual dispatch: treating this as a docs change."
+            exit 0
+          fi
+          changed=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+          echo "$changed"
+          if printf '%s\n' "$changed" | grep -qE "$DOCS_PATHS"; then
+            echo 'docs=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'docs=false' >> "$GITHUB_OUTPUT"
+            echo "::notice::Nothing the docs site is built from changed in this range; the docs jobs are skipped."
+          fi
+
   build:
     name: Build & test
+    needs: [changes]
+    if: ${{ needs.changes.outputs.docs == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -75,8 +93,8 @@ jobs:
           retention-days: 1
 
   preview:
-    name: Preview
-    if: github.event_name == 'pull_request'
+    name: Deploy to development
+    if: ${{ github.event_name == 'pull_request' }}
     needs: [build]
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -129,8 +147,8 @@ jobs:
             | **Commit** | `${{ github.event.pull_request.head.sha }}` |
 
   deploy:
-    name: Deploy
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    name: Deploy to production
+    if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' }}
     needs: [build]
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -157,9 +175,9 @@ jobs:
           command: deploy --env production
 
   smoke:
-    name: Docs production smoke tests
+    name: Production smoke tests
     needs: [deploy]
-    if: github.event_name == 'push'
+    if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -168,7 +186,7 @@ jobs:
       - name: Require the production URL
         run: |
           if [ -z "$BASE_URL" ]; then
-            echo "The docs production URL is empty, so Playwright would fall back to localhost and pass against it"
+            echo "DOCS_SITE_URL is empty, so Playwright would fall back to localhost and pass against it"
             exit 1
           fi
       - name: Checkout
@@ -231,7 +249,7 @@ jobs:
 
   release-docs:
     name: Semantic Release (docs)
-    if: github.event_name == 'push'
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     needs: [deploy, smoke]
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -255,3 +273,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
         run: pnpm exec semantic-release
+
+  check:
+    name: Check (docs)
+    needs: [changes, build, preview, deploy, smoke, release-docs]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Fail if any job above did not succeed
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: exit 1

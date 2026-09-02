@@ -34,7 +34,7 @@ The `deploy-development` job of `.github/workflows/ci.yml` fires on `pull_reques
 
 ### Destroyed
 
-`.github/workflows/cleanup-development.yml` fires on `pull_request: closed` (merged or not) and runs `wrangler delete pr-<n>-forever-pto-development --force`. That single command is the entirety of teardown: the Worker and its attached secrets disappear.
+`.github/workflows/cleanup-development.yml` fires on `pull_request: closed` (merged or not) and runs `wrangler delete pr-<n>-forever-pto-development --force`. That single command is the entirety of teardown: the Worker and its attached secrets disappear. It queues behind the pull request's own CI run, in a concurrency group spelled from the pull request number, so the E2E job is never left driving a Worker that no longer exists; a weekly sweep deletes any preview Worker whose pull request is closed, for the cleanups something else lost.
 
 ### What survives
 
