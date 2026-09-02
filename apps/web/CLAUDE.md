@@ -473,14 +473,19 @@ per-PR worker straight from `wrangler.toml`. Only the site URL is dead weight th
 either: without it a hand-run development deploy would fall through to the top-level `[vars]` and advertise
 itself as `forever-pto.com`. Read the whole block as configuration, not residue.
 
-**The deploy passes `--message`, and the value is one hyphenated token on purpose.** Every form of
-`--message "<sha> <separator> <event>"` tried made wrangler 4.115 fail with `Unknown argument: push`; the
-last word of the message arrived as a second positional beside `deploy [path]`. It was not the quoting
-(`pnpm exec` passes argv through untouched, and `nick-fields/retry` was wrongly blamed for it first), and not
-the separator character. `_deploy-web.yml` now passes `${{ github.sha }}-${{ github.event_name }}`, which
-contains no spaces at all and so cannot split. That diagnosis was made against wrangler **4.115** and the pin
-has since moved to **4.126.0**; nothing has been re-verified, so treat the mechanism as recorded rather than
-retested, and reintroduce any multi-word form from a PR where the preview deploy exercises the same file.
+**The deploy passes `--message`, and the value is one hyphenated token on purpose.** In this package
+`wrangler deploy` is not wrangler: it detects the OpenNext project and hands the whole command to
+`opennextjs-cloudflare deploy`, which re-spawns wrangler through a shell with the arguments concatenated
+rather than escaped (Node prints `DEP0190` for exactly that on every deploy). So a quoted
+`--message "<sha> <separator> <event>"` reaches the shell unquoted: with a space the last word arrived as a
+second positional beside `deploy [path]` (`Unknown argument: push`, on wrangler 4.115), and with a
+parenthesis the line does not parse at all (`/bin/sh: 1: Syntax error: "(" unexpected`, on 4.126.0, the day
+the three deploying repositories were normalised onto `<sha> (<event>)` and this one failed its first
+production deploy behind it). It was never the quoting on our side, and `nick-fields/retry` was wrongly
+blamed for it first. `_deploy-web.yml` passes `${{ github.sha }}-${{ github.event_name }}`, which contains
+nothing a shell reads, and biancafiore and contribKit pass the same token so the format cannot drift apart
+again. The rollback jobs keep a multi-word message: wrangler redirects only `deploy` to OpenNext, so
+`wrangler rollback` receives its argv untouched.
 
 **No `wrangler deploy` in this repo is wrapped in `nick-fields/retry`'s usual forgiveness for argument
 errors**: not the app's in `_deploy-web.yml`, and not the tail Worker's in `ci.yml`. A wrapper that retries
