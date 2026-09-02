@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Every stylesheet the app ships. Tailwind CSS v4 is configured entirely in CSS; there is no
+Every stylesheet the app ships. Tailwind CSS is configured entirely in CSS; there is no
 `tailwind.config.*` anywhere in the repo. PostCSS runs a single plugin (`@tailwindcss/postcss`, see
 [`postcss.config.mjs`](../../../postcss.config.mjs)) and [`index.css`](./index.css) is the whole configuration surface: tokens, custom variants and
 custom utilities are all declared here in CSS at-rules.
@@ -89,7 +89,7 @@ Fonts come from [`fonts.ts`](../../app/fonts.ts) (next/font), which exposes `--f
 
 ## Custom variants
 
-- `@custom-variant hover (&:hover)` **replaces** Tailwind v4's built-in `hover`, which wraps the rule
+- `@custom-variant hover (&:hover)` **replaces** Tailwind's built-in `hover`, which wraps the rule
   in `@media (hover: hover)`. With the override, `hover:` utilities also apply on coarse pointers. It
   reads like a no-op redefinition; it is not.
 - `@custom-variant dark (&:is([data-theme="dark"] *))` matches *descendants* of the themed element

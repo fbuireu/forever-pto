@@ -2312,7 +2312,7 @@ describe("translation bundles stay in step", () => {
 // dated and quotes the versions it decided on; the entries below are the sentences that narrate a past bump
 // or a past mistake by its number, which is history rather than a claim about the tree.
 const STATED_VERSION =
-	/\b(?:Node(?:\.js)?|pnpm|TypeScript|Astro|Next(?:\.js)?|React|Effect|Flutter|Dart|[Ww]rangler|Ruby|Starlight)\s+(?:v|@)?\d+(?:\.\d+)*\b/g;
+	/\b(?:Node(?:\.js)?|pnpm|TypeScript|Astro|Next(?:\.js)?|React|Effect|Flutter|Dart|[Ww]rangler|Ruby|Starlight|Tailwind(?: CSS)?)\s+(?:v|@)?\d+(?:\.\d+)*\b/g;
 const NARRATED_VERSIONS: Record<string, string[]> = {
 	"CLAUDE.md": ["Flutter 3.47.2", "Next 16.3.3"],
 	"apps/web/CLAUDE.md": ["Next 16.3", "TypeScript 7", "TypeScript 6", "wrangler 4.115"],
