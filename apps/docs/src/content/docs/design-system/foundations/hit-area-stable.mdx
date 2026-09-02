@@ -19,7 +19,7 @@ Compare the two below by parking the pointer exactly on the bottom-right edge:
 
 ## The fix
 
-`apps/web/src/ui/styles/utilities/index.css` defines a Tailwind v4 `@utility` named `hit-area-stable`. It attaches an invisible `::after` overlay (`inset: 0`, `z-index: -1` so it never covers content) that expands asymmetrically with the movement:
+`apps/web/src/ui/styles/utilities/index.css` defines a Tailwind `@utility` named `hit-area-stable`. It attaches an invisible `::after` overlay (`inset: 0`, `z-index: -1` so it never covers content) that expands asymmetrically with the movement:
 
 - On `:hover`, the overlay grows down-right (`inset: 0 -8px -8px 0`), covering the band the element vacates when it lifts up-left.
 - On `:active`, it grows up-left (`inset: -8px 0 0 -8px`), covering the opposite band vacated by the press translate.

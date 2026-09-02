@@ -102,6 +102,6 @@ A few tokens hold full gradient values rather than single colors:
 Two files, two jobs:
 
 - `apps/web/src/ui/styles/global/index.css` declares the raw values (`:root` and `[data-theme='dark']`).
-- `apps/web/src/ui/styles/theme/index.css` re-exposes a subset under Tailwind v4's `@theme inline` block: `--color-background: var(--background)`, `--color-accent: var(--accent)`, and so on.
+- `apps/web/src/ui/styles/theme/index.css` re-exposes a subset under Tailwind's `@theme inline` block: `--color-background: var(--background)`, `--color-accent: var(--accent)`, and so on.
 
 Only the tokens aliased inside `@theme inline` become Tailwind utilities (`bg-background`, `text-muted-foreground`, `border-border`, `ring-ring`…). Everything else, meaning brand colors, surfaces, `--frame` and shadows, is consumed through arbitrary values, e.g. `bg-[var(--surface-panel)]`, `border-[var(--frame)]`, `shadow-[var(--shadow-brutal-md)]`. When adding a component, prefer the semantic utilities and reach for `var()` arbitraries only for surfaces and frames, matching the existing primitives in `apps/web/src/ui/modules/core/primitives/`.

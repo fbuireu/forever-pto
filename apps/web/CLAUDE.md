@@ -25,7 +25,7 @@ The vocabulary is the repo glossary's; see [`CONTEXT.md`](../../CONTEXT.md).
   injected as service tags ([ADR 0002](../../adr/0002-effect-for-external-service-boundaries.md))
 - **Temporal** via `temporal-polyfill`, never the global
   ([ADR 0005](../../adr/0005-temporal-polyfill.md))
-- **Tailwind CSS v4** + shadcn/ui; **Turso** via `@tursodatabase/serverless`: hand-written SQL, no ORM;
+- **Tailwind CSS** + shadcn/ui; **Turso** via `@tursodatabase/serverless`: hand-written SQL, no ORM;
   **Stripe**; **Resend**; **BetterStack**
 - **Cloudflare Workers** via `@opennextjs/cloudflare`, R2 for the incremental cache, the platform's own
   rate-limiting binding for the payment limiter

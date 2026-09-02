@@ -35,7 +35,7 @@ What does **not** flip: the brand palette (`--color-brand-*`), `--accent` (brand
 @custom-variant dark (&:is([data-theme="dark"] *));
 ```
 
-This redefines Tailwind v4's `dark:` variant to match *descendants of* the themed root instead of the default `prefers-color-scheme` media query. Components rarely need it, since the token flip covers most cases, but it exists for one-off dark adjustments (e.g. the color-mix schemes in `apps/web/src/ui/modules/core/primitives/Banner.tsx`).
+This redefines Tailwind's `dark:` variant to match *descendants of* the themed root instead of the default `prefers-color-scheme` media query. Components rarely need it, since the token flip covers most cases, but it exists for one-off dark adjustments (e.g. the color-mix schemes in `apps/web/src/ui/modules/core/primitives/Banner.tsx`).
 
 ## Why Starlight's toggle just works
 
