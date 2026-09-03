@@ -189,8 +189,14 @@ and enters the Holiday one, and that a range reaching past the years it has Holi
 counting the gap as workdays, and, because both
 held a defect that no type or lint rule can catch, [`sidebar/components/PtoCalculator.tsx`](./sidebar/components/PtoCalculator.tsx) and
 [`PtoSalaryCalculator.tsx`](./sidebar/components/PtoSalaryCalculator.tsx), whose cases drive the real inputs and assert on what the field and the caption
-actually show). Components whose body is markup plus translation calls are left to the Playwright suite in
-`e2e/` instead.
+actually show). The rest of `sidebar/` carries tests for the state each component owns rather than for its
+markup: `sidebar/components/SidebarCollapsibleGroup.test.tsx` pins that a collapsed rail reads a group as closed
+without discarding its own open state, `sidebar/components/CarryOverMonths.test.tsx` the debounce and the store
+write it drops on unmount, `sidebar/components/LanguageSelector.test.tsx` the code-versus-label switch by rail
+state, `sidebar/components/WorkdayCounterCalendarModal.test.tsx` that open and close both go through the owner
+that holds the state, and [`sidebar/AppSidebar.test.tsx`](./sidebar/AppSidebar.test.tsx) the tutorial anchors, the
+landmark the skip link targets and the year handed to both windowed controls. Components whose body is markup
+plus translation calls are still left to the Playwright suite in `e2e/`.
 
 **An accessible name is behaviour, so the components that grew one grew a test with it.**
 [`shared/cookie-consent/CookieConsentDialog.test.tsx`](./shared/cookie-consent/CookieConsentDialog.test.tsx)
