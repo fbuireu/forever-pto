@@ -56,6 +56,17 @@ describe("PremiumRequiredModal", () => {
 		expect(screen.getByText(enMessages.premiumModal.accessDenied)).toBeDefined();
 	});
 
+	it("returns to the address form on try again, with the refusal gone", async () => {
+		renderModal(vi.fn().mockResolvedValue(false));
+		await submitEmail();
+		await waitFor(() => expect(screen.getByText(enMessages.premiumModal.accessDenied)).toBeDefined());
+
+		fireEvent.click(screen.getByRole("button", { name: enMessages.formButtons.tryAgain }));
+
+		expect(screen.getByPlaceholderText(enMessages.premiumModal.emailPlaceholder)).toBeDefined();
+		expect(screen.queryByText(enMessages.premiumModal.accessDenied)).toBeNull();
+	});
+
 	it("closes itself once the promised seconds have passed", async () => {
 		const onClose = renderModal(vi.fn().mockResolvedValue(true));
 
