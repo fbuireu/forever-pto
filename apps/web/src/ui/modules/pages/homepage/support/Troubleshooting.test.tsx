@@ -4,23 +4,31 @@ import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import en from "../../../../i18n/messages/en.json";
 
-const { filtersState, mockResetFilters, mockResetHolidays, mockFetchHolidays, mockGenerateSuggestions, mockToast } =
-	vi.hoisted(() => ({
-		filtersState: {
-			country: "",
-			region: "",
-			year: 2026,
-			carryOverMonths: 1,
-			ptoDays: 22,
-			allowPastDays: false,
-			strategy: "grouped",
-		},
-		mockResetFilters: vi.fn(),
-		mockResetHolidays: vi.fn(),
-		mockFetchHolidays: vi.fn().mockResolvedValue(undefined),
-		mockGenerateSuggestions: vi.fn().mockResolvedValue(undefined),
-		mockToast: { success: vi.fn(), error: vi.fn() },
-	}));
+const {
+	filtersState,
+	mockResetFilters,
+	mockResetHolidays,
+	mockFetchHolidays,
+	mockGenerateSuggestions,
+	mockToast,
+	mockLogClientError,
+} = vi.hoisted(() => ({
+	filtersState: {
+		country: "",
+		region: "",
+		year: 2026,
+		carryOverMonths: 1,
+		ptoDays: 22,
+		allowPastDays: false,
+		strategy: "grouped",
+	},
+	mockResetFilters: vi.fn(),
+	mockResetHolidays: vi.fn(),
+	mockFetchHolidays: vi.fn().mockResolvedValue(undefined),
+	mockGenerateSuggestions: vi.fn().mockResolvedValue(undefined),
+	mockToast: { success: vi.fn(), error: vi.fn() },
+	mockLogClientError: vi.fn(),
+}));
 
 vi.mock("@application/stores/filters", () => ({
 	useFiltersStore: Object.assign(
@@ -39,6 +47,7 @@ vi.mock("@application/stores/holidays", () => ({
 }));
 
 vi.mock("sonner", () => ({ toast: mockToast }));
+vi.mock("@application/shared/utils/clientLog", () => ({ logClientError: mockLogClientError }));
 
 const { Troubleshooting } = await import("./Troubleshooting");
 
@@ -92,5 +101,24 @@ describe("Troubleshooting", () => {
 		await clickReset();
 
 		await waitFor(() => expect(mockToast.success).toHaveBeenCalled());
+	});
+
+	it("tells the user the reset failed, leaves a record, and keeps the button available for another try", async () => {
+		mockResetHolidays.mockImplementationOnce(() => {
+			throw new Error("storage quota");
+		});
+		renderComponent();
+		await clickReset();
+
+		await waitFor(() =>
+			expect(mockToast.error).toHaveBeenCalledWith(en.troubleshooting.errorTitle, {
+				description: en.troubleshooting.errorDescription,
+			}),
+		);
+		expect(mockLogClientError).toHaveBeenCalledExactlyOnceWith(
+			expect.objectContaining({ context: { component: "Troubleshooting" } }),
+		);
+		expect(mockToast.success).not.toHaveBeenCalled();
+		expect(screen.getByRole("button", { name: en.troubleshooting.resetButton })).toHaveProperty("disabled", false);
 	});
 });

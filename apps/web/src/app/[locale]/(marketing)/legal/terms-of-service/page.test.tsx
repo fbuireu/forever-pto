@@ -1,4 +1,6 @@
 import { EN, ES } from "@infrastructure/i18n/locales";
+import { render } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const NAMESPACE = "termsOfService";
@@ -8,6 +10,7 @@ const mockGetCloudflareContext = vi.fn();
 const MockLegalLayout = vi.fn().mockReturnValue(null);
 const mockGetTranslations = vi.fn();
 const mockCreateRichLink = vi.fn().mockReturnValue(vi.fn().mockReturnValue(null));
+const mockRich = vi.fn().mockReturnValue(null);
 
 vi.mock("@opennextjs/cloudflare", () => ({
 	getCloudflareContext: mockGetCloudflareContext,
@@ -35,7 +38,7 @@ describe("terms-of-service/page", () => {
 		const mockT = Object.assign(
 			vi.fn((key: string) => `t:${key}`),
 			{
-				rich: vi.fn().mockReturnValue(null),
+				rich: mockRich,
 			},
 		);
 		mockGetTranslations.mockResolvedValue(mockT);
@@ -61,5 +64,15 @@ describe("terms-of-service/page", () => {
 	it("renders lastUpdated prop", async () => {
 		const element = await TermsOfServicePage(makeParams());
 		expect(element.props.lastUpdated).toBeDefined();
+	});
+
+	it("renders the bold chunks of the refund exclusions in a strong element", async () => {
+		await TermsOfServicePage(makeParams());
+		const exclusions = mockRich.mock.calls.find(([key]) => key === "sections.refundPolicy.exclusions.description");
+		const tags = exclusions?.[1] as { b: (chunks: ReactNode) => ReactNode };
+
+		const { container } = render(tags.b("no refund"));
+
+		expect(container.querySelector("strong")?.textContent).toBe("no refund");
 	});
 });

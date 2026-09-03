@@ -20,10 +20,15 @@ const messagesWithErrors = {
 	contact: { ...enMessages.contact, errors: { internal_error: INTERNAL_ERROR_MESSAGE } },
 };
 
-const submitMessage = async (messages: object) => {
+interface SubmitMessageParams {
+	messages: object;
+	onClose?: () => void;
+}
+
+const submitMessage = async ({ messages, onClose = vi.fn() }: SubmitMessageParams) => {
 	render(
 		<NextIntlClientProvider locale="en" messages={messages}>
-			<ContactModal open onClose={vi.fn()} />
+			<ContactModal open onClose={onClose} />
 		</NextIntlClientProvider>,
 	);
 
@@ -50,7 +55,7 @@ describe("ContactModal failure reporting", () => {
 	it("renders the translated message for a machine code instead of the code itself", async () => {
 		sendContactEmailAction.mockResolvedValue({ success: false, error: "internal_error" });
 
-		await submitMessage(messagesWithErrors);
+		await submitMessage({ messages: messagesWithErrors });
 
 		await waitFor(() => expect(screen.getByText(INTERNAL_ERROR_MESSAGE)).toBeTruthy());
 		expect(screen.queryByText("internal_error")).toBeNull();
@@ -60,7 +65,7 @@ describe("ContactModal failure reporting", () => {
 		premiumState.setEmail.mockClear();
 		sendContactEmailAction.mockResolvedValue({ success: false, error: "internal_error" });
 
-		await submitMessage(messagesWithErrors);
+		await submitMessage({ messages: messagesWithErrors });
 
 		await waitFor(() => expect(screen.getByText(INTERNAL_ERROR_MESSAGE)).toBeTruthy());
 		expect(premiumState.setEmail).not.toHaveBeenCalled();
@@ -70,7 +75,7 @@ describe("ContactModal failure reporting", () => {
 		premiumState.setEmail.mockClear();
 		sendContactEmailAction.mockResolvedValue({ success: true });
 
-		await submitMessage(messagesWithErrors);
+		await submitMessage({ messages: messagesWithErrors });
 
 		await waitFor(() => expect(premiumState.setEmail).toHaveBeenCalledWith("ada@example.com"));
 	});
@@ -78,8 +83,52 @@ describe("ContactModal failure reporting", () => {
 	it("falls back to the generic message when the code has no key of its own", async () => {
 		sendContactEmailAction.mockResolvedValue({ success: false, error: "name_too_long" });
 
-		await submitMessage(messagesWithErrors);
+		await submitMessage({ messages: messagesWithErrors });
 
 		await waitFor(() => expect(screen.getByText(enMessages.contact.failedToSend)).toBeTruthy());
+	});
+
+	it("shows the thrown error's own words when the action itself fails rather than answering", async () => {
+		sendContactEmailAction.mockRejectedValue(new Error("Mailbox unavailable"));
+
+		await submitMessage({ messages: messagesWithErrors });
+
+		await waitFor(() => expect(screen.getByText("Mailbox unavailable")).toBeTruthy());
+		expect(screen.getByText(enMessages.contact.errorTitle)).toBeTruthy();
+	});
+
+	it("falls back to the generic message when what was thrown is not an Error", async () => {
+		sendContactEmailAction.mockRejectedValue("offline");
+
+		await submitMessage({ messages: messagesWithErrors });
+
+		await waitFor(() => expect(screen.getByText(enMessages.contact.failedToSend)).toBeTruthy());
+	});
+});
+
+describe("ContactModal after a failure", () => {
+	it("returns to the form on try again, with the previous failure cleared", async () => {
+		sendContactEmailAction.mockResolvedValue({ success: false, error: "internal_error" });
+		await submitMessage({ messages: messagesWithErrors });
+		await waitFor(() => expect(screen.getByText(INTERNAL_ERROR_MESSAGE)).toBeTruthy());
+
+		fireEvent.click(screen.getByRole("button", { name: enMessages.formButtons.tryAgain }));
+
+		expect(screen.getByPlaceholderText(enMessages.contact.namePlaceholder)).toBeTruthy();
+		expect(screen.queryByText(INTERNAL_ERROR_MESSAGE)).toBeNull();
+	});
+
+	it("hands the dialog back to its owner from the outcome panel's close button", async () => {
+		const onClose = vi.fn();
+		sendContactEmailAction.mockResolvedValue({ success: true });
+		await submitMessage({ messages: messagesWithErrors, onClose });
+		await waitFor(() => expect(screen.getByText(enMessages.contact.successTitle)).toBeTruthy());
+
+		const outcomeClose = screen
+			.getAllByRole("button", { name: enMessages.formButtons.close })
+			.find((button) => button.getAttribute("data-slot") === "button");
+		fireEvent.click(outcomeClose as HTMLElement);
+
+		expect(onClose).toHaveBeenCalledOnce();
 	});
 });

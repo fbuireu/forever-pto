@@ -19,6 +19,7 @@ const Harness = ({ isPending }: { isPending: boolean }) => {
 				currencySymbol="€"
 				isPending={isPending}
 			/>
+			<output data-testid="amount">{String(form.watch("amount"))}</output>
 		</NextIntlClientProvider>
 	);
 };
@@ -103,6 +104,25 @@ describe("DonationForm", () => {
 		render(<Harness isPending={false} />);
 
 		expect(screen.getByLabelText(enMessages.donationForm.donationAmount).tagName).toBe("INPUT");
+	});
+
+	it("writes a preset into the form the moment it is clicked", () => {
+		render(<Harness isPending={false} />);
+
+		fireEvent.click(screen.getByRole("button", { name: "€15" }));
+
+		expect(screen.getByTestId("amount").textContent).toBe("15");
+	});
+
+	it("stores the typed amount as a number, and an emptied field as zero rather than NaN", () => {
+		render(<Harness isPending={false} />);
+		const amount = screen.getByPlaceholderText(enMessages.donationForm.enterAmount);
+
+		fireEvent.change(amount, { target: { value: "25" } });
+		expect(screen.getByTestId("amount").textContent).toBe("25");
+
+		fireEvent.change(amount, { target: { value: "" } });
+		expect(screen.getByTestId("amount").textContent).toBe("0");
 	});
 
 	it("promises no description on a field that has none", () => {
