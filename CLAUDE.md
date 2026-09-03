@@ -181,7 +181,7 @@ is in flight.
 
 **A change confined to the repo root releases nothing**: `adr/`, `tests/`, `README.md`, `CONTEXT.md`, this
 file. That is correct and occasionally surprising. **It is narrower than it reads**: `WEB_PATHS` in `ci.yml`
-also matches [`package.json`](./package.json), `pnpm-workspace.yaml`, [`patches/`](./patches), [`biome.json`](./biome.json), [`.npmrc`](./.npmrc), `.nvmrc` and
+also matches [`package.json`](./package.json), `pnpm-workspace.yaml`, [`patches/`](./patches), [`biome.json`](./biome.json), `.nvmrc` and
 [`.github/actions/`](./.github/actions), all of which do cut a release. That is deliberate (each of them changes what the app
 builds from), but it means "the repo root" is not the boundary; the regex is.
 
