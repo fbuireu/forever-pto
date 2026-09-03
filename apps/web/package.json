@@ -1,7 +1,8 @@
 {
 	"name": "forever-pto-web",
-	"description": "The all-in-one tool to squish your valuable PTO days",
 	"version": "1.9.7",
+	"private": true,
+	"description": "The all-in-one tool to squish your valuable PTO days",
 	"keywords": [
 		"nextjs",
 		"typescript",
@@ -16,8 +17,16 @@
 		"pnpm"
 	],
 	"author": "Ferran Buireu <contact@forever-pto.com>",
-	"private": true,
 	"license": "AGPL-3.0-only",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/fbuireu/forever-pto.git",
+		"directory": "apps/web"
+	},
+	"homepage": "https://forever-pto.com",
+	"bugs": {
+		"url": "https://github.com/fbuireu/forever-pto/issues"
+	},
 	"scripts": {
 		"dev": "next dev --turbopack",
 		"build": "next build",
@@ -41,7 +50,7 @@
 		"test:ut": "vitest run --logHeapUsage",
 		"test:ut:watch": "vitest --logHeapUsage",
 		"test:ut:coverage": "vitest run --coverage",
-		"test:ut:changed": "pnpm test:ut --bail 1",
+		"test:ut:changed": "pnpm test:ut --changed origin/main",
 		"test:e2e": "playwright test",
 		"test:e2e:ui": "playwright test --ui",
 		"test:e2e:changed": "playwright test --only-changed --pass-with-no-tests"
