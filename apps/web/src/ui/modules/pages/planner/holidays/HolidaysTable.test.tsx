@@ -5,9 +5,10 @@ import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { holidaysState, openHandler } = vi.hoisted(() => ({
+const { holidaysState, openHandler, loaders } = vi.hoisted(() => ({
 	holidaysState: { holidays: [] as unknown[] },
 	openHandler: { current: (_open: boolean) => {} },
+	loaders: [] as (() => Promise<{ default: unknown }>)[],
 }));
 
 vi.mock("@application/stores/holidays", () => ({
@@ -64,36 +65,39 @@ interface ModalMockProps {
 }
 
 vi.mock("next/dynamic", () => ({
-	default: () => (props: ModalMockProps) => {
-		if (props.holidays) {
+	default: (loader: () => Promise<{ default: unknown }>) => {
+		loaders.push(loader);
+		return (props: ModalMockProps) => {
+			if (props.holidays) {
+				return (
+					<div
+						data-testid="delete-modal"
+						data-names={props.holidays.map((h) => h.name).join(",")}
+						data-open={String(props.open)}
+					>
+						<button type="button" onClick={props.onClose}>
+							close delete
+						</button>
+					</div>
+				);
+			}
+			if (props.holiday) {
+				return (
+					<div data-testid="edit-modal" data-name={props.holiday.name} data-open={String(props.open)}>
+						<button type="button" onClick={props.onClose}>
+							close edit
+						</button>
+					</div>
+				);
+			}
 			return (
-				<div
-					data-testid="delete-modal"
-					data-names={props.holidays.map((h) => h.name).join(",")}
-					data-open={String(props.open)}
-				>
+				<div data-testid="add-modal" data-open={String(props.open)}>
 					<button type="button" onClick={props.onClose}>
-						close delete
+						close add
 					</button>
 				</div>
 			);
-		}
-		if (props.holiday) {
-			return (
-				<div data-testid="edit-modal" data-name={props.holiday.name} data-open={String(props.open)}>
-					<button type="button" onClick={props.onClose}>
-						close edit
-					</button>
-				</div>
-			);
-		}
-		return (
-			<div data-testid="add-modal" data-open={String(props.open)}>
-				<button type="button" onClick={props.onClose}>
-					close add
-				</button>
-			</div>
-		);
+		};
 	},
 }));
 
@@ -103,12 +107,16 @@ interface HolidayParams {
 	id: string;
 	name: string;
 	date: Date;
+	type?: string;
+	location?: string;
 }
 
-const holiday = ({ id, name, date }: HolidayParams) => ({
+const holiday = ({ id, name, date, type, location }: HolidayParams) => ({
 	id,
 	name,
 	date,
+	type,
+	location,
 	variant: HolidayVariant.NATIONAL,
 	isInPlanningWindow: true,
 });
@@ -393,5 +401,118 @@ describe("HolidaysTable with nothing to show", () => {
 
 		expect(selectAllBoxes(view, enMessages.holidaysTable.selectAll)[0]?.checked).toBe(false);
 		expect(view.getAllByText(enMessages.holidaysTable.noHolidaysFound).length).toBeGreaterThan(0);
+	});
+});
+
+describe("HolidaysTable loads its three modals lazily", () => {
+	it("resolves each one to the export it names, so a renamed export fails here rather than on first open", async () => {
+		expect(loaders).toHaveLength(3);
+
+		for (const loader of loaders) {
+			await expect(loader()).resolves.toEqual({ default: expect.any(Function) });
+		}
+	});
+});
+
+describe("HolidaysTable follows its tab", () => {
+	const wrap = (open: boolean) => (
+		<NextIntlClientProvider locale="en" messages={enMessages}>
+			<HolidaysTable title="National holidays" variant={HolidayVariant.NATIONAL} open={open} />
+		</NextIntlClientProvider>
+	);
+
+	it("folds itself back up when the tab it sits in closes, so it does not come back open on the next visit", () => {
+		const view = render(wrap(true));
+		fireEvent.click(view.getByTestId("trigger"));
+		expect(view.getByPlaceholderText(enMessages.holidaysTable.searchPlaceholder)).toBeTruthy();
+
+		view.rerender(wrap(false));
+
+		expect(view.queryByPlaceholderText(enMessages.holidaysTable.searchPlaceholder)).toBeNull();
+	});
+});
+
+const rowOrder = (view: View) =>
+	view
+		.getAllByLabelText(/^Select (?!all$)/)
+		.slice(0, holidaysState.holidays.length)
+		.map((box) => box.getAttribute("aria-label")?.replace("Select ", ""));
+
+describe("HolidaysTable sorting", () => {
+	it("orders by date both ways, which the name order cannot stand in for", () => {
+		holidaysState.holidays = [
+			holiday({ id: "n-3", name: "Alpha", date: new Date(2026, 5, 1) }),
+			holiday({ id: "n-1", name: "Mike", date: new Date(2026, 11, 1) }),
+			holiday({ id: "n-2", name: "Zulu", date: new Date(2026, 0, 1) }),
+		];
+		const view = renderTable();
+		const sortByDate = view.getByRole("button", { name: enMessages.holidayTableHeader.date });
+
+		fireEvent.click(sortByDate);
+		expect(rowOrder(view)).toStrictEqual(["Zulu", "Alpha", "Mike"]);
+
+		fireEvent.click(sortByDate);
+		expect(rowOrder(view)).toStrictEqual(["Mike", "Alpha", "Zulu"]);
+	});
+
+	it("keeps the holidays without a type after the typed ones, whichever way the order runs", () => {
+		holidaysState.holidays = [
+			holiday({ id: "n-1", name: "Alpha", date: new Date(2026, 0, 1), type: "public" }),
+			holiday({ id: "n-2", name: "Beta", date: new Date(2026, 5, 1) }),
+			holiday({ id: "n-3", name: "Gamma", date: new Date(2026, 11, 1), type: "bank" }),
+		];
+		const view = renderTable();
+		const sortByType = view.getByRole("button", { name: enMessages.holidayTableHeader.type });
+
+		fireEvent.click(sortByType);
+		expect(rowOrder(view)).toStrictEqual(["Gamma", "Alpha", "Beta"]);
+
+		fireEvent.click(sortByType);
+		expect(rowOrder(view)).toStrictEqual(["Alpha", "Gamma", "Beta"]);
+	});
+});
+
+describe("HolidaysTable card details", () => {
+	const saturday = new Date(2026, 5, 6);
+
+	it("shows a holiday's type, its location and a weekend badge on the mobile card when it has them", () => {
+		holidaysState.holidays = [
+			holiday({ id: "n-1", name: "Alpha", date: saturday, type: "public", location: "Barcelona" }),
+		];
+		const view = renderTable();
+
+		expect(view.getAllByText("public").length).toBeGreaterThan(0);
+		expect(view.getByText(/Barcelona/)).toBeTruthy();
+		expect(view.getAllByText(enMessages.holidaysTable.weekend)).toHaveLength(2);
+	});
+
+	it("finds a holiday by its type or its location, not only by its name", () => {
+		holidaysState.holidays = [
+			holiday({ id: "n-1", name: "Alpha", date: new Date(2026, 0, 1), type: "public", location: "Barcelona" }),
+			holiday({ id: "n-2", name: "Beta", date: new Date(2026, 5, 1), type: "bank" }),
+		];
+		const view = renderTable();
+
+		search(view, "barcel");
+		expect(view.getAllByLabelText(/^Select (?!all$)/).map((box) => box.getAttribute("aria-label"))).toStrictEqual([
+			"Select Alpha",
+			"Select Alpha",
+		]);
+
+		search(view, "bank");
+		expect(view.getAllByLabelText(/^Select (?!all$)/).map((box) => box.getAttribute("aria-label"))).toStrictEqual([
+			"Select Beta",
+			"Select Beta",
+		]);
+	});
+});
+
+describe("HolidaysTable with no holidays at all", () => {
+	it("says there are none, rather than that none were found, when nothing was searched for", () => {
+		holidaysState.holidays = [];
+		const view = renderTable();
+
+		expect(view.getAllByText(enMessages.holidaysTable.noHolidays).length).toBeGreaterThan(0);
+		expect(view.queryByText(enMessages.holidaysTable.noHolidaysFound)).toBeNull();
 	});
 });

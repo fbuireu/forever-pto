@@ -7,6 +7,15 @@ import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
+const { locationState, premiumState, loaders } = vi.hoisted(() => ({
+	locationState: {
+		countries: [] as { value: string; label: string; flag: string }[],
+		regions: [] as { value: string; label: string }[],
+	},
+	premiumState: { premiumKey: "key" as string | null },
+	loaders: [] as (() => Promise<{ default: unknown }>)[],
+}));
+
 const JAN = (day: number) => new Date(2025, 0, day);
 
 const filtersState = {
@@ -34,18 +43,22 @@ vi.mock("@application/stores/holidays", () => ({
 	useHolidaysStore: (selector: (state: typeof holidaysState) => unknown) => selector(holidaysState),
 }));
 vi.mock("@application/stores/location", () => ({
-	useLocationStore: (selector: (state: { countries: unknown[]; regions: unknown[] }) => unknown) =>
-		selector({ countries: [], regions: [] }),
+	useLocationStore: (selector: (state: typeof locationState) => unknown) => selector(locationState),
 }));
 vi.mock("@application/stores/premium", () => ({
-	usePremiumStore: (selector: (state: { premiumKey: string | null }) => unknown) => selector({ premiumKey: "key" }),
+	usePremiumStore: (selector: (state: typeof premiumState) => unknown) => selector(premiumState),
 	PremiumFeatureId: { ADVANCED_METRICS: "advancedMetrics", YEAR_SUMMARY: "yearSummary" },
 }));
 vi.mock("@ui/hooks/useStoresReady", () => ({ useStoresReady: () => ({ areStoresReady: true }) }));
 vi.mock("@application/i18n/navigation", () => ({
 	Link: ({ children }: { children: ReactNode }) => <span>{children}</span>,
 }));
-vi.mock("next/dynamic", () => ({ default: () => () => null }));
+vi.mock("next/dynamic", () => ({
+	default: (loader: () => Promise<{ default: unknown }>) => {
+		loaders.push(loader);
+		return () => null;
+	},
+}));
 vi.mock("boneyard-js/react", () => ({ Skeleton: ({ children }: { children: ReactNode }) => <div>{children}</div> }));
 vi.mock("@ui/modules/premium/PremiumFeature", () => ({
 	PremiumFeature: ({ children }: { children: ReactNode }) => <>{children}</>,
@@ -271,5 +284,156 @@ describe("the banner about Custom Holidays", () => {
 
 		expect(container.textContent).toContain("1 custom holiday");
 		expect(container.textContent).not.toContain("1 custom holidays");
+	});
+});
+
+const holidayOf = (variant: string, day: number, isInPlanningWindow = true) => ({
+	id: `${variant}-${day}`,
+	date: JAN(day),
+	name: `Holiday ${day}`,
+	variant,
+	isInPlanningWindow,
+});
+
+describe("Summary loads its five charts lazily", () => {
+	it("resolves each one to the export it names, so a renamed chart fails here rather than on the page", async () => {
+		expect(loaders).toHaveLength(5);
+
+		for (const loader of loaders) {
+			await expect(loader()).resolves.toEqual({ default: expect.any(Function) });
+		}
+	});
+});
+
+describe("Summary heading", () => {
+	const spain = () => {
+		resetPlan();
+		locationState.countries = [{ value: "es", label: "Spain", flag: "es" }];
+		locationState.regions = [{ value: "ct", label: "Catalonia" }];
+		filtersState.country = "ES";
+	};
+
+	const restore = () => {
+		locationState.countries = [];
+		locationState.regions = [];
+		filtersState.country = "ES";
+		filtersState.region = "";
+	};
+
+	it("names the country and the region it was planned for, flag first, matching them without regard to case", () => {
+		spain();
+		filtersState.region = "CT";
+		holidaysState.holidays = [holidayOf("regional", 10)];
+
+		const { container } = renderSummary();
+
+		expect(container.querySelector(".fi-es")).not.toBeNull();
+		expect(container.textContent).toContain("Spain");
+		expect(container.textContent).toContain("Catalonia");
+		expect(container.textContent).toContain("1 of your holidays are specific to Catalonia.");
+		expect(container.textContent).not.toContain(enMessages.summary.summaryParagraph.noRegionHintTitle);
+
+		restore();
+	});
+
+	it("nudges the reader to pick a region while none is set, and names no region it does not have", () => {
+		spain();
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain(enMessages.summary.summaryParagraph.noRegionHintTitle);
+		expect(container.textContent).not.toContain("Catalonia");
+
+		restore();
+	});
+});
+
+describe("Summary before there is a plan", () => {
+	it("renders nothing to summarise, leaving the skeleton to hold the place", () => {
+		resetPlan();
+		holidaysState.suggestion = null;
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).not.toContain(enMessages.summary.metrics.effectiveDays);
+	});
+
+	it("copes with a store that has not filled in carry-over or alternatives yet", () => {
+		resetPlan();
+		(filtersState as { carryOverMonths?: number }).carryOverMonths = undefined;
+		holidaysState.alternatives = null as never;
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain(enMessages.summary.metrics.effectiveDays);
+		expect(container.textContent).not.toContain(enMessages.summary.notifications.canImprove.title);
+
+		filtersState.carryOverMonths = 0;
+	});
+});
+
+describe("Summary holiday badge", () => {
+	it("breaks the count down by Variant, naming only the Variants that have any", () => {
+		resetPlan();
+		holidaysState.holidays = [
+			holidayOf("national", 1),
+			holidayOf("national", 6),
+			holidayOf("regional", 10),
+			holidayOf("custom", 20),
+		];
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain("2 nat. + 1 reg. + 1 cust.");
+	});
+
+	it("names the national count alone when that is all there is", () => {
+		resetPlan();
+		holidaysState.holidays = [holidayOf("national", 1)];
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain("1 nat.");
+		expect(container.textContent).not.toContain("reg.");
+		expect(container.textContent).not.toContain("cust.");
+	});
+});
+
+describe("Summary year summary", () => {
+	it("appears once the engine has found a first and a last break, with the streak between them", () => {
+		resetPlan();
+		holidaysState.suggestion = {
+			...planOf([JAN(6), JAN(7), JAN(8)]),
+			metrics: { ...METRICS, firstLastBreak: { first: "Jan 6", last: "Dec 24" }, maxWorkStreak: 45, bonusDays: 3 },
+		};
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain(enMessages.summary.yearSummary.title);
+		expect(container.textContent).toContain(`${enMessages.summary.yearSummary.maxWorkStreak}45 days`);
+		expect(container.textContent).toContain("+3");
+	});
+
+	it("stays away while the engine has no breaks to report", () => {
+		resetPlan();
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).not.toContain(enMessages.summary.yearSummary.title);
+	});
+});
+
+describe("the banner that says a better plan exists, for a reader without Premium", () => {
+	it("offers Premium rather than the Alternatives it cannot show", () => {
+		resetPlan();
+		premiumState.premiumKey = null;
+		holidaysState.alternatives = [planOf([JAN(6)], 7)];
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain(enMessages.summary.notifications.canImprove.considerPremium);
+		expect(container.textContent).not.toContain(enMessages.summary.notifications.canImprove.reviewOptions);
+
+		premiumState.premiumKey = "key";
 	});
 });

@@ -1,4 +1,5 @@
 import deMessages from "@i18n/messages/de.json";
+import enMessages from "@i18n/messages/en.json";
 import itMessages from "@i18n/messages/it.json";
 import { render } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
@@ -14,7 +15,9 @@ vi.mock("recharts", () => {
 		CartesianGrid: empty,
 		Cell: empty,
 		ResponsiveContainer: passthrough,
-		Tooltip: empty,
+		Tooltip: ({ formatter }: { formatter: (value: number) => [string, string] }) => (
+			<span data-testid="tooltip">{formatter(3).join(" | ")}</span>
+		),
 		XAxis: empty,
 		YAxis: empty,
 	};
@@ -54,5 +57,13 @@ describe("QuarterDistributionChart", () => {
 		const { container } = renderChart({ locale: "it", messages: itMessages, quarterDist: [8, 0, 0, 0] });
 		expect(container.textContent).toContain("1 trimestre");
 		expect(container.textContent).not.toContain("trimestri");
+	});
+});
+
+describe("QuarterDistributionChart tooltip", () => {
+	it("labels a bar with its day count and what the bar measures", () => {
+		const { getByTestId } = renderChart({ locale: "en", messages: enMessages, quarterDist: [3, 2, 2, 1] });
+
+		expect(getByTestId("tooltip").textContent).toBe(`3 ${enMessages.charts.days} | ${enMessages.charts.daysOff}`);
 	});
 });
