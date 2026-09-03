@@ -1,14 +1,22 @@
 {
 	"name": "forever-pto-monorepo",
+	"version": "0.0.0",
+	"private": true,
 	"description": "Monorepo for the Forever PTO app and its documentation site",
 	"author": "Ferran Buireu <contact@forever-pto.com>",
-	"packageManager": "pnpm@11.22.0",
+	"license": "AGPL-3.0-only",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/fbuireu/forever-pto.git"
+	},
+	"homepage": "https://forever-pto.com",
+	"bugs": {
+		"url": "https://github.com/fbuireu/forever-pto/issues"
+	},
 	"engines": {
 		"node": "26.7.0"
 	},
-	"private": true,
-	"license": "AGPL-3.0-only",
-	"version": "0.0.0",
+	"packageManager": "pnpm@11.22.0",
 	"scripts": {
 		"dev": "pnpm --filter forever-pto-web dev",
 		"build": "pnpm --filter forever-pto-web build",
@@ -30,7 +38,7 @@
 		"format:check": "biome check --no-errors-on-unmatched .",
 		"typecheck": "tsc --project . --noEmit && pnpm --filter forever-pto-web typecheck && pnpm --filter forever-pto-docs typecheck",
 		"test:ut": "pnpm --filter forever-pto-web test:ut && vitest run",
-		"test:ut:watch": "vitest",
+		"test:ut:watch": "pnpm --filter forever-pto-web test:ut:watch",
 		"test:ut:coverage": "pnpm --filter forever-pto-web test:ut:coverage && vitest run --coverage",
 		"test:ut:changed": "pnpm --filter forever-pto-web test:ut:changed",
 		"test:docs": "vitest run",
