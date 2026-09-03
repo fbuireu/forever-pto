@@ -9,9 +9,12 @@ interface LegendMockProps {
 	content: (props: { payload?: { value: string; color: string }[] }) => ReactNode;
 }
 
+interface TooltipMockProps {
+	formatter: (value: number, name: string) => [string, string];
+}
+
 vi.mock("recharts", () => {
 	const passthrough = ({ children }: { children?: ReactNode }) => <div>{children}</div>;
-	const empty = () => null;
 	return {
 		Cell: ({ fill }: { fill: string }) => <span data-testid="cell" data-fill={fill} />,
 		Legend: ({ content }: LegendMockProps) => (
@@ -35,7 +38,7 @@ vi.mock("recharts", () => {
 		),
 		PieChart: passthrough,
 		ResponsiveContainer: passthrough,
-		Tooltip: empty,
+		Tooltip: ({ formatter }: TooltipMockProps) => <span data-testid="tooltip">{formatter(5, "PTO").join(" | ")}</span>,
 	};
 });
 
@@ -137,5 +140,13 @@ describe("HolidaysDistributionChart", () => {
 		renderChart({ ptoDays: 20, holidays: oneOfEach });
 
 		expect(screen.getByTestId("legend-without-payload").querySelectorAll("li")).toHaveLength(0);
+	});
+});
+
+describe("HolidaysDistributionChart tooltip", () => {
+	it("labels a slice with its day count and keeps the series name recharts handed it", () => {
+		renderChart({ ptoDays: 20, holidays: oneOfEach });
+
+		expect(screen.getByTestId("tooltip").textContent).toBe(`5 ${en.charts.days} | PTO`);
 	});
 });

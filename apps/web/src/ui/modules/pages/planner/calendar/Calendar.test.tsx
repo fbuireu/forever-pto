@@ -375,3 +375,67 @@ describe("Calendar month navigation", () => {
 		expect(onSelect).not.toHaveBeenCalled();
 	});
 });
+
+describe("Calendar outside days", () => {
+	it("leaves the neighbouring months' days blank when asked to hide them, keeping the grid's shape", () => {
+		const { container } = renderCalendar({ showOutsideDays: false });
+
+		expect(screen.queryByRole("button", { name: /July 1, 2026/ })).toBeNull();
+		expect(screen.getAllByRole("button")).toHaveLength(30);
+		expect(container.querySelectorAll(".grid-cols-7.gap-2 > div")).toHaveLength(35);
+	});
+
+	it("shows them, named in full, when it is not", () => {
+		renderCalendar({ showOutsideDays: true });
+
+		expect(screen.getByRole("button", { name: "Wednesday, July 1, 2026" })).toBeTruthy();
+	});
+});
+
+describe("Calendar with no month of its own", () => {
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
+	it("opens on the month today is in", () => {
+		vi.useFakeTimers({ toFake: ["Date"] });
+		vi.setSystemTime(new Date(2026, 8, 15));
+
+		const { container } = renderCalendar({ month: undefined });
+
+		expect(title(container)).toBe("September 2026");
+	});
+});
+
+describe("Calendar past days", () => {
+	const isTheTwelfth = (date: Date) => date.getDate() === 12 && date.getMonth() === 5;
+	const isTheEleventh = (date: Date) => date.getDate() === 11 && date.getMonth() === 5;
+
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
+	it("disables the days already gone, unless the plan still holds them", () => {
+		vi.useFakeTimers({ toFake: ["Date"] });
+		vi.setSystemTime(new Date(2026, 5, 15));
+
+		renderCalendar({
+			allowPastDays: false,
+			dayStates: { suggested: isTheTwelfth, manuallySelected: isTheEleventh },
+		});
+
+		expect((june(10) as HTMLButtonElement).disabled).toBe(true);
+		expect((june(11) as HTMLButtonElement).disabled).toBe(false);
+		expect((june(12) as HTMLButtonElement).disabled).toBe(false);
+		expect((june(16) as HTMLButtonElement).disabled).toBe(false);
+	});
+
+	it("leaves every day open while past days are allowed", () => {
+		vi.useFakeTimers({ toFake: ["Date"] });
+		vi.setSystemTime(new Date(2026, 5, 15));
+
+		renderCalendar({ allowPastDays: true });
+
+		expect((june(10) as HTMLButtonElement).disabled).toBe(false);
+	});
+});

@@ -48,6 +48,10 @@ follow-up is renaming it, which costs an edit in six bundles.
 
 [`HolidayFormModal.test.tsx`](./holidays/components/HolidayFormModal.test.tsx) is the first test either modal has had: applied, a refusal with copy, a refusal
 without copy falling through to the generic error, and the `null` no-op.
+[`AddHolidayModal.test.tsx`](./holidays/components/AddHolidayModal.test.tsx) and
+[`EditHolidayModal.test.tsx`](./holidays/components/EditHolidayModal.test.tsx) drive the two callers through the real
+form: what each hands its store action, including the window it is checked against, and that Edit answers `null` for
+a form submitted untouched.
 
 **The planner's click policy lives in `calendar/usePlannerDayClick.tsx`, not in the calendar.** `Calendar`
 serves three callers and only one of them is the planner: `CalendarList` picks days out of a plan,
@@ -533,13 +537,15 @@ at all, because `generateSuggestions` takes the window rather than its expansion
 
 ## Testing
 
-Twenty-one test files. The components carrying them are the ones holding logic, and the rest are left
-to the Playwright suite in `e2e/`, which on this screen asserts only that `/planner` answers 200, has a
+Thirty-one test files. Every component on this screen has one of its own except `HolidayRow`,
+`HolidayTableHeader` and `MetricCard`, which are exercised through the table and the summary that render
+them; the three fixtures are asserted on their shape, since a skeleton that grows a button or a word is a
+defect. The Playwright suite in `e2e/` asserts only that `/planner` answers 200, has a
 title, and does not trip the error boundary. No e2e spec drives a calculation, so nothing outside these
 files pins planner *behaviour*. **That count is worth recounting rather than trusting**: it said fifteen while
 the tree held sixteen, which is the failure mode a number in prose has.
 
-Two of the twenty-one cover this screen's remaining pure modules.
+Two of the thirty-one cover this screen's remaining pure modules.
 [`calendar/utils/refusals.test.ts`](./calendar/utils/refusals.test.ts) asserts `DAY_REFUSAL_COPY` against
 `DayRefusal` itself, key set for key set, so a refusal added to the stores without copy fails here rather
 than rendering nothing on the calendar; it also pins that `describeHolidayRefusal` answers `null` for the one
