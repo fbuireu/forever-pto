@@ -10,6 +10,7 @@
 **Maximize your time off. Forever PTO helps you strategically combine your PTO days with public holidays to get the most out of every one of them.**
 
 [![CI](https://img.shields.io/github/actions/workflow/status/fbuireu/forever-pto/ci.yml?style=flat-square&logo=github&label=CI)](https://github.com/fbuireu/forever-pto/actions/workflows/ci.yml)
+[![Codecov](https://img.shields.io/codecov/c/gh/fbuireu/forever-pto?style=flat-square&logo=codecov)](https://codecov.io/gh/fbuireu/forever-pto)
 [![Uptime](https://uptime.betterstack.com/status-badges/v1/monitor/272ww.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL%20v3-blue?style=flat-square)](./LICENSE)
 
