@@ -38,8 +38,9 @@ The Forever PTO documentation wiki (docs.forever-pto.com). An Astro Starlight si
   list is derived from `dist/**/index.html` after the build, not from the MDX sources, because the source
   question ("does this file import from `components/demos/`?") answers yes for a page that merely names the
   folder in prose and for one that imports a plain constant like `APP_LOCALES`. The built HTML is what is
-  actually served. Sixty-five tests cover 64 pages plus a floor assertion, so a build that stops emitting
-  demos fails rather than passing with an empty list.
+  actually served. One test per page plus a floor assertion, so a build that stops emitting demos fails
+  rather than passing with an empty list; the floor is the number to read, and it is in the spec rather
+  than here, where nothing could keep it true.
 
   Each page is asserted three ways: it answers 200, every `data-demo` frame has at least one element child
   once scrolled into view, and the page raises no `pageerror` and logs no `console.error`. That third one is

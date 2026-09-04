@@ -25,7 +25,7 @@ Installs the whole workspace (**unfiltered** `pnpm install`: the demos import ap
 
 - `pnpm typecheck`: `astro check`, which typechecks the demo islands. This is the drift tripwire: demos import real app components via the `@ui` alias with exhaustive `Record<Variant, …>` maps, so renaming a CVA variant in the app breaks this build.
 - `pnpm build`: `astro build`; the resulting `apps/docs/dist` is uploaded as an artifact for the deploy jobs.
-- Playwright (`pnpm test:e2e`) runs against a local preview server: `apps/docs/playwright.config.ts` boots `astro preview` itself via `webServer`, so no deployment is needed to test. Seven specs are site-level smoke tests; the rest walk **every** page the build emitted a demo onto, asserting each answers 200, that every `data-demo` frame renders something once scrolled into view, and that the page raises no `pageerror` and logs no `console.error`. That last assertion is the one that matters: a demo can throw during hydration and still build green.
+- Playwright (`pnpm test:e2e`) runs against a local preview server: `apps/docs/playwright.config.ts` boots `astro preview` itself via `webServer`, so no deployment is needed to test. Some specs are site-level smoke tests; the rest walk **every** page the build emitted a demo onto, asserting each answers 200, that every `data-demo` frame renders something once scrolled into view, and that the page raises no `pageerror` and logs no `console.error`. That last assertion is the one that matters: a demo can throw during hydration and still build green.
 
 There is no Biome step here. Both packages are linted in one root pass from the app workflow; a second one over `apps/docs` would duplicate it.
 

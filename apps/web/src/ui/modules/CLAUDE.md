@@ -177,7 +177,7 @@ Vitest, `happy-dom`, co-located `.test.tsx`. Two exclusions in [`vitest.config.t
 
 **Coverage used to be deliberately uneven here, and this section is the record of it stopping.** It read
 *you should not read a missing test as an oversight to fix in passing*, and named `core/primitives/` as
-carrying three tests after saying for months that it carried none. Every folder under `modules/` is covered
+barely tested, after saying for months that it carried nothing at all. Every folder under `modules/` is covered
 file for file now, so the sentence that mattered is the inverse one: a component landing here without a
 co-located test is the oversight, and the paragraphs below say what each suite is actually asserting so the
 number cannot be mistaken for the guarantee. [`core/primitives/utils/helpers.test.ts`](./core/primitives/utils/helpers.test.ts) is still worth

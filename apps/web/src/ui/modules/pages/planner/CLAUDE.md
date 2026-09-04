@@ -537,15 +537,18 @@ at all, because `generateSuggestions` takes the window rather than its expansion
 
 ## Testing
 
-Thirty-one test files. Every component on this screen has one of its own except `HolidayRow`,
-`HolidayTableHeader` and `MetricCard`, which are exercised through the table and the summary that render
-them; the three fixtures are asserted on their shape, since a skeleton that grows a button or a word is a
-defect. The Playwright suite in `e2e/` asserts only that `/planner` answers 200, has a
-title, and does not trip the error boundary. No e2e spec drives a calculation, so nothing outside these
-files pins planner *behaviour*. **That count is worth recounting rather than trusting**: it said fifteen while
-the tree held sixteen, which is the failure mode a number in prose has.
+Every component on this screen carries a co-located test except `HolidayRow`, `HolidayTableHeader` and
+`MetricCard`, which are exercised through the table and the summary that render them; the three fixtures are
+asserted on their shape, since a skeleton that grows a button or a word is a defect. The Playwright suite in
+`e2e/` asserts only that `/planner` answers 200, has a title, and does not trip the error boundary. No e2e
+spec drives a calculation, so nothing outside these files pins planner *behaviour*.
 
-Two of the thirty-one cover this screen's remaining pure modules.
+**This paragraph used to open with a count of the test files, and the count is what went wrong with it**: it
+said fifteen while the tree held sixteen, then thirty-one while the tree grew past it. A number in prose has
+no way to stay true and nothing checks it, so the rule it stood for is written out instead. `ls` answers the
+other question in less time than it takes to distrust the sentence.
+
+Two of them cover this screen's remaining pure modules.
 [`calendar/utils/refusals.test.ts`](./calendar/utils/refusals.test.ts) asserts `DAY_REFUSAL_COPY` against
 `DayRefusal` itself, key set for key set, so a refusal added to the stores without copy fails here rather
 than rendering nothing on the calendar; it also pins that `describeHolidayRefusal` answers `null` for the one
