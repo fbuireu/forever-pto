@@ -214,7 +214,7 @@ would have passed with the branch deleted, and nothing covered a successful writ
 disagrees with its subject's return type cannot falsify anything the subject does with it.
 
 **Do not drive a function the same file has pinned as never called.** `paymentFailed.test.ts` asserts
-`getPaymentById` is never reached, and then carried two cases below it setting up `mockReturnValueOnce` on
+`getPaymentById` is never reached, and then carried cases below it setting up `mockReturnValueOnce` on
 that same function: a no-op, leaving both byte-identical in effect to the plain "calls updatePaymentStatus"
 case above. They are deleted; the never-called assertion is the one that means something.
 `paymentSucceeded.test.ts` carries the same assertion for the same reason, and its `getPaymentById` entry in

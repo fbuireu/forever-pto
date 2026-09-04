@@ -418,7 +418,7 @@ genuinely distinct, and also why a strong Bridge in the current plan cannot reap
 budget at all.** It computes `bonusDays = totalEffectiveDays − days.length`; the baseline is what the plan
 actually spent. It used to accept `totalPtoBudget` "so callers that already have it can pass it" and then
 never destructure it, an interface with a parameter and no behaviour behind it, which one caller dutifully
-supplied and one test existed only to confirm was discarded. Both are gone.
+supplied and a test existed only to confirm was discarded. Both are gone.
 
 **Gain is the budget-based twin, and it lives in `utils/budget.ts` beside `measureBudget`.** `measureGain`
 answers `{ overBudget, gain }` from `totalEffectiveDays` and the whole budget. It was six characters of
@@ -523,7 +523,7 @@ silently, because a stale Holiday set is structurally valid.
 
 **The Holiday set used to be a keyed `Map` with one key.** `createHolidaySet(holidays, cacheKey?)` fell back
 to `'default'`, and that fallback was the only key any production call site ever wrote; the second argument
-existed on the interface, in the type, and in three test cases that were its only callers. This guide stated
+existed on the interface, in the type, and in the test cases that were its only callers. This guide stated
 the fact without drawing the conclusion. It is one slot and `clearHolidayCache()` is one assignment, which
 reads as what it is: a memo the pipeline resets, not a cache anyone keys into. If a second Holiday list ever
 needs to coexist, the key comes back **with** the caller that needs it.

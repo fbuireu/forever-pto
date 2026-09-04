@@ -17,7 +17,7 @@ amendment is the last section of this file.
 ## Context
 
 Next 16.3.0 landed in `81222a48` together with TypeScript 7, and from that commit onward every pull request
-failed the same six tests in `e2e/[locale]/not-found.spec.ts`: an unknown path answered **500**, serving
+failed the same tests in `e2e/[locale]/not-found.spec.ts`: an unknown path answered **500**, serving
 Cloudflare's **Error 1101 (Worker threw exception)** page instead of the app's own 404. Nothing else on the
 site was affected, and the failure never showed locally.
 
@@ -125,7 +125,7 @@ adapter that no longer supports the version this app was pinned to is a differen
 range happens to include the version it was never built against.
 
 **What was verified locally, on this branch:** `pnpm typecheck` clean across all three projects, the unit
-suite at 2063 tests and the contract suite at 129, and `pnpm build` producing a full Next 16.3.3 production
+suite and the contract suite both green, and `pnpm build` producing a full Next 16.3.3 production
 build with `partialPrefetching` and `cacheComponents` both on.
 
 **What was not verified, and it is the bar this ADR set:** condition 2, a green `e2e` run against a preview

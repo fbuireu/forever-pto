@@ -376,9 +376,8 @@ test is usually a decision rather than an omission:
   and the three [`animate/primitives/base/`](./animate/primitives/base) wrappers beside
   [`Tooltip.tsx`](./animate/primitives/base/Tooltip.tsx) had none. These carry state
   machines, controlled/uncontrolled fallbacks and event composition: the parts that break silently.
-- `primitives/` is covered file for file now, and this bullet said it carried **one test,
-  `Combobox.test.tsx`, and that is the whole list** on the reasoning that the rest is markup plus `cn()`.
-  Two of them were not: [`Progress.tsx`](./primitives/Progress.tsx) computes the overlay's clip from the
+- `primitives/` is covered file for file now, and this bullet said it carried **`Combobox.test.tsx`
+  and nothing else** on the reasoning that the rest is markup plus `cn()`. Two of those files were not: [`Progress.tsx`](./primitives/Progress.tsx) computes the overlay's clip from the
   value, and [`Slider.tsx`](./primitives/Slider.tsx) forks a `number | readonly number[]` into the
   `number[]` every caller wants, both of which are the *arithmetic* kind of defect that renders as a
   plausible picture. The markup ones assert the thing a class list cannot: which element carries the

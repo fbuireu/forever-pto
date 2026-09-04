@@ -61,7 +61,7 @@ failure channel onto a status code. Business logic that lands here is in the wro
    app's own 404 page as HTML and the homepage's markdown at 200 to anything sending
    `Accept: text/markdown`, which tells a crawler or an agent that the page exists. The `Vary: Accept` header
    is on the 404 too, so a shared cache cannot serve one representation for the other. Verified by restoring
-   the fallthrough and watching four cases go red.
+   the fallthrough and watching the affected cases go red.
 
    **That 404 was unreachable end to end until the header fix below, and this paragraph read as though it
    were live.** `buildMarkdownPage` did answer `null` and the route did turn it into a 404, but no request
@@ -122,7 +122,7 @@ what was handed to `NextResponse.next`, so it sees the intent and never the runt
 **[`markdown.spec.ts`](../../e2e/api/markdown.spec.ts) drives the twin the way a client does, and it is the only place the proxy,
 the route and the header are proven to line up.** It used to request `/api/markdown` directly and assert
 200, `text/markdown` and `public, max-age=3600`: the three things the route refuses on exactly that path,
-so all five cases were red on every pull request and the `e2e` job with them. The sharp one asserted the
+so every case in it was red on every pull request and the `e2e` job with them. The sharp one asserted the
 *defect*: `?path=/en/planner` expecting 200, which `route.test.ts` pins as a 404, so making the spec green
 the obvious way would have put the query fallback back. It now requests the **page** route with
 `Accept: text/markdown` and asserts what the twin produces on each branch, plus the two claims no unit test

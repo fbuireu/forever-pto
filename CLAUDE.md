@@ -315,7 +315,7 @@ verified by listing. The two scripts in [`apps/web/package.json`](./apps/web/pac
 written that way, `test:e2e:ui` and `test:e2e:changed`, are not: both invoke `playwright test` with their flag
 directly. This paragraph said they still had the defect long after they stopped.
 
-**Three cases carry `@smoke`, all in [`apps/web/e2e/smoke.spec.ts`](./apps/web/e2e/smoke.spec.ts), and the step
+**The `@smoke` cases all live in [`apps/web/e2e/smoke.spec.ts`](./apps/web/e2e/smoke.spec.ts), and the step
 passes no `--pass-with-no-tests`, which is the point.** Playwright exits 1 on an empty set, so the flag would
 make a typo in the grep green; without it, a grep that stops matching fails the job, which is the only thing
 that keeps the set honest. They are the homepage with a non-empty title, the 404 route — `/_not-found` is the
@@ -330,7 +330,7 @@ distinguishes a running Worker from a bucket of assets; here the 404 route alrea
 On 2026-08-29 the merge of the Next 16.3.3 upgrade deployed cleanly and the 404 case passed, confirming the
 fault this repository had been carrying since 16.3.1 was gone. Then `/sitemap.xml` and `/api/health`
 answered **403** to the runner across all three retries, `smoke` failed, and `rollback` returned production
-to the broken version. A good deploy was reverted by two cases that were never about the Worker.
+to the broken version. A good deploy was reverted by cases that were never about the Worker.
 
 **So `/sitemap.xml` and `/api/health` are out of the set, and the rule is now explicit: a case whose result
 depends on the caller's address cannot hold the power to revert a release.** Both sibling repositories lost
