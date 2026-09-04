@@ -88,6 +88,20 @@ rename it, so both configs register `summaryLabel` from the root [`vitest.config
 a reporter whose whole job is writing the suite's own heading above its block, on CI only. Neither block
 duplicates the other; the labels are what say so without counting tests.
 
+**Coverage has a floor of 85 on all four metrics, and it sits on the app package's config alone.**
+[`apps/web/vitest.config.ts`](./apps/web/vitest.config.ts) declares `thresholds` from one `MIN_THRESHOLD`
+const, the same shape and the same number the sibling repositories use, so a package that drifts below it
+fails `verify` rather than being noticed in a report nobody opens. The measured margin when it was added was
+comfortable, and branches is the tight one: a change that guts a branch-heavy module trips this before it
+trips a reviewer.
+
+**The root config deliberately has none, and the reason is worth knowing before adding one.** The root
+Vitest collects `tests/docs-consistency.test.ts`, which imports `next.config.ts` to read `PUBLIC_ENV`, and it
+declares no `coverage.include`, so the only file the report ever covers is that config, at a fraction of its
+branches. That number measures nothing, and a floor over it would fail every run. Restricting or dropping the
+root's coverage collection is the real fix; until then, read the second report as an artifact rather than a
+measurement.
+
 ## Shared tooling
 
 **One Biome config, at the root, for both packages.** `--changed` needs the git root to compare against,

@@ -1,6 +1,8 @@
 import { defineConfig } from "vitest/config";
 import { summaryLabel } from "../../vitest.config";
 
+const MIN_THRESHOLD = 85;
+
 export default defineConfig({
 	resolve: {
 		tsconfigPaths: true,
@@ -37,6 +39,12 @@ export default defineConfig({
 				"src/ui/modules/core/animate/icons/!(Icon).tsx",
 				"src/ui/i18n/messages/**",
 			],
+			thresholds: {
+				lines: MIN_THRESHOLD,
+				functions: MIN_THRESHOLD,
+				branches: MIN_THRESHOLD,
+				statements: MIN_THRESHOLD,
+			},
 		},
 	},
 });
