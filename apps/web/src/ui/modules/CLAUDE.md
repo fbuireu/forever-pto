@@ -175,13 +175,17 @@ Vitest, `happy-dom`, co-located `.test.tsx`. Two exclusions in [`vitest.config.t
 - `src/ui/modules/core/animate/icons/`: excluded from the **coverage report** only, and the glob spares
   `Icon.tsx`, whose co-located test runs with everything else.
 
-Coverage is deliberately uneven and you should not read a missing test as an oversight to fix in
-passing. [`core/animate/`](./core/animate) is tested close to exhaustively; [`core/primitives/`](./core/primitives) carries three, and
-this sentence said it carried none long after `Sonner.test.tsx` and `Combobox.test.tsx` landed, which is why
-the third, [`core/primitives/utils/helpers.test.ts`](./core/primitives/utils/helpers.test.ts), is named here
-rather than counted: it is the whole of the logic in that folder, `hasFlag`, and the reason an empty `flag`
-string has to read as no flag is that a Region has none and the picker would otherwise render a blank slot;
-`pages/`, `shared/` and `sidebar/` have tests only where logic lives (`ManagementBar`, `Summary` charts,
+**Coverage used to be deliberately uneven here, and this section is the record of it stopping.** It read
+*you should not read a missing test as an oversight to fix in passing*, and named `core/primitives/` as
+carrying three tests after saying for months that it carried none. Every folder under `modules/` is covered
+file for file now, so the sentence that mattered is the inverse one: a component landing here without a
+co-located test is the oversight, and the paragraphs below say what each suite is actually asserting so the
+number cannot be mistaken for the guarantee. [`core/primitives/utils/helpers.test.ts`](./core/primitives/utils/helpers.test.ts) is still worth
+naming rather than counting: it is the whole of the logic in that folder, `hasFlag`, and the reason an empty
+`flag` string has to read as no flag is that a Region has none and the picker would otherwise render a blank
+slot.
+
+The tests that predate that sweep are the ones sitting on logic (`ManagementBar`, `Summary` charts,
 homepage sections, `shared/utils/helpers.ts`, the two forms that render an API failure,
 [`sidebar/components/WorkdayCounter.tsx`](./sidebar/components/WorkdayCounter.tsx), which is the one component
 in that folder that *counts* rather than renders and whose cases pin that a Holiday leaves the workday total
@@ -195,8 +199,16 @@ without discarding its own open state, `sidebar/components/CarryOverMonths.test.
 write it drops on unmount, `sidebar/components/LanguageSelector.test.tsx` the code-versus-label switch by rail
 state, `sidebar/components/WorkdayCounterCalendarModal.test.tsx` that open and close both go through the owner
 that holds the state, and [`sidebar/AppSidebar.test.tsx`](./sidebar/AppSidebar.test.tsx) the tutorial anchors, the
-landmark the skip link targets and the year handed to both windowed controls. Components whose body is markup
-plus translation calls are still left to the Playwright suite in `e2e/`.
+landmark the skip link targets and the year handed to both windowed controls.
+
+**A component whose body is markup plus translation calls is no longer left to `e2e/`, and what its test
+asserts is chosen so it can fail.** Re-rendering the markup back as an expectation proves only that the file
+parses. So these assert the seam instead: the key resolves in a bundle rather than falling through to its own
+name, the accessible name reaches the element that carries the behaviour, an `href` points where the copy
+says, and a `dynamic()` loader resolves to the export it names. That last one is the reason the fixtures
+([`pages/planner/PlannerPanelFixture.tsx`](./pages/planner/PlannerPanelFixture.tsx) and its two siblings) are
+asserted on their **shape**: a skeleton that grows a button or a word has stopped being a skeleton, and
+nothing else in the tree would say so.
 
 **An accessible name is behaviour, so the components that grew one grew a test with it.**
 [`shared/cookie-consent/CookieConsentDialog.test.tsx`](./shared/cookie-consent/CookieConsentDialog.test.tsx)
