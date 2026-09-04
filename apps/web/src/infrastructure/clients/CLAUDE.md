@@ -2,8 +2,9 @@
 
 ## `LoggerService` is a tag with one adapter, on purpose
 
-It looks like ceremony and the cost is real: eleven modules carry it in `R`, twelve test files build a
-five-method stub, and `LoggerServiceLive` hands back the same singleton `getBetterStackInstance()` does. It
+It looks like ceremony and the cost is real: every module that logs carries it in `R`, every test that
+reaches one builds a five-method stub, and `LoggerServiceLive` hands back the same singleton
+`getBetterStackInstance()` does. It
 buys one property, verified rather than assumed: because `activateWithEmail` annotates its return type as
 requiring `TursoService` and nothing else, a `yield* LoggerService` creeping into its body fails the build at
 that function. A singleton call cannot do that, since it is not a requirement and never appears in a type.
