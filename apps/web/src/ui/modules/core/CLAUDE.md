@@ -372,16 +372,28 @@ Vitest with `happy-dom`, co-located `*.test.tsx`. Coverage here is deliberately 
 test is usually a decision rather than an omission:
 
 - `animate/base/` is covered file for file, and so are `animate/components/`, `animate/effects/`,
-  `animate/text/SlidingNumber.tsx` and [`animate/primitives/base/Tooltip.tsx`](./animate/primitives/base/Tooltip.tsx). These carry state
+  `animate/text/` and `animate/primitives/`, the last two only since this branch: `animate/text/Rotating.tsx`
+  and the three [`animate/primitives/base/`](./animate/primitives/base) wrappers beside
+  [`Tooltip.tsx`](./animate/primitives/base/Tooltip.tsx) had none. These carry state
   machines, controlled/uncontrolled fallbacks and event composition: the parts that break silently.
-- `primitives/` has **one test, `Combobox.test.tsx`, and that is the whole list**. The rest of those files
-  are markup plus `cn()`, and the Playwright suite in `e2e/` only proves the pages holding them render; see
-  [`../CLAUDE.md`](../CLAUDE.md) for what those specs actually assert, which is less than the word "covered"
-  suggests. `Combobox` earns its test because it is the one primitive here with a behaviour: it maps a click
-  on a list item back to an option and decides what to hand its caller. It mocks
+- `primitives/` is covered file for file now, and this bullet said it carried **one test,
+  `Combobox.test.tsx`, and that is the whole list** on the reasoning that the rest is markup plus `cn()`.
+  Two of them were not: [`Progress.tsx`](./primitives/Progress.tsx) computes the overlay's clip from the
+  value, and [`Slider.tsx`](./primitives/Slider.tsx) forks a `number | readonly number[]` into the
+  `number[]` every caller wants, both of which are the *arithmetic* kind of defect that renders as a
+  plausible picture. The markup ones assert the thing a class list cannot: which element carries the
+  accessible name, and that a caller's `className` replaces the default rather than joining it.
+  `Combobox` is still the one whose behaviour is the whole point: it maps a click on a list item back to
+  an option and decides what to hand its caller. It mocks
   `animate/base/Popover` the way [`animate/base/Popover.test.tsx`](./animate/base/Popover.test.tsx) mocks the Base UI primitives (the popup
   needs layout this environment does not have), and keeps `cmdk` real, because cmdk is what decides which
   string `onSelect` receives.
+
+  **`Progress.test.tsx` composes the three parts the way [`../pages/planner/PlannerPanel.tsx`](../pages/planner/PlannerPanel.tsx) does, and the
+  obvious composition renders nothing.** `ProgressTrack` passes `{...props}` to `ProgressPrimitive.Track`
+  *and* gives it an explicit `MotionIndicator` child, so JSX children win and anything a caller nests
+  inside the track is silently dropped. `ProgressOverlayLabel` is a **sibling** of the track, not a child;
+  writing it as a child is a test that renders an empty bar and asserts nothing.
 - `animate/icons/` is excluded from the **coverage report** only, and the glob already spares `Icon.tsx`.
   The 22 icons are mechanical wrappers around SVG path data; `Icon.tsx` is not, and its co-located
   [`Icon.test.tsx`](./animate/icons/Icon.test.tsx) runs with everything else. Nothing under `core/` is excluded from the test run.
