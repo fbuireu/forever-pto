@@ -93,7 +93,7 @@ the same get/miss/set dance, with options that had drifted: default fraction dig
 in the second (which also hard-coded `'EUR'` twenty lines below the `DEFAULT_CURRENCY` const it should have
 read), and `0` plus a `try/catch` in the third that the other two lacked.
 
-`getCurrencySymbol` had **no production caller** at all, only its own five tests: the third instance in this
+`getCurrencySymbol` had **no production caller** at all, only its own tests: the third instance in this
 codebase of a function kept alive by its test suite. It is gone.
 
 `getCurrencyForLocale` also stopped round-tripping through `resolvedOptions().currency`. It always constructed

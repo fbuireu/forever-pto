@@ -66,7 +66,7 @@ There are exactly four producers of a `HolidayDTO` (`create`, `createCustom`, th
 `deserializeHolidays`, and the rehydration revive), and all four hand back a real `Date`. So `normalize` was
 the identity function, and its one caller ran it over an array that was already uniform.
 
-**Nothing could have told you that from the tests**, which is the part worth remembering. Its own four cases
+**Nothing could have told you that from the tests**, which is the part worth remembering. Its own cases
 included one asserting the coercion, written as `date: '2024-06-15' as unknown as Date`, a cast whose only
 purpose is to defeat the type the code does not believe. And [`holidays.test.ts`](../stores/holidays.test.ts) mocked `normalize` to the
 identity function, so the store test could not distinguish "essential" from "no-op" either. Both are gone
@@ -201,7 +201,7 @@ separator (`10.000`, `10 000`, `10,000`). Raising the cap made every bundle lie.
 [`JsonLd.tsx`](../../ui/modules/shared/seo/JsonLd.tsx)'s `MINIMUM_DONATION` reads `AMOUNT_MIN` for the same reason: the structured data advertises a
 `minPrice`, and the app guide used to say the two "move together" as an instruction to the reader.
 
-**There is one `calculateFinalAmount` now, and it is the private one in `@infrastructure/services/payments/provider/promoCode` that actually applies a Stripe coupon.** This folder used to export a second function of the same name whose whole body was `discountInfo?.finalAmount ?? baseAmount`: one caller, three tests, and a paragraph here whose only job was to stop a reader confusing it with the one that does the work. [`Donate.tsx`](../../ui/modules/shared/donate/Donate.tsx) reads the field directly.
+**There is one `calculateFinalAmount` now, and it is the private one in `@infrastructure/services/payments/provider/promoCode` that actually applies a Stripe coupon.** This folder used to export a second function of the same name whose whole body was `discountInfo?.finalAmount ?? baseAmount`: one caller, its own tests, and a paragraph here whose only job was to stop a reader confusing it with the one that does the work. [`Donate.tsx`](../../ui/modules/shared/donate/Donate.tsx) reads the field directly.
 
 ## Testing
 

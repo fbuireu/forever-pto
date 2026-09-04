@@ -15,7 +15,7 @@ real one) it reads as pure ceremony.
 
 The cost is real and spread across the tree. Eleven production modules carry `LoggerService` in their `R`:
 both payment handlers, four use-cases, `zodParse`, the webhook route, the payments confirmation service and
-the Premium activation operation. Twelve test files build a five-method `Layer.succeed(LoggerService, { … })`
+the Premium activation operation. Every test that reaches one builds a five-method `Layer.succeed(LoggerService, { … })`
 stub. [`api/operations/activatePremium.ts`](../apps/web/src/infrastructure/api/operations/activatePremium.ts) opens an `Effect.gen` inside its `catchAll` for no reason other
 than to `yield*` a logger. And [ADR 0002](./0002-effect-for-external-service-boundaries.md) already places
 logging *outside* Effect: BetterStack has both a tag and a plain singleton, and the singleton is what the
@@ -64,7 +64,7 @@ than stylistic on any Effect program under `@application/use-cases`.
 
   [`../apps/web/src/infrastructure/clients/CLAUDE.md`](../apps/web/src/infrastructure/clients/CLAUDE.md).
   A test asserting "nothing logged" is only meaningful for code that reaches the tag.
-- **Twelve test files pay a five-method stub, and that stays.** It is the price of the signal. Shrinking the
+- **Every test that reaches one pays a five-method stub, and that stays.** It is the price of the signal. Shrinking the
   tag's interface would reduce it, but every method has a caller.
 - **The two-mechanism split at the confirmation page is left standing.** It is on the wrong side of this
   decision and is cheap to fix by routing that page through the operation; it has not been, and it is the
