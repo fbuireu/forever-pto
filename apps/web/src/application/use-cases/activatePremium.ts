@@ -103,7 +103,10 @@ export const activateWithPayment = ({
 }: {
 	paymentIntentId: string;
 	clientSecret: string;
-}): DonationActivation => activateFromDonation({ paymentIntentId, clientSecret, expectedEmail: undefined });
+}): DonationActivation =>
+	activateFromDonation({ paymentIntentId, clientSecret, expectedEmail: undefined }).pipe(
+		Effect.withSpan("activateWithPayment"),
+	);
 
 export const activateWithClaimedPayment = ({
 	paymentIntentId,
@@ -111,7 +114,10 @@ export const activateWithClaimedPayment = ({
 }: {
 	paymentIntentId: string;
 	expectedEmail: string;
-}): DonationActivation => activateFromDonation({ paymentIntentId, expectedEmail, clientSecret: undefined });
+}): DonationActivation =>
+	activateFromDonation({ paymentIntentId, expectedEmail, clientSecret: undefined }).pipe(
+		Effect.withSpan("activateWithClaimedPayment"),
+	);
 
 export const activateWithEmail = (
 	email: string,
@@ -131,4 +137,4 @@ export const activateWithEmail = (
 		const token = yield* createSession({ email: normalizedEmail, paymentIntentId: payment.id });
 
 		return { email: normalizedEmail, premiumKey: payment.id, token, deferred: Effect.void };
-	});
+	}).pipe(Effect.withSpan("activateWithEmail"));

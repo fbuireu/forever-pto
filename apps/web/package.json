@@ -101,6 +101,8 @@
 		"zustand": "5.0.14"
 	},
 	"devDependencies": {
+		"@opentelemetry/context-async-hooks": "2.11.0",
+		"@opentelemetry/sdk-trace-base": "2.11.0",
 		"@playwright/test": "1.62.1",
 		"@tailwindcss/postcss": "4.3.3",
 		"@testing-library/react": "16.3.3",

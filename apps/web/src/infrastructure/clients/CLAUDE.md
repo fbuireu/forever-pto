@@ -69,6 +69,27 @@ manifest and nothing else, because the Worker entrypoint bundles it before Next 
 binding unbound it returns a configuration with no exporter rather than one pointed at `undefined`;
 `tracing.test.ts` pins that fallback, the sampling ratio and the header.
 
+**`tracer.ts` is what makes `Effect.withSpan` reach BetterStack, and it is deliberately not
+`@effect/opentelemetry`.** That package would do the same job and declares eight peer dependencies, most of
+them SDK packages the Worker never runs; the bridge is one file. `Tracer.make` gets two hooks. `span` opens an
+OpenTelemetry span through `trace.getTracer(LOG_SERVICE)`, parented on the Effect parent when there is one
+and otherwise on whatever OpenTelemetry context is active, which inside a request is the root span
+`@microlabs/otel-cf-workers` opened for it. `context` runs the fiber with the Effect span set as the active
+OpenTelemetry context, so a `fetch` made inside a use-case nests under the use-case's span rather than
+under the request's. The Effect side of each span (`status`, `attributes`, `links`) is kept as well, because
+`Effect.currentSpan` and the test helpers read it. A failed exit sets `ERROR` with `Cause.pretty`; an
+interruption does not. Attribute values that are not primitives are stringified, since OpenTelemetry
+accepts nothing else. `tracer.test.ts` runs a real `BasicTracerProvider` with an in-memory exporter and an
+`AsyncLocalStorageContextManager`, the same context manager the Worker library installs, and pins the
+parenting in both directions, the error status and the attribute carry-over.
+
+**Every log entry carries the active span's `traceId` and `spanId`.** [`correlation.ts`](./logging/better-stack/correlation.ts)
+reads them off `trace.getActiveSpan()` and `BetterStackClient.getFullContext` spreads them under the base
+context, so inside a request a log line names the request span, and inside a use-case it names the
+use-case's own span, since the bridge makes that one active. Off a span it adds nothing rather than empty
+strings. A caller's own `traceId` wins, which is how a log about a *different* trace stays sayable.
+`correlation.test.ts` and `client.test.ts` pin both halves.
+
 ## Purpose
 
 One folder per external SDK, and nothing else in the repo constructs one. Four of them are Effect services:
@@ -217,6 +238,7 @@ exercises. Adding a method here means adding its caller and its error mapping in
 | [`logging/better-stack/client.ts`](./logging/better-stack/client.ts) | Deliberate exception: `getBetterStackInstance()` is what stores, lookups and components use ([ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md)) |
 | [`logging/better-stack/tracking.ts`](./logging/better-stack/tracking.ts) | Not a logger at all: `track()` and `identifyUser()` push to the `window.betterstack` snippet injected by the UI layer's [`modules/tracking/BetterStackTracking.tsx`](../../ui/modules/tracking/BetterStackTracking.tsx). Both no-op when the snippet has not loaded |
 | [`logging/better-stack/tracing.ts`](./logging/better-stack/tracing.ts) | Not a client either: `tracingConfig(env)` is a pure function the Worker entrypoint [`worker.ts`](../../../worker.ts) hands to `instrument`, so it runs before Next does and outside any layer ([ADR 0015](../../../../../adr/0015-traces-reach-betterstack-by-wrapping-the-opennext-entrypoint.md)) |
+| [`logging/better-stack/tracer.ts`](./logging/better-stack/tracer.ts) | An Effect `Tracer`, not a client: `TracerLive` is `Layer.setTracer` over a bridge from Effect spans to the OpenTelemetry tracer the Worker wrapper registers, merged into `ApplicationLayer` |
 | [`tutorial/driver/client.tsx`](./tutorial/driver/client.tsx) | Wraps driver.js, a DOM library. It renders a close icon into the popover, but never imports one: the icon arrives as the injected `closeIcon?: ReactNode` config field, so nothing here reaches into `@ui/*` |
 
 `logging/better-stack/client.ts` is the one to read before touching. **A log call cannot fail its caller, and
