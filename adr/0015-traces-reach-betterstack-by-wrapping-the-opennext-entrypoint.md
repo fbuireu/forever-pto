@@ -86,5 +86,7 @@ library rewritten with fewer features.
   ships that bridge declares eight peer dependencies, most of them SDK packages the Worker never runs, and
   the bridge it would replace is under two hundred lines with a test that runs a real tracer provider. A
   fetch made inside a use-case nests under the use-case span, which is what makes the trace readable.
+  Every log entry stamps the active span's `traceId` and `spanId`, so the log line that failed and the trace
+  it failed in answer one query in BetterStack.
 - Where this bites: the *Deploy* section of [`apps/web/CLAUDE.md`](../apps/web/CLAUDE.md), and the clients guide
   at [`apps/web/src/infrastructure/clients/CLAUDE.md`](../apps/web/src/infrastructure/clients/CLAUDE.md).

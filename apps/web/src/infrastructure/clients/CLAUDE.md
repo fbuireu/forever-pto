@@ -83,6 +83,13 @@ accepts nothing else. `tracer.test.ts` runs a real `BasicTracerProvider` with an
 `AsyncLocalStorageContextManager`, the same context manager the Worker library installs, and pins the
 parenting in both directions, the error status and the attribute carry-over.
 
+**Every log entry carries the active span's `traceId` and `spanId`.** [`correlation.ts`](./logging/better-stack/correlation.ts)
+reads them off `trace.getActiveSpan()` and `BetterStackClient.getFullContext` spreads them under the base
+context, so inside a request a log line names the request span, and inside a use-case it names the
+use-case's own span, since the bridge makes that one active. Off a span it adds nothing rather than empty
+strings. A caller's own `traceId` wins, which is how a log about a *different* trace stays sayable.
+`correlation.test.ts` and `client.test.ts` pin both halves.
+
 ## Purpose
 
 One folder per external SDK, and nothing else in the repo constructs one. Four of them are Effect services:
