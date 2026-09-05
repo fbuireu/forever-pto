@@ -2,13 +2,11 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { mockGetCloudflareContext, mockCacheLife } = vi.hoisted(() => ({
+const { mockGetCloudflareContext } = vi.hoisted(() => ({
 	mockGetCloudflareContext: vi.fn(),
-	mockCacheLife: vi.fn(),
 }));
 
 vi.mock("@opennextjs/cloudflare", () => ({ getCloudflareContext: mockGetCloudflareContext }));
-vi.mock("next/cache", () => ({ cacheLife: mockCacheLife }));
 
 const { getPublicEnv } = await import("./getPublicEnv");
 
@@ -30,18 +28,13 @@ describe("getPublicEnv", () => {
 		});
 	});
 
-	it('reads the Cloudflare context in its async form, the only one valid under "use cache"', async () => {
+	it("reads the Cloudflare context in its async form, the only one valid during prerender", async () => {
 		await getPublicEnv();
 		expect(mockGetCloudflareContext).toHaveBeenCalledWith({ async: true });
 	});
 
-	it("declares a cache lifetime, so a dozen call sites do not each re-enter the runtime", async () => {
-		await getPublicEnv();
-		expect(mockCacheLife).toHaveBeenCalledWith("days");
-	});
-
-	it('keeps the "use cache" directive, which nothing else in the module system enforces', () => {
+	it('carries no "use cache" directive, since Cache Components hang requests on workerd', () => {
 		const source = readFileSync(resolve(process.cwd(), "src/infrastructure/services/env/getPublicEnv.ts"), "utf8");
-		expect(source).toMatch(/["']use cache["']/);
+		expect(source).not.toMatch(/["']use cache["']/);
 	});
 });

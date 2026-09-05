@@ -1,6 +1,5 @@
 import { Badge } from "@ui/modules/core/primitives/Badge";
 import { cn } from "@ui/utils/cn";
-import { cacheLife } from "next/cache";
 import type { Locale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { brutCard } from "./shared";
@@ -23,8 +22,6 @@ interface TestimonialsProps {
 }
 
 export const Testimonials = async ({ locale }: TestimonialsProps) => {
-	"use cache";
-	cacheLife("days");
 	const t = await getTranslations({ locale, namespace: "homepage" });
 
 	return (

@@ -528,8 +528,9 @@ generic and the `"wrapper" in props` narrowing are gone; a conditional `<div>` i
 needs no component.
 
 **`pages/homepage/sections/Testimonials.tsx` does not shuffle, and the shuffle it had did nothing three
-ways.** It is a `'use cache'` server component with `cacheLife('days')`, so `TESTIMONIAL_KEYS.toSorted(() =>
-Math.random() - 0.5)` ran once per cache period rather than per visitor: the order every reader saw was
+ways.** It was a `'use cache'` server component with `cacheLife('days')` then, and is a prerendered one now,
+so `TESTIMONIAL_KEYS.toSorted(() => Math.random() - 0.5)` ran once per cache period, and would run once per
+build, rather than per visitor: the order every reader saw was
 whatever one render happened to produce. `toSorted` with a random comparator is a biased shuffle regardless,
 and `CARD_STYLES[idx]` keys the avatar colour and the tilt to the *slot*, so a re-render silently repainted
 every testimonial. Rendering `TESTIMONIAL_KEYS` in order makes the colour a property of the person. Bringing
