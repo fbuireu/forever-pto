@@ -1,23 +1,32 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { LOG_LEVEL, type LogLevel } from "./contract";
 
-const { mockLogtail, MockLogtail } = vi.hoisted(() => {
-	const mockLogtail = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() };
+const { mockLogtail, mockLogtailConstructor, mockGetCloudflareContext, requestContext } = vi.hoisted(() => {
+	const mockLogtail = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn(), flush: vi.fn() };
 	class MockLogtail {
 		debug = mockLogtail.debug;
 		info = mockLogtail.info;
 		warn = mockLogtail.warn;
 		error = mockLogtail.error;
+		flush = mockLogtail.flush;
 	}
-	return { mockLogtail, MockLogtail };
+	const requestContext = { waitUntil: vi.fn(), passThroughOnException: vi.fn() };
+	return {
+		mockLogtail,
+		mockLogtailConstructor: vi
+			.fn()
+			.mockImplementation(MockLogtail as unknown as () => InstanceType<typeof MockLogtail>),
+		mockGetCloudflareContext: vi.fn().mockReturnValue({ ctx: requestContext }),
+		requestContext,
+	};
 });
 
 vi.mock("@logtail/edge", () => ({
-	Logtail: vi.fn().mockImplementation(MockLogtail as unknown as () => InstanceType<typeof MockLogtail>),
+	Logtail: mockLogtailConstructor,
 }));
 
 vi.mock("@opennextjs/cloudflare", () => ({
-	getCloudflareContext: vi.fn().mockReturnValue({ ctx: {} }),
+	getCloudflareContext: mockGetCloudflareContext,
 }));
 
 process.env.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN = "test-token";
@@ -27,6 +36,7 @@ const { BetterStackClient, getBetterStackInstance } = await import("./client");
 
 beforeEach(() => {
 	vi.clearAllMocks();
+	mockGetCloudflareContext.mockReturnValue({ ctx: requestContext });
 });
 
 describe("getBetterStackInstance", () => {
@@ -141,6 +151,63 @@ describe("BetterStackClient.measureAsync", () => {
 		expect(mockLogtail.error).toHaveBeenCalled();
 		const [, ctx] = mockLogtail.error.mock.calls[0];
 		expect(ctx.status).toBe("error");
+	});
+});
+
+describe("the transport is scoped to the request", () => {
+	const anotherRequest = () => ({ waitUntil: vi.fn(), passThroughOnException: vi.fn() });
+
+	it("hands the request's own ExecutionContext to the transport, so the flush rides waitUntil", () => {
+		new BetterStackClient().info("hello");
+
+		expect(mockLogtail.info).toHaveBeenCalledWith("hello", expect.anything(), requestContext);
+	});
+
+	it("reuses one transport for every log of the same request", async () => {
+		vi.resetModules();
+		const { BetterStackClient: Fresh } = await import("./client");
+		const client = new Fresh();
+
+		client.info("first");
+		client.warn("second");
+		client.error("third");
+
+		expect(mockLogtailConstructor).toHaveBeenCalledTimes(1);
+		vi.resetModules();
+	});
+
+	it("builds a separate transport for a different request, so no batch or timer is shared across two", async () => {
+		vi.resetModules();
+		const { BetterStackClient: Fresh } = await import("./client");
+		const client = new Fresh();
+
+		mockGetCloudflareContext.mockReturnValue({ ctx: anotherRequest() });
+		client.info("from request a");
+		mockGetCloudflareContext.mockReturnValue({ ctx: anotherRequest() });
+		client.info("from request b");
+
+		expect(mockLogtailConstructor).toHaveBeenCalledTimes(2);
+		vi.resetModules();
+	});
+
+	it("flushes right away off a request, where there is no waitUntil to carry a batch", async () => {
+		vi.resetModules();
+		mockGetCloudflareContext.mockImplementation(() => {
+			throw new Error("not in a request");
+		});
+		const { BetterStackClient: Fresh } = await import("./client");
+
+		new Fresh().info("from the browser");
+
+		expect(mockLogtail.info).toHaveBeenCalledWith("from the browser", expect.anything(), undefined);
+		expect(mockLogtail.flush).toHaveBeenCalledTimes(1);
+		vi.resetModules();
+	});
+
+	it("does not flush on a request, where the batch flushes on its own inside waitUntil", () => {
+		new BetterStackClient().info("on a request");
+
+		expect(mockLogtail.flush).not.toHaveBeenCalled();
 	});
 });
 

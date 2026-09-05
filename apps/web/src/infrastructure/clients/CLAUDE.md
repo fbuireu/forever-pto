@@ -213,9 +213,9 @@ exercises. Adding a method here means adding its caller and its error mapping in
 `logging/better-stack/client.ts` is the one to read before touching. **A log call cannot fail its caller, and
 that is the property everything else here leans on.** Three things hold it up, and all three are load-bearing:
 
-- `getLogtail()` builds the transport on first use and returns `null` (not a throw) when
-  `NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN` or `NEXT_PUBLIC_BETTER_STACK_INGESTING_URL` is missing, warning once
-  on the console so the misconfiguration is still visible.
+- `createTransport()` returns `null` (not a throw) when `NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN` or
+  `NEXT_PUBLIC_BETTER_STACK_INGESTING_URL` is missing, warning once on the console so the misconfiguration is
+  still visible.
 - every level goes through `send`, whose `try` swallows a transport that throws synchronously.
 - the call itself is fire-and-forget (`void`), so a rejected ingestion never surfaces either.
 
@@ -228,6 +228,20 @@ equally a defect. The guarantee has to live in the client, and `describe('a log 
 
 The price is that a lost log is silent, and `getExecutionContext()` reads the Cloudflare context through a
 `try` returning `undefined`, so logging off-request works but loses `waitUntil`.
+
+**The Logtail transport is scoped to the request, and it used to be one module-level instance.** `Logtail`
+batches: the first `log()` of a batch arms a `setTimeout`, later calls join the buffer, and the timer's
+callback is what runs the `fetch`. Shared across requests, that batcher scheduled its timer inside request A
+and delivered request B's lines through it, which is the two failure shapes workerd reports for I/O that
+crosses a request boundary: `Cannot perform I/O on behalf of a different request`, and a request the runtime
+cancels as hung while it waits on a promise another request's context owns. `getTransport` keeps one
+`Logtail` per `ExecutionContext` in a `WeakMap`, so a request's lines batch together, flush inside its own
+`waitUntil`, and the instance is collected with the request; nothing outlives it. Off a request (the browser,
+`next build`, a `getCloudflareContext()` that throws) there is no context to key on and no `waitUntil` to
+carry a batch, so `send` builds a throwaway transport and calls `flush()` at once, one POST per line. That
+path is the browser's and logs rarely, so the lost batching costs nothing measurable. `client.test.ts`
+pins all of it under `describe('the transport is scoped to the request')`: same context, one constructor
+call; two contexts, two; no context, an immediate flush.
 
 Both `DriverClient` and `StripeClient` keep mutable instance state behind a module-level singleton, so a
 second `getDriverClientInstance()` returns the same tour, and a second `getStripeClientInstance()` returns

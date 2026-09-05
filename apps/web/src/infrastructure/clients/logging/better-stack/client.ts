@@ -1,5 +1,5 @@
 import { Logtail } from "@logtail/edge";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { type CloudflareContext, getCloudflareContext } from "@opennextjs/cloudflare";
 import { LOG_LEVEL, LOG_SERVICE, type LogLevel, stripQuery } from "./contract";
 
 interface LogContext {
@@ -9,27 +9,35 @@ interface LogContext {
 const UNCONFIGURED_WARNING =
 	"BetterStack logging is disabled: NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN and NEXT_PUBLIC_BETTER_STACK_INGESTING_URL are not both defined";
 
-let logtail: Logtail | null = null;
+const transports = new WeakMap<CloudflareContext["ctx"], Logtail>();
 let warnedUnconfigured = false;
 
-const getLogtail = () => {
-	if (!logtail) {
-		const sourceToken = process.env.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN;
-		const ingestingUrl = process.env.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL;
+const createTransport = () => {
+	const sourceToken = process.env.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN;
+	const ingestingUrl = process.env.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL;
 
-		if (!sourceToken || !ingestingUrl) {
-			if (!warnedUnconfigured) {
-				warnedUnconfigured = true;
-				console.warn(UNCONFIGURED_WARNING);
-			}
-
-			return null;
+	if (!sourceToken || !ingestingUrl) {
+		if (!warnedUnconfigured) {
+			warnedUnconfigured = true;
+			console.warn(UNCONFIGURED_WARNING);
 		}
 
-		logtail = new Logtail(sourceToken, { endpoint: ingestingUrl, warnAboutMissingExecutionContext: false });
+		return null;
 	}
 
-	return logtail;
+	return new Logtail(sourceToken, { endpoint: ingestingUrl, warnAboutMissingExecutionContext: false });
+};
+
+const getTransport = (ctx: CloudflareContext["ctx"] | undefined) => {
+	if (!ctx) return createTransport();
+
+	const existing = transports.get(ctx);
+	if (existing) return existing;
+
+	const created = createTransport();
+	if (created) transports.set(ctx, created);
+
+	return created;
 };
 
 const getExecutionContext = () => {
@@ -49,7 +57,12 @@ interface SendParams {
 
 const send = ({ level, message, context }: SendParams) => {
 	try {
-		void getLogtail()?.[level](message, context, getExecutionContext());
+		const ctx = getExecutionContext();
+		const transport = getTransport(ctx);
+		if (!transport) return;
+
+		void transport[level](message, context, ctx);
+		if (!ctx) void transport.flush();
 	} catch {
 		return;
 	}
