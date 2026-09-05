@@ -377,13 +377,39 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
 
 ## Deploy
 
-Cloudflare Workers via wrangler ([`wrangler.toml`](./wrangler.toml)): `.open-next/worker.js` as the entrypoint,
-`.open-next/assets` served through the `ASSETS` binding, an R2 bucket for the incremental cache, a
+Cloudflare Workers via wrangler ([`wrangler.toml`](./wrangler.toml)): [`worker.ts`](./worker.ts) as the entrypoint, a
+wrapper that imports the handler OpenNext writes to `.open-next/worker.js` and exports it instrumented for
+tracing, `.open-next/assets` served through the `ASSETS` binding, an R2 bucket for the incremental cache, a
 `PAYMENT_RATE_LIMITER` `[[ratelimits]]` binding for the payment limiter, smart placement, and a
 `forever-pto-tail` tail consumer, which is its own Worker under [`workers/tail/`](./workers/tail) and is deployed by the `deploy-tail`
 job when the files its bundle is built from change. Only `env.production` binds a
 route (`forever-pto.com/*`); `env.development` supplies the preview bindings and CI deploys one worker per PR
 from it: `pr-<number>-forever-pto-development.fbuireu.workers.dev`, deleted when the PR closes.
+
+**Traces go to BetterStack from a wrapper around the generated entrypoint, and that wrapper is the one file in
+the tree that imports a file the tree does not contain.** `wrangler.toml` used to name `.open-next/worker.js`
+as `main`; it names [`worker.ts`](./worker.ts) now, which imports that generated module and exports
+`instrument(handler, tracingConfig)` from `@microlabs/otel-cf-workers`: a root span per request, a child span
+per outbound `fetch` (Stripe, Turso, the R2 cache), exported as OTLP to the `/v1/traces` path of the same
+BetterStack host the logs already reach, under the same token. `tsc` cannot resolve `./.open-next/worker.js`
+on a clean checkout because `.open-next/` is generated and gitignored, so [`open-next.d.ts`](./open-next.d.ts)
+declares it as a wildcard ambient module with the handler's shape written out structurally; keep that
+declaration honest by hand, since a change in what OpenNext exports fails in wrangler rather than in `tsc`.
+The wrapper is bundled by wrangler, not OpenNext, so it imports by relative path like the tail Worker does, and
+nothing can unit-test it without a build: `pnpm cf:build` followed by `wrangler deploy --dry-run` is what proves
+it bundles. What *is* tested is
+[`src/infrastructure/clients/logging/better-stack/tracing.ts`](./src/infrastructure/clients/logging/better-stack/tracing.ts),
+which builds the configuration from two Worker bindings, `BETTER_STACK_INGESTING_URL` and
+`BETTER_STACK_SOURCE_TOKEN`, the names the tail Worker reads, handed over the same way: the host as a `--var`,
+the token in `--secrets-file`, both from the GitHub variables the build already reads, and `_deploy-web.yml`
+fails before deploying when either is empty. With either unbound the configuration exports through `DROP_SPANS`,
+an exporter that acknowledges every batch and sends nothing, so a hand-run deploy without them traces into
+nothing rather than into a broken address, and without the per-request `console.warn` the library emits when
+it is handed no exporter at all. Sampling is
+`TRACE_SAMPLING_RATIO`, the same fraction `[observability.traces]` gives Cloudflare's own traces, which stay
+enabled; `acceptRemote` is off so a caller cannot raise it through a `traceparent` header. The decision, the
+two alternatives it beat and what it costs are
+[ADR 0015](../../adr/0015-traces-reach-betterstack-by-wrapping-the-opennext-entrypoint.md).
 
 **The tail Worker is gated on what its bundle is built from, which is wider than `workers/tail/`.**
 [`workers/tail/index.ts`](./workers/tail/index.ts) imports the log-level contract out of

@@ -16,7 +16,7 @@ nothing: the inferred type widens to include `LoggerService` and the build stays
 [ADR 0013](../../../../../adr/0013-loggerservice-stays-a-tag.md) records the decision and what it costs, so
 the next architecture pass does not re-propose deleting it.
 
-## The tail Worker and the app share one log contract
+## The tail Worker, the app and the traces share one log contract
 
 [`better-stack/contract.ts`](./logging/better-stack/contract.ts) holds `LOG_SERVICE`, the four levels the app emits and `toLogLevel`. It is types
 and constants only, deliberately, because [`workers/tail/index.ts`](../../../workers/tail/index.ts) imports it by relative path and must not
@@ -60,6 +60,15 @@ than `url`, which is the point: the redaction is keyed on the field name, not on
 
 `index.test.ts` asserts the Worker imports `stripQuery` rather than declaring its own, because a second
 local copy would pass every behavioural test in that file while drifting from the one the app enforces.
+
+**Traces stamp the same `LOG_SERVICE` and go to the same host.** [`tracing.ts`](./logging/better-stack/tracing.ts)
+sits beside the contract for that reason: it names the service the logs name, so a span and the log line it
+failed on answer one query, and it targets the `/v1/traces` path of `BETTER_STACK_INGESTING_URL` under
+`BETTER_STACK_SOURCE_TOKEN`, the two bindings the tail Worker reads. It imports the contract and the package
+manifest and nothing else, because the Worker entrypoint bundles it before Next has loaded. With either
+binding unbound it returns a configuration exporting through `DROP_SPANS`, which acknowledges and discards,
+rather than one pointed at `undefined` or one with no exporter, which the library warns about on every request;
+`tracing.test.ts` pins that fallback, the sampling ratio and the header.
 
 ## Purpose
 
@@ -208,6 +217,7 @@ exercises. Adding a method here means adding its caller and its error mapping in
 | `payments/stripe/client.ts` | Runs in the browser, where there is no layer to provide |
 | [`logging/better-stack/client.ts`](./logging/better-stack/client.ts) | Deliberate exception: `getBetterStackInstance()` is what stores, lookups and components use ([ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md)) |
 | [`logging/better-stack/tracking.ts`](./logging/better-stack/tracking.ts) | Not a logger at all: `track()` and `identifyUser()` push to the `window.betterstack` snippet injected by the UI layer's [`modules/tracking/BetterStackTracking.tsx`](../../ui/modules/tracking/BetterStackTracking.tsx). Both no-op when the snippet has not loaded |
+| [`logging/better-stack/tracing.ts`](./logging/better-stack/tracing.ts) | Not a client either: `tracingConfig(env)` is a pure function the Worker entrypoint [`worker.ts`](../../../worker.ts) hands to `instrument`, so it runs before Next does and outside any layer ([ADR 0015](../../../../../adr/0015-traces-reach-betterstack-by-wrapping-the-opennext-entrypoint.md)) |
 | [`tutorial/driver/client.tsx`](./tutorial/driver/client.tsx) | Wraps driver.js, a DOM library. It renders a close icon into the popover, but never imports one: the icon arrives as the injected `closeIcon?: ReactNode` config field, so nothing here reaches into `@ui/*` |
 
 `logging/better-stack/client.ts` is the one to read before touching. **A log call cannot fail its caller, and
