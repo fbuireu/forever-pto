@@ -236,8 +236,10 @@ equality now: all three pins **exact**, the root and this package **identical**,
 `6.` line. Exactness is the part that was already load-bearing, because a `rangeStrategy` flip writes `^7.0.2`
 into every manifest at once, which is equal and no longer a pin.
 
-Two consequences to know. `partialPrefetching` is a 16.3 option and was a config error on 16.2; it is on in
-`next.config.ts` now, beside `cacheComponents`. And that same contract suite imports `typescript` for its
+Two consequences to know. `cacheComponents` is off and `partialPrefetching`, which requires it, is gone from
+`next.config.ts`: Cache Components hang requests on workerd, reproduced locally and recorded in
+[ADR 0015](../../adr/0015-cache-components-stay-off-on-the-workers-runtime.md), so the `[locale]` pages are
+plain SSG and no file carries `'use cache'`. And that same contract suite imports `typescript` for its
 compiler-API parsing, which under 7 resolves to a module with no API at all: the import is
 `@typescript/typescript6`, the compatibility package pinning the 6.x API, declared at the root.
 

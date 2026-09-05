@@ -9,9 +9,15 @@ vi.mock("@opennextjs/cloudflare", () => ({
 }));
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL;
-const { default: sitemap } = await import("./sitemap");
+const { default: sitemap, dynamic } = await import("./sitemap");
 
 const ROUTES_COUNT = 2;
+
+describe("rendering mode", () => {
+	it("is rendered per request, so a preview names its own host rather than the one baked at build", () => {
+		expect(dynamic).toBe("force-dynamic");
+	});
+});
 
 describe("sitemap", () => {
 	it("returns an entry for each locale × route", async () => {

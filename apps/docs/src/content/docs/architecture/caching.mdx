@@ -1,39 +1,17 @@
 ---
 title: Caching
-description: Next Cache Components ('use cache' + cacheLife), the OpenNext R2 incremental cache and the proxy markdown cache.
+description: Why Cache Components are off, the OpenNext R2 incremental cache and the proxy markdown cache.
 sidebar:
   order: 5
 ---
 
-Caching happens at three levels: Next.js Cache Components inside the rendering layer, an R2-backed incremental cache at the OpenNext/Workers level, and plain `Cache-Control` headers for the agent-facing markdown surface.
+Caching happens at two levels: an R2-backed incremental cache at the OpenNext/Workers level, and plain `Cache-Control` headers for the agent-facing markdown surface. Next's Cache Components are deliberately not a third.
 
-## Cache Components
+## Cache Components are off
 
-`next.config.ts` enables `cacheComponents: true` (Next's Cache Components). `partialPrefetching` is intentionally commented out there; the inline comment records the Next version it is waiting on.
+`next.config.ts` sets `cacheComponents: false`, and no file carries a `'use cache'` directive. The flag was on, with three `cacheLife('days')` sites (`getCurrentYear`, `getPublicEnv`, the `Testimonials` section), until it was found to hang requests on the Workers runtime: production logged Next's *cannot guarantee that Cache Components will run as expected due to the current runtime's implementation of `setTimeout()`* warning followed by the runtime cancelling the request as hung, and the same thing reproduced locally on workerd. Turning the flag off made every route answer in under a second with no errors. The evidence, the alternative that did not build and the cost are in [ADR 0015](https://github.com/fbuireu/forever-pto/blob/main/adr/0015-cache-components-stay-off-on-the-workers-runtime.md).
 
-With Cache Components enabled, anything dynamic must either be wrapped in Suspense or explicitly cached with a `'use cache'` directive plus a `cacheLife` profile. Current cache sites:
-
-| Function / component | File | Profile |
-| --- | --- | --- |
-| `getCurrentYear()` | `apps/web/src/ui/utils/getCurrentYear.ts` | `cacheLife('days')` |
-| `getPublicEnv()` | `apps/web/src/infrastructure/services/env/getPublicEnv.ts` | `cacheLife('days')` |
-| `Testimonials` (RSC) | `apps/web/src/ui/modules/pages/homepage/sections/Testimonials.tsx` | `cacheLife('days')` |
-
-The pattern is always the same:
-
-```ts
-import { cacheLife } from 'next/cache';
-
-export async function getCurrentYear() {
-  'use cache';
-  cacheLife('days');
-  return new Date().getFullYear();
-}
-```
-
-`getCurrentYear` and `getPublicEnv` exist precisely because `new Date()` and `getCloudflareContext()` are dynamic APIs: hoisting them behind `'use cache'` keeps the pages that call them prerenderable. `Testimonials` caches a whole server component subtree (including its shuffled card order) for the same reason.
-
-**Testing consequence:** `vitest.setup.ts` mocks `next/cache` (`cacheLife`, `cacheTag` as no-ops) because the directive is meaningless in a unit-test runtime.
+What that means for rendering: the `[locale]` pages are plain SSG through `generateStaticParams`, built once per deploy, and the three values that used to be cached fragments are computed at build. `sitemap.ts` is the one route that opts into `export const dynamic = "force-dynamic"`, so a preview Worker names its own host. Re-enabling the flag is a decision that has to come with the ADR's reproduction run green on workerd.
 
 ## OpenNext incremental cache on R2
 
@@ -48,7 +26,7 @@ export default defineCloudflareConfig({
 });
 ```
 
-At runtime this is backed by the R2 bucket bound as `NEXT_INC_CACHE_R2_BUCKET` in `wrangler.toml`, with separate buckets per environment (see [environments](/infra/environments/)). Everything Next.js would put in its incremental cache (prerendered pages, `'use cache'` entries, fetch cache) is persisted there, so cache entries survive Worker isolate recycling and are shared across the fleet.
+At runtime this is backed by the R2 bucket bound as `NEXT_INC_CACHE_R2_BUCKET` in `wrangler.toml`, with separate buckets per environment (see [environments](/infra/environments/)). Everything Next.js would put in its incremental cache (prerendered pages, fetch cache) is persisted there, so cache entries survive Worker isolate recycling and are shared across the fleet.
 
 ## HTTP-level caches
 
