@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import pkg from "../../../../../package.json";
 import { LOG_SERVICE } from "./contract";
-import { TRACE_SAMPLING_RATIO, TRACES_PATH, tracingConfig } from "./tracing";
+import { DROP_SPANS, TRACE_SAMPLING_RATIO, TRACES_PATH, tracingConfig } from "./tracing";
 
 const env = {
 	BETTER_STACK_INGESTING_URL: "https://s123.eu-fsn-3.betterstackdata.com",
@@ -35,8 +35,16 @@ describe("tracingConfig", () => {
 	])("drops every span when %s is unbound rather than exporting to a broken address", (_label, partial) => {
 		const config = tracingConfig(partial);
 
-		expect("exporter" in config).toBe(false);
-		expect("spanProcessors" in config && config.spanProcessors).toEqual([]);
+		expect("exporter" in config && config.exporter).toBe(DROP_SPANS);
 		expect(config.service.name).toBe(LOG_SERVICE);
+	});
+
+	it("drops spans through an exporter that reports success, so the library neither warns nor retries", () => {
+		const outcomes: unknown[] = [];
+
+		DROP_SPANS.export([], (result) => outcomes.push(result));
+
+		expect(outcomes).toEqual([{ code: 0 }]);
+		expect(DROP_SPANS.shutdown()).resolves.toBeUndefined();
 	});
 });

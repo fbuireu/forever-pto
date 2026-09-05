@@ -66,7 +66,8 @@ sits beside the contract for that reason: it names the service the logs name, so
 failed on answer one query, and it targets the `/v1/traces` path of `BETTER_STACK_INGESTING_URL` under
 `BETTER_STACK_SOURCE_TOKEN`, the two bindings the tail Worker reads. It imports the contract and the package
 manifest and nothing else, because the Worker entrypoint bundles it before Next has loaded. With either
-binding unbound it returns a configuration with no exporter rather than one pointed at `undefined`;
+binding unbound it returns a configuration exporting through `DROP_SPANS`, which acknowledges and discards,
+rather than one pointed at `undefined` or one with no exporter, which the library warns about on every request;
 `tracing.test.ts` pins that fallback, the sampling ratio and the header.
 
 ## Purpose

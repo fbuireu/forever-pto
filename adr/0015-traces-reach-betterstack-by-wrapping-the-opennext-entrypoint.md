@@ -50,7 +50,8 @@ beside the log contract, because the spans go to the same BetterStack source as 
 `LOG_SERVICE` name, so one query reaches both. It reads two Worker bindings, `BETTER_STACK_INGESTING_URL` and
 `BETTER_STACK_SOURCE_TOKEN`, the names the tail Worker already uses, and the deploy hands them over the same
 way: the host as a `--var`, the token inside `--secrets-file`. When either is unbound it returns a configuration
-with no exporter, so a hand-run deploy without them traces into nothing rather than into a broken address.
+whose exporter is `DROP_SPANS`, one that acknowledges every batch and sends nothing, so a hand-run deploy without
+them traces into nothing rather than into a broken address.
 
 Spans are head-sampled at `TRACE_SAMPLING_RATIO`, the same fraction `wrangler.toml` gives Cloudflare's own
 traces, and `acceptRemote` is off so no caller can raise our sampling by sending a `traceparent`.
@@ -76,9 +77,11 @@ library rewritten with fewer features.
   the BetterStack source is still "update the two variables and redeploy".
 - **Every outbound `fetch` is a span**, Stripe, Turso and the R2 cache included, at the sampled rate. That is the
   value and it is also the volume: BetterStack bills by it, and the ratio is the dial.
-- **The `spanProcessors: []` fallback is silent by design**, which is the opposite of what the tail Worker does
+- **The `DROP_SPANS` fallback is silent by design**, which is the opposite of what the tail Worker does
   with a missing host. The tail Worker can report through its own invocation logs; the wrapper runs inside the
   app Worker, where a `console.error` per request would land in the very logs it is trying to correlate.
-  `tracing.test.ts` pins the fallback so it cannot turn into an export to `undefined/v1/traces`.
+  `tracing.test.ts` pins the fallback so it cannot turn into an export to `undefined/v1/traces`. It is an exporter
+  rather than an empty `spanProcessors` list because the library warns on every request when handed the latter,
+  through `console.warn`, into the very logs the tail Worker forwards.
 - Where this bites: the *Deploy* section of [`apps/web/CLAUDE.md`](../apps/web/CLAUDE.md), and the clients guide
   at [`apps/web/src/infrastructure/clients/CLAUDE.md`](../apps/web/src/infrastructure/clients/CLAUDE.md).
