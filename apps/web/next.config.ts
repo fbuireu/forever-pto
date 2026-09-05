@@ -1,4 +1,3 @@
-import { withBetterStack } from "@logtail/next";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
@@ -128,6 +127,6 @@ const nextConfig: NextConfig = {
 	},
 };
 
-export default withBetterStack(withNextIntl(nextConfig));
+export default withNextIntl(nextConfig);
 
 initOpenNextCloudflareForDev();
