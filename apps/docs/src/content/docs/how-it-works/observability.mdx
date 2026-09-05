@@ -21,7 +21,6 @@ It checks what comes back. The handler used to await the POST and discard the re
 
 - `apps/web/src/infrastructure/clients/logging/better-stack/client.ts` holds `getBetterStackInstance()`, a singleton over `@logtail/edge`'s `Logtail` configured with `NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN` / `NEXT_PUBLIC_BETTER_STACK_INGESTING_URL` and the Cloudflare execution context. Used directly by plain code ([country detection](/how-it-works/country-detection/), stores, services).
 - `apps/web/src/infrastructure/clients/logging/better-stack/service.ts` holds `LoggerService`, the Effect wrapper used inside use-cases; it is part of `ApplicationLayer`.
-- `next.config.ts` wraps the whole Next config in `withBetterStack` from `@logtail/next`.
 
 A privacy convention runs through all call sites: log the email **domain**, ids and flags, never full addresses or payloads.
 
