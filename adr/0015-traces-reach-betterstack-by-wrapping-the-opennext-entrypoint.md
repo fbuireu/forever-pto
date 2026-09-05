@@ -80,5 +80,11 @@ library rewritten with fewer features.
   with a missing host. The tail Worker can report through its own invocation logs; the wrapper runs inside the
   app Worker, where a `console.error` per request would land in the very logs it is trying to correlate.
   `tracing.test.ts` pins the fallback so it cannot turn into an export to `undefined/v1/traces`.
+- **Use-cases are named spans, through Effect's own `Tracer` and not through `@effect/opentelemetry`.**
+  Every export under `application/use-cases` ends in `Effect.withSpan`, and `TracerLive` in `layers.ts` is a
+  one-file bridge from Effect spans onto the OpenTelemetry tracer the wrapper registers. The package that
+  ships that bridge declares eight peer dependencies, most of them SDK packages the Worker never runs, and
+  the bridge it would replace is under two hundred lines with a test that runs a real tracer provider. A
+  fetch made inside a use-case nests under the use-case span, which is what makes the trace readable.
 - Where this bites: the *Deploy* section of [`apps/web/CLAUDE.md`](../apps/web/CLAUDE.md), and the clients guide
   at [`apps/web/src/infrastructure/clients/CLAUDE.md`](../apps/web/src/infrastructure/clients/CLAUDE.md).

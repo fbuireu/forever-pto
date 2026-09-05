@@ -27,6 +27,15 @@ parameters written out explicitly rather than inferred. That signature is the co
   `_tag` via `Effect.catchTags`, so adding a failure mode to `E` turns every unhandled call site into a
   type error instead of a silent 500 ([ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md)).
 - Success values are plain objects. Nothing here builds a `NextResponse`.
+- **Every export ends in `Effect.withSpan` named after itself**: `createPayment`, `sendContactEmail`,
+  `processWebhookEvent`, `activateWithPayment`, `activateWithClaimedPayment`, `activateWithEmail`. `withSpan`
+  is plain Effect and adds nothing to `R`; what turns the span into an OpenTelemetry one is the `Tracer`
+  that `ApplicationLayer` provides, so a use-case names its span and knows nothing about where it goes. The
+  Stripe, Turso and Resend calls made inside then nest under it as `fetch` children, which is the whole
+  point: a trace reads `createPayment → fetch api.stripe.com → fetch turso`. A new export without a span is
+  a request that shows up in BetterStack as an anonymous run of `fetch` calls. Annotate with
+  `Effect.annotateCurrentSpan` rather than logging an id twice; see
+  [`../../infrastructure/clients/CLAUDE.md`](../../infrastructure/clients/CLAUDE.md).
 
 Failures the flow is expected to survive are absorbed in place rather than widening `E`: a deferred write
 that no longer has a response to fail, a charge lookup that only adds reporting detail. **A database failure
