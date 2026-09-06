@@ -1,3 +1,17 @@
+# [forever-pto-web-v1.10.0](https://github.com/fbuireu/forever-pto/compare/web-v1.9.8...web-v1.10.0) (2026-09-06)
+
+
+### Bug Fixes
+
+* **web:** scope the BetterStack transport to the request ([382af07](https://github.com/fbuireu/forever-pto/commit/382af0798017829619fc2a849e824a850a1842cf))
+
+
+### Features
+
+* **web:** export request traces to BetterStack from the Worker entrypoint ([d26f183](https://github.com/fbuireu/forever-pto/commit/d26f183190f963e83d3bd89d62de52597a6c4e4c))
+* **web:** tag Better Stack sessions with the release and the real environment ([#391](https://github.com/fbuireu/forever-pto/issues/391)) ([81c3467](https://github.com/fbuireu/forever-pto/commit/81c3467b6153265307789854d8b8604dee034f40))
+* **web:** trace every use case as a named span under the request ([#387](https://github.com/fbuireu/forever-pto/issues/387)) ([9a10bab](https://github.com/fbuireu/forever-pto/commit/9a10bab5dfa4cd6916c17d7d13c79e0e9c2c7294))
+
 # [forever-pto-web-v1.9.8](https://github.com/fbuireu/forever-pto/compare/web-v1.9.7...web-v1.9.8) (2026-09-06)
 
 
