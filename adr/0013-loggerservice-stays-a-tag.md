@@ -66,9 +66,12 @@ than stylistic on any Effect program under `@application/use-cases`.
   A test asserting "nothing logged" is only meaningful for code that reaches the tag.
 - **Every test that reaches one pays a five-method stub, and that stays.** It is the price of the signal. Shrinking the
   tag's interface would reduce it, but every method has a caller.
-- **The two-mechanism split at the confirmation page is left standing.** It is on the wrong side of this
-  decision and is cheap to fix by routing that page through the operation; it has not been, and it is the
-  regression to watch for rather than an example to copy.
+- **The two-mechanism split at the confirmation page is closed.** The page used to warn through
+  `getBetterStackInstance()` on a payment intent that had not succeeded while `confirmation` logged the
+  Stripe failure through the tag: one story, two mechanisms. The warn lives in `confirmation` now, beside the
+  `logError` it always sat next to, so the page imports no logger at all and the whole activation story
+  reaches `LoggerService`. A page that reaches for the singleton for something its Effect program already
+  sees is the regression to watch for.
 - This does **not** reopen [ADR 0002](./0002-effect-for-external-service-boundaries.md). Logging remains the
   documented exception to "all external calls go through Effect"; what this records is why the tag survives
   *alongside* the singleton rather than being replaced by it.
