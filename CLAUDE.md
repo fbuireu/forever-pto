@@ -193,6 +193,18 @@ alternative was a bridge tag one patch higher, which would have skipped a versio
 that never happened; grafting keeps the numbers honest. Prefer it, and never force-push `main` while a release
 is in flight.
 
+**Nothing may land on `main` while `release-web` is running, and a plain merge is enough to break it.**
+`@semantic-release/git` commits the version bump and the changelog on the sha the job checked out and pushes
+`HEAD:main`; a commit that reached `main` in the meantime makes that push a non-fast-forward and the job fails
+after the deploy and the smoke run have already passed. It happened on 2026-09-06: the release for the
+Better Stack work started at 06:38 on `81c3467b`, a docs-only pull request was squash-merged at 06:39, and the
+push was refused at 06:41. That run leaves no tag behind, so there is nothing to graft, and re-running the
+failed job does not release either: semantic-release checks that the branch it holds is up to date with the
+remote before publishing and stands down when it is not. What cuts the release is a fresh push to `main`
+touching `WEB_PATHS`, which is what the commit that added this paragraph is. The window to respect is from
+`deploy-production` going green to `Semantic Release (web)` finishing, a few minutes; queue the next merge
+behind it rather than beside it.
+
 **A change confined to the repo root releases nothing**: `adr/`, `tests/`, `README.md`, `CONTEXT.md`, this
 file. That is correct and occasionally surprising. **It is narrower than it reads**: `WEB_PATHS` in `ci.yml`
 also matches [`package.json`](./package.json), `pnpm-workspace.yaml`, [`patches/`](./patches), [`biome.json`](./biome.json), `.nvmrc` and
