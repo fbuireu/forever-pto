@@ -1,6 +1,6 @@
 ---
 title: Observability
-description: Workers observability sampling, the tail worker forwarding to Better Stack, server and browser logging, and the typed analytics events.
+description: Workers observability sampling, the tail worker forwarding to Better Stack, the request traces the Worker exports, server and browser logging, and the typed analytics events.
 sidebar:
   order: 14
 ---
@@ -17,9 +17,16 @@ Telemetry converges on **Better Stack** (Logtail), fed from four surfaces: the C
 
 It checks what comes back. The handler used to await the POST and discard the response, so a 401 from a rotated token, or any 5xx, stopped logging with nothing to show for it. A non-`ok` status and a thrown `fetch` are both reported through the Worker's own `console.error`, which its `wrangler.toml` retains by declaring `[observability]` with invocation logs and no sampling.
 
+## Request traces
+
+Cloudflare's own traces stay in the Cloudflare dashboard: the platform exports them nowhere and the tail Worker never receives spans. What Better Stack shows in the SPANS stream is produced by the app. `apps/web/worker.ts` is the Worker entrypoint `wrangler.toml` names: it imports the handler OpenNext writes and exports it through `instrument` from `@microlabs/otel-cf-workers`, which opens a root span per request and a child span per outbound `fetch` (Stripe, Turso, the R2 cache) and ships them over OTLP to the `/v1/traces` path of the same host and token the logs use. `apps/web/src/infrastructure/clients/logging/better-stack/tracing.ts` builds that configuration from the two Worker bindings the tail Worker also reads; with either unbound it exports into a sink that acknowledges and discards, so a hand-run deploy traces into nothing rather than into a broken address. Sampling is head-based at `TRACE_SAMPLING_RATIO`, the same fraction Cloudflare's traces get, and a caller cannot raise it through a `traceparent` header.
+
+Inside a request, every use case is a named child span: each export under `apps/web/src/application/use-cases` ends in `Effect.withSpan`, and `tracer.ts` bridges Effect spans onto the OpenTelemetry tracer the wrapper registered, so a trace reads `createPayment` → `fetch api.stripe.com` → `fetch` to Turso rather than a request followed by anonymous calls. The decision and the two alternatives it beat are in [ADR 0016](https://github.com/fbuireu/forever-pto/blob/main/adr/0016-traces-reach-betterstack-by-wrapping-the-opennext-entrypoint.md).
+
 ## Server-side logging
 
-- `apps/web/src/infrastructure/clients/logging/better-stack/client.ts` holds `getBetterStackInstance()`, a singleton over `@logtail/edge`'s `Logtail` configured with `NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN` / `NEXT_PUBLIC_BETTER_STACK_INGESTING_URL` and the Cloudflare execution context. Used directly by plain code ([country detection](/how-it-works/country-detection/), stores, services).
+- `apps/web/src/infrastructure/clients/logging/better-stack/client.ts` holds `getBetterStackInstance()`, the client plain code uses directly ([country detection](/how-it-works/country-detection/), stores, services). Under it, one `@logtail/edge` `Logtail` transport per request, keyed on the Cloudflare execution context and configured with `NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN` / `NEXT_PUBLIC_BETTER_STACK_INGESTING_URL`: a request's lines batch together and flush inside its own `waitUntil`. It used to be one module-level instance, and on workerd a batch timer armed by one request delivering another request's lines is an I/O violation the runtime cancels the request for. Off a request there is no `waitUntil`, so the transport is throwaway and flushes at once.
+- Every entry carries the active span's `traceId` and `spanId`, read off the OpenTelemetry context by `correlation.ts`, so a log line and the span it failed on answer one query.
 - `apps/web/src/infrastructure/clients/logging/better-stack/service.ts` holds `LoggerService`, the Effect wrapper used inside use-cases; it is part of `ApplicationLayer`.
 
 A privacy convention runs through all call sites: log the email **domain**, ids and flags, never full addresses or payloads.
