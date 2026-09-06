@@ -236,8 +236,10 @@ equality now: all three pins **exact**, the root and this package **identical**,
 `6.` line. Exactness is the part that was already load-bearing, because a `rangeStrategy` flip writes `^7.0.2`
 into every manifest at once, which is equal and no longer a pin.
 
-Two consequences to know. `partialPrefetching` is a 16.3 option and was a config error on 16.2; it is on in
-`next.config.ts` now, beside `cacheComponents`. And that same contract suite imports `typescript` for its
+Two consequences to know. `cacheComponents` is off and `partialPrefetching`, which requires it, is gone from
+`next.config.ts`: Cache Components hang requests on workerd, reproduced locally and recorded in
+[ADR 0015](../../adr/0015-cache-components-stay-off-on-the-workers-runtime.md), so the `[locale]` pages are
+plain SSG and no file carries `'use cache'`. And that same contract suite imports `typescript` for its
 compiler-API parsing, which under 7 resolves to a module with no API at all: the import is
 `@typescript/typescript6`, the compatibility package pinning the 6.x API, declared at the root.
 
@@ -402,8 +404,10 @@ it bundles. What *is* tested is
 which builds the configuration from two Worker bindings, `BETTER_STACK_INGESTING_URL` and
 `BETTER_STACK_SOURCE_TOKEN`, the names the tail Worker reads, handed over the same way: the host as a `--var`,
 the token in `--secrets-file`, both from the GitHub variables the build already reads, and `_deploy-web.yml`
-fails before deploying when either is empty. With either unbound the configuration carries no exporter, so a
-hand-run deploy without them traces into nothing rather than into a broken address. Inside a request, every use-case under
+fails before deploying when either is empty. With either unbound the configuration exports through `DROP_SPANS`,
+an exporter that acknowledges every batch and sends nothing, so a hand-run deploy without them traces into
+nothing rather than into a broken address, and without the per-request `console.warn` the library emits when
+it is handed no exporter at all. Inside a request, every use-case under
 [`src/application/use-cases/`](./src/application/use-cases) is a named child span: each export ends in
 `Effect.withSpan`, and `TracerLive` in [`src/infrastructure/layers.ts`](./src/infrastructure/layers.ts) bridges
 Effect spans onto the OpenTelemetry tracer the wrapper registered, so a trace reads `createPayment` → its
@@ -411,7 +415,7 @@ Effect spans onto the OpenTelemetry tracer the wrapper registered, so a trace re
 `TRACE_SAMPLING_RATIO`, the same fraction `[observability.traces]` gives Cloudflare's own traces, which stay
 enabled; `acceptRemote` is off so a caller cannot raise it through a `traceparent` header. The decision, the
 two alternatives it beat and what it costs are
-[ADR 0015](../../adr/0015-traces-reach-betterstack-by-wrapping-the-opennext-entrypoint.md).
+[ADR 0016](../../adr/0016-traces-reach-betterstack-by-wrapping-the-opennext-entrypoint.md).
 
 **The tail Worker is gated on what its bundle is built from, which is wider than `workers/tail/`.**
 [`workers/tail/index.ts`](./workers/tail/index.ts) imports the log-level contract out of

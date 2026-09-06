@@ -66,7 +66,8 @@ sits beside the contract for that reason: it names the service the logs name, so
 failed on answer one query, and it targets the `/v1/traces` path of `BETTER_STACK_INGESTING_URL` under
 `BETTER_STACK_SOURCE_TOKEN`, the two bindings the tail Worker reads. It imports the contract and the package
 manifest and nothing else, because the Worker entrypoint bundles it before Next has loaded. With either
-binding unbound it returns a configuration with no exporter rather than one pointed at `undefined`;
+binding unbound it returns a configuration exporting through `DROP_SPANS`, which acknowledges and discards,
+rather than one pointed at `undefined` or one with no exporter, which the library warns about on every request;
 `tracing.test.ts` pins that fallback, the sampling ratio and the header.
 
 **`tracer.ts` is what makes `Effect.withSpan` reach BetterStack, and it is deliberately not
@@ -237,7 +238,7 @@ exercises. Adding a method here means adding its caller and its error mapping in
 | `payments/stripe/client.ts` | Runs in the browser, where there is no layer to provide |
 | [`logging/better-stack/client.ts`](./logging/better-stack/client.ts) | Deliberate exception: `getBetterStackInstance()` is what stores, lookups and components use ([ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md)) |
 | [`logging/better-stack/tracking.ts`](./logging/better-stack/tracking.ts) | Not a logger at all: `track()` and `identifyUser()` push to the `window.betterstack` snippet injected by the UI layer's [`modules/tracking/BetterStackTracking.tsx`](../../ui/modules/tracking/BetterStackTracking.tsx). Both no-op when the snippet has not loaded |
-| [`logging/better-stack/tracing.ts`](./logging/better-stack/tracing.ts) | Not a client either: `tracingConfig(env)` is a pure function the Worker entrypoint [`worker.ts`](../../../worker.ts) hands to `instrument`, so it runs before Next does and outside any layer ([ADR 0015](../../../../../adr/0015-traces-reach-betterstack-by-wrapping-the-opennext-entrypoint.md)) |
+| [`logging/better-stack/tracing.ts`](./logging/better-stack/tracing.ts) | Not a client either: `tracingConfig(env)` is a pure function the Worker entrypoint [`worker.ts`](../../../worker.ts) hands to `instrument`, so it runs before Next does and outside any layer ([ADR 0016](../../../../../adr/0016-traces-reach-betterstack-by-wrapping-the-opennext-entrypoint.md)) |
 | [`logging/better-stack/tracer.ts`](./logging/better-stack/tracer.ts) | An Effect `Tracer`, not a client: `TracerLive` is `Layer.setTracer` over a bridge from Effect spans to the OpenTelemetry tracer the Worker wrapper registers, merged into `ApplicationLayer` |
 | [`tutorial/driver/client.tsx`](./tutorial/driver/client.tsx) | Wraps driver.js, a DOM library. It renders a close icon into the popover, but never imports one: the icon arrives as the injected `closeIcon?: ReactNode` config field, so nothing here reaches into `@ui/*` |
 
