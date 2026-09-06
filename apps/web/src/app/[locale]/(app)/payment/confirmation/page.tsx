@@ -1,5 +1,4 @@
 import { Link } from "@application/i18n/navigation";
-import { getBetterStackInstance } from "@infrastructure/clients/logging/better-stack/client";
 import { ApplicationLayer } from "@infrastructure/layers";
 import { routeMetadata } from "@infrastructure/seo/routeMetadata";
 import { confirmation } from "@infrastructure/services/payments/confirmation";
@@ -82,26 +81,16 @@ async function PaymentError({ charged }: { charged: boolean }) {
 }
 
 export default async function PaymentSuccessPage({ searchParams, params }: Readonly<PaymentSuccessParams>) {
-	const logger = getBetterStackInstance();
 	const [{ payment_intent: paymentIntentId, activation }, { locale }] = await Promise.all([searchParams, params]);
 	const hasActivated = activation !== ACTIVATION_FAILED;
 
 	if (!paymentIntentId) {
-		logger.warn("Payment success page accessed without payment_intent, redirecting to home");
 		redirect(`/${locale}`);
 	}
 
 	const data = await Effect.runPromise(confirmation(paymentIntentId).pipe(Effect.provide(ApplicationLayer)));
 
 	if (data?.status !== "succeeded") {
-		if (data) {
-			logger.warn("Payment intent not succeeded", {
-				paymentIntentId: data.id,
-				status: data.status,
-				amount: data.amount,
-				currency: data.currency,
-			});
-		}
 		return <PaymentError charged={!data || !NOT_CHARGED_STATUSES.has(data.status)} />;
 	}
 
