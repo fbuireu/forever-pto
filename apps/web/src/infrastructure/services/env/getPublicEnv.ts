@@ -1,5 +1,4 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { cacheLife } from "next/cache";
 
 export interface PublicEnv {
 	siteUrl: string;
@@ -7,8 +6,6 @@ export interface PublicEnv {
 }
 
 export async function getPublicEnv(): Promise<PublicEnv> {
-	"use cache";
-	cacheLife("days");
 	const { env } = await getCloudflareContext({ async: true });
 
 	return {
