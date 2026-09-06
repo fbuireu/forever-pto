@@ -3,6 +3,13 @@
 
 ### Bug Fixes
 
+* **web:** make the footer's cookie and contact buttons hover like the other links ([9bff6fb](https://github.com/fbuireu/forever-pto/commit/9bff6fb58e33ffddb390637b3eaa5ee8c1d0f2f5))
+
+# [forever-pto-web-v1.10.1](https://github.com/fbuireu/forever-pto/compare/web-v1.10.0...web-v1.10.1) (2026-09-06)
+
+
+### Bug Fixes
+
 * **web:** make the footer's cookie and contact buttons hover like the other links ([2a7d2aa](https://github.com/fbuireu/forever-pto/commit/2a7d2aaf677c8a22b2a4ca6b5bceed47073511c5))
 
 # [forever-pto-web-v1.10.0](https://github.com/fbuireu/forever-pto/compare/web-v1.9.8...web-v1.10.0) (2026-09-06)
