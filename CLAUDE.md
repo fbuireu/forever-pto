@@ -156,7 +156,7 @@ its paths fall under, so a docs change never cuts an app release and vice versa.
 the two release jobs from racing each other. Its package version stays `0.0.0` forever and nothing reads it:
 the docs site displays the **app's** version.
 
-**There are two bridge tags, `web-v1.8.2` and `web-v1.8.3`, and the first looks like debris.** Each sits on
+**There are three bridge tags, `web-v1.8.2`, `web-v1.8.3` and `web-v1.10.2`, and the first looks like debris.** Each sits on
 the same commit as the legacy `v1.8.x` tag of the same number. semantic-release finds the last release by
 `tagFormat`, which is `web-v${version}`; delete the highest one and the next app release publishes
 `web-v1.0.0` over a 1.8.x line, which cannot be recalled from GitHub Releases. The `release-web` job fails
@@ -176,6 +176,19 @@ patch. The tag exists so the next release continues from 1.8.3 rather than re-cu
 **Both tags are on the remote**, verified with `git ls-remote --tags origin 'web-v*'` on 2026-08-24. They had
 to reach it before `release-web` first runs on `main`, and they have. This paragraph used to say they were
 still local; that is the shape of claim to re-check rather than copy forward.
+
+**`web-v1.10.2` is the third, and it exists because a rewrite orphaned `web-v1.10.1`.** `main` was rewritten
+on 2026-09-06 to drop a commit whose author was not the owner's identity, which changed that commit's sha and
+every sha above it, `web-v1.10.1`'s release commit included. The release carrying that tag is `immutable`, so
+the tag could not be moved onto the rewritten commit or deleted, and it now points at a commit `main` does not
+reach. `web-v1.10.2` is what `release-web` reads instead; its content is 1.10.1's, and no 1.10.2 was ever
+released.
+
+**The order that rewrite has to run in is the lesson, and it was learned the expensive way.** `main` went
+first and the tag second, so between the two `release-web` ran, found only `web-v1.10.0` reachable, recomputed
+1.10.1, pushed a release commit for it and then died on `fatal: tag 'web-v1.10.1' already exists`. That left a
+second 1.10.1 section in [`apps/web/CHANGELOG.md`](./apps/web/CHANGELOG.md), since deleted, and a red `Check`
+until the bridge tag landed. Push the tag before the branch, or do not start.
 
 **A `web-v*` tag on a commit `main` cannot reach is worse than a missing one, and `web-v1.9.3` was one.**
 semantic-release finds the last release with `git tag --merged`, so a tag whose commit is not an ancestor of
