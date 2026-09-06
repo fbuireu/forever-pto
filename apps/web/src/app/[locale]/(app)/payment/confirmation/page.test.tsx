@@ -12,16 +12,11 @@ const NON_BREAKING_SPACES = /[  ]/g;
 const PAYMENT_INTENT_ID = "pi_test_123";
 
 const mockRedirect = vi.fn();
-const mockLogger = { warn: vi.fn(), logError: vi.fn() };
 const mockGetTranslations = vi.fn();
 const mockGetFormatter = vi.fn();
 const mockConfirmation = vi.hoisted(() => vi.fn());
 
 vi.mock("next/navigation", () => ({ redirect: mockRedirect }));
-
-vi.mock("@infrastructure/clients/logging/better-stack/client", () => ({
-	getBetterStackInstance: vi.fn().mockReturnValue(mockLogger),
-}));
 
 vi.mock("@infrastructure/layers", () => ({ ApplicationLayer: Layer.empty }));
 
@@ -151,14 +146,6 @@ describe("payment/confirmation page", () => {
 			const { container } = await renderErrorPage();
 			expect(container.textContent).toContain("t:description");
 			expect(container.textContent).not.toContain("t:unconfirmedTitle");
-		});
-
-		it("logs a warning when status is not succeeded", async () => {
-			mockConfirmation.mockReturnValueOnce(
-				Effect.succeed({ id: PAYMENT_INTENT_ID, status: "requires_payment_method", amount: 10, currency: "USD" }),
-			);
-			await PaymentSuccessPage(makeSuccessParams());
-			expect(mockLogger.warn).toHaveBeenCalled();
 		});
 	});
 
