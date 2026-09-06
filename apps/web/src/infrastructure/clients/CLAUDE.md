@@ -207,7 +207,7 @@ exercises. Adding a method here means adding its caller and its error mapping in
 | --- | --- |
 | `payments/stripe/client.ts` | Runs in the browser, where there is no layer to provide |
 | [`logging/better-stack/client.ts`](./logging/better-stack/client.ts) | Deliberate exception: `getBetterStackInstance()` is what stores, lookups and components use ([ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md)) |
-| [`logging/better-stack/tracking.ts`](./logging/better-stack/tracking.ts) | Not a logger at all: `track()` and `identifyUser()` push to the `window.betterstack` snippet injected by the UI layer's [`modules/tracking/BetterStackTracking.tsx`](../../ui/modules/tracking/BetterStackTracking.tsx). Both no-op when the snippet has not loaded |
+| [`logging/better-stack/tracking.ts`](./logging/better-stack/tracking.ts) | Not a logger at all: `track()` and `identifyUser()` push to the `window.betterstack` snippet injected by the UI layer's [`modules/tracking/BetterStackTracking.tsx`](../../ui/modules/tracking/BetterStackTracking.tsx). Both no-op when the snippet has not loaded. `trackingEnvironment(hostname)` is the pure rule beside them, deciding `development` for `localhost` and `.workers.dev` hosts and `production` for the rest, because `NODE_ENV` is `production` on a preview Worker too |
 | [`tutorial/driver/client.tsx`](./tutorial/driver/client.tsx) | Wraps driver.js, a DOM library. It renders a close icon into the popover, but never imports one: the icon arrives as the injected `closeIcon?: ReactNode` config field, so nothing here reaches into `@ui/*` |
 
 `logging/better-stack/client.ts` is the one to read before touching. **A log call cannot fail its caller, and

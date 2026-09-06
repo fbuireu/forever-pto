@@ -2,9 +2,10 @@ import { act, render } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { mockAcceptedService, mockIdentifyUser } = vi.hoisted(() => ({
+const { mockAcceptedService, mockIdentifyUser, mockTrackingEnvironment } = vi.hoisted(() => ({
 	mockAcceptedService: vi.fn(),
 	mockIdentifyUser: vi.fn(),
+	mockTrackingEnvironment: vi.fn(() => "development"),
 }));
 
 vi.mock("vanilla-cookieconsent", () => ({
@@ -14,6 +15,7 @@ vi.mock("vanilla-cookieconsent", () => ({
 
 vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({
 	identifyUser: mockIdentifyUser,
+	trackingEnvironment: mockTrackingEnvironment,
 }));
 
 vi.mock("@application/stores/premium", () => ({
@@ -27,10 +29,12 @@ vi.mock("next/script", () => ({
 process.env.NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN = "test-token";
 
 const { BetterStackTracking } = await import("./BetterStackTracking");
+const { version } = await import("../../../../package.json");
 
 beforeEach(() => {
 	vi.clearAllMocks();
 	mockAcceptedService.mockReturnValue(false);
+	mockTrackingEnvironment.mockReturnValue("development");
 });
 
 describe("BetterStackTracking", () => {
@@ -51,6 +55,22 @@ describe("BetterStackTracking", () => {
 		});
 
 		expect(container.querySelector("script")).not.toBeNull();
+	});
+
+	it("configures the release from the package version and the environment from the hostname", () => {
+		mockTrackingEnvironment.mockReturnValue("production");
+		mockAcceptedService.mockReturnValue(true);
+		const { container } = render(<BetterStackTracking />);
+		act(() => {
+			window.dispatchEvent(new CustomEvent("cc:onConsent"));
+		});
+
+		const snippet = container.querySelector("script")?.textContent ?? "";
+		expect(mockTrackingEnvironment).toHaveBeenCalledWith(window.location.hostname);
+		expect(snippet).toContain(`betterstack('config', { release: '${version}' })`);
+		expect(snippet).toContain("betterstack('init', { environment: 'production' })");
+		expect(snippet).toContain("b.js?t='+r");
+		expect(snippet).toContain("'betterstack','test-token'");
 	});
 
 	it("ignores an event dispatched on document, which the library never uses", () => {
