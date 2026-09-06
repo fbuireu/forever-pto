@@ -4,6 +4,8 @@ import { indexableRoutes } from "@infrastructure/seo/routes";
 import { getPublicEnv } from "@infrastructure/services/env/getPublicEnv";
 import type { MetadataRoute } from "next";
 
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 	const { siteUrl: baseUrl } = await getPublicEnv();
 

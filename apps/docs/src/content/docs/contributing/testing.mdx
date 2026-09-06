@@ -10,7 +10,7 @@ sidebar:
 Configured in `vitest.config.ts` with `resolve.tsconfigPaths: true`, so all the app's path aliases (`@ui`, `@domain`, …) work in tests without extra mapping.
 
 - **Environment**: happy-dom.
-- **Setup** (`vitest.setup.ts`): mocks `next/cache` (`cacheLife`, `cacheTag`), required because the app enables Cache Components, and runs Testing Library's `cleanup` after each test.
+- **Setup** (`vitest.setup.ts`): runs Testing Library's `cleanup` after each test.
 - **Excluded from the runner**: `apps/web/e2e/**`, `apps/docs/**`, generated bones, icon directories and i18n message JSON.
 - **Coverage**: v8 provider over `apps/web/src/**/*.{ts,tsx}` (tests, `*.d.ts`, `types.ts` files and generated code excluded), reported as text + lcov. `ci.yml` runs `pnpm test:ut:coverage` and uploads `coverage/lcov.info` to Codecov on every push and PR.
 
