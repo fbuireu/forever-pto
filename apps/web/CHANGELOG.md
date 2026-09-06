@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.9.8](https://github.com/fbuireu/forever-pto/compare/web-v1.9.7...web-v1.9.8) (2026-09-06)
+
+
+### Bug Fixes
+
+* **web:** turn Cache Components off, they hang requests on workerd ([f6d75ed](https://github.com/fbuireu/forever-pto/commit/f6d75ed55eb5c16d006981c1e7d80890d04693db))
+
 # [forever-pto-web-v1.9.7](https://github.com/fbuireu/forever-pto/compare/web-v1.9.6...web-v1.9.7) (2026-09-01)
 
 
