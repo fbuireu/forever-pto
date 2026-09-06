@@ -5,9 +5,12 @@ allowBuilds:
   '@parcel/watcher': true
   '@swc/core': true
   esbuild: true
+  protobufjs: false
   sharp: true
   workerd: true
 savePrefix: ""
+overrides:
+  "@opentelemetry/core": 2.11.0
 minimumReleaseAge: 4320 # 3 days
 blockExoticSubdeps: true
 patchedDependencies:
