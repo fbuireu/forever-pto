@@ -1,5 +1,5 @@
 name = "forever-pto"
-main = ".open-next/worker.js"
+main = "worker.ts"
 compatibility_date = "2025-11-25"
 compatibility_flags = ["nodejs_compat", "enable_nodejs_process_v2"]
 keep_names = false
