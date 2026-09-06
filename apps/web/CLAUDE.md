@@ -375,7 +375,11 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
   See [`./src/application/stores/CLAUDE.md`](./src/application/stores/CLAUDE.md).
 - **The package version is load-bearing at runtime, not just at release time.** Six source files import
   [`package.json`](./package.json) and read `version` to render the footer, the hero, the error page, the `/api/markdown` output
-  and both `.well-known` documents, the agent-skills index and the MCP server card. The docs site reads it too.
+  and both `.well-known` documents, the agent-skills index and the MCP server card. The docs site reads it too,
+  and so does the Better Stack tag, which files every browser error under it as the release. The number is
+  only as current as the last `release-web` that pushed: a release run that fails after the deploy leaves
+  production serving new code while every one of those surfaces still names the previous version, which is
+  what the root guide's release-window rule exists to prevent.
 
 ## Deploy
 
