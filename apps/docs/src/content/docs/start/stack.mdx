@@ -11,7 +11,7 @@ Exact versions are pinned in `package.json` (the repo uses exact pins, via `save
 
 | Technology | Role | Why |
 | --- | --- | --- |
-| Next.js (App Router) | Framework | Server Components plus Cache Components (`cacheComponents: true` in `next.config.ts`) give per-fragment caching that maps well onto a Cloudflare Worker |
+| Next.js (App Router) | Framework | Server Components, prerendered per locale through `generateStaticParams`; Cache Components are deliberately off, see [caching](/architecture/caching/) |
 | React | UI runtime | Required by Next; concurrent features (`use`, transitions) are used throughout |
 | TypeScript | Language | `strict: true`; typed boundaries between layers are load-bearing (see the drift-guard pattern in the docs demos) |
 | Tailwind CSS | Styling | v4 CSS-first config, with no `tailwind.config` file; theme lives in CSS under `apps/web/src/ui/styles/` |

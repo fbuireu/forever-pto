@@ -158,7 +158,7 @@ use-cases may not, and receive configuration as plain values instead: `contact.t
 Five places inside this layer read it directly, and each has a reason:
 [`services/env/getRequestPublicEnv.ts`](./services/env/getRequestPublicEnv.ts) (the per-request config both contact transports pass down),
 [`services/payments/rateLimit.ts`](./services/payments/rateLimit.ts) (the `PAYMENT_RATE_LIMITER` binding),
-[`services/env/getPublicEnv.ts`](./services/env/getPublicEnv.ts) (a `'use cache'` function, so it uses the `{ async: true }` form),
+[`services/env/getPublicEnv.ts`](./services/env/getPublicEnv.ts) (evaluated during prerender as well as per request, so it uses the `{ async: true }` form),
 [`clients/logging/better-stack/client.ts`](./clients/logging/better-stack/client.ts) (the execution context for `waitUntil`, wrapped in a `try` that
 returns `undefined` so logging still works off-request), and [`services/location/utils/strategies.ts`](./services/location/utils/strategies.ts) (only
 `env.NEXT_PUBLIC_SITE_URL`, to build the CDN trace URL). The signal that makes country detection cheap is not
@@ -166,21 +166,22 @@ the Cloudflare context at all: it is the `cf-ipcountry` request header, read by 
 which touches no context and is why the common path needs no geolocation service.
 
 **There are two readers of the same two variables, and the difference is *when* they are asked.**
-`getPublicEnv` is the cached, build-safe one (`'use cache'`, `cacheLife('days')`, the `{ async: true }`
-context), and [`sitemap.ts`](../app/sitemap.ts), [`robots.ts`](../app/robots.ts) and every route's `generateMetadata` use it because they are evaluated outside
+`getPublicEnv` is the build-safe one (the `{ async: true }` context, which falls back to wrangler's platform
+proxy during prerender), and [`sitemap.ts`](../app/sitemap.ts), [`robots.ts`](../app/robots.ts) and every route's `generateMetadata` use it because they may be evaluated outside
 a request. `getRequestPublicEnv` beside it is the synchronous, per-request one, and the two contact
 transports use it. They each hand-mapped those four lines before, which is the residue of exactly the drift
 `operations/` exists to prevent.
 
-They are deliberately not merged. Pointing the transports at `getPublicEnv` would change both the context
-form and the cache lifetime on the path that decides where a contact email is sent, and that is the same
-class of question as the `NEXT_PUBLIC_SITE_URL` resolution below, verifiable only against a real build,
-which is currently the thing that cannot be run locally. One reader per timing, one place each.
+They are deliberately not merged. Pointing the transports at `getPublicEnv` would change the context form
+on the path that decides where a contact email is sent, and that is the same class of question as the
+`NEXT_PUBLIC_SITE_URL` resolution below, verifiable only against a real build. One reader per timing, one
+place each.
 
-`getPublicEnv` carries `'use cache'` with `cacheLife('days')`, and neither is visible at its signature. The
-lifetime is safe because both values are deploy-time constants; a caller cannot observe a stale one. Its
-return type `PublicEnv` is exported and is the config shape [`api/operations/contact.ts`](./api/operations/contact.ts) takes, so the two
-cannot drift into describing different objects.
+`getPublicEnv` used to carry `'use cache'` with `cacheLife('days')`; it does not since
+[ADR 0015](../../../../adr/0015-cache-components-stay-off-on-the-workers-runtime.md) turned Cache Components off,
+and it needs no cache: both values are deploy-time constants, so reading them costs nothing and a caller cannot
+observe a stale one. Its return type `PublicEnv` is exported and is the config shape
+[`api/operations/contact.ts`](./api/operations/contact.ts) takes, so the two cannot drift into describing different objects.
 
 ## Two transports per operation, one implementation
 
