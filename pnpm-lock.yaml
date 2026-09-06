@@ -172,9 +172,6 @@ importers:
       '@logtail/edge':
         specifier: 0.5.8
         version: 0.5.8
-      '@logtail/next':
-        specifier: 0.4.0
-        version: 0.4.0(next@16.3.3(@babel/core@7.29.7(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@playwright/test@1.62.1)(@types/node@26.2.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)
       '@microlabs/otel-cf-workers':
         specifier: 1.0.0-rc.52
         version: 1.0.0-rc.52(@opentelemetry/api@1.9.1)
@@ -299,6 +296,9 @@ importers:
         specifier: 5.0.14
         version: 5.0.14(@types/react@19.2.18)(immer@11.1.15)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))
     devDependencies:
+      '@opentelemetry/context-async-hooks':
+        specifier: 2.11.0
+        version: 2.11.0(@opentelemetry/api@1.9.1)
       '@playwright/test':
         specifier: 1.62.1
         version: 1.62.1
@@ -2025,13 +2025,6 @@ packages:
     peerDependencies:
       '@cloudflare/workers-types': ^4.20230904.0
 
-  '@logtail/next@0.4.0':
-    resolution: {integrity: sha512-Ck2MVnPiu4D05xlp5luz+uQMxZz2UAMkRjujRo4n7itE4Fu//IwlILiQjsGEeK64ciG+mQXaQ9hDAVXC2PTqAw==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      next: '>=15.0'
-      react: '>=18.0.0'
-
   '@logtail/tools@0.5.8':
     resolution: {integrity: sha512-eAbbHaYSpRoB7Udp301xVUVDeKdgXTP2/s9FOeKX5tPLMM3hgbvuIx50bYJoV/to7bHGYBi36Gdsnj8ElcPXbg==}
 
@@ -2226,6 +2219,12 @@ packages:
   '@opentelemetry/api@1.9.1':
     resolution: {integrity: sha512-gLyJlPHPZYdAk1JENA9LeHejZe1Ti77/pTeFm/nMXmQH/HFZlcS/O2XJB+L8fkbrNSqhdtlvjBVjxwUYanNH5Q==}
     engines: {node: '>=8.0.0'}
+
+  '@opentelemetry/context-async-hooks@2.11.0':
+    resolution: {integrity: sha512-Tr79DyWI8itsBdg+jH+opjfrwLzX+erk1/ExkIwhWoAVjVrJIn2y5+cGjTC0Vy8fyNIA/y8wuJPZwr1T3xCZeQ==}
+    engines: {node: ^18.19.0 || >=20.6.0}
+    peerDependencies:
+      '@opentelemetry/api': '>=1.0.0 <1.10.0'
 
   '@opentelemetry/core@2.11.0':
     resolution: {integrity: sha512-7YP44XH0tV6+Mb54x2YGf84i7yi+31MBZlE8JwvozkxyTvXbSp10X7cI7YE49ChJ3shMJoBmCJF3+1QFBJctGA==}
@@ -7551,11 +7550,6 @@ packages:
       '@types/react':
         optional: true
 
-  use-deep-compare@1.3.0:
-    resolution: {integrity: sha512-94iG+dEdEP/Sl3WWde+w9StIunlV8Dgj+vkt5wTwMoFQLaijiEZSXXy8KtcStpmEDtIptRJiNeD4ACTtVvnIKA==}
-    peerDependencies:
-      react: '>=16.8.0'
-
   use-intl@4.13.6:
     resolution: {integrity: sha512-RLej84qL6PGTDp/PSG3tqRpwr7IvJfOu4Qfv/uyy8CrnYn1oEOQb6osNJb++jZ7FQxqN3aQ5BI7wTIerUgrgMA==}
     peerDependencies:
@@ -7823,9 +7817,6 @@ packages:
 
   webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
-
-  whatwg-fetch@3.6.20:
-    resolution: {integrity: sha512-EqhiFU6daOA8kpjOWTL0olhVOF3i7OrFzSYiGsEMB8GcXS+RrzauAERX65xMeNWVqxA6HXH2m69Z9LaKKdisfg==}
 
   whatwg-mimetype@3.0.0:
     resolution: {integrity: sha512-nt+N2dzIutVRxARx1nghPKGv1xHikU7HKdfafKkLNLindmPU/ch3U31NOCGGA/dmPcmb1VlofO0vnKAcsm0o/Q==}
@@ -9807,13 +9798,6 @@ snapshots:
       minimatch: 9.0.9
       stack-trace: 0.0.10
 
-  '@logtail/next@0.4.0(next@16.3.3(@babel/core@7.29.7(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@playwright/test@1.62.1)(@types/node@26.2.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)':
-    dependencies:
-      next: 16.3.3(@babel/core@7.29.7(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@playwright/test@1.62.1)(@types/node@26.2.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      react: 19.2.8
-      use-deep-compare: 1.3.0(react@19.2.8)
-      whatwg-fetch: 3.6.20
-
   '@logtail/tools@0.5.8':
     dependencies:
       '@logtail/types': 0.5.8
@@ -10057,6 +10041,10 @@ snapshots:
       '@opentelemetry/api': 1.9.1
 
   '@opentelemetry/api@1.9.1': {}
+
+  '@opentelemetry/context-async-hooks@2.11.0(@opentelemetry/api@1.9.1)':
+    dependencies:
+      '@opentelemetry/api': 1.9.1
 
   '@opentelemetry/core@2.11.0(@opentelemetry/api@1.9.1)':
     dependencies:
@@ -15823,11 +15811,6 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.18
 
-  use-deep-compare@1.3.0(react@19.2.8):
-    dependencies:
-      dequal: 2.0.3
-      react: 19.2.8
-
   use-intl@4.13.6(react@19.2.8):
     dependencies:
       '@formatjs/fast-memoize': 3.1.7
@@ -16071,8 +16054,6 @@ snapshots:
   web-worker@1.5.0: {}
 
   webidl-conversions@3.0.1: {}
-
-  whatwg-fetch@3.6.20: {}
 
   whatwg-mimetype@3.0.0: {}
 

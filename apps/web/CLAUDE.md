@@ -407,7 +407,11 @@ the token in `--secrets-file`, both from the GitHub variables the build already 
 fails before deploying when either is empty. With either unbound the configuration exports through `DROP_SPANS`,
 an exporter that acknowledges every batch and sends nothing, so a hand-run deploy without them traces into
 nothing rather than into a broken address, and without the per-request `console.warn` the library emits when
-it is handed no exporter at all. Sampling is
+it is handed no exporter at all. Inside a request, every use-case under
+[`src/application/use-cases/`](./src/application/use-cases) is a named child span: each export ends in
+`Effect.withSpan`, and `TracerLive` in [`src/infrastructure/layers.ts`](./src/infrastructure/layers.ts) bridges
+Effect spans onto the OpenTelemetry tracer the wrapper registered, so a trace reads `createPayment` → its
+`fetch` calls rather than a request followed by anonymous `fetch` calls. Sampling is
 `TRACE_SAMPLING_RATIO`, the same fraction `[observability.traces]` gives Cloudflare's own traces, which stay
 enabled; `acceptRemote` is off so a caller cannot raise it through a `traceparent` header. The decision, the
 two alternatives it beat and what it costs are

@@ -111,4 +111,4 @@ export const createPayment = ({
 		);
 
 		return { clientSecret: paymentIntent.client_secret, discountInfo, deferred };
-	});
+	}).pipe(Effect.withSpan("createPayment"));
