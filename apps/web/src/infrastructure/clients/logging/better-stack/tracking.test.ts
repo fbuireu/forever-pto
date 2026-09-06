@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { identifyUser, track } from "./tracking";
+import { identifyUser, track, trackingEnvironment } from "./tracking";
 
 afterEach(() => {
 	vi.unstubAllGlobals();
@@ -46,4 +46,20 @@ describe("identifyUser", () => {
 		identifyUser({ email: "user@example.com", plan: "premium" });
 		expect(betterstack).toHaveBeenCalledWith("user", { email: "user@example.com", plan: "premium" });
 	});
+});
+
+describe("trackingEnvironment", () => {
+	it.each(["localhost", "127.0.0.1", "pr-384-forever-pto-development.fbuireu.workers.dev"])(
+		"reports %s as development",
+		(hostname) => {
+			expect(trackingEnvironment(hostname)).toBe("development");
+		},
+	);
+
+	it.each(["forever-pto.com", "www.forever-pto.com", "workers.dev.example.com"])(
+		"reports %s as production",
+		(hostname) => {
+			expect(trackingEnvironment(hostname)).toBe("production");
+		},
+	);
 });
