@@ -1,14 +1,14 @@
 "use client";
 
 import { usePremiumStore } from "@application/stores/premium";
-import { identifyUser } from "@infrastructure/clients/logging/better-stack/tracking";
+import { identifyUser, trackingEnvironment } from "@infrastructure/clients/logging/better-stack/tracking";
 import { BETTER_STACK_SERVICE_ID, isServiceConsented } from "@ui/modules/shared/cookie-consent/utils/consent";
 import Script from "next/script";
 import { useEffect, useState } from "react";
 import { useShallow } from "zustand/shallow";
+import { version } from "../../../../package.json";
 
 const TRACKING_TOKEN = process.env.NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN;
-const ENV = process.env.NODE_ENV;
 
 export const BetterStackTracking = () => {
 	const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
@@ -43,6 +43,8 @@ export const BetterStackTracking = () => {
 
 	if (!TRACKING_TOKEN || !analyticsEnabled) return null;
 
+	const environment = trackingEnvironment(window.location.hostname);
+
 	return (
 		<Script id="betterstack-tracking" strategy="afterInteractive">
 			{`
@@ -53,7 +55,8 @@ export const BetterStackTracking = () => {
           s.src='https://betterstack.net/b.js?t='+r;
           (e.head||e.getElementsByTagName('head')[0]).appendChild(s);
         }(window,document,'betterstack','${TRACKING_TOKEN}');
-        betterstack('init', { environment: '${ENV}' });
+        betterstack('config', { release: '${version}' });
+        betterstack('init', { environment: '${environment}' });
       `}
 		</Script>
 	);

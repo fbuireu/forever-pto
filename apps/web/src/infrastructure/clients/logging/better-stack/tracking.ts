@@ -24,6 +24,13 @@ export const track = ({ event, properties }: TrackParams) => {
 	globalThis.window.betterstack("track", event, properties);
 };
 
+export type TrackingEnvironment = "production" | "development";
+
+const DEVELOPMENT_HOSTS = ["localhost", "127.0.0.1"];
+
+export const trackingEnvironment = (hostname: string): TrackingEnvironment =>
+	DEVELOPMENT_HOSTS.includes(hostname) || hostname.endsWith(".workers.dev") ? "development" : "production";
+
 export interface IdentifyUserParams {
 	email: string;
 	plan: "premium" | "free";
