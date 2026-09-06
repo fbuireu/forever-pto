@@ -351,10 +351,10 @@ four guards:
   handler never calls Stripe at all.
 - **Rate-limited on `cf-connecting-ip`**, through the same `checkRateLimit` the payment route uses.
 - **Never cached**, through an explicit `no-store` header on the redirect, because the response carries a
-  `Set-Cookie`. It must **not** also declare `export const dynamic = 'force-dynamic'`: this app runs with
-  `cacheComponents` enabled in `next.config.ts`, and Turbopack rejects that route segment config outright:
-  `next build` fails with "Route segment config "dynamic" is not compatible with
-  `nextConfig.cacheComponents`". The header is the whole mechanism.
+  `Set-Cookie`. It declares no `export const dynamic`: the route is dynamic by construction, and the header
+  is the whole mechanism. (While `cacheComponents` was on, that segment config was a build error; it is
+  allowed again since [ADR 0015](../../../../adr/0015-cache-components-stay-off-on-the-workers-runtime.md), and
+  `sitemap.ts` is the one route that uses it.)
 
 **Failure used to be silent to the operator, and that was the worse half.** The whole program was
 `checkRateLimit(ip).pipe(Effect.andThen(activateWithPayment), Effect.catchAll(() => Effect.succeed(null)))`,
@@ -467,7 +467,7 @@ importing the other five.
 
 The `{ async: true }` form is not interchangeable with the bare call, but the split is not request versus
 no-request. Only the async form works where there may be no request, so everything evaluable outside one
-(`sitemap.ts`, `robots.ts`, the `.well-known` handler, `getPublicEnv.ts` under `'use cache'`) must use it.
+(`sitemap.ts`, `robots.ts`, the `.well-known` handler, `getPublicEnv.ts`) must use it.
 The reverse does not hold: `api/markdown/route.ts` uses the async form and only ever runs inside a GET,
 because the async form is always safe. `api/contact/route.ts` uses the sync one. Copying a *sync* call into
 a prerendered path is the failure mode to watch for; copying an async one costs nothing.
