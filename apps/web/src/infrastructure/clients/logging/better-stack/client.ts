@@ -1,6 +1,7 @@
 import { Logtail } from "@logtail/edge";
 import { type CloudflareContext, getCloudflareContext } from "@opennextjs/cloudflare";
 import { LOG_LEVEL, LOG_SERVICE, type LogLevel, stripQuery } from "./contract";
+import { traceCorrelation } from "./correlation";
 
 interface LogContext {
 	[key: string]: unknown;
@@ -81,6 +82,7 @@ export class BetterStackClient {
 
 	private getFullContext(context?: LogContext) {
 		const merged: LogContext = {
+			...traceCorrelation(),
 			...this.baseContext,
 			...context,
 		};

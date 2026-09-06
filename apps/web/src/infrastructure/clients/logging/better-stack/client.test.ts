@@ -25,6 +25,10 @@ vi.mock("@logtail/edge", () => ({
 	Logtail: mockLogtailConstructor,
 }));
 
+vi.mock("./correlation", () => ({
+	traceCorrelation: vi.fn().mockReturnValue({ traceId: "trace-1", spanId: "span-1" }),
+}));
+
 vi.mock("@opennextjs/cloudflare", () => ({
 	getCloudflareContext: mockGetCloudflareContext,
 }));
@@ -241,6 +245,22 @@ describe("a log never fails its caller", () => {
 		expect(() => new Fresh().error("still fine")).not.toThrow();
 
 		vi.resetModules();
+	});
+});
+
+describe("trace correlation", () => {
+	it("stamps the active span's ids on every entry, so a log line and its trace answer one query", () => {
+		new BetterStackClient().info("charged");
+
+		const [, ctx] = mockLogtail.info.mock.calls[0];
+		expect(ctx).toMatchObject({ traceId: "trace-1", spanId: "span-1" });
+	});
+
+	it("lets a caller's own traceId win over the active span's", () => {
+		new BetterStackClient().info("charged", { traceId: "caller-trace" });
+
+		const [, ctx] = mockLogtail.info.mock.calls[0];
+		expect(ctx.traceId).toBe("caller-trace");
 	});
 });
 

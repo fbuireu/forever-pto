@@ -102,4 +102,4 @@ export const sendContactEmail = ({
 		);
 
 		return { deferred };
-	});
+	}).pipe(Effect.withSpan("sendContactEmail"));

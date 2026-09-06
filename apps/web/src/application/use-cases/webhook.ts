@@ -70,4 +70,4 @@ export const processWebhookEvent = (
 				logger.warn("Unhandled webhook event type", { eventType: event.type, eventId: event.id });
 				break;
 		}
-	});
+	}).pipe(Effect.withSpan("processWebhookEvent"));
