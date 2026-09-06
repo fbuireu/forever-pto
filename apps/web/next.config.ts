@@ -99,8 +99,7 @@ const SECURITY_HEADERS = [
 
 const nextConfig: NextConfig = {
 	poweredByHeader: false,
-	cacheComponents: true,
-	partialPrefetching: true,
+	cacheComponents: false,
 	compiler: {
 		removeConsole: isProd,
 	},
