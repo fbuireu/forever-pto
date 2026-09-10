@@ -10,7 +10,7 @@ Accepted for v1. Accounts and user authentication were considered and deliberate
 
 There is no account system and no licence key, because [ADR 0001](./0001-planner-runs-in-the-browser.md) left the product with no users table and no identity to attach an entitlement to. The only durable record of a user is the Donation they made.
 
-Two paths have to work: activating immediately after donating, and getting access back on a second device weeks later. The first can be verified against Stripe. The second cannot, because there is nothing to verify against except the email address itself. (The first has since split into two entry points with two different guards; the Decision below carries the current shape.)
+Both paths have to work: activating immediately after donating, and getting access back on a second device weeks later. The first can be verified against Stripe. The second cannot, because there is nothing to verify against except the email address itself. (The first has since split into separate entry points with a guard each; the Decision below carries the current shape.)
 
 The alternative is a magic link: email the user a signed URL on the recovery path. That is a mail round-trip, a token store and a whole failure surface, bought to protect a tier whose contents are advanced metrics and manual editing of a Suggestion.
 
@@ -18,9 +18,9 @@ The alternative is a magic link: email the user a signed URL on the recovery pat
 
 Premium is granted by looking up whether a succeeded payment exists for a given email address and, if so, issuing a signed 30-day session cookie. The payment record *is* the entitlement.
 
-Activation straight after a Donation is verified against Stripe. What it verifies *with* depends on which entry point the browser arrives at, and the Context's "two paths have to work" has since become three entry points over two guards.
+Activation straight after a Donation is verified against Stripe. What it verifies *with* depends on which entry point the browser arrives at, and the Context's "both paths have to work" has since become several entry points, not all of them guarded the same way.
 
-The two verified ones are thin wrappers over a single private `activateFromDonation` in [`activatePremium.ts`](../apps/web/src/application/use-cases/activatePremium.ts), which retrieves the payment intent, refuses anything not `succeeded`, and takes the payer's address from the intent rather than from the caller. The third reaches Stripe not at all. The extra guard is a **required** parameter of the entry point that holds it, never an optional field on a shared function:
+The verified ones are thin wrappers over a single private `activateFromDonation` in [`activatePremium.ts`](../apps/web/src/application/use-cases/activatePremium.ts), which retrieves the payment intent, refuses anything not `succeeded`, and takes the payer's address from the intent rather than from the caller. The remaining one reaches Stripe not at all. The extra guard is a **required** parameter of the entry point that holds it, never an optional field on a shared function:
 
 | Entry point | Use case | Guard |
 | --- | --- | --- |
@@ -28,7 +28,7 @@ The two verified ones are thin wrappers over a single private `activateFromDonat
 | `POST /api/check-session` with a `premiumKey` | `activateWithClaimedPayment` | the email the browser typed must equal the intent's. It passes no client secret |
 | `POST /api/check-session` with an email only | `activateWithEmail` | none: the "I already donated" recovery path |
 
-The client secret is the stronger of the two guards, since only someone who completed the payment holds it, and it is what the straight-after-a-Donation redirect actually presents. Deriving the email from the intent rather than checking it is what lets that redirect activate at all, because the payer may return in a browser that never held their address. The recovery path is not verified: it grants access to anyone who types an address with a succeeded payment behind it.
+The client secret is the stronger guard, since only someone who completed the payment holds it, and it is what the straight-after-a-Donation redirect actually presents. Deriving the email from the intent rather than checking it is what lets that redirect activate at all, because the payer may return in a browser that never held their address. The recovery path is not verified: it grants access to anyone who types an address with a succeeded payment behind it.
 
 ## Consequences
 

@@ -24,7 +24,7 @@ The full span the planner considers: the chosen year plus its Carry-over Months.
 _Avoid_: selected range, date range
 
 **Strategy**:
-The rule that decides which Bridges make it into a Suggestion when the PTO budget cannot cover them all. Three exist: Grouped, Optimized and Balanced.
+The rule that decides which Bridges make it into a Suggestion when the PTO budget cannot cover them all. They are Grouped, Optimized and Balanced.
 _Avoid_: filter, algorithm
 
 ## The calendar
@@ -100,7 +100,7 @@ Effective Days divided by the PTO Days spent to get them. It is the single quali
 _Avoid_: multiplier, ratio, performance
 
 **Gain**:
-The Effective Days a plan produces beyond the user's whole PTO budget, divided by that budget and shown as a percentage. It answers "how much more did optimising get me than spending my allowance naively?", where Efficiency answers "what did each PTO Day I actually placed return?". The two are measured against different denominators (the budget, against the days actually placed), so they coincide only when the plan spends the budget in full, and part company by whatever it leaves unspent.
+The Effective Days a plan produces beyond the user's whole PTO budget, divided by that budget and shown as a percentage. It answers "how much more did optimising get me than spending my allowance naively?", where Efficiency answers "what did each PTO Day I actually placed return?". They are measured against different denominators (the budget, against the days actually placed), so they coincide only when the plan spends the budget in full, and part company by whatever it leaves unspent.
 _Avoid_: improvement, multiplier, performance
 
 **Long Weekend**:
@@ -111,7 +111,7 @@ One separated period of time off within the year, however long. Counting them te
 _Avoid_: vacation period, period, break
 
 **Quarter**:
-Three consecutive months of the Planning Window, counted from its start rather than from January. A Planning Window is the year plus its Carry-over Months, so it holds five Quarters at the default of one Carry-over Month and up to eight at the maximum of twelve. A Quarter is therefore not a calendar quarter and the fifth one is not an error.
+Three consecutive months of the Planning Window, counted from its start rather than from January. A Planning Window is the year plus its Carry-over Months, so it holds more Quarters than a calendar year does, and gains them as the Carry-over Months grow. A Quarter is therefore not a calendar quarter, and one past the last calendar quarter is not an error.
 _Avoid_: trimester
 
 **Long Block**:

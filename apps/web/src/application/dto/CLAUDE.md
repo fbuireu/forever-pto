@@ -45,13 +45,13 @@ type BaseDTO<INPUT, OUTPUT, PARAMS = undefined> = [PARAMS] extends [undefined]
 request metadata attached to a Donation), and omitting them is a compile error. `countryDTO`, `regionDTO` and
 `paymentConfirmationDTO` declare none and cannot be handed a spurious one.
 
-That used to be `params?: PARAMS` for every mapper, enforced by two hand-written throws with two different
-messages plus a test each, for a condition the compiler had enough information to reject, while the other
-three would have accepted an extra argument silently. Both throws and both tests are gone because the case
+That used to be `params?: PARAMS` for every mapper, enforced by hand-written throws with their own
+messages plus a test each, for a condition the compiler had enough information to reject, while the rest
+would have accepted an extra argument silently. Those throws and their tests are gone because the case
 is unrepresentable. The trade is real and worth naming: the throw also guarded an untyped call path, and
 there are none today.
 
-`holidayDTO` widens `BaseDTO` with two extra entry points:
+`holidayDTO` widens `BaseDTO` with extra entry points:
 
 - `createCustom`: builds a Custom Holiday from what the user typed, rather than from upstream data. It
   takes no `locale`: its id is an ISO datetime, built by `isoDateTime` directly rather than through
@@ -62,8 +62,8 @@ Manual Days arrive as pseudo-Holidays built in the store and that rehydrated sta
 strings. Neither holds: `runPlanningPipeline` builds the `manual-N` pseudo-Holidays now, and
 `onRehydrateStorage` revives `state.holidays` through `fromStoredInstant` before anything can read them.
 
-There are exactly four producers of a `HolidayDTO` (`create`, `createCustom`, the worker's
-`deserializeHolidays`, and the rehydration revive), and all four hand back a real `Date`. So `normalize` was
+The producers of a `HolidayDTO` are `create`, `createCustom`, the worker's
+`deserializeHolidays` and the rehydration revive, and every one of them hands back a real `Date`. So `normalize` was
 the identity function, and its one caller ran it over an array that was already uniform.
 
 **Nothing could have told you that from the tests**, which is the part worth remembering. Its own cases
@@ -83,7 +83,7 @@ a `string`, so `createCustom` no longer coerces a `date` its own `CreateCustomHo
 **`isHolidayVariant` is where the sealed union is re-established, and it exists because `HolidayVariant`
 crosses a boundary the app does not control.** Persisted store state is obfuscated, not encrypted
 ([ADR 0007](../../../../../adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md)), so the `variant`
-of a stored Holiday is a string a user can edit and a string an older build may have written. Eight files
+of a stored Holiday is a string a user can edit and a string an older build may have written. Files
 read it outside this folder: [`../stores/holidays.ts`](../stores/holidays.ts),
 [`HolidayRow.tsx`](../../ui/modules/pages/planner/holidays/components/HolidayRow.tsx),
 [`HolidaysTable.tsx`](../../ui/modules/pages/planner/holidays/HolidaysTable.tsx),
@@ -91,7 +91,7 @@ read it outside this folder: [`../stores/holidays.ts`](../stores/holidays.ts),
 [`Summary.tsx`](../../ui/modules/pages/planner/Summary.tsx),
 [`HolidaysDistributionChart.tsx`](../../ui/modules/pages/planner/summary/HolidaysDistributionChart.tsx),
 [`YearTimelineChart.tsx`](../../ui/modules/pages/planner/summary/YearTimelineChart.tsx) and
-[`modifiers.ts`](../../ui/modules/pages/planner/utils/modifiers.ts). Seven of the eight compare against a
+[`modifiers.ts`](../../ui/modules/pages/planner/utils/modifiers.ts). Nearly all of them compare against a
 member of the union, so every branch answers *no* for a value outside it and an unrecognised variant does not
 fail anywhere: the Holiday drops out of the counts, the pie, the timeline and the table while still occupying
 its date and still blocking a PTO Day. The eighth, `HolidayRow.tsx`, renders `holiday.type ?? holiday.variant`
@@ -102,7 +102,7 @@ straight into the row, so the one thing the value can do is appear on screen. `o
 
 **`Raw*` types reach exactly one place outside this folder, and the rule used to be stated as if they
 reached none.** It said they "must not escape this folder", then illustrated it with a store or a component,
-and the tree keeps the second sentence rather than the first: `RawHoliday` is named in eight files under
+and the tree keeps the second sentence rather than the first: `RawHoliday` is named across the files under
 [`../../infrastructure/services/holidays/source/`](../../infrastructure/services/holidays/source), which is
 the adapter that *produces* the shape and hands it to `holidayDTO.create`. That is the upstream side of this
 seam, and a foreign type has to be spellable there or the adapter cannot type its own output. `RawCountry`
@@ -122,22 +122,22 @@ point: without it, the guard is bypassed by typing a different alias, which cost
 It deliberately does **not** widen `@infrastructure/services/payments/normalizeEmail`, which only lowercases
 and trims. Premium recovery is keyed by email through `getSucceededPaymentByEmail`'s
 `lower(trim(email)) = ?`, so stripping aliases there would change who can recover an entitlement: a
-different decision, on a different table, that this one must not smuggle in. Two normalisers, two reasons,
+different decision, on a different table, that this one must not smuggle in. A normaliser each, a reason each,
 and this paragraph is why neither should be collapsed into the other.
 
 ## A DTO does no I/O
 
 Nothing here fetches, writes, logs or reads a clock it was not handed. `create` is a pure function of `raw` and `params`. `stripe`, `date-holidays` and `i18n-iso-countries` appear only as `import type`; no SDK is constructed, so nothing in this folder pulls a runtime dependency in behind it.
 
-That is what lets `HolidayDTO` cross into the domain. The pure calendar context imports `@application/dto/holiday/types` directly, which is a layering inversion on paper: the type describes a Holiday, so it belongs in the domain. It is a known pragmatic exception (moving it means touching every calendar module and its tests), and it is safe only because everything in the file is evaluable inside a Web Worker with no DOM: two types, one const object, and `isHolidayVariant`, which is `Object.values` over that object and reaches nothing else. See [ADR 0003](../../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md) and [`../../domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md). If anything with a runtime dependency is ever added to [`holiday/types.ts`](./holiday/types.ts), the planner breaks in the worker and no server-side test will catch it.
+That is what lets `HolidayDTO` cross into the domain. The pure calendar context imports `@application/dto/holiday/types` directly, which is a layering inversion on paper: the type describes a Holiday, so it belongs in the domain. It is a known pragmatic exception (moving it means touching every calendar module and its tests), and it is safe only because everything in the file is evaluable inside a Web Worker with no DOM: two types, one const object, and `isHolidayVariant`, which is `Object.values` over one const object and reaches nothing else. See [ADR 0003](../../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md) and [`../../domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md). If anything with a runtime dependency is ever added to [`holiday/types.ts`](./holiday/types.ts), the planner breaks in the worker and no server-side test will catch it.
 
 `RegionDTO` also crosses outwards, but downwards only: `holidayDTO.create` takes the region list so `getRegionName` can turn a region code into a display label. No domain code imports it.
 
 ## Gotchas
 
-**The two payment mappers disagree about the unit of `amount`, deliberately.** `paymentConfirmationDTO` divides by 100 because it feeds a screen; `paymentDataDTO` keeps Stripe's minor units because it feeds the payments table. Both are built from the same `PaymentIntent`. Check which one you are holding before formatting or summing.
+**The payment mappers disagree about the unit of `amount`, deliberately.** `paymentConfirmationDTO` divides by 100 because it feeds a screen; `paymentDataDTO` keeps Stripe's minor units because it feeds the payments table. Both are built from the same `PaymentIntent`. Check which one you are holding before formatting or summing.
 
-**`holidayDTO.create` sorts twice, and the first sort is not chronological.** It compares nothing but the `location` flag, so Regional entries land after National ones and the `processedDates` dedupe keeps the National Holiday when both fall on the same date. Because that comparator is a real ordering, the sort stays stable: two entries of the same variant on the same date survive in the order upstream listed them, whatever the length of the list. The chronological sort happens at the end of the reduce.
+**`holidayDTO.create` sorts twice, and the first sort is not chronological.** It compares nothing but the `location` flag, so Regional entries land after National ones and the `processedDates` dedupe keeps the National Holiday when both fall on the same date. Because that comparator is a real ordering, the sort stays stable: entries of the same variant on the same date survive in the order upstream listed them, whatever the length of the list. The chronological sort happens at the end of the reduce.
 
 **`HolidayDTO.isInPlanningWindow` is a snapshot, so whoever carries a Holiday across a window change has to
 recompute it.** `isInPlanningWindow` the predicate is called by `create` and `createCustom`, and by the
@@ -150,7 +150,7 @@ applies no window filter, and no code under `@domain/calendar/` reads the flag a
 `runPlanningPipeline` stamping `true` on each `manual-N` pseudo-Holiday.
 [`../../domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md) states the opposite, correctly, under
 *Invariants and traps*: the Metrics see the whole unfiltered two-year set, and narrowing them to the flag was
-tried and reverted. So two guides contradicted each other, and this one was using the false half to justify a
+tried and reverted. So the guides contradicted each other, and this one was using the false half to justify a
 store behaviour that is in fact justified by the UI. What a stale flag actually breaks is the Summary's
 Holiday count, the composition pie and the Holidays table, all of which filter on it.
 
@@ -162,15 +162,15 @@ name crossed into the domain and onto the worker's wire type, and one file held 
 **The bounds themselves are no longer defined here.** `planningWindowInterval` and `isInPlanningWindow` live
 in [`../../domain/calendar/window.ts`](../../domain/calendar/window.ts), beside `planningWindowMonths`, which
 is the other projection of the same `{ year, carryOverMonths }` and has to describe the same span. They were
-here, one layer up from it, with nothing relating the two. This section used to narrate exactly that risk for
+here, one layer up from it, with nothing relating them. This section used to narrate exactly that risk for
 a *different* duplicate it had deleted: the holidays store's private `getPlanningWindow` wrapped the end in an
 extra `endOfMonth`, which could never change the answer because `addMonths` on 31 December already lands on
-the shorter month's last day. The two agreed on Temporal's overflow behaviour rather than on a shared
+the shorter month's last day. They agreed on Temporal's overflow behaviour rather than on a shared
 definition, and so did the month array. `window.test.ts` relates them now.
 
 **`create`'s keep window is derived, not written twice.** It kept anything inside the chosen year plus the
 whole of the following one, as a literal `year + 1`, while `filters.ts` capped Carry-over Months at 12 as a UI
-clamp. Those are the same bound, stated in two layers, and raising the clamp alone would have widened the
+clamp. Those are the same bound, stated in separate layers, and raising the clamp alone would have widened the
 Planning Window past the data. `MAX_CARRY_OVER_MONTHS` is declared in `window.ts` now, and this mapper builds
 its keep window as `planningWindowInterval({ year, carryOverMonths: MAX_CARRY_OVER_MONTHS })`.
 
@@ -183,23 +183,23 @@ it: what it guards is the mapper going back to a literal, and the *value* of the
 
 **The bounds are a value, and the predicate takes one.** `isInPlanningWindow` used to take
 `{ date, year, carryOverMonths }` and rebuild the interval on every call, so the one definition of the bounds
-was recomputed once per Holiday rather than once per window: three `Date` allocations and four
+was recomputed once per Holiday rather than once per window: a fresh set of `Date` allocations and
 `Temporal.PlainDate` conversions inside a reduce that runs over every raw Holiday, and again per Custom
 Holiday, Manual Day and Removed Day. `planningWindowInterval({ year, carryOverMonths })` is that definition
 now, and each call site builds it once.
 
-**Two date windows, not one.** `create` drops anything outside the widest Planning Window the data supports (`MAX_CARRY_OVER_MONTHS`, so the chosen year plus the whole of the following one), then sets `isInPlanningWindow` from the *actual* Planning Window (the year plus its Carry-over Months). Holidays between the two are kept so the UI can show them for context. They are not hidden from the engine: it plans against the unfiltered set on purpose, and the flag is read only by the display filters listed above.
+**There is a keep window and a display window, not one window.** `create` drops anything outside the widest Planning Window the data supports (`MAX_CARRY_OVER_MONTHS`, so the chosen year plus the whole of the following one), then sets `isInPlanningWindow` from the *actual* Planning Window (the year plus its Carry-over Months). Holidays between them are kept so the UI can show them for context. They are not hidden from the engine: it plans against the unfiltered set on purpose, and the flag is read only by the display filters listed above.
 
 **Schemas carry message keys, not messages.** `contactSchema` and `createPaymentSchema` are pre-bound with keys such as `invalid_email` for server-side validation. The UI calls `createContactSchema` / `createPaymentSchemaWithMessages` with translated strings instead. Adding a validation rule means adding it to the messages interface too, or the localised form silently loses the message.
 
 **The bounds are exported, and the bundles interpolate them.** `AMOUNT_MIN`/`AMOUNT_MAX` and
 `NAME_MIN_LENGTH`/`SUBJECT_MIN_LENGTH`/`MESSAGE_MIN_LENGTH` come out of the schema modules, so the rule and
-the message it explains move together. They did not: [`payment/schema.ts`](./payment/schema.ts) said `.max(10000)` while twelve
+the message it explains move together. They did not: [`payment/schema.ts`](./payment/schema.ts) said `.max(10000)` while
 hand-written strings said "Maximum amount is 10,000": one per bound per locale, each with its own grouping
 separator (`10.000`, `10 000`, `10,000`). Raising the cap made every bundle lie. The keys are
 `{max, number}` now, so ICU does the grouping per locale and the number comes from the schema.
 [`JsonLd.tsx`](../../ui/modules/shared/seo/JsonLd.tsx)'s `MINIMUM_DONATION` reads `AMOUNT_MIN` for the same reason: the structured data advertises a
-`minPrice`, and the app guide used to say the two "move together" as an instruction to the reader.
+`minPrice`, and the app guide used to say they "move together" as an instruction to the reader.
 
 **There is one `calculateFinalAmount` now, and it is the private one in `@infrastructure/services/payments/provider/promoCode` that actually applies a Stripe coupon.** This folder used to export a second function of the same name whose whole body was `discountInfo?.finalAmount ?? baseAmount`: one caller, its own tests, and a paragraph here whose only job was to stop a reader confusing it with the one that does the work. [`Donate.tsx`](../../ui/modules/shared/donate/Donate.tsx) reads the field directly.
 

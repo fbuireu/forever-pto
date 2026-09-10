@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-The app runs as a Cloudflare Worker built with OpenNext. There are three kinds of environment, all defined by the two `[env.*]` blocks in `wrangler.toml`: previews are not a third wrangler environment, they are the `development` environment deployed under a different Worker name.
+The app runs as a Cloudflare Worker built with OpenNext. The kinds of environment are all defined by the `[env.*]` blocks in `wrangler.toml`: previews are not a wrangler environment of their own, they are the `development` environment deployed under a different Worker name.
 
 | Environment | Worker | URL | Access |
 | --- | --- | --- | --- |

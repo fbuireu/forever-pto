@@ -26,7 +26,7 @@ Markdown negotiation is the **first** thing `apps/web/src/middleware.ts` decides
 
 - No `x-markdown-path` header → **404**. There is no fallback to the query string; the fallback is the vulnerability, not a convenience.
 - Otherwise it resolves `NEXT_PUBLIC_SITE_URL` from the Cloudflare context and calls `buildMarkdownPage(baseUrl, pathname)`.
-- `buildMarkdownPage` answering `null`, an unlisted path, is also a **404**, so the two representations of one URL agree. A 200 with the homepage's body would have told a crawler that `/does-not-exist` exists.
+- `buildMarkdownPage` answering `null`, an unlisted path, is also a **404**, so the representations of one URL agree. A 200 with the homepage's body would have told a crawler that `/does-not-exist` exists.
 
 ## The headers
 

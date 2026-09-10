@@ -17,11 +17,11 @@ read by the premium activation path as well as by the payment one.
 | --- | --- | --- |
 | `repository.ts` | `savePayment`, `updatePaymentStatus`, `updatePaymentCharge`, `getPaymentById`, `getSucceededPaymentByEmail`, `countPromoCodeRedemptions`, the `PaymentChargeData` shape | `TursoService` |
 | [`normalizeEmail.ts`](./normalizeEmail.ts) | `normalizeEmail(email)`: trim and lower-case, applied on both sides of every address comparison | None |
-| [`normalForms.ts`](./normalForms.ts) | `PAYMENT_CURRENCY` and `normalizePromoCode(code)`: the two forms every payment value has to be written in, at every site that writes one | None |
+| [`normalForms.ts`](./normalForms.ts) | `PAYMENT_CURRENCY` and `normalizePromoCode(code)`: the forms every payment value has to be written in, at every site that writes one | None |
 | [`confirmation.ts`](./confirmation.ts) | `confirmation(paymentIntentId)`: a `PaymentConfirmationDTO`, or `null` on any failure; warns through the tag when the intent is not `succeeded`, so the page renders and never logs | `StripeServerService`, `LoggerService` |
 | [`rateLimit.ts`](./rateLimit.ts) | `checkRateLimit(ip)`: fails with `RateLimitError` | the Cloudflare `PAYMENT_RATE_LIMITER` binding |
 | [`provider/intent.ts`](./provider/intent.ts) | `createPaymentIntent(params)`: the Stripe intent behind a Donation | `StripeServerService` |
-| [`provider/metadata.ts`](./provider/metadata.ts) | `readDonationMetadata(intent)` and `clampMetadata(value)`: the two halves of the donation metadata format | None |
+| [`provider/metadata.ts`](./provider/metadata.ts) | `readDonationMetadata(intent)` and `clampMetadata(value)`: the halves of the donation metadata format | None |
 | [`provider/charge.ts`](./provider/charge.ts) | `retrieveCharge(chargeId)`: normalises a Stripe `Charge` into flat, nullable fields | `StripeServerService` |
 | [`provider/promoCode.ts`](./provider/promoCode.ts) | `validatePromoCode(code, amount)`: a `DiscountInfo`, or a `PromoCodeError` | `StripeServerService`, `TursoService` |
 
@@ -62,7 +62,7 @@ second insert for the same intent is dropped whole, including any column the fir
 `AND status != 'succeeded'`, so a succeeded row, the entitlement, cannot be overwritten by a late or
 redelivered event, and both functions return a `boolean` off `rowsAffected`. That is what removed the
 read-compare-write those callers each spelled out: `getPaymentById(...)` absorbed to `undefined`, a
-comparison against `PAYMENT_SUCCEEDED`, then the write, written four times over. It was never a real guard
+comparison against `PAYMENT_SUCCEEDED`, then the write, spelled out at every caller. It was never a real guard
 anyway: `TursoService` opens a connection per call, so nothing spanned the read and the write, and two
 webhook deliveries could both read `processing` and both write. The rule is now one predicate the database
 evaluates atomically.
@@ -80,21 +80,21 @@ database into a 200 Stripe would never retry. See
 
 **Amounts are in Stripe minor units everywhere except `confirmation.ts`.** `createPaymentIntent` multiplies
 by 100 on the way in, `paymentDataDTO` keeps minor units for the table, and `confirmation` divides by 100
-because its output feeds a screen. Two payment shapes with an `amount` field, two different units.
+because its output feeds a screen. Payment shapes with an `amount` field, in different units.
 
 **The currency is `PAYMENT_CURRENCY` from [`normalForms.ts`](./normalForms.ts)**, imported by `createPaymentIntent` (which
 prices the intent) and by `provider/promoCode.ts`, which refuses to compare a promotion-code minimum
-priced in anything else. They were two separate literals with a sentence here saying they had to move
+priced in anything else. They were separate literals with a sentence here saying they had to move
 together, and nothing enforcing it; one import each is what makes that sentence a compile-time fact.
 
 `normalizePromoCode` sits beside it for the same reason. It was exported from `repository.ts` with
 `repository.ts` as its only importer, while `provider/promoCode.ts` re-spelled it as
-`code.toUpperCase().trim()`, the same two operations in the opposite order. The order is not observable
-(no character uppercases into or out of whitespace, so the two compose commutatively over every input), but
+`code.toUpperCase().trim()`, the same operations in the opposite order. The order is not observable
+(no character uppercases into or out of whitespace, so they compose commutatively over every input), but
 the duplication is: the code sent to Stripe's `promotionCodes.list` and the code the redemption count is
 keyed by have to be the same string, and only one of them was reading a shared definition.
 
-`PAYMENT_CURRENCY` guards **two** places in that file and both are load-bearing. The promotion-code
+`PAYMENT_CURRENCY` guards **more than one** place in that file and each is load-bearing. The promotion-code
 `minimum_amount` in another currency is *ignored*: the restriction cannot be evaluated, so it is not
 applied. A coupon's own `amount_off` in another currency is *refused* with `COUPON_INVALID`, because
 `calculateFinalAmount` subtracts `amount_off / 100` as though it were euros: a $200 discount would come off
@@ -136,10 +136,10 @@ took the first non-blank of `metadata.email` and `receipt_email` after trimming;
 valid `receipt_email` had the webhook record the row correctly while the redirect path refused it with
 `'Email mismatch'` and sent the payer to `activation=failed`, for a Donation that had cleared. Both callers
 now read through `readDonationMetadata`, and `clampMetadata` moved beside it. The reader returns
-`email: string | undefined` rather than failing, because the two callers owe different errors:
+`email: string | undefined` rather than failing, because the callers owe different errors:
 `MissingDonorEmailError` in the factory, `ValidationError` at the use-case.
 
-**Stripe caps a metadata value at 500 characters, and three of ours were unbounded.** `promoCode`,
+**Stripe caps a metadata value at 500 characters, and some of ours were unbounded.** `promoCode`,
 `userAgent` and `ipAddress` now go through `clampMetadata`. A `User-Agent` over the cap is trivially
 forgeable and occurs in the wild from AV- and enterprise-injected headers, and it made `paymentIntents.create`
 reject the whole call, so a header the donor never chose failed the Donation, and the route answered a bare
@@ -152,7 +152,7 @@ matches on it exactly, so a truncated address would silently orphan the payer, t
 a blank one. An over-long address is refused earlier instead, by the `.max(254)` on
 `createPaymentSchemaWithMessages`, so it fails as a `ValidationError` and a 400 rather than reaching Stripe.
 `promoCode` carries a `.max()` there too, which is what stops the whitespace bypass carrying an arbitrarily
-long string. Adding a new free-text metadata field means deciding which of these two it is.
+long string. Adding a new free-text metadata field means deciding which of these it is.
 
 Both of those `.max()` rules carry a message key, and the promo-code one did not at first. A Zod rule
 without `{ message }` falls back to Zod's own English prose, and that string is what `zodParse` puts into
@@ -160,19 +160,19 @@ without `{ message }` falls back to Zod's own English prose, and that string is 
 was shown "Too big: expected string to have <=100 characters", in the form and from the API alike. The rule
 now names `messages.promoCodeTooLong`, pre-bound to the machine code `promo_code_too_long` for the server
 and resolved through `validation.payment.promoCodeTooLong` for the form; `checkout.errors.promo_code_too_long`
-is its lookup in all six bundles. See [`../../../application/dto/CLAUDE.md`](../../../application/dto/CLAUDE.md).
+is its lookup in every bundle. See [`../../../application/dto/CLAUDE.md`](../../../application/dto/CLAUDE.md).
 
 ## Traps
 
-**A payment is written with `NewPayment` and read back as `PaymentData`, and the two are different
-widths.** `PaymentData` is the stored record: 28 fields, one per column. `NewPayment` is the thirteen the
-`PaymentIntent` actually knows, and `paymentDataDTO` produces that. The DTO used to produce all 28 by
-hardcoding `null` for the other fifteen, which read as "we checked and there is nothing there" when it meant
-"this is not knowable yet": twelve of them are filled minutes later by `updatePaymentCharge` off the expanded
-charge, and the last four (the refund, dispute, parent and origin columns) have no writer anywhere in this
+**A payment is written with `NewPayment` and read back as `PaymentData`, and they are different
+widths.** `PaymentData` is the stored record, one field per column. `NewPayment` is the subset the
+`PaymentIntent` actually knows, and `paymentDataDTO` produces that. The DTO used to produce the whole record by
+hardcoding `null` for the rest, which read as "we checked and there is nothing there" when it meant
+"this is not knowable yet": most of them are filled minutes later by `updatePaymentCharge` off the expanded
+charge, and the refund, dispute, parent and origin columns have no writer anywhere in this
 codebase.
 
-**The `INSERT` still names all 29 columns and binds a literal `null` to the fifteen, and that is
+**The `INSERT` still names every column and binds a literal `null` to the ones with no value yet, and that is
 deliberate.** Omitting a column is not the same statement: a `NOT NULL` column with a `DEFAULT` takes the
 default when omitted and rejects an explicit `NULL`. The schema lives in Turso, not in this repo, so nothing
 here can prove which columns those are. Binding `null` is what the code already did, byte for byte, and the
@@ -211,10 +211,10 @@ the context call ([ADR 0004](../../../../../../adr/0004-cloudflare-workers-as-de
 **It counts on the platform, because a KV counter cannot be made correct here.** This was a read-modify-write
 over `RATE_LIMIT_KV` (`get`, compare, `put(count + 1)`) and Workers KV offers neither compare-and-swap nor
 atomic increment, so every request whose `get` resolved before a peer's `put` landed read the same value and
-wrote the same number. The 10-per-60 s bound therefore held only for strictly serialised traffic: two hundred
+wrote the same number. The 10-per-60 s bound therefore held only for strictly serialised traffic: a burst of
 parallel `POST /api/payment` from one IP, which is exactly the shape of card-testing traffic, advanced the
 counter by an amount unrelated to the burst and admitted almost all of them to
-`stripe.paymentIntents.create`. Two KV properties widened the window rather than narrowing it: a `get` is
+`stripe.paymentIntents.create`. KV properties widened the window rather than narrowing it: a `get` is
 served from a per-colo cache whose minimum TTL is 60 s, the same as the window, and writes to one key are
 throttled to roughly one per second. `simple = { limit = 10, period = 60 }` in `wrangler.toml` now owns both
 bounds (`period` accepts only 10 or 60), so there is no `LIMIT`, no `WINDOW_SECONDS` and no `rl:payment:`
@@ -229,8 +229,8 @@ broke every promo code in production.** On the `dahlia` API version this repo pi
 what stopped the compiler saying so), got `undefined`, and failed every single valid code
 with `FAILED_TO_LOAD`. Nothing caught it: the co-located test built its mock in the shape the code expected
 rather than the shape Stripe sends, so the suite agreed with the bug. Verified against the real test account
-by creating codes and running the program over them; with the old read, seven of nine live cases returned
-`failed_to_load`, and the only two that passed were the ones that never reach a coupon at all.
+by creating codes and running the program over them; with the old read, nearly every live case returned
+`failed_to_load`, and the only ones that passed were those that never reach a coupon at all.
 
 The coupon is a bare id unless asked for, so `list` now carries `expand: ['data.promotion.coupon']` and the
 second `retrieve` call is gone: one round trip, not two. That expansion is the load-bearing part: without
@@ -242,11 +242,11 @@ the code, then evaluates the promotion code (active, expiry, redemptions, minimu
 and only then the coupon (valid, redemptions, `redeem_by`). A code failing both reports the promotion-code
 reason. The `PromoCodeErrorCode` returned is a translation key the UI looks up, not a message.
 
-**Two branches here are unreachable through this path, and both are deliberate.** `list` is called with
+**Some branches here are unreachable through this path, and each is deliberate.** `list` is called with
 `active: true`, which the API honours by hiding deactivated codes entirely, so a code the operator switched
 off comes back as an empty list and reports `INVALID_OR_EXPIRED` from the length check, never from the
 `promotionCode.active === false` test below it. And Stripe refuses to *create* a coupon whose `redeem_by` or
-a code whose `expires_at` is already in the past, so those two comparisons can only fire on an object that
+a code whose `expires_at` is already in the past, so those comparisons can only fire on an object that
 aged into expiry. Keep them: they are the only thing standing between a stale object and a discount.
 
 **Discounted amounts are rounded to whole cents where they are computed.** `amount * (1 - percent_off / 100)`
@@ -263,7 +263,7 @@ discount locally and sends a bare `paymentIntents.create` with the amount alread
 never fire on its own. A single-use 90%-off code was therefore permanent for anyone who learned it.
 `validatePromoCode` now counts succeeded rows in `payments` whose `promo_code` matches (normalised on both
 sides, since the column holds what the user typed while Stripe is queried with the upper-cased form), and
-refuses once the count reaches the cap. Three properties are deliberate:
+refuses once the count reaches the cap. These properties are deliberate:
 
 - **It queries only when the code declares a cap.** An uncapped code costs no database round trip.
 - **It fails open.** A failed count is caught to zero rather than refusing a paying donor over an outage,
@@ -312,13 +312,13 @@ asserting the code never reaches for a top-level `coupon`.
 literal indices.** `insertedColumns` slices the `INSERT`'s own column list, `updatedColumns` matches the
 `SET x = ?` assignments and appends the `WHERE id` key, and `boundRow` zips either list against the argument
 array, so the expectation is a named row, `{ email: 'user@example.com', … }`, and a column inserted mid-list
-shifts every name-value pair below it and fails loudly. It also ties the two counts nothing used to compare:
+shifts every name-value pair below it and fails loudly. It also ties the counts nothing used to compare:
 `sql.split('?')` against `args.length + 1`, so a placeholder added without its value, or the reverse, is
 caught on its own.
 
-That replaced seven positional spot checks over a 29-column insert. They covered indices 0 and 4–7 and left
+That replaced a handful of positional spot checks over a wide insert. They covered only the first few indices and left
 everything from `payment_method_type` through `origin` unasserted (which is precisely the stretch a mid-list
-insertion shifts), and `updatePaymentCharge` asserted only its first and last argument over a thirteen-field
+insertion shifts), and `updatePaymentCharge` asserted only its first and last argument over a
 payload whose middle is entirely nullable strings and numbers, where a one-place shift is type-clean. Both
 falsifications were run: swapping two column names in the `INSERT`, and dropping one placeholder along with
 its value.
@@ -326,18 +326,18 @@ its value.
 `updatePaymentStatus`'s test also pins the SQL's `WHEN ? = 'succeeded'` against `PAYMENT_SUCCEEDED`.
 
 **That sentence used to end "that literal is the one copy of the entitlement value the type system cannot
-reach", and the count was wrong.** [`repository.ts`](./repository.ts) writes it four times, not once:
+reach", and the count was wrong.** [`repository.ts`](./repository.ts) writes it in several statements, not once:
 `CASE WHEN ? = 'succeeded'` and `WHERE id = ? AND status != 'succeeded'` inside `updatePaymentStatus`,
 `AND status = 'succeeded'` in `getSucceededPaymentByEmail`, and `AND status = 'succeeded'` in
-`countPromoCodeRedemptions`. One of the four is pinned here; the other three had nothing, and the third of
+`countPromoCodeRedemptions`. One of them is pinned here; the others had nothing, and among
 them is the query that decides whether a returning donor recovers Premium at all.
 
 They are not consolidated, and that is the decision rather than the backlog. Stripe owns the value, so
 nothing in this tree can produce a divergent one and the illegal state is not reachable from any code path:
-it is a guard, not a defect. Binding the constant as a fourth parameter in four statements would couple this
+it is a guard, not a defect. Binding the constant as an extra parameter in each statement would couple this
 SQL to a word Stripe cannot change and pay for it in statements that read less like the SQL they are.
 [`tests/docs-consistency.test.ts`](../../../../../../tests/docs-consistency.test.ts) asserts instead that every
-`status` comparison in this file names `PAYMENT_SUCCEEDED`'s value and no other, with a floor of four so a
+`status` comparison in this file names `PAYMENT_SUCCEEDED`'s value and no other, with a floor so a
 rewritten statement the pattern stops matching fails the rule rather than emptying it. Verified by misspelling
 one predicate.
 
@@ -345,6 +345,6 @@ The same rule's second half is why `activateFromDonation`, the private helper `a
 `activateWithClaimedPayment` both delegate to, compares `paymentIntent.status !== PAYMENT_SUCCEEDED` rather
 than against a literal. It already imported the constant and passed it to `updatePaymentStatus` further down
 its own body, while the comparison that decides whether the Donation counts at all was a bare string: one
-rule, one function, two spellings. No production module that imports the constant may also spell the value.
+rule, one function, spelled both ways. No production module that imports the constant may also spell the value.
 See
 [`../../../domain/payment/CLAUDE.md`](../../../domain/payment/CLAUDE.md).

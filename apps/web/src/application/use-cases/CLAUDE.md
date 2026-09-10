@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The four server-side flows that combine more than one external service: taking a Donation, activating
+The server-side flows that combine more than one external service: taking a Donation, activating
 Premium, handling the Stripe webhook, and sending a contact message. A use-case is an Effect *program*: a
 value, not a call. It composes service tags and repository functions, declares what it can fail with, and
 returns. It never runs itself, never reaches for a request, and never decides an HTTP status.
@@ -18,8 +18,8 @@ returns. It never runs itself, never reaches for a request, and never decides an
 
 ## The entry-point convention
 
-Every export is `(input, …) => Effect.Effect<A, E, R>` built with `Effect.gen`, with all three type
-parameters written out explicitly rather than inferred. That signature is the contract:
+Every export is `(input, …) => Effect.Effect<A, E, R>` built with `Effect.gen`, with every type
+parameter written out explicitly rather than inferred. That signature is the contract:
 
 - **`R`** lists the service tags the caller must provide: `StripeServerService`, `TursoService`,
   `ResendService`, `LoggerService`. Tags are `yield*`-ed out of context; no client is ever constructed here.
@@ -44,7 +44,7 @@ that as "no such row", which turned an unreachable Turso into a 200 Stripe never
 [`../../domain/payment/CLAUDE.md`](../../domain/payment/CLAUDE.md). Absorb a failure only where the answer
 you substitute is one the flow could genuinely have got.
 
-Logging comes in three shapes here and the choice is about *when* the line runs, never about safety. A log
+Logging comes in a few shapes here and the choice is about *when* the line runs, never about safety. A log
 attached to a failure sits in `Effect.sync` inside `tapError` (`webhook.ts`, `payment.ts`) or inside
 `catchAll` where the failure is also being absorbed (`contact.ts`, `activatePremium.ts`); a log describing a
 successful branch is a bare statement in the generator body (`webhook.ts` lines around the dispatch). None of
@@ -60,7 +60,7 @@ under `src/app/api/` and the server actions in `@infrastructure/actions`) pipes 
 `catchAll` fallback for the untyped remainder, and runs it. Forgetting the layer is a compile error, not a
 runtime one.
 
-Two entry points exist for the same operation: `/api/payment` and the `createPaymentAction` server action
+Separate entry points exist for the same operation: `/api/payment` and the `createPaymentAction` server action
 both call `createPayment`, and both must keep behaving identically (rate limit first, same error mapping).
 The same holds for `sendContactEmail`.
 
@@ -75,12 +75,12 @@ cookies or `env` belongs in that parameter.
 
 ## The deferred effect
 
-Three of the four use-cases return a `deferred: Effect.Effect<void, never, TursoService>` alongside their
+Most of the use-cases return a `deferred: Effect.Effect<void, never, TursoService>` alongside their
 result. It holds the database writes that the user's response does not depend on; the caller schedules it
 with `after(() => Effect.runPromise(deferred.pipe(Effect.provide(ApplicationLayer))))`. The layer has to be
 provided a second time: the outer program's runtime is gone by then.
 
-Two properties of that type are deliberate:
+These properties of that type are deliberate:
 
 - **`never` in the error channel.** Every failure inside is caught and logged, because there is no longer a
   response to fail. A lost write is invisible outside the logs, which is why `processWebhookEvent` re-creates
@@ -89,7 +89,7 @@ Two properties of that type are deliberate:
   closure, so the deferred does not require `LoggerService` even though it logs.
 
 `activateWithEmail` returns `Effect.void` as its deferred (the recovery path has nothing to persist), so the
-caller can treat all four uniformly.
+caller can treat them all uniformly.
 
 ## Premium activation
 
@@ -97,7 +97,7 @@ caller can treat all four uniformly.
 there is no accounts table, so a succeeded payment record *is* the entitlement, and both exports end by
 minting the same 30-day session token via `createSession` in [`session.ts`](../../infrastructure/services/premium/session.ts).
 
-The two paths are deliberately asymmetric, and this is the trap:
+The paths are deliberately asymmetric, and this is the trap:
 
 - `activateWithPayment` and `activateWithClaimedPayment` (straight after a Donation) **verify**. Both are
   thin entry points over one private `activateFromDonation`, which retrieves the payment intent from Stripe,
@@ -107,7 +107,7 @@ The two paths are deliberately asymmetric, and this is the trap:
   entry point, not an optional one on a shared function**: `activateWithPayment({ paymentIntentId,
   clientSecret })` for `GET /api/payment/activate`, which holds the secret Stripe appended to the
   `return_url`; `activateWithClaimedPayment({ paymentIntentId, expectedEmail })` for `POST
-  /api/check-session`, which holds an email the browser typed. The secret is the stronger of the two, since
+  /api/check-session`, which holds an email the browser typed. The secret is the stronger of them, since
   only someone who completed the payment has it. It was one function with both fields optional and a body
   reading `if (clientSecret && …)`, so omitting the field skipped the guard. No caller did, but nothing said
   they could not, and half the tests called it with no guard at all. Deriving the email from the intent is
@@ -133,11 +133,11 @@ whose message is shown. The path that reaches it is the post-charge one: `confir
 `No such payment_intent: 'pi_3ABC…'`, under a 400 telling every layer above that the request was wrong and
 there was nothing to retry. `PaymentError` now travels in `activateWithPayment`'s error channel and
 `check-session` maps it beside `SessionError` and `DatabaseError`. `ValidationError` is reserved for the
-three conditions this file decides for itself: secret mismatch, not succeeded, email mismatch.
+conditions this file decides for itself: secret mismatch, not succeeded, email mismatch.
 
 ## The contact guard runs before the send, and it is not an IP rate limit
 
-`sendContactEmail` refuses in two cases before it renders or sends anything, so a refusal costs no Resend
+`sendContactEmail` refuses in a couple of cases before it renders or sends anything, so a refusal costs no Resend
 call and no `contacts` row:
 
 - **A cooldown.** The same sender wrote inside the last `CONTACT_COOLDOWN_HOURS`.
@@ -190,7 +190,7 @@ someone has to go and find them, which is why the message says so rather than re
 
 ## Testing
 
-Each file has a co-located `.test.ts`. The pattern is identical across the four and worth copying:
+Each file has a co-located `.test.ts`. The pattern is identical across them and worth copying:
 
 - Build a `TestLayer` with `Layer.succeed(Tag, mockImplementation)` for every tag in `R`. No test constructs
   a real Stripe, Turso or Resend client.

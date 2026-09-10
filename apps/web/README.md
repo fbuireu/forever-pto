@@ -56,7 +56,7 @@ e2e/                  Playwright specs
 workers/tail/         the tail consumer Worker, with its own wrangler.toml
 ```
 
-Twenty-one folders under `src/` carry their own `CLAUDE.md`. They are the detail; start from
+Folders under `src/` carry their own `CLAUDE.md`. They are the detail; start from
 [`CLAUDE.md`](./CLAUDE.md), which indexes them and states the rules for changing anything here.
 
 ## Testing
@@ -77,6 +77,6 @@ This package versions itself: tags are `web-vX.Y.Z`, and a commit belongs to it 
 `apps/web/`. The release runs after the production deploy, so a tag means the version is live. See
 [ADR 0011](../../adr/0011-per-package-versioning-with-a-bridge-tag.md).
 
-`version` in [`package.json`](./package.json) is read at runtime by six source files to render the footer, the hero, the
+`version` in [`package.json`](./package.json) is read at runtime by source files across the app to render the footer, the hero, the
 error page, the `/api/markdown` output and both `.well-known` documents, the agent-skills index and the MCP
 server card, and by the docs site for its header badge. It is not only a release number.

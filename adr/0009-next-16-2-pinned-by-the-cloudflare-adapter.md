@@ -6,7 +6,7 @@ Date: 2026-08-15
 
 Accepted. **Amended 2026-08-29: the pin is lifted.** Next is 16.3.3, `@opennextjs/cloudflare` is 1.20.3,
 wrangler is 4.126.0 and TypeScript is 7.0.2 at the root and in `apps/web`. That amendment says plainly which
-of the two conditions below was met and which was not.
+of the conditions below was met and which was not.
 
 **Amended 2026-09-02: `E2E (preview)` gates a merge.** The missing half named below is in place: `ci.yml`'s `Check` job aggregates the preview E2E run, so a bump like #350 cannot merge while the suite is red. The job was called `E2E tests` when this was written.
 
@@ -26,9 +26,9 @@ so on Cloudflare it executes no application code at all. `/_not-found` is the on
 time, because [`global-not-found.tsx`](../apps/web/src/app/global-not-found.tsx) detects the locale through `headers()` and `cookies()` inside a
 `<Suspense>` boundary. It is therefore the only page in a position to throw, and it did.
 
-Four bisect pull requests narrowed it, each ruling one thing out: the tree from immediately before
+The bisect pull requests narrowed it, each ruling one thing out: the tree from immediately before
 `81222a48` runs the full suite green; `partialPrefetching: false` on its own does not help; reverting the
-four dependency bumps that participate in rendering that page (`motion`, `@base-ui/react`, `next-intl`,
+dependency bumps that participate in rendering that page (`motion`, `@base-ui/react`, `next-intl`,
 `lucide-react`) does not help; and Next 16.3.1 does not help either, so the fault survives at least one patch
 release rather than being a single bad build. What remained was the Next bump itself, against
 [`@opennextjs/cloudflare`](https://github.com/opennextjs/opennextjs-cloudflare) **1.20.2**, which is the
@@ -40,11 +40,11 @@ two days, which understated how far behind the adapter is and made the gap read 
 accident rather than a version the adapter has never been built against.
 
 **Only 16.3.0 and 16.3.1 were ever put on a preview.** "The fault spans 16.3.x" therefore generalises from
-two releases to an open-ended range, and 16.3.2 is the untested member Renovate proposes next. Treat the pin
+the tested releases to an open-ended range, and 16.3.2 is the untested member Renovate proposes next. Treat the pin
 as covering it, and treat a green run on 16.3.2 as evidence rather than as proof the pin was wrong: the
 failure needs a preview deploy to appear at all.
 
-That left no version of the adapter that *works with* the Next the app was running, whatever the peer range says, and three ways out. Patching
+That left no version of the adapter that *works with* the Next the app was running, whatever the peer range says, and a few ways out. Patching
 the adapter through `pnpm patch` was rejected because the actual exception has never been captured: no local
 reproduction is possible (`cf:build` fails on the maintainer's Windows machine) and the Worker's stack trace
 was never pulled from the tail consumer, so any patch would be a guess at a fault whose shape is unknown.
@@ -83,7 +83,7 @@ Until one of them happens, a bump is reverted on the pin, not re-diagnosed.
 `partialPrefetching` stays out of [`next.config.ts`](../apps/web/next.config.ts): it is a 16.3 option and a config error on 16.2. The
 `@typescript/typescript6` compatibility package is not a dependency, and [`tests/docs-consistency.test.ts`](../tests/docs-consistency.test.ts)
 imports `typescript` directly for its compiler-API parsing, and under TypeScript 7 that import has to become the
-compatibility package, which is why the two versions travel together.
+compatibility package, which is why the versions travel together.
 
 The rejected alternative worth naming is upgrading anyway and working around the crash in application code,
 by making the 404 statically prerendered. It was rejected because the cost lands on users of a page the app
@@ -124,13 +124,13 @@ one that *requires*: `@opennextjs/cloudflare` **1.20.3**, published 2026-08-26, 
 adapter that no longer supports the version this app was pinned to is a different fact from an adapter whose
 range happens to include the version it was never built against.
 
-**What was verified locally, on this branch:** `pnpm typecheck` clean across all three projects, the unit
+**What was verified locally, on this branch:** `pnpm typecheck` clean across every project, the unit
 suite and the contract suite both green, and `pnpm build` producing a full Next 16.3.3 production
 build with `partialPrefetching` and `cacheComponents` both on.
 
 **What was not verified, and it is the bar this ADR set:** condition 2, a green `e2e` run against a preview
 on the candidate version, including `e2e/[locale]/not-found.spec.ts`. The preview deploy cannot authenticate
-until `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` reach the four `web-*`/`docs-*` environments, which
+until `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` reach the `web-*`/`docs-*` environments, which
 is recorded in [`CLAUDE.md`](../CLAUDE.md) as the one outstanding settings item. Condition 1, the captured
 Worker stack trace, was not attempted either: the exception is still unknown, and if 16.3.3 with 1.20.3
 renders `/_not-found` correctly it will stay unknown. The fault itself is no longer in doubt, per the
@@ -163,13 +163,13 @@ which is the page this fault appears on. A failure there fails the run, withhold
 `wrangler rollback --env production`. That is a second line, not a replacement for the preview run: it
 catches the fault after users could have seen it, where `e2e` catches it before.
 
-**TypeScript moved with Next, but only two thirds of the way.** `astro check` refuses to run under
+**TypeScript moved with Next, but not everywhere.** `astro check` refuses to run under
 TypeScript 7 and says so itself: the native compiler exposes no programmatic API for the Astro language
 server to load. So `apps/docs` stays on 6.0.3 while the root and `apps/web` take 7.0.2, and
 [`tests/docs-consistency.test.ts`](../tests/docs-consistency.test.ts) asserts exactly that shape. The
 compiler-API import in that suite is `@typescript/typescript6` now, as this ADR anticipated.
 
-**Two pnpm-workspace `overrides` came off with the pin.** `postcss` and `sharp` were lifted there only
+**The pnpm-workspace `overrides` came off with the pin.** `postcss` and `sharp` were lifted there only
 because `next@16.2.12` resolved versions carrying advisories; 16.3.3 vendors fixed ones, so the overrides are
 deleted and Dependency Review stops failing for a consequence of this ADR rather than for the diff.
 
@@ -182,7 +182,7 @@ is old enough.
 
 `0803eb1` renamed `apps/web/src/middleware.ts` to `proxy.ts`, which is Next 16's name for the same artefact.
 It reads as a rename and is not one: **`proxy.ts` always runs on the Node.js runtime**, where `middleware.ts`
-runs on the edge. On Cloudflare that switches which of two OpenNext code paths bundles the chain, and the
+runs on the edge. On Cloudflare that switches which OpenNext code path bundles the chain, and the
 Node.js one is new and explicitly unsupported. `bundle-node-middleware.js` says so in its own header, and the
 build prints it on every run:
 
@@ -204,11 +204,11 @@ stopped taking effect, which is why the build, the deploy and the smoke run all 
 | The direct `/api/markdown` guard | `NextResponse.next`, header **deleted** | **the caller's header survives**: 200, not 404 — but see the correction below |
 | `x-next-intl-locale` into `global-not-found` | header into a per-request render | **never arrives**: every locale answers `lang="en"` |
 
-Eight `E2E tests` cases caught exactly those two, and nothing else in the suite moved. Nothing in the unit
+The `E2E tests` cases caught exactly those rows, and nothing else in the suite moved. Nothing in the unit
 suite could have: `middleware.test.ts` calls the exported function directly, so it passes under either name.
 
-**Correction, 2026-09-01: the third row was not the rename's doing.** Reverting to `middleware.ts` cleared
-the six locale cases and left the `/api/markdown` one red, which is what a runtime-specific failure does not
+**Correction, 2026-09-01: the `/api/markdown` row was not the rename's doing.** Reverting to `middleware.ts` cleared
+the locale cases and left the `/api/markdown` one red, which is what a runtime-specific failure does not
 do. `@opennextjs/aws` reconstructs the request in `dist/core/routing/middleware.js` as
 `headers: { ...internalEvent.headers, ...reqHeaders }` — a merge. A header the middleware *deleted* is
 absent from `reqHeaders`, so the caller's value survives; Next's own router deletes every original header
@@ -224,6 +224,6 @@ and changes nothing here either. This is the same shape as the original decision
 framework, and the framework's new default is the one that is not carried.
 
 **So the file keeps the old name on purpose.** Next nags on it; take the nag. Renaming it back to `proxy.ts`
-is a runtime change, not a tidy-up, and it must not be done again until a `proxy.ts` build passes the two
+is a runtime change, not a tidy-up, and it must not be done again until a `proxy.ts` build passes the failing
 cases in the table above on a preview. The published docs page keeps the `/architecture/proxy/` address, since
 the concept is Next's and only the file name is ours.

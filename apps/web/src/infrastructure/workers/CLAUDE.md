@@ -17,7 +17,7 @@ Cloudflare Worker that hosts the app is configured in `wrangler.toml`, not here.
 (clearing the caches, building the `manual-N` pseudo-Holidays, deriving `carryOverMonths`, computing the
 budget, short-circuiting when there is no budget or no candidate, measuring each Suggestion) moved into
 that module, because the
-holidays store had its own copy of all of it and the two were kept in step by a pair of hand-mirrored test
+holidays store had its own copy of all of it and they were kept in step by a pair of hand-mirrored test
 suites. A rule you want to change is in the domain; what lives here is the boundary.
 
 | File | Contents |
@@ -59,7 +59,7 @@ handler's `try`, after the message-type guard, so a throw anywhere in a run stil
 an unrelated message never starts one.
 
 **`Temporal` reaches this thread through `temporal-polyfill`.** The engine imports it explicitly rather than
-using the global, and this worker is one of the three realms that has to work
+using the global, and this worker is one of the realms that has to work
 ([ADR 0005](../../../../../adr/0005-temporal-polyfill.md)). Nothing here imports `Temporal` directly, but a
 codemod that "modernises" the engine's import breaks this thread too.
 
@@ -67,12 +67,12 @@ codemod that "modernises" the engine's import breaks this thread too.
 written by this app with `toISOString()`, so the instant is the thing being round-tripped, the same
 provenance the persistence layer has, and the same intake function answers it
 ([`@application/shared/utils/dateIntake`](../../application/CLAUDE.md)). `serializers.ts` and `worker.ts`
-called `new Date(x)` inline seven times between them, which is the rule that module exists to hold restated
+called `new Date(x)` inline over and over between them, which is the rule that module exists to hold restated
 as bare code. `fromUpstreamCalendarDay` is the wrong tool here and would silently discard the time component.
 
 **Every `Date` crosses as an ISO string, in both directions.** This is not a structured-clone limitation;
 structured clone carries `Date` natively. It is a choice to make the boundary an explicit, inspectable type:
-`SerializedHolidayDTO`, `SerializedBridge` and `SerializedSuggestion` in `types.ts` are what the two sides
+`SerializedHolidayDTO`, `SerializedBridge` and `SerializedSuggestion` in `types.ts` are what both sides
 agree on, and `utils/serializers.ts` is the only place that converts. Adding a `Date` field to a domain type
 that crosses here means adding it to the serialiser and to the wire type, or it arrives as a string typed as a
 `Date`.
@@ -98,7 +98,7 @@ having; it fails to compile when the shape changes.
 `Metrics` fixtures are plain values annotated `Metrics`. The annotation is the load-bearing part. The fixture
 was once an untyped `{ efficiency: 2, totalDaysOff: 7 }`, and neither field exists on `Metrics`, while
 `totalDaysOff` is a name [`CONTEXT.md`](../../../../../CONTEXT.md) retired under **Effective Day**, so a reader
-learning the shape from that fixture learned two names that are not real.
+learning the shape from that fixture learned names that are not real.
 
 **`SerializedSuggestion.metrics` is required, not optional, and the serialisers speak `MeasuredSuggestion`.**
 The pipeline measures both of its branches, so a Suggestion crossing this boundary always has Metrics; saying
@@ -126,14 +126,14 @@ to **Grouped**, while `generateAlternatives` sends anything that is not Balanced
 `selectBridgesForStrategy`, whose `switch` default is **Balanced**. So one bad string produced a Grouped
 Suggestion beside Balanced Alternatives, from a single run.
 
-Neither of those two fallbacks was the defect and neither has been touched. `selectBridgesForStrategy`'s
+Neither fallback was the defect and neither has been touched. `selectBridgesForStrategy`'s
 default is a real, tested branch; it is how Balanced is dispatched at all. The fix belongs at the seam the
 untyped value crosses, and it is one predicate at one call site: do not grow it into a validation layer over
 the rest of the wire type.
 
 ## Manual and Removed Days
 
-The two kinds of hand-edited day reach the engine by different routes, and that asymmetry is the point.
+The kinds of hand-edited day reach the engine by different routes, and that asymmetry is the point.
 
 - **Manual days** reach the *planning* calls only as pseudo-holidays (`id: 'manual-N'`, `variant: CUSTOM`)
   appended to the real holidays as `holidaysWithManual`. A manual day is genuinely a day off, so counting it
@@ -148,11 +148,11 @@ The two kinds of hand-edited day reach the engine by different routes, and that 
   `removedDays`, and to both `generateMetrics` calls as `removedSuggestedDays`. They are never turned into
   holidays. Passing them to the Metrics is belt and braces rather than load-bearing
   (`getAvailableWorkdays` already excludes them, so a Removed Day cannot appear in `suggestion.days` for
-  `resolveSelectedDays` to strip), but it keeps the two arguments symmetric and matches what
+  `resolveSelectedDays` to strip), but it keeps the arguments symmetric and matches what
   `toggleDaySelection` does on the store side.
 
 **A day passed both ways must only be counted once.** `holidaysWithManual` and `manuallySelectedDays`
-overlap by construction, so any Metric that subtracts Holidays and PTO Days as two independent counts
+overlap by construction, so any Metric that subtracts Holidays and PTO Days as independent counts
 subtracts every Manual Day twice. `getWorkedDaysPerMonth` did exactly that and understated Worked Days per
 month by one day per Manual Day. Every Metric touching both lists now goes through one helper,
 `dayOffKeys`, in the calendar domain's [`metrics/utils/dayOff.ts`](../../domain/calendar/metrics/utils/dayOff.ts), so a new Metric that reads `holidays` and
@@ -178,7 +178,7 @@ pipeline's `planned: false` result carries an empty Suggestion whose `metrics` a
 so `serializeSuggestionResult` has a real object to send and `currentSelection.metrics` is never `undefined`.
 
 `worker.ts` used to hand-write that object as a module-level `EMPTY_METRICS` constant, and it was wrong in a
-way nothing caught: it hard-coded twelve monthly buckets and four quarterly ones, while the engine sizes both
+way nothing caught: it hard-coded a calendar year of monthly and quarterly buckets, while the engine sizes both
 to the Planning Window, so with any Carry-over Month the empty plan reported a differently-shaped `Metrics`
 than a real one. Deriving it removed the constant and the bug together.
 
@@ -200,31 +200,31 @@ stale *work*.
 for its registration side effect; the import must come after the stubs, and the mock is `vi.hoisted` for the
 same reason. Messages are driven by invoking `globalThis.onmessage` directly.
 
-**The mock is keyed on the pipeline, and this section used to say it must be keyed on the four engine modules
+**The mock is keyed on the pipeline, and this section used to say it must be keyed on the engine modules
 instead.** That instruction was right while `worker.ts` held the orchestration: the input assertions had to
 reach *through* the handler to the generators, because the handler was where the rules lived.
 `runPlanningPipeline` holds them now, so reaching through it from here would restate domain behaviour inside
-the boundary's test, which is the pair of mirrored suites the extraction exists to have removed. Three of the
-four claims that paragraph listed are pinned against the real engine in
+the boundary's test, which is the pair of mirrored suites the extraction exists to have removed. Nearly every
+claim that paragraph listed is pinned against the real engine in
 [`pipeline.test.ts`](../../domain/calendar/pipeline.test.ts) instead: Manual Days becoming `CUSTOM`
 pseudo-Holidays, Manual Days coming out of the budget, and the Metrics being sized to the Planning Window they
 were given. Re-mocking the engine here would buy a weaker copy of each and nothing else.
 
-The fourth claim is genuinely this side's, because this side builds the array it is about: a Removed Day
+The remaining claim is genuinely this side's, because this side builds the array it is about: a Removed Day
 reaches the pipeline as `removedSuggestedDays` and appears in `holidays` not at all. `worker.test.ts` keeps
 that one, asserted against the recorded `PlanningInput`.
 
-What it pins: the message-type guard, deserialisation into the pipeline's own input names, the two wire
+What it pins: the message-type guard, deserialisation into the pipeline's own input names, the wire
 narrowings (`isFilterStrategy` and `isLocale`), serialisation of the reply, that an unplanned result reaches
 the wire carrying the pipeline's own `Metrics` rather than a literal, and that a throw becomes `WORKER_ERROR`
 rather than an unhandled rejection.
 
 **The unplanned case asserts the `Metrics` *shape*, and it has to, because the values alone cannot fail it.**
-The defect it guards is the deleted `EMPTY_METRICS` constant: twelve monthly buckets and four quarterly ones,
+The defect it guards is the deleted `EMPTY_METRICS` constant: a calendar year of monthly and quarterly buckets,
 written by hand, where the engine sizes both to the Planning Window. A case sent with `carryOverMonths: 0`
-cannot tell the two apart, since twelve and four are the right answer there, and the fixture that made the old
-case go red did so only by carrying empty arrays and a seven-day "empty" plan, which no engine produces. So
-the case sends `carryOverMonths: 3` and its fixture carries fifteen monthly buckets and five quarterly ones,
+cannot tell them apart, since a calendar year is the right answer there, and the fixture that made the old
+case go red did so only by carrying empty arrays and a week-long "empty" plan, which no engine produces. So
+the case sends `carryOverMonths: 3` and its fixture carries the wider bucket counts that implies,
 zeroed. Verified by reintroducing the constant and watching both halves go red.
 
 An empty *Holiday* list is **not** one of those short circuits, and a test asserting it was would be wrong. A
@@ -233,7 +233,7 @@ pipeline short-circuits on an empty candidate set instead.
 
 The pipeline's own behaviour is pinned once, against the real engine, in
 [`pipeline.test.ts`](../../domain/calendar/pipeline.test.ts), including the cache clearing, which is testable
-there as behaviour (run twice, check the second run answers for its own Holidays) rather than as two spy calls
+there as behaviour (run twice, check the second run answers for its own Holidays) rather than as spy calls
 in no particular order.
 
 [`utils/serializers.test.ts`](./utils/serializers.test.ts) covers the round trip. It is the cheaper place to catch a new `Date` field than a

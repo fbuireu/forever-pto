@@ -8,7 +8,7 @@ Accepted, with the naming corrected. The mechanism is unchanged; what changed is
 
 ## Context
 
-The Zustand stores persist to local storage through a wrapper that XORs the serialised value against a key shipped in the client bundle and base64-encodes the result. The key is in the bundle, so anyone who wants the plaintext has it. Calling that encryption invites two mistakes: putting something confidential behind it, and reasoning about the threat model as though a client-side cipher were one.
+The Zustand stores persist to local storage through a wrapper that XORs the serialised value against a key shipped in the client bundle and base64-encodes the result. The key is in the bundle, so anyone who wants the plaintext has it. Calling that encryption invites mistakes: putting something confidential behind it, and reasoning about the threat model as though a client-side cipher were one.
 
 The original motivation is not recorded anywhere in the history, and this ADR does not invent one. Judged on its merits today it stands, but it stands as obfuscation.
 

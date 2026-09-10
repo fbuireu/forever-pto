@@ -11,7 +11,7 @@ The planner ships a guided tour built on `driver.js`. It never auto-starts: it r
 
 `apps/web/src/infrastructure/clients/tutorial/driver/client.tsx` wraps `driver.js` in a `DriverClient` class, exposed through `getDriverClientInstance()` (a singleton: one driver, one overlay). Defaults: progress indicator on, `next`/`previous`/`close` buttons, smooth scroll, `stagePadding: 10`, `stageRadius: 12`.
 
-Two customizations happen in `onPopoverRender`:
+Customizations happen in `onPopoverRender`:
 
 - The library's close button is replaced with a **React-rendered animated X icon** (`AnimateIcon` + `X` from `apps/web/src/ui/modules/core/animate/icons/`) mounted via `createRoot` into the popover DOM. The roots are tracked and unmounted in `onDestroyStarted` to avoid leaks.
 - On the last step, the next button gets the `driver-popover-done-btn` class so it can be styled as a "done" action.
@@ -32,4 +32,4 @@ Two customizations happen in `onPopoverRender`:
 
 Add the anchor to `TUTORIAL_ANCHOR` in `apps/web/src/ui/modules/tutorial/anchors.ts`, spread it onto the target element as `data-tutorial={TUTORIAL_ANCHOR.YOUR_ANCHOR}`, add the step in `useTutorial` through `tutorialSelector(TUTORIAL_ANCHOR.YOUR_ANCHOR)`, then add `step*Title` and `step*Description` to every locale's `tutorial.steps` namespace.
 
-`TUTORIAL_ANCHOR` is the contract, not the attribute. `anchors.test.ts` reads the component tree and asserts the two sets match in both directions, so a raw string attribute turns it red and an anchor no element carries does too.
+`TUTORIAL_ANCHOR` is the contract, not the attribute. `anchors.test.ts` reads the component tree and asserts the sets match in both directions, so a raw string attribute turns it red and an anchor no element carries does too.

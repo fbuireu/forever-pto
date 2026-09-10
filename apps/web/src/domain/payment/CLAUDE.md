@@ -2,8 +2,8 @@
 
 ## Purpose
 
-What happens to a Donation once Stripe has decided. Two domain events, a factory that builds them out of a
-Stripe `PaymentIntent`, and two handlers that reconcile the payments table with them. Server-only, and the
+What happens to a Donation once Stripe has decided. The domain events, a factory that builds them out of a
+Stripe `PaymentIntent`, and the handlers that reconcile the payments table with them. Server-only, and the
 one place in `src/domain/` that composes Effect against infrastructure, deliberately, not by accident
 ([ADR 0003](../../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md)). The layer contract is
 in [`../CLAUDE.md`](../CLAUDE.md).
@@ -42,7 +42,7 @@ event through the factory; the layer is provided at the route.
 both are `import type`; no SDK is constructed, so nothing here pulls the Stripe runtime in behind it. The
 handlers see only the event interfaces.
 
-Two things the factory settles that everything downstream then assumes:
+Things the factory settles that everything downstream then assumes:
 
 - **`amount` stays in Stripe's minor units.** It is copied straight from `paymentIntent.amount` and written
   to the payments table unchanged. Only `paymentConfirmationDTO`, which feeds a screen, divides by 100.
@@ -62,8 +62,8 @@ the annotations when adding a field.
 
 ## An event carries what a handler acts on, not a copy of the intent
 
-`PaymentSucceededEvent` is four fields (`paymentId`, `email`, `status`, `latestChargeId`), and
-`handlePaymentSucceeded` reads all four. It used to be eight. The other four were not extra detail; they were
+`PaymentSucceededEvent` is `paymentId`, `email`, `status` and `latestChargeId`, and
+`handlePaymentSucceeded` reads every one. It used to carry more. The rest were not extra detail; they were
 the `Stripe.PaymentIntent` leaking through the seam in pieces:
 
 - `amount` had **no reader at all** in production. `paymentDataDTO.create` takes the intent as `raw` and reads
@@ -85,17 +85,17 @@ the only field on `PaymentFailedEvent` whose reason to exist is the log line.
 
 ## The entitlement value is typed where it can be proved, and named where it cannot
 
-`PaymentStatus` restates Stripe's seven `PaymentIntent.Status` members by hand: it is not imported from the
+`PaymentStatus` restates Stripe's `PaymentIntent.Status` members by hand: it is not imported from the
 SDK, because this folder keeps Stripe at the factory. The factory assigns `paymentIntent.status` into it, so
 a member Stripe adds is a compile error there, at the one place that translates Stripe into the domain, and
 nowhere else.
 
-It types the two events' `status`, and `updatePaymentStatus`'s parameter, a function that used to take
-`(paymentIntentId: string, status: string)`, where swapping the two arguments compiled. Every caller passes
-either a literal from this codebase or an event's status, so the union is true at all three.
+It types both events' `status`, and `updatePaymentStatus`'s parameter, a function that used to take
+`(paymentIntentId: string, status: string)`, where swapping the arguments compiled. Every caller passes
+either a literal from this codebase or an event's status, so the union is true at each one.
 
-**`PaymentData.status` deliberately stays `string`, and the union would be a lie there.** It has two
-producers: `paymentDataDTO`, which reads a `Stripe.PaymentIntent`, and `toPaymentData` in
+**`PaymentData.status` deliberately stays `string`, and the union would be a lie there.** Its
+producers are: `paymentDataDTO`, which reads a `Stripe.PaymentIntent`, and `toPaymentData` in
 [`@infrastructure/services/payments/repository`](../../infrastructure/services/payments/CLAUDE.md), which
 reads a SQLite `TEXT` column. Nothing constrains what that column holds (an older deploy, a manual fix), so
 narrowing the field would need an `as` at the read, which buys a claim the code cannot check in exchange for
@@ -103,18 +103,18 @@ nothing: no consumer switches on the status, they all test it against one value.
 
 That is what `PAYMENT_SUCCEEDED` is for. It is redundant where the union already applies, and it is the
 spelling to reach for wherever a `PaymentData.status` meets the entitlement value. **No handler compares
-against it any more** (the `WHERE` clause owns that rule, see below), so its two remaining live uses are
+against it any more** (the `WHERE` clause owns that rule, see below), so its remaining live uses are
 `activatePremium`, which passes it to `updatePaymentStatus` as the value to write, and
 `repository.test.ts`, which ties the `succeeded_at` `CASE` to it by assertion. `activatePremium` also tests a
 raw `Stripe.PaymentIntent.status` against the bare literal at its guard, which is correct: that value is
 Stripe's, not the payments table's. `PaymentConfirmationDTO.status` is narrowed instead of named, since its
 single producer is the Stripe read.
 
-**Three copies of the literal remain, all inside SQL, and none of them can take the constant.**
+**Copies of the literal remain, all inside SQL, and none of them can take the constant.**
 `repository.ts` spells `'succeeded'` in the `succeeded_at` `CASE`, in `getSucceededPaymentByEmail`'s `WHERE` and in
 `countPromoCodeRedemptions`'. Interpolating a TypeScript value into a query string to remove them would
 trade a checkable drift for something that reads as injection. `repository.test.ts` ties the first to the
-constant by assertion instead; the other two are covered by their own query assertions.
+constant by assertion instead; the others are covered by their own query assertions.
 
 ## Invariants and traps
 
@@ -141,7 +141,7 @@ donor's recovery path was dead for good, with one warning line to show for it.
 is `id = ? AND status != 'succeeded'` and it returns whether it wrote, so `false` means "absent or already
 succeeded" and a `DatabaseError` propagates as "we could not tell". Both handlers branch on that one boolean
 now; they used to disagree, `handlePaymentFailed` reading it and `handlePaymentSucceeded` discarding it.
-The two branches are no longer distinguished and do not need to be. `updatePaymentCharge`'s own
+The branches are no longer distinguished and do not need to be. `updatePaymentCharge`'s own
 `WHERE id = ?` touches nothing when the row is absent, and a redelivery landing on an already-succeeded row
 is exactly when charge enrichment is worth retrying. `paymentSucceeded.test.ts` pins that `getPaymentById`
 is never called; that case goes red the moment the read comes back.
@@ -171,12 +171,12 @@ call in either handler, and adding one back re-creates the defect above: an abso
 indistinguishable from a row that is not there, and the difference decides whether Stripe redelivers.
 `updateCharge` is the single exception and is not a repository guard; see *Charge enrichment* below.
 
-**Error-path logs go in `Effect.sync` inside `tapError`; the two guard-path logs do not.** The wrapper is
+**Error-path logs go in `Effect.sync` inside `tapError`; the guard-path logs do not.** The wrapper is
 about *when* the line runs, not about safety: `tapError` fires only on the failure it is attached to, and each
 one must sit on the step it names: in `updateCharge` the retrieval log is piped directly onto
 `retrieveCharge`, before the `Effect.flatMap`, because on the composed pipeline it would also fire for a
-failed write and log it a second time as a retrieval failure that never happened. The two early-return
-warnings (both handlers, on a write that touched no row) are
+failed write and log it a second time as a retrieval failure that never happened. The early-return
+warnings (in both handlers, on a write that touched no row) are
 bare statements in the generator body, because there is no failure to tap: the condition is a successful
 write that touched no row. That is safe only because `BetterStackClient` cannot throw; see
 [`../../infrastructure/clients/CLAUDE.md`](../../infrastructure/clients/CLAUDE.md). `Effect.sync` would not

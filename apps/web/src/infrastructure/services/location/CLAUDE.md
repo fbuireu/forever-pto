@@ -3,7 +3,7 @@
 ## Purpose
 
 Guesses the visitor's Country so the planner opens on a plausible holiday calendar instead of an empty one.
-Three strategies are tried in order and the first non-empty answer wins, as a lower-case ISO 3166-1 alpha-2
+The strategies are tried in order and the first non-empty answer wins, as a lower-case ISO 3166-1 alpha-2
 code.
 
 This is a convenience, not a fact: the user can always override the Country, and a wrong or empty guess
@@ -14,7 +14,7 @@ costs one interaction. Nothing downstream should treat the result as authoritati
 | File | Role |
 | --- | --- |
 | [`detectCountry.ts`](./detectCountry.ts) | Runs the chain. The ordering and nothing else |
-| [`utils/strategies.ts`](./utils/strategies.ts) | The three strategies and `CLOUDFLARE_COUNTRY_HEADER` |
+| [`utils/strategies.ts`](./utils/strategies.ts) | The strategies and `CLOUDFLARE_COUNTRY_HEADER` |
 | [`utils/normalize.ts`](./utils/normalize.ts) | `normalizeCountryCode`, the one exit rule, plus `noStoreFetch` and the `UNIDENTIFIED_COUNTRY` / `TOR_COUNTRY` sentinels |
 
 ## The chain
@@ -27,16 +27,16 @@ costs one interaction. Nothing downstream should treat the result as authoritati
 2. **`detectCountryFromCDN()`** resolves the Cloudflare context, fetches
    `${env.NEXT_PUBLIC_SITE_URL}/cdn-cgi/trace` with a 5 s `AbortSignal.timeout`, and reads the `loc=` line.
 3. **`detectCountryFromEgressIP()`** calls `api.ipify.org` for an IP, then `ipinfo.io/<ip>/json` for its country.
-   Two round trips, each with the same 5 s timeout.
+   A round trip each, with the same 5 s timeout.
 
 **Empty string is the failure value throughout.** Never `null`, never a throw: every strategy catches its own
-errors and returns `''`, and `detectCountry` returns `''` when all three come up empty. [`proxy/location.ts`](../../proxy/location.ts)
+errors and returns `''`, and `detectCountry` returns `''` when every one of them comes up empty. [`proxy/location.ts`](../../proxy/location.ts)
 treats that as "no cookie to set" and moves on.
 
 **The only caller is the proxy.** `proxy/location.ts` calls `detectCountry` from [`src/middleware.ts`](../../../middleware.ts), so
 everything here runs server-side inside a Cloudflare Worker request, including the fetches, which read like
 browser calls and are not. It also short-circuits on an existing `user-country` cookie, which is what keeps
-this chain off the hot path for returning visitors. Between that cookie and the header running first, the two
+this chain off the hot path for returning visitors. Between that cookie and the header running first, the
 network strategies sit in front of an HTML response only when both have already come up empty.
 
 ## Gotchas
@@ -46,7 +46,7 @@ unset the fetch simply fails and the chain continues; if it points at another en
 that environment's answer. The value is environment-specific configuration, not a constant
 ([ADR 0004](../../../../../../adr/0004-cloudflare-workers-as-deployment-target.md)).
 
-**All three fetches are `cache: 'no-store'`, and must stay that way.** Every response here identifies whoever
+**Every fetch is `cache: 'no-store'`, and must stay that way.** Every response here identifies whoever
 asked for it, so a stored copy would hand one visitor's Country to the next, which then gets written to the
 week-long `user-country` cookie by `proxy/location.ts`. Nothing in the chain re-validates, so the only safe
 setting is no storage at all.
@@ -69,13 +69,13 @@ path).
 **`XX` and `T1` are filtered, and now in every strategy.** They mean unidentified traffic and a Tor exit
 node, not countries, and not values `date-holidays` could do anything with. The filter used to live in the
 header strategy alone: the CDN trace's `loc` line was passed through as-is and the egress-IP answer was
-`geoData.country?.toLowerCase() ?? ''`, so the same two codes could reach the week-long `user-country` cookie
-by either route. Each strategy also spelled its own exit normalisation, three times, differently, and none
+`geoData.country?.toLowerCase() ?? ''`, so the same codes could reach the week-long `user-country` cookie
+by either route. Each strategy also spelled its own exit normalisation, differently, and none
 checked the shape, so a malformed header reached the cookie and then `new Holidays(country)`.
 
 `normalizeCountryCode` is that one rule: trim, lower-case, reject anything that is not two ASCII letters,
 reject the sentinels. `noStoreFetch` beside it owns `cache: 'no-store'` and the 5 s timeout, which were
-re-typed at all three fetches, and the cache mode is a privacy invariant, not a preference, so a fourth
+re-typed at every fetch, and the cache mode is a privacy invariant, not a preference, so a new
 strategy must not be able to forget it.
 
 **Effect is used here but never escapes.** Both async strategies are `Effect.gen` programs terminated inside

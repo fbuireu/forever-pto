@@ -8,7 +8,7 @@ Accepted.
 
 ## Context
 
-Production logged, several times a day and always in the same shape, a Next warning followed by three
+Production logged, several times a day and always in the same shape, a Next warning followed by
 runtime errors:
 
 ```
@@ -23,22 +23,22 @@ across every locale and both attempts of a run, while a sibling pull request's p
 minutes earlier. Intermittent in production, deterministic on a fresh Worker.
 
 It reproduced locally on workerd, with `wrangler dev --local` over a `pnpm cf:build` of `main`, with
-BetterStack logging disabled so the logger could not be the cause: `/fr` and `/es` answered 500 after five
-seconds with three "code had hung" errors each, and `/de/<unknown>` and `/<unknown>` never answered at all.
-Three errors per request matched the three `'use cache'` sites the home page reaches (`getPublicEnv`,
+BetterStack logging disabled so the logger could not be the cause: `/fr` and `/es` answered 500 after several
+seconds with a burst of "code had hung" errors each, and `/de/<unknown>` and `/<unknown>` never answered at all.
+There was one error per request per `'use cache'` site the home page reaches (`getPublicEnv`,
 `getCurrentYear`, `Testimonials`), and the warning is Next's `createAtomicTimerGroup` finding no `_idleStart`
 on workerd's timers, which are numbers rather than Node `Timeout` objects. The warning itself is benign; the
 hang is in how Cache Components run their per-request prerender on that runtime, and the intermittence in
 production is the `cacheLife('days')` entries being warm most of the time.
 
-Two experiments settled it. Keeping `cacheComponents` on and taking only `getCloudflareContext` out of the
+The experiments settled it. Keeping `cacheComponents` on and taking only `getCloudflareContext` out of the
 cached function did not build: `generateMetadata` then reads a dynamic value during prerender and Next
-refuses. Turning `cacheComponents` off, with `partialPrefetching` (which requires it) and the three
+refuses. Turning `cacheComponents` off, with `partialPrefetching` (which requires it) and the
 `'use cache'` directives, built, and every route answered on workerd in under a second with zero errors:
-`/`, `/fr`, `/es` 200, the three 404 paths 404 in about a hundred milliseconds.
+`/`, `/fr`, `/es` 200, the 404 paths 404 in about a hundred milliseconds.
 
-What the flag was buying: partial prerendering of the `[locale]` pages (a static shell with three cached
-holes revalidated daily), `partialPrefetching`, and a per-fragment cache for three values that are
+What the flag was buying: partial prerendering of the `[locale]` pages (a static shell with cached
+holes revalidated daily), `partialPrefetching`, and a per-fragment cache for values that are
 deploy-time constants or a translated static section. Without it the same pages are plain SSG through
 `generateStaticParams`, built once per deploy, which is what those values were anyway.
 
@@ -53,7 +53,7 @@ baked at build time. `vitest.setup.ts` no longer stubs `next/cache`, since nothi
 
 The rejected alternative is keeping the flag and hunting the hang inside Next or OpenNext. It may well be
 fixable there, and the day either ships a fix this ADR can be superseded; until then a feature that hangs
-requests in production is not worth three cached constants.
+requests in production is not worth a few cached constants.
 
 ## Consequences
 
@@ -65,7 +65,7 @@ requests in production is not worth three cached constants.
 - **Route segment config is allowed again**, and `apps/web/src/app/CLAUDE.md` no longer has to warn that
   `export const dynamic` fails the build. The activate route still relies on its `no-store` header alone.
 - **Re-enabling the flag is a decision, not a cleanup.** It has to come with the reproduction above run
-  green on workerd: `pnpm cf:build`, `wrangler dev --local`, the seven paths in the experiment, zero
+  green on workerd: `pnpm cf:build`, `wrangler dev --local`, the paths in the experiment, zero
   "code had hung" errors.
 - Where this bites: [`apps/web/CLAUDE.md`](../apps/web/CLAUDE.md), the env section of
   [`apps/web/src/infrastructure/CLAUDE.md`](../apps/web/src/infrastructure/CLAUDE.md), and the docs site's

@@ -62,7 +62,7 @@ Note that `--accent` is pinned to the brand yellow and `--destructive` stays con
 
 ## Surfaces and the frame
 
-Panel backgrounds come in three warmth steps plus an inset alias, and `--frame` is the ink used for every hard border and brutal shadow:
+Panel backgrounds come in warmth steps plus an inset alias, and `--frame` is the ink used for every hard border and brutal shadow:
 
 <TokenSwatch tokens={[
   '--surface-panel',
@@ -95,11 +95,11 @@ A few tokens hold full gradient values rather than single colors:
   '--grid-color',
 ]} />
 
-`--brand-gradient` is the five-stop brand sweep used for decorative strips; `--page-glow` is the trio of faint radial gradients painted behind the page body (`apps/web/src/ui/styles/base/index.css` sets it as a fixed `background-image`); `--grid-color` is the near-transparent ink used for background grids.
+`--brand-gradient` is the brand sweep used for decorative strips; `--page-glow` is the set of faint radial gradients painted behind the page body (`apps/web/src/ui/styles/base/index.css` sets it as a fixed `background-image`); `--grid-color` is the near-transparent ink used for background grids.
 
 ## How the semantic layer maps to Tailwind
 
-Two files, two jobs:
+Separate files, separate jobs:
 
 - `apps/web/src/ui/styles/global/index.css` declares the raw values (`:root` and `[data-theme='dark']`).
 - `apps/web/src/ui/styles/theme/index.css` re-exposes a subset under Tailwind's `@theme inline` block: `--color-background: var(--background)`, `--color-accent: var(--accent)`, and so on.

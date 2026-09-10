@@ -8,20 +8,20 @@ Accepted.
 
 ## Context
 
-`application/shared/utils/dates.ts` is a thin wrapper over `temporal-polyfill`: twenty-four functions that
+`application/shared/utils/dates.ts` is a thin wrapper over `temporal-polyfill`: functions that
 take a `Date`, do plain-date arithmetic and hand a `Date` back, plus `formatDate` and `getWeekdayNames`,
 which reach `Intl`. There is no I/O in it, no DOM, no framework, no store, and nothing application-specific.
 
-Three layers import it. The UI reads it in seventeen files, `application/` in three, and (the part that
-raises the question) `domain/calendar/` in five: [`window.ts`](../apps/web/src/domain/calendar/window.ts), [`utils/helpers.ts`](../apps/web/src/domain/calendar/utils/helpers.ts),
+Layers above and below import it. The UI reads it in files all over itself, `application/` in its own, and (the part that
+raises the question) `domain/calendar/` in several: [`window.ts`](../apps/web/src/domain/calendar/window.ts), [`utils/helpers.ts`](../apps/web/src/domain/calendar/utils/helpers.ts),
 [`utils/cache.ts`](../apps/web/src/domain/calendar/utils/cache.ts), [`metrics/utils/helpers.ts`](../apps/web/src/domain/calendar/metrics/utils/helpers.ts) and [`metrics/utils/streaks.ts`](../apps/web/src/domain/calendar/metrics/utils/streaks.ts). That is the domain importing
 from the layer above it, which is the wrong direction for a dependency arrow.
 
-**The number that carries the rule is the specifier count, not the file count, and it is unchanged at four.**
+**What carries the rule is the specifier list, not the file count, and it is unchanged.**
 `domain/CLAUDE.md` enumerates what the calendar domain may import from outside itself, and a new *file*
 reaching an already-listed specifier adds nothing to that list; `window.ts` is exactly that. `dates.ts` is one
-of exactly two upward imports the calendar domain has (`@application/dto/holiday/types` is the other), and
-the other two entries on the list of four are the bare `temporal-polyfill` and `next-intl`.
+of the upward imports the calendar domain has (`@application/dto/holiday/types` is the other), and
+the remaining entries on that list are the bare `temporal-polyfill` and `next-intl`.
 
 The obvious repair is to move the file somewhere both layers may legally reach: a `src/shared/` tier under
 the app, or a real `packages/` workspace member. Neither is as cheap as it looks.
@@ -33,7 +33,7 @@ the app, or a real `packages/` workspace member. Neither is as cheap as it looks
 - A `packages/` member contradicts [ADR 0010](./0010-apps-web-and-apps-docs-monorepo-layout.md), which says
   the tier appears the day a real shared package exists. One file that only [`apps/web`](../apps/web) imports is not that
   day; [`apps/docs`](../apps/docs) reaches app sources through the `@ui` alias and does not import this module at all.
-- Moving it *down* into `domain/` is worse than the problem. `domain/` holds two bounded contexts and
+- Moving it *down* into `domain/` is worse than the problem. `domain/` holds bounded contexts that
   nothing else, so the file would either become a third thing that is not a context, or land inside
   `calendar/`, from where the UI, the export and the DTOs would all import planning-engine internals to get
   `formatDate`.
@@ -50,12 +50,12 @@ The shared date helpers stay at `application/shared/utils/dates.ts`, and `domain
 importing them through `@application/shared/utils/dates`.
 
 The rejected alternative is a neutral `src/shared/` tier, rejected because it buys diagram tidiness and
-pays for it with a directory whose membership rule nobody can state, at a moment when exactly two modules
+pays for it with a directory whose membership rule nobody can state, at a moment when barely a module or two
 would move into it.
 
 The list in [`../apps/web/src/domain/CLAUDE.md`](../apps/web/src/domain/CLAUDE.md) is what makes this
-enforceable by review: the calendar domain's outside imports are enumerated there and are meant to stay at
-four. The test for a new one is the runtime, not the layer: does it resolve inside a Web Worker with no DOM
+enforceable by review: the calendar domain's outside imports are enumerated there and the list is meant to stay
+short. The test for a new one is the runtime, not the layer: does it resolve inside a Web Worker with no DOM
 and no server context.
 
 ## Consequences
@@ -73,7 +73,7 @@ and no server context.
 - **The same reasoning covers `@application/dto/holiday/types`**, the calendar domain's other upward import,
   which [`../apps/web/src/application/dto/CLAUDE.md`](../apps/web/src/application/dto/CLAUDE.md) records as a
   known exception safe only while everything in that file stays evaluable inside a Web Worker with no DOM
-  and no server context: today two types, one const object and `isHolidayVariant`, the union's own membership
+  and no server context: today its types, one const object and `isHolidayVariant`, the union's own membership
   test.
 - If a second app ever needs these helpers, this decision is superseded rather than amended: at that point
   the `packages/` tier ADR 0010 defers is genuinely warranted, and the move becomes a workspace change rather

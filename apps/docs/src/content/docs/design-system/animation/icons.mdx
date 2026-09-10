@@ -1,6 +1,6 @@
 ---
 title: Animated icons
-description: The AnimateIcon system of 22 motion-drawn icons with hover, tap, view and loop triggers driven through context.
+description: The AnimateIcon system of motion-drawn icons with hover, tap, view and loop triggers driven through context.
 sidebar:
   order: 1
 ---
@@ -11,7 +11,7 @@ Source: `apps/web/src/ui/modules/core/animate/icons/`. The directory holds {ICON
 
 ## Gallery
 
-Hover a tile to play its animation. The gallery imports every icon by its real export name, so a rename in the app breaks `astro check` here. Two exports differ from their file name: `PanelLeft.tsx` exports `PanelLeftIcon` and `Search.tsx` exports both `Search` and `SearchIcon`.
+Hover a tile to play its animation. The gallery imports every icon by its real export name, so a rename in the app breaks `astro check` here. Some exports differ from their file name: `PanelLeft.tsx` exports `PanelLeftIcon` and `Search.tsx` exports both `Search` and `SearchIcon`.
 
 <IconsGalleryDemo client:visible />
 
@@ -23,7 +23,7 @@ Each icon file (e.g. `apps/web/src/ui/modules/core/animate/icons/Check.tsx`) fol
 2. An inner component draws the SVG with `m.*` elements, wiring each part to `useVariants(animations)` and the shared `controls` from `useAnimateIconContext`.
 3. The export wraps it in `IconWrapper`, which connects the icon to the nearest `AnimateIcon` context, or creates one on the fly when trigger props are passed directly to the icon.
 
-On top of the per-icon animations, `Icon.tsx` defines two static animations available to every icon: `path` and `path-loop`, which redraw the strokes via `pathLength`.
+On top of the per-icon animations, `Icon.tsx` defines static animations available to every icon: `path` and `path-loop`, which redraw the strokes via `pathLength`.
 
 ## Trigger API
 

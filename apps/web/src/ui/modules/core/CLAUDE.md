@@ -9,7 +9,7 @@ under *Layer rules*, the one folder that imports nothing back.
 
 ## Structure
 
-Two stacks share the folder: the flat `primitives/`, and the three-deep `animate/` tower where
+Two stacks share the folder: the flat `primitives/`, and the layered `animate/` tower where
 [`animate/primitives/`](./animate/primitives) wraps the headless library, [`animate/base/`](./animate/base) styles and animates those wrappers,
 and [`animate/components/`](./animate/components) composes them. Knowing which layer you are editing tells you how far the
 change reaches.
@@ -23,7 +23,7 @@ change reaches.
 | [`animate/effects/`](./animate/effects) | [`AutoHeight.tsx`](./animate/effects/AutoHeight.tsx) and [`MotionHighlight.tsx`](./animate/effects/MotionHighlight.tsx): behaviour applied to someone else's children |
 | [`animate/icons/`](./animate/icons) | 22 animated SVG icons plus [`animate/icons/Icon.tsx`](./animate/icons/Icon.tsx), which exports `AnimateIcon`, `IconWrapper` and `useVariants`. Excluded from the coverage report; `Icon.tsx` beside them is tested |
 | [`animate/text/`](./animate/text) | [`SlidingNumber.tsx`](./animate/text/SlidingNumber.tsx) and [`animate/text/Rotating.tsx`](./animate/text/Rotating.tsx) |
-| [`animate/providers/`](./animate/providers) | [`LazyMotionProvider.tsx`](./animate/providers/LazyMotionProvider.tsx), a nine-line `LazyMotion` wrapper, mounted once in the locale layout |
+| [`animate/providers/`](./animate/providers) | [`LazyMotionProvider.tsx`](./animate/providers/LazyMotionProvider.tsx), a thin `LazyMotion` wrapper, mounted once in the locale layout |
 
 There is no `Switch` in `primitives/`; the only one is [`animate/base/Switch.tsx`](./animate/base/Switch.tsx).
 
@@ -43,11 +43,11 @@ There is no `Switch` in `primitives/`; the only one is [`animate/base/Switch.tsx
   `hit-area-stable` is a Tailwind `@utility` in [`src/ui/styles/utilities/index.css`](../../styles/utilities/index.css). See
   [`styles/CLAUDE.md`](../../styles/CLAUDE.md).
 
-**CVA is not the rule.** Only four files use `class-variance-authority` (`Button.tsx`, `Badge.tsx`,
+**CVA is not the rule.** Only a handful of files use `class-variance-authority` (`Button.tsx`, `Badge.tsx`,
 `InputGroup.tsx` and `animate/base/Sidebar.tsx`), and only `buttonVariants` and `badgeVariants` are
 exported. Everything else is a plain `cn()` call, and `Banner.tsx` and the planner's `MetricCard`
 instead take a `colorScheme` key into a local `COLOR_SCHEMES` record. Reach for CVA when a component
-genuinely has orthogonal variant axes; a single `variant` prop with four values does not need it.
+genuinely has orthogonal variant axes; a single `variant` prop with a short list of values does not need it.
 
 ## Layer rules
 
@@ -71,7 +71,7 @@ Coupling back into the rest of the app is small, but it is not zero. The complet
   from `document.cookie` on mount. It exports `SIDEBAR_COOKIE_NAME`, and **nothing in this package imports
   it**: no server layout reads the cookie and passes a `defaultOpen`, so the rail always renders expanded
   and then collapses once the effect runs. Either wire the layout up or stop describing the export as
-  shared; what is not true today is that anything in [`apps/web`](../../../..) uses the key. The docs site does: two wiki
+  shared; what is not true today is that anything in [`apps/web`](../../../..) uses the key. The docs site does: wiki
   pages import it to document the cookie's name, which is also why `temporal-polyfill` ends up in the docs
   dependency list to render a string. This bullet said "nothing outside that file" until that reach was
   derived mechanically; the seam is invisible from this side, which is the reason to check rather than
@@ -88,8 +88,8 @@ Coupling back into the rest of the app is small, but it is not zero. The complet
 No component here calls `useTranslations` or touches a Zustand store, and that line should hold.
 
 **That rule makes a hard-coded accessible name a defect, not a shortcut.** A component in this folder cannot
-translate, so a literal `aria-label` or `sr-only` string ships one language to screen-reader users on all six
-locales, and it is invisible to everyone testing visually. Four of them shipped that way: `Dialog`'s close
+translate, so a literal `aria-label` or `sr-only` string ships one language to screen-reader users in every
+locale, and it is invisible to everyone testing visually. Several shipped that way: `Dialog`'s close
 button said "Close" on every modal in the app, `SidebarTrigger` said "Toggle Sidebar", `Sidebar`'s mobile
 landmark said "Sidebar" and `RadialNav` said "Radial navigation". Each now takes the string as a prop
 (`closeLabel`, `label`, `landmarkLabel`, `aria-label`), keeping the English literal as the default so a caller
@@ -97,27 +97,27 @@ that forgets degrades to what it said before rather than to nothing. The callers
 see [`../../i18n/CLAUDE.md`](../../i18n/CLAUDE.md). A brand name is the one thing that stays literal:
 `aria-label='Forever PTO'` is correct in every locale.
 
-**A name the caller can forget is a name that gets forgotten, so four components now demand one.** The
+**A name the caller can forget is a name that gets forgotten, so these components now demand one.** The
 `closeLabel` shape above (optional, with an English default) degrades to what the component said before,
 and that is only a safe default where the component *said* something. Where it said nothing, the prop is
 required and the compiler is the check:
 
 - [`primitives/Label.tsx`](./primitives/Label.tsx) takes `htmlFor: string`, not the optional one `ComponentProps<'label'>` carries. A
-  `<label>` naming nothing is not inert, it is a promise to a screen reader that never resolves, and four of
-  its five callers made it: two in `shared/cookie-consent/CookieConsentDialog.tsx`, one over the donation
+  `<label>` naming nothing is not inert, it is a promise to a screen reader that never resolves, and nearly
+  every caller made it: a pair in `shared/cookie-consent/CookieConsentDialog.tsx`, one over the donation
   presets and one over the Workday counter heading. It also destructures `children` and renders them rather
   than letting them arrive through the spread: that is what lets Biome see the label has content, and it is
   why the file no longer carries a `noLabelWithoutControl` suppression.
 - [`animate/base/Switch.tsx`](./animate/base/Switch.tsx) takes `{ id } | { 'aria-label' } | { 'aria-labelledby' }`, intersected with its
-  other props, so one of the three has to be there. Base UI renders it as `<button role='switch'>` with no
-  name of its own: the four switches in the cookie dialog announced as "switch, not pressed" and nothing
+  other props, so one of them has to be there. Base UI renders it as `<button role='switch'>` with no
+  name of its own: the switches in the cookie dialog announced as "switch, not pressed" and nothing
   else.
 - [`animate/base/Checkbox.tsx`](./animate/base/Checkbox.tsx) takes the identical union, and it took nothing at all for a long
   time, which is exactly how it drifted: Base UI renders it as `<button role='checkbox'>` with no intrinsic
   name either, the rule above was written for `Switch` alone, and the file sitting beside it never got the
-  same treatment. Two of its three call sites already passed `aria-label`; the mobile Holiday card in
+  same treatment. All but one of its call sites already passed `aria-label`; the mobile Holiday card in
   `pages/planner/holidays/HolidaysTable.tsx` did not, so on a phone every Holiday row announced as "checkbox,
-  not checked" while the desktop row two hundred lines away announced "Select Christmas Day". A fourth call
+  not checked" while the desktop row further down the same file announced "Select Christmas Day". A new call
   site cannot repeat it. Its own test carries a `@ts-expect-error` over a nameless `<Checkbox />`, so
   loosening the type fails `pnpm typecheck` on an unused suppression rather than passing quietly.
 - [`primitives/Slider.tsx`](./primitives/Slider.tsx) takes `label: string` and puts it on `Slider.Thumb`, which is where Base UI's
@@ -152,7 +152,7 @@ prop arrives.
 **`Tooltip` only mints a `TooltipProvider` when it is given a delay of its own.** It used to mint one
 unconditionally, defaulting to `delay = 0`, and since `TooltipTrigger` resolves `delay ?? use(TooltipDelayContext)`
 from the *nearest* provider, and a trigger is always inside a `Tooltip`, that inner provider shadowed every
-outer one. The `delayDuration={200}` written at all ten call sites, `SidebarProvider` included, was dead:
+outer one. The `delayDuration={200}` written at every call site, `SidebarProvider` included, was dead:
 every tooltip in the app opened instantly, not even at Base UI's own default. `Tooltip` now renders the
 primitive bare unless a `delay`/`delayDuration` is passed to it directly, so the nearest enclosing
 `TooltipProvider` is the one that counts. A component in this layer that wraps its subtree in a context
@@ -160,7 +160,7 @@ provider has to ask whether it is overriding one the caller set.
 
 **There is no app-wide tooltip provider, and 200 ms is `TooltipProvider`'s own default.** The root layout
 mounts `BonesProvider`, `NextIntlClientProvider`, `AppThemeProvider` and `LazyMotionProvider` and no tooltip
-one, so every tooltip depends on a provider some ancestor happened to mint. All ten of those wrote
+one, so every tooltip depends on a provider some ancestor happened to mint. Every one of them wrote
 `delayDuration={200}` by hand; the default carries it now and the call sites say nothing. Passing a delay
 still overrides it, which is what `Tooltip.test.tsx` pins.
 
@@ -175,7 +175,7 @@ the rest of the app; that is deliberate, because the defect it catches cannot be
 the drawer in `<AnimatePresence onExitComplete={() => { document.body.style.pointerEvents = ''; }}>`, which
 is a counter-hack: `vaul` sets `document.body.style.pointerEvents = 'auto'` on a `requestAnimationFrame`
 whenever a `Drawer` is mounted with `modal={false}`, and `pages/planner/ManagementBar.tsx` keeps one mounted
-for the life of the planner screen on mobile. Two modules were writing the same global from opposite
+for the life of the planner screen on mobile. Rival modules were writing the same global from opposite
 directions with no ordering between them, and the sidebar's half only ran when an exit animation *completed*;
 a route change or an unmount mid-spring skipped it.
 
@@ -208,22 +208,22 @@ global in its `beforeEach`, which is exactly what hid this, so the fallback has 
 away.
 
 **The dialog lives in [`animate/base/Dialog.tsx`](./animate/base/Dialog.tsx) and nowhere else.** `primitives/` used to carry a
-pure re-export of it; the seven callers now import the implementation directly. Do not reintroduce a
+pure re-export of it; its callers now import the implementation directly. Do not reintroduce a
 re-export: the no-barrel convention has no exception here.
 
-**`animate/base/DropdownMenu.tsx` exports four components and used to define fifteen.** The other eleven
+**`animate/base/DropdownMenu.tsx` exports the components it needs and used to define far more.** The rest
 came with the vendored menu (`Group`, `Portal`, `Sub`, `SubTrigger`, `SubContent`, `RadioGroup`,
 `CheckboxItem`, `RadioItem`, `Label`, `Separator`, `Shortcut`), each prefixed with an underscore so Biome
 would not report it, each referenced exactly once in the whole tree: by its own definition. That is the same
 shape as `getCurrencySymbol` and `RotatingTextContainer` above, minus even the test suite keeping them alive,
 and it made the file's coverage read as a gap when the gap was code nothing rendered. They are gone, with
-their `Props` types and the three imports that only they used. The three call sites
+their `Props` types and the imports that only they used. The call sites
 (`sidebar/components/LanguageSelector.tsx`, `sidebar/components/ThemeSelector.tsx`,
 `pages/homepage/navigation/HomepageLanguageSwitcher.tsx`) take `DropdownMenu`, `DropdownMenuTrigger`,
 `DropdownMenuContent` and `DropdownMenuItem` and nothing else. A submenu or a checkable item comes back from
-`@base-ui/react` when something needs one, wired the way the four that survived are.
+`@base-ui/react` when something needs one, wired the way the survivors are.
 
-**There is one `Rotating.tsx` now, and there used to be two.** `animate/text/Rotating.tsx` exports
+**There is one `Rotating.tsx` now, and there used to be another.** `animate/text/Rotating.tsx` exports
 `RotatingText`, a self-contained `AnimatePresence` cycle over a string array, and it supplies its own
 `overflow-hidden py-1` wrapper. A second file under `animate/primitives/texts/` exported `RotatingTextContainer`,
 described here as "a context provider with no visual output"; it was the opposite on both counts. It built
@@ -235,10 +235,10 @@ random, not sequential, which is why it does not simply pass `EMOJIS` to `Rotati
 container left the render identical.
 
 **`animate/primitives/` is internal to `animate/`, and that is now true rather than aspirational.** It had
-three importers from outside. One was the no-op above. The other two took `Switch`, which was never an
+importers from outside. One was the no-op above. The rest took `Switch`, which was never an
 unstyled wrapper: it carried the full `border-[3px] border-[var(--frame)]` and `--shadow-brutal-3` treatment,
 so it was misfiled rather than merely leaked. It lives in `animate/base/Switch.tsx` now beside `Checkbox` and
-`Collapsible`, its two styled siblings, and it has the co-located test they have. The folder has zero
+`Collapsible`, its styled siblings, and it has the co-located test they have. The folder has zero
 external importers; keep it that way, and promote rather than reach in.
 
 `Switch`'s context was the same shape as the one above on a smaller scale: it published `isChecked`,
@@ -248,7 +248,7 @@ uncontrolled behaviour is enforced *twice*: `useControlledState` and `SwitchPrim
 prop both do it, so removing either one alone leaves the suite green. `useControlledState` earns its place
 for `onCheckedChange`, not for the rendered state.
 
-**`IconWrapper` still drops `persistOnAnimateEnd` when there is no parent context.** The two context
+**`IconWrapper` still drops `persistOnAnimateEnd` when there is no parent context.** The context
 values in `animate/icons/Icon.tsx` carry it, so a parent `AnimateIcon` reaches a nested icon, but the
 context-free branch of `IconWrapper` builds its `AnimateIcon` without `persistOnAnimateEnd` or
 `initialOnAnimateEnd`: on a standalone icon both are inert. Nothing passes them today.
@@ -280,9 +280,9 @@ part this wrapper does not use. The name has to reach the input, so `label` beco
 Putting it on the `Root` instead is the mistake that looks right.
 
 **`primitives/Combobox.tsx` keys its `CommandItem` by `option.value` and carries the label in `keywords`,
-and the two halves are one decision.** cmdk hands `onSelect` the item's own `value` (trimmed, case intact),
+and both halves are one decision.** cmdk hands `onSelect` the item's own `value` (trimmed, case intact),
 and that string is the only thing identifying which row was clicked. The item used to be keyed by
-`option.label`, so `handleSelect` had to reverse-look-up the option *by label*: two options sharing a label
+`option.label`, so `handleSelect` had to reverse-look-up the option *by label*: options sharing a label
 collided on the first one, which Regions can plausibly do. Keying by `value` fixes that, but cmdk also
 filters on `value`, so the change on its own would have silently reduced the country search to matching ISO
 codes: nobody types `ES` to find Spain. `keywords={[option.label]}` puts the label back in the filter's
@@ -293,7 +293,7 @@ tidy-up, and [`Combobox.test.tsx`](./primitives/Combobox.test.tsx) has a case th
 with `option.value.toLowerCase() as TValue`: the cast existed only to silence the compiler about a string
 the component had just changed. Country and Region codes arrive uppercase (`i18n-iso-countries` and
 `date-holidays`' `getStates()` both emit them that way), so the store held a value no option list contained.
-Nothing broke, because every reader compares case-insensitively: `getRegionName`, `Summary`'s two lookups,
+Nothing broke, because every reader compares case-insensitively: `getRegionName`, `Summary`'s own lookups,
 this component's own `selectedOption`, and `date-holidays` itself, which accepts either casing for country
 and region alike. That is what made it safe to remove and also what made it invisible. A primitive that
 rewrites the value it was given is lying to its caller; hand back what the option holds.
@@ -308,8 +308,8 @@ handed back is exact; the question of whether it *changed* is not.
 **Its `PopoverContent` carried `id='combobox-listbox'` and nothing referenced it.** No `aria-controls`
 anywhere in [`apps/web/src`](../../..) named it, so it bought no accessibility, and `PopoverContent` spreads its rest
 props onto the *positioner*, not the popup, so it was not even labelling the list. What it did do is put a
-literal id on a component the sidebar mounts four times: open two of them and the document holds two
-`#combobox-listbox`. It is gone. If a listbox relationship is wanted here it has to be a generated id
+literal id on a component the sidebar mounts more than once: open a couple of them and the document holds
+duplicate `#combobox-listbox` ids. It is gone. If a listbox relationship is wanted here it has to be a generated id
 threaded to a real `aria-controls`, not a constant.
 
 **`RadialNav`'s `orbitRadius` is `size / 2 - 0.5`, and the half pixel is not slop.** It puts the
@@ -317,9 +317,9 @@ threaded to a real `aria-controls`, not a constant.
 less half the border the child draws. Drop the `0.5` and the ring stops reading as concentric.
 
 **`primitives/Sonner.tsx` takes a `closeLabel`, because the string it needed lived in a dependency.** The
-hard-coded-name rule above closed four components and missed this one: sonner 2.0.8 defaults
+hard-coded-name rule above closed the components above and missed this one: sonner 2.0.8 defaults
 `closeButtonAriaLabel = 'Close toast'` and reads the override from `toastOptions.closeButtonAriaLabel`, so
-every toast in all six locales offered an English close button and nothing in `src/` held a string to grep
+every toast in every locale offered an English close button and nothing in `src/` held a string to grep
 for. `Toaster` now takes `closeLabel`, defaulting to sonner's own wording so a caller that forgets loses
 nothing, and both mount sites (`app/[locale]/(app)/planner/layout.tsx` and
 `app/[locale]/(marketing)/layout.tsx`) pass `a11y.closeToast` through `getTranslations`. A defect can hide in
@@ -329,11 +329,11 @@ a dependency's default; the fix is the same prop shape as `closeLabel` on `Dialo
 and the CSS blanket is why nobody noticed it was missing.** `src/ui/styles/animations/index.css` carries a
 correct global `@media (prefers-reduced-motion: reduce)` override, so the page *looks* covered; motion drives
 transform, opacity and filter through the Web Animations API and inline style writes, which no CSS
-`transition-duration` rule can reach. Sixty-two files in this package import `motion/react` and not one of
+`transition-duration` rule can reach. Files all over this package import `motion/react` and not one of
 them mentioned `useReducedMotion`, `MotionConfig`, `motion-safe` or `motion-reduce`, so with reduce-motion set
 at OS level a user still got the mobile sidebar sliding a viewport width on a stiff spring, every dialog
 scaling and blurring in, and `SlidingNumber` animating every metric on every recalculation. One provider
-covers all of them, because every render tree passes through one of its three mount sites
+covers all of them, because every render tree passes through one of its mount sites
 (`app/[locale]/layout.tsx`, `app/global-error.tsx`, `app/global-not-found.tsx`) and `MotionConfig` publishes
 through the same context that every `m.*` component and every `m.create()` reads.
 [`animate/providers/LazyMotionProvider.test.tsx`](./animate/providers/LazyMotionProvider.test.tsx) drives
@@ -342,20 +342,20 @@ directions.
 
 **`animate/base/Sidebar.tsx`'s mobile drawer manages focus itself, because it is not a Base UI `Dialog`.**
 Every other modal in this package goes through `animate/primitives/base/Dialog.tsx`, which hands Base UI an
-`initialFocus`/`finalFocus`; that branch is a raw `AnimatePresence` plus two `m.div`s. It had no initial
+`initialFocus`/`finalFocus`; that branch is a raw `AnimatePresence` plus its own `m.div`s. It had no initial
 focus, no return focus and no Escape, so opening it left focus on the trigger now behind the overlay, and Tab
 walked the whole planner underneath without ever reaching the drawer. It takes a `tabIndex={-1}` and a ref
 now, focuses itself on open, remembers `document.activeElement` and restores it on close, and closes on
 Escape from a window-level listener, because focus can legitimately leave the drawer and a local handler
 would miss it.
 
-**There is still no focus trap, and `aria-modal="false"` is why.** The two are one decision: this drawer
+**There is still no focus trap, and `aria-modal="false"` is why.** They are one decision: this drawer
 blocks the pointer with a real `fixed inset-0` backdrop rather than a body-level lock (see the
 `document.body.style` note above), and a non-modal dialog does not trap. Setting `aria-modal="true"` while
 the page behind it stays reachable would be the lie; adding a trap while claiming not to be modal would be
 the other one. If the drawer ever becomes genuinely modal, both change together.
 
-**The desktop rail is an `<aside>` and used to be four nested role-less `div`s.** The mobile branch got
+**The desktop rail is an `<aside>` and used to be nested role-less `div`s.** The mobile branch got
 `role="dialog"` and a label; the desktop branch got nothing, while `sidebar/AppSidebar.tsx` puts the entire
 control surface inside it, so pressing the landmark key on the planner cycled between `main` and `footer` and
 nothing else. `sidebar-container` is `<aside aria-label={landmarkLabel}>` now, which is the element Biome's
@@ -372,12 +372,12 @@ Vitest with `happy-dom`, co-located `*.test.tsx`. Coverage here is deliberately 
 test is usually a decision rather than an omission:
 
 - `animate/base/` is covered file for file, and so are `animate/components/`, `animate/effects/`,
-  `animate/text/` and `animate/primitives/`, the last two only since this branch: `animate/text/Rotating.tsx`
-  and the three [`animate/primitives/base/`](./animate/primitives/base) wrappers beside
+  `animate/text/` and `animate/primitives/`, those last only since this branch: `animate/text/Rotating.tsx`
+  and the [`animate/primitives/base/`](./animate/primitives/base) wrappers beside
   [`Tooltip.tsx`](./animate/primitives/base/Tooltip.tsx) had none. These carry state
   machines, controlled/uncontrolled fallbacks and event composition: the parts that break silently.
 - `primitives/` is covered file for file now, and this bullet said it carried **`Combobox.test.tsx`
-  and nothing else** on the reasoning that the rest is markup plus `cn()`. Two of those files were not: [`Progress.tsx`](./primitives/Progress.tsx) computes the overlay's clip from the
+  and nothing else** on the reasoning that the rest is markup plus `cn()`. Some of those files were not: [`Progress.tsx`](./primitives/Progress.tsx) computes the overlay's clip from the
   value, and [`Slider.tsx`](./primitives/Slider.tsx) forks a `number | readonly number[]` into the
   `number[]` every caller wants, both of which are the *arithmetic* kind of defect that renders as a
   plausible picture. The markup ones assert the thing a class list cannot: which element carries the
@@ -388,20 +388,20 @@ test is usually a decision rather than an omission:
   needs layout this environment does not have), and keeps `cmdk` real, because cmdk is what decides which
   string `onSelect` receives.
 
-  **`Progress.test.tsx` composes the three parts the way [`../pages/planner/PlannerPanel.tsx`](../pages/planner/PlannerPanel.tsx) does, and the
+  **`Progress.test.tsx` composes the parts the way [`../pages/planner/PlannerPanel.tsx`](../pages/planner/PlannerPanel.tsx) does, and the
   obvious composition renders nothing.** `ProgressTrack` passes `{...props}` to `ProgressPrimitive.Track`
   *and* gives it an explicit `MotionIndicator` child, so JSX children win and anything a caller nests
   inside the track is silently dropped. `ProgressOverlayLabel` is a **sibling** of the track, not a child;
   writing it as a child is a test that renders an empty bar and asserts nothing.
 - `animate/icons/` is excluded from the **coverage report** only, and the glob already spares `Icon.tsx`.
-  The 22 icons are mechanical wrappers around SVG path data; `Icon.tsx` is not, and its co-located
+  The icons are mechanical wrappers around SVG path data; `Icon.tsx` is not, and its co-located
   [`Icon.test.tsx`](./animate/icons/Icon.test.tsx) runs with everything else. Nothing under `core/` is excluded from the test run.
 
-**`Combobox` declares the nine props it honours, and used to declare the whole `<input>` surface.** It
-extended `Omit<HTMLProps<HTMLInputElement>, "onChange">` while rendering a `<button>`, destructured four
+**`Combobox` declares the props it honours, and used to declare the whole `<input>` surface.** It
+extended `Omit<HTMLProps<HTMLInputElement>, "onChange">` while rendering a `<button>`, destructured a few
 inherited props and spread nothing, so every other prop the type advertised was silently discarded, and
 several it advertised (`type`, `checked`, `multiple`, a numeric `size`) mean nothing on the element it
-renders. No call site lost a prop, because all four pass only handled ones; the interface was what invited
+renders. No call site lost a prop, because every one of them passes only handled ones; the interface was what invited
 the next caller to pass `aria-label` and watch it vanish. This is the defect recorded for `RadialNav` one
 section up, and the same instruction applies: if a caller needs another prop, widen the destructure and
 forward it to the `Button`.

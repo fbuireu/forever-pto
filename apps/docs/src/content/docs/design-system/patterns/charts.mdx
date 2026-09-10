@@ -1,19 +1,19 @@
 ---
 title: Summary charts
-description: The four Recharts visualizations in the planner summary, what each shows and how data flows from the Zustand stores into them.
+description: The Recharts visualizations in the planner summary, what each shows and how data flows from the Zustand stores into them.
 sidebar:
   order: 2
 ---
 
 Source: `apps/web/src/ui/modules/pages/planner/summary/`. These components are **reference-only**: they pull in `next-intl` (`useTranslations('charts')`, `useLocale`), the premium gate (`apps/web/src/ui/modules/premium/PremiumFeature.tsx`) and app DTO types, so the docs describe them without rendering live demos.
 
-## The four Recharts components
+## The Recharts components
 
-All four follow the same skeleton: a core `Card` with an icon-and-title header, a description line computed from the data, and a `ResponsiveContainer` chart body, each wrapped in `PremiumFeature`,, which blurs the chart and pitches the upgrade for free users.
+They all follow the same skeleton: a core `Card` with an icon-and-title header, a description line computed from the data, and a `ResponsiveContainer` chart body, each wrapped in `PremiumFeature`,, which blurs the chart and pitches the upgrade for free users.
 
 ### QuarterDistributionChart
 
-`QuarterDistributionChart.tsx` is a `BarChart` of the PTO Days the plan places per quarter (`quarterDist: number[]`, one bar per Q1–Q4). Bars are colored per quarter from `COLOR_SCHEMES` in `summary/const.ts` (the four brand CSS variables: teal, purple, yellow, green). The description summarizes total days and how many quarters are active.
+`QuarterDistributionChart.tsx` is a `BarChart` of the PTO Days the plan places per quarter (`quarterDist: number[]`, one bar per Quarter). Bars are colored per quarter from `COLOR_SCHEMES` in `summary/const.ts` (the brand CSS variables: teal, purple, yellow, green). The description summarizes total days and how many quarters are active.
 
 ### MonthlyDistributionChart
 

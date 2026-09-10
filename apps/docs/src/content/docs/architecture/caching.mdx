@@ -5,13 +5,13 @@ sidebar:
   order: 5
 ---
 
-Caching happens at two levels: an R2-backed incremental cache at the OpenNext/Workers level, and plain `Cache-Control` headers for the agent-facing markdown surface. Next's Cache Components are deliberately not a third.
+Caching happens at separate levels: an R2-backed incremental cache at the OpenNext/Workers level, and plain `Cache-Control` headers for the agent-facing markdown surface. Next's Cache Components are deliberately not another.
 
 ## Cache Components are off
 
-`next.config.ts` sets `cacheComponents: false`, and no file carries a `'use cache'` directive. The flag was on, with three `cacheLife('days')` sites (`getCurrentYear`, `getPublicEnv`, the `Testimonials` section), until it was found to hang requests on the Workers runtime: production logged Next's *cannot guarantee that Cache Components will run as expected due to the current runtime's implementation of `setTimeout()`* warning followed by the runtime cancelling the request as hung, and the same thing reproduced locally on workerd. Turning the flag off made every route answer in under a second with no errors. The evidence, the alternative that did not build and the cost are in [ADR 0015](https://github.com/fbuireu/forever-pto/blob/main/adr/0015-cache-components-stay-off-on-the-workers-runtime.md).
+`next.config.ts` sets `cacheComponents: false`, and no file carries a `'use cache'` directive. The flag was on, with `cacheLife('days')` sites (`getCurrentYear`, `getPublicEnv`, the `Testimonials` section), until it was found to hang requests on the Workers runtime: production logged Next's *cannot guarantee that Cache Components will run as expected due to the current runtime's implementation of `setTimeout()`* warning followed by the runtime cancelling the request as hung, and the same thing reproduced locally on workerd. Turning the flag off made every route answer in under a second with no errors. The evidence, the alternative that did not build and the cost are in [ADR 0015](https://github.com/fbuireu/forever-pto/blob/main/adr/0015-cache-components-stay-off-on-the-workers-runtime.md).
 
-What that means for rendering: the `[locale]` pages are plain SSG through `generateStaticParams`, built once per deploy, and the three values that used to be cached fragments are computed at build. `sitemap.ts` is the one route that opts into `export const dynamic = "force-dynamic"`, so a preview Worker names its own host. Re-enabling the flag is a decision that has to come with the ADR's reproduction run green on workerd.
+What that means for rendering: the `[locale]` pages are plain SSG through `generateStaticParams`, built once per deploy, and the values that used to be cached fragments are computed at build. `sitemap.ts` is the one route that opts into `export const dynamic = "force-dynamic"`, so a preview Worker names its own host. Re-enabling the flag is a decision that has to come with the ADR's reproduction run green on workerd.
 
 ## OpenNext incremental cache on R2
 
