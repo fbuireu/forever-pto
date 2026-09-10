@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-All client state lives in Zustand stores under `apps/web/src/application/stores/`. Four of them persist; each is created as `create()(devtools(persist(...)))` with a versioned storage name. The `ui` store is devtools-only. Store conventions are documented in `apps/web/src/application/stores/CLAUDE.md`.
+All client state lives in Zustand stores under `apps/web/src/application/stores/`. Most of them persist; each is created as `create()(devtools(persist(...)))` with a versioned storage name. The `ui` store is devtools-only. Store conventions are documented in `apps/web/src/application/stores/CLAUDE.md`.
 
 ## Persistence: encrypted localStorage
 
@@ -29,7 +29,7 @@ This prevents re-renders when unrelated fields change. Stores never fetch data t
 
 ## `filters` (`useFiltersStore`, storage `filters-store`)
 
-User-facing planner configuration: `ptoDays`, `allowPastDays`, `country`, `region`, `year`, `carryOverMonths`, `strategy` (a `FilterStrategy`, defaulting to grouped; see [holidays engine](/how-it-works/holidays-engine/)). Two quirks:
+User-facing planner configuration: `ptoDays`, `allowPastDays`, `country`, `region`, `year`, `carryOverMonths`, `strategy` (a `FilterStrategy`, defaulting to grouped; see [holidays engine](/how-it-works/holidays-engine/)). Quirks:
 
 - `partialize` persists everything **except `year`**, since the year deliberately resets to the current year on every visit.
 - `setCountry` resets `region` to `''`, since regions belong to a country.
@@ -40,7 +40,7 @@ The largest store: `holidays` (the `HolidayDTO[]`), the current `suggestion`, `a
 
 - `fetchHolidays` dynamic-imports `@infrastructure/services/holidays/getHolidays`, preserves user-created (`CUSTOM`) holidays and dedupes by date.
 - `generateSuggestions` / `generateAlternatives` dynamic-import the domain functions for the synchronous path; `setCalculationResult` is the entry point used by the [Web Worker path](/how-it-works/calculation-worker/), preserving the selected alternative index across recalculations.
-- `addHoliday` / `editHoliday` / `removeHoliday` manage custom holidays, and all three ask one predicate, `heldOn`, whether the date is already taken and by what; `toggleDaySelection` implements manual day editing with PTO-budget enforcement; `trimManualDays` supports the calendar UI. Remaining Budget comes from `measureBudget` in the calendar domain rather than from a store action.
+- `addHoliday` / `editHoliday` / `removeHoliday` manage custom holidays, and all of them ask one predicate, `heldOn`, whether the date is already taken and by what; `toggleDaySelection` implements manual day editing with PTO-budget enforcement; `trimManualDays` supports the calendar UI. Remaining Budget comes from `measureBudget` in the calendar domain rather than from a store action.
 
 Because `Date` does not survive JSON, `partialize` serializes every date (including nested bridge dates) to ISO strings and `onRehydrateStorage` revives them.
 

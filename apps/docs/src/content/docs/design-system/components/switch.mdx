@@ -7,7 +7,7 @@ sidebar:
 
 import { SwitchDemo } from '../../../../components/demos/SwitchDemo';
 
-Source: `apps/web/src/ui/modules/core/animate/base/Switch.tsx`, beside `Checkbox` and `Collapsible`. It sat in `animate/primitives/base/`, the unstyled layer, while carrying the full 3px frame and hard shadow,, which made it the one thing two feature components had to reach into that folder for. Rendered as `m.button`, so it needs a `LazyMotionProvider` ancestor.
+Source: `apps/web/src/ui/modules/core/animate/base/Switch.tsx`, beside `Checkbox` and `Collapsible`. It sat in `animate/primitives/base/`, the unstyled layer, while carrying the full 3px frame and hard shadow,, which made it the one thing feature components had to reach into that folder for. Rendered as `m.button`, so it needs a `LazyMotionProvider` ancestor.
 
 Exports: `Switch` (the thumb is an internal sub-component, rendered automatically unless you pass `children`).
 
@@ -34,8 +34,8 @@ Use Switch for immediate on/off settings; use [Checkbox](/design-system/componen
 ## Conventions
 
 - **An accessible name is required, and the type says so.** The props are intersected with
-  `{ id: string } | { "aria-label": string } | { "aria-labelledby": string }`, so a `Switch` with none of the
-  three does not compile. It renders a `button` with no text inside it, so without one it reaches a screen
+  `{ id: string } | { "aria-label": string } | { "aria-labelledby": string }`, so a `Switch` with none of
+  them does not compile. It renders a `button` with no text inside it, so without one it reaches a screen
   reader as "switch, not pressed" and nothing else. Pass `id` when a visible `Label` names it (the `Label`
   needs the matching `htmlFor`, which is also required), and `aria-label` when there is no visible label.
 - `data-slot` hooks: `switch`, `switch-thumb`.

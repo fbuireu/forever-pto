@@ -5,7 +5,7 @@ sidebar:
   order: 11
 ---
 
-Two endpoints are rate limited, and they are the two that reach Stripe on an unauthenticated request: `POST /api/payment`, which creates a PaymentIntent, and `GET /api/payment/activate`, Stripe's `return_url`, which grants an entitlement. Both trigger billable third-party work without a session in front of them, which makes them the natural abuse targets.
+The rate-limited endpoints are the ones that reach Stripe on an unauthenticated request: `POST /api/payment`, which creates a PaymentIntent, and `GET /api/payment/activate`, Stripe's `return_url`, which grants an entitlement. Both trigger billable third-party work without a session in front of them, which makes them the natural abuse targets.
 
 ## How it works
 
@@ -21,7 +21,7 @@ The source file holds no limit, no window length and no cache key: both bounds l
 
 This was a read-modify-write over a KV namespace (`get`, compare, `put(count + 1)`) and it did not hold. Workers KV offers neither compare-and-swap nor atomic increment, so every request whose `get` resolved before a peer's `put` landed read the same value and wrote the same number. The bound therefore only ever held for strictly serialised traffic: two hundred parallel `POST /api/payment` from one IP, exactly the shape of card-testing traffic, advanced the counter by an amount unrelated to the burst and admitted almost all of them to `stripe.paymentIntents.create`.
 
-Two KV properties widened the window rather than narrowing it: a `get` is served from a per-colo cache whose minimum TTL is 60 seconds, the same length as the window, and writes to a single key are throttled to roughly one per second.
+KV properties widened the window rather than narrowing it: a `get` is served from a per-colo cache whose minimum TTL is 60 seconds, the same length as the window, and writes to a single key are throttled to roughly one per second.
 
 ## Fail-open by design
 

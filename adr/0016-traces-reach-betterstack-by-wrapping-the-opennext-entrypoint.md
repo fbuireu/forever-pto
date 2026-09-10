@@ -8,7 +8,7 @@ Accepted.
 
 ## Context
 
-The app Worker had logs in BetterStack and no traces anywhere a person could query. Two things looked like
+The app Worker had logs in BetterStack and no traces anywhere a person could query. Things looked like
 traces and were not. `wrangler.toml` enables `[observability.traces]`, which Cloudflare renders in its own
 dashboard and exports nowhere: there is no destination setting, and the tail consumer under `workers/tail/`
 receives `logs`, `exceptions` and request metadata but no spans, so it cannot forward what it never gets.
@@ -32,7 +32,7 @@ The alternatives were:
   destination with no library, and it means writing a span exporter, W3C trace-context propagation and a
   sampler by hand, and instrumenting every `fetch` call site one at a time. Everything the library does for
   free, done worse.
-- **Wrap the generated entrypoint.** A five-line `worker.ts` imports `.open-next/worker.js`, wraps it in
+- **Wrap the generated entrypoint.** A short `worker.ts` imports `.open-next/worker.js`, wraps it in
   `instrument`, and `wrangler.toml` names the wrapper as `main`. OpenNext keeps generating what it generates;
   wrangler bundles the wrapper on top. The cost is a file in the tree that imports a file the tree does not
   contain until a build has run, and a dependency on the shape of what OpenNext emits: an ES module whose
@@ -47,7 +47,7 @@ any more.
 
 `tracingConfig` lives in [`apps/web/src/infrastructure/clients/logging/better-stack/tracing.ts`](../apps/web/src/infrastructure/clients/logging/better-stack/tracing.ts),
 beside the log contract, because the spans go to the same BetterStack source as the logs and stamp the same
-`LOG_SERVICE` name, so one query reaches both. It reads two Worker bindings, `BETTER_STACK_INGESTING_URL` and
+`LOG_SERVICE` name, so one query reaches both. It reads the Worker bindings `BETTER_STACK_INGESTING_URL` and
 `BETTER_STACK_SOURCE_TOKEN`, the names the tail Worker already uses, and the deploy hands them over the same
 way: the host as a `--var`, the token inside `--secrets-file`. When either is unbound it returns a configuration
 whose exporter is `DROP_SPANS`, one that acknowledges every batch and sends nothing, so a hand-run deploy without
@@ -71,10 +71,10 @@ library rewritten with fewer features.
   through `tsconfig.json`; it imports by relative path, the way `workers/tail/index.ts` does. A test can import
   `tracing.ts`; nothing can unit-test `worker.ts` itself, because its import does not exist without a build.
   `wrangler deploy --dry-run` after `pnpm cf:build` is what proves it bundles.
-- **Two Workers now read `BETTER_STACK_INGESTING_URL` and `BETTER_STACK_SOURCE_TOKEN`.** Both come from the same
-  two GitHub variables, `NEXT_PUBLIC_BETTER_STACK_INGESTING_URL` and `NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN`, on
+- **More than one Worker now reads `BETTER_STACK_INGESTING_URL` and `BETTER_STACK_SOURCE_TOKEN`.** Both come from the same
+  GitHub variables, `NEXT_PUBLIC_BETTER_STACK_INGESTING_URL` and `NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN`, on
   the environment being deployed, and `_deploy-web.yml` fails before deploying when either is empty. Reissuing
-  the BetterStack source is still "update the two variables and redeploy".
+  the BetterStack source is still "update the variables and redeploy".
 - **Every outbound `fetch` is a span**, Stripe, Turso and the R2 cache included, at the sampled rate. That is the
   value and it is also the volume: BetterStack bills by it, and the ratio is the dial.
 - **The `DROP_SPANS` fallback is silent by design**, which is the opposite of what the tail Worker does

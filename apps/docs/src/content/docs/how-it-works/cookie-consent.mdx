@@ -15,10 +15,10 @@ Consent management is built on `vanilla-cookieconsent`, but with the library's U
 
 ## Categories and services
 
-Two categories are registered with the library:
+These categories are registered with the library:
 
 - **necessary**: `enabled: true, readOnly: true`, and not consentable. Per `COOKIE_SECTIONS` this covers `user-country` (see [country detection](/how-it-works/country-detection/)), the library's own `cc_cookie`, and Stripe's `__stripe_mid`/`__stripe_sid` (set during [donation checkout](/how-it-works/premium/)). The `NEXT_LOCALE` and `premium-token` cookies are likewise functional, not tracking; see [cookies](/reference/cookies/).
-- **analytics** is the only consent-gated category, with two independently toggleable services:
+- **analytics** is the only consent-gated category, with independently toggleable services:
   - `ga4` covers Google Analytics (`_ga*`, `_gid` cookie patterns).
   - `betterStack` covers Better Stack browser analytics (`_bs*` patterns).
 

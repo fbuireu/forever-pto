@@ -1,6 +1,6 @@
 # apps/web/src/domain
 
-The business rules, in two bounded contexts that deliberately do not follow the same rule. Nothing here
+The business rules, in bounded contexts that deliberately do not follow the same rule. Nothing here
 renders, routes, reads a request or reaches for a browser global. The vocabulary is
 [`CONTEXT.md`](../../../../CONTEXT.md); a variable named for a retired term is a defect here, not a style
 preference.
@@ -15,18 +15,18 @@ preference.
 They share no code and no types, and there is no reason for one to import the other. Premium is the only
 thing that connects them, and that connection lives in the application layer, not here.
 
-## Two rules, on purpose
+## Rival rules, on purpose
 
-A reader who finds two contracts inside one layer assumes one is a mistake. Both are intended; see
+A reader who finds rival contracts inside one layer assumes one is a mistake. Both are intended; see
 [ADR 0003](../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md).
 
-**`calendar/` is pure.** Its outside imports are exactly four, and the list is meant to stay that short:
+**`calendar/` is pure.** Its outside imports are a short list, and it is meant to stay that way:
 
 - `@application/dto/holiday/types`: `HolidayDTO` and `HolidayVariant`
 - `@application/shared/utils/dates`: the Temporal-backed date helpers. The arrow points the wrong way and
   stays that way on purpose; the alternatives cost more than the tidiness is worth, and
   [ADR 0012](../../../../adr/0012-shared-date-helpers-stay-in-the-application-layer.md) records why. **The
-  test for a fifth entry on this list is the runtime, not the layer**: does the module resolve inside a Web
+  test for a new entry on this list is the runtime, not the layer**: does the module resolve inside a Web
   Worker with no DOM and no server context
 - `temporal-polyfill`, in `utils/helpers.ts` only, for `PlainYearMonth.daysInMonth`
 - `next-intl`, the `Locale` type alone, threaded through [`pipeline.ts`](./calendar/pipeline.ts) to the Metrics, where it formats month names
@@ -63,7 +63,7 @@ exist in the deployed Workers runtime and a local run proves nothing
 
 ## Testing
 
-Every module with behaviour has a co-located `.test.ts`, run by Vitest. Four have none and should not grow
+Every module with behaviour has a co-located `.test.ts`, run by Vitest. A few have none and should not grow
 one: [`calendar/const.ts`](./calendar/const.ts) is a tunables object, [`payment/events/types.ts`](./payment/events/types.ts) is types plus `PAYMENT_SUCCEEDED`,
 and [`payment/events/factory/resolvers.ts`](./payment/events/factory/resolvers.ts) is covered through [`events.test.ts`](./payment/events/factory/events.test.ts). [`calendar/types.ts`](./calendar/types.ts) grew one:
 it holds `isFilterStrategy`, the predicate the Web Worker narrows an incoming strategy string with, and

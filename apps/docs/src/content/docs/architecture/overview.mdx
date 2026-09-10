@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-Forever PTO is a Next.js App Router application organized into five layers under `apps/web/src/`, plus `apps/web/src/middleware.ts` at the root of the tree. Each layer has a single responsibility and a deliberate dependency direction.
+Forever PTO is a Next.js App Router application organized into layers under `apps/web/src/`, plus `apps/web/src/middleware.ts` at the root of the tree. Each layer has a single responsibility and a deliberate dependency direction.
 
 ## The layers
 
@@ -19,11 +19,11 @@ Forever PTO is a Next.js App Router application organized into five layers under
 
 ## Dependency direction
 
-This section used to draw `app → ui → application → domain` with two side arrows, and that picture was read
+This section used to draw `app → ui → application → domain` with a couple of side arrows, and that picture was read
 off the intent rather than off the tree. Walking every `import`, `import type`, dynamic `import()` and
-`vi.mock` specifier under `apps/web/src` gives **fifteen** production edges between the five layers plus
-`middleware.ts`, and the old figure drew five of them. The largest one it left out was `app → infrastructure`, at
-63 imports across 20 files, the third-heaviest edge in the package. It also mixed two relations under one
+`vi.mock` specifier under `apps/web/src` gives **more** production edges between the layers plus
+`middleware.ts` than the old figure drew. The largest one it left out was `app → infrastructure`,
+one of the heaviest edges in the package. It also mixed separate relations under one
 arrow head, labelling infrastructure as *reached through use-cases, services and adapters*: that is a call
 path, not an import, and a diagram whose arrows mean `imports` cannot carry both.
 
@@ -40,7 +40,7 @@ either direction, so it is a measurement rather than a drawing.
 | `infrastructure` | | 7/2 | 33/23 | 5/4 | |
 | `middleware.ts` | | | | | 5/1 |
 
-Read the shape rather than the numbers. Four things are worth naming, and three of them are arrows the old
+Read the shape rather than the numbers. These are worth naming, and most of them are arrows the old
 figure said were not there:
 
 - **`app` never imports `domain`.** It is the only empty cell a reader would expect to be full, and it is the
@@ -53,7 +53,7 @@ figure said were not there:
   programs against service tags, which is
   [ADR 0003](https://github.com/fbuireu/forever-pto/blob/main/adr/0003-pure-calendar-domain-effectful-payment-domain.md).
 - **`infrastructure` imports upwards too**, and one of those edges was undocumented until this page was
-  corrected: seven imports across two files reach `apps/web/src/ui/i18n/messages/*.json` through the `@i18n`
+  corrected: imports in a couple of files reach `apps/web/src/ui/i18n/messages/*.json` through the `@i18n`
   shorthand. The infrastructure guide said nothing there imports from `@ui/*`, which was true of the literal
   specifier and false of the layer.
 - **`application → ui` is a single import**, recorded as a known inversion in
@@ -69,7 +69,7 @@ them:
 - `apps/web/src/ui/CLAUDE.md` lists the short set of pure value helpers the UI may take from
   `@domain/calendar`, and why it must not reach the planning engine itself.
 
-Two facts about the system that no import arrow carries, and that the old figure tried to put on one:
+Facts about the system that no import arrow carries, and that the old figure tried to put on one:
 
 - Stores in `apps/web/src/application/stores/` never call SDK clients directly; they delegate to
   `apps/web/src/infrastructure/services/*`.
@@ -82,7 +82,7 @@ Which practices this tree takes from domain-driven design, which it takes in par
 
 ## A CLAUDE.md per folder
 
-Per the repo's root `CLAUDE.md`, every significant folder carries its own `CLAUDE.md` describing what may be changed there and what its rules are; read it before touching the folder. Examples: `apps/web/src/domain/CLAUDE.md` (layer rules and allowed imports), `apps/web/src/infrastructure/clients/CLAUDE.md` (the Effect client pattern), `apps/web/src/application/stores/CLAUDE.md` (store conventions). Those files are the source of truth for layer boundaries; this page summarizes them. `CONTEXT.md` is a different document and exists **only** at the repo root, where it is the domain glossary. A nested one is forbidden, because the name would mean two things.
+Per the repo's root `CLAUDE.md`, every significant folder carries its own `CLAUDE.md` describing what may be changed there and what its rules are; read it before touching the folder. Examples: `apps/web/src/domain/CLAUDE.md` (layer rules and allowed imports), `apps/web/src/infrastructure/clients/CLAUDE.md` (the Effect client pattern), `apps/web/src/application/stores/CLAUDE.md` (store conventions). Those files are the source of truth for layer boundaries; this page summarizes them. `CONTEXT.md` is a different document and exists **only** at the repo root, where it is the domain glossary. A nested one is forbidden, because the name would be ambiguous.
 
 ## Path aliases
 
@@ -103,14 +103,14 @@ Declared in `apps/web/tsconfig.json` (`compilerOptions.paths`), not at the repo 
 | `@styles/*` | `./src/ui/styles/*` |
 | `@i18n/*` | `./src/ui/i18n/*` |
 
-That is the whole list. This page carried two more, `@mocks/*` and `@types/*`, pointing at
+That is the whole list. This page carried extra rows, `@mocks/*` and `@types/*`, pointing at
 `apps/web/src/mocks` and `apps/web/src/types`; neither alias is declared and neither directory exists. The
 rule keeping the same table honest in `apps/web/CLAUDE.md` read only that file, so the published copy could
 drift and did. It reads both now.
 
 `@assets`, `@styles` and `@i18n` all point inside `apps/web/src/ui/`: they are shorthands, not separate
 layers, which is why an `@i18n/...` import from `apps/web/src/infrastructure/` is an `infrastructure → ui`
-edge and appears as one in the table above. Each package has its own `tsconfig.json`, so the two type-check
+edge and appears as one in the table above. Each package has its own `tsconfig.json`, so they type-check
 independently; the app's aliases carry no `baseUrl` and resolve against that file.
 
 ## Related pages

@@ -55,16 +55,16 @@ unlayered rules. That is why it can flatten animations globally from where it si
 
 **It flattens CSS animation, and only CSS animation, which made it the most convincing kind of wrong.**
 `motion/react` drives transform, opacity and filter through the Web Animations API and direct inline style
-writes; a `transition-duration: 0.01ms !important` rule reaches neither. Sixty-two files in `apps/web` import
+writes; a `transition-duration: 0.01ms !important` rule reaches neither. Files all over `apps/web` import
 `motion/react`, so with reduce-motion set at OS level the page still sprang, slid and blurred while this
-block sat there looking like coverage. Twelve review passes walked past it for that reason. The motion half
+block sat there looking like coverage. Review pass after review pass walked past it for that reason. The motion half
 is handled by `<MotionConfig reducedMotion="user">` in
 [`../modules/core/animate/providers/LazyMotionProvider.tsx`](../modules/core/animate/providers/LazyMotionProvider.tsx);
-this block still owns everything CSS animates, and the two are not substitutes.
+this block still owns everything CSS animates, and they are not substitutes.
 
 ## Design tokens
 
-All tokens live in `global/index.css`, in three tiers:
+All tokens live in `global/index.css`, in tiers:
 
 1. **Brand palette**: `--color-brand-*` raw hex, plus `--brand-gradient`, `--frame` (the neo-brutalist
    outline colour) and the `--surface-panel*` set.
@@ -99,19 +99,19 @@ Fonts come from [`fonts.ts`](../../app/fonts.ts) (next/font), which exposes `--f
 ## quiet-link
 
 The nav-and-footer link treatment: a transparent 3px border that fills with `--accent` and `--frame` on
-hover, over 75ms. It was written out by hand **eleven times**, six of them in [`Footer.tsx`](../modules/shared/footer/Footer.tsx) alone, plus
+hover, over 75ms. It was written out by hand **at every call site**, most of them in [`Footer.tsx`](../modules/shared/footer/Footer.tsx), plus
 `ContactButton`, `CookieButton`, `Navigation`, `Faq` and the planner's `Contact`, as a 190-character class
 string, and [`Faq.tsx`](../modules/pages/homepage/sections/Faq.tsx) had already started fixing it locally by hoisting the string to a module const, which
-made a seventh place for the value to live.
+made one more place for the value to live.
 
-It is a `@utility` rather than a `Button` variant because only three of the eleven sites are `Button`s. The
-rest are the locale-aware `Link` and `createRichLink`, so a CVA variant would have covered a third of them
-and left the string in the other two thirds.
+It is a `@utility` rather than a `Button` variant because only a minority of the sites are `Button`s. The
+rest are the locale-aware `Link` and `createRichLink`, so a CVA variant would have covered a fraction of them
+and left the string everywhere else.
 
-**Three differences between the call sites survived on purpose, and one of them is real drift.** `h-auto`
+**Differences between the call sites survived on purpose, and one of them is real drift.** `h-auto`
 appears only on the `Button` sites, which is correct: `Button` sets a height and `Link` does not.
 `Navigation` uses `px-2 py-1` where everyone else uses `px-1.5 py-0.5`, plausibly because the top nav wants
-a larger target. But the font weight genuinely disagrees: four sites say `font-medium` and three say
+a larger target. But the font weight genuinely disagrees: some sites say `font-medium` and others say
 `font-semibold`, and nothing distinguishes them. Picking one is a design decision with visible output, not a
 refactor, so it was left alone rather than flattened inside a change that moves no pixels.
 
@@ -129,8 +129,8 @@ pins the hit area while the box moves, using a transparent `::after` at `inset: 
 [`Sidebar.tsx`](../modules/core/animate/base/Sidebar.tsx), [`Tooltip.tsx`](../modules/core/animate/base/Tooltip.tsx)), the planner calendar day cells and the homepage sections.
 
 `hit-area-stable-tilt` is the variant for elements that *rotate* on hover rather than translate
-(`rotate-[-1deg]` → `hover:rotate-0`, in [`Pricing.tsx`](../modules/pages/homepage/sections/Pricing.tsx) and [`Testimonials.tsx`](../modules/pages/homepage/sections/Testimonials.tsx)). A rotation moves all
-four edges, so its hover inset is symmetric (`inset: -16px`) and it has no `:active` case.
+(`rotate-[-1deg]` → `hover:rotate-0`, in [`Pricing.tsx`](../modules/pages/homepage/sections/Pricing.tsx) and [`Testimonials.tsx`](../modules/pages/homepage/sections/Testimonials.tsx)). A rotation moves every
+edge, so its hover inset is symmetric (`inset: -16px`) and it has no `:active` case.
 
 Both set `position: relative` through `:where(&)`, which contributes zero specificity, so a component
 can still set its own positioning without `!important`.
@@ -144,7 +144,7 @@ track; change the insets here and the copy will not follow.
 
 Biome's CSS parser rejects Tailwind-only at-rules by default: `@apply` in `base/`, `@theme inline` and
 `@custom-variant` in `theme/`, `@utility` in `utilities/` all parse as errors, and a parse error aborts
-formatting for the whole file. [`biome.json`](../../../../../biome.json) used to answer that by excluding those three folders from
+formatting for the whole file. [`biome.json`](../../../../../biome.json) used to answer that by excluding those folders from
 `files.includes`, which gates the *whole* tool: they fell out of `pnpm format:all` and `pnpm lint:all`
 alike, and their formatting drifted apart, with `utilities/index.css` on single quotes and `theme/index.css`
 on CRLF.
@@ -179,7 +179,7 @@ quotes throughout, LF, 120 columns: Biome's defaults, applied by the tool rather
 ## Testing
 
 `index.test.ts` is the only test here, and it reads CSS as text rather than rendering anything. It
-pins the two things that look like tidy-ups and are not: the design tokens stay unlayered and the
+pins the things that look like tidy-ups and are not: the design tokens stay unlayered and the
 layer statement reserves no slot for them, and `theme/index.css` keeps `--container-8xl` without a
 `--max-width-8xl` mirror.
 

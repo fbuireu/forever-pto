@@ -20,24 +20,24 @@ The shape lives in one module and each route supplies only its own path. `routeM
 
 ## Structured data: `JsonLd` and `FaqJsonLd`
 
-`apps/web/src/ui/modules/shared/seo/JsonLd.tsx` exports **two** server components, mounted on different pages on purpose: a search engine expects the marked-up questions to be visible on the page carrying the markup.
+`apps/web/src/ui/modules/shared/seo/JsonLd.tsx` exports **its** server components, mounted on different pages on purpose: a search engine expects the marked-up questions to be visible on the page carrying the markup.
 
-- **`JsonLd`** sits on the planner (`apps/web/src/app/[locale]/(app)/planner/page.tsx`) and emits two `application/ld+json` scripts: **WebApplication**, with name and description from translations, `applicationCategory: 'ProductivityApplication'`, `availableLanguage` interpolated from `LOCALES` and the free plus Premium offers; and **Organization**, with name, URL and logo.
+- **`JsonLd`** sits on the planner (`apps/web/src/app/[locale]/(app)/planner/page.tsx`) and emits its `application/ld+json` scripts: **WebApplication**, with name and description from translations, `applicationCategory: 'ProductivityApplication'`, `availableLanguage` interpolated from `LOCALES` and the free plus Premium offers; and **Organization**, with name, URL and logo.
 - **`FaqJsonLd`** sits on the homepage (`apps/web/src/app/[locale]/(marketing)/page.tsx`), beside the `Faq` section it describes, and emits the **FAQPage** schema. Answers come from the `faq` namespace so structured data and visible content stay in sync per locale. It used to be emitted on the planner, which has no FAQ on it at all.
 
 The Premium offer states a `priceSpecification` with a `minPrice` rather than a fixed price. Premium is unlocked by a Donation whose amount the payer chooses, so the minimum is read out of the payment schema instead of being restated here or there.
 
 `dangerouslySetInnerHTML` is required for JSON-LD scripts; the Biome suppression is annotated inline.
 
-## One table, five readers
+## One table, many readers
 
-`SITE_ROUTES` in `apps/web/src/infrastructure/seo/routes.ts` is the single statement of which routes exist, which are public and what each is called: a `path`, an `indexable` flag, the sitemap hints and the `metadata.*` message keys. Five readers derive from it: `sitemap.ts` emits the cross-product of the locales and `indexableRoutes()`, `robots.ts` disallows every locale-expanded `privateRoutes()` path, `buildMetadata` resolves `isIndexable(route)` for itself, `buildMarkdownPage` looks a title and description up through `findRoute`, and `routeMetadata` builds a whole `generateMetadata` from one row.
+`SITE_ROUTES` in `apps/web/src/infrastructure/seo/routes.ts` is the single statement of which routes exist, which are public and what each is called: a `path`, an `indexable` flag, the sitemap hints and the `metadata.*` message keys. Its readers derive from it: `sitemap.ts` emits the cross-product of the locales and `indexableRoutes()`, `robots.ts` disallows every locale-expanded `privateRoutes()` path, `buildMetadata` resolves `isIndexable(route)` for itself, `buildMarkdownPage` looks a title and description up through `findRoute`, and `routeMetadata` builds a whole `generateMetadata` from one row.
 
-Adding a route is one row here and one line in the route file. It used to be three edits in three places (a routes entry, a disallowed-prefix list and a `robots: { index: false }` block) with nothing tying them together, and the prefix list covered only `/legal/` and `/payment/`, so a private route anywhere else was disallowed by nobody. `isIndexable` **fails closed**: a path with no row counts as private, so forgetting the table costs a page in the sitemap rather than exposing a private one.
+Adding a route is one row here and one line in the route file. It used to be an edit in each of several places (a routes entry, a disallowed-prefix list and a `robots: { index: false }` block) with nothing tying them together, and the prefix list covered only `/legal/` and `/payment/`, so a private route anywhere else was disallowed by nobody. `isIndexable` **fails closed**: a path with no row counts as private, so forgetting the table costs a page in the sitemap rather than exposing a private one.
 
 ## robots.ts
 
-`apps/web/src/app/robots.ts` allows everything except `/_next/static/` and, per locale, every path `privateRoutes()` returns: the four legal pages and the payment confirmation. It also points crawlers at `${baseUrl}/sitemap.xml`.
+`apps/web/src/app/robots.ts` allows everything except `/_next/static/` and, per locale, every path `privateRoutes()` returns: the legal pages and the payment confirmation. It also points crawlers at `${baseUrl}/sitemap.xml`.
 
 `robots.txt` is prerendered, so it bakes whatever base URL the build resolved, where `sitemap.ts` gets the host it is actually served from. On a preview Worker that means `robots.txt` advertises the production sitemap, tolerated rather than fixed, because previews sit behind Cloudflare Access and nothing crawls them.
 

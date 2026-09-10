@@ -1,13 +1,13 @@
 ---
 title: Typography
-description: The four type roles, how fonts load in the app versus these docs, and the variable-font weight caps.
+description: The type roles, how fonts load in the app versus these docs, and the variable-font weight caps.
 sidebar:
   order: 3
 ---
 
 import { TypeSpecimen } from '../../../../components/TypeSpecimen';
 
-Four families, four roles. The specimens below render with the same font tokens the app uses:
+A family per role. The specimens below render with the same font tokens the app uses:
 
 <TypeSpecimen />
 
@@ -22,7 +22,7 @@ Four families, four roles. The specimens below render with the same font tokens 
 
 The role tokens are mapped in `apps/web/src/ui/styles/theme/index.css` under `@theme inline` (`--font-sans: var(--font-space-grotesk)`, `--font-display: var(--font-bricolage)`, …), which makes Tailwind's `font-sans` / `font-display` / `font-serif` / `font-mono` utilities point at the right family.
 
-## Two loading pipelines, same variables
+## Separate loading pipelines, same variables
 
 The role mapping targets raw per-family variables (`--font-bricolage`, `--font-space-grotesk`, `--font-instrument-serif`, `--font-jetbrains-mono`), and *who defines those variables* differs by host:
 
@@ -33,7 +33,7 @@ Because both pipelines feed the same variables, the specimens above and every co
 
 ## Weight-axis caps
 
-The two grotesques are variable fonts with **capped weight axes**:
+The grotesques are variable fonts with **capped weight axes**:
 
 | Family | `wght` axis |
 | --- | --- |

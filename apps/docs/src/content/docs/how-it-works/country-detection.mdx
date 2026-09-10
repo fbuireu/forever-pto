@@ -1,6 +1,6 @@
 ---
 title: Country detection
-description: How the user-country cookie is obtained, covering the proxy chain, the three detection strategies, and why only one of them truly reflects the browser.
+description: How the user-country cookie is obtained, covering the proxy chain, the detection strategies, and why only one of them truly reflects the browser.
 sidebar:
   order: 1
 ---
@@ -11,7 +11,7 @@ When you open Forever PTO, the planner already knows your country. That value tr
 
 1. `apps/web/src/middleware.ts` runs the last step of the proxy, (after markdown negotiation, the payment-confirmation guard and i18n) calls the location proxy with the `next-intl` response.
 2. `apps/web/src/infrastructure/proxy/location.ts`: `location()` runs `detectCountry(request)` and, only if a country came back, calls `setLocationCookie()`.
-3. `apps/web/src/infrastructure/services/location/detectCountry.ts` tries three strategies in order and returns the first non-empty result.
+3. `apps/web/src/infrastructure/services/location/detectCountry.ts` tries its strategies in order and returns the first non-empty result.
 4. `apps/web/src/infrastructure/services/location/utils/strategies.ts` implements the strategies as Effect programs.
 
 The proxy matcher skips `/api/*` (except `/api/markdown`), `/_next`, `/_vercel` and any path with a file extension, so the cookie is refreshed on page navigations, not on asset or API requests.
@@ -26,7 +26,7 @@ The proxy matcher skips `/api/*` (except `/api/markdown`), `/_next`, `/_vercel` 
 
 See [cookies](/reference/cookies/) for the full cookie inventory.
 
-## The three strategies, in order
+## The strategies, in order
 
 ### 1. Cloudflare trace (`detectCountryFromCDN`)
 
@@ -34,7 +34,7 @@ A server-side `fetch` of `${NEXT_PUBLIC_SITE_URL}/cdn-cgi/trace` (Cloudflare's t
 
 ### 2. `cf-ipcountry` header (`detectCountryFromHeaders`)
 
-Reads the `cf-ipcountry` request header (`CLOUDFLARE_COUNTRY_HEADER`), which Cloudflare stamps on every request based on the **visitor's** IP. Two sentinel values are rejected: `XX` (`UNIDENTIFIED_COUNTRY`) and `T1` (`TOR_COUNTRY`, Tor exit nodes).
+Reads the `cf-ipcountry` request header (`CLOUDFLARE_COUNTRY_HEADER`), which Cloudflare stamps on every request based on the **visitor's** IP. Sentinel values are rejected: `XX` (`UNIDENTIFIED_COUNTRY`) and `T1` (`TOR_COUNTRY`, Tor exit nodes).
 
 ### 3. IP lookup (`detectCountryFromIP`)
 
@@ -48,4 +48,4 @@ The only strategy that genuinely reflects the end user is **strategy 2**, the `c
 
 ## Failure behavior
 
-Nothing in this chain ever throws to the user. CDN and IP failures are swallowed (`Effect.catchAll` / `Effect.orElse`) and only the CDN path logs to Better Stack; see [observability](/how-it-works/observability/). If all three strategies return `''`, no cookie is set and the planner falls back to manual country selection backed by the [location store](/how-it-works/state-stores/).
+Nothing in this chain ever throws to the user. CDN and IP failures are swallowed (`Effect.catchAll` / `Effect.orElse`) and only the CDN path logs to Better Stack; see [observability](/how-it-works/observability/). If every strategy returns `''`, no cookie is set and the planner falls back to manual country selection backed by the [location store](/how-it-works/state-stores/).

@@ -15,7 +15,7 @@ Every primitive with visual variants uses [CVA](https://cva.style) (`class-varia
 export { Button, buttonVariants };
 ```
 
-Two reasons:
+Reasons:
 
 1. Other components can reuse the exact class recipe without importing the component (e.g. styling a link as a button).
 2. `VariantProps<typeof buttonVariants>` gives consumers, including these docs, the variant union as a *type*. The demo wrappers here build exhaustive `Record<Variant, …>` maps from it, so renaming a variant in the app breaks `astro check` instead of letting the [Button page](/design-system/components/button/) drift.
@@ -68,4 +68,4 @@ export function cn(...inputs: ClassValue[]) {
 
 ## Client/server split
 
-Roughly 52 of the ~60 core files are `'use client'`, because everything animated needs Motion's `m.*` components,, which in turn require an ancestor `LazyMotionProvider` (`apps/web/src/ui/modules/core/animate/providers/LazyMotionProvider.tsx`). The server-safe set (no directive, no hooks) is the plain primitives: Badge, Banner, Button, Card, Input, Textarea, Label, Separator, FlagIcon, plus the Slot. Keep new primitives server-safe unless they genuinely need state or motion.
+Nearly every core file is `'use client'`, because everything animated needs Motion's `m.*` components,, which in turn require an ancestor `LazyMotionProvider` (`apps/web/src/ui/modules/core/animate/providers/LazyMotionProvider.tsx`). The server-safe set (no directive, no hooks) is the plain primitives: Badge, Banner, Button, Card, Input, Textarea, Label, Separator, FlagIcon, plus the Slot. Keep new primitives server-safe unless they genuinely need state or motion.

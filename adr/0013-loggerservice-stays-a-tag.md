@@ -9,13 +9,13 @@ Accepted.
 ## Context
 
 `LoggerServiceLive` is `Layer.sync(LoggerService, () => getBetterStackInstance())`. The tag's interface is
-five method signatures; its implementation is one call returning the module singleton. There is one production
+a handful of method signatures; its implementation is one call returning the module singleton. There is one production
 adapter and no second one in prospect, so by the usual rule (one adapter is a hypothetical seam, two is a
 real one) it reads as pure ceremony.
 
-The cost is real and spread across the tree. Eleven production modules carry `LoggerService` in their `R`:
-both payment handlers, four use-cases, `zodParse`, the webhook route, the payments confirmation service and
-the Premium activation operation. Every test that reaches one builds a five-method `Layer.succeed(LoggerService, { … })`
+The cost is real and spread across the tree. Production modules all over carry `LoggerService` in their `R`:
+both payment handlers, the use-cases, `zodParse`, the webhook route, the payments confirmation service and
+the Premium activation operation. Every test that reaches one builds a whole-interface `Layer.succeed(LoggerService, { … })`
 stub. [`api/operations/activatePremium.ts`](../apps/web/src/infrastructure/api/operations/activatePremium.ts) opens an `Effect.gen` inside its `catchAll` for no reason other
 than to `yield*` a logger. And [ADR 0002](./0002-effect-for-external-service-boundaries.md) already places
 logging *outside* Effect: BetterStack has both a tag and a plain singleton, and the singleton is what the
@@ -24,7 +24,7 @@ completion rather than a challenge to it.
 
 The clearest symptom that it is not behaving like a boundary: `[locale]/(app)/payment/confirmation/page.tsx`
 logs the *same* activation story through `getBetterStackInstance()` while the operation logs it through the
-tag. One concern, two mechanisms, chosen by whether the caller happens to sit inside an `Effect.gen`.
+tag. One concern, rival mechanisms, chosen by whether the caller happens to sit inside an `Effect.gen`.
 
 Against all that, the tag buys one property, and it was verified rather than assumed. `activateWithEmail`
 declares its return type explicitly, `TursoService` and nothing else. Adding a `yield* LoggerService` to its
@@ -41,12 +41,12 @@ the place it was introduced.
 
 ## Decision
 
-`LoggerService` stays a tag, and the eleven modules go on carrying it in `R`.
+`LoggerService` stays a tag, and the modules that need it go on carrying it in `R`.
 
 The rejected alternative is replacing it with the `getBetterStackInstance()` singleton everywhere, which
-would delete the tag, the Live layer and twelve stub layers. It is rejected because the guarantee above only
-exists while logging is a *requirement*: the twelve `Layer.succeed` blocks would become twelve
-`vi.mock('…/better-stack/client')` calls, no cheaper, and the compile-time signal would be gone with
+would delete the tag, the Live layer and every stub layer. It is rejected because the guarantee above only
+exists while logging is a *requirement*: each `Layer.succeed` block would become a
+`vi.mock('…/better-stack/client')` call, no cheaper, and the compile-time signal would be gone with
 nothing to replace it.
 
 **The guarantee is the tag *and* an explicit return-type annotation together.** A use-case whose `R` is
@@ -57,18 +57,18 @@ than stylistic on any Effect program under `@application/use-cases`.
 ## Consequences
 
 - **A new Effect program that must not log has to declare its return type.** Leaving `R` inferred silently
-  permits a logger. The four use-cases annotate theirs today; a fifth that does not gets no protection and
+  permits a logger. The use-cases annotate theirs today; a new one that does not gets no protection and
   looks identical.
 - **The tag is not a substitution seam and must not be treated as one.** Providing a stub in a test does not
   silence a module that calls `getBetterStackInstance()` directly, and several do. See
 
   [`../apps/web/src/infrastructure/clients/CLAUDE.md`](../apps/web/src/infrastructure/clients/CLAUDE.md).
   A test asserting "nothing logged" is only meaningful for code that reaches the tag.
-- **Every test that reaches one pays a five-method stub, and that stays.** It is the price of the signal. Shrinking the
+- **Every test that reaches one pays a whole-interface stub, and that stays.** It is the price of the signal. Shrinking the
   tag's interface would reduce it, but every method has a caller.
-- **The two-mechanism split at the confirmation page is closed.** The page used to warn through
+- **The split between mechanisms at the confirmation page is closed.** The page used to warn through
   `getBetterStackInstance()` on a payment intent that had not succeeded while `confirmation` logged the
-  Stripe failure through the tag: one story, two mechanisms. The warn lives in `confirmation` now, beside the
+  Stripe failure through the tag: one story, rival mechanisms. The warn lives in `confirmation` now, beside the
   `logError` it always sat next to, so the page imports no logger at all and the whole activation story
   reaches `LoggerService`. A page that reaches for the singleton for something its Effect program already
   sees is the regression to watch for.

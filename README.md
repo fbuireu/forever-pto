@@ -24,7 +24,7 @@
 
 Given your country, region, year, and number of PTO days, Forever PTO suggests the optimal way to place your PTO days so you get the longest possible stretches of time off, automatically accounting for weekends and public holidays.
 
-**Three strategies:**
+**Strategies:**
 
 - **Grouped**: consolidate days into a few long vacations
 - **Optimized**: maximize the total number of days off
@@ -44,7 +44,7 @@ Given your country, region, year, and number of PTO days, Forever PTO suggests t
 
 The full wiki lives at **[docs.forever-pto.com](https://docs.forever-pto.com)**: architecture, runtime flows (country detection, premium, holidays engine…), the design system with live component demos, and the complete CI/CD and environments lifecycle.
 
-This repo is a workspace with two packages: the app in [`apps/web/`](apps/web/) (`forever-pto`) and the docs site in [`apps/docs/`](apps/docs/) (`forever-pto-docs`, Astro Starlight), which reuses the app's real components and tokens and deploys independently. Each versions itself: a commit is attributed to whichever package its paths fall under, so keep a pull request to one package.
+This repo is a workspace holding the app in [`apps/web/`](apps/web/) (`forever-pto`) and the docs site in [`apps/docs/`](apps/docs/) (`forever-pto-docs`, Astro Starlight), which reuses the app's real components and tokens and deploys independently. Each versions itself: a commit is attributed to whichever package its paths fall under, so keep a pull request to one package.
 
 ```bash
 pnpm --filter forever-pto-docs dev   # docs dev server
@@ -132,13 +132,13 @@ See [`apps/web/.env.example`](apps/web/.env.example) for the full list. Key vari
 | [`adr/`](adr/) | Why it is like this. One hard-to-reverse decision per file |
 
 **The architecture is domain-driven in its strategic half and deliberately not in its tactical half.** The
-glossary rules the names, the two bounded contexts and the layer boundaries are constraints, and the
+glossary rules the names, the bounded contexts and the layer boundaries are constraints, and the
 dependency graph is measured rather than drawn; aggregates, repositories, entities and an event bus are all
 absent on purpose. Which practices are taken, which are taken in part and which are rejected, with the reason
-for each and six worked examples from this tree, is
+for each and worked examples from this tree, is
 [ADR 0014](adr/0014-ddd-where-it-pays.md). Read it before proposing that anything here be "finished".
 
-Selected folders under [`apps/web/src/`](./apps/web/src) carry their own `CLAUDE.md` with the detail for that folder: the five layer roots plus sixteen sub-folders, all listed in [`apps/web/CLAUDE.md`](apps/web/CLAUDE.md).
+Selected folders under [`apps/web/src/`](./apps/web/src) carry their own `CLAUDE.md` with the detail for that folder: the layer roots plus their sub-folders, all listed in [`apps/web/CLAUDE.md`](apps/web/CLAUDE.md).
 [`tests/docs-consistency.test.ts`](tests/docs-consistency.test.ts) runs with the unit suite and fails the build
 when the docs and the code disagree.
 

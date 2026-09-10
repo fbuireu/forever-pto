@@ -13,7 +13,7 @@ Every element with the brutal hover lift moves *away from the pointer*. Without 
 
 Hover translates the element `-2px, -2px` (up-left). If your pointer sits within 2px of the bottom or right edge, the element slides out from under it into the band it just vacated, the region between the element's new position and its shadow. The shadow is paint, not a hit target, so the pointer is now over nothing: hover ends, the element snaps back under the pointer, hover starts again. The result is a rapid hover/unhover loop: visible flicker and, at the edge, an unclickable button.
 
-Compare the two below by parking the pointer exactly on the bottom-right edge:
+Compare the demos below by parking the pointer exactly on the bottom-right edge:
 
 <HitAreaDemo client:visible />
 

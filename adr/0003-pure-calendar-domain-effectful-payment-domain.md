@@ -4,11 +4,11 @@ Date: 2026-07-26
 
 ## Status
 
-Accepted. Refines [ADR 0002](./0002-effect-for-external-service-boundaries.md) for the two bounded contexts under `src/domain/`.
+Accepted. Refines [ADR 0002](./0002-effect-for-external-service-boundaries.md) for the bounded contexts under `src/domain/`.
 
 ## Context
 
-A domain layer is normally held to one rule, and a reader who finds two different rules inside the same folder assumes one of them is a mistake. Here they are not.
+A domain layer is normally held to one rule, and a reader who finds different rules inside the same folder assumes one of them is a mistake. Here they are not.
 
 The calendar context is executed in a second runtime: the planner runs it inside a Web Worker, with no DOM and no server context ([ADR 0001](./0001-planner-runs-in-the-browser.md)). Anything it imports has to be evaluable there. The payment context has the opposite shape: it never leaves the server, and every operation it performs is an orchestration of fallible external calls, which is exactly what [ADR 0002](./0002-effect-for-external-service-boundaries.md) puts on the Effect side of the line.
 
@@ -16,7 +16,7 @@ The uniform alternative would be to hold both to purity, extracting repository i
 
 ## Decision
 
-The two bounded contexts follow different rules on purpose.
+The bounded contexts follow different rules on purpose.
 
 **`calendar/` is pure.** Its only outside imports are the holiday DTO type, the shared date helpers, `temporal-polyfill` and the `next-intl` locale type. It must not import from `@infrastructure/*` and must not depend on Effect.
 

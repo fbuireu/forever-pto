@@ -18,7 +18,7 @@ PRs are **squash-merged**, so the **PR title becomes the commit that lands on `m
 | `feat!: …` or a `BREAKING CHANGE:` footer | Major version bump |
 | `docs: …`, `chore: …`, `ci: …`, `refactor: …`, `test: …` | **No release** |
 
-Each package versions itself, and a commit is attributed to whichever package its paths fall under, so the type no longer has to compensate for the layout. Three rules follow:
+Each package versions itself, and a commit is attributed to whichever package its paths fall under, so the type no longer has to compensate for the layout. The rules that follow:
 
 - **One package per pull request.** The repo squash-merges, so a PR touching both `apps/web` and `apps/docs` lands in both changelogs.
 - **The title describes the package it touches.** A `fix:` on a wiki-only PR releases the wiki, not the app.

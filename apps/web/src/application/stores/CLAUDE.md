@@ -3,7 +3,7 @@
 ## Purpose
 
 All client state. Because the planner runs in the browser
-([ADR 0001](../../../../../adr/0001-planner-runs-in-the-browser.md)), these five Zustand stores are the
+([ADR 0001](../../../../../adr/0001-planner-runs-in-the-browser.md)), these Zustand stores are the
 product's real database: the Holiday calendar, the Suggestion and its Alternatives, the user's manual edits
 and their Premium session all live here and nowhere else. Lose local storage and the plan is gone.
 
@@ -18,33 +18,33 @@ The rest of the application layer contract is in [`../CLAUDE.md`](../CLAUDE.md).
 | [`location.ts`](./location.ts) | `useLocationStore`: the Country and Region option lists |
 | [`premium.ts`](./premium.ts) | `usePremiumStore`: the Premium session and the Premium-required modal |
 | [`ui.ts`](./ui.ts) | `useUIStore`: donate popover and currency; the one store with no persistence |
-| [`crypto.ts`](./crypto.ts) | `obfuscatedStorage`, the zustand `PersistStorage` the four persisted stores share. Not a store |
+| [`crypto.ts`](./crypto.ts) | `obfuscatedStorage`, the zustand `PersistStorage` the persisted stores share. Not a store |
 | [`utils/crypto.ts`](./utils/crypto.ts) | `obfuscate` / `deobfuscate` / `base64Encode` / `base64Decode`, plus `TWENTY_FOUR_HOURS` and `BASE64_PATTERN`. Not a store |
 | [`types.ts`](./types.ts) | The action parameter objects shared between the stores and their callers (`GenerateSuggestionsParams`, `MainThreadSuggestionsParams`, `FetchHolidaysParams`, `PlanningWindowParams`, `AddHolidayParams`, `EditHolidayParams`, `AlternativeSelectionBaseParams`) plus the outcomes the actions answer with: `DayRefusal`/`DayOutcome` and `HolidayRefusal`/`HolidayOutcome` |
 
-## The five stores
+## The stores
 
 | Store | Owns | Persisted |
 | --- | --- | --- |
 | `filters` | `ptoDays`, `allowPastDays`, `country`, `region`, `year`, `carryOverMonths`, `strategy` | all but `year` |
 | `holidays` | `holidays`, `suggestion`, `alternatives`, `maxAlternatives`, `currentSelection`, `currentSelectionIndex`, `previewAlternativeIndex`, `manuallySelectedDays`, `removedSuggestedDays`, `isCalculating`, `hasCalculated`, `planRevision` | all but `previewAlternativeIndex`, `isCalculating`, `hasCalculated` and `planRevision` |
 | `location` | `countries`, `regions` | nothing |
-| `premium` | `premiumKey`, `userEmail`, `lastVerified`, `needsSessionCheck`, `isLoading`, `modalOpen`, `currentFeature` | the first four |
+| `premium` | `premiumKey`, `userEmail`, `lastVerified`, `needsSessionCheck`, `isLoading`, `modalOpen`, `currentFeature` | everything up to `needsSessionCheck` |
 | `ui` | `donatePopoverOpen`, `donatePopoverIsOpening` | nothing |
 
-**The `ui` store used to carry a currency, and giving that rule one owner was the wrong fix.** It had four
+**The `ui` store used to carry a currency, and giving that rule one owner was the wrong fix.** It had several
 owners and a free-rider, so a `CurrencySync` component was written to seed it once from the `[locale]` root
 layout. That was true as far as it went, and it took a second pass to notice the rule had no observable
-output to own: `getCurrencyForLocale` hard-codes `DEFAULT_CURRENCY`, and all six supported locales format
+output to own: `getCurrencyForLocale` hard-codes `DEFAULT_CURRENCY`, and every supported locale formats
 EUR with the same symbol, so `currency` was `"EUR"` and `currencySymbol` was `"€"` for the whole life of the
-app. Five modules and a `@ui/*` inversion resolved to two constants.
+app. A run of modules and a `@ui/*` inversion resolved to a pair of constants.
 
 They are two constants now. `CurrencySync`, `getCurrencyFromLocale` and `getCurrencyForLocale` are deleted,
-and the four readers import `DEFAULT_CURRENCY` / `DEFAULT_CURRENCY_SYMBOL` from
+and its readers import `DEFAULT_CURRENCY` / `DEFAULT_CURRENCY_SYMBOL` from
 [`currencies.ts`](../../ui/utils/currencies.ts) directly. What is *not* constant is the symbol's **position**
 (`10 €` in es, fr and de against `€10` in en), and `PtoSalaryCalculator` derives that from the locale it
 already has, never from the store. [`currencies.test.ts`](../../ui/utils/currencies.test.ts) pins the
-constants across all six locales, so a seventh that formats EUR differently fails there rather than
+constants across every locale, so a new one that formats EUR differently fails there rather than
 silently.
 
 `setCountry` clears `region` in the same `set` call: a Region code is only meaningful under its Country, and
@@ -54,7 +54,7 @@ leaving a stale one produces a plan with holidays from the wrong place.
 `MAX_PTO_DAYS` and `MIN_CARRY_OVER_MONTHS` live in `filters.ts` and the setters hold them;
 [`PtoDays.tsx`](../../ui/modules/sidebar/components/PtoDays.tsx) and [`CarryOverMonths.tsx`](../../ui/modules/sidebar/components/CarryOverMonths.tsx) import the same constants rather than declaring their own. Each
 setter used to clamp the floor and nothing else, and the ceiling was enforced only by the control that owned
-it, `PtoDays`'s increment button going disabled at 365. That left two ways past it: the accrual calculator
+it, `PtoDays`'s increment button going disabled at 365. That left ways past it: the accrual calculator
 in [`PtoCalculator.tsx`](../../ui/modules/sidebar/components/PtoCalculator.tsx), which writes a computed budget straight through `setPtoDays` (its `max='8'` is an
 HTML attribute, which stops the stepper and not a typed number), and a persisted blob carrying whatever a
 previous version allowed. `onRehydrateStorage` clamps as well for the second case: `migrate` only runs on a
@@ -62,8 +62,8 @@ version change, so a stored out-of-range value would otherwise outlive the bound
 at one control is not an invariant; put it where every writer passes.
 
 **`MAX_CARRY_OVER_MONTHS` is the one bound that is not declared here, because it is not a UI preference.**
-The Holiday source fetches `year` and `year + 1` and nothing else, so a Planning Window wider than twelve
-Carry-over Months enumerates months whose Holiday set is provably empty and scores every Bridge there against
+The Holiday source fetches `year` and `year + 1` and nothing else, so a Planning Window wider than `MAX_CARRY_OVER_MONTHS`
+enumerates months whose Holiday set is provably empty and scores every Bridge there against
 a blank calendar. It lives in [`../../domain/calendar/window.ts`](../../domain/calendar/window.ts) beside the
 Planning Window it constrains; `holidayDTO.create` derives its keep window from the same value, this store
 imports it as its clamp ceiling, and so does `CarryOverMonths.tsx`. It was a literal 12 here next to a
@@ -75,10 +75,10 @@ literal `year + 1` in the mapper, with nothing relating them.
 the client bundle, so this is obfuscation and nothing more; never call it encryption, and never put anything
 confidential behind it ([ADR 0007](../../../../../adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md)).
 The exported names say so (`obfuscate`, `deobfuscate`, `obfuscatedStorage`), and so do the log messages. Only
-the two file names still read as a cipher, because renaming them would break the paths the guides above this
+the file names still read as a cipher, because renaming them would break the paths the guides above this
 folder quote; the vocabulary inside them is the part that matters.
 
-Three branches, chosen once at module load:
+The branches, chosen once at module load:
 
 - **No `window`**: a no-op storage, so importing a store on the server neither reads nor writes.
 - **Development, or `NEXT_PUBLIC_STORAGE_KEY` missing**: plain local storage. A missing key degrades, it does
@@ -87,7 +87,7 @@ Three branches, chosen once at module load:
   stored"; the store keeps its initial state rather than crashing.
 
 **`partialize` is the whole persistence contract.** A field absent from it is browser-session state by
-design, and three of those omissions are load-bearing:
+design, and some of those omissions are load-bearing:
 
 - **`year` is not persisted, and `filters.ts` has a `migrate` that strips it.** The bumped
   `STORAGE_VERSION` exists for exactly this: a v1 blob still carries a `year`, and the shallow merge would
@@ -112,7 +112,7 @@ hand on the way out, inside `holidays` and inside `days`, `bridges[].startDate`,
 `bridges[].ptoDays` of each Suggestion, through a `serializeSuggestion` helper. Every one of those produced
 a string byte-identical to the one `JSON.stringify` would have produced on its own, which is why no test
 could falsify them: deleting `bridges[].startDate.toISOString()` left the persisted blob unchanged. The
-helper is gone and `partializeHolidays` now just names the eight fields that persist.
+helper is gone and `partializeHolidays` now just names the fields that persist.
 
 `onRehydrateStorage` is the half that does work, mapping them all back through `fromStoredInstant`, the
 intake function for values this app itself wrote (see [`../CLAUDE.md`](../CLAUDE.md)). **Adding a `Date`
@@ -137,7 +137,7 @@ The `strategy` half is the one that produced a visible disagreement. `worker.ts`
 incoming string with `isFilterStrategy` and fell back to `DEFAULT_FILTER_STRATEGY`, so a stale value planned
 as **Grouped** while this store still held the stale string and
 [`Summary.tsx`](../../ui/modules/pages/planner/Summary.tsx) asked next-intl for
-`sidebar.strategy.<stale>.label` at three call sites and
+`sidebar.strategy.<stale>.label` at every call site and
 [`Strategy.tsx`](../../ui/modules/sidebar/components/Strategy.tsx)'s `strategies.find` matched nothing. The
 engine and the screen answered differently and neither reported it. Narrowing at the near end rather than
 only at the far one is what makes them agree, and the fallback is the same constant on both sides.
@@ -145,7 +145,7 @@ only at the far one is what makes them agree, and the fallback is the same const
 The `variant` half drops the entry rather than coercing it, on the same precedent `alternatives` already sets
 by filtering out whatever `reviveSuggestion` cannot revive: there is no safe variant to pick for it, and a
 Holiday nothing can classify is one the tables and the charts count differently from each other. See
-[`../dto/CLAUDE.md`](../dto/CLAUDE.md) for what each of the eight readers does with a value outside the union.
+[`../dto/CLAUDE.md`](../dto/CLAUDE.md) for what each reader does with a value outside the union.
 
 ## Selection indices
 
@@ -158,10 +158,10 @@ form. Introducing an off-by-one here silently applies the wrong plan rather than
 The rehydration guard `currentSelectionIndex > alternatives.length` exists because `maxAlternatives` can
 shrink between sessions, leaving a persisted index that names nothing. It resets to the base Suggestion.
 
-## Two threads run one pipeline
+## Both threads run one pipeline
 
-There are two ways a plan gets calculated, and they are two *callers* of `runPlanningPipeline` under
-`@domain/calendar`, not two implementations:
+A plan gets calculated on either of two threads, and they are *callers* of `runPlanningPipeline` under
+`@domain/calendar`, not separate implementations:
 
 - **The normal path** is the Web Worker. [`useCalculationsWorker.ts`](../../ui/hooks/useCalculationsWorker.ts) posts to [`worker.ts`](../../infrastructure/workers/worker.ts), which deserialises
   the request, calls the pipeline off the main thread, serialises the result and hands it back through
@@ -176,8 +176,8 @@ pseudo-Holidays, deriving `carryOverMonths`, `effectivePtoDays`, the empty guard
 each Alternative) is inside the pipeline. What is left here is genuinely this side's: reading the store
 and deciding what "nothing to plan" writes to state.
 
-**All four stores fail rehydration through `onRehydrateFailure`, and one of them was clamping first.**
-The four callbacks wrote the same three statements: the same log message, the same `{ storeName, hasState }`
+**Every persisted store fails rehydration through `onRehydrateFailure`, and one of them was clamping first.**
+The callbacks wrote the same statements: the same log message, the same `{ storeName, hasState }`
 context and the same `globalThis.localStorage?.removeItem`, whose guard exists because the callback also runs
 where `localStorage` is absent. What differed was *where the block sat*:
 
@@ -188,22 +188,22 @@ where `localStorage` is absent. What differed was *where the block sat*:
   out-of-range values and asserts they are left alone.
 - `premium` deliberately does **not** return: it re-reads `error` two guards later to raise
   `needsSessionCheck`. It is now the only one that falls through, which is what makes the deviation visible
-  instead of looking like a fourth accident.
+  instead of looking like another accident.
 - `location` had the error branch and nothing else.
 
 The log message names the storage key verbatim (`Error rehydrating filters-store`) rather than a prose label,
 because the helper has the key and the key is what a person debugging goes looking for. That is a change to
 the log text.
 
-**And the eleven store-side error logs go through `logClientError`.** This guide already said to use it "for
+**And the store-side error logs go through `logClientError`.** This guide already said to use it "for
 the common case", and every error site in this folder wrote `logClient((logger) => logger.logError(…))`
 instead, so the wrapper's only callers were outside the folder its own rule governs, and its only coverage
 was its own test file. `logClient` remains for anything that is *not* an error, which is now the honest
-distinction between the two.
+distinction between them.
 
 **`checkExistingSession` answers one request for concurrent callers, and it had to learn to.**
 `needsSessionCheck` is cleared only *after* `await getExistingSession()`, and `PremiumFeature` runs the check
-in its own effect, at nine call sites, one of them per Holiday row. So every instance mounting in the same
+in its own effect, at call sites all over the screen, one of them per Holiday row. So every instance mounting in the same
 commit read `needsSessionCheck: true` and issued its own `GET /api/check-session`. A module-level in-flight
 promise now hands the same one back to every caller until it settles.
 
@@ -215,7 +215,7 @@ than *reads* is still the odd part; this makes it cheap rather than correct.
 
 **`checkExistingSession` clears Premium only on an authoritative "no session", never on a failed check.**
 `getExistingSession` returns `null` when the server answered and said there is no session (a genuine
-expiry, which should clear the stored `premiumKey`), and **throws** when the request itself failed. The two
+expiry, which should clear the stored `premiumKey`), and **throws** when the request itself failed. They
 used to collapse into the same `null`, so a 500 or a dropped connection revoked a donor's Premium locally
 until they went and recovered it, which ADR 0008 says never happens. The store's `catch` deliberately
 writes only `lastVerified` and `needsSessionCheck`; adding `premiumKey: null` there reinstates the bug.
@@ -232,10 +232,10 @@ re-fetches Holidays) and would otherwise strand it, spending budget with no way 
 either `{ applied: true }` or `{ applied: false, reason }`, with `HolidayOutcome` additionally carrying
 `heldBy` so a caller can name the Holiday already on the date without looking it up. They used to answer
 `boolean` (or nothing at all), which is why [`calendar/Calendar.tsx`](../../ui/modules/pages/planner/calendar/Calendar.tsx), [`AddHolidayModal.tsx`](../../ui/modules/pages/planner/holidays/components/AddHolidayModal.tsx) and
-[`EditHolidayModal.tsx`](../../ui/modules/pages/planner/holidays/components/EditHolidayModal.tsx) each reimplemented the occupancy check purely to pick a toast: four hand-rolled
+[`EditHolidayModal.tsx`](../../ui/modules/pages/planner/holidays/components/EditHolidayModal.tsx) each reimplemented the occupancy check purely to pick a toast: hand-rolled
 `toDateString()` comparisons for one rule, kept in agreement by review. The reasons are the distinctions the
-copy actually needs: a weekend, a National or Regional Holiday and a Custom Holiday are three different
-refusals because the UI says three different things. Adding a refusal branch means adding a reason, not a
+copy actually needs: a weekend, a National or Regional Holiday and a Custom Holiday are different
+refusals because the UI says different things about each. Adding a refusal branch means adding a reason, not a
 second copy of the condition.
 
 **One `DayRefusal` is raised by the caller and never by this store.** `PLAN_IN_FLIGHT` is what
@@ -249,11 +249,11 @@ planning rule. See [`../../ui/modules/pages/planner/CLAUDE.md`](../../ui/modules
 what the race produces if the guard is removed.
 
 **`heldOn` is that rule inside the store, and it took a second pass to get there.** The refusal *reasons*
-crossed the seam; the *rule* stayed written out at every action that needed it: thirteen `toDateString()`
-comparisons in one file, where the layer guide says to compare with `isSameDay`. That is untidy but
+crossed the seam; the *rule* stayed written out at every action that needed it: `toDateString()`
+comparisons all over one file, where the layer guide says to compare with `isSameDay`. That is untidy but
 survivable. What was not survivable is that the copies had split over date coercion, inside the same
 function: `fetchHolidays` built its Custom Holidays through `isInPlanningWindow({ date: fromStoredInstant(h.date) })`
-(treating a stored date as possibly a string), and four lines later compared `customHoliday.date.toDateString()`
+(treating a stored date as possibly a string), and a few lines later compared `customHoliday.date.toDateString()`
 raw. Both cannot be right. `addHoliday` compared raw and `editHoliday` coerced, for what this guide calls
 deliberately the same act, and `toggleDaySelection` called `fromStoredInstant` on a parameter its own
 signature types `Date`.
@@ -261,11 +261,11 @@ signature types `Date`.
 The answer is that a stored date is always a `Date` by the time an action runs: `onRehydrateStorage` maps
 `state.holidays` through `fromStoredInstant` before anything can read it. So the coercions were decoration.
 
-**Saying that did not make them go away, and for a while three survived the sentence that declared them
+**Saying that did not make them go away, and for a while some survived the sentence that declared them
 dead.** `fetchHolidays` still wrapped `h.date`, `toggleDaySelection` still wrapped its own `Date` parameter,
 and `holidayDTO.createCustom` had a third the paragraph never mentioned, coercing `date` on one line while
 using it raw on the line above. Prose cannot enforce this; the signature can. `fromStoredInstant` takes a
-`string` now, not `Date | string`, so those three are compile errors rather than decoration, and the
+`string` now, not `Date | string`, so those are compile errors rather than decoration, and the
 rehydration seam is its only caller in this layer.
 
 That narrowing needs the persisted shape to be honest about itself, which is the fix
@@ -280,21 +280,21 @@ every caller downstream pretend it might be either.
 `addHoliday` asks without an index, `editHoliday` with its own (a Holiday cannot collide with itself, which
 is the one branch nothing tested: renaming a Holiday without moving it would have been refused), and
 `toggleDaySelection` reads `.holiday` for its Holiday check and `.manualDay` for its Manual Day one. The
-three refusal *shapes* stay different; the rule is one. Both halves were verified by breaking them.
+refusal *shapes* stay different; the rule is one. Both halves were verified by breaking them.
 
-**Only `triggerCalculation` raises `isCalculating`, and only a worker reply clears it.** Nothing else in the app sets it back to false: `useCalculationsWorker`'s three callbacks and its
+**Only `triggerCalculation` raises `isCalculating`, and only a worker reply clears it.** Nothing else in the app sets it back to false: `useCalculationsWorker`'s callbacks and its
 unmount cleanup are the whole list, and the cleanup is gated on a request actually being in flight. The only
 thing that starts a run is `CalendarList`'s effect, keyed on year, budget, past-days, Holidays, months,
 Strategy and locale. So a caller that raises the flag without moving one of those freezes the planner: the
 month grid takes `pointer-events-none` and both remaining-budget readouts stick on their last settled value,
-with no spinner and no error. The two budget writers used to raise it pre-emptively, to spare the readout a
+with no spinner and no error. The budget writers used to raise it pre-emptively, to spare the readout a
 frame of flicker, and each found its own way to freeze the planner: writing a value equal to the current one
 (press Apply twice), or writing any value while the calculation gate is closed because no Country is picked
 yet. Guarding each case separately was losing ground, so neither raises it any more; the flag belongs to
 the one function that also clears it. They still return early on an unchanged value, because that spares a
 pointless worker run.
 
-**Applying an Alternative re-plans, and that is what makes the hand edits safe to keep.** Two things about a
+**Applying an Alternative re-plans, and that is what makes the hand edits safe to keep.** Things about a
 stored Suggestion go stale the moment it is adopted, and neither can be repaired locally:
 
 - Its size. The worker built it against `effectivePtoDays = ptoDays - manualDays.length`, the manual count
@@ -310,7 +310,7 @@ tried and both were wrong.** So the action keeps them (every Alternative was pla
 Metrics were measured *with* them) and bumps `planRevision`, which `CalendarList` carries in its calculation
 effect's dependencies. A fresh run then sizes the budget against the current manual count and rebuilds the
 Bridges against the current calendar, and `setCalculationResult` preserves the index the user picked. An
-apply therefore costs one worker round trip; that is the price of the two guarantees. Removing the bump, or
+apply therefore costs one worker round trip; that is the price of both guarantees. Removing the bump, or
 dropping `planRevision` from those dependencies, silently restores whichever half of the bug the other
 choice would have caused.
 
@@ -320,7 +320,7 @@ so without a re-plan the freed budget is never spent again, and the restored Sug
 measured *with* the Manual Days included, over Bridges expanded through them as pseudo-Holidays. Recomputing
 `generateMetrics` the way `toggleDaySelection` does would fix the stale numbers and not the unspent budget;
 only the bump fixes both, because the follow-up run sends no Manual Days, no Removed Days and therefore no
-`autoSuggestCount` cap, and re-plans the whole budget. All three `set` branches carry it, including the one
+`autoSuggestCount` cap, and re-plans the whole budget. Every `set` branch carries it, including the one
 that runs with no `currentSelection`.
 
 **`clearCalculation` is the only way a plan is discarded without a new one replacing it.** It nulls the
@@ -339,7 +339,7 @@ only against `holidays`, so a Custom Holiday could be created on a date the user
 on: the day then counted against the allowance while being a non-working day, so the PTO Day was paid for
 and bought nothing. The check lives in the store alone, and the modals render whichever refusal comes back.
 
-**The Troubleshooting reset clears two stores and deliberately not the third.** Its copy promises that
+**The Troubleshooting reset clears the planning stores and deliberately not the Premium one.** Its copy promises that
 clearing local storage "resets everything back to defaults", so it calls `resetToDefaults` on the holidays
 store *and* on the filters store; clearing only the first left a corrupt Country, Region or budget in place
 while telling the user all data had been reset, which is precisely the state the button exists to escape.
@@ -371,7 +371,7 @@ does with what this store hands it, and getting the *inputs* wrong still produce
   placed PTO Day, which measured a plan starting in the Carry-over Months against the following year.
 - **Neither guards on the Holiday count any more, and the guard that did was wrong.** It read
   `holidaysWithManual.length === 0`, which refused to plan a Holiday-free calendar. A weekend is a Free Day,
-  so a Bridge needs no Holiday at all: with none, a Friday still returns three Effective Days at an
+  so a Bridge needs no Holiday at all: with none, a Friday still expands into the weekend beside it, at an
   Efficiency of 3.0. The pipeline short-circuits on an empty *candidate* set instead, which is the condition
   the run cannot proceed without. See [`@domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md).
 
@@ -386,7 +386,7 @@ gates the worker path on `holidays.length > 0`, which is the deleted guard livin
 the defect was never user-visible on the normal path, and why the Troubleshooting reset, which calls
 `generateSuggestions` with no gate, was.
 
-**The two sides still differ on what "nothing to plan" *writes*, and that is the one deliberate difference
+**The sides still differ on what "nothing to plan" *writes*, and that is the one deliberate difference
 left.** The pipeline answers `planned: false` with an empty Suggestion whose Metrics are real; the worker
 forwards it as-is, because the wire type has no null, while this store maps it to `null` across `suggestion`,
 `alternatives` and `currentSelection`, its existing "no plan" state, which the calendar already renders.
@@ -412,7 +412,7 @@ both in the client chunk of every component that reads a store, which is every p
 
 `logClient` and `logClientError` in `@application/shared/utils/clientLog` hold the whole incantation. Each of
 `crypto.ts`, `filters.ts`, `holidays.ts`, `location.ts` and `premium.ts` declared its own byte-identical copy
-until then, and the UI layer's [`adapters/payments/checkout.ts`](../../ui/adapters/payments/checkout.ts) a sixth; seven more files open-coded it. Call
+until then, and the UI layer's [`adapters/payments/checkout.ts`](../../ui/adapters/payments/checkout.ts) another; more files open-coded it. Call
 `logClient((logger) => logger.warn(message, context))` for anything but an error, and `logClientError(message,
 error, context)` for the common case.
 
@@ -438,10 +438,10 @@ survive the next fetch; that is the intended behaviour, not a leak.
 **The budget arithmetic is not written here.** `measureBudget` under `@domain/calendar/utils` owns it, and
 `toggleDaySelection` asks it whether anything is left rather than subtracting two lengths itself. The store
 used to expose `getRemainingDays` for the same question; **nothing ever called it**, every real caller inlined
-the three lines instead, and it was nonetheless the only copy with tests. It is gone: the deletion is the
+the arithmetic instead, and it was nonetheless the only copy with tests. It is gone: the deletion is the
 fix, not a regression to restore.
 
-**`getFreeDaysForMonth` was the second instance of that pattern, and it was worse than uncalled.** It
+**`getFreeDaysForMonth` was another instance of that pattern, and it was worse than uncalled.** It
 counted the Holidays in a month carrying `isInPlanningWindow` and answered that as a month's "free days",
 but [`CONTEXT.md`](../../../../../CONTEXT.md) defines a **Free Day** as any non-working day, weekends
 included, so the action published a store-level name for a rule the glossary contradicts. Its only
@@ -509,9 +509,9 @@ has not been called when the action returns, so the assertion is `await vi.waitF
 The spies are hoisted with `vi.hoisted` and handed to the mocked `getBetterStackInstance` so a test can reach
 them at all. Several of these tests assert `expect(spy).not.toHaveBeenCalled()` *before* the `waitFor`: that
 line is the one that fails if someone converts the import back to a static one, and it is the reason the
-assertion is worth its two lines.
+assertion is worth the line it costs.
 
-Anything the store reaches through `await import(...)` (the two planning entry points, the cache module,
+Anything the store reaches through `await import(...)` (both planning entry points, the cache module,
 `getHolidays.ts`) is mocked by module path, which is also how `holidays.test.ts` asserts that both cache
 clears happen before a run. `generateMetrics` is mocked the same way despite being a static import; the path
 is what the mock keys on, not the import style. [`crypto.test.ts`](./crypto.test.ts) is the exception that has to re-import: it uses `vi.resetModules()` with

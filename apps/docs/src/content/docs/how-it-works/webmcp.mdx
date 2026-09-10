@@ -6,11 +6,11 @@ sidebar:
   order: 9
 ---
 
-Beyond the [Markdown API](/how-it-works/markdown-api/), the app exposes itself to AI agents through two mechanisms: in-page tools via the emerging WebMCP browser API, and static discovery documents under `/.well-known/`.
+Beyond the [Markdown API](/how-it-works/markdown-api/), the app exposes itself to AI agents through separate mechanisms: in-page tools via the emerging WebMCP browser API, and static discovery documents under `/.well-known/`.
 
 ## WebMCP: `navigator.modelContext`
 
-`apps/web/src/ui/modules/shared/WebMCP.tsx` is a render-null client component mounted in the root locale layout (`apps/web/src/app/[locale]/layout.tsx`). On mount it feature-detects `navigator.modelContext?.provideContext`, a no-op in browsers without WebMCP, and registers two tools:
+`apps/web/src/ui/modules/shared/WebMCP.tsx` is a render-null client component mounted in the root locale layout (`apps/web/src/app/[locale]/layout.tsx`). On mount it feature-detects `navigator.modelContext?.provideContext`, a no-op in browsers without WebMCP, and registers its tools:
 
 - `get_site_info` returns a structured description of Forever PTO: feature list, supported locales (interpolated from the real `LOCALES` constant in `apps/web/src/infrastructure/i18n/locales.ts`), the strategy names and the origin URL.
 - `check_status` fetches `/api/health` and returns the JSON, so an agent driving the page can verify the service is up.
@@ -19,7 +19,7 @@ Both tools take no input (`inputSchema: { type: 'object', properties: {} }`) and
 
 ## `.well-known` endpoints
 
-`apps/web/src/app/.well-known/[...slug]/route.ts` is a catch-all GET handler with an explicit route table; unknown slugs get a 404. Each handler lives in `apps/web/src/infrastructure/well-known/` and receives the base URL from the Cloudflare context (`NEXT_PUBLIC_SITE_URL`). All three respond with `Cache-Control: public, max-age=86400`.
+`apps/web/src/app/.well-known/[...slug]/route.ts` is a catch-all GET handler with an explicit route table; unknown slugs get a 404. Each handler lives in `apps/web/src/infrastructure/well-known/` and receives the base URL from the Cloudflare context (`NEXT_PUBLIC_SITE_URL`). All of them respond with `Cache-Control: public, max-age=86400`.
 
 | Path | Builder | What it serves |
 | --- | --- | --- |
@@ -29,5 +29,5 @@ Both tools take no input (`inputSchema: { type: 'object', properties: {} }`) and
 
 ## Why this shape
 
-The three documents make the site self-describing: an agent that lands anywhere can walk `/.well-known/` to discover that Markdown renditions exist, that health is machine-checkable, and that in-page tools are available, without any of it being hard-coded into the agent.
+The documents make the site self-describing: an agent that lands anywhere can walk `/.well-known/` to discover that Markdown renditions exist, that health is machine-checkable, and that in-page tools are available, without any of it being hard-coded into the agent.
  Version numbers in the payloads come from `package.json` at build time, so they track releases automatically.

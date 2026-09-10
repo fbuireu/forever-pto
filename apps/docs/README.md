@@ -27,7 +27,7 @@ app's own tokens. Nothing here is a copy of a component: the demos import the or
 ```bash
 pnpm install                              # from the repository root, never filtered
 pnpm --filter forever-pto-docs dev        # dev server
-pnpm --filter forever-pto-docs build      # 153 pages
+pnpm --filter forever-pto-docs build      # the whole site
 pnpm --filter forever-pto-docs typecheck  # astro check
 ```
 
@@ -46,7 +46,7 @@ src/
   assets/          the wiki's own logo pair
 e2e/               a small Playwright smoke suite
 astro.config.ts    Starlight config, the @ui alias, the sidebar
-wrangler.toml      two environments: production and development
+wrangler.toml      environments: production and development
 ```
 
 Read [`CLAUDE.md`](./CLAUDE.md) before changing anything: it carries the boundary rules: which app
@@ -68,4 +68,4 @@ this package stays at `0.0.0` permanently and nothing reads it.
 - **Prose names a file, never a volatile literal.** Where the app exports a constant, import it and
   interpolate, so a rename breaks the build instead of rotting the page.
 - [`tests/docs-consistency.test.ts`](../../tests/docs-consistency.test.ts) checks that every source file these pages cite in backticks still
-  exists. It found seven that did not.
+  exists. It found some that did not.

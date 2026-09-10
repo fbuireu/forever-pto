@@ -3,7 +3,7 @@
 ## `LoggerService` is a tag with one adapter, on purpose
 
 It looks like ceremony and the cost is real: every module that logs carries it in `R`, every test that
-reaches one builds a five-method stub, and `LoggerServiceLive` hands back the same singleton
+reaches one stubs its whole surface, and `LoggerServiceLive` hands back the same singleton
 `getBetterStackInstance()` does. It
 buys one property, verified rather than assumed: because `activateWithEmail` annotates its return type as
 requiring `TursoService` and nothing else, a `yield* LoggerService` creeping into its body fails the build at
@@ -18,14 +18,14 @@ the next architecture pass does not re-propose deleting it.
 
 ## The tail Worker, the app and the traces share one log contract
 
-[`better-stack/contract.ts`](./logging/better-stack/contract.ts) holds `LOG_SERVICE`, the four levels the app emits and `toLogLevel`. It is types
+[`better-stack/contract.ts`](./logging/better-stack/contract.ts) holds `LOG_SERVICE`, the levels the app emits and `toLogLevel`. It is types
 and constants only, deliberately, because [`workers/tail/index.ts`](../../../workers/tail/index.ts) imports it by relative path and must not
 pull `@logtail/edge` or `@opennextjs/cloudflare` into a Worker that has neither. `wrangler deploy --dry-run`
 over [`workers/tail/wrangler.toml`](../../../workers/tail/wrangler.toml) confirms the bundle still builds at 1.87 KiB.
 
 Both sides ship to the same BetterStack source and **shared no queryable field**. The app stamps
 `{ environment, service: 'forever-pto' }` on every entry; the tail Worker stamped
-`{ script, outcome, url, method, status }` and neither of those two, so "all errors in production" could not
+`{ script, outcome, url, method, status }` and neither of the app's, so "all errors in production" could not
 be expressed in one query. The tail Worker stamps `service` now. `environment` stays out of it on purpose:
 that Worker is deployed once and receives events from every app Worker, so a fixed value would be wrong;
 `script` is the discriminator, carrying `forever-pto` or `pr-<n>-forever-pto-development`.
@@ -36,8 +36,8 @@ pins `['log', 'warn', 'trace'] → ['info', 'warn', 'info']`.
 
 **The app side reads that union rather than restating it.** [`client.ts`](./logging/better-stack/client.ts) already imported `LOG_SERVICE` from
 the contract and then declared its own `type LogLevel = 'debug' | 'info' | 'warn' | 'error'` beside it: the
-same four names, written twice, with nothing holding them together. It imports `LOG_LEVEL` and `LogLevel`
-now and its four methods dispatch through the constant, so a fifth level added to the contract fails to
+same names, written twice, with nothing holding them together. It imports `LOG_LEVEL` and `LogLevel`
+now and its methods dispatch through the constant, so a level added to the contract fails to
 compile here: `send` indexes the Logtail transport by the level, and Logtail has no method for a name it
 does not know. On the tail Worker's side the same addition would keep folding onto `info`, silently, which
 is why the compile error has to live on this side. `client.test.ts` iterates `LOG_LEVEL` and asserts each
@@ -64,15 +64,15 @@ local copy would pass every behavioural test in that file while drifting from th
 **Traces stamp the same `LOG_SERVICE` and go to the same host.** [`tracing.ts`](./logging/better-stack/tracing.ts)
 sits beside the contract for that reason: it names the service the logs name, so a span and the log line it
 failed on answer one query, and it targets the `/v1/traces` path of `BETTER_STACK_INGESTING_URL` under
-`BETTER_STACK_SOURCE_TOKEN`, the two bindings the tail Worker reads. It imports the contract and the package
+`BETTER_STACK_SOURCE_TOKEN`, the bindings the tail Worker reads. It imports the contract and the package
 manifest and nothing else, because the Worker entrypoint bundles it before Next has loaded. With either
 binding unbound it returns a configuration exporting through `DROP_SPANS`, which acknowledges and discards,
 rather than one pointed at `undefined` or one with no exporter, which the library warns about on every request;
 `tracing.test.ts` pins that fallback, the sampling ratio and the header.
 
 **`tracer.ts` is what makes `Effect.withSpan` reach BetterStack, and it is deliberately not
-`@effect/opentelemetry`.** That package would do the same job and declares eight peer dependencies, most of
-them SDK packages the Worker never runs; the bridge is one file. `Tracer.make` gets two hooks. `span` opens an
+`@effect/opentelemetry`.** That package would do the same job and declares a tree of peer dependencies, most of
+them SDK packages the Worker never runs; the bridge is one file. `Tracer.make` gets its hooks. `span` opens an
 OpenTelemetry span through `trace.getTracer(LOG_SERVICE)`, parented on the Effect parent when there is one
 and otherwise on whatever OpenTelemetry context is active, which inside a request is the root span
 `@microlabs/otel-cf-workers` opened for it. `context` runs the fiber with the Effect span set as the active
@@ -93,10 +93,10 @@ strings. A caller's own `traceId` wins, which is how a log about a *different* t
 
 ## Purpose
 
-One folder per external SDK, and nothing else in the repo constructs one. Four of them are Effect services:
+One folder per external SDK, and nothing else in the repo constructs one. Some of them are Effect services:
 a `Context.Tag` for the interface and a Live `Layer` for the real implementation, so a test can substitute the
 tag and never reach the network ([ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md)).
-Four modules here are not services at all, for the reasons given below.
+The rest are not services at all, for the reasons given below.
 
 ## Effect services
 
@@ -107,7 +107,7 @@ Four modules here are not services at all, for the reasons given below.
 | [`logging/better-stack/`](./logging/better-stack) | `@logtail/edge` | `LoggerService` | `NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN`, `NEXT_PUBLIC_BETTER_STACK_INGESTING_URL` |
 | [`payments/stripe/`](./payments/stripe) | `stripe` | `StripeServerService` | `STRIPE_SECRET_KEY` (plus `STRIPE_WEBHOOK_SECRET`, see below) |
 
-All four are merged into `ApplicationLayer` in [`src/infrastructure/layers.ts`](../layers.ts). There is no partial layer: an
+They are all merged into `ApplicationLayer` in [`src/infrastructure/layers.ts`](../layers.ts). There is no partial layer: an
 entry point providing `ApplicationLayer` builds every client, which is why none of them may need anything at
 construction time.
 
@@ -133,7 +133,7 @@ export const FooServiceLive = Layer.sync(FooService, () => {
 });
 ```
 
-`Layer.sync`, not `Layer.effect`: construction is synchronous in all four, and the SDK instance is captured
+`Layer.sync`, not `Layer.effect`: construction is synchronous in every one of them, and the SDK instance is captured
 in the closure so it is built once per layer, not once per call. The `catch` handler always maps to a tagged
 error from [`src/infrastructure/errors.ts`](../errors.ts); a client never lets a raw SDK exception into the error channel.
 
@@ -141,7 +141,7 @@ error from [`src/infrastructure/errors.ts`](../errors.ts); a client never lets a
 
 - **Nothing is read from the environment while the layer is built.** A throw there is an Effect *defect*: the
   `Effect.catchTags` map and the trailing `Effect.catchAll` at the entry point both miss it, the request fails
-  as a rejected promise, and, because all four layers are merged, a variable belonging to a service the
+  as a rejected promise, and, because every layer is merged, a variable belonging to a service the
   request never touches takes the request down with it. Each client reads its variables inside the call, from
   a lazy getter invoked in the `try` block, so a missing one becomes the method's own tagged error
   (`DatabaseError`, `EmailError`, `PaymentError`) and only fails the routes that reach that client.
@@ -161,7 +161,7 @@ error from [`src/infrastructure/errors.ts`](../errors.ts); a client never lets a
 `service.ts` exposes `query` and `execute`, each taking SQL and positional `InValue[]` args. There is
 no ORM and no schema layer in the repo; SQL is written by hand in `services/*/repository.ts`.
 
-Both call `connect()` themselves, so every call is its own connection and nothing spans them. If you need two
+Both call `connect()` themselves, so every call is its own connection and nothing spans them. If you need
 writes to succeed together, that guarantee does not exist here today.
 
 **Both go through `withConnection`, and the release is structural because nothing else would remember it.**
@@ -174,8 +174,8 @@ what makes it safe in a `finally` that would otherwise replace a real failure wi
 
 **They call `conn.all` and `conn.run`, never `conn.prepare`.** `prepare(sql)` fetches column metadata over a
 `describe` round trip that neither method reads; the SDK documents `all` and `run` as "like
-`prepare(sql).run(args)` but in a single round trip, skips describe". The webhook's succeeded path was eight
-round trips from a Worker to a remote database where four do.
+`prepare(sql).run(args)` but in a single round trip, skips describe". The webhook's succeeded path was taking
+twice the round trips from a Worker to a remote database that it needs.
 
 **`run` answers `{ changes, lastInsertRowid }`, so there is no `rowsAffected` on it, and reading one is
 silent.** `execute` read `result.rowsAffected` off a statement that has never carried that field, so it
@@ -194,7 +194,7 @@ seam no caller used. Adding it back means adding a caller in the same commit.
 
 ## Stripe
 
-Two clients, and the split is the trap:
+There is a client on each side, and the split is the trap:
 
 - [`payments/stripe/serverService.ts`](./payments/stripe/serverService.ts): the Effect service. Node SDK, API version pinned to `'2026-07-29.dahlia'`,
   and `StripeNode.createFetchHttpClient()` because the Workers runtime has no Node HTTP stack
@@ -212,7 +212,7 @@ Two clients, and the split is the trap:
   up. The confirm-and-classify path that actually runs is a *second* implementation in
   [`../../ui/adapters/payments/checkout.ts`](../../ui/adapters/payments/checkout.ts): it takes the `stripe` instance from Elements and calls
   `stripe.confirmPayment` itself, classifying the outcome as `ConfirmPaymentOutcome` rather than as one of
-  the four codes here, none of which had a `checkout.errors.*` key in [`en.json`](../../ui/i18n/messages/en.json), so none of them could
+  the codes here, none of which had a `checkout.errors.*` key in [`en.json`](../../ui/i18n/messages/en.json), so none of them could
   ever have been shown to a payer. Deleting the dead half also removed this module's only reason to reach
   for the logger and for Effect.
 
@@ -225,7 +225,7 @@ under `promotion` rather than at the top level, and a lone `as unknown as` in th
 on reading the old field and returned `undefined` for every code
 (see [`../services/payments/CLAUDE.md`](../services/payments/CLAUDE.md)). When you bump the SDK, the
 `apiVersion` string is the smallest part of the change: grep the payment paths for `as unknown as` and for
-`expand`, because those are the two places the types stop checking anything.
+`expand`, because those are the places the types stop checking anything.
 
 **The tag carries only the methods something calls.** `promotionCodes.retrieve` was on it until the promo-code
 service stopped needing a second round trip; it went with the caller rather than staying as surface nothing
@@ -243,7 +243,7 @@ exercises. Adding a method here means adding its caller and its error mapping in
 | [`tutorial/driver/client.tsx`](./tutorial/driver/client.tsx) | Wraps driver.js, a DOM library. It renders a close icon into the popover, but never imports one: the icon arrives as the injected `closeIcon?: ReactNode` config field, so nothing here reaches into `@ui/*` |
 
 `logging/better-stack/client.ts` is the one to read before touching. **A log call cannot fail its caller, and
-that is the property everything else here leans on.** Three things hold it up, and all three are load-bearing:
+that is the property everything else here leans on.** The things that hold it up are all load-bearing:
 
 - `createTransport()` returns `null` (not a throw) when `NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN` or
   `NEXT_PUBLIC_BETTER_STACK_INGESTING_URL` is missing, warning once on the console so the misconfiguration is
@@ -264,7 +264,7 @@ The price is that a lost log is silent, and `getExecutionContext()` reads the Cl
 **The Logtail transport is scoped to the request, and it used to be one module-level instance.** `Logtail`
 batches: the first `log()` of a batch arms a `setTimeout`, later calls join the buffer, and the timer's
 callback is what runs the `fetch`. Shared across requests, that batcher scheduled its timer inside request A
-and delivered request B's lines through it, which is the two failure shapes workerd reports for I/O that
+and delivered request B's lines through it, which is what workerd reports for I/O that
 crosses a request boundary: `Cannot perform I/O on behalf of a different request`, and a request the runtime
 cancels as hung while it waits on a promise another request's context owns. `getTransport` keeps one
 `Logtail` per `ExecutionContext` in a `WeakMap`, so a request's lines batch together, flush inside its own
@@ -273,7 +273,7 @@ cancels as hung while it waits on a promise another request's context owns. `get
 carry a batch, so `send` builds a throwaway transport and calls `flush()` at once, one POST per line. That
 path is the browser's and logs rarely, so the lost batching costs nothing measurable. `client.test.ts`
 pins all of it under `describe('the transport is scoped to the request')`: same context, one constructor
-call; two contexts, two; no context, an immediate flush.
+call; a second context, a second constructor call; no context, an immediate flush.
 
 Both `DriverClient` and `StripeClient` keep mutable instance state behind a module-level singleton, so a
 second `getDriverClientInstance()` returns the same tour, and a second `getStripeClientInstance()` returns
@@ -302,10 +302,10 @@ Each client has a co-located `.test.ts` that mocks the SDK module and asserts th
 value, and that a rejection becomes the right tagged error. Nothing here is tested against a live service, and
 nothing here should be.
 
-A test that transitively imports `src/infrastructure/layers.ts` must mock the four Live layers with
+A test that transitively imports `src/infrastructure/layers.ts` must mock every Live layer with
 `Layer.empty` rather than set environment variables; [`layers.test.ts`](../layers.test.ts) is the reference.
 
-Each of the three configured services also asserts the missing-variable path twice: that the layer still
-builds, and that the first call fails with that service's tagged error. The logger is the fourth and behaves
+Each configured service also asserts the missing-variable path twice: that the layer still
+builds, and that the first call fails with that service's tagged error. The logger is the exception and behaves
 differently on purpose: `client.test.ts` asserts that a missing variable makes a log a no-op rather than an
 error, because it has no error channel to fail into.

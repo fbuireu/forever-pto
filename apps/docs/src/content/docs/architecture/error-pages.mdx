@@ -1,13 +1,13 @@
 ---
 title: Error pages
-description: The five error/not-found surfaces, the experimental globalNotFound flag and the brutal 500/404 designs in ErrorContent and NotFoundContent.
+description: The error/not-found surfaces, the experimental globalNotFound flag and the brutal 500/404 designs in ErrorContent and NotFoundContent.
 sidebar:
   order: 6
 ---
 
-Failures are handled by five boundary files that all funnel into two shared UI modules: `ErrorContent` (`apps/web/src/ui/modules/pages/error/ErrorContent.tsx`) for runtime errors and `NotFoundContent` (`apps/web/src/ui/modules/pages/not-found/NotFoundContent.tsx`) for 404s. The boundaries differ only in how much scaffolding they must rebuild.
+Failures are handled by boundary files that all funnel into shared UI modules: `ErrorContent` (`apps/web/src/ui/modules/pages/error/ErrorContent.tsx`) for runtime errors and `NotFoundContent` (`apps/web/src/ui/modules/pages/not-found/NotFoundContent.tsx`) for 404s. The boundaries differ only in how much scaffolding they must rebuild.
 
-## The five surfaces
+## The surfaces
 
 | File | Scope | Notes |
 | --- | --- | --- |
@@ -19,18 +19,18 @@ Failures are handled by five boundary files that all funnel into two shared UI m
 
 ## Global boundaries rebuild the shell
 
-Because the root layout is gone when they run, the two global files recreate everything the app normally gets for free: they import `@styles/index.css`, apply the font CSS variables from `apps/web/src/app/fonts.ts`, and mount `NextIntlClientProvider`, `AppThemeProvider` and `LazyMotionProvider` themselves.
+Because the root layout is gone when they run, the global files recreate everything the app normally gets for free: they import `@styles/index.css`, apply the font CSS variables from `apps/web/src/app/fonts.ts`, and mount `NextIntlClientProvider`, `AppThemeProvider` and `LazyMotionProvider` themselves.
 
 They differ in how they pick a locale:
 
 - **`global-error.tsx`** is a client component with no intl request context, so it derives the locale from the pathname (`getLocaleFromPathname` in `apps/web/src/infrastructure/i18n/utils/url.ts`) and falls back to the statically imported English message catalog (`@i18n/messages/en.json`): an error page must never itself throw on a missing translation.
-- **`global-not-found.tsx`** runs on the server and detects the locale with a three-step chain: the `x-next-intl-locale` header, then the next-intl locale cookie (`LOCALE_COOKIE` from `apps/web/src/infrastructure/i18n/locales.ts`), then `Accept-Language`, defaulting to the routing default. Since the `<html>` tag is already rendered with the default locale by the time detection finishes, the small client component `HtmlLangSync` (`apps/web/src/ui/modules/pages/not-found/HtmlLangSync.tsx`) patches `lang` after hydration. It also renders its own skip-link, since the root layout's one is unavailable.
+- **`global-not-found.tsx`** runs on the server and detects the locale with a fallback chain: the `x-next-intl-locale` header, then the next-intl locale cookie (`LOCALE_COOKIE` from `apps/web/src/infrastructure/i18n/locales.ts`), then `Accept-Language`, defaulting to the routing default. Since the `<html>` tag is already rendered with the default locale by the time detection finishes, the small client component `HtmlLangSync` (`apps/web/src/ui/modules/pages/not-found/HtmlLangSync.tsx`) patches `lang` after hydration. It also renders its own skip-link, since the root layout's one is unavailable.
 
 ## ErrorContent: the brutal 500
 
 `ErrorContent` is a client component that leans fully into the design system's neobrutalism (see [philosophy](/design-system/foundations/philosophy/)):
 
-- **Giant "500"**: three digit blocks with thick `--frame` borders, brand-color backgrounds and `--shadow-brutal-xl` hard shadows.
+- **Giant "500"**: digit blocks with thick `--frame` borders, brand-color backgrounds and `--shadow-brutal-xl` hard shadows.
 - **A fake terminal**: a styled window (traffic-light dots, `server.log: pty/0` title) that streams a staged log trace line by line on a timer, mixing playful `calc-engine` lines with the *real* `error.message` and stack trace, and ends on a blinking-cursor prompt. Log levels are color-coded via brand CSS variables.
 - **Real observability**: on mount it reports the error (including `error.digest`) to BetterStack through `getBetterStackInstance()`; the kicker badge interpolates the app `version` imported from `package.json`.
 - **Recovery actions**: a retry button wired to the boundary's `reset()`, plus links to the status page, the GitHub releases changelog, a prefilled bug-report issue, and a lazily-loaded `ContactModal`.

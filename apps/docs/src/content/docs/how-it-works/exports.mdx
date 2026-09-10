@@ -5,7 +5,7 @@ sidebar:
   order: 7
 ---
 
-Users can take their plan with them in two formats: a printable **PDF** and an **ICS** file that imports into Google Calendar, Outlook and Apple Calendar. Both live behind the premium gate.
+Users can take their plan with them as a printable **PDF** or an **ICS** file that imports into Google Calendar, Outlook and Apple Calendar. Both live behind the premium gate.
 
 ## The component
 
@@ -17,7 +17,7 @@ The download buttons, and only the buttons, are wrapped in `PremiumFeature` (`ap
 
 The PDF path is fully lazy: neither `@react-pdf/renderer` nor the document component is in the main bundle. Inside a React transition, `pdfExportEffect` dynamic-imports both, renders `HolidayDocument` (`apps/web/src/ui/modules/export/HolidayDocument.tsx`) to a blob with `renderer.pdf(...).toBlob()`, and triggers a download named `forever-pto-{year}.pdf`.
 
-Two details worth copying elsewhere:
+Details worth copying elsewhere:
 
 - The object URL is managed with `Effect.acquireRelease` + `Effect.scoped`, so `URL.revokeObjectURL` runs even on failure, with no leaked blob URLs.
 - All labels (`pdf.holidays`, `pdf.vacationDays`, ...) are passed in from the `calendarExport` i18n namespace; the document component itself stays translation-agnostic.

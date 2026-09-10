@@ -11,7 +11,7 @@ This page is self-documenting: it describes the pipeline that published it. The 
 
 `.github/workflows/docs.yml` follows the repo's workflow conventions (SHA-pinned actions, `persist-credentials: false`, zizmor-linted). It runs on every push and pull request, and a `changes` job gates `build` on the `DOCS_PATHS` list: `apps/docs/**`, `apps/web/package.json`, all of `apps/web/src/ui/**`, `apps/web/src/domain/calendar/types.ts`, `apps/web/src/infrastructure/i18n/locales.ts`, `pnpm-lock.yaml`, the workflow file and `.github/actions/**`. Unrelated app changes never build the docs; changes to the reused sources do, on purpose, because they can break the demos. The list used to be a `paths:` trigger filter, written out twice, and a filtered workflow never reports on a pull request outside its paths, which is why nothing in it could be a required check.
 
-The last three app entries are not decoration. `app-version.ts` reads the app manifest, and `HowItWorksDemo.tsx` reaches `@domain/calendar/types` and `@infrastructure/i18n/locales` by relative path rather than through `@ui`. The app's own contract suite derives that reach from the sources and fails if a path of it is missing from `DOCS_PATHS`, so this list cannot drift from what the site imports.
+The trailing app entries are not decoration. `app-version.ts` reads the app manifest, and `HowItWorksDemo.tsx` reaches `@domain/calendar/types` and `@infrastructure/i18n/locales` by relative path rather than through `@ui`. The app's own contract suite derives that reach from the sources and fails if a path of it is missing from `DOCS_PATHS`, so this list cannot drift from what the site imports.
 
 Triggers:
 
@@ -37,7 +37,7 @@ Both packages preview the same way. The preview job downloads the build artifact
 wrangler deploy --env development --name pr-<n>-forever-pto-docs-development
 ```
 
-The `--name` override is what mints a fresh Worker rather than updating the stable one, so two open pull requests never overwrite each other's preview. It resolves at:
+The `--name` override is what mints a fresh Worker rather than updating the stable one, so open pull requests never overwrite each other's preview. It resolves at:
 
 ```text
 https://pr-<n>-forever-pto-docs-development.fbuireu.workers.dev
@@ -51,11 +51,11 @@ What the docs preview does *not* need is what separates it from the app's: no bi
 
 `cleanup-development.yml` deletes the Worker when the pull request closes, in a `cleanup-docs` job beside the app's. A per-PR Worker that nothing tears down accumulates forever.
 
-The app's job in that workflow has to queue behind the CI run, because app E2E drives the per-PR Worker over the network and deleting it mid-run turns every remaining spec into a placeholder. The two jobs carry a concurrency group each: `cleanup-web` on `CI-…`, `cleanup-docs` on `docs-…`, the group of the workflow that deployed the Worker each one deletes. They shared one workflow-level group until 2026-08-28, and it was `ci.yml`'s, so `cleanup-docs` waited on a run that has nothing to do with its Worker while the `preview` job that does own it could still be mid-deploy. The docs Playwright suite genuinely needs no wait, since it runs against the build artifact in the `build` job before the preview Worker exists at all; the deploy it must not race is the preview deploy itself.
+The app's job in that workflow has to queue behind the CI run, because app E2E drives the per-PR Worker over the network and deleting it mid-run turns every remaining spec into a placeholder. The jobs carry a concurrency group each: `cleanup-web` on `CI-…`, `cleanup-docs` on `docs-…`, the group of the workflow that deployed the Worker each one deletes. They shared one workflow-level group until 2026-08-28, and it was `ci.yml`'s, so `cleanup-docs` waited on a run that has nothing to do with its Worker while the `preview` job that does own it could still be mid-deploy. The docs Playwright suite genuinely needs no wait, since it runs against the build artifact in the `build` job before the preview Worker exists at all; the deploy it must not race is the preview deploy itself.
 
 ## Production deploy
 
-On `main`, the deploy job reuses the build job's `apps/docs/dist` artifact and runs `wrangler deploy` via `wrangler-action`, handing it the wrangler version a step reads out of `apps/docs/package.json` so the two never diverge (the `deploy` script in `apps/docs/package.json` is the local one-shot, though it passes no `--env`, so it deploys the top-level config to the production Worker's name without its route block), activating a new version of `forever-pto-docs` on `docs.forever-pto.com` (an infrastructure-as-code `custom_domain` route; see [Cloudflare stack](/infra/cloudflare/)). The only credentials involved are `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; the site has no [runtime secrets](/infra/secrets/) at all.
+On `main`, the deploy job reuses the build job's `apps/docs/dist` artifact and runs `wrangler deploy` via `wrangler-action`, handing it the wrangler version a step reads out of `apps/docs/package.json` so they never diverge (the `deploy` script in `apps/docs/package.json` is the local one-shot, though it passes no `--env`, so it deploys the top-level config to the production Worker's name without its route block), activating a new version of `forever-pto-docs` on `docs.forever-pto.com` (an infrastructure-as-code `custom_domain` route; see [Cloudflare stack](/infra/cloudflare/)). The only credentials involved are `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; the site has no [runtime secrets](/infra/secrets/) at all.
 
 ## Accepted cost: docs PRs still run app CI
 
@@ -63,7 +63,7 @@ On `main`, the deploy job reuses the build job's `apps/docs/dist` artifact and r
 
 The obvious fix, `paths-ignore: ['apps/docs/**']` on the app workflows, has a branch-protection caveat: required status checks that never run **never report**, and GitHub blocks the merge waiting for them. That is why neither workflow carries a path filter: each has a `changes` job that gates its own jobs with `if:`, and an aggregate job that always reports, `Check` in `ci.yml` and `Check (docs)` in `docs.yml`, is what the ruleset requires. The redundancy that remains, the contract suite running on every pull request, is deliberate.
 
-Two related conventions for docs PRs:
+Related conventions for docs PRs:
 
 - Title them `docs:` or `chore:`; a `feat:`/`fix:` docs PR would [cut an app release](/infra/release/).
 - Docs dependencies live in `apps/docs/package.json` but share the root `pnpm-lock.yaml`, so [Renovate](/infra/renovate/) manages them under the same policy.

@@ -19,7 +19,7 @@ Exact versions are pinned in `package.json` (the repo uses exact pins, via `save
 | Motion | Animation | `LazyMotion` keeps the animation runtime out of the initial bundle; see the design-system animation pages |
 | Zustand | Client state | Small store-per-concern model (`filters`, `holidays`, `location`, `premium`) with persistence, accessed via `useShallow` selectors |
 | Effect | Server flows | Typed, composable error handling for the payment/premium pipeline (`apps/web/src/domain/payment/`, `apps/web/src/application/use-cases/`), with no try/catch pyramids |
-| next-intl | i18n | Locale routing plus namespaced messages for the four locales in `apps/web/src/ui/i18n/messages/` |
+| next-intl | i18n | Locale routing plus namespaced messages for the locales in `apps/web/src/ui/i18n/messages/` |
 | boneyard-js | Loading skeletons | Generates skeleton components from real rendered output into `apps/web/src/ui/modules/bones` instead of hand-maintaining them (patched; see [repo structure](/start/repo-structure/)) |
 | driver.js | Onboarding | Lightweight product-tour overlay with no framework coupling |
 
@@ -41,4 +41,4 @@ Exact versions are pinned in `package.json` (the repo uses exact pins, via `save
 | Playwright | E2E tests | Runs against real preview deployments in CI, cross-browser locally |
 | semantic-release | Releases | Versions, changelog and GitHub releases derived from conventional commits; see [conventions](/contributing/conventions/) |
 
-More detail on the last three in [tooling](/contributing/tooling/) and [testing](/contributing/testing/).
+More detail on those in [tooling](/contributing/tooling/) and [testing](/contributing/testing/).

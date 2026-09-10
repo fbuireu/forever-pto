@@ -21,11 +21,11 @@ One day of the continuous stretch off a Bridge or Suggestion produces. The total
 
 ### Strategy
 
-The rule that decides which Bridges make it into a Suggestion when the budget cannot cover them all. Three values, exported as the `FilterStrategy` const object in `apps/web/src/domain/calendar/types.ts`:
+The rule that decides which Bridges make it into a Suggestion when the budget cannot cover them all. Its values, exported as the `FilterStrategy` const object in `apps/web/src/domain/calendar/types.ts`:
 
 - **`grouped`** prefers multi-day blocks, with efficiency as the tiebreaker. Fewer, longer breaks.
 - **`optimized`** prefers the highest-efficiency bridges first. Maximum Effective Days per PTO Day.
-- **`balanced`** is two-pass greedy scoring that prioritizes high-value long bridges, then fills the remaining budget.
+- **`balanced`** is greedy scoring that prioritizes high-value long bridges, then fills the remaining budget.
 
 ### Suggestion
 

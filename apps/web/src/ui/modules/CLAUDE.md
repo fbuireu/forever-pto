@@ -11,7 +11,7 @@ Every React component the product renders. Nothing else in `src/ui/` holds compo
 | `core/` | The design system: `primitives/` plus the `animate/` layer. See [core/CLAUDE.md](./core/CLAUDE.md) | Yes, everywhere |
 | `pages/` | One folder per screen: `homepage/`, `planner/`, `legal/`, `error/`, `not-found/`. See [pages/planner/CLAUDE.md](./pages/planner/CLAUDE.md) | No, by definition |
 | `shared/` | Cross-page pieces that are not primitives: footer, donate, contact, cookie consent, JSON-LD, [`shared/Logo.tsx`](./shared/Logo.tsx), [`shared/Icon.tsx`](./shared/Icon.tsx), [`shared/FormButtons.tsx`](./shared/FormButtons.tsx), [`shared/StepOutcome.tsx`](./shared/StepOutcome.tsx), [`shared/SupportButton.tsx`](./shared/SupportButton.tsx), [`shared/ConditionalWrapper.tsx`](./shared/ConditionalWrapper.tsx), [`shared/WebMCP.tsx`](./shared/WebMCP.tsx), plus [`shared/utils/helpers.ts`](./shared/utils/helpers.ts) for the helpers those pieces need | Yes |
-| `layout/` | [`layout/LegalLayout.tsx`](./layout/LegalLayout.tsx), the card chrome the four legal pages share, and [`layout/SkipToContent.tsx`](./layout/SkipToContent.tsx), which owns the skip link **and** the `MAIN_CONTENT_ID` every route shell's landmark is keyed on | Between sibling routes |
+| `layout/` | [`layout/LegalLayout.tsx`](./layout/LegalLayout.tsx), the card chrome the legal pages share, and [`layout/SkipToContent.tsx`](./layout/SkipToContent.tsx), which owns the skip link **and** the `MAIN_CONTENT_ID` every route shell's landmark is keyed on | Between sibling routes |
 | `sidebar/` | [`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) and its controls: country, region, year, Strategy, PTO Day budget, the calculators, calendar export | One screen, but not a page section |
 | `premium/` | The Premium gate and the Donation checkout: [`premium/PremiumFeature.tsx`](./premium/PremiumFeature.tsx), [`premium/featureLabels.ts`](./premium/featureLabels.ts), [`premium/PremiumModal.tsx`](./premium/PremiumModal.tsx), [`premium/PremiumRequiredModal.tsx`](./premium/PremiumRequiredModal.tsx), [`premium/CheckoutForm.tsx`](./premium/CheckoutForm.tsx) | Yes |
 | `providers/` | Context wrappers mounted once in the locale layout: [`providers/AppThemeProvider.tsx`](./providers/AppThemeProvider.tsx), [`providers/BonesProvider.tsx`](./providers/BonesProvider.tsx) | Once |
@@ -31,7 +31,7 @@ Walk the questions in order and stop at the first yes.
 1. Is it a stateless visual element with no product vocabulary in it: a button, a field, a badge, an
    animated icon? → `core/`. It takes strings as props; it never calls `useTranslations`.
 2. Does it exist because one screen needs it? → `pages/<screen>/`. Split further into a subfolder once
-   the screen folder passes roughly a dozen files, as `planner/` has.
+   the screen folder outgrows a flat list, as `planner/` has.
 3. Is it mounted by more than one screen and does it carry product meaning? → `shared/`.
 4. Does it gate something behind Premium, or move money? → `premium/`, whatever screen uses it. Access
    is derived from the payment record, not stored as a flag. [ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md).
@@ -58,7 +58,7 @@ co-located stylesheets: [`pages/planner/legend.module.css`](./pages/planner/lege
 [`shared/donate/donate.css`](./shared/donate/donate.css) live beside the component that imports them. Only cross-cutting CSS belongs
 in `src/ui/styles/`.
 
-**`*Client.tsx` means two different things.** The suffix is not a single convention, and reading it as
+**`*Client.tsx` means more than one thing.** The suffix is not a single convention, and reading it as
 one will mislead you:
 
 - A thin `'use client'` shell that `dynamic()`-imports the real component with `ssr: false`, purely to
@@ -79,7 +79,7 @@ browser API. `sidebar/AppSidebar.tsx` and `layout/LegalLayout.tsx` are `async` s
 call `getTranslations` from `next-intl/server`; client components use the `useTranslations` hook. The
 planner itself is client-side end to end. [ADR 0001](../../../../../adr/0001-planner-runs-in-the-browser.md).
 
-## A three-step form modal
+## A stepped form modal
 
 `shared/StepOutcome.tsx` holds what `premium/PremiumRequiredModal.tsx` and
 [`shared/contact/ContactModal.tsx`](./shared/contact/ContactModal.tsx) were writing out twice: the `Step`
@@ -93,35 +93,35 @@ centred icon and heading. They are both brutalist now; `StepOutcome` takes a `to
 (`SUCCESS` or `ERROR`), an icon, a title, a description, and an `onTryAgain` whose
 presence is what decides between one Close button and the Try-again/Close pair.
 
-Three other things the two disagreed about are gone with it:
+Other things they disagreed about are gone with it:
 
 - **The Premium modal hand-wrote the submit row**, including a verbatim copy of
   `FormButtons`' own `<Loader2 className='size-4 mr-2 animate-spin' />`, while
   `FormButtons` exists for exactly that. It uses it now.
 - **It reported one failure twice**: `form.setError('email', …)` *and* the ERROR
-  panel, with two near-identical strings. The field error was invisible anyway,
+  panel, with near-identical strings. The field error was invisible anyway,
   because the ERROR step unmounts the form that would render it. Only the panel
   remains.
 - **`setTimeout(handleClose, 5000)` sat beside `t('welcomeToPremium', { seconds: 5 })`**
-  with nothing tying the two numbers together. Both read `AUTO_CLOSE_MS` now.
+  with nothing tying the numbers together. Both read `AUTO_CLOSE_MS` now.
 
 `tryAgain` and `close` moved from the `contact` and Premium modal namespaces into
 `formButtons`, where `submit`, `processing` and `cancel` already live. They were
-character-identical in all six locales, so that is twelve translations recovered and
-one place left to edit.
+character-identical in every locale, so those translations are recovered and
+there is one place left to edit.
 
 **Its auto-close is held in a ref and cleared twice, and it used to be held nowhere.** The modal is mounted
 for the life of the planner by [`app/[locale]/(app)/planner/layout.tsx`](../../app/[locale]/(app)/planner/layout.tsx),
 so a `setTimeout(handleClose, AUTO_CLOSE_MS)` nobody kept a handle to outlived the panel that scheduled it:
-close the success panel, reopen the modal within five seconds, and the orphaned timer shut it again and
+close the success panel, reopen the modal before it elapses, and the orphaned timer shut it again and
 `form.reset()` wiped the address that had just been typed. `handleClose` and an unmount cleanup both call
 `cancelAutoClose` now. [`premium/PremiumRequiredModal.test.tsx`](./premium/PremiumRequiredModal.test.tsx)
-drives the three steps on fake timers and counts `onClose`, which is what goes red if the handle is dropped
+drives the steps on fake timers and counts `onClose`, which is what goes red if the handle is dropped
 again.
 
 ## Skeletons and bones
 
-Loading states go through `boneyard-js`, not hand-rolled shimmer divs. Three pieces cooperate:
+Loading states go through `boneyard-js`, not hand-rolled shimmer divs. These pieces cooperate:
 
 - `bones/*.bones.json`: captured DOM shapes, regenerated by `pnpm bones:build`. Output path and
   colours come from [boneyard.config.json](../../../boneyard.config.json).
@@ -140,7 +140,7 @@ The `animate: 'shimmer'` in that config names a boneyard-js animation style, not
 The library injects `@keyframes bs-<uid>` beside each skeleton at runtime, so no CSS under `ui/styles/`
 declares, or should declare, a keyframe called `shimmer`.
 
-**`fixture` and `fallback` are not two names for the same thing, and passing only the first renders
+**`fixture` and `fallback` are not the same thing, and passing only the first renders
 nothing.** `Skeleton` computes `showFallback = loading && !activeBones` and then renders
 `showFallback ? fallback : children`; `fixture` appears nowhere in that path. It is build-time only:
 the component returns early and renders `fixture ?? children` when the CLI sets
@@ -156,9 +156,9 @@ approximations kept beside their component.
 **A stale `.bones.json` re-registers itself, so closing a drift means deleting the file.** The CLI
 merges what it captured this run with every descriptor still on disk (`mergePreservingExisting`, absent
 `--force`), which is how `alternatives-manager` and `pto-status` stayed in the registry long after the
-last `<Skeleton>` asking for them was removed: two 35-byte empty descriptors, registered because they
+last `<Skeleton>` asking for them was removed: empty descriptors, registered because they
 existed rather than because anything wanted them. Both files are gone and the registry is down to the
-three bones actually requested by name: `calendar-list`, `planner-panel` and `summary`.
+bones actually requested by name: `calendar-list`, `planner-panel` and `summary`.
 
 `express-checkout` in `premium/CheckoutForm.tsx` is still requested and still uncaptured, and that is
 now a cosmetic gap rather than a blank box, because it has a `fallback`. Capturing it does **not**
@@ -168,7 +168,7 @@ build would measure.
 
 ## Testing
 
-Vitest, `happy-dom`, co-located `.test.tsx`. Two exclusions in [`vitest.config.ts`](../../../../../vitest.config.ts) matter here:
+Vitest, `happy-dom`, co-located `.test.tsx`. The exclusions in [`vitest.config.ts`](../../../../../vitest.config.ts) that matter here:
 
 - `src/ui/modules/bones/**`: excluded from both the test run *and* the coverage report. It is
   generated data; asserting on it would only assert that the generator ran.
@@ -186,7 +186,7 @@ naming rather than counting: it is the whole of the logic in that folder, `hasFl
 slot.
 
 The tests that predate that sweep are the ones sitting on logic (`ManagementBar`, `Summary` charts,
-homepage sections, `shared/utils/helpers.ts`, the two forms that render an API failure,
+homepage sections, `shared/utils/helpers.ts`, the forms that render an API failure,
 [`sidebar/components/WorkdayCounter.tsx`](./sidebar/components/WorkdayCounter.tsx), which is the one component
 in that folder that *counts* rather than renders and whose cases pin that a Holiday leaves the workday total
 and enters the Holiday one, and that a range reaching past the years it has Holidays for says so rather than
@@ -206,7 +206,7 @@ asserts is chosen so it can fail.** Re-rendering the markup back as an expectati
 parses. So these assert the seam instead: the key resolves in a bundle rather than falling through to its own
 name, the accessible name reaches the element that carries the behaviour, an `href` points where the copy
 says, and a `dynamic()` loader resolves to the export it names. That last one is the reason the fixtures
-([`pages/planner/PlannerPanelFixture.tsx`](./pages/planner/PlannerPanelFixture.tsx) and its two siblings) are
+([`pages/planner/PlannerPanelFixture.tsx`](./pages/planner/PlannerPanelFixture.tsx) and its siblings) are
 asserted on their **shape**: a skeleton that grows a button or a word has stopped being a skeleton, and
 nothing else in the tree would say so.
 
@@ -220,7 +220,7 @@ name through the real widget rather than beside a synthetic `<input>`, which is 
 `SidebarFieldLabel.test.tsx` used to do and what let a label naming a `div` pass.
 [`shared/ConditionalWrapper.test.tsx`](./shared/ConditionalWrapper.test.tsx) and
 [`pages/homepage/sections/Testimonials.test.tsx`](./pages/homepage/sections/Testimonials.test.tsx) are the
-other two additions.
+other additions.
 
 **Be precise about what that buys, because it is less than "covered".** The `e2e/` specs are smoke tests: a
 page answers 200, has a non-empty `<title>`, carries the right `lang`, and a handful of section ids and links
@@ -246,16 +246,16 @@ leaving either real drags the Stripe element tree into the test.
 ## Gotchas
 
 **The skip link and every landmark it can reach read one const.** `layout/SkipToContent.tsx` exports
-`MAIN_CONTENT_ID` and builds its own `href` from it; the six route shells interpolate the same const onto
-their landmark. It was a string literal on both sides, and four shells did not hold up their end:
+`MAIN_CONTENT_ID` and builds its own `href` from it; the route shells interpolate the same const onto
+their landmark. It was a string literal on both sides, and several shells did not hold up their end:
 `pages/error/ErrorContent.tsx` rendered a `<main>` with no `id` (reached from `[locale]/error.tsx`,
-`[locale]/(marketing)/error.tsx` and `global-error.tsx`, the first two inside the layout that emits the link)
-and `app/[locale]/(app)/payment/confirmation/page.tsx` opened all three of its branches with a bare
+`[locale]/(marketing)/error.tsx` and `global-error.tsx`, both of those inside the layout that emits the link)
+and `app/[locale]/(app)/payment/confirmation/page.tsx` opened every one of its branches with a bare
 `<div>` and had **no `main` landmark at all**. Pressing Tab then Enter did nothing on any of them, which is
 the same class as the `htmlFor='remaining-days'` and `AllowPastDays` defects below: a promise to a screen
 reader that never resolves. [`layout/SkipToContent.test.tsx`](./layout/SkipToContent.test.tsx) renders each
 shell it can and asserts the landmark is in the tree, and scans `src/` for the declaring files so the list
-cannot silently shrink or grow a duplicate. All six shells read the const; the scan still accepts the literal
+cannot silently shrink or grow a duplicate. Every shell reads the const; the scan still accepts the literal
 form, because it is what tells a new shell apart from a renamed one.
 
 **The destination has to show it received focus, and for a while it showed nothing.** `SidebarInset` is the
@@ -269,8 +269,8 @@ beside it.
 **`focus:outline-none` is always wrong, and `outline-none` on its own is the house style.** `:focus-visible`
 is a subset of `:focus`, so scoping the suppression to `:focus` kills the focus-visible ring as well, and no
 `focus-visible:ring-*` written afterwards can bring it back. `premium/PremiumFeature.tsx` had it, and that
-gate is rendered at thirteen call sites (every gated chart, every gated Holiday row, the Custom tab, the
-calendar export), so a free user tabbing through the Summary landed on a blurred chart thirteen times with
+gate is rendered all over the screen (every gated chart, every gated Holiday row, the Custom tab, the
+calendar export), so a free user tabbing through the Summary landed on a blurred chart again and again with
 nothing on screen changing. `shared/Logo.tsx` had the unconditional form with no ring, and it is the **first**
 focusable element in the planner sidebar, so it was the first thing a keyboard user met after the skip link.
 Both pair `outline-none` with the `focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2`
@@ -279,22 +279,22 @@ one place a bare suppression is fine, because nothing tabs onto it.
 
 **`String.replace` with a string pattern replaces the first match only, and one accessible name was built
 that way.** [`shared/footer/components/DevFooter.tsx`](./shared/footer/components/DevFooter.tsx) derives each
-social link's name from its config key, `key.toLowerCase().replace("_", " ")`, so three of the four read
+social link's name from its config key, `key.toLowerCase().replace("_", " ")`, so all but one read
 correctly and `BUY_ME_A_COFFEE` announced as *Visit my buy me_a_coffee profile*. It is `replaceAll` now.
 A name assembled from an identifier is the kind that nobody reads aloud in review, which is why
 [`DevFooter.test.tsx`](./shared/footer/components/DevFooter.test.tsx) asks for each link **by name**.
 
-**Two of `shared/donate/DonationForm.tsx`'s controls said nothing about what they were about to charge.**
-The three amount presets were `variant={currentAmount === preset ? "default" : "outline"}` and no
+**Some of `shared/donate/DonationForm.tsx`'s controls said nothing about what they were about to charge.**
+The amount presets were `variant={currentAmount === preset ? "default" : "outline"}` and no
 `aria-pressed`, so a reader heard the same string before and after pressing the button that *decides how much
-money is taken*; `sidebar/components/CalendarExport.tsx`'s two include-toggles had the same shape over the
+money is taken*; `sidebar/components/CalendarExport.tsx`'s include-toggles had the same shape over the
 contents of a downloaded file. Both carry `aria-pressed` now. A `variant=` that flips on state is the tell:
 if the colour means "on", something has to say so.
 
 **The promo-code field had no label at all, and the amount field's label named a `<div>`.** The promo input
 had only a `placeholder`, which vanishes on the first keystroke, so a payer correcting a half-typed code heard
-"edit, FOREV" and had no click target; it takes a `FormLabel` and a new `donationForm.promoCode` key in all
-six bundles. The amount field had a `FormLabel`, but `FormControl` wrapped the whole `InputGroup`, so its `id`
+"edit, FOREV" and had no click target; it takes a `FormLabel` and a new `donationForm.promoCode` key in every
+bundle. The amount field had a `FormLabel`, but `FormControl` wrapped the whole `InputGroup`, so its `id`
 and `aria-describedby` landed on the `role="group"` wrapper and the `<label for>` pointed at a `div`.
 `FormControl` sits **inside** `InputGroup`, around `InputGroupInput`, now. `InputGroup`'s `has-[>input]`
 selectors still hold: `Slot` renders its child directly, so the DOM stays `div > input`. The form also sets
@@ -302,45 +302,45 @@ selectors still hold: `Slot` renders its child directly, so the DOM stays `div >
 inputs declare it now, which is what puts `required` in the accessible tree without turning native validation
 back on.
 
-**The three legal identity modules derive their own accessible name; they do not take one.**
+**The legal identity modules derive their own accessible name; they do not take one.**
 `pages/legal/Me.tsx`, `pages/legal/Nif.tsx` and `pages/legal/Address.tsx` are a `{ character, order }` table
 rendered into flexbox-`order`-scrambled spans, so the DOM text is nonsense and `role="img"` makes the
-`aria-label` the *only* thing announced. The prop was called `ariaLabel` and four of the five call sites
+`aria-label` the *only* thing announced. The prop was called `ariaLabel` and most call sites
 passed the field **label**; a screen reader on the legal notice heard "NIF: NIF:" and never the number, and
 the same on the address and the owner's name on the privacy policy. Both pages exist to state that identity.
 [`pages/legal/ScrambledText.tsx`](./pages/legal/ScrambledText.tsx) now holds the single render and
 `decodeScrambledText`, which sorts the table by `order`; each module is its data plus a one-line render and
 there is no prop to get wrong. [`pages/legal/identity.test.tsx`](./pages/legal/identity.test.tsx) pins the
-three decoded strings, so a transposed `order` on a compliance page fails red instead of shipping a wrong
+decoded strings, so a transposed `order` on a compliance page fails red instead of shipping a wrong
 NIF. `legalNotice.…items.owner.value` and `privacyPolicy.…dataController.items.name.value` were `"{author}"`
-in all six bundles with no caller and no `author` source; those twelve entries are deleted.
+in every bundle with no caller and no `author` source; those entries are deleted.
 
 **vanilla-cookieconsent dispatches its `cc:*` events on `window`, never on `document`.** Its emitter is a
 bare `dispatchEvent(new CustomEvent(...))`, which resolves to `window`, and an event dispatched on `window`
 does not reach a listener on `document`. `tracking/BetterStackTracking.tsx` listened on `document`, so its
 `cc:onConsent`/`cc:onChange` handlers never fired and the snippet was never injected: `window.betterstack`
 stayed undefined and every `track()` and `identifyUser()` call no-opped for **every** consenting visitor.
-[`shared/cookie-consent/CookieConsent.tsx`](./shared/cookie-consent/CookieConsent.tsx) already used `window` for `cc:showPreferences`; the two now agree.
+[`shared/cookie-consent/CookieConsent.tsx`](./shared/cookie-consent/CookieConsent.tsx) already used `window` for `cc:showPreferences`; they now agree.
 
 **One module answers what has been consented to, and every reader uses it.**
-[`shared/cookie-consent/utils/consent.ts`](./shared/cookie-consent/utils/consent.ts) holds the analytics service ids and three functions over them:
+[`shared/cookie-consent/utils/consent.ts`](./shared/cookie-consent/utils/consent.ts) holds the analytics service ids and the functions over them:
 `isServiceConsented`, `consentedAnalyticsServices`, `allAnalyticsServices`. `CookieConsent.tsx` derived that
-state inline at three separate call sites (the initial read, `onConsent` and `onChange`), and
-`tracking/BetterStackTracking.tsx` answered the same question through a different library call. Two
-mechanisms for one question is exactly how the category-versus-service bug below shipped; both now read
+state inline at separate call sites (the initial read, `onConsent` and `onChange`), and
+`tracking/BetterStackTracking.tsx` answered the same question through a different library call. More than one
+mechanism for one question is exactly how the category-versus-service bug below shipped; both now read
 `acceptedService`, through this module.
 
-**`utils/consent.ts` has a test now, and it reproduces the defect below.** The trio had none, against three
+**`utils/consent.ts` has a test now, and it reproduces the defect below.** The module had none, against
 shipped defects on record. Its cases pin the thing that went wrong: `isServiceConsented` is called with the
 *service* id and the category, `consentedAnalyticsServices` reports one service off while the other is on
 (which asking the category could not), and it covers every id the dialog config declares, so a gate can never
-read `undefined` for one. Swapping the service id for the category turns two of the five red.
+read `undefined` for one. Swapping the service id for the category turns cases red.
 
-**Consent is *answered* one way and *notified* two, and that second part is structural rather than drift.**
+**Consent is *answered* one way and *notified* another, and that second part is structural rather than drift.**
 `CookieConsent.tsx` owns the config it hands to `CookieConsentLib.run`, so it reacts through that config's
 `onConsent`/`onChange` callbacks. `tracking/BetterStackTracking.tsx` is a separate component and cannot add a
 callback to someone else's config, so it listens for the `cc:onConsent`/`cc:onChange` window events the
-library dispatches. Collapsing the two would mean making `CookieConsent` listen for its own library's events
+library dispatches. Collapsing them would mean making `CookieConsent` listen for its own library's events
 instead of using the callbacks it already registers: plausible, but the callbacks fire synchronously with the
 decision and `updateGtagConsent` runs inside one, so the timing is not something a unit test can vouch for.
 Left as is, deliberately, and written down so it does not read as an oversight.
@@ -357,7 +357,7 @@ category is not a proxy for it.
 `cc:showPreferences`, and `CookieConsent`'s handler set `showPreferences` without clearing `showBanner`; the
 `if (showBanner) return …banner…` early return then short-circuited before the dialog could render, so the
 click did nothing at all. The handler now clears the banner first, which is exactly what the banner's own
-"Manage preferences" button already did; the two entry points had silently disagreed.
+"Manage preferences" button already did; the entry points had silently disagreed.
 
 **Anything the render reads has to be state, not a ref: React bails out of equal updates.**
 `sidebar/components/PtoCalculator.tsx` kept the inputs behind the accrual result in a
@@ -394,7 +394,7 @@ on the value.
 mechanism used by [`core/animate/effects/AutoHeight.tsx`](./core/animate/effects/AutoHeight.tsx) and [`core/animate/icons/Icon.tsx`](./core/animate/icons/Icon.tsx).
 
 It is internal to `core/animate/`, and that is now true rather than aspirational; it has zero importers
-from outside. It had three. `DevFooter` took `RotatingTextContainer`, which turned out to publish into a
+from outside. It used to have them. `DevFooter` took `RotatingTextContainer`, which turned out to publish into a
 context nothing read; it is deleted. `CookieConsentDialog` and `AllowPastDays` took `Switch`, which was never
 unstyled (it carried the full frame and shadow), so it moved up to [`core/animate/base/`](./core/animate/base) rather than getting
 a wrapper. Promote what a feature needs; do not reach in.
@@ -410,11 +410,11 @@ it statically would pull the whole PDF renderer into the client bundle.
 
 `data-tutorial` attributes scattered through `sidebar/` and [`pages/planner/`](./pages/planner) are the tutorial's anchors, and
 both sides now name them through `TUTORIAL_ANCHOR` in [`tutorial/anchors.ts`](./tutorial/anchors.ts) rather than as strings. They look
-like dead attributes and are not, **but nine of them were**. The components declared nineteen anchors while
-`useTutorial` targeted ten, and the gap was invisible in either direction: a step whose anchor is not
+like dead attributes and are not, **but some of them were**. The components declared more anchors than
+`useTutorial` targeted, and the gap was invisible in either direction: a step whose anchor is not
 rendered lands on driver.js's dummy-element fallback with nothing highlighted and no error, which is exactly
-how the mobile `open`-vs-`openMobile` bug stayed hidden. The nine unclaimed ones are gone; a future step adds
-its anchor back through the const. [`tutorial/anchors.test.ts`](./tutorial/anchors.test.ts) reads the component tree and asserts the two
+how the mobile `open`-vs-`openMobile` bug stayed hidden. The unclaimed ones are gone; a future step adds
+its anchor back through the const. [`tutorial/anchors.test.ts`](./tutorial/anchors.test.ts) reads the component tree and asserts the
 sets match in both directions.
 
 `resolveApiErrorMessage` in `shared/utils/helpers.ts` tells a machine code from prose by shape. A
@@ -427,13 +427,13 @@ this key is only known at runtime, which is the question `has` exists to answer.
 
 Payment analytics send the machine code, never the rendered message. `premium/CheckoutForm.tsx` shows
 the user `resolveApiErrorMessage(...)` and passes the raw `result.error` to `track`; a translated
-string would split one failure mode across six locales.
+string would split one failure mode across every locale.
 
-**The Premium gate broke that same rule for every one of its thirteen call sites, and the fix is a second
+**The Premium gate broke that same rule at every one of its call sites, and the fix is a second
 type.** `PremiumFeature` took `feature: string`, showed it to the user *and* handed it to
 `showPremiumModal`, which is what `track('upgrade_modal_opened', { feature })` reports. Every producer was a
-`useTranslations` call (`t('editHolidays')`, `t('metrics.advancedMetrics')`, `t('title')` from three
-different namespaces), so thirteen gates over six locales were up to seventy-eight values in one dimension
+`useTranslations` call (`t('editHolidays')`, `t('metrics.advancedMetrics')`, `t('title')` from
+different namespaces), so every gate in every locale was its own value in one dimension
 and no two locales' funnels could be compared. The prop is a `PremiumFeatureId` now, declared beside the
 state it sets in [`../../application/stores/premium.ts`](../../application/stores/premium.ts): the gate takes
 the id, the store tracks the id, and `premium/featureLabels.ts` maps each id to the message key that already
@@ -442,15 +442,15 @@ held its label, so no translation moved and the modal still names the feature in
 asserts the store receives the same value both times.
 
 The label map is the one place where an id and a message path meet, and it resolves through a
-**namespace-less** `useTranslations()` because the thirteen labels live in seven different namespaces.
+**namespace-less** `useTranslations()` because the labels live in different namespaces.
 `satisfies Record<PremiumFeatureId, string>` is what makes a new id a compile error rather than a blank
 banner.
 
 **The analytics event is still called `upgrade_modal_opened`, and that is deliberate.** `CONTEXT.md` retires
 *upgrade* as a word for Premium, and the identifiers went with it: `PremiumRequiredModal`,
 `showPremiumModal`, the `premiumModal` message namespace, `premium.becomePremium`. The event id did not,
-because it is a key in a Better Stack funnel that this repo cannot see: renaming it splits the series in two
-with no way to stitch them. It is the one surviving instance of the retired word, in
+because it is a key in a Better Stack funnel that this repo cannot see: renaming it splits the series
+with no way to stitch it back together. It is the one surviving instance of the retired word, in
 [`../../infrastructure/clients/logging/better-stack/tracking.ts`](../../infrastructure/clients/logging/better-stack/tracking.ts)'s event union.
 
 The Stripe Elements appearance in [`shared/donate/Donate.tsx`](./shared/donate/Donate.tsx) repeats the theme as hex literals. The
@@ -459,10 +459,10 @@ Elements iframe cannot read this app's CSS custom properties, so the light and d
 `--muted-foreground` from [`src/ui/styles/global/index.css`](../styles/global/index.css) by value. Change a token there and this
 object has to be changed by hand, or the donation form drifts from the page around it.
 
-**One module answers how a sidebar control is labelled, and its interface is where the two accessibility
+**One module answers how a sidebar control is labelled, and its interface is where the accessibility
 defects came from.** [`sidebar/components/SidebarFieldLabel.tsx`](./sidebar/components/SidebarFieldLabel.tsx) exports `SidebarFieldLabel` (icon, title,
-optional tooltip, optional `controlId`) and `SidebarFieldTooltip` (the six-line
-provider/trigger/content block, which four widgets use without a label around it). Eleven call sites had
+optional tooltip, optional `controlId`) and `SidebarFieldTooltip` (the
+provider/trigger/content block, which several widgets use without a label around it). Call sites had
 written both out by hand, and the copies had drifted in ways nothing could see:
 
 - **[`PtoDays.tsx`](./sidebar/components/PtoDays.tsx) carried `<label htmlFor='remaining-days'>` over a read-only status group, and no element
@@ -473,31 +473,31 @@ written both out by hand, and the copies had drifted in ways nothing could see:
   popover. With the popover open the document held two `#years`, and the label resolved to whichever came
   first. Nothing referenced the second one; it is gone.
 
-**`controlId` may only name a labelable element, and two of the seven call sites named a `<div>`.**
+**`controlId` may only name a labelable element, and some call sites named a `<div>`.**
 `<label for>` resolves against the HTML labelable set (`button`, `input`, `select`, `textarea` and a
-couple more), so the five sites pointing at a combobox trigger or a switch button are honest.
+couple more), so the sites pointing at a combobox trigger or a switch button are honest.
 [`PtoDays.tsx`](./sidebar/components/PtoDays.tsx) named `Counter`, whose outer element is an `m.div`, and
 [`CarryOverMonths.tsx`](./sidebar/components/CarryOverMonths.tsx) named `Slider`, whose Base UI `Root` is
 also a `div`; in both cases the `id` was reaching the wrong element through `...props` and the label
-resolved to nothing. Both drop `controlId` and render a heading instead, and the two widgets carry their
+resolved to nothing. Both drop `controlId` and render a heading instead, and both widgets carry their
 own names; see [`core/CLAUDE.md`](./core/CLAUDE.md).
 
 The alternative was to make `SidebarFieldLabel` emit `aria-labelledby` against a generated id, and it is
-worse: it would strip a working `htmlFor` from the five honest sites and still need every caller to thread
+worse: it would strip a working `htmlFor` from the honest sites and still need every caller to thread
 the id onto its own control, because this module renders no control. Naming the control is one edit in the
 control; naming it from outside is an edit in both.
 
-[`WorkdayCounter.tsx`](./sidebar/components/WorkdayCounter.tsx) was a twelfth hand-written copy: a bare
+[`WorkdayCounter.tsx`](./sidebar/components/WorkdayCounter.tsx) was another hand-written copy: a bare
 `Label` with the icon, the title and a `SidebarFieldTooltip` inside it, over a modal trigger it did not
 name. It uses `SidebarFieldLabel` now, with `className='my-0'` to keep its own spacing.
 
-The tooltip width is the caller's (`w-50` for the fields, `w-60` for the three calculators) and `Strategy`
+The tooltip width is the caller's (`w-50` for the fields, `w-60` for the calculators) and `Strategy`
 keeps `font-medium` with no vertical margin, both passed through `className` so the render is unchanged.
 That drift is real but cosmetic, and flattening it silently would have been a visual change hiding inside a
 refactor.
 
 **`useFormStatus` cannot report anything in this app, and one field had already drifted onto it.** React
-reports `pending` only for a parent `<form>` submitted through a form **action**; all five forms here submit
+reports `pending` only for a parent `<form>` submitted through a form **action**; every form here submits
 through `onSubmit` and none has an `action`, so `pending` was a constant `false`, invisibly, because the type
 is `boolean` either way. In `shared/donate/DonationForm.tsx` it was doubly dead: the hook was called by the
 same module that renders the `<form>`, which React documents as never reporting. The drift it produced is the
@@ -505,12 +505,12 @@ part a payer met: the email field took `disabled={pending}` while the amount, th
 the submit all took the real transition, so during the charge the one control still editable was the address
 the receipt goes to, and the value being charged was the one captured at submit, so an edit mid-flight was
 discarded without a word. `shared/FormButtons.tsx` had the same call behind a `pendingProp ?? pendingStatus`
-fallback that every one of its three callers already satisfied. Both are gone and `pending` is a **required**
-`boolean`, so a fourth form cannot forget to say whose transition it is on.
+fallback that every one of its callers already satisfied. Both are gone and `pending` is a **required**
+`boolean`, so a new form cannot forget to say whose transition it is on.
 
 **One module owns the locale switch, and the line that looked like the mechanism was dead.**
 `sidebar/components/LanguageSelector.tsx` and `pages/homepage/navigation/HomepageLanguageSwitcher.tsx` wrote
-out the same policy character for character. `hooks/useLanguageSwitch.ts` holds it now; the two keep only
+out the same policy character for character. `hooks/useLanguageSwitch.ts` holds it now; both keep only
 their triggers, which genuinely differ (the sidebar's collapses to a code and wraps in `AnimateIcon`).
 
 Both copies carried `push(pathname.replace(`/${locale}`, `/${newLocale}`), { locale: newLocale })`, and the
@@ -520,22 +520,22 @@ the switch. Worse than useless: a route with a locale-looking segment, `/es-guid
 to `/en-guide`, which is the case the hook's test pins. `LanguageSelector` also held a `useState` mirroring
 the menu's own uncontrolled open state, read by nothing but the props it fed back.
 
-**`shared/ConditionalWrapper.tsx` has one arm, and it used to advertise two.** The second took `as` and
+**`shared/ConditionalWrapper.tsx` has one arm, and it used to advertise another.** That one took `as` and
 `wrapperProps` and rendered `<Component {...wrapperProps}>`, behind a `<T extends ElementType>` generic that
 existed only to type it. Nothing ever called it: both call sites (`pages/planner/calendar/Calendar.tsx` for
 the Holiday tooltip and `sidebar/components/PtoSalaryCalculator.tsx`) pass `wrapper`. The union, the
 generic and the `"wrapper" in props` narrowing are gone; a conditional `<div>` is `doWrap && <div>`, which
 needs no component.
 
-**`pages/homepage/sections/Testimonials.tsx` does not shuffle, and the shuffle it had did nothing three
+**`pages/homepage/sections/Testimonials.tsx` does not shuffle, and the shuffle it had did nothing, in several
 ways.** It was a `'use cache'` server component with `cacheLife('days')` then, and is a prerendered one now,
 so `TESTIMONIAL_KEYS.toSorted(() => Math.random() - 0.5)` ran once per cache period, and would run once per
 build, rather than per visitor: the order every reader saw was
 whatever one render happened to produce. `toSorted` with a random comparator is a biased shuffle regardless,
 and `CARD_STYLES[idx]` keys the avatar colour and the tilt to the *slot*, so a re-render silently repainted
 every testimonial. Rendering `TESTIMONIAL_KEYS` in order makes the colour a property of the person. Bringing
-a real shuffle back means moving it out of the cached body, and choosing between six styles keyed by index
-and six keyed by testimonial.
+a real shuffle back means moving it out of the cached body, and choosing between styles keyed by index
+and styles keyed by testimonial.
 
 `BRIDGE_WEEK` in [`pages/homepage/sections/Features.tsx`](./pages/homepage/sections/Features.tsx) is the shape the card's copy describes:
 Workdays Monday to Wednesday, a Thursday Holiday, a Friday PTO Day, then the weekend: a Bridge.
@@ -543,15 +543,15 @@ Reordering the array desyncs the illustration from the translated text beside it
 
 **[`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) mounts no `SidebarProvider` and must not grow one back.** It returns a
 fragment of `Sidebar` plus `SidebarInset` and reads the context from `app/[locale]/(app)/planner/layout.tsx`,
-the app's only mount site. It used to open a second provider inside the layout's, which gave the tree two
-independent `open`/`openMobile` pairs and two nested `div.flex.min-h-svh.w-full` wrappers; consumers agreed
+the app's only mount site. It used to open a second provider inside the layout's, which gave the tree a
+second independent `open`/`openMobile` pair and nested `div.flex.min-h-svh.w-full` wrappers; consumers agreed
 with each other only because they all happened to render inside the inner one. `Sidebar.test.tsx` fails on a
 second mount anywhere under `src/`. It also means `AppSidebar` is not self-contained: a host other than that
 layout has to supply the provider.
 
 **[`shared/donate/Donate.tsx`](./shared/donate/Donate.tsx)'s trigger is a `fixed` band, and the band is `pointer-events-none` while the
 button inside it is `pointer-events-auto`.** Below `md` the container is `w-full` and the `Button` inside
-carries `w-full` too, so the two edges coincide and the band is the button; that is the full-bleed mobile
+carries `w-full` too, so the edges coincide and the band is the button; that is the full-bleed mobile
 CTA and deleting the `w-full` would shrink it to its text. What the guards buy is the gap the container can
 open without anyone editing it: `donate-brutal`'s `nudge` keyframes translate the button up to 3px sideways
 for the last 12% of every four-second cycle, and `md:w-auto` reverses the coincidence outright the moment a
@@ -560,7 +560,7 @@ construction rather than by measurement.
 
 **The `bottom-[calc(15dvh+8px)]` default in the same file is the mobile planner drawer's collapsed snap
 point, written out by hand.** `DRAWER_SNAP.COLLAPSED` in [`pages/planner/ManagementBar.tsx`](./pages/planner/ManagementBar.tsx) is `0.15` and
-nothing keeps the two in step: change the snap point and the donate button either rides on top of the drawer
+nothing keeps them in step: change the snap point and the donate button either rides on top of the drawer
 or floats away from it. The marketing page already overrides the whole value with `bottomClassName`, which is
 the seam a fix would use: the planner layout passing its own offset, rather than a shared component holding
 one screen's number as its default.
