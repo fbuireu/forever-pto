@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import ts from "@typescript/typescript6";
 import { describe, expect, it } from "vitest";
 import webNextConfig, { PUBLIC_ENV, RUNTIME_ONLY } from "../apps/web/next.config";
@@ -13,6 +14,7 @@ const WORKSPACE_PACKAGES = [WEB, DOCS];
 const PACKAGE_GUIDES = WORKSPACE_PACKAGES.map((pkg) => `${pkg}/CLAUDE.md`);
 const LAYER_ROOTS = ["app", "application", "domain", "infrastructure", "ui"].map((layer) => `${WEB}/src/${layer}`);
 const LOCALES_DIR = `${WEB}/src/ui/i18n/messages`;
+const STARLIGHT_VENDOR = `${DOCS}/node_modules/@astrojs/starlight/dist`;
 const ADR_DIR = "adr";
 const ADR_TEMPLATE = "0000-adr-template.md";
 // Written by `pnpm cf:typegen` into the web package, so it is absent from the tracked tree by design.
@@ -1364,12 +1366,8 @@ describe("documentation does not point at things that are gone", () => {
 	});
 
 	// An override restating the vendor string byte for byte is worse than no override: it pins a value
-	// upstream may later correct, and it buries the handful that are real. This file carried eleven keys, of
-	// which four were deliberate shortenings; six were copies of Starlight's own Spanish bundle, and the
-	// eleventh was the reason the rule exists. `search.ctrlKey` read "Ctrl K" where `Search.astro` renders
-	// `<kbd>{ctrlKey}</kbd><kbd>K</kbd>`, so all 76 Spanish pages shipped a search box labelled "Ctrl K K".
-	// The vendor bundle is the baseline, so what is left in the file is exactly what this site changes.
-	it("overrides only the Starlight strings the docs site actually changes", () => {
+	// upstream may later correct, and it buries the handful that are real.
+	it("overrides only the Starlight strings the docs site actually changes", async () => {
 		const overrides = trackedFiles.filter(
 			(path) => path.startsWith(`${DOCS}/src/content/i18n/`) && path.endsWith(".json"),
 		);
@@ -1379,10 +1377,10 @@ describe("documentation does not point at things that are gone", () => {
 		expect(overrides.length).toBeGreaterThan(0);
 
 		for (const file of overrides) {
-			const vendor = `${DOCS}/node_modules/@astrojs/starlight/translations/${basename(file, ".json")}.json`;
+			const vendor = `${STARLIGHT_VENDOR}/translations/${basename(file, ".json")}.js`;
 			expect(existsSync(join(ROOT, vendor)), `${vendor} is absent, so this rule would read nothing`).toBe(true);
 
-			const defaults: Record<string, string> = readJson(vendor);
+			const defaults: Record<string, string> = (await import(pathToFileURL(join(ROOT, vendor)).href)).default;
 			for (const [key, value] of Object.entries(readJson(file) as Record<string, string>)) {
 				checked += 1;
 				if (defaults[key] === value) restated.push(`${file} -> ${key} restates the Starlight default`);
@@ -1407,7 +1405,7 @@ describe("documentation does not point at things that are gone", () => {
 	it("overrides search.ctrlKey with a modifier alone, because Starlight renders the K itself", () => {
 		const SEARCH_SHORTCUT = /<kbd>\{[^}]*search\.ctrlKey[^}]*\}<\/kbd><kbd>K<\/kbd>/;
 		const MODIFIER_ALONE = /^\S{1,5}$/;
-		const search = `${DOCS}/node_modules/@astrojs/starlight/components/Search.astro`;
+		const search = `${STARLIGHT_VENDOR}/components/Search.astro`;
 
 		expect(existsSync(join(ROOT, search)), `${search} is absent, so this rule would read nothing`).toBe(true);
 		expect(SEARCH_SHORTCUT.test(read(search))).toBe(true);

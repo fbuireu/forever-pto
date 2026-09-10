@@ -39,12 +39,12 @@ describe("tracingConfig", () => {
 		expect(config.service.name).toBe(LOG_SERVICE);
 	});
 
-	it("drops spans through an exporter that reports success, so the library neither warns nor retries", () => {
+	it("drops spans through an exporter that reports success, so the library neither warns nor retries", async () => {
 		const outcomes: unknown[] = [];
 
 		DROP_SPANS.export([], (result) => outcomes.push(result));
 
 		expect(outcomes).toEqual([{ code: 0 }]);
-		expect(DROP_SPANS.shutdown()).resolves.toBeUndefined();
+		await expect(DROP_SPANS.shutdown()).resolves.toBeUndefined();
 	});
 });
