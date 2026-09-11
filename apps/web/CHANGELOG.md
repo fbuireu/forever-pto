@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.10.3](https://github.com/fbuireu/forever-pto/compare/web-v1.10.2...web-v1.10.3) (2026-09-11)
+
+
+### Bug Fixes
+
+* **web:** mirror Stripe's open payment-status enum instead of closing it ([36a2621](https://github.com/fbuireu/forever-pto/commit/36a26219156b6e0657a34be0ec577f8f173044b4))
+
 # [forever-pto-web-v1.10.1](https://github.com/fbuireu/forever-pto/compare/web-v1.10.0...web-v1.10.1) (2026-09-06)
 
 
