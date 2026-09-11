@@ -4,6 +4,7 @@ import { describeFailure } from "@infrastructure/api/errors";
 import type { ValidationError } from "@infrastructure/errors";
 import { ApplicationLayer } from "@infrastructure/layers";
 import type { PublicEnv } from "@infrastructure/services/env/getPublicEnv";
+import { traced } from "@infrastructure/span";
 import { Effect } from "effect";
 import { after } from "next/server";
 import type { ApiOutcome } from "./types";
@@ -15,7 +16,10 @@ export interface SendContactRequestParams {
 	config: PublicEnv;
 }
 
-export const sendContactRequest = ({ input, config }: SendContactRequestParams): Promise<ApiOutcome<ContactBody>> =>
+export const sendContactRequest = (params: SendContactRequestParams): Promise<ApiOutcome<ContactBody>> =>
+	traced({ name: "sendContactEmail", run: () => sendContactProgram(params) });
+
+const sendContactProgram = ({ input, config }: SendContactRequestParams): Promise<ApiOutcome<ContactBody>> =>
 	Effect.runPromise(
 		input.pipe(
 			Effect.flatMap((body) => sendContactEmail({ data: body, config })),
