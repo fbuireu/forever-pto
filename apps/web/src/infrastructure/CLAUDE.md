@@ -70,6 +70,21 @@ the caller decides the fallback and the precedence is assertable without renderi
 | `workers/` | The calculations Web Worker and its message contract. See [`workers/CLAUDE.md`](./workers/CLAUDE.md) |
 | [`errors.ts`](./errors.ts) | Every tagged error in the app: `DatabaseError`, `EmailError`, `MissingDonorEmailError`, `PaymentError` and its `PaymentRequestError` subclass, `PromoCodeError`, `RateLimitError`, `SessionError`, `ValidationError`, `WebhookError` |
 | [`layers.ts`](./layers.ts) | `ApplicationLayer`: the Live layers merged, provided at every entry point |
+| [`span.ts`](./span.ts) | `traced({ name, run })`: opens a named span through the runtime's `ctx.tracing` so a trace reads `createPayment` rather than `POST`. Wrapped around every entry point that terminates an Effect program |
+
+**`traced` resolves the tracing API first and calls the work exactly once, which is the whole of why it is
+not a `try`/`catch` around the call.** Wrapping `ctx.tracing.enterSpan(name, run)` in a `catch` that falls
+back to `run()` reads the same and is a double-charge bug: a rejected payment would land in the `catch` and
+be run a second time. So the lookup of `getCloudflareContext().ctx.tracing` is what is guarded, and the
+result decides which of the two single calls happens. `span.test.ts` pins the call count on every path,
+including the rejecting one, because that is the assertion that can tell the two shapes apart.
+
+The names are the use cases' (`createPayment`, `sendContactEmail`, `activatePremium`,
+`processWebhookEvent`, `verifySession`, `paymentConfirmation`), so a trace in the log sink reads as the
+operation rather than as `POST`. They sit at the entry point rather than inside the Effect program because
+the runtime's span API is callback-scoped and hands out no span id, so Effect's `Tracer` cannot be bridged
+onto it; [ADR 0017](../../../../adr/0017-observability-is-the-platform-export.md) has the detail. The
+`Effect.withSpan` call each use case still ends in is not what produces these.
 
 There is no `services/calendar/`. The planning engine is `@domain/calendar/`, and `FilterStrategy` is declared
 there, not here.

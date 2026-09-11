@@ -6,11 +6,16 @@ import {
 	StripeServerService,
 } from "@infrastructure/clients/payments/stripe/serverService";
 import { ApplicationLayer } from "@infrastructure/layers";
+import { traced } from "@infrastructure/span";
 import { Effect } from "effect";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
+	return traced({ name: "processWebhookEvent", run: () => handleStripeWebhook(request) });
+}
+
+async function handleStripeWebhook(request: NextRequest) {
 	const [body, headersList] = await Promise.all([request.text(), headers()]);
 	const signature = headersList.get("stripe-signature");
 

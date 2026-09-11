@@ -4,6 +4,7 @@ import { ApplicationLayer } from "@infrastructure/layers";
 import { routeMetadata } from "@infrastructure/seo/routeMetadata";
 import { confirmation } from "@infrastructure/services/payments/confirmation";
 import { ACTIVATION_FAILED } from "@infrastructure/services/premium/activation";
+import { traced } from "@infrastructure/span";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@ui/modules/core/primitives/Card";
 import { MAIN_CONTENT_ID } from "@ui/modules/layout/SkipToContent";
@@ -87,7 +88,10 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
 		redirect(`/${locale}`);
 	}
 
-	const data = await Effect.runPromise(confirmation(paymentIntentId).pipe(Effect.provide(ApplicationLayer)));
+	const data = await traced({
+		name: "paymentConfirmation",
+		run: () => Effect.runPromise(confirmation(paymentIntentId).pipe(Effect.provide(ApplicationLayer))),
+	});
 
 	if (!data || !hasSucceeded(data)) {
 		return <PaymentError charged={wasCharged(data)} />;

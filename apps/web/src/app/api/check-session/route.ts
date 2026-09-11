@@ -10,11 +10,16 @@ import { ApplicationLayer } from "@infrastructure/layers";
 import { clearPremiumCookie, PREMIUM_COOKIE, setPremiumCookie } from "@infrastructure/services/premium/cookie";
 import { verifySession as verifySessionEffect } from "@infrastructure/services/premium/session";
 import { isSessionConfigurationError } from "@infrastructure/services/premium/sessionErrors";
+import { traced } from "@infrastructure/span";
 import { Effect } from "effect";
 import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
 
 export async function GET(_request: NextRequest) {
+	return traced({ name: "verifySession", run: readPremiumSession });
+}
+
+async function readPremiumSession() {
 	const cookieStore = await cookies();
 	const token = cookieStore.get(PREMIUM_COOKIE)?.value;
 

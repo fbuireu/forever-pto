@@ -11,6 +11,7 @@ import type {
 } from "@infrastructure/errors";
 import { ApplicationLayer } from "@infrastructure/layers";
 import { checkRateLimit } from "@infrastructure/services/payments/rateLimit";
+import { traced } from "@infrastructure/span";
 import { Effect } from "effect";
 import { after } from "next/server";
 import { type RequestContext, UNKNOWN_IP } from "./types";
@@ -52,7 +53,10 @@ export interface ActivatePremiumRequestParams {
 	program: Effect.Effect<ActivationResult, ActivationFailure, StripeServerService | LoggerService | TursoService>;
 }
 
-export const activatePremiumRequest = ({
+export const activatePremiumRequest = (params: ActivatePremiumRequestParams): Promise<ActivationOutcome> =>
+	traced({ name: "activatePremium", run: () => activatePremiumProgram(params) });
+
+const activatePremiumProgram = ({
 	context: { ipAddress },
 	program,
 }: ActivatePremiumRequestParams): Promise<ActivationOutcome> =>

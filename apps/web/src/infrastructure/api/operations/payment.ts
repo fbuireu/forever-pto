@@ -5,6 +5,7 @@ import { describeFailure } from "@infrastructure/api/errors";
 import type { ValidationError } from "@infrastructure/errors";
 import { ApplicationLayer } from "@infrastructure/layers";
 import { checkRateLimit } from "@infrastructure/services/payments/rateLimit";
+import { traced } from "@infrastructure/span";
 import { Effect } from "effect";
 import { after } from "next/server";
 import { type ApiOutcome, type RequestContext, UNKNOWN_IP } from "./types";
@@ -14,7 +15,10 @@ export interface CreatePaymentRequestParams {
 	context: RequestContext;
 }
 
-export const createPaymentRequest = ({
+export const createPaymentRequest = (params: CreatePaymentRequestParams): Promise<ApiOutcome<CreatePaymentResult>> =>
+	traced({ name: "createPayment", run: () => createPaymentProgram(params) });
+
+const createPaymentProgram = ({
 	input,
 	context: { userAgent, ipAddress },
 }: CreatePaymentRequestParams): Promise<ApiOutcome<CreatePaymentResult>> =>
