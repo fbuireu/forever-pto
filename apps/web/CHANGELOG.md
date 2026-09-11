@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.10.7](https://github.com/fbuireu/forever-pto/compare/web-v1.10.6...web-v1.10.7) (2026-09-11)
+
+
+### Bug Fixes
+
+* teach the release parsers the ! grammar in both packages ([3a264b3](https://github.com/fbuireu/forever-pto/commit/3a264b3a03b550367ebceb2b5a1c9c937b7110d8))
+
 # [forever-pto-web-v1.10.6](https://github.com/fbuireu/forever-pto/compare/web-v1.10.5...web-v1.10.6) (2026-09-11)
 
 
