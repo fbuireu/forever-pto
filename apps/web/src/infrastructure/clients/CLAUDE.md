@@ -16,80 +16,57 @@ nothing: the inferred type widens to include `LoggerService` and the build stays
 [ADR 0013](../../../../../adr/0013-loggerservice-stays-a-tag.md) records the decision and what it costs, so
 the next architecture pass does not re-propose deleting it.
 
-## The tail Worker, the app and the traces share one log contract
+## The log contract outlives the Worker that shared it
 
-[`better-stack/contract.ts`](./logging/better-stack/contract.ts) holds `LOG_SERVICE`, the levels the app emits and `toLogLevel`. It is types
-and constants only, deliberately, because [`workers/tail/index.ts`](../../../workers/tail/index.ts) imports it by relative path and must not
-pull `@logtail/edge` or `@opennextjs/cloudflare` into a Worker that has neither. `wrangler deploy --dry-run`
-over [`workers/tail/wrangler.toml`](../../../workers/tail/wrangler.toml) confirms the bundle still builds at 1.87 KiB.
+[`better-stack/contract.ts`](./logging/better-stack/contract.ts) holds `LOG_SERVICE`, the levels the app
+emits, `toLogLevel` and `stripQuery`. It was types and constants only so that a tail consumer Worker could
+import it by relative path without pulling `@logtail/edge` or `@opennextjs/cloudflare` into a bundle that had
+neither. That Worker is gone, since logs leave through Cloudflare's own OTLP export now
+([ADR 0017](../../../../../adr/0017-observability-is-the-platform-export.md)), and the module stays as it is
+anyway, because each of its functions still answers a question the app asks.
 
-Both sides ship to the same BetterStack source and **shared no queryable field**. The app stamps
-`{ environment, service: 'forever-pto' }` on every entry; the tail Worker stamped
-`{ script, outcome, url, method, status }` and neither of the app's, so "all errors in production" could not
-be expressed in one query. The tail Worker stamps `service` now. `environment` stays out of it on purpose:
-that Worker is deployed once and receives events from every app Worker, so a fixed value would be wrong;
-`script` is the discriminator, carrying `forever-pto` or `pr-<n>-forever-pto-development`.
+**`stripQuery` is the one to understand before touching anything here.** It encodes "a URL logged off-worker
+must not carry its query string, because Stripe appends `payment_intent_client_secret` to the return URL",
+a statement about this app's payment flow. Cloudflare's `redact_query_string = true` in
+[`wrangler.toml`](../../../wrangler.toml) redacts the **request** URL in logs and traces; it does not touch a
+`url` field a caller puts in a structured log context, and that is the leak this guards.
+[`api/payment/activate/route.ts`](../../app/api/payment/activate/route.ts) reads
+`payment_intent_client_secret` off the query, already emits a log line per failure, and `matchesClientSecret`
+is the only guard on a GET that mints a Premium session, so `{ url: request.url }` added while debugging
+would have shipped the secret to the sink. The rule is enforced at the seam rather than at call sites:
+`BetterStackClient.getFullContext` strips a string `url` on every entry, whichever method emitted it and
+whether it arrived in the call or on the base context, so no caller has to remember. A caller that genuinely
+wants a query string has to name the field something other than `url`, which is the point: the redaction is
+keyed on the field name, not on who wrote it.
 
-**The level vocabularies also disagreed.** workerd emits `log` and `trace`, which the app never does, so a
-filter on `level` silently missed them. `toLogLevel` folds anything unrecognised onto `info`; `index.test.ts`
-pins `['log', 'warn', 'trace'] → ['info', 'warn', 'info']`.
+**`toLogLevel` folds an unrecognised level onto `info`, and it now has one reader instead of two.** workerd
+emits `log` and `trace`, which the app never does; the tail Worker used to normalise them on the way out, and
+the native export does not, so a BetterStack query filtering on `level` has to account for them itself. On the
+app's side [`client.ts`](./logging/better-stack/client.ts) reads the union rather than restating it: it
+imports `LOG_LEVEL` and `LogLevel` and its methods dispatch through the constant, so a level added to the
+contract fails to compile here, since `send` indexes the Logtail transport by the level and Logtail has no
+method for a name it does not know. `client.test.ts` iterates `LOG_LEVEL` and asserts each level reaches the
+transport method of its own name and no other.
 
-**The app side reads that union rather than restating it.** [`client.ts`](./logging/better-stack/client.ts) already imported `LOG_SERVICE` from
-the contract and then declared its own `type LogLevel = 'debug' | 'info' | 'warn' | 'error'` beside it: the
-same names, written twice, with nothing holding them together. It imports `LOG_LEVEL` and `LogLevel`
-now and its methods dispatch through the constant, so a level added to the contract fails to
-compile here: `send` indexes the Logtail transport by the level, and Logtail has no method for a name it
-does not know. On the tail Worker's side the same addition would keep folding onto `info`, silently, which
-is why the compile error has to live on this side. `client.test.ts` iterates `LOG_LEVEL` and asserts each
-level reaches the transport method of its own name and no other.
+## Traces are the platform's, and no log line carries a trace id from here
 
-**`stripQuery` is in the contract, and both sides read it.** It encodes "a URL logged off-worker must not
-carry its query string, because Stripe appends `payment_intent_client_secret` to the return URL", a
-statement about this app's payment flow, and it used to be a private function in the tail Worker where
-nothing on the app side could reach it. That was one added log context away from a live leak:
-[`api/payment/activate/route.ts`](../../app/api/payment/activate/route.ts) reads `payment_intent_client_secret` off the query, already emits a log line
-per failure, and `matchesClientSecret` is the only guard on a GET that mints a Premium session, so
-`{ url: request.url }` added while debugging would have shipped the secret to the sink.
+There is no tracer in this folder and no OpenTelemetry dependency in the package. Cloudflare instruments
+handler invocations, outbound `fetch` and binding calls itself, attributes `console.*` to the active span, and
+stamps the trace id on every exported log record, so the correlation a helper in this folder used to build by
+hand arrives on the far side without the app producing it.
 
-It sits in `contract.ts` rather than beside the client because that module is types and constants only,
-which is what keeps the Worker's bundle free of `@logtail/edge` and `@opennextjs/cloudflare`. The rule is
-enforced at the seam rather than at call sites: `BetterStackClient.getFullContext` strips a string `url` on
-every entry, whichever method emitted it and whether it arrived in the call or on the base context, so no
-caller has to remember. A caller that genuinely wants a query string has to name the field something other
-than `url`, which is the point: the redaction is keyed on the field name, not on who wrote it.
+**That file had to go with the wrapper rather than after it**, and the reason generalises: `trace.getActiveSpan()`
+reads `@opentelemetry/api`'s global context manager, and the deleted `@microlabs/otel-cf-workers` wrapper was
+the only thing in the tree that ever called `setGlobalContextManager`. Left behind, it would have returned
+`undefined` on every call and stamped `{}` on every log line, with its own test still green because that test
+installed a context manager by hand. A helper whose test supplies the very thing production stopped providing
+is the shape to check for.
 
-`index.test.ts` asserts the Worker imports `stripQuery` rather than declaring its own, because a second
-local copy would pass every behavioural test in that file while drifting from the one the app enforces.
-
-**Traces stamp the same `LOG_SERVICE` and go to the same host.** [`tracing.ts`](./logging/better-stack/tracing.ts)
-sits beside the contract for that reason: it names the service the logs name, so a span and the log line it
-failed on answer one query, and it targets the `/v1/traces` path of `BETTER_STACK_INGESTING_URL` under
-`BETTER_STACK_SOURCE_TOKEN`, the bindings the tail Worker reads. It imports the contract and the package
-manifest and nothing else, because the Worker entrypoint bundles it before Next has loaded. With either
-binding unbound it returns a configuration exporting through `DROP_SPANS`, which acknowledges and discards,
-rather than one pointed at `undefined` or one with no exporter, which the library warns about on every request;
-`tracing.test.ts` pins that fallback, the sampling ratio and the header.
-
-**`tracer.ts` is what makes `Effect.withSpan` reach BetterStack, and it is deliberately not
-`@effect/opentelemetry`.** That package would do the same job and declares a tree of peer dependencies, most of
-them SDK packages the Worker never runs; the bridge is one file. `Tracer.make` gets its hooks. `span` opens an
-OpenTelemetry span through `trace.getTracer(LOG_SERVICE)`, parented on the Effect parent when there is one
-and otherwise on whatever OpenTelemetry context is active, which inside a request is the root span
-`@microlabs/otel-cf-workers` opened for it. `context` runs the fiber with the Effect span set as the active
-OpenTelemetry context, so a `fetch` made inside a use-case nests under the use-case's span rather than
-under the request's. The Effect side of each span (`status`, `attributes`, `links`) is kept as well, because
-`Effect.currentSpan` and the test helpers read it. A failed exit sets `ERROR` with `Cause.pretty`; an
-interruption does not. Attribute values that are not primitives are stringified, since OpenTelemetry
-accepts nothing else. `tracer.test.ts` runs a real `BasicTracerProvider` with an in-memory exporter and an
-`AsyncLocalStorageContextManager`, the same context manager the Worker library installs, and pins the
-parenting in both directions, the error status and the attribute carry-over.
-
-**Every log entry carries the active span's `traceId` and `spanId`.** [`correlation.ts`](./logging/better-stack/correlation.ts)
-reads them off `trace.getActiveSpan()` and `BetterStackClient.getFullContext` spreads them under the base
-context, so inside a request a log line names the request span, and inside a use-case it names the
-use-case's own span, since the bridge makes that one active. Off a span it adds nothing rather than empty
-strings. A caller's own `traceId` wins, which is how a log about a *different* trace stays sayable.
-`correlation.test.ts` and `client.test.ts` pin both halves.
+**`Effect.withSpan` stays on every use case and is wired to nothing.** Effect's `Tracer.Span` wants a
+`traceId`, a `spanId` and a caller-supplied end timestamp on a span built synchronously; the runtime's
+`cloudflare:workers` span has none of those and exists only inside a callback, so the bridge cannot be
+repointed at it. The calls are free, they name the boundary of each use case, and they are the attachment
+point if that changes. `ApplicationLayer` in [`../layers.ts`](../layers.ts) no longer merges a `TracerLive`.
 
 ## Purpose
 
@@ -238,8 +215,6 @@ exercises. Adding a method here means adding its caller and its error mapping in
 | `payments/stripe/client.ts` | Runs in the browser, where there is no layer to provide |
 | [`logging/better-stack/client.ts`](./logging/better-stack/client.ts) | Deliberate exception: `getBetterStackInstance()` is what stores, lookups and components use ([ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md)) |
 | [`logging/better-stack/tracking.ts`](./logging/better-stack/tracking.ts) | Not a logger at all: `track()` and `identifyUser()` push to the `window.betterstack` snippet injected by the UI layer's [`modules/tracking/BetterStackTracking.tsx`](../../ui/modules/tracking/BetterStackTracking.tsx). Both no-op when the snippet has not loaded. `trackingEnvironment(hostname)` is the pure rule beside them, deciding `development` for `localhost` and `.workers.dev` hosts and `production` for the rest, because `NODE_ENV` is `production` on a preview Worker too |
-| [`logging/better-stack/tracing.ts`](./logging/better-stack/tracing.ts) | Not a client either: `tracingConfig(env)` is a pure function the Worker entrypoint [`worker.ts`](../../../worker.ts) hands to `instrument`, so it runs before Next does and outside any layer ([ADR 0016](../../../../../adr/0016-traces-reach-betterstack-by-wrapping-the-opennext-entrypoint.md)) |
-| [`logging/better-stack/tracer.ts`](./logging/better-stack/tracer.ts) | An Effect `Tracer`, not a client: `TracerLive` is `Layer.setTracer` over a bridge from Effect spans to the OpenTelemetry tracer the Worker wrapper registers, merged into `ApplicationLayer` |
 | [`tutorial/driver/client.tsx`](./tutorial/driver/client.tsx) | Wraps driver.js, a DOM library. It renders a close icon into the popover, but never imports one: the icon arrives as the injected `closeIcon?: ReactNode` config field, so nothing here reaches into `@ui/*` |
 
 `logging/better-stack/client.ts` is the one to read before touching. **A log call cannot fail its caller, and
