@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.10.4](https://github.com/fbuireu/forever-pto/compare/web-v1.10.3...web-v1.10.4) (2026-09-11)
+
+
+### Bug Fixes
+
+* **web:** name the spans an operation is recognised by in the log sink ([fd89ad2](https://github.com/fbuireu/forever-pto/commit/fd89ad29b081416080964fc4137a162d5dc7c64b))
+
 # [forever-pto-web-v1.10.3](https://github.com/fbuireu/forever-pto/compare/web-v1.10.2...web-v1.10.3) (2026-09-11)
 
 
