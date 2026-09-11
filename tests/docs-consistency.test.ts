@@ -2389,3 +2389,47 @@ describe("stated versions", () => {
 		expect(stated).toEqual([]);
 	});
 });
+
+const BREAKING_PARSER_OPTS = {
+	headerPattern: "^(\\w*)(?:\\((.*)\\))?!?: (.*)$",
+	breakingHeaderPattern: "^(\\w*)(?:\\((.*)\\))?!: (.*)$",
+};
+const COMMIT_PARSING_PLUGINS = ["@semantic-release/commit-analyzer", "@semantic-release/release-notes-generator"];
+const RELEASE_CONFIG_PATTERN = /^\.releaserc(\.\w+)?$|^release\.config\./;
+
+type ReleasePlugin = string | [string, Record<string, unknown>?];
+
+interface ParserOptsOfParams {
+	plugins: ReleasePlugin[];
+	name: string;
+}
+
+const parserOptsOf = ({ plugins, name }: ParserOptsOfParams): unknown => {
+	const entry = plugins.find((plugin) => (Array.isArray(plugin) ? plugin[0] : plugin) === name);
+
+	return Array.isArray(entry) ? entry[1]?.parserOpts : undefined;
+};
+
+const releaseConfigs = (): string[] =>
+	["", ...readdirSync(join(ROOT, "apps")).map((app) => `apps/${app}`)].flatMap((dir) =>
+		readdirSync(join(ROOT, dir || "."))
+			.filter((entry) => RELEASE_CONFIG_PATTERN.test(entry))
+			.map((entry) => (dir ? `${dir}/${entry}` : entry)),
+	);
+
+describe("the release configs parse the commit grammar commitlint accepts", () => {
+	const configs = releaseConfigs();
+
+	it("teaches every plugin that parses a commit message the same header grammar, in every package", () => {
+		const wrong = configs.flatMap((file) => {
+			const { plugins } = readJson(file) as { plugins: ReleasePlugin[] };
+
+			return COMMIT_PARSING_PLUGINS.filter(
+				(name) => JSON.stringify(parserOptsOf({ plugins, name })) !== JSON.stringify(BREAKING_PARSER_OPTS),
+			).map((name) => `${file}: ${name}`);
+		});
+
+		expect(configs.length).toBeGreaterThan(1);
+		expect(wrong).toEqual([]);
+	});
+});
