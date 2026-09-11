@@ -687,6 +687,24 @@ relative-link rule could not catch because they were prose rather than links.
   reaches the CSS pipeline answers `Invalid PostCSS Plugin found at: plugins[0]`. The plain unit suite never
   gets there and passes; `test:ut:changed` does and fails. It had been failing since before anything called
   it, which is why nobody knew: no workflow and no hook ran it.
+- **Both release configs teach their parsers the `!` grammar, and a bare config silently drops every breaking
+  change.** `@semantic-release/commit-analyzer` falls back to `conventional-changelog-angular`, whose
+  `headerPattern` is `/^(\w*)(?:\((.*)\))?: (.*)$/`: it wants the colon straight after the scope, so
+  `feat(web)!: …` does not match, the commit is analysed with no type at all and the analyser answers *no
+  release*. The job ends green and publishes nothing, which is the failure mode that matters, and it has
+  already happened here: `feat(web)!: export logs and traces through Cloudflare` cut neither line until a
+  later ordinary commit released past it. Nothing warns you, because `@commitlint/config-conventional`
+  accepts the `!` that the spec defines, so the pull-request title check passes while only the release
+  quietly does nothing. The fix is `parserOpts` on **both** parsing plugins in **both** packages, adding
+  `!?` to the header pattern and a `breakingHeaderPattern`; `semantic-release-monorepo` only decorates those
+  steps to filter commits by package, so the plugin config passes through untouched. The `preset` route looks
+  tidier and does not work: `conventional-changelog-conventionalcommits@10` needs
+  `conventional-changelog-writer@9` while `@semantic-release/release-notes-generator` pins `^8.0.0`, so the
+  notes step dies on *Missing helper*, and pinning an older preset does not help either, since the analyser
+  resolves a preset by name from its own directory first, where pnpm's hidden `node_modules/.pnpm/node_modules`
+  hoist exposes whichever copy commitlint installed. `tests/docs-consistency.test.ts` asserts every config
+  carries the same `parserOpts`. Note that `!` then means major on **any** type, exactly as a
+  `BREAKING CHANGE:` footer already did.
 - **The `v1` floating tag is stale and nothing maintains it.** It diverges between local and remote, which
   makes semantic-release's own `git fetch --tags` fail outright with *would clobber existing tag*. No
   workflow moves it and no ADR records it.
