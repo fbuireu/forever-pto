@@ -5,7 +5,7 @@ sidebar:
   order: 14
 ---
 
-Telemetry converges on **Better Stack** (Logtail), fed from several surfaces: the Cloudflare platform, the server runtime, the browser, plus Google Analytics for product metrics.
+Telemetry converges on **Better Stack**, fed from several surfaces: the Cloudflare platform, the server runtime, the browser, plus Google Analytics for product metrics. Nothing in the app opens a connection to it. The server side writes to `console` and Cloudflare exports; the browser side is a tag.
 
 ## Cloudflare Workers observability
 
@@ -25,8 +25,10 @@ Every use case under `apps/web/src/application/use-cases` still ends in `Effect.
 
 ## Server-side logging
 
-- `apps/web/src/infrastructure/clients/logging/better-stack/client.ts` holds `getBetterStackInstance()`, the client plain code uses directly ([country detection](/how-it-works/country-detection/), stores, services). Under it, one `@logtail/edge` `Logtail` transport per request, keyed on the Cloudflare execution context and configured with `NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN` / `NEXT_PUBLIC_BETTER_STACK_INGESTING_URL`: a request's lines batch together and flush inside its own `waitUntil`. It used to be one module-level instance, and on workerd a batch timer armed by one request delivering another request's lines is an I/O violation the runtime cancels the request for. Off a request there is no `waitUntil`, so the transport is throwaway and flushes at once.
-- Every entry has its `url` field stripped of its query string by `stripQuery`, because Stripe appends `payment_intent_client_secret` to the return URL. That is a different guarantee from `redact_query_string` above, which covers the request URL rather than a field a caller passes in a log context.
+- `apps/web/src/infrastructure/clients/logging/better-stack/client.ts` holds `getBetterStackInstance()`, the client plain code uses directly ([country detection](/how-it-works/country-detection/), stores, services). Under it there is no SDK and no HTTP call: `send` writes one JSON line to the `console` method of the level, and the platform export above carries it. The spread order inside that line is load-bearing, with the caller's context first, so a caller cannot relabel its own level, message or service; the tests pin all three.
+- That is what puts a trace id on the app's own log lines. It did not for one release: the client held a `@logtail/edge` transport and posted over HTTP from inside the Worker, which the runtime cannot see, so spans and logs both arrived and nothing joined them. See [ADR 0018](https://github.com/fbuireu/forever-pto/blob/main/adr/0018-the-platform-is-the-log-transport.md), which also records the price: the fields are serialised here and parsed back out of the JSON body by the sink, rather than handed over as an object.
+- Every entry has its `url` field stripped of its query string by `stripQuery`, because Stripe appends `payment_intent_client_secret` to the return URL. That is a different guarantee from `redact_query_string` above, which covers the request URL the platform records rather than a field a caller passes in a log context.
+- In the browser the same client writes to the browser console, which reaches Better Stack only through the RUM tag below and only after analytics consent. Before this it posted over HTTP regardless of consent.
 - `apps/web/src/infrastructure/clients/logging/better-stack/service.ts` holds `LoggerService`, the Effect wrapper used inside use-cases; it is part of `ApplicationLayer`.
 
 A privacy convention runs through all call sites: log the email **domain**, ids and flags, never full addresses or payloads.

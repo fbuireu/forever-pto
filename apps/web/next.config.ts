@@ -20,8 +20,6 @@ const isProd = process.env.NODE_ENV === "production";
 export const RUNTIME_ONLY = "runtime-only";
 
 export const PUBLIC_ENV = {
-	NEXT_PUBLIC_BETTER_STACK_INGESTING_URL: z.url().optional(),
-	NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN: z.string().optional(),
 	NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN: z.string().optional(),
 	NEXT_PUBLIC_CONTACT_EMAIL: RUNTIME_ONLY,
 	NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: z.string().optional(),
