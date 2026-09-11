@@ -9,7 +9,6 @@ export default defineConfig({
 	},
 	test: {
 		environment: "happy-dom",
-		clearMocks: false,
 		testTimeout: 20_000,
 		reporters: process.env.GITHUB_ACTIONS
 			? ["default", summaryLabel("Unit suite (forever-pto-web)"), "github-actions"]

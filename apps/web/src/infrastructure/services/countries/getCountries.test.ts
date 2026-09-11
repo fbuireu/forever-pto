@@ -28,6 +28,7 @@ vi.mock("@application/dto/country/dto", () => ({
 }));
 
 const { getCountries } = await import("./getCountries");
+const registeredAtLoad = [...mockRegisterLocale.mock.calls];
 
 beforeEach(() => {
 	mockGetNames.mockReset();
@@ -37,11 +38,11 @@ beforeEach(() => {
 
 describe("locale registration", () => {
 	it("registers all 6 locales at module load", () => {
-		expect(mockRegisterLocale).toHaveBeenCalledTimes(6);
+		expect(registeredAtLoad).toHaveLength(6);
 	});
 
 	it("registers ca, de, en, es, fr and it locales", () => {
-		const registeredLocales = mockRegisterLocale.mock.calls.map((call) => (call[0] as { locale: string }).locale);
+		const registeredLocales = registeredAtLoad.map((call) => (call[0] as { locale: string }).locale);
 		expect(registeredLocales).toEqual(expect.arrayContaining([CA, DE, EN, ES, FR, IT]));
 	});
 });

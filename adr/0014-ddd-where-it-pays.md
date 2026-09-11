@@ -8,6 +8,10 @@ Accepted. States the rule that [ADR 0003](./0003-pure-calendar-domain-effectful-
 [ADR 0012](./0012-shared-date-helpers-stay-in-the-application-layer.md) were each applying case by case
 without naming it.
 
+Amended on 2026-09-11. Worked example 2 answered *Reachable: no* on the grounds that Stripe owns the payment
+status, and that was wrong: Stripe's enums are **open**, so it adds values on an API version already pinned.
+The rerun and what it bought are recorded in that example.
+
 ## Context
 
 This tree speaks domain-driven design fluently and never says so. `CONTEXT.md` opens by calling itself "the
@@ -152,12 +156,36 @@ rejections matter as much as the fixes: a rule is only as clear as the cases it 
    Holiday silently drops out of the Summary counts, the composition pie, the year timeline and the table
    while still occupying its date. Yes on every question, so it earned code: `isHolidayVariant` beside the union, and a
    drop at the rehydration seam.
-2. **The `succeeded` payment status, written once in TypeScript and again inside every SQL statement. Reachable: no.
-   Read: yes. Crosses: yes.** Stripe owns the value, so no code path here can produce a divergent one. A
-   bound parameter in each statement would couple this SQL to a word Stripe cannot change and pay for
-   it in statements that read less like the SQL they are. So the rule is written instead, as an assertion
-   that every `status` comparison in `repository.ts` names `PAYMENT_SUCCEEDED`'s value and no other, with a
+2. **The `succeeded` payment status, written once in TypeScript and again inside every SQL statement.
+   Reachable: no, then yes. Read: yes. Crosses: yes.** The *word* is still Stripe's, and the SQL half of this
+   is unchanged: a bound parameter in each statement would couple the SQL to a word Stripe cannot change and
+   pay for it in statements that read less like the SQL they are, so that half stays an assertion, with a
    floor so a rewritten statement fails rather than emptying the set.
+
+   The first question is what changed. It was answered *no* because "Stripe owns the value, so no code path
+   here can produce a divergent one", and that reasoning skipped a step: nothing here produces one, but
+   Stripe *sends* one. Its enums are documented as **open** — it adds values to them on an API version
+   already pinned — and `stripe@22.6.1` made that explicit in the types by widening
+   `PaymentIntent.Status` with its `OtherString` marker. Pinning `apiVersion` never bought what this example
+   assumed it bought.
+
+   So the answer is yes on all three, and the union earned code. What it did *not* earn is a sentinel: an
+   eighth member would be a domain word for "Stripe said something we do not model", and the raw value —
+   the only thing worth having when reconciling a payment — would be thrown away to make room for it.
+   Nor an error path: a status this tree does not model must not turn a webhook into a retry loop, and the
+   consumers already answer correctly without one, because every decision is *is it succeeded*, never
+   *which of the seven is it*. The shape is to mirror upstream's contract instead of closing it:
+   `PAYMENT_STATUSES` is the list this product reasons about, `PaymentStatus` is derived from it, and
+   `ReportedPaymentStatus` is that union widened the same way Stripe widens its own. The value reaches the
+   database exactly as Stripe sent it.
+
+   Widening costs the exhaustiveness that made a misspelt comparison a type error, and two rules pay it
+   back. One asserts `PAYMENT_STATUSES` still equals the union the installed SDK publishes, so a status
+   Stripe adds fails the suite rather than sitting outside the list with every gate green. The other used to
+   read "no module that *imports the constant* may spell the literal beside it", which made it blind to the
+   file that needed it most: `confirmation/page.tsx` compared against a bare `"succeeded"` and imported
+   nothing. It now reads every production module, with three exemptions that each mean a different thing by
+   the word, and each exemption asserts it still does.
 3. **A typed `HolidayId`. Reachable: no. Read: yes. Crosses: yes.** Its producers each build the string their
    own way: `national-<raw upstream date>`, `custom-<ISO datetime>` and `manual-<index>`. That looks like a
    value object asking to exist, and the collision it would prevent is unreachable: `addHoliday` refuses any

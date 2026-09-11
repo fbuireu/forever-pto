@@ -1,9 +1,9 @@
-import type { PaymentStatus } from "@domain/payment/events/types";
+import type { ReportedPaymentStatus } from "@domain/payment/events/types";
 import type Stripe from "stripe";
 
 export interface PaymentConfirmationDTO {
 	id: string;
-	status: PaymentStatus;
+	status: ReportedPaymentStatus;
 	amount: number;
 	currency: string;
 }

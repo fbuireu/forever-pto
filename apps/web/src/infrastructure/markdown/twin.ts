@@ -3,7 +3,7 @@ export const MARKDOWN_ACCEPT = "text/markdown";
 export const MARKDOWN_PATH_HEADER = "x-markdown-path";
 export const NEUTRALISED_MARKDOWN_PATH = "";
 
-export const isProxiedMarkdownPath = (value: string | null): value is string => value !== null && value.startsWith("/");
+export const isProxiedMarkdownPath = (value: string | null): value is string => value?.startsWith("/") ?? false;
 
 const VARY = "Accept";
 const FOUND_CACHE_CONTROL = "public, max-age=3600";

@@ -1,7 +1,18 @@
 import type { BaseDTO } from "@application/shared/dto/baseDTO";
+import { PAYMENT_SUCCEEDED, type PaymentStatus, type ReportedPaymentStatus } from "@domain/payment/events/types";
 import type Stripe from "stripe";
 import type { NewPayment, PaymentConfirmationDTO } from "./types";
 import { extractChargeId, extractCustomerId } from "./utils/helpers";
+
+const NOT_CHARGED_STATUSES: ReadonlySet<ReportedPaymentStatus> = new Set<PaymentStatus>([
+	"requires_payment_method",
+	"canceled",
+]);
+
+export const hasSucceeded = (confirmation: PaymentConfirmationDTO) => confirmation.status === PAYMENT_SUCCEEDED;
+
+export const wasCharged = (confirmation: PaymentConfirmationDTO | null) =>
+	!confirmation || !NOT_CHARGED_STATUSES.has(confirmation.status);
 
 export const paymentConfirmationDTO: BaseDTO<Stripe.PaymentIntent, PaymentConfirmationDTO> = {
 	create: ({ raw }) => ({
