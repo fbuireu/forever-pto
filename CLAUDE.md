@@ -75,8 +75,8 @@ pnpm test:docs          # the contract suite alone
 pnpm test:ut:coverage   # apps/web with coverage, then the contract suite with coverage
 pnpm test:e2e           # apps/web playwright
 pnpm verify:static      # format:check && typecheck: everything verify does but the suite
-pnpm verify             # verify:static && test:ut:coverage; the CI Check job and pre-push
-pnpm verify:changed     # verify:static && test:ut:changed; see the gotcha before reaching for it
+pnpm verify             # verify:static && test:ut:coverage; the CI Check job
+pnpm verify:changed     # verify:static && test:ut:changed; what pre-push runs
 ```
 
 `pnpm --filter forever-pto-docs dev` runs the docs site; it has no root passthrough because nothing else
@@ -459,14 +459,15 @@ says `cleanup-docs` rides along harmlessly: it did not, it rode along behind an 
 version from `apps/web/package.json`; without a dispatch after a web release, the published site keeps
 advertising the previous one.
 
-Husky runs `lint-staged` on `pre-commit`, `commitlint` on `commit-msg` and `verify` on `pre-push`, the same
-command the CI `Verify` job runs, so a green push is a green check.
+Husky runs `lint-staged` on `pre-commit`, `commitlint` on `commit-msg` and `verify:changed` on `pre-push`.
 
-**`verify:changed` exists and this repository cannot use it, unlike the siblings.** It swaps the coverage run
-for `test:ut:changed`, which is what keeps a `pre-push` short enough not to be skipped with `--no-verify`;
-here `test:ut:changed` does not run at all, for the PostCSS reason in the gotchas. Until that is fixed the
-hook runs the full `verify`, and the saving would have been small anyway: the coverage step is a few seconds
-of a run the type checks dominate.
+**The hook deliberately runs something weaker than the CI `Verify` job, and the coverage floor is why.**
+`apps/web/vitest.config.ts` sets `coverage.include` over all of `src`, which is what makes v8 report a file no
+test loaded as zero, so a changed-only subset drags the global average under the floor and fails on a clean
+tree: a scoped run and the threshold cannot both hold. Coverage stays in CI, where `Verify` runs the full
+`pnpm verify` on the pushed sha, so a push whose coverage dropped still fails its check. What the hook gives
+up is the claim that a green push is a green check; what it buys is smaller here than in the siblings, since
+the type checks dominate this run rather than coverage.
 
 **A hook on `pre-push` also fires for pushes this repository makes to itself.** `@semantic-release/git`
 pushes the release commit, and husky is installed on the runner by `prepare`, so whatever `pre-push` runs
@@ -682,11 +683,15 @@ relative-link rule could not catch because they were prose rather than links.
   revision expression works (`@{push}` resolves) and is worse: on a branch with no upstream it silently
   checks nothing and exits zero. Reach for `format:all` instead, which reads the whole tree in well under a
   second.
-- **`vitest --changed` does not work in `apps/web`.** [`apps/web/postcss.config.mjs`](./apps/web/postcss.config.mjs) declares
-  `plugins: ["@tailwindcss/postcss"]`, the string form Next resolves and Vite does not, so a Vitest run that
-  reaches the CSS pipeline answers `Invalid PostCSS Plugin found at: plugins[0]`. The plain unit suite never
-  gets there and passes; `test:ut:changed` does and fails. It had been failing since before anything called
-  it, which is why nobody knew: no workflow and no hook ran it.
+- **Vitest declares its own empty `css.postcss`, and deleting it breaks `--changed` alone.**
+  [`apps/web/postcss.config.mjs`](./apps/web/postcss.config.mjs) declares `plugins: ["@tailwindcss/postcss"]`, the string form
+  Next resolves by name and Vite does not, so any Vitest run reaching the CSS pipeline answers
+  `Invalid PostCSS Plugin found at: plugins[0]`. A plain run never reaches it, which is why the unit suite
+  passed for as long as nobody ran the other one; `--changed` builds the module graph to find which tests
+  depend on what changed, and that transforms the CSS imports. So `test:ut:changed` had been failing since
+  before anything called it, and the day a `pre-push` hook called it the failure reached the release job too,
+  because `@semantic-release/git` pushes and husky is installed on the runner. The override is scoped to the
+  test run: the Next build still reads `postcss.config.mjs` untouched, and no test asserts CSS.
 - **Both release configs teach their parsers the `!` grammar, and a bare config silently drops every breaking
   change.** `@semantic-release/commit-analyzer` falls back to `conventional-changelog-angular`, whose
   `headerPattern` is `/^(\w*)(?:\((.*)\))?: (.*)$/`: it wants the colon straight after the scope, so
