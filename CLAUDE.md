@@ -74,7 +74,9 @@ pnpm test:ut            # apps/web unit tests, then the contract suite
 pnpm test:docs          # the contract suite alone
 pnpm test:ut:coverage   # apps/web with coverage, then the contract suite with coverage
 pnpm test:e2e           # apps/web playwright
-pnpm verify             # format:check && typecheck && test:ut:coverage; the CI Check job and pre-push
+pnpm verify             # format:check && typecheck && test:ut:coverage; the CI Check job
+pnpm verify:changed     # the same with test:ut:changed in place of coverage; what pre-push runs
+pnpm since              # prints the push target the :changed variants diff against
 ```
 
 `pnpm --filter forever-pto-docs dev` runs the docs site; it has no root passthrough because nothing else
@@ -457,8 +459,16 @@ says `cleanup-docs` rides along harmlessly: it did not, it rode along behind an 
 version from `apps/web/package.json`; without a dispatch after a web release, the published site keeps
 advertising the previous one.
 
-Husky runs `lint-staged` on `pre-commit`, `commitlint` on `commit-msg` and `verify` on `pre-push`, the same
-command the CI `Verify` job runs, so a green push is a green check.
+Husky runs `lint-staged` on `pre-commit`, `commitlint` on `commit-msg` and `verify:changed` on `pre-push`.
+
+**The hook deliberately runs something weaker than the CI `Verify` job, and the coverage floor is why.**
+`apps/web/vitest.config.ts` sets `coverage.include` over all of `src`, which is what makes v8 report a file no
+test loaded as zero, so a changed-only subset drags the global average under the floor and fails on a clean
+tree: a scoped run and the threshold cannot both hold. Coverage stays in CI, where `Verify` runs the full
+`pnpm verify` on the pushed sha, so a push whose coverage dropped still fails its check; what the hook gives
+up is the claim that a green push is a green check, and what it buys is that the whole-repo run stops
+standing between you and a push, which is when a hook starts getting skipped with `--no-verify` and protects
+nothing at all.
 
 **`typecheck` ends with `astro check`, and that tail is what puts the cross-package seam in front of
 the author.** (Do not "fix" that command by pointing it at `tsc`: a raw `tsc --noEmit -p apps/docs` reports
@@ -657,9 +667,14 @@ relative-link rule could not catch because they were prose rather than links.
   `overrides`. That is the only entry, and it is the whole allowance; anything else is a defect. A second
   `overrides` entry is the wrong shape for a one-off, where a `biome-ignore` comment on the call is the right
   one, but neither is warranted today.
-- **`format:changed` and `lint:changed` pass `--changed`, which means "changed against `main`".** On a
-  branch that moves or renames a large number of files that is every one of them, and a `pre-commit` hook
-  will happily reformat and stage files the commit was never about.
+- **Every `:changed` variant takes its base from `pnpm since`, because no tool's default was usable here.**
+  It resolves `@{push}`, the ref the current branch would push to, falling back to `origin/main` when the
+  branch has no upstream. Biome's own `--changed` diffs against `vcs.defaultBranch`, which is `main`, so on
+  `main` it selected nothing whatever had changed and `pnpm format:changed` answered *Checked 0 files*; that
+  is a green check that checked nothing, and it had been the state of both Biome variants here. Vitest's
+  `--changed` took a hardcoded `origin/main`, which is the wrong base on any other branch. What the base
+  cannot fix is breadth: on a branch that moves or renames a large number of files the changed set is still
+  every one of them, and `format:changed` will happily reformat files the work was never about.
 - **The `v1` floating tag is stale and nothing maintains it.** It diverges between local and remote, which
   makes semantic-release's own `git fetch --tags` fail outright with *would clobber existing tag*. No
   workflow moves it and no ADR records it.
