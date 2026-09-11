@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.10.8](https://github.com/fbuireu/forever-pto/compare/web-v1.10.7...web-v1.10.8) (2026-09-11)
+
+
+### Bug Fixes
+
+* **web:** give Vitest an empty postcss config, so --changed can run ([9990809](https://github.com/fbuireu/forever-pto/commit/9990809a4aecb7964587931080f723920e78f5e3))
+
 # [forever-pto-web-v1.10.7](https://github.com/fbuireu/forever-pto/compare/web-v1.10.6...web-v1.10.7) (2026-09-11)
 
 
