@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.10.5](https://github.com/fbuireu/forever-pto/compare/web-v1.10.4...web-v1.10.5) (2026-09-11)
+
+
+### Bug Fixes
+
+* stop the :changed scripts shelling out, and take verify:changed off the hook ([32197a0](https://github.com/fbuireu/forever-pto/commit/32197a07e9ff86ce4ac72506537073acba92ceda))
+
 # [forever-pto-web-v1.10.4](https://github.com/fbuireu/forever-pto/compare/web-v1.10.3...web-v1.10.4) (2026-09-11)
 
 
