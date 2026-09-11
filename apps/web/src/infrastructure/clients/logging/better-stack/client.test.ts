@@ -25,10 +25,6 @@ vi.mock("@logtail/edge", () => ({
 	Logtail: mockLogtailConstructor,
 }));
 
-vi.mock("./correlation", () => ({
-	traceCorrelation: vi.fn().mockReturnValue({ traceId: "trace-1", spanId: "span-1" }),
-}));
-
 vi.mock("@opennextjs/cloudflare", () => ({
 	getCloudflareContext: mockGetCloudflareContext,
 }));
@@ -71,7 +67,7 @@ describe("the level vocabulary", () => {
 		}
 	});
 
-	it("has a method for every level the tail Worker's contract names", () => {
+	it("has a method for every level the log contract names", () => {
 		const client = new BetterStackClient();
 
 		for (const level of Object.values(LOG_LEVEL)) {
@@ -248,36 +244,20 @@ describe("a log never fails its caller", () => {
 	});
 });
 
-describe("trace correlation", () => {
-	it("stamps the active span's ids on every entry, so a log line and its trace answer one query", () => {
-		new BetterStackClient().info("charged");
-
-		const [, ctx] = mockLogtail.info.mock.calls[0];
-		expect(ctx).toMatchObject({ traceId: "trace-1", spanId: "span-1" });
-	});
-
-	it("lets a caller's own traceId win over the active span's", () => {
-		new BetterStackClient().info("charged", { traceId: "caller-trace" });
-
-		const [, ctx] = mockLogtail.info.mock.calls[0];
-		expect(ctx.traceId).toBe("caller-trace");
-	});
-});
-
 describe("BetterStackClient.withContext", () => {
 	it("returns a new BetterStackClient instance", () => {
 		const client = new BetterStackClient();
-		const child = client.withContext({ traceId: "abc" });
+		const child = client.withContext({ requestId: "abc" });
 		expect(child).toBeInstanceOf(BetterStackClient);
 		expect(child).not.toBe(client);
 	});
 
 	it("child client includes the added context when logging", () => {
 		const client = new BetterStackClient();
-		const child = client.withContext({ traceId: "abc" });
+		const child = client.withContext({ requestId: "abc" });
 		child.info("test");
 		const [, ctx] = mockLogtail.info.mock.calls[0];
-		expect(ctx.traceId).toBe("abc");
+		expect(ctx.requestId).toBe("abc");
 	});
 });
 

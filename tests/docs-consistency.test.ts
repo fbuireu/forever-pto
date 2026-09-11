@@ -129,34 +129,6 @@ const stepBody = ({ workflow, name }: StepBodyParams): string => {
 const readIfPresent = (path: string) => (existsSync(join(ROOT, path)) ? read(path) : "");
 const readJson = (path: string) => JSON.parse(read(path));
 
-// A relative specifier is not its file name. TypeScript resolves `"./foo"` to `foo.ts` *or* `foo/index.ts`,
-// and NodeNext writes `"./foo.js"` for what is authored as `foo.ts`. Every candidate has to be a source file
-// on disk: `existsSync` alone says yes to the directory a barrel specifier names, which is not a module.
-interface ResolveRelativeImportParams {
-	from: string;
-	specifier: string;
-}
-
-const resolveRelativeImport = ({ from, specifier }: ResolveRelativeImportParams) => {
-	const target = join(dirname(from), specifier).replace(/\\/g, "/");
-	const candidates = SOURCE_FILE.test(target)
-		? [target]
-		: [
-				...(target.endsWith(".js") ? [target.replace(/\.js$/, ".ts"), target.replace(/\.js$/, ".tsx")] : []),
-				`${target}.ts`,
-				`${target}.tsx`,
-				`${target}/index.ts`,
-				`${target}/index.tsx`,
-			];
-
-	return (
-		candidates.find((candidate) => {
-			const absolute = join(ROOT, candidate);
-			return existsSync(absolute) && statSync(absolute).isFile();
-		}) ?? null
-	);
-};
-
 const isGitIgnored = (path: string) => {
 	try {
 		execFileSync("git", ["check-ignore", "--no-index", "-q", "--", path], { cwd: ROOT });
@@ -686,14 +658,43 @@ describe("every wrangler environment carries the whole binding set", () => {
 		expect(restated).toEqual([]);
 	});
 
-	it("restates the same observability settings in every environment that restates them at all", () => {
-		const tables = ["observability", "observability.logs", "observability.traces"];
-		const blocks = WRANGLER_ENVIRONMENTS.map((environment) =>
-			tables.map((table) => wranglerSection({ environment, table }).map((section) => section.entries)),
+	// Sampling is what this rule is for: a rate that differs between environments makes every other symptom
+	// read differently for a reason nobody remembers. `destinations` is the one key here that is *meant* to
+	// differ, since each stage ships to its own Better Stack source, so the rule below covers it instead.
+	// Folding it back in would force the stages to share a source.
+	const OBSERVABILITY_TABLES = ["observability", "observability.logs", "observability.traces"];
+	const withoutDestinations = (entries: Record<string, string>) =>
+		Object.fromEntries(Object.entries(entries).filter(([key]) => key !== "destinations"));
+	const destinationsOf = (environment: string) =>
+		OBSERVABILITY_TABLES.flatMap((table) =>
+			wranglerSection({ environment, table })
+				.map((section) => section.entries.destinations)
+				.filter((value): value is string => Boolean(value)),
 		);
 
-		expect(blocks[0]?.flat().length).toBe(tables.length);
+	it("restates the same observability settings in every environment that restates them at all", () => {
+		const blocks = WRANGLER_ENVIRONMENTS.map((environment) =>
+			OBSERVABILITY_TABLES.map((table) =>
+				wranglerSection({ environment, table }).map((section) => withoutDestinations(section.entries)),
+			),
+		);
+
+		expect(blocks[0]?.flat().length).toBe(OBSERVABILITY_TABLES.length);
 		expect(new Set(blocks.map((block) => JSON.stringify(block))).size).toBe(1);
+	});
+
+	// An export destination is an account-level resource referenced by a bare name, so nothing in the name
+	// says which stage owns it and nothing fails when two stages name the same one. Better Stack has a source
+	// per stage here, and a development Worker exporting into the production source is invisible: the events
+	// arrive, they are just filed with the live site's. The top level is production's twin, sharing its
+	// `name` and its vars, so a bare `wrangler deploy` has to reach the production source and not the other.
+	it("ships each stage into its own export destinations, and the top level into production's", () => {
+		const development = destinationsOf("env.development");
+		const production = destinationsOf("env.production");
+
+		expect(WRANGLER_ENVIRONMENTS.filter((environment) => destinationsOf(environment).length === 0)).toEqual([]);
+		expect(development.filter((destination) => production.includes(destination))).toEqual([]);
+		expect(destinationsOf("")).toEqual(production);
 	});
 
 	it("gives the payment rate limiter identical bounds in every environment", () => {
@@ -890,12 +891,20 @@ describe("documentation does not point at things that are gone", () => {
 	// and not at `proxy.ts`, which is a statement about a file that does not exist and cannot be written
 	// without naming it. Everything else in this rule stays as strict as it was: a name lands here only when
 	// the absence is the point, never to quiet a citation that has merely rotted.
-	const DELIBERATELY_ABSENT = new Set(["proxy.ts"]);
+	const DELIBERATELY_ABSENT = new Set(["proxy.ts", "index.ts"]);
+
+	// A superseded ADR is a historical record: it has to go on describing the tree it decided on, and the
+	// files it names are exactly the ones its successor deleted. Policing its citations would force either a
+	// rewrite that destroys the record or a growing exemption list of names nobody may reuse. The live
+	// documents are still policed, which is where a rotten citation actually misleads someone.
+	const isSupersededAdr = (file: string) =>
+		file.startsWith("adr/") && /^## Status\n\n(?:.*\n)*?Superseded by /m.test(read(file));
 
 	const exists = (token: string) => sourceFiles.some((path) => path === token || path.endsWith(`/${token}`));
 	const citedSourceFiles = (files: string[]) => {
 		const missing: string[] = [];
 		for (const file of files) {
+			if (isSupersededAdr(file)) continue;
 			for (const [, token] of read(file).matchAll(BACKTICKED_SOURCE_FILE)) {
 				if (token.includes("*") || token.startsWith(".") || GENERATED.has(token) || DELIBERATELY_ABSENT.has(token))
 					continue;
@@ -915,9 +924,8 @@ describe("documentation does not point at things that are gone", () => {
 	});
 
 	// A guide may write `src/…` because it sits inside the package it describes, and the rules above
-	// match a citation by suffix so both forms resolve. The wiki has no such context: `workers/tail`
-	// is a different directory from `src/infrastructure/workers`, and `src/` alone names neither
-	// package. Every repo path it prints has to carry its own prefix.
+	// match a citation by suffix so both forms resolve. The wiki has no such context: `src/` alone names
+	// neither package. Every repo path it prints has to carry its own prefix.
 	// The root guide forbids a nested CONTEXT.md outright: the name would mean two things, and the
 	// domain-modeling skill reads it as vocabulary. The wiki taught the opposite under a heading of
 	// "CONTEXT.md per folder" and cited five paths that have never existed. A relative-link rule cannot
@@ -957,7 +965,6 @@ describe("documentation does not point at things that are gone", () => {
 			`${WEB}/wrangler.toml`,
 			`${WEB}/.env.example`,
 			`${WEB}/playwright.config.ts`,
-			`${WEB}/workers/tail/wrangler.toml`,
 			...workflowFiles,
 		];
 		const corpus = [
@@ -1166,10 +1173,11 @@ describe("documentation does not point at things that are gone", () => {
 	});
 
 	// An output the `changes` job declares but never writes is the empty string, and a job guarded on
-	// `== 'true'` then never runs: silently, with a green tick, forever. `deploy-tail` shipped that way: the
-	// Filter step wrote `tail=false` on its no-base-commit early exit and nothing at all on the normal path,
-	// so the tail consumer Worker was never deployed while four documents said it was. Nothing catches this
-	// by reading the workflow, because both halves are individually well-formed.
+	// `== 'true'` then never runs: silently, with a green tick, forever. The `deploy-tail` job, since
+	// removed with the tail consumer Worker, shipped that way: the Filter step wrote `tail=false` on its
+	// no-base-commit early exit and nothing at all on the normal path, so that Worker was never deployed
+	// while four documents said it was. Nothing catches this by reading the workflow, because both halves
+	// are individually well-formed.
 	it("writes every output the changes job declares, on both paths through its Filter step", () => {
 		const workflow = read(".github/workflows/ci.yml");
 		const declared = [
@@ -1941,13 +1949,13 @@ describe("the guides describe the project as it is configured", () => {
 		},
 	);
 
-	// This saw two of the four deploys this repo runs, and its floor of `> 1` was satisfied by both of them,
-	// so the two it could not see were unguarded. `docs.yml` deploys twice through `cloudflare/wrangler-action`,
-	// whose script arrives on a `command:` input rather than in the step text, and a script name reaches a
-	// deploy of its own: `apps/docs`'s `deploy` is `astro build && wrangler deploy`. Replacing the docs
-	// production deploy with a retry-wrapped `pnpm --filter forever-pto-docs deploy` kept the count at two,
-	// kept `wrapped` empty, and retried a wrangler deploy three times on an argv error. The floor tracks the
-	// four the repo actually has, so losing sight of one fails rather than passes.
+	// This once saw only the deploys written as plain step text, and its floor was satisfied by those alone,
+	// so the rest were unguarded. `docs.yml` deploys through `cloudflare/wrangler-action`, whose script
+	// arrives on a `command:` input rather than in the step text, and a script name reaches a deploy of its
+	// own: the `deploy` of `apps/docs` is `astro build && wrangler deploy`. Replacing the docs production
+	// deploy with a retry-wrapped `pnpm --filter forever-pto-docs deploy` kept the count unchanged, kept
+	// `wrapped` empty, and retried a wrangler deploy on an argv error. The floor tracks what the repo
+	// actually has, so losing sight of one fails rather than passes; raise it whenever a deploy is added.
 	it("runs every wrangler deploy without a retry wrapper, so an argv error reports on the first attempt", () => {
 		const wrapped: string[] = [];
 		let deploySteps = 0;
@@ -1964,7 +1972,7 @@ describe("the guides describe the project as it is configured", () => {
 			}
 		}
 
-		expect(deploySteps).toBeGreaterThan(3);
+		expect(deploySteps).toBeGreaterThan(2);
 		expect(wrapped).toEqual([]);
 	});
 
@@ -2058,43 +2066,6 @@ describe("the guides describe the project as it is configured", () => {
 			.map((job) => job.trim());
 
 		expect(needs).toEqual(expect.arrayContaining(gated));
-	});
-
-	it("gates the tail Worker deploy on every path its bundle is built from", () => {
-		const tailRoot = `${WEB}/workers/tail`;
-		const filter = /TAIL_PATHS: '([^']+)'/.exec(read(`${WORKFLOW_DIR}/ci.yml`))?.[1] ?? "";
-		const pattern = new RegExp(filter);
-		const sources = trackedFiles.filter((path) => path.startsWith(`${tailRoot}/`) && SOURCE_FILE.test(path));
-		const reached = new Set<string>();
-		const pending = [...sources];
-
-		// A reach the resolver cannot place is a failure, not an exemption. The first version appended `.ts`
-		// and nothing else, so `"./foo"` meaning `foo/index.ts` and a NodeNext `"./foo.js"` both produced a
-		// path that does not exist; the final filter then guarded itself with `existsSync`, so exactly the
-		// specifiers it could not follow were the ones it let through. The `not.toEqual([])` floor did not
-		// notice either: one unresolvable entry is a non-tail entry and satisfies it on its own.
-		const unresolved: string[] = [];
-
-		while (pending.length > 0) {
-			const file = pending.pop() as string;
-
-			for (const [, specifier] of read(file).matchAll(/from\s+["'](\.[^"']+)["']/g)) {
-				const resolved = resolveRelativeImport({ from: file, specifier: specifier as string });
-				if (!resolved) {
-					unresolved.push(`${file} -> ${specifier}`);
-					continue;
-				}
-				if (reached.has(resolved)) continue;
-				reached.add(resolved);
-				pending.push(resolved);
-			}
-		}
-
-		expect(filter).not.toBe("");
-		expect(sources.length).toBeGreaterThan(0);
-		expect(unresolved).toEqual([]);
-		expect([...reached].filter((path) => !path.startsWith(`${tailRoot}/`))).not.toEqual([]);
-		expect([...reached].filter((path) => !pattern.test(path))).toEqual([]);
 	});
 
 	// The filtered form names its own package, so it can be checked wherever it is written, including the

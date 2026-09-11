@@ -28,7 +28,6 @@ jobs:
     timeout-minutes: 15
     outputs:
       web: ${{ steps.filter.outputs.web }}
-      tail: ${{ steps.filter.outputs.tail }}
       cross_package: ${{ steps.filter.outputs.cross_package }}
     steps:
       - name: Checkout
@@ -42,11 +41,9 @@ jobs:
           BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
           HEAD_SHA: ${{ github.sha }}
           WEB_PATHS: '^(apps/web/|patches/|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$|biome\.json$|\.nvmrc$|\.github/actions/|\.github/workflows/(ci|_deploy-web)\.yml$)'
-          TAIL_PATHS: '^(apps/web/workers/tail/|apps/web/src/infrastructure/clients/logging/|\.github/workflows/ci\.yml$)'
         run: |
           if [ -z "$BASE_SHA" ] || ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
             echo 'web=true' >> "$GITHUB_OUTPUT"
-            echo 'tail=true' >> "$GITHUB_OUTPUT"
             echo 'cross_package=false' >> "$GITHUB_OUTPUT"
             echo "::notice::No usable base commit, treating this as a web change."
             exit 0
@@ -58,11 +55,6 @@ jobs:
           else
             echo 'web=false' >> "$GITHUB_OUTPUT"
             echo "::notice::No apps/web change in this range; the web deploy and release are skipped."
-          fi
-          if printf '%s\n' "$changed" | grep -qE "$TAIL_PATHS"; then
-            echo 'tail=true' >> "$GITHUB_OUTPUT"
-          else
-            echo 'tail=false' >> "$GITHUB_OUTPUT"
           fi
           if printf '%s\n' "$changed" | grep -qE '^apps/web/' && printf '%s\n' "$changed" | grep -qE '^apps/docs/'; then
             echo 'cross_package=true' >> "$GITHUB_OUTPUT"
@@ -243,52 +235,6 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: gh workflow run docs.yml --ref main
 
-  deploy-tail:
-    name: Deploy the tail Worker
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    needs: [changes, verify]
-    if: ${{ (github.event_name == 'push' && needs.changes.outputs.tail == 'true' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' }}
-    environment: web-production
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: ./.github/actions/prepare-env
-      - name: Collect the ingest token
-        env:
-          BETTER_STACK_INGESTING_URL: ${{ vars.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL }}
-          BETTER_STACK_SOURCE_TOKEN: ${{ vars.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN }}
-          SECRETS_FILE: ${{ runner.temp }}/tail-secrets.json
-        run: |
-          if [ -z "$BETTER_STACK_INGESTING_URL" ]; then
-            echo '::error::NEXT_PUBLIC_BETTER_STACK_INGESTING_URL is not set on web-production.'
-            exit 1
-          fi
-          if [ -z "$BETTER_STACK_SOURCE_TOKEN" ]; then
-            echo '::error::NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN is not set on web-production.'
-            exit 1
-          fi
-          node -e "
-          const body = JSON.stringify({ BETTER_STACK_SOURCE_TOKEN: process.env.BETTER_STACK_SOURCE_TOKEN });
-          require('node:fs').writeFileSync(process.env.SECRETS_FILE, body, { mode: 0o600 });
-          "
-      - name: Deploy to Cloudflare Workers
-        working-directory: apps/web
-        env:
-          BETTER_STACK_INGESTING_URL: ${{ vars.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL }}
-          SECRETS_FILE: ${{ runner.temp }}/tail-secrets.json
-        run: pnpm exec wrangler deploy --config workers/tail/wrangler.toml --var "BETTER_STACK_INGESTING_URL:$BETTER_STACK_INGESTING_URL" --secrets-file "$SECRETS_FILE"
-      - name: Remove the secrets file
-        if: always()
-        env:
-          SECRETS_FILE: ${{ runner.temp }}/tail-secrets.json
-        run: rm -f "$SECRETS_FILE"
-
   cross-package-notice:
     name: Cross-package pull request
     needs: [changes]
@@ -425,7 +371,7 @@ jobs:
 
   check:
     name: Check
-    needs: [changes, verify, deploy-development, e2e, deploy-tail, deploy-production, smoke, release-web]
+    needs: [changes, verify, deploy-development, e2e, deploy-production, smoke, release-web]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     timeout-minutes: 15

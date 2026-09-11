@@ -13,7 +13,6 @@ forever-pto/
 │   ├── web/              # the planner (forever-pto)
 │   │   ├── src/          # app source, layered (see below)
 │   │   ├── e2e/          # Playwright specs mirroring the app routes
-│   │   ├── workers/tail/ # forever-pto-tail Worker (forwards logs to Better Stack)
 │   │   ├── wrangler.toml
 │   │   ├── open-next.config.ts
 │   │   └── next.config.ts
@@ -47,10 +46,6 @@ End-to-end Playwright specs (`*.spec.ts`) whose folder structure mirrors the app
 ## `patches/`
 
 pnpm patches, wired through the `patchedDependencies` section of `pnpm-workspace.yaml`. Currently `patches/boneyard-js.patch` fixes the skeleton component in `boneyard-js` to derive its unique id from React's `useId()` instead of `Math.random()`, which keeps server and client markup consistent.
-
-## `apps/web/workers/tail/`
-
-A second, standalone Cloudflare Worker (`forever-pto-tail`) with its own `wrangler.toml`. It implements a `tail()` handler that receives the app Worker's logs and exceptions and forwards them to Better Stack. See [environments](/infra/environments/).
 
 ## `apps/docs/`
 
