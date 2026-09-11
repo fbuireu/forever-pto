@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.10.6](https://github.com/fbuireu/forever-pto/compare/web-v1.10.5...web-v1.10.6) (2026-09-11)
+
+
+### Bug Fixes
+
+* **web:** make console the log transport, so a log line carries its trace id ([022be28](https://github.com/fbuireu/forever-pto/commit/022be28458395dbd5c153c1d7b23336b87c3812b))
+
 # [forever-pto-web-v1.10.5](https://github.com/fbuireu/forever-pto/compare/web-v1.10.4...web-v1.10.5) (2026-09-11)
 
 
