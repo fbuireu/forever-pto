@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.10.9](https://github.com/fbuireu/forever-pto/compare/web-v1.10.8...web-v1.10.9) (2026-09-11)
+
+
+### Bug Fixes
+
+* **web:** name the export destinations the way the account spells them ([719b5cb](https://github.com/fbuireu/forever-pto/commit/719b5cb0b410f21dabf8f8695aa27d0d49ad2c68))
+
 # [forever-pto-web-v1.10.8](https://github.com/fbuireu/forever-pto/compare/web-v1.10.7...web-v1.10.8) (2026-09-11)
 
 
