@@ -74,8 +74,9 @@ pnpm test:ut            # apps/web unit tests, then the contract suite
 pnpm test:docs          # the contract suite alone
 pnpm test:ut:coverage   # apps/web with coverage, then the contract suite with coverage
 pnpm test:e2e           # apps/web playwright
-pnpm verify             # format:check && typecheck && test:ut:coverage; the CI Check job
-pnpm verify:changed     # the same with test:ut:changed in place of coverage; what pre-push runs
+pnpm verify:static      # format:check && typecheck: everything verify does but the suite
+pnpm verify             # verify:static && test:ut:coverage; the CI Check job
+pnpm verify:changed     # verify:static && test:ut:changed; what pre-push runs
 pnpm since              # prints the push target the :changed variants diff against
 ```
 
