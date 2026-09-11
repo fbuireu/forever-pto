@@ -197,6 +197,23 @@ relative. There is no `baseUrl`, so every target resolves against this `tsconfig
 no edit when the package moved. [`vitest.config.ts`](./vitest.config.ts) sets `resolve.tsconfigPaths`, so a new alias needs exactly
 one edit, in `tsconfig.json`.
 
+**Mock history is cleared before every test, so a suite asserting an import-time call has to snapshot it.**
+That is Vitest's default and it stays on. A file that mocks a module, imports the module under test at top
+level and then asserts the call the import made is asserting against a record no test can re-trigger: the
+clear empties it and the case fails against a mock that genuinely was called. Copy the calls into a
+module-scope const beside the import (`const configuredAtLoad = [...mock.calls]`) and assert on that;
+[`src/ui/modules/providers/BonesProvider.test.tsx`](./src/ui/modules/providers/BonesProvider.test.tsx),
+[`src/application/i18n/navigation.test.ts`](./src/application/i18n/navigation.test.ts) and
+[`src/infrastructure/services/countries/getCountries.test.ts`](./src/infrastructure/services/countries/getCountries.test.ts)
+are the three that do. It reads better than the alternative, too: what the mock itself still holds inside a
+test is then exactly what *that* test caused, which is what "configures nothing more on mount" wants to say.
+
+**`testTimeout` is raised well above the default, and the number is covering for something else.** The suite
+builds a fresh `happy-dom` per file, close to half its wall clock, and the two cases that resolve every lazy
+chunk of a page in one go were timing out under that load while passing in seconds on their own. The real fix
+is the environment cost — `pool: 'vmThreads'` or `isolate: false` builds the DOM once per worker instead of
+once per file — and neither has been measured against this suite yet.
+
 **Backticked paths in this guide and the ones below it are package-relative.** [`src/domain/calendar/types.ts`](./src/domain/calendar/types.ts)
 means `apps/web/src/domain/calendar/types.ts`; the contract suite matches source-file citations by suffix, so
 both forms resolve.

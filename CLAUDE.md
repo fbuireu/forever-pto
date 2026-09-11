@@ -95,12 +95,13 @@ fails `verify` rather than being noticed in a report nobody opens. The measured 
 comfortable, and branches is the tight one: a change that guts a branch-heavy module trips this before it
 trips a reviewer.
 
-**The root config deliberately has none, and the reason is worth knowing before adding one.** The root
+**The root config deliberately has none, and the root leg no longer collects coverage at all.** The root
 Vitest collects `tests/docs-consistency.test.ts`, which imports `next.config.ts` to read `PUBLIC_ENV`, and it
-declares no `coverage.include`, so the only file the report ever covers is that config, at a fraction of its
-branches. That number measures nothing, and a floor over it would fail every run. Restricting or dropping the
-root's coverage collection is the real fix; until then, read the second report as an artifact rather than a
-measurement.
+declares no `coverage.include`, so the only file the report ever covered was that config, at a fraction of its
+branches. That number measured nothing, a floor over it would have failed every run, and Codecov reads only
+`apps/web/coverage/lcov.info`, so nothing consumed it either. `test:ut:coverage` runs the root suite without
+`--coverage` now, which is why the job prints one coverage summary and two test reports. Adding a floor here
+means giving the root config a `coverage.include` first; without one there is nothing to put a floor over.
 
 ## Shared tooling
 
@@ -669,12 +670,36 @@ relative-link rule could not catch because they were prose rather than links.
   4320 minutes (3 days), `.github/renovate.json` says 4 days. Renovate being the stricter is what
   makes it safe: it cannot open a pull request for a release the installer would then refuse. Lower it below
   the workspace's and CI fails on the lockfile rather than at resolution, because the age is re-checked on
-  **every** install and not only when a version is picked.
+  **every** install and not only when a version is picked. **A security update is the case that hits it**, and
+  `dependabot-auto-merge.yml` merges those unattended: GitHub raises them the hour the advisory lands, the
+  installer refuses a release that young, and the merge fails on the lockfile with nothing wrong in the tree.
+  The escape hatch is `minimumReleaseAgeExclude` in `pnpm-workspace.yaml`, which takes an exact
+  `name@version` and is what the sibling repositories carry, one commented entry per security bump, deleted
+  once the release ages past the floor.
+- **An unrecognized key in `pnpm-workspace.yaml` is a hard install failure, not a shrug.** The installer
+  answers `ERR_PNPM_UNRECOGNIZED_WORKSPACE_SETTINGS` and stops whenever the repository pins its own
+  installer version, which this one does through `packageManager`. That is an improvement — a misspelt setting used to be ignored in
+  silence — but it means a settings typo breaks every job rather than quietly disabling the thing it names.
 - **An import sorted above a `'use client'` silently deletes it, and only `next build` notices.** Biome's
   import sorting moves an added import to the top of the file; the directive then stops being the first
   statement, and the formatter parenthesises the orphaned string, leaving `('use client');`. That is an
   ordinary expression; the module becomes a Server Component. Typecheck, Biome and the whole unit suite
   stay green, because none of them models the RSC boundary. Planner files sat like that for several
   commits. `tests/docs-consistency.test.ts` parses for it now, in both shapes.
+- **`pnpm-workspace.yaml` scopes one peer range, and the narrowness is the point.** `wrangler` asks for
+  `@cloudflare/workers-types` v5 and `@logtail/edge` asks for v4, so every install reported an unmet peer.
+  Neither side is wrong to fix: wrangler declares that peer **optional** and never loads it, while
+  `@logtail/edge`'s own `.d.ts` imports `ExecutionContext` from it, so v4 is the version the only real
+  consumer needs, and 0.5.8 is the last release upstream published. `peerDependencyRules.allowedVersions`
+  names that one edge, `wrangler>@cloudflare/workers-types`, and nothing else: a blanket entry, or one on the
+  package rather than the edge, would silence the next mismatch too. Delete it the day `@logtail/edge` moves.
 - **Never run `lint-staged` by hand.** It stashes the whole tree; interrupting it can revert the working
   copy. Let the hook run it.
+- **On Windows an install that replaces an already-installed package fails, and only a clean tree gets past
+  it.** The installer writes the package's own nested `node_modules` before renaming the unpacked staging
+  directory into place, and Windows refuses a rename onto a directory that is not empty:
+  `failed to rename staging directory ... Access is denied. (os error 5)`. It names one package at a time, so
+  it reads like a file lock; it is not, and retrying, deleting that one directory or closing the editor
+  changes nothing. Delete `node_modules` at the root and in both packages, then install. Two versions were
+  tried and both do it, so do not chase it with a version pin. CI never sees it: the runners are Linux and
+  install into an empty tree.

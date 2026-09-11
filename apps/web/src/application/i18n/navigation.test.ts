@@ -12,10 +12,11 @@ const createNavigation = vi.hoisted(() =>
 vi.mock("next-intl/navigation", () => ({ createNavigation }));
 
 const navigation = await import("./navigation");
+const builtAtLoad = [...createNavigation.mock.calls];
 
 describe("application/i18n/navigation", () => {
 	it("builds the helpers from the shared routing, so every link follows the same prefix rule", () => {
-		expect(createNavigation).toHaveBeenCalledExactlyOnceWith(routing);
+		expect(builtAtLoad).toEqual([[routing]]);
 	});
 
 	it("exports the three helpers the UI imports, and nothing that bypasses the routing", () => {

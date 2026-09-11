@@ -12,6 +12,9 @@ savePrefix: ""
 overrides:
   "@opentelemetry/core": 2.11.0
 minimumReleaseAge: 4320 # 3 days
+peerDependencyRules:
+  allowedVersions:
+    "wrangler>@cloudflare/workers-types": "4"
 blockExoticSubdeps: true
 patchedDependencies:
   boneyard-js: patches/boneyard-js.patch

@@ -5,7 +5,7 @@ import { pathToFileURL } from "node:url";
 import ts from "@typescript/typescript6";
 import { describe, expect, it } from "vitest";
 import webNextConfig, { PUBLIC_ENV, RUNTIME_ONLY } from "../apps/web/next.config";
-import { PAYMENT_SUCCEEDED } from "../apps/web/src/domain/payment/events/types";
+import { PAYMENT_STATUSES, PAYMENT_SUCCEEDED } from "../apps/web/src/domain/payment/events/types";
 
 const ROOT = resolve(__dirname, "..");
 const WEB = "apps/web";
@@ -286,7 +286,7 @@ interface JobBodyParams {
 
 const jobBody = ({ workflow, job }: JobBodyParams) => {
 	const lines = workflow.split(/\r?\n/);
-	const start = lines.findIndex((line) => line === `  ${job}:`);
+	const start = lines.indexOf(`  ${job}:`);
 	if (start < 0) return "";
 	const end = lines.slice(start + 1).findIndex((line) => /^ {2}[\w-]+:/.test(line));
 
@@ -1520,14 +1520,26 @@ describe("the succeeded-payment status is one value in both languages", () => {
 	// fifth predicate against a different spelling, and every gate stays green while
 	// `getSucceededPaymentByEmail` quietly stops matching and no donor recovers Premium again.
 	//
-	// Stripe owns the value, so nothing in this tree can produce a divergent one and the illegal state is not
-	// reachable today. That makes it a guard rather than a defect, and an assertion the proportionate answer:
-	// interpolating the constant into four SQL strings would buy a coupling to a word Stripe cannot change and
-	// pay for it by making the statements less readable than the SQL they are.
+	// Stripe owns the value, so nothing in this tree can produce a divergent one. That makes it a guard rather
+	// than a defect, and an assertion the proportionate answer: interpolating the constant into four SQL
+	// strings would buy a coupling to a word Stripe cannot change and pay for it by making the statements less
+	// readable than the SQL they are.
 	const PAYMENTS_REPOSITORY = `${WEB}/src/infrastructure/services/payments/repository.ts`;
 	const SQL_STATUS_COMPARISON = /status\s*(?:!=|=)\s*'([^']*)'|WHEN \? = '([^']*)'/g;
 	const SUCCEEDED_LITERAL = /['"]succeeded['"]/;
 	const PAYMENT_STATUS_MODULE = `${WEB}/src/domain/payment/events/types.ts`;
+	// Its `succeeded` is a different word for a different thing: the outcome of a browser-side confirm, whose
+	// siblings are `refused_before_charge` and `handed_off_to_issuer`. The exemption is checked below, because
+	// one granted by name outlives the reason it was granted for.
+	const CONFIRM_OUTCOME_MODULE = `${WEB}/src/ui/adapters/payments/checkout.ts`;
+	// And this one reads Stripe's `redirect_status` query parameter, whose values are `succeeded`, `failed`
+	// and `pending`: a third vocabulary that happens to share the word. It was annotated
+	// `Stripe.PaymentIntent.Status`, which is the mistake the exemption exists to stop being made again.
+	const REDIRECT_STATUS_MODULE = `${WEB}/src/app/api/payment/activate/route.ts`;
+	// Stripe publishes the union this list mirrors. `OtherString` is its open-enum marker, not a member.
+	const STRIPE_PAYMENT_INTENTS = `${WEB}/node_modules/stripe/cjs/resources/PaymentIntents.d.ts`;
+	const STRIPE_STATUS_UNION = /^\s*type Status = (.+);$/m;
+	const STRIPE_STATUS_MEMBER = /'([^']+)'/g;
 
 	it("compares the status column against that value and no other, in every SQL predicate", () => {
 		const compared = [...read(PAYMENTS_REPOSITORY).matchAll(SQL_STATUS_COMPARISON)].map(
@@ -1541,17 +1553,55 @@ describe("the succeeded-payment status is one value in both languages", () => {
 	});
 
 	// Production sources only. A test asserting the SQL has to write the wire value out, and
-	// `repository.test.ts` does exactly that, deliberately.
-	it("lets no production module that imports the constant spell the literal beside it", () => {
-		const offenders = sourceFiles
-			.filter((path) => path.startsWith(`${WEB}/src/`) && path !== PAYMENT_STATUS_MODULE)
-			.filter((path) => !/\.test\.tsx?$/.test(path))
-			.filter((path) => {
-				const source = read(path);
-				return source.includes("PAYMENT_SUCCEEDED") && SUCCEEDED_LITERAL.test(source);
-			});
+	// `repository.test.ts` does exactly that, deliberately. The repository is exempt because the rule above is
+	// what holds its four SQL predicates; the domain module is where the word is declared.
+	//
+	// This used to read `source.includes("PAYMENT_SUCCEEDED") && …`, which made it blind to exactly the file
+	// that needed it: `confirmation/page.tsx` compared against a bare `"succeeded"` and imported nothing, so
+	// it was never a candidate. A module that does not import the constant is the one to worry about, not the
+	// one that does.
+	it("lets no production module spell the literal, whether or not it imports the constant", () => {
+		const exempt = new Set([
+			PAYMENT_STATUS_MODULE,
+			PAYMENTS_REPOSITORY,
+			CONFIRM_OUTCOME_MODULE,
+			REDIRECT_STATUS_MODULE,
+		]);
+		const candidates = sourceFiles
+			.filter((path) => path.startsWith(`${WEB}/src/`) && !exempt.has(path))
+			.filter((path) => !/\.test\.tsx?$/.test(path));
 
-		expect(offenders).toEqual([]);
+		expect(candidates.length).toBeGreaterThan(100);
+		expect(candidates.filter((path) => SUCCEEDED_LITERAL.test(read(path)))).toEqual([]);
+	});
+
+	it.each([
+		[CONFIRM_OUTCOME_MODULE, "ConfirmPaymentOutcome"],
+		[REDIRECT_STATUS_MODULE, "redirect_status"],
+	])("grants %s its exemption only while it still means something else by the word", (module, evidence) => {
+		const source = read(module);
+
+		expect(source).toContain(evidence);
+		expect(source).not.toContain("PaymentStatus");
+	});
+
+	// The domain union mirrors an enum Stripe calls *open*: it may send a value this list does not carry, on a
+	// pinned API version, which is why the carrier type is widened rather than closed. Mirroring only pays
+	// while the mirror is accurate, and nothing but this compares the two: a status Stripe adds to the SDK
+	// would otherwise sit outside `PAYMENT_STATUSES` with every gate green.
+	it("carries every status the installed Stripe SDK knows, and none it does not", () => {
+		expect(
+			existsSync(join(ROOT, STRIPE_PAYMENT_INTENTS)),
+			`${STRIPE_PAYMENT_INTENTS} is absent, so this rule would read nothing`,
+		).toBe(true);
+
+		const union = read(STRIPE_PAYMENT_INTENTS).match(STRIPE_STATUS_UNION);
+		expect(union, "no `type Status = …` in the Stripe SDK; it moved, so repoint this rule").not.toBeNull();
+
+		const published = [...(union as RegExpMatchArray)[1].matchAll(STRIPE_STATUS_MEMBER)].map(([, member]) => member);
+
+		expect(published.length).toBeGreaterThan(5);
+		expect([...published].sort()).toEqual([...PAYMENT_STATUSES].sort());
 	});
 });
 

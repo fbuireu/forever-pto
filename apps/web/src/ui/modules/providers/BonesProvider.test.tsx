@@ -7,11 +7,12 @@ vi.mock("boneyard-js/react", () => ({ configureBoneyard }));
 vi.mock("src/ui/modules/bones/registry", () => ({}));
 
 const { BonesProvider } = await import("./BonesProvider");
+const configuredAtLoad = [...configureBoneyard.mock.calls];
 
 describe("BonesProvider", () => {
 	it("configures the skeletons when the module loads, before any bone can render", () => {
-		expect(configureBoneyard).toHaveBeenCalledOnce();
-		expect(configureBoneyard.mock.calls[0]?.[0]).toMatchObject({
+		expect(configuredAtLoad).toHaveLength(1);
+		expect(configuredAtLoad[0]?.[0]).toMatchObject({
 			animate: "shimmer",
 			boneClass: "boneyard-bordered",
 			transition: true,
@@ -19,7 +20,7 @@ describe("BonesProvider", () => {
 	});
 
 	it("names a light and a dark colour for both the bone and its shimmer", () => {
-		const config = configureBoneyard.mock.calls[0]?.[0] as Record<string, string>;
+		const config = configuredAtLoad[0]?.[0] as Record<string, string>;
 
 		expect(config.color).not.toBe(config.darkColor);
 		expect(config.shimmerColor).not.toBe(config.darkShimmerColor);
@@ -29,6 +30,6 @@ describe("BonesProvider", () => {
 		const { container } = render(<BonesProvider />);
 
 		expect(container.childNodes).toHaveLength(0);
-		expect(configureBoneyard).toHaveBeenCalledOnce();
+		expect(configureBoneyard).not.toHaveBeenCalled();
 	});
 });

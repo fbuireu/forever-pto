@@ -5,9 +5,8 @@ import { localePath, resolveLocale } from "@infrastructure/i18n/utils/url";
 import { ACTIVATION_FAILED, ACTIVATION_PARAM } from "@infrastructure/services/premium/activation";
 import { setPremiumCookie } from "@infrastructure/services/premium/cookie";
 import { type NextRequest, NextResponse } from "next/server";
-import type Stripe from "stripe";
 
-const SUCCEEDED_REDIRECT_STATUS: Stripe.PaymentIntent.Status = "succeeded";
+const SUCCEEDED_REDIRECT_STATUS = "succeeded";
 
 export async function GET(request: NextRequest) {
 	const { searchParams, origin } = request.nextUrl;

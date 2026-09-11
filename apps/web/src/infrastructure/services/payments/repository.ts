@@ -1,5 +1,5 @@
 import type { NewPayment, PaymentData } from "@application/dto/payment/types";
-import type { PaymentStatus } from "@domain/payment/events/types";
+import type { ReportedPaymentStatus } from "@domain/payment/events/types";
 import { TursoService } from "@infrastructure/clients/db/turso/service";
 import type { DatabaseError } from "@infrastructure/errors";
 import { normalizePromoCode } from "@infrastructure/services/payments/normalForms";
@@ -59,7 +59,7 @@ export const savePayment = (data: NewPayment): Effect.Effect<boolean, DatabaseEr
 
 export interface UpdatePaymentStatusParams {
 	paymentIntentId: string;
-	status: PaymentStatus;
+	status: ReportedPaymentStatus;
 }
 
 export const updatePaymentStatus = ({

@@ -1,3 +1,4 @@
+import { hasSucceeded, wasCharged } from "@application/dto/payment/dto";
 import { Link } from "@application/i18n/navigation";
 import { ApplicationLayer } from "@infrastructure/layers";
 import { routeMetadata } from "@infrastructure/seo/routeMetadata";
@@ -23,8 +24,6 @@ interface PaymentSuccessParams {
 	}>;
 	params: Promise<{ locale: Locale }>;
 }
-
-const NOT_CHARGED_STATUSES = new Set(["requires_payment_method", "canceled"]);
 
 async function PaymentError({ charged }: { charged: boolean }) {
 	const t = await getTranslations("paymentConfirmation.failed");
@@ -90,8 +89,8 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
 
 	const data = await Effect.runPromise(confirmation(paymentIntentId).pipe(Effect.provide(ApplicationLayer)));
 
-	if (data?.status !== "succeeded") {
-		return <PaymentError charged={!data || !NOT_CHARGED_STATUSES.has(data.status)} />;
+	if (!data || !hasSucceeded(data)) {
+		return <PaymentError charged={wasCharged(data)} />;
 	}
 
 	const [t, format] = await Promise.all([getTranslations("paymentConfirmation.success"), getFormatter({ locale })]);

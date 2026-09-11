@@ -39,7 +39,7 @@ export const StripeServerServiceLive = Layer.sync(StripeServerService, () => {
 			if (!secretKey) throw new MissingStripeConfiguration("STRIPE_SECRET_KEY environment variable is not set");
 
 			stripe = new StripeNode(secretKey, {
-				apiVersion: "2026-07-29.dahlia",
+				apiVersion: "2026-08-26.dahlia",
 				httpClient: StripeNode.createFetchHttpClient(),
 			});
 		}

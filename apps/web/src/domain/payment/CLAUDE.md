@@ -16,7 +16,7 @@ keeping that row honest.
 
 | File | Contents |
 | --- | --- |
-| [`events/types.ts`](./events/types.ts) | `PaymentSucceededEvent` and `PaymentFailedEvent` (plain interfaces, no Stripe types) plus the `PaymentStatus` union and the `PAYMENT_SUCCEEDED` constant |
+| [`events/types.ts`](./events/types.ts) | `PaymentSucceededEvent` and `PaymentFailedEvent` (plain interfaces, no Stripe types) plus `PAYMENT_STATUSES`, the `PaymentStatus` union derived from it, the widened `ReportedPaymentStatus` that the events actually carry, and the `PAYMENT_SUCCEEDED` constant |
 | [`events/factory/events.ts`](./events/factory/events.ts) | `createPaymentSucceededEvent` (an Effect, it can fail), `createPaymentFailedEvent`, the only place a `Stripe.PaymentIntent` is read |
 | [`events/factory/resolvers.ts`](./events/factory/resolvers.ts) | `resolveChargeId`: flattens `latest_charge`, which Stripe returns as an id, an expanded object or nothing |
 | [`handlers/paymentSucceeded.ts`](./handlers/paymentSucceeded.ts) | `handlePaymentSucceeded`: status reconciliation plus best-effort charge enrichment |
@@ -85,14 +85,27 @@ the only field on `PaymentFailedEvent` whose reason to exist is the log line.
 
 ## The entitlement value is typed where it can be proved, and named where it cannot
 
-`PaymentStatus` restates Stripe's `PaymentIntent.Status` members by hand: it is not imported from the
-SDK, because this folder keeps Stripe at the factory. The factory assigns `paymentIntent.status` into it, so
-a member Stripe adds is a compile error there, at the one place that translates Stripe into the domain, and
-nowhere else.
+`PAYMENT_STATUSES` restates Stripe's `PaymentIntent.Status` members by hand, and `PaymentStatus` is derived
+from it: the list is not imported from the SDK, because this folder keeps Stripe at the factory. It is the
+set of statuses **this product reasons about**, which is not the same claim as the set Stripe can send.
 
-It types both events' `status`, and `updatePaymentStatus`'s parameter, a function that used to take
-`(paymentIntentId: string, status: string)`, where swapping the arguments compiled. Every caller passes
-either a literal from this codebase or an event's status, so the union is true at each one.
+**Stripe's enums are open, so what an event carries is `ReportedPaymentStatus`, not `PaymentStatus`.** Stripe
+adds members to an enum on an API version already pinned, and `stripe@22.6.1` said so in the types by
+widening `PaymentIntent.Status` with its `OtherString` marker. `ReportedPaymentStatus` is the union widened
+the same way, so a status this product has never modelled reaches the database exactly as Stripe sent it
+rather than being dropped, renamed to a sentinel, or turned into a failed webhook that Stripe then retries
+forever. Every consumer asks *is it succeeded* and never *which of the seven is it*, so none of them needs
+the closed union to be correct.
+
+The guarantee that used to come from the compiler comes from the contract suite instead, and it reaches
+further: the old one was an assignment in the factory, which caught a member Stripe added only because
+something happened to assign it there. `tests/docs-consistency.test.ts` now compares `PAYMENT_STATUSES`
+against the `type Status` union the installed SDK publishes, so a member Stripe adds fails the suite whether
+or not any code assigns it. [ADR 0014](../../../../../adr/0014-ddd-where-it-pays.md) records the rerun of its
+own worked example that this replaced.
+
+`updatePaymentStatus`'s parameter takes the same widened type, a function that used to take
+`(paymentIntentId: string, status: string)`, where swapping the arguments compiled.
 
 **`PaymentData.status` deliberately stays `string`, and the union would be a lie there.** Its
 producers are: `paymentDataDTO`, which reads a `Stripe.PaymentIntent`, and `toPaymentData` in
@@ -105,10 +118,14 @@ That is what `PAYMENT_SUCCEEDED` is for. It is redundant where the union already
 spelling to reach for wherever a `PaymentData.status` meets the entitlement value. **No handler compares
 against it any more** (the `WHERE` clause owns that rule, see below), so its remaining live uses are
 `activatePremium`, which passes it to `updatePaymentStatus` as the value to write, and
-`repository.test.ts`, which ties the `succeeded_at` `CASE` to it by assertion. `activatePremium` also tests a
-raw `Stripe.PaymentIntent.status` against the bare literal at its guard, which is correct: that value is
-Stripe's, not the payments table's. `PaymentConfirmationDTO.status` is narrowed instead of named, since its
-single producer is the Stripe read.
+`repository.test.ts`, which ties the `succeeded_at` `CASE` to it by assertion, and `activatePremium`'s guard
+on a raw `Stripe.PaymentIntent.status`.
+
+**`PaymentConfirmationDTO.status` is widened like the events, and the page no longer reads it.** Which
+statuses mean *charged* is a business rule, and `app` never imports `domain`, so
+[`@application/dto/payment/dto`](../../application/dto/payment/dto.ts) owns it: `hasSucceeded` and
+`wasCharged` are what the confirmation page calls, and the set of not-charged statuses lives beside them.
+The page used to carry that set as bare literals, which is also why the rule above could not see it.
 
 **Copies of the literal remain, all inside SQL, and none of them can take the constant.**
 `repository.ts` spells `'succeeded'` in the `succeeded_at` `CASE`, in `getSucceededPaymentByEmail`'s `WHERE` and in

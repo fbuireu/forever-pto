@@ -1,5 +1,6 @@
 import { paymentConfirmationDTO } from "@application/dto/payment/dto";
 import type { PaymentConfirmationDTO } from "@application/dto/payment/types";
+import { PAYMENT_SUCCEEDED } from "@domain/payment/events/types";
 import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import { Effect } from "effect";
@@ -15,7 +16,7 @@ export const confirmation = (
 			Effect.map((raw) => paymentConfirmationDTO.create({ raw })),
 			Effect.tap((confirmed) =>
 				Effect.sync(() => {
-					if (confirmed.status === "succeeded") return;
+					if (confirmed.status === PAYMENT_SUCCEEDED) return;
 
 					logger.warn("Payment intent not succeeded", {
 						paymentIntentId: confirmed.id,
