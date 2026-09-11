@@ -44,7 +44,7 @@ component and over and over in its test, because there was no type either could 
 now cannot compile without saying which side of the charge it is on; that used to be a rule stated here and
 checked in review.
 
-**The BetterStack logging client is reached through a dynamic `import()`, never a static one.** Its module graph pulls `@logtail/edge` and `@opennextjs/cloudflare` in through its own top-level imports, so a static import puts both in the client chunk of every component that touches it. No file in this layer writes that out: `logClient` and `logClientError` in
+**The BetterStack logging client is reached through a dynamic `import()`, never a static one, and the reason it was has expired.** Its module graph used to pull `@logtail/edge` and `@opennextjs/cloudflare` in through its own top-level imports, so a static import put both in the client chunk of every component that touched it. Since [ADR 0018](../../../../adr/0018-the-platform-is-the-log-transport.md) it imports its own log contract and nothing else, so a static import would cost nothing. The dynamic form is kept because changing it is a separate decision and not because it still buys anything. No file in this layer writes that out: `logClient` and `logClientError` in
 `@application/shared/utils/clientLog` hold the whole incantation, and [`clientLog.test.ts`](../application/shared/utils/clientLog.test.ts) asserts by reading
 its own source that the import stays dynamic.
 

@@ -407,7 +407,7 @@ chunk that reads this store), and making it dynamic is not a tidy-up either.
 ## Logging is reached through a dynamic import
 
 **No file here imports the BetterStack client statically, and none holds a module-scope `logger`.** That
-client's own top-level imports pull in `@logtail/edge` and `@opennextjs/cloudflare`, so a static import lands
+client's own top-level imports used to pull in `@logtail/edge` and `@opennextjs/cloudflare`, so a static import landed
 both in the client chunk of every component that reads a store, which is every planner and marketing screen.
 
 `logClient` and `logClientError` in `@application/shared/utils/clientLog` hold the whole incantation. Each of

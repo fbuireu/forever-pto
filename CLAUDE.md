@@ -719,13 +719,14 @@ relative-link rule could not catch because they were prose rather than links.
   ordinary expression; the module becomes a Server Component. Typecheck, Biome and the whole unit suite
   stay green, because none of them models the RSC boundary. Planner files sat like that for several
   commits. `tests/docs-consistency.test.ts` parses for it now, in both shapes.
-- **`pnpm-workspace.yaml` scopes one peer range, and the narrowness is the point.** `wrangler` asks for
-  `@cloudflare/workers-types` v5 and `@logtail/edge` asks for v4, so every install reported an unmet peer.
-  Neither side is wrong to fix: wrangler declares that peer **optional** and never loads it, while
-  `@logtail/edge`'s own `.d.ts` imports `ExecutionContext` from it, so v4 is the version the only real
-  consumer needs, and 0.5.8 is the last release upstream published. `peerDependencyRules.allowedVersions`
-  names that one edge, `wrangler>@cloudflare/workers-types`, and nothing else: a blanket entry, or one on the
-  package rather than the edge, would silence the next mismatch too. Delete it the day `@logtail/edge` moves.
+- **`pnpm-workspace.yaml` scopes no peer range any more, and the entry it used to carry is the shape to copy
+  if one comes back.** `wrangler` asks for `@cloudflare/workers-types` v5 while `@logtail/edge` asked for v4,
+  so every install reported an unmet peer, and `peerDependencyRules.allowedVersions` named that one edge,
+  `wrangler>@cloudflare/workers-types`, and nothing else: a blanket entry, or one on the package rather than
+  the edge, would have silenced the next mismatch too. The instruction here was to delete it the day
+  `@logtail/edge` moved, and it went further than moving:
+  [ADR 0018](./adr/0018-the-platform-is-the-log-transport.md) made `console` the log transport and the package
+  left the tree, so the only consumer of v4 went with it.
 - **Never run `lint-staged` by hand.** It stashes the whole tree; interrupting it can revert the working
   copy. Let the hook run it.
 - **On Windows an install that replaces an already-installed package fails, and only a clean tree gets past

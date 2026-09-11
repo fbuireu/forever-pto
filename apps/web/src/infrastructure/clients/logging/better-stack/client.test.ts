@@ -1,49 +1,23 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { LOG_LEVEL, type LogLevel } from "./contract";
+import { BetterStackClient, getBetterStackInstance } from "./client";
+import { LOG_LEVEL, LOG_SERVICE, type LogLevel } from "./contract";
 
-const { mockLogtail, mockLogtailConstructor, mockGetCloudflareContext, requestContext } = vi.hoisted(() => {
-	const mockLogtail = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn(), flush: vi.fn() };
-	class MockLogtail {
-		debug = mockLogtail.debug;
-		info = mockLogtail.info;
-		warn = mockLogtail.warn;
-		error = mockLogtail.error;
-		flush = mockLogtail.flush;
-	}
-	const requestContext = { waitUntil: vi.fn(), passThroughOnException: vi.fn() };
-	return {
-		mockLogtail,
-		mockLogtailConstructor: vi
-			.fn()
-			.mockImplementation(MockLogtail as unknown as () => InstanceType<typeof MockLogtail>),
-		mockGetCloudflareContext: vi.fn().mockReturnValue({ ctx: requestContext }),
-		requestContext,
-	};
-});
+const spies = {
+	debug: vi.spyOn(console, "debug").mockImplementation(() => {}),
+	info: vi.spyOn(console, "info").mockImplementation(() => {}),
+	warn: vi.spyOn(console, "warn").mockImplementation(() => {}),
+	error: vi.spyOn(console, "error").mockImplementation(() => {}),
+};
 
-vi.mock("@logtail/edge", () => ({
-	Logtail: mockLogtailConstructor,
-}));
-
-vi.mock("@opennextjs/cloudflare", () => ({
-	getCloudflareContext: mockGetCloudflareContext,
-}));
-
-process.env.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN = "test-token";
-process.env.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL = "https://test.logtail.com";
-
-const { BetterStackClient, getBetterStackInstance } = await import("./client");
+const lineFrom = (level: LogLevel) => JSON.parse(spies[level].mock.calls[0]?.[0] as string);
 
 beforeEach(() => {
 	vi.clearAllMocks();
-	mockGetCloudflareContext.mockReturnValue({ ctx: requestContext });
 });
 
 describe("getBetterStackInstance", () => {
 	it("returns the same instance on repeated calls", () => {
-		const a = getBetterStackInstance();
-		const b = getBetterStackInstance();
-		expect(a).toBe(b);
+		expect(getBetterStackInstance()).toBe(getBetterStackInstance());
 	});
 
 	it("returns a BetterStackClient", () => {
@@ -51,19 +25,26 @@ describe("getBetterStackInstance", () => {
 	});
 });
 
-describe("the level vocabulary", () => {
-	it.each(Object.values(LOG_LEVEL))("emits %s under its own name, so no level folds onto another", (level) => {
-		const client = new BetterStackClient();
+describe("the platform is the transport", () => {
+	it("writes one JSON line per call, which is what Cloudflare exports and attributes to the active span", () => {
+		new BetterStackClient().info("payment created", { paymentIntentId: "pi_1" });
 
-		client[level as LogLevel]("test event", { field: 1 });
+		expect(spies.info).toHaveBeenCalledTimes(1);
+		expect(lineFrom(LOG_LEVEL.INFO)).toMatchObject({
+			message: "payment created",
+			level: LOG_LEVEL.INFO,
+			service: LOG_SERVICE,
+			paymentIntentId: "pi_1",
+		});
+	});
 
-		expect(mockLogtail[level as LogLevel]).toHaveBeenCalledWith(
-			"test event",
-			expect.objectContaining({ field: 1 }),
-			expect.anything(),
-		);
+	it.each(Object.values(LOG_LEVEL))("emits %s through the console method of its own name", (level) => {
+		new BetterStackClient()[level as LogLevel]("test event", { field: 1 });
+
+		expect(spies[level as LogLevel]).toHaveBeenCalledTimes(1);
+		expect(lineFrom(level as LogLevel)).toMatchObject({ level, field: 1 });
 		for (const other of Object.values(LOG_LEVEL)) {
-			if (other !== level) expect(mockLogtail[other as LogLevel]).not.toHaveBeenCalled();
+			if (other !== level) expect(spies[other as LogLevel]).not.toHaveBeenCalled();
 		}
 	});
 
@@ -76,171 +57,118 @@ describe("the level vocabulary", () => {
 	});
 });
 
+describe("a caller cannot relabel its own line", () => {
+	it("keeps the level the method decided, whatever the context says", () => {
+		new BetterStackClient().error("charge failed", { level: LOG_LEVEL.INFO });
+
+		expect(lineFrom(LOG_LEVEL.ERROR).level).toBe(LOG_LEVEL.ERROR);
+	});
+
+	it("keeps the message the caller passed, not one smuggled through the context", () => {
+		new BetterStackClient().warn("the real message", { message: "the decoy" });
+
+		expect(lineFrom(LOG_LEVEL.WARN).message).toBe("the real message");
+	});
+
+	it("keeps the service name, so a line cannot claim to come from somewhere else", () => {
+		new BetterStackClient().info("hello", { service: "not-this-app" });
+
+		expect(lineFrom(LOG_LEVEL.INFO).service).toBe(LOG_SERVICE);
+	});
+
+	it("still carries a level a logError caller put in its context under a different key", () => {
+		new BetterStackClient().logError("boom", new Error("x"), { attemptedLevel: LOG_LEVEL.DEBUG });
+
+		expect(lineFrom(LOG_LEVEL.ERROR).attemptedLevel).toBe(LOG_LEVEL.DEBUG);
+	});
+});
+
 describe("BetterStackClient.logError", () => {
 	it("includes error message, name and stack in context", () => {
-		const client = new BetterStackClient();
-		const err = new Error("boom");
-		client.logError("test event", err);
-		const [, ctx] = mockLogtail.error.mock.calls[0];
-		expect(ctx.error.message).toBe("boom");
-		expect(ctx.error.name).toBe("Error");
-		expect(ctx.error.stack).toContain("Error: boom");
+		new BetterStackClient().logError("test event", new Error("boom"));
+
+		const { error } = lineFrom(LOG_LEVEL.ERROR);
+		expect(error.message).toBe("boom");
+		expect(error.name).toBe("Error");
+		expect(error.stack).toContain("Error: boom");
 	});
 
 	it("handles non-Error values", () => {
-		const client = new BetterStackClient();
-		client.logError("test", "string error");
-		const [, ctx] = mockLogtail.error.mock.calls[0];
-		expect(ctx.error.message).toBe("string error");
-		expect(ctx.error.name).toBe("UnknownError");
-		expect(ctx.error.stack).toBeUndefined();
+		new BetterStackClient().logError("test", "string error");
+
+		const { error } = lineFrom(LOG_LEVEL.ERROR);
+		expect(error.message).toBe("string error");
+		expect(error.name).toBe("UnknownError");
+		expect(error.stack).toBeUndefined();
 	});
 
 	it("merges caller context with error context", () => {
-		const client = new BetterStackClient();
-		client.logError("test", new Error("x"), { requestId: "req-1" });
-		const [, ctx] = mockLogtail.error.mock.calls[0];
-		expect(ctx.requestId).toBe("req-1");
-		expect(ctx.error.message).toBe("x");
+		new BetterStackClient().logError("test", new Error("x"), { requestId: "req-1" });
+
+		const line = lineFrom(LOG_LEVEL.ERROR);
+		expect(line.requestId).toBe("req-1");
+		expect(line.error.message).toBe("x");
 	});
 });
 
 describe("BetterStackClient.logDuration", () => {
 	it("logs duration_ms and duration_seconds", () => {
-		const client = new BetterStackClient();
-		client.logDuration("my-op", 250);
-		const [msg, ctx] = mockLogtail.info.mock.calls[0];
-		expect(msg).toBe("my-op completed");
-		expect(ctx.duration_ms).toBe(250);
-		expect(ctx.duration_seconds).toBe(0.25);
+		new BetterStackClient().logDuration("my-op", 250);
+
+		const line = lineFrom(LOG_LEVEL.INFO);
+		expect(line.message).toBe("my-op completed");
+		expect(line.duration_ms).toBe(250);
+		expect(line.duration_seconds).toBe(0.25);
 	});
 });
 
 describe("BetterStackClient.measureAsync", () => {
 	it("returns the function result", async () => {
-		const client = new BetterStackClient();
-		const result = await client.measureAsync("op", async () => 42);
-		expect(result).toBe(42);
+		await expect(new BetterStackClient().measureAsync("op", async () => 42)).resolves.toBe(42);
 	});
 
 	it("rethrows errors thrown by the function", async () => {
-		const client = new BetterStackClient();
 		await expect(
-			client.measureAsync("op", async () => {
+			new BetterStackClient().measureAsync("op", async () => {
 				throw new Error("fail");
 			}),
 		).rejects.toThrow("fail");
 	});
 
 	it("logs success duration after a successful call", async () => {
-		const client = new BetterStackClient();
-		await client.measureAsync("op", async () => "x");
-		expect(mockLogtail.info).toHaveBeenCalled();
-		const [, ctx] = mockLogtail.info.mock.calls[0];
-		expect(ctx.status).toBe("success");
-		expect(typeof ctx.duration_ms).toBe("number");
+		await new BetterStackClient().measureAsync("op", async () => "x");
+
+		const line = lineFrom(LOG_LEVEL.INFO);
+		expect(line.status).toBe("success");
+		expect(typeof line.duration_ms).toBe("number");
 	});
 
 	it("logs error context when the function throws", async () => {
-		const client = new BetterStackClient();
-		await client
+		await new BetterStackClient()
 			.measureAsync("op", async () => {
 				throw new Error("e");
 			})
 			.catch(() => {});
-		expect(mockLogtail.error).toHaveBeenCalled();
-		const [, ctx] = mockLogtail.error.mock.calls[0];
-		expect(ctx.status).toBe("error");
-	});
-});
 
-describe("the transport is scoped to the request", () => {
-	const anotherRequest = () => ({ waitUntil: vi.fn(), passThroughOnException: vi.fn() });
-
-	it("hands the request's own ExecutionContext to the transport, so the flush rides waitUntil", () => {
-		new BetterStackClient().info("hello");
-
-		expect(mockLogtail.info).toHaveBeenCalledWith("hello", expect.anything(), requestContext);
-	});
-
-	it("reuses one transport for every log of the same request", async () => {
-		vi.resetModules();
-		const { BetterStackClient: Fresh } = await import("./client");
-		const client = new Fresh();
-
-		client.info("first");
-		client.warn("second");
-		client.error("third");
-
-		expect(mockLogtailConstructor).toHaveBeenCalledTimes(1);
-		vi.resetModules();
-	});
-
-	it("builds a separate transport for a different request, so no batch or timer is shared across two", async () => {
-		vi.resetModules();
-		const { BetterStackClient: Fresh } = await import("./client");
-		const client = new Fresh();
-
-		mockGetCloudflareContext.mockReturnValue({ ctx: anotherRequest() });
-		client.info("from request a");
-		mockGetCloudflareContext.mockReturnValue({ ctx: anotherRequest() });
-		client.info("from request b");
-
-		expect(mockLogtailConstructor).toHaveBeenCalledTimes(2);
-		vi.resetModules();
-	});
-
-	it("flushes right away off a request, where there is no waitUntil to carry a batch", async () => {
-		vi.resetModules();
-		mockGetCloudflareContext.mockImplementation(() => {
-			throw new Error("not in a request");
-		});
-		const { BetterStackClient: Fresh } = await import("./client");
-
-		new Fresh().info("from the browser");
-
-		expect(mockLogtail.info).toHaveBeenCalledWith("from the browser", expect.anything(), undefined);
-		expect(mockLogtail.flush).toHaveBeenCalledTimes(1);
-		vi.resetModules();
-	});
-
-	it("does not flush on a request, where the batch flushes on its own inside waitUntil", () => {
-		new BetterStackClient().info("on a request");
-
-		expect(mockLogtail.flush).not.toHaveBeenCalled();
+		expect(lineFrom(LOG_LEVEL.ERROR).status).toBe("error");
 	});
 });
 
 describe("a log never fails its caller", () => {
-	it("is a no-op when the BetterStack variables are absent", async () => {
-		vi.resetModules();
-		vi.stubEnv("NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN", "");
-		vi.stubEnv("NEXT_PUBLIC_BETTER_STACK_INGESTING_URL", "");
-		const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+	it("swallows a context that cannot be serialised, rather than throwing from a store action", () => {
+		const circular: Record<string, unknown> = {};
+		circular.self = circular;
 
-		const { BetterStackClient: Unconfigured } = await import("./client");
-		const client = new Unconfigured();
-
-		expect(() => client.info("hello")).not.toThrow();
-		expect(() => client.logError("boom", new Error("x"))).not.toThrow();
-		expect(mockLogtail.info).not.toHaveBeenCalled();
-		expect(warn).toHaveBeenCalledTimes(1);
-
-		warn.mockRestore();
-		vi.unstubAllEnvs();
-		vi.resetModules();
+		expect(() => new BetterStackClient().info("round trip", circular)).not.toThrow();
+		expect(spies.info).not.toHaveBeenCalled();
 	});
 
-	it("swallows a transport that throws synchronously", async () => {
-		vi.resetModules();
-		mockLogtail.error.mockImplementationOnce(() => {
-			throw new Error("transport down");
+	it("swallows a console that throws synchronously", () => {
+		spies.error.mockImplementationOnce(() => {
+			throw new Error("sink down");
 		});
 
-		const { BetterStackClient: Fresh } = await import("./client");
-		expect(() => new Fresh().error("still fine")).not.toThrow();
-
-		vi.resetModules();
+		expect(() => new BetterStackClient().error("still fine")).not.toThrow();
 	});
 });
 
@@ -248,16 +176,15 @@ describe("BetterStackClient.withContext", () => {
 	it("returns a new BetterStackClient instance", () => {
 		const client = new BetterStackClient();
 		const child = client.withContext({ requestId: "abc" });
+
 		expect(child).toBeInstanceOf(BetterStackClient);
 		expect(child).not.toBe(client);
 	});
 
 	it("child client includes the added context when logging", () => {
-		const client = new BetterStackClient();
-		const child = client.withContext({ requestId: "abc" });
-		child.info("test");
-		const [, ctx] = mockLogtail.info.mock.calls[0];
-		expect(ctx.requestId).toBe("abc");
+		new BetterStackClient().withContext({ requestId: "abc" }).info("test");
+
+		expect(lineFrom(LOG_LEVEL.INFO).requestId).toBe("abc");
 	});
 });
 
@@ -267,9 +194,9 @@ describe("url redaction", () => {
 			url: "https://forever-pto.com/api/payment/activate?payment_intent_client_secret=redacted-in-fixture",
 		});
 
-		const [, ctx] = mockLogtail.error.mock.calls[0];
-		expect(ctx.url).toBe("https://forever-pto.com/api/payment/activate");
-		expect(JSON.stringify(ctx)).not.toContain("redacted-in-fixture");
+		const [line] = spies.error.mock.calls[0] as [string];
+		expect(JSON.parse(line).url).toBe("https://forever-pto.com/api/payment/activate");
+		expect(line).not.toContain("redacted-in-fixture");
 	});
 
 	it("strips a url carried on the base context too", () => {
@@ -277,14 +204,12 @@ describe("url redaction", () => {
 			.withContext({ url: "https://forever-pto.com/en/payment/confirmation?payment_intent=pi_3Abc" })
 			.warn("slow confirmation");
 
-		const [, ctx] = mockLogtail.warn.mock.calls[0];
-		expect(ctx.url).toBe("https://forever-pto.com/en/payment/confirmation");
+		expect(lineFrom(LOG_LEVEL.WARN).url).toBe("https://forever-pto.com/en/payment/confirmation");
 	});
 
 	it("leaves a non-string url alone", () => {
 		new BetterStackClient().info("no url", { url: 42 });
 
-		const [, ctx] = mockLogtail.info.mock.calls[0];
-		expect(ctx.url).toBe(42);
+		expect(lineFrom(LOG_LEVEL.INFO).url).toBe(42);
 	});
 });

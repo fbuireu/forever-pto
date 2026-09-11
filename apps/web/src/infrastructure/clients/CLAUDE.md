@@ -16,20 +16,21 @@ nothing: the inferred type widens to include `LoggerService` and the build stays
 [ADR 0013](../../../../../adr/0013-loggerservice-stays-a-tag.md) records the decision and what it costs, so
 the next architecture pass does not re-propose deleting it.
 
-## The log contract outlives the Worker that shared it
+## The log contract, and the one function in it that guards a secret
 
-[`better-stack/contract.ts`](./logging/better-stack/contract.ts) holds `LOG_SERVICE`, the levels the app
-emits, `toLogLevel` and `stripQuery`. It was types and constants only so that a tail consumer Worker could
-import it by relative path without pulling `@logtail/edge` or `@opennextjs/cloudflare` into a bundle that had
-neither. That Worker is gone, since logs leave through Cloudflare's own OTLP export now
-([ADR 0017](../../../../../adr/0017-observability-is-the-platform-export.md)), and the module stays as it is
-anyway, because each of its functions still answers a question the app asks.
+[`better-stack/contract.ts`](./logging/better-stack/contract.ts) holds `LOG_SERVICE`, the levels the app emits
+and `stripQuery`. It is types and constants only, which is what it has always been, though the reason changed:
+it was shaped that way so a tail consumer Worker could import it without pulling a transport into a bundle that
+had none, and that Worker is gone ([ADR 0017](../../../../../adr/0017-observability-is-the-platform-export.md)).
+It carried a `toLogLevel` as well, folding workerd's `log` and `trace` onto `info` on the way out of that
+Worker; nothing has called it since, and it went with
+[ADR 0018](../../../../../adr/0018-the-platform-is-the-log-transport.md).
 
-**`stripQuery` is the one to understand before touching anything here.** It encodes "a URL logged off-worker
-must not carry its query string, because Stripe appends `payment_intent_client_secret` to the return URL",
-a statement about this app's payment flow. Cloudflare's `redact_query_string = true` in
-[`wrangler.toml`](../../../wrangler.toml) redacts the **request** URL in logs and traces; it does not touch a
-`url` field a caller puts in a structured log context, and that is the leak this guards.
+**`stripQuery` is the one to understand before touching anything here.** It encodes "a URL in a log context
+must not carry its query string, because Stripe appends `payment_intent_client_secret` to the return URL", a
+statement about this app's payment flow. Cloudflare's `redact_query_string = true` in
+[`wrangler.toml`](../../../wrangler.toml) redacts the **request** URL the platform itself records; it does not
+touch a `url` field a caller puts in a structured log context, and that is the leak this guards.
 [`api/payment/activate/route.ts`](../../app/api/payment/activate/route.ts) reads
 `payment_intent_client_secret` off the query, already emits a log line per failure, and `matchesClientSecret`
 is the only guard on a GET that mints a Premium session, so `{ url: request.url }` added while debugging
@@ -39,23 +40,26 @@ whether it arrived in the call or on the base context, so no caller has to remem
 wants a query string has to name the field something other than `url`, which is the point: the redaction is
 keyed on the field name, not on who wrote it.
 
-**`toLogLevel` folds an unrecognised level onto `info`, and it now has one reader instead of two.** workerd
-emits `log` and `trace`, which the app never does; the tail Worker used to normalise them on the way out, and
-the native export does not, so a BetterStack query filtering on `level` has to account for them itself. On the
-app's side [`client.ts`](./logging/better-stack/client.ts) reads the union rather than restating it: it
-imports `LOG_LEVEL` and `LogLevel` and its methods dispatch through the constant, so a level added to the
-contract fails to compile here, since `send` indexes the Logtail transport by the level and Logtail has no
-method for a name it does not know. `client.test.ts` iterates `LOG_LEVEL` and asserts each level reaches the
-transport method of its own name and no other.
+**`client.ts` reads the level union rather than restating it.** It imports `LOG_LEVEL` and `LogLevel` and
+indexes `console` by the level, so a level added to the contract that `console` has no method for fails to
+compile here. `client.test.ts` iterates `LOG_LEVEL` and asserts each level reaches the console method of its
+own name and no other.
 
 ## Traces are the platform's, and no log line carries a trace id from here
 
 There is no tracer in this folder and no OpenTelemetry dependency in the package. Cloudflare instruments
-handler invocations, outbound `fetch` and binding calls itself, attributes `console.*` to the active span, and
-stamps the trace id on every exported log record, so the correlation a helper in this folder used to build by
-hand arrives on the far side without the app producing it.
+handler invocations, outbound `fetch` and binding calls itself, attributes `console` output to the active span,
+and stamps the trace id on every log record it exports. Because `console` is what this folder's client writes
+to ([ADR 0018](../../../../../adr/0018-the-platform-is-the-log-transport.md)), the app's own lines are among
+those records and the correlation a helper here used to build by hand arrives without the app producing it.
 
-**That file had to go with the wrapper rather than after it**, and the reason generalises: `trace.getActiveSpan()`
+**That only holds for lines the runtime sees, which is the trap this replaced.** Between
+[ADR 0017](../../../../../adr/0017-observability-is-the-platform-export.md) and 0018 the client still posted
+over HTTP from inside the Worker, so the spans were in BetterStack, the logs were in BetterStack, and nothing
+joined them. A future transport that leaves the runtime again puts it straight back.
+
+**The *correlation.ts* that used to stamp those ids had to go with the wrapper rather than after it**, and the
+reason generalises: `trace.getActiveSpan()`
 reads `@opentelemetry/api`'s global context manager, and the deleted `@microlabs/otel-cf-workers` wrapper was
 the only thing in the tree that ever called `setGlobalContextManager`. Left behind, it would have returned
 `undefined` on every call and stamped `{}` on every log line, with its own test still green because that test
@@ -81,7 +85,7 @@ The rest are not services at all, for the reasons given below.
 | --- | --- | --- | --- |
 | [`db/turso/`](./db/turso) | `@tursodatabase/serverless` | `TursoService` | `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` |
 | [`email/resend/`](./email/resend) | `resend` | `ResendService` | `RESEND_API_KEY` |
-| [`logging/better-stack/`](./logging/better-stack) | `@logtail/edge` | `LoggerService` | `NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN`, `NEXT_PUBLIC_BETTER_STACK_INGESTING_URL` |
+| [`logging/better-stack/`](./logging/better-stack) | none: `console`, exported by the platform | `LoggerService` | none |
 | [`payments/stripe/`](./payments/stripe) | `stripe` | `StripeServerService` | `STRIPE_SECRET_KEY` (plus `STRIPE_WEBHOOK_SECRET`, see below) |
 
 They are all merged into `ApplicationLayer` in [`src/infrastructure/layers.ts`](../layers.ts). There is no partial layer: an
@@ -218,37 +222,41 @@ exercises. Adding a method here means adding its caller and its error mapping in
 | [`tutorial/driver/client.tsx`](./tutorial/driver/client.tsx) | Wraps driver.js, a DOM library. It renders a close icon into the popover, but never imports one: the icon arrives as the injected `closeIcon?: ReactNode` config field, so nothing here reaches into `@ui/*` |
 
 `logging/better-stack/client.ts` is the one to read before touching. **A log call cannot fail its caller, and
-that is the property everything else here leans on.** The things that hold it up are all load-bearing:
+that is the property everything else here leans on.** `send` is one statement:
 
-- `createTransport()` returns `null` (not a throw) when `NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN` or
-  `NEXT_PUBLIC_BETTER_STACK_INGESTING_URL` is missing, warning once on the console so the misconfiguration is
-  still visible.
-- every level goes through `send`, whose `try` swallows a transport that throws synchronously.
-- the call itself is fire-and-forget (`void`), so a rejected ingestion never surfaces either.
+```ts
+console[level](JSON.stringify({ ...context, service: LOG_SERVICE, level, message }));
+```
 
-It matters because the singleton is called *bare*, outside any Effect combinator, from Zustand actions, the
-country lookups and both payment handlers. A throw from one of those positions inside an `Effect.gen` is a
-defect that neither `Effect.catchTags` nor the trailing `Effect.catchAll` can map, the same failure the
-first invariant above describes for layer construction. `Effect.sync` would not help: a throw inside it is
-equally a defect. The guarantee has to live in the client, and `describe('a log never fails its caller')` in
-`client.test.ts` is what holds it there.
+wrapped in a `try` that returns. What is load-bearing in it:
 
-The price is that a lost log is silent, and `getExecutionContext()` reads the Cloudflare context through a
-`try` returning `undefined`, so logging off-request works but loses `waitUntil`.
+- **The spread order.** `context` comes first, so a caller passing `{ level: 'info' }` or
+  `{ service: 'something-else' }` cannot relabel its own line. Written the other way round it reads
+  identically and lets a log lie about which level and which service produced it; `client.test.ts` asserts
+  the level, the message and the service each survive a context that tries to overwrite them, and inverting
+  the spread turns three of those cases red.
+- **The `try`.** `JSON.stringify` throws on a circular reference and on a `BigInt`. Without it, a caller
+  passing either takes down the Zustand action or the payment handler it was logging from.
 
-**The Logtail transport is scoped to the request, and it used to be one module-level instance.** `Logtail`
-batches: the first `log()` of a batch arms a `setTimeout`, later calls join the buffer, and the timer's
-callback is what runs the `fetch`. Shared across requests, that batcher scheduled its timer inside request A
-and delivered request B's lines through it, which is what workerd reports for I/O that
-crosses a request boundary: `Cannot perform I/O on behalf of a different request`, and a request the runtime
-cancels as hung while it waits on a promise another request's context owns. `getTransport` keeps one
-`Logtail` per `ExecutionContext` in a `WeakMap`, so a request's lines batch together, flush inside its own
-`waitUntil`, and the instance is collected with the request; nothing outlives it. Off a request (the browser,
-`next build`, a `getCloudflareContext()` that throws) there is no context to key on and no `waitUntil` to
-carry a batch, so `send` builds a throwaway transport and calls `flush()` at once, one POST per line. That
-path is the browser's and logs rarely, so the lost batching costs nothing measurable. `client.test.ts`
-pins all of it under `describe('the transport is scoped to the request')`: same context, one constructor
-call; a second context, a second constructor call; no context, an immediate flush.
+That second point is why the guarantee has to live here at all: the singleton is called *bare*, outside any
+Effect combinator, from Zustand actions, the country lookups and both payment handlers. A throw from one of
+those positions inside an `Effect.gen` is a defect that neither `Effect.catchTags` nor the trailing
+`Effect.catchAll` can map, the same failure the first invariant above describes for layer construction.
+`Effect.sync` would not help: a throw inside it is equally a defect. `describe('a log never fails its caller')`
+in `client.test.ts` is what holds it there.
+
+The price is that a lost log is silent, and that the structured fields are serialised here rather than handed
+to an API as an object, so the sink parses them back out of the JSON body. That was accepted knowingly; see
+[ADR 0018](../../../../../adr/0018-the-platform-is-the-log-transport.md).
+
+**There is no transport to scope to a request any more, and the hazard it existed for is worth keeping in
+view.** The client held a `@logtail/edge` batcher: the first call armed a `setTimeout`, later calls joined the
+buffer, and the timer's callback ran the `fetch`. As one module-level instance, that batcher armed its timer
+inside request A and delivered request B's lines through it, which workerd refuses as
+`Cannot perform I/O on behalf of a different request`, cancelling a request left waiting on a promise another
+request's context owns. Keying one instance per `ExecutionContext` in a `WeakMap` fixed it, and writing to
+`console` removes the class of problem: there is no buffer, no timer and no `fetch`, so nothing can outlive the
+request that wrote it. Any future transport that batches has to answer this question again.
 
 Both `DriverClient` and `StripeClient` keep mutable instance state behind a module-level singleton, so a
 second `getDriverClientInstance()` returns the same tour, and a second `getStripeClientInstance()` returns
@@ -281,6 +289,7 @@ A test that transitively imports `src/infrastructure/layers.ts` must mock every 
 `Layer.empty` rather than set environment variables; [`layers.test.ts`](../layers.test.ts) is the reference.
 
 Each configured service also asserts the missing-variable path twice: that the layer still
-builds, and that the first call fails with that service's tagged error. The logger is the exception and behaves
-differently on purpose: `client.test.ts` asserts that a missing variable makes a log a no-op rather than an
-error, because it has no error channel to fail into.
+builds, and that the first call fails with that service's tagged error. The logger is the exception and has no
+variable to be missing: it writes to `console`. What its test asserts in place of that is the shape of the
+failure it *can* have, a context that will not serialise, and that the line is dropped rather than thrown,
+because it has no error channel to fail into.

@@ -22,7 +22,6 @@ vi.mock("stripe", () => ({
 		errors: { StripeSignatureVerificationError: Error },
 	}),
 }));
-vi.mock("@logtail/edge", () => ({ Logtail: vi.fn() }));
 vi.mock("@opennextjs/cloudflare", () => ({ getCloudflareContext: vi.fn().mockReturnValue({ ctx: {} }) }));
 
 const { ApplicationLayer } = await import("./layers");
@@ -33,8 +32,6 @@ const CLIENT_ENV_KEYS = [
 	"RESEND_API_KEY",
 	"STRIPE_SECRET_KEY",
 	"STRIPE_WEBHOOK_SECRET",
-	"NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN",
-	"NEXT_PUBLIC_BETTER_STACK_INGESTING_URL",
 ];
 
 describe("ApplicationLayer", () => {

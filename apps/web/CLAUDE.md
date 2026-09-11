@@ -26,7 +26,7 @@ The vocabulary is the repo glossary's; see [`CONTEXT.md`](../../CONTEXT.md).
 - **Temporal** via `temporal-polyfill`, never the global
   ([ADR 0005](../../adr/0005-temporal-polyfill.md))
 - **Tailwind CSS** + shadcn/ui; **Turso** via `@tursodatabase/serverless`: hand-written SQL, no ORM;
-  **Stripe**; **Resend**; **BetterStack**
+  **Stripe**; **Resend**; **BetterStack**, reached through the platform's log export rather than an SDK
 - **Cloudflare Workers** via `@opennextjs/cloudflare`, R2 for the incremental cache, the platform's own
   rate-limiting binding for the payment limiter
   ([ADR 0004](../../adr/0004-cloudflare-workers-as-deployment-target.md))
@@ -410,12 +410,21 @@ from it: `pr-<number>-forever-pto-development.fbuireu.workers.dev`, deleted when
 them.** `[observability.logs]` and `[observability.traces]` each name a `destinations` entry,
 one pair per stage, configured in the Cloudflare dashboard with the OTLP
 endpoint and its bearer token. The platform instruments handler invocations, outbound `fetch` and **binding**
-calls with no code, stamps `console.*` output onto the active span, and puts the trace id on every exported
-log record, so a line and the span it failed on answer one query without the app doing anything.
-`head_sampling_rate` is `0.2` on both, in every environment, and `redact_query_string` is on, which is what
-keeps `payment_intent_client_secret` out of a logged request URL.
+calls with no code, attributes `console` output to the active span, and puts the trace id on every log record
+it exports. `head_sampling_rate` is `0.2` on both, in every environment, and `redact_query_string` is on, which
+is what keeps `payment_intent_client_secret` out of a request URL the platform records.
 
-**What follows from that is not obvious, and none of it is in a file.** The destination names are
+**The app's own log lines are in that export because `console` is what the logger writes to, and for one
+release they were not.** `BetterStackClient` held a `@logtail/edge` transport and posted over HTTP from inside
+the Worker, which the runtime cannot see, so the spans and the logs both reached BetterStack with nothing
+joining them: the trace id column was empty on every line the app produced.
+[ADR 0018](../../adr/0018-the-platform-is-the-log-transport.md) is the fix and records its price, which is that
+the structured fields are serialised here and parsed back by the sink rather than handed over as an object.
+Nothing in the deploy carries a BetterStack credential any more, and no `NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN`
+or `NEXT_PUBLIC_BETTER_STACK_INGESTING_URL` exists: the host and the token live on the Cloudflare destination.
+`NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN` is unrelated and stays, for the browser tag.
+
+**What follows from the destinations is not obvious, and none of it is in a file.** The destination names are
 *settings*: a `destinations` entry naming one that has not been created in the dashboard exports nowhere, and
 nothing in this repository can assert it. A destination belongs to the **account** rather than to the Worker,
 created in the account's Workers Observability section and referenced by bare name, so those names share a
@@ -425,19 +434,17 @@ environment here names its own pair, because Better Stack has a source per stage
 stage's destination exports happily into it, filing preview traffic with the live site's. The top level names
 production's, since it shares production's `name` and vars. The spelling is
 `<repo>-<package>-<signal>-<stage>`, matching the GitHub environments and the release tags, so `apps/docs` has
-a name waiting for it. `tests/docs-consistency.test.ts` asserts the split, because the names resolve against
-an account no test can read. And rotating the BetterStack source is now a dashboard change with no deploy,
-which is why no workflow hands the Worker a BetterStack credential any more. Only the build's
-`NEXT_PUBLIC_BETTER_STACK_*` variables survive, which `BetterStackClient` and the browser tracking snippet
-read.
+a name waiting for it, though it declares no `[observability]` at all today. `tests/docs-consistency.test.ts`
+asserts the split, because the names resolve against an account no test can read. And rotating the BetterStack
+source is a dashboard change with no deploy.
 
 **Every use case still ends in `Effect.withSpan` and nothing consumes it, deliberately.** The bridge that used
 to turn those into OpenTelemetry spans is gone with the wrapper: Effect's `Tracer.Span` needs a `traceId` and
 a `spanId` on a span constructed synchronously, and the runtime's `cloudflare:workers` span has neither and
 exists only inside a callback. The calls cost nothing, they mark the boundary of each use case, and they are
 what a future bridge attaches to if Cloudflare ships `spanContext()`. Deleting them is the change to undo.
-[ADR 0017](../../adr/0017-observability-is-the-platform-export.md) records the decision, the three
-alternatives it beat and what it costs;
+[ADR 0017](../../adr/0017-observability-is-the-platform-export.md) records the decision, the alternatives it
+beat and what it costs;
 [ADR 0016](../../adr/0016-traces-reach-betterstack-by-wrapping-the-opennext-entrypoint.md) is the superseded
 one and says which of its own claims expired.
 
