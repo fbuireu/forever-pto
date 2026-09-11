@@ -7,6 +7,9 @@ export default defineConfig({
 	resolve: {
 		tsconfigPaths: true,
 	},
+	css: {
+		postcss: { plugins: [] },
+	},
 	test: {
 		environment: "happy-dom",
 		testTimeout: 20_000,
