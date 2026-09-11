@@ -4,7 +4,13 @@ Date: 2026-09-05
 
 ## Status
 
-Accepted.
+Superseded by [ADR 0017](./0017-observability-is-the-platform-export.md).
+
+The premise below is the part that expired: Cloudflare's observability now takes a `destinations`
+array on both `[observability.logs]` and `[observability.traces]`, so the platform exports what this
+decision said it exported nowhere. One claim in *Consequences* was also wrong when written, and ADR 0017
+uses it as evidence: `@microlabs/otel-cf-workers` has no R2 branch in `instrumentEnv`, so the R2
+incremental cache never produced a span.
 
 ## Context
 
@@ -40,12 +46,12 @@ The alternatives were:
 
 ## Decision
 
-The app Worker's entrypoint is [`apps/web/worker.ts`](../apps/web/worker.ts), which imports the handler OpenNext
+The app Worker's entrypoint is *apps/web/worker.ts*, which imports the handler OpenNext
 writes to `.open-next/worker.js` and exports `instrument(handler, tracingConfig)`. `wrangler.toml` names it as
 `main`; the OpenNext build is untouched and still emits `.open-next/worker.js`, which nothing deploys directly
 any more.
 
-`tracingConfig` lives in [`apps/web/src/infrastructure/clients/logging/better-stack/tracing.ts`](../apps/web/src/infrastructure/clients/logging/better-stack/tracing.ts),
+`tracingConfig` lives in *apps/web/src/infrastructure/clients/logging/better-stack/tracing.ts*,
 beside the log contract, because the spans go to the same BetterStack source as the logs and stamp the same
 `LOG_SERVICE` name, so one query reaches both. It reads the Worker bindings `BETTER_STACK_INGESTING_URL` and
 `BETTER_STACK_SOURCE_TOKEN`, the names the tail Worker already uses, and the deploy hands them over the same

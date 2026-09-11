@@ -186,7 +186,6 @@ src/
   infrastructure/     # everything outbound: clients, services, workers, proxy, api operations, seo route table
   ui/                 # adapters, hooks, i18n, modules (components), styles, assets
 e2e/                  # Playwright specs
-workers/tail/         # the tail consumer Worker, with its own wrangler.toml
 public/               # static assets
 ```
 
@@ -400,78 +399,47 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
 
 ## Deploy
 
-Cloudflare Workers via wrangler ([`wrangler.toml`](./wrangler.toml)): [`worker.ts`](./worker.ts) as the entrypoint, a
-wrapper that imports the handler OpenNext writes to `.open-next/worker.js` and exports it instrumented for
-tracing, `.open-next/assets` served through the `ASSETS` binding, an R2 bucket for the incremental cache, a
-`PAYMENT_RATE_LIMITER` `[[ratelimits]]` binding for the payment limiter, smart placement, and a
-`forever-pto-tail` tail consumer, which is its own Worker under [`workers/tail/`](./workers/tail) and is deployed by the `deploy-tail`
-job when the files its bundle is built from change. Only `env.production` binds a
+Cloudflare Workers via wrangler ([`wrangler.toml`](./wrangler.toml)): `.open-next/worker.js` as the
+entrypoint, exactly what OpenNext generates and nothing wrapped around it, `.open-next/assets` served through
+the `ASSETS` binding, an R2 bucket for the incremental cache, a `PAYMENT_RATE_LIMITER` `[[ratelimits]]`
+binding for the payment limiter, and smart placement. Only `env.production` binds a
 route (`forever-pto.com/*`); `env.development` supplies the preview bindings and CI deploys one worker per PR
 from it: `pr-<number>-forever-pto-development.fbuireu.workers.dev`, deleted when the PR closes.
 
-**Traces go to BetterStack from a wrapper around the generated entrypoint, and that wrapper is the one file in
-the tree that imports a file the tree does not contain.** `wrangler.toml` used to name `.open-next/worker.js`
-as `main`; it names [`worker.ts`](./worker.ts) now, which imports that generated module and exports
-`instrument(handler, tracingConfig)` from `@microlabs/otel-cf-workers`: a root span per request, a child span
-per outbound `fetch` (Stripe, Turso, the R2 cache), exported as OTLP to the `/v1/traces` path of the same
-BetterStack host the logs already reach, under the same token. `tsc` cannot resolve `./.open-next/worker.js`
-on a clean checkout because `.open-next/` is generated and gitignored, so [`open-next.d.ts`](./open-next.d.ts)
-declares it as a wildcard ambient module with the handler's shape written out structurally; keep that
-declaration honest by hand, since a change in what OpenNext exports fails in wrangler rather than in `tsc`.
-The wrapper is bundled by wrangler, not OpenNext, so it imports by relative path like the tail Worker does, and
-nothing can unit-test it without a build: `pnpm cf:build` followed by `wrangler deploy --dry-run` is what proves
-it bundles. What *is* tested is
-[`src/infrastructure/clients/logging/better-stack/tracing.ts`](./src/infrastructure/clients/logging/better-stack/tracing.ts),
-which builds the configuration from the Worker bindings `BETTER_STACK_INGESTING_URL` and
-`BETTER_STACK_SOURCE_TOKEN`, the names the tail Worker reads, handed over the same way: the host as a `--var`,
-the token in `--secrets-file`, both from the GitHub variables the build already reads, and `_deploy-web.yml`
-fails before deploying when either is empty. With either unbound the configuration exports through `DROP_SPANS`,
-an exporter that acknowledges every batch and sends nothing, so a hand-run deploy without them traces into
-nothing rather than into a broken address, and without the per-request `console.warn` the library emits when
-it is handed no exporter at all. Inside a request, every use-case under
-[`src/application/use-cases/`](./src/application/use-cases) is a named child span: each export ends in
-`Effect.withSpan`, and `TracerLive` in [`src/infrastructure/layers.ts`](./src/infrastructure/layers.ts) bridges
-Effect spans onto the OpenTelemetry tracer the wrapper registered, so a trace reads `createPayment` → its
-`fetch` calls rather than a request followed by anonymous `fetch` calls. Sampling is
-`TRACE_SAMPLING_RATIO`, the same fraction `[observability.traces]` gives Cloudflare's own traces, which stay
-enabled; `acceptRemote` is off so a caller cannot raise it through a `traceparent` header. The decision, the
-alternatives it beat and what it costs are
-[ADR 0016](../../adr/0016-traces-reach-betterstack-by-wrapping-the-opennext-entrypoint.md).
+**Logs and traces reach BetterStack through Cloudflare's own OTLP export, and nothing in this tree carries
+them.** `[observability.logs]` and `[observability.traces]` each name a `destinations` entry,
+one pair per stage, configured in the Cloudflare dashboard with the OTLP
+endpoint and its bearer token. The platform instruments handler invocations, outbound `fetch` and **binding**
+calls with no code, stamps `console.*` output onto the active span, and puts the trace id on every exported
+log record, so a line and the span it failed on answer one query without the app doing anything.
+`head_sampling_rate` is `0.2` on both, in every environment, and `redact_query_string` is on, which is what
+keeps `payment_intent_client_secret` out of a logged request URL.
 
-**The tail Worker is gated on what its bundle is built from, which is wider than `workers/tail/`.**
-[`workers/tail/index.ts`](./workers/tail/index.ts) imports the log-level contract out of
-[`src/infrastructure/clients/logging/better-stack/contract.ts`](./src/infrastructure/clients/logging/better-stack/contract.ts), so `TAIL_PATHS` in `ci.yml` has to watch that
-client too. While it named only `apps/web/workers/tail/`, editing the contract redeployed the app and left the
-Worker on the previous bundled copy, and [`workers/tail/index.test.ts`](./workers/tail/index.test.ts) reads the *source* module, so
-nothing in the suite could see the split. `tests/docs-consistency.test.ts` walks that import graph
-**transitively** against the filter now, because whatever the contract itself imports is bundled too, and it
-asserts at least one resolved path lands outside `workers/tail/`: `index.test.ts` imports `./index`, so a walk
-that crossed no folder boundary at all still looked like a successful one.
+**What follows from that is not obvious, and none of it is in a file.** The destination names are
+*settings*: a `destinations` entry naming one that has not been created in the dashboard exports nowhere, and
+nothing in this repository can assert it. A destination belongs to the **account** rather than to the Worker,
+created in the account's Workers Observability section and referenced by bare name, so those names share a
+namespace with the docs site, every per-pull-request preview and the sibling repositories, which is why they
+carry `forever-pto` and not a generic `better-stack`. And a destination has no environment of its own: every
+environment here names its own pair, because Better Stack has a source per stage and a Worker naming another
+stage's destination exports happily into it, filing preview traffic with the live site's. The top level names
+production's, since it shares production's `name` and vars. The spelling is
+`<repo>-<package>-<signal>-<stage>`, matching the GitHub environments and the release tags, so `apps/docs` has
+a name waiting for it. `tests/docs-consistency.test.ts` asserts the split, because the names resolve against
+an account no test can read. And rotating the BetterStack source is now a dashboard change with no deploy,
+which is why no workflow hands the Worker a BetterStack credential any more. Only the build's
+`NEXT_PUBLIC_BETTER_STACK_*` variables survive, which `BetterStackClient` and the browser tracking snippet
+read.
 
-**The tail Worker checks the ingest response and retains its own invocation logs, because it is the one
-Worker whose whole job is telling you what happened.** Its `tail()` handler used to `await fetch(...)` and
-discard the result: a 401 from a rotated or absent `BETTER_STACK_SOURCE_TOKEN`, or any 5xx, resolved to a
-`Response` nobody read, so logging stopped and nothing said so. That is the failure shape
-[`src/app/CLAUDE.md`](./src/app/CLAUDE.md) spends its own paragraphs on for `api/payment/activate`, reproduced in
-the observability path. It now reports a non-`ok` status and a thrown `fetch` through its own
-`console.error`, which the Workers runtime captures only because `workers/tail/wrangler.toml` declares
-`[observability]` with `invocation_logs` and no sampling; without that block there was no second place to
-look. The `console.error` calls carry a `biome-ignore` each, on the same reasoning as the BetterStack
-client's: the log sink has nothing else to call. `workers/tail/index.test.ts` covers the rejected batch, the
-unreachable host and the silence on success.
-
-**`BETTER_STACK_INGESTING_URL` reaches the tail Worker from the same GitHub variable the app build reads,
-and is no longer written in `workers/tail/wrangler.toml`.** The file hardcoded the host in `[vars]` while
-`_deploy-web.yml` read `vars.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL` for the app, so changing the BetterStack
-source, which reissues the host and not only the token, updated the app on the next deploy and left the tail
-Worker posting to a dead endpoint. `deploy-tail` was already reading
-`vars.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN` for the token, so the split was per value rather than per
-Worker; the deploy step now passes `--var BETTER_STACK_INGESTING_URL:<host>` the way `_deploy-web.yml`
-overrides `NEXT_PUBLIC_SITE_URL`, and fails loudly when the variable is unset. A hand-run
-`wrangler deploy` from `workers/tail/` therefore leaves the host unbound, which the handler reports rather
-than swallowing; pass the same `--var` when you deploy it by hand. Rotating either variable requires no
-hand-run at all: `ci.yml` answers `workflow_dispatch`, and a manual dispatch on `main` runs `deploy-tail`
-with the current values.
+**Every use case still ends in `Effect.withSpan` and nothing consumes it, deliberately.** The bridge that used
+to turn those into OpenTelemetry spans is gone with the wrapper: Effect's `Tracer.Span` needs a `traceId` and
+a `spanId` on a span constructed synchronously, and the runtime's `cloudflare:workers` span has neither and
+exists only inside a callback. The calls cost nothing, they mark the boundary of each use case, and they are
+what a future bridge attaches to if Cloudflare ships `spanContext()`. Deleting them is the change to undo.
+[ADR 0017](../../adr/0017-observability-is-the-platform-export.md) records the decision, the three
+alternatives it beat and what it costs;
+[ADR 0016](../../adr/0016-traces-reach-betterstack-by-wrapping-the-opennext-entrypoint.md) is the superseded
+one and says which of its own claims expired.
 
 Every path in `wrangler.toml` is relative to the file itself, so the deploy runs with this package as the
 working directory. Build config lives in `next.config.ts` and [`open-next.config.ts`](./open-next.config.ts).
@@ -479,7 +447,7 @@ working directory. Build config lives in `next.config.ts` and [`open-next.config
 **Wrangler inherits configuration into a named environment but never a binding, so the repeated `[[ratelimits]]`
 blocks are not duplication.** `[assets]` and `[placement]` are declared once at the top
 level and every environment gets them, which is the pattern `apps/docs/CLAUDE.md` teaches, but `vars`,
-`ratelimits`, `r2_buckets` and `tail_consumers` are bindings: an environment that does not declare one does
+`ratelimits` and `r2_buckets` are bindings: an environment that does not declare one does
 not have it. Deleting `[[env.production.ratelimits]]` as a copy of the top-level block is the most ordinary
 tidy-up in the file, and it makes `env.PAYMENT_RATE_LIMITER` `undefined` in production. The limiter fails
 open **by design for errors** (`Effect.catchAll` turns a throwing `.limit()` into "not limited"), which is
@@ -487,8 +455,8 @@ right for a flaky binding and catastrophic for a missing one: `POST /api/payment
 go unbounded in front of Stripe, silently. `tests/docs-consistency.test.ts` asserts every binding name
 `environment.d.ts` declares is present in every environment, and that the rate limiter is bounded
 identically in each. It also asserts each named environment declares every binding **kind** the top level
-declares: `CloudflareEnv` names bindings of its own and neither `r2_buckets` nor `tail_consumers` is one of them,
-so deleting either block from `env.production` passed the name check untouched.
+declares: `CloudflareEnv` names bindings of its own and `r2_buckets` is not one of them,
+so deleting that block from `env.production` passed the name check untouched.
 
 **`[observability]` is inheritable too, and this file restates it in every environment anyway.** It was the example
 the paragraph above used for the safe-to-inherit kind while the file restated it in both named environments,
@@ -541,7 +509,7 @@ again. The rollback jobs keep a multi-word message: wrangler redirects only `dep
 `wrangler rollback` receives its argv untouched.
 
 **No `wrangler deploy` in this repo is wrapped in `nick-fields/retry`'s usual forgiveness for argument
-errors**: not the app's in `_deploy-web.yml`, and not the tail Worker's in `ci.yml`. A wrapper that retries
+errors**: not the app's in `_deploy-web.yml`, and not the docs site's in `docs.yml`. A wrapper that retries
 every failure cannot tell a bad argument from a bad network, and this failure burned repeated identical attempts
 per run before reporting. Only the preview delete keeps its retry; it is idempotent, it takes no argument
 built from an input, and it already treats *does not exist* as success.
@@ -549,10 +517,11 @@ built from an input, and it already treats *does not exist* as success.
 rather than naming one workflow, so a further deploy is covered the day it appears.
 
 **The secret writes had kept theirs, and now there are no secret writes.** `wrangler secret bulk` in
-`_deploy-web.yml` and `wrangler secret put` in `ci.yml`'s `deploy-tail` were each wrapped, and each began with
-a guard that fails on an empty value: a missing environment secret was therefore reported several retries and
-half a minute late, by a wrapper that could not have fixed it on any of them. Both are folded into the deploy
-as `wrangler deploy --secrets-file`, which uploads them **with the version** rather than as a second one.
+`_deploy-web.yml`, and `wrangler secret put` in the `deploy-tail` job that no longer exists, were each
+wrapped, and each began with a guard that fails on an empty value: a missing environment secret was therefore
+reported several retries and half a minute late, by a wrapper that could not have fixed it on any of them. The
+one that survived is folded into the deploy as `wrangler deploy --secrets-file`, which uploads it **with the
+version** rather than as a second one.
 
 That fold is worth more than the wrapper it removes. `wrangler secret bulk` creates a Worker version and a
 deployment of its own, so every deploy here produced an extra one, and between them the freshly deployed code ran

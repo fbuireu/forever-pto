@@ -59,11 +59,7 @@
 		"@base-ui/react": "1.8.0",
 		"@hookform/resolvers": "5.9.1",
 		"@logtail/edge": "0.5.8",
-		"@microlabs/otel-cf-workers": "1.0.0-rc.52",
 		"@opennextjs/cloudflare": "1.20.6",
-		"@opentelemetry/api": "1.9.1",
-		"@opentelemetry/core": "2.11.0",
-		"@opentelemetry/sdk-trace-base": "2.11.0",
 		"@react-email/components": "1.0.12",
 		"@react-email/render": "2.1.0",
 		"@react-pdf/renderer": "4.9.0",
@@ -102,7 +98,6 @@
 		"zustand": "5.0.15"
 	},
 	"devDependencies": {
-		"@opentelemetry/context-async-hooks": "2.11.0",
 		"@playwright/test": "1.63.0",
 		"@tailwindcss/postcss": "4.3.3",
 		"@testing-library/react": "16.3.3",

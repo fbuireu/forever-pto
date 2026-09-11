@@ -321,16 +321,23 @@ Already true, and this list said otherwise:
 catches the Cloudflare Error 1101 the Next pin exists to prevent, and Renovate auto-merged 16.3.1 straight
 past it on 2026-08-22, into the deploy production ran until 1.9.x; pull request 384 merged on 2026-09-01 while the suite was still red. A version pin does not hold against a bot with automerge rights, which is what
 makes this check the missing half of [ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)
-rather than a nicety. It cannot be named in the ruleset directly: every job in `ci.yml` is conditional on the event, and a required check that never reports blocks the merge forever. So `check` is an aggregate under `always()` that needs `verify`, both deploys, `e2e`, `deploy-tail`, `smoke` and `release-web`, fails when any of them failed or was cancelled, and counts a skipped one as success. `docs.yml` has the same shape as `Check (docs)`, over its own `changes`, `build`, `preview`, `deploy`, `smoke` and `release-docs`, which is what made the docs pipeline requireable at all: a path-filtered workflow never reports on a pull request outside its paths, so `docs.yml` carries no `paths:` any more and its `changes` job gates `build` on the same list, `DOCS_PATHS`, instead. **The suite has to be green to hold that power**, and its one flaky case was environmental: the per-request `/_not-found` route on a preview Worker that had never been hit timed out at 30 s. [`apps/web/e2e/warm-up.ts`](./apps/web/e2e/warm-up.ts) is Playwright's `globalSetup`: with `BASE_URL` set it requests the homepage and one unknown path once, with a long timeout, before any worker starts, so the first render a spec sees is not the Worker's first ever.
+rather than a nicety. It cannot be named in the ruleset directly: every job in `ci.yml` is conditional on the event, and a required check that never reports blocks the merge forever. So `check` is an aggregate under `always()` that needs `verify`, both deploys, `e2e`, `smoke` and `release-web`, fails when any of them failed or was cancelled, and counts a skipped one as success. `docs.yml` has the same shape as `Check (docs)`, over its own `changes`, `build`, `preview`, `deploy`, `smoke` and `release-docs`, which is what made the docs pipeline requireable at all: a path-filtered workflow never reports on a pull request outside its paths, so `docs.yml` carries no `paths:` any more and its `changes` job gates `build` on the same list, `DOCS_PATHS`, instead. **The suite has to be green to hold that power**, and its one flaky case was environmental: the per-request `/_not-found` route on a preview Worker that had never been hit timed out at 30 s. [`apps/web/e2e/warm-up.ts`](./apps/web/e2e/warm-up.ts) is Playwright's `globalSetup`: with `BASE_URL` set it requests the homepage and one unknown path once, with a long timeout, before any worker starts, so the first render a spec sees is not the Worker's first ever.
 
-**`deploy-tail` is gated on the files its bundle is built from, which is wider than its own folder.** The tail consumer is a second Worker with its own `wrangler.toml`; the app declares it in `[[tail_consumers]]` but does not carry it. It changes rarely, so `TAIL_PATHS` gates it, but `workers/tail/index.ts` imports the log-level contract from `apps/web/src/infrastructure/clients/logging/`, and while the filter named only `apps/web/workers/tail/**` a change to that contract redeployed the app and left the Worker running the old bundled copy. The Worker's own unit test reads the source module, so it could not see the split. `tests/docs-consistency.test.ts` walks that import graph **transitively** against `TAIL_PATHS` now (one level is not enough, because whatever the contract itself imports is bundled too) and asserts at least one resolved path lands outside `workers/tail/`, since the Worker test's own `./index` import would otherwise make an empty walk look like a successful one. **A reach the walk cannot resolve fails the rule.** It appended `.ts` and nothing else, so a directory specifier standing for the `index.ts` inside it, and a NodeNext `./foo.js`, each produced a path that does not exist, and the final assertion was guarded by `existsSync`, which exempted precisely those. The floor did not notice either: one unresolvable entry is itself an entry outside `workers/tail/`. `ci.yml` also answers
-`workflow_dispatch`, and a manual dispatch on `main` is the credential-rotation path: it runs `deploy-tail`
-unconditionally and `deploy-production` with `smoke` behind it, because every credential is read at build or
-deploy time — the Worker secrets ride `--secrets-file`, the public variables are inlined by the build, and
-the tail Worker takes its token and host as deploy arguments — so rotating any of them changes no file,
-matches no path filter, and used to leave the old value live until an unrelated commit came along.
-`release-web` stays push-gated: a dispatch redeploys the same sha and there is nothing to version. The
-push-triggered gates are unchanged.
+**There is no `deploy-tail` job and no tail consumer Worker.** Logs leave the platform through
+`[observability.logs].destinations` now, which is [ADR 0017](./adr/0017-observability-is-the-platform-export.md);
+the job, `TAIL_PATHS` and the `tail` output of `changes` went with the Worker. What that job taught is worth
+keeping, because the next Worker built out of this tree will hit it: a deploy gated on a path filter has to be
+gated on **every** file its bundle is built from, not on its own folder, and *workers/tail/index.ts* imported
+the log-level contract out of `apps/web/src/infrastructure/clients/logging/` while the filter named only its
+own directory, so editing the contract redeployed the app and left that Worker running the previous bundled
+copy. Its own unit test read the source module, so nothing could see the split. `ci.yml` still answers
+`workflow_dispatch`, and a manual dispatch on `main` is the credential-rotation path: it runs
+`deploy-production` with `smoke` behind it, because every credential is read at build or deploy time (the
+Worker secrets ride `--secrets-file`, the public variables are inlined by the build), so rotating any of
+them changes no file, matches no path filter, and used to leave the old value live until an unrelated commit
+came along. The BetterStack credentials are no longer among them: the endpoint and token live on the
+Cloudflare destination, so reissuing that source needs no deploy at all. `release-web` stays push-gated: a
+dispatch redeploys the same sha and there is nothing to version. The push-triggered gates are unchanged.
 
 **`smoke` is the only job that ever touches production, and until this branch there was none.** `e2e` needs
 `deploy-development`, which runs on `pull_request` only, so a push to `main` deployed production, cut a tag
@@ -414,12 +421,14 @@ and impossible for one that talks to a deployed site. With `BASE_URL` set it ski
 changelogs, because attribution is by path and `main` takes squash merges. Sometimes that is what you
 want, so the job posts a sticky comment saying what will happen and does not fail the run.
 
-**`deploy-tail` passes the BetterStack host as well as the token, and `workers/tail/wrangler.toml` no longer
-hardcodes it.** The host lived in that file's `[vars]` while the app read
-`vars.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL` in `_deploy-web.yml`, so reissuing the BetterStack source
-moved the app and left the tail Worker posting into a dead endpoint, silently. Both values now come from the
-same GitHub variables. The details, and the response check that stops the failure being silent, are in
-[`apps/web/CLAUDE.md`](./apps/web/CLAUDE.md).
+**No deploy step hands the Worker a BetterStack credential any more.** `_deploy-web.yml` used to put
+`BETTER_STACK_SOURCE_TOKEN` in `--secrets-file` and pass `--var BETTER_STACK_INGESTING_URL`, both read only by
+the tracing wrapper that [ADR 0017](./adr/0017-observability-is-the-platform-export.md) deleted. The
+`NEXT_PUBLIC_BETTER_STACK_*` variables the **build** step inlines stay: `BetterStackClient` and the browser
+tracking snippet read them. The failure this closes is worth naming, because it cost a silent outage once: the
+host lived in one place and the token in another, so reissuing the BetterStack source moved the app and left
+the tail Worker posting into a dead endpoint. There is one place now, and it is a Cloudflare setting rather
+than a file.
 
 **`cleanup-development.yml` queues each of its jobs behind the workflow that deployed the Worker that job deletes, which is what stops it deleting a Worker
 that is still under test.** It fires on `pull_request: closed`, and closing a pull request does not cancel
@@ -596,11 +605,7 @@ repository is trying to hold. Both censuses count the job rather than one spelli
 `cloudflare/wrangler-action`'s `command: deploy` input and as a script name that resolves to one (`apps/docs`'s
 `deploy` is `astro build && wrangler deploy`), and a build as `pnpm exec astro build`, `npx next build`, or a
 `build` script reached through the short `-F` flag. The deploy census missed half of this repo's deploys against a floor the visible ones already met, so half the corpus satisfied
-it and the other half was unguarded; that `TAIL_PATHS` matches every relative import reachable **transitively** from
-[`apps/web/workers/tail/`](./apps/web/workers/tail/), at least one of which has to land outside that folder, and that
-every one of those reaches **resolves**: a specifier the walk cannot place is a failure, not an exemption. It used to
-append `.ts` and nothing else, so a directory specifier standing for the `index.ts` inside it, and a NodeNext
-`./foo.js`, both produced a path that does not exist, and the assertion then guarded itself with `existsSync`, skipping exactly the reaches it could not follow;
+it and the other half was unguarded;
 that every workflow file is **linked** from this guide and carries its own `##` section in the wiki, the link rather
 than a bare mention, since `ci.yml` is named throughout here and one incidental mention used to be enough;
 that the cleanup workflow's concurrency
@@ -649,8 +654,9 @@ relative-link rule could not catch because they were prose rather than links.
 - **Biome's `noConsole` is an error with no allowlist**: no `console` at any level, so a stray `console.log`
   fails the build rather than shipping. The places that call it anyway are the log sink itself, which
   has nothing else to call: the BetterStack client's unconfigured warning, scoped in `biome.json`'s
-  `overrides`, and the ingest-failure reports in `apps/web/workers/tail/index.ts`, which carry a
-  `biome-ignore` each rather than a second `overrides` entry. Anything else is a defect.
+  `overrides`. That is the only entry, and it is the whole allowance; anything else is a defect. A second
+  `overrides` entry is the wrong shape for a one-off, where a `biome-ignore` comment on the call is the right
+  one, but neither is warranted today.
 - **`format:changed` and `lint:changed` pass `--changed`, which means "changed against `main`".** On a
   branch that moves or renames a large number of files that is every one of them, and a `pre-commit` hook
   will happily reformat and stage files the commit was never about.

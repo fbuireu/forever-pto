@@ -1,5 +1,5 @@
 name = "forever-pto"
-main = "worker.ts"
+main = ".open-next/worker.js"
 compatibility_date = "2025-11-25"
 compatibility_flags = ["nodejs_compat", "enable_nodejs_process_v2"]
 keep_names = false
@@ -10,17 +10,17 @@ binding = "ASSETS"
 
 [observability]
 enabled = true
+redact_query_string = true
 
 [observability.logs]
 invocation_logs = true
 head_sampling_rate = 0.2
+destinations = ["forever-pto-web-logs-production"]
 
 [observability.traces]
 enabled = true
 head_sampling_rate = 0.2
-
-[[tail_consumers]]
-service = "forever-pto-tail"
+destinations = ["forever-pto-web-traces-production"]
 
 [placement]
 mode = "smart"
@@ -42,19 +42,19 @@ NEXT_PUBLIC_CONTACT_EMAIL = "contact@forever-pto.com"
 [env.development]
 name = "forever-pto-development"
 
-[[env.development.tail_consumers]]
-service = "forever-pto-tail"
-
 [env.development.observability]
 enabled = true
+redact_query_string = true
 
 [env.development.observability.logs]
 invocation_logs = true
 head_sampling_rate = 0.2
+destinations = ["forever-pto-web-logs-development"]
 
 [env.development.observability.traces]
 enabled = true
 head_sampling_rate = 0.2
+destinations = ["forever-pto-web-traces-development"]
 
 [env.development.vars]
 NEXT_PUBLIC_SITE_URL = "https://forever-pto-development.fbuireu.workers.dev"
@@ -76,17 +76,17 @@ name = "forever-pto"
 
 [env.production.observability]
 enabled = true
+redact_query_string = true
 
 [env.production.observability.logs]
 invocation_logs = true
 head_sampling_rate = 0.2
+destinations = ["forever-pto-web-logs-production"]
 
 [env.production.observability.traces]
 enabled = true
 head_sampling_rate = 0.2
-
-[[env.production.tail_consumers]]
-service = "forever-pto-tail"
+destinations = ["forever-pto-web-traces-production"]
 
 [env.production.vars]
 NEXT_PUBLIC_SITE_URL = "https://forever-pto.com"
