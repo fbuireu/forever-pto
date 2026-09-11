@@ -75,9 +75,8 @@ pnpm test:docs          # the contract suite alone
 pnpm test:ut:coverage   # apps/web with coverage, then the contract suite with coverage
 pnpm test:e2e           # apps/web playwright
 pnpm verify:static      # format:check && typecheck: everything verify does but the suite
-pnpm verify             # verify:static && test:ut:coverage; the CI Check job
-pnpm verify:changed     # verify:static && test:ut:changed; what pre-push runs
-pnpm since              # prints the push target the :changed variants diff against
+pnpm verify             # verify:static && test:ut:coverage; the CI Check job and pre-push
+pnpm verify:changed     # verify:static && test:ut:changed; see the gotcha before reaching for it
 ```
 
 `pnpm --filter forever-pto-docs dev` runs the docs site; it has no root passthrough because nothing else
@@ -460,16 +459,19 @@ says `cleanup-docs` rides along harmlessly: it did not, it rode along behind an 
 version from `apps/web/package.json`; without a dispatch after a web release, the published site keeps
 advertising the previous one.
 
-Husky runs `lint-staged` on `pre-commit`, `commitlint` on `commit-msg` and `verify:changed` on `pre-push`.
+Husky runs `lint-staged` on `pre-commit`, `commitlint` on `commit-msg` and `verify` on `pre-push`, the same
+command the CI `Verify` job runs, so a green push is a green check.
 
-**The hook deliberately runs something weaker than the CI `Verify` job, and the coverage floor is why.**
-`apps/web/vitest.config.ts` sets `coverage.include` over all of `src`, which is what makes v8 report a file no
-test loaded as zero, so a changed-only subset drags the global average under the floor and fails on a clean
-tree: a scoped run and the threshold cannot both hold. Coverage stays in CI, where `Verify` runs the full
-`pnpm verify` on the pushed sha, so a push whose coverage dropped still fails its check; what the hook gives
-up is the claim that a green push is a green check, and what it buys is that the whole-repo run stops
-standing between you and a push, which is when a hook starts getting skipped with `--no-verify` and protects
-nothing at all.
+**`verify:changed` exists and this repository cannot use it, unlike the siblings.** It swaps the coverage run
+for `test:ut:changed`, which is what keeps a `pre-push` short enough not to be skipped with `--no-verify`;
+here `test:ut:changed` does not run at all, for the PostCSS reason in the gotchas. Until that is fixed the
+hook runs the full `verify`, and the saving would have been small anyway: the coverage step is a few seconds
+of a run the type checks dominate.
+
+**A hook on `pre-push` also fires for pushes this repository makes to itself.** `@semantic-release/git`
+pushes the release commit, and husky is installed on the runner by `prepare`, so whatever `pre-push` runs
+happens inside the release job as well. That is how a broken `test:ut:changed` took out `Semantic Release`
+rather than only a developer's push.
 
 **`typecheck` ends with `astro check`, and that tail is what puts the cross-package seam in front of
 the author.** (Do not "fix" that command by pointing it at `tsc`: a raw `tsc --noEmit -p apps/docs` reports
@@ -668,14 +670,23 @@ relative-link rule could not catch because they were prose rather than links.
   `overrides`. That is the only entry, and it is the whole allowance; anything else is a defect. A second
   `overrides` entry is the wrong shape for a one-off, where a `biome-ignore` comment on the call is the right
   one, but neither is warranted today.
-- **Every `:changed` variant takes its base from `pnpm since`, because no tool's default was usable here.**
-  It resolves `@{push}`, the ref the current branch would push to, falling back to `origin/main` when the
-  branch has no upstream. Biome's own `--changed` diffs against `vcs.defaultBranch`, which is `main`, so on
-  `main` it selected nothing whatever had changed and `pnpm format:changed` answered *Checked 0 files*; that
-  is a green check that checked nothing, and it had been the state of both Biome variants here. Vitest's
-  `--changed` took a hardcoded `origin/main`, which is the wrong base on any other branch. What the base
-  cannot fix is breadth: on a branch that moves or renames a large number of files the changed set is still
-  every one of them, and `format:changed` will happily reformat files the work was never about.
+- **A `:changed` variant names a literal base, and computing one is what it must not do.** A `package.json`
+  script runs under `cmd` on Windows, where `$(...)` is not substituted but passed through as literal argv,
+  so a script that resolved the branch's push target broke every push from a Windows checkout. Vitest
+  therefore takes `origin/main` outright. On a branch that is wider than the push needs and never narrower,
+  so it errs safe, and what no base fixes is breadth: on a branch that moves or renames a large number of
+  files the changed set is still every one of them.
+- **Biome's `--changed` selects nothing on `main`, and that is left alone.** It diffs against
+  `vcs.defaultBranch`, which is `main`, so standing on `main` there is nothing to compare and
+  `pnpm format:changed` answers *Checked 0 files* however much has changed. Setting `defaultBranch` to a
+  revision expression works (`@{push}` resolves) and is worse: on a branch with no upstream it silently
+  checks nothing and exits zero. Reach for `format:all` instead, which reads the whole tree in well under a
+  second.
+- **`vitest --changed` does not work in `apps/web`.** [`apps/web/postcss.config.mjs`](./apps/web/postcss.config.mjs) declares
+  `plugins: ["@tailwindcss/postcss"]`, the string form Next resolves and Vite does not, so a Vitest run that
+  reaches the CSS pipeline answers `Invalid PostCSS Plugin found at: plugins[0]`. The plain unit suite never
+  gets there and passes; `test:ut:changed` does and fails. It had been failing since before anything called
+  it, which is why nobody knew: no workflow and no hook ran it.
 - **The `v1` floating tag is stale and nothing maintains it.** It diverges between local and remote, which
   makes semantic-release's own `git fetch --tags` fail outright with *would clobber existing tag*. No
   workflow moves it and no ADR records it.
