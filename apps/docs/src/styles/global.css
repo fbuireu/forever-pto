@@ -238,7 +238,10 @@ figure.mermaid.mermaid-expanded > svg {
   box-shadow: var(--shadow-brutal-sm);
   display: table;
   margin-block: 1.5rem;
-  overflow-wrap: anywhere;
+  /* `break-word`, never `anywhere`: `anywhere` is taken into account when the browser computes a
+     column's minimum width, so a narrow column collapses to one character per line. The Value
+     column of the tunables table read as a vertical "V A L U E" until this changed. */
+  overflow-wrap: break-word;
   width: 100%;
 }
 
@@ -249,6 +252,8 @@ figure.mermaid.mermaid-expanded > svg {
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  /* A header is two or three words; wrapping one is what made it unreadable. */
+  white-space: nowrap;
 }
 
 .sl-markdown-content :is(th, td):not(:where(.not-content *)) {
@@ -272,6 +277,67 @@ figure.mermaid.mermaid-expanded > svg {
 
 .sl-markdown-content tbody tr:last-child td:not(:where(.not-content *)) {
   border-bottom: 0;
+}
+
+/* A long identifier does not wrap, so it sets its column's minimum width and squeezes the prose
+   beside it. The generated tables (props, variants, tunables, strategies) pin their columns with a
+   colgroup instead, and only there is the eager break wanted: inside a fixed layout a token that
+   does not fit has nowhere else to go. */
+.sl-markdown-content table[style*='fixed'] :is(td, th) code {
+  /* Tighter than prose code: the padding of the default chrome is what pushed a nine-character
+     token past its pinned column and broke the closing quote onto its own line. */
+  font-size: 0.78em;
+  overflow-wrap: anywhere;
+  padding-inline: 0.3em;
+}
+
+/* Below the sidebar breakpoint the column is too narrow for a wide table to fill honestly, so it
+   goes back to Starlight's scrolling block instead of squeezing every column. */
+@media (max-width: 50rem) {
+  .sl-markdown-content table:not(:where(.not-content *)) {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+/* The theme and language pickers, framed the way the app frames a control */
+starlight-theme-select > label,
+starlight-lang-select > label {
+  background: var(--surface-panel);
+  border: 2px solid var(--frame);
+  border-radius: 8px;
+  box-shadow: var(--shadow-brutal-xs);
+  color: var(--foreground);
+  font-weight: 700;
+  padding-inline: 0.5rem;
+  transition:
+    translate 80ms linear,
+    box-shadow 80ms linear;
+}
+
+starlight-theme-select > label:hover,
+starlight-lang-select > label:hover {
+  box-shadow: var(--shadow-brutal-sm);
+  translate: -1px -1px;
+}
+
+starlight-theme-select > label:focus-within,
+starlight-lang-select > label:focus-within {
+  background: var(--accent);
+  color: var(--color-brand-ink);
+}
+
+starlight-theme-select select,
+starlight-lang-select select {
+  color: inherit;
+  font-weight: 700;
+  padding-block: 0.3rem;
+}
+
+starlight-theme-select select option,
+starlight-lang-select select option {
+  background: var(--surface-panel);
+  color: var(--foreground);
 }
 
 /* Asides: full frame, hard shadow, the tint kept */

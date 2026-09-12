@@ -26,7 +26,13 @@ interface PropsTableProps {
 
 export const PropsTable = ({ rows, extends: base }: PropsTableProps) => (
 	<>
-		<table>
+		<table style={{ tableLayout: "fixed" }}>
+			<colgroup>
+				<col style={{ width: "17%" }} />
+				<col style={{ width: "21%" }} />
+				<col style={{ width: "19%" }} />
+				<col style={{ width: "43%" }} />
+			</colgroup>
 			<thead>
 				<tr>
 					<th>Prop</th>

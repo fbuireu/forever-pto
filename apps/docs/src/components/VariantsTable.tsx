@@ -14,7 +14,13 @@ export interface VariantRow {
  */
 export const VariantsTable = ({ rows }: { rows: VariantRow[] }) => {
 	return (
-		<table>
+		<table style={{ tableLayout: "fixed" }}>
+			<colgroup>
+				<col style={{ width: "14%" }} />
+				<col style={{ width: "36%" }} />
+				<col style={{ width: "14%" }} />
+				<col style={{ width: "36%" }} />
+			</colgroup>
 			<thead>
 				<tr>
 					<th>Axis</th>

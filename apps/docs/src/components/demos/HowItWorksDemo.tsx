@@ -21,7 +21,11 @@ const STRATEGY_DESCRIPTIONS: Record<FilterStrategy, string> = {
 };
 
 export const StrategiesTable = () => (
-	<table>
+	<table style={{ tableLayout: "fixed" }}>
+		<colgroup>
+			<col style={{ width: "16%" }} />
+			<col style={{ width: "84%" }} />
+		</colgroup>
 		<thead>
 			<tr>
 				<th>Value</th>

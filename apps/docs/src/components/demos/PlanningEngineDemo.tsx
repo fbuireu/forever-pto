@@ -56,7 +56,13 @@ export const TunablesTable = () => {
 	const keys = Object.keys(TUNABLE_DESCRIPTIONS) as TunableKey[];
 
 	return (
-		<table>
+		<table style={{ tableLayout: "fixed" }}>
+			<colgroup>
+				<col style={{ width: "18%" }} />
+				<col style={{ width: "26%" }} />
+				<col style={{ width: "10%" }} />
+				<col style={{ width: "46%" }} />
+			</colgroup>
 			<thead>
 				<tr>
 					<th>Group</th>
@@ -74,7 +80,9 @@ export const TunablesTable = () => {
 						<td>
 							<code>{key.includes(".") ? key.split(".").slice(1).join(".") : key}</code>
 						</td>
-						<td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{readTunable(key)}</td>
+						<td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>
+							{readTunable(key)}
+						</td>
 						<td>{TUNABLE_DESCRIPTIONS[key]}</td>
 					</tr>
 				))}
