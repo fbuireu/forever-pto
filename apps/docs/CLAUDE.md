@@ -75,6 +75,50 @@ has this shape — nothing in their `e2e/` reads the filesystem while collecting
 - **Every sidebar group carries its `translations: { es }`, the nested ones included.** The ones under "Design system" did not, so a Spanish visitor read English labels inside an otherwise Spanish sidebar. "Design system" itself stays untranslated on purpose.
 - **Commits touching docs use the `docs:` type**: the repo squash-merges and the PR title becomes the commit on main, so a `feat:`/`fix:` title would cut an app release. See `/contributing/conventions/`.
 
+## Analytics and consent
+
+The wiki measures itself, and everything it measures is browser-side. There is no observability here and there
+cannot be: `wrangler.toml` declares no `main`, so Cloudflare serves the built assets without invoking a script
+and there is no handler, `fetch` or binding call to trace. Naming a `destinations` entry would create a
+destination that receives its own test message and nothing else.
+[ADR 0019](../../adr/0019-the-wiki-measures-itself-with-its-own-consent-flow.md) records the whole decision.
+
+- [`src/lib/analytics/consent.ts`](./src/lib/analytics/consent.ts) configures `vanilla-cookieconsent` with the
+  library's own UI, in English and Spanish picked off `document.documentElement.lang`, and wires the answer to
+  both services. [`src/components/Head.astro`](./src/components/Head.astro) is a Starlight `Head` override
+  that emits Consent Mode defaults of `denied` before `gtag.js` loads, then boots the consent module.
+- **This shares the library and the vocabulary with the app, and nothing else.** The `analytics` category and
+  the `ga4` and `betterStack` service ids are the same strings, and `vanilla-cookieconsent` is pinned to the
+  same version, so a reader can move between the two. The app's consent UI is React reading `next-intl` off
+  its own bundles, with a cookie table listing Stripe cookies the wiki never sets; porting that into an island
+  would cost more than the file it replaces.
+- **Google Analytics uses the app's measurement id on purpose.** Both sites are subdomains of
+  `forever-pto.com`, so one id gives a single session that runs from the wiki into the planner, separated by
+  the `Hostname` dimension. It lives in one repository variable, `GOOGLE_ANALYTICS_ID`, and each workflow maps
+  it to the prefix its bundler inlines.
+- **Better Stack RUM uses a source of its own, per stage, under one variable name.** Sharing the app's would
+  file wiki sessions under the app's `release`, and this package's version is `0.0.0` for good. So
+  `BETTER_STACK_TRACKING_TOKEN` is a variable on `docs-development` and `docs-production`.
+- **Which is why `build` in [`docs.yml`](../../.github/workflows/docs.yml) declares an `environment:`, and it
+  had none.** A job without one reads an empty string from any environment variable, and the single
+  `docs-dist` artifact both `preview` and `deploy` ship can only carry one baked value. The job now names
+  `docs-development` on a pull request and `docs-production` on a push, so each build takes its own stage's
+  token. If `docs-production` ever grows a required reviewer, that gate moves onto the build.
+- **The tags report a floor, not a census.** Better Stack RUM is Sentry's browser SDK underneath and posts to
+  a Sentry `envelope` endpoint, which ad blockers filter hard; GA4 fares no better. Only Cloudflare's own
+  request analytics cannot be blocked. `blocked:other` on that POST in DevTools is an extension, not the CSP:
+  `_headers` admits the host.
+- **[`public/_headers`](./public/_headers) is new, and the site had no headers at all before it.** It carries
+  the CSP that admits the two tags plus HSTS, `nosniff`, `DENY` framing and a referrer policy. The app states
+  its own policy in `next.config.ts`, which the contract suite asserts; this one has no Worker to serve it
+  from, so Cloudflare's static-asset `_headers` support is what applies it. Nothing compares the two.
+- **[`e2e/cookie-consent.spec.ts`](./e2e/cookie-consent.spec.ts) has to tell the browser it is not a robot.**
+  `vanilla-cookieconsent` defaults `hideFromBots` to true, and the check is
+  `/bot|crawl|spider|slurp|teoma/i.test(userAgent) || navigator.webdriver`. Playwright sets
+  `navigator.webdriver`, so the banner never renders while `run()` resolves without an error, which reads as
+  broken code and is the library doing its job. The spec overrides that property in a `beforeEach`. Do not
+  answer it by setting `hideFromBots: false`.
+
 ## Deploy
 
 Wrangler environments, the same shape the app uses. `[assets]` is declared once at the top level and both inherit it. **`name` does not differ between the top level and production**: both are `forever-pto-docs`, and what production actually overrides is the route plus the exposure flags.
@@ -83,6 +127,6 @@ Wrangler environments, the same shape the app uses. `[assets]` is declared once 
 - **PRs**: `deploy --env development --name pr-<n>-forever-pto-docs-development` → one Worker per pull request at `pr-<n>-forever-pto-docs-development.fbuireu.workers.dev`. The `--name` override is what mints a fresh Worker instead of updating the stable one, so open PRs never overwrite each other's preview.
 - **[`cleanup-development.yml`](../../.github/workflows/cleanup-development.yml) deletes it when the PR closes**, in a job of its own beside the app's. A per-PR Worker that nothing tears down accumulates forever.
 - **Previews never touch the production Worker**, which is the whole point of the development environment: it carries no custom domain, so a preview cannot answer on docs.forever-pto.com.
-- The GitHub environments are split per package: this site uses `docs-production` and `docs-development`, and carries none of the app's `NEXT_PUBLIC_*` values in either. It does need the Cloudflare credentials: every docs job declares `environment:` and read `CLOUDFLARE_API_TOKEN` from inside it, so the pair is on the repository guide's setup checklist like the `web-*` pair. Only `PAT` and `CODECOV_TOKEN` are repository-level.
+- The GitHub environments are split per package: this site uses `docs-production` and `docs-development`, and carries none of the app's `NEXT_PUBLIC_*` values in either. What it does carry on both is `BETTER_STACK_TRACKING_TOKEN`, read by `build` rather than by a deploy job; see *Analytics and consent*. It does need the Cloudflare credentials: every docs job declares `environment:` and read `CLOUDFLARE_API_TOKEN` from inside it, so the pair is on the repository guide's setup checklist like the `web-*` pair. Only `PAT` and `CODECOV_TOKEN` are repository-level.
 - **`workers_dev` and `preview_urls` are inheritable, so production has to refuse them explicitly.** Both are `true` at the top level, which is what a per-PR preview needs and what `[env.development]` therefore inherits rather than restating, and `[env.production]` sets both to `false`. They were inherited, so the published wiki also answered on a `workers.dev` origin, from a `robots.txt` that says `Allow: /`. Starlight emits a correct canonical, so that was hygiene rather than an incident.
 - **`pnpm --filter forever-pto-docs deploy` passes no `--env`, so it deploys the top-level config to the live production Worker.** The top level carries production's own `name` with no route block and with `workers_dev = true`, so a local one-shot deploy overwrites docs.forever-pto.com and turns its `workers.dev` origin back on. Run `wrangler deploy --env production`, which is what the workflow runs.
