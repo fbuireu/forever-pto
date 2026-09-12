@@ -1,11 +1,11 @@
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import { ValidationError } from "@infrastructure/errors";
+import { LoggerService } from "@infrastructure/logging/service";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import { zodParse } from "./zodParse";
 
-const mockLogger = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
+const mockLogger = { info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
 const TestLayer = Layer.succeed(LoggerService, mockLogger);
 const run = <A>(eff: Effect.Effect<A, ValidationError, LoggerService>) =>
 	Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
@@ -29,10 +29,10 @@ describe("zodParse", () => {
 
 	it("logs the failing field and message on ZodError", async () => {
 		await runFail(zodParse({ schema, data: { name: "A", age: 30 } }));
-		expect(mockLogger.warn).toHaveBeenCalledWith(
-			"Validation error",
-			expect.objectContaining({ field: "name", message: expect.any(String) }),
-		);
+		expect(mockLogger.warn).toHaveBeenCalledWith({
+			message: "Validation error",
+			context: expect.objectContaining({ field: "name", message: expect.any(String) }),
+		});
 	});
 
 	it("carries the Zod message in the ValidationError", async () => {

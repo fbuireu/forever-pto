@@ -1,6 +1,5 @@
 import { describeFailure } from "@infrastructure/api/errors";
 import type { TursoService } from "@infrastructure/clients/db/turso/service";
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import type { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import type {
 	DatabaseError,
@@ -10,6 +9,7 @@ import type {
 	ValidationError,
 } from "@infrastructure/errors";
 import { ApplicationLayer } from "@infrastructure/layers";
+import { LoggerService } from "@infrastructure/logging/service";
 import { checkRateLimit } from "@infrastructure/services/payments/rateLimit";
 import { traced } from "@infrastructure/span";
 import { Effect } from "effect";
@@ -73,9 +73,9 @@ const activatePremiumProgram = ({
 					const { status, error } = describeFailure(failure);
 
 					if (status >= 500) {
-						logger.error("Premium activation failed", failureContext(failure));
+						logger.error({ message: "Premium activation failed", context: failureContext(failure) });
 					} else {
-						logger.warn("Premium activation refused", failureContext(failure));
+						logger.warn({ message: "Premium activation refused", context: failureContext(failure) });
 					}
 
 					return refused({ status: status as 400 | 429 | 500, error });

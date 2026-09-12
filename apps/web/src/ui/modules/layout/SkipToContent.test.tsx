@@ -51,8 +51,8 @@ vi.mock("@application/i18n/navigation", () => ({ Link: () => null }));
 vi.mock("@application/shared/utils/clientLog", () => ({ logClientError: vi.fn() }));
 vi.mock("@infrastructure/layers", () => ({ ApplicationLayer: Layer.empty }));
 vi.mock("@infrastructure/services/payments/confirmation", () => ({ confirmation: mockConfirmation }));
-vi.mock("@infrastructure/clients/logging/better-stack/client", () => ({
-	getBetterStackInstance: () => mockLogger,
+vi.mock("@infrastructure/logging/logger", () => ({
+	logger: mockLogger,
 }));
 vi.mock("@ui/modules/core/primitives/Button", () => ({ Button: () => null }));
 vi.mock("@ui/modules/core/primitives/Card", () => {

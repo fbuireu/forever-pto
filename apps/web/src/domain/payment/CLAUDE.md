@@ -195,8 +195,8 @@ one must sit on the step it names: in `updateCharge` the retrieval log is piped 
 failed write and log it a second time as a retrieval failure that never happened. The early-return
 warnings (in both handlers, on a write that touched no row) are
 bare statements in the generator body, because there is no failure to tap: the condition is a successful
-write that touched no row. That is safe only because `BetterStackClient` cannot throw; see
-[`../../infrastructure/clients/CLAUDE.md`](../../infrastructure/clients/CLAUDE.md). `Effect.sync` would not
+write that touched no row. That is safe only because `logger` cannot throw; see
+[`../../infrastructure/CLAUDE.md`](../../infrastructure/CLAUDE.md). `Effect.sync` would not
 buy safety anyway; a throw inside it is a defect just the same.
 
 ## Out of scope

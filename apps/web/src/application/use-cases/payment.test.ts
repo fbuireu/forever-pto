@@ -1,7 +1,7 @@
 import { TursoService } from "@infrastructure/clients/db/turso/service";
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import { PaymentError, ValidationError } from "@infrastructure/errors";
+import { LoggerService } from "@infrastructure/logging/service";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createPayment } from "./payment";
@@ -29,7 +29,7 @@ vi.mock("@infrastructure/services/payments/repository", () => ({
 	updatePaymentStatus: vi.fn(() => Effect.succeed(undefined)),
 }));
 
-const mockLogger = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
+const mockLogger = { info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
 const TestLayer = Layer.mergeAll(
 	Layer.succeed(LoggerService, mockLogger),
 	Layer.succeed(TursoService, { query: vi.fn(), execute: vi.fn() }),

@@ -1,6 +1,6 @@
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import { PaymentError } from "@infrastructure/errors";
+import { LoggerService } from "@infrastructure/logging/service";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -20,7 +20,6 @@ const MockStripeLayer = Layer.succeed(StripeServerService, {
 });
 
 const MockLoggerLayer = Layer.succeed(LoggerService, {
-	debug: vi.fn(),
 	info: vi.fn(),
 	warn: vi.fn(),
 	error: vi.fn(),
@@ -60,10 +59,10 @@ describe("confirmation", () => {
 		const result = await run("pi_err");
 		expect(result).toBeNull();
 		expect(mockLogError).toHaveBeenCalledOnce();
-		expect(mockLogError).toHaveBeenCalledWith(
-			"Failed to retrieve payment intent",
+		expect(mockLogError).toHaveBeenCalledWith({
+			message: "Failed to retrieve payment intent",
 			error,
-			expect.objectContaining({ paymentIntentId: "pi_err", service: "confirmation" }),
-		);
+			context: expect.objectContaining({ paymentIntentId: "pi_err", service: "confirmation" }),
+		});
 	});
 });

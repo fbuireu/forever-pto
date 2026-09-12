@@ -7,7 +7,7 @@ vi.mock("@infrastructure/clients/db/turso/service", () => ({
 vi.mock("@infrastructure/clients/email/resend/service", () => ({
 	ResendServiceLive: Layer.empty,
 }));
-vi.mock("@infrastructure/clients/logging/better-stack/service", () => ({
+vi.mock("@infrastructure/logging/service", () => ({
 	LoggerServiceLive: Layer.empty,
 }));
 vi.mock("@infrastructure/clients/payments/stripe/serverService", () => ({
@@ -49,7 +49,7 @@ describe("ApplicationLayer", () => {
 		vi.resetModules();
 		vi.doUnmock("@infrastructure/clients/db/turso/service");
 		vi.doUnmock("@infrastructure/clients/email/resend/service");
-		vi.doUnmock("@infrastructure/clients/logging/better-stack/service");
+		vi.doUnmock("@infrastructure/logging/service");
 		vi.doUnmock("@infrastructure/clients/payments/stripe/serverService");
 
 		const { ApplicationLayer: realLayer } = await import("./layers");
@@ -65,7 +65,7 @@ describe("ApplicationLayer", () => {
 		vi.resetModules();
 		vi.doUnmock("@infrastructure/clients/db/turso/service");
 		vi.doUnmock("@infrastructure/clients/email/resend/service");
-		vi.doUnmock("@infrastructure/clients/logging/better-stack/service");
+		vi.doUnmock("@infrastructure/logging/service");
 		vi.doUnmock("@infrastructure/clients/payments/stripe/serverService");
 
 		const [{ ApplicationLayer: realLayer }, { TursoService }] = await Promise.all([

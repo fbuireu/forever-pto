@@ -3,9 +3,9 @@ import type { NewPayment } from "@application/dto/payment/types";
 import { emailDomain } from "@application/shared/utils/redact";
 import { PAYMENT_SUCCEEDED } from "@domain/payment/events/types";
 import type { TursoService } from "@infrastructure/clients/db/turso/service";
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import { type DatabaseError, type PaymentError, type SessionError, ValidationError } from "@infrastructure/errors";
+import { LoggerService } from "@infrastructure/logging/service";
 import { normalizeEmail } from "@infrastructure/services/payments/normalizeEmail";
 import { readDonationMetadata } from "@infrastructure/services/payments/provider/metadata";
 import {
@@ -63,15 +63,18 @@ const activateFromDonation = ({
 			yield* savePayment(paymentData).pipe(
 				Effect.tap((created) =>
 					Effect.sync(() => {
-						if (created) logger.info("Payment created successfully", { paymentIntentId });
+						if (created) logger.info({ message: "Payment created successfully", context: { paymentIntentId } });
 					}),
 				),
 				Effect.tapError((e) =>
 					Effect.sync(() => {
-						logger.warn("Failed to save payment to database, will use webhook fallback", {
-							reason: e.message,
-							paymentIntentId,
-							emailDomain: emailDomain(email),
+						logger.warn({
+							message: "Failed to save payment to database, will use webhook fallback",
+							context: {
+								reason: e.message,
+								paymentIntentId,
+								emailDomain: emailDomain(email),
+							},
 						});
 					}),
 				),
@@ -81,10 +84,13 @@ const activateFromDonation = ({
 			yield* updatePaymentStatus({ paymentIntentId, status: PAYMENT_SUCCEEDED }).pipe(
 				Effect.catchAll((e) =>
 					Effect.sync(() => {
-						logger.error("Failed to update payment status", {
-							reason: e.message,
-							paymentIntentId,
-							emailDomain: emailDomain(email),
+						logger.error({
+							message: "Failed to update payment status",
+							context: {
+								reason: e.message,
+								paymentIntentId,
+								emailDomain: emailDomain(email),
+							},
 						});
 						return false;
 					}),

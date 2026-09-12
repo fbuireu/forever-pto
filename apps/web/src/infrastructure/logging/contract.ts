@@ -1,7 +1,6 @@
-export const LOG_SERVICE = "forever-pto";
+export const LOG_SERVICE = "forever-pto-web";
 
 export const LOG_LEVEL = {
-	DEBUG: "debug",
 	INFO: "info",
 	WARN: "warn",
 	ERROR: "error",

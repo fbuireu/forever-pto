@@ -51,7 +51,7 @@
 			}
 		},
 		{
-			"includes": ["**/apps/web/src/infrastructure/clients/logging/better-stack/client.ts"],
+			"includes": ["**/apps/web/src/infrastructure/logging/logger.ts"],
 			"linter": {
 				"rules": {
 					"suspicious": {

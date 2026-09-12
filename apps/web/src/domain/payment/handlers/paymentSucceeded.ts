@@ -1,7 +1,7 @@
 import type { TursoService } from "@infrastructure/clients/db/turso/service";
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import type { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import type { DatabaseError } from "@infrastructure/errors";
+import { LoggerService } from "@infrastructure/logging/service";
 import { retrieveCharge } from "@infrastructure/services/payments/provider/charge";
 import { updatePaymentCharge, updatePaymentStatus } from "@infrastructure/services/payments/repository";
 import { Effect } from "effect";
@@ -19,10 +19,13 @@ const updateCharge = (
 		yield* retrieveCharge(latestChargeId).pipe(
 			Effect.tapError((e) =>
 				Effect.sync(() => {
-					logger.error("Failed to retrieve charge details", {
-						reason: e.message,
-						chargeId: latestChargeId,
-						paymentId: event.paymentId,
+					logger.error({
+						message: "Failed to retrieve charge details",
+						context: {
+							reason: e.message,
+							chargeId: latestChargeId,
+							paymentId: event.paymentId,
+						},
 					});
 				}),
 			),
@@ -44,10 +47,13 @@ const updateCharge = (
 				}).pipe(
 					Effect.tapError((e) =>
 						Effect.sync(() => {
-							logger.error("Failed to update charge details", {
-								reason: e.message,
-								paymentId: event.paymentId,
-								chargeId: latestChargeId,
+							logger.error({
+								message: "Failed to update charge details",
+								context: {
+									reason: e.message,
+									paymentId: event.paymentId,
+									chargeId: latestChargeId,
+								},
 							});
 						}),
 					),
@@ -67,8 +73,11 @@ export const handlePaymentSucceeded = (
 		const updated = yield* updatePaymentStatus({ paymentIntentId: event.paymentId, status: event.status });
 
 		if (!updated) {
-			logger.warn("Succeeded-payment event wrote no status: the payment is absent or already succeeded", {
-				paymentId: event.paymentId,
+			logger.warn({
+				message: "Succeeded-payment event wrote no status: the payment is absent or already succeeded",
+				context: {
+					paymentId: event.paymentId,
+				},
 			});
 		}
 

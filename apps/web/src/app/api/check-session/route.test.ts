@@ -1,7 +1,7 @@
 import { ApiError } from "@infrastructure/api/errors";
 import { INVALID_BODY } from "@infrastructure/api/parseJsonBody";
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import { SessionError, ValidationError } from "@infrastructure/errors";
+import { LoggerService } from "@infrastructure/logging/service";
 import { SessionConfigurationError } from "@infrastructure/services/premium/sessionErrors";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -50,7 +50,6 @@ vi.mock("next/headers", () => ({
 
 vi.mock("@infrastructure/layers", () => ({
 	ApplicationLayer: Layer.succeed(LoggerService, {
-		debug: vi.fn(),
 		info: vi.fn(),
 		warn: vi.fn(),
 		error: vi.fn(),

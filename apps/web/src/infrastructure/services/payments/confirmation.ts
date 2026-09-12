@@ -1,8 +1,8 @@
 import { paymentConfirmationDTO } from "@application/dto/payment/dto";
 import type { PaymentConfirmationDTO } from "@application/dto/payment/types";
 import { PAYMENT_SUCCEEDED } from "@domain/payment/events/types";
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
+import { LoggerService } from "@infrastructure/logging/service";
 import { Effect } from "effect";
 
 export const confirmation = (
@@ -18,19 +18,26 @@ export const confirmation = (
 				Effect.sync(() => {
 					if (confirmed.status === PAYMENT_SUCCEEDED) return;
 
-					logger.warn("Payment intent not succeeded", {
-						paymentIntentId: confirmed.id,
-						status: confirmed.status,
-						amount: confirmed.amount,
-						currency: confirmed.currency,
+					logger.warn({
+						message: "Payment intent not succeeded",
+						context: {
+							paymentIntentId: confirmed.id,
+							status: confirmed.status,
+							amount: confirmed.amount,
+							currency: confirmed.currency,
+						},
 					});
 				}),
 			),
 			Effect.catchAll((error) =>
 				Effect.sync(() => {
-					logger.logError("Failed to retrieve payment intent", error, {
-						paymentIntentId,
-						service: "confirmation",
+					logger.logError({
+						message: "Failed to retrieve payment intent",
+						error,
+						context: {
+							paymentIntentId,
+							service: "confirmation",
+						},
 					});
 					return null;
 				}),

@@ -1,6 +1,6 @@
 import { TursoService } from "@infrastructure/clients/db/turso/service";
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import { DatabaseError } from "@infrastructure/errors";
+import { LoggerService } from "@infrastructure/logging/service";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { PaymentFailedEvent } from "../events/types";
@@ -11,7 +11,7 @@ vi.mock("@infrastructure/services/payments/repository", () => ({
 	updatePaymentStatus: vi.fn(() => Effect.succeed(true)),
 }));
 
-const mockLogger = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
+const mockLogger = { info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
 const TestLayer = Layer.mergeAll(
 	Layer.succeed(LoggerService, mockLogger),
 	Layer.succeed(TursoService, { query: vi.fn(), execute: vi.fn() }),
@@ -54,10 +54,10 @@ describe("handlePaymentFailed", () => {
 		const { updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
 		vi.mocked(updatePaymentStatus).mockReturnValueOnce(Effect.succeed(false) as never);
 		await run(handlePaymentFailed(EVENT));
-		expect(mockLogger.warn).toHaveBeenCalledWith(
-			"Ignoring failed-payment event for an already-succeeded or absent payment",
-			{ paymentId: "pi_test", reason: "Your card was declined." },
-		);
+		expect(mockLogger.warn).toHaveBeenCalledWith({
+			message: "Ignoring failed-payment event for an already-succeeded or absent payment",
+			context: { paymentId: "pi_test", reason: "Your card was declined." },
+		});
 	});
 
 	it("stays silent when the guarded update reports it wrote the row", async () => {

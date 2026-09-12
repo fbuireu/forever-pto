@@ -500,13 +500,13 @@ shared constants module. Do not read either file name as a boundary or as a clai
 
 Each store has a co-located `.test.ts` and none of them mounts React. The shared setup is worth copying:
 `vi.mock('./crypto')` replaces `obfuscatedStorage` with an in-memory triple so persistence never touches the
-real `localStorage`; `vi.mock` on `@infrastructure/clients/logging/better-stack/client` stubs the singleton;
+real `localStorage`; `vi.mock` on `@infrastructure/logging/logger` stubs the `logger` export;
 `beforeEach` resets with `useXStore.setState(INITIAL)`. Tests then drive actions through `getState()` and
 assert on `getState()`.
 
 **A logging assertion has to wait for the dynamic import.** The `vi.mock` still intercepts it, but the spy
 has not been called when the action returns, so the assertion is `await vi.waitFor(() => expect(spy).toHaveBeenCalledWith(…))`.
-The spies are hoisted with `vi.hoisted` and handed to the mocked `getBetterStackInstance` so a test can reach
+The spies are hoisted with `vi.hoisted` and handed to the mocked `logger` object so a test can reach
 them at all. Several of these tests assert `expect(spy).not.toHaveBeenCalled()` *before* the `waitFor`: that
 line is the one that fails if someone converts the import back to a static one, and it is the reason the
 assertion is worth the line it costs.

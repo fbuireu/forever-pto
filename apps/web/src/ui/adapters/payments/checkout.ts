@@ -70,9 +70,12 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
 
 		if (!paymentIntent) {
 			logClient((logger) =>
-				logger.warn("Payment confirmation resolved without a payment intent", {
-					emailDomain: emailDomain(email),
-					returnUrl,
+				logger.warn({
+					message: "Payment confirmation resolved without a payment intent",
+					context: {
+						emailDomain: emailDomain(email),
+						returnUrl,
+					},
 				}),
 			);
 			return { outcome: ConfirmPaymentOutcome.HANDED_OFF_TO_ISSUER };
@@ -92,11 +95,14 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
 		if (!sessionResponse.ok) {
 			const errorData = yield* Effect.tryPromise(() => sessionResponse.json() as Promise<{ error?: string }>);
 			logClient((logger) =>
-				logger.error("Session activation failed after payment", {
-					statusCode: sessionResponse.status,
-					reason: errorData.error,
-					emailDomain: emailDomain(email),
-					paymentIntentId: paymentIntent.id,
+				logger.error({
+					message: "Session activation failed after payment",
+					context: {
+						statusCode: sessionResponse.status,
+						reason: errorData.error,
+						emailDomain: emailDomain(email),
+						paymentIntentId: paymentIntent.id,
+					},
 				}),
 			);
 			return { outcome: ConfirmPaymentOutcome.FAILED_AFTER_CHARGE, error: errorData.error ?? "" };
@@ -113,9 +119,13 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
 	}).pipe(
 		Effect.catchAll((error) => {
 			logClient((logger) =>
-				logger.logError("Payment confirmation error in checkout adapter", error, {
-					emailDomain: emailDomain(email),
-					returnUrl,
+				logger.logError({
+					message: "Payment confirmation error in checkout adapter",
+					error,
+					context: {
+						emailDomain: emailDomain(email),
+						returnUrl,
+					},
 				}),
 			);
 

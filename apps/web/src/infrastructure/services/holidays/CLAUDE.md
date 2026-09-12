@@ -77,7 +77,7 @@ through a dynamic `import()`. Holiday data ships in the client bundle and is com
 ([ADR 0001](../../../../../../adr/0001-planner-runs-in-the-browser.md)). Consequences that are easy to miss:
 
 - **No Node and no Cloudflare APIs may appear here or in anything it imports.** Logging goes through the
-  `getBetterStackInstance()` singleton rather than `LoggerService`, because there is no Effect layer on
+  `logger` import rather than `LoggerService`, because there is no Effect layer on
   the browser path, the logging exception in
   [ADR 0002](../../../../../../adr/0002-effect-for-external-service-boundaries.md).
 - **The work is synchronous and it is not offloaded to the Web Worker.** `Effect.try` wraps a plain

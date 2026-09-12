@@ -3,8 +3,8 @@ import { PremiumFeatureId, usePremiumStore } from "./premium";
 
 const { mockLogError, mockWarn } = vi.hoisted(() => ({ mockLogError: vi.fn(), mockWarn: vi.fn() }));
 
-vi.mock("@infrastructure/clients/logging/better-stack/client", () => ({
-	getBetterStackInstance: vi.fn().mockReturnValue({ logError: mockLogError, warn: mockWarn }),
+vi.mock("@infrastructure/logging/logger", () => ({
+	logger: { logError: mockLogError, warn: mockWarn },
 }));
 
 vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({
@@ -162,9 +162,13 @@ describe("verifyEmail", () => {
 		await usePremiumStore.getState().verifyEmail("user@example.com");
 
 		await vi.waitFor(() =>
-			expect(mockLogError).toHaveBeenCalledWith("Error verifying premium email in premium store", expect.any(Error), {
-				emailDomain: "example.com",
-				hasEmail: true,
+			expect(mockLogError).toHaveBeenCalledWith({
+				message: "Error verifying premium email in premium store",
+				error: expect.any(Error),
+				context: {
+					emailDomain: "example.com",
+					hasEmail: true,
+				},
 			}),
 		);
 	});
@@ -323,8 +327,11 @@ describe("onRehydrateStorage", () => {
 
 		expect(mockWarn).not.toHaveBeenCalled();
 		await vi.waitFor(() =>
-			expect(mockWarn).toHaveBeenCalledWith("No state to rehydrate in premium store", {
-				storeName: "premium-store",
+			expect(mockWarn).toHaveBeenCalledWith({
+				message: "No state to rehydrate in premium store",
+				context: {
+					storeName: "premium-store",
+				},
 			}),
 		);
 	});
@@ -337,9 +344,13 @@ describe("onRehydrateStorage", () => {
 
 		expect(mockLogError).not.toHaveBeenCalled();
 		await vi.waitFor(() =>
-			expect(mockLogError).toHaveBeenCalledWith("Error rehydrating premium-store", expect.any(Error), {
-				storeName: "premium-store",
-				hasState: true,
+			expect(mockLogError).toHaveBeenCalledWith({
+				message: "Error rehydrating premium-store",
+				error: expect.any(Error),
+				context: {
+					storeName: "premium-store",
+					hasState: true,
+				},
 			}),
 		);
 	});

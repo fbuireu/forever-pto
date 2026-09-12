@@ -13,14 +13,15 @@ enabled = true
 redact_query_string = true
 
 [observability.logs]
+enabled = true
 invocation_logs = true
-head_sampling_rate = 0.2
-destinations = ["forever-pto-web-logs-production"]
+head_sampling_rate = 1
+destinations = ["forever-pto-web-production-logs"]
 
 [observability.traces]
 enabled = true
-head_sampling_rate = 0.2
-destinations = ["forever-pto-web-traces-production"]
+head_sampling_rate = 1
+destinations = ["forever-pto-web-production-traces"]
 
 [placement]
 mode = "smart"
@@ -47,14 +48,15 @@ enabled = true
 redact_query_string = true
 
 [env.development.observability.logs]
+enabled = true
 invocation_logs = true
-head_sampling_rate = 0.2
-destinations = ["forever-pto-web-logs-development"]
+head_sampling_rate = 1
+destinations = ["forever-pto-web-development-logs"]
 
 [env.development.observability.traces]
 enabled = true
-head_sampling_rate = 0.2
-destinations = ["forever-pto-web-traces-development"]
+head_sampling_rate = 1
+destinations = ["forever-pto-web-development-traces"]
 
 [env.development.vars]
 NEXT_PUBLIC_SITE_URL = "https://forever-pto-development.fbuireu.workers.dev"
@@ -79,14 +81,15 @@ enabled = true
 redact_query_string = true
 
 [env.production.observability.logs]
+enabled = true
 invocation_logs = true
-head_sampling_rate = 0.2
-destinations = ["forever-pto-web-logs-production"]
+head_sampling_rate = 1
+destinations = ["forever-pto-web-production-logs"]
 
 [env.production.observability.traces]
 enabled = true
-head_sampling_rate = 0.2
-destinations = ["forever-pto-web-traces-production"]
+head_sampling_rate = 1
+destinations = ["forever-pto-web-production-traces"]
 
 [env.production.vars]
 NEXT_PUBLIC_SITE_URL = "https://forever-pto.com"

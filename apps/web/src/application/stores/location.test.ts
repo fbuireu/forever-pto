@@ -4,8 +4,8 @@ import { useLocationStore } from "./location";
 
 const { mockLogError, mockWarn } = vi.hoisted(() => ({ mockLogError: vi.fn(), mockWarn: vi.fn() }));
 
-vi.mock("@infrastructure/clients/logging/better-stack/client", () => ({
-	getBetterStackInstance: vi.fn().mockReturnValue({ logError: mockLogError, warn: mockWarn }),
+vi.mock("@infrastructure/logging/logger", () => ({
+	logger: { logError: mockLogError, warn: mockWarn },
 }));
 
 vi.mock("./crypto", () => ({
@@ -100,9 +100,13 @@ describe("onRehydrateStorage", () => {
 
 		expect(mockLogError).not.toHaveBeenCalled();
 		await vi.waitFor(() =>
-			expect(mockLogError).toHaveBeenCalledWith("Error rehydrating location-store", expect.any(Error), {
-				storeName: "location-store",
-				hasState: true,
+			expect(mockLogError).toHaveBeenCalledWith({
+				message: "Error rehydrating location-store",
+				error: expect.any(Error),
+				context: {
+					storeName: "location-store",
+					hasState: true,
+				},
 			}),
 		);
 	});

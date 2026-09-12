@@ -1,11 +1,10 @@
 import { ApiError } from "@infrastructure/api/errors";
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import { DatabaseError, PaymentError, RateLimitError, SessionError, ValidationError } from "@infrastructure/errors";
+import { LoggerService } from "@infrastructure/logging/service";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const logger = vi.hoisted(() => ({
-	debug: vi.fn(),
 	info: vi.fn(),
 	warn: vi.fn(),
 	error: vi.fn(),
@@ -116,7 +115,7 @@ describe("activatePremiumRequest", () => {
 			const outcome = await activatePremiumRequest({ context: IP, program: Effect.fail(failure) as never });
 
 			expect(outcome).toMatchObject({ status, error, token: null });
-			expect(logger[level as "warn" | "error"]).toHaveBeenCalledExactlyOnceWith(message, context);
+			expect(logger[level as "warn" | "error"]).toHaveBeenCalledExactlyOnceWith({ message, context });
 		},
 	);
 

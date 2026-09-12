@@ -7,8 +7,8 @@ import type { HolidaySource } from "./source/types";
 
 const { mockLogError } = vi.hoisted(() => ({ mockLogError: vi.fn() }));
 
-vi.mock("@infrastructure/clients/logging/better-stack/client", () => ({
-	getBetterStackInstance: vi.fn().mockReturnValue({ logError: mockLogError }),
+vi.mock("@infrastructure/logging/logger", () => ({
+	logger: { logError: mockLogError },
 }));
 
 const { getHolidays } = await import("./getHolidays");
@@ -109,10 +109,14 @@ describe("getHolidays", () => {
 		const holidays = await getHolidays({ ...BASE_PARAMS, source: brokenSource });
 
 		expect(holidays).toEqual([]);
-		expect(mockLogError).toHaveBeenCalledWith("Error in getHolidays", expect.any(Error), {
-			country: "US",
-			region: "",
-			year: 2027,
+		expect(mockLogError).toHaveBeenCalledWith({
+			message: "Error in getHolidays",
+			error: expect.any(Error),
+			context: {
+				country: "US",
+				region: "",
+				year: 2027,
+			},
 		});
 	});
 });

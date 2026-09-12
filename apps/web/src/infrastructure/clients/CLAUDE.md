@@ -1,76 +1,11 @@
 # apps/web/src/infrastructure/clients
 
-## `LoggerService` is a tag with one adapter, on purpose
-
-It looks like ceremony and the cost is real: every module that logs carries it in `R`, every test that
-reaches one stubs its whole surface, and `LoggerServiceLive` hands back the same singleton
-`getBetterStackInstance()` does. It
-buys one property, verified rather than assumed: because `activateWithEmail` annotates its return type as
-requiring `TursoService` and nothing else, a `yield* LoggerService` creeping into its body fails the build at
-that function. A singleton call cannot do that, since it is not a requirement and never appears in a type.
-
-**The guarantee is the tag *and* the explicit annotation together.** A program that leaves `R` inferred gets
-nothing: the inferred type widens to include `LoggerService` and the build stays green. That makes
-"annotate the return type" load-bearing on any Effect program under `@application/use-cases`, not stylistic.
-
-[ADR 0013](../../../../../adr/0013-loggerservice-stays-a-tag.md) records the decision and what it costs, so
-the next architecture pass does not re-propose deleting it.
-
-## The log contract, and the one function in it that guards a secret
-
-[`better-stack/contract.ts`](./logging/better-stack/contract.ts) holds `LOG_SERVICE`, the levels the app emits
-and `stripQuery`. It is types and constants only, which is what it has always been, though the reason changed:
-it was shaped that way so a tail consumer Worker could import it without pulling a transport into a bundle that
-had none, and that Worker is gone ([ADR 0017](../../../../../adr/0017-observability-is-the-platform-export.md)).
-It carried a `toLogLevel` as well, folding workerd's `log` and `trace` onto `info` on the way out of that
-Worker; nothing has called it since, and it went with
-[ADR 0018](../../../../../adr/0018-the-platform-is-the-log-transport.md).
-
-**`stripQuery` is the one to understand before touching anything here.** It encodes "a URL in a log context
-must not carry its query string, because Stripe appends `payment_intent_client_secret` to the return URL", a
-statement about this app's payment flow. Cloudflare's `redact_query_string = true` in
-[`wrangler.toml`](../../../wrangler.toml) redacts the **request** URL the platform itself records; it does not
-touch a `url` field a caller puts in a structured log context, and that is the leak this guards.
-[`api/payment/activate/route.ts`](../../app/api/payment/activate/route.ts) reads
-`payment_intent_client_secret` off the query, already emits a log line per failure, and `matchesClientSecret`
-is the only guard on a GET that mints a Premium session, so `{ url: request.url }` added while debugging
-would have shipped the secret to the sink. The rule is enforced at the seam rather than at call sites:
-`BetterStackClient.getFullContext` strips a string `url` on every entry, whichever method emitted it and
-whether it arrived in the call or on the base context, so no caller has to remember. A caller that genuinely
-wants a query string has to name the field something other than `url`, which is the point: the redaction is
-keyed on the field name, not on who wrote it.
-
-**`client.ts` reads the level union rather than restating it.** It imports `LOG_LEVEL` and `LogLevel` and
-indexes `console` by the level, so a level added to the contract that `console` has no method for fails to
-compile here. `client.test.ts` iterates `LOG_LEVEL` and asserts each level reaches the console method of its
-own name and no other.
-
-## Traces are the platform's, and no log line carries a trace id from here
-
-There is no tracer in this folder and no OpenTelemetry dependency in the package. Cloudflare instruments
-handler invocations, outbound `fetch` and binding calls itself, attributes `console` output to the active span,
-and stamps the trace id on every log record it exports. Because `console` is what this folder's client writes
-to ([ADR 0018](../../../../../adr/0018-the-platform-is-the-log-transport.md)), the app's own lines are among
-those records and the correlation a helper here used to build by hand arrives without the app producing it.
-
-**That only holds for lines the runtime sees, which is the trap this replaced.** Between
-[ADR 0017](../../../../../adr/0017-observability-is-the-platform-export.md) and 0018 the client still posted
-over HTTP from inside the Worker, so the spans were in BetterStack, the logs were in BetterStack, and nothing
-joined them. A future transport that leaves the runtime again puts it straight back.
-
-**The *correlation.ts* that used to stamp those ids had to go with the wrapper rather than after it**, and the
-reason generalises: `trace.getActiveSpan()`
-reads `@opentelemetry/api`'s global context manager, and the deleted `@microlabs/otel-cf-workers` wrapper was
-the only thing in the tree that ever called `setGlobalContextManager`. Left behind, it would have returned
-`undefined` on every call and stamped `{}` on every log line, with its own test still green because that test
-installed a context manager by hand. A helper whose test supplies the very thing production stopped providing
-is the shape to check for.
-
-**`Effect.withSpan` stays on every use case and is wired to nothing.** Effect's `Tracer.Span` wants a
-`traceId`, a `spanId` and a caller-supplied end timestamp on a span built synchronously; the runtime's
-`cloudflare:workers` span has none of those and exists only inside a callback, so the bridge cannot be
-repointed at it. The calls are free, they name the boundary of each use case, and they are the attachment
-point if that changes. `ApplicationLayer` in [`../layers.ts`](../layers.ts) no longer merges a `TracerLive`.
+There is no logger in this folder. It lived here as `logging/better-stack/` while it wrapped an SDK, and since
+[ADR 0018](../../../../../adr/0018-the-platform-is-the-log-transport.md) there is none under it, so it sits in
+[`../logging/`](../logging) and [`../CLAUDE.md`](../CLAUDE.md) describes it: the contract, the
+`stripQuery` rule, the `LoggerService` tag and why it stays one, and why nothing here carries a trace id.
+What is left of Better Stack in this folder is the browser tag, `logging/better-stack/tracking.ts`, in the
+table of things that are not services below.
 
 ## Purpose
 
@@ -85,7 +20,6 @@ The rest are not services at all, for the reasons given below.
 | --- | --- | --- | --- |
 | [`db/turso/`](./db/turso) | `@tursodatabase/serverless` | `TursoService` | `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` |
 | [`email/resend/`](./email/resend) | `resend` | `ResendService` | `RESEND_API_KEY` |
-| [`logging/better-stack/`](./logging/better-stack) | none: `console`, exported by the platform | `LoggerService` | none |
 | [`payments/stripe/`](./payments/stripe) | `stripe` | `StripeServerService` | `STRIPE_SECRET_KEY` (plus `STRIPE_WEBHOOK_SECRET`, see below) |
 
 They are all merged into `ApplicationLayer` in [`src/infrastructure/layers.ts`](../layers.ts). There is no partial layer: an
@@ -133,9 +67,6 @@ error from [`src/infrastructure/errors.ts`](../errors.ts); a client never lets a
 - **Errors are wrapped, never rethrown.** `TursoService` fails with `DatabaseError`, `ResendService` with
   `EmailError`, `StripeServerService` with `PaymentError` (and `WebhookError` on the webhook method). Adding a
   method means choosing its tagged error too.
-- **`LoggerServiceLive` returns the singleton.** It is `Layer.sync(LoggerService, () => getBetterStackInstance())`:
-  the tag and `getBetterStackInstance()` hand back the *same object*. Substituting the tag in a test does not
-  silence a module that calls the singleton directly, and there are several of those.
 
 ## Turso
 
@@ -217,46 +148,8 @@ exercises. Adding a method here means adding its caller and its error mapping in
 | Path | Why it is not an Effect service |
 | --- | --- |
 | `payments/stripe/client.ts` | Runs in the browser, where there is no layer to provide |
-| [`logging/better-stack/client.ts`](./logging/better-stack/client.ts) | Deliberate exception: `getBetterStackInstance()` is what stores, lookups and components use ([ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md)) |
 | [`logging/better-stack/tracking.ts`](./logging/better-stack/tracking.ts) | Not a logger at all: `track()` and `identifyUser()` push to the `window.betterstack` snippet injected by the UI layer's [`modules/tracking/BetterStackTracking.tsx`](../../ui/modules/tracking/BetterStackTracking.tsx). Both no-op when the snippet has not loaded. `trackingEnvironment(hostname)` is the pure rule beside them, deciding `development` for `localhost` and `.workers.dev` hosts and `production` for the rest, because `NODE_ENV` is `production` on a preview Worker too |
 | [`tutorial/driver/client.tsx`](./tutorial/driver/client.tsx) | Wraps driver.js, a DOM library. It renders a close icon into the popover, but never imports one: the icon arrives as the injected `closeIcon?: ReactNode` config field, so nothing here reaches into `@ui/*` |
-
-`logging/better-stack/client.ts` is the one to read before touching. **A log call cannot fail its caller, and
-that is the property everything else here leans on.** `send` is one statement:
-
-```ts
-console[level](JSON.stringify({ ...context, service: LOG_SERVICE, level, message }));
-```
-
-wrapped in a `try` that returns. What is load-bearing in it:
-
-- **The spread order.** `context` comes first, so a caller passing `{ level: 'info' }` or
-  `{ service: 'something-else' }` cannot relabel its own line. Written the other way round it reads
-  identically and lets a log lie about which level and which service produced it; `client.test.ts` asserts
-  the level, the message and the service each survive a context that tries to overwrite them, and inverting
-  the spread turns three of those cases red.
-- **The `try`.** `JSON.stringify` throws on a circular reference and on a `BigInt`. Without it, a caller
-  passing either takes down the Zustand action or the payment handler it was logging from.
-
-That second point is why the guarantee has to live here at all: the singleton is called *bare*, outside any
-Effect combinator, from Zustand actions, the country lookups and both payment handlers. A throw from one of
-those positions inside an `Effect.gen` is a defect that neither `Effect.catchTags` nor the trailing
-`Effect.catchAll` can map, the same failure the first invariant above describes for layer construction.
-`Effect.sync` would not help: a throw inside it is equally a defect. `describe('a log never fails its caller')`
-in `client.test.ts` is what holds it there.
-
-The price is that a lost log is silent, and that the structured fields are serialised here rather than handed
-to an API as an object, so the sink parses them back out of the JSON body. That was accepted knowingly; see
-[ADR 0018](../../../../../adr/0018-the-platform-is-the-log-transport.md).
-
-**There is no transport to scope to a request any more, and the hazard it existed for is worth keeping in
-view.** The client held a `@logtail/edge` batcher: the first call armed a `setTimeout`, later calls joined the
-buffer, and the timer's callback ran the `fetch`. As one module-level instance, that batcher armed its timer
-inside request A and delivered request B's lines through it, which workerd refuses as
-`Cannot perform I/O on behalf of a different request`, cancelling a request left waiting on a promise another
-request's context owns. Keying one instance per `ExecutionContext` in a `WeakMap` fixed it, and writing to
-`console` removes the class of problem: there is no buffer, no timer and no `fetch`, so nothing can outlive the
-request that wrote it. Any future transport that batches has to answer this question again.
 
 Both `DriverClient` and `StripeClient` keep mutable instance state behind a module-level singleton, so a
 second `getDriverClientInstance()` returns the same tour, and a second `getStripeClientInstance()` returns
@@ -289,7 +182,4 @@ A test that transitively imports `src/infrastructure/layers.ts` must mock every 
 `Layer.empty` rather than set environment variables; [`layers.test.ts`](../layers.test.ts) is the reference.
 
 Each configured service also asserts the missing-variable path twice: that the layer still
-builds, and that the first call fails with that service's tagged error. The logger is the exception and has no
-variable to be missing: it writes to `console`. What its test asserts in place of that is the shape of the
-failure it *can* have, a context that will not serialise, and that the line is dropped rather than thrown,
-because it has no error channel to fail into.
+builds, and that the first call fails with that service's tagged error.
