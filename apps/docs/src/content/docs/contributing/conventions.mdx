@@ -24,7 +24,7 @@ Each package versions itself, and a commit is attributed to whichever package it
 - **The title describes the package it touches.** A `fix:` on a wiki-only PR releases the wiki, not the app.
 - **A change confined to the repo root releases nothing**: `.github/`, `biome.json`, `adr/`, `tests/`, the root manifest.
 
-The release commit is created by semantic-release as `chore(web): release x.y.z [skip ci]`, scoped to the package it releases the way every other commit here is; the docs package writes no commit at all.
+The release commit is created by semantic-release as `chore(web): release x.y.z [skip ci]`, scoped to the package it releases the way every other commit here is, and `chore(docs): release x.y.z [skip ci]` for this package.
 
 ## Code conventions
 

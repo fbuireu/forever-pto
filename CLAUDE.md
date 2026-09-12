@@ -153,11 +153,16 @@ its paths fall under, so a docs change never cuts an app release and vice versa.
 | Package | Tags | Writes | Runs in |
 | --- | --- | --- | --- |
 | `apps/web` | `web-vX.Y.Z` | [`apps/web/package.json`](./apps/web/package.json), [`apps/web/CHANGELOG.md`](./apps/web/CHANGELOG.md), a GitHub release | [`ci.yml`](./.github/workflows/ci.yml), after the production deploy |
-| `apps/docs` | `docs-vX.Y.Z` | a tag and a GitHub release, nothing else | [`docs.yml`](./.github/workflows/docs.yml), after the docs deploy and its smoke run |
+| `apps/docs` | `docs-vX.Y.Z` | [`apps/docs/package.json`](./apps/docs/package.json), `apps/docs/CHANGELOG.md`, a GitHub release | [`docs.yml`](./.github/workflows/docs.yml), after the docs deploy and its smoke run |
 
-`apps/docs` has no changelog, npm or git plugin on purpose: it pushes nothing to `main`, which is what keeps
-the release jobs from racing each other. Its package version stays `0.0.0` forever and nothing reads it:
-the docs site displays the **app's** version.
+**Both packages run the same chain, and what keeps their pushes apart is the concurrency group.**
+`release-web` and `release-docs` both declare `group: release` with `cancel-in-progress: false`, and GitHub
+serialises a group across workflows, so the second job checks out after the first one has pushed. `apps/docs`
+carried no changelog, npm or git plugin for eight tags on the theory that a second pusher was the race; the
+group was always the guard, and the cost was a `docs-v1.2.3` tag beside a `package.json` reading `0.0.0` and
+release notes that existed only on GitHub. Nothing read that version: the site displays the **app's**, read
+from `apps/web/package.json`. [ADR 0011](./adr/0011-per-package-versioning-with-a-bridge-tag.md) carries the
+correction, and the contract asserts the group rather than the absence of a plugin.
 
 **The bridge tags are `web-v1.8.2`, `web-v1.8.3` and `web-v1.10.2`, and the first looks like debris.** Each sits on
 the same commit as the legacy `v1.8.x` tag of the same number. semantic-release finds the last release by

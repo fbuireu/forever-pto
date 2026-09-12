@@ -2450,13 +2450,38 @@ describe("the release configs parse the commit grammar commitlint accepts", () =
 			})
 			.filter(({ message }) => message !== "");
 
-	// `ci.yml` and `docs.yml` release independently and can run at the same time, so exactly one of them may
-	// push to `main`; the other cuts a tag and a GitHub release and writes nothing. That is why `apps/docs`
-	// carries no changelog, npm or git plugin, and the guide says so. A second pusher is a race, not a
-	// missing feature, which is what makes this an assertion rather than a gap to fill.
-	it("lets exactly one package push a release commit to main", () => {
+	// Both packages push a release commit to `main` and they release from different workflows, so the only
+	// thing ordering them is that both jobs name the same concurrency group. GitHub serialises a group across
+	// workflows, and each job checks out at its own start, so the second one branches from the first one's
+	// push rather than racing it. Take the group off either job and the loser fails its push *after*
+	// `@semantic-release/git` has created its tag: a version that exists as a tag with no commit behind it.
+	it("serialises every job that pushes a release commit into one concurrency group", () => {
+		const groups = ["ci.yml", "docs.yml"].map((workflow) => {
+			const body = read(`.github/workflows/${workflow}`);
+			const job = body.slice(body.indexOf("  release-"));
+
+			return job.slice(0, job.indexOf("\n    steps:")).match(/^\s*group:\s*(\S+)$/m)?.[1];
+		});
+
+		expect(groups).toEqual(["release", "release"]);
+	});
+
+	// Every package that cuts a release keeps a changelog in the tree, and the plugin that writes one is
+	// useless without the plugin that commits it. apps/docs had neither for eight tags: its notes existed on
+	// a GitHub release and nowhere a reader would look, and its package.json sat at 0.0.0 while its tags said
+	// otherwise.
+	it("writes, versions and commits a changelog wherever it cuts a release", () => {
+		const missing = configs.flatMap((file) => {
+			const { plugins } = readJson(file) as { plugins: ReleasePlugin[] };
+			const names = plugins.map((plugin) => (Array.isArray(plugin) ? plugin[0] : plugin));
+
+			return ["@semantic-release/changelog", "@semantic-release/npm", "@semantic-release/git"]
+				.filter((name) => !names.includes(name))
+				.map((name) => `${file}: ${name}`);
+		});
+
 		expect(configs.length).toBeGreaterThan(1);
-		expect(gitMessages().map(({ app }) => app)).toEqual(["web"]);
+		expect(missing).toEqual([]);
 	});
 
 	// A release commit that omits `[skip ci]` starts the run that cuts the next release, and the scope is the
