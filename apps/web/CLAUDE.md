@@ -411,7 +411,8 @@ them.** `[observability.logs]` and `[observability.traces]` each name a `destina
 one pair per stage, configured in the Cloudflare dashboard with the OTLP
 endpoint and its bearer token. The platform instruments handler invocations, outbound `fetch` and **binding**
 calls with no code, attributes `console` output to the active span, and puts the trace id on every log record
-it exports. `head_sampling_rate` is `0.2` on both, in every environment, and `redact_query_string` is on, which
+it exports. `head_sampling_rate` is `1` on both, in every environment, which is the platform's own default written
+down so the knob stays visible, and `redact_query_string` is on, which
 is what keeps `payment_intent_client_secret` out of a request URL the platform records.
 
 **The app's own log lines are in that export because `console` is what the logger writes to, and for one

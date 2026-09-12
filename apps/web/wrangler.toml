@@ -14,12 +14,12 @@ redact_query_string = true
 
 [observability.logs]
 invocation_logs = true
-head_sampling_rate = 0.2
+head_sampling_rate = 1
 destinations = ["forever-pto-web-production-logs"]
 
 [observability.traces]
 enabled = true
-head_sampling_rate = 0.2
+head_sampling_rate = 1
 destinations = ["forever-pto-web-production-traces"]
 
 [placement]
@@ -48,12 +48,12 @@ redact_query_string = true
 
 [env.development.observability.logs]
 invocation_logs = true
-head_sampling_rate = 0.2
+head_sampling_rate = 1
 destinations = ["forever-pto-web-development-logs"]
 
 [env.development.observability.traces]
 enabled = true
-head_sampling_rate = 0.2
+head_sampling_rate = 1
 destinations = ["forever-pto-web-development-traces"]
 
 [env.development.vars]
@@ -80,12 +80,12 @@ redact_query_string = true
 
 [env.production.observability.logs]
 invocation_logs = true
-head_sampling_rate = 0.2
+head_sampling_rate = 1
 destinations = ["forever-pto-web-production-logs"]
 
 [env.production.observability.traces]
 enabled = true
-head_sampling_rate = 0.2
+head_sampling_rate = 1
 destinations = ["forever-pto-web-production-traces"]
 
 [env.production.vars]
