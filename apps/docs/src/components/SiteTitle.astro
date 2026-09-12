@@ -12,18 +12,53 @@ import { APP_VERSION } from "../lib/app-version";
   .site-title-with-version {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.6rem;
     min-width: 0;
+  }
+
+  /* The app's own header: "Forever" in the display face beside the logo in a
+     tilted yellow box that straightens on hover (apps/web Navigation.tsx). */
+  .site-title-with-version :global(.site-title) {
+    flex-direction: row-reverse;
+    gap: 0.6rem;
+    color: var(--foreground);
+    font-family: var(--font-bricolage), var(--sl-font);
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .site-title-with-version :global(.site-title img) {
+    box-sizing: content-box;
+    width: 30px;
+    height: 30px;
+    padding: 2px;
+    background: var(--accent);
+    border: 3px solid var(--frame);
+    border-radius: 8px;
+    box-shadow: var(--shadow-brutal-3);
+    object-fit: contain;
+    object-position: center;
+    transform: rotate(-4deg);
+    transition: transform 150ms ease;
+  }
+
+  .site-title-with-version :global(.site-title:hover img) {
+    transform: rotate(0deg);
   }
 
   .app-version {
     flex-shrink: 0;
-    border: 1px solid var(--sl-color-gray-5);
+    background: var(--surface-panel);
+    border: 2px solid var(--frame);
     border-radius: 999px;
-    color: var(--sl-color-gray-3);
-    font-size: var(--sl-text-xs);
+    box-shadow: var(--shadow-brutal-xs);
+    color: var(--foreground);
+    font-family: var(--sl-font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
     line-height: 1;
-    padding: 0.2em 0.6em;
+    padding: 0.35em 0.65em;
   }
 
   @media (max-width: 50rem) {

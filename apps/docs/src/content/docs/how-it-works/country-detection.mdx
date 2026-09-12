@@ -2,7 +2,7 @@
 title: Country detection
 description: How the user-country cookie is obtained, covering the proxy chain, the detection strategies, and why only one of them truly reflects the browser.
 sidebar:
-  order: 1
+  order: 7
 ---
 
 When you open Forever PTO, the planner already knows your country. That value travels in the `user-country` cookie (constant `USER_COUNTRY_COOKIE` in `apps/web/src/infrastructure/proxy/cookie.ts`), set by the proxy on every matched request.
@@ -27,6 +27,17 @@ The proxy matcher skips `/api/*` (except `/api/markdown`), `/_next`, `/_vercel` 
 See [cookies](/reference/cookies/) for the full cookie inventory.
 
 ## The strategies, in order
+
+```mermaid
+flowchart TD
+  S[detectCountry] --> A[1. GET NEXT_PUBLIC_SITE_URL/cdn-cgi/trace<br/>parse loc=, force-cache, 5 s timeout]
+  A -->|country| OK[Lowercased alpha-2 code → user-country cookie]
+  A -->|empty or error, logged| B["2. cf-ipcountry request header<br/>reject XX (unknown) and T1 (Tor)"]
+  B -->|country| OK
+  B -->|empty| C[3. api.ipify.org → ipinfo.io<br/>force-cache, 5 s timeouts]
+  C -->|country| OK
+  C -->|empty or error| NONE[No cookie; the user picks a Country]
+```
 
 ### 1. Cloudflare trace (`detectCountryFromCDN`)
 

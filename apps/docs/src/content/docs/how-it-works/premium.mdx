@@ -2,10 +2,36 @@
 title: Premium and donations
 description: The donation-based premium model (Stripe PaymentIntents as premium keys, the JWT session cookie, activation paths, promo codes and the webhook fallback).
 sidebar:
-  order: 4
+  order: 9
 ---
 
 Forever PTO has no accounts and no subscriptions. Premium is **donation-based**: donate once through Stripe and the app treats you as premium. The central trick: **the premium key *is* the Stripe PaymentIntent id**. There is no separate license table: Stripe (plus a payments table in Turso) is the source of truth.
+```mermaid
+sequenceDiagram
+  autonumber
+  participant U as Browser
+  participant API as /api/payment
+  participant S as Stripe
+  participant ACT as /api/payment/activate
+  participant DB as Turso
+  participant WH as /api/webhooks/stripe
+  U->>API: POST { amount, email, promoCode? }
+  API->>API: rate limit by IP, zod, promo code
+  API->>S: paymentIntents.create (metadata: email, ip, ua)
+  S-->>API: clientSecret
+  API-->>U: clientSecret + discountInfo
+  API--)DB: after(): savePayment (deferred, may fail)
+  U->>S: confirmPayment with Stripe Elements
+  S-->>U: redirect to return_url = /api/payment/activate?payment_intent=…
+  U->>ACT: GET (rate-limited, client secret required)
+  ACT->>S: retrieve the PaymentIntent, require status = succeeded
+  ACT->>ACT: mint the JWT, set premium-token (httpOnly, 30 days)
+  ACT--)DB: after(): upsert the payment row
+  ACT-->>U: 302 /payment/confirmation, no-store
+  S-)WH: payment_intent.succeeded
+  WH->>DB: create the row if the deferred save never landed
+```
+
 
 ## The Donate popover
 

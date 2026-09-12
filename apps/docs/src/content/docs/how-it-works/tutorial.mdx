@@ -2,10 +2,28 @@
 title: Onboarding tutorial
 description: The driver.js guided tour, covering the DriverClient singleton, data-tutorial anchors, lazy-loaded styling and when it runs.
 sidebar:
-  order: 13
+  order: 18
 ---
 
 The planner ships a guided tour built on `driver.js`. It never auto-starts: it runs **on demand**, when the user clicks the "quick tour" link in the planner subtitle (`apps/web/src/ui/modules/pages/planner/SiteSubtitle.tsx`).
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant H as useTutorial
+  participant SB as Sidebar
+  participant D as DriverClient
+  U->>H: click "quick tour"
+  par lazy
+    H->>H: import driver client
+    H->>H: import DriverStyles (driver.css in @layer tutorial)
+  end
+  H->>SB: open if closed, wait for the first anchor to stop moving
+  H->>D: drive(steps from TUTORIAL_ANCHOR + tutorial.steps copy)
+  D-->>U: highlight step 1 … n, done button on the last
+  U->>D: close
+  D->>D: unmount the React roots it mounted into popovers
+```
+
 
 ## The client: a wrapped singleton
 

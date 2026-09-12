@@ -3,9 +3,13 @@ title: Switch
 description: 60x32 brutal toggle pill, a Base UI switch rendered as a Motion button.
 sidebar:
   order: 19
+  badge:
+    text: Live
+    variant: success
 ---
 
-import { SwitchDemo } from '../../../../components/demos/SwitchDemo';
+import { SWITCH_PROP_ROWS, SwitchDemo } from '../../../../components/demos/SwitchDemo';
+import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/animate/base/Switch.tsx`, beside `Checkbox` and `Collapsible`. It sat in `animate/primitives/base/`, the unstyled layer, while carrying the full 3px frame and hard shadow,, which made it the one thing feature components had to reach into that folder for. Rendered as `m.button`, so it needs a `LazyMotionProvider` ancestor.
 
@@ -19,6 +23,10 @@ Exports: `Switch` (the thumb is an internal sub-component, rendered automaticall
 - The thumb is an `m.div` that translates 28px to the right when checked (via Base UI's `data-checked` attribute) and flips from frame-on-frame to accent-on-frame coloring. The travel uses a linear 0.15s tween.
 - Press feedback is context-driven: the root tracks tap state (`onTapStart`/`onTapCancel`/`onTap`) and shares it with the thumb, which can react through its `pressedAnimation` prop. Pass custom `children` to `Switch` if you want a thumb with icons or a squish animation. Press state is the *only* thing on that context; it used to also carry the checked value and its setter, which nothing read.
 - Disabled state washes out border, background and shadow with `color-mix` so the hard shadow fades consistently in both themes.
+
+## Props
+
+<PropsTable rows={SWITCH_PROP_ROWS} extends='the Base UI switch root and the Motion button props' />
 
 ## Usage
 
@@ -40,3 +48,13 @@ Use Switch for immediate on/off settings; use [Checkbox](/design-system/componen
   needs the matching `htmlFor`, which is also required), and `aria-label` when there is no visible label.
 - `data-slot` hooks: `switch`, `switch-thumb`.
 - Form integration comes from Base UI: `name`, `required`, `readOnly` and `inputRef` forward to a hidden input.
+
+## Accessibility
+
+- Base UI renders `role='switch'` with `aria-checked`; Space toggles, and the root is a real button, so Enter works too.
+- The accessible name is enforced by the type, exactly as on Checkbox: `id` with a Label, or `aria-label` / `aria-labelledby`.
+- The 60×32 pill clears the touch-target minimum on its own, and the thumb squash while pressed is purely visual.
+
+## In the app
+
+The *Allow past days* toggle in `AllowPastDays.tsx` and the per-service toggles of the consent dialog (`CookieConsentDialog.tsx`).

@@ -2,7 +2,7 @@
 title: Error pages
 description: The error/not-found surfaces, the experimental globalNotFound flag and the brutal 500/404 designs in ErrorContent and NotFoundContent.
 sidebar:
-  order: 6
+  order: 8
 ---
 
 Failures are handled by boundary files that all funnel into shared UI modules: `ErrorContent` (`apps/web/src/ui/modules/pages/error/ErrorContent.tsx`) for runtime errors and `NotFoundContent` (`apps/web/src/ui/modules/pages/not-found/NotFoundContent.tsx`) for 404s. The boundaries differ only in how much scaffolding they must rebuild.

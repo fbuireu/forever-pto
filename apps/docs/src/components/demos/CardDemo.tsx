@@ -1,6 +1,8 @@
 import { Badge } from "@ui/modules/core/primitives/Badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@ui/modules/core/primitives/Card";
+import type { ComponentProps } from "react";
 import { Demo } from "../Demo";
+import { type OwnProps, propRows } from "../PropsTable";
 
 export const CardDemo = () => (
 	<Demo>
@@ -30,3 +32,12 @@ export const CardPartsDemo = () => (
 		</Card>
 	</Demo>
 );
+
+export const CARD_TITLE_PROP_ROWS = propRows<OwnProps<ComponentProps<typeof CardTitle>, ComponentProps<"div">>>({
+	as: {
+		type: '"div" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6"',
+		defaultValue: '"div"',
+		description:
+			"The element the title renders as. Pick a heading level when the card is a section of the page, so the outline stays meaningful.",
+	},
+});

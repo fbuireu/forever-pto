@@ -3,9 +3,13 @@ title: Table
 description: Data table with a framed scroll container, primary-colored header row and striped body.
 sidebar:
   order: 20
+  badge:
+    text: Live
+    variant: success
 ---
 
-import { TableDemo } from '../../../../components/demos/TableDemo';
+import { TABLE_PROP_ROWS, TableDemo } from '../../../../components/demos/TableDemo';
+import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/primitives/Table.tsx`. `Table` renders the native `<table>` inside a wrapper div that owns the frame: 3px border, `rounded-[10px]`, medium brutal shadow and, crucially, `overflow-x-auto`, so wide tables scroll inside the frame instead of breaking the page layout.
 
@@ -23,6 +27,12 @@ Source: `apps/web/src/ui/modules/core/primitives/Table.tsx`. `Table` renders the
 | `TableCell` | `<td>`, with `p-3`, `whitespace-nowrap` and checkbox-aware padding. |
 
 Only these are exported. `_TableFooter` and `_TableCaption` exist in the source but are private; see `apps/web/src/ui/modules/core/primitives/Table.tsx`.
+
+## Props
+
+`Table` adds one prop; every part after it takes the props of its native element.
+
+<PropsTable rows={TABLE_PROP_ROWS} extends='the native table' />
 
 ## Usage
 
@@ -52,3 +62,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 - Every part sets a `data-slot` attribute (`table-container`, `table`, `table-header`, …).
 - The file carries a `'use client'` directive even though it has no hooks, so treat it as a client module when importing from server components.
 - Cells default to `whitespace-nowrap`; override per-cell with `className` when wrapping is wanted.
+
+## Accessibility
+
+- Native table semantics throughout: `<thead>`, `<th>` and `<td>` are the real elements, so a screen reader can navigate by row and column. Use `TableHead` for column headers and add `scope='row'` on a `TableCell` that heads its row.
+- The container scrolls horizontally on narrow screens instead of shrinking the table, so column headers stay readable; give it a `tabIndex={0}` and an `aria-label` when the content overflows, so keyboard users can scroll it.
+
+## In the app
+
+The Holiday tables: `HolidaysTable.tsx`, with `HolidayTableHeader.tsx` and one `HolidayRow.tsx` per Holiday.

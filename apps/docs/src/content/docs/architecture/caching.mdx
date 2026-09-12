@@ -2,7 +2,7 @@
 title: Caching
 description: Why Cache Components are off, the OpenNext R2 incremental cache and the proxy markdown cache.
 sidebar:
-  order: 5
+  order: 7
 ---
 
 Caching happens at separate levels: an R2-backed incremental cache at the OpenNext/Workers level, and plain `Cache-Control` headers for the agent-facing markdown surface. Next's Cache Components are deliberately not another.
@@ -30,7 +30,7 @@ At runtime this is backed by the R2 bucket bound as `NEXT_INC_CACHE_R2_BUCKET` i
 
 ## HTTP-level caches
 
-- **Markdown renditions**: the [proxy](/architecture/proxy/) sets a one-hour public `Cache-Control` header on `/api/markdown` responses and on the `Accept: text/markdown` rewrites that target it.
+- **Markdown renditions**: `markdownTwinHeaders` in `apps/web/src/infrastructure/markdown/twin.ts` sets `public, max-age=3600` on a found page and `no-store` on a miss, with `Vary: Accept` on both. The [proxy](/architecture/proxy/) states no cache policy itself, because it runs before the lookup; see the [Markdown API](/how-it-works/markdown-api/#the-headers) page.
 
 ## What is deliberately not cached
 

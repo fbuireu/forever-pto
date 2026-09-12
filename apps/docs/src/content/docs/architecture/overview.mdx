@@ -40,6 +40,35 @@ either direction, so it is a measurement rather than a drawing.
 | `infrastructure` | | 7/2 | 33/23 | 6/5 | |
 | `middleware.ts` | | | | | 5/1 |
 
+The same graph drawn, every arrow an `imports` edge that exists in the tree and its weight the count above. The
+two upward arrows out of `domain` and the one out of `infrastructure` are the deliberate inversions the bullets
+below explain:
+
+```mermaid
+flowchart LR
+  APP[app]
+  UI[ui]
+  APPL[application]
+  DOM[domain]
+  INFRA[infrastructure]
+  MW[middleware.ts]
+  APP -->|81| UI
+  APP -->|7| APPL
+  APP -->|65| INFRA
+  UI -->|137| APPL
+  UI -->|14| DOM
+  UI -->|23| INFRA
+  APPL -->|15| DOM
+  APPL -->|35| INFRA
+  APPL -.->|1, the known inversion| UI
+  DOM -.->|13, ADR 0012| APPL
+  DOM -.->|12, ADR 0003| INFRA
+  INFRA -->|33| APPL
+  INFRA -->|6| DOM
+  INFRA -.->|7, via @i18n| UI
+  MW -->|5| INFRA
+```
+
 Read the shape rather than the numbers. These are worth naming, and most of them are arrows the old
 figure said were not there:
 
@@ -115,6 +144,8 @@ independently; the app's aliases carry no `baseUrl` and resolve against that fil
 
 ## Related pages
 
+- [The layers in detail](/architecture/layers/) walks each node of the graph above: what it holds, where it runs, what it may import.
+- [What runs where, and when](/architecture/when-and-where/) orders the same code by moment: build, deploy, edge, page load, interaction, worker.
 - [Routing](/architecture/routing/) covers how `apps/web/src/app/` is laid out.
 - [Proxy](/architecture/proxy/) covers the per-request chain.
 - [Effect layers](/architecture/effect-layers/) covers server-side dependency injection.

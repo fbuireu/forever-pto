@@ -2,7 +2,7 @@
 title: Emails
 description: Resend plus react-email. Which emails exist, when they fire and how the contact pipeline works.
 sidebar:
-  order: 12
+  order: 15
 ---
 
 Email is deliberately minimal. There is exactly **one** email in the system today: the contact-form notification. No welcome mails, no receipts (Stripe handles its own), no marketing.
@@ -13,6 +13,24 @@ Email is deliberately minimal. There is exactly **one** email in the system toda
 - **react-email** for templates: React components rendered to HTML with `@react-email/render` on the server.
 
 ## The contact pipeline
+
+```mermaid
+sequenceDiagram
+  participant U as Contact form
+  participant R as /api/contact
+  participant UC as sendContactEmail
+  participant RS as Resend
+  participant DB as Turso
+  U->>R: POST { name, email, message }
+  R->>UC: run with ApplicationLayer
+  UC->>UC: zod contactSchema
+  UC->>UC: render ContactFormEmail to HTML
+  UC->>RS: send from and to the contact address, replyTo = visitor
+  RS-->>UC: messageId
+  UC-->>R: ok
+  R-->>U: 200
+  R--)DB: after(): saveContact with the messageId, failure only logs
+```
 
 1. The contact form (under `apps/web/src/ui/modules/shared/contact/`) posts to `POST /api/contact` (`apps/web/src/app/api/contact/route.ts`), which pulls `NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_CONTACT_EMAIL` from the Cloudflare context and invokes the use-case.
 2. `sendContactEmail` (`apps/web/src/application/use-cases/contact.ts`):

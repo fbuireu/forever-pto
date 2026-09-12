@@ -3,9 +3,13 @@ title: Checkbox
 description: Base UI checkbox rendered as a Motion button, with tap/hover scale plus an SVG path-drawn check.
 sidebar:
   order: 6
+  badge:
+    text: Live
+    variant: success
 ---
 
-import { CheckboxDemo } from '../../../../components/demos/CheckboxDemo';
+import { CHECKBOX_PROP_ROWS, CheckboxDemo } from '../../../../components/demos/CheckboxDemo';
+import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/animate/base/Checkbox.tsx`. A Base UI checkbox whose root is rendered as `m.button` (`whileTap` scale 0.95, `whileHover` scale 1.05), so it needs a `LazyMotionProvider` ancestor.
 
@@ -19,6 +23,10 @@ Exports: `Checkbox`.
 - The component mirrors `checked`/`defaultChecked` into local state to drive the SVG variants, and forwards `onCheckedChange` untouched (Base UI signature: `(checked, eventDetails)`).
 - Visuals: `size-5`, 3px frame border, `shadow-brutal-xs`; checked state flips to `bg-accent` with ink-colored stroke.
 - Extra Motion props for the button go through the `motionProps` prop.
+
+## Props
+
+<PropsTable rows={CHECKBOX_PROP_ROWS} extends='the Base UI checkbox root, minus render' />
 
 ## Usage
 
@@ -35,3 +43,13 @@ Pair with [Label](/design-system/components/label/) via `id`/`htmlFor`. For an o
 
 - `data-slot='checkbox'` and `data-slot='checkbox-indicator'` for CSS containment hooks; checked styling keys off Base UI's `data-checked` attribute.
 - The `render` prop is reserved by the component (it injects the `m.button`), so it is omitted from the public prop type.
+
+## Accessibility
+
+- Base UI renders `role='checkbox'` with `aria-checked`, and Space toggles it. The root is a button, so it is in the tab order and gets the focus ring.
+- The accessible-name union in the props is the rule that matters: pass `id` and pair it with a [Label](/design-system/components/label/), or pass `aria-label` or `aria-labelledby` directly. Nothing else compiles.
+- The drawn check is an SVG path animation; `keepMounted` keeps the indicator in the DOM so the retract can play, and the state a screen reader hears comes from `aria-checked`, not from the drawing.
+
+## In the app
+
+The per-row and select-all checkboxes of the Holiday table, in `HolidayRow.tsx` and `HolidaysTable.tsx`.

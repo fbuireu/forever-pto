@@ -3,9 +3,13 @@ title: Tooltip
 description: Primary-colored hint bubble with a rotated square arrow, plus the small "i" info trigger.
 sidebar:
   order: 23
+  badge:
+    text: Live
+    variant: success
 ---
 
-import { TooltipDemo, TooltipInfoTriggerDemo } from '../../../../components/demos/TooltipDemo';
+import { TOOLTIP_CONTENT_PROP_ROWS, TOOLTIP_DELAY_MS, TOOLTIP_PROP_ROWS, TooltipDemo, TooltipInfoTriggerDemo } from '../../../../components/demos/TooltipDemo';
+import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/animate/base/Tooltip.tsx`, the styling layer over the motion primitive at `apps/web/src/ui/modules/core/animate/primitives/base/Tooltip.tsx` (Base UI tooltip + `AnimatePresence`). Needs a `LazyMotionProvider` ancestor.
 
@@ -21,6 +25,18 @@ Exports: `Tooltip`, `TooltipTrigger`, `TooltipContent`, `TooltipProvider`, `Tool
 - `TooltipInfoTrigger` is a ready-made trigger: a `size-5` accent square with a mono "i", `cursor-help`, `hit-area-stable` and the standard hover lift. Drop it next to a stat label and pair it with a `TooltipContent`.
 
 <TooltipInfoTriggerDemo client:visible />
+
+## Props
+
+`Tooltip` adds two props on top of Base UI's root; the others worth knowing:
+
+<PropsTable rows={TOOLTIP_PROP_ROWS} />
+
+`TooltipContent` merges Base UI's positioner and popup props:
+
+<PropsTable rows={TOOLTIP_CONTENT_PROP_ROWS} />
+
+`TooltipProvider` takes the same `delay` and `delayDuration` pair and defaults the delay to `TOOLTIP_DELAY_MS`, which is {TOOLTIP_DELAY_MS} ms in the app; a `Tooltip` with no explicit delay rendered outside a provider opens with Base UI's own default.
 
 ## Usage
 
@@ -47,3 +63,13 @@ Tooltips are hover/focus-only hints, so content must be non-essential.
 
 - `data-slot` hooks (from the motion primitive): `tooltip`, `tooltip-trigger`, `tooltip-portal`, `tooltip-positioner`, `tooltip-popup`, `tooltip-arrow`.
 - `TooltipInfoTrigger` defaults to `ml-auto` (it usually sits at the end of a label row); override with `className='ml-0'` when inlining it.
+
+## Accessibility
+
+- Base UI renders the bubble with `role='tooltip'` and points the trigger's `aria-describedby` at it, so the text is read as a description of the trigger. It opens on hover **and** on keyboard focus, and Escape dismisses it.
+- A tooltip is never the only place for information: the trigger has to make sense without it, and touch screens cannot hover.
+- `TooltipInfoTrigger` renders an `aria-hidden` "i", so the trigger itself needs an `aria-label` (or the tooltip text is all a screen reader gets, as a description of an unnamed button).
+
+## In the app
+
+The field captions in the sidebar (`SidebarFieldLabel.tsx`), the per-day hints on the calendar (`Calendar.tsx`) and the lock explanation in `PremiumFeature.tsx`.

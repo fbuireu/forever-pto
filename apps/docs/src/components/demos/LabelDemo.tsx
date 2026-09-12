@@ -1,6 +1,8 @@
 import { Input } from "@ui/modules/core/primitives/Input";
 import { Label } from "@ui/modules/core/primitives/Label";
+import type { ComponentProps } from "react";
 import { Demo } from "../Demo";
+import { type OwnProps, propRows } from "../PropsTable";
 
 export const LabelDemo = () => (
 	<Demo className="flex-col items-stretch">
@@ -17,3 +19,13 @@ export const LabelDemo = () => (
 		</div>
 	</Demo>
 );
+
+export const LABEL_PROP_ROWS = propRows<
+	OwnProps<ComponentProps<typeof Label>, Omit<ComponentProps<"label">, "htmlFor">>
+>({
+	htmlFor: {
+		type: "string",
+		description:
+			"The id of the control this label names. Required by the type, so an orphan label is a compile error rather than an accessibility finding.",
+	},
+});

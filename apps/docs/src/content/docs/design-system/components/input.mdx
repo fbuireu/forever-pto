@@ -3,9 +3,13 @@ title: Input
 description: The single-line text field, with shadow-based hover, focus and invalid states on the brutal frame.
 sidebar:
   order: 12
+  badge:
+    text: Live
+    variant: success
 ---
 
-import { InputStatesDemo, InputTypesDemo } from '../../../../components/demos/InputDemo';
+import { INPUT_PROP_ROWS, InputStatesDemo, InputTypesDemo } from '../../../../components/demos/InputDemo';
+import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/primitives/Input.tsx`. A styled native `<input>` on `bg-input` with `rounded-[8px]` and the 3px frame border. No variants: state is communicated entirely through the shadow,: hover adds the extra-small brutal shadow, focus the small one, and `aria-invalid` swaps the border to destructive with a destructive focus shadow.
 
@@ -16,6 +20,12 @@ Source: `apps/web/src/ui/modules/core/primitives/Input.tsx`. A styled native `<i
 All native `input` attributes pass through, including `type`. File inputs get dedicated `file:` pseudo-element styling.
 
 <InputTypesDemo client:visible />
+
+## Props
+
+`Input` adds no prop of its own. The ones that change how it looks:
+
+<PropsTable rows={INPUT_PROP_ROWS} extends='the native input' />
 
 ## Usage
 
@@ -33,3 +43,13 @@ import { Input } from '@ui/modules/core/primitives/Input';
 - Validation styling is driven by `aria-invalid`, not a prop, so set it from your form state so styling and accessibility stay in sync.
 - `h-11` matches the default [Button](/design-system/components/button/) height, so inputs and buttons align in rows.
 - Pair with [Label](/design-system/components/label/); for prefixes, suffixes and inline buttons use [InputGroup](/design-system/components/input-group/).
+
+## Accessibility
+
+- A native `<input>`, so labelling is the caller's job: pair it with [Label](/design-system/components/label/) through `id` and `htmlFor`, or give it an `aria-label` when there is no visible caption.
+- `aria-invalid` is the single source of truth for the error state, so the border a sighted user sees and the state a screen reader announces cannot disagree.
+- Focus is shown by the shadow growing rather than by an outline, and the frame keeps a 3:1 contrast against both surfaces.
+
+## In the app
+
+The PTO budget field in `PtoDays.tsx` and the accrual calculator in `PtoCalculator.tsx`, the Holiday form (`HolidayFormModal.tsx`), the email field in `PremiumRequiredModal.tsx`, the contact form (`ContactModal.tsx`) and the Donation form (`DonationForm.tsx`).

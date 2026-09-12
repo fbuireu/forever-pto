@@ -2,7 +2,7 @@
 title: Markdown API
 description: Content negotiation for agents, how Accept text/markdown requests are rewritten to /api/markdown and served a Markdown rendition of the page.
 sidebar:
-  order: 8
+  order: 12
 ---
 
 Any page of the site can be fetched as Markdown instead of HTML by sending `Accept: text/markdown`. This exists for **agents**: LLMs and crawlers that consume text get a compact, token-cheap rendition of the site instead of a hydrated React tree.
@@ -12,6 +12,21 @@ curl -H 'Accept: text/markdown' https://forever-pto.com/planner
 ```
 
 ## The rewrite
+
+```mermaid
+sequenceDiagram
+  participant A as Agent
+  participant P as Proxy
+  participant R as /api/markdown
+  participant B as buildMarkdownPage
+  A->>P: GET /planner, Accept: text/markdown
+  P->>P: set x-markdown-path = /planner
+  P->>R: rewrite (URL unchanged for the agent)
+  R->>R: header present? else 404
+  R->>B: buildMarkdownPage(baseUrl, "/planner")
+  B-->>R: Markdown, or null for an unlisted path
+  R-->>A: 200 text/markdown with Cache-Control, or 404
+```
 
 Markdown negotiation is the **first** thing `apps/web/src/middleware.ts` decides, and the matcher is what keeps it safe: `/api/*` and every dotted path (so all of `/.well-known/*`) never reach the proxy at all, which is why the rewrite branch carries no exclusion list of its own.
 

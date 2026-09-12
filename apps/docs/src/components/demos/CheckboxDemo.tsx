@@ -2,6 +2,7 @@ import { Checkbox } from "@ui/modules/core/animate/base/Checkbox";
 import { Label } from "@ui/modules/core/primitives/Label";
 import { useState } from "react";
 import { Demo } from "../Demo";
+import { propRows } from "../PropsTable";
 
 export const CheckboxDemo = () => {
 	const [checked, setChecked] = useState(true);
@@ -25,3 +26,22 @@ export const CheckboxDemo = () => {
 		</Demo>
 	);
 };
+
+export const CHECKBOX_PROP_ROWS = propRows({
+	checked: { type: "boolean", description: "Controlled state." },
+	defaultChecked: { type: "boolean", defaultValue: "false", description: "Uncontrolled initial state." },
+	onCheckedChange: {
+		type: "(checked: boolean, details) => void",
+		description: "Base UI's signature, forwarded untouched.",
+	},
+	disabled: { type: "boolean", description: "Halves the opacity and blocks interaction." },
+	motionProps: {
+		type: 'HTMLMotionProps<"button">',
+		description: "Extra Motion props for the m.button root, on top of the tap and hover scales.",
+	},
+	"id | aria-label | aria-labelledby": {
+		type: "one of them, required",
+		description:
+			"The accessible name. The type is a union that forces exactly one: pair id with a Label, or name the box directly.",
+	},
+});

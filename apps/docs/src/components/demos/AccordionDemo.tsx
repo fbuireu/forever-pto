@@ -1,5 +1,8 @@
+import type { Accordion as AccordionPrimitive } from "@base-ui/react/accordion";
 import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from "@ui/modules/core/animate/base/Accordion";
+import type { ComponentProps } from "react";
 import { Demo } from "../Demo";
+import { type OwnProps, propRows } from "../PropsTable";
 
 const ITEMS = [
 	{
@@ -45,3 +48,41 @@ export const AccordionNoChevronDemo = () => (
 		</Accordion>
 	</Demo>
 );
+
+export const ACCORDION_PROP_ROWS = propRows({
+	openMultiple: {
+		type: "boolean",
+		defaultValue: "false",
+		description: "Whether more than one item may be open. Off, opening an item closes the others.",
+	},
+	value: { type: "unknown[]", description: "Controlled list of open item values." },
+	defaultValue: { type: "unknown[]", description: "Uncontrolled initial open items." },
+	onValueChange: { type: "(value: unknown[]) => void", description: "Fires with the new list of open values." },
+});
+
+export const ACCORDION_TRIGGER_PROP_ROWS = propRows<
+	OwnProps<ComponentProps<typeof AccordionTrigger>, ComponentProps<typeof AccordionPrimitive.Trigger>>
+>({
+	transition: {
+		type: "Transition",
+		defaultValue: '{ type: "spring", stiffness: 150, damping: 22 }',
+		description: "Spring driving the chevron's 45° rotation.",
+	},
+	chevron: {
+		type: "boolean",
+		defaultValue: "true",
+		description:
+			"Whether the + square renders. Off, the trigger is text only and the open state has no visual cue beyond the panel.",
+	},
+});
+
+export const ACCORDION_PANEL_PROP_ROWS = propRows<
+	OwnProps<ComponentProps<typeof AccordionPanel>, ComponentProps<typeof AccordionPrimitive.Panel>>
+>({
+	motionProps: { type: 'HTMLMotionProps<"div">', description: "Extra Motion props merged onto the animated wrapper." },
+	transition: {
+		type: "Transition",
+		defaultValue: "the trigger's spring",
+		description: "Transition of the height and opacity when the panel opens or closes.",
+	},
+});

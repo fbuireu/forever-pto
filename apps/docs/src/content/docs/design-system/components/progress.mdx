@@ -3,9 +3,13 @@ title: Progress
 description: Compound progress bar with a spring-animated indicator and a clip-path overlay label.
 sidebar:
   order: 16
+  badge:
+    text: Live
+    variant: success
 ---
 
-import { ProgressCustomDemo, ProgressDemo } from '../../../../components/demos/ProgressDemo';
+import { PROGRESS_LABEL_PROP_ROWS, PROGRESS_PROP_ROWS, PROGRESS_TRACK_PROP_ROWS, ProgressCustomDemo, ProgressDemo } from '../../../../components/demos/ProgressDemo';
+import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/primitives/Progress.tsx`. Base UI progress with a Motion indicator (`m.create(ProgressPrimitive.Indicator)`); needs a `LazyMotionProvider` ancestor.
 
@@ -26,6 +30,20 @@ The planner panel (`apps/web/src/ui/modules/pages/planner/PlannerPanel.tsx`) res
 
 <ProgressCustomDemo client:visible />
 
+## Props
+
+`Progress` forwards Base UI's root props; the ones that matter:
+
+<PropsTable rows={PROGRESS_PROP_ROWS} />
+
+`ProgressTrack` adds two on top of Base UI's track:
+
+<PropsTable rows={PROGRESS_TRACK_PROP_ROWS} />
+
+`ProgressOverlayLabel` is the app's own:
+
+<PropsTable rows={PROGRESS_LABEL_PROP_ROWS} />
+
 ## Usage
 
 ```tsx
@@ -43,3 +61,13 @@ import { Progress, ProgressOverlayLabel, ProgressTrack } from '@ui/modules/core/
 
 - `data-slot` hooks: `progress`, `progress-track`, `progress-indicator`.
 - The label typography is fixed to mono, 11px, bold, uppercase (via CSS, per the no-uppercase-strings rule); pass `className`/`overlayClassName` to recolor rather than restyle.
+
+## Accessibility
+
+- Base UI renders the root with `role='progressbar'` and keeps `aria-valuenow`, `aria-valuemin` and `aria-valuemax` in step with `value` and `max`.
+- The overlay label is drawn twice and the inverse copy is `aria-hidden`, so the text is announced once. The label still needs to be *inside* the root or referenced by `aria-labelledby` for the bar to have a name.
+- The animation is on width and clip-path only; nothing flashes, and the spring settles within a second, so no reduced-motion branch is needed.
+
+## In the app
+
+The PTO budget bar in `PlannerPanel.tsx`, where the overlay label reads the spent and remaining counts.

@@ -2,7 +2,7 @@
 title: Cookie consent
 description: The vanilla-cookieconsent integration, covering the custom React UI, per-service analytics consent, Google Consent Mode wiring and what needs consent at all.
 sidebar:
-  order: 10
+  order: 17
 ---
 
 Consent management is built on `vanilla-cookieconsent`, but with the library's UI **disabled**: it runs headless (`autoShow: false`) as the consent state machine, while the banner and preferences dialog are the app's own React components styled like the rest of the design system.
@@ -25,6 +25,27 @@ These categories are registered with the library:
   Each service declares its cookies with regex patterns, and `autoClear` deletes them when consent is withdrawn.
 
 ## Consent flow
+
+```mermaid
+stateDiagram-v2
+  [*] --> NoDecision: first visit, no cc_cookie
+  NoDecision --> Banner: CookieConsent renders the custom banner
+  Banner --> Accepted: accept all
+  Banner --> Rejected: reject all
+  Banner --> Custom: save preferences per service
+  Accepted --> Dialog: cc:showPreferences from the footer
+  Rejected --> Dialog
+  Custom --> Dialog
+  Dialog --> Accepted
+  Dialog --> Rejected
+  Dialog --> Custom
+  state Accepted {
+    [*] --> ga4_on
+    [*] --> betterStack_on
+  }
+```
+
+Every transition ends in `acceptService`, and the two tags react to the resulting events rather than to the UI:
 
 Accepting or saving preferences calls `CookieConsentLib.acceptService(enabledServices, 'analytics')`, then:
 

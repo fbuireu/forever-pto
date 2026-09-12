@@ -3,9 +3,13 @@ title: Banner
 description: Inline callout with icon, uppercase title and brand-tinted color schemes for tips, notices and confirmations.
 sidebar:
   order: 4
+  badge:
+    text: Live
+    variant: success
 ---
 
-import { BANNER_SCHEME_ROWS, BannerActionDemo, BannerSchemesDemo } from '../../../../components/demos/BannerDemo';
+import { BANNER_PROP_ROWS, BANNER_SCHEME_ROWS, BannerActionDemo, BannerSchemesDemo } from '../../../../components/demos/BannerDemo';
+import { PropsTable } from '../../../../components/PropsTable';
 import { VariantsTable } from '../../../../components/VariantsTable';
 
 Source: `apps/web/src/ui/modules/core/primitives/Banner.tsx`. A bordered, shadowed callout box (`role='note'`, labelled by its `title`) with an icon row on top and the message below. Framework-clean, so this page renders the real component.
@@ -24,6 +28,10 @@ Source: `apps/web/src/ui/modules/core/primitives/Banner.tsx`. A bordered, shadow
 
 <BannerActionDemo client:visible />
 
+## Props
+
+<PropsTable rows={BANNER_PROP_ROWS} />
+
 ## Usage
 
 ```tsx
@@ -40,3 +48,13 @@ import { Lightbulb } from 'lucide-react';
 - `title` is rendered uppercase by CSS, so pass a normal-case string.
 - The icon is `aria-hidden`; the accessible name comes from `aria-label={title}` on the container.
 - `children` renders in a `flex flex-wrap items-baseline` row, so inline fragments (values, links) line up on the baseline.
+
+## Accessibility
+
+- `role='note'` with `aria-label` set to the `title`, so the box announces as a note named by its heading and its body is read as content.
+- The icon is `aria-hidden`; the colour scheme carries no meaning on its own, which is why `title` is required.
+- The optional `action` is a real control inside the note; keep it a `Button` so it is reachable by keyboard.
+
+## In the app
+
+The Summary's Region hint (`Summary.tsx`) and the upgrade explanation in `PremiumRequiredModal.tsx`.

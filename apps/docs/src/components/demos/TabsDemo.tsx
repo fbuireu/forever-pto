@@ -7,7 +7,9 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@ui/modules/core/animate/components/Tabs";
+import type { ComponentProps } from "react";
 import { Demo } from "../Demo";
+import { type OwnProps, propRows } from "../PropsTable";
 
 const TABS = [
 	{
@@ -50,3 +52,36 @@ export const TabsDemo = () => (
 		</Tabs>
 	</Demo>
 );
+
+export const TABS_PROP_ROWS = propRows<
+	OwnProps<ComponentProps<typeof Tabs>, Omit<ComponentProps<"div">, "defaultValue">>
+>({
+	value: { type: "string", description: "Controlled active tab." },
+	defaultValue: {
+		type: "string",
+		description: "Uncontrolled initial tab. Without either, no panel renders until a tab is clicked.",
+	},
+	onValueChange: {
+		type: "(value: string) => void",
+		description: "Fires when a tab is activated by click or keyboard.",
+	},
+});
+
+export const TABS_CONTENTS_PROP_ROWS = propRows({
+	mode: {
+		type: '"auto-height" | "layout"',
+		defaultValue: '"auto-height"',
+		description:
+			"How the container follows the active panel's height: measured and animated by AutoHeight, or a Motion layout animation.",
+	},
+	transition: { type: "Transition", description: "Transition of the height change and of the panel cross-fade." },
+});
+
+export const TABS_HIGHLIGHT_PROP_ROWS = propRows({
+	activeClassName: { type: "string", description: "Classes on the gliding pill." },
+	transition: {
+		type: "Transition",
+		defaultValue: '{ type: "spring", stiffness: 200, damping: 25 }',
+		description: "Spring the pill moves with.",
+	},
+});

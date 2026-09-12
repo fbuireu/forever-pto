@@ -2,10 +2,93 @@
 title: Observability
 description: Workers observability sampling, the platform's own OTLP export of logs and traces to Better Stack, server and browser logging, and the typed analytics events.
 sidebar:
-  order: 14
+  order: 16
 ---
 
 Telemetry converges on **Better Stack**, fed from several surfaces: the Cloudflare platform, the server runtime, the browser, plus Google Analytics for product metrics. Nothing in the app opens a connection to it. The server side writes to `console` and Cloudflare exports; the browser side is a tag.
+```mermaid
+flowchart LR
+  subgraph worker [Cloudflare Worker]
+    H[Handler invocation]
+    F[Outbound fetch: Stripe, Turso, Resend]
+    BND[Bindings: R2 cache, rate limiter]
+    LOG[logger → console, one JSON line]
+  end
+  subgraph platform [Cloudflare platform]
+    OBS[observability.logs + traces<br/>head-sampled, query strings redacted]
+    DEST[destinations, one pair per stage]
+  end
+  subgraph browser [Browser]
+    RUM[Better Stack RUM tag<br/>after analytics consent]
+    GA[gtag, Consent Mode]
+  end
+  H & F & BND & LOG --> OBS --> DEST
+  DEST -->|OTLP, trace id on every log| BS[(Better Stack)]
+  RUM --> BS
+  GA --> GA4[(Google Analytics)]
+```
+
+
+## One request, end to end
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant B as Browser
+  participant W as Worker runtime
+  participant R as Route handler + operation
+  participant UC as Use case
+  participant X as Stripe / Turso / Resend
+  participant CF as Cloudflare observability
+  participant BS as Better Stack
+  B->>W: POST /api/payment
+  W->>W: open the invocation span, head-sample the request
+  W->>R: run the handler
+  R->>R: traced({ name: "createPayment" }): a child span named after the use case
+  R->>UC: Effect program, provided with ApplicationLayer
+  UC->>X: fetch (instrumented by the runtime: one span per call)
+  UC->>UC: logger.info(...) → one JSON line on console, tagged with the active span
+  X-->>UC: response
+  UC-->>R: result or a tagged failure
+  R-->>B: status and body
+  W->>CF: invocation log + spans + console lines, batched
+  CF->>BS: OTLP export to the stage's destinations, trace id on every log record
+```
+
+Nothing in the app opens a connection to a telemetry backend. The runtime instruments the handler, the outbound `fetch` calls and the binding calls on its own; `traced` in `apps/web/src/infrastructure/span.ts`, called by each operation under `apps/web/src/infrastructure/api/operations/`, adds one named span per entry point (`createPayment`, `sendContactEmail`, `activatePremium`) so a trace reads the operation rather than `POST`; `logger` writes one JSON line per call to `console`; and the platform ships all of it to the destinations `wrangler.toml` names. The browser side is a tag, loaded only after consent.
+
+## The signals
+
+| Signal | Produced by | Sampling | Lands in | Correlated by |
+| --- | --- | --- | --- | --- |
+| Invocation log | The runtime, per request: URL (query string redacted), method, status, outcome, duration | `head_sampling_rate` in `wrangler.toml`, the same in every environment | Cloudflare Workers Logs and, through the `destinations` entry, Better Stack | The invocation's trace id |
+| Spans | The runtime: the invocation, each `fetch`, each binding call; plus one named span per entry point from `traced` | The same rate, decided once per request | Cloudflare Traces and Better Stack | Parent and child ids the runtime nests itself |
+| Application log lines | `logger.info`, `warn`, `error` and `logError`: one `JSON.stringify` line to `console[level]` | Follows the invocation: a sampled-out request exports none of its lines | Same as the invocation log | The trace id of the span active when the line ran, attached by the runtime |
+| Browser errors, session replays, web vitals | The Better Stack RUM tag, after the analytics consent | Configured remotely in Better Stack | Better Stack, under the app version as `release` and the hostname-derived environment | Session |
+| Product events | `track()` over `window.betterstack`, a closed union of event names | None | Better Stack | Session, plus `identifyUser` for Premium users |
+| Page analytics | `gtag` with Consent Mode, `analytics_storage` granted only after opt-in | None | Google Analytics, one measurement id shared with the wiki | GA session |
+
+## What a log line looks like
+
+Every application line is the same shape, written by `write` in `apps/web/src/infrastructure/logging/logger.ts`:
+
+```json
+{"ip":"203.0.113.9","reason":"rate_limit_exceeded","service":"forever-pto-web","level":"warn","message":"Payment request refused"}
+```
+
+Three things about it are deliberate. The caller's context is spread **first**, so a context carrying its own `level` or `service` cannot relabel the line; `service` is `LOG_SERVICE`, the same value contribKit's logger writes, so the two sinks answer the same query; and a `url` in the context has its query string removed by `stripQuery` before serialisation, because Stripe appends the client secret to the return URL. The whole call sits in a `try` that returns, so a circular reference or a `BigInt` in a context cannot take down the Zustand action or the payment handler that was logging.
+
+There is no `debug` level and no request-scoped transport: the levels are `info`, `warn` and `error`, indexed by the contract's own union so a level `console` has no method for fails to compile, and the line reaches the sink through the platform rather than through a batcher the Worker owns. [ADR 0018](https://github.com/fbuireu/forever-pto/blob/main/adr/0018-the-platform-is-the-log-transport.md) records why the batcher went: as a module-level instance it delivered request B's lines from a timer armed in request A, which workerd refuses as I/O on behalf of a different request.
+
+## Where the configuration lives
+
+| Setting | Where | Notes |
+| --- | --- | --- |
+| Whether logs and traces are collected, the sampling rate, query-string redaction | `[observability]` in `wrangler.toml`, restated per environment | The contract suite asserts every environment restates the same values |
+| Where they are exported | `destinations = [...]` in the same blocks, one pair per stage | A destination is an account-level object in the Cloudflare dashboard: an OTLP endpoint and its headers. The repository names it and holds no credential for it |
+| The Better Stack source token for the export | The destination, in the dashboard | Reissuing the source is a dashboard edit; no deploy |
+| The browser tag's token | `NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN`, a GitHub environment variable inlined by the build | The last Better Stack value the build reads |
+| The Google Analytics id | `GOOGLE_ANALYTICS_ID`, one repository variable mapped to `NEXT_PUBLIC_` for the app and `PUBLIC_` for the wiki | Shared on purpose: one session across both subdomains |
 
 ## Cloudflare Workers observability
 

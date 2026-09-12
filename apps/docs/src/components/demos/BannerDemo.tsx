@@ -3,6 +3,7 @@ import { Button } from "@ui/modules/core/primitives/Button";
 import { Check, Info, Lightbulb, type LucideIcon, Sparkles } from "lucide-react";
 import type { ComponentProps } from "react";
 import { Demo } from "../Demo";
+import { propRows } from "../PropsTable";
 import type { VariantRow } from "../VariantsTable";
 
 type BannerColorScheme = ComponentProps<typeof Banner>["colorScheme"];
@@ -55,3 +56,20 @@ export const BannerActionDemo = () => (
 		</Banner>
 	</Demo>
 );
+
+export const BANNER_PROP_ROWS = propRows<keyof ComponentProps<typeof Banner>>({
+	icon: {
+		type: "LucideIcon | ComponentType<IconProps>",
+		description:
+			"The icon drawn beside the title, a lucide icon or one of the animated icons. Rendered aria-hidden; the title carries the meaning.",
+	},
+	title: { type: "string", description: "Uppercase heading of the callout and its accessible name." },
+	children: { type: "ReactNode", description: "The message body." },
+	action: { type: "ReactNode", description: "An optional control rendered after the message, usually a small Button." },
+	colorScheme: {
+		type: SCHEMES.map((scheme) => `"${scheme}"`).join(" | "),
+		description:
+			"Brand tint of the surface, icon and title. Required: a Banner without a scheme has no meaning to convey.",
+	},
+	className: { type: "string", defaultValue: '""', description: "Extra classes on the outer box." },
+});

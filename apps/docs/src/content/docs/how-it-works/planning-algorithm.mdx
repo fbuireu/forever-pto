@@ -1,0 +1,184 @@
+---
+title: The planning algorithm
+description: How the engine turns a Planning Window, a Holiday calendar and a PTO budget into a Suggestion, covering Workday enumeration, Bridge search and ranking, the three Strategies, greedy selection, Alternatives, the budget rules and every Metric, with the tunables read live from the code.
+sidebar:
+  order: 1
+---
+
+import { StrategiesTable } from '../../../components/demos/HowItWorksDemo';
+import { BalancedScoreFormula, PTO_CONSTANTS, TunablesTable } from '../../../components/demos/PlanningEngineDemo';
+
+The engine lives in `apps/web/src/domain/calendar/` and is pure: same inputs, same output, no I/O, no clock beyond "today". `runPlanningPipeline` in `apps/web/src/domain/calendar/pipeline.ts` is the one entry point, and every stage below is a function it calls in order. The numbers in this page are interpolated from `PTO_CONSTANTS` in `apps/web/src/domain/calendar/const.ts`, so they are the values the engine runs on.
+
+```mermaid
+flowchart TD
+  IN[PlanningInput<br/>window · budget · Holidays · Manual and Removed Days · Strategy · locale]
+  CLR[Clear the date-key and Holiday caches]
+  WIN[Expand the Planning Window into months]
+  PSEUDO[Manual Days → pseudo-Holidays]
+  BUD{Remaining Budget > 0?}
+  WD[getAvailableWorkdays]
+  BR[findBridges]
+  ANY{Any Bridge?}
+  SEL[selectBridgesForStrategy → Suggestion]
+  ALT[generateAlternatives]
+  MET[generateMetrics, once per plan]
+  EMPTY[Empty Suggestion, measured]
+  IN --> CLR --> WIN --> PSEUDO --> BUD
+  BUD -- no --> EMPTY
+  BUD -- yes --> WD --> BR --> ANY
+  ANY -- no --> EMPTY
+  ANY -- yes --> SEL --> ALT --> MET
+  SEL --> MET
+```
+
+## Stage 0: the window and the budget
+
+**The Planning Window** is the chosen year plus its Carry-over Months, expanded into one `Date` per month by `planningWindowMonths` (`apps/web/src/domain/calendar/window.ts`). A window with three Carry-over Months holds fifteen months and five Quarters; every Metric that buckets by month or Quarter sizes itself to that count, which is why a Quarter here is not a calendar quarter.
+
+**Manual Days become Holidays before anything else runs.** Each one is appended to the Holiday list as a pseudo-Holiday with the Custom Variant and an id of `manual-N`. A Manual Day is genuinely a day the user is off, so counting it as a Free Day for Bridge expansion is correct; the same dates are also handed to the Metrics **by name**, because a Metric has to know the user paid for them. Removed Days take the opposite route: they are struck from the Workday list and never become Free Days, so a day the user has said they will work cannot anchor a Bridge.
+
+**The budget the selector sees** is the Remaining Budget: the PTO budget less the Manual Days, measured by `measureBudget` (`apps/web/src/domain/calendar/utils/budget.ts`). When the caller passes an `autoSuggestCount` (the [worker hook](/how-it-works/calculation-worker/) does, after a manual edit) it replaces that number, so a user who took two Suggested Days back is not handed two new ones. A budget of zero, or a calendar with no candidate Bridge at all, short-circuits to an empty Suggestion that is still **measured**, so the Summary always has a real `Metrics` object to render.
+
+## Stage 1: Workdays
+
+`getAvailableWorkdays` in `apps/web/src/domain/calendar/utils/helpers.ts` walks every day of every month in the window and keeps a date only if it is not a weekend, not a Holiday (the pseudo-Holidays included), not a Removed Day and, unless past days are allowed, not before today. What comes out is the set of dates a PTO Day could be spent on: the candidates.
+
+The Holiday lookups go through `createHolidaySet` and `getKey` in `apps/web/src/domain/calendar/utils/cache.ts`, which memoise the string key of every date. Those caches are **caller-owned**: the pipeline clears both on entry, so a worker instance that outlives one run cannot answer with a stale key ([ADR 0006](https://github.com/fbuireu/forever-pto/blob/main/adr/0006-caller-owned-calculation-caches.md)).
+
+## Stage 2: Bridges
+
+A **Bridge** is the unit the engine reasons about: a short run of consecutive Workdays that, once spent, joins the Free Days on either side into one continuous stretch. `findBridges` generates every candidate and ranks them.
+
+```mermaid
+flowchart LR
+  subgraph gen [For every Workday]
+    S1[Try the day alone]
+    S2["Try it plus the next 1 … MAX_MULTI_DAY_SIZE − 1 Workdays<br/>(consecutive only; a gap stops the run)"]
+  end
+  subgraph analyze [analyzePotentialBridge]
+    ADJ{Touches a Free Day<br/>on either side?}
+    EXP[Expand outward over weekends and Holidays<br/>until a Workday, up to SAFETY_LIMIT]
+    EFF[efficiency = effectiveDays ÷ ptoDaysNeeded]
+    MIN{efficiency ≥ MINIMUM?}
+  end
+  S1 --> ADJ
+  S2 --> ADJ
+  ADJ -- no --> DROP1[Discard]
+  ADJ -- yes --> EXP --> EFF --> MIN
+  MIN -- no --> DROP2[Discard]
+  MIN -- yes --> KEEP[Bridge]
+  KEEP --> SORT[Sort by compareByEfficiency]
+```
+
+1. **Generation.** For each Workday, the search tries the day alone and then runs of {PTO_CONSTANTS.BRIDGE_SEARCH.MIN_MULTI_DAY_SIZE} to {PTO_CONSTANTS.BRIDGE_SEARCH.MAX_MULTI_DAY_SIZE} consecutive Workdays starting there. A run is only tried when every day in it is a Workday; a Holiday or a weekend in the middle ends it. Longer stretches are not generated as single candidates: the selector builds them by picking adjacent Bridges, which is what lets a week-long break appear without the search enumerating every four- and five-day run.
+2. **Adjacency.** A run that touches no Free Day on either side is discarded at once. A PTO Day in the middle of a working week buys exactly one day and no stretch, and the product is not for that.
+3. **Expansion.** From the run's first day backwards and last day forwards, the analyser walks over every weekend day and Holiday it meets and stops at the first Workday. The span from the first Free Day absorbed to the last is the Bridge's `startDate` to `endDate`, and its length in days is the **Effective Days**. `SAFETY_LIMIT` ({PTO_CONSTANTS.SAFETY_LIMIT}) bounds each walk; it is a guard against a malformed calendar, not a planning rule.
+4. **Efficiency.** Effective Days divided by the PTO Days the run spends. A candidate under `EFFICIENCY.MINIMUM` ({PTO_CONSTANTS.EFFICIENCY.MINIMUM}) is discarded: one PTO Day beside a weekend already returns two, so anything weaker is not worth offering. Note that a lone Friday reaches exactly the floor and is kept.
+5. **Ranking.** `compareByEfficiency` orders the survivors by Efficiency, and when two differ by less than `EFFICIENCY_COMPARISON_THRESHOLD` ({PTO_CONSTANTS.BRIDGE_GENERATION.EFFICIENCY_COMPARISON_THRESHOLD}) it prefers the one with more Effective Days, so a near tie goes to the longer stretch.
+
+The candidates and the Workdays are computed **once** per run, by `findPlanningCandidates` in `apps/web/src/domain/calendar/utils/candidates.ts`, and handed to both the Suggestion and the Alternatives. They used to be recomputed by each, and a Planning Window then cost two Bridge searches for one plan.
+
+### A worked example
+
+Take a Monday Holiday on the 25th. The Friday before is a Workday whose next day, Saturday, is free, so it passes adjacency. Expanding backwards from the Friday stops immediately (Thursday is a Workday); expanding forwards absorbs Saturday, Sunday and the Monday Holiday and stops at the Tuesday. The Bridge spans Friday to Monday: four Effective Days for one PTO Day, Efficiency 4.
+
+```mermaid
+gantt
+  dateFormat YYYY-MM-DD
+  axisFormat %a %d
+  section Calendar
+  Workdays          :2026-05-18, 4d
+  PTO Day (Friday)  :active, 2026-05-22, 1d
+  Weekend           :done, 2026-05-23, 2d
+  Holiday (Monday)  :crit, 2026-05-25, 1d
+  Workdays          :2026-05-26, 4d
+  section Bridge
+  startDate → endDate, 4 Effective Days :milestone, 2026-05-22, 0d
+  effectiveDays = 4  :active, 2026-05-22, 4d
+```
+
+The Tuesday to Friday after that Holiday form a second candidate: a four-day run whose previous day is the Holiday, expanding backwards over Monday, Sunday and Saturday and forwards over the next weekend. Nine Effective Days for four PTO Days, Efficiency 2.25: kept, and block-shaped, which matters to the Balanced Strategy below.
+
+## Stage 3: the Strategy
+
+A Strategy is an **ordering** of the Bridges, and nothing else. `STRATEGY_ORDERING` in `apps/web/src/domain/calendar/suggestions/utils/selectors.ts` maps each `FilterStrategy` to a function that sorts the candidate list; a single greedy selector then walks whatever order it is given. The table is rendered from the imported `FilterStrategy` constant, so it cannot drift from the code:
+
+<StrategiesTable />
+
+- **Grouped** sorts by PTO Days needed, descending, with Efficiency as the tiebreaker. Multi-day runs come first, so the budget goes into a few long blocks.
+- **Optimized** sorts by `compareByEfficiency`, the same ordering the generator produced. The single-day Fridays before Monday Holidays win, and the plan spreads into many short, cheap stretches.
+- **Balanced** scores every Bridge and puts the **high-value** ones at the front. A Bridge is *block-shaped* when it spends at least `HIGH_VALUE_THRESHOLD_DAYS` ({PTO_CONSTANTS.SELECTION_WEIGHTS.HIGH_VALUE_THRESHOLD_DAYS}) PTO Days and produces at least `HIGH_VALUE_THRESHOLD_EFFECTIVE` ({PTO_CONSTANTS.SELECTION_WEIGHTS.HIGH_VALUE_THRESHOLD_EFFECTIVE}) Effective Days; it is *high-value* when it is block-shaped **and** its Efficiency reaches `EFFICIENCY.ACCEPTABLE` ({PTO_CONSTANTS.EFFICIENCY.ACCEPTABLE}). High-value Bridges are ordered by score first, then everything else by score.
+
+<BalancedScoreFormula />
+
+The score weighs Efficiency against the raw length of the stretch, so a nine-day block at 2.25 can outrank a four-day Friday at 4.0 when the block bonus applies, which is the trade the Balanced Strategy exists to make.
+
+An unknown Strategy string cannot reach this table: `worker.ts` narrows the inbound value with `isFilterStrategy` and falls back to `DEFAULT_FILTER_STRATEGY`, and the ordering lookup falls back to Grouped for the same reason.
+
+## Stage 4: greedy selection
+
+`selectGreedily` walks the ordered list once with a budget and a set of dates already taken:
+
+```mermaid
+flowchart TD
+  NEXT[Next Bridge in order] --> SPENT{spent ≥ budget?}
+  SPENT -- yes --> DONE[Stop]
+  SPENT -- no --> FIT{spent + ptoDaysNeeded ≤ budget?}
+  FIT -- no --> NEXT
+  FIT -- yes --> CLASH{Any of its PTO Days already taken?}
+  CLASH -- yes --> NEXT
+  CLASH -- no --> TAKE[Take it: add its dates, add its cost] --> NEXT
+```
+
+A Bridge that would overspend is skipped, not truncated: the engine never places half a Bridge, because half a Bridge does not produce the stretch that justified it. A Bridge sharing a date with one already chosen is skipped for the same reason. The result is the sorted list of dates, the Bridges behind them and the Strategy that produced them: a **Suggestion**. The selector is shared by both the Suggestion and the Alternatives, which is what makes an Alternative a plan of the same kind rather than a looser one.
+
+## Stage 5: Alternatives
+
+`generateAlternatives` in `apps/web/src/domain/calendar/alternatives/generateAlternatives.ts` produces up to `maxAlternatives` (four, from the holidays store) plans that are **genuinely different** from the Suggestion:
+
+1. Every Bridge that shares a date with the Suggestion is excluded first, so an Alternative cannot be the Suggestion with one day moved.
+2. Seven orderings of the remaining Bridges are prepared: by Efficiency, by Effective Days, by PTO cost, by Efficiency times cost, by month, by Efficiency ascending, and one deterministic pseudo-random order driven by `Math.sin` of the Efficiency. Each attempt runs the greedy selector over the next ordering in the cycle.
+3. Once every ordering has been used, later attempts **rotate** the list by a growing offset before selecting, so the same ordering yields a different head and therefore a different plan.
+4. Each result is fingerprinted with `getCombinationKey` over its dates; a plan already seen is dropped. The loop stops at `maxAlternatives` plans, or after three times that many attempts (fifteen at least), whichever comes first.
+
+The point of the cycle is variety without randomness: two runs over the same inputs produce the same Alternatives, so the user's "option three" is still option three after a refresh.
+
+## Stage 6: Metrics
+
+`generateMetrics` in `apps/web/src/domain/calendar/metrics/generateMetrics.ts` measures a plan, and the pipeline runs it once for the Suggestion and once per Alternative. Every Metric below is defined in the [glossary](/reference/glossary/); this is how each is computed. The placed days it reads are the plan's Suggested Days with Removed Days struck and Manual Days folded in (`resolveSelectedDays`), so a hand-edited plan is measured as edited.
+
+| Metric | Computed as |
+| --- | --- |
+| Effective Days | The union of every date covered by the plan's Bridges plus the weekends and Holidays they absorb, counted once each. A plan whose Bridges no longer match its dates (after a manual edit) falls back to the placed count |
+| Bonus Days | Effective Days minus placed PTO Days: the stretch the budget did not pay for |
+| Efficiency | Effective Days divided by placed PTO Days; zero for an empty plan |
+| Gain | Effective Days beyond the **whole** budget, over that budget, as a percentage (`measureGain`). Efficiency divides by the days actually placed, Gain by the allowance, so they agree only when the budget is spent in full |
+| Long Weekends | Free streaks of at least `LONG_WEEKEND_MINIMUM_DAYS` ({PTO_CONSTANTS.METRICS.LONG_WEEKEND_MINIMUM_DAYS}) days that contain a weekend and at least one placed PTO Day |
+| Rest Blocks | Placed dates are sorted; a gap wider than `REST_BLOCK_SEPARATION_DAYS` ({PTO_CONSTANTS.METRICS.REST_BLOCK_SEPARATION_DAYS}) days starts a new block |
+| Long Blocks per Quarter | Free streaks of at least `LONG_BLOCK_MINIMUM_DAYS` ({PTO_CONSTANTS.METRICS.LONG_BLOCK_MINIMUM_DAYS}) days with a placed day, bucketed by the Quarter their first in-window day falls in |
+| Longest Vacation | The longest free streak that contains a placed PTO Day |
+| Max Work Streak | The longest run of Workdays between two Free Days or placed PTO Days in the **year**, scanned from today unless past days are allowed |
+| Worked Days per month | Workdays in the year minus the Holidays and PTO Days that fall on one, divided by twelve, to one decimal |
+| Monthly and Quarter distribution | Placed days bucketed by window month and by Quarter, each array sized to the window |
+| Bridges used | The plan's Bridges whose every PTO Day is still placed |
+| First and last break | The first and last placed dates, formatted for the locale |
+
+Two details keep the Metrics honest across a hand-edited plan. **Free streaks** (`freeStreaks` in `apps/web/src/domain/calendar/metrics/utils/streaks.ts`) scan from `STREAK_SCAN_MARGIN_DAYS` ({PTO_CONSTANTS.METRICS.STREAK_SCAN_MARGIN_DAYS}) days before the first relevant date to as many after the last, so a stretch that begins on a weekend outside the placed days is measured whole. And every Metric that reads Holidays and placed days together builds its set through one helper, `dayOffKeys` in `apps/web/src/domain/calendar/metrics/utils/dayOff.ts`, because Manual Days appear in both lists by construction and a Metric that subtracted them independently counted each one twice. `getWorkedDaysPerMonth` did exactly that once.
+
+## The tunables
+
+Every constant the engine reads, with its live value. The table is exhaustive over `PTO_CONSTANTS` by type, so adding or renaming a tunable in the code fails this site's typecheck until the row is written.
+
+<TunablesTable />
+
+## Complexity and cost
+
+For a window of *m* months there are roughly 21·*m* Workdays; each spawns at most {PTO_CONSTANTS.BRIDGE_SEARCH.MAX_MULTI_DAY_SIZE} candidates and each candidate expands over at most a few days, so generation is linear in the window and the sort dominates. Alternatives add a handful of sorts and greedy passes. The whole run for a year is tens of milliseconds on a laptop, which is fast enough to feel instant and slow enough to stutter a slider drag if it ran on the main thread; that, and nothing about the algorithm, is why it runs in a [Web Worker](/how-it-works/calculation-worker/).
+
+## Where to read next
+
+- `apps/web/src/domain/calendar/CLAUDE.md` is the engine's own guide: files, public API, invariants and the traps a change here falls into.
+- [Holidays engine](/how-it-works/holidays-engine/) covers where the Holidays come from before this page starts.
+- [Calculation worker](/how-it-works/calculation-worker/) covers the boundary the engine runs behind.
+- [ADR 0003](https://github.com/fbuireu/forever-pto/blob/main/adr/0003-pure-calendar-domain-effectful-payment-domain.md) records why this context is pure while the payment one is not.

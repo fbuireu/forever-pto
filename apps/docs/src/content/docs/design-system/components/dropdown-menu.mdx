@@ -3,9 +3,13 @@ title: Dropdown menu
 description: Base UI menu with a MotionHighlight hover pill and scale-in content.
 sidebar:
   order: 11
+  badge:
+    text: Live
+    variant: success
 ---
 
-import { DropdownMenuDemo } from '../../../../components/demos/DropdownMenuDemo';
+import { DROPDOWN_MENU_CONTENT_PROP_ROWS, DROPDOWN_MENU_PROP_ROWS, DropdownMenuDemo } from '../../../../components/demos/DropdownMenuDemo';
+import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/animate/base/DropdownMenu.tsx`. Base UI menu plus Motion; needs a `LazyMotionProvider` ancestor.
 
@@ -19,6 +23,18 @@ Public exports: `DropdownMenu`, `DropdownMenuTrigger`, `DropdownMenuContent`, `D
 - Hover highlighting is not per-item CSS: the content wraps children in `MotionHighlight` (`apps/web/src/ui/modules/core/animate/effects/MotionHighlight.tsx`), a single accent pill that glides between items. The spring (default `stiffness: 350, damping: 35`) and the effect itself are configured on the root via `transition` and `animateOnHover`. The same effect powers [Tabs](/design-system/components/tabs/) and the sidebar.
 - `DropdownMenuItem` renders as an `m.div` with `whileTap` scale 0.97 and accepts `variant: 'default' | 'destructive'` (destructive tints the highlight and text red) plus `inset` for left padding alignment.
 - `DropdownMenuTrigger asChild` composes with [Button](/design-system/components/button/) via Base UI's `render`.
+
+## Props
+
+`DropdownMenu` adds two props on top of Base UI's menu root:
+
+<PropsTable rows={DROPDOWN_MENU_PROP_ROWS} />
+
+`DropdownMenuContent` forwards Base UI's positioner and popup props; the ones worth setting:
+
+<PropsTable rows={DROPDOWN_MENU_CONTENT_PROP_ROWS} />
+
+`DropdownMenuTrigger` accepts `asChild`; `DropdownMenuItem` forwards Base UI's item props.
 
 ## Usage
 
@@ -42,3 +58,13 @@ For free-form anchored content (forms, explanations) use [Popover](/design-syste
 
 - `data-slot` hooks: `dropdown-menu`, `dropdown-menu-trigger`, `dropdown-menu-content`, `dropdown-menu-item` (plus `data-variant`/`data-inset` on items).
 - Content height is capped to Base UI's `--available-height` so long menus scroll instead of overflowing the viewport.
+
+## Accessibility
+
+- Base UI renders `role='menu'` and `role='menuitem'`, moves focus into the menu on open, supports arrow keys, Home and End, typeahead by first letter, and closes on Escape or on selecting an item, returning focus to the trigger.
+- The hover pill follows the focused item as well as the hovered one, so keyboard users see the same highlight.
+- A trigger with `asChild` must be a button, or carry `role='button'` and `aria-haspopup='menu'`, which Base UI adds when it renders the button itself.
+
+## In the app
+
+The language switchers (`LanguageSelector.tsx` in the sidebar, `HomepageLanguageSwitcher.tsx` on the homepage) and the theme picker (`ThemeSelector.tsx`).

@@ -2,10 +2,29 @@
 title: State stores
 description: The Zustand stores (filters, holidays, location, premium and ui), their shapes, encrypted localStorage persistence and the useShallow convention.
 sidebar:
-  order: 3
+  order: 6
 ---
 
 All client state lives in Zustand stores under `apps/web/src/application/stores/`. Most of them persist; each is created as `create()(devtools(persist(...)))` with a versioned storage name. The `ui` store is devtools-only. Store conventions are documented in `apps/web/src/application/stores/CLAUDE.md`.
+```mermaid
+flowchart LR
+  subgraph stores [Zustand stores]
+    F[filters]
+    H[holidays]
+    L[location]
+    P[premium]
+    U[ui]
+  end
+  LS[(localStorage<br/>obfuscated JSON, dates as ISO strings)]
+  F & H & L & P <-->|persist + partialize| LS
+  H -->|dynamic import| GH[getHolidays]
+  H -->|dynamic import, main-thread path| PIPE[runPlanningPipeline]
+  W[useCalculationsWorker] -->|setCalculationResult| H
+  L -->|dynamic import| GC[getCountries / getRegions]
+  P -->|fetch| CS["/api/check-session"]
+  CK[user-country cookie] -->|StoresInitializer| F
+```
+
 
 ## Persistence: encrypted localStorage
 

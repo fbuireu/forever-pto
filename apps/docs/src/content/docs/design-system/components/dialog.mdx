@@ -3,9 +3,13 @@ title: Dialog
 description: Centered modal with a gradient blurred backdrop, brutal close button and Motion enter/exit.
 sidebar:
   order: 9
+  badge:
+    text: Live
+    variant: success
 ---
 
-import { DialogDemo, DialogNoCloseButtonDemo } from '../../../../components/demos/DialogDemo';
+import { DIALOG_CONTENT_PROP_ROWS, DIALOG_PROP_ROWS, DialogDemo, DialogNoCloseButtonDemo } from '../../../../components/demos/DialogDemo';
+import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/animate/base/Dialog.tsx`, a styling layer over the Motion dialog primitive at `apps/web/src/ui/modules/core/animate/primitives/base/Dialog.tsx` (Base UI dialog + `AnimatePresence`). Import from `animate/base/Dialog`, which is what the demo on this page does; the inner layer is an implementation detail. Needs a `LazyMotionProvider` ancestor.
 
@@ -22,6 +26,16 @@ Exports: `Dialog`, `DialogTrigger`, `DialogContent`, `DialogHeader`, `DialogTitl
 - `DialogTrigger` supports `asChild` (via Base UI's `render`) so a [Button](/design-system/components/button/) can be the trigger without nesting buttons.
 
 <DialogNoCloseButtonDemo client:visible />
+
+## Props
+
+`Dialog` forwards Base UI's root props; the ones that matter:
+
+<PropsTable rows={DIALOG_PROP_ROWS} />
+
+`DialogContent` adds two on top of Base UI's popup:
+
+<PropsTable rows={DIALOG_CONTENT_PROP_ROWS} />
 
 ## Usage
 
@@ -49,3 +63,13 @@ For a mobile-first bottom sheet use [Drawer](/design-system/components/drawer/);
 - `DialogHeader` draws the standard 2px bottom hairline (frame color at 18% opacity); `DialogFooter` stacks buttons column-reverse on mobile, row-end on desktop.
 - `DialogTitle` is `font-black` with tight tracking, matching the app's display type.
 - Always include `DialogTitle` (and ideally `DialogDescription`) for accessible labelling; Base UI wires the aria attributes.
+
+## Accessibility
+
+- Base UI renders `role='dialog'` with `aria-modal`, traps focus inside while open, closes on Escape and returns focus to the trigger on close.
+- `DialogTitle` becomes the `aria-labelledby` target and `DialogDescription` the `aria-describedby` one, which is why both should always be present, even visually hidden.
+- The close button's only text is `closeLabel`, rendered `sr-only`; pass the translated string, since the default is English.
+
+## In the app
+
+Every modal in the app: the Holiday form and delete confirmation (`HolidayFormModal.tsx`, `DeleteHolidayModal.tsx`), the upgrade modal (`PremiumRequiredModal.tsx`), the contact form (`ContactModal.tsx`), the consent preferences (`CookieConsentDialog.tsx`) and the Workday counter's range picker (`WorkdayCounterCalendarModal.tsx`).

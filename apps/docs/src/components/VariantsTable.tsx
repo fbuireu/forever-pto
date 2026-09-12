@@ -30,11 +30,11 @@ export const VariantsTable = ({ rows }: { rows: VariantRow[] }) => {
 							<code>{axis}</code>
 						</td>
 						<td>
-							{values.map((value) => (
-								<code key={value} style={{ marginRight: "0.5rem", whiteSpace: "nowrap" }}>
-									{value}
-								</code>
-							))}
+							<span style={{ display: "flex", flexWrap: "wrap", gap: "0.35rem" }}>
+								{values.map((value) => (
+									<code key={value}>{value}</code>
+								))}
+							</span>
 						</td>
 						<td>{defaultValue ? <code>{defaultValue}</code> : "—"}</td>
 						<td>{notes ?? ""}</td>

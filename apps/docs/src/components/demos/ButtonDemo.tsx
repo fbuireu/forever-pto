@@ -1,6 +1,8 @@
 import { Button, type buttonVariants } from "@ui/modules/core/primitives/Button";
 import type { VariantProps } from "class-variance-authority";
+import type { ComponentProps } from "react";
 import { Demo } from "../Demo";
+import { type OwnProps, propRows } from "../PropsTable";
 import type { VariantRow } from "../VariantsTable";
 
 type ButtonVariant = NonNullable<VariantProps<typeof buttonVariants>["variant"]>;
@@ -83,3 +85,24 @@ export const ButtonStatesDemo = () => (
 		</Button>
 	</Demo>
 );
+
+export const BUTTON_PROP_ROWS = propRows<OwnProps<ComponentProps<typeof Button>, ComponentProps<"button">>>({
+	variant: {
+		type: VARIANTS.map((variant) => `"${variant}"`).join(" | "),
+		defaultValue: '"default"',
+		description: "The visual recipe. ghost and link drop the frame, the shadow and the hover lift.",
+	},
+	size: {
+		type: Object.keys(SIZE_LABELS)
+			.map((size) => `"${size}"`)
+			.join(" | "),
+		defaultValue: '"default"',
+		description: "Height and padding. The icon-* sizes are square, for a button holding only an icon.",
+	},
+	asChild: {
+		type: "boolean",
+		defaultValue: "false",
+		description:
+			"Render the single child element with the button's classes and props merged in, through the local Slot, so a link can look like a button without nesting interactive elements.",
+	},
+});
