@@ -25,8 +25,19 @@ export interface Logger {
 const redacted = (context: LogContext = {}): LogContext =>
 	typeof context.url === "string" ? { ...context, url: stripQuery(context.url) } : context;
 
+const describeValue = (value: unknown): string => {
+	if (value instanceof Error) return value.message;
+	if (typeof value !== "object" || value === null) return String(value);
+
+	try {
+		return JSON.stringify(value);
+	} catch {
+		return String(value);
+	}
+};
+
 const describeError = (error: unknown): LogContext => ({
-	message: error instanceof Error ? error.message : String(error),
+	message: describeValue(error),
 	name: error instanceof Error ? error.name : "UnknownError",
 	stack: error instanceof Error ? error.stack : undefined,
 	...(error instanceof Error
