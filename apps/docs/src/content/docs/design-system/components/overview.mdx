@@ -7,6 +7,33 @@ sidebar:
 
 All core components live in `apps/web/src/ui/modules/core/` and follow the conventions in `apps/web/src/ui/modules/core/CLAUDE.md`: CVA variants, `data-slot` attributes, named exports, no business logic or translations inside components. See [Philosophy](/design-system/foundations/philosophy/) for the visual language.
 
+```mermaid
+flowchart TB
+  subgraph deps [Foundations]
+    BASE[Base UI: behaviour and ARIA]
+    MOTION[Motion: m.* and AnimatePresence]
+    CVA[CVA: variants]
+    TOKENS[Design tokens: colours, shadows, frame]
+  end
+  subgraph core [apps/web/src/ui/modules/core]
+    PRIM[primitives/<br/>Button · Badge · Banner · Card · Input · Textarea · Label · Separator · Table · InputGroup · Progress · Slider · Command]
+    ABASE[animate/base/<br/>Accordion · Checkbox · Collapsible · Dialog · Drawer · DropdownMenu · Popover · Switch · Tooltip · Sidebar · Slot]
+    ACOMP[animate/components/<br/>Tabs · Counter · FeatureList · RadialNav]
+    AEFF[animate/effects/<br/>AutoHeight · MotionHighlight]
+    AICON[animate/icons/ and animate/text/]
+    APRIM[animate/primitives/<br/>the unstyled motion layer]
+  end
+  BASE --> PRIM & ABASE & APRIM
+  MOTION --> APRIM & ACOMP & AEFF & AICON
+  CVA --> PRIM
+  TOKENS --> PRIM & ABASE & ACOMP
+  APRIM --> ABASE
+  AEFF --> ACOMP & ABASE
+  FEAT[Feature modules: sidebar, planner, homepage, shared] --> PRIM & ABASE & ACOMP
+```
+
+
+
 These docs import the real components through the `@ui` alias and render them as Astro islands. Portability determines what a page can show:
 
 - **Live** means a framework-clean module (no Next.js in its import graph); the docs render the real component.

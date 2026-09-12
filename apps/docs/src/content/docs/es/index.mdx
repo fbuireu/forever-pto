@@ -3,11 +3,15 @@ title: Docs de Forever PTO
 description: Documentación y wiki interna de Forever PTO.
 template: splash
 hero:
-  tagline: La wiki interna de Forever PTO. Arquitectura, design system, infraestructura y convenciones, documentadas contra el código real.
+  tagline: Cómo el planificador convierte un presupuesto de PTO Days en las rachas más largas lejos del trabajo, y cómo se construye, despliega y mantiene honesto el código que lo hace. Escrita contra el árbol real, con los componentes reales renderizados en vivo.
   actions:
-    - text: Empezar
-      link: /es/start/introduction/
+    - text: Qué hace el planificador
+      link: /es/start/what-the-planner-does/
       icon: right-arrow
+    - text: Seguir una petición de principio a fin
+      link: /es/how-it-works/overview/
+      icon: rocket
+      variant: minimal
     - text: Explorar el design system
       link: /es/design-system/components/overview/
       icon: puzzle
@@ -16,29 +20,55 @@ hero:
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
+## Todo el producto en una imagen
+
+Lo importante ocurre en el navegador: el edge solo detecta un Country y sirve HTML prerenderizado, y el plan nunca sale del dispositivo.
+
+```mermaid
+flowchart TB
+  subgraph edge [Cloudflare Worker]
+    PX[Proxy: cookies de locale y Country]
+    API["/api/*: Donation, sesión, contacto"]
+  end
+  subgraph browser [Navegador]
+    ST[(Stores de Zustand<br/>localStorage ofuscado)]
+    HOL[date-holidays, en el bundle]
+    UI[Pantalla del planificador]
+    WK[Web Worker<br/>motor de planificación]
+  end
+  PX -->|HTML + cookies| UI
+  UI <--> ST
+  ST --> HOL --> ST
+  ST -->|cadenas ISO| WK -->|Suggestion + Alternatives + Metrics| ST
+  UI -->|solo la Donation| API
+```
+
 <CardGrid stagger>
   <Card title='Empieza aquí' icon='rocket'>
-    Qué es Forever PTO, cómo ejecutarlo en local y cómo está organizado el repositorio.
-    [Introducción →](/es/start/introduction/)
-  </Card>
-  <Card title='Arquitectura' icon='open-book'>
-    La estructura en capas bajo `apps/web/src/` (app, application, domain, infrastructure y ui) y cómo dependen entre
-    sí. [Visión general →](/es/architecture/overview/)
+    Qué hace el producto, qué entradas toma y qué plan devuelve; después, cómo ejecutarlo en local y cómo está
+    organizado el repositorio. [Qué hace el planificador →](/es/start/what-the-planner-does/)
   </Card>
   <Card title='Cómo funciona' icon='information'>
-    Inmersiones por feature: el motor de sugerencias, la detección de país, el flujo premium y más.
-    [Detección de país →](/es/how-it-works/country-detection/)
+    Una petición seguida desde el edge hasta la última Metric, y luego cada subsistema: el algoritmo con sus
+    parámetros leídos del código, las fuentes de Holidays, el Web Worker, la pantalla del planificador, los stores.
+    [Visión general →](/es/how-it-works/overview/) · [El algoritmo →](/es/how-it-works/planning-algorithm/)
+  </Card>
+  <Card title='Arquitectura' icon='open-book'>
+    El árbol por capas bajo `apps/web/src/`, con el grafo de dependencias medido sobre los imports y no dibujado
+    desde la intención, la cadena del proxy por petición y la capa de servicios con Effect.
+    [Visión general →](/es/architecture/overview/)
   </Card>
   <Card title='Design system' icon='puzzle'>
-    La librería de componentes neobrutalista, renderizada en vivo en estas páginas con los componentes reales de
-    la app. [Componentes →](/es/design-system/components/overview/)
+    La librería de componentes neobrutalista, renderizada en vivo desde las fuentes de la app, con props, notas de
+    accesibilidad y dónde se usa cada componente. [Componentes →](/es/design-system/components/overview/)
   </Card>
   <Card title='Infraestructura y CI/CD' icon='setting'>
-    Cloudflare Workers, OpenNext, previews por PR y el pipeline de releases.
-    [Entornos →](/es/infra/environments/)
+    Cloudflare Workers a través de OpenNext, un Worker por pull request, el pipeline de release con smoke tests y
+    las tags que mantienen dos paquetes versionados por separado. [Entornos →](/es/infra/environments/)
   </Card>
-  <Card title='Contribuir' icon='pencil'>
-    Convenciones de commits, estilo de código, tooling y reglas de testing para trabajar en este repo.
+  <Card title='Referencia y contribuir' icon='pencil'>
+    El glosario en el que está escrito el código, cada cookie que la app establece, y las convenciones, tooling y
+    reglas de testing que un cambio tiene que cumplir. [Glosario →](/es/reference/glossary/) ·
     [Convenciones →](/es/contributing/conventions/)
   </Card>
 </CardGrid>

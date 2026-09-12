@@ -3,9 +3,13 @@ title: Tabs
 description: Custom tabs with a gliding MotionHighlight pill and auto-height animated panels.
 sidebar:
   order: 21
+  badge:
+    text: Live
+    variant: success
 ---
 
-import { TabsDemo } from '../../../../components/demos/TabsDemo';
+import { TABS_CONTENTS_PROP_ROWS, TABS_HIGHLIGHT_PROP_ROWS, TABS_PROP_ROWS, TabsDemo } from '../../../../components/demos/TabsDemo';
+import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/animate/components/Tabs.tsx`. This is a hand-rolled compound component (plain `div`s + React context), not a Base UI wrapper. Heavy Motion usage; needs a `LazyMotionProvider` ancestor.
 
@@ -19,7 +23,23 @@ Exports: `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`, `TabsContents`, `Tabs
 - The active-tab pill is `MotionHighlight` in parent mode (`apps/web/src/ui/modules/core/animate/effects/MotionHighlight.tsx`): a single accent rectangle (`border-2`, `shadow-brutal-xs`) animated to the bounds of the active item with a spring (`stiffness: 200, damping: 25`). That is why the list needs the extra wrapper pair: `TabsHighlight` around `TabsList`,, and each `TabsTrigger` inside a `TabsHighlightItem` keyed by the same `value`.
 - `TabsContents` renders only the active `TabsContent` inside `AnimatePresence mode='wait'`. Its `mode` prop picks the height strategy: `'auto-height'` (default) animates the container height to the new panel via `AutoHeight` (`apps/web/src/ui/modules/core/animate/effects/AutoHeight.tsx`); `'layout'` uses a Motion layout animation instead.
 - Each `TabsContent` enters with an opacity + `blur(4px) → 0` transition, so panel swaps read as a focus pull rather than a hard cut.
-- `TabsTrigger` is an `m.button` with `whileTap` scale 0.95 and proper `role='tab'` / `data-state` attributes; note it does not implement roving arrow-key focus.
+- `TabsTrigger` is an `m.button` with `whileTap` scale 0.95 and the `role='tab'` / `aria-selected` / `aria-controls` attributes; Arrow Left, Arrow Right, Home and End move between tabs and activate them (`activateSiblingTab`), which the accessibility section below spells out.
+
+## Props
+
+`Tabs` adds three props on top of a `div`'s:
+
+<PropsTable rows={TABS_PROP_ROWS} extends='the native div' />
+
+`TabsContents` takes the Motion props of a `div` plus:
+
+<PropsTable rows={TABS_CONTENTS_PROP_ROWS} />
+
+`TabsHighlight` wraps the list and takes:
+
+<PropsTable rows={TABS_HIGHLIGHT_PROP_ROWS} />
+
+`TabsTrigger` and `TabsContent` each take a required `value`; `TabsList` takes a `div`'s props.
 
 ## Usage
 
@@ -50,3 +70,13 @@ Reference consumers: the planner's holidays list (`apps/web/src/ui/modules/pages
 
 - `data-slot` hooks: `tabs`, `tabs-list`, `tabs-trigger`, `tabs-contents`, `tabs-content`.
 - The `value` on `TabsHighlightItem` and its inner `TabsTrigger` must match; the highlight and the click handler are wired independently.
+
+## Accessibility
+
+- Hand-rolled, so the ARIA is explicit: `TabsList` is `role='tablist'`, each trigger `role='tab'` with `aria-selected` and `aria-controls`, each panel `role='tabpanel'` with `aria-labelledby`, and the ids are generated with `useId` so several tab sets on one page do not collide.
+- Keyboard: Arrow Left and Arrow Right move focus between tabs and activate them, Home and End jump to the ends, all handled in the trigger's `onKeyDown` through `activateSiblingTab`. Disabled tabs are skipped.
+- Only the active panel is rendered, so hidden content is out of the tab order and the accessibility tree without any `aria-hidden` bookkeeping.
+
+## In the app
+
+The Holiday Variant tabs in `HolidaysList.tsx` and the FAQ categories in `FaqTabs.tsx`.

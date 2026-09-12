@@ -3,9 +3,13 @@ title: Accordion
 description: Base UI accordion with a spring-animated panel and a rotating "+" chevron square.
 sidebar:
   order: 2
+  badge:
+    text: Live
+    variant: success
 ---
 
-import { AccordionDemo, AccordionNoChevronDemo } from '../../../../components/demos/AccordionDemo';
+import { ACCORDION_PANEL_PROP_ROWS, ACCORDION_PROP_ROWS, ACCORDION_TRIGGER_PROP_ROWS, AccordionDemo, AccordionNoChevronDemo } from '../../../../components/demos/AccordionDemo';
+import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/animate/base/Accordion.tsx`. Built on the Base UI accordion with Motion (`m.*`) as the visual layer, so any consumer must sit under `LazyMotionProvider` (`apps/web/src/ui/modules/core/animate/providers/LazyMotionProvider.tsx`); the app mounts it in the locale layout.
 
@@ -20,6 +24,22 @@ Exports: `Accordion`, `AccordionItem`, `AccordionTrigger`, `AccordionPanel`.
 - The chevron is a square "+" badge that rotates 45° when open and flips from `bg-accent` to the frame color. Pass `chevron={false}` on `AccordionTrigger` to remove it. It uses the `hit-area-stable` utility so the hover lift does not shift the pointer target; see [Button](/design-system/components/button/) for the same pattern.
 
 <AccordionNoChevronDemo client:visible />
+
+## Props
+
+`Accordion` forwards Base UI's root props; the ones that matter:
+
+<PropsTable rows={ACCORDION_PROP_ROWS} />
+
+`AccordionTrigger` adds two on top of Base UI's trigger:
+
+<PropsTable rows={ACCORDION_TRIGGER_PROP_ROWS} />
+
+`AccordionPanel` adds two on top of Base UI's panel:
+
+<PropsTable rows={ACCORDION_PANEL_PROP_ROWS} />
+
+`AccordionItem` takes Base UI's item props and requires `children`.
 
 ## Usage
 
@@ -41,3 +61,13 @@ Root props are the Base UI accordion root props (e.g. `multiple`, `defaultValue`
 - `data-slot` hooks: `accordion`, `accordion-item`, `accordion-header`, `accordion-trigger`, `accordion-trigger-chevron`, `accordion-panel`.
 - Items separate with a faint `border-b-2` in the frame color at 18% opacity.
 - The panel stays mounted (`keepMounted`) so exit animations can play.
+
+## Accessibility
+
+- Base UI renders each trigger as a `<button>` inside a heading (`AccordionPrimitive.Header`), with `aria-expanded` and `aria-controls` pointing at its panel, so the pattern matches the WAI-ARIA accordion.
+- Keyboard: Enter and Space toggle, Arrow Up and Arrow Down move between triggers, Home and End jump to the first and last. Closed panels are hidden from the accessibility tree.
+- The rotating + is decorative; the open state is announced through `aria-expanded`, so `chevron={false}` loses nothing for a screen reader.
+
+## In the app
+
+The homepage FAQ (`Faq.tsx`) and the per-category sections of the consent dialog (`CookieConsentDialog.tsx`).

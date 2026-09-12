@@ -2,7 +2,7 @@
 title: Proxy
 description: The per-request chain in src/middleware.ts (markdown negotiation, payment guard, i18n, locale cookie and country detection).
 sidebar:
-  order: 3
+  order: 5
 ---
 
 `apps/web/src/middleware.ts` is the single per-request entry point. Next calls this artefact the proxy and would have it at `proxy.ts`; the older file name is kept deliberately, because the name is what picks the runtime. `proxy.ts` always runs on Node.js, and OpenNext's Node middleware bundling is experimental: under it the header edits this chain makes never reach the route. `middleware.ts` keeps the chain on the edge runtime, where it works. [ADR 0009](https://github.com/fbuireu/forever-pto/blob/main/adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) carries the evidence. The old `/architecture/middleware/` address redirects here, and this page keeps the proxy address because the concept is Next's, not the file's. It runs a short, strictly ordered chain and returns as early as it can. Each step delegates to a focused helper; the proxy file itself is orchestration only.
@@ -20,6 +20,21 @@ Everything under `/api`, Next internals (`/_next`, `/_vercel`) and any path with
 **The markdown rewrite trusts this matcher to keep internal paths out.** `/.well-known/*` contains a dot and `/api/*` is excluded outright, so neither ever reaches the proxy and the rewrite branch carries no guard of its own. Widening the matcher means adding one back.
 
 ## The chain, in order
+
+```mermaid
+flowchart TD
+  IN[Matched request] --> D1{pathname is /api/markdown?}
+  D1 -- yes --> H1[Delete x-markdown-path, pass through]
+  D1 -- no --> D2{Accept contains text/markdown?}
+  D2 -- yes --> H2[Set x-markdown-path = pathname<br/>rewrite to /api/markdown]
+  D2 -- no --> D3{ends with /payment/confirmation<br/>without payment_intent?}
+  D3 -- yes --> H3[Redirect to the locale home]
+  D3 -- no --> I18N[next-intl resolves the locale<br/>re-sets NEXT_LOCALE with LOCALE_COOKIE_POLICY]
+  I18N --> GEO[location: detectCountry → user-country cookie]
+  GEO --> OUT[Response]
+```
+
+Only the last branch reaches country detection; the three early returns skip it, which is why a Markdown rendition or a bounced confirmation URL never carries a fresh `user-country` cookie.
 
 1. **Direct hits on `/api/markdown` strip the path header.** The request passes through with `x-markdown-path` **deleted** and nothing else changed. Without this branch a direct request carrying `Accept: text/markdown` would match the next rule and rewrite the route onto itself; deleting the header is what stops a caller driving the route by hand.
 

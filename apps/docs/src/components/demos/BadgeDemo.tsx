@@ -1,6 +1,8 @@
 import { Badge, type badgeVariants } from "@ui/modules/core/primitives/Badge";
 import type { VariantProps } from "class-variance-authority";
+import type { ComponentProps } from "react";
 import { Demo } from "../Demo";
+import { type OwnProps, propRows } from "../PropsTable";
 import type { VariantRow } from "../VariantsTable";
 
 type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>["variant"]>;
@@ -45,3 +47,17 @@ export const BadgeAsLinkDemo = () => (
 		</Badge>
 	</Demo>
 );
+
+export const BADGE_PROP_ROWS = propRows<OwnProps<ComponentProps<typeof Badge>, ComponentProps<"span">>>({
+	variant: {
+		type: VARIANTS.map((variant) => `"${variant}"`).join(" | "),
+		defaultValue: '"default"',
+		description: "Fill and text colour. outline sits on the panel surface with the foreground colour.",
+	},
+	asChild: {
+		type: "boolean",
+		defaultValue: "false",
+		description:
+			"Render the single child with the pill's classes, which is how a Badge becomes a link and gains the hover lift.",
+	},
+});

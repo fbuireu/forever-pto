@@ -2,6 +2,7 @@ import { Drawer, DrawerContent, DrawerTitle } from "@ui/modules/core/animate/bas
 import { Button } from "@ui/modules/core/primitives/Button";
 import { useState } from "react";
 import { Demo } from "../Demo";
+import { propRows } from "../PropsTable";
 
 export const DrawerDemo = () => {
 	const [open, setOpen] = useState(false);
@@ -27,3 +28,21 @@ export const DrawerDemo = () => {
 		</Demo>
 	);
 };
+
+export const DRAWER_PROP_ROWS = propRows({
+	open: { type: "boolean", description: "Controlled state; there is no trigger export, so this is how it opens." },
+	onOpenChange: { type: "(open: boolean) => void", description: "Fires on drag-to-dismiss, Esc and overlay click." },
+	shouldScaleBackground: {
+		type: "boolean",
+		defaultValue: "false",
+		description: "vaul's page-scaling effect, off here because the planner's sticky bar sits behind it.",
+	},
+});
+
+export const DRAWER_CONTENT_PROP_ROWS = propRows({
+	overlay: {
+		type: "boolean",
+		defaultValue: "true",
+		description: "Whether the dimmed overlay renders behind the sheet.",
+	},
+});

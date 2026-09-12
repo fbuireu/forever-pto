@@ -3,9 +3,13 @@ title: Collapsible
 description: Single fold-out region with a brutal default trigger and a height/opacity spring.
 sidebar:
   order: 7
+  badge:
+    text: Live
+    variant: success
 ---
 
-import { CollapsibleAsChildDemo, CollapsibleDemo } from '../../../../components/demos/CollapsibleDemo';
+import { COLLAPSIBLE_CONTENT_PROP_ROWS, COLLAPSIBLE_PROP_ROWS, COLLAPSIBLE_TRIGGER_PROP_ROWS, CollapsibleAsChildDemo, CollapsibleDemo } from '../../../../components/demos/CollapsibleDemo';
+import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/animate/base/Collapsible.tsx`. Base UI collapsible with a Motion-animated panel; requires a `LazyMotionProvider` ancestor. Where [Accordion](/design-system/components/accordion/) manages a list of exclusive folds, Collapsible is a single independent one.
 
@@ -20,6 +24,20 @@ Exports: `Collapsible`, `CollapsibleTrigger`, `CollapsibleContent`.
 - `CollapsibleTrigger asChild` swaps in your own element via Base UI's `render`, skipping the default styling entirely.
 
 <CollapsibleAsChildDemo client:visible />
+
+## Props
+
+`Collapsible` forwards Base UI's root props; the ones that matter:
+
+<PropsTable rows={COLLAPSIBLE_PROP_ROWS} />
+
+`CollapsibleTrigger` adds one on top of Base UI's trigger:
+
+<PropsTable rows={COLLAPSIBLE_TRIGGER_PROP_ROWS} />
+
+`CollapsibleContent` adds one on top of Base UI's panel:
+
+<PropsTable rows={COLLAPSIBLE_CONTENT_PROP_ROWS} />
 
 ## Usage
 
@@ -38,3 +56,13 @@ Controlled mode works through the Base UI root props (`open`, `onOpenChange`); t
 
 - `data-slot` hooks: `collapsible`, `collapsible-trigger`, `collapsible-content`.
 - The default trigger uses `hit-area-stable`, matching [Button](/design-system/components/button/) hover mechanics.
+
+## Accessibility
+
+- The trigger carries `aria-expanded` and `aria-controls` from Base UI, and the panel sets `aria-hidden` while closed so its content leaves the accessibility tree.
+- Enter and Space toggle; there is no arrow-key navigation, because a Collapsible is a single fold rather than a set.
+- With `asChild`, the child element receives the aria attributes; keep it a button or an element with `role='button'`.
+
+## In the app
+
+The sidebar's grouped steps (`SidebarCollapsibleGroup.tsx`), the Strategy explainer in `Strategy.tsx`, the advanced options of the Donation form (`DonationForm.tsx`) and the weekend rows of the Holiday table (`HolidaysTable.tsx`).

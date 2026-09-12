@@ -22,6 +22,21 @@ All workflows live in `.github/workflows/`. Repo-wide conventions, enforced soci
 
 Runs on pushes to `main` and PRs targeting `main`. `cancel-in-progress` is conditional on `pull_request`: cancelling a superseded PR run is free, cancelling a `main` run would kill a deploy or a release halfway.
 
+```mermaid
+flowchart LR
+  CH[changes] --> DP & DD
+  V[Verify] --> DP & DD
+  subgraph main [on push to main]
+    DP[deploy-production] --> SM[smoke] --> RW[release-web] --> DR[docs-refresh]
+    SM -. failed .-> RB[rollback]
+  end
+  subgraph pr [on pull_request]
+    DD[deploy-development] --> CM[comment] & E2E[e2e]
+  end
+  CH --> XN[cross-package-notice]
+  V & DP & DD & E2E & SM & RW --> CK[Check, always]
+```
+
 - **changes**: derives from `git diff` whether `apps/web` (or anything the app build depends on) was touched, and exposes it as an output. It uses `git diff` rather than a filter action because every third-party action here is SHA-pinned and an unpinnable one trips zizmor. It fails open.
 - **Verify**, one job running `pnpm verify`: `format:check` (Biome, no writes), `typecheck` (the root program, then `apps/web`, then `astro check` over `apps/docs`) and `test:ut:coverage` (`apps/web`'s Vitest run, then the contract suite), then coverage upload to Codecov from `apps/web/coverage/lcov.info` (`fail_ci_if_error: false`, so Codecov outages never block CI). The same command is what `pre-push` runs, so a green push is a green CI.
 - **deploy-production → smoke → release-web → docs-refresh** on `main`, with **smoke → rollback** when the smoke run fails, or **deploy-development → comment / e2e** on a PR. `cross-package-notice` hangs off `changes` on its own condition.
@@ -55,7 +70,7 @@ Each job declares its **own** group, with `cancel-in-progress: false`, spelled f
 
 ## `docs.yml`: Docs
 
-CI/CD for this documentation site. It runs on every push and pull request, like `ci.yml`, and a `changes` job of its own gates `build` on `DOCS_PATHS`: `apps/docs/**` plus everything the site reaches into the app for, `apps/web/src/ui/**`, `apps/web/package.json` (the version the site displays), `apps/web/src/domain/calendar/types.ts` and `apps/web/src/infrastructure/i18n/locales.ts`. It used to be path-filtered on that same list, which meant it could never be a required check, since a filtered workflow does not report on a pull request outside its paths; a `Check (docs)` aggregate reports on every pull request now and is what the ruleset names. It also answers `workflow_dispatch`, which is how `ci.yml`'s `docs-refresh` job rebuilds the site after a web release: the release commit carries `[skip ci]`, so without the dispatch the published site keeps advertising the previous version. It also carries `release-docs`, which runs after the docs deploy **and** its `smoke` job, so a `docs-v*` tag only exists once the site is live and answering, and `rollback`, which reverts the Worker when that smoke run fails. Build & test, versioned PR previews and production deploy of the `forever-pto-docs` Worker; the full walkthrough is on [docs CI](/infra/docs-ci/).
+CI/CD for this documentation site. It runs on every push and pull request, like `ci.yml`, and a `changes` job of its own gates `build` on `DOCS_PATHS`: `apps/docs/**` plus everything the site reaches into the app for, `apps/web/src/ui/**`, `apps/web/package.json` (the version the site displays), `apps/web/src/domain/calendar/types.ts`, `apps/web/src/domain/calendar/const.ts` and `apps/web/src/infrastructure/i18n/locales.ts`. It used to be path-filtered on that same list, which meant it could never be a required check, since a filtered workflow does not report on a pull request outside its paths; a `Check (docs)` aggregate reports on every pull request now and is what the ruleset names. It also answers `workflow_dispatch`, which is how `ci.yml`'s `docs-refresh` job rebuilds the site after a web release: the release commit carries `[skip ci]`, so without the dispatch the published site keeps advertising the previous version. It also carries `release-docs`, which runs after the docs deploy **and** its `smoke` job, so a `docs-v*` tag only exists once the site is live and answering, and `rollback`, which reverts the Worker when that smoke run fails. Build & test, versioned PR previews and production deploy of the `forever-pto-docs` Worker; the full walkthrough is on [docs CI](/infra/docs-ci/).
 
 ## `commit-message.yml`: Commit Message
 

@@ -3,9 +3,13 @@ title: Popover
 description: Anchored non-modal panel that springs out of its trigger.
 sidebar:
   order: 15
+  badge:
+    text: Live
+    variant: success
 ---
 
-import { PopoverDemo } from '../../../../components/demos/PopoverDemo';
+import { POPOVER_CONTENT_PROP_ROWS, POPOVER_PROP_ROWS, PopoverDemo } from '../../../../components/demos/PopoverDemo';
+import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/animate/base/Popover.tsx`, the styling layer. The motion lives one level down in `apps/web/src/ui/modules/core/animate/primitives/base/Popover.tsx` (Base UI popover + `AnimatePresence`). Needs a `LazyMotionProvider` ancestor.
 
@@ -19,6 +23,16 @@ Exports: `Popover`, `PopoverTrigger`, `PopoverContent`.
 - `PopoverContent` bundles portal + positioner + popup: a `w-72`, `rounded-[12px]`, 3px-frame-border panel with `shadow-brutal-md`. Positioning props go on it directly, namely `align` (default `'center'`) and `sideOffset` (default 4), and `positionerClassName` styles the positioner (default `z-52`) separately from the panel.
 - Focus management passes through: `initialFocus` / `finalFocus` forward to the Base UI popup.
 - `PopoverTrigger asChild` renders your element as the trigger via Base UI's `render`.
+
+## Props
+
+`Popover` forwards Base UI's root props; the ones that matter:
+
+<PropsTable rows={POPOVER_PROP_ROWS} />
+
+`PopoverContent` merges Base UI's positioner and popup props and adds one:
+
+<PropsTable rows={POPOVER_CONTENT_PROP_ROWS} />
 
 ## Usage
 
@@ -41,3 +55,13 @@ Related surfaces: [DropdownMenu](/design-system/components/dropdown-menu/) for a
 
 - `data-slot` hooks (from the motion primitive): `popover`, `popover-trigger`, `popover-portal`, `popover-positioner`, `popover-popup`.
 - The portal stays mounted while the exit animation plays (`keepMounted` under `AnimatePresence`).
+
+## Accessibility
+
+- Base UI renders the popup with `role='dialog'` (non-modal), moves focus into it on open, closes on Escape and outside click, and returns focus to the trigger; `initialFocus` and `finalFocus` override both ends.
+- Give the panel a name: an `aria-label` on `PopoverContent`, or a heading inside referenced by `aria-labelledby`.
+- The panel is not modal, so the page behind stays interactive; use [Dialog](/design-system/components/dialog/) when the user must answer before continuing.
+
+## In the app
+
+The Donate popover (`Donate.tsx`), the year picker (`Years.tsx`) and, inside `Combobox.tsx`, every searchable select.

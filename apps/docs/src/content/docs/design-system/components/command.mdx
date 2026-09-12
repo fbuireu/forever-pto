@@ -3,9 +3,13 @@ title: Command
 description: cmdk-powered filterable list, the engine inside the country/region combobox.
 sidebar:
   order: 8
+  badge:
+    text: Live
+    variant: success
 ---
 
-import { CommandDemo } from '../../../../components/demos/CommandDemo';
+import { COMMAND_PROP_ROWS, CommandDemo } from '../../../../components/demos/CommandDemo';
+import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/primitives/Command.tsx`. A styled wrapper around [cmdk](https://cmdk.paco.me): type in the input and the list filters, ranks and keyboard-navigates automatically. `CommandInput` wraps its search icon in `AnimateIcon animateOnHover` (see [animated icons](/design-system/animation/icons/)), which is why demos need a `LazyMotionProvider` ancestor.
 
@@ -19,6 +23,14 @@ Exports: `Command`, `CommandInput`, `CommandList`, `CommandEmpty`, `CommandGroup
 - `CommandInput` renders inside a wrapper row with a 2px bottom border and the animated `SearchIcon` from `apps/web/src/ui/modules/core/animate/icons/Search.tsx`; hovering the row plays the icon's draw animation.
 - `CommandList` caps at `max-h-[300px]` with vertical scroll; `CommandGroup` headings render as small black-weight uppercase labels (styled via CSS, per the no-uppercase-strings convention); selected items get `bg-accent` through cmdk's `data-selected` attribute.
 - The root has no border of its own: in the app it lives inside a [Popover](/design-system/components/popover/) (see `apps/web/src/ui/modules/core/primitives/Combobox.tsx`, the country/region picker, which is app-coupled and documented separately). Standalone use adds its own frame, as the demo above does.
+
+## Props
+
+`Command` forwards cmdk's root props; the ones worth knowing:
+
+<PropsTable rows={COMMAND_PROP_ROWS} />
+
+`CommandInput`, `CommandList`, `CommandEmpty`, `CommandGroup` and `CommandItem` forward their cmdk counterparts' props unchanged.
 
 ## Usage
 
@@ -40,3 +52,13 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 
 - `data-slot` hooks: `command`, `command-input-wrapper`, `command-input`, `command-list`, `command-empty`, `command-group`, `command-item`.
 - Icons inside items are auto-sized to `size-4` and muted unless they carry an explicit `text-*`/`size-*` class.
+
+## Accessibility
+
+- cmdk wires the ARIA combobox pattern: the input is `role='combobox'` controlling a `role='listbox'`, each `CommandItem` is an option, and `aria-activedescendant` tracks the highlighted one so focus never leaves the input.
+- Keyboard: arrow keys move the highlight, Enter selects, Escape is left to the surrounding popover. Give `CommandInput` a `placeholder` or an `aria-label`, and put a `heading` on each `CommandGroup` so groups announce.
+- `CommandEmpty` is announced when the filter matches nothing; keep its text meaningful ("No country found") rather than decorative.
+
+## In the app
+
+The year picker in `Years.tsx` and, through `Combobox.tsx`, the Country, Region and Strategy pickers.

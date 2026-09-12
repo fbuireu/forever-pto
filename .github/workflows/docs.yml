@@ -32,7 +32,7 @@ jobs:
         env:
           BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
           HEAD_SHA: ${{ github.sha }}
-          DOCS_PATHS: '^(apps/docs/|apps/web/package\.json$|apps/web/src/ui/|apps/web/src/domain/calendar/types\.ts$|apps/web/src/infrastructure/i18n/locales\.ts$|pnpm-lock\.yaml$|\.github/workflows/docs\.yml$|\.github/actions/)'
+          DOCS_PATHS: '^(apps/docs/|apps/web/package\.json$|apps/web/src/ui/|apps/web/src/domain/calendar/types\.ts$|apps/web/src/domain/calendar/const\.ts$|apps/web/src/infrastructure/i18n/locales\.ts$|pnpm-lock\.yaml$|\.github/workflows/docs\.yml$|\.github/actions/)'
         run: |
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] || [ -z "$BASE_SHA" ] || ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
             echo 'docs=true' >> "$GITHUB_OUTPUT"

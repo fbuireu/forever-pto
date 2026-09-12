@@ -3,9 +3,13 @@ title: Button
 description: The primary interactive element, with CVA variants, sizes, asChild composition and the brutal hover lift.
 sidebar:
   order: 1
+  badge:
+    text: Live
+    variant: success
 ---
 
-import { ButtonSizesDemo, ButtonStatesDemo, ButtonVariantsDemo, BUTTON_VARIANT_ROWS } from '../../../../components/demos/ButtonDemo';
+import { BUTTON_PROP_ROWS, BUTTON_VARIANT_ROWS, ButtonSizesDemo, ButtonStatesDemo, ButtonVariantsDemo } from '../../../../components/demos/ButtonDemo';
+import { PropsTable } from '../../../../components/PropsTable';
 import { VariantsTable } from '../../../../components/VariantsTable';
 
 Source: `apps/web/src/ui/modules/core/primitives/Button.tsx`. Built with [CVA](https://cva.style) and rendered through the local `Slot` when `asChild` is set. It is framework-clean (no Next.js imports), which is why this page can render the real component.
@@ -26,6 +30,10 @@ Hover lifts the button up-left (`translate -2px, -2px`) while the hard shadow gr
 
 <ButtonStatesDemo client:visible />
 
+## Props
+
+<PropsTable rows={BUTTON_PROP_ROWS} extends='the native button' />
+
 ## Usage
 
 ```tsx
@@ -44,3 +52,14 @@ import { Button } from '@ui/modules/core/primitives/Button';
 - The CVA object is exported alongside the component (`buttonVariants`) so other primitives can reuse the classes.
 - `data-slot='button'` is set for CSS containment hooks (the shared transition block targets it).
 - Icons inside get `pointer-events: none` and a default `size-4` automatically.
+
+## Accessibility
+
+- A native `<button>` unless `asChild` hands the classes to a child, in which case the child's semantics are what ships: an `<a>` stays a link, with a link's keyboard behaviour.
+- Focus is visible through a 3px ring offset from the background (`focus-visible:ring-[3px]`), which is the one state the hover lift does not cover.
+- `disabled` drops pointer events, the shadow and the lift, so a disabled button reads flat; it stays in the tab order as native buttons do not, so prefer `aria-disabled` plus a no-op handler when the button must remain reachable.
+- Icons inside are `pointer-events: none` and sized `size-4`, but they are **not** hidden from assistive technology: an icon-only button needs an `aria-label`.
+
+## In the app
+
+The most-used primitive in the tree. Among others: the planner's `PlannerPanel.tsx` (apply an Alternative), the homepage `Hero.tsx` and `Navigation.tsx`, the sidebar's collapsible triggers in `Sidebar.tsx`, and the recovery actions in `ErrorContent.tsx`.

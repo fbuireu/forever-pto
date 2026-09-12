@@ -3,9 +3,13 @@ title: Card
 description: The surface container, Card with Header, Title, Description and Content sub-components.
 sidebar:
   order: 5
+  badge:
+    text: Live
+    variant: success
 ---
 
-import { CardDemo, CardPartsDemo } from '../../../../components/demos/CardDemo';
+import { CARD_TITLE_PROP_ROWS, CardDemo, CardPartsDemo } from '../../../../components/demos/CardDemo';
+import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/primitives/Card.tsx`. A `bg-card` column with `rounded-[14px]`, the 3px frame border and the medium brutal shadow. No variants: composition happens through the sub-components. Framework-clean, so this page renders the real component.
 
@@ -24,6 +28,12 @@ Source: `apps/web/src/ui/modules/core/primitives/Card.tsx`. A `bg-card` column w
 | `CardContent` | Body area, horizontal padding matching the header. |
 
 Only these are exported. The source also defines `_CardAction` and `_CardFooter`, currently private, so check `apps/web/src/ui/modules/core/primitives/Card.tsx` before reaching for them.
+
+## Props
+
+`Card`, `CardHeader`, `CardDescription` and `CardContent` take the props of a `div` and add none. `CardTitle` adds one:
+
+<PropsTable rows={CARD_TITLE_PROP_ROWS} extends='the native div' />
 
 ## Usage
 
@@ -44,3 +54,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/m
 - Every part sets a `data-slot` attribute (`card`, `card-header`, `card-title`, …) for CSS containment hooks.
 - Vertical rhythm comes from the container's `gap-6`; parts only own horizontal padding (`px-6`).
 - The homepage sections use their own heavier `brutCard` class (4px border) from `apps/web/src/ui/modules/pages/homepage/sections/shared.ts`; that is a page-level pattern, not this primitive.
+
+## Accessibility
+
+- No landmark and no role: a Card is a visual grouping. When it is a section of the page, render `CardTitle` with `as='h2'` (or the level the outline needs) so the heading tree stays navigable.
+- Nothing inside is interactive by default; a clickable card should wrap its content in a link or a button rather than putting a handler on the container.
+
+## In the app
+
+The planner's `Legend.tsx` and `Contact.tsx`, every Summary chart (`BlocksPerQuarterChart.tsx`, `HolidaysDistributionChart.tsx` and siblings), the legal pages' `LegalLayout.tsx` and the payment confirmation page.

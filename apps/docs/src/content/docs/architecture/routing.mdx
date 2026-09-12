@@ -2,7 +2,7 @@
 title: Routing
 description: The app/[locale] route tree, covering marketing and app route groups, API routes, the .well-known catch-all and the error surfaces.
 sidebar:
-  order: 2
+  order: 4
 ---
 
 All user-facing routes live under `apps/web/src/app/[locale]/`. The locale segment is driven by `next-intl` with `localePrefix: 'as-needed'` (`apps/web/src/infrastructure/i18n/routing.ts`): the default locale (English) has no URL prefix, every other locale from `apps/web/src/infrastructure/i18n/locales.ts` gets one (`/es`, `/ca`, `/it`, `/fr`, `/de`).
@@ -29,6 +29,22 @@ src/app/
 ├── global-error.tsx            # root error boundary (own <html> shell)
 ├── global-not-found.tsx        # root 404 (experimental.globalNotFound)
 ├── robots.ts / sitemap.ts / favicon.ico / fonts.ts
+```
+How a request reaches one of those files:
+
+```mermaid
+flowchart TD
+  REQ[Request] --> M{"Matches the proxy?<br/>not /api, /_next, /_vercel, no dot"}
+  M -- no --> API["/api/* route handlers<br/>and /.well-known/*"]
+  M -- yes --> PX[Proxy chain<br/>markdown · payment guard · locale · country]
+  PX -->|Accept: text/markdown| MD["/api/markdown"]
+  PX --> LOC{Locale prefix?}
+  LOC -->|none| EN["[locale] = en, no prefix"]
+  LOC -->|"/es, /ca, /it, /fr, /de"| L["[locale]"]
+  EN & L --> G{Route group}
+  G --> MK["(marketing): homepage, legal/*"]
+  G --> AP["(app): planner, payment/confirmation"]
+  G --> NF[not-found.tsx]
 ```
 
 ## Route groups

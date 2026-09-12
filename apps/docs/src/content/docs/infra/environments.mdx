@@ -15,7 +15,7 @@ The app runs as a Cloudflare Worker built with OpenNext. The kinds of environmen
 
 ## Production
 
-Deployed by the `deploy-production` job of `.github/workflows/ci.yml` on every push to `main`, gated on the `Check` job passing and on the `changes` job finding an `apps/web` change (see [release](/infra/release/)). The Worker is bound to the `forever-pto.com` zone via a route pattern in `wrangler.toml`, a zone route, not a Workers custom domain. It uses the production R2 incremental-cache bucket, KV namespace and Turso database (see [Cloudflare stack](/infra/cloudflare/)).
+Deployed by the `deploy-production` job of `.github/workflows/ci.yml` on every push to `main`, gated on the `Check` job passing and on the `changes` job finding an `apps/web` change (see [release](/infra/release/)). The Worker is bound to the `forever-pto.com` zone via a route pattern in `wrangler.toml`, a zone route, not a Workers custom domain. It uses the production R2 incremental-cache bucket, the rate-limiter binding and the Turso database (see [Cloudflare stack](/infra/cloudflare/)).
 
 ## Development (stable)
 
@@ -38,31 +38,30 @@ The `deploy-development` job of `.github/workflows/ci.yml` fires on `pull_reques
 
 ### What survives
 
-Previews deploy with `--env development`, so they all **share** the development bindings: the dev R2 incremental-cache bucket, the dev rate-limit KV namespace and the dev Turso database (all declared under `[env.development]` in `wrangler.toml`). None of that state is cleaned up when a PR closes, and one preview's writes are visible to every other preview.
+Previews deploy with `--env development`, so they all **share** the development bindings: the dev R2 incremental-cache bucket, the rate-limiter binding and the dev Turso database (all declared under `[env.development]` in `wrangler.toml`). None of that state is cleaned up when a PR closes, and one preview's writes are visible to every other preview.
 
 ## Lifecycle
 
-```text
- PR opened / synchronized                          PR closed
-        │                                              │
-        ▼                                              ▼
- ci.yml: deploy-development                       cleanup-development.yml
-        │                                              │
-        ▼                                              ▼
- _deploy-web.yml                                  wrangler delete
-   ├─ cf:build (OpenNext)                     pr-<n>-forever-pto-development
-   ├─ wrangler deploy --env development         --force
-   │    --name pr-<n>-forever-pto-development         │
-   │    --secrets-file $RUNNER_TEMP/…                 ▼
-   ├─ sticky PR comment (preview URL)         Worker + secrets gone.
-   └─ Playwright E2E via Access token         Shared dev R2 / KV / Turso
-                                              persist untouched.
-
- push to main ──► ci.yml: changes + Check ──► deploy-production ──► _deploy-web.yml
-                                                                    └─ wrangler deploy --env production
-                                                  → Worker forever-pto @ forever-pto.com/*
+```mermaid
+flowchart TD
+  subgraph pr [Pull request]
+    O[opened / synchronized] --> DD[ci.yml: deploy-development]
+    DD --> RW[_deploy-web.yml]
+    RW --> B[cf:build, OpenNext]
+    B --> W["wrangler deploy --env development<br/>--name pr-n-forever-pto-development<br/>--secrets-file"]
+    W --> C[sticky PR comment with the preview URL]
+    W --> E[e2e: Playwright through an Access service token]
+  end
+  subgraph close [Pull request closed]
+    X[cleanup-development.yml, queued behind the CI run] --> DEL[wrangler delete --force]
+    DEL --> GONE[Worker and its secrets gone;<br/>shared dev R2 and Turso untouched]
+  end
+  subgraph main [push to main]
+    P[changes + Verify] --> DP[deploy-production] --> RW2[_deploy-web.yml]
+    RW2 --> W2[wrangler deploy --env production] --> LIVE[forever-pto @ forever-pto.com/*]
+  end
 ```
 
-## Contrast: the docs site's previews
+## The docs site's previews
 
-This documentation site does it differently: PR previews are immutable [Worker versions](/infra/docs-ci/) uploaded with `wrangler versions upload --preview-alias`, not standalone Workers. They carry no secrets and no shared state, so there is **no teardown workflow**; old versions are inert and harmless. When the app's preview model feels heavyweight, that page explains the cheaper alternative.
+This documentation site previews the same way, one Worker per pull request named `pr-<n>-forever-pto-docs-development`, deleted by its own `cleanup-docs` job when the pull request closes. What differs is what it does *not* need: no bindings, no `--secrets-file`, no `--var` override, and no second build, since it ships the `docs-dist` artifact the `build` job already produced. This section used to say the docs previews were immutable Worker versions with no teardown; they were, until both packages were aligned on the per-PR Worker model. See [docs CI](/infra/docs-ci/).

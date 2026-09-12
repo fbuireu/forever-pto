@@ -1,8 +1,8 @@
 <div align="center">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="src/assets/logo-dark.svg">
-  <img src="src/assets/logo-light.svg" alt="" width="72" align="center">
+  <source media="(prefers-color-scheme: dark)" srcset="src/assets/forever-pto-logo-dark.png">
+  <img src="src/assets/forever-pto-logo.png" alt="" width="72" align="center">
 </picture>
 
 # forever-pto-docs
@@ -40,10 +40,11 @@ build fails on a dependency this package never declared.
 ```
 src/
   content/docs/    the pages themselves (.mdx); es/ mirrors filenames
-  components/      Demo wrappers, the token visualizers, demos/
-  lib/             app-version, read from apps/web/package.json at build time
+  components/      Demo wrappers, the token visualizers, PropsTable, demos/
+  lib/             app-version (read from apps/web/package.json at build time), the Mermaid
+                   pipeline (mermaid-plugin.ts at build, mermaid.ts in the browser), analytics
   styles/          global.css, read its header before touching the import order
-  assets/          the wiki's own logo pair
+  assets/          the app's logo pair, copied from apps/web/public/static/images
 e2e/               a small Playwright smoke suite
 astro.config.ts    Starlight config, the @ui alias, the sidebar
 wrangler.toml      environments: production and development
@@ -67,5 +68,9 @@ this package stays at `0.0.0` permanently and nothing reads it.
   filenames and anything untranslated falls back to English automatically.
 - **Prose names a file, never a volatile literal.** Where the app exports a constant, import it and
   interpolate, so a rename breaks the build instead of rotting the page.
+- **Diagrams are ```mermaid fences**, drawn in the browser in the app's palette and redrawn on a theme
+  change. Prefer one over an ASCII box: the fence is source, the box is a picture nobody updates.
+- **Component pages carry props, accessibility and usage sections**, and the prop tables are typed
+  against the real component so a renamed prop fails `astro check`.
 - [`tests/docs-consistency.test.ts`](../../tests/docs-consistency.test.ts) checks that every source file these pages cite in backticks still
   exists. It found some that did not.

@@ -3,9 +3,13 @@ title: Slider
 description: Base UI slider with an accent thumb and number-to-array value normalization.
 sidebar:
   order: 18
+  badge:
+    text: Live
+    variant: success
 ---
 
-import { SliderDemo, SliderDisabledDemo, SliderRangeDemo } from '../../../../components/demos/SliderDemo';
+import { SLIDER_PROP_ROWS, SliderDemo, SliderDisabledDemo, SliderRangeDemo } from '../../../../components/demos/SliderDemo';
+import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/primitives/Slider.tsx`. A Base UI slider under a brutal skin. No Motion here (the thumb's hover lift is plain CSS transition), so it works without `LazyMotionProvider`.
 
@@ -27,6 +31,10 @@ Exports: `Slider`.
 `disabled` dims root and thumb to 50% opacity and disables pointer events via Base UI's `data-disabled`.
 
 <SliderDisabledDemo client:visible />
+
+## Props
+
+<PropsTable rows={SLIDER_PROP_ROWS} />
 
 ## Usage
 
@@ -51,3 +59,13 @@ For discrete numeric stepping the app also has the animated `Counter` (`apps/web
 - **`label` is required**, and it is the only required prop. It becomes the thumb's `aria-label`: a slider with no visible text label is unusable with a screen reader, so the type refuses to let one ship rather than leaving it to a review.
 - The rest of the prop surface is a deliberate subset (`className`, `value`, `defaultValue`, `min`, `max`, `step`, its callbacks, `disabled`); extend the interface in the source if you need more of Base UI's API rather than reaching for the primitive directly. `id` is gone: it landed on the wrapper `div` Base UI renders, so a `<label for>` pointing at it named nothing, which is why `label` is required instead.
 - Defaults: `min=0`, `max=100`, `step=1`.
+
+## Accessibility
+
+- Base UI renders each thumb as `role='slider'` with `aria-valuenow`, `aria-valuemin` and `aria-valuemax`; the required `label` prop becomes the thumb's `aria-label`, which is why it is not optional.
+- Keyboard: arrow keys move by `step`, Page Up and Page Down by a larger step, Home and End to the bounds. The thumb is `size-7`, above the 24px minimum target, and `touch-none` stops the page from scrolling while dragging on touch screens.
+- Prefer `onValueCommitted` for anything expensive: `onValueChange` fires on every pixel of a drag.
+
+## In the app
+
+The Carry-over Months control in `CarryOverMonths.tsx`.

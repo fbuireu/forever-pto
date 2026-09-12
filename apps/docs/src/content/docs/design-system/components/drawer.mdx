@@ -3,9 +3,13 @@ title: Drawer
 description: vaul bottom sheet with a drag handle, the mobile counterpart to Dialog.
 sidebar:
   order: 10
+  badge:
+    text: Live
+    variant: success
 ---
 
-import { DrawerDemo } from '../../../../components/demos/DrawerDemo';
+import { DRAWER_CONTENT_PROP_ROWS, DRAWER_PROP_ROWS, DrawerDemo } from '../../../../components/demos/DrawerDemo';
+import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/animate/base/Drawer.tsx`. A thin skin over [vaul](https://vaul.emilkowal.ski)'s drawer: vaul handles the drag-to-dismiss gesture and slide animation itself (no Motion `m.*` here, so no `LazyMotionProvider` needed, which is the exception in `animate/base/`).
 
@@ -18,6 +22,16 @@ Exports: `Drawer`, `DrawerContent`, `DrawerTitle`. There is intentionally no `Dr
 - `Drawer` wraps `vaul`'s root with `shouldScaleBackground` defaulting to `false` (the app's brutal layout should not zoom out behind the sheet). All other vaul root props (`open`, `onOpenChange`, `dismissible`, snap points…) pass through.
 - `DrawerContent` renders the portal, an optional black/50 overlay (`overlay` prop, default `true`), and the sheet itself: fixed to the bottom edge, `rounded-t-[14px]`, 3px frame border on top and sides, `bg-card`, capped at `max-h-[85dvh]`. A pill-shaped vaul `Handle` is always rendered above your content for drag affordance.
 - `DrawerTitle` is visually hidden (`sr-only`) by default, and vaul warns when a drawer has no accessible title,, so always include one and override the class only if you want it visible.
+
+## Props
+
+`Drawer` forwards vaul's root props; the ones that matter:
+
+<PropsTable rows={DRAWER_PROP_ROWS} />
+
+`DrawerContent` adds one on top of vaul's content:
+
+<PropsTable rows={DRAWER_CONTENT_PROP_ROWS} />
 
 ## Usage
 
@@ -41,3 +55,13 @@ For desktop-centric confirmations prefer [Dialog](/design-system/components/dial
 
 - `data-slot` hooks: `drawer`, `drawer-portal`, `drawer-overlay`, `drawer-content`, `drawer-title`.
 - Content sits at `z-51` above a `z-50` overlay, and below dialogs (`z-200`) by design.
+
+## Accessibility
+
+- vaul renders the sheet as `role='dialog'` with focus management and Escape to close, like Dialog. `DrawerTitle` is rendered `sr-only` by default and is what names the sheet, so always include one.
+- The drag handle is decorative; the gesture has a keyboard equivalent in Escape, and the overlay click closes it for pointer users who cannot drag.
+- The sheet is capped at `85dvh`, so the page behind stays reachable and the sheet scrolls inside itself when its content is taller.
+
+## In the app
+
+The mobile rendering of the planner panel in `ManagementBar.tsx`, where the Alternative switcher and the Legend share one sheet.

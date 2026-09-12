@@ -2,7 +2,7 @@
 title: Effect layers
 description: How server-side code uses Effect, covering Context.Tag services, Live Layers, the ApplicationLayer and deferred after() database writes.
 sidebar:
-  order: 4
+  order: 6
 ---
 
 Every server-side flow that touches an external system (database, Stripe, email, logging) is written with [Effect](https://effect.website). The payoff is twofold: **typed errors** that route handlers can exhaustively map to HTTP statuses, and **dependency injection** that lets tests swap real SDKs for mock layers without module mocking.
@@ -48,6 +48,27 @@ export const ApplicationLayer = Layer.mergeAll(
 ```
 
 Route handlers and server actions provide it exactly once, at the edge of the program: `Effect.runPromise(program.pipe(Effect.provide(ApplicationLayer)))`.
+```mermaid
+flowchart LR
+  subgraph tags [Context.Tag, the interface]
+    T1[TursoService]
+    T2[StripeServerService]
+    T3[ResendService]
+    T4[LoggerService]
+  end
+  subgraph live [Live Layer, the SDK]
+    L1[TursoServiceLive]
+    L2[StripeServerServiceLive]
+    L3[ResendServiceLive]
+    L4[LoggerServiceLive]
+  end
+  AL[ApplicationLayer<br/>Layer.mergeAll]
+  L1 & L2 & L3 & L4 --> AL
+  UC[Use case: Effect.gen<br/>declares T1..T4 as requirements] -->|Effect.provide at the route| AL
+  TEST[Test: mock Layers] -.->|substitutes| T1 & T2 & T3 & T4
+  AL --> RUN[Effect.runPromise]
+```
+
 
 ## Where Effect runs
 

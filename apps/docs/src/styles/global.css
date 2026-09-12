@@ -108,3 +108,330 @@ button[data-slot],
     border-color 120ms ease,
     color 120ms ease;
 }
+
+/* Mermaid diagrams. The remark plugin in src/lib/remark-mermaid.ts emits a
+   <pre class="mermaid" data-mermaid> per fence and src/lib/mermaid.ts draws the
+   SVG into it in the brand palette; the frame matches the demo canvas. */
+pre.mermaid {
+  background: var(--surface-panel);
+  background-image: var(--page-glow);
+  border: 3px solid var(--frame);
+  border-radius: 14px;
+  box-shadow: var(--shadow-brutal-sm);
+  color: var(--foreground);
+  font-family: var(--sl-font);
+  font-size: var(--sl-text-sm);
+  margin-block: 1.5rem;
+  overflow-x: auto;
+  padding: 1.5rem;
+  white-space: pre-wrap;
+}
+
+pre.mermaid[data-mermaid-rendered='true'] {
+  cursor: zoom-in;
+  display: flex;
+  justify-content: center;
+  white-space: normal;
+}
+
+pre.mermaid[data-mermaid-rendered='true']::after {
+  color: var(--sl-color-gray-3);
+  content: 'click to enlarge';
+  font-family: var(--sl-font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  position: absolute;
+  right: 0.9rem;
+  text-transform: uppercase;
+  top: 0.6rem;
+}
+
+pre.mermaid[data-mermaid-rendered='true'] {
+  position: relative;
+}
+
+pre.mermaid[data-mermaid-rendered='true'] svg {
+  height: auto;
+  max-width: 100%;
+}
+
+pre.mermaid.mermaid-expanded {
+  cursor: zoom-out;
+  justify-content: safe center;
+}
+
+pre.mermaid.mermaid-expanded::after {
+  content: 'click to shrink';
+}
+
+pre.mermaid.mermaid-expanded svg {
+  flex: none;
+  max-width: none;
+}
+
+pre.mermaid[data-mermaid-rendered='error'] {
+  border-color: var(--destructive);
+  font-family: var(--sl-font-mono);
+}
+
+/* ---------------------------------------------------------------------------
+   Neobrutalist chrome. Starlight's defaults are soft and rounded; the app is
+   hard frames, offset shadows and a display face. Every rule below reads the
+   app's own tokens (--frame, --accent, --surface-panel-*, --shadow-brutal-*)
+   so the wiki re-themes with the app and flips with data-theme like it does.
+   --------------------------------------------------------------------------- */
+
+:root {
+  --sl-color-hairline: color-mix(in srgb, var(--frame) 18%, transparent);
+  --sl-color-hairline-light: color-mix(in srgb, var(--frame) 28%, transparent);
+  --sl-color-bg-inline-code: var(--surface-panel-alt);
+}
+
+.sl-markdown-content :is(h1, h2, h3, h4) {
+  font-family: var(--font-bricolage), var(--sl-font);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.sl-markdown-content h2:not(:where(.not-content *)) {
+  border-bottom: 3px solid var(--frame);
+  padding-bottom: 0.3em;
+}
+
+.sl-markdown-content code:not(:where(pre *, .not-content *, a *)) {
+  border: 1.5px solid color-mix(in srgb, var(--frame) 22%, transparent);
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+/* Tables: the app's Table primitive, in markdown */
+.sl-markdown-content table:not(:where(.not-content *)) {
+  border: 3px solid var(--frame);
+  border-collapse: separate;
+  border-radius: 12px;
+  border-spacing: 0;
+  box-shadow: var(--shadow-brutal-sm);
+  margin-block: 1.5rem;
+  overflow-x: auto;
+}
+
+.sl-markdown-content thead th:not(:where(.not-content *)) {
+  background: var(--accent);
+  color: var(--color-brand-ink);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sl-markdown-content :is(th, td):not(:where(.not-content *)) {
+  border: 0;
+  border-bottom: 2px solid var(--sl-color-hairline);
+}
+
+.sl-markdown-content tbody tr:nth-child(even) td:not(:where(.not-content *)) {
+  background: var(--surface-panel-soft);
+}
+
+.sl-markdown-content tbody tr:last-child td:not(:where(.not-content *)) {
+  border-bottom: 0;
+}
+
+/* Asides: full frame, hard shadow, the tint kept */
+.starlight-aside {
+  border: 3px solid var(--frame);
+  border-inline-start-width: 3px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-brutal-sm);
+}
+
+.starlight-aside__title {
+  font-family: var(--font-bricolage), var(--sl-font);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+/* Code blocks: Expressive Code exposes its frame through variables */
+.expressive-code {
+  --ec-brdCol: var(--frame);
+  --ec-brdWd: 3px;
+  --ec-brdRad: 12px;
+}
+
+.expressive-code .frame {
+  box-shadow: var(--shadow-brutal-sm);
+}
+
+/* Landing hero and its actions */
+.hero h1 {
+  font-family: var(--font-bricolage), var(--sl-font);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.hero .tagline {
+  font-family: var(--font-instrument-serif), var(--sl-font);
+  font-size: clamp(1.25rem, 2.4vw, 1.6rem);
+  font-style: italic;
+  line-height: 1.35;
+}
+
+.sl-link-button {
+  border: 3px solid var(--frame) !important;
+  border-radius: 8px !important;
+  box-shadow: var(--shadow-brutal-sm);
+  font-weight: 900;
+  transition:
+    transform 80ms linear,
+    box-shadow 80ms linear;
+}
+
+.sl-link-button.primary {
+  background: var(--accent) !important;
+  color: var(--color-brand-ink) !important;
+}
+
+.sl-link-button.minimal {
+  background: var(--surface-panel) !important;
+  color: var(--foreground) !important;
+}
+
+.sl-link-button:hover {
+  box-shadow: var(--shadow-brutal-md);
+  transform: translate(-2px, -2px);
+}
+
+/* Card grid on the landing pages */
+.sl-markdown-content .card {
+  background: var(--surface-panel);
+  border: 3px solid var(--frame);
+  border-radius: 14px;
+  box-shadow: var(--shadow-brutal-md);
+  transition:
+    transform 80ms linear,
+    box-shadow 80ms linear;
+}
+
+.sl-markdown-content .card:hover {
+  box-shadow: var(--shadow-brutal-lg);
+  transform: translate(-2px, -2px);
+}
+
+.sl-markdown-content .card .title {
+  font-family: var(--font-bricolage), var(--sl-font);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.sl-markdown-content .card .icon {
+  background: var(--accent);
+  border: 2.5px solid var(--frame);
+  border-radius: 8px;
+  color: var(--color-brand-ink);
+  padding: 0.3rem;
+}
+
+/* Sidebar: the current page is a lifted accent pill */
+.sidebar-content .large {
+  font-family: var(--font-bricolage), var(--sl-font);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.sidebar-content a[aria-current='page'],
+.sidebar-content a[aria-current='page']:hover,
+.sidebar-content a[aria-current='page']:focus {
+  background: var(--accent);
+  border: 2px solid var(--frame);
+  border-radius: 8px;
+  box-shadow: var(--shadow-brutal-xs);
+  color: var(--color-brand-ink);
+  font-weight: 800;
+}
+
+.sl-badge {
+  border-radius: 999px;
+  border-width: 2px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sl-badge.success {
+  --sl-badge-success-border: var(--frame);
+  --sl-badge-success-bg: var(--color-brand-teal);
+  --sl-badge-success-text: var(--color-brand-ink);
+}
+
+/* Search trigger and pagination */
+site-search > button {
+  border: 2px solid var(--frame);
+  border-radius: 8px;
+  box-shadow: var(--shadow-brutal-xs);
+}
+
+.pagination-links a {
+  border: 3px solid var(--frame);
+  border-radius: 12px;
+  box-shadow: var(--shadow-brutal-sm);
+  transition:
+    transform 80ms linear,
+    box-shadow 80ms linear;
+}
+
+.pagination-links a:hover {
+  box-shadow: var(--shadow-brutal-md);
+  transform: translate(-2px, -2px);
+}
+
+/* Live demo frames carry a chip naming where the component comes from */
+.demo-frame {
+  position: relative;
+}
+
+.demo-chip {
+  background: var(--accent);
+  border: 2px solid var(--frame);
+  border-radius: 999px;
+  color: var(--color-brand-ink);
+  font-family: var(--sl-font-mono);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  padding: 0.3em 0.6em;
+  position: absolute;
+  right: 0.75rem;
+  text-transform: uppercase;
+  top: -0.55rem;
+  z-index: 1;
+}
+
+/* The site's own chrome: the cream page glow behind everything, the 4px ink rule
+   under the header and the panel-tinted sidebar, all as the app draws them. */
+body {
+  background-color: var(--background);
+  background-image: var(--page-glow);
+}
+
+:root {
+  --sl-color-bg: transparent;
+  --sl-color-bg-nav: var(--background);
+  --sl-color-bg-sidebar: var(--surface-panel-soft);
+}
+
+.header {
+  background: var(--background);
+}
+
+header.header {
+  border-bottom: 4px solid var(--frame);
+}
+
+.sidebar-pane {
+  border-inline-end: 3px solid var(--frame);
+}
+
+.right-sidebar-panel {
+  border-inline-start: 2px solid var(--sl-color-hairline);
+}

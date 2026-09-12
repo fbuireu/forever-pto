@@ -10,6 +10,7 @@ import {
 import { Button } from "@ui/modules/core/primitives/Button";
 import { useState } from "react";
 import { Demo } from "../Demo";
+import { propRows } from "../PropsTable";
 
 export const DialogDemo = () => {
 	const [open, setOpen] = useState(false);
@@ -56,3 +57,26 @@ export const DialogNoCloseButtonDemo = () => (
 		</Dialog>
 	</Demo>
 );
+
+export const DIALOG_PROP_ROWS = propRows({
+	open: { type: "boolean", description: "Controlled state." },
+	defaultOpen: { type: "boolean", defaultValue: "false", description: "Uncontrolled initial state." },
+	onOpenChange: {
+		type: "(open: boolean, details) => void",
+		description: "Fires on trigger, close button, Esc and backdrop click.",
+	},
+	modal: { type: "boolean", defaultValue: "true", description: "Whether the rest of the page is inert while open." },
+});
+
+export const DIALOG_CONTENT_PROP_ROWS = propRows({
+	showCloseButton: {
+		type: "boolean",
+		defaultValue: "true",
+		description: "Whether the top-right X renders. Off, Esc and the backdrop still dismiss.",
+	},
+	closeLabel: {
+		type: "string",
+		defaultValue: '"Close"',
+		description: "Screen-reader text of the X. Pass a translated string; the default is English.",
+	},
+});

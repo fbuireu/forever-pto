@@ -1,7 +1,10 @@
+import type { Progress as ProgressPrimitive } from "@base-ui/react/progress";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { Progress, ProgressOverlayLabel, ProgressTrack } from "@ui/modules/core/primitives/Progress";
+import type { ComponentProps } from "react";
 import { useState } from "react";
 import { Demo } from "../Demo";
+import { type OwnProps, propRows } from "../PropsTable";
 
 export const ProgressDemo = () => {
 	const [value, setValue] = useState(40);
@@ -40,3 +43,38 @@ export const ProgressCustomDemo = () => (
 		</Progress>
 	</Demo>
 );
+
+export const PROGRESS_PROP_ROWS = propRows({
+	value: {
+		type: "number | null",
+		description:
+			"The current value in percent, read by the track's indicator and exposed as aria-valuenow. null renders an indeterminate bar.",
+	},
+	max: { type: "number", defaultValue: "100", description: "Upper bound the value is measured against." },
+});
+
+export const PROGRESS_TRACK_PROP_ROWS = propRows<
+	OwnProps<ComponentProps<typeof ProgressTrack>, ComponentProps<typeof ProgressPrimitive.Track>>
+>({
+	indicatorClassName: { type: "string", description: "Classes for the filled part, which is bg-accent by default." },
+	transition: {
+		type: "Transition",
+		defaultValue: '{ type: "spring", stiffness: 100, damping: 30 }',
+		description: "Motion transition applied to the indicator's width whenever value changes.",
+	},
+});
+
+export const PROGRESS_LABEL_PROP_ROWS = propRows<keyof ComponentProps<typeof ProgressOverlayLabel>>({
+	children: {
+		type: "ReactNode",
+		description:
+			"The label, rendered twice: once over the track and once clipped to the filled part in the inverse colour.",
+	},
+	className: { type: "string", description: "Classes on the outer label layer." },
+	overlayClassName: { type: "string", description: "Classes on the clipped, inverse-coloured copy." },
+	transition: {
+		type: "Transition",
+		defaultValue: "the track's",
+		description: "Transition of the clip-path, so the inverse copy keeps pace with the indicator.",
+	},
+});

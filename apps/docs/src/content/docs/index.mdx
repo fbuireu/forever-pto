@@ -3,11 +3,15 @@ title: Forever PTO Docs
 description: Documentation and internal wiki for Forever PTO.
 template: splash
 hero:
-  tagline: The internal wiki for Forever PTO. Architecture, design system, infrastructure and conventions, documented against the real code.
+  tagline: How the planner turns a PTO budget into the longest stretches away from work, and how the code that does it is built, shipped and kept honest. Written against the real tree, with the real components rendered live.
   actions:
-    - text: Get started
-      link: /start/introduction/
+    - text: What the planner does
+      link: /start/what-the-planner-does/
       icon: right-arrow
+    - text: Follow a request end to end
+      link: /how-it-works/overview/
+      icon: rocket
+      variant: minimal
     - text: Browse the design system
       link: /design-system/components/overview/
       icon: puzzle
@@ -16,29 +20,53 @@ hero:
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
+## The whole product in one picture
+
+Everything that matters happens in the browser: the edge only detects a Country and serves prerendered HTML, and the plan itself never leaves the device.
+
+```mermaid
+flowchart TB
+  subgraph edge [Cloudflare Worker]
+    PX[Proxy: locale + Country cookies]
+    API["/api/*: Donation, session, contact"]
+  end
+  subgraph browser [Browser]
+    ST[(Zustand stores<br/>encrypted localStorage)]
+    HOL[date-holidays, bundled]
+    UI[Planner screen]
+    WK[Web Worker<br/>planning engine]
+  end
+  PX -->|HTML + cookies| UI
+  UI <--> ST
+  ST --> HOL --> ST
+  ST -->|ISO strings| WK -->|Suggestion + Alternatives + Metrics| ST
+  UI -->|Donation only| API
+```
+
 <CardGrid stagger>
   <Card title='Start here' icon='rocket'>
-    What Forever PTO is, how to run it locally and how the repository is laid out.
-    [Introduction →](/start/introduction/)
-  </Card>
-  <Card title='Architecture' icon='open-book'>
-    The layered structure under `apps/web/src/` (app, application, domain, infrastructure and ui) and how they depend on
-    each other. [Overview →](/architecture/overview/)
+    What the product does, the inputs it takes and the plan it returns; then how to run it locally and how the
+    repository is laid out. [What the planner does →](/start/what-the-planner-does/)
   </Card>
   <Card title='How it works' icon='information'>
-    Feature deep dives: the suggestion engine, country detection, premium flow and more.
-    [Country detection →](/how-it-works/country-detection/)
+    One request followed from the edge to the last Metric, then every subsystem: the planning algorithm with its
+    live tunables, the Holiday sources, the Web Worker, the planner screen, the stores.
+    [Overview →](/how-it-works/overview/) · [The algorithm →](/how-it-works/planning-algorithm/)
+  </Card>
+  <Card title='Architecture' icon='open-book'>
+    The layered tree under `apps/web/src/`, with the dependency graph measured from the imports rather than drawn
+    from intent, the per-request proxy chain and the Effect service layer. [Overview →](/architecture/overview/)
   </Card>
   <Card title='Design system' icon='puzzle'>
-    The neo-brutalist component library, rendered live on these pages using the app's real components.
-    [Components →](/design-system/components/overview/)
+    The neobrutalist component library, rendered live from the app's own sources, with props, accessibility notes
+    and where each component is used. [Components →](/design-system/components/overview/)
   </Card>
   <Card title='Infrastructure & CI/CD' icon='setting'>
-    Cloudflare Workers, OpenNext, per-PR previews and the release pipeline.
-    [Environments →](/infra/environments/)
+    Cloudflare Workers through OpenNext, one Worker per pull request, the smoke-gated release pipeline and the
+    tags that keep two packages versioned apart. [Environments →](/infra/environments/)
   </Card>
-  <Card title='Contributing' icon='pencil'>
-    Commit conventions, code style, tooling and testing rules for working in this repo.
-    [Conventions →](/contributing/conventions/)
+  <Card title='Reference & contributing' icon='pencil'>
+    The glossary the code is written in, every cookie the app sets, and the conventions, tooling and testing
+    rules a change has to meet, plus how this wiki itself is built. [Glossary →](/reference/glossary/) · [How the wiki works →](/contributing/docs-site/)
   </Card>
 </CardGrid>

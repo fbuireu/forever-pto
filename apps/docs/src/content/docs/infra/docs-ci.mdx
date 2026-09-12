@@ -9,9 +9,20 @@ This page is self-documenting: it describes the pipeline that published it. The 
 
 ## The workflow
 
-`.github/workflows/docs.yml` follows the repo's workflow conventions (SHA-pinned actions, `persist-credentials: false`, zizmor-linted). It runs on every push and pull request, and a `changes` job gates `build` on the `DOCS_PATHS` list: `apps/docs/**`, `apps/web/package.json`, all of `apps/web/src/ui/**`, `apps/web/src/domain/calendar/types.ts`, `apps/web/src/infrastructure/i18n/locales.ts`, `pnpm-lock.yaml`, the workflow file and `.github/actions/**`. Unrelated app changes never build the docs; changes to the reused sources do, on purpose, because they can break the demos. The list used to be a `paths:` trigger filter, written out twice, and a filtered workflow never reports on a pull request outside its paths, which is why nothing in it could be a required check.
+```mermaid
+flowchart LR
+  CH[changes: DOCS_PATHS] --> B[build: astro check · astro build · Playwright]
+  B -->|pull_request| PV["preview: deploy --env development --name pr-n-…"]
+  B -->|push to main or dispatch| D[deploy --env production]
+  D --> S[smoke against DOCS_SITE_URL]
+  S --> R[release-docs]
+  S -. failed .-> RB[rollback]
+  CH & B & PV & D & S & R --> CK["Check (docs), always"]
+```
 
-The trailing app entries are not decoration. `app-version.ts` reads the app manifest, and `HowItWorksDemo.tsx` reaches `@domain/calendar/types` and `@infrastructure/i18n/locales` by relative path rather than through `@ui`. The app's own contract suite derives that reach from the sources and fails if a path of it is missing from `DOCS_PATHS`, so this list cannot drift from what the site imports.
+`.github/workflows/docs.yml` follows the repo's workflow conventions (SHA-pinned actions, `persist-credentials: false`, zizmor-linted). It runs on every push and pull request, and a `changes` job gates `build` on the `DOCS_PATHS` list: `apps/docs/**`, `apps/web/package.json`, all of `apps/web/src/ui/**`, `apps/web/src/domain/calendar/types.ts`, `apps/web/src/domain/calendar/const.ts`, `apps/web/src/infrastructure/i18n/locales.ts`, `pnpm-lock.yaml`, the workflow file and `.github/actions/**`. Unrelated app changes never build the docs; changes to the reused sources do, on purpose, because they can break the demos. The list used to be a `paths:` trigger filter, written out twice, and a filtered workflow never reports on a pull request outside its paths, which is why nothing in it could be a required check.
+
+The trailing app entries are not decoration. `app-version.ts` reads the app manifest, `HowItWorksDemo.tsx` reaches `@domain/calendar/types` and `@infrastructure/i18n/locales` by relative path rather than through `@ui`, and `PlanningEngineDemo.tsx` reaches `@domain/calendar/const` the same way, so the tunables the algorithm page quotes are the engine's own. The app's own contract suite derives that reach from the sources and fails if a path of it is missing from `DOCS_PATHS`, so this list cannot drift from what the site imports.
 
 Triggers:
 

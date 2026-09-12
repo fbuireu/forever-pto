@@ -1,9 +1,11 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { satteri } from "@astrojs/markdown-satteri";
 import react from "@astrojs/react";
 import starlight from "@astrojs/starlight";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
+import { mermaidPlugin } from "./src/lib/mermaid-plugin";
 
 // tsconfig.json is the single declaration of where the app's UI layer sits: `astro check` reads it, and
 // this file derives the build-time alias from the same string rather than spelling it a second time.
@@ -23,15 +25,19 @@ export default defineConfig({
 	redirects: {
 		"/architecture/middleware/": "/architecture/proxy/",
 	},
+	markdown: {
+		processor: satteri({ mdastPlugins: [mermaidPlugin] }),
+	},
 	integrations: [
 		starlight({
 			title: "Forever PTO",
 			description: "Documentation and internal wiki for Forever PTO, the PTO optimization tool.",
 			logo: {
-				light: "./src/assets/logo-light.svg",
-				dark: "./src/assets/logo-dark.svg",
+				light: "./src/assets/forever-pto-logo.png",
+				dark: "./src/assets/forever-pto-logo-dark.png",
+				alt: "Forever PTO",
 			},
-			favicon: "/favicon.svg",
+			favicon: "/favicon.ico",
 			head: [
 				{
 					tag: "meta",

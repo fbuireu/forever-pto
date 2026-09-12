@@ -1,5 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@ui/modules/core/primitives/Table";
+import type { ComponentProps } from "react";
 import { Demo } from "../Demo";
+import { type OwnProps, propRows } from "../PropsTable";
 
 const HOLIDAYS = [
 	{ id: "new-year", name: "New Year", date: "Jan 1", scope: "National" },
@@ -30,3 +32,11 @@ export const TableDemo = () => (
 		</Table>
 	</Demo>
 );
+
+export const TABLE_PROP_ROWS = propRows<OwnProps<ComponentProps<typeof Table>, ComponentProps<"table">>>({
+	containerClassName: {
+		type: "string",
+		description:
+			"Classes for the scroll container that owns the frame, the shadow and overflow-x: auto; className goes to the table element itself.",
+	},
+});

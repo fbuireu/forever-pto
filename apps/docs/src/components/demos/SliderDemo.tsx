@@ -1,6 +1,8 @@
 import { Slider } from "@ui/modules/core/primitives/Slider";
+import type { ComponentProps } from "react";
 import { useState } from "react";
 import { Demo } from "../Demo";
+import { propRows } from "../PropsTable";
 
 export const SliderDemo = () => {
 	const [value, setValue] = useState([15]);
@@ -31,3 +33,29 @@ export const SliderDisabledDemo = () => (
 		<Slider label="PTO days" defaultValue={10} max={30} disabled className="max-w-sm" />
 	</Demo>
 );
+
+export const SLIDER_PROP_ROWS = propRows<keyof ComponentProps<typeof Slider>>({
+	label: {
+		type: "string",
+		description:
+			"Accessible name of the thumb (its aria-label). Required: a slider without one announces only a number.",
+	},
+	className: { type: "string", description: "Classes on the root." },
+	defaultValue: {
+		type: "number | number[]",
+		description: "Uncontrolled initial value. An array renders one thumb per entry, so a pair makes a range slider.",
+	},
+	value: { type: "number | number[]", description: "Controlled value, same shape rule as defaultValue." },
+	min: { type: "number", defaultValue: "0", description: "Lower bound." },
+	max: { type: "number", defaultValue: "100", description: "Upper bound." },
+	step: { type: "number", defaultValue: "1", description: "Increment for keyboard and drag." },
+	onValueChange: {
+		type: "(value: number[]) => void",
+		description: "Fires on every change while dragging. Always receives an array, whatever shape value has.",
+	},
+	onValueCommitted: {
+		type: "(value: number[]) => void",
+		description: "Fires once when the pointer is released or a key press ends. Use it for the expensive side effect.",
+	},
+	disabled: { type: "boolean", description: "Halves the opacity and blocks interaction." },
+});

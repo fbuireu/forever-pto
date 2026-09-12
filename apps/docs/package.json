@@ -24,6 +24,7 @@
 		"test:e2e": "playwright test"
 	},
 	"dependencies": {
+		"@astrojs/markdown-satteri": "0.4.1",
 		"@astrojs/react": "6.0.5",
 		"@astrojs/starlight": "0.42.0",
 		"@astrojs/starlight-tailwind": "5.0.0",
@@ -38,6 +39,7 @@
 		"clsx": "2.1.1",
 		"cmdk": "1.1.1",
 		"lucide-react": "1.42.0",
+		"mermaid": "11.17.2",
 		"next-intl": "4.14.2",
 		"react": "19.2.8",
 		"react-dom": "19.2.8",
@@ -45,8 +47,8 @@
 		"sharp": "0.35.4",
 		"tailwind-merge": "3.6.0",
 		"tailwindcss": "4.3.3",
-		"vanilla-cookieconsent": "3.1.0",
 		"temporal-polyfill": "1.0.4",
+		"vanilla-cookieconsent": "3.1.0",
 		"vaul": "1.1.2",
 		"zustand": "5.0.15"
 	},
