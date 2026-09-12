@@ -90,7 +90,7 @@ jobs:
     uses: ./.github/workflows/_deploy-web.yml
     with:
       environment: web-production
-      url: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+      url: ${{ vars.WEB_SITE_URL }}
     secrets:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -108,12 +108,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      BASE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+      BASE_URL: ${{ vars.WEB_SITE_URL }}
     steps:
       - name: Require the production URL
         run: |
           if [ -z "$BASE_URL" ]; then
-            echo "NEXT_PUBLIC_SITE_URL is empty, so Playwright would fall back to localhost and pass against it"
+            echo "WEB_SITE_URL is empty, so Playwright would fall back to localhost and pass against it"
             exit 1
           fi
       - name: Checkout
