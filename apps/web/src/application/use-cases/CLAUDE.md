@@ -48,8 +48,8 @@ Logging comes in a few shapes here and the choice is about *when* the line runs,
 attached to a failure sits in `Effect.sync` inside `tapError` (`webhook.ts`, `payment.ts`) or inside
 `catchAll` where the failure is also being absorbed (`contact.ts`, `activatePremium.ts`); a log describing a
 successful branch is a bare statement in the generator body (`webhook.ts` lines around the dispatch). None of
-them needs a guard, because `BetterStackClient` cannot throw; see
-[`../../infrastructure/clients/CLAUDE.md`](../../infrastructure/clients/CLAUDE.md). Do not add `Effect.sync`
+them needs a guard, because `logger` cannot throw; see
+[`../../infrastructure/CLAUDE.md`](../../infrastructure/CLAUDE.md). Do not add `Effect.sync`
 for protection: a throw inside it is a defect too, so it would buy nothing.
 
 ## Termination is the caller's job, not ours

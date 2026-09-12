@@ -1,10 +1,8 @@
 import { regionDTO } from "@application/dto/region/dto";
 import { collateByLabel } from "@application/shared/utils/collate";
-import { getBetterStackInstance } from "@infrastructure/clients/logging/better-stack/client";
+import { logger } from "@infrastructure/logging/logger";
 import { dateHolidaysSource } from "@infrastructure/services/holidays/source/dateHolidays";
 import type { HolidaySource } from "@infrastructure/services/holidays/source/types";
-
-const logger = getBetterStackInstance();
 
 export interface GetRegionsParams {
 	countryCode?: string;
@@ -21,7 +19,7 @@ export function getRegions({ countryCode, source = dateHolidaysSource }: GetRegi
 
 		return collateByLabel({ options: regionDTO.create({ raw: regions }) });
 	} catch (error) {
-		logger.logError("Error in getRegions", error, { countryCode });
+		logger.logError({ message: "Error in getRegions", error, context: { countryCode } });
 		return [];
 	}
 }

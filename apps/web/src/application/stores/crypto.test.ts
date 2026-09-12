@@ -7,8 +7,8 @@ const { mockObfuscate, mockDeobfuscate } = vi.hoisted(() => ({
 	mockDeobfuscate: vi.fn(({ text }: { text: string }) => text.replace("obf::", "")),
 }));
 
-vi.mock("@infrastructure/clients/logging/better-stack/client", () => ({
-	getBetterStackInstance: vi.fn().mockReturnValue({ logError: mockLogError }),
+vi.mock("@infrastructure/logging/logger", () => ({
+	logger: { logError: mockLogError },
 }));
 
 vi.mock("./utils/crypto", () => ({
@@ -156,8 +156,12 @@ describe("prod mode with SECRET_KEY", () => {
 		});
 		expect(storage.getItem("test-key")).toBeNull();
 		await vi.waitFor(() =>
-			expect(mockLogError).toHaveBeenCalledWith("Failed to deobfuscate storage value", expect.any(Error), {
-				key: "test-key",
+			expect(mockLogError).toHaveBeenCalledWith({
+				message: "Failed to deobfuscate storage value",
+				error: expect.any(Error),
+				context: {
+					key: "test-key",
+				},
 			}),
 		);
 	});
@@ -185,8 +189,12 @@ describe("prod mode with SECRET_KEY", () => {
 		});
 		storage.setItem("test-key", STATE_VALUE as never);
 		await vi.waitFor(() =>
-			expect(mockLogError).toHaveBeenCalledWith("Failed to set item in obfuscated storage", expect.any(Error), {
-				key: "test-key",
+			expect(mockLogError).toHaveBeenCalledWith({
+				message: "Failed to set item in obfuscated storage",
+				error: expect.any(Error),
+				context: {
+					key: "test-key",
+				},
 			}),
 		);
 	});
@@ -202,8 +210,12 @@ describe("prod mode with SECRET_KEY", () => {
 		});
 		storage.removeItem("test-key");
 		await vi.waitFor(() =>
-			expect(mockLogError).toHaveBeenCalledWith("Failed to remove item from obfuscated storage", expect.any(Error), {
-				key: "test-key",
+			expect(mockLogError).toHaveBeenCalledWith({
+				message: "Failed to remove item from obfuscated storage",
+				error: expect.any(Error),
+				context: {
+					key: "test-key",
+				},
 			}),
 		);
 	});

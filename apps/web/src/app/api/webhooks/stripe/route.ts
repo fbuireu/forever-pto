@@ -1,11 +1,11 @@
 import { processWebhookEvent } from "@application/use-cases/webhook";
 import { ApiError } from "@infrastructure/api/errors";
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import {
 	isWebhookConfigurationError,
 	StripeServerService,
 } from "@infrastructure/clients/payments/stripe/serverService";
 import { ApplicationLayer } from "@infrastructure/layers";
+import { LoggerService } from "@infrastructure/logging/service";
 import { traced } from "@infrastructure/span";
 import { Effect } from "effect";
 import { headers } from "next/headers";
@@ -44,7 +44,10 @@ async function handleStripeWebhook(request: NextRequest) {
 
 				return Effect.gen(function* () {
 					const logger = yield* LoggerService;
-					logger.logError("Stripe webhook is misconfigured, rejecting the delivery as non-retryable", e);
+					logger.logError({
+						message: "Stripe webhook is misconfigured, rejecting the delivery as non-retryable",
+						error: e,
+					});
 
 					return NextResponse.json({ error: ApiError.WEBHOOK_MISCONFIGURED }, { status: 400 });
 				});

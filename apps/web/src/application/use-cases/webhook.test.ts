@@ -1,7 +1,7 @@
 import { TursoService } from "@infrastructure/clients/db/turso/service";
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import { DatabaseError, MissingDonorEmailError } from "@infrastructure/errors";
+import { LoggerService } from "@infrastructure/logging/service";
 import { Effect, Layer } from "effect";
 import type Stripe from "stripe";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -49,7 +49,7 @@ vi.mock("@application/dto/payment/dto", () => ({
 	paymentDataDTO: { create: vi.fn().mockReturnValue({ id: "pi_test" }) },
 }));
 
-const mockLogger = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
+const mockLogger = { info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
 const TestLayer = Layer.mergeAll(
 	Layer.succeed(LoggerService, mockLogger),
 	Layer.succeed(TursoService, { query: vi.fn(), execute: vi.fn() }),
@@ -123,10 +123,10 @@ describe("processWebhookEvent", () => {
 		vi.mocked(savePayment).mockReturnValueOnce(Effect.succeed(true) as never);
 		await run(processWebhookEvent(succeededEvent({ id: "pi_test" })));
 		expect(savePayment).toHaveBeenCalledOnce();
-		expect(mockLogger.warn).toHaveBeenCalledWith(
-			"Payment was missing from the DB and was created from the webhook",
-			expect.objectContaining({ paymentId: "pi_test" }),
-		);
+		expect(mockLogger.warn).toHaveBeenCalledWith({
+			message: "Payment was missing from the DB and was created from the webhook",
+			context: expect.objectContaining({ paymentId: "pi_test" }),
+		});
 	});
 
 	it("reads the transport metadata off the intent, not off the domain event", async () => {
@@ -154,11 +154,11 @@ describe("processWebhookEvent", () => {
 		const { handlePaymentSucceeded } = await import("@domain/payment/handlers/paymentSucceeded");
 		vi.mocked(handlePaymentSucceeded).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "db down" })));
 		await run(processWebhookEvent(succeededEvent({ id: "pi_test" }))).catch(() => undefined);
-		expect(mockLogger.logError).toHaveBeenCalledWith(
-			"Error handling successful payment",
-			expect.anything(),
-			expect.objectContaining({ paymentId: "pi_test" }),
-		);
+		expect(mockLogger.logError).toHaveBeenCalledWith({
+			message: "Error handling successful payment",
+			error: expect.anything(),
+			context: expect.objectContaining({ paymentId: "pi_test" }),
+		});
 	});
 
 	it("succeeds so Stripe stops redelivering when the intent carries no donor email", async () => {
@@ -177,11 +177,11 @@ describe("processWebhookEvent", () => {
 			Effect.fail(new MissingDonorEmailError({ paymentId: "pi_test" })),
 		);
 		await run(processWebhookEvent(succeededEvent({ id: "pi_test" })));
-		expect(mockLogger.logError).toHaveBeenCalledWith(
-			"Payment succeeded with no donor email, Premium can never be recovered",
-			expect.any(MissingDonorEmailError),
-			expect.objectContaining({ paymentId: "pi_test" }),
-		);
+		expect(mockLogger.logError).toHaveBeenCalledWith({
+			message: "Payment succeeded with no donor email, Premium can never be recovered",
+			error: expect.any(MissingDonorEmailError),
+			context: expect.objectContaining({ paymentId: "pi_test" }),
+		});
 		expect(handlePaymentSucceeded).not.toHaveBeenCalled();
 		expect(savePayment).not.toHaveBeenCalled();
 	});
@@ -207,10 +207,10 @@ describe("processWebhookEvent", () => {
 
 	it("logs a warning for unhandled event types", async () => {
 		await run(processWebhookEvent(unhandledEvent()));
-		expect(mockLogger.warn).toHaveBeenCalledWith(
-			"Unhandled webhook event type",
-			expect.objectContaining({ eventType: "customer.created" }),
-		);
+		expect(mockLogger.warn).toHaveBeenCalledWith({
+			message: "Unhandled webhook event type",
+			context: expect.objectContaining({ eventType: "customer.created" }),
+		});
 	});
 
 	it("does not call any handler for unhandled event types", async () => {

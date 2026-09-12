@@ -62,6 +62,7 @@ path-segment reader), and a fourth, [`global-not-found.tsx`](../app/global-not-f
 chain that existed nowhere else and was reachable only through a page most users never see. The
 `Accept-Language` half is `localeFromAcceptLanguage` now and answers `undefined` rather than the default, so
 the caller decides the fallback and the precedence is assertable without rendering a document.
+| `logging/` | [`logger.ts`](./logging/logger.ts), the `logger` object every log line in the app goes through; [`contract.ts`](./logging/contract.ts), its service name, levels and `stripQuery`; [`service.ts`](./logging/service.ts), the `LoggerService` tag wrapping that same object. See *`logging/`* below |
 | `markdown/` | `buildMarkdownPage.ts`: the Markdown twin of a page, served when the request asks for `text/markdown`. Translates through `createTranslator` over statically imported bundles, never `next-intl/server`; see *Gotchas*. [`twin.ts`](./markdown/twin.ts) beside it holds how the twin is *requested* and *cached*: the route path, the `Accept` token, the `x-markdown-path` header the proxy sets, and `markdownTwinHeaders({ found })`. Both the proxy and the route read it, which is what stopped the policy being a guess made before the lookup; see [`../app/CLAUDE.md`](../app/CLAUDE.md) |
 | `seo/` | [`buildMetadata.ts`](./seo/buildMetadata.ts): the `Metadata` shape every route's `generateMetadata` fills in; [`routeMetadata.ts`](./seo/routeMetadata.ts): that `generateMetadata`, built from a route's own row so a route file is one line; [`routes.ts`](./seo/routes.ts): `SITE_ROUTES`, the one list of pages and whether each is indexable, plus `routeFor`, the total lookup keyed by the table's own literal paths |
 | `proxy/` | Middleware helpers: `location.ts` (country detection + cookie) and [`cookie.ts`](./proxy/cookie.ts) (`user-country`, one week) |
@@ -163,6 +164,142 @@ anywhere there is no layer to provide. The browser Stripe client was on that lis
 at all: it is now a memoised `loadStripe` and nothing else. "All external calls go through Effect" is false for logging, on
 purpose ([ADR 0002](../../../../adr/0002-effect-for-external-service-boundaries.md)).
 
+## `logging/`
+
+`logger` is a module-level object with `info`, `warn`, `error` and `logError`, each taking one
+`{ message, context }` object (`logError` adds `error`), and it sends nothing anywhere. Each call writes **one
+`JSON.stringify` line to `console[level]`**, and Cloudflare's own observability exports it to Better Stack over
+OTLP, named as a `destinations` entry in [`wrangler.toml`](../../wrangler.toml)
+([ADR 0018](../../../../adr/0018-the-platform-is-the-log-transport.md)). It is the same object, the same line
+and the same path as contribKit's logger, so a reader who knows one knows the other; what is specific to this
+app is `logError`, `stripQuery` and the `LoggerService` tag, each named below.
+
+**A log call cannot fail its caller, and that is the property everything else leans on.** `write` is one
+statement:
+
+```ts
+console[level](JSON.stringify({ ...redacted(context), service: LOG_SERVICE, level, message }));
+```
+
+wrapped in a `try` that returns. What is load-bearing in it:
+
+- **The spread order.** `context` comes first, so a caller passing `{ level: 'info' }` or
+  `{ service: 'something-else' }` cannot relabel its own line. Written the other way round it reads
+  identically and lets a log lie about which level and which service produced it; `logger.test.ts` asserts
+  the level, the message and the service each survive a context that tries to overwrite them, and inverting
+  the spread turns three of those cases red.
+- **The `try`.** `JSON.stringify` throws on a circular reference and on a `BigInt`. Without it, a caller
+  passing either takes down the Zustand action or the payment handler it was logging from.
+- **The index.** `console[level]` is indexed by the contract's own union, so a level added to `LOG_LEVEL` that
+  `console` has no method for fails to compile here rather than falling through to `console.error`;
+  `logger.test.ts` iterates `LOG_LEVEL` and asserts each level reaches the method of its own name and no other.
+
+That second point is why the guarantee has to live here at all: `logger` is called *bare*, outside any Effect
+combinator, from Zustand actions, the country lookups and both payment handlers. A throw from one of those
+positions inside an `Effect.gen` is a defect that neither `Effect.catchTags` nor the trailing `Effect.catchAll`
+can map, the same failure the clients guide describes for layer construction. `Effect.sync` would not help: a
+throw inside it is equally a defect. `describe('a log never fails its caller')` in `logger.test.ts` is what
+holds it there.
+
+The price is that a lost log is silent, and that the structured fields are serialised here rather than handed
+to an API as an object, so the sink parses them back out of the JSON body. That was accepted knowingly; see
+[ADR 0018](../../../../adr/0018-the-platform-is-the-log-transport.md).
+
+**The object carries exactly the methods something calls.** It was a class with `debug`, `logDuration`,
+`measureAsync`, `withContext` and a base context stamping `environment: NODE_ENV` on every line, and outside
+the class itself none of those had a caller; the `environment` field was also `production` on every preview
+Worker, which is the one place it would have mattered. `logError` is the one method beyond the three levels,
+because sixteen call sites pass an `Error` through it and it is what serialises `message`, `name`, `stack` and
+the error's own enumerable fields into the `error` field of the line. contribKit does that serialisation in the
+`logServerError` helper of its application layer instead and has no `logError`; that is a difference in the
+apps, not drift.
+
+**There is no transport to scope to a request any more, and the hazard it existed for is worth keeping in
+view.** The client held a `@logtail/edge` batcher: the first call armed a `setTimeout`, later calls joined the
+buffer, and the timer's callback ran the `fetch`. As one module-level instance, that batcher armed its timer
+inside request A and delivered request B's lines through it, which workerd refuses as
+`Cannot perform I/O on behalf of a different request`, cancelling a request left waiting on a promise another
+request's context owns. Keying one instance per `ExecutionContext` in a `WeakMap` fixed it, and writing to
+`console` removes the class of problem: there is no buffer, no timer and no `fetch`, so nothing can outlive the
+request that wrote it. Any future transport that batches has to answer this question again.
+
+**`console` is a lint error everywhere else in this package.** The root [`biome.json`](../../../../biome.json)
+turns `noConsole` off for [`logging/logger.ts`](./logging/logger.ts) and for nothing else, which is what keeps
+this file the only writer; the entry must not become a package-wide allowance.
+
+### The log contract, and the one function in it that guards a secret
+
+[`logging/contract.ts`](./logging/contract.ts) holds `LOG_SERVICE`, `forever-pto-web` in the `<repo>-<package>`
+spelling the sibling repositories use, the levels the app emits and `stripQuery`. It is types and constants
+only, which is what it has always been, though the reason changed: it was shaped that way so a tail consumer
+Worker could import it without pulling a transport into a bundle that had none, and that Worker is gone
+([ADR 0017](../../../../adr/0017-observability-is-the-platform-export.md)). It carried a `toLogLevel` as well,
+folding workerd's `log` and `trace` onto `info` on the way out of that Worker; nothing has called it since, and
+it went with [ADR 0018](../../../../adr/0018-the-platform-is-the-log-transport.md).
+
+**`stripQuery` is the one to understand before touching anything here.** It encodes "a URL in a log context
+must not carry its query string, because Stripe appends `payment_intent_client_secret` to the return URL", a
+statement about this app's payment flow. Cloudflare's `redact_query_string = true` in
+[`wrangler.toml`](../../wrangler.toml) redacts the **request** URL the platform itself records; it does not
+touch a `url` field a caller puts in a structured log context, and that is the leak this guards.
+[`api/payment/activate/route.ts`](../app/api/payment/activate/route.ts) reads
+`payment_intent_client_secret` off the query, already emits a log line per failure, and `matchesClientSecret`
+is the only guard on a GET that mints a Premium session, so `{ url: request.url }` added while debugging
+would have shipped the secret to the sink. The rule is enforced at the seam rather than at call sites:
+`write` strips a string `url` on every line, whichever method emitted it, so no caller has to remember. A
+caller that genuinely wants a query string has to name the field something other than `url`, which is the
+point: the redaction is keyed on the field name, not on who wrote it. contribKit has no secret in a URL and no
+`stripQuery`; that too is the apps differing, not the loggers.
+
+### `LoggerService` is a tag with one adapter, on purpose
+
+It looks like ceremony and the cost is real: every module that logs carries it in `R`, every test that
+reaches one stubs its whole surface, and `LoggerServiceLive` hands back the same `logger` object the import
+does. It buys one property, verified rather than assumed: because `activateWithEmail` annotates its return
+type as requiring `TursoService` and nothing else, a `yield* LoggerService` creeping into its body fails the
+build at that function. A bare import cannot do that, since it is not a requirement and never appears in a
+type.
+
+**The guarantee is the tag *and* the explicit annotation together.** A program that leaves `R` inferred gets
+nothing: the inferred type widens to include `LoggerService` and the build stays green. That makes
+"annotate the return type" load-bearing on any Effect program under `@application/use-cases`, not stylistic.
+
+**The tag is not a substitution seam.** `LoggerServiceLive` is `Layer.sync(LoggerService, () => logger)`, so
+the tag and the import hand back the *same object*; substituting the tag in a test does not silence a module
+that imports `logger` directly, and several do. Where there is no layer to provide, the import is the
+documented exception to "every external call goes through Effect"
+([ADR 0002](../../../../adr/0002-effect-for-external-service-boundaries.md)): the lookups under `services/`,
+the location strategies, the Zustand stores and the components.
+
+[ADR 0013](../../../../adr/0013-loggerservice-stays-a-tag.md) records the decision and what it costs, so
+the next architecture pass does not re-propose deleting it.
+
+### Traces are the platform's, and no log line carries a trace id from here
+
+There is no tracer in this folder and no OpenTelemetry dependency in the package. Cloudflare instruments
+handler invocations, outbound `fetch` and binding calls itself, attributes `console` output to the active span,
+and stamps the trace id on every log record it exports. Because `console` is what `logger` writes to
+([ADR 0018](../../../../adr/0018-the-platform-is-the-log-transport.md)), the app's own lines are among those
+records and the correlation a helper here used to build by hand arrives without the app producing it.
+
+**That only holds for lines the runtime sees, which is the trap this replaced.** Between
+[ADR 0017](../../../../adr/0017-observability-is-the-platform-export.md) and 0018 the client still posted
+over HTTP from inside the Worker, so the spans were in BetterStack, the logs were in BetterStack, and nothing
+joined them. A future transport that leaves the runtime again puts it straight back.
+
+**The *correlation.ts* that used to stamp those ids had to go with the wrapper rather than after it**, and the
+reason generalises: `trace.getActiveSpan()` reads `@opentelemetry/api`'s global context manager, and the
+deleted `@microlabs/otel-cf-workers` wrapper was the only thing in the tree that ever called
+`setGlobalContextManager`. Left behind, it would have returned `undefined` on every call and stamped `{}` on
+every log line, with its own test still green because that test installed a context manager by hand. A helper
+whose test supplies the very thing production stopped providing is the shape to check for.
+
+**`Effect.withSpan` stays on every use case and is wired to nothing.** Effect's `Tracer.Span` wants a
+`traceId`, a `spanId` and a caller-supplied end timestamp on a span built synchronously; the runtime's
+`cloudflare:workers` span has none of those and exists only inside a callback, so the bridge cannot be
+repointed at it. The calls are free, they name the boundary of each use case, and they are the attachment
+point if that changes. `ApplicationLayer` in [`layers.ts`](./layers.ts) no longer merges a `TracerLive`.
+
 ## The Cloudflare context is request-scoped
 
 `getCloudflareContext()` is only valid inside a request
@@ -174,8 +311,7 @@ Places inside this layer read it directly, and each has a reason:
 [`services/env/getRequestPublicEnv.ts`](./services/env/getRequestPublicEnv.ts) (the per-request config both contact transports pass down),
 [`services/payments/rateLimit.ts`](./services/payments/rateLimit.ts) (the `PAYMENT_RATE_LIMITER` binding),
 [`services/env/getPublicEnv.ts`](./services/env/getPublicEnv.ts) (evaluated during prerender as well as per request, so it uses the `{ async: true }` form),
-[`clients/logging/better-stack/client.ts`](./clients/logging/better-stack/client.ts) (the execution context for `waitUntil`, wrapped in a `try` that
-returns `undefined` so logging still works off-request), and [`services/location/utils/strategies.ts`](./services/location/utils/strategies.ts) (only
+and [`services/location/utils/strategies.ts`](./services/location/utils/strategies.ts) (only
 `env.NEXT_PUBLIC_SITE_URL`, to build the CDN trace URL). The signal that makes country detection cheap is not
 the Cloudflare context at all: it is the `cf-ipcountry` request header, read by `detectCountryFromHeaders`,
 which touches no context and is why the common path needs no geolocation service.
@@ -223,10 +359,12 @@ already drifted over how a missing IP header was recorded.
   locale on purpose: its labels come from `date-holidays`' `getStates()` in whatever language that package
   emits, and it is reached from the location store and from `getHolidays`, neither of which carries one.
   Giving it a locale means threading one from both call sites first.
-- **`getCountries.ts` and `getRegions.ts` call `getBetterStackInstance()` at module scope.** Importing either
-  constructs the logger. The Logtail transport itself is created lazily on the first log, so the import does
-  not require the BetterStack environment variables, but it does pull the logging client into whatever bundle
-  imports them, and [`Countries.tsx`](../ui/modules/sidebar/components/Countries.tsx) imports `getCountries.ts` from the UI layer.
+- **`getCountries.ts`, `getRegions.ts`, `getHolidays.ts` and `location/utils/strategies.ts` import `logger`
+  statically.** The import needs no configuration and costs nothing at runtime, since the module is a
+  `console` writer, but it does pull `logging/logger.ts` and its contract into whatever bundle imports them,
+  and [`Countries.tsx`](../ui/modules/sidebar/components/Countries.tsx) imports `getCountries.ts` from the UI
+  layer. The stores and components reach the same object through `logClient`'s dynamic import instead; see
+  [`../ui/CLAUDE.md`](../ui/CLAUDE.md).
 - **Country detection sits in front of every HTML response.** [`proxy/location.ts`](./proxy/location.ts) re-sets an existing
   `user-country` cookie instead of re-running [`detectCountry.ts`](./services/location/detectCountry.ts), which is a subrequest with its own timeout.
   Writing back a value it already has is not redundant: it slides the week-long expiry forward on every

@@ -8,8 +8,8 @@ const { mockGetNames, mockRegisterLocale } = vi.hoisted(() => ({
 }));
 const { mockCountryDTOCreate } = vi.hoisted(() => ({ mockCountryDTOCreate: vi.fn() }));
 
-vi.mock("@infrastructure/clients/logging/better-stack/client", () => ({
-	getBetterStackInstance: vi.fn().mockReturnValue({ logError: mockLogError }),
+vi.mock("@infrastructure/logging/logger", () => ({
+	logger: { logError: mockLogError },
 }));
 
 vi.mock("i18n-iso-countries", () => ({
@@ -75,7 +75,11 @@ describe("getCountries", () => {
 		const result = getCountries("ca");
 
 		expect(result).toEqual([]);
-		expect(mockLogError).toHaveBeenCalledWith("Error in getCountries", expect.any(Error), { locale: "ca" });
+		expect(mockLogError).toHaveBeenCalledWith({
+			message: "Error in getCountries",
+			error: expect.any(Error),
+			context: { locale: "ca" },
+		});
 	});
 
 	it("returns empty array and logs error when countryDTO.create throws", () => {
@@ -87,6 +91,10 @@ describe("getCountries", () => {
 		const result = getCountries("en");
 
 		expect(result).toEqual([]);
-		expect(mockLogError).toHaveBeenCalledWith("Error in getCountries", expect.any(Error), { locale: "en" as const });
+		expect(mockLogError).toHaveBeenCalledWith({
+			message: "Error in getCountries",
+			error: expect.any(Error),
+			context: { locale: "en" as const },
+		});
 	});
 });

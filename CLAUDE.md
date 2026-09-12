@@ -426,8 +426,8 @@ want, so the job posts a sticky comment saying what will happen and does not fai
 **No deploy step hands the Worker a BetterStack credential any more.** `_deploy-web.yml` used to put
 `BETTER_STACK_SOURCE_TOKEN` in `--secrets-file` and pass `--var BETTER_STACK_INGESTING_URL`, both read only by
 the tracing wrapper that [ADR 0017](./adr/0017-observability-is-the-platform-export.md) deleted. The
-`NEXT_PUBLIC_BETTER_STACK_*` variables the **build** step inlines stay: `BetterStackClient` and the browser
-tracking snippet read them. The failure this closes is worth naming, because it cost a silent outage once: the
+`NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN` the **build** step inlines stays: the browser tracking snippet
+reads it, and it is the last of that family, since the logger reads nothing. The failure this closes is worth naming, because it cost a silent outage once: the
 host lived in one place and the token in another, so reissuing the BetterStack source moved the app and left
 the tail Worker posting into a dead endpoint. There is one place now, and it is a Cloudflare setting rather
 than a file.

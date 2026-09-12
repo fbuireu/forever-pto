@@ -1,7 +1,7 @@
 import { TursoService } from "@infrastructure/clients/db/turso/service";
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import { DatabaseError } from "@infrastructure/errors";
+import { LoggerService } from "@infrastructure/logging/service";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { PaymentSucceededEvent } from "../events/types";
@@ -32,7 +32,7 @@ vi.mock("@infrastructure/services/payments/provider/charge", () => ({
 	),
 }));
 
-const mockLogger = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
+const mockLogger = { info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
 const TestLayer = Layer.mergeAll(
 	Layer.succeed(LoggerService, mockLogger),
 	Layer.succeed(TursoService, { query: vi.fn(), execute: vi.fn() }),
@@ -98,10 +98,10 @@ describe("handlePaymentSucceeded", () => {
 		const { updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
 		vi.mocked(updatePaymentStatus).mockReturnValueOnce(Effect.succeed(false));
 		await expect(run(handlePaymentSucceeded(EVENT))).resolves.toBeUndefined();
-		expect(mockLogger.warn).toHaveBeenCalledWith(
-			"Succeeded-payment event wrote no status: the payment is absent or already succeeded",
-			expect.objectContaining({ paymentId: "pi_test" }),
-		);
+		expect(mockLogger.warn).toHaveBeenCalledWith({
+			message: "Succeeded-payment event wrote no status: the payment is absent or already succeeded",
+			context: expect.objectContaining({ paymentId: "pi_test" }),
+		});
 	});
 
 	it("does not warn when the write touched a row", async () => {
@@ -140,10 +140,10 @@ describe("handlePaymentSucceeded", () => {
 		const { retrieveCharge } = await import("@infrastructure/services/payments/provider/charge");
 		vi.mocked(retrieveCharge).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "stripe error" })) as never);
 		await run(handlePaymentSucceeded(EVENT));
-		expect(mockLogger.error).toHaveBeenCalledExactlyOnceWith(
-			"Failed to retrieve charge details",
-			expect.objectContaining({ reason: "stripe error", chargeId: "ch_test", paymentId: "pi_test" }),
-		);
+		expect(mockLogger.error).toHaveBeenCalledExactlyOnceWith({
+			message: "Failed to retrieve charge details",
+			context: expect.objectContaining({ reason: "stripe error", chargeId: "ch_test", paymentId: "pi_test" }),
+		});
 	});
 
 	it("logs a failing updatePaymentCharge once, as an update failure", async () => {
@@ -152,9 +152,9 @@ describe("handlePaymentSucceeded", () => {
 			Effect.fail(new DatabaseError({ message: "db error" })) as never,
 		);
 		await run(handlePaymentSucceeded(EVENT));
-		expect(mockLogger.error).toHaveBeenCalledExactlyOnceWith(
-			"Failed to update charge details",
-			expect.objectContaining({ reason: "db error", paymentId: "pi_test", chargeId: "ch_test" }),
-		);
+		expect(mockLogger.error).toHaveBeenCalledExactlyOnceWith({
+			message: "Failed to update charge details",
+			context: expect.objectContaining({ reason: "db error", paymentId: "pi_test", chargeId: "ch_test" }),
+		});
 	});
 });

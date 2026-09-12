@@ -1,7 +1,7 @@
 import { TursoService } from "@infrastructure/clients/db/turso/service";
 import { ResendService } from "@infrastructure/clients/email/resend/service";
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import { DuplicateContactError, EmailError, ValidationError } from "@infrastructure/errors";
+import { LoggerService } from "@infrastructure/logging/service";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { sendContactEmail } from "./contact";
@@ -24,7 +24,7 @@ vi.mock("@react-email/render", () => ({
 	render: vi.fn().mockResolvedValue("<html>email</html>"),
 }));
 
-const mockLogger = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
+const mockLogger = { info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
 const mockSend = vi.fn(() => Effect.succeed({ messageId: "msg_123" }));
 const TestLayer = Layer.mergeAll(
 	Layer.succeed(LoggerService, mockLogger),
