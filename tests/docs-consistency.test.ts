@@ -2432,4 +2432,44 @@ describe("the release configs parse the commit grammar commitlint accepts", () =
 		expect(configs.length).toBeGreaterThan(1);
 		expect(wrong).toEqual([]);
 	});
+
+	// A release commit that omits `[skip ci]` starts the run that cuts the next release, and a scope the
+	// workspace does not name is the one commit on main commitlint never sees, because the hook runs on a
+	// branch and `commit-message.yml` reads the pull request title. The shape is `chore(<package>): release
+	// <version> [skip ci]` in a monorepo, which this is; the single-package siblings drop the package and say
+	// `chore(release): <version> [skip ci]`.
+	const gitMessages = () =>
+		configs
+			.map((file) => {
+				const { plugins } = readJson(file) as { plugins: ReleasePlugin[] };
+				const entry = plugins.find(
+					(plugin) => (Array.isArray(plugin) ? plugin[0] : plugin) === "@semantic-release/git",
+				);
+
+				return { file, app: file.split("/")[1] ?? "", message: Array.isArray(entry) ? String(entry[1]?.message) : "" };
+			})
+			.filter(({ message }) => message !== "");
+
+	// `ci.yml` and `docs.yml` release independently and can run at the same time, so exactly one of them may
+	// push to `main`; the other cuts a tag and a GitHub release and writes nothing. That is why `apps/docs`
+	// carries no changelog, npm or git plugin, and the guide says so. A second pusher is a race, not a
+	// missing feature, which is what makes this an assertion rather than a gap to fill.
+	it("lets exactly one package push a release commit to main", () => {
+		expect(configs.length).toBeGreaterThan(1);
+		expect(gitMessages().map(({ app }) => app)).toEqual(["web"]);
+	});
+
+	// A release commit that omits `[skip ci]` starts the run that cuts the next release, and the scope is the
+	// one commit on main commitlint never sees, because the hook runs on a branch and `commit-message.yml`
+	// reads the pull request title. The shape is `chore(<package>): release <version> [skip ci]` in a
+	// monorepo; the single-package siblings drop the package and say `chore(release): <version> [skip ci]`.
+	it("commits the release under its own package's scope, and tells CI to leave it alone", () => {
+		const wrong = gitMessages().filter(
+			({ app, message }) =>
+				!message.startsWith(`chore(${app}): release \${nextRelease.version}`) || !message.includes("[skip ci]"),
+		);
+
+		expect(gitMessages().length).toBeGreaterThan(0);
+		expect(wrong).toEqual([]);
+	});
 });

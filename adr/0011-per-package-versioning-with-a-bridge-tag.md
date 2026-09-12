@@ -29,7 +29,7 @@ Each package runs its own semantic-release through `semantic-release-monorepo`, 
 
 `tagFormat` is stated explicitly in both. Left out, `semantic-release-monorepo` derives it from the package name and would produce `forever-pto-v${version}`, and `tagFormat` is used both to *find* the previous release and to write the new one, so the derived form would not match the history.
 
-`apps/docs` deliberately runs **no** changelog, npm or git plugin. It pushes nothing to `main`, which is what stops the release jobs racing each other for the branch rather than relying on the shared concurrency group alone. Its own version stays `0.0.0` permanently and nothing reads it: the docs site displays the **app's** version, read from [`apps/web/package.json`](../apps/web/package.json) at build time.
+`apps/docs` deliberately runs **no** changelog, npm or git plugin. It pushes nothing to `main`, which is what stops the release jobs racing each other for the branch rather than relying on the shared concurrency group alone. [`tests/docs-consistency.test.ts`](../tests/docs-consistency.test.ts) asserts that exactly one package carries `@semantic-release/git`, so adding the changelog to `apps/docs` to make the two packages symmetrical fails the suite with the reason rather than shipping the race. Its own version stays `0.0.0` permanently and nothing reads it: the docs site displays the **app's** version, read from [`apps/web/package.json`](../apps/web/package.json) at build time.
 
 **Bridge tags** are created in the new format on the same commits as the existing plain `v*` tags of the same numbers, so the new format finds the existing history. They are on the remote, and the repository guide lists which they are. The historical plain `v*` tags are left in place, untouched.
 
