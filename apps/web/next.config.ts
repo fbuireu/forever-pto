@@ -48,7 +48,7 @@ const CSP = [
 	"style-src 'self' 'unsafe-inline'",
 	"img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com https://*.stripe.com",
 	"font-src 'self'",
-	"connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://www.googletagmanager.com https://stats.g.doubleclick.net https://www.google.com/ads/ https://api.stripe.com https://r.stripe.com https://q.stripe.com https://m.stripe.com https://betterstack.net https://in.logtail.com https://telemetry.betterstack.com https://*.betterstackdata.com",
+	"connect-src 'self' https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://www.googletagmanager.com https://stats.g.doubleclick.net https://www.google.com/ads/ https://api.stripe.com https://r.stripe.com https://q.stripe.com https://m.stripe.com https://betterstack.net https://*.betterstackdata.com",
 	"frame-src https://js.stripe.com https://hooks.stripe.com",
 	"frame-ancestors 'none'",
 	"base-uri 'self'",
