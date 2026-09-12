@@ -96,9 +96,13 @@ read), and `0` plus a `try/catch` in the last that the others lacked.
 `getCurrencySymbol` had **no production caller** at all, only its own tests: another instance in this
 codebase of a function kept alive by its test suite. It is gone.
 
-`getCurrencyForLocale` also stopped round-tripping through `resolvedOptions().currency`. It always constructed
-the formatter with `DEFAULT_CURRENCY`, so that read could only ever answer `'EUR'`, an elaborate way to
-return a constant beside a localised glyph.
+`getCurrencyForLocale` is gone too, and it had the same shape of defect before it went: it round-tripped
+through `resolvedOptions().currency` on a formatter it had just constructed with `DEFAULT_CURRENCY`, so that
+read could only ever answer `'EUR'`, an elaborate way to return a constant beside a localised glyph. What
+consumed it was the store derivation deleted along with `CurrencySync`, which
+[`application/stores/CLAUDE.md`](../application/stores/CLAUDE.md) records. So the module exports
+`amountFormatter` over the one cache, `useCurrencyFormatter` below it, and the two currency constants, and
+nothing else.
 
 **The cache is keyed on locale alone, because there is one formatter shape.** It was keyed on locale,
 currency and fraction digits, with a paragraph here calling the third component load-bearing because it kept

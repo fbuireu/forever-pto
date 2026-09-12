@@ -31,9 +31,7 @@ failure channel onto a status code. Business logic that lands here is in the wro
 
 1. Lets a direct `/api/markdown` request through, and **overwrites the path header** on the way; see below.
    The branch is not decoration: without it a direct hit carrying `Accept: text/markdown` would match the
-   next rule and rewrite the route onto itself. This file used to say the branch existed "only to attach
-   `Cache-Control` and `Vary: Accept`", which was both its least important effect and the one that turned out
-   to be wrong.
+   next rule and rewrite the route onto itself.
 2. Rewrites any request carrying `Accept: text/markdown` to `/api/markdown`, passing the pathname in an
    `x-markdown-path` **request header**, so every HTML URL has a Markdown twin without a second route
    existing. **The Markdown twin reads `SITE_ROUTES`, the same
@@ -221,8 +219,7 @@ becomes the only thing that decides. Nothing can now pass `{ route: '/legal/priv
 because there is nothing to pass. Making `route` required closed the other half: it was optional, so a route
 could omit it and get `canonical: localePath(locale, undefined)` (`'/'`), and the marketing page *did*,
 carrying an unused `HOME_PATH` const while canonicalising through the fallback. It read correctly only
-because the homepage's canonical happens to be `/`. The guide used to say "passing `path` is what prevents
-it"; the type says it now.
+because the homepage's canonical happens to be `/`.
 
 The `keywords` gate is new in the code and old in this file: the rule was written here and the
 implementation spread `...(keywords && { keywords })` ungated. It held only because no caller passed keywords
@@ -336,7 +333,7 @@ guards:
   anyone holding a leaked payment intent id could mint a session. The length check is not tidiness:
   `charCodeAt` past the end returns `NaN`, `NaN | 0` is `0`, so a length-blind loop accepts any prefix.
 
-  This paragraph used to be a claim about the route rather than about the use-case. One function served
+  One function served
   both activation paths with `expectedEmail?` **and** `clientSecret?` optional, and its body read
   `if (clientSecret && !matchesClientSecret(...))`: omit the field and the guard did not run. Neither
   call site did omit it, but nothing said they could not, and half the use-case's own tests called it with
@@ -535,7 +532,7 @@ emitted on the planner, which has no FAQ on it at all.
 The Premium offer states a `priceSpecification` with a `minPrice`, not a fixed price. Premium is unlocked by
 a Donation the payer chooses ([`src/application/dto/payment/schema.ts`](../application/dto/payment/schema.ts) accepts 1 to 10000), so the fixed
 4.99 it used to advertise was simply untrue. `MINIMUM_DONATION` reads `AMOUNT_MIN` out of that schema now, so
-they cannot drift; this sentence used to ask the reader to move them together by hand.
+they cannot drift.
 
 ## Fonts
 

@@ -144,8 +144,7 @@ recompute it.** `isInPlanningWindow` the predicate is called by `create` and `cr
 holidays store, which preserves Custom Holidays verbatim through a `fetchHolidays` and would otherwise keep
 the flag from the year they were created in.
 
-**The reason to recompute it is display, not Bridge anchoring, and this paragraph said otherwise for a long
-time.** It claimed "only a flagged Holiday can anchor a Bridge", which the engine falsifies: `createHolidaySet`
+**The reason to recompute it is display, not Bridge anchoring.** It claimed "only a flagged Holiday can anchor a Bridge", which the engine falsifies: `createHolidaySet`
 applies no window filter, and no code under `@domain/calendar/` reads the flag at all. The one write is
 `runPlanningPipeline` stamping `true` on each `manual-N` pseudo-Holiday.
 [`../../domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md) states the opposite, correctly, under
@@ -199,7 +198,7 @@ hand-written strings said "Maximum amount is 10,000": one per bound per locale, 
 separator (`10.000`, `10 000`, `10,000`). Raising the cap made every bundle lie. The keys are
 `{max, number}` now, so ICU does the grouping per locale and the number comes from the schema.
 [`JsonLd.tsx`](../../ui/modules/shared/seo/JsonLd.tsx)'s `MINIMUM_DONATION` reads `AMOUNT_MIN` for the same reason: the structured data advertises a
-`minPrice`, and the app guide used to say they "move together" as an instruction to the reader.
+`minPrice`.
 
 **There is one `calculateFinalAmount` now, and it is the private one in `@infrastructure/services/payments/provider/promoCode` that actually applies a Stripe coupon.** This folder used to export a second function of the same name whose whole body was `discountInfo?.finalAmount ?? baseAmount`: one caller, its own tests, and a paragraph here whose only job was to stop a reader confusing it with the one that does the work. [`Donate.tsx`](../../ui/modules/shared/donate/Donate.tsx) reads the field directly.
 

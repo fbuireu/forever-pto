@@ -310,29 +310,33 @@ Passing the secret explicitly in the caller's `secrets:` block does not rescue i
 declare an `environment:`, so `${{ secrets.CLOUDFLARE_API_TOKEN }}` there resolves against repository
 secrets only. The value that works on `main` comes from the *callee* job's own `environment: production`.
 
-**Every environment carries what its jobs read, and this guide said otherwise for a week.** The Cloudflare token and account id are on every one of them, `CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET` are on `web-development`, and the evidence is the runs rather than a settings page nobody can read from outside: `deploy-development` and `e2e` succeed on pull requests, and `deploy-production` shipped 1.9.7. The `docs-*` pair needs no Access secret, because nothing in `docs.yml` requests the docs preview: its `PREVIEW_URL` is only written into the pull request comment, and the docs Playwright suite runs against a local preview in `build`. This paragraph used to be an *Outstanding* item saying the secrets were missing; a claim like that is the kind to re-check against a run rather than copy forward.
+**Every environment carries what its jobs read.** The Cloudflare token and account id are on all four;
+`CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET` are on `web-development`; the runtime secrets
+(`JWT_SECRET`, `RESEND_API_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `TURSO_AUTH_TOKEN`) and the
+`NEXT_PUBLIC_*` vars are on both `web-*`. The `docs-*` pair needs none of those, only the Cloudflare ones,
+because nothing in `docs.yml` requests the docs preview: its `PREVIEW_URL` is only written into the pull
+request comment, and the docs Playwright suite runs against a local preview in `build`. The evidence for all
+of it is the runs rather than a settings page nobody can read from outside, which is the only way to check a
+claim like this.
 
-**The docs preview needs an Access destination even though it needs no secret, and it was missing one.** The
-Access application matches `pr-*-forever-pto-development`; the docs preview is
-`pr-*-forever-pto-docs-development`, which that pattern does not match, so every docs preview was publicly
-reachable. That is worse than it sounds, because [`apps/docs/public/robots.txt`](./apps/docs/public/robots.txt)
-says `Allow: /` and advertises the **production** sitemap, so each preview invited crawlers to index a
-duplicate of `docs.forever-pto.com`. The published wiki asserted the opposite, *every PR preview sits behind
-Zero Trust Access, which is why nothing crawls a preview*, and that sentence is what made the gap findable.
-The fix is a second destination on the same Access application, so the docs preview inherits the `Allow` and
-`Service Auth` policies already on it. It cannot be fixed in this tree: `build` produces one `docs-dist`
-artifact that both `preview` and `deploy` ship, the docs build reads no environment variable, and
-`apps/docs` serves static assets with no Worker, so there is no build-time switch and no per-environment
-header to fall back on.
+**Ruleset `main` requires `Check`, `Check (docs)`, `zizmor`, `Lint the pull request title` and
+`Dependency Review`**, the set every sibling names plus the docs aggregate this one has because it deploys
+two sites. `zizmor` is the check run the action publishes through code scanning, not the `Run zizmor` job:
+the job passes whatever it finds, and only the code-scanning check turns red on a finding. There is no
+approval requirement and no `required_deployments` rule. Two settings outside that ruleset complete it:
+`release-tags`, which forbids deleting or moving any `web-v*` or `docs-v*` tag (semantic-release creates them
+with the owner's `PAT`, which passes the admin bypass), and a deployment-branch policy of `main` only on
+`web-production` and `docs-production`, so a job naming either from another ref fails before its first step.
 
-Already true, and this list said otherwise:
-
-- Every one of those environments exists.
-- The runtime secrets (`JWT_SECRET`, `RESEND_API_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
-  `TURSO_AUTH_TOKEN`) are on both `web-*`. The `docs-*` pair needs none of them, only the Cloudflare ones.
-- The `NEXT_PUBLIC_*` vars are on both `web-*`.
-- There is **no `required_deployments` rule** on ruleset `main`, so there is nothing to repoint. Its
-  `required_status_checks` are `Check`, `Check (docs)`, `zizmor`, `Lint the pull request title` and `Dependency Review`, the same set every sibling repository names, plus the docs aggregate this one has because it deploys both sites. `zizmor` is the check run the action publishes through code scanning, not the `Run zizmor` job: the job passes whatever it finds, and only the code-scanning check turns red on a finding. No approval is required, which is why `renovate-auto-approve.yml` is gone: the owner is the only reviewer, the checks are the gate, and Renovate merges through the platform once they are green. Settings outside that ruleset complete it: `release-tags`, a tag ruleset that forbids deleting or moving any `web-v*` or `docs-v*` tag (semantic-release creates them with the owner's `PAT`, which passes the admin bypass), and a deployment-branch policy of `main` only on `web-production` and `docs-production`, so a job naming either environment from any other ref fails before its first step.
+**The docs preview needs an Access destination and does not have one.** The Access application matches
+`pr-*-forever-pto-development`; the docs preview is `pr-*-forever-pto-docs-development`, which that pattern
+does not match, so every docs preview is publicly reachable. That is worse than it sounds, because
+[`apps/docs/public/robots.txt`](./apps/docs/public/robots.txt) says `Allow: /` and advertises the
+**production** sitemap, so each preview invites crawlers to index a duplicate of `docs.forever-pto.com`. The
+fix is a second destination on the same Access application, inheriting the `Allow` and `Service Auth`
+policies already there. It cannot be fixed in this tree: `build` produces one `docs-dist` artifact that both
+`preview` and `deploy` ship, the docs build reads no environment variable, and `apps/docs` serves static
+assets with no Worker, so there is no build-time switch and no per-environment header to fall back on.
 
 **`E2E (preview)` gates a merge through `Check`, and for a month it did not, which is the hole separate incidents came through.** It is what
 catches the Cloudflare Error 1101 the Next pin exists to prevent, and Renovate auto-merged 16.3.1 straight
@@ -341,20 +345,19 @@ makes this check the missing half of [ADR 0009](./adr/0009-next-16-2-pinned-by-t
 rather than a nicety. It cannot be named in the ruleset directly: every job in `ci.yml` is conditional on the event, and a required check that never reports blocks the merge forever. So `check` is an aggregate under `always()` that needs `verify`, both deploys, `e2e`, `smoke` and `release-web`, fails when any of them failed or was cancelled, and counts a skipped one as success. `docs.yml` has the same shape as `Check (docs)`, over its own `changes`, `build`, `preview`, `deploy`, `smoke` and `release-docs`, which is what made the docs pipeline requireable at all: a path-filtered workflow never reports on a pull request outside its paths, so `docs.yml` carries no `paths:` any more and its `changes` job gates `build` on the same list, `DOCS_PATHS`, instead. **The suite has to be green to hold that power**, and its one flaky case was environmental: the per-request `/_not-found` route on a preview Worker that had never been hit timed out at 30 s. [`apps/web/e2e/warm-up.ts`](./apps/web/e2e/warm-up.ts) is Playwright's `globalSetup`: with `BASE_URL` set it requests the homepage and one unknown path once, with a long timeout, before any worker starts, so the first render a spec sees is not the Worker's first ever.
 
 **There is no `deploy-tail` job and no tail consumer Worker.** Logs leave the platform through
-`[observability.logs].destinations` now, which is [ADR 0017](./adr/0017-observability-is-the-platform-export.md);
-the job, `TAIL_PATHS` and the `tail` output of `changes` went with the Worker. What that job taught is worth
-keeping, because the next Worker built out of this tree will hit it: a deploy gated on a path filter has to be
-gated on **every** file its bundle is built from, not on its own folder, and *workers/tail/index.ts* imported
-the log-level contract out of `apps/web/src/infrastructure/clients/logging/` while the filter named only its
-own directory, so editing the contract redeployed the app and left that Worker running the previous bundled
-copy. Its own unit test read the source module, so nothing could see the split. `ci.yml` still answers
-`workflow_dispatch`, and a manual dispatch on `main` is the credential-rotation path: it runs
-`deploy-production` with `smoke` behind it, because every credential is read at build or deploy time (the
-Worker secrets ride `--secrets-file`, the public variables are inlined by the build), so rotating any of
-them changes no file, matches no path filter, and used to leave the old value live until an unrelated commit
-came along. The BetterStack credentials are no longer among them: the endpoint and token live on the
-Cloudflare destination, so reissuing that source needs no deploy at all. `release-web` stays push-gated: a
-dispatch redeploys the same sha and there is nothing to version. The push-triggered gates are unchanged.
+`[observability.logs].destinations`, which is [ADR 0017](./adr/0017-observability-is-the-platform-export.md);
+the job, `TAIL_PATHS` and the `tail` output of `changes` went with the Worker. One lesson outlives it, and the
+next Worker built out of this tree will hit it: **a deploy gated on a path filter has to be gated on every file
+its bundle is built from**, not on its own folder. That Worker imported the log-level contract out of the app
+and the filter named only its own directory, so editing the contract redeployed the app and left the Worker
+running the previous bundle, invisibly, because its unit test read the source module rather than the bundle.
+
+**A manual dispatch of `ci.yml` on `main` is the credential-rotation path.** It runs `deploy-production` with
+`smoke` behind it, because every credential is read at build or deploy time (the Worker secrets ride
+`--secrets-file`, the public variables are inlined by the build), so rotating one changes no file and would
+otherwise leave the old value live until an unrelated commit came along. The BetterStack credentials are not
+among them: endpoint and token live on the Cloudflare destination, so reissuing that source needs no deploy.
+`release-web` stays push-gated, since a dispatch redeploys the same sha and there is nothing to version.
 
 **`smoke` is the only job that ever touches production, and until this branch there was none.** `e2e` needs
 `deploy-development`, which runs on `pull_request` only, so a push to `main` deployed production, cut a tag
@@ -443,14 +446,12 @@ and impossible for one that talks to a deployed site. With `BASE_URL` set it ski
 changelogs, because attribution is by path and `main` takes squash merges. Sometimes that is what you
 want, so the job posts a sticky comment saying what will happen and does not fail the run.
 
-**No deploy step hands the Worker a BetterStack credential any more.** `_deploy-web.yml` used to put
-`BETTER_STACK_SOURCE_TOKEN` in `--secrets-file` and pass `--var BETTER_STACK_INGESTING_URL`, both read only by
-the tracing wrapper that [ADR 0017](./adr/0017-observability-is-the-platform-export.md) deleted. The
-`NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN` the **build** step inlines stays: the browser tracking snippet
-reads it, and it is the last of that family, since the logger reads nothing. The failure this closes is worth naming, because it cost a silent outage once: the
-host lived in one place and the token in another, so reissuing the BetterStack source moved the app and left
-the tail Worker posting into a dead endpoint. There is one place now, and it is a Cloudflare setting rather
-than a file.
+**No deploy step hands the Worker a BetterStack credential.** The only one left in the tree is
+`NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN`, which the **build** step inlines for the browser tracking snippet;
+the logger reads none. The rest went with the tracing wrapper
+[ADR 0017](./adr/0017-observability-is-the-platform-export.md) deleted, and the reason to keep it that way is
+that splitting the host from the token across two places cost a silent outage: reissuing the source moved one
+and left the other posting into a dead endpoint. Both are one Cloudflare setting now rather than a file.
 
 **`cleanup-development.yml` queues each of its jobs behind the workflow that deployed the Worker that job deletes, which is what stops it deleting a Worker
 that is still under test.** It fires on `pull_request: closed`, and closing a pull request does not cancel
@@ -467,13 +468,12 @@ silently unqueues the cleanup and the race comes back, which is why `tests/docs-
 substitutes each deploying workflow's own `name:` into its group expression, replaces its `github.ref` with the pull request's merge ref, and compares the result with the
 literal the matching cleanup job hardcodes. A third job, `sweep`, runs weekly and on dispatch: it lists the account's Workers through the Cloudflare API, keeps every `pr-<n>-forever-pto-development` and `pr-<n>-forever-pto-docs-development` whose pull request is still open, and deletes the rest, so a cleanup lost to a token or an outage does not leave a Worker behind for good.
 
-**The group is per job, and it used to be per workflow, which queued `cleanup-docs` behind the wrong thing.**
-A workflow-level `concurrency` covers every job in the run, so one group meant both deletes waited on `CI`.
-But the Worker `cleanup-docs` deletes is deployed by the `preview` job in `docs.yml`, whose group is
-`docs-${{ github.ref }}`, and nothing in `ci.yml` touches it: the docs preview could be deleted while its own
-workflow was still using it, and `ci.yml` finishing was not evidence that it had stopped. `cleanup-web` keeps
-`CI-…` and `cleanup-docs` takes `docs-…`, each on its own job and each spelled from the pull request number. This is also why the paragraph above no longer
-says `cleanup-docs` rides along harmlessly: it did not, it rode along behind an unrelated run.
+**The group is per job, not per workflow, because the two deletes wait on different runs.** A workflow-level
+`concurrency` covers every job in the run, so one group made both deletes wait on `CI`, and the Worker
+`cleanup-docs` deletes is deployed by `docs.yml`'s `preview` job, group `docs-${{ github.ref }}`, which
+nothing in `ci.yml` touches. `ci.yml` finishing was no evidence the docs preview had stopped being used.
+`cleanup-web` keeps `CI-…`, `cleanup-docs` takes `docs-…`, each on its own job and each spelled from the pull
+request number.
 
 **`docs-refresh` exists because the release commit carries `[skip ci]`.** The docs site renders the app
 version from `apps/web/package.json`; without a dispatch after a web release, the published site keeps
@@ -552,99 +552,32 @@ promise, not a fix.
 | A decision an ADR records | that ADR: amend it, or supersede it and say so in both `## Status` blocks |
 
 [`tests/docs-consistency.test.ts`](./tests/docs-consistency.test.ts) makes the mechanical half of that
-contract executable. It runs with `pnpm test:ut` (so, in CI on every PR) and asserts: that `CONTEXT.md`
-exists only at the root, is linked from here, and stays a glossary: no backticked token holding a path, a
-call signature or a source-file name, every term defined, no empty `_Avoid_` list, no term listing itself as
-its own alternative; that the workspace globs resolve, both packages are members with their own manifests,
-the root stays private and dependency-free at `0.0.0`, neither package carries its own Biome config or
-lockfile, and every literal path Biome's `files.includes` excludes still resolves; that every layer root has a `CLAUDE.md`, that both package guides exist and are listed here, and
-that every guide under [`apps/web/src`](./apps/web/src) is listed in the web package's own table; that ADRs are named
-`NNNN-slug.md`, numbered contiguously from `0001`, carry the template's sections, and are each linked from
-some document **outside** `adr/` (an ADR nothing points at will not be read), and that an ADR names back
-every document which ties the word *amend* to it, because twice in one audit a nested guide recorded a
-change and the ADR it amends did not (the guide was right and the ADR was wrong, which is the worse
-direction, since the ADR is what the next agent is told not to re-litigate); that every relative markdown
-link resolves **and points at what it names**, the second half being a table row that names one package and
-then links the root twin of a file that package has its own copy of, which is how ADR 0011's release row
-came to cite the root manifest in the app's row while a resolver passed it; every `.ts`/`.tsx` file named in backticks still exists, no document cites a nested
-`CONTEXT.md`, and every symbol the published wiki's `tsx` fences import from `@ui/…` is still exported by the
-module they name; that last one is the largest slice of the cross-package seam and had nothing checking it,
-because `astro check` registers no MDX plugin and the citation rules match paths rather than symbols; that
-every script this file
-documents exists in the root manifest, every script the web guide documents exists in one of them, every
-`pnpm --filter <pkg> <script>` citation resolves against the manifest of the package it names, and every bare
-script a workflow runs exists in one of the manifests. One parser reads every spelling of the package
-flag (`--filter`, `-F`, `--dir`, `-C`, with the value attached by a space or an `=`), because a short-flag call with
-a mistyped script name used to be invisible to both rules at once: the bare pattern met a `-` where it wanted a
-letter and yielded nothing, the filtered one wanted the literal `--filter`, and `docs.yml`, whose own historical
-`check` citation against a docs manifest that has never had that script is why the rule exists, reached it citing
-nothing and asserted `[]` against `[]`. Each workflow's `pnpm` calls are counted against the ones the parser read, so the next spelling
-nobody anticipated fails loudly instead of emptying the list; that every backticked constant the published
-wiki names **in prose** exists somewhere in `apps/web`, fenced blocks excluded, since a fence is the app's own
-code quoted verbatim; that the `@ui` seam target is declared once, in
-[`apps/docs/tsconfig.json`](./apps/docs/tsconfig.json), with the vite alias deriving from it rather than
-restating it; that every relative `@import` and `@source` in any `.css` the docs package tracks, and in any `<style>` block of
-an `.astro` file under it, resolves to a path that exists, which nothing did before: `astro check` does not read CSS,
-a renamed `@import` target fails only
-`astro build` and a renamed `@source` target fails nothing at all, leaving the demos unstyled on a green build.
-The scope was [`apps/docs/src/styles`](./apps/docs/src/styles), which is one file, and a component's scoped
-`<style>` is CSS the same rule has to reach; that
-every font variable [`apps/web/src/app/fonts.ts`](./apps/web/src/app/fonts.ts) registers is declared in the docs
-stylesheet's `:root`, since the app's role tokens point at those names and there is no Next in the wiki to inject them;
-that every design token the wiki's swatches name is still declared, counting the bare strings in a `tokens={[…]}` array
-and the docs' own visualiser components rather than only `var(--x)` in prose, with a floor on both sides so an emptied
-citation set cannot pass it vacuously. `.astro` components count too, with the `--sl-*` vendor prefix carved out rather
-than the extension: excluding `.astro` wholesale to keep Starlight's own tokens quiet also hid every token in one that
-is ours, and a typo renders transparent, which reads as a pale colour rather than an error; that no locale override under
-[`apps/docs/src/content/i18n`](./apps/docs/src/content/i18n) restates the Starlight bundle it overrides byte for byte,
-and separately that `search.ctrlKey`, if it is overridden at all, is a modifier on its own: the byte-for-byte rule is
-named for that key and cannot see it, because the defect was `Ctrl K` against a vendor `Ctrl` and those are not equal.
-Starlight renders the value in a `<kbd>` of its own beside a literal `<kbd>K</kbd>`, and the suite reads that markup
-first so the rule fails loudly if upstream stops appending the K;
-that the wiki's prose uses the canonical name rather than a retired one, with a compound allowed to pluralise on
-**either** word: `day off` plus an optional trailing `s` matches `day offs`, which nobody writes, and missed
-`days off`, which the wiki wrote across several pages while the rule reported nothing;
-that [`apps/web/tsconfig.json`](./apps/web/tsconfig.json) keeps the settings `next build` would otherwise fill in for it (`strict`
-on and `allowJs` off), that it sits beside the [`next.config.ts`](./apps/web/next.config.ts) that rewrites it, and that
-`cloudflare-env.d.ts` stays both excluded from the program and ignored by git, and that
-[`apps/web/environment.d.ts`](./apps/web/environment.d.ts) references no identifier it does not import:
-`skipLibCheck` is on and that file is a `.d.ts`, so `pnpm typecheck` reads no name inside it; that every
-`'use client'`, `'use server'` and `'use cache'` under either package's `src/` is a bare string literal in
-first position; that `PUBLIC_ENV` in [`apps/web/next.config.ts`](./apps/web/next.config.ts), imported rather
-than regexed out of the source, classifies exactly the `NEXT_PUBLIC_*` names
-[`apps/web/environment.d.ts`](./apps/web/environment.d.ts) declares, in both directions, and that each one is
-wired where it is actually read: one carrying a zod schema in the build step's `env:`, one carrying the
-`RUNTIME_ONLY` sentinel in `wrangler.toml`'s `[vars]`, since those are read off `CloudflareEnv` and
-never reach the client bundle;
-that `typescript` is pinned **exactly** in every manifest, that the root and `apps/web` carry the *same*
-pin and that `apps/docs` stays on a `6.` line, spelled out to the patch, so a `rangeStrategy` flip to `^7.0.2` in
-every manifest at once fails rather than passing as "equal", and a docs package quietly dragged onto 7 fails
-too, since that is what breaks `astro check`. The rule asked for one version across every manifest until
-`astro check` made that impossible; that
-[`apps/web/next.config.ts`](./apps/web/next.config.ts)'s own `headers()` (imported and awaited, not regexed
-out of the source) returns exactly one rule, for `/(.*)`, carrying every security header **with its
-value**: a year of HSTS with `includeSubDomains`, `X-Frame-Options` refusing the frame, `nosniff`, and
-`frame-ancestors 'none'`, `object-src 'none'` and `base-uri 'self'` in the CSP, the ones whose absence is
-invisible in a browser, and that the policy names no Google font host, because `next/font/google` downloads
-and self-hosts at build time so the allowances that named them were dead, and the whole policy sits
-outside `src/` where the co-located-test convention does not reach it; that every binding `CloudflareEnv` declares is present
-in **each** of `wrangler.toml`'s environments, that each named environment declares every binding
-*kind* the top level declares, that `[assets]` and `[placement]` are declared once and `[observability]`
-reads identically wherever it is restated, and that the payment rate limiter is identically bounded in all
-of them; that no
-deploy step, no build step and no `wrangler secret` step in any workflow is wrapped in `nick-fields/retry`, counted rather
-than named one file at a time. The secret rule carries **no floor**, unlike the others: both secret writes are folded into
-their deploy as `--secrets-file` now, so the corpus it reads is empty, and a floor of one would fail on exactly the state the
-repository is trying to hold. Both censuses count the job rather than one spelling of it: a deploy also arrives as
-`cloudflare/wrangler-action`'s `command: deploy` input and as a script name that resolves to one (`apps/docs`'s
-`deploy` is `astro build && wrangler deploy`), and a build as `pnpm exec astro build`, `npx next build`, or a
-`build` script reached through the short `-F` flag. The deploy census missed half of this repo's deploys against a floor the visible ones already met, so half the corpus satisfied
-it and the other half was unguarded;
-that every workflow file is **linked** from this guide and carries its own `##` section in the wiki, the link rather
-than a bare mention, since `ci.yml` is named throughout here and one incidental mention used to be enough;
-that the cleanup workflow's concurrency
-group still equals `ci.yml`'s with its `name:` substituted in and the pull request's merge ref in place of `github.ref`, and that each of `ci.yml` and `docs.yml` aggregates its gated jobs, the preview E2E among them, under a `Check` job;
-and that every locale bundle has exactly the keys [`en.json`](./apps/web/src/ui/i18n/messages/en.json) has and shouts nothing outside a named acronym allow-list. Key parity compares key *sets*, so it can see neither a value that drifted nor one written in capitals; the allow-list is itself asserted to hold only names the bundles still use.
+contract executable. It runs with `pnpm test:ut`, so in CI on every pull request, and alone with
+`pnpm test:docs`. **The rules are named in the test and the reason each exists is the comment above it**, so
+this table is the map rather than a second copy: when one fails, read it there.
+
+| Subject | What is held |
+| --- | --- |
+| [`CONTEXT.md`](./CONTEXT.md) | Root only, linked from here, and still a glossary: no backticked path, signature or filename, every term defined, no empty `_Avoid_` list, no self-referential alternative |
+| The workspace | Globs resolve, both packages are members with their own manifests, the root stays private and dependency-free at `0.0.0`, neither package carries its own Biome config or lockfile, and Biome's excluded paths all resolve |
+| The guides | Every layer root has a `CLAUDE.md`, and every guide is listed where it belongs: the package guides here, the `apps/web/src` ones in the web table |
+| The ADRs | Template shape, contiguous numbering from `0001`, a link from outside `adr/`, and a named-back reference from any document that ties the word *amend* to one |
+| Citations | Every relative link resolves *and points at what it names*; every cited `.ts`/`.tsx` exists; no document cites a nested `CONTEXT.md` |
+| The cross-package seam | Every `@ui/…` symbol the wiki's fences import is still exported; the seam target is declared once in [`apps/docs/tsconfig.json`](./apps/docs/tsconfig.json); every relative `@import` and `@source` resolves, in `.css` and in an `.astro` `<style>` alike; every font variable [`fonts.ts`](./apps/web/src/app/fonts.ts) registers is declared in the docs `:root` |
+| Scripts | Every documented script exists in the manifest it is attributed to, over every spelling of the package flag, with each workflow's `pnpm` calls counted against what the parser read |
+| The wiki's prose | Canonical glossary names, with compounds pluralising on either word; every design token and every constant it names still declared, with a floor on both sides so an emptied citation set cannot pass vacuously |
+| The locale bundles | Exactly `en.json`'s keys, nothing shouted outside a named acronym allow-list, no override restating the Starlight bundle, and `search.ctrlKey` a modifier on its own |
+| The app's configuration | `strict` on and `allowJs` off, `cloudflare-env.d.ts` out of the program and out of git, [`environment.d.ts`](./apps/web/environment.d.ts) importing every identifier it names, and every `'use client'` / `'use server'` / `'use cache'` a bare literal in first position |
+| The public env | `PUBLIC_ENV` classifies exactly the `NEXT_PUBLIC_*` names [`environment.d.ts`](./apps/web/environment.d.ts) declares, both directions, each wired where it is read |
+| `typescript` | Pinned exactly in every manifest, the same pin at the root and in `apps/web`, `apps/docs` held to a `6.` line, spelled to the patch so a range flip everywhere at once cannot pass as "equal" |
+| The security headers | [`next.config.ts`](./apps/web/next.config.ts)'s `headers()`, imported and awaited, returns one rule for `/(.*)` carrying every header **with its value**, and names no Google font host |
+| [`wrangler.toml`](./apps/web/wrangler.toml) | Every `CloudflareEnv` binding present in each environment, each environment declaring every binding *kind* the top level does, `[assets]` and `[placement]` once, `[observability]` identical wherever restated, the payment rate limiter identically bounded |
+| The workflows | No deploy, build or `wrangler secret` step wrapped in `nick-fields/retry`, counted by job rather than by spelling; every workflow linked from this guide and sectioned in the wiki; the cleanup group still equal to `ci.yml`'s; both workflows aggregating their gated jobs, preview E2E included, under a `Check` |
+
+Two of those carry a deliberate absence, so do not "fix" them: the secret census has **no floor**, because both
+secret writes are folded into their deploy as `--secrets-file` and the corpus it reads is empty on purpose; and the
+`typescript` split exists because `astro check` cannot run under 7, which is the one thing stopping one version
+across every manifest.
 
 It reads staged *and* unstaged files, so a rule fires before the offending file is committed. **Each rule was
 verified by breaking it and confirming the matching case fails**; keep that property when you add one.

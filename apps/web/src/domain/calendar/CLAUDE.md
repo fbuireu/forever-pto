@@ -493,8 +493,7 @@ nothing, so a block lying wholly outside the window is still dropped.
 `windowMonthIndex` is already `>= 0`, the floor of a non-negative over three cannot be negative; the
 comparison could not fail. Only the upper bound does real work now. The other `>= 0` checks in this file,
 at the top of `getMonthlyDist` and in `calculateQuarterDistribution`, are **live**: those read a raw day, not
-one the `find` has already vetted. This paragraph named `closeBlock` and `currentBlock` for a while, which
-have never existed under `src/`; the rule survived a refactor and the prose did not.
+one the `find` has already vetted.
 
 **Rest Blocks are separated by more than seven days.** Two PTO Days five days apart are one Rest Block even
 with Workdays between them. Long Weekends, Longest Vacation and Long Blocks use a different rule entirely:
@@ -523,8 +522,7 @@ silently, because a stale Holiday set is structurally valid.
 
 **The Holiday set used to be a keyed `Map` with one key.** `createHolidaySet(holidays, cacheKey?)` fell back
 to `'default'`, and that fallback was the only key any production call site ever wrote; the second argument
-existed on the interface, in the type, and in the test cases that were its only callers. This guide stated
-the fact without drawing the conclusion. It is one slot and `clearHolidayCache()` is one assignment, which
+existed on the interface, in the type, and in the test cases that were its only callers. It is one slot and `clearHolidayCache()` is one assignment, which
 reads as what it is: a memo the pipeline resets, not a cache anyone keys into. If a second Holiday list ever
 needs to coexist, the key comes back **with** the caller that needs it.
 
