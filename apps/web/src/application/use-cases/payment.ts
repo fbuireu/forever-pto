@@ -4,9 +4,9 @@ import type { DiscountInfo } from "@application/dto/payment/types";
 import { emailDomain } from "@application/shared/utils/redact";
 import { zodParse } from "@application/shared/utils/zodParse";
 import type { TursoService } from "@infrastructure/clients/db/turso/service";
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import type { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import { PaymentError, type PromoCodeError, type ValidationError } from "@infrastructure/errors";
+import { LoggerService } from "@infrastructure/logging/service";
 import { createPaymentIntent } from "@infrastructure/services/payments/provider/intent";
 import { validatePromoCode } from "@infrastructure/services/payments/provider/promoCode";
 import { savePayment } from "@infrastructure/services/payments/repository";
@@ -62,20 +62,28 @@ export const createPayment = ({
 			Effect.tapError((e) =>
 				Effect.sync(() => {
 					if (e.cause instanceof Stripe.errors.StripeError) {
-						logger.logError("Stripe payment creation error", e.cause, {
-							stripeErrorType: e.cause.type,
-							stripeErrorCode: e.cause.code,
-							amount: params.amount,
-							hasPromoCode: !!params.promoCode,
-							userAgent,
-							ipAddress,
+						logger.logError({
+							message: "Stripe payment creation error",
+							error: e.cause,
+							context: {
+								stripeErrorType: e.cause.type,
+								stripeErrorCode: e.cause.code,
+								amount: params.amount,
+								hasPromoCode: !!params.promoCode,
+								userAgent,
+								ipAddress,
+							},
 						});
 					} else {
-						logger.logError("Unknown payment creation error", e.cause ?? e, {
-							amount: params.amount,
-							hasPromoCode: !!params.promoCode,
-							userAgent,
-							ipAddress,
+						logger.logError({
+							message: "Unknown payment creation error",
+							error: e.cause ?? e,
+							context: {
+								amount: params.amount,
+								hasPromoCode: !!params.promoCode,
+								userAgent,
+								ipAddress,
+							},
 						});
 					}
 				}),
@@ -100,10 +108,13 @@ export const createPayment = ({
 			).pipe(
 				Effect.catchAll((e) =>
 					Effect.sync(() => {
-						logger.warn("Failed to save payment to database, will use webhook fallback", {
-							reason: e.message,
-							paymentIntentId: paymentIntent.id,
-							emailDomain: emailDomain(validated.email),
+						logger.warn({
+							message: "Failed to save payment to database, will use webhook fallback",
+							context: {
+								reason: e.message,
+								paymentIntentId: paymentIntent.id,
+								emailDomain: emailDomain(validated.email),
+							},
 						});
 					}),
 				),

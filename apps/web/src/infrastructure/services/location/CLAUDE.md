@@ -80,7 +80,7 @@ strategy must not be able to forget it.
 
 **Effect is used here but never escapes.** Both async strategies are `Effect.gen` programs terminated inside
 their own wrapper with `Effect.runPromise`, because the proxy has no `ApplicationLayer` to provide. For
-the same reason logging goes through the `getBetterStackInstance()` singleton rather than `LoggerService`,
+the same reason logging goes through the `logger` import rather than `LoggerService`,
 the documented logging exception in
 [ADR 0002](../../../../../../adr/0002-effect-for-external-service-boundaries.md).
 

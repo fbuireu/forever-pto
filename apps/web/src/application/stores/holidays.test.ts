@@ -22,8 +22,8 @@ vi.mock("@domain/calendar/pipeline", () => ({
 
 const { mockLogError, mockWarn } = vi.hoisted(() => ({ mockLogError: vi.fn(), mockWarn: vi.fn() }));
 
-vi.mock("@infrastructure/clients/logging/better-stack/client", () => ({
-	getBetterStackInstance: vi.fn().mockReturnValue({ logError: mockLogError, warn: mockWarn }),
+vi.mock("@infrastructure/logging/logger", () => ({
+	logger: { logError: mockLogError, warn: mockWarn },
 }));
 
 vi.mock("./crypto", () => ({
@@ -412,7 +412,10 @@ describe("addHoliday", () => {
 
 		expect(mockWarn).not.toHaveBeenCalled();
 		await vi.waitFor(() =>
-			expect(mockWarn).toHaveBeenCalledWith("Holiday already exists on this date", { date: date.toISOString() }),
+			expect(mockWarn).toHaveBeenCalledWith({
+				message: "Holiday already exists on this date",
+				context: { date: date.toISOString() },
+			}),
 		);
 	});
 
@@ -854,10 +857,14 @@ describe("fetchHolidays", () => {
 		await useHolidaysStore.getState().fetchHolidays(FETCH_PARAMS);
 
 		await vi.waitFor(() =>
-			expect(mockLogError).toHaveBeenCalledWith("Error fetching holidays in holidays store", expect.any(Error), {
-				year: 2026,
-				country: "ES",
-				region: "",
+			expect(mockLogError).toHaveBeenCalledWith({
+				message: "Error fetching holidays in holidays store",
+				error: expect.any(Error),
+				context: {
+					year: 2026,
+					country: "ES",
+					region: "",
+				},
 			}),
 		);
 	});

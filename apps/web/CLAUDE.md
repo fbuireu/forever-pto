@@ -377,8 +377,8 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
 - **The bounded contexts under [`src/domain/`](./src/domain) follow different rules.** `calendar/` is pure because it runs
   in a Web Worker; `payment/` composes Effect against infrastructure tags. Neither is lint-enforced.
   [ADR 0003](../../adr/0003-pure-calendar-domain-effectful-payment-domain.md).
-- **Logging is the one external call that does not go through Effect.** BetterStack has both a service tag and
-  a plain singleton, and the singleton is what the stores, lookups and components use.
+- **Logging is the one external call that does not go through Effect.** The logger has both a service tag and
+  a plain module export, `logger`, and the export is what the stores, lookups and components use.
   [ADR 0002](../../adr/0002-effect-for-external-service-boundaries.md).
 - **The Cloudflare context is request-scoped.** Route handlers and server actions may read it; use-cases may
   not, and must receive configuration as plain values.
@@ -411,11 +411,14 @@ them.** `[observability.logs]` and `[observability.traces]` each name a `destina
 one pair per stage, configured in the Cloudflare dashboard with the OTLP
 endpoint and its bearer token. The platform instruments handler invocations, outbound `fetch` and **binding**
 calls with no code, attributes `console` output to the active span, and puts the trace id on every log record
-it exports. `head_sampling_rate` is `0.2` on both, in every environment, and `redact_query_string` is on, which
+it exports. `head_sampling_rate` is `1` on both, in every environment, which is the platform's own default written
+down so the knob stays visible; `enabled = true` is written on the logs block for the same reason, even though
+the parent's switch already turns logs on, so the block reads like its `traces` neighbour, whose own switch is
+not optional; and `redact_query_string` is on, which
 is what keeps `payment_intent_client_secret` out of a request URL the platform records.
 
 **The app's own log lines are in that export because `console` is what the logger writes to, and for one
-release they were not.** `BetterStackClient` held a `@logtail/edge` transport and posted over HTTP from inside
+release they were not.** The logger held a `@logtail/edge` transport and posted over HTTP from inside
 the Worker, which the runtime cannot see, so the spans and the logs both reached BetterStack with nothing
 joining them: the trace id column was empty on every line the app produced.
 [ADR 0018](../../adr/0018-the-platform-is-the-log-transport.md) is the fix and records its price, which is that

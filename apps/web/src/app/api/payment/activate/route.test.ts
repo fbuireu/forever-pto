@@ -1,6 +1,6 @@
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import { RateLimitError } from "@infrastructure/errors";
 import { EN, ES } from "@infrastructure/i18n/locales";
+import { LoggerService } from "@infrastructure/logging/service";
 import { ACTIVATION_FAILED, ACTIVATION_PARAM } from "@infrastructure/services/premium/activation";
 import { PREMIUM_COOKIE } from "@infrastructure/services/premium/cookie";
 import { Effect, Layer } from "effect";
@@ -17,7 +17,6 @@ vi.mock("@application/use-cases/activatePremium", () => ({ activateWithPayment: 
 vi.mock("@infrastructure/services/payments/rateLimit", () => ({ checkRateLimit: mockCheckRateLimit }));
 vi.mock("@infrastructure/layers", () => ({
 	ApplicationLayer: Layer.succeed(LoggerService, {
-		debug: vi.fn(),
 		info: vi.fn(),
 		warn: vi.fn(),
 		error: vi.fn(),

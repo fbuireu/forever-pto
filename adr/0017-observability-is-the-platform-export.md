@@ -71,8 +71,8 @@ The alternatives considered and rejected:
 ## Decision
 
 Logs and traces reach Better Stack through Cloudflare's own OTLP export. `wrangler.toml` names the
-destinations per stage, `forever-pto-web-logs-production` and `forever-pto-web-traces-production` against
-the live Better Stack source and the `-development` pair against the other one, each configured in the
+destinations per stage, `forever-pto-web-production-logs` and `forever-pto-web-production-traces` against
+the live Better Stack source and the `development` pair against the other one, each configured in the
 Cloudflare dashboard with its endpoint and bearer token. `head_sampling_rate` keeps the ratio it already used
 and `redact_query_string` is on, both identical in every environment.
 

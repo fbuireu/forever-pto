@@ -12,8 +12,8 @@ const { mockGetStates, MockHolidays } = vi.hoisted(() => {
 });
 const { mockRegionDTOCreate } = vi.hoisted(() => ({ mockRegionDTOCreate: vi.fn() }));
 
-vi.mock("@infrastructure/clients/logging/better-stack/client", () => ({
-	getBetterStackInstance: vi.fn().mockReturnValue({ logError: mockLogError }),
+vi.mock("@infrastructure/logging/logger", () => ({
+	logger: { logError: mockLogError },
 }));
 
 vi.mock("date-holidays", () => ({ default: MockHolidays }));
@@ -101,6 +101,10 @@ describe("getRegions", () => {
 		const result = getRegions({ countryCode: ES });
 
 		expect(result).toEqual([]);
-		expect(mockLogError).toHaveBeenCalledWith("Error in getRegions", expect.any(Error), { countryCode: ES });
+		expect(mockLogError).toHaveBeenCalledWith({
+			message: "Error in getRegions",
+			error: expect.any(Error),
+			context: { countryCode: ES },
+		});
 	});
 });

@@ -1,5 +1,5 @@
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import { ValidationError } from "@infrastructure/errors";
+import { LoggerService } from "@infrastructure/logging/service";
 import { Effect } from "effect";
 import { z } from "zod";
 
@@ -16,14 +16,17 @@ export function zodParse<T>({ schema, data }: ZodParseParams<T>): Effect.Effect<
 			catch: (error) => {
 				if (error instanceof z.ZodError) {
 					const firstError = error.issues[0];
-					logger.warn("Validation error", {
-						field: firstError?.path.join("."),
-						message: firstError?.message,
-						code: firstError?.code,
+					logger.warn({
+						message: "Validation error",
+						context: {
+							field: firstError?.path.join("."),
+							message: firstError?.message,
+							code: firstError?.code,
+						},
 					});
 					return new ValidationError({ message: firstError?.message ?? "Validation failed" });
 				}
-				logger.logError("Unexpected validation error", error);
+				logger.logError({ message: "Unexpected validation error", error });
 				return new ValidationError({ message: error instanceof Error ? error.message : String(error) });
 			},
 		});

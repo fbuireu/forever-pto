@@ -22,7 +22,7 @@ vi.mock("next/headers", () => ({
 vi.mock("@infrastructure/layers", async () => {
 	const { Layer } = await import("effect");
 	const { StripeServerService } = await import("@infrastructure/clients/payments/stripe/serverService");
-	const { LoggerService } = await import("@infrastructure/clients/logging/better-stack/service");
+	const { LoggerService } = await import("@infrastructure/logging/service");
 	return {
 		ApplicationLayer: Layer.mergeAll(
 			Layer.succeed(StripeServerService, {
@@ -32,7 +32,6 @@ vi.mock("@infrastructure/layers", async () => {
 				webhooks: { constructEvent: mockConstructEvent as never },
 			}),
 			Layer.succeed(LoggerService, {
-				debug: vi.fn(),
 				info: vi.fn(),
 				warn: vi.fn(),
 				error: vi.fn(),
@@ -145,10 +144,10 @@ describe("POST /api/webhooks/stripe", () => {
 			),
 		);
 		await POST(makeRequest({ body: "{}" }) as never);
-		expect(mockLogError).toHaveBeenCalledWith(
-			"Stripe webhook is misconfigured, rejecting the delivery as non-retryable",
-			expect.any(WebhookConfigurationError),
-		);
+		expect(mockLogError).toHaveBeenCalledWith({
+			message: "Stripe webhook is misconfigured, rejecting the delivery as non-retryable",
+			error: expect.any(WebhookConfigurationError),
+		});
 	});
 
 	it("returns 500 on unexpected typed error", async () => {

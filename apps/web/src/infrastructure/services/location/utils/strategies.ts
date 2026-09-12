@@ -1,10 +1,8 @@
-import { getBetterStackInstance } from "@infrastructure/clients/logging/better-stack/client";
+import { logger } from "@infrastructure/logging/logger";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { Effect } from "effect";
 import type { NextRequest } from "next/server";
 import { normalizeCountryCode, noStoreFetch } from "./normalize";
-
-const logger = getBetterStackInstance();
 
 const LOCATION_IDENTIFIER = "loc=";
 const CDN_TRACE = "cdn-cgi/trace";
@@ -31,7 +29,7 @@ export async function detectCountryFromCDN() {
 	return Effect.runPromise(
 		detectCountryFromCDNEffect.pipe(
 			Effect.catchAll((error) => {
-				logger.warn("Error while detecting country from CDN", { error });
+				logger.warn({ message: "Error while detecting country from CDN", context: { error } });
 				return Effect.succeed("");
 			}),
 		),

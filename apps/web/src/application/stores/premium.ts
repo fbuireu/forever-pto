@@ -185,8 +185,11 @@ export const usePremiumStore = create<PremiumStore>()(
 
 					if (!state) {
 						logClient((logger) =>
-							logger.warn("No state to rehydrate in premium store", {
-								storeName: STORAGE_NAME,
+							logger.warn({
+								message: "No state to rehydrate in premium store",
+								context: {
+									storeName: STORAGE_NAME,
+								},
 							}),
 						);
 						return;

@@ -7,6 +7,18 @@ Date: 2026-09-11
 Accepted. Completes [ADR 0017](./0017-observability-is-the-platform-export.md), which moved traces and the
 platform's own logs onto Cloudflare's OTLP export and left the app's log lines on a transport of their own.
 
+Amended 2026-09-12. The port this ADR kept unchanged has since changed shape, and the line it writes has
+not. `BetterStackClient` and `getBetterStackInstance()` are gone: the writer is a plain `logger` object in
+[`apps/web/src/infrastructure/logging/logger.ts`](../apps/web/src/infrastructure/logging/logger.ts), out of
+`clients/` because there is no SDK under it, with `info`, `warn`, `error` and `logError` taking one
+`{ message, context }` object each, and without `debug`, `logDuration`, `measureAsync`, `withContext` or the
+`environment` base field, none of which had a caller outside the class itself (`environment` was also wrong
+on every preview Worker, where `NODE_ENV` is `production` too). `LOG_SERVICE` is `forever-pto-web`, the
+`<repo>-<package>` spelling contribKit's `contribkit-web` already used. The `noConsole` exemption in
+`biome.json` moved with the file. The shape is the one the sibling repositories share, so a reader who knows
+one logger knows them all; what stays specific to this app is named in
+[`apps/web/src/infrastructure/CLAUDE.md`](../apps/web/src/infrastructure/CLAUDE.md).
+
 ## Context
 
 [ADR 0017](./0017-observability-is-the-platform-export.md) recorded a consequence that turned out to be the

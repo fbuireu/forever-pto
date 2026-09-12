@@ -30,9 +30,9 @@ The concrete services:
 | `TursoService` | `apps/web/src/infrastructure/clients/db/turso/service.ts` | `@tursodatabase/serverless`, exposing `query` / `execute` / `batch` |
 | `StripeServerService` | `apps/web/src/infrastructure/clients/payments/stripe/serverService.ts` | Server-side Stripe SDK |
 | `ResendService` | `apps/web/src/infrastructure/clients/email/resend/service.ts` | Resend transactional email |
-| `LoggerService` | `apps/web/src/infrastructure/clients/logging/better-stack/service.ts` | BetterStack/Logtail logging |
+| `LoggerService` | `apps/web/src/infrastructure/logging/service.ts` | The `logger` object, so a use case declares logging as a requirement |
 
-For code that runs outside Effect (pure utilities, client components), `apps/web/src/infrastructure/clients/logging/better-stack/client.ts` exposes a `getBetterStackInstance()` singleton; never use it inside Effect code, where `LoggerService` is the injected equivalent.
+For code that runs outside Effect (pure utilities, client components), `apps/web/src/infrastructure/logging/logger.ts` exports the same `logger` object directly; never import it inside Effect code, where `LoggerService` is the injected equivalent.
 
 ## ApplicationLayer
 

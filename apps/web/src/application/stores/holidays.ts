@@ -288,14 +288,20 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
 					if (existingHoliday) {
 						logClient((logger) =>
-							logger.warn("Holiday already exists on this date", { date: holiday.date.toISOString() }),
+							logger.warn({
+								message: "Holiday already exists on this date",
+								context: { date: holiday.date.toISOString() },
+							}),
 						);
 						return { applied: false, reason: HolidayRefusal.DATE_HELD_BY_HOLIDAY, heldBy: existingHoliday };
 					}
 
 					if (manualDay) {
 						logClient((logger) =>
-							logger.warn("A PTO day is already booked on this date", { date: holiday.date.toISOString() }),
+							logger.warn({
+								message: "A PTO day is already booked on this date",
+								context: { date: holiday.date.toISOString() },
+							}),
 						);
 						return { applied: false, reason: HolidayRefusal.DATE_HELD_BY_MANUAL_DAY };
 					}
@@ -334,7 +340,9 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
 					if (heldBy || collidesWithManualDay) {
 						const targetDateStr = updates.date.toDateString();
-						logClient((logger) => logger.warn("Refused to move a holiday onto an occupied date", { targetDateStr }));
+						logClient((logger) =>
+							logger.warn({ message: "Refused to move a holiday onto an occupied date", context: { targetDateStr } }),
+						);
 
 						return heldBy
 							? { applied: false, reason: HolidayRefusal.DATE_HELD_BY_HOLIDAY, heldBy }
@@ -371,7 +379,9 @@ export const useHolidaysStore = create<HolidaysStore>()(
 					const { holiday: holidayOnDate, manualDay: isManuallySelected } = get().heldOn({ date });
 
 					if (!isSuggested && !isManuallySelected && (isWeekend(date) || holidayOnDate)) {
-						logClient((logger) => logger.warn("Refused to spend a PTO day on a day that is already off", { dateStr }));
+						logClient((logger) =>
+							logger.warn({ message: "Refused to spend a PTO day on a day that is already off", context: { dateStr } }),
+						);
 
 						if (holidayOnDate) {
 							return {
@@ -405,7 +415,10 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
 						if (budget.remaining <= 0) {
 							logClient((logger) =>
-								logger.warn("No remaining PTO days to assign", { totalPtoDays, spent: budget.spent }),
+								logger.warn({
+									message: "No remaining PTO days to assign",
+									context: { totalPtoDays, spent: budget.spent },
+								}),
 							);
 							return { applied: false, reason: DayRefusal.BUDGET_EXHAUSTED };
 						}

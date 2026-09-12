@@ -5,8 +5,8 @@ import { MAX_PTO_DAYS, MIN_CARRY_OVER_MONTHS, MIN_PTO_DAYS, useFiltersStore } fr
 
 const { mockLogError, mockWarn } = vi.hoisted(() => ({ mockLogError: vi.fn(), mockWarn: vi.fn() }));
 
-vi.mock("@infrastructure/clients/logging/better-stack/client", () => ({
-	getBetterStackInstance: vi.fn().mockReturnValue({ logError: mockLogError, warn: mockWarn }),
+vi.mock("@infrastructure/logging/logger", () => ({
+	logger: { logError: mockLogError, warn: mockWarn },
 }));
 
 const { mockStorageGetItem } = vi.hoisted(() => ({ mockStorageGetItem: vi.fn().mockResolvedValue(null) }));
@@ -170,9 +170,13 @@ describe("onRehydrateStorage", () => {
 
 		expect(mockLogError).not.toHaveBeenCalled();
 		await vi.waitFor(() =>
-			expect(mockLogError).toHaveBeenCalledWith("Error rehydrating filters-store", expect.any(Error), {
-				storeName: "filters-store",
-				hasState: true,
+			expect(mockLogError).toHaveBeenCalledWith({
+				message: "Error rehydrating filters-store",
+				error: expect.any(Error),
+				context: {
+					storeName: "filters-store",
+					hasState: true,
+				},
 			}),
 		);
 	});
