@@ -1,7 +1,7 @@
 import { TursoService } from "@infrastructure/clients/db/turso/service";
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import { PaymentError, ValidationError } from "@infrastructure/errors";
+import { LoggerService } from "@infrastructure/logging/service";
 import type * as Repository from "@infrastructure/services/payments/repository";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -39,7 +39,7 @@ const mockStripe = {
 	webhooks: { constructEvent: vi.fn() },
 };
 
-const mockLogger = { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
+const mockLogger = { info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
 const TestLayer = Layer.mergeAll(
 	Layer.succeed(LoggerService, mockLogger),
 	Layer.succeed(TursoService, { query: vi.fn(), execute: vi.fn() }),
@@ -114,7 +114,10 @@ describe("the two donation entry points", () => {
 		await runDeferred(deferred);
 
 		expect(savePayment).toHaveBeenCalledOnce();
-		expect(mockLogger.info).toHaveBeenCalledWith("Payment created successfully", { paymentIntentId: "pi_test" });
+		expect(mockLogger.info).toHaveBeenCalledWith({
+			message: "Payment created successfully",
+			context: { paymentIntentId: "pi_test" },
+		});
 	});
 
 	it("lets a Stripe failure stay a PaymentError, so its message never reaches the payer", async () => {

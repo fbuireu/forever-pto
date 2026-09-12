@@ -6,8 +6,8 @@ import { emailDomain } from "@application/shared/utils/redact";
 import { zodParse } from "@application/shared/utils/zodParse";
 import type { TursoService } from "@infrastructure/clients/db/turso/service";
 import { ResendService } from "@infrastructure/clients/email/resend/service";
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import { type DatabaseError, DuplicateContactError, EmailError, type ValidationError } from "@infrastructure/errors";
+import { LoggerService } from "@infrastructure/logging/service";
 import {
 	findContactWithMessage,
 	findLatestContactSince,
@@ -50,9 +50,12 @@ export const sendContactEmail = ({
 
 		if (withinCooldown || repeated) {
 			const reason = repeated ? "repeated" : "cooldown";
-			logger.info("Contact refused before sending", {
-				reason,
-				emailDomain: emailDomain(validated.email),
+			logger.info({
+				message: "Contact refused before sending",
+				context: {
+					reason,
+					emailDomain: emailDomain(validated.email),
+				},
 			});
 
 			return yield* Effect.fail(new DuplicateContactError({ reason }));
@@ -61,10 +64,14 @@ export const sendContactEmail = ({
 		const emailHtml = yield* Effect.tryPromise({
 			try: () => render(ContactFormEmail({ ...validated, baseUrl: config.siteUrl })),
 			catch: (error) => {
-				logger.logError("Contact email render failed", error, {
-					emailDomain: emailDomain(validated.email),
-					name: validated.name,
-					subject: validated.subject,
+				logger.logError({
+					message: "Contact email render failed",
+					error,
+					context: {
+						emailDomain: emailDomain(validated.email),
+						name: validated.name,
+						subject: validated.subject,
+					},
 				});
 				return new EmailError({ message: "Email render failed", cause: error });
 			},
@@ -91,10 +98,13 @@ export const sendContactEmail = ({
 			}).pipe(
 				Effect.catchAll((e) =>
 					Effect.sync(() => {
-						logger.error("Failed to save contact to database", {
-							reason: e.message,
-							emailDomain: emailDomain(validated.email),
-							messageId: messageId ?? undefined,
+						logger.error({
+							message: "Failed to save contact to database",
+							context: {
+								reason: e.message,
+								emailDomain: emailDomain(validated.email),
+								messageId: messageId ?? undefined,
+							},
 						});
 					}),
 				),

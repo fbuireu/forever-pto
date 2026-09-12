@@ -3,9 +3,9 @@ import { createPaymentFailedEvent, createPaymentSucceededEvent } from "@domain/p
 import { handlePaymentFailed } from "@domain/payment/handlers/paymentFailed";
 import { handlePaymentSucceeded } from "@domain/payment/handlers/paymentSucceeded";
 import type { TursoService } from "@infrastructure/clients/db/turso/service";
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import type { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import type { DatabaseError } from "@infrastructure/errors";
+import { LoggerService } from "@infrastructure/logging/service";
 import { readDonationMetadata } from "@infrastructure/services/payments/provider/metadata";
 import { savePayment } from "@infrastructure/services/payments/repository";
 import { Effect } from "effect";
@@ -20,16 +20,23 @@ export const processWebhookEvent = (
 		switch (event.type) {
 			case "payment_intent.succeeded": {
 				const paymentIntent = event.data.object;
-				logger.info("Processing payment_intent.succeeded", {
-					paymentIntentId: paymentIntent.id,
-					status: paymentIntent.status,
-					hasId: !!paymentIntent.id,
+				logger.info({
+					message: "Processing payment_intent.succeeded",
+					context: {
+						paymentIntentId: paymentIntent.id,
+						status: paymentIntent.status,
+						hasId: !!paymentIntent.id,
+					},
 				});
 				const paymentEvent = yield* createPaymentSucceededEvent(paymentIntent).pipe(
 					Effect.tapError((e) =>
 						Effect.sync(() => {
-							logger.logError("Payment succeeded with no donor email, Premium can never be recovered", e, {
-								paymentId: paymentIntent.id,
+							logger.logError({
+								message: "Payment succeeded with no donor email, Premium can never be recovered",
+								error: e,
+								context: {
+									paymentId: paymentIntent.id,
+								},
 							});
 						}),
 					),
@@ -47,15 +54,22 @@ export const processWebhookEvent = (
 				);
 
 				if (created) {
-					logger.warn("Payment was missing from the DB and was created from the webhook", {
-						paymentId: paymentEvent.paymentId,
+					logger.warn({
+						message: "Payment was missing from the DB and was created from the webhook",
+						context: {
+							paymentId: paymentEvent.paymentId,
+						},
 					});
 				}
 
 				yield* handlePaymentSucceeded(paymentEvent).pipe(
 					Effect.tapError((e) =>
 						Effect.sync(() => {
-							logger.logError("Error handling successful payment", e, { paymentId: paymentEvent.paymentId });
+							logger.logError({
+								message: "Error handling successful payment",
+								error: e,
+								context: { paymentId: paymentEvent.paymentId },
+							});
 						}),
 					),
 				);
@@ -67,7 +81,7 @@ export const processWebhookEvent = (
 				break;
 			}
 			default:
-				logger.warn("Unhandled webhook event type", { eventType: event.type, eventId: event.id });
+				logger.warn({ message: "Unhandled webhook event type", context: { eventType: event.type, eventId: event.id } });
 				break;
 		}
 	}).pipe(Effect.withSpan("processWebhookEvent"));

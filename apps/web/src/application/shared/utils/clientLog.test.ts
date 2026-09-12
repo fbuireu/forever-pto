@@ -3,13 +3,15 @@ import { resolve } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { logClient, logClientError } from "./clientLog";
 
-const { mockGetBetterStackInstance, mockLogError } = vi.hoisted(() => ({
-	mockGetBetterStackInstance: vi.fn(),
+const { mockLoggerModule, mockLogError } = vi.hoisted(() => ({
+	mockLoggerModule: vi.fn(),
 	mockLogError: vi.fn(),
 }));
 
-vi.mock("@infrastructure/clients/logging/better-stack/client", () => ({
-	getBetterStackInstance: mockGetBetterStackInstance,
+vi.mock("@infrastructure/logging/logger", () => ({
+	get logger() {
+		return mockLoggerModule();
+	},
 }));
 
 afterEach(() => {
@@ -18,37 +20,41 @@ afterEach(() => {
 
 describe("a client log never makes its caller asynchronous", () => {
 	it("returns undefined, not a promise the caller would have to await", () => {
-		mockGetBetterStackInstance.mockReturnValue({ logError: mockLogError });
+		mockLoggerModule.mockReturnValue({ logError: mockLogError });
 		expect(logClient(() => {})).toBeUndefined();
 		expect(logClientError({ message: "boom", error: new Error("x") })).toBeUndefined();
 	});
 
 	it("has not written by the time it returns, so a test must wait for the import", async () => {
-		mockGetBetterStackInstance.mockReturnValue({ logError: mockLogError });
+		mockLoggerModule.mockReturnValue({ logError: mockLogError });
 
 		logClientError({ message: "boom", error: new Error("x"), context: { component: "Probe" } });
 		expect(mockLogError).not.toHaveBeenCalled();
 
 		await vi.waitFor(() => {
-			expect(mockLogError).toHaveBeenCalledWith("boom", expect.any(Error), { component: "Probe" });
+			expect(mockLogError).toHaveBeenCalledWith({
+				message: "boom",
+				error: expect.any(Error),
+				context: { component: "Probe" },
+			});
 		});
 	});
 });
 
 describe("a client log never fails its caller", () => {
-	it("swallows a logger that throws once the import resolves", async () => {
-		mockGetBetterStackInstance.mockImplementation(() => {
+	it("swallows a logger module that throws once the import resolves", async () => {
+		mockLoggerModule.mockImplementation(() => {
 			throw new Error("logger unavailable");
 		});
 
 		expect(() => logClientError({ message: "boom", error: new Error("x") })).not.toThrow();
 		await vi.waitFor(() => {
-			expect(mockGetBetterStackInstance).toHaveBeenCalled();
+			expect(mockLoggerModule).toHaveBeenCalled();
 		});
 	});
 
 	it("swallows a write callback that throws", async () => {
-		mockGetBetterStackInstance.mockReturnValue({ logError: mockLogError });
+		mockLoggerModule.mockReturnValue({ logError: mockLogError });
 
 		expect(() =>
 			logClient(() => {
@@ -56,19 +62,19 @@ describe("a client log never fails its caller", () => {
 			}),
 		).not.toThrow();
 		await vi.waitFor(() => {
-			expect(mockGetBetterStackInstance).toHaveBeenCalled();
+			expect(mockLoggerModule).toHaveBeenCalled();
 		});
 	});
 });
 
-describe("the import that keeps the logging SDK out of every client chunk", () => {
+describe("the import that keeps the logger out of every client chunk", () => {
 	const source = readFileSync(resolve(process.cwd(), "src/application/shared/utils/clientLog.ts"), "utf8");
 
-	it("reaches the BetterStack client through a dynamic import", () => {
-		expect(source).toMatch(/import\(["']@infrastructure\/clients\/logging\/better-stack\/client["']\)/);
+	it("reaches the logger through a dynamic import", () => {
+		expect(source).toMatch(/import\(["']@infrastructure\/logging\/logger["']\)/);
 	});
 
 	it("has no value-level static import of it", () => {
-		expect(source).not.toMatch(/^import (?!type )[^\n]*better-stack\/client/m);
+		expect(source).not.toMatch(/^import (?!type )[^\n]*logging\/logger/m);
 	});
 });

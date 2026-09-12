@@ -4,12 +4,16 @@ Date: 2026-08-17
 
 ## Status
 
-Accepted.
+Accepted. Amended 2026-09-12: the singleton this ADR names, `getBetterStackInstance()`, is the plain `logger`
+export of [`apps/web/src/infrastructure/logging/logger.ts`](../apps/web/src/infrastructure/logging/logger.ts)
+now, and the tag's interface is that object's type rather than a second declaration of it. Nothing below
+changes: the tag is still the requirement the annotation turns into a compile-time signal, and the module
+export is still what runs where there is no layer to provide.
 
 ## Context
 
-`LoggerServiceLive` is `Layer.sync(LoggerService, () => getBetterStackInstance())`. The tag's interface is
-a handful of method signatures; its implementation is one call returning the module singleton. There is one production
+`LoggerServiceLive` is `Layer.sync(LoggerService, () => logger)`. The tag's interface is
+the type of that object; its implementation is one call returning the module export. There is one production
 adapter and no second one in prospect, so by the usual rule (one adapter is a hypothetical seam, two is a
 real one) it reads as pure ceremony.
 
@@ -23,7 +27,7 @@ stores, the lookups and the components use, so deleting the tag would be that de
 completion rather than a challenge to it.
 
 The clearest symptom that it is not behaving like a boundary: `[locale]/(app)/payment/confirmation/page.tsx`
-logs the *same* activation story through `getBetterStackInstance()` while the operation logs it through the
+logs the *same* activation story through the `logger` import while the operation logs it through the
 tag. One concern, rival mechanisms, chosen by whether the caller happens to sit inside an `Effect.gen`.
 
 Against all that, the tag buys one property, and it was verified rather than assumed. `activateWithEmail`
@@ -43,10 +47,10 @@ the place it was introduced.
 
 `LoggerService` stays a tag, and the modules that need it go on carrying it in `R`.
 
-The rejected alternative is replacing it with the `getBetterStackInstance()` singleton everywhere, which
+The rejected alternative is replacing it with the `logger` import everywhere, which
 would delete the tag, the Live layer and every stub layer. It is rejected because the guarantee above only
 exists while logging is a *requirement*: each `Layer.succeed` block would become a
-`vi.mock('…/better-stack/client')` call, no cheaper, and the compile-time signal would be gone with
+`vi.mock('@infrastructure/logging/logger')` call, no cheaper, and the compile-time signal would be gone with
 nothing to replace it.
 
 **The guarantee is the tag *and* an explicit return-type annotation together.** A use-case whose `R` is
@@ -60,14 +64,14 @@ than stylistic on any Effect program under `@application/use-cases`.
   permits a logger. The use-cases annotate theirs today; a new one that does not gets no protection and
   looks identical.
 - **The tag is not a substitution seam and must not be treated as one.** Providing a stub in a test does not
-  silence a module that calls `getBetterStackInstance()` directly, and several do. See
-
-  [`../apps/web/src/infrastructure/clients/CLAUDE.md`](../apps/web/src/infrastructure/clients/CLAUDE.md).
+  silence a module that imports `logger` directly, and several do. See
+  [`../apps/web/src/infrastructure/CLAUDE.md`](../apps/web/src/infrastructure/CLAUDE.md).
   A test asserting "nothing logged" is only meaningful for code that reaches the tag.
-- **Every test that reaches one pays a whole-interface stub, and that stays.** It is the price of the signal. Shrinking the
-  tag's interface would reduce it, but every method has a caller.
+- **Every test that reaches one pays a whole-interface stub, and that stays.** It is the price of the signal.
+  The interface is as small as its callers: `debug` was on it with no caller anywhere, and went, so a stub is
+  four methods and each of them is one something reaches.
 - **The split between mechanisms at the confirmation page is closed.** The page used to warn through
-  `getBetterStackInstance()` on a payment intent that had not succeeded while `confirmation` logged the
+  the `logger` import on a payment intent that had not succeeded while `confirmation` logged the
   Stripe failure through the tag: one story, rival mechanisms. The warn lives in `confirmation` now, beside the
   `logError` it always sat next to, so the page imports no logger at all and the whole activation story
   reaches `LoggerService`. A page that reaches for the singleton for something its Effect program already

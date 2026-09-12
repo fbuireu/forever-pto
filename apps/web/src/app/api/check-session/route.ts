@@ -4,9 +4,9 @@ import { activatePremiumRequest } from "@infrastructure/api/operations/activateP
 import { resolveClientIp } from "@infrastructure/api/operations/types";
 import { parseJsonBody } from "@infrastructure/api/parseJsonBody";
 import { noStore } from "@infrastructure/api/response";
-import { LoggerService } from "@infrastructure/clients/logging/better-stack/service";
 import { ValidationError } from "@infrastructure/errors";
 import { ApplicationLayer } from "@infrastructure/layers";
+import { LoggerService } from "@infrastructure/logging/service";
 import { clearPremiumCookie, PREMIUM_COOKIE, setPremiumCookie } from "@infrastructure/services/premium/cookie";
 import { verifySession as verifySessionEffect } from "@infrastructure/services/premium/session";
 import { isSessionConfigurationError } from "@infrastructure/services/premium/sessionErrors";
@@ -34,7 +34,7 @@ async function readPremiumSession() {
 
 					if (isSessionConfigurationError(failure)) {
 						const logger = yield* LoggerService;
-						logger.logError("Premium session could not be verified, keeping the cookie", failure);
+						logger.logError({ message: "Premium session could not be verified, keeping the cookie", error: failure });
 
 						return res;
 					}

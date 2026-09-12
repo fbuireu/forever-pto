@@ -1,8 +1,8 @@
 import { DE, ES, FR } from "@infrastructure/i18n/locales";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@infrastructure/clients/logging/better-stack/client", () => ({
-	getBetterStackInstance: () => ({ warn: vi.fn(), info: vi.fn(), error: vi.fn() }),
+vi.mock("@infrastructure/logging/logger", () => ({
+	logger: { warn: vi.fn(), info: vi.fn(), error: vi.fn() },
 }));
 
 const mockGetCloudflareContext = vi.hoisted(() => vi.fn());

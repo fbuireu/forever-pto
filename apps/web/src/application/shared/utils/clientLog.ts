@@ -1,11 +1,11 @@
-import type { BetterStackClient } from "@infrastructure/clients/logging/better-stack/client";
+import type { Logger } from "@infrastructure/logging/logger";
 
 type LogContext = Record<string, unknown>;
 
-export const logClient = (write: (logger: BetterStackClient) => void): void => {
-	void import("@infrastructure/clients/logging/better-stack/client")
-		.then(({ getBetterStackInstance }) => {
-			write(getBetterStackInstance());
+export const logClient = (write: (logger: Logger) => void): void => {
+	void import("@infrastructure/logging/logger")
+		.then(({ logger }) => {
+			write(logger);
 		})
 		.catch(() => {});
 };
@@ -18,6 +18,6 @@ export interface LogClientErrorParams {
 
 export const logClientError = ({ message, error, context }: LogClientErrorParams): void => {
 	logClient((logger) => {
-		logger.logError(message, error, context);
+		logger.logError({ message, error, context });
 	});
 };

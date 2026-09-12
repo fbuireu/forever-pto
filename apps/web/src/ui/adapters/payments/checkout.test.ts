@@ -10,8 +10,8 @@ const mockLoggerError = vi.hoisted(() => vi.fn());
 const mockLoggerWarn = vi.hoisted(() => vi.fn());
 
 vi.mock("@infrastructure/actions/payment", () => ({ createPaymentAction: mockCreatePaymentAction }));
-vi.mock("@infrastructure/clients/logging/better-stack/client", () => ({
-	getBetterStackInstance: vi.fn(() => ({ logError: mockLogError, error: mockLoggerError, warn: mockLoggerWarn })),
+vi.mock("@infrastructure/logging/logger", () => ({
+	logger: { logError: mockLogError, error: mockLoggerError, warn: mockLoggerWarn },
 }));
 
 const mockFetch = vi.fn();
