@@ -103,6 +103,23 @@ describe("logger.logError", () => {
 		expect(lineFrom(LOG_LEVEL.ERROR).error.code).toBe("card_declined");
 	});
 
+	it("describes a thrown plain object as its JSON rather than as [object Object]", () => {
+		logger.logError({ message: "test", error: { code: "E_THROWN", retry: false } });
+
+		expect(lineFrom(LOG_LEVEL.ERROR).error.message).toBe('{"code":"E_THROWN","retry":false}');
+	});
+
+	it("keeps the line when the thrown object cannot be serialised, falling back to String()", () => {
+		const circular: Record<string, unknown> = {};
+		circular.self = circular;
+
+		logger.logError({ message: "test", error: circular });
+		logger.logError({ message: "test", error: { size: 1n } });
+
+		expect(spies.error).toHaveBeenCalledTimes(2);
+		expect(lineFrom(LOG_LEVEL.ERROR).error.message).toBe("[object Object]");
+	});
+
 	it("merges caller context with error context", () => {
 		logger.logError({ message: "test", error: new Error("x"), context: { requestId: "req-1" } });
 

@@ -171,8 +171,8 @@ purpose ([ADR 0002](../../../../adr/0002-effect-for-external-service-boundaries.
 `JSON.stringify` line to `console[level]`**, and Cloudflare's own observability exports it to Better Stack over
 OTLP, named as a `destinations` entry in [`wrangler.toml`](../../wrangler.toml)
 ([ADR 0018](../../../../adr/0018-the-platform-is-the-log-transport.md)). It is the same object, the same line
-and the same path as contribKit's logger, so a reader who knows one knows the other; what is specific to this
-app is `logError`, `stripQuery` and the `LoggerService` tag, each named below.
+and the same path as contribKit's logger, byte for byte apart from `LOG_SERVICE`, so a reader who knows one
+knows the other; what is specific to this app is the `LoggerService` tag, named below.
 
 **A log call cannot fail its caller, and that is the property everything else leans on.** `write` is one
 statement:
@@ -210,9 +210,8 @@ to an API as an object, so the sink parses them back out of the JSON body. That 
 the class itself none of those had a caller; the `environment` field was also `production` on every preview
 Worker, which is the one place it would have mattered. `logError` is the one method beyond the three levels,
 because sixteen call sites pass an `Error` through it and it is what serialises `message`, `name`, `stack` and
-the error's own enumerable fields into the `error` field of the line. contribKit does that serialisation in the
-`logServerError` helper of its application layer instead and has no `logError`; that is a difference in the
-apps, not drift.
+the error's own enumerable fields into the `error` field of the line. contribKit carries the same method and
+routes its `logServerError` through it.
 
 **There is no transport to scope to a request any more, and the hazard it existed for is worth keeping in
 view.** The client held a `@logtail/edge` batcher: the first call armed a `setTimeout`, later calls joined the
@@ -248,8 +247,8 @@ is the only guard on a GET that mints a Premium session, so `{ url: request.url 
 would have shipped the secret to the sink. The rule is enforced at the seam rather than at call sites:
 `write` strips a string `url` on every line, whichever method emitted it, so no caller has to remember. A
 caller that genuinely wants a query string has to name the field something other than `url`, which is the
-point: the redaction is keyed on the field name, not on who wrote it. contribKit has no secret in a URL and no
-`stripQuery`; that too is the apps differing, not the loggers.
+point: the redaction is keyed on the field name, not on who wrote it. contribKit carries the same rule with
+no secret behind it yet, so a `url` field means the same thing in both sinks.
 
 ### `LoggerService` is a tag with one adapter, on purpose
 
