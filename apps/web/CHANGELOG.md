@@ -1,3 +1,11 @@
+# [forever-pto-web-v1.11.1](https://github.com/fbuireu/forever-pto/compare/web-v1.11.0...web-v1.11.1) (2026-09-12)
+
+
+### Bug Fixes
+
+* **web:** name worker-src, and let the Cloudflare beacon report ([19daa7e](https://github.com/fbuireu/forever-pto/commit/19daa7e205fac6d8b26c71a1245cc755e9307d6a))
+* **web:** stop pinning one GA4 region, and drop the dead Logtail hosts ([d1866e2](https://github.com/fbuireu/forever-pto/commit/d1866e23c25599b34e05d30940d4c813b9dce4a1))
+
 # [forever-pto-web-v1.11.0](https://github.com/fbuireu/forever-pto/compare/web-v1.10.9...web-v1.11.0) (2026-09-12)
 
 
