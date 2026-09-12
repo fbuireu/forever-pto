@@ -26,6 +26,11 @@ Check the existing issues first, then use the [bug report template](ISSUE_TEMPLA
 what you did, what you expected, and what actually happened. For planner bugs, add the Country, Region, year
 and PTO budget you were looking at, since the whole calculation depends on them.
 
+**A mistake in the text is a content issue, not a bug.** The planner's copy lives in the locale bundles
+under `apps/web/src/ui/i18n/messages` and the docs site's pages under `apps/docs/src/content/docs`, so a
+pull request can fix either; if you would rather not open one, use the
+[content issue template](ISSUE_TEMPLATE/content_issue.yml) and say which language it is in.
+
 Security issues go through the [Security Policy](./SECURITY.md), never a public issue.
 
 ### Suggesting features
@@ -120,13 +125,11 @@ lints what you type locally, and [`commit-message.yml`](./workflows/commit-messa
 request title on every open and edit, because that title is what semantic-release parses. Title the pull
 request the way you would title a commit.
 
-### One pull request, one package
-
-Each package versions itself, and a commit belongs to whichever package its paths fall under
-([ADR 0011](../adr/0011-per-package-versioning-with-a-bridge-tag.md)). A pull request spanning `apps/web`
-and `apps/docs` therefore lands as one commit in both changelogs and can cut both releases. Keep a pull
-request to one package where you can; the `cross-package-notice` job comments when one spans both and does
-not block it, because a change that genuinely spans both is legitimate.
+**One pull request, one package.** Each package versions itself, and a commit belongs to whichever package
+its paths fall under ([ADR 0011](../adr/0011-per-package-versioning-with-a-bridge-tag.md)). A pull request
+spanning `apps/web` and `apps/docs` therefore lands as one commit in both changelogs and can cut both
+releases. Keep a pull request to one package where you can; the `cross-package-notice` job comments when one
+spans both and does not block it, because a change that genuinely spans both is legitimate.
 
 Do **not** add a `Co-Authored-By` trailer for an AI assistant to a commit or a pull request.
 

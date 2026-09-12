@@ -7,3 +7,12 @@ coverage:
     patch:
       default:
         informational: true
+
+ignore:
+  - "**/*.d.ts"
+  - "**/types.ts"
+  - "**/*.types.ts"
+  - "apps/web/src/app/fonts.ts"
+  - "apps/web/src/ui/modules/bones/**"
+  - "apps/web/src/ui/assets/icons/**"
+  - "apps/web/src/ui/i18n/messages/**"
