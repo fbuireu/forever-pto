@@ -57,10 +57,16 @@ const CSP = [
 	"object-src 'none'",
 ].join("; ");
 
+const TRUSTED_TYPES_REPORT_ONLY = "require-trusted-types-for 'script'";
+
 const SECURITY_HEADERS = [
 	{
 		key: "Content-Security-Policy",
 		value: CSP,
+	},
+	{
+		key: "Content-Security-Policy-Report-Only",
+		value: TRUSTED_TYPES_REPORT_ONLY,
 	},
 	{
 		key: "Strict-Transport-Security",

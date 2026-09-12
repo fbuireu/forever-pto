@@ -31,7 +31,7 @@ flowchart TB
     API["/api/*: Donation, session, contact"]
   end
   subgraph browser [Browser]
-    ST[(Zustand stores<br/>encrypted localStorage)]
+    ST[(Zustand stores<br/>obfuscated localStorage)]
     HOL[date-holidays, bundled]
     UI[Planner screen]
     WK[Web Worker<br/>planning engine]
@@ -50,7 +50,8 @@ flowchart TB
   </Card>
   <Card title='How it works' icon='information'>
     One request followed from the edge to the last Metric, then every subsystem: the planning algorithm with its
-    live tunables, the Holiday sources, the Web Worker, the planner screen, the stores.
+    live tunables, the Holiday sources, the Web Worker, the planner screen, the stores, what is signed and what
+    is only obfuscated.
     [Overview →](/how-it-works/overview/) · [The algorithm →](/how-it-works/planning-algorithm/)
   </Card>
   <Card title='Architecture' icon='open-book'>

@@ -4,14 +4,16 @@ import { usePremiumStore } from "@application/stores/premium";
 import { identifyUser, trackingEnvironment } from "@infrastructure/clients/logging/better-stack/tracking";
 import { BETTER_STACK_SERVICE_ID, isServiceConsented } from "@ui/modules/shared/cookie-consent/utils/consent";
 import Script from "next/script";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
+import { browser } from "react-dom";
 import { useShallow } from "zustand/shallow";
 import { version } from "../../../../package.json";
 
 const TRACKING_TOKEN = process.env.NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN;
 
 export const BetterStackTracking = () => {
-	const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
+	use(browser());
+	const [analyticsEnabled, setAnalyticsEnabled] = useState(() => isServiceConsented(BETTER_STACK_SERVICE_ID));
 
 	const { userEmail, premiumKey } = usePremiumStore(
 		useShallow((state) => ({
@@ -24,8 +26,6 @@ export const BetterStackTracking = () => {
 		const readConsent = () => {
 			setAnalyticsEnabled(isServiceConsented(BETTER_STACK_SERVICE_ID));
 		};
-
-		readConsent();
 
 		window.addEventListener("cc:onConsent", readConsent);
 		window.addEventListener("cc:onChange", readConsent);

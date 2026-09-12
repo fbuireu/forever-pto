@@ -63,11 +63,11 @@ function DropdownMenu({
 	);
 
 	return (
-		<DropdownMenuContext.Provider value={contextValue}>
+		<DropdownMenuContext value={contextValue}>
 			<DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} onOpenChange={handleOpenChange}>
 				{children}
 			</DropdownMenuPrimitive.Root>
-		</DropdownMenuContext.Provider>
+		</DropdownMenuContext>
 	);
 }
 

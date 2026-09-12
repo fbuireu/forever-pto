@@ -9,7 +9,7 @@ import { StoresInitializer } from "@ui/modules/stores/StoresInitializer";
 import dynamic from "next/dynamic";
 import type { Locale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import type { ReactNode } from "react";
+import { type ReactNode, Suspense } from "react";
 
 const PremiumModal = dynamic(() =>
 	import("@ui/modules/premium/PremiumModal").then((module) => ({ default: module.PremiumModal })),
@@ -27,7 +27,9 @@ const AppLayout = async ({ children, params }: Readonly<AppLayoutProps>) => {
 
 	return (
 		<SidebarProvider>
-			<StoresInitializer />
+			<Suspense fallback={null}>
+				<StoresInitializer />
+			</Suspense>
 			<AppSidebar locale={locale}>
 				<div
 					className="pointer-events-none h-full z-1 rounded-[8px] inset-0 absolute

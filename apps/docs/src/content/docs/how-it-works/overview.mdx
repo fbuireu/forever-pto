@@ -64,7 +64,7 @@ sequenceDiagram
   P->>CF: /cdn-cgi/trace, then cf-ipcountry, then IP lookup
   CF-->>P: country code
   P-->>B: HTML + NEXT_LOCALE + user-country cookies
-  B->>S: rehydrate from encrypted localStorage
+  B->>S: rehydrate from obfuscated localStorage
   S->>S: StoresInitializer reads user-country, sets Country if none is stored
 ```
 
@@ -111,7 +111,7 @@ sequenceDiagram
 | Boundary | Carries | Never carries |
 | --- | --- | --- |
 | Edge → browser | HTML, `NEXT_LOCALE`, `user-country` | Any planning input or output |
-| Store → `localStorage` | Filters, Holidays, the Suggestion, Alternatives, Manual and Removed Days, all dates as ISO strings, obfuscated with a build-time key | The year (it resets on every visit), loading flags |
+| Store → `localStorage` | Filters, Holidays, the Suggestion, Alternatives, Manual and Removed Days, all dates as ISO strings, [obfuscated](/how-it-works/data-protection/) with a build-time key | The year (it resets on every visit), loading flags |
 | Main thread → worker | `CalculateSuggestionsRequest`: window, budget, serialised Holidays, Strategy, locale, Manual and Removed Days as ISO strings | `Date` objects, store references |
 | Worker → main thread | `WorkerResponse`: a measured Suggestion and its Alternatives, or a stringified error, echoing the `requestId` | Anything for a stale `requestId` (the hook drops it) |
 | Browser → API | A Donation intent, a session check, a contact message | The plan |
@@ -130,5 +130,6 @@ The API routes exist for the parts a browser cannot do alone, and each has its o
 | Agent-facing renditions | `Accept: text/markdown`, `/.well-known/*` | [Markdown API](/how-it-works/markdown-api/), [WebMCP](/how-it-works/webmcp/) |
 | Abuse control on the payment routes | The `PAYMENT_RATE_LIMITER` binding | [Rate limiting](/how-it-works/rate-limiting/) |
 | Telemetry: invocation logs, spans, the app's own log lines, the browser tag | The platform export named in `wrangler.toml`; nothing in the app opens a connection | [Observability](/how-it-works/observability/) |
+| Signed session, constant-time secret check, webhook signature, obfuscated storage | Where the app applies a primitive, and where it deliberately does not | [Data protection](/how-it-works/data-protection/) |
 
 All of them are Effect programs provided with one `ApplicationLayer`; see [Effect layers](/architecture/effect-layers/).

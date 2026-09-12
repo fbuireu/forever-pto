@@ -311,11 +311,7 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
 				}, []),
 			);
 
-	return (
-		<MotionHighlightContext.Provider value={contextValue}>
-			{enabled ? wrappedChildren : children}
-		</MotionHighlightContext.Provider>
-	);
+	return <MotionHighlightContext value={contextValue}>{enabled ? wrappedChildren : children}</MotionHighlightContext>;
 }
 
 interface GetNonOverridingDataAttributesParams {

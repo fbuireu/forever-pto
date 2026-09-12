@@ -46,7 +46,7 @@ function AccordionItem({ className, children, ...props }: AccordionItemProps) {
 	const contextValue = useMemo(() => ({ isOpen, setIsOpen }), [isOpen]);
 
 	return (
-		<AccordionItemContext.Provider value={contextValue}>
+		<AccordionItemContext value={contextValue}>
 			<AccordionPrimitive.Item
 				data-slot="accordion-item"
 				className={cn("border-b-2 border-(--frame)/18", className)}
@@ -54,7 +54,7 @@ function AccordionItem({ className, children, ...props }: AccordionItemProps) {
 			>
 				{children}
 			</AccordionPrimitive.Item>
-		</AccordionItemContext.Provider>
+		</AccordionItemContext>
 	);
 }
 

@@ -2,7 +2,7 @@ import { LOCALES } from "@infrastructure/i18n/locales";
 import { BonesProvider } from "@ui/modules/providers/BonesProvider";
 import { CookieConsentClient } from "@ui/modules/shared/cookie-consent/CookieConsentClient";
 import { WebMCP } from "@ui/modules/shared/WebMCP";
-import type { ReactNode } from "react";
+import { type ReactNode, Suspense } from "react";
 import "@styles/index.css";
 import { DOCUMENT_BODY_CLASS } from "@app/fonts";
 import { LazyMotionProvider } from "@ui/modules/core/animate/providers/LazyMotionProvider";
@@ -47,7 +47,9 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
 				</NextIntlClientProvider>
 				<WebMCP />
 				<Analytics />
-				<BetterStackTracking />
+				<Suspense fallback={null}>
+					<BetterStackTracking />
+				</Suspense>
 			</body>
 		</html>
 	);

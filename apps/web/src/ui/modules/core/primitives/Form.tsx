@@ -41,9 +41,9 @@ const FormField = <
 }: ControllerProps<TFieldValues, TName>) => {
 	const fieldContextValue = useMemo(() => ({ name: props.name }), [props.name]);
 	return (
-		<FormFieldContext.Provider value={fieldContextValue}>
+		<FormFieldContext value={fieldContextValue}>
 			<Controller {...props} />
-		</FormFieldContext.Provider>
+		</FormFieldContext>
 	);
 };
 
@@ -81,9 +81,9 @@ function FormItem({ className, ...props }: ComponentProps<"div">) {
 		[id, hasDescription],
 	);
 	return (
-		<FormItemContext.Provider value={itemContextValue}>
+		<FormItemContext value={itemContextValue}>
 			<div data-slot="form-item" className={cn("grid gap-2", className)} {...props} />
-		</FormItemContext.Provider>
+		</FormItemContext>
 	);
 }
 

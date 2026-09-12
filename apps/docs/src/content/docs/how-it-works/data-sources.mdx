@@ -21,7 +21,7 @@ flowchart TB
     IPAPI[ipify + ipinfo]
   end
   subgraph browser [Browser storage]
-    LS[(encrypted localStorage)]
+    LS[(obfuscated localStorage)]
     CK[(cookies)]
   end
   subgraph server [Server-side services]
@@ -92,7 +92,7 @@ Everything the user configures or the engine produces lives in the browser, in `
 | `premium` | The Premium key, email, last verification time | Mirrors the server session; re-verified after 24 hours |
 | `ui` | Nothing | Ephemeral popover and currency state |
 
-The values are obfuscated with a build-time key before they hit storage (XOR plus base64), which keeps casual tampering out and is not cryptography; [ADR 0007](https://github.com/fbuireu/forever-pto/blob/main/adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md) explains why that is the right amount. Details on the [state stores](/how-it-works/state-stores/) page.
+The values are obfuscated with a build-time key before they hit storage (XOR plus base64), which keeps casual tampering out and is not cryptography ([data protection](/how-it-works/data-protection/) has every primitive the app does apply); [ADR 0007](https://github.com/fbuireu/forever-pto/blob/main/adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md) explains why that is the right amount. Details on the [state stores](/how-it-works/state-stores/) page.
 
 ## Server-side data
 

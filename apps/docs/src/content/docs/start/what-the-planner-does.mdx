@@ -103,6 +103,6 @@ Manual editing, Custom Holidays, Carry-over Months, past days, the advanced Metr
 
 ## Where it runs
 
-The engine is a set of pure functions under `apps/web/src/domain/calendar/`, with no framework, no I/O and no clock beyond "today". The planner runs it inside a **Web Worker** (`apps/web/src/infrastructure/workers/worker.ts`) so a slider drag never freezes the calendar, and state lives in encrypted `localStorage` through Zustand. Because the planner never sends the plan anywhere, a PTO plan is private by construction; see [ADR 0001](https://github.com/fbuireu/forever-pto/blob/main/adr/0001-planner-runs-in-the-browser.md) for the trade-offs that decision carries.
+The engine is a set of pure functions under `apps/web/src/domain/calendar/`, with no framework, no I/O and no clock beyond "today". The planner runs it inside a **Web Worker** (`apps/web/src/infrastructure/workers/worker.ts`) so a slider drag never freezes the calendar, and state lives in obfuscated `localStorage` through Zustand. Because the planner never sends the plan anywhere, a PTO plan is private by construction; see [ADR 0001](https://github.com/fbuireu/forever-pto/blob/main/adr/0001-planner-runs-in-the-browser.md) for the trade-offs that decision carries.
 
 The [How it works](/how-it-works/overview/) section follows a request from the first byte to the last Metric.

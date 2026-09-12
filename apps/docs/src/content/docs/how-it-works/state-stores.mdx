@@ -1,6 +1,6 @@
 ---
 title: State stores
-description: The Zustand stores (filters, holidays, location, premium and ui), their shapes, encrypted localStorage persistence and the useShallow convention.
+description: The Zustand stores (filters, holidays, location, premium and ui), their shapes, obfuscated localStorage persistence and the useShallow convention.
 sidebar:
   order: 6
 ---
@@ -26,11 +26,11 @@ flowchart LR
 ```
 
 
-## Persistence: encrypted localStorage
+## Persistence: obfuscated localStorage
 
-Persisted stores share `encryptedStorage` from `apps/web/src/application/stores/crypto.ts`, a `createJSONStorage` wrapper over `localStorage`:
+Persisted stores share `obfuscatedStorage` from `apps/web/src/application/stores/crypto.ts`, a `createJSONStorage` wrapper over `localStorage`:
 
-- In production with `NEXT_PUBLIC_STORAGE_KEY` set, values are encrypted (XOR + base64, `encrypt`/`decrypt` in `apps/web/src/application/stores/utils/crypto.ts`) before hitting `localStorage`. This is obfuscation, not cryptography: it keeps casual tampering out, nothing more.
+- In production with `NEXT_PUBLIC_STORAGE_KEY` set, values are obfuscated (XOR + base64, `obfuscate`/`deobfuscate` in `apps/web/src/application/stores/utils/crypto.ts`) before hitting `localStorage`. That key ships in the client bundle, so this is obfuscation and never cryptography: it keeps casual tampering out, nothing more. See [data protection](/how-it-works/data-protection/).
 - In development, or when the key is missing, it falls back to plain `localStorage`.
 - On the server it is a no-op storage, so SSR never touches `localStorage`.
 

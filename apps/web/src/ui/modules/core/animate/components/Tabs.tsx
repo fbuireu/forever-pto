@@ -111,11 +111,11 @@ function Tabs({ defaultValue, value, onValueChange, children, className, ...prop
 	);
 
 	return (
-		<TabsContext.Provider value={contextValue}>
+		<TabsContext value={contextValue}>
 			<div data-slot="tabs" className={cn("flex flex-col gap-2", className)} {...props}>
 				{children}
 			</div>
-		</TabsContext.Provider>
+		</TabsContext>
 	);
 }
 

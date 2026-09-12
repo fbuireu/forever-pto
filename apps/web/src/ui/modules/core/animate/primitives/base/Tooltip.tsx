@@ -27,7 +27,7 @@ const TooltipDelayContext = createContext(0);
 
 type TooltipProviderProps = { delay?: number; children?: ReactNode };
 function TooltipProvider({ delay = 0, children }: TooltipProviderProps) {
-	return <TooltipDelayContext.Provider value={delay}>{children}</TooltipDelayContext.Provider>;
+	return <TooltipDelayContext value={delay}>{children}</TooltipDelayContext>;
 }
 
 type TooltipProps = ComponentProps<typeof PopoverPrimitive.Root> & {

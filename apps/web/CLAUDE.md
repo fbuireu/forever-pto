@@ -330,12 +330,29 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
   `tests/docs-consistency.test.ts` scans every bundle for it now, against a named acronym allow-list; the same
   bullet in [`./src/ui/i18n/CLAUDE.md`](./src/ui/i18n/CLAUDE.md) says what the keys that shouted were and
   why whole-token matching is what keeps `iOS` out of the report.
-- **`typeof window`/`typeof document` guards stay.** They look redundant to a linter but are required under
-  SSR: the bare identifier throws `ReferenceError` on the server.
+- **A `typeof window`/`typeof document` guard stays wherever `use(browser())` cannot reach.** The guard looks
+  redundant to a linter and is not: the bare identifier throws `ReferenceError` on the server. React gives
+  a *component* a better tool, `use(browser())`, which opts its subtree out of the server render outright, so
+  inside a component the guard is now the fallback rather than the rule. Module scope, plain utilities and event
+  handlers cannot call it and keep the guard; [`./src/ui/CLAUDE.md`](./src/ui/CLAUDE.md) names which files sit
+  on which side and why `useMobile.ts` deliberately stays as it is.
 - **Cross-layer imports use the alias, same-folder imports stay relative.** Mixed forms of the same module
   break Biome's import sorting.
 
 ## Gotchas
+
+- **Trusted Types is report-only, and enforcing it is a project rather than a flag.** React stopped
+  coercing `TrustedHTML` to a string on its way to a DOM sink, which is what made
+  `require-trusted-types-for 'script'` enforceable here at all, so [`next.config.ts`](./next.config.ts) now
+  sends it on a `Content-Security-Policy-Report-Only` header. Turning it into the enforcing
+  `Content-Security-Policy` blanks the page until every sink has a policy, and the list is longer than this
+  tree: [`JsonLd.tsx`](./src/ui/modules/shared/seo/JsonLd.tsx) writes three `ld+json` blocks and
+  [`HtmlLangSync.tsx`](./src/ui/modules/pages/not-found/HtmlLangSync.tsx) an inline `lang` assignment, both
+  through `dangerouslySetInnerHTML`, and Tag Manager, Stripe, `vanilla-cookieconsent` and `boneyard-js` each
+  inject their own. The report-only header deliberately carries **no** `trusted-types` allowlist: policy names
+  we have only guessed at would silence the violations the header exists to collect. Read them first, wrap the
+  sinks, then promote the directive. `driver.js`'s `closeButton.innerHTML = ""` is not one of them — the empty
+  string is the one assignment the spec exempts.
 
 - **Every build renames every Server Action, so a page from the previous deploy cannot call the current
   one.** Action ids are per-build; a tab, a cached page or a prerendered shell served before a deploy carries

@@ -4,7 +4,7 @@ export function getStrictContext<T>(name?: string) {
 	const Context = createContext<T | undefined>(undefined);
 
 	const Provider = ({ value, children }: { value: T; children?: ReactNode }) => (
-		<Context.Provider value={value}>{children}</Context.Provider>
+		<Context value={value}>{children}</Context>
 	);
 
 	const useSafeContext = () => {
