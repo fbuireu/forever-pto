@@ -46,9 +46,10 @@
 
 - [ ] `pnpm verify` passes (format check, typecheck and coverage, then the contract suite)
 - [ ] I have performed a self-review of my own code
-- [ ] This PR touches one package, `apps/web` or `apps/docs`, unless the change genuinely spans both
+- [ ] My change carries no inline comments; rationale lives in this PR, the commit messages, an ADR or the folder's guide
 - [ ] I used the glossary's words ([`CONTEXT.md`](../CONTEXT.md)) rather than synonyms
-- [ ] I updated any `CLAUDE.md`, `CONTEXT.md`, ADR or docs-site page my change affects, in this same PR, and `pnpm test:docs` passes
+- [ ] This PR touches one package, `apps/web` or `apps/docs`, unless the change genuinely spans both
+- [ ] I updated any `CLAUDE.md`, [`CONTEXT.md`](../CONTEXT.md), ADR or docs-site page my change affects, in this same PR, and `pnpm test:docs` passes
 - [ ] My changes generate no new warnings or errors
 - [ ] I have added tests that prove my fix is effective or that my feature works
 

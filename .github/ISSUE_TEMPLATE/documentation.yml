@@ -19,6 +19,7 @@ body:
         - CONTEXT.md glossary
         - An ADR
         - The docs site (docs.forever-pto.com)
+        - CONTRIBUTING
         - Other
     validations:
       required: true

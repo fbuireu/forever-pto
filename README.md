@@ -14,7 +14,7 @@
 [![Uptime](https://uptime.betterstack.com/status-badges/v1/monitor/272ww.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL%20v3-blue?style=flat-square)](./LICENSE)
 
-**[forever-pto.com](https://forever-pto.com)** · **[Documentation](https://docs.forever-pto.com)** · **[Getting Started](#getting-started)** · **[Stack](#stack)** · **[Contributing](./CONTRIBUTING.md)**
+**[forever-pto.com](https://forever-pto.com)** · **[Documentation](https://docs.forever-pto.com)** · **[Getting Started](#getting-started)** · **[Stack](#stack)** · **[Contributing](./.github/CONTRIBUTING.md)**
 
 </div>
 
@@ -146,9 +146,9 @@ when the docs and the code disagree.
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup, checks and conventions,
-and the [Code of Conduct](./CODE_OF_CONDUCT.md). Security issues follow the
-[Security Policy](./SECURITY.md), never a public issue.
+See [CONTRIBUTING.md](./.github/CONTRIBUTING.md) for setup, checks and conventions,
+and the [Code of Conduct](./.github/CODE_OF_CONDUCT.md). Security issues follow the
+[Security Policy](./.github/SECURITY.md), never a public issue.
 
 - [Open a feature request](https://github.com/fbuireu/forever-pto/issues/new?template=feature_request.yml&labels=enhancement)
 - [Report a bug](https://github.com/fbuireu/forever-pto/issues/new?template=bug_report.yml)

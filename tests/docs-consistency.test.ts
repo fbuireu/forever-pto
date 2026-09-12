@@ -532,7 +532,9 @@ describe("pinned runtimes", () => {
 
 	it("names every runtime it pins", () => {
 		const named = ["Node", "pnpm"].flatMap((runtime) =>
-			["CLAUDE.md", "CONTRIBUTING.md"].filter((doc) => !read(doc).includes(runtime)).map((doc) => `${doc}: ${runtime}`),
+			["CLAUDE.md", ".github/CONTRIBUTING.md"]
+				.filter((doc) => !read(doc).includes(runtime))
+				.map((doc) => `${doc}: ${runtime}`),
 		);
 
 		expect(named).toEqual([]);
@@ -2097,7 +2099,7 @@ describe("the guides describe the project as it is configured", () => {
 		const sources = [
 			"CLAUDE.md",
 			"README.md",
-			"CONTRIBUTING.md",
+			".github/CONTRIBUTING.md",
 			...PACKAGE_GUIDES,
 			...WORKSPACE_PACKAGES.map((pkg) => `${pkg}/README.md`),
 			...contentFiles,
