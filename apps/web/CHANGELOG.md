@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.11.0](https://github.com/fbuireu/forever-pto/compare/web-v1.10.9...web-v1.11.0) (2026-09-12)
+
+
+### Features
+
+* **observability:** sample every log line and every span ([b6ab3fd](https://github.com/fbuireu/forever-pto/commit/b6ab3fd6619934c11ead90c7b29c01b3b0d716af))
+
 # [forever-pto-web-v1.10.9](https://github.com/fbuireu/forever-pto/compare/web-v1.10.8...web-v1.10.9) (2026-09-11)
 
 
