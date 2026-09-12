@@ -588,7 +588,17 @@ describe("the security header policy covers every request", () => {
 		"Cross-Origin-Opener-Policy",
 		"Cross-Origin-Resource-Policy",
 	];
-	const REQUIRED_CSP_DIRECTIVES = ["frame-ancestors 'none'", "object-src 'none'", "base-uri 'self'"];
+	const REQUIRED_CSP_DIRECTIVES = [
+		"frame-ancestors 'none'",
+		"object-src 'none'",
+		"base-uri 'self'",
+		"worker-src 'self' blob:",
+	];
+	const VENDOR_HOST_PAIRS = [
+		["https://betterstack.net", "https://*.betterstackdata.com"],
+		["https://www.googletagmanager.com", "https://*.google-analytics.com"],
+		["https://static.cloudflareinsights.com", "https://cloudflareinsights.com"],
+	];
 	const HSTS_MINIMUM_MAX_AGE = 31536000;
 	const FRAMING_REFUSALS = ["DENY", "SAMEORIGIN"];
 	const sent = new Map(webHeaderRules.flatMap(({ headers }) => headers.map(({ key, value }) => [key, value])));
@@ -601,9 +611,20 @@ describe("the security header policy covers every request", () => {
 		expect(REQUIRED_HEADERS.filter((header) => !sent.get(header))).toEqual([]);
 	});
 
-	it("states the three CSP directives whose absence is invisible in a browser", () => {
+	it("states the CSP directives whose absence is invisible in a browser", () => {
 		const directives = (sent.get("Content-Security-Policy") ?? "").split(";").map((directive) => directive.trim());
 		expect(REQUIRED_CSP_DIRECTIVES.filter((directive) => !directives.includes(directive))).toEqual([]);
+	});
+
+	// A tag loads from one host and reports to another, and admitting only the first is invisible: the script
+	// runs, the browser refuses its beacons in the console alone, and the dashboard is merely empty. It has
+	// happened three times here, on Better Stack, on GA4's regional endpoint and on the Cloudflare beacon, so
+	// the pairing is a rule rather than a gotcha. Whichever side is admitted, both must be.
+	it.each(VENDOR_HOST_PAIRS)("admits %s and the host it reports to, %s, or neither", (from, to) => {
+		const directives = (sent.get("Content-Security-Policy") ?? "").split(";").map((directive) => directive.trim());
+		const directive = (name: string) => directives.find((entry) => entry.startsWith(`${name} `)) ?? "";
+
+		expect(directive("script-src").includes(from)).toBe(directive("connect-src").includes(to));
 	});
 
 	it("holds a browser to HTTPS for a year, subdomains included", () => {
