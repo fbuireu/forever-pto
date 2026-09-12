@@ -97,7 +97,7 @@ destination that receives its own test message and nothing else.
   the `Hostname` dimension. It lives in one repository variable, `GOOGLE_ANALYTICS_ID`, and each workflow maps
   it to the prefix its bundler inlines.
 - **Better Stack RUM uses a source of its own, per stage, under one variable name.** Sharing the app's would
-  file wiki sessions under the app's `release`, and this package's version is `0.0.0` for good. So
+  file wiki sessions under the app's `release`, and this tag passes no `release` of its own at all. So
   `BETTER_STACK_TRACKING_TOKEN` is a variable on `docs-development` and `docs-production`.
 - **Which is why `build` in [`docs.yml`](../../.github/workflows/docs.yml) declares an `environment:`, and it
   had none.** A job without one reads an empty string from any environment variable, and the single

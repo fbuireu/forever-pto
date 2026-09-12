@@ -4,7 +4,9 @@ Date: 2026-08-15
 
 ## Status
 
-Accepted.
+Accepted. Amended 2026-09-12: `apps/docs` now runs the same plugin chain as `apps/web` and pushes its own
+release commit. The clause below that kept the changelog off it read the race backwards, and the *Decision*
+section carries the correction; everything else about per-package versioning and the bridge tags stands.
 
 ## Context
 
@@ -25,11 +27,15 @@ Each package runs its own semantic-release through `semantic-release-monorepo`, 
 | Package | `tagFormat` | Writes | Runs in |
 | --- | --- | --- | --- |
 | [`apps/web`](../apps/web) | `web-v${version}` | [`apps/web/package.json`](../apps/web/package.json), [`apps/web/CHANGELOG.md`](../apps/web/CHANGELOG.md), a GitHub release | `ci.yml`, after `deploy-production` |
-| [`apps/docs`](../apps/docs) | `docs-v${version}` | a tag and a GitHub release only | [`docs.yml`](../.github/workflows/docs.yml), after `deploy` |
+| [`apps/docs`](../apps/docs) | `docs-v${version}` | [`apps/docs/package.json`](../apps/docs/package.json), `apps/docs/CHANGELOG.md`, a GitHub release | [`docs.yml`](../.github/workflows/docs.yml), after `deploy` |
 
 `tagFormat` is stated explicitly in both. Left out, `semantic-release-monorepo` derives it from the package name and would produce `forever-pto-v${version}`, and `tagFormat` is used both to *find* the previous release and to write the new one, so the derived form would not match the history.
 
-`apps/docs` deliberately runs **no** changelog, npm or git plugin. It pushes nothing to `main`, which is what stops the release jobs racing each other for the branch rather than relying on the shared concurrency group alone. [`tests/docs-consistency.test.ts`](../tests/docs-consistency.test.ts) asserts that exactly one package carries `@semantic-release/git`, so adding the changelog to `apps/docs` to make the two packages symmetrical fails the suite with the reason rather than shipping the race. Its own version stays `0.0.0` permanently and nothing reads it: the docs site displays the **app's** version, read from [`apps/web/package.json`](../apps/web/package.json) at build time.
+**Both packages run the same plugin chain, and that is a correction.** `apps/docs` ran neither changelog, npm nor git plugin, on the stated ground that pushing nothing to `main` is "what stops the release jobs racing each other for the branch rather than relying on the shared concurrency group alone". That reads the race backwards. `release-web` and `release-docs` both declare `concurrency: group: release` with `cancel-in-progress: false`, GitHub serialises a group across workflows, and each job checks out at its own start, so the second one branches from the first one's push rather than competing with it. The group is not a weaker guard the missing plugins were shoring up; it is the guard, and the missing plugins bought nothing on top of it.
+
+What they cost was visible for eight tags: `docs-v1.2.3` existed while [`apps/docs/package.json`](../apps/docs/package.json) said `0.0.0`, and the notes for every one of those releases lived on a GitHub release and nowhere a reader of the tree would look. The version being unread is what made the discrepancy survivable, not what made it right: `src/lib/app-version.ts` reads the **app's** manifest for the version the site displays, and the wiki's own Better Stack tag calls `betterstack("init")` with no `release` at all, so nothing anywhere consumed the `0.0.0`.
+
+[`tests/docs-consistency.test.ts`](../tests/docs-consistency.test.ts) asserts what actually holds the line: that every release job which pushes names the `release` concurrency group, and that every package cutting a release carries changelog, npm and git. Taking the group off either job fails the suite, which is the assertion the old clause should have been.
 
 **Bridge tags** are created in the new format on the same commits as the existing plain `v*` tags of the same numbers, so the new format finds the existing history. They are on the remote, and the repository guide lists which they are. The historical plain `v*` tags are left in place, untouched.
 
