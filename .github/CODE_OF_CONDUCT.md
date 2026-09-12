@@ -41,8 +41,9 @@ Examples of unacceptable behavior include:
 
 This Code of Conduct applies within all community spaces of this project
 ([Issues](https://github.com/fbuireu/forever-pto/issues),
-[Pull Requests](https://github.com/fbuireu/forever-pto/pulls), and
-[Discussions](https://github.com/fbuireu/forever-pto/discussions)), and also
+[Pull Requests](https://github.com/fbuireu/forever-pto/pulls),
+[Discussions](https://github.com/fbuireu/forever-pto/discussions),
+and the [Documentation](https://docs.forever-pto.com)), and also
 applies when an individual is officially representing the project in public
 spaces.
 
