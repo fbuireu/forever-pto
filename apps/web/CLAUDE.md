@@ -436,7 +436,7 @@ carry `forever-pto` and not a generic `better-stack`. And a destination has no e
 environment here names its own pair, because Better Stack has a source per stage and a Worker naming another
 stage's destination exports happily into it, filing preview traffic with the live site's. The top level names
 production's, since it shares production's `name` and vars. The spelling is
-`<repo>-<package>-<signal>-<stage>`, matching the GitHub environments and the release tags, so `apps/docs` has
+`<repo>-<package>-<stage>-<signal>`, whose middle pair matches the GitHub environments and the release tags, so `apps/docs` has
 a name waiting for it, though it declares no `[observability]` at all today. `tests/docs-consistency.test.ts`
 asserts the split, because the names resolve against an account no test can read. And rotating the BetterStack
 source is a dashboard change with no deploy.

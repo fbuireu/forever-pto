@@ -19,6 +19,7 @@ The rest of the application layer contract is in [`../CLAUDE.md`](../CLAUDE.md).
 | [`premium.ts`](./premium.ts) | `usePremiumStore`: the Premium session and the Premium-required modal |
 | [`ui.ts`](./ui.ts) | `useUIStore`: donate popover and currency; the one store with no persistence |
 | [`crypto.ts`](./crypto.ts) | `obfuscatedStorage`, the zustand `PersistStorage` the persisted stores share. Not a store |
+| [`rehydration.ts`](./rehydration.ts) | `onRehydrateFailure`, the one thing every persisted store does when a stored blob will not come back. Not a store |
 | [`utils/crypto.ts`](./utils/crypto.ts) | `obfuscate` / `deobfuscate` / `base64Encode` / `base64Decode`, plus `TWENTY_FOUR_HOURS` and `BASE64_PATTERN`. Not a store |
 | [`types.ts`](./types.ts) | The action parameter objects shared between the stores and their callers (`GenerateSuggestionsParams`, `MainThreadSuggestionsParams`, `FetchHolidaysParams`, `PlanningWindowParams`, `AddHolidayParams`, `EditHolidayParams`, `AlternativeSelectionBaseParams`) plus the outcomes the actions answer with: `DayRefusal`/`DayOutcome` and `HolidayRefusal`/`HolidayOutcome` |
 

@@ -124,9 +124,10 @@ The rejected alternatives are the ones listed above.
   per-pull-request previews, and the sibling repositories. `better-stack-logs` was the first spelling and it
   is the wrong one, because the next repository to want a Better Stack source would find the name taken and
   would have to either share the source or pick a worse name. The shape is
-  `<repo>-<package>-<signal>-<stage>`, which is the namespacing the GitHub environments and the release tags
-  already use (`web-production`, `docs-production`, `web-v*`), so an alphabetical list of destinations groups
-  itself and `apps/docs` has a spelling waiting for it.
+  `<repo>-<package>-<stage>-<signal>`, whose middle pair is the namespacing the GitHub environments and the
+  release tags already use (`web-production`, `docs-production`, `web-v*`), so an alphabetical list of
+  destinations groups itself by stage and `apps/docs` has a spelling waiting for it. Both sibling
+  repositories name theirs the same way.
 - **Each stage exports into its own destinations, and nothing would have failed if it did not.** A
   destination has no environment of its own; what is per-environment is which name each `[observability]`
   block references, so a development Worker naming the production destination is accepted, exports happily,

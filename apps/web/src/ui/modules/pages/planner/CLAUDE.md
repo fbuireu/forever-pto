@@ -14,11 +14,14 @@ off the main thread and every other component reads the result back out of the h
 
 `src/app/[locale]/(app)/planner/page.tsx` `dynamic()`-imports its components and renders them in
 this order; the layout adds [`SiteTitle.tsx`](./SiteTitle.tsx) and [`SiteSubtitle.tsx`](./SiteSubtitle.tsx) above them.
+`SiteTitle` is a server component but the year in it is not: [`SiteTitleYear.tsx`](./SiteTitleYear.tsx) is the client island that
+reads `year` off the filters store and animates it through `SlidingNumber`, which is why the heading is split
+in two rather than one component reading the store.
 
 | Component | Role |
 | --- | --- |
 | [`HolidaysList.tsx`](./HolidaysList.tsx) | Tabs over [`HolidaysTable.tsx`](./holidays/HolidaysTable.tsx), one per Holiday Variant. The Custom tab is behind the Premium gate; the Regional tab is inert when the Region has no Holidays |
-| [`ManagementBar.tsx`](./ManagementBar.tsx) | Sticky host for [`PlannerPanel.tsx`](./PlannerPanel.tsx). On desktop it renders it inline; on mobile it renders it inside a `vaul` drawer |
+| [`ManagementBar.tsx`](./ManagementBar.tsx) | Sticky host for [`PlannerPanel.tsx`](./PlannerPanel.tsx). On desktop it renders it inline; on mobile it renders it inside a `vaul` drawer, with [`PlannerPanelFixture.tsx`](./PlannerPanelFixture.tsx) as both its fixture and its fallback |
 | `CalendarList.tsx` | Expands the Planning Window for rendering (`planningWindowMonths`, from `@domain/calendar/window`), owns the Holiday fetch and the worker trigger. Renders one `Calendar` per month. It no longer *owns* the window: the trigger sends `{ year, carryOverMonths }` and the engine expands its own |
 | [`Legend.tsx`](./Legend.tsx) | Explains the day colours. Exports `Legend` *and* `LegendItems`, which `ManagementBar` reuses inside the mobile drawer |
 | [`Summary.tsx`](./Summary.tsx) | Metric cards plus the charts, all `dynamic()`-imported from here rather than from the route |
