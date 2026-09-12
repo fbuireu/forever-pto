@@ -346,8 +346,13 @@ dispatch redeploys the same sha and there is nothing to version. The push-trigge
 and made no request to `https://forever-pto.com` at all. The suite that catches Cloudflare Error 1101 ran
 against a preview Worker with different bindings and a different `NEXT_PUBLIC_SITE_URL`. `smoke` needs
 `deploy-production`, is gated on `github.event_name == 'push'`, and runs Playwright with `BASE_URL` taken from the
-**`NEXT_PUBLIC_SITE_URL` repository variable**, the same name the app declares in `environment.d.ts` and the same
-value `_deploy-web.yml` hands the Worker as `--var NEXT_PUBLIC_SITE_URL`, so the address is written once. It has to
+**`WEB_SITE_URL` repository variable**, which is also what `deploy-production` passes as the reusable deploy's
+`url` input and what `_deploy-web.yml` then hands the Worker as `--var NEXT_PUBLIC_SITE_URL`, so the address is
+written once. **The variable and the binding are deliberately spelled differently**: GitHub is not a bundler, so
+the variable carries the package (`WEB_SITE_URL`, beside `DOCS_SITE_URL`), while the binding keeps the
+`NEXT_PUBLIC_` prefix the app reads off `CloudflareEnv` and `environment.d.ts` declares. Renaming the variable
+without the workflow is what an empty `BASE_URL` looks like, and it cost a rolled-back production deploy: the
+guard fired, `smoke` failed, `rollback` reverted a good version and `release-web` never ran. It has to
 be a **repository** variable rather than one on `web-production`: this job declares no `environment:` and a caller
 job cannot declare one either, so both would read an empty string. A first step fails the job when it is empty,
 because [`apps/web/playwright.config.ts`](./apps/web/playwright.config.ts) falls back to localhost when `BASE_URL`
