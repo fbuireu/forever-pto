@@ -41,6 +41,12 @@ The script itself is injected by `apps/web/src/ui/modules/tracking/BetterStackTr
 
 That snippet is Better Stack's real user monitoring tag, not only an event pipe: once loaded it also captures browser errors, session replays, web vitals and console logs, and which of those run, at what sampling, is configured remotely in the Better Stack application, so a change there needs no deploy. Two things are set from code because the tag cannot know them. The **release** is the app version from `apps/web/package.json`, passed through `betterstack('config', { release })`, so an error is grouped under the version that produced it. The **environment** is derived from the hostname by `trackingEnvironment(hostname)`: `localhost` and any `.workers.dev` host, which is where a pull-request preview lives, report `development`, everything else `production`. It used to read `NODE_ENV`, which every deployed build sets to `production`, so preview traffic was filed with the live site's.
 
+## The wiki
+
+`docs.forever-pto.com` has no observability and cannot have any: its `wrangler.toml` declares no `main`, so Cloudflare serves the built assets without invoking a script, and there is no handler invocation, outbound `fetch` or binding call to trace. What it does have is browser-side analytics behind its own consent banner, with its own Better Stack RUM source and the same Google Analytics measurement id the app uses. Both are described on the [cookie consent](/how-it-works/cookie-consent/) page.
+
+Read every browser-side figure as a floor. Better Stack RUM is Sentry's browser SDK underneath and posts to a Sentry `envelope` endpoint that ad blockers filter aggressively, and GA4 fares no better. The only numbers nothing can block are Cloudflare's own request analytics.
+
 ## Google Analytics
 
 `apps/web/src/ui/modules/tracking/Analytics.tsx` loads gtag (`NEXT_PUBLIC_GOOGLE_ANALYTICS_ID`) with **Consent Mode defaults of denied** for all storage types; the consent component upgrades `analytics_storage` only after opt-in. GA covers acquisition/product analytics; Better Stack events cover behavioral telemetry the team actually alerts on.

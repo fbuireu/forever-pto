@@ -54,6 +54,7 @@ jobs:
     if: ${{ needs.changes.outputs.docs == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    environment: ${{ github.event_name == 'pull_request' && 'docs-development' || 'docs-production' }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -63,6 +64,9 @@ jobs:
       - name: Typecheck
         run: pnpm --filter forever-pto-docs typecheck
       - name: Build
+        env:
+          PUBLIC_GOOGLE_ANALYTICS_ID: ${{ vars.GOOGLE_ANALYTICS_ID }}
+          PUBLIC_BETTER_STACK_TRACKING_TOKEN: ${{ vars.BETTER_STACK_TRACKING_TOKEN }}
         run: pnpm --filter forever-pto-docs build
       - name: Cache Playwright browsers
         id: playwright-cache

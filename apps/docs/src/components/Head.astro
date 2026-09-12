@@ -1,0 +1,35 @@
+---
+import Default from "@astrojs/starlight/components/Head.astro";
+
+const googleAnalyticsId = import.meta.env.PUBLIC_GOOGLE_ANALYTICS_ID ?? "";
+
+const consentDefaults = `
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments)}
+window.gtag = gtag;
+gtag('consent', 'default', {
+  analytics_storage: 'denied',
+  ad_storage: 'denied',
+  ad_user_data: 'denied',
+  ad_personalization: 'denied'
+});
+gtag('js', new Date());
+gtag('config', ${JSON.stringify(googleAnalyticsId)});
+`;
+---
+
+<Default><slot /></Default>
+
+{googleAnalyticsId && <script is:inline set:html={consentDefaults} />}
+{
+	googleAnalyticsId && (
+		<script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`} />
+	)
+}
+
+<script>
+	import "vanilla-cookieconsent/dist/cookieconsent.css";
+	import { startCookieConsent } from "../lib/analytics/consent";
+
+	startCookieConsent();
+</script>

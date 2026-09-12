@@ -36,3 +36,9 @@ On a revisit, `onConsent` restores per-service state from `CookieConsentLib.getU
 ## What this means in practice
 
 No analytics code runs until the user opts in; rejecting all is a first-class, equally prominent action. Everything the app strictly needs to function (locale, country, premium session, payment) is in the necessary bucket and never blocked by consent.
+
+## This wiki has its own, and shares only the vocabulary
+
+`docs.forever-pto.com` asks the same question with a separate implementation: `apps/docs/src/lib/analytics/consent.ts` drives the same `vanilla-cookieconsent` version through the library's own UI, in English and Spanish, and `apps/docs/src/components/Head.astro` emits the Consent Mode defaults before `gtag.js` loads. The `analytics` category and the `ga4` and `betterStack` service ids are the same strings on both sites, deliberately, so the two read as one policy.
+
+What is not shared is the UI. The app's is React reading `next-intl` off its own message bundles, with a cookie table listing Stripe cookies the wiki never sets. What is also not shared is the Better Stack source: the wiki has its own, because the app's tag reports a `release` taken from `apps/web/package.json` and the docs package version never moves. Google Analytics **is** shared, one measurement id across both subdomains, so a session that starts in the wiki and ends in the planner is one session. See [ADR 0019](https://github.com/fbuireu/forever-pto/blob/main/adr/0019-the-wiki-measures-itself-with-its-own-consent-flow.md).
