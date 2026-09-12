@@ -32,11 +32,7 @@ export default defineConfig({
 		starlight({
 			title: "Forever PTO",
 			description: "Documentation and internal wiki for Forever PTO, the PTO optimization tool.",
-			logo: {
-				light: "./src/assets/forever-pto-logo.png",
-				dark: "./src/assets/forever-pto-logo-dark.png",
-				alt: "Forever PTO",
-			},
+			logo: { src: "./src/assets/forever-pto-logo.png", alt: "Forever PTO" },
 			favicon: "/favicon.ico",
 			head: [
 				{
@@ -51,9 +47,16 @@ export default defineConfig({
 			customCss: ["./src/styles/global.css"],
 			components: { Head: "./src/components/Head.astro", SiteTitle: "./src/components/SiteTitle.astro" },
 			defaultLocale: "root",
+			// The same six the app serves (LOCALES in apps/web/src/infrastructure/i18n/locales.ts), so the
+			// language picker offers what the planner does. Starlight ships the chrome translations for all
+			// of them and falls back to English for a page with no translation of its own.
 			locales: {
 				root: { label: "English", lang: "en" },
 				es: { label: "Español", lang: "es" },
+				ca: { label: "Català", lang: "ca" },
+				it: { label: "Italiano", lang: "it" },
+				fr: { label: "Français", lang: "fr" },
+				de: { label: "Deutsch", lang: "de" },
 			},
 			social: [{ icon: "github", label: "GitHub", href: "https://github.com/fbuireu/forever-pto" }],
 			editLink: { baseUrl: "https://github.com/fbuireu/forever-pto/edit/main/apps/docs/" },
@@ -62,18 +65,36 @@ export default defineConfig({
 			sidebar: [
 				{
 					label: "Start here",
-					translations: { es: "Empieza aquí" },
+					translations: {
+						es: "Empieza aquí",
+						ca: "Comença aquí",
+						it: "Inizia qui",
+						fr: "Commencer ici",
+						de: "Erste Schritte",
+					},
 					items: [{ autogenerate: { directory: "start" } }],
 				},
 				{
 					label: "Architecture",
-					translations: { es: "Arquitectura" },
+					translations: {
+						es: "Arquitectura",
+						ca: "Arquitectura",
+						it: "Architettura",
+						fr: "Architecture",
+						de: "Architektur",
+					},
 					collapsed: true,
 					items: [{ autogenerate: { directory: "architecture" } }],
 				},
 				{
 					label: "How it works",
-					translations: { es: "Cómo funciona" },
+					translations: {
+						es: "Cómo funciona",
+						ca: "Com funciona",
+						it: "Come funziona",
+						fr: "Comment ça marche",
+						de: "So funktioniert es",
+					},
 					collapsed: true,
 					items: [{ autogenerate: { directory: "how-it-works" } }],
 				},
@@ -84,24 +105,36 @@ export default defineConfig({
 					items: [
 						{
 							label: "Foundations",
-							translations: { es: "Fundamentos" },
+							translations: {
+								es: "Fundamentos",
+								ca: "Fonaments",
+								it: "Fondamenti",
+								fr: "Fondations",
+								de: "Grundlagen",
+							},
 							items: [{ autogenerate: { directory: "design-system/foundations" } }],
 						},
 						{
 							label: "Components",
-							translations: { es: "Componentes" },
+							translations: {
+								es: "Componentes",
+								ca: "Components",
+								it: "Componenti",
+								fr: "Composants",
+								de: "Komponenten",
+							},
 							collapsed: true,
 							items: [{ autogenerate: { directory: "design-system/components" } }],
 						},
 						{
 							label: "Animation",
-							translations: { es: "Animación" },
+							translations: { es: "Animación", ca: "Animació", it: "Animazione", fr: "Animation", de: "Animation" },
 							collapsed: true,
 							items: [{ autogenerate: { directory: "design-system/animation" } }],
 						},
 						{
 							label: "Patterns",
-							translations: { es: "Patrones" },
+							translations: { es: "Patrones", ca: "Patrons", it: "Pattern", fr: "Motifs", de: "Muster" },
 							collapsed: true,
 							items: [{ autogenerate: { directory: "design-system/patterns" } }],
 						},
@@ -109,19 +142,25 @@ export default defineConfig({
 				},
 				{
 					label: "Infrastructure & CI/CD",
-					translations: { es: "Infraestructura y CI/CD" },
+					translations: {
+						es: "Infraestructura y CI/CD",
+						ca: "Infraestructura i CI/CD",
+						it: "Infrastruttura e CI/CD",
+						fr: "Infrastructure et CI/CD",
+						de: "Infrastruktur & CI/CD",
+					},
 					collapsed: true,
 					items: [{ autogenerate: { directory: "infra" } }],
 				},
 				{
 					label: "Reference",
-					translations: { es: "Referencia" },
+					translations: { es: "Referencia", ca: "Referència", it: "Riferimento", fr: "Référence", de: "Referenz" },
 					collapsed: true,
 					items: [{ autogenerate: { directory: "reference" } }],
 				},
 				{
 					label: "Contributing",
-					translations: { es: "Contribuir" },
+					translations: { es: "Contribuir", ca: "Contribuir", it: "Contribuire", fr: "Contribuer", de: "Mitwirken" },
 					collapsed: true,
 					items: [{ autogenerate: { directory: "contributing" } }],
 				},

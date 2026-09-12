@@ -109,32 +109,24 @@ button[data-slot],
     color 120ms ease;
 }
 
-/* Mermaid diagrams. The remark plugin in src/lib/remark-mermaid.ts emits a
-   <pre class="mermaid" data-mermaid> per fence and src/lib/mermaid.ts draws the
-   SVG into it in the brand palette; the frame matches the demo canvas. */
-pre.mermaid {
+/* Mermaid diagrams, drawn at build time by src/lib/mermaid-plugin.ts into a
+   figure holding one SVG per theme; Starlight's light:/dark:sl-hidden pick one.
+   The frame matches the demo canvas; a click toggles the natural size. */
+figure.mermaid {
   background: var(--surface-panel);
   background-image: var(--page-glow);
   border: 3px solid var(--frame);
   border-radius: 14px;
   box-shadow: var(--shadow-brutal-sm);
-  color: var(--foreground);
-  font-family: var(--sl-font);
-  font-size: var(--sl-text-sm);
+  cursor: zoom-in;
   margin-block: 1.5rem;
+  margin-inline: 0;
   overflow-x: auto;
   padding: 1.5rem;
-  white-space: pre-wrap;
+  position: relative;
 }
 
-pre.mermaid[data-mermaid-rendered='true'] {
-  cursor: zoom-in;
-  display: flex;
-  justify-content: center;
-  white-space: normal;
-}
-
-pre.mermaid[data-mermaid-rendered='true']::after {
+figure.mermaid::after {
   color: var(--sl-color-gray-3);
   content: 'click to enlarge';
   font-family: var(--sl-font-mono);
@@ -146,32 +138,63 @@ pre.mermaid[data-mermaid-rendered='true']::after {
   top: 0.6rem;
 }
 
-pre.mermaid[data-mermaid-rendered='true'] {
-  position: relative;
+figure.mermaid {
+  display: flex;
+  justify-content: center;
 }
 
-pre.mermaid[data-mermaid-rendered='true'] svg {
+/* One copy per theme, picked the way the app picks its tokens: light by default, the system preference
+   when the reader has not chosen, and the explicit choice above both. */
+figure.mermaid-dark {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) figure.mermaid-light {
+    display: none;
+  }
+
+  :root:not([data-theme='light']) figure.mermaid-dark {
+    display: flex;
+  }
+}
+
+:root[data-theme='dark'] figure.mermaid-light {
+  display: none;
+}
+
+:root[data-theme='dark'] figure.mermaid-dark {
+  display: flex;
+}
+
+:root[data-theme='light'] figure.mermaid-light {
+  display: flex;
+}
+
+:root[data-theme='light'] figure.mermaid-dark {
+  display: none;
+}
+
+figure.mermaid > svg {
   height: auto;
   max-width: 100%;
 }
 
-pre.mermaid.mermaid-expanded {
+figure.mermaid.mermaid-expanded {
   cursor: zoom-out;
-  justify-content: safe center;
 }
 
-pre.mermaid.mermaid-expanded::after {
+figure.mermaid.mermaid-expanded::after {
   content: 'click to shrink';
 }
 
-pre.mermaid.mermaid-expanded svg {
-  flex: none;
-  max-width: none;
+figure.mermaid.mermaid-expanded {
+  justify-content: safe center;
 }
 
-pre.mermaid[data-mermaid-rendered='error'] {
-  border-color: var(--destructive);
-  font-family: var(--sl-font-mono);
+figure.mermaid.mermaid-expanded > svg {
+  flex: none;
+  max-width: none;
 }
 
 /* ---------------------------------------------------------------------------
@@ -205,14 +228,18 @@ pre.mermaid[data-mermaid-rendered='error'] {
 }
 
 /* Tables: the app's Table primitive, in markdown */
+/* Starlight renders a table as display: block so it can scroll; that also stops it
+   filling the column. A real table at full width, wrapping long cells instead. */
 .sl-markdown-content table:not(:where(.not-content *)) {
   border: 3px solid var(--frame);
   border-collapse: separate;
   border-radius: 12px;
   border-spacing: 0;
   box-shadow: var(--shadow-brutal-sm);
+  display: table;
   margin-block: 1.5rem;
-  overflow-x: auto;
+  overflow-wrap: anywhere;
+  width: 100%;
 }
 
 .sl-markdown-content thead th:not(:where(.not-content *)) {
@@ -227,6 +254,16 @@ pre.mermaid[data-mermaid-rendered='error'] {
 .sl-markdown-content :is(th, td):not(:where(.not-content *)) {
   border: 0;
   border-bottom: 2px solid var(--sl-color-hairline);
+  padding: 0.65rem 0.9rem;
+  vertical-align: middle;
+}
+
+.sl-markdown-content :is(th:first-child, td:first-child):not(:where(.not-content *)) {
+  padding-inline-start: 0.9rem;
+}
+
+.sl-markdown-content :is(th:last-child, td:last-child):not(:where(.not-content *)) {
+  padding-inline-end: 0.9rem;
 }
 
 .sl-markdown-content tbody tr:nth-child(even) td:not(:where(.not-content *)) {
@@ -282,8 +319,19 @@ pre.mermaid[data-mermaid-rendered='error'] {
   box-shadow: var(--shadow-brutal-sm);
   font-weight: 900;
   transition:
-    transform 80ms linear,
+    translate 80ms linear,
     box-shadow 80ms linear;
+}
+
+/* Starlight zeroes the inline padding of the minimal variant; with a frame on it, that reads as clipped */
+.sl-link-button.minimal {
+  padding-inline: 1.125rem !important;
+}
+
+@media (min-width: 50rem) {
+  .sl-link-button.minimal {
+    padding-inline: 1.25rem !important;
+  }
 }
 
 .sl-link-button.primary {
@@ -298,7 +346,7 @@ pre.mermaid[data-mermaid-rendered='error'] {
 
 .sl-link-button:hover {
   box-shadow: var(--shadow-brutal-md);
-  transform: translate(-2px, -2px);
+  translate: -2px -2px;
 }
 
 /* Card grid on the landing pages */
@@ -308,13 +356,15 @@ pre.mermaid[data-mermaid-rendered='error'] {
   border-radius: 14px;
   box-shadow: var(--shadow-brutal-md);
   transition:
-    transform 80ms linear,
+    translate 80ms linear,
     box-shadow 80ms linear;
 }
 
+/* `translate`, not `transform`: CardGrid's stagger positions the second column with a transform, and a
+   hover transform would replace it, so the card jumped up by the whole stagger height. */
 .sl-markdown-content .card:hover {
   box-shadow: var(--shadow-brutal-lg);
-  transform: translate(-2px, -2px);
+  translate: -2px -2px;
 }
 
 .sl-markdown-content .card .title {
@@ -375,13 +425,13 @@ site-search > button {
   border-radius: 12px;
   box-shadow: var(--shadow-brutal-sm);
   transition:
-    transform 80ms linear,
+    translate 80ms linear,
     box-shadow 80ms linear;
 }
 
 .pagination-links a:hover {
   box-shadow: var(--shadow-brutal-md);
-  transform: translate(-2px, -2px);
+  translate: -2px -2px;
 }
 
 /* Live demo frames carry a chip naming where the component comes from */
@@ -434,4 +484,32 @@ header.header {
 
 .right-sidebar-panel {
   border-inline-start: 2px solid var(--sl-color-hairline);
+}
+
+/* The app's components assume Tailwind's preflight, which this site deliberately does not import
+   (Starlight owns the base layer). Without it a `ghost` Button keeps the browser's own ButtonFace
+   grey and every form control renders in the UA font. This is the slice of preflight the demos
+   depend on, scoped to `.not-content` so Starlight's own chrome keeps its styles, and inside
+   `@layer base` so a `bg-*` utility still wins: unlayered, it would flatten every filled Button. */
+@layer base {
+  .not-content :is(button, input, optgroup, select, textarea) {
+    background-color: transparent;
+    background-image: none;
+    border-style: solid;
+    border-width: 0;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    margin: 0;
+    padding: 0;
+  }
+
+  .not-content :is(button, [type='button'], [type='reset'], [type='submit']) {
+    appearance: button;
+  }
+
+  .not-content ::placeholder {
+    color: color-mix(in srgb, currentcolor 50%, transparent);
+    opacity: 1;
+  }
 }

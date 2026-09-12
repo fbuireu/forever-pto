@@ -1,33 +1,33 @@
 import type { SatteriProcessorOptions } from "@astrojs/markdown-satteri";
+import { renderMermaid } from "./mermaid-render";
 
 type MdastPlugin = NonNullable<SatteriProcessorOptions["mdastPlugins"]>[number];
 
 export const MERMAID_LANG = "mermaid";
-export const MERMAID_SOURCE_ATTRIBUTE = "data-mermaid";
 
-/**
- * Turns every ```mermaid fence into a `<pre class="mermaid" data-mermaid="…">` before Expressive Code
- * sees it, so the fence reaches the browser as a diagram source rather than highlighted as text. The
- * source travels URI-encoded in the attribute (the canonical copy the client renders) and as the
- * element's text (what a reader without JavaScript sees). `mermaid.ts` in this folder is the other half.
- *
- * Starlight runs on Sätteri, Astro's default Markdown processor, which takes mdast plugins of this shape
- * rather than remark plugins; a `paragraph` carrying `hName`/`hProperties` is how a plugin emits an
- * arbitrary element from either a `.md` or an `.mdx` page.
- */
 export const mermaidPlugin: MdastPlugin = {
 	name: "forever-pto-mermaid",
-	code(node) {
+	async code(node, context) {
 		if (node.lang !== MERMAID_LANG) return;
 
-		const paragraph = { type: "paragraph" as const, children: [{ type: "text" as const, value: node.value }] };
-		Object.assign(paragraph, {
-			data: {
-				hName: "pre",
-				hProperties: { className: MERMAID_LANG, [MERMAID_SOURCE_ATTRIBUTE]: encodeURIComponent(node.value) },
-			},
+		let drawn: Awaited<ReturnType<typeof renderMermaid>>;
+		try {
+			drawn = await renderMermaid(node.value);
+		} catch (error) {
+			throw new Error(`Mermaid could not draw a diagram in ${context.fileURL ?? "an unknown page"}: ${String(error)}`);
+		}
+
+		// One figure per theme, replacing the fence with two nodes rather than one holding both. Parsed
+		// together, the second `<svg>` lands inside the first: Mermaid's labels are `<foreignObject>`
+		// elements carrying their own HTML, and the parser never leaves the first diagram's subtree.
+		// Each raw node is parsed on its own, so the two stay siblings; `global.css` shows one, keyed on
+		// `data-theme` the way the app's own tokens are.
+		const source = encodeURIComponent(node.value);
+		const figure = (svg: string, theme: "light" | "dark") => ({
+			raw: `<figure class="${MERMAID_LANG} mermaid-${theme}" data-mermaid="${source}">${svg}</figure>`,
+			mdxExpressions: false,
 		});
 
-		return paragraph;
+		context.replaceNode(node, [figure(drawn.light, "light"), figure(drawn.dark, "dark")]);
 	},
 };

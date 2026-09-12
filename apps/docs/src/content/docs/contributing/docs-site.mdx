@@ -85,7 +85,9 @@ Two more directives close the loop. `@source` points Tailwind at `apps/web/src/u
 
 ## Diagrams
 
-Every diagram on this site is a ```mermaid fence in the page's source. Starlight runs on Sätteri, Astro's default Markdown processor, which takes mdast plugins rather than remark ones, so `src/lib/mermaid-plugin.ts` turns each fence into a `<pre class="mermaid" data-mermaid="…">` before Expressive Code can highlight it as text. In the browser, `src/lib/mermaid.ts` lazy-loads Mermaid only on a page that carries a fence, draws every diagram with the app's tokens read off `:root` at render time, redraws when the theme toggle rewrites `data-theme`, and lets a click toggle a wide diagram between the column width and its natural size. The source travels URI-encoded in the attribute and as the element's text, so a reader without JavaScript sees the definition.
+Every diagram on this site is a ```mermaid fence in the page's source, **drawn at build time**. Starlight runs on Sätteri, Astro's default Markdown processor, which takes mdast plugins rather than remark ones, so `src/lib/mermaid-plugin.ts` replaces each fence with two `<figure>` elements, one per theme, and `src/lib/mermaid-render.ts` draws them in a single headless Chromium held open for the whole build, with the site's display face loaded so labels are measured against the real glyphs and the palette read out of the app's own token sheet. Results are memoised by content, so a diagram repeated across locales is drawn once.
+
+What that buys: no Mermaid in the browser bundle, no flash of source text before a draw, a diagram for a reader without JavaScript, and a fence Mermaid cannot parse failing the build with the page named rather than shipping a red frame. The only script a diagram carries is a click-to-enlarge toggle, and which copy shows is decided in CSS from `data-theme`.
 
 ## What keeps it honest
 

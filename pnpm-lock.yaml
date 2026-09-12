@@ -228,9 +228,6 @@ importers:
       lucide-react:
         specifier: 1.42.0
         version: 1.42.0(react@19.2.8)
-      mermaid:
-        specifier: 11.17.2
-        version: 11.17.2
       next-intl:
         specifier: 4.14.2
         version: 4.14.2(@swc/helpers@0.5.23)(next@16.3.4(@babel/core@7.29.7(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@playwright/test@1.63.0)(@types/node@26.2.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)
@@ -277,6 +274,9 @@ importers:
       '@types/react-dom':
         specifier: 19.2.7
         version: 19.2.7(@types/react@19.2.18)
+      mermaid:
+        specifier: 11.17.2
+        version: 11.17.2
       typescript:
         specifier: 6.0.3
         version: 6.0.3
