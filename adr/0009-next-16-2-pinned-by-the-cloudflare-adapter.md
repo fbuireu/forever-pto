@@ -143,7 +143,7 @@ shows Error 1101 again, revert to 16.2.12 with 1.20.2 and restore this pin rathe
 Renovate auto-merged [#350](https://github.com/fbuireu/forever-pto/pull/350) on 2026-08-22, taking `next` to
 **16.3.1** against adapter **1.20.2**, the exact pair this ADR forbids. It merged because `E2E tests` is not
 a required check and 1.20.2's peer range admits 16.3, so nothing in the pull request objected. `main` has
-carried it since — `6614da61`, the 1.8.3 release commit — and it is the last deploy production has had.
+carried it since `6614da61`, the 1.8.3 release commit, and it is the last deploy production has had.
 `https://forever-pto.com` answers **Cloudflare Error 1101** to a browser today, checked 2026-08-29 at 10:45
 UTC.
 
@@ -201,7 +201,7 @@ stopped taking effect, which is why the build, the deploy and the smoke run all 
 | --- | --- | --- |
 | The payment-confirmation guard | `NextResponse.redirect` | works |
 | The markdown twin | `NextResponse.rewrite`, header **set** | works |
-| The direct `/api/markdown` guard | `NextResponse.next`, header **deleted** | **the caller's header survives**: 200, not 404 — but see the correction below |
+| The direct `/api/markdown` guard | `NextResponse.next`, header **deleted** | **the caller's header survives**: 200, not 404, but see the correction below |
 | `x-next-intl-locale` into `global-not-found` | header into a per-request render | **never arrives**: every locale answers `lang="en"` |
 
 The `E2E tests` cases caught exactly those rows, and nothing else in the suite moved. Nothing in the unit
@@ -210,7 +210,7 @@ suite could have: `middleware.test.ts` calls the exported function directly, so 
 **Correction, 2026-09-01: the `/api/markdown` row was not the rename's doing.** Reverting to `middleware.ts` cleared
 the locale cases and left the `/api/markdown` one red, which is what a runtime-specific failure does not
 do. `@opennextjs/aws` reconstructs the request in `dist/core/routing/middleware.js` as
-`headers: { ...internalEvent.headers, ...reqHeaders }` — a merge. A header the middleware *deleted* is
+`headers: { ...internalEvent.headers, ...reqHeaders }`, a merge. A header the middleware *deleted* is
 absent from `reqHeaders`, so the caller's value survives; Next's own router deletes every original header
 missing from the override list, and the adapter never implemented that half. It is one code path for both
 the edge and Node.js middleware, so the guard had never run on Cloudflare under either name, and the table

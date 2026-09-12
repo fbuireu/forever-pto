@@ -176,16 +176,17 @@ Annotate the next one too.
 
 **`web-v1.8.3`'s number matches what is live and its content does not, deliberately.** The 1.8.3 changelog
 entry lists one fix, the Renovate bump of Next to 16.3.1, which this branch reverted for the whole of
-[ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md). The branch carries 16.3.3 now, with the
-adapter that admits it, so the entry and the tree agree again on the major and minor and still not on the
-patch. The tag exists so the next release continues from 1.8.3 rather than re-cutting it and writing a second
+[ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md). The branch carries a later patch on that
+same line now, with the adapter that admits it, so the entry and the tree agree on the major and minor and
+still not on the patch; which patch is [`apps/web/package.json`](./apps/web/package.json)'s to say, not this
+paragraph's. The tag exists so the next release continues from 1.8.3 rather than re-cutting it and writing a second
 1.8.3 section into a changelog that already has one.
 
-**Every bridge tag is on the remote**, verified with `git ls-remote --tags origin 'web-v*'` on 2026-08-24. They had
+**Every bridge tag is on the remote**, verified with `git ls-remote --tags origin 'web-v*'`, last on 2026-09-12. They had
 to reach it before `release-web` first runs on `main`, and they have. This paragraph used to say they were
 still local; that is the shape of claim to re-check rather than copy forward.
 
-**`web-v1.10.2` is the newest, and it exists because a rewrite orphaned `web-v1.10.1`.** `main` was rewritten
+**`web-v1.10.2` is the newest of the three, and it exists because a rewrite orphaned `web-v1.10.1`.** `main` was rewritten
 on 2026-09-06 to drop a commit whose author was not the owner's identity, which changed that commit's sha and
 every sha above it, `web-v1.10.1`'s release commit included. The release carrying that tag is `immutable`, so
 the tag could not be moved onto the rewritten commit or deleted, and it now points at a commit `main` does not
@@ -213,6 +214,15 @@ tag reachable and changes no file, since `main` already carried the same work un
 alternative was a bridge tag one patch higher, which would have skipped a version number and claimed a release
 that never happened; grafting keeps the numbers honest. Prefer it, and never force-push `main` while a release
 is in flight.
+
+**The graft does not survive the next rewrite, and it stops mattering once the numbers move past it.**
+`web-v1.9.3` is not an ancestor of `main` again: the 2026-09-06 rewrite above changed every sha over the
+commit it dropped, the merge commit that carried the graft included, so the orphan is orphaned once more
+(checked with `git merge-base --is-ancestor` on 2026-09-12, along with `web-v1.10.1`, which is orphaned the
+same way and by the same rewrite). Neither blocks anything now, because semantic-release reads the *highest*
+reachable tag and that is `web-v1.11.1`: an unreachable tag only stops a release while it is the version the
+analyser would compute next. So a graft buys one release rather than a permanent fix, and what makes the
+problem go away for good is the line moving on.
 
 **Nothing may land on `main` while `release-web` is running, and a plain merge is enough to break it.**
 `@semantic-release/git` commits the version bump and the changelog on the sha the job checked out and pushes
@@ -300,15 +310,15 @@ Passing the secret explicitly in the caller's `secrets:` block does not rescue i
 declare an `environment:`, so `${{ secrets.CLOUDFLARE_API_TOKEN }}` there resolves against repository
 secrets only. The value that works on `main` comes from the *callee* job's own `environment: production`.
 
-**Every environment carries what its jobs read, and this guide said otherwise for a week.** The Cloudflare token and account id are on every one of them, `CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET` are on `web-development`, and the evidence is the runs rather than a settings page nobody can read from outside: `deploy-development` and `e2e` succeed on pull requests, and `deploy-production` shipped 1.9.7. The `docs-*` pair needs no Access secret, because nothing in `docs.yml` requests the docs preview — its `PREVIEW_URL` is only written into the pull request comment, and the docs Playwright suite runs against a local preview in `build`. This paragraph used to be an *Outstanding* item saying the secrets were missing; a claim like that is the kind to re-check against a run rather than copy forward.
+**Every environment carries what its jobs read, and this guide said otherwise for a week.** The Cloudflare token and account id are on every one of them, `CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET` are on `web-development`, and the evidence is the runs rather than a settings page nobody can read from outside: `deploy-development` and `e2e` succeed on pull requests, and `deploy-production` shipped 1.9.7. The `docs-*` pair needs no Access secret, because nothing in `docs.yml` requests the docs preview: its `PREVIEW_URL` is only written into the pull request comment, and the docs Playwright suite runs against a local preview in `build`. This paragraph used to be an *Outstanding* item saying the secrets were missing; a claim like that is the kind to re-check against a run rather than copy forward.
 
 **The docs preview needs an Access destination even though it needs no secret, and it was missing one.** The
 Access application matches `pr-*-forever-pto-development`; the docs preview is
 `pr-*-forever-pto-docs-development`, which that pattern does not match, so every docs preview was publicly
 reachable. That is worse than it sounds, because [`apps/docs/public/robots.txt`](./apps/docs/public/robots.txt)
 says `Allow: /` and advertises the **production** sitemap, so each preview invited crawlers to index a
-duplicate of `docs.forever-pto.com`. The published wiki asserted the opposite — *every PR preview sits behind
-Zero Trust Access, which is why nothing crawls a preview* — and that sentence is what made the gap findable.
+duplicate of `docs.forever-pto.com`. The published wiki asserted the opposite, *every PR preview sits behind
+Zero Trust Access, which is why nothing crawls a preview*, and that sentence is what made the gap findable.
 The fix is a second destination on the same Access application, so the docs preview inherits the `Allow` and
 `Service Auth` policies already on it. It cannot be fixed in this tree: `build` produces one `docs-dist`
 artifact that both `preview` and `deploy` ship, the docs build reads no environment variable, and
@@ -377,8 +387,8 @@ directly. This paragraph said they still had the defect long after they stopped.
 **The `@smoke` cases all live in [`apps/web/e2e/smoke.spec.ts`](./apps/web/e2e/smoke.spec.ts), and the step
 passes no `--pass-with-no-tests`, which is the point.** Playwright exits 1 on an empty set, so the flag would
 make a typo in the grep green; without it, a grep that stops matching fails the job, which is the only thing
-that keeps the set honest. They are the homepage with a non-empty title, the 404 route — `/_not-found` is the
-only page rendered per request, so it is the one that shows Cloudflare Error 1101 — and `robots.txt`.
+that keeps the set honest. They are the homepage with a non-empty title, the 404 route (`/_not-found` is the
+only page rendered per request, so it is the one that shows Cloudflare Error 1101) and `robots.txt`.
 
 **That set is the same in every repository that deploys**, in biancafiore, in contribKit and in the docs site
 below, so a set that differs between them is drift rather than a decision. contribKit carries an extra case that
@@ -393,7 +403,7 @@ to the broken version. A good deploy was reverted by cases that were never about
 
 **So `/sitemap.xml` and `/api/health` are out of the set, and the rule is now explicit: a case whose result
 depends on the caller's address cannot hold the power to revert a release.** Both sibling repositories lost
-a case to the same shape — biancafiore's `/rss.xml` and `/sitemap-index.xml`, contribKit's `/api/health` —
+a case to the same shape, biancafiore's `/rss.xml` and `/sitemap-index.xml` and contribKit's `/api/health`,
 and in every instance a browser gets the expected response while a datacenter address does not, which points
 at a zone rule rather than at anything in the tree. Cloudflare's **Security Events** log names the rule; the
 fix is a Cloudflare setting. The cases themselves are not deleted: they stay in `sitemap.spec.ts` and
@@ -744,8 +754,8 @@ relative-link rule could not catch because they were prose rather than links.
   once the release ages past the floor.
 - **An unrecognized key in `pnpm-workspace.yaml` is a hard install failure, not a shrug.** The installer
   answers `ERR_PNPM_UNRECOGNIZED_WORKSPACE_SETTINGS` and stops whenever the repository pins its own
-  installer version, which this one does through `packageManager`. That is an improvement — a misspelt setting used to be ignored in
-  silence — but it means a settings typo breaks every job rather than quietly disabling the thing it names.
+  installer version, which this one does through `packageManager`. That is an improvement, since a misspelt setting used to be ignored in
+  silence, but it means a settings typo breaks every job rather than quietly disabling the thing it names.
 - **An import sorted above a `'use client'` silently deletes it, and only `next build` notices.** Biome's
   import sorting moves an added import to the top of the file; the directive then stops being the first
   statement, and the formatter parenthesises the orphaned string, leaving `('use client');`. That is an

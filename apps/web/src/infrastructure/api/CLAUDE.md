@@ -113,7 +113,7 @@ under a value that arrived lying about its type, which a test injecting an off-u
 
 A `PaymentRequestError` carries the `PaymentError` tag for the same reason, and is the one payment failure
 that is the caller's fault rather than the system's. `wrapError` in [`serverService.ts`](../clients/payments/stripe/serverService.ts) raised every Stripe
-rejection as a plain `PaymentError`, so `pi_invalid` — a reference the visitor typed — answered **500
+rejection as a plain `PaymentError`, so `pi_invalid`, a reference the visitor typed, answered **500
 `INTERNAL_ERROR`**, the same as Stripe being down. It now narrows on `StripeInvalidRequestError`, which is
 what Stripe raises for a malformed or unknown id, and `describeFailure` narrows back on
 `isPaymentRequestError` to answer **400 `INVALID_PAYMENT_REFERENCE`**. The body still carries a fixed code

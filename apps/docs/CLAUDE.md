@@ -61,7 +61,7 @@ collects every spec before it applies `--grep`, so `demos.spec.ts` reading `dist
 deployed site. The config's `dist` guard could not help: it deliberately skips when `BASE_URL` is set, which
 is exactly that job. The spec now derives an empty page list and skips its floor assertion when `BASE_URL`
 is set, so it stays a local-build suite and stops breaking a run it was never part of. No sibling repository
-has this shape — nothing in their `e2e/` reads the filesystem while collecting.
+has this shape: nothing in their `e2e/` reads the filesystem while collecting.
 
 **`test:e2e` does not build, and it needs the build.** `astro preview` serves `dist`, it does not produce it, and
   the page list is read off `dist` while the spec file is being collected, so a clean checkout died with

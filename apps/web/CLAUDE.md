@@ -210,8 +210,8 @@ test is then exactly what *that* test caused, which is what "configures nothing 
 **`testTimeout` is raised well above the default, and the number is covering for something else.** The suite
 builds a fresh `happy-dom` per file, close to half its wall clock, and the two cases that resolve every lazy
 chunk of a page in one go were timing out under that load while passing in seconds on their own. The real fix
-is the environment cost — `pool: 'vmThreads'` or `isolate: false` builds the DOM once per worker instead of
-once per file — and neither has been measured against this suite yet.
+is the environment cost (`pool: 'vmThreads'` or `isolate: false` builds the DOM once per worker instead of
+once per file), and neither has been measured against this suite yet.
 
 **Backticked paths in this guide and the ones below it are package-relative.** [`src/domain/calendar/types.ts`](./src/domain/calendar/types.ts)
 means `apps/web/src/domain/calendar/types.ts`; the contract suite matches source-file citations by suffix, so
@@ -339,12 +339,12 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
 
 - **Every build renames every Server Action, so a page from the previous deploy cannot call the current
   one.** Action ids are per-build; a tab, a cached page or a prerendered shell served before a deploy carries
-  the old id, and the new Worker answers it with `NEXT_ACTION_NOT_FOUND` — the action never runs, and the
+  the old id, and the new Worker answers it with `NEXT_ACTION_NOT_FOUND`: the action never runs, and the
   visitor saw a generic payment-failed toast for a problem a reload fixes. Found from a breakpoint in
   production: the checkout POST returned that header while every layer below it measured clean.
   [`recoverFromStaleDeployment`](./src/ui/adapters/navigation/staleDeployment.ts) closes the visible half: it
-  wraps `unstable_isUnrecognizedActionError` from `next/navigation` — Next's own detector for exactly this,
-  not a string match — and reloads, so the visitor lands on the current build instead of an error. The
+  wraps `unstable_isUnrecognizedActionError` from `next/navigation`, Next's own detector for exactly this
+  rather than a string match, and reloads, so the visitor lands on the current build instead of an error. The
   invisible half is the closure encryption key, which also rotates per build unless
   `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` pins it: `_deploy-web.yml` passes that secret through to the Worker
   **optionally**, so deploys keep working while it is unset, and setting it on both `web-*` environments

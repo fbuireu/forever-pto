@@ -112,7 +112,7 @@ choice.** It called `headers.delete(MARKDOWN_PATH_HEADER)` for months. Next seri
 `x-middleware-request-<key>` per header, and Next's own router applies it by *deleting* every original
 header absent from that list. `@opennextjs/aws` does not: `dist/core/routing/middleware.js` ends on
 `headers: { ...internalEvent.headers, ...reqHeaders }`, a merge, so a deleted header is simply not
-overridden and the caller's value survives. On Cloudflare the guard therefore never ran, in either runtime —
+overridden and the caller's value survives. On Cloudflare the guard therefore never ran, in either runtime:
 the merge is the same code on the edge and Node.js middleware paths, so [ADR 0009](../../../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) blamed the wrong
 thing for this one. Overwriting is expressible in the mechanism that does exist, which is why the sentinel
 lives in `twin.ts` beside the header name rather than being an empty string spelled twice. Only

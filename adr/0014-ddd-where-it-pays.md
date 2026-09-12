@@ -164,14 +164,14 @@ rejections matter as much as the fixes: a rule is only as clear as the cases it 
 
    The first question is what changed. It was answered *no* because "Stripe owns the value, so no code path
    here can produce a divergent one", and that reasoning skipped a step: nothing here produces one, but
-   Stripe *sends* one. Its enums are documented as **open** — it adds values to them on an API version
-   already pinned — and `stripe@22.6.1` made that explicit in the types by widening
+   Stripe *sends* one. Its enums are documented as **open**, since it adds values to them on an API version
+   already pinned, and `stripe@22.6.1` made that explicit in the types by widening
    `PaymentIntent.Status` with its `OtherString` marker. Pinning `apiVersion` never bought what this example
    assumed it bought.
 
    So the answer is yes on all three, and the union earned code. What it did *not* earn is a sentinel: an
-   eighth member would be a domain word for "Stripe said something we do not model", and the raw value —
-   the only thing worth having when reconciling a payment — would be thrown away to make room for it.
+   eighth member would be a domain word for "Stripe said something we do not model", and the raw value,
+   the only thing worth having when reconciling a payment, would be thrown away to make room for it.
    Nor an error path: a status this tree does not model must not turn a webhook into a retry loop, and the
    consumers already answer correctly without one, because every decision is *is it succeeded*, never
    *which of the seven is it*. The shape is to mirror upstream's contract instead of closing it:
