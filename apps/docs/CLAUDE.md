@@ -29,6 +29,13 @@ The Forever PTO documentation wiki (docs.forever-pto.com). An Astro Starlight si
 - **A component that needs an app context gets the context, not a note saying it cannot be rendered, and `Demo` supplies it, so no demo has to remember.** `LazyMotionProvider` is needed by every `m.*` consumer and `DemoIntlProvider` by the `next-intl` ones in `core/`: `SlidingNumber`, which reads the locale to pick its decimal separator, and `Counter`, which wraps it. Both would otherwise throw during prerender, since `client:visible` still renders on the server.
 
   Many of the demos used to wrap `LazyMotionProvider` themselves and some also wrapped the intl one, with this bullet as the only thing telling the next author to do the same; and forgetting does not fail typecheck, it fails the build, in the other workflow. `Demo` composes both around the frame now. The cost is nil: `LazyMotion` with `domAnimation` is lazy by construction and `NextIntlClientProvider` with empty messages is inert for anything that does not consume it. Add a provider **here** rather than at a demo.
+- **A `pre` a component renders itself gets none of Expressive Code's chrome, overflow included.** Only a
+  markdown fence goes through Expressive Code; `BalancedScoreFormula`'s hand-written `<pre>` did not, so its
+  one long line pushed the whole page sideways on a phone rather than scrolling inside its own box. The rule
+  in [`src/styles/global.css`](./src/styles/global.css) covers any such block, and it carries `min-width: 0`
+  as well as `overflow-x`: the content column is a grid item, so without it the block's min-content width
+  becomes the column's and there is nothing for `overflow-x` to clip against. Prefer a fence; reach for a raw
+  `<pre>` only when the content is interpolated from the app's constants, as that one is.
 - Never import [`src/ui/styles/index.css`](../web/src/ui/styles/index.css) (double preflight + layer collision with Starlight). The allowed style imports live in `src/styles/global.css` and are ordered deliberately; read its header comment before touching it.
 
 ## Conventions
@@ -119,6 +126,15 @@ destination that receives its own test message and nothing else.
   the CSP that admits the two tags plus HSTS, `nosniff`, `DENY` framing and a referrer policy. The app states
   its own policy in `next.config.ts`, which the contract suite asserts; this one has no Worker to serve it
   from, so Cloudflare's static-asset `_headers` support is what applies it. Nothing compares the two.
+- **That CSP silently disabled the site's search, and two of its directives exist only to keep it working.**
+  Pagefind, which is what Starlight's search box runs on, compiles a WebAssembly module in the browser, and a
+  `script-src` without `'wasm-unsafe-eval'` refuses to instantiate it: the dialog opens, the input accepts
+  typing and it says *Searching for …* forever, because the only symptom is a console `CompileError`. The
+  other is `font-src 'self' data:`: Vite inlines the smallest `@fontsource` subset as a `data:` URI, so
+  `'self'` alone blocks one JetBrains Mono face and the mono text falls back to the UA font on some pages and
+  not others. Neither is a loosening worth trading away; `'wasm-unsafe-eval'` grants WebAssembly and nothing
+  of what `'unsafe-eval'` would. Cloudflare's own `static.cloudflareinsights.com` beacon is blocked too, and
+  that one is left blocked deliberately: the site already carries GA4 and Better Stack RUM.
 - **[`e2e/cookie-consent.spec.ts`](./e2e/cookie-consent.spec.ts) has to tell the browser it is not a robot.**
   `vanilla-cookieconsent` defaults `hideFromBots` to true, and the check is
   `/bot|crawl|spider|slurp|teoma/i.test(userAgent) || navigator.webdriver`. Playwright sets

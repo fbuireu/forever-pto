@@ -354,6 +354,17 @@ starlight-lang-select select option {
   letter-spacing: -0.01em;
 }
 
+/* A `pre` a component renders itself is not an Expressive Code block and inherits none of its chrome,
+   overflow included, so a line wider than the column pushes the whole page sideways instead of
+   scrolling inside its own box. BalancedScoreFormula's one-line formula did exactly that on a phone.
+   `min-width: 0` is the half that matters: the content column is a grid item, and without it the
+   block's min-content width sets the column's, so `overflow-x` alone has nothing to clip against. */
+.sl-markdown-content pre:not(:where(.expressive-code *, .not-content *)) {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+}
+
 /* Code blocks: Expressive Code exposes its frame through variables */
 .expressive-code {
   --ec-brdCol: var(--frame);
