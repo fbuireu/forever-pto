@@ -62,7 +62,7 @@
 		"@types/node": "26.2.0",
 		"@typescript/typescript6": "6.0.2",
 		"husky": "9.1.7",
-		"lint-staged": "17.5.0",
+		"lint-staged": "17.5.1",
 		"semantic-release": "25.0.9",
 		"semantic-release-monorepo": "8.0.2",
 		"typescript": "7.0.2",
