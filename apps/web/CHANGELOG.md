@@ -1,3 +1,12 @@
+# [forever-pto-web-v1.11.3](https://github.com/fbuireu/forever-pto/compare/web-v1.11.2...web-v1.11.3) (2026-09-15)
+
+
+### Bug Fixes
+
+* **deps:** update dependency next to v16.3.5 ([#401](https://github.com/fbuireu/forever-pto/issues/401)) ([07dd382](https://github.com/fbuireu/forever-pto/commit/07dd3824427edc02ed84faa20964fbce690ddcf0))
+* **deps:** update dependency next-intl to v4.14.3 ([#399](https://github.com/fbuireu/forever-pto/issues/399)) ([202a8f0](https://github.com/fbuireu/forever-pto/commit/202a8f040d01491e267dfe426ac266a746d20731))
+* **deps:** update dependency stripe to v22.6.2 ([#400](https://github.com/fbuireu/forever-pto/issues/400)) ([c3a6880](https://github.com/fbuireu/forever-pto/commit/c3a68809cb713c170b237605c79dd7d0b01e0e75))
+
 # [forever-pto-web-v1.11.1](https://github.com/fbuireu/forever-pto/compare/web-v1.11.0...web-v1.11.1) (2026-09-12)
 
 
