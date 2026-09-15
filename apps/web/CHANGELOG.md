@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.11.4](https://github.com/fbuireu/forever-pto/compare/web-v1.11.3...web-v1.11.4) (2026-09-15)
+
+
+### Bug Fixes
+
+* **deps:** update dependency next-intl to v4.14.4 ([#402](https://github.com/fbuireu/forever-pto/issues/402)) ([5324113](https://github.com/fbuireu/forever-pto/commit/5324113ff4ce7827acbb09967bd1c3226d14aef0))
+
 # [forever-pto-web-v1.11.3](https://github.com/fbuireu/forever-pto/compare/web-v1.11.2...web-v1.11.3) (2026-09-15)
 
 
