@@ -1,3 +1,10 @@
+# [forever-pto-docs-v1.3.3](https://github.com/fbuireu/forever-pto/compare/docs-v1.3.2...docs-v1.3.3) (2026-09-15)
+
+
+### Bug Fixes
+
+* **deps:** update dependency next-intl to v4.14.3 ([#399](https://github.com/fbuireu/forever-pto/issues/399)) ([202a8f0](https://github.com/fbuireu/forever-pto/commit/202a8f040d01491e267dfe426ac266a746d20731))
+
 # [forever-pto-docs-v1.3.2](https://github.com/fbuireu/forever-pto/compare/docs-v1.3.1...docs-v1.3.2) (2026-09-13)
 
 
