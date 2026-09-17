@@ -208,7 +208,7 @@ are the three that do. It reads better than the alternative, too: what the mock 
 test is then exactly what *that* test caused, which is what "configures nothing more on mount" wants to say.
 
 **`testTimeout` is raised well above the default, and the number is covering for something else.** The suite
-builds a fresh `happy-dom` per file, close to half its wall clock, and the two cases that resolve every lazy
+builds a fresh `happy-dom` per file, close to half its wall clock, and the cases that resolve every lazy
 chunk of a page in one go were timing out under that load while passing in seconds on their own. The real fix
 is the environment cost (`pool: 'vmThreads'` or `isolate: false` builds the DOM once per worker instead of
 once per file), and neither has been measured against this suite yet.
@@ -351,7 +351,7 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
   through `dangerouslySetInnerHTML`, and Tag Manager, Stripe, `vanilla-cookieconsent` and `boneyard-js` each
   inject their own. The report-only header deliberately carries **no** `trusted-types` allowlist: policy names
   we have only guessed at would silence the violations the header exists to collect. Read them first, wrap the
-  sinks, then promote the directive. `driver.js`'s `closeButton.innerHTML = ""` is not one of them — the empty
+  sinks, then promote the directive. `driver.js`'s `closeButton.innerHTML = ""` is not one of them: the empty
   string is the one assignment the spec exempts.
 
 - **Every build renames every Server Action, so a page from the previous deploy cannot call the current

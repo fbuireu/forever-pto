@@ -187,7 +187,7 @@ where `localStorage` is absent. What differed was *where the block sat*:
   rehydration clamped whatever partial state had arrived and *afterwards* dropped the key. That ordering
   reads as deliberate and was not. It checks the error first and returns now, pinned by a case that sets
   out-of-range values and asserts they are left alone.
-- `premium` deliberately does **not** return: it re-reads `error` two guards later to raise
+- `premium` deliberately does **not** return: it re-reads `error` further down to raise
   `needsSessionCheck`. It is now the only one that falls through, which is what makes the deviation visible
   instead of looking like another accident.
 - `location` had the error branch and nothing else.
