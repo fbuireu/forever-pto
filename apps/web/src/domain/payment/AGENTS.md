@@ -6,7 +6,7 @@ What happens to a Donation once Stripe has decided. The domain events, a factory
 Stripe `PaymentIntent`, and the handlers that reconcile the payments table with them. Server-only, and the
 one place in `src/domain/` that composes Effect against infrastructure, deliberately, not by accident
 ([ADR 0003](../../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md)). The layer contract is
-in [`../CLAUDE.md`](../CLAUDE.md).
+in [`../AGENTS.md`](../AGENTS.md).
 
 There is no accounts table: a payment row with status `succeeded` *is* Premium
 ([ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md)). Everything here is ultimately about
@@ -109,7 +109,7 @@ own worked example that this replaced.
 
 **`PaymentData.status` deliberately stays `string`, and the union would be a lie there.** Its
 producers are: `paymentDataDTO`, which reads a `Stripe.PaymentIntent`, and `toPaymentData` in
-[`@infrastructure/services/payments/repository`](../../infrastructure/services/payments/CLAUDE.md), which
+[`@infrastructure/services/payments/repository`](../../infrastructure/services/payments/AGENTS.md), which
 reads a SQLite `TEXT` column. Nothing constrains what that column holds (an older deploy, a manual fix), so
 narrowing the field would need an `as` at the read, which buys a claim the code cannot check in exchange for
 nothing: no consumer switches on the status, they all test it against one value.
@@ -142,7 +142,7 @@ overwritten, but **the rule lives in the `WHERE` clause now, not in either handl
 `handlePaymentFailed` calls it and warns when nothing was touched instead of reading the row first. That
 read never guarded anything: `TursoService` opens a connection per call, so a redelivery racing the original
 could have both reads see `processing`. See
-[`../../infrastructure/services/payments/CLAUDE.md`](../../infrastructure/services/payments/CLAUDE.md).
+[`../../infrastructure/services/payments/AGENTS.md`](../../infrastructure/services/payments/AGENTS.md).
 
 **Neither handler reads before it writes, and `handlePaymentSucceeded` was the last one that did.** It ran
 `getPaymentById` absorbed to `undefined` and returned early on a falsy answer. The only reachable way that
@@ -196,7 +196,7 @@ failed write and log it a second time as a retrieval failure that never happened
 warnings (in both handlers, on a write that touched no row) are
 bare statements in the generator body, because there is no failure to tap: the condition is a successful
 write that touched no row. That is safe only because `logger` cannot throw; see
-[`../../infrastructure/CLAUDE.md`](../../infrastructure/CLAUDE.md). `Effect.sync` would not
+[`../../infrastructure/AGENTS.md`](../../infrastructure/AGENTS.md). `Effect.sync` would not
 buy safety anyway; a throw inside it is a defect just the same.
 
 ## Out of scope

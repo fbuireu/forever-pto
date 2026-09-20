@@ -66,7 +66,7 @@ codemod that "modernises" the engine's import breaks this thread too.
 **The way back from a string is `fromStoredInstant`, not `new Date`.** Everything crossing this boundary was
 written by this app with `toISOString()`, so the instant is the thing being round-tripped, the same
 provenance the persistence layer has, and the same intake function answers it
-([`@application/shared/utils/dateIntake`](../../application/CLAUDE.md)). `serializers.ts` and `worker.ts`
+([`@application/shared/utils/dateIntake`](../../application/AGENTS.md)). `serializers.ts` and `worker.ts`
 called `new Date(x)` inline over and over between them, which is the rule that module exists to hold restated
 as bare code. `fromUpstreamCalendarDay` is the wrong tool here and would silently discard the time component.
 
@@ -142,7 +142,7 @@ The kinds of hand-edited day reach the engine by different routes, and that asym
   that the user *paid* for it: without the parameter the denominator is the days the engine placed by itself
   while the numerator still counts spans expanded through the manual ones, which inflates Efficiency and
   Bonus Days. See the *Public API* section of
-  [`@domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md).
+  [`@domain/calendar/AGENTS.md`](../../domain/calendar/AGENTS.md).
 - **Removed Days** are dates the user has told us they *will work*. They cross as ISO strings, are mapped
   straight to `Date` objects and are handed to `generateSuggestions` and `generateAlternatives` as
   `removedDays`, and to both `generateMetrics` calls as `removedSuggestedDays`. They are never turned into
@@ -162,7 +162,7 @@ here as a note to future readers, which is where a function should have been.
 The engine drops a `removedDays` date from the Workday list and stops there: it does not become a Free Day
 for Bridge expansion or scoring. Folding them back into the holidays array would restore exactly the bias the
 parameter exists to remove; see the traps in
-[`@domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md). Tests in `worker.test.ts` pin both halves:
+[`@domain/calendar/AGENTS.md`](../../domain/calendar/AGENTS.md). Tests in `worker.test.ts` pin both halves:
 that `removedDays` arrives as dates on the planner calls, and that no Removed Day appears in any
 holidays array.
 
@@ -173,7 +173,7 @@ lands in `year + 1` whenever the plan starts in the Carry-over Months.
 ## The budget, and the empty-result short circuit
 
 Both live in `runPlanningPipeline` now; the rule is in
-[`@domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md). What matters on this side is the wire: the
+[`@domain/calendar/AGENTS.md`](../../domain/calendar/AGENTS.md). What matters on this side is the wire: the
 pipeline's `planned: false` result carries an empty Suggestion whose `metrics` are **measured by the engine**,
 so `serializeSuggestionResult` has a real object to send and `currentSelection.metrics` is never `undefined`.
 

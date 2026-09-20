@@ -112,7 +112,7 @@ does not control the traffic to, in order to keep a toolchain version the app ga
 - **`/[locale]/payment/confirmation` renders at request time too**, and escapes the e2e suite only because
   [`middleware.ts`](../apps/web/src/middleware.ts) redirects it away when `payment_intent` is absent. It was never confirmed broken or
   healthy under 16.3; whoever revisits this pin should check it with a real payment intent first.
-- Recorded in [`CLAUDE.md`](../apps/web/CLAUDE.md) under *Versions* and *Structure & aliases*.
+- Recorded in [`AGENTS.md`](../apps/web/AGENTS.md) under *Versions* and *Structure & aliases*.
 
 ## Amendment, 2026-08-29: what moved and what is still unverified
 
@@ -131,7 +131,7 @@ build with `partialPrefetching` and `cacheComponents` both on.
 **What was not verified, and it is the bar this ADR set:** condition 2, a green `e2e` run against a preview
 on the candidate version, including `e2e/[locale]/not-found.spec.ts`. The preview deploy cannot authenticate
 until `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` reach the `web-*`/`docs-*` environments, which
-is recorded in [`CLAUDE.md`](../CLAUDE.md) as the one outstanding settings item. Condition 1, the captured
+is recorded in [`AGENTS.md`](../AGENTS.md) as the one outstanding settings item. Condition 1, the captured
 Worker stack trace, was not attempted either: the exception is still unknown, and if 16.3.3 with 1.20.3
 renders `/_not-found` correctly it will stay unknown. The fault itself is no longer in doubt, per the
 paragraph above; what is unverified is whether **this** pair clears it. **So this bump is staged on evidence
@@ -216,7 +216,7 @@ missing from the override list, and the adapter never implemented that half. It 
 the edge and Node.js middleware, so the guard had never run on Cloudflare under either name, and the table
 above credited the rename with a hole that predated it. The fix is in `middleware.ts`, not in the adapter:
 the branch overwrites the header with a sentinel instead of deleting it, which the override mechanism does
-carry. Only the `E2E` suite can see the difference, per [`src/app/CLAUDE.md`](../apps/web/src/app/CLAUDE.md).
+carry. Only the `E2E` suite can see the difference, per [`src/app/AGENTS.md`](../apps/web/src/app/AGENTS.md).
 
 **Upgrading is not the fix.** `@opennextjs/cloudflare` 1.20.5 was the latest on 2026-09-01 and its
 `bundle-node-middleware.js` and `useNodeMiddleware` are byte-identical to 1.20.3's. Next 16.3.4 was the latest

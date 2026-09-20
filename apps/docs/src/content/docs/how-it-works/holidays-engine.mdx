@@ -41,7 +41,7 @@ The adapter returns raw lookups and nothing else; the rules run **above** it, in
 2. **Regional entries are stamped.** `stampRegion` writes the Region code onto each entry of the regional lookup as `location`, which is what later tells National from Regional.
 3. **The Region overrides the Country.** `resolveObservedHolidays` (`apps/web/src/infrastructure/services/holidays/source/utils/observed.ts`) lets a Region's calendar add Holidays the Country does not have **and drop** national ones it does not observe, which is the difference between "Region as a filter" and "Region as a calendar".
 
-The seam used to sit one level higher, with the filter inside the production adapter only; the fixture then had to hand-write the filtered shape, and deleting the filter left the end-to-end test green. `apps/web/src/infrastructure/services/holidays/CLAUDE.md` records that move.
+The seam used to sit one level higher, with the filter inside the production adapter only; the fixture then had to hand-write the filtered shape, and deleting the filter left the end-to-end test green. `apps/web/src/infrastructure/services/holidays/AGENTS.md` records that move.
 
 ## The shape
 

@@ -265,31 +265,31 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
 
 | Folder | Covers |
 | --- | --- |
-| [`./src/app/CLAUDE.md`](./src/app/CLAUDE.md) | Route groups, the `[locale]` segment, API route handlers, metadata |
-| [`./src/application/CLAUDE.md`](./src/application/CLAUDE.md) | Layer contract: what orchestration may touch |
-| [`./src/application/dto/CLAUDE.md`](./src/application/dto/CLAUDE.md) | The DTO mapping convention, one folder per concept |
-| [`./src/application/stores/CLAUDE.md`](./src/application/stores/CLAUDE.md) | The Zustand stores, persistence, rehydration |
-| [`./src/application/use-cases/CLAUDE.md`](./src/application/use-cases/CLAUDE.md) | Effect entry points and how they terminate |
-| [`./src/domain/CLAUDE.md`](./src/domain/CLAUDE.md) | Layer contract: the bounded contexts and their different rules |
-| [`./src/domain/calendar/CLAUDE.md`](./src/domain/calendar/CLAUDE.md) | The planning engine: bridges, strategies, metrics, the cache protocol |
-| [`./src/domain/payment/CLAUDE.md`](./src/domain/payment/CLAUDE.md) | Payment events, factory and handlers |
-| [`./src/infrastructure/CLAUDE.md`](./src/infrastructure/CLAUDE.md) | Layer contract: the only layer that reaches outward |
-| [`./src/infrastructure/api/CLAUDE.md`](./src/infrastructure/api/CLAUDE.md) | Failure → HTTP status mapping |
-| [`./src/infrastructure/clients/CLAUDE.md`](./src/infrastructure/clients/CLAUDE.md) | Effect service tags for db, email, logging, payments |
-| [`./src/infrastructure/services/holidays/CLAUDE.md`](./src/infrastructure/services/holidays/CLAUDE.md) | Holiday lookup and normalisation |
-| [`./src/infrastructure/services/location/CLAUDE.md`](./src/infrastructure/services/location/CLAUDE.md) | Country detection strategies |
-| [`./src/infrastructure/services/payments/CLAUDE.md`](./src/infrastructure/services/payments/CLAUDE.md) | Stripe provider, repository, promo codes |
-| [`./src/infrastructure/workers/CLAUDE.md`](./src/infrastructure/workers/CLAUDE.md) | The calculations Web Worker and its message contract |
-| [`./src/ui/CLAUDE.md`](./src/ui/CLAUDE.md) | Layer contract: adapters, hooks, modules, styles |
-| [`./src/ui/i18n/CLAUDE.md`](./src/ui/i18n/CLAUDE.md) | Message bundles, namespaces, adding a locale |
-| [`./src/ui/modules/CLAUDE.md`](./src/ui/modules/CLAUDE.md) | How component folders are organised |
-| [`./src/ui/modules/core/CLAUDE.md`](./src/ui/modules/core/CLAUDE.md) | Primitives and the animation layer |
-| [`./src/ui/modules/pages/planner/CLAUDE.md`](./src/ui/modules/pages/planner/CLAUDE.md) | The planner screen: calendar, holidays, summary |
-| [`./src/ui/styles/CLAUDE.md`](./src/ui/styles/CLAUDE.md) | Layer order, tokens, what Biome does not format |
+| [`./src/app/AGENTS.md`](./src/app/AGENTS.md) | Route groups, the `[locale]` segment, API route handlers, metadata |
+| [`./src/application/AGENTS.md`](./src/application/AGENTS.md) | Layer contract: what orchestration may touch |
+| [`./src/application/dto/AGENTS.md`](./src/application/dto/AGENTS.md) | The DTO mapping convention, one folder per concept |
+| [`./src/application/stores/AGENTS.md`](./src/application/stores/AGENTS.md) | The Zustand stores, persistence, rehydration |
+| [`./src/application/use-cases/AGENTS.md`](./src/application/use-cases/AGENTS.md) | Effect entry points and how they terminate |
+| [`./src/domain/AGENTS.md`](./src/domain/AGENTS.md) | Layer contract: the bounded contexts and their different rules |
+| [`./src/domain/calendar/AGENTS.md`](./src/domain/calendar/AGENTS.md) | The planning engine: bridges, strategies, metrics, the cache protocol |
+| [`./src/domain/payment/AGENTS.md`](./src/domain/payment/AGENTS.md) | Payment events, factory and handlers |
+| [`./src/infrastructure/AGENTS.md`](./src/infrastructure/AGENTS.md) | Layer contract: the only layer that reaches outward |
+| [`./src/infrastructure/api/AGENTS.md`](./src/infrastructure/api/AGENTS.md) | Failure → HTTP status mapping |
+| [`./src/infrastructure/clients/AGENTS.md`](./src/infrastructure/clients/AGENTS.md) | Effect service tags for db, email, logging, payments |
+| [`./src/infrastructure/services/holidays/AGENTS.md`](./src/infrastructure/services/holidays/AGENTS.md) | Holiday lookup and normalisation |
+| [`./src/infrastructure/services/location/AGENTS.md`](./src/infrastructure/services/location/AGENTS.md) | Country detection strategies |
+| [`./src/infrastructure/services/payments/AGENTS.md`](./src/infrastructure/services/payments/AGENTS.md) | Stripe provider, repository, promo codes |
+| [`./src/infrastructure/workers/AGENTS.md`](./src/infrastructure/workers/AGENTS.md) | The calculations Web Worker and its message contract |
+| [`./src/ui/AGENTS.md`](./src/ui/AGENTS.md) | Layer contract: adapters, hooks, modules, styles |
+| [`./src/ui/i18n/AGENTS.md`](./src/ui/i18n/AGENTS.md) | Message bundles, namespaces, adding a locale |
+| [`./src/ui/modules/AGENTS.md`](./src/ui/modules/AGENTS.md) | How component folders are organised |
+| [`./src/ui/modules/core/AGENTS.md`](./src/ui/modules/core/AGENTS.md) | Primitives and the animation layer |
+| [`./src/ui/modules/pages/planner/AGENTS.md`](./src/ui/modules/pages/planner/AGENTS.md) | The planner screen: calendar, holidays, summary |
+| [`./src/ui/styles/AGENTS.md`](./src/ui/styles/AGENTS.md) | Layer order, tokens, what Biome does not format |
 
 ## Conventions
 
-- **No explanatory comments in TypeScript sources under `src/`.** The folder's `CLAUDE.md` carries the
+- **No explanatory comments in TypeScript sources under `src/`.** The folder's `AGENTS.md` carries the
   explanation instead: a magic constant, a deliberate deviation, an ordering that looks wrong but is not, all
   belong in that folder's *Invariants* or *Gotchas* section, not above the line. A comment is invisible to
   everyone who is not already reading that file and nothing checks it against the code; a guide is read before
@@ -328,13 +328,13 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
 - **No ALL-CAPS in translation strings.** Uppercasing is a presentation choice; do it with a CSS class in the
   component, so the bundles stay comparable and other scripts are not mangled.
   `tests/docs-consistency.test.ts` scans every bundle for it now, against a named acronym allow-list; the same
-  bullet in [`./src/ui/i18n/CLAUDE.md`](./src/ui/i18n/CLAUDE.md) says what the keys that shouted were and
+  bullet in [`./src/ui/i18n/AGENTS.md`](./src/ui/i18n/AGENTS.md) says what the keys that shouted were and
   why whole-token matching is what keeps `iOS` out of the report.
 - **A `typeof window`/`typeof document` guard stays wherever `use(browser())` cannot reach.** The guard looks
   redundant to a linter and is not: the bare identifier throws `ReferenceError` on the server. React gives
   a *component* a better tool, `use(browser())`, which opts its subtree out of the server render outright, so
   inside a component the guard is now the fallback rather than the rule. Module scope, plain utilities and event
-  handlers cannot call it and keep the guard; [`./src/ui/CLAUDE.md`](./src/ui/CLAUDE.md) names which files sit
+  handlers cannot call it and keep the guard; [`./src/ui/AGENTS.md`](./src/ui/AGENTS.md) names which files sit
   on which side and why `useMobile.ts` deliberately stays as it is.
 - **Cross-layer imports use the alias, same-folder imports stay relative.** Mixed forms of the same module
   break Biome's import sorting.
@@ -405,7 +405,7 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
   The Web Worker and the holidays store's own action are its callers and add only transport. They were separate
   copies held together by mirrored test blocks, they drifted, and the symptom was one Planning Window
   producing different plans depending on which path ran. Do not reintroduce orchestration at a caller.
-  See [`./src/application/stores/CLAUDE.md`](./src/application/stores/CLAUDE.md).
+  See [`./src/application/stores/AGENTS.md`](./src/application/stores/AGENTS.md).
 - **The package version is load-bearing at runtime, not just at release time.** Source files across the app import
   [`package.json`](./package.json) and read `version` to render the footer, the hero, the error page, the `/api/markdown` output
   and both `.well-known` documents, the agent-skills index and the MCP server card. The docs site reads it too,
@@ -473,7 +473,7 @@ working directory. Build config lives in `next.config.ts` and [`open-next.config
 
 **Wrangler inherits configuration into a named environment but never a binding, so the repeated `[[ratelimits]]`
 blocks are not duplication.** `[assets]` and `[placement]` are declared once at the top
-level and every environment gets them, which is the pattern `apps/docs/CLAUDE.md` teaches, but `vars`,
+level and every environment gets them, which is the pattern `apps/docs/AGENTS.md` teaches, but `vars`,
 `ratelimits` and `r2_buckets` are bindings: an environment that does not declare one does
 not have it. Deleting `[[env.production.ratelimits]]` as a copy of the top-level block is the most ordinary
 tidy-up in the file, and it makes `env.PAYMENT_RATE_LIMITER` `undefined` in production. The limiter fails

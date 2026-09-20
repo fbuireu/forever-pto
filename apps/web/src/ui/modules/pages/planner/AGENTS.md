@@ -156,7 +156,7 @@ have not arrived yet) would clear a plan that was never there and mark the store
 **Only `CalendarList.tsx` triggers a calculation.** It fires `triggerCalculation` on any change to
 year, PTO budget, Strategy, past-days flag, locale or the Holiday list, and on `planRevision`, which
 `setCurrentAlternativeSelection` bumps so that applying a plan re-plans it; see
-[`@application/stores/CLAUDE.md`](../../../../application/stores/CLAUDE.md). [`Troubleshooting.tsx`](../homepage/support/Troubleshooting.tsx), which now
+[`@application/stores/AGENTS.md`](../../../../application/stores/AGENTS.md). [`Troubleshooting.tsx`](../homepage/support/Troubleshooting.tsx), which now
 lives under `pages/homepage/support/`, is the one other caller and it goes the other way:
 `useHolidaysStore().generateSuggestions`, on the main thread. Those are the *UI* entry points; the
 callers [ADR 0006](../../../../../../../adr/0006-caller-owned-calculation-caches.md) counts are the ones that
@@ -222,7 +222,7 @@ What the race produces is specific and silent, and worth knowing before anyone l
   clear, while the request already in flight was posted with the older list and with `autoSuggestCount`
   computed from it. The arriving plan therefore spends the full budget alongside a Manual Day it never knew
   about, and the total spend can exceed `ptoDays`. See the budget-cap notes in
-  [`../../../CLAUDE.md`](../../../CLAUDE.md).
+  [`../../../AGENTS.md`](../../../AGENTS.md).
 
 `toggleDay` answers `DayRefusal.PLAN_IN_FLIGHT` while `isCalculating`, so the store is never reached. The
 `Calendar` component's own `disabled` prop was rejected for this: it reaches every day button and a focused
@@ -364,7 +364,7 @@ days the plan actually *placed* (`days.length` in [`generateMetrics.ts`](../../.
 
 The denominators are equal only when the plan spends the whole budget, and it deliberately does not
 always: a Removed Day, or a Bridge that no longer fits, leaves budget standing (see
-[`@domain/calendar/CLAUDE.md`](../../../../domain/calendar/CLAUDE.md)). Gain is therefore **not** Efficiency
+[`@domain/calendar/AGENTS.md`](../../../../domain/calendar/AGENTS.md)). Gain is therefore **not** Efficiency
 minus one, and the badge is **not** a Bonus Day count as [`CONTEXT.md`](../../../../../../../CONTEXT.md) defines it,
 which is why its label says "over budget" and never the word bonus. Collapsing any of these into one
 another ships a number that is silently wrong by however much budget went unspent.
@@ -392,7 +392,7 @@ used to fold it themselves and this sentence was the whole mechanism keeping the
 survives it because "your 1-day budget" is an attributive, while `es`, `ca`, `it`, `de` and `fr` all put a
 bare plural noun after the number. Both keys select the noun with `{ptoDays, plural, one {…} other {…}}` in
 every bundle now. A new string interpolating a count belongs in the same shape; see
-[`../../../i18n/CLAUDE.md`](../../../i18n/CLAUDE.md).
+[`../../../i18n/AGENTS.md`](../../../i18n/AGENTS.md).
 
 **`MetricCard` renders `hint` in the compact layout only.** The default branch destructures the prop and
 never uses it, so passing a hint to a full-size card is silently dropped rather than misplaced. Every
@@ -470,7 +470,7 @@ show the extra ones for context, so the Holidays metric card, the composition pi
 region" line and the custom-Holiday banner all read a list filtered on `isInPlanningWindow`; otherwise the
 headline figure is roughly double what the Holidays table beside it lists. This is a *display* filter and
 belongs here; the same narrowing applied to `generateMetrics` was tried and reverted, for the reason in
-[`@domain/calendar/CLAUDE.md`](../../../../domain/calendar/CLAUDE.md).
+[`@domain/calendar/AGENTS.md`](../../../../domain/calendar/AGENTS.md).
 
 **The Legend's stuck state is CSS, and the JavaScript that shadowed it was dead.** [`legend.module.css`](./legend.module.css)
 declares `container-type: scroll-state` on `.sticky_container` and styles the collapsed form under
@@ -519,7 +519,7 @@ though it were still full height.
   bones `calendar-list`, `planner-panel` and `summary` are registered in [`modules/bones/registry.ts`](../../bones/registry.ts).
   Both props take the same fixture component and both are required: `fixture` is read only by the
   capture CLI, `fallback` is what renders when no bone resolves, so passing `fixture` alone shows an
-  empty container. See [`../../CLAUDE.md`](../../CLAUDE.md).
+  empty container. See [`../../AGENTS.md`](../../AGENTS.md).
 
 ## Screen boundaries
 

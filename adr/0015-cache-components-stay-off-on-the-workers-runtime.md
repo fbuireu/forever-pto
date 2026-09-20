@@ -59,14 +59,14 @@ requests in production is not worth a few cached constants.
 
 - **The `[locale]` pages are fully static per deploy.** The footer year and the public env they render are
   the build's. Both were already the build's on every prerendered shell, as the *Deploy* section of
-  [`apps/web/CLAUDE.md`](../apps/web/CLAUDE.md) explains; nothing observable changed for a visitor.
+  [`apps/web/AGENTS.md`](../apps/web/AGENTS.md) explains; nothing observable changed for a visitor.
 - **`sitemap.ts` is server-rendered on demand**, so it reads the Worker's runtime `NEXT_PUBLIC_SITE_URL` and
   the preview suite's host assertion keeps holding. `robots.txt` stays static, as it was.
-- **Route segment config is allowed again**, and `apps/web/src/app/CLAUDE.md` no longer has to warn that
+- **Route segment config is allowed again**, and `apps/web/src/app/AGENTS.md` no longer has to warn that
   `export const dynamic` fails the build. The activate route still relies on its `no-store` header alone.
 - **Re-enabling the flag is a decision, not a cleanup.** It has to come with the reproduction above run
   green on workerd: `pnpm cf:build`, `wrangler dev --local`, the paths in the experiment, zero
   "code had hung" errors.
-- Where this bites: [`apps/web/CLAUDE.md`](../apps/web/CLAUDE.md), the env section of
-  [`apps/web/src/infrastructure/CLAUDE.md`](../apps/web/src/infrastructure/CLAUDE.md), and the docs site's
+- Where this bites: [`apps/web/AGENTS.md`](../apps/web/AGENTS.md), the env section of
+  [`apps/web/src/infrastructure/AGENTS.md`](../apps/web/src/infrastructure/AGENTS.md), and the docs site's
   caching page.

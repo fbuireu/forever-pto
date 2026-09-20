@@ -89,5 +89,5 @@ library rewritten with fewer features.
   `tracing.test.ts` pins the fallback so it cannot turn into an export to `undefined/v1/traces`. It is an exporter
   rather than an empty `spanProcessors` list because the library warns on every request when handed the latter,
   through `console.warn`, into the very logs the tail Worker forwards.
-- Where this bites: the *Deploy* section of [`apps/web/CLAUDE.md`](../apps/web/CLAUDE.md), and the clients guide
-  at [`apps/web/src/infrastructure/clients/CLAUDE.md`](../apps/web/src/infrastructure/clients/CLAUDE.md).
+- Where this bites: the *Deploy* section of [`apps/web/AGENTS.md`](../apps/web/AGENTS.md), and the clients guide
+  at [`apps/web/src/infrastructure/clients/AGENTS.md`](../apps/web/src/infrastructure/clients/AGENTS.md).

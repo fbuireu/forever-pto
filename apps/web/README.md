@@ -9,7 +9,7 @@
 
 **The planner.** Next.js on Cloudflare Workers through OpenNext.
 
-**[forever-pto.com](https://forever-pto.com)** · **[Repository README](../../README.md)** · **[Agent guide](./CLAUDE.md)** · **[Glossary](../../CONTEXT.md)**
+**[forever-pto.com](https://forever-pto.com)** · **[Repository README](../../README.md)** · **[Agent guide](./AGENTS.md)** · **[Glossary](../../CONTEXT.md)**
 
 </div>
 
@@ -39,7 +39,7 @@ it in; Worker secrets for a local run go in `.dev.vars`.
 **Both runtimes are pinned exactly and must match:** Node in [`.nvmrc`](../../.nvmrc), mirrored in
 `engines.node`; pnpm, in the root `packageManager`. Next and `@opennextjs/cloudflare` move as a pair, and the
 docs package stays on an older TypeScript line than this one; see
-[ADR 0009](../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) and [`CLAUDE.md`](./CLAUDE.md) before
+[ADR 0009](../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) and [`AGENTS.md`](./AGENTS.md) before
 raising any of them.
 
 ## Layout
@@ -56,8 +56,8 @@ e2e/                  Playwright specs
 workers/tail/         the tail consumer Worker, with its own wrangler.toml
 ```
 
-Folders under `src/` carry their own `CLAUDE.md`. They are the detail; start from
-[`CLAUDE.md`](./CLAUDE.md), which indexes them and states the rules for changing anything here.
+Folders under `src/` carry their own `AGENTS.md`. They are the detail; start from
+[`AGENTS.md`](./AGENTS.md), which indexes them and states the rules for changing anything here.
 
 ## Testing
 

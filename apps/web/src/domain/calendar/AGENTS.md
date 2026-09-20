@@ -5,7 +5,7 @@
 The planning engine. Given a Planning Window, a set of Holidays and a PTO budget, it finds the Bridges that
 turn that budget into the longest stretches away from work, picks a set of them under the chosen Strategy,
 offers Alternatives, and measures the result. Pure functions throughout: same inputs, same output, no
-clock beyond `startOfToday()`, no I/O. The layer contract it sits under is in [`../CLAUDE.md`](../CLAUDE.md)
+clock beyond `startOfToday()`, no I/O. The layer contract it sits under is in [`../AGENTS.md`](../AGENTS.md)
 ([ADR 0003](../../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md)); the words it uses are
 in [`CONTEXT.md`](../../../../../CONTEXT.md).
 

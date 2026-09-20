@@ -18,7 +18,7 @@ raises the question) `domain/calendar/` in several: [`window.ts`](../apps/web/sr
 from the layer above it, which is the wrong direction for a dependency arrow.
 
 **What carries the rule is the specifier list, not the file count, and it is unchanged.**
-`domain/CLAUDE.md` enumerates what the calendar domain may import from outside itself, and a new *file*
+`domain/AGENTS.md` enumerates what the calendar domain may import from outside itself, and a new *file*
 reaching an already-listed specifier adds nothing to that list; `window.ts` is exactly that. `dates.ts` is one
 of the upward imports the calendar domain has (`@application/dto/holiday/types` is the other), and
 the remaining entries on that list are the bare `temporal-polyfill` and `next-intl`.
@@ -28,7 +28,7 @@ the app, or a real `packages/` workspace member. Neither is as cheap as it looks
 
 - A fourth top-level directory beside `app/`, `application/`, `domain/`, `infrastructure/` and `ui/` needs a
   path alias, an entry in every layer contract that currently enumerates what it may import, a rule in
-  [`tests/docs-consistency.test.ts`](../tests/docs-consistency.test.ts) (which asserts every layer root has a `CLAUDE.md`), and an answer to the
+  [`tests/docs-consistency.test.ts`](../tests/docs-consistency.test.ts) (which asserts every layer root has a `AGENTS.md`), and an answer to the
   question of what else belongs there; a tier with one file in it invites everything.
 - A `packages/` member contradicts [ADR 0010](./0010-apps-web-and-apps-docs-monorepo-layout.md), which says
   the tier appears the day a real shared package exists. One file that only [`apps/web`](../apps/web) imports is not that
@@ -53,14 +53,14 @@ The rejected alternative is a neutral `src/shared/` tier, rejected because it bu
 pays for it with a directory whose membership rule nobody can state, at a moment when barely a module or two
 would move into it.
 
-The list in [`../apps/web/src/domain/CLAUDE.md`](../apps/web/src/domain/CLAUDE.md) is what makes this
+The list in [`../apps/web/src/domain/AGENTS.md`](../apps/web/src/domain/AGENTS.md) is what makes this
 enforceable by review: the calendar domain's outside imports are enumerated there and the list is meant to stay
 short. The test for a new one is the runtime, not the layer: does it resolve inside a Web Worker with no DOM
 and no server context.
 
 ## Consequences
 
-- **The enumerated import list in `domain/CLAUDE.md` is the enforcement mechanism, and there is no other.**
+- **The enumerated import list in `domain/AGENTS.md` is the enforcement mechanism, and there is no other.**
   Biome has no import-boundary rule. A fifth entry appearing there without a paragraph explaining why is the
   regression to catch in review.
 - **This makes the layer diagram permanently inaccurate, and that is the cost.** A reader who checks the
@@ -71,7 +71,7 @@ and no server context.
   break the planner at runtime with no build error. `formatDate` and `getWeekdayNames` reaching `Intl` is the
   furthest this file goes, and `Intl` exists in workerd.
 - **The same reasoning covers `@application/dto/holiday/types`**, the calendar domain's other upward import,
-  which [`../apps/web/src/application/dto/CLAUDE.md`](../apps/web/src/application/dto/CLAUDE.md) records as a
+  which [`../apps/web/src/application/dto/AGENTS.md`](../apps/web/src/application/dto/AGENTS.md) records as a
   known exception safe only while everything in that file stays evaluable inside a Web Worker with no DOM
   and no server context: today its types, one const object and `isHolidayVariant`, the union's own membership
   test.

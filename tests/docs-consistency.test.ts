@@ -11,7 +11,7 @@ const ROOT = resolve(__dirname, "..");
 const WEB = "apps/web";
 const DOCS = "apps/docs";
 const WORKSPACE_PACKAGES = [WEB, DOCS];
-const PACKAGE_GUIDES = WORKSPACE_PACKAGES.map((pkg) => `${pkg}/CLAUDE.md`);
+const PACKAGE_GUIDES = WORKSPACE_PACKAGES.map((pkg) => `${pkg}/AGENTS.md`);
 const LAYER_ROOTS = ["app", "application", "domain", "infrastructure", "ui"].map((layer) => `${WEB}/src/${layer}`);
 const LOCALES_DIR = `${WEB}/src/ui/i18n/messages`;
 const STARLIGHT_VENDOR = `${DOCS}/node_modules/@astrojs/starlight/dist`;
@@ -138,8 +138,8 @@ const isGitIgnored = (path: string) => {
 	}
 };
 
-const rootGuide = read("CLAUDE.md");
-const webGuide = readIfPresent(`${WEB}/CLAUDE.md`);
+const rootGuide = read("AGENTS.md");
+const webGuide = readIfPresent(`${WEB}/AGENTS.md`);
 const rootManifest = readJson("package.json");
 const rootScripts: Record<string, string> = rootManifest.scripts ?? {};
 const webScripts: Record<string, string> = readJson(`${WEB}/package.json`).scripts ?? {};
@@ -364,7 +364,7 @@ describe("CONTEXT.md is the domain glossary and nothing else", () => {
 		expect(markdownFiles.filter((path) => path.endsWith("/CONTEXT.md"))).toEqual([]);
 	});
 
-	it("is linked from CLAUDE.md so it is discoverable", () => {
+	it("is linked from AGENTS.md so it is discoverable", () => {
 		expect(rootGuide).toContain("CONTEXT.md");
 	});
 
@@ -438,7 +438,7 @@ describe("the workspace is shaped the way the guides describe it", () => {
 
 	it.each(WORKSPACE_PACKAGES)("%s explains itself to a human and to an agent", (pkg) => {
 		expect(existsSync(join(ROOT, pkg, "README.md"))).toBe(true);
-		expect(existsSync(join(ROOT, pkg, "CLAUDE.md"))).toBe(true);
+		expect(existsSync(join(ROOT, pkg, "AGENTS.md"))).toBe(true);
 		expect(read("README.md")).toContain(`(${pkg}/README.md)`);
 	});
 
@@ -532,7 +532,7 @@ describe("pinned runtimes", () => {
 
 	it("names every runtime it pins", () => {
 		const named = ["Node", "pnpm"].flatMap((runtime) =>
-			["CLAUDE.md", ".github/CONTRIBUTING.md"]
+			["AGENTS.md", ".github/CONTRIBUTING.md"]
 				.filter((doc) => !read(doc).includes(runtime))
 				.map((doc) => `${doc}: ${runtime}`),
 		);
@@ -545,7 +545,7 @@ describe("pinned runtimes", () => {
 	// line that opens a bullet is checked: the prose beneath narrates the versions this guide used to state
 	// wrongly, and that history is the reason the decision exists.
 	it("quotes a version for none of them, since nothing here would keep one current", () => {
-		const section = read("CLAUDE.md").match(VERSIONS_SECTION)?.[1] ?? "";
+		const section = read("AGENTS.md").match(VERSIONS_SECTION)?.[1] ?? "";
 		const quoting = section.split("\n").filter((line) => line.startsWith("- ") && QUOTED_VERSION.test(line));
 
 		expect(section).not.toBe("");
@@ -733,11 +733,11 @@ describe("every wrangler environment carries the whole binding set", () => {
 });
 
 describe("folder guides exist where they are promised", () => {
-	const nestedGuides = markdownFiles.filter((path) => path !== "CLAUDE.md" && path.endsWith("CLAUDE.md"));
+	const nestedGuides = markdownFiles.filter((path) => path !== "AGENTS.md" && path.endsWith("AGENTS.md"));
 	const webSrcGuides = nestedGuides.filter((path) => path.startsWith(`${WEB}/src/`));
 
-	it.each(LAYER_ROOTS)("%s has a CLAUDE.md", (layer) => {
-		expect(existsSync(join(ROOT, layer, "CLAUDE.md"))).toBe(true);
+	it.each(LAYER_ROOTS)("%s has an AGENTS.md", (layer) => {
+		expect(existsSync(join(ROOT, layer, "AGENTS.md"))).toBe(true);
 	});
 
 	it.each(PACKAGE_GUIDES)("%s exists", (guide) => {
@@ -745,11 +745,11 @@ describe("folder guides exist where they are promised", () => {
 	});
 
 	// The reverse direction of the link check, in two levels: a guide no index points at will not be read.
-	it("lists every package guide in the root CLAUDE.md", () => {
+	it("lists every package guide in the root AGENTS.md", () => {
 		expect(PACKAGE_GUIDES.filter((guide) => !rootGuide.includes(`./${guide}`))).toEqual([]);
 	});
 
-	it("lists every web source guide in the apps/web CLAUDE.md table", () => {
+	it("lists every web source guide in the apps/web AGENTS.md table", () => {
 		expect(webSrcGuides.length).toBeGreaterThan(LAYER_ROOTS.length);
 		const missing = webSrcGuides.filter((path) => !webGuide.includes(`./${path.slice(`${WEB}/`.length)}`));
 		expect(missing).toEqual([]);
@@ -818,7 +818,7 @@ describe("architecture decision records", () => {
 	// Twice in one audit a nested guide recorded a change and the ADR it amends did not, and both guides
 	// named the ADR they were amending. The maintenance contract's "amend it, or supersede it and say so"
 	// row is the rule that slipped, and it slipped the worse way round: the guide was right and the ADR was
-	// wrong, while the ADR is what every future agent is told not to re-litigate. `domain/calendar/CLAUDE.md`
+	// wrong, while the ADR is what every future agent is told not to re-litigate. `domain/calendar/AGENTS.md`
 	// said outright "That is an amendment to ADR 0006" and then answered, in the opposite direction, a
 	// question ADR 0006 was still asking a reader to settle with a probe on a deployed preview.
 	//
@@ -1920,7 +1920,7 @@ describe("the guides describe the project as it is configured", () => {
 		["README.md", rootScripts],
 		[`${WEB}/README.md`, { ...rootScripts, ...webScripts }],
 		[`${DOCS}/README.md`, { ...rootScripts, ...docsScripts }],
-		[`${DOCS}/CLAUDE.md`, { ...rootScripts, ...docsScripts }],
+		[`${DOCS}/AGENTS.md`, { ...rootScripts, ...docsScripts }],
 	])("%s cites only scripts a reader could run", (file, available) => {
 		expect(citedScripts(readIfPresent(file)).filter((script) => !(script in available))).toEqual([]);
 	});
@@ -1956,7 +1956,7 @@ describe("the guides describe the project as it is configured", () => {
 	it.each(workflowFiles.map((file) => file.slice(WORKFLOW_DIR.length + 1)))(
 		"%s is documented in both places that claim to list every workflow",
 		(name) => {
-			const rootGuide = read("CLAUDE.md");
+			const rootGuide = read("AGENTS.md");
 			const wiki = read(`${DOCS}/src/content/docs/infra/workflows.mdx`);
 
 			// A bare `includes(name)` was not a listing test: `ci.yml` is named twelve times in that guide,
@@ -2097,7 +2097,7 @@ describe("the guides describe the project as it is configured", () => {
 	// the whole match fails and the line yields no script at all.
 	it("resolves every filtered pnpm citation against the package it names", () => {
 		const sources = [
-			"CLAUDE.md",
+			"AGENTS.md",
 			"README.md",
 			".github/CONTRIBUTING.md",
 			...PACKAGE_GUIDES,
@@ -2386,8 +2386,8 @@ const POLICED_NAMES = policedNames({
 });
 const STATED_VERSION = statedVersionPattern(POLICED_NAMES);
 const NARRATED_VERSIONS: Record<string, string[]> = {
-	"CLAUDE.md": ["Flutter 3.47.2", "Next 16.3.3"],
-	"apps/web/CLAUDE.md": ["Next 16.3", "TypeScript 7", "TypeScript 6", "wrangler 4.115"],
+	"AGENTS.md": ["Flutter 3.47.2", "Next 16.3.3"],
+	"apps/web/AGENTS.md": ["Next 16.3", "TypeScript 7", "TypeScript 6", "wrangler 4.115"],
 };
 
 describe("stated versions", () => {

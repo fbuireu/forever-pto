@@ -6,7 +6,7 @@
 
 **The wiki.** Astro Starlight on Cloudflare Workers, rendering the app's real components.
 
-**[docs.forever-pto.com](https://docs.forever-pto.com)** · **[Repository README](../../README.md)** · **[Agent guide](./CLAUDE.md)** · **[Glossary](../../CONTEXT.md)**
+**[docs.forever-pto.com](https://docs.forever-pto.com)** · **[Repository README](../../README.md)** · **[Agent guide](./AGENTS.md)** · **[Glossary](../../CONTEXT.md)**
 
 </div>
 
@@ -47,7 +47,7 @@ astro.config.ts    Starlight config, the @ui alias, the sidebar
 wrangler.toml      environments: production and development
 ```
 
-Read [`CLAUDE.md`](./CLAUDE.md) before changing anything: it carries the boundary rules: which app
+Read [`AGENTS.md`](./AGENTS.md) before changing anything: it carries the boundary rules: which app
 modules may be imported into a demo, why a component that needs an app context gets the context rather
 than a note saying it cannot be rendered, and why [`src/ui/styles/index.css`](../web/src/ui/styles/index.css) must never be imported here.
 

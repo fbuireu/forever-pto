@@ -16,8 +16,8 @@ The largest single thing in here is a browser file: the Web Worker.
 | Directory | Contents |
 | --- | --- |
 | `actions/` | The `'use server'` entry points: `payment.ts` and `contact.ts`. They read request-scoped config and hand it to the matching operation under [`api/operations/`](./api/operations) |
-| `api/` | The wire vocabulary for failures, the no-store response helper, and the operations both transports terminate. See [`api/CLAUDE.md`](./api/CLAUDE.md) |
-| `clients/` | SDK wrappers: Effect service tags plus modules that are deliberately not services. See [`clients/CLAUDE.md`](./clients/CLAUDE.md) |
+| `api/` | The wire vocabulary for failures, the no-store response helper, and the operations both transports terminate. See [`api/AGENTS.md`](./api/AGENTS.md) |
+| `clients/` | SDK wrappers: Effect service tags plus modules that are deliberately not services. See [`clients/AGENTS.md`](./clients/AGENTS.md) |
 | `i18n/` | [`routing.ts`](./i18n/routing.ts) (next-intl routing, `localePrefix: 'as-needed'`), [`config.ts`](./i18n/config.ts) (request config + message loading), [`locales.ts`](./i18n/locales.ts) (the locale codes and `LOCALE_COOKIE`), [`cookie.ts`](./i18n/cookie.ts) (`LOCALE_COOKIE_POLICY`, the one statement of the `NEXT_LOCALE` attributes, plus `setLocaleCookie`), [`utils/url.ts`](./i18n/utils/url.ts) (`localePath`, `resolveLocale`, `getLocaleFromPathname`, `routePathFromPathname`, `localeFromAcceptLanguage`, `localeAlternates`) |
 
 **`LOCALES` is `as const`, and until it was, `Locale` was `string`.** The array was an unannotated literal,
@@ -63,12 +63,12 @@ chain that existed nowhere else and was reachable only through a page most users
 `Accept-Language` half is `localeFromAcceptLanguage` now and answers `undefined` rather than the default, so
 the caller decides the fallback and the precedence is assertable without rendering a document.
 | `logging/` | [`logger.ts`](./logging/logger.ts), the `logger` object every log line in the app goes through; [`contract.ts`](./logging/contract.ts), its service name, levels and `stripQuery`; [`service.ts`](./logging/service.ts), the `LoggerService` tag wrapping that same object. See *`logging/`* below |
-| `markdown/` | `buildMarkdownPage.ts`: the Markdown twin of a page, served when the request asks for `text/markdown`. Translates through `createTranslator` over statically imported bundles, never `next-intl/server`; see *Gotchas*. [`twin.ts`](./markdown/twin.ts) beside it holds how the twin is *requested* and *cached*: the route path, the `Accept` token, the `x-markdown-path` header the proxy sets, and `markdownTwinHeaders({ found })`. Both the proxy and the route read it, which is what stopped the policy being a guess made before the lookup; see [`../app/CLAUDE.md`](../app/CLAUDE.md) |
+| `markdown/` | `buildMarkdownPage.ts`: the Markdown twin of a page, served when the request asks for `text/markdown`. Translates through `createTranslator` over statically imported bundles, never `next-intl/server`; see *Gotchas*. [`twin.ts`](./markdown/twin.ts) beside it holds how the twin is *requested* and *cached*: the route path, the `Accept` token, the `x-markdown-path` header the proxy sets, and `markdownTwinHeaders({ found })`. Both the proxy and the route read it, which is what stopped the policy being a guess made before the lookup; see [`../app/AGENTS.md`](../app/AGENTS.md) |
 | `seo/` | [`buildMetadata.ts`](./seo/buildMetadata.ts): the `Metadata` shape every route's `generateMetadata` fills in; [`routeMetadata.ts`](./seo/routeMetadata.ts): that `generateMetadata`, built from a route's own row so a route file is one line; [`routes.ts`](./seo/routes.ts): `SITE_ROUTES`, the one list of pages and whether each is indexable, plus `routeFor`, the total lookup keyed by the table's own literal paths |
 | `proxy/` | Middleware helpers: `location.ts` (country detection + cookie) and [`cookie.ts`](./proxy/cookie.ts) (`user-country`, one week) |
-| `services/` | Everything with a purpose but no SDK of its own: `contact/`, `countries/`, `env/`, `holidays/`, `location/`, `payments/`, `premium/`, `regions/`. Some carry their own guides: [holidays](./services/holidays/CLAUDE.md), [location](./services/location/CLAUDE.md), [payments](./services/payments/CLAUDE.md) |
+| `services/` | Everything with a purpose but no SDK of its own: `contact/`, `countries/`, `env/`, `holidays/`, `location/`, `payments/`, `premium/`, `regions/`. Some carry their own guides: [holidays](./services/holidays/AGENTS.md), [location](./services/location/AGENTS.md), [payments](./services/payments/AGENTS.md) |
 | `well-known/` | [`slugs.ts`](./well-known/slugs.ts) (the slugs, the shared cache header, `wellKnownUrl`), [`documents.ts`](./well-known/documents.ts) (slug → content type and builder), and the builders [`apiCatalog.ts`](./well-known/apiCatalog.ts) (RFC 9727 linkset), [`mcpServerCard.ts`](./well-known/mcpServerCard.ts) (SEP-1649) and [`agentSkillsIndex.ts`](./well-known/agentSkillsIndex.ts), each returning a plain object, with the route owning the response envelope |
-| `workers/` | The calculations Web Worker and its message contract. See [`workers/CLAUDE.md`](./workers/CLAUDE.md) |
+| `workers/` | The calculations Web Worker and its message contract. See [`workers/AGENTS.md`](./workers/AGENTS.md) |
 | [`errors.ts`](./errors.ts) | Every tagged error in the app: `DatabaseError`, `EmailError`, `MissingDonorEmailError`, `PaymentError` and its `PaymentRequestError` subclass, `PromoCodeError`, `RateLimitError`, `SessionError`, `ValidationError`, `WebhookError` |
 | [`layers.ts`](./layers.ts) | `ApplicationLayer`: the Live layers merged, provided at every entry point |
 | [`span.ts`](./span.ts) | `traced({ name, run })`: opens a named span through the runtime's `ctx.tracing` so a trace reads `createPayment` rather than `POST`. Wrapped around every entry point that terminates an Effect program |
@@ -337,7 +337,7 @@ observe a stale one. Its return type `PublicEnv` is exported and is the config s
 
 Payment creation and contact submission are each reachable more than one way: a route handler under `src/app/api/` and
 a server action here. They no longer restate the operation. Both call the module under
-[`api/operations/`](./api/CLAUDE.md), which owns the rate limit, the use-case, the deferred write and the
+[`api/operations/`](./api/AGENTS.md), which owns the rate limit, the use-case, the deferred write and the
 failure-to-status mapping, and answers a transport-free `{ status, body }`. The action drops the status; the
 route puts it on a `NextResponse`.
 
@@ -363,7 +363,7 @@ already drifted over how a missing IP header was recorded.
   `console` writer, but it does pull `logging/logger.ts` and its contract into whatever bundle imports them,
   and [`Countries.tsx`](../ui/modules/sidebar/components/Countries.tsx) imports `getCountries.ts` from the UI
   layer. The stores and components reach the same object through `logClient`'s dynamic import instead; see
-  [`../ui/CLAUDE.md`](../ui/CLAUDE.md).
+  [`../ui/AGENTS.md`](../ui/AGENTS.md).
 - **Country detection sits in front of every HTML response.** [`proxy/location.ts`](./proxy/location.ts) re-sets an existing
   `user-country` cookie instead of re-running [`detectCountry.ts`](./services/location/detectCountry.ts), which is a subrequest with its own timeout.
   Writing back a value it already has is not redundant: it slides the week-long expiry forward on every
@@ -389,7 +389,7 @@ already drifted over how a missing IP header was recorded.
   [`serverService.ts`](./clients/payments/stripe/serverService.ts) `WebhookConfigurationError` shape, copied
   deliberately. `session.ts` keeps only the Effects and hands `wrapSessionError` to both `catch`
   handlers, so the route can import the classification without importing `jose`. A rotated secret is not
-  separable from a forged token and stays in the silent branch; [`../app/CLAUDE.md`](../app/CLAUDE.md)
+  separable from a forged token and stays in the silent branch; [`../app/AGENTS.md`](../app/AGENTS.md)
   records why that is the end of it.
 - **`PREMIUM_SESSION_LIFETIME_SECONDS` in `cookie.ts` is the single source of truth for how long Premium
   lasts.** [`session.ts`](./services/premium/session.ts) derives the JWT expiry from it, so a cookie can never outlive the token it carries.
@@ -401,8 +401,8 @@ already drifted over how a missing IP header was recorded.
   to read the row first, and with a connection per call that read guarded nothing. The count comes off the
   SDK's `changes`, **not** `rowsAffected`, which is not a field on what `run` answers and read as `undefined`
   for as long as it was there. The payments repository is the consumer: see
-  [`services/payments/CLAUDE.md`](./services/payments/CLAUDE.md) and
-  [`clients/CLAUDE.md`](./clients/CLAUDE.md).
+  [`services/payments/AGENTS.md`](./services/payments/AGENTS.md) and
+  [`clients/AGENTS.md`](./clients/AGENTS.md).
 - **Turso opens a connection per call, and every call closes the one it opened.** `query` and `execute` each
   call `connect()` themselves, so two calls are two connections and nothing spans them transactionally. Each
   also releases its server-side stream in a `finally`; nothing did before, and a Worker has no process exit to
@@ -427,7 +427,7 @@ test that uses it).
 **[`api/errors.ts`](./api/errors.ts) was listed here as a third kind (a const map asserted through the route tests), and it is
 not.** It has [`api/errors.test.ts`](./api/errors.test.ts) beside it, which is the only place the tag→status table belongs; the route
 and action tests that restated it row by row have been cut back to what each transport alone decides. See
-[`api/CLAUDE.md`](./api/CLAUDE.md).
+[`api/AGENTS.md`](./api/AGENTS.md).
 
 **`seo/buildMetadata.ts` and [`services/holidays/source/dateHolidays.ts`](./services/holidays/source/dateHolidays.ts) were a fourth kind (untested) and
 are not any more.** `buildMetadata` was reached only through the route `metadata.test.ts` files that existed then, and

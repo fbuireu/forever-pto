@@ -2,7 +2,7 @@
 
 There is no logger in this folder. It lived here as `logging/better-stack/` while it wrapped an SDK, and since
 [ADR 0018](../../../../../adr/0018-the-platform-is-the-log-transport.md) there is none under it, so it sits in
-[`../logging/`](../logging) and [`../CLAUDE.md`](../CLAUDE.md) describes it: the contract, the
+[`../logging/`](../logging) and [`../AGENTS.md`](../AGENTS.md) describes it: the contract, the
 `stripQuery` rule, the `LoggerService` tag and why it stays one, and why nothing here carries a trace id.
 What is left of Better Stack in this folder is the browser tag, `logging/better-stack/tracking.ts`, in the
 table of things that are not services below.
@@ -135,7 +135,7 @@ cast is left describing whatever the previous version sent. That is not hypothet
 22.3.2 → 22.4.0 bump moved the pin to `'2026-07-29.dahlia'`, where a `PromotionCode` carries its coupon
 under `promotion` rather than at the top level, and a lone `as unknown as` in the promo-code service went
 on reading the old field and returned `undefined` for every code
-(see [`../services/payments/CLAUDE.md`](../services/payments/CLAUDE.md)). When you bump the SDK, the
+(see [`../services/payments/AGENTS.md`](../services/payments/AGENTS.md)). When you bump the SDK, the
 `apiVersion` string is the smallest part of the change: grep the payment paths for `as unknown as` and for
 `expand`, because those are the places the types stop checking anything.
 

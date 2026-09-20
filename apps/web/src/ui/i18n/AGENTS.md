@@ -67,7 +67,7 @@ go hunting for a key:
   so the list shrinks with the copy instead of accumulating.
 - **`a11y` holds accessible names, and it is the only namespace that does.** More than one kind lives here. Names a
   `core/` component cannot translate for itself, because those files may not call `useTranslations`
-  ([`../modules/core/CLAUDE.md`](../modules/core/CLAUDE.md)); each takes its label as a prop and the *caller*
+  ([`../modules/core/AGENTS.md`](../modules/core/AGENTS.md)); each takes its label as a prop and the *caller*
   supplies it: `closeDialog` for every modal's close button, `closeToast` for the sonner toaster,
   `toggleSidebar` and `sidebarLandmark` for the sidebar, `radialNavigation` for the roadmap dial,
   `skipToMainContent` for `SkipToContent`. And names more than one feature needs: `selectLanguage`, read by
@@ -89,7 +89,7 @@ go hunting for a key:
   `errors.<code>`, so a feature only carries the codes whose copy it needs to change. `contact.errors` and
   `checkout.errors` used to duplicate `invalid_email`, `email_required` and `invalid_body` character for
   character, and `internal_error` was the *only* one that legitimately differed: the checkout copy adds
-  "Your card has not been charged", which [`../CLAUDE.md`](../CLAUDE.md) explains is load-bearing.
+  "Your card has not been charged", which [`../AGENTS.md`](../AGENTS.md) explains is load-bearing.
 
   So the generic `internal_error` is in the base too and `checkout` overrides it. That is what makes the
   precedence real rather than decorative: while nothing overlapped, inverting the lookup order changed
@@ -232,6 +232,6 @@ not it is a locale.
 ## Out of scope
 
 Locale routing, detection and the cookie (`@infrastructure/i18n`, see
-[`infrastructure/CLAUDE.md`](../../infrastructure/CLAUDE.md)); transactional email copy, which is
+[`infrastructure/AGENTS.md`](../../infrastructure/AGENTS.md)); transactional email copy, which is
 hard-coded English in [`application/email/templates/Contact.tsx`](../../application/email/templates/Contact.tsx) and has no locale plumbing at all; log
 and error-report strings, which are never translated.

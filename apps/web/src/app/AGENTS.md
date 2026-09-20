@@ -75,7 +75,7 @@ failure channel onto a status code. Business logic that lands here is in the wro
    point: the client-side language switcher writes this cookie too, from `document.cookie`, and both
    writers have to agree. This step used to say next-intl's own cookie "carries none of those", which was
    wrong about `secure` and `sameSite`, and it used to add `httpOnly`, which silently broke every soft
-   locale switch. See [`src/infrastructure/CLAUDE.md`](../infrastructure/CLAUDE.md). [`middleware.test.ts`](../middleware.test.ts) guards the step under
+   locale switch. See [`src/infrastructure/AGENTS.md`](../infrastructure/AGENTS.md). [`middleware.test.ts`](../middleware.test.ts) guards the step under
    `describe('locale cookie policy')`; the policy itself is asserted in
    [`src/infrastructure/i18n/cookie.test.ts`](../infrastructure/i18n/cookie.test.ts).
 6. Hands the response to the location proxy ([`src/infrastructure/proxy/location.ts`](../infrastructure/proxy/location.ts)), which sets the
@@ -358,7 +358,7 @@ guards:
 so a rate limit, a replayed payment-intent id, a Stripe outage and a rotated `JWT_SECRET` all became the same
 `null`, and the file imported no logger at all. A rotated secret meant every donor paid, was redirected, saw
 `premiumActivationFailed`, and nothing anywhere emitted a line. Both transports now go through
-`activatePremiumRequest` in [`@infrastructure/api/operations`](../infrastructure/api/CLAUDE.md), which owns
+`activatePremiumRequest` in [`@infrastructure/api/operations`](../infrastructure/api/AGENTS.md), which owns
 the deferred hand-off, the tag→status map and one log line per failure: `warn` for a refusal the payer
 caused, `error` for Stripe, the session and the database. The route keeps only what is its own: the redirect,
 the cookie and the `no-store` header.
@@ -519,7 +519,7 @@ pins that, and [`robots.test.ts`](./robots.test.ts) additionally pins that nothi
 
 Both files resolve the base URL from the Cloudflare env rather than a constant. Only `sitemap.ts` gets the
 host it is actually served from, though: `robots.ts` is prerendered, so it bakes whatever the build resolved;
-see the Deploy section of the root [`CLAUDE.md`](../../../../CLAUDE.md).
+see the Deploy section of the root [`AGENTS.md`](../../../../AGENTS.md).
 
 ## Structured data
 

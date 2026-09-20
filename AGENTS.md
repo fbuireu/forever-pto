@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 Agent-facing guide for the **forever-pto** repository, a workspace holding the Forever PTO planner
 and its documentation site. See [CONTEXT.md](./CONTEXT.md) for the domain glossary (PTO Day, Bridge,
@@ -13,8 +13,8 @@ omits.
 
 | Package | Guide | What it is |
 | --- | --- | --- |
-| [`apps/web`](./apps/web) (`forever-pto-web`) | [`./apps/web/CLAUDE.md`](./apps/web/CLAUDE.md) | The planner. Next App Router on Cloudflare Workers through OpenNext |
-| [`apps/docs`](./apps/docs) (`forever-pto-docs`) | [`./apps/docs/CLAUDE.md`](./apps/docs/CLAUDE.md) | docs.forever-pto.com. Astro Starlight, rendering the app's real components |
+| [`apps/web`](./apps/web) (`forever-pto-web`) | [`./apps/web/AGENTS.md`](./apps/web/AGENTS.md) | The planner. Next App Router on Cloudflare Workers through OpenNext |
+| [`apps/docs`](./apps/docs) (`forever-pto-docs`) | [`./apps/docs/AGENTS.md`](./apps/docs/AGENTS.md) | docs.forever-pto.com. Astro Starlight, rendering the app's real components |
 
 ## Layout
 
@@ -51,7 +51,7 @@ Read the manifest. What `tests/docs-consistency.test.ts` asserts is the shape a 
   pair, and the pair is what lifted the pin
   [ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) recorded. That ADR is dated and quotes
   the versions it decided on, which is what an ADR is for. The reasoning belongs to the app:
-  [`./apps/web/CLAUDE.md`](./apps/web/CLAUDE.md)
+  [`./apps/web/AGENTS.md`](./apps/web/AGENTS.md)
 
 ## Commands
 
@@ -515,7 +515,7 @@ discovers the config by walking up from the working directory and resolves every
 that file, which is why the deploy steps `cd` into the package first.
 
 The app's bindings, environments and the `NEXT_PUBLIC_SITE_URL` resolution are in
-[`./apps/web/CLAUDE.md`](./apps/web/CLAUDE.md).
+[`./apps/web/AGENTS.md`](./apps/web/AGENTS.md).
 
 **Both packages preview the same way: one Worker per pull request, deleted when it closes.** `apps/web`
 deploys `pr-<number>-forever-pto-development` from `_deploy-web.yml`, `apps/docs` deploys
@@ -536,17 +536,17 @@ promise, not a fix.
 | [`CONTEXT.md`](./CONTEXT.md) (root only) | *What does this word mean?* A domain glossary, and nothing else: no file names, no libraries, no implementation detail | A domain term changes meaning, a new one appears, or a second name for an existing concept shows up in the code or the UI |
 | This file | *How is the repository put together?* Layout, shared tooling, releases, CI | You change the workspace, the release setup, a workflow, or a rule that spans both packages |
 | `apps/*/README.md` | *What is this package, and how do I run it?* The human-facing front page for one package |
-| `apps/*/CLAUDE.md` | *What may I change here, and what are its rules?* The agent-facing guide | You change a package's stack, commands, deployment or its own conventions. Both files, and they answer different questions |
-| `apps/web/src/**/CLAUDE.md` | *What may I touch here, and how is this folder built?* Layer contract at a layer root; files, public API, invariants and gotchas below it. Its `# ` heading is the folder's own path, repo-relative: `# apps/web/src/domain/calendar`, never `# domain/calendar` | You change a layer's dependencies, a signature, an invariant, or the files in that folder |
+| `apps/*/AGENTS.md` | *What may I change here, and what are its rules?* The agent-facing guide | You change a package's stack, commands, deployment or its own conventions. Both files, and they answer different questions |
+| `apps/web/src/**/AGENTS.md` | *What may I touch here, and how is this folder built?* Layer contract at a layer root; files, public API, invariants and gotchas below it. Its `# ` heading is the folder's own path, repo-relative: `# apps/web/src/domain/calendar`, never `# domain/calendar` | You change a layer's dependencies, a signature, an invariant, or the files in that folder |
 | [`adr/`](./adr/) | *Why is it like this?* One decision per file | You make a decision that is hard to reverse, surprising without context, **and** the result of a real trade-off. If any of them is missing, skip the ADR |
 | [`README.md`](./README.md) | *What is this product and how do I run it?* The human-facing front page | The product's capabilities, the stack table, the scripts or the required versions change |
 
 | If you change | Update |
 | --- | --- |
 | What a domain word means, or introduce a new one | [`CONTEXT.md`](./CONTEXT.md): the glossary, vocabulary only |
-| A folder's layout, the files a concept is made of, or a rule its guide states | that folder's nested `CLAUDE.md` |
+| A folder's layout, the files a concept is made of, or a rule its guide states | that folder's nested `AGENTS.md` |
 | A behaviour a doc states as an invariant or a gotcha | that bullet, or delete it if it stopped being true |
-| A layer's allowed imports | that layer's `CLAUDE.md`, and the ADR that decided the boundary |
+| A layer's allowed imports | that layer's `AGENTS.md`, and the ADR that decided the boundary |
 | A package script, a path alias, or the folder tree | the *Commands* section here or in the package guide, and `README.md` if it lists the script |
 | A translation key | every bundle under [`apps/web/src/ui/i18n/messages/`](./apps/web/src/ui/i18n/messages); parity is asserted |
 | A decision an ADR records | that ADR: amend it, or supersede it and say so in both `## Status` blocks |
@@ -560,7 +560,7 @@ this table is the map rather than a second copy: when one fails, read it there.
 | --- | --- |
 | [`CONTEXT.md`](./CONTEXT.md) | Root only, linked from here, and still a glossary: no backticked path, signature or filename, every term defined, no empty `_Avoid_` list, no self-referential alternative |
 | The workspace | Globs resolve, both packages are members with their own manifests, the root stays private and dependency-free at `0.0.0`, neither package carries its own Biome config or lockfile, and Biome's excluded paths all resolve |
-| The guides | Every layer root has a `CLAUDE.md`, and every guide is listed where it belongs: the package guides here, the `apps/web/src` ones in the web table |
+| The guides | Every layer root has an `AGENTS.md`, and every guide is listed where it belongs: the package guides here, the `apps/web/src` ones in the web table |
 | The ADRs | Template shape, contiguous numbering from `0001`, a link from outside `adr/`, and a named-back reference from any document that ties the word *amend* to one |
 | Citations | Every relative link resolves *and points at what it names*; every cited `.ts`/`.tsx` exists; no document cites a nested `CONTEXT.md` |
 | The cross-package seam | Every `@ui/…` symbol the wiki's fences import is still exported; the seam target is declared once in [`apps/docs/tsconfig.json`](./apps/docs/tsconfig.json); every relative `@import` and `@source` resolves, in `.css` and in an `.astro` `<style>` alike; every font variable [`fonts.ts`](./apps/web/src/app/fonts.ts) registers is declared in the docs `:root` |
@@ -670,7 +670,7 @@ relative-link rule could not catch because they were prose rather than links.
   `boneyard-js` by bare name, with no version, so that patch is applied to whatever version resolves: a bump
   that still applies cleanly but no longer patches what the diff was written against is silent, the install
   succeeds and CI stays green. `vaul` is keyed as `vaul@1.1.2`, so there a bump fails the install loudly
-  instead; what the patch does and why is [`src/ui/modules/core/CLAUDE.md`](./apps/web/src/ui/modules/core/CLAUDE.md)'s
+  instead; what the patch does and why is [`src/ui/modules/core/AGENTS.md`](./apps/web/src/ui/modules/core/AGENTS.md)'s
   to explain. [`.github/renovate.json`](./.github/renovate.json) carries a rule naming them and turning
   `automerge` off, against the blanket patch/minor automerge above it; a human reads the upstream diff and
   regenerates the patch. `tests/docs-consistency.test.ts` asserts the pairing, so a further patch without its

@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-The [overview](/architecture/overview/) measures the dependency graph; this page walks each node of it. Every layer carries a `CLAUDE.md` at its root that is the binding contract; this page is the tour, and it links the contract rather than restating it where the contract is long.
+The [overview](/architecture/overview/) measures the dependency graph; this page walks each node of it. Every layer carries a `AGENTS.md` at its root that is the binding contract; this page is the tour, and it links the contract rather than restating it where the contract is long.
 
 ```mermaid
 flowchart TB
@@ -95,7 +95,7 @@ Not a layer but a single file at the root of `src`, kept at the pre-Next-16 name
 - **An event carries what a handler acts on.** `PaymentSucceededEvent` is `paymentId`, `email`, `status` and `latestChargeId`, and the handler reads every one; the factory fails with `MissingDonorEmailError` rather than build an event with a blank address, because Premium is keyed by that address ([ADR 0008](https://github.com/fbuireu/forever-pto/blob/main/adr/0008-premium-derived-from-payment.md)).
 - **Neither contract is lint-enforced.** Biome has no import-boundary rule; the contract suite compares the measured graph against the overview's table, and the rest holds by review.
 
-`apps/web/src/domain/calendar/CLAUDE.md` is the engine's own guide, with its public API, invariants and the traps a change falls into.
+`apps/web/src/domain/calendar/AGENTS.md` is the engine's own guide, with its public API, invariants and the traps a change falls into.
 
 ## `infrastructure/`: the only layer that reaches outward
 
@@ -144,7 +144,7 @@ Not a layer but a single file at the root of `src`, kept at the pre-Next-16 name
 
 **The rules.**
 
-- **`core/` imports nothing back.** No stores, no `useTranslations`, no fetching; components take strings and callbacks. Everything else may import `core/`; where a new component goes is a five-question walk in `apps/web/src/ui/modules/CLAUDE.md`.
+- **`core/` imports nothing back.** No stores, no `useTranslations`, no fetching; components take strings and callbacks. Everything else may import `core/`; where a new component goes is a five-question walk in `apps/web/src/ui/modules/AGENTS.md`.
 - **Navigation goes through `@application/i18n/navigation`.** No file imports `next/link` or `next/navigation` directly, so every internal link carries the locale prefix.
 - **Import `m`, never `motion`.** The app wraps everything in `LazyMotionProvider`, which loads `domAnimation` on demand; a `motion.div` re-introduces the full bundle the provider exists to defer.
 - **The worker hook reads the hand-edited days non-reactively.** `manuallySelectedDays`, `removedSuggestedDays` and `currentSelection` come out of `getState()` inside `triggerCalculation`, never through the selector: they are inputs to the next run, not reasons to start one. While they sat in the selector, picking one day re-planned the whole year.
@@ -152,7 +152,7 @@ Not a layer but a single file at the root of `src`, kept at the pre-Next-16 name
 - **A component opts out of the server render with `use(browser())`; everything else keeps its `typeof window` guard.** React added `browser()` to `react-dom`, so a browser-only component suspends on the server instead of proving at every access that `document` exists, inside a `<Suspense>` boundary, which is not optional. Module scope, plain utilities and event handlers cannot call `use()` and keep the guard, because the bare identifier still throws there.
 - **Server components live here too.** Around a third of the components have no `'use client'`; those files stay free of hooks and store access, and nothing here declares `'use server'` or touches `next/headers`.
 
-The design tokens, the shadow scale and the cascade order are the [design system foundations](/design-system/foundations/philosophy/); `apps/web/src/ui/styles/CLAUDE.md` explains why line one of `index.css` must stay above the Tailwind import.
+The design tokens, the shadow scale and the cascade order are the [design system foundations](/design-system/foundations/philosophy/); `apps/web/src/ui/styles/AGENTS.md` explains why line one of `index.css` must stay above the Tailwind import.
 
 ## What holds it together
 

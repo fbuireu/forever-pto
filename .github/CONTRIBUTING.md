@@ -5,7 +5,7 @@ one fact that shapes everything else is that **the whole planner runs in the bro
 payment and contact records and nothing else. Read this before your first pull request; it will save you a
 rejected commit.
 
-If you want the shape of the codebase, that is [CLAUDE.md](../CLAUDE.md) and the package guides it links.
+If you want the shape of the codebase, that is [AGENTS.md](../AGENTS.md) and the package guides it links.
 If you want the vocabulary, that is [CONTEXT.md](../CONTEXT.md). If you want the *why*, that is
 [adr/](../adr/).
 
@@ -42,7 +42,7 @@ already being talked about.
 ### Improving documentation
 
 Use the [documentation template](ISSUE_TEMPLATE/documentation.yml), or just open a pull request. The
-user-facing documentation is the docs site, built from `apps/docs`; the agent-facing guides (`CLAUDE.md` and
+user-facing documentation is the docs site, built from `apps/docs`; the agent-facing guides (`AGENTS.md` and
 friends) are held to the code by a test, so read *The docs are part of the change* below before editing one.
 
 ## Getting started
@@ -84,13 +84,13 @@ pnpm verify             # format check, typecheck and coverage: what CI runs
 Husky runs lint-staged on `pre-commit`, commitlint on `commit-msg` and `pnpm verify:changed` on `pre-push`.
 The hook runs the changed-only variant rather than `verify` because the coverage floor and a subset run
 cannot both hold; CI runs the full `pnpm verify` on the pushed sha, so a push whose coverage dropped still
-fails its check. [CLAUDE.md](../CLAUDE.md) explains the trade.
+fails its check. [AGENTS.md](../AGENTS.md) explains the trade.
 
 ## Conventions that will bite you if you skip them
 
 - **Use the glossary's words.** [CONTEXT.md](../CONTEXT.md) names one canonical term per concept: PTO Day,
   Bridge, Suggestion, Donation. A variable named after a retired term is a defect, not a style preference.
-- **No explanatory comments in TypeScript sources.** The folder's `CLAUDE.md` carries the explanation
+- **No explanatory comments in TypeScript sources.** The folder's `AGENTS.md` carries the explanation
   instead.
 - **One argument is positional and two or more are a single object typed `<FunctionName>Params`**:
   `localePath({ locale, path }: LocalePathParams)`. The exception is a function a runtime calls back, such
@@ -101,7 +101,7 @@ fails its check. [CLAUDE.md](../CLAUDE.md) explains the trade.
   files: import from the source module.
 - **Don't bump Next or TypeScript on your own.** Next and the Cloudflare adapter move as a pair, and the
   docs package is held to an older TypeScript line than the app; the *Versions* section of
-  [CLAUDE.md](../CLAUDE.md) explains why raising either breaks the build or the deployed Worker.
+  [AGENTS.md](../AGENTS.md) explains why raising either breaks the build or the deployed Worker.
 
 ## Commit rules
 
@@ -140,7 +140,7 @@ commit**. A follow-up commit is a promise, not a fix.
 [`tests/docs-consistency.test.ts`](../tests/docs-consistency.test.ts) runs with the unit tests and fails the
 build when the mechanical half of that contract is broken: scripts that no longer exist, links that no
 longer resolve, aliases that moved. When it fails, the docs and the code disagree; fix whichever is wrong,
-and never delete an assertion to get green. [CLAUDE.md](../CLAUDE.md) has the full table of what to update
+and never delete an assertion to get green. [AGENTS.md](../AGENTS.md) has the full table of what to update
 for a given change.
 
 ## Pull requests

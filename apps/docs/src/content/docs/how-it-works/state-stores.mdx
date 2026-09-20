@@ -5,7 +5,7 @@ sidebar:
   order: 6
 ---
 
-All client state lives in Zustand stores under `apps/web/src/application/stores/`. Most of them persist; each is created as `create()(devtools(persist(...)))` with a versioned storage name. The `ui` store is devtools-only. Store conventions are documented in `apps/web/src/application/stores/CLAUDE.md`.
+All client state lives in Zustand stores under `apps/web/src/application/stores/`. Most of them persist; each is created as `create()(devtools(persist(...)))` with a versioned storage name. The `ui` store is devtools-only. Store conventions are documented in `apps/web/src/application/stores/AGENTS.md`.
 ```mermaid
 flowchart LR
   subgraph stores [Zustand stores]

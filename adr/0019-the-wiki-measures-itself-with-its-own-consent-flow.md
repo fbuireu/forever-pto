@@ -103,5 +103,5 @@ and observability on a Worker that does not exist.
 - **`apps/docs` reads environment variables for the first time**, so it has an
   [`.env.example`](../apps/docs/.env.example) now. Both are optional: without them the site builds, serves,
   and shows no banner at all, because there is nothing to ask about.
-- Where this bites: [`apps/docs/CLAUDE.md`](../apps/docs/CLAUDE.md), and the published wiki's
+- Where this bites: [`apps/docs/AGENTS.md`](../apps/docs/AGENTS.md), and the published wiki's
   *Cookie consent*, *Observability* and *Secrets* pages.

@@ -65,7 +65,7 @@ than stylistic on any Effect program under `@application/use-cases`.
   looks identical.
 - **The tag is not a substitution seam and must not be treated as one.** Providing a stub in a test does not
   silence a module that imports `logger` directly, and several do. See
-  [`../apps/web/src/infrastructure/CLAUDE.md`](../apps/web/src/infrastructure/CLAUDE.md).
+  [`../apps/web/src/infrastructure/AGENTS.md`](../apps/web/src/infrastructure/AGENTS.md).
   A test asserting "nothing logged" is only meaningful for code that reaches the tag.
 - **Every test that reaches one pays a whole-interface stub, and that stays.** It is the price of the signal.
   The interface is as small as its callers: `debug` was on it with no caller anywhere, and went, so a stub is

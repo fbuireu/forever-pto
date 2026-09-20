@@ -1,6 +1,6 @@
 ---
 title: Architecture overview
-description: The layered src/ architecture (app, application, domain, infrastructure and ui) plus dependency rules, nested CLAUDE.md guides and path aliases.
+description: The layered src/ architecture (app, application, domain, infrastructure and ui) plus dependency rules, nested AGENTS.md guides and path aliases.
 sidebar:
   order: 1
 ---
@@ -86,16 +86,16 @@ figure said were not there:
   shorthand. The infrastructure guide said nothing there imports from `@ui/*`, which was true of the literal
   specifier and false of the layer.
 - **`application → ui` is a single import**, recorded as a known inversion in
-  `apps/web/src/application/CLAUDE.md`. One is the number; a second is a regression.
+  `apps/web/src/application/AGENTS.md`. One is the number; a second is a regression.
 
 The normative statements stay with the code, in the layer contracts, and this page links rather than restates
 them:
 
-- `apps/web/src/domain/CLAUDE.md` enumerates exactly what the pure calendar context may import from outside
+- `apps/web/src/domain/AGENTS.md` enumerates exactly what the pure calendar context may import from outside
   itself, and why the test for a fifth entry is the runtime rather than the layer.
-- `apps/web/src/application/CLAUDE.md` carries the orchestration rules and the one `@ui/*` inversion.
-- `apps/web/src/infrastructure/CLAUDE.md` carries what the outward-facing layer may reach back into.
-- `apps/web/src/ui/CLAUDE.md` lists the short set of pure value helpers the UI may take from
+- `apps/web/src/application/AGENTS.md` carries the orchestration rules and the one `@ui/*` inversion.
+- `apps/web/src/infrastructure/AGENTS.md` carries what the outward-facing layer may reach back into.
+- `apps/web/src/ui/AGENTS.md` lists the short set of pure value helpers the UI may take from
   `@domain/calendar`, and why it must not reach the planning engine itself.
 
 Facts about the system that no import arrow carries, and that the old figure tried to put on one:
@@ -109,9 +109,9 @@ Facts about the system that no import arrow carries, and that the old figure tri
 Which practices this tree takes from domain-driven design, which it takes in part and which it rejects, is
 [ADR 0014](https://github.com/fbuireu/forever-pto/blob/main/adr/0014-ddd-where-it-pays.md).
 
-## A CLAUDE.md per folder
+## An AGENTS.md per folder
 
-Per the repo's root `CLAUDE.md`, every significant folder carries its own `CLAUDE.md` describing what may be changed there and what its rules are; read it before touching the folder. Examples: `apps/web/src/domain/CLAUDE.md` (layer rules and allowed imports), `apps/web/src/infrastructure/clients/CLAUDE.md` (the Effect client pattern), `apps/web/src/application/stores/CLAUDE.md` (store conventions). Those files are the source of truth for layer boundaries; this page summarizes them. `CONTEXT.md` is a different document and exists **only** at the repo root, where it is the domain glossary. A nested one is forbidden, because the name would be ambiguous.
+Per the repo's root `AGENTS.md`, every significant folder carries its own `AGENTS.md` describing what may be changed there and what its rules are; read it before touching the folder. Examples: `apps/web/src/domain/AGENTS.md` (layer rules and allowed imports), `apps/web/src/infrastructure/clients/AGENTS.md` (the Effect client pattern), `apps/web/src/application/stores/AGENTS.md` (store conventions). Those files are the source of truth for layer boundaries; this page summarizes them. `CONTEXT.md` is a different document and exists **only** at the repo root, where it is the domain glossary. A nested one is forbidden, because the name would be ambiguous.
 
 ## Path aliases
 
@@ -134,7 +134,7 @@ Declared in `apps/web/tsconfig.json` (`compilerOptions.paths`), not at the repo 
 
 That is the whole list. This page carried extra rows, `@mocks/*` and `@types/*`, pointing at
 `apps/web/src/mocks` and `apps/web/src/types`; neither alias is declared and neither directory exists. The
-rule keeping the same table honest in `apps/web/CLAUDE.md` read only that file, so the published copy could
+rule keeping the same table honest in `apps/web/AGENTS.md` read only that file, so the published copy could
 drift and did. It reads both now.
 
 `@assets`, `@styles` and `@i18n` all point inside `apps/web/src/ui/`: they are shorthands, not separate

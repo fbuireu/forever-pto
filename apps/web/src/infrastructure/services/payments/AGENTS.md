@@ -41,7 +41,7 @@ read by the premium activation path as well as by the payment one.
 
 The domain handlers importing infrastructure directly is the deliberate asymmetry in
 [ADR 0003](../../../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md); see
-[`../../../domain/payment/CLAUDE.md`](../../../domain/payment/CLAUDE.md).
+[`../../../domain/payment/AGENTS.md`](../../../domain/payment/AGENTS.md).
 
 ## Invariants
 
@@ -49,7 +49,7 @@ The domain handlers importing infrastructure directly is the deliberate asymmetr
 guide's to state.** Both operations that reach it (`createPaymentRequest` and `activatePremiumRequest`)
 yield it first, before the request body is even read, and every transport over them inherits the limit
 whether it asks for one or not. That is the property this folder owns; the endpoint list belongs to
-[`../../api/CLAUDE.md`](../../api/CLAUDE.md), and this file kept a second copy of it that had gone stale:
+[`../../api/AGENTS.md`](../../api/AGENTS.md), and this file kept a second copy of it that had gone stale:
 it still said the `POST /api/check-session` half of session activation was unlimited, which stopped being
 true when the limiter moved into `activatePremiumRequest`.
 
@@ -76,7 +76,7 @@ grounds that 0 rows cannot tell "already succeeded" from "no such row". It canno
 needs to: `savePayment` runs immediately before it in `processWebhookEvent`, so "no such row" was
 unreachable and the read only ever answered it when the read itself had failed, laundering an unreachable
 database into a 200 Stripe would never retry. See
-[`../../../domain/payment/CLAUDE.md`](../../../domain/payment/CLAUDE.md).
+[`../../../domain/payment/AGENTS.md`](../../../domain/payment/AGENTS.md).
 
 **Amounts are in Stripe minor units everywhere except `confirmation.ts`.** `createPaymentIntent` multiplies
 by 100 on the way in, `paymentDataDTO` keeps minor units for the table, and `confirmation` divides by 100
@@ -160,7 +160,7 @@ without `{ message }` falls back to Zod's own English prose, and that string is 
 was shown "Too big: expected string to have <=100 characters", in the form and from the API alike. The rule
 now names `messages.promoCodeTooLong`, pre-bound to the machine code `promo_code_too_long` for the server
 and resolved through `validation.payment.promoCodeTooLong` for the form; `checkout.errors.promo_code_too_long`
-is its lookup in every bundle. See [`../../../application/dto/CLAUDE.md`](../../../application/dto/CLAUDE.md).
+is its lookup in every bundle. See [`../../../application/dto/AGENTS.md`](../../../application/dto/AGENTS.md).
 
 ## Traps
 
@@ -347,4 +347,4 @@ than against a literal. It already imported the constant and passed it to `updat
 its own body, while the comparison that decides whether the Donation counts at all was a bare string: one
 rule, one function, spelled both ways. No production module that imports the constant may also spell the value.
 See
-[`../../../domain/payment/CLAUDE.md`](../../../domain/payment/CLAUDE.md).
+[`../../../domain/payment/AGENTS.md`](../../../domain/payment/AGENTS.md).

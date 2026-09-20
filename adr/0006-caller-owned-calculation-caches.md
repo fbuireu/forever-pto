@@ -24,7 +24,7 @@ preview over a large Planning Window. No probe is needed, because the call graph
 Holiday list. The memoisation is what makes the second call free; deleting it rebuilds the Holiday set twice
 on every run. What moved was who benefits, not whether anyone does: the sharing is now inside one
 `findPlanningCandidates` call rather than across the generators, which no longer touch the memo at all.
-[`../apps/web/src/domain/calendar/CLAUDE.md`](../apps/web/src/domain/calendar/CLAUDE.md) reached this
+[`../apps/web/src/domain/calendar/AGENTS.md`](../apps/web/src/domain/calendar/AGENTS.md) reached this
 conclusion first and recorded it as an amendment to this file; this paragraph is that amendment.
 
 **2026-08-16.** The second paragraph of the Context below asserted a premise that has stopped being true:
@@ -82,9 +82,9 @@ Worker and the holidays store, pass inputs and read a result, and neither knows 
 - Tests that exercise a generator directly must still clear in setup. The `clearDateKeyCache()` / `clearHolidayCache()` pair exists for that, and the domain guide still requires it per `describe`. Tests that exercise the pipeline need no setup, because it clears for them; `pipeline.test.ts` pins that by running twice with different Holidays and checking the second run answers for its own.
 - The correctness that used to depend on discipline is now structural. What still depends on discipline is the narrower rule above: a generator must not clear.
 - Recorded elsewhere, and each of these is a place an amendment has been written before it reached this file:
-  the Gotchas bullet in [`../apps/web/CLAUDE.md`](../apps/web/CLAUDE.md), the cache section of
-  [`../apps/web/src/domain/calendar/CLAUDE.md`](../apps/web/src/domain/calendar/CLAUDE.md), the pipeline
-  section of [`../apps/web/src/application/stores/CLAUDE.md`](../apps/web/src/application/stores/CLAUDE.md),
-  and the invariant in [`../apps/web/src/infrastructure/workers/CLAUDE.md`](../apps/web/src/infrastructure/workers/CLAUDE.md).
+  the Gotchas bullet in [`../apps/web/AGENTS.md`](../apps/web/AGENTS.md), the cache section of
+  [`../apps/web/src/domain/calendar/AGENTS.md`](../apps/web/src/domain/calendar/AGENTS.md), the pipeline
+  section of [`../apps/web/src/application/stores/AGENTS.md`](../apps/web/src/application/stores/AGENTS.md),
+  and the invariant in [`../apps/web/src/infrastructure/workers/AGENTS.md`](../apps/web/src/infrastructure/workers/AGENTS.md).
   A guide that says it amends this ADR while this ADR says nothing about the amendment is the failure mode
   [`../tests/docs-consistency.test.ts`](../tests/docs-consistency.test.ts) now watches for.

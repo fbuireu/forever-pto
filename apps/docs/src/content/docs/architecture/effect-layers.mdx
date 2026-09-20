@@ -9,7 +9,7 @@ Every server-side flow that touches an external system (database, Stripe, email,
 
 ## The service pattern
 
-Each external SDK is wrapped once, in `apps/web/src/infrastructure/clients/`, following the pattern documented in `apps/web/src/infrastructure/clients/CLAUDE.md`: a `Context.Tag` declares the interface, a Live `Layer` provides the real implementation.
+Each external SDK is wrapped once, in `apps/web/src/infrastructure/clients/`, following the pattern documented in `apps/web/src/infrastructure/clients/AGENTS.md`: a `Context.Tag` declares the interface, a Live `Layer` provides the real implementation.
 
 ```ts
 export class FooService extends Context.Tag('FooService')<
@@ -93,4 +93,4 @@ This pattern appears in `apps/web/src/app/api/payment/route.ts`, `apps/web/src/a
 
 ## Testing
 
-Because dependencies are tags, unit tests provide mock layers instead of the Live ones, so the SDKs are never called in tests (see `apps/web/src/infrastructure/clients/CLAUDE.md`). This is why the pattern lives in infrastructure rather than being ad-hoc per route.
+Because dependencies are tags, unit tests provide mock layers instead of the Live ones, so the SDKs are never called in tests (see `apps/web/src/infrastructure/clients/AGENTS.md`). This is why the pattern lives in infrastructure rather than being ad-hoc per route.

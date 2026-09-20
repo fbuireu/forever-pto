@@ -17,7 +17,7 @@ on every preview Worker, where `NODE_ENV` is `production` too). `LOG_SERVICE` is
 `<repo>-<package>` spelling contribKit's `contribkit-web` already used. The `noConsole` exemption in
 `biome.json` moved with the file. The shape is the one the sibling repositories share, so a reader who knows
 one logger knows them all; what stays specific to this app is named in
-[`apps/web/src/infrastructure/CLAUDE.md`](../apps/web/src/infrastructure/CLAUDE.md).
+[`apps/web/src/infrastructure/AGENTS.md`](../apps/web/src/infrastructure/AGENTS.md).
 
 ## Context
 
@@ -116,9 +116,9 @@ The rejected alternatives are the ones listed above.
   `LoggerService` is still a tag with one adapter, are both about the port and the `R` channel, neither of
   which the transport touches. `LoggerServiceLive` still returns the same singleton, and the tag's interface is
   byte for byte what it was.
-- Where this bites: the *Deploy* section of [`apps/web/CLAUDE.md`](../apps/web/CLAUDE.md), the clients guide at
-  [`apps/web/src/infrastructure/clients/CLAUDE.md`](../apps/web/src/infrastructure/clients/CLAUDE.md), the
-  dynamic-import paragraphs in [`apps/web/src/ui/CLAUDE.md`](../apps/web/src/ui/CLAUDE.md) and
-  [`apps/web/src/application/stores/CLAUDE.md`](../apps/web/src/application/stores/CLAUDE.md), the
-  `@logtail/edge` gotcha in [`CLAUDE.md`](../CLAUDE.md), and the published wiki's *Observability*, *Secrets*
+- Where this bites: the *Deploy* section of [`apps/web/AGENTS.md`](../apps/web/AGENTS.md), the clients guide at
+  [`apps/web/src/infrastructure/clients/AGENTS.md`](../apps/web/src/infrastructure/clients/AGENTS.md), the
+  dynamic-import paragraphs in [`apps/web/src/ui/AGENTS.md`](../apps/web/src/ui/AGENTS.md) and
+  [`apps/web/src/application/stores/AGENTS.md`](../apps/web/src/application/stores/AGENTS.md), the
+  `@logtail/edge` gotcha in [`AGENTS.md`](../AGENTS.md), and the published wiki's *Observability*, *Secrets*
   and *Tooling* pages.

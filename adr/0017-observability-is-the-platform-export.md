@@ -141,7 +141,7 @@ The rejected alternatives are the ones listed above.
 - **ADR 0013 is untouched.** `LoggerService` stays a tag, `LoggerServiceLive` still returns the singleton, and
   `layers.ts` loses exactly one entry, `TracerLive`. The transport did not change; only the second pipeline
   beside it went away.
-- Where this bites: the *Deploy* and *CI* sections of [`CLAUDE.md`](../CLAUDE.md), the *Deploy* section of
-  [`apps/web/CLAUDE.md`](../apps/web/CLAUDE.md), the clients guide at
-  [`apps/web/src/infrastructure/clients/CLAUDE.md`](../apps/web/src/infrastructure/clients/CLAUDE.md), and the
+- Where this bites: the *Deploy* and *CI* sections of [`AGENTS.md`](../AGENTS.md), the *Deploy* section of
+  [`apps/web/AGENTS.md`](../apps/web/AGENTS.md), the clients guide at
+  [`apps/web/src/infrastructure/clients/AGENTS.md`](../apps/web/src/infrastructure/clients/AGENTS.md), and the
   published wiki's *Observability*, *Cloudflare* and *Workflows* pages.

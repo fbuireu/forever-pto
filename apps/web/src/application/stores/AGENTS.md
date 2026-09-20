@@ -7,7 +7,7 @@ All client state. Because the planner runs in the browser
 product's real database: the Holiday calendar, the Suggestion and its Alternatives, the user's manual edits
 and their Premium session all live here and nowhere else. Lose local storage and the plan is gone.
 
-The rest of the application layer contract is in [`../CLAUDE.md`](../CLAUDE.md).
+The rest of the application layer contract is in [`../AGENTS.md`](../AGENTS.md).
 
 ## Files
 
@@ -116,7 +116,7 @@ could falsify them: deleting `bridges[].startDate.toISOString()` left the persis
 helper is gone and `partializeHolidays` now just names the fields that persist.
 
 `onRehydrateStorage` is the half that does work, mapping them all back through `fromStoredInstant`, the
-intake function for values this app itself wrote (see [`../CLAUDE.md`](../CLAUDE.md)). **Adding a `Date`
+intake function for values this app itself wrote (see [`../AGENTS.md`](../AGENTS.md)). **Adding a `Date`
 anywhere in persisted holidays state means editing that half only**; miss it and you get a string where
 the calendar expects a `Date`, which only surfaces at render. [`holidays.test.ts`](./holidays.test.ts) covers the nested case:
 `makeSuggestion` builds a real Bridge, and one case asserts `startDate`, `endDate` and `ptoDays[]` come back
@@ -146,7 +146,7 @@ only at the far one is what makes them agree, and the fallback is the same const
 The `variant` half drops the entry rather than coercing it, on the same precedent `alternatives` already sets
 by filtering out whatever `reviveSuggestion` cannot revive: there is no safe variant to pick for it, and a
 Holiday nothing can classify is one the tables and the charts count differently from each other. See
-[`../dto/CLAUDE.md`](../dto/CLAUDE.md) for what each reader does with a value outside the union.
+[`../dto/AGENTS.md`](../dto/AGENTS.md) for what each reader does with a value outside the union.
 
 ## Selection indices
 
@@ -167,7 +167,7 @@ A plan gets calculated on either of two threads, and they are *callers* of `runP
 - **The normal path** is the Web Worker. [`useCalculationsWorker.ts`](../../ui/hooks/useCalculationsWorker.ts) posts to [`worker.ts`](../../infrastructure/workers/worker.ts), which deserialises
   the request, calls the pipeline off the main thread, serialises the result and hands it back through
   `setCalculationResult`. See
-  [`../../infrastructure/workers/CLAUDE.md`](../../infrastructure/workers/CLAUDE.md).
+  [`../../infrastructure/workers/AGENTS.md`](../../infrastructure/workers/AGENTS.md).
 - **The store's own `generateSuggestions` action** calls the same pipeline on the main thread. Its
   one caller is the Troubleshooting reset in [`Troubleshooting.tsx`](../../ui/modules/pages/homepage/support/Troubleshooting.tsx), which fires it after `resetToDefaults()`
   has cleared the manual edits.
@@ -246,7 +246,7 @@ because the *shape* is the seam: a caller that refuses on its own grounds still 
 and `DAY_REFUSAL_COPY` is exhaustive over `DayRefusal`, so a reason with no copy decision is a compile error.
 Why the guard cannot live in the store: the store has no way to know a request is in flight without the
 holidays store reading `isCalculating` inside its own action, and the race is a UI-input problem rather than a
-planning rule. See [`../../ui/modules/pages/planner/CLAUDE.md`](../../ui/modules/pages/planner/CLAUDE.md) for
+planning rule. See [`../../ui/modules/pages/planner/AGENTS.md`](../../ui/modules/pages/planner/AGENTS.md) for
 what the race produces if the guard is removed.
 
 **`heldOn` is that rule inside the store, and it took a second pass to get there.** The refusal *reasons*
@@ -270,7 +270,7 @@ using it raw on the line above. Prose cannot enforce this; the signature can. `f
 rehydration seam is its only caller in this layer.
 
 That narrowing needs the persisted shape to be honest about itself, which is the fix
-[`dto/CLAUDE.md`](../dto/CLAUDE.md) already named. Zustand types the `onRehydrateStorage` argument as the
+[`dto/AGENTS.md`](../dto/AGENTS.md) already named. Zustand types the `onRehydrateStorage` argument as the
 live store, where every date field is a `Date`, while what actually arrives is whatever `JSON.parse`
 produced: strings. `Stored<T>` in [`dateIntake.ts`](../shared/utils/dateIntake.ts) maps a shape's `Date`s to
 `string`s, and the callback casts **once**, to `Stored<PersistedHolidays>`, then reads from `stored` and
@@ -328,7 +328,7 @@ that runs with no `currentSelection`.
 Suggestion, the Alternatives and the current selection, drops the Removed Days and marks `hasCalculated`, so
 the planner shows its settled-empty state rather than a skeleton. Its one caller is `CalendarList`, when the
 calculation gate closes while a plan is still standing; see
-[`../../ui/modules/pages/planner/CLAUDE.md`](../../ui/modules/pages/planner/CLAUDE.md).
+[`../../ui/modules/pages/planner/AGENTS.md`](../../ui/modules/pages/planner/AGENTS.md).
 
 **`editHoliday` carries the same collision rule as `addHoliday`, because moving a Holiday onto a date is
 the same act as creating one there.** It refuses a target date already held by another Holiday or by a
@@ -374,7 +374,7 @@ does with what this store hands it, and getting the *inputs* wrong still produce
   `holidaysWithManual.length === 0`, which refused to plan a Holiday-free calendar. A weekend is a Free Day,
   so a Bridge needs no Holiday at all: with none, a Friday still expands into the weekend beside it, at an
   Efficiency of 3.0. The pipeline short-circuits on an empty *candidate* set instead, which is the condition
-  the run cannot proceed without. See [`@domain/calendar/CLAUDE.md`](../../domain/calendar/CLAUDE.md).
+  the run cannot proceed without. See [`@domain/calendar/AGENTS.md`](../../domain/calendar/AGENTS.md).
 
 The `describe('generateSuggestions agrees with the worker')` block in `holidays.test.ts` still mirrors
 [`worker.test.ts`](../../infrastructure/workers/worker.test.ts), and both now assert the same thing from opposite sides: that each caller hands the pipeline
@@ -485,7 +485,7 @@ filled by `Regions.tsx`'s effect, and `CalendarList`'s effect is what calls `fet
 are `dynamic()`-imported from different levels, so chunk arrival decides which runs first, and `regions` is
 in no dependency array. Losing the race left every Regional Holiday reading `CA` rather than `California`
 for the whole session. `getHolidays` derives the list itself now; see
-[`../../infrastructure/services/holidays/CLAUDE.md`](../../infrastructure/services/holidays/CLAUDE.md). A
+[`../../infrastructure/services/holidays/AGENTS.md`](../../infrastructure/services/holidays/AGENTS.md). A
 non-reactive read of a store another component populates is an ordering dependency; if the value can be
 derived, derive it.
 

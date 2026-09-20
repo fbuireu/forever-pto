@@ -8,8 +8,8 @@ Every React component the product renders. Nothing else in `src/ui/` holds compo
 
 | Folder | Holds | Reused across screens? |
 | --- | --- | --- |
-| `core/` | The design system: `primitives/` plus the `animate/` layer. See [core/CLAUDE.md](./core/CLAUDE.md) | Yes, everywhere |
-| `pages/` | One folder per screen: `homepage/`, `planner/`, `legal/`, `error/`, `not-found/`. See [pages/planner/CLAUDE.md](./pages/planner/CLAUDE.md) | No, by definition |
+| `core/` | The design system: `primitives/` plus the `animate/` layer. See [core/AGENTS.md](./core/AGENTS.md) | Yes, everywhere |
+| `pages/` | One folder per screen: `homepage/`, `planner/`, `legal/`, `error/`, `not-found/`. See [pages/planner/AGENTS.md](./pages/planner/AGENTS.md) | No, by definition |
 | `shared/` | Cross-page pieces that are not primitives: footer, donate, contact, cookie consent, JSON-LD, [`shared/Logo.tsx`](./shared/Logo.tsx), [`shared/Icon.tsx`](./shared/Icon.tsx), [`shared/FormButtons.tsx`](./shared/FormButtons.tsx), [`shared/StepOutcome.tsx`](./shared/StepOutcome.tsx), [`shared/SupportButton.tsx`](./shared/SupportButton.tsx), [`shared/ConditionalWrapper.tsx`](./shared/ConditionalWrapper.tsx), [`shared/WebMCP.tsx`](./shared/WebMCP.tsx), plus [`shared/utils/helpers.ts`](./shared/utils/helpers.ts) for the helpers those pieces need | Yes |
 | `layout/` | [`layout/LegalLayout.tsx`](./layout/LegalLayout.tsx), the card chrome the legal pages share, and [`layout/SkipToContent.tsx`](./layout/SkipToContent.tsx), which owns the skip link **and** the `MAIN_CONTENT_ID` every route shell's landmark is keyed on | Between sibling routes |
 | `sidebar/` | [`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) and its controls: country, region, year, Strategy, PTO Day budget, the calculators, calendar export | One screen, but not a page section |
@@ -480,7 +480,7 @@ couple more), so the sites pointing at a combobox trigger or a switch button are
 [`CarryOverMonths.tsx`](./sidebar/components/CarryOverMonths.tsx) named `Slider`, whose Base UI `Root` is
 also a `div`; in both cases the `id` was reaching the wrong element through `...props` and the label
 resolved to nothing. Both drop `controlId` and render a heading instead, and both widgets carry their
-own names; see [`core/CLAUDE.md`](./core/CLAUDE.md).
+own names; see [`core/AGENTS.md`](./core/AGENTS.md).
 
 The alternative was to make `SidebarFieldLabel` emit `aria-labelledby` against a generated id, and it is
 worse: it would strip a working `htmlFor` from the honest sites and still need every caller to thread

@@ -9,8 +9,8 @@ preference.
 
 | Directory | Responsibility | Where it runs |
 | --- | --- | --- |
-| [`calendar/`](./calendar/CLAUDE.md) | The planning engine: Workday enumeration, Bridge detection, Strategy selection, Alternatives, Metrics | browser main thread and Web Worker |
-| [`payment/`](./payment/CLAUDE.md) | Domain events for a Donation, and the Effect programs that handle them | server only |
+| [`calendar/`](./calendar/AGENTS.md) | The planning engine: Workday enumeration, Bridge detection, Strategy selection, Alternatives, Metrics | browser main thread and Web Worker |
+| [`payment/`](./payment/AGENTS.md) | Domain events for a Donation, and the Effect programs that handle them | server only |
 
 They share no code and no types, and there is no reason for one to import the other. Premium is the only
 thing that connects them, and that connection lives in the application layer, not here.
@@ -39,7 +39,7 @@ test in this repo runs on the main thread.
 
 `HolidayDTO` living in the application layer is a layering inversion on paper, since the type describes a
 Holiday, so it belongs here. It is a known exception, safe only because the file is types plus one const
-object. See [`../application/dto/CLAUDE.md`](../application/dto/CLAUDE.md).
+object. See [`../application/dto/AGENTS.md`](../application/dto/AGENTS.md).
 
 **`payment/` is not pure and is not meant to be.** It composes Effect programs directly against
 infrastructure service tags (`@infrastructure/clients/*`, `@infrastructure/services/payments/*`) and holds
@@ -74,7 +74,7 @@ it holds `isFilterStrategy`, the predicate the Web Worker narrows an incoming st
   `clearHolidayCache()` in `beforeEach`: the caches in [`calendar/utils/cache.ts`](./calendar/utils/cache.ts) are module-level and
   survive between cases in the same file
   ([ADR 0006](../../../../adr/0006-caller-owned-calculation-caches.md)). The `metrics/` subtree reaches
-  neither and is exempt; see [`calendar/CLAUDE.md`](./calendar/CLAUDE.md).
+  neither and is exempt; see [`calendar/AGENTS.md`](./calendar/AGENTS.md).
 
 - `payment/` tests build a `Layer.succeed(Tag, mock)` for every tag the handler requires and run the
   program over it. No test constructs a real Stripe or Turso client.

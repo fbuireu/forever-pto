@@ -56,7 +56,7 @@ deliberate and named, the second because the claims become measurements.
 2. **Bounded contexts.** `domain/calendar/` and `domain/payment/` share no code and no types, and there is no
    reason for one to import the other. Premium is the only thing that connects them and that connection
    lives in the application layer.
-3. **Layer boundaries.** The layers under `apps/web/src/`, plus `middleware.ts`. Each has a `CLAUDE.md` stating
+3. **Layer boundaries.** The layers under `apps/web/src/`, plus `middleware.ts`. Each has a `AGENTS.md` stating
    what it may reach.
 4. **Dependency direction, as measured rather than as intended.** The graph is published as a counted table
    on the architecture overview and
@@ -100,7 +100,7 @@ a deferred refactor.
 
 The suffix is not a hedge and not an apology. It has a size, and the cheapest way to see it is that the same
 maintainer runs the sibling repositories on the same conventions (the same `CONTEXT.md` glossary, the same
-nested `CLAUDE.md` per folder, the same contract suite, the same Cloudflare Workers deploy), and each takes a
+nested `AGENTS.md` per folder, the same contract suite, the same Cloudflare Workers deploy), and each takes a
 *different* amount of tactical DDD. Read against them, the "ish" here is a measurement rather than a mood.
 
 | | forever-pto | biancafiore | contribKit |
@@ -191,7 +191,7 @@ rejections matter as much as the fixes: a rule is only as clear as the cases it 
    value object asking to exist, and the collision it would prevent is unreachable: `addHoliday` refuses any
    date already held, so no Custom Holidays can share a day, and `holidayDTO.create` dedupes on the raw
    date string. One "no" on the first question is enough. The rule is written in
-   [`../apps/web/src/application/dto/CLAUDE.md`](../apps/web/src/application/dto/CLAUDE.md) instead, and the
+   [`../apps/web/src/application/dto/AGENTS.md`](../apps/web/src/application/dto/AGENTS.md) instead, and the
    defensive `${id}::${name}` composite key in `HolidaysTable.tsx` is the shape to notice: a downstream
    re-application of an invariant nobody had stated.
 4. **`Efficiency` and `Gain` as distinct numeric types. Reachable: no. Read: yes. Crosses: yes.** They are
@@ -238,6 +238,6 @@ rejections matter as much as the fixes: a rule is only as clear as the cases it 
   The contract suite can tell you that the graph table matches the tree. It cannot tell you that an edge
   should not exist. That judgement stays with the layer contracts under
   [`../apps/web/src/`](../apps/web/src), and with review.
-- Where this bites elsewhere: the *Conventions* section of [`../CLAUDE.md`](../CLAUDE.md), the layer
+- Where this bites elsewhere: the *Conventions* section of [`../AGENTS.md`](../AGENTS.md), the layer
   contracts under [`../apps/web/src/`](../apps/web/src), and the architecture overview on the documentation
   site, which links here rather than restating any of it.

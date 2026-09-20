@@ -4,7 +4,7 @@
 
 The design system: the visual vocabulary every screen is built from. Components here take strings and
 callbacks as props and know nothing about Suggestions, Holidays or Premium. It is the one folder
-[`modules/CLAUDE.md`](../CLAUDE.md) allows everything else to import, and, with the exceptions listed
+[`modules/AGENTS.md`](../AGENTS.md) allows everything else to import, and, with the exceptions listed
 under *Layer rules*, the one folder that imports nothing back.
 
 ## Structure
@@ -41,7 +41,7 @@ There is no `Switch` in `primitives/`; the only one is [`animate/base/Switch.tsx
 - **Design tokens, not literals.** 3px frames (`border-[3px] border-[var(--frame)]`), the
   `--shadow-brutal-*` scale and `--color-brand-*` are all defined in [`src/ui/styles/global/index.css`](../../styles/global/index.css);
   `hit-area-stable` is a Tailwind `@utility` in [`src/ui/styles/utilities/index.css`](../../styles/utilities/index.css). See
-  [`styles/CLAUDE.md`](../../styles/CLAUDE.md).
+  [`styles/AGENTS.md`](../../styles/AGENTS.md).
 
 **CVA is not the rule.** Only a handful of files use `class-variance-authority` (`Button.tsx`, `Badge.tsx`,
 `InputGroup.tsx` and `animate/base/Sidebar.tsx`), and only `buttonVariants` and `badgeVariants` are
@@ -94,7 +94,7 @@ button said "Close" on every modal in the app, `SidebarTrigger` said "Toggle Sid
 landmark said "Sidebar" and `RadialNav` said "Radial navigation". Each now takes the string as a prop
 (`closeLabel`, `label`, `landmarkLabel`, `aria-label`), keeping the English literal as the default so a caller
 that forgets degrades to what it said before rather than to nothing. The callers pass the `a11y` namespace;
-see [`../../i18n/CLAUDE.md`](../../i18n/CLAUDE.md). A brand name is the one thing that stays literal:
+see [`../../i18n/AGENTS.md`](../../i18n/AGENTS.md). A brand name is the one thing that stays literal:
 `aria-label='Forever PTO'` is correct in every locale.
 
 **A name the caller can forget is a name that gets forgotten, so these components now demand one.** The
@@ -136,7 +136,7 @@ container said `menu` and each button said `menuitem`, but every button sits ins
 `div`, and `menu` requires it to *own* its items, so several readers exposed the menu as empty. There was no
 roving focus either, and, decisively, it is not a menu: it is the Roadmap's category selector and nothing
 navigates. That is the same reasoning that removed the calendar's `role="grid"`, recorded in
-[`../pages/planner/CLAUDE.md`](../pages/planner/CLAUDE.md): do not declare a pattern you have not written. It
+[`../pages/planner/AGENTS.md`](../pages/planner/AGENTS.md): do not declare a pattern you have not written. It
 is a group, which promises nothing, and Biome's `useSemanticElements` wants the element rather than the role,
 hence `<fieldset aria-label>`; the label is still the caller's, because this folder cannot translate. Each
 button carries `aria-pressed`, so the selected category is announced and not merely coloured. `aria-current`
@@ -258,7 +258,7 @@ named one that never did.** `useFormField` builds `formDescriptionId` as `${id}-
 `FormControl` put it on every control unconditionally; grepping `apps/web/src` for `form-item-description`
 returned exactly one hit, that definition. There is no `FormDescription` in this fork: shadcn's original has
 one, this copy dropped it and kept the reference, so in the no-error case the dangling id was the *only*
-value `aria-describedby` carried. That is the third instance of the defect [`../CLAUDE.md`](../CLAUDE.md)
+value `aria-describedby` carried. That is the third instance of the defect [`../AGENTS.md`](../AGENTS.md)
 names as "a promise to a screen reader that never resolves".
 
 Both halves are fixed rather than one. `FormDescription` exists again, and `FormItem` holds a

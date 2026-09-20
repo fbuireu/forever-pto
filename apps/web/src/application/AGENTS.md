@@ -17,9 +17,9 @@ halves are joined only by `dto/` and [`shared/utils/dates.ts`](./shared/utils/da
 
 | Folder | Contents | Runs |
 | --- | --- | --- |
-| `dto/` | The translation seam between foreign shapes and the glossary. See [`dto/CLAUDE.md`](./dto/CLAUDE.md) | both |
-| `stores/` | The Zustand stores and the storage wrapper. See [`stores/CLAUDE.md`](./stores/CLAUDE.md) | browser |
-| `use-cases/` | The Effect programs that combine more than one service. See [`use-cases/CLAUDE.md`](./use-cases/CLAUDE.md) | server |
+| `dto/` | The translation seam between foreign shapes and the glossary. See [`dto/AGENTS.md`](./dto/AGENTS.md) | both |
+| `stores/` | The Zustand stores and the storage wrapper. See [`stores/AGENTS.md`](./stores/AGENTS.md) | browser |
+| `use-cases/` | The Effect programs that combine more than one service. See [`use-cases/AGENTS.md`](./use-cases/AGENTS.md) | server |
 | [`email/templates/`](./email/templates) | `Contact.tsx`, the React Email document `sendContactEmail` renders to HTML | server |
 | `export/` | [`generateIcs.ts`](./export/generateIcs.ts) builds an RFC 5545 calendar string from Holidays and PTO Days; `utils/sanitizer.ts` escapes the characters that would break a line; [`utils/serializers.ts`](./export/utils/serializers.ts) holds the ICS date formats, which live here rather than in the shared date library because nothing else speaks them | browser |
 | `i18n/` | `navigation.ts`: `Link`, `useRouter`, `usePathname` bound to the next-intl routing config, so every internal link carries the locale prefix | browser |
@@ -33,7 +33,7 @@ May import from `@domain/*` and `@infrastructure/*`. Must not import React compo
 ([ADR 0004](../../../../adr/0004-cloudflare-workers-as-deployment-target.md)).
 
 **One file imports from `@ui/*`, inverting the dependency.** [`stores/premium.ts`](./stores/premium.ts) uses
-`@ui/adapters/session/checkSession`. It is noted in [`../ui/CLAUDE.md`](../ui/CLAUDE.md) as known and not
+`@ui/adapters/session/checkSession`. It is noted in [`../ui/AGENTS.md`](../ui/AGENTS.md) as known and not
 endorsed; check before moving that target file. Do not add a second. There used to be another: `stores/ui.ts` reached
 for `@ui/utils/currencies` to derive a currency that was a constant, and deleting the derivation removed the
 inversion with it.
@@ -44,7 +44,7 @@ substitutable in tests. The one exception is logging: the stores log against the
 than a tag, because a Zustand action has no Effect context to yield one out of. They reach it through a
 `void import(...)` helper declared in each file, never a static import and never a module-scope `logger`,
 because that client's own top-level imports would land in the client chunk of every component that reads a
-store. Both halves of that exception are deliberate; see [`stores/CLAUDE.md`](./stores/CLAUDE.md).
+store. Both halves of that exception are deliberate; see [`stores/AGENTS.md`](./stores/AGENTS.md).
 
 **[`email/templates/Contact.tsx`](./email/templates/Contact.tsx) is the only React in the layer**, and it is not DOM React: its elements
 come from `@react-email/components` and it is rendered to a string by `render()` inside `sendContactEmail`.
@@ -125,7 +125,7 @@ schema factories in `dto/` instead (`createContactSchema`, `createPaymentSchemaW
 translated messages and hand back a schema the form parses itself.
 
 **The payment mappers disagree about the unit of `amount`, deliberately**; see
-[`dto/CLAUDE.md`](./dto/CLAUDE.md). Anything summing or formatting a payment needs to know which one it
+[`dto/AGENTS.md`](./dto/AGENTS.md). Anything summing or formatting a payment needs to know which one it
 holds.
 
 **Escaping and folding are properties of a content line, not of a call site.** RFC 5545 has one rule for
@@ -170,7 +170,7 @@ template and watching them go red.
 same wrong literal.** `public/static/` holds exactly one subdirectory, `images/`, and
 [`next.config.ts`](../../next.config.ts) declares no rewrite, so every contact notification rendered a broken
 image while both assertions on that `src` passed: they were written from the template, not from the tree, and
-that is the vacuous-fixture pattern [`../app/CLAUDE.md`](../app/CLAUDE.md) already records for `check-session`
+that is the vacuous-fixture pattern [`../app/AGENTS.md`](../app/AGENTS.md) already records for `check-session`
 and `health`. A third assertion
 resolves the rendered `src` against `public/` on disk now, so a path naming no file fails whatever literal the
 others hold. Every other consumer of the logo already used `images/`; the template was the single outlier.
@@ -198,7 +198,7 @@ much interface as implementation.
 ## Testing
 
 Every module has a co-located `.test.ts`, with the type-only DTO folders as the deliberate exception (see
-[`dto/CLAUDE.md`](./dto/CLAUDE.md)). The patterns split by half:
+[`dto/AGENTS.md`](./dto/AGENTS.md)). The patterns split by half:
 
 - **Use-cases** build a `TestLayer` of `Layer.succeed(Tag, mock)` and assert the deferred effect separately
   from the critical path.

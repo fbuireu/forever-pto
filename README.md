@@ -125,7 +125,7 @@ See [`apps/web/.env.example`](apps/web/.env.example) for the full list. Key vari
 
 | Document | What it answers |
 | --- | --- |
-| [`CLAUDE.md`](CLAUDE.md) | How the repository is put together, and the rules for changing it. Start here |
+| [`AGENTS.md`](AGENTS.md) | How the repository is put together, and the rules for changing it. Start here |
 | [`apps/web/README.md`](apps/web/README.md) | The planner: what it does, how to run it, how it releases |
 | [`apps/docs/README.md`](apps/docs/README.md) | The wiki: how to run it, and how to write a page |
 | [`CONTEXT.md`](CONTEXT.md) | The domain glossary: one canonical name per concept |
@@ -138,7 +138,7 @@ absent on purpose. Which practices are taken, which are taken in part and which 
 for each and worked examples from this tree, is
 [ADR 0014](adr/0014-ddd-where-it-pays.md). Read it before proposing that anything here be "finished".
 
-Selected folders under [`apps/web/src/`](./apps/web/src) carry their own `CLAUDE.md` with the detail for that folder: the layer roots plus their sub-folders, all listed in [`apps/web/CLAUDE.md`](apps/web/CLAUDE.md).
+Selected folders under [`apps/web/src/`](./apps/web/src) carry their own `AGENTS.md` with the detail for that folder: the layer roots plus their sub-folders, all listed in [`apps/web/AGENTS.md`](apps/web/AGENTS.md).
 [`tests/docs-consistency.test.ts`](tests/docs-consistency.test.ts) runs with the unit suite and fails the build
 when the docs and the code disagree.
 

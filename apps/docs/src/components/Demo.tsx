@@ -12,7 +12,7 @@ interface DemoProps {
  * Frame for live component demos: renders children on the app's real page
  * background so tokens, shadows and dark mode look exactly like production,
  * and supplies the two app contexts a real component may reach for. A demo
- * that needs one must not have to remember it; see apps/docs/CLAUDE.md. The chip sits outside the
+ * that needs one must not have to remember it; see apps/docs/AGENTS.md. The chip sits outside the
  * `data-demo` frame on purpose: e2e/demos.spec.ts counts that frame's children, and a chip inside it
  * would let a demo that renders nothing pass as rendered.
  */

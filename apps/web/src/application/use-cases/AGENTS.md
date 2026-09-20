@@ -35,13 +35,13 @@ parameter written out explicitly rather than inferred. That signature is the con
   point: a trace reads `createPayment → fetch api.stripe.com → fetch turso`. A new export without a span is
   a request that shows up in BetterStack as an anonymous run of `fetch` calls. Annotate with
   `Effect.annotateCurrentSpan` rather than logging an id twice; see
-  [`../../infrastructure/clients/CLAUDE.md`](../../infrastructure/clients/CLAUDE.md).
+  [`../../infrastructure/clients/AGENTS.md`](../../infrastructure/clients/AGENTS.md).
 
 Failures the flow is expected to survive are absorbed in place rather than widening `E`: a deferred write
 that no longer has a response to fail, a charge lookup that only adds reporting detail. **A database failure
 on the critical path is not one of them.** `handlePaymentSucceeded` absorbed its read to `undefined` and read
 that as "no such row", which turned an unreachable Turso into a 200 Stripe never redelivered; see
-[`../../domain/payment/CLAUDE.md`](../../domain/payment/CLAUDE.md). Absorb a failure only where the answer
+[`../../domain/payment/AGENTS.md`](../../domain/payment/AGENTS.md). Absorb a failure only where the answer
 you substitute is one the flow could genuinely have got.
 
 Logging comes in a few shapes here and the choice is about *when* the line runs, never about safety. A log
@@ -49,7 +49,7 @@ attached to a failure sits in `Effect.sync` inside `tapError` (`webhook.ts`, `pa
 `catchAll` where the failure is also being absorbed (`contact.ts`, `activatePremium.ts`); a log describing a
 successful branch is a bare statement in the generator body (`webhook.ts` lines around the dispatch). None of
 them needs a guard, because `logger` cannot throw; see
-[`../../infrastructure/CLAUDE.md`](../../infrastructure/CLAUDE.md). Do not add `Effect.sync`
+[`../../infrastructure/AGENTS.md`](../../infrastructure/AGENTS.md). Do not add `Effect.sync`
 for protection: a throw inside it is a defect too, so it would buy nothing.
 
 ## Termination is the caller's job, not ours
@@ -112,7 +112,7 @@ The paths are deliberately asymmetric, and this is the trap:
   reading `if (clientSecret && …)`, so omitting the field skipped the guard. No caller did, but nothing said
   they could not, and half the tests called it with no guard at all. Deriving the email from the intent is
   what lets the redirect path activate at all, since the payer may come back in a browser that never held
-  their address. See [`../../app/CLAUDE.md`](../../app/CLAUDE.md).
+  their address. See [`../../app/AGENTS.md`](../../app/AGENTS.md).
 - `activateWithEmail` (the "I already donated" recovery path) **does not verify**. It looks up a succeeded
   payment by email and grants access. That is accepted, not overlooked; do not "fix" it in passing.
 
@@ -145,7 +145,7 @@ call and no `contacts` row:
 
 Both lookups run concurrently against the `contacts` table the flow already writes, so this needs no new
 binding and no new store. Both are keyed on `contactSenderKey`, which strips a `+alias`; see
-[`../dto/CLAUDE.md`](../dto/CLAUDE.md) for why that normaliser is separate from the payments one.
+[`../dto/AGENTS.md`](../dto/AGENTS.md) for why that normaliser is separate from the payments one.
 
 **Why not `checkRateLimit`.** The platform limiter keys on the IP, which is the right shape for the card
 processor in front of `POST /api/payment`: there the attacker is anonymous and the cost is Stripe's. Here
