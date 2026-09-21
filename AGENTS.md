@@ -164,65 +164,33 @@ release notes that existed only on GitHub. Nothing read that version: the site d
 from `apps/web/package.json`. [ADR 0011](./adr/0011-per-package-versioning-with-a-bridge-tag.md) carries the
 correction, and the contract asserts the group rather than the absence of a plugin.
 
-**The bridge tags are `web-v1.8.2`, `web-v1.8.3` and `web-v1.10.2`, and the first looks like debris.** Each sits on
-the same commit as the legacy `v1.8.x` tag of the same number. semantic-release finds the last release by
-`tagFormat`, which is `web-v${version}`; delete the highest one and the next app release publishes
-`web-v1.0.0` over a 1.8.x line, which cannot be recalled from GitHub Releases. The `release-web` job fails
-loudly if no `web-v*` tag exists rather than letting it happen quietly.
+**Annotate every bridge tag with its own reason.** semantic-release finds the last release by `tagFormat`
+(`web-v${version}`) and reads the **highest** matching tag, so an unannotated one reads as debris and invites
+a tidy-up that deletes the wrong tag; `git show <tag>` should answer why it exists with no guide open.
 
-`web-v1.8.2` carries no annotation, which is why it reads as debris and why this paragraph exists.
-`web-v1.8.3` is annotated with its own reason, so `git show web-v1.8.3` answers the question without a guide.
-Annotate the next one too.
+**On a history rewrite, push the tag before the branch, never after.** If `main` moves first, `release-web`
+runs against the old history, recomputes the next version from the last tag it can still see, and dies on
+`fatal: tag '<version>' already exists` once the rewritten branch lands and the same version is computed
+again. Pushing the tag first avoids the race.
 
-**`web-v1.8.3`'s number matches what is live and its content does not, deliberately.** The 1.8.3 changelog
-entry lists one fix, the Renovate bump of Next to 16.3.1, which this branch reverted for the whole of
-[ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md). The branch carries a later patch on that
-same line now, with the adapter that admits it, so the entry and the tree agree on the major and minor and
-still not on the patch; which patch is [`apps/web/package.json`](./apps/web/package.json)'s to say, not this
-paragraph's. The tag exists so the next release continues from 1.8.3 rather than re-cutting it and writing a second
-1.8.3 section into a changelog that already has one.
+**A tag on a commit `main` cannot reach is worse than a missing one.** semantic-release finds the last release
+with `git tag --merged`, so a tag whose commit is not an ancestor of the release branch is invisible to it: it
+recomputes the same version and dies on `fatal: tag '<version>' already exists`, because the tag it cannot
+*see* is still one `git tag` refuses to overwrite. That is a permanent stop rather than one bad run — every
+later push repeats it. It happens when a release commit is rebased away by a force-push to `main` while its
+tag stays put.
 
-**Every bridge tag is on the remote**, verified with `git ls-remote --tags origin 'web-v*'`, last on 2026-09-12. They had
-to reach it before `release-web` first runs on `main`, and they have. This paragraph used to say they were
-still local; that is the shape of claim to re-check rather than copy forward.
+**It cannot be repaired by moving the tag: the GitHub Release carrying it is `immutable`**, so the API refuses
+a force-update of the ref and a delete alike. The fix is a `git merge -s ours` of the orphaned release commit
+into `main`, which makes the tag reachable again and changes no file, since `main` already carries the same
+work under a different sha. The alternative, a bridge tag one patch higher, would skip a version number and
+claim a release that never happened; grafting keeps the numbers honest. Prefer it, and never force-push `main`
+while a release is in flight.
 
-**`web-v1.10.2` is the newest of the three, and it exists because a rewrite orphaned `web-v1.10.1`.** `main` was rewritten
-on 2026-09-06 to drop a commit whose author was not the owner's identity, which changed that commit's sha and
-every sha above it, `web-v1.10.1`'s release commit included. The release carrying that tag is `immutable`, so
-the tag could not be moved onto the rewritten commit or deleted, and it now points at a commit `main` does not
-reach. `web-v1.10.2` is what `release-web` reads instead; its content is 1.10.1's, and no 1.10.2 was ever
-released.
-
-**The order that rewrite has to run in is the lesson, and it was learned the expensive way.** `main` went
-first and the tag second, so between them `release-web` ran, found only `web-v1.10.0` reachable, recomputed
-1.10.1, pushed a release commit for it and then died on `fatal: tag 'web-v1.10.1' already exists`. That left a
-second 1.10.1 section in [`apps/web/CHANGELOG.md`](./apps/web/CHANGELOG.md), since deleted, and a red `Check`
-until the bridge tag landed. Push the tag before the branch, or do not start.
-
-**A `web-v*` tag on a commit `main` cannot reach is worse than a missing one, and `web-v1.9.3` was one.**
-semantic-release finds the last release with `git tag --merged`, so a tag whose commit is not an ancestor of
-the release branch is invisible to it: it read the last release as 1.9.2, computed 1.9.3 again, and then died
-on `fatal: tag 'web-v1.9.3' already exists`, because the tag it could not *see* is still one `git tag` refuses
-to overwrite. That is a permanent stop rather than one bad run: every later push repeats it, and `release-web`
-is what `docs-refresh` hangs off. It happens when the release commit `@semantic-release/git` pushes is later
-rebased away while its tag stays put, which is exactly what a force-push to `main` under a release does.
-
-**It could not be repaired by moving the tag**, and that is worth knowing before reaching for the obvious fix:
-the GitHub Release carrying it is `immutable`, so the API answers `403` to a force-update of the ref and to a
-delete. What repaired it is a `git merge -s ours` of the orphaned release commit into `main`, which makes the
-tag reachable and changes no file, since `main` already carried the same work under a different sha. The
-alternative was a bridge tag one patch higher, which would have skipped a version number and claimed a release
-that never happened; grafting keeps the numbers honest. Prefer it, and never force-push `main` while a release
-is in flight.
-
-**The graft does not survive the next rewrite, and it stops mattering once the numbers move past it.**
-`web-v1.9.3` is not an ancestor of `main` again: the 2026-09-06 rewrite above changed every sha over the
-commit it dropped, the merge commit that carried the graft included, so the orphan is orphaned once more
-(checked with `git merge-base --is-ancestor` on 2026-09-12, along with `web-v1.10.1`, which is orphaned the
-same way and by the same rewrite). Neither blocks anything now, because semantic-release reads the *highest*
-reachable tag and that is `web-v1.11.1`: an unreachable tag only stops a release while it is the version the
-analyser would compute next. So a graft buys one release rather than a permanent fix, and what makes the
-problem go away for good is the line moving on.
+**A graft buys one release, not a permanent fix — a further rewrite orphans it again the same way.** What
+actually retires the problem is the version line moving past the orphaned tag, since semantic-release only
+ever reads the *highest* reachable one: an unreachable tag only stops a release while it is the version the
+analyser would compute next.
 
 **Nothing may land on `main` while `release-web` is running, and a plain merge is enough to break it.**
 `@semantic-release/git` commits the version bump and the changelog on the sha the job checked out and pushes
@@ -340,7 +308,8 @@ assets with no Worker, so there is no build-time switch and no per-environment h
 
 **`E2E (preview)` gates a merge through `Check`, and for a month it did not, which is the hole separate incidents came through.** It is what
 catches the Cloudflare Error 1101 the Next pin exists to prevent, and Renovate auto-merged 16.3.1 straight
-past it on 2026-08-22, into the deploy production ran until 1.9.x; pull request 384 merged on 2026-09-01 while the suite was still red. A version pin does not hold against a bot with automerge rights, which is what
+past it on 2026-08-22; the broken deploy stayed on production until the 1.9.x line fixed it, and pull request
+384 merged on 2026-09-01 while the suite was still red. A version pin does not hold against a bot with automerge rights, which is what
 makes this check the missing half of [ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)
 rather than a nicety. It cannot be named in the ruleset directly: every job in `ci.yml` is conditional on the event, and a required check that never reports blocks the merge forever. So `check` is an aggregate under `always()` that needs `verify`, both deploys, `e2e`, `smoke` and `release-web`, fails when any of them failed or was cancelled, and counts a skipped one as success. `docs.yml` has the same shape as `Check (docs)`, over its own `changes`, `build`, `preview`, `deploy`, `smoke` and `release-docs`, which is what made the docs pipeline requireable at all: a path-filtered workflow never reports on a pull request outside its paths, so `docs.yml` carries no `paths:` any more and its `changes` job gates `build` on the same list, `DOCS_PATHS`, instead. **The suite has to be green to hold that power**, and its one flaky case was environmental: the per-request `/_not-found` route on a preview Worker that had never been hit timed out at 30 s. [`apps/web/e2e/warm-up.ts`](./apps/web/e2e/warm-up.ts) is Playwright's `globalSetup`: with `BASE_URL` set it requests the homepage and one unknown path once, with a long timeout, before any worker starts, so the first render a spec sees is not the Worker's first ever.
 
