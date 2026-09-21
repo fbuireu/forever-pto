@@ -63,7 +63,8 @@ one will mislead you:
 
 - A thin `'use client'` shell that `dynamic()`-imports the real component with `ssr: false`, purely to
   keep a heavy dependency out of the server bundle: [`shared/donate/DonateClient.tsx`](./shared/donate/DonateClient.tsx),
-  [`shared/cookie-consent/CookieConsentClient.tsx`](./shared/cookie-consent/CookieConsentClient.tsx). The shell takes the same props and forwards them.
+  [`shared/cookie-consent/CookieConsentClient.tsx`](./shared/cookie-consent/CookieConsentClient.tsx),
+  [`pages/homepage/quick-start/QuickStartClient.tsx`](./pages/homepage/quick-start/QuickStartClient.tsx). The shell takes the same props and forwards them.
 - The interactive half of a server/client pair, where the server sibling does the fetching:
   [`sidebar/components/Countries.tsx`](./sidebar/components/Countries.tsx) awaits `getCountries` and hands the result to
   [`sidebar/components/CountriesClient.tsx`](./sidebar/components/CountriesClient.tsx). [`pages/homepage/sections/HomepageCta.tsx`](./pages/homepage/sections/HomepageCta.tsx) and
@@ -80,9 +81,13 @@ Every planner call to action on the homepage (the header's trial action, the her
 `Pricing.tsx` and the closing section) is a [`pages/homepage/quick-start/QuickStartTrigger.tsx`](./pages/homepage/quick-start/QuickStartTrigger.tsx), a
 button that flips `quickStartOpen` on the `ui` store, not a link into `/planner`. The dialog itself is
 mounted once, from the marketing layout, as [`pages/homepage/quick-start/QuickStart.tsx`](./pages/homepage/quick-start/QuickStart.tsx): a server
-component that fetches the Country list and the current year, then renders the `'use client'`
-[`pages/homepage/quick-start/QuickStartDialog.tsx`](./pages/homepage/quick-start/QuickStartDialog.tsx) beside the Premium modal. The dialog reads the
-store's flag; the content is [`pages/homepage/quick-start/QuickStartForm.tsx`](./pages/homepage/quick-start/QuickStartForm.tsx), one component per step
+component that fetches the Country list and the current year and hands them to
+[`pages/homepage/quick-start/QuickStartClient.tsx`](./pages/homepage/quick-start/QuickStartClient.tsx). That shell renders nothing until the
+store's flag first turns true, and only then `dynamic()`-imports, with `ssr: false`, the
+[`pages/homepage/quick-start/QuickStartDialog.tsx`](./pages/homepage/quick-start/QuickStartDialog.tsx) and the Premium modal beside it, so a visitor who
+never clicks a call to action downloads none of it: not the dialog, not the Counter, not the regions lookup the
+location store drags `date-holidays` in for, and not the Stripe client the Premium modal reaches. Once opened the
+pair stays mounted, which is what lets the close animate and a second open cost no fetch. The content is [`pages/homepage/quick-start/QuickStartForm.tsx`](./pages/homepage/quick-start/QuickStartForm.tsx), one component per step
 next to it, and the step list, the draft shape and the pure rules ([`pages/homepage/quick-start/steps.ts`](./pages/homepage/quick-start/steps.ts)).
 
 **The steps are the sidebar's first three cards, asked one at a time.** Location (Country, with the
@@ -90,6 +95,10 @@ next to it, and the step list, the draft shape and the pure rules ([`pages/homep
 Strategy, past days and Carry-over Months. The last two sit behind the same `PremiumFeature` gate the
 sidebar uses, which is why `QuickStart.tsx` mounts `PremiumModal`: the marketing layout carried none, and a
 gated control whose click opens nothing reads as broken.
+
+**The gate is a `useState` seeded from the flag and set during render, not an effect.** An effect would mount
+the dialog one render after the click; setting state while rendering is React's own pattern for deriving
+"has this ever been true" from a prop, and it costs the one re-render the docs say it does.
 
 **The form edits a draft and writes the store once, on the last step.** Closing the dialog before that
 changes nothing, which the sidebar controls, writing on every change, cannot offer. Base UI unmounts the

@@ -5,6 +5,7 @@ import { expect, test } from "@playwright/test";
 
 const MAIN = "main#main-content";
 const HOMEPAGE_NAMESPACE = "homepage.";
+const DIALOG_OPEN_TIMEOUT = 3_000;
 const PLANNER_NAVIGATION_TIMEOUT = 60_000;
 
 test.describe("(marketing) homepage", () => {
@@ -56,8 +57,8 @@ test.describe("(marketing) homepage", () => {
 		const trigger = page.locator("#hero").getByRole("button", { name: enMessages.homepage.hero.plannerCta });
 		const dialog = page.getByRole("dialog").filter({ has: page.getByRole("progressbar") });
 		await expect(async () => {
-			await trigger.click();
-			await expect(dialog).toBeVisible({ timeout: 1000 });
+			if (!(await dialog.isVisible())) await trigger.click();
+			await expect(dialog).toBeVisible({ timeout: DIALOG_OPEN_TIMEOUT });
 		}).toPass();
 		await expect(dialog.getByRole("heading", { name: enMessages.quickStart.location.title })).toBeVisible();
 

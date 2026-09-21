@@ -8,25 +8,16 @@ const getCurrentYear = vi.hoisted(() => vi.fn());
 
 vi.mock("@infrastructure/services/countries/getCountries", () => ({ getCountries }));
 vi.mock("@ui/utils/getCurrentYear", () => ({ getCurrentYear }));
-
-vi.mock("next/dynamic", () => ({
-	default: (loader: () => Promise<unknown>) => {
-		const source = String(loader);
-
-		if (source.includes("PremiumModal")) {
-			return () => <div data-testid="premium-modal" />;
-		}
-
-		return ({ countries, currentYear }: { countries: CountryDTO[]; currentYear: number }) => (
-			<div data-testid="dialog" data-year={currentYear}>
-				<ul>
-					{countries.map((country) => (
-						<li key={country.value}>{country.label}</li>
-					))}
-				</ul>
-			</div>
-		);
-	},
+vi.mock("./QuickStartClient", () => ({
+	QuickStartClient: ({ countries, currentYear }: { countries: CountryDTO[]; currentYear: number }) => (
+		<div data-testid="client" data-year={currentYear}>
+			<ul>
+				{countries.map((country) => (
+					<li key={country.value}>{country.label}</li>
+				))}
+			</ul>
+		</div>
+	),
 }));
 
 const { QuickStart } = await import("./QuickStart");
@@ -52,16 +43,19 @@ describe("QuickStart", () => {
 		expect(getCountries).toHaveBeenCalledExactlyOnceWith("fr");
 	});
 
-	it("hands the dialog the list it fetched and the year it resolved", async () => {
+	it("hands the client shell the list it fetched and the year it resolved", async () => {
 		await renderQuickStart();
 
 		expect(screen.getAllByRole("listitem").map((item) => item.textContent)).toStrictEqual(["Spain", "France"]);
-		expect(screen.getByTestId("dialog").getAttribute("data-year")).toBe("2026");
+		expect(screen.getByTestId("client").getAttribute("data-year")).toBe("2026");
 	});
 
-	it("mounts the Premium modal beside the dialog, so a gated setting can open it from the homepage", async () => {
+	it("hands the client an empty list rather than nothing when the service found none", async () => {
+		getCountries.mockReturnValue([]);
+
 		await renderQuickStart();
 
-		expect(screen.getByTestId("premium-modal")).toBeDefined();
+		expect(screen.getByRole("list")).toBeTruthy();
+		expect(screen.queryAllByRole("listitem")).toHaveLength(0);
 	});
 });
