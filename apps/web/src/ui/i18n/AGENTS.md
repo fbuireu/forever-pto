@@ -20,7 +20,7 @@ breaks the dynamic import in `config.ts` at request time.
 
 ## Namespaces
 
-[`en.json`](./messages/en.json) has 48 top-level namespaces and roughly 1,270 leaf keys. A namespace is the scope passed to
+[`en.json`](./messages/en.json) has 49 top-level namespaces and roughly 1,300 leaf keys. A namespace is the scope passed to
 `useTranslations` in a client component or `getTranslations` in a server one:
 
 ```typescript

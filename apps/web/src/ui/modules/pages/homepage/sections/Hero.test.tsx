@@ -16,8 +16,8 @@ vi.mock("next-intl/server", () => ({
 	getLocale: mockGetLocale,
 }));
 
-vi.mock("@application/i18n/navigation", () => ({
-	Link: ({ children }: { children: ReactNode }) => <a href="/">{children}</a>,
+vi.mock("@ui/modules/pages/homepage/quick-start/QuickStartTrigger", () => ({
+	QuickStartTrigger: ({ children }: { children: ReactNode }) => <button type="button">{children}</button>,
 }));
 vi.mock("@ui/modules/core/primitives/Badge", () => ({
 	Badge: ({ children }: { children: ReactNode }) => <span>{children}</span>,

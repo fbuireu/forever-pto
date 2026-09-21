@@ -10,8 +10,12 @@ vi.mock("next-intl/server", () => ({ getTranslations: mockGetTranslations }));
 vi.mock("@application/i18n/navigation", () => ({
 	Link: ({ children, ...props }: ComponentProps<"a">) => <a {...props}>{children}</a>,
 }));
-vi.mock("@ui/modules/core/primitives/Button", () => ({
-	Button: ({ children }: { children: ReactNode }) => <>{children}</>,
+vi.mock("@ui/modules/pages/homepage/quick-start/QuickStartTrigger", () => ({
+	QuickStartTrigger: ({ children }: { children: ReactNode }) => (
+		<button type="button" data-testid="quick-start-trigger">
+			{children}
+		</button>
+	),
 }));
 vi.mock("@ui/modules/sidebar/components/ThemeSelector", () => ({
 	ThemeSelector: ({ buttonClassName }: { buttonClassName?: string }) => (
@@ -59,10 +63,11 @@ describe("Header", () => {
 		expect(screen.getByRole("link", { name: nav.pricing }).getAttribute("href")).toBe("/#pricing");
 	});
 
-	it("sends the trial action into the planner", async () => {
+	it("opens the quick start from the trial action rather than linking straight into the planner", async () => {
 		await renderHeader();
 
-		expect(screen.getByRole("link", { name: nav.trialAction }).getAttribute("href")).toBe("/planner");
+		expect(screen.getByTestId("quick-start-trigger").textContent).toBe(nav.trialAction);
+		expect(screen.queryByRole("link", { name: nav.trialAction })).toBeNull();
 	});
 
 	it("places the theme and language controls inside the navigation landmark", async () => {

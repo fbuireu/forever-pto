@@ -1090,6 +1090,37 @@
 			}
 		}
 	},
+	"quickStart": {
+		"title": "Configure ton planificateur",
+		"progress": "Étape {current} sur {total}",
+		"steps": {
+			"location": "Lieu",
+			"ptoDays": "Jours de congé",
+			"settings": "Réglages"
+		},
+		"location": {
+			"title": "Où travailles-tu ?",
+			"description": "Le pays décide des jours fériés sur lesquels le planificateur s'appuie. Une région ajoute les jours locaux.",
+			"country": "Pays",
+			"detected": "Détecté depuis ta connexion. Change-le s'il est faux.",
+			"region": "Région",
+			"optional": "facultatif",
+			"noRegions": "Ce pays n'a pas de calendriers régionaux, le calendrier national est donc utilisé."
+		},
+		"ptoDays": {
+			"title": "Combien de jours de congé as-tu ?",
+			"description": "Ton budget pour l'année. Un chiffre approximatif suffit ; tu pourras l'ajuster dans le planificateur.",
+			"year": "Année"
+		},
+		"settings": {
+			"title": "Affine le plan",
+			"description": "Choisis comment les jours sont placés. Le reste est facultatif.",
+			"premiumHint": "Les jours passés et les mois de report sont des réglages premium. Débloque-les ou garde les valeurs par défaut."
+		},
+		"back": "Retour",
+		"next": "Suivant",
+		"finish": "Ouvrir mon planificateur →"
+	},
 	"cookiePolicy": {
 		"title": "Politique de cookies",
 		"lastUpdated": "Dernière mise à jour : {date}",

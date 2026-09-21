@@ -1090,6 +1090,37 @@
 			}
 		}
 	},
+	"quickStart": {
+		"title": "Set up your planner",
+		"progress": "Step {current} of {total}",
+		"steps": {
+			"location": "Location",
+			"ptoDays": "PTO days",
+			"settings": "Settings"
+		},
+		"location": {
+			"title": "Where do you work?",
+			"description": "The country decides which public holidays the planner builds on. A region adds the local ones.",
+			"country": "Country",
+			"detected": "Detected from your connection. Change it if it's wrong.",
+			"region": "Region",
+			"optional": "optional",
+			"noRegions": "This country has no regional calendars, so the national one is used."
+		},
+		"ptoDays": {
+			"title": "How many PTO days do you have?",
+			"description": "Your budget for the year. A rough number is fine; you can adjust it in the planner.",
+			"year": "Year"
+		},
+		"settings": {
+			"title": "Fine-tune the plan",
+			"description": "Choose how the days are placed. The rest is optional.",
+			"premiumHint": "Past days and carry-over months are premium settings. Unlock them or keep the defaults."
+		},
+		"back": "Back",
+		"next": "Next",
+		"finish": "Open my planner →"
+	},
 	"cookiePolicy": {
 		"title": "Cookie Policy",
 		"lastUpdated": "Last updated: {date}",

@@ -1,5 +1,5 @@
 import { Link } from "@application/i18n/navigation";
-import { Button } from "@ui/modules/core/primitives/Button";
+import { QuickStartTrigger } from "@ui/modules/pages/homepage/quick-start/QuickStartTrigger";
 import { ThemeSelector } from "@ui/modules/sidebar/components/ThemeSelector";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
@@ -40,9 +40,7 @@ export const Header = async () => {
 				<div className="flex gap-2.5 items-center">
 					<ThemeSelector buttonClassName="size-9 px-0 focus-visible:ring-1" />
 					<HomepageLanguageSwitcher />
-					<Button variant="accent" size="sm" asChild>
-						<Link href="/planner">{t("nav.trialAction")}</Link>
-					</Button>
+					<QuickStartTrigger size="sm">{t("nav.trialAction")}</QuickStartTrigger>
 				</div>
 			</div>
 		</nav>

@@ -5,6 +5,7 @@ const mockSetRequestLocale = vi.fn();
 const MockHeader = vi.fn().mockReturnValue(null);
 const MockFooter = vi.fn().mockReturnValue(null);
 const MockToaster = vi.fn().mockReturnValue(null);
+const MockQuickStart = vi.fn().mockReturnValue(null);
 
 vi.mock("next-intl/server", () => ({
 	setRequestLocale: mockSetRequestLocale,
@@ -13,6 +14,7 @@ vi.mock("next-intl/server", () => ({
 vi.mock("@ui/modules/pages/homepage/navigation/Navigation", () => ({ Header: MockHeader }));
 vi.mock("@ui/modules/shared/footer/Footer", () => ({ Footer: MockFooter }));
 vi.mock("@ui/modules/core/primitives/Sonner", () => ({ Toaster: MockToaster }));
+vi.mock("@ui/modules/pages/homepage/quick-start/QuickStart", () => ({ QuickStart: MockQuickStart }));
 
 const { default: MarketingLayout } = await import("./layout");
 
@@ -52,6 +54,15 @@ describe("(marketing)/layout", () => {
 		const element = await MarketingLayout({ children: null, params: Promise.resolve({ locale: EN as never }) });
 		const children: unknown[] = [element.props.children].flat();
 		expect(children.some((c: unknown) => (c as { type?: unknown })?.type === MockToaster)).toBe(true);
+	});
+
+	it("mounts the quick start once, for every trigger on the page, with the resolved locale", async () => {
+		const element = await MarketingLayout({ children: null, params: Promise.resolve({ locale: ES as never }) });
+		const children: unknown[] = [element.props.children].flat();
+		const quickStart = children.filter((c: unknown) => (c as { type?: unknown })?.type === MockQuickStart);
+
+		expect(quickStart).toHaveLength(1);
+		expect((quickStart[0] as { props: { locale?: string } }).props.locale).toBe(ES);
 	});
 
 	it("hands the Toaster a translated close label, which sonner otherwise hard-codes to English", async () => {

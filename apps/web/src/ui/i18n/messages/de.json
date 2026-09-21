@@ -1090,6 +1090,37 @@
 			}
 		}
 	},
+	"quickStart": {
+		"title": "Richte deinen Planer ein",
+		"progress": "Schritt {current} von {total}",
+		"steps": {
+			"location": "Standort",
+			"ptoDays": "Urlaubstage",
+			"settings": "Einstellungen"
+		},
+		"location": {
+			"title": "Wo arbeitest du?",
+			"description": "Das Land bestimmt, auf welchen Feiertagen der Planer aufbaut. Eine Region ergänzt die lokalen.",
+			"country": "Land",
+			"detected": "Anhand deiner Verbindung erkannt. Ändere es, wenn es nicht stimmt.",
+			"region": "Region",
+			"optional": "optional",
+			"noRegions": "Dieses Land hat keine regionalen Kalender, also gilt der nationale."
+		},
+		"ptoDays": {
+			"title": "Wie viele Urlaubstage hast du?",
+			"description": "Dein Budget für das Jahr. Eine ungefähre Zahl reicht; im Planer kannst du sie anpassen.",
+			"year": "Jahr"
+		},
+		"settings": {
+			"title": "Feinschliff für den Plan",
+			"description": "Wähle, wie die Tage verteilt werden. Der Rest ist optional.",
+			"premiumHint": "Vergangene Tage und Übertragungsmonate sind Premium-Einstellungen. Schalte sie frei oder behalte die Standardwerte."
+		},
+		"back": "Zurück",
+		"next": "Weiter",
+		"finish": "Meinen Planer öffnen →"
+	},
 	"cookiePolicy": {
 		"title": "Cookie-Richtlinie",
 		"lastUpdated": "Zuletzt aktualisiert: {date}",

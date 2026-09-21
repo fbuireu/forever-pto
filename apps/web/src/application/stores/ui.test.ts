@@ -4,6 +4,7 @@ import { useUIStore } from "./ui";
 const INITIAL = {
 	donatePopoverOpen: false,
 	donatePopoverIsOpening: false,
+	quickStartOpen: false,
 };
 
 beforeEach(() => {
@@ -61,5 +62,35 @@ describe("donate popover", () => {
 		useUIStore.getState().clearDonatePopoverOpening();
 		expect(useUIStore.getState().donatePopoverOpen).toBe(true);
 		expect(useUIStore.getState().donatePopoverIsOpening).toBe(false);
+	});
+});
+
+describe("quick start", () => {
+	it("starts closed", () => {
+		expect(useUIStore.getState().quickStartOpen).toBe(false);
+	});
+
+	it("openQuickStart opens it", () => {
+		useUIStore.getState().openQuickStart();
+		expect(useUIStore.getState().quickStartOpen).toBe(true);
+	});
+
+	it("closeQuickStart closes it", () => {
+		useUIStore.setState({ quickStartOpen: true });
+		useUIStore.getState().closeQuickStart();
+		expect(useUIStore.getState().quickStartOpen).toBe(false);
+	});
+
+	it("setQuickStartOpen mirrors the flag it is handed", () => {
+		useUIStore.getState().setQuickStartOpen(true);
+		expect(useUIStore.getState().quickStartOpen).toBe(true);
+		useUIStore.getState().setQuickStartOpen(false);
+		expect(useUIStore.getState().quickStartOpen).toBe(false);
+	});
+
+	it("leaves the donate popover alone", () => {
+		useUIStore.setState({ donatePopoverOpen: true });
+		useUIStore.getState().openQuickStart();
+		expect(useUIStore.getState().donatePopoverOpen).toBe(true);
 	});
 });

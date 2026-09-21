@@ -1,6 +1,5 @@
-import { Link } from "@application/i18n/navigation";
 import { Badge } from "@ui/modules/core/primitives/Badge";
-import { Button } from "@ui/modules/core/primitives/Button";
+import { QuickStartTrigger } from "@ui/modules/pages/homepage/quick-start/QuickStartTrigger";
 import { SupportButton } from "@ui/modules/shared/SupportButton";
 import { cn } from "@ui/utils/cn";
 import { amountFormatter } from "@ui/utils/currencies";
@@ -58,9 +57,9 @@ export const Pricing = async () => {
 							</li>
 						))}
 					</ul>
-					<Button variant="outline" className="w-full justify-center" asChild>
-						<Link href="/planner">{t("pricing.freeCta")}</Link>
-					</Button>
+					<QuickStartTrigger variant="outline" className="w-full justify-center">
+						{t("pricing.freeCta")}
+					</QuickStartTrigger>
 				</div>
 				<div
 					className={cn(

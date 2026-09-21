@@ -9,13 +9,13 @@ Every React component the product renders. Nothing else in `src/ui/` holds compo
 | Folder | Holds | Reused across screens? |
 | --- | --- | --- |
 | `core/` | The design system: `primitives/` plus the `animate/` layer. See [core/AGENTS.md](./core/AGENTS.md) | Yes, everywhere |
-| `pages/` | One folder per screen: `homepage/`, `planner/`, `legal/`, `error/`, `not-found/`. See [pages/planner/AGENTS.md](./pages/planner/AGENTS.md) | No, by definition |
+| `pages/` | One folder per screen: `homepage/`, `planner/`, `legal/`, `error/`, `not-found/`. See [pages/planner/AGENTS.md](./pages/planner/AGENTS.md). `homepage/quick-start/` is the stepped dialog every planner call to action on the homepage opens, see below | No, by definition |
 | `shared/` | Cross-page pieces that are not primitives: footer, donate, contact, cookie consent, JSON-LD, [`shared/Logo.tsx`](./shared/Logo.tsx), [`shared/Icon.tsx`](./shared/Icon.tsx), [`shared/FormButtons.tsx`](./shared/FormButtons.tsx), [`shared/StepOutcome.tsx`](./shared/StepOutcome.tsx), [`shared/SupportButton.tsx`](./shared/SupportButton.tsx), [`shared/ConditionalWrapper.tsx`](./shared/ConditionalWrapper.tsx), [`shared/WebMCP.tsx`](./shared/WebMCP.tsx), plus [`shared/utils/helpers.ts`](./shared/utils/helpers.ts) for the helpers those pieces need | Yes |
 | `layout/` | [`layout/LegalLayout.tsx`](./layout/LegalLayout.tsx), the card chrome the legal pages share, and [`layout/SkipToContent.tsx`](./layout/SkipToContent.tsx), which owns the skip link **and** the `MAIN_CONTENT_ID` every route shell's landmark is keyed on | Between sibling routes |
 | `sidebar/` | [`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) and its controls: country, region, year, Strategy, PTO Day budget, the calculators, calendar export | One screen, but not a page section |
 | `premium/` | The Premium gate and the Donation checkout: [`premium/PremiumFeature.tsx`](./premium/PremiumFeature.tsx), [`premium/featureLabels.ts`](./premium/featureLabels.ts), [`premium/PremiumModal.tsx`](./premium/PremiumModal.tsx), [`premium/PremiumRequiredModal.tsx`](./premium/PremiumRequiredModal.tsx), [`premium/CheckoutForm.tsx`](./premium/CheckoutForm.tsx) | Yes |
 | `providers/` | Context wrappers mounted once in the locale layout: [`providers/AppThemeProvider.tsx`](./providers/AppThemeProvider.tsx), [`providers/BonesProvider.tsx`](./providers/BonesProvider.tsx) | Once |
-| `stores/` | [`stores/StoresInitializer.tsx`](./stores/StoresInitializer.tsx), a render-nothing component that seeds the filters store from the `user-country` cookie | Once |
+| `stores/` | [`stores/StoresInitializer.tsx`](./stores/StoresInitializer.tsx), a render-nothing component that seeds the filters store from the `user-country` cookie, read through [`utils/userCountry.ts`](../utils/userCountry.ts) | Once |
 | `tutorial/` | [`tutorial/DriverStyles.tsx`](./tutorial/DriverStyles.tsx) only, a render-nothing component whose single job is to make the driver.js stylesheet import lazy | Once |
 | `tracking/` | The third-party script mounts: [`tracking/Analytics.tsx`](./tracking/Analytics.tsx) (Google gtag consent defaults and config) and [`tracking/BetterStackTracking.tsx`](./tracking/BetterStackTracking.tsx) (the Better Stack snippet, gated on the cookieconsent `betterStack` **service**, not the category) | Once |
 | `export/` | [`export/HolidayDocument.tsx`](./export/HolidayDocument.tsx), the `@react-pdf/renderer` document tree. Not DOM React; it renders in the PDF reconciler only | Once |
@@ -73,6 +73,35 @@ Whichever it is, the export carries the file's name. Without barrel files every 
 the module path anyway, so a file whose export is named something else just makes it unfindable.
 
 **`*Fixture.tsx` is a static placeholder**, not a test fixture. See the skeleton section.
+
+## The quick start
+
+Every planner call to action on the homepage (the header's trial action, the hero, the free plan in
+`Pricing.tsx` and the closing section) is a [`pages/homepage/quick-start/QuickStartTrigger.tsx`](./pages/homepage/quick-start/QuickStartTrigger.tsx), a
+button that flips `quickStartOpen` on the `ui` store, not a link into `/planner`. The dialog itself is
+mounted once, from the marketing layout, as [`pages/homepage/quick-start/QuickStart.tsx`](./pages/homepage/quick-start/QuickStart.tsx): a server
+component that fetches the Country list and the current year, then renders the `'use client'`
+[`pages/homepage/quick-start/QuickStartDialog.tsx`](./pages/homepage/quick-start/QuickStartDialog.tsx) beside the Premium modal. The dialog reads the
+store's flag; the content is [`pages/homepage/quick-start/QuickStartForm.tsx`](./pages/homepage/quick-start/QuickStartForm.tsx), one component per step
+next to it, and the step list, the draft shape and the pure rules ([`pages/homepage/quick-start/steps.ts`](./pages/homepage/quick-start/steps.ts)).
+
+**The steps are the sidebar's first three cards, asked one at a time.** Location (Country, with the
+`user-country` cookie as the default, and an optional Region), the PTO Day budget with the year, then
+Strategy, past days and Carry-over Months. The last two sit behind the same `PremiumFeature` gate the
+sidebar uses, which is why `QuickStart.tsx` mounts `PremiumModal`: the marketing layout carried none, and a
+gated control whose click opens nothing reads as broken.
+
+**The form edits a draft and writes the store once, on the last step.** Closing the dialog before that
+changes nothing, which the sidebar controls, writing on every change, cannot offer. Base UI unmounts the
+popup when the dialog closes, so the draft resets for free: it is a `useState` initialiser seeded from
+`useFiltersStore.getState()` and the cookie, not an effect keyed on `open`. On finish the form calls the
+same setters the sidebar does, in the order that survives `setCountry` clearing the Region, closes, and
+pushes `/planner` through `@application/i18n/navigation`, where `CalendarList.tsx` recomputes from the
+store as it always has. No search params are involved.
+
+**Year is offered as four chips, not the sidebar's ten.** Last year, this year and the two after cover the
+question the wizard asks; a stored year outside that span is kept in the list rather than lost, and the
+sidebar still offers the full range.
 
 **Server by default.** A file gets `'use client'` only when it needs state, an effect, a store or a
 browser API. `sidebar/AppSidebar.tsx` and `layout/LegalLayout.tsx` are `async` server components that

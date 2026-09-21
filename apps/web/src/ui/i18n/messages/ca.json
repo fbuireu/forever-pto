@@ -1090,6 +1090,37 @@
 			}
 		}
 	},
+	"quickStart": {
+		"title": "Configura el teu planificador",
+		"progress": "Pas {current} de {total}",
+		"steps": {
+			"location": "Ubicació",
+			"ptoDays": "Dies de vacances",
+			"settings": "Ajustos"
+		},
+		"location": {
+			"title": "On treballes?",
+			"description": "El país decideix quins festius fa servir el planificador. La regió hi afegeix els locals.",
+			"country": "País",
+			"detected": "Detectat des de la teva connexió. Canvia'l si no és correcte.",
+			"region": "Regió",
+			"optional": "opcional",
+			"noRegions": "Aquest país no té calendaris regionals, així que es fa servir el nacional."
+		},
+		"ptoDays": {
+			"title": "Quants dies de vacances tens?",
+			"description": "El teu pressupost per a l'any. Amb un número aproximat n'hi ha prou; el podràs ajustar al planificador.",
+			"year": "Any"
+		},
+		"settings": {
+			"title": "Afina el pla",
+			"description": "Tria com es col·loquen els dies. La resta és opcional.",
+			"premiumHint": "Els dies passats i els mesos d'arrossegament són ajustos premium. Desbloqueja'ls o mantén els valors per defecte."
+		},
+		"back": "Enrere",
+		"next": "Següent",
+		"finish": "Obrir el meu planificador →"
+	},
 	"cookiePolicy": {
 		"title": "Política de cookies",
 		"lastUpdated": "Darrera actualització: {date}",

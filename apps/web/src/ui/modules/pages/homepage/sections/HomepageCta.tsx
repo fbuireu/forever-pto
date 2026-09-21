@@ -1,5 +1,4 @@
-import { Link } from "@application/i18n/navigation";
-import { Button } from "@ui/modules/core/primitives/Button";
+import { QuickStartTrigger } from "@ui/modules/pages/homepage/quick-start/QuickStartTrigger";
 import { getTranslations } from "next-intl/server";
 import { CtaShapesClient } from "./CtaShapesClient";
 
@@ -23,14 +22,12 @@ export const HomepageCta = async () => {
 					{t("closing.titleEnd")}
 				</h2>
 				<p className="text-[19px] opacity-85 mb-8">{t("closing.description")}</p>
-				<Button
-					variant="accent"
+				<QuickStartTrigger
 					size="lg"
-					asChild
 					className="shadow-[var(--shadow-brutal-btn-inverted)] hover:shadow-[var(--shadow-brutal-btn-inverted-hover)] active:shadow-[var(--shadow-brutal-btn-inverted-active)]"
 				>
-					<Link href="/planner">{t("closing.cta")}</Link>
-				</Button>
+					{t("closing.cta")}
+				</QuickStartTrigger>
 			</div>
 		</section>
 	);

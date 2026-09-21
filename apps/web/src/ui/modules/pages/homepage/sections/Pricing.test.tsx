@@ -3,21 +3,22 @@ import deMessages from "@i18n/messages/de.json";
 import enMessages from "@i18n/messages/en.json";
 import { render, screen } from "@testing-library/react";
 import { createTranslator, type Locale } from "next-intl";
-import type { ComponentProps, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetTranslations = vi.hoisted(() => vi.fn());
 const mockGetLocale = vi.hoisted(() => vi.fn());
 
 vi.mock("next-intl/server", () => ({ getTranslations: mockGetTranslations, getLocale: mockGetLocale }));
-vi.mock("@application/i18n/navigation", () => ({
-	Link: ({ children, ...props }: ComponentProps<"a">) => <a {...props}>{children}</a>,
-}));
 vi.mock("@ui/modules/core/primitives/Badge", () => ({
 	Badge: ({ children }: { children: ReactNode }) => <span>{children}</span>,
 }));
-vi.mock("@ui/modules/core/primitives/Button", () => ({
-	Button: ({ children }: { children: ReactNode }) => <>{children}</>,
+vi.mock("@ui/modules/pages/homepage/quick-start/QuickStartTrigger", () => ({
+	QuickStartTrigger: ({ children, className }: { children: ReactNode; className?: string }) => (
+		<button type="button" data-testid="quick-start-trigger" className={className}>
+			{children}
+		</button>
+	),
 }));
 vi.mock("@ui/modules/shared/SupportButton", () => ({
 	SupportButton: ({ label, className }: { label: string; className?: string }) => (
@@ -67,10 +68,11 @@ describe("Pricing", () => {
 		);
 	});
 
-	it("starts the free plan in the planner and the supporter plan in the donation flow", async () => {
+	it("starts the free plan through the quick start and the supporter plan in the donation flow", async () => {
 		await renderPricing({ locale: "en", messages: enMessages });
 
-		expect(screen.getByRole("link", { name: pricing.freeCta }).getAttribute("href")).toBe("/planner");
+		expect(screen.getByTestId("quick-start-trigger").textContent).toBe(pricing.freeCta);
+		expect(screen.queryByRole("link", { name: pricing.freeCta })).toBeNull();
 		expect(screen.getByRole("button", { name: pricing.lifetimeCta })).toBeDefined();
 	});
 

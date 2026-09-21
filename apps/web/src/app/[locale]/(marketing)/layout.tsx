@@ -1,5 +1,6 @@
 import { Toaster } from "@ui/modules/core/primitives/Sonner";
 import { Header } from "@ui/modules/pages/homepage/navigation/Navigation";
+import { QuickStart } from "@ui/modules/pages/homepage/quick-start/QuickStart";
 import { Footer } from "@ui/modules/shared/footer/Footer";
 import type { Locale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -21,6 +22,7 @@ const MarketingLayout = async ({ children, params }: Readonly<MarketingLayoutPro
 			{children}
 			<Footer />
 			<Toaster closeLabel={tA11y("closeToast")} />
+			<QuickStart locale={locale} />
 		</div>
 	);
 };
