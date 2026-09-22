@@ -38,8 +38,9 @@ export interface TrackParams {
 }
 
 export const track = ({ event, properties }: TrackParams) => {
-	if (globalThis.window === undefined || !globalThis.window.betterstack) return;
-	globalThis.window.betterstack("track", event, properties);
+	if (globalThis.window === undefined) return;
+	globalThis.window.betterstack?.("track", event, properties);
+	globalThis.window.gtag?.("event", event, properties);
 };
 
 export type TrackingEnvironment = "production" | "development";
@@ -55,6 +56,7 @@ export interface IdentifyUserParams {
 }
 
 export const identifyUser = ({ email, plan }: IdentifyUserParams) => {
-	if (globalThis.window === undefined || !globalThis.window.betterstack) return;
-	globalThis.window.betterstack("user", { email, plan });
+	if (globalThis.window === undefined) return;
+	globalThis.window.betterstack?.("user", { email, plan });
+	globalThis.window.gtag?.("set", "user_properties", { plan });
 };

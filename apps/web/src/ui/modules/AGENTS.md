@@ -128,7 +128,9 @@ that every trigger reports the same event with its own `source`. `planner_genera
 `hooks/useCalculationsWorker.ts` when the worker's answer lands, the one place that holds the inputs and the
 measured plan together, and it reports the plan's quality metrics and never its days. The budget is the same
 everywhere: `ptoDays` reports a `direction`, never a number, and the leak guards in the tests
-(`JSON.stringify(track.mock.calls)` not containing the value) are what keep that true.
+(`JSON.stringify(track.mock.calls)` not containing the value) are what keep that true. `track()` itself fans
+every event out to Better Stack and to Google Analytics under the same name, so the call sites know nothing
+about destinations; the split of what each one is for is on the docs site's observability page.
 
 **Year is offered as four chips, not the sidebar's ten.** Last year, this year and the two after cover the
 question the wizard asks; a stored year outside that span is kept in the list rather than lost, and the
