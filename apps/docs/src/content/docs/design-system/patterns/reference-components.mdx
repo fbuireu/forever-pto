@@ -29,6 +29,7 @@ Most core components are framework-clean and get live demos elsewhere in this se
 
 - **API**: `options?: CountryDTO[] | RegionDTO[]`, `value?`, `onChange: (value: FilterStrategy) => void`, `placeholder`, `searchPlaceholder`, `notFoundText`, `disabled`, `id`. Options with a flag render a `FlagIcon` next to the label.
 - **Coupling**: type imports from `@application/dto/country/types`, `@application/dto/region/types` and `@domain/calendar/types` (`FilterStrategy`) tie it to the app's DTO layer.
+- **Sizing**: the list is as wide as the control it opens from (Base UI's `--anchor-width`, with a 200px floor) and no taller than the room under it (`--available-height`), so a full-width control in a dialog or the sidebar gets a full-width list that scrolls. When even that does not fit below, the list flips above the control; it never falls back to the side, which is where a 200px list used to land inside a dialog.
 
 ## Sidebar
 

@@ -30,6 +30,7 @@ interface ComboboxProps<TValue extends string> {
 }
 
 const EMPTY_OPTIONS: ComboboxOption<never>[] = [];
+const COLLISION_AVOIDANCE = { side: "flip", fallbackAxisSide: "none" } as const;
 
 export const Combobox = <TValue extends string>({
 	value = "",
@@ -84,10 +85,13 @@ export const Combobox = <TValue extends string>({
 					</Button>
 				</PopoverTrigger>
 			</AnimateIcon>
-			<PopoverContent className="w-[200px] p-0">
+			<PopoverContent
+				className="flex w-(--anchor-width) min-w-[200px] max-h-(--available-height) flex-col overflow-hidden p-0"
+				collisionAvoidance={COLLISION_AVOIDANCE}
+			>
 				<Command>
 					<CommandInput placeholder={searchPlaceholder} className="h-9" />
-					<CommandList>
+					<CommandList className="min-h-0">
 						<CommandEmpty>{notFoundText}</CommandEmpty>
 						<CommandGroup>
 							{options.map((option) => (
