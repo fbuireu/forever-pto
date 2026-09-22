@@ -160,7 +160,7 @@ describe("QuickStartForm", () => {
 				event: "quick_start_completed",
 				properties: {
 					country: "es",
-					hasRegion: false,
+					region: "",
 					year: expect.any(Number),
 					strategy: FilterStrategy.GROUPED,
 					allowPastDays: false,

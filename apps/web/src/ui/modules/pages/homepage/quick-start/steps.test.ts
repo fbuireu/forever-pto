@@ -69,18 +69,17 @@ describe("yearOptions", () => {
 });
 
 describe("trackedDraft", () => {
-	it("reports the settings and whether a Region was chosen, and never the budget", () => {
+	it("reports the settings, the Region included, and never the budget", () => {
 		const draft = { ...FILTERS, country: "es", region: "ct", ptoDays: 30, strategy: FilterStrategy.BALANCED };
 
 		expect(trackedDraft(draft)).toStrictEqual({
 			country: "es",
-			hasRegion: true,
+			region: "ct",
 			year: 2026,
 			strategy: FilterStrategy.BALANCED,
 			allowPastDays: false,
 			carryOverMonths: 1,
 		});
 		expect(Object.keys(trackedDraft(draft))).not.toContain("ptoDays");
-		expect(Object.keys(trackedDraft(draft))).not.toContain("region");
 	});
 });

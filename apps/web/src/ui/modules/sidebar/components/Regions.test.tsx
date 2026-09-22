@@ -120,7 +120,7 @@ describe("Regions", () => {
 });
 
 describe("Regions analytics", () => {
-	it("reports that a Region was chosen, without saying which", async () => {
+	it("reports the Region that was picked, by its code", async () => {
 		track.mockClear();
 		location.regions = [{ value: "CT", label: "Catalonia" }] as never;
 		renderRegions();
@@ -129,8 +129,7 @@ describe("Regions analytics", () => {
 
 		expect(track).toHaveBeenCalledExactlyOnceWith({
 			event: "planning_input_changed",
-			properties: { input: "region", value: true },
+			properties: { input: "region", value: "CT" },
 		});
-		expect(JSON.stringify(track.mock.calls)).not.toContain("CT");
 	});
 });

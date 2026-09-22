@@ -122,7 +122,7 @@ A privacy convention runs through all call sites: log the email **domain**, ids 
 
 The script itself is injected by `apps/web/src/ui/modules/tracking/BetterStackTracking.tsx`, mounted in the root layout but rendering nothing until the analytics [consent category](/how-it-works/cookie-consent/) is accepted and `NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN` is set. Once consented, premium users are identified with `identifyUser({ email, plan })`, where `plan` is `'premium' | 'free'`.
 
-The four `quick_start_*` events are the homepage funnel: `opened` carries the call to action that opened it (`nav`, `hero`, `pricing` or `closing`), `step_completed` and `abandoned` carry the step (`location`, `ptoDays` or `settings`), and `completed` carries the Country, whether a Region was chosen, the year, the Strategy, past days and Carry-over Months. It never carries the PTO Day budget, which is the one planning input the [data sources](/how-it-works/data-sources/) page promises stays in the browser.
+The four `quick_start_*` events are the homepage funnel: `opened` carries the call to action that opened it (`nav`, `hero`, `pricing` or `closing`), `step_completed` and `abandoned` carry the step (`location`, `ptoDays` or `settings`), and `completed` carries the Country, the Region, the year, the Strategy, past days and Carry-over Months. It never carries the PTO Day budget, which is the one planning input the [data sources](/how-it-works/data-sources/) page promises stays in the browser.
 
 The planner and the rest of the app report these, under the same rule: a setting, a feature id, an outcome or a count, never a date, a name or the budget.
 

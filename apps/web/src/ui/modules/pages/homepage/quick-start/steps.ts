@@ -64,7 +64,7 @@ export function yearOptions({ currentYear, selectedYear }: YearOptionsParams): n
 export function trackedDraft(draft: QuickStartDraft) {
 	return {
 		country: draft.country,
-		hasRegion: draft.region !== "",
+		region: draft.region,
 		year: draft.year,
 		strategy: draft.strategy,
 		allowPastDays: draft.allowPastDays,

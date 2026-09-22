@@ -25,7 +25,7 @@ export const Regions = () => {
 
 	const handleRegionChange = (value: string) => {
 		setRegion(value);
-		track({ event: "planning_input_changed", properties: { input: "region", value: value !== "" } });
+		track({ event: "planning_input_changed", properties: { input: "region", value } });
 	};
 
 	return (
