@@ -2,6 +2,7 @@
 
 import { useFiltersStore } from "@application/stores/filters";
 import { FilterStrategy } from "@domain/calendar/types";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@ui/modules/core/animate/base/Collapsible";
 import { ChevronDown } from "@ui/modules/core/animate/icons/ChevronDown";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
@@ -64,6 +65,11 @@ export const Strategy = () => {
 		[t],
 	);
 
+	const handleStrategyChange = (value: FilterStrategy) => {
+		setStrategy(value);
+		track({ event: "planning_input_changed", properties: { input: "strategy", value } });
+	};
+
 	const currentStrategy = strategies.find(({ value }) => value === strategy);
 
 	return (
@@ -79,7 +85,7 @@ export const Strategy = () => {
 				id="strategy"
 				options={strategies}
 				value={strategy}
-				onChange={setStrategy}
+				onChange={handleStrategyChange}
 				disabled={!strategies.length}
 				placeholder={t("placeholder")}
 				searchPlaceholder={t("search")}

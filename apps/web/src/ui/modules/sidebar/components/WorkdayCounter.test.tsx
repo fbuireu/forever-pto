@@ -13,6 +13,9 @@ interface CalendarModalProps {
 
 const holidays = vi.hoisted(() => ({ value: [] as HolidayDTO[] }));
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("@application/stores/holidays", () => ({
 	useHolidaysStore: (selector: (state: unknown) => unknown) => selector({ holidays: holidays.value }),
 }));
@@ -209,5 +212,17 @@ describe("WorkdayCounter", () => {
 		pick("2027-06-01", "2027-06-07");
 
 		expect(screen.queryByText(unknownYearsWarning)).toBeNull();
+	});
+});
+
+describe("WorkdayCounter analytics", () => {
+	it("reports the tool being used once a range is picked, without the range", () => {
+		track.mockClear();
+		renderCounter();
+
+		pick("2026-06-01", "2026-06-07");
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({ event: "tool_used", properties: { tool: "workdayCounter" } });
+		expect(JSON.stringify(track.mock.calls)).not.toContain("2026");
 	});
 });

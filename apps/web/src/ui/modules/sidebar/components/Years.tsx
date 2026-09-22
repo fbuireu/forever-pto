@@ -1,6 +1,7 @@
 "use client";
 
 import { useFiltersStore } from "@application/stores/filters";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { Popover, PopoverContent, PopoverTrigger } from "@ui/modules/core/animate/base/Popover";
 import { Check } from "@ui/modules/core/animate/icons/Check";
 import { ChevronDown } from "@ui/modules/core/animate/icons/ChevronDown";
@@ -61,6 +62,7 @@ export const Years = ({ currentYear }: YearsProps) => {
 											value={String(yearOption)}
 											onSelect={() => {
 												setYear(yearOption);
+												track({ event: "planning_input_changed", properties: { input: "year", value: yearOption } });
 												setOpen(false);
 											}}
 										>

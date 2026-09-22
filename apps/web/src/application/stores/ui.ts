@@ -2,6 +2,14 @@ import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
+export const DonateSource = {
+	FLOATING: "floating",
+	PLANNER_TOAST: "planner_toast",
+	PRICING: "pricing",
+} as const;
+
+export type DonateSource = (typeof DonateSource)[keyof typeof DonateSource];
+
 export const QuickStartSource = {
 	NAV: "nav",
 	HERO: "hero",
@@ -18,7 +26,7 @@ interface UIState {
 }
 
 interface UIActions {
-	openDonatePopover: () => void;
+	openDonatePopover: (source: DonateSource) => void;
 	closeDonatePopover: () => void;
 	setDonatePopoverOpen: (isOpen: boolean) => void;
 	clearDonatePopoverOpening: () => void;
@@ -40,8 +48,9 @@ export const useUIStore = create<UIStore>()(
 		(set) => ({
 			...uiInitialState,
 
-			openDonatePopover: () => {
+			openDonatePopover: (source: DonateSource) => {
 				set({ donatePopoverOpen: true, donatePopoverIsOpening: true });
+				track({ event: "donate_opened", properties: { source } });
 				setTimeout(() => set({ donatePopoverIsOpening: false }), 0);
 			},
 

@@ -14,6 +14,9 @@ const { mockGenerateIcs, holidaysState } = vi.hoisted(() => ({
 	},
 }));
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("@application/export/generateIcs", () => ({ generateIcs: mockGenerateIcs }));
 
 vi.mock("@application/stores/filters", () => ({
@@ -200,5 +203,44 @@ describe("CalendarExport as a PDF", () => {
 		);
 		expect(mockToastSuccess).not.toHaveBeenCalled();
 		expect(URL.createObjectURL).not.toHaveBeenCalled();
+	});
+});
+
+describe("CalendarExport analytics", () => {
+	beforeEach(() => {
+		holidaysState.holidays = [makeHoliday({ id: "in-1", date: "2026-01-01", isInPlanningWindow: true })];
+	});
+
+	it("reports an ICS export with what it carried", async () => {
+		render(<CalendarExport />);
+
+		await userEvent.click(screen.getByRole("button", { name: "includePto" }));
+		await userEvent.click(screen.getByRole("button", { name: "download" }));
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({
+			event: "calendar_exported",
+			properties: { format: "ics", includeHolidays: true, includePto: false, outcome: "success" },
+		});
+	});
+
+	it("reports a PDF export, and whether it failed", async () => {
+		render(<CalendarExport />);
+
+		await downloadPdf();
+		await waitFor(() =>
+			expect(track).toHaveBeenLastCalledWith({
+				event: "calendar_exported",
+				properties: { format: "pdf", includeHolidays: true, includePto: true, outcome: "success" },
+			}),
+		);
+
+		mockToBlob.mockRejectedValueOnce(new Error("renderer down"));
+		await downloadPdf();
+		await waitFor(() =>
+			expect(track).toHaveBeenLastCalledWith({
+				event: "calendar_exported",
+				properties: { format: "pdf", includeHolidays: true, includePto: true, outcome: "error" },
+			}),
+		);
 	});
 });

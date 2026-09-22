@@ -12,6 +12,9 @@ const { mockToastError, mockToastSuccess, logClientError, PICKED } = vi.hoisted(
 	PICKED: new Date(2026, 4, 15),
 }));
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("sonner", () => ({ toast: { error: mockToastError, success: mockToastSuccess } }));
 
 vi.mock("@application/shared/utils/clientLog", () => ({ logClientError }));
@@ -203,5 +206,31 @@ describe("HolidayFormModal closing", () => {
 		await submit();
 
 		expect(onClose).toHaveBeenCalledOnce();
+	});
+});
+
+describe("HolidayFormModal analytics", () => {
+	it("reports a saved Custom Holiday by mode and outcome, never by name or date", async () => {
+		renderModal(vi.fn(() => ({ applied: true as const })));
+
+		await submit();
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({
+			event: "custom_holiday_saved",
+			properties: { mode: "add", applied: true },
+		});
+		expect(JSON.stringify(track.mock.calls)).not.toContain("Company shutdown");
+		expect(JSON.stringify(track.mock.calls)).not.toContain("2026");
+	});
+
+	it("reports a refusal with the store's reason", async () => {
+		renderModal(vi.fn(() => ({ applied: false as const, reason: HolidayRefusal.DATE_HELD_BY_HOLIDAY })));
+
+		await submit();
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({
+			event: "custom_holiday_saved",
+			properties: { mode: "add", applied: false, reason: HolidayRefusal.DATE_HELD_BY_HOLIDAY },
+		});
 	});
 });

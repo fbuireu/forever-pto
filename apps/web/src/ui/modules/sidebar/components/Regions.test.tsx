@@ -12,6 +12,9 @@ const location = vi.hoisted(() => ({
 	fetchRegions: vi.fn(),
 }));
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("@application/stores/filters", () => ({
 	useFiltersStore: (selector: (state: unknown) => unknown) => selector(filters),
 }));
@@ -113,5 +116,21 @@ describe("Regions", () => {
 		await userEvent.click(screen.getByRole("option", { name: "Catalonia" }));
 
 		expect(filters.setRegion).toHaveBeenCalledExactlyOnceWith("CT");
+	});
+});
+
+describe("Regions analytics", () => {
+	it("reports that a Region was chosen, without saying which", async () => {
+		track.mockClear();
+		location.regions = [{ value: "CT", label: "Catalonia" }] as never;
+		renderRegions();
+
+		await userEvent.click(screen.getByRole("option", { name: /Catalonia/ }));
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({
+			event: "planning_input_changed",
+			properties: { input: "region", value: true },
+		});
+		expect(JSON.stringify(track.mock.calls)).not.toContain("CT");
 	});
 });

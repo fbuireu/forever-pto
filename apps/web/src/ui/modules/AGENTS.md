@@ -118,6 +118,18 @@ reports `quick_start_abandoned` from `onOpenChange(false)`, the close button, th
 the step the form last announced through `onStepChange`; a finish closes through the store, which fires no
 `onOpenChange`, so it is never counted as an abandonment.
 
+**The planner reports its own interactions the same way, at the handler and never in the store.** Every
+sidebar control, the day click, the Alternatives, the Custom Holiday modals, the export, the calculators, the
+tutorial, the language and theme switchers and the contact form call `track()` where the click lands; the
+catalogue is the observability page of the docs site. The stores stay quiet because their setters also run on
+rehydration and on the quick start's finish, where a "change" event would be a lie. Two producers are the
+exception, and both are opens: `openDonatePopover(source)` and `openQuickStart(source)` on the `ui` store, so
+that every trigger reports the same event with its own `source`. `planner_generated` fires in
+`hooks/useCalculationsWorker.ts` when the worker's answer lands, the one place that holds the inputs and the
+measured plan together, and it reports the plan's quality metrics and never its days. The budget is the same
+everywhere: `ptoDays` reports a `direction`, never a number, and the leak guards in the tests
+(`JSON.stringify(track.mock.calls)` not containing the value) are what keep that true.
+
 **Year is offered as four chips, not the sidebar's ten.** Last year, this year and the two after cover the
 question the wizard asks; a stored year outside that span is kept in the list rather than lost, and the
 sidebar still offers the full range.

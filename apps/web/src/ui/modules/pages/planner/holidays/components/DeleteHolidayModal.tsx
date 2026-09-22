@@ -4,6 +4,7 @@ import type { HolidayDTO } from "@application/dto/holiday/types";
 import { logClientError } from "@application/shared/utils/clientLog";
 import { formatDate } from "@application/shared/utils/dates";
 import { useHolidaysStore } from "@application/stores/holidays";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import {
 	Dialog,
 	DialogContent,
@@ -41,6 +42,7 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
 				holidays.forEach((holiday) => {
 					removeHoliday(holiday.id);
 				});
+				track({ event: "custom_holiday_deleted", properties: { count: holidays.length } });
 
 				toast.success(isMultiple ? t("successTitle") : t("successTitleSingular"), {
 					description: isMultiple

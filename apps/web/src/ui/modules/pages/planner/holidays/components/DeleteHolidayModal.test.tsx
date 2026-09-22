@@ -12,6 +12,9 @@ const { mockToastError, mockToastSuccess, removeHoliday, logClientError } = vi.h
 	logClientError: vi.fn(),
 }));
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("sonner", () => ({ toast: { error: mockToastError, success: mockToastSuccess } }));
 
 vi.mock("@application/shared/utils/clientLog", () => ({ logClientError }));
@@ -126,5 +129,17 @@ describe("DeleteHolidayModal", () => {
 
 		expect(removeHoliday).not.toHaveBeenCalled();
 		expect(onClose).toHaveBeenCalledOnce();
+	});
+});
+
+describe("DeleteHolidayModal analytics", () => {
+	it("reports how many Custom Holidays went, never which", async () => {
+		track.mockClear();
+		renderModal([SHUTDOWN, OFFSITE]);
+
+		await confirm();
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({ event: "custom_holiday_deleted", properties: { count: 2 } });
+		expect(JSON.stringify(track.mock.calls)).not.toContain("shutdown");
 	});
 });

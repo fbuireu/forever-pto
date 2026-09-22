@@ -10,6 +10,9 @@ const filters = vi.hoisted(() => ({ country: "", setCountry: vi.fn() }));
 
 const location = vi.hoisted(() => ({ setCountries: vi.fn() }));
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("@application/stores/filters", () => ({
 	useFiltersStore: (selector: (state: unknown) => unknown) => selector(filters),
 }));
@@ -76,5 +79,19 @@ describe("CountriesClient", () => {
 
 		expect(container.querySelector("label")?.getAttribute("for")).toBe("countries");
 		expect(screen.getByRole("button", { name: en.sidebar.country.title }).id).toBe("countries");
+	});
+});
+
+describe("CountriesClient analytics", () => {
+	it("reports the country that was picked as a planning input change", async () => {
+		track.mockClear();
+		renderCountries();
+
+		await userEvent.click(screen.getByRole("option", { name: /France/ }));
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({
+			event: "planning_input_changed",
+			properties: { input: "country", value: "FR" },
+		});
 	});
 });

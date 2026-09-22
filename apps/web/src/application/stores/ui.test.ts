@@ -4,7 +4,7 @@ const track = vi.hoisted(() => vi.fn());
 
 vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
 
-import { QuickStartSource, useUIStore } from "./ui";
+import { DonateSource, QuickStartSource, useUIStore } from "./ui";
 
 const INITIAL = {
 	donatePopoverOpen: false,
@@ -29,15 +29,16 @@ describe("donate popover", () => {
 		expect(donatePopoverIsOpening).toBe(false);
 	});
 
-	it("openDonatePopover sets open and isOpening to true", () => {
-		useUIStore.getState().openDonatePopover();
+	it("openDonatePopover sets open and isOpening to true, and reports which trigger opened it", () => {
+		useUIStore.getState().openDonatePopover(DonateSource.PRICING);
+		expect(track).toHaveBeenCalledExactlyOnceWith({ event: "donate_opened", properties: { source: "pricing" } });
 		const { donatePopoverOpen, donatePopoverIsOpening } = useUIStore.getState();
 		expect(donatePopoverOpen).toBe(true);
 		expect(donatePopoverIsOpening).toBe(true);
 	});
 
 	it("openDonatePopover clears isOpening after the next tick", () => {
-		useUIStore.getState().openDonatePopover();
+		useUIStore.getState().openDonatePopover(DonateSource.PLANNER_TOAST);
 		vi.runAllTimers();
 		expect(useUIStore.getState().donatePopoverIsOpening).toBe(false);
 		expect(useUIStore.getState().donatePopoverOpen).toBe(true);

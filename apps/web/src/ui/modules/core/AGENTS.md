@@ -193,7 +193,8 @@ popover and dropdown positioners `z-210`, tooltip positioner `z-220`. A popover 
 under it, so it has to clear the highest one; it sat at `z-52` and the tooltip at `z-50`, which put the Country
 Combobox inside the quick start dialog behind the dialog's own backdrop and the sidebar field tooltips behind the
 mobile sidebar's `z-51` panel. `Popover.test.tsx` and `Tooltip.test.tsx` assert the positioner's layer beats
-`200`. A new modal surface goes below `200`; a new transient overlay goes above `210`.
+`200`. A new modal surface goes below `200`; a new transient overlay goes above `210`. The donate popover used to pin its
+positioner to `z-[53]` on top of that scale and rides the default now.
 
 **`vaul` is patched to forward `modal` to the Radix `Dialog.Root` it wraps, because 1.1.2 does not.**
 Unpatched, every vaul drawer mounts a *modal* Radix dialog whatever its `modal` prop says, and Radix's

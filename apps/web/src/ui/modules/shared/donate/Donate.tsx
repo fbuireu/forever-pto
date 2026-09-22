@@ -8,7 +8,7 @@ import {
 } from "@application/dto/payment/schema";
 import type { DiscountInfo } from "@application/dto/payment/types";
 import { usePremiumStore } from "@application/stores/premium";
-import { useUIStore } from "@application/stores/ui";
+import { DonateSource, useUIStore } from "@application/stores/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { getStripeClientInstance } from "@infrastructure/clients/payments/stripe/client";
@@ -71,6 +71,7 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 
 	const handleOpenChange = useCallback(
 		(open: boolean) => {
+			if (open) track({ event: "donate_opened", properties: { source: DonateSource.FLOATING } });
 			setDonatePopoverOpen(open);
 		},
 		[setDonatePopoverOpen],
@@ -188,6 +189,7 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 	}, [isOpen, isOpening, clearDonatePopoverOpening]);
 
 	const handlePaymentCancel = useCallback(() => {
+		track({ event: "payment_cancelled" });
 		setPaymentState(null);
 	}, []);
 
@@ -385,7 +387,7 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 					</PopoverTrigger>
 				</div>
 			</div>
-			<PopoverContent className="w-96 bg-card text-card-foreground" positionerClassName="z-[53]">
+			<PopoverContent className="w-96 bg-card text-card-foreground">
 				<div className="grid gap-4">
 					<div className="space-y-2">
 						<h2 className="leading-none font-medium">{tDonate("supportAndUnblock")}</h2>

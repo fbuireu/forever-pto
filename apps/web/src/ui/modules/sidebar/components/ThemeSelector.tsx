@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -31,7 +32,14 @@ export const ThemeSelector = ({ buttonClassName }: { buttonClassName?: string })
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end">
 				{themes.map((theme) => (
-					<DropdownMenuItem key={theme} className="flex justify-between" onClick={() => setTheme(theme)}>
+					<DropdownMenuItem
+						key={theme}
+						className="flex justify-between"
+						onClick={() => {
+							setTheme(theme);
+							track({ event: "theme_changed", properties: { theme } });
+						}}
+					>
 						{t(theme as Parameters<typeof t>[0])}
 						{currentTheme === theme && <Check className="size-4" />}
 					</DropdownMenuItem>

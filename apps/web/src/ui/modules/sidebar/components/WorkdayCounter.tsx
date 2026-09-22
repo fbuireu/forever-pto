@@ -2,6 +2,7 @@
 
 import { differenceInDays, formatDate } from "@application/shared/utils/dates";
 import { useHolidaysStore } from "@application/stores/holidays";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { SlidingNumber } from "@ui/modules/core/animate/text/SlidingNumber";
 import { Button } from "@ui/modules/core/primitives/Button";
 import type { FromTo } from "@ui/modules/pages/planner/calendar/Calendar";
@@ -46,6 +47,7 @@ export const WorkdayCounter = () => {
 
 		setSelectedRange(date);
 		setIsCalendarOpen(false);
+		track({ event: "tool_used", properties: { tool: "workdayCounter" } });
 	};
 
 	const clearSelection = () => {

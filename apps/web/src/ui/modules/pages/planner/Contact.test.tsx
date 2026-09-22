@@ -10,6 +10,9 @@ interface ContactModalMockProps {
 	onClose: () => void;
 }
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("./contact.css", () => ({}));
 vi.mock("src/ui/modules/shared/contact/ContactModal", () => ({
 	ContactModal: ({ open, onClose }: ContactModalMockProps) => (
@@ -87,5 +90,25 @@ describe("Contact", () => {
 		expect(link.getAttribute("href")).toContain("github.com/fbuireu/forever-pto/issues/new");
 		expect(link.getAttribute("target")).toBe("_blank");
 		expect(link.getAttribute("rel")).toContain("noopener");
+	});
+});
+
+describe("Contact analytics", () => {
+	it("reports the form opened from the button as a click", async () => {
+		track.mockClear();
+		renderContact();
+
+		await userEvent.click(screen.getByRole("button", { name: en.roadmap.letsTalk }));
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({ event: "contact_opened", properties: { source: "click" } });
+	});
+
+	it("reports a form opened by the #contact hash as such, since nobody clicked", async () => {
+		track.mockClear();
+		globalThis.location.hash = "#contact";
+		renderContact();
+
+		expect(await modalState()).toBe("true");
+		expect(track).toHaveBeenCalledExactlyOnceWith({ event: "contact_opened", properties: { source: "hash" } });
 	});
 });

@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { useIsMobile } from "@ui/hooks/useMobile";
 import { useSidebar } from "@ui/modules/core/animate/base/Sidebar";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
@@ -52,6 +53,7 @@ export const useTutorial = () => {
 	const tUi = useTranslations("tutorial");
 
 	const startTutorial = useCallback(async () => {
+		track({ event: "tutorial_started", properties: { isMobile } });
 		const [{ getDriverClientInstance }] = await Promise.all([
 			import("@infrastructure/clients/tutorial/driver/client"),
 			import("@ui/modules/tutorial/DriverStyles"),

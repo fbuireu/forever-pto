@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@ui/modules/core/primitives/Card";
 import dynamic from "next/dynamic";
@@ -21,6 +22,7 @@ export function Contact() {
 	useEffect(() => {
 		if (globalThis.location.hash === "#contact") {
 			setContactModalOpen(true);
+			track({ event: "contact_opened", properties: { source: "hash" } });
 		}
 	}, []);
 
@@ -54,7 +56,10 @@ export function Contact() {
 						<Button
 							variant="ghost"
 							className="px-1.5 py-0.5 h-auto text-sm font-semibold hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground"
-							onClick={() => setContactModalOpen(true)}
+							onClick={() => {
+								setContactModalOpen(true);
+								track({ event: "contact_opened", properties: { source: "click" } });
+							}}
 						>
 							{t("letsTalk")}
 						</Button>

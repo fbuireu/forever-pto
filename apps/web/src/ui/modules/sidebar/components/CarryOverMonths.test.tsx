@@ -6,6 +6,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const store = vi.hoisted(() => ({ carryOverMonths: 1, setCarryOverMonths: vi.fn() }));
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("@application/stores/filters", () => ({
 	MIN_CARRY_OVER_MONTHS: 0,
 	useFiltersStore: (selector: (state: unknown) => unknown) => selector(store),
@@ -133,5 +136,33 @@ describe("CarryOverMonths debounce", () => {
 		});
 
 		expect(store.setCarryOverMonths).not.toHaveBeenCalled();
+	});
+});
+
+describe("CarryOverMonths analytics", () => {
+	beforeEach(() => {
+		track.mockClear();
+		vi.useFakeTimers();
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
+	it("reports the settled value once, after the debounce, not on every notch of the drag", () => {
+		renderField();
+
+		nudgeUp();
+		nudgeUp();
+		expect(track).not.toHaveBeenCalled();
+
+		act(() => {
+			vi.advanceTimersByTime(300);
+		});
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({
+			event: "planning_input_changed",
+			properties: { input: "carryOverMonths", value: 3 },
+		});
 	});
 });

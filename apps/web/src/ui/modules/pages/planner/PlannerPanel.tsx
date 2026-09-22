@@ -3,6 +3,7 @@
 import { useHolidaysStore } from "@application/stores/holidays";
 import type { AlternativeSelectionBaseParams } from "@application/stores/types";
 import type { MeasuredSuggestion } from "@domain/calendar/types";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { usePlanReadout } from "@ui/hooks/usePlanReadout";
 import { ChevronLeft } from "@ui/modules/core/animate/icons/ChevronLeft";
 import { ChevronRight } from "@ui/modules/core/animate/icons/ChevronRight";
@@ -266,6 +267,10 @@ function Status() {
 		remaining,
 		hasManualChanges,
 	} = usePlanReadout();
+	const handleReset = () => {
+		resetManualSelection();
+		track({ event: "manual_changes_reset", properties: { surface: "panel" } });
+	};
 	const usedPct = ptoDays > 0 ? Math.min(100, Math.round((usedDays / ptoDays) * 100)) : 0;
 	const remainingPct = Math.max(0, 100 - usedPct);
 
@@ -328,7 +333,7 @@ function Status() {
 					<Button
 						variant="outline"
 						size="sm"
-						onClick={resetManualSelection}
+						onClick={handleReset}
 						type="button"
 						className={cn("text-xs", !hasManualChanges && "invisible pointer-events-none")}
 					>

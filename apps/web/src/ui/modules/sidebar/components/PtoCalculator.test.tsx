@@ -7,6 +7,9 @@ const filters = vi.hoisted(() => ({ ptoDays: 20, setPtoDays: vi.fn() }));
 
 const holidays = vi.hoisted(() => ({ trimManualDays: vi.fn() }));
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("@application/stores/filters", () => ({
 	MIN_PTO_DAYS: 1,
 	useFiltersStore: (selector: (state: unknown) => unknown) => selector(filters),
@@ -143,5 +146,24 @@ describe("PtoCalculator", () => {
 		await user.click(apply());
 
 		expect(filters.setPtoDays).toHaveBeenCalledExactlyOnceWith(1);
+	});
+});
+
+describe("PtoCalculator analytics", () => {
+	it("reports the tool being used, and an applied result as a budget change by direction only", async () => {
+		track.mockClear();
+		const user = userEvent.setup();
+		render(<PtoCalculator currentYear={2026} />);
+
+		await calculate({ user, days: "2", month: "12" });
+		expect(track).toHaveBeenCalledExactlyOnceWith({ event: "tool_used", properties: { tool: "ptoCalculator" } });
+
+		await user.click(apply());
+
+		expect(track).toHaveBeenLastCalledWith({
+			event: "planning_input_changed",
+			properties: { input: "ptoDays", direction: "up", source: "ptoCalculator" },
+		});
+		expect(JSON.stringify(track.mock.calls)).not.toContain("24");
 	});
 });

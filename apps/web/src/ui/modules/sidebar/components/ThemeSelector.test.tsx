@@ -7,6 +7,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const theme = vi.hoisted(() => ({ theme: "dark", themes: ["light", "dark", "system"], setTheme: vi.fn() }));
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("next-themes", () => ({ useTheme: () => theme }));
 
 vi.mock("@ui/modules/core/animate/base/DropdownMenu", () => ({
@@ -89,5 +92,17 @@ describe("ThemeSelector", () => {
 
 		expect(trigger().className).toContain("size-9");
 		expect(trigger().className).not.toContain("w-full");
+	});
+});
+
+describe("ThemeSelector analytics", () => {
+	it("reports the theme that was picked", async () => {
+		track.mockClear();
+		renderSelector();
+
+		await userEvent.click(item(en.theme.light));
+
+		expect(theme.setTheme).toHaveBeenCalledExactlyOnceWith("light");
+		expect(track).toHaveBeenCalledExactlyOnceWith({ event: "theme_changed", properties: { theme: "light" } });
 	});
 });

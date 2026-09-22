@@ -3,6 +3,7 @@
 import { MIN_CARRY_OVER_MONTHS, useFiltersStore } from "@application/stores/filters";
 import { PremiumFeatureId } from "@application/stores/premium";
 import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
 import { SlidersHorizontal } from "@ui/modules/core/animate/icons/SlidersHorizontal";
 import { SlidingNumber } from "@ui/modules/core/animate/text/SlidingNumber";
@@ -49,6 +50,7 @@ export const CarryOverMonths = () => {
 
 			timeoutRef.current = setTimeout(() => {
 				setCarryOverMonths(newValue);
+				track({ event: "planning_input_changed", properties: { input: "carryOverMonths", value: newValue } });
 			}, DEBOUNCE_DELAY);
 		},
 		[setCarryOverMonths],

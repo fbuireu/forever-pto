@@ -11,6 +11,9 @@ const { mockToastInfo, mockToastWarning, premiumKey } = vi.hoisted(() => ({
 	premiumKey: { current: "key" as string | null },
 }));
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("sonner", () => ({ toast: { info: mockToastInfo, warning: mockToastWarning } }));
 
 vi.mock("@application/stores/premium", () => ({
@@ -72,5 +75,29 @@ describe("usePlannerDayClick", () => {
 		clickWith(() => ({ applied: false, reason: DayRefusal.NO_PLAN }));
 
 		expect(mockToastWarning).not.toHaveBeenCalled();
+	});
+});
+
+describe("usePlannerDayClick analytics", () => {
+	it("reports a click the Premium gate refused, without reaching the store", () => {
+		premiumKey.current = null;
+
+		clickWith(vi.fn(() => ({ applied: true as const })));
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({
+			event: "calendar_day_toggled",
+			properties: { applied: false, reason: "premium_required" },
+		});
+	});
+
+	it("reports an applied toggle and a refused one with the store's reason, never the date", () => {
+		clickWith(() => ({ applied: true }));
+		clickWith(() => ({ applied: false, reason: DayRefusal.BUDGET_EXHAUSTED }));
+
+		expect(track.mock.calls.map(([call]) => call)).toStrictEqual([
+			{ event: "calendar_day_toggled", properties: { applied: true } },
+			{ event: "calendar_day_toggled", properties: { applied: false, reason: DayRefusal.BUDGET_EXHAUSTED } },
+		]);
+		expect(JSON.stringify(track.mock.calls)).not.toContain("2026");
 	});
 });

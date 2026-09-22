@@ -30,6 +30,9 @@ const holidaysState = {
 	currentSelectionIndex: 0,
 };
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("@application/stores/holidays", () => ({
 	useHolidaysStore: (selector: (state: typeof holidaysState) => unknown) => selector(holidaysState),
 }));
@@ -292,6 +295,21 @@ describe("ManagementBar hands the panel's choices to the store", () => {
 		});
 		expect(toastSuccess).toHaveBeenCalledExactlyOnceWith(esMessages.toasts.suggestionApplied);
 		expect(getByTestId("drawer").getAttribute("data-active-snap")).toBe(String(DRAWER_SNAP.COLLAPSED));
+		settle();
+	});
+
+	it("reports the applied Alternative by its index and quality, never its days", () => {
+		ready();
+		track.mockClear();
+		const { getByRole } = renderBar({ locale: "es", messages: esMessages });
+
+		fireEvent.click(getByRole("button", { name: "apply" }));
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({
+			event: "alternative_applied",
+			properties: expect.objectContaining({ index: 1 }),
+		});
+		expect(JSON.stringify(track.mock.calls)).not.toContain("days");
 		settle();
 	});
 

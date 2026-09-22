@@ -1,4 +1,4 @@
-import { QuickStartSource } from "@application/stores/ui";
+import { DonateSource, QuickStartSource } from "@application/stores/ui";
 import { Badge } from "@ui/modules/core/primitives/Badge";
 import { QuickStartTrigger } from "@ui/modules/pages/homepage/quick-start/QuickStartTrigger";
 import { SupportButton } from "@ui/modules/shared/SupportButton";
@@ -105,6 +105,7 @@ export const Pricing = async () => {
 						))}
 					</ul>
 					<SupportButton
+						source={DonateSource.PRICING}
 						label={t("pricing.lifetimeCta")}
 						className="w-full justify-center !bg-[var(--color-brand-ink)] !text-white !border-transparent !shadow-[var(--shadow-brutal-btn-orange)] hover:!shadow-[var(--shadow-brutal-btn-orange-hover)] active:!shadow-[var(--shadow-brutal-btn-orange-active)]"
 					/>

@@ -12,7 +12,21 @@ type TrackEventName =
 	| "quick_start_opened"
 	| "quick_start_step_completed"
 	| "quick_start_abandoned"
-	| "quick_start_completed";
+	| "quick_start_completed"
+	| "donate_opened"
+	| "payment_cancelled"
+	| "planning_input_changed"
+	| "calendar_day_toggled"
+	| "alternative_applied"
+	| "manual_changes_reset"
+	| "custom_holiday_saved"
+	| "custom_holiday_deleted"
+	| "calendar_exported"
+	| "tutorial_started"
+	| "language_changed"
+	| "theme_changed"
+	| "tool_used"
+	| "contact_opened";
 
 interface TrackProperties {
 	[key: string]: unknown;

@@ -2,6 +2,7 @@
 
 import { useFiltersStore } from "@application/stores/filters";
 import { PremiumFeatureId } from "@application/stores/premium";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { Switch } from "@ui/modules/core/animate/base/Switch";
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
 import { SidebarFieldLabel } from "@ui/modules/sidebar/components/SidebarFieldLabel";
@@ -18,6 +19,11 @@ export const AllowPastDays = () => {
 		})),
 	);
 
+	const handleChange = (value: boolean) => {
+		setAllowPastDays(value);
+		track({ event: "planning_input_changed", properties: { input: "allowPastDays", value } });
+	};
+
 	return (
 		<div className="space-y-2 w-full">
 			<SidebarFieldLabel
@@ -27,7 +33,7 @@ export const AllowPastDays = () => {
 			/>
 			<PremiumFeature feature={PremiumFeatureId.ALLOW_PAST_DAYS}>
 				<div className="flex gap-2 w-full items-center">
-					<Switch checked={allowPastDays} aria-label={t("title")} onCheckedChange={setAllowPastDays} />
+					<Switch checked={allowPastDays} aria-label={t("title")} onCheckedChange={handleChange} />
 					<p className="font-normal text-sm">{allowPastDays ? t("enabled") : t("disabled")}</p>
 				</div>
 			</PremiumFeature>

@@ -19,6 +19,9 @@ const { setPreviewAlternativeSelection, resetManualSelection, readout } = vi.hoi
 	},
 }));
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("@application/stores/holidays", () => ({
 	useHolidaysStore: (selector: (state: unknown) => unknown) =>
 		selector({ resetManualSelection, setPreviewAlternativeSelection }),
@@ -235,5 +238,6 @@ describe("PlannerPanel budget readout", () => {
 		await userEvent.click(reset);
 
 		expect(resetManualSelection).toHaveBeenCalledOnce();
+		expect(track).toHaveBeenCalledExactlyOnceWith({ event: "manual_changes_reset", properties: { surface: "panel" } });
 	});
 });

@@ -3,6 +3,7 @@
 import type { CountryDTO } from "@application/dto/country/types";
 import { useFiltersStore } from "@application/stores/filters";
 import { useLocationStore } from "@application/stores/location";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
 import { MapPin } from "@ui/modules/core/animate/icons/MapPin";
 import { Combobox } from "@ui/modules/core/primitives/Combobox";
@@ -25,6 +26,11 @@ export const CountriesClient = ({ countries }: CountriesClientProps) => {
 		setCountries(countries);
 	}, [countries, setCountries]);
 
+	const handleCountryChange = (value: string) => {
+		setCountry(value);
+		track({ event: "planning_input_changed", properties: { input: "country", value } });
+	};
+
 	return (
 		<AnimateIcon animateOnHover asChild>
 			<div className="space-y-2 w-full">
@@ -39,7 +45,7 @@ export const CountriesClient = ({ countries }: CountriesClientProps) => {
 					id="countries"
 					options={countries}
 					value={country}
-					onChange={setCountry}
+					onChange={handleCountryChange}
 					placeholder={t("placeholder")}
 					searchPlaceholder={t("search")}
 				/>
