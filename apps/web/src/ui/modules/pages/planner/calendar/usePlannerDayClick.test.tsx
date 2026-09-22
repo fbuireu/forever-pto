@@ -1,4 +1,4 @@
-import { type DayOutcome, DayRefusal } from "@application/stores/types";
+import { DayChange, type DayOutcome, DayRefusal } from "@application/stores/types";
 import en from "@i18n/messages/en.json";
 import { renderHook } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
@@ -45,7 +45,7 @@ beforeEach(() => {
 describe("usePlannerDayClick", () => {
 	it("never reaches the store for a visitor without Premium", () => {
 		premiumKey.current = null;
-		const toggle = vi.fn<(date: Date) => DayOutcome>(() => ({ applied: true }));
+		const toggle = vi.fn<(date: Date) => DayOutcome>(() => ({ applied: true, change: DayChange.MANUAL_DAY_ADDED }));
 
 		clickWith(toggle);
 
@@ -54,7 +54,7 @@ describe("usePlannerDayClick", () => {
 	});
 
 	it("stays silent when the store applies the toggle", () => {
-		const toggle = vi.fn<(date: Date) => DayOutcome>(() => ({ applied: true }));
+		const toggle = vi.fn<(date: Date) => DayOutcome>(() => ({ applied: true, change: DayChange.MANUAL_DAY_ADDED }));
 
 		clickWith(toggle);
 
@@ -82,7 +82,7 @@ describe("usePlannerDayClick analytics", () => {
 	it("reports a click the Premium gate refused, without reaching the store", () => {
 		premiumKey.current = null;
 
-		clickWith(vi.fn(() => ({ applied: true as const })));
+		clickWith(vi.fn(() => ({ applied: true as const, change: DayChange.MANUAL_DAY_ADDED })));
 
 		expect(track).toHaveBeenCalledExactlyOnceWith({
 			event: "calendar_day_toggled",
@@ -90,12 +90,12 @@ describe("usePlannerDayClick analytics", () => {
 		});
 	});
 
-	it("reports an applied toggle and a refused one with the store's reason, never the date", () => {
-		clickWith(() => ({ applied: true }));
+	it("reports an applied toggle with what changed, and a refused one with the store's reason, never the date", () => {
+		clickWith(() => ({ applied: true, change: DayChange.MANUAL_DAY_ADDED }));
 		clickWith(() => ({ applied: false, reason: DayRefusal.BUDGET_EXHAUSTED }));
 
 		expect(track.mock.calls.map(([call]) => call)).toStrictEqual([
-			{ event: "calendar_day_toggled", properties: { applied: true } },
+			{ event: "calendar_day_toggled", properties: { applied: true, change: DayChange.MANUAL_DAY_ADDED } },
 			{ event: "calendar_day_toggled", properties: { applied: false, reason: DayRefusal.BUDGET_EXHAUSTED } },
 		]);
 		expect(JSON.stringify(track.mock.calls)).not.toContain("2026");

@@ -5,7 +5,7 @@ import { FilterStrategy, type MeasuredSuggestion } from "@domain/calendar/types"
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useFiltersStore } from "./filters";
 import { type HolidaysState, useHolidaysStore } from "./holidays";
-import { DayRefusal, HolidayRefusal } from "./types";
+import { DayChange, DayRefusal, HolidayRefusal } from "./types";
 
 const { mockGetHolidays, mockRunPlanningPipeline, mockStorageGetItem } = vi.hoisted(() => ({
 	mockGetHolidays: vi.fn().mockResolvedValue([]),
@@ -615,7 +615,7 @@ describe("toggleDaySelection", () => {
 			removedSuggestedDays: [],
 		});
 		const result = useHolidaysStore.getState().toggleDaySelection({ date: baseDate, ...PARAMS });
-		expect(result.applied).toBe(true);
+		expect(result).toEqual({ applied: true, change: DayChange.MANUAL_DAY_REMOVED });
 		expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(0);
 	});
 
@@ -626,7 +626,10 @@ describe("toggleDaySelection", () => {
 			manuallySelectedDays: [],
 			removedSuggestedDays: [baseDate],
 		});
-		useHolidaysStore.getState().toggleDaySelection({ date: baseDate, ...PARAMS });
+		expect(useHolidaysStore.getState().toggleDaySelection({ date: baseDate, ...PARAMS })).toEqual({
+			applied: true,
+			change: DayChange.REMOVED_DAY_RESTORED,
+		});
 		expect(useHolidaysStore.getState().removedSuggestedDays).toHaveLength(0);
 	});
 
@@ -637,7 +640,10 @@ describe("toggleDaySelection", () => {
 			manuallySelectedDays: [],
 			removedSuggestedDays: [],
 		});
-		useHolidaysStore.getState().toggleDaySelection({ date: baseDate, ...PARAMS });
+		expect(useHolidaysStore.getState().toggleDaySelection({ date: baseDate, ...PARAMS })).toEqual({
+			applied: true,
+			change: DayChange.SUGGESTED_DAY_REMOVED,
+		});
 		expect(useHolidaysStore.getState().removedSuggestedDays).toHaveLength(1);
 	});
 

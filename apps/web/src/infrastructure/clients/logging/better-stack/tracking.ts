@@ -21,6 +21,7 @@ type TrackEventName =
 	| "manual_changes_reset"
 	| "custom_holiday_saved"
 	| "custom_holiday_deleted"
+	| "holiday_modal_opened"
 	| "calendar_exported"
 	| "tutorial_started"
 	| "language_changed"

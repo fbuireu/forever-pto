@@ -231,7 +231,10 @@ re-fetches Holidays) and would otherwise strand it, spending budget with no way 
 **The refusal reason crosses the seam, so no caller re-derives the rule.** `toggleDaySelection` returns a
 `DayOutcome` and `addHoliday`/`editHoliday` return a `HolidayOutcome`, both declared in `types.ts`, both
 either `{ applied: true }` or `{ applied: false, reason }`, with `HolidayOutcome` additionally carrying
-`heldBy` so a caller can name the Holiday already on the date without looking it up. They used to answer
+`heldBy` so a caller can name the Holiday already on the date without looking it up, and `DayOutcome`
+carrying a `change` on success (`DayChange`: a Manual Day added or removed, a Suggested Day removed, a Removed
+Day restored), because the store is the only place that knows which of the four a click was and the analytics
+event wants to say so without re-deriving it. They used to answer
 `boolean` (or nothing at all), which is why [`calendar/Calendar.tsx`](../../ui/modules/pages/planner/calendar/Calendar.tsx), [`AddHolidayModal.tsx`](../../ui/modules/pages/planner/holidays/components/AddHolidayModal.tsx) and
 [`EditHolidayModal.tsx`](../../ui/modules/pages/planner/holidays/components/EditHolidayModal.tsx) each reimplemented the occupancy check purely to pick a toast: hand-rolled
 `toDateString()` comparisons for one rule, kept in agreement by review. The reasons are the distinctions the

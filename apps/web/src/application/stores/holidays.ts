@@ -17,6 +17,7 @@ import {
 	type AddHolidayParams,
 	type AlternativePreviewParams,
 	type AlternativeSelectionBaseParams,
+	DayChange,
 	type DayOutcome,
 	DayRefusal,
 	type EditHolidayParams,
@@ -398,13 +399,17 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
 					let updatedManualDays = manuallySelectedDays;
 					let updatedRemovedDays = removedSuggestedDays;
+					let change: DayChange;
 
 					if (isManuallySelected) {
 						updatedManualDays = manuallySelectedDays.filter((day) => !isSameDay({ a: day, b: date }));
+						change = DayChange.MANUAL_DAY_REMOVED;
 					} else if (isSuggested && wasRemoved) {
 						updatedRemovedDays = removedSuggestedDays.filter((day) => !isSameDay({ a: day, b: date }));
+						change = DayChange.REMOVED_DAY_RESTORED;
 					} else if (isSuggested && !wasRemoved) {
 						updatedRemovedDays = [...removedSuggestedDays, date].toSorted((a, b) => a.getTime() - b.getTime());
+						change = DayChange.SUGGESTED_DAY_REMOVED;
 					} else {
 						const budget = measureBudget({
 							ptoDays: totalPtoDays,
@@ -424,6 +429,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 						}
 
 						updatedManualDays = [...manuallySelectedDays, date].toSorted((a, b) => a.getTime() - b.getTime());
+						change = DayChange.MANUAL_DAY_ADDED;
 					}
 
 					const { year, carryOverMonths } = useFiltersStore.getState();
@@ -443,7 +449,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 						currentSelection: { ...currentSelection, metrics: updatedMetrics },
 					});
 
-					return { applied: true };
+					return { applied: true, change };
 				},
 
 				pruneDaysOutsideWindow: (params?: PlanningWindowParams) => {

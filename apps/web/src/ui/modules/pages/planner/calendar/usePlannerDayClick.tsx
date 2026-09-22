@@ -43,7 +43,9 @@ export const usePlannerDayClick = (onDayToggle: (date: Date) => DayOutcome) => {
 			const outcome = onDayToggle(date);
 			track({
 				event: "calendar_day_toggled",
-				properties: outcome.applied ? { applied: true } : { applied: false, reason: outcome.reason },
+				properties: outcome.applied
+					? { applied: true, change: outcome.change }
+					: { applied: false, reason: outcome.reason },
 			});
 
 			if (outcome.applied) return;

@@ -130,9 +130,10 @@ The planner and the rest of the app report these, under the same rule: a setting
 | --- | --- | --- |
 | `planner_generated` | The worker settles a plan (every replan) | Strategy, year, Carry-over Months, past days, the number of Alternatives and the plan's quality: Efficiency, Effective Days, Bonus Days, Long Weekends, Rest Blocks, Longest Vacation, Max Work Streak |
 | `planning_input_changed` | A sidebar control changes a planning input | `input` (`country`, `region`, `year`, `ptoDays`, `strategy`, `allowPastDays`, `carryOverMonths`) and its new value, except the budget, which reports only a `direction` (`up` or `down`) and, from the calculator, a `source` |
-| `calendar_day_toggled` | A day is clicked | `applied`, or `applied: false` with the store's refusal (`budget_exhausted`, `day_is_holiday`…) or `premium_required` when the gate stopped it |
+| `calendar_day_toggled` | A day is clicked | `applied` with what changed (`manual_day_added`, `manual_day_removed`, `suggested_day_removed`, `removed_day_restored`), or `applied: false` with the store's refusal (`budget_exhausted`, `day_is_holiday`…) or `premium_required` when the gate stopped it |
 | `alternative_applied` | An Alternative becomes the Suggestion | Its index and its Efficiency and Effective Days |
 | `manual_changes_reset` | The manual changes are discarded | `surface` (`panel` or `sidebar`) |
+| `holiday_modal_opened` | The add, edit or delete button of a Holiday table is pressed | `action` (`add`, `edit`, `delete`) and the tab's Holiday Variant |
 | `custom_holiday_saved` | A Custom Holiday is added or edited | `mode` (`add` or `edit`), `applied` and the refusal reason if any |
 | `custom_holiday_deleted` | Custom Holidays are deleted | `count` |
 | `calendar_exported` | An ICS or PDF export finishes | `format`, `includeHolidays`, `includePto`, `outcome` (`success` or `error`) |
