@@ -20,7 +20,7 @@ Exports: `Popover`, `PopoverTrigger`, `PopoverContent`.
 ## How it works
 
 - The popup enters with `opacity 0 → 1` and `scale 0.5 → 1` on a spring (`stiffness: 300, damping: 25` in the motion primitive), growing out of the trigger thanks to `origin-(--transform-origin)`; Base UI computes the transform origin from the anchor side.
-- `PopoverContent` bundles portal + positioner + popup: a `w-72`, `rounded-[12px]`, 3px-frame-border panel with `shadow-brutal-md`. Positioning props go on it directly, namely `align` (default `'center'`) and `sideOffset` (default 4), and `positionerClassName` styles the positioner (default `z-52`) separately from the panel.
+- `PopoverContent` bundles portal + positioner + popup: a `w-72`, `rounded-[12px]`, 3px-frame-border panel with `shadow-brutal-md`. Positioning props go on it directly, namely `align` (default `'center'`) and `sideOffset` (default 4), and `positionerClassName` styles the positioner (default `z-210`, above a dialog's `z-200`, so a Combobox opened inside a modal floats over it) separately from the panel.
 - Focus management passes through: `initialFocus` / `finalFocus` forward to the Base UI popup.
 - `PopoverTrigger asChild` renders your element as the trigger via Base UI's `render`.
 

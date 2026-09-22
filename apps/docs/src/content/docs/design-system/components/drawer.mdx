@@ -54,7 +54,7 @@ For desktop-centric confirmations prefer [Dialog](/design-system/components/dial
 ## Conventions
 
 - `data-slot` hooks: `drawer`, `drawer-portal`, `drawer-overlay`, `drawer-content`, `drawer-title`.
-- Content sits at `z-51` above a `z-50` overlay, and below dialogs (`z-200`) by design.
+- Content sits at `z-51` above a `z-50` overlay, below dialogs (`z-200`) by design, and below every transient overlay (popover and menu at `z-210`, tooltip at `z-220`), so a field inside it can still open one.
 
 ## Accessibility
 

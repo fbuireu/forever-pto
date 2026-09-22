@@ -35,7 +35,7 @@ export const QuickStartLocationStep = ({ countries, regions, draft, onChange }: 
 					placeholder={tSidebar("country.placeholder")}
 					searchPlaceholder={tSidebar("country.search")}
 				/>
-				<p className="text-xs text-muted-foreground">{t("detected")}</p>
+				<p className="pt-1.5 text-xs text-muted-foreground">{t("detected")}</p>
 			</div>
 			<div className="space-y-2">
 				<Label htmlFor={REGION_ID}>

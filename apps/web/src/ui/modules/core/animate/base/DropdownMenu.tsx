@@ -111,7 +111,7 @@ function DropdownMenuContent({
 						sideOffset={sideOffset}
 						align={align}
 						positionMethod="fixed"
-						className="z-52"
+						className="z-210"
 					>
 						<DropdownMenuPrimitive.Popup
 							render={

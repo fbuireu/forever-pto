@@ -186,6 +186,14 @@ writes body pointer events, and `vaul`'s value is `auto`, which is the initial v
 not ours to undo. `Sidebar.test.tsx` fails on any `document.body.style` in this file. If a component here ever
 does need a body-level lock, it owns the restore in the same effect's cleanup, not in an animation callback.
 
+**Transient overlays sit above every modal surface, on purpose and by number.** The scale is: desktop sidebar
+`z-10`, drawer overlay and mobile sidebar backdrop `z-50`, their panels `z-51`, dialog backdrop and popup `z-200`,
+popover and dropdown positioners `z-210`, tooltip positioner `z-220`. A popover is opened *from* whatever surface is
+under it, so it has to clear the highest one; it sat at `z-52` and the tooltip at `z-50`, which put the Country
+Combobox inside the quick start dialog behind the dialog's own backdrop and the sidebar field tooltips behind the
+mobile sidebar's `z-51` panel. `Popover.test.tsx` and `Tooltip.test.tsx` assert the positioner's layer beats
+`200`. A new modal surface goes below `200`; a new transient overlay goes above `210`.
+
 **`vaul` is patched to forward `modal` to the Radix `Dialog.Root` it wraps, because 1.1.2 does not.**
 Unpatched, every vaul drawer mounts a *modal* Radix dialog whatever its `modal` prop says, and Radix's
 content effect then sets `document.body.style.pointerEvents = 'none'` and `aria-hidden` on everything
