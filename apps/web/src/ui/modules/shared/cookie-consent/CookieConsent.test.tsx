@@ -3,6 +3,8 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+const DIALOG_LAYER = 200;
+
 interface DialogProps {
 	open: boolean;
 	analyticsEnabled: boolean;
@@ -122,6 +124,13 @@ describe("the first visit", () => {
 		renderConsent();
 
 		expect(screen.queryByRole("dialog", { name: en.cookies.title })).toBeNull();
+	});
+
+	it("sits below dialogs and popovers, so a prompt never covers a modal or the list a control opens", () => {
+		renderConsent();
+		const layer = screen.getByRole("dialog").className.match(/\bz-(\d+)\b/);
+
+		expect(Number(layer?.[1])).toBeLessThan(DIALOG_LAYER);
 	});
 
 	it("asks the library not to show its own banner, since this one replaces it", () => {
