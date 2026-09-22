@@ -108,12 +108,11 @@ same setters the sidebar does, in the order that survives `setCountry` clearing 
 pushes `/planner` through `@application/i18n/navigation`, where `CalendarList.tsx` recomputes from the
 store as it always has. No search params are involved.
 
-**The funnel is four `track()` events, and the budget is not in any of them.** `openQuickStart(source)` on the
+**The funnel is four `track()` events.** `openQuickStart(source)` on the
 `ui` store reports `quick_start_opened` with the call to action (`nav`, `hero`, `pricing`, `closing`), which is
 why `QuickStartTrigger` takes a `source` rather than the store guessing one. The form reports
 `quick_start_step_completed` on every Next and `quick_start_completed` on finish with `trackedDraft(draft)`
-from `steps.ts`: Country, Region, year, Strategy, past days, Carry-over Months, and
-deliberately not `ptoDays`, because the docs site promises the budget never leaves the browser. The dialog
+from `steps.ts`: the PTO Day budget, Country, Region, year, Strategy, past days and Carry-over Months. The dialog
 reports `quick_start_abandoned` from `onOpenChange(false)`, the close button, the backdrop and Escape, naming
 the step the form last announced through `onStepChange`; a finish closes through the store, which fires no
 `onOpenChange`, so it is never counted as an abandonment.
@@ -126,9 +125,10 @@ rehydration and on the quick start's finish, where a "change" event would be a l
 exception, and both are opens: `openDonatePopover(source)` and `openQuickStart(source)` on the `ui` store, so
 that every trigger reports the same event with its own `source`. `planner_generated` fires in
 `hooks/useCalculationsWorker.ts` when the worker's answer lands, the one place that holds the inputs and the
-measured plan together, and it reports the plan's quality metrics and never its days. The budget is the same
-everywhere: `ptoDays` reports a `direction`, never a number, and the leak guards in the tests
-(`JSON.stringify(track.mock.calls)` not containing the value) are what keep that true. `track()` itself fans
+measured plan together, and it reports the plan's quality metrics and never its days. What never travels is
+a date, a Manual Day, a Custom Holiday's name or a salary, and the leak guards in the tests
+(`JSON.stringify(track.mock.calls)` not containing the value) are what keep that true; the budget is a setting
+and travels as its number, which is a decision the docs site's data sources page states. `track()` itself fans
 every event out to Better Stack and to Google Analytics under the same name, so the call sites know nothing
 about destinations; the split of what each one is for is on the docs site's observability page.
 

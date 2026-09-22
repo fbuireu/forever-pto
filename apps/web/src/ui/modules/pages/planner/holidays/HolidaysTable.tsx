@@ -176,12 +176,24 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 		return filtered;
 	}, [variantHolidays, debouncedSearchTerm, sortConfig]);
 
-	const handleSort = useCallback((key: keyof HolidayDTO) => {
-		setSortConfig((current) => ({
-			key,
-			direction: current.key === key && current.direction === "asc" ? "desc" : "asc",
-		}));
-	}, []);
+	const handleSort = useCallback(
+		(key: keyof HolidayDTO) => {
+			setSortConfig((current) => ({
+				key,
+				direction: current.key === key && current.direction === "asc" ? "desc" : "asc",
+			}));
+			track({ event: "holidays_sorted", properties: { variant, key } });
+		},
+		[variant],
+	);
+
+	const wasSearching = useRef(false);
+
+	useEffect(() => {
+		const isSearching = debouncedSearchTerm !== "";
+		if (isSearching && !wasSearching.current) track({ event: "holidays_searched", properties: { variant } });
+		wasSearching.current = isSearching;
+	}, [debouncedSearchTerm, variant]);
 
 	const getHolidayId = useCallback((holiday: HolidayDTO) => `${holiday.id}::${holiday.name}`, []);
 
@@ -202,6 +214,10 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 	}, [filteredHolidays, selectedHolidays, getHolidayId]);
 
 	const toggleSelectAll = useCallback(() => {
+		track({
+			event: "holiday_selection_changed",
+			properties: { variant, scope: "all", selected: selectionState.type !== "all" },
+		});
 		setSelectedHolidays((prev) => {
 			const newSelected = new Set(prev);
 
@@ -217,10 +233,14 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 
 			return newSelected;
 		});
-	}, [filteredHolidays, selectionState.type, getHolidayId]);
+	}, [filteredHolidays, selectionState.type, getHolidayId, variant]);
 
 	const toggleSelectHoliday = useCallback(
 		(holiday: HolidayDTO) => {
+			track({
+				event: "holiday_selection_changed",
+				properties: { variant, scope: "one", selected: !selectedHolidays.has(getHolidayId(holiday)) },
+			});
 			setSelectedHolidays((prev) => {
 				const holidayId = getHolidayId(holiday);
 				const newSelected = new Set(prev);
@@ -234,7 +254,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 				return newSelected;
 			});
 		},
-		[getHolidayId],
+		[getHolidayId, selectedHolidays, variant],
 	);
 
 	const handleCloseAddModal = useCallback(() => {

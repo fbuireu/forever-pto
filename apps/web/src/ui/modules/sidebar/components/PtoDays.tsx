@@ -50,7 +50,7 @@ export const PtoDays = () => {
 			trimManualDays(newValue);
 			track({
 				event: "planning_input_changed",
-				properties: { input: "ptoDays", direction: newValue > ptoDays ? "up" : "down" },
+				properties: { input: "ptoDays", value: newValue },
 			});
 		},
 		[setPtoDays, trimManualDays, ptoDays],

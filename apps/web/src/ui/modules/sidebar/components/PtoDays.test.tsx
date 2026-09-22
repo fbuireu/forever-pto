@@ -144,7 +144,7 @@ describe("PtoDays", () => {
 });
 
 describe("PtoDays analytics", () => {
-	it("reports the direction of a budget change and never the budget itself", async () => {
+	it("reports the new budget on every change", async () => {
 		track.mockClear();
 		renderField();
 
@@ -152,10 +152,9 @@ describe("PtoDays analytics", () => {
 		await userEvent.click(decrease());
 
 		expect(track.mock.calls.map(([call]) => call)).toStrictEqual([
-			{ event: "planning_input_changed", properties: { input: "ptoDays", direction: "up" } },
-			{ event: "planning_input_changed", properties: { input: "ptoDays", direction: "down" } },
+			{ event: "planning_input_changed", properties: { input: "ptoDays", value: 24 } },
+			{ event: "planning_input_changed", properties: { input: "ptoDays", value: 22 } },
 		]);
-		expect(JSON.stringify(track.mock.calls)).not.toContain("23");
 	});
 
 	it("reports a reset of the manual changes from the sidebar", async () => {

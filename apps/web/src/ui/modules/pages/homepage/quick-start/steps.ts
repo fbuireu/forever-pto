@@ -63,6 +63,7 @@ export function yearOptions({ currentYear, selectedYear }: YearOptionsParams): n
 
 export function trackedDraft(draft: QuickStartDraft) {
 	return {
+		ptoDays: draft.ptoDays,
 		country: draft.country,
 		region: draft.region,
 		year: draft.year,

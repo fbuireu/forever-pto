@@ -74,7 +74,7 @@ export const PtoCalculator = ({ currentYear }: PtoCalculatorProps) => {
 		trimManualDays(nextBudget);
 		track({
 			event: "planning_input_changed",
-			properties: { input: "ptoDays", direction: nextBudget > ptoDays ? "up" : "down", source: "ptoCalculator" },
+			properties: { input: "ptoDays", value: nextBudget, source: "ptoCalculator" },
 		});
 	};
 

@@ -393,7 +393,7 @@ describe("useCalculationsWorker", () => {
 });
 
 describe("planner_generated", () => {
-	it("reports the settled plan's settings and quality, never the budget, the days or the break dates", () => {
+	it("reports the settled plan's inputs and quality, never the days or the break dates", () => {
 		track.mockClear();
 		const { result } = renderHook(() => useCalculationsWorker());
 		act(() => {
@@ -412,6 +412,7 @@ describe("planner_generated", () => {
 		expect(track).toHaveBeenCalledExactlyOnceWith({
 			event: "planner_generated",
 			properties: {
+				ptoDays: 5,
 				strategy: "grouped",
 				year: 2025,
 				carryOverMonths: 0,
@@ -427,7 +428,6 @@ describe("planner_generated", () => {
 			},
 		});
 		const report = JSON.stringify(track.mock.calls);
-		expect(report).not.toContain("ptoDays");
 		expect(report).not.toContain("2025-01-01");
 		expect(report).not.toContain("days");
 	});

@@ -24,6 +24,7 @@ export function plannerGeneratedProperties({ params, measured, alternatives }: P
 	const { metrics } = measured;
 
 	return {
+		ptoDays: params.ptoDays,
 		strategy: params.strategy,
 		year: params.year,
 		carryOverMonths: params.carryOverMonths,

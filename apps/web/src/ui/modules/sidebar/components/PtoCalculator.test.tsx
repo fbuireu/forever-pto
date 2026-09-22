@@ -150,7 +150,7 @@ describe("PtoCalculator", () => {
 });
 
 describe("PtoCalculator analytics", () => {
-	it("reports the tool being used, and an applied result as a budget change by direction only", async () => {
+	it("reports the tool being used, and an applied result as the new budget", async () => {
 		track.mockClear();
 		const user = userEvent.setup();
 		render(<PtoCalculator currentYear={2026} />);
@@ -162,8 +162,7 @@ describe("PtoCalculator analytics", () => {
 
 		expect(track).toHaveBeenLastCalledWith({
 			event: "planning_input_changed",
-			properties: { input: "ptoDays", direction: "up", source: "ptoCalculator" },
+			properties: { input: "ptoDays", value: 24, source: "ptoCalculator" },
 		});
-		expect(JSON.stringify(track.mock.calls)).not.toContain("24");
 	});
 });

@@ -144,7 +144,7 @@ describe("QuickStartForm", () => {
 		expect(router.push).toHaveBeenCalledExactlyOnceWith("/planner");
 	});
 
-	it("reports each step it leaves and the settings it finishes with, never the budget", () => {
+	it("reports each step it leaves and the planning inputs it finishes with", () => {
 		cookie.country = "es";
 		renderForm();
 
@@ -159,6 +159,7 @@ describe("QuickStartForm", () => {
 			{
 				event: "quick_start_completed",
 				properties: {
+					ptoDays: 23,
 					country: "es",
 					region: "",
 					year: expect.any(Number),
@@ -168,7 +169,6 @@ describe("QuickStartForm", () => {
 				},
 			},
 		]);
-		expect(JSON.stringify(track.mock.calls)).not.toContain('ptoDays":23');
 	});
 
 	it("tells its owner which step is showing, so an abandonment can name it", () => {
