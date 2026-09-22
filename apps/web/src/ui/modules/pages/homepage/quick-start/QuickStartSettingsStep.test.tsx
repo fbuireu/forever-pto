@@ -1,4 +1,4 @@
-import { PremiumFeatureId } from "@application/stores/premium";
+import { PremiumFeatureId, PremiumOrigin } from "@application/stores/premium";
 import { FilterStrategy } from "@domain/calendar/types";
 import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import enMessages from "@i18n/messages/en.json";
@@ -7,11 +7,12 @@ import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const gate = vi.hoisted(() => ({ features: [] as string[] }));
+const gate = vi.hoisted(() => ({ features: [] as string[], origins: [] as (string | undefined)[] }));
 
 vi.mock("@ui/modules/premium/PremiumFeature", () => ({
-	PremiumFeature: ({ feature, children }: { feature: string; children: ReactNode }) => {
+	PremiumFeature: ({ feature, origin, children }: { feature: string; origin?: string; children: ReactNode }) => {
 		gate.features.push(feature);
+		gate.origins.push(origin);
 		return <div data-gated={feature}>{children}</div>;
 	},
 }));
@@ -44,6 +45,7 @@ const renderStep = ({
 
 beforeEach(() => {
 	gate.features = [];
+	gate.origins = [];
 });
 
 describe("QuickStartSettingsStep", () => {
@@ -70,6 +72,7 @@ describe("QuickStartSettingsStep", () => {
 		renderStep();
 
 		expect(gate.features).toStrictEqual([PremiumFeatureId.ALLOW_PAST_DAYS, PremiumFeatureId.CARRY_OVER_MONTHS]);
+		expect(gate.origins).toStrictEqual([PremiumOrigin.QUICK_START, PremiumOrigin.QUICK_START]);
 	});
 
 	it("names the past-days switch itself and reports its state beside it", () => {

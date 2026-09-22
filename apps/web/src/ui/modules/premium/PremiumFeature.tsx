@@ -1,6 +1,6 @@
 "use client";
 
-import type { PremiumFeatureId } from "@application/stores/premium";
+import type { PremiumFeatureId, PremiumOrigin } from "@application/stores/premium";
 import { usePremiumStore } from "@application/stores/premium";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@ui/modules/core/animate/base/Tooltip";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
@@ -20,6 +20,7 @@ export type PremiumFeatureVariant = (typeof PremiumFeatureVariant)[keyof typeof 
 
 interface PremiumFeatureProps {
 	feature: PremiumFeatureId;
+	origin?: PremiumOrigin;
 	children: ReactNode;
 	className?: string;
 	description?: string;
@@ -30,6 +31,7 @@ interface PremiumFeatureProps {
 
 export const PremiumFeature = ({
 	feature,
+	origin,
 	children,
 	className,
 	description,
@@ -66,11 +68,11 @@ export const PremiumFeature = ({
 					className,
 				)}
 				aria-label={description ?? t("unlockFeature", { feature: featureLabel(feature) })}
-				onClick={() => showPremiumModal(feature)}
+				onClick={() => showPremiumModal(feature, origin)}
 				onKeyDown={(e) => {
 					if (e.key === "Enter" || e.key === " ") {
 						e.preventDefault();
-						showPremiumModal(feature);
+						showPremiumModal(feature, origin);
 					}
 				}}
 			>

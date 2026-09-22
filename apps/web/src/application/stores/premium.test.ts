@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { PremiumFeatureId, usePremiumStore } from "./premium";
+import { PremiumFeatureId, PremiumOrigin, usePremiumStore } from "./premium";
 
 const { mockLogError, mockWarn } = vi.hoisted(() => ({ mockLogError: vi.fn(), mockWarn: vi.fn() }));
 
@@ -89,7 +89,19 @@ describe("showPremiumModal / closeModal", () => {
 	it("sends the gate id to analytics, never the label the gate shows", async () => {
 		const { track } = await import("@infrastructure/clients/logging/better-stack/tracking");
 		usePremiumStore.getState().showPremiumModal(PremiumFeatureId.ADVANCED_METRICS);
-		expect(track).toHaveBeenCalledWith({ event: "upgrade_modal_opened", properties: { feature: "advancedMetrics" } });
+		expect(track).toHaveBeenCalledWith({
+			event: "upgrade_modal_opened",
+			properties: { feature: "advancedMetrics", origin: "planner" },
+		});
+	});
+
+	it("names where the gate was, defaulting to the planner and taking the quick start when told", async () => {
+		const { track } = await import("@infrastructure/clients/logging/better-stack/tracking");
+		usePremiumStore.getState().showPremiumModal(PremiumFeatureId.ALLOW_PAST_DAYS, PremiumOrigin.QUICK_START);
+		expect(track).toHaveBeenLastCalledWith({
+			event: "upgrade_modal_opened",
+			properties: { feature: "allowPastDays", origin: "quick_start" },
+		});
 	});
 
 	it("closeModal closes modal and clears feature", () => {

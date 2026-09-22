@@ -43,7 +43,7 @@ describe("PremiumFeature", () => {
 
 		fireEvent.click(screen.getByRole("button"));
 
-		expect(premiumState.showPremiumModal).toHaveBeenCalledWith("calendarExport");
+		expect(premiumState.showPremiumModal).toHaveBeenCalledWith("calendarExport", undefined);
 	});
 
 	it("sends the same id from a German render, so one gate is one value in the funnel", () => {
@@ -51,7 +51,7 @@ describe("PremiumFeature", () => {
 
 		fireEvent.click(screen.getByRole("button"));
 
-		expect(premiumState.showPremiumModal).toHaveBeenCalledWith("calendarExport");
+		expect(premiumState.showPremiumModal).toHaveBeenCalledWith("calendarExport", undefined);
 	});
 
 	it("keeps a focus ring, so tabbing onto a gated chart changes something on screen", () => {

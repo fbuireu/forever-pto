@@ -1,7 +1,7 @@
 "use client";
 
 import { MIN_CARRY_OVER_MONTHS } from "@application/stores/filters";
-import { PremiumFeatureId } from "@application/stores/premium";
+import { PremiumFeatureId, PremiumOrigin } from "@application/stores/premium";
 import { FilterStrategy } from "@domain/calendar/types";
 import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import { Switch } from "@ui/modules/core/animate/base/Switch";
@@ -65,7 +65,7 @@ export const QuickStartSettingsStep = ({ draft, onChange }: QuickStartSettingsSt
 
 			<div className="space-y-2">
 				<p className="text-sm font-medium leading-none">{tSidebar("allowPastDays.title")}</p>
-				<PremiumFeature feature={PremiumFeatureId.ALLOW_PAST_DAYS}>
+				<PremiumFeature feature={PremiumFeatureId.ALLOW_PAST_DAYS} origin={PremiumOrigin.QUICK_START}>
 					<div className="flex w-full items-center gap-2">
 						<Switch
 							checked={draft.allowPastDays}
@@ -81,7 +81,7 @@ export const QuickStartSettingsStep = ({ draft, onChange }: QuickStartSettingsSt
 
 			<div className="space-y-2">
 				<p className="text-sm font-medium leading-none">{tSidebar("carryOverMonths.title")}</p>
-				<PremiumFeature feature={PremiumFeatureId.CARRY_OVER_MONTHS}>
+				<PremiumFeature feature={PremiumFeatureId.CARRY_OVER_MONTHS} origin={PremiumOrigin.QUICK_START}>
 					<div className="flex w-full items-center gap-4">
 						<p className="text-sm font-normal">{MIN_CARRY_OVER_MONTHS}</p>
 						<Slider

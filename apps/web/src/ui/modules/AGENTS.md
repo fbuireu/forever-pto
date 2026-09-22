@@ -493,7 +493,9 @@ string would split one failure mode across every locale.
 
 **The Premium gate broke that same rule at every one of its call sites, and the fix is a second
 type.** `PremiumFeature` took `feature: string`, showed it to the user *and* handed it to
-`showPremiumModal`, which is what `track('upgrade_modal_opened', { feature })` reports. Every producer was a
+`showPremiumModal`, which is what `track('upgrade_modal_opened', { feature, origin })` reports; `origin` is the
+gate's optional prop, `planner` by default and `quick_start` from the homepage dialog, so the same feature's
+gates on the two surfaces are two rows rather than one. Every producer was a
 `useTranslations` call (`t('editHolidays')`, `t('metrics.advancedMetrics')`, `t('title')` from
 different namespaces), so every gate in every locale was its own value in one dimension
 and no two locales' funnels could be compared. The prop is a `PremiumFeatureId` now, declared beside the
