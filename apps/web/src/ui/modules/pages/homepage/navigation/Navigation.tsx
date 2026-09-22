@@ -1,4 +1,5 @@
 import { Link } from "@application/i18n/navigation";
+import { QuickStartSource } from "@application/stores/ui";
 import { QuickStartTrigger } from "@ui/modules/pages/homepage/quick-start/QuickStartTrigger";
 import { ThemeSelector } from "@ui/modules/sidebar/components/ThemeSelector";
 import Image from "next/image";
@@ -40,7 +41,9 @@ export const Header = async () => {
 				<div className="flex gap-2.5 items-center">
 					<ThemeSelector buttonClassName="size-9 px-0 focus-visible:ring-1" />
 					<HomepageLanguageSwitcher />
-					<QuickStartTrigger size="sm">{t("nav.trialAction")}</QuickStartTrigger>
+					<QuickStartTrigger source={QuickStartSource.NAV} size="sm">
+						{t("nav.trialAction")}
+					</QuickStartTrigger>
 				</div>
 			</div>
 		</nav>

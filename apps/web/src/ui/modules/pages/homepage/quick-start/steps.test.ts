@@ -1,7 +1,7 @@
 import type { FiltersState } from "@application/stores/filters";
 import { FilterStrategy } from "@domain/calendar/types";
 import { describe, expect, it } from "vitest";
-import { canLeaveStep, createDraft, QUICK_START_STEPS, QuickStartStep, yearOptions } from "./steps";
+import { canLeaveStep, createDraft, QUICK_START_STEPS, QuickStartStep, trackedDraft, yearOptions } from "./steps";
 
 const FILTERS: FiltersState = {
 	ptoDays: 22,
@@ -65,5 +65,22 @@ describe("yearOptions", () => {
 	it("keeps a selected year outside that span rather than losing it", () => {
 		expect(yearOptions({ currentYear: 2026, selectedYear: 2030 })).toStrictEqual([2025, 2026, 2027, 2028, 2030]);
 		expect(yearOptions({ currentYear: 2026, selectedYear: 2020 })).toStrictEqual([2020, 2025, 2026, 2027, 2028]);
+	});
+});
+
+describe("trackedDraft", () => {
+	it("reports the settings and whether a Region was chosen, and never the budget", () => {
+		const draft = { ...FILTERS, country: "es", region: "ct", ptoDays: 30, strategy: FilterStrategy.BALANCED };
+
+		expect(trackedDraft(draft)).toStrictEqual({
+			country: "es",
+			hasRegion: true,
+			year: 2026,
+			strategy: FilterStrategy.BALANCED,
+			allowPastDays: false,
+			carryOverMonths: 1,
+		});
+		expect(Object.keys(trackedDraft(draft))).not.toContain("ptoDays");
+		expect(Object.keys(trackedDraft(draft))).not.toContain("region");
 	});
 });

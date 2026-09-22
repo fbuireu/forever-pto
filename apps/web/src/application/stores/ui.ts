@@ -1,5 +1,15 @@
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
+
+export const QuickStartSource = {
+	NAV: "nav",
+	HERO: "hero",
+	PRICING: "pricing",
+	CLOSING: "closing",
+} as const;
+
+export type QuickStartSource = (typeof QuickStartSource)[keyof typeof QuickStartSource];
 
 interface UIState {
 	donatePopoverOpen: boolean;
@@ -12,7 +22,7 @@ interface UIActions {
 	closeDonatePopover: () => void;
 	setDonatePopoverOpen: (isOpen: boolean) => void;
 	clearDonatePopoverOpening: () => void;
-	openQuickStart: () => void;
+	openQuickStart: (source: QuickStartSource) => void;
 	closeQuickStart: () => void;
 	setQuickStartOpen: (isOpen: boolean) => void;
 }
@@ -47,8 +57,9 @@ export const useUIStore = create<UIStore>()(
 				set({ donatePopoverIsOpening: false });
 			},
 
-			openQuickStart: () => {
+			openQuickStart: (source: QuickStartSource) => {
 				set({ quickStartOpen: true });
+				track({ event: "quick_start_opened", properties: { source } });
 			},
 
 			closeQuickStart: () => {

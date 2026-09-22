@@ -1,3 +1,4 @@
+import { QuickStartSource } from "@application/stores/ui";
 import { Badge } from "@ui/modules/core/primitives/Badge";
 import { QuickStartTrigger } from "@ui/modules/pages/homepage/quick-start/QuickStartTrigger";
 import { SupportButton } from "@ui/modules/shared/SupportButton";
@@ -57,7 +58,7 @@ export const Pricing = async () => {
 							</li>
 						))}
 					</ul>
-					<QuickStartTrigger variant="outline" className="w-full justify-center">
+					<QuickStartTrigger source={QuickStartSource.PRICING} variant="outline" className="w-full justify-center">
 						{t("pricing.freeCta")}
 					</QuickStartTrigger>
 				</div>

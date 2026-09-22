@@ -1,4 +1,5 @@
 import { getWeekdayNames } from "@application/shared/utils/dates";
+import { QuickStartSource } from "@application/stores/ui";
 import { LOCALES } from "@infrastructure/i18n/locales";
 import { Badge } from "@ui/modules/core/primitives/Badge";
 import { Button } from "@ui/modules/core/primitives/Button";
@@ -74,7 +75,9 @@ export const Hero = async () => {
 					</p>
 
 					<div className="flex gap-4 flex-wrap items-center mb-7">
-						<QuickStartTrigger size="lg">{t("hero.plannerCta")}</QuickStartTrigger>
+						<QuickStartTrigger source={QuickStartSource.HERO} size="lg">
+							{t("hero.plannerCta")}
+						</QuickStartTrigger>
 						<Button variant="outline" size="lg" asChild>
 							<a href="#how">{t("hero.demoLink")}</a>
 						</Button>

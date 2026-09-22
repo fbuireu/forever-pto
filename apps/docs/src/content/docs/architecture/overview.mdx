@@ -34,8 +34,8 @@ either direction, so it is a measurement rather than a drawing.
 | from / to | `app` | `ui` | `application` | `domain` | `infrastructure` |
 | --- | --- | --- | --- | --- | --- |
 | `app` | | 82/16 | 7/6 | | 65/20 |
-| `ui` | | | 150/75 | 16/12 | 24/16 |
-| `application` | | 1/1 | | 15/8 | 35/10 |
+| `ui` | | | 154/77 | 16/12 | 26/18 |
+| `application` | | 1/1 | | 15/8 | 36/11 |
 | `domain` | | | 13/9 | | 12/3 |
 | `infrastructure` | | 7/2 | 33/23 | 6/5 | |
 | `middleware.ts` | | | | | 5/1 |
@@ -55,11 +55,11 @@ flowchart LR
   APP -->|82| UI
   APP -->|7| APPL
   APP -->|65| INFRA
-  UI -->|150| APPL
+  UI -->|154| APPL
   UI -->|16| DOM
-  UI -->|24| INFRA
+  UI -->|26| INFRA
   APPL -->|15| DOM
-  APPL -->|35| INFRA
+  APPL -->|36| INFRA
   APPL -.->|1, the known inversion| UI
   DOM -.->|13, ADR 0012| APPL
   DOM -.->|12, ADR 0003| INFRA

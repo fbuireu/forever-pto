@@ -4,12 +4,20 @@ import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const ui = vi.hoisted(() => ({ quickStartOpen: false, setQuickStartOpen: vi.fn() }));
+const track = vi.hoisted(() => vi.fn());
 
 vi.mock("@application/stores/ui", () => ({
 	useUIStore: (selector: (state: typeof ui) => unknown) => selector(ui),
 }));
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
 vi.mock("./QuickStartForm", () => ({
-	QuickStartForm: ({ currentYear }: { currentYear: number }) => <div data-testid="form" data-year={currentYear} />,
+	QuickStartForm: ({ currentYear, onStepChange }: { currentYear: number; onStepChange?: (step: string) => void }) => (
+		<div data-testid="form" data-year={currentYear}>
+			<button type="button" onClick={() => onStepChange?.("ptoDays")}>
+				advance
+			</button>
+		</div>
+	),
 }));
 
 import { QuickStartDialog } from "./QuickStartDialog";
@@ -24,6 +32,7 @@ const renderDialog = () =>
 beforeEach(() => {
 	ui.quickStartOpen = false;
 	ui.setQuickStartOpen.mockClear();
+	track.mockClear();
 });
 
 describe("QuickStartDialog", () => {
@@ -51,5 +60,28 @@ describe("QuickStartDialog", () => {
 		fireEvent.click(screen.getByRole("button", { name: enMessages.a11y.closeDialog }));
 
 		expect(ui.setQuickStartOpen).toHaveBeenCalledExactlyOnceWith(false);
+	});
+
+	it("reports a close as an abandonment, naming the step that was showing", () => {
+		ui.quickStartOpen = true;
+		renderDialog();
+
+		fireEvent.click(screen.getByRole("button", { name: "advance" }));
+		fireEvent.click(screen.getByRole("button", { name: enMessages.a11y.closeDialog }));
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({ event: "quick_start_abandoned", properties: { step: "ptoDays" } });
+	});
+
+	it("reports nothing while the store closes it from the outside, which is what a finish does", () => {
+		ui.quickStartOpen = true;
+		const { rerender } = renderDialog();
+		ui.quickStartOpen = false;
+		rerender(
+			<NextIntlClientProvider locale="en" messages={enMessages}>
+				<QuickStartDialog countries={[]} currentYear={2026} />
+			</NextIntlClientProvider>,
+		);
+
+		expect(track).not.toHaveBeenCalled();
 	});
 });

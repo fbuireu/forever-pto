@@ -8,8 +8,8 @@ const mockGetTranslations = vi.hoisted(() => vi.fn());
 
 vi.mock("next-intl/server", () => ({ getTranslations: mockGetTranslations }));
 vi.mock("@ui/modules/pages/homepage/quick-start/QuickStartTrigger", () => ({
-	QuickStartTrigger: ({ children }: { children: ReactNode }) => (
-		<button type="button" data-testid="quick-start-trigger">
+	QuickStartTrigger: ({ children, source }: { children: ReactNode; source: string }) => (
+		<button type="button" data-testid="quick-start-trigger" data-source={source}>
 			{children}
 		</button>
 	),
@@ -45,6 +45,7 @@ describe("HomepageCta", () => {
 	it("opens the quick start from the call to action rather than linking straight into the planner", async () => {
 		await renderCta();
 
+		expect(screen.getByTestId("quick-start-trigger").getAttribute("data-source")).toBe("closing");
 		expect(screen.getByTestId("quick-start-trigger").textContent).toBe(closing.cta);
 		expect(screen.queryByRole("link", { name: closing.cta })).toBeNull();
 	});

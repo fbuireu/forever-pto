@@ -8,7 +8,11 @@ type TrackEventName =
 	| "upgrade_modal_opened"
 	| "feature_unlocked"
 	| "planner_generated"
-	| "contact_form_submitted";
+	| "contact_form_submitted"
+	| "quick_start_opened"
+	| "quick_start_step_completed"
+	| "quick_start_abandoned"
+	| "quick_start_completed";
 
 interface TrackProperties {
 	[key: string]: unknown;

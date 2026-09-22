@@ -5,6 +5,7 @@ import { useRouter } from "@application/i18n/navigation";
 import { useFiltersStore } from "@application/stores/filters";
 import { useLocationStore } from "@application/stores/location";
 import { useUIStore } from "@application/stores/ui";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@ui/modules/core/animate/base/Dialog";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { Progress, ProgressTrack } from "@ui/modules/core/primitives/Progress";
@@ -15,7 +16,14 @@ import { useShallow } from "zustand/react/shallow";
 import { QuickStartLocationStep } from "./QuickStartLocationStep";
 import { QuickStartPtoDaysStep } from "./QuickStartPtoDaysStep";
 import { QuickStartSettingsStep } from "./QuickStartSettingsStep";
-import { canLeaveStep, createDraft, QUICK_START_STEPS, type QuickStartDraft, QuickStartStep } from "./steps";
+import {
+	canLeaveStep,
+	createDraft,
+	QUICK_START_STEPS,
+	type QuickStartDraft,
+	QuickStartStep,
+	trackedDraft,
+} from "./steps";
 
 const PLANNER_PATH = "/planner";
 const PERCENT = 100;
@@ -23,9 +31,10 @@ const PERCENT = 100;
 interface QuickStartFormProps {
 	countries: CountryDTO[];
 	currentYear: number;
+	onStepChange?: (step: QuickStartStep) => void;
 }
 
-export const QuickStartForm = ({ countries, currentYear }: QuickStartFormProps) => {
+export const QuickStartForm = ({ countries, currentYear, onStepChange }: QuickStartFormProps) => {
 	const t = useTranslations("quickStart");
 	const router = useRouter();
 	const closeQuickStart = useUIStore((state) => state.closeQuickStart);
@@ -46,6 +55,10 @@ export const QuickStartForm = ({ countries, currentYear }: QuickStartFormProps) 
 	}, [draft.country, fetchRegions]);
 
 	const step = QUICK_START_STEPS[stepIndex];
+
+	useEffect(() => {
+		onStepChange?.(step);
+	}, [step, onStepChange]);
 	const isFirstStep = stepIndex === 0;
 	const isLastStep = stepIndex === QUICK_START_STEPS.length - 1;
 	const progress = ((stepIndex + 1) / QUICK_START_STEPS.length) * PERCENT;
@@ -55,7 +68,10 @@ export const QuickStartForm = ({ countries, currentYear }: QuickStartFormProps) 
 	}, []);
 
 	const goBack = () => setStepIndex((index) => Math.max(0, index - 1));
-	const goNext = () => setStepIndex((index) => Math.min(QUICK_START_STEPS.length - 1, index + 1));
+	const goNext = () => {
+		track({ event: "quick_start_step_completed", properties: { step } });
+		setStepIndex((index) => Math.min(QUICK_START_STEPS.length - 1, index + 1));
+	};
 
 	const finish = () => {
 		const filters = useFiltersStore.getState();
@@ -66,6 +82,7 @@ export const QuickStartForm = ({ countries, currentYear }: QuickStartFormProps) 
 		filters.setStrategy(draft.strategy);
 		filters.setAllowPastDays(draft.allowPastDays);
 		filters.setCarryOverMonths(draft.carryOverMonths);
+		track({ event: "quick_start_completed", properties: trackedDraft(draft) });
 		closeQuickStart();
 		router.push(PLANNER_PATH);
 	};

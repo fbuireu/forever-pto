@@ -14,8 +14,8 @@ vi.mock("@ui/modules/core/primitives/Badge", () => ({
 	Badge: ({ children }: { children: ReactNode }) => <span>{children}</span>,
 }));
 vi.mock("@ui/modules/pages/homepage/quick-start/QuickStartTrigger", () => ({
-	QuickStartTrigger: ({ children, className }: { children: ReactNode; className?: string }) => (
-		<button type="button" data-testid="quick-start-trigger" className={className}>
+	QuickStartTrigger: ({ children, className, source }: { children: ReactNode; className?: string; source: string }) => (
+		<button type="button" data-testid="quick-start-trigger" className={className} data-source={source}>
 			{children}
 		</button>
 	),
@@ -71,6 +71,7 @@ describe("Pricing", () => {
 	it("starts the free plan through the quick start and the supporter plan in the donation flow", async () => {
 		await renderPricing({ locale: "en", messages: enMessages });
 
+		expect(screen.getByTestId("quick-start-trigger").getAttribute("data-source")).toBe("pricing");
 		expect(screen.getByTestId("quick-start-trigger").textContent).toBe(pricing.freeCta);
 		expect(screen.queryByRole("link", { name: pricing.freeCta })).toBeNull();
 		expect(screen.getByRole("button", { name: pricing.lifetimeCta })).toBeDefined();

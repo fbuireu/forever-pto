@@ -12,10 +12,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const router = vi.hoisted(() => ({ push: vi.fn() }));
 const cookie = vi.hoisted(() => ({ country: undefined as string | undefined }));
 const getRegions = vi.hoisted(() => vi.fn());
+const track = vi.hoisted(() => vi.fn());
 
 vi.mock("@application/i18n/navigation", () => ({ useRouter: () => router }));
 vi.mock("@ui/utils/userCountry", () => ({ getUserCountryFromCookie: () => cookie.country }));
 vi.mock("@infrastructure/services/regions/getRegions", () => ({ getRegions }));
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
 vi.mock("@ui/modules/premium/PremiumFeature", () => ({
 	PremiumFeature: ({ children }: { children: ReactNode }) => <>{children}</>,
 }));
@@ -52,6 +54,7 @@ const finish = () => fireEvent.click(screen.getByRole("button", { name: quickSta
 
 beforeEach(() => {
 	router.push.mockClear();
+	track.mockClear();
 	cookie.country = undefined;
 	getRegions.mockReset();
 	getRegions.mockImplementation(({ countryCode }: { countryCode: string }) => REGIONS_BY_COUNTRY[countryCode] ?? []);
@@ -139,6 +142,47 @@ describe("QuickStartForm", () => {
 		expect(filters.carryOverMonths).toBe(4);
 		expect(useUIStore.getState().quickStartOpen).toBe(false);
 		expect(router.push).toHaveBeenCalledExactlyOnceWith("/planner");
+	});
+
+	it("reports each step it leaves and the settings it finishes with, never the budget", () => {
+		cookie.country = "es";
+		renderForm();
+
+		next();
+		fireEvent.click(screen.getByRole("button", { name: enMessages.ptoDays.increase }));
+		next();
+		finish();
+
+		expect(track.mock.calls.map(([call]) => call)).toStrictEqual([
+			{ event: "quick_start_step_completed", properties: { step: "location" } },
+			{ event: "quick_start_step_completed", properties: { step: "ptoDays" } },
+			{
+				event: "quick_start_completed",
+				properties: {
+					country: "es",
+					hasRegion: false,
+					year: expect.any(Number),
+					strategy: FilterStrategy.GROUPED,
+					allowPastDays: false,
+					carryOverMonths: 1,
+				},
+			},
+		]);
+		expect(JSON.stringify(track.mock.calls)).not.toContain('ptoDays":23');
+	});
+
+	it("tells its owner which step is showing, so an abandonment can name it", () => {
+		cookie.country = "es";
+		const onStepChange = vi.fn();
+		render(
+			<NextIntlClientProvider locale="en" messages={enMessages}>
+				<QuickStartForm countries={COUNTRIES} currentYear={2026} onStepChange={onStepChange} />
+			</NextIntlClientProvider>,
+		);
+
+		expect(onStepChange).toHaveBeenLastCalledWith("location");
+		next();
+		expect(onStepChange).toHaveBeenLastCalledWith("ptoDays");
 	});
 
 	it("leaves the store untouched until the last step is confirmed", () => {

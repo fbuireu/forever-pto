@@ -11,8 +11,8 @@ vi.mock("@application/i18n/navigation", () => ({
 	Link: ({ children, ...props }: ComponentProps<"a">) => <a {...props}>{children}</a>,
 }));
 vi.mock("@ui/modules/pages/homepage/quick-start/QuickStartTrigger", () => ({
-	QuickStartTrigger: ({ children }: { children: ReactNode }) => (
-		<button type="button" data-testid="quick-start-trigger">
+	QuickStartTrigger: ({ children, source }: { children: ReactNode; source: string }) => (
+		<button type="button" data-testid="quick-start-trigger" data-source={source}>
 			{children}
 		</button>
 	),
@@ -66,6 +66,7 @@ describe("Header", () => {
 	it("opens the quick start from the trial action rather than linking straight into the planner", async () => {
 		await renderHeader();
 
+		expect(screen.getByTestId("quick-start-trigger").getAttribute("data-source")).toBe("nav");
 		expect(screen.getByTestId("quick-start-trigger").textContent).toBe(nav.trialAction);
 		expect(screen.queryByRole("link", { name: nav.trialAction })).toBeNull();
 	});

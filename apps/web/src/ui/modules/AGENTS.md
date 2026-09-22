@@ -108,6 +108,16 @@ same setters the sidebar does, in the order that survives `setCountry` clearing 
 pushes `/planner` through `@application/i18n/navigation`, where `CalendarList.tsx` recomputes from the
 store as it always has. No search params are involved.
 
+**The funnel is four `track()` events, and the budget is not in any of them.** `openQuickStart(source)` on the
+`ui` store reports `quick_start_opened` with the call to action (`nav`, `hero`, `pricing`, `closing`), which is
+why `QuickStartTrigger` takes a `source` rather than the store guessing one. The form reports
+`quick_start_step_completed` on every Next and `quick_start_completed` on finish with `trackedDraft(draft)`
+from `steps.ts`: Country, whether a Region was chosen, year, Strategy, past days, Carry-over Months, and
+deliberately not `ptoDays`, because the docs site promises the budget never leaves the browser. The dialog
+reports `quick_start_abandoned` from `onOpenChange(false)`, the close button, the backdrop and Escape, naming
+the step the form last announced through `onStepChange`; a finish closes through the store, which fires no
+`onOpenChange`, so it is never counted as an abandonment.
+
 **Year is offered as four chips, not the sidebar's ten.** Last year, this year and the two after cover the
 question the wizard asks; a stored year outside that span is kept in the list rather than lost, and the
 sidebar still offers the full range.

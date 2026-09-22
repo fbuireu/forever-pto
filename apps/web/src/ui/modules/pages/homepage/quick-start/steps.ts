@@ -60,3 +60,14 @@ export function yearOptions({ currentYear, selectedYear }: YearOptionsParams): n
 
 	return years.includes(selectedYear) ? years : [selectedYear, ...years].sort((a, b) => a - b);
 }
+
+export function trackedDraft(draft: QuickStartDraft) {
+	return {
+		country: draft.country,
+		hasRegion: draft.region !== "",
+		year: draft.year,
+		strategy: draft.strategy,
+		allowPastDays: draft.allowPastDays,
+		carryOverMonths: draft.carryOverMonths,
+	};
+}

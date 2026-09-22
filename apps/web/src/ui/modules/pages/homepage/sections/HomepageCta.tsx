@@ -1,3 +1,4 @@
+import { QuickStartSource } from "@application/stores/ui";
 import { QuickStartTrigger } from "@ui/modules/pages/homepage/quick-start/QuickStartTrigger";
 import { getTranslations } from "next-intl/server";
 import { CtaShapesClient } from "./CtaShapesClient";
@@ -23,6 +24,7 @@ export const HomepageCta = async () => {
 				</h2>
 				<p className="text-[19px] opacity-85 mb-8">{t("closing.description")}</p>
 				<QuickStartTrigger
+					source={QuickStartSource.CLOSING}
 					size="lg"
 					className="shadow-[var(--shadow-brutal-btn-inverted)] hover:shadow-[var(--shadow-brutal-btn-inverted-hover)] active:shadow-[var(--shadow-brutal-btn-inverted-active)]"
 				>
