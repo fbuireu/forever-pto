@@ -1,3 +1,10 @@
+# [forever-pto-docs-v1.4.1](https://github.com/fbuireu/forever-pto/compare/docs-v1.4.0...docs-v1.4.1) (2026-09-23)
+
+
+### Bug Fixes
+
+* **web:** rename the planning input's value property, which GA4 reserves ([ac8fd28](https://github.com/fbuireu/forever-pto/commit/ac8fd28daeb4dca225035438fb9ce7f87e908a87))
+
 # [forever-pto-docs-v1.4.0](https://github.com/fbuireu/forever-pto/compare/docs-v1.3.4...docs-v1.4.0) (2026-09-23)
 
 
