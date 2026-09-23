@@ -6,6 +6,12 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      release:
+        description: Also run Semantic Release (docs), for a push whose release was refused because another commit landed on main while it ran
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -259,7 +265,7 @@ jobs:
 
   release-docs:
     name: Semantic Release (docs)
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.release)) }}
     needs: [deploy, smoke]
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -277,6 +283,17 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.PAT }}
           persist-credentials: false
+      - name: Fast-forward over the sibling package's release commit
+        run: |
+          git fetch --quiet origin main
+          if [ -z "$(git rev-list HEAD..origin/main)" ]; then
+            exit 0
+          fi
+          if git log --format=%s HEAD..origin/main | grep -qv '\[skip ci\]'; then
+            echo "::warning::main moved past this run by more than a release commit, so semantic-release will stand down. Dispatch docs.yml on main with the release input to cut the release."
+            exit 0
+          fi
+          git merge --ff-only origin/main
       - uses: ./.github/actions/prepare-env
       - name: Semantic Release
         working-directory: apps/docs
