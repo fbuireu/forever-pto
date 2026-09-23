@@ -1,3 +1,10 @@
+# [forever-pto-docs-v1.4.0](https://github.com/fbuireu/forever-pto/compare/docs-v1.3.4...docs-v1.4.0) (2026-09-23)
+
+
+### Features
+
+* **web:** open a quick start from the homepage calls to action ([#403](https://github.com/fbuireu/forever-pto/issues/403)) ([7853903](https://github.com/fbuireu/forever-pto/commit/7853903ae3ea90095a79a771572cc3dfe51982af))
+
 # [forever-pto-docs-v1.3.4](https://github.com/fbuireu/forever-pto/compare/docs-v1.3.3...docs-v1.3.4) (2026-09-17)
 
 
