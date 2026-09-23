@@ -28,7 +28,7 @@ Triggers:
 
 - `pull_request` → `changes`, then build & test + versioned preview when the range touches the list, and always `Check (docs)`, the aggregate the ruleset requires.
 - `push` to `main` → build & test + production deploy + smoke run + release when the range touches the list.
-- `workflow_dispatch` → treated as a docs change: build, deploy and smoke, which is how `ci.yml`'s `docs-refresh` rebuilds the site after a web release and how a redeploy without a commit is done. With the `release` input checked, `release-docs` runs behind the smoke run as well, for a release that was refused when a commit landed on `main` mid-run.
+- `workflow_dispatch` → treated as a docs change: build, deploy and smoke, which is how `ci.yml`'s `docs-refresh` rebuilds the site after a web release and how a redeploy without a commit is done.
 
 ## Build & test job
 

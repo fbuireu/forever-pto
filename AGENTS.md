@@ -163,9 +163,8 @@ release commit behind the remote and semantic-release stood down on *The local b
 remote one*, green and releasing nothing. Every push touching both packages lost its web release that way,
 the quick-start `feat` of 2026-09-23 among them, and the concurrency group could not have prevented it: it
 orders the jobs and cannot move a checkout. Both release jobs now fast-forward onto `origin/main` before
-releasing when everything that landed since carries `[skip ci]`, which is only ever the sibling's release
-commit, and leave the checkout alone otherwise, so a real commit landing mid-run still stands the job down
-and the dispatch below is the recovery. `apps/docs`
+releasing, whatever landed since: the sibling's release commit, and any merge that arrived mid-run, which
+joins the release rather than refusing its push; the paragraph on merges below carries what that costs. `apps/docs`
 carried no changelog, npm or git plugin for eight tags on the theory that a second pusher was the race; the
 group was always the guard, and the cost was a `docs-v1.2.3` tag beside a `package.json` reading `0.0.0` and
 release notes that existed only on GitHub. Nothing read that version: the site displays the **app's**, read
@@ -200,21 +199,21 @@ actually retires the problem is the version line moving past the orphaned tag, s
 ever reads the *highest* reachable one: an unreachable tag only stops a release while it is the version the
 analyser would compute next.
 
-**Nothing may land on `main` while `release-web` is running, and a plain merge is enough to break it.**
-`@semantic-release/git` commits the version bump and the changelog on the sha the job checked out and pushes
-`HEAD:main`; a commit that reached `main` in the meantime makes that push a non-fast-forward and the job fails
-after the deploy and the smoke run have already passed. It happened on 2026-09-06: the release for the
-Better Stack work started at 06:38 on `81c3467b`, a docs-only pull request was squash-merged at 06:39, and the
-push was refused at 06:41. That run leaves no tag behind, so there is nothing to graft, and re-running the
-failed job does not release either: semantic-release checks that the branch it holds is up to date with the
-remote before publishing and stands down when it is not. What cuts the release is a manual dispatch of
-`ci.yml` on `main` with its `release` input checked: the run redeploys the head of `main`, `smoke` answers for
-it, and `release-web` starts from a checkout that *is* up to date with the remote, so the version is computed
-over every commit since the last tag, the refused one included. Before the input existed the recovery was a
-fresh push touching `WEB_PATHS`, a commit whose only content was the need to re-trigger the job. `docs.yml`
-carries the same input for `release-docs`, since the same push can refuse it. The window to respect is still
-from `deploy-production` going green to `Semantic Release (web)` finishing, a few minutes; queue the next merge
-behind it rather than beside it, and reach for the dispatch when one lands beside it anyway.
+**A merge landing while `release-web` runs joins that release instead of breaking it.** `@semantic-release/git`
+commits the version bump and the changelog on the branch the job holds and pushes `HEAD:main`, and
+`actions/checkout` pins the run's own sha, so a commit that reached `main` in the meantime used to make that
+push a non-fast-forward: the job failed after the deploy and the smoke run had passed, no tag was written, and
+a re-run stood down on *The local branch main is behind the remote one*. It happened on 2026-09-06: the release
+for the Better Stack work started at 06:38 on `81c3467b`, a docs-only pull request was squash-merged at 06:39,
+and the push was refused at 06:41; the recovery then was a filler commit touching `WEB_PATHS`. Both release jobs
+now fast-forward onto `origin/main` before semantic-release runs, so the version is computed over every commit
+on `main` at that moment, the ones that landed mid-run included, and the run those commits queued finds nothing
+left to publish. The cost is stated rather than hidden: a tag can precede the deploy of the commits it absorbed
+by the minutes their queued run takes, and `Verify` ran on them in their pull request rather than in the run
+that released them. Two cases still stand a release job down, and both heal on their own: `main` rewritten
+under the run, where the sha is no ancestor of the head and the step leaves the checkout alone, and a merge
+landing in the seconds between the fast-forward and the push. Neither writes a tag, so the run the newer head
+queued computes the release over everything since the last one and cuts it; nobody has to dispatch anything.
 
 **A change confined to the repo root releases nothing**: `adr/`, `tests/`, `README.md`, `CONTEXT.md`, this
 file. That is correct and occasionally surprising. **It is narrower than it reads**: `WEB_PATHS` in `ci.yml`
@@ -333,17 +332,14 @@ its bundle is built from**, not on its own folder. That Worker imported the log-
 and the filter named only its own directory, so editing the contract redeployed the app and left the Worker
 running the previous bundle, invisibly, because its unit test read the source module rather than the bundle.
 
-**A manual dispatch of `ci.yml` on `main` is the credential-rotation path, and with its `release` input
-checked it is the release-recovery path too.** It runs `deploy-production` with `smoke` behind it, because
-every credential is read at build or deploy time (the Worker secrets ride `--secrets-file`, the public
-variables are inlined by the build), so rotating one changes no file and would otherwise leave the old value
-live until an unrelated commit came along. The BetterStack credentials are not among them: endpoint and token
-live on the Cloudflare destination, so reissuing that source needs no deploy. `release-web` runs on a dispatch
-only when `release` is checked; left at its default the dispatch redeploys the same sha and versions nothing,
-which is right for a rotation. Checked, it is how a release refused by a commit landing mid-run is cut without
-a filler commit; the *Releases* section carries the failure it recovers from. `docs.yml` takes the same input
-for `release-docs`, and `docs-refresh` dispatches it without one, so the rebuild after a web release never
-tries to version the docs.
+**A manual dispatch of `ci.yml` on `main` is the credential-rotation path.** It runs `deploy-production` with
+`smoke` behind it, because every credential is read at build or deploy time (the Worker secrets ride
+`--secrets-file`, the public variables are inlined by the build), so rotating one changes no file and would
+otherwise leave the old value live until an unrelated commit came along. The BetterStack credentials are not
+among them: endpoint and token live on the Cloudflare destination, so reissuing that source needs no deploy.
+`release-web` stays push-gated, since a dispatch redeploys the same sha and there is nothing to version; a
+release the push-triggered job stood down on is cut by the next run, as the *Releases* section says, not by a
+dispatch.
 
 **`smoke` is the only job that ever touches production, and until this branch there was none.** `e2e` needs
 `deploy-development`, which runs on `pull_request` only, so a push to `main` deployed production, cut a tag
