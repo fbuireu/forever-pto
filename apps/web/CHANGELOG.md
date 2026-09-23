@@ -10,18 +10,6 @@
 
 * **web:** open a quick start from the homepage calls to action ([#403](https://github.com/fbuireu/forever-pto/issues/403)) ([7853903](https://github.com/fbuireu/forever-pto/commit/7853903ae3ea90095a79a771572cc3dfe51982af))
 
-# [forever-pto-web-v1.12.0](https://github.com/fbuireu/forever-pto/compare/web-v1.11.4...web-v1.12.0) (2026-09-23)
-
-
-### Bug Fixes
-
-* **web:** rename the planning input's value property, which GA4 reserves ([ac8fd28](https://github.com/fbuireu/forever-pto/commit/ac8fd28daeb4dca225035438fb9ce7f87e908a87))
-
-
-### Features
-
-* **web:** open a quick start from the homepage calls to action ([#403](https://github.com/fbuireu/forever-pto/issues/403)) ([7853903](https://github.com/fbuireu/forever-pto/commit/7853903ae3ea90095a79a771572cc3dfe51982af))
-
 # [forever-pto-web-v1.11.4](https://github.com/fbuireu/forever-pto/compare/web-v1.11.3...web-v1.11.4) (2026-09-15)
 
 
