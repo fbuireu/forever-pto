@@ -152,8 +152,8 @@ describe("PtoDays analytics", () => {
 		await userEvent.click(decrease());
 
 		expect(track.mock.calls.map(([call]) => call)).toStrictEqual([
-			{ event: "planning_input_changed", properties: { input: "ptoDays", value: 24 } },
-			{ event: "planning_input_changed", properties: { input: "ptoDays", value: 22 } },
+			{ event: "planning_input_changed", properties: { input: "ptoDays", inputValue: 24 } },
+			{ event: "planning_input_changed", properties: { input: "ptoDays", inputValue: 22 } },
 		]);
 	});
 

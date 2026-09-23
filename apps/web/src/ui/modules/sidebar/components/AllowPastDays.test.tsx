@@ -64,7 +64,7 @@ describe("AllowPastDays analytics", () => {
 		expect(filtersState.setAllowPastDays).toHaveBeenCalledExactlyOnceWith(true);
 		expect(track).toHaveBeenCalledExactlyOnceWith({
 			event: "planning_input_changed",
-			properties: { input: "allowPastDays", value: true },
+			properties: { input: "allowPastDays", inputValue: true },
 		});
 	});
 });

@@ -136,7 +136,7 @@ describe("Strategy analytics", () => {
 
 		expect(track).toHaveBeenCalledExactlyOnceWith({
 			event: "planning_input_changed",
-			properties: { input: "strategy", value: FilterStrategy.OPTIMIZED },
+			properties: { input: "strategy", inputValue: FilterStrategy.OPTIMIZED },
 		});
 	});
 });

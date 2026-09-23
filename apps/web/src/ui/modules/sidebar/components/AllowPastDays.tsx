@@ -21,7 +21,7 @@ export const AllowPastDays = () => {
 
 	const handleChange = (value: boolean) => {
 		setAllowPastDays(value);
-		track({ event: "planning_input_changed", properties: { input: "allowPastDays", value } });
+		track({ event: "planning_input_changed", properties: { input: "allowPastDays", inputValue: value } });
 	};
 
 	return (

@@ -91,7 +91,7 @@ describe("CountriesClient analytics", () => {
 
 		expect(track).toHaveBeenCalledExactlyOnceWith({
 			event: "planning_input_changed",
-			properties: { input: "country", value: "FR" },
+			properties: { input: "country", inputValue: "FR" },
 		});
 	});
 });

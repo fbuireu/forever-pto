@@ -28,7 +28,7 @@ export const CountriesClient = ({ countries }: CountriesClientProps) => {
 
 	const handleCountryChange = (value: string) => {
 		setCountry(value);
-		track({ event: "planning_input_changed", properties: { input: "country", value } });
+		track({ event: "planning_input_changed", properties: { input: "country", inputValue: value } });
 	};
 
 	return (
