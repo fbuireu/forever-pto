@@ -7,6 +7,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const store = vi.hoisted(() => ({ year: 2026, setYear: vi.fn() }));
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("@application/stores/filters", () => ({
 	useFiltersStore: (selector: (state: unknown) => unknown) => selector({ year: store.year, setYear: store.setYear }),
 }));
@@ -106,5 +109,19 @@ describe("Years", () => {
 
 		expect(trigger().getAttribute("aria-expanded")).toBe("false");
 		expect(trigger().getAttribute("aria-haspopup")).toBe("listbox");
+	});
+});
+
+describe("Years analytics", () => {
+	it("reports the year that was picked", async () => {
+		track.mockClear();
+		renderYears(2026);
+
+		await userEvent.click(screen.getByRole("option", { name: "2027" }));
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({
+			event: "planning_input_changed",
+			properties: { input: "year", value: 2027 },
+		});
 	});
 });

@@ -11,6 +11,9 @@ const { holidaysState, openHandler, loaders } = vi.hoisted(() => ({
 	loaders: [] as (() => Promise<{ default: unknown }>)[],
 }));
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("@application/stores/holidays", () => ({
 	useHolidaysStore: (selector: (state: typeof holidaysState) => unknown) => selector(holidaysState),
 }));
@@ -514,5 +517,79 @@ describe("HolidaysTable with no holidays at all", () => {
 
 		expect(view.getAllByText(enMessages.holidaysTable.noHolidays).length).toBeGreaterThan(0);
 		expect(view.queryByText(enMessages.holidaysTable.noHolidaysFound)).toBeNull();
+	});
+});
+
+describe("HolidaysTable analytics", () => {
+	it("reports each toolbar action as the modal it opens, with the tab it was opened from", () => {
+		track.mockClear();
+		const view = renderCustomTable();
+
+		press(view, ADD);
+		fireEvent.click(desktopRow(view, "Shutdown"));
+		press(view, EDIT);
+		press(view, /Delete \(1\)/);
+
+		const opened = track.mock.calls.map(([call]) => call).filter(({ event }) => event === "holiday_modal_opened");
+		expect(opened).toStrictEqual([
+			{ event: "holiday_modal_opened", properties: { action: "add", variant: HolidayVariant.CUSTOM } },
+			{ event: "holiday_modal_opened", properties: { action: "edit", variant: HolidayVariant.CUSTOM } },
+			{ event: "holiday_modal_opened", properties: { action: "delete", variant: HolidayVariant.CUSTOM } },
+		]);
+	});
+});
+
+describe("HolidaysTable analytics on the rows", () => {
+	beforeEach(() => track.mockClear());
+
+	it("reports a row picked and un-picked, and a select-all, with the tab and never the name", () => {
+		const view = renderTable();
+
+		fireEvent.click(desktopRow(view, "Alpha"));
+		fireEvent.click(desktopRow(view, "Alpha"));
+		fireEvent.click(selectAllBoxes(view, enMessages.holidaysTable.selectAll)[0]);
+
+		expect(track.mock.calls.map(([call]) => call)).toStrictEqual([
+			{
+				event: "holiday_selection_changed",
+				properties: { variant: HolidayVariant.NATIONAL, scope: "one", selected: true },
+			},
+			{
+				event: "holiday_selection_changed",
+				properties: { variant: HolidayVariant.NATIONAL, scope: "one", selected: false },
+			},
+			{
+				event: "holiday_selection_changed",
+				properties: { variant: HolidayVariant.NATIONAL, scope: "all", selected: true },
+			},
+		]);
+		expect(JSON.stringify(track.mock.calls)).not.toContain("Alpha");
+	});
+
+	it("reports a sort by the column it was sorted on", () => {
+		const view = renderTable();
+
+		fireEvent.click(view.getByRole("button", { name: enMessages.holidayTableHeader.holiday }));
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({
+			event: "holidays_sorted",
+			properties: { variant: HolidayVariant.NATIONAL, key: "name" },
+		});
+	});
+
+	it("reports a search once when it starts, never what was typed", () => {
+		const view = renderTable();
+		const search = view.getByPlaceholderText(enMessages.holidaysTable.searchPlaceholder);
+
+		fireEvent.change(search, { target: { value: "Al" } });
+		fireEvent.change(search, { target: { value: "Alp" } });
+		fireEvent.change(search, { target: { value: "" } });
+		fireEvent.change(search, { target: { value: "Be" } });
+
+		expect(track.mock.calls.map(([call]) => call)).toStrictEqual([
+			{ event: "holidays_searched", properties: { variant: HolidayVariant.NATIONAL } },
+			{ event: "holidays_searched", properties: { variant: HolidayVariant.NATIONAL } },
+		]);
+		expect(JSON.stringify(track.mock.calls)).not.toContain("Al");
 	});
 });

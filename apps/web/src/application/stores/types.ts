@@ -53,7 +53,16 @@ export const DayRefusal = {
 
 export type DayRefusal = (typeof DayRefusal)[keyof typeof DayRefusal];
 
-export type DayOutcome = { applied: true } | { applied: false; reason: DayRefusal };
+export const DayChange = {
+	MANUAL_DAY_ADDED: "manual_day_added",
+	MANUAL_DAY_REMOVED: "manual_day_removed",
+	SUGGESTED_DAY_REMOVED: "suggested_day_removed",
+	REMOVED_DAY_RESTORED: "removed_day_restored",
+} as const;
+
+export type DayChange = (typeof DayChange)[keyof typeof DayChange];
+
+export type DayOutcome = { applied: true; change: DayChange } | { applied: false; reason: DayRefusal };
 
 export const HolidayRefusal = {
 	DATE_HELD_BY_HOLIDAY: "date_held_by_holiday",

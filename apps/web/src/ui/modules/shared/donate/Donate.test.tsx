@@ -33,6 +33,7 @@ vi.mock("@application/stores/premium", () => ({
 }));
 vi.mock("@application/stores/ui", () => ({
 	useUIStore: (selector: (state: typeof uiState) => unknown) => selector(uiState),
+	DonateSource: { FLOATING: "floating" },
 }));
 vi.mock("@application/shared/utils/clientLog", () => ({ logClientError }));
 vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
@@ -47,6 +48,9 @@ vi.mock("@ui/modules/core/animate/base/Popover", () => ({
 		<div>
 			<button type="button" onClick={() => onOpenChange(false)}>
 				dismiss
+			</button>
+			<button type="button" onClick={() => onOpenChange(true)}>
+				open
 			</button>
 			{children}
 		</div>
@@ -231,6 +235,7 @@ describe("once the checkout is on screen", () => {
 
 		expect(screen.getByRole("button", { name: "donate" })).toBeDefined();
 		expect(uiState.setDonatePopoverOpen).not.toHaveBeenCalled();
+		expect(track).toHaveBeenLastCalledWith({ event: "payment_cancelled" });
 	});
 });
 
@@ -241,6 +246,16 @@ describe("the popover's open state", () => {
 		fireEvent.click(screen.getByRole("button", { name: "dismiss" }));
 
 		expect(uiState.setDonatePopoverOpen).toHaveBeenCalledExactlyOnceWith(false);
+		expect(track).not.toHaveBeenCalled();
+	});
+
+	it("reports an open from the floating button as its own source, and a close as nothing", () => {
+		renderDonate();
+
+		fireEvent.click(screen.getByRole("button", { name: "open" }));
+
+		expect(uiState.setDonatePopoverOpen).toHaveBeenCalledExactlyOnceWith(true);
+		expect(track).toHaveBeenCalledExactlyOnceWith({ event: "donate_opened", properties: { source: "floating" } });
 	});
 });
 

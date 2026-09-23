@@ -26,6 +26,13 @@ export const PremiumFeatureId = {
 
 export type PremiumFeatureId = (typeof PremiumFeatureId)[keyof typeof PremiumFeatureId];
 
+export const PremiumOrigin = {
+	PLANNER: "planner",
+	QUICK_START: "quick_start",
+} as const;
+
+export type PremiumOrigin = (typeof PremiumOrigin)[keyof typeof PremiumOrigin];
+
 interface PremiumState {
 	premiumKey: string | null;
 	userEmail: string | null;
@@ -44,7 +51,7 @@ interface SetPremiumStatusParams {
 interface PremiumActions {
 	verifyEmail: (email: string) => Promise<boolean>;
 	checkExistingSession: (options?: { force?: boolean }) => Promise<void>;
-	showPremiumModal: (feature: PremiumFeatureId) => void;
+	showPremiumModal: (feature: PremiumFeatureId, origin?: PremiumOrigin) => void;
 	closeModal: () => void;
 	setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => void;
 	refreshPremiumStatus: () => Promise<void>;
@@ -159,9 +166,9 @@ export const usePremiumStore = create<PremiumStore>()(
 					}
 				},
 
-				showPremiumModal: (feature: PremiumFeatureId) => {
+				showPremiumModal: (feature: PremiumFeatureId, origin: PremiumOrigin = PremiumOrigin.PLANNER) => {
 					set({ currentFeature: feature, modalOpen: true });
-					track({ event: "upgrade_modal_opened", properties: { feature } });
+					track({ event: "upgrade_modal_opened", properties: { feature, origin } });
 				},
 
 				closeModal: () => {

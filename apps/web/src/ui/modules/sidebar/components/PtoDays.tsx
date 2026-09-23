@@ -2,6 +2,7 @@
 
 import { MAX_PTO_DAYS, MIN_PTO_DAYS, useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { usePlanReadout } from "@ui/hooks/usePlanReadout";
 import { Counter } from "@ui/modules/core/animate/components/Counter";
 import { SlidingNumber } from "@ui/modules/core/animate/text/SlidingNumber";
@@ -27,6 +28,10 @@ export const PtoDays = () => {
 			trimManualDays: state.trimManualDays,
 		})),
 	);
+	const handleReset = () => {
+		resetManualSelection();
+		track({ event: "manual_changes_reset", properties: { surface: "sidebar" } });
+	};
 	const {
 		suggested: activeSuggestedCount,
 		manual: manualSelectedCount,
@@ -43,6 +48,10 @@ export const PtoDays = () => {
 
 			setPtoDays(newValue);
 			trimManualDays(newValue);
+			track({
+				event: "planning_input_changed",
+				properties: { input: "ptoDays", value: newValue },
+			});
 		},
 		[setPtoDays, trimManualDays, ptoDays],
 	);
@@ -104,13 +113,7 @@ export const PtoDays = () => {
 						</span>
 					</div>
 					{hasManualChanges && (
-						<Button
-							variant="outline"
-							size="sm"
-							onClick={resetManualSelection}
-							className="w-full mt-2 text-xs"
-							type="button"
-						>
+						<Button variant="outline" size="sm" onClick={handleReset} className="w-full mt-2 text-xs" type="button">
 							{t("resetManualChanges")}
 						</Button>
 					)}

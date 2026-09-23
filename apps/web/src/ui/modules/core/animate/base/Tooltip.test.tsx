@@ -2,6 +2,8 @@ import { render } from "@testing-library/react";
 import type { ComponentProps, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
+const DIALOG_LAYER = 200;
+
 vi.mock("../primitives/base/Tooltip", () => ({
 	TooltipProvider: ({ children, delay, ...props }: ComponentProps<"div"> & { delay?: number }) => (
 		<div data-primitive="tooltip-provider" data-delay={delay} {...props}>
@@ -109,6 +111,13 @@ describe("TooltipContent", () => {
 	it("applies className onto the popup", () => {
 		const { container } = render(<TooltipContent className="custom-class">tip</TooltipContent>);
 		expect(container.querySelector('[data-primitive="tooltip-popup"]')?.className).toContain("custom-class");
+	});
+
+	it("floats the positioner above a dialog and the mobile sidebar, so a field tooltip is never hidden behind either", () => {
+		const { container } = render(<TooltipContent>hint</TooltipContent>);
+		const layer = container.querySelector('[data-primitive="tooltip-positioner"]')?.className.match(/\bz-(\d+)\b/);
+
+		expect(Number(layer?.[1])).toBeGreaterThan(DIALOG_LAYER);
 	});
 
 	it("passes sideOffset to the positioner (default 4)", () => {

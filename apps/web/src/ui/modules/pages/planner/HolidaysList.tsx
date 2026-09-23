@@ -3,6 +3,7 @@
 import { HolidayVariant } from "@application/dto/holiday/types";
 import { useHolidaysStore } from "@application/stores/holidays";
 import { PremiumFeatureId } from "@application/stores/premium";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { useStoresReady } from "@ui/hooks/useStoresReady";
 import {
 	Tabs,
@@ -34,6 +35,7 @@ export const HolidaysList = () => {
 		const variant = value as HolidayVariant;
 		if (variant === HolidayVariant.REGIONAL && !hasRegionalHolidays) return;
 		setActiveTab(variant);
+		track({ event: "holiday_tab_changed", properties: { variant } });
 	};
 
 	return (

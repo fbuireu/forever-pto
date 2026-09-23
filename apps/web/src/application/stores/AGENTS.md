@@ -17,7 +17,7 @@ The rest of the application layer contract is in [`../AGENTS.md`](../AGENTS.md).
 | [`holidays.ts`](./holidays.ts) | `useHolidaysStore`: the calendar, the plan, and the user's edits to it |
 | [`location.ts`](./location.ts) | `useLocationStore`: the Country and Region option lists |
 | [`premium.ts`](./premium.ts) | `usePremiumStore`: the Premium session and the Premium-required modal |
-| [`ui.ts`](./ui.ts) | `useUIStore`: donate popover and currency; the one store with no persistence |
+| [`ui.ts`](./ui.ts) | `useUIStore`: the donate popover and the homepage quick start. `openDonatePopover` and `openQuickStart` each take the trigger that opened them and report it (`donate_opened`, `quick_start_opened`), the way `showPremiumModal` reports its feature; the one store with no persistence |
 | [`crypto.ts`](./crypto.ts) | `obfuscatedStorage`, the zustand `PersistStorage` the persisted stores share. Not a store |
 | [`rehydration.ts`](./rehydration.ts) | `onRehydrateFailure`, the one thing every persisted store does when a stored blob will not come back. Not a store |
 | [`utils/crypto.ts`](./utils/crypto.ts) | `obfuscate` / `deobfuscate` / `base64Encode` / `base64Decode`, plus `TWENTY_FOUR_HOURS` and `BASE64_PATTERN`. Not a store |
@@ -31,7 +31,7 @@ The rest of the application layer contract is in [`../AGENTS.md`](../AGENTS.md).
 | `holidays` | `holidays`, `suggestion`, `alternatives`, `maxAlternatives`, `currentSelection`, `currentSelectionIndex`, `previewAlternativeIndex`, `manuallySelectedDays`, `removedSuggestedDays`, `isCalculating`, `hasCalculated`, `planRevision` | all but `previewAlternativeIndex`, `isCalculating`, `hasCalculated` and `planRevision` |
 | `location` | `countries`, `regions` | nothing |
 | `premium` | `premiumKey`, `userEmail`, `lastVerified`, `needsSessionCheck`, `isLoading`, `modalOpen`, `currentFeature` | everything up to `needsSessionCheck` |
-| `ui` | `donatePopoverOpen`, `donatePopoverIsOpening` | nothing |
+| `ui` | `donatePopoverOpen`, `donatePopoverIsOpening`, `quickStartOpen` | nothing |
 
 **The `ui` store used to carry a currency, and giving that rule one owner was the wrong fix.** It had several
 owners and a free-rider, so a `CurrencySync` component was written to seed it once from the `[locale]` root
@@ -231,7 +231,10 @@ re-fetches Holidays) and would otherwise strand it, spending budget with no way 
 **The refusal reason crosses the seam, so no caller re-derives the rule.** `toggleDaySelection` returns a
 `DayOutcome` and `addHoliday`/`editHoliday` return a `HolidayOutcome`, both declared in `types.ts`, both
 either `{ applied: true }` or `{ applied: false, reason }`, with `HolidayOutcome` additionally carrying
-`heldBy` so a caller can name the Holiday already on the date without looking it up. They used to answer
+`heldBy` so a caller can name the Holiday already on the date without looking it up, and `DayOutcome`
+carrying a `change` on success (`DayChange`: a Manual Day added or removed, a Suggested Day removed, a Removed
+Day restored), because the store is the only place that knows which of the four a click was and the analytics
+event wants to say so without re-deriving it. They used to answer
 `boolean` (or nothing at all), which is why [`calendar/Calendar.tsx`](../../ui/modules/pages/planner/calendar/Calendar.tsx), [`AddHolidayModal.tsx`](../../ui/modules/pages/planner/holidays/components/AddHolidayModal.tsx) and
 [`EditHolidayModal.tsx`](../../ui/modules/pages/planner/holidays/components/EditHolidayModal.tsx) each reimplemented the occupancy check purely to pick a toast: hand-rolled
 `toDateString()` comparisons for one rule, kept in agreement by review. The reasons are the distinctions the

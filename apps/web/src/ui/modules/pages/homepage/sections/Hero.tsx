@@ -1,9 +1,10 @@
-import { Link } from "@application/i18n/navigation";
 import { getWeekdayNames } from "@application/shared/utils/dates";
+import { QuickStartSource } from "@application/stores/ui";
 import { LOCALES } from "@infrastructure/i18n/locales";
 import { Badge } from "@ui/modules/core/primitives/Badge";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { FlagIcon } from "@ui/modules/core/primitives/FlagIcon";
+import { QuickStartTrigger } from "@ui/modules/pages/homepage/quick-start/QuickStartTrigger";
 import { MODIFIERS_CLASS_NAMES } from "@ui/modules/pages/planner/calendar/utils/helpers";
 import { cn } from "@ui/utils/cn";
 import { getCurrentYear } from "@ui/utils/getCurrentYear";
@@ -74,9 +75,9 @@ export const Hero = async () => {
 					</p>
 
 					<div className="flex gap-4 flex-wrap items-center mb-7">
-						<Button variant="accent" size="lg" asChild>
-							<Link href="/planner">{t("hero.plannerCta")}</Link>
-						</Button>
+						<QuickStartTrigger source={QuickStartSource.HERO} size="lg">
+							{t("hero.plannerCta")}
+						</QuickStartTrigger>
 						<Button variant="outline" size="lg" asChild>
 							<a href="#how">{t("hero.demoLink")}</a>
 						</Button>

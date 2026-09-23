@@ -10,6 +10,9 @@ const holidays = vi.hoisted(() => ({ resetManualSelection: vi.fn(), trimManualDa
 
 const readout = vi.hoisted(() => ({ suggested: 4, manual: 2, remaining: 17, hasManualChanges: false }));
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("@application/stores/filters", () => ({
 	MIN_PTO_DAYS: 1,
 	MAX_PTO_DAYS: 60,
@@ -137,5 +140,34 @@ describe("PtoDays", () => {
 
 		expect(holidays.resetManualSelection).toHaveBeenCalledOnce();
 		expect(screen.queryByText(en.ptoDays.allAssigned)).toBeNull();
+	});
+});
+
+describe("PtoDays analytics", () => {
+	it("reports the new budget on every change", async () => {
+		track.mockClear();
+		renderField();
+
+		await userEvent.click(increase());
+		await userEvent.click(decrease());
+
+		expect(track.mock.calls.map(([call]) => call)).toStrictEqual([
+			{ event: "planning_input_changed", properties: { input: "ptoDays", value: 24 } },
+			{ event: "planning_input_changed", properties: { input: "ptoDays", value: 22 } },
+		]);
+	});
+
+	it("reports a reset of the manual changes from the sidebar", async () => {
+		track.mockClear();
+		readout.hasManualChanges = true;
+		renderField();
+
+		await userEvent.click(screen.getByRole("button", { name: en.ptoDays.resetManualChanges }));
+
+		expect(holidays.resetManualSelection).toHaveBeenCalledOnce();
+		expect(track).toHaveBeenCalledExactlyOnceWith({
+			event: "manual_changes_reset",
+			properties: { surface: "sidebar" },
+		});
 	});
 });

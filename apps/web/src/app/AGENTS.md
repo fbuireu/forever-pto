@@ -171,7 +171,8 @@ render for it to opt out of. Copy the explicit-locale form or the `setRequestLoc
 
 Groups do not affect the URL: `(app)` and `(marketing)` exist purely to give different chromes.
 
-**`(marketing)`** has a group-level `layout.tsx` (header, footer, toaster) and its own `error.tsx`. Its
+**`(marketing)`** has a group-level `layout.tsx` (header, footer, toaster, and the quick start dialog the header's
+trial action opens, mounted here so one instance serves every trigger on the page) and its own `error.tsx`. Its
 pages are fully static: `page.tsx` declares `generateStaticParams`, and indexability comes off `SITE_ROUTES`
 rather than out of the page: the homepage's row says indexable, every `legal/` row says it is not.
 

@@ -20,6 +20,9 @@ const mockGetState = vi.hoisted(() =>
 	})),
 );
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("@application/stores/holidays", () => ({
 	useHolidaysStore: Object.assign(
 		vi.fn((selector: (state: unknown) => unknown) =>
@@ -76,6 +79,26 @@ const BASE_PARAMS = {
 	locale: "en" as const,
 };
 
+const PLAN = {
+	days: [],
+	bridges: [],
+	metrics: {
+		averageEfficiency: 2.1,
+		totalEffectiveDays: 12,
+		bonusDays: 7,
+		longWeekends: 3,
+		restBlocks: 4,
+		longestVacation: 9,
+		maxWorkStreak: 30,
+		bridgesUsed: 3,
+		workedDaysPerMonth: 18,
+		quarterDist: [],
+		monthlyDist: [],
+		longBlocksPerQuarter: [],
+		firstLastBreak: { first: "2025-01-01", last: "2025-12-24" },
+	},
+};
+
 const MANUAL_DAYS = [new Date(2025, 1, 10), new Date(2025, 1, 11)];
 const REMOVED_DAY = new Date(2025, 3, 7);
 const SUGGESTED_DAYS = [new Date(2025, 3, 7), new Date(2025, 3, 8), new Date(2025, 3, 9)];
@@ -94,7 +117,7 @@ const deliverResult = () => {
 			data: {
 				type: WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT,
 				requestId: lastRequest().requestId,
-				payload: { suggestion: { days: [], bridges: [] }, alternatives: [] },
+				payload: { suggestion: PLAN, alternatives: [] },
 			},
 		} as MessageEvent);
 	});
@@ -278,7 +301,7 @@ describe("useCalculationsWorker", () => {
 				data: {
 					type: WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT,
 					requestId,
-					payload: { suggestion: { days: [], bridges: [] }, alternatives: [] },
+					payload: { suggestion: PLAN, alternatives: [] },
 				},
 			} as MessageEvent);
 		});
@@ -299,7 +322,7 @@ describe("useCalculationsWorker", () => {
 				data: {
 					type: WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT,
 					requestId: "stale-id",
-					payload: { suggestion: { days: [], bridges: [] }, alternatives: [] },
+					payload: { suggestion: PLAN, alternatives: [] },
 				},
 			} as MessageEvent);
 		});
@@ -366,5 +389,65 @@ describe("useCalculationsWorker", () => {
 		unmount();
 
 		expect(mockSetCalculating).not.toHaveBeenCalled();
+	});
+});
+
+describe("planner_generated", () => {
+	it("reports the settled plan's inputs and quality, never the days or the break dates", () => {
+		track.mockClear();
+		const { result } = renderHook(() => useCalculationsWorker());
+		act(() => {
+			result.current.triggerCalculation(BASE_PARAMS);
+		});
+		act(() => {
+			workerInstance.onmessage?.({
+				data: {
+					type: WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT,
+					requestId: lastRequest().requestId,
+					payload: { suggestion: PLAN, alternatives: [PLAN, PLAN] },
+				},
+			} as MessageEvent);
+		});
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({
+			event: "planner_generated",
+			properties: {
+				ptoDays: 5,
+				strategy: "grouped",
+				year: 2025,
+				carryOverMonths: 0,
+				allowPastDays: false,
+				alternatives: 2,
+				averageEfficiency: 2.1,
+				totalEffectiveDays: 12,
+				bonusDays: 7,
+				longWeekends: 3,
+				restBlocks: 4,
+				longestVacation: 9,
+				maxWorkStreak: 30,
+			},
+		});
+		const report = JSON.stringify(track.mock.calls);
+		expect(report).not.toContain("2025-01-01");
+		expect(report).not.toContain("days");
+	});
+
+	it("reports nothing for a stale response, which is not a plan the user sees", () => {
+		track.mockClear();
+		const { result } = renderHook(() => useCalculationsWorker());
+		act(() => {
+			result.current.triggerCalculation(BASE_PARAMS);
+		});
+		act(() => {
+			workerInstance.onmessage?.({
+				data: {
+					type: WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT,
+					requestId: "stale-id",
+					payload: { suggestion: PLAN, alternatives: [] },
+				},
+			} as MessageEvent);
+		});
+
+		expect(track).not.toHaveBeenCalled();
 	});
 });

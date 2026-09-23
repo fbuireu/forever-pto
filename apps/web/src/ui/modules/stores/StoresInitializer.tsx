@@ -2,14 +2,10 @@
 
 import { useFiltersStore } from "@application/stores/filters";
 import { useStoresReady } from "@ui/hooks/useStoresReady";
+import { getUserCountryFromCookie } from "@ui/utils/userCountry";
 import { use, useEffect } from "react";
 import { browser } from "react-dom";
 import { useShallow } from "zustand/react/shallow";
-
-function getUserCountryFromCookie() {
-	const cookie = document.cookie.split("; ").find((row) => row.startsWith("user-country="));
-	return cookie?.split("=")[1];
-}
 
 export const StoresInitializer = () => {
 	use(browser());

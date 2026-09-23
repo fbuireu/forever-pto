@@ -2,6 +2,7 @@
 
 import { MIN_PTO_DAYS, useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
 import { Plus } from "@ui/modules/core/animate/icons/Plus";
 import { SlidingNumber } from "@ui/modules/core/animate/text/SlidingNumber";
@@ -54,6 +55,7 @@ export const PtoCalculator = ({ currentYear }: PtoCalculatorProps) => {
 	}, [locale, currentYear]);
 
 	const handleCalculate = () => {
+		track({ event: "tool_used", properties: { tool: "ptoCalculator" } });
 		const monthNumber = Number(selectedMonth);
 		const accumulated = daysPerMonth * monthNumber;
 
@@ -70,6 +72,10 @@ export const PtoCalculator = ({ currentYear }: PtoCalculatorProps) => {
 
 		setPtoDays(nextBudget);
 		trimManualDays(nextBudget);
+		track({
+			event: "planning_input_changed",
+			properties: { input: "ptoDays", value: nextBudget, source: "ptoCalculator" },
+		});
 	};
 
 	const handleMonthChange = (value: string) => {

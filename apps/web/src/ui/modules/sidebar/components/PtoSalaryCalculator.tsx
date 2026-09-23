@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { SlidingNumber } from "@ui/modules/core/animate/text/SlidingNumber";
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@ui/modules/core/primitives/InputGroup";
 import { ConditionalWrapper } from "@ui/modules/shared/ConditionalWrapper";
@@ -7,7 +8,7 @@ import { SidebarFieldTooltip } from "@ui/modules/sidebar/components/SidebarField
 import { DEFAULT_CURRENCY, DEFAULT_CURRENCY_SYMBOL } from "@ui/utils/currencies";
 import { Euro } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const WORKING_DAYS_PER_YEAR = 252;
 const HOURS_PER_DAY = 8;
@@ -70,6 +71,12 @@ export const PtoSalaryCalculator = () => {
 	const workedDays = WORKING_DAYS_PER_YEAR + unusedPTODays;
 	const effectiveHourlyRate = annualSalary / workedDays / HOURS_PER_DAY;
 	const showResults = annualSalary > 0 && unusedPTODays >= 0;
+	const hadResults = useRef(false);
+
+	useEffect(() => {
+		if (showResults && !hadResults.current) track({ event: "tool_used", properties: { tool: "ptoSalaryCalculator" } });
+		hadResults.current = showResults;
+	}, [showResults]);
 
 	return (
 		<div className="space-y-2 w-full">

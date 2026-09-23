@@ -2,6 +2,7 @@
 
 import { useHolidaysStore } from "@application/stores/holidays";
 import type { AlternativeSelectionBaseParams } from "@application/stores/types";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { useIsMobile } from "@ui/hooks/useMobile";
 import { useStoresReady } from "@ui/hooks/useStoresReady";
 import { Drawer, DrawerContent, DrawerTitle } from "@ui/modules/core/animate/base/Drawer";
@@ -75,6 +76,14 @@ export const ManagementBar = () => {
 	const handleSelectionChange = useCallback(
 		(params: AlternativeSelectionBaseParams) => {
 			setCurrentAlternativeSelection(params);
+			track({
+				event: "alternative_applied",
+				properties: {
+					index: params.index,
+					averageEfficiency: params.suggestion?.metrics.averageEfficiency,
+					totalEffectiveDays: params.suggestion?.metrics.totalEffectiveDays,
+				},
+			});
 			toast.success(t("suggestionApplied"));
 			setSnap(DRAWER_SNAP.COLLAPSED);
 		},

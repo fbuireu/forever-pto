@@ -2,6 +2,8 @@
 
 import { usePremiumStore } from "@application/stores/premium";
 import type { DayOutcome } from "@application/stores/types";
+import { DonateSource } from "@application/stores/ui";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { SupportButton } from "@ui/modules/shared/SupportButton";
 import { LockIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -17,6 +19,7 @@ export const usePlannerDayClick = (onDayToggle: (date: Date) => DayOutcome) => {
 	return useCallback(
 		(date: Date) => {
 			if (!premiumKey) {
+				track({ event: "calendar_day_toggled", properties: { applied: false, reason: "premium_required" } });
 				toast.info(tPremium("premiumFeature"), {
 					description: tPremium("unlockDescription"),
 					duration: 7_500,
@@ -28,6 +31,7 @@ export const usePlannerDayClick = (onDayToggle: (date: Date) => DayOutcome) => {
 					icon: <LockIcon size="16" />,
 					action: (
 						<SupportButton
+							source={DonateSource.PLANNER_TOAST}
 							label={tPremium("becomePremium")}
 							className="w-full py-3 px-2 !bg-[var(--color-brand-ink)] !text-white !border-transparent !shadow-[var(--shadow-brutal-btn-orange)] hover:!shadow-[var(--shadow-brutal-btn-orange-hover)] active:!shadow-[var(--shadow-brutal-btn-orange-active)]"
 						/>
@@ -37,6 +41,12 @@ export const usePlannerDayClick = (onDayToggle: (date: Date) => DayOutcome) => {
 			}
 
 			const outcome = onDayToggle(date);
+			track({
+				event: "calendar_day_toggled",
+				properties: outcome.applied
+					? { applied: true, change: outcome.change }
+					: { applied: false, reason: outcome.reason },
+			});
 
 			if (outcome.applied) return;
 

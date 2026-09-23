@@ -2,7 +2,9 @@
 
 import { useHolidaysStore } from "@application/stores/holidays";
 import type { GenerateSuggestionsParams } from "@application/stores/types";
+import type { MeasuredSuggestion } from "@domain/calendar/types";
 import { measureBudget } from "@domain/calendar/utils/budget";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import {
 	type CalculateSuggestionsRequest,
 	WORKER_MESSAGE_TYPE,
@@ -11,6 +13,32 @@ import {
 import { deserializeSuggestion, serializeHolidays } from "@infrastructure/workers/utils/serializers";
 import { useCallback, useEffect, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
+
+interface PlannerGeneratedParams {
+	params: GenerateSuggestionsParams;
+	measured: MeasuredSuggestion;
+	alternatives: readonly unknown[];
+}
+
+export function plannerGeneratedProperties({ params, measured, alternatives }: PlannerGeneratedParams) {
+	const { metrics } = measured;
+
+	return {
+		ptoDays: params.ptoDays,
+		strategy: params.strategy,
+		year: params.year,
+		carryOverMonths: params.carryOverMonths,
+		allowPastDays: params.allowPastDays,
+		alternatives: alternatives.length,
+		averageEfficiency: metrics.averageEfficiency,
+		totalEffectiveDays: metrics.totalEffectiveDays,
+		bonusDays: metrics.bonusDays,
+		longWeekends: metrics.longWeekends,
+		restBlocks: metrics.restBlocks,
+		longestVacation: metrics.longestVacation,
+		maxWorkStreak: metrics.maxWorkStreak,
+	};
+}
 
 export function useCalculationsWorker() {
 	const workerRef = useRef<Worker | null>(null);
@@ -47,9 +75,14 @@ export function useCalculationsWorker() {
 				if (e.data.type === WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT) {
 					lastCalculatedPtoDaysRef.current = params.ptoDays;
 					const { suggestion, alternatives } = e.data.payload;
+					const measured = deserializeSuggestion(suggestion);
 					setCalculationResult({
-						suggestion: deserializeSuggestion(suggestion),
+						suggestion: measured,
 						alternatives: alternatives.map(deserializeSuggestion),
+					});
+					track({
+						event: "planner_generated",
+						properties: plannerGeneratedProperties({ params, measured, alternatives }),
 					});
 				}
 			};

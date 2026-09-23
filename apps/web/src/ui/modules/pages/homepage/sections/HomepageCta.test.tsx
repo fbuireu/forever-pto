@@ -1,17 +1,18 @@
 import enMessages from "@i18n/messages/en.json";
 import { render, screen } from "@testing-library/react";
 import { createTranslator } from "next-intl";
-import type { ComponentProps, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetTranslations = vi.hoisted(() => vi.fn());
 
 vi.mock("next-intl/server", () => ({ getTranslations: mockGetTranslations }));
-vi.mock("@application/i18n/navigation", () => ({
-	Link: ({ children, ...props }: ComponentProps<"a">) => <a {...props}>{children}</a>,
-}));
-vi.mock("@ui/modules/core/primitives/Button", () => ({
-	Button: ({ children }: { children: ReactNode }) => <>{children}</>,
+vi.mock("@ui/modules/pages/homepage/quick-start/QuickStartTrigger", () => ({
+	QuickStartTrigger: ({ children, source }: { children: ReactNode; source: string }) => (
+		<button type="button" data-testid="quick-start-trigger" data-source={source}>
+			{children}
+		</button>
+	),
 }));
 vi.mock("./CtaShapesClient", () => ({
 	CtaShapesClient: (props: Record<string, string>) => (
@@ -41,10 +42,12 @@ describe("HomepageCta", () => {
 		vi.clearAllMocks();
 	});
 
-	it("sends the call to action into the planner", async () => {
+	it("opens the quick start from the call to action rather than linking straight into the planner", async () => {
 		await renderCta();
 
-		expect(screen.getByRole("link", { name: closing.cta }).getAttribute("href")).toBe("/planner");
+		expect(screen.getByTestId("quick-start-trigger").getAttribute("data-source")).toBe("closing");
+		expect(screen.getByTestId("quick-start-trigger").textContent).toBe(closing.cta);
+		expect(screen.queryByRole("link", { name: closing.cta })).toBeNull();
 	});
 
 	it("hands the floating shapes their translated labels, one per shape", async () => {

@@ -14,6 +14,9 @@ const mockUseSidebar = vi.hoisted(() =>
 	})),
 );
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("@ui/hooks/useMobile", () => ({ useIsMobile: mockUseIsMobile }));
 vi.mock("@ui/modules/core/animate/base/Sidebar", () => ({ useSidebar: mockUseSidebar }));
 vi.mock("next-intl", () => ({ useTranslations: () => (key: string) => key }));
@@ -192,5 +195,19 @@ describe("useTutorial", () => {
 		});
 
 		expect(mockStart.mock.calls[0][1].onDestroyStarted).toBeUndefined();
+	});
+});
+
+describe("useTutorial analytics", () => {
+	it("reports the tour starting and on which layout", async () => {
+		track.mockClear();
+		mockUseIsMobile.mockReturnValue(true);
+		const { result } = renderHook(() => useTutorial());
+
+		await act(async () => {
+			await result.current.startTutorial();
+		});
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({ event: "tutorial_started", properties: { isMobile: true } });
 	});
 });

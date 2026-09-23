@@ -5,6 +5,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const intl = vi.hoisted(() => ({ locale: "en" }));
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("@application/stores/ui", () => ({
 	useUIStore: (selector: (state: unknown) => unknown) => selector({ currencySymbol: "€", currency: "EUR" }),
 }));
@@ -130,5 +133,18 @@ describe("PtoSalaryCalculator", () => {
 		await user.type(input, "50400");
 
 		expect(text()).toContain("€1000");
+	});
+});
+
+describe("PtoSalaryCalculator analytics", () => {
+	it("reports the tool once, when figures first appear, and never the salary", async () => {
+		track.mockClear();
+		const user = userEvent.setup();
+		const input = renderCalculator();
+
+		await user.type(input, "50400");
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({ event: "tool_used", properties: { tool: "ptoSalaryCalculator" } });
+		expect(JSON.stringify(track.mock.calls)).not.toContain("50400");
 	});
 });

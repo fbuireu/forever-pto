@@ -2,6 +2,7 @@
 
 import { useFiltersStore } from "@application/stores/filters";
 import { useLocationStore } from "@application/stores/location";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { Combobox } from "@ui/modules/core/primitives/Combobox";
 import { SidebarFieldLabel } from "@ui/modules/sidebar/components/SidebarFieldLabel";
 import { MapPinned } from "lucide-react";
@@ -22,6 +23,11 @@ export const Regions = () => {
 		fetchRegions(country);
 	}, [country, fetchRegions]);
 
+	const handleRegionChange = (value: string) => {
+		setRegion(value);
+		track({ event: "planning_input_changed", properties: { input: "region", value } });
+	};
+
 	return (
 		<div className="space-y-2 w-full">
 			<SidebarFieldLabel controlId="regions" icon={<MapPinned size={16} />} title={t("title")} />
@@ -30,7 +36,7 @@ export const Regions = () => {
 				id="regions"
 				options={regions}
 				value={region}
-				onChange={setRegion}
+				onChange={handleRegionChange}
 				disabled={!country}
 				placeholder={t("placeholder")}
 				searchPlaceholder={t("search")}

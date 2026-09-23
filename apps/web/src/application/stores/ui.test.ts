@@ -1,12 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { useUIStore } from "./ui";
+
+const track = vi.hoisted(() => vi.fn());
+
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
+import { DonateSource, QuickStartSource, useUIStore } from "./ui";
 
 const INITIAL = {
 	donatePopoverOpen: false,
 	donatePopoverIsOpening: false,
+	quickStartOpen: false,
 };
 
 beforeEach(() => {
+	track.mockClear();
 	useUIStore.setState(INITIAL);
 	vi.useFakeTimers();
 });
@@ -22,15 +29,16 @@ describe("donate popover", () => {
 		expect(donatePopoverIsOpening).toBe(false);
 	});
 
-	it("openDonatePopover sets open and isOpening to true", () => {
-		useUIStore.getState().openDonatePopover();
+	it("openDonatePopover sets open and isOpening to true, and reports which trigger opened it", () => {
+		useUIStore.getState().openDonatePopover(DonateSource.PRICING);
+		expect(track).toHaveBeenCalledExactlyOnceWith({ event: "donate_opened", properties: { source: "pricing" } });
 		const { donatePopoverOpen, donatePopoverIsOpening } = useUIStore.getState();
 		expect(donatePopoverOpen).toBe(true);
 		expect(donatePopoverIsOpening).toBe(true);
 	});
 
 	it("openDonatePopover clears isOpening after the next tick", () => {
-		useUIStore.getState().openDonatePopover();
+		useUIStore.getState().openDonatePopover(DonateSource.PLANNER_TOAST);
 		vi.runAllTimers();
 		expect(useUIStore.getState().donatePopoverIsOpening).toBe(false);
 		expect(useUIStore.getState().donatePopoverOpen).toBe(true);
@@ -61,5 +69,42 @@ describe("donate popover", () => {
 		useUIStore.getState().clearDonatePopoverOpening();
 		expect(useUIStore.getState().donatePopoverOpen).toBe(true);
 		expect(useUIStore.getState().donatePopoverIsOpening).toBe(false);
+	});
+});
+
+describe("quick start", () => {
+	it("starts closed", () => {
+		expect(useUIStore.getState().quickStartOpen).toBe(false);
+	});
+
+	it("openQuickStart opens it and reports which call to action did", () => {
+		useUIStore.getState().openQuickStart(QuickStartSource.HERO);
+		expect(useUIStore.getState().quickStartOpen).toBe(true);
+		expect(track).toHaveBeenCalledExactlyOnceWith({ event: "quick_start_opened", properties: { source: "hero" } });
+	});
+
+	it("neither closing nor setting the flag reports anything, since only an open is a funnel entry", () => {
+		useUIStore.getState().setQuickStartOpen(true);
+		useUIStore.getState().closeQuickStart();
+		expect(track).not.toHaveBeenCalled();
+	});
+
+	it("closeQuickStart closes it", () => {
+		useUIStore.setState({ quickStartOpen: true });
+		useUIStore.getState().closeQuickStart();
+		expect(useUIStore.getState().quickStartOpen).toBe(false);
+	});
+
+	it("setQuickStartOpen mirrors the flag it is handed", () => {
+		useUIStore.getState().setQuickStartOpen(true);
+		expect(useUIStore.getState().quickStartOpen).toBe(true);
+		useUIStore.getState().setQuickStartOpen(false);
+		expect(useUIStore.getState().quickStartOpen).toBe(false);
+	});
+
+	it("leaves the donate popover alone", () => {
+		useUIStore.setState({ donatePopoverOpen: true });
+		useUIStore.getState().openQuickStart(QuickStartSource.NAV);
+		expect(useUIStore.getState().donatePopoverOpen).toBe(true);
 	});
 });

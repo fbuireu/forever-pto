@@ -8,6 +8,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const store = vi.hoisted(() => ({ strategy: "balanced" as string, setStrategy: vi.fn() }));
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("@application/stores/filters", () => ({
 	useFiltersStore: (selector: (state: unknown) => unknown) =>
 		selector({ strategy: store.strategy, setStrategy: store.setStrategy }),
@@ -121,5 +124,19 @@ describe("Strategy", () => {
 		const { container } = renderStrategy();
 
 		expect(container.querySelector('[data-slot="collapsible-content"]')).toBeNull();
+	});
+});
+
+describe("Strategy analytics", () => {
+	it("reports the Strategy that was picked", async () => {
+		track.mockClear();
+		renderStrategy();
+
+		await userEvent.click(screen.getByRole("option", { name: en.sidebar.strategy.optimized.label }));
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({
+			event: "planning_input_changed",
+			properties: { input: "strategy", value: FilterStrategy.OPTIMIZED },
+		});
 	});
 });

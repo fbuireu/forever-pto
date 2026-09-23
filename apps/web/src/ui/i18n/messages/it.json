@@ -1090,6 +1090,37 @@
 			}
 		}
 	},
+	"quickStart": {
+		"title": "Configura il tuo pianificatore",
+		"progress": "Passo {current} di {total}",
+		"steps": {
+			"location": "Posizione",
+			"ptoDays": "Giorni di ferie",
+			"settings": "Impostazioni"
+		},
+		"location": {
+			"title": "Dove lavori?",
+			"description": "Il paese decide quali festività usa il pianificatore. La regione aggiunge quelle locali.",
+			"country": "Paese",
+			"detected": "Rilevato dalla tua connessione. Cambialo se non è corretto.",
+			"region": "Regione",
+			"optional": "facoltativa",
+			"noRegions": "Questo paese non ha calendari regionali, quindi si usa quello nazionale."
+		},
+		"ptoDays": {
+			"title": "Quanti giorni di ferie hai?",
+			"description": "Il tuo budget per l'anno. Va bene un numero approssimativo; potrai modificarlo nel pianificatore.",
+			"year": "Anno"
+		},
+		"settings": {
+			"title": "Rifinisci il piano",
+			"description": "Scegli come vengono collocati i giorni. Il resto è facoltativo.",
+			"premiumHint": "I giorni passati e i mesi di riporto sono impostazioni premium. Sbloccale o mantieni i valori predefiniti."
+		},
+		"back": "Indietro",
+		"next": "Avanti",
+		"finish": "Apri il mio pianificatore →"
+	},
 	"cookiePolicy": {
 		"title": "Politica sui cookie",
 		"lastUpdated": "Ultimo aggiornamento: {date}",

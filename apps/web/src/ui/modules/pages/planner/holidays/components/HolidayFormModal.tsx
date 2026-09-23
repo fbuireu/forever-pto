@@ -5,6 +5,7 @@ import { formatDate } from "@application/shared/utils/dates";
 import { useHolidaysStore } from "@application/stores/holidays";
 import type { HolidayOutcome } from "@application/stores/types";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import {
 	Dialog,
 	DialogContent,
@@ -107,6 +108,14 @@ export const HolidayFormModal = ({
 				const outcome = onCommit(data);
 
 				if (!outcome) return;
+
+				track({
+					event: "custom_holiday_saved",
+					properties: {
+						mode: mode === HolidayFormMode.ADD ? "add" : "edit",
+						...(outcome.applied ? { applied: true } : { applied: false, reason: outcome.reason }),
+					},
+				});
 
 				if (!outcome.applied) {
 					const refusal = describeHolidayRefusal({ outcome, t: tFields, formattedDate });

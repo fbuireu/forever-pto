@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "@application/i18n/navigation";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import type { LocaleCode } from "@infrastructure/i18n/locales";
 import { useLanguages } from "@ui/hooks/useLanguages";
 import { useLocale, useTranslations } from "next-intl";
@@ -15,9 +16,10 @@ export const useLanguageSwitch = () => {
 
 	const selectLanguage = useCallback(
 		(newLocale: LocaleCode) => {
+			track({ event: "language_changed", properties: { from: locale, to: newLocale } });
 			push(pathname, { locale: newLocale, scroll: false });
 		},
-		[pathname, push],
+		[locale, pathname, push],
 	);
 
 	const currentLanguage = useMemo(() => languages.find(({ code }) => code === locale), [languages, locale]);

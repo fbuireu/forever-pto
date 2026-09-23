@@ -5,6 +5,7 @@ import { generateIcs } from "@application/export/generateIcs";
 import { useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
 import { PremiumFeatureId } from "@application/stores/premium";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { usePlanReadout } from "@ui/hooks/usePlanReadout";
 import { Button } from "@ui/modules/core/primitives/Button";
 import type { HolidayDocumentProps } from "@ui/modules/export/HolidayDocument";
@@ -85,6 +86,10 @@ export const CalendarExport = () => {
 		a.click();
 		document.body.removeChild(a);
 		URL.revokeObjectURL(url);
+		track({
+			event: "calendar_exported",
+			properties: { format: "ics", includeHolidays, includePto, outcome: "success" },
+		});
 	};
 
 	const handleDownloadPdf = () => {
@@ -108,8 +113,16 @@ export const CalendarExport = () => {
 					}),
 				);
 				toast.success(t("pdf.successTitle"), { description: t("pdf.successDescription") });
+				track({
+					event: "calendar_exported",
+					properties: { format: "pdf", includeHolidays, includePto, outcome: "success" },
+				});
 			} catch {
 				toast.error(t("pdf.errorTitle"), { description: t("pdf.errorDescription") });
+				track({
+					event: "calendar_exported",
+					properties: { format: "pdf", includeHolidays, includePto, outcome: "error" },
+				});
 			}
 		});
 	};

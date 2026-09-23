@@ -118,9 +118,38 @@ A privacy convention runs through all call sites: log the email **domain**, ids 
 
 ## Browser analytics: typed `track()`
 
-`apps/web/src/infrastructure/clients/logging/better-stack/tracking.ts` exposes `track({ event, properties })` and `identifyUser({ email, plan })` over `window.betterstack`. Event names are a closed union (`TrackEventName`): `payment_started`, `payment_completed`, `payment_failed`, `promo_code_applied`, `premium_activated`, `upgrade_modal_opened`, `feature_unlocked`, `planner_generated`, `contact_form_submitted`, so a typo or ad-hoc event is a compile error. Both functions no-op when the script is absent (SSR, consent denied).
+`apps/web/src/infrastructure/clients/logging/better-stack/tracking.ts` exposes `track({ event, properties })` and `identifyUser({ email, plan })` over `window.betterstack`. Event names are a closed union (`TrackEventName`): `payment_started`, `payment_completed`, `payment_failed`, `promo_code_applied`, `premium_activated`, `upgrade_modal_opened`, `feature_unlocked`, `planner_generated`, `contact_form_submitted`, the four `quick_start_*` events and the planner set below, so a typo or ad-hoc event is a compile error. Both functions fan out to two destinations: the Better Stack script, where an event sits next to the logs and the errors of the same release, and Google Analytics through `gtag`, where the same event name and properties feed funnel and path explorations, key events and audiences. Each no-ops on its own when its script is absent (SSR, consent denied); GA's consent mode decides on its side what a denied visitor's event becomes. The email goes to Better Stack only; GA receives the plan as a user property and nothing that identifies the person. `upgrade_modal_opened` carries the gate's `feature` and an `origin`, `planner` unless the gate sits in the homepage quick start, which reports `quick_start`.
 
 The script itself is injected by `apps/web/src/ui/modules/tracking/BetterStackTracking.tsx`, mounted in the root layout but rendering nothing until the analytics [consent category](/how-it-works/cookie-consent/) is accepted and `NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN` is set. Once consented, premium users are identified with `identifyUser({ email, plan })`, where `plan` is `'premium' | 'free'`.
+
+The four `quick_start_*` events are the homepage funnel: `opened` carries the call to action that opened it (`nav`, `hero`, `pricing` or `closing`), `step_completed` and `abandoned` carry the step (`location`, `ptoDays` or `settings`), and `completed` carries every planning input the visitor finished with: the PTO Day budget, the Country, the Region, the year, the Strategy, past days and Carry-over Months.
+
+The planner and the rest of the app report these, under the same rule: a setting, a feature id, an outcome or a count, never a date or a name. The budget is a setting and travels as its number; the dates a plan places, the Manual Days and the Custom Holidays never do, which is what the [data sources](/how-it-works/data-sources/) page promises.
+
+| Event | Fires when | Carries |
+| --- | --- | --- |
+| `planner_generated` | The worker settles a plan (every replan) | The PTO Day budget, Strategy, year, Carry-over Months, past days, the number of Alternatives and the plan's quality: Efficiency, Effective Days, Bonus Days, Long Weekends, Rest Blocks, Longest Vacation, Max Work Streak |
+| `planning_input_changed` | A sidebar control changes a planning input | `input` (`country`, `region`, `year`, `ptoDays`, `strategy`, `allowPastDays`, `carryOverMonths`) and its new value; the budget applied from the calculator adds `source: ptoCalculator` |
+| `calendar_day_toggled` | A day is clicked | `applied` with what changed (`manual_day_added`, `manual_day_removed`, `suggested_day_removed`, `removed_day_restored`), or `applied: false` with the store's refusal (`budget_exhausted`, `day_is_holiday`…) or `premium_required` when the gate stopped it |
+| `alternative_applied` | An Alternative becomes the Suggestion | Its index and its Efficiency and Effective Days |
+| `manual_changes_reset` | The manual changes are discarded | `surface` (`panel` or `sidebar`) |
+| `holiday_tab_changed` | A Holiday table tab is opened | The Holiday Variant of the tab |
+| `holiday_selection_changed` | A Holiday is picked or un-picked, or select-all is used | The Holiday Variant, `scope` (`one` or `all`) and `selected` |
+| `holidays_sorted` | A Holiday table column is sorted | The Holiday Variant and the column `key` |
+| `holidays_searched` | A search in a Holiday table starts (once per search, never the text) | The Holiday Variant |
+| `holiday_modal_opened` | The add, edit or delete button of a Holiday table is pressed | `action` (`add`, `edit`, `delete`) and the tab's Holiday Variant |
+| `custom_holiday_saved` | A Custom Holiday is added or edited | `mode` (`add` or `edit`), `applied` and the refusal reason if any |
+| `custom_holiday_deleted` | Custom Holidays are deleted | `count` |
+| `calendar_exported` | An ICS or PDF export finishes | `format`, `includeHolidays`, `includePto`, `outcome` (`success` or `error`) |
+| `donate_opened` | The donation popover opens | `source` (`floating`, `planner_toast` or `pricing`) |
+| `payment_cancelled` | The checkout is abandoned back to the form | nothing |
+| `tool_used` | A calculator produces a result | `tool` (`ptoCalculator`, `ptoSalaryCalculator` or `workdayCounter`) |
+| `tutorial_started` | The guided tour starts | `isMobile` |
+| `language_changed` | The language switcher is used | `from`, `to` |
+| `theme_changed` | The theme selector is used | `theme` |
+| `contact_opened` | The feedback form opens | `source` (`click` or `hash`) |
+
+The salary calculator reports only that it was used, once per session of figures: the salary is pay data and stays in the browser.
 
 That snippet is Better Stack's real user monitoring tag, not only an event pipe: once loaded it also captures browser errors, session replays, web vitals and console logs, and which of those run, at what sampling, is configured remotely in the Better Stack application, so a change there needs no deploy. Two things are set from code because the tag cannot know them. The **release** is the app version from `apps/web/package.json`, passed through `betterstack('config', { release })`, so an error is grouped under the version that produced it. The **environment** is derived from the hostname by `trackingEnvironment(hostname)`: `localhost` and any `.workers.dev` host, which is where a pull-request preview lives, report `development`, everything else `production`. It used to read `NODE_ENV`, which every deployed build sets to `production`, so preview traffic was filed with the live site's.
 

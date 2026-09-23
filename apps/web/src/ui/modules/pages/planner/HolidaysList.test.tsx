@@ -11,6 +11,9 @@ const { holidaysState, readyState } = vi.hoisted(() => ({
 	readyState: { areStoresReady: true },
 }));
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("@application/stores/holidays", () => ({
 	useHolidaysStore: (selector: (state: typeof holidaysState) => unknown) => selector(holidaysState),
 }));
@@ -93,5 +96,22 @@ describe("HolidaysList", () => {
 
 		expect(screen.queryByTestId("table")).toBeNull();
 		expect(screen.queryByRole("tab", { name: en.holidaysTable.regionalTab })).toBeNull();
+	});
+});
+
+describe("HolidaysList analytics", () => {
+	it("reports the tab that was opened, and nothing for the inert regional tab", async () => {
+		track.mockClear();
+		renderList();
+
+		await userEvent.click(screen.getByText(en.holidaysTable.regionalTab));
+		expect(track).not.toHaveBeenCalled();
+
+		await userEvent.click(screen.getByRole("tab", { name: en.holidaysTable.customTab }));
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({
+			event: "holiday_tab_changed",
+			properties: { variant: HolidayVariant.CUSTOM },
+		});
 	});
 });

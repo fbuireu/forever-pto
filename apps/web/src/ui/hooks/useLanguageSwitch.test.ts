@@ -6,6 +6,9 @@ const push = vi.hoisted(() => vi.fn());
 const currentPathname = vi.hoisted(() => ({ value: "/planner" }));
 const currentLocale = vi.hoisted(() => ({ value: "es" }));
 
+const track = vi.hoisted(() => vi.fn());
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+
 vi.mock("@application/i18n/navigation", () => ({
 	useRouter: () => ({ push }),
 	usePathname: () => currentPathname.value,
@@ -69,5 +72,13 @@ describe("useLanguageSwitch", () => {
 describe("the a11y key the label is built from", () => {
 	it("exists in the real bundle, so the mocked translator is not covering a missing key", () => {
 		expect(enMessages.a11y.selectLanguage).toBeDefined();
+	});
+});
+
+describe("useLanguageSwitch analytics", () => {
+	it("reports the switch from the locale in force to the one picked", () => {
+		renderHook(() => useLanguageSwitch()).result.current.selectLanguage("en");
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({ event: "language_changed", properties: { from: "es", to: "en" } });
 	});
 });

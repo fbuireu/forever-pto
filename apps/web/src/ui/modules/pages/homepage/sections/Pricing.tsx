@@ -1,6 +1,6 @@
-import { Link } from "@application/i18n/navigation";
+import { DonateSource, QuickStartSource } from "@application/stores/ui";
 import { Badge } from "@ui/modules/core/primitives/Badge";
-import { Button } from "@ui/modules/core/primitives/Button";
+import { QuickStartTrigger } from "@ui/modules/pages/homepage/quick-start/QuickStartTrigger";
 import { SupportButton } from "@ui/modules/shared/SupportButton";
 import { cn } from "@ui/utils/cn";
 import { amountFormatter } from "@ui/utils/currencies";
@@ -58,9 +58,9 @@ export const Pricing = async () => {
 							</li>
 						))}
 					</ul>
-					<Button variant="outline" className="w-full justify-center" asChild>
-						<Link href="/planner">{t("pricing.freeCta")}</Link>
-					</Button>
+					<QuickStartTrigger source={QuickStartSource.PRICING} variant="outline" className="w-full justify-center">
+						{t("pricing.freeCta")}
+					</QuickStartTrigger>
 				</div>
 				<div
 					className={cn(
@@ -105,6 +105,7 @@ export const Pricing = async () => {
 						))}
 					</ul>
 					<SupportButton
+						source={DonateSource.PRICING}
 						label={t("pricing.lifetimeCta")}
 						className="w-full justify-center !bg-[var(--color-brand-ink)] !text-white !border-transparent !shadow-[var(--shadow-brutal-btn-orange)] hover:!shadow-[var(--shadow-brutal-btn-orange-hover)] active:!shadow-[var(--shadow-brutal-btn-orange-active)]"
 					/>

@@ -2,6 +2,8 @@ import { render } from "@testing-library/react";
 import type { ComponentProps, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
+const DIALOG_LAYER = 200;
+
 vi.mock("../primitives/base/Popover", () => ({
 	Popover: ({ children, ...props }: ComponentProps<"div">) => (
 		<div data-primitive="popover" {...props}>
@@ -88,6 +90,13 @@ describe("PopoverContent", () => {
 	it("respects a custom align", () => {
 		const { container } = render(<PopoverContent align="start">content</PopoverContent>);
 		expect(container.querySelector<HTMLElement>('[data-primitive="popover-positioner"]')?.dataset.align).toBe("start");
+	});
+
+	it("floats the positioner above a dialog, so a Combobox opened inside a modal is not hidden behind it", () => {
+		const { container } = render(<PopoverContent>content</PopoverContent>);
+		const layer = container.querySelector('[data-primitive="popover-positioner"]')?.className.match(/\bz-(\d+)\b/);
+
+		expect(Number(layer?.[1])).toBeGreaterThan(DIALOG_LAYER);
 	});
 
 	it("applies positionerClassName to the positioner", () => {

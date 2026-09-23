@@ -5,6 +5,7 @@ import { HolidayVariant } from "@application/dto/holiday/types";
 import { formatDate, isWeekend } from "@application/shared/utils/dates";
 import { useHolidaysStore } from "@application/stores/holidays";
 import { PremiumFeatureId } from "@application/stores/premium";
+import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { useDebounce } from "@ui/hooks/useDebounce";
 import { Checkbox } from "@ui/modules/core/animate/base/Checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@ui/modules/core/animate/base/Collapsible";
@@ -175,12 +176,24 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 		return filtered;
 	}, [variantHolidays, debouncedSearchTerm, sortConfig]);
 
-	const handleSort = useCallback((key: keyof HolidayDTO) => {
-		setSortConfig((current) => ({
-			key,
-			direction: current.key === key && current.direction === "asc" ? "desc" : "asc",
-		}));
-	}, []);
+	const handleSort = useCallback(
+		(key: keyof HolidayDTO) => {
+			setSortConfig((current) => ({
+				key,
+				direction: current.key === key && current.direction === "asc" ? "desc" : "asc",
+			}));
+			track({ event: "holidays_sorted", properties: { variant, key } });
+		},
+		[variant],
+	);
+
+	const wasSearching = useRef(false);
+
+	useEffect(() => {
+		const isSearching = debouncedSearchTerm !== "";
+		if (isSearching && !wasSearching.current) track({ event: "holidays_searched", properties: { variant } });
+		wasSearching.current = isSearching;
+	}, [debouncedSearchTerm, variant]);
 
 	const getHolidayId = useCallback((holiday: HolidayDTO) => `${holiday.id}::${holiday.name}`, []);
 
@@ -201,6 +214,10 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 	}, [filteredHolidays, selectedHolidays, getHolidayId]);
 
 	const toggleSelectAll = useCallback(() => {
+		track({
+			event: "holiday_selection_changed",
+			properties: { variant, scope: "all", selected: selectionState.type !== "all" },
+		});
 		setSelectedHolidays((prev) => {
 			const newSelected = new Set(prev);
 
@@ -216,10 +233,14 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 
 			return newSelected;
 		});
-	}, [filteredHolidays, selectionState.type, getHolidayId]);
+	}, [filteredHolidays, selectionState.type, getHolidayId, variant]);
 
 	const toggleSelectHoliday = useCallback(
 		(holiday: HolidayDTO) => {
+			track({
+				event: "holiday_selection_changed",
+				properties: { variant, scope: "one", selected: !selectedHolidays.has(getHolidayId(holiday)) },
+			});
 			setSelectedHolidays((prev) => {
 				const holidayId = getHolidayId(holiday);
 				const newSelected = new Set(prev);
@@ -233,7 +254,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 				return newSelected;
 			});
 		},
-		[getHolidayId],
+		[getHolidayId, selectedHolidays, variant],
 	);
 
 	const handleCloseAddModal = useCallback(() => {
@@ -319,7 +340,10 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 							<AnimateIcon animateOnTap>
 								<Button
 									size="sm"
-									onClick={() => setShowAddModal(true)}
+									onClick={() => {
+										setShowAddModal(true);
+										track({ event: "holiday_modal_opened", properties: { action: "add", variant } });
+									}}
 									className="bg-[var(--color-brand-teal)] text-[var(--color-brand-ink)] hover:bg-[var(--color-brand-teal)] hover:text-[var(--color-brand-ink)]"
 								>
 									<Plus className="size-4 mr-1" />
@@ -330,7 +354,15 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 						)}
 						{selectedCount === 1 && (
 							<AnimateIcon animateOnHover>
-								<Button variant="outline" size="sm" onClick={() => setShowEditModal(true)} className="py-4">
+								<Button
+									variant="outline"
+									size="sm"
+									onClick={() => {
+										setShowEditModal(true);
+										track({ event: "holiday_modal_opened", properties: { action: "edit", variant } });
+									}}
+									className="py-4"
+								>
 									<Edit className="size-4 mr-1" />
 									<span className="hidden xs:inline">{t("editHoliday")}</span>
 									<span className="xs:hidden">{t("edit")}</span>
@@ -340,7 +372,14 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 						{selectedCount > 0 && (
 							<div className="flex items-center gap-x-2">
 								<AnimateIcon animateOnHover>
-									<Button variant="destructive" size="sm" onClick={() => setShowDeleteModal(true)}>
+									<Button
+										variant="destructive"
+										size="sm"
+										onClick={() => {
+											setShowDeleteModal(true);
+											track({ event: "holiday_modal_opened", properties: { action: "delete", variant } });
+										}}
+									>
 										<Trash2 className="size-4 mr-1" />
 										<span className="hidden xs:inline">{t("deleteHolidays", { count: selectedCount })}</span>
 										<span className="xs:hidden">

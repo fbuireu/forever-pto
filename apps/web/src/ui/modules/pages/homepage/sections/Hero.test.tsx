@@ -16,8 +16,12 @@ vi.mock("next-intl/server", () => ({
 	getLocale: mockGetLocale,
 }));
 
-vi.mock("@application/i18n/navigation", () => ({
-	Link: ({ children }: { children: ReactNode }) => <a href="/">{children}</a>,
+vi.mock("@ui/modules/pages/homepage/quick-start/QuickStartTrigger", () => ({
+	QuickStartTrigger: ({ children, source }: { children: ReactNode; source: string }) => (
+		<button type="button" data-source={source}>
+			{children}
+		</button>
+	),
 }));
 vi.mock("@ui/modules/core/primitives/Badge", () => ({
 	Badge: ({ children }: { children: ReactNode }) => <span>{children}</span>,
@@ -67,5 +71,16 @@ describe("Hero social proof", () => {
 	it("formats the rating with the locale decimal separator", async () => {
 		expect(await renderHero({ locale: "fr", messages: frMessages })).toContain("4,9");
 		expect(await renderHero({ locale: "en", messages: enMessages })).toContain("4.9");
+	});
+
+	it("names the hero as the source of the quick start it opens", async () => {
+		mockGetTranslations.mockResolvedValue(
+			createTranslator({ locale: "en", messages: enMessages, namespace: "homepage" }),
+		);
+		mockGetFormatter.mockResolvedValue(createFormatter({ locale: "en" }));
+		mockGetLocale.mockResolvedValue("en");
+		const { container } = render(await Hero());
+
+		expect(container.querySelector("[data-source]")?.getAttribute("data-source")).toBe("hero");
 	});
 });
