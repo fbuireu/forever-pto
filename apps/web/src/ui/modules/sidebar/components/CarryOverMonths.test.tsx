@@ -162,7 +162,7 @@ describe("CarryOverMonths analytics", () => {
 
 		expect(track).toHaveBeenCalledExactlyOnceWith({
 			event: "planning_input_changed",
-			properties: { input: "carryOverMonths", value: 3 },
+			properties: { input: "carryOverMonths", inputValue: 3 },
 		});
 	});
 });

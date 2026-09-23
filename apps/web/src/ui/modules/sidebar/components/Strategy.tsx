@@ -67,7 +67,7 @@ export const Strategy = () => {
 
 	const handleStrategyChange = (value: FilterStrategy) => {
 		setStrategy(value);
-		track({ event: "planning_input_changed", properties: { input: "strategy", value } });
+		track({ event: "planning_input_changed", properties: { input: "strategy", inputValue: value } });
 	};
 
 	const currentStrategy = strategies.find(({ value }) => value === strategy);

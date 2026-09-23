@@ -129,7 +129,7 @@ describe("Regions analytics", () => {
 
 		expect(track).toHaveBeenCalledExactlyOnceWith({
 			event: "planning_input_changed",
-			properties: { input: "region", value: "CT" },
+			properties: { input: "region", inputValue: "CT" },
 		});
 	});
 });

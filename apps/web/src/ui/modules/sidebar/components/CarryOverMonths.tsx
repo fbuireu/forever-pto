@@ -50,7 +50,7 @@ export const CarryOverMonths = () => {
 
 			timeoutRef.current = setTimeout(() => {
 				setCarryOverMonths(newValue);
-				track({ event: "planning_input_changed", properties: { input: "carryOverMonths", value: newValue } });
+				track({ event: "planning_input_changed", properties: { input: "carryOverMonths", inputValue: newValue } });
 			}, DEBOUNCE_DELAY);
 		},
 		[setCarryOverMonths],

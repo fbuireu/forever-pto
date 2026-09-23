@@ -121,7 +121,7 @@ describe("Years analytics", () => {
 
 		expect(track).toHaveBeenCalledExactlyOnceWith({
 			event: "planning_input_changed",
-			properties: { input: "year", value: 2027 },
+			properties: { input: "year", inputValue: 2027 },
 		});
 	});
 });

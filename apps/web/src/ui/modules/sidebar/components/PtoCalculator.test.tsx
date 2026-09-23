@@ -162,7 +162,7 @@ describe("PtoCalculator analytics", () => {
 
 		expect(track).toHaveBeenLastCalledWith({
 			event: "planning_input_changed",
-			properties: { input: "ptoDays", value: 24, source: "ptoCalculator" },
+			properties: { input: "ptoDays", inputValue: 24, source: "ptoCalculator" },
 		});
 	});
 });

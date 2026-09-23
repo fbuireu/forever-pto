@@ -62,7 +62,10 @@ export const Years = ({ currentYear }: YearsProps) => {
 											value={String(yearOption)}
 											onSelect={() => {
 												setYear(yearOption);
-												track({ event: "planning_input_changed", properties: { input: "year", value: yearOption } });
+												track({
+													event: "planning_input_changed",
+													properties: { input: "year", inputValue: yearOption },
+												});
 												setOpen(false);
 											}}
 										>
