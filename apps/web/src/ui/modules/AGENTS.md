@@ -121,7 +121,7 @@ the step the form last announced through `onStepChange`; a finish closes through
 sidebar control, the day click, the Alternatives, the Custom Holiday modals, the export, the calculators, the
 tutorial, the language and theme switchers and the contact form call `track()` where the click lands; the
 catalogue is the observability page of the docs site. The stores stay quiet because their setters also run on
-rehydration and on the quick start's finish, where a "change" event would be a lie. Two producers are the
+rehydration and on the quick start's finish, where a "change" event would report a change nobody made. Two producers are the
 exception, and both are opens: `openDonatePopover(source)` and `openQuickStart(source)` on the `ui` store, so
 that every trigger reports the same event with its own `source`. `planner_generated` fires in
 `hooks/useCalculationsWorker.ts` when the worker's answer lands, the one place that holds the inputs and the

@@ -186,7 +186,7 @@ writes body pointer events, and `vaul`'s value is `auto`, which is the initial v
 not ours to undo. `Sidebar.test.tsx` fails on any `document.body.style` in this file. If a component here ever
 does need a body-level lock, it owns the restore in the same effect's cleanup, not in an animation callback.
 
-**Transient overlays sit above every modal surface, on purpose and by number.** The scale is: desktop sidebar
+**Transient overlays sit above every modal surface.** The scale is: desktop sidebar
 `z-10`, the cookie banner `z-40` (a prompt, not a modal: it yields to anything that dims the page, and it used to sit at
 `z-9999` and cover the quick start dialog and the Country list it opens), drawer overlay and mobile sidebar backdrop `z-50`, their panels `z-51`, dialog backdrop and popup `z-200`,
 popover and dropdown positioners `z-210`, tooltip positioner `z-220`. A popover is opened *from* whatever surface is

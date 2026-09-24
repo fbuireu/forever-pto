@@ -157,8 +157,8 @@ its paths fall under, so a docs change never cuts an app release and vice versa.
 
 **Both packages run the same chain, and what keeps their pushes apart is the concurrency group.**
 `release-web` and `release-docs` both declare `group: release` with `cancel-in-progress: false`, and GitHub
-serialises a group across workflows, so the second job starts after the first one has pushed. **Starting after
-is not checking out after**: `actions/checkout` pins the run's own sha, so the second job held the branch one
+serialises a group across workflows, so the second job starts after the first one has pushed. **It still checks out
+its own run's sha**, because `actions/checkout` pins it, so the second job held the branch one
 release commit behind the remote and semantic-release stood down on *The local branch main is behind the
 remote one*, green and releasing nothing. Every push touching both packages lost its web release that way,
 the quick-start `feat` of 2026-09-23 among them, and the concurrency group could not have prevented it: it
@@ -183,7 +183,7 @@ again. Pushing the tag first avoids the race.
 **A tag on a commit `main` cannot reach is worse than a missing one.** semantic-release finds the last release
 with `git tag --merged`, so a tag whose commit is not an ancestor of the release branch is invisible to it: it
 recomputes the same version and dies on `fatal: tag '<version>' already exists`, because the tag it cannot
-*see* is still one `git tag` refuses to overwrite. That is a permanent stop rather than one bad run — every
+*see* is still one `git tag` refuses to overwrite. That is a permanent stop rather than one bad run: every
 later push repeats it. It happens when a release commit is rebased away by a force-push to `main` while its
 tag stays put.
 
@@ -194,7 +194,7 @@ work under a different sha. The alternative, a bridge tag one patch higher, woul
 claim a release that never happened; grafting keeps the numbers honest. Prefer it, and never force-push `main`
 while a release is in flight.
 
-**A graft buys one release, not a permanent fix — a further rewrite orphans it again the same way.** What
+**A graft buys one release, not a permanent fix: a further rewrite orphans it again the same way.** What
 actually retires the problem is the version line moving past the orphaned tag, since semantic-release only
 ever reads the *highest* reachable one: an unreachable tag only stops a release while it is the version the
 analyser would compute next.
@@ -208,12 +208,12 @@ for the Better Stack work started at 06:38 on `81c3467b`, a docs-only pull reque
 and the push was refused at 06:41; the recovery then was a filler commit touching `WEB_PATHS`. Both release jobs
 now fast-forward onto `origin/main` before semantic-release runs, so the version is computed over every commit
 on `main` at that moment, the ones that landed mid-run included, and the run those commits queued finds nothing
-left to publish. The cost is stated rather than hidden: a tag can precede the deploy of the commits it absorbed
+left to publish. The cost: a tag can precede the deploy of the commits it absorbed
 by the minutes their queued run takes, and `Verify` ran on them in their pull request rather than in the run
 that released them. Two cases still stand a release job down, and both heal on their own: `main` rewritten
 under the run, where the sha is no ancestor of the head and the step leaves the checkout alone, and a merge
 landing in the seconds between the fast-forward and the push. Neither writes a tag, so the run the newer head
-queued computes the release over everything since the last one and cuts it; nobody has to dispatch anything.
+queued computes the release over everything since the last one and cuts it.
 
 **A change confined to the repo root releases nothing**: `adr/`, `tests/`, `README.md`, `CONTEXT.md`, this
 file. That is correct and occasionally surprising. **It is narrower than it reads**: `WEB_PATHS` in `ci.yml`
