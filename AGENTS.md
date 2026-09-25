@@ -112,8 +112,9 @@ and a single pass is what lints `apps/docs` now that its workflow no longer has 
 The docs manifest carries no Biome scripts either: it held a copy of the root's, nothing ran them, and
 the `--changed` ones could not have worked from a package directory.
 Its `files.includes` exclusions are repo-relative paths, so any future move has to re-prefix them;
-`tests/docs-consistency.test.ts` asserts every one that names a literal path still resolves. `.astro` files are excluded from the **linter** only: Biome parses just
-their frontmatter, so every import used in the template body reads as unused. `astro check` covers them.
+`tests/docs-consistency.test.ts` asserts every one that names a literal path still resolves. `.astro` files keep the linter but lose two of its rules, `noUnusedImports` and `noUnusedVariables`,
+through an `overrides` entry: Biome parses just their frontmatter, so every import used in the template body
+reads as unused. `astro check` covers them.
 
 **One lockfile, at the root.** [`.gitignore`](./.gitignore) carries `apps/*/pnpm-lock.yaml` so a stray per-package lockfile
 cannot shadow the workspace resolution.
@@ -218,8 +219,10 @@ queued computes the release over everything since the last one and cuts it.
 **A change confined to the repo root releases nothing**: `adr/`, `tests/`, `README.md`, `CONTEXT.md`, this
 file. That is correct and occasionally surprising. **It is narrower than it reads**: `WEB_PATHS` in `ci.yml`
 also matches [`package.json`](./package.json), `pnpm-workspace.yaml`, [`patches/`](./patches), [`biome.json`](./biome.json), `.nvmrc` and
-[`.github/actions/`](./.github/actions), all of which do cut a release. That is deliberate (each of them changes what the app
-builds from), but it means "the repo root" is not the boundary; the regex is.
+[`.github/actions/`](./.github/actions), all of which redeploy the app and run `release-web`. That is deliberate (each of them
+changes what the app builds from), but the release job then finds no commit under `apps/web`, because
+`semantic-release-monorepo` attributes by the package path, and cuts nothing. The regex is the deploy
+boundary; the package path is the release one.
 
 ## CI
 
@@ -256,7 +259,7 @@ and those had their inputs repointed instead.
 **The `changes` job gates the web deploy and release on whether `apps/web` was touched**, so a docs-only or
 markdown-only commit no longer redeploys production. It derives the answer from `git diff` rather than a
 third-party filter action, because every other action here is pinned to a commit SHA and an unpinnable one
-trips `zizmor`. It fails open. `lint`, `typecheck` and `test` stay unconditional: the contract suite reads
+trips `zizmor`. It fails open. `verify` stays unconditional: the contract suite reads
 `CONTEXT.md`, `adr/` and every guide, so a markdown-only change must not slip past it.
 
 **There is no `deploy-production.yml` and no `deploy-development.yml`, and that is the point.** They were
@@ -314,7 +317,8 @@ does not match, so every docs preview is publicly reachable. That is worse than 
 **production** sitemap, so each preview invites crawlers to index a duplicate of `docs.forever-pto.com`. The
 fix is a second destination on the same Access application, inheriting the `Allow` and `Service Auth`
 policies already there. It cannot be fixed in this tree: `build` produces one `docs-dist` artifact that both
-`preview` and `deploy` ship, the docs build reads no environment variable, and `apps/docs` serves static
+`preview` and `deploy` ship, the docs build reads no variable beyond the two analytics ids and emits the
+same `robots.txt` for every stage, and `apps/docs` serves static
 assets with no Worker, so there is no build-time switch and no per-environment header to fall back on.
 
 **`E2E (preview)` gates a merge through `Check`, and for a month it did not, which is the hole separate incidents came through.** It is what
@@ -601,9 +605,11 @@ relative-link rule could not catch because they were prose rather than links.
 ## Gotchas
 
 - **Biome's `noConsole` is an error with no allowlist**: no `console` at any level, so a stray `console.log`
-  fails the build rather than shipping. The places that call it anyway are the log sink itself, which
-  has nothing else to call: the BetterStack client's unconfigured warning, scoped in `biome.json`'s
-  `overrides`. That is the only entry, and it is the whole allowance; anything else is a defect. A second
+  fails the build rather than shipping. The one place that calls it anyway is the log sink itself, which
+  has nothing else to call: [`logger.ts`](./apps/web/src/infrastructure/logging/logger.ts) writes every entry to
+  `console` for the platform to export ([ADR 0018](./adr/0018-the-platform-is-the-log-transport.md)), scoped
+  in `biome.json`'s `overrides`. That is the only `noConsole` entry, and it is the whole allowance; anything
+  else is a defect. A second
   `overrides` entry is the wrong shape for a one-off, where a `biome-ignore` comment on the call is the right
   one, but neither is warranted today.
 - **A `:changed` variant names a literal base, and computing one is what it must not do.** A `package.json`
