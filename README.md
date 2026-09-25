@@ -40,7 +40,7 @@ Given your country, region, year, and number of PTO days, Forever PTO suggests t
 
 ---
 
-## Documentation
+## Wiki
 
 The full wiki lives at **[docs.forever-pto.com](https://docs.forever-pto.com)**: architecture, runtime flows (country detection, premium, holidays engine…), the design system with live component demos, and the complete CI/CD and environments lifecycle.
 
