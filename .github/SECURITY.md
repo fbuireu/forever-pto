@@ -49,11 +49,6 @@ Please check these before reporting:
   revoked.** There are no accounts; the payment record is the entitlement.
   Both follow from that decision. See
   [ADR 0008](../adr/0008-premium-derived-from-payment.md).
-- **The per-pull-request docs preview Workers are publicly reachable.** That
-  is known: the Cloudflare Access application covers the planner previews and
-  not the docs ones, and the fix is a second Access destination rather than a
-  change in this tree. They serve the same public documentation as the live
-  site.
 
 A report that one of these exposes something *beyond* its documented scope
 (confidential data behind the obfuscation, or an entitlement without any

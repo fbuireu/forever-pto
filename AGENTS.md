@@ -310,16 +310,16 @@ approval requirement and no `required_deployments` rule. Two settings outside th
 with the owner's `PAT`, which passes the admin bypass), and a deployment-branch policy of `main` only on
 `web-production` and `docs-production`, so a job naming either from another ref fails before its first step.
 
-**The docs preview needs an Access destination and does not have one.** The Access application matches
-`pr-*-forever-pto-development`; the docs preview is `pr-*-forever-pto-docs-development`, which that pattern
-does not match, so every docs preview is publicly reachable. That is worse than it sounds, because
-[`apps/docs/public/robots.txt`](./apps/docs/public/robots.txt) says `Allow: /` and advertises the
-**production** sitemap, so each preview invites crawlers to index a duplicate of `docs.forever-pto.com`. The
-fix is a second destination on the same Access application, inheriting the `Allow` and `Service Auth`
-policies already there. It cannot be fixed in this tree: `build` produces one `docs-dist` artifact that both
-`preview` and `deploy` ship, the docs build reads no variable beyond the two analytics ids and emits the
-same `robots.txt` for every stage, and `apps/docs` serves static
-assets with no Worker, so there is no build-time switch and no per-environment header to fall back on.
+**The docs preview has its own Access destination, and it has to keep it.** The Access application carries two
+public-hostname destinations, `pr-*-forever-pto-development` and `pr-*-forever-pto-docs-development`, because
+the first pattern does not match the docs previews. Both inherit the application's `Allow` and `Service Auth`
+policies. Removing the docs destination would make every docs preview publicly reachable, and that is worse
+than it sounds: [`apps/docs/public/robots.txt`](./apps/docs/public/robots.txt) says `Allow: /` and advertises
+the **production** sitemap, so each preview would invite crawlers to index a duplicate of
+`docs.forever-pto.com`. Nothing in this tree can stand in for it: `build` produces one `docs-dist` artifact
+that both `preview` and `deploy` ship, the docs build reads no variable beyond the two analytics ids and emits
+the same `robots.txt` for every stage, and `apps/docs` serves static assets with no Worker, so there is no
+build-time switch and no per-environment header to fall back on.
 
 **`E2E (preview)` gates a merge through `Check`, and for a month it did not, which is the hole separate incidents came through.** It is what
 catches the Cloudflare Error 1101 the Next pin exists to prevent, and Renovate auto-merged 16.3.1 straight
