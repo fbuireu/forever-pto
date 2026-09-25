@@ -10,7 +10,7 @@ The repository is a pnpm workspace with sibling packages under `apps/`, the Next
 ```
 forever-pto/
 ├── apps/
-│   ├── web/              # the planner (forever-pto)
+│   ├── web/              # the planner (forever-pto-web)
 │   │   ├── src/          # app source, layered (see below)
 │   │   ├── e2e/          # Playwright specs mirroring the app routes
 │   │   ├── wrangler.toml
@@ -28,7 +28,7 @@ There is no `packages/` tier; one is added the day a real shared package exists.
 
 ## `apps/web/src/` layers
 
-The app follows a layered architecture: each directory has a `AGENTS.md` describing its purpose and boundaries,, and the details are covered in the [architecture overview](/architecture/overview/).
+The app follows a layered architecture: each directory has an `AGENTS.md` describing its purpose and boundaries, and the details are covered in the [architecture overview](/architecture/overview/).
 
 | Directory | Role |
 | --- | --- |
@@ -45,7 +45,7 @@ End-to-end Playwright specs (`*.spec.ts`) whose folder structure mirrors the app
 
 ## `patches/`
 
-pnpm patches, wired through the `patchedDependencies` section of `pnpm-workspace.yaml`. Currently `patches/boneyard-js.patch` fixes the skeleton component in `boneyard-js` to derive its unique id from React's `useId()` instead of `Math.random()`, which keeps server and client markup consistent.
+pnpm patches, wired through the `patchedDependencies` section of `pnpm-workspace.yaml`. `patches/boneyard-js.patch` fixes the skeleton component in `boneyard-js` to derive its unique id from React's `useId()` instead of `Math.random()`, which keeps server and client markup consistent. `patches/vaul@1.1.2.patch` patches the drawer library; `apps/web/src/ui/modules/core/AGENTS.md` says what it changes and why.
 
 ## `apps/docs/`
 

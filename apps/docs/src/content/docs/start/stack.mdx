@@ -17,7 +17,7 @@ Exact versions are pinned in `package.json` (the repo uses exact pins, via `save
 | Tailwind CSS | Styling | v4 CSS-first config, with no `tailwind.config` file; theme lives in CSS under `apps/web/src/ui/styles/` |
 | Base UI | Headless primitives | Accessible behavior (tooltips, popovers, dialogs) without imposed styling, so the neo-brutalist skin stays in our CSS |
 | Motion | Animation | `LazyMotion` keeps the animation runtime out of the initial bundle; see the design-system animation pages |
-| Zustand | Client state | Small store-per-concern model (`filters`, `holidays`, `location`, `premium`) with persistence, accessed via `useShallow` selectors |
+| Zustand | Client state | Small store-per-concern model (`filters`, `holidays`, `location`, `premium`, `ui`) with persistence, accessed via `useShallow` selectors |
 | Effect | Server flows | Typed, composable error handling for the payment/premium pipeline (`apps/web/src/domain/payment/`, `apps/web/src/application/use-cases/`), with no try/catch pyramids |
 | next-intl | i18n | Locale routing plus namespaced messages for the locales in `apps/web/src/ui/i18n/messages/` |
 | boneyard-js | Loading skeletons | Generates skeleton components from real rendered output into `apps/web/src/ui/modules/bones` instead of hand-maintaining them (patched; see [repo structure](/start/repo-structure/)) |

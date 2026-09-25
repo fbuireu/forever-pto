@@ -57,7 +57,7 @@ than a note saying it cannot be rendered, and why [`src/ui/styles/index.css`](..
 - **a pull request** → its own Worker, `pr-<n>-forever-pto-docs-development`, deleted when the PR closes
 
 Previews never touch the production Worker. The site displays the **app's** version, not its own:
-this package stays at `0.0.0` permanently and nothing reads it.
+this package's version is cut as `docs-vX.Y.Z` with its own `CHANGELOG.md`, and nothing reads it.
 
 ## Writing
 

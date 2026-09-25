@@ -11,11 +11,11 @@ A single `biome.json` at the repo root lints and formats the whole workspace, `a
 
 - Formatter: 120-char lines, LF, tabs, double quotes, trailing commas everywhere, Biome's own defaults bar the line width. The config declares no `javascript.formatter` block at all, which is what keeps it identical to the sibling repos'.
 - `assist.actions.source.organizeImports: on`, so import sorting is automated. Don't hand-sort.
-- Recommended rules plus `suspicious.noConsole` as an **error** with no allowlist: no `console` at any level. Log through [`apps/web/src/infrastructure/clients/logging`](https://github.com/fbuireu/forever-pto/tree/main/apps/web/src/infrastructure/clients/logging) instead. The one exception is scoped in `overrides` rather than hidden in a suppression comment, and it is the logging client itself: `console` is what that client writes to, because the Cloudflare platform is what exports it ([ADR 0018](https://github.com/fbuireu/forever-pto/blob/main/adr/0018-the-platform-is-the-log-transport.md)). It is an exemption for the sink, not a licence anywhere else.
-- `apps/docs/src/styles` is excluded from formatting, because it carries Tailwind directives; the app's own style layers are not excluded, since `css.parser.tailwindDirectives` handles them in place. `*.d.ts` and `*.astro` files are excluded from linting, because Biome parses only an Astro file's frontmatter, so every import used in the template body would read as unused. `astro check` covers those files instead.
+- Recommended rules plus `suspicious.noConsole` as an **error** with no allowlist: no `console` at any level. Log through [`apps/web/src/infrastructure/logging`](https://github.com/fbuireu/forever-pto/tree/main/apps/web/src/infrastructure/logging) instead. The one exception is scoped in `overrides` rather than hidden in a suppression comment, and it is the logger itself, `logger.ts`: `console` is what it writes to, because the Cloudflare platform is what exports it ([ADR 0018](https://github.com/fbuireu/forever-pto/blob/main/adr/0018-the-platform-is-the-log-transport.md)). It is an exemption for the sink, not a licence anywhere else.
+- `apps/docs/src/styles` is excluded from formatting, because it carries Tailwind directives; the app's own style layers are not excluded, since `css.parser.tailwindDirectives` handles them in place. `*.d.ts` files are excluded from linting, and `*.astro` files lose `noUnusedImports` and `noUnusedVariables` through an `overrides` entry, because Biome parses only an Astro file's frontmatter, so every import used in the template body would read as unused. `astro check` covers those files instead.
 - VCS integration is on (`useIgnoreFile`, default branch `main`), which is what powers the `--changed` script variants.
 
-Run `pnpm format:changed` before pushing if you bypassed the hooks; `pnpm verify` is what CI and `pre-push` both run.
+Run `pnpm format:changed` before pushing if you bypassed the hooks; CI runs `pnpm verify`, and `pre-push` runs `pnpm verify:changed`.
 
 ## Git hooks (husky)
 
@@ -23,13 +23,13 @@ Installed by the `prepare` script on `pnpm install`. The hooks in `.husky/`:
 
 | Hook | Runs | Purpose |
 | --- | --- | --- |
-| `pre-commit` | `pnpm lint-staged` | Format + lint staged files; run unit tests for staged test files |
+| `pre-commit` | `pnpm lint-staged` | Format + lint staged files |
 | `commit-msg` | `pnpm exec commitlint --edit` | Enforce conventional commits (see [conventions](/contributing/conventions/)) |
-| `pre-push` | `pnpm verify` | The full gate (`format:check`, `typecheck` across both packages, and the coverage run) before anything leaves your machine. It is the same command the CI Check job runs |
+| `pre-push` | `pnpm verify:changed` | `format:check`, `typecheck` across both packages and the unit tests over what changed. CI's `Verify` job runs the full `pnpm verify`, coverage included, because the coverage floor cannot hold over a changed-only subset |
 
 ### lint-staged
 
-The active config is [`.lintstagedrc.json`](https://github.com/fbuireu/forever-pto/blob/main/.lintstagedrc.json), and it does one thing: Biome formats and fixes every staged file it recognises, in both packages. Tests are deliberately not here, because `pre-push` runs the full `pnpm verify`, so a commit stays fast and nothing reaches the remote unverified.
+The active config is [`.lintstagedrc.json`](https://github.com/fbuireu/forever-pto/blob/main/.lintstagedrc.json), and it does one thing: Biome formats and fixes every staged file it recognises, in both packages. Tests are deliberately not here, because `pre-push` runs `pnpm verify:changed`, so a commit stays fast and nothing reaches the remote untested.
 
 ## CI-side scanners
 
@@ -40,4 +40,4 @@ The active config is [`.lintstagedrc.json`](https://github.com/fbuireu/forever-p
 
 ## Dependency management
 
-Renovate (`.github/renovate.json`) pins everything (including action SHAs), runs twice a month and automerges patch/minor updates once the required checks pass; no approval is required, so no workflow has to approve them first. pnpm policy lives in `pnpm-workspace.yaml`: an `allowBuilds` whitelist for postinstall scripts, a minimum release age for new versions, and `patchedDependencies` for the boneyard-js patch.
+Renovate (`.github/renovate.json`) pins everything (including action SHAs), runs twice a month and automerges patch/minor updates once the required checks pass; no approval is required, so no workflow has to approve them first. pnpm policy lives in `pnpm-workspace.yaml`: an `allowBuilds` whitelist for postinstall scripts, a minimum release age for new versions, and `patchedDependencies` for the boneyard-js and vaul patches.

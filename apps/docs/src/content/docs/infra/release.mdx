@@ -10,7 +10,7 @@ Each package releases itself. [semantic-release](https://semantic-release.gitboo
 | Package | Tags | Writes | Runs in |
 | --- | --- | --- | --- |
 | `apps/web` | `web-vX.Y.Z` | `package.json`, `CHANGELOG.md`, a GitHub Release | `ci.yml`, after the production deploy |
-| `apps/docs` | `docs-vX.Y.Z` | a tag and a GitHub Release, nothing else | `docs.yml`, after the docs deploy |
+| `apps/docs` | `docs-vX.Y.Z` | `package.json`, `CHANGELOG.md`, a GitHub Release | `docs.yml`, after the docs deploy and its smoke run |
 
 ## The flow
 
@@ -71,7 +71,7 @@ Consequences:
 
 - **One package per pull request.** A PR spanning both packages appears in both changelogs.
 - **A change confined to the repo root releases nothing**: `.github/`, `biome.json`, `adr/`, `tests/`, the root manifest.
-- The old rule requiring documentation PRs to use `docs:` titles is gone, along with the matching `semanticCommitType` override in `renovate.json`. Both existed only to stop single-package versioning doing the wrong thing.
+- The old rule requiring documentation PRs to use `docs:` titles is gone; it existed only to stop single-package versioning doing the wrong thing. The `semanticCommitType: docs` rule in `renovate.json` for `apps/docs/package.json` stays, so a docs dependency bump does not read as an app change; attribution already books it against `apps/docs`.
 
 ## Source files
 

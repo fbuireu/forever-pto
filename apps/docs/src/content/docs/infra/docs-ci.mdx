@@ -32,7 +32,7 @@ Triggers:
 
 ## Build & test job
 
-Installs the whole workspace (**unfiltered** `pnpm install`: the demos import app sources whose bare imports resolve from the root `node_modules`), then runs, via the scripts in `apps/docs/package.json`:
+Installs the whole workspace (**unfiltered** `pnpm install`: the demos import app sources whose bare imports resolve from `apps/web/node_modules`), then runs, via the scripts in `apps/docs/package.json`:
 
 - `pnpm typecheck`: `astro check`, which typechecks the demo islands. This is the drift tripwire: demos import real app components via the `@ui` alias with exhaustive `Record<Variant, …>` maps, so renaming a CVA variant in the app breaks this build.
 - `pnpm build`: `astro build`; the resulting `apps/docs/dist` is uploaded as an artifact for the deploy jobs.
@@ -70,11 +70,11 @@ On `main`, the deploy job reuses the build job's `apps/docs/dist` artifact and r
 
 ## Accepted cost: docs PRs still run app CI
 
-`ci.yml` opens with a `changes` job that derives whether `apps/web` was touched, and gates `deploy-production`, `release-web` and `deploy-development` on it, so a docs-only PR no longer deploys an app preview Worker or runs app E2E. Lint, typecheck and unit tests stay unconditional, because the documentation contract suite reads `CONTEXT.md`, `adr/` and every guide and must not be skipped by a markdown-only change.
+`ci.yml` opens with a `changes` job that derives whether `apps/web` was touched, and gates `deploy-production`, `release-web` and `deploy-development` on it, so a docs-only PR no longer deploys an app preview Worker or runs app E2E. The `Verify` job stays unconditional, because the documentation contract suite reads `CONTEXT.md`, `adr/` and every guide and must not be skipped by a markdown-only change.
 
 The obvious fix, `paths-ignore: ['apps/docs/**']` on the app workflows, has a branch-protection caveat: required status checks that never run **never report**, and GitHub blocks the merge waiting for them. That is why neither workflow carries a path filter: each has a `changes` job that gates its own jobs with `if:`, and an aggregate job that always reports, `Check` in `ci.yml` and `Check (docs)` in `docs.yml`, is what the ruleset requires. The redundancy that remains, the contract suite running on every pull request, is deliberate.
 
 Related conventions for docs PRs:
 
-- Title them `docs:` or `chore:`; a `feat:`/`fix:` docs PR would [cut an app release](/infra/release/).
+- Title them for the package they touch: attribution is by path, so a `feat:`/`fix:` on a docs-only PR cuts a docs release, never an app one (see [releases](/infra/release/)).
 - Docs dependencies live in `apps/docs/package.json` but share the root `pnpm-lock.yaml`, so [Renovate](/infra/renovate/) manages them under the same policy.

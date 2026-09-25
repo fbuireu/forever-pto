@@ -15,12 +15,12 @@ Renovate is the repo's dependency bot, configured in `.github/renovate.json`. A 
 
 ## Pin everything
 
-- `rangeStrategy: pin` means every dependency is an exact version, with no `^`/`~` ranges. This pairs with `save-prefix=` in `.npmrc`, which makes manual installs exact too.
+- `rangeStrategy: pin` means every dependency is an exact version, with no `^`/`~` ranges. This pairs with `savePrefix: ""` in `pnpm-workspace.yaml`, which makes manual installs exact too.
 - `pinDigests: true` means GitHub Actions are pinned to commit SHAs (the `uses: owner/action@<sha> # vX.Y.Z` pattern you see in every workflow). Renovate keeps both the SHA and the version comment in sync.
 
 ## Automerge by label
 
-Package rules label each PR by update type, and those labels drive the approval workflow:
+Package rules label each PR by update type and set its automerge:
 
 | Update type | Label | Automerge |
 | --- | --- | --- |
@@ -41,8 +41,7 @@ The ruleset on `main` requires no approval, only the checks, so Renovate merges 
 ## Extras
 
 - Node is constrained to even (LTS-track) majors via an `allowedVersions` regex on the `node` dep.
-- `customManagers:biomeVersions` keeps the Biome schema version in `biome.json` in step with the installed package.
 - Assignees and reviewers come from `CODEOWNERS` (`assigneesFromCodeOwners` / `reviewersFromCodeOwners`).
 - The dependency dashboard issue (`:dependencyDashboard`) lists pending/blocked updates.
 
-Since `apps/docs/` joined the pnpm workspace, Renovate also manages this site's dependencies under the same policy, and a docs dependency PR runs docs CI via the path filter in `docs.yml` (see [docs CI](/infra/docs-ci/)).
+Since `apps/docs/` joined the pnpm workspace, Renovate also manages this site's dependencies under the same policy, and a docs dependency PR runs docs CI through the `DOCS_PATHS` gate in `docs.yml`'s `changes` job (see [docs CI](/infra/docs-ci/)).

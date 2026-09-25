@@ -10,16 +10,16 @@ The app runs as a Cloudflare Worker built with OpenNext. The kinds of environmen
 | Environment | Worker | URL | Access |
 | --- | --- | --- | --- |
 | Production | `forever-pto` | `https://forever-pto.com` (zone route `forever-pto.com/*`) | Public |
-| Development (stable) | `forever-pto-development` | `https://development.forever-pto.com` | Cloudflare Access |
+| Development (stable) | `forever-pto-development` | `https://forever-pto-development.fbuireu.workers.dev` | Cloudflare Access |
 | Per-PR preview | `pr-<n>-forever-pto-development` | `https://pr-<n>-forever-pto-development.fbuireu.workers.dev` | Cloudflare Access |
 
 ## Production
 
-Deployed by the `deploy-production` job of `.github/workflows/ci.yml` on every push to `main`, gated on the `Check` job passing and on the `changes` job finding an `apps/web` change (see [release](/infra/release/)). The Worker is bound to the `forever-pto.com` zone via a route pattern in `wrangler.toml`, a zone route, not a Workers custom domain. It uses the production R2 incremental-cache bucket, the rate-limiter binding and the Turso database (see [Cloudflare stack](/infra/cloudflare/)).
+Deployed by the `deploy-production` job of `.github/workflows/ci.yml` on every push to `main`, gated on the `Verify` job passing and on the `changes` job finding an `apps/web` change (see [release](/infra/release/)). The Worker is bound to the `forever-pto.com` zone via a route pattern in `wrangler.toml`, a zone route, not a Workers custom domain. It uses the production R2 incremental-cache bucket, the rate-limiter binding and the Turso database (see [Cloudflare stack](/infra/cloudflare/)).
 
 ## Development (stable)
 
-The `forever-pto-development` Worker is the long-lived development environment. Its custom domain (`development.forever-pto.com`) is managed in the Cloudflare dashboard: `wrangler.toml` only knows the URL as the `NEXT_PUBLIC_SITE_URL` var, there is no route for it in the file. The whole environment sits behind Cloudflare Zero Trust Access (`CF_ACCESS_*` vars in `wrangler.toml`), so a browser hitting it gets an Access login and CI must authenticate with a service token.
+The `forever-pto-development` Worker is the long-lived development environment. It answers on its `workers.dev` origin, which `wrangler.toml` knows only as the `NEXT_PUBLIC_SITE_URL` var under `[env.development.vars]`; there is no route for it in the file. The whole environment sits behind Cloudflare Zero Trust Access, configured in the dashboard rather than in `wrangler.toml`, so a browser hitting it gets an Access login and CI authenticates with a service token (`CF_ACCESS_CLIENT_ID` / `CF_ACCESS_CLIENT_SECRET`, secrets on the `web-development` GitHub environment).
 
 ## Per-PR previews
 
@@ -27,7 +27,7 @@ Every pull request gets its own throwaway Worker.
 
 ### Created
 
-The `deploy-development` job of `.github/workflows/ci.yml` fires on `pull_request` (`opened`, `reopened`, `synchronize`) and calls the reusable `.github/workflows/_deploy-web.yml` with `wrangler_env: development` plus a `worker_name` override of `pr-<n>-forever-pto-development`. The `--name` flag on `wrangler deploy` is what mints a brand-new Worker instead of updating the stable one, and `--secrets-file` on the same call is what gives it the five runtime secrets, which do not exist on a Worker until they are uploaded (see [secrets](/infra/secrets/)). After deploying:
+The `deploy-development` job of `.github/workflows/ci.yml` fires on `pull_request` (`opened`, `reopened`, `synchronize`) and calls the reusable `.github/workflows/_deploy-web.yml` with `environment: web-development`, from which it derives the wrangler environment `development`, plus a `worker_name` override of `pr-<n>-forever-pto-development`. The `--name` flag on `wrangler deploy` is what mints a brand-new Worker instead of updating the stable one, and `--secrets-file` on the same call is what gives it the five runtime secrets, which do not exist on a Worker until they are uploaded (see [secrets](/infra/secrets/)). After deploying:
 
 1. A sticky PR comment (upserted via a hidden marker) posts the preview URL.
 2. A Playwright E2E job runs against the live preview, authenticating through Cloudflare Access with a service token (`CF_ACCESS_CLIENT_ID` / `CF_ACCESS_CLIENT_SECRET` injected as `CF-Access-Client-Id/Secret` headers by `playwright.config.ts`).

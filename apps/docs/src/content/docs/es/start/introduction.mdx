@@ -23,7 +23,7 @@ La app funciona en [forever-pto.com](https://forever-pto.com) como un Cloudflare
 
 ## Cómo está construido este sitio
 
-Esta wiki es parte del propio repositorio: un sitio Astro Starlight en el paquete de workspace `apps/docs/`. No es una reimplementación paralela de la UI de la app: las páginas del design system importan los **componentes reales de la app** a través del alias `@ui` (mapeado a `apps/web/src/ui` en `apps/docs/astro.config.ts`) y los renderizan como islands de React.
+Esta wiki es parte del propio repositorio: un sitio Astro Starlight en el paquete de workspace `apps/docs/`. No es una reimplementación paralela de la UI de la app: las páginas del design system importan los **componentes reales de la app** a través del alias `@ui` (mapeado a `apps/web/src/ui` en `apps/docs/tsconfig.json`, del que `apps/docs/astro.config.ts` deriva su alias de Vite) y los renderizan como islands de React.
 
 Las demos están tipadas contra las definiciones reales de variantes de cada componente (mira el patrón anti-drift en `apps/docs/src/components/demos/ButtonDemo.tsx`): si una variante se añade, renombra o elimina en la app, `astro check` falla en el build de docs. El mismo principio aplica a la prosa: donde la app exporta una constante, la documentación la importa
  en lugar de copiar el valor. La [página de Button](/es/design-system/components/button/) es el ejemplo de referencia.
