@@ -5,7 +5,7 @@
   <img src="public/static/images/forever-pto-logo.png" alt="" width="72" align="center">
 </picture>
 
-# forever-pto
+# forever-pto-web
 
 **The planner.** Next.js on Cloudflare Workers through OpenNext.
 
@@ -53,7 +53,6 @@ src/
   infrastructure/     everything outbound: clients, services, workers, proxy
   ui/                 adapters, hooks, i18n, modules, styles, assets
 e2e/                  Playwright specs
-workers/tail/         the tail consumer Worker, with its own wrangler.toml
 ```
 
 Folders under `src/` carry their own `AGENTS.md`. They are the detail; start from
@@ -62,12 +61,12 @@ Folders under `src/` carry their own `AGENTS.md`. They are the detail; start fro
 ## Testing
 
 ```bash
-pnpm test:ut          # 1770 unit tests, co-located with the code
-pnpm test:ut:coverage    # the same, with coverage
+pnpm test:ut          # unit tests, co-located with the code
+pnpm test:ut:coverage # the same, with coverage
 pnpm test:e2e         # Playwright, against BASE_URL
 ```
 
-The end-to-end suite runs against a deployed preview, not a local server. [`not-found.spec.ts`](./e2e/[locale]/not-found.spec.ts) is
+In CI the end-to-end suite runs against a deployed preview; locally, without `BASE_URL`, it starts `next dev`. [`not-found.spec.ts`](./e2e/[locale]/not-found.spec.ts) is
 load-bearing: `/_not-found` is the only page rendered per request, so it is the only one that catches the
 Worker failing to boot.
 
