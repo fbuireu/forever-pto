@@ -2,9 +2,11 @@ import { AutoHeight } from "@ui/modules/core/animate/effects/AutoHeight";
 import { MotionHighlight, MotionHighlightItem } from "@ui/modules/core/animate/effects/MotionHighlight";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { useState } from "react";
+import { FilterStrategy } from "../../../../web/src/domain/calendar/types";
+import en from "../../../../web/src/ui/i18n/messages/en.json";
 import { Demo } from "../Demo";
 
-const STRATEGIES = ["Grouped", "Optimized", "Balanced", "Main vacation"];
+const STRATEGIES = Object.values(FilterStrategy).map((strategy) => en.sidebar.strategy[strategy].label);
 
 export const MotionHighlightChildrenDemo = () => (
 	<Demo>
