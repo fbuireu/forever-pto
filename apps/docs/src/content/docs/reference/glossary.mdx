@@ -17,15 +17,15 @@ A block of PTO days that connects weekends and public holidays into one contiguo
 
 ### Effective Day
 
-One day of the continuous stretch off a Bridge or Suggestion produces. The total counts PTO days plus the weekends and holidays they absorb. **Efficiency** is `effectiveDays / ptoDaysNeeded`; the engine discards bridges below a minimum efficiency threshold (tunables in `apps/web/src/domain/calendar/const.ts`).
+One day of the continuous stretch off a Bridge or Suggestion produces. The total counts PTO days plus the weekends and holidays they lean on, each once, however many Bridges reach it. **Efficiency** is `effectiveDays / ptoDaysNeeded`; each Strategy refuses a Bridge whose marginal Efficiency, the days it adds to the plan so far per PTO Day, falls under its floor (tunables in `apps/web/src/domain/calendar/const.ts`).
 
 ### Strategy
 
 The rule that decides which Bridges make it into a Suggestion when the budget cannot cover them all. Its values, exported as the `FilterStrategy` const object in `apps/web/src/domain/calendar/types.ts`:
 
-- **`grouped`** prefers multi-day blocks, with efficiency as the tiebreaker. Fewer, longer breaks.
-- **`optimized`** prefers the highest-efficiency bridges first. Maximum Effective Days per PTO Day.
-- **`balanced`** is greedy scoring that prioritizes high-value long bridges, then fills the remaining budget.
+- **`grouped`** grows a few long blocks, up to about two weeks each, accepting a lower return per PTO Day to get there. Fewer, longer breaks.
+- **`optimized`** takes whatever adds the most Effective Days per PTO Day to the plan so far. The most Effective Days for the budget.
+- **`balanced`** gives every quarter its share of the budget and prefers breaks of up to a week. Breaks across the whole year.
 
 ### Suggestion
 
@@ -33,7 +33,7 @@ The engine's output for a given budget, calendar and strategy: the set of recomm
 
 ### Alternative
 
-A genuinely distinct plan for the same inputs, produced by `apps/web/src/domain/calendar/alternatives/generateAlternatives.ts` using different bridge-ordering strategies, so the user can compare plans rather than accept a single answer.
+A genuinely distinct plan for the same inputs, produced by `apps/web/src/domain/calendar/alternatives/generateAlternatives.ts` from the other Strategies and from the chosen one re-run without one of the Suggestion's breaks, each far enough from every other plan to be a real choice, so the user can compare plans rather than accept a single answer.
 
 ### Carry-over Months
 

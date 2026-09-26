@@ -18,24 +18,23 @@ const TUNABLE_DESCRIPTIONS: Record<TunableKey, string> = {
 		"Upper bound on how many days a Bridge may expand into adjacent Free Days in either direction. A guard against a runaway loop, not a planning rule; one year of days is unreachable in practice.",
 	"BRIDGE_GENERATION.EFFICIENCY_COMPARISON_THRESHOLD":
 		"Two Bridges whose Efficiency differs by less than this are treated as equal and ordered by Effective Days instead, so a longer stretch wins a near tie.",
-	"SCORING.BASE_SCORE": "The multiplier a Bridge gets when it is not block-shaped: no bonus.",
-	"SCORING.MULTI_DAY_BONUS":
-		"The multiplier a block-shaped Bridge gets in the Balanced score, so a long block beats a short one of equal Efficiency.",
-	"SCORING.EFFICIENCY": "Weight of Efficiency in the Balanced composite score.",
-	"SCORING.TOTAL_VALUE": "Weight of the normalised Effective Days in the Balanced composite score.",
-	"SCORING.VALUE_DIVISOR":
-		"Effective Days are divided by this before weighting, so a ten-day stretch scores 1.0 on that axis and is comparable with an Efficiency ratio.",
-	"SELECTION_WEIGHTS.HIGH_VALUE_THRESHOLD_DAYS":
-		"Minimum PTO Days a Bridge must spend to count as block-shaped, and therefore eligible for the multi-day bonus and the high-value tier.",
-	"SELECTION_WEIGHTS.HIGH_VALUE_THRESHOLD_EFFECTIVE":
-		"Minimum Effective Days a Bridge must produce to count as block-shaped.",
-	"EFFICIENCY.ACCEPTABLE":
-		"A block-shaped Bridge also needs at least this Efficiency to be promoted to the front of the Balanced ordering.",
 	"EFFICIENCY.MINIMUM":
-		"A candidate below this Efficiency is discarded during generation and never reaches any Strategy. Two is the natural floor: one PTO Day beside a weekend already returns two Effective Days per day spent... only a candidate that does at least as well is worth offering.",
+		"The marginal floor of Optimized and Balanced: a Bridge is taken only while the days it adds to the plan, divided by the PTO Days it costs, reach this. One PTO Day beside a weekend returns three, a Thursday and Friday before one return exactly two.",
+	"EFFICIENCY.BLOCK_MINIMUM":
+		"The marginal floor of Grouped, and the admission floor of the search. A working week between two weekends returns nine days for five and a week that extends a block already taken returns seven for five, which is the lowest this floor lets through. No Strategy can take a candidate under it, so the search does not keep one.",
 	"BRIDGE_SEARCH.MIN_MULTI_DAY_SIZE": "Smallest multi-day Bridge the search tries, in consecutive Workdays.",
 	"BRIDGE_SEARCH.MAX_MULTI_DAY_SIZE":
-		"Largest multi-day Bridge the search tries. Longer stretches are built by the selector combining adjacent Bridges, not by generating one huge candidate.",
+		"Largest multi-day Bridge the search tries: a whole working week. Anything longer is two Bridges the selector joins, and the marginal gain is what makes joining them worth it.",
+	"SELECTION.GROUPED_MAX_BLOCK_DAYS":
+		"The longest stretch Grouped aims for. Growing a block up to this is what Grouped ranks first; a Bridge that would push a block past it loses a point per day over, so the next week of budget starts a second block instead.",
+	"SELECTION.BALANCED_MAX_BLOCK_DAYS":
+		"The longest break Balanced aims for inside a quarter's share, a week plus both weekends. Longer counts against the Bridge the same way it does for Grouped.",
+	"SELECTION.RANK_TOLERANCE":
+		"Two rank values closer than this are a tie, and the next key decides. The marginal gain is a division, so an exact comparison would order equal candidates on rounding noise.",
+	"ALTERNATIVES.MIN_DIFFERENCE":
+		"How far apart two plans must be to both be offered, as the share of their combined days they do not have in common. An Alternative closer than this to the Suggestion or to an earlier Alternative is dropped.",
+	"ALTERNATIVES.RUNS_PER_ALTERNATIVE":
+		"How many selection runs the Alternatives may spend per Alternative asked for. It bounds the cost of the search, not its result: a search that finds enough distinct plans stops sooner.",
 	"METRICS.LONG_BLOCK_MINIMUM_DAYS": "A Rest Block of at least this many days counts as a Long Block.",
 	"METRICS.LONG_WEEKEND_MINIMUM_DAYS":
 		"A free streak of at least this many days that contains a weekend and a placed PTO Day counts as a Long Weekend.",
@@ -91,14 +90,18 @@ export const TunablesTable = () => {
 	);
 };
 
-export const BalancedScoreFormula = () => {
-	const { EFFICIENCY, TOTAL_VALUE, VALUE_DIVISOR, MULTI_DAY_BONUS, BASE_SCORE } = PTO_CONSTANTS.SCORING;
+export const StrategyRanking = () => {
+	const { MINIMUM, BLOCK_MINIMUM } = PTO_CONSTANTS.EFFICIENCY;
+	const { GROUPED_MAX_BLOCK_DAYS, BALANCED_MAX_BLOCK_DAYS } = PTO_CONSTANTS.SELECTION;
 
 	return (
 		<pre>
 			<code>
-				{`score = (efficiency × ${EFFICIENCY} + (effectiveDays ÷ ${VALUE_DIVISOR}) × ${TOTAL_VALUE}) × bonus\n`}
-				{`bonus = ${MULTI_DAY_BONUS} when block-shaped, ${BASE_SCORE} otherwise`}
+				{"marginal  = days the Bridge adds to the plan ÷ its PTO Days\n"}
+				{"stretch   = length of the break it ends up in, less one per day over the cap\n\n"}
+				{`optimized : marginal ≥ ${MINIMUM}, ranked by marginal, then stretch, then distance from the other breaks\n`}
+				{`grouped   : marginal ≥ ${BLOCK_MINIMUM}, ranked by stretch (cap ${GROUPED_MAX_BLOCK_DAYS}), then marginal, then distance\n`}
+				{`balanced  : marginal ≥ ${MINIMUM}, ranked by quarter share, then stretch (cap ${BALANCED_MAX_BLOCK_DAYS}), then marginal, then distance`}
 			</code>
 		</pre>
 	);

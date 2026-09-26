@@ -13,7 +13,7 @@ The whole calculation runs in the browser. Nothing about a plan is sent to a ser
 
 ## The problem, in numbers
 
-One PTO Day on a Friday buys a three-day stretch away from work: the Friday plus the weekend. One PTO Day on the Friday before a Monday public holiday buys **four**. Four PTO Days between a Monday holiday and the following weekend buy **nine**. The engine calls that ratio **Efficiency** (Effective Days divided by PTO Days spent), and it discards any candidate under {PTO_CONSTANTS.EFFICIENCY.MINIMUM}, the value a lone PTO Day beside a weekend already reaches. Every rule in the engine is about raising that number across the budget while respecting the user's Strategy.
+One PTO Day on a Friday buys a three-day stretch away from work: the Friday plus the weekend. One PTO Day on the Friday before a Monday public holiday buys **four**. Four PTO Days between a Monday holiday and the following weekend buy **nine**. The engine calls that ratio **Efficiency** (Effective Days divided by PTO Days spent). What it ranks is the **marginal** version of it: the days a Bridge adds to the plan built so far, per PTO Day, so a weekend two Bridges share is paid for once. Optimized and Balanced take nothing that adds under {PTO_CONSTANTS.EFFICIENCY.MINIMUM}, Grouped nothing under {PTO_CONSTANTS.EFFICIENCY.BLOCK_MINIMUM}, the price of the week that makes a block long. Every rule in the engine is about spending the budget on the days it adds most, under the objective the user's Strategy sets.
 
 ```mermaid
 gantt

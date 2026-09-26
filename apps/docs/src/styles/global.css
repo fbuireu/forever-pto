@@ -356,7 +356,7 @@ starlight-lang-select select option {
 
 /* A `pre` a component renders itself is not an Expressive Code block and inherits none of its chrome,
    overflow included, so a line wider than the column pushes the whole page sideways instead of
-   scrolling inside its own box. BalancedScoreFormula's one-line formula did exactly that on a phone.
+   scrolling inside its own box. The old Balanced score formula did exactly that on a phone; StrategyRanking relies on this rule.
    `min-width: 0` is the half that matters: the content column is a grid item, and without it the
    block's min-content width sets the column's, so `overflow-x` alone has nothing to clip against. */
 .sl-markdown-content pre:not(:where(.expressive-code *, .not-content *)) {
