@@ -934,8 +934,8 @@
 			"plannerCta": "Calcula els meus dies →",
 			"demoLink": "Veure com va (30s)",
 			"stars": "{rating} · usat per {users} empleats rebels",
-			"mockupLabel": "Dies lliures reals el {year}",
-			"mockupRatio": "dies · eficiència 3,45×",
+			"mockupLabel": "Dies lliures reals en un any",
+			"mockupRatio": "dies · eficiència 3,36×",
 			"mockupQuote": "\"Això són 22 escapades llargues, capità.\"",
 			"mockupLegendPto": "PTO",
 			"mockupLegendHoliday": "Festiu",
@@ -943,7 +943,7 @@
 			"mockupFieldPto": "Dies PTO",
 			"mockupFieldPtoUnit": "dies/any",
 			"mockupFieldCountry": "País",
-			"mockupFieldHolidays": "14 festius"
+			"mockupFieldHolidays": "12 festius"
 		},
 		"marquee": {
 			"items": "setmana santa · pont de maig · estiu infinit · pont de la mercè · nadal prolongat · pont de novembre · pont de juny · pont de l'agost · pont d'octubre · cap d'any prolongat"
@@ -980,7 +980,7 @@
 			"bridgeTitle": "Converteix 1 dia de PTO en 4 lliures.",
 			"bridgeDescription": "Detecta festius en dimarts i dijous i et suggereix construir ponts mínims. Un dia estratègic = un cap de setmana de 4 dies.",
 			"ratioTag": "max eficiència",
-			"ratioDescription": "Millor eficiència: 8 dies de PTO convertits en 33 lliures (Catalunya, 2026).",
+			"ratioDescription": "Millor eficiència: 8 dies de PTO convertits en 33 lliures (Catalunya).",
 			"syncTag": "sync en 1 clic",
 			"syncTitle": "Google · Outlook · iCal",
 			"syncDescription": "Exporta el teu pla al calendari que ja uses. Sense embolicar-te.",
@@ -1013,7 +1013,7 @@
 			"withTitle": "😎 Amb Forever PTO",
 			"withItems": {
 				"planInJanuary": "Ho planifiques tot al gener, mentre esperes el cafè.",
-				"dayEfficiency": "Cada dia de PTO et retorna 3,4 dies lliures de mitjana.",
+				"dayEfficiency": "Cada dia de PTO et retorna 3,3 dies lliures de mitjana.",
 				"visualCalendar": "Visualitzes l'any sencer en un calendari clar.",
 				"bookFirst": "Demanes primer, sense remordiment, amb dades.",
 				"burnAllDays": "Gastes el 100% dels teus dies. Com ha de ser."
@@ -1046,12 +1046,12 @@
 					"role": "QA engineer · Lisboa"
 				},
 				"lauraT": {
-					"text": "La meva cap em va preguntar com havia aconseguit 47 dies lliures amb només 22 dies de PTO. Li vaig dir \"estratègia\". No vaig esmentar l'app.",
+					"text": "La meva cap em va preguntar com havia aconseguit 45 dies lliures amb només 22 dies de PTO. Li vaig dir \"estratègia\". No vaig esmentar l'app.",
 					"name": "Laura T.",
 					"role": "marketing manager · París"
 				},
 				"thomasK": {
-					"text": "ROI: 22 dies de PTO d'entrada, 75 dies lliures de sortida. Això és una eficiència de 3,4×. He llançat pitjors funcionalitats a la feina.",
+					"text": "ROI: 22 dies de PTO d'entrada, 74 dies lliures de sortida. Això és una eficiència de 3,4×. He llançat pitjors funcionalitats a la feina.",
 					"name": "Thomas K.",
 					"role": "software architect · Amsterdam"
 				}

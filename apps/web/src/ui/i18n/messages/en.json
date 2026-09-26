@@ -934,8 +934,8 @@
 			"plannerCta": "Calculate my days →",
 			"demoLink": "See how it works (30s)",
 			"stars": "{rating} · used by {users} rebel employees",
-			"mockupLabel": "Real days off in {year}",
-			"mockupRatio": "days · efficiency 3.45×",
+			"mockupLabel": "Real days off in a year",
+			"mockupRatio": "days · efficiency 3.36×",
 			"mockupQuote": "\"That's 22 long weekends, captain.\"",
 			"mockupLegendPto": "PTO",
 			"mockupLegendHoliday": "Holiday",
@@ -943,7 +943,7 @@
 			"mockupFieldPto": "PTO days",
 			"mockupFieldPtoUnit": "days/yr",
 			"mockupFieldCountry": "Country",
-			"mockupFieldHolidays": "14 holidays"
+			"mockupFieldHolidays": "12 holidays"
 		},
 		"marquee": {
 			"items": "easter break · public holiday weekend · summer stretch · thanksgiving bridge · christmas stretch · november bridge · whit monday bridge · may day long weekend · august public holiday · new year stretch"
@@ -980,7 +980,7 @@
 			"bridgeTitle": "Turn 1 PTO day into 4 days off.",
 			"bridgeDescription": "Detects holidays on Tuesdays and Thursdays and suggests minimal bridges. One strategic day = a 4-day weekend.",
 			"ratioTag": "max efficiency",
-			"ratioDescription": "Best efficiency: 8 PTO days turned into 34 free days (Madrid, 2026).",
+			"ratioDescription": "Best efficiency: 8 PTO days turned into 32 free days (Madrid).",
 			"syncTag": "sync in 1 click",
 			"syncTitle": "Google · Outlook · iCal",
 			"syncDescription": "Export your plan to the calendar you already use. No hassle.",
@@ -1013,7 +1013,7 @@
 			"withTitle": "😎 With Forever PTO",
 			"withItems": {
 				"planInJanuary": "You plan everything in January, while waiting for your coffee.",
-				"dayEfficiency": "Each PTO day gives you back 3.4 free days on average.",
+				"dayEfficiency": "Each PTO day gives you back 3.3 free days on average.",
 				"visualCalendar": "You visualize the whole year in a clear calendar.",
 				"bookFirst": "You book first, guilt-free, with data.",
 				"burnAllDays": "You burn 100% of your days. As it should be."
@@ -1046,12 +1046,12 @@
 					"role": "QA engineer · Lisbon"
 				},
 				"lauraT": {
-					"text": "My manager asked how I managed 47 days off with only 22 PTO days. I said \"strategy\". I did not mention the app.",
+					"text": "My manager asked how I managed 45 days off with only 22 PTO days. I said \"strategy\". I did not mention the app.",
 					"name": "Laura T.",
 					"role": "marketing manager · Paris"
 				},
 				"thomasK": {
-					"text": "ROI: 22 PTO days in, 75 free days out. That's a 3.4× efficiency. I've shipped worse features at work.",
+					"text": "ROI: 22 PTO days in, 74 free days out. That's a 3.4× efficiency. I've shipped worse features at work.",
 					"name": "Thomas K.",
 					"role": "software architect · Amsterdam"
 				}

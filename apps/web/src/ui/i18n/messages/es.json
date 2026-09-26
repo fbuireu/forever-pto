@@ -934,8 +934,8 @@
 			"plannerCta": "Calcular mis días →",
 			"demoLink": "Ver cómo va (30s)",
 			"stars": "{rating} · {users} empleados rebeldes ya lo usan",
-			"mockupLabel": "Días libres reales en {year}",
-			"mockupRatio": "días · eficiencia 3,45×",
+			"mockupLabel": "Días libres reales en un año",
+			"mockupRatio": "días · eficiencia 3,36×",
 			"mockupQuote": "\"Eso son 22 escapadas largas, capitán.\"",
 			"mockupLegendPto": "PTO",
 			"mockupLegendHoliday": "Festivo",
@@ -943,7 +943,7 @@
 			"mockupFieldPto": "Días PTO",
 			"mockupFieldPtoUnit": "días/año",
 			"mockupFieldCountry": "País",
-			"mockupFieldHolidays": "14 festivos"
+			"mockupFieldHolidays": "12 festivos"
 		},
 		"marquee": {
 			"items": "puente de semana santa · puente de mayo · verano infinito · puente del pilar · puente de diciembre · puente de noviembre · puente de junio · puente de agosto · puente de octubre · nochevieja extendida"
@@ -980,7 +980,7 @@
 			"bridgeTitle": "Convierte 1 día de PTO en 4 libres.",
 			"bridgeDescription": "Detecta festivos en martes y jueves y te sugiere construir puentes mínimos. Un día estratégico = un fin de semana de 4 días.",
 			"ratioTag": "max eficiencia",
-			"ratioDescription": "Mejor eficiencia: 8 días de PTO convertidos en 34 libres (Madrid, 2026).",
+			"ratioDescription": "Mejor eficiencia: 8 días de PTO convertidos en 32 libres (Madrid).",
 			"syncTag": "sync en 1 clic",
 			"syncTitle": "Google · Outlook · iCal",
 			"syncDescription": "Exporta tu plan al calendario que ya usas. Sin liarte.",
@@ -1013,7 +1013,7 @@
 			"withTitle": "😎 Con Forever PTO",
 			"withItems": {
 				"planInJanuary": "Lo planificas todo en enero, mientras esperas el café.",
-				"dayEfficiency": "Cada día de PTO te devuelve 3,4 días libres de media.",
+				"dayEfficiency": "Cada día de PTO te devuelve 3,3 días libres de media.",
 				"visualCalendar": "Visualizas el año entero en un calendario claro.",
 				"bookFirst": "Pides primero, sin remordimiento, con datos.",
 				"burnAllDays": "Quemas el 100% de tus días. Como debe ser."
@@ -1046,12 +1046,12 @@
 					"role": "QA engineer · Lisboa"
 				},
 				"lauraT": {
-					"text": "Mi jefa me preguntó cómo conseguí 47 días libres con solo 22 días de PTO. Le dije \"estrategia\". No mencioné la app.",
+					"text": "Mi jefa me preguntó cómo conseguí 45 días libres con solo 22 días de PTO. Le dije \"estrategia\". No mencioné la app.",
 					"name": "Laura T.",
 					"role": "marketing manager · París"
 				},
 				"thomasK": {
-					"text": "ROI: 22 días de PTO de entrada, 75 días libres de salida. Eso es una eficiencia de 3,4×. He lanzado peores features en el trabajo.",
+					"text": "ROI: 22 días de PTO de entrada, 74 días libres de salida. Eso es una eficiencia de 3,4×. He lanzado peores features en el trabajo.",
 					"name": "Thomas K.",
 					"role": "software architect · Ámsterdam"
 				}

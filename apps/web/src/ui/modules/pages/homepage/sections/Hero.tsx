@@ -7,7 +7,6 @@ import { FlagIcon } from "@ui/modules/core/primitives/FlagIcon";
 import { QuickStartTrigger } from "@ui/modules/pages/homepage/quick-start/QuickStartTrigger";
 import { MODIFIERS_CLASS_NAMES } from "@ui/modules/pages/planner/calendar/utils/helpers";
 import { cn } from "@ui/utils/cn";
-import { getCurrentYear } from "@ui/utils/getCurrentYear";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 import { version } from "../../../../../../package.json";
@@ -27,12 +26,7 @@ const SOCIAL_PROOF_RATING = 4.9;
 const SOCIAL_PROOF_USERS = 12847;
 
 export const Hero = async () => {
-	const [t, locale, year, format] = await Promise.all([
-		getTranslations("homepage"),
-		getLocale(),
-		getCurrentYear(),
-		getFormatter(),
-	]);
+	const [t, locale, format] = await Promise.all([getTranslations("homepage"), getLocale(), getFormatter()]);
 	const DAY_HEADERS = getWeekdayNames({ locale, weekStartsOn: 1, format: "narrow" }).map((label, index) => ({
 		id: `day-${index}`,
 		label,
@@ -135,10 +129,10 @@ export const Hero = async () => {
 							</div>
 							<div className="px-[18px] pt-[18px] pb-4 bg-[var(--accent)] text-[var(--color-brand-ink)] border-[4px] border-[var(--frame)] rounded-[10px]">
 								<div className="font-mono text-[12px] uppercase tracking-[0.1em] mb-1" suppressHydrationWarning>
-									{t("hero.mockupLabel", { year })}
+									{t("hero.mockupLabel")}
 								</div>
 								<div className="font-display font-extrabold text-[56px] leading-none tracking-[-0.03em] flex items-baseline gap-2.5">
-									76
+									74
 									<span className="text-[18px] font-semibold opacity-70">{t("hero.mockupRatio")}</span>
 								</div>
 								<div className="mt-2 font-serif italic text-[18px]">{t("hero.mockupQuote")}</div>

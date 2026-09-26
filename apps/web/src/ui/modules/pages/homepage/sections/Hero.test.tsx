@@ -30,7 +30,6 @@ vi.mock("@ui/modules/core/primitives/Button", () => ({
 	Button: ({ children }: { children: ReactNode }) => <span>{children}</span>,
 }));
 vi.mock("@ui/modules/core/primitives/FlagIcon", () => ({ FlagIcon: () => null }));
-vi.mock("@ui/utils/getCurrentYear", () => ({ getCurrentYear: vi.fn().mockResolvedValue(2026) }));
 
 import { Hero } from "./Hero";
 
