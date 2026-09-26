@@ -156,7 +156,7 @@ describe("what the reader can do about it", () => {
 	it("keeps the contact form shut until it is asked for", () => {
 		renderError();
 
-		expect(screen.getByTestId("contact-modal").dataset.open).toBe("false");
+		expect(screen.queryByTestId("contact-modal")).toBeNull();
 
 		fireEvent.click(screen.getByRole("button", { name: new RegExp(en.error.contact) }));
 

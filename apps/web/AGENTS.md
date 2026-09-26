@@ -423,6 +423,13 @@ binding for the payment limiter, and smart placement. Only `env.production` bind
 route (`forever-pto.com/*`); `env.development` supplies the preview bindings and CI deploys one worker per PR
 from it: `pr-<number>-forever-pto-development.fbuireu.workers.dev`, deleted when the PR closes.
 
+**The hashed build output is cached for good, and [`public/_headers`](./public/_headers) is what says so.** Workers
+Static Assets serve every file with `max-age=0, must-revalidate` unless a `_headers` file in the assets directory
+says otherwise, so every page load revalidated its 30 to 40 chunks, its CSS and its fonts one round trip each.
+OpenNext copies `public/` into `.open-next/assets`, which is where the rule has to land; it covers the
+`_next/static` tree alone, whose file names carry a content hash, and nothing a deploy can change under the same URL.
+`tests/docs-consistency.test.ts` asserts the rule. The docs site carries a `_headers` of its own for other reasons.
+
 **Logs and traces reach BetterStack through Cloudflare's own OTLP export, and nothing in this tree carries
 them.** `[observability.logs]` and `[observability.traces]` each name a `destinations` entry,
 one pair per stage, configured in the Cloudflare dashboard with the OTLP

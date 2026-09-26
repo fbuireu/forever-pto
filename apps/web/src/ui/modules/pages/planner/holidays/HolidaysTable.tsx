@@ -7,6 +7,7 @@ import { useHolidaysStore } from "@application/stores/holidays";
 import { PremiumFeatureId } from "@application/stores/premium";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { useDebounce } from "@ui/hooks/useDebounce";
+import { useHasOpened } from "@ui/hooks/useHasOpened";
 import { Checkbox } from "@ui/modules/core/animate/base/Checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@ui/modules/core/animate/base/Collapsible";
 import { ChevronDown } from "@ui/modules/core/animate/icons/ChevronDown";
@@ -116,6 +117,8 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 	const [showAddModal, setShowAddModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const addModalHasOpened = useHasOpened(showAddModal);
+	const editModalHasOpened = useHasOpened(showEditModal);
 	const [innerOpen, setInnerOpen] = useState(false);
 	const [selectedHolidays, setSelectedHolidays] = useState<Set<string>>(new Set());
 	const [sortConfig, setSortConfig] = useState<{
@@ -507,8 +510,8 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 					</div>
 				</div>
 			</CollapsibleContent>
-			<AddHolidayModal open={showAddModal} onClose={handleCloseAddModal} locale={locale} />
-			{selectedHolidaysList.length === 1 && (
+			{addModalHasOpened && <AddHolidayModal open={showAddModal} onClose={handleCloseAddModal} locale={locale} />}
+			{editModalHasOpened && selectedHolidaysList.length === 1 && (
 				<EditHolidayModal
 					open={showEditModal}
 					onClose={handleCloseEditModal}

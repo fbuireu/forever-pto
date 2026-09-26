@@ -51,10 +51,10 @@ afterEach(() => {
 });
 
 describe("Contact", () => {
-	it("keeps the feedback form closed on an ordinary arrival", async () => {
+	it("keeps the feedback form unmounted on an ordinary arrival", () => {
 		renderContact();
 
-		expect(await modalState()).toBe("false");
+		expect(screen.queryByTestId("contact-modal")).toBeNull();
 	});
 
 	it("opens the form from the inline button", async () => {

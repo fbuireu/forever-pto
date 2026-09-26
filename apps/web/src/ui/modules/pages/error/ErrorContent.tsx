@@ -1,6 +1,7 @@
 "use client";
 
 import { logClientError } from "@application/shared/utils/clientLog";
+import { useHasOpened } from "@ui/hooks/useHasOpened";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { MAIN_CONTENT_ID } from "@ui/modules/layout/SkipToContent";
 import { ArrowUpRight, RotateCcw } from "lucide-react";
@@ -81,6 +82,7 @@ const LINE_DELAY_MS = 130;
 export function ErrorContent({ error, reset }: ErrorContentProps) {
 	const t = useTranslations("error");
 	const [contactOpen, setContactOpen] = useState(false);
+	const contactHasOpened = useHasOpened(contactOpen);
 	const [visibleCount, setVisibleCount] = useState(0);
 	const capturedAt = useRef(new Date());
 	const terminalRef = useRef<HTMLDivElement>(null);
@@ -262,7 +264,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
 				</div>
 			</main>
 
-			<ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
+			{contactHasOpened && <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />}
 		</>
 	);
 }

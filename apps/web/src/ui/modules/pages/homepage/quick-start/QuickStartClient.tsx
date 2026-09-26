@@ -2,8 +2,8 @@
 
 import type { CountryDTO } from "@application/dto/country/types";
 import { useUIStore } from "@application/stores/ui";
+import { useHasOpened } from "@ui/hooks/useHasOpened";
 import dynamic from "next/dynamic";
-import { useState } from "react";
 
 const QuickStartDialog = dynamic(
 	() => import("./QuickStartDialog").then((module) => ({ default: module.QuickStartDialog })),
@@ -21,11 +21,7 @@ interface QuickStartClientProps {
 
 export const QuickStartClient = ({ countries, currentYear }: QuickStartClientProps) => {
 	const open = useUIStore((state) => state.quickStartOpen);
-	const [hasOpened, setHasOpened] = useState(open);
-
-	if (open && !hasOpened) {
-		setHasOpened(true);
-	}
+	const hasOpened = useHasOpened(open);
 
 	if (!hasOpened) return null;
 

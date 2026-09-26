@@ -159,6 +159,7 @@ describe("HolidaysTable selection survives the rows moving", () => {
 
 		expect(desktopRow(view, "Gamma").checked).toBe(true);
 		expect(view.getByTestId("delete-modal").getAttribute("data-names")).toBe("Gamma");
+		press(view, EDIT);
 		expect(view.getByTestId("edit-modal").getAttribute("data-name")).toBe("Gamma");
 	});
 
@@ -356,6 +357,14 @@ describe("HolidaysTable toolbar", () => {
 });
 
 describe("HolidaysTable modals", () => {
+	it("mounts the add and edit forms only once one is opened, so their form code loads on demand", () => {
+		const view = renderCustomTable();
+		fireEvent.click(desktopRow(view, "Shutdown"));
+
+		expect(view.queryByTestId("add-modal")).toBeNull();
+		expect(view.queryByTestId("edit-modal")).toBeNull();
+	});
+
 	it("opens the add form and clears the selection when it closes", () => {
 		const view = renderCustomTable();
 		fireEvent.click(desktopRow(view, "Shutdown"));

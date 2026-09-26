@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import "./contact.css";
+import { useHasOpened } from "@ui/hooks/useHasOpened";
 
 const ContactModal = dynamic(() =>
 	import("src/ui/modules/shared/contact/ContactModal").then((module) => ({ default: module.ContactModal })),
@@ -18,6 +19,7 @@ const GITHUB_ISSUE_URL =
 export function Contact() {
 	const t = useTranslations("roadmap");
 	const [contactModalOpen, setContactModalOpen] = useState(false);
+	const contactModalHasOpened = useHasOpened(contactModalOpen);
 
 	useEffect(() => {
 		if (globalThis.location.hash === "#contact") {
@@ -75,7 +77,7 @@ export function Contact() {
 					</div>
 				</CardContent>
 			</Card>
-			<ContactModal open={contactModalOpen} onClose={() => setContactModalOpen(false)} />
+			{contactModalHasOpened && <ContactModal open={contactModalOpen} onClose={() => setContactModalOpen(false)} />}
 		</div>
 	);
 }
