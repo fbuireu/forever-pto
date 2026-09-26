@@ -42,6 +42,7 @@ function Counter({
 		<m.div
 			data-slot="counter"
 			layout
+			layoutDependency={number}
 			transition={transition}
 			className={cn(
 				"inline-flex items-stretch overflow-hidden rounded-xl border-[3px] border-(--frame) bg-(--surface-panel) shadow-(--shadow-brutal-sm)",

@@ -22,6 +22,7 @@ import {
 	use,
 	useCallback,
 	useEffect,
+	useMemo,
 	useRef,
 	useState,
 } from "react";
@@ -411,6 +412,33 @@ function AnimateIcon({
 			? cloneElement(children as ReactElement, dataProps)
 			: children;
 
+	const contextValue = useMemo(
+		() => ({
+			controls,
+			animation: currentAnimation,
+			loop,
+			loopDelay,
+			active: localAnimate,
+			animate,
+			initialOnAnimateEnd,
+			completeOnStop,
+			persistOnAnimateEnd,
+			delay,
+		}),
+		[
+			controls,
+			currentAnimation,
+			loop,
+			loopDelay,
+			localAnimate,
+			animate,
+			initialOnAnimateEnd,
+			completeOnStop,
+			persistOnAnimateEnd,
+			delay,
+		],
+	);
+
 	const content = asChild ? (
 		<MotionSlot
 			ref={inViewRef}
@@ -435,24 +463,7 @@ function AnimateIcon({
 		</m.span>
 	);
 
-	return (
-		<AnimateIconContext
-			value={{
-				controls,
-				animation: currentAnimation,
-				loop,
-				loopDelay,
-				active: localAnimate,
-				animate,
-				initialOnAnimateEnd,
-				completeOnStop,
-				persistOnAnimateEnd,
-				delay,
-			}}
-		>
-			{content}
-		</AnimateIconContext>
-	);
+	return <AnimateIconContext value={contextValue}>{content}</AnimateIconContext>;
 }
 
 const pathClassName = "[&_[stroke-dasharray='1px_1px']]:![stroke-dasharray:1px_0px]";

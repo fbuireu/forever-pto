@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@ui/modules/core/primi
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
 import { BarChart3 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { memo, useMemo } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { COLOR_SCHEMES } from "./const";
 
@@ -12,14 +13,20 @@ interface QuarterDistributionChartChartProps {
 	quarterDist: number[];
 }
 
-export const QuarterDistributionChart = ({ quarterDist }: QuarterDistributionChartChartProps) => {
+export const QuarterDistributionChart = memo(function QuarterDistributionChart({
+	quarterDist,
+}: QuarterDistributionChartChartProps) {
 	const t = useTranslations("charts");
 
-	const data = quarterDist.map((value, index) => ({
-		name: `Q${index + 1}`,
-		days: value,
-		color: COLOR_SCHEMES[index % COLOR_SCHEMES.length],
-	}));
+	const data = useMemo(
+		() =>
+			quarterDist.map((value, index) => ({
+				name: `Q${index + 1}`,
+				days: value,
+				color: COLOR_SCHEMES[index % COLOR_SCHEMES.length],
+			})),
+		[quarterDist],
+	);
 
 	const totalDays = quarterDist.reduce((sum, days) => sum + days, 0);
 	const activeQuarters = quarterDist.filter((days) => days > 0).length;
@@ -71,4 +78,4 @@ export const QuarterDistributionChart = ({ quarterDist }: QuarterDistributionCha
 			</Card>
 		</PremiumFeature>
 	);
-};
+});

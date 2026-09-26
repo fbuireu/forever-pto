@@ -319,7 +319,14 @@ describe("Summary loads its five charts lazily", () => {
 		expect(loaders).toHaveLength(5);
 
 		for (const loader of loaders) {
-			await expect(loader()).resolves.toEqual({ default: expect.any(Function) });
+			await expect(loader()).resolves.toEqual({ default: expect.anything() });
+		}
+	});
+
+	it("resolves each one to a memoised chart, so a calculation starting does not redraw them", async () => {
+		for (const loader of loaders) {
+			const { default: chart } = (await loader()) as { default: { $$typeof?: symbol } };
+			expect(chart.$$typeof).toBe(Symbol.for("react.memo"));
 		}
 	});
 });

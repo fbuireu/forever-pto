@@ -136,7 +136,12 @@ function Alternatives({
 
 			<div className="hidden lg:block mx-1 h-9 w-[2px] bg-[var(--frame)]/15 rounded-full" />
 
-			<m.div layout layoutRoot className="flex flex-col gap-2 sm:flex-row sm:flex-nowrap">
+			<m.div
+				layout
+				layoutRoot
+				layoutDependency={`${currentIndex}|${effectiveDays}|${bonusDays}|${efficiency}`}
+				className="flex flex-col gap-2 sm:flex-row sm:flex-nowrap"
+			>
 				<m.div
 					{...STAT_CARD_MOTION_CONFIG}
 					className="flex h-11 items-center gap-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_16%,black_84%)]"

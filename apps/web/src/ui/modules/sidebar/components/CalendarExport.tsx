@@ -6,7 +6,7 @@ import { useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
 import { PremiumFeatureId } from "@application/stores/premium";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
-import { usePlanReadout } from "@ui/hooks/usePlanReadout";
+import { usePlacedPlan } from "@ui/hooks/usePlanReadout";
 import { Button } from "@ui/modules/core/primitives/Button";
 import type { HolidayDocumentProps } from "@ui/modules/export/HolidayDocument";
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
@@ -61,7 +61,7 @@ export const CalendarExport = () => {
 	);
 	const holidays = useHolidaysStore((s) => s.holidays);
 
-	const { placedDays: ptoDays } = usePlanReadout();
+	const { placedDays: ptoDays } = usePlacedPlan();
 	const holidaysInWindow = useMemo(() => holidaysInPlanningWindow(holidays), [holidays]);
 	const hasData = (includeHolidays && holidaysInWindow.length > 0) || (includePto && ptoDays.length > 0);
 

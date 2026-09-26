@@ -9,7 +9,7 @@ import { useLocationStore } from "@application/stores/location";
 import { PremiumFeatureId, usePremiumStore } from "@application/stores/premium";
 import { isFilterStrategy } from "@domain/calendar/types";
 import { measureGain } from "@domain/calendar/utils/budget";
-import { usePlanReadout } from "@ui/hooks/usePlanReadout";
+import { usePlacedPlan } from "@ui/hooks/usePlanReadout";
 import { useStoresReady } from "@ui/hooks/useStoresReady";
 import { Clock } from "@ui/modules/core/animate/icons/Clock";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
@@ -94,7 +94,7 @@ export const Summary = () => {
 		})),
 	);
 
-	const { activeSuggestion, placedDays, manuallySelectedDays, removedSuggestedDays } = usePlanReadout();
+	const { activeSuggestion, placedDays, manuallySelectedDays, removedSuggestedDays } = usePlacedPlan();
 
 	const holidaysInWindow = useMemo(() => holidaysInPlanningWindow(holidays), [holidays]);
 

@@ -1,11 +1,13 @@
 import { type UseInViewOptions, useInView } from "motion/react";
-import { type Ref, useImperativeHandle, useRef } from "react";
+import { type Ref, type RefObject, useImperativeHandle, useRef } from "react";
 
 export interface UseIsInViewOptions {
 	inView?: boolean;
 	inViewOnce?: boolean;
 	inViewMargin?: UseInViewOptions["margin"];
 }
+
+const NO_TARGET: RefObject<HTMLElement | null> = { current: null };
 
 export interface UseIsInViewParams<T extends HTMLElement = HTMLElement> {
 	ref: Ref<T>;
@@ -16,7 +18,7 @@ export function useIsInView<T extends HTMLElement = HTMLElement>({ ref, options 
 	const { inView, inViewOnce = false, inViewMargin = "0px" } = options;
 	const localRef = useRef<T>(null);
 	useImperativeHandle(ref, () => localRef.current as T);
-	const inViewResult = useInView(localRef, {
+	const inViewResult = useInView(inView ? localRef : NO_TARGET, {
 		once: inViewOnce,
 		margin: inViewMargin,
 	});
