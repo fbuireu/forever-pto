@@ -3,15 +3,11 @@ import { PTO_CONSTANTS } from "@domain/calendar/const";
 import type { Bridge } from "@domain/calendar/types";
 import { FilterStrategy } from "@domain/calendar/types";
 import type { PlanMeasures } from "@domain/calendar/utils/measures";
+import { type DaySpan, spanLength } from "@domain/calendar/utils/spans";
 import { workStretchesOf } from "@domain/calendar/utils/stretches";
 import { inPreferredMonths, monthKeyOf } from "@domain/calendar/window";
 
 const NO_NEIGHBOUR = Number.MAX_SAFE_INTEGER;
-
-interface DaySpan {
-	start: number;
-	end: number;
-}
 
 export interface Candidate {
 	bridge: Bridge;
@@ -20,7 +16,7 @@ export interface Candidate {
 	gap: number;
 	longestStretchAfter: number;
 	stretchRelief: number;
-	inPreferredMonths: boolean;
+	isPreferred: boolean;
 	joinsBlock: boolean;
 	planIsEmpty: boolean;
 }
@@ -73,8 +69,8 @@ export const STRATEGY_OBJECTIVE: Record<FilterStrategy, Objective> = {
 		floor: PTO_CONSTANTS.EFFICIENCY.BLOCK_MINIMUM,
 		aim: ({ longestPreferredVacation }) =>
 			Math.min(longestPreferredVacation, PTO_CONSTANTS.SELECTION.MAIN_VACATION_BLOCK_DAYS),
-		admits: ({ inPreferredMonths, runLength, planIsEmpty, joinsBlock }) =>
-			inPreferredMonths && runLength <= PTO_CONSTANTS.SELECTION.MAIN_VACATION_BLOCK_DAYS && (planIsEmpty || joinsBlock),
+		admits: ({ isPreferred, runLength, planIsEmpty, joinsBlock }) =>
+			isPreferred && runLength <= PTO_CONSTANTS.SELECTION.MAIN_VACATION_BLOCK_DAYS && (planIsEmpty || joinsBlock),
 		rank: ({ runLength, marginalEfficiency, gap }) => [runLength, marginalEfficiency, gap],
 		next: OPTIMIZED_OBJECTIVE,
 	},
@@ -83,7 +79,7 @@ export const STRATEGY_OBJECTIVE: Record<FilterStrategy, Objective> = {
 export const objectiveFor = (strategy: FilterStrategy) =>
 	STRATEGY_OBJECTIVE[strategy] ?? STRATEGY_OBJECTIVE[FilterStrategy.GROUPED];
 
-export interface OutranksParams {
+interface OutranksParams {
 	rank: number[];
 	rival: number[];
 }
@@ -101,7 +97,7 @@ interface PoolEntry {
 	start: number;
 	end: number;
 	ptoDays: number[];
-	inPreferredMonths: boolean;
+	isPreferred: boolean;
 	newDays: number;
 	runLength: number;
 	gap: number;
@@ -119,21 +115,33 @@ interface ToPoolEntryParams {
 const toPoolEntry = ({ bridge, preferredMonths }: ToPoolEntryParams): PoolEntry => {
 	const start = dayIndex(bridge.startDate);
 	const end = dayIndex(bridge.endDate);
+	const length = spanLength({ start, end });
 
 	return {
 		bridge,
 		start,
 		end,
 		ptoDays: bridge.ptoDays.map(dayIndex),
-		inPreferredMonths: inPreferredMonths({ months: bridge.ptoDays.map(monthKeyOf), preferredMonths }),
-		newDays: end - start + 1,
-		runLength: end - start + 1,
+		isPreferred: inPreferredMonths({ months: bridge.ptoDays.map(monthKeyOf), preferredMonths }),
+		newDays: length,
+		runLength: length,
 		gap: NO_NEIGHBOUR,
 		alive: true,
-		freshDays: end - start + 1,
+		freshDays: length,
 		first: undefined,
 		last: undefined,
 	};
+};
+
+interface CountDaysParams {
+	span: DaySpan;
+	isCounted: (day: number) => boolean;
+}
+
+const countDays = ({ span: { start, end }, isCounted }: CountDaysParams) => {
+	let count = 0;
+	for (let day = start; day <= end; day++) if (isCounted(day)) count++;
+	return count;
 };
 
 export interface SelectBridgesParams {
@@ -163,7 +171,7 @@ export const selectBridges = ({
 
 	const workdayIndexes = [...new Set(workdays.map(dayIndex))].toSorted((a, b) => a - b);
 	const positionOf = new Map(workdayIndexes.map((day, position) => [day, position]));
-	let stretches = workStretchesOf(workdayIndexes);
+	let stretches = workStretchesOf({ workdays: workdayIndexes });
 	for (const entry of pool) {
 		for (const day of entry.ptoDays) {
 			const position = positionOf.get(day);
@@ -188,20 +196,11 @@ export const selectBridges = ({
 		return { start: left, end: right };
 	};
 
-	const countNewDays = ({ start, end }: DaySpan) => {
-		let newDays = 0;
-		for (let day = start; day <= end; day++) if (!isOff(day)) newDays++;
-		return newDays;
-	};
-
-	const countFreshDays = ({ start, end }: DaySpan) => {
-		let freshDays = 0;
-		for (let day = start; day <= end; day++) if (!covered.has(day)) freshDays++;
-		return freshDays;
-	};
+	const isNew = (day: number) => !isOff(day);
+	const isFresh = (day: number) => !covered.has(day);
 
 	if (alreadyFree.size > 0) {
-		for (const entry of pool) entry.newDays = countNewDays(entry);
+		for (const entry of pool) entry.newDays = countDays({ span: entry, isCounted: isNew });
 	}
 
 	const stretchIndexOf = (position: number) => {
@@ -218,14 +217,12 @@ export const selectBridges = ({
 		return -1;
 	};
 
-	const lengthOf = ({ start, end }: DaySpan) => Math.max(0, end - start + 1);
-
 	let longest = { index: -1, length: 0, runnerUp: 0 };
 
 	const rankStretches = () => {
 		longest = { index: -1, length: 0, runnerUp: 0 };
 		stretches.forEach((stretch, index) => {
-			const length = lengthOf(stretch);
+			const length = spanLength(stretch);
 			if (length > longest.length) longest = { index, length, runnerUp: longest.length };
 			else if (length > longest.runnerUp) longest.runnerUp = length;
 		});
@@ -244,7 +241,7 @@ export const selectBridges = ({
 		const others = index === longest.index ? longest.runnerUp : longest.length;
 		const before = first - stretch.start;
 		const after = stretch.end - last;
-		const length = lengthOf(stretch);
+		const length = spanLength(stretch);
 		return {
 			longestStretchAfter: Math.max(others, before, after),
 			stretchRelief: length * length - before * before - after * after,
@@ -261,7 +258,7 @@ export const selectBridges = ({
 		const parts = [
 			{ start: stretch.start, end: first - 1 },
 			{ start: last + 1, end: stretch.end },
-		].filter((part) => lengthOf(part) > 0);
+		].filter((part) => spanLength(part) > 0);
 		stretches = [...stretches.slice(0, index), ...parts, ...stretches.slice(index + 1)];
 		rankStretches();
 	};
@@ -278,28 +275,29 @@ export const selectBridges = ({
 
 		for (const other of pool) {
 			if (!other.alive) continue;
-			if (other.start <= end && other.end >= start && other.ptoDays.some((day) => usedPtoDays.has(day))) {
+			const overlaps = other.start <= end && other.end >= start;
+			if (overlaps && other.ptoDays.some((day) => usedPtoDays.has(day))) {
 				other.alive = false;
 				continue;
 			}
 			other.gap = Math.min(other.gap, Math.max(0, start - other.end, other.start - end));
-			if (other.start <= end && other.end >= start) {
-				other.newDays = countNewDays(other);
-				other.freshDays = countFreshDays(other);
+			if (overlaps) {
+				other.newDays = countDays({ span: other, isCounted: isNew });
+				other.freshDays = countDays({ span: other, isCounted: isFresh });
 			}
 			if (other.start <= merged.end + 1 && other.end >= merged.start - 1) {
-				const run = runAround(other);
-				other.runLength = run.end - run.start + 1;
+				other.runLength = spanLength(runAround(other));
 			}
 		}
 	};
 
 	const bestUnder = (stage: Objective) => {
 		let best: { entry: PoolEntry; rank: number[] } | null = null;
+		const planIsEmpty = selected.length === 0;
 
 		for (const entry of pool) {
 			if (!entry.alive) continue;
-			const { bridge, newDays, runLength, gap, inPreferredMonths } = entry;
+			const { bridge, newDays, runLength, gap, isPreferred } = entry;
 			if (spent + bridge.ptoDaysNeeded > targetPtoDays) continue;
 
 			const marginalEfficiency = newDays / bridge.ptoDaysNeeded;
@@ -313,9 +311,9 @@ export const selectBridges = ({
 				gap,
 				longestStretchAfter: after.longestStretchAfter,
 				stretchRelief: after.stretchRelief,
-				inPreferredMonths,
+				isPreferred,
 				joinsBlock: runLength > entry.freshDays,
-				planIsEmpty: selected.length === 0,
+				planIsEmpty,
 			};
 			if (stage.admits && !stage.admits(candidate)) continue;
 

@@ -2,10 +2,11 @@ import { routing } from "@infrastructure/i18n/routing";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { mockHeaders, mockCookies, mockGetTranslations, mockSetRequestLocale } = vi.hoisted(() => ({
+const { mockHeaders, mockCookies, mockGetTranslations, mockGetMessages, mockSetRequestLocale } = vi.hoisted(() => ({
 	mockHeaders: vi.fn(),
 	mockCookies: vi.fn(),
 	mockGetTranslations: vi.fn(),
+	mockGetMessages: vi.fn(),
 	mockSetRequestLocale: vi.fn(),
 }));
 
@@ -15,7 +16,7 @@ vi.mock("next-intl/server", async (importOriginal) => {
 	return {
 		...actual,
 		getTranslations: mockGetTranslations,
-		getMessages: vi.fn().mockResolvedValue({}),
+		getMessages: mockGetMessages,
 		setRequestLocale: mockSetRequestLocale,
 	};
 });
@@ -49,16 +50,32 @@ const request = ({ intlLocale, cookieLocale, acceptLanguage }: Signals = {}) => 
 	mockCookies.mockResolvedValue({ get: () => (cookieLocale ? { value: cookieLocale } : undefined) });
 };
 
-const resolveLocale = async () => {
+const renderLocalized = async () => {
 	const suspense = GlobalNotFound().props.children.props.children;
 	const localized = suspense.props.children;
-	await localized.type(localized.props);
+	return localized.type(localized.props);
+};
+
+const resolveLocale = async () => {
+	await renderLocalized();
 	return mockSetRequestLocale.mock.calls.at(-1)?.[0];
+};
+
+interface ProviderNode {
+	props?: { children?: unknown; messages?: unknown };
+}
+
+const findProvider = (node: unknown): ProviderNode | undefined => {
+	if (!node || typeof node !== "object") return undefined;
+	const { props } = node as ProviderNode;
+	if (props && "messages" in props) return node as ProviderNode;
+	return [props?.children].flat().map(findProvider).find(Boolean);
 };
 
 beforeEach(() => {
 	vi.clearAllMocks();
 	mockGetTranslations.mockResolvedValue((key: string) => key);
+	mockGetMessages.mockResolvedValue({ a11y: { closeDialog: "Close" }, notFound: { title: "Gone" } });
 	request();
 });
 
@@ -74,6 +91,12 @@ describe("global-not-found", () => {
 
 	it("declares the default locale on <html lang>, which HtmlLangSync corrects on the client", () => {
 		expect(GlobalNotFound().props.lang).toBe(routing.defaultLocale);
+	});
+
+	it("hands the client provider every namespace but the ones only the server reads", async () => {
+		const tree = await renderLocalized();
+
+		expect(findProvider(tree)?.props?.messages).toEqual({ a11y: { closeDialog: "Close" } });
 	});
 });
 

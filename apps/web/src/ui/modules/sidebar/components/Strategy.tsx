@@ -6,23 +6,16 @@ import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@ui/modules/core/animate/base/Collapsible";
 import { ChevronDown } from "@ui/modules/core/animate/icons/ChevronDown";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
-import { Users } from "@ui/modules/core/animate/icons/Users";
 import { Card, CardDescription } from "@ui/modules/core/primitives/Card";
 import { Combobox } from "@ui/modules/core/primitives/Combobox";
+import { STRATEGY_ICONS } from "@ui/modules/shared/strategyIcons";
 import { PreferredMonths } from "@ui/modules/sidebar/components/PreferredMonths";
 import { SidebarFieldLabel } from "@ui/modules/sidebar/components/SidebarFieldLabel";
 import { cn } from "@ui/utils/cn";
-import { AlertCircle, CheckCircle2, DicesIcon, Plane, Scale, TrendingUp } from "lucide-react";
+import { AlertCircle, CheckCircle2, DicesIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { type ElementType, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
-
-const STRATEGY_ICONS = {
-	[FilterStrategy.GROUPED]: Users,
-	[FilterStrategy.OPTIMIZED]: TrendingUp,
-	[FilterStrategy.BALANCED]: Scale,
-	[FilterStrategy.MAIN_VACATION]: Plane,
-} as const satisfies Record<FilterStrategy, ElementType>;
 
 interface StrategyDetails {
 	label: string;
@@ -83,6 +76,7 @@ export const Strategy = () => {
 	};
 
 	const currentStrategy = strategies.find(({ value }) => value === strategy);
+	const CurrentIcon = currentStrategy?.icon;
 
 	return (
 		<div className="space-y-2 w-full">
@@ -117,10 +111,7 @@ export const Strategy = () => {
 						<Card className="p-4 bg-muted/50 mt-2 text-xs">
 							<div className="space-y-2">
 								<div className="flex items-start gap-3">
-									{(() => {
-										const Icon = currentStrategy.icon;
-										return <Icon className="size-6 text-primary" />;
-									})()}
+									{CurrentIcon && <CurrentIcon className="size-6 text-primary" />}
 									<div className="flex-1">
 										<h4 className="font-semibold text-xs">{currentStrategy.description}</h4>
 										<CardDescription className="text-xs">{currentStrategy.subtitle}</CardDescription>

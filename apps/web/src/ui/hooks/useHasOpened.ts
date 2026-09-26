@@ -1,6 +1,10 @@
 import { useState } from "react";
 
-export const useHasOpened = (open: boolean) => {
+interface UseHasOpenedParams {
+	open: boolean;
+}
+
+export const useHasOpened = ({ open }: UseHasOpenedParams) => {
 	const [hasOpened, setHasOpened] = useState(open);
 
 	if (open && !hasOpened) setHasOpened(true);

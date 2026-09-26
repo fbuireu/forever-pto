@@ -9,8 +9,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const store = vi.hoisted(() => ({
 	strategy: "balanced" as string,
 	setStrategy: vi.fn(),
-	preferredMonths: [6, 7],
-	setPreferredMonths: vi.fn(),
 }));
 
 const track = vi.hoisted(() => vi.fn());
@@ -21,12 +19,11 @@ vi.mock("@application/stores/filters", () => ({
 		selector({
 			strategy: store.strategy,
 			setStrategy: store.setStrategy,
-			preferredMonths: store.preferredMonths,
-			setPreferredMonths: store.setPreferredMonths,
-			year: 2099,
-			carryOverMonths: 0,
-			allowPastDays: false,
 		}),
+}));
+
+vi.mock("./PreferredMonths", () => ({
+	PreferredMonths: () => <fieldset aria-label={en.sidebar.preferredMonths.title} />,
 }));
 
 vi.mock("@ui/modules/core/animate/base/Popover", () => ({

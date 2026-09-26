@@ -32,14 +32,20 @@ export const usePlacedPlan = () => {
 };
 
 export const usePlanReadout = () => {
-	const plan = usePlacedPlan();
-	const { activeSuggestion, manuallySelectedDays, removedSuggestedDays } = plan;
+	const { currentSelection, suggestion, manuallySelectedDays, removedSuggestedDays, isCalculating } = useHolidaysStore(
+		useShallow((state) => ({
+			currentSelection: state.currentSelection,
+			suggestion: state.suggestion,
+			manuallySelectedDays: state.manuallySelectedDays,
+			removedSuggestedDays: state.removedSuggestedDays,
+			isCalculating: state.isCalculating,
+		})),
+	);
 	const ptoDays = useFiltersStore((state) => state.ptoDays);
-	const isCalculating = useHolidaysStore((state) => state.isCalculating);
 
 	const budget = measureBudget({
 		ptoDays,
-		days: activeSuggestion?.days,
+		days: (currentSelection ?? suggestion)?.days,
 		manuallySelectedDays,
 		removedSuggestedDays,
 	});
@@ -50,7 +56,6 @@ export const usePlanReadout = () => {
 	});
 
 	return {
-		...plan,
 		ptoDays,
 		suggested: budget.suggested,
 		manual: budget.manual,

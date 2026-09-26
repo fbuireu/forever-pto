@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import en from "@i18n/messages/en.json";
 import { describe, expect, it } from "vitest";
-import { clientMessagesOf, SERVER_ONLY_NAMESPACES } from "./clientMessages";
+import { clientMessagesOf, isServerOnlyNamespace, SERVER_ONLY_NAMESPACES } from "./clientMessages";
 
 const SRC = resolve(process.cwd(), "src");
 
@@ -14,7 +14,6 @@ const sourceFiles = (dir: string): string[] =>
 	});
 
 const FILES = sourceFiles(SRC).map((path) => ({ path: relative(SRC, path), source: readFileSync(path, "utf8") }));
-const SERVER_ONLY = new Set<string>(SERVER_ONLY_NAMESPACES);
 const rootOf = (key: string) => key.split(".")[0] ?? key;
 
 const TRANSLATION_CALL = /useTranslations\(([^)]*)\)/g;
@@ -30,7 +29,7 @@ describe("clientMessagesOf", () => {
 		const client = clientMessagesOf(en);
 
 		for (const namespace of Object.keys(en)) {
-			expect(namespace in client).toBe(!SERVER_ONLY.has(namespace));
+			expect(namespace in client).toBe(!isServerOnlyNamespace(namespace));
 		}
 	});
 
@@ -47,7 +46,7 @@ describe("no client code reads a namespace the client is not sent", () => {
 	it("reads every literal namespace from the ones the client receives", () => {
 		const offenders = calls
 			.filter(({ argument }) => /^["'`]/.test(argument))
-			.filter(({ argument }) => SERVER_ONLY.has(rootOf(argument.slice(1, -1))))
+			.filter(({ argument }) => isServerOnlyNamespace(rootOf(argument.slice(1, -1))))
 			.map(({ path, argument }) => `${path} -> ${argument}`);
 
 		expect(offenders).toEqual([]);
@@ -65,6 +64,6 @@ describe("no client code reads a namespace the client is not sent", () => {
 		);
 
 		expect(keys.length).toBeGreaterThan(0);
-		expect(keys.filter((root) => SERVER_ONLY.has(root))).toEqual([]);
+		expect(keys.filter((root) => isServerOnlyNamespace(root))).toEqual([]);
 	});
 });

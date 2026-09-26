@@ -15,5 +15,7 @@ export const SERVER_ONLY_NAMESPACES = [
 
 const SERVER_ONLY = new Set<string>(SERVER_ONLY_NAMESPACES);
 
+export const isServerOnlyNamespace = (namespace: string) => SERVER_ONLY.has(namespace);
+
 export const clientMessagesOf = (messages: AbstractIntlMessages): AbstractIntlMessages =>
-	Object.fromEntries(Object.entries(messages).filter(([namespace]) => !SERVER_ONLY.has(namespace)));
+	Object.fromEntries(Object.entries(messages).filter(([namespace]) => !isServerOnlyNamespace(namespace)));

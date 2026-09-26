@@ -1,25 +1,16 @@
 "use client";
 
-import { startOfToday } from "@application/shared/utils/dates";
 import { MIN_CARRY_OVER_MONTHS } from "@application/stores/filters";
 import { PremiumFeatureId, PremiumOrigin } from "@application/stores/premium";
 import { FilterStrategy } from "@domain/calendar/types";
-import { MAX_CARRY_OVER_MONTHS, reachableMonths, reachablePreferredMonths } from "@domain/calendar/window";
+import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import { Switch } from "@ui/modules/core/animate/base/Switch";
 import { Slider } from "@ui/modules/core/primitives/Slider";
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
 import { MonthToggles } from "@ui/modules/shared/MonthToggles";
-import { type LucideIcon, Plane, Scale, TrendingUp, Users } from "lucide-react";
+import { STRATEGY_ICONS } from "@ui/modules/shared/strategyIcons";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
 import type { QuickStartDraft } from "./steps";
-
-const STRATEGY_ICONS = {
-	[FilterStrategy.GROUPED]: Users,
-	[FilterStrategy.OPTIMIZED]: TrendingUp,
-	[FilterStrategy.BALANCED]: Scale,
-	[FilterStrategy.MAIN_VACATION]: Plane,
-} as const satisfies Record<FilterStrategy, LucideIcon>;
 
 const STRATEGY_CARD_CLASS =
 	"flex w-full cursor-pointer items-start gap-3 rounded-[10px] border-[3px] border-(--frame) bg-(--surface-panel) p-3 text-left shadow-(--shadow-brutal-xs) transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-(--shadow-brutal-sm) peer-checked:bg-(--accent) peer-checked:text-(--color-brand-ink) peer-checked:[&_span]:text-(--color-brand-ink) peer-focus-visible:ring-[3px] peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2";
@@ -33,10 +24,6 @@ export const QuickStartSettingsStep = ({ draft, onChange }: QuickStartSettingsSt
 	const t = useTranslations("quickStart.settings");
 	const tSidebar = useTranslations("sidebar");
 	const { year, carryOverMonths, allowPastDays, preferredMonths } = draft;
-	const reachable = useMemo(
-		() => reachableMonths({ year, carryOverMonths, allowPastDays, today: startOfToday() }),
-		[year, carryOverMonths, allowPastDays],
-	);
 
 	return (
 		<div className="space-y-6">
@@ -76,14 +63,11 @@ export const QuickStartSettingsStep = ({ draft, onChange }: QuickStartSettingsSt
 					<MonthToggles
 						label={tSidebar("preferredMonths.title")}
 						legendClassName="text-sm font-medium leading-none mb-2"
-						window={{ year, carryOverMonths }}
+						planningWindow={{ year, carryOverMonths }}
+						allowPastDays={allowPastDays}
 						months={preferredMonths}
 						onChange={(months) => onChange({ preferredMonths: months })}
-						reachable={reachable}
 					/>
-					{reachablePreferredMonths({ preferredMonths, reachable }).length === 0 && (
-						<p className="text-xs text-muted-foreground">{tSidebar("preferredMonths.anyMonth")}</p>
-					)}
 				</div>
 			)}
 

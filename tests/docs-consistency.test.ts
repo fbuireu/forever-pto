@@ -580,7 +580,7 @@ describe("pinned runtimes", () => {
 
 describe("the app's hashed build assets are cached for good", () => {
 	it("marks /_next/static immutable, because Workers Static Assets revalidate every file by default", () => {
-		const rules = readFileSync(resolve(ROOT, "apps/web/public/_headers"), "utf8").split(/\r?\n/);
+		const rules = read("apps/web/public/_headers").split(/\r?\n/);
 		const start = rules.indexOf("/_next/static/*");
 
 		expect(start).toBeGreaterThanOrEqual(0);

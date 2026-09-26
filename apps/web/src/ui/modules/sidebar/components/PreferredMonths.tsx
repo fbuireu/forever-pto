@@ -1,14 +1,11 @@
 "use client";
 
-import { startOfToday } from "@application/shared/utils/dates";
 import { useFiltersStore } from "@application/stores/filters";
-import { reachableMonths, reachablePreferredMonths } from "@domain/calendar/window";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { MonthToggles } from "@ui/modules/shared/MonthToggles";
 import { SidebarFieldLabel } from "@ui/modules/sidebar/components/SidebarFieldLabel";
 import { CalendarHeart } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
 
 export const PreferredMonths = () => {
@@ -22,17 +19,12 @@ export const PreferredMonths = () => {
 			allowPastDays: state.allowPastDays,
 		})),
 	);
-	const reachable = useMemo(
-		() => reachableMonths({ year, carryOverMonths, allowPastDays, today: startOfToday() }),
-		[year, carryOverMonths, allowPastDays],
-	);
-	const chosen = reachablePreferredMonths({ preferredMonths, reachable });
 
 	const handleChange = (months: number[]) => {
 		setPreferredMonths(months);
 		track({
 			event: "planning_input_changed",
-			properties: { input: "preferredMonths", inputValue: months.toSorted((a, b) => a - b).join(",") },
+			properties: { input: "preferredMonths", inputValue: months.join(",") },
 		});
 	};
 
@@ -45,12 +37,11 @@ export const PreferredMonths = () => {
 			/>
 			<MonthToggles
 				label={t("title")}
-				window={{ year, carryOverMonths }}
+				planningWindow={{ year, carryOverMonths }}
+				allowPastDays={allowPastDays}
 				months={preferredMonths}
 				onChange={handleChange}
-				reachable={reachable}
 			/>
-			{chosen.length === 0 && <p className="text-xs text-muted-foreground">{t("anyMonth")}</p>}
 		</div>
 	);
 };

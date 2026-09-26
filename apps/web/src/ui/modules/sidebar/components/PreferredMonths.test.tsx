@@ -53,7 +53,7 @@ describe("PreferredMonths", () => {
 
 		fireEvent.click(screen.getByRole("button", { name: /^June \d{4}$/ }));
 
-		expect(store.setPreferredMonths).toHaveBeenCalledExactlyOnceWith([6, 7, 5]);
+		expect(store.setPreferredMonths).toHaveBeenCalledExactlyOnceWith([5, 6, 7]);
 		expect(track).toHaveBeenCalledExactlyOnceWith({
 			event: "planning_input_changed",
 			properties: { input: "preferredMonths", inputValue: "5,6,7" },

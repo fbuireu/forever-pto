@@ -5,7 +5,7 @@ import enMessages from "@i18n/messages/en.json";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const gate = vi.hoisted(() => ({ features: [] as string[], origins: [] as (string | undefined)[] }));
 
@@ -88,7 +88,7 @@ describe("QuickStartSettingsStep", () => {
 		expect(screen.getByRole("group", { name: sidebar.preferredMonths.title })).toBeDefined();
 		fireEvent.click(screen.getByRole("button", { name: /^June \d{4}$/ }));
 
-		expect(onChange).toHaveBeenCalledExactlyOnceWith({ preferredMonths: [6, 7, 5] });
+		expect(onChange).toHaveBeenCalledExactlyOnceWith({ preferredMonths: [5, 6, 7] });
 	});
 
 	it("says the block may land anywhere once no month is picked", () => {
@@ -125,15 +125,19 @@ describe("QuickStartSettingsStep", () => {
 		expect(onChange).toHaveBeenCalledExactlyOnceWith({ carryOverMonths: 6 });
 	});
 
-	it("refuses a Preferred Month already past in the current year while past days are off", () => {
-		vi.useFakeTimers({ now: new Date(2026, 8, 26), toFake: ["Date"] });
-		try {
+	describe("in the current year with past days off", () => {
+		beforeEach(() => {
+			vi.useFakeTimers({ now: new Date(2026, 8, 26), toFake: ["Date"] });
+		});
+		afterEach(() => {
+			vi.useRealTimers();
+		});
+
+		it("refuses a Preferred Month already past", () => {
 			renderStep({ strategy: FilterStrategy.MAIN_VACATION, year: 2026, carryOverMonths: 0 });
 
 			expect(screen.getByRole("button", { name: /^August \d{4}$/ })).toHaveProperty("disabled", true);
 			expect(screen.getByRole("button", { name: /^October \d{4}$/ })).toHaveProperty("disabled", false);
-		} finally {
-			vi.useRealTimers();
-		}
+		});
 	});
 });

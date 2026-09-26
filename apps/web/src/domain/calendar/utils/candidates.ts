@@ -34,7 +34,7 @@ export const findPlanningCandidates = ({
 	};
 };
 
-export interface SelectionInputParams {
+interface SelectionInputParams {
 	candidates: PlanningCandidates;
 	ptoDays: number;
 	preferredMonths?: number[];

@@ -1,39 +1,48 @@
+import en from "@i18n/messages/en.json";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MonthToggles } from "./MonthToggles";
+
+const YEAR = 2026;
 
 interface RenderTogglesParams {
 	locale?: Locale;
 	months?: number[];
-	reachable?: ReadonlySet<number>;
+	allowPastDays?: boolean;
 	carryOverMonths?: number;
 }
-
-const EVERY_MONTH: ReadonlySet<number> = new Set(Array.from({ length: 24 }, (_, position) => position));
 
 const renderToggles = ({
 	locale = "en",
 	months = [6, 7],
-	reachable = EVERY_MONTH,
+	allowPastDays = true,
 	carryOverMonths = 0,
 }: RenderTogglesParams = {}) => {
 	const onChange = vi.fn();
 
 	render(
-		<NextIntlClientProvider locale={locale} messages={{}}>
+		<NextIntlClientProvider locale={locale} messages={en}>
 			<MonthToggles
 				label="Months"
-				window={{ year: 2026, carryOverMonths }}
+				planningWindow={{ year: YEAR, carryOverMonths }}
+				allowPastDays={allowPastDays}
 				months={months}
 				onChange={onChange}
-				reachable={reachable}
 			/>
 		</NextIntlClientProvider>,
 	);
 
 	return onChange;
 };
+
+beforeEach(() => {
+	vi.useFakeTimers({ now: new Date(YEAR, 8, 26), toFake: ["Date"] });
+});
+
+afterEach(() => {
+	vi.useRealTimers();
+});
 
 describe("MonthToggles", () => {
 	it("offers the twelve months inside a group named by its legend, the chosen ones pressed", () => {
@@ -57,12 +66,12 @@ describe("MonthToggles", () => {
 		expect(screen.getByRole("button", { name: "julio 2026" })).toBeDefined();
 	});
 
-	it("hands back the months with one added", () => {
+	it("hands back the months with one added, in calendar order", () => {
 		const onChange = renderToggles();
 
 		fireEvent.click(screen.getByRole("button", { name: "March 2026" }));
 
-		expect(onChange).toHaveBeenCalledExactlyOnceWith([6, 7, 2]);
+		expect(onChange).toHaveBeenCalledExactlyOnceWith([2, 6, 7]);
 	});
 
 	it("hands back the months with one removed", () => {
@@ -73,27 +82,41 @@ describe("MonthToggles", () => {
 		expect(onChange).toHaveBeenCalledExactlyOnceWith([7]);
 	});
 
-	it("refuses a month the plan can no longer reach, and does not show it as chosen", () => {
-		const onChange = renderToggles({ months: [2, 7], reachable: new Set([8, 9, 10, 11]) });
+	describe("with past days not allowed", () => {
+		it("refuses a month already past, and does not show it as chosen", () => {
+			const onChange = renderToggles({ months: [2, 7], allowPastDays: false });
 
-		const march = screen.getByRole("button", { name: "March 2026" });
-		expect(march).toHaveProperty("disabled", true);
-		expect(march.getAttribute("aria-pressed")).toBe("false");
-		expect(screen.getByRole("button", { name: "August 2026" }).getAttribute("aria-pressed")).toBe("false");
+			const march = screen.getByRole("button", { name: "March 2026" });
+			expect(march).toHaveProperty("disabled", true);
+			expect(march.getAttribute("aria-pressed")).toBe("false");
+			expect(screen.getByRole("button", { name: "September 2026" })).toHaveProperty("disabled", false);
 
-		fireEvent.click(march);
-		expect(onChange).not.toHaveBeenCalled();
+			fireEvent.click(march);
+			expect(onChange).not.toHaveBeenCalled();
+		});
+
+		it("says any month will do when every choice has passed", () => {
+			renderToggles({ months: [2, 7], allowPastDays: false });
+
+			expect(screen.getByText(en.sidebar.preferredMonths.anyMonth)).toBeDefined();
+		});
+
+		it("keeps a passed choice when another month is toggled, so it returns once past days are allowed", () => {
+			const onChange = renderToggles({ months: [2], allowPastDays: false });
+
+			fireEvent.click(screen.getByRole("button", { name: "October 2026" }));
+
+			expect(onChange).toHaveBeenCalledExactlyOnceWith([2, 9]);
+		});
 	});
 
-	it("keeps an unreachable choice when another month is toggled, so it returns once past days are allowed", () => {
-		const onChange = renderToggles({ months: [2], reachable: new Set([8, 9, 10, 11]) });
+	it("says nothing about any month while a choice still counts", () => {
+		renderToggles();
 
-		fireEvent.click(screen.getByRole("button", { name: "October 2026" }));
-
-		expect(onChange).toHaveBeenCalledExactlyOnceWith([2, 9]);
+		expect(screen.queryByText(en.sidebar.preferredMonths.anyMonth)).toBeNull();
 	});
 
-	it("adds the Carry-over Months after December, as the months of the next year they are", () => {
+	it("adds the Carry-over Months after December, under the next year", () => {
 		const onChange = renderToggles({ carryOverMonths: 2 });
 
 		const group = screen.getByRole("group", { name: "Months" });

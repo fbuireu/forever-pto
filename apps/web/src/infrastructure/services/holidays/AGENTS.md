@@ -18,6 +18,7 @@ are not non-working days, tags and hands over.
 | [`source/dateHolidays.ts`](./source/dateHolidays.ts) | The production adapter. The **only** place in the app that constructs `Holidays` |
 | [`source/fixture.ts`](./source/fixture.ts) | `createFixtureHolidaySource(calendar)`: the test adapter, plain data in |
 | [`source/observedHolidays.ts`](./source/observedHolidays.ts) | `observedHolidays(source, lookup)`: the rules, composed **above** the seam so both adapters go through them |
+| [`source/cachedObservedHolidays.ts`](./source/cachedObservedHolidays.ts) | `cachedObservedHolidays`: the last lookup, kept in one slot keyed on Country, Region, year, locale and the source, so a Carry-over Months change re-runs only the mapping |
 | [`source/utils/observed.ts`](./source/utils/observed.ts) | `resolveObservedHolidays`: the Region-over-Country rule, pure |
 | [`source/utils/nonWorking.ts`](./source/utils/nonWorking.ts) | `keepNonWorking` (the `public`/`bank` filter) and `stampRegion` (the `location` stamp), pure |
 

@@ -12,6 +12,7 @@ import { Temporal } from "temporal-polyfill";
 import { PTO_CONSTANTS } from "../const";
 import type { Bridge } from "../types";
 import { createHolidaySet, getKey } from "./cache";
+import { spanLength } from "./spans";
 
 interface ExpandThroughFreeDaysParams {
 	first: Date;
@@ -142,7 +143,7 @@ export const findBridges = ({ availableWorkdays, holidays }: FindBridgesParams) 
 		let end = last;
 		for (let steps = 0; isFree(end + 1) && steps < PTO_CONSTANTS.SAFETY_LIMIT; steps++) end++;
 
-		const effectiveDays = end - start + 1;
+		const effectiveDays = spanLength({ start, end });
 		const efficiency = effectiveDays / size;
 		if (efficiency < BLOCK_MINIMUM) return;
 

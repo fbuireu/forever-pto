@@ -26,7 +26,7 @@ in two rather than one component reading the store.
 | [`Legend.tsx`](./Legend.tsx) | Explains the day colours. Exports `Legend` *and* `LegendItems`, which `ManagementBar` reuses inside the mobile drawer |
 | [`Summary.tsx`](./Summary.tsx) | Metric cards plus the charts, all `dynamic()`-imported from here rather than from the route |
 | [`Roadmap.tsx`](./Roadmap.tsx) | Feature map over `RadialNav` and `FeatureList` from `core/animate/components/` |
-| [`Contact.tsx`](./Contact.tsx) | The feedback prompt; opens [`shared/contact/ContactModal.tsx`](../../shared/contact/ContactModal.tsx) |
+| [`Contact.tsx`](./Contact.tsx) | The feedback prompt; opens [`shared/contact/ContactModal.tsx`](../../shared/contact/ContactModal.tsx) through [`shared/contact/LazyContactModal.tsx`](../../shared/contact/LazyContactModal.tsx), the one gate the footer button and the error page share: it downloads the modal only once it has been opened |
 
 ## Subdirectories
 

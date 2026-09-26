@@ -1,10 +1,10 @@
-import { dayIndex, isSameMonth } from "@application/shared/utils/dates";
+import { isSameMonth } from "@application/shared/utils/dates";
 import type { FromTo } from "../Calendar";
 
 interface GetDayClassNamesParams {
 	date: Date;
 	month: Date;
-	selectedDates: Date[];
+	isSelected: boolean;
 	disabled?: boolean;
 	showOutsideDays: boolean;
 	modifiers: Record<string, ((date: Date) => boolean) | undefined>;
@@ -59,15 +59,13 @@ export const getDayStateLabelKeys = ({ date, modifiers }: GetDayStateLabelKeysPa
 export const getDayClassNames = ({
 	date,
 	month,
-	selectedDates,
+	isSelected,
 	disabled = false,
 	showOutsideDays,
 	modifiers,
 }: GetDayClassNamesParams) => {
 	const classes: string[] = [];
 	const isOutsideMonth = !isSameMonth({ a: date, b: month });
-	const index = dayIndex(date);
-	const isSelected = selectedDates.some((d) => dayIndex(d) === index);
 	const shouldShowAsPast = modifiers.disabled?.(date) ?? false;
 
 	classes.push(

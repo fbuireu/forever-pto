@@ -1,30 +1,41 @@
 "use client";
 
-import { getMonthNames } from "@application/shared/utils/dates";
-import { type PlanningWindow, planningWindowMonths } from "@domain/calendar/window";
+import { getMonthNames, startOfToday } from "@application/shared/utils/dates";
+import {
+	type PlanningWindow,
+	planningWindowMonths,
+	reachableMonths,
+	reachablePreferredMonths,
+} from "@domain/calendar/window";
 import { Button } from "@ui/modules/core/primitives/Button";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useMemo } from "react";
 
 interface MonthTogglesProps {
 	label: string;
-	window: PlanningWindow;
+	planningWindow: PlanningWindow;
+	allowPastDays: boolean;
 	months: readonly number[];
 	onChange: (months: number[]) => void;
-	reachable: ReadonlySet<number>;
 	legendClassName?: string;
 }
 
 export const MonthToggles = ({
 	label,
-	window,
+	planningWindow,
+	allowPastDays,
 	months,
 	onChange,
-	reachable,
 	legendClassName = "sr-only",
 }: MonthTogglesProps) => {
 	const locale = useLocale();
-	const { year, carryOverMonths } = window;
+	const t = useTranslations("sidebar.preferredMonths");
+	const { year, carryOverMonths } = planningWindow;
+	const reachable = useMemo(
+		() => reachableMonths({ year, carryOverMonths, allowPastDays, today: startOfToday() }),
+		[year, carryOverMonths, allowPastDays],
+	);
+	const chosen = reachablePreferredMonths({ preferredMonths: months, reachable });
 	const years = useMemo(() => {
 		const shortNames = getMonthNames({ locale });
 		const longNames = getMonthNames({ locale, format: "long" });
@@ -42,7 +53,11 @@ export const MonthToggles = ({
 	}, [locale, year, carryOverMonths]);
 
 	const handleToggle = (position: number) =>
-		onChange(months.includes(position) ? months.filter((selected) => selected !== position) : [...months, position]);
+		onChange(
+			(months.includes(position) ? months.filter((selected) => selected !== position) : [...months, position]).toSorted(
+				(a, b) => a - b,
+			),
+		);
 
 	return (
 		<fieldset className="min-w-0">
@@ -80,6 +95,7 @@ export const MonthToggles = ({
 					</div>
 				))}
 			</div>
+			{chosen.length === 0 && <p className="mt-2 text-xs text-muted-foreground">{t("anyMonth")}</p>}
 		</fieldset>
 	);
 };

@@ -117,8 +117,8 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 	const [showAddModal, setShowAddModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
-	const addModalHasOpened = useHasOpened(showAddModal);
-	const editModalHasOpened = useHasOpened(showEditModal);
+	const addModalHasOpened = useHasOpened({ open: showAddModal });
+	const editModalHasOpened = useHasOpened({ open: showEditModal });
 	const [innerOpen, setInnerOpen] = useState(false);
 	const [selectedHolidays, setSelectedHolidays] = useState<Set<string>>(new Set());
 	const [sortConfig, setSortConfig] = useState<{

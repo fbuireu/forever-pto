@@ -16,7 +16,7 @@ export interface GenerateAlternativesParams {
 	preferredMonths?: number[];
 }
 
-export interface PlanChoice {
+interface PlanChoice {
 	suggestion: Suggestion;
 	alternatives: Suggestion[];
 }

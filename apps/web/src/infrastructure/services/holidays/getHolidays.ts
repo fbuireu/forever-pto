@@ -1,34 +1,12 @@
 import { holidayDTO } from "@application/dto/holiday/dto";
-import type { HolidayDTO, RawHoliday } from "@application/dto/holiday/types";
+import type { HolidayDTO } from "@application/dto/holiday/types";
 import { logger } from "@infrastructure/logging/logger";
 import { getRegions } from "@infrastructure/services/regions/getRegions";
 import { Effect } from "effect";
 import type { Locale } from "next-intl";
+import { cachedObservedHolidays } from "./source/cachedObservedHolidays";
 import { dateHolidaysSource } from "./source/dateHolidays";
-import { observedHolidays } from "./source/observedHolidays";
-import type { HolidayLookup, HolidaySource } from "./source/types";
-
-interface LastLookup {
-	key: string;
-	source: HolidaySource;
-	raw: RawHoliday[];
-}
-
-let lastLookup: LastLookup | null = null;
-
-interface CachedObservedHolidaysParams {
-	source: HolidaySource;
-	lookup: HolidayLookup;
-}
-
-const cachedObservedHolidays = ({ source, lookup }: CachedObservedHolidaysParams) => {
-	const key = [lookup.country, lookup.region ?? "", lookup.year, lookup.locale].join("|");
-	if (lastLookup?.key === key && lastLookup.source === source) return lastLookup.raw;
-
-	const raw = observedHolidays({ source, lookup });
-	lastLookup = { key, source, raw };
-	return raw;
-};
+import type { HolidaySource } from "./source/types";
 
 export interface GetHolidaysParams {
 	year: number;

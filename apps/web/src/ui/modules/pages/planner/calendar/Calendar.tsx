@@ -390,7 +390,7 @@ export const Calendar = memo(function Calendar({
 					const baseClasses = getDayClassNames({
 						date,
 						month: currentMonth,
-						selectedDates: mode === CalendarSelectionMode.RANGE ? [] : selectedDates,
+						isSelected: mode !== CalendarSelectionMode.RANGE && (modifiers.selected?.(date) ?? false),
 						disabled: isDisabled,
 						showOutsideDays,
 						modifiers,

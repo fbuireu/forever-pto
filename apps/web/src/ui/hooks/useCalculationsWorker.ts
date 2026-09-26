@@ -20,7 +20,7 @@ interface PlannerGeneratedParams {
 	alternatives: readonly unknown[];
 }
 
-export function plannerGeneratedProperties({ params, measured, alternatives }: PlannerGeneratedParams) {
+function plannerGeneratedProperties({ params, measured, alternatives }: PlannerGeneratedParams) {
 	const { metrics } = measured;
 
 	return {

@@ -1,19 +1,14 @@
 "use client";
 
 import { logClientError } from "@application/shared/utils/clientLog";
-import { useHasOpened } from "@ui/hooks/useHasOpened";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { MAIN_CONTENT_ID } from "@ui/modules/layout/SkipToContent";
+import { LazyContactModal } from "@ui/modules/shared/contact/LazyContactModal";
 import { ArrowUpRight, RotateCcw } from "lucide-react";
-import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { version } from "../../../../../package.json";
 import type { ErrorBoundaryProps } from "./types";
-
-const ContactModal = dynamic(() =>
-	import("@ui/modules/shared/contact/ContactModal").then((m) => ({ default: m.ContactModal })),
-);
 
 const STATUS_URL = "https://status.forever-pto.com";
 const CHANGELOG_URL = "https://github.com/fbuireu/forever-pto/releases";
@@ -82,7 +77,6 @@ const LINE_DELAY_MS = 130;
 export function ErrorContent({ error, reset }: ErrorContentProps) {
 	const t = useTranslations("error");
 	const [contactOpen, setContactOpen] = useState(false);
-	const contactHasOpened = useHasOpened(contactOpen);
 	const [visibleCount, setVisibleCount] = useState(0);
 	const capturedAt = useRef(new Date());
 	const terminalRef = useRef<HTMLDivElement>(null);
@@ -264,7 +258,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
 				</div>
 			</main>
 
-			{contactHasOpened && <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />}
+			<LazyContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
 		</>
 	);
 }

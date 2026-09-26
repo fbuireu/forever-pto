@@ -8,20 +8,20 @@ describe("workStretchesOf", () => {
 	it("keeps a weekend inside one stretch of work", () => {
 		const workdays = [13, 14, 15, 16, 17, 20, 21].map(january);
 
-		expect(workStretchesOf(workdays)).toEqual([{ start: 0, end: 6 }]);
+		expect(workStretchesOf({ workdays })).toEqual([{ start: 0, end: 6 }]);
 	});
 
 	it("ends a stretch at a weekday that is not a Workday", () => {
 		const workdays = [13, 14, 16, 17, 20].map(january);
 
-		expect(workStretchesOf(workdays)).toEqual([
+		expect(workStretchesOf({ workdays })).toEqual([
 			{ start: 0, end: 1 },
 			{ start: 2, end: 4 },
 		]);
 	});
 
 	it("answers no stretch for no Workdays", () => {
-		expect(workStretchesOf([])).toEqual([]);
+		expect(workStretchesOf({ workdays: [] })).toEqual([]);
 	});
 });
 

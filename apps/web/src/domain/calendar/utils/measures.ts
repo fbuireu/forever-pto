@@ -11,7 +11,7 @@ export interface PlanMeasures {
 	longestWorkStretch: number;
 }
 
-export interface MeasurePlanParams {
+interface MeasurePlanParams {
 	plan: Pick<Suggestion, "days" | "bridges">;
 	alreadyOff: Date[];
 	manualDays: Date[];

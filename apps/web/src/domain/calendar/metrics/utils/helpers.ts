@@ -4,7 +4,6 @@ import {
 	eachDayOfInterval,
 	endOfYear,
 	formatDate,
-	getMonth,
 	getYear,
 	isWeekend,
 	startOfToday,
@@ -16,6 +15,7 @@ import type { Bridge } from "../../types";
 import {
 	MONTHS_IN_QUARTER,
 	MONTHS_IN_YEAR,
+	monthKeyOf,
 	type PlanningWindow,
 	windowMonthCount,
 	windowQuarterCount,
@@ -29,7 +29,7 @@ export interface WindowMonthIndexParams {
 }
 
 export const windowMonthIndex = ({ date, window: { year } }: WindowMonthIndexParams) =>
-	(getYear(date) - year) * MONTHS_IN_YEAR + getMonth(date);
+	monthKeyOf(date) - year * MONTHS_IN_YEAR;
 
 export interface GetMonthlyDistParams {
 	days: Date[];

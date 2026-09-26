@@ -1,16 +1,12 @@
 "use client";
 
-import { useHasOpened } from "@ui/hooks/useHasOpened";
-import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-
-const ContactModal = dynamic(() => import("./ContactModal").then((module) => ({ default: module.ContactModal })));
+import { LazyContactModal } from "./LazyContactModal";
 
 export function ContactButton() {
 	const t = useTranslations("footer");
 	const [open, setOpen] = useState(false);
-	const hasOpened = useHasOpened(open);
 
 	return (
 		<>
@@ -21,7 +17,7 @@ export function ContactButton() {
 			>
 				{t("contactUs")}
 			</button>
-			{hasOpened && <ContactModal open={open} onClose={() => setOpen(false)} />}
+			<LazyContactModal open={open} onClose={() => setOpen(false)} />
 		</>
 	);
 }
