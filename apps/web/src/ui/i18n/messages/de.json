@@ -159,7 +159,7 @@
 				"title": "Technisch",
 				"algorithms": {
 					"question": "Wie funktioniert der Vorschlagsalgorithmus?",
-					"answer": "Das System analysiert verfügbare Arbeitstage, Feiertage und Benutzerpräferenzen (z. B. Vermeidung vergangener Tage), um PTO-Kombinationen zu erstellen, die die effektive Freizeit maximieren. Es wendet Heuristiken basierend auf Effizienz und Bewertung an, um Brückentage und gruppierte Tage zu priorisieren."
+					"answer": "Das System analysiert deine verfügbaren Arbeitstage, Feiertage und Präferenzen (z. B. Vermeidung vergangener Tage) und findet jede mögliche Brücke, bis zu einer ganzen Arbeitswoche. Dann baut es deinen Plan Brücke für Brücke auf und nimmt immer die, die dem bereits abgedeckten Zeitraum die meisten neuen freien Tage hinzufügt, nach den Regeln deiner Strategie. So wird ein Wochenende, das sich zwei Brücken teilen, nie doppelt gezählt."
 				},
 				"strategies": {
 					"question": "Was ist der Unterschied zwischen \"gruppiert\", \"optimiert\" und \"ausgewogen\"?",

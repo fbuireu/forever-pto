@@ -159,7 +159,7 @@
 				"title": "Técnico",
 				"algorithms": {
 					"question": "¿Cómo funciona el algoritmo de sugerencias?",
-					"answer": "El sistema analiza los días laborables disponibles, los festivos y tus preferencias (p.ej. evitar días pasados) para encontrar combinaciones de PTO que maximicen el tiempo libre. Usa criterios de eficiencia para priorizar puentes y bloques de días agrupados."
+					"answer": "El sistema analiza tus días laborables disponibles, los festivos y tus preferencias (p. ej. evitar días pasados) y encuentra todos los puentes posibles, hasta una semana laboral entera. Después construye tu plan puente a puente, tomando siempre el que añade más días libres nuevos a lo que el plan ya cubre, según las reglas de tu estrategia, así que un fin de semana que comparten dos puentes nunca cuenta dos veces."
 				},
 				"strategies": {
 					"question": "¿Cuál es la diferencia entre las estrategias \"agrupada\", \"optimizada\" y \"equilibrada\"?",

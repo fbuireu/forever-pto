@@ -159,7 +159,7 @@
 				"title": "Technical",
 				"algorithms": {
 					"question": "How does the suggestion algorithm work?",
-					"answer": "The system looks at your available workdays, holidays, and preferences (like skipping past dates) to find PTO combinations that maximize your total time off. It scores every possible bridge and block by efficiency, then surfaces the best ones."
+					"answer": "The system looks at your available workdays, holidays and preferences (like skipping past dates) and finds every possible bridge, up to a whole working week. It then builds your plan one bridge at a time, always taking the one that adds the most new days off to what the plan already covers, under the rules of your strategy, so a weekend two bridges share is never counted twice."
 				},
 				"strategies": {
 					"question": "What is the difference between the \"grouped\", \"optimized\" and \"balanced\" strategies?",

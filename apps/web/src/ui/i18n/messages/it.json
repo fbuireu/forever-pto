@@ -159,7 +159,7 @@
 				"title": "Tecnico",
 				"algorithms": {
 					"question": "Come funziona l'algoritmo dei suggerimenti?",
-					"answer": "Il sistema analizza giorni lavorativi disponibili, festivi e preferenze dell'utente (es. evitare giorni passati) per produrre combinazioni di PTO che massimizzino il tempo libero effettivo. Applica euristiche basate su efficienza e punteggio per dare priorità ai ponti e ai giorni raggruppati."
+					"answer": "Il sistema analizza i tuoi giorni lavorativi disponibili, i festivi e le tue preferenze (es. evitare giorni passati) e trova tutti i ponti possibili, fino a un'intera settimana lavorativa. Poi costruisce il tuo piano un ponte alla volta, prendendo sempre quello che aggiunge più giorni liberi nuovi a ciò che il piano copre già, secondo le regole della tua strategia, così un fine settimana condiviso da due ponti non viene mai contato due volte."
 				},
 				"strategies": {
 					"question": "Qual è la differenza tra le strategie \"raggruppata\", \"ottimizzata\" e \"bilanciata\"?",

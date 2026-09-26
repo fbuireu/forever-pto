@@ -159,7 +159,7 @@
 				"title": "Tècnic",
 				"algorithms": {
 					"question": "Com funciona l'algoritme de suggeriments?",
-					"answer": "El sistema analitza dies laborables, festius i preferències (com ara evitar dates passades) per trobar combinacions de PTO que maximitzin el temps lliure. Prioritza ponts i blocs agrupats basant-se en eficiència i puntuació."
+					"answer": "El sistema analitza els teus dies laborables disponibles, els festius i les teves preferències (com ara evitar dates passades) i troba tots els ponts possibles, fins a una setmana laboral sencera. Després construeix el teu pla pont a pont, agafant sempre el que afegeix més dies lliures nous al que el pla ja cobreix, segons les regles de la teva estratègia, de manera que un cap de setmana que comparteixen dos ponts mai no compta dues vegades."
 				},
 				"strategies": {
 					"question": "Quina és la diferència entre les estratègies \"agrupada\", \"optimitzada\" i \"equilibrada\"?",

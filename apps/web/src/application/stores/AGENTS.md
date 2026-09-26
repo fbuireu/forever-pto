@@ -307,7 +307,9 @@ stored Suggestion go stale the moment it is adopted, and neither can be repaired
   exceed the budget; `measureBudget` clamps the Remaining Budget at zero, so the overdraft reads as nothing
   left rather than as a negative allowance: correct for the user, and invisible to anyone debugging.
 - Its Bridges. They were expanded through the Manual Days as pseudo-Holidays, so clearing those days leaves
-  spans crossing dates the calendar now paints as workdays, and `getTotalEffectiveDays` keeps counting them.
+  spans crossing dates the calendar now paints as workdays. Effective Days no longer read the spans (they are the
+  free streaks around the placed days, so they drop correctly), but `bridgesUsed` still counts those Bridges and
+  every one of them describes a stretch that is no longer there.
 
 Clearing the Manual Days fixes the first and causes the second; keeping them does the reverse. **Both were
 tried and both were wrong.** So the action keeps them (every Alternative was planned *around* them, and its

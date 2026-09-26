@@ -159,7 +159,7 @@
 				"title": "Technique",
 				"algorithms": {
 					"question": "Comment fonctionne l'algorithme de suggestion ?",
-					"answer": "Le système analyse les jours ouvrés disponibles, les jours fériés et tes préférences (par ex. éviter les jours passés) pour trouver les combinaisons de congés qui maximisent ton temps de repos effectif. Il applique des heuristiques d'efficacité et un score pour prioriser les ponts et les jours groupés."
+					"answer": "Le système analyse tes jours ouvrés disponibles, les jours fériés et tes préférences (par ex. éviter les jours passés) et trouve tous les ponts possibles, jusqu'à une semaine de travail entière. Il construit ensuite ton plan pont par pont, en prenant toujours celui qui ajoute le plus de nouveaux jours de repos à ce que le plan couvre déjà, selon les règles de ta stratégie : un week-end que partagent deux ponts n'est jamais compté deux fois."
 				},
 				"strategies": {
 					"question": "Quelle est la différence entre les stratégies \"groupée\", \"optimisée\" et \"équilibrée\" ?",
