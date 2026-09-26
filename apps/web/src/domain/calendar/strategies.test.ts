@@ -106,6 +106,18 @@ describe("the Strategies over a real calendar", () => {
 	});
 
 	it.each(Object.values(FilterStrategy))(
+		"%s offers no Alternative with more Effective Days or more Efficiency than the Suggestion",
+		(strategy) => {
+			const { suggestion, alternatives } = PLANS[strategy];
+
+			for (const { metrics } of alternatives) {
+				expect(metrics.totalEffectiveDays).toBeLessThanOrEqual(suggestion.metrics.totalEffectiveDays);
+				expect(metrics.averageEfficiency).toBeLessThanOrEqual(suggestion.metrics.averageEfficiency);
+			}
+		},
+	);
+
+	it.each(Object.values(FilterStrategy))(
 		"%s offers four Alternatives, each distinct from every other plan",
 		(strategy) => {
 			const { suggestion, alternatives } = PLANS[strategy];

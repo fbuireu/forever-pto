@@ -1,5 +1,6 @@
 import { dayIndex } from "@application/shared/utils/dates";
 import { PTO_CONSTANTS } from "@domain/calendar/const";
+import type { Suggestion } from "@domain/calendar/types";
 
 export interface PlanDistanceParams {
 	plan: Date[];
@@ -14,6 +15,15 @@ export const planDistance = ({ plan, rival }: PlanDistanceParams) => {
 	const shared = [...planDays].filter((day) => rivalDays.has(day)).length;
 
 	return 1 - shared / union;
+};
+
+export const coveredDays = ({ days, bridges = [] }: Pick<Suggestion, "days" | "bridges">) => {
+	const covered = new Set(days.map(dayIndex));
+	for (const bridge of bridges) {
+		for (let day = dayIndex(bridge.startDate); day <= dayIndex(bridge.endDate); day++) covered.add(day);
+	}
+
+	return covered.size;
 };
 
 export const restBlocksOf = (days: Date[]) => {

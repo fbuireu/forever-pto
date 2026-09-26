@@ -1,6 +1,6 @@
 import { PTO_CONSTANTS } from "@domain/calendar/const";
 import { describe, expect, it } from "vitest";
-import { planDistance, restBlocksOf } from "./helpers";
+import { coveredDays, planDistance, restBlocksOf } from "./helpers";
 
 const jan = (day: number) => new Date(2025, 0, day);
 
@@ -23,6 +23,37 @@ describe("planDistance", () => {
 
 	it("is zero for two empty plans rather than NaN", () => {
 		expect(planDistance({ plan: [], rival: [] })).toBe(0);
+	});
+});
+
+describe("coveredDays", () => {
+	const friday = {
+		startDate: jan(10),
+		endDate: jan(12),
+		ptoDays: [jan(10)],
+		ptoDaysNeeded: 1,
+		effectiveDays: 3,
+		efficiency: 3,
+	};
+	const monday = {
+		startDate: jan(11),
+		endDate: jan(13),
+		ptoDays: [jan(13)],
+		ptoDaysNeeded: 1,
+		effectiveDays: 3,
+		efficiency: 3,
+	};
+
+	it("counts a weekend two Bridges share once", () => {
+		expect(coveredDays({ days: [jan(10), jan(13)], bridges: [friday, monday] })).toBe(4);
+	});
+
+	it("counts a placed day no Bridge covers as itself", () => {
+		expect(coveredDays({ days: [jan(10), jan(15)], bridges: [friday] })).toBe(4);
+	});
+
+	it("counts only the placed days when there are no Bridges", () => {
+		expect(coveredDays({ days: [jan(10), jan(15)] })).toBe(2);
 	});
 });
 

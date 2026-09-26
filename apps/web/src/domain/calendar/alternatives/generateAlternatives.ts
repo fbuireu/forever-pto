@@ -2,13 +2,13 @@ import { PTO_CONSTANTS } from "../const";
 import { objectiveFor, selectBridges } from "../suggestions/utils/selectors";
 import { FilterStrategy, type Suggestion } from "../types";
 import type { PlanningCandidates } from "../utils/candidates";
-import { planDistance, restBlocksOf } from "./utils/helpers";
+import { coveredDays, planDistance, restBlocksOf } from "./utils/helpers";
 
 export interface GenerateAlternativesParams {
 	ptoDays: number;
 	candidates: PlanningCandidates;
 	maxAlternatives: number;
-	existingSuggestion: Date[];
+	existingSuggestion: Pick<Suggestion, "days" | "bridges">;
 	strategy: FilterStrategy;
 }
 
@@ -20,7 +20,7 @@ interface Seed {
 export function generateAlternatives(params: GenerateAlternativesParams) {
 	const { ptoDays, candidates, maxAlternatives, existingSuggestion, strategy } = params;
 
-	if (ptoDays <= 0 || maxAlternatives <= 0 || existingSuggestion.length === 0) {
+	if (ptoDays <= 0 || maxAlternatives <= 0 || existingSuggestion.days.length === 0) {
 		return [];
 	}
 
@@ -29,10 +29,14 @@ export function generateAlternatives(params: GenerateAlternativesParams) {
 	const alternatives: Suggestion[] = [];
 	const maxRuns = maxAlternatives * PTO_CONSTANTS.ALTERNATIVES.RUNS_PER_ALTERNATIVE;
 	let runs = 0;
+	const ceiling = coveredDays(existingSuggestion);
+	const ceilingEfficiency = ceiling / existingSuggestion.days.length;
 
 	const offer = ({ days, bridges: selected }: Pick<Suggestion, "days" | "bridges">) => {
 		if (days.length === 0) return;
-		const plans = [existingSuggestion, ...alternatives.map((alternative) => alternative.days)];
+		const covered = coveredDays({ days, bridges: selected });
+		if (covered > ceiling || covered / days.length > ceilingEfficiency) return;
+		const plans = [existingSuggestion.days, ...alternatives.map((alternative) => alternative.days)];
 		if (plans.some((plan) => planDistance({ plan, rival: days }) < PTO_CONSTANTS.ALTERNATIVES.MIN_DIFFERENCE)) return;
 
 		alternatives.push({ days, bridges: selected, strategy });
@@ -44,7 +48,7 @@ export function generateAlternatives(params: GenerateAlternativesParams) {
 		offer(selectBridges({ bridges, targetPtoDays: ptoDays, objective: objectiveFor(other) }));
 	}
 
-	const seeds: Seed[] = [{ days: existingSuggestion, excludedDays: [] }];
+	const seeds: Seed[] = [{ days: existingSuggestion.days, excludedDays: [] }];
 
 	for (let next = 0; next < seeds.length; next++) {
 		const seed = seeds[next];

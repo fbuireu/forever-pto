@@ -90,13 +90,21 @@ export function runPlanningPipeline({
 		ptoDays: effectivePtoDays,
 		candidates,
 		maxAlternatives,
-		existingSuggestion: baseSuggestion.days,
+		existingSuggestion: baseSuggestion,
 		strategy,
 	});
 
+	const suggestion = measure(baseSuggestion);
+	const { totalEffectiveDays, averageEfficiency } = suggestion.metrics;
+
 	return {
 		planned: true,
-		suggestion: measure(baseSuggestion),
-		alternatives: baseAlternatives.map(measure),
+		suggestion,
+		alternatives: baseAlternatives
+			.map(measure)
+			.filter(
+				({ metrics }) =>
+					metrics.totalEffectiveDays <= totalEffectiveDays && metrics.averageEfficiency <= averageEfficiency,
+			),
 	};
 }

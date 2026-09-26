@@ -58,7 +58,8 @@ selector, `selectBridges`, to a `Candidate` measured against the plan built so f
   believed it gained is exactly what the Metrics report.
 - Alternatives run the other Strategies first, then the chosen one with one of the Suggestion's Rest Blocks taken
   away at a time, and are kept only when at least `ALTERNATIVES.MIN_DIFFERENCE` away from every plan already
-  offered.
+  offered and never ahead of the Suggestion on Effective Days or Efficiency: the Suggestion is the
+  recommendation, and an Alternative is a different shape of year that gives some of it up.
 
 The exact optimiser is rejected, not deferred: the Strategies are not one linear objective, and a solver in the
 Worker buys optimality for an objective the product does not have. The per-Strategy sort is rejected because it
@@ -78,5 +79,8 @@ cannot express the double count at all.
   too, or the prune silently drops what the Strategy would have taken.
 - An Alternative may now share Bridges with the Suggestion. "Distinct" is a distance, not disjointness, and the
   glossary's Alternative entry already said no more than that.
+- Because the other Strategies' plans are seeds, the ceiling is load-bearing: without it a Grouped user is offered
+  the Optimized plan with more days than their own. It is enforced in `generateAlternatives` and re-checked on the
+  measured Metrics in `runPlanningPipeline`.
 - The rules and their traps are in [`apps/web/src/domain/calendar/AGENTS.md`](../apps/web/src/domain/calendar/AGENTS.md);
   the wiki's planning algorithm page explains the three objectives to a reader.

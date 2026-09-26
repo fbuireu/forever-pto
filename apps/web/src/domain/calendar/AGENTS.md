@@ -25,7 +25,7 @@ in [`CONTEXT.md`](../../../../../CONTEXT.md).
 | [`window.ts`](./window.ts) | `PlanningWindow` and both of its projections, `planningWindowMonths` (the month array) and `planningWindowInterval`/`isInPlanningWindow` (the interval), plus `MONTHS_IN_YEAR`, `MONTHS_IN_QUARTER`, `QUARTERS_IN_YEAR`, `MAX_CARRY_OVER_MONTHS`, `windowMonthCount`/`windowQuarterCount` and `quarterIndex`, which numbers a date's quarter continuously across years so a Carry-over quarter never folds onto the first |
 | [`pipeline.ts`](./pipeline.ts) | `runPlanningPipeline`, the whole run: caches, pseudo-Holidays, budget, the planning calls and the Metrics |
 | [`alternatives/generateAlternatives.ts`](./alternatives/generateAlternatives.ts) | Re-runs selection under the other Strategies and without one Rest Block of the Suggestion at a time, keeping plans at least `MIN_DIFFERENCE` apart |
-| [`alternatives/utils/helpers.ts`](./alternatives/utils/helpers.ts) | `planDistance` (one minus the Jaccard index of two day sets) and `restBlocksOf` (a plan's Rest Blocks, largest first), the two measures the Alternatives are built from |
+| [`alternatives/utils/helpers.ts`](./alternatives/utils/helpers.ts) | `planDistance` (one minus the Jaccard index of two day sets), `coveredDays` (the days a plan's spans and placed days cover, the ceiling an Alternative may not pass) and `restBlocksOf` (a plan's Rest Blocks, largest first) |
 | [`metrics/generateMetrics.ts`](./metrics/generateMetrics.ts) | Assembles the `Metrics` object for a Suggestion or an Alternative |
 | [`metrics/utils/dayOff.ts`](./metrics/utils/dayOff.ts) | `dayKey` and `dayOffKeys`: the one spelling of a day's identity and of the set of days a plan leaves free, which every metric below counts against |
 | [`metrics/utils/streaks.ts`](./metrics/utils/streaks.ts) | `freeStreaks`: the one scan of the free-day runs the plan produces |
@@ -390,6 +390,25 @@ kept. The old rule removed every Bridge touching the Suggestion before searching
 of every Alternative, and two of its seven orderings started from the worst Bridges on purpose; together they
 guaranteed Alternatives worse than the Suggestion. `generateAlternatives.test.ts` pins that an Alternative may
 now keep the Suggestion's strongest Bridge.
+
+**No Alternative beats the Suggestion, and that is what makes it an alternative.** The Suggestion is the
+recommendation; an Alternative trades some of its Effective Days or its Efficiency for a different shape of year,
+never the other way round. It has to be enforced, because the other Strategies' plans are among the seeds: for a
+`GROUPED` Suggestion the `OPTIMIZED` plan covers far more days, and offering it would tell every Grouped user
+their plan was the worse one. Two layers hold it:
+
+- `generateAlternatives` refuses a plan whose `coveredDays` (the union of its Bridges' spans and its placed days)
+  exceeds the Suggestion's, or whose `coveredDays` per placed day does, so the search keeps looking instead of
+  returning a short list. Without Manual Days `coveredDays` is exactly the measured Effective Days, which is the
+  property `strategies.test.ts` already pins for the Suggestion.
+- `runPlanningPipeline` re-checks the **measured** Effective Days and Efficiency of each Alternative against the
+  Suggestion's and drops any that exceeds them. A Manual Day can make the two measures part company (it is a
+  stretch in the Metrics whether or not a span reaches it), and the rule is about what the user sees.
+
+So for `OPTIMIZED` the other Strategies' plans are usually offered, since they cover fewer days, and for
+`GROUPED` and `BALANCED` the `OPTIMIZED` plan is refused whenever it covers more, which over a real calendar
+is every time. The Summary's "alternatives that add more days" notice
+can therefore only fire on a hand-edited plan that fell below one of them, which is what it is for.
 
 **Every Alternative is stamped with the chosen Strategy, even the ones another objective found.** Applying one
 makes it the Suggestion, and the filters store still holds the Strategy the user chose, so a label naming a

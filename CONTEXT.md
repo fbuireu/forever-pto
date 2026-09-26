@@ -66,7 +66,7 @@ The plan the product recommends: a set of dates on which to spend the PTO budget
 _Avoid_: plan
 
 **Alternative**:
-A different, genuinely distinct Suggestion built from the same budget and calendar, offered so the user can compare trade-offs. Applying an Alternative makes it the Suggestion.
+A different, genuinely distinct Suggestion built from the same budget and calendar, offered so the user can compare trade-offs. It never has more Effective Days or a higher Efficiency than the Suggestion: the Suggestion is the recommendation, and an Alternative is what the user gives up some of that for. Applying an Alternative makes it the Suggestion.
 _Avoid_: option, variant
 
 **Suggested Day**:
