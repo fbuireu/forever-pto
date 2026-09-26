@@ -1,6 +1,5 @@
 import type { CountryDTO } from "@application/dto/country/types";
 import type { RegionDTO } from "@application/dto/region/types";
-import { getRegions } from "@infrastructure/services/regions/getRegions";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { obfuscatedStorage } from "./crypto";
@@ -13,7 +12,7 @@ interface LocationState {
 
 interface LocationActions {
 	setCountries: (countries: CountryDTO[]) => void;
-	fetchRegions: (countryCode: string) => void;
+	fetchRegions: (countryCode: string) => Promise<void>;
 }
 
 type LocationStore = LocationState & LocationActions;
@@ -38,7 +37,8 @@ export const useLocationStore = create<LocationStore>()(
 					set({ countries });
 				},
 
-				fetchRegions: (countryCode: string) => {
+				fetchRegions: async (countryCode: string) => {
+					const { getRegions } = await import("@infrastructure/services/regions/getRegions");
 					set({ regions: getRegions({ countryCode }) });
 				},
 			}),

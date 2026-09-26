@@ -450,7 +450,10 @@ different module with no SDK behind it.
 
 **`fetchHolidays` and `fetchRegions` do no network I/O.** Both resolve out of the bundled `date-holidays`
 dataset in the browser: `getHolidays.ts` is `async` but local, and [`getRegions.ts`](../../infrastructure/services/regions/getRegions.ts) is outright synchronous.
-The names are historical. Nothing in this folder makes an HTTP request except `premium.ts`, which calls
+The names are historical. Both stores import their lookup with a dynamic `import()`, never a static one: the
+dataset is about 280 KB compressed, and `location.ts` importing `getRegions` statically put it in the planner's
+first load through every component that reads the Countries, however carefully `fetchHolidays` deferred its
+own. `location.test.ts` reads the store's source to keep it out. Nothing in this folder makes an HTTP request except `premium.ts`, which calls
 `/api/check-session` through `@ui/adapters/session/checkSession`.
 
 **`holidaysKey` says which filters the Holidays were fetched for, and a fetch that was overtaken is

@@ -467,8 +467,9 @@ bundle. Deleting the "empty" component silently ships the CSS eagerly.
 
 `export/HolidayDocument.tsx` is JSX but not DOM. Its elements come from `@react-pdf/renderer` and its
 styles are `StyleSheet.create` objects, so Tailwind classes and `cn()` do nothing there. It is loaded
-through a dynamic import inside an Effect program in [`sidebar/components/CalendarExport.tsx`](./sidebar/components/CalendarExport.tsx); importing
-it statically would pull the whole PDF renderer into the client bundle.
+through a dynamic import inside the Effect program in [`export/exportPdf.tsx`](./export/exportPdf.tsx), which
+[`sidebar/components/CalendarExport.tsx`](./sidebar/components/CalendarExport.tsx) itself imports only when the button is pressed; importing
+either statically would pull the PDF renderer, or the Effect runtime, into the planner's first load.
 
 `data-tutorial` attributes scattered through `sidebar/` and [`pages/planner/`](./pages/planner) are the tutorial's anchors, and
 both sides now name them through `TUTORIAL_ANCHOR` in [`tutorial/anchors.ts`](./tutorial/anchors.ts) rather than as strings. They look

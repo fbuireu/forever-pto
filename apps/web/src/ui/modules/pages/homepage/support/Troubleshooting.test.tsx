@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
@@ -38,12 +40,13 @@ vi.mock("@application/stores/filters", () => ({
 }));
 
 vi.mock("@application/stores/holidays", () => ({
-	useHolidaysStore: (selector: (state: unknown) => unknown) =>
-		selector({
+	useHolidaysStore: {
+		getState: () => ({
 			resetToDefaults: mockResetHolidays,
 			fetchHolidays: mockFetchHolidays,
 			generateSuggestions: mockGenerateSuggestions,
 		}),
+	},
 }));
 
 vi.mock("sonner", () => ({ toast: mockToast }));
@@ -69,6 +72,15 @@ beforeEach(() => {
 });
 
 describe("Troubleshooting", () => {
+	it("loads the planner stores only when the reset is pressed, so the homepage does not rehydrate them", () => {
+		const source = readFileSync(
+			resolve(process.cwd(), "src/ui/modules/pages/homepage/support/Troubleshooting.tsx"),
+			"utf8",
+		);
+
+		expect(source).not.toMatch(/^import .*@application\/stores\//m);
+	});
+
 	it("clears the filters store too, because the copy promises everything goes back to defaults", async () => {
 		renderComponent();
 		await clickReset();

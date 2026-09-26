@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import type { CountryDTO } from "@application/dto/country/types";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useLocationStore } from "./location";
@@ -55,12 +57,12 @@ describe("setCountries", () => {
 });
 
 describe("fetchRegions", () => {
-	it("sets regions from getRegions synchronously", async () => {
+	it("sets the regions getRegions answers", async () => {
 		const { getRegions } = await import("@infrastructure/services/regions/getRegions");
 		const MOCK_REGIONS = [{ value: "CAT", label: "Catalonia" }];
 		vi.mocked(getRegions).mockReturnValueOnce(MOCK_REGIONS);
 
-		useLocationStore.getState().fetchRegions("ES");
+		await useLocationStore.getState().fetchRegions("ES");
 		expect(getRegions).toHaveBeenCalledWith({ countryCode: "ES" });
 		expect(useLocationStore.getState().regions).toEqual(MOCK_REGIONS);
 	});
@@ -70,8 +72,14 @@ describe("fetchRegions", () => {
 		useLocationStore.setState({ regions: [{ value: "CAT", label: "Catalonia" }] });
 		vi.mocked(getRegions).mockReturnValueOnce([]);
 
-		useLocationStore.getState().fetchRegions("FR");
+		await useLocationStore.getState().fetchRegions("FR");
 		expect(useLocationStore.getState().regions).toEqual([]);
+	});
+
+	it("does not load the holiday dataset until regions are asked for", () => {
+		const source = readFileSync(resolve(process.cwd(), "src/application/stores/location.ts"), "utf8");
+
+		expect(source).not.toMatch(/^import .*getRegions/m);
 	});
 });
 

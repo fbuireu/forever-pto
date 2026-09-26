@@ -8,42 +8,13 @@ import { PremiumFeatureId } from "@application/stores/premium";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { usePlacedPlan } from "@ui/hooks/usePlanReadout";
 import { Button } from "@ui/modules/core/primitives/Button";
-import type { HolidayDocumentProps } from "@ui/modules/export/HolidayDocument";
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
 import { SidebarFieldTooltip } from "@ui/modules/sidebar/components/SidebarFieldLabel";
-import { Effect } from "effect";
 import { Download, FileText } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { type ReactNode, useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/react/shallow";
-
-interface PdfExportParams extends HolidayDocumentProps {
-	filename: string;
-}
-
-function makeObjectUrl(blob: Blob) {
-	return Effect.acquireRelease(
-		Effect.sync(() => URL.createObjectURL(blob)),
-		(url) => Effect.sync(() => URL.revokeObjectURL(url)),
-	);
-}
-
-function pdfExportEffect({ filename, ...docProps }: PdfExportParams) {
-	return Effect.gen(function* () {
-		const [renderer, { HolidayDocument }] = yield* Effect.tryPromise(() =>
-			Promise.all([import("@react-pdf/renderer"), import("@ui/modules/export/HolidayDocument")]),
-		);
-		const blob = yield* Effect.tryPromise(() => renderer.pdf(<HolidayDocument {...docProps} />).toBlob());
-		const url = yield* makeObjectUrl(blob);
-		const a = document.createElement("a");
-		a.href = url;
-		a.download = filename;
-		document.body.appendChild(a);
-		a.click();
-		a.remove();
-	}).pipe(Effect.scoped);
-}
 
 function BoldText(chunks: ReactNode) {
 	return <strong className="font-black text-foreground">{chunks}</strong>;
@@ -95,23 +66,22 @@ export const CalendarExport = () => {
 	const handleDownloadPdf = () => {
 		startPdfTransition(async () => {
 			try {
-				await Effect.runPromise(
-					pdfExportEffect({
-						year,
-						holidays: includeHolidays ? holidaysInWindow : [],
-						ptoDays: includePto ? ptoDays : [],
-						includeHolidays,
-						includePto,
-						locale,
-						labels: {
-							holidays: t("pdf.holidays"),
-							ptoDays: t("pdf.ptoDays"),
-							ptoDay: t("pdf.ptoDay"),
-							generatedOn: t("pdf.generatedOn"),
-						},
-						filename: `forever-pto-${year}.pdf`,
-					}),
-				);
+				const { exportPdf } = await import("@ui/modules/export/exportPdf");
+				await exportPdf({
+					year,
+					holidays: includeHolidays ? holidaysInWindow : [],
+					ptoDays: includePto ? ptoDays : [],
+					includeHolidays,
+					includePto,
+					locale,
+					labels: {
+						holidays: t("pdf.holidays"),
+						ptoDays: t("pdf.ptoDays"),
+						ptoDay: t("pdf.ptoDay"),
+						generatedOn: t("pdf.generatedOn"),
+					},
+					filename: `forever-pto-${year}.pdf`,
+				});
 				toast.success(t("pdf.successTitle"), { description: t("pdf.successDescription") });
 				track({
 					event: "calendar_exported",

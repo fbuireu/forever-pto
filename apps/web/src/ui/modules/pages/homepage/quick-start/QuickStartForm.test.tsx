@@ -79,12 +79,12 @@ describe("QuickStartForm", () => {
 		expect((screen.getByRole("button", { name: quickStart.back }) as HTMLButtonElement).disabled).toBe(true);
 	});
 
-	it("preselects the country the edge detected and loads its regions", () => {
+	it("preselects the country the edge detected and loads its regions", async () => {
 		cookie.country = "es";
 		renderForm();
 
 		expect(screen.getByLabelText(quickStart.location.country).textContent).toContain("Spain");
-		expect(getRegions).toHaveBeenCalledWith({ countryCode: "es" });
+		await vi.waitFor(() => expect(getRegions).toHaveBeenCalledWith({ countryCode: "es" }));
 		expect((screen.getByRole("button", { name: quickStart.next }) as HTMLButtonElement).disabled).toBe(false);
 	});
 
