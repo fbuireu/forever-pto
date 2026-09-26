@@ -12,7 +12,12 @@ const { mockHeaders, mockCookies, mockGetTranslations, mockSetRequestLocale } = 
 vi.mock("next/headers", () => ({ headers: mockHeaders, cookies: mockCookies }));
 vi.mock("next-intl/server", async (importOriginal) => {
 	const actual = await importOriginal<typeof import("next-intl/server")>();
-	return { ...actual, getTranslations: mockGetTranslations, setRequestLocale: mockSetRequestLocale };
+	return {
+		...actual,
+		getTranslations: mockGetTranslations,
+		getMessages: vi.fn().mockResolvedValue({}),
+		setRequestLocale: mockSetRequestLocale,
+	};
 });
 vi.mock("next-intl", async (importOriginal) => {
 	const actual = await importOriginal<typeof import("next-intl")>();

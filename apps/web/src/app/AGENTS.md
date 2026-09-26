@@ -453,7 +453,10 @@ branch.
 `global-error.tsx` bundles **only** [`en.json`](../ui/i18n/messages/en.json) and hard-codes `lang="en"` on the document. That is
 deliberate: pulling every catalogue into the root bundle would cost every route roughly 500 KB for a
 page most users never see. Do not "fix" the mismatch between the URL locale and the rendered language by
-importing the others.
+importing the others. It still costs every route the whole of `en.json`, about 26 KB compressed, because a client
+component's JSON import is bundled whole; sending it `clientMessagesOf` would not help, since the import is the
+cost. Loading the bundle lazily is not the fix either: this page is what renders when a chunk failed to load. A
+subset file derived from `en.json` at build time is the fix, and it needs that build step first.
 
 ## Cloudflare request context
 

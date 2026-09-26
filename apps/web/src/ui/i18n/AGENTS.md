@@ -190,11 +190,16 @@ glossary's word.
 
 ## Gotchas
 
-**The whole catalogue ships to the browser.** `src/app/[locale]/layout.tsx` mounts
-`NextIntlClientProvider` with no `messages` prop, which hands the client every namespace for the
-active locale, about 93 KB of JSON for `en`, more for the others. There is no per-route splitting.
-Adding a namespace makes every page heavier, so a large block of copy used by one screen is worth
-weighing rather than adding by reflex. Trimming this by rendering more copy on the server is not
+**The catalogue ships to the browser minus the namespaces only the server reads.** `src/app/[locale]/layout.tsx`
+and `global-not-found.tsx` hand `NextIntlClientProvider` `clientMessagesOf(await getMessages())`, which drops
+`SERVER_ONLY_NAMESPACES` in [`infrastructure/i18n/clientMessages.ts`](../../infrastructure/i18n/clientMessages.ts):
+the homepage, the FAQ, the legal pages, the metadata, the not-found page and the payment confirmation, all
+rendered on the server. That took about 25 KB compressed off every page's HTML. The list says what to leave out
+rather than what to send, so forgetting a namespace there costs bytes, never a blank string; and
+[`clientMessages.test.ts`](../../infrastructure/i18n/clientMessages.test.ts) scans every `useTranslations` call,
+including the few that compute their namespace, and fails when client code reads one the client is not sent.
+Adding a namespace still makes every page heavier unless only the server reads it, so a large block of copy used
+by one screen is worth weighing rather than adding by reflex. Trimming this by rendering more copy on the server is not
 available either: the planner is client-side end to end
 ([ADR 0001](../../../../../adr/0001-planner-runs-in-the-browser.md)), so most of the catalogue has to
 reach the browser one way or another.

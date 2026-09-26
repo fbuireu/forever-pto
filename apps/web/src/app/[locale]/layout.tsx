@@ -1,3 +1,4 @@
+import { clientMessagesOf } from "@infrastructure/i18n/clientMessages";
 import { LOCALES } from "@infrastructure/i18n/locales";
 import { BonesProvider } from "@ui/modules/providers/BonesProvider";
 import { CookieConsentClient } from "@ui/modules/shared/cookie-consent/CookieConsentClient";
@@ -12,7 +13,7 @@ import { Analytics } from "@ui/modules/tracking/Analytics";
 import { BetterStackTracking } from "@ui/modules/tracking/BetterStackTracking";
 import { notFound } from "next/navigation";
 import { hasLocale, type Locale, NextIntlClientProvider } from "next-intl";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 
 interface LayoutProps {
 	children: ReactNode;
@@ -30,14 +31,14 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
 		notFound();
 	}
 	setRequestLocale(locale);
-	const t = await getTranslations("a11y");
+	const [t, messages] = await Promise.all([getTranslations("a11y"), getMessages()]);
 
 	return (
 		<html lang={locale} suppressHydrationWarning>
 			<body className={DOCUMENT_BODY_CLASS}>
 				<SkipToContent label={t("skipToMainContent")} />
 				<BonesProvider />
-				<NextIntlClientProvider>
+				<NextIntlClientProvider messages={clientMessagesOf(messages)}>
 					<AppThemeProvider>
 						<LazyMotionProvider>
 							{children}

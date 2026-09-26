@@ -4,10 +4,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mockNotFound = vi.fn();
 const mockSetRequestLocale = vi.fn();
 const mockGetTranslations = vi.fn().mockResolvedValue((key: string) => key);
+const mockGetMessages = vi.fn().mockResolvedValue({ a11y: { skipToMainContent: "Skip" }, homepage: { title: "Home" } });
 
 vi.mock("next/navigation", () => ({ notFound: mockNotFound }));
 vi.mock("next-intl/server", () => ({
 	getTranslations: mockGetTranslations,
+	getMessages: mockGetMessages,
 	setRequestLocale: mockSetRequestLocale,
 }));
 vi.mock("next-intl", () => ({
@@ -66,6 +68,22 @@ describe("[locale]/layout", () => {
 		it("sets the lang attribute on the html element", async () => {
 			const element = await Layout({ children: null, params: Promise.resolve({ locale: ES as never }) });
 			expect(element.props.lang).toBe(ES);
+		});
+
+		it("hands the client provider every namespace but the ones only the server reads", async () => {
+			interface Node {
+				props?: { children?: unknown; messages?: unknown };
+			}
+			const find = (node: unknown): Node | undefined => {
+				if (!node || typeof node !== "object") return undefined;
+				const { props } = node as Node;
+				if (props && "messages" in props) return node as Node;
+				return [props?.children].flat().map(find).find(Boolean);
+			};
+
+			const element = await Layout({ children: null, params: Promise.resolve({ locale: EN as never }) });
+
+			expect(find(element)?.props?.messages).toEqual({ a11y: { skipToMainContent: "Skip" } });
 		});
 	});
 });
