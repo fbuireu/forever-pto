@@ -4,7 +4,7 @@ import { Button } from "@ui/modules/core/primitives/Button";
 import { useState } from "react";
 import { Demo } from "../Demo";
 
-const STRATEGIES = ["Grouped", "Optimized", "Balanced"];
+const STRATEGIES = ["Grouped", "Optimized", "Balanced", "Main vacation"];
 
 export const MotionHighlightChildrenDemo = () => (
 	<Demo>

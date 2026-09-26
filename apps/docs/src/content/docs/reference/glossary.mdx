@@ -23,9 +23,9 @@ One day of the continuous stretch off a Bridge or Suggestion produces. The total
 
 The rule that decides which Bridges make it into a Suggestion when the budget cannot cover them all. Its values, exported as the `FilterStrategy` const object in `apps/web/src/domain/calendar/types.ts`:
 
-- **`grouped`** grows a few long blocks, up to about two weeks each, accepting a lower return per PTO Day to get there. Fewer, longer breaks.
+- **`grouped`** grows a few long blocks of about two weeks each, accepting a lower return per PTO Day to get there. Fewer, longer stretches off.
 - **`optimized`** takes whatever adds the most Effective Days per PTO Day to the plan so far. The most Effective Days for the budget.
-- **`balanced`** gives every quarter its share of the budget and prefers breaks of up to a week. Breaks across the whole year.
+- **`balanced`** keeps every stretch of work short: a long weekend every few weeks, placed where the longest stretches without rest are. The shortest Max Work Streak for the budget.
 - **`mainVacation`** builds one long block of up to two weeks inside the Preferred Months first, then spends the rest like `optimized`. The trip you actually want, plus the best bridges.
 
 ### Suggestion
@@ -34,7 +34,7 @@ The engine's output for a given budget, calendar and strategy: the set of recomm
 
 ### Alternative
 
-A genuinely distinct plan for the same inputs, produced by `apps/web/src/domain/calendar/alternatives/generateAlternatives.ts` from the other Strategies and from the chosen one re-run without one of the Suggestion's breaks, each far enough from every other plan to be a real choice and never with more Effective Days or a higher Efficiency than the Suggestion, so the user can compare plans rather than accept a single answer.
+A genuinely distinct plan for the same inputs, produced by `apps/web/src/domain/calendar/alternatives/generateAlternatives.ts` from the other Strategies and from the chosen one re-run without one of the Suggestion's Rest Blocks, each far enough from every other plan to be a real choice and never with more Effective Days or a higher Efficiency than the Suggestion, so the user can compare plans rather than accept a single answer.
 
 ### Carry-over Months
 

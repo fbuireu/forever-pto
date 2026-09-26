@@ -69,6 +69,6 @@ Errors resolve to an empty array and a log entry, in the service and again in th
 
 ## From here to the engine
 
-The store hands the merged list to the [calculation worker](/how-it-works/calculation-worker/) as `SerializedHolidayDTO[]`, dates as ISO strings, and the worker deserialises them for `runPlanningPipeline`. What the engine does with them, Bridge by Bridge, is the [planning algorithm](/how-it-works/planning-algorithm/) page; the three Strategies it can apply are:
+The store hands the merged list to the [calculation worker](/how-it-works/calculation-worker/) as `SerializedHolidayDTO[]`, dates as ISO strings, and the worker deserialises them for `runPlanningPipeline`. What the engine does with them, Bridge by Bridge, is the [planning algorithm](/how-it-works/planning-algorithm/) page; the Strategies it can apply are:
 
 <StrategiesTable />

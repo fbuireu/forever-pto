@@ -26,9 +26,9 @@ const TUNABLE_DESCRIPTIONS: Record<TunableKey, string> = {
 	"BRIDGE_SEARCH.MAX_MULTI_DAY_SIZE":
 		"Largest multi-day Bridge the search tries: a whole working week. Anything longer is two Bridges the selector joins, and the marginal gain is what makes joining them worth it.",
 	"SELECTION.GROUPED_MAX_BLOCK_DAYS":
-		"The longest stretch Grouped aims for. Growing a block up to this is what Grouped ranks first; a Bridge that would push a block past it loses a point per day over, so the next week of budget starts a second block instead.",
+		"The stretch Grouped grows a block towards. Up to it every day counts for the Bridge; past it each further day counts against, so the next week of budget usually opens a second block. A target, not a wall.",
 	"SELECTION.BALANCED_MAX_BLOCK_DAYS":
-		"The longest break Balanced aims for inside a quarter's share, a week plus both weekends. Longer counts against the Bridge the same way it does for Grouped.",
+		"A tie-break for Balanced: among picks that leave the same stretch of work and bring the same relief, the one whose stretch off ends up closer to a week and both weekends wins.",
 	"SELECTION.MAIN_VACATION_BLOCK_DAYS":
 		"The longest block Main Vacation builds inside the Preferred Months before it spends the rest like Optimized. Unlike Grouped's cap it is a hard limit: a Bridge that would push the block past it is not admitted to that stage at all.",
 	"SELECTION.RANK_TOLERANCE":
@@ -100,10 +100,13 @@ export const StrategyRanking = () => {
 		<pre>
 			<code>
 				{"marginal  = days the Bridge adds to the plan ÷ its PTO Days\n"}
-				{"stretch   = length of the break it ends up in, less one per day over the cap\n\n"}
-				{`optimized : marginal ≥ ${MINIMUM}, ranked by marginal, then stretch, then distance from the other breaks\n`}
+				{
+					"stretch   = length of the stretch off it ends up in, counted up to the cap and back down by one for every day past it\n\n"
+				}
+				{`optimized : marginal ≥ ${MINIMUM}, ranked by marginal, then stretch, then distance from the other stretches off\n`}
 				{`grouped   : marginal ≥ ${BLOCK_MINIMUM}, ranked by stretch (cap ${GROUPED_MAX_BLOCK_DAYS}), then marginal, then distance\n`}
-				{`balanced  : marginal ≥ ${MINIMUM}, ranked by quarter share, then stretch (cap ${BALANCED_MAX_BLOCK_DAYS}), then marginal, then distance\n`}
+				{`balanced  : marginal ≥ ${MINIMUM}, ranked by the longest stretch of work left, then relief per PTO Day, then stretch (cap ${BALANCED_MAX_BLOCK_DAYS}), then marginal
+`}
 				{`main trip : first one block in the Preferred Months, marginal ≥ ${BLOCK_MINIMUM}, stretch ≤ ${MAIN_VACATION_BLOCK_DAYS}; then as optimized`}
 			</code>
 		</pre>

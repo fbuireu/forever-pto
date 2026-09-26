@@ -26,7 +26,7 @@ const TABS = [
 		id: "balanced",
 		label: "Balanced",
 		content:
-			"A middle ground: decent streaks, spread across the year. It trades a little efficiency for regular rests, which is why the panel height animates when you switch here.",
+			"Never too long at work: a long weekend every few weeks, so no stretch without rest runs long. It trades some days for regular rest, which is why the panel height animates when you switch here.",
 	},
 ];
 

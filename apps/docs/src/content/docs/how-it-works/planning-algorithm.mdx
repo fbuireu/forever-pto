@@ -1,6 +1,6 @@
 ---
 title: The planning algorithm
-description: How the engine turns a Planning Window, a Holiday calendar and a PTO budget into a Suggestion, covering Workday enumeration, Bridge search, the three Strategies as objectives over the marginal gain, Alternatives, the budget rules and every Metric, with the tunables read live from the code.
+description: How the engine turns a Planning Window, a Holiday calendar and a PTO budget into a Suggestion, covering Workday enumeration, Bridge search, the four Strategies as objectives over the marginal gain, Alternatives, the budget rules and every Metric, with the tunables read live from the code.
 sidebar:
   order: 1
 ---
@@ -98,7 +98,7 @@ gantt
   effectiveDays = 4  :active, 2026-05-22, 4d
 ```
 
-The Tuesday to Friday after that Holiday form a second candidate: a four-day run whose previous day is the Holiday, expanding backwards over Monday, Sunday and Saturday and forwards over the next weekend. Nine Effective Days for four PTO Days, Efficiency 2.25: kept. Taken together with the Friday the two share the Monday Holiday, which is exactly the double count Stage 4 exists to refuse: on their own they are worth four and nine, together they are worth twelve.
+The Tuesday to Friday after that Holiday form a second candidate: a four-day run whose previous day is the Holiday, expanding backwards over Monday, Sunday and Saturday and forwards over the next weekend. Nine Effective Days for four PTO Days, Efficiency 2.25: kept. Taken together with the Friday the two share Saturday, Sunday and the Monday Holiday, which is exactly the double count Stage 4 exists to refuse: on their own they are worth four and nine, together they are worth ten.
 
 ## Stage 3: the Strategy
 
@@ -108,12 +108,12 @@ A Strategy is an **objective**, not an ordering: a marginal floor and a ranking,
 
 <StrategyRanking />
 
-- **Optimized** is the most Effective Days for the budget. It takes the Bridge that adds the most days per PTO Day, and when several add the same it takes the one whose break ends up longer, then the one farthest from the breaks already chosen. That last key is what spreads a crowd of equal Fridays across the year instead of stacking them into January.
-- **Grouped** is a few long vacations. It ranks by the length of the break a Bridge ends up in, so once it holds a block it keeps growing it with the next working week, up to `GROUPED_MAX_BLOCK_DAYS` ({PTO_CONSTANTS.SELECTION.GROUPED_MAX_BLOCK_DAYS}) days. Its floor is the lower `BLOCK_MINIMUM` ({PTO_CONSTANTS.EFFICIENCY.BLOCK_MINIMUM}), because a week that extends a block adds seven days for five and would never clear Optimized's.
+- **Optimized** is the most Effective Days for the budget. It takes the Bridge that adds the most days per PTO Day, and when several add the same it takes the one whose stretch off ends up longer, then the one farthest from the stretches already chosen. That last key is what spreads a crowd of equal Fridays across the year instead of stacking them into January.
+- **Grouped** is a few long vacations. It ranks by the length of the stretch off a Bridge ends up in, so once it holds a block it keeps growing it with the next working week towards `GROUPED_MAX_BLOCK_DAYS` ({PTO_CONSTANTS.SELECTION.GROUPED_MAX_BLOCK_DAYS}) days. The cap is a target, not a wall: past it each further day counts against the Bridge, so the next week of budget usually starts a second block, but a single candidate that is already longer is still taken. Its floor is the lower `BLOCK_MINIMUM` ({PTO_CONSTANTS.EFFICIENCY.BLOCK_MINIMUM}), because a week that extends a block adds seven days for five and would never clear Optimized's.
 - **Main Vacation** is the trip first. It works in two stages. The first admits only Bridges whose PTO Days all fall in the user's Preferred Months and that start the block or join it, ranks them by the length of that block, and stops at `MAIN_VACATION_BLOCK_DAYS` ({PTO_CONSTANTS.SELECTION.MAIN_VACATION_BLOCK_DAYS}) days, at Grouped's floor. When nothing more can join, the second stage spends the rest of the budget exactly like Optimized. With no month chosen the block goes wherever it is longest.
-- **Balanced** is a break in every part of the year. It gives each quarter an equal share of the budget first, and within that share prefers the longer break, up to `BALANCED_MAX_BLOCK_DAYS` ({PTO_CONSTANTS.SELECTION.BALANCED_MAX_BLOCK_DAYS}) days, at Optimized's floor.
+- **Balanced** is never too long at work. Its first key is the longest stretch of work the plan would leave in the year (the Max Work Streak, where a weekend does not end a stretch and a Holiday does), and its second is how much a pick relieves the stretch it splits, per PTO Day, which makes it cut the longest stretches near their middle with single days. In practice it places a long weekend every two or three weeks, at Optimized's floor, and leaves the shortest Max Work Streak of every Strategy.
 
-Over a real calendar the first three sit on one axis, which the engine's own tests pin: Optimized produces the most Effective Days and the shortest breaks, Grouped the fewest and the longest, Balanced lands between them on both. Main Vacation sits off that axis on purpose: it gives up some Effective Days for a block in the months the user asked for, and the tests pin that the block is there and that the plan still beats Grouped on Effective Days.
+Over a real calendar the engine's own tests pin what each is for: Optimized produces the most Effective Days, Balanced the next most with the shortest stretch of work, Grouped the fewest and the longest stretch off, and Main Vacation a block in the Preferred Months while still beating Grouped on Effective Days.
 
 An unknown Strategy string cannot reach this table: `worker.ts` narrows the inbound value with `isFilterStrategy` and falls back to `DEFAULT_FILTER_STRATEGY`, and `objectiveFor` falls back to Grouped for the same reason.
 
@@ -146,10 +146,11 @@ A Bridge that would overspend is skipped, not truncated, and budget can be left 
 
 `generateAlternatives` in `apps/web/src/domain/calendar/alternatives/generateAlternatives.ts` produces up to `maxAlternatives` (four, from the holidays store) plans that are **genuinely different** from the Suggestion and from each other:
 
-1. The other two Strategies' plans come first, over the same candidates, when they pass the ceiling in point 4. They are the most different plans the engine can make, and the user sees what the other objectives would have done.
-2. Then the chosen Strategy is re-run with one of the Suggestion's Rest Blocks taken away, largest first, and each plan found that way is itself a seed whose blocks are taken away in turn. Each run is one axis of "what if not that break?".
+1. The other Strategies' plans come first, over the same candidates, when they pass the ceiling in point 5. They are the most different plans the engine can make, and the user sees what the other objectives would have done.
+2. Then the chosen Strategy is re-run with one of the Suggestion's Rest Blocks taken away, largest first, and each new plan found that way is itself a seed whose blocks are taken away in turn. A combination already tried, or a plan already seen, costs no run.
 3. A plan is offered only when it is at least `ALTERNATIVES.MIN_DIFFERENCE` ({PTO_CONSTANTS.ALTERNATIVES.MIN_DIFFERENCE}) away from the Suggestion and from every Alternative already kept, measured as the share of their combined days they do not have in common. Distinct no longer means disjoint: an Alternative may keep the Suggestion's best Bridge and still be a different plan.
-4. **No Alternative beats the Suggestion.** A plan that covers more days than the Suggestion, or more per PTO Day, is refused during the search, and the pipeline re-checks the measured Effective Days and Efficiency before handing the Alternatives out. The Suggestion is the recommendation; an Alternative is a different shape of year that gives some of it up. That is why a Grouped user is not offered the Optimized plan whenever it covers more days, which over a real calendar is every time, while an Optimized user usually is offered the Grouped one.
+4. **The Suggestion is the best plan the chosen Strategy found.** Greedy selection is not optimal, so a re-run can beat the plan it started from. Every plan the chosen Strategy produced is ranked by what that Strategy is for (Effective Days for Optimized, the longest stretch off for Grouped, the shortest stretch of work for Balanced, the longest stretch in the Preferred Months for Main Vacation), then by Effective Days and Efficiency, and the winner becomes the Suggestion. The greedy plan it replaced is offered as an Alternative.
+5. **No Alternative beats the Suggestion.** Every other plan is offered only when its Effective Days and its Efficiency are both at most the Suggestion's, measured exactly as the Metrics measure them, Manual Days included. The Suggestion is the recommendation; an Alternative is a different shape of year that gives some of it up. That is why a Grouped user is not offered the Optimized plan whenever it covers more days, which over a real calendar is every time, while an Optimized user usually is offered the Grouped one.
 
 Every Alternative is stamped with the Strategy that found it: the other Strategies' plans carry their own, the Rest Block re-runs carry the chosen one. The Summary's notice that an Alternative adds more days compares only with the ones the chosen Strategy found, so it speaks up for a hand-edited plan that fell behind, never to tell a Grouped user that Optimized covers more. Two runs over the same inputs produce the same Alternatives, so the user's "option three" is still option three after a refresh.
 
@@ -170,7 +171,7 @@ Every Alternative is stamped with the Strategy that found it: the other Strategi
 | Max Work Streak | The longest run of Workdays between two Free Days or placed PTO Days in the **year**, scanned from today unless past days are allowed |
 | Worked Days per month | Workdays in the year minus the Holidays and PTO Days that fall on one, divided by twelve, to one decimal |
 | Monthly and Quarter distribution | Placed days bucketed by window month and by Quarter, each array sized to the window |
-| Bridges used | The plan's Bridges whose every PTO Day is still placed |
+| Bridges used | The plan's Bridges with at least one PTO Day still placed, so a Bridge that lost one of its days but still leads into a weekend is still counted |
 | First and last break | The first and last placed dates, formatted for the locale |
 
 Two details keep the Metrics honest across a hand-edited plan. **Free streaks** (`freeStreaks` in `apps/web/src/domain/calendar/metrics/utils/streaks.ts`) scan from `STREAK_SCAN_MARGIN_DAYS` ({PTO_CONSTANTS.METRICS.STREAK_SCAN_MARGIN_DAYS}) days before the first relevant date to as many after the last, so a stretch that begins on a weekend outside the placed days is measured whole. And every Metric that reads Holidays and placed days together builds its set through one helper, `dayOffKeys` in `apps/web/src/domain/calendar/metrics/utils/dayOff.ts`, because Manual Days appear in both lists by construction and a Metric that subtracted them independently counted each one twice. `getWorkedDaysPerMonth` did exactly that once.
