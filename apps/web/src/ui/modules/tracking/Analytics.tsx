@@ -3,6 +3,8 @@ import Script from "next/script";
 const GA_ID = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
 
 export const Analytics = () => {
+	if (!GA_ID) return null;
+
 	return (
 		<>
 			<Script id="gtag-consent" strategy="afterInteractive">

@@ -23,7 +23,11 @@ costs one interaction. Nothing downstream should treat the result as authoritati
 
 1. **`detectCountryFromHeaders(request)`** reads the `cf-ipcountry` header the edge already put on the
    request. Synchronous, no I/O, and the only signal derived from the visitor's own connection, which is why
-   it goes first.
+   it goes first. **When the header is present its answer is final, even an empty one.** Cloudflare sends `XX`
+   or `T1` when it cannot place the visitor, and the two strategies below would then locate the Worker's own
+   egress rather than the visitor, while no cookie is set on failure, so every navigation repeated up to three
+   sequential subrequests for a wrong answer. They run only when the header is absent, which is local
+   development and nothing in production.
 2. **`detectCountryFromCDN()`** resolves the Cloudflare context, fetches
    `${env.NEXT_PUBLIC_SITE_URL}/cdn-cgi/trace` with a 5 s `AbortSignal.timeout`, and reads the `loc=` line.
 3. **`detectCountryFromEgressIP()`** calls `api.ipify.org` for an IP, then `ipinfo.io/<ip>/json` for its country.

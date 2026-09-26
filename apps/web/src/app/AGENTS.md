@@ -594,5 +594,9 @@ mock is gone and the real `noStore` runs, which is what makes the body assertion
   excludes `/api` and every dotted path, so `/.well-known/*` and the other route handlers never reach the
   proxy at all; the rewrite branch has no guard of its own. Widening the matcher means adding one back,
   which is what the `config matcher` block in `src/middleware.test.ts` is there to catch.
-- **The planner page imports its sections through `next/dynamic`.** That is a bundle-size decision, not an
-  accident; a static import of `CalendarList` or `Summary` pulls the whole planning UI into the first load.
+- **The planner page imports its sections through `next/dynamic`, and that does not keep them out of the first
+  load.** A `dynamic()` import that is rendered on the server is fetched and run at hydration like any other
+  chunk, so `CalendarList`, `Summary`, `Legend`, `Roadmap` and `Contact` are in the planner's first load in one
+  chunk of about 20 KB compressed. What keeps the first load small is what those sections import: the holiday
+  dataset and the PDF export's Effect runtime are imported when they are used, and a modal is mounted only once
+  it has been opened (`useHasOpened`), since a mounted `dynamic()` modal is fetched even while it stays shut.

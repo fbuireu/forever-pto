@@ -511,7 +511,8 @@ differently depending on when it is asked:
   `getPlatformProxy`, which reads `wrangler.toml`'s **top-level** `[vars]`. `cf:build` passes no `--env`, so
   every build, production and preview alike, bakes `https://forever-pto.com` into whatever is prerendered.
   `robots.txt` is fully static with no revalidation and keeps it for the life of the deployment; the
-  `[locale]` shells carry it in `canonical`, `hrefLang` and `og:url` until their 24-hour revalidation.
+  `[locale]` shells carry it in `canonical`, `hrefLang` and `og:url` for the life of the deployment too: no
+  route revalidates, so a prerendered page changes only with the next deploy.
 
 So a preview's `robots.txt` advertises the production sitemap. That is tolerated rather than fixed because
 previews sit behind Cloudflare Access: nothing crawls them, which is why [`playwright.config.ts`](./playwright.config.ts) has to send
