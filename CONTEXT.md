@@ -28,7 +28,7 @@ The rule that decides which Bridges make it into a Suggestion when the PTO budge
 _Avoid_: filter, algorithm
 
 **Preferred Months**:
-The months of the year in which the user wants the long block of the Main Vacation Strategy. None chosen means any month: the block goes wherever it returns most.
+The months of the year in which the user wants the block the Main Vacation Strategy builds first. None chosen means any month: the block goes wherever it can be longest.
 _Avoid_: season, favourite months
 
 ## The calendar

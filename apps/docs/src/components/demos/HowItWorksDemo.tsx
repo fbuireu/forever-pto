@@ -17,7 +17,7 @@ const STRATEGY_DESCRIPTIONS: Record<FilterStrategy, string> = {
 	optimized:
 		"The most Effective Days for the budget. Ranks a Bridge by the days it adds to the plan per PTO Day, so a weekend two Bridges share is never paid for twice, and spreads equal picks across the year.",
 	mainVacation:
-		"The trip first. Builds one block of up to two weeks inside the Preferred Months the user picked, growing it a week at a time at Grouped's lower floor, then spends what is left exactly like Optimized.",
+		"The trip first. Builds one block of up to two weeks inside the Preferred Months the user picked, growing it with every Bridge that joins it at Grouped's lower floor, then spends what is left exactly like Optimized.",
 	balanced:
 		"Never too long at work. Ranks a Bridge by the longest stretch of work the plan would leave, then by how much it relieves the stretch it splits per PTO Day, so it places a long weekend every few weeks where the stretches without rest are longest, at the same marginal floor as Optimized.",
 };

@@ -99,15 +99,14 @@ export const StrategyRanking = () => {
 	return (
 		<pre>
 			<code>
-				{"marginal  = days the Bridge adds to the plan ÷ its PTO Days\n"}
+				{"marginal     = days the Bridge adds to the plan ÷ its PTO Days\n"}
 				{
-					"stretch   = length of the stretch off it ends up in, counted up to the cap and back down by one for every day past it\n\n"
+					"stretch      = length of the stretch off it ends up in, counted up to the cap and back down by one for every day past it\n\n"
 				}
-				{`optimized : marginal ≥ ${MINIMUM}, ranked by marginal, then stretch, then distance from the other stretches off\n`}
-				{`grouped   : marginal ≥ ${BLOCK_MINIMUM}, ranked by stretch (cap ${GROUPED_MAX_BLOCK_DAYS}), then marginal, then distance\n`}
-				{`balanced  : marginal ≥ ${MINIMUM}, ranked by the longest stretch of work left, then relief per PTO Day, then stretch (cap ${BALANCED_MAX_BLOCK_DAYS}), then marginal
-`}
-				{`main trip : first one block in the Preferred Months, marginal ≥ ${BLOCK_MINIMUM}, stretch ≤ ${MAIN_VACATION_BLOCK_DAYS}; then as optimized`}
+				{`optimized    : marginal ≥ ${MINIMUM}, ranked by marginal, then stretch, then distance from the other stretches off\n`}
+				{`grouped      : marginal ≥ ${BLOCK_MINIMUM}, ranked by stretch (cap ${GROUPED_MAX_BLOCK_DAYS}), then marginal, then distance\n`}
+				{`balanced     : marginal ≥ ${MINIMUM}, ranked by the longest stretch of work left, then relief per PTO Day, then stretch (cap ${BALANCED_MAX_BLOCK_DAYS}), then marginal, then distance\n`}
+				{`mainVacation : first one block in the Preferred Months, marginal ≥ ${BLOCK_MINIMUM}, ranked by stretch (≤ ${MAIN_VACATION_BLOCK_DAYS}), then marginal, then distance; then as optimized`}
 			</code>
 		</pre>
 	);
