@@ -911,13 +911,13 @@
 			"command": "Weniger arbeiten.",
 			"verb": "Reise",
 			"highlight": "mehr",
-			"description": "Forever PTO berechnet <em>genau</em>, welche Tage du beantragen musst, damit aus deinen 22 PTO-Tagen <strong>47+ Tage außer Haus</strong> werden. Keine Tabellen. Kein Kopfzerbrechen. Kein schlechtes Gewissen.",
+			"description": "Forever PTO berechnet <em>genau</em>, welche Tage du beantragen musst, damit aus deinen 22 PTO-Tagen <strong>70+ Tage außer Haus</strong> werden. Keine Tabellen. Kein Kopfzerbrechen. Kein schlechtes Gewissen.",
 			"plannerCta": "Meine Tage berechnen →",
 			"demoLink": "Wie es funktioniert (30s)",
 			"stars": "{rating} · genutzt von {users} rebellischen Mitarbeitern",
 			"mockupLabel": "Echte freie Tage {year}",
-			"mockupRatio": "Tage · Effizienz 2,14×",
-			"mockupQuote": "\"Das sind 9 lange Wochenenden, Kapitän.\"",
+			"mockupRatio": "Tage · Effizienz 3,45×",
+			"mockupQuote": "\"Das sind 22 lange Wochenenden, Kapitän.\"",
 			"mockupLegendPto": "Urlaub",
 			"mockupLegendHoliday": "Feiertag",
 			"mockupLegendWeekend": "Wochenende",
@@ -961,7 +961,7 @@
 			"bridgeTitle": "1 PTO-Tag in 4 freie Tage verwandeln.",
 			"bridgeDescription": "Erkennt Feiertage an Dienstagen und Donnerstagen und schlägt minimale Brücken vor. Ein strategischer Tag = ein 4-Tage-Wochenende.",
 			"ratioTag": "max-effizienz",
-			"ratioDescription": "Beste Effizienz: 8 PTO-Tage zu 28 freien Tagen (ES, April 26).",
+			"ratioDescription": "Beste Effizienz: 8 PTO-Tage zu 35 freien Tagen (Bayern, 2026).",
 			"syncTag": "sync in 1 klick",
 			"syncTitle": "Google · Outlook · iCal",
 			"syncDescription": "Exportiere deinen Plan in den Kalender, den du bereits nutzt.",
@@ -994,7 +994,7 @@
 			"withTitle": "😎 Mit Forever PTO",
 			"withItems": {
 				"planInJanuary": "Du planst alles im Januar, während du auf deinen Kaffee wartest.",
-				"dayEfficiency": "Jeder PTO-Tag gibt dir im Schnitt 2,1 freie Tage zurück.",
+				"dayEfficiency": "Jeder PTO-Tag gibt dir im Schnitt 3,4 freie Tage zurück.",
 				"visualCalendar": "Du siehst das ganze Jahr in einem übersichtlichen Kalender.",
 				"bookFirst": "Du buchst zuerst, ohne schlechtes Gewissen, mit Daten.",
 				"burnAllDays": "Du verbrauchst 100% deiner Tage. So wie es sein sollte."
@@ -1027,12 +1027,12 @@
 					"role": "QA engineer · Lissabon"
 				},
 				"lauraT": {
-					"text": "Meine Chefin fragte mich, wie ich 34 freie Tage mit nur 22 PTO-Tagen hatte. Ich sagte „Strategie\". Die App habe ich nicht erwähnt.",
+					"text": "Meine Chefin fragte mich, wie ich 47 freie Tage mit nur 22 PTO-Tagen hatte. Ich sagte „Strategie\". Die App habe ich nicht erwähnt.",
 					"name": "Laura T.",
 					"role": "Marketing Manager · Paris"
 				},
 				"thomasK": {
-					"text": "ROI: 22 PTO-Tage rein, 47 freie Tage raus. Das ist eine Effizienz von 2,1×. Schlechtere Features habe ich schon bei der Arbeit geliefert.",
+					"text": "ROI: 22 PTO-Tage rein, 75 freie Tage raus. Das ist eine Effizienz von 3,4×. Schlechtere Features habe ich schon bei der Arbeit geliefert.",
 					"name": "Thomas K.",
 					"role": "Software-Architekt · Amsterdam"
 				}
@@ -1079,7 +1079,7 @@
 			"titleStart": "Dein nächstes",
 			"titleEmphasis": "freies",
 			"titleEnd": "Jahr beginnt heute.",
-			"description": "22 Tage können 47 werden. Du musst nur wissen, wo du sie platzierst. Das machen wir.",
+			"description": "22 Tage können über 70 werden. Du musst nur wissen, wo du sie platzierst. Das machen wir.",
 			"cta": "Meine freien Tage berechnen →",
 			"shapes": {
 				"byeMonday": "tschüss, Montag",

@@ -9,8 +9,8 @@ export const Stats = async () => {
 		<section className="px-7 pb-24">
 			<div className="max-w-[1240px] mx-auto grid grid-cols-2 md:grid-cols-4 border-[4px] border-[var(--frame)] rounded-[14px] overflow-hidden bg-card shadow-[var(--shadow-brutal-xl)]">
 				{[
-					{ num: `${format.number(2.14)}×`, label: t("stats.efficiencyLabel"), bg: "var(--color-brand-yellow)" },
-					{ num: format.number(47), label: t("stats.daysLabel", { days: 22 }), bg: "var(--color-brand-teal)" },
+					{ num: `${format.number(3.4)}×`, label: t("stats.efficiencyLabel"), bg: "var(--color-brand-yellow)" },
+					{ num: format.number(75), label: t("stats.daysLabel", { days: 22 }), bg: "var(--color-brand-teal)" },
 					{ num: format.number(203), label: t("stats.countriesLabel"), bg: "var(--color-brand-orange)" },
 					{
 						num: t("stats.plansValue", { value: format.number(PLANS_GENERATED, { notation: "compact" }) }),

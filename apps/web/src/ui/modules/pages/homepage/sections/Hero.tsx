@@ -138,7 +138,7 @@ export const Hero = async () => {
 									{t("hero.mockupLabel", { year })}
 								</div>
 								<div className="font-display font-extrabold text-[56px] leading-none tracking-[-0.03em] flex items-baseline gap-2.5">
-									47
+									76
 									<span className="text-[18px] font-semibold opacity-70">{t("hero.mockupRatio")}</span>
 								</div>
 								<div className="mt-2 font-serif italic text-[18px]">{t("hero.mockupQuote")}</div>

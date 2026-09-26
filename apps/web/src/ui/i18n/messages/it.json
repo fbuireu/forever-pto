@@ -911,13 +911,13 @@
 			"command": "Lavora meno.",
 			"verb": "Viaggia",
 			"highlight": "di più",
-			"description": "Forever PTO calcola <em>esattamente</em> quali giorni richiedere per trasformare i tuoi 22 giorni di PTO in <strong>47+ giorni fuori dall'ufficio</strong>. Senza fogli Excel. Senza matematica. Senza stress.",
+			"description": "Forever PTO calcola <em>esattamente</em> quali giorni richiedere per trasformare i tuoi 22 giorni di PTO in <strong>70+ giorni fuori dall'ufficio</strong>. Senza fogli Excel. Senza matematica. Senza stress.",
 			"plannerCta": "Calcola i miei giorni →",
 			"demoLink": "Scopri come funziona (30s)",
 			"stars": "{rating} · usato da {users} dipendenti ribelli",
 			"mockupLabel": "Giorni liberi reali nel {year}",
-			"mockupRatio": "giorni · efficienza 2,14×",
-			"mockupQuote": "\"Sono 9 weekend lunghi, capitano.\"",
+			"mockupRatio": "giorni · efficienza 3,45×",
+			"mockupQuote": "\"Sono 22 weekend lunghi, capitano.\"",
 			"mockupLegendPto": "PTO",
 			"mockupLegendHoliday": "Festivo",
 			"mockupLegendWeekend": "Weekend",
@@ -961,7 +961,7 @@
 			"bridgeTitle": "Trasforma 1 giorno di PTO in 4 giorni liberi.",
 			"bridgeDescription": "Rileva festivi di martedì e giovedì e suggerisce ponti minimi. Un giorno strategico = un weekend di 4 giorni.",
 			"ratioTag": "max efficienza",
-			"ratioDescription": "Miglior efficienza: 8 giorni PTO trasformati in 28 liberi (IT, aprile '26).",
+			"ratioDescription": "Miglior efficienza: 8 giorni PTO trasformati in 31 liberi (IT, 2026).",
 			"syncTag": "Sync in 1 click",
 			"syncTitle": "Google · Outlook · iCal",
 			"syncDescription": "Esporta il tuo piano nel calendario che già usi. Senza complicazioni.",
@@ -994,7 +994,7 @@
 			"withTitle": "😎 Con Forever PTO",
 			"withItems": {
 				"planInJanuary": "Pianifichi tutto a gennaio, mentre aspetti il caffè.",
-				"dayEfficiency": "ogni giorno PTO vale in media 2,1 giorni liberi.",
+				"dayEfficiency": "ogni giorno PTO vale in media 3,4 giorni liberi.",
 				"visualCalendar": "Visualizzi l'intero anno in un calendario chiaro.",
 				"bookFirst": "Prenoti per primo, senza sensi di colpa, con dati.",
 				"burnAllDays": "Usi il 100% dei tuoi giorni. Come si deve."
@@ -1027,12 +1027,12 @@
 					"role": "QA engineer · Lisbona"
 				},
 				"lauraT": {
-					"text": "La mia responsabile mi ha chiesto come avevo fatto a prendere 34 giorni liberi con solo 22 giorni di PTO. Ho detto \"strategia\". Non ho menzionato l'app.",
+					"text": "La mia responsabile mi ha chiesto come avevo fatto a prendere 47 giorni liberi con solo 22 giorni di PTO. Ho detto \"strategia\". Non ho menzionato l'app.",
 					"name": "Laura T.",
 					"role": "marketing manager · Parigi"
 				},
 				"thomasK": {
-					"text": "ROI: 22 giorni di PTO in entrata, 47 giorni liberi in uscita. È un'efficienza di 2,1×. Ho rilasciato funzionalità peggiori al lavoro.",
+					"text": "ROI: 22 giorni di PTO in entrata, 75 giorni liberi in uscita. È un'efficienza di 3,4×. Ho rilasciato funzionalità peggiori al lavoro.",
 					"name": "Thomas K.",
 					"role": "software architect · Amsterdam"
 				}
@@ -1079,7 +1079,7 @@
 			"titleStart": "Il tuo prossimo anno",
 			"titleEmphasis": "libero",
 			"titleEnd": "inizia oggi.",
-			"description": "22 giorni possono diventare 47. Devi solo sapere dove metterli. Lo facciamo noi.",
+			"description": "22 giorni possono diventare più di 70. Devi solo sapere dove metterli. Lo facciamo noi.",
 			"cta": "Calcola i miei giorni gratis →",
 			"shapes": {
 				"byeMonday": "ciao, lunedì",

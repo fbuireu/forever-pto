@@ -32,11 +32,11 @@ describe("Stats", () => {
 	});
 
 	it("formats the multiplier with the German decimal separator", async () => {
-		expect(await renderStats({ locale: "de", messages: deMessages })).toContain("2,14×");
+		expect(await renderStats({ locale: "de", messages: deMessages })).toContain("3,4×");
 	});
 
 	it("formats the multiplier with the English decimal separator", async () => {
-		expect(await renderStats({ locale: "en", messages: enMessages })).toContain("2.14×");
+		expect(await renderStats({ locale: "en", messages: enMessages })).toContain("3.4×");
 	});
 
 	it("abbreviates the suggestion count the way the locale does, which German does not", async () => {

@@ -2286,7 +2286,6 @@ describe("translation bundles stay in step", () => {
 		"EE",
 		"EEA",
 		"EEE",
-		"ES",
 		"EU",
 		"EUA",
 		"EWR",

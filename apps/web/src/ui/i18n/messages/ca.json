@@ -911,13 +911,13 @@
 			"command": "Treballa menys.",
 			"verb": "Viatja",
 			"highlight": "més",
-			"description": "Forever PTO calcula <em>exactament</em> quins dies demanar lliure perquè els teus 22 dies de PTO es converteixin en <strong>47+ dies fora de l'oficina</strong>. Sense excels. Sense matemàtiques. Sense remordiment.",
+			"description": "Forever PTO calcula <em>exactament</em> quins dies demanar lliure perquè els teus 22 dies de PTO es converteixin en <strong>70+ dies fora de l'oficina</strong>. Sense excels. Sense matemàtiques. Sense remordiment.",
 			"plannerCta": "Calcula els meus dies →",
 			"demoLink": "Veure com va (30s)",
 			"stars": "{rating} · usat per {users} empleats rebels",
 			"mockupLabel": "Dies lliures reals el {year}",
-			"mockupRatio": "dies · eficiència 2,14×",
-			"mockupQuote": "\"Això són 9 escapades llargues, capità.\"",
+			"mockupRatio": "dies · eficiència 3,45×",
+			"mockupQuote": "\"Això són 22 escapades llargues, capità.\"",
 			"mockupLegendPto": "PTO",
 			"mockupLegendHoliday": "Festiu",
 			"mockupLegendWeekend": "Cap de setmana",
@@ -961,7 +961,7 @@
 			"bridgeTitle": "Converteix 1 dia de PTO en 4 lliures.",
 			"bridgeDescription": "Detecta festius en dimarts i dijous i et suggereix construir ponts mínims. Un dia estratègic = un cap de setmana de 4 dies.",
 			"ratioTag": "max eficiència",
-			"ratioDescription": "Millor eficiència: 8 dies de PTO convertits en 28 lliures (ES, abril '26).",
+			"ratioDescription": "Millor eficiència: 8 dies de PTO convertits en 33 lliures (Catalunya, 2026).",
 			"syncTag": "sync en 1 clic",
 			"syncTitle": "Google · Outlook · iCal",
 			"syncDescription": "Exporta el teu pla al calendari que ja uses. Sense embolicar-te.",
@@ -994,7 +994,7 @@
 			"withTitle": "😎 Amb Forever PTO",
 			"withItems": {
 				"planInJanuary": "Ho planifiques tot al gener, mentre esperes el cafè.",
-				"dayEfficiency": "Cada dia de PTO et retorna 2,1 dies lliures de mitjana.",
+				"dayEfficiency": "Cada dia de PTO et retorna 3,4 dies lliures de mitjana.",
 				"visualCalendar": "Visualitzes l'any sencer en un calendari clar.",
 				"bookFirst": "Demanes primer, sense remordiment, amb dades.",
 				"burnAllDays": "Gastes el 100% dels teus dies. Com ha de ser."
@@ -1027,12 +1027,12 @@
 					"role": "QA engineer · Lisboa"
 				},
 				"lauraT": {
-					"text": "La meva cap em va preguntar com havia aconseguit 34 dies lliures amb només 22 dies de PTO. Li vaig dir \"estratègia\". No vaig esmentar l'app.",
+					"text": "La meva cap em va preguntar com havia aconseguit 47 dies lliures amb només 22 dies de PTO. Li vaig dir \"estratègia\". No vaig esmentar l'app.",
 					"name": "Laura T.",
 					"role": "marketing manager · París"
 				},
 				"thomasK": {
-					"text": "ROI: 22 dies de PTO d'entrada, 47 dies lliures de sortida. Això és una eficiència de 2,1×. He llançat pitjors funcionalitats a la feina.",
+					"text": "ROI: 22 dies de PTO d'entrada, 75 dies lliures de sortida. Això és una eficiència de 3,4×. He llançat pitjors funcionalitats a la feina.",
 					"name": "Thomas K.",
 					"role": "software architect · Amsterdam"
 				}
@@ -1079,7 +1079,7 @@
 			"titleStart": "El teu pròxim any",
 			"titleEmphasis": "lliure",
 			"titleEnd": "comença avui.",
-			"description": "22 dies poden ser 47. Només cal saber on col·locar-los. Això ho fem nosaltres.",
+			"description": "22 dies poden ser més de 70. Només cal saber on col·locar-los. Això ho fem nosaltres.",
 			"cta": "Calcula els meus dies gratis →",
 			"shapes": {
 				"byeMonday": "adéu, dilluns",
