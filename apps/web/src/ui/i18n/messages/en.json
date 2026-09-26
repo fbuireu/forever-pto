@@ -162,8 +162,8 @@
 					"answer": "The system looks at your available workdays, holidays, and preferences (like skipping past dates) to find PTO combinations that maximize your total time off. It scores every possible bridge and block by efficiency, then surfaces the best ones."
 				},
 				"strategies": {
-					"question": "What is the difference between \"balanced\" and \"optimized\" strategies?",
-					"answer": "Balanced aims to spread time off across the year for steady value, while Optimized focuses on maximizing efficiency (effective days per PTO day) by prioritizing the best ratio combinations."
+					"question": "What is the difference between the \"grouped\", \"optimized\" and \"balanced\" strategies?",
+					"answer": "Optimized gets you the most effective days off per PTO day, mostly in long weekends spread across the year. Grouped trades some of that efficiency for a few long vacations of up to two weeks. Balanced sits in between: it gives every quarter its share of your budget and prefers breaks of up to a week."
 				},
 				"results": {
 					"question": "Why do recommendations change when I update preferences or holidays?",
@@ -501,11 +501,11 @@
 			"strategyDetails": "details",
 			"grouped": {
 				"label": "Grouped",
-				"description": "Prioritizes long, continuous vacations",
-				"subtitle": "Groups bridge days with consecutive holidays",
+				"description": "A few long vacations",
+				"subtitle": "Builds blocks of up to two weeks around holidays",
 				"pros": {
-					"simulatesHumanSelection": "Simulates human selection",
-					"longBridges": "Long bridges"
+					"longVacations": "Long vacations",
+					"wholeWeeks": "Whole weeks off"
 				},
 				"cons": {
 					"fewerDays": "Fewer total days",
@@ -514,29 +514,28 @@
 			},
 			"optimized": {
 				"label": "Optimized",
-				"description": "Maximizes PTO day efficiency",
-				"subtitle": "Get the most days off possible",
+				"description": "Maximizes your total days off",
+				"subtitle": "Every PTO day returns as much as it can",
 				"pros": {
 					"maximumEfficiency": "Maximum efficiency",
 					"moreDays": "More total days"
 				},
 				"cons": {
-					"shortBridges": "Short bridges",
-					"scatteredDays": "Scattered days"
+					"shortBreaks": "Short breaks",
+					"noLongTrip": "No long trip"
 				}
 			},
 			"balanced": {
 				"label": "Balanced",
-				"description": "Smart balance",
-				"subtitle": "Combines efficiency with grouping",
+				"description": "Breaks spread across the year",
+				"subtitle": "Every quarter gets its share, in breaks of up to a week",
 				"pros": {
-					"flexible": "Flexible",
-					"mediumPeriods": "Medium periods",
-					"versatile": "Versatile"
+					"everyQuarter": "A break every quarter",
+					"weekLongBreaks": "Breaks of up to a week"
 				},
 				"cons": {
 					"noMaximization": "Doesn't maximize",
-					"intermediateSolution": "Middle-of-the-road"
+					"noLongTrip": "No long trip"
 				}
 			}
 		},

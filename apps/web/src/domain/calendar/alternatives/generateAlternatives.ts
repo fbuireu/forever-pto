@@ -1,7 +1,8 @@
-import { selectGreedily } from "../suggestions/utils/selectors";
-import type { Bridge, FilterStrategy, Suggestion } from "../types";
-import { getCombinationKey } from "../utils/cache";
+import { PTO_CONSTANTS } from "../const";
+import { objectiveFor, selectBridges } from "../suggestions/utils/selectors";
+import { FilterStrategy, type Suggestion } from "../types";
 import type { PlanningCandidates } from "../utils/candidates";
+import { planDistance, restBlocksOf } from "./utils/helpers";
 
 export interface GenerateAlternativesParams {
 	ptoDays: number;
@@ -9,6 +10,11 @@ export interface GenerateAlternativesParams {
 	maxAlternatives: number;
 	existingSuggestion: Date[];
 	strategy: FilterStrategy;
+}
+
+interface Seed {
+	days: Date[];
+	excludedDays: Date[];
 }
 
 export function generateAlternatives(params: GenerateAlternativesParams) {
@@ -19,47 +25,39 @@ export function generateAlternatives(params: GenerateAlternativesParams) {
 	}
 
 	const { bridges } = candidates;
-
-	const existingSuggestionSet = new Set(existingSuggestion.map((d) => d.getTime()));
-	const availableBridges = bridges.filter(
-		(bridge) => !bridge.ptoDays.some((day) => existingSuggestionSet.has(day.getTime())),
-	);
-
+	const objective = objectiveFor(strategy);
 	const alternatives: Suggestion[] = [];
-	const usedCombinations = new Set<string>();
+	const maxRuns = maxAlternatives * PTO_CONSTANTS.ALTERNATIVES.RUNS_PER_ALTERNATIVE;
+	let runs = 0;
 
-	const sortingStrategies = [
-		(a: Bridge, b: Bridge) => b.efficiency - a.efficiency,
-		(a: Bridge, b: Bridge) => b.effectiveDays - a.effectiveDays,
-		(a: Bridge, b: Bridge) => b.ptoDaysNeeded - a.ptoDaysNeeded,
-		(a: Bridge, b: Bridge) => b.efficiency * b.ptoDaysNeeded - a.efficiency * a.ptoDaysNeeded,
-		(a: Bridge, b: Bridge) => (a.ptoDays[0]?.getMonth() || 0) - (b.ptoDays[0]?.getMonth() || 0),
-		(a: Bridge, b: Bridge) => a.efficiency - b.efficiency,
-		(a: Bridge, b: Bridge) => Math.sin(a.efficiency * 1000) - Math.sin(b.efficiency * 1000),
-	];
-	const maxAttempts = Math.max(maxAlternatives * 3, 15);
-	const sortedVariants = sortingStrategies.map((fn) => availableBridges.toSorted(fn));
+	const offer = ({ days, bridges: selected }: Pick<Suggestion, "days" | "bridges">) => {
+		if (days.length === 0) return;
+		const plans = [existingSuggestion, ...alternatives.map((alternative) => alternative.days)];
+		if (plans.some((plan) => planDistance({ plan, rival: days }) < PTO_CONSTANTS.ALTERNATIVES.MIN_DIFFERENCE)) return;
 
-	for (let attempt = 0; attempt < maxAttempts && alternatives.length < maxAlternatives; attempt++) {
-		const strategyIndex = attempt % sortingStrategies.length;
-		const shuffledBridges = [...sortedVariants[strategyIndex]];
-		if (attempt >= sortingStrategies.length) {
-			const rotateBy = attempt - sortingStrategies.length + 1;
-			shuffledBridges.push(...shuffledBridges.splice(0, rotateBy % Math.max(shuffledBridges.length, 1)));
-		}
-		const selection = selectGreedily({ orderedBridges: shuffledBridges, targetPtoDays: ptoDays });
-		if (selection.days.length > 0) {
-			const alternative: Suggestion = {
-				days: selection.days,
-				bridges: selection.bridges,
-				strategy,
-			};
+		alternatives.push({ days, bridges: selected, strategy });
+	};
 
-			const combinationKey = getCombinationKey(alternative.days);
-			if (!usedCombinations.has(combinationKey)) {
-				alternatives.push(alternative);
-				usedCombinations.add(combinationKey);
-			}
+	for (const other of Object.values(FilterStrategy)) {
+		if (other === strategy || alternatives.length >= maxAlternatives) continue;
+		runs++;
+		offer(selectBridges({ bridges, targetPtoDays: ptoDays, objective: objectiveFor(other) }));
+	}
+
+	const seeds: Seed[] = [{ days: existingSuggestion, excludedDays: [] }];
+
+	for (let next = 0; next < seeds.length; next++) {
+		const seed = seeds[next];
+		if (seed === undefined) break;
+
+		for (const block of restBlocksOf(seed.days)) {
+			if (alternatives.length >= maxAlternatives || runs >= maxRuns) return alternatives;
+
+			const excludedDays = [...seed.excludedDays, ...block];
+			runs++;
+			const selection = selectBridges({ bridges, targetPtoDays: ptoDays, objective, excludedDays });
+			offer(selection);
+			if (selection.days.length > 0) seeds.push({ days: selection.days, excludedDays });
 		}
 	}
 

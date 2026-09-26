@@ -24,21 +24,6 @@ interface MakeDateParams {
 
 const makeDate = ({ year, month, day }: MakeDateParams) => new Date(year, month - 1, day);
 
-interface MakeBridgeParams {
-	startDate: Date;
-	endDate: Date;
-	ptoDays: Date[];
-}
-
-const makeBridge = ({ startDate, endDate, ptoDays }: MakeBridgeParams) => ({
-	startDate,
-	endDate,
-	ptoDays,
-	ptoDaysNeeded: ptoDays.length,
-	effectiveDays: Math.round((endDate.getTime() - startDate.getTime()) / 86_400_000) + 1,
-	efficiency: 0,
-});
-
 const makeHoliday = (date: Date) => ({
 	id: `h-${date.toISOString()}`,
 	date,
@@ -46,6 +31,14 @@ const makeHoliday = (date: Date) => ({
 	variant: HolidayVariant.NATIONAL,
 	isInPlanningWindow: true,
 });
+
+interface EffectiveDaysOfParams {
+	days: Date[];
+	holidays?: ReturnType<typeof makeHoliday>[];
+}
+
+const effectiveDaysOf = ({ days, holidays = [] }: EffectiveDaysOfParams) =>
+	getTotalEffectiveDays(freeStreaks({ placedDays: days, holidays }));
 
 describe("getMonthlyDist", () => {
 	it("returns 12 zeros for empty input", () => {
@@ -172,72 +165,42 @@ describe("getLongBlocksPerQuarter", () => {
 });
 
 describe("getTotalEffectiveDays", () => {
-	it("returns days.length when no bridges provided", () => {
+	it("answers zero for a plan that placed nothing", () => {
+		expect(effectiveDaysOf({ days: [] })).toBe(0);
+	});
+
+	it("counts a mid-week day as itself, with no Free Day beside it", () => {
+		expect(effectiveDaysOf({ days: [makeDate({ year: 2025, month: 1, day: 8 })] })).toBe(1);
+	});
+
+	it("counts the weekend a Monday leans on", () => {
+		expect(effectiveDaysOf({ days: [makeDate({ year: 2025, month: 1, day: 6 })] })).toBe(3);
+	});
+
+	it("adds a stretch that does not touch the others on top of them", () => {
 		expect(
-			getTotalEffectiveDays({
-				days: [makeDate({ year: 2025, month: 1, day: 6 }), makeDate({ year: 2025, month: 1, day: 7 })],
-			}),
-		).toBe(2);
-	});
-
-	it("returns days.length when bridges array is empty", () => {
-		expect(getTotalEffectiveDays({ days: [makeDate({ year: 2025, month: 1, day: 6 })], bridges: [] })).toBe(1);
-	});
-
-	it("counts the whole span a bridge absorbs", () => {
-		const bridges = [
-			makeBridge({
-				startDate: makeDate({ year: 2025, month: 1, day: 4 }),
-				endDate: makeDate({ year: 2025, month: 1, day: 6 }),
-				ptoDays: [makeDate({ year: 2025, month: 1, day: 6 })],
-			}),
-		];
-		expect(getTotalEffectiveDays({ days: [makeDate({ year: 2025, month: 1, day: 6 })], bridges })).toBe(3);
-	});
-
-	it("adds standalone days on top of the spans", () => {
-		const bridges = [
-			makeBridge({
-				startDate: makeDate({ year: 2025, month: 1, day: 4 }),
-				endDate: makeDate({ year: 2025, month: 1, day: 6 }),
-				ptoDays: [makeDate({ year: 2025, month: 1, day: 6 })],
-			}),
-		];
-		expect(
-			getTotalEffectiveDays({
-				days: [makeDate({ year: 2025, month: 1, day: 6 }), makeDate({ year: 2025, month: 1, day: 9 })],
-				bridges,
+			effectiveDaysOf({
+				days: [makeDate({ year: 2025, month: 1, day: 6 }), makeDate({ year: 2025, month: 1, day: 8 })],
 			}),
 		).toBe(4);
 	});
 
-	it("ignores a bridge whose PTO days are not all in the selection", () => {
-		const bridges = [
-			makeBridge({
-				startDate: makeDate({ year: 2025, month: 1, day: 4 }),
-				endDate: makeDate({ year: 2025, month: 1, day: 6 }),
-				ptoDays: [makeDate({ year: 2025, month: 1, day: 6 })],
-			}),
-		];
-		expect(getTotalEffectiveDays({ days: [makeDate({ year: 2025, month: 1, day: 9 })], bridges })).toBe(1);
+	it("counts the weekend a lone Manual Day leans on, as Longest Vacation does", () => {
+		const days = [makeDate({ year: 2025, month: 1, day: 10 })];
+		const holidays = [makeHoliday(makeDate({ year: 2025, month: 1, day: 10 }))];
+
+		expect(effectiveDaysOf({ days, holidays })).toBe(3);
+		expect(calculateLongestVacation(freeStreaks({ placedDays: days, holidays }))).toBe(3);
 	});
 
-	it("discards a multi-day bridge when only part of its PTO days remain selected", () => {
-		const bridges = [
-			makeBridge({
-				startDate: makeDate({ year: 2025, month: 1, day: 9 }),
-				endDate: makeDate({ year: 2025, month: 1, day: 12 }),
-				ptoDays: [makeDate({ year: 2025, month: 1, day: 9 }), makeDate({ year: 2025, month: 1, day: 10 })],
-			}),
-		];
-
+	it("keeps the stretch the remaining half of a two-day break still reaches", () => {
 		expect(
-			getTotalEffectiveDays({
+			effectiveDaysOf({
 				days: [makeDate({ year: 2025, month: 1, day: 9 }), makeDate({ year: 2025, month: 1, day: 10 })],
-				bridges,
 			}),
 		).toBe(4);
-		expect(getTotalEffectiveDays({ days: [makeDate({ year: 2025, month: 1, day: 9 })], bridges })).toBe(1);
+		expect(effectiveDaysOf({ days: [makeDate({ year: 2025, month: 1, day: 10 })] })).toBe(3);
+		expect(effectiveDaysOf({ days: [makeDate({ year: 2025, month: 1, day: 9 })] })).toBe(1);
 	});
 });
 
@@ -517,38 +480,20 @@ describe("calculateLongWeekends", () => {
 });
 
 describe("getTotalEffectiveDays overlap", () => {
-	it("counts a weekend shared by two bridges once", () => {
-		const days = [makeDate({ year: 2025, month: 1, day: 3 }), makeDate({ year: 2025, month: 1, day: 6 })];
-		const bridges = [
-			makeBridge({
-				startDate: makeDate({ year: 2025, month: 1, day: 3 }),
-				endDate: makeDate({ year: 2025, month: 1, day: 5 }),
-				ptoDays: [makeDate({ year: 2025, month: 1, day: 3 })],
+	it("counts a weekend shared by two breaks once", () => {
+		expect(
+			effectiveDaysOf({
+				days: [makeDate({ year: 2025, month: 1, day: 3 }), makeDate({ year: 2025, month: 1, day: 6 })],
 			}),
-			makeBridge({
-				startDate: makeDate({ year: 2025, month: 1, day: 4 }),
-				endDate: makeDate({ year: 2025, month: 1, day: 6 }),
-				ptoDays: [makeDate({ year: 2025, month: 1, day: 6 })],
-			}),
-		];
-		expect(getTotalEffectiveDays({ days, bridges })).toBe(4);
+		).toBe(4);
 	});
 
-	it("still adds disjoint bridges in full", () => {
-		const days = [makeDate({ year: 2025, month: 1, day: 3 }), makeDate({ year: 2025, month: 6, day: 2 })];
-		const bridges = [
-			makeBridge({
-				startDate: makeDate({ year: 2025, month: 1, day: 3 }),
-				endDate: makeDate({ year: 2025, month: 1, day: 5 }),
-				ptoDays: [makeDate({ year: 2025, month: 1, day: 3 })],
+	it("still adds disjoint breaks in full", () => {
+		expect(
+			effectiveDaysOf({
+				days: [makeDate({ year: 2025, month: 1, day: 3 }), makeDate({ year: 2025, month: 6, day: 2 })],
 			}),
-			makeBridge({
-				startDate: makeDate({ year: 2025, month: 5, day: 31 }),
-				endDate: makeDate({ year: 2025, month: 6, day: 2 }),
-				ptoDays: [makeDate({ year: 2025, month: 6, day: 2 })],
-			}),
-		];
-		expect(getTotalEffectiveDays({ days, bridges })).toBe(6);
+		).toBe(6);
 	});
 
 	it("never reports fewer effective days than days actually spent", () => {
@@ -557,19 +502,8 @@ describe("getTotalEffectiveDays overlap", () => {
 			makeDate({ year: 2025, month: 1, day: 6 }),
 			makeDate({ year: 2025, month: 9, day: 10 }),
 		];
-		const bridges = [
-			makeBridge({
-				startDate: makeDate({ year: 2025, month: 1, day: 3 }),
-				endDate: makeDate({ year: 2025, month: 1, day: 5 }),
-				ptoDays: [makeDate({ year: 2025, month: 1, day: 3 })],
-			}),
-			makeBridge({
-				startDate: makeDate({ year: 2025, month: 1, day: 4 }),
-				endDate: makeDate({ year: 2025, month: 1, day: 6 }),
-				ptoDays: [makeDate({ year: 2025, month: 1, day: 6 })],
-			}),
-		];
-		expect(getTotalEffectiveDays({ days, bridges })).toBeGreaterThanOrEqual(days.length);
+
+		expect(effectiveDaysOf({ days })).toBeGreaterThanOrEqual(days.length);
 	});
 });
 
@@ -659,34 +593,26 @@ describe("getLongBlocksPerQuarter anchors on the first day inside the window", (
 	});
 });
 
-describe("getTotalEffectiveDays only counts span days that are still free", () => {
-	it("drops a day the span crossed that is now a workday again", () => {
-		const days = [makeDate({ year: 2025, month: 1, day: 3 })];
-		const bridges = [
-			makeBridge({
-				startDate: makeDate({ year: 2025, month: 1, day: 3 }),
-				endDate: makeDate({ year: 2025, month: 1, day: 7 }),
-				ptoDays: [makeDate({ year: 2025, month: 1, day: 3 })],
-			}),
-		];
-
-		expect(getTotalEffectiveDays({ days, bridges })).toBe(3);
+describe("getTotalEffectiveDays only counts days that are still free", () => {
+	it("stops at a day that is a workday again, however far the Holidays once reached", () => {
+		expect(effectiveDaysOf({ days: [makeDate({ year: 2025, month: 1, day: 3 })] })).toBe(3);
 	});
 
-	it("counts the span in full while the Holiday inside it still stands", () => {
-		const days = [makeDate({ year: 2025, month: 1, day: 3 })];
-		const bridges = [
-			makeBridge({
-				startDate: makeDate({ year: 2025, month: 1, day: 3 }),
-				endDate: makeDate({ year: 2025, month: 1, day: 7 }),
-				ptoDays: [makeDate({ year: 2025, month: 1, day: 3 })],
-			}),
-		];
+	it("runs through the Holidays that still stand", () => {
 		const holidays = [
 			makeHoliday(makeDate({ year: 2025, month: 1, day: 6 })),
 			makeHoliday(makeDate({ year: 2025, month: 1, day: 7 })),
 		];
 
-		expect(getTotalEffectiveDays({ days, bridges, holidays })).toBe(5);
+		expect(effectiveDaysOf({ days: [makeDate({ year: 2025, month: 1, day: 3 })], holidays })).toBe(5);
+	});
+
+	it("does not count a run of Holidays the plan placed nothing in", () => {
+		const holidays = [
+			makeHoliday(makeDate({ year: 2025, month: 4, day: 18 })),
+			makeHoliday(makeDate({ year: 2025, month: 4, day: 21 })),
+		];
+
+		expect(effectiveDaysOf({ days: [makeDate({ year: 2025, month: 1, day: 8 })], holidays })).toBe(1);
 	});
 });

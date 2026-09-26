@@ -162,8 +162,8 @@
 					"answer": "Das System analysiert verfügbare Arbeitstage, Feiertage und Benutzerpräferenzen (z. B. Vermeidung vergangener Tage), um PTO-Kombinationen zu erstellen, die die effektive Freizeit maximieren. Es wendet Heuristiken basierend auf Effizienz und Bewertung an, um Brückentage und gruppierte Tage zu priorisieren."
 				},
 				"strategies": {
-					"question": "Was ist der Unterschied zwischen \"ausgewogen\" und \"optimiert\"?",
-					"answer": "Ausgewogen verteilt freie Tage gleichmäßig über das Jahr. Optimiert maximiert dagegen die Effizienz – also möglichst viele freie Tage pro eingesetztem PTO-Tag."
+					"question": "Was ist der Unterschied zwischen \"gruppiert\", \"optimiert\" und \"ausgewogen\"?",
+					"answer": "Optimiert holt die meisten effektiven freien Tage pro PTO-Tag heraus, vor allem als Brückentage über das Jahr verteilt. Gruppiert gibt einen Teil dieser Effizienz für wenige lange Urlaube von bis zu zwei Wochen auf. Ausgewogen liegt dazwischen: Jedes Quartal bekommt seinen Anteil am Budget, und Pausen von bis zu einer Woche werden bevorzugt."
 				},
 				"results": {
 					"question": "Warum ändern sich meine Empfehlungen, wenn ich Einstellungen oder Feiertage anpasse?",
@@ -501,11 +501,11 @@
 			"strategyDetails": "Details",
 			"grouped": {
 				"label": "Gruppiert",
-				"description": "Priorisiert lange, zusammenhängende Urlaube",
-				"subtitle": "Gruppiert Brückentage mit aufeinanderfolgenden Feiertagen",
+				"description": "Wenige lange Urlaube",
+				"subtitle": "Baut Blöcke von bis zu zwei Wochen rund um Feiertage",
 				"pros": {
-					"simulatesHumanSelection": "Simuliert menschliche Auswahl",
-					"longBridges": "Lange Brückentage"
+					"longVacations": "Lange Urlaube",
+					"wholeWeeks": "Ganze Wochen frei"
 				},
 				"cons": {
 					"fewerDays": "Weniger Gesamttage",
@@ -514,29 +514,28 @@
 			},
 			"optimized": {
 				"label": "Optimiert",
-				"description": "Maximiert die Effizienz der PTO-Tage",
-				"subtitle": "Hole die meisten freien Tage heraus",
+				"description": "Maximiert deine freien Tage insgesamt",
+				"subtitle": "Jeder PTO-Tag bringt so viel wie möglich",
 				"pros": {
 					"maximumEfficiency": "Maximale Effizienz",
 					"moreDays": "Mehr Gesamttage"
 				},
 				"cons": {
-					"shortBridges": "Kurze Brückentage",
-					"scatteredDays": "Verstreute Tage"
+					"shortBreaks": "Kurze Pausen",
+					"noLongTrip": "Keine lange Reise"
 				}
 			},
 			"balanced": {
 				"label": "Ausgewogen",
-				"description": "Intelligente Balance",
-				"subtitle": "Kombiniert Effizienz mit Gruppierung",
+				"description": "Pausen über das Jahr verteilt",
+				"subtitle": "Jedes Quartal bekommt seinen Anteil, in Pausen von bis zu einer Woche",
 				"pros": {
-					"flexible": "Flexibel",
-					"mediumPeriods": "Mittlere Zeiträume",
-					"versatile": "Vielseitig"
+					"everyQuarter": "Eine Pause pro Quartal",
+					"weekLongBreaks": "Pausen von bis zu einer Woche"
 				},
 				"cons": {
 					"noMaximization": "Maximiert nicht",
-					"intermediateSolution": "Zwischenlösung"
+					"noLongTrip": "Keine lange Reise"
 				}
 			}
 		},

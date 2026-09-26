@@ -88,7 +88,7 @@ _Avoid_: remaining days, available days, unused days
 ## Measuring a plan
 
 **Effective Day**:
-One day of the continuous stretch off that a plan actually produces, counting the Free Days its Bridges absorb. This is the number the product exists to grow.
+One day of the continuous stretch off that a plan actually produces, counting the Free Days its PTO Days lean on, each once however many Bridges reach it. This is the number the product exists to grow.
 _Avoid_: actual day off, total off, day off
 
 **Bonus Day**:

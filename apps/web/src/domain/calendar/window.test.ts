@@ -5,9 +5,22 @@ import {
 	MONTHS_IN_YEAR,
 	planningWindowInterval,
 	planningWindowMonths,
+	QUARTERS_IN_YEAR,
+	quarterIndex,
 	windowMonthCount,
 	windowQuarterCount,
 } from "./window";
+
+describe("quarterIndex", () => {
+	it("puts the three months of a quarter in one bucket and the next month in the next", () => {
+		expect(quarterIndex(new Date(2026, 0, 1))).toBe(quarterIndex(new Date(2026, 2, 31)));
+		expect(quarterIndex(new Date(2026, 3, 1))).toBe(quarterIndex(new Date(2026, 2, 31)) + 1);
+	});
+
+	it("carries on across the year, so a Carry-over quarter is not folded onto the first", () => {
+		expect(quarterIndex(new Date(2027, 0, 1)) - quarterIndex(new Date(2026, 0, 1))).toBe(QUARTERS_IN_YEAR);
+	});
+});
 
 describe("planningWindowMonths", () => {
 	it("starts at January of the chosen year, whatever the Carry-over Months", () => {

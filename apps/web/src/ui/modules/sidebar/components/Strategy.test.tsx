@@ -88,7 +88,7 @@ describe("Strategy", () => {
 		renderStrategy();
 
 		expect(screen.getByText(en.sidebar.strategy.optimized.pros.maximumEfficiency)).toBeTruthy();
-		expect(screen.getByText(en.sidebar.strategy.optimized.cons.shortBridges)).toBeTruthy();
+		expect(screen.getByText(en.sidebar.strategy.optimized.cons.shortBreaks)).toBeTruthy();
 	});
 
 	it("keeps the details away from a reader who has not asked for them", () => {

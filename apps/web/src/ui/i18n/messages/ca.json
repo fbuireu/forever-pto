@@ -162,8 +162,8 @@
 					"answer": "El sistema analitza dies laborables, festius i preferències (com ara evitar dates passades) per trobar combinacions de PTO que maximitzin el temps lliure. Prioritza ponts i blocs agrupats basant-se en eficiència i puntuació."
 				},
 				"strategies": {
-					"question": "Quina és la diferència entre les estratègies \"equilibrada\" i \"optimitzada\"?",
-					"answer": "L'estratègia Equilibrada distribueix el temps lliure al llarg de l'any de manera constant, mentre que l'Optimitzada maximitza l'eficiència (dies lliures efectius per dia de PTO) prioritzant les combinacions amb millor ràtio."
+					"question": "Quina és la diferència entre les estratègies \"agrupada\", \"optimitzada\" i \"equilibrada\"?",
+					"answer": "L'Optimitzada et dona el màxim de dies lliures efectius per cada dia de PTO, sobretot en ponts repartits per l'any. L'Agrupada cedeix part d'aquesta eficiència a canvi d'unes poques vacances llargues de fins a dues setmanes. L'Equilibrada queda al mig: dona a cada trimestre la seva part del pressupost i prefereix descansos de fins a una setmana."
 				},
 				"results": {
 					"question": "Per què canvien les recomanacions quan actualitzo preferències o festius?",
@@ -501,11 +501,11 @@
 			"strategyDetails": "Detalls",
 			"grouped": {
 				"label": "Agrupada",
-				"description": "Prioritza vacances llargues i contínues",
-				"subtitle": "Agrupa dies pont amb festius consecutius",
+				"description": "Poques vacances llargues",
+				"subtitle": "Crea blocs de fins a dues setmanes al voltant dels festius",
 				"pros": {
-					"simulatesHumanSelection": "Simula la selecció humana",
-					"longBridges": "Ponts llargs"
+					"longVacations": "Vacances llargues",
+					"wholeWeeks": "Setmanes senceres lliures"
 				},
 				"cons": {
 					"fewerDays": "Menys dies totals",
@@ -514,29 +514,28 @@
 			},
 			"optimized": {
 				"label": "Optimitzada",
-				"description": "Maximitza l'eficiència dels dies PTO",
-				"subtitle": "Obté la major quantitat de dies lliures",
+				"description": "Maximitza els teus dies lliures totals",
+				"subtitle": "Cada dia de PTO rendeix tot el possible",
 				"pros": {
 					"maximumEfficiency": "Màxima eficiència",
 					"moreDays": "Més dies totals"
 				},
 				"cons": {
-					"shortBridges": "Ponts curts",
-					"scatteredDays": "Dies dispersos"
+					"shortBreaks": "Descansos curts",
+					"noLongTrip": "Sense un viatge llarg"
 				}
 			},
 			"balanced": {
 				"label": "Equilibrada",
-				"description": "Combina eficiència i agrupació",
-				"subtitle": "Combina eficiència amb agrupació",
+				"description": "Descansos repartits durant l'any",
+				"subtitle": "Cada trimestre rep la seva part, en descansos de fins a una setmana",
 				"pros": {
-					"flexible": "Flexible",
-					"mediumPeriods": "Períodes mitjans",
-					"versatile": "Versàtil"
+					"everyQuarter": "Un descans cada trimestre",
+					"weekLongBreaks": "Descansos de fins a una setmana"
 				},
 				"cons": {
 					"noMaximization": "No maximitza",
-					"intermediateSolution": "Solució intermèdia"
+					"noLongTrip": "Sense un viatge llarg"
 				}
 			}
 		},

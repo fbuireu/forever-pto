@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
 	addDays,
 	addMonths,
+	dayIndex,
 	differenceInDays,
 	eachDayOfInterval,
 	endOfMonth,
@@ -16,6 +17,28 @@ import {
 	startOfMonth,
 	startOfWeek,
 } from "./dates";
+
+describe("dayIndex", () => {
+	it("numbers consecutive calendar days consecutively", () => {
+		expect(dayIndex(new Date(2025, 0, 11)) - dayIndex(new Date(2025, 0, 10))).toBe(1);
+	});
+
+	it("ignores the time of day", () => {
+		expect(dayIndex(new Date(2025, 0, 10, 23, 59))).toBe(dayIndex(new Date(2025, 0, 10)));
+	});
+
+	it("keeps a one-day step across a daylight-saving change", () => {
+		expect(dayIndex(new Date(2025, 2, 31)) - dayIndex(new Date(2025, 2, 30))).toBe(1);
+		expect(dayIndex(new Date(2025, 9, 27)) - dayIndex(new Date(2025, 9, 26))).toBe(1);
+	});
+
+	it("agrees with differenceInDays over a year boundary", () => {
+		const dateLeft = new Date(2026, 0, 6);
+		const dateRight = new Date(2025, 11, 20);
+
+		expect(dayIndex(dateLeft) - dayIndex(dateRight)).toBe(differenceInDays({ dateLeft, dateRight }));
+	});
+});
 
 describe("isSameDay", () => {
 	it("returns true for the same date", () => {

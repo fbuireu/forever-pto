@@ -162,8 +162,8 @@
 					"answer": "Le système analyse les jours ouvrés disponibles, les jours fériés et tes préférences (par ex. éviter les jours passés) pour trouver les combinaisons de congés qui maximisent ton temps de repos effectif. Il applique des heuristiques d'efficacité et un score pour prioriser les ponts et les jours groupés."
 				},
 				"strategies": {
-					"question": "Quelle est la différence entre les stratégies \"équilibrée\" et \"optimisée\" ?",
-					"answer": "Équilibrée répartit les jours de repos sur toute l'année pour un niveau de repos stable, tandis qu'Optimisée se concentre sur l'efficacité maximale (jours effectifs par jour de congé) en priorisant les meilleures combinaisons en termes de ratio."
+					"question": "Quelle est la différence entre les stratégies \"groupée\", \"optimisée\" et \"équilibrée\" ?",
+					"answer": "Optimisée te donne le plus de jours de repos effectifs par jour de congé, surtout en ponts répartis sur l'année. Groupée cède une partie de cette efficacité contre quelques longues vacances de deux semaines au plus. Équilibrée se situe entre les deux : elle donne à chaque trimestre sa part du budget et privilégie des pauses d'une semaine au plus."
 				},
 				"results": {
 					"question": "Pourquoi les recommandations changent-elles quand je modifie mes préférences ou mes jours fériés ?",
@@ -501,11 +501,11 @@
 			"strategyDetails": "détails",
 			"grouped": {
 				"label": "Groupée",
-				"description": "Priorise les longues vacances continues",
-				"subtitle": "Regroupe les ponts avec les jours fériés consécutifs",
+				"description": "Quelques longues vacances",
+				"subtitle": "Construit des blocs de deux semaines au plus autour des jours fériés",
 				"pros": {
-					"simulatesHumanSelection": "Simule une sélection humaine",
-					"longBridges": "Ponts longs"
+					"longVacations": "Longues vacances",
+					"wholeWeeks": "Semaines entières de repos"
 				},
 				"cons": {
 					"fewerDays": "Moins de jours au total",
@@ -514,29 +514,28 @@
 			},
 			"optimized": {
 				"label": "Optimisée",
-				"description": "Maximise l'efficacité des jours de congé",
-				"subtitle": "Obtiens le maximum de jours de repos possible",
+				"description": "Maximise tes jours de repos au total",
+				"subtitle": "Chaque jour de congé rapporte le plus possible",
 				"pros": {
 					"maximumEfficiency": "Efficacité maximale",
 					"moreDays": "Plus de jours au total"
 				},
 				"cons": {
-					"shortBridges": "Ponts courts",
-					"scatteredDays": "Jours éparpillés"
+					"shortBreaks": "Pauses courtes",
+					"noLongTrip": "Pas de long voyage"
 				}
 			},
 			"balanced": {
 				"label": "Équilibrée",
-				"description": "Équilibre intelligent",
-				"subtitle": "Combine efficacité et regroupement",
+				"description": "Des pauses réparties sur l'année",
+				"subtitle": "Chaque trimestre reçoit sa part, en pauses d'une semaine au plus",
 				"pros": {
-					"flexible": "Flexible",
-					"mediumPeriods": "Périodes moyennes",
-					"versatile": "Polyvalente"
+					"everyQuarter": "Une pause chaque trimestre",
+					"weekLongBreaks": "Des pauses d'une semaine au plus"
 				},
 				"cons": {
 					"noMaximization": "Ne maximise pas",
-					"intermediateSolution": "Solution intermédiaire"
+					"noLongTrip": "Pas de long voyage"
 				}
 			}
 		},

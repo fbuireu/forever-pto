@@ -102,7 +102,7 @@ describe("generateSuggestions", () => {
 			months,
 			holidays,
 			ptoDays: 10,
-			strategy: FilterStrategy.GROUPED,
+			strategy: FilterStrategy.OPTIMIZED,
 		});
 		const bridgeOrder = (result.bridges ?? []).flatMap((bridge) => bridge.ptoDays);
 

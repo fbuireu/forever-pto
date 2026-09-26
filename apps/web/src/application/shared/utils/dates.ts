@@ -7,6 +7,11 @@ const toPlainDate = (date: Date): Temporal.PlainDate =>
 
 const toDate = (pd: Temporal.PlainDate): Date => new Date(pd.year, pd.month - 1, pd.day);
 
+const MS_PER_DAY = 86_400_000;
+
+export const dayIndex = (date: Date): number =>
+	Math.round(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / MS_PER_DAY);
+
 export interface DatePairParams {
 	a: Date;
 	b: Date;

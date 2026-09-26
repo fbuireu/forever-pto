@@ -1,4 +1,5 @@
 import { DonateSource, QuickStartSource } from "@application/stores/ui";
+import { FilterStrategy } from "@domain/calendar/types";
 import { Badge } from "@ui/modules/core/primitives/Badge";
 import { QuickStartTrigger } from "@ui/modules/pages/homepage/quick-start/QuickStartTrigger";
 import { SupportButton } from "@ui/modules/shared/SupportButton";
@@ -9,6 +10,7 @@ import { brutCard } from "./shared";
 
 const FREE_AMOUNT = 0;
 const MINIMUM_DONATION = 1;
+const STRATEGY_COUNT = Object.values(FilterStrategy).length;
 
 export const Pricing = async () => {
 	const [t, locale] = await Promise.all([getTranslations("homepage"), getLocale()]);
@@ -54,7 +56,7 @@ export const Pricing = async () => {
 								className="flex gap-2.5 py-2 border-b-[2px] border-dashed border-black/15 last:border-b-0 text-[15px]"
 							>
 								<span className="font-black">✓</span>{" "}
-								{key === "pricing.freeFeatures.threeStrategies" ? t(key, { count: 3 }) : t(key)}
+								{key === "pricing.freeFeatures.threeStrategies" ? t(key, { count: STRATEGY_COUNT }) : t(key)}
 							</li>
 						))}
 					</ul>

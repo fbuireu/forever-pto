@@ -79,35 +79,8 @@ export function getValidBridges({ days, bridges }: GetValidBridgesParams) {
 	return bridges.filter((bridge) => bridge.ptoDays.every((ptoDay) => daysSet.has(dayKey(ptoDay))));
 }
 
-export interface GetTotalEffectiveDaysParams {
-	days: Date[];
-	bridges?: Bridge[];
-	holidays?: HolidayDTO[];
-}
-
-export function getTotalEffectiveDays({ days, bridges, holidays = [] }: GetTotalEffectiveDaysParams) {
-	const validBridges = getValidBridges({ days, bridges });
-
-	if (validBridges.length === 0) {
-		return days.length;
-	}
-
-	const freeDays = dayOffKeys({ placedDays: days, holidays });
-	const covered = new Set<string>();
-
-	for (const bridge of validBridges) {
-		for (const day of eachDayOfInterval({ start: bridge.startDate, end: bridge.endDate })) {
-			const key = dayKey(day);
-			if (isWeekend(day) || freeDays.has(key)) covered.add(key);
-		}
-	}
-
-	for (const day of days) {
-		covered.add(dayKey(day));
-	}
-
-	return covered.size;
-}
+export const getTotalEffectiveDays = (streaks: FreeStreak[]) =>
+	streaks.filter((streak) => streak.hasPlacedDay).reduce((total, streak) => total + streak.length, 0);
 
 export const calculateRestBlocks = (dates: Date[]) => {
 	if (dates.length === 0) return 0;

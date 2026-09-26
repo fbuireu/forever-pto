@@ -162,8 +162,8 @@
 					"answer": "El sistema analiza los días laborables disponibles, los festivos y tus preferencias (p.ej. evitar días pasados) para encontrar combinaciones de PTO que maximicen el tiempo libre. Usa criterios de eficiencia para priorizar puentes y bloques de días agrupados."
 				},
 				"strategies": {
-					"question": "¿Cuál es la diferencia entre las estrategias \"equilibrada\" y \"optimizada\"?",
-					"answer": "Equilibrada busca repartir el tiempo libre durante el año para un valor constante, mientras que Optimizada se centra en maximizar la eficiencia (días efectivos por día de PTO) priorizando las combinaciones con mejor ratio."
+					"question": "¿Cuál es la diferencia entre las estrategias \"agrupada\", \"optimizada\" y \"equilibrada\"?",
+					"answer": "Optimizada te da el máximo de días libres efectivos por cada día de PTO, sobre todo en puentes repartidos por el año. Agrupada cede parte de esa eficiencia a cambio de unas pocas vacaciones largas de hasta dos semanas. Equilibrada queda en medio: da a cada trimestre su parte del presupuesto y prefiere descansos de hasta una semana."
 				},
 				"results": {
 					"question": "¿Por qué cambian las recomendaciones cuando actualizo preferencias o festivos?",
@@ -501,11 +501,11 @@
 			"strategyDetails": "Detalles",
 			"grouped": {
 				"label": "Agrupada",
-				"description": "Prioriza vacaciones largas y continuas",
-				"subtitle": "Agrupa días puentes con festivos consecutivos",
+				"description": "Pocas vacaciones largas",
+				"subtitle": "Crea bloques de hasta dos semanas alrededor de los festivos",
 				"pros": {
-					"simulatesHumanSelection": "Simula la selección humana",
-					"longBridges": "Puentes largos"
+					"longVacations": "Vacaciones largas",
+					"wholeWeeks": "Semanas enteras libres"
 				},
 				"cons": {
 					"fewerDays": "Menos días totales",
@@ -514,29 +514,28 @@
 			},
 			"optimized": {
 				"label": "Optimizada",
-				"description": "Maximiza eficiencia de días PTO",
-				"subtitle": "Obtén la mayor cantidad de días libres",
+				"description": "Maximiza tus días libres totales",
+				"subtitle": "Cada día de PTO rinde todo lo posible",
 				"pros": {
 					"maximumEfficiency": "Máxima eficiencia",
 					"moreDays": "Más días totales"
 				},
 				"cons": {
-					"shortBridges": "Puentes cortos",
-					"scatteredDays": "Días dispersos"
+					"shortBreaks": "Descansos cortos",
+					"noLongTrip": "Sin un viaje largo"
 				}
 			},
 			"balanced": {
 				"label": "Equilibrada",
-				"description": "Equilibrio inteligente",
-				"subtitle": "Combina eficiencia con agrupación",
+				"description": "Descansos repartidos durante el año",
+				"subtitle": "Cada trimestre recibe su parte, en descansos de hasta una semana",
 				"pros": {
-					"flexible": "Flexible",
-					"mediumPeriods": "Períodos medianos",
-					"versatile": "Versátil"
+					"everyQuarter": "Un descanso cada trimestre",
+					"weekLongBreaks": "Descansos de hasta una semana"
 				},
 				"cons": {
 					"noMaximization": "No maximiza",
-					"intermediateSolution": "Solución intermedia"
+					"noLongTrip": "Sin un viaje largo"
 				}
 			}
 		},

@@ -40,7 +40,7 @@ export const Strategy = () => {
 				icon: STRATEGY_ICONS[FilterStrategy.GROUPED],
 				description: t("grouped.description"),
 				subtitle: t("grouped.subtitle"),
-				pros: [t("grouped.pros.simulatesHumanSelection"), t("grouped.pros.longBridges")],
+				pros: [t("grouped.pros.longVacations"), t("grouped.pros.wholeWeeks")],
 				cons: [t("grouped.cons.fewerDays"), t("grouped.cons.lowerEfficiency")],
 			},
 			{
@@ -50,7 +50,7 @@ export const Strategy = () => {
 				description: t("optimized.description"),
 				subtitle: t("optimized.subtitle"),
 				pros: [t("optimized.pros.maximumEfficiency"), t("optimized.pros.moreDays")],
-				cons: [t("optimized.cons.shortBridges"), t("optimized.cons.scatteredDays")],
+				cons: [t("optimized.cons.shortBreaks"), t("optimized.cons.noLongTrip")],
 			},
 			{
 				value: FilterStrategy.BALANCED,
@@ -58,8 +58,8 @@ export const Strategy = () => {
 				icon: STRATEGY_ICONS[FilterStrategy.BALANCED],
 				description: t("balanced.description"),
 				subtitle: t("balanced.subtitle"),
-				pros: [t("balanced.pros.flexible"), t("balanced.pros.mediumPeriods"), t("balanced.pros.versatile")],
-				cons: [t("balanced.cons.noMaximization"), t("balanced.cons.intermediateSolution")],
+				pros: [t("balanced.pros.everyQuarter"), t("balanced.pros.weekLongBreaks")],
+				cons: [t("balanced.cons.noMaximization"), t("balanced.cons.noLongTrip")],
 			},
 		],
 		[t],

@@ -14,7 +14,7 @@ function analyzePotentialBridge({ ptoDays, holidaySet }: AnalyzePotentialBridges
 	if (ptoDays.length === 0) return null;
 	const {
 		SAFETY_LIMIT,
-		EFFICIENCY: { MINIMUM },
+		EFFICIENCY: { BLOCK_MINIMUM },
 	} = PTO_CONSTANTS;
 
 	const sortedDays = ptoDays.toSorted((a, b) => a.getTime() - b.getTime());
@@ -64,7 +64,7 @@ function analyzePotentialBridge({ ptoDays, holidaySet }: AnalyzePotentialBridges
 	const effectiveDays = differenceInDays({ dateLeft: effectiveEnd, dateRight: effectiveStart }) + 1;
 	const efficiency = effectiveDays / ptoDays.length;
 
-	if (efficiency >= MINIMUM) {
+	if (efficiency >= BLOCK_MINIMUM) {
 		return {
 			startDate: effectiveStart,
 			endDate: effectiveEnd,

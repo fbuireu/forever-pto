@@ -1,5 +1,6 @@
 import { HolidayVariant } from "@application/dto/holiday/types";
 import { PTO_CONSTANTS } from "@domain/calendar/const";
+import { STRATEGY_OBJECTIVE } from "@domain/calendar/suggestions/utils/selectors";
 import { beforeEach, describe, expect, it } from "vitest";
 import { clearDateKeyCache, clearHolidayCache } from "./cache";
 import { findBridges, getAvailableWorkdays } from "./helpers";
@@ -232,17 +233,22 @@ describe("findBridges efficiency floor", () => {
 		clearHolidayCache();
 	});
 
-	it("rejects three PTO days absorbing one weekend, five effective for an efficiency of 1.67", () => {
-		const wednesday = makeDate({ year: 2025, month: 1, day: 8 });
-		const thursday = makeDate({ year: 2025, month: 1, day: 9 });
-		const friday = makeDate({ year: 2025, month: 1, day: 10 });
+	it("admits a working week between two weekends, nine effective for five PTO Days", () => {
+		const week = [6, 7, 8, 9, 10].map((day) => makeDate({ year: 2025, month: 1, day }));
 
-		const bridges = findBridges({ availableWorkdays: [wednesday, thursday, friday], holidays: [] });
+		const bridges = findBridges({ availableWorkdays: week, holidays: [] });
+		const whole = bridges.find((bridge) => bridge.ptoDaysNeeded === 5);
 
-		expect(bridges.some((bridge) => bridge.ptoDaysNeeded === 3)).toBe(false);
+		expect(whole?.effectiveDays).toBe(9);
 		for (const bridge of bridges) {
-			expect(bridge.efficiency).toBeGreaterThanOrEqual(PTO_CONSTANTS.EFFICIENCY.MINIMUM);
+			expect(bridge.efficiency).toBeGreaterThanOrEqual(PTO_CONSTANTS.EFFICIENCY.BLOCK_MINIMUM);
 		}
+	});
+
+	it("admits at the lowest floor any Strategy applies, so the prune can never drop a Bridge one of them would take", () => {
+		const floors = Object.values(STRATEGY_OBJECTIVE).map(({ floor }) => floor);
+
+		expect(PTO_CONSTANTS.EFFICIENCY.BLOCK_MINIMUM).toBe(Math.min(...floors));
 	});
 
 	it("keeps the one-day candidate beside the same weekend, which clears the floor", () => {
