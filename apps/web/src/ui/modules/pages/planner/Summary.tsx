@@ -125,7 +125,7 @@ export const Summary = () => {
 			effectiveDays,
 			...(alternatives?.reduce<number[]>((acc, a) => {
 				const v = a?.metrics.totalEffectiveDays;
-				if (typeof v === "number") acc.push(v);
+				if (typeof v === "number" && a.strategy === strategy) acc.push(v);
 				return acc;
 			}, []) ?? []),
 		);
@@ -140,7 +140,7 @@ export const Summary = () => {
 			maxAlternative,
 			canImprove,
 		};
-	}, [activeSuggestion, ptoDays, alternatives, placedDays.length]);
+	}, [activeSuggestion, ptoDays, alternatives, placedDays.length, strategy]);
 
 	const manualAdjustmentsCase = (() => {
 		if (manuallySelectedDays.length > 0 && removedSuggestedDays.length > 0) return "addedAndRemoved";

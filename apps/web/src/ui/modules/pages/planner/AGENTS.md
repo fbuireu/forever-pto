@@ -353,6 +353,13 @@ supply it. Both are gone; the panel's props are exactly `Alternatives`'.
 modal in `shared/contact/`. It also imports [`contact.css`](./contact.css), which is global CSS, not a module: the
 `.dashed-card` class it defines is visible to the whole app.
 
+**The "alternatives that add more days" banner compares only with the Alternatives the chosen Strategy found.**
+`canImprove` reads `maxAlternative` over the Alternatives whose `strategy` equals the filters store's; the other
+Strategies' plans carry their own value there (see the Alternatives section of the
+[engine guide](../../../../domain/calendar/AGENTS.md)). Counting them would tell a Grouped user, on every plan, that
+Optimized covers more days, which is the trade they chose. No Alternative out of the engine beats the Suggestion,
+so the banner fires only once a hand edit left the plan on screen behind one of them.
+
 **`Summary.tsx` measures against different denominators, and several of its numbers depend on which.**
 `ptoDays` here is the *budget*, read from the filters store; the engine's `Metrics` are computed against the
 days the plan actually *placed* (`days.length` in [`generateMetrics.ts`](../../../../domain/calendar/metrics/generateMetrics.ts)). So:

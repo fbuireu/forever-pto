@@ -239,6 +239,16 @@ describe("the banner that says a better plan exists", () => {
 		expect(container.textContent).not.toContain("1 more days");
 	});
 
+	it("compares only with the Alternatives the chosen Strategy found, not with another Strategy's plan", () => {
+		resetPlan();
+		holidaysState.alternatives = [{ ...planOf([JAN(6)], 9), strategy: "optimized" }, planOf([JAN(7)], 6)];
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain("1 more day");
+		expect(container.textContent).not.toContain("4 more days");
+	});
+
 	it("ignores an Alternative carrying no metrics rather than counting it as nought", () => {
 		resetPlan();
 		holidaysState.alternatives = [null, planOf([JAN(6)], 7)];

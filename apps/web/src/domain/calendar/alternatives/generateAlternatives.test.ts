@@ -203,12 +203,20 @@ describe("generateAlternatives", () => {
 		}
 	});
 
-	it("stamps the chosen Strategy on every Alternative, whichever objective found it", () => {
-		const { alternatives } = planAlternatives({ ...YEAR, strategy: FilterStrategy.OPTIMIZED });
+	it("stamps each Alternative with the Strategy that found it", () => {
+		const { candidates, alternatives } = planAlternatives({ ...YEAR, strategy: FilterStrategy.OPTIMIZED });
+		const groupedPlan = toStrings(
+			selectBridgesForStrategy({
+				bridges: candidates.bridges,
+				targetPtoDays: YEAR.ptoDays,
+				strategy: FilterStrategy.GROUPED,
+			}).days,
+		).join();
 
-		expect(alternatives.map((alt) => alt.strategy)).toEqual(
-			new Array(alternatives.length).fill(FilterStrategy.OPTIMIZED),
+		expect(alternatives.find((alt) => toStrings(alt.days).join() === groupedPlan)?.strategy).toBe(
+			FilterStrategy.GROUPED,
 		);
+		expect(alternatives.at(-1)?.strategy).toBe(FilterStrategy.OPTIMIZED);
 	});
 
 	it("returns no alternatives when no workdays are available (past months, allowPastDays=false)", () => {

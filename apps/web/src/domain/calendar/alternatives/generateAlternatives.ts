@@ -32,20 +32,24 @@ export function generateAlternatives(params: GenerateAlternativesParams) {
 	const ceiling = coveredDays(existingSuggestion);
 	const ceilingEfficiency = ceiling / existingSuggestion.days.length;
 
-	const offer = ({ days, bridges: selected }: Pick<Suggestion, "days" | "bridges">) => {
+	const offer = ({
+		days,
+		bridges: selected,
+		strategy: foundBy,
+	}: Required<Pick<Suggestion, "days" | "strategy">> & Pick<Suggestion, "bridges">) => {
 		if (days.length === 0) return;
 		const covered = coveredDays({ days, bridges: selected });
 		if (covered > ceiling || covered / days.length > ceilingEfficiency) return;
 		const plans = [existingSuggestion.days, ...alternatives.map((alternative) => alternative.days)];
 		if (plans.some((plan) => planDistance({ plan, rival: days }) < PTO_CONSTANTS.ALTERNATIVES.MIN_DIFFERENCE)) return;
 
-		alternatives.push({ days, bridges: selected, strategy });
+		alternatives.push({ days, bridges: selected, strategy: foundBy });
 	};
 
 	for (const other of Object.values(FilterStrategy)) {
 		if (other === strategy || alternatives.length >= maxAlternatives) continue;
 		runs++;
-		offer(selectBridges({ bridges, targetPtoDays: ptoDays, objective: objectiveFor(other) }));
+		offer({ ...selectBridges({ bridges, targetPtoDays: ptoDays, objective: objectiveFor(other) }), strategy: other });
 	}
 
 	const seeds: Seed[] = [{ days: existingSuggestion.days, excludedDays: [] }];
@@ -60,7 +64,7 @@ export function generateAlternatives(params: GenerateAlternativesParams) {
 			const excludedDays = [...seed.excludedDays, ...block];
 			runs++;
 			const selection = selectBridges({ bridges, targetPtoDays: ptoDays, objective, excludedDays });
-			offer(selection);
+			offer({ ...selection, strategy });
 			if (selection.days.length > 0) seeds.push({ days: selection.days, excludedDays });
 		}
 	}

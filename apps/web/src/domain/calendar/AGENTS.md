@@ -407,12 +407,15 @@ their plan was the worse one. Two layers hold it:
 
 So for `OPTIMIZED` the other Strategies' plans are usually offered, since they cover fewer days, and for
 `GROUPED` and `BALANCED` the `OPTIMIZED` plan is refused whenever it covers more, which over a real calendar
-is every time. The Summary's "alternatives that add more days" notice
-can therefore only fire on a hand-edited plan that fell below one of them, which is what it is for.
+is every time.
 
-**Every Alternative is stamped with the chosen Strategy, even the ones another objective found.** Applying one
-makes it the Suggestion, and the filters store still holds the Strategy the user chose, so a label naming a
-different one would disagree with the sidebar the moment it was applied.
+**Every Alternative is stamped with the Strategy that found it, not the one the user chose.** The other
+Strategies' plans carry their own value in `strategy`, the Rest Block re-runs carry the chosen one. Nothing in
+the planner renders a Suggestion's `strategy` (the sidebar and the Summary read the filters store), so the field
+is free to say where a plan came from, and the Summary needs exactly that: its "alternatives that add more days"
+notice compares the plan on screen only with the Alternatives whose `strategy` is the chosen one. With the ceiling
+above, that notice can only fire on a hand-edited plan that fell below one of them, which is what it is for; a
+Grouped user is never told the Optimized plan has more days, because that is what choosing Grouped means.
 
 **Bonus Days are measured against days placed, not the budget, and `generateMetrics` no longer takes the
 budget at all.** It computes `bonusDays = totalEffectiveDays − days.length`; the baseline is what the plan
