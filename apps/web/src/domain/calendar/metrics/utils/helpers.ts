@@ -1,6 +1,6 @@
 import type { HolidayDTO } from "@application/dto/holiday/types";
 import {
-	differenceInDays,
+	dayIndex,
 	eachDayOfInterval,
 	endOfYear,
 	formatDate,
@@ -89,8 +89,7 @@ export const restBlocksOf = (dates: Date[]) => {
 		const block = blocks.at(-1);
 		const previous = block?.at(-1);
 		const separated =
-			previous === undefined ||
-			differenceInDays({ dateLeft: date, dateRight: previous }) > PTO_CONSTANTS.METRICS.REST_BLOCK_SEPARATION_DAYS;
+			previous === undefined || dayIndex(date) - dayIndex(previous) > PTO_CONSTANTS.METRICS.REST_BLOCK_SEPARATION_DAYS;
 		if (block && !separated) block.push(date);
 		else blocks.push([date]);
 	}

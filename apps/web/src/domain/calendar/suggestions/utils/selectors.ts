@@ -89,8 +89,8 @@ export interface OutranksParams {
 }
 
 export const outranks = ({ rank, rival }: OutranksParams) => {
-	for (const [index, value] of rank.entries()) {
-		const difference = value - (rival[index] ?? 0);
+	for (let index = 0; index < rank.length; index++) {
+		const difference = (rank[index] as number) - (rival[index] ?? 0);
 		if (Math.abs(difference) > PTO_CONSTANTS.SELECTION.RANK_TOLERANCE) return difference > 0;
 	}
 	return false;
@@ -106,6 +106,9 @@ interface PoolEntry {
 	runLength: number;
 	gap: number;
 	alive: boolean;
+	freshDays: number;
+	first: number | undefined;
+	last: number | undefined;
 }
 
 interface ToPoolEntryParams {
@@ -127,6 +130,9 @@ const toPoolEntry = ({ bridge, preferredMonths }: ToPoolEntryParams): PoolEntry 
 		runLength: end - start + 1,
 		gap: NO_NEIGHBOUR,
 		alive: true,
+		freshDays: end - start + 1,
+		first: undefined,
+		last: undefined,
 	};
 };
 
@@ -158,6 +164,14 @@ export const selectBridges = ({
 	const workdayIndexes = [...new Set(workdays.map(dayIndex))].toSorted((a, b) => a - b);
 	const positionOf = new Map(workdayIndexes.map((day, position) => [day, position]));
 	let stretches = workStretchesOf(workdayIndexes);
+	for (const entry of pool) {
+		for (const day of entry.ptoDays) {
+			const position = positionOf.get(day);
+			if (position === undefined) continue;
+			if (entry.first === undefined) entry.first = position;
+			entry.last = position;
+		}
+	}
 
 	const covered = new Set<number>();
 	const alreadyFree = new Set(alreadyOff.map(dayIndex));
@@ -219,11 +233,8 @@ export const selectBridges = ({
 
 	rankStretches();
 
-	const stretchesAfter = ({ ptoDays }: PoolEntry) => {
+	const stretchesAfter = ({ first, last }: PoolEntry) => {
 		const unchanged = { longestStretchAfter: longest.length, stretchRelief: 0 };
-		const positions = ptoDays.map((day) => positionOf.get(day)).filter((position) => position !== undefined);
-		const first = positions.at(0);
-		const last = positions.at(-1);
 		if (first === undefined || last === undefined) return unchanged;
 
 		const index = stretchIndexOf(first);
@@ -240,10 +251,7 @@ export const selectBridges = ({
 		};
 	};
 
-	const splitStretches = ({ ptoDays }: PoolEntry) => {
-		const positions = ptoDays.map((day) => positionOf.get(day)).filter((position) => position !== undefined);
-		const first = positions.at(0);
-		const last = positions.at(-1);
+	const splitStretches = ({ first, last }: PoolEntry) => {
 		if (first === undefined || last === undefined) return;
 
 		const index = stretchIndexOf(first);
@@ -270,12 +278,15 @@ export const selectBridges = ({
 
 		for (const other of pool) {
 			if (!other.alive) continue;
-			if (other.ptoDays.some((day) => usedPtoDays.has(day))) {
+			if (other.start <= end && other.end >= start && other.ptoDays.some((day) => usedPtoDays.has(day))) {
 				other.alive = false;
 				continue;
 			}
 			other.gap = Math.min(other.gap, Math.max(0, start - other.end, other.start - end));
-			if (other.start <= end && other.end >= start) other.newDays = countNewDays(other);
+			if (other.start <= end && other.end >= start) {
+				other.newDays = countNewDays(other);
+				other.freshDays = countFreshDays(other);
+			}
 			if (other.start <= merged.end + 1 && other.end >= merged.start - 1) {
 				const run = runAround(other);
 				other.runLength = run.end - run.start + 1;
@@ -294,14 +305,16 @@ export const selectBridges = ({
 			const marginalEfficiency = newDays / bridge.ptoDaysNeeded;
 			if (marginalEfficiency + PTO_CONSTANTS.SELECTION.RANK_TOLERANCE < stage.floor) continue;
 
+			const after = stretchesAfter(entry);
 			const candidate: Candidate = {
 				bridge,
 				marginalEfficiency,
 				runLength,
 				gap,
-				...stretchesAfter(entry),
+				longestStretchAfter: after.longestStretchAfter,
+				stretchRelief: after.stretchRelief,
 				inPreferredMonths,
-				joinsBlock: runLength > countFreshDays(entry),
+				joinsBlock: runLength > entry.freshDays,
 				planIsEmpty: selected.length === 0,
 			};
 			if (stage.admits && !stage.admits(candidate)) continue;

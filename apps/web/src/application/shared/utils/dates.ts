@@ -12,6 +12,11 @@ const MS_PER_DAY = 86_400_000;
 export const dayIndex = (date: Date): number =>
 	Math.round(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / MS_PER_DAY);
 
+export const isWeekendIndex = (index: number): boolean => {
+	const weekday = (((index + 4) % 7) + 7) % 7;
+	return weekday === 0 || weekday === 6;
+};
+
 export const fromDayIndex = (index: number): Date => {
 	const utc = new Date(index * MS_PER_DAY);
 	return new Date(utc.getUTCFullYear(), utc.getUTCMonth(), utc.getUTCDate());
@@ -53,8 +58,8 @@ export const isWithinInterval = ({ date, start, end }: IsWithinIntervalParams): 
 };
 
 export const isWeekend = (date: Date): boolean => {
-	const { dayOfWeek } = toPlainDate(date);
-	return dayOfWeek === 6 || dayOfWeek === 7;
+	const day = date.getDay();
+	return day === 0 || day === 6;
 };
 
 export interface AddDaysParams {
@@ -83,7 +88,10 @@ export const differenceInDays = ({ dateLeft, dateRight }: DifferenceInDaysParams
 
 export const startOfDay = (date: Date): Date => toDate(toPlainDate(date));
 
-export const startOfToday = (): Date => toDate(Temporal.Now.plainDateISO());
+export const startOfToday = (): Date => {
+	const now = new Date();
+	return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+};
 
 export const startOfYear = (date: Date): Date => toDate(toPlainDate(date).with({ month: 1, day: 1 }));
 
@@ -117,12 +125,8 @@ export const endOfWeek = ({ date, options }: WeekBoundaryParams): Date => {
 
 export const eachDayOfInterval = ({ start, end }: { start: Date; end: Date }): Date[] => {
 	const days: Date[] = [];
-	let current = toPlainDate(start);
-	const endPd = toPlainDate(end);
-	while (Temporal.PlainDate.compare(current, endPd) <= 0) {
-		days.push(toDate(current));
-		current = current.add({ days: 1 });
-	}
+	const last = dayIndex(end);
+	for (let day = dayIndex(start); day <= last; day++) days.push(fromDayIndex(day));
 	return days;
 };
 

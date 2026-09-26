@@ -1,4 +1,4 @@
-import { fromDayIndex, isWeekend } from "@application/shared/utils/dates";
+import { isWeekendIndex } from "@application/shared/utils/dates";
 
 export interface WorkStretch {
 	start: number;
@@ -12,7 +12,7 @@ interface OnlyWeekendBetweenParams {
 
 const onlyWeekendBetween = ({ start, end }: OnlyWeekendBetweenParams) => {
 	for (let day = start + 1; day < end; day++) {
-		if (!isWeekend(fromDayIndex(day))) return false;
+		if (!isWeekendIndex(day)) return false;
 	}
 	return true;
 };
