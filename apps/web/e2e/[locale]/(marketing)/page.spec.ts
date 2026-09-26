@@ -7,6 +7,7 @@ const MAIN = "main#main-content";
 const HOMEPAGE_NAMESPACE = "homepage.";
 const DIALOG_OPEN_TIMEOUT = 3_000;
 const PLANNER_NAVIGATION_TIMEOUT = 60_000;
+const PHONE_VIEWPORT = { width: 390, height: 664 };
 
 test.describe("(marketing) homepage", () => {
 	test("returns 200", async ({ page }) => {
@@ -69,6 +70,35 @@ test.describe("(marketing) homepage", () => {
 		await dialog.getByRole("button", { name: enMessages.quickStart.finish }).click();
 
 		await expect(page).toHaveURL(/\/planner$/, { timeout: PLANNER_NAVIGATION_TIMEOUT });
+	});
+
+	test.describe("on a phone", () => {
+		test.use({ viewport: PHONE_VIEWPORT });
+
+		test("the quick start stays inside the screen and finishes from its longest step", async ({ page }) => {
+			await page.goto("/");
+			await page.context().addCookies([{ name: "user-country", value: "es", url: page.url() }]);
+			await page.reload();
+
+			const trigger = page.locator("#hero").getByRole("button", { name: enMessages.homepage.hero.plannerCta });
+			const dialog = page.getByRole("dialog").filter({ has: page.getByRole("progressbar") });
+			await expect(async () => {
+				if (!(await dialog.isVisible())) await trigger.click();
+				await expect(dialog).toBeVisible({ timeout: DIALOG_OPEN_TIMEOUT });
+			}).toPass();
+
+			await dialog.getByRole("button", { name: enMessages.quickStart.next }).click();
+			await dialog.getByRole("button", { name: enMessages.quickStart.next }).click();
+			await dialog.getByText(enMessages.sidebar.strategy.mainVacation.label, { exact: true }).click();
+			await expect(dialog.getByText(enMessages.sidebar.preferredMonths.title, { exact: true })).toBeVisible();
+
+			const box = await dialog.boundingBox();
+			expect(box?.y).toBeGreaterThanOrEqual(0);
+			expect((box?.y ?? 0) + (box?.height ?? 0)).toBeLessThanOrEqual(PHONE_VIEWPORT.height);
+
+			await dialog.getByRole("button", { name: enMessages.quickStart.finish }).click();
+			await expect(page).toHaveURL(/\/planner$/, { timeout: PLANNER_NAVIGATION_TIMEOUT });
+		});
 	});
 
 	for (const locale of LOCALES) {

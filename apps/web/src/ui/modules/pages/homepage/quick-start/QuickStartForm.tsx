@@ -91,7 +91,7 @@ export const QuickStartForm = ({ countries, currentYear, onStepChange }: QuickSt
 	return (
 		<>
 			<DialogHeader>
-				<div className="flex items-center justify-between gap-3 font-mono text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+				<div className="flex items-center justify-between gap-3 pr-10 font-mono text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
 					<span>{t("progress", { current: stepIndex + 1, total: QUICK_START_STEPS.length })}</span>
 					<span>{t(`steps.${step}`)}</span>
 				</div>
