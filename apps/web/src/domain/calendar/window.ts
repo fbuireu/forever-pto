@@ -9,7 +9,7 @@ export const DEFAULT_PREFERRED_MONTHS: readonly number[] = [6, 7];
 export const isPreferredMonths = (value: unknown): value is number[] =>
 	Array.isArray(value) &&
 	new Set(value).size === value.length &&
-	value.every((month) => Number.isInteger(month) && month >= 0 && month < MONTHS_IN_YEAR);
+	value.every((month) => Number.isInteger(month) && month >= 0 && month < MONTHS_IN_YEAR + MAX_CARRY_OVER_MONTHS);
 
 export interface InPreferredMonthsParams {
 	months: number[];
@@ -55,11 +55,21 @@ export const reachableMonths = ({
 	const currentMonth = startOfMonth(today).getTime();
 
 	return new Set(
-		planningWindowMonths({ year, carryOverMonths })
-			.filter((month) => allowPastDays || month.getTime() >= currentMonth)
-			.map((month) => month.getMonth()),
+		planningWindowMonths({ year, carryOverMonths }).flatMap((month, position) =>
+			allowPastDays || month.getTime() >= currentMonth ? [position] : [],
+		),
 	);
 };
+
+export const monthKeyOf = (date: Date) => date.getFullYear() * MONTHS_IN_YEAR + date.getMonth();
+
+export interface PreferredMonthKeysParams {
+	year: number;
+	preferredMonths: readonly number[];
+}
+
+export const preferredMonthKeys = ({ year, preferredMonths }: PreferredMonthKeysParams) =>
+	preferredMonths.map((position) => year * MONTHS_IN_YEAR + position);
 
 export interface ReachablePreferredMonthsParams {
 	preferredMonths: readonly number[];

@@ -3,6 +3,7 @@ import { PTO_CONSTANTS } from "@domain/calendar/const";
 import type { Bridge } from "@domain/calendar/types";
 import { FilterStrategy } from "@domain/calendar/types";
 import { clearDateKeyCache, clearHolidayCache } from "@domain/calendar/utils/cache";
+import { monthKeyOf } from "@domain/calendar/window";
 import { beforeEach, describe, expect, it } from "vitest";
 import { objectiveFor, STRATEGY_OBJECTIVE, selectBridges, selectBridgesForStrategy } from "./selectors";
 
@@ -333,7 +334,7 @@ describe("MAIN_VACATION", () => {
 		from: on({ month: 3, day: 1 }),
 		to: on({ month: 3, day: 9 }),
 	});
-	const julyMonths = [6];
+	const julyMonths = [monthKeyOf(new Date(2025, 6, 1))];
 
 	it("builds its block inside the preferred months before anything else, even against a sharper day", () => {
 		const { bridges } = selectBridges({

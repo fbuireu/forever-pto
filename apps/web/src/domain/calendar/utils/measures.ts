@@ -1,6 +1,6 @@
 import { dayIndex } from "@application/shared/utils/dates";
 import type { Suggestion } from "../types";
-import { inPreferredMonths } from "../window";
+import { inPreferredMonths, monthKeyOf } from "../window";
 import { longestWorkStretch } from "./stretches";
 
 export interface PlanMeasures {
@@ -36,7 +36,7 @@ export const measurePlan = ({
 	preferredMonths,
 }: MeasurePlanParams): PlanMeasures => {
 	const covered = coveredSetOf({ plan, alreadyOff });
-	const placed = new Map(plan.days.map((day) => [dayIndex(day), day.getMonth()]));
+	const placed = new Map(plan.days.map((day) => [dayIndex(day), monthKeyOf(day)]));
 	const preferred = new Set(preferredMonths);
 	const sorted = [...covered].toSorted((a, b) => a - b);
 	const spent = plan.days.length + manualDays.length;

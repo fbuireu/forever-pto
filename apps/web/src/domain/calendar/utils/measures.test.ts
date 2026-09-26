@@ -1,3 +1,4 @@
+import { monthKeyOf } from "@domain/calendar/window";
 import { describe, expect, it } from "vitest";
 import type { Bridge } from "../types";
 import { measurePlan } from "./measures";
@@ -60,8 +61,8 @@ describe("measurePlan", () => {
 	});
 
 	it("counts a run towards the Preferred Months only when its placed days all fall in them", () => {
-		expect(measure({ preferredMonths: [0] }).longestPreferredVacation).toBe(4);
-		expect(measure({ preferredMonths: [6] }).longestPreferredVacation).toBe(0);
+		expect(measure({ preferredMonths: [monthKeyOf(jan(1))] }).longestPreferredVacation).toBe(4);
+		expect(measure({ preferredMonths: [monthKeyOf(new Date(2025, 6, 1))] }).longestPreferredVacation).toBe(0);
 	});
 
 	it("reads no Preferred Months as every month", () => {

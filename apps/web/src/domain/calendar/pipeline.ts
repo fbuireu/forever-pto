@@ -8,7 +8,13 @@ import type { FilterStrategy, MeasuredSuggestion, Suggestion } from "./types";
 import { measureBudget } from "./utils/budget";
 import { clearDateKeyCache, clearHolidayCache } from "./utils/cache";
 import { findPlanningCandidates } from "./utils/candidates";
-import { type PlanningWindow, planningWindowMonths, reachableMonths, reachablePreferredMonths } from "./window";
+import {
+	type PlanningWindow,
+	planningWindowMonths,
+	preferredMonthKeys,
+	reachableMonths,
+	reachablePreferredMonths,
+} from "./window";
 
 export interface PlanningInput {
 	window: PlanningWindow;
@@ -47,9 +53,12 @@ export function runPlanningPipeline({
 	clearHolidayCache();
 
 	const months = planningWindowMonths(window);
-	const preferredMonths = reachablePreferredMonths({
-		preferredMonths: requestedMonths,
-		reachable: reachableMonths({ ...window, allowPastDays, today: startOfToday() }),
+	const preferredMonths = preferredMonthKeys({
+		year: window.year,
+		preferredMonths: reachablePreferredMonths({
+			preferredMonths: requestedMonths,
+			reachable: reachableMonths({ ...window, allowPastDays, today: startOfToday() }),
+		}),
 	});
 	const manualPseudoHolidays: HolidayDTO[] = manuallySelectedDays.map((date, index) => ({
 		id: `manual-${index}`,

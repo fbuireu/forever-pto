@@ -4,7 +4,7 @@ import type { Bridge } from "@domain/calendar/types";
 import { FilterStrategy } from "@domain/calendar/types";
 import type { PlanMeasures } from "@domain/calendar/utils/measures";
 import { workStretchesOf } from "@domain/calendar/utils/stretches";
-import { inPreferredMonths } from "@domain/calendar/window";
+import { inPreferredMonths, monthKeyOf } from "@domain/calendar/window";
 
 const NO_NEIGHBOUR = Number.MAX_SAFE_INTEGER;
 
@@ -125,7 +125,7 @@ const toPoolEntry = ({ bridge, preferredMonths }: ToPoolEntryParams): PoolEntry 
 		start,
 		end,
 		ptoDays: bridge.ptoDays.map(dayIndex),
-		inPreferredMonths: inPreferredMonths({ months: bridge.ptoDays.map((day) => day.getMonth()), preferredMonths }),
+		inPreferredMonths: inPreferredMonths({ months: bridge.ptoDays.map(monthKeyOf), preferredMonths }),
 		newDays: end - start + 1,
 		runLength: end - start + 1,
 		gap: NO_NEIGHBOUR,

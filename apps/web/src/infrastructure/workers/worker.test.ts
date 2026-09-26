@@ -216,7 +216,7 @@ describe("worker onmessage", () => {
 		expect(planningInput()?.preferredMonths).toEqual([6, 7]);
 	});
 
-	it.each([[[12]], ["summer"], [undefined]])(
+	it.each([[[24]], ["summer"], [undefined]])(
 		"plans with no preferred month when the message carries %o, rather than guess",
 		(preferredMonths) => {
 			sendMessage({ preferredMonths });

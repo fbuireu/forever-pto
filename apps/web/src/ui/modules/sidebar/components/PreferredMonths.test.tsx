@@ -44,14 +44,14 @@ describe("PreferredMonths", () => {
 
 		const group = screen.getByRole("group", { name: en.sidebar.preferredMonths.title });
 		expect(within(group).getAllByRole("button")).toHaveLength(12);
-		expect(screen.getByRole("button", { name: "July" }).getAttribute("aria-pressed")).toBe("true");
-		expect(screen.getByRole("button", { name: "March" }).getAttribute("aria-pressed")).toBe("false");
+		expect(screen.getByRole("button", { name: /^July \d{4}$/ }).getAttribute("aria-pressed")).toBe("true");
+		expect(screen.getByRole("button", { name: /^March \d{4}$/ }).getAttribute("aria-pressed")).toBe("false");
 	});
 
 	it("adds a month that was not preferred and reports the new set in calendar order", () => {
 		renderMonths();
 
-		fireEvent.click(screen.getByRole("button", { name: "June" }));
+		fireEvent.click(screen.getByRole("button", { name: /^June \d{4}$/ }));
 
 		expect(store.setPreferredMonths).toHaveBeenCalledExactlyOnceWith([6, 7, 5]);
 		expect(track).toHaveBeenCalledExactlyOnceWith({
@@ -63,7 +63,7 @@ describe("PreferredMonths", () => {
 	it("drops a month that was preferred", () => {
 		renderMonths();
 
-		fireEvent.click(screen.getByRole("button", { name: "August" }));
+		fireEvent.click(screen.getByRole("button", { name: /^August \d{4}$/ }));
 
 		expect(store.setPreferredMonths).toHaveBeenCalledExactlyOnceWith([6]);
 	});
@@ -85,9 +85,9 @@ describe("PreferredMonths", () => {
 		it("refuses the months already past, so a choice there cannot be made", () => {
 			renderMonths();
 
-			expect(screen.getByRole("button", { name: "July" })).toHaveProperty("disabled", true);
-			expect(screen.getByRole("button", { name: "July" }).getAttribute("aria-pressed")).toBe("false");
-			expect(screen.getByRole("button", { name: "September" })).toHaveProperty("disabled", false);
+			expect(screen.getByRole("button", { name: /^July \d{4}$/ })).toHaveProperty("disabled", true);
+			expect(screen.getByRole("button", { name: /^July \d{4}$/ }).getAttribute("aria-pressed")).toBe("false");
+			expect(screen.getByRole("button", { name: /^September \d{4}$/ })).toHaveProperty("disabled", false);
 			expect(screen.getByText(en.sidebar.preferredMonths.anyMonth)).toBeDefined();
 		});
 
@@ -95,8 +95,8 @@ describe("PreferredMonths", () => {
 			store.allowPastDays = true;
 			renderMonths();
 
-			expect(screen.getByRole("button", { name: "July" })).toHaveProperty("disabled", false);
-			expect(screen.getByRole("button", { name: "July" }).getAttribute("aria-pressed")).toBe("true");
+			expect(screen.getByRole("button", { name: /^July \d{4}$/ })).toHaveProperty("disabled", false);
+			expect(screen.getByRole("button", { name: /^July \d{4}$/ }).getAttribute("aria-pressed")).toBe("true");
 		});
 	});
 });

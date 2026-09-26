@@ -91,7 +91,7 @@ describe("isPreferredMonths", () => {
 		expect(isPreferredMonths(value)).toBe(true);
 	});
 
-	it.each([[[12]], [[-1]], [[6, 6]], [[1.5]], [["6"]], ["6,7"], [null], [undefined], [{}]])(
+	it.each([[[24]], [[-1]], [[6, 6]], [[1.5]], [["6"]], ["6,7"], [null], [undefined], [{}]])(
 		"rejects %o, which a hand-edited persisted blob or a stale worker message could carry",
 		(value) => {
 			expect(isPreferredMonths(value)).toBe(false);
@@ -126,10 +126,10 @@ describe("reachableMonths", () => {
 		expect([...reachable]).toStrictEqual([8, 9, 10, 11]);
 	});
 
-	it("reaches a passed month again through the Carry-over Months, which carry it into next year", () => {
+	it("reaches the Carry-over Months, which are the next year's and still ahead", () => {
 		const reachable = reachableMonths({ year: 2026, carryOverMonths: 3, allowPastDays: false, today });
 
-		expect([...reachable].toSorted((a, b) => a - b)).toStrictEqual([0, 1, 2, 8, 9, 10, 11]);
+		expect([...reachable]).toStrictEqual([8, 9, 10, 11, 12, 13, 14]);
 	});
 
 	it("reaches every month when past days are allowed, or when the window is a later year", () => {

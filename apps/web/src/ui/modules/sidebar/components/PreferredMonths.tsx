@@ -43,7 +43,13 @@ export const PreferredMonths = () => {
 				title={t("title")}
 				tooltip={{ label: t("tooltipLabel"), content: t("tooltip") }}
 			/>
-			<MonthToggles label={t("title")} months={preferredMonths} onChange={handleChange} reachable={reachable} />
+			<MonthToggles
+				label={t("title")}
+				window={{ year, carryOverMonths }}
+				months={preferredMonths}
+				onChange={handleChange}
+				reachable={reachable}
+			/>
 			{chosen.length === 0 && <p className="text-xs text-muted-foreground">{t("anyMonth")}</p>}
 		</div>
 	);

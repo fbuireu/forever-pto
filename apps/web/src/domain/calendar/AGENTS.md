@@ -24,7 +24,7 @@ in [`CONTEXT.md`](../../../../../CONTEXT.md).
 | [`suggestions/utils/selectors.ts`](./suggestions/utils/selectors.ts) | `STRATEGY_OBJECTIVE` (one `Objective` per Strategy: a marginal floor and a rank), `objectiveFor` (the one fallback), `selectBridges`, the single selector they all feed and the one owner of the chronological day order, `selectBridgesForStrategy` which composes them, and `outranks`, the one lexicographic comparison of ranks, which the Alternatives search reuses. It counts days with `dayIndex` from `@application/shared/utils/dates` |
 | [`utils/stretches.ts`](./utils/stretches.ts) | `workStretchesOf` and `longestWorkStretch`: Workdays grouped into stretches of work that only a Free Day on a weekday ends, the one reading of the rule the selector and `measurePlan` share |
 | [`utils/measures.ts`](./utils/measures.ts) | `measurePlan` and `PlanMeasures`: the facts an `aim` ranks a whole plan by, and the Effective Days and Efficiency the Alternatives are capped with, counted the way the Metrics count them |
-| [`window.ts`](./window.ts) | `PlanningWindow` and both of its projections, `planningWindowMonths` (the month array) and `planningWindowInterval`/`isInPlanningWindow` (the interval), plus `MONTHS_IN_YEAR`, `MONTHS_IN_QUARTER`, `MAX_CARRY_OVER_MONTHS`, `windowMonthCount`/`windowQuarterCount`, and the Preferred Months: `isPreferredMonths` with `DEFAULT_PREFERRED_MONTHS`, `reachableMonths` and `reachablePreferredMonths`, the months the window can still place a PTO Day in, and `inPreferredMonths`, the one reading of "every month is preferred, and none chosen means any" that the selector and `measurePlan` share, kept here rather than in `types.ts` because the docs site imports `types.ts` by relative path and it must stay import-free |
+| [`window.ts`](./window.ts) | `PlanningWindow` and both of its projections, `planningWindowMonths` (the month array) and `planningWindowInterval`/`isInPlanningWindow` (the interval), plus `MONTHS_IN_YEAR`, `MONTHS_IN_QUARTER`, `MAX_CARRY_OVER_MONTHS`, `windowMonthCount`/`windowQuarterCount`, and the Preferred Months: `isPreferredMonths` with `DEFAULT_PREFERRED_MONTHS`, `reachableMonths` and `reachablePreferredMonths`, the window positions that can still take a PTO Day, `monthKeyOf` and `preferredMonthKeys`, the absolute month keys the engine compares, and `inPreferredMonths`, the one reading of "every month is preferred, and none chosen means any" that the selector and `measurePlan` share, kept here rather than in `types.ts` because the docs site imports `types.ts` by relative path and it must stay import-free |
 | [`pipeline.ts`](./pipeline.ts) | `runPlanningPipeline`, the whole run: caches, pseudo-Holidays, budget, the planning calls and the Metrics |
 | [`alternatives/generateAlternatives.ts`](./alternatives/generateAlternatives.ts) | Re-runs selection under the other Strategies and without one Rest Block of the Suggestion at a time, keeping plans at least `MIN_DIFFERENCE` apart |
 | [`alternatives/utils/helpers.ts`](./alternatives/utils/helpers.ts) | `planDistance`: one minus the Jaccard index of two day sets |
@@ -223,10 +223,18 @@ pipeline takes from the filters store through the worker; every other Strategy r
 which `selectors.test.ts` pins, so a user's months change nothing unless Main Vacation is chosen, apart from the
 Main Vacation plan offered among the Alternatives.
 
+**A Preferred Month is a position in the Planning Window, not a month of the year.** `0` is January of the
+chosen year and `12` the first Carry-over Month, January of the next, so the two are different choices and the
+picker shows each once, in order, grouped under a heading per year when the window spans two. The stored values from before the
+Carry-over Months counted (`0` to `11`) mean what they meant, and changing the year keeps "July" as July of the
+new one. `runPlanningPipeline` turns positions into absolute month keys once, `preferredMonthKeys`, and
+the selector and `measurePlan` compare them with `monthKeyOf` of each placed day; a position past the end of a
+shorter window matches no day.
+
 **A Preferred Month the window can no longer reach counts as not chosen.** With `allowPastDays` off, a month
 of the Planning Window that ended before today has no Workday left to place, so `runPlanningPipeline` passes
-the selector only `reachablePreferredMonths`: the ones `reachableMonths` still finds in the window from the
-current month on. A month the Carry-over Months bring round again in the next year is reachable. Without this,
+the selector only `reachablePreferredMonths`: the positions `reachableMonths` still finds in the window from
+the current month on. Without this,
 months that had all passed left the block stage with nothing to admit and Main Vacation fell straight to its
 Optimized stage, where "none chosen" would have built the block wherever it is longest. Both month pickers
 take the same set and disable the rest, keeping the stored choice so it returns when past days are allowed;

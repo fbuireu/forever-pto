@@ -105,7 +105,7 @@ describe("setters", () => {
 	});
 
 	it("setPreferredMonths falls back to the default rather than store a month that does not exist", () => {
-		useFiltersStore.getState().setPreferredMonths([13]);
+		useFiltersStore.getState().setPreferredMonths([24]);
 		expect(useFiltersStore.getState().preferredMonths).toEqual([...DEFAULT_PREFERRED_MONTHS]);
 	});
 
@@ -221,8 +221,8 @@ describe("onRehydrateStorage", () => {
 		},
 	);
 
-	it.each([[[12]], [[6, 6]], [[1.5]], ["summer"], [null]])(
-		"replaces stored preferred months %o, which are not twelve-month indexes, with the default",
+	it.each([[[24]], [[6, 6]], [[1.5]], ["summer"], [null]])(
+		"replaces stored preferred months %o, which are not months of any Planning Window, with the default",
 		(stored) => {
 			useFiltersStore.setState({ preferredMonths: stored as number[] });
 

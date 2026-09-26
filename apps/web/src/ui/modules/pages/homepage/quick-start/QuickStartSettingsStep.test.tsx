@@ -86,7 +86,7 @@ describe("QuickStartSettingsStep", () => {
 		const onChange = renderStep({ strategy: FilterStrategy.MAIN_VACATION });
 
 		expect(screen.getByRole("group", { name: sidebar.preferredMonths.title })).toBeDefined();
-		fireEvent.click(screen.getByRole("button", { name: "June" }));
+		fireEvent.click(screen.getByRole("button", { name: /^June \d{4}$/ }));
 
 		expect(onChange).toHaveBeenCalledExactlyOnceWith({ preferredMonths: [6, 7, 5] });
 	});
@@ -130,8 +130,8 @@ describe("QuickStartSettingsStep", () => {
 		try {
 			renderStep({ strategy: FilterStrategy.MAIN_VACATION, year: 2026, carryOverMonths: 0 });
 
-			expect(screen.getByRole("button", { name: "August" })).toHaveProperty("disabled", true);
-			expect(screen.getByRole("button", { name: "October" })).toHaveProperty("disabled", false);
+			expect(screen.getByRole("button", { name: /^August \d{4}$/ })).toHaveProperty("disabled", true);
+			expect(screen.getByRole("button", { name: /^October \d{4}$/ })).toHaveProperty("disabled", false);
 		} finally {
 			vi.useRealTimers();
 		}

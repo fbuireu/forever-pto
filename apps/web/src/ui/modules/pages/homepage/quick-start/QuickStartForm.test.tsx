@@ -153,7 +153,7 @@ describe("QuickStartForm", () => {
 			next();
 			next();
 			fireEvent.click(screen.getByLabelText(new RegExp(enMessages.sidebar.strategy.mainVacation.label)));
-			fireEvent.click(screen.getByRole("button", { name: "June" }));
+			fireEvent.click(screen.getByRole("button", { name: /^June \d{4}$/ }));
 			finish();
 
 			const filters = useFiltersStore.getState();

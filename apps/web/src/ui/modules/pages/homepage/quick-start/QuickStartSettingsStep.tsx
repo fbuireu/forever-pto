@@ -76,6 +76,7 @@ export const QuickStartSettingsStep = ({ draft, onChange }: QuickStartSettingsSt
 					<MonthToggles
 						label={tSidebar("preferredMonths.title")}
 						legendClassName="text-sm font-medium leading-none mb-2"
+						window={{ year, carryOverMonths }}
 						months={preferredMonths}
 						onChange={(months) => onChange({ preferredMonths: months })}
 						reachable={reachable}
