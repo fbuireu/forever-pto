@@ -17,7 +17,7 @@ Every React component the product renders. Nothing else in `src/ui/` holds compo
 | `providers/` | Context wrappers mounted once in the locale layout: [`providers/AppThemeProvider.tsx`](./providers/AppThemeProvider.tsx), [`providers/BonesProvider.tsx`](./providers/BonesProvider.tsx) | Once |
 | `stores/` | [`stores/StoresInitializer.tsx`](./stores/StoresInitializer.tsx), a render-nothing component that seeds the filters store from the `user-country` cookie, read through [`utils/userCountry.ts`](../utils/userCountry.ts) | Once |
 | `tutorial/` | [`tutorial/DriverStyles.tsx`](./tutorial/DriverStyles.tsx) only, a render-nothing component whose single job is to make the driver.js stylesheet import lazy | Once |
-| `tracking/` | The third-party script mounts: [`tracking/Analytics.tsx`](./tracking/Analytics.tsx) (Google gtag consent defaults and config) and [`tracking/BetterStackTracking.tsx`](./tracking/BetterStackTracking.tsx) (the Better Stack snippet, gated on the cookieconsent `betterStack` **service**, not the category) | Once |
+| `tracking/` | The third-party script mounts: [`tracking/Analytics.tsx`](./tracking/Analytics.tsx) (Google gtag consent defaults and config; nothing at all when the build has no `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID`, so a preview or a local build loads no Google script) and [`tracking/BetterStackTracking.tsx`](./tracking/BetterStackTracking.tsx) (the Better Stack snippet, gated on the cookieconsent `betterStack` **service**, not the category) | Once |
 | `export/` | [`export/HolidayDocument.tsx`](./export/HolidayDocument.tsx), the `@react-pdf/renderer` document tree. Not DOM React; it renders in the PDF reconciler only | Once |
 | `bones/` | Generated skeleton data, see below. Not hand-written | n/a |
 
@@ -85,8 +85,10 @@ component that fetches the Country list and the current year and hands them to
 [`pages/homepage/quick-start/QuickStartClient.tsx`](./pages/homepage/quick-start/QuickStartClient.tsx). That shell renders nothing until the
 store's flag first turns true, and only then `dynamic()`-imports, with `ssr: false`, the
 [`pages/homepage/quick-start/QuickStartDialog.tsx`](./pages/homepage/quick-start/QuickStartDialog.tsx) and the Premium modal beside it, so a visitor who
-never clicks a call to action downloads none of it: not the dialog, not the Counter, not the regions lookup the
-location store drags `date-holidays` in for, and not the Stripe client the Premium modal reaches. Once opened the
+never clicks a call to action downloads none of it: not the dialog, not the Counter, and not the Stripe client
+the Premium modal reaches. The regions lookup is further out still: the location store imports it only when
+`fetchRegions` runs, because it drags `date-holidays` in, so nothing downloads that dataset until a Country's
+Regions are asked for. Once opened the
 pair stays mounted, which is what lets the close animate and a second open cost no fetch. The content is [`pages/homepage/quick-start/QuickStartForm.tsx`](./pages/homepage/quick-start/QuickStartForm.tsx), one component per step
 next to it, and the step list, the draft shape and the pure rules ([`pages/homepage/quick-start/steps.ts`](./pages/homepage/quick-start/steps.ts)).
 

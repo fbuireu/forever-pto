@@ -395,8 +395,8 @@ and `removedSuggestedDays` and recomputes the Metrics), so the stored day list i
 first placed it, for ever. Efficiency is `totalEffectiveDays / resolveSelectedDays(…).length`, so a hint
 reading the raw array named the wrong number the moment anything was hand-edited, which is precisely when a
 label naming the baseline earns its place: with no Manual or Removed Days they agree and nobody needed
-the label. `Summary` therefore reads `placedDays` off `usePlanReadout`, which applies `resolveSelectedDays`
-with the same lists the store holds. [`sidebar/components/CalendarExport.tsx`](../../sidebar/components/CalendarExport.tsx) reads the same field: it
+the label. `Summary` therefore reads `placedDays` off `usePlacedPlan`, the half of `usePlanReadout` with no
+`isCalculating` subscription, which applies `resolveSelectedDays` with the same lists the store holds. [`sidebar/components/CalendarExport.tsx`](../../sidebar/components/CalendarExport.tsx) reads the same field: it
 wants the array rather than the count, so the exported calendar carries exactly the days the Metrics were
 measured from. Anything else on this screen that wants "the days spent" takes it from the hook; those callers
 used to fold it themselves and this sentence was the whole mechanism keeping them in step.

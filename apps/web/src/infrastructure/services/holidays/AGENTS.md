@@ -129,7 +129,7 @@ calendar, country rules included, minus whatever the region does not observe. So
 country-level lookup put back every national day the region had dropped: a Californian's 2027 calendar
 carried Columbus Day, a Scot's carried Easter Monday, Luzern's carried Ostermontag and Pfingstmontag. Those
 dates then became Free Days: struck from the Workday list so no PTO Day was ever placed on them, and
-expanded straight through by `analyzePotentialBridge`, inflating Effective Days, Efficiency and Longest
+expanded straight through by `findBridges`, inflating Effective Days, Efficiency and Longest
 Vacation. `resolveObservedHolidays` keeps a national entry only when the regional lookup emitted the same
 date.
 

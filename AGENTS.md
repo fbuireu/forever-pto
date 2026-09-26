@@ -557,6 +557,7 @@ this table is the map rather than a second copy: when one fails, read it there.
 | The public env | `PUBLIC_ENV` classifies exactly the `NEXT_PUBLIC_*` names [`environment.d.ts`](./apps/web/environment.d.ts) declares, both directions, each wired where it is read |
 | `typescript` | Pinned exactly in every manifest, the same pin at the root and in `apps/web`, `apps/docs` held to a `6.` line, spelled to the patch so a range flip everywhere at once cannot pass as "equal" |
 | The security headers | [`next.config.ts`](./apps/web/next.config.ts)'s `headers()`, imported and awaited, returns one rule for `/(.*)` carrying every header **with its value**, and names no Google font host |
+| The build assets | [`public/_headers`](./apps/web/public/_headers) gives the hashed `_next/static` tree its year-long `immutable` `Cache-Control`, the value spelled out, since Workers Static Assets otherwise revalidate every file |
 | [`wrangler.toml`](./apps/web/wrangler.toml) | Every `CloudflareEnv` binding present in each environment, each environment declaring every binding *kind* the top level does, `[assets]` and `[placement]` once, `[observability]` identical wherever restated, the payment rate limiter identically bounded |
 | The workflows | No deploy, build or `wrangler secret` step wrapped in `nick-fields/retry`, counted by job rather than by spelling; every workflow linked from this guide and sectioned in the wiki; the cleanup group still equal to `ci.yml`'s; both workflows aggregating their gated jobs, preview E2E included, under a `Check` |
 

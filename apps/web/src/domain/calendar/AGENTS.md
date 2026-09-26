@@ -95,7 +95,7 @@ sides.
 
 **The short circuit is the empty candidate set, and it used to be the empty Holiday list.** The guard read
 `effectivePtoDays <= 0 || holidaysWithManual.length === 0`, and the second half was wrong on its own terms:
-`analyzePotentialBridge` asks `isWeekend(prevDay) || holidaySet.has(...)`, so a weekend is a Free Day and a
+`findBridges` asks `isWeekendIndex(day) || holidayDays.has(day)` of each neighbour, so a weekend is a Free Day and a
 Bridge needs nothing else beside it. With no Holidays at all a Friday still expands into Saturday and
 Sunday for three Effective Days at 3.0, and a Thursday-Friday pair reaches Sunday at 4/2, exactly
 `EFFICIENCY.MINIMUM`. A Holiday-free year is full of admissible Bridges, which
@@ -300,7 +300,7 @@ budgets: every weekend offers a Friday worth three.
 **`generateMetrics` must see exactly the Holiday list the engine planned against: the whole two-year set,
 unfiltered.** It is tempting to narrow it to `isInPlanningWindow`, and that was tried and reverted. The
 planning calls receive the unfiltered list, `createHolidaySet` applies no window filter, and
-`analyzePotentialBridge` expands a Bridge's span straight through a next-year Holiday; the selector counts that
+`findBridges` expands a Bridge's span straight through a next-year Holiday; the selector counts that
 span as gain, and `getTotalEffectiveDays` measures the same stretch from the streaks. Filtering only the *Metrics* input would shorten every streak the span was built on, Effective Days
 included, so the Metrics would stop agreeing with what the selector and the Alternatives search counted when they
 chose the plan: a Suggestion could measure below an Alternative it was ranked above. Whatever the engine plans against, the Metrics measure against.
@@ -370,9 +370,9 @@ out of a month array; see the Planning Window section above. Charts must treat t
 variable-length: `MonthlyDistributionChart` already did, and the quarter charts index
 `COLOR_SCHEMES` modulo its length, since the brand colours no longer cover every bucket.
 
-**A multi-day Bridge is consecutive *calendar* days that are all Workdays.** `findBridges` builds a
-candidate with `addDays(workday, i)` and requires every step to be in the Workday set, so a Friday and the
-following Monday are never one two-day candidate; they surface as two separate one-day Bridges. `MAX_MULTI_DAY_SIZE` is a working week, so any Workday run between two weekends is one candidate;
+**A multi-day Bridge is consecutive *calendar* days that are all Workdays.** `findBridges` extends a run
+one day index at a time and requires every step to be a Workday (`workdayAt`, the Workdays keyed by
+`dayIndex`), so a Friday and the following Monday are never one two-day candidate; they surface as two separate one-day Bridges. `MAX_MULTI_DAY_SIZE` is a working week, so any Workday run between two weekends is one candidate;
 anything longer is two Bridges, and the marginal gain decides whether joining them is worth it.
 
 **Efficiency is computed after expansion, not before.** A candidate's `startDate`/`endDate` are pushed
@@ -518,7 +518,7 @@ its Thursday still leads into the weekend, and the card now says so. `getBridges
 
 **`removedDays` reaches `getAvailableWorkdays` and nothing else, on purpose.** A Removed Day is a date the
 user has told us they *will work*: the planner must not place it, but it is not a Free Day. Passing it into
-`createHolidaySet` (or into `findBridges`) would let `analyzePotentialBridge` count it as adjacent free
+`createHolidaySet` (or into `findBridges`) would let the Bridge search count it as adjacent free
 time and expand a Bridge through it, inflating `effectiveDays` and therefore Efficiency for every Bridge
 that touches it. Dropping the date from the Workday list is the whole mechanism; there is deliberately no
 second consumer.

@@ -62,6 +62,9 @@ Optimized after it.
   report, Manual Days included.
 - The Suggestion is the best plan the chosen Strategy produced, not the first: the greedy plan and every re-run of
   the same objective are ranked by what the Strategy is for (its `aim`), then by Effective Days and Efficiency.
+  That search is sized by the engine, `ALTERNATIVES.SEARCHED`, and never by how many Alternatives the caller
+  shows: `maxAlternatives` only slices the list the search returns, so the same inputs give the same Suggestion
+  whether the screen offers four Alternatives or none.
 - Alternatives run the other Strategies first, then the chosen one with one of the Suggestion's Rest Blocks taken
   away at a time, and are kept only when at least `ALTERNATIVES.MIN_DIFFERENCE` away from every plan already
   offered and never ahead of the Suggestion on Effective Days or Efficiency: the Suggestion is the
@@ -83,7 +86,11 @@ cannot express the double count at all.
   keeps the Strategies different.
 - Selection is no longer a sort followed by a walk, so it costs a pass per Bridge taken rather than one sort. The
   gain, stretch length and distance are updated incrementally to keep it inside the Worker's budget; recomputing
-  them from scratch on every step is the regression to watch for.
+  them from scratch on every step is the regression to watch for. It happened once: the first version of this
+  engine re-measured the plan per step, doubled the candidates and ran a wider Alternatives search, and was about
+  2.7 times slower than the heuristics it replaced. Counting the hot loops in day indexes rather than `Date` or
+  Temporal objects, and computing once what a run never changes, brought the average run to about 17 ms against
+  the old engine's 58, with the plans of 864 benchmarked configurations unchanged by the rewrite.
 - A candidate is never worth more to a plan than on its own, so the search prunes at the lowest floor any
   Strategy applies and no lower. Lowering a Strategy's floor under `BLOCK_MINIMUM` means lowering that constant
   too, or the prune silently drops what the Strategy would have taken.
