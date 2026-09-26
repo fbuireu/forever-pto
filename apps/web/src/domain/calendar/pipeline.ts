@@ -82,13 +82,14 @@ export function runPlanningPipeline({
 		months,
 		allowPastDays,
 		removedDays: removedSuggestedDays,
+		manualDays: manuallySelectedDays,
 	});
 
 	if (candidates.bridges.length === 0) return unplanned();
 
 	const baseSuggestion = generateSuggestions({ ptoDays: effectivePtoDays, candidates, strategy, preferredMonths });
 
-	const baseAlternatives = generateAlternatives({
+	const { suggestion, alternatives } = generateAlternatives({
 		ptoDays: effectivePtoDays,
 		candidates,
 		maxAlternatives,
@@ -97,17 +98,9 @@ export function runPlanningPipeline({
 		preferredMonths,
 	});
 
-	const suggestion = measure(baseSuggestion);
-	const { totalEffectiveDays, averageEfficiency } = suggestion.metrics;
-
 	return {
 		planned: true,
-		suggestion,
-		alternatives: baseAlternatives
-			.map(measure)
-			.filter(
-				({ metrics }) =>
-					metrics.totalEffectiveDays <= totalEffectiveDays && metrics.averageEfficiency <= averageEfficiency,
-			),
+		suggestion: measure(suggestion),
+		alternatives: alternatives.map(measure),
 	};
 }

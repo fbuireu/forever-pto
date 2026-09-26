@@ -5,6 +5,38 @@ import { PTO_CONSTANTS } from "../const";
 import type { Bridge } from "../types";
 import { createHolidaySet, getKey } from "./cache";
 
+interface ExpandThroughFreeDaysParams {
+	first: Date;
+	last: Date;
+	holidaySet: Set<string>;
+}
+
+interface IsFreeDayParams {
+	date: Date;
+	holidaySet: Set<string>;
+}
+
+const isFreeDay = ({ date, holidaySet }: IsFreeDayParams) => isWeekend(date) || holidaySet.has(getKey(date));
+
+const expandThroughFreeDays = ({ first, last, holidaySet }: ExpandThroughFreeDaysParams) => {
+	let start = first;
+	let end = last;
+
+	let current = addDays({ date: first, days: -1 });
+	for (let steps = 0; isFreeDay({ date: current, holidaySet }) && steps < PTO_CONSTANTS.SAFETY_LIMIT; steps++) {
+		start = current;
+		current = addDays({ date: current, days: -1 });
+	}
+
+	current = addDays({ date: last, days: 1 });
+	for (let steps = 0; isFreeDay({ date: current, holidaySet }) && steps < PTO_CONSTANTS.SAFETY_LIMIT; steps++) {
+		end = current;
+		current = addDays({ date: current, days: 1 });
+	}
+
+	return { start, end };
+};
+
 interface AnalyzePotentialBridgesParams {
 	ptoDays: Date[];
 	holidaySet: Set<string>;
@@ -13,7 +45,6 @@ interface AnalyzePotentialBridgesParams {
 function analyzePotentialBridge({ ptoDays, holidaySet }: AnalyzePotentialBridgesParams) {
 	if (ptoDays.length === 0) return null;
 	const {
-		SAFETY_LIMIT,
 		EFFICIENCY: { BLOCK_MINIMUM },
 	} = PTO_CONSTANTS;
 
@@ -27,8 +58,8 @@ function analyzePotentialBridge({ ptoDays, holidaySet }: AnalyzePotentialBridges
 		const prevDay = addDays({ date: day, days: -1 });
 		const nextDay = addDays({ date: day, days: 1 });
 
-		const prevIsFree = isWeekend(prevDay) || holidaySet.has(getKey(prevDay));
-		const nextIsFree = isWeekend(nextDay) || holidaySet.has(getKey(nextDay));
+		const prevIsFree = isFreeDay({ date: prevDay, holidaySet });
+		const nextIsFree = isFreeDay({ date: nextDay, holidaySet });
 
 		if (prevIsFree || nextIsFree) {
 			hasAdjacentFreeDay = true;
@@ -40,26 +71,11 @@ function analyzePotentialBridge({ ptoDays, holidaySet }: AnalyzePotentialBridges
 		return null;
 	}
 
-	let effectiveStart = firstDay;
-	let effectiveEnd = lastDay;
-
-	let current = addDays({ date: firstDay, days: -1 });
-	let expansionCount = 0;
-
-	while ((isWeekend(current) || holidaySet.has(getKey(current))) && expansionCount < SAFETY_LIMIT) {
-		effectiveStart = current;
-		current = addDays({ date: current, days: -1 });
-		expansionCount++;
-	}
-
-	current = addDays({ date: lastDay, days: 1 });
-	expansionCount = 0;
-
-	while ((isWeekend(current) || holidaySet.has(getKey(current))) && expansionCount < SAFETY_LIMIT) {
-		effectiveEnd = current;
-		current = addDays({ date: current, days: 1 });
-		expansionCount++;
-	}
+	const { start: effectiveStart, end: effectiveEnd } = expandThroughFreeDays({
+		first: firstDay,
+		last: lastDay,
+		holidaySet,
+	});
 
 	const effectiveDays = differenceInDays({ dateLeft: effectiveEnd, dateRight: effectiveStart }) + 1;
 	const efficiency = effectiveDays / ptoDays.length;
@@ -175,4 +191,20 @@ export const findBridges = ({ availableWorkdays, holidays }: FindBridgesParams) 
 	}
 
 	return bridges.sort((a, b) => compareByEfficiency({ a, b }));
+};
+
+interface FreeDaysAroundParams {
+	days: Date[];
+	holidays: HolidayDTO[];
+}
+
+export const freeDaysAround = ({ days, holidays }: FreeDaysAroundParams) => {
+	const holidaySet = createHolidaySet(holidays);
+
+	return days.flatMap((day) => {
+		const { start, end } = expandThroughFreeDays({ first: day, last: day, holidaySet });
+		return Array.from({ length: differenceInDays({ dateLeft: end, dateRight: start }) + 1 }, (_, offset) =>
+			addDays({ date: start, days: offset }),
+		);
+	});
 };

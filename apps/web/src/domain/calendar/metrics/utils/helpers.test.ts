@@ -1,5 +1,6 @@
 import { HolidayVariant } from "@application/dto/holiday/types";
 import { describe, expect, it } from "vitest";
+import { PTO_CONSTANTS } from "../../const";
 import {
 	calculateLongestVacation,
 	calculateLongWeekends,
@@ -11,6 +12,7 @@ import {
 	getMonthlyDist,
 	getTotalEffectiveDays,
 	getWorkedDaysPerMonth,
+	restBlocksOf,
 } from "./helpers";
 import { freeStreaks } from "./streaks";
 
@@ -614,5 +616,26 @@ describe("getTotalEffectiveDays only counts days that are still free", () => {
 		];
 
 		expect(effectiveDaysOf({ days: [makeDate({ year: 2025, month: 1, day: 8 })], holidays })).toBe(1);
+	});
+});
+
+const janDay = (day: number) => new Date(2025, 0, day);
+
+describe("restBlocksOf", () => {
+	it("groups days no further apart than REST_BLOCK_SEPARATION_DAYS, in calendar order", () => {
+		const blocks = restBlocksOf([new Date(2025, 2, 3), janDay(3), new Date(2025, 2, 4)]);
+
+		expect(blocks.map((block) => block.length)).toEqual([1, 2]);
+	});
+
+	it("keeps two days exactly REST_BLOCK_SEPARATION_DAYS apart in one block and splits them one day further", () => {
+		const separation = PTO_CONSTANTS.METRICS.REST_BLOCK_SEPARATION_DAYS;
+
+		expect(restBlocksOf([janDay(1), janDay(1 + separation)])).toHaveLength(1);
+		expect(restBlocksOf([janDay(1), janDay(2 + separation)])).toHaveLength(2);
+	});
+
+	it("answers no blocks for no days", () => {
+		expect(restBlocksOf([])).toEqual([]);
 	});
 });

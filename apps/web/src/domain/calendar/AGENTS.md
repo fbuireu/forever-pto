@@ -13,7 +13,7 @@ in [`CONTEXT.md`](../../../../../CONTEXT.md).
 
 | File | Contents |
 | --- | --- |
-| [`types.ts`](./types.ts) | `Bridge`, `Suggestion`, `Metrics`, `FirstLastBreak`, the `FilterStrategy` const object plus its type, and the two pairs that guard the wire: `isFilterStrategy` with `DEFAULT_FILTER_STRATEGY`, and `isPreferredMonths` with `DEFAULT_PREFERRED_MONTHS` |
+| [`types.ts`](./types.ts) | `Bridge`, `Suggestion`, `Metrics`, `FirstLastBreak`, the `FilterStrategy` const object plus its type, and the pair that guards the wire: `isFilterStrategy` and `DEFAULT_FILTER_STRATEGY`. It imports nothing, because the docs site reads it by relative path |
 | [`const.ts`](./const.ts) | `PTO_CONSTANTS`: every tunable in the engine; the unit and meaning of each are in [Constants](#constants) below |
 | [`utils/cache.ts`](./utils/cache.ts) | `getKey`, `getCombinationKey`, `createHolidaySet`, and the `clear*` functions the caller must use |
 | [`utils/helpers.ts`](./utils/helpers.ts) | `getAvailableWorkdays` (Workday enumeration) and `findBridges` (candidate generation and ranking) |
@@ -21,15 +21,16 @@ in [`CONTEXT.md`](../../../../../CONTEXT.md).
 | [`utils/selection.ts`](./utils/selection.ts) | `resolveSelectedDays`: folds Manual Days in and Removed Days out of a Suggestion's day list |
 | [`utils/budget.ts`](./utils/budget.ts) | `measureBudget`: how much of the PTO budget a plan has spent, and the Remaining Budget |
 | [`suggestions/generateSuggestions.ts`](./suggestions/generateSuggestions.ts) | The entry point: Workdays → Bridges → Strategy selector → Suggestion |
-| [`suggestions/utils/selectors.ts`](./suggestions/utils/selectors.ts) | `STRATEGY_OBJECTIVE` (one `Objective` per Strategy: a marginal floor and a rank), `objectiveFor` (the one fallback), `selectBridges`, the single selector they all feed and the one owner of the chronological day order, and `selectBridgesForStrategy` which composes them. It counts days with `dayIndex` from `@application/shared/utils/dates` and quarters with `quarterIndex` |
-| [`window.ts`](./window.ts) | `PlanningWindow` and both of its projections, `planningWindowMonths` (the month array) and `planningWindowInterval`/`isInPlanningWindow` (the interval), plus `MONTHS_IN_YEAR`, `MONTHS_IN_QUARTER`, `QUARTERS_IN_YEAR`, `MAX_CARRY_OVER_MONTHS`, `windowMonthCount`/`windowQuarterCount` and `quarterIndex`, which numbers a date's quarter continuously across years so a Carry-over quarter never folds onto the first |
+| [`suggestions/utils/selectors.ts`](./suggestions/utils/selectors.ts) | `STRATEGY_OBJECTIVE` (one `Objective` per Strategy: a marginal floor and a rank), `objectiveFor` (the one fallback), `selectBridges`, the single selector they all feed and the one owner of the chronological day order, and `selectBridgesForStrategy` which composes them, plus `PlanMeasures`, the facts an `aim` reads. It counts days with `dayIndex` from `@application/shared/utils/dates` |
+| [`suggestions/utils/stretches.ts`](./suggestions/utils/stretches.ts) | `workStretchesOf` and `longestWorkStretch`: Workdays grouped into stretches of work that only a Free Day on a weekday ends, the one reading of the rule the selector and the Alternatives share |
+| [`window.ts`](./window.ts) | `PlanningWindow` and both of its projections, `planningWindowMonths` (the month array) and `planningWindowInterval`/`isInPlanningWindow` (the interval), plus `MONTHS_IN_YEAR`, `MONTHS_IN_QUARTER`, `MAX_CARRY_OVER_MONTHS`, `windowMonthCount`/`windowQuarterCount`, and the Preferred Months pair `isPreferredMonths` with `DEFAULT_PREFERRED_MONTHS`, kept here rather than in `types.ts` because the docs site imports `types.ts` by relative path and it must stay import-free |
 | [`pipeline.ts`](./pipeline.ts) | `runPlanningPipeline`, the whole run: caches, pseudo-Holidays, budget, the planning calls and the Metrics |
 | [`alternatives/generateAlternatives.ts`](./alternatives/generateAlternatives.ts) | Re-runs selection under the other Strategies and without one Rest Block of the Suggestion at a time, keeping plans at least `MIN_DIFFERENCE` apart |
-| [`alternatives/utils/helpers.ts`](./alternatives/utils/helpers.ts) | `planDistance` (one minus the Jaccard index of two day sets), `coveredDays` (the days a plan's spans and placed days cover, the ceiling an Alternative may not pass) and `restBlocksOf` (a plan's Rest Blocks, largest first) |
+| [`alternatives/utils/helpers.ts`](./alternatives/utils/helpers.ts) | `planDistance` (one minus the Jaccard index of two day sets), `coveredDays` (the days a plan's spans, placed days and `alreadyOff` cover) and `measurePlan` (the `PlanMeasures` an `aim` ranks a plan by) |
 | [`metrics/generateMetrics.ts`](./metrics/generateMetrics.ts) | Assembles the `Metrics` object for a Suggestion or an Alternative |
 | [`metrics/utils/dayOff.ts`](./metrics/utils/dayOff.ts) | `dayKey` and `dayOffKeys`: the one spelling of a day's identity and of the set of days a plan leaves free, which every metric below counts against |
 | [`metrics/utils/streaks.ts`](./metrics/utils/streaks.ts) | `freeStreaks`: the one scan of the free-day runs the plan produces |
-| [`metrics/utils/helpers.ts`](./metrics/utils/helpers.ts) | One function per metric (Long Weekends, Rest Blocks, Max Work Streak, Longest Vacation, Worked Days per month, quarterly and monthly distribution) plus `windowMonthIndex`, which places a date in one of the buckets `window.ts` sizes |
+| [`metrics/utils/helpers.ts`](./metrics/utils/helpers.ts) | One function per metric (Long Weekends, Rest Blocks, Max Work Streak, Longest Vacation, Worked Days per month, quarterly and monthly distribution) plus `windowMonthIndex`, which places a date in one of the buckets `window.ts` sizes, `restBlocksOf`, the one owner of the Rest Block separation rule, and `getBridgesInUse` |
 
 ## Public API
 
@@ -62,7 +63,7 @@ The generators below are still exported and still tested on their own, but nothi
 calls them directly:
 
 - `generateSuggestions({ ptoDays, candidates, strategy })` → `{ days, bridges?, strategy }`
-- `generateAlternatives({ ptoDays, candidates, maxAlternatives, existingSuggestion, strategy })` → `Suggestion[]`
+- `generateAlternatives({ ptoDays, candidates, maxAlternatives, existingSuggestion, strategy, preferredMonths? })` → `{ suggestion, alternatives }`, the best plan the chosen Strategy found and the ones offered beside it
 - `generateMetrics({ suggestion, locale, planningWindow, holidays, allowPastDays, manuallySelectedDays, removedSuggestedDays })` → `Metrics`
 
 **`measureBudget` is the one place the budget arithmetic lives, and it is built on `resolveSelectedDays` so it
@@ -82,7 +83,7 @@ else under `utils/` and [`suggestions/utils/`](./suggestions/utils) is internal.
 
 **Both `manuallySelectedDays` and `removedSuggestedDays` are required, and neither defaults.** They used to
 default to `[]`, and a caller that omitted them got Metrics measured against the days
-the engine placed *by itself*, while `getTotalEffectiveDays` still counts Bridge spans that ran straight
+the engine placed *by itself*, while the Effective Days of that time were the union of Bridge spans, and those ran straight
 through the Manual Days: the pseudo-Holidays make them Free Days for the expansion. Efficiency
 (`totalEffectiveDays / days.length`) and Bonus Days (`totalEffectiveDays - days.length`) were then inflated by
 every Manual Day a span covered, and so were the monthly and quarterly distributions. Both planning pipelines
@@ -166,14 +167,16 @@ used to take a whole `Suggestion` *and* a separate `bridges` array, then read `d
 from the other and never `suggestion.bridges`. Both production callers passed the same object's own field
 straight back in, and nothing stopped them disagreeing: `bridgesUsed` could be
 measured against Bridges that did not belong to the days being measured, which is the precise pairing
-`getValidBridges` exists to keep together. One fixture in the test file was already built that way, a
+`getBridgesInUse` exists to keep together. One fixture in the test file was already built that way, a
 `suggestion` with no `bridges` beside a top-level `bridges`. That fixture no longer compiles, which is the
 point.
 
 ## The pipeline, in order
 
-1. `generateSuggestions` drops Holidays that fall on a weekend. They are already Free Days, and keeping
-   them would let a Bridge claim credit for absorbing a Saturday.
+1. `findPlanningCandidates` hands every Holiday to `createHolidaySet`, which drops the ones that fall on a
+   weekend: they are already Free Days, and keeping them would let a Bridge claim credit for absorbing a Saturday.
+   It also expands every Manual Day through the Free Days around it into `alreadyOff`, the days the plan has before
+   it takes a single Bridge.
 2. `getAvailableWorkdays` walks each month of the expanded window day by day and keeps the Workdays: not
    a weekend, not a Holiday, not one of `removedDays`, and (unless `allowPastDays`) not before today. It has
    no other notion of range, and a duplicated month would yield duplicated Workdays, which is why the
@@ -186,7 +189,9 @@ point.
    `effectiveDays`; that order is no longer a ranking, only the last tie-break every objective falls back to.
 4. `selectBridges` builds the plan one Bridge at a time: at every step it re-measures each candidate against the
    days the plan already covers and takes the best one under the Strategy's `Objective`.
-5. `generateMetrics` measures the outcome, separately, from the day list, not from the selector.
+5. `generateAlternatives` searches for other plans and hands back the best one the chosen Strategy found as the
+   Suggestion, with the Alternatives beside it.
+6. `generateMetrics` measures the outcome, separately, from the day list, not from the selector.
 
 ## Strategies
 
@@ -196,9 +201,9 @@ far. The marginal gain is the days a Bridge's span adds to what the plan already
 
 | Strategy | Floor | Rank, most significant first |
 | --- | --- | --- |
-| `OPTIMIZED` | `MINIMUM` | Marginal gain, then the length of the break it ends up in, then distance from the breaks already taken |
-| `GROUPED` | `BLOCK_MINIMUM` | Break length capped at `GROUPED_MAX_BLOCK_DAYS`, then marginal gain, then distance |
-| `BALANCED` | `MINIMUM` | Inside its quarter's share of the budget, then break length capped at `BALANCED_MAX_BLOCK_DAYS`, then marginal gain, then distance |
+| `OPTIMIZED` | `MINIMUM` | Marginal gain, then the length of the stretch off it ends up in, then distance from the stretches already taken |
+| `GROUPED` | `BLOCK_MINIMUM` | Stretch length, counted up to `GROUPED_MAX_BLOCK_DAYS` and against it past that, then marginal gain, then distance |
+| `BALANCED` | `MINIMUM` | The longest stretch of work left in the year, then the relief it brings to the stretch it splits per PTO Day, then stretch length as `GROUPED` counts it with `BALANCED_MAX_BLOCK_DAYS`, then marginal gain, then distance |
 | `MAIN_VACATION` | `BLOCK_MINIMUM`, then `MINIMUM` | Two stages. First, only Bridges in the Preferred Months that start or join the one block, up to `MAIN_VACATION_BLOCK_DAYS`, ranked by block length, then marginal gain, then distance; then exactly `OPTIMIZED` |
 
 **An `Objective` may carry `admits` and `next`, and `MAIN_VACATION` is why.** `admits` filters the candidates a
@@ -222,24 +227,33 @@ to the order `findBridges` handed over, and only then.
 
 **The marginal gain is the fix, and a sorted list cannot express it.** The walk this replaced ranked each Bridge by
 the Efficiency it had alone, so a Friday and the Monday after it were each three days for one and together paid
-for their weekend twice: Optimized believed 80 Effective Days where the calendar held 55. Measured against what
+for their weekend twice: Optimized's Bridges summed to 80 Effective Days where the calendar held 55. Measured against what
 is covered, the Monday adds one day, falls under the floor and stays out. A sort is computed before the first
 pick, so no per-Strategy key could have fixed this; that is the alternative the ADR rejects.
 
-**Break length is the length after the Bridge is added, capped, and a cap that is passed costs a point per day.**
+**Stretch length is the length after the Bridge is added, and a cap that is passed costs a point per day.**
 `cappedRun` answers `min(runLength, cap) − max(0, runLength − cap)`. Plain `min` was tried first and let Grouped keep growing
 one block through the whole budget, because a 30-day block still scored the cap and won the tie on marginal gain
-against starting a second one. The penalty is what makes the next week of budget open a new block.
+against starting a second one. The penalty is what usually makes the next week of budget open a new block;
+a single candidate already past the cap can still win, so the cap is a target rather than a wall.
 
 **Distance is what spreads ties, and it is why no Strategy clusters in January.** Every Friday and Monday of a
 year is worth three for one, candidates are emitted in date order and the old sort was stable, so ties fell to
-the calendar and Optimized spent ten of 22 days before mid-February. The farthest candidate from the breaks
+the calendar and Optimized spent twelve of 22 days in January and February. The farthest candidate from the stretches
 already taken wins a tie now; the first pick of a run still falls to input order, because nothing is taken yet.
 
-**Balanced's quarter share is a strict first key, and it counts a Bridge's quarter by its first PTO Day.** The quota
-is the budget divided by the number of quarters the candidates cover, rounded up. A Bridge straddling a quarter
-boundary is charged whole to the quarter it starts in, so `quarterDist`, which counts days, can show a quarter
-one or two over its share. That is the price of keeping a Bridge indivisible, not a defect.
+**Balanced ranks by the longest stretch of work left, and a weekend does not end a stretch.** `selectBridges` takes
+the Workdays and groups them into work stretches (`workStretchesOf` in
+[`suggestions/utils/stretches.ts`](./suggestions/utils/stretches.ts)): two Workdays belong to one stretch when only
+weekend days lie between them, so a Holiday, a Manual Day or a Removed Day ends one. That is the rule
+`calculateMaxWorkStreak` applies, which is why Balanced's first key is the Max Work Streak the plan would leave.
+The second key is what makes it work: ranking by the maximum alone plateaus as soon as two stretches are equally
+long, because no single pick lowers the maximum and every candidate ties, and the tie then went to the longest
+Bridge, which spent the budget in Easter blocks and left a 55-day stretch. The relief a pick brings, the stretch's
+length squared less its two remaining pieces squared, per PTO Day, prefers cutting the longest stretches near
+their middle with single days. Over a real year Balanced then places a long weekend every two or three weeks and
+leaves the shortest Max Work Streak of every Strategy, which `strategies.test.ts` pins. A Removed Day ending a
+stretch is a simplification the metric does not share: it is rare, and it can only make Balanced cut sooner.
 
 **Grouped's floor is lower on purpose, and the search's floor is the lowest of them.** A week extending a block
 adds seven days for five, 1.4, which Optimized's floor of 2 would never let through, so Grouped carries
@@ -248,8 +262,8 @@ can never be taken by anyone, and `findBridges` prunes exactly there. `utils/hel
 `BLOCK_MINIMUM` equals the lowest floor in `STRATEGY_OBJECTIVE`: lower a Strategy's floor without lowering the
 constant and the prune silently drops what that Strategy wanted.
 
-**The gain, the break length and the distance are kept up to date, not recomputed.** After each pick only the
-candidates overlapping the new span need their gain again, only those touching the merged break need its length,
+**The gain, the stretch length and the distance are kept up to date, not recomputed.** After each pick only the
+candidates overlapping the new span need their gain again, only those touching the merged stretch need its length,
 and every distance is a `min` with the new span. Recomputing all three from scratch on every step made selection
 quadratic in the budget for no change in the plan; that is the regression to watch for if a new rank key needs a
 fact about the plan.
@@ -286,9 +300,9 @@ budgets: every weekend offers a Friday worth three.
 unfiltered.** It is tempting to narrow it to `isInPlanningWindow`, and that was tried and reverted. The
 planning calls receive the unfiltered list, `createHolidaySet` applies no window filter, and
 `analyzePotentialBridge` expands a Bridge's span straight through a next-year Holiday; the selector counts that
-span as gain, and `getTotalEffectiveDays` measures the same stretch from the streaks. Filtering only the *Metrics* input leaves Longest Vacation, Long Weekends
-and Long Blocks scanning a calendar missing the very day the span was built on, so they contradict Effective
-Days inside the same Metrics object. Whatever the engine plans against, the Metrics measure against.
+span as gain, and `getTotalEffectiveDays` measures the same stretch from the streaks. Filtering only the *Metrics* input would shorten every streak the span was built on, Effective Days
+included, so the Metrics would stop agreeing with what the selector and the Alternatives search counted when they
+chose the plan: a Suggestion could measure below an Alternative it was ranked above. Whatever the engine plans against, the Metrics measure against.
 
 That rule leaves the Metrics seeing Holidays from outside the Planning Window, and **the placed-day test is
 what stops them being counted as the plan's own work**: a stretch scores only when it contains a day the plan
@@ -391,48 +405,51 @@ inert (both selectors add a Bridge only when its PTO Days are unused, so a selec
 distinct available Workdays) and giving it to `generateAlternatives` for symmetry would be a behaviour change
 wearing a tidy-up's clothes.
 
-**`generateAlternatives` calls `selectBridges`, not `selectBridgesForStrategy`.** It needs the two parameters the
-Strategy entry point does not take: another Strategy's objective, and the days a run must leave out.
+**`generateAlternatives` calls `selectBridges`, not `selectBridgesForStrategy`.** It needs the parameters the
+Strategy entry point does not take: another Strategy's objective, and the days a run must leave out
+(`forbiddenDays`).
 
-**The Alternatives run the other Strategies first, then take the Suggestion apart one Rest Block at a time.** The
-other two objectives over the same candidates are the most different plans the engine can make. After them,
-each Rest Block of the Suggestion (`restBlocksOf`, largest first, the same seven-day separation the Rest Block
-metric uses) is excluded and the chosen objective re-run; every plan found that way is a seed whose own blocks are
-then excluded in turn, breadth first, with the exclusions accumulating. The number of selection runs is bounded
-by `ALTERNATIVES.RUNS_PER_ALTERNATIVE` per Alternative asked for, which is what bounds the cost.
+**The search runs the other Strategies first, then takes the plan apart one Rest Block at a time.** The other
+objectives over the same candidates are the most different plans the engine can make. After them, each Rest Block
+of the Suggestion (`restBlocksOf`, the one owner of the Rest Block rule in
+[`metrics/utils/helpers.ts`](./metrics/utils/helpers.ts), taken largest first) is forbidden and the chosen objective
+re-run; every new plan found that way becomes a seed whose own blocks are forbidden in turn, breadth first. A set of
+forbidden days already tried, or a plan already seen, is skipped before it costs a run, and the runs are bounded by
+`ALTERNATIVES.RUNS_PER_ALTERNATIVE` per Alternative asked for.
+
+**The Suggestion is the best plan the chosen Strategy found, not the first one.** Greedy selection is not optimal,
+so a re-run with a block forbidden can land on a better plan than the one it started from. Every plan the chosen
+objective produced (the greedy Suggestion and its re-runs) is ranked by the objective's `aim` over `measurePlan`,
+then by Effective Days, then by Efficiency, and the leader becomes the Suggestion; the greedy plan it replaced is
+offered among the Alternatives instead. The `aim` is what the Strategy is for: Effective Days for `OPTIMIZED`, the
+longest stretch off for `GROUPED`, the shortest Max Work Streak for `BALANCED`, the longest stretch off in the
+Preferred Months for `MAIN_VACATION`. Ranking every Strategy by Effective Days was tried first and made each of
+them Optimized with extra steps: Balanced's Max Work Streak went from 14 back to 53.
+
+**No Alternative beats the Suggestion on Effective Days or Efficiency, and that is what makes it an alternative.**
+Once the leader is known, every other plan, the other Strategies' included, is offered only when its Effective Days
+and its Efficiency are both at most the Suggestion's. A re-run with more days but a worse `aim` is neither: it cannot
+lead, and offering it would present more days than the recommendation. So for `OPTIMIZED` the other Strategies'
+plans are usually offered, and for the others the `OPTIMIZED` plan is refused whenever it covers more days, which
+over a real calendar is every time.
+
+**The measure is exact, Manual Days included, so nothing downstream has to filter again.** `measurePlan` counts the
+union of the plan's spans, its placed days and `alreadyOff`, which is exactly the free streaks the Metrics count.
+The pipeline used to re-check the measured Metrics after the search and drop what exceeded them; because the
+search's measure then missed the streaks around Manual Days, that filter dropped plans the search had already
+spent its runs on and the list came back short. With one measure there is one check, and `strategies.test.ts`
+pins four Alternatives, none ahead, with Manual Days placed.
 
 **Distinct is a distance, not disjointness.** `planDistance` is one minus the Jaccard index of two day sets, and a
-plan is offered only when it is at least `ALTERNATIVES.MIN_DIFFERENCE` from the Suggestion and every Alternative
-kept. The old rule removed every Bridge touching the Suggestion before searching, which took the best Bridges out
-of every Alternative, and two of its seven orderings started from the worst Bridges on purpose; together they
-guaranteed Alternatives worse than the Suggestion. `generateAlternatives.test.ts` pins that an Alternative may
-now keep the Suggestion's strongest Bridge.
+plan is kept only when it is at least `ALTERNATIVES.MIN_DIFFERENCE` from the Suggestion and every plan already kept.
+The old rule removed every Bridge touching the Suggestion before searching, which took the best Bridges out of every
+Alternative, and two of its seven orderings started from the worst Bridges on purpose.
 
-**No Alternative beats the Suggestion, and that is what makes it an alternative.** The Suggestion is the
-recommendation; an Alternative trades some of its Effective Days or its Efficiency for a different shape of year,
-never the other way round. It has to be enforced, because the other Strategies' plans are among the seeds: for a
-`GROUPED` Suggestion the `OPTIMIZED` plan covers far more days, and offering it would tell every Grouped user
-their plan was the worse one. Two layers hold it:
-
-- `generateAlternatives` refuses a plan whose `coveredDays` (the union of its Bridges' spans and its placed days)
-  exceeds the Suggestion's, or whose `coveredDays` per placed day does, so the search keeps looking instead of
-  returning a short list. Without Manual Days `coveredDays` is exactly the measured Effective Days, which is the
-  property `strategies.test.ts` already pins for the Suggestion.
-- `runPlanningPipeline` re-checks the **measured** Effective Days and Efficiency of each Alternative against the
-  Suggestion's and drops any that exceeds them. A Manual Day can make the two measures part company (it is a
-  stretch in the Metrics whether or not a span reaches it), and the rule is about what the user sees.
-
-So for `OPTIMIZED` the other Strategies' plans are usually offered, since they cover fewer days, and for
-`GROUPED` and `BALANCED` the `OPTIMIZED` plan is refused whenever it covers more, which over a real calendar
-is every time.
-
-**Every Alternative is stamped with the Strategy that found it, not the one the user chose.** The other
-Strategies' plans carry their own value in `strategy`, the Rest Block re-runs carry the chosen one. Nothing in
-the planner renders a Suggestion's `strategy` (the sidebar and the Summary read the filters store), so the field
-is free to say where a plan came from, and the Summary needs exactly that: its "alternatives that add more days"
-notice compares the plan on screen only with the Alternatives whose `strategy` is the chosen one. With the ceiling
-above, that notice can only fire on a hand-edited plan that fell below one of them, which is what it is for; a
-Grouped user is never told the Optimized plan has more days, because that is what choosing Grouped means.
+**Every Alternative is stamped with the Strategy that found it, not the one the user chose.** Nothing in the planner
+renders a Suggestion's `strategy` except the Summary, which names the Strategy of the plan on screen, so the field is
+free to say where a plan came from. The Summary's "alternatives that add more days" notice compares the plan on
+screen only with the Alternatives whose `strategy` is the chosen one, so it speaks up when a hand edit, or an applied
+Alternative, leaves the plan behind one of them, and never to tell a Grouped user that Optimized covers more.
 
 **Bonus Days are measured against days placed, not the budget, and `generateMetrics` no longer takes the
 budget at all.** It computes `bonusDays = totalEffectiveDays − days.length`; the baseline is what the plan
@@ -457,21 +474,24 @@ Vacation takes the maximum of, so the two cannot contradict each other. It used 
 whose every PTO Day was still placed, plus the placed days themselves, and that had two faults: a lone Manual Day
 on a Friday counted one where Longest Vacation counted three, and removing one day of a two-day Bridge discarded
 its whole span, so the Friday left behind counted one beside the weekend it still led into. Both read the same
-from the streaks now, and the re-check that stopped a span outliving a Manual Day handed back is gone with the
-spans: a day that is a workday again ends the streak by construction.
+from the streaks now, and a day that is a workday again ends the streak by construction.
 
-**It equals the selector's own belief, and that is the property to keep.** The union of the chosen Bridges' spans
-is exactly the free streaks containing their PTO Days, because each span already expanded through every adjacent
-Free Day. [`strategies.test.ts`](./strategies.test.ts) asserts the two are equal for every Strategy over a real
-calendar; the walk this replaced was 25 days apart on the same assertion.
+**It equals what the engine counted when it chose the plan, and that is the property to keep.** The union of the
+chosen Bridges' spans and `alreadyOff` is exactly the free streaks containing the placed days, because each span
+already expanded through every adjacent Free Day and `alreadyOff` is each Manual Day's own streak.
+[`strategies.test.ts`](./strategies.test.ts) asserts it for every Strategy over a real calendar.
 
-**`bridgesUsed` counts the Bridges that survived, not the ones the plan was born with.** It was
-`bridges?.length`, taken straight from the array the caller passed, while Effective Days had already
-discarded some, so a two-day Bridge with one day removed left the card reading
-"Bridges used: 1" beside an Efficiency of exactly 1.0 and no Bonus Days, describing bridging that was no
-longer happening. It comes from `getValidBridges` now, which keeps a Bridge only while every one of its PTO Days is placed. `toggleDaySelection` never re-derives
-`currentSelection.bridges` and starts no worker run, so they would otherwise stay out of step until an
-unrelated change forced a re-plan.
+**The selector keeps the Manual Days' streaks apart from what it took.** `alreadyOff` enters a separate set that
+only the gain reads: a Bridge next to a Manual Day's weekend gains nothing for that weekend, which is the defect
+this closed (a Friday before a Manual Monday used to rank at four for one and add one). The covered set, the stretch
+length and `joinsBreak` stay about the Bridges taken, because Main Vacation's first stage asks whether a candidate
+joins its block, and a Manual Day's weekend is not the block.
+
+**`bridgesUsed` counts the Bridges still in use: those with at least one PTO Day still placed.** It was
+`bridges?.length` first, straight from the array the caller passed, and then only the Bridges whose every PTO Day
+was placed. The second rule agreed with the Effective Days of its time, which dropped a partly removed Bridge's whole
+span; the streaks keep whatever stretch the remaining days still reach, so a Thursday and Friday Bridge that loses
+its Thursday still leads into the weekend, and the card now says so. `getBridgesInUse` is the filter.
 
 **`removedDays` reaches `getAvailableWorkdays` and nothing else, on purpose.** A Removed Day is a date the
 user has told us they *will work*: the planner must not place it, but it is not a Free Day. Passing it into
@@ -480,7 +500,7 @@ time and expand a Bridge through it, inflating `effectiveDays` and therefore Eff
 that touches it. Dropping the date from the Workday list is the whole mechanism; there is deliberately no
 second consumer.
 
-**The metrics year is passed in, not inferred.** `generateMetrics` takes a required `year` and hands it to
+**The metrics year is passed in, not inferred.** `generateMetrics` reads `year` off the `PlanningWindow` it is handed and passes it to
 `calculateMaxWorkStreak` and `getWorkedDaysPerMonth`, which both scope themselves to one calendar year.
 It cannot be derived from the plan: the Planning Window runs into the following year through the Carry-over
 Months, so the first placed day may sit in `year + 1`. Nor can it come from `holidays`: that set spans both
@@ -521,7 +541,7 @@ stretch straddling the edge of the data is still counted whole.
 **`generateMetrics` has one construction of `Metrics`, and used to have more.** A zero-day guard hand-built
 every field, nearly all of them byte-for-byte what the helpers already answer for an empty day
 list: `getMonthlyDist`, `calculateQuarterDistribution` and `getLongBlocksPerQuarter` size themselves from
-the Planning Window and fill zeros, `freeStreaks` short-circuits to `[]`, `getValidBridges` filters
+the Planning Window and fill zeros, `freeStreaks` short-circuits to `[]`, `getBridgesInUse` filters
 everything out, `calculateRestBlocks` and `getFirstLastBreak` have their own empty answers. Only the
 Efficiency division needs a guard, because `0 / 0` is `NaN`.
 
@@ -587,12 +607,12 @@ behaviour change and expect the selector tests to move.
 | `EFFICIENCY.BLOCK_MINIMUM` | 1.4 | Efficiency ratio. The marginal floor of `GROUPED`, seven days for five, and the admission floor of `findBridges`; it must stay the lowest floor any Strategy applies |
 | `BRIDGE_SEARCH.MIN_MULTI_DAY_SIZE` | 2 | Consecutive Workdays. Smallest multi-day candidate tried, in addition to the single-day ones |
 | `BRIDGE_SEARCH.MAX_MULTI_DAY_SIZE` | 5 | Consecutive Workdays. Largest multi-day candidate tried: a working week |
-| `SELECTION.GROUPED_MAX_BLOCK_DAYS` | 16 | Days. The break length `GROUPED` grows a block up to, two weeks and both weekends; each day past it costs a point |
-| `SELECTION.BALANCED_MAX_BLOCK_DAYS` | 9 | Days. The break length `BALANCED` prefers up to, a week and both weekends, penalised past it the same way |
+| `SELECTION.GROUPED_MAX_BLOCK_DAYS` | 16 | Days. The stretch length `GROUPED` grows a block towards, two weeks and both weekends; each day past it costs a point |
+| `SELECTION.BALANCED_MAX_BLOCK_DAYS` | 9 | Days. The stretch length `BALANCED` counts towards in its third rank key, a tie-break after the work stretch and the relief; penalised past it the way `GROUPED`'s cap is |
 | `SELECTION.MAIN_VACATION_BLOCK_DAYS` | 16 | Days. The longest block `MAIN_VACATION` builds in the Preferred Months; a hard admission limit, not a penalised cap |
 | `SELECTION.RANK_TOLERANCE` | 1e-9 | Rank values closer than this are a tie and the next key decides; the gain is a float division |
 | `ALTERNATIVES.MIN_DIFFERENCE` | 0.25 | Share of two plans' combined days they must not have in common for both to be offered |
-| `ALTERNATIVES.RUNS_PER_ALTERNATIVE` | 6 | Selection runs the Alternatives may spend per Alternative asked for; bounds the cost, not the result |
+| `ALTERNATIVES.RUNS_PER_ALTERNATIVE` | 10 | Selection runs the Alternatives may spend per Alternative asked for; bounds the cost, not the result |
 | `METRICS.LONG_BLOCK_MINIMUM_DAYS` | 3 | Consecutive days. Below this a Rest Block is not a Long Block |
 | `METRICS.LONG_WEEKEND_MINIMUM_DAYS` | 3 | Consecutive Free Days. The floor for a Long Weekend, which must also contain a weekend and a placed day |
 | `METRICS.REST_BLOCK_SEPARATION_DAYS` | 7 | Days. Two placed days further apart than this are separate Rest Blocks. **Not the same value** as the scan margin below, and they are free to move independently |

@@ -163,7 +163,7 @@
 				},
 				"strategies": {
 					"question": "¿Cuál es la diferencia entre las estrategias \"agrupada\", \"optimizada\", \"equilibrada\" y \"vacación principal\"?",
-					"answer": "Optimizada te da el máximo de días libres efectivos por cada día de PTO, sobre todo en puentes repartidos por el año. Agrupada cede parte de esa eficiencia a cambio de unas pocas vacaciones largas de hasta dos semanas. Equilibrada queda en medio: da a cada trimestre su parte del presupuesto y prefiere descansos de hasta una semana. Vacación principal coloca un bloque largo de hasta dos semanas en los meses que elijas y reparte el resto como Optimizada."
+					"answer": "Optimizada te da el máximo de días libres efectivos por cada día de PTO, sobre todo en fines de semana largos repartidos por el año. Agrupada cede parte de esa eficiencia a cambio de unas pocas vacaciones largas de unas dos semanas. Equilibrada se asegura de que nunca trabajes demasiado tiempo sin descansar: coloca un fin de semana largo cada pocas semanas para que ninguna racha de trabajo se alargue. Vacación principal coloca un bloque largo de hasta dos semanas en los meses que elijas y reparte el resto como Optimizada."
 				},
 				"results": {
 					"question": "¿Por qué cambian las recomendaciones cuando actualizo preferencias o festivos?",
@@ -502,7 +502,7 @@
 			"grouped": {
 				"label": "Agrupada",
 				"description": "Pocas vacaciones largas",
-				"subtitle": "Crea bloques de hasta dos semanas alrededor de los festivos",
+				"subtitle": "Crea bloques de unas dos semanas alrededor de los festivos",
 				"pros": {
 					"longVacations": "Vacaciones largas",
 					"wholeWeeks": "Semanas enteras libres"
@@ -521,17 +521,17 @@
 					"moreDays": "Más días totales"
 				},
 				"cons": {
-					"shortBreaks": "Descansos cortos",
+					"shortBreaks": "Sobre todo fines de semana largos",
 					"noLongTrip": "Sin un viaje largo"
 				}
 			},
 			"balanced": {
 				"label": "Equilibrada",
-				"description": "Descansos repartidos durante el año",
-				"subtitle": "Cada trimestre recibe su parte, en descansos de hasta una semana",
+				"description": "Descanso cada pocas semanas",
+				"subtitle": "Nunca demasiado tiempo trabajando: un fin de semana largo cada pocas semanas",
 				"pros": {
-					"everyQuarter": "Un descanso cada trimestre",
-					"weekLongBreaks": "Descansos de hasta una semana"
+					"noLongStretch": "Sin rachas largas de trabajo",
+					"restAllYear": "Descanso todo el año"
 				},
 				"cons": {
 					"noMaximization": "No maximiza",

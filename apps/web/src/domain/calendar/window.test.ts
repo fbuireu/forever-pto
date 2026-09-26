@@ -1,26 +1,15 @@
 import { endOfMonth } from "@application/shared/utils/dates";
 import { describe, expect, it } from "vitest";
 import {
+	DEFAULT_PREFERRED_MONTHS,
+	isPreferredMonths,
 	MAX_CARRY_OVER_MONTHS,
 	MONTHS_IN_YEAR,
 	planningWindowInterval,
 	planningWindowMonths,
-	QUARTERS_IN_YEAR,
-	quarterIndex,
 	windowMonthCount,
 	windowQuarterCount,
 } from "./window";
-
-describe("quarterIndex", () => {
-	it("puts the three months of a quarter in one bucket and the next month in the next", () => {
-		expect(quarterIndex(new Date(2026, 0, 1))).toBe(quarterIndex(new Date(2026, 2, 31)));
-		expect(quarterIndex(new Date(2026, 3, 1))).toBe(quarterIndex(new Date(2026, 2, 31)) + 1);
-	});
-
-	it("carries on across the year, so a Carry-over quarter is not folded onto the first", () => {
-		expect(quarterIndex(new Date(2027, 0, 1)) - quarterIndex(new Date(2026, 0, 1))).toBe(QUARTERS_IN_YEAR);
-	});
-});
 
 describe("planningWindowMonths", () => {
 	it("starts at January of the chosen year, whatever the Carry-over Months", () => {
@@ -91,5 +80,22 @@ describe("MAX_CARRY_OVER_MONTHS", () => {
 		expect(
 			planningWindowInterval({ year, carryOverMonths: MAX_CARRY_OVER_MONTHS + 1 }).end.getFullYear(),
 		).toBeGreaterThan(year + 1);
+	});
+});
+
+describe("isPreferredMonths", () => {
+	it.each([[[]], [[0]], [[6, 7]], [[0, 11]]])("accepts %o", (value) => {
+		expect(isPreferredMonths(value)).toBe(true);
+	});
+
+	it.each([[[12]], [[-1]], [[6, 6]], [[1.5]], [["6"]], ["6,7"], [null], [undefined], [{}]])(
+		"rejects %o, which a hand-edited persisted blob or a stale worker message could carry",
+		(value) => {
+			expect(isPreferredMonths(value)).toBe(false);
+		},
+	);
+
+	it("accepts the default it is paired with", () => {
+		expect(isPreferredMonths([...DEFAULT_PREFERRED_MONTHS])).toBe(true);
 	});
 });

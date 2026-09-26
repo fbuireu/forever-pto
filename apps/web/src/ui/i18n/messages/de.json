@@ -163,7 +163,7 @@
 				},
 				"strategies": {
 					"question": "Was ist der Unterschied zwischen \"gruppiert\", \"optimiert\", \"ausgewogen\" und \"Haupturlaub\"?",
-					"answer": "Optimiert holt die meisten effektiven freien Tage pro PTO-Tag heraus, vor allem als Brückentage über das Jahr verteilt. Gruppiert gibt einen Teil dieser Effizienz für wenige lange Urlaube von bis zu zwei Wochen auf. Ausgewogen liegt dazwischen: Jedes Quartal bekommt seinen Anteil am Budget, und Pausen von bis zu einer Woche werden bevorzugt. Haupturlaub legt einen langen Block von bis zu zwei Wochen in die Monate deiner Wahl und verteilt den Rest wie Optimiert."
+					"answer": "Optimiert holt die meisten effektiven freien Tage pro PTO-Tag heraus, vor allem als lange Wochenenden über das Jahr verteilt. Gruppiert gibt einen Teil dieser Effizienz für wenige lange Urlaube von etwa zwei Wochen auf. Ausgewogen sorgt dafür, dass du nie zu lange ohne Erholung arbeitest: Alle paar Wochen gibt es ein langes Wochenende, damit keine Arbeitsphase zu lang wird. Haupturlaub legt einen langen Block von bis zu zwei Wochen in die Monate deiner Wahl und verteilt den Rest wie Optimiert."
 				},
 				"results": {
 					"question": "Warum ändern sich meine Empfehlungen, wenn ich Einstellungen oder Feiertage anpasse?",
@@ -502,7 +502,7 @@
 			"grouped": {
 				"label": "Gruppiert",
 				"description": "Wenige lange Urlaube",
-				"subtitle": "Baut Blöcke von bis zu zwei Wochen rund um Feiertage",
+				"subtitle": "Baut Blöcke von etwa zwei Wochen rund um Feiertage",
 				"pros": {
 					"longVacations": "Lange Urlaube",
 					"wholeWeeks": "Ganze Wochen frei"
@@ -521,17 +521,17 @@
 					"moreDays": "Mehr Gesamttage"
 				},
 				"cons": {
-					"shortBreaks": "Kurze Pausen",
+					"shortBreaks": "Vor allem lange Wochenenden",
 					"noLongTrip": "Keine lange Reise"
 				}
 			},
 			"balanced": {
 				"label": "Ausgewogen",
-				"description": "Pausen über das Jahr verteilt",
-				"subtitle": "Jedes Quartal bekommt seinen Anteil, in Pausen von bis zu einer Woche",
+				"description": "Erholung alle paar Wochen",
+				"subtitle": "Nie zu lange am Stück arbeiten: alle paar Wochen ein langes Wochenende",
 				"pros": {
-					"everyQuarter": "Eine Pause pro Quartal",
-					"weekLongBreaks": "Pausen von bis zu einer Woche"
+					"noLongStretch": "Keine langen Arbeitsphasen",
+					"restAllYear": "Erholung das ganze Jahr"
 				},
 				"cons": {
 					"noMaximization": "Maximiert nicht",

@@ -142,8 +142,10 @@ The kinds of hand-edited day reach the engine by different routes, and that asym
   as free for Bridge expansion is correct. They additionally reach both `generateMetrics` calls **by name**,
   as `manuallySelectedDays: manualDates`, because a Metric needs to know not just that the day is free but
   that the user *paid* for it: without the parameter the denominator is the days the engine placed by itself
-  while the numerator still counts spans expanded through the manual ones, which inflates Efficiency and
-  Bonus Days. See the *Public API* section of
+  while the streaks the numerator counts still run through the manual ones, which inflates Efficiency and
+  Bonus Days. The pipeline also hands them to `findPlanningCandidates` as `manualDays`, which turns each into the
+  free streak around it (`alreadyOff`) so the selector does not count that streak as a Bridge's gain. See the
+  *Public API* section of
   [`@domain/calendar/AGENTS.md`](../../domain/calendar/AGENTS.md).
 - **Removed Days** are dates the user has told us they *will work*. They cross as ISO strings, are mapped
   straight to `Date` objects and are handed to `generateSuggestions` and `generateAlternatives` as

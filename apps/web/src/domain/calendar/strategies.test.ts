@@ -83,15 +83,23 @@ describe("the Strategies over a real calendar", () => {
 		expect(suggestionOf(strategy).metrics.averageEfficiency).toBeGreaterThanOrEqual(floor);
 	});
 
-	it("orders the Strategies along one axis: Effective Days one way, the longest break the other", () => {
+	it("orders Effective Days from OPTIMIZED through BALANCED to GROUPED, and gives GROUPED the longest break", () => {
 		const { OPTIMIZED, BALANCED, GROUPED } = FilterStrategy;
 		const effective = (strategy: FilterStrategy) => suggestionOf(strategy).metrics.totalEffectiveDays;
 		const longest = (strategy: FilterStrategy) => suggestionOf(strategy).metrics.longestVacation;
 
 		expect(effective(OPTIMIZED)).toBeGreaterThan(effective(BALANCED));
 		expect(effective(BALANCED)).toBeGreaterThan(effective(GROUPED));
-		expect(longest(GROUPED)).toBeGreaterThan(longest(BALANCED));
-		expect(longest(BALANCED)).toBeGreaterThan(longest(OPTIMIZED));
+		expect(longest(GROUPED)).toBeGreaterThan(longest(OPTIMIZED));
+	});
+
+	it("leaves BALANCED the shortest stretch of work of every Strategy", () => {
+		const balanced = suggestionOf(FilterStrategy.BALANCED).metrics.maxWorkStreak;
+
+		for (const strategy of Object.values(FilterStrategy)) {
+			expect(balanced).toBeLessThanOrEqual(suggestionOf(strategy).metrics.maxWorkStreak);
+		}
+		expect(balanced).toBeLessThan(suggestionOf(FilterStrategy.GROUPED).metrics.maxWorkStreak);
 	});
 
 	it("gives MAIN_VACATION its summer block first, then spends the rest like OPTIMIZED", () => {
@@ -112,10 +120,6 @@ describe("the Strategies over a real calendar", () => {
 
 	it("does not pile OPTIMIZED's ties into the first weeks of the year", () => {
 		expect(Math.max(...suggestionOf(FilterStrategy.OPTIMIZED).metrics.monthlyDist)).toBeLessThanOrEqual(3);
-	});
-
-	it("gives BALANCED a break in every quarter", () => {
-		expect(suggestionOf(FilterStrategy.BALANCED).metrics.quarterDist.every((count) => count > 0)).toBe(true);
 	});
 
 	it.each(Object.values(FilterStrategy))(
@@ -143,6 +147,30 @@ describe("the Strategies over a real calendar", () => {
 						PTO_CONSTANTS.ALTERNATIVES.MIN_DIFFERENCE,
 					);
 				}
+			}
+		},
+	);
+
+	it.each(Object.values(FilterStrategy))(
+		"%s keeps four Alternatives, none ahead of the Suggestion, when Manual Days are placed",
+		(strategy) => {
+			const { suggestion, alternatives } = runPlanningPipeline({
+				window: { year: 2026, carryOverMonths: 0 },
+				ptoDays: BUDGET,
+				holidays: SPAIN_2026,
+				manuallySelectedDays: [new Date(2026, 0, 9), new Date(2026, 2, 9), new Date(2026, 5, 22)],
+				removedSuggestedDays: [],
+				allowPastDays: true,
+				strategy,
+				preferredMonths: SUMMER,
+				locale: "en",
+				maxAlternatives: 4,
+			});
+
+			expect(alternatives).toHaveLength(4);
+			for (const { metrics } of alternatives) {
+				expect(metrics.totalEffectiveDays).toBeLessThanOrEqual(suggestion.metrics.totalEffectiveDays);
+				expect(metrics.averageEfficiency).toBeLessThanOrEqual(suggestion.metrics.averageEfficiency);
 			}
 		},
 	);

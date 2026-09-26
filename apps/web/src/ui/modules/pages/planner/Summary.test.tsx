@@ -249,6 +249,15 @@ describe("the banner that says a better plan exists", () => {
 		expect(container.textContent).not.toContain("4 more days");
 	});
 
+	it("names the Strategy that found the plan on screen, not only the one chosen in the sidebar", () => {
+		resetPlan();
+		holidaysState.currentSelection = { ...planOf([JAN(6)], 9), strategy: "optimized" };
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain(enMessages.sidebar.strategy.optimized.label);
+	});
+
 	it("ignores an Alternative carrying no metrics rather than counting it as nought", () => {
 		resetPlan();
 		holidaysState.alternatives = [null, planOf([JAN(6)], 7)];

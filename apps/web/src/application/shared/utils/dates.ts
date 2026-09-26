@@ -12,6 +12,11 @@ const MS_PER_DAY = 86_400_000;
 export const dayIndex = (date: Date): number =>
 	Math.round(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / MS_PER_DAY);
 
+export const fromDayIndex = (index: number): Date => {
+	const utc = new Date(index * MS_PER_DAY);
+	return new Date(utc.getUTCFullYear(), utc.getUTCMonth(), utc.getUTCDate());
+};
+
 export interface DatePairParams {
 	a: Date;
 	b: Date;

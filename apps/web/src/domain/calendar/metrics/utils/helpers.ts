@@ -66,38 +66,39 @@ export function getLongBlocksPerQuarter({ streaks, window }: GetLongBlocksPerQua
 	return longBlocksPerQuarter;
 }
 
-export interface GetValidBridgesParams {
+export interface GetBridgesInUseParams {
 	days: Date[];
 	bridges?: Bridge[];
 }
 
-export function getValidBridges({ days, bridges }: GetValidBridgesParams) {
+export function getBridgesInUse({ days, bridges }: GetBridgesInUseParams) {
 	if (!bridges || bridges.length === 0) return [];
 
 	const daysSet = new Set(days.map(dayKey));
 
-	return bridges.filter((bridge) => bridge.ptoDays.every((ptoDay) => daysSet.has(dayKey(ptoDay))));
+	return bridges.filter((bridge) => bridge.ptoDays.some((ptoDay) => daysSet.has(dayKey(ptoDay))));
 }
 
 export const getTotalEffectiveDays = (streaks: FreeStreak[]) =>
 	streaks.filter((streak) => streak.hasPlacedDay).reduce((total, streak) => total + streak.length, 0);
 
-export const calculateRestBlocks = (dates: Date[]) => {
-	if (dates.length === 0) return 0;
+export const restBlocksOf = (dates: Date[]) => {
+	const blocks: Date[][] = [];
 
-	let blocks = 1;
-	const sorted = dates.toSorted((a, b) => a.getTime() - b.getTime());
-
-	for (let i = 1; i < sorted.length; i++) {
-		const curr = sorted[i];
-		const prev = sorted[i - 1];
-		if (curr === undefined || prev === undefined) continue;
-		const daysDiff = differenceInDays({ dateLeft: curr, dateRight: prev });
-		if (daysDiff > PTO_CONSTANTS.METRICS.REST_BLOCK_SEPARATION_DAYS) blocks++;
+	for (const date of dates.toSorted((a, b) => a.getTime() - b.getTime())) {
+		const block = blocks.at(-1);
+		const previous = block?.at(-1);
+		const separated =
+			previous === undefined ||
+			differenceInDays({ dateLeft: date, dateRight: previous }) > PTO_CONSTANTS.METRICS.REST_BLOCK_SEPARATION_DAYS;
+		if (block && !separated) block.push(date);
+		else blocks.push([date]);
 	}
 
 	return blocks;
 };
+
+export const calculateRestBlocks = (dates: Date[]) => restBlocksOf(dates).length;
 
 interface CalculateMaxWorkStreakParams {
 	ptoDays: Date[];

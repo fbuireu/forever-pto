@@ -17,7 +17,7 @@ interface PlanAlternativesParams {
 	strategy: FilterStrategy;
 	removedDays?: Date[];
 	maxAlternatives: number;
-	existingSuggestion?: Pick<Suggestion, "days" | "bridges">;
+	existingSuggestion?: Suggestion;
 }
 
 const planAlternatives = ({
@@ -31,20 +31,24 @@ const planAlternatives = ({
 	existingSuggestion,
 }: PlanAlternativesParams) => {
 	const candidates = findPlanningCandidates({ holidays, months, allowPastDays, removedDays });
-	const suggestion =
-		existingSuggestion ?? selectBridgesForStrategy({ bridges: candidates.bridges, targetPtoDays: ptoDays, strategy });
-
-	return {
-		suggestion,
-		candidates,
-		alternatives: generateAlternatives({
-			ptoDays,
+	const greedy = existingSuggestion ?? {
+		...selectBridgesForStrategy({
+			bridges: candidates.bridges,
+			targetPtoDays: ptoDays,
 			strategy,
-			maxAlternatives,
-			existingSuggestion: suggestion,
-			candidates,
+			workdays: candidates.availableWorkdays,
 		}),
+		strategy,
 	};
+	const { suggestion, alternatives } = generateAlternatives({
+		ptoDays,
+		strategy,
+		maxAlternatives,
+		existingSuggestion: greedy,
+		candidates,
+	});
+
+	return { greedy, suggestion, candidates, alternatives };
 };
 
 interface MakeDateParams {
@@ -88,12 +92,20 @@ describe("generateAlternatives", () => {
 		clearHolidayCache();
 	});
 
-	it("returns empty array when ptoDays is 0", () => {
-		expect(planAlternatives({ ...BASE, ptoDays: 0, maxAlternatives: 3 }).alternatives).toHaveLength(0);
-	});
+	it.each([[0], [-1]])("returns the Suggestion untouched and no Alternative for a budget of %i", (ptoDays) => {
+		const placed = {
+			days: [makeDate({ year: 2025, month: 1, day: 3 })],
+			bridges: [],
+			strategy: FilterStrategy.GROUPED,
+		};
+		const { suggestion, alternatives } = planAlternatives({
+			...YEAR,
+			ptoDays,
+			existingSuggestion: placed,
+		});
 
-	it("returns empty array when ptoDays is negative", () => {
-		expect(planAlternatives({ ...BASE, ptoDays: -1, maxAlternatives: 3 }).alternatives).toHaveLength(0);
+		expect(suggestion).toBe(placed);
+		expect(alternatives).toHaveLength(0);
 	});
 
 	it("returns empty array when maxAlternatives is 0", () => {
@@ -144,6 +156,23 @@ describe("generateAlternatives", () => {
 				toStrings(alternative.days).join(),
 			),
 		).not.toContain(toStrings(planOf(FilterStrategy.OPTIMIZED).days).join());
+	});
+
+	it("makes a better plan the chosen Strategy found the Suggestion, and offers the weaker one instead", () => {
+		const weak = {
+			days: [makeDate({ year: 2025, month: 1, day: 3 })],
+			bridges: [],
+			strategy: FilterStrategy.OPTIMIZED,
+		};
+		const { suggestion, alternatives } = planAlternatives({
+			...YEAR,
+			strategy: FilterStrategy.OPTIMIZED,
+			existingSuggestion: weak,
+		});
+
+		expect(suggestion).not.toBe(weak);
+		expect(coveredDays(suggestion)).toBeGreaterThan(coveredDays(weak));
+		expect(alternatives).toContain(weak);
 	});
 
 	it("keeps every Alternative at least MIN_DIFFERENCE away from the Suggestion and from each other", () => {

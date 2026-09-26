@@ -1,11 +1,5 @@
-import {
-	DEFAULT_FILTER_STRATEGY,
-	DEFAULT_PREFERRED_MONTHS,
-	type FilterStrategy,
-	isFilterStrategy,
-	isPreferredMonths,
-} from "@domain/calendar/types";
-import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
+import { DEFAULT_FILTER_STRATEGY, type FilterStrategy, isFilterStrategy } from "@domain/calendar/types";
+import { DEFAULT_PREFERRED_MONTHS, isPreferredMonths, MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { obfuscatedStorage } from "./crypto";

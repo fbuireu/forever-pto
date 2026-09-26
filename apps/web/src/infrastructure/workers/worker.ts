@@ -1,6 +1,7 @@
 import { fromStoredInstant } from "@application/shared/utils/dateIntake";
 import { runPlanningPipeline } from "@domain/calendar/pipeline";
-import { DEFAULT_FILTER_STRATEGY, isFilterStrategy, isPreferredMonths } from "@domain/calendar/types";
+import { DEFAULT_FILTER_STRATEGY, isFilterStrategy } from "@domain/calendar/types";
+import { isPreferredMonths } from "@domain/calendar/window";
 import { EN, isLocale } from "@infrastructure/i18n/locales";
 import { type CalculateSuggestionsRequest, WORKER_MESSAGE_TYPE, type WorkerResponse } from "./types";
 import { deserializeHolidays, serializeSuggestionResult } from "./utils/serializers";

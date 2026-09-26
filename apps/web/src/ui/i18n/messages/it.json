@@ -163,7 +163,7 @@
 				},
 				"strategies": {
 					"question": "Qual è la differenza tra le strategie \"raggruppata\", \"ottimizzata\", \"bilanciata\" e \"vacanza principale\"?",
-					"answer": "Ottimizzata ti dà il massimo di giorni liberi effettivi per ogni giorno di PTO, soprattutto in ponti distribuiti durante l'anno. Raggruppata cede parte di questa efficienza in cambio di poche vacanze lunghe fino a due settimane. Bilanciata sta nel mezzo: dà a ogni trimestre la sua parte del budget e preferisce pause fino a una settimana. Vacanza principale mette un blocco lungo fino a due settimane nei mesi che scegli, poi distribuisce il resto come Ottimizzata."
+					"answer": "Ottimizzata ti dà il massimo di giorni liberi effettivi per ogni giorno di PTO, soprattutto in weekend lunghi distribuiti durante l'anno. Raggruppata cede parte di questa efficienza in cambio di poche vacanze lunghe di circa due settimane. Bilanciata fa in modo che tu non lavori mai troppo a lungo senza riposo: mette un weekend lungo ogni poche settimane così nessun periodo di lavoro si allunga. Vacanza principale mette un blocco lungo fino a due settimane nei mesi che scegli, poi distribuisce il resto come Ottimizzata."
 				},
 				"results": {
 					"question": "Perché i suggerimenti cambiano quando aggiorno preferenze o festività?",
@@ -502,7 +502,7 @@
 			"grouped": {
 				"label": "Raggruppata",
 				"description": "Poche vacanze lunghe",
-				"subtitle": "Crea blocchi fino a due settimane intorno ai festivi",
+				"subtitle": "Crea blocchi di circa due settimane intorno ai festivi",
 				"pros": {
 					"longVacations": "Vacanze lunghe",
 					"wholeWeeks": "Settimane intere libere"
@@ -521,17 +521,17 @@
 					"moreDays": "Più giorni totali"
 				},
 				"cons": {
-					"shortBreaks": "Pause brevi",
+					"shortBreaks": "Soprattutto weekend lunghi",
 					"noLongTrip": "Nessun viaggio lungo"
 				}
 			},
 			"balanced": {
 				"label": "Bilanciata",
-				"description": "Pause distribuite durante l'anno",
-				"subtitle": "Ogni trimestre riceve la sua parte, in pause fino a una settimana",
+				"description": "Riposo ogni poche settimane",
+				"subtitle": "Mai troppo a lungo al lavoro: un weekend lungo ogni poche settimane",
 				"pros": {
-					"everyQuarter": "Una pausa ogni trimestre",
-					"weekLongBreaks": "Pause fino a una settimana"
+					"noLongStretch": "Nessun lungo periodo di lavoro",
+					"restAllYear": "Riposo tutto l'anno"
 				},
 				"cons": {
 					"noMaximization": "Non massimizza",

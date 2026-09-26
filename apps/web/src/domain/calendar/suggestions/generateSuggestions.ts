@@ -14,7 +14,7 @@ export function generateSuggestions({ ptoDays, candidates, strategy, preferredMo
 		return { days: [], bridges: [], strategy };
 	}
 
-	const { availableWorkdays, bridges } = candidates;
+	const { availableWorkdays, bridges, alreadyOff } = candidates;
 
 	if (availableWorkdays.length === 0) {
 		return { days: [], bridges: [], strategy };
@@ -27,6 +27,8 @@ export function generateSuggestions({ ptoDays, candidates, strategy, preferredMo
 		targetPtoDays: effectivePtoDays,
 		strategy,
 		preferredMonths,
+		workdays: availableWorkdays,
+		alreadyOff,
 	});
 
 	return {

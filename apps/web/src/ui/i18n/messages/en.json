@@ -163,7 +163,7 @@
 				},
 				"strategies": {
 					"question": "What is the difference between the \"grouped\", \"optimized\", \"balanced\" and \"main vacation\" strategies?",
-					"answer": "Optimized gets you the most effective days off per PTO day, mostly in long weekends spread across the year. Grouped trades some of that efficiency for a few long vacations of up to two weeks. Balanced sits in between: it gives every quarter its share of your budget and prefers breaks of up to a week. Main vacation puts one long block of up to two weeks in the months you choose, then spends the rest like Optimized."
+					"answer": "Optimized gets you the most effective days off per PTO day, mostly as long weekends spread across the year. Grouped trades some of that efficiency for a few long vacations of about two weeks. Balanced makes sure you never work too long without rest: it places a long weekend every few weeks so no stretch of work runs long. Main vacation puts one long block of up to two weeks in the months you choose, then spends the rest like Optimized."
 				},
 				"results": {
 					"question": "Why do recommendations change when I update preferences or holidays?",
@@ -502,7 +502,7 @@
 			"grouped": {
 				"label": "Grouped",
 				"description": "A few long vacations",
-				"subtitle": "Builds blocks of up to two weeks around holidays",
+				"subtitle": "Builds blocks of about two weeks around holidays",
 				"pros": {
 					"longVacations": "Long vacations",
 					"wholeWeeks": "Whole weeks off"
@@ -521,17 +521,17 @@
 					"moreDays": "More total days"
 				},
 				"cons": {
-					"shortBreaks": "Short breaks",
+					"shortBreaks": "Mostly long weekends",
 					"noLongTrip": "No long trip"
 				}
 			},
 			"balanced": {
 				"label": "Balanced",
-				"description": "Breaks spread across the year",
-				"subtitle": "Every quarter gets its share, in breaks of up to a week",
+				"description": "Rest every few weeks",
+				"subtitle": "Never too long at work: a long weekend every few weeks",
 				"pros": {
-					"everyQuarter": "A break every quarter",
-					"weekLongBreaks": "Breaks of up to a week"
+					"noLongStretch": "No long stretch at work",
+					"restAllYear": "Rest all year round"
 				},
 				"cons": {
 					"noMaximization": "Doesn't maximize",

@@ -163,7 +163,7 @@
 				},
 				"strategies": {
 					"question": "Quelle est la différence entre les stratégies \"groupée\", \"optimisée\", \"équilibrée\" et \"vacances principales\" ?",
-					"answer": "Optimisée te donne le plus de jours de repos effectifs par jour de congé, surtout en ponts répartis sur l'année. Groupée cède une partie de cette efficacité contre quelques longues vacances de deux semaines au plus. Équilibrée se situe entre les deux : elle donne à chaque trimestre sa part du budget et privilégie des pauses d'une semaine au plus. Vacances principales place un long bloc de deux semaines au plus dans les mois que tu choisis, puis répartit le reste comme Optimisée."
+					"answer": "Optimisée te donne le plus de jours de repos effectifs par jour de congé, surtout en week-ends prolongés répartis sur l'année. Groupée cède une partie de cette efficacité contre quelques longues vacances d'environ deux semaines. Équilibrée veille à ce que tu ne travailles jamais trop longtemps sans repos : elle place un week-end prolongé toutes les quelques semaines pour qu'aucune période de travail ne s'éternise. Vacances principales place un long bloc de deux semaines au plus dans les mois que tu choisis, puis répartit le reste comme Optimisée."
 				},
 				"results": {
 					"question": "Pourquoi les recommandations changent-elles quand je modifie mes préférences ou mes jours fériés ?",
@@ -502,7 +502,7 @@
 			"grouped": {
 				"label": "Groupée",
 				"description": "Quelques longues vacances",
-				"subtitle": "Construit des blocs de deux semaines au plus autour des jours fériés",
+				"subtitle": "Construit des blocs d'environ deux semaines autour des jours fériés",
 				"pros": {
 					"longVacations": "Longues vacances",
 					"wholeWeeks": "Semaines entières de repos"
@@ -521,17 +521,17 @@
 					"moreDays": "Plus de jours au total"
 				},
 				"cons": {
-					"shortBreaks": "Pauses courtes",
+					"shortBreaks": "Surtout des week-ends prolongés",
 					"noLongTrip": "Pas de long voyage"
 				}
 			},
 			"balanced": {
 				"label": "Équilibrée",
-				"description": "Des pauses réparties sur l'année",
-				"subtitle": "Chaque trimestre reçoit sa part, en pauses d'une semaine au plus",
+				"description": "Du repos toutes les quelques semaines",
+				"subtitle": "Jamais trop longtemps au travail : un week-end prolongé toutes les quelques semaines",
 				"pros": {
-					"everyQuarter": "Une pause chaque trimestre",
-					"weekLongBreaks": "Des pauses d'une semaine au plus"
+					"noLongStretch": "Pas de longue période de travail",
+					"restAllYear": "Du repos toute l'année"
 				},
 				"cons": {
 					"noMaximization": "Ne maximise pas",

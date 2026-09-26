@@ -19,9 +19,9 @@ Run over the Spanish national calendar for 2026 with 22 PTO Days, the old engine
   on their own and four together. Optimized's walk believed its plan was worth 80 Effective Days; the Metrics,
   which take the union, measured 55.
 - **Ties fell to the calendar.** Every Friday and Monday of the year scores 3.0, the sort was stable, and
-  candidates are emitted in date order, so Optimized spent 10 of its 22 days on the Fridays and Mondays of
+  candidates are emitted in date order, so Optimized spent 12 of its 22 days on the Fridays and Mondays of
   January and February and left June to September empty.
-- **Grouped ranked by the budget spent, not the break produced.** It took three-day runs at 2.0 before one-day
+- **Grouped ranked by the budget spent, not the stretch off produced.** It took three-day runs at 2.0 before one-day
   Bridges at 4.0, and finished at 1.82, under the floor that defines a Bridge.
 - **Balanced was Optimized with one exception.** Its score was nearly all Efficiency, its high-value tier could
   only ever hold three-day runs at 3.0 or better, so its extra efficiency clause and its bonus changed no order,
@@ -37,7 +37,7 @@ The alternatives weighed were:
   Bridge became cheaper or dearer once its neighbour was taken, which is the whole of the double count.
 - **An exact optimiser** (integer programming or a knapsack over the candidates). It would find the best plan
   for a stated objective, and it needs a solver the Web Worker does not carry, a run time that grows with the
-  budget, and an objective written as a single linear function, which Balanced's quarter share and Grouped's
+  budget, and an objective written as a single linear function, which Balanced's longest stretch of work and Grouped's
   block cap are not.
 - **Greedy on the marginal gain**: re-measure every candidate against the plan at each step and take the best.
   No new dependency, a cost of one pass over the candidates per Bridge taken, and any objective that can rank a
@@ -53,12 +53,15 @@ Optimized after it.
 
 - The marginal gain is the days a Bridge's span adds to the days the plan already covers, divided by its PTO Days.
   A candidate under its Strategy's floor is not taken, and budget is left unspent rather than spent on it.
-- Optimized ranks by the marginal gain, then the length of the break the Bridge ends up in, then its distance
-  from the breaks already taken. Grouped ranks by the break's length up to `GROUPED_MAX_BLOCK_DAYS`, at the lower
-  `BLOCK_MINIMUM` floor. Balanced gives each quarter an equal share of the budget first, then ranks by break
-  length up to `BALANCED_MAX_BLOCK_DAYS`.
-- Effective Days are measured the same way: the free streaks that contain a placed day, so what the selector
-  believed it gained is exactly what the Metrics report.
+- Optimized ranks by the marginal gain, then the length of the stretch off the Bridge ends up in, then its
+  distance from the stretches already taken. Grouped ranks by that stretch's length towards
+  `GROUPED_MAX_BLOCK_DAYS`, at the lower `BLOCK_MINIMUM` floor. Balanced ranks by the longest stretch of work the
+  plan would leave (the Max Work Streak), then by the relief a pick brings to the stretch it splits per PTO Day.
+- Effective Days are measured the same way: the free streaks that contain a placed day. The Manual Days' own
+  streaks are known to the selector before it takes a Bridge, so what it counts as gain is what the Metrics
+  report, Manual Days included.
+- The Suggestion is the best plan the chosen Strategy produced, not the first: the greedy plan and every re-run of
+  the same objective are ranked by what the Strategy is for (its `aim`), then by Effective Days and Efficiency.
 - Alternatives run the other Strategies first, then the chosen one with one of the Suggestion's Rest Blocks taken
   away at a time, and are kept only when at least `ALTERNATIVES.MIN_DIFFERENCE` away from every plan already
   offered and never ahead of the Suggestion on Effective Days or Efficiency: the Suggestion is the
@@ -71,11 +74,15 @@ cannot express the double count at all.
 ## Consequences
 
 - The plans users see change for every Strategy. Over the calendar above, Optimized goes from 55 Effective Days to
-  74 and spreads through the year; Grouped from 40 at 1.82 to 46 at 2.09 in blocks of up to 16 days; Balanced now
-  differs from Optimized, at 50 days with a break in every quarter. `strategies.test.ts` pins the ordering of the
-  three and that the selector's belief equals the Metrics.
+  74 and spreads through the year; Grouped from 40 at 1.82 to 46 at 2.09 in blocks of about 16 days; Balanced now
+  differs from Optimized, placing a long weekend every two or three weeks for the shortest Max Work Streak of
+  every Strategy. `strategies.test.ts` pins what each Strategy is for and that the selector's count equals the
+  Metrics.
+- Ranking every Strategy's plans by Effective Days alone was tried for the Suggestion and rejected: it turned each
+  Strategy into Optimized with extra steps, and Balanced's Max Work Streak went from 14 to 53. The `aim` is what
+  keeps the Strategies different.
 - Selection is no longer a sort followed by a walk, so it costs a pass per Bridge taken rather than one sort. The
-  gain, break length and distance are updated incrementally to keep it inside the Worker's budget; recomputing
+  gain, stretch length and distance are updated incrementally to keep it inside the Worker's budget; recomputing
   them from scratch on every step is the regression to watch for.
 - A candidate is never worth more to a plan than on its own, so the search prunes at the lowest floor any
   Strategy applies and no lower. Lowering a Strategy's floor under `BLOCK_MINIMUM` means lowering that constant
@@ -83,7 +90,8 @@ cannot express the double count at all.
 - An Alternative may now share Bridges with the Suggestion. "Distinct" is a distance, not disjointness, and the
   glossary's Alternative entry already said no more than that.
 - Because the other Strategies' plans are seeds, the ceiling is load-bearing: without it a Grouped user is offered
-  the Optimized plan with more days than their own. It is enforced in `generateAlternatives` and re-checked on the
-  measured Metrics in `runPlanningPipeline`.
+  the Optimized plan with more days than their own. It is enforced once, in `generateAlternatives`, with the same
+  measure the Metrics use; a second check on the measured Metrics was removed because it dropped plans after the
+  search had spent its runs, and the list came back short.
 - The rules and their traps are in [`apps/web/src/domain/calendar/AGENTS.md`](../apps/web/src/domain/calendar/AGENTS.md);
-  the wiki's planning algorithm page explains the three objectives to a reader.
+  the wiki's planning algorithm page explains the objectives to a reader.

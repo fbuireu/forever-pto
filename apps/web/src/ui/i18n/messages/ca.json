@@ -163,7 +163,7 @@
 				},
 				"strategies": {
 					"question": "Quina és la diferència entre les estratègies \"agrupada\", \"optimitzada\", \"equilibrada\" i \"vacança principal\"?",
-					"answer": "L'Optimitzada et dona el màxim de dies lliures efectius per cada dia de PTO, sobretot en ponts repartits per l'any. L'Agrupada cedeix part d'aquesta eficiència a canvi d'unes poques vacances llargues de fins a dues setmanes. L'Equilibrada queda al mig: dona a cada trimestre la seva part del pressupost i prefereix descansos de fins a una setmana. La Vacança principal col·loca un bloc llarg de fins a dues setmanes als mesos que triïs i reparteix la resta com l'Optimitzada."
+					"answer": "L'Optimitzada et dona el màxim de dies lliures efectius per cada dia de PTO, sobretot en caps de setmana llargs repartits per l'any. L'Agrupada cedeix part d'aquesta eficiència a canvi d'unes poques vacances llargues d'unes dues setmanes. L'Equilibrada s'assegura que mai no treballis massa temps sense descansar: col·loca un cap de setmana llarg cada poques setmanes perquè cap ratxa de feina s'allargui. La Vacança principal col·loca un bloc llarg de fins a dues setmanes als mesos que triïs i reparteix la resta com l'Optimitzada."
 				},
 				"results": {
 					"question": "Per què canvien les recomanacions quan actualitzo preferències o festius?",
@@ -502,7 +502,7 @@
 			"grouped": {
 				"label": "Agrupada",
 				"description": "Poques vacances llargues",
-				"subtitle": "Crea blocs de fins a dues setmanes al voltant dels festius",
+				"subtitle": "Crea blocs d'unes dues setmanes al voltant dels festius",
 				"pros": {
 					"longVacations": "Vacances llargues",
 					"wholeWeeks": "Setmanes senceres lliures"
@@ -521,17 +521,17 @@
 					"moreDays": "Més dies totals"
 				},
 				"cons": {
-					"shortBreaks": "Descansos curts",
+					"shortBreaks": "Sobretot caps de setmana llargs",
 					"noLongTrip": "Sense un viatge llarg"
 				}
 			},
 			"balanced": {
 				"label": "Equilibrada",
-				"description": "Descansos repartits durant l'any",
-				"subtitle": "Cada trimestre rep la seva part, en descansos de fins a una setmana",
+				"description": "Descans cada poques setmanes",
+				"subtitle": "Mai massa temps treballant: un cap de setmana llarg cada poques setmanes",
 				"pros": {
-					"everyQuarter": "Un descans cada trimestre",
-					"weekLongBreaks": "Descansos de fins a una setmana"
+					"noLongStretch": "Sense ratxes llargues de feina",
+					"restAllYear": "Descans tot l'any"
 				},
 				"cons": {
 					"noMaximization": "No maximitza",

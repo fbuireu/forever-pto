@@ -75,7 +75,7 @@ ${tPlanner("description")}
 
 1. The planner auto-detects your country via your IP
 2. Adjust country and region if needed
-3. Choose a strategy: Grouped (a few long vacations), Optimized (the most days off), Balanced (a break every quarter), or Main vacation (a long trip in the months you pick, then the best bridges)
+3. Choose a strategy: Grouped (a few long vacations), Optimized (the most days off), Balanced (a long weekend every few weeks), or Main vacation (a long trip in the months you pick, then the best bridges)
 4. Review suggested days and manually edit as needed
 5. Export your schedule
 
@@ -97,7 +97,7 @@ ${t("description")}
 
 - **Holiday Detection**: automatic country detection with national and regional holidays
 - **Bridge Day Optimizer**: identifies the best days to take off to maximize streaks
-- **Four Strategies**: Grouped (a few long vacations), Optimized (the most days off), Balanced (a break every quarter), Main vacation (a long trip in the months you pick, then the best bridges)
+- **Four Strategies**: Grouped (a few long vacations), Optimized (the most days off), Balanced (a long weekend every few weeks), Main vacation (a long trip in the months you pick, then the best bridges)
 - **Calculations**: PTO accrual, PTO vs salary, workday counter, date stats
 - **Export**: send your schedule to Google Calendar, Outlook, or Apple Calendar
 - **Multilingual**: available in English, Spanish, Catalan, Italian, French, and German

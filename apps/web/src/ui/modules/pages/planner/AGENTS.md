@@ -357,8 +357,11 @@ modal in `shared/contact/`. It also imports [`contact.css`](./contact.css), whic
 `canImprove` reads `maxAlternative` over the Alternatives whose `strategy` equals the filters store's; the other
 Strategies' plans carry their own value there (see the Alternatives section of the
 [engine guide](../../../../domain/calendar/AGENTS.md)). Counting them would tell a Grouped user, on every plan, that
-Optimized covers more days, which is the trade they chose. No Alternative out of the engine beats the Suggestion,
-so the banner fires only once a hand edit left the plan on screen behind one of them.
+Optimized covers more days, which is the trade they chose. The engine never hands out an Alternative ahead of the
+Suggestion, so the banner speaks up when the plan on screen is behind one of them: after a hand edit, or when the
+applied Alternative is itself one of the weaker ones. The header badge and the summary sentence name the Strategy
+of the plan on screen (its own `strategy`, narrowed with `isFilterStrategy`), so an applied plan another Strategy
+found is not credited to the one in the sidebar.
 
 **`Summary.tsx` measures against different denominators, and several of its numbers depend on which.**
 `ptoDays` here is the *budget*, read from the filters store; the engine's `Metrics` are computed against the

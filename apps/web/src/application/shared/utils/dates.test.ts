@@ -1,5 +1,5 @@
 import { EN } from "@infrastructure/i18n/locales";
-import { describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import {
 	addDays,
 	addMonths,
@@ -8,6 +8,7 @@ import {
 	eachDayOfInterval,
 	endOfMonth,
 	formatDate,
+	fromDayIndex,
 	getMonthNames,
 	getWeekdayNames,
 	isBefore,
@@ -19,6 +20,30 @@ import {
 	startOfWeek,
 } from "./dates";
 
+describe("dayIndex in a zone that changes its clocks", () => {
+	const runnerZone = process.env.TZ;
+
+	beforeAll(() => {
+		process.env.TZ = "Europe/Madrid";
+	});
+
+	afterAll(() => {
+		if (runnerZone === undefined) delete process.env.TZ;
+		else process.env.TZ = runnerZone;
+	});
+
+	it("keeps a one-day step across both daylight-saving changes", () => {
+		expect(dayIndex(new Date(2025, 2, 31)) - dayIndex(new Date(2025, 2, 30))).toBe(1);
+		expect(dayIndex(new Date(2025, 9, 27)) - dayIndex(new Date(2025, 9, 26))).toBe(1);
+	});
+
+	it("round-trips local midnight on the day the clocks go forward", () => {
+		const changeover = new Date(2025, 2, 30);
+
+		expect(fromDayIndex(dayIndex(changeover)).getTime()).toBe(changeover.getTime());
+	});
+});
+
 describe("dayIndex", () => {
 	it("numbers consecutive calendar days consecutively", () => {
 		expect(dayIndex(new Date(2025, 0, 11)) - dayIndex(new Date(2025, 0, 10))).toBe(1);
@@ -28,9 +53,12 @@ describe("dayIndex", () => {
 		expect(dayIndex(new Date(2025, 0, 10, 23, 59))).toBe(dayIndex(new Date(2025, 0, 10)));
 	});
 
-	it("keeps a one-day step across a daylight-saving change", () => {
-		expect(dayIndex(new Date(2025, 2, 31)) - dayIndex(new Date(2025, 2, 30))).toBe(1);
-		expect(dayIndex(new Date(2025, 9, 27)) - dayIndex(new Date(2025, 9, 26))).toBe(1);
+	it("is undone by fromDayIndex, which returns local midnight", () => {
+		const date = new Date(2026, 2, 29);
+		const back = fromDayIndex(dayIndex(date));
+
+		expect(back.getTime()).toBe(date.getTime());
+		expect(fromDayIndex(dayIndex(new Date(2026, 9, 25, 18))).getTime()).toBe(new Date(2026, 9, 25).getTime());
 	});
 
 	it("agrees with differenceInDays over a year boundary", () => {

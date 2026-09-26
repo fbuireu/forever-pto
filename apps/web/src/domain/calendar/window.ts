@@ -3,7 +3,13 @@ import { addMonths, endOfYear, isWithinInterval, startOfMonth } from "@applicati
 export const MONTHS_IN_YEAR = 12;
 export const MONTHS_IN_QUARTER = 3;
 export const MAX_CARRY_OVER_MONTHS = 12;
-export const QUARTERS_IN_YEAR = MONTHS_IN_YEAR / MONTHS_IN_QUARTER;
+
+export const DEFAULT_PREFERRED_MONTHS: readonly number[] = [6, 7];
+
+export const isPreferredMonths = (value: unknown): value is number[] =>
+	Array.isArray(value) &&
+	new Set(value).size === value.length &&
+	value.every((month) => Number.isInteger(month) && month >= 0 && month < MONTHS_IN_YEAR);
 
 export interface PlanningWindow {
 	year: number;
@@ -20,9 +26,6 @@ export const windowMonthCount = ({ carryOverMonths }: Pick<PlanningWindow, "carr
 
 export const windowQuarterCount = (window: Pick<PlanningWindow, "carryOverMonths">) =>
 	Math.ceil(windowMonthCount(window) / MONTHS_IN_QUARTER);
-
-export const quarterIndex = (date: Date) =>
-	date.getFullYear() * QUARTERS_IN_YEAR + Math.floor(date.getMonth() / MONTHS_IN_QUARTER);
 
 export const planningWindowMonths = (window: PlanningWindow): Date[] => {
 	const start = startOfMonth(new Date(window.year, 0, 1));

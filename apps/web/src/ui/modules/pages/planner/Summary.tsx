@@ -7,6 +7,7 @@ import { useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
 import { useLocationStore } from "@application/stores/location";
 import { PremiumFeatureId, usePremiumStore } from "@application/stores/premium";
+import { isFilterStrategy } from "@domain/calendar/types";
 import { measureGain } from "@domain/calendar/utils/budget";
 import { usePlanReadout } from "@ui/hooks/usePlanReadout";
 import { useStoresReady } from "@ui/hooks/useStoresReady";
@@ -142,6 +143,8 @@ export const Summary = () => {
 		};
 	}, [activeSuggestion, ptoDays, alternatives, placedDays.length, strategy]);
 
+	const planStrategy = isFilterStrategy(activeSuggestion?.strategy) ? activeSuggestion.strategy : strategy;
+
 	const manualAdjustmentsCase = (() => {
 		if (manuallySelectedDays.length > 0 && removedSuggestedDays.length > 0) return "addedAndRemoved";
 		return manuallySelectedDays.length > 0 ? "addedOnly" : "removedOnly";
@@ -166,7 +169,7 @@ export const Summary = () => {
 										<span>{locationInfo.userRegion.label}</span>
 									</Badge>
 								)}
-								<Badge variant="outline">{tSidebar(`strategy.${strategy}.label`)}</Badge>
+								<Badge variant="outline">{tSidebar(`strategy.${planStrategy}.label`)}</Badge>
 							</div>
 						</CardTitle>
 						<CardDescription className="space-y-2">
@@ -175,7 +178,7 @@ export const Summary = () => {
 									? t("summaryParagraph.withGain", {
 											ptoDays,
 											totalHolidays: holidayMetrics.totalHolidays,
-											strategy: tSidebar(`strategy.${strategy}.label`).toLowerCase(),
+											strategy: tSidebar(`strategy.${planStrategy}.label`).toLowerCase(),
 											effectiveDays,
 											increment,
 											percentage: gain.toFixed(0),
@@ -183,7 +186,7 @@ export const Summary = () => {
 									: t("summaryParagraph.withoutGain", {
 											ptoDays,
 											totalHolidays: holidayMetrics.totalHolidays,
-											strategy: tSidebar(`strategy.${strategy}.label`).toLowerCase(),
+											strategy: tSidebar(`strategy.${planStrategy}.label`).toLowerCase(),
 											effectiveDays,
 										})}
 							</p>

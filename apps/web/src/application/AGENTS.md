@@ -59,6 +59,14 @@ the arithmetic. Every function converts to `Temporal.PlainDate`, does the work t
 ([ADR 0005](../../../../adr/0005-temporal-polyfill.md)); `dateIntake.ts` beside it is the only other file on
 this side of the tree that imports `temporal-polyfill`.
 
+**`dayIndex` and `fromDayIndex` are the two exceptions, and they are arithmetic, not dates.** `dayIndex` turns a
+calendar day into an integer (days since 1 January 1970, read from the local year, month and day through
+`Date.UTC`) and `fromDayIndex` turns it back into local midnight. The planning engine counts in those integers
+inside loops that run once per candidate per pick, where a `Temporal.PlainDate` round trip per comparison is the
+cost that matters; no `Date` with a time component and no UTC instant ever leaves either function.
+`dates.test.ts` pins that they round-trip across both daylight-saving changes with the zone set to
+Europe/Madrid, since a UTC runner could not tell a wrong implementation from a right one.
+
 Consequences worth holding on to:
 
 - **Every `Date` this layer produces is local midnight**, built with `new Date(y, m, d)`. There is no time

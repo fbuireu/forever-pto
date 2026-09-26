@@ -26,9 +26,9 @@ Given your country, region, year, and number of PTO days, Forever PTO suggests t
 
 **Strategies:**
 
-- **Grouped**: consolidate days into a few long vacations of up to two weeks
+- **Grouped**: consolidate days into a few long vacations of about two weeks
 - **Optimized**: maximize the total number of days off
-- **Balanced**: a break in every quarter, each of up to a week
+- **Balanced**: a long weekend every few weeks, so you never work too long without rest
 - **Main vacation**: one long trip of up to two weeks in the months you pick, then the best bridges for the rest
 
 **Beyond scheduling:**

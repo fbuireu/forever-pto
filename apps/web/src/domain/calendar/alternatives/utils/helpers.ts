@@ -1,5 +1,7 @@
 import { dayIndex } from "@application/shared/utils/dates";
 import { PTO_CONSTANTS } from "@domain/calendar/const";
+import type { PlanMeasures } from "@domain/calendar/suggestions/utils/selectors";
+import { longestWorkStretch } from "@domain/calendar/suggestions/utils/stretches";
 import type { Suggestion } from "@domain/calendar/types";
 
 export interface PlanDistanceParams {
@@ -17,28 +19,62 @@ export const planDistance = ({ plan, rival }: PlanDistanceParams) => {
 	return 1 - shared / union;
 };
 
-export const coveredDays = ({ days, bridges = [] }: Pick<Suggestion, "days" | "bridges">) => {
-	const covered = new Set(days.map(dayIndex));
+export interface CoveredDaysParams extends Pick<Suggestion, "days" | "bridges"> {
+	alreadyOff?: Date[];
+}
+
+const coveredSetOf = ({ days, bridges = [], alreadyOff = [] }: CoveredDaysParams) => {
+	const covered = new Set([...days, ...alreadyOff].map(dayIndex));
 	for (const bridge of bridges) {
 		for (let day = dayIndex(bridge.startDate); day <= dayIndex(bridge.endDate); day++) covered.add(day);
 	}
 
-	return covered.size;
+	return covered;
 };
 
-export const restBlocksOf = (days: Date[]) => {
-	const blocks: Date[][] = [];
-	const sorted = days.toSorted((a, b) => a.getTime() - b.getTime());
+export const coveredDays = (params: CoveredDaysParams) => coveredSetOf(params).size;
 
-	for (const day of sorted) {
-		const block = blocks.at(-1);
-		const previous = block?.at(-1);
-		if (block && previous && dayIndex(day) - dayIndex(previous) <= PTO_CONSTANTS.METRICS.REST_BLOCK_SEPARATION_DAYS) {
-			block.push(day);
-		} else {
-			blocks.push([day]);
+export interface MeasurePlanParams {
+	plan: Pick<Suggestion, "days" | "bridges">;
+	alreadyOff: Date[];
+	workdays: Date[];
+	preferredMonths: number[];
+}
+
+export const measurePlan = ({ plan, alreadyOff, workdays, preferredMonths }: MeasurePlanParams): PlanMeasures => {
+	const covered = coveredSetOf({ ...plan, alreadyOff });
+	const placed = new Map(plan.days.map((day) => [dayIndex(day), day.getMonth()]));
+	const preferred = new Set(preferredMonths);
+	const sorted = [...covered].toSorted((a, b) => a - b);
+
+	let longestBreak = 0;
+	let longestPreferredBreak = 0;
+	let runStart = 0;
+
+	sorted.forEach((day, position) => {
+		const nextDay = sorted[position + 1];
+		if (nextDay === day + 1) return;
+
+		const run = sorted.slice(runStart, position + 1);
+		const months = run.flatMap((runDay) => {
+			const month = placed.get(runDay);
+			return month === undefined ? [] : [month];
+		});
+		longestBreak = Math.max(longestBreak, run.length);
+		if (months.length > 0 && (preferred.size === 0 || months.every((month) => preferred.has(month)))) {
+			longestPreferredBreak = Math.max(longestPreferredBreak, run.length);
 		}
-	}
+		runStart = position + 1;
+	});
 
-	return blocks.toSorted((a, b) => b.length - a.length);
+	return {
+		covered: covered.size,
+		efficiency: plan.days.length > 0 ? covered.size / plan.days.length : 0,
+		longestBreak,
+		longestPreferredBreak,
+		longestWorkStretch: longestWorkStretch({
+			workdays: [...new Set(workdays.map(dayIndex))].toSorted((a, b) => a - b),
+			off: covered,
+		}),
+	};
 };

@@ -60,7 +60,7 @@ export const Strategy = () => {
 				icon: STRATEGY_ICONS[FilterStrategy.BALANCED],
 				description: t("balanced.description"),
 				subtitle: t("balanced.subtitle"),
-				pros: [t("balanced.pros.everyQuarter"), t("balanced.pros.weekLongBreaks")],
+				pros: [t("balanced.pros.noLongStretch"), t("balanced.pros.restAllYear")],
 				cons: [t("balanced.cons.noMaximization"), t("balanced.cons.noLongTrip")],
 			},
 			{

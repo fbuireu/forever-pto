@@ -1,5 +1,5 @@
-import { DEFAULT_FILTER_STRATEGY, DEFAULT_PREFERRED_MONTHS, FilterStrategy } from "@domain/calendar/types";
-import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
+import { DEFAULT_FILTER_STRATEGY, FilterStrategy } from "@domain/calendar/types";
+import { DEFAULT_PREFERRED_MONTHS, MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MAX_PTO_DAYS, MIN_CARRY_OVER_MONTHS, MIN_PTO_DAYS, useFiltersStore } from "./filters";
 
