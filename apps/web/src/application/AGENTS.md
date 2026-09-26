@@ -59,7 +59,12 @@ the arithmetic. Every function converts to `Temporal.PlainDate`, does the work t
 ([ADR 0005](../../../../adr/0005-temporal-polyfill.md)); `dateIntake.ts` beside it is the only other file on
 this side of the tree that imports `temporal-polyfill`.
 
-**`dayIndex` and `fromDayIndex` are the two exceptions, and they are arithmetic, not dates.** `dayIndex` turns a
+**`isSameDay` and `isSameMonth` compare the local year, month and day directly, and that is the same answer.**
+They built two `Temporal.PlainDate`s per call from exactly those three fields and compared them, and the planner's
+calendar calls them hundreds of thousands of times per render; the comparison is the whole of what the
+round trip did.
+
+**`dayIndex` and `fromDayIndex` are the other exceptions, and they are arithmetic, not dates.** `dayIndex` turns a
 calendar day into an integer (days since 1 January 1970, read from the local year, month and day through
 `Date.UTC`) and `fromDayIndex` turns it back into local midnight. The planning engine counts in those integers
 inside loops that run once per candidate per pick, where a `Temporal.PlainDate` round trip per comparison is the

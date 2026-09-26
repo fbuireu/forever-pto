@@ -84,11 +84,12 @@ export const CalendarList = () => {
 	);
 
 	const toggleDay = useCallback(
-		(date: Date): DayOutcome =>
-			isCalculating
-				? { applied: false, reason: DayRefusal.PLAN_IN_FLIGHT }
-				: toggleDaySelection({ date, totalPtoDays: ptoDays, locale, allowPastDays }),
-		[isCalculating, toggleDaySelection, ptoDays, locale, allowPastDays],
+		(date: Date): DayOutcome => {
+			if (useHolidaysStore.getState().isCalculating) return { applied: false, reason: DayRefusal.PLAN_IN_FLIGHT };
+			const { ptoDays: totalPtoDays, allowPastDays: pastDaysAllowed } = useFiltersStore.getState();
+			return toggleDaySelection({ date, totalPtoDays, locale, allowPastDays: pastDaysAllowed });
+		},
+		[toggleDaySelection, locale],
 	);
 	const handleDayToggle = usePlannerDayClick(toggleDay);
 

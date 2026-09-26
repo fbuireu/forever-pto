@@ -45,18 +45,23 @@ const {
 }));
 
 vi.mock("@application/stores/filters", () => ({
-	useFiltersStore: (selector: (state: unknown) => unknown) => selector(mockFiltersState),
+	useFiltersStore: Object.assign((selector: (state: unknown) => unknown) => selector(mockFiltersState), {
+		getState: () => mockFiltersState,
+	}),
 }));
 
 vi.mock("@application/stores/holidays", () => ({
-	useHolidaysStore: (selector: (state: unknown) => unknown) =>
-		selector({
-			...mockHolidaysState,
-			fetchHolidays: mockFetchHolidays,
-			toggleDaySelection: mockToggleDaySelection,
-			pruneDaysOutsideWindow: mockPrune,
-			clearCalculation: mockClearCalculation,
-		}),
+	useHolidaysStore: Object.assign(
+		(selector: (state: unknown) => unknown) =>
+			selector({
+				...mockHolidaysState,
+				fetchHolidays: mockFetchHolidays,
+				toggleDaySelection: mockToggleDaySelection,
+				pruneDaysOutsideWindow: mockPrune,
+				clearCalculation: mockClearCalculation,
+			}),
+		{ getState: () => mockHolidaysState },
+	),
 }));
 
 vi.mock("@ui/hooks/useCalculationsWorker", () => ({
@@ -230,5 +235,27 @@ describe("CalendarList blocks the keyboard on the same terms as the mouse", () =
 		capturedDayToggle.current?.(new Date(2026, 0, 5));
 
 		expect(mockToggleDaySelection).toHaveBeenCalledTimes(1);
+	});
+
+	it("keeps the day handler stable across a budget change, so the months are not re-rendered for it", () => {
+		const { rerender } = render(<CalendarList />);
+		const before = capturedDayToggle.current;
+
+		mockFiltersState.ptoDays = 11;
+		mockHolidaysState.isCalculating = true;
+		rerender(<CalendarList />);
+
+		expect(capturedDayToggle.current).toBe(before);
+		mockFiltersState.ptoDays = 10;
+	});
+
+	it("reads the budget at the click, not from the render that built the handler", () => {
+		render(<CalendarList />);
+		mockFiltersState.ptoDays = 12;
+
+		capturedDayToggle.current?.(new Date(2026, 0, 5));
+
+		expect(mockToggleDaySelection).toHaveBeenCalledWith(expect.objectContaining({ totalPtoDays: 12 }));
+		mockFiltersState.ptoDays = 10;
 	});
 });

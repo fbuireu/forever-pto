@@ -1,11 +1,15 @@
 import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
-import { isBefore, isSameDay, startOfDay } from "@application/shared/utils/dates";
+import { dayIndex, isBefore, isSameDay, startOfDay } from "@application/shared/utils/dates";
 import type { HolidaysState } from "@application/stores/holidays";
 import type { Suggestion } from "@domain/calendar/types";
 import type { FromTo } from "../calendar/Calendar";
 
-export const isHoliday = (holidays: HolidaysState["holidays"]) => (date: Date) =>
-	holidays.some((holiday) => isSameDay({ a: date, b: holiday.date }));
+const daySetOf = (dates: Date[]) => new Set(dates.map(dayIndex));
+
+export const isHoliday = (holidays: HolidaysState["holidays"]) => {
+	const days = daySetOf(holidays.map(({ date }) => date));
+	return (date: Date) => days.has(dayIndex(date));
+};
 
 export interface IsPastParams {
 	allowPastDays: boolean;
@@ -22,7 +26,10 @@ export const isPast = ({ allowPastDays, today }: IsPastParams) => {
 	return (date: Date) => isBefore({ date, dateToCompare: todayStart });
 };
 
-export const isToday = (today: Date | null) => (date: Date) => (today ? isSameDay({ a: date, b: today }) : false);
+export const isToday = (today: Date | null) => {
+	const todayIndex = today ? dayIndex(today) : null;
+	return (date: Date) => todayIndex !== null && dayIndex(date) === todayIndex;
+};
 
 export interface IsSuggestionParams {
 	currentSelection: Suggestion | null;
@@ -30,20 +37,20 @@ export interface IsSuggestionParams {
 }
 
 export const isSuggestion = ({ currentSelection, removedSuggestedDays = [] }: IsSuggestionParams) => {
+	if (!currentSelection) return () => false;
+
+	const removed = daySetOf(removedSuggestedDays);
+	const suggested = daySetOf(currentSelection.days);
+
 	return (date: Date) => {
-		if (!currentSelection) return false;
-
-		const wasRemoved = removedSuggestedDays.some((d) => isSameDay({ a: d, b: date }));
-		if (wasRemoved) return false;
-
-		return currentSelection.days.some((d) => isSameDay({ a: d, b: date }));
+		const index = dayIndex(date);
+		return !removed.has(index) && suggested.has(index);
 	};
 };
 
 export const isManuallySelected = (manuallySelectedDays: Date[]) => {
-	return (date: Date) => {
-		return manuallySelectedDays.some((d) => isSameDay({ a: d, b: date }));
-	};
+	const days = daySetOf(manuallySelectedDays);
+	return (date: Date) => days.has(dayIndex(date));
 };
 
 interface IsAlternativeParams {
@@ -59,35 +66,35 @@ export const isAlternative = ({
 	previewAlternativeIndex,
 	currentSelection,
 }: IsAlternativeParams) => {
+	const targetSuggestion = previewAlternativeIndex === 0 ? suggestion : alternatives[previewAlternativeIndex - 1];
+	if (!targetSuggestion?.days) return () => false;
+
+	const selected = daySetOf(currentSelection?.days ?? []);
+	const target = daySetOf(targetSuggestion.days);
+
 	return (date: Date) => {
-		if (currentSelection?.days.some((d) => isSameDay({ a: d, b: date }))) {
-			return false;
-		}
-
-		const targetSuggestion = previewAlternativeIndex === 0 ? suggestion : alternatives[previewAlternativeIndex - 1];
-
-		if (!targetSuggestion?.days) return false;
-
-		return targetSuggestion?.days.some((d) => isSameDay({ a: d, b: date })) ?? false;
+		const index = dayIndex(date);
+		return !selected.has(index) && target.has(index);
 	};
 };
 
-export const isCustom = (holidays: HolidayDTO[]) => (date: Date) => {
-	return holidays.some(
-		(holiday) => isSameDay({ a: holiday.date, b: date }) && holiday.variant === HolidayVariant.CUSTOM,
-	);
+const holidayDaysOf = (holidays: HolidayDTO[], variants: readonly HolidayDTO["variant"][]) =>
+	daySetOf(holidays.filter(({ variant }) => variants.includes(variant)).map(({ date }) => date));
+
+export const isCustom = (holidays: HolidayDTO[]) => {
+	const days = holidayDaysOf(holidays, [HolidayVariant.CUSTOM]);
+	return (date: Date) => days.has(dayIndex(date));
 };
 
-export const isNationalOrRegionalHoliday = (holidays: HolidayDTO[]) => (date: Date) => {
-	return holidays.some(
-		(holiday) =>
-			isSameDay({ a: holiday.date, b: date }) &&
-			(holiday.variant === HolidayVariant.NATIONAL || holiday.variant === HolidayVariant.REGIONAL),
-	);
+export const isNationalOrRegionalHoliday = (holidays: HolidayDTO[]) => {
+	const days = holidayDaysOf(holidays, [HolidayVariant.NATIONAL, HolidayVariant.REGIONAL]);
+	return (date: Date) => days.has(dayIndex(date));
 };
 
-export const isSelected = (selectedDates: Date[]) => (date: Date) =>
-	selectedDates.some((d) => isSameDay({ a: d, b: date }));
+export const isSelected = (selectedDates: Date[]) => {
+	const days = daySetOf(selectedDates);
+	return (date: Date) => days.has(dayIndex(date));
+};
 
 export const isInRange =
 	({ from, to }: Partial<FromTo>) =>

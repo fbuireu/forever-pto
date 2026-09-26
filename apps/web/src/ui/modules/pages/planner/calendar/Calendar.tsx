@@ -20,7 +20,7 @@ import { ConditionalWrapper } from "@ui/modules/shared/ConditionalWrapper";
 import { cn } from "@ui/utils/cn";
 import type { Locale } from "next-intl";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { getCalendarDays } from "../utils/helpers";
 import {
 	getPreviewRange,
@@ -88,7 +88,7 @@ interface RangeState {
 
 const NO_DAY_STATES: DayStates = {};
 
-export function Calendar({
+export const Calendar = memo(function Calendar({
 	mode = CalendarSelectionMode.SINGLE,
 	selected,
 	onSelect,
@@ -430,4 +430,4 @@ export function Calendar({
 			</div>
 		</div>
 	);
-}
+});

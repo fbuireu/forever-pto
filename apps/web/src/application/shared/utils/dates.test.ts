@@ -77,6 +77,14 @@ describe("isSameDay", () => {
 	it("returns false for different dates", () => {
 		expect(isSameDay({ a: new Date(2024, 0, 1), b: new Date(2024, 0, 2) })).toBe(false);
 	});
+
+	it("ignores the time of day", () => {
+		expect(isSameDay({ a: new Date(2024, 0, 1, 23, 59), b: new Date(2024, 0, 1) })).toBe(true);
+	});
+
+	it("tells the same day of another year apart", () => {
+		expect(isSameDay({ a: new Date(2024, 0, 1), b: new Date(2025, 0, 1) })).toBe(false);
+	});
 });
 
 describe("isSameMonth", () => {
@@ -86,6 +94,10 @@ describe("isSameMonth", () => {
 
 	it("returns false for different months", () => {
 		expect(isSameMonth({ a: new Date(2024, 0, 1), b: new Date(2024, 1, 1) })).toBe(false);
+	});
+
+	it("tells the same month of another year apart", () => {
+		expect(isSameMonth({ a: new Date(2024, 0, 1), b: new Date(2025, 0, 1) })).toBe(false);
 	});
 });
 

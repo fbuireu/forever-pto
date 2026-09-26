@@ -22,13 +22,11 @@ export interface DatePairParams {
 	b: Date;
 }
 
-export const isSameDay = ({ a, b }: DatePairParams): boolean => toPlainDate(a).equals(toPlainDate(b));
+export const isSameDay = ({ a, b }: DatePairParams): boolean =>
+	a.getDate() === b.getDate() && a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear();
 
-export const isSameMonth = ({ a, b }: DatePairParams): boolean => {
-	const pa = toPlainDate(a);
-	const pb = toPlainDate(b);
-	return pa.year === pb.year && pa.month === pb.month;
-};
+export const isSameMonth = ({ a, b }: DatePairParams): boolean =>
+	a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear();
 
 export interface IsBeforeParams {
 	date: Date;
