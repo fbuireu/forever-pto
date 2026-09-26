@@ -195,7 +195,7 @@ describe("getTotalEffectiveDays", () => {
 		expect(calculateLongestVacation(freeStreaks({ placedDays: days, holidays }))).toBe(3);
 	});
 
-	it("keeps the stretch the remaining half of a two-day break still reaches", () => {
+	it("keeps the stretch the remaining half of a two-day Bridge still reaches", () => {
 		expect(
 			effectiveDaysOf({
 				days: [makeDate({ year: 2025, month: 1, day: 9 }), makeDate({ year: 2025, month: 1, day: 10 })],
@@ -482,7 +482,7 @@ describe("calculateLongWeekends", () => {
 });
 
 describe("getTotalEffectiveDays overlap", () => {
-	it("counts a weekend shared by two breaks once", () => {
+	it("counts a weekend shared by two Bridges once", () => {
 		expect(
 			effectiveDaysOf({
 				days: [makeDate({ year: 2025, month: 1, day: 3 }), makeDate({ year: 2025, month: 1, day: 6 })],
@@ -490,7 +490,7 @@ describe("getTotalEffectiveDays overlap", () => {
 		).toBe(4);
 	});
 
-	it("still adds disjoint breaks in full", () => {
+	it("still adds disjoint Bridges in full", () => {
 		expect(
 			effectiveDaysOf({
 				days: [makeDate({ year: 2025, month: 1, day: 3 }), makeDate({ year: 2025, month: 6, day: 2 })],

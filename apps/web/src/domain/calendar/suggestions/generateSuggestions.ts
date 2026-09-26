@@ -1,5 +1,5 @@
 import type { FilterStrategy } from "../types";
-import type { PlanningCandidates } from "../utils/candidates";
+import { type PlanningCandidates, selectionInputOf } from "../utils/candidates";
 import { selectBridgesForStrategy } from "./utils/selectors";
 
 export interface GenerateSuggestionsParams {
@@ -10,30 +10,14 @@ export interface GenerateSuggestionsParams {
 }
 
 export function generateSuggestions({ ptoDays, candidates, strategy, preferredMonths }: GenerateSuggestionsParams) {
-	if (ptoDays <= 0) {
+	if (ptoDays <= 0 || candidates.availableWorkdays.length === 0) {
 		return { days: [], bridges: [], strategy };
 	}
 
-	const { availableWorkdays, bridges, alreadyOff } = candidates;
-
-	if (availableWorkdays.length === 0) {
-		return { days: [], bridges: [], strategy };
-	}
-
-	const effectivePtoDays = Math.min(availableWorkdays.length, ptoDays);
-
-	const selection = selectBridgesForStrategy({
-		bridges,
-		targetPtoDays: effectivePtoDays,
+	const { days, bridges } = selectBridgesForStrategy({
+		...selectionInputOf({ candidates, ptoDays, preferredMonths }),
 		strategy,
-		preferredMonths,
-		workdays: availableWorkdays,
-		alreadyOff,
 	});
 
-	return {
-		days: selection.days,
-		bridges: selection.bridges,
-		strategy,
-	};
+	return { days, bridges, strategy };
 }

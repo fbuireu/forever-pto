@@ -5,9 +5,24 @@ import { PTO_CONSTANTS } from "../const";
 import { selectBridgesForStrategy } from "../suggestions/utils/selectors";
 import { FilterStrategy, type Suggestion } from "../types";
 import { clearDateKeyCache, clearHolidayCache } from "../utils/cache";
-import { findPlanningCandidates } from "../utils/candidates";
+import { findPlanningCandidates, type PlanningCandidates, selectionInputOf } from "../utils/candidates";
+import { measurePlan } from "../utils/measures";
 import { generateAlternatives } from "./generateAlternatives";
-import { coveredDays, planDistance } from "./utils/helpers";
+import { planDistance } from "./utils/helpers";
+
+interface MeasureAgainstParams {
+	plan: Suggestion;
+	candidates: PlanningCandidates;
+}
+
+const measureAgainst = ({ plan, candidates }: MeasureAgainstParams) =>
+	measurePlan({
+		plan,
+		alreadyOff: candidates.alreadyOff,
+		manualDays: candidates.manualDays,
+		workdays: candidates.availableWorkdays,
+		preferredMonths: [],
+	});
 
 interface PlanAlternativesParams {
 	ptoDays: number;
@@ -30,14 +45,9 @@ const planAlternatives = ({
 	maxAlternatives,
 	existingSuggestion,
 }: PlanAlternativesParams) => {
-	const candidates = findPlanningCandidates({ holidays, months, allowPastDays, removedDays });
+	const candidates = findPlanningCandidates({ holidays, months, allowPastDays, removedDays, manualDays: [] });
 	const greedy = existingSuggestion ?? {
-		...selectBridgesForStrategy({
-			bridges: candidates.bridges,
-			targetPtoDays: ptoDays,
-			strategy,
-			workdays: candidates.availableWorkdays,
-		}),
+		...selectBridgesForStrategy({ ...selectionInputOf({ candidates, ptoDays }), strategy }),
 		strategy,
 	};
 	const { suggestion, alternatives } = generateAlternatives({
@@ -132,14 +142,14 @@ describe("generateAlternatives", () => {
 	it.each(Object.values(FilterStrategy))(
 		"%s: never offers a plan that covers more days than the Suggestion, or returns more per PTO Day",
 		(strategy) => {
-			const { suggestion, alternatives } = planAlternatives({ ...YEAR, strategy });
-			const ceiling = coveredDays(suggestion);
+			const { suggestion, alternatives, candidates } = planAlternatives({ ...YEAR, strategy });
+			const ceiling = measureAgainst({ plan: suggestion, candidates });
 
 			expect(alternatives.length).toBeGreaterThan(0);
 			for (const alternative of alternatives) {
-				const covered = coveredDays(alternative);
-				expect(covered).toBeLessThanOrEqual(ceiling);
-				expect(covered / alternative.days.length).toBeLessThanOrEqual(ceiling / suggestion.days.length);
+				const { covered, efficiency } = measureAgainst({ plan: alternative, candidates });
+				expect(covered).toBeLessThanOrEqual(ceiling.covered);
+				expect(efficiency).toBeLessThanOrEqual(ceiling.efficiency);
 			}
 		},
 	);
@@ -147,7 +157,7 @@ describe("generateAlternatives", () => {
 	it("offers another Strategy's plan only when it covers fewer days than the Suggestion", () => {
 		const { candidates, alternatives } = planAlternatives({ ...YEAR, strategy: FilterStrategy.OPTIMIZED });
 		const planOf = (strategy: FilterStrategy) =>
-			selectBridgesForStrategy({ bridges: candidates.bridges, targetPtoDays: YEAR.ptoDays, strategy });
+			selectBridgesForStrategy({ ...selectionInputOf({ candidates, ptoDays: YEAR.ptoDays }), strategy });
 		const offered = alternatives.map((alternative) => toStrings(alternative.days).join());
 
 		expect(offered).toContain(toStrings(planOf(FilterStrategy.GROUPED).days).join());
@@ -164,14 +174,16 @@ describe("generateAlternatives", () => {
 			bridges: [],
 			strategy: FilterStrategy.OPTIMIZED,
 		};
-		const { suggestion, alternatives } = planAlternatives({
+		const { suggestion, alternatives, candidates } = planAlternatives({
 			...YEAR,
 			strategy: FilterStrategy.OPTIMIZED,
 			existingSuggestion: weak,
 		});
 
 		expect(suggestion).not.toBe(weak);
-		expect(coveredDays(suggestion)).toBeGreaterThan(coveredDays(weak));
+		expect(measureAgainst({ plan: suggestion, candidates }).covered).toBeGreaterThan(
+			measureAgainst({ plan: weak, candidates }).covered,
+		);
 		expect(alternatives).toContain(weak);
 	});
 
@@ -236,8 +248,7 @@ describe("generateAlternatives", () => {
 		const { candidates, alternatives } = planAlternatives({ ...YEAR, strategy: FilterStrategy.OPTIMIZED });
 		const groupedPlan = toStrings(
 			selectBridgesForStrategy({
-				bridges: candidates.bridges,
-				targetPtoDays: YEAR.ptoDays,
+				...selectionInputOf({ candidates, ptoDays: YEAR.ptoDays }),
 				strategy: FilterStrategy.GROUPED,
 			}).days,
 		).join();

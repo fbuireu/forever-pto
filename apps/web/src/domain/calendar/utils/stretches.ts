@@ -1,19 +1,24 @@
 import { fromDayIndex, isWeekend } from "@application/shared/utils/dates";
 
-export interface DaySpan {
+export interface WorkStretch {
 	start: number;
 	end: number;
 }
 
-const onlyWeekendBetween = ({ start, end }: DaySpan) => {
+interface OnlyWeekendBetweenParams {
+	start: number;
+	end: number;
+}
+
+const onlyWeekendBetween = ({ start, end }: OnlyWeekendBetweenParams) => {
 	for (let day = start + 1; day < end; day++) {
 		if (!isWeekend(fromDayIndex(day))) return false;
 	}
 	return true;
 };
 
-export const workStretchesOf = (workdays: number[]): DaySpan[] => {
-	const stretches: DaySpan[] = [];
+export const workStretchesOf = (workdays: number[]): WorkStretch[] => {
+	const stretches: WorkStretch[] = [];
 
 	workdays.forEach((day, position) => {
 		const last = stretches.at(-1);

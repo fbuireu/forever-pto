@@ -17,16 +17,17 @@ in [`CONTEXT.md`](../../../../../CONTEXT.md).
 | [`const.ts`](./const.ts) | `PTO_CONSTANTS`: every tunable in the engine; the unit and meaning of each are in [Constants](#constants) below |
 | [`utils/cache.ts`](./utils/cache.ts) | `getKey`, `getCombinationKey`, `createHolidaySet`, and the `clear*` functions the caller must use |
 | [`utils/helpers.ts`](./utils/helpers.ts) | `getAvailableWorkdays` (Workday enumeration) and `findBridges` (candidate generation and ranking) |
-| [`utils/candidates.ts`](./utils/candidates.ts) | `findPlanningCandidates`: the Workdays and the Bridges, found once per run and handed to both generators |
+| [`utils/candidates.ts`](./utils/candidates.ts) | `findPlanningCandidates`: the Workdays, the Bridges, the Manual Days and their streaks (`alreadyOff`), found once per run and handed to both generators, and `selectionInputOf`, the one construction of what a selector run is given |
 | [`utils/selection.ts`](./utils/selection.ts) | `resolveSelectedDays`: folds Manual Days in and Removed Days out of a Suggestion's day list |
 | [`utils/budget.ts`](./utils/budget.ts) | `measureBudget`: how much of the PTO budget a plan has spent, and the Remaining Budget |
 | [`suggestions/generateSuggestions.ts`](./suggestions/generateSuggestions.ts) | The entry point: Workdays → Bridges → Strategy selector → Suggestion |
-| [`suggestions/utils/selectors.ts`](./suggestions/utils/selectors.ts) | `STRATEGY_OBJECTIVE` (one `Objective` per Strategy: a marginal floor and a rank), `objectiveFor` (the one fallback), `selectBridges`, the single selector they all feed and the one owner of the chronological day order, and `selectBridgesForStrategy` which composes them, plus `PlanMeasures`, the facts an `aim` reads. It counts days with `dayIndex` from `@application/shared/utils/dates` |
-| [`suggestions/utils/stretches.ts`](./suggestions/utils/stretches.ts) | `workStretchesOf` and `longestWorkStretch`: Workdays grouped into stretches of work that only a Free Day on a weekday ends, the one reading of the rule the selector and the Alternatives share |
-| [`window.ts`](./window.ts) | `PlanningWindow` and both of its projections, `planningWindowMonths` (the month array) and `planningWindowInterval`/`isInPlanningWindow` (the interval), plus `MONTHS_IN_YEAR`, `MONTHS_IN_QUARTER`, `MAX_CARRY_OVER_MONTHS`, `windowMonthCount`/`windowQuarterCount`, and the Preferred Months pair `isPreferredMonths` with `DEFAULT_PREFERRED_MONTHS`, kept here rather than in `types.ts` because the docs site imports `types.ts` by relative path and it must stay import-free |
+| [`suggestions/utils/selectors.ts`](./suggestions/utils/selectors.ts) | `STRATEGY_OBJECTIVE` (one `Objective` per Strategy: a marginal floor and a rank), `objectiveFor` (the one fallback), `selectBridges`, the single selector they all feed and the one owner of the chronological day order, `selectBridgesForStrategy` which composes them, and `outranks`, the one lexicographic comparison of ranks, which the Alternatives search reuses. It counts days with `dayIndex` from `@application/shared/utils/dates` |
+| [`utils/stretches.ts`](./utils/stretches.ts) | `workStretchesOf` and `longestWorkStretch`: Workdays grouped into stretches of work that only a Free Day on a weekday ends, the one reading of the rule the selector and `measurePlan` share |
+| [`utils/measures.ts`](./utils/measures.ts) | `measurePlan` and `PlanMeasures`: the facts an `aim` ranks a whole plan by, and the Effective Days and Efficiency the Alternatives are capped with, counted the way the Metrics count them |
+| [`window.ts`](./window.ts) | `PlanningWindow` and both of its projections, `planningWindowMonths` (the month array) and `planningWindowInterval`/`isInPlanningWindow` (the interval), plus `MONTHS_IN_YEAR`, `MONTHS_IN_QUARTER`, `MAX_CARRY_OVER_MONTHS`, `windowMonthCount`/`windowQuarterCount`, and the Preferred Months: `isPreferredMonths` with `DEFAULT_PREFERRED_MONTHS`, and `inPreferredMonths`, the one reading of "every month is preferred, and none chosen means any" that the selector and `measurePlan` share, kept here rather than in `types.ts` because the docs site imports `types.ts` by relative path and it must stay import-free |
 | [`pipeline.ts`](./pipeline.ts) | `runPlanningPipeline`, the whole run: caches, pseudo-Holidays, budget, the planning calls and the Metrics |
 | [`alternatives/generateAlternatives.ts`](./alternatives/generateAlternatives.ts) | Re-runs selection under the other Strategies and without one Rest Block of the Suggestion at a time, keeping plans at least `MIN_DIFFERENCE` apart |
-| [`alternatives/utils/helpers.ts`](./alternatives/utils/helpers.ts) | `planDistance` (one minus the Jaccard index of two day sets), `coveredDays` (the days a plan's spans, placed days and `alreadyOff` cover) and `measurePlan` (the `PlanMeasures` an `aim` ranks a plan by) |
+| [`alternatives/utils/helpers.ts`](./alternatives/utils/helpers.ts) | `planDistance`: one minus the Jaccard index of two day sets |
 | [`metrics/generateMetrics.ts`](./metrics/generateMetrics.ts) | Assembles the `Metrics` object for a Suggestion or an Alternative |
 | [`metrics/utils/dayOff.ts`](./metrics/utils/dayOff.ts) | `dayKey` and `dayOffKeys`: the one spelling of a day's identity and of the set of days a plan leaves free, which every metric below counts against |
 | [`metrics/utils/streaks.ts`](./metrics/utils/streaks.ts) | `freeStreaks`: the one scan of the free-day runs the plan produces |
@@ -62,7 +63,7 @@ than pretending, because a stored blob is the only input the type cannot vouch f
 The generators below are still exported and still tested on their own, but nothing outside the domain
 calls them directly:
 
-- `generateSuggestions({ ptoDays, candidates, strategy })` → `{ days, bridges?, strategy }`
+- `generateSuggestions({ ptoDays, candidates, strategy, preferredMonths? })` → `{ days, bridges, strategy }`, the greedy plan the search starts from
 - `generateAlternatives({ ptoDays, candidates, maxAlternatives, existingSuggestion, strategy, preferredMonths? })` → `{ suggestion, alternatives }`, the best plan the chosen Strategy found and the ones offered beside it
 - `generateMetrics({ suggestion, locale, planningWindow, holidays, allowPastDays, manuallySelectedDays, removedSuggestedDays })` → `Metrics`
 
@@ -213,8 +214,8 @@ budget and the incremental facts, so the second stage sees the block the first o
 candidate against it. A single `rank` cannot express Main Vacation: "only this block, and only up to this
 length" is a hard admission rule, and putting it in the rank would let a better Bridge outside the Preferred
 Months win the first pick. The first stage recognises the block through two `Candidate` facts, `planIsEmpty`
-(nothing is taken yet, so any admissible Bridge may start it) and `joinsBreak` (`runLength > newDays`, which is
-true exactly when the span touches or overlaps a covered day).
+(nothing is taken yet, so any admissible Bridge may start it) and `joinsBlock` (`runLength` above the span's days no
+taken Bridge covers yet, which is true exactly when the span touches or overlaps a covered day).
 
 **`inPreferredMonths` asks whether every PTO Day of a Bridge falls in the Preferred Months, and an empty list
 means every month.** It is computed once per candidate from `preferredMonths` on `selectBridges`, which the
@@ -244,7 +245,7 @@ already taken wins a tie now; the first pick of a run still falls to input order
 
 **Balanced ranks by the longest stretch of work left, and a weekend does not end a stretch.** `selectBridges` takes
 the Workdays and groups them into work stretches (`workStretchesOf` in
-[`suggestions/utils/stretches.ts`](./suggestions/utils/stretches.ts)): two Workdays belong to one stretch when only
+[`utils/stretches.ts`](./utils/stretches.ts)): two Workdays belong to one stretch when only
 weekend days lie between them, so a Holiday, a Manual Day or a Removed Day ends one. That is the rule
 `calculateMaxWorkStreak` applies, which is why Balanced's first key is the Max Work Streak the plan would leave.
 The second key is what makes it work: ranking by the maximum alone plateaus as soon as two stretches are equally
@@ -335,10 +336,12 @@ month by one day per Manual Day, because the lists overlap by construction. It f
 then unions them through the same helper.
 
 `dayKey` is exported beside it and is the only spelling of `toDateString()` left under `metrics/`; there
-are none loose in either file. It is deliberately **not** `getKey` from `utils/cache.ts`: that one is keyed
-on `Date.getTime()` and distinguishes noon from midnight, which is right for the memoisation it serves and
-wrong here, where a Holiday carrying a time component still has to line up with a placed day at local
-midnight. Both conventions are correct, and conflating them is the failure mode to watch for.
+are none loose in either file. It names the same day `getKey` from `utils/cache.ts` does, whatever the time of
+day: `getKey` only *memoises* on `Date.getTime()`, and its string reads the year, the month and the day and
+nothing else. The metrics keep their own spelling because `utils/cache.ts` needs its clear at the start of a run
+and nothing under `metrics/` should depend on that; the selector and `measurePlan` count in `dayIndex`, the
+integer form, because spans are ranges and a range needs arithmetic. Three spellings of one identity is the
+price, and every one of them ignores the time of day.
 
 **Every streak metric applies it, and for a while only `calculateLongWeekends` did.**
 Longest Vacation folded every free run into its maximum as the streak grew, so it reported whatever the
@@ -400,10 +403,12 @@ the only consumer of the `holidays` argument in either `getAvailableWorkdays` or
 generators' copies were inert. The rule the filter enforced (a Bridge must not claim credit for absorbing a
 Saturday) is enforced there and stated in the cache row above.
 
-`effectivePtoDays = Math.min(availableWorkdays.length, ptoDays)` stays in `generateSuggestions` alone. It is
-inert (both selectors add a Bridge only when its PTO Days are unused, so a selection can never exceed the
-distinct available Workdays) and giving it to `generateAlternatives` for symmetry would be a behaviour change
-wearing a tidy-up's clothes.
+**Both generators build a selector run from `selectionInputOf`, and neither builds it by hand.** They each wrote
+out the same object (the Bridges, the budget, the Preferred Months, the Workdays and `alreadyOff`), and nothing
+checked that the greedy Suggestion `generateAlternatives` receives was made from the same inputs as its own
+re-runs. `generateSuggestions` also clamped the budget to the Workday count, and that clamp is gone: a Bridge is
+taken only while its PTO Days are unused, so a selection can never exceed the distinct Workdays whatever the
+target says, and the plan is the same with or without it.
 
 **`generateAlternatives` calls `selectBridges`, not `selectBridgesForStrategy`.** It needs the parameters the
 Strategy entry point does not take: another Strategy's objective, and the days a run must leave out
@@ -434,7 +439,10 @@ plans are usually offered, and for the others the `OPTIMIZED` plan is refused wh
 over a real calendar is every time.
 
 **The measure is exact, Manual Days included, so nothing downstream has to filter again.** `measurePlan` counts the
-union of the plan's spans, its placed days and `alreadyOff`, which is exactly the free streaks the Metrics count.
+union of the plan's spans, its placed days and `alreadyOff`, which is exactly the free streaks the Metrics count, and
+divides it by the days placed plus the Manual Days, which is the Efficiency the Metrics report. It divided by the
+placed days alone for a while, so with Manual Days the ceiling compared numbers the user never sees and could refuse
+an Alternative whose shown Efficiency was below the Suggestion's.
 The pipeline used to re-check the measured Metrics after the search and drop what exceeded them; because the
 search's measure then missed the streaks around Manual Days, that filter dropped plans the search had already
 spent its runs on and the list came back short. With one measure there is one check, and `strategies.test.ts`
@@ -484,8 +492,16 @@ already expanded through every adjacent Free Day and `alreadyOff` is each Manual
 **The selector keeps the Manual Days' streaks apart from what it took.** `alreadyOff` enters a separate set that
 only the gain reads: a Bridge next to a Manual Day's weekend gains nothing for that weekend, which is the defect
 this closed (a Friday before a Manual Monday used to rank at four for one and add one). The covered set, the stretch
-length and `joinsBreak` stay about the Bridges taken, because Main Vacation's first stage asks whether a candidate
-joins its block, and a Manual Day's weekend is not the block.
+length and `joinsBlock` stay about the Bridges taken, because Main Vacation's first stage asks whether a candidate
+joins its block, and a Manual Day's weekend is not the block. The `aim` does see them: `measurePlan` counts
+`alreadyOff`, because a whole plan is ranked by the Longest Vacation the Metrics will show, Manual Days and all.
+
+**Balanced's aim and the Max Work Streak metric read different ranges, and only the Carry-over Months separate
+them.** The selector and `measurePlan` measure stretches over the Planning Window's available Workdays, which is
+what a plan can change: Removed Days and, unless `allowPastDays`, past days are not in it. `calculateMaxWorkStreak`
+scans one calendar year from the same starting point. So, the Removed Day simplification above aside, the two
+agree on the year and part company only when a stretch runs on into the Carry-over Months, where the aim counts
+days the metric stops at 31 December.
 
 **`bridgesUsed` counts the Bridges still in use: those with at least one PTO Day still placed.** It was
 `bridges?.length` first, straight from the array the caller passed, and then only the Bridges whose every PTO Day
@@ -626,8 +642,10 @@ are on returned values; there is nothing to mock, with one exception below.
 [`strategies.test.ts`](./strategies.test.ts) is the benchmark: the Spanish national calendar for 2026 and a
 22-day budget through `runPlanningPipeline`, asserting what each Strategy is *for* rather than the dates it
 picks. Every Strategy spends the budget and never lands under its own floor; what the selector believed it gained
-equals the measured Effective Days; Optimized produces the most Effective Days and Grouped the longest break, with
-Balanced between them on both; and every plan offered is at least `MIN_DIFFERENCE` from every other. A change to
+equals the measured Effective Days; Optimized produces the most Effective Days, Balanced the next most with the
+shortest Max Work Streak of every Strategy, and Grouped the fewest with the Longest Vacation, its blocks held to
+`GROUPED_MAX_BLOCK_DAYS`; Main Vacation's block lands in the Preferred Months before it spends the rest like
+Optimized; and every plan offered is at least `MIN_DIFFERENCE` from every other. A change to
 an objective that keeps those holding is a tuning; one that breaks them changes what a Strategy means, and wants
 the ADR amended.
 

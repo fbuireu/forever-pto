@@ -1,10 +1,10 @@
 import { HolidayVariant } from "@application/dto/holiday/types";
-import { dayIndex } from "@application/shared/utils/dates";
 import { describe, expect, it } from "vitest";
 import { planDistance } from "./alternatives/utils/helpers";
 import { PTO_CONSTANTS } from "./const";
 import { runPlanningPipeline } from "./pipeline";
 import { FilterStrategy, type MeasuredSuggestion } from "./types";
+import { measurePlan } from "./utils/measures";
 
 const SPAIN_2026 = [
 	new Date(2026, 0, 1),
@@ -52,13 +52,8 @@ const PLANS = Object.fromEntries(Object.values(FilterStrategy).map((strategy) =>
 
 const suggestionOf = (strategy: FilterStrategy) => PLANS[strategy].suggestion;
 
-const spanUnion = ({ bridges = [] }: MeasuredSuggestion) => {
-	const covered = new Set<number>();
-	for (const bridge of bridges) {
-		for (let day = dayIndex(bridge.startDate); day <= dayIndex(bridge.endDate); day++) covered.add(day);
-	}
-	return covered.size;
-};
+const spanUnion = (plan: MeasuredSuggestion) =>
+	measurePlan({ plan, alreadyOff: [], manualDays: [], workdays: [], preferredMonths: [] }).covered;
 
 describe("the Strategies over a real calendar", () => {
 	it.each(Object.values(FilterStrategy))("%s spends the whole budget", (strategy) => {
@@ -83,7 +78,7 @@ describe("the Strategies over a real calendar", () => {
 		expect(suggestionOf(strategy).metrics.averageEfficiency).toBeGreaterThanOrEqual(floor);
 	});
 
-	it("orders Effective Days from OPTIMIZED through BALANCED to GROUPED, and gives GROUPED the longest break", () => {
+	it("orders Effective Days from OPTIMIZED through BALANCED to GROUPED, and gives GROUPED the Longest Vacation", () => {
 		const { OPTIMIZED, BALANCED, GROUPED } = FilterStrategy;
 		const effective = (strategy: FilterStrategy) => suggestionOf(strategy).metrics.totalEffectiveDays;
 		const longest = (strategy: FilterStrategy) => suggestionOf(strategy).metrics.longestVacation;

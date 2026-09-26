@@ -2,6 +2,7 @@ import { endOfMonth } from "@application/shared/utils/dates";
 import { describe, expect, it } from "vitest";
 import {
 	DEFAULT_PREFERRED_MONTHS,
+	inPreferredMonths,
 	isPreferredMonths,
 	MAX_CARRY_OVER_MONTHS,
 	MONTHS_IN_YEAR,
@@ -97,5 +98,19 @@ describe("isPreferredMonths", () => {
 
 	it("accepts the default it is paired with", () => {
 		expect(isPreferredMonths([...DEFAULT_PREFERRED_MONTHS])).toBe(true);
+	});
+});
+
+describe("inPreferredMonths", () => {
+	it("holds when every month is preferred", () => {
+		expect(inPreferredMonths({ months: [6, 7, 7], preferredMonths: new Set([6, 7]) })).toBe(true);
+	});
+
+	it("fails when one month is not", () => {
+		expect(inPreferredMonths({ months: [5, 6], preferredMonths: new Set([6, 7]) })).toBe(false);
+	});
+
+	it("reads no preference as every month", () => {
+		expect(inPreferredMonths({ months: [0, 11], preferredMonths: new Set() })).toBe(true);
 	});
 });

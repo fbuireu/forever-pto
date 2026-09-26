@@ -6,6 +6,8 @@ import { clearDateKeyCache, clearHolidayCache } from "@domain/calendar/utils/cac
 import { beforeEach, describe, expect, it } from "vitest";
 import { objectiveFor, STRATEGY_OBJECTIVE, selectBridges, selectBridgesForStrategy } from "./selectors";
 
+const NO_CALENDAR = { workdays: [], alreadyOff: [] };
+
 beforeEach(() => {
 	clearDateKeyCache();
 	clearHolidayCache();
@@ -69,13 +71,14 @@ interface DateRangeParams {
 
 describe("selectBridgesForStrategy, every Strategy", () => {
 	it.each(Object.values(FilterStrategy))("%s: returns an empty result for no bridges", (strategy) => {
-		const result = selectBridgesForStrategy({ bridges: [], targetPtoDays: 5, strategy });
+		const result = selectBridgesForStrategy({ ...NO_CALENDAR, bridges: [], targetPtoDays: 5, strategy });
 		expect(result.days).toHaveLength(0);
 		expect(result.bridges).toHaveLength(0);
 	});
 
 	it.each(Object.values(FilterStrategy))("%s: never exceeds the budget", (strategy) => {
 		const result = selectBridgesForStrategy({
+			...NO_CALENDAR,
 			bridges: [friday10, friday17, friday31, fridayBeforeHoliday],
 			targetPtoDays: 2,
 			strategy,
@@ -86,20 +89,26 @@ describe("selectBridgesForStrategy, every Strategy", () => {
 	it.each(Object.values(FilterStrategy))("%s: never places the same day twice", (strategy) => {
 		const mondayTuesday = makeBridge({ from: jan(11), to: jan(14), ptoDays: [jan(13), jan(14)] });
 		const tuesdayWednesday = makeBridge({ from: jan(14), to: jan(19), ptoDays: [jan(14), jan(15)] });
-		const result = selectBridgesForStrategy({ bridges: [mondayTuesday, tuesdayWednesday], targetPtoDays: 4, strategy });
+		const result = selectBridgesForStrategy({
+			...NO_CALENDAR,
+			bridges: [mondayTuesday, tuesdayWednesday],
+			targetPtoDays: 4,
+			strategy,
+		});
 
 		expect(new Set(toStrings(result.days)).size).toBe(result.days.length);
 	});
 
 	it.each(Object.values(FilterStrategy))("%s: skips a Bridge that costs more than the budget left", (strategy) => {
 		const thursdayFriday = makeBridge({ from: jan(9), to: jan(12), ptoDays: [jan(9), jan(10)] });
-		const result = selectBridgesForStrategy({ bridges: [thursdayFriday], targetPtoDays: 1, strategy });
+		const result = selectBridgesForStrategy({ ...NO_CALENDAR, bridges: [thursdayFriday], targetPtoDays: 1, strategy });
 
 		expect(result.days).toEqual([]);
 	});
 
 	it.each(Object.values(FilterStrategy))("%s: returns its days chronologically", (strategy) => {
 		const result = selectBridgesForStrategy({
+			...NO_CALENDAR,
 			bridges: [friday31, friday17, fridayBeforeHoliday],
 			targetPtoDays: 3,
 			strategy,
@@ -117,6 +126,7 @@ describe("selectBridgesForStrategy, every Strategy", () => {
 describe("the marginal gain", () => {
 	it("counts a weekend two Bridges share once, so the second one is worth a single day", () => {
 		const { days } = selectBridgesForStrategy({
+			...NO_CALENDAR,
 			bridges: [friday10, monday13, friday17],
 			targetPtoDays: 2,
 			strategy: FilterStrategy.OPTIMIZED,
@@ -127,6 +137,7 @@ describe("the marginal gain", () => {
 
 	it("leaves budget unspent rather than take a day that adds less than the floor", () => {
 		const { days } = selectBridgesForStrategy({
+			...NO_CALENDAR,
 			bridges: [friday10, monday13],
 			targetPtoDays: 2,
 			strategy: FilterStrategy.OPTIMIZED,
@@ -137,6 +148,7 @@ describe("the marginal gain", () => {
 
 	it("counts the weekend a Manual Day already covers as no gain", () => {
 		const { days } = selectBridges({
+			...NO_CALENDAR,
 			bridges: [friday10, friday17],
 			targetPtoDays: 1,
 			objective: STRATEGY_OBJECTIVE[FilterStrategy.OPTIMIZED],
@@ -148,6 +160,7 @@ describe("the marginal gain", () => {
 
 	it("never places a forbidden day, whatever it would add", () => {
 		const { days } = selectBridges({
+			...NO_CALENDAR,
 			bridges: [fridayBeforeHoliday, friday10],
 			targetPtoDays: 1,
 			objective: STRATEGY_OBJECTIVE[FilterStrategy.OPTIMIZED],
@@ -161,6 +174,7 @@ describe("the marginal gain", () => {
 describe("OPTIMIZED", () => {
 	it("takes the Bridge that adds most per PTO Day first", () => {
 		const { days } = selectBridgesForStrategy({
+			...NO_CALENDAR,
 			bridges: [friday10, fridayBeforeHoliday],
 			targetPtoDays: 1,
 			strategy: FilterStrategy.OPTIMIZED,
@@ -169,8 +183,9 @@ describe("OPTIMIZED", () => {
 		expect(toStrings(days)).toEqual(toStrings([jan(3)]));
 	});
 
-	it("breaks a tie by distance from the breaks already taken, not by date", () => {
+	it("breaks a tie by distance from the Bridges already taken, not by date", () => {
 		const { days } = selectBridgesForStrategy({
+			...NO_CALENDAR,
 			bridges: [friday10, friday17, friday31],
 			targetPtoDays: 2,
 			strategy: FilterStrategy.OPTIMIZED,
@@ -182,6 +197,7 @@ describe("OPTIMIZED", () => {
 	it("refuses a working week, which returns under the floor", () => {
 		const block = week({ monday: jan(13), from: jan(11), to: jan(19) });
 		const { days } = selectBridgesForStrategy({
+			...NO_CALENDAR,
 			bridges: [block],
 			targetPtoDays: 5,
 			strategy: FilterStrategy.OPTIMIZED,
@@ -204,6 +220,7 @@ describe("GROUPED", () => {
 
 	it("takes a working week over a sharper single day, because the stretch is what it ranks", () => {
 		const { bridges } = selectBridgesForStrategy({
+			...NO_CALENDAR,
 			bridges: [fridayBeforeHoliday, first],
 			targetPtoDays: 5,
 			strategy: FilterStrategy.GROUPED,
@@ -214,6 +231,7 @@ describe("GROUPED", () => {
 
 	it("grows a block it already holds before starting another one", () => {
 		const { bridges } = selectBridgesForStrategy({
+			...NO_CALENDAR,
 			bridges: [first, march, second],
 			targetPtoDays: 10,
 			strategy: FilterStrategy.GROUPED,
@@ -224,6 +242,7 @@ describe("GROUPED", () => {
 
 	it("starts a new block once the current one would pass GROUPED_MAX_BLOCK_DAYS", () => {
 		const { bridges } = selectBridgesForStrategy({
+			...NO_CALENDAR,
 			bridges: [first, second, third, march],
 			targetPtoDays: 15,
 			strategy: FilterStrategy.GROUPED,
@@ -249,12 +268,14 @@ describe("BALANCED", () => {
 
 	it("splits the longest stretch of Workdays first, where OPTIMIZED would take the earliest tie", () => {
 		const balanced = selectBridgesForStrategy({
+			...NO_CALENDAR,
 			bridges: fridays,
 			targetPtoDays: 2,
 			strategy: FilterStrategy.BALANCED,
 			workdays: winter,
 		});
 		const optimized = selectBridgesForStrategy({
+			...NO_CALENDAR,
 			bridges: fridays,
 			targetPtoDays: 1,
 			strategy: FilterStrategy.OPTIMIZED,
@@ -268,6 +289,7 @@ describe("BALANCED", () => {
 	it("does not break a stretch at a weekend, and does at a Holiday", () => {
 		const holidayFriday = winter.filter((day) => day.toDateString() !== jan(31).toDateString());
 		const { days } = selectBridgesForStrategy({
+			...NO_CALENDAR,
 			bridges: [fridays[0], fridays[2]].filter((bridge) => bridge !== undefined),
 			targetPtoDays: 1,
 			strategy: FilterStrategy.BALANCED,
@@ -277,9 +299,10 @@ describe("BALANCED", () => {
 		expect(toStrings(days)).toEqual(toStrings([on({ month: 2, day: 14 })]));
 	});
 
-	it("prefers the longer break when the stretches tie, up to BALANCED_MAX_BLOCK_DAYS", () => {
+	it("prefers the longer stretch off when the stretches of work tie, up to BALANCED_MAX_BLOCK_DAYS", () => {
 		const thursdayFriday = makeBridge({ from: jan(9), to: jan(12), ptoDays: [jan(9), jan(10)] });
 		const { bridges } = selectBridgesForStrategy({
+			...NO_CALENDAR,
 			bridges: [friday17, thursdayFriday],
 			targetPtoDays: 2,
 			strategy: FilterStrategy.BALANCED,
@@ -314,6 +337,7 @@ describe("MAIN_VACATION", () => {
 
 	it("builds its block inside the preferred months before anything else, even against a sharper day", () => {
 		const { bridges } = selectBridges({
+			...NO_CALENDAR,
 			bridges: [fridayBeforeHoliday, march, july],
 			targetPtoDays: 5,
 			objective: STRATEGY_OBJECTIVE[FilterStrategy.MAIN_VACATION],
@@ -325,6 +349,7 @@ describe("MAIN_VACATION", () => {
 
 	it("grows that one block up to MAIN_VACATION_BLOCK_DAYS and no further", () => {
 		const { bridges } = selectBridges({
+			...NO_CALENDAR,
 			bridges: [july, julySecond, julyThird],
 			targetPtoDays: 15,
 			objective: STRATEGY_OBJECTIVE[FilterStrategy.MAIN_VACATION],
@@ -337,6 +362,7 @@ describe("MAIN_VACATION", () => {
 
 	it("spends what the block leaves like OPTIMIZED, outside the preferred months too", () => {
 		const { bridges } = selectBridges({
+			...NO_CALENDAR,
 			bridges: [march, fridayBeforeHoliday, friday17, july],
 			targetPtoDays: 7,
 			objective: STRATEGY_OBJECTIVE[FilterStrategy.MAIN_VACATION],
@@ -348,6 +374,7 @@ describe("MAIN_VACATION", () => {
 
 	it("takes the longest block anywhere when no month is preferred", () => {
 		const { bridges } = selectBridges({
+			...NO_CALENDAR,
 			bridges: [fridayBeforeHoliday, march],
 			targetPtoDays: 5,
 			objective: STRATEGY_OBJECTIVE[FilterStrategy.MAIN_VACATION],
@@ -358,11 +385,13 @@ describe("MAIN_VACATION", () => {
 
 	it("ignores the preferred months under every other Strategy", () => {
 		const plain = selectBridgesForStrategy({
+			...NO_CALENDAR,
 			bridges: [march, july],
 			targetPtoDays: 5,
 			strategy: FilterStrategy.GROUPED,
 		});
 		const preferring = selectBridgesForStrategy({
+			...NO_CALENDAR,
 			bridges: [march, july],
 			targetPtoDays: 5,
 			strategy: FilterStrategy.GROUPED,

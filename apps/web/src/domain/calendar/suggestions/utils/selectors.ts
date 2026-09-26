@@ -2,29 +2,27 @@ import { dayIndex } from "@application/shared/utils/dates";
 import { PTO_CONSTANTS } from "@domain/calendar/const";
 import type { Bridge } from "@domain/calendar/types";
 import { FilterStrategy } from "@domain/calendar/types";
-import { type DaySpan, workStretchesOf } from "./stretches";
+import type { PlanMeasures } from "@domain/calendar/utils/measures";
+import { workStretchesOf } from "@domain/calendar/utils/stretches";
+import { inPreferredMonths } from "@domain/calendar/window";
 
 const NO_NEIGHBOUR = Number.MAX_SAFE_INTEGER;
 
+interface DaySpan {
+	start: number;
+	end: number;
+}
+
 export interface Candidate {
 	bridge: Bridge;
-	newDays: number;
 	marginalEfficiency: number;
 	runLength: number;
 	gap: number;
 	longestStretchAfter: number;
 	stretchRelief: number;
 	inPreferredMonths: boolean;
-	joinsBreak: boolean;
+	joinsBlock: boolean;
 	planIsEmpty: boolean;
-}
-
-export interface PlanMeasures {
-	covered: number;
-	efficiency: number;
-	longestBreak: number;
-	longestPreferredBreak: number;
-	longestWorkStretch: number;
 }
 
 export interface Objective {
@@ -52,8 +50,8 @@ export const STRATEGY_OBJECTIVE: Record<FilterStrategy, Objective> = {
 	[FilterStrategy.OPTIMIZED]: OPTIMIZED_OBJECTIVE,
 	[FilterStrategy.GROUPED]: {
 		floor: PTO_CONSTANTS.EFFICIENCY.BLOCK_MINIMUM,
-		aim: ({ longestBreak }) =>
-			cappedRun({ runLength: longestBreak, cap: PTO_CONSTANTS.SELECTION.GROUPED_MAX_BLOCK_DAYS }),
+		aim: ({ longestVacation }) =>
+			cappedRun({ runLength: longestVacation, cap: PTO_CONSTANTS.SELECTION.GROUPED_MAX_BLOCK_DAYS }),
 		rank: ({ runLength, marginalEfficiency, gap }) => [
 			cappedRun({ runLength, cap: PTO_CONSTANTS.SELECTION.GROUPED_MAX_BLOCK_DAYS }),
 			marginalEfficiency,
@@ -73,10 +71,10 @@ export const STRATEGY_OBJECTIVE: Record<FilterStrategy, Objective> = {
 	},
 	[FilterStrategy.MAIN_VACATION]: {
 		floor: PTO_CONSTANTS.EFFICIENCY.BLOCK_MINIMUM,
-		aim: ({ longestPreferredBreak }) =>
-			Math.min(longestPreferredBreak, PTO_CONSTANTS.SELECTION.MAIN_VACATION_BLOCK_DAYS),
-		admits: ({ inPreferredMonths, runLength, planIsEmpty, joinsBreak }) =>
-			inPreferredMonths && runLength <= PTO_CONSTANTS.SELECTION.MAIN_VACATION_BLOCK_DAYS && (planIsEmpty || joinsBreak),
+		aim: ({ longestPreferredVacation }) =>
+			Math.min(longestPreferredVacation, PTO_CONSTANTS.SELECTION.MAIN_VACATION_BLOCK_DAYS),
+		admits: ({ inPreferredMonths, runLength, planIsEmpty, joinsBlock }) =>
+			inPreferredMonths && runLength <= PTO_CONSTANTS.SELECTION.MAIN_VACATION_BLOCK_DAYS && (planIsEmpty || joinsBlock),
 		rank: ({ runLength, marginalEfficiency, gap }) => [runLength, marginalEfficiency, gap],
 		next: OPTIMIZED_OBJECTIVE,
 	},
@@ -85,12 +83,12 @@ export const STRATEGY_OBJECTIVE: Record<FilterStrategy, Objective> = {
 export const objectiveFor = (strategy: FilterStrategy) =>
 	STRATEGY_OBJECTIVE[strategy] ?? STRATEGY_OBJECTIVE[FilterStrategy.GROUPED];
 
-interface OutranksParams {
+export interface OutranksParams {
 	rank: number[];
 	rival: number[];
 }
 
-const outranks = ({ rank, rival }: OutranksParams) => {
+export const outranks = ({ rank, rival }: OutranksParams) => {
 	for (const [index, value] of rank.entries()) {
 		const difference = value - (rival[index] ?? 0);
 		if (Math.abs(difference) > PTO_CONSTANTS.SELECTION.RANK_TOLERANCE) return difference > 0;
@@ -124,7 +122,7 @@ const toPoolEntry = ({ bridge, preferredMonths }: ToPoolEntryParams): PoolEntry 
 		start,
 		end,
 		ptoDays: bridge.ptoDays.map(dayIndex),
-		inPreferredMonths: preferredMonths.size === 0 || bridge.ptoDays.every((day) => preferredMonths.has(day.getMonth())),
+		inPreferredMonths: inPreferredMonths({ months: bridge.ptoDays.map((day) => day.getMonth()), preferredMonths }),
 		newDays: end - start + 1,
 		runLength: end - start + 1,
 		gap: NO_NEIGHBOUR,
@@ -138,8 +136,8 @@ export interface SelectBridgesParams {
 	objective: Objective;
 	forbiddenDays?: Date[];
 	preferredMonths?: number[];
-	workdays?: Date[];
-	alreadyOff?: Date[];
+	workdays: Date[];
+	alreadyOff: Date[];
 }
 
 export const selectBridges = ({
@@ -148,8 +146,8 @@ export const selectBridges = ({
 	objective,
 	forbiddenDays = [],
 	preferredMonths = [],
-	workdays = [],
-	alreadyOff = [],
+	workdays,
+	alreadyOff,
 }: SelectBridgesParams) => {
 	const forbidden = new Set(forbiddenDays.map(dayIndex));
 	const preferred = new Set(preferredMonths);
@@ -298,13 +296,12 @@ export const selectBridges = ({
 
 			const candidate: Candidate = {
 				bridge,
-				newDays,
 				marginalEfficiency,
 				runLength,
 				gap,
 				...stretchesAfter(entry),
 				inPreferredMonths,
-				joinsBreak: runLength > countFreshDays(entry),
+				joinsBlock: runLength > countFreshDays(entry),
 				planIsEmpty: selected.length === 0,
 			};
 			if (stage.admits && !stage.admits(candidate)) continue;
@@ -333,13 +330,8 @@ export const selectBridges = ({
 	};
 };
 
-interface SelectBridgesForStrategyParams {
-	bridges: Bridge[];
-	targetPtoDays: number;
+interface SelectBridgesForStrategyParams extends Omit<SelectBridgesParams, "objective" | "forbiddenDays"> {
 	strategy: FilterStrategy;
-	preferredMonths?: number[];
-	workdays?: Date[];
-	alreadyOff?: Date[];
 }
 
 export const selectBridgesForStrategy = ({ strategy, ...params }: SelectBridgesForStrategyParams) =>

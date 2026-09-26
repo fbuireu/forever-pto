@@ -11,6 +11,14 @@ export const isPreferredMonths = (value: unknown): value is number[] =>
 	new Set(value).size === value.length &&
 	value.every((month) => Number.isInteger(month) && month >= 0 && month < MONTHS_IN_YEAR);
 
+export interface InPreferredMonthsParams {
+	months: number[];
+	preferredMonths: ReadonlySet<number>;
+}
+
+export const inPreferredMonths = ({ months, preferredMonths }: InPreferredMonthsParams) =>
+	preferredMonths.size === 0 || months.every((month) => preferredMonths.has(month));
+
 export interface PlanningWindow {
 	year: number;
 	carryOverMonths: number;

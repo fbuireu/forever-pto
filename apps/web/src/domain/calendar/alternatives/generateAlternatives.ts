@@ -1,10 +1,11 @@
-import { dayIndex } from "@application/shared/utils/dates";
 import { PTO_CONSTANTS } from "../const";
 import { restBlocksOf } from "../metrics/utils/helpers";
-import { objectiveFor, selectBridges } from "../suggestions/utils/selectors";
+import { objectiveFor, outranks, selectBridges } from "../suggestions/utils/selectors";
 import { FilterStrategy, type Suggestion } from "../types";
-import type { PlanningCandidates } from "../utils/candidates";
-import { measurePlan, planDistance } from "./utils/helpers";
+import { getCombinationKey } from "../utils/cache";
+import { type PlanningCandidates, selectionInputOf } from "../utils/candidates";
+import { measurePlan } from "../utils/measures";
+import { planDistance } from "./utils/helpers";
 
 export interface GenerateAlternativesParams {
 	ptoDays: number;
@@ -37,19 +38,6 @@ interface OfferParams {
 	into: Scored[];
 }
 
-interface OutscoresParams {
-	plan: Scored;
-	rival: Scored;
-}
-
-const outscores = ({ plan, rival }: OutscoresParams) => {
-	for (const [index, value] of plan.standing.entries()) {
-		const rivalValue = rival.standing[index] ?? 0;
-		if (value !== rivalValue) return value > rivalValue;
-	}
-	return false;
-};
-
 interface StaysBelowParams {
 	plan: Scored;
 	ceiling: Scored;
@@ -65,8 +53,7 @@ export function generateAlternatives(params: GenerateAlternativesParams): PlanCh
 		return { suggestion: existingSuggestion, alternatives: [] };
 	}
 
-	const { bridges, availableWorkdays, alreadyOff } = candidates;
-	const shared = { bridges, targetPtoDays: ptoDays, preferredMonths, workdays: availableWorkdays, alreadyOff };
+	const shared = selectionInputOf({ candidates, ptoDays, preferredMonths });
 	const objective = objectiveFor(strategy);
 	const maxRuns = maxAlternatives * PTO_CONSTANTS.ALTERNATIVES.RUNS_PER_ALTERNATIVE;
 	let runs = 0;
@@ -74,8 +61,9 @@ export function generateAlternatives(params: GenerateAlternativesParams): PlanCh
 	const score = (plan: Suggestion): Scored => {
 		const measures = measurePlan({
 			plan,
-			alreadyOff,
-			workdays: availableWorkdays,
+			alreadyOff: candidates.alreadyOff,
+			manualDays: candidates.manualDays,
+			workdays: candidates.availableWorkdays,
 			preferredMonths: preferredMonths ?? [],
 		});
 		return {
@@ -90,7 +78,8 @@ export function generateAlternatives(params: GenerateAlternativesParams): PlanCh
 	const own: Scored[] = [];
 	const foreign: Scored[] = [];
 
-	const best = () => own.reduce((leader, plan) => (outscores({ plan, rival: leader }) ? plan : leader), main);
+	const best = () =>
+		own.reduce((leader, plan) => (outranks({ rank: plan.standing, rival: leader.standing }) ? plan : leader), main);
 	const offered = () => {
 		const leader = best();
 		return [...foreign, ...own, main].filter((plan) => plan !== leader && staysBelow({ plan, ceiling: leader }));
@@ -117,13 +106,8 @@ export function generateAlternatives(params: GenerateAlternativesParams): PlanCh
 	}
 
 	const seeds: Seed[] = [{ days: existingSuggestion.days, forbiddenDays: [] }];
-	const keyOf = (days: Date[]) =>
-		days
-			.map(dayIndex)
-			.toSorted((a, b) => a - b)
-			.join();
 	const triedExclusions = new Set<string>();
-	const seenPlans = new Set([keyOf(existingSuggestion.days)]);
+	const seenPlans = new Set([getCombinationKey(existingSuggestion.days)]);
 
 	search: for (let next = 0; next < seeds.length; next++) {
 		const seed = seeds[next];
@@ -133,13 +117,13 @@ export function generateAlternatives(params: GenerateAlternativesParams): PlanCh
 			if (offered().length >= maxAlternatives || runs >= maxRuns) break search;
 
 			const forbiddenDays = [...seed.forbiddenDays, ...block];
-			const exclusion = keyOf(forbiddenDays);
+			const exclusion = getCombinationKey(forbiddenDays);
 			if (triedExclusions.has(exclusion)) continue;
 			triedExclusions.add(exclusion);
 
 			runs++;
 			const selection = selectBridges({ ...shared, objective, forbiddenDays });
-			const planKey = keyOf(selection.days);
+			const planKey = getCombinationKey(selection.days);
 			if (selection.days.length === 0 || seenPlans.has(planKey)) continue;
 			seenPlans.add(planKey);
 

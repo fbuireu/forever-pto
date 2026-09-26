@@ -25,7 +25,7 @@ const planSuggestions = ({
 	generateSuggestions({
 		ptoDays,
 		strategy,
-		candidates: findPlanningCandidates({ holidays, months, allowPastDays, removedDays }),
+		candidates: findPlanningCandidates({ holidays, months, allowPastDays, removedDays, manualDays: [] }),
 	});
 
 vi.mock("./utils/selectors", async (importOriginal) => {
