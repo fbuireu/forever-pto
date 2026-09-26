@@ -48,7 +48,7 @@ This prevents re-renders when unrelated fields change. Stores never fetch data t
 
 ## `filters` (`useFiltersStore`, storage `filters-store`)
 
-User-facing planner configuration: `ptoDays`, `allowPastDays`, `country`, `region`, `year`, `carryOverMonths`, `strategy` (a `FilterStrategy`, defaulting to grouped; see [holidays engine](/how-it-works/holidays-engine/)). Quirks:
+User-facing planner configuration: `ptoDays`, `allowPastDays`, `country`, `region`, `year`, `carryOverMonths`, `strategy` (a `FilterStrategy`, defaulting to grouped; see [holidays engine](/how-it-works/holidays-engine/)), `preferredMonths` (the Preferred Months the Main Vacation Strategy builds its block in, July and August by default, guarded on rehydration by `isPreferredMonths`). Quirks:
 
 - `partialize` persists everything **except `year`**, since the year deliberately resets to the current year on every visit.
 - `setCountry` resets `region` to `''`, since regions belong to a country.

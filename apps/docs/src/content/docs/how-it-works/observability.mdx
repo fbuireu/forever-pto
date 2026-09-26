@@ -128,8 +128,8 @@ The planner and the rest of the app report these, under the same rule: a setting
 
 | Event | Fires when | Carries |
 | --- | --- | --- |
-| `planner_generated` | The worker settles a plan (every replan) | The PTO Day budget, Strategy, year, Carry-over Months, past days, the number of Alternatives and the plan's quality: Efficiency, Effective Days, Bonus Days, Long Weekends, Rest Blocks, Longest Vacation, Max Work Streak |
-| `planning_input_changed` | A sidebar control changes a planning input | `input` (`country`, `region`, `year`, `ptoDays`, `strategy`, `allowPastDays`, `carryOverMonths`) and `inputValue`, its new value; the budget applied from the calculator adds `source: ptoCalculator`. The property is not called `value` because GA4 reserves that name for the monetary value of a key event |
+| `planner_generated` | The worker settles a plan (every replan) | The PTO Day budget, Strategy, Preferred Months (as a comma-separated list), year, Carry-over Months, past days, the number of Alternatives and the plan's quality: Efficiency, Effective Days, Bonus Days, Long Weekends, Rest Blocks, Longest Vacation, Max Work Streak |
+| `planning_input_changed` | A sidebar control changes a planning input | `input` (`country`, `region`, `year`, `ptoDays`, `strategy`, `preferredMonths`, `allowPastDays`, `carryOverMonths`) and `inputValue`, its new value (the Preferred Months as a comma-separated list); the budget applied from the calculator adds `source: ptoCalculator`. The property is not called `value` because GA4 reserves that name for the monetary value of a key event |
 | `calendar_day_toggled` | A day is clicked | `applied` with what changed (`manual_day_added`, `manual_day_removed`, `suggested_day_removed`, `removed_day_restored`), or `applied: false` with the store's refusal (`budget_exhausted`, `day_is_holiday`…) or `premium_required` when the gate stopped it |
 | `alternative_applied` | An Alternative becomes the Suggestion | Its index and its Efficiency and Effective Days |
 | `manual_changes_reset` | The manual changes are discarded | `surface` (`panel` or `sidebar`) |
