@@ -33,7 +33,7 @@ either direction, so it is a measurement rather than a drawing.
 
 | from / to | `app` | `ui` | `application` | `domain` | `infrastructure` |
 | --- | --- | --- | --- | --- | --- |
-| `app` | | 82/16 | 7/6 | | 65/20 |
+| `app` | | 82/16 | 7/6 | | 67/20 |
 | `ui` | | | 158/79 | 20/14 | 50/39 |
 | `application` | | 1/1 | | 15/8 | 36/11 |
 | `domain` | | | 17/13 | | 12/3 |
@@ -54,7 +54,7 @@ flowchart LR
   MW[middleware.ts]
   APP -->|82| UI
   APP -->|7| APPL
-  APP -->|65| INFRA
+  APP -->|67| INFRA
   UI -->|158| APPL
   UI -->|20| DOM
   UI -->|50| INFRA
