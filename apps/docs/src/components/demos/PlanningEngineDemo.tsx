@@ -35,8 +35,10 @@ const TUNABLE_DESCRIPTIONS: Record<TunableKey, string> = {
 		"Two rank values closer than this are a tie, and the next key decides. The marginal gain is a division, so an exact comparison would order equal candidates on rounding noise.",
 	"ALTERNATIVES.MIN_DIFFERENCE":
 		"How far apart two plans must be to both be offered, as the share of their combined days they do not have in common. An Alternative closer than this to the Suggestion or to an earlier Alternative is dropped.",
+	"ALTERNATIVES.SEARCHED":
+		"How many Alternatives the search looks for, whatever the planner shows. The same search is what finds a better Suggestion, so sizing it by the number displayed would let that number change the plan.",
 	"ALTERNATIVES.RUNS_PER_ALTERNATIVE":
-		"How many selection runs the Alternatives may spend per Alternative asked for. It bounds the cost of the search, not its result: a search that finds enough distinct plans stops sooner.",
+		"How many selection runs the search may spend per Alternative it looks for. It bounds the cost of the search, not its result: a search that finds enough distinct plans stops sooner.",
 	"METRICS.LONG_BLOCK_MINIMUM_DAYS": "A Rest Block of at least this many days counts as a Long Block.",
 	"METRICS.LONG_WEEKEND_MINIMUM_DAYS":
 		"A free streak of at least this many days that contains a weekend and a placed PTO Day counts as a Long Weekend.",
