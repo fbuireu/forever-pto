@@ -79,7 +79,6 @@ export const Summary = () => {
 		useShallow((state) => ({
 			holidays: state.holidays,
 			alternatives: state.alternatives,
-			removedSuggestedDays: state.removedSuggestedDays,
 		})),
 	);
 	const { countries, regions } = useLocationStore(
