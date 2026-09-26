@@ -69,6 +69,7 @@ export function trackedDraft(draft: QuickStartDraft) {
 		region: draft.region,
 		year: draft.year,
 		strategy: draft.strategy,
+		preferredMonths: draft.preferredMonths.join(","),
 		allowPastDays: draft.allowPastDays,
 		carryOverMonths: draft.carryOverMonths,
 	};

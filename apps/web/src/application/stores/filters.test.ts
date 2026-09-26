@@ -240,6 +240,14 @@ describe("onRehydrateStorage", () => {
 		expect(useFiltersStore.getState().preferredMonths).toEqual([]);
 	});
 
+	it("sorts stored preferred months into calendar order, as the setter does", () => {
+		useFiltersStore.setState({ preferredMonths: [7, 5, 6] });
+
+		runRehydrate();
+
+		expect(useFiltersStore.getState().preferredMonths).toEqual([5, 6, 7]);
+	});
+
 	it("keeps a stored strategy that does name one", () => {
 		useFiltersStore.setState({ strategy: FilterStrategy.BALANCED });
 

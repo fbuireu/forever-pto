@@ -23,12 +23,14 @@ const sidebar = enMessages.sidebar;
 
 interface RenderStepParams {
 	strategy?: FilterStrategy;
+	preferredMonths?: number[];
 	allowPastDays?: boolean;
 	carryOverMonths?: number;
 }
 
 const renderStep = ({
 	strategy = FilterStrategy.GROUPED,
+	preferredMonths = [6, 7],
 	allowPastDays = false,
 	carryOverMonths = 1,
 }: RenderStepParams = {}) => {
@@ -36,7 +38,10 @@ const renderStep = ({
 
 	render(
 		<NextIntlClientProvider locale="en" messages={enMessages}>
-			<QuickStartSettingsStep draft={{ strategy, allowPastDays, carryOverMonths }} onChange={onChange} />
+			<QuickStartSettingsStep
+				draft={{ strategy, preferredMonths, allowPastDays, carryOverMonths }}
+				onChange={onChange}
+			/>
 		</NextIntlClientProvider>,
 	);
 
@@ -67,6 +72,27 @@ describe("QuickStartSettingsStep", () => {
 		fireEvent.click(screen.getByLabelText(new RegExp(sidebar.strategy.optimized.label)));
 
 		expect(onChange).toHaveBeenCalledExactlyOnceWith({ strategy: FilterStrategy.OPTIMIZED });
+	});
+
+	it("asks for the Preferred Months only when Main vacation is picked", () => {
+		renderStep({ strategy: FilterStrategy.OPTIMIZED });
+
+		expect(screen.queryByRole("group", { name: sidebar.preferredMonths.title })).toBeNull();
+	});
+
+	it("hands back the Preferred Months with a month added", () => {
+		const onChange = renderStep({ strategy: FilterStrategy.MAIN_VACATION });
+
+		expect(screen.getByRole("group", { name: sidebar.preferredMonths.title })).toBeDefined();
+		fireEvent.click(screen.getByRole("button", { name: "June" }));
+
+		expect(onChange).toHaveBeenCalledExactlyOnceWith({ preferredMonths: [6, 7, 5] });
+	});
+
+	it("says the block may land anywhere once no month is picked", () => {
+		renderStep({ strategy: FilterStrategy.MAIN_VACATION, preferredMonths: [] });
+
+		expect(screen.getByText(sidebar.preferredMonths.anyMonth)).toBeDefined();
 	});
 
 	it("gates past days and carry-over behind Premium, and nothing else", () => {

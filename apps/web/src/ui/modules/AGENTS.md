@@ -10,9 +10,9 @@ Every React component the product renders. Nothing else in `src/ui/` holds compo
 | --- | --- | --- |
 | `core/` | The design system: `primitives/` plus the `animate/` layer. See [core/AGENTS.md](./core/AGENTS.md) | Yes, everywhere |
 | `pages/` | One folder per screen: `homepage/`, `planner/`, `legal/`, `error/`, `not-found/`. See [pages/planner/AGENTS.md](./pages/planner/AGENTS.md). `homepage/quick-start/` is the stepped dialog every planner call to action on the homepage opens, see below | No, by definition |
-| `shared/` | Cross-page pieces that are not primitives: footer, donate, contact, cookie consent, JSON-LD, [`shared/Logo.tsx`](./shared/Logo.tsx), [`shared/Icon.tsx`](./shared/Icon.tsx), [`shared/FormButtons.tsx`](./shared/FormButtons.tsx), [`shared/StepOutcome.tsx`](./shared/StepOutcome.tsx), [`shared/SupportButton.tsx`](./shared/SupportButton.tsx), [`shared/ConditionalWrapper.tsx`](./shared/ConditionalWrapper.tsx), [`shared/WebMCP.tsx`](./shared/WebMCP.tsx), plus [`shared/utils/helpers.ts`](./shared/utils/helpers.ts) for the helpers those pieces need | Yes |
+| `shared/` | Cross-page pieces that are not primitives: footer, donate, contact, cookie consent, JSON-LD, [`shared/Logo.tsx`](./shared/Logo.tsx), [`shared/Icon.tsx`](./shared/Icon.tsx), [`shared/FormButtons.tsx`](./shared/FormButtons.tsx), [`shared/StepOutcome.tsx`](./shared/StepOutcome.tsx), [`shared/SupportButton.tsx`](./shared/SupportButton.tsx), [`shared/ConditionalWrapper.tsx`](./shared/ConditionalWrapper.tsx), [`shared/WebMCP.tsx`](./shared/WebMCP.tsx), [`shared/MonthToggles.tsx`](./shared/MonthToggles.tsx) (the month picker the sidebar and the quick start share), plus [`shared/utils/helpers.ts`](./shared/utils/helpers.ts) for the helpers those pieces need | Yes |
 | `layout/` | [`layout/LegalLayout.tsx`](./layout/LegalLayout.tsx), the card chrome the legal pages share, and [`layout/SkipToContent.tsx`](./layout/SkipToContent.tsx), which owns the skip link **and** the `MAIN_CONTENT_ID` every route shell's landmark is keyed on | Between sibling routes |
-| `sidebar/` | [`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) and its controls: country, region, year, Strategy, PTO Day budget, the calculators, calendar export | One screen, but not a page section |
+| `sidebar/` | [`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) and its controls: country, region, year, Strategy and its Preferred Months, PTO Day budget, the calculators, calendar export | One screen, but not a page section |
 | `premium/` | The Premium gate and the Donation checkout: [`premium/PremiumFeature.tsx`](./premium/PremiumFeature.tsx), [`premium/featureLabels.ts`](./premium/featureLabels.ts), [`premium/PremiumModal.tsx`](./premium/PremiumModal.tsx), [`premium/PremiumRequiredModal.tsx`](./premium/PremiumRequiredModal.tsx), [`premium/CheckoutForm.tsx`](./premium/CheckoutForm.tsx) | Yes |
 | `providers/` | Context wrappers mounted once in the locale layout: [`providers/AppThemeProvider.tsx`](./providers/AppThemeProvider.tsx), [`providers/BonesProvider.tsx`](./providers/BonesProvider.tsx) | Once |
 | `stores/` | [`stores/StoresInitializer.tsx`](./stores/StoresInitializer.tsx), a render-nothing component that seeds the filters store from the `user-country` cookie, read through [`utils/userCountry.ts`](../utils/userCountry.ts) | Once |
@@ -92,7 +92,7 @@ next to it, and the step list, the draft shape and the pure rules ([`pages/homep
 
 **The steps are the sidebar's first three cards, asked one at a time.** Location (Country, with the
 `user-country` cookie as the default, and an optional Region), the PTO Day budget with the year, then
-Strategy, past days and Carry-over Months. The last two sit behind the same `PremiumFeature` gate the
+Strategy (with the Preferred Months when it is Main Vacation), past days and Carry-over Months. The last two sit behind the same `PremiumFeature` gate the
 sidebar uses, which is why `QuickStart.tsx` mounts `PremiumModal`: the marketing layout carried none, and a
 gated control whose click opens nothing reads as broken.
 
@@ -112,7 +112,7 @@ store as it always has. No search params are involved.
 `ui` store reports `quick_start_opened` with the call to action (`nav`, `hero`, `pricing`, `closing`), which is
 why `QuickStartTrigger` takes a `source` rather than the store guessing one. The form reports
 `quick_start_step_completed` on every Next and `quick_start_completed` on finish with `trackedDraft(draft)`
-from `steps.ts`: the PTO Day budget, Country, Region, year, Strategy, past days and Carry-over Months. The dialog
+from `steps.ts`: the PTO Day budget, Country, Region, year, Strategy, Preferred Months, past days and Carry-over Months. The dialog
 reports `quick_start_abandoned` from `onOpenChange(false)`, the close button, the backdrop and Escape, naming
 the step the form last announced through `onStepChange`; a finish closes through the store, which fires no
 `onOpenChange`, so it is never counted as an abandonment.
@@ -261,7 +261,7 @@ without discarding its own open state, `sidebar/components/CarryOverMonths.test.
 write it drops on unmount, `sidebar/components/LanguageSelector.test.tsx` the code-versus-label switch by rail
 state, `sidebar/components/WorkdayCounterCalendarModal.test.tsx` that open and close both go through the owner
 that holds the state, and [`sidebar/AppSidebar.test.tsx`](./sidebar/AppSidebar.test.tsx) the tutorial anchors, the
-landmark the skip link targets and the year handed to both windowed controls.
+landmark the skip link targets and the year handed to the Years control.
 
 **A component whose body is markup plus translation calls is no longer left to `e2e/`, and what its test
 asserts is chosen so it can fail.** Re-rendering the markup back as an expectation proves only that the file

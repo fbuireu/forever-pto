@@ -34,7 +34,7 @@ The rest of the application layer contract is in [`../AGENTS.md`](../AGENTS.md).
 | `ui` | `donatePopoverOpen`, `donatePopoverIsOpening`, `quickStartOpen` | nothing |
 
 **`preferredMonths` is guarded on rehydration the way `strategy` is, by the same predicate the worker uses.**
-`isPreferredMonths` in `@domain/calendar/types` accepts an array of distinct month indexes from 0 to 11, the empty
+`isPreferredMonths` in `@domain/calendar/window` accepts an array of distinct month indexes from 0 to 11, the empty
 one included (which means any month), and a stored value that fails it becomes `DEFAULT_PREFERRED_MONTHS`.
 `setPreferredMonths` applies it too and stores the months sorted, so the calculation effect that depends on the
 array does not re-plan when the same months arrive in another order. The field was added without a

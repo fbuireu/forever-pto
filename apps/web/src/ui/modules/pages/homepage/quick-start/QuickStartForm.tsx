@@ -80,6 +80,7 @@ export const QuickStartForm = ({ countries, currentYear, onStepChange }: QuickSt
 		filters.setYear(draft.year);
 		filters.setPtoDays(draft.ptoDays);
 		filters.setStrategy(draft.strategy);
+		filters.setPreferredMonths(draft.preferredMonths);
 		filters.setAllowPastDays(draft.allowPastDays);
 		filters.setCarryOverMonths(draft.carryOverMonths);
 		track({ event: "quick_start_completed", properties: trackedDraft(draft) });

@@ -144,6 +144,21 @@ describe("QuickStartForm", () => {
 		expect(router.push).toHaveBeenCalledExactlyOnceWith("/planner");
 	});
 
+	it("writes the Preferred Months picked for Main vacation into the filters store", () => {
+		cookie.country = "es";
+		renderForm();
+
+		next();
+		next();
+		fireEvent.click(screen.getByLabelText(new RegExp(enMessages.sidebar.strategy.mainVacation.label)));
+		fireEvent.click(screen.getByRole("button", { name: "June" }));
+		finish();
+
+		const filters = useFiltersStore.getState();
+		expect(filters.strategy).toBe(FilterStrategy.MAIN_VACATION);
+		expect(filters.preferredMonths).toStrictEqual([5, 6, 7]);
+	});
+
 	it("reports each step it leaves and the planning inputs it finishes with", () => {
 		cookie.country = "es";
 		renderForm();
@@ -164,6 +179,7 @@ describe("QuickStartForm", () => {
 					region: "",
 					year: expect.any(Number),
 					strategy: FilterStrategy.GROUPED,
+					preferredMonths: "6,7",
 					allowPastDays: false,
 					carryOverMonths: 1,
 				},

@@ -79,6 +79,7 @@ describe("trackedDraft", () => {
 			region: "ct",
 			year: 2026,
 			strategy: FilterStrategy.BALANCED,
+			preferredMonths: "6,7",
 			allowPastDays: false,
 			carryOverMonths: 1,
 		});

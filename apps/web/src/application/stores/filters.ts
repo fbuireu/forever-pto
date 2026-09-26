@@ -45,6 +45,9 @@ interface ClampParams {
 
 const clamp = ({ value, min, max }: ClampParams) => Math.min(max, Math.max(min, value));
 
+const preferredMonthsOf = (months: unknown) =>
+	isPreferredMonths(months) ? months.toSorted((a, b) => a - b) : [...DEFAULT_PREFERRED_MONTHS];
+
 const initialState: FiltersState = {
 	ptoDays: 22,
 	allowPastDays: false,
@@ -99,9 +102,7 @@ export const useFiltersStore = create<FiltersStore>()(
 				setPreferredMonths: (months: number[]) =>
 					set(
 						{
-							preferredMonths: isPreferredMonths(months)
-								? months.toSorted((a, b) => a - b)
-								: [...DEFAULT_PREFERRED_MONTHS],
+							preferredMonths: preferredMonthsOf(months),
 						},
 						false,
 						"setPreferredMonths",
@@ -131,9 +132,7 @@ export const useFiltersStore = create<FiltersStore>()(
 							max: MAX_CARRY_OVER_MONTHS,
 						});
 						state.strategy = isFilterStrategy(state.strategy) ? state.strategy : DEFAULT_FILTER_STRATEGY;
-						state.preferredMonths = isPreferredMonths(state.preferredMonths)
-							? state.preferredMonths
-							: [...DEFAULT_PREFERRED_MONTHS];
+						state.preferredMonths = preferredMonthsOf(state.preferredMonths);
 					}
 				},
 			},
