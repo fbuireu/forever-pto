@@ -49,13 +49,14 @@ const staysBelow = ({ plan, ceiling }: StaysBelowParams) =>
 export function generateAlternatives(params: GenerateAlternativesParams): PlanChoice {
 	const { ptoDays, candidates, maxAlternatives, existingSuggestion, strategy, preferredMonths } = params;
 
-	if (ptoDays <= 0 || maxAlternatives <= 0 || existingSuggestion.days.length === 0) {
+	if (ptoDays <= 0 || existingSuggestion.days.length === 0) {
 		return { suggestion: existingSuggestion, alternatives: [] };
 	}
 
 	const shared = selectionInputOf({ candidates, ptoDays, preferredMonths });
 	const objective = objectiveFor(strategy);
-	const maxRuns = maxAlternatives * PTO_CONSTANTS.ALTERNATIVES.RUNS_PER_ALTERNATIVE;
+	const { SEARCHED, RUNS_PER_ALTERNATIVE } = PTO_CONSTANTS.ALTERNATIVES;
+	const maxRuns = SEARCHED * RUNS_PER_ALTERNATIVE;
 	let runs = 0;
 
 	const score = (plan: Suggestion): Scored => {
@@ -114,7 +115,7 @@ export function generateAlternatives(params: GenerateAlternativesParams): PlanCh
 		if (seed === undefined) break;
 
 		for (const block of restBlocksOf(seed.days).toSorted((a, b) => b.length - a.length)) {
-			if (offered().length >= maxAlternatives || runs >= maxRuns) break search;
+			if (offered().length >= SEARCHED || runs >= maxRuns) break search;
 
 			const forbiddenDays = [...seed.forbiddenDays, ...block];
 			const exclusion = getCombinationKey(forbiddenDays);
@@ -135,7 +136,7 @@ export function generateAlternatives(params: GenerateAlternativesParams): PlanCh
 	return {
 		suggestion: best().plan,
 		alternatives: offered()
-			.slice(0, maxAlternatives)
+			.slice(0, Math.max(0, maxAlternatives))
 			.map(({ plan }) => plan),
 	};
 }

@@ -31,9 +31,15 @@ const SPAIN_2026 = [
 const BUDGET = 22;
 const SUMMER = [6, 7];
 
-const plan = (strategy: FilterStrategy) =>
+interface PlanParams {
+	strategy: FilterStrategy;
+	carryOverMonths?: number;
+	maxAlternatives?: number;
+}
+
+const plan = ({ strategy, carryOverMonths = 0, maxAlternatives = 4 }: PlanParams) =>
 	runPlanningPipeline({
-		window: { year: 2026, carryOverMonths: 0 },
+		window: { year: 2026, carryOverMonths },
 		ptoDays: BUDGET,
 		holidays: SPAIN_2026,
 		manuallySelectedDays: [],
@@ -42,13 +48,12 @@ const plan = (strategy: FilterStrategy) =>
 		strategy,
 		preferredMonths: SUMMER,
 		locale: "en",
-		maxAlternatives: 4,
+		maxAlternatives,
 	});
 
-const PLANS = Object.fromEntries(Object.values(FilterStrategy).map((strategy) => [strategy, plan(strategy)])) as Record<
-	FilterStrategy,
-	ReturnType<typeof plan>
->;
+const PLANS = Object.fromEntries(
+	Object.values(FilterStrategy).map((strategy) => [strategy, plan({ strategy })]),
+) as Record<FilterStrategy, ReturnType<typeof plan>>;
 
 const suggestionOf = (strategy: FilterStrategy) => PLANS[strategy].suggestion;
 
@@ -56,6 +61,19 @@ const spanUnion = (plan: MeasuredSuggestion) =>
 	measurePlan({ plan, alreadyOff: [], manualDays: [], workdays: [], preferredMonths: [] }).covered;
 
 describe("the Strategies over a real calendar", () => {
+	it.each(Object.values(FilterStrategy))(
+		"%s chooses the same Suggestion however many Alternatives are asked for",
+		(strategy) => {
+			const days = (maxAlternatives: number) =>
+				plan({ strategy, carryOverMonths: 1, maxAlternatives })
+					.suggestion.days.map((day) => day.toDateString())
+					.join();
+
+			expect(days(0)).toBe(days(4));
+			expect(days(1)).toBe(days(4));
+		},
+	);
+
 	it.each(Object.values(FilterStrategy))("%s spends the whole budget", (strategy) => {
 		expect(suggestionOf(strategy).days).toHaveLength(BUDGET);
 	});

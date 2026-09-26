@@ -420,7 +420,14 @@ of the Suggestion (`restBlocksOf`, the one owner of the Rest Block rule in
 [`metrics/utils/helpers.ts`](./metrics/utils/helpers.ts), taken largest first) is forbidden and the chosen objective
 re-run; every new plan found that way becomes a seed whose own blocks are forbidden in turn, breadth first. A set of
 forbidden days already tried, or a plan already seen, is skipped before it costs a run, and the runs are bounded by
-`ALTERNATIVES.RUNS_PER_ALTERNATIVE` per Alternative asked for.
+`ALTERNATIVES.RUNS_PER_ALTERNATIVE` per Alternative searched for.
+
+**The search is sized by `ALTERNATIVES.SEARCHED`, not by how many Alternatives the caller shows.** It stops
+once that many are on offer or the runs are spent, and `maxAlternatives` only cuts the list it returns. The search
+used to be sized by `maxAlternatives` and to skip itself entirely at nought, and because the same search is what
+finds a better Suggestion, the Suggestion depended on how many Alternatives were displayed: over the Spanish
+calendar with one Carry-over Month, Grouped chose a different plan at nought than at four. `strategies.test.ts`
+pins the same Suggestion at nought, one and four for every Strategy.
 
 **The Suggestion is the best plan the chosen Strategy found, not the first one.** Greedy selection is not optimal,
 so a re-run with a block forbidden can land on a better plan than the one it started from. Every plan the chosen
@@ -628,7 +635,8 @@ behaviour change and expect the selector tests to move.
 | `SELECTION.MAIN_VACATION_BLOCK_DAYS` | 16 | Days. The longest block `MAIN_VACATION` builds in the Preferred Months; a hard admission limit, not a penalised cap |
 | `SELECTION.RANK_TOLERANCE` | 1e-9 | Rank values closer than this are a tie and the next key decides; the gain is a float division |
 | `ALTERNATIVES.MIN_DIFFERENCE` | 0.25 | Share of two plans' combined days they must not have in common for both to be offered |
-| `ALTERNATIVES.RUNS_PER_ALTERNATIVE` | 10 | Selection runs the Alternatives may spend per Alternative asked for; bounds the cost, not the result |
+| `ALTERNATIVES.SEARCHED` | 4 | Alternatives the search looks for, whatever the caller shows; it also sizes the search that chooses the Suggestion, so it must not follow `maxAlternatives` |
+| `ALTERNATIVES.RUNS_PER_ALTERNATIVE` | 10 | Selection runs the search may spend per Alternative it looks for; bounds the cost, not the result |
 | `METRICS.LONG_BLOCK_MINIMUM_DAYS` | 3 | Consecutive days. Below this a Rest Block is not a Long Block |
 | `METRICS.LONG_WEEKEND_MINIMUM_DAYS` | 3 | Consecutive Free Days. The floor for a Long Weekend, which must also contain a weekend and a placed day |
 | `METRICS.REST_BLOCK_SEPARATION_DAYS` | 7 | Days. Two placed days further apart than this are separate Rest Blocks. **Not the same value** as the scan margin below, and they are free to move independently |
