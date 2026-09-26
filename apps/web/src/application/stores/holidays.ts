@@ -24,6 +24,7 @@ import {
 	type FetchHolidaysParams,
 	type HolidayOutcome,
 	HolidayRefusal,
+	holidaysKeyOf,
 	type MainThreadSuggestionsParams,
 	type PlanningWindowParams,
 } from "./types";
@@ -41,6 +42,7 @@ export interface HolidaysState {
 	isCalculating: boolean;
 	hasCalculated: boolean;
 	planRevision: number;
+	holidaysKey: string | null;
 }
 
 interface HeldOnParams {
@@ -81,6 +83,8 @@ interface HolidaysActions {
 type HolidaysStore = HolidaysState & HolidaysActions;
 
 const STORAGE_NAME = "holidays-store";
+
+let latestHolidaysFetch = 0;
 const STORAGE_VERSION = 1;
 
 const holidaysInitialState: HolidaysState = {
@@ -96,6 +100,7 @@ const holidaysInitialState: HolidaysState = {
 	isCalculating: false,
 	hasCalculated: false,
 	planRevision: 0,
+	holidaysKey: null,
 };
 
 export type PersistedHolidays = ReturnType<typeof partializeHolidays>;
@@ -118,6 +123,8 @@ export const useHolidaysStore = create<HolidaysStore>()(
 				...holidaysInitialState,
 
 				fetchHolidays: async (params: FetchHolidaysParams) => {
+					const fetchId = ++latestHolidaysFetch;
+					const holidaysKey = holidaysKeyOf(params);
 					const { holidays: currentHolidays } = get();
 					const planningWindow = planningWindowInterval(params);
 					const customHolidays = currentHolidays
@@ -130,6 +137,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 					try {
 						const { getHolidays } = await import("@infrastructure/services/holidays/getHolidays");
 						const holidays = await getHolidays(params);
+						if (fetchId !== latestHolidaysFetch) return;
 						const filteredHolidays = holidays.filter(
 							(fetchedHoliday) =>
 								!customHolidays.some((custom) => isSameDay({ a: custom.date, b: fetchedHoliday.date })),
@@ -138,6 +146,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 							holidays: [...customHolidays, ...filteredHolidays].toSorted(
 								(a, b) => a.date.getTime() - b.date.getTime(),
 							),
+							holidaysKey,
 						});
 					} catch (error) {
 						logClientError({
@@ -149,7 +158,8 @@ export const useHolidaysStore = create<HolidaysStore>()(
 								region: params.region,
 							},
 						});
-						set({ holidays: customHolidays });
+						if (fetchId !== latestHolidaysFetch) return;
+						set({ holidays: customHolidays, holidaysKey });
 					}
 				},
 

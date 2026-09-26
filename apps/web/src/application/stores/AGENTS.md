@@ -95,6 +95,15 @@ The branches, chosen once at module load:
 - **Otherwise**: obfuscated. A failed decode logs and returns `null`, which zustand treats as "nothing
   stored"; the store keeps its initial state rather than crashing.
 
+**A write whose value has not changed is skipped, in both storing branches.** zustand's `persist` saves the
+whole partialized slice on every `set`, including the ones that touch only unpersisted fields
+(`setCalculating`, the Alternative preview), so the holidays store rewrote and re-obfuscated roughly 50 KB
+three times per calculation. The obfuscated branch remembers the last value it wrote or read per key and skips
+a write of the same value while storage still holds what it wrote, so another tab's write is never mistaken
+for its own; the plain branch compares with what is stored. The obfuscation itself works on code units in
+chunks rather than one string per character, and its output is byte for byte what the per-character version
+wrote, which `utils/crypto.test.ts` pins against that version, so every blob already stored still reads.
+
 **`partialize` is the whole persistence contract.** A field absent from it is browser-session state by
 design, and some of those omissions are load-bearing:
 
@@ -443,6 +452,14 @@ different module with no SDK behind it.
 dataset in the browser: `getHolidays.ts` is `async` but local, and [`getRegions.ts`](../../infrastructure/services/regions/getRegions.ts) is outright synchronous.
 The names are historical. Nothing in this folder makes an HTTP request except `premium.ts`, which calls
 `/api/check-session` through `@ui/adapters/session/checkSession`.
+
+**`holidaysKey` says which filters the Holidays were fetched for, and a fetch that was overtaken is
+dropped.** `fetchHolidays` records `holidaysKeyOf(params)` beside the Holidays it sets, on the catch branch as
+on success, and `CalendarList` plans only while that key matches the filters on screen. The key is
+deliberately not in `partialize`: after a reload the persisted Holidays are for whatever was on screen last,
+and the planner waits for the fresh fetch instead of planning on them. Each call also takes a sequence number
+and gives up if a newer call started while it awaited, so a slow answer for the previous year cannot overwrite
+the current one.
 
 **A Custom Holiday wins the date it lands on.** `fetchHolidays` keeps the existing Custom Holidays, drops any
 fetched Holiday sharing a date with one, and re-sorts. `editHoliday` rebuilds through

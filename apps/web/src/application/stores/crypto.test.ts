@@ -90,6 +90,12 @@ describe("dev mode", () => {
 		expect(mockLocalStorage.removeItem).toHaveBeenCalledWith("test-key");
 	});
 
+	it("skips a write whose value is already what is stored", () => {
+		mockLocalStorage.getItem.mockReturnValueOnce(JSON_STATE);
+		storage.setItem("test-key", STATE_VALUE as never);
+		expect(mockLocalStorage.setItem).not.toHaveBeenCalled();
+	});
+
 	it("does not call obfuscate or deobfuscate", () => {
 		mockLocalStorage.getItem.mockReturnValueOnce(JSON_STATE);
 		storage.getItem("test-key");
@@ -181,6 +187,43 @@ describe("prod mode with SECRET_KEY", () => {
 		storage.setItem("test-key", STATE_VALUE as never);
 		expect(mockObfuscate).toHaveBeenCalledWith({ text: JSON_STATE, key: "secret-key" });
 		expect(mockLocalStorage.setItem).toHaveBeenCalledWith("test-key", "obfuscated-result");
+	});
+
+	it("skips a write whose value has not changed since the last one, so an unpersisted field costs nothing", () => {
+		mockObfuscate.mockReturnValueOnce("obfuscated-result");
+		storage.setItem("test-key", STATE_VALUE as never);
+		mockLocalStorage.getItem.mockReturnValueOnce("obfuscated-result");
+		storage.setItem("test-key", STATE_VALUE as never);
+
+		expect(mockObfuscate).toHaveBeenCalledOnce();
+		expect(mockLocalStorage.setItem).toHaveBeenCalledOnce();
+	});
+
+	it("skips a write of the value it just read back", () => {
+		mockLocalStorage.getItem.mockReturnValueOnce(OBFUSCATED).mockReturnValueOnce(OBFUSCATED);
+		mockDeobfuscate.mockReturnValueOnce(JSON_STATE);
+		storage.getItem("test-key");
+		storage.setItem("test-key", STATE_VALUE as never);
+
+		expect(mockLocalStorage.setItem).not.toHaveBeenCalled();
+	});
+
+	it("writes an unchanged value again when another tab has replaced what is stored", () => {
+		mockObfuscate.mockReturnValue("obfuscated-result");
+		storage.setItem("test-key", STATE_VALUE as never);
+		mockLocalStorage.getItem.mockReturnValueOnce("another-tab");
+		storage.setItem("test-key", STATE_VALUE as never);
+
+		expect(mockLocalStorage.setItem).toHaveBeenCalledTimes(2);
+		mockObfuscate.mockImplementation(({ text }: { text: string }) => `obf::${text}`);
+	});
+
+	it("writes a changed value", () => {
+		storage.setItem("test-key", STATE_VALUE as never);
+		mockLocalStorage.getItem.mockReturnValueOnce(`obf::${JSON_STATE}`);
+		storage.setItem("test-key", { ...STATE_VALUE, version: 2 } as never);
+
+		expect(mockLocalStorage.setItem).toHaveBeenCalledTimes(2);
 	});
 
 	it("setItem logs error when obfuscate throws", async () => {

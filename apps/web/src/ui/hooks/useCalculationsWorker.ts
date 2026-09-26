@@ -43,8 +43,9 @@ export function plannerGeneratedProperties({ params, measured, alternatives }: P
 
 export function useCalculationsWorker() {
 	const workerRef = useRef<Worker | null>(null);
-	const currentRequestIdRef = useRef<string>("");
-	const pendingRequestIdRef = useRef<string | null>(null);
+	const lastRequestIdRef = useRef(0);
+	const inFlightRequestIdRef = useRef<string | null>(null);
+	const queuedRunRef = useRef<(() => void) | null>(null);
 	const lastCalculatedPtoDaysRef = useRef<number | null>(null);
 
 	const { setCalculating, setCalculationResult, holidays, maxAlternatives } = useHolidaysStore(
@@ -58,97 +59,115 @@ export function useCalculationsWorker() {
 
 	const triggerCalculation = useCallback(
 		(params: GenerateSuggestionsParams) => {
-			workerRef.current?.terminate();
-
-			const worker = new Worker(new URL("../../infrastructure/workers/worker", import.meta.url));
-			workerRef.current = worker;
-
-			const requestId = String(Date.now());
-			currentRequestIdRef.current = requestId;
-			pendingRequestIdRef.current = requestId;
-
-			setCalculating(true);
-
-			worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
-				if (e.data.requestId !== currentRequestIdRef.current) return;
-				pendingRequestIdRef.current = null;
+			const settle = () => {
+				inFlightRequestIdRef.current = null;
+				const queuedRun = queuedRunRef.current;
+				queuedRunRef.current = null;
+				if (queuedRun) {
+					queuedRun();
+					return true;
+				}
 				setCalculating(false);
-				if (e.data.type === WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT) {
-					lastCalculatedPtoDaysRef.current = params.ptoDays;
-					const { suggestion, alternatives } = e.data.payload;
-					const measured = deserializeSuggestion(suggestion);
-					setCalculationResult({
-						suggestion: measured,
-						alternatives: alternatives.map(deserializeSuggestion),
-					});
-					track({
-						event: "planner_generated",
-						properties: plannerGeneratedProperties({ params, measured, alternatives }),
-					});
-				}
+				return false;
 			};
 
-			worker.onerror = () => {
-				if (currentRequestIdRef.current === requestId) {
-					pendingRequestIdRef.current = null;
-					setCalculating(false);
-				}
+			const run = () => {
+				workerRef.current ??= new Worker(new URL("../../infrastructure/workers/worker", import.meta.url));
+				const worker = workerRef.current;
+
+				lastRequestIdRef.current += 1;
+				const requestId = String(lastRequestIdRef.current);
+				inFlightRequestIdRef.current = requestId;
+
+				setCalculating(true);
+
+				worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
+					if (e.data.requestId !== inFlightRequestIdRef.current) return;
+					if (settle()) return;
+					if (e.data.type === WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT) {
+						lastCalculatedPtoDaysRef.current = params.ptoDays;
+						const { suggestion, alternatives } = e.data.payload;
+						const measured = deserializeSuggestion(suggestion);
+						setCalculationResult({
+							suggestion: measured,
+							alternatives: alternatives.map(deserializeSuggestion),
+						});
+						track({
+							event: "planner_generated",
+							properties: plannerGeneratedProperties({ params, measured, alternatives }),
+						});
+					}
+				};
+
+				worker.onerror = () => {
+					if (inFlightRequestIdRef.current !== requestId) return;
+					worker.terminate();
+					if (workerRef.current === worker) workerRef.current = null;
+					settle();
+				};
+
+				worker.onmessageerror = () => {
+					if (inFlightRequestIdRef.current !== requestId) return;
+					settle();
+				};
+
+				const { removedSuggestedDays, currentSelection, manuallySelectedDays } = useHolidaysStore.getState();
+
+				const budgetForAutoSuggest = measureBudget({ ptoDays: params.ptoDays, manuallySelectedDays }).remaining;
+				const hasRemovedDays = removedSuggestedDays.length > 0;
+				const activeSuggestedDays =
+					currentSelection && hasRemovedDays
+						? Math.max(0, currentSelection.days.length - removedSuggestedDays.length)
+						: undefined;
+
+				const ptoDaysChanged =
+					lastCalculatedPtoDaysRef.current !== null && lastCalculatedPtoDaysRef.current !== params.ptoDays;
+				const cap =
+					!ptoDaysChanged && activeSuggestedDays !== undefined
+						? Math.min(budgetForAutoSuggest, activeSuggestedDays)
+						: undefined;
+				const autoSuggestCount = cap && cap > 0 ? cap : undefined;
+
+				const request: CalculateSuggestionsRequest = {
+					type: WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS,
+					requestId,
+					payload: {
+						year: params.year,
+						carryOverMonths: params.carryOverMonths,
+						ptoDays: params.ptoDays,
+						holidays: serializeHolidays(holidays),
+						allowPastDays: params.allowPastDays,
+						strategy: params.strategy,
+						preferredMonths: params.preferredMonths,
+						locale: params.locale,
+						maxAlternatives,
+						manualDays: manuallySelectedDays.map((d) => d.toISOString()),
+						removedDays: removedSuggestedDays.map((d) => d.toISOString()),
+						autoSuggestCount,
+					},
+				};
+
+				worker.postMessage(request);
 			};
 
-			worker.onmessageerror = () => {
-				if (currentRequestIdRef.current === requestId) {
-					pendingRequestIdRef.current = null;
-					setCalculating(false);
-				}
-			};
-
-			const { removedSuggestedDays, currentSelection, manuallySelectedDays } = useHolidaysStore.getState();
-
-			const budgetForAutoSuggest = measureBudget({ ptoDays: params.ptoDays, manuallySelectedDays }).remaining;
-			const hasRemovedDays = removedSuggestedDays.length > 0;
-			const activeSuggestedDays =
-				currentSelection && hasRemovedDays
-					? Math.max(0, currentSelection.days.length - removedSuggestedDays.length)
-					: undefined;
-
-			const ptoDaysChanged =
-				lastCalculatedPtoDaysRef.current !== null && lastCalculatedPtoDaysRef.current !== params.ptoDays;
-			const cap =
-				!ptoDaysChanged && activeSuggestedDays !== undefined
-					? Math.min(budgetForAutoSuggest, activeSuggestedDays)
-					: undefined;
-			const autoSuggestCount = cap && cap > 0 ? cap : undefined;
-
-			const request: CalculateSuggestionsRequest = {
-				type: WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS,
-				requestId,
-				payload: {
-					year: params.year,
-					carryOverMonths: params.carryOverMonths,
-					ptoDays: params.ptoDays,
-					holidays: serializeHolidays(holidays),
-					allowPastDays: params.allowPastDays,
-					strategy: params.strategy,
-					preferredMonths: params.preferredMonths,
-					locale: params.locale,
-					maxAlternatives,
-					manualDays: manuallySelectedDays.map((d) => d.toISOString()),
-					removedDays: removedSuggestedDays.map((d) => d.toISOString()),
-					autoSuggestCount,
-				},
-			};
-
-			worker.postMessage(request);
+			if (inFlightRequestIdRef.current !== null) {
+				queuedRunRef.current = run;
+				return;
+			}
+			run();
 		},
 		[setCalculating, setCalculationResult, holidays, maxAlternatives],
 	);
 
 	useEffect(() => {
 		return () => {
-			if (pendingRequestIdRef.current) {
+			if (inFlightRequestIdRef.current !== null) {
 				useHolidaysStore.getState().setCalculating(false);
 			}
+			inFlightRequestIdRef.current = null;
+			queuedRunRef.current = null;
 			workerRef.current?.terminate();
+			workerRef.current = null;
 		};
 	}, []);
 

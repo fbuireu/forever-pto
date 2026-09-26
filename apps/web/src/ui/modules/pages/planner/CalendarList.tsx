@@ -2,7 +2,7 @@
 
 import { useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
-import { type DayOutcome, DayRefusal } from "@application/stores/types";
+import { type DayOutcome, DayRefusal, holidaysKeyOf } from "@application/stores/types";
 import { planningWindowMonths } from "@domain/calendar/window";
 import { useCalculationsWorker } from "@ui/hooks/useCalculationsWorker";
 import { useStoresReady } from "@ui/hooks/useStoresReady";
@@ -49,6 +49,7 @@ export const CalendarList = () => {
 		pruneDaysOutsideWindow,
 		clearCalculation,
 		planRevision,
+		holidaysKey,
 	} = useHolidaysStore(
 		useShallow((state) => ({
 			holidays: state.holidays,
@@ -65,6 +66,7 @@ export const CalendarList = () => {
 			pruneDaysOutsideWindow: state.pruneDaysOutsideWindow,
 			clearCalculation: state.clearCalculation,
 			planRevision: state.planRevision,
+			holidaysKey: state.holidaysKey,
 		})),
 	);
 
@@ -105,10 +107,11 @@ export const CalendarList = () => {
 	}, [fetchHolidays, year, region, country, locale, carryOverMonths]);
 
 	const canCalculate = ptoDays > 0 && holidays.length > 0 && months.length > 0;
+	const holidaysAreCurrent = holidaysKey === holidaysKeyOf({ year, region, country, locale, carryOverMonths });
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: planRevision is a re-plan signal, not a value the body reads
 	useEffect(() => {
-		if (!canCalculate) return;
+		if (!canCalculate || !holidaysAreCurrent) return;
 
 		triggerCalculation({
 			year,
@@ -122,6 +125,7 @@ export const CalendarList = () => {
 	}, [
 		triggerCalculation,
 		canCalculate,
+		holidaysAreCurrent,
 		year,
 		carryOverMonths,
 		ptoDays,

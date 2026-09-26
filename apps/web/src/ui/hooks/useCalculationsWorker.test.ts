@@ -62,9 +62,9 @@ const workerInstance: {
 	onmessageerror: null,
 };
 
-function MockWorker() {
+const MockWorker = vi.fn(function MockWorker() {
 	return workerInstance;
-}
+});
 
 vi.stubGlobal("Worker", MockWorker);
 
@@ -112,17 +112,19 @@ const lastRequest = (): CalculateSuggestionsRequest => {
 
 const lastPayload = () => lastRequest().payload;
 
-const deliverResult = () => {
+const deliverResultFor = (requestId: string) => {
 	act(() => {
 		workerInstance.onmessage?.({
 			data: {
 				type: WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS_RESULT,
-				requestId: lastRequest().requestId,
+				requestId,
 				payload: { suggestion: PLAN, alternatives: [] },
 			},
 		} as MessageEvent);
 	});
 };
+
+const deliverResult = () => deliverResultFor(lastRequest().requestId);
 
 beforeEach(() => {
 	vi.clearAllMocks();
@@ -198,17 +200,91 @@ describe("useCalculationsWorker", () => {
 		expect(mockSetCalculating).toHaveBeenCalledWith(true);
 	});
 
-	it("terminates the previous worker before starting a new one", () => {
+	it("reuses one worker for every calculation, so each run after the first starts warm", () => {
+		const { result } = renderHook(() => useCalculationsWorker());
+
+		act(() => {
+			result.current.triggerCalculation(BASE_PARAMS);
+		});
+		deliverResult();
+		act(() => {
+			result.current.triggerCalculation({ ...BASE_PARAMS, ptoDays: 6 });
+		});
+
+		expect(MockWorker).toHaveBeenCalledOnce();
+		expect(mockTerminate).not.toHaveBeenCalled();
+		expect(mockPostMessage).toHaveBeenCalledTimes(2);
+	});
+
+	it("numbers every request apart, so a reused worker's replies cannot be mistaken for each other", () => {
+		const { result } = renderHook(() => useCalculationsWorker());
+
+		act(() => {
+			result.current.triggerCalculation(BASE_PARAMS);
+		});
+		const first = lastRequest().requestId;
+		deliverResult();
+		act(() => {
+			result.current.triggerCalculation(BASE_PARAMS);
+		});
+
+		expect(lastRequest().requestId).not.toBe(first);
+	});
+
+	it("holds a request made while one is in flight, and sends only the latest once the first returns", () => {
+		const { result } = renderHook(() => useCalculationsWorker());
+
+		act(() => {
+			result.current.triggerCalculation(BASE_PARAMS);
+		});
+		const first = lastRequest().requestId;
+		act(() => {
+			result.current.triggerCalculation({ ...BASE_PARAMS, ptoDays: 6 });
+			result.current.triggerCalculation({ ...BASE_PARAMS, ptoDays: 7 });
+		});
+
+		expect(mockPostMessage).toHaveBeenCalledOnce();
+		deliverResultFor(first);
+
+		expect(mockPostMessage).toHaveBeenCalledTimes(2);
+		expect(lastPayload().ptoDays).toBe(7);
+		expect(mockSetCalculationResult).not.toHaveBeenCalled();
+		expect(mockSetCalculating).not.toHaveBeenCalledWith(false);
+	});
+
+	it("applies the latest request's result once it returns", () => {
+		const { result } = renderHook(() => useCalculationsWorker());
+
+		act(() => {
+			result.current.triggerCalculation(BASE_PARAMS);
+		});
+		const first = lastRequest().requestId;
+		act(() => {
+			result.current.triggerCalculation({ ...BASE_PARAMS, ptoDays: 7 });
+		});
+		deliverResultFor(first);
+		deliverResult();
+
+		expect(mockSetCalculationResult).toHaveBeenCalledOnce();
+		expect(mockSetCalculating).toHaveBeenLastCalledWith(false);
+	});
+
+	it("starts a fresh worker after one fails, and still sends the request that was waiting", () => {
 		const { result } = renderHook(() => useCalculationsWorker());
 
 		act(() => {
 			result.current.triggerCalculation(BASE_PARAMS);
 		});
 		act(() => {
-			result.current.triggerCalculation(BASE_PARAMS);
+			result.current.triggerCalculation({ ...BASE_PARAMS, ptoDays: 7 });
+		});
+		act(() => {
+			workerInstance.onerror?.();
 		});
 
-		expect(mockTerminate).toHaveBeenCalled();
+		expect(mockTerminate).toHaveBeenCalledOnce();
+		expect(MockWorker).toHaveBeenCalledTimes(2);
+		expect(lastPayload().ptoDays).toBe(7);
 	});
 
 	it("posts the calculation request to the worker", () => {

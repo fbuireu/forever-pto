@@ -34,6 +34,7 @@ const {
 		removedSuggestedDays: [],
 		previewAlternativeIndex: 0,
 		planRevision: 0,
+		holidaysKey: "ES||2026|0|en" as string | null,
 	},
 	mockPrune: vi.fn(),
 	mockClearCalculation: vi.fn(),
@@ -99,6 +100,7 @@ beforeEach(() => {
 	mockHolidaysState.hasCalculated = false;
 	capturedDayToggle.current = null;
 	(mockHolidaysState as { planRevision?: number }).planRevision = 0;
+	mockHolidaysState.holidaysKey = "ES||2026|0|en";
 });
 
 describe("CalendarList does not re-plan itself", () => {
@@ -112,6 +114,27 @@ describe("CalendarList does not re-plan itself", () => {
 		rerender(<CalendarList />);
 
 		expect(mockTriggerCalculation).toHaveBeenCalledTimes(1);
+	});
+});
+
+describe("CalendarList plans on the Holidays of the current filters", () => {
+	it("waits while the Holidays loaded are for another year, then plans once they arrive", () => {
+		mockHolidaysState.holidaysKey = "ES||2025|0|en";
+		const { rerender } = render(<CalendarList />);
+
+		expect(mockTriggerCalculation).not.toHaveBeenCalled();
+
+		mockHolidaysState.holidaysKey = "ES||2026|0|en";
+		rerender(<CalendarList />);
+
+		expect(mockTriggerCalculation).toHaveBeenCalledOnce();
+	});
+
+	it("waits for the first fetch after a reload rather than planning on the persisted Holidays", () => {
+		mockHolidaysState.holidaysKey = null;
+		render(<CalendarList />);
+
+		expect(mockTriggerCalculation).not.toHaveBeenCalled();
 	});
 });
 

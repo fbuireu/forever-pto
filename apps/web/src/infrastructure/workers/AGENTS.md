@@ -190,13 +190,21 @@ The consequence that remains is the stored empty plan being what the next run re
 emptied selection can pin the auto-suggest cap at zero. `useCalculationsWorker.ts` guards that by treating a
 computed cap of `0` as "no cap".
 
-## A worker per calculation, on purpose
+## One worker, reused, and the latest request wins
 
-`useCalculationsWorker.ts` terminates the in-flight worker and spawns a fresh one on every recalculation. That
-reads like waste and is not: the handler in `worker.ts` is fully synchronous, so a reused worker cannot be
-preempted: queued messages sit behind the running computation and execute to completion. `terminate()` is the
-only thing that actually cancels a run. The `requestId` guard discards stale *results*; it does nothing about
-stale *work*.
+`useCalculationsWorker.ts` spawns the worker on its first calculation and keeps it for the life of the hook. It
+used to terminate the in-flight worker and spawn a fresh one on every recalculation, on the grounds that the
+handler in `worker.ts` is synchronous, so a reused worker cannot be preempted and `terminate()` is the only
+thing that cancels a run. That was true and cost more than it saved: a fresh worker starts cold (its JIT and
+its cached `Intl` formatters), and measured over the real bundle it answered in about 270 ms where a warm one
+answers in about 60. Every recalculation paid that difference, idle or not.
+
+So the hook never cancels a run. A request made while one is in flight is held, and a later one replaces it,
+so a burst of ten budget clicks runs the first and the last and nothing in between. When the in-flight reply
+arrives it is discarded if a request is waiting, and the waiting one is posted; only the reply to the latest
+request is applied. Requests are numbered by a counter rather than a timestamp, because a reused worker's
+replies are told apart by their id alone. A worker that reports `error` is terminated and dropped, and the
+next request, a waiting one included, spawns a fresh one.
 
 ## Testing
 

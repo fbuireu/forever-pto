@@ -146,16 +146,20 @@ all.
 
 **`CalendarList` also *clears* the plan, and that is the other half of the same effect.** Its trigger is
 gated on `ptoDays > 0 && holidays.length > 0 && months.length > 0`; when the gate closes the worker is never
-asked, and nothing else in the app nulls a Suggestion: `fetchHolidays` writes only `holidays`, on both its
+asked, and nothing else in the app nulls a Suggestion: `fetchHolidays` writes only `holidays` and `holidaysKey`, on both its
 success and its catch branch. So a Country whose Holidays fail to load, or a Region that has none, used to
 leave the previous Country's plan painted over a calendar that no longer existed, with no way to re-trigger
 a run. The effect now calls `clearCalculation()` when the gate closes **and** a Suggestion is still standing.
 The second condition matters: without it, the cold load (where the gate is also closed, because Holidays
 have not arrived yet) would clear a plan that was never there and mark the store as having calculated.
 
-**Only `CalendarList.tsx` triggers a calculation.** It fires `triggerCalculation` on any change to
-year, PTO budget, Strategy, past-days flag, locale or the Holiday list, and on `planRevision`, which
-`setCurrentAlternativeSelection` bumps so that applying a plan re-plans it; see
+**Only `CalendarList.tsx` triggers a calculation, and only on the Holidays of the filters on screen.** It
+fires `triggerCalculation` on any change to year, PTO budget, Strategy, Preferred Months, past-days flag,
+locale or the Holiday list, and on `planRevision`, but only once `holidaysKey` in the holidays store names the
+same Country, Region, year, Carry-over Months and locale the filters do (`holidaysKeyOf`). Without that gate a
+year change planned twice, the first time on the previous year's Holidays, and so did every reload, on the
+persisted ones; `holidaysKey` is not persisted, so a reload waits for its first fetch. `planRevision` is the
+signal `setCurrentAlternativeSelection` bumps so that applying a plan re-plans it; see
 [`@application/stores/AGENTS.md`](../../../../application/stores/AGENTS.md). [`Troubleshooting.tsx`](../homepage/support/Troubleshooting.tsx), which now
 lives under `pages/homepage/support/`, is the one other caller and it goes the other way:
 `useHolidaysStore().generateSuggestions`, on the main thread. Those are the *UI* entry points; the

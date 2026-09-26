@@ -82,8 +82,10 @@ through a dynamic `import()`. Holiday data ships in the client bundle and is com
   [ADR 0002](../../../../../../adr/0002-effect-for-external-service-boundaries.md).
 - **The work is synchronous and it is not offloaded to the Web Worker.** `Effect.try` wraps a plain
   computation; only suggestion generation goes through [`src/infrastructure/workers/worker.ts`](../../workers/worker.ts). Building
-  two years of Holidays blocks the main thread, and it re-runs on every Country, Region, year or
-  Carry-over Months change.
+  two years of Holidays blocks the main thread, and it re-runs on every Country, Region, year or locale change.
+  A Carry-over Months change re-runs only the mapping: the lookup is the same two years whatever the window,
+  so `getHolidays` keeps the last one it made (`cachedObservedHolidays`, a single entry keyed on Country,
+  Region, year, locale and the source) and only `holidayDTO.create` re-flags `isInPlanningWindow`.
 
 ## Invariants
 
