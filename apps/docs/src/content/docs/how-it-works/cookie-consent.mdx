@@ -49,7 +49,7 @@ Every transition ends in `acceptService`, and the two tags react to the resultin
 
 Accepting or saving preferences calls `CookieConsentLib.acceptService(enabledServices, 'analytics')`, then:
 
-- **Google Consent Mode**: `apps/web/src/ui/modules/tracking/Analytics.tsx` loads gtag with a default of everything `denied`. On consent changes the component updates `analytics_storage` via `gtag('consent', 'update', ...)` and fires a `page_view` when granted, so GA never tracks pre-consent.
+- **Google Consent Mode**: `apps/web/src/ui/modules/tracking/Analytics.tsx` loads gtag with a default of everything `denied`, and renders nothing at all when the build carries no `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID`, so a build without a property loads no Google script. On consent changes the component updates `analytics_storage` via `gtag('consent', 'update', ...)` and fires a `page_view` when granted, so GA never tracks pre-consent.
 - **Better Stack tracking**: `apps/web/src/ui/modules/tracking/BetterStackTracking.tsx` listens to the library's `cc:onConsent` / `cc:onChange` document events and only injects the tracking script when the analytics category is accepted (and a tracking token exists). It also `identifyUser`s premium users post-consent. See [observability](/how-it-works/observability/).
 
 On a revisit, `onConsent` restores per-service state from `CookieConsentLib.getUserPreferences()` so the dialog reflects reality.

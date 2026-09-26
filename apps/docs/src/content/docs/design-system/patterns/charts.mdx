@@ -33,9 +33,10 @@ The same folder also contains `YearTimelineChart.tsx`, the year-at-a-glance stri
 
 The charts themselves are pure props-in components, with no store access, per the project's core-component rules. The wiring lives one level up in `apps/web/src/ui/modules/pages/planner/Summary.tsx`:
 
-1. `Summary` reads the Zustand stores (`useFiltersStore` for ptoDays, country, region, strategy, year and carryOverMonths, plus `useHolidaysStore`, `useLocationStore` and `usePremiumStore`) through `useShallow` selectors,, waiting on `useStoresReady` before rendering.
+1. `Summary` reads the Zustand stores (`useFiltersStore` for ptoDays, country, region, strategy, year and carryOverMonths, plus `useHolidaysStore`, `useLocationStore` and `usePremiumStore`) through `useShallow` selectors, waiting on `useStoresReady` before rendering. The plan itself comes through `usePlacedPlan` (`apps/web/src/ui/hooks/usePlanReadout.ts`), which has no subscription to `isCalculating`, so a calculation starting and ending does not redraw five charts twice.
 2. It derives the metrics objects (`quarterDist`, `monthlyDist`, `longBlocksPerQuarter`, efficiency stats) from the active suggestion in a `useMemo`.
 3. Each chart is loaded with `next/dynamic`, so Recharts stays out of the initial planner bundle, and receives only plain arrays and DTOs as props.
+4. Each chart is wrapped in `memo` and memoises the series it builds from its props, so a Summary render whose inputs did not change re-renders no chart.
 
 This makes the charts easy to test and reuse: any caller that can produce a `number[]` (or `HolidayDTO[]`) can render them; the Next.js coupling is in the surrounding translation and premium layers, not the data flow.
 

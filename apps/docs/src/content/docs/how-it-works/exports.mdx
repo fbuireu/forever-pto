@@ -9,14 +9,14 @@ Users can take their plan with them as a printable **PDF** or an **ICS** file th
 
 ## The component
 
-`apps/web/src/ui/modules/sidebar/components/CalendarExport.tsx` (a sidebar tool, tutorial anchor `data-tutorial='calendar-export'`) reads `year` from the filters store and `holidays` + the active suggestion from the holidays store (`currentSelection ?? suggestion`, so manual edits win over the raw suggestion). Two toggle buttons choose what to include: holidays, PTO days, or both; the download buttons disable when the resulting selection is empty.
+`apps/web/src/ui/modules/sidebar/components/CalendarExport.tsx` (a sidebar tool, tutorial anchor `data-tutorial='calendar-export'`) reads `year` from the filters store, the Holidays inside the Planning Window from the holidays store, and the PTO Days through `usePlacedPlan` (`apps/web/src/ui/hooks/usePlanReadout.ts`): the applied plan, `currentSelection ?? suggestion`, with the Manual Days added and the Removed Days struck, so the file carries what the calendar shows. That hook does not subscribe to `isCalculating`, so a calculation starting and ending does not redraw the tool. Two toggle buttons choose what to include: holidays, PTO days, or both; the download buttons disable when the resulting selection is empty.
 
 The download buttons, and only the buttons, are wrapped in `PremiumFeature` (`apps/web/src/ui/modules/premium/PremiumFeature.tsx`), so free users see the tool blurred with a lock and get the upgrade modal on interaction. See [premium](/how-it-works/premium/).
 ```mermaid
 flowchart LR
-  ST[(holidays + filters stores)] --> SEL[Selected Holidays and PTO Days<br/>currentSelection ?? suggestion]
+  ST[(holidays + filters stores)] --> SEL[Holidays in the window, and the placed PTO Days<br/>usePlacedPlan]
   SEL --> T{Format}
-  T -- PDF --> DYN[dynamic import<br/>@react-pdf/renderer + HolidayDocument]
+  T -- PDF --> DYN[dynamic import of exportPdf<br/>then @react-pdf/renderer + HolidayDocument]
   DYN --> BLOB1[pdf.toBlob]
   BLOB1 --> URL[Object URL, released by Effect.acquireRelease]
   T -- ICS --> GEN[generateIcs<br/>one all-day VEVENT per date, deterministic UID]
@@ -27,7 +27,7 @@ flowchart LR
 
 ## PDF export
 
-The PDF path is fully lazy: neither `@react-pdf/renderer` nor the document component is in the main bundle. Inside a React transition, `pdfExportEffect` dynamic-imports both, renders `HolidayDocument` (`apps/web/src/ui/modules/export/HolidayDocument.tsx`) to a blob with `renderer.pdf(...).toBlob()`, and triggers a download named `forever-pto-{year}.pdf`.
+The PDF path is fully lazy: neither the Effect runtime, nor `@react-pdf/renderer`, nor the document component is in the sidebar's bundle. On the first click, inside a React transition, the component dynamic-imports `exportPdf` from `apps/web/src/ui/modules/export/exportPdf.tsx`, the module that holds the whole Effect program. `CalendarExport.tsx` imports nothing from `effect` itself, which its test asserts against the source, because a static import there would put the runtime back in the planner's first load for a button most visits never press. `pdfExportEffect` then dynamic-imports the renderer and the document, renders `HolidayDocument` (`apps/web/src/ui/modules/export/HolidayDocument.tsx`) to a blob with `renderer.pdf(...).toBlob()`, and triggers a download named `forever-pto-{year}.pdf`.
 
 Details worth copying elsewhere:
 
@@ -44,4 +44,4 @@ Because UIDs are deterministic, re-importing a regenerated file updates events i
 
 ## Testing
 
-`apps/web/src/application/export/generateIcs.test.ts` covers the generator; the PDF path is exercised through the component tests.
+`apps/web/src/application/export/generateIcs.test.ts` covers the generator; the PDF path is exercised through the component tests in `apps/web/src/ui/modules/sidebar/components/CalendarExport.test.tsx`, which also hold the static-import rule above.

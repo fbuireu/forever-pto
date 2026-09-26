@@ -59,6 +59,8 @@ The seam used to sit one level higher, with the filter inside the production ada
 
 Two entries on the same date collapse to one, with the Regional one winning, which is why the mapper sorts regional entries after national ones before deduplicating. The Region **list** the mapper needs to render a label is derived inside `getHolidays` from the same adapter (`getRegions` in `apps/web/src/infrastructure/services/regions/getRegions.ts`), not passed in: it used to arrive from the location store, populated by a different component's effect, and whenever this ran first the label stayed a raw code for the rest of the session.
 
+The lookup is the same two years whatever the Planning Window, so a Carry-over Months change re-runs only the mapping: `getHolidays` keeps the last lookup it made (`cachedObservedHolidays`, a single entry keyed on Country, Region, year, locale and the source), and only `holidayDTO.create` re-flags `isInPlanningWindow`.
+
 ## Custom Holidays
 
 User-created Holidays never pass through the fetch. The store builds them with `holidayDTO.createCustom`, keeps them across every refetch, recomputes their `isInPlanningWindow` for the new window, and drops any fetched Holiday that falls on the same date, so a Custom Holiday outranks a National or Regional one as the glossary says it must. Adding or editing one asks `heldOn` whether the date is already taken and by what, and answers a `HolidayOutcome` the [Holiday form](/how-it-works/planner-ui/#the-holiday-tables) turns into copy.

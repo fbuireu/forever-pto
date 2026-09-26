@@ -1,6 +1,6 @@
 ---
 title: Calculation worker
-description: The Web Worker that runs the planning pipeline off the main thread, covering the message protocol, requestId correlation, the ISO-string boundary, terminate-and-respawn cancellation, the auto-suggest cap and the failure modes.
+description: The Web Worker that runs the planning pipeline off the main thread, covering the message protocol, requestId correlation, the ISO-string boundary, one reused worker where the latest request wins, the auto-suggest cap and the failure modes.
 sidebar:
   order: 3
 ---
@@ -22,10 +22,14 @@ sequenceDiagram
   participant WK as worker.ts
   participant PL as runPlanningPipeline
   CL->>HK: triggerCalculation(params)
-  HK->>HK: terminate the previous worker, spawn a new one
-  HK->>HS: setCalculating(true)
-  HK->>HK: requestId = String(Date.now()), then the autoSuggestCount cap
-  HK->>WK: CALCULATE_SUGGESTIONS { requestId, payload }
+  alt a request is in flight
+    HK->>HK: hold this one, replacing any held before it
+  else nothing is running
+    HK->>HK: spawn the worker on the first run, reuse it after
+    HK->>HS: setCalculating(true)
+    HK->>HK: requestId = the next counter value, then the autoSuggestCount cap
+    HK->>WK: CALCULATE_SUGGESTIONS { requestId, payload }
+  end
   WK->>WK: drop any other message type
   WK->>WK: deserialise: fromStoredInstant, isFilterStrategy, isPreferredMonths, isLocale
   WK->>PL: PlanningInput
@@ -33,10 +37,11 @@ sequenceDiagram
   alt success
     WK-->>HK: CALCULATE_SUGGESTIONS_RESULT { requestId, suggestion, alternatives }
     HK->>HK: requestId matches? else drop
+    HK->>HK: a request held? post it and drop this reply
     HK->>HS: setCalculationResult, keeping the applied Alternative index
   else throw inside the run
     WK-->>HK: WORKER_ERROR { requestId, error: String(err) }
-    HK->>HS: setCalculating(false)
+    HK->>HS: post the held request, or setCalculating(false)
   end
 ```
 
@@ -48,20 +53,23 @@ The handler is wrapped end to end in `try`/`catch`, so the main thread gets exac
 
 ```mermaid
 stateDiagram-v2
-  [*] --> Idle
-  Idle --> Spawned: triggerCalculation
-  Spawned --> Running: postMessage
-  Running --> Settled: RESULT or WORKER_ERROR with the current requestId
-  Running --> Terminated: a new triggerCalculation, or unmount
-  Terminated --> Spawned: the new run
-  Settled --> Idle
-  Running --> Ignored: a message with a stale requestId
-  Ignored --> Running
+  [*] --> NoWorker
+  NoWorker --> Running: triggerCalculation spawns the worker
+  Idle --> Running: triggerCalculation reuses it
+  Running --> Holding: triggerCalculation while a run is in flight
+  Holding --> Holding: a later request replaces the held one
+  Holding --> Running: the reply arrives and is dropped, the held request is posted
+  Running --> Idle: RESULT or WORKER_ERROR with the current requestId
+  Running --> Running: a message with a stale requestId is ignored
+  Running --> NoWorker: onerror terminates and drops the worker
+  Idle --> [*]: unmount terminates the worker
 ```
 
-**A worker per calculation, on purpose.** Every trigger terminates the in-flight worker and spawns a fresh one with `new Worker(new URL('../../infrastructure/workers/worker', import.meta.url))`, the shape the bundler detects statically to emit a worker chunk. That reads like waste and is not: the handler is fully synchronous, so a reused worker could not be preempted; queued messages would sit behind the running computation and execute to completion. `terminate()` is the only thing that actually cancels a run. The `requestId` guard discards stale **results**; it does nothing about stale **work**, and dragging the PTO slider produces a dozen stale runs a second.
+**One worker, reused, and the latest request wins.** The hook spawns the worker on its first calculation, with `new Worker(new URL('../../infrastructure/workers/worker', import.meta.url))`, the shape the bundler detects statically to emit a worker chunk, and keeps it for the life of the hook. It used to terminate the in-flight worker and spawn a fresh one on every trigger, because the handler is fully synchronous: a reused worker cannot be preempted, and `terminate()` is the only thing that cancels a run. That was true and cost more than it saved. A fresh worker starts cold, without its JIT or its cached `Intl` formatters, and measured over the real bundle it answered in about 270 ms where a warm one answers in about 60; every recalculation paid the difference.
 
-On unmount the hook terminates whatever is running and, if a request was still pending, clears the store's `isCalculating` flag so the UI cannot be left in a loading state with nobody to end it.
+So nothing cancels a run any more, and the hook limits how many start instead. A request made while one is in flight is **held**, and a later one replaces it, so dragging the PTO slider through a dozen values runs the first and the last and nothing in between. When the in-flight reply arrives with a request waiting, the reply is dropped and the waiting request is posted, so only the reply to the latest request ever reaches the store. `requestId` is a counter rather than a timestamp, because the replies of a reused worker are told apart by their id alone. A worker whose `onerror` fires is terminated and dropped, and the next request, a held one included, spawns a fresh one.
+
+On unmount the hook terminates the worker, drops any held request and, if a request was still pending, clears the store's `isCalculating` flag so the UI cannot be left in a loading state with nobody to end it.
 
 ## The boundary: every `Date` as an ISO string
 
@@ -101,4 +109,4 @@ It holds **no planning rule**. Clearing the caches, building the pseudo-Holidays
 
 ## Testing
 
-`apps/web/src/infrastructure/workers/worker.test.ts` stubs `self`, mocks `runPlanningPipeline` and drives `globalThis.onmessage` directly. It pins the boundary and only the boundary: the message-type guard, deserialisation into the pipeline's input names, the two narrowings, serialisation of the reply, that an unplanned result reaches the wire with the pipeline's own `Metrics`, and that a throw becomes `WORKER_ERROR`. The pipeline's behaviour is pinned once, against the real engine, in `apps/web/src/domain/calendar/pipeline.test.ts`. `apps/web/src/infrastructure/workers/AGENTS.md` is the folder's own guide and carries the invariants in full.
+`apps/web/src/infrastructure/workers/worker.test.ts` stubs `self`, mocks `runPlanningPipeline` and drives `globalThis.onmessage` directly. It pins the boundary and only the boundary: the message-type guard, deserialisation into the pipeline's input names, the two narrowings, serialisation of the reply, that an unplanned result reaches the wire with the pipeline's own `Metrics`, and that a throw becomes `WORKER_ERROR`. The pipeline's behaviour is pinned once, against the real engine, in `apps/web/src/domain/calendar/pipeline.test.ts`. The lifecycle is the hook's, and `apps/web/src/ui/hooks/useCalculationsWorker.test.ts` pins it: one worker across every run, a new id per request, a held request replaced by a later one, only the latest reply applied, and a fresh worker after one fails. `apps/web/src/infrastructure/workers/AGENTS.md` is the folder's own guide and carries the invariants in full.

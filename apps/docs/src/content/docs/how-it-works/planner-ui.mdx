@@ -69,15 +69,20 @@ sequenceDiagram
   CL->>H: pruneDaysOutsideWindow, so a Manual Day outside the new window is dropped
   F-->>CL: country / region / year / carryOverMonths / locale changed
   CL->>H: fetchHolidays
-  H-->>CL: holidays updated
+  H-->>CL: holidays and holidaysKey updated
   Note over CL: canCalculate = ptoDays > 0 ∧ holidays.length > 0 ∧ months.length > 0
-  CL->>W: triggerCalculation (also when planRevision bumps)
+  Note over CL: holidaysAreCurrent = holidaysKey names the filters on screen
+  CL->>W: triggerCalculation when both hold (also when planRevision bumps)
   W-->>H: setCalculationResult
   H-->>CL: repaint, and the a11y status reads "plan updated"
   Note over CL,H: canCalculate false while a Suggestion exists → clearCalculation
 ```
 
 `planRevision` is a counter the store bumps when a user action should re-plan without any input having changed, such as removing a Holiday. The effect lists it as a dependency and never reads it, which is the one place in the file Biome is told to look away.
+
+**The effect plans only on the Holidays of the filters on screen.** `holidaysKey` in the holidays store records which Country, Region, year, Carry-over Months and locale the loaded Holidays were fetched for (`holidaysKeyOf` in `apps/web/src/application/stores/types.ts`), and `holidaysAreCurrent` compares it with the filters. Without that gate a filter change planned once on the previous Holidays and again when the new ones arrived, and a reload planned on the persisted list first; the key is not persisted, so a reload waits for its first fetch and plans once.
+
+**The months do not re-render for a click or a budget change.** `Calendar` is wrapped in `memo`, and the day handler it receives is stable: `toggleDay` reads `isCalculating`, the budget and `allowPastDays` from the stores with `getState()` at the moment of the click, instead of closing over values that would give it a new identity on every change. Each month answers "is this day suggested, manual, removed, a Holiday?" from sets of day indexes built, memoised, when the plan changes (`apps/web/src/ui/modules/pages/planner/utils/modifiers.ts`), not by scanning arrays of dates for every day it paints.
 
 ## The calendar grid
 

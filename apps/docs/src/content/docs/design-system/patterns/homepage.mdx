@@ -1,15 +1,15 @@
 ---
 title: Homepage patterns
-description: brutCard and dayCell, the shared class-string constants that keep the marketing homepage sections visually consistent.
+description: brutCard and dayCell, the shared class-string constants that keep the marketing homepage sections visually consistent, and the one showcase plan every homepage figure comes from.
 sidebar:
   order: 1
 ---
 
-import { brutCard } from '@ui/modules/pages/homepage/sections/shared';
+import { brutCard, SHOWCASE_PLAN } from '@ui/modules/pages/homepage/sections/shared';
 import { BrutCardDemo, DayCellsDemo, DAY_TYPE_ROWS } from '../../../../components/demos/HomepagePatternsDemo';
 import { VariantsTable } from '../../../../components/VariantsTable';
 
-Source: `apps/web/src/ui/modules/pages/homepage/sections/shared.ts`. The homepage sections (`Hero`, `Features`, `Comparison`, `HowItWorks`, `Pricing`, `Testimonials` under `apps/web/src/ui/modules/pages/homepage/sections/`) do not share components; they share **class-string constants**. This file is pure data (a type, two class maps, a fixture array), which is why this page can import it and render the real styles live.
+Source: `apps/web/src/ui/modules/pages/homepage/sections/shared.ts`. The homepage sections (`Hero`, `Features`, `Comparison`, `HowItWorks`, `Pricing`, `Testimonials` under `apps/web/src/ui/modules/pages/homepage/sections/`) do not share components; they share **class-string constants**. This file is pure data (a type, two class maps, a fixture array and the showcase plan), which is why this page can import it and render the real styles live.
 
 ## brutCard
 
@@ -32,6 +32,12 @@ Note the **deliberate 4px border**: core primitives like [Button](/design-system
 <VariantsTable rows={DAY_TYPE_ROWS} />
 
 The visual language matches the real planner: holidays get the yellow gradient with a full-strength frame, PTO days the brand teal, weekends recede onto the soft panel surface, and plain work days sit on the card background with a faint 15%-opacity border.
+
+## SHOWCASE_PLAN
+
+Every figure the homepage quotes about a plan comes from one constant, `SHOWCASE_PLAN`, a plan the engine produced: {SHOWCASE_PLAN.ptoDays} PTO Days turned into {SHOWCASE_PLAN.effectiveDays} Effective Days, around {SHOWCASE_PLAN.holidays} Holidays (the values above are read from the app, not copied). `SHOWCASE_RATIO` beside it is the division, never a typed number. `Hero` shows the plan in its mock-up, `Stats` quotes the ratio and the Effective Days, and `Comparison` quotes the ratio in its copy; each formats the ratio with the locale's number format, and the translations take it as a `{ratio}` placeholder.
+
+It exists because the same ratio used to be typed three times, and read 3.3, 3.36 and 3.4 on one page. It names no year on purpose, so the homepage does not go stale when the calendar turns. When the engine changes what it produces, re-run the plan and change this constant, and every section follows.
 
 ## Usage
 

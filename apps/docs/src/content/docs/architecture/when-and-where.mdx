@@ -32,6 +32,8 @@ flowchart LR
 | Skeletons | `boneyard-js` generates the bones from fixture renders into `apps/web/src/ui/modules/bones/` | A layout change regenerates its skeleton with `pnpm bones:build` rather than drifting from it |
 | The Markdown twins | `buildMarkdownPage` imports every locale's bundle statically and translates with `createTranslator` | A missing locale row is a compile error, not a runtime blank |
 | The Web Worker chunk | The bundler detects `new Worker(new URL(..., import.meta.url))` in `useCalculationsWorker` | The engine ships as its own chunk, loaded on the first calculation |
+| The client message catalogue | `clientMessagesOf` drops `SERVER_ONLY_NAMESPACES` before the layout hands the bundle to the intl client provider | The homepage, legal and FAQ copy renders on the server and never ships to the browser ([i18n](/how-it-works/i18n/)) |
+| The hashed build assets | `apps/web/public/_headers` marks the `_next/static` tree `immutable` for a year | A repeat visit reuses the scripts and styles it already holds without asking the server, which is safe because their file names change whenever their content does ([caching](/architecture/caching/)) |
 
 ## At deploy time
 
@@ -61,17 +63,17 @@ In this order, once the HTML arrives:
 3. **`StoresInitializer`** reads the `user-country` cookie and seeds the Country, only when the user has never chosen one.
 4. **`PremiumSessionSync`** asks `GET /api/check-session` whether the `premium-token` cookie still verifies, and the premium store mirrors the answer; the store also flips `needsSessionCheck` on its own when its last verification is older than 24 hours.
 5. **Consent** decides whether the Google tag and the Better Stack tag load at all. Before a decision, the Consent Mode defaults are `denied` and neither script exists in the page.
-6. **The planning loop starts**: `CalendarList` refetches Holidays for the stored Country and window and, once the budget and the Holidays are in, triggers the first calculation ([the planner screen](/how-it-works/planner-ui/)).
+6. **The planning loop starts**: `CalendarList` refetches Holidays for the stored Country and window and triggers the first calculation once the Holidays it holds are the ones fetched for the current filters. The list rehydrated from the last visit does not count, because the store's `holidaysKey` is not persisted, so a reload plans once rather than once on stale Holidays and again on fresh ones ([the planner screen](/how-it-works/planner-ui/)).
 
 ## On every interaction
 
 A sidebar field writes one value to the filters store, and `CalendarList`'s effects do the rest: a Country, Region, year or Carry-over change refetches Holidays; any planning input change, or a `planRevision` bump from a Holiday edit, triggers a calculation. A calendar click never re-plans the year: `toggleDaySelection` writes a Manual or Removed Day, recomputes the budget readout locally, and the hand-edited days reach the engine only as inputs to the **next** run, read non-reactively by the worker hook. Applying an Alternative writes it as `currentSelection` and clears the Removed Days. Every refusal (weekend, Holiday, exhausted budget, plan in flight, no Premium) is a `DayRefusal` the calendar turns into a toast rather than a silent no-op.
 
-The exports run here too: the PDF path dynamic-imports `@react-pdf/renderer` inside a transition on the first click, the ICS path is a string builder, and both hand the browser a blob to download ([exports](/how-it-works/exports/)).
+The exports run here too: the PDF path dynamic-imports `apps/web/src/ui/modules/export/exportPdf.tsx` inside a transition on the first click, which is what keeps the Effect runtime, `@react-pdf/renderer` and the document out of the first load, the ICS path is a string builder, and both hand the browser a blob to download ([exports](/how-it-works/exports/)).
 
 ## Inside the Web Worker
 
-Every calculation is a fresh worker: the hook terminates the in-flight one, spawns a new one, and posts one `CALCULATE_SUGGESTIONS` message with every `Date` as an ISO string. The worker deserialises, narrows the Strategy and locale, runs `runPlanningPipeline` synchronously (tens of milliseconds for a year) and posts back a measured Suggestion and its Alternatives, or a `WORKER_ERROR`. A reply whose `requestId` is stale is dropped. The worker has no DOM, no store and no network; the [calculation worker](/how-it-works/calculation-worker/) page has the protocol and the [planning algorithm](/how-it-works/planning-algorithm/) what runs inside.
+One worker serves every calculation: the hook spawns it on the first and keeps it, holds a request made while another is in flight (a later one replaces it), and posts one `CALCULATE_SUGGESTIONS` message per run with every `Date` as an ISO string. The worker deserialises, narrows the Strategy and locale, runs `runPlanningPipeline` synchronously (tens of milliseconds for a year) and posts back a measured Suggestion and its Alternatives, or a `WORKER_ERROR`. A reply whose `requestId` is stale is dropped. The worker has no DOM, no store and no network; the [calculation worker](/how-it-works/calculation-worker/) page has the protocol and the [planning algorithm](/how-it-works/planning-algorithm/) what runs inside.
 
 ## When the user leaves
 

@@ -108,7 +108,7 @@ Not a layer but a single file at the root of `src`, kept at the pre-Next-16 name
 | `api/` | The wire vocabulary: `errors.ts` (`ApiError` and `describeFailure`, the one tag-to-status table), `response.ts` (`noStore`), `parseJsonBody.ts`, and `operations/`, where a flow behind two transports is terminated once | Server |
 | `actions/` | The `'use server'` entry points, `payment.ts` and `contact.ts`, thin wrappers over the operations | Server |
 | `workers/` | The calculations Web Worker and its message contract; see [calculation worker](/how-it-works/calculation-worker/) | Browser, worker thread |
-| `i18n/` | `routing.ts`, `config.ts`, `locales.ts` (the codes, `LOCALE_COOKIE`, `isLocale`), `cookie.ts` (`LOCALE_COOKIE_POLICY`, stated once for both writers), `utils/url.ts` | Both |
+| `i18n/` | `routing.ts`, `config.ts`, `locales.ts` (the codes, `LOCALE_COOKIE`, `isLocale`), `cookie.ts` (`LOCALE_COOKIE_POLICY`, stated once for both writers), `clientMessages.ts` (the catalogue the browser is sent), `utils/url.ts` | Both |
 | `proxy/` | `location.ts` and `cookie.ts`: Country detection and the `user-country` cookie | Edge |
 | `logging/` | `logger.ts`, one JSON line per call to `console`, and `service.ts`, the `LoggerService` tag over the same object; the platform exports the lines ([ADR 0018](https://github.com/fbuireu/forever-pto/blob/main/adr/0018-the-platform-is-the-log-transport.md)) | Both |
 | `seo/`, `markdown/`, `well-known/` | `SITE_ROUTES` and `buildMetadata`; the Markdown twin and `markdownTwinHeaders`; the three agent-facing discovery documents | Server |

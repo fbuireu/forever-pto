@@ -56,7 +56,7 @@ flowchart LR
     S1[Try the day alone]
     S2["Try it plus the next 1 … MAX_MULTI_DAY_SIZE − 1 Workdays<br/>(consecutive only; a gap stops the run)"]
   end
-  subgraph analyze [analyzePotentialBridge]
+  subgraph analyze [analyzeRun, inside findBridges]
     ADJ{Touches a Free Day<br/>on either side?}
     EXP[Expand outward over weekends and Holidays<br/>until a Workday, up to SAFETY_LIMIT]
     EFF[efficiency = effectiveDays ÷ ptoDaysNeeded]
@@ -184,7 +184,7 @@ Every constant the engine reads, with its live value. The table is exhaustive ov
 
 ## Complexity and cost
 
-For a window of *m* months there are roughly 21·*m* Workdays; each spawns at most {PTO_CONSTANTS.BRIDGE_SEARCH.MAX_MULTI_DAY_SIZE} candidates and each candidate expands over at most a few days, so generation is linear in the window. Selection costs one pass over the candidates per Bridge taken, with the gain, the stretch and the distance kept up to date incrementally rather than recomputed. Alternatives add a bounded number of further selections. The whole run for a year is tens of milliseconds on a laptop, which is fast enough to feel instant and slow enough to stutter a slider drag if it ran on the main thread; that, and nothing about the algorithm, is why it runs in a [Web Worker](/how-it-works/calculation-worker/).
+For a window of *m* months there are roughly 21·*m* Workdays; each spawns at most {PTO_CONSTANTS.BRIDGE_SEARCH.MAX_MULTI_DAY_SIZE} candidates and each candidate expands over at most a few days, so generation is linear in the window. Selection costs one pass over the candidates per Bridge taken, with the gain, the stretch and the distance kept up to date incrementally rather than recomputed. Alternatives add a bounded number of further selections. The loops that run per day count in **day indexes**, the integer form `dayIndex` gives a date, rather than in `Date` or Temporal objects: the Bridge search tests a neighbour with `isWeekendIndex` and a set of Holiday indexes, and the selector keeps each candidate's first and last Workday position computed once instead of per step. That rewrite cut the average run to about 17 ms, against about 58 ms for the heuristics this engine replaced, and left the plans of all 864 benchmarked configurations identical. The whole run for a year is tens of milliseconds on a laptop, which is fast enough to feel instant and slow enough to stutter a slider drag if it ran on the main thread; that, and nothing about the algorithm, is why it runs in a [Web Worker](/how-it-works/calculation-worker/).
 
 ## Where to read next
 
@@ -192,3 +192,4 @@ For a window of *m* months there are roughly 21·*m* Workdays; each spawns at mo
 - [Holidays engine](/how-it-works/holidays-engine/) covers where the Holidays come from before this page starts.
 - [Calculation worker](/how-it-works/calculation-worker/) covers the boundary the engine runs behind.
 - [ADR 0003](https://github.com/fbuireu/forever-pto/blob/main/adr/0003-pure-calendar-domain-effectful-payment-domain.md) records why this context is pure while the payment one is not.
+- [ADR 0020](https://github.com/fbuireu/forever-pto/blob/main/adr/0020-strategies-are-objectives-over-the-marginal-gain.md) records why every Strategy is an objective over the marginal gain rather than its own heuristic, and what that costs.

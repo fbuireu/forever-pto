@@ -60,7 +60,7 @@ Everything imports these from `@application/i18n/navigation`, so hrefs stay loca
 
 ```mermaid
 flowchart LR
-  EN["en.json, the reference bundle<br/>48 namespaces, ~1,270 leaf keys"] -->|"typeof messages"| T["AppConfig.Messages in environment.d.ts"]
+  EN["en.json, the reference bundle<br/>49 namespaces, ~1,300 leaf keys"] -->|"typeof messages"| T["AppConfig.Messages in environment.d.ts"]
   T -->|"typed t()"| CC["'use client' components<br/>useTranslations(namespace)"]
   T -->|"typed t()"| SC["Server components and metadata<br/>getTranslations({ locale, namespace })"]
   T -->|"createTranslator"| MD["The Markdown twin<br/>every bundle imported statically"]
@@ -72,8 +72,9 @@ flowchart LR
 2. **A component reads one namespace at a time.** `useTranslations('sidebar')` in a client component, `getTranslations({ locale, namespace })` in a server one; a component that needs two namespaces calls the hook twice rather than reaching across. Namespaces map to a surface, not to a component tree, so `pages/planner/Contact.tsx` reads `roadmap` and the contact form reads `contact`.
 3. **`core/` components never translate.** They may not call `useTranslations`, so every accessible name a primitive needs (`closeDialog`, `toggleSidebar`, `closeToast`) is a prop the caller supplies out of the `a11y` namespace, the one namespace that holds names rather than copy.
 4. **The bundle for a request is loaded once**, by `apps/web/src/infrastructure/i18n/config.ts`: it validates the locale with `hasLocale`, falls back to the default, and dynamically imports the matching JSON. The Markdown twin cannot do that (it runs where `next-intl/server` is unavailable) and imports every bundle statically into a `Record<LocaleCode, …>`, so a seventh locale without a row fails to compile.
-5. **Every other bundle must have exactly the keys `en.json` has.** `tests/docs-consistency.test.ts` compares key sets in both directions, so a key added to English and forgotten in Catalan fails the app's own CI. It compares *sets*, not values, so a stale translation is invisible to it; and it separately fails on any string written in capitals outside a named acronym allow-list, because uppercase is a CSS class here, never copy.
-6. **Machine-code keys stay snake_case.** `toasts.promoCodeErrors.*` mirrors Stripe's promotion-code error codes and `contact.errors.*` mirrors `ApiError`, looked up by a value that arrives from elsewhere; a missing key falls back to the namespace's generic message, which is why adding a reachable code means adding its key in the same change.
+5. **The browser is sent the catalogue minus what only the server reads.** The locale layout and `global-not-found.tsx` hand `NextIntlClientProvider` `clientMessagesOf(await getMessages())` (`apps/web/src/infrastructure/i18n/clientMessages.ts`), which drops `SERVER_ONLY_NAMESPACES`: the homepage, the FAQ, the legal pages, the metadata, the not-found page and the payment confirmation, all rendered on the server. That took about 25 KB compressed off every page's HTML. The list names what to leave out rather than what to send, so forgetting a namespace there costs bytes, never a blank string, and `clientMessages.test.ts` beside it scans every `useTranslations` call and fails when client code reads a namespace the client is not sent.
+6. **Every other bundle must have exactly the keys `en.json` has.** `tests/docs-consistency.test.ts` compares key sets in both directions, so a key added to English and forgotten in Catalan fails the app's own CI. It compares *sets*, not values, so a stale translation is invisible to it; and it separately fails on any string written in capitals outside a named acronym allow-list, because uppercase is a CSS class here, never copy.
+7. **Machine-code keys stay snake_case.** `toasts.promoCodeErrors.*` mirrors Stripe's promotion-code error codes and `contact.errors.*` mirrors `ApiError`, looked up by a value that arrives from elsewhere; a missing key falls back to the namespace's generic message, which is why adding a reachable code means adding its key in the same change.
 
 ## Switching language
 

@@ -7,11 +7,11 @@ sidebar:
 
 import { APP_LOCALES } from '../../../components/demos/HowItWorksDemo';
 
-The planner needs surprisingly little data, and most of it never crosses the network: the Holiday calendars and the Country list ship inside the client bundle. This page lists every source, what reads it, how it is cached and what happens when it fails.
+The planner needs surprisingly little data, and most of it never crosses the network to a third party: the Holiday calendars ship with the app as a chunk the browser loads when it first needs one, and the Country list arrives with the server-rendered page. This page lists every source, what reads it, how it is cached and what happens when it fails.
 
 ```mermaid
 flowchart TB
-  subgraph bundle [Inside the client bundle]
+  subgraph bundle [Shipped with the app]
     DH[date-holidays<br/>Holiday calendars per Country and Region]
     ISO[i18n-iso-countries<br/>Country names in every locale]
   end
@@ -63,20 +63,20 @@ The upstream word `type` is reserved for that classification; the app's own Nati
 | --- | --- | --- |
 | Source | `i18n-iso-countries`, with the language files for {APP_LOCALES.length} locales registered at module load (`apps/web/src/infrastructure/services/countries/getCountries.ts`) | The same `date-holidays` adapter: `regionsOf(country)` returns the subdivisions the package knows a calendar for (`apps/web/src/infrastructure/services/regions/getRegions.ts`) |
 | Why | Country names have to render in the user's language, and the ISO list is the one the Holiday package keys on | Only a Region with a calendar of its own is worth offering; a list from a geographic database would include Regions that change nothing |
-| Runs | In the browser | In the browser |
-| Cache | The location store refreshes the list at most once every 24 hours (`TWENTY_FOUR_HOURS` in `apps/web/src/application/stores/utils/crypto.ts`) and persists it | Recomputed synchronously whenever the Country changes; not persisted |
+| Runs | On the server, in the async `Countries.tsx` and `QuickStart.tsx`, which hand the list to their client halves | In the browser, through `fetchRegions`, which imports the lookup only when it runs so `date-holidays` stays out of the first load |
+| Cache | Rendered with the page and pushed into the location store on mount; not persisted | Recomputed whenever the Country changes; not persisted |
 | Ordering | Both go through `collateByLabel` (`apps/web/src/application/shared/utils/collate.ts`), a locale-aware sort, so accented names land where a speaker expects them | Same |
 | Failure | Empty list and a log entry | Empty list and a log entry; the Region field disables |
 
 ## The visitor's Country
 
-Detected at the edge, on every page request, by three strategies tried in order and described on the [country detection](/how-it-works/country-detection/) page:
+Detected at the edge, on a page request that carries no `user-country` cookie yet, by the strategies described on the [country detection](/how-it-works/country-detection/) page. The header decides whenever it is present, which in production is always; the two network strategies run, in order, only without it:
 
 | Strategy | Reads | Reflects | Cache |
 | --- | --- | --- | --- |
-| Cloudflare trace | `GET /cdn-cgi/trace` from inside the Worker | The Worker's egress, which is usually near the visitor and not always | `force-cache`, 5 s timeout |
 | `cf-ipcountry` header | A header Cloudflare stamps on the inbound request | The **visitor's** IP, the only strategy that truly does | None needed |
-| IP lookup | `api.ipify.org`, then `ipinfo.io` | The Worker's egress again | `force-cache`, 5 s timeout |
+| Cloudflare trace | `GET /cdn-cgi/trace` from inside the Worker | The Worker's egress, which is usually near the visitor and not always | `no-store`, 5 s timeout |
+| Egress IP lookup | `api.ipify.org`, then `ipinfo.io` | The Worker's egress again | `no-store`, 5 s timeout |
 
 The answer is a lowercase ISO 3166-1 alpha-2 code in the `user-country` cookie, valid for a week, readable from JavaScript on purpose. Nothing about it is stored server-side.
 
