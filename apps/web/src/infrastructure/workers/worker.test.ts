@@ -211,6 +211,19 @@ describe("worker onmessage", () => {
 		expect(planningInput()?.strategy).toBe(FilterStrategy.GROUPED);
 	});
 
+	it("passes valid preferred months through to the pipeline", () => {
+		sendMessage({ preferredMonths: [6, 7] });
+		expect(planningInput()?.preferredMonths).toEqual([6, 7]);
+	});
+
+	it.each([[[12]], ["summer"], [undefined]])(
+		"plans with no preferred month when the message carries %o, rather than guess",
+		(preferredMonths) => {
+			sendMessage({ preferredMonths });
+			expect(planningInput()?.preferredMonths).toEqual([]);
+		},
+	);
+
 	it("replaces an unrecognised locale with English, since the Metrics format month names with it", () => {
 		sendMessage({ locale: "es" });
 		expect(planningInput()?.locale).toBe("es");

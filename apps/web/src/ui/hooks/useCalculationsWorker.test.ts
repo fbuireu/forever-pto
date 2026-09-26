@@ -76,6 +76,7 @@ const BASE_PARAMS = {
 	allowPastDays: false,
 	carryOverMonths: 0,
 	strategy: "grouped" as const,
+	preferredMonths: [6, 7],
 	locale: "en" as const,
 };
 
@@ -414,6 +415,7 @@ describe("planner_generated", () => {
 			properties: {
 				ptoDays: 5,
 				strategy: "grouped",
+				preferredMonths: "6,7",
 				year: 2025,
 				carryOverMonths: 0,
 				allowPastDays: false,

@@ -25,7 +25,7 @@ export function WebMCP() {
 						features: [
 							"National and regional holiday detection",
 							"Bridge day optimizer",
-							"Three strategies: Grouped, Optimized, Balanced",
+							"Four strategies: Grouped, Optimized, Balanced, Main vacation",
 							"Custom holidays: add, edit, and delete national and regional holidays",
 							"Manual editing of suggested days off",
 							"Year selection and carryover months configuration",

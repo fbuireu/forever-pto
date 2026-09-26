@@ -26,6 +26,7 @@ export function plannerGeneratedProperties({ params, measured, alternatives }: P
 	return {
 		ptoDays: params.ptoDays,
 		strategy: params.strategy,
+		preferredMonths: params.preferredMonths.join(","),
 		year: params.year,
 		carryOverMonths: params.carryOverMonths,
 		allowPastDays: params.allowPastDays,
@@ -128,6 +129,7 @@ export function useCalculationsWorker() {
 					holidays: serializeHolidays(holidays),
 					allowPastDays: params.allowPastDays,
 					strategy: params.strategy,
+					preferredMonths: params.preferredMonths,
 					locale: params.locale,
 					maxAlternatives,
 					manualDays: manuallySelectedDays.map((d) => d.toISOString()),

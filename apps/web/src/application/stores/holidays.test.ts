@@ -1047,6 +1047,7 @@ describe("generateSuggestions", () => {
 		allowPastDays: false,
 		carryOverMonths: 0,
 		strategy: FilterStrategy.GROUPED,
+		preferredMonths: [6, 7],
 		locale: "en" as const,
 	};
 

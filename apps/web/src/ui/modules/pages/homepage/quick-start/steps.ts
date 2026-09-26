@@ -32,6 +32,7 @@ export function createDraft({ filters, detectedCountry }: CreateDraftParams): Qu
 		year: filters.year,
 		carryOverMonths: filters.carryOverMonths,
 		strategy: filters.strategy,
+		preferredMonths: filters.preferredMonths,
 	};
 }
 

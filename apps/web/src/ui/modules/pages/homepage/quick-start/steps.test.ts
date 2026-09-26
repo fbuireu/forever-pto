@@ -11,6 +11,7 @@ const FILTERS: FiltersState = {
 	year: 2026,
 	carryOverMonths: 1,
 	strategy: FilterStrategy.GROUPED,
+	preferredMonths: [6, 7],
 };
 
 describe("QUICK_START_STEPS", () => {

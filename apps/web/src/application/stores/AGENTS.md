@@ -27,11 +27,19 @@ The rest of the application layer contract is in [`../AGENTS.md`](../AGENTS.md).
 
 | Store | Owns | Persisted |
 | --- | --- | --- |
-| `filters` | `ptoDays`, `allowPastDays`, `country`, `region`, `year`, `carryOverMonths`, `strategy` | all but `year` |
+| `filters` | `ptoDays`, `allowPastDays`, `country`, `region`, `year`, `carryOverMonths`, `strategy`, `preferredMonths` | all but `year` |
 | `holidays` | `holidays`, `suggestion`, `alternatives`, `maxAlternatives`, `currentSelection`, `currentSelectionIndex`, `previewAlternativeIndex`, `manuallySelectedDays`, `removedSuggestedDays`, `isCalculating`, `hasCalculated`, `planRevision` | all but `previewAlternativeIndex`, `isCalculating`, `hasCalculated` and `planRevision` |
 | `location` | `countries`, `regions` | nothing |
 | `premium` | `premiumKey`, `userEmail`, `lastVerified`, `needsSessionCheck`, `isLoading`, `modalOpen`, `currentFeature` | everything up to `needsSessionCheck` |
 | `ui` | `donatePopoverOpen`, `donatePopoverIsOpening`, `quickStartOpen` | nothing |
+
+**`preferredMonths` is guarded on rehydration the way `strategy` is, by the same predicate the worker uses.**
+`isPreferredMonths` in `@domain/calendar/types` accepts an array of distinct month indexes from 0 to 11, the empty
+one included (which means any month), and a stored value that fails it becomes `DEFAULT_PREFERRED_MONTHS`.
+`setPreferredMonths` applies it too and stores the months sorted, so the calculation effect that depends on the
+array does not re-plan when the same months arrive in another order. The field was added without a
+`STORAGE_VERSION` bump on purpose: a blob written before it lacks the key, the initial state supplies it, and the
+guard covers anything else a hand-edited blob could hold.
 
 **The `ui` store used to carry a currency, and giving that rule one owner was the wrong fix.** It had several
 owners and a free-rider, so a `CurrencySync` component was written to seed it once from the `[locale]` root

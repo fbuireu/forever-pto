@@ -208,3 +208,18 @@ export const getWeekdayNames = ({ locale, weekStartsOn = 0, format = "short" }: 
 		formatDate({ date: addDays({ date: weekStart, days: i }), locale, format: WEEKDAY_FORMAT[format] }),
 	);
 };
+
+const MONTH_FORMAT = {
+	short: "MMM",
+	long: "MMMM",
+} satisfies Record<string, DateFormat>;
+
+export interface GetMonthNamesParams {
+	locale: string;
+	format?: keyof typeof MONTH_FORMAT;
+}
+
+export const getMonthNames = ({ locale, format = "short" }: GetMonthNamesParams): string[] =>
+	Array.from({ length: 12 }, (_, month) =>
+		formatDate({ date: new Date(2023, month, 1), locale, format: MONTH_FORMAT[format] }),
+	);

@@ -7,7 +7,7 @@ import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import { Switch } from "@ui/modules/core/animate/base/Switch";
 import { Slider } from "@ui/modules/core/primitives/Slider";
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
-import { Scale, TrendingUp, Users } from "lucide-react";
+import { Plane, Scale, TrendingUp, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { QuickStartDraft } from "./steps";
 
@@ -15,6 +15,7 @@ const STRATEGIES = [
 	{ value: FilterStrategy.GROUPED, icon: Users },
 	{ value: FilterStrategy.OPTIMIZED, icon: TrendingUp },
 	{ value: FilterStrategy.BALANCED, icon: Scale },
+	{ value: FilterStrategy.MAIN_VACATION, icon: Plane },
 ] as const;
 
 const STRATEGY_CARD_CLASS =

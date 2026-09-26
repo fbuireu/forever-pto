@@ -29,6 +29,7 @@ const SPAIN_2026 = [
 }));
 
 const BUDGET = 22;
+const SUMMER = [6, 7];
 
 const plan = (strategy: FilterStrategy) =>
 	runPlanningPipeline({
@@ -39,6 +40,7 @@ const plan = (strategy: FilterStrategy) =>
 		removedSuggestedDays: [],
 		allowPastDays: true,
 		strategy,
+		preferredMonths: SUMMER,
 		locale: "en",
 		maxAlternatives: 4,
 	});
@@ -76,6 +78,7 @@ describe("the Strategies over a real calendar", () => {
 		[FilterStrategy.OPTIMIZED, PTO_CONSTANTS.EFFICIENCY.MINIMUM],
 		[FilterStrategy.BALANCED, PTO_CONSTANTS.EFFICIENCY.MINIMUM],
 		[FilterStrategy.GROUPED, PTO_CONSTANTS.EFFICIENCY.BLOCK_MINIMUM],
+		[FilterStrategy.MAIN_VACATION, PTO_CONSTANTS.EFFICIENCY.BLOCK_MINIMUM],
 	])("%s never lands under its own floor of %s", (strategy, floor) => {
 		expect(suggestionOf(strategy).metrics.averageEfficiency).toBeGreaterThanOrEqual(floor);
 	});
@@ -89,6 +92,16 @@ describe("the Strategies over a real calendar", () => {
 		expect(effective(BALANCED)).toBeGreaterThan(effective(GROUPED));
 		expect(longest(GROUPED)).toBeGreaterThan(longest(BALANCED));
 		expect(longest(BALANCED)).toBeGreaterThan(longest(OPTIMIZED));
+	});
+
+	it("gives MAIN_VACATION its summer block first, then spends the rest like OPTIMIZED", () => {
+		const { bridges = [], metrics } = suggestionOf(FilterStrategy.MAIN_VACATION);
+		const [block] = bridges;
+
+		expect(block?.ptoDays.every((day) => SUMMER.includes(day.getMonth()))).toBe(true);
+		expect(metrics.longestVacation).toBeGreaterThan(suggestionOf(FilterStrategy.OPTIMIZED).metrics.longestVacation);
+		expect(metrics.longestVacation).toBeLessThanOrEqual(PTO_CONSTANTS.SELECTION.MAIN_VACATION_BLOCK_DAYS);
+		expect(metrics.totalEffectiveDays).toBeGreaterThan(suggestionOf(FilterStrategy.GROUPED).metrics.totalEffectiveDays);
 	});
 
 	it("keeps GROUPED's blocks within GROUPED_MAX_BLOCK_DAYS", () => {

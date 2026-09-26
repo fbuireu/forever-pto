@@ -227,3 +227,87 @@ describe("BALANCED", () => {
 		expect(bridges).toEqual([thursdayFriday]);
 	});
 });
+
+describe("MAIN_VACATION", () => {
+	const july = week({
+		monday: on({ month: 7, day: 7 }),
+		from: on({ month: 7, day: 5 }),
+		to: on({ month: 7, day: 13 }),
+	});
+	const julySecond = week({
+		monday: on({ month: 7, day: 14 }),
+		from: on({ month: 7, day: 12 }),
+		to: on({ month: 7, day: 20 }),
+	});
+	const julyThird = week({
+		monday: on({ month: 7, day: 21 }),
+		from: on({ month: 7, day: 19 }),
+		to: on({ month: 7, day: 27 }),
+	});
+	const march = week({
+		monday: on({ month: 3, day: 3 }),
+		from: on({ month: 3, day: 1 }),
+		to: on({ month: 3, day: 9 }),
+	});
+	const julyMonths = [6];
+
+	it("builds its block inside the preferred months before anything else, even against a sharper day", () => {
+		const { bridges } = selectBridges({
+			bridges: [fridayBeforeHoliday, march, july],
+			targetPtoDays: 5,
+			objective: STRATEGY_OBJECTIVE[FilterStrategy.MAIN_VACATION],
+			preferredMonths: julyMonths,
+		});
+
+		expect(bridges).toEqual([july]);
+	});
+
+	it("grows that one block up to MAIN_VACATION_BLOCK_DAYS and no further", () => {
+		const { bridges } = selectBridges({
+			bridges: [july, julySecond, julyThird],
+			targetPtoDays: 15,
+			objective: STRATEGY_OBJECTIVE[FilterStrategy.MAIN_VACATION],
+			preferredMonths: julyMonths,
+		});
+
+		expect(PTO_CONSTANTS.SELECTION.MAIN_VACATION_BLOCK_DAYS).toBe(16);
+		expect(bridges).toEqual([july, julySecond]);
+	});
+
+	it("spends what the block leaves like OPTIMIZED, outside the preferred months too", () => {
+		const { bridges } = selectBridges({
+			bridges: [march, fridayBeforeHoliday, friday17, july],
+			targetPtoDays: 7,
+			objective: STRATEGY_OBJECTIVE[FilterStrategy.MAIN_VACATION],
+			preferredMonths: julyMonths,
+		});
+
+		expect(bridges).toEqual([july, fridayBeforeHoliday, friday17]);
+	});
+
+	it("takes the longest block anywhere when no month is preferred", () => {
+		const { bridges } = selectBridges({
+			bridges: [fridayBeforeHoliday, march],
+			targetPtoDays: 5,
+			objective: STRATEGY_OBJECTIVE[FilterStrategy.MAIN_VACATION],
+		});
+
+		expect(bridges).toEqual([march]);
+	});
+
+	it("ignores the preferred months under every other Strategy", () => {
+		const plain = selectBridgesForStrategy({
+			bridges: [march, july],
+			targetPtoDays: 5,
+			strategy: FilterStrategy.GROUPED,
+		});
+		const preferring = selectBridgesForStrategy({
+			bridges: [march, july],
+			targetPtoDays: 5,
+			strategy: FilterStrategy.GROUPED,
+			preferredMonths: julyMonths,
+		});
+
+		expect(preferring.bridges).toEqual(plain.bridges);
+	});
+});

@@ -18,6 +18,7 @@ export interface PlanningInput {
 	removedSuggestedDays?: Date[];
 	allowPastDays: boolean;
 	strategy: FilterStrategy;
+	preferredMonths?: number[];
 	locale: Locale;
 	maxAlternatives: number;
 }
@@ -37,6 +38,7 @@ export function runPlanningPipeline({
 	removedSuggestedDays = [],
 	allowPastDays,
 	strategy,
+	preferredMonths,
 	locale,
 	maxAlternatives,
 }: PlanningInput): PlanningResult {
@@ -84,7 +86,7 @@ export function runPlanningPipeline({
 
 	if (candidates.bridges.length === 0) return unplanned();
 
-	const baseSuggestion = generateSuggestions({ ptoDays: effectivePtoDays, candidates, strategy });
+	const baseSuggestion = generateSuggestions({ ptoDays: effectivePtoDays, candidates, strategy, preferredMonths });
 
 	const baseAlternatives = generateAlternatives({
 		ptoDays: effectivePtoDays,
@@ -92,6 +94,7 @@ export function runPlanningPipeline({
 		maxAlternatives,
 		existingSuggestion: baseSuggestion,
 		strategy,
+		preferredMonths,
 	});
 
 	const suggestion = measure(baseSuggestion);

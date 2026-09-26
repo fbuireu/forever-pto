@@ -162,8 +162,8 @@
 					"answer": "The system looks at your available workdays, holidays and preferences (like skipping past dates) and finds every possible bridge, up to a whole working week. It then builds your plan one bridge at a time, always taking the one that adds the most new days off to what the plan already covers, under the rules of your strategy, so a weekend two bridges share is never counted twice."
 				},
 				"strategies": {
-					"question": "What is the difference between the \"grouped\", \"optimized\" and \"balanced\" strategies?",
-					"answer": "Optimized gets you the most effective days off per PTO day, mostly in long weekends spread across the year. Grouped trades some of that efficiency for a few long vacations of up to two weeks. Balanced sits in between: it gives every quarter its share of your budget and prefers breaks of up to a week."
+					"question": "What is the difference between the \"grouped\", \"optimized\", \"balanced\" and \"main vacation\" strategies?",
+					"answer": "Optimized gets you the most effective days off per PTO day, mostly in long weekends spread across the year. Grouped trades some of that efficiency for a few long vacations of up to two weeks. Balanced sits in between: it gives every quarter its share of your budget and prefers breaks of up to a week. Main vacation puts one long block of up to two weeks in the months you choose, then spends the rest like Optimized."
 				},
 				"results": {
 					"question": "Why do recommendations change when I update preferences or holidays?",
@@ -537,7 +537,26 @@
 					"noMaximization": "Doesn't maximize",
 					"noLongTrip": "No long trip"
 				}
+			},
+			"mainVacation": {
+				"label": "Main vacation",
+				"description": "Your big trip first",
+				"subtitle": "A block of up to two weeks in the months you choose, then the best bridges",
+				"pros": {
+					"yourTrip": "Your trip, when you want it",
+					"bridgesAfter": "Best bridges for the rest"
+				},
+				"cons": {
+					"fewerDays": "Fewer total days",
+					"oneBlock": "One long block only"
+				}
 			}
+		},
+		"preferredMonths": {
+			"title": "Preferred months",
+			"tooltipLabel": "About preferred months",
+			"tooltip": "Main vacation builds its long block inside these months. Pick none to let it find the best time of year.",
+			"anyMonth": "No month picked: the block goes wherever it returns most."
 		},
 		"allowPastDays": {
 			"title": "Allow past days",
@@ -1051,7 +1070,7 @@
 			"freeFeatures": {
 				"optimizedPlan": "Auto-optimized vacation plan",
 				"countryHolidays": "Country & region holidays",
-				"threeStrategies": "{count} strategies (Grouped, Optimized, Balanced)",
+				"threeStrategies": "{count} strategies (Grouped, Optimized, Balanced, Main vacation)",
 				"basicStats": "Basic efficiency stats & calculators"
 			},
 			"freeCta": "Start for free",

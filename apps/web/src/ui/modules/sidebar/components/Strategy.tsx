@@ -9,9 +9,10 @@ import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
 import { Users } from "@ui/modules/core/animate/icons/Users";
 import { Card, CardDescription } from "@ui/modules/core/primitives/Card";
 import { Combobox } from "@ui/modules/core/primitives/Combobox";
+import { PreferredMonths } from "@ui/modules/sidebar/components/PreferredMonths";
 import { SidebarFieldLabel } from "@ui/modules/sidebar/components/SidebarFieldLabel";
 import { cn } from "@ui/utils/cn";
-import { AlertCircle, CheckCircle2, DicesIcon, Scale, TrendingUp } from "lucide-react";
+import { AlertCircle, CheckCircle2, DicesIcon, Plane, Scale, TrendingUp } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
@@ -20,6 +21,7 @@ const STRATEGY_ICONS = {
 	[FilterStrategy.GROUPED]: Users,
 	[FilterStrategy.OPTIMIZED]: TrendingUp,
 	[FilterStrategy.BALANCED]: Scale,
+	[FilterStrategy.MAIN_VACATION]: Plane,
 } as const;
 
 export const Strategy = () => {
@@ -61,6 +63,15 @@ export const Strategy = () => {
 				pros: [t("balanced.pros.everyQuarter"), t("balanced.pros.weekLongBreaks")],
 				cons: [t("balanced.cons.noMaximization"), t("balanced.cons.noLongTrip")],
 			},
+			{
+				value: FilterStrategy.MAIN_VACATION,
+				label: t("mainVacation.label"),
+				icon: STRATEGY_ICONS[FilterStrategy.MAIN_VACATION],
+				description: t("mainVacation.description"),
+				subtitle: t("mainVacation.subtitle"),
+				pros: [t("mainVacation.pros.yourTrip"), t("mainVacation.pros.bridgesAfter")],
+				cons: [t("mainVacation.cons.fewerDays"), t("mainVacation.cons.oneBlock")],
+			},
 		],
 		[t],
 	);
@@ -90,6 +101,7 @@ export const Strategy = () => {
 				placeholder={t("placeholder")}
 				searchPlaceholder={t("search")}
 			/>
+			{strategy === FilterStrategy.MAIN_VACATION && <PreferredMonths />}
 			{currentStrategy && (
 				<Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
 					<AnimateIcon animateOnHover>

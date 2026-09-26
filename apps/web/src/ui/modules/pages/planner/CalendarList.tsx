@@ -22,7 +22,7 @@ export const CalendarList = () => {
 	const tA11y = useTranslations("a11y");
 	const { areStoresReady } = useStoresReady();
 
-	const { carryOverMonths, year, allowPastDays, country, region, ptoDays, strategy } = useFiltersStore(
+	const { carryOverMonths, year, allowPastDays, country, region, ptoDays, strategy, preferredMonths } = useFiltersStore(
 		useShallow((state) => ({
 			carryOverMonths: state.carryOverMonths,
 			year: state.year,
@@ -31,6 +31,7 @@ export const CalendarList = () => {
 			region: state.region,
 			ptoDays: state.ptoDays,
 			strategy: state.strategy,
+			preferredMonths: state.preferredMonths,
 		})),
 	);
 	const {
@@ -115,9 +116,21 @@ export const CalendarList = () => {
 			ptoDays,
 			allowPastDays,
 			strategy,
+			preferredMonths,
 			locale,
 		});
-	}, [triggerCalculation, canCalculate, year, carryOverMonths, ptoDays, allowPastDays, strategy, locale, planRevision]);
+	}, [
+		triggerCalculation,
+		canCalculate,
+		year,
+		carryOverMonths,
+		ptoDays,
+		allowPastDays,
+		strategy,
+		preferredMonths,
+		locale,
+		planRevision,
+	]);
 
 	useEffect(() => {
 		if (!canCalculate && suggestion) clearCalculation();

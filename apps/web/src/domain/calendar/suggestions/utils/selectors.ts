@@ -13,11 +13,16 @@ export interface Candidate {
 	runLength: number;
 	gap: number;
 	overQuota: boolean;
+	inPreferredMonths: boolean;
+	joinsBreak: boolean;
+	planIsEmpty: boolean;
 }
 
 export interface Objective {
 	floor: number;
 	rank: (candidate: Candidate) => number[];
+	admits?: (candidate: Candidate) => boolean;
+	next?: Objective;
 }
 
 interface CappedRunParams {
@@ -27,11 +32,13 @@ interface CappedRunParams {
 
 const cappedRun = ({ runLength, cap }: CappedRunParams) => Math.min(runLength, cap) - Math.max(0, runLength - cap);
 
+const OPTIMIZED_OBJECTIVE: Objective = {
+	floor: PTO_CONSTANTS.EFFICIENCY.MINIMUM,
+	rank: ({ marginalEfficiency, runLength, gap }) => [marginalEfficiency, runLength, gap],
+};
+
 export const STRATEGY_OBJECTIVE: Record<FilterStrategy, Objective> = {
-	[FilterStrategy.OPTIMIZED]: {
-		floor: PTO_CONSTANTS.EFFICIENCY.MINIMUM,
-		rank: ({ marginalEfficiency, runLength, gap }) => [marginalEfficiency, runLength, gap],
-	},
+	[FilterStrategy.OPTIMIZED]: OPTIMIZED_OBJECTIVE,
 	[FilterStrategy.GROUPED]: {
 		floor: PTO_CONSTANTS.EFFICIENCY.BLOCK_MINIMUM,
 		rank: ({ runLength, marginalEfficiency, gap }) => [
@@ -48,6 +55,13 @@ export const STRATEGY_OBJECTIVE: Record<FilterStrategy, Objective> = {
 			marginalEfficiency,
 			gap,
 		],
+	},
+	[FilterStrategy.MAIN_VACATION]: {
+		floor: PTO_CONSTANTS.EFFICIENCY.BLOCK_MINIMUM,
+		admits: ({ inPreferredMonths, runLength, planIsEmpty, joinsBreak }) =>
+			inPreferredMonths && runLength <= PTO_CONSTANTS.SELECTION.MAIN_VACATION_BLOCK_DAYS && (planIsEmpty || joinsBreak),
+		rank: ({ runLength, marginalEfficiency, gap }) => [runLength, marginalEfficiency, gap],
+		next: OPTIMIZED_OBJECTIVE,
 	},
 };
 
@@ -73,13 +87,19 @@ interface PoolEntry {
 	end: number;
 	ptoDays: number[];
 	quarter: number;
+	inPreferredMonths: boolean;
 	newDays: number;
 	runLength: number;
 	gap: number;
 	alive: boolean;
 }
 
-const toPoolEntry = (bridge: Bridge): PoolEntry => {
+interface ToPoolEntryParams {
+	bridge: Bridge;
+	preferredMonths: Set<number>;
+}
+
+const toPoolEntry = ({ bridge, preferredMonths }: ToPoolEntryParams): PoolEntry => {
 	const start = dayIndex(bridge.startDate);
 	const end = dayIndex(bridge.endDate);
 
@@ -89,6 +109,7 @@ const toPoolEntry = (bridge: Bridge): PoolEntry => {
 		end,
 		ptoDays: bridge.ptoDays.map(dayIndex),
 		quarter: quarterIndex(bridge.ptoDays[0] ?? bridge.startDate),
+		inPreferredMonths: preferredMonths.size === 0 || bridge.ptoDays.every((day) => preferredMonths.has(day.getMonth())),
 		newDays: end - start + 1,
 		runLength: end - start + 1,
 		gap: NO_NEIGHBOUR,
@@ -96,16 +117,31 @@ const toPoolEntry = (bridge: Bridge): PoolEntry => {
 	};
 };
 
+interface DaySpan {
+	start: number;
+	end: number;
+}
+
 export interface SelectBridgesParams {
 	bridges: Bridge[];
 	targetPtoDays: number;
 	objective: Objective;
 	excludedDays?: Date[];
+	preferredMonths?: number[];
 }
 
-export const selectBridges = ({ bridges, targetPtoDays, objective, excludedDays = [] }: SelectBridgesParams) => {
+export const selectBridges = ({
+	bridges,
+	targetPtoDays,
+	objective,
+	excludedDays = [],
+	preferredMonths = [],
+}: SelectBridgesParams) => {
 	const excluded = new Set(excludedDays.map(dayIndex));
-	const pool = bridges.map(toPoolEntry).filter(({ ptoDays }) => !ptoDays.some((day) => excluded.has(day)));
+	const preferred = new Set(preferredMonths);
+	const pool = bridges
+		.map((bridge) => toPoolEntry({ bridge, preferredMonths: preferred }))
+		.filter(({ ptoDays }) => !ptoDays.some((day) => excluded.has(day)));
 	const quarterQuota = Math.ceil(targetPtoDays / Math.max(new Set(pool.map(({ quarter }) => quarter)).size, 1));
 
 	const covered = new Set<number>();
@@ -114,12 +150,12 @@ export const selectBridges = ({ bridges, targetPtoDays, objective, excludedDays 
 	const selected: Bridge[] = [];
 	let spent = 0;
 
-	const runAround = (start: number, end: number) => {
+	const runAround = ({ start, end }: DaySpan): DaySpan => {
 		let left = start;
 		let right = end;
 		while (covered.has(left - 1)) left--;
 		while (covered.has(right + 1)) right++;
-		return { left, right };
+		return { start: left, end: right };
 	};
 
 	const take = (entry: PoolEntry) => {
@@ -130,7 +166,7 @@ export const selectBridges = ({ bridges, targetPtoDays, objective, excludedDays 
 		spentByQuarter.set(quarter, (spentByQuarter.get(quarter) ?? 0) + bridge.ptoDaysNeeded);
 		spent += bridge.ptoDaysNeeded;
 
-		const { left, right } = runAround(start, end);
+		const merged = runAround({ start, end });
 
 		for (const other of pool) {
 			if (!other.alive) continue;
@@ -144,37 +180,53 @@ export const selectBridges = ({ bridges, targetPtoDays, objective, excludedDays 
 				for (let day = other.start; day <= other.end; day++) if (!covered.has(day)) newDays++;
 				other.newDays = newDays;
 			}
-			if (other.start <= right + 1 && other.end >= left - 1) {
-				const run = runAround(other.start, other.end);
-				other.runLength = run.right - run.left + 1;
+			if (other.start <= merged.end + 1 && other.end >= merged.start - 1) {
+				const run = runAround(other);
+				other.runLength = run.end - run.start + 1;
 			}
 		}
 	};
 
-	while (spent < targetPtoDays) {
+	const bestUnder = (stage: Objective) => {
 		let best: { entry: PoolEntry; rank: number[] } | null = null;
 
 		for (const entry of pool) {
 			if (!entry.alive) continue;
-			const { bridge, newDays, runLength, gap, quarter } = entry;
+			const { bridge, newDays, runLength, gap, quarter, inPreferredMonths } = entry;
 			if (spent + bridge.ptoDaysNeeded > targetPtoDays) continue;
 
 			const marginalEfficiency = newDays / bridge.ptoDaysNeeded;
-			if (marginalEfficiency + PTO_CONSTANTS.SELECTION.RANK_TOLERANCE < objective.floor) continue;
+			if (marginalEfficiency + PTO_CONSTANTS.SELECTION.RANK_TOLERANCE < stage.floor) continue;
 
-			const rank = objective.rank({
+			const candidate: Candidate = {
 				bridge,
 				newDays,
 				marginalEfficiency,
 				runLength,
 				gap,
 				overQuota: (spentByQuarter.get(quarter) ?? 0) + bridge.ptoDaysNeeded > quarterQuota,
-			});
+				inPreferredMonths,
+				joinsBreak: runLength > newDays,
+				planIsEmpty: selected.length === 0,
+			};
+			if (stage.admits && !stage.admits(candidate)) continue;
+
+			const rank = stage.rank(candidate);
 			if (best === null || outranks({ rank, rival: best.rank })) best = { entry, rank };
 		}
 
-		if (best === null) break;
-		take(best.entry);
+		return best?.entry ?? null;
+	};
+
+	let stage: Objective | undefined = objective;
+
+	while (stage && spent < targetPtoDays) {
+		const best = bestUnder(stage);
+		if (best === null) {
+			stage = stage.next;
+			continue;
+		}
+		take(best);
 	}
 
 	return {
@@ -187,7 +239,13 @@ interface SelectBridgesForStrategyParams {
 	bridges: Bridge[];
 	targetPtoDays: number;
 	strategy: FilterStrategy;
+	preferredMonths?: number[];
 }
 
-export const selectBridgesForStrategy = ({ bridges, targetPtoDays, strategy }: SelectBridgesForStrategyParams) =>
-	selectBridges({ bridges, targetPtoDays, objective: objectiveFor(strategy) });
+export const selectBridgesForStrategy = ({
+	bridges,
+	targetPtoDays,
+	strategy,
+	preferredMonths,
+}: SelectBridgesForStrategyParams) =>
+	selectBridges({ bridges, targetPtoDays, objective: objectiveFor(strategy), preferredMonths });

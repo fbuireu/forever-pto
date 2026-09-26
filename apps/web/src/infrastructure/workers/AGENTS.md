@@ -115,7 +115,9 @@ out and narrowed it back on the way in, with nothing in between deciding anythin
 `serializeHolidays` and `serializeSuggestionResult` from types that were already sealed, so the honest wire
 type costs nothing and a bare string in either serialiser is a compile error rather than a cast that absorbs
 it. `CalculateSuggestionsPayload.strategy` stays `string`, deliberately: that is the *inbound* leg, and it is
-where a value out of persisted storage arrives.
+where a value out of persisted storage arrives. `preferredMonths` is `unknown` on that leg for the same reason, and
+`worker.ts` narrows it with `isPreferredMonths`, planning with no preferred month rather than a guess when it fails:
+an empty list is the one value the Main Vacation objective already reads as any month.
 
 `worker.ts` is the inbound direction and parses: `isFilterStrategy` from
 [`@domain/calendar/types`](../../domain/calendar/types.ts) narrows the incoming string, falling back to

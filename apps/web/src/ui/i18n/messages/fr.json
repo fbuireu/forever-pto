@@ -162,8 +162,8 @@
 					"answer": "Le système analyse tes jours ouvrés disponibles, les jours fériés et tes préférences (par ex. éviter les jours passés) et trouve tous les ponts possibles, jusqu'à une semaine de travail entière. Il construit ensuite ton plan pont par pont, en prenant toujours celui qui ajoute le plus de nouveaux jours de repos à ce que le plan couvre déjà, selon les règles de ta stratégie : un week-end que partagent deux ponts n'est jamais compté deux fois."
 				},
 				"strategies": {
-					"question": "Quelle est la différence entre les stratégies \"groupée\", \"optimisée\" et \"équilibrée\" ?",
-					"answer": "Optimisée te donne le plus de jours de repos effectifs par jour de congé, surtout en ponts répartis sur l'année. Groupée cède une partie de cette efficacité contre quelques longues vacances de deux semaines au plus. Équilibrée se situe entre les deux : elle donne à chaque trimestre sa part du budget et privilégie des pauses d'une semaine au plus."
+					"question": "Quelle est la différence entre les stratégies \"groupée\", \"optimisée\", \"équilibrée\" et \"vacances principales\" ?",
+					"answer": "Optimisée te donne le plus de jours de repos effectifs par jour de congé, surtout en ponts répartis sur l'année. Groupée cède une partie de cette efficacité contre quelques longues vacances de deux semaines au plus. Équilibrée se situe entre les deux : elle donne à chaque trimestre sa part du budget et privilégie des pauses d'une semaine au plus. Vacances principales place un long bloc de deux semaines au plus dans les mois que tu choisis, puis répartit le reste comme Optimisée."
 				},
 				"results": {
 					"question": "Pourquoi les recommandations changent-elles quand je modifie mes préférences ou mes jours fériés ?",
@@ -537,7 +537,26 @@
 					"noMaximization": "Ne maximise pas",
 					"noLongTrip": "Pas de long voyage"
 				}
+			},
+			"mainVacation": {
+				"label": "Vacances principales",
+				"description": "D'abord ton grand voyage",
+				"subtitle": "Un bloc de deux semaines au plus dans les mois que tu choisis, puis les meilleurs ponts",
+				"pros": {
+					"yourTrip": "Ton voyage, quand tu veux",
+					"bridgesAfter": "Les meilleurs ponts pour le reste"
+				},
+				"cons": {
+					"fewerDays": "Moins de jours au total",
+					"oneBlock": "Un seul long bloc"
+				}
 			}
+		},
+		"preferredMonths": {
+			"title": "Mois préférés",
+			"tooltipLabel": "À propos des mois préférés",
+			"tooltip": "Vacances principales construit son long bloc dans ces mois. Si tu n'en choisis aucun, il cherche la meilleure période de l'année.",
+			"anyMonth": "Aucun mois choisi : le bloc va là où il rapporte le plus."
 		},
 		"allowPastDays": {
 			"title": "Autoriser les jours passés",
@@ -1051,7 +1070,7 @@
 			"freeFeatures": {
 				"optimizedPlan": "Plan de vacances auto-optimisé",
 				"countryHolidays": "Jours fériés de ton pays et région",
-				"threeStrategies": "{count} stratégies (Groupée, Optimisée, Équilibrée)",
+				"threeStrategies": "{count} stratégies (Groupée, Optimisée, Équilibrée, Vacances principales)",
 				"basicStats": "Statistiques de base et calculateurs"
 			},
 			"freeCta": "Commencer gratuitement",

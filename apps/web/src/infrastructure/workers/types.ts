@@ -56,6 +56,7 @@ interface CalculateSuggestionsPayload {
 	holidays: SerializedHolidayDTO[];
 	allowPastDays: boolean;
 	strategy: string;
+	preferredMonths?: unknown;
 	locale: string;
 	maxAlternatives: number;
 	manualDays: string[];

@@ -162,8 +162,8 @@
 					"answer": "El sistema analiza tus días laborables disponibles, los festivos y tus preferencias (p. ej. evitar días pasados) y encuentra todos los puentes posibles, hasta una semana laboral entera. Después construye tu plan puente a puente, tomando siempre el que añade más días libres nuevos a lo que el plan ya cubre, según las reglas de tu estrategia, así que un fin de semana que comparten dos puentes nunca cuenta dos veces."
 				},
 				"strategies": {
-					"question": "¿Cuál es la diferencia entre las estrategias \"agrupada\", \"optimizada\" y \"equilibrada\"?",
-					"answer": "Optimizada te da el máximo de días libres efectivos por cada día de PTO, sobre todo en puentes repartidos por el año. Agrupada cede parte de esa eficiencia a cambio de unas pocas vacaciones largas de hasta dos semanas. Equilibrada queda en medio: da a cada trimestre su parte del presupuesto y prefiere descansos de hasta una semana."
+					"question": "¿Cuál es la diferencia entre las estrategias \"agrupada\", \"optimizada\", \"equilibrada\" y \"vacación principal\"?",
+					"answer": "Optimizada te da el máximo de días libres efectivos por cada día de PTO, sobre todo en puentes repartidos por el año. Agrupada cede parte de esa eficiencia a cambio de unas pocas vacaciones largas de hasta dos semanas. Equilibrada queda en medio: da a cada trimestre su parte del presupuesto y prefiere descansos de hasta una semana. Vacación principal coloca un bloque largo de hasta dos semanas en los meses que elijas y reparte el resto como Optimizada."
 				},
 				"results": {
 					"question": "¿Por qué cambian las recomendaciones cuando actualizo preferencias o festivos?",
@@ -537,7 +537,26 @@
 					"noMaximization": "No maximiza",
 					"noLongTrip": "Sin un viaje largo"
 				}
+			},
+			"mainVacation": {
+				"label": "Vacación principal",
+				"description": "Primero tu gran viaje",
+				"subtitle": "Un bloque de hasta dos semanas en los meses que elijas y después los mejores puentes",
+				"pros": {
+					"yourTrip": "Tu viaje, cuando quieras",
+					"bridgesAfter": "Los mejores puentes para el resto"
+				},
+				"cons": {
+					"fewerDays": "Menos días totales",
+					"oneBlock": "Un solo bloque largo"
+				}
 			}
+		},
+		"preferredMonths": {
+			"title": "Meses preferidos",
+			"tooltipLabel": "Sobre los meses preferidos",
+			"tooltip": "Vacación principal crea su bloque largo dentro de estos meses. Si no eliges ninguno, busca la mejor época del año.",
+			"anyMonth": "Ningún mes elegido: el bloque va donde más rinde."
 		},
 		"allowPastDays": {
 			"title": "Permitir días pasados",
@@ -1051,7 +1070,7 @@
 			"freeFeatures": {
 				"optimizedPlan": "Plan de vacaciones auto-optimizado",
 				"countryHolidays": "Festivos de tu país y región",
-				"threeStrategies": "{count} estrategias (Agrupada, Optimizada, Equilibrada)",
+				"threeStrategies": "{count} estrategias (Agrupada, Optimizada, Equilibrada, Vacación principal)",
 				"basicStats": "Estadísticas básicas y calculadoras"
 			},
 			"freeCta": "Empezar gratis",

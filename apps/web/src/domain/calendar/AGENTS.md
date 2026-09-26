@@ -13,7 +13,7 @@ in [`CONTEXT.md`](../../../../../CONTEXT.md).
 
 | File | Contents |
 | --- | --- |
-| [`types.ts`](./types.ts) | `Bridge`, `Suggestion`, `Metrics`, `FirstLastBreak`, the `FilterStrategy` const object plus its type, and the pair that guards the wire: `isFilterStrategy` and `DEFAULT_FILTER_STRATEGY` |
+| [`types.ts`](./types.ts) | `Bridge`, `Suggestion`, `Metrics`, `FirstLastBreak`, the `FilterStrategy` const object plus its type, and the two pairs that guard the wire: `isFilterStrategy` with `DEFAULT_FILTER_STRATEGY`, and `isPreferredMonths` with `DEFAULT_PREFERRED_MONTHS` |
 | [`const.ts`](./const.ts) | `PTO_CONSTANTS`: every tunable in the engine; the unit and meaning of each are in [Constants](#constants) below |
 | [`utils/cache.ts`](./utils/cache.ts) | `getKey`, `getCombinationKey`, `createHolidaySet`, and the `clear*` functions the caller must use |
 | [`utils/helpers.ts`](./utils/helpers.ts) | `getAvailableWorkdays` (Workday enumeration) and `findBridges` (candidate generation and ranking) |
@@ -38,7 +38,7 @@ result:
 
 ```
 runPlanningPipeline({ window, ptoDays, autoSuggestCount?, holidays, manuallySelectedDays?,
-                      removedSuggestedDays?, allowPastDays, strategy, locale, maxAlternatives })
+                      removedSuggestedDays?, allowPastDays, strategy, preferredMonths?, locale, maxAlternatives })
   → { planned, suggestion, alternatives }
 ```
 
@@ -199,6 +199,23 @@ far. The marginal gain is the days a Bridge's span adds to what the plan already
 | `OPTIMIZED` | `MINIMUM` | Marginal gain, then the length of the break it ends up in, then distance from the breaks already taken |
 | `GROUPED` | `BLOCK_MINIMUM` | Break length capped at `GROUPED_MAX_BLOCK_DAYS`, then marginal gain, then distance |
 | `BALANCED` | `MINIMUM` | Inside its quarter's share of the budget, then break length capped at `BALANCED_MAX_BLOCK_DAYS`, then marginal gain, then distance |
+| `MAIN_VACATION` | `BLOCK_MINIMUM`, then `MINIMUM` | Two stages. First, only Bridges in the Preferred Months that start or join the one block, up to `MAIN_VACATION_BLOCK_DAYS`, ranked by block length, then marginal gain, then distance; then exactly `OPTIMIZED` |
+
+**An `Objective` may carry `admits` and `next`, and `MAIN_VACATION` is why.** `admits` filters the candidates a
+stage may consider at all, where the rank only orders them; `next` is the stage that takes over when the current
+one has nothing left to take (not `then`, which Biome refuses because it would make the object a thenable). `selectBridges` walks the chain in one run, sharing the covered set, the spent
+budget and the incremental facts, so the second stage sees the block the first one built and measures every
+candidate against it. A single `rank` cannot express Main Vacation: "only this block, and only up to this
+length" is a hard admission rule, and putting it in the rank would let a better Bridge outside the Preferred
+Months win the first pick. The first stage recognises the block through two `Candidate` facts, `planIsEmpty`
+(nothing is taken yet, so any admissible Bridge may start it) and `joinsBreak` (`runLength > newDays`, which is
+true exactly when the span touches or overlaps a covered day).
+
+**`inPreferredMonths` asks whether every PTO Day of a Bridge falls in the Preferred Months, and an empty list
+means every month.** It is computed once per candidate from `preferredMonths` on `selectBridges`, which the
+pipeline takes from the filters store through the worker; every other Strategy receives it and ignores it,
+which `selectors.test.ts` pins, so a user's months change nothing unless Main Vacation is chosen, apart from the
+Main Vacation plan offered among the Alternatives.
 
 Ranks compare lexicographically within `SELECTION.RANK_TOLERANCE`, because the gain is a float division. A tie on every key falls
 to the order `findBridges` handed over, and only then.
@@ -572,6 +589,7 @@ behaviour change and expect the selector tests to move.
 | `BRIDGE_SEARCH.MAX_MULTI_DAY_SIZE` | 5 | Consecutive Workdays. Largest multi-day candidate tried: a working week |
 | `SELECTION.GROUPED_MAX_BLOCK_DAYS` | 16 | Days. The break length `GROUPED` grows a block up to, two weeks and both weekends; each day past it costs a point |
 | `SELECTION.BALANCED_MAX_BLOCK_DAYS` | 9 | Days. The break length `BALANCED` prefers up to, a week and both weekends, penalised past it the same way |
+| `SELECTION.MAIN_VACATION_BLOCK_DAYS` | 16 | Days. The longest block `MAIN_VACATION` builds in the Preferred Months; a hard admission limit, not a penalised cap |
 | `SELECTION.RANK_TOLERANCE` | 1e-9 | Rank values closer than this are a tie and the next key decides; the gain is a float division |
 | `ALTERNATIVES.MIN_DIFFERENCE` | 0.25 | Share of two plans' combined days they must not have in common for both to be offered |
 | `ALTERNATIVES.RUNS_PER_ALTERNATIVE` | 6 | Selection runs the Alternatives may spend per Alternative asked for; bounds the cost, not the result |

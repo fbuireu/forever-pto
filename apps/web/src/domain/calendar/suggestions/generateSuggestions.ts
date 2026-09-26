@@ -6,9 +6,10 @@ export interface GenerateSuggestionsParams {
 	ptoDays: number;
 	candidates: PlanningCandidates;
 	strategy: FilterStrategy;
+	preferredMonths?: number[];
 }
 
-export function generateSuggestions({ ptoDays, candidates, strategy }: GenerateSuggestionsParams) {
+export function generateSuggestions({ ptoDays, candidates, strategy, preferredMonths }: GenerateSuggestionsParams) {
 	if (ptoDays <= 0) {
 		return { days: [], bridges: [], strategy };
 	}
@@ -21,7 +22,12 @@ export function generateSuggestions({ ptoDays, candidates, strategy }: GenerateS
 
 	const effectivePtoDays = Math.min(availableWorkdays.length, ptoDays);
 
-	const selection = selectBridgesForStrategy({ bridges, targetPtoDays: effectivePtoDays, strategy });
+	const selection = selectBridgesForStrategy({
+		bridges,
+		targetPtoDays: effectivePtoDays,
+		strategy,
+		preferredMonths,
+	});
 
 	return {
 		days: selection.days,

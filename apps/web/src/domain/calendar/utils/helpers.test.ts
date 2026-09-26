@@ -246,7 +246,9 @@ describe("findBridges efficiency floor", () => {
 	});
 
 	it("admits at the lowest floor any Strategy applies, so the prune can never drop a Bridge one of them would take", () => {
-		const floors = Object.values(STRATEGY_OBJECTIVE).map(({ floor }) => floor);
+		const floors = Object.values(STRATEGY_OBJECTIVE).flatMap(({ floor, next }) =>
+			next ? [floor, next.floor] : [floor],
+		);
 
 		expect(PTO_CONSTANTS.EFFICIENCY.BLOCK_MINIMUM).toBe(Math.min(...floors));
 	});

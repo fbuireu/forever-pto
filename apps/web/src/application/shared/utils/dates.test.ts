@@ -8,6 +8,7 @@ import {
 	eachDayOfInterval,
 	endOfMonth,
 	formatDate,
+	getMonthNames,
 	getWeekdayNames,
 	isBefore,
 	isSameDay,
@@ -216,6 +217,29 @@ describe("formatDate", () => {
 		});
 
 		expect(constructions).toBe(1);
+	});
+});
+
+describe("getMonthNames", () => {
+	it("names the twelve months in calendar order", () => {
+		expect(getMonthNames({ locale: EN, format: "long" })).toEqual([
+			"January",
+			"February",
+			"March",
+			"April",
+			"May",
+			"June",
+			"July",
+			"August",
+			"September",
+			"October",
+			"November",
+			"December",
+		]);
+	});
+
+	it("abbreviates them by default and follows the locale", () => {
+		expect(getMonthNames({ locale: "es" })[0]?.toLowerCase()).toMatch(/^ene/);
 	});
 });
 

@@ -9,6 +9,7 @@ export interface GenerateSuggestionsParams {
 	ptoDays: number;
 	allowPastDays: boolean;
 	strategy: FilterStrategy;
+	preferredMonths: number[];
 	locale: Locale;
 }
 

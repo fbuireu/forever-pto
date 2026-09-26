@@ -10,6 +10,7 @@ export interface GenerateAlternativesParams {
 	maxAlternatives: number;
 	existingSuggestion: Pick<Suggestion, "days" | "bridges">;
 	strategy: FilterStrategy;
+	preferredMonths?: number[];
 }
 
 interface Seed {
@@ -18,7 +19,7 @@ interface Seed {
 }
 
 export function generateAlternatives(params: GenerateAlternativesParams) {
-	const { ptoDays, candidates, maxAlternatives, existingSuggestion, strategy } = params;
+	const { ptoDays, candidates, maxAlternatives, existingSuggestion, strategy, preferredMonths } = params;
 
 	if (ptoDays <= 0 || maxAlternatives <= 0 || existingSuggestion.days.length === 0) {
 		return [];
@@ -49,7 +50,10 @@ export function generateAlternatives(params: GenerateAlternativesParams) {
 	for (const other of Object.values(FilterStrategy)) {
 		if (other === strategy || alternatives.length >= maxAlternatives) continue;
 		runs++;
-		offer({ ...selectBridges({ bridges, targetPtoDays: ptoDays, objective: objectiveFor(other) }), strategy: other });
+		offer({
+			...selectBridges({ bridges, targetPtoDays: ptoDays, objective: objectiveFor(other), preferredMonths }),
+			strategy: other,
+		});
 	}
 
 	const seeds: Seed[] = [{ days: existingSuggestion.days, excludedDays: [] }];
@@ -63,7 +67,7 @@ export function generateAlternatives(params: GenerateAlternativesParams) {
 
 			const excludedDays = [...seed.excludedDays, ...block];
 			runs++;
-			const selection = selectBridges({ bridges, targetPtoDays: ptoDays, objective, excludedDays });
+			const selection = selectBridges({ bridges, targetPtoDays: ptoDays, objective, excludedDays, preferredMonths });
 			offer({ ...selection, strategy });
 			if (selection.days.length > 0) seeds.push({ days: selection.days, excludedDays });
 		}

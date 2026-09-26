@@ -159,6 +159,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 					ptoDays,
 					allowPastDays,
 					strategy,
+					preferredMonths,
 					locale,
 					autoSuggestCount,
 				}: MainThreadSuggestionsParams) => {
@@ -176,6 +177,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 							removedSuggestedDays,
 							allowPastDays,
 							strategy,
+							preferredMonths,
 							locale,
 							maxAlternatives,
 						});

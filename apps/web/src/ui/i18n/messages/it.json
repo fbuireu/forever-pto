@@ -162,8 +162,8 @@
 					"answer": "Il sistema analizza i tuoi giorni lavorativi disponibili, i festivi e le tue preferenze (es. evitare giorni passati) e trova tutti i ponti possibili, fino a un'intera settimana lavorativa. Poi costruisce il tuo piano un ponte alla volta, prendendo sempre quello che aggiunge più giorni liberi nuovi a ciò che il piano copre già, secondo le regole della tua strategia, così un fine settimana condiviso da due ponti non viene mai contato due volte."
 				},
 				"strategies": {
-					"question": "Qual è la differenza tra le strategie \"raggruppata\", \"ottimizzata\" e \"bilanciata\"?",
-					"answer": "Ottimizzata ti dà il massimo di giorni liberi effettivi per ogni giorno di PTO, soprattutto in ponti distribuiti durante l'anno. Raggruppata cede parte di questa efficienza in cambio di poche vacanze lunghe fino a due settimane. Bilanciata sta nel mezzo: dà a ogni trimestre la sua parte del budget e preferisce pause fino a una settimana."
+					"question": "Qual è la differenza tra le strategie \"raggruppata\", \"ottimizzata\", \"bilanciata\" e \"vacanza principale\"?",
+					"answer": "Ottimizzata ti dà il massimo di giorni liberi effettivi per ogni giorno di PTO, soprattutto in ponti distribuiti durante l'anno. Raggruppata cede parte di questa efficienza in cambio di poche vacanze lunghe fino a due settimane. Bilanciata sta nel mezzo: dà a ogni trimestre la sua parte del budget e preferisce pause fino a una settimana. Vacanza principale mette un blocco lungo fino a due settimane nei mesi che scegli, poi distribuisce il resto come Ottimizzata."
 				},
 				"results": {
 					"question": "Perché i suggerimenti cambiano quando aggiorno preferenze o festività?",
@@ -537,7 +537,26 @@
 					"noMaximization": "Non massimizza",
 					"noLongTrip": "Nessun viaggio lungo"
 				}
+			},
+			"mainVacation": {
+				"label": "Vacanza principale",
+				"description": "Prima il tuo grande viaggio",
+				"subtitle": "Un blocco fino a due settimane nei mesi che scegli, poi i ponti migliori",
+				"pros": {
+					"yourTrip": "Il tuo viaggio, quando vuoi",
+					"bridgesAfter": "I ponti migliori per il resto"
+				},
+				"cons": {
+					"fewerDays": "Meno giorni totali",
+					"oneBlock": "Un solo blocco lungo"
+				}
 			}
+		},
+		"preferredMonths": {
+			"title": "Mesi preferiti",
+			"tooltipLabel": "Informazioni sui mesi preferiti",
+			"tooltip": "Vacanza principale crea il suo blocco lungo in questi mesi. Se non ne scegli nessuno, cerca il periodo migliore dell'anno.",
+			"anyMonth": "Nessun mese scelto: il blocco va dove rende di più."
 		},
 		"allowPastDays": {
 			"title": "Consenti giorni passati",
@@ -1051,7 +1070,7 @@
 			"freeFeatures": {
 				"optimizedPlan": "Piano vacanze auto-ottimizzato",
 				"countryHolidays": "Festività del tuo paese e regione",
-				"threeStrategies": "{count} strategie (Raggruppata, Ottimizzata, Bilanciata)",
+				"threeStrategies": "{count} strategie (Raggruppata, Ottimizzata, Bilanciata, Vacanza principale)",
 				"basicStats": "Statistiche di base e calcolatrici"
 			},
 			"freeCta": "Inizia gratis",

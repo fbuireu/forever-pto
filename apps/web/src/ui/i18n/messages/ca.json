@@ -162,8 +162,8 @@
 					"answer": "El sistema analitza els teus dies laborables disponibles, els festius i les teves preferències (com ara evitar dates passades) i troba tots els ponts possibles, fins a una setmana laboral sencera. Després construeix el teu pla pont a pont, agafant sempre el que afegeix més dies lliures nous al que el pla ja cobreix, segons les regles de la teva estratègia, de manera que un cap de setmana que comparteixen dos ponts mai no compta dues vegades."
 				},
 				"strategies": {
-					"question": "Quina és la diferència entre les estratègies \"agrupada\", \"optimitzada\" i \"equilibrada\"?",
-					"answer": "L'Optimitzada et dona el màxim de dies lliures efectius per cada dia de PTO, sobretot en ponts repartits per l'any. L'Agrupada cedeix part d'aquesta eficiència a canvi d'unes poques vacances llargues de fins a dues setmanes. L'Equilibrada queda al mig: dona a cada trimestre la seva part del pressupost i prefereix descansos de fins a una setmana."
+					"question": "Quina és la diferència entre les estratègies \"agrupada\", \"optimitzada\", \"equilibrada\" i \"vacança principal\"?",
+					"answer": "L'Optimitzada et dona el màxim de dies lliures efectius per cada dia de PTO, sobretot en ponts repartits per l'any. L'Agrupada cedeix part d'aquesta eficiència a canvi d'unes poques vacances llargues de fins a dues setmanes. L'Equilibrada queda al mig: dona a cada trimestre la seva part del pressupost i prefereix descansos de fins a una setmana. La Vacança principal col·loca un bloc llarg de fins a dues setmanes als mesos que triïs i reparteix la resta com l'Optimitzada."
 				},
 				"results": {
 					"question": "Per què canvien les recomanacions quan actualitzo preferències o festius?",
@@ -537,7 +537,26 @@
 					"noMaximization": "No maximitza",
 					"noLongTrip": "Sense un viatge llarg"
 				}
+			},
+			"mainVacation": {
+				"label": "Vacança principal",
+				"description": "Primer el teu gran viatge",
+				"subtitle": "Un bloc de fins a dues setmanes als mesos que triïs i després els millors ponts",
+				"pros": {
+					"yourTrip": "El teu viatge, quan vulguis",
+					"bridgesAfter": "Els millors ponts per a la resta"
+				},
+				"cons": {
+					"fewerDays": "Menys dies totals",
+					"oneBlock": "Un sol bloc llarg"
+				}
 			}
+		},
+		"preferredMonths": {
+			"title": "Mesos preferits",
+			"tooltipLabel": "Sobre els mesos preferits",
+			"tooltip": "Vacança principal crea el seu bloc llarg dins d'aquests mesos. Si no en tries cap, busca la millor època de l'any.",
+			"anyMonth": "Cap mes triat: el bloc va on més rendeix."
 		},
 		"allowPastDays": {
 			"title": "Permetre dies passats",
@@ -1051,7 +1070,7 @@
 			"freeFeatures": {
 				"optimizedPlan": "Pla de vacances auto-optimitzat",
 				"countryHolidays": "Festius del teu país i regió",
-				"threeStrategies": "{count} estratègies (Agrupada, Optimitzada, Equilibrada)",
+				"threeStrategies": "{count} estratègies (Agrupada, Optimitzada, Equilibrada, Vacança principal)",
 				"basicStats": "Estadístiques bàsiques i calculadores"
 			},
 			"freeCta": "Comença gratis",

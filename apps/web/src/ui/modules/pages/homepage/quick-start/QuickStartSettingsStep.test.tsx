@@ -49,13 +49,14 @@ beforeEach(() => {
 });
 
 describe("QuickStartSettingsStep", () => {
-	it("offers the three strategies with the draft's one checked", () => {
+	it("offers every strategy with the draft's one checked", () => {
 		renderStep({ strategy: FilterStrategy.BALANCED });
 
 		expect(screen.getAllByRole("radio").map((radio) => (radio as HTMLInputElement).value)).toStrictEqual([
 			FilterStrategy.GROUPED,
 			FilterStrategy.OPTIMIZED,
 			FilterStrategy.BALANCED,
+			FilterStrategy.MAIN_VACATION,
 		]);
 		expect((screen.getByLabelText(new RegExp(sidebar.strategy.balanced.label)) as HTMLInputElement).checked).toBe(true);
 	});

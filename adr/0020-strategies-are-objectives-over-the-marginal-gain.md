@@ -46,7 +46,10 @@ The alternatives weighed were:
 ## Decision
 
 A Strategy is an `Objective` in `STRATEGY_OBJECTIVE`: a **marginal floor** and a **rank**, both applied by one
-selector, `selectBridges`, to a `Candidate` measured against the plan built so far.
+selector, `selectBridges`, to a `Candidate` measured against the plan built so far. An `Objective` may also carry
+`admits`, a hard filter on which candidates it considers, and `next`, the stage that takes over when it has
+nothing left to take; Main Vacation is the Strategy that needs both, a block in the Preferred Months first and
+Optimized after it.
 
 - The marginal gain is the days a Bridge's span adds to the days the plan already covers, divided by its PTO Days.
   A candidate under its Strategy's floor is not taken, and budget is left unspent rather than spent on it.

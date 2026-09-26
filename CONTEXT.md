@@ -24,8 +24,12 @@ The full span the planner considers: the chosen year plus its Carry-over Months.
 _Avoid_: selected range, date range
 
 **Strategy**:
-The rule that decides which Bridges make it into a Suggestion when the PTO budget cannot cover them all. They are Grouped, Optimized and Balanced.
+The rule that decides which Bridges make it into a Suggestion when the PTO budget cannot cover them all. They are Grouped, Optimized, Balanced and Main Vacation.
 _Avoid_: filter, algorithm
+
+**Preferred Months**:
+The months of the year in which the user wants the long block of the Main Vacation Strategy. None chosen means any month: the block goes wherever it returns most.
+_Avoid_: season, favourite months
 
 ## The calendar
 
