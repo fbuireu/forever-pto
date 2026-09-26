@@ -150,7 +150,7 @@ A Bridge that would overspend is skipped, not truncated, and budget can be left 
 3. A plan is offered only when it is at least `ALTERNATIVES.MIN_DIFFERENCE` ({PTO_CONSTANTS.ALTERNATIVES.MIN_DIFFERENCE}) away from the Suggestion and from every Alternative already kept, measured as the share of their combined days they do not have in common. Distinct no longer means disjoint: an Alternative may keep the Suggestion's best Bridge and still be a different plan.
 4. **No Alternative beats the Suggestion.** A plan that covers more days than the Suggestion, or more per PTO Day, is refused during the search, and the pipeline re-checks the measured Effective Days and Efficiency before handing the Alternatives out. The Suggestion is the recommendation; an Alternative is a different shape of year that gives some of it up. That is why a Grouped user is not offered the Optimized plan whenever it covers more days, which over a real calendar is every time, while an Optimized user usually is offered the Grouped one.
 
-Every Alternative is stamped with the chosen Strategy, because applying it makes it the Suggestion. Two runs over the same inputs produce the same Alternatives, so the user's "option three" is still option three after a refresh.
+Every Alternative is stamped with the Strategy that found it: the other Strategies' plans carry their own, the Rest Block re-runs carry the chosen one. The Summary's notice that an Alternative adds more days compares only with the ones the chosen Strategy found, so it speaks up for a hand-edited plan that fell behind, never to tell a Grouped user that Optimized covers more. Two runs over the same inputs produce the same Alternatives, so the user's "option three" is still option three after a refresh.
 
 ## Stage 6: Metrics
 
