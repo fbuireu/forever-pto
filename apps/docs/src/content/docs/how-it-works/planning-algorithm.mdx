@@ -145,9 +145,10 @@ A Bridge that would overspend is skipped, not truncated, and budget can be left 
 
 `generateAlternatives` in `apps/web/src/domain/calendar/alternatives/generateAlternatives.ts` produces up to `maxAlternatives` (four, from the holidays store) plans that are **genuinely different** from the Suggestion and from each other:
 
-1. The other two Strategies' plans come first, over the same candidates. They are the most different plans the engine can make, and the user sees what the other objectives would have done.
+1. The other two Strategies' plans come first, over the same candidates, when they pass the ceiling in point 4. They are the most different plans the engine can make, and the user sees what the other objectives would have done.
 2. Then the chosen Strategy is re-run with one of the Suggestion's Rest Blocks taken away, largest first, and each plan found that way is itself a seed whose blocks are taken away in turn. Each run is one axis of "what if not that break?".
 3. A plan is offered only when it is at least `ALTERNATIVES.MIN_DIFFERENCE` ({PTO_CONSTANTS.ALTERNATIVES.MIN_DIFFERENCE}) away from the Suggestion and from every Alternative already kept, measured as the share of their combined days they do not have in common. Distinct no longer means disjoint: an Alternative may keep the Suggestion's best Bridge and still be a different plan.
+4. **No Alternative beats the Suggestion.** A plan that covers more days than the Suggestion, or more per PTO Day, is refused during the search, and the pipeline re-checks the measured Effective Days and Efficiency before handing the Alternatives out. The Suggestion is the recommendation; an Alternative is a different shape of year that gives some of it up. That is why a Grouped user is not offered the Optimized plan whenever it covers more days, which over a real calendar is every time, while an Optimized user usually is offered the Grouped one.
 
 Every Alternative is stamped with the chosen Strategy, because applying it makes it the Suggestion. Two runs over the same inputs produce the same Alternatives, so the user's "option three" is still option three after a refresh.
 

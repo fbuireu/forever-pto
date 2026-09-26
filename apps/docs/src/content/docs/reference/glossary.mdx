@@ -33,7 +33,7 @@ The engine's output for a given budget, calendar and strategy: the set of recomm
 
 ### Alternative
 
-A genuinely distinct plan for the same inputs, produced by `apps/web/src/domain/calendar/alternatives/generateAlternatives.ts` from the other Strategies and from the chosen one re-run without one of the Suggestion's breaks, each far enough from every other plan to be a real choice, so the user can compare plans rather than accept a single answer.
+A genuinely distinct plan for the same inputs, produced by `apps/web/src/domain/calendar/alternatives/generateAlternatives.ts` from the other Strategies and from the chosen one re-run without one of the Suggestion's breaks, each far enough from every other plan to be a real choice and never with more Effective Days or a higher Efficiency than the Suggestion, so the user can compare plans rather than accept a single answer.
 
 ### Carry-over Months
 
