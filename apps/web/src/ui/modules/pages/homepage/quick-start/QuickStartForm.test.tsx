@@ -145,18 +145,23 @@ describe("QuickStartForm", () => {
 	});
 
 	it("writes the Preferred Months picked for Main vacation into the filters store", () => {
-		cookie.country = "es";
-		renderForm();
+		vi.useFakeTimers({ now: new Date(useFiltersStore.getState().year, 0, 15), toFake: ["Date"] });
+		try {
+			cookie.country = "es";
+			renderForm();
 
-		next();
-		next();
-		fireEvent.click(screen.getByLabelText(new RegExp(enMessages.sidebar.strategy.mainVacation.label)));
-		fireEvent.click(screen.getByRole("button", { name: "June" }));
-		finish();
+			next();
+			next();
+			fireEvent.click(screen.getByLabelText(new RegExp(enMessages.sidebar.strategy.mainVacation.label)));
+			fireEvent.click(screen.getByRole("button", { name: "June" }));
+			finish();
 
-		const filters = useFiltersStore.getState();
-		expect(filters.strategy).toBe(FilterStrategy.MAIN_VACATION);
-		expect(filters.preferredMonths).toStrictEqual([5, 6, 7]);
+			const filters = useFiltersStore.getState();
+			expect(filters.strategy).toBe(FilterStrategy.MAIN_VACATION);
+			expect(filters.preferredMonths).toStrictEqual([5, 6, 7]);
+		} finally {
+			vi.useRealTimers();
+		}
 	});
 
 	it("reports each step it leaves and the planning inputs it finishes with", () => {

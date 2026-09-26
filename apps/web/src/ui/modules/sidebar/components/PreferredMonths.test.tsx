@@ -1,9 +1,17 @@
 import en from "@i18n/messages/en.json";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const store = vi.hoisted(() => ({ preferredMonths: [6, 7] as number[], setPreferredMonths: vi.fn() }));
+const FUTURE_YEAR = 2099;
+
+const store = vi.hoisted(() => ({
+	preferredMonths: [6, 7] as number[],
+	setPreferredMonths: vi.fn(),
+	year: 2099,
+	carryOverMonths: 0,
+	allowPastDays: false,
+}));
 
 const track = vi.hoisted(() => vi.fn());
 vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
@@ -23,6 +31,9 @@ const renderMonths = () =>
 
 beforeEach(() => {
 	store.preferredMonths = [6, 7];
+	store.year = FUTURE_YEAR;
+	store.carryOverMonths = 0;
+	store.allowPastDays = false;
 	store.setPreferredMonths.mockClear();
 	track.mockClear();
 });
@@ -62,5 +73,30 @@ describe("PreferredMonths", () => {
 		renderMonths();
 
 		expect(screen.getByText(en.sidebar.preferredMonths.anyMonth)).toBeTruthy();
+	});
+
+	describe("in the current year with past days off", () => {
+		beforeEach(() => {
+			vi.useFakeTimers({ now: new Date(2026, 8, 26), toFake: ["Date"] });
+			store.year = 2026;
+		});
+		afterEach(() => vi.useRealTimers());
+
+		it("refuses the months already past, so a choice there cannot be made", () => {
+			renderMonths();
+
+			expect(screen.getByRole("button", { name: "July" })).toHaveProperty("disabled", true);
+			expect(screen.getByRole("button", { name: "July" }).getAttribute("aria-pressed")).toBe("false");
+			expect(screen.getByRole("button", { name: "September" })).toHaveProperty("disabled", false);
+			expect(screen.getByText(en.sidebar.preferredMonths.anyMonth)).toBeDefined();
+		});
+
+		it("offers them again once past days are allowed", () => {
+			store.allowPastDays = true;
+			renderMonths();
+
+			expect(screen.getByRole("button", { name: "July" })).toHaveProperty("disabled", false);
+			expect(screen.getByRole("button", { name: "July" }).getAttribute("aria-pressed")).toBe("true");
+		});
 	});
 });

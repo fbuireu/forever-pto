@@ -41,6 +41,34 @@ export const planningWindowMonths = (window: PlanningWindow): Date[] => {
 	return Array.from({ length: windowMonthCount(window) }, (_, index) => addMonths({ date: start, months: index }));
 };
 
+export interface ReachableMonthsParams extends PlanningWindow {
+	allowPastDays: boolean;
+	today: Date;
+}
+
+export const reachableMonths = ({
+	year,
+	carryOverMonths,
+	allowPastDays,
+	today,
+}: ReachableMonthsParams): ReadonlySet<number> => {
+	const currentMonth = startOfMonth(today).getTime();
+
+	return new Set(
+		planningWindowMonths({ year, carryOverMonths })
+			.filter((month) => allowPastDays || month.getTime() >= currentMonth)
+			.map((month) => month.getMonth()),
+	);
+};
+
+export interface ReachablePreferredMonthsParams {
+	preferredMonths: readonly number[];
+	reachable: ReadonlySet<number>;
+}
+
+export const reachablePreferredMonths = ({ preferredMonths, reachable }: ReachablePreferredMonthsParams) =>
+	preferredMonths.filter((month) => reachable.has(month));
+
 export const planningWindowInterval = ({ year, carryOverMonths }: PlanningWindow): PlanningWindowInterval => ({
 	start: new Date(year, 0, 1),
 	end: addMonths({ date: endOfYear(new Date(year, 0, 1)), months: carryOverMonths }),

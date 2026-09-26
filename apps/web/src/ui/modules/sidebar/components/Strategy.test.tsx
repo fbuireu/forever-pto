@@ -23,6 +23,9 @@ vi.mock("@application/stores/filters", () => ({
 			setStrategy: store.setStrategy,
 			preferredMonths: store.preferredMonths,
 			setPreferredMonths: store.setPreferredMonths,
+			year: 2099,
+			carryOverMonths: 0,
+			allowPastDays: false,
 		}),
 }));
 

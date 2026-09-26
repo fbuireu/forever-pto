@@ -26,6 +26,7 @@ interface RenderStepParams {
 	preferredMonths?: number[];
 	allowPastDays?: boolean;
 	carryOverMonths?: number;
+	year?: number;
 }
 
 const renderStep = ({
@@ -33,13 +34,14 @@ const renderStep = ({
 	preferredMonths = [6, 7],
 	allowPastDays = false,
 	carryOverMonths = 1,
+	year = 2099,
 }: RenderStepParams = {}) => {
 	const onChange = vi.fn();
 
 	render(
 		<NextIntlClientProvider locale="en" messages={enMessages}>
 			<QuickStartSettingsStep
-				draft={{ strategy, preferredMonths, allowPastDays, carryOverMonths }}
+				draft={{ strategy, preferredMonths, allowPastDays, carryOverMonths, year }}
 				onChange={onChange}
 			/>
 		</NextIntlClientProvider>,
@@ -121,5 +123,17 @@ describe("QuickStartSettingsStep", () => {
 		fireEvent.change(slider, { target: { value: "6" } });
 
 		expect(onChange).toHaveBeenCalledExactlyOnceWith({ carryOverMonths: 6 });
+	});
+
+	it("refuses a Preferred Month already past in the current year while past days are off", () => {
+		vi.useFakeTimers({ now: new Date(2026, 8, 26), toFake: ["Date"] });
+		try {
+			renderStep({ strategy: FilterStrategy.MAIN_VACATION, year: 2026, carryOverMonths: 0 });
+
+			expect(screen.getByRole("button", { name: "August" })).toHaveProperty("disabled", true);
+			expect(screen.getByRole("button", { name: "October" })).toHaveProperty("disabled", false);
+		} finally {
+			vi.useRealTimers();
+		}
 	});
 });

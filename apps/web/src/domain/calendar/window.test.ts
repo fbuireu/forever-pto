@@ -8,6 +8,8 @@ import {
 	MONTHS_IN_YEAR,
 	planningWindowInterval,
 	planningWindowMonths,
+	reachableMonths,
+	reachablePreferredMonths,
 	windowMonthCount,
 	windowQuarterCount,
 } from "./window";
@@ -112,5 +114,32 @@ describe("inPreferredMonths", () => {
 
 	it("reads no preference as every month", () => {
 		expect(inPreferredMonths({ months: [0, 11], preferredMonths: new Set() })).toBe(true);
+	});
+});
+
+describe("reachableMonths", () => {
+	const today = new Date(2026, 8, 26);
+
+	it("drops the months already behind today when past days are not allowed, keeping the current one", () => {
+		const reachable = reachableMonths({ year: 2026, carryOverMonths: 0, allowPastDays: false, today });
+
+		expect([...reachable]).toStrictEqual([8, 9, 10, 11]);
+	});
+
+	it("reaches a passed month again through the Carry-over Months, which carry it into next year", () => {
+		const reachable = reachableMonths({ year: 2026, carryOverMonths: 3, allowPastDays: false, today });
+
+		expect([...reachable].toSorted((a, b) => a - b)).toStrictEqual([0, 1, 2, 8, 9, 10, 11]);
+	});
+
+	it("reaches every month when past days are allowed, or when the window is a later year", () => {
+		expect(reachableMonths({ year: 2026, carryOverMonths: 0, allowPastDays: true, today }).size).toBe(MONTHS_IN_YEAR);
+		expect(reachableMonths({ year: 2027, carryOverMonths: 0, allowPastDays: false, today }).size).toBe(MONTHS_IN_YEAR);
+	});
+
+	it("keeps only the Preferred Months the window can still reach", () => {
+		const reachable = reachableMonths({ year: 2026, carryOverMonths: 0, allowPastDays: false, today });
+
+		expect(reachablePreferredMonths({ preferredMonths: [6, 7, 11], reachable })).toStrictEqual([11]);
 	});
 });

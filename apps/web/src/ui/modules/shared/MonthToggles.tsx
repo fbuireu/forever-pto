@@ -9,10 +9,17 @@ interface MonthTogglesProps {
 	label: string;
 	months: readonly number[];
 	onChange: (months: number[]) => void;
+	reachable: ReadonlySet<number>;
 	legendClassName?: string;
 }
 
-export const MonthToggles = ({ label, months, onChange, legendClassName = "sr-only" }: MonthTogglesProps) => {
+export const MonthToggles = ({
+	label,
+	months,
+	onChange,
+	reachable,
+	legendClassName = "sr-only",
+}: MonthTogglesProps) => {
 	const locale = useLocale();
 	const monthNames = useMemo(() => {
 		const longNames = getMonthNames({ locale, format: "long" });
@@ -27,7 +34,8 @@ export const MonthToggles = ({ label, months, onChange, legendClassName = "sr-on
 			<legend className={legendClassName}>{label}</legend>
 			<div className="grid grid-cols-4 gap-1.5">
 				{monthNames.map(({ month, short, long }) => {
-					const selected = months.includes(month);
+					const disabled = !reachable.has(month);
+					const selected = !disabled && months.includes(month);
 
 					return (
 						<Button
@@ -37,6 +45,7 @@ export const MonthToggles = ({ label, months, onChange, legendClassName = "sr-on
 							variant={selected ? "default" : "outline"}
 							aria-pressed={selected}
 							aria-label={long}
+							disabled={disabled}
 							onClick={() => handleToggle(month)}
 							className="px-1.5 text-xs capitalize"
 						>
