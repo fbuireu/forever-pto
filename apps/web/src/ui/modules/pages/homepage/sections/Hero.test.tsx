@@ -67,6 +67,15 @@ describe("Hero social proof", () => {
 		expect(text).not.toContain("12.847");
 	});
 
+	it("derives the mockup's efficiency from the showcase plan, with the locale decimal separator", async () => {
+		expect(await renderHero({ locale: "en", messages: enMessages })).toContain("efficiency 3.36×");
+		expect(await renderHero({ locale: "de", messages: deMessages })).toContain("Effizienz 3,36×");
+	});
+
+	it("names the showcase plan's Holiday count", async () => {
+		expect(await renderHero({ locale: "en", messages: enMessages })).toContain("12 holidays");
+	});
+
 	it("formats the rating with the locale decimal separator", async () => {
 		expect(await renderHero({ locale: "fr", messages: frMessages })).toContain("4,9");
 		expect(await renderHero({ locale: "en", messages: enMessages })).toContain("4.9");

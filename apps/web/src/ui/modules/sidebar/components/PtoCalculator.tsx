@@ -1,5 +1,6 @@
 "use client";
 
+import { getMonthNames } from "@application/shared/utils/dates";
 import { MIN_PTO_DAYS, useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
@@ -9,7 +10,6 @@ import { SlidingNumber } from "@ui/modules/core/animate/text/SlidingNumber";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { Combobox } from "@ui/modules/core/primitives/Combobox";
 import { Input } from "@ui/modules/core/primitives/Input";
-import { getMonthNames } from "@ui/modules/pages/planner/utils/helpers";
 import { SidebarFieldTooltip } from "@ui/modules/sidebar/components/SidebarFieldLabel";
 import { Calculator } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -21,11 +21,7 @@ interface MonthOption {
 	label: string;
 }
 
-interface PtoCalculatorProps {
-	currentYear: number;
-}
-
-export const PtoCalculator = ({ currentYear }: PtoCalculatorProps) => {
+export const PtoCalculator = () => {
 	const locale = useLocale();
 	const t = useTranslations("ptoCalculator");
 	const [daysPerMonth, setDaysPerMonth] = useState<number>(2.5);
@@ -41,18 +37,13 @@ export const PtoCalculator = ({ currentYear }: PtoCalculatorProps) => {
 	const trimManualDays = useHolidaysStore((state) => state.trimManualDays);
 
 	const monthOptions: MonthOption[] = useMemo(() => {
-		const monthNames = getMonthNames({
-			locale,
-			monthCount: 12,
-			startYear: currentYear,
-			monthOutputFormat: "long",
-		});
+		const monthNames = getMonthNames({ locale, format: "long" });
 
 		return monthNames.map((monthName, index) => ({
 			value: (index + 1).toString(),
 			label: monthName,
 		}));
-	}, [locale, currentYear]);
+	}, [locale]);
 
 	const handleCalculate = () => {
 		track({ event: "tool_used", properties: { tool: "ptoCalculator" } });

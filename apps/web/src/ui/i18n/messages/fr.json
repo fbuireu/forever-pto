@@ -163,7 +163,7 @@
 				},
 				"strategies": {
 					"question": "Quelle est la différence entre les stratégies \"groupée\", \"optimisée\", \"équilibrée\" et \"vacances principales\" ?",
-					"answer": "Optimisée te donne le plus de jours de repos effectifs par jour de congé, surtout en week-ends prolongés répartis sur l'année. Groupée cède une partie de cette efficacité contre quelques longues vacances d'environ deux semaines. Équilibrée veille à ce que tu ne travailles jamais trop longtemps sans repos : elle place un week-end prolongé toutes les quelques semaines pour qu'aucune période de travail ne s'éternise. Vacances principales place un long bloc de deux semaines au plus dans les mois que tu choisis, puis répartit le reste comme Optimisée."
+					"answer": "Optimisée te donne le plus de jours de repos effectifs par jour de congé, surtout en week-ends prolongés répartis sur l'année. Groupée cède une partie de cette efficacité contre quelques longues vacances d'environ deux semaines. Équilibrée veille à ce que tu ne travailles jamais trop longtemps sans repos : elle place un week-end prolongé toutes les quelques semaines pour qu'aucune période de travail ne s'éternise. Vacances principales place un bloc de deux semaines au plus dans les mois que tu choisis, puis répartit le reste comme Optimisée."
 				},
 				"results": {
 					"question": "Pourquoi les recommandations changent-elles quand je modifie mes préférences ou mes jours fériés ?",
@@ -521,7 +521,7 @@
 					"moreDays": "Plus de jours au total"
 				},
 				"cons": {
-					"shortBreaks": "Surtout des week-ends prolongés",
+					"mostlyLongWeekends": "Surtout des week-ends prolongés",
 					"noLongTrip": "Pas de long voyage"
 				}
 			},
@@ -548,15 +548,15 @@
 				},
 				"cons": {
 					"fewerDays": "Moins de jours au total",
-					"oneBlock": "Un seul long bloc"
+					"oneBlock": "Un seul grand voyage"
 				}
 			}
 		},
 		"preferredMonths": {
 			"title": "Mois préférés",
 			"tooltipLabel": "À propos des mois préférés",
-			"tooltip": "Vacances principales construit son long bloc dans ces mois. Si tu n'en choisis aucun, il cherche la meilleure période de l'année.",
-			"anyMonth": "Aucun mois choisi : le bloc va là où il rapporte le plus."
+			"tooltip": "La stratégie Vacances principales place son bloc dans ces mois. Si tu n'en choisis aucun, elle cherche la meilleure période de l'année.",
+			"anyMonth": "Aucun mois choisi : le bloc va là où il peut être le plus long."
 		},
 		"allowPastDays": {
 			"title": "Autoriser les jours passés",
@@ -935,7 +935,7 @@
 			"demoLink": "Voir comment ça marche (30s)",
 			"stars": "{rating} · utilisé par {users} employés rebelles",
 			"mockupLabel": "Vrais jours de repos sur une année",
-			"mockupRatio": "jours · efficacité 3,36×",
+			"mockupRatio": "jours · efficacité {ratio}×",
 			"mockupQuote": "\"C'est 22 longs week-ends, capitaine.\"",
 			"mockupLegendPto": "Congés",
 			"mockupLegendHoliday": "Férié",
@@ -943,7 +943,7 @@
 			"mockupFieldPto": "Jours PTO",
 			"mockupFieldPtoUnit": "jours/an",
 			"mockupFieldCountry": "Pays",
-			"mockupFieldHolidays": "12 jours fériés"
+			"mockupFieldHolidays": "{count} jours fériés"
 		},
 		"marquee": {
 			"items": "ponts de pâques · week-end férié · été prolongé · pont toussaint · semaine de noël · pont novembre · lundi de pentecôte · pont ascension · pont 14 juillet · pont 11 novembre"
@@ -980,7 +980,7 @@
 			"bridgeTitle": "Transforme 1 congé en 4 jours libres.",
 			"bridgeDescription": "Détecte les jours fériés les mardis et jeudis et suggère des ponts minimaux. Un jour stratégique = un week-end de 4 jours.",
 			"ratioTag": "max efficacité",
-			"ratioDescription": "Meilleure efficacité : 8 jours de congé en 30 jours libres (FR).",
+			"ratioDescription": "Meilleure efficacité : 8 jours de congé en 30 jours libres (France).",
 			"syncTag": "sync en 1 clic",
 			"syncTitle": "Google · Outlook · iCal",
 			"syncDescription": "Exporte ton plan vers le calendrier que tu utilises déjà. Sans prise de tête.",
@@ -1013,7 +1013,7 @@
 			"withTitle": "😎 Avec Forever PTO",
 			"withItems": {
 				"planInJanuary": "Tu planifies tout en janvier, en attendant ton café.",
-				"dayEfficiency": "Chaque jour de congé te rend 3,3 jours libres en moyenne.",
+				"dayEfficiency": "Chaque jour de congé te rend {ratio} jours libres en moyenne.",
 				"visualCalendar": "Tu visualises toute l'année dans un calendrier clair.",
 				"bookFirst": "Tu réserves en premier, sans culpabilité, avec des données.",
 				"burnAllDays": "Tu utilises 100% de tes jours. Comme il se doit."
@@ -1070,7 +1070,7 @@
 			"freeFeatures": {
 				"optimizedPlan": "Plan de vacances auto-optimisé",
 				"countryHolidays": "Jours fériés de ton pays et région",
-				"threeStrategies": "{count} stratégies (Groupée, Optimisée, Équilibrée, Vacances principales)",
+				"strategies": "{count} stratégies (Groupée, Optimisée, Équilibrée, Vacances principales)",
 				"basicStats": "Statistiques de base et calculateurs"
 			},
 			"freeCta": "Commencer gratuitement",

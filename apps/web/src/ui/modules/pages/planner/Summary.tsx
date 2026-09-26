@@ -178,7 +178,7 @@ export const Summary = () => {
 									? t("summaryParagraph.withGain", {
 											ptoDays,
 											totalHolidays: holidayMetrics.totalHolidays,
-											strategy: tSidebar(`strategy.${planStrategy}.label`).toLowerCase(),
+											strategy: tSidebar(`strategy.${planStrategy}.label`),
 											effectiveDays,
 											increment,
 											percentage: gain.toFixed(0),
@@ -186,7 +186,7 @@ export const Summary = () => {
 									: t("summaryParagraph.withoutGain", {
 											ptoDays,
 											totalHolidays: holidayMetrics.totalHolidays,
-											strategy: tSidebar(`strategy.${planStrategy}.label`).toLowerCase(),
+											strategy: tSidebar(`strategy.${planStrategy}.label`),
 											effectiveDays,
 										})}
 							</p>

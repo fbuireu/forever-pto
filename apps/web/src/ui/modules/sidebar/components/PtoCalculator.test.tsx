@@ -90,21 +90,21 @@ beforeEach(() => {
 
 describe("PtoCalculator", () => {
 	it("offers the twelve months of the year it was given", () => {
-		render(<PtoCalculator currentYear={2026} />);
+		render(<PtoCalculator />);
 
 		expect(screen.getAllByRole("option")).toHaveLength(12);
 		expect(screen.getAllByRole("option")[0]?.textContent).toBe("January");
 	});
 
 	it("shows no result, and nothing to apply, until asked to calculate", () => {
-		render(<PtoCalculator currentYear={2026} />);
+		render(<PtoCalculator />);
 
 		expect(screen.queryByRole("button", { name: "applyToPtoDays" })).toBeNull();
 	});
 
 	it("redraws the breakdown when a second calculation lands on the same total", async () => {
 		const user = userEvent.setup();
-		const { container } = render(<PtoCalculator currentYear={2026} />);
+		const { container } = render(<PtoCalculator />);
 		const breakdown = () => container.querySelector(".bg-muted p")?.textContent?.replace(/\s+/g, " ").trim() ?? "";
 
 		await calculate({ user, days: "2", month: "6" });
@@ -118,7 +118,7 @@ describe("PtoCalculator", () => {
 
 	it("applies the rounded total as the new budget and trims the manual picks to it", async () => {
 		const user = userEvent.setup();
-		render(<PtoCalculator currentYear={2026} />);
+		render(<PtoCalculator />);
 
 		await calculate({ user, days: "2.5", month: "5" });
 		await user.click(apply());
@@ -129,7 +129,7 @@ describe("PtoCalculator", () => {
 
 	it("leaves the store alone when the total already is the budget, so nothing is trimmed for no change", async () => {
 		const user = userEvent.setup();
-		render(<PtoCalculator currentYear={2026} />);
+		render(<PtoCalculator />);
 
 		await calculate({ user, days: "2", month: "10" });
 		await user.click(apply());
@@ -140,7 +140,7 @@ describe("PtoCalculator", () => {
 
 	it("never applies less than the minimum budget, whatever the accrual came to", async () => {
 		const user = userEvent.setup();
-		render(<PtoCalculator currentYear={2026} />);
+		render(<PtoCalculator />);
 
 		await calculate({ user, days: "0", month: "3" });
 		await user.click(apply());
@@ -153,7 +153,7 @@ describe("PtoCalculator analytics", () => {
 	it("reports the tool being used, and an applied result as the new budget", async () => {
 		track.mockClear();
 		const user = userEvent.setup();
-		render(<PtoCalculator currentYear={2026} />);
+		render(<PtoCalculator />);
 
 		await calculate({ user, days: "2", month: "12" });
 		expect(track).toHaveBeenCalledExactlyOnceWith({ event: "tool_used", properties: { tool: "ptoCalculator" } });

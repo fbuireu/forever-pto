@@ -47,7 +47,7 @@ export const Pricing = async () => {
 							[
 								"pricing.freeFeatures.optimizedPlan",
 								"pricing.freeFeatures.countryHolidays",
-								"pricing.freeFeatures.threeStrategies",
+								"pricing.freeFeatures.strategies",
 								"pricing.freeFeatures.basicStats",
 							] as const
 						).map((key) => (
@@ -56,7 +56,7 @@ export const Pricing = async () => {
 								className="flex gap-2.5 py-2 border-b-[2px] border-dashed border-black/15 last:border-b-0 text-[15px]"
 							>
 								<span className="font-black">✓</span>{" "}
-								{key === "pricing.freeFeatures.threeStrategies" ? t(key, { count: STRATEGY_COUNT }) : t(key)}
+								{key === "pricing.freeFeatures.strategies" ? t(key, { count: STRATEGY_COUNT }) : t(key)}
 							</li>
 						))}
 					</ul>

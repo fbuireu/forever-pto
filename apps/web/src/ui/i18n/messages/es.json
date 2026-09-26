@@ -162,8 +162,8 @@
 					"answer": "El sistema analiza tus días laborables disponibles, los festivos y tus preferencias (p. ej. evitar días pasados) y encuentra todos los puentes posibles, hasta una semana laboral entera. Después construye tu plan puente a puente, tomando siempre el que añade más días libres nuevos a lo que el plan ya cubre, según las reglas de tu estrategia, así que un fin de semana que comparten dos puentes nunca cuenta dos veces."
 				},
 				"strategies": {
-					"question": "¿Cuál es la diferencia entre las estrategias \"agrupada\", \"optimizada\", \"equilibrada\" y \"vacación principal\"?",
-					"answer": "Optimizada te da el máximo de días libres efectivos por cada día de PTO, sobre todo en fines de semana largos repartidos por el año. Agrupada cede parte de esa eficiencia a cambio de unas pocas vacaciones largas de unas dos semanas. Equilibrada se asegura de que nunca trabajes demasiado tiempo sin descansar: coloca un fin de semana largo cada pocas semanas para que ninguna racha de trabajo se alargue. Vacación principal coloca un bloque largo de hasta dos semanas en los meses que elijas y reparte el resto como Optimizada."
+					"question": "¿Cuál es la diferencia entre las estrategias \"agrupada\", \"optimizada\", \"equilibrada\" y \"vacaciones principales\"?",
+					"answer": "Optimizada te da el máximo de días libres efectivos por cada día de PTO, sobre todo en fines de semana largos repartidos por el año. Agrupada cede parte de esa eficiencia a cambio de unas pocas vacaciones largas de unas dos semanas. Equilibrada se asegura de que nunca trabajes demasiado tiempo sin descansar: coloca un fin de semana largo cada pocas semanas para que ninguna racha de trabajo se alargue. Vacaciones principales coloca un bloque de hasta dos semanas en los meses que elijas y reparte el resto como Optimizada."
 				},
 				"results": {
 					"question": "¿Por qué cambian las recomendaciones cuando actualizo preferencias o festivos?",
@@ -521,7 +521,7 @@
 					"moreDays": "Más días totales"
 				},
 				"cons": {
-					"shortBreaks": "Sobre todo fines de semana largos",
+					"mostlyLongWeekends": "Sobre todo fines de semana largos",
 					"noLongTrip": "Sin un viaje largo"
 				}
 			},
@@ -539,7 +539,7 @@
 				}
 			},
 			"mainVacation": {
-				"label": "Vacación principal",
+				"label": "Vacaciones principales",
 				"description": "Primero tu gran viaje",
 				"subtitle": "Un bloque de hasta dos semanas en los meses que elijas y después los mejores puentes",
 				"pros": {
@@ -548,15 +548,15 @@
 				},
 				"cons": {
 					"fewerDays": "Menos días totales",
-					"oneBlock": "Un solo bloque largo"
+					"oneBlock": "Solo un gran viaje"
 				}
 			}
 		},
 		"preferredMonths": {
 			"title": "Meses preferidos",
 			"tooltipLabel": "Sobre los meses preferidos",
-			"tooltip": "Vacación principal crea su bloque largo dentro de estos meses. Si no eliges ninguno, busca la mejor época del año.",
-			"anyMonth": "Ningún mes elegido: el bloque va donde más rinde."
+			"tooltip": "La estrategia Vacaciones principales coloca su bloque dentro de estos meses. Si no eliges ninguno, busca la mejor época del año.",
+			"anyMonth": "Ningún mes elegido: el bloque va donde pueda ser más largo."
 		},
 		"allowPastDays": {
 			"title": "Permitir días pasados",
@@ -935,7 +935,7 @@
 			"demoLink": "Ver cómo va (30s)",
 			"stars": "{rating} · {users} empleados rebeldes ya lo usan",
 			"mockupLabel": "Días libres reales en un año",
-			"mockupRatio": "días · eficiencia 3,36×",
+			"mockupRatio": "días · eficiencia {ratio}×",
 			"mockupQuote": "\"Eso son 22 escapadas largas, capitán.\"",
 			"mockupLegendPto": "PTO",
 			"mockupLegendHoliday": "Festivo",
@@ -943,7 +943,7 @@
 			"mockupFieldPto": "Días PTO",
 			"mockupFieldPtoUnit": "días/año",
 			"mockupFieldCountry": "País",
-			"mockupFieldHolidays": "12 festivos"
+			"mockupFieldHolidays": "{count} festivos"
 		},
 		"marquee": {
 			"items": "puente de semana santa · puente de mayo · verano infinito · puente del pilar · puente de diciembre · puente de noviembre · puente de junio · puente de agosto · puente de octubre · nochevieja extendida"
@@ -1013,7 +1013,7 @@
 			"withTitle": "😎 Con Forever PTO",
 			"withItems": {
 				"planInJanuary": "Lo planificas todo en enero, mientras esperas el café.",
-				"dayEfficiency": "Cada día de PTO te devuelve 3,3 días libres de media.",
+				"dayEfficiency": "Cada día de PTO te devuelve {ratio} días libres de media.",
 				"visualCalendar": "Visualizas el año entero en un calendario claro.",
 				"bookFirst": "Pides primero, sin remordimiento, con datos.",
 				"burnAllDays": "Quemas el 100% de tus días. Como debe ser."
@@ -1070,7 +1070,7 @@
 			"freeFeatures": {
 				"optimizedPlan": "Plan de vacaciones auto-optimizado",
 				"countryHolidays": "Festivos de tu país y región",
-				"threeStrategies": "{count} estrategias (Agrupada, Optimizada, Equilibrada, Vacación principal)",
+				"strategies": "{count} estrategias (Agrupada, Optimizada, Equilibrada, Vacaciones principales)",
 				"basicStats": "Estadísticas básicas y calculadoras"
 			},
 			"freeCta": "Empezar gratis",

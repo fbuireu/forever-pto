@@ -65,7 +65,7 @@ describe("Pricing", () => {
 
 	it("counts the strategies through the message rather than hardcoding the digit in the copy", async () => {
 		expect(await renderPricing({ locale: "en", messages: enMessages })).toContain(
-			pricing.freeFeatures.threeStrategies.replace("{count}", String(Object.values(FilterStrategy).length)),
+			pricing.freeFeatures.strategies.replace("{count}", String(Object.values(FilterStrategy).length)),
 		);
 	});
 

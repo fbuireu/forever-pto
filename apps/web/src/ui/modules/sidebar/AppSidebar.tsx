@@ -173,7 +173,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
 								>
 									<div className="px-1 pt-2 pb-1 space-y-[18px]">
 										<div className={STEP_CARD_CLASS}>
-											<PtoCalculator currentYear={currentYear} />
+											<PtoCalculator />
 										</div>
 										<div className={STEP_CARD_CLASS}>
 											<PtoSalaryCalculator />

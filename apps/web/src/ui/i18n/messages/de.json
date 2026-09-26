@@ -163,7 +163,7 @@
 				},
 				"strategies": {
 					"question": "Was ist der Unterschied zwischen \"gruppiert\", \"optimiert\", \"ausgewogen\" und \"Haupturlaub\"?",
-					"answer": "Optimiert holt die meisten effektiven freien Tage pro PTO-Tag heraus, vor allem als lange Wochenenden über das Jahr verteilt. Gruppiert gibt einen Teil dieser Effizienz für wenige lange Urlaube von etwa zwei Wochen auf. Ausgewogen sorgt dafür, dass du nie zu lange ohne Erholung arbeitest: Alle paar Wochen gibt es ein langes Wochenende, damit keine Arbeitsphase zu lang wird. Haupturlaub legt einen langen Block von bis zu zwei Wochen in die Monate deiner Wahl und verteilt den Rest wie Optimiert."
+					"answer": "Optimiert holt die meisten effektiven freien Tage pro PTO-Tag heraus, vor allem als lange Wochenenden über das Jahr verteilt. Gruppiert gibt einen Teil dieser Effizienz für wenige lange Urlaube von etwa zwei Wochen auf. Ausgewogen sorgt dafür, dass du nie zu lange ohne Erholung arbeitest: Alle paar Wochen gibt es ein langes Wochenende, damit keine Arbeitsphase zu lang wird. Haupturlaub legt einen Block von bis zu zwei Wochen in die Monate deiner Wahl und verteilt den Rest wie Optimiert."
 				},
 				"results": {
 					"question": "Warum ändern sich meine Empfehlungen, wenn ich Einstellungen oder Feiertage anpasse?",
@@ -521,7 +521,7 @@
 					"moreDays": "Mehr Gesamttage"
 				},
 				"cons": {
-					"shortBreaks": "Vor allem lange Wochenenden",
+					"mostlyLongWeekends": "Vor allem lange Wochenenden",
 					"noLongTrip": "Keine lange Reise"
 				}
 			},
@@ -548,15 +548,15 @@
 				},
 				"cons": {
 					"fewerDays": "Weniger Gesamttage",
-					"oneBlock": "Nur ein langer Block"
+					"oneBlock": "Nur eine große Reise"
 				}
 			}
 		},
 		"preferredMonths": {
 			"title": "Bevorzugte Monate",
 			"tooltipLabel": "Über bevorzugte Monate",
-			"tooltip": "Haupturlaub legt seinen langen Block in diese Monate. Wählst du keinen, sucht er die beste Zeit des Jahres.",
-			"anyMonth": "Kein Monat gewählt: Der Block landet dort, wo er am meisten bringt."
+			"tooltip": "Die Haupturlaub-Strategie legt ihren Block in diese Monate. Wählst du keinen, sucht sie die beste Zeit des Jahres.",
+			"anyMonth": "Kein Monat gewählt: Der Block landet dort, wo er am längsten sein kann."
 		},
 		"allowPastDays": {
 			"title": "Vergangene Tage erlauben",
@@ -935,7 +935,7 @@
 			"demoLink": "Wie es funktioniert (30s)",
 			"stars": "{rating} · genutzt von {users} rebellischen Mitarbeitern",
 			"mockupLabel": "Echte freie Tage in einem Jahr",
-			"mockupRatio": "Tage · Effizienz 3,36×",
+			"mockupRatio": "Tage · Effizienz {ratio}×",
 			"mockupQuote": "\"Das sind 22 lange Wochenenden, Kapitän.\"",
 			"mockupLegendPto": "Urlaub",
 			"mockupLegendHoliday": "Feiertag",
@@ -943,7 +943,7 @@
 			"mockupFieldPto": "PTO-Tage",
 			"mockupFieldPtoUnit": "Tage/Jahr",
 			"mockupFieldCountry": "Land",
-			"mockupFieldHolidays": "12 Feiertage"
+			"mockupFieldHolidays": "{count} Feiertage"
 		},
 		"marquee": {
 			"items": "osterbrücke · feiertags-wochenende · sommer-stretch · herbst-brücke · weihnachts-stretch · november-brücke · pfingstbrücke · himmelfahrt-brücke · tag der einheit · silvester-stretch"
@@ -1013,7 +1013,7 @@
 			"withTitle": "😎 Mit Forever PTO",
 			"withItems": {
 				"planInJanuary": "Du planst alles im Januar, während du auf deinen Kaffee wartest.",
-				"dayEfficiency": "Jeder PTO-Tag gibt dir im Schnitt 3,3 freie Tage zurück.",
+				"dayEfficiency": "Jeder PTO-Tag gibt dir im Schnitt {ratio} freie Tage zurück.",
 				"visualCalendar": "Du siehst das ganze Jahr in einem übersichtlichen Kalender.",
 				"bookFirst": "Du buchst zuerst, ohne schlechtes Gewissen, mit Daten.",
 				"burnAllDays": "Du verbrauchst 100% deiner Tage. So wie es sein sollte."
@@ -1070,7 +1070,7 @@
 			"freeFeatures": {
 				"optimizedPlan": "Auto-optimierter Urlaubsplan",
 				"countryHolidays": "Feiertage deines Landes und deiner Region",
-				"threeStrategies": "{count} Strategien (Gruppiert, Optimiert, Ausgewogen, Haupturlaub)",
+				"strategies": "{count} Strategien (Gruppiert, Optimiert, Ausgewogen, Haupturlaub)",
 				"basicStats": "Grundlegende Statistiken & Rechner"
 			},
 			"freeCta": "Kostenlos starten",

@@ -163,7 +163,7 @@
 				},
 				"strategies": {
 					"question": "Qual è la differenza tra le strategie \"raggruppata\", \"ottimizzata\", \"bilanciata\" e \"vacanza principale\"?",
-					"answer": "Ottimizzata ti dà il massimo di giorni liberi effettivi per ogni giorno di PTO, soprattutto in weekend lunghi distribuiti durante l'anno. Raggruppata cede parte di questa efficienza in cambio di poche vacanze lunghe di circa due settimane. Bilanciata fa in modo che tu non lavori mai troppo a lungo senza riposo: mette un weekend lungo ogni poche settimane così nessun periodo di lavoro si allunga. Vacanza principale mette un blocco lungo fino a due settimane nei mesi che scegli, poi distribuisce il resto come Ottimizzata."
+					"answer": "Ottimizzata ti dà il massimo di giorni liberi effettivi per ogni giorno di PTO, soprattutto in weekend lunghi distribuiti durante l'anno. Raggruppata cede parte di questa efficienza in cambio di poche vacanze lunghe di circa due settimane. Bilanciata fa in modo che tu non lavori mai troppo a lungo senza riposo: mette un weekend lungo ogni poche settimane così nessun periodo di lavoro si allunga. Vacanza principale mette un blocco fino a due settimane nei mesi che scegli, poi distribuisce il resto come Ottimizzata."
 				},
 				"results": {
 					"question": "Perché i suggerimenti cambiano quando aggiorno preferenze o festività?",
@@ -521,7 +521,7 @@
 					"moreDays": "Più giorni totali"
 				},
 				"cons": {
-					"shortBreaks": "Soprattutto weekend lunghi",
+					"mostlyLongWeekends": "Soprattutto weekend lunghi",
 					"noLongTrip": "Nessun viaggio lungo"
 				}
 			},
@@ -548,15 +548,15 @@
 				},
 				"cons": {
 					"fewerDays": "Meno giorni totali",
-					"oneBlock": "Un solo blocco lungo"
+					"oneBlock": "Un solo grande viaggio"
 				}
 			}
 		},
 		"preferredMonths": {
 			"title": "Mesi preferiti",
 			"tooltipLabel": "Informazioni sui mesi preferiti",
-			"tooltip": "Vacanza principale crea il suo blocco lungo in questi mesi. Se non ne scegli nessuno, cerca il periodo migliore dell'anno.",
-			"anyMonth": "Nessun mese scelto: il blocco va dove rende di più."
+			"tooltip": "La strategia Vacanza principale mette il suo blocco in questi mesi. Se non ne scegli nessuno, cerca il periodo migliore dell'anno.",
+			"anyMonth": "Nessun mese scelto: il blocco va dove può essere più lungo."
 		},
 		"allowPastDays": {
 			"title": "Consenti giorni passati",
@@ -935,7 +935,7 @@
 			"demoLink": "Scopri come funziona (30s)",
 			"stars": "{rating} · usato da {users} dipendenti ribelli",
 			"mockupLabel": "Giorni liberi reali in un anno",
-			"mockupRatio": "giorni · efficienza 3,36×",
+			"mockupRatio": "giorni · efficienza {ratio}×",
 			"mockupQuote": "\"Sono 22 weekend lunghi, capitano.\"",
 			"mockupLegendPto": "PTO",
 			"mockupLegendHoliday": "Festivo",
@@ -943,7 +943,7 @@
 			"mockupFieldPto": "Giorni PTO",
 			"mockupFieldPtoUnit": "giorni/anno",
 			"mockupFieldCountry": "Paese",
-			"mockupFieldHolidays": "12 festivi"
+			"mockupFieldHolidays": "{count} festivi"
 		},
 		"marquee": {
 			"items": "ponte di pasqua · ponte del primo maggio · estate infinita · ponte di ferragosto · natale prolungato · ponte di novembre · ponte del 25 aprile · ponte del 2 giugno · ponte di ottobre · capodanno prolungato"
@@ -980,7 +980,7 @@
 			"bridgeTitle": "Trasforma 1 giorno di PTO in 4 giorni liberi.",
 			"bridgeDescription": "Rileva festivi di martedì e giovedì e suggerisce ponti minimi. Un giorno strategico = un weekend di 4 giorni.",
 			"ratioTag": "max efficienza",
-			"ratioDescription": "Miglior efficienza: 8 giorni PTO trasformati in 28 liberi (IT).",
+			"ratioDescription": "Miglior efficienza: 8 giorni PTO trasformati in 28 liberi (Italia).",
 			"syncTag": "Sync in 1 click",
 			"syncTitle": "Google · Outlook · iCal",
 			"syncDescription": "Esporta il tuo piano nel calendario che già usi. Senza complicazioni.",
@@ -1013,7 +1013,7 @@
 			"withTitle": "😎 Con Forever PTO",
 			"withItems": {
 				"planInJanuary": "Pianifichi tutto a gennaio, mentre aspetti il caffè.",
-				"dayEfficiency": "ogni giorno PTO vale in media 3,3 giorni liberi.",
+				"dayEfficiency": "ogni giorno PTO vale in media {ratio} giorni liberi.",
 				"visualCalendar": "Visualizzi l'intero anno in un calendario chiaro.",
 				"bookFirst": "Prenoti per primo, senza sensi di colpa, con dati.",
 				"burnAllDays": "Usi il 100% dei tuoi giorni. Come si deve."
@@ -1070,7 +1070,7 @@
 			"freeFeatures": {
 				"optimizedPlan": "Piano vacanze auto-ottimizzato",
 				"countryHolidays": "Festività del tuo paese e regione",
-				"threeStrategies": "{count} strategie (Raggruppata, Ottimizzata, Bilanciata, Vacanza principale)",
+				"strategies": "{count} strategie (Raggruppata, Ottimizzata, Bilanciata, Vacanza principale)",
 				"basicStats": "Statistiche di base e calcolatrici"
 			},
 			"freeCta": "Inizia gratis",

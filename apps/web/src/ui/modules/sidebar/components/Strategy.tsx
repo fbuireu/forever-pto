@@ -14,7 +14,7 @@ import { SidebarFieldLabel } from "@ui/modules/sidebar/components/SidebarFieldLa
 import { cn } from "@ui/utils/cn";
 import { AlertCircle, CheckCircle2, DicesIcon, Plane, Scale, TrendingUp } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { type ElementType, useMemo, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 
 const STRATEGY_ICONS = {
@@ -22,7 +22,15 @@ const STRATEGY_ICONS = {
 	[FilterStrategy.OPTIMIZED]: TrendingUp,
 	[FilterStrategy.BALANCED]: Scale,
 	[FilterStrategy.MAIN_VACATION]: Plane,
-} as const;
+} as const satisfies Record<FilterStrategy, ElementType>;
+
+interface StrategyDetails {
+	label: string;
+	description: string;
+	subtitle: string;
+	pros: string[];
+	cons: string[];
+}
 
 export const Strategy = () => {
 	const t = useTranslations("sidebar.strategy");
@@ -34,47 +42,40 @@ export const Strategy = () => {
 	);
 	const [detailsOpen, setDetailsOpen] = useState(false);
 
-	const strategies = useMemo(
-		() => [
-			{
-				value: FilterStrategy.GROUPED,
+	const strategies = useMemo(() => {
+		const details: Record<FilterStrategy, StrategyDetails> = {
+			[FilterStrategy.GROUPED]: {
 				label: t("grouped.label"),
-				icon: STRATEGY_ICONS[FilterStrategy.GROUPED],
 				description: t("grouped.description"),
 				subtitle: t("grouped.subtitle"),
 				pros: [t("grouped.pros.longVacations"), t("grouped.pros.wholeWeeks")],
 				cons: [t("grouped.cons.fewerDays"), t("grouped.cons.lowerEfficiency")],
 			},
-			{
-				value: FilterStrategy.OPTIMIZED,
+			[FilterStrategy.OPTIMIZED]: {
 				label: t("optimized.label"),
-				icon: STRATEGY_ICONS[FilterStrategy.OPTIMIZED],
 				description: t("optimized.description"),
 				subtitle: t("optimized.subtitle"),
 				pros: [t("optimized.pros.maximumEfficiency"), t("optimized.pros.moreDays")],
-				cons: [t("optimized.cons.shortBreaks"), t("optimized.cons.noLongTrip")],
+				cons: [t("optimized.cons.mostlyLongWeekends"), t("optimized.cons.noLongTrip")],
 			},
-			{
-				value: FilterStrategy.BALANCED,
+			[FilterStrategy.BALANCED]: {
 				label: t("balanced.label"),
-				icon: STRATEGY_ICONS[FilterStrategy.BALANCED],
 				description: t("balanced.description"),
 				subtitle: t("balanced.subtitle"),
 				pros: [t("balanced.pros.noLongStretch"), t("balanced.pros.restAllYear")],
 				cons: [t("balanced.cons.noMaximization"), t("balanced.cons.noLongTrip")],
 			},
-			{
-				value: FilterStrategy.MAIN_VACATION,
+			[FilterStrategy.MAIN_VACATION]: {
 				label: t("mainVacation.label"),
-				icon: STRATEGY_ICONS[FilterStrategy.MAIN_VACATION],
 				description: t("mainVacation.description"),
 				subtitle: t("mainVacation.subtitle"),
 				pros: [t("mainVacation.pros.yourTrip"), t("mainVacation.pros.bridgesAfter")],
 				cons: [t("mainVacation.cons.fewerDays"), t("mainVacation.cons.oneBlock")],
 			},
-		],
-		[t],
-	);
+		};
+
+		return Object.values(FilterStrategy).map((value) => ({ value, icon: STRATEGY_ICONS[value], ...details[value] }));
+	}, [t]);
 
 	const handleStrategyChange = (value: FilterStrategy) => {
 		setStrategy(value);

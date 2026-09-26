@@ -9,7 +9,7 @@ import { TrendingUp } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { getMonthNames } from "../utils/helpers";
+import { getWindowMonthLabels } from "../utils/helpers";
 import { COLOR_SCHEMES } from "./const";
 
 interface MonthlyDistributionChartProps {
@@ -23,7 +23,7 @@ export const MonthlyDistributionChart = ({ monthlyDist, year, carryOverMonths }:
 	const t = useTranslations("charts");
 	const { monthNames, timelineData, monthLabelMap } = useMemo(() => {
 		const totalMonths = MONTHS_IN_YEAR + carryOverMonths;
-		const names = getMonthNames({ locale, monthCount: totalMonths, startYear: year });
+		const names = getWindowMonthLabels({ locale, monthCount: totalMonths, startYear: year });
 		const paddedMonthlyDist = [...monthlyDist, ...Array(Math.max(0, totalMonths - monthlyDist.length)).fill(0)];
 		const data = paddedMonthlyDist.map((value, index) => ({
 			mes: names[index] || `Month ${index + 1}`,

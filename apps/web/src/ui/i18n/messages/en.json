@@ -163,7 +163,7 @@
 				},
 				"strategies": {
 					"question": "What is the difference between the \"grouped\", \"optimized\", \"balanced\" and \"main vacation\" strategies?",
-					"answer": "Optimized gets you the most effective days off per PTO day, mostly as long weekends spread across the year. Grouped trades some of that efficiency for a few long vacations of about two weeks. Balanced makes sure you never work too long without rest: it places a long weekend every few weeks so no stretch of work runs long. Main vacation puts one long block of up to two weeks in the months you choose, then spends the rest like Optimized."
+					"answer": "Optimized gets you the most effective days off per PTO day, mostly as long weekends spread across the year. Grouped trades some of that efficiency for a few long vacations of about two weeks. Balanced makes sure you never work too long without rest: it places a long weekend every few weeks so no stretch of work runs long. Main vacation puts one block of up to two weeks in the months you choose, then spends the rest like Optimized."
 				},
 				"results": {
 					"question": "Why do recommendations change when I update preferences or holidays?",
@@ -521,7 +521,7 @@
 					"moreDays": "More total days"
 				},
 				"cons": {
-					"shortBreaks": "Mostly long weekends",
+					"mostlyLongWeekends": "Mostly long weekends",
 					"noLongTrip": "No long trip"
 				}
 			},
@@ -548,15 +548,15 @@
 				},
 				"cons": {
 					"fewerDays": "Fewer total days",
-					"oneBlock": "One long block only"
+					"oneBlock": "Only one big trip"
 				}
 			}
 		},
 		"preferredMonths": {
 			"title": "Preferred months",
 			"tooltipLabel": "About preferred months",
-			"tooltip": "Main vacation builds its long block inside these months. Pick none to let it find the best time of year.",
-			"anyMonth": "No month picked: the block goes wherever it returns most."
+			"tooltip": "The Main vacation strategy places its block inside these months. Pick none to let it find the best time of year.",
+			"anyMonth": "No month picked: the block goes wherever it can be longest."
 		},
 		"allowPastDays": {
 			"title": "Allow past days",
@@ -935,7 +935,7 @@
 			"demoLink": "See how it works (30s)",
 			"stars": "{rating} · used by {users} rebel employees",
 			"mockupLabel": "Real days off in a year",
-			"mockupRatio": "days · efficiency 3.36×",
+			"mockupRatio": "days · efficiency {ratio}×",
 			"mockupQuote": "\"That's 22 long weekends, captain.\"",
 			"mockupLegendPto": "PTO",
 			"mockupLegendHoliday": "Holiday",
@@ -943,7 +943,7 @@
 			"mockupFieldPto": "PTO days",
 			"mockupFieldPtoUnit": "days/yr",
 			"mockupFieldCountry": "Country",
-			"mockupFieldHolidays": "12 holidays"
+			"mockupFieldHolidays": "{count} holidays"
 		},
 		"marquee": {
 			"items": "easter break · public holiday weekend · summer stretch · thanksgiving bridge · christmas stretch · november bridge · whit monday bridge · may day long weekend · august public holiday · new year stretch"
@@ -1013,7 +1013,7 @@
 			"withTitle": "😎 With Forever PTO",
 			"withItems": {
 				"planInJanuary": "You plan everything in January, while waiting for your coffee.",
-				"dayEfficiency": "Each PTO day gives you back 3.3 free days on average.",
+				"dayEfficiency": "Each PTO day gives you back {ratio} free days on average.",
 				"visualCalendar": "You visualize the whole year in a clear calendar.",
 				"bookFirst": "You book first, guilt-free, with data.",
 				"burnAllDays": "You burn 100% of your days. As it should be."
@@ -1070,7 +1070,7 @@
 			"freeFeatures": {
 				"optimizedPlan": "Auto-optimized vacation plan",
 				"countryHolidays": "Country & region holidays",
-				"threeStrategies": "{count} strategies (Grouped, Optimized, Balanced, Main vacation)",
+				"strategies": "{count} strategies (Grouped, Optimized, Balanced, Main vacation)",
 				"basicStats": "Basic efficiency stats & calculators"
 			},
 			"freeCta": "Start for free",

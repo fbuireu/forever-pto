@@ -128,11 +128,11 @@ describe("AppSidebar", () => {
 		}
 	});
 
-	it("hands the same current year to both components that draw a window around it", async () => {
+	it("hands the current year to Years, and none to PtoCalculator, whose month names carry no year", async () => {
 		await renderSidebar();
 
 		expect(dynamicProps("Years")).toStrictEqual({ currentYear: 2026 });
-		expect(dynamicProps("PtoCalculator")).toStrictEqual({ currentYear: 2026 });
+		expect(dynamicProps("PtoCalculator")).toStrictEqual({});
 	});
 
 	it("hands the locale down to Countries instead of letting it read the request", async () => {
