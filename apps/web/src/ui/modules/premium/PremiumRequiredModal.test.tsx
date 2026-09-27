@@ -1,4 +1,5 @@
 import { PremiumFeatureId } from "@application/stores/premium";
+import { useUIStore } from "@application/stores/ui";
 import enMessages from "@i18n/messages/en.json";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
@@ -41,6 +42,16 @@ afterEach(() => {
 });
 
 describe("PremiumRequiredModal", () => {
+	it("closes itself and opens the donation popover from its call to action", () => {
+		useUIStore.setState({ donatePopoverOpen: false });
+		const onClose = renderModal(vi.fn().mockResolvedValue(true));
+
+		fireEvent.click(screen.getByRole("button", { name: enMessages.premium.becomePremium }));
+
+		expect(onClose).toHaveBeenCalledTimes(1);
+		expect(useUIStore.getState().donatePopoverOpen).toBe(true);
+	});
+
 	it("names the gated feature in the reader's language", () => {
 		renderModal(vi.fn().mockResolvedValue(true));
 

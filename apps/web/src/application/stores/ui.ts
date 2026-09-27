@@ -6,6 +6,7 @@ export const DonateSource = {
 	FLOATING: "floating",
 	PLANNER_TOAST: "planner_toast",
 	PRICING: "pricing",
+	PREMIUM_MODAL: "premium_modal",
 } as const;
 
 export type DonateSource = (typeof DonateSource)[keyof typeof DonateSource];

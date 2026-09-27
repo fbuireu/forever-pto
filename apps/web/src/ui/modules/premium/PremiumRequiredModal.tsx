@@ -1,6 +1,7 @@
 "use client";
 
 import type { PremiumFeatureId } from "@application/stores/premium";
+import { DonateSource, useUIStore } from "@application/stores/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
 	Dialog,
@@ -11,6 +12,7 @@ import {
 } from "@ui/modules/core/animate/base/Dialog";
 import { Lock } from "@ui/modules/core/animate/icons/Lock";
 import { Banner } from "@ui/modules/core/primitives/Banner";
+import { Button } from "@ui/modules/core/primitives/Button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@ui/modules/core/primitives/Form";
 import { Input } from "@ui/modules/core/primitives/Input";
 import { FormButtons } from "@ui/modules/shared/FormButtons";
@@ -49,6 +51,8 @@ export const PremiumRequiredModal = ({
 }: PremiumRequiredModalProps) => {
 	const t = useTranslations("premiumModal");
 	const tA11y = useTranslations("a11y");
+	const tPremium = useTranslations("premium");
+	const openDonatePopover = useUIStore((state) => state.openDonatePopover);
 	const tEmail = useTranslations("validation.email");
 	const featureLabel = usePremiumFeatureLabel();
 	const [step, setStep] = useState<Step>(Step.INPUT);
@@ -92,6 +96,11 @@ export const PremiumRequiredModal = ({
 		setStep(Step.ERROR);
 	};
 
+	const handleBecomePremium = () => {
+		handleClose();
+		openDonatePopover(DonateSource.PREMIUM_MODAL);
+	};
+
 	const handleTryAgain = () => {
 		setStep(Step.INPUT);
 		form.clearErrors();
@@ -112,7 +121,12 @@ export const PremiumRequiredModal = ({
 					</Banner>
 					<DialogDescription>{t("verifyDescription")}</DialogDescription>
 				</DialogHeader>
-				<p className="text-sm text-muted-foreground">{t("considerDonating")}</p>
+				<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+					<p className="text-sm text-muted-foreground">{t("considerDonating")}</p>
+					<Button type="button" variant="accent" size="sm" onClick={handleBecomePremium} className="shrink-0">
+						{tPremium("becomePremium")}
+					</Button>
+				</div>
 
 				{step === Step.INPUT && (
 					<Form {...form}>
