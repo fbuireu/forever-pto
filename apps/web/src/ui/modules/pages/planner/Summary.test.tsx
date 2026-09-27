@@ -239,6 +239,25 @@ describe("the banner that says a better plan exists", () => {
 		expect(container.textContent).not.toContain("1 more days");
 	});
 
+	it("compares only with the Alternatives the chosen Strategy found, not with another Strategy's plan", () => {
+		resetPlan();
+		holidaysState.alternatives = [{ ...planOf([JAN(6)], 9), strategy: "optimized" }, planOf([JAN(7)], 6)];
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain("1 more day");
+		expect(container.textContent).not.toContain("4 more days");
+	});
+
+	it("names the Strategy that found the plan on screen, not only the one chosen in the sidebar", () => {
+		resetPlan();
+		holidaysState.currentSelection = { ...planOf([JAN(6)], 9), strategy: "optimized" };
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain(enMessages.sidebar.strategy.optimized.label);
+	});
+
 	it("ignores an Alternative carrying no metrics rather than counting it as nought", () => {
 		resetPlan();
 		holidaysState.alternatives = [null, planOf([JAN(6)], 7)];
@@ -300,7 +319,14 @@ describe("Summary loads its five charts lazily", () => {
 		expect(loaders).toHaveLength(5);
 
 		for (const loader of loaders) {
-			await expect(loader()).resolves.toEqual({ default: expect.any(Function) });
+			await expect(loader()).resolves.toEqual({ default: expect.anything() });
+		}
+	});
+
+	it("resolves each one to a memoised chart, so a calculation starting does not redraw them", async () => {
+		for (const loader of loaders) {
+			const { default: chart } = (await loader()) as { default: { $$typeof?: symbol } };
+			expect(chart.$$typeof).toBe(Symbol.for("react.memo"));
 		}
 	});
 });

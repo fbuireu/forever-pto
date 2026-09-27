@@ -9,11 +9,11 @@ import {
 	calculateMaxWorkStreak,
 	calculateQuarterDistribution,
 	calculateRestBlocks,
+	getBridgesInUse,
 	getFirstLastBreak,
 	getLongBlocksPerQuarter,
 	getMonthlyDist,
 	getTotalEffectiveDays,
-	getValidBridges,
 	getWorkedDaysPerMonth,
 } from "./utils/helpers";
 import { freeStreaks } from "./utils/streaks";
@@ -44,8 +44,8 @@ export const generateMetrics = ({
 	const monthlyDist = getMonthlyDist({ days, window: planningWindow });
 	const streaks = freeStreaks({ placedDays: days, holidays });
 	const longBlocksPerQuarter = getLongBlocksPerQuarter({ streaks, window: planningWindow });
-	const totalEffectiveDays = getTotalEffectiveDays({ days, bridges, holidays });
-	const bridgesUsed = getValidBridges({ days, bridges }).length;
+	const totalEffectiveDays = getTotalEffectiveDays(streaks);
+	const bridgesUsed = getBridgesInUse({ days, bridges }).length;
 	const longWeekends = calculateLongWeekends(streaks);
 	const longestVacation = calculateLongestVacation(streaks);
 

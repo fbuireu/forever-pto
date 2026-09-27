@@ -6,7 +6,7 @@ import {
 	eachWeekendOfInterval,
 	endOfMonth,
 	endOfWeek,
-	formatDate,
+	getMonthNames,
 	isWeekend,
 	startOfMonth,
 	startOfWeek,
@@ -87,23 +87,18 @@ export function calculateHolidaysInRange({ range, holidays }: DateRangeCountPara
 	}).length;
 }
 
-interface GetMonthsParamsNames {
+interface GetWindowMonthLabelsParams {
 	locale: string;
 	monthCount: number;
 	startYear: number;
-	monthOutputFormat?: "short" | "long";
 }
 
-export const getMonthNames = ({ locale, monthCount, startYear, monthOutputFormat = "short" }: GetMonthsParamsNames) => {
-	const monthNames: string[] = [];
-	const format = monthOutputFormat === "long" ? "MMMM" : "MMM";
-	for (let i = 0; i < monthCount; i++) {
-		const year = startYear + Math.floor(i / MONTHS_IN_YEAR);
-		const month = i % MONTHS_IN_YEAR;
-		const date = new Date(year, month, 1);
-		const monthName = formatDate({ date, locale, format });
-		const yearSuffix = i >= MONTHS_IN_YEAR ? ` '${year.toString().slice(-2)}` : "";
-		monthNames.push(`${monthName}${yearSuffix}`);
-	}
-	return monthNames;
+export const getWindowMonthLabels = ({ locale, monthCount, startYear }: GetWindowMonthLabelsParams) => {
+	const names = getMonthNames({ locale });
+
+	return Array.from({ length: monthCount }, (_, index) => {
+		const year = startYear + Math.floor(index / MONTHS_IN_YEAR);
+		const yearSuffix = index >= MONTHS_IN_YEAR ? ` '${year.toString().slice(-2)}` : "";
+		return `${names[index % MONTHS_IN_YEAR]}${yearSuffix}`;
+	});
 };

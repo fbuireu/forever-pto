@@ -140,6 +140,14 @@ applied to markup a library owns, and that file is compiled on its own without i
 `@apply` has nothing to resolve either. A comment there names this utility as the thing the copy must
 track; change the insets here and the copy will not follow.
 
+**The driver.js buttons copy `Button`'s variants by value for the same reason.** Next is the `default`
+variant, so it casts the accent trio: an ink face over a frame shadow drew no shadow at all. Done is `success`,
+so its greens are Tailwind's `green-700` and `green-800` written as `oklch()` literals, since the theme
+variables are emitted only into the Tailwind build this file is not part of. Previous is `outline`, and the
+close button is the Dialog's. The step counter takes the quick start's mono kicker, and the title keeps room
+on its right for the close button, as a Dialog header row does. Retune a variant in `Button.tsx` and these
+rules will not follow.
+
 ## Biome formats all of these folders
 
 Biome's CSS parser rejects Tailwind-only at-rules by default: `@apply` in `base/`, `@theme inline` and

@@ -58,7 +58,7 @@ describe("WebMCP", () => {
 		};
 
 		expect(info.locales).toEqual(LOCALES);
-		expect(info.strategies).toEqual(["grouped", "optimized", "balanced"]);
+		expect(info.strategies).toEqual(["grouped", "optimized", "balanced", "mainVacation"]);
 		expect(info.url).toBe(globalThis.location.origin);
 	});
 

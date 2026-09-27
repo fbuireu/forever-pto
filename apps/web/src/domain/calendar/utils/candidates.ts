@@ -1,10 +1,12 @@
 import type { HolidayDTO } from "@application/dto/holiday/types";
 import type { Bridge } from "../types";
-import { findBridges, getAvailableWorkdays } from "./helpers";
+import { findBridges, freeDaysAround, getAvailableWorkdays } from "./helpers";
 
 export interface PlanningCandidates {
 	availableWorkdays: Date[];
 	bridges: Bridge[];
+	manualDays: Date[];
+	alreadyOff: Date[];
 }
 
 interface FindPlanningCandidatesParams {
@@ -12,6 +14,7 @@ interface FindPlanningCandidatesParams {
 	months: Date[];
 	allowPastDays: boolean;
 	removedDays?: Date[];
+	manualDays: Date[];
 }
 
 export const findPlanningCandidates = ({
@@ -19,8 +22,32 @@ export const findPlanningCandidates = ({
 	months,
 	allowPastDays,
 	removedDays,
+	manualDays,
 }: FindPlanningCandidatesParams): PlanningCandidates => {
 	const availableWorkdays = getAvailableWorkdays({ months, holidays, allowPastDays, removedDays });
 
-	return { availableWorkdays, bridges: findBridges({ availableWorkdays, holidays }) };
+	return {
+		availableWorkdays,
+		bridges: findBridges({ availableWorkdays, holidays }),
+		manualDays,
+		alreadyOff: freeDaysAround({ days: manualDays, holidays }),
+	};
 };
+
+interface SelectionInputParams {
+	candidates: PlanningCandidates;
+	ptoDays: number;
+	preferredMonths?: number[];
+}
+
+export const selectionInputOf = ({
+	candidates: { bridges, availableWorkdays, alreadyOff },
+	ptoDays,
+	preferredMonths,
+}: SelectionInputParams) => ({
+	bridges,
+	targetPtoDays: ptoDays,
+	preferredMonths,
+	workdays: availableWorkdays,
+	alreadyOff,
+});

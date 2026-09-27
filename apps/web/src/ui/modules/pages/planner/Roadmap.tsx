@@ -119,19 +119,19 @@ export function Roadmap() {
 					description: t("features.calendarExportDescription"),
 					quarter: "Q2 2026",
 				},
-			],
-			[CategoryStatus.IN_PROGRESS]: [
 				{
 					id: "7",
 					title: t("features.performanceOptimization"),
 					description: t("features.performanceOptimizationDescription"),
 					quarter: "Q3 2026",
 				},
+			],
+			[CategoryStatus.IN_PROGRESS]: [
 				{
 					id: "16",
 					title: t("features.blockedPeriods"),
 					description: t("features.blockedPeriodsDescription"),
-					quarter: "Q3 2026",
+					quarter: "Q1 2027",
 				},
 			],
 			[CategoryStatus.PLANNED]: [
@@ -139,13 +139,13 @@ export function Roadmap() {
 					id: "9",
 					title: t("features.teamPlanning"),
 					description: t("features.teamPlanningDescription"),
-					quarter: "Q4 2026",
+					quarter: "Q3 2027",
 				},
 				{
 					id: "10",
 					title: t("features.emailNotifications"),
 					description: t("features.emailNotificationsDescription"),
-					quarter: "Q4 2026",
+					quarter: "Q3 2027",
 				},
 			],
 			[CategoryStatus.FUTURE]: [

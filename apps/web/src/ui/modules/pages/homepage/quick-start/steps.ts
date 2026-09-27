@@ -1,5 +1,7 @@
 import type { FiltersState } from "@application/stores/filters";
 
+export const PLANNER_PATH = "/planner";
+
 export const QuickStartStep = {
 	LOCATION: "location",
 	PTO_DAYS: "ptoDays",
@@ -32,6 +34,7 @@ export function createDraft({ filters, detectedCountry }: CreateDraftParams): Qu
 		year: filters.year,
 		carryOverMonths: filters.carryOverMonths,
 		strategy: filters.strategy,
+		preferredMonths: filters.preferredMonths,
 	};
 }
 
@@ -68,6 +71,7 @@ export function trackedDraft(draft: QuickStartDraft) {
 		region: draft.region,
 		year: draft.year,
 		strategy: draft.strategy,
+		preferredMonths: draft.preferredMonths.join(","),
 		allowPastDays: draft.allowPastDays,
 		carryOverMonths: draft.carryOverMonths,
 	};

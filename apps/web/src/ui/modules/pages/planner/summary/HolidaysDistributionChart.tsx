@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@ui/modules/core/primi
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
 import { PieChart } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import { Cell, Legend, Pie, PieChart as RechartsPieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { COLOR_SCHEMES } from "./const";
 
@@ -31,7 +31,10 @@ const HolidaysDistributionChartLegend = ({ payload }: { payload?: readonly Legen
 	</ul>
 );
 
-export const HolidaysDistributionChart = ({ ptoDays, holidays }: HolidaysDistributionChartProps) => {
+export const HolidaysDistributionChart = memo(function HolidaysDistributionChart({
+	ptoDays,
+	holidays,
+}: HolidaysDistributionChartProps) {
 	const t = useTranslations("charts");
 
 	const chartData = useMemo(() => {
@@ -113,4 +116,4 @@ export const HolidaysDistributionChart = ({ ptoDays, holidays }: HolidaysDistrib
 			</Card>
 		</PremiumFeature>
 	);
-};
+});

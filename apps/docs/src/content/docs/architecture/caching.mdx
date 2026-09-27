@@ -1,11 +1,11 @@
 ---
 title: Caching
-description: Why Cache Components are off, the OpenNext R2 incremental cache and the proxy markdown cache.
+description: Why Cache Components are off, the OpenNext R2 incremental cache, the immutable build assets and the proxy markdown cache.
 sidebar:
   order: 7
 ---
 
-Caching happens at separate levels: an R2-backed incremental cache at the OpenNext/Workers level, and plain `Cache-Control` headers for the agent-facing markdown surface. Next's Cache Components are deliberately not another.
+Caching happens at separate levels: an R2-backed incremental cache at the OpenNext/Workers level, and plain `Cache-Control` headers for the hashed build assets and the agent-facing markdown surface. Next's Cache Components are deliberately not another.
 
 ## Cache Components are off
 
@@ -30,6 +30,7 @@ At runtime this is backed by the R2 bucket bound as `NEXT_INC_CACHE_R2_BUCKET` i
 
 ## HTTP-level caches
 
+- **The hashed build assets**: `apps/web/public/_headers` gives the `_next/static` tree `public, max-age=31536000, immutable`. Workers Static Assets serve every file with `max-age=0, must-revalidate` unless a `_headers` file in the assets directory says otherwise, so every page load used to revalidate its 30 to 40 chunks, its CSS and its fonts, one round trip each. OpenNext copies `public/` into `.open-next/assets`, which is where the rule has to land. It covers that tree alone, because its file names carry a content hash, and nothing a deploy can change under the same URL; `tests/docs-consistency.test.ts` asserts the rule. The docs site carries a `_headers` of its own, for its security headers.
 - **Markdown renditions**: `markdownTwinHeaders` in `apps/web/src/infrastructure/markdown/twin.ts` sets `public, max-age=3600` on a found page and `no-store` on a miss, with `Vary: Accept` on both. The [proxy](/architecture/proxy/) states no cache policy itself, because it runs before the lookup; see the [Markdown API](/how-it-works/markdown-api/#the-headers) page.
 
 ## What is deliberately not cached

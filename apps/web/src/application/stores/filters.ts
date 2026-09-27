@@ -1,5 +1,5 @@
 import { DEFAULT_FILTER_STRATEGY, type FilterStrategy, isFilterStrategy } from "@domain/calendar/types";
-import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
+import { DEFAULT_PREFERRED_MONTHS, isPreferredMonths, MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { obfuscatedStorage } from "./crypto";
@@ -13,6 +13,7 @@ export interface FiltersState {
 	year: number;
 	carryOverMonths: number;
 	strategy: FilterStrategy;
+	preferredMonths: number[];
 }
 
 interface FilterActions {
@@ -23,6 +24,7 @@ interface FilterActions {
 	setYear: (year: number) => void;
 	setCarryOverMonths: (months: number) => void;
 	setStrategy: (strategy: FilterStrategy) => void;
+	setPreferredMonths: (months: number[]) => void;
 	resetToDefaults: () => void;
 }
 
@@ -43,6 +45,9 @@ interface ClampParams {
 
 const clamp = ({ value, min, max }: ClampParams) => Math.min(max, Math.max(min, value));
 
+const preferredMonthsOf = (months: unknown) =>
+	isPreferredMonths(months) ? months.toSorted((a, b) => a - b) : [...DEFAULT_PREFERRED_MONTHS];
+
 const initialState: FiltersState = {
 	ptoDays: 22,
 	allowPastDays: false,
@@ -51,6 +56,7 @@ const initialState: FiltersState = {
 	year: new Date().getFullYear(),
 	carryOverMonths: 1,
 	strategy: DEFAULT_FILTER_STRATEGY,
+	preferredMonths: [...DEFAULT_PREFERRED_MONTHS],
 };
 
 const partializeFilters = (state: FiltersStore) => ({
@@ -60,6 +66,7 @@ const partializeFilters = (state: FiltersStore) => ({
 	region: state.region,
 	carryOverMonths: state.carryOverMonths,
 	strategy: state.strategy,
+	preferredMonths: state.preferredMonths,
 });
 
 type PersistedFiltersState = ReturnType<typeof partializeFilters>;
@@ -92,6 +99,14 @@ export const useFiltersStore = create<FiltersStore>()(
 						"setCarryOverMonths",
 					),
 				setStrategy: (strategy: FilterStrategy) => set({ strategy }, false, "setStrategy"),
+				setPreferredMonths: (months: number[]) =>
+					set(
+						{
+							preferredMonths: preferredMonthsOf(months),
+						},
+						false,
+						"setPreferredMonths",
+					),
 				resetToDefaults: () => set(initialState, false, "resetToDefaults"),
 			}),
 			{
@@ -117,6 +132,7 @@ export const useFiltersStore = create<FiltersStore>()(
 							max: MAX_CARRY_OVER_MONTHS,
 						});
 						state.strategy = isFilterStrategy(state.strategy) ? state.strategy : DEFAULT_FILTER_STRATEGY;
+						state.preferredMonths = preferredMonthsOf(state.preferredMonths);
 					}
 				},
 			},

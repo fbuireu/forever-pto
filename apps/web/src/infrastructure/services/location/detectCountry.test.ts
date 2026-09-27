@@ -5,6 +5,7 @@ const mockDetectCountryFromHeaders = vi.hoisted(() => vi.fn<() => string>());
 const mockDetectCountryFromEgressIP = vi.hoisted(() => vi.fn<() => Promise<string>>());
 
 vi.mock("./utils/strategies", () => ({
+	CLOUDFLARE_COUNTRY_HEADER: "cf-ipcountry",
 	detectCountryFromCDN: mockDetectCountryFromCDN,
 	detectCountryFromHeaders: mockDetectCountryFromHeaders,
 	detectCountryFromEgressIP: mockDetectCountryFromEgressIP,
@@ -12,34 +13,39 @@ vi.mock("./utils/strategies", () => ({
 
 const { detectCountry } = await import("./detectCountry");
 
-const mockRequest = {} as never;
+const onCloudflare = { headers: new Headers({ "cf-ipcountry": "ES" }) } as never;
+const offCloudflare = { headers: new Headers() } as never;
 
 describe("detectCountry", () => {
 	it("returns the header result when non-empty, without any network call", async () => {
 		mockDetectCountryFromHeaders.mockReturnValue("es");
-		expect(await detectCountry(mockRequest)).toBe("es");
+		expect(await detectCountry(onCloudflare)).toBe("es");
 		expect(mockDetectCountryFromCDN).not.toHaveBeenCalled();
 		expect(mockDetectCountryFromEgressIP).not.toHaveBeenCalled();
 	});
 
-	it("falls back to the CDN when the header is empty", async () => {
+	it("stops at a header Cloudflare could not resolve, because the fallbacks would locate the Worker, not the visitor", async () => {
 		mockDetectCountryFromHeaders.mockReturnValue("");
-		mockDetectCountryFromCDN.mockResolvedValue("de");
-		expect(await detectCountry(mockRequest)).toBe("de");
+		expect(await detectCountry(onCloudflare)).toBe("");
+		expect(mockDetectCountryFromCDN).not.toHaveBeenCalled();
 		expect(mockDetectCountryFromEgressIP).not.toHaveBeenCalled();
 	});
 
-	it("falls back to the egress IP when the header and the CDN both return empty", async () => {
-		mockDetectCountryFromHeaders.mockReturnValue("");
-		mockDetectCountryFromCDN.mockResolvedValue("");
-		mockDetectCountryFromEgressIP.mockResolvedValue("fr");
-		expect(await detectCountry(mockRequest)).toBe("fr");
+	it("falls back to the CDN when there is no header at all", async () => {
+		mockDetectCountryFromCDN.mockResolvedValue("de");
+		expect(await detectCountry(offCloudflare)).toBe("de");
+		expect(mockDetectCountryFromEgressIP).not.toHaveBeenCalled();
 	});
 
-	it("returns empty string when all strategies fail", async () => {
-		mockDetectCountryFromHeaders.mockReturnValue("");
+	it("falls back to the egress IP when the CDN returns empty too", async () => {
+		mockDetectCountryFromCDN.mockResolvedValue("");
+		mockDetectCountryFromEgressIP.mockResolvedValue("fr");
+		expect(await detectCountry(offCloudflare)).toBe("fr");
+	});
+
+	it("returns empty string when every strategy fails", async () => {
 		mockDetectCountryFromCDN.mockResolvedValue("");
 		mockDetectCountryFromEgressIP.mockResolvedValue("");
-		expect(await detectCountry(mockRequest)).toBe("");
+		expect(await detectCountry(offCloudflare)).toBe("");
 	});
 });

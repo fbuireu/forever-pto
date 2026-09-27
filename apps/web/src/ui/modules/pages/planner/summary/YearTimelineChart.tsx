@@ -7,7 +7,7 @@ import type { Suggestion } from "@domain/calendar/types";
 import { windowMonthCount } from "@domain/calendar/window";
 import { cn } from "@ui/utils/cn";
 import { useLocale, useTranslations } from "next-intl";
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import { Temporal } from "temporal-polyfill";
 
 interface Seg {
@@ -90,13 +90,13 @@ const ROW_COLOR: Record<string, string> = {
 	manual: "bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,var(--color-brand-teal)_82%)]",
 };
 
-export const YearTimelineChart = ({
+export const YearTimelineChart = memo(function YearTimelineChart({
 	year,
 	carryOverMonths,
 	holidays,
 	suggestion,
 	manuallySelectedDays,
-}: YearTimelineChartProps) => {
+}: YearTimelineChartProps) {
 	const t = useTranslations("summary");
 	const locale = useLocale();
 	const monthCount = windowMonthCount({ carryOverMonths });
@@ -185,4 +185,4 @@ export const YearTimelineChart = ({
 			</div>
 		</div>
 	);
-};
+});

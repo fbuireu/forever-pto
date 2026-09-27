@@ -7,34 +7,35 @@ import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import { Switch } from "@ui/modules/core/animate/base/Switch";
 import { Slider } from "@ui/modules/core/primitives/Slider";
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
-import { Scale, TrendingUp, Users } from "lucide-react";
+import { MonthToggles } from "@ui/modules/shared/MonthToggles";
+import { STRATEGY_ICONS } from "@ui/modules/shared/strategyIcons";
+import { cn } from "@ui/utils/cn";
 import { useTranslations } from "next-intl";
+import { CHOICE_CLASS } from "./choice";
 import type { QuickStartDraft } from "./steps";
 
-const STRATEGIES = [
-	{ value: FilterStrategy.GROUPED, icon: Users },
-	{ value: FilterStrategy.OPTIMIZED, icon: TrendingUp },
-	{ value: FilterStrategy.BALANCED, icon: Scale },
-] as const;
-
-const STRATEGY_CARD_CLASS =
-	"flex w-full cursor-pointer items-start gap-3 rounded-[10px] border-[3px] border-(--frame) bg-(--surface-panel) p-3 text-left shadow-(--shadow-brutal-xs) transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-(--shadow-brutal-sm) peer-checked:bg-(--accent) peer-checked:text-(--color-brand-ink) peer-checked:[&_span]:text-(--color-brand-ink) peer-focus-visible:ring-[3px] peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2";
+const STRATEGY_CARD_CLASS = cn(
+	CHOICE_CLASS,
+	"flex w-full items-start gap-3 p-3 text-left peer-checked:[&_span]:text-primary-foreground",
+);
 
 interface QuickStartSettingsStepProps {
-	draft: Pick<QuickStartDraft, "strategy" | "allowPastDays" | "carryOverMonths">;
+	draft: Pick<QuickStartDraft, "strategy" | "preferredMonths" | "allowPastDays" | "carryOverMonths" | "year">;
 	onChange: (patch: Partial<QuickStartDraft>) => void;
 }
 
 export const QuickStartSettingsStep = ({ draft, onChange }: QuickStartSettingsStepProps) => {
 	const t = useTranslations("quickStart.settings");
 	const tSidebar = useTranslations("sidebar");
+	const { year, carryOverMonths, allowPastDays, preferredMonths } = draft;
 
 	return (
-		<div className="space-y-6">
+		<div className="space-y-4">
 			<fieldset className="space-y-2">
 				<legend className="text-sm font-medium leading-none mb-2">{tSidebar("strategy.title")}</legend>
 				<div className="grid gap-2">
-					{STRATEGIES.map(({ value, icon: Icon }) => {
+					{Object.values(FilterStrategy).map((value) => {
+						const Icon = STRATEGY_ICONS[value];
 						const id = `quick-start-strategy-${value}`;
 
 						return (
@@ -60,6 +61,17 @@ export const QuickStartSettingsStep = ({ draft, onChange }: QuickStartSettingsSt
 					})}
 				</div>
 			</fieldset>
+
+			{draft.strategy === FilterStrategy.MAIN_VACATION && (
+				<MonthToggles
+					label={tSidebar("preferredMonths.title")}
+					legendClassName="text-sm font-medium leading-none mb-2"
+					planningWindow={{ year, carryOverMonths }}
+					allowPastDays={allowPastDays}
+					months={preferredMonths}
+					onChange={(months) => onChange({ preferredMonths: months })}
+				/>
+			)}
 
 			<p className="text-xs text-muted-foreground">{t("premiumHint")}</p>
 

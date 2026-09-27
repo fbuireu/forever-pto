@@ -79,12 +79,12 @@ describe("QuickStartForm", () => {
 		expect((screen.getByRole("button", { name: quickStart.back }) as HTMLButtonElement).disabled).toBe(true);
 	});
 
-	it("preselects the country the edge detected and loads its regions", () => {
+	it("preselects the country the edge detected and loads its regions", async () => {
 		cookie.country = "es";
 		renderForm();
 
 		expect(screen.getByLabelText(quickStart.location.country).textContent).toContain("Spain");
-		expect(getRegions).toHaveBeenCalledWith({ countryCode: "es" });
+		await vi.waitFor(() => expect(getRegions).toHaveBeenCalledWith({ countryCode: "es" }));
 		expect((screen.getByRole("button", { name: quickStart.next }) as HTMLButtonElement).disabled).toBe(false);
 	});
 
@@ -144,6 +144,26 @@ describe("QuickStartForm", () => {
 		expect(router.push).toHaveBeenCalledExactlyOnceWith("/planner");
 	});
 
+	it("writes the Preferred Months picked for Main vacation into the filters store", () => {
+		vi.useFakeTimers({ now: new Date(useFiltersStore.getState().year, 0, 15), toFake: ["Date"] });
+		try {
+			cookie.country = "es";
+			renderForm();
+
+			next();
+			next();
+			fireEvent.click(screen.getByLabelText(new RegExp(enMessages.sidebar.strategy.mainVacation.label)));
+			fireEvent.click(screen.getByRole("button", { name: /^June \d{4}$/ }));
+			finish();
+
+			const filters = useFiltersStore.getState();
+			expect(filters.strategy).toBe(FilterStrategy.MAIN_VACATION);
+			expect(filters.preferredMonths).toStrictEqual([5]);
+		} finally {
+			vi.useRealTimers();
+		}
+	});
+
 	it("reports each step it leaves and the planning inputs it finishes with", () => {
 		cookie.country = "es";
 		renderForm();
@@ -164,6 +184,7 @@ describe("QuickStartForm", () => {
 					region: "",
 					year: expect.any(Number),
 					strategy: FilterStrategy.GROUPED,
+					preferredMonths: "",
 					allowPastDays: false,
 					carryOverMonths: 1,
 				},

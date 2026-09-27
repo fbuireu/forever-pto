@@ -1,4 +1,5 @@
 import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
+import { startOfToday } from "@application/shared/utils/dates";
 import type { Locale } from "next-intl";
 import { generateAlternatives } from "./alternatives/generateAlternatives";
 import { generateMetrics } from "./metrics/generateMetrics";
@@ -7,7 +8,13 @@ import type { FilterStrategy, MeasuredSuggestion, Suggestion } from "./types";
 import { measureBudget } from "./utils/budget";
 import { clearDateKeyCache, clearHolidayCache } from "./utils/cache";
 import { findPlanningCandidates } from "./utils/candidates";
-import { type PlanningWindow, planningWindowMonths } from "./window";
+import {
+	type PlanningWindow,
+	planningWindowMonths,
+	preferredMonthKeys,
+	reachableMonths,
+	reachablePreferredMonths,
+} from "./window";
 
 export interface PlanningInput {
 	window: PlanningWindow;
@@ -18,6 +25,7 @@ export interface PlanningInput {
 	removedSuggestedDays?: Date[];
 	allowPastDays: boolean;
 	strategy: FilterStrategy;
+	preferredMonths?: number[];
 	locale: Locale;
 	maxAlternatives: number;
 }
@@ -37,6 +45,7 @@ export function runPlanningPipeline({
 	removedSuggestedDays = [],
 	allowPastDays,
 	strategy,
+	preferredMonths: requestedMonths = [],
 	locale,
 	maxAlternatives,
 }: PlanningInput): PlanningResult {
@@ -44,6 +53,13 @@ export function runPlanningPipeline({
 	clearHolidayCache();
 
 	const months = planningWindowMonths(window);
+	const preferredMonths = preferredMonthKeys({
+		year: window.year,
+		preferredMonths: reachablePreferredMonths({
+			preferredMonths: requestedMonths,
+			reachable: reachableMonths({ ...window, allowPastDays, today: startOfToday() }),
+		}),
+	});
 	const manualPseudoHolidays: HolidayDTO[] = manuallySelectedDays.map((date, index) => ({
 		id: `manual-${index}`,
 		date,
@@ -80,23 +96,25 @@ export function runPlanningPipeline({
 		months,
 		allowPastDays,
 		removedDays: removedSuggestedDays,
+		manualDays: manuallySelectedDays,
 	});
 
 	if (candidates.bridges.length === 0) return unplanned();
 
-	const baseSuggestion = generateSuggestions({ ptoDays: effectivePtoDays, candidates, strategy });
+	const baseSuggestion = generateSuggestions({ ptoDays: effectivePtoDays, candidates, strategy, preferredMonths });
 
-	const baseAlternatives = generateAlternatives({
+	const { suggestion, alternatives } = generateAlternatives({
 		ptoDays: effectivePtoDays,
 		candidates,
 		maxAlternatives,
-		existingSuggestion: baseSuggestion.days,
+		existingSuggestion: baseSuggestion,
 		strategy,
+		preferredMonths,
 	});
 
 	return {
 		planned: true,
-		suggestion: measure(baseSuggestion),
-		alternatives: baseAlternatives.map(measure),
+		suggestion: measure(suggestion),
+		alternatives: alternatives.map(measure),
 	};
 }

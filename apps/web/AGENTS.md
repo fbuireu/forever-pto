@@ -423,6 +423,16 @@ binding for the payment limiter, and smart placement. Only `env.production` bind
 route (`forever-pto.com/*`); `env.development` supplies the preview bindings and CI deploys one worker per PR
 from it: `pr-<number>-forever-pto-development.fbuireu.workers.dev`, deleted when the PR closes.
 
+**The hashed build output is cached for good, and [`public/_headers`](./public/_headers) is what says so.** Workers
+Static Assets serve every file with `max-age=0, must-revalidate` unless a `_headers` file in the assets directory
+says otherwise, so every page load revalidated its 30 to 40 chunks, its CSS and its fonts one round trip each.
+OpenNext copies `public/` into `.open-next/assets`, which is where the rule has to land; it covers the
+`_next/static` tree, whose file names carry a content hash, with the year-long `immutable` rule, and nothing a
+deploy can change under the same URL. The one other rule covers [`public/fonts/stripe/`](./public/fonts/stripe/fonts.css), the font copy the Stripe
+Elements iframe loads: it needs `Access-Control-Allow-Origin` because the request comes from Stripe's origin,
+and it takes a week's `max-age` without `immutable`, since those names carry no hash.
+`tests/docs-consistency.test.ts` asserts the rule. The docs site carries a `_headers` of its own for other reasons.
+
 **Logs and traces reach BetterStack through Cloudflare's own OTLP export, and nothing in this tree carries
 them.** `[observability.logs]` and `[observability.traces]` each name a `destinations` entry,
 one pair per stage, configured in the Cloudflare dashboard with the OTLP
@@ -504,7 +514,8 @@ differently depending on when it is asked:
   `getPlatformProxy`, which reads `wrangler.toml`'s **top-level** `[vars]`. `cf:build` passes no `--env`, so
   every build, production and preview alike, bakes `https://forever-pto.com` into whatever is prerendered.
   `robots.txt` is fully static with no revalidation and keeps it for the life of the deployment; the
-  `[locale]` shells carry it in `canonical`, `hrefLang` and `og:url` until their 24-hour revalidation.
+  `[locale]` shells carry it in `canonical`, `hrefLang` and `og:url` for the life of the deployment too: no
+  route revalidates, so a prerendered page changes only with the next deploy.
 
 So a preview's `robots.txt` advertises the production sitemap. That is tolerated rather than fixed because
 previews sit behind Cloudflare Access: nothing crawls them, which is why [`playwright.config.ts`](./playwright.config.ts) has to send
@@ -570,3 +581,13 @@ hour across identical attempts before reporting. `next build` fails deterministi
 than it fails for a reason a second attempt can fix, so the wrapper is gone and the step is a plain `run:`
 scoped with `working-directory`. The contract suite counts build steps the same way it counts deploys, so
 `docs.yml`'s build is covered too.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

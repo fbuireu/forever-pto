@@ -20,6 +20,7 @@ export const FilterStrategy = {
 	GROUPED: "grouped",
 	OPTIMIZED: "optimized",
 	BALANCED: "balanced",
+	MAIN_VACATION: "mainVacation",
 } as const;
 
 export type FilterStrategy = (typeof FilterStrategy)[keyof typeof FilterStrategy];

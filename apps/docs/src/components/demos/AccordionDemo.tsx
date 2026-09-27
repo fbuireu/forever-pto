@@ -14,7 +14,8 @@ const ITEMS = [
 	{
 		id: "strategies",
 		question: "What are strategies?",
-		answer: "Grouped, Optimized and Balanced change how aggressively PTO days are clustered around holidays.",
+		answer:
+			"Grouped, Optimized, Balanced and Main vacation change how PTO days are clustered around holidays, spread across the year or built around the trip you want.",
 	},
 	{
 		id: "regions",

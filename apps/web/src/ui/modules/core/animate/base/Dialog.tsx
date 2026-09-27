@@ -57,7 +57,7 @@ function DialogPopup({
 			<DialogBackdrop />
 			<DialogPopupPrimitive
 				className={cn(
-					"bg-card fixed top-[50%] left-[50%] z-200 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-[14px] border-[3px] border-(--frame) p-6 shadow-(--shadow-brutal-xl) sm:max-w-lg",
+					"bg-card fixed top-[50%] left-[50%] z-200 grid max-h-[calc(100dvh-2rem)] w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 overflow-y-auto overscroll-contain rounded-[14px] border-[3px] border-(--frame) p-6 shadow-(--shadow-brutal-xl) sm:max-w-lg",
 					className,
 				)}
 				{...props}
@@ -80,7 +80,7 @@ type DialogHeaderProps = DialogHeaderPrimitiveProps;
 function DialogHeader({ className, ...props }: DialogHeaderProps) {
 	return (
 		<DialogHeaderPrimitive
-			className={cn("flex flex-col gap-3 border-b-2 border-(--frame)/18 pb-4 text-center sm:text-left", className)}
+			className={cn("flex flex-col gap-3 border-b-2 border-(--frame)/18 pb-4 text-left", className)}
 			{...props}
 		/>
 	);

@@ -5,7 +5,7 @@ import { FilterStrategy, type MeasuredSuggestion } from "@domain/calendar/types"
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useFiltersStore } from "./filters";
 import { type HolidaysState, useHolidaysStore } from "./holidays";
-import { DayChange, DayRefusal, HolidayRefusal } from "./types";
+import { DayChange, DayRefusal, HolidayRefusal, holidaysKeyOf } from "./types";
 
 const { mockGetHolidays, mockRunPlanningPipeline, mockStorageGetItem } = vi.hoisted(() => ({
 	mockGetHolidays: vi.fn().mockResolvedValue([]),
@@ -850,6 +850,41 @@ describe("fetchHolidays", () => {
 		expect(useHolidaysStore.getState().holidays).toEqual([custom]);
 	});
 
+	it("records which filters the Holidays it set were fetched for", async () => {
+		mockGetHolidays.mockResolvedValueOnce([makeHoliday({ id: "h1", dateStr: "2026-06-01" })]);
+
+		await useHolidaysStore.getState().fetchHolidays(FETCH_PARAMS);
+
+		expect(useHolidaysStore.getState().holidaysKey).toBe(holidaysKeyOf(FETCH_PARAMS));
+	});
+
+	it("records the filters on error too, so the planner still plans on the Custom Holidays", async () => {
+		mockGetHolidays.mockRejectedValueOnce(new Error("network error"));
+
+		await useHolidaysStore.getState().fetchHolidays({ ...FETCH_PARAMS, year: 2027 });
+
+		expect(useHolidaysStore.getState().holidaysKey).toBe(holidaysKeyOf({ ...FETCH_PARAMS, year: 2027 }));
+	});
+
+	it("drops a fetch a newer one has overtaken, so a slow answer cannot bring back an old year", async () => {
+		const older = Promise.withResolvers<HolidayDTO[]>();
+		const newer = [makeHoliday({ id: "newer", dateStr: "2027-06-01" })];
+		mockGetHolidays.mockImplementation(({ year }: { year: number }) =>
+			year === 2026 ? older.promise : Promise.resolve(newer),
+		);
+
+		const first = useHolidaysStore.getState().fetchHolidays(FETCH_PARAMS);
+		await vi.waitFor(() => expect(mockGetHolidays).toHaveBeenCalledOnce());
+		await useHolidaysStore.getState().fetchHolidays({ ...FETCH_PARAMS, year: 2027 });
+		older.resolve([makeHoliday({ id: "older", dateStr: "2026-06-01" })]);
+		await first;
+
+		const { holidays, holidaysKey } = useHolidaysStore.getState();
+		expect(holidays.map(({ id }) => id)).toEqual(["newer"]);
+		expect(holidaysKey).toBe(holidaysKeyOf({ ...FETCH_PARAMS, year: 2027 }));
+		mockGetHolidays.mockResolvedValue([]);
+	});
+
 	it("sets holidays to empty on error when there are no custom holidays", async () => {
 		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "national-1", dateStr: "2026-01-01" })] });
 		mockGetHolidays.mockRejectedValueOnce(new Error("network error"));
@@ -941,6 +976,10 @@ describe("persistence", () => {
 
 	beforeEach(() => {
 		useFiltersStore.setState({ year: 2026, carryOverMonths: 1 });
+	});
+
+	it("never persists which filters the Holidays were fetched for, so a reload waits for a fresh fetch", () => {
+		expect(persist({ holidaysKey: "ES||2026|1|en" })).not.toHaveProperty("holidaysKey");
 	});
 
 	it("revives persisted days as Date instances", async () => {
@@ -1047,6 +1086,7 @@ describe("generateSuggestions", () => {
 		allowPastDays: false,
 		carryOverMonths: 0,
 		strategy: FilterStrategy.GROUPED,
+		preferredMonths: [6, 7],
 		locale: "en" as const,
 	};
 

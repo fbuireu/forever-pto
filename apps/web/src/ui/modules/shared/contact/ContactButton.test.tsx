@@ -36,10 +36,10 @@ const renderButton = () =>
 const modalOpen = () => screen.getByTestId("contact-modal").getAttribute("data-open");
 
 describe("ContactButton", () => {
-	it("keeps the modal closed until asked, so the form is not on the page for every visitor", () => {
+	it("does not mount the modal until asked, so the form's code is not loaded for every visitor", () => {
 		renderButton();
 
-		expect(modalOpen()).toBe("false");
+		expect(screen.queryByTestId("contact-modal")).toBeNull();
 	});
 
 	it("opens the modal from the translated footer link", () => {

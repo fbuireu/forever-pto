@@ -1,5 +1,5 @@
 import { DEFAULT_FILTER_STRATEGY, FilterStrategy } from "@domain/calendar/types";
-import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
+import { DEFAULT_PREFERRED_MONTHS, MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MAX_PTO_DAYS, MIN_CARRY_OVER_MONTHS, MIN_PTO_DAYS, useFiltersStore } from "./filters";
 
@@ -27,6 +27,7 @@ const INITIAL = {
 	year: new Date().getFullYear(),
 	carryOverMonths: 1,
 	strategy: FilterStrategy.GROUPED,
+	preferredMonths: [6, 7],
 };
 
 beforeEach(() => {
@@ -43,6 +44,10 @@ describe("initial state", () => {
 		expect(state.year).toBe(new Date().getFullYear());
 		expect(state.carryOverMonths).toBe(1);
 		expect(state.strategy).toBe(FilterStrategy.GROUPED);
+	});
+
+	it("starts with no Preferred Month, which lets Main vacation place its block wherever it is longest", () => {
+		expect(useFiltersStore.getInitialState().preferredMonths).toEqual([]);
 	});
 });
 
@@ -96,6 +101,16 @@ describe("setters", () => {
 	it("setCarryOverMonths updates carryOverMonths", () => {
 		useFiltersStore.getState().setCarryOverMonths(3);
 		expect(useFiltersStore.getState().carryOverMonths).toBe(3);
+	});
+
+	it("setPreferredMonths stores the months in calendar order", () => {
+		useFiltersStore.getState().setPreferredMonths([7, 5, 6]);
+		expect(useFiltersStore.getState().preferredMonths).toEqual([5, 6, 7]);
+	});
+
+	it("setPreferredMonths falls back to the default rather than store a month that does not exist", () => {
+		useFiltersStore.getState().setPreferredMonths([24]);
+		expect(useFiltersStore.getState().preferredMonths).toEqual([...DEFAULT_PREFERRED_MONTHS]);
 	});
 
 	it("setStrategy updates strategy", () => {
@@ -209,6 +224,33 @@ describe("onRehydrateStorage", () => {
 			expect(useFiltersStore.getState().strategy).toBe(DEFAULT_FILTER_STRATEGY);
 		},
 	);
+
+	it.each([[[24]], [[6, 6]], [[1.5]], ["summer"], [null]])(
+		"replaces stored preferred months %o, which are not months of any Planning Window, with the default",
+		(stored) => {
+			useFiltersStore.setState({ preferredMonths: stored as number[] });
+
+			runRehydrate();
+
+			expect(useFiltersStore.getState().preferredMonths).toEqual([...DEFAULT_PREFERRED_MONTHS]);
+		},
+	);
+
+	it("keeps stored preferred months that are valid, including none at all", () => {
+		useFiltersStore.setState({ preferredMonths: [] });
+
+		runRehydrate();
+
+		expect(useFiltersStore.getState().preferredMonths).toEqual([]);
+	});
+
+	it("sorts stored preferred months into calendar order, as the setter does", () => {
+		useFiltersStore.setState({ preferredMonths: [7, 5, 6] });
+
+		runRehydrate();
+
+		expect(useFiltersStore.getState().preferredMonths).toEqual([5, 6, 7]);
+	});
 
 	it("keeps a stored strategy that does name one", () => {
 		useFiltersStore.setState({ strategy: FilterStrategy.BALANCED });

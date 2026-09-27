@@ -3,6 +3,8 @@
 import { differenceInDays, formatDate } from "@application/shared/utils/dates";
 import { useHolidaysStore } from "@application/stores/holidays";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
+import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
+import { Trash2 } from "@ui/modules/core/animate/icons/Trash2";
 import { SlidingNumber } from "@ui/modules/core/animate/text/SlidingNumber";
 import { Button } from "@ui/modules/core/primitives/Button";
 import type { FromTo } from "@ui/modules/pages/planner/calendar/Calendar";
@@ -84,20 +86,31 @@ export const WorkdayCounter = () => {
 
 			<div className="space-y-2 w-full">
 				<p className="text-xs text-muted-foreground">{t("selectRange")}</p>
-				<CalendarModal
-					open={isCalendarOpen}
-					setOpen={setIsCalendarOpen}
-					selectedRange={selectedRange}
-					handleRangeSelect={handleRangeSelect}
-					locale={locale}
-					holidays={holidays}
-				/>
-
-				{selectedRange && (
-					<Button variant="outline" size="sm" onClick={clearSelection} className="w-full">
-						{t("clearSelection")}
-					</Button>
-				)}
+				<div className="flex gap-2">
+					<div className="min-w-0 flex-1">
+						<CalendarModal
+							open={isCalendarOpen}
+							setOpen={setIsCalendarOpen}
+							selectedRange={selectedRange}
+							handleRangeSelect={handleRangeSelect}
+							locale={locale}
+							holidays={holidays}
+						/>
+					</div>
+					{selectedRange && (
+						<AnimateIcon animateOnHover>
+							<Button
+								variant="destructive"
+								size="icon"
+								onClick={clearSelection}
+								aria-label={t("clearSelection")}
+								title={t("clearSelection")}
+							>
+								<Trash2 />
+							</Button>
+						</AnimateIcon>
+					)}
+				</div>
 			</div>
 
 			{selectedRange && (

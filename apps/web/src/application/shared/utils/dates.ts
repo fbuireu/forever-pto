@@ -7,18 +7,31 @@ const toPlainDate = (date: Date): Temporal.PlainDate =>
 
 const toDate = (pd: Temporal.PlainDate): Date => new Date(pd.year, pd.month - 1, pd.day);
 
+const MS_PER_DAY = 86_400_000;
+
+export const dayIndex = (date: Date): number =>
+	Math.round(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / MS_PER_DAY);
+
+export const isWeekendIndex = (index: number): boolean => {
+	const weekday = (((index + 4) % 7) + 7) % 7;
+	return weekday === 0 || weekday === 6;
+};
+
+export const fromDayIndex = (index: number): Date => {
+	const utc = new Date(index * MS_PER_DAY);
+	return new Date(utc.getUTCFullYear(), utc.getUTCMonth(), utc.getUTCDate());
+};
+
 export interface DatePairParams {
 	a: Date;
 	b: Date;
 }
 
-export const isSameDay = ({ a, b }: DatePairParams): boolean => toPlainDate(a).equals(toPlainDate(b));
+export const isSameDay = ({ a, b }: DatePairParams): boolean =>
+	a.getDate() === b.getDate() && a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear();
 
-export const isSameMonth = ({ a, b }: DatePairParams): boolean => {
-	const pa = toPlainDate(a);
-	const pb = toPlainDate(b);
-	return pa.year === pb.year && pa.month === pb.month;
-};
+export const isSameMonth = ({ a, b }: DatePairParams): boolean =>
+	a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear();
 
 export interface IsBeforeParams {
 	date: Date;
@@ -45,8 +58,8 @@ export const isWithinInterval = ({ date, start, end }: IsWithinIntervalParams): 
 };
 
 export const isWeekend = (date: Date): boolean => {
-	const { dayOfWeek } = toPlainDate(date);
-	return dayOfWeek === 6 || dayOfWeek === 7;
+	const day = date.getDay();
+	return day === 0 || day === 6;
 };
 
 export interface AddDaysParams {
@@ -75,7 +88,10 @@ export const differenceInDays = ({ dateLeft, dateRight }: DifferenceInDaysParams
 
 export const startOfDay = (date: Date): Date => toDate(toPlainDate(date));
 
-export const startOfToday = (): Date => toDate(Temporal.Now.plainDateISO());
+export const startOfToday = (): Date => {
+	const now = new Date();
+	return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+};
 
 export const startOfYear = (date: Date): Date => toDate(toPlainDate(date).with({ month: 1, day: 1 }));
 
@@ -109,12 +125,8 @@ export const endOfWeek = ({ date, options }: WeekBoundaryParams): Date => {
 
 export const eachDayOfInterval = ({ start, end }: { start: Date; end: Date }): Date[] => {
 	const days: Date[] = [];
-	let current = toPlainDate(start);
-	const endPd = toPlainDate(end);
-	while (Temporal.PlainDate.compare(current, endPd) <= 0) {
-		days.push(toDate(current));
-		current = current.add({ days: 1 });
-	}
+	const last = dayIndex(end);
+	for (let day = dayIndex(start); day <= last; day++) days.push(fromDayIndex(day));
 	return days;
 };
 
@@ -203,3 +215,18 @@ export const getWeekdayNames = ({ locale, weekStartsOn = 0, format = "short" }: 
 		formatDate({ date: addDays({ date: weekStart, days: i }), locale, format: WEEKDAY_FORMAT[format] }),
 	);
 };
+
+const MONTH_FORMAT = {
+	short: "MMM",
+	long: "MMMM",
+} satisfies Record<string, DateFormat>;
+
+export interface GetMonthNamesParams {
+	locale: string;
+	format?: keyof typeof MONTH_FORMAT;
+}
+
+export const getMonthNames = ({ locale, format = "short" }: GetMonthNamesParams): string[] =>
+	Array.from({ length: 12 }, (_, month) =>
+		formatDate({ date: new Date(2023, month, 1), locale, format: MONTH_FORMAT[format] }),
+	);

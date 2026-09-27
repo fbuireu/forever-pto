@@ -16,6 +16,7 @@ import { PromoCodeError, PromoCodeErrors } from "@infrastructure/errors";
 import { Elements } from "@stripe/react-stripe-js";
 import type { StripeElementsOptions } from "@stripe/stripe-js";
 import { initializePayment } from "@ui/adapters/payments/checkout";
+import { useIsMobile } from "@ui/hooks/useMobile";
 import { Popover, PopoverContent, PopoverTrigger } from "@ui/modules/core/animate/base/Popover";
 import { Star } from "@ui/modules/core/animate/icons/Star";
 import { Button } from "@ui/modules/core/primitives/Button";
@@ -28,6 +29,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useShallow } from "zustand/react/shallow";
 import { DonationForm } from "./DonationForm";
+import { stripeAppearance, stripeFonts } from "./stripeAppearance";
 import "./donate.css";
 import { logClientError } from "@application/shared/utils/clientLog";
 import { recoverFromStaleDeployment } from "@ui/adapters/navigation/staleDeployment";
@@ -48,6 +50,7 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 	const tValidation = useTranslations("validation.payment");
 	const tEmail = useTranslations("validation.email");
 	const { resolvedTheme } = useTheme();
+	const isMobile = useIsMobile();
 	const formatCurrency = useCurrencyFormatter();
 	const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
 	const [isPending, startTransition] = useTransition();
@@ -198,177 +201,13 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 	const elementsOptions = useMemo<StripeElementsOptions | undefined>(() => {
 		if (!paymentState?.clientSecret) return undefined;
 
-		const isDark = resolvedTheme === "dark";
-
-		const t = isDark
-			? {
-					bg: "#1A1612",
-					bgInput: "#181410",
-					fg: "#FFF5E1",
-					frame: "#FFF5E1",
-					accent: "#FFD93D",
-					accentText: "#0E0E0E",
-					hover: "#2B241E",
-					destructive: "#FF5A5F",
-					muted: "#C6B8A5",
-				}
-			: {
-					bg: "#FFFDF8",
-					bgInput: "#FFFAF0",
-					fg: "#0E0E0E",
-					frame: "#0E0E0E",
-					accent: "#FFD93D",
-					accentText: "#0E0E0E",
-					hover: "#FFF0C6",
-					destructive: "#FF5A5F",
-					muted: "#6B5E4E",
-				};
-
 		return {
 			clientSecret: paymentState.clientSecret,
 			loader: "always",
-			appearance: {
-				theme: undefined,
-				labels: "above",
-				variables: {
-					colorBackground: t.bg,
-					colorText: t.fg,
-					colorPrimary: t.frame,
-					colorDanger: t.destructive,
-					colorTextSecondary: t.muted,
-					colorTextPlaceholder: t.muted,
-					accessibleColorOnColorPrimary: t.fg,
-					fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-					fontSizeBase: "14px",
-					fontWeightNormal: "400",
-					fontWeightMedium: "500",
-					fontWeightBold: "700",
-					spacingUnit: "4px",
-					borderRadius: "8px",
-					focusBoxShadow: `4px 4px 0 0 ${t.frame}`,
-					focusOutline: "none",
-				},
-				rules: {
-					".Input": {
-						backgroundColor: t.bgInput,
-						borderWidth: "3px",
-						borderStyle: "solid",
-						borderColor: t.frame,
-						padding: "10px 12px",
-						fontSize: "14px",
-						color: t.fg,
-						boxShadow: "none",
-						borderRadius: "8px",
-						transition: "box-shadow 75ms linear",
-					},
-					".Input:hover": {
-						boxShadow: `2px 2px 0 0 ${t.frame}`,
-					},
-					".Input:focus": {
-						boxShadow: `4px 4px 0 0 ${t.frame}`,
-						outline: "none",
-					},
-
-					".Input--invalid": {
-						borderColor: t.destructive,
-						boxShadow: "none",
-					},
-					".Input--invalid:focus": {
-						boxShadow: `4px 4px 0 0 ${t.destructive}`,
-					},
-					".Input::placeholder": {
-						color: t.muted,
-					},
-					".Label": {
-						fontSize: "11px",
-						fontWeight: "700",
-						color: t.fg,
-						letterSpacing: "0.07em",
-						textTransform: "uppercase",
-					},
-					".Error": {
-						fontSize: "12px",
-						color: t.destructive,
-						fontWeight: "500",
-					},
-					".Tab": {
-						backgroundColor: t.bg,
-						borderWidth: "3px",
-						borderStyle: "solid",
-						borderColor: t.frame,
-						boxShadow: "none",
-						color: t.fg,
-						borderRadius: "8px",
-						padding: "10px 16px",
-						transition: "box-shadow 80ms linear",
-					},
-					".Tab:hover": {
-						backgroundColor: t.hover,
-						boxShadow: `3px 3px 0 0 ${t.frame}`,
-					},
-					".Tab--selected": {
-						backgroundColor: t.accent,
-						color: t.accentText,
-						borderColor: t.frame,
-						boxShadow: `4px 4px 0 0 ${t.frame}`,
-					},
-					".Tab--selected:hover": {
-						boxShadow: `5px 5px 0 0 ${t.frame}`,
-					},
-					".Block": {
-						backgroundColor: t.bg,
-						borderWidth: "3px",
-						borderStyle: "solid",
-						borderColor: t.frame,
-						borderRadius: "8px",
-						boxShadow: "none",
-					},
-					".PickerItem": {
-						backgroundColor: t.bg,
-						borderWidth: "3px",
-						borderStyle: "solid",
-						borderColor: t.frame,
-						borderRadius: "8px",
-						boxShadow: "none",
-						transition: "box-shadow 80ms linear",
-					},
-					".PickerItem:hover": {
-						backgroundColor: t.hover,
-						boxShadow: `3px 3px 0 0 ${t.frame}`,
-					},
-					".PickerItem--selected": {
-						backgroundColor: t.accent,
-						borderColor: t.frame,
-						color: t.accentText,
-						boxShadow: `4px 4px 0 0 ${t.frame}`,
-					},
-					".PickerItem--selected:hover": {
-						boxShadow: `5px 5px 0 0 ${t.frame}`,
-					},
-					".AccordionItem": {
-						backgroundColor: t.bg,
-						borderWidth: "3px",
-						borderStyle: "solid",
-						borderColor: t.frame,
-						borderRadius: "8px",
-						boxShadow: "none",
-					},
-					".AccordionItem:focus-within": {
-						boxShadow: `4px 4px 0 0 ${t.frame}`,
-					},
-					".CheckboxInput": {
-						border: `2px solid ${t.frame}`,
-						borderRadius: "4px",
-						backgroundColor: t.bgInput,
-					},
-					".CheckboxInput--checked": {
-						backgroundColor: t.accent,
-						borderColor: t.frame,
-					},
-				},
-			},
+			appearance: stripeAppearance({ isDark: resolvedTheme === "dark", isMobile }),
+			fonts: stripeFonts(globalThis.location.origin),
 		};
-	}, [paymentState?.clientSecret, resolvedTheme]);
+	}, [paymentState?.clientSecret, resolvedTheme, isMobile]);
 
 	return (
 		<Popover open={isOpen} onOpenChange={handleOpenChange}>
@@ -387,15 +226,21 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 					</PopoverTrigger>
 				</div>
 			</div>
-			<PopoverContent className="w-96 bg-card text-card-foreground">
+			<PopoverContent className="w-96 max-w-[calc(100vw-2rem)] max-h-(--available-height) overflow-y-auto overscroll-contain bg-card text-card-foreground">
 				<div className="grid gap-4">
 					<div className="space-y-2">
-						<h2 className="leading-none font-medium">{tDonate("supportAndUnblock")}</h2>
+						<h2 className="text-lg leading-none font-black tracking-[-0.03em]">{tDonate("supportAndUnblock")}</h2>
 						<p className="text-muted-foreground text-sm">{tDonate("makeDonation")}</p>
 						{premiumKey && (
-							<div className="flex items-center gap-2 p-2 rounded-md bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700">
-								<Star className="size-4 text-green-500" fill="currentColor" aria-hidden="true" animateOnView loop />
-								<span className="text-green-700 dark:text-green-300 font-semibold text-sm">
+							<div className="flex items-center gap-2 rounded-[10px] border-[3px] border-(--frame) bg-[color-mix(in_srgb,var(--color-brand-green)_18%,white_82%)] p-2 shadow-(--shadow-brutal-xs) dark:bg-[color-mix(in_srgb,var(--color-brand-green)_16%,black_84%)]">
+								<Star
+									className="size-4 text-[#3f6212] dark:text-(--color-brand-green)"
+									fill="currentColor"
+									aria-hidden="true"
+									animateOnView
+									loop
+								/>
+								<span className="text-sm font-black text-[#3f6212] dark:text-(--color-brand-green)">
 									{tDonate("alreadyPremium")}
 								</span>
 							</div>

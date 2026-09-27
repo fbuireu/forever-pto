@@ -44,6 +44,16 @@ export const Faq = async () => {
 					question: t("sections.general.pricing.question"),
 					answer: t("sections.general.pricing.answer"),
 				},
+				{
+					id: "premium",
+					question: t("sections.general.premium.question"),
+					answer: t("sections.general.premium.answer"),
+				},
+				{
+					id: "carry-over",
+					question: t("sections.general.carryOver.question"),
+					answer: t("sections.general.carryOver.answer"),
+				},
 			],
 		},
 		{
@@ -61,9 +71,24 @@ export const Faq = async () => {
 					answer: t("sections.technical.strategies.answer"),
 				},
 				{
+					id: "weekends",
+					question: t("sections.technical.weekends.question"),
+					answer: t("sections.technical.weekends.answer"),
+				},
+				{
+					id: "alternatives",
+					question: t("sections.technical.alternatives.question"),
+					answer: t("sections.technical.alternatives.answer"),
+				},
+				{
 					id: "results",
 					question: t("sections.technical.results.question"),
 					answer: t("sections.technical.results.answer"),
+				},
+				{
+					id: "export",
+					question: t("sections.technical.export.question"),
+					answer: t("sections.technical.export.answer"),
 				},
 			],
 		},
@@ -85,6 +110,11 @@ export const Faq = async () => {
 					id: "tracking",
 					question: t("sections.security.tracking.question"),
 					answer: t("sections.security.tracking.answer"),
+				},
+				{
+					id: "devices",
+					question: t("sections.security.devices.question"),
+					answer: t("sections.security.devices.answer"),
 				},
 				{
 					id: "troubleshooting",

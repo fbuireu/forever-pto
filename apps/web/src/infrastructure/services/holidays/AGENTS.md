@@ -18,6 +18,7 @@ are not non-working days, tags and hands over.
 | [`source/dateHolidays.ts`](./source/dateHolidays.ts) | The production adapter. The **only** place in the app that constructs `Holidays` |
 | [`source/fixture.ts`](./source/fixture.ts) | `createFixtureHolidaySource(calendar)`: the test adapter, plain data in |
 | [`source/observedHolidays.ts`](./source/observedHolidays.ts) | `observedHolidays(source, lookup)`: the rules, composed **above** the seam so both adapters go through them |
+| [`source/cachedObservedHolidays.ts`](./source/cachedObservedHolidays.ts) | `cachedObservedHolidays`: the last lookup, kept in one slot keyed on Country, Region, year, locale and the source, so a Carry-over Months change re-runs only the mapping |
 | [`source/utils/observed.ts`](./source/utils/observed.ts) | `resolveObservedHolidays`: the Region-over-Country rule, pure |
 | [`source/utils/nonWorking.ts`](./source/utils/nonWorking.ts) | `keepNonWorking` (the `public`/`bank` filter) and `stampRegion` (the `location` stamp), pure |
 
@@ -82,8 +83,10 @@ through a dynamic `import()`. Holiday data ships in the client bundle and is com
   [ADR 0002](../../../../../../adr/0002-effect-for-external-service-boundaries.md).
 - **The work is synchronous and it is not offloaded to the Web Worker.** `Effect.try` wraps a plain
   computation; only suggestion generation goes through [`src/infrastructure/workers/worker.ts`](../../workers/worker.ts). Building
-  two years of Holidays blocks the main thread, and it re-runs on every Country, Region, year or
-  Carry-over Months change.
+  two years of Holidays blocks the main thread, and it re-runs on every Country, Region, year or locale change.
+  A Carry-over Months change re-runs only the mapping: the lookup is the same two years whatever the window,
+  so `getHolidays` keeps the last one it made (`cachedObservedHolidays`, a single entry keyed on Country,
+  Region, year, locale and the source) and only `holidayDTO.create` re-flags `isInPlanningWindow`.
 
 ## Invariants
 
@@ -127,7 +130,7 @@ calendar, country rules included, minus whatever the region does not observe. So
 country-level lookup put back every national day the region had dropped: a Californian's 2027 calendar
 carried Columbus Day, a Scot's carried Easter Monday, Luzern's carried Ostermontag and Pfingstmontag. Those
 dates then became Free Days: struck from the Workday list so no PTO Day was ever placed on them, and
-expanded straight through by `analyzePotentialBridge`, inflating Effective Days, Efficiency and Longest
+expanded straight through by `findBridges`, inflating Effective Days, Efficiency and Longest
 Vacation. `resolveObservedHolidays` keeps a national entry only when the regional lookup emitted the same
 date.
 

@@ -6,21 +6,24 @@ import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@ui/modules/core/animate/base/Collapsible";
 import { ChevronDown } from "@ui/modules/core/animate/icons/ChevronDown";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
-import { Users } from "@ui/modules/core/animate/icons/Users";
 import { Card, CardDescription } from "@ui/modules/core/primitives/Card";
 import { Combobox } from "@ui/modules/core/primitives/Combobox";
+import { STRATEGY_ICONS } from "@ui/modules/shared/strategyIcons";
+import { PreferredMonths } from "@ui/modules/sidebar/components/PreferredMonths";
 import { SidebarFieldLabel } from "@ui/modules/sidebar/components/SidebarFieldLabel";
 import { cn } from "@ui/utils/cn";
-import { AlertCircle, CheckCircle2, DicesIcon, Scale, TrendingUp } from "lucide-react";
+import { AlertCircle, CheckCircle2, DicesIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 
-const STRATEGY_ICONS = {
-	[FilterStrategy.GROUPED]: Users,
-	[FilterStrategy.OPTIMIZED]: TrendingUp,
-	[FilterStrategy.BALANCED]: Scale,
-} as const;
+interface StrategyDetails {
+	label: string;
+	description: string;
+	subtitle: string;
+	pros: string[];
+	cons: string[];
+}
 
 export const Strategy = () => {
 	const t = useTranslations("sidebar.strategy");
@@ -32,38 +35,40 @@ export const Strategy = () => {
 	);
 	const [detailsOpen, setDetailsOpen] = useState(false);
 
-	const strategies = useMemo(
-		() => [
-			{
-				value: FilterStrategy.GROUPED,
+	const strategies = useMemo(() => {
+		const details: Record<FilterStrategy, StrategyDetails> = {
+			[FilterStrategy.GROUPED]: {
 				label: t("grouped.label"),
-				icon: STRATEGY_ICONS[FilterStrategy.GROUPED],
 				description: t("grouped.description"),
 				subtitle: t("grouped.subtitle"),
-				pros: [t("grouped.pros.simulatesHumanSelection"), t("grouped.pros.longBridges")],
+				pros: [t("grouped.pros.longVacations"), t("grouped.pros.wholeWeeks")],
 				cons: [t("grouped.cons.fewerDays"), t("grouped.cons.lowerEfficiency")],
 			},
-			{
-				value: FilterStrategy.OPTIMIZED,
+			[FilterStrategy.OPTIMIZED]: {
 				label: t("optimized.label"),
-				icon: STRATEGY_ICONS[FilterStrategy.OPTIMIZED],
 				description: t("optimized.description"),
 				subtitle: t("optimized.subtitle"),
 				pros: [t("optimized.pros.maximumEfficiency"), t("optimized.pros.moreDays")],
-				cons: [t("optimized.cons.shortBridges"), t("optimized.cons.scatteredDays")],
+				cons: [t("optimized.cons.mostlyLongWeekends"), t("optimized.cons.noLongTrip")],
 			},
-			{
-				value: FilterStrategy.BALANCED,
+			[FilterStrategy.BALANCED]: {
 				label: t("balanced.label"),
-				icon: STRATEGY_ICONS[FilterStrategy.BALANCED],
 				description: t("balanced.description"),
 				subtitle: t("balanced.subtitle"),
-				pros: [t("balanced.pros.flexible"), t("balanced.pros.mediumPeriods"), t("balanced.pros.versatile")],
-				cons: [t("balanced.cons.noMaximization"), t("balanced.cons.intermediateSolution")],
+				pros: [t("balanced.pros.noLongStretch"), t("balanced.pros.restAllYear")],
+				cons: [t("balanced.cons.noMaximization"), t("balanced.cons.noLongTrip")],
 			},
-		],
-		[t],
-	);
+			[FilterStrategy.MAIN_VACATION]: {
+				label: t("mainVacation.label"),
+				description: t("mainVacation.description"),
+				subtitle: t("mainVacation.subtitle"),
+				pros: [t("mainVacation.pros.yourTrip"), t("mainVacation.pros.bridgesAfter")],
+				cons: [t("mainVacation.cons.mayHaveFewerDays")],
+			},
+		};
+
+		return Object.values(FilterStrategy).map((value) => ({ value, icon: STRATEGY_ICONS[value], ...details[value] }));
+	}, [t]);
 
 	const handleStrategyChange = (value: FilterStrategy) => {
 		setStrategy(value);
@@ -71,6 +76,7 @@ export const Strategy = () => {
 	};
 
 	const currentStrategy = strategies.find(({ value }) => value === strategy);
+	const CurrentIcon = currentStrategy?.icon;
 
 	return (
 		<div className="space-y-2 w-full">
@@ -90,6 +96,7 @@ export const Strategy = () => {
 				placeholder={t("placeholder")}
 				searchPlaceholder={t("search")}
 			/>
+			{strategy === FilterStrategy.MAIN_VACATION && <PreferredMonths />}
 			{currentStrategy && (
 				<Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
 					<AnimateIcon animateOnHover>
@@ -104,10 +111,7 @@ export const Strategy = () => {
 						<Card className="p-4 bg-muted/50 mt-2 text-xs">
 							<div className="space-y-2">
 								<div className="flex items-start gap-3">
-									{(() => {
-										const Icon = currentStrategy.icon;
-										return <Icon className="size-6 text-primary" />;
-									})()}
+									{CurrentIcon && <CurrentIcon className="size-6 text-primary" />}
 									<div className="flex-1">
 										<h4 className="font-semibold text-xs">{currentStrategy.description}</h4>
 										<CardDescription className="text-xs">{currentStrategy.subtitle}</CardDescription>

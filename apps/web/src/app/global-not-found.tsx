@@ -1,5 +1,6 @@
 import "@styles/index.css";
 import { DOCUMENT_BODY_CLASS } from "@app/fonts";
+import { clientMessagesOf } from "@infrastructure/i18n/clientMessages";
 import { LOCALE_COOKIE, LOCALES } from "@infrastructure/i18n/locales";
 import { routing } from "@infrastructure/i18n/routing";
 import { localeFromAcceptLanguage, resolveLocale } from "@infrastructure/i18n/utils/url";
@@ -10,7 +11,7 @@ import { NotFoundContent } from "@ui/modules/pages/not-found/NotFoundContent";
 import { AppThemeProvider } from "@ui/modules/providers/AppThemeProvider";
 import { cookies, headers } from "next/headers";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 
 async function detectLocale() {
@@ -28,13 +29,13 @@ async function detectLocale() {
 const LocalizedNotFound = async () => {
 	const locale = await detectLocale();
 	setRequestLocale(locale);
-	const t = await getTranslations({ locale, namespace: "a11y" });
+	const [t, messages] = await Promise.all([getTranslations({ locale, namespace: "a11y" }), getMessages({ locale })]);
 
 	return (
 		<>
 			<HtmlLangSync locale={locale} />
 			<SkipToContent label={t("skipToMainContent")} />
-			<NextIntlClientProvider>
+			<NextIntlClientProvider messages={clientMessagesOf(messages)}>
 				<AppThemeProvider>
 					<LazyMotionProvider>
 						<NotFoundContent locale={locale} />

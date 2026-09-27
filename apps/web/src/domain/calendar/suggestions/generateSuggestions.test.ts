@@ -25,7 +25,7 @@ const planSuggestions = ({
 	generateSuggestions({
 		ptoDays,
 		strategy,
-		candidates: findPlanningCandidates({ holidays, months, allowPastDays, removedDays }),
+		candidates: findPlanningCandidates({ holidays, months, allowPastDays, removedDays, manualDays: [] }),
 	});
 
 vi.mock("./utils/selectors", async (importOriginal) => {
@@ -102,7 +102,7 @@ describe("generateSuggestions", () => {
 			months,
 			holidays,
 			ptoDays: 10,
-			strategy: FilterStrategy.GROUPED,
+			strategy: FilterStrategy.OPTIMIZED,
 		});
 		const bridgeOrder = (result.bridges ?? []).flatMap((bridge) => bridge.ptoDays);
 

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@ui/modules/core/primi
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
 import { Calendar } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { memo, useMemo } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { COLOR_SCHEMES } from "./const";
 
@@ -12,13 +13,19 @@ interface BlockPerQuarterChartProps {
 	blocksPerQuarter: number[];
 }
 
-export const BlocksPerQuarterChart = ({ blocksPerQuarter }: BlockPerQuarterChartProps) => {
+export const BlocksPerQuarterChart = memo(function BlocksPerQuarterChart({
+	blocksPerQuarter,
+}: BlockPerQuarterChartProps) {
 	const t = useTranslations("charts");
-	const data = blocksPerQuarter.map((value, index) => ({
-		name: `Q${index + 1}`,
-		blocks: value,
-		color: COLOR_SCHEMES[(blocksPerQuarter.length - index - 1) % COLOR_SCHEMES.length],
-	}));
+	const data = useMemo(
+		() =>
+			blocksPerQuarter.map((value, index) => ({
+				name: `Q${index + 1}`,
+				blocks: value,
+				color: COLOR_SCHEMES[(blocksPerQuarter.length - index - 1) % COLOR_SCHEMES.length],
+			})),
+		[blocksPerQuarter],
+	);
 
 	const totalBlocks = blocksPerQuarter.reduce((sum, blocks) => sum + blocks, 0);
 	const bestQuarterIndex = blocksPerQuarter.indexOf(Math.max(...blocksPerQuarter));
@@ -73,4 +80,4 @@ export const BlocksPerQuarterChart = ({ blocksPerQuarter }: BlockPerQuarterChart
 			</Card>
 		</PremiumFeature>
 	);
-};
+});

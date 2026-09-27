@@ -1,12 +1,13 @@
 import enMessages from "@i18n/messages/en.json";
 import { render, screen } from "@testing-library/react";
-import { createTranslator } from "next-intl";
+import { createFormatter, createTranslator } from "next-intl";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetTranslations = vi.hoisted(() => vi.fn());
+const mockGetFormatter = vi.hoisted(() => vi.fn());
 
-vi.mock("next-intl/server", () => ({ getTranslations: mockGetTranslations }));
+vi.mock("next-intl/server", () => ({ getTranslations: mockGetTranslations, getFormatter: mockGetFormatter }));
 vi.mock("@ui/modules/core/primitives/Badge", () => ({
 	Badge: ({ children }: { children: ReactNode }) => <span>{children}</span>,
 }));
@@ -19,6 +20,7 @@ const renderComparison = async () => {
 	mockGetTranslations.mockResolvedValue(
 		createTranslator({ locale: "en", messages: enMessages, namespace: "homepage" }),
 	);
+	mockGetFormatter.mockResolvedValue(createFormatter({ locale: "en" }));
 	render(await Comparison());
 	return screen.getAllByRole("list");
 };
@@ -41,7 +43,15 @@ describe("Comparison", () => {
 		const [without, withApp] = await renderComparison();
 
 		expect(itemsOf(without).map((text) => text.slice(1))).toEqual(Object.values(comparison.withoutItems));
-		expect(itemsOf(withApp).map((text) => text.slice(1))).toEqual(Object.values(comparison.withItems));
+		expect(itemsOf(withApp).map((text) => text.slice(1))).toEqual(
+			Object.values(comparison.withItems).map((item) => item.replace("{ratio}", "3.4")),
+		);
+	});
+
+	it("states the showcase plan's efficiency, rounded for the reader's locale", async () => {
+		const [, withApp] = await renderComparison();
+
+		expect(itemsOf(withApp)).toContain(`✓${comparison.withItems.dayEfficiency.replace("{ratio}", "3.4")}`);
 	});
 
 	it("titles both columns from the bundle, so the emoji travel with the translation", async () => {

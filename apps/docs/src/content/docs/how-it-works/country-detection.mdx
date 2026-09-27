@@ -10,8 +10,8 @@ When you open Forever PTO, the planner already knows your country. That value tr
 ## The chain
 
 1. `apps/web/src/middleware.ts` runs the last step of the proxy, (after markdown negotiation, the payment-confirmation guard and i18n) calls the location proxy with the `next-intl` response.
-2. `apps/web/src/infrastructure/proxy/location.ts`: `location()` runs `detectCountry(request)` and, only if a country came back, calls `setLocationCookie()`.
-3. `apps/web/src/infrastructure/services/location/detectCountry.ts` tries its strategies in order and returns the first non-empty result.
+2. `apps/web/src/infrastructure/proxy/location.ts`: `location()` re-sets a `user-country` cookie the request already carries, which renews its week, and detects nothing. Only without one does it run `detectCountry(request)`, and it calls `setLocationCookie()` only if a country came back.
+3. `apps/web/src/infrastructure/services/location/detectCountry.ts` takes the `cf-ipcountry` header's answer whenever the header is present, and tries the two network strategies in order only when it is absent.
 4. `apps/web/src/infrastructure/services/location/utils/strategies.ts` implements the strategies as Effect programs.
 
 The proxy matcher skips `/api/*` (except `/api/markdown`), `/_next`, `/_vercel` and any path with a file extension, so the cookie is refreshed on page navigations, not on asset or API requests.
@@ -30,33 +30,41 @@ See [cookies](/reference/cookies/) for the full cookie inventory.
 
 ```mermaid
 flowchart TD
-  S[detectCountry] --> A[1. GET NEXT_PUBLIC_SITE_URL/cdn-cgi/trace<br/>parse loc=, force-cache, 5 s timeout]
+  S[detectCountry] --> H{cf-ipcountry header present?}
+  H -->|yes| A["1. detectCountryFromHeaders<br/>XX (unknown) and T1 (Tor) read as empty"]
   A -->|country| OK[Lowercased alpha-2 code → user-country cookie]
-  A -->|empty or error, logged| B["2. cf-ipcountry request header<br/>reject XX (unknown) and T1 (Tor)"]
+  A -->|empty, and final| NONE[No cookie; the user picks a Country]
+  H -->|no, as in local development| B[2. GET NEXT_PUBLIC_SITE_URL/cdn-cgi/trace<br/>parse loc=, no-store, 5 s timeout]
   B -->|country| OK
-  B -->|empty| C[3. api.ipify.org → ipinfo.io<br/>force-cache, 5 s timeouts]
+  B -->|empty or error, logged| C[3. api.ipify.org → ipinfo.io<br/>no-store, 5 s timeouts]
   C -->|country| OK
-  C -->|empty or error| NONE[No cookie; the user picks a Country]
+  C -->|empty or error| NONE
 ```
 
-### 1. Cloudflare trace (`detectCountryFromCDN`)
+Every strategy leaves through `normalizeCountryCode` (`apps/web/src/infrastructure/services/location/utils/normalize.ts`), the one exit rule: trim, lower-case, reject anything that is not two ASCII letters, and reject the sentinels `XX` (`UNIDENTIFIED_COUNTRY`) and `T1` (`TOR_COUNTRY`, Tor exit nodes). Both network strategies fetch through `noStoreFetch` beside it, which owns `cache: 'no-store'` and the 5-second `AbortSignal.timeout`.
 
-A server-side `fetch` of `${NEXT_PUBLIC_SITE_URL}/cdn-cgi/trace` (Cloudflare's trace endpoint), with `cache: 'force-cache'` and a 5-second `AbortSignal.timeout`. The response is plain text; the strategy parses the `loc=` line and lowercases it. Any failure is caught, logged as a warning to Better Stack, and resolves to `''` so the chain falls through, and the user never sees an error.
+### 1. `cf-ipcountry` header (`detectCountryFromHeaders`)
 
-### 2. `cf-ipcountry` header (`detectCountryFromHeaders`)
+Reads the `cf-ipcountry` request header (`CLOUDFLARE_COUNTRY_HEADER`), which Cloudflare stamps on every request based on the **visitor's** IP. Synchronous, no I/O.
 
-Reads the `cf-ipcountry` request header (`CLOUDFLARE_COUNTRY_HEADER`), which Cloudflare stamps on every request based on the **visitor's** IP. Sentinel values are rejected: `XX` (`UNIDENTIFIED_COUNTRY`) and `T1` (`TOR_COUNTRY`, Tor exit nodes).
+**When the header is present, its answer is final, even an empty one.** Cloudflare sends `XX` or `T1` when it cannot place the visitor, and the strategies below would then locate the Worker's own egress instead. Since no cookie is set on a failure, every navigation from such a visitor used to repeat up to three sequential subrequests for a wrong answer. In production the header is always there, so the two network strategies run only where it is not, which is local development.
 
-### 3. IP lookup (`detectCountryFromIP`)
+### 2. Cloudflare trace (`detectCountryFromCDN`)
 
-Asks `api.ipify.org` for an IP, then `ipinfo.io/{ip}/json` for its country. Both calls use `force-cache` and 5-second timeouts, and the whole program fails open to `''`.
+A server-side `fetch` of `${NEXT_PUBLIC_SITE_URL}/cdn-cgi/trace` (Cloudflare's trace endpoint). The response is plain text; the strategy parses the `loc=` line. Any failure is caught, logged as a warning, and resolves to `''` so the chain falls through, and the user never sees an error.
+
+### 3. Egress IP lookup (`detectCountryFromEgressIP`)
+
+Asks `api.ipify.org` for an IP, then `ipinfo.io/{ip}/json` for its country, and the whole program fails open to `''`.
 
 ## The crucial nuance
 
-Strategies 1 and 3 run **inside the Cloudflare Worker**, so they geolocate the *Worker's egress*, not the browser. That is usually a colo near the user, but not guaranteed, especially with smart placement enabled (`[placement] mode = "smart"` in `wrangler.toml`), which may move the Worker closer to its backends and away from the visitor. On top of that, `cache: 'force-cache'` can pin a previously-fetched trace or IP response, serving a stale country.
+Strategies 2 and 3 run **inside the Cloudflare Worker**, so they geolocate the *Worker's egress*, not the browser. That is usually a colo near the user, but not guaranteed, especially with smart placement enabled (`[placement] mode = "smart"` in `wrangler.toml`), which may move the Worker closer to its backends and away from the visitor. That is why they come last and never overrule the header.
 
-The only strategy that genuinely reflects the end user is **strategy 2**, the `cf-ipcountry` header, yet it runs second, as a fallback. Keep this in mind when debugging "wrong country detected" reports.
+**Every fetch is `no-store`, and must stay that way.** Each response identifies whoever asked for it, so a stored copy would hand one visitor's Country to the next, and the proxy would write it into a week-long cookie.
+
+The only strategy that genuinely reflects the end user is **strategy 1**, the `cf-ipcountry` header. Keep that in mind when debugging "wrong country detected" reports: in production the cookie holds what Cloudflare said about the visitor's IP, or nothing.
 
 ## Failure behavior
 
-Nothing in this chain ever throws to the user. CDN and IP failures are swallowed (`Effect.catchAll` / `Effect.orElse`) and only the CDN path logs to Better Stack; see [observability](/how-it-works/observability/). If every strategy returns `''`, no cookie is set and the planner falls back to manual country selection backed by the [location store](/how-it-works/state-stores/).
+Nothing in this chain ever throws to the user. CDN and IP failures are swallowed (`Effect.catchAll` / `Effect.orElse`) and only the CDN path logs; see [observability](/how-it-works/observability/). If every strategy returns `''`, no cookie is set and the planner falls back to manual country selection backed by the [location store](/how-it-works/state-stores/).

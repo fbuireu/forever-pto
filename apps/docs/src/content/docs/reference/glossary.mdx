@@ -17,23 +17,24 @@ A block of PTO days that connects weekends and public holidays into one contiguo
 
 ### Effective Day
 
-One day of the continuous stretch off a Bridge or Suggestion produces. The total counts PTO days plus the weekends and holidays they absorb. **Efficiency** is `effectiveDays / ptoDaysNeeded`; the engine discards bridges below a minimum efficiency threshold (tunables in `apps/web/src/domain/calendar/const.ts`).
+One day of the continuous stretch off a Bridge or Suggestion produces. The total counts PTO days plus the weekends and holidays they lean on, each once, however many Bridges reach it. **Efficiency** is `effectiveDays / ptoDaysNeeded`; each Strategy refuses a Bridge whose marginal Efficiency, the days it adds to the plan so far per PTO Day, falls under its floor (tunables in `apps/web/src/domain/calendar/const.ts`).
 
 ### Strategy
 
 The rule that decides which Bridges make it into a Suggestion when the budget cannot cover them all. Its values, exported as the `FilterStrategy` const object in `apps/web/src/domain/calendar/types.ts`:
 
-- **`grouped`** prefers multi-day blocks, with efficiency as the tiebreaker. Fewer, longer breaks.
-- **`optimized`** prefers the highest-efficiency bridges first. Maximum Effective Days per PTO Day.
-- **`balanced`** is greedy scoring that prioritizes high-value long bridges, then fills the remaining budget.
+- **`grouped`** grows a few blocks of about two weeks each, accepting a lower return per PTO Day to get there. Fewer, longer stretches off.
+- **`optimized`** takes whatever adds the most Effective Days per PTO Day to the plan so far. The most Effective Days for the budget.
+- **`balanced`** keeps every stretch of work short: a long weekend every few weeks, placed where the longest stretches without rest are. The shortest Max Work Streak for the budget.
+- **`mainVacation`** builds one block of up to two weeks inside the Preferred Months first, then spends the rest like `optimized`. The trip you actually want, plus the best bridges.
 
 ### Suggestion
 
-The engine's output for a given budget, calendar and strategy: the set of recommended PTO dates plus the bridges and metrics behind them (`Suggestion` interface, produced by `apps/web/src/domain/calendar/suggestions/generateSuggestions.ts`). Users can hand-edit the suggested days afterwards.
+The engine's output for a given budget, calendar and strategy: the set of recommended PTO dates plus the bridges and metrics behind them (`Suggestion` interface, seeded by `apps/web/src/domain/calendar/suggestions/generateSuggestions.ts` and chosen by `apps/web/src/domain/calendar/alternatives/generateAlternatives.ts`, which keeps the best plan the Strategy finds). Users can hand-edit the suggested days afterwards.
 
 ### Alternative
 
-A genuinely distinct plan for the same inputs, produced by `apps/web/src/domain/calendar/alternatives/generateAlternatives.ts` using different bridge-ordering strategies, so the user can compare plans rather than accept a single answer.
+A genuinely distinct plan for the same inputs, produced by `apps/web/src/domain/calendar/alternatives/generateAlternatives.ts` from the other Strategies and from the chosen one re-run without one of the Suggestion's Rest Blocks, each far enough from every other plan to be a real choice and never with more Effective Days or a higher Efficiency than the Suggestion, so the user can compare plans rather than accept a single answer.
 
 ### Carry-over Months
 

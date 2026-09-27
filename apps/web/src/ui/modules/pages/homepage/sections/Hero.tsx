@@ -7,11 +7,10 @@ import { FlagIcon } from "@ui/modules/core/primitives/FlagIcon";
 import { QuickStartTrigger } from "@ui/modules/pages/homepage/quick-start/QuickStartTrigger";
 import { MODIFIERS_CLASS_NAMES } from "@ui/modules/pages/planner/calendar/utils/helpers";
 import { cn } from "@ui/utils/cn";
-import { getCurrentYear } from "@ui/utils/getCurrentYear";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 import { version } from "../../../../../../package.json";
-import { CAL_ENTRIES, type DayType } from "./shared";
+import { CAL_ENTRIES, type DayType, SHOWCASE_PLAN, SHOWCASE_RATIO } from "./shared";
 
 const LOCALE_FLAG: Record<string, string> = { en: "gb", ca: "es-ct" };
 
@@ -27,12 +26,7 @@ const SOCIAL_PROOF_RATING = 4.9;
 const SOCIAL_PROOF_USERS = 12847;
 
 export const Hero = async () => {
-	const [t, locale, year, format] = await Promise.all([
-		getTranslations("homepage"),
-		getLocale(),
-		getCurrentYear(),
-		getFormatter(),
-	]);
+	const [t, locale, format] = await Promise.all([getTranslations("homepage"), getLocale(), getFormatter()]);
 	const DAY_HEADERS = getWeekdayNames({ locale, weekStartsOn: 1, format: "narrow" }).map((label, index) => ({
 		id: `day-${index}`,
 		label,
@@ -106,7 +100,11 @@ export const Hero = async () => {
 							<div className="grid grid-cols-2 gap-3.5 mb-4">
 								{(
 									[
-										{ label: t("hero.mockupFieldPto"), value: <span>22</span>, unit: t("hero.mockupFieldPtoUnit") },
+										{
+											label: t("hero.mockupFieldPto"),
+											value: <span>{SHOWCASE_PLAN.ptoDays}</span>,
+											unit: t("hero.mockupFieldPtoUnit"),
+										},
 										{
 											label: t("hero.mockupFieldCountry"),
 											value: (
@@ -115,7 +113,7 @@ export const Hero = async () => {
 													<span>{locale.toUpperCase()}</span>
 												</span>
 											),
-											unit: t("hero.mockupFieldHolidays"),
+											unit: t("hero.mockupFieldHolidays", { count: SHOWCASE_PLAN.holidays }),
 										},
 									] as { label: string; value: ReactNode; unit: string }[]
 								).map(({ label, value, unit }) => (
@@ -134,12 +132,12 @@ export const Hero = async () => {
 								))}
 							</div>
 							<div className="px-[18px] pt-[18px] pb-4 bg-[var(--accent)] text-[var(--color-brand-ink)] border-[4px] border-[var(--frame)] rounded-[10px]">
-								<div className="font-mono text-[12px] uppercase tracking-[0.1em] mb-1" suppressHydrationWarning>
-									{t("hero.mockupLabel", { year })}
-								</div>
+								<div className="font-mono text-[12px] uppercase tracking-[0.1em] mb-1">{t("hero.mockupLabel")}</div>
 								<div className="font-display font-extrabold text-[56px] leading-none tracking-[-0.03em] flex items-baseline gap-2.5">
-									47
-									<span className="text-[18px] font-semibold opacity-70">{t("hero.mockupRatio")}</span>
+									{SHOWCASE_PLAN.effectiveDays}
+									<span className="text-[18px] font-semibold opacity-70">
+										{t("hero.mockupRatio", { ratio: format.number(SHOWCASE_RATIO, { maximumFractionDigits: 2 }) })}
+									</span>
 								</div>
 								<div className="mt-2 font-serif italic text-[18px]">{t("hero.mockupQuote")}</div>
 							</div>

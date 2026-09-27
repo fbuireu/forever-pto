@@ -99,7 +99,7 @@ describe("Faq", () => {
 
 	it("sends contributors to a GitHub issue form in a new tab, without leaking the opener", async () => {
 		await renderFaq();
-		const link = screen.getByRole("link", { name: "Open issues or merge requests" });
+		const link = screen.getByRole("link", { name: "Open issues or pull requests" });
 
 		expect(link.getAttribute("href")).toContain("https://github.com/fbuireu/forever-pto/issues/new");
 		expect(link.getAttribute("target")).toBe("_blank");

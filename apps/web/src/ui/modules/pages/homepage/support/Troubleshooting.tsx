@@ -1,50 +1,41 @@
 "use client";
 
 import { logClientError } from "@application/shared/utils/clientLog";
-import { useFiltersStore } from "@application/stores/filters";
-import { useHolidaysStore } from "@application/stores/holidays";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { useShallow } from "zustand/react/shallow";
 
 export const Troubleshooting = () => {
 	const locale = useLocale();
 	const t = useTranslations("troubleshooting");
-	const resetFiltersStore = useFiltersStore((state) => state.resetToDefaults);
-
-	const {
-		resetToDefaults: resetHolidaysStore,
-		fetchHolidays,
-		generateSuggestions,
-	} = useHolidaysStore(
-		useShallow((state) => ({
-			resetToDefaults: state.resetToDefaults,
-			fetchHolidays: state.fetchHolidays,
-			generateSuggestions: state.generateSuggestions,
-		})),
-	);
 	const [cleared, setCleared] = useState(false);
 	const [isPending, startTransition] = useTransition();
 
 	const resetToDefaults = () => {
 		startTransition(async () => {
 			try {
-				resetHolidaysStore();
-				resetFiltersStore();
+				const [{ useFiltersStore }, { useHolidaysStore }] = await Promise.all([
+					import("@application/stores/filters"),
+					import("@application/stores/holidays"),
+				]);
+				const holidays = useHolidaysStore.getState();
+				holidays.resetToDefaults();
+				useFiltersStore.getState().resetToDefaults();
 
-				const { country, region, year, carryOverMonths, ptoDays, allowPastDays, strategy } = useFiltersStore.getState();
+				const { country, region, year, carryOverMonths, ptoDays, allowPastDays, strategy, preferredMonths } =
+					useFiltersStore.getState();
 
 				if (country) {
-					await fetchHolidays({ country, region, year, locale, carryOverMonths });
+					await holidays.fetchHolidays({ country, region, year, locale, carryOverMonths });
 
-					await generateSuggestions({
+					await holidays.generateSuggestions({
 						year,
 						carryOverMonths,
 						ptoDays,
 						allowPastDays,
 						strategy,
+						preferredMonths,
 						locale,
 					});
 				}

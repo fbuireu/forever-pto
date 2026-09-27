@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
@@ -140,12 +142,24 @@ const downloadPdf = async () => {
 
 	try {
 		await userEvent.click(screen.getByRole("button", { name: "downloadPdf" }));
+		await waitFor(() =>
+			expect(mockToastSuccess.mock.calls.length + mockToastError.mock.calls.length).toBeGreaterThan(0),
+		);
 	} finally {
 		spy.mockRestore();
 	}
 
 	return clicks;
 };
+
+describe("CalendarExport keeps the PDF machinery out of the first load", () => {
+	it("imports neither Effect nor the PDF module until the download is asked for", () => {
+		const source = readFileSync(resolve(process.cwd(), "src/ui/modules/sidebar/components/CalendarExport.tsx"), "utf8");
+
+		expect(source).not.toMatch(/^import .*from "effect"/m);
+		expect(source).not.toMatch(/^import .*exportPdf/m);
+	});
+});
 
 describe("CalendarExport as a PDF", () => {
 	beforeEach(() => {

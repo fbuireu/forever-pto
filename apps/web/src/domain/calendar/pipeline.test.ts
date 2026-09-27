@@ -227,4 +227,19 @@ describe("runPlanningPipeline", () => {
 		expect(findBridges).toHaveBeenCalledTimes(1);
 		findBridges.mockRestore();
 	});
+
+	it("treats a Preferred Month already past as not chosen, so Main vacation's block goes where it can still be taken", () => {
+		vi.useFakeTimers({ now: new Date(YEAR, 8, 15), toFake: ["Date"] });
+		try {
+			const input = { ...baseInput, ptoDays: 10, allowPastDays: false, strategy: FilterStrategy.MAIN_VACATION };
+			const passed = runPlanningPipeline({ ...input, preferredMonths: [0] });
+			const none = runPlanningPipeline({ ...input, preferredMonths: [] });
+
+			expect(passed.suggestion.days.map((day) => day.getTime())).toStrictEqual(
+				none.suggestion.days.map((day) => day.getTime()),
+			);
+		} finally {
+			vi.useRealTimers();
+		}
+	});
 });

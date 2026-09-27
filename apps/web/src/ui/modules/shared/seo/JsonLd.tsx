@@ -124,6 +124,22 @@ export async function FaqJsonLd({ locale }: JsonLdProps) {
 			},
 			{
 				"@type": "Question",
+				name: tFaq("sections.general.premium.question"),
+				acceptedAnswer: {
+					"@type": "Answer",
+					text: tFaq("sections.general.premium.answer"),
+				},
+			},
+			{
+				"@type": "Question",
+				name: tFaq("sections.general.carryOver.question"),
+				acceptedAnswer: {
+					"@type": "Answer",
+					text: tFaq("sections.general.carryOver.answer"),
+				},
+			},
+			{
+				"@type": "Question",
 				name: tFaq("sections.technical.algorithms.question"),
 				acceptedAnswer: {
 					"@type": "Answer",
@@ -140,10 +156,34 @@ export async function FaqJsonLd({ locale }: JsonLdProps) {
 			},
 			{
 				"@type": "Question",
+				name: tFaq("sections.technical.weekends.question"),
+				acceptedAnswer: {
+					"@type": "Answer",
+					text: tFaq("sections.technical.weekends.answer"),
+				},
+			},
+			{
+				"@type": "Question",
+				name: tFaq("sections.technical.alternatives.question"),
+				acceptedAnswer: {
+					"@type": "Answer",
+					text: tFaq("sections.technical.alternatives.answer"),
+				},
+			},
+			{
+				"@type": "Question",
 				name: tFaq("sections.technical.results.question"),
 				acceptedAnswer: {
 					"@type": "Answer",
 					text: tFaq("sections.technical.results.answer"),
+				},
+			},
+			{
+				"@type": "Question",
+				name: tFaq("sections.technical.export.question"),
+				acceptedAnswer: {
+					"@type": "Answer",
+					text: tFaq("sections.technical.export.answer"),
 				},
 			},
 			{
@@ -168,6 +208,14 @@ export async function FaqJsonLd({ locale }: JsonLdProps) {
 				acceptedAnswer: {
 					"@type": "Answer",
 					text: tFaq("sections.security.tracking.answer"),
+				},
+			},
+			{
+				"@type": "Question",
+				name: tFaq("sections.security.devices.question"),
+				acceptedAnswer: {
+					"@type": "Answer",
+					text: tFaq("sections.security.devices.answer"),
 				},
 			},
 			{

@@ -19,13 +19,13 @@ import { QuickStartSettingsStep } from "./QuickStartSettingsStep";
 import {
 	canLeaveStep,
 	createDraft,
+	PLANNER_PATH,
 	QUICK_START_STEPS,
 	type QuickStartDraft,
 	QuickStartStep,
 	trackedDraft,
 } from "./steps";
 
-const PLANNER_PATH = "/planner";
 const PERCENT = 100;
 
 interface QuickStartFormProps {
@@ -80,6 +80,7 @@ export const QuickStartForm = ({ countries, currentYear, onStepChange }: QuickSt
 		filters.setYear(draft.year);
 		filters.setPtoDays(draft.ptoDays);
 		filters.setStrategy(draft.strategy);
+		filters.setPreferredMonths(draft.preferredMonths);
 		filters.setAllowPastDays(draft.allowPastDays);
 		filters.setCarryOverMonths(draft.carryOverMonths);
 		track({ event: "quick_start_completed", properties: trackedDraft(draft) });
@@ -90,7 +91,7 @@ export const QuickStartForm = ({ countries, currentYear, onStepChange }: QuickSt
 	return (
 		<>
 			<DialogHeader>
-				<div className="flex items-center justify-between gap-3 font-mono text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+				<div className="flex items-center justify-between gap-3 pr-10 font-mono text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
 					<span>{t("progress", { current: stepIndex + 1, total: QUICK_START_STEPS.length })}</span>
 					<span>{t(`steps.${step}`)}</span>
 				</div>

@@ -1,10 +1,15 @@
 import { endOfMonth } from "@application/shared/utils/dates";
 import { describe, expect, it } from "vitest";
 import {
+	DEFAULT_PREFERRED_MONTHS,
+	inPreferredMonths,
+	isPreferredMonths,
 	MAX_CARRY_OVER_MONTHS,
 	MONTHS_IN_YEAR,
 	planningWindowInterval,
 	planningWindowMonths,
+	reachableMonths,
+	reachablePreferredMonths,
 	windowMonthCount,
 	windowQuarterCount,
 } from "./window";
@@ -78,5 +83,63 @@ describe("MAX_CARRY_OVER_MONTHS", () => {
 		expect(
 			planningWindowInterval({ year, carryOverMonths: MAX_CARRY_OVER_MONTHS + 1 }).end.getFullYear(),
 		).toBeGreaterThan(year + 1);
+	});
+});
+
+describe("isPreferredMonths", () => {
+	it.each([[[]], [[0]], [[6, 7]], [[0, 11]]])("accepts %o", (value) => {
+		expect(isPreferredMonths(value)).toBe(true);
+	});
+
+	it.each([[[24]], [[-1]], [[6, 6]], [[1.5]], [["6"]], ["6,7"], [null], [undefined], [{}]])(
+		"rejects %o, which a hand-edited persisted blob or a stale worker message could carry",
+		(value) => {
+			expect(isPreferredMonths(value)).toBe(false);
+		},
+	);
+
+	it("accepts the default it is paired with", () => {
+		expect(isPreferredMonths([...DEFAULT_PREFERRED_MONTHS])).toBe(true);
+	});
+});
+
+describe("inPreferredMonths", () => {
+	it("holds when every month is preferred", () => {
+		expect(inPreferredMonths({ months: [6, 7, 7], preferredMonths: new Set([6, 7]) })).toBe(true);
+	});
+
+	it("fails when one month is not", () => {
+		expect(inPreferredMonths({ months: [5, 6], preferredMonths: new Set([6, 7]) })).toBe(false);
+	});
+
+	it("reads no preference as every month", () => {
+		expect(inPreferredMonths({ months: [0, 11], preferredMonths: new Set() })).toBe(true);
+	});
+});
+
+describe("reachableMonths", () => {
+	const today = new Date(2026, 8, 26);
+
+	it("drops the months already behind today when past days are not allowed, keeping the current one", () => {
+		const reachable = reachableMonths({ year: 2026, carryOverMonths: 0, allowPastDays: false, today });
+
+		expect([...reachable]).toStrictEqual([8, 9, 10, 11]);
+	});
+
+	it("reaches the Carry-over Months, which are the next year's and still ahead", () => {
+		const reachable = reachableMonths({ year: 2026, carryOverMonths: 3, allowPastDays: false, today });
+
+		expect([...reachable]).toStrictEqual([8, 9, 10, 11, 12, 13, 14]);
+	});
+
+	it("reaches every month when past days are allowed, or when the window is a later year", () => {
+		expect(reachableMonths({ year: 2026, carryOverMonths: 0, allowPastDays: true, today }).size).toBe(MONTHS_IN_YEAR);
+		expect(reachableMonths({ year: 2027, carryOverMonths: 0, allowPastDays: false, today }).size).toBe(MONTHS_IN_YEAR);
+	});
+
+	it("keeps only the Preferred Months the window can still reach", () => {
+		const reachable = reachableMonths({ year: 2026, carryOverMonths: 0, allowPastDays: false, today });
+
+		expect(reachablePreferredMonths({ preferredMonths: [6, 7, 11], reachable })).toStrictEqual([11]);
 	});
 });

@@ -229,7 +229,7 @@ describe("generateMetrics", () => {
 		expect(result.totalEffectiveDays).toBe(0);
 	});
 
-	it("counts only the Bridges Effective Days kept", () => {
+	it("counts a Bridge while any of its PTO Days is still placed, as Effective Days still count its stretch", () => {
 		const kept = makeDate({ year: 2025, month: 1, day: 3 });
 		const dropped = [makeDate({ year: 2025, month: 1, day: 9 }), makeDate({ year: 2025, month: 1, day: 10 })];
 		const bridges = [
@@ -261,6 +261,34 @@ describe("generateMetrics", () => {
 			manuallySelectedDays: [],
 		});
 
-		expect(result.bridgesUsed).toBe(1);
+		expect(result.bridgesUsed).toBe(2);
+		expect(result.totalEffectiveDays).toBe(6);
+	});
+
+	it("stops counting a Bridge once none of its PTO Days is placed", () => {
+		const friday = makeDate({ year: 2025, month: 1, day: 3 });
+		const result = generateMetrics({
+			suggestion: {
+				days: [friday],
+				bridges: [
+					{
+						startDate: friday,
+						endDate: makeDate({ year: 2025, month: 1, day: 5 }),
+						ptoDaysNeeded: 1,
+						ptoDays: [friday],
+						effectiveDays: 3,
+						efficiency: 3,
+					},
+				],
+			},
+			locale: LOCALE,
+			planningWindow: { year: YEAR, carryOverMonths: 0 },
+			holidays: [],
+			allowPastDays: true,
+			removedSuggestedDays: [friday],
+			manuallySelectedDays: [],
+		});
+
+		expect(result.bridgesUsed).toBe(0);
 	});
 });

@@ -8,7 +8,7 @@
 		"selectLanguage": "Sprache auswählen, aktuell: {current}",
 		"calculating": "Dein Plan wird berechnet",
 		"planUpdated": "Plan aktualisiert",
-		"noPlan": "Noch kein Plan vorhanden. Prüfe deine Urlaubstage, dein Land und das Jahr.",
+		"noPlan": "Noch kein Plan vorhanden. Prüfe deine PTO-Tage, dein Land und das Jahr.",
 		"skipToMainContent": "Zum Hauptinhalt springen"
 	},
 	"metadata": {
@@ -36,19 +36,17 @@
 		},
 		"planner": {
 			"title": "Planer | Forever PTO",
-			"description": "Plane und optimiere deine PTO-Tage. Intelligenter PTO-Kalender mit Feiertagserkennung, Brückentagsoptimierung und Export nach Google Kalender, Outlook und Apple."
+			"description": "Plane und optimiere deine PTO-Tage. Ein PTO-Kalender, der Feiertage erkennt, Brückentage findet und nach Google Kalender, Outlook und Apple exportiert."
 		}
 	},
 	"planner": {
 		"title": "Forever PTO",
 		"heading": "Planer",
-		"description": "Dein intelligenter PTO-Planer. Konfiguriere deine PTO-Tage, dein Land und deine Strategie, um jeden Feiertag optimal zu nutzen.",
+		"description": "Dein PTO-Planer. Stell deine PTO-Tage, dein Land und deine Strategie ein, damit du jeden Feiertag optimal nutzt.",
 		"titleHighlight1": "Dein Jahr",
 		"titleHighlight2": "frei",
 		"instructions": "Trag deine Tage in der Seitenleiste ein und passe deine Einstellungen an. Noch Fragen?",
-		"quickTour": "Kurze Tour starten",
-		"or": "oder",
-		"checkFaqs": "schau dir unsere FAQs an"
+		"quickTour": "Kurze Tour starten"
 	},
 	"languages": {
 		"en": "Englisch",
@@ -65,7 +63,7 @@
 		"toggleTheme": "Design umschalten"
 	},
 	"summary": {
-		"title": "Urlaubsübersicht {year} – {nextYear}",
+		"title": "PTO-Übersicht {year} – {nextYear}",
 		"metrics": {
 			"ptoDays": "PTO-Tage",
 			"days": "Tage",
@@ -74,14 +72,14 @@
 			"regional": "reg.",
 			"custom": "eigene",
 			"effectiveDays": "Effektive Tage",
-			"overBudget": "über dein Budget von {ptoDays} {ptoDays, plural, one {Tag} other {Tagen}}",
+			"overBudget": "über deinem Budget von {ptoDays} {ptoDays, plural, one {Tag} other {Tagen}}",
 			"gain": "Gewinn",
 			"perPtoDay": "deines Budgets von {ptoDays} {ptoDays, plural, one {Tag} other {Tagen}}",
 			"longWeekends": "Lange Wochenenden",
 			"restBlocks": "Ruheblöcke",
 			"efficiency": "Effizienz",
-			"bridgesUsed": "Brückentage genutzt",
-			"workedDaysPerMonth": "Gearbeitete Tage/Monat",
+			"bridgesUsed": "Genutzte Brücken",
+			"workedDaysPerMonth": "Arbeitstage/Monat",
 			"longestVacation": "Längster Urlaub",
 			"advancedMetrics": "Erweiterte Kennzahlen",
 			"perPlacedDay": "pro genutztem Tag ({placedDays})"
@@ -90,26 +88,26 @@
 			"feature": "Jahresübersicht",
 			"featureDescription": "Detaillierte Analyse deiner freien Tage.",
 			"title": "Jahresübersicht",
-			"firstBreak": "Erste Pause",
-			"maxWorkStreak": "Längste Arbeitsserie",
-			"lastBreak": "Letzte Pause",
-			"totalBonusDays": "Gesamte Bonustage",
+			"firstBreak": "Erste Auszeit",
+			"maxWorkStreak": "Längste Arbeitsphase",
+			"lastBreak": "Letzte Auszeit",
+			"totalBonusDays": "Bonustage insgesamt",
 			"bonusDaysCaption": "Bonustage durch Optimierung",
 			"daysCount": "{count, plural, one {Tag} other {Tage}}"
 		},
 		"summaryParagraph": {
-			"withGain": "Mit deinen {ptoDays} PTO-Tagen und {totalHolidays} Feiertagen verwandelt die {strategy}-Strategie deine Tage in {effectiveDays} effektive freie Tage – das sind {increment} Tage über deinem Budget, ein Gewinn von +{percentage}% gegenüber der Nutzung ohne Optimierung.",
+			"withGain": "Mit deinen {ptoDays} PTO-Tagen und {totalHolidays} Feiertagen macht die {strategy}-Strategie daraus {effectiveDays} effektive freie Tage. Das sind {increment} Tage über deinem Budget, ein Gewinn von +{percentage}% gegenüber einer Planung ohne Optimierung.",
 			"withoutGain": "Mit deinen {ptoDays} PTO-Tagen und {totalHolidays} Feiertagen erhältst du {effectiveDays} effektive freie Tage mit der {strategy}-Strategie.",
 			"noRegionHintTitle": "Region hinzufügen",
 			"noRegionHint": "Wähle deine Region in der Seitenleiste aus, um regionale Feiertage einzubeziehen und möglicherweise noch mehr freie Tage zu erhalten.",
-			"withRegion": "{regionalDays} deiner Feiertage sind spezifisch für {region}."
+			"withRegion": "{regionalDays} deiner Feiertage gelten nur in {region}."
 		},
 		"notifications": {
 			"canImprove": {
 				"title": "Verbesserung möglich",
 				"message": "{count, plural, one {Es gibt Alternativen, die <b><n>#</n> Tag mehr</b> zu deinem Vorschlag hinzufügen.} other {Es gibt Alternativen, die <b><n>#</n> Tage mehr</b> zu deinem Vorschlag hinzufügen.}}",
-				"reviewOptions": "Verfügbare Alternativen prüfen.",
-				"considerPremium": "Hol dir Premium für tiefere Einblicke."
+				"reviewOptions": "Sieh dir die Alternativen an.",
+				"considerPremium": "Mit Premium siehst du mehr Details."
 			},
 			"manualAdjustments": {
 				"title": "Manuelle Anpassungen",
@@ -134,40 +132,59 @@
 		}
 	},
 	"faq": {
-		"title": "Häufig gestellte Fragen",
 		"sections": {
 			"general": {
 				"title": "Allgemein",
 				"whatIsPto": {
 					"question": "Was ist PTO?",
-					"answer": "PTO steht für Paid Time Off (bezahlte freie Tage): die Anzahl der bezahlten freien Tage, die dein Arbeitgeber dir jedes Jahr gibt, um sie nach Belieben zu nutzen. Im Gegensatz zu Krankentagen oder gesetzlichen Feiertagen kannst du PTO-Tage frei einplanen. Das Problem ist, dass die meisten Menschen sie zufällig nutzen und viel Erholungspotenzial verschenken. Forever PTO hilft dir, diese Tage strategisch rund um Feiertage zu platzieren, um beispielsweise 5 PTO-Tage in 12 aufeinanderfolgende freie Tage zu verwandeln."
+					"answer": "PTO steht für Paid Time Off (bezahlte freie Tage): die Anzahl der bezahlten freien Tage, die dein Arbeitgeber dir jedes Jahr gibt und die du nach Belieben nutzen kannst. Anders als Krankentage oder gesetzliche Feiertage kannst du PTO-Tage frei einplanen. Die meisten setzen sie allerdings planlos ein und verschenken so viel Erholung. Forever PTO hilft dir, diese Tage strategisch rund um Feiertage zu legen, um zum Beispiel aus 5 PTO-Tagen 12 freie Tage am Stück zu machen."
 				},
 				"whatIs": {
 					"question": "Was ist das?",
-					"answer": "Forever PTO ist ein Tool, das dir hilft, deine PTO-Tage optimal zu planen. Es schlägt dir basierend auf Feiertagen und deinen Präferenzen die besten freien Tage vor. Du kannst verschiedene Strategien wählen und Feiertage – inklusive eigener Firmen- oder Regionsfeiertage – vollständig anpassen."
+					"answer": "Forever PTO ist ein Tool, das dir hilft, deine PTO-Tage optimal zu planen. Es schlägt dir anhand der Feiertage und deiner Präferenzen die besten freien Tage vor. Du kannst verschiedene Strategien wählen und die Feiertage vollständig anpassen, auch mit eigenen Firmen- oder Regionsfeiertagen."
 				},
 				"whyNotSeeingCountry": {
-					"question": "Warum wird mein Land oder meine Feiertage nicht korrekt angezeigt?",
-					"answer": "Der Einfachheit und Leistung halber verwenden wir ein Drittanbieter-Tool, um die gesetzlichen Feiertage für ein bestimmtes Land und Jahr abzurufen. Es kann vorkommen, dass dein Land oder deine Region nicht unterstützt wird oder die Daten nicht aktuell sind. Um dies zu beheben, kannst du eigene Feiertage hinzufügen."
+					"question": "Warum werden mein Land oder meine Feiertage nicht richtig angezeigt?",
+					"answer": "Aus Gründen der Einfachheit und Performance verwenden wir ein Drittanbieter-Tool, um die gesetzlichen Feiertage für ein bestimmtes Land und Jahr abzurufen. Es kann vorkommen, dass dein Land oder deine Region nicht unterstützt wird oder die Daten nicht aktuell sind. In dem Fall kannst du eigene Feiertage hinzufügen."
 				},
 				"pricing": {
 					"question": "Warum gibt es ein kostenpflichtiges Modell?",
-					"answer": "Forever PTO ist kostenlos. Allerdings nutzen wir ein kostenpflichtiges Modell, um die Kosten für Datenpflege, Infrastruktur und kontinuierliche Verbesserungen zu decken. Das kostenpflichtige Modell finanziert Updates, Support und Hosting. Wir bieten auch eine kostenlose Version mit den wichtigsten Funktionen an, damit jeder von einer besseren Urlaubsplanung profitieren kann."
+					"answer": "Forever PTO ist kostenlos. Das kostenpflichtige Modell deckt die Kosten für Datenpflege, Hosting, Support und laufende Verbesserungen. Die wichtigsten Funktionen bleiben in der kostenlosen Version, damit alle ihren Urlaub besser planen können."
+				},
+				"premium": {
+					"question": "Was schaltet Premium frei?",
+					"answer": "Premium schaltet die erweiterten Funktionen des Planers frei: die vorgeschlagenen Tage von Hand bearbeiten, eigene Feiertage hinzufügen, vergangene Tage planen, Übertragsmonate ins nächste Jahr, die erweiterten Kennzahlen und Diagramme und den Export deines Plans in den Kalender. Planen mit jeder Strategie, jedem Land und jeder Region bleibt kostenlos."
+				},
+				"carryOver": {
+					"question": "Was sind Übertragsmonate?",
+					"answer": "Wenn deine Firma dir erlaubt, die PTO-Tage dieses Jahres in den ersten Monaten des nächsten zu nehmen, verlängern Übertragsmonate den Planungszeitraum um bis zu 12 Monate nach Dezember. So kann der Planer auch Tage etwa im Januar oder Februar des Folgejahres setzen."
 				}
 			},
 			"technical": {
 				"title": "Technisch",
 				"algorithms": {
 					"question": "Wie funktioniert der Vorschlagsalgorithmus?",
-					"answer": "Das System analysiert verfügbare Arbeitstage, Feiertage und Benutzerpräferenzen (z. B. Vermeidung vergangener Tage), um PTO-Kombinationen zu erstellen, die die effektive Freizeit maximieren. Es wendet Heuristiken basierend auf Effizienz und Bewertung an, um Brückentage und gruppierte Tage zu priorisieren."
+					"answer": "Das System analysiert deine verfügbaren Arbeitstage, Feiertage und Präferenzen (z. B. Vermeidung vergangener Tage) und findet jede mögliche Brücke, bis zu einer ganzen Arbeitswoche. Dann baut es deinen Plan Brücke für Brücke auf und nimmt immer die, die dem bereits abgedeckten Zeitraum die meisten neuen freien Tage hinzufügt, nach den Regeln deiner Strategie. So wird ein Wochenende, das sich zwei Brücken teilen, nie doppelt gezählt."
 				},
 				"strategies": {
-					"question": "Was ist der Unterschied zwischen \"ausgewogen\" und \"optimiert\"?",
-					"answer": "Ausgewogen verteilt freie Tage gleichmäßig über das Jahr. Optimiert maximiert dagegen die Effizienz – also möglichst viele freie Tage pro eingesetztem PTO-Tag."
+					"question": "Was ist der Unterschied zwischen \"gruppiert\", \"optimiert\", \"ausgewogen\" und \"Haupturlaub\"?",
+					"answer": "Optimiert holt die meisten effektiven freien Tage pro PTO-Tag heraus, vor allem als lange Wochenenden über das Jahr verteilt. Gruppiert gibt einen Teil dieser Effizienz für wenige lange Urlaube von etwa zwei Wochen auf. Ausgewogen sorgt dafür, dass du nie zu lange ohne Erholung arbeitest: Alle paar Wochen gibt es ein langes Wochenende, damit keine Arbeitsphase zu lang wird. Haupturlaub legt einen Block von bis zu zwei Wochen in die Monate deiner Wahl und verteilt den Rest wie Optimiert."
+				},
+				"weekends": {
+					"question": "Verbrauchen Wochenenden und Feiertage PTO-Tage?",
+					"answer": "Nein. PTO-Tage werden nur auf Arbeitstage gelegt. Wochenenden und Feiertage sind schon frei, und genau das nutzt der Planer, um aus jedem PTO-Tag mehr freie Tage zu machen."
+				},
+				"alternatives": {
+					"question": "Was sind die Alternativen?",
+					"answer": "Neben dem Vorschlag erstellt der Planer weitere Pläne mit demselben Budget, mit deiner Strategie und mit den anderen. So kannst du vergleichen, wie viele freie Tage dir jeder bringt, und den gewünschten mit einem Klick übernehmen."
 				},
 				"results": {
 					"question": "Warum ändern sich meine Empfehlungen, wenn ich Einstellungen oder Feiertage anpasse?",
-					"answer": "Die Vorschläge werden in Echtzeit anhand deines PTO-Budgets, des ausgewählten Jahres, des Feiertagssatzes, eigener Feiertage und der Strategie neu berechnet. Schon kleine Änderungen können das Ranking verschieben, weil die Engine jede mögliche Brücke und jeden Block neu bewertet."
+					"answer": "Die Vorschläge werden in Echtzeit neu berechnet, sobald sich dein PTO-Budget, das Jahr, die Feiertage oder die Strategie ändern. Schon kleine Änderungen können die Reihenfolge verschieben, weil der Planer jede mögliche Brücke und jeden Block neu bewertet."
+				},
+				"export": {
+					"question": "Kann ich meinen Plan in meinen Kalender übernehmen?",
+					"answer": "Ja. Mit Premium kannst du deine PTO-Tage, die Feiertage oder beides als .ics-Datei exportieren, die mit Google Calendar, Apple Calendar, Outlook und jeder anderen Kalender-App funktioniert, oder als PDF zum Drucken oder Teilen."
 				}
 			},
 			"security": {
@@ -178,38 +195,42 @@
 				},
 				"encryption": {
 					"question": "Sind meine Daten verschlüsselt?",
-					"answer": "Deine Urlaubsplanungsdaten werden ausschließlich lokal in deinem Browser gespeichert. Wir verwenden eine XOR-Verschleierung, um die Daten bei flüchtiger Einsicht unlesbar zu machen – nicht zum Schutz vor gezielten Angriffen. Wir sehen diese Daten nie; du behältst die volle Kontrolle."
+					"answer": "Deine Urlaubsplanungsdaten werden ausschließlich lokal in deinem Browser gespeichert. Wir verschleiern sie per XOR, damit sie auf den ersten Blick nicht lesbar sind; vor gezielten Angriffen schützt das nicht. Wir sehen diese Daten nie; du behältst die volle Kontrolle."
 				},
 				"tracking": {
 					"question": "Verkauft ihr meine Daten oder verfolgt ihr meine Urlaubsplanung?",
-					"answer": "Nein. Deine Planungsdaten bleiben in deinem Browser und werden weder an Werbetreibende noch an Datenhändler verkauft. Wenn Analytics aktiviert sind, dienen sie nur der Produktmessung und werden niemals genutzt, um deine Urlaubsplanung zu profilieren."
+					"answer": "Nein. Deine Planungsdaten bleiben in deinem Browser und werden weder an Werbetreibende noch an Datenhändler verkauft. Wenn Analytics aktiviert sind, dienen sie nur der Produktmessung und werden nie genutzt, um Profile über deine Urlaubsplanung zu erstellen."
+				},
+				"devices": {
+					"question": "Brauche ich ein Konto? Kann ich meinen Plan auf einem anderen Gerät nutzen?",
+					"answer": "Es gibt keine Konten. Dein Plan liegt in diesem Browser, auf einem anderen Gerät oder Browser fängst du also von vorn an. Premium hängt an der E-Mail-Adresse, mit der du gespendet hast: Gib sie auf einem neuen Gerät im Premium-Fenster ein, und der Zugang ist wieder da."
 				},
 				"troubleshooting": {
-					"question": "Fehlerbehebung & veraltete Client-Daten"
+					"question": "Fehlerbehebung & veraltete Browserdaten"
 				}
 			},
 			"collaborate": {
 				"title": "Interesse an einer Zusammenarbeit?",
 				"code": {
 					"question": "Wie kann man Code oder Ideen beitragen?",
-					"answer": "<link>Öffne Issues oder Merge Requests</link> mit Vorschlägen. Wir freuen uns über Hilfe bei Algorithmen, Integrationen und UX-Verbesserungen."
+					"answer": "<link>Öffne Issues oder Pull Requests</link> mit Vorschlägen. Wir freuen uns über Hilfe bei Algorithmen, Integrationen und UX-Verbesserungen."
 				},
 				"business": {
-					"question": "Integrationen oder Unternehmenspartnerschaften",
+					"question": "Integrationen oder Unternehmenspartnerschaften vorschlagen",
 					"answer": "Wenn du ein Unternehmen vertrittst und Forever PTO integrieren möchtest, meld dich beim Support oder öffne einen Vorschlag für eine individuelle Integration."
 				},
 				"nonCode": {
 					"question": "Kann ich auch mitarbeiten, wenn ich kein Entwickler bin?",
-					"answer": "Ja. Feedback zu UX, Texten, Übersetzungen, Feiertagsgenauigkeit, Tests und Partnerschaftsideen ist sehr hilfreich. Wenn dir Reibung auffällt oder du einen marktspezifischen Bedarf hast, melde dich und wir schauen es uns gemeinsam an."
+					"answer": "Ja. Feedback zu UX, Texten, Übersetzungen, Feiertagsgenauigkeit, Tests und Partnerschaftsideen ist sehr hilfreich. Wenn dir etwas umständlich vorkommt oder du einen marktspezifischen Bedarf hast, melde dich und wir schauen es uns gemeinsam an."
 				}
 			}
 		}
 	},
 	"workdayCounter": {
 		"title": "Arbeitstage-Zähler",
-		"tooltip": "Zähle Arbeitstage zwischen zwei Daten – Wochenenden und Feiertage werden automatisch ausgeschlossen. Nützlich für Projektplanung und Terminberechnungen.",
+		"tooltip": "Zählt die Arbeitstage zwischen zwei Daten und lässt Wochenenden und Feiertage automatisch weg. Nützlich für Projektplanung und Terminberechnungen.",
 		"tooltipLabel": "Mehr Informationen zum Arbeitstage-Zähler",
-		"selectRange": "Daten auswählen",
+		"selectRange": "Zeitraum auswählen",
 		"clearSelection": "Auswahl löschen",
 		"workdays": "Arbeitstage",
 		"businessDays": "Arbeitstage in deinem Planungszeitraum",
@@ -217,7 +238,7 @@
 		"weekendDays": "Wochenendtage",
 		"holidays": "Feiertage",
 		"holidaysOutsideRange": "Feiertage sind nur für {from}–{to} bekannt, alle außerhalb zählen daher als Arbeitstage.",
-		"dateRange": "Ausgewählte Daten",
+		"dateRange": "Ausgewählter Zeitraum",
 		"from": "Von",
 		"to": "bis"
 	},
@@ -265,13 +286,13 @@
 		"regionalPart": ", {regionalDays} regionalen",
 		"customPart": " und {customDays} eigenen",
 		"quarterDescription": "Verteilung von {totalDays} effektiven Tagen auf {activeQuarters, plural, one {# Quartal} other {# Quartale}} deines Planungszeitraums.",
-		"annualTimeline": "Jahresübersicht",
-		"annualTimelineFeature": "Diagramm: Jahresübersicht",
+		"annualTimeline": "Jahresverlauf",
+		"annualTimelineFeature": "Diagramm: Jahresverlauf",
 		"timelineDescription": "Monatliche Entwicklung von {totalDays} freien Tagen verteilt auf {activeMonths} Monate. Höchstwert im {peakMonth} mit {peakDays} Tagen.",
 		"daysOffLabel": "Freie Tage",
 		"longBlocksPerQuarter": "Lange Blöcke pro Quartal",
 		"longBlocksFeature": "Diagramm: Lange Blöcke pro Quartal",
-		"blocksDescription": "{totalBlocks} lange Blöcke (3+ aufeinanderfolgende Tage) ideal für Urlaub{bestQuarterPart}.",
+		"blocksDescription": "{totalBlocks} lange Blöcke (3+ aufeinanderfolgende Tage), ideal für einen Urlaub{bestQuarterPart}.",
 		"bestQuarterPart": ". Bestes Quartal: Q{bestQuarter} mit {maxBlocks, plural, one {# Block} other {# Blöcke}}",
 		"blocks": "Blöcke",
 		"blocksOf3Days": "Blöcke von 3+ Tagen"
@@ -287,12 +308,12 @@
 			"submit": "Feiertag hinzufügen",
 			"submitting": "Wird hinzugefügt...",
 			"cancel": "Abbrechen",
-			"successTitle": "Feiertag erfolgreich erstellt",
+			"successTitle": "Feiertag hinzugefügt",
 			"successDescription": "{name} wurde am {date} hinzugefügt",
-			"errorTitle": "Fehler beim Erstellen des Feiertags",
-			"errorDescription": "Etwas ist schiefgelaufen. Versuch es nochmal.",
+			"errorTitle": "Feiertag konnte nicht hinzugefügt werden",
+			"errorDescription": "Etwas ist schiefgelaufen. Versuch es noch einmal.",
 			"existsTitle": "Feiertag existiert bereits",
-			"manualDayExistsTitle": "Dieser Tag ist bereits ein Urlaubstag",
+			"manualDayExistsTitle": "Dieser Tag ist bereits ein PTO-Tag",
 			"manualDayExistsDescription": "Du hast den {date} bereits als freien Tag eingeplant. Nimm ihn zuerst aus deinem Plan und füge dann den Feiertag hinzu.",
 			"existsDescription": "Am {date} gibt es bereits einen Feiertag: {name}"
 		},
@@ -302,10 +323,10 @@
 			"submit": "Änderungen speichern",
 			"submitting": "Wird gespeichert...",
 			"cancel": "Abbrechen",
-			"successTitle": "Feiertag erfolgreich aktualisiert",
+			"successTitle": "Feiertag aktualisiert",
 			"successDescription": "{name} wurde aktualisiert",
-			"errorTitle": "Fehler beim Aktualisieren des Feiertags",
-			"errorDescription": "Etwas ist schiefgelaufen. Versuch es nochmal."
+			"errorTitle": "Feiertag konnte nicht aktualisiert werden",
+			"errorDescription": "Etwas ist schiefgelaufen. Versuch es noch einmal."
 		},
 		"deleteHoliday": {
 			"title": "Feiertage löschen",
@@ -319,8 +340,8 @@
 			"successTitleSingular": "Feiertag gelöscht",
 			"successDescription": "{count} Feiertage wurden entfernt",
 			"successDescriptionSingular": "Der Feiertag wurde entfernt",
-			"errorTitle": "Fehler beim Löschen der Feiertage",
-			"errorDescription": "Etwas ist schiefgelaufen. Versuch es nochmal."
+			"errorTitle": "Feiertage konnten nicht gelöscht werden",
+			"errorDescription": "Etwas ist schiefgelaufen. Versuch es noch einmal."
 		}
 	},
 	"tutorial": {
@@ -330,27 +351,27 @@
 		"progressTextConnector": "von",
 		"steps": {
 			"toolsTitle": "Rechner & Werkzeuge",
-			"toolsDescription": "Greife hier auf hilfreiche Rechner zu: Schätze deine PTO-Tage basierend auf deiner Berufserfahrung, berechne den Geldwert ungenutzter PTO-Tage oder zähle Arbeitstage zwischen zwei Daten.",
+			"toolsDescription": "Hier findest du die Rechner: Schätze, wie viele PTO-Tage du angesammelt hast, sieh, was dich ungenutzte Tage an Gehalt kosten, oder zähle die Arbeitstage zwischen zwei Daten.",
 			"alternativesTitle": "Alternativen-Manager",
-			"alternativesDescription": "Sieh dir verschiedene Urlaubsvorschläge an, die wir für dich berechnet haben. Vergleiche Effizienzkennzahlen, effektive Tage und finde die perfekte Balance. Die erste Alternative ist immer unser Empfehlungsvorschlag, markiert mit einem Funkelsymbol. Nutze die Pfeile, um Alternativen zu erkunden, und klicke auf \"Alternative anwenden\", um einen anderen Vorschlag zu übernehmen.",
-			"statusTitle": "Urlaubsstatus-Tracker",
-			"statusDescription": "Verfolge deine Urlaubszuweisung in Echtzeit. Sieh automatisch zugewiesene Tage (von unserem System vorgeschlagen), manuell ausgewählte Tage und verbleibende verfügbare Tage. Du kannst manuelle Änderungen jederzeit zurücksetzen, um zum automatischen Vorschlag zurückzukehren.",
-			"calendarTitle": "Dein interaktiver Urlaubskalender",
-			"calendarDescription": "Dies ist dein Jahresübersichtskalender. Feiertage erscheinen in Grau, vorgeschlagene PTO-Tage in Türkis und manuell ausgewählte Tage in Blau. Klicke auf einen beliebigen Arbeitstag, um die Auswahl manuell umzuschalten. Der Kalender aktualisiert sich sofort, wenn du verschiedene Alternativen erkundest.",
+			"alternativesDescription": "Sieh dir die verschiedenen Vorschläge an, die wir für dich berechnet haben, und vergleiche Effizienz und effektive Tage. Die erste Alternative ist immer unsere Empfehlung und mit einem Funkelsymbol markiert. Blättere mit den Pfeilen und klicke auf „Alternative anwenden“, um zu wechseln.",
+			"statusTitle": "PTO-Status",
+			"statusDescription": "Hier siehst du deine PTO-Tage auf einen Blick: automatisch zugewiesene Tage, manuell ausgewählte Tage und wie viele noch übrig sind. Du kannst manuelle Änderungen jederzeit zurücksetzen, um zum vorgeschlagenen Plan zurückzukehren.",
+			"calendarTitle": "Dein interaktiver PTO-Kalender",
+			"calendarDescription": "Hier siehst du dein ganzes Jahr auf einen Blick. Feiertage erscheinen in Grau, vorgeschlagene PTO-Tage in Türkis und manuell ausgewählte Tage in Blau. Klicke auf einen beliebigen Arbeitstag, um ihn manuell aus- oder abzuwählen. Der Kalender aktualisiert sich sofort, wenn du verschiedene Alternativen durchgehst.",
 			"finishTitle": "Du bist startklar!",
-			"finishDescription": "Du kennst jetzt die wichtigsten Funktionen. Stell deine Einstellungen in der Seitenleiste ein – die App erledigt den Rest. Viel Spaß beim freien Sein!",
+			"finishDescription": "Leg deine Einstellungen in der Seitenleiste fest und wir schlagen dir die besten PTO-Tage vor.",
 			"holidaysListTitle": "Passe deine Feiertage an",
-			"holidaysListDescription": "Hier kannst du die Feiertagsdaten an deine genaue Situation anpassen. Bearbeite oder lösche nationale oder regionale Feiertage und füge eigene freie Tage hinzu – Firmenfeiertage, lokale Bräuche oder jedes Datum, das dir wichtig ist. Je genauer die Daten, desto besser die Vorschläge.",
+			"holidaysListDescription": "Hier kannst du die Feiertagsdaten an deine genaue Situation anpassen. Bearbeite oder lösche nationale oder regionale Feiertage und füge eigene freie Tage hinzu, etwa Firmenfeiertage, lokale Bräuche oder jedes andere Datum, das dir wichtig ist. Je genauer die Daten, desto besser die Vorschläge.",
 			"step1Title": "Dein Kontext",
-			"step1Description": "Wähle dein Land, deine Region und das Jahr, für das du planen möchtest. Dies konfiguriert deinen Feiertagskalender, damit wir die besten Brückentage finden.",
+			"step1Description": "Wähle dein Land, deine Region und das Jahr, für das du planen möchtest. Damit richten wir deinen Feiertagskalender ein und finden die besten Brücken.",
 			"step2Title": "Deine PTO-Tage",
 			"step2Description": "Gib an, wie viele PTO-Tage du hast. Dies ist die Grundlage für alle Berechnungen.",
 			"step3Title": "Deine Konfiguration",
 			"step3Description": "Wähle deine Optimierungsstrategie und konfiguriere vergangene Tage und Übertragsmonate, um deinen Plan zu verfeinern.",
 			"step4Title": "Kalender exportieren",
 			"step4Description": "Lade deine Feiertage und geplanten PTO-Tage als .ics-Datei herunter, um sie in Google Calendar, Apple Calendar oder Outlook zu importieren, oder als PDF zum Drucken oder Teilen.",
-			"drawerTitle": "Dein Planungspanel",
-			"drawerDescription": "Diese Leiste zeigt immer eine Zusammenfassung deines Plans. Wische nach oben (oder ziehe den Griff) um Alternativen zu erkunden und zu sehen, wie deine Tage verteilt sind."
+			"drawerTitle": "Dein Planungsbereich",
+			"drawerDescription": "Diese Leiste zeigt immer eine Zusammenfassung deines Plans. Wische sie nach oben (oder zieh am Griff), um Alternativen zu erkunden und zu sehen, wie deine Tage verteilt sind."
 		}
 	},
 	"legend": {
@@ -377,7 +398,7 @@
 		"downloadPdf": "Als .pdf herunterladen",
 		"downloadingPdf": "Wird heruntergeladen",
 		"tooltip": "Wähle, was du in den Export einbeziehen möchtest: Feiertage, deine PTO-Tage oder beides.",
-		"tooltipLabel": "Info Exportoptionen",
+		"tooltipLabel": "Infos zu den Exportoptionen",
 		"pdf": {
 			"holidays": "Feiertage",
 			"ptoDays": "PTO-Tage",
@@ -386,7 +407,7 @@
 			"successTitle": "PDF heruntergeladen",
 			"successDescription": "Dein Kalender wurde erfolgreich exportiert.",
 			"errorTitle": "Download fehlgeschlagen",
-			"errorDescription": "Das PDF konnte nicht erstellt werden. Versuch es nochmal."
+			"errorDescription": "Das PDF konnte nicht erstellt werden. Versuch es noch einmal."
 		}
 	},
 	"ptoStatus": {
@@ -441,7 +462,7 @@
 		"daysUnit": "Tage"
 	},
 	"toasts": {
-		"suggestionApplied": "Vorschlag erfolgreich angewendet",
+		"suggestionApplied": "Vorschlag angewendet",
 		"noPtoDaysRemaining": "Keine verbleibenden PTO-Tage zum Zuweisen",
 		"removeDaysToFree": "Entferne bestehende Tage, um Platz freizugeben",
 		"cannotSelectHoliday": "Ein gesetzlicher Feiertag kann nicht ausgewählt werden",
@@ -450,19 +471,19 @@
 		"cannotSelectWeekendDescription": "Dieser Tag gehört bereits zum Wochenende und kostet dich nichts.",
 		"cannotSelectHolidayDescription": "Dieser Tag ist bereits ein nationaler oder regionaler Feiertag",
 		"paymentFailed": "Zahlung konnte nicht gestartet werden",
-		"paymentFailedDescription": "Versuch es gleich nochmal.",
+		"paymentFailedDescription": "Versuch es später noch einmal",
 		"paymentSuccess": "Zahlung erfolgreich!",
 		"paymentSuccessDescription": "Vielen Dank für deine Unterstützung! Du hast jetzt Premium-Zugang.",
-		"promoApplied": "Aktionscode angewendet!",
+		"promoApplied": "Gutscheincode angewendet!",
 		"promoSavedDescription": "Du hast {saved} gespart (Original: {original}, Endpreis: {final})",
-		"promoCodeError": "Fehler beim Gutscheincode",
+		"promoCodeError": "Fehler mit dem Gutscheincode",
 		"promoCodeErrors": {
 			"invalid_or_expired": "Ungültiger oder abgelaufener Gutscheincode",
 			"usage_limit_reached": "Dieser Gutscheincode hat sein Nutzungslimit erreicht",
 			"coupon_expired": "Dieser Gutscheincode ist abgelaufen",
 			"coupon_invalid": "Dieser Gutscheincode ist nicht mehr gültig",
-			"failed_to_load": "Gutscheincode konnte nicht validiert werden",
-			"min_amount_exceeded": "Rabatt kann auf diesen Betrag nicht angewendet werden"
+			"failed_to_load": "Der Gutscheincode konnte nicht überprüft werden",
+			"min_amount_exceeded": "Der Rabatt kann auf diesen Betrag nicht angewendet werden"
 		}
 	},
 	"troubleshooting": {
@@ -470,10 +491,10 @@
 		"resetButton": "Lokalen Speicher zurücksetzen",
 		"clearing": "Wird gelöscht...",
 		"cleared": "Gelöscht",
-		"successTitle": "Lokaler Speicher erfolgreich gelöscht",
+		"successTitle": "Lokaler Speicher gelöscht",
 		"successDescription": "Alle Daten wurden zurückgesetzt und neu geladen.",
-		"errorTitle": "Fehler beim Löschen des lokalen Speichers",
-		"errorDescription": "Beim Zurücksetzen ist etwas schiefgelaufen. Versuch es nochmal."
+		"errorTitle": "Lokaler Speicher konnte nicht gelöscht werden",
+		"errorDescription": "Beim Zurücksetzen ist etwas schiefgelaufen. Versuch es noch einmal."
 	},
 	"sidebar": {
 		"configuration": "Konfiguration",
@@ -501,11 +522,11 @@
 			"strategyDetails": "Details",
 			"grouped": {
 				"label": "Gruppiert",
-				"description": "Priorisiert lange, zusammenhängende Urlaube",
-				"subtitle": "Gruppiert Brückentage mit aufeinanderfolgenden Feiertagen",
+				"description": "Wenige lange Urlaube",
+				"subtitle": "Bildet Blöcke von etwa zwei Wochen rund um Feiertage",
 				"pros": {
-					"simulatesHumanSelection": "Simuliert menschliche Auswahl",
-					"longBridges": "Lange Brückentage"
+					"longVacations": "Lange Urlaube",
+					"wholeWeeks": "Ganze Wochen frei"
 				},
 				"cons": {
 					"fewerDays": "Weniger Gesamttage",
@@ -514,42 +535,59 @@
 			},
 			"optimized": {
 				"label": "Optimiert",
-				"description": "Maximiert die Effizienz der PTO-Tage",
-				"subtitle": "Hole die meisten freien Tage heraus",
+				"description": "Maximiert deine freien Tage insgesamt",
+				"subtitle": "Jeder PTO-Tag bringt so viel wie möglich",
 				"pros": {
 					"maximumEfficiency": "Maximale Effizienz",
 					"moreDays": "Mehr Gesamttage"
 				},
 				"cons": {
-					"shortBridges": "Kurze Brückentage",
-					"scatteredDays": "Verstreute Tage"
+					"mostlyLongWeekends": "Vor allem lange Wochenenden",
+					"noLongTrip": "Keine lange Reise"
 				}
 			},
 			"balanced": {
 				"label": "Ausgewogen",
-				"description": "Intelligente Balance",
-				"subtitle": "Kombiniert Effizienz mit Gruppierung",
+				"description": "Erholung alle paar Wochen",
+				"subtitle": "Nie zu lange am Stück arbeiten: alle paar Wochen ein langes Wochenende",
 				"pros": {
-					"flexible": "Flexibel",
-					"mediumPeriods": "Mittlere Zeiträume",
-					"versatile": "Vielseitig"
+					"noLongStretch": "Keine langen Arbeitsphasen",
+					"restAllYear": "Erholung das ganze Jahr"
 				},
 				"cons": {
-					"noMaximization": "Maximiert nicht",
-					"intermediateSolution": "Zwischenlösung"
+					"noMaximization": "Keine Maximierung",
+					"noLongTrip": "Keine lange Reise"
+				}
+			},
+			"mainVacation": {
+				"label": "Haupturlaub",
+				"description": "Zuerst deine große Reise",
+				"subtitle": "Ein Block von bis zu zwei Wochen in den Monaten deiner Wahl, danach die besten Brücken",
+				"pros": {
+					"yourTrip": "Deine Reise, wann du willst",
+					"bridgesAfter": "Die besten Brücken für den Rest"
+				},
+				"cons": {
+					"mayHaveFewerDays": "Möglicherweise weniger Tage insgesamt"
 				}
 			}
 		},
+		"preferredMonths": {
+			"title": "Bevorzugte Monate",
+			"tooltipLabel": "Über bevorzugte Monate",
+			"tooltip": "Die Strategie Haupturlaub legt ihren Block in diese Monate. Wählst du keinen, sucht sie die beste Zeit des Jahres.",
+			"anyMonth": "Kein Monat gewählt: Der Block landet dort, wo er am längsten sein kann."
+		},
 		"allowPastDays": {
 			"title": "Vergangene Tage erlauben",
-			"tooltip": "Mit diesem Schalter kannst du die Vorschläge für vergangene Feiertage des ausgewählten Jahres aktivieren oder deaktivieren. So siehst du PTO-Möglichkeiten, die in der Vergangenheit verpasst wurden",
+			"tooltip": "Aktiviere diese Option, um vergangene Tage des ausgewählten Jahres in die Vorschläge einzubeziehen. Praktisch, um PTO-Möglichkeiten zu sehen, die du vielleicht verpasst hast.",
 			"tooltipLabel": "Mehr Informationen über vergangene Tage",
 			"enabled": "Aktiviert",
 			"disabled": "Deaktiviert"
 		},
 		"carryOverMonths": {
 			"title": "Übertragsmonate",
-			"tooltip": "Damit kannst du Monate aus dem Folgejahr einbeziehen und so noch mehr Möglichkeiten für lange freie Zeiträume finden.",
+			"tooltip": "Erweitere den Planungszeitraum ins Folgejahr, um noch mehr Möglichkeiten für Brücken zu finden.",
 			"tooltipLabel": "Mehr Informationen über den Übertrag"
 		},
 		"years": {
@@ -583,7 +621,7 @@
 		"days": "Tage",
 		"decrease": "PTO-Tage verringern",
 		"increase": "PTO-Tage erhöhen",
-		"status": "PTO-Tage Status",
+		"status": "Status der PTO-Tage",
 		"autoAssigned": "Vorgeschlagen:",
 		"manuallySelected": "Manuell ausgewählt:",
 		"remaining": "Verbleibend:",
@@ -593,7 +631,7 @@
 	},
 	"ptoCalculator": {
 		"title": "PTO-Rechner",
-		"tooltip": "Berechne deine PTO-Tage anhand monatlicher Ansammlung. Die meisten Unternehmen bieten 2–3 Tage pro Monat. Wähle den Zielmonat, um deine verfügbaren Tage zu sehen.",
+		"tooltip": "Berechne, wie viele PTO-Tage du bei einer monatlichen Rate angesammelt hast. Die meisten Unternehmen gewähren 2–3 Tage pro Monat. Wähle einen Zielmonat, um deine Gesamtzahl zu sehen.",
 		"tooltipLabel": "Mehr Informationen über den PTO-Rechner",
 		"daysPerMonth": "Tage pro Monat",
 		"calculateThrough": "Berechnen bis",
@@ -608,24 +646,24 @@
 		"applyToPtoDays": "Auf PTO-Tage anwenden"
 	},
 	"ptoSalaryCalculator": {
-		"title": "PTO vs. Gehaltsrechner",
+		"title": "Rechner: PTO vs. Gehalt",
 		"tooltip": "Berechne, wie viel bezahlte Freizeit du aufgibst, wenn du deine PTO-Tage nicht nutzt. Du erhältst weiterhin dein volles Gehalt, aber du arbeitest Tage, die du als bezahlten Urlaub hättest nehmen können.",
 		"tooltipLabel": "Mehr Informationen über den Gehaltsrechner",
 		"annualSalary": "Jahresgehalt",
 		"annualSalaryPlaceholder": "{amount}",
 		"unusedPtoDays": "Ungenutzte PTO-Tage",
 		"unusedPtoDaysPlaceholder": "{days}",
-		"valueOfUnusedPto": "Wert ungenutzter PTO:",
+		"valueOfUnusedPto": "Wert ungenutzter PTO-Tage:",
 		"worthOfPaidVacation": "Wert des nicht genutzten bezahlten Urlaubs",
 		"yourDailyRate": "Dein Tagessatz:",
 		"perDay": "/Tag",
 		"yourHourlyRate": "Dein Stundensatz:",
 		"perHour": "/Stunde",
-		"standardWorkingHours": "Standard-Arbeitsstunden",
+		"standardWorkingHours": "Reguläre Arbeitsstunden",
 		"effectiveHourlyRate": "Effektiver Stundensatz:",
-		"whenWorkingExtraDays": "Bei {days} zusätzlichen unbezahlten Arbeitstagen.",
+		"whenWorkingExtraDays": "Bei {days} zusätzlichen unbezahlten Arbeitstagen",
 		"opportunityCost": "Opportunitätskosten",
-		"opportunityCostDescription": "Du hast {days} Tage gearbeitet, die du als bezahlten Urlaub hättest nehmen können. Das entspricht <amount>value</amount> an bezahlter Freizeit, die ungenutzt blieb. Dein Gehalt bleibt gleich – aber die Tage sind weg."
+		"opportunityCostDescription": "Du hast {days} Tage gearbeitet, die du als bezahlten Urlaub hättest nehmen können. Das entspricht <amount>value</amount> an bezahlter Freizeit, die ungenutzt blieb. Dein Gehalt bleibt gleich, aber die Tage sind weg."
 	},
 	"checkout": {
 		"back": "Zurück",
@@ -642,14 +680,14 @@
 		"errors": {
 			"internal_error": "Bei uns ist etwas schiefgelaufen. Deine Karte wurde nicht belastet.",
 			"rate_limit_exceeded": "Zu viele Versuche. Warte einen Moment und versuche es noch einmal.",
-			"promo_code_too_long": "Dieser Promo-Code ist zu lang."
+			"promo_code_too_long": "Dieser Gutscheincode ist zu lang."
 		}
 	},
 	"donate": {
 		"donateAndUnblock": "Spenden & Freischalten",
 		"supportAndUnblock": "Unterstützen & Freischalten",
-		"makeDonation": "Spende, um den Inhalt zu unterstützen und den Zugang freizuschalten.",
-		"alreadyPremium": "Du hast bereits Premium-Zugang – danke für deine Unterstützung!"
+		"makeDonation": "Unterstütze das Projekt mit einer Spende und schalte den Zugang frei.",
+		"alreadyPremium": "Du hast bereits Premium-Zugang. Danke für deine Unterstützung!"
 	},
 	"donationForm": {
 		"email": "E-Mail",
@@ -658,8 +696,8 @@
 		"donationAmount": "Spendenbetrag",
 		"enterAmount": "Betrag eingeben",
 		"basePriceNote": "Grundpreis in {currency}. Der Endbetrag wird zum aktuellen Wechselkurs in deine lokale Währung umgerechnet.",
-		"havePromoCode": "Hast du einen Promo-Code?",
-		"promoCode": "Promo-Code",
+		"havePromoCode": "Hast du einen Gutscheincode?",
+		"promoCode": "Gutscheincode",
 		"promoCodePlaceholder": "Wäre es doch so einfach",
 		"continueToPayment": "Weiter zur Zahlung",
 		"processing": "Wird verarbeitet..."
@@ -668,14 +706,14 @@
 		"premiumRequired": "Premium-Funktion erforderlich",
 		"featureRequiresPremium": "erfordert Premium-Zugang",
 		"verifyDescription": "Wenn du bereits gespendet oder bezahlt hast, gleichen wir deine E-Mail mit unserer Liste ab und schalten deinen Zugang frei. Bei Problemen meld dich einfach bei uns.",
-		"considerDonating": "Falls du noch nicht gespendet hast, würden wir uns über eine Spende freuen – sie hält das Projekt am Leben und schaltet Premium-Funktionen frei.",
-		"enterPremiumEmail": "Gib deine Premium-E-Mail ein",
+		"considerDonating": "Falls du noch nicht gespendet hast, freuen wir uns über eine Spende. Damit bleibt das Projekt am Leben, und du schaltest die Premium-Funktionen frei.",
+		"enterPremiumEmail": "Gib deine E-Mail-Adresse ein",
 		"emailPlaceholder": "deine@email.com",
-		"verifying": "Überprüfung...",
+		"verifying": "Wird überprüft...",
 		"verifyAccess": "Zugang überprüfen",
 		"cancel": "Abbrechen",
 		"accessGranted": "Zugang gewährt!",
-		"welcomeToPremium": "Willkommen bei Premium! Du kannst dieses Fenster schließen – es schließt sich in {seconds} Sekunden von selbst.",
+		"welcomeToPremium": "Willkommen bei Premium! Du kannst dieses Fenster schließen, sonst schließt es sich in {seconds} Sekunden von selbst.",
 		"accessDenied": "Zugang verweigert",
 		"emailNotFound": "Diese E-Mail-Adresse ist nicht als Premium-Nutzer:in registriert."
 	},
@@ -689,23 +727,23 @@
 			"messageMax": "Die Nachricht ist zu lang"
 		},
 		"payment": {
-			"amountMin": "Mindestbetrag ist {min, number}",
-			"amountMax": "Höchstbetrag ist {max, number}",
-			"promoCodeTooLong": "Der Promo-Code ist zu lang"
+			"amountMin": "Der Mindestbetrag ist {min, number}",
+			"amountMax": "Der Höchstbetrag ist {max, number}",
+			"promoCodeTooLong": "Der Gutscheincode ist zu lang"
 		},
 		"holiday": {
-			"nameRequired": "Name des Feiertags fehlt.",
-			"nameMax": "Name des Feiertags ist zu lang.",
-			"invalidDate": "Wähle ein gültiges Datum."
+			"nameRequired": "Der Name des Feiertags ist erforderlich",
+			"nameMax": "Der Name des Feiertags ist zu lang",
+			"invalidDate": "Wähle ein gültiges Datum"
 		},
 		"email": {
-			"invalid": "Gib eine gültige E-Mail-Adresse ein.",
-			"required": "Gib deine E-Mail-Adresse ein."
+			"invalid": "Gib eine gültige E-Mail-Adresse ein",
+			"required": "Die E-Mail-Adresse ist erforderlich"
 		}
 	},
 	"roadmap": {
 		"title": "Roadmap",
-		"subtitle": "Entdecke, was wir gebaut haben und was als Nächstes kommt",
+		"subtitle": "Was schon fertig ist und was als Nächstes kommt",
 		"selected": "Ausgewählt",
 		"completed": "Abgeschlossen",
 		"inProgress": "In Bearbeitung",
@@ -713,20 +751,20 @@
 		"future": "Zukunft",
 		"detailedView": "Detailansicht",
 		"haveSuggestion": "Hast du einen Vorschlag?",
-		"feedbackShapes": "Dein Feedback gestaltet unsere Roadmap. Teile deine Ideen und hilf uns, den perfekten Urlaubsplaner zu bauen.",
+		"feedbackShapes": "Dein Feedback fließt in unsere Roadmap ein. Erzähl uns deine Ideen und hilf uns, den Planer besser zu machen.",
 		"gotAnIdea": "Hast du eine Idee, die dein Leben einfacher machen würde?",
 		"letsTalk": "Lass uns reden",
 		"or": "oder",
 		"openIssue": "erstelle ein Issue auf GitHub",
 		"features": {
 			"corePtoCalculator": "PTO-Kernrechner",
-			"corePtoCalculatorDescription": "Intelligente Urlaubsplanung mit Feiertagsoptimierung und Brückentag-Erkennung.",
+			"corePtoCalculatorDescription": "Urlaubsplanung rund um Feiertage, mit Erkennung von Brückentagen.",
 			"multipleCountries": "Unterstützung mehrerer Länder",
 			"multipleCountriesDescription": "Feiertage für europäische Länder mit regionsspezifischen Regeln.",
 			"premiumFeatures": "Premium-Funktionen",
 			"premiumFeaturesDescription": "Erweiterte Funktionen per Einmalzahlung über Stripe freischalten.",
 			"customHolidays": "Eigene Feiertage",
-			"customHolidaysDescription": "Eigene Feiertage hinzufügen, bearbeiten und entfernen – für einen Plan, der genau zu dir passt.",
+			"customHolidaysDescription": "Eigene Feiertage hinzufügen, bearbeiten und entfernen.",
 			"alternativeStrategies": "Alternative Strategien",
 			"alternativeStrategiesDescription": "Mehrere Urlaubsplanungsstrategien mit Effizienzvergleich.",
 			"analyticsDashboard": "Analyse-Dashboard",
@@ -740,17 +778,17 @@
 			"mobileApp": "Mobile App",
 			"mobileAppDescription": "Native iOS- und Android-Apps für Urlaubsplanung unterwegs.",
 			"aiSuggestions": "KI-Vorschläge",
-			"aiSuggestionsDescription": "KI-gestützte Empfehlungen basierend auf deinen Präferenzen und bisherigen Mustern.",
+			"aiSuggestionsDescription": "Empfehlungen per KI, abgestimmt auf deine Präferenzen und bisherigen Muster.",
 			"weatherIntegration": "Wetter-Integration",
 			"weatherIntegrationDescription": "Wettervorhersagen für deine geplanten PTO-Tage.",
 			"blockedPeriods": "Gesperrte Zeiträume",
 			"blockedPeriodsDescription": "Markiere Zeiträume, in denen du keine PTO-Vorschläge möchtest: Konferenzen, Reisen, Krankschreibungen oder Zeiten, von denen du weißt, dass du beschäftigt sein wirst.",
 			"performanceOptimization": "Performance-Optimierung",
-			"performanceOptimizationDescription": "Schnellere Berechnungen und flüssigeres Erlebnis dank Web Workers.",
+			"performanceOptimizationDescription": "Schnellere Berechnungen und eine flüssigere Oberfläche dank Web Workers.",
 			"customWeekends": "Individuelle Wochenenden",
 			"customWeekendsDescription": "Definiere eigene arbeitsfreie Tage über das Standard-Samstag-Sonntag-Wochenende hinaus.",
 			"multiYearPlanning": "Mehrjahresplanung",
-			"multiYearPlanningDescription": "Plane Urlaube über mehrere Jahre mit Übertragsunterstützung.",
+			"multiYearPlanningDescription": "Plane Urlaube über mehrere Jahre, inklusive Übertrag.",
 			"calendarSubscription": "Live-Kalenderabonnement",
 			"calendarSubscriptionDescription": "Abonniere direkt aus Google Calendar, Apple Calendar oder Outlook über eine webcal://-URL; dein Plan bleibt automatisch synchronisiert."
 		}
@@ -775,17 +813,17 @@
 		"minutes": "Minuten",
 		"hours": "Stunden",
 		"week": "Woche",
-		"userCountryDesc": "Speichert deinen CDN-Länderstandort für den ersten Feiertagsvorschlag.",
+		"userCountryDesc": "Speichert dein erkanntes Land für den ersten Feiertagsvorschlag.",
 		"ccCookieDesc": "Speichert deine Cookie-Einwilligungseinstellungen",
 		"stripeMidDesc": "Betrugserkennung und -prävention. Von Stripe für sichere Zahlungsabwicklung gesetzt.",
 		"stripeSidDesc": "Sitzungskennung zur Betrugserkennung. Erforderlich für den Bezahlvorgang.",
 		"gaDesc": "Unterscheidet eindeutige Nutzer.",
-		"gaStarDesc": "Pflegt den Sitzungsstatus für die Analyse-Nachverfolgung",
+		"gaStarDesc": "Speichert den Sitzungsstatus für das Analyse-Tracking",
 		"gidDesc": "Unterscheidet Nutzer für kurzfristige Analysen",
 		"learnMore": "Mehr erfahren",
 		"provider": "Anbieter: {name}",
-		"bsUidDesc": "Eindeutige Besucherkennung für das Better Stack Analyse-Tracking",
-		"bsSidDesc": "Sitzungskennung für das Better Stack Analyse-Tracking",
+		"bsUidDesc": "Eindeutige Besucherkennung für das Analyse-Tracking von Better Stack",
+		"bsSidDesc": "Sitzungskennung für das Analyse-Tracking von Better Stack",
 		"ga4Label": "Google Analytics 4",
 		"betterStackLabel": "Better Stack",
 		"session": "Sitzung"
@@ -798,16 +836,16 @@
 		"status": "Status"
 	},
 	"workdayCounterModal": {
-		"selectDateRange": "Daten auswählen"
+		"selectDateRange": "Zeitraum auswählen"
 	},
 	"legal": {
 		"lastUpdated": "Zuletzt aktualisiert: {date}"
 	},
 	"notFound": {
-		"kicker": "fehler 404 · route verloren",
-		"title": "Diese Seite ist in den",
+		"kicker": "Fehler 404 · Route verloren",
+		"title": "Diese Seite ist einfach in den",
 		"titleHighlight": "Urlaub",
-		"titleEmphasis": "gefahren ohne Bescheid.",
+		"titleEmphasis": "gefahren, ohne Bescheid zu sagen.",
 		"lede": "Wir haben am Strand gesucht, unter dem Sonnenschirm nachgeschaut, an der Strandbar gefragt… nichts. Die URL, die du suchst, existiert nicht (oder hat sich zwischen zwei langen Wochenenden verirrt).",
 		"ctaPrimary": "Zurück zur Startseite",
 		"ctaPlanner": "Planer öffnen",
@@ -819,11 +857,11 @@
 	},
 	"error": {
 		"retry": "Erneut versuchen",
-		"kicker": "Internal server error · v{version} · {time} UTC",
+		"kicker": "Interner Serverfehler · v{version} · {time} UTC",
 		"title": "Der Server hat sich einen",
 		"titleHighlight": "freien Tag",
 		"titleEmphasis": "ohne Erlaubnis genommen.",
-		"lede": "Auf unserer Seite ist etwas explodiert. Nicht deine Schuld (dieses Mal). Unser Team weiß davon: die Logs rauchen und wir sind dabei. Versuche es in einigen Minuten erneut, oder prüfe den Live-Status.",
+		"lede": "Auf unserer Seite ist etwas kaputtgegangen. Nicht deine Schuld (diesmal). Die Logs rauchen und wir sind schon dran. Versuch es in ein paar Minuten noch einmal oder sieh dir den Live-Status an.",
 		"statusPage": "Status ansehen",
 		"meanwhile": "In der Zwischenzeit:",
 		"contact": "Problem melden",
@@ -840,7 +878,7 @@
 		"manageCookies": "Cookies verwalten",
 		"contactUs": "Kontakt",
 		"legalNavigation": "Rechtliche Hinweise und Richtlinien",
-		"copyright": "© {year} Forever PTO · Von einer Hängematte aus gemacht.",
+		"copyright": "© {year} Forever PTO · Aus der Hängematte gemacht.",
 		"version": "v{version} · Status: im Urlaub ●",
 		"planner": "Planer",
 		"docs": "Dokumentation"
@@ -897,7 +935,7 @@
 			"confirmed": "Bestätigt",
 			"paymentId": "Zahlungs-ID",
 			"premiumActivationFailed": "Deine Zahlung war erfolgreich, aber der Premium-Zugang konnte nicht automatisch aktiviert werden. Lade diese Seite neu oder stelle deinen Zugang mit der E-Mail wieder her, mit der du bezahlt hast.",
-			"premiumActivated": "Dein Premium ist jetzt aktiv. Viel Spaß mit allen Features!",
+			"premiumActivated": "Dein Premium ist jetzt aktiv. Viel Spaß mit den neuen Funktionen!",
 			"continueHome": "Weiter zur Startseite"
 		}
 	},
@@ -906,32 +944,33 @@
 			"how": "Wie es funktioniert",
 			"features": "Funktionen",
 			"pricing": "Preise",
-			"trialAction": "Kostenlos testen →"
+			"trialAction": "Kostenlos testen →",
+			"resumeAction": "Mein Plan →"
 		},
 		"hero": {
 			"command": "Weniger arbeiten.",
 			"verb": "Reise",
 			"highlight": "mehr",
-			"description": "Forever PTO berechnet <em>genau</em>, welche Tage du beantragen musst, damit aus deinen 22 PTO-Tagen <strong>47+ Tage außer Haus</strong> werden. Keine Tabellen. Kein Kopfzerbrechen. Kein schlechtes Gewissen.",
+			"description": "Forever PTO berechnet <em>genau</em>, welche Tage du beantragen musst, damit aus deinen 22 PTO-Tagen <strong>70+ Tage außer Haus</strong> werden. Keine Tabellen. Kein Kopfzerbrechen. Kein schlechtes Gewissen.",
 			"plannerCta": "Meine Tage berechnen →",
-			"demoLink": "Wie es funktioniert (30s)",
+			"demoLink": "So funktioniert’s (30 s)",
 			"stars": "{rating} · genutzt von {users} rebellischen Mitarbeitern",
-			"mockupLabel": "Echte freie Tage {year}",
-			"mockupRatio": "Tage · Effizienz 2,14×",
-			"mockupQuote": "\"Das sind 9 lange Wochenenden, Kapitän.\"",
-			"mockupLegendPto": "Urlaub",
+			"mockupLabel": "Echte freie Tage in einem Jahr",
+			"mockupRatio": "Tage · Effizienz {ratio}×",
+			"mockupQuote": "„Das sind 22 lange Wochenenden, Käpt’n.“",
+			"mockupLegendPto": "PTO",
 			"mockupLegendHoliday": "Feiertag",
 			"mockupLegendWeekend": "Wochenende",
 			"mockupFieldPto": "PTO-Tage",
 			"mockupFieldPtoUnit": "Tage/Jahr",
 			"mockupFieldCountry": "Land",
-			"mockupFieldHolidays": "14 Feiertage"
+			"mockupFieldHolidays": "{count} Feiertage"
 		},
 		"marquee": {
-			"items": "osterbrücke · feiertags-wochenende · sommer-stretch · herbst-brücke · weihnachts-stretch · november-brücke · pfingstbrücke · himmelfahrt-brücke · tag der einheit · silvester-stretch"
+			"items": "Osterbrücke · Feiertagswochenende · Sommerauszeit · Herbstbrücke · Weihnachtsauszeit · Novemberbrücke · Pfingstbrücke · Himmelfahrtsbrücke · Tag der Einheit · Silvesterauszeit"
 		},
 		"how": {
-			"badge": "wie es funktioniert · {steps} Schritte",
+			"badge": "So funktioniert’s · {steps} Schritte",
 			"titleStart": "Von",
 			"titleMid": "zu",
 			"question1": "was soll ich tun",
@@ -940,10 +979,10 @@
 			"description": "Keine Installation. Keine Kreditkarte. Kein Newsletter. Sag uns einfach, wie viele Tage du hast und wo du wohnst.",
 			"inputDaysTitle": "Tage eingeben.",
 			"inputDaysDescription": "Wie viele PTO-Tage du hast und in welchem Land oder welcher Region du arbeitest. Das war's.",
-			"engineTitle": "Die Engine macht die Magie.",
-			"engineDescription": "Die Engine gleicht deine Tage mit offiziellen Feiertagen und regionalen Brückentagen ab, findet alle möglichen Kombinationen und sortiert sie nach dem Verhältnis freie Tage zu eingesetzten PTO-Tagen.",
+			"engineTitle": "Die Engine zaubert.",
+			"engineDescription": "Der Planer gleicht deine Tage mit offiziellen Feiertagen und regionalen Brücken ab, findet alle möglichen Kombinationen und sortiert sie nach dem Verhältnis von freien Tagen zu eingesetzten PTO-Tagen.",
 			"exportTitle": "PTO-Tage beantragen.",
-			"exportDescription": "Exportiere den Plan nach Google Kalender, Outlook oder als PDF – einfach ins HR-Formular einfügen und fertig. Kein Rätselraten mehr."
+			"exportDescription": "Exportiere den Plan nach Google Kalender, Outlook oder als PDF und trag ihn ins HR-Formular ein."
 		},
 		"stats": {
 			"efficiencyLabel": "Durchschnittliche Effizienz",
@@ -953,24 +992,24 @@
 			"plansValue": "{value}+"
 		},
 		"features": {
-			"badge": "engine-tricks",
+			"badge": "Funktionen",
 			"titleStart": "Kein Kalender. Ein",
 			"titleEmphasis": "Verbündeter",
 			"titleEnd": "gegen Montage.",
-			"description": "Das sind die Züge, die Forever PTO automatisch für dich macht.",
-			"bridgeTag": "clevere brücken",
+			"description": "Das erledigt Forever PTO automatisch für dich.",
+			"bridgeTag": "Brückentage",
 			"bridgeTitle": "1 PTO-Tag in 4 freie Tage verwandeln.",
 			"bridgeDescription": "Erkennt Feiertage an Dienstagen und Donnerstagen und schlägt minimale Brücken vor. Ein strategischer Tag = ein 4-Tage-Wochenende.",
-			"ratioTag": "max-effizienz",
-			"ratioDescription": "Beste Effizienz: 8 PTO-Tage zu 28 freien Tagen (ES, April 26).",
-			"syncTag": "sync in 1 klick",
+			"ratioTag": "Max. Effizienz",
+			"ratioDescription": "Beste Effizienz: 8 PTO-Tage werden zu 33 freien Tagen (Bayern).",
+			"syncTag": "Sync mit 1 Klick",
 			"syncTitle": "Google · Outlook · iCal",
 			"syncDescription": "Exportiere deinen Plan in den Kalender, den du bereits nutzt.",
-			"conflictsTag": "anti-konflikte",
+			"conflictsTag": "Anti-Konflikt",
 			"conflictsTitle": "Warnt dich, bevor dein Chef es tut.",
 			"conflictsDescription": "Markiere die Tabu-Zeiten deines Unternehmens.",
 			"conflictItems": {
-				"allHandsMeeting": "All-hands Meeting",
+				"allHandsMeeting": "All-Hands-Meeting",
 				"quarterClose": "Q3-Abschluss",
 				"productLaunch": "Produktstart"
 			},
@@ -982,95 +1021,95 @@
 			"privacyDescription": "Keine Anmeldung. Kein Konto. Deine Urlaubsdaten werden ausschließlich in deinem Browser gespeichert; wir sehen sie nie."
 		},
 		"comparison": {
-			"badge": "vorher · nachher",
-			"title": "Vor vs. nach Forever PTO.",
-			"withoutTitle": "😩 Ohne Forever PTO",
+			"badge": "Vorher · nachher",
+			"title": "Vor und nach Forever PTO",
+			"withoutTitle": "Ohne Forever PTO",
 			"withoutItems": {
 				"spreadsheetFrustration": "Du öffnest eine Tabelle und steckst bei Zelle C7 fest.",
-				"missedBridge": "Du beantragst den Montag nach einem Feiertag und niemand warnt dich.",
+				"missedBridge": "Du nimmst den Montag nach einem Feiertag frei, ohne zu merken, dass der Dienstag auch ein Feiertag war.",
 				"daysRunOut": "Du merkst im September, dass keine Tage mehr übrig sind.",
 				"colleagueConflict": "Ein Kollege bucht deine Woche zuerst. Schon wieder.",
 				"unusedDays": "Du beendest das Jahr mit 4 ungenutzten Tagen."
 			},
-			"withTitle": "😎 Mit Forever PTO",
+			"withTitle": "Mit Forever PTO",
 			"withItems": {
 				"planInJanuary": "Du planst alles im Januar, während du auf deinen Kaffee wartest.",
-				"dayEfficiency": "Jeder PTO-Tag gibt dir im Schnitt 2,1 freie Tage zurück.",
+				"dayEfficiency": "Jeder PTO-Tag gibt dir im Schnitt {ratio} freie Tage zurück.",
 				"visualCalendar": "Du siehst das ganze Jahr in einem übersichtlichen Kalender.",
 				"bookFirst": "Du buchst zuerst, ohne schlechtes Gewissen, mit Daten.",
 				"burnAllDays": "Du verbrauchst 100% deiner Tage. So wie es sein sollte."
 			}
 		},
 		"testimonials": {
-			"badge": "das sagen andere",
+			"badge": "Das sagen andere",
 			"titleStart": "Menschen, die sich schon",
 			"titleEmphasis": "Wochen",
 			"titleEnd": "ihres Lebens zurückgeholt haben.",
 			"items": {
 				"martaR": {
-					"text": "Ich bin von einzelnen freien Tagen zu 6 geplanten Reisen übergegangen. Mein Partner denkt, ich bin organisiert geworden.",
+					"text": "Früher hatte ich einzelne freie Tage, jetzt 6 geplante Reisen. Mein Partner glaubt, ich sei plötzlich organisiert.",
 					"name": "Marta R.",
 					"role": "Designerin · Madrid"
 				},
 				"diegoA": {
-					"text": "Ich hatte 4 Jahre lang ungenutzte Tage. Dieses Mal hab ich jeden einzelnen aufgebraucht. Kam gebräunt zurück.",
+					"text": "4 Jahre lang sind mir Tage verfallen. Dieses Mal habe ich jeden einzelnen genommen und bin braungebrannt zurückgekommen.",
 					"name": "Diego A.",
 					"role": "Backend-Entwickler · Barcelona"
 				},
 				"saraV": {
-					"text": "Ich hab es kurz geöffnet und 90 Sekunden später hatte ich ein PDF für die Personalabteilung fertig.",
+					"text": "Ich hab es nur kurz geöffnet, und 90 Sekunden später hatte ich ein PDF für die Personalabteilung fertig.",
 					"name": "Sara V.",
 					"role": "Produktmanagerin · Berlin"
 				},
 				"carlosM": {
-					"text": "Ich habe 20 Minuten mit einem Kollegen darüber gestritten, wer die gleiche Woche zuerst gebucht hat. Die App hat es in 3 Sekunden gelöst. Ich habe gewonnen.",
+					"text": "Ich habe 20 Minuten mit einem Kollegen darüber gestritten, wer dieselbe Woche zuerst gebucht hat. Die App hat es in 3 Sekunden geklärt. Ich habe gewonnen.",
 					"name": "Carlos M.",
-					"role": "QA engineer · Lissabon"
+					"role": "QA-Engineer · Lissabon"
 				},
 				"lauraT": {
-					"text": "Meine Chefin fragte mich, wie ich 34 freie Tage mit nur 22 PTO-Tagen hatte. Ich sagte „Strategie\". Die App habe ich nicht erwähnt.",
+					"text": "Meine Chefin fragte mich, wie ich mit nur 22 PTO-Tagen auf 45 freie Tage gekommen bin. Ich sagte „Strategie“. Die App habe ich nicht erwähnt.",
 					"name": "Laura T.",
-					"role": "Marketing Manager · Paris"
+					"role": "Marketingmanagerin · Paris"
 				},
 				"thomasK": {
-					"text": "ROI: 22 PTO-Tage rein, 47 freie Tage raus. Das ist eine Effizienz von 2,1×. Schlechtere Features habe ich schon bei der Arbeit geliefert.",
+					"text": "ROI: 22 PTO-Tage rein, 74 freie Tage raus. Das ist eine Effizienz von 3,4×. Schlechtere Features habe ich schon bei der Arbeit geliefert.",
 					"name": "Thomas K.",
 					"role": "Software-Architekt · Amsterdam"
 				}
 			}
 		},
 		"pricing": {
-			"badge": "ehrliche preise",
+			"badge": "Ehrliche Preise",
 			"titleStart": "Einmal bezahlen.",
 			"titleEmphasis": "Für immer.",
-			"description": "Kein SaaS. Kein Abo. Kein \"7-Tage-Test, der sich automatisch verlängert\".",
+			"description": "Kein SaaS. Kein Abo. Kein „7-Tage-Test, der sich automatisch verlängert“.",
 			"freeName": "Kostenlos für immer",
 			"freeTagline": "Probier es aus. Es wird dich überzeugen.",
 			"freePrice": "{amount}",
 			"freePer": "/immer",
 			"freeNote": "Keine Karte. Keine E-Mail. Nichts.",
 			"freeFeatures": {
-				"optimizedPlan": "Auto-optimierter Urlaubsplan",
+				"optimizedPlan": "Automatisch optimierter Urlaubsplan",
 				"countryHolidays": "Feiertage deines Landes und deiner Region",
-				"threeStrategies": "{count} Strategien (Gruppiert, Optimiert, Ausgewogen)",
+				"strategies": "{count} Strategien (Gruppiert, Optimiert, Ausgewogen, Haupturlaub)",
 				"basicStats": "Grundlegende Statistiken & Rechner"
 			},
 			"freeCta": "Kostenlos starten",
 			"lifetimeName": "Unterstützer-Pass",
-			"lifetimeTagline": "Mindestspende von {amount}. Nutze es für immer.",
+			"lifetimeTagline": "Mindestspende von {amount}. Nutze ihn für immer.",
 			"lifetimePrice": "Ab {amount}",
 			"lifetimePer": " einmalig",
 			"lifetimeNote": "100% freiwillig. Hält das Projekt am Leben.",
 			"lifetimeFeatures": {
 				"manualEditing": "Manuelle Kalenderbearbeitung",
 				"calendarExport": "Exportieren nach Google · Outlook · Apple · PDF",
-				"customHolidays": "Eigene & Unternehmens-Feiertage",
+				"customHolidays": "Eigene & Firmenfeiertage",
 				"pastDaysAndCarryover": "Vergangene Tage erlauben · Übertragsmonate",
 				"holidayManagement": "Beliebige Feiertage bearbeiten & löschen",
 				"fullAnalytics": "Vollständige Analysen & visuelle Diagramme"
 			},
 			"lifetimeCta": "Projekt unterstützen →",
-			"popularBadge": "am beliebtesten 🔥"
+			"popularBadge": "Am beliebtesten"
 		},
 		"faq": {
 			"badge": "FAQ",
@@ -1080,7 +1119,7 @@
 			"titleStart": "Dein nächstes",
 			"titleEmphasis": "freies",
 			"titleEnd": "Jahr beginnt heute.",
-			"description": "22 Tage können 47 werden. Du musst nur wissen, wo du sie platzierst. Das machen wir.",
+			"description": "22 Tage können über 70 werden. Du musst nur wissen, wo du sie platzierst. Das machen wir.",
 			"cta": "Meine freien Tage berechnen →",
 			"shapes": {
 				"byeMonday": "tschüss, Montag",
@@ -1095,7 +1134,7 @@
 		"progress": "Schritt {current} von {total}",
 		"steps": {
 			"location": "Standort",
-			"ptoDays": "Urlaubstage",
+			"ptoDays": "PTO-Tage",
 			"settings": "Einstellungen"
 		},
 		"location": {
@@ -1108,14 +1147,14 @@
 			"noRegions": "Dieses Land hat keine regionalen Kalender, also gilt der nationale."
 		},
 		"ptoDays": {
-			"title": "Wie viele Urlaubstage hast du?",
+			"title": "Wie viele PTO-Tage hast du?",
 			"description": "Dein Budget für das Jahr. Eine ungefähre Zahl reicht; im Planer kannst du sie anpassen.",
 			"year": "Jahr"
 		},
 		"settings": {
 			"title": "Feinschliff für den Plan",
 			"description": "Wähle, wie die Tage verteilt werden. Der Rest ist optional.",
-			"premiumHint": "Vergangene Tage und Übertragungsmonate sind Premium-Einstellungen. Schalte sie frei oder behalte die Standardwerte."
+			"premiumHint": "Vergangene Tage und Übertragsmonate sind Premium-Einstellungen. Schalte sie frei oder behalte die Standardwerte."
 		},
 		"back": "Zurück",
 		"next": "Weiter",
@@ -1128,12 +1167,12 @@
 			"introduction": {
 				"title": "Einleitung",
 				"p1": "Diese Cookie-Richtlinie erklärt, wie Forever PTO (<link>https://forever-pto.com</link>) Cookies und ähnliche Technologien verwendet. Durch die Nutzung unserer Website stimmst du der Verwendung von Cookies gemäß dieser Richtlinie zu.",
-				"p2": "Wir sind der Transparenz verpflichtet, wie wir Daten erheben und verwenden. Diese Richtlinie bietet detaillierte Informationen über die Arten von Cookies, die wir verwenden, ihren Zweck und wie du sie kontrollieren kannst."
+				"p2": "Uns ist wichtig, offen zu zeigen, wie wir Daten erheben und verwenden. Diese Richtlinie bietet detaillierte Informationen über die Arten von Cookies, die wir verwenden, ihren Zweck und wie du sie kontrollieren kannst."
 			},
 			"whatAreCookies": {
 				"title": "Was sind Cookies?",
 				"p1": "Cookies sind kleine Textdateien, die auf deinem Gerät gespeichert werden, wenn du eine Website besuchst. Sie werden häufig eingesetzt, damit Websites effizienter funktionieren und den Website-Betreibern Informationen liefern.",
-				"p2": "Cookies können ‘persistente’ oder ‘Sitzungs’-Cookies sein. Persistente Cookies verbleiben für einen bestimmten Zeitraum auf deinem Gerät. Sitzungs-Cookies sind temporär und werden gelöscht, wenn du deinen Browser schließt."
+				"p2": "Cookies können „persistente“ oder „Sitzungs“-Cookies sein. Persistente Cookies verbleiben für einen bestimmten Zeitraum auf deinem Gerät. Sitzungs-Cookies sind temporär und werden gelöscht, wenn du deinen Browser schließt."
 			},
 			"typesOfCookies": {
 				"title": "Arten von Cookies, die wir verwenden",
@@ -1145,16 +1184,16 @@
 					"socialMedia": "Social-Media-Cookies"
 				},
 				"strictlyNecessary": {
-					"title": "Unbedingt erforderliche Cookies (Lokaler Speicher)",
+					"title": "Unbedingt erforderliche Cookies (lokaler Speicher)",
 					"description": "Wir verwenden den lokalen Speicher des Browsers, um deine Einstellungen und den Anwendungsstatus zu speichern. Diese sind für die Funktion der Website unerlässlich und können nicht deaktiviert werden:",
 					"items": {
 						"filters": {
 							"label": "Filter-Speicher:",
-							"description": "Speichert deine ausgewählten Land-, Regions- und Jahreinstellungen für die Feiertagsfilterung."
+							"description": "Speichert deine Auswahl von Land, Region und Jahr für die Feiertagsfilterung."
 						},
 						"holidays": {
 							"label": "Feiertags-Speicher:",
-							"description": "Speichert deine benutzerdefinierten Feiertage und PTO-Tage-Konfiguration."
+							"description": "Speichert deine eigenen Feiertage und die Konfiguration deiner PTO-Tage."
 						},
 						"location": {
 							"label": "Standort-Speicher:",
@@ -1192,7 +1231,7 @@
 						"description": "Optionale Cookies, die uns helfen zu verstehen, wie Besucher unsere Website nutzen."
 					}
 				},
-				"consentStorage": "Deine Zustimmungseinstellungen werden in einem Cookie namens ‘cc_cookie’ gespeichert, das nach 6 Monaten abläuft."
+				"consentStorage": "Deine Zustimmungseinstellungen werden in einem Cookie namens „cc_cookie“ gespeichert, das nach 6 Monaten abläuft."
 			},
 			"googleConsent": {
 				"title": "Google Consent Mode v2",
@@ -1217,13 +1256,13 @@
 				},
 				"categoriesIntro": "Consent Mode v2 steuert diese Kategorien:",
 				"categories": {
-					"analyticsStorage": "Steuert die Analysedatenerfassung (standardmäßig auf ‘denied’ gesetzt, bis du zustimmst)",
-					"adStorage": "Steuert Werbe-Cookies (auf Forever PTO immer ‘denied’)",
-					"adUserData": "Steuert die Weitergabe von Nutzerdaten für Werbung (immer ‘denied’)",
-					"adPersonalization": "Steuert personalisierte Werbung (immer ‘denied’)",
-					"functionalityStorage": "Steuert funktionale Cookies (immer ‘granted’, da sie notwendig sind)",
-					"personalizationStorage": "Steuert Personalisierungsfunktionen (immer ‘granted’ für Theme/Einstellungen)",
-					"securityStorage": "Steuert sicherheitsbezogenen Speicher (immer ‘granted’)"
+					"analyticsStorage": "Steuert die Analysedatenerfassung (standardmäßig auf „denied“ gesetzt, bis du zustimmst)",
+					"adStorage": "Steuert Werbe-Cookies (auf Forever PTO immer „denied“)",
+					"adUserData": "Steuert die Weitergabe von Nutzerdaten für Werbung (immer „denied“)",
+					"adPersonalization": "Steuert personalisierte Werbung (immer „denied“)",
+					"functionalityStorage": "Steuert funktionale Cookies (immer „granted“, da sie notwendig sind)",
+					"personalizationStorage": "Steuert Personalisierungsfunktionen (immer „granted“ für Theme/Einstellungen)",
+					"securityStorage": "Steuert sicherheitsbezogenen Speicher (immer „granted“)"
 				},
 				"gdprCompliance": "Diese Implementierung gewährleistet die vollständige DSGVO-Konformität, indem deine Datenschutzentscheidungen respektiert werden und gleichzeitig grundlegende anonyme Messungen möglich sind."
 			},
@@ -1268,7 +1307,7 @@
 						"blockSpecific": "Bestimmte Cookies von bestimmten Websites blockieren",
 						"deleteOnClose": "Cookies beim Schließen des Browsers löschen"
 					},
-					"warning": "Hinweis: Das Blockieren oder Löschen unseres lokalen Speichers setzt alle deine Einstellungen und benutzerdefinierten Feiertage zurück."
+					"warning": "Hinweis: Das Blockieren oder Löschen unseres lokalen Speichers setzt alle deine Einstellungen und eigenen Feiertage zurück."
 				},
 				"browserInstructions": {
 					"title": "Browserspezifische Anleitungen",
@@ -1284,7 +1323,7 @@
 			},
 			"yourRights": {
 				"title": "Deine Rechte",
-				"description": "Gemäß der DSGVO und anderer Datenschutzgesetze hast du das Recht:",
+				"description": "Gemäß der DSGVO und anderen Datenschutzgesetzen hast du das Recht:",
 				"items": {
 					"know": "Zu erfahren, welche Daten gespeichert werden (alle Daten sind sichtbar unter Browser-Entwicklertools → Anwendung → Lokaler Speicher)",
 					"access": "Auf deine Daten zuzugreifen (sie sind alle lokal auf deinem Gerät gespeichert)",
@@ -1294,9 +1333,9 @@
 				}
 			},
 			"changes": {
-				"title": "Änderungen dieser Richtlinie",
+				"title": "Änderungen an dieser Richtlinie",
 				"p1": "Wir können diese Cookie-Richtlinie von Zeit zu Zeit aktualisieren, um Änderungen in unseren Praktiken oder aus anderen betrieblichen, rechtlichen oder regulatorischen Gründen widerzuspiegeln.",
-				"p2": "Wir informieren die Nutzer über wesentliche Änderungen, indem wir das Datum ‘Zuletzt aktualisiert’ oben in dieser Richtlinie aktualisieren."
+				"p2": "Wir informieren die Nutzer über wesentliche Änderungen, indem wir das Datum „Zuletzt aktualisiert“ oben in dieser Richtlinie aktualisieren."
 			},
 			"contact": {
 				"title": "Kontakt",
@@ -1319,7 +1358,7 @@
 			"introduction": {
 				"title": "Einleitung",
 				"p1": "Forever PTO verpflichtet sich zum Schutz deiner Privatsphäre. Diese Datenschutzerklärung erläutert, wie wir deine personenbezogenen Daten erheben, verwenden und schützen, wenn du unseren Dienst nutzt.",
-				"p2": "Forever PTO arbeitet nach dem Prinzip ‘Privacy First’. Wir minimieren die Datenerhebung und verarbeiten die meisten Informationen lokal in deinem Browser."
+				"p2": "Forever PTO arbeitet nach dem Prinzip „Privacy First“. Wir minimieren die Datenerhebung und verarbeiten die meisten Informationen lokal in deinem Browser."
 			},
 			"dataController": {
 				"title": "Verantwortlicher",
@@ -1353,7 +1392,7 @@
 							"description": "Öffentliche Feiertage, die von externen APIs abgerufen und lokal zwischengespeichert werden."
 						},
 						"customHolidays": {
-							"label": "Benutzerdefinierte Feiertage:",
+							"label": "Eigene Feiertage:",
 							"description": "Feiertage, die du manuell zum Kalender hinzufügst."
 						},
 						"calendarState": {
@@ -1402,7 +1441,7 @@
 				},
 				"analytics": {
 					"title": "Analysedaten (optional)",
-					"description": "Wenn du Analyse-Cookies zustimmst, können wir Folgendes erheben:",
+					"description": "Wenn du den Analyse-Cookies zustimmst, können wir Folgendes erheben:",
 					"items": {
 						"pagesVisited": "Besuchte Seiten und genutzte Funktionen",
 						"browserInfo": "Browsertyp, Gerätetyp, Bildschirmauflösung",
@@ -1452,12 +1491,12 @@
 						"description": "Verarbeitet anonymisierte Nutzungsdaten. Siehe Googles Datenschutzerklärung."
 					},
 					"legal": {
-						"label": "Gesetzliche Einhaltung:",
+						"label": "Einhaltung gesetzlicher Vorschriften:",
 						"description": "Wenn gesetzlich vorgeschrieben oder zum Schutz unserer Rechte."
 					},
 					"betterStack": {
 						"label": "Better Stack (Analyse, bei Einwilligung):",
-						"description": "Verarbeitet anonymisierte Nutzungsdaten und verfolgt Benutzerinteraktionen zur Produktverbesserung. Siehe Datenschutzrichtlinie von Better Stack."
+						"description": "Verarbeitet anonymisierte Nutzungsdaten und verfolgt Nutzerinteraktionen zur Produktverbesserung. Siehe die Datenschutzerklärung von Better Stack."
 					}
 				}
 			},
@@ -1486,7 +1525,7 @@
 			},
 			"yourRights": {
 				"title": "Deine Rechte",
-				"description": "Gemäß der DSGVO und anderer Datenschutzgesetze hast du folgende Rechte:",
+				"description": "Gemäß der DSGVO und anderen Datenschutzgesetzen hast du folgende Rechte:",
 				"items": {
 					"access": {
 						"label": "Recht auf Auskunft:",
@@ -1497,7 +1536,7 @@
 						"description": "Du kannst die Korrektur ungenauer oder unvollständiger Daten verlangen."
 					},
 					"erasure": {
-						"label": "Recht auf Löschung (‘Recht auf Vergessenwerden’):",
+						"label": "Recht auf Löschung („Recht auf Vergessenwerden“):",
 						"description": "Du kannst die Löschung deiner personenbezogenen Daten verlangen."
 					},
 					"restrict": {
@@ -1534,9 +1573,9 @@
 				"p2": "Wenn wir erfahren, dass wir Daten von einem Kind unter 16 Jahren erhoben haben, werden wir umgehend Maßnahmen ergreifen, um diese Informationen zu löschen."
 			},
 			"changes": {
-				"title": "Änderungen dieser Datenschutzerklärung",
+				"title": "Änderungen an dieser Datenschutzerklärung",
 				"p1": "Wir können diese Datenschutzerklärung von Zeit zu Zeit aktualisieren, um Änderungen in unseren Praktiken, gesetzlichen Anforderungen oder Dienstfunktionen widerzuspiegeln.",
-				"p2": "Wir informieren die Nutzer über wesentliche Änderungen, indem wir das Datum ‘Zuletzt aktualisiert’ oben in dieser Erklärung aktualisieren.",
+				"p2": "Wir informieren die Nutzer über wesentliche Änderungen, indem wir das Datum „Zuletzt aktualisiert“ oben in dieser Erklärung aktualisieren.",
 				"p3": "Die fortgesetzte Nutzung von Forever PTO nach Änderungen gilt als Zustimmung zur aktualisierten Erklärung."
 			},
 			"dataBreach": {
@@ -1566,7 +1605,7 @@
 		"sections": {
 			"acceptance": {
 				"title": "Annahme der Bedingungen",
-				"p1": "Durch den Zugriff auf oder die Nutzung von Forever PTO (dem ‘Dienst’) erklärst du dich mit diesen Nutzungsbedingungen (‘Bedingungen’) einverstanden. Wenn du diesen Bedingungen nicht zustimmst, nutze den Dienst bitte nicht.",
+				"p1": "Durch den Zugriff auf oder die Nutzung von Forever PTO (dem „Dienst“) erklärst du dich mit diesen Nutzungsbedingungen („Bedingungen“) einverstanden. Wenn du diesen Bedingungen nicht zustimmst, nutze den Dienst bitte nicht.",
 				"p2": "Diese Bedingungen stellen eine rechtsverbindliche Vereinbarung zwischen dir und {author}, dem Betreiber von Forever PTO, dar."
 			},
 			"serviceDescription": {
@@ -1578,7 +1617,7 @@
 					"items": {
 						"optimization": "Grundlegende PTO-Optimierung basierend auf gesetzlichen Feiertagen",
 						"visualization": "Kalendervisualisierung von Feiertagen und PTO-Tagen",
-						"customHolidays": "Möglichkeit, benutzerdefinierte Feiertage hinzuzufügen",
+						"customHolidays": "Möglichkeit, eigene Feiertage hinzuzufügen",
 						"metrics": "Grundlegende Kennzahlen und zusammenfassende Statistiken",
 						"strategy": "Auswahl verschiedener Optimierungsstrategien"
 					}
@@ -1628,7 +1667,7 @@
 				},
 				"processing": {
 					"title": "Zahlungsabwicklung",
-					"description": "Zahlungen werden sicher von Stripe, einem Drittanbieter-Zahlungsdienstleister, abgewickelt. Wir speichern nicht deine vollständigen Kreditkartendaten.",
+					"description": "Zahlungen werden sicher von Stripe, einem Zahlungsdienstleister eines Drittanbieters, abgewickelt. Wir speichern deine vollständigen Kreditkartendaten nicht.",
 					"items": {
 						"other": "Mit einer Zahlung stimmst du Stripes Nutzungsbedingungen und Datenschutzerklärung zu."
 					},
@@ -1699,11 +1738,11 @@
 			},
 			"disclaimer": {
 				"title": "Haftungsausschlüsse und Einschränkungen",
-				"description": "Forever PTO wird ‘wie besehen’ ohne jegliche Gewährleistung bereitgestellt. Wir schließen insbesondere aus:",
+				"description": "Forever PTO wird „wie besehen“ ohne jegliche Gewährleistung bereitgestellt. Wir schließen insbesondere aus:",
 				"items": {
 					"accuracy": {
 						"label": "Genauigkeit der Feiertagsdaten:",
-						"description": "Obwohl wir nach Genauigkeit streben, stammen die Feiertagsdaten aus Drittanbieter-APIs und können Fehler enthalten. Überprüfe immer mit offiziellen Quellen."
+						"description": "Obwohl wir nach Genauigkeit streben, stammen die Feiertagsdaten aus Drittanbieter-APIs und können Fehler enthalten. Gleiche sie immer mit offiziellen Quellen ab."
 					},
 					"availability": {
 						"label": "Dienstverfügbarkeit:",
@@ -1741,7 +1780,7 @@
 				},
 				"openSource": {
 					"title": "Open-Source-Code",
-					"description": "Teile von Forever PTO können als Open-Source-Software unter bestimmten Lizenzen verfügbar sein. Siehe unser <link>GitHub-Repository</link> für Details."
+					"description": "Teile von Forever PTO können als Open-Source-Software unter bestimmten Lizenzen verfügbar sein. Details findest du in unserem <link>GitHub-Repository</link>."
 				},
 				"restrictions": {
 					"title": "Einschränkungen",
@@ -1847,9 +1886,9 @@
 				"description": "Unser Versäumnis, ein Recht oder eine Bestimmung dieser Bedingungen durchzusetzen, gilt nicht als Verzicht auf diese Rechte."
 			},
 			"changes": {
-				"title": "Änderungen dieser Bedingungen",
+				"title": "Änderungen an diesen Bedingungen",
 				"p1": "Wir können diese Bedingungen von Zeit zu Zeit aktualisieren, um Änderungen in unseren Praktiken, gesetzlichen Anforderungen oder Dienstfunktionen widerzuspiegeln.",
-				"p2": "Wir informieren die Nutzer über wesentliche Änderungen, indem wir das Datum ‘Zuletzt aktualisiert’ oben in diesen Bedingungen aktualisieren. Die fortgesetzte Nutzung des Dienstes nach Änderungen gilt als Zustimmung zu den aktualisierten Bedingungen."
+				"p2": "Wir informieren die Nutzer über wesentliche Änderungen, indem wir das Datum „Zuletzt aktualisiert“ oben in diesen Bedingungen aktualisieren. Die fortgesetzte Nutzung des Dienstes nach Änderungen gilt als Zustimmung zu den aktualisierten Bedingungen."
 			},
 			"contactInfo": {
 				"title": "Kontaktinformationen",
@@ -1947,7 +1986,7 @@
 			},
 			"modifications": {
 				"title": "Änderungen des Impressums",
-				"p1": "{author} behält sich das Recht vor, dieses Impressum jederzeit anzupassen, um es an Gesetzesänderungen oder Aktualisierungen der Website anzupassen.",
+				"p1": "{author} behält sich das Recht vor, dieses Impressum jederzeit zu ändern, um es an Gesetzesänderungen oder Aktualisierungen der Website anzupassen.",
 				"p2": "Nutzern wird empfohlen, dieses Impressum regelmäßig zu überprüfen, um über Änderungen informiert zu bleiben."
 			},
 			"applicableLaw": {

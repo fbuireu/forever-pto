@@ -6,10 +6,18 @@ export interface ObfuscationParams {
 	key: string;
 }
 
+const CHUNK_SIZE = 8192;
+
+const fromCodePoints = (points: ArrayLike<number>) => {
+	let text = "";
+	for (let start = 0; start < points.length; start += CHUNK_SIZE) {
+		text += String.fromCodePoint(...Array.prototype.slice.call(points, start, start + CHUNK_SIZE));
+	}
+	return text;
+};
+
 export function base64Encode(str: string) {
-	const utf8Bytes = new TextEncoder().encode(str);
-	const binaryString = Array.from(utf8Bytes, (byte) => String.fromCodePoint(byte)).join("");
-	return btoa(binaryString);
+	return btoa(fromCodePoints(new TextEncoder().encode(str)));
 }
 
 export function base64Decode(str: string) {
@@ -21,18 +29,19 @@ export function base64Decode(str: string) {
 	return new TextDecoder().decode(bytes);
 }
 
+const xorWithKey = ({ text, key }: ObfuscationParams) => {
+	const keyPoints = Array.from({ length: key.length }, (_, index) => key.codePointAt(index) ?? 0);
+	const points = new Array<number>(text.length);
+	for (let i = 0; i < text.length; i++) {
+		points[i] = text.charCodeAt(i) ^ (keyPoints[i % keyPoints.length] ?? 0);
+	}
+	return fromCodePoints(points);
+};
+
 export function obfuscate({ text, key }: ObfuscationParams) {
-	const obfuscated = text
-		.split("")
-		.map((char, i) => String.fromCodePoint((char.codePointAt(0) ?? 0) ^ (key.codePointAt(i % key.length) ?? 0)))
-		.join("");
-	return base64Encode(obfuscated);
+	return base64Encode(xorWithKey({ text, key }));
 }
 
 export function deobfuscate({ text, key }: ObfuscationParams) {
-	const decoded = base64Decode(text);
-	return decoded
-		.split("")
-		.map((char, i) => String.fromCodePoint((char.codePointAt(0) ?? 0) ^ (key.codePointAt(i % key.length) ?? 0)))
-		.join("");
+	return xorWithKey({ text: base64Decode(text), key });
 }

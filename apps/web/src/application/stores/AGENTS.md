@@ -27,11 +27,21 @@ The rest of the application layer contract is in [`../AGENTS.md`](../AGENTS.md).
 
 | Store | Owns | Persisted |
 | --- | --- | --- |
-| `filters` | `ptoDays`, `allowPastDays`, `country`, `region`, `year`, `carryOverMonths`, `strategy` | all but `year` |
+| `filters` | `ptoDays`, `allowPastDays`, `country`, `region`, `year`, `carryOverMonths`, `strategy`, `preferredMonths` | all but `year` |
 | `holidays` | `holidays`, `suggestion`, `alternatives`, `maxAlternatives`, `currentSelection`, `currentSelectionIndex`, `previewAlternativeIndex`, `manuallySelectedDays`, `removedSuggestedDays`, `isCalculating`, `hasCalculated`, `planRevision` | all but `previewAlternativeIndex`, `isCalculating`, `hasCalculated` and `planRevision` |
 | `location` | `countries`, `regions` | nothing |
 | `premium` | `premiumKey`, `userEmail`, `lastVerified`, `needsSessionCheck`, `isLoading`, `modalOpen`, `currentFeature` | everything up to `needsSessionCheck` |
 | `ui` | `donatePopoverOpen`, `donatePopoverIsOpening`, `quickStartOpen` | nothing |
+
+**`preferredMonths` is guarded on rehydration the way `strategy` is, by the same predicate the worker uses.**
+`isPreferredMonths` in `@domain/calendar/window` accepts an array of distinct Planning Window positions, the Carry-over Months included, the empty
+one included (which means any month), and a stored value that fails it becomes `DEFAULT_PREFERRED_MONTHS`, which
+is empty: a default of July and August stopped being reachable every September, and an empty choice is honest about
+where the block will go.
+`setPreferredMonths` applies it too and stores the months sorted, so the calculation effect that depends on the
+array does not re-plan when the same months arrive in another order. The field was added without a
+`STORAGE_VERSION` bump on purpose: a blob written before it lacks the key, the initial state supplies it, and the
+guard covers anything else a hand-edited blob could hold.
 
 **The `ui` store used to carry a currency, and giving that rule one owner was the wrong fix.** It had several
 owners and a free-rider, so a `CurrencySync` component was written to seed it once from the `[locale]` root
@@ -86,6 +96,15 @@ The branches, chosen once at module load:
   not break, so devtools show readable JSON locally and obfuscated blobs in production.
 - **Otherwise**: obfuscated. A failed decode logs and returns `null`, which zustand treats as "nothing
   stored"; the store keeps its initial state rather than crashing.
+
+**A write whose value has not changed is skipped, in both storing branches.** zustand's `persist` saves the
+whole partialized slice on every `set`, including the ones that touch only unpersisted fields
+(`setCalculating`, the Alternative preview), so the holidays store rewrote and re-obfuscated roughly 50 KB
+three times per calculation. The obfuscated branch remembers the last value it wrote or read per key and skips
+a write of the same value while storage still holds what it wrote, so another tab's write is never mistaken
+for its own; the plain branch compares with what is stored. The obfuscation itself works on code units in
+chunks rather than one string per character, and its output is byte for byte what the per-character version
+wrote, which `utils/crypto.test.ts` pins against that version, so every blob already stored still reads.
 
 **`partialize` is the whole persistence contract.** A field absent from it is browser-session state by
 design, and some of those omissions are load-bearing:
@@ -307,7 +326,9 @@ stored Suggestion go stale the moment it is adopted, and neither can be repaired
   exceed the budget; `measureBudget` clamps the Remaining Budget at zero, so the overdraft reads as nothing
   left rather than as a negative allowance: correct for the user, and invisible to anyone debugging.
 - Its Bridges. They were expanded through the Manual Days as pseudo-Holidays, so clearing those days leaves
-  spans crossing dates the calendar now paints as workdays, and `getTotalEffectiveDays` keeps counting them.
+  spans crossing dates the calendar now paints as workdays. Effective Days no longer read the spans (they are the
+  free streaks around the placed days, so they drop correctly), but `bridgesUsed` still counts those Bridges and
+  every one of them describes a stretch that is no longer there.
 
 Clearing the Manual Days fixes the first and causes the second; keeping them does the reverse. **Both were
 tried and both were wrong.** So the action keeps them (every Alternative was planned *around* them, and its
@@ -431,8 +452,19 @@ different module with no SDK behind it.
 
 **`fetchHolidays` and `fetchRegions` do no network I/O.** Both resolve out of the bundled `date-holidays`
 dataset in the browser: `getHolidays.ts` is `async` but local, and [`getRegions.ts`](../../infrastructure/services/regions/getRegions.ts) is outright synchronous.
-The names are historical. Nothing in this folder makes an HTTP request except `premium.ts`, which calls
+The names are historical. Both stores import their lookup with a dynamic `import()`, never a static one: the
+dataset is about 280 KB compressed, and `location.ts` importing `getRegions` statically put it in the planner's
+first load through every component that reads the Countries, however carefully `fetchHolidays` deferred its
+own. `location.test.ts` reads the store's source to keep it out. Nothing in this folder makes an HTTP request except `premium.ts`, which calls
 `/api/check-session` through `@ui/adapters/session/checkSession`.
+
+**`holidaysKey` says which filters the Holidays were fetched for, and a fetch that was overtaken is
+dropped.** `fetchHolidays` records `holidaysKeyOf(params)` beside the Holidays it sets, on the catch branch as
+on success, and `CalendarList` plans only while that key matches the filters on screen. The key is
+deliberately not in `partialize`: after a reload the persisted Holidays are for whatever was on screen last,
+and the planner waits for the fresh fetch instead of planning on them. Each call also takes a sequence number
+and gives up if a newer call started while it awaited, so a slow answer for the previous year cannot overwrite
+the current one.
 
 **A Custom Holiday wins the date it lands on.** `fetchHolidays` keeps the existing Custom Holidays, drops any
 fetched Holiday sharing a date with one, and re-sorts. `editHoliday` rebuilds through

@@ -115,7 +115,9 @@ function AccordionTrigger({
 						transition={transition}
 						className={cn(
 							"relative hit-area-stable size-7 flex items-center justify-center shrink-0 rounded-md border-[2.5px] border-(--frame) font-black text-lg leading-none select-none transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-(--shadow-brutal-sm)",
-							isOpen ? "bg-(--frame) text-background" : "bg-accent text-(--color-brand-ink)",
+							isOpen
+								? "bg-(--frame) text-background hover:shadow-(--shadow-brutal-sm-accent)"
+								: "bg-accent text-(--color-brand-ink)",
 						)}
 					>
 						+

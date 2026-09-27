@@ -1,5 +1,6 @@
 "use client";
 
+import { FilterStrategy } from "@domain/calendar/types";
 import { LOCALES } from "@infrastructure/i18n/locales";
 import { useEffect } from "react";
 
@@ -24,7 +25,7 @@ export function WebMCP() {
 						features: [
 							"National and regional holiday detection",
 							"Bridge day optimizer",
-							"Three strategies: Grouped, Optimized, Balanced",
+							"Four strategies: Grouped, Optimized, Balanced, Main vacation",
 							"Custom holidays: add, edit, and delete national and regional holidays",
 							"Manual editing of suggested days off",
 							"Year selection and carryover months configuration",
@@ -36,7 +37,7 @@ export function WebMCP() {
 							"Export to Google Calendar, Outlook, Apple Calendar",
 						],
 						locales: LOCALES,
-						strategies: ["grouped", "optimized", "balanced"],
+						strategies: Object.values(FilterStrategy),
 						url: globalThis.location.origin,
 					}),
 				},

@@ -12,7 +12,7 @@ const classesFor = (overrides: Partial<Parameters<typeof getDayClassNames>[0]> =
 	getDayClassNames({
 		date: DAY,
 		month: MONTH,
-		selectedDates: [],
+		isSelected: false,
 		showOutsideDays: true,
 		modifiers: {},
 		...overrides,
@@ -40,7 +40,7 @@ describe("getDayClassNames precedence", () => {
 
 	it("lets a selected day suppress the modifiers and win outright", () => {
 		const classes = classesFor({
-			selectedDates: [DAY],
+			isSelected: true,
 			modifiers: { holiday: always, suggested: always, manuallySelected: always },
 		});
 		expect(has({ classes, name: "selected" })).toBe(true);
@@ -60,7 +60,7 @@ describe("getDayClassNames precedence", () => {
 		expect(has({ classes: unselected, name: "inRange" })).toBe(true);
 		expect(has({ classes: unselected, name: "rangeStart" })).toBe(true);
 
-		const selected = classesFor({ selectedDates: [DAY], modifiers: { inRange: always, rangeStart: always } });
+		const selected = classesFor({ isSelected: true, modifiers: { inRange: always, rangeStart: always } });
 		expect(has({ classes: selected, name: "inRange" })).toBe(false);
 		expect(has({ classes: selected, name: "rangeStart" })).toBe(true);
 	});
@@ -74,7 +74,7 @@ describe("getDayClassNames precedence", () => {
 	it("drops every state class when the day is disabled", () => {
 		const classes = classesFor({
 			disabled: true,
-			selectedDates: [DAY],
+			isSelected: true,
 			modifiers: { today: always, holiday: always, inRange: always },
 		});
 		expect(has({ classes, name: "today" })).toBe(false);
@@ -116,7 +116,7 @@ describe("getDayClassNames month and past-day handling", () => {
 
 	it("offers the hover lift only to a day that carries no state of its own", () => {
 		expect(classesFor()).toContain("hit-area-stable");
-		expect(classesFor({ selectedDates: [DAY] })).not.toContain("hit-area-stable");
+		expect(classesFor({ isSelected: true })).not.toContain("hit-area-stable");
 		expect(classesFor({ modifiers: { today: always } })).not.toContain("hit-area-stable");
 	});
 });

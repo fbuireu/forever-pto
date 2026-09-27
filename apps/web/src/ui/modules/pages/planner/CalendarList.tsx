@@ -2,7 +2,7 @@
 
 import { useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
-import { type DayOutcome, DayRefusal } from "@application/stores/types";
+import { type DayOutcome, DayRefusal, holidaysKeyOf } from "@application/stores/types";
 import { planningWindowMonths } from "@domain/calendar/window";
 import { useCalculationsWorker } from "@ui/hooks/useCalculationsWorker";
 import { useStoresReady } from "@ui/hooks/useStoresReady";
@@ -22,7 +22,7 @@ export const CalendarList = () => {
 	const tA11y = useTranslations("a11y");
 	const { areStoresReady } = useStoresReady();
 
-	const { carryOverMonths, year, allowPastDays, country, region, ptoDays, strategy } = useFiltersStore(
+	const { carryOverMonths, year, allowPastDays, country, region, ptoDays, strategy, preferredMonths } = useFiltersStore(
 		useShallow((state) => ({
 			carryOverMonths: state.carryOverMonths,
 			year: state.year,
@@ -31,6 +31,7 @@ export const CalendarList = () => {
 			region: state.region,
 			ptoDays: state.ptoDays,
 			strategy: state.strategy,
+			preferredMonths: state.preferredMonths,
 		})),
 	);
 	const {
@@ -48,6 +49,7 @@ export const CalendarList = () => {
 		pruneDaysOutsideWindow,
 		clearCalculation,
 		planRevision,
+		holidaysKey,
 	} = useHolidaysStore(
 		useShallow((state) => ({
 			holidays: state.holidays,
@@ -64,6 +66,7 @@ export const CalendarList = () => {
 			pruneDaysOutsideWindow: state.pruneDaysOutsideWindow,
 			clearCalculation: state.clearCalculation,
 			planRevision: state.planRevision,
+			holidaysKey: state.holidaysKey,
 		})),
 	);
 
@@ -81,11 +84,12 @@ export const CalendarList = () => {
 	);
 
 	const toggleDay = useCallback(
-		(date: Date): DayOutcome =>
-			isCalculating
-				? { applied: false, reason: DayRefusal.PLAN_IN_FLIGHT }
-				: toggleDaySelection({ date, totalPtoDays: ptoDays, locale, allowPastDays }),
-		[isCalculating, toggleDaySelection, ptoDays, locale, allowPastDays],
+		(date: Date): DayOutcome => {
+			if (useHolidaysStore.getState().isCalculating) return { applied: false, reason: DayRefusal.PLAN_IN_FLIGHT };
+			const { ptoDays: totalPtoDays, allowPastDays: pastDaysAllowed } = useFiltersStore.getState();
+			return toggleDaySelection({ date, totalPtoDays, locale, allowPastDays: pastDaysAllowed });
+		},
+		[toggleDaySelection, locale],
 	);
 	const handleDayToggle = usePlannerDayClick(toggleDay);
 
@@ -104,10 +108,11 @@ export const CalendarList = () => {
 	}, [fetchHolidays, year, region, country, locale, carryOverMonths]);
 
 	const canCalculate = ptoDays > 0 && holidays.length > 0 && months.length > 0;
+	const holidaysAreCurrent = holidaysKey === holidaysKeyOf({ year, region, country, locale, carryOverMonths });
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: planRevision is a re-plan signal, not a value the body reads
 	useEffect(() => {
-		if (!canCalculate) return;
+		if (!canCalculate || !holidaysAreCurrent) return;
 
 		triggerCalculation({
 			year,
@@ -115,9 +120,22 @@ export const CalendarList = () => {
 			ptoDays,
 			allowPastDays,
 			strategy,
+			preferredMonths,
 			locale,
 		});
-	}, [triggerCalculation, canCalculate, year, carryOverMonths, ptoDays, allowPastDays, strategy, locale, planRevision]);
+	}, [
+		triggerCalculation,
+		canCalculate,
+		holidaysAreCurrent,
+		year,
+		carryOverMonths,
+		ptoDays,
+		allowPastDays,
+		strategy,
+		preferredMonths,
+		locale,
+		planRevision,
+	]);
 
 	useEffect(() => {
 		if (!canCalculate && suggestion) clearCalculation();

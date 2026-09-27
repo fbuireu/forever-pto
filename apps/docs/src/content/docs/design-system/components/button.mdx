@@ -26,7 +26,7 @@ Source: `apps/web/src/ui/modules/core/primitives/Button.tsx`. Built with [CVA](h
 
 ## States and composition
 
-Hover lifts the button up-left (`translate -2px, -2px`) while the hard shadow grows; press does the inverse. The pointer hit-area stays stable during the movement thanks to the `hit-area-stable` utility; see [Hit-area stability](/design-system/foundations/hit-area-stable/).
+Hover lifts the button up-left (`translate -2px, -2px`) while the hard shadow grows; press does the inverse. The `default` variant casts the yellow accent shadow (`--shadow-brutal-btn-accent`, at the same offsets as the frame shadow so a selected toggle sits at the same depth as its neighbours), like the tooltip, because its `bg-primary` face is the frame colour in both themes, and a frame-coloured shadow behind it would vanish; a selected toggle drawn in `default` still reads as lifted. The pointer hit-area stays stable during the movement thanks to the `hit-area-stable` utility; see [Hit-area stability](/design-system/foundations/hit-area-stable/).
 
 <ButtonStatesDemo client:visible />
 

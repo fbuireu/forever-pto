@@ -24,8 +24,12 @@ The full span the planner considers: the chosen year plus its Carry-over Months.
 _Avoid_: selected range, date range
 
 **Strategy**:
-The rule that decides which Bridges make it into a Suggestion when the PTO budget cannot cover them all. They are Grouped, Optimized and Balanced.
+The rule that decides which Bridges make it into a Suggestion when the PTO budget cannot cover them all. They are Grouped, Optimized, Balanced and Main Vacation.
 _Avoid_: filter, algorithm
+
+**Preferred Months**:
+The months of the Planning Window in which the user wants the block the Main Vacation Strategy builds first. Each is one month of one year: a Carry-over Month is a month of the next year, distinct from the same month of the chosen one. None chosen means any month: the block goes wherever it can be longest. A month the plan can no longer reach, because it has passed and past days are not allowed, cannot be chosen and counts as not chosen.
+_Avoid_: season, favourite months
 
 ## The calendar
 
@@ -66,7 +70,7 @@ The plan the product recommends: a set of dates on which to spend the PTO budget
 _Avoid_: plan
 
 **Alternative**:
-A different, genuinely distinct Suggestion built from the same budget and calendar, offered so the user can compare trade-offs. Applying an Alternative makes it the Suggestion.
+A different, genuinely distinct Suggestion built from the same budget and calendar, offered so the user can compare trade-offs. It never has more Effective Days or a higher Efficiency than the Suggestion: the Suggestion is the recommendation, and an Alternative is what the user gives up some of that for. Applying an Alternative makes it the Suggestion.
 _Avoid_: option, variant
 
 **Suggested Day**:
@@ -88,7 +92,7 @@ _Avoid_: remaining days, available days, unused days
 ## Measuring a plan
 
 **Effective Day**:
-One day of the continuous stretch off that a plan actually produces, counting the Free Days its Bridges absorb. This is the number the product exists to grow.
+One day of the continuous stretch off that a plan actually produces, counting the Free Days its PTO Days lean on, each once however many Bridges reach it. This is the number the product exists to grow.
 _Avoid_: actual day off, total off, day off
 
 **Bonus Day**:

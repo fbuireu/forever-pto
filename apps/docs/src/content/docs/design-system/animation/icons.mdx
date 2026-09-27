@@ -27,7 +27,7 @@ On top of the per-icon animations, `Icon.tsx` defines static animations availabl
 
 ## Trigger API
 
-`AnimateIcon` wraps arbitrary children (an `m.span`, or the child itself with `asChild`) and drives all descendant icons through context. The same props are accepted directly on any icon. From `Icon.tsx`:
+`AnimateIcon` wraps arbitrary children (an `m.span`, or the child itself with `asChild`) and drives all descendant icons through context. The context value is memoised over the props and state it carries, so a parent re-rendering does not re-render every icon beneath it. The same props are accepted directly on any icon. From `Icon.tsx`:
 
 | Prop | What it does |
 | --- | --- |

@@ -74,7 +74,6 @@ export function DonationForm({
 									disabled={isPending}
 									required
 									{...field}
-									className="h-10"
 									autoComplete="email"
 								/>
 							</FormControl>
@@ -165,7 +164,7 @@ export function DonationForm({
 												placeholder={t("promoCodePlaceholder")}
 												disabled={isPending}
 												{...field}
-												className="h-10 uppercase"
+												className="uppercase"
 											/>
 										</FormControl>
 										<FormMessage />

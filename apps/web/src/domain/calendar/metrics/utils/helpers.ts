@@ -1,10 +1,9 @@
 import type { HolidayDTO } from "@application/dto/holiday/types";
 import {
-	differenceInDays,
+	dayIndex,
 	eachDayOfInterval,
 	endOfYear,
 	formatDate,
-	getMonth,
 	getYear,
 	isWeekend,
 	startOfToday,
@@ -16,6 +15,7 @@ import type { Bridge } from "../../types";
 import {
 	MONTHS_IN_QUARTER,
 	MONTHS_IN_YEAR,
+	monthKeyOf,
 	type PlanningWindow,
 	windowMonthCount,
 	windowQuarterCount,
@@ -29,7 +29,7 @@ export interface WindowMonthIndexParams {
 }
 
 export const windowMonthIndex = ({ date, window: { year } }: WindowMonthIndexParams) =>
-	(getYear(date) - year) * MONTHS_IN_YEAR + getMonth(date);
+	monthKeyOf(date) - year * MONTHS_IN_YEAR;
 
 export interface GetMonthlyDistParams {
 	days: Date[];
@@ -66,65 +66,38 @@ export function getLongBlocksPerQuarter({ streaks, window }: GetLongBlocksPerQua
 	return longBlocksPerQuarter;
 }
 
-export interface GetValidBridgesParams {
+export interface GetBridgesInUseParams {
 	days: Date[];
 	bridges?: Bridge[];
 }
 
-export function getValidBridges({ days, bridges }: GetValidBridgesParams) {
+export function getBridgesInUse({ days, bridges }: GetBridgesInUseParams) {
 	if (!bridges || bridges.length === 0) return [];
 
 	const daysSet = new Set(days.map(dayKey));
 
-	return bridges.filter((bridge) => bridge.ptoDays.every((ptoDay) => daysSet.has(dayKey(ptoDay))));
+	return bridges.filter((bridge) => bridge.ptoDays.some((ptoDay) => daysSet.has(dayKey(ptoDay))));
 }
 
-export interface GetTotalEffectiveDaysParams {
-	days: Date[];
-	bridges?: Bridge[];
-	holidays?: HolidayDTO[];
-}
+export const getTotalEffectiveDays = (streaks: FreeStreak[]) =>
+	streaks.filter((streak) => streak.hasPlacedDay).reduce((total, streak) => total + streak.length, 0);
 
-export function getTotalEffectiveDays({ days, bridges, holidays = [] }: GetTotalEffectiveDaysParams) {
-	const validBridges = getValidBridges({ days, bridges });
+export const restBlocksOf = (dates: Date[]) => {
+	const blocks: Date[][] = [];
 
-	if (validBridges.length === 0) {
-		return days.length;
-	}
-
-	const freeDays = dayOffKeys({ placedDays: days, holidays });
-	const covered = new Set<string>();
-
-	for (const bridge of validBridges) {
-		for (const day of eachDayOfInterval({ start: bridge.startDate, end: bridge.endDate })) {
-			const key = dayKey(day);
-			if (isWeekend(day) || freeDays.has(key)) covered.add(key);
-		}
-	}
-
-	for (const day of days) {
-		covered.add(dayKey(day));
-	}
-
-	return covered.size;
-}
-
-export const calculateRestBlocks = (dates: Date[]) => {
-	if (dates.length === 0) return 0;
-
-	let blocks = 1;
-	const sorted = dates.toSorted((a, b) => a.getTime() - b.getTime());
-
-	for (let i = 1; i < sorted.length; i++) {
-		const curr = sorted[i];
-		const prev = sorted[i - 1];
-		if (curr === undefined || prev === undefined) continue;
-		const daysDiff = differenceInDays({ dateLeft: curr, dateRight: prev });
-		if (daysDiff > PTO_CONSTANTS.METRICS.REST_BLOCK_SEPARATION_DAYS) blocks++;
+	for (const date of dates.toSorted((a, b) => a.getTime() - b.getTime())) {
+		const block = blocks.at(-1);
+		const previous = block?.at(-1);
+		const separated =
+			previous === undefined || dayIndex(date) - dayIndex(previous) > PTO_CONSTANTS.METRICS.REST_BLOCK_SEPARATION_DAYS;
+		if (block && !separated) block.push(date);
+		else blocks.push([date]);
 	}
 
 	return blocks;
 };
+
+export const calculateRestBlocks = (dates: Date[]) => restBlocksOf(dates).length;
 
 interface CalculateMaxWorkStreakParams {
 	ptoDays: Date[];

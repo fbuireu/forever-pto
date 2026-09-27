@@ -8,27 +8,16 @@ import {
 	TabsTrigger,
 } from "@ui/modules/core/animate/components/Tabs";
 import type { ComponentProps } from "react";
+import { FilterStrategy } from "../../../../web/src/domain/calendar/types";
+import en from "../../../../web/src/ui/i18n/messages/en.json";
 import { Demo } from "../Demo";
 import { type OwnProps, propRows } from "../PropsTable";
 
-const TABS = [
-	{
-		id: "grouped",
-		label: "Grouped",
-		content: "Clusters PTO days into a few long breaks around holidays.",
-	},
-	{
-		id: "optimized",
-		label: "Optimized",
-		content: "Maximizes total days off, even if breaks end up scattered.",
-	},
-	{
-		id: "balanced",
-		label: "Balanced",
-		content:
-			"A middle ground: decent streaks, spread across the year. It trades a little efficiency for regular rests, which is why the panel height animates when you switch here.",
-	},
-];
+const TABS = Object.values(FilterStrategy).map((id) => ({
+	id,
+	label: en.sidebar.strategy[id].label,
+	content: en.sidebar.strategy[id].subtitle,
+}));
 
 export const TabsDemo = () => (
 	<Demo>

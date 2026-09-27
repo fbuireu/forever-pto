@@ -6,7 +6,7 @@ import {
 	calculateWeekends,
 	calculateWorkdays,
 	getCalendarDays,
-	getMonthNames,
+	getWindowMonthLabels,
 } from "./helpers";
 
 const holiday = (date: Date): HolidayDTO => ({
@@ -17,23 +17,23 @@ const holiday = (date: Date): HolidayDTO => ({
 	isInPlanningWindow: true,
 });
 
-describe("getMonthNames", () => {
+describe("getWindowMonthLabels", () => {
 	it("labels a plain year without a year suffix", () => {
-		const names = getMonthNames({ locale: "en", monthCount: 12, startYear: 2025 });
+		const names = getWindowMonthLabels({ locale: "en", monthCount: 12, startYear: 2025 });
 		expect(names).toHaveLength(12);
 		expect(names.every((name) => !name.includes("'"))).toBe(true);
 	});
 
 	it("suffixes the carry-over months with the year they fall in", () => {
-		const names = getMonthNames({ locale: "en", monthCount: 15, startYear: 2025 });
+		const names = getWindowMonthLabels({ locale: "en", monthCount: 15, startYear: 2025 });
 		expect(names[11]).not.toContain("'");
 		expect(names[12]).toContain("'26");
 		expect(names[14]).toContain("'26");
 	});
 
 	it("rolls over to the right month, not past the end of the year", () => {
-		const short = getMonthNames({ locale: "en", monthCount: 13, startYear: 2025 });
-		const first = getMonthNames({ locale: "en", monthCount: 1, startYear: 2026 });
+		const short = getWindowMonthLabels({ locale: "en", monthCount: 13, startYear: 2025 });
+		const first = getWindowMonthLabels({ locale: "en", monthCount: 1, startYear: 2026 });
 		expect(short[12]).toBe(`${first[0]} '26`);
 	});
 });

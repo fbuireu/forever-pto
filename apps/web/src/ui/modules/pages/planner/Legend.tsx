@@ -56,8 +56,18 @@ export const Legend = () => {
 	const [isExpanded, setIsExpanded] = useState(false);
 
 	return (
-		<div className={cn(styles.sticky_container, "hidden md:block")}>
-			<section className={cn(styles.section, isExpanded && styles.expanded)}>
+		<div className={cn(styles.sticky_container, "hidden md:grid")}>
+			<div className={cn(styles.section, styles.ghost)} aria-hidden inert>
+				<Card className={styles.card}>
+					<CardHeader className={styles.card_header}>
+						<CardTitle className={styles.card_title}>{t("title")}</CardTitle>
+					</CardHeader>
+					<CardContent className={styles.card_content}>
+						<LegendItems className={styles.items} itemClassName={styles.item} />
+					</CardContent>
+				</Card>
+			</div>
+			<section className={cn(styles.section, styles.live, isExpanded && styles.expanded)}>
 				<Card className={styles.card}>
 					<CardHeader className={styles.card_header}>
 						<CardTitle className={styles.card_title}>{t("title")}</CardTitle>

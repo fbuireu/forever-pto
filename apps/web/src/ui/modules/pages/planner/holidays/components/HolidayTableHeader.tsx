@@ -61,11 +61,11 @@ const HolidayTableHeaderComponent = ({ selectAllButton, sortConfig, onSort }: Ho
 				<TableHeader sortKey="date" currentSort={sortConfig} onSort={onSort}>
 					{t("date")}
 				</TableHeader>
-				<TableHead className="text-foreground">{t("day")}</TableHead>
+				<TableHead className="text-foreground normal-case">{t("day")}</TableHead>
 				<TableHeader sortKey="type" currentSort={sortConfig} onSort={onSort}>
 					{t("type")}
 				</TableHeader>
-				<TableHead className="text-foreground">{t("status")}</TableHead>
+				<TableHead className="text-foreground normal-case">{t("status")}</TableHead>
 			</TableRow>
 		</BaseTableHeader>
 	);

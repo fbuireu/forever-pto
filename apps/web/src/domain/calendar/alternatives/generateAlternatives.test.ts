@@ -1,10 +1,39 @@
 import type { HolidayDTO } from "@application/dto/holiday/types";
 import { HolidayVariant } from "@application/dto/holiday/types";
 import { beforeEach, describe, expect, it } from "vitest";
-import { FilterStrategy } from "../types";
+import { PTO_CONSTANTS } from "../const";
+import { selectBridgesForStrategy } from "../suggestions/utils/selectors";
+import { FilterStrategy, type Suggestion } from "../types";
 import { clearDateKeyCache, clearHolidayCache } from "../utils/cache";
-import { findPlanningCandidates } from "../utils/candidates";
+import { findPlanningCandidates, type PlanningCandidates, selectionInputOf } from "../utils/candidates";
+import { measurePlan } from "../utils/measures";
 import { generateAlternatives } from "./generateAlternatives";
+import { planDistance } from "./utils/helpers";
+
+interface MeasureAgainstParams {
+	plan: Suggestion;
+	candidates: PlanningCandidates;
+}
+
+const measureAgainst = ({ plan, candidates }: MeasureAgainstParams) =>
+	measurePlan({
+		plan,
+		alreadyOff: candidates.alreadyOff,
+		manualDays: candidates.manualDays,
+		workdays: candidates.availableWorkdays,
+		preferredMonths: [],
+	});
+
+interface PlanAlternativesParams {
+	ptoDays: number;
+	holidays: HolidayDTO[];
+	allowPastDays: boolean;
+	months: Date[];
+	strategy: FilterStrategy;
+	removedDays?: Date[];
+	maxAlternatives: number;
+	existingSuggestion?: Suggestion;
+}
 
 const planAlternatives = ({
 	ptoDays,
@@ -15,23 +44,22 @@ const planAlternatives = ({
 	removedDays,
 	maxAlternatives,
 	existingSuggestion,
-}: {
-	ptoDays: number;
-	holidays: HolidayDTO[];
-	allowPastDays: boolean;
-	months: Date[];
-	strategy: FilterStrategy;
-	removedDays?: Date[];
-	maxAlternatives: number;
-	existingSuggestion: Date[];
-}) =>
-	generateAlternatives({
+}: PlanAlternativesParams) => {
+	const candidates = findPlanningCandidates({ holidays, months, allowPastDays, removedDays, manualDays: [] });
+	const greedy = existingSuggestion ?? {
+		...selectBridgesForStrategy({ ...selectionInputOf({ candidates, ptoDays }), strategy }),
+		strategy,
+	};
+	const { suggestion, alternatives } = generateAlternatives({
 		ptoDays,
 		strategy,
 		maxAlternatives,
-		existingSuggestion,
-		candidates: findPlanningCandidates({ holidays, months, allowPastDays, removedDays }),
+		existingSuggestion: greedy,
+		candidates,
 	});
+
+	return { greedy, suggestion, candidates, alternatives };
+};
 
 interface MakeDateParams {
 	year: number;
@@ -49,6 +77,14 @@ const makeHoliday = (date: Date) => ({
 	isInPlanningWindow: true,
 });
 
+const FULL_YEAR = Array.from({ length: 12 }, (_, index) => makeDate({ year: 2025, month: index + 1, day: 1 }));
+
+const HOLIDAYS = [
+	makeDate({ year: 2025, month: 1, day: 1 }),
+	makeDate({ year: 2025, month: 5, day: 1 }),
+	makeDate({ year: 2025, month: 12, day: 25 }),
+].map(makeHoliday);
+
 const BASE = {
 	holidays: [] as ReturnType<typeof makeHoliday>[],
 	allowPastDays: true,
@@ -56,131 +92,133 @@ const BASE = {
 	strategy: FilterStrategy.GROUPED,
 };
 
+const YEAR = { ...BASE, months: FULL_YEAR, holidays: HOLIDAYS, ptoDays: 10, maxAlternatives: 4 };
+
+const toStrings = (days: Date[]) => days.map((day) => day.toDateString());
+
 describe("generateAlternatives", () => {
 	beforeEach(() => {
 		clearDateKeyCache();
 		clearHolidayCache();
 	});
 
-	it("returns empty array when ptoDays is 0", () => {
-		expect(
-			planAlternatives({
-				...BASE,
-				ptoDays: 0,
-				maxAlternatives: 3,
-				existingSuggestion: [makeDate({ year: 2025, month: 1, day: 6 })],
-			}),
-		).toHaveLength(0);
-	});
+	it.each([[0], [-1]])("returns the Suggestion untouched and no Alternative for a budget of %i", (ptoDays) => {
+		const placed = {
+			days: [makeDate({ year: 2025, month: 1, day: 3 })],
+			bridges: [],
+			strategy: FilterStrategy.GROUPED,
+		};
+		const { suggestion, alternatives } = planAlternatives({
+			...YEAR,
+			ptoDays,
+			existingSuggestion: placed,
+		});
 
-	it("returns empty array when ptoDays is negative", () => {
-		expect(
-			planAlternatives({
-				...BASE,
-				ptoDays: -1,
-				maxAlternatives: 3,
-				existingSuggestion: [makeDate({ year: 2025, month: 1, day: 6 })],
-			}),
-		).toHaveLength(0);
+		expect(suggestion).toBe(placed);
+		expect(alternatives).toHaveLength(0);
 	});
 
 	it("returns empty array when maxAlternatives is 0", () => {
+		expect(planAlternatives({ ...BASE, ptoDays: 3, maxAlternatives: 0 }).alternatives).toHaveLength(0);
+	});
+
+	it("returns empty array when the Suggestion placed nothing", () => {
 		expect(
-			planAlternatives({
-				...BASE,
-				ptoDays: 3,
-				maxAlternatives: 0,
-				existingSuggestion: [makeDate({ year: 2025, month: 1, day: 6 })],
-			}),
+			planAlternatives({ ...BASE, ptoDays: 3, maxAlternatives: 3, existingSuggestion: { days: [] } }).alternatives,
 		).toHaveLength(0);
 	});
 
-	it("returns empty array when existingSuggestion is empty", () => {
-		expect(planAlternatives({ ...BASE, ptoDays: 3, maxAlternatives: 3, existingSuggestion: [] })).toHaveLength(0);
-	});
-
 	it("returns at most maxAlternatives alternatives", () => {
-		const result = planAlternatives({
-			...BASE,
-			ptoDays: 3,
-			maxAlternatives: 2,
-			existingSuggestion: [makeDate({ year: 2025, month: 1, day: 6 })],
-		});
-		expect(result.length).toBeLessThanOrEqual(2);
+		expect(planAlternatives({ ...BASE, ptoDays: 3, maxAlternatives: 2 }).alternatives.length).toBeLessThanOrEqual(2);
 	});
 
-	it("fills maxAlternatives on a full year that has bridges to spare", () => {
-		const months = Array.from({ length: 12 }, (_, i) => makeDate({ year: 2025, month: i + 1, day: 1 }));
-		const holidays = [
-			makeDate({ year: 2025, month: 1, day: 1 }),
-			makeDate({ year: 2025, month: 5, day: 1 }),
-			makeDate({ year: 2025, month: 12, day: 25 }),
-		].map(makeHoliday);
-		const result = planAlternatives({
-			...BASE,
-			months,
-			holidays,
-			ptoDays: 10,
-			maxAlternatives: 4,
-			existingSuggestion: [makeDate({ year: 2025, month: 1, day: 3 })],
-		});
-		expect(result).toHaveLength(4);
+	it.each(Object.values(FilterStrategy))(
+		"%s: fills maxAlternatives on a full year that has bridges to spare",
+		(strategy) => {
+			expect(planAlternatives({ ...YEAR, strategy }).alternatives).toHaveLength(4);
+		},
+	);
+
+	it.each(Object.values(FilterStrategy))(
+		"%s: never offers a plan that covers more days than the Suggestion, or returns more per PTO Day",
+		(strategy) => {
+			const { suggestion, alternatives, candidates } = planAlternatives({ ...YEAR, strategy });
+			const ceiling = measureAgainst({ plan: suggestion, candidates });
+
+			expect(alternatives.length).toBeGreaterThan(0);
+			for (const alternative of alternatives) {
+				const { covered, efficiency } = measureAgainst({ plan: alternative, candidates });
+				expect(covered).toBeLessThanOrEqual(ceiling.covered);
+				expect(efficiency).toBeLessThanOrEqual(ceiling.efficiency);
+			}
+		},
+	);
+
+	it("offers another Strategy's plan only when it covers fewer days than the Suggestion", () => {
+		const { candidates, alternatives } = planAlternatives({ ...YEAR, strategy: FilterStrategy.OPTIMIZED });
+		const planOf = (strategy: FilterStrategy) =>
+			selectBridgesForStrategy({ ...selectionInputOf({ candidates, ptoDays: YEAR.ptoDays }), strategy });
+		const offered = alternatives.map((alternative) => toStrings(alternative.days).join());
+
+		expect(offered).toContain(toStrings(planOf(FilterStrategy.GROUPED).days).join());
+		expect(
+			planAlternatives({ ...YEAR, strategy: FilterStrategy.GROUPED }).alternatives.map((alternative) =>
+				toStrings(alternative.days).join(),
+			),
+		).not.toContain(toStrings(planOf(FilterStrategy.OPTIMIZED).days).join());
 	});
 
-	it("alternatives do not contain days from existingSuggestion", () => {
-		const existingSuggestion = [makeDate({ year: 2025, month: 1, day: 6 })];
-		const existing = new Set(existingSuggestion.map((day) => day.toDateString()));
-		const result = planAlternatives({
-			...BASE,
-			ptoDays: 3,
-			maxAlternatives: 3,
-			existingSuggestion,
+	it("makes a better plan the chosen Strategy found the Suggestion, and offers the weaker one instead", () => {
+		const weak = {
+			days: [makeDate({ year: 2025, month: 1, day: 3 })],
+			bridges: [],
+			strategy: FilterStrategy.OPTIMIZED,
+		};
+		const { suggestion, alternatives, candidates } = planAlternatives({
+			...YEAR,
+			strategy: FilterStrategy.OPTIMIZED,
+			existingSuggestion: weak,
 		});
-		for (const alt of result) {
-			for (const day of alt.days) {
-				expect(existing.has(day.toDateString())).toBe(false);
+
+		expect(suggestion).not.toBe(weak);
+		expect(measureAgainst({ plan: suggestion, candidates }).covered).toBeGreaterThan(
+			measureAgainst({ plan: weak, candidates }).covered,
+		);
+		expect(alternatives).toContain(weak);
+	});
+
+	it("keeps every Alternative at least MIN_DIFFERENCE away from the Suggestion and from each other", () => {
+		const { suggestion, alternatives } = planAlternatives({ ...YEAR, strategy: FilterStrategy.OPTIMIZED });
+		const plans = [suggestion.days, ...alternatives.map((alt) => alt.days)];
+
+		expect(alternatives.length).toBeGreaterThan(1);
+		for (let i = 0; i < plans.length; i++) {
+			for (let j = i + 1; j < plans.length; j++) {
+				expect(planDistance({ plan: plans[i] ?? [], rival: plans[j] ?? [] })).toBeGreaterThanOrEqual(
+					PTO_CONSTANTS.ALTERNATIVES.MIN_DIFFERENCE,
+				);
 			}
 		}
 	});
 
-	it("all alternatives have distinct day sets", () => {
-		const result = planAlternatives({
-			...BASE,
-			ptoDays: 5,
-			maxAlternatives: 5,
-			existingSuggestion: [makeDate({ year: 2025, month: 1, day: 6 })],
-		});
-		const keys = result.map((alt) =>
-			alt.days
-				.map((day) => day.toDateString())
-				.sort()
-				.join(","),
-		);
-		expect(keys.length).toBe(new Set(keys).size);
+	it("may reuse a Bridge of the Suggestion, since distinct no longer means disjoint", () => {
+		const { suggestion, alternatives } = planAlternatives({ ...YEAR, strategy: FilterStrategy.OPTIMIZED });
+		const placed = new Set(toStrings(suggestion.days));
+
+		expect(alternatives.some((alt) => alt.days.some((day) => placed.has(day.toDateString())))).toBe(true);
 	});
 
-	it("each alternative has days sorted chronologically even where its comparator picks a later Bridge first", () => {
-		const result = planAlternatives({
-			...BASE,
-			months: Array.from({ length: 12 }, (_, index) => makeDate({ year: 2025, month: index + 1, day: 1 })),
-			holidays: [
-				makeDate({ year: 2025, month: 1, day: 1 }),
-				makeDate({ year: 2025, month: 5, day: 1 }),
-				makeDate({ year: 2025, month: 12, day: 25 }),
-			].map(makeHoliday),
-			ptoDays: 10,
-			maxAlternatives: 3,
-			existingSuggestion: [makeDate({ year: 2025, month: 1, day: 3 })],
-		});
+	it("each alternative has days sorted chronologically even where it took a later Bridge first", () => {
+		const { alternatives } = planAlternatives({ ...YEAR, strategy: FilterStrategy.OPTIMIZED, maxAlternatives: 3 });
 
-		expect(result).toHaveLength(3);
-		for (const alt of result) {
+		expect(alternatives).toHaveLength(3);
+		for (const alt of alternatives) {
 			for (let i = 1; i < alt.days.length; i++) {
 				expect(alt.days[i - 1].getTime()).toBeLessThanOrEqual(alt.days[i].getTime());
 			}
 		}
 		expect(
-			result.some((alt) => {
+			alternatives.some((alt) => {
 				const bridgeOrder = (alt.bridges ?? []).flatMap((bridge) => bridge.ptoDays);
 				return bridgeOrder.map((day) => day.getTime()).join() !== alt.days.map((day) => day.getTime()).join();
 			}),
@@ -189,15 +227,14 @@ describe("generateAlternatives", () => {
 
 	it("never places a Removed Day and does not let it lengthen a neighbouring bridge", () => {
 		const removed = makeDate({ year: 2025, month: 1, day: 6 });
-		const result = planAlternatives({
-			...BASE,
-			ptoDays: 5,
-			maxAlternatives: 4,
-			existingSuggestion: [makeDate({ year: 2025, month: 1, day: 10 })],
+		const { alternatives } = planAlternatives({
+			...YEAR,
+			strategy: FilterStrategy.OPTIMIZED,
 			removedDays: [removed],
 		});
-		expect(result.length).toBeGreaterThan(0);
-		for (const alt of result) {
+
+		expect(alternatives.length).toBeGreaterThan(0);
+		for (const alt of alternatives) {
 			expect(alt.days.some((day) => day.toDateString() === removed.toDateString())).toBe(false);
 			for (const bridge of alt.bridges ?? []) {
 				expect(bridge.startDate.getTime() <= removed.getTime() && removed.getTime() <= bridge.endDate.getTime()).toBe(
@@ -207,40 +244,30 @@ describe("generateAlternatives", () => {
 		}
 	});
 
-	it("stamps the Strategy on every Alternative but orders by the diversity comparators, not by it", () => {
-		const shared = {
-			...BASE,
-			months: Array.from({ length: 12 }, (_, index) => makeDate({ year: 2025, month: index + 1, day: 1 })),
-			holidays: [
-				makeDate({ year: 2025, month: 1, day: 1 }),
-				makeDate({ year: 2025, month: 5, day: 1 }),
-				makeDate({ year: 2025, month: 12, day: 25 }),
-			].map(makeHoliday),
-			ptoDays: 10,
-			maxAlternatives: 4,
-			existingSuggestion: [makeDate({ year: 2025, month: 1, day: 3 })],
-		};
-		const daySets = (result: ReturnType<typeof planAlternatives>) =>
-			result.map((alt) => alt.days.map((day) => day.toDateString()).join(","));
+	it("stamps each Alternative with the Strategy that found it", () => {
+		const { candidates, alternatives } = planAlternatives({ ...YEAR, strategy: FilterStrategy.OPTIMIZED });
+		const groupedPlan = toStrings(
+			selectBridgesForStrategy({
+				...selectionInputOf({ candidates, ptoDays: YEAR.ptoDays }),
+				strategy: FilterStrategy.GROUPED,
+			}).days,
+		).join();
 
-		const balanced = planAlternatives({ ...shared, strategy: FilterStrategy.BALANCED });
-		const grouped = planAlternatives({ ...shared, strategy: FilterStrategy.GROUPED });
-
-		expect(balanced).toHaveLength(4);
-		expect(balanced.map((alt) => alt.strategy)).toEqual(new Array(4).fill(FilterStrategy.BALANCED));
-		expect(daySets(balanced)).toEqual(daySets(grouped));
-		expect(new Set(daySets(balanced)).size).toBe(4);
+		expect(alternatives.find((alt) => toStrings(alt.days).join() === groupedPlan)?.strategy).toBe(
+			FilterStrategy.GROUPED,
+		);
+		expect(alternatives.at(-1)?.strategy).toBe(FilterStrategy.OPTIMIZED);
 	});
 
 	it("returns no alternatives when no workdays are available (past months, allowPastDays=false)", () => {
-		const result = planAlternatives({
+		const { alternatives } = planAlternatives({
 			...BASE,
 			ptoDays: 3,
 			maxAlternatives: 3,
 			allowPastDays: false,
 			months: [makeDate({ year: 2020, month: 1, day: 1 })],
-			existingSuggestion: [makeDate({ year: 2020, month: 1, day: 6 })],
+			existingSuggestion: { days: [makeDate({ year: 2020, month: 1, day: 6 })] },
 		});
-		expect(result).toHaveLength(0);
+		expect(alternatives).toHaveLength(0);
 	});
 });

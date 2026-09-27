@@ -60,3 +60,16 @@ describe("Analytics", () => {
 		);
 	});
 });
+
+describe("Analytics without a property", () => {
+	it("renders nothing, rather than requesting a tag for an undefined id", async () => {
+		vi.resetModules();
+		vi.stubEnv("NEXT_PUBLIC_GOOGLE_ANALYTICS_ID", "");
+		const { Analytics: Unconfigured } = await import("./Analytics");
+
+		const { container } = render(<Unconfigured />);
+
+		expect(container.querySelectorAll("script")).toHaveLength(0);
+		vi.unstubAllEnvs();
+	});
+});

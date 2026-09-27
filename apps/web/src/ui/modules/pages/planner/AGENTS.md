@@ -26,7 +26,7 @@ in two rather than one component reading the store.
 | [`Legend.tsx`](./Legend.tsx) | Explains the day colours. Exports `Legend` *and* `LegendItems`, which `ManagementBar` reuses inside the mobile drawer |
 | [`Summary.tsx`](./Summary.tsx) | Metric cards plus the charts, all `dynamic()`-imported from here rather than from the route |
 | [`Roadmap.tsx`](./Roadmap.tsx) | Feature map over `RadialNav` and `FeatureList` from `core/animate/components/` |
-| [`Contact.tsx`](./Contact.tsx) | The feedback prompt; opens [`shared/contact/ContactModal.tsx`](../../shared/contact/ContactModal.tsx) |
+| [`Contact.tsx`](./Contact.tsx) | The feedback prompt; opens [`shared/contact/ContactModal.tsx`](../../shared/contact/ContactModal.tsx) through [`shared/contact/LazyContactModal.tsx`](../../shared/contact/LazyContactModal.tsx), the one gate the footer button and the error page share: it downloads the modal only once it has been opened |
 
 ## Subdirectories
 
@@ -146,16 +146,20 @@ all.
 
 **`CalendarList` also *clears* the plan, and that is the other half of the same effect.** Its trigger is
 gated on `ptoDays > 0 && holidays.length > 0 && months.length > 0`; when the gate closes the worker is never
-asked, and nothing else in the app nulls a Suggestion: `fetchHolidays` writes only `holidays`, on both its
+asked, and nothing else in the app nulls a Suggestion: `fetchHolidays` writes only `holidays` and `holidaysKey`, on both its
 success and its catch branch. So a Country whose Holidays fail to load, or a Region that has none, used to
 leave the previous Country's plan painted over a calendar that no longer existed, with no way to re-trigger
 a run. The effect now calls `clearCalculation()` when the gate closes **and** a Suggestion is still standing.
 The second condition matters: without it, the cold load (where the gate is also closed, because Holidays
 have not arrived yet) would clear a plan that was never there and mark the store as having calculated.
 
-**Only `CalendarList.tsx` triggers a calculation.** It fires `triggerCalculation` on any change to
-year, PTO budget, Strategy, past-days flag, locale or the Holiday list, and on `planRevision`, which
-`setCurrentAlternativeSelection` bumps so that applying a plan re-plans it; see
+**Only `CalendarList.tsx` triggers a calculation, and only on the Holidays of the filters on screen.** It
+fires `triggerCalculation` on any change to year, PTO budget, Strategy, Preferred Months, past-days flag,
+locale or the Holiday list, and on `planRevision`, but only once `holidaysKey` in the holidays store names the
+same Country, Region, year, Carry-over Months and locale the filters do (`holidaysKeyOf`). Without that gate a
+year change planned twice, the first time on the previous year's Holidays, and so did every reload, on the
+persisted ones; `holidaysKey` is not persisted, so a reload waits for its first fetch. `planRevision` is the
+signal `setCurrentAlternativeSelection` bumps so that applying a plan re-plans it; see
 [`@application/stores/AGENTS.md`](../../../../application/stores/AGENTS.md). [`Troubleshooting.tsx`](../homepage/support/Troubleshooting.tsx), which now
 lives under `pages/homepage/support/`, is the one other caller and it goes the other way:
 `useHolidaysStore().generateSuggestions`, on the main thread. Those are the *UI* entry points; the
@@ -353,6 +357,16 @@ supply it. Both are gone; the panel's props are exactly `Alternatives`'.
 modal in `shared/contact/`. It also imports [`contact.css`](./contact.css), which is global CSS, not a module: the
 `.dashed-card` class it defines is visible to the whole app.
 
+**The "alternatives that add more days" banner compares only with the Alternatives the chosen Strategy found.**
+`canImprove` reads `maxAlternative` over the Alternatives whose `strategy` equals the filters store's; the other
+Strategies' plans carry their own value there (see the Alternatives section of the
+[engine guide](../../../../domain/calendar/AGENTS.md)). Counting them would tell a Grouped user, on every plan, that
+Optimized covers more days, which is the trade they chose. The engine never hands out an Alternative ahead of the
+Suggestion, so the banner speaks up when the plan on screen is behind one of them: after a hand edit, or when the
+applied Alternative is itself one of the weaker ones. The header badge and the summary sentence name the Strategy
+of the plan on screen (its own `strategy`, narrowed with `isFilterStrategy`), so an applied plan another Strategy
+found is not credited to the one in the sidebar.
+
 **`Summary.tsx` measures against different denominators, and several of its numbers depend on which.**
 `ptoDays` here is the *budget*, read from the filters store; the engine's `Metrics` are computed against the
 days the plan actually *placed* (`days.length` in [`generateMetrics.ts`](../../../../domain/calendar/metrics/generateMetrics.ts)). So:
@@ -381,8 +395,8 @@ and `removedSuggestedDays` and recomputes the Metrics), so the stored day list i
 first placed it, for ever. Efficiency is `totalEffectiveDays / resolveSelectedDays(…).length`, so a hint
 reading the raw array named the wrong number the moment anything was hand-edited, which is precisely when a
 label naming the baseline earns its place: with no Manual or Removed Days they agree and nobody needed
-the label. `Summary` therefore reads `placedDays` off `usePlanReadout`, which applies `resolveSelectedDays`
-with the same lists the store holds. [`sidebar/components/CalendarExport.tsx`](../../sidebar/components/CalendarExport.tsx) reads the same field: it
+the label. `Summary` therefore reads `placedDays` off `usePlacedPlan`, the half of `usePlanReadout` with no
+`isCalculating` subscription, which applies `resolveSelectedDays` with the same lists the store holds. [`sidebar/components/CalendarExport.tsx`](../../sidebar/components/CalendarExport.tsx) reads the same field: it
 wants the array rather than the count, so the exported calendar carries exactly the days the Metrics were
 measured from. Anything else on this screen that wants "the days spent" takes it from the hook; those callers
 used to fold it themselves and this sentence was the whole mechanism keeping them in step.
@@ -480,6 +494,15 @@ per frame and toggled `data-legend-stuck` on `<html>`, an attribute no styleshee
 so it was not the `@supports` fallback it looked like. Both the effect and the id are gone. If a fallback for
 browsers without `scroll-state()` is ever wanted, it belongs beside `Legend.tsx` **with a CSS rule that
 consumes the attribute**, not in a cross-screen component reaching in by DOM id.
+
+**The sticky container never changes height, which is what stops the Legend flickering at the edge.** The
+compact stuck form is shorter than the open card, and a `bottom: 0` sticky box is stuck while its natural bottom
+is below the viewport's. So shrinking on stick raised that bottom back into view, the card unstuck, grew, stuck
+again, and inside a band as tall as the difference it toggled every frame. `Legend.tsx` now renders an inert,
+`aria-hidden`, invisible copy of the open card (`.ghost`, no toggle) in the same grid cell as the real one
+(`.live`), so the container is always the open height; only `.live` answers the stuck container query, it sits
+at the bottom of the cell, and the container passes pointer events through everywhere but the card. No script
+measures anything.
 
 **`data-tutorial` attributes are load-bearing, and they come from `TUTORIAL_ANCHOR`.** `CALENDAR_LIST`,
 `HOLIDAYS_LIST`, `PLANNER_DRAWER`, `ALTERNATIVES_MANAGER` and `PTO_STATUS` are this screen's driver.js

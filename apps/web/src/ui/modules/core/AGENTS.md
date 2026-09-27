@@ -221,6 +221,18 @@ away.
 pure re-export of it; its callers now import the implementation directly. Do not reintroduce a
 re-export: the no-barrel convention has no exception here.
 
+**A dialog never outgrows the screen: the popup caps itself at `100dvh` less the gutter and scrolls
+inside.** Base UI locks the page's scroll while a modal is open, so a centred, `fixed` popup taller than the
+viewport had no way to reach its top or its bottom. The quick start's last step with Main Vacation chosen is
+about 1050 px tall, and on a phone its finish button sat below the fold, out of reach: the flow could not be
+completed. `overscroll-contain` keeps a scroll that reaches the end from chaining to the locked page. A caller
+does not add its own `max-h` or `overflow` any more; `CookieConsentDialog` carried a private
+`max-h-[80vh] overflow-y-auto` for exactly this, and it went when the primitive took the rule.
+`Dialog.test.tsx` asserts the classes, and the homepage e2e suite opens the quick start at a phone's
+viewport, picks Main Vacation and asserts the popup stays inside the screen and finishes. The close button is
+absolute inside the popup, so it scrolls with the content: a header that runs under it reserves the room
+itself, which is why the quick start's step row carries `pr-10`.
+
 **`animate/base/DropdownMenu.tsx` exports the components it needs and used to define far more.** The rest
 came with the vendored menu (`Group`, `Portal`, `Sub`, `SubTrigger`, `SubContent`, `RadioGroup`,
 `CheckboxItem`, `RadioItem`, `Label`, `Separator`, `Shortcut`), each prefixed with an underscore so Biome

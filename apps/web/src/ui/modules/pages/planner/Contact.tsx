@@ -3,14 +3,10 @@
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@ui/modules/core/primitives/Card";
-import dynamic from "next/dynamic";
+import { LazyContactModal } from "@ui/modules/shared/contact/LazyContactModal";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import "./contact.css";
-
-const ContactModal = dynamic(() =>
-	import("src/ui/modules/shared/contact/ContactModal").then((module) => ({ default: module.ContactModal })),
-);
 
 const GITHUB_ISSUE_URL =
 	"https://github.com/fbuireu/forever-pto/issues/new?template=feature_request.yml&labels=enhancement";
@@ -75,7 +71,7 @@ export function Contact() {
 					</div>
 				</CardContent>
 			</Card>
-			<ContactModal open={contactModalOpen} onClose={() => setContactModalOpen(false)} />
+			<LazyContactModal open={contactModalOpen} onClose={() => setContactModalOpen(false)} />
 		</div>
 	);
 }

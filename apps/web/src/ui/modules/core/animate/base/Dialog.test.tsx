@@ -97,6 +97,15 @@ describe("DialogContent (DialogPopup)", () => {
 		const popup = container.querySelector('[data-primitive="dialog-popup"]');
 		expect(popup?.className).toContain("custom-class");
 	});
+
+	it("never outgrows the screen, and scrolls inside itself, because an open dialog locks the page's own scroll", () => {
+		const { container } = render(<DialogContent className="sm:max-w-xl">body</DialogContent>);
+		const classes = container.querySelector('[data-primitive="dialog-popup"]')?.className.split(" ") ?? [];
+
+		expect(classes).toEqual(
+			expect.arrayContaining(["max-h-[calc(100dvh-2rem)]", "overflow-y-auto", "overscroll-contain"]),
+		);
+	});
 });
 
 describe("DialogHeader", () => {

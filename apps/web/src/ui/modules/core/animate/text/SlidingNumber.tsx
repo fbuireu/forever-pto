@@ -11,8 +11,18 @@ import {
 	useTransform,
 } from "motion/react";
 import { useLocale } from "next-intl";
-import { type ComponentProps, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from "react";
+import {
+	type ComponentProps,
+	type RefObject,
+	useCallback,
+	useEffect,
+	useImperativeHandle,
+	useMemo,
+	useRef,
+} from "react";
 import useMeasure from "react-use-measure";
+
+const NO_TARGET: RefObject<HTMLSpanElement | null> = { current: null };
 
 const decimalSeparatorCache = new Map<string, string>();
 
@@ -133,7 +143,7 @@ function SlidingNumber({
 		return localRef.current;
 	});
 
-	const inViewResult = useInView(localRef, {
+	const inViewResult = useInView(inView ? localRef : NO_TARGET, {
 		once: inViewOnce,
 		margin: inViewMargin,
 	});

@@ -453,7 +453,10 @@ branch.
 `global-error.tsx` bundles **only** [`en.json`](../ui/i18n/messages/en.json) and hard-codes `lang="en"` on the document. That is
 deliberate: pulling every catalogue into the root bundle would cost every route roughly 500 KB for a
 page most users never see. Do not "fix" the mismatch between the URL locale and the rendered language by
-importing the others.
+importing the others. It still costs every route the whole of `en.json`, about 26 KB compressed, because a client
+component's JSON import is bundled whole; sending it `clientMessagesOf` would not help, since the import is the
+cost. Loading the bundle lazily is not the fix either: this page is what renders when a chunk failed to load. A
+subset file derived from `en.json` at build time is the fix, and it needs that build step first.
 
 ## Cloudflare request context
 
@@ -591,5 +594,9 @@ mock is gone and the real `noStore` runs, which is what makes the body assertion
   excludes `/api` and every dotted path, so `/.well-known/*` and the other route handlers never reach the
   proxy at all; the rewrite branch has no guard of its own. Widening the matcher means adding one back,
   which is what the `config matcher` block in `src/middleware.test.ts` is there to catch.
-- **The planner page imports its sections through `next/dynamic`.** That is a bundle-size decision, not an
-  accident; a static import of `CalendarList` or `Summary` pulls the whole planning UI into the first load.
+- **The planner page imports its sections through `next/dynamic`, and that does not keep them out of the first
+  load.** A `dynamic()` import that is rendered on the server is fetched and run at hydration like any other
+  chunk, so `CalendarList`, `Summary`, `Legend`, `Roadmap` and `Contact` are in the planner's first load in one
+  chunk of about 20 KB compressed. What keeps the first load small is what those sections import: the holiday
+  dataset and the PDF export's Effect runtime are imported when they are used, and a modal is mounted only once
+  it has been opened (`useHasOpened`), since a mounted `dynamic()` modal is fetched even while it stays shut.

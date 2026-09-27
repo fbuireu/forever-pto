@@ -30,12 +30,12 @@ The Forever PTO documentation wiki (docs.forever-pto.com). An Astro Starlight si
 
   Many of the demos used to wrap `LazyMotionProvider` themselves and some also wrapped the intl one, with this bullet as the only thing telling the next author to do the same; and forgetting does not fail typecheck, it fails the build, in the other workflow. `Demo` composes both around the frame now. The cost is nil: `LazyMotion` with `domAnimation` is lazy by construction and `NextIntlClientProvider` with empty messages is inert for anything that does not consume it. Add a provider **here** rather than at a demo.
 - **A `pre` a component renders itself gets none of Expressive Code's chrome, overflow included.** Only a
-  markdown fence goes through Expressive Code; `BalancedScoreFormula`'s hand-written `<pre>` did not, so its
-  one long line pushed the whole page sideways on a phone rather than scrolling inside its own box. The rule
+  markdown fence goes through Expressive Code; the hand-written `<pre>` of the Balanced score formula that
+  `StrategyRanking` replaced did not, so its one long line pushed the whole page sideways on a phone rather than scrolling inside its own box. The rule
   in [`src/styles/global.css`](./src/styles/global.css) covers any such block, and it carries `min-width: 0`
   as well as `overflow-x`: the content column is a grid item, so without it the block's min-content width
   becomes the column's and there is nothing for `overflow-x` to clip against. Prefer a fence; reach for a raw
-  `<pre>` only when the content is interpolated from the app's constants, as that one is.
+  `<pre>` only when the content is interpolated from the app's constants, as `StrategyRanking`'s is.
 - Never import [`src/ui/styles/index.css`](../web/src/ui/styles/index.css) (double preflight + layer collision with Starlight). The allowed style imports live in `src/styles/global.css` and are ordered deliberately; read its header comment before touching it.
 
 ## Conventions

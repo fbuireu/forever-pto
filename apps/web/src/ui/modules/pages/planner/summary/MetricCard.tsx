@@ -146,7 +146,13 @@ export const MetricCard = ({
 				</span>
 			</div>
 			{badge && (
-				<Badge variant="outline" className={cn("text-xs mt-2", colors.badge)}>
+				<Badge
+					variant="outline"
+					className={cn(
+						"mt-2 max-w-full whitespace-normal rounded-[14px] text-balance text-center text-xs leading-tight",
+						colors.badge,
+					)}
+				>
 					{badge}
 				</Badge>
 			)}

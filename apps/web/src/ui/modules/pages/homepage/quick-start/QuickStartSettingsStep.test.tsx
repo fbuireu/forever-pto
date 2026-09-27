@@ -5,7 +5,7 @@ import enMessages from "@i18n/messages/en.json";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const gate = vi.hoisted(() => ({ features: [] as string[], origins: [] as (string | undefined)[] }));
 
@@ -23,20 +23,27 @@ const sidebar = enMessages.sidebar;
 
 interface RenderStepParams {
 	strategy?: FilterStrategy;
+	preferredMonths?: number[];
 	allowPastDays?: boolean;
 	carryOverMonths?: number;
+	year?: number;
 }
 
 const renderStep = ({
 	strategy = FilterStrategy.GROUPED,
+	preferredMonths = [6, 7],
 	allowPastDays = false,
 	carryOverMonths = 1,
+	year = 2099,
 }: RenderStepParams = {}) => {
 	const onChange = vi.fn();
 
 	render(
 		<NextIntlClientProvider locale="en" messages={enMessages}>
-			<QuickStartSettingsStep draft={{ strategy, allowPastDays, carryOverMonths }} onChange={onChange} />
+			<QuickStartSettingsStep
+				draft={{ strategy, preferredMonths, allowPastDays, carryOverMonths, year }}
+				onChange={onChange}
+			/>
 		</NextIntlClientProvider>,
 	);
 
@@ -49,13 +56,14 @@ beforeEach(() => {
 });
 
 describe("QuickStartSettingsStep", () => {
-	it("offers the three strategies with the draft's one checked", () => {
+	it("offers every strategy with the draft's one checked", () => {
 		renderStep({ strategy: FilterStrategy.BALANCED });
 
 		expect(screen.getAllByRole("radio").map((radio) => (radio as HTMLInputElement).value)).toStrictEqual([
 			FilterStrategy.GROUPED,
 			FilterStrategy.OPTIMIZED,
 			FilterStrategy.BALANCED,
+			FilterStrategy.MAIN_VACATION,
 		]);
 		expect((screen.getByLabelText(new RegExp(sidebar.strategy.balanced.label)) as HTMLInputElement).checked).toBe(true);
 	});
@@ -66,6 +74,27 @@ describe("QuickStartSettingsStep", () => {
 		fireEvent.click(screen.getByLabelText(new RegExp(sidebar.strategy.optimized.label)));
 
 		expect(onChange).toHaveBeenCalledExactlyOnceWith({ strategy: FilterStrategy.OPTIMIZED });
+	});
+
+	it("asks for the Preferred Months only when Main vacation is picked", () => {
+		renderStep({ strategy: FilterStrategy.OPTIMIZED });
+
+		expect(screen.queryByRole("group", { name: sidebar.preferredMonths.title })).toBeNull();
+	});
+
+	it("hands back the Preferred Months with a month added", () => {
+		const onChange = renderStep({ strategy: FilterStrategy.MAIN_VACATION });
+
+		expect(screen.getByRole("group", { name: sidebar.preferredMonths.title })).toBeDefined();
+		fireEvent.click(screen.getByRole("button", { name: /^June \d{4}$/ }));
+
+		expect(onChange).toHaveBeenCalledExactlyOnceWith({ preferredMonths: [5, 6, 7] });
+	});
+
+	it("says the block may land anywhere once no month is picked", () => {
+		renderStep({ strategy: FilterStrategy.MAIN_VACATION, preferredMonths: [] });
+
+		expect(screen.getByText(sidebar.preferredMonths.anyMonth)).toBeDefined();
 	});
 
 	it("gates past days and carry-over behind Premium, and nothing else", () => {
@@ -94,5 +123,21 @@ describe("QuickStartSettingsStep", () => {
 		fireEvent.change(slider, { target: { value: "6" } });
 
 		expect(onChange).toHaveBeenCalledExactlyOnceWith({ carryOverMonths: 6 });
+	});
+
+	describe("in the current year with past days off", () => {
+		beforeEach(() => {
+			vi.useFakeTimers({ now: new Date(2026, 8, 26), toFake: ["Date"] });
+		});
+		afterEach(() => {
+			vi.useRealTimers();
+		});
+
+		it("refuses a Preferred Month already past", () => {
+			renderStep({ strategy: FilterStrategy.MAIN_VACATION, year: 2026, carryOverMonths: 0 });
+
+			expect(screen.getByRole("button", { name: /^August \d{4}$/ })).toHaveProperty("disabled", true);
+			expect(screen.getByRole("button", { name: /^October \d{4}$/ })).toHaveProperty("disabled", false);
+		});
 	});
 });

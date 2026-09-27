@@ -61,7 +61,7 @@ sequenceDiagram
   B->>P: GET /planner
   P->>P: markdown negotiation? payment guard?
   P->>P: next-intl resolves the locale, sets NEXT_LOCALE
-  P->>CF: /cdn-cgi/trace, then cf-ipcountry, then IP lookup
+  P->>CF: cf-ipcountry, or without it /cdn-cgi/trace, then IP lookup
   CF-->>P: country code
   P-->>B: HTML + NEXT_LOCALE + user-country cookies
   B->>S: rehydrate from obfuscated localStorage
@@ -91,7 +91,7 @@ sequenceDiagram
   CL->>HS: fetchHolidays({ year, country, region, carryOverMonths, locale })
   HS->>GH: dynamic import, then the two-year lookup
   GH-->>HS: HolidayDTO[] (National, Regional), merged with Custom Holidays
-  CL->>WK: triggerCalculation → terminate the previous worker, spawn a new one
+  CL->>WK: triggerCalculation → one reused worker, the latest request wins
   Note over CL,WK: CALCULATE_SUGGESTIONS with a requestId, every Date as an ISO string
   WK->>EN: deserialise, then run
   EN->>EN: Workdays → Bridges → Strategy selection → Alternatives → Metrics
@@ -102,7 +102,7 @@ sequenceDiagram
 ```
 
 - **Holidays** come from the `date-holidays` package, looked up for the chosen year and the next, once for the Country and once for the Region, then filtered to non-working types and shaped into `HolidayDTO`. The [holidays engine](/how-it-works/holidays-engine/) page has the rules; [data sources](/how-it-works/data-sources/) has the provenance.
-- **The worker** is spawned fresh for every calculation and the previous one is terminated, because the handler is synchronous and `terminate()` is the only real cancellation. The [calculation worker](/how-it-works/calculation-worker/) page covers the protocol.
+- **The worker** is spawned on the first calculation and reused for every one after it, because a warm worker answers several times faster than a cold one. Nothing cancels a run: a request made while one is in flight is held, a later one replaces it, and only the latest reply reaches the store. The [calculation worker](/how-it-works/calculation-worker/) page covers the protocol.
 - **The engine** is `runPlanningPipeline` in `apps/web/src/domain/calendar/pipeline.ts`: clear the caches, expand the Planning Window into months, fold Manual Days in as pseudo-Holidays, measure the Remaining Budget, find Workdays and Bridges, select under the Strategy, build Alternatives, measure everything. The [planning algorithm](/how-it-works/planning-algorithm/) page walks each stage.
 - **The result** lands in the holidays store, and every planner component reads it back from there: the calendar paints Suggested, Manual and Alternative days, the panel shows the budget and the Alternative switcher, the Summary renders the Metrics. The [planner UI](/how-it-works/planner-ui/) page maps the screen.
 

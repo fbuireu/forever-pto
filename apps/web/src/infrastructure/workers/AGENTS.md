@@ -115,7 +115,9 @@ out and narrowed it back on the way in, with nothing in between deciding anythin
 `serializeHolidays` and `serializeSuggestionResult` from types that were already sealed, so the honest wire
 type costs nothing and a bare string in either serialiser is a compile error rather than a cast that absorbs
 it. `CalculateSuggestionsPayload.strategy` stays `string`, deliberately: that is the *inbound* leg, and it is
-where a value out of persisted storage arrives.
+where a value out of persisted storage arrives. `preferredMonths` is `unknown` on that leg for the same reason, and
+`worker.ts` narrows it with `isPreferredMonths`, planning with no preferred month rather than a guess when it fails:
+an empty list is the one value the Main Vacation objective already reads as any month.
 
 `worker.ts` is the inbound direction and parses: `isFilterStrategy` from
 [`@domain/calendar/types`](../../domain/calendar/types.ts) narrows the incoming string, falling back to
@@ -140,8 +142,10 @@ The kinds of hand-edited day reach the engine by different routes, and that asym
   as free for Bridge expansion is correct. They additionally reach both `generateMetrics` calls **by name**,
   as `manuallySelectedDays: manualDates`, because a Metric needs to know not just that the day is free but
   that the user *paid* for it: without the parameter the denominator is the days the engine placed by itself
-  while the numerator still counts spans expanded through the manual ones, which inflates Efficiency and
-  Bonus Days. See the *Public API* section of
+  while the streaks the numerator counts still run through the manual ones, which inflates Efficiency and
+  Bonus Days. The pipeline also hands them to `findPlanningCandidates` as `manualDays`, which turns each into the
+  free streak around it (`alreadyOff`) so the selector does not count that streak as a Bridge's gain. See the
+  *Public API* section of
   [`@domain/calendar/AGENTS.md`](../../domain/calendar/AGENTS.md).
 - **Removed Days** are dates the user has told us they *will work*. They cross as ISO strings, are mapped
   straight to `Date` objects and are handed to `generateSuggestions` and `generateAlternatives` as
@@ -186,13 +190,21 @@ The consequence that remains is the stored empty plan being what the next run re
 emptied selection can pin the auto-suggest cap at zero. `useCalculationsWorker.ts` guards that by treating a
 computed cap of `0` as "no cap".
 
-## A worker per calculation, on purpose
+## One worker, reused, and the latest request wins
 
-`useCalculationsWorker.ts` terminates the in-flight worker and spawns a fresh one on every recalculation. That
-reads like waste and is not: the handler in `worker.ts` is fully synchronous, so a reused worker cannot be
-preempted: queued messages sit behind the running computation and execute to completion. `terminate()` is the
-only thing that actually cancels a run. The `requestId` guard discards stale *results*; it does nothing about
-stale *work*.
+`useCalculationsWorker.ts` spawns the worker on its first calculation and keeps it for the life of the hook. It
+used to terminate the in-flight worker and spawn a fresh one on every recalculation, on the grounds that the
+handler in `worker.ts` is synchronous, so a reused worker cannot be preempted and `terminate()` is the only
+thing that cancels a run. That was true and cost more than it saved: a fresh worker starts cold (its JIT and
+its cached `Intl` formatters), and measured over the real bundle it answered in about 270 ms where a warm one
+answers in about 60. Every recalculation paid that difference, idle or not.
+
+So the hook never cancels a run. A request made while one is in flight is held, and a later one replaces it,
+so a burst of ten budget clicks runs the first and the last and nothing in between. When the in-flight reply
+arrives it is discarded if a request is waiting, and the waiting one is posted; only the reply to the latest
+request is applied. Requests are numbered by a counter rather than a timestamp, because a reused worker's
+replies are told apart by their id alone. A worker that reports `error` is terminated and dropped, and the
+next request, a waiting one included, spawns a fresh one.
 
 ## Testing
 

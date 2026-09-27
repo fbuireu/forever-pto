@@ -10,14 +10,14 @@ Every React component the product renders. Nothing else in `src/ui/` holds compo
 | --- | --- | --- |
 | `core/` | The design system: `primitives/` plus the `animate/` layer. See [core/AGENTS.md](./core/AGENTS.md) | Yes, everywhere |
 | `pages/` | One folder per screen: `homepage/`, `planner/`, `legal/`, `error/`, `not-found/`. See [pages/planner/AGENTS.md](./pages/planner/AGENTS.md). `homepage/quick-start/` is the stepped dialog every planner call to action on the homepage opens, see below | No, by definition |
-| `shared/` | Cross-page pieces that are not primitives: footer, donate, contact, cookie consent, JSON-LD, [`shared/Logo.tsx`](./shared/Logo.tsx), [`shared/Icon.tsx`](./shared/Icon.tsx), [`shared/FormButtons.tsx`](./shared/FormButtons.tsx), [`shared/StepOutcome.tsx`](./shared/StepOutcome.tsx), [`shared/SupportButton.tsx`](./shared/SupportButton.tsx), [`shared/ConditionalWrapper.tsx`](./shared/ConditionalWrapper.tsx), [`shared/WebMCP.tsx`](./shared/WebMCP.tsx), plus [`shared/utils/helpers.ts`](./shared/utils/helpers.ts) for the helpers those pieces need | Yes |
+| `shared/` | Cross-page pieces that are not primitives: footer, donate, contact, cookie consent, JSON-LD, [`shared/Logo.tsx`](./shared/Logo.tsx), [`shared/Icon.tsx`](./shared/Icon.tsx), [`shared/FormButtons.tsx`](./shared/FormButtons.tsx), [`shared/StepOutcome.tsx`](./shared/StepOutcome.tsx), [`shared/SupportButton.tsx`](./shared/SupportButton.tsx), [`shared/ConditionalWrapper.tsx`](./shared/ConditionalWrapper.tsx), [`shared/WebMCP.tsx`](./shared/WebMCP.tsx), [`shared/MonthToggles.tsx`](./shared/MonthToggles.tsx) (the month picker the sidebar and the quick start share), plus [`shared/utils/helpers.ts`](./shared/utils/helpers.ts) for the helpers those pieces need | Yes |
 | `layout/` | [`layout/LegalLayout.tsx`](./layout/LegalLayout.tsx), the card chrome the legal pages share, and [`layout/SkipToContent.tsx`](./layout/SkipToContent.tsx), which owns the skip link **and** the `MAIN_CONTENT_ID` every route shell's landmark is keyed on | Between sibling routes |
-| `sidebar/` | [`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) and its controls: country, region, year, Strategy, PTO Day budget, the calculators, calendar export | One screen, but not a page section |
+| `sidebar/` | [`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) and its controls: country, region, year, Strategy and its Preferred Months, PTO Day budget, the calculators, calendar export | One screen, but not a page section |
 | `premium/` | The Premium gate and the Donation checkout: [`premium/PremiumFeature.tsx`](./premium/PremiumFeature.tsx), [`premium/featureLabels.ts`](./premium/featureLabels.ts), [`premium/PremiumModal.tsx`](./premium/PremiumModal.tsx), [`premium/PremiumRequiredModal.tsx`](./premium/PremiumRequiredModal.tsx), [`premium/CheckoutForm.tsx`](./premium/CheckoutForm.tsx) | Yes |
 | `providers/` | Context wrappers mounted once in the locale layout: [`providers/AppThemeProvider.tsx`](./providers/AppThemeProvider.tsx), [`providers/BonesProvider.tsx`](./providers/BonesProvider.tsx) | Once |
 | `stores/` | [`stores/StoresInitializer.tsx`](./stores/StoresInitializer.tsx), a render-nothing component that seeds the filters store from the `user-country` cookie, read through [`utils/userCountry.ts`](../utils/userCountry.ts) | Once |
 | `tutorial/` | [`tutorial/DriverStyles.tsx`](./tutorial/DriverStyles.tsx) only, a render-nothing component whose single job is to make the driver.js stylesheet import lazy | Once |
-| `tracking/` | The third-party script mounts: [`tracking/Analytics.tsx`](./tracking/Analytics.tsx) (Google gtag consent defaults and config) and [`tracking/BetterStackTracking.tsx`](./tracking/BetterStackTracking.tsx) (the Better Stack snippet, gated on the cookieconsent `betterStack` **service**, not the category) | Once |
+| `tracking/` | The third-party script mounts: [`tracking/Analytics.tsx`](./tracking/Analytics.tsx) (Google gtag consent defaults and config; nothing at all when the build has no `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID`, so a preview or a local build loads no Google script) and [`tracking/BetterStackTracking.tsx`](./tracking/BetterStackTracking.tsx) (the Better Stack snippet, gated on the cookieconsent `betterStack` **service**, not the category) | Once |
 | `export/` | [`export/HolidayDocument.tsx`](./export/HolidayDocument.tsx), the `@react-pdf/renderer` document tree. Not DOM React; it renders in the PDF reconciler only | Once |
 | `bones/` | Generated skeleton data, see below. Not hand-written | n/a |
 
@@ -79,20 +79,27 @@ the module path anyway, so a file whose export is named something else just make
 
 Every planner call to action on the homepage (the header's trial action, the hero, the free plan in
 `Pricing.tsx` and the closing section) is a [`pages/homepage/quick-start/QuickStartTrigger.tsx`](./pages/homepage/quick-start/QuickStartTrigger.tsx), a
-button that flips `quickStartOpen` on the `ui` store, not a link into `/planner`. The dialog itself is
+button that flips `quickStartOpen` on the `ui` store, not a link into `/planner`. The header's trial action is the one exception, and only for a returning visitor: it passes a
+`resumeLabel`, and once `useHasStoredPlan` finds the holidays store's blob in local storage the trigger renders
+that label as a link straight to `/planner` instead, since someone with a plan has nothing to set up. The check
+is presence of the key, read through [`application/stores/storedPlan.ts`](../../application/stores/storedPlan.ts), not a parse of the blob: it
+is obfuscated, and reading it would pull the whole holidays store into the homepage. The server snapshot is
+`false`, so the prerendered header always offers the trial and hydration swaps in the link. The dialog itself is
 mounted once, from the marketing layout, as [`pages/homepage/quick-start/QuickStart.tsx`](./pages/homepage/quick-start/QuickStart.tsx): a server
 component that fetches the Country list and the current year and hands them to
 [`pages/homepage/quick-start/QuickStartClient.tsx`](./pages/homepage/quick-start/QuickStartClient.tsx). That shell renders nothing until the
 store's flag first turns true, and only then `dynamic()`-imports, with `ssr: false`, the
 [`pages/homepage/quick-start/QuickStartDialog.tsx`](./pages/homepage/quick-start/QuickStartDialog.tsx) and the Premium modal beside it, so a visitor who
-never clicks a call to action downloads none of it: not the dialog, not the Counter, not the regions lookup the
-location store drags `date-holidays` in for, and not the Stripe client the Premium modal reaches. Once opened the
+never clicks a call to action downloads none of it: not the dialog, not the Counter, and not the Stripe client
+the Premium modal reaches. The regions lookup is further out still: the location store imports it only when
+`fetchRegions` runs, because it drags `date-holidays` in, so nothing downloads that dataset until a Country's
+Regions are asked for. Once opened the
 pair stays mounted, which is what lets the close animate and a second open cost no fetch. The content is [`pages/homepage/quick-start/QuickStartForm.tsx`](./pages/homepage/quick-start/QuickStartForm.tsx), one component per step
 next to it, and the step list, the draft shape and the pure rules ([`pages/homepage/quick-start/steps.ts`](./pages/homepage/quick-start/steps.ts)).
 
 **The steps are the sidebar's first three cards, asked one at a time.** Location (Country, with the
 `user-country` cookie as the default, and an optional Region), the PTO Day budget with the year, then
-Strategy, past days and Carry-over Months. The last two sit behind the same `PremiumFeature` gate the
+Strategy (with the Preferred Months when it is Main Vacation), past days and Carry-over Months. The last two sit behind the same `PremiumFeature` gate the
 sidebar uses, which is why `QuickStart.tsx` mounts `PremiumModal`: the marketing layout carried none, and a
 gated control whose click opens nothing reads as broken.
 
@@ -112,7 +119,7 @@ store as it always has. No search params are involved.
 `ui` store reports `quick_start_opened` with the call to action (`nav`, `hero`, `pricing`, `closing`), which is
 why `QuickStartTrigger` takes a `source` rather than the store guessing one. The form reports
 `quick_start_step_completed` on every Next and `quick_start_completed` on finish with `trackedDraft(draft)`
-from `steps.ts`: the PTO Day budget, Country, Region, year, Strategy, past days and Carry-over Months. The dialog
+from `steps.ts`: the PTO Day budget, Country, Region, year, Strategy, Preferred Months, past days and Carry-over Months. The dialog
 reports `quick_start_abandoned` from `onOpenChange(false)`, the close button, the backdrop and Escape, naming
 the step the form last announced through `onStepChange`; a finish closes through the store, which fires no
 `onOpenChange`, so it is never counted as an abandonment.
@@ -261,7 +268,7 @@ without discarding its own open state, `sidebar/components/CarryOverMonths.test.
 write it drops on unmount, `sidebar/components/LanguageSelector.test.tsx` the code-versus-label switch by rail
 state, `sidebar/components/WorkdayCounterCalendarModal.test.tsx` that open and close both go through the owner
 that holds the state, and [`sidebar/AppSidebar.test.tsx`](./sidebar/AppSidebar.test.tsx) the tutorial anchors, the
-landmark the skip link targets and the year handed to both windowed controls.
+landmark the skip link targets and the year handed to the Years control.
 
 **A component whose body is markup plus translation calls is no longer left to `e2e/`, and what its test
 asserts is chosen so it can fail.** Re-rendering the markup back as an expectation proves only that the file
@@ -467,8 +474,9 @@ bundle. Deleting the "empty" component silently ships the CSS eagerly.
 
 `export/HolidayDocument.tsx` is JSX but not DOM. Its elements come from `@react-pdf/renderer` and its
 styles are `StyleSheet.create` objects, so Tailwind classes and `cn()` do nothing there. It is loaded
-through a dynamic import inside an Effect program in [`sidebar/components/CalendarExport.tsx`](./sidebar/components/CalendarExport.tsx); importing
-it statically would pull the whole PDF renderer into the client bundle.
+through a dynamic import inside the Effect program in [`export/exportPdf.tsx`](./export/exportPdf.tsx), which
+[`sidebar/components/CalendarExport.tsx`](./sidebar/components/CalendarExport.tsx) itself imports only when the button is pressed; importing
+either statically would pull the PDF renderer, or the Effect runtime, into the planner's first load.
 
 `data-tutorial` attributes scattered through `sidebar/` and [`pages/planner/`](./pages/planner) are the tutorial's anchors, and
 both sides now name them through `TUTORIAL_ANCHOR` in [`tutorial/anchors.ts`](./tutorial/anchors.ts) rather than as strings. They look
@@ -517,11 +525,29 @@ because it is a key in a Better Stack funnel that this repo cannot see: renaming
 with no way to stitch it back together. It is the one surviving instance of the retired word, in
 [`../../infrastructure/clients/logging/better-stack/tracking.ts`](../../infrastructure/clients/logging/better-stack/tracking.ts)'s event union.
 
-The Stripe Elements appearance in [`shared/donate/Donate.tsx`](./shared/donate/Donate.tsx) repeats the theme as hex literals. The
-Elements iframe cannot read this app's CSS custom properties, so the light and dark objects mirror
-`--card`, `--input`, `--foreground`, `--frame`, `--accent` (identical in both modes), `--secondary` and
-`--muted-foreground` from [`src/ui/styles/global/index.css`](../styles/global/index.css) by value. Change a token there and this
-object has to be changed by hand, or the donation form drifts from the page around it.
+The Stripe Elements appearance lives in [`shared/donate/stripeAppearance.ts`](./shared/donate/stripeAppearance.ts), and it repeats the theme as hex
+literals. The Elements iframe cannot read this app's CSS custom properties, so the light and dark palettes
+mirror `--surface-panel`, `--surface-panel-alt`, `--sidebar`, `--foreground`, `--frame`, `--primary-foreground`,
+`--accent`, `--destructive`, `--muted-foreground` and `--ring` from [`src/ui/styles/global/index.css`](../styles/global/index.css) by value, and the
+shadow offsets mirror the `--shadow-brutal-*` scale. Change a token there and this module has to be changed by
+hand, or the donation form drifts from the page around it.
+
+**The model is the sidebar, not the `Input` primitive.** A field is drawn like the sidebar's comboboxes, which
+are `Button` `outline`: the panel face, a resting 5px frame shadow that grows to 7px on hover, the value in
+bold and the orange focus ring; a label takes the sidebar's mono face at 14px; a payment method in the
+accordion is a sidebar step card, on `--sidebar` with the 14px radius and the 6px shadow. What Stripe cannot
+do is move an element, so a field lifts by its shadow alone, and it cannot load `next/font`'s files, whose names
+carry a per-build hash, so the faces it types in come from a copy of their own:
+[`public/fonts/stripe/fonts.css`](../../../public/fonts/stripe/fonts.css) declares Space Grotesk and JetBrains Mono over
+woff2 files beside it, and `stripeFonts` hands its absolute URL to Elements as `cssSrc`. That copy does not
+follow a font upgrade in `app/fonts.ts`; refresh the files by hand when the faces change. The iframe fetches
+them from Stripe's origin, which is why `public/_headers` gives that folder `Access-Control-Allow-Origin`. A selected picker item is drawn like a selected
+`default` Button, ink with the accent shadow at the same depth as its unselected neighbours.
+`CheckoutForm.tsx` pins the Payment Element to `layout: 'accordion'`, which is what the narrow popover made
+Stripe choose anyway, because the two layouts share the `.TabIcon--selected` rule: an ink selected tab wants a
+light icon, a cream accordion card a dark one, and one value was always invisible in the other. The rule and
+`colorIconTabSelected` are the frame colour, which the accordion needs. The input text
+is 16px on phones, read from `useIsMobile`, because the browser zooms into anything smaller.
 
 **One module answers how a sidebar control is labelled, and its interface is where the accessibility
 defects came from.** [`sidebar/components/SidebarFieldLabel.tsx`](./sidebar/components/SidebarFieldLabel.tsx) exports `SidebarFieldLabel` (icon, title,

@@ -6,6 +6,19 @@
 	z-index: 9;
 	width: 100%;
 	margin-top: 2rem;
+	pointer-events: none;
+
+	& > * {
+		grid-area: 1 / 1;
+	}
+}
+
+.ghost {
+	visibility: hidden;
+}
+
+.live {
+	align-self: end;
 }
 
 .toggle {
@@ -113,6 +126,10 @@
 		transform 120ms ease-out;
 }
 
+.live .card {
+	pointer-events: auto;
+}
+
 @keyframes legendItemIn {
 	from {
 		opacity: 0;
@@ -126,35 +143,35 @@
 
 @supports (container-type: scroll-state) {
 	@container pto-legend scroll-state(stuck: bottom) {
-		.section {
+		.live {
 			font-size: var(--text-xs);
 			line-height: calc(var(--spacing) * 4);
 			width: fit-content;
 		}
 
-		.card {
+		.live .card {
 			gap: 0;
 			padding-top: calc(var(--spacing) * 2);
 			padding-bottom: calc(var(--spacing) * 2);
 			box-shadow: var(--shadow-lg);
 		}
 
-		.card_header {
+		.live .card_header {
 			padding-block: 0;
 		}
 
-		.card_title {
+		.live .card_title {
 			font-size: 0;
 			line-height: 0;
 			overflow: hidden;
 			height: 0;
 		}
 
-		.toggle {
+		.live .toggle {
 			display: inline-block;
 		}
 
-		.card_content {
+		.live .card_content {
 			display: grid;
 			grid-template-rows: 0fr;
 			transition: grid-template-rows 200ms ease-in-out;
@@ -163,19 +180,19 @@
 			overflow: hidden;
 		}
 
-		.items {
+		.live .items {
 			min-height: 0;
 			margin-bottom: 0;
 			gap: calc(var(--spacing) * 2);
 		}
 
-		.item {
+		.live .item {
 			opacity: 0;
 			transform: translateY(6px) scale(0.95);
 		}
 	}
 
-	.section.expanded {
+	.live.expanded {
 		@container pto-legend scroll-state(stuck: bottom) {
 			.card_content {
 				grid-template-rows: 1fr;

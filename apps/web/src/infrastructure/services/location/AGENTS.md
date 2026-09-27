@@ -23,7 +23,11 @@ costs one interaction. Nothing downstream should treat the result as authoritati
 
 1. **`detectCountryFromHeaders(request)`** reads the `cf-ipcountry` header the edge already put on the
    request. Synchronous, no I/O, and the only signal derived from the visitor's own connection, which is why
-   it goes first.
+   it goes first. **When the header is present its answer is final, even an empty one.** Cloudflare sends `XX`
+   or `T1` when it cannot place the visitor, and the two strategies below would then locate the Worker's own
+   egress rather than the visitor, while no cookie is set on failure, so every navigation repeated up to three
+   sequential subrequests for a wrong answer. They run only when the header is absent, which is local
+   development and nothing in production.
 2. **`detectCountryFromCDN()`** resolves the Cloudflare context, fetches
    `${env.NEXT_PUBLIC_SITE_URL}/cdn-cgi/trace` with a 5 s `AbortSignal.timeout`, and reads the `loc=` line.
 3. **`detectCountryFromEgressIP()`** calls `api.ipify.org` for an IP, then `ipinfo.io/<ip>/json` for its country.
@@ -36,8 +40,8 @@ treats that as "no cookie to set" and moves on.
 **The only caller is the proxy.** `proxy/location.ts` calls `detectCountry` from [`src/middleware.ts`](../../../middleware.ts), so
 everything here runs server-side inside a Cloudflare Worker request, including the fetches, which read like
 browser calls and are not. It also short-circuits on an existing `user-country` cookie, which is what keeps
-this chain off the hot path for returning visitors. Between that cookie and the header running first, the
-network strategies sit in front of an HTML response only when both have already come up empty.
+this chain off the hot path for returning visitors. Between that cookie and the header being final whenever
+it is present, the network strategies never sit in front of a production HTML response.
 
 ## Gotchas
 
@@ -56,7 +60,8 @@ originate inside the proxy Worker, so `api.ipify.org` reports the runtime's *egr
 `ipinfo.io` returns that address's country. On Cloudflare that is the colo the request landed in: usually
 near the visitor, never derived from their connection; off Cloudflare it is whatever network the process
 sits on. It is kept as the last resort precisely because it is the only strategy that still answers when
-neither `cf-ipcountry` nor the trace has anything to read, and it is last because a guess about the server
+there is no `cf-ipcountry` header and the trace has nothing to read either, which in practice means local
+development, and it is last because a guess about the server
 must never beat a fact about the visitor. Do not read its result as visitor geolocation, and do not promote
 it up the chain.
 
@@ -91,7 +96,8 @@ is not evidence.
 ## Testing
 
 Both files have a co-located test. [`detectCountry.test.ts`](./detectCountry.test.ts) mocks `./utils/strategies` outright and asserts
-only the fallthrough, including that a later strategy is *not* called once an earlier one answers.
+only the fallthrough, including that a later strategy is *not* called once an earlier one answers, and
+that a present header stops the chain even when Cloudflare could not resolve it.
 [`utils/strategies.test.ts`](./utils/strategies.test.ts) stubs `getCloudflareContext` and the global `fetch`, and covers each failure mode
 separately, since every one of them has to produce `''` rather than an exception.
 

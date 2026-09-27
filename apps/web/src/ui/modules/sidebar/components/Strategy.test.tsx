@@ -6,14 +6,24 @@ import { NextIntlClientProvider } from "next-intl";
 import type { ComponentProps, ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const store = vi.hoisted(() => ({ strategy: "balanced" as string, setStrategy: vi.fn() }));
+const store = vi.hoisted(() => ({
+	strategy: "balanced" as string,
+	setStrategy: vi.fn(),
+}));
 
 const track = vi.hoisted(() => vi.fn());
 vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
 
 vi.mock("@application/stores/filters", () => ({
 	useFiltersStore: (selector: (state: unknown) => unknown) =>
-		selector({ strategy: store.strategy, setStrategy: store.setStrategy }),
+		selector({
+			strategy: store.strategy,
+			setStrategy: store.setStrategy,
+		}),
+}));
+
+vi.mock("./PreferredMonths", () => ({
+	PreferredMonths: () => <fieldset aria-label={en.sidebar.preferredMonths.title} />,
 }));
 
 vi.mock("@ui/modules/core/animate/base/Popover", () => ({
@@ -48,7 +58,17 @@ describe("Strategy", () => {
 			en.sidebar.strategy.grouped.label,
 			en.sidebar.strategy.optimized.label,
 			en.sidebar.strategy.balanced.label,
+			en.sidebar.strategy.mainVacation.label,
 		]);
+	});
+
+	it("asks for the preferred months only under Main vacation", () => {
+		renderStrategy();
+		expect(screen.queryByRole("group", { name: en.sidebar.preferredMonths.title })).toBeNull();
+
+		store.strategy = FilterStrategy.MAIN_VACATION;
+		renderStrategy();
+		expect(screen.getByRole("group", { name: en.sidebar.preferredMonths.title })).toBeTruthy();
 	});
 
 	it("stores the strategy that was picked", async () => {
@@ -88,7 +108,7 @@ describe("Strategy", () => {
 		renderStrategy();
 
 		expect(screen.getByText(en.sidebar.strategy.optimized.pros.maximumEfficiency)).toBeTruthy();
-		expect(screen.getByText(en.sidebar.strategy.optimized.cons.shortBridges)).toBeTruthy();
+		expect(screen.getByText(en.sidebar.strategy.optimized.cons.mostlyLongWeekends)).toBeTruthy();
 	});
 
 	it("keeps the details away from a reader who has not asked for them", () => {

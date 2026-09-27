@@ -39,6 +39,7 @@
 	--shadow-brutal-3-accent: 3px 3px 0 0 var(--accent);
 	--shadow-brutal-sm: 4px 4px 0 0 var(--frame);
 	--shadow-brutal-sm-destructive: 4px 4px 0 0 var(--destructive);
+	--shadow-brutal-sm-accent: 4px 4px 0 0 var(--accent);
 	--shadow-brutal-md: 6px 6px 0 0 var(--frame);
 	--shadow-brutal-lg: 8px 8px 0 0 var(--frame);
 	--shadow-brutal-xl: 10px 10px 0 0 var(--frame);

@@ -72,7 +72,7 @@ export const CookieConsentDialog = ({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto" closeLabel={tA11y("closeDialog")}>
+			<DialogContent className="sm:max-w-2xl" closeLabel={tA11y("closeDialog")}>
 				<DialogHeader>
 					<DialogTitle>{t("preferencesTitle")}</DialogTitle>
 					<DialogDescription>{t("preferencesDescription")}</DialogDescription>

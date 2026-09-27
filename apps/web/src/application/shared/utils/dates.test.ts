@@ -1,12 +1,15 @@
 import { EN } from "@infrastructure/i18n/locales";
-import { describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import {
 	addDays,
 	addMonths,
+	dayIndex,
 	differenceInDays,
 	eachDayOfInterval,
 	endOfMonth,
 	formatDate,
+	fromDayIndex,
+	getMonthNames,
 	getWeekdayNames,
 	isBefore,
 	isSameDay,
@@ -17,6 +20,55 @@ import {
 	startOfWeek,
 } from "./dates";
 
+describe("dayIndex in a zone that changes its clocks", () => {
+	const runnerZone = process.env.TZ;
+
+	beforeAll(() => {
+		process.env.TZ = "Europe/Madrid";
+	});
+
+	afterAll(() => {
+		if (runnerZone === undefined) delete process.env.TZ;
+		else process.env.TZ = runnerZone;
+	});
+
+	it("keeps a one-day step across both daylight-saving changes", () => {
+		expect(dayIndex(new Date(2025, 2, 31)) - dayIndex(new Date(2025, 2, 30))).toBe(1);
+		expect(dayIndex(new Date(2025, 9, 27)) - dayIndex(new Date(2025, 9, 26))).toBe(1);
+	});
+
+	it("round-trips local midnight on the day the clocks go forward", () => {
+		const changeover = new Date(2025, 2, 30);
+
+		expect(fromDayIndex(dayIndex(changeover)).getTime()).toBe(changeover.getTime());
+	});
+});
+
+describe("dayIndex", () => {
+	it("numbers consecutive calendar days consecutively", () => {
+		expect(dayIndex(new Date(2025, 0, 11)) - dayIndex(new Date(2025, 0, 10))).toBe(1);
+	});
+
+	it("ignores the time of day", () => {
+		expect(dayIndex(new Date(2025, 0, 10, 23, 59))).toBe(dayIndex(new Date(2025, 0, 10)));
+	});
+
+	it("is undone by fromDayIndex, which returns local midnight", () => {
+		const date = new Date(2026, 2, 29);
+		const back = fromDayIndex(dayIndex(date));
+
+		expect(back.getTime()).toBe(date.getTime());
+		expect(fromDayIndex(dayIndex(new Date(2026, 9, 25, 18))).getTime()).toBe(new Date(2026, 9, 25).getTime());
+	});
+
+	it("agrees with differenceInDays over a year boundary", () => {
+		const dateLeft = new Date(2026, 0, 6);
+		const dateRight = new Date(2025, 11, 20);
+
+		expect(dayIndex(dateLeft) - dayIndex(dateRight)).toBe(differenceInDays({ dateLeft, dateRight }));
+	});
+});
+
 describe("isSameDay", () => {
 	it("returns true for the same date", () => {
 		expect(isSameDay({ a: new Date(2024, 0, 1), b: new Date(2024, 0, 1) })).toBe(true);
@@ -24,6 +76,14 @@ describe("isSameDay", () => {
 
 	it("returns false for different dates", () => {
 		expect(isSameDay({ a: new Date(2024, 0, 1), b: new Date(2024, 0, 2) })).toBe(false);
+	});
+
+	it("ignores the time of day", () => {
+		expect(isSameDay({ a: new Date(2024, 0, 1, 23, 59), b: new Date(2024, 0, 1) })).toBe(true);
+	});
+
+	it("tells the same day of another year apart", () => {
+		expect(isSameDay({ a: new Date(2024, 0, 1), b: new Date(2025, 0, 1) })).toBe(false);
 	});
 });
 
@@ -34,6 +94,10 @@ describe("isSameMonth", () => {
 
 	it("returns false for different months", () => {
 		expect(isSameMonth({ a: new Date(2024, 0, 1), b: new Date(2024, 1, 1) })).toBe(false);
+	});
+
+	it("tells the same month of another year apart", () => {
+		expect(isSameMonth({ a: new Date(2024, 0, 1), b: new Date(2025, 0, 1) })).toBe(false);
 	});
 });
 
@@ -193,6 +257,29 @@ describe("formatDate", () => {
 		});
 
 		expect(constructions).toBe(1);
+	});
+});
+
+describe("getMonthNames", () => {
+	it("names the twelve months in calendar order", () => {
+		expect(getMonthNames({ locale: EN, format: "long" })).toEqual([
+			"January",
+			"February",
+			"March",
+			"April",
+			"May",
+			"June",
+			"July",
+			"August",
+			"September",
+			"October",
+			"November",
+			"December",
+		]);
+	});
+
+	it("abbreviates them by default and follows the locale", () => {
+		expect(getMonthNames({ locale: "es" })[0]?.toLowerCase()).toMatch(/^ene/);
 	});
 });
 

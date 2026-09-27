@@ -53,4 +53,36 @@ describe("obfuscate / deobfuscate", () => {
 		const obfuscated = obfuscate({ text: "hello", key: "correct" });
 		expect(deobfuscate({ text: obfuscated, key: "wrong" })).not.toBe("hello");
 	});
+
+	const referenceObfuscate = ({ text, key: secret }: { text: string; key: string }) =>
+		btoa(
+			Array.from(
+				new TextEncoder().encode(
+					text
+						.split("")
+						.map((char, i) =>
+							String.fromCodePoint((char.codePointAt(0) ?? 0) ^ (secret.codePointAt(i % secret.length) ?? 0)),
+						)
+						.join(""),
+				),
+				(byte) => String.fromCodePoint(byte),
+			).join(""),
+		);
+
+	it.each([
+		["plain ASCII", "some payload", key],
+		["accents and emoji", '{"name":"café 🎉","n":42}', key],
+		["a payload longer than one chunk", JSON.stringify({ days: Array.from({ length: 3000 }, (_, i) => i) }), key],
+		["a key with an astral character", "hello world", "k🔑y"],
+	])(
+		"writes exactly what the previous implementation wrote, for %s, so stored blobs stay readable",
+		(_, text, secret) => {
+			expect(obfuscate({ text, key: secret })).toBe(referenceObfuscate({ text, key: secret }));
+		},
+	);
+
+	it("round-trips a payload longer than one chunk", () => {
+		const text = JSON.stringify({ days: Array.from({ length: 3000 }, (_, i) => `2026-01-${i}`) });
+		expect(deobfuscate({ text: obfuscate({ text, key }), key })).toBe(text);
+	});
 });

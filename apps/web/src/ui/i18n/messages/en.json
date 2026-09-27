@@ -13,7 +13,7 @@
 	},
 	"metadata": {
 		"title": "Forever PTO - Manage your paid time off",
-		"description": "Plan and optimize your holidays and PTO with Forever PTO. Find the best long weekends and maximized time off.",
+		"description": "Plan your PTO around public holidays with Forever PTO. Find the best long weekends and get more days off.",
 		"keywords": "PTO, holidays, time off, vacation, long weekend, paid time off, calendar",
 		"cookiePolicy": {
 			"title": "Cookie Policy | Forever PTO",
@@ -36,19 +36,17 @@
 		},
 		"planner": {
 			"title": "Planner | Forever PTO",
-			"description": "Plan and optimize your PTO days. Smart PTO calendar with holiday detection, bridge day optimizer, and export to Google Calendar, Outlook and Apple."
+			"description": "Plan your PTO days around public holidays. The planner finds the bridges and exports to Google Calendar, Outlook and Apple."
 		}
 	},
 	"planner": {
 		"title": "Forever PTO",
 		"heading": "Planner",
-		"description": "Your smart PTO planner. Configure your PTO days, country and strategy to get the most out of every public holiday.",
+		"description": "Set your PTO days, country and strategy, and the planner places your days around the public holidays.",
 		"titleHighlight1": "Your year",
 		"titleHighlight2": "free",
-		"instructions": "Start by adding your days on the left sidebar and the rest of your configurations. Still have questions?",
-		"quickTour": "Take a quick tour",
-		"or": "or",
-		"checkFaqs": "check our FAQs"
+		"instructions": "Start by adding your days in the left sidebar, then adjust the rest of your settings. Still have questions?",
+		"quickTour": "Take a quick tour"
 	},
 	"languages": {
 		"en": "English",
@@ -134,17 +132,16 @@
 		}
 	},
 	"faq": {
-		"title": "Frequently asked questions",
 		"sections": {
 			"general": {
 				"title": "General",
 				"whatIsPto": {
 					"question": "What is PTO?",
-					"answer": "PTO stands for Paid Time Off: the number of paid days off your employer gives you each year to use however you want. Unlike sick leave or public holidays, PTO days are yours to schedule freely. The challenge is that most people use them randomly and leave a lot of potential rest on the table. Forever PTO helps you place those days strategically around public holidays to turn, say, 5 PTO days into 12 consecutive days off."
+					"answer": "PTO stands for Paid Time Off: the number of paid days off your employer gives you each year to use however you want. Unlike sick leave or public holidays, PTO days are yours to schedule freely. Most people take them at random and get less rest out of them than they could. Forever PTO helps you place those days strategically around public holidays to turn, say, 5 PTO days into 12 consecutive days off."
 				},
 				"whatIs": {
 					"question": "What is this?",
-					"answer": "Forever PTO helps you plan and optimize your paid time off by suggesting the best dates to request based on public holidays and your preferences. Holiday planning can get complicated, and Forever PTO simplifies it so you get the most out of every day. You can choose different strategies to spread time off across the year, customize holiday names, and add company-specific or regional holidays."
+					"answer": "Forever PTO suggests which days to request off, based on the public holidays and your preferences. You can choose different strategies to spread time off across the year, customize holiday names, and add company-specific or regional holidays."
 				},
 				"whyNotSeeingCountry": {
 					"question": "Why am I not seeing my country or holidays correctly?",
@@ -152,22 +149,42 @@
 				},
 				"pricing": {
 					"question": "Why is there a paid model?",
-					"answer": "Forever PTO is free. The paid model covers the cost of data, hosting, and ongoing improvements. It funds updates, support, and infrastructure. Core features remain free so anyone can plan smarter without paying."
+					"answer": "Forever PTO is free to use. The paid model covers data and hosting, and pays for updates and support. The core features stay free."
+				},
+				"premium": {
+					"question": "What does premium unlock?",
+					"answer": "Premium unlocks the planner's advanced controls: editing the suggested days by hand, adding your own holidays, planning past days, carry-over months into the next year, the advanced metrics and charts, and exporting your plan to your calendar. Planning with any strategy, country and region stays free."
+				},
+				"carryOver": {
+					"question": "What are carry-over months?",
+					"answer": "If your company lets you use this year's PTO days in the first months of next year, carry-over months extend the planning window up to 12 months past December, so the planner can also place days in, say, January or February of the following year."
 				}
 			},
 			"technical": {
 				"title": "Technical",
 				"algorithms": {
 					"question": "How does the suggestion algorithm work?",
-					"answer": "The system looks at your available workdays, holidays, and preferences (like skipping past dates) to find PTO combinations that maximize your total time off. It scores every possible bridge and block by efficiency, then surfaces the best ones."
+					"answer": "The system looks at your available workdays, holidays and preferences (like skipping past dates) and finds every possible bridge, up to a whole working week. It then builds your plan one bridge at a time, always taking the one that adds the most new days off to what the plan already covers, under the rules of your strategy, so a weekend two bridges share is never counted twice."
 				},
 				"strategies": {
-					"question": "What is the difference between \"balanced\" and \"optimized\" strategies?",
-					"answer": "Balanced aims to spread time off across the year for steady value, while Optimized focuses on maximizing efficiency (effective days per PTO day) by prioritizing the best ratio combinations."
+					"question": "What is the difference between the \"grouped\", \"optimized\", \"balanced\" and \"main vacation\" strategies?",
+					"answer": "Optimized gets you the most effective days off per PTO day, mostly as long weekends spread across the year. Grouped trades some of that efficiency for a few long vacations of about two weeks. Balanced places a long weekend every few weeks, so you never go too long without a break. Main vacation puts one block of up to two weeks in the months you choose, then spends the rest like Optimized."
+				},
+				"weekends": {
+					"question": "Do weekends and public holidays use up my PTO days?",
+					"answer": "No. PTO days are only placed on workdays. Weekends and public holidays are already free, and that is exactly what the planner uses to stretch each PTO day into more days off."
+				},
+				"alternatives": {
+					"question": "What are the alternatives?",
+					"answer": "Besides the suggestion, the planner builds other plans with the same budget, from your strategy and from the others, so you can compare how many days off each one gets you and apply the one you prefer with a click."
 				},
 				"results": {
 					"question": "Why do recommendations change when I update preferences or holidays?",
 					"answer": "Suggestions are recalculated in real time whenever your PTO budget, year, holidays, or strategy changes. Even small tweaks can reshuffle the rankings because the engine re-scores every possible bridge and block."
+				},
+				"export": {
+					"question": "Can I add my plan to my calendar?",
+					"answer": "Yes. With premium you can export your PTO days, the public holidays or both as an .ics file that works with Google Calendar, Apple Calendar, Outlook and any other calendar app, or as a PDF to print or share."
 				}
 			},
 			"security": {
@@ -178,11 +195,15 @@
 				},
 				"encryption": {
 					"question": "Is my data encrypted?",
-					"answer": "Everything is stored locally in your browser: PTO days, selected dates, custom holidays, preferences. We apply light obfuscation so the data isn't readable at a glance, but the real protection is that we never send it to our servers. Your vacation planning never leaves your device."
+					"answer": "Everything is stored locally in your browser: PTO days, selected dates, custom holidays, preferences. We apply light obfuscation so the data isn't readable at a glance, but the real protection is that we never send it to our servers."
 				},
 				"tracking": {
 					"question": "Do you sell my data or track my vacation plans?",
 					"answer": "No. Your planning data stays in your browser and is not sold to advertisers or data brokers. If analytics are enabled, they are limited to product measurement and never used to profile your vacation plans."
+				},
+				"devices": {
+					"question": "Do I need an account? Can I use my plan on another device?",
+					"answer": "There are no accounts. Your plan lives in this browser, so another device or browser starts from scratch. Premium is tied to the email you donated with: on a new device, enter it in the premium window and access comes back."
 				},
 				"troubleshooting": {
 					"question": "Troubleshooting & outdated browser data"
@@ -192,7 +213,7 @@
 				"title": "Interested in collaborating?",
 				"code": {
 					"question": "How to contribute code or ideas?",
-					"answer": "<link>Open issues or merge requests</link> with proposals. We need help on algorithms, integrations and UX improvements."
+					"answer": "<link>Open issues or pull requests</link> with proposals. We need help on algorithms, integrations and UX improvements."
 				},
 				"business": {
 					"question": "Propose integrations or corporate partnerships",
@@ -208,7 +229,7 @@
 	"workdayCounter": {
 		"title": "Workday counter",
 		"tooltip": "Count Workdays between two dates, automatically excluding weekends and holidays. Useful for project planning and deadline calculations.",
-		"tooltipLabel": "More information about workday counter",
+		"tooltipLabel": "More information about the workday counter",
 		"selectRange": "Select dates",
 		"clearSelection": "Clear selection",
 		"workdays": "Workdays",
@@ -332,21 +353,21 @@
 			"toolsTitle": "Calculators & tools",
 			"toolsDescription": "Calculators live here: estimate how many PTO days you've accrued, see what unused days cost you in salary, or count workdays between two dates.",
 			"alternativesTitle": "Alternatives manager",
-			"alternativesDescription": "Browse the different suggestions we generated. Compare efficiency and effective days to find your ideal balance. The first alternative is always our top pick, marked with a sparkle. Use the arrows to explore, then click \"Apply alternative\" to switch.",
+			"alternativesDescription": "Browse the alternatives we generated and compare their efficiency and effective days. The first one is our top pick, marked with a sparkle. Use the arrows to move between them, then click \"Apply alternative\" to switch.",
 			"statusTitle": "PTO status tracker",
 			"statusDescription": "Track your PTO at a glance: auto-assigned days, manually selected days, and how many are left. Reset manual changes anytime to go back to the suggested plan.",
-			"calendarTitle": "Your interactive PTO calendar",
-			"calendarDescription": "This is your year-at-a-glance calendar. Holidays appear in gray, suggested PTO days in teal, and manually selected days in blue. Click any Workday to manually toggle selection. The calendar updates instantly as you explore different alternatives.",
+			"calendarTitle": "Your PTO calendar",
+			"calendarDescription": "This calendar shows your whole year. Holidays appear in gray, suggested PTO days in teal, and manually selected days in blue. Click any Workday to manually toggle selection. It updates as you switch between alternatives.",
 			"finishTitle": "You're all set!",
-			"finishDescription": "You're set. Configure your preferences in the sidebar and we'll suggest the best PTO days to take.",
+			"finishDescription": "Configure your preferences in the sidebar and we'll suggest the best PTO days to take.",
 			"holidaysListTitle": "Customize your holidays",
-			"holidaysListDescription": "Here you can fine-tune the holiday data to match your exact situation. Edit or delete any national or regional holiday, and add your own custom days off: company holidays, local observances, or any date that matters to you. The more accurate the data, the better the suggestions.",
+			"holidaysListDescription": "Adjust the holiday data to match your situation. Edit or delete any national or regional holiday, and add your own: company holidays, local observances or any other date. The more accurate the data, the better the suggestions.",
 			"step1Title": "Your context",
 			"step1Description": "Select your country, region, and the year you want to plan. This sets up your holiday calendar so we can find the best bridges.",
 			"step2Title": "Your PTO days",
 			"step2Description": "Enter how many PTO days you have. This is the base for all calculations.",
 			"step3Title": "Your configuration",
-			"step3Description": "Choose your optimization strategy and configure past days and carryover months to fine-tune your plan.",
+			"step3Description": "Choose your optimization strategy and configure past days and carry-over months to fine-tune your plan.",
 			"step4Title": "Export your calendar",
 			"step4Description": "Download your holidays and planned PTO days as a .ics file to import into Google Calendar, Apple Calendar or Outlook, or as a PDF to print or share.",
 			"drawerTitle": "Your planner panel",
@@ -400,7 +421,7 @@
 	},
 	"contact": {
 		"title": "Contact us",
-		"description": "Have a question or feedback? We'd love to hear from you.",
+		"description": "Have a question or feedback? Send us a message.",
 		"name": "Name",
 		"namePlaceholder": "John Doe",
 		"email": "Email",
@@ -501,11 +522,11 @@
 			"strategyDetails": "details",
 			"grouped": {
 				"label": "Grouped",
-				"description": "Prioritizes long, continuous vacations",
-				"subtitle": "Groups bridge days with consecutive holidays",
+				"description": "A few long vacations",
+				"subtitle": "Builds blocks of about two weeks around holidays",
 				"pros": {
-					"simulatesHumanSelection": "Simulates human selection",
-					"longBridges": "Long bridges"
+					"longVacations": "Long vacations",
+					"wholeWeeks": "Whole weeks off"
 				},
 				"cons": {
 					"fewerDays": "Fewer total days",
@@ -514,31 +535,48 @@
 			},
 			"optimized": {
 				"label": "Optimized",
-				"description": "Maximizes PTO day efficiency",
-				"subtitle": "Get the most days off possible",
+				"description": "Maximizes your total days off",
+				"subtitle": "Every PTO day returns as much as it can",
 				"pros": {
 					"maximumEfficiency": "Maximum efficiency",
 					"moreDays": "More total days"
 				},
 				"cons": {
-					"shortBridges": "Short bridges",
-					"scatteredDays": "Scattered days"
+					"mostlyLongWeekends": "Mostly long weekends",
+					"noLongTrip": "No long trip"
 				}
 			},
 			"balanced": {
 				"label": "Balanced",
-				"description": "Smart balance",
-				"subtitle": "Combines efficiency with grouping",
+				"description": "Rest every few weeks",
+				"subtitle": "Never too long at work: a long weekend every few weeks",
 				"pros": {
-					"flexible": "Flexible",
-					"mediumPeriods": "Medium periods",
-					"versatile": "Versatile"
+					"noLongStretch": "No long stretch at work",
+					"restAllYear": "Rest all year round"
 				},
 				"cons": {
 					"noMaximization": "Doesn't maximize",
-					"intermediateSolution": "Middle-of-the-road"
+					"noLongTrip": "No long trip"
+				}
+			},
+			"mainVacation": {
+				"label": "Main vacation",
+				"description": "Your big trip first",
+				"subtitle": "A block of up to two weeks in the months you choose, then the best bridges",
+				"pros": {
+					"yourTrip": "Your trip, when you want it",
+					"bridgesAfter": "Best bridges for the rest"
+				},
+				"cons": {
+					"mayHaveFewerDays": "Possibly fewer total days"
 				}
 			}
+		},
+		"preferredMonths": {
+			"title": "Preferred months",
+			"tooltipLabel": "About preferred months",
+			"tooltip": "The Main vacation strategy places its block inside these months. Pick none to let it find the best time of year.",
+			"anyMonth": "No month picked: the block goes wherever it can be longest."
 		},
 		"allowPastDays": {
 			"title": "Allow past days",
@@ -550,7 +588,7 @@
 		"carryOverMonths": {
 			"title": "Carry-over months",
 			"tooltip": "Extend the planning window into the following year to find more bridge opportunities.",
-			"tooltipLabel": "More information about carry over"
+			"tooltipLabel": "More information about carry-over months"
 		},
 		"years": {
 			"title": "Year"
@@ -594,7 +632,7 @@
 	"ptoCalculator": {
 		"title": "PTO accrual calculator",
 		"tooltip": "Calculate how many PTO days you've accrued based on a monthly rate. Most companies give 2–3 days per month. Pick a target month to see your total.",
-		"tooltipLabel": "More information about PTO calculator",
+		"tooltipLabel": "More information about the PTO calculator",
 		"daysPerMonth": "Days/month",
 		"calculateThrough": "Calculate through",
 		"selectMonth": "Select month",
@@ -610,7 +648,7 @@
 	"ptoSalaryCalculator": {
 		"title": "PTO vs. salary calculator",
 		"tooltip": "See how much paid vacation you're leaving on the table by not using your PTO days. You're still getting paid; you're just working days you didn't have to.",
-		"tooltipLabel": "More information about salary calculator",
+		"tooltipLabel": "More information about the salary calculator",
 		"annualSalary": "Annual salary",
 		"annualSalaryPlaceholder": "{amount}",
 		"unusedPtoDays": "Unused PTO days",
@@ -646,8 +684,8 @@
 		}
 	},
 	"donate": {
-		"donateAndUnblock": "Donate & Unblock",
-		"supportAndUnblock": "Support & Unblock",
+		"donateAndUnblock": "Donate & Unlock",
+		"supportAndUnblock": "Support & Unlock",
 		"makeDonation": "Support the project with a donation to unlock access.",
 		"alreadyPremium": "You're already a premium user. Thank you!"
 	},
@@ -705,7 +743,7 @@
 	},
 	"roadmap": {
 		"title": "Roadmap",
-		"subtitle": "Explore what we've built and what's coming next",
+		"subtitle": "What we've built and what's coming next",
 		"selected": "Selected",
 		"completed": "Completed",
 		"inProgress": "In progress",
@@ -713,24 +751,24 @@
 		"future": "Future",
 		"detailedView": "Detailed view",
 		"haveSuggestion": "Have a suggestion?",
-		"feedbackShapes": "Your feedback shapes what gets built next. Share ideas, report gaps, or vote with your voice.",
+		"feedbackShapes": "Your feedback decides what gets built next. Share an idea or tell us what's missing.",
 		"gotAnIdea": "Got an idea that would make your life easier?",
 		"letsTalk": "Let's talk",
 		"or": "or",
 		"openIssue": "Open an issue on GitHub",
 		"features": {
 			"corePtoCalculator": "Core PTO calculator",
-			"corePtoCalculatorDescription": "Smart vacation planning with holiday optimization and bridge detection",
+			"corePtoCalculatorDescription": "Vacation planning around public holidays, with bridge detection",
 			"multipleCountries": "Multiple countries support",
 			"multipleCountriesDescription": "Support for holidays across European countries with region-specific rules",
 			"premiumFeatures": "Premium features",
 			"premiumFeaturesDescription": "Unlock advanced features with one-time payment via Stripe",
 			"customHolidays": "Custom holidays",
-			"customHolidaysDescription": "Add, edit, and remove custom holidays for personalized planning",
+			"customHolidaysDescription": "Add, edit and remove your own holidays",
 			"alternativeStrategies": "Alternative strategies",
 			"alternativeStrategiesDescription": "Multiple vacation planning strategies with efficiency comparison",
 			"analyticsDashboard": "Analytics dashboard",
-			"analyticsDashboardDescription": "Detailed metrics and insights about your vacation planning",
+			"analyticsDashboardDescription": "Detailed metrics about your vacation plan",
 			"calendarExport": "Calendar export",
 			"calendarExportDescription": "Export your vacation plan to Google Calendar, iCal, or Outlook",
 			"teamPlanning": "Team planning",
@@ -740,17 +778,17 @@
 			"mobileApp": "Mobile app",
 			"mobileAppDescription": "Native iOS and Android apps for vacation planning on the go",
 			"aiSuggestions": "AI suggestions",
-			"aiSuggestionsDescription": "AI-powered recommendations based on your preferences and past patterns",
+			"aiSuggestionsDescription": "AI recommendations based on your preferences and past patterns",
 			"weatherIntegration": "Weather integration",
 			"weatherIntegrationDescription": "See weather forecasts for your planned vacation dates",
 			"blockedPeriods": "Blocked periods",
 			"blockedPeriodsDescription": "Mark periods where you don't want any PTO suggestions: conferences, trips, medical leave, or any time you know you'll be busy",
 			"performanceOptimization": "Performance optimization",
-			"performanceOptimizationDescription": "Faster calculations and smoother experience powered by Web Workers",
+			"performanceOptimizationDescription": "Faster calculations, run in a Web Worker so the page stays responsive",
 			"customWeekends": "Custom weekends",
 			"customWeekendsDescription": "Define custom non-working days beyond the standard Saturday-Sunday weekend",
 			"multiYearPlanning": "Multi-year planning",
-			"multiYearPlanningDescription": "Plan vacations across multiple years with carryover support",
+			"multiYearPlanningDescription": "Plan vacations across multiple years with carry-over support",
 			"calendarSubscription": "Live calendar subscription",
 			"calendarSubscriptionDescription": "Subscribe directly from Google Calendar, Apple Calendar or Outlook via a webcal:// URL; your plan stays in sync automatically"
 		}
@@ -781,7 +819,7 @@
 		"stripeSidDesc": "Session identifier for fraud prevention. Required for checkout process.",
 		"gaDesc": "Distinguishes unique users.",
 		"gaStarDesc": "Maintains session state for analytics tracking.",
-		"gidDesc": "Distinguishes users for short-term analytics",
+		"gidDesc": "Distinguishes users for short-term analytics.",
 		"learnMore": "Learn more",
 		"provider": "Provider: {name}",
 		"bsUidDesc": "Unique visitor identifier for Better Stack analytics tracking",
@@ -906,26 +944,27 @@
 			"how": "How it works",
 			"features": "Features",
 			"pricing": "Pricing",
-			"trialAction": "Try for free →"
+			"trialAction": "Try for free →",
+			"resumeAction": "My plan →"
 		},
 		"hero": {
 			"command": "Work less.",
 			"verb": "Travel",
 			"highlight": "more",
-			"description": "Forever PTO calculates <em>exactly</em> which days to request off so your 22 PTO days become <strong>47+ days out of the office</strong>. No spreadsheets. No math. No guilt.",
+			"description": "Forever PTO calculates <em>exactly</em> which days to request off so your 22 PTO days become <strong>70+ days out of the office</strong>. No spreadsheets. No math. No guilt.",
 			"plannerCta": "Calculate my days →",
 			"demoLink": "See how it works (30s)",
 			"stars": "{rating} · used by {users} rebel employees",
-			"mockupLabel": "Real days off in {year}",
-			"mockupRatio": "days · efficiency 2.14×",
-			"mockupQuote": "\"That's 9 long weekends, captain.\"",
+			"mockupLabel": "Real days off in a year",
+			"mockupRatio": "days · efficiency {ratio}×",
+			"mockupQuote": "\"That's 22 long weekends, captain.\"",
 			"mockupLegendPto": "PTO",
 			"mockupLegendHoliday": "Holiday",
 			"mockupLegendWeekend": "Weekend",
 			"mockupFieldPto": "PTO days",
 			"mockupFieldPtoUnit": "days/yr",
 			"mockupFieldCountry": "Country",
-			"mockupFieldHolidays": "14 holidays"
+			"mockupFieldHolidays": "{count} holidays"
 		},
 		"marquee": {
 			"items": "easter break · public holiday weekend · summer stretch · thanksgiving bridge · christmas stretch · november bridge · whit monday bridge · may day long weekend · august public holiday · new year stretch"
@@ -941,9 +980,9 @@
 			"inputDaysTitle": "Enter your days.",
 			"inputDaysDescription": "How many PTO days you have and which country or region you work in. That's it.",
 			"engineTitle": "The engine does the magic.",
-			"engineDescription": "It crosses your days with official holidays and regional bridges. Finds all possible combos and ranks them by \"rest ratio\".",
+			"engineDescription": "It checks your days against national and regional holidays, finds every possible bridge and ranks them by days off per PTO day.",
 			"exportTitle": "Request your days off.",
-			"exportDescription": "Export to Google Calendar, Outlook, or a PDF you paste into the HR form and forget. No more guessing."
+			"exportDescription": "Export to Google Calendar, Outlook, or a PDF to attach to your HR request."
 		},
 		"stats": {
 			"efficiencyLabel": "Average efficiency",
@@ -957,15 +996,15 @@
 			"titleStart": "Not a calendar. An",
 			"titleEmphasis": "ally",
 			"titleEnd": "against Mondays.",
-			"description": "These are the moves Forever PTO makes for you automatically.",
-			"bridgeTag": "smart bridges",
+			"description": "What Forever PTO works out for you.",
+			"bridgeTag": "bridges",
 			"bridgeTitle": "Turn 1 PTO day into 4 days off.",
 			"bridgeDescription": "Detects holidays on Tuesdays and Thursdays and suggests minimal bridges. One strategic day = a 4-day weekend.",
 			"ratioTag": "max efficiency",
-			"ratioDescription": "Best efficiency: 8 PTO days turned into 28 free days (ES, April '26).",
+			"ratioDescription": "Best efficiency: 8 PTO days turned into 32 free days (Madrid).",
 			"syncTag": "sync in 1 click",
 			"syncTitle": "Google · Outlook · iCal",
-			"syncDescription": "Export your plan to the calendar you already use. No hassle.",
+			"syncDescription": "Export your plan to the calendar you already use.",
 			"conflictsTag": "anti-conflicts",
 			"conflictsTitle": "Warns you before your boss does.",
 			"conflictsDescription": "Mark company \"no-fly\" periods.",
@@ -979,12 +1018,12 @@
 			"countriesDescription": "Official calendars updated every year. Even regional ones.",
 			"privacyTag": "100% local",
 			"privacyTitle": "Your data never leaves your browser.",
-			"privacyDescription": "No login. No account. Your PTO data is stored exclusively in your browser; we never see it."
+			"privacyDescription": "No login and no account. Your PTO data stays in your browser; we never see it."
 		},
 		"comparison": {
 			"badge": "before · after",
 			"title": "Before vs. after Forever PTO",
-			"withoutTitle": "😩 Without Forever PTO",
+			"withoutTitle": "Without Forever PTO",
 			"withoutItems": {
 				"spreadsheetFrustration": "You open a spreadsheet and get stuck on cell C7.",
 				"missedBridge": "You take the Monday after a holiday without realizing Tuesday was also a holiday.",
@@ -992,11 +1031,11 @@
 				"colleagueConflict": "A colleague books your week first. Again.",
 				"unusedDays": "You end the year with 4 unused days."
 			},
-			"withTitle": "😎 With Forever PTO",
+			"withTitle": "With Forever PTO",
 			"withItems": {
 				"planInJanuary": "You plan everything in January, while waiting for your coffee.",
-				"dayEfficiency": "Each PTO day gives you back 2.1 free days on average.",
-				"visualCalendar": "You visualize the whole year in a clear calendar.",
+				"dayEfficiency": "Each PTO day gives you back {ratio} free days on average.",
+				"visualCalendar": "You see the whole year in one calendar.",
 				"bookFirst": "You book first, guilt-free, with data.",
 				"burnAllDays": "You burn 100% of your days. As it should be."
 			}
@@ -1028,12 +1067,12 @@
 					"role": "QA engineer · Lisbon"
 				},
 				"lauraT": {
-					"text": "My manager asked how I managed 34 days off with only 22 PTO days. I said \"strategy\". I did not mention the app.",
+					"text": "My manager asked how I managed 45 days off with only 22 PTO days. I said \"strategy\". I did not mention the app.",
 					"name": "Laura T.",
 					"role": "marketing manager · Paris"
 				},
 				"thomasK": {
-					"text": "ROI: 22 PTO days in, 47 free days out. That's a 2.1× efficiency. I've shipped worse features at work.",
+					"text": "ROI: 22 PTO days in, 74 free days out. That's a 3.4× efficiency. I've shipped worse features at work.",
 					"name": "Thomas K.",
 					"role": "software architect · Amsterdam"
 				}
@@ -1052,7 +1091,7 @@
 			"freeFeatures": {
 				"optimizedPlan": "Auto-optimized vacation plan",
 				"countryHolidays": "Country & region holidays",
-				"threeStrategies": "{count} strategies (Grouped, Optimized, Balanced)",
+				"strategies": "{count} strategies (Grouped, Optimized, Balanced, Main vacation)",
 				"basicStats": "Basic efficiency stats & calculators"
 			},
 			"freeCta": "Start for free",
@@ -1070,7 +1109,7 @@
 				"fullAnalytics": "Full analytics & visual charts"
 			},
 			"lifetimeCta": "Support the project →",
-			"popularBadge": "most popular 🔥"
+			"popularBadge": "most popular"
 		},
 		"faq": {
 			"badge": "FAQ",
@@ -1080,7 +1119,7 @@
 			"titleStart": "Your next",
 			"titleEmphasis": "free",
 			"titleEnd": "year starts today.",
-			"description": "22 days can become 47. You just need to know where to place them. That's what we do.",
+			"description": "22 days can become more than 70. You just need to know where to place them. That's what we do.",
 			"cta": "Calculate my free days →",
 			"shapes": {
 				"byeMonday": "bye, monday",

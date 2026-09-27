@@ -1,6 +1,7 @@
 "use client";
 
 import { usePremiumStore } from "@application/stores/premium";
+import { useHasOpened } from "@ui/hooks/useHasOpened";
 import dynamic from "next/dynamic";
 import { useShallow } from "zustand/react/shallow";
 
@@ -18,6 +19,9 @@ export const PremiumModal = () => {
 			isLoading: state.isLoading,
 		})),
 	);
+
+	const hasOpened = useHasOpened({ open: modalOpen });
+	if (!hasOpened) return null;
 
 	return (
 		<PremiumRequiredModal
