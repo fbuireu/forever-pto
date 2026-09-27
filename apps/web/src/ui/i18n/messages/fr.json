@@ -46,9 +46,7 @@
 		"titleHighlight1": "Ton année",
 		"titleHighlight2": "libre",
 		"instructions": "Commence par ajouter tes jours et le reste de ta configuration dans la barre latérale gauche. Encore des questions ?",
-		"quickTour": "Fais la visite guidée",
-		"or": "ou",
-		"checkFaqs": "consulte notre FAQ"
+		"quickTour": "Fais la visite guidée"
 	},
 	"languages": {
 		"en": "Anglais",
@@ -152,6 +150,14 @@
 				"pricing": {
 					"question": "Pourquoi y a-t-il un modèle payant ?",
 					"answer": "Forever PTO est gratuit. Nous utilisons cependant un modèle payant pour couvrir les coûts de maintenance des données, de l'infrastructure et des améliorations continues. Le modèle payant finance les mises à jour, le support et l'hébergement. Nous proposons également une offre gratuite avec les fonctionnalités essentielles pour que tout le monde puisse mieux planifier ses congés."
+				},
+				"premium": {
+					"question": "Que débloque premium ?",
+					"answer": "Premium débloque les réglages avancés du planificateur : modifier à la main les jours suggérés, ajouter tes propres jours fériés, planifier des jours passés, des mois de report sur l'année suivante, les indicateurs et graphiques avancés et l'export de ton plan vers ton calendrier. Planifier avec n'importe quelle stratégie, n'importe quel pays et n'importe quelle région reste gratuit."
+				},
+				"carryOver": {
+					"question": "Que sont les mois de report ?",
+					"answer": "Si ton entreprise te permet d'utiliser les jours de PTO de cette année au début de l'année suivante, les mois de report prolongent la période de planification jusqu'à 12 mois après décembre, pour que le planificateur puisse aussi placer des jours en janvier ou en février de l'année suivante, par exemple."
 				}
 			},
 			"technical": {
@@ -164,9 +170,21 @@
 					"question": "Quelle est la différence entre les stratégies \"groupée\", \"optimisée\", \"équilibrée\" et \"vacances principales\" ?",
 					"answer": "Optimisée te donne le plus de jours de repos effectifs par jour de congé, surtout en week-ends prolongés répartis sur l'année. Groupée cède une partie de cette efficacité contre quelques longues vacances d'environ deux semaines. Équilibrée veille à ce que tu ne travailles jamais trop longtemps sans repos : elle place un week-end prolongé à quelques semaines d'intervalle pour qu'aucune période de travail ne s'éternise. Vacances principales place un bloc de deux semaines au plus dans les mois que tu choisis, puis répartit le reste comme Optimisée."
 				},
+				"weekends": {
+					"question": "Les week-ends et les jours fériés consomment-ils mes jours de PTO ?",
+					"answer": "Non. Les jours de PTO ne sont placés que sur des jours ouvrés. Les week-ends et les jours fériés sont déjà libres, et c'est justement ce que le planificateur exploite pour transformer chaque jour de PTO en davantage de jours de congé."
+				},
+				"alternatives": {
+					"question": "Que sont les alternatives ?",
+					"answer": "En plus de la suggestion, le planificateur construit d'autres plans avec le même budget, avec ta stratégie et avec les autres, pour que tu compares combien de jours de congé chacun t'apporte et que tu appliques celui que tu préfères en un clic."
+				},
 				"results": {
 					"question": "Pourquoi les recommandations changent-elles quand je modifie mes préférences ou mes jours fériés ?",
 					"answer": "Les suggestions sont recalculées en temps réel selon ton budget de congés, l'année sélectionnée, la liste des jours fériés, les jours fériés personnalisés et la stratégie. De petits changements peuvent bouleverser le classement, car le moteur réévalue chaque pont et chaque bloc possible."
+				},
+				"export": {
+					"question": "Puis-je ajouter mon plan à mon calendrier ?",
+					"answer": "Oui. Avec premium, tu peux exporter tes jours de PTO, les jours fériés ou les deux dans un fichier .ics compatible avec Google Calendar, Apple Calendar, Outlook et toute autre app de calendrier, ou en PDF pour l'imprimer ou le partager."
 				}
 			},
 			"security": {
@@ -182,6 +200,10 @@
 				"tracking": {
 					"question": "Vendez-vous mes données ou suivez-vous mes projets de congés ?",
 					"answer": "Non. Tes données de planification restent dans ton navigateur et ne sont vendues ni à des annonceurs ni à des courtiers en données. Si le suivi analytique est activé, il sert uniquement à mesurer l'usage du produit et n'est jamais utilisé pour établir un profil de tes congés."
+				},
+				"devices": {
+					"question": "Ai-je besoin d'un compte ? Puis-je utiliser mon plan sur un autre appareil ?",
+					"answer": "Il n'y a pas de compte. Ton plan vit dans ce navigateur : sur un autre appareil ou un autre navigateur, tu repars de zéro. Premium est lié à l'e-mail avec lequel tu as fait ton don : sur un nouvel appareil, saisis-le dans la fenêtre premium et tu retrouves l'accès."
 				},
 				"troubleshooting": {
 					"question": "Dépannage et données obsolètes du navigateur"
@@ -546,8 +568,7 @@
 					"bridgesAfter": "Les meilleurs ponts pour le reste"
 				},
 				"cons": {
-					"fewerDays": "Moins de jours au total",
-					"oneBlock": "Un seul grand voyage"
+					"mayHaveFewerDays": "Peut-être moins de jours au total"
 				}
 			}
 		},

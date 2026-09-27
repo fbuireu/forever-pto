@@ -46,9 +46,7 @@
 		"titleHighlight1": "Il tuo anno",
 		"titleHighlight2": "libero",
 		"instructions": "Inizia inserendo i tuoi giorni e le altre impostazioni nella barra laterale a sinistra. Hai ancora dubbi?",
-		"quickTour": "Fai un tour veloce",
-		"or": "o",
-		"checkFaqs": "consulta le nostre FAQ"
+		"quickTour": "Fai un tour veloce"
 	},
 	"languages": {
 		"en": "Inglese",
@@ -152,6 +150,14 @@
 				"pricing": {
 					"question": "Perché c'è un modello a pagamento?",
 					"answer": "Forever PTO è gratuito. Tuttavia, utilizziamo un modello a pagamento per coprire i costi di mantenimento dei dati, infrastruttura e miglioramenti continui. Il modello a pagamento finanzia aggiornamenti, supporto e hosting. Se vuoi sostenere il progetto, puoi fare una donazione volontaria che sblocca le funzioni premium. Offriamo anche un piano gratuito con le funzioni principali affinché tutti possano pianificare meglio il proprio PTO."
+				},
+				"premium": {
+					"question": "Cosa sblocca premium?",
+					"answer": "Premium sblocca i controlli avanzati del pianificatore: modificare a mano i giorni suggeriti, aggiungere le tue festività, pianificare giorni passati, i mesi di riporto sull'anno successivo, le metriche e i grafici avanzati ed esportare il tuo piano nel calendario. Pianificare con qualsiasi strategia, paese e regione resta gratis."
+				},
+				"carryOver": {
+					"question": "Cosa sono i mesi di riporto?",
+					"answer": "Se la tua azienda ti permette di usare i giorni di PTO di quest'anno nei primi mesi del successivo, i mesi di riporto allungano il periodo di pianificazione fino a 12 mesi dopo dicembre, così il pianificatore può mettere giorni anche, per esempio, a gennaio o febbraio dell'anno seguente."
 				}
 			},
 			"technical": {
@@ -164,9 +170,21 @@
 					"question": "Qual è la differenza tra le strategie \"raggruppata\", \"ottimizzata\", \"bilanciata\" e \"vacanza principale\"?",
 					"answer": "Ottimizzata ti dà il massimo di giorni liberi effettivi per ogni giorno di PTO, soprattutto in weekend lunghi distribuiti durante l'anno. Raggruppata cede parte di questa efficienza in cambio di poche vacanze lunghe di circa due settimane. Bilanciata fa in modo che tu non lavori mai troppo a lungo senza riposo: mette un weekend lungo ogni qualche settimana, così nessun periodo di lavoro si allunga troppo. Vacanza principale mette un blocco fino a due settimane nei mesi che scegli, poi distribuisce il resto come Ottimizzata."
 				},
+				"weekends": {
+					"question": "I fine settimana e le festività consumano giorni di PTO?",
+					"answer": "No. I giorni di PTO vengono messi solo nei giorni lavorativi. I fine settimana e le festività sono già liberi, ed è proprio questo che il pianificatore sfrutta per trasformare ogni giorno di PTO in più giorni liberi."
+				},
+				"alternatives": {
+					"question": "Cosa sono le alternative?",
+					"answer": "Oltre al suggerimento, il pianificatore crea altri piani con lo stesso budget, con la tua strategia e con le altre, così puoi confrontare quanti giorni liberi ti dà ciascuno e applicare quello che preferisci con un clic."
+				},
 				"results": {
 					"question": "Perché i suggerimenti cambiano quando aggiorno preferenze o festività?",
 					"answer": "I suggerimenti vengono ricalcolati in tempo reale in base al tuo budget PTO, all'anno selezionato, al set di festività, alle festività personalizzate e alla strategia. Anche piccoli cambiamenti possono rimescolare la classifica perché il motore rivaluta ogni ponte e ogni blocco possibile."
+				},
+				"export": {
+					"question": "Posso aggiungere il mio piano al calendario?",
+					"answer": "Sì. Con premium puoi esportare i tuoi giorni di PTO, le festività o entrambi in un file .ics compatibile con Google Calendar, Apple Calendar, Outlook e qualsiasi altra app di calendario, oppure in PDF da stampare o condividere."
 				}
 			},
 			"security": {
@@ -182,6 +200,10 @@
 				"tracking": {
 					"question": "Vendete i miei dati o tracciate i miei piani ferie?",
 					"answer": "No. I tuoi dati di pianificazione restano nel tuo browser e non vengono venduti a inserzionisti o broker di dati. Se l'analitica è abilitata, serve solo a misurare l'uso del prodotto e non viene mai usata per profilare le tue ferie."
+				},
+				"devices": {
+					"question": "Serve un account? Posso usare il mio piano su un altro dispositivo?",
+					"answer": "Non ci sono account. Il tuo piano vive in questo browser, quindi su un altro dispositivo o browser riparti da zero. Premium è legato all'email con cui hai donato: su un nuovo dispositivo inseriscila nella finestra premium e l'accesso torna."
 				},
 				"troubleshooting": {
 					"question": "Risoluzione dei problemi e dati del browser obsoleti"
@@ -546,8 +568,7 @@
 					"bridgesAfter": "I ponti migliori per il resto"
 				},
 				"cons": {
-					"fewerDays": "Meno giorni totali",
-					"oneBlock": "Un solo grande viaggio"
+					"mayHaveFewerDays": "Forse meno giorni totali"
 				}
 			}
 		},

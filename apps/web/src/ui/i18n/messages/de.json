@@ -46,9 +46,7 @@
 		"titleHighlight1": "Dein Jahr",
 		"titleHighlight2": "frei",
 		"instructions": "Trag deine Tage in der Seitenleiste ein und passe deine Einstellungen an. Noch Fragen?",
-		"quickTour": "Kurze Tour starten",
-		"or": "oder",
-		"checkFaqs": "schau dir unsere FAQs an"
+		"quickTour": "Kurze Tour starten"
 	},
 	"languages": {
 		"en": "Englisch",
@@ -152,6 +150,14 @@
 				"pricing": {
 					"question": "Warum gibt es ein kostenpflichtiges Modell?",
 					"answer": "Forever PTO ist kostenlos. Allerdings nutzen wir ein kostenpflichtiges Modell, um die Kosten für Datenpflege, Infrastruktur und kontinuierliche Verbesserungen zu decken. Das kostenpflichtige Modell finanziert Updates, Support und Hosting. Wir bieten auch eine kostenlose Version mit den wichtigsten Funktionen an, damit jeder von einer besseren Urlaubsplanung profitieren kann."
+				},
+				"premium": {
+					"question": "Was schaltet Premium frei?",
+					"answer": "Premium schaltet die erweiterten Funktionen des Planers frei: die vorgeschlagenen Tage von Hand bearbeiten, eigene Feiertage hinzufügen, vergangene Tage planen, Übertragsmonate ins nächste Jahr, die erweiterten Kennzahlen und Diagramme und den Export deines Plans in den Kalender. Planen mit jeder Strategie, jedem Land und jeder Region bleibt kostenlos."
+				},
+				"carryOver": {
+					"question": "Was sind Übertragsmonate?",
+					"answer": "Wenn deine Firma dir erlaubt, die PTO-Tage dieses Jahres in den ersten Monaten des nächsten zu nehmen, verlängern Übertragsmonate den Planungszeitraum um bis zu 12 Monate nach Dezember. So kann der Planer auch Tage etwa im Januar oder Februar des Folgejahres setzen."
 				}
 			},
 			"technical": {
@@ -164,9 +170,21 @@
 					"question": "Was ist der Unterschied zwischen \"gruppiert\", \"optimiert\", \"ausgewogen\" und \"Haupturlaub\"?",
 					"answer": "Optimiert holt die meisten effektiven freien Tage pro PTO-Tag heraus, vor allem als lange Wochenenden über das Jahr verteilt. Gruppiert gibt einen Teil dieser Effizienz für wenige lange Urlaube von etwa zwei Wochen auf. Ausgewogen sorgt dafür, dass du nie zu lange ohne Erholung arbeitest: Alle paar Wochen gibt es ein langes Wochenende, damit keine Arbeitsphase zu lang wird. Haupturlaub legt einen Block von bis zu zwei Wochen in die Monate deiner Wahl und verteilt den Rest wie Optimiert."
 				},
+				"weekends": {
+					"question": "Verbrauchen Wochenenden und Feiertage PTO-Tage?",
+					"answer": "Nein. PTO-Tage werden nur auf Arbeitstage gelegt. Wochenenden und Feiertage sind schon frei, und genau das nutzt der Planer, um aus jedem PTO-Tag mehr freie Tage zu machen."
+				},
+				"alternatives": {
+					"question": "Was sind die Alternativen?",
+					"answer": "Neben dem Vorschlag erstellt der Planer weitere Pläne mit demselben Budget, mit deiner Strategie und mit den anderen. So kannst du vergleichen, wie viele freie Tage dir jeder bringt, und den gewünschten mit einem Klick übernehmen."
+				},
 				"results": {
 					"question": "Warum ändern sich meine Empfehlungen, wenn ich Einstellungen oder Feiertage anpasse?",
 					"answer": "Die Vorschläge werden in Echtzeit neu berechnet, sobald sich dein PTO-Budget, das Jahr, die Feiertage oder die Strategie ändern. Schon kleine Änderungen können die Reihenfolge verschieben, weil die Engine jede mögliche Brücke und jeden Block neu bewertet."
+				},
+				"export": {
+					"question": "Kann ich meinen Plan in meinen Kalender übernehmen?",
+					"answer": "Ja. Mit Premium kannst du deine PTO-Tage, die Feiertage oder beides als .ics-Datei exportieren, die mit Google Calendar, Apple Calendar, Outlook und jeder anderen Kalender-App funktioniert, oder als PDF zum Drucken oder Teilen."
 				}
 			},
 			"security": {
@@ -182,6 +200,10 @@
 				"tracking": {
 					"question": "Verkauft ihr meine Daten oder verfolgt ihr meine Urlaubsplanung?",
 					"answer": "Nein. Deine Planungsdaten bleiben in deinem Browser und werden weder an Werbetreibende noch an Datenhändler verkauft. Wenn Analytics aktiviert sind, dienen sie nur der Produktmessung und werden nie genutzt, um Profile über deine Urlaubsplanung zu erstellen."
+				},
+				"devices": {
+					"question": "Brauche ich ein Konto? Kann ich meinen Plan auf einem anderen Gerät nutzen?",
+					"answer": "Es gibt keine Konten. Dein Plan liegt in diesem Browser, auf einem anderen Gerät oder Browser fängst du also von vorn an. Premium hängt an der E-Mail-Adresse, mit der du gespendet hast: Gib sie auf einem neuen Gerät im Premium-Fenster ein, und der Zugang ist wieder da."
 				},
 				"troubleshooting": {
 					"question": "Fehlerbehebung & veraltete Browserdaten"
@@ -546,8 +568,7 @@
 					"bridgesAfter": "Die besten Brücken für den Rest"
 				},
 				"cons": {
-					"fewerDays": "Weniger Gesamttage",
-					"oneBlock": "Nur eine große Reise"
+					"mayHaveFewerDays": "Möglicherweise weniger Tage insgesamt"
 				}
 			}
 		},

@@ -63,7 +63,7 @@ export const Strategy = () => {
 				description: t("mainVacation.description"),
 				subtitle: t("mainVacation.subtitle"),
 				pros: [t("mainVacation.pros.yourTrip"), t("mainVacation.pros.bridgesAfter")],
-				cons: [t("mainVacation.cons.fewerDays"), t("mainVacation.cons.oneBlock")],
+				cons: [t("mainVacation.cons.mayHaveFewerDays")],
 			},
 		};
 

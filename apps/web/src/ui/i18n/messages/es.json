@@ -46,9 +46,7 @@
 		"titleHighlight1": "Tu año",
 		"titleHighlight2": "libre",
 		"instructions": "Empieza añadiendo tus días en la barra lateral y ajusta el resto. ¿Aún tienes dudas?",
-		"quickTour": "Haz un recorrido rápido",
-		"or": "o",
-		"checkFaqs": "consulta las preguntas frecuentes"
+		"quickTour": "Haz un recorrido rápido"
 	},
 	"languages": {
 		"en": "Inglés",
@@ -152,6 +150,14 @@
 				"pricing": {
 					"question": "¿Por qué hay un modelo de pago?",
 					"answer": "Forever PTO es gratuito. Aun así, tenemos un modelo de pago opcional para cubrir los costes de datos, infraestructura y mejoras continuas. Las donaciones financian actualizaciones, soporte y hosting. La versión gratuita incluye las funciones principales para que todo el mundo pueda planificar mejor sus vacaciones."
+				},
+				"premium": {
+					"question": "¿Qué desbloquea premium?",
+					"answer": "Premium desbloquea los controles avanzados del planificador: editar a mano los días sugeridos, añadir tus propios festivos, planificar días pasados, meses de arrastre al año siguiente, las métricas y gráficos avanzados y exportar tu plan al calendario. Planificar con cualquier estrategia, país y región sigue siendo gratis."
+				},
+				"carryOver": {
+					"question": "¿Qué son los meses de arrastre?",
+					"answer": "Si tu empresa te deja usar los días de PTO de este año en los primeros meses del siguiente, los meses de arrastre alargan el periodo de planificación hasta 12 meses después de diciembre, para que el planificador también pueda colocar días en, por ejemplo, enero o febrero del año siguiente."
 				}
 			},
 			"technical": {
@@ -164,9 +170,21 @@
 					"question": "¿Cuál es la diferencia entre las estrategias \"agrupada\", \"optimizada\", \"equilibrada\" y \"vacaciones principales\"?",
 					"answer": "Optimizada te da el máximo de días libres efectivos por cada día de PTO, sobre todo en fines de semana largos repartidos por el año. Agrupada cede parte de esa eficiencia a cambio de unas pocas vacaciones largas de unas dos semanas. Equilibrada se asegura de que nunca trabajes demasiado tiempo sin descansar: coloca un fin de semana largo cada pocas semanas para que ninguna racha de trabajo se alargue. Vacaciones principales coloca un bloque de hasta dos semanas en los meses que elijas y reparte el resto como Optimizada."
 				},
+				"weekends": {
+					"question": "¿Los fines de semana y los festivos gastan días de PTO?",
+					"answer": "No. Los días de PTO solo se colocan en días laborables. Los fines de semana y los festivos ya son libres, y eso es justo lo que aprovecha el planificador para convertir cada día de PTO en más días libres."
+				},
+				"alternatives": {
+					"question": "¿Qué son las alternativas?",
+					"answer": "Además de la sugerencia, el planificador crea otros planes con el mismo presupuesto, con tu estrategia y con las demás, para que compares cuántos días libres te da cada uno y apliques el que prefieras con un clic."
+				},
 				"results": {
 					"question": "¿Por qué cambian las recomendaciones cuando actualizo preferencias o festivos?",
 					"answer": "Las sugerencias se recalculan en tiempo real según tus días de PTO, el año, los festivos activos y la estrategia. Cambios pequeños pueden reordenar los resultados porque el motor vuelve a evaluar cada puente y bloque posible."
+				},
+				"export": {
+					"question": "¿Puedo añadir mi plan a mi calendario?",
+					"answer": "Sí. Con premium puedes exportar tus días de PTO, los festivos o ambos en un archivo .ics compatible con Google Calendar, Apple Calendar, Outlook y cualquier otra app de calendario, o en un PDF para imprimirlo o compartirlo."
 				}
 			},
 			"security": {
@@ -182,6 +200,10 @@
 				"tracking": {
 					"question": "¿Vendéis mis datos o seguís mis planes de vacaciones?",
 					"answer": "No. Tus datos de planificación se quedan en tu navegador y no se venden a anunciantes ni a intermediarios de datos. Si aceptas la analítica, solo se usa para medir el producto y nunca para crear perfiles a partir de tus planes de vacaciones."
+				},
+				"devices": {
+					"question": "¿Necesito una cuenta? ¿Puedo usar mi plan en otro dispositivo?",
+					"answer": "No hay cuentas. Tu plan vive en este navegador, así que en otro dispositivo o navegador empiezas de cero. Premium va ligado al email con el que donaste: en un dispositivo nuevo, introdúcelo en la ventana de premium y recuperas el acceso."
 				},
 				"troubleshooting": {
 					"question": "Solución de problemas y datos desactualizados del navegador"
@@ -546,8 +568,7 @@
 					"bridgesAfter": "Los mejores puentes para el resto"
 				},
 				"cons": {
-					"fewerDays": "Menos días totales",
-					"oneBlock": "Solo un gran viaje"
+					"mayHaveFewerDays": "Posiblemente menos días totales"
 				}
 			}
 		},

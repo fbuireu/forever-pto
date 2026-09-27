@@ -46,9 +46,7 @@
 		"titleHighlight1": "Your year",
 		"titleHighlight2": "free",
 		"instructions": "Start by adding your days in the left sidebar, then adjust the rest of your settings. Still have questions?",
-		"quickTour": "Take a quick tour",
-		"or": "or",
-		"checkFaqs": "check our FAQs"
+		"quickTour": "Take a quick tour"
 	},
 	"languages": {
 		"en": "English",
@@ -152,6 +150,14 @@
 				"pricing": {
 					"question": "Why is there a paid model?",
 					"answer": "Forever PTO is free. The paid model covers the cost of data, hosting, and ongoing improvements. It funds updates, support, and infrastructure. Core features remain free so anyone can plan smarter without paying."
+				},
+				"premium": {
+					"question": "What does premium unlock?",
+					"answer": "Premium unlocks the planner's advanced controls: editing the suggested days by hand, adding your own holidays, planning past days, carry-over months into the next year, the advanced metrics and charts, and exporting your plan to your calendar. Planning with any strategy, country and region stays free."
+				},
+				"carryOver": {
+					"question": "What are carry-over months?",
+					"answer": "If your company lets you use this year's PTO days in the first months of next year, carry-over months extend the planning window up to 12 months past December, so the planner can also place days in, say, January or February of the following year."
 				}
 			},
 			"technical": {
@@ -164,9 +170,21 @@
 					"question": "What is the difference between the \"grouped\", \"optimized\", \"balanced\" and \"main vacation\" strategies?",
 					"answer": "Optimized gets you the most effective days off per PTO day, mostly as long weekends spread across the year. Grouped trades some of that efficiency for a few long vacations of about two weeks. Balanced makes sure you never work too long without rest: it places a long weekend every few weeks so no stretch of work runs long. Main vacation puts one block of up to two weeks in the months you choose, then spends the rest like Optimized."
 				},
+				"weekends": {
+					"question": "Do weekends and public holidays use up my PTO days?",
+					"answer": "No. PTO days are only placed on workdays. Weekends and public holidays are already free, and that is exactly what the planner uses to stretch each PTO day into more days off."
+				},
+				"alternatives": {
+					"question": "What are the alternatives?",
+					"answer": "Besides the suggestion, the planner builds other plans with the same budget, from your strategy and from the others, so you can compare how many days off each one gets you and apply the one you prefer with a click."
+				},
 				"results": {
 					"question": "Why do recommendations change when I update preferences or holidays?",
 					"answer": "Suggestions are recalculated in real time whenever your PTO budget, year, holidays, or strategy changes. Even small tweaks can reshuffle the rankings because the engine re-scores every possible bridge and block."
+				},
+				"export": {
+					"question": "Can I add my plan to my calendar?",
+					"answer": "Yes. With premium you can export your PTO days, the public holidays or both as an .ics file that works with Google Calendar, Apple Calendar, Outlook and any other calendar app, or as a PDF to print or share."
 				}
 			},
 			"security": {
@@ -182,6 +200,10 @@
 				"tracking": {
 					"question": "Do you sell my data or track my vacation plans?",
 					"answer": "No. Your planning data stays in your browser and is not sold to advertisers or data brokers. If analytics are enabled, they are limited to product measurement and never used to profile your vacation plans."
+				},
+				"devices": {
+					"question": "Do I need an account? Can I use my plan on another device?",
+					"answer": "There are no accounts. Your plan lives in this browser, so another device or browser starts from scratch. Premium is tied to the email you donated with: on a new device, enter it in the premium window and access comes back."
 				},
 				"troubleshooting": {
 					"question": "Troubleshooting & outdated browser data"
@@ -546,8 +568,7 @@
 					"bridgesAfter": "Best bridges for the rest"
 				},
 				"cons": {
-					"fewerDays": "Fewer total days",
-					"oneBlock": "Only one big trip"
+					"mayHaveFewerDays": "Possibly fewer total days"
 				}
 			}
 		},

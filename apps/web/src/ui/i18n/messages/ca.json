@@ -46,9 +46,7 @@
 		"titleHighlight1": "El teu any",
 		"titleHighlight2": "lliure",
 		"instructions": "Comença afegint els teus dies i la resta de preferències a la barra lateral. Encara tens dubtes?",
-		"quickTour": "Fes un recorregut ràpid",
-		"or": "o",
-		"checkFaqs": "consulta les preguntes freqüents"
+		"quickTour": "Fes un recorregut ràpid"
 	},
 	"languages": {
 		"en": "Anglès",
@@ -152,6 +150,14 @@
 				"pricing": {
 					"question": "Per què hi ha un model de pagament?",
 					"answer": "Forever PTO és gratuït. Tot i això, fem servir un model de pagament per cobrir els costos de manteniment de les dades, la infraestructura i les millores contínues. El model de pagament finança les actualitzacions, el suport i l'allotjament. Si vols donar suport al projecte, hi ha una donació voluntària que desbloqueja les funcions premium."
+				},
+				"premium": {
+					"question": "Què desbloqueja premium?",
+					"answer": "Premium desbloqueja els controls avançats del planificador: editar a mà els dies suggerits, afegir els teus propis festius, planificar dies passats, mesos d'arrossegament a l'any següent, les mètriques i els gràfics avançats i exportar el teu pla al calendari. Planificar amb qualsevol estratègia, país i regió continua sent gratuït."
+				},
+				"carryOver": {
+					"question": "Què són els mesos d'arrossegament?",
+					"answer": "Si la teva empresa et deixa fer servir els dies de PTO d'aquest any als primers mesos del següent, els mesos d'arrossegament allarguen el període de planificació fins a 12 mesos després de desembre, perquè el planificador també pugui posar dies, per exemple, al gener o al febrer de l'any següent."
 				}
 			},
 			"technical": {
@@ -164,9 +170,21 @@
 					"question": "Quina és la diferència entre les estratègies \"agrupada\", \"optimitzada\", \"equilibrada\" i \"vacances principals\"?",
 					"answer": "L'Optimitzada et dona el màxim de dies lliures efectius per cada dia de PTO, sobretot en caps de setmana llargs repartits per l'any. L'Agrupada cedeix part d'aquesta eficiència a canvi d'unes poques vacances llargues d'unes dues setmanes. L'Equilibrada s'assegura que mai no treballis massa temps sense descansar: col·loca un cap de setmana llarg cada poques setmanes perquè cap ratxa de feina s'allargui. Vacances principals col·loca un bloc de fins a dues setmanes als mesos que triïs i reparteix la resta com l'Optimitzada."
 				},
+				"weekends": {
+					"question": "Els caps de setmana i els festius gasten dies de PTO?",
+					"answer": "No. Els dies de PTO només es posen en dies laborables. Els caps de setmana i els festius ja són lliures, i això és justament el que aprofita el planificador per convertir cada dia de PTO en més dies lliures."
+				},
+				"alternatives": {
+					"question": "Què són les alternatives?",
+					"answer": "A més del suggeriment, el planificador crea altres plans amb el mateix pressupost, amb la teva estratègia i amb les altres, perquè comparis quants dies lliures et dona cadascun i apliquis el que prefereixis amb un clic."
+				},
 				"results": {
 					"question": "Per què canvien les recomanacions quan actualitzo preferències o festius?",
 					"answer": "Els suggeriments es recalculen en temps real cada vegada que canvies el pressupost de PTO, l'any, els festius o l'estratègia. Fins i tot els canvis petits poden reordenar els resultats, perquè el motor torna a puntuar tots els ponts i blocs possibles."
+				},
+				"export": {
+					"question": "Puc afegir el meu pla al calendari?",
+					"answer": "Sí. Amb premium pots exportar els teus dies de PTO, els festius o tots dos en un fitxer .ics compatible amb Google Calendar, Apple Calendar, Outlook i qualsevol altra app de calendari, o en un PDF per imprimir-lo o compartir-lo."
 				}
 			},
 			"security": {
@@ -182,6 +200,10 @@
 				"tracking": {
 					"question": "Veneu les meves dades o feu el seguiment dels meus plans de vacances?",
 					"answer": "No. Les teves dades de planificació es queden al teu navegador i no es venen a anunciants ni a intermediaris de dades. Si acceptes l'analítica, només serveix per mesurar l'ús del producte i mai per crear un perfil de les teves vacances."
+				},
+				"devices": {
+					"question": "Necessito un compte? Puc fer servir el meu pla en un altre dispositiu?",
+					"answer": "No hi ha comptes. El teu pla viu en aquest navegador, així que en un altre dispositiu o navegador comences de zero. Premium va lligat al correu amb què vas fer la donació: en un dispositiu nou, introdueix-lo a la finestra de premium i recuperes l'accés."
 				},
 				"troubleshooting": {
 					"question": "Solució de problemes i dades obsoletes del navegador"
@@ -546,8 +568,7 @@
 					"bridgesAfter": "Els millors ponts per a la resta"
 				},
 				"cons": {
-					"fewerDays": "Menys dies totals",
-					"oneBlock": "Només un gran viatge"
+					"mayHaveFewerDays": "Possiblement menys dies totals"
 				}
 			}
 		},
