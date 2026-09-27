@@ -195,7 +195,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 							<span className="bg-card px-2 text-muted-foreground">{t("orPayWithCard")}</span>
 						</div>
 					</div>
-					<PaymentElement />
+					<PaymentElement options={{ layout: "accordion" }} />
 				</div>
 				{errorMessage && (
 					<div className="flex items-start gap-3 rounded-[10px] border-[3px] border-(--frame) bg-[color-mix(in_srgb,var(--destructive)_12%,var(--card)_88%)] p-4 shadow-(--shadow-brutal-sm)">

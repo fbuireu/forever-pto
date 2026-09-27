@@ -35,16 +35,23 @@ describe("stripeAppearance", () => {
 		});
 	});
 
-	it("selects a tab at the same depth as an unselected one, ink with an accent shadow", () => {
+	it("selects a picker item at the same depth as an unselected one, ink with an accent shadow", () => {
 		const { rules } = stripeAppearance({ isDark: false, isMobile: false });
 
-		expect(rules?.[".Tab"]).toMatchObject({ boxShadow: "5px 5px 0 0 #0E0E0E" });
-		expect(rules?.[".Tab--selected"]).toMatchObject({
+		expect(rules?.[".PickerItem"]).toMatchObject({ boxShadow: "5px 5px 0 0 #0E0E0E" });
+		expect(rules?.[".PickerItem--selected"]).toMatchObject({
 			backgroundColor: "#0E0E0E",
 			color: "#FFFAF0",
 			boxShadow: "5px 5px 0 0 #FFD93D",
 		});
-		expect(rules?.[".Tab--selected:hover"]).toEqual({ boxShadow: "7px 7px 0 0 #FFD93D" });
+		expect(rules?.[".PickerItem--selected:hover"]).toEqual({ boxShadow: "7px 7px 0 0 #FFD93D" });
+	});
+
+	it("keeps the selected payment method's icon in the frame colour, visible on the card", () => {
+		const { variables, rules } = stripeAppearance({ isDark: false, isMobile: false });
+
+		expect(variables?.colorIconTabSelected).toBe("#0E0E0E");
+		expect(rules?.[".TabIcon--selected"]).toEqual({ color: "#0E0E0E" });
 	});
 
 	it("switches to the dark tokens", () => {
@@ -52,7 +59,7 @@ describe("stripeAppearance", () => {
 
 		expect(variables).toMatchObject({ colorBackground: "#1A1612", colorText: "#FFF5E1" });
 		expect(rules?.[".AccordionItem"]).toMatchObject({ backgroundColor: "#141008" });
-		expect(rules?.[".Tab--selected"]).toMatchObject({ backgroundColor: "#FFF5E1", color: "#0E0E0E" });
+		expect(rules?.[".PickerItem--selected"]).toMatchObject({ backgroundColor: "#FFF5E1", color: "#0E0E0E" });
 	});
 
 	it("keeps the input text at 16px on phones so the browser does not zoom", () => {

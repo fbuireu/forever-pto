@@ -537,8 +537,12 @@ are `Button` `outline`: the panel face, a resting 5px frame shadow that grows to
 bold and the orange focus ring; a label takes the sidebar's mono face at 14px; a payment method in the
 accordion is a sidebar step card, on `--sidebar` with the 14px radius and the 6px shadow. What Stripe cannot
 do is move an element, so a field lifts by its shadow alone, and it cannot load `next/font`'s files, so the
-type falls back to the system and mono stacks. A selected tab or picker item is drawn like a selected
-`default` Button, ink with the accent shadow at the same depth as its unselected neighbours. The input text
+type falls back to the system and mono stacks. A selected picker item is drawn like a selected
+`default` Button, ink with the accent shadow at the same depth as its unselected neighbours.
+`CheckoutForm.tsx` pins the Payment Element to `layout: 'accordion'`, which is what the narrow popover made
+Stripe choose anyway, because the two layouts share the `.TabIcon--selected` rule: an ink selected tab wants a
+light icon, a cream accordion card a dark one, and one value was always invisible in the other. The rule and
+`colorIconTabSelected` are the frame colour, which the accordion needs. The input text
 is 16px on phones, read from `useIsMobile`, because the browser zooms into anything smaller.
 
 **One module answers how a sidebar control is labelled, and its interface is where the accessibility
