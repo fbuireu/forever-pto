@@ -20,6 +20,7 @@ Exports: `Dialog`, `DialogTrigger`, `DialogContent`, `DialogHeader`, `DialogTitl
 ## How it works
 
 - `DialogContent` (an alias of the internal `DialogPopup`) renders the portal, backdrop and popup in one go: a centered `bg-card` panel with 3px frame border, `rounded-[14px]` and `shadow-brutal-xl`, capped at `sm:max-w-lg`.
+- `DialogHeader` is left-aligned at every width. It used to centre on phones, which put a long description in the middle while the text under it stayed on the left.
 - The popup never outgrows the screen. It is capped at `100dvh` less a `2rem` gutter and scrolls inside itself, with `overscroll-contain` so reaching the end does not chain to the page. That is the only way to reach content past the fold, because Base UI locks the page's scroll while a modal is open; a caller adds no `max-h` or `overflow` of its own. The close button scrolls with the content, so a header row that runs under it keeps the room clear itself.
 - The backdrop is a fixed vertical gradient of near-black ink with `backdrop-blur-[2px]`, at `z-200` together with the popup.
 - `showCloseButton` (default `true`) controls the top-right X, a brutal mini-button with `hit-area-stable` and hover lift. With it off, Esc and backdrop click still dismiss.
