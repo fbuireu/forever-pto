@@ -47,8 +47,8 @@
 	--shadow-brutal-btn: 5px 5px 0 0 var(--frame);
 	--shadow-brutal-btn-hover: 7px 7px 0 0 var(--frame);
 	--shadow-brutal-btn-active: 1px 1px 0 0 var(--frame);
-	--shadow-brutal-btn-accent: 5px 5px 0 0 var(--accent);
-	--shadow-brutal-btn-accent-hover: 7px 7px 0 0 var(--accent);
+	--shadow-brutal-btn-accent: 3px 3px 0 0 var(--accent);
+	--shadow-brutal-btn-accent-hover: 5px 5px 0 0 var(--accent);
 	--shadow-brutal-btn-accent-active: 1px 1px 0 0 var(--accent);
 	--shadow-brutal-btn-orange: 5px 5px 0 0 var(--color-brand-orange);
 	--shadow-brutal-btn-orange-hover: 7px 7px 0 0 var(--color-brand-orange);

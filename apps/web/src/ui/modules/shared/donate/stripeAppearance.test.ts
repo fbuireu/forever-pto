@@ -26,7 +26,7 @@ describe("stripeAppearance", () => {
 		expect(rules?.[".Tab--selected"]).toMatchObject({
 			backgroundColor: "#0E0E0E",
 			color: "#FFFAF0",
-			boxShadow: "5px 5px 0 0 #FFD93D",
+			boxShadow: "3px 3px 0 0 #FFD93D",
 		});
 	});
 
