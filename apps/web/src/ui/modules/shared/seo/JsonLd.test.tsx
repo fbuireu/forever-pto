@@ -114,7 +114,7 @@ describe("FaqJsonLd", () => {
 		);
 
 		expect(answers.some((text) => text.includes("privacy policy"))).toBe(true);
-		expect(answers.some((text) => text.includes("Open issues or merge requests"))).toBe(true);
+		expect(answers.some((text) => text.includes("Open issues or pull requests"))).toBe(true);
 		expect(answers.every((text) => !text.includes("<") && text.length > 0)).toBe(true);
 	});
 
