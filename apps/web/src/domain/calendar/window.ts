@@ -4,7 +4,7 @@ export const MONTHS_IN_YEAR = 12;
 export const MONTHS_IN_QUARTER = 3;
 export const MAX_CARRY_OVER_MONTHS = 12;
 
-export const DEFAULT_PREFERRED_MONTHS: readonly number[] = [6, 7];
+export const DEFAULT_PREFERRED_MONTHS: readonly number[] = [];
 
 export const isPreferredMonths = (value: unknown): value is number[] =>
 	Array.isArray(value) &&

@@ -45,6 +45,10 @@ describe("initial state", () => {
 		expect(state.carryOverMonths).toBe(1);
 		expect(state.strategy).toBe(FilterStrategy.GROUPED);
 	});
+
+	it("starts with no Preferred Month, which lets Main vacation place its block wherever it is longest", () => {
+		expect(useFiltersStore.getInitialState().preferredMonths).toEqual([]);
+	});
 });
 
 describe("setters", () => {

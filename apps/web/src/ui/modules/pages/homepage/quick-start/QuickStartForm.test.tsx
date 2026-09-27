@@ -158,7 +158,7 @@ describe("QuickStartForm", () => {
 
 			const filters = useFiltersStore.getState();
 			expect(filters.strategy).toBe(FilterStrategy.MAIN_VACATION);
-			expect(filters.preferredMonths).toStrictEqual([5, 6, 7]);
+			expect(filters.preferredMonths).toStrictEqual([5]);
 		} finally {
 			vi.useRealTimers();
 		}
@@ -184,7 +184,7 @@ describe("QuickStartForm", () => {
 					region: "",
 					year: expect.any(Number),
 					strategy: FilterStrategy.GROUPED,
-					preferredMonths: "6,7",
+					preferredMonths: "",
 					allowPastDays: false,
 					carryOverMonths: 1,
 				},

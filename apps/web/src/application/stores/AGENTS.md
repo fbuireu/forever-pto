@@ -34,8 +34,10 @@ The rest of the application layer contract is in [`../AGENTS.md`](../AGENTS.md).
 | `ui` | `donatePopoverOpen`, `donatePopoverIsOpening`, `quickStartOpen` | nothing |
 
 **`preferredMonths` is guarded on rehydration the way `strategy` is, by the same predicate the worker uses.**
-`isPreferredMonths` in `@domain/calendar/window` accepts an array of distinct month indexes from 0 to 11, the empty
-one included (which means any month), and a stored value that fails it becomes `DEFAULT_PREFERRED_MONTHS`.
+`isPreferredMonths` in `@domain/calendar/window` accepts an array of distinct Planning Window positions, the Carry-over Months included, the empty
+one included (which means any month), and a stored value that fails it becomes `DEFAULT_PREFERRED_MONTHS`, which
+is empty: a default of July and August stopped being reachable every September, and an empty choice is honest about
+where the block will go.
 `setPreferredMonths` applies it too and stores the months sorted, so the calculation effect that depends on the
 array does not re-plan when the same months arrive in another order. The field was added without a
 `STORAGE_VERSION` bump on purpose: a blob written before it lacks the key, the initial state supplies it, and the
