@@ -2289,7 +2289,6 @@ describe("translation bundles stay in step", () => {
 		"AI",
 		"APDCAT",
 		"API",
-		"CDN",
 		"CE",
 		"CNIL",
 		"DSGVO",
