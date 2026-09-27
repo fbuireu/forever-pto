@@ -2,13 +2,13 @@ import type { Appearance } from "@stripe/stripe-js";
 
 const LIGHT_PALETTE = {
 	surface: "#FFFDF8",
-	surfaceHover: "#FFF5E1",
-	input: "#FFFAF0",
+	panel: "#FFF5E1",
+	field: "#FFFDF8",
+	fieldHover: "#FFF5E1",
 	foreground: "#0E0E0E",
 	frame: "#0E0E0E",
 	primaryForeground: "#FFFAF0",
 	accent: "#FFD93D",
-	accentForeground: "#0E0E0E",
 	destructive: "#D32F2F",
 	muted: "#6B5E4E",
 	ring: "#FF7A45",
@@ -16,13 +16,13 @@ const LIGHT_PALETTE = {
 
 const DARK_PALETTE: typeof LIGHT_PALETTE = {
 	surface: "#1A1612",
-	surfaceHover: "#241E18",
-	input: "#181410",
+	panel: "#141008",
+	field: "#1A1612",
+	fieldHover: "#241E18",
 	foreground: "#FFF5E1",
 	frame: "#FFF5E1",
 	primaryForeground: "#0E0E0E",
 	accent: "#FFD93D",
-	accentForeground: "#0E0E0E",
 	destructive: "#D32F2F",
 	muted: "#C6B8A5",
 	ring: "#FF7A45",
@@ -30,6 +30,10 @@ const DARK_PALETTE: typeof LIGHT_PALETTE = {
 
 const FONT_SIZE_DESKTOP = "14px";
 const FONT_SIZE_MOBILE = "16px";
+const SANS_STACK = 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+const MONO_STACK = 'ui-monospace, "JetBrains Mono", SFMono-Regular, Menlo, Consolas, monospace';
+
+const SHADOW = { XS: 2, MD: 6, BUTTON: 5, BUTTON_HOVER: 7 } as const;
 
 const shadow = ({ offset, color }: { offset: number; color: string }) => `${offset}px ${offset}px 0 0 ${color}`;
 
@@ -44,37 +48,30 @@ interface StripeAppearanceParams {
 export const stripeAppearance = ({ isDark, isMobile }: StripeAppearanceParams): Appearance => {
 	const palette = isDark ? DARK_PALETTE : LIGHT_PALETTE;
 	const fontSize = isMobile ? FONT_SIZE_MOBILE : FONT_SIZE_DESKTOP;
-	const frameBorder = { borderWidth: "3px", borderStyle: "solid", borderColor: palette.frame, borderRadius: "8px" };
-	const button = {
+	const frameBorder = { borderWidth: "3px", borderStyle: "solid", borderColor: palette.frame };
+	const rest = shadow({ offset: SHADOW.BUTTON, color: palette.frame });
+	const lifted = shadow({ offset: SHADOW.BUTTON_HOVER, color: palette.frame });
+	const selectedRest = shadow({ offset: SHADOW.BUTTON, color: palette.accent });
+	const ringed = (base: string) => focusRing({ base, surface: palette.surface, ring: palette.ring });
+
+	const field = {
 		...frameBorder,
-		backgroundColor: palette.surface,
+		borderRadius: "8px",
+		backgroundColor: palette.field,
 		color: palette.foreground,
-		boxShadow: shadow({ offset: 5, color: palette.frame }),
-		fontSize: FONT_SIZE_DESKTOP,
-		fontWeight: "900",
-		letterSpacing: "0.01em",
+		boxShadow: rest,
 		transition: "box-shadow 75ms linear, background-color 75ms linear",
 	};
-	const buttonHover = {
-		backgroundColor: palette.surfaceHover,
-		color: palette.foreground,
-		boxShadow: shadow({ offset: 7, color: palette.frame }),
-	};
-	const buttonFocus = {
-		boxShadow: focusRing({
-			base: shadow({ offset: 5, color: palette.frame }),
-			surface: palette.surface,
-			ring: palette.ring,
-		}),
-		outline: "none",
-	};
-	const buttonSelected = {
+	const fieldHover = { backgroundColor: palette.fieldHover, boxShadow: lifted };
+	const fieldFocus = { boxShadow: ringed(rest), outline: "none" };
+	const selected = {
 		backgroundColor: palette.frame,
 		color: palette.primaryForeground,
 		borderColor: palette.frame,
-		boxShadow: shadow({ offset: 5, color: palette.accent }),
+		boxShadow: selectedRest,
 	};
-	const buttonSelectedHover = { boxShadow: shadow({ offset: 7, color: palette.accent }) };
+	const selectedHover = { boxShadow: shadow({ offset: SHADOW.BUTTON_HOVER, color: palette.accent }) };
+	const choice = { ...field, fontSize: FONT_SIZE_DESKTOP, fontWeight: "900", padding: "10px 16px" };
 
 	return {
 		theme: undefined,
@@ -87,70 +84,79 @@ export const stripeAppearance = ({ isDark, isMobile }: StripeAppearanceParams): 
 			colorTextSecondary: palette.muted,
 			colorTextPlaceholder: palette.muted,
 			accessibleColorOnColorPrimary: palette.primaryForeground,
-			fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+			fontFamily: SANS_STACK,
 			fontSizeBase: fontSize,
 			fontWeightNormal: "400",
 			fontWeightMedium: "500",
 			fontWeightBold: "900",
 			fontLineHeight: "20px",
 			spacingUnit: "4px",
+			spacingGridRow: "16px",
+			spacingAccordionItem: "16px",
 			borderRadius: "8px",
-			focusBoxShadow: shadow({ offset: 4, color: palette.frame }),
+			focusBoxShadow: ringed(rest),
 			focusOutline: "none",
 		},
 		rules: {
-			".Input": {
-				...frameBorder,
-				backgroundColor: palette.input,
-				color: palette.foreground,
-				padding: "9px 16px",
-				fontSize,
-				lineHeight: "20px",
-				boxShadow: "none",
-				transition: "box-shadow 75ms linear",
+			".Input": { ...field, padding: "9px 16px", fontSize, fontWeight: "700", lineHeight: "20px" },
+			".Input:hover": fieldHover,
+			".Input:focus": fieldFocus,
+			".Input--invalid": {
+				borderColor: palette.destructive,
+				boxShadow: shadow({ offset: SHADOW.BUTTON, color: palette.destructive }),
 			},
-			".Input:hover": { boxShadow: shadow({ offset: 2, color: palette.frame }) },
-			".Input:focus": { boxShadow: shadow({ offset: 4, color: palette.frame }), outline: "none" },
-			".Input--invalid": { borderColor: palette.destructive, boxShadow: "none" },
-			".Input--invalid:hover": { boxShadow: "none" },
-			".Input--invalid:focus": { boxShadow: shadow({ offset: 4, color: palette.destructive }) },
-			".Input::placeholder": { color: palette.muted },
+			".Input--invalid:hover": { boxShadow: shadow({ offset: SHADOW.BUTTON_HOVER, color: palette.destructive }) },
+			".Input--invalid:focus": {
+				boxShadow: ringed(shadow({ offset: SHADOW.BUTTON, color: palette.destructive })),
+			},
+			".Input::placeholder": { color: palette.muted, fontWeight: "400" },
 			".Label": {
+				fontFamily: MONO_STACK,
 				fontSize: FONT_SIZE_DESKTOP,
-				fontWeight: "500",
-				lineHeight: "1",
+				fontWeight: "400",
 				color: palette.foreground,
 				marginBottom: "8px",
 			},
 			".Error": { fontSize: FONT_SIZE_DESKTOP, fontWeight: "400", color: palette.destructive, marginTop: "8px" },
-			".Tab": { ...button, padding: "10px 16px" },
-			".Tab:hover": buttonHover,
-			".Tab:focus": buttonFocus,
-			".Tab--selected": buttonSelected,
-			".Tab--selected:hover": buttonSelectedHover,
-			".Tab--selected:focus": {
-				boxShadow: focusRing({
-					base: shadow({ offset: 5, color: palette.accent }),
-					surface: palette.surface,
-					ring: palette.ring,
-				}),
-			},
+			".Tab": choice,
+			".Tab:hover": { ...fieldHover, color: palette.foreground },
+			".Tab:focus": fieldFocus,
+			".Tab--selected": selected,
+			".Tab--selected:hover": selectedHover,
+			".Tab--selected:focus": { boxShadow: ringed(selectedRest) },
 			".TabIcon--selected": { color: palette.primaryForeground },
 			".TabLabel--selected": { color: palette.primaryForeground },
-			".PickerItem": { ...button, padding: "10px 16px" },
-			".PickerItem:hover": buttonHover,
-			".PickerItem:focus": buttonFocus,
-			".PickerItem--selected": buttonSelected,
-			".PickerItem--selected:hover": buttonSelectedHover,
-			".Block": { ...frameBorder, backgroundColor: palette.surface, boxShadow: "none" },
-			".AccordionItem": { ...frameBorder, backgroundColor: palette.surface, boxShadow: "none" },
-			".AccordionItem:focus-within": { boxShadow: shadow({ offset: 4, color: palette.frame }) },
+			".PickerItem": choice,
+			".PickerItem:hover": { ...fieldHover, color: palette.foreground },
+			".PickerItem:focus": fieldFocus,
+			".PickerItem--selected": selected,
+			".PickerItem--selected:hover": selectedHover,
+			".AccordionItem": {
+				...frameBorder,
+				borderRadius: "14px",
+				backgroundColor: palette.panel,
+				boxShadow: shadow({ offset: SHADOW.MD, color: palette.frame }),
+				padding: "18px",
+				fontWeight: "900",
+			},
+			".AccordionItem:focus-visible": {
+				boxShadow: ringed(shadow({ offset: SHADOW.MD, color: palette.frame })),
+			},
+			".AccordionItem--selected": { fontWeight: "900" },
+			".Block": {
+				...frameBorder,
+				borderRadius: "12px",
+				backgroundColor: palette.surface,
+				boxShadow: shadow({ offset: SHADOW.XS, color: palette.frame }),
+			},
 			".CheckboxInput": {
-				border: `2px solid ${palette.frame}`,
+				border: `3px solid ${palette.frame}`,
 				borderRadius: "4px",
-				backgroundColor: palette.input,
+				backgroundColor: palette.field,
+				boxShadow: shadow({ offset: SHADOW.XS, color: palette.frame }),
 			},
 			".CheckboxInput--checked": { backgroundColor: palette.frame, borderColor: palette.frame },
+			".CheckboxInput:focus": { boxShadow: ringed(shadow({ offset: SHADOW.XS, color: palette.frame })) },
 		},
 	};
 };

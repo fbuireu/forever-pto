@@ -2,39 +2,56 @@ import { describe, expect, it } from "vitest";
 import { stripeAppearance } from "./stripeAppearance";
 
 describe("stripeAppearance", () => {
-	it("draws inputs like the Input primitive", () => {
+	it("draws a field like the sidebar's controls: a resting frame shadow that grows on hover", () => {
 		const { rules } = stripeAppearance({ isDark: false, isMobile: false });
 
-		expect(rules?.[".Input"]).toMatchObject({ borderWidth: "3px", borderRadius: "8px", padding: "9px 16px" });
-		expect(rules?.[".Input:hover"]).toEqual({ boxShadow: "2px 2px 0 0 #0E0E0E" });
-		expect(rules?.[".Input:focus"]).toMatchObject({ boxShadow: "4px 4px 0 0 #0E0E0E" });
-		expect(rules?.[".Input--invalid:focus"]).toEqual({ boxShadow: "4px 4px 0 0 #D32F2F" });
+		expect(rules?.[".Input"]).toMatchObject({
+			borderWidth: "3px",
+			borderRadius: "8px",
+			backgroundColor: "#FFFDF8",
+			boxShadow: "5px 5px 0 0 #0E0E0E",
+		});
+		expect(rules?.[".Input:hover"]).toEqual({ backgroundColor: "#FFF5E1", boxShadow: "7px 7px 0 0 #0E0E0E" });
+		expect(rules?.[".Input:focus"]?.boxShadow).toBe("5px 5px 0 0 #0E0E0E, 0 0 0 2px #FFFDF8, 0 0 0 5px #FF7A45");
+		expect(rules?.[".Input--invalid"]).toMatchObject({ borderColor: "#D32F2F", boxShadow: "5px 5px 0 0 #D32F2F" });
 	});
 
-	it("labels like the Label primitive, without shouting", () => {
+	it("labels in the sidebar's mono face, without shouting", () => {
 		const { rules } = stripeAppearance({ isDark: false, isMobile: false });
 
-		expect(rules?.[".Label"]).toMatchObject({ fontSize: "14px", fontWeight: "500" });
+		expect(rules?.[".Label"]).toMatchObject({ fontSize: "14px", fontWeight: "400" });
+		expect(rules?.[".Label"]?.fontFamily).toContain("monospace");
 		expect(rules?.[".Label"]).not.toHaveProperty("textTransform");
 	});
 
-	it("selects a tab the way a selected Button is drawn, ink with an accent shadow", () => {
+	it("draws a payment method like a sidebar card", () => {
+		const { rules } = stripeAppearance({ isDark: false, isMobile: false });
+
+		expect(rules?.[".AccordionItem"]).toMatchObject({
+			borderRadius: "14px",
+			backgroundColor: "#FFF5E1",
+			boxShadow: "6px 6px 0 0 #0E0E0E",
+			padding: "18px",
+		});
+	});
+
+	it("selects a tab at the same depth as an unselected one, ink with an accent shadow", () => {
 		const { rules } = stripeAppearance({ isDark: false, isMobile: false });
 
 		expect(rules?.[".Tab"]).toMatchObject({ boxShadow: "5px 5px 0 0 #0E0E0E" });
-		expect(rules?.[".Tab:hover"]).toMatchObject({ boxShadow: "7px 7px 0 0 #0E0E0E" });
-		expect(rules?.[".Tab--selected:hover"]).toEqual({ boxShadow: "7px 7px 0 0 #FFD93D" });
 		expect(rules?.[".Tab--selected"]).toMatchObject({
 			backgroundColor: "#0E0E0E",
 			color: "#FFFAF0",
 			boxShadow: "5px 5px 0 0 #FFD93D",
 		});
+		expect(rules?.[".Tab--selected:hover"]).toEqual({ boxShadow: "7px 7px 0 0 #FFD93D" });
 	});
 
 	it("switches to the dark tokens", () => {
 		const { variables, rules } = stripeAppearance({ isDark: true, isMobile: false });
 
 		expect(variables).toMatchObject({ colorBackground: "#1A1612", colorText: "#FFF5E1" });
+		expect(rules?.[".AccordionItem"]).toMatchObject({ backgroundColor: "#141008" });
 		expect(rules?.[".Tab--selected"]).toMatchObject({ backgroundColor: "#FFF5E1", color: "#0E0E0E" });
 	});
 

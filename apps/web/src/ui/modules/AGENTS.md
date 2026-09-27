@@ -520,11 +520,21 @@ because it is a key in a Better Stack funnel that this repo cannot see: renaming
 with no way to stitch it back together. It is the one surviving instance of the retired word, in
 [`../../infrastructure/clients/logging/better-stack/tracking.ts`](../../infrastructure/clients/logging/better-stack/tracking.ts)'s event union.
 
-The Stripe Elements appearance in [`shared/donate/Donate.tsx`](./shared/donate/Donate.tsx) repeats the theme as hex literals. The
-Elements iframe cannot read this app's CSS custom properties, so the light and dark objects mirror
-`--card`, `--input`, `--foreground`, `--frame`, `--accent` (identical in both modes), `--secondary` and
-`--muted-foreground` from [`src/ui/styles/global/index.css`](../styles/global/index.css) by value. Change a token there and this
-object has to be changed by hand, or the donation form drifts from the page around it.
+The Stripe Elements appearance lives in [`shared/donate/stripeAppearance.ts`](./shared/donate/stripeAppearance.ts), and it repeats the theme as hex
+literals. The Elements iframe cannot read this app's CSS custom properties, so the light and dark palettes
+mirror `--surface-panel`, `--surface-panel-alt`, `--sidebar`, `--foreground`, `--frame`, `--primary-foreground`,
+`--accent`, `--destructive`, `--muted-foreground` and `--ring` from [`src/ui/styles/global/index.css`](../styles/global/index.css) by value, and the
+shadow offsets mirror the `--shadow-brutal-*` scale. Change a token there and this module has to be changed by
+hand, or the donation form drifts from the page around it.
+
+**The model is the sidebar, not the `Input` primitive.** A field is drawn like the sidebar's comboboxes, which
+are `Button` `outline`: the panel face, a resting 5px frame shadow that grows to 7px on hover, the value in
+bold and the orange focus ring; a label takes the sidebar's mono face at 14px; a payment method in the
+accordion is a sidebar step card, on `--sidebar` with the 14px radius and the 6px shadow. What Stripe cannot
+do is move an element, so a field lifts by its shadow alone, and it cannot load `next/font`'s files, so the
+type falls back to the system and mono stacks. A selected tab or picker item is drawn like a selected
+`default` Button, ink with the accent shadow at the same depth as its unselected neighbours. The input text
+is 16px on phones, read from `useIsMobile`, because the browser zooms into anything smaller.
 
 **One module answers how a sidebar control is labelled, and its interface is where the accessibility
 defects came from.** [`sidebar/components/SidebarFieldLabel.tsx`](./sidebar/components/SidebarFieldLabel.tsx) exports `SidebarFieldLabel` (icon, title,
