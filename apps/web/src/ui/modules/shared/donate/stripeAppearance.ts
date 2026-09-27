@@ -72,9 +72,9 @@ export const stripeAppearance = ({ isDark, isMobile }: StripeAppearanceParams): 
 		backgroundColor: palette.frame,
 		color: palette.primaryForeground,
 		borderColor: palette.frame,
-		boxShadow: shadow({ offset: 3, color: palette.accent }),
+		boxShadow: shadow({ offset: 5, color: palette.accent }),
 	};
-	const buttonSelectedHover = { boxShadow: shadow({ offset: 5, color: palette.accent }) };
+	const buttonSelectedHover = { boxShadow: shadow({ offset: 7, color: palette.accent }) };
 
 	return {
 		theme: undefined,
@@ -130,7 +130,7 @@ export const stripeAppearance = ({ isDark, isMobile }: StripeAppearanceParams): 
 			".Tab--selected:hover": buttonSelectedHover,
 			".Tab--selected:focus": {
 				boxShadow: focusRing({
-					base: shadow({ offset: 3, color: palette.accent }),
+					base: shadow({ offset: 5, color: palette.accent }),
 					surface: palette.surface,
 					ring: palette.ring,
 				}),

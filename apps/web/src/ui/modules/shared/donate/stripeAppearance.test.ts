@@ -23,10 +23,11 @@ describe("stripeAppearance", () => {
 
 		expect(rules?.[".Tab"]).toMatchObject({ boxShadow: "5px 5px 0 0 #0E0E0E" });
 		expect(rules?.[".Tab:hover"]).toMatchObject({ boxShadow: "7px 7px 0 0 #0E0E0E" });
+		expect(rules?.[".Tab--selected:hover"]).toEqual({ boxShadow: "7px 7px 0 0 #FFD93D" });
 		expect(rules?.[".Tab--selected"]).toMatchObject({
 			backgroundColor: "#0E0E0E",
 			color: "#FFFAF0",
-			boxShadow: "3px 3px 0 0 #FFD93D",
+			boxShadow: "5px 5px 0 0 #FFD93D",
 		});
 	});
 
