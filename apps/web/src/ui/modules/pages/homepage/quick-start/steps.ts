@@ -1,5 +1,7 @@
 import type { FiltersState } from "@application/stores/filters";
 
+export const PLANNER_PATH = "/planner";
+
 export const QuickStartStep = {
 	LOCATION: "location",
 	PTO_DAYS: "ptoDays",

@@ -13,6 +13,7 @@ import { devtools, persist } from "zustand/middleware";
 import { obfuscatedStorage } from "./crypto";
 import { useFiltersStore } from "./filters";
 import { onRehydrateFailure } from "./rehydration";
+import { HOLIDAYS_STORAGE_NAME } from "./storedPlan";
 import {
 	type AddHolidayParams,
 	type AlternativePreviewParams,
@@ -82,7 +83,7 @@ interface HolidaysActions {
 
 type HolidaysStore = HolidaysState & HolidaysActions;
 
-const STORAGE_NAME = "holidays-store";
+const STORAGE_NAME = HOLIDAYS_STORAGE_NAME;
 
 let latestHolidaysFetch = 0;
 const STORAGE_VERSION = 1;

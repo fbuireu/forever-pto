@@ -923,7 +923,8 @@
 			"how": "Cómo va",
 			"features": "Trucos",
 			"pricing": "Precio",
-			"trialAction": "Probar gratis →"
+			"trialAction": "Probar gratis →",
+			"resumeAction": "Mi plan →"
 		},
 		"hero": {
 			"command": "Trabaja menos.",

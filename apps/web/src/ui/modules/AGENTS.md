@@ -79,7 +79,12 @@ the module path anyway, so a file whose export is named something else just make
 
 Every planner call to action on the homepage (the header's trial action, the hero, the free plan in
 `Pricing.tsx` and the closing section) is a [`pages/homepage/quick-start/QuickStartTrigger.tsx`](./pages/homepage/quick-start/QuickStartTrigger.tsx), a
-button that flips `quickStartOpen` on the `ui` store, not a link into `/planner`. The dialog itself is
+button that flips `quickStartOpen` on the `ui` store, not a link into `/planner`. The header's trial action is the one exception, and only for a returning visitor: it passes a
+`resumeLabel`, and once `useHasStoredPlan` finds the holidays store's blob in local storage the trigger renders
+that label as a link straight to `/planner` instead, since someone with a plan has nothing to set up. The check
+is presence of the key, read through [`application/stores/storedPlan.ts`](../../application/stores/storedPlan.ts), not a parse of the blob: it
+is obfuscated, and reading it would pull the whole holidays store into the homepage. The server snapshot is
+`false`, so the prerendered header always offers the trial and hydration swaps in the link. The dialog itself is
 mounted once, from the marketing layout, as [`pages/homepage/quick-start/QuickStart.tsx`](./pages/homepage/quick-start/QuickStart.tsx): a server
 component that fetches the Country list and the current year and hands them to
 [`pages/homepage/quick-start/QuickStartClient.tsx`](./pages/homepage/quick-start/QuickStartClient.tsx). That shell renders nothing until the

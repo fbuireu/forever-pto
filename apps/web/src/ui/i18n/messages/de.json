@@ -923,7 +923,8 @@
 			"how": "Wie es funktioniert",
 			"features": "Funktionen",
 			"pricing": "Preise",
-			"trialAction": "Kostenlos testen →"
+			"trialAction": "Kostenlos testen →",
+			"resumeAction": "Mein Plan →"
 		},
 		"hero": {
 			"command": "Weniger arbeiten.",

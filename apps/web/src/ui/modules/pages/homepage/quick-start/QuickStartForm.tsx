@@ -19,13 +19,13 @@ import { QuickStartSettingsStep } from "./QuickStartSettingsStep";
 import {
 	canLeaveStep,
 	createDraft,
+	PLANNER_PATH,
 	QUICK_START_STEPS,
 	type QuickStartDraft,
 	QuickStartStep,
 	trackedDraft,
 } from "./steps";
 
-const PLANNER_PATH = "/planner";
 const PERCENT = 100;
 
 interface QuickStartFormProps {

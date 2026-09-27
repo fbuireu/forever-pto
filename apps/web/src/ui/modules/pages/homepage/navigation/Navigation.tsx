@@ -41,7 +41,7 @@ export const Header = async () => {
 				<div className="flex gap-2.5 items-center">
 					<ThemeSelector buttonClassName="size-9 px-0 focus-visible:ring-1" />
 					<HomepageLanguageSwitcher />
-					<QuickStartTrigger source={QuickStartSource.NAV} size="sm">
+					<QuickStartTrigger source={QuickStartSource.NAV} size="sm" resumeLabel={t("nav.resumeAction")}>
 						{t("nav.trialAction")}
 					</QuickStartTrigger>
 				</div>
