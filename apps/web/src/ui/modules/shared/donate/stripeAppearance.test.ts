@@ -12,7 +12,7 @@ describe("stripeAppearance", () => {
 			boxShadow: "5px 5px 0 0 #0E0E0E",
 		});
 		expect(rules?.[".Input:hover"]).toEqual({ backgroundColor: "#FFF5E1", boxShadow: "7px 7px 0 0 #0E0E0E" });
-		expect(rules?.[".Input:focus"]?.boxShadow).toBe("5px 5px 0 0 #0E0E0E, 0 0 0 2px #FFFDF8, 0 0 0 5px #FF7A45");
+		expect(rules?.[".Input:focus"]?.boxShadow).toBe("0 0 0 2px #FFFDF8, 0 0 0 5px #FF7A45, 5px 5px 0 0 #0E0E0E");
 		expect(rules?.[".Input--invalid"]).toMatchObject({ borderColor: "#D32F2F", boxShadow: "5px 5px 0 0 #D32F2F" });
 	});
 

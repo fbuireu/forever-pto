@@ -38,7 +38,7 @@ const SHADOW = { XS: 2, MD: 6, BUTTON: 5, BUTTON_HOVER: 7 } as const;
 const shadow = ({ offset, color }: { offset: number; color: string }) => `${offset}px ${offset}px 0 0 ${color}`;
 
 const focusRing = ({ base, surface, ring }: { base: string; surface: string; ring: string }) =>
-	`${base}, 0 0 0 2px ${surface}, 0 0 0 5px ${ring}`;
+	`0 0 0 2px ${surface}, 0 0 0 5px ${ring}, ${base}`;
 
 interface StripeAppearanceParams {
 	isDark: boolean;
