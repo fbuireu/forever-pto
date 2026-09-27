@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.13.0](https://github.com/fbuireu/forever-pto/compare/web-v1.12.1...web-v1.13.0) (2026-09-27)
+
+
+### Features
+
+* **web:** plan every Strategy on the marginal gain, add Main vacation and make the planner faster ([#404](https://github.com/fbuireu/forever-pto/issues/404)) ([e1c617a](https://github.com/fbuireu/forever-pto/commit/e1c617ac45b03b432d8190ded13f208bb5ffbb86))
+
 # [forever-pto-web-v1.12.0](https://github.com/fbuireu/forever-pto/compare/web-v1.11.4...web-v1.12.0) (2026-09-23)
 
 
