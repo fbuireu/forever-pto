@@ -495,6 +495,15 @@ so it was not the `@supports` fallback it looked like. Both the effect and the i
 browsers without `scroll-state()` is ever wanted, it belongs beside `Legend.tsx` **with a CSS rule that
 consumes the attribute**, not in a cross-screen component reaching in by DOM id.
 
+**The sticky container never changes height, which is what stops the Legend flickering at the edge.** The
+compact stuck form is shorter than the open card, and a `bottom: 0` sticky box is stuck while its natural bottom
+is below the viewport's. So shrinking on stick raised that bottom back into view, the card unstuck, grew, stuck
+again, and inside a band as tall as the difference it toggled every frame. `Legend.tsx` now renders an inert,
+`aria-hidden`, invisible copy of the open card (`.ghost`, no toggle) in the same grid cell as the real one
+(`.live`), so the container is always the open height; only `.live` answers the stuck container query, it sits
+at the bottom of the cell, and the container passes pointer events through everywhere but the card. No script
+measures anything.
+
 **`data-tutorial` attributes are load-bearing, and they come from `TUTORIAL_ANCHOR`.** `CALENDAR_LIST`,
 `HOLIDAYS_LIST`, `PLANNER_DRAWER`, `ALTERNATIVES_MANAGER` and `PTO_STATUS` are this screen's driver.js
 anchors; the const in [`../../tutorial/anchors.ts`](../../tutorial/anchors.ts) is the only place their

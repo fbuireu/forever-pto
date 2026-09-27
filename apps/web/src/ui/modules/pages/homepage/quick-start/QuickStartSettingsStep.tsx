@@ -26,7 +26,7 @@ export const QuickStartSettingsStep = ({ draft, onChange }: QuickStartSettingsSt
 	const { year, carryOverMonths, allowPastDays, preferredMonths } = draft;
 
 	return (
-		<div className="space-y-6">
+		<div className="space-y-4">
 			<fieldset className="space-y-2">
 				<legend className="text-sm font-medium leading-none mb-2">{tSidebar("strategy.title")}</legend>
 				<div className="grid gap-2">
@@ -59,16 +59,14 @@ export const QuickStartSettingsStep = ({ draft, onChange }: QuickStartSettingsSt
 			</fieldset>
 
 			{draft.strategy === FilterStrategy.MAIN_VACATION && (
-				<div className="space-y-2">
-					<MonthToggles
-						label={tSidebar("preferredMonths.title")}
-						legendClassName="text-sm font-medium leading-none mb-2"
-						planningWindow={{ year, carryOverMonths }}
-						allowPastDays={allowPastDays}
-						months={preferredMonths}
-						onChange={(months) => onChange({ preferredMonths: months })}
-					/>
-				</div>
+				<MonthToggles
+					label={tSidebar("preferredMonths.title")}
+					legendClassName="text-sm font-medium leading-none mb-2"
+					planningWindow={{ year, carryOverMonths }}
+					allowPastDays={allowPastDays}
+					months={preferredMonths}
+					onChange={(months) => onChange({ preferredMonths: months })}
+				/>
 			)}
 
 			<p className="text-xs text-muted-foreground">{t("premiumHint")}</p>

@@ -80,7 +80,7 @@ type DialogHeaderProps = DialogHeaderPrimitiveProps;
 function DialogHeader({ className, ...props }: DialogHeaderProps) {
 	return (
 		<DialogHeaderPrimitive
-			className={cn("flex flex-col gap-3 border-b-2 border-(--frame)/18 pb-4 text-center sm:text-left", className)}
+			className={cn("flex flex-col gap-3 border-b-2 border-(--frame)/18 pb-4 text-left", className)}
 			{...props}
 		/>
 	);

@@ -45,7 +45,7 @@
 		"description": "Your smart PTO planner. Configure your PTO days, country and strategy to get the most out of every public holiday.",
 		"titleHighlight1": "Your year",
 		"titleHighlight2": "free",
-		"instructions": "Start by adding your days on the left sidebar and the rest of your configurations. Still have questions?",
+		"instructions": "Start by adding your days in the left sidebar, then adjust the rest of your settings. Still have questions?",
 		"quickTour": "Take a quick tour",
 		"or": "or",
 		"checkFaqs": "check our FAQs"
@@ -208,7 +208,7 @@
 	"workdayCounter": {
 		"title": "Workday counter",
 		"tooltip": "Count Workdays between two dates, automatically excluding weekends and holidays. Useful for project planning and deadline calculations.",
-		"tooltipLabel": "More information about workday counter",
+		"tooltipLabel": "More information about the workday counter",
 		"selectRange": "Select dates",
 		"clearSelection": "Clear selection",
 		"workdays": "Workdays",
@@ -346,7 +346,7 @@
 			"step2Title": "Your PTO days",
 			"step2Description": "Enter how many PTO days you have. This is the base for all calculations.",
 			"step3Title": "Your configuration",
-			"step3Description": "Choose your optimization strategy and configure past days and carryover months to fine-tune your plan.",
+			"step3Description": "Choose your optimization strategy and configure past days and carry-over months to fine-tune your plan.",
 			"step4Title": "Export your calendar",
 			"step4Description": "Download your holidays and planned PTO days as a .ics file to import into Google Calendar, Apple Calendar or Outlook, or as a PDF to print or share.",
 			"drawerTitle": "Your planner panel",
@@ -568,7 +568,7 @@
 		"carryOverMonths": {
 			"title": "Carry-over months",
 			"tooltip": "Extend the planning window into the following year to find more bridge opportunities.",
-			"tooltipLabel": "More information about carry over"
+			"tooltipLabel": "More information about carry-over months"
 		},
 		"years": {
 			"title": "Year"
@@ -612,7 +612,7 @@
 	"ptoCalculator": {
 		"title": "PTO accrual calculator",
 		"tooltip": "Calculate how many PTO days you've accrued based on a monthly rate. Most companies give 2–3 days per month. Pick a target month to see your total.",
-		"tooltipLabel": "More information about PTO calculator",
+		"tooltipLabel": "More information about the PTO calculator",
 		"daysPerMonth": "Days/month",
 		"calculateThrough": "Calculate through",
 		"selectMonth": "Select month",
@@ -628,7 +628,7 @@
 	"ptoSalaryCalculator": {
 		"title": "PTO vs. salary calculator",
 		"tooltip": "See how much paid vacation you're leaving on the table by not using your PTO days. You're still getting paid; you're just working days you didn't have to.",
-		"tooltipLabel": "More information about salary calculator",
+		"tooltipLabel": "More information about the salary calculator",
 		"annualSalary": "Annual salary",
 		"annualSalaryPlaceholder": "{amount}",
 		"unusedPtoDays": "Unused PTO days",
@@ -664,8 +664,8 @@
 		}
 	},
 	"donate": {
-		"donateAndUnblock": "Donate & Unblock",
-		"supportAndUnblock": "Support & Unblock",
+		"donateAndUnblock": "Donate & Unlock",
+		"supportAndUnblock": "Support & Unlock",
 		"makeDonation": "Support the project with a donation to unlock access.",
 		"alreadyPremium": "You're already a premium user. Thank you!"
 	},
@@ -768,7 +768,7 @@
 			"customWeekends": "Custom weekends",
 			"customWeekendsDescription": "Define custom non-working days beyond the standard Saturday-Sunday weekend",
 			"multiYearPlanning": "Multi-year planning",
-			"multiYearPlanningDescription": "Plan vacations across multiple years with carryover support",
+			"multiYearPlanningDescription": "Plan vacations across multiple years with carry-over support",
 			"calendarSubscription": "Live calendar subscription",
 			"calendarSubscriptionDescription": "Subscribe directly from Google Calendar, Apple Calendar or Outlook via a webcal:// URL; your plan stays in sync automatically"
 		}
@@ -799,7 +799,7 @@
 		"stripeSidDesc": "Session identifier for fraud prevention. Required for checkout process.",
 		"gaDesc": "Distinguishes unique users.",
 		"gaStarDesc": "Maintains session state for analytics tracking.",
-		"gidDesc": "Distinguishes users for short-term analytics",
+		"gidDesc": "Distinguishes users for short-term analytics.",
 		"learnMore": "Learn more",
 		"provider": "Provider: {name}",
 		"bsUidDesc": "Unique visitor identifier for Better Stack analytics tracking",
