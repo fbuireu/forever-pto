@@ -951,7 +951,7 @@
 			"command": "Trabaja menos.",
 			"verb": "Viaja",
 			"highlight": "más",
-			"description": "Forever PTO calcula <em>exactamente</em> qué días pedir libre para que tus 22 días de PTO se conviertan en <strong>70+ días fuera de la oficina</strong>. Sin Excel y sin hacer cuentas.",
+			"description": "Forever PTO calcula <em>exactamente</em> qué días pedir libre para que tus 22 días de PTO se conviertan en <strong>70+ días fuera de la oficina</strong>. Sin excels. Sin matemáticas. Sin remordimiento.",
 			"plannerCta": "Calcular mis días →",
 			"demoLink": "Ver cómo va (30s)",
 			"stars": "{rating} · {users} empleados rebeldes ya lo usan",
@@ -976,10 +976,10 @@
 			"question1": "qué hago",
 			"question2": "ya tengo el viaje",
 			"titleEnd": "en 60 segundos.",
-			"description": "No instalas nada, no das la tarjeta ni te apuntas a ninguna newsletter. Dinos cuántos días tienes y dónde vives.",
+			"description": "Sin instalar nada. Sin tarjeta. Sin newsletter. Solo dinos cuántos días tienes y dónde vives.",
 			"inputDaysTitle": "Mete tus días.",
 			"inputDaysDescription": "Cuántos días de PTO tienes, en qué país o región trabajas. Eso es todo.",
-			"engineTitle": "El motor hace las cuentas.",
+			"engineTitle": "El motor hace magia.",
 			"engineDescription": "Cruza tus días con los festivos oficiales y los puentes regionales. Encuentra todas las combinaciones posibles y las ordena por ratio de descanso.",
 			"exportTitle": "Pides los días.",
 			"exportDescription": "Exporta a Google Calendar, Outlook o un PDF que pegas en el formulario de RR.HH. y ya está."
@@ -993,13 +993,13 @@
 		},
 		"features": {
 			"badge": "trucos del motor",
-			"titleStart": "Un calendario que es tu",
+			"titleStart": "No es un calendario. Es un",
 			"titleEmphasis": "aliado",
 			"titleEnd": "contra el lunes.",
 			"description": "Lo que Forever PTO hace para que no tengas que hacerlo tú.",
 			"bridgeTag": "detector de puentes",
 			"bridgeTitle": "Convierte 1 día de PTO en 4 libres.",
-			"bridgeDescription": "Detecta los festivos en martes y jueves y te dice qué día pedir. Un día de PTO bien puesto = un fin de semana de 4 días.",
+			"bridgeDescription": "Detecta festivos en martes y jueves y te sugiere construir puentes mínimos. Un día estratégico = un fin de semana de 4 días.",
 			"ratioTag": "max eficiencia",
 			"ratioDescription": "Mejor eficiencia: 8 días de PTO convertidos en 32 libres (Madrid).",
 			"syncTag": "sync en 1 clic",
@@ -1036,8 +1036,8 @@
 				"planInJanuary": "Lo planificas todo en enero, mientras esperas el café.",
 				"dayEfficiency": "Cada día de PTO te devuelve {ratio} días libres de media.",
 				"visualCalendar": "Visualizas el año entero en un calendario claro.",
-				"bookFirst": "Pides los días antes que nadie, y con datos.",
-				"burnAllDays": "Usas el 100% de tus días. Como debe ser."
+				"bookFirst": "Pides primero, sin remordimiento, con datos.",
+				"burnAllDays": "Quemas el 100% de tus días. Como debe ser."
 			}
 		},
 		"testimonials": {
@@ -1082,12 +1082,12 @@
 			"badge": "precio honesto",
 			"titleStart": "Paga una vez.",
 			"titleEmphasis": "Para siempre.",
-			"description": "Sin suscripción ni \"pruebas gratuitas\" que se renuevan solas.",
+			"description": "Sin SaaS. Sin suscripción. Sin \"prueba gratuita que se renueva sola\".",
 			"freeName": "Gratis siempre",
-			"freeTagline": "Pruébalo sin compromiso.",
+			"freeTagline": "Pruébalo. Te convencerá.",
 			"freePrice": "{amount}",
 			"freePer": "/siempre",
-			"freeNote": "Sin tarjeta ni email.",
+			"freeNote": "Sin tarjeta. Sin email. Sin nada.",
 			"freeFeatures": {
 				"optimizedPlan": "Plan de vacaciones auto-optimizado",
 				"countryHolidays": "Festivos de tu país y región",
@@ -1113,7 +1113,7 @@
 		},
 		"faq": {
 			"badge": "FAQ",
-			"title": "Preguntas frecuentes"
+			"title": "¿Preguntas? Tenemos respuestas."
 		},
 		"closing": {
 			"titleStart": "Tu próximo año",

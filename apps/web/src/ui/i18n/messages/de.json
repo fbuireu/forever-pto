@@ -951,7 +951,7 @@
 			"command": "Weniger arbeiten.",
 			"verb": "Reise",
 			"highlight": "mehr",
-			"description": "Forever PTO berechnet <em>genau</em>, welche Tage du beantragen musst, damit aus deinen 22 PTO-Tagen <strong>70+ Tage außer Haus</strong> werden, ganz ohne Tabellen und Kopfzerbrechen.",
+			"description": "Forever PTO berechnet <em>genau</em>, welche Tage du beantragen musst, damit aus deinen 22 PTO-Tagen <strong>70+ Tage außer Haus</strong> werden. Keine Tabellen. Kein Kopfzerbrechen. Kein schlechtes Gewissen.",
 			"plannerCta": "Meine Tage berechnen →",
 			"demoLink": "So funktioniert’s (30 s)",
 			"stars": "{rating} · genutzt von {users} rebellischen Mitarbeitern",
@@ -976,10 +976,10 @@
 			"question1": "was soll ich tun",
 			"question2": "Reise gebucht",
 			"titleEnd": "in 60 Sekunden.",
-			"description": "Ohne Installation, Kreditkarte oder Newsletter. Sag uns einfach, wie viele Tage du hast und wo du wohnst.",
+			"description": "Keine Installation. Keine Kreditkarte. Kein Newsletter. Sag uns einfach, wie viele Tage du hast und wo du wohnst.",
 			"inputDaysTitle": "Tage eingeben.",
-			"inputDaysDescription": "Wie viele PTO-Tage du hast und in welchem Land oder welcher Region du arbeitest.",
-			"engineTitle": "Der Planer rechnet.",
+			"inputDaysDescription": "Wie viele PTO-Tage du hast und in welchem Land oder welcher Region du arbeitest. Das war's.",
+			"engineTitle": "Die Engine zaubert.",
 			"engineDescription": "Der Planer gleicht deine Tage mit offiziellen Feiertagen und regionalen Brücken ab, findet alle möglichen Kombinationen und sortiert sie nach dem Verhältnis von freien Tagen zu eingesetzten PTO-Tagen.",
 			"exportTitle": "PTO-Tage beantragen.",
 			"exportDescription": "Exportiere den Plan nach Google Kalender, Outlook oder als PDF und trag ihn ins HR-Formular ein."
@@ -993,13 +993,13 @@
 		},
 		"features": {
 			"badge": "Funktionen",
-			"titleStart": "Dein",
+			"titleStart": "Kein Kalender. Ein",
 			"titleEmphasis": "Verbündeter",
 			"titleEnd": "gegen Montage.",
 			"description": "Das erledigt Forever PTO automatisch für dich.",
 			"bridgeTag": "Brückentage",
 			"bridgeTitle": "1 PTO-Tag in 4 freie Tage verwandeln.",
-			"bridgeDescription": "Erkennt Feiertage an Dienstagen und Donnerstagen und schlägt minimale Brücken vor. Ein PTO-Tag = ein 4-Tage-Wochenende.",
+			"bridgeDescription": "Erkennt Feiertage an Dienstagen und Donnerstagen und schlägt minimale Brücken vor. Ein strategischer Tag = ein 4-Tage-Wochenende.",
 			"ratioTag": "Max. Effizienz",
 			"ratioDescription": "Beste Effizienz: 8 PTO-Tage werden zu 33 freien Tagen (Bayern).",
 			"syncTag": "Sync mit 1 Klick",
@@ -1036,8 +1036,8 @@
 				"planInJanuary": "Du planst alles im Januar, während du auf deinen Kaffee wartest.",
 				"dayEfficiency": "Jeder PTO-Tag gibt dir im Schnitt {ratio} freie Tage zurück.",
 				"visualCalendar": "Du siehst das ganze Jahr in einem übersichtlichen Kalender.",
-				"bookFirst": "Du buchst als Erster, mit Zahlen im Rücken und ohne schlechtes Gewissen.",
-				"burnAllDays": "Du nutzt 100% deiner Tage, so wie es sein sollte."
+				"bookFirst": "Du buchst zuerst, ohne schlechtes Gewissen, mit Daten.",
+				"burnAllDays": "Du verbrauchst 100% deiner Tage. So wie es sein sollte."
 			}
 		},
 		"testimonials": {
@@ -1082,12 +1082,12 @@
 			"badge": "Ehrliche Preise",
 			"titleStart": "Einmal bezahlen.",
 			"titleEmphasis": "Für immer.",
-			"description": "Kein Abo und kein „7-Tage-Test, der sich automatisch verlängert“.",
+			"description": "Kein SaaS. Kein Abo. Kein „7-Tage-Test, der sich automatisch verlängert“.",
 			"freeName": "Kostenlos für immer",
-			"freeTagline": "Probier es einfach aus.",
+			"freeTagline": "Probier es aus. Es wird dich überzeugen.",
 			"freePrice": "{amount}",
 			"freePer": "/immer",
-			"freeNote": "Ohne Karte und ohne E-Mail.",
+			"freeNote": "Keine Karte. Keine E-Mail. Nichts.",
 			"freeFeatures": {
 				"optimizedPlan": "Automatisch optimierter Urlaubsplan",
 				"countryHolidays": "Feiertage deines Landes und deiner Region",
@@ -1113,13 +1113,13 @@
 		},
 		"faq": {
 			"badge": "FAQ",
-			"title": "Häufige Fragen"
+			"title": "Fragen? Wir haben Antworten."
 		},
 		"closing": {
 			"titleStart": "Dein nächstes",
 			"titleEmphasis": "freies",
 			"titleEnd": "Jahr beginnt heute.",
-			"description": "Aus 22 Tagen können über 70 werden, wenn du weißt, wo du sie hinlegst. Das übernehmen wir.",
+			"description": "22 Tage können über 70 werden. Du musst nur wissen, wo du sie platzierst. Das machen wir.",
 			"cta": "Meine freien Tage berechnen →",
 			"shapes": {
 				"byeMonday": "tschüss, Montag",

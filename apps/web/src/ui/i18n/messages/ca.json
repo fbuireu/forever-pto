@@ -951,7 +951,7 @@
 			"command": "Treballa menys.",
 			"verb": "Viatja",
 			"highlight": "més",
-			"description": "Forever PTO calcula <em>exactament</em> quins dies has de demanar perquè els teus 22 dies de PTO es converteixin en <strong>70+ dies fora de l'oficina</strong>. Sense fulls de càlcul ni comptes a mà.",
+			"description": "Forever PTO calcula <em>exactament</em> quins dies has de demanar perquè els teus 22 dies de PTO es converteixin en <strong>70+ dies fora de l'oficina</strong>. Sense fulls de càlcul. Sense matemàtiques. Sense remordiments.",
 			"plannerCta": "Calcula els meus dies →",
 			"demoLink": "Mira com funciona (30 s)",
 			"stars": "{rating} · utilitzat per {users} treballadors rebels",
@@ -976,10 +976,10 @@
 			"question1": "què faig",
 			"question2": "ja tinc el viatge",
 			"titleEnd": "en 60 segons.",
-			"description": "No cal instal·lar res ni posar cap targeta. Només has de dir-nos quants dies tens i on vius.",
+			"description": "Sense instal·lar res. Sense targeta. Sense butlletins. Només has de dir-nos quants dies tens i on vius.",
 			"inputDaysTitle": "Introdueix els teus dies.",
-			"inputDaysDescription": "Quants dies de PTO tens i a quin país o regió treballes.",
-			"engineTitle": "El motor fa els càlculs.",
+			"inputDaysDescription": "Quants dies de PTO tens i a quin país o regió treballes. Això és tot.",
+			"engineTitle": "El motor fa la màgia.",
 			"engineDescription": "Creua els teus dies amb els festius oficials i els ponts regionals. Troba totes les combinacions possibles i les ordena per \"ràtio de descans\".",
 			"exportTitle": "Demana els dies.",
 			"exportDescription": "Exporta a Google Calendar, a Outlook o a un PDF que adjuntes al formulari de RRHH i te n'oblides."
@@ -993,7 +993,7 @@
 		},
 		"features": {
 			"badge": "trucs del motor",
-			"titleStart": "El teu",
+			"titleStart": "No és un calendari. És un",
 			"titleEmphasis": "aliat",
 			"titleEnd": "contra el dilluns.",
 			"description": "Això és el que Forever PTO fa per tu sense que hagis de fer res.",
@@ -1036,7 +1036,7 @@
 				"planInJanuary": "Ho planifiques tot al gener, mentre esperes el cafè.",
 				"dayEfficiency": "Cada dia de PTO et retorna {ratio} dies lliures de mitjana.",
 				"visualCalendar": "Veus tot l'any en un sol calendari.",
-				"bookFirst": "Demanes els dies abans que ningú, amb les dades a la mà.",
+				"bookFirst": "Demanes primer, sense remordiments, amb dades.",
 				"burnAllDays": "Gastes el 100% dels teus dies. Com ha de ser."
 			}
 		},
@@ -1082,12 +1082,12 @@
 			"badge": "preu honest",
 			"titleStart": "Paga una vegada.",
 			"titleEmphasis": "Per sempre.",
-			"description": "Sense subscripció ni cap \"prova gratuïta\" que es renova sola.",
+			"description": "Sense SaaS. Sense subscripció. Sense \"prova gratuïta que es renova sola\".",
 			"freeName": "Gratis per sempre",
-			"freeTagline": "Prova-ho sense pagar res.",
+			"freeTagline": "Prova-ho. Et convencerà.",
 			"freePrice": "{amount}",
 			"freePer": "/sempre",
-			"freeNote": "Sense targeta ni correu.",
+			"freeNote": "Sense targeta. Sense correu. Res.",
 			"freeFeatures": {
 				"optimizedPlan": "Pla de vacances auto-optimitzat",
 				"countryHolidays": "Festius del teu país i regió",
@@ -1113,13 +1113,13 @@
 		},
 		"faq": {
 			"badge": "FAQ",
-			"title": "Preguntes freqüents"
+			"title": "Preguntes? Tenim respostes."
 		},
 		"closing": {
 			"titleStart": "El teu pròxim any",
 			"titleEmphasis": "lliure",
 			"titleEnd": "comença avui.",
-			"description": "22 dies poden ser més de 70 si saps on col·locar-los. Nosaltres t'ho calculem.",
+			"description": "22 dies poden ser més de 70. Només cal saber on col·locar-los. Això ho fem nosaltres.",
 			"cta": "Calcula els meus dies lliures →",
 			"shapes": {
 				"byeMonday": "adeu, dilluns",

@@ -951,7 +951,7 @@
 			"command": "Travaille moins.",
 			"verb": "Voyage",
 			"highlight": "plus",
-			"description": "Forever PTO calcule <em>exactement</em> quels jours poser pour transformer tes 22 jours de congé en <strong>70+ jours libres</strong>, sans tableur ni calculs.",
+			"description": "Forever PTO calcule <em>exactement</em> quels jours poser pour transformer tes 22 jours de congé en <strong>70+ jours libres</strong>. Pas de tableur. Pas de calculs. Pas de culpabilité.",
 			"plannerCta": "Calculer mes jours →",
 			"demoLink": "Voir comment ça marche (30s)",
 			"stars": "{rating} · utilisé par {users} employés rebelles",
@@ -976,10 +976,10 @@
 			"question1": "que faire",
 			"question2": "voyage réservé",
 			"titleEnd": "en 60 secondes.",
-			"description": "Rien à installer, pas de carte bancaire ni de newsletter. Dis-nous combien de jours tu as et où tu vis.",
+			"description": "Sans installation. Sans carte bancaire. Sans newsletter. Dis-nous combien de jours tu as et où tu vis.",
 			"inputDaysTitle": "Saisis tes jours.",
-			"inputDaysDescription": "Combien de jours de congé tu as, et dans quel pays ou quelle région tu travailles.",
-			"engineTitle": "Le moteur fait les calculs.",
+			"inputDaysDescription": "Combien de jours de congé tu as et dans quel pays ou région tu travailles. C'est tout.",
+			"engineTitle": "Le moteur fait la magie.",
 			"engineDescription": "Il croise tes jours avec les jours fériés officiels et régionaux, trouve toutes les combinaisons possibles et les classe par ratio de repos.",
 			"exportTitle": "Demande tes jours.",
 			"exportDescription": "Exporte vers Google Agenda, Outlook, ou un PDF à coller dans le formulaire RH, et n'y pense plus."
@@ -993,13 +993,13 @@
 		},
 		"features": {
 			"badge": "astuces du moteur",
-			"titleStart": "Un calendrier",
+			"titleStart": "Pas un calendrier. Un",
 			"titleEmphasis": "allié",
 			"titleEnd": "contre les lundis.",
 			"description": "Voici les coups que Forever PTO joue pour toi automatiquement.",
 			"bridgeTag": "détection des ponts",
 			"bridgeTitle": "Transforme 1 congé en 4 jours libres.",
-			"bridgeDescription": "Repère les jours fériés qui tombent un mardi ou un jeudi et propose le pont le moins coûteux. Un seul jour posé = un week-end de 4 jours.",
+			"bridgeDescription": "Détecte les jours fériés les mardis et jeudis et suggère des ponts minimaux. Un jour stratégique = un week-end de 4 jours.",
 			"ratioTag": "max efficacité",
 			"ratioDescription": "Meilleure efficacité : 8 jours de congé en 30 jours libres (France).",
 			"syncTag": "sync en 1 clic",
@@ -1036,7 +1036,7 @@
 				"planInJanuary": "Tu planifies tout en janvier, en attendant ton café.",
 				"dayEfficiency": "Chaque jour de congé te rend {ratio} jours libres en moyenne.",
 				"visualCalendar": "Tu visualises toute l'année dans un calendrier clair.",
-				"bookFirst": "Tu réserves avant les autres, chiffres à l'appui.",
+				"bookFirst": "Tu réserves en premier, sans culpabilité, avec des données.",
 				"burnAllDays": "Tu utilises 100% de tes jours. Comme il se doit."
 			}
 		},
@@ -1082,12 +1082,12 @@
 			"badge": "prix honnête",
 			"titleStart": "Paie une fois.",
 			"titleEmphasis": "Pour toujours.",
-			"description": "Ni abonnement ni « essai gratuit » qui se renouvelle tout seul.",
+			"description": "Pas de SaaS. Pas d'abonnement. Pas d'« essai gratuit qui se renouvelle automatiquement ».",
 			"freeName": "Gratuit pour toujours",
 			"freeTagline": "Essaie, ça va te convaincre.",
 			"freePrice": "{amount}",
 			"freePer": "/toujours",
-			"freeNote": "Ni carte ni e-mail.",
+			"freeNote": "Pas de carte. Pas d'e-mail. Rien.",
 			"freeFeatures": {
 				"optimizedPlan": "Plan de vacances auto-optimisé",
 				"countryHolidays": "Jours fériés de ton pays et région",
@@ -1113,13 +1113,13 @@
 		},
 		"faq": {
 			"badge": "FAQ",
-			"title": "Questions fréquentes"
+			"title": "Des questions ? On a des réponses."
 		},
 		"closing": {
 			"titleStart": "Ta prochaine année",
 			"titleEmphasis": "libre",
 			"titleEnd": "commence aujourd'hui.",
-			"description": "22 jours peuvent en devenir plus de 70 si tu sais où les placer. Le planificateur s'en charge.",
+			"description": "22 jours peuvent devenir plus de 70. Il suffit de savoir où les placer. C'est ce qu'on fait.",
 			"cta": "Calculer mes jours libres →",
 			"shapes": {
 				"byeMonday": "adieu, lundi",

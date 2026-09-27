@@ -951,7 +951,7 @@
 			"command": "Work less.",
 			"verb": "Travel",
 			"highlight": "more",
-			"description": "Forever PTO calculates <em>exactly</em> which days to request off so your 22 PTO days become <strong>70+ days out of the office</strong>, without a spreadsheet.",
+			"description": "Forever PTO calculates <em>exactly</em> which days to request off so your 22 PTO days become <strong>70+ days out of the office</strong>. No spreadsheets. No math. No guilt.",
 			"plannerCta": "Calculate my days →",
 			"demoLink": "See how it works (30s)",
 			"stars": "{rating} · used by {users} rebel employees",
@@ -976,10 +976,10 @@
 			"question1": "what do I do",
 			"question2": "trip is booked",
 			"titleEnd": "in 60 seconds.",
-			"description": "Nothing to install and no credit card. Tell us how many days you have and where you live.",
+			"description": "No install. No credit card. No newsletter. Just tell us how many days you have and where you live.",
 			"inputDaysTitle": "Enter your days.",
-			"inputDaysDescription": "How many PTO days you have and which country or region you work in.",
-			"engineTitle": "The engine does the math.",
+			"inputDaysDescription": "How many PTO days you have and which country or region you work in. That's it.",
+			"engineTitle": "The engine does the magic.",
 			"engineDescription": "It checks your days against national and regional holidays, finds every possible bridge and ranks them by days off per PTO day.",
 			"exportTitle": "Request your days off.",
 			"exportDescription": "Export to Google Calendar, Outlook, or a PDF to attach to your HR request."
@@ -993,13 +993,13 @@
 		},
 		"features": {
 			"badge": "engine tricks",
-			"titleStart": "Your",
+			"titleStart": "Not a calendar. An",
 			"titleEmphasis": "ally",
 			"titleEnd": "against Mondays.",
 			"description": "What Forever PTO works out for you.",
 			"bridgeTag": "bridges",
 			"bridgeTitle": "Turn 1 PTO day into 4 days off.",
-			"bridgeDescription": "Detects holidays on Tuesdays and Thursdays and suggests minimal bridges. One PTO day on the right date gives you a 4-day weekend.",
+			"bridgeDescription": "Detects holidays on Tuesdays and Thursdays and suggests minimal bridges. One strategic day = a 4-day weekend.",
 			"ratioTag": "max efficiency",
 			"ratioDescription": "Best efficiency: 8 PTO days turned into 32 free days (Madrid).",
 			"syncTag": "sync in 1 click",
@@ -1036,8 +1036,8 @@
 				"planInJanuary": "You plan everything in January, while waiting for your coffee.",
 				"dayEfficiency": "Each PTO day gives you back {ratio} free days on average.",
 				"visualCalendar": "You see the whole year in one calendar.",
-				"bookFirst": "You book your dates first, with the numbers to back them.",
-				"burnAllDays": "You use every one of your days, as you should."
+				"bookFirst": "You book first, guilt-free, with data.",
+				"burnAllDays": "You burn 100% of your days. As it should be."
 			}
 		},
 		"testimonials": {
@@ -1082,12 +1082,12 @@
 			"badge": "honest pricing",
 			"titleStart": "Pay once.",
 			"titleEmphasis": "Forever.",
-			"description": "No subscription, and no \"7-day trial\" that renews itself.",
+			"description": "No SaaS. No subscription. No \"7-day trial that auto-renews\".",
 			"freeName": "Free Forever",
-			"freeTagline": "Try it and see.",
+			"freeTagline": "Try it. It will convince you.",
 			"freePrice": "{amount}",
 			"freePer": "/always",
-			"freeNote": "No credit card, no email.",
+			"freeNote": "No credit card. No email. Nothing.",
 			"freeFeatures": {
 				"optimizedPlan": "Auto-optimized vacation plan",
 				"countryHolidays": "Country & region holidays",
@@ -1099,7 +1099,7 @@
 			"lifetimeTagline": "Minimum donation of {amount}. Use it forever.",
 			"lifetimePrice": "From {amount}",
 			"lifetimePer": " one time",
-			"lifetimeNote": "Entirely optional. It keeps the project running.",
+			"lifetimeNote": "100% optional. Keeps the project alive.",
 			"lifetimeFeatures": {
 				"manualEditing": "Manual calendar editing",
 				"calendarExport": "Export to Google · Outlook · Apple · PDF",
@@ -1113,13 +1113,13 @@
 		},
 		"faq": {
 			"badge": "FAQ",
-			"title": "Common questions"
+			"title": "Questions? We have answers."
 		},
 		"closing": {
 			"titleStart": "Your next",
 			"titleEmphasis": "free",
 			"titleEnd": "year starts today.",
-			"description": "22 days can become more than 70 if you know where to place them. Forever PTO works that out for you.",
+			"description": "22 days can become more than 70. You just need to know where to place them. That's what we do.",
 			"cta": "Calculate my free days →",
 			"shapes": {
 				"byeMonday": "bye, monday",

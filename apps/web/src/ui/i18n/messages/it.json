@@ -951,7 +951,7 @@
 			"command": "Lavora meno.",
 			"verb": "Viaggia",
 			"highlight": "di più",
-			"description": "Forever PTO calcola <em>esattamente</em> quali giorni richiedere per trasformare i tuoi 22 giorni di PTO in <strong>70+ giorni fuori dall'ufficio</strong>. Senza fogli Excel e senza fare calcoli.",
+			"description": "Forever PTO calcola <em>esattamente</em> quali giorni richiedere per trasformare i tuoi 22 giorni di PTO in <strong>70+ giorni fuori dall'ufficio</strong>. Senza fogli Excel. Senza matematica. Senza stress.",
 			"plannerCta": "Calcola i miei giorni →",
 			"demoLink": "Scopri come funziona (30s)",
 			"stars": "{rating} · usato da {users} dipendenti ribelli",
@@ -976,10 +976,10 @@
 			"question1": "cosa faccio",
 			"question2": "viaggio prenotato",
 			"titleEnd": "in 60 secondi.",
-			"description": "Non devi installare nulla, inserire una carta o iscriverti a una newsletter. Dicci solo quanti giorni hai e dove vivi.",
+			"description": "Senza installare nulla. Senza carta di credito. Senza newsletter. Dicci solo quanti giorni hai e dove vivi.",
 			"inputDaysTitle": "Inserisci i tuoi giorni.",
 			"inputDaysDescription": "Quanti giorni di PTO hai e in quale paese o regione lavori. Tutto qui.",
-			"engineTitle": "Il motore fa i calcoli.",
+			"engineTitle": "Il motore fa magie.",
 			"engineDescription": "Trova tutte le combinazioni possibili e le ordina per efficienza: quanti giorni liberi ottieni per ogni giorno di PTO usato.",
 			"exportTitle": "Richiedi i giorni liberi.",
 			"exportDescription": "Esporta su Google Calendar, Outlook o in un PDF da allegare alla richiesta all'HR, e non pensarci più."
@@ -993,7 +993,7 @@
 		},
 		"features": {
 			"badge": "Trucchi del motore",
-			"titleStart": "Il tuo",
+			"titleStart": "Non è un calendario. È un",
 			"titleEmphasis": "alleato",
 			"titleEnd": "contro il lunedì.",
 			"description": "Queste sono le mosse che Forever PTO fa automaticamente per te.",
@@ -1113,13 +1113,13 @@
 		},
 		"faq": {
 			"badge": "FAQ",
-			"title": "Domande frequenti"
+			"title": "Domande? Abbiamo risposte."
 		},
 		"closing": {
 			"titleStart": "Il tuo prossimo anno",
 			"titleEmphasis": "libero",
 			"titleEnd": "inizia oggi.",
-			"description": "22 giorni possono diventare più di 70, se sai dove metterli. A quello pensiamo noi.",
+			"description": "22 giorni possono diventare più di 70. Devi solo sapere dove metterli. Lo facciamo noi.",
 			"cta": "Calcola i miei giorni liberi →",
 			"shapes": {
 				"byeMonday": "ciao, lunedì",
