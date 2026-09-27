@@ -36,13 +36,13 @@
 		},
 		"planner": {
 			"title": "Planificateur | Forever PTO",
-			"description": "Planifie et optimise tes jours de congé. Calendrier de congés intelligent avec détection des jours fériés, optimiseur de ponts et export vers Google Agenda, Outlook et Apple."
+			"description": "Planifie et optimise tes jours de congé. Calendrier de congés qui détecte les jours fériés, trouve les meilleurs ponts et exporte vers Google Agenda, Outlook et Apple."
 		}
 	},
 	"planner": {
 		"title": "Forever PTO",
 		"heading": "Planificateur",
-		"description": "Ton planificateur de congés intelligent. Configure tes jours de congé, ton pays et ta stratégie pour profiter au maximum de chaque jour férié.",
+		"description": "Ton planificateur de congés. Indique tes jours de congé, ton pays et ta stratégie pour tirer parti de chaque jour férié.",
 		"titleHighlight1": "Ton année",
 		"titleHighlight2": "libre",
 		"instructions": "Commence par ajouter tes jours et le reste de ta configuration dans la barre latérale gauche. Encore des questions ?",
@@ -141,7 +141,7 @@
 				},
 				"whatIs": {
 					"question": "Qu'est-ce que c'est ?",
-					"answer": "Forever PTO est un outil qui t'aide à planifier et optimiser tes jours de congé en te suggérant les meilleures dates à poser en fonction des jours fériés et de tes préférences. Planifier ses vacances peut vite devenir compliqué : Forever PTO simplifie tout pour que tu profites au maximum de chaque jour. Tu peux choisir différentes stratégies pour répartir tes jours de repos sur l'année, personnaliser entièrement les jours fériés et leurs noms, et même ajouter des jours fériés propres à ton entreprise ou à ta région."
+					"answer": "Forever PTO est un outil qui t'aide à planifier et optimiser tes jours de congé en te suggérant les meilleures dates à poser en fonction des jours fériés et de tes préférences. Tu peux choisir différentes stratégies pour répartir tes jours de repos sur l'année, personnaliser entièrement les jours fériés et leurs noms, et même ajouter des jours fériés propres à ton entreprise ou à ta région."
 				},
 				"whyNotSeeingCountry": {
 					"question": "Pourquoi mon pays ou mes jours fériés ne s'affichent-ils pas correctement ?",
@@ -149,7 +149,7 @@
 				},
 				"pricing": {
 					"question": "Pourquoi y a-t-il un modèle payant ?",
-					"answer": "Forever PTO est gratuit. Nous utilisons cependant un modèle payant pour couvrir les coûts de maintenance des données, de l'infrastructure et des améliorations continues. Le modèle payant finance les mises à jour, le support et l'hébergement. Nous proposons également une offre gratuite avec les fonctionnalités essentielles pour que tout le monde puisse mieux planifier ses congés."
+					"answer": "Forever PTO est gratuit. Un modèle payant couvre cependant la maintenance des données, l'hébergement, le support et les mises à jour. L'offre gratuite garde les fonctionnalités essentielles pour que tout le monde puisse mieux planifier ses congés."
 				},
 				"premium": {
 					"question": "Que débloque premium ?",
@@ -195,7 +195,7 @@
 				},
 				"encryption": {
 					"question": "Mes données sont-elles chiffrées ?",
-					"answer": "Tes données de planification de vacances sont stockées localement dans ton navigateur. Nous appliquons une légère obfuscation (XOR) pour que les données ne soient pas lisibles au premier coup d'œil. Ce n'est pas du chiffrement et cela ne protège pas contre un attaquant déterminé : cela évite une exposition accidentelle. Nous ne stockons pas d'informations personnelles sensibles, et tu gardes le contrôle total de tes données sur ton appareil. Toutes tes données (jours de congé, dates sélectionnées, jours fériés personnalisés, préférences) sont stockées exclusivement dans le stockage local de ton navigateur. Nous n'envoyons jamais ces informations à nos serveurs. Ta planification de vacances reste entièrement privée sur ton appareil."
+					"answer": "Toutes tes données (jours de congé, dates sélectionnées, jours fériés personnalisés, préférences) sont stockées uniquement dans le stockage local de ton navigateur, et nous ne les envoyons jamais à nos serveurs. Nous leur appliquons une légère obfuscation (XOR) pour qu'elles ne soient pas lisibles au premier coup d'œil. Ce n'est pas du chiffrement et cela ne protège pas contre un attaquant déterminé : cela évite seulement une exposition accidentelle. Nous ne stockons pas d'informations personnelles sensibles."
 				},
 				"tracking": {
 					"question": "Vendez-vous mes données ou suivez-vous mes projets de congés ?",
@@ -213,7 +213,7 @@
 				"title": "Envie de collaborer ?",
 				"code": {
 					"question": "Comment contribuer au code ou proposer des idées ?",
-					"answer": "<link>Ouvre des issues ou des merge requests</link> avec tes propositions. Nous avons besoin d'aide sur les algorithmes, les intégrations et les améliorations UX."
+					"answer": "<link>Ouvre des issues ou des pull requests</link> avec tes propositions. Nous avons besoin d'aide sur les algorithmes, les intégrations et les améliorations UX."
 				},
 				"business": {
 					"question": "Proposer des intégrations ou des partenariats d'entreprise",
@@ -221,7 +221,7 @@
 				},
 				"nonCode": {
 					"question": "Puis-je collaborer si je ne suis pas développeur ?",
-					"answer": "Oui. Les retours sur l'UX, les textes, les traductions, l'exactitude des jours fériés, les tests et les idées de partenariat sont très utiles. Si tu repères des frictions ou si tu as un besoin spécifique à ton marché, écris-nous et on en parle ensemble."
+					"answer": "Oui. Les retours sur l'UX, les textes, les traductions, l'exactitude des jours fériés, les tests et les idées de partenariat sont très utiles. Si tu repères des frictions ou si tu as un besoin spécifique à ton marché, écris-nous et on en parle."
 				}
 			}
 		}
@@ -353,17 +353,17 @@
 			"toolsTitle": "Calculateurs et outils",
 			"toolsDescription": "Les calculateurs sont ici : estime combien de jours de congé tu as acquis, découvre ce que tes jours non utilisés te coûtent en salaire, ou compte les jours ouvrés entre deux dates.",
 			"alternativesTitle": "Gestionnaire d'alternatives",
-			"alternativesDescription": "Navigue parmi différentes suggestions de congés qu'on a calculées pour toi. Compare les métriques d'efficacité, le total de jours effectifs et trouve l'équilibre parfait. La première alternative est toujours la suggestion recommandée, marquée d'une étincelle. Utilise les flèches pour explorer les alternatives et clique sur \"Appliquer l'alternative\" pour en choisir une différente.",
+			"alternativesDescription": "Parcours les autres plans calculés pour toi et compare leur efficacité et leur total de jours effectifs. La première alternative est toujours la suggestion recommandée, marquée d'une étincelle. Utilise les flèches pour passer de l'une à l'autre et clique sur \"Appliquer l'alternative\" pour en choisir une autre.",
 			"statusTitle": "Suivi du statut des congés",
 			"statusDescription": "Suis l'utilisation de tes congés en temps réel. Tu vois les jours attribués automatiquement (suggérés par l'app), les jours sélectionnés manuellement et les jours restants. Tu peux réinitialiser les modifications manuelles à tout moment pour revenir à la suggestion d'origine.",
 			"calendarTitle": "Ton calendrier interactif de congés",
 			"calendarDescription": "Voici ton calendrier annuel en un coup d'œil. Les jours fériés apparaissent en gris, les jours de congé suggérés en bleu-vert et les jours sélectionnés manuellement en bleu. Clique sur n'importe quel jour ouvré pour le sélectionner ou le désélectionner manuellement. Le calendrier se met à jour instantanément lorsque tu explores différentes alternatives.",
 			"finishTitle": "C'est tout bon !",
-			"finishDescription": "Maintenant tu sais comment utiliser Forever PTO pour maximiser ton temps libre. Commence par configurer tes préférences dans la barre latérale et laisse l'application te suggérer les meilleurs jours de congé. Profite bien de tes pauses méritées !",
+			"finishDescription": "Tu sais maintenant comment utiliser Forever PTO. Configure tes préférences dans la barre latérale et l'application te suggérera les meilleurs jours à poser. Bonnes vacances !",
 			"holidaysListTitle": "Personnalise tes jours fériés",
 			"holidaysListDescription": "Ici, tu peux affiner les données des jours fériés pour qu'elles correspondent exactement à ta situation. Modifie ou supprime n'importe quel jour férié national ou régional, et ajoute tes propres jours de repos : jours fériés d'entreprise, fêtes locales ou toute date qui compte pour toi. Plus les données sont précises, meilleures seront les suggestions.",
 			"step1Title": "Ton contexte",
-			"step1Description": "Sélectionne ton pays, ta région et l'année que tu veux planifier. Cela permet de configurer ton calendrier des jours fériés pour trouver les meilleurs ponts.",
+			"step1Description": "Sélectionne ton pays, ta région et l'année que tu veux planifier. On en déduit tes jours fériés, qui servent à trouver les meilleurs ponts.",
 			"step2Title": "Tes jours de congé",
 			"step2Description": "Indique combien de jours de congé tu as. C'est la base de tous les calculs.",
 			"step3Title": "Ta configuration",
@@ -587,7 +587,7 @@
 		},
 		"carryOverMonths": {
 			"title": "Mois de report",
-			"tooltip": "Étend la recherche sur les premiers mois de l'année suivante pour trouver plus d'opportunités.",
+			"tooltip": "Étend la recherche aux premiers mois de l'année suivante.",
 			"tooltipLabel": "Plus d'informations sur le report"
 		},
 		"years": {
@@ -751,14 +751,14 @@
 		"future": "Futur",
 		"detailedView": "Vue détaillée",
 		"haveSuggestion": "Tu as une suggestion ?",
-		"feedbackShapes": "Tes retours façonnent notre feuille de route. Partage tes idées et aide-nous à construire le planificateur de vacances parfait.",
+		"feedbackShapes": "Tes retours orientent notre feuille de route. Partage tes idées pour nous aider à améliorer le planificateur.",
 		"gotAnIdea": "Tu as une idée qui te faciliterait la vie ?",
 		"letsTalk": "Parlons-en",
 		"or": "ou",
 		"openIssue": "ouvre un ticket sur GitHub",
 		"features": {
 			"corePtoCalculator": "Calculateur de congés principal",
-			"corePtoCalculatorDescription": "Planification intelligente des vacances avec optimisation des jours fériés et détection des ponts",
+			"corePtoCalculatorDescription": "Planification des vacances autour des jours fériés, avec détection des ponts",
 			"multipleCountries": "Prise en charge de plusieurs pays",
 			"multipleCountriesDescription": "Prise en charge des jours fériés des pays européens, avec des règles propres à chaque région",
 			"premiumFeatures": "Fonctionnalités premium",
@@ -784,7 +784,7 @@
 			"blockedPeriods": "Périodes bloquées",
 			"blockedPeriodsDescription": "Marque les périodes où tu ne veux aucune suggestion de congés : conférences, voyages, arrêts maladie ou tout moment où tu sais que tu seras occupé",
 			"performanceOptimization": "Optimisation des performances",
-			"performanceOptimizationDescription": "Calculs plus rapides et expérience plus fluide grâce aux Web Workers",
+			"performanceOptimizationDescription": "Calculs plus rapides et interface plus réactive grâce aux Web Workers",
 			"customWeekends": "Week-ends personnalisés",
 			"customWeekendsDescription": "Définis des jours chômés personnalisés au-delà du week-end standard samedi-dimanche",
 			"multiYearPlanning": "Planification pluriannuelle",
@@ -861,7 +861,7 @@
 		"title": "Le serveur a pris un",
 		"titleHighlight": "jour de congé",
 		"titleEmphasis": "sans demander la permission.",
-		"lede": "Quelque chose a planté de notre côté. Ce n'est pas ta faute (cette fois). Notre équipe est déjà dessus : les logs fument et on s'en occupe. Reviens dans quelques minutes, ou consulte le statut en direct.",
+		"lede": "Quelque chose a planté de notre côté. Ce n'est pas ta faute (cette fois), et on est déjà dessus. Reviens dans quelques minutes ou consulte le statut en direct.",
 		"statusPage": "Voir le statut",
 		"meanwhile": "En attendant :",
 		"contact": "Signaler un problème",
@@ -935,7 +935,7 @@
 			"confirmed": "Confirmé",
 			"paymentId": "Identifiant de paiement",
 			"premiumActivationFailed": "Ton paiement a bien été effectué, mais nous n’avons pas pu activer l’accès premium automatiquement. Recharge cette page ou récupère ton accès avec l’e-mail utilisé pour payer.",
-			"premiumActivated": "Ton accès premium a été activé. Tu peux désormais profiter de toutes les fonctionnalités premium !",
+			"premiumActivated": "Ton accès premium a été activé. Toutes les fonctionnalités premium sont débloquées.",
 			"continueHome": "Continuer vers l'accueil"
 		}
 	},
@@ -951,7 +951,7 @@
 			"command": "Travaille moins.",
 			"verb": "Voyage",
 			"highlight": "plus",
-			"description": "Forever PTO calcule <em>exactement</em> quels jours poser pour transformer tes 22 jours de congé en <strong>70+ jours libres</strong>. Pas de tableur. Pas de calculs. Pas de culpabilité.",
+			"description": "Forever PTO calcule <em>exactement</em> quels jours poser pour transformer tes 22 jours de congé en <strong>70+ jours libres</strong>, sans tableur ni calculs.",
 			"plannerCta": "Calculer mes jours →",
 			"demoLink": "Voir comment ça marche (30s)",
 			"stars": "{rating} · utilisé par {users} employés rebelles",
@@ -976,11 +976,11 @@
 			"question1": "que faire",
 			"question2": "voyage réservé",
 			"titleEnd": "en 60 secondes.",
-			"description": "Sans installation. Sans carte bancaire. Sans newsletter. Dis-nous combien de jours tu as et où tu vis.",
+			"description": "Rien à installer, pas de carte bancaire ni de newsletter. Dis-nous combien de jours tu as et où tu vis.",
 			"inputDaysTitle": "Saisis tes jours.",
-			"inputDaysDescription": "Combien de jours de congé tu as et dans quel pays ou région tu travailles. C'est tout.",
-			"engineTitle": "Le moteur fait la magie.",
-			"engineDescription": "Il croise tes jours avec les jours fériés officiels et les ponts régionaux. Trouve toutes les combinaisons possibles et les classe par ratio de repos.",
+			"inputDaysDescription": "Combien de jours de congé tu as, et dans quel pays ou quelle région tu travailles.",
+			"engineTitle": "Le moteur fait les calculs.",
+			"engineDescription": "Il croise tes jours avec les jours fériés officiels et régionaux, trouve toutes les combinaisons possibles et les classe par ratio de repos.",
 			"exportTitle": "Demande tes jours.",
 			"exportDescription": "Exporte vers Google Agenda, Outlook, ou un PDF à coller dans le formulaire RH, et n'y pense plus."
 		},
@@ -993,18 +993,18 @@
 		},
 		"features": {
 			"badge": "astuces du moteur",
-			"titleStart": "Pas un calendrier. Un",
+			"titleStart": "Un calendrier",
 			"titleEmphasis": "allié",
 			"titleEnd": "contre les lundis.",
 			"description": "Voici les coups que Forever PTO joue pour toi automatiquement.",
-			"bridgeTag": "ponts intelligents",
+			"bridgeTag": "détection des ponts",
 			"bridgeTitle": "Transforme 1 congé en 4 jours libres.",
-			"bridgeDescription": "Détecte les jours fériés les mardis et jeudis et suggère des ponts minimaux. Un jour stratégique = un week-end de 4 jours.",
+			"bridgeDescription": "Repère les jours fériés qui tombent un mardi ou un jeudi et propose le pont le moins coûteux. Un seul jour posé = un week-end de 4 jours.",
 			"ratioTag": "max efficacité",
 			"ratioDescription": "Meilleure efficacité : 8 jours de congé en 30 jours libres (France).",
 			"syncTag": "sync en 1 clic",
 			"syncTitle": "Google · Outlook · iCal",
-			"syncDescription": "Exporte ton plan vers le calendrier que tu utilises déjà. Sans prise de tête.",
+			"syncDescription": "Exporte ton plan vers le calendrier que tu utilises déjà.",
 			"conflictsTag": "anti-conflits",
 			"conflictsTitle": "Te prévient avant ton patron.",
 			"conflictsDescription": "Marque les périodes interdites de ton entreprise.",
@@ -1018,12 +1018,12 @@
 			"countriesDescription": "Calendriers officiels mis à jour chaque année. Même les régionaux.",
 			"privacyTag": "100% local",
 			"privacyTitle": "Tes données ne quittent jamais ton navigateur.",
-			"privacyDescription": "Pas de connexion. Pas de compte. Tes données de congé sont stockées exclusivement dans ton navigateur ; nous ne les voyons jamais."
+			"privacyDescription": "Ni connexion ni compte : tes données de congé restent dans ton navigateur et nous ne les voyons jamais."
 		},
 		"comparison": {
 			"badge": "avant · après",
 			"title": "Avant vs. après Forever PTO",
-			"withoutTitle": "😩 Sans Forever PTO",
+			"withoutTitle": "Sans Forever PTO",
 			"withoutItems": {
 				"spreadsheetFrustration": "Tu ouvres un tableur et tu bloques sur la cellule C7.",
 				"missedBridge": "Tu demandes le lundi après un férié et personne ne te prévient.",
@@ -1031,12 +1031,12 @@
 				"colleagueConflict": "Un collègue réserve ta semaine en premier. Encore.",
 				"unusedDays": "Tu finis l'année avec 4 jours non utilisés."
 			},
-			"withTitle": "😎 Avec Forever PTO",
+			"withTitle": "Avec Forever PTO",
 			"withItems": {
 				"planInJanuary": "Tu planifies tout en janvier, en attendant ton café.",
 				"dayEfficiency": "Chaque jour de congé te rend {ratio} jours libres en moyenne.",
 				"visualCalendar": "Tu visualises toute l'année dans un calendrier clair.",
-				"bookFirst": "Tu réserves en premier, sans culpabilité, avec des données.",
+				"bookFirst": "Tu réserves avant les autres, chiffres à l'appui.",
 				"burnAllDays": "Tu utilises 100% de tes jours. Comme il se doit."
 			}
 		},
@@ -1082,12 +1082,12 @@
 			"badge": "prix honnête",
 			"titleStart": "Paie une fois.",
 			"titleEmphasis": "Pour toujours.",
-			"description": "Pas de SaaS. Pas d'abonnement. Pas d'« essai gratuit qui se renouvelle automatiquement ».",
+			"description": "Ni abonnement ni « essai gratuit » qui se renouvelle tout seul.",
 			"freeName": "Gratuit pour toujours",
 			"freeTagline": "Essaie, ça va te convaincre.",
 			"freePrice": "{amount}",
 			"freePer": "/toujours",
-			"freeNote": "Pas de carte. Pas d'e-mail. Rien.",
+			"freeNote": "Ni carte ni e-mail.",
 			"freeFeatures": {
 				"optimizedPlan": "Plan de vacances auto-optimisé",
 				"countryHolidays": "Jours fériés de ton pays et région",
@@ -1096,7 +1096,7 @@
 			},
 			"freeCta": "Commencer gratuitement",
 			"lifetimeName": "Pass Soutien",
-			"lifetimeTagline": "Don minimum de {amount}. Profites-en pour toujours.",
+			"lifetimeTagline": "Don minimum de {amount}, accès à vie.",
 			"lifetimePrice": "À partir de {amount}",
 			"lifetimePer": " en une fois",
 			"lifetimeNote": "100% facultatif. Maintient le projet en vie.",
@@ -1109,17 +1109,17 @@
 				"fullAnalytics": "Analyses complètes et graphiques visuels"
 			},
 			"lifetimeCta": "Soutenir le projet →",
-			"popularBadge": "le plus populaire 🔥"
+			"popularBadge": "le plus populaire"
 		},
 		"faq": {
 			"badge": "FAQ",
-			"title": "Des questions ? On a des réponses."
+			"title": "Questions fréquentes"
 		},
 		"closing": {
 			"titleStart": "Ta prochaine année",
 			"titleEmphasis": "libre",
 			"titleEnd": "commence aujourd'hui.",
-			"description": "22 jours peuvent devenir plus de 70. Il suffit de savoir où les placer. C'est ce qu'on fait.",
+			"description": "22 jours peuvent en devenir plus de 70 si tu sais où les placer. Le planificateur s'en charge.",
 			"cta": "Calculer mes jours libres →",
 			"shapes": {
 				"byeMonday": "adieu, lundi",

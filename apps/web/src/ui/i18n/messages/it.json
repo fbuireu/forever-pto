@@ -36,13 +36,13 @@
 		},
 		"planner": {
 			"title": "Pianificatore | Forever PTO",
-			"description": "Pianifica e ottimizza i tuoi giorni di PTO. Calendario PTO intelligente con rilevamento dei festivi, ottimizzatore di ponti ed esportazione su Google Calendar, Outlook e Apple."
+			"description": "Pianifica e ottimizza i tuoi giorni di PTO. Calendario PTO con rilevamento dei festivi, ottimizzatore di ponti ed esportazione su Google Calendar, Outlook e Apple."
 		}
 	},
 	"planner": {
 		"title": "Forever PTO",
 		"heading": "Pianificatore",
-		"description": "Il tuo pianificatore PTO intelligente. Configura i tuoi giorni di PTO, il paese e la strategia per sfruttare al massimo ogni festività.",
+		"description": "Il tuo pianificatore PTO. Configura i tuoi giorni di PTO, il paese e la strategia per ottenere il massimo da ogni festività.",
 		"titleHighlight1": "Il tuo anno",
 		"titleHighlight2": "libero",
 		"instructions": "Inizia inserendo i tuoi giorni e le altre impostazioni nella barra laterale a sinistra. Hai ancora dubbi?",
@@ -140,7 +140,7 @@
 					"answer": "PTO sta per Paid Time Off (giorni liberi retribuiti): il numero di giorni liberi retribuiti che il tuo datore di lavoro ti assegna ogni anno da usare come preferisci. A differenza dei giorni di malattia o dei festivi, i giorni di PTO puoi programmarli liberamente. Il problema è che la maggior parte delle persone li usa a caso e spreca molto potenziale riposo. Forever PTO ti aiuta a collocare quei giorni strategicamente intorno ai festivi per trasformare, ad esempio, 5 giorni di PTO in 12 giorni liberi consecutivi."
 				},
 				"whatIs": {
-					"question": "Cos'è questo?",
+					"question": "Cos'è Forever PTO?",
 					"answer": "Forever PTO è uno strumento che ti aiuta a pianificare e ottimizzare i tuoi giorni di PTO, suggerendo le date migliori in base ai festivi e alle tue preferenze. Ti permette di scegliere diverse strategie per distribuire il tempo libero durante l'anno. Puoi anche personalizzare completamente i festivi e i loro nomi, e persino aggiungere festivi specifici della tua azienda o regione."
 				},
 				"whyNotSeeingCountry": {
@@ -149,7 +149,7 @@
 				},
 				"pricing": {
 					"question": "Perché c'è un modello a pagamento?",
-					"answer": "Forever PTO è gratuito. Tuttavia, utilizziamo un modello a pagamento per coprire i costi di mantenimento dei dati, infrastruttura e miglioramenti continui. Il modello a pagamento finanzia aggiornamenti, supporto e hosting. Se vuoi sostenere il progetto, puoi fare una donazione volontaria che sblocca le funzioni premium. Offriamo anche un piano gratuito con le funzioni principali affinché tutti possano pianificare meglio il proprio PTO."
+					"answer": "Forever PTO è gratuito. La parte a pagamento serve a coprire i costi di dati, infrastruttura e hosting, e a finanziare aggiornamenti e supporto. Se vuoi sostenere il progetto, puoi fare una donazione volontaria che sblocca le funzioni premium. Le funzioni principali restano gratuite per tutti."
 				},
 				"premium": {
 					"question": "Cosa sblocca premium?",
@@ -195,7 +195,7 @@
 				},
 				"encryption": {
 					"question": "I miei dati sono crittografati?",
-					"answer": "Tutto viene memorizzato localmente nel tuo browser: giorni di PTO, date selezionate, festivi personalizzati, preferenze. Applichiamo un leggero offuscamento perché i dati non siano leggibili a colpo d'occhio, ma la vera protezione è che non li inviamo mai ai nostri server. La tua pianificazione delle vacanze non lascia mai il tuo dispositivo."
+					"answer": "Tutto viene memorizzato localmente nel tuo browser: giorni di PTO, date selezionate, festivi personalizzati, preferenze. Applichiamo un leggero offuscamento perché i dati non siano leggibili a colpo d'occhio, ma la vera protezione è che non li inviamo mai ai nostri server."
 				},
 				"tracking": {
 					"question": "Vendete i miei dati o tracciate i miei piani ferie?",
@@ -353,7 +353,7 @@
 			"toolsTitle": "Calcolatori e strumenti",
 			"toolsDescription": "Qui trovi i calcolatori: stima quanti giorni di PTO hai maturato, scopri quanto ti costano in stipendio i giorni non usati o conta i giorni lavorativi tra due date.",
 			"alternativesTitle": "Gestore alternative",
-			"alternativesDescription": "Sfoglia i diversi suggerimenti che abbiamo generato. Confronta efficienza e giorni effettivi per trovare l'equilibrio ideale. La prima alternativa è sempre la nostra preferita, contrassegnata da una scintilla. Usa le frecce per esplorarle, poi clicca \"Applica alternativa\" per passare a quella.",
+			"alternativesDescription": "Sfoglia i diversi suggerimenti che abbiamo generato. Confronta efficienza e giorni effettivi e scegli quella che fa per te. La prima alternativa è sempre la nostra preferita, contrassegnata da una scintilla. Usa le frecce per esplorarle, poi clicca \"Applica alternativa\" per passare a quella.",
 			"statusTitle": "Stato PTO",
 			"statusDescription": "Tieni d'occhio i tuoi giorni di PTO: quelli assegnati automaticamente, quelli selezionati manualmente e quanti ne restano. Puoi ripristinare le modifiche manuali in qualsiasi momento per tornare al piano suggerito.",
 			"calendarTitle": "Il tuo calendario PTO interattivo",
@@ -361,7 +361,7 @@
 			"finishTitle": "Tutto pronto!",
 			"finishDescription": "Ora sai come usare Forever PTO. Configura le tue preferenze nella barra laterale e lascia che l'app trovi i migliori giorni per te.",
 			"holidaysListTitle": "Personalizza le tue festività",
-			"holidaysListDescription": "Qui puoi perfezionare i dati sulle festività per adattarli alla tua situazione. Modifica o elimina qualsiasi festività nazionale o regionale e aggiungi i tuoi giorni personalizzati: festività aziendali, celebrazioni locali o qualsiasi data che conti per te. Più accurati sono i dati, migliori saranno i suggerimenti.",
+			"holidaysListDescription": "Qui puoi perfezionare i dati sulle festività per adattarli alla tua situazione. Modifica o elimina qualsiasi festività nazionale o regionale e aggiungi i tuoi giorni personalizzati: festività aziendali, celebrazioni locali o qualsiasi altra data importante per te. Più accurati sono i dati, migliori saranno i suggerimenti.",
 			"step1Title": "Il tuo contesto",
 			"step1Description": "Seleziona il tuo paese, la regione e l'anno che vuoi pianificare. Così configuriamo il tuo calendario dei festivi per trovare i ponti migliori.",
 			"step2Title": "I tuoi giorni di PTO",
@@ -405,7 +405,7 @@
 			"ptoDay": "Giorno di PTO",
 			"generatedOn": "Generato il",
 			"successTitle": "PDF scaricato",
-			"successDescription": "Il tuo calendario è stato esportato con successo.",
+			"successDescription": "Il tuo calendario è stato esportato.",
 			"errorTitle": "Download non riuscito",
 			"errorDescription": "Impossibile generare il PDF. Riprova."
 		}
@@ -751,14 +751,14 @@
 		"future": "Futuro",
 		"detailedView": "Vista dettagliata",
 		"haveSuggestion": "Hai un suggerimento?",
-		"feedbackShapes": "Il tuo feedback dà forma alla nostra roadmap. Condividi le tue idee e aiutaci a costruire il pianificatore di ferie perfetto.",
-		"gotAnIdea": "Hai un'idea che renderebbe la tua vita più facile?",
+		"feedbackShapes": "La roadmap nasce anche dal tuo feedback. Raccontaci le tue idee.",
+		"gotAnIdea": "Hai un'idea che ti semplificherebbe la vita?",
 		"letsTalk": "Parliamone",
 		"or": "o",
 		"openIssue": "Apri un issue su GitHub",
 		"features": {
 			"corePtoCalculator": "Calcolatore PTO principale",
-			"corePtoCalculatorDescription": "Pianificazione intelligente delle ferie con ottimizzazione dei festivi e rilevamento dei ponti",
+			"corePtoCalculatorDescription": "Pianificazione delle ferie con ottimizzazione dei festivi e rilevamento dei ponti",
 			"multipleCountries": "Supporto per più paesi",
 			"multipleCountriesDescription": "Supporto per i festivi nei paesi europei con regole specifiche per regione",
 			"premiumFeatures": "Funzioni premium",
@@ -784,7 +784,7 @@
 			"blockedPeriods": "Periodi bloccati",
 			"blockedPeriodsDescription": "Segna periodi in cui non vuoi suggerimenti di PTO: conferenze, viaggi, malattie o qualsiasi momento in cui sai che sarai impegnato",
 			"performanceOptimization": "Ottimizzazione delle prestazioni",
-			"performanceOptimizationDescription": "Calcoli più veloci ed esperienza più fluida grazie ai Web Workers",
+			"performanceOptimizationDescription": "Calcoli più veloci e un'interfaccia più reattiva grazie ai Web Workers",
 			"customWeekends": "Weekend personalizzati",
 			"customWeekendsDescription": "Definisci giorni non lavorativi personalizzati oltre al weekend standard sabato-domenica",
 			"multiYearPlanning": "Pianificazione pluriennale",
@@ -935,7 +935,7 @@
 			"confirmed": "Confermato",
 			"paymentId": "ID pagamento",
 			"premiumActivationFailed": "Il pagamento è andato a buon fine, ma non siamo riusciti ad attivare l’accesso premium automaticamente. Ricarica questa pagina oppure recupera il tuo accesso con l’email con cui hai pagato.",
-			"premiumActivated": "Il tuo accesso premium è attivo. Ora hai accesso a tutte le funzioni premium.",
+			"premiumActivated": "Il tuo accesso premium è attivo: ora puoi usare tutte le funzioni premium.",
 			"continueHome": "Continua alla homepage"
 		}
 	},
@@ -951,7 +951,7 @@
 			"command": "Lavora meno.",
 			"verb": "Viaggia",
 			"highlight": "di più",
-			"description": "Forever PTO calcola <em>esattamente</em> quali giorni richiedere per trasformare i tuoi 22 giorni di PTO in <strong>70+ giorni fuori dall'ufficio</strong>. Senza fogli Excel. Senza matematica. Senza stress.",
+			"description": "Forever PTO calcola <em>esattamente</em> quali giorni richiedere per trasformare i tuoi 22 giorni di PTO in <strong>70+ giorni fuori dall'ufficio</strong>. Senza fogli Excel e senza fare calcoli.",
 			"plannerCta": "Calcola i miei giorni →",
 			"demoLink": "Scopri come funziona (30s)",
 			"stars": "{rating} · usato da {users} dipendenti ribelli",
@@ -976,10 +976,10 @@
 			"question1": "cosa faccio",
 			"question2": "viaggio prenotato",
 			"titleEnd": "in 60 secondi.",
-			"description": "Senza installare nulla. Senza carta di credito. Senza newsletter. Dicci solo quanti giorni hai e dove vivi.",
+			"description": "Non devi installare nulla, inserire una carta o iscriverti a una newsletter. Dicci solo quanti giorni hai e dove vivi.",
 			"inputDaysTitle": "Inserisci i tuoi giorni.",
 			"inputDaysDescription": "Quanti giorni di PTO hai e in quale paese o regione lavori. Tutto qui.",
-			"engineTitle": "Il motore fa magie.",
+			"engineTitle": "Il motore fa i calcoli.",
 			"engineDescription": "Trova tutte le combinazioni possibili e le ordina per efficienza: quanti giorni liberi ottieni per ogni giorno di PTO usato.",
 			"exportTitle": "Richiedi i giorni liberi.",
 			"exportDescription": "Esporta su Google Calendar, Outlook o in un PDF da allegare alla richiesta all'HR, e non pensarci più."
@@ -993,18 +993,18 @@
 		},
 		"features": {
 			"badge": "Trucchi del motore",
-			"titleStart": "Non è un calendario. È un",
+			"titleStart": "Il tuo",
 			"titleEmphasis": "alleato",
 			"titleEnd": "contro il lunedì.",
 			"description": "Queste sono le mosse che Forever PTO fa automaticamente per te.",
-			"bridgeTag": "Ponti intelligenti",
+			"bridgeTag": "Ponti automatici",
 			"bridgeTitle": "Trasforma 1 giorno di PTO in 4 giorni liberi.",
 			"bridgeDescription": "Rileva i festivi di martedì e giovedì e suggerisce ponti minimi. Un giorno strategico = un weekend di 4 giorni.",
 			"ratioTag": "max efficienza",
 			"ratioDescription": "Miglior efficienza: 8 giorni di PTO trasformati in 28 giorni liberi (Italia).",
 			"syncTag": "Sincronizza in 1 clic",
 			"syncTitle": "Google · Outlook · iCal",
-			"syncDescription": "Esporta il tuo piano nel calendario che già usi. Senza complicazioni.",
+			"syncDescription": "Esporta il tuo piano nel calendario che usi già.",
 			"conflictsTag": "Anti-conflitti",
 			"conflictsTitle": "Ti avvisa prima del tuo capo.",
 			"conflictsDescription": "Segna i periodi \"tabù\" della tua azienda.",
@@ -1018,12 +1018,12 @@
 			"countriesDescription": "Calendari ufficiali aggiornati ogni anno. Anche quelli regionali.",
 			"privacyTag": "100% locale",
 			"privacyTitle": "I tuoi dati non lasciano mai il tuo browser.",
-			"privacyDescription": "Nessun accesso. Nessun account. I tuoi dati sulle ferie sono salvati esclusivamente nel tuo browser; non li vediamo mai."
+			"privacyDescription": "Non serve registrarsi. I tuoi dati sulle ferie restano solo nel tuo browser e noi non li vediamo mai."
 		},
 		"comparison": {
 			"badge": "Prima · dopo",
 			"title": "Prima vs. dopo Forever PTO",
-			"withoutTitle": "😩 Senza Forever PTO",
+			"withoutTitle": "Senza Forever PTO",
 			"withoutItems": {
 				"spreadsheetFrustration": "Apri un foglio Excel e ti blocchi alla cella C7.",
 				"missedBridge": "Prendi libero il lunedì dopo un festivo senza accorgerti che anche il martedì era festivo.",
@@ -1031,7 +1031,7 @@
 				"colleagueConflict": "Un collega prenota la tua settimana per primo. Di nuovo.",
 				"unusedDays": "Finisci l'anno con 4 giorni non utilizzati."
 			},
-			"withTitle": "😎 Con Forever PTO",
+			"withTitle": "Con Forever PTO",
 			"withItems": {
 				"planInJanuary": "Pianifichi tutto a gennaio, mentre aspetti il caffè.",
 				"dayEfficiency": "Ogni giorno di PTO ti restituisce in media {ratio} giorni liberi.",
@@ -1057,7 +1057,7 @@
 					"role": "backend dev · Barcellona"
 				},
 				"saraV": {
-					"text": "L'ho aperto \"per vedere\" e dopo 90 secondi avevo già un PDF da mandare all'HR con tutto l'anno sistemato. Assurdamente efficace.",
+					"text": "L'ho aperto \"per vedere\" e dopo 90 secondi avevo già un PDF da mandare all'HR con tutto l'anno sistemato. Funziona davvero.",
 					"name": "Sara V.",
 					"role": "product manager · Berlino"
 				},
@@ -1089,7 +1089,7 @@
 			"freePer": "/sempre",
 			"freeNote": "Niente carta. Niente email. Niente.",
 			"freeFeatures": {
-				"optimizedPlan": "Piano vacanze auto-ottimizzato",
+				"optimizedPlan": "Piano ferie ottimizzato in automatico",
 				"countryHolidays": "Festività del tuo paese e regione",
 				"strategies": "{count} strategie (Raggruppata, Ottimizzata, Bilanciata, Vacanza principale)",
 				"basicStats": "Statistiche di efficienza di base e calcolatori"
@@ -1106,20 +1106,20 @@
 				"customHolidays": "Festività personalizzate e aziendali",
 				"pastDaysAndCarryover": "Consenti giorni passati · mesi di riporto",
 				"holidayManagement": "Modifica ed elimina qualsiasi festività",
-				"fullAnalytics": "Analisi completa e grafici visivi"
+				"fullAnalytics": "Metriche avanzate e grafici"
 			},
 			"lifetimeCta": "Sostieni il progetto →",
-			"popularBadge": "Più popolare 🔥"
+			"popularBadge": "Il più scelto"
 		},
 		"faq": {
 			"badge": "FAQ",
-			"title": "Domande? Abbiamo risposte."
+			"title": "Domande frequenti"
 		},
 		"closing": {
 			"titleStart": "Il tuo prossimo anno",
 			"titleEmphasis": "libero",
 			"titleEnd": "inizia oggi.",
-			"description": "22 giorni possono diventare più di 70. Devi solo sapere dove metterli. Lo facciamo noi.",
+			"description": "22 giorni possono diventare più di 70, se sai dove metterli. A quello pensiamo noi.",
 			"cta": "Calcola i miei giorni liberi →",
 			"shapes": {
 				"byeMonday": "ciao, lunedì",

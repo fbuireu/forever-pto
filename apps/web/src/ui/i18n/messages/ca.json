@@ -36,13 +36,13 @@
 		},
 		"planner": {
 			"title": "Planificador | Forever PTO",
-			"description": "Planifica i optimitza els teus dies de PTO. Calendari intel·ligent de PTO amb detecció de festius, optimitzador de ponts i exportació a Google Calendar, Outlook i Apple."
+			"description": "Planifica i optimitza els teus dies de PTO. Calendari de PTO que detecta els festius, troba els millors ponts i exporta a Google Calendar, Outlook i Apple."
 		}
 	},
 	"planner": {
 		"title": "Forever PTO",
 		"heading": "Planificador",
-		"description": "El teu planificador de PTO intel·ligent. Configura els teus dies de PTO, país i estratègia per aprofitar al màxim cada festiu.",
+		"description": "Indica els teus dies de PTO, el país i l'estratègia, i el planificador els col·locarà al voltant de cada festiu.",
 		"titleHighlight1": "El teu any",
 		"titleHighlight2": "lliure",
 		"instructions": "Comença afegint els teus dies i la resta de preferències a la barra lateral. Encara tens dubtes?",
@@ -110,7 +110,7 @@
 				"considerPremium": "Passa't a premium per a una anàlisi més detallada."
 			},
 			"manualAdjustments": {
-				"title": "Ajustos manuals",
+				"title": "Canvis manuals",
 				"addedOnly": "{added, plural, one {Has afegit <b><a>#</a> dia</b> al suggeriment original.} other {Has afegit <b><a>#</a> dies</b> al suggeriment original.}}",
 				"removedOnly": "{removed, plural, one {Has tret <b><r>#</r> dia</b> del suggeriment original.} other {Has tret <b><r>#</r> dies</b> del suggeriment original.}}",
 				"addedAndRemoved": "{added, plural, one {Has afegit <b><a>#</a> dia</b>} other {Has afegit <b><a>#</a> dies</b>}} i {removed, plural, one {tret <b><r>#</r> dia</b>} other {tret <b><r>#</r> dies</b>}} del suggeriment original."
@@ -141,7 +141,7 @@
 				},
 				"whatIs": {
 					"question": "Què és això?",
-					"answer": "Forever PTO és una eina que t'ajuda a planificar i optimitzar els teus dies lliures (PTO): et suggereix les millors dates segons els festius i les teves preferències. Simplifica tot el procés i maximitza el teu temps lliure. Pots triar l'estratègia, personalitzar els festius i fins i tot afegir-hi dies específics de la teva empresa."
+					"answer": "Forever PTO és una eina que t'ajuda a planificar i optimitzar els teus dies lliures (PTO): et suggereix les millors dates segons els festius i les teves preferències. Pots triar l'estratègia, personalitzar els festius i fins i tot afegir-hi dies específics de la teva empresa."
 				},
 				"whyNotSeeingCountry": {
 					"question": "Per què no veig correctament el meu país o els meus festius?",
@@ -149,7 +149,7 @@
 				},
 				"pricing": {
 					"question": "Per què hi ha un model de pagament?",
-					"answer": "Forever PTO és gratuït. Tot i això, fem servir un model de pagament per cobrir els costos de manteniment de les dades, la infraestructura i les millores contínues. El model de pagament finança les actualitzacions, el suport i l'allotjament. Si vols donar suport al projecte, hi ha una donació voluntària que desbloqueja les funcions premium."
+					"answer": "Forever PTO és gratuït. El model de pagament cobreix el manteniment de les dades, la infraestructura, l'allotjament, el suport i les millores. Si vols donar suport al projecte, hi ha una donació voluntària que desbloqueja les funcions premium."
 				},
 				"premium": {
 					"question": "Què desbloqueja premium?",
@@ -213,7 +213,7 @@
 				"title": "T'interessa col·laborar?",
 				"code": {
 					"question": "Com puc aportar codi o idees?",
-					"answer": "<link>Obre issues o merge requests</link> amb les teves propostes. Necessitem ajuda amb els algoritmes, les integracions i les millores d'UX."
+					"answer": "<link>Obre issues o pull requests</link> amb les teves propostes. Necessitem ajuda amb els algoritmes, les integracions i les millores d'UX."
 				},
 				"business": {
 					"question": "Vols proposar integracions o col·laboracions amb empreses?",
@@ -353,7 +353,7 @@
 			"toolsTitle": "Calculadores i eines",
 			"toolsDescription": "Aquí tens les calculadores: estima quants dies de PTO has acumulat, mira quant et costen en sou els dies que no fas servir o compta els dies laborables entre dues dates.",
 			"alternativesTitle": "Gestor d'alternatives",
-			"alternativesDescription": "Explora els diferents suggeriments que hem generat per a tu. Compara l'eficiència i els dies efectius per trobar el teu equilibri ideal. La primera alternativa és sempre la recomanada (marcada amb una espurna). Fes servir les fletxes per explorar-les i fes clic a \"Aplica l'alternativa\" per canviar-hi.",
+			"alternativesDescription": "Aquí tens les alternatives al teu suggeriment. Compara l'eficiència i els dies efectius de cadascuna. La primera alternativa és sempre la recomanada (marcada amb una espurna). Fes servir les fletxes per explorar-les i fes clic a \"Aplica l'alternativa\" per canviar-hi.",
 			"statusTitle": "Seguiment del PTO",
 			"statusDescription": "Controla el teu PTO d'un cop d'ull: els dies assignats automàticament, els seleccionats manualment i quants te'n queden. Pots restablir els canvis manuals en qualsevol moment per tornar al pla suggerit.",
 			"calendarTitle": "El teu calendari de PTO interactiu",
@@ -361,7 +361,7 @@
 			"finishTitle": "Ja ho tens tot a punt!",
 			"finishDescription": "Ara ja saps com funciona. Configura les preferències a la barra lateral i l'app et suggerirà els millors dies. Gaudeix dels dies lliures!",
 			"holidaysListTitle": "Personalitza els teus festius",
-			"holidaysListDescription": "Aquí pots ajustar les dades de festius perquè s'adaptin exactament a la teva situació. Edita o elimina qualsevol festiu nacional o regional, i afegeix els teus propis dies personalitzats: festius d'empresa, celebracions locals o qualsevol data que sigui rellevant per a tu. Com més precises siguin les dades, millors seran els suggeriments.",
+			"holidaysListDescription": "Aquí pots adaptar els festius a la teva situació. Edita o elimina qualsevol festiu nacional o regional i afegeix-hi els teus: festius d'empresa, festes locals o qualsevol altra data que et calgui. Com més precises siguin les dades, millors seran els suggeriments.",
 			"step1Title": "El teu context",
 			"step1Description": "Selecciona el teu país, la regió i l'any que vols planificar. Així configurem el teu calendari de festius per poder trobar els millors ponts.",
 			"step2Title": "Els teus dies de PTO",
@@ -663,7 +663,7 @@
 		"effectiveHourlyRate": "Tarifa per hora efectiva:",
 		"whenWorkingExtraDays": "Si treballes {days} dies extra no retribuïts",
 		"opportunityCost": "Cost d'oportunitat",
-		"opportunityCostDescription": "Has treballat {days} dies que podries haver fet com a vacances pagades. Això són <amount>valor</amount> de temps lliure pagat al qual has renunciat. El teu sou continua sent el mateix, però has treballat dies extra sense cap benefici addicional."
+		"opportunityCostDescription": "Has treballat {days} dies que podries haver fet com a vacances pagades. Això són <amount>valor</amount> de temps lliure pagat al qual has renunciat, i el sou no t'ha augmentat gens."
 	},
 	"checkout": {
 		"back": "Torna",
@@ -751,14 +751,14 @@
 		"future": "Futur",
 		"detailedView": "Vista detallada",
 		"haveSuggestion": "Tens un suggeriment?",
-		"feedbackShapes": "Els teus comentaris donen forma al nostre full de ruta. Comparteix les teves idees i ajuda'ns a construir el planificador de vacances perfecte.",
-		"gotAnIdea": "Tens una idea que faria la teva vida més fàcil?",
+		"feedbackShapes": "El que ens expliques decideix què fem després. Digues-nos què hi trobes a faltar.",
+		"gotAnIdea": "Tens alguna idea per millorar l'app?",
 		"letsTalk": "Parlem",
 		"or": "o",
 		"openIssue": "Obre una incidència a GitHub",
 		"features": {
 			"corePtoCalculator": "Calculadora de PTO principal",
-			"corePtoCalculatorDescription": "Planificació intel·ligent de vacances amb optimització de festius i detecció de ponts",
+			"corePtoCalculatorDescription": "Planificació de vacances al voltant dels festius, amb detecció de ponts",
 			"multipleCountries": "Compatibilitat amb diversos països",
 			"multipleCountriesDescription": "Festius de diversos països europeus amb regles específiques per a cada regió",
 			"premiumFeatures": "Funcions premium",
@@ -951,7 +951,7 @@
 			"command": "Treballa menys.",
 			"verb": "Viatja",
 			"highlight": "més",
-			"description": "Forever PTO calcula <em>exactament</em> quins dies has de demanar perquè els teus 22 dies de PTO es converteixin en <strong>70+ dies fora de l'oficina</strong>. Sense fulls de càlcul. Sense matemàtiques. Sense remordiments.",
+			"description": "Forever PTO calcula <em>exactament</em> quins dies has de demanar perquè els teus 22 dies de PTO es converteixin en <strong>70+ dies fora de l'oficina</strong>. Sense fulls de càlcul ni comptes a mà.",
 			"plannerCta": "Calcula els meus dies →",
 			"demoLink": "Mira com funciona (30 s)",
 			"stars": "{rating} · utilitzat per {users} treballadors rebels",
@@ -976,10 +976,10 @@
 			"question1": "què faig",
 			"question2": "ja tinc el viatge",
 			"titleEnd": "en 60 segons.",
-			"description": "Sense instal·lar res. Sense targeta. Sense butlletins. Només has de dir-nos quants dies tens i on vius.",
+			"description": "No cal instal·lar res ni posar cap targeta. Només has de dir-nos quants dies tens i on vius.",
 			"inputDaysTitle": "Introdueix els teus dies.",
-			"inputDaysDescription": "Quants dies de PTO tens i a quin país o regió treballes. Això és tot.",
-			"engineTitle": "El motor fa la màgia.",
+			"inputDaysDescription": "Quants dies de PTO tens i a quin país o regió treballes.",
+			"engineTitle": "El motor fa els càlculs.",
 			"engineDescription": "Creua els teus dies amb els festius oficials i els ponts regionals. Troba totes les combinacions possibles i les ordena per \"ràtio de descans\".",
 			"exportTitle": "Demana els dies.",
 			"exportDescription": "Exporta a Google Calendar, a Outlook o a un PDF que adjuntes al formulari de RRHH i te n'oblides."
@@ -993,18 +993,18 @@
 		},
 		"features": {
 			"badge": "trucs del motor",
-			"titleStart": "No és un calendari. És un",
+			"titleStart": "El teu",
 			"titleEmphasis": "aliat",
 			"titleEnd": "contra el dilluns.",
-			"description": "Aquests són els moviments que Forever PTO fa per tu automàticament.",
-			"bridgeTag": "ponts intel·ligents",
+			"description": "Això és el que Forever PTO fa per tu sense que hagis de fer res.",
+			"bridgeTag": "detecció de ponts",
 			"bridgeTitle": "Converteix 1 dia de PTO en 4 lliures.",
 			"bridgeDescription": "Detecta els festius que cauen en dimarts o dijous i et suggereix ponts mínims. Un dia estratègic = un cap de setmana de 4 dies.",
 			"ratioTag": "màxima eficiència",
 			"ratioDescription": "Millor eficiència: 8 dies de PTO convertits en 33 lliures (Catalunya).",
 			"syncTag": "sync en 1 clic",
 			"syncTitle": "Google · Outlook · iCal",
-			"syncDescription": "Exporta el teu pla al calendari que ja fas servir. Sense complicacions.",
+			"syncDescription": "Exporta el teu pla al calendari que ja fas servir.",
 			"conflictsTag": "anti-conflictes",
 			"conflictsTitle": "T'avisa abans que el teu cap.",
 			"conflictsDescription": "Marca els períodes \"tabú\" de la teva empresa.",
@@ -1018,12 +1018,12 @@
 			"countriesDescription": "Calendaris oficials actualitzats cada any. Fins i tot els regionals.",
 			"privacyTag": "100% local",
 			"privacyTitle": "Les teves dades no surten mai del teu navegador.",
-			"privacyDescription": "Sense registre. Sense compte. Les teves dades de vacances es guarden exclusivament al teu navegador, mai no les veiem."
+			"privacyDescription": "No cal registrar-se ni crear cap compte. Les teves dades de vacances es guarden només al teu navegador i nosaltres no les veiem mai."
 		},
 		"comparison": {
 			"badge": "abans · després",
 			"title": "Abans vs. després de Forever PTO",
-			"withoutTitle": "😩 Sense Forever PTO",
+			"withoutTitle": "Sense Forever PTO",
 			"withoutItems": {
 				"spreadsheetFrustration": "Obres un full de càlcul i t'encalles a la cel·la C7.",
 				"missedBridge": "Demanes el dilluns després del festiu i ningú t'avisa que era redundant.",
@@ -1031,12 +1031,12 @@
 				"colleagueConflict": "Un company es queda la teva setmana abans que tu. Una altra vegada.",
 				"unusedDays": "Acabes l'any amb 4 dies sense fer servir."
 			},
-			"withTitle": "😎 Amb Forever PTO",
+			"withTitle": "Amb Forever PTO",
 			"withItems": {
 				"planInJanuary": "Ho planifiques tot al gener, mentre esperes el cafè.",
 				"dayEfficiency": "Cada dia de PTO et retorna {ratio} dies lliures de mitjana.",
-				"visualCalendar": "Visualitzes l'any sencer en un calendari clar.",
-				"bookFirst": "Demanes primer, sense remordiments, amb dades.",
+				"visualCalendar": "Veus tot l'any en un sol calendari.",
+				"bookFirst": "Demanes els dies abans que ningú, amb les dades a la mà.",
 				"burnAllDays": "Gastes el 100% dels teus dies. Com ha de ser."
 			}
 		},
@@ -1082,12 +1082,12 @@
 			"badge": "preu honest",
 			"titleStart": "Paga una vegada.",
 			"titleEmphasis": "Per sempre.",
-			"description": "Sense SaaS. Sense subscripció. Sense \"prova gratuïta que es renova sola\".",
+			"description": "Sense subscripció ni cap \"prova gratuïta\" que es renova sola.",
 			"freeName": "Gratis per sempre",
-			"freeTagline": "Prova-ho. Et convencerà.",
+			"freeTagline": "Prova-ho sense pagar res.",
 			"freePrice": "{amount}",
 			"freePer": "/sempre",
-			"freeNote": "Sense targeta. Sense correu. Res.",
+			"freeNote": "Sense targeta ni correu.",
 			"freeFeatures": {
 				"optimizedPlan": "Pla de vacances auto-optimitzat",
 				"countryHolidays": "Festius del teu país i regió",
@@ -1109,17 +1109,17 @@
 				"fullAnalytics": "Analítica completa i gràfics visuals"
 			},
 			"lifetimeCta": "Dona suport al projecte →",
-			"popularBadge": "el més popular 🔥"
+			"popularBadge": "el més popular"
 		},
 		"faq": {
 			"badge": "FAQ",
-			"title": "Preguntes? Tenim respostes."
+			"title": "Preguntes freqüents"
 		},
 		"closing": {
 			"titleStart": "El teu pròxim any",
 			"titleEmphasis": "lliure",
 			"titleEnd": "comença avui.",
-			"description": "22 dies poden ser més de 70. Només cal saber on col·locar-los. Això ho fem nosaltres.",
+			"description": "22 dies poden ser més de 70 si saps on col·locar-los. Nosaltres t'ho calculem.",
 			"cta": "Calcula els meus dies lliures →",
 			"shapes": {
 				"byeMonday": "adeu, dilluns",
