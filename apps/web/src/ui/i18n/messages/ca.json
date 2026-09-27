@@ -703,7 +703,7 @@
 		"processing": "S'està processant..."
 	},
 	"premiumModal": {
-		"premiumRequired": "Cal tenir premium",
+		"premiumRequired": "Es requereix premium",
 		"featureRequiresPremium": "requereix accés premium",
 		"verifyDescription": "Si ja has fet una donació o has pagat, comprovarem el teu correu i et donarem accés de seguida. Si tens cap problema, escriu-nos i ho solucionarem.",
 		"considerDonating": "Encara no has fet cap donació? Dona suport al projecte i desbloqueja les funcions premium.",
