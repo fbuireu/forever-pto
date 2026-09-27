@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { stripeAppearance } from "./stripeAppearance";
+import { stripeAppearance, stripeFonts } from "./stripeAppearance";
 
 describe("stripeAppearance", () => {
 	it("draws a field like the sidebar's controls: a resting frame shadow that grows on hover", () => {
@@ -67,5 +67,15 @@ describe("stripeAppearance", () => {
 
 		expect(variables?.fontSizeBase).toBe("16px");
 		expect(rules?.[".Input"]).toMatchObject({ fontSize: "16px" });
+	});
+
+	it("types in the app's own faces, loaded from this origin's copy", () => {
+		const { variables, rules } = stripeAppearance({ isDark: false, isMobile: false });
+
+		expect(variables?.fontFamily?.startsWith('"Space Grotesk"')).toBe(true);
+		expect(rules?.[".Label"]?.fontFamily?.startsWith('"JetBrains Mono"')).toBe(true);
+		expect(stripeFonts("https://forever-pto.com")).toEqual([
+			{ cssSrc: "https://forever-pto.com/fonts/stripe/fonts.css" },
+		]);
 	});
 });

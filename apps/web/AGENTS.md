@@ -427,7 +427,10 @@ from it: `pr-<number>-forever-pto-development.fbuireu.workers.dev`, deleted when
 Static Assets serve every file with `max-age=0, must-revalidate` unless a `_headers` file in the assets directory
 says otherwise, so every page load revalidated its 30 to 40 chunks, its CSS and its fonts one round trip each.
 OpenNext copies `public/` into `.open-next/assets`, which is where the rule has to land; it covers the
-`_next/static` tree alone, whose file names carry a content hash, and nothing a deploy can change under the same URL.
+`_next/static` tree, whose file names carry a content hash, with the year-long `immutable` rule, and nothing a
+deploy can change under the same URL. The one other rule covers [`public/fonts/stripe/`](./public/fonts/stripe/fonts.css), the font copy the Stripe
+Elements iframe loads: it needs `Access-Control-Allow-Origin` because the request comes from Stripe's origin,
+and it takes a week's `max-age` without `immutable`, since those names carry no hash.
 `tests/docs-consistency.test.ts` asserts the rule. The docs site carries a `_headers` of its own for other reasons.
 
 **Logs and traces reach BetterStack through Cloudflare's own OTLP export, and nothing in this tree carries

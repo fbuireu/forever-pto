@@ -29,7 +29,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useShallow } from "zustand/react/shallow";
 import { DonationForm } from "./DonationForm";
-import { stripeAppearance } from "./stripeAppearance";
+import { stripeAppearance, stripeFonts } from "./stripeAppearance";
 import "./donate.css";
 import { logClientError } from "@application/shared/utils/clientLog";
 import { recoverFromStaleDeployment } from "@ui/adapters/navigation/staleDeployment";
@@ -205,6 +205,7 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 			clientSecret: paymentState.clientSecret,
 			loader: "always",
 			appearance: stripeAppearance({ isDark: resolvedTheme === "dark", isMobile }),
+			fonts: stripeFonts(globalThis.location.origin),
 		};
 	}, [paymentState?.clientSecret, resolvedTheme, isMobile]);
 

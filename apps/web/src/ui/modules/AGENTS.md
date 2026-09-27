@@ -536,8 +536,12 @@ hand, or the donation form drifts from the page around it.
 are `Button` `outline`: the panel face, a resting 5px frame shadow that grows to 7px on hover, the value in
 bold and the orange focus ring; a label takes the sidebar's mono face at 14px; a payment method in the
 accordion is a sidebar step card, on `--sidebar` with the 14px radius and the 6px shadow. What Stripe cannot
-do is move an element, so a field lifts by its shadow alone, and it cannot load `next/font`'s files, so the
-type falls back to the system and mono stacks. A selected picker item is drawn like a selected
+do is move an element, so a field lifts by its shadow alone, and it cannot load `next/font`'s files, whose names
+carry a per-build hash, so the faces it types in come from a copy of their own:
+[`public/fonts/stripe/fonts.css`](../../../public/fonts/stripe/fonts.css) declares Space Grotesk and JetBrains Mono over
+woff2 files beside it, and `stripeFonts` hands its absolute URL to Elements as `cssSrc`. That copy does not
+follow a font upgrade in `app/fonts.ts`; refresh the files by hand when the faces change. The iframe fetches
+them from Stripe's origin, which is why `public/_headers` gives that folder `Access-Control-Allow-Origin`. A selected picker item is drawn like a selected
 `default` Button, ink with the accent shadow at the same depth as its unselected neighbours.
 `CheckoutForm.tsx` pins the Payment Element to `layout: 'accordion'`, which is what the narrow popover made
 Stripe choose anyway, because the two layouts share the `.TabIcon--selected` rule: an ink selected tab wants a

@@ -30,8 +30,11 @@ const DARK_PALETTE: typeof LIGHT_PALETTE = {
 
 const FONT_SIZE_DESKTOP = "14px";
 const FONT_SIZE_MOBILE = "16px";
-const SANS_STACK = 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-const MONO_STACK = 'ui-monospace, "JetBrains Mono", SFMono-Regular, Menlo, Consolas, monospace';
+const SANS_STACK = '"Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+const MONO_STACK = '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+const FONTS_STYLESHEET = "/fonts/stripe/fonts.css";
+
+export const stripeFonts = (origin: string) => [{ cssSrc: `${origin}${FONTS_STYLESHEET}` }];
 
 const SHADOW = { XS: 2, MD: 6, BUTTON: 5, BUTTON_HOVER: 7 } as const;
 
