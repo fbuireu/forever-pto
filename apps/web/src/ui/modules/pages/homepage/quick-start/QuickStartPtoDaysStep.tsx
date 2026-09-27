@@ -2,11 +2,12 @@
 
 import { MAX_PTO_DAYS, MIN_PTO_DAYS } from "@application/stores/filters";
 import { Counter } from "@ui/modules/core/animate/components/Counter";
+import { cn } from "@ui/utils/cn";
 import { useTranslations } from "next-intl";
+import { CHOICE_CLASS } from "./choice";
 import { type QuickStartDraft, yearOptions } from "./steps";
 
-const YEAR_CHIP_CLASS =
-	"cursor-pointer rounded-[8px] border-[3px] border-(--frame) bg-(--surface-panel) px-4 py-2 font-display text-sm font-black shadow-(--shadow-brutal-xs) transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-(--shadow-brutal-sm) peer-checked:bg-(--accent) peer-checked:text-(--color-brand-ink) peer-focus-visible:ring-[3px] peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2";
+const YEAR_CHIP_CLASS = cn(CHOICE_CLASS, "inline-flex h-9 items-center px-3.5 text-sm font-black tracking-[0.01em]");
 
 interface QuickStartPtoDaysStepProps {
 	currentYear: number;

@@ -9,11 +9,15 @@ import { Slider } from "@ui/modules/core/primitives/Slider";
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
 import { MonthToggles } from "@ui/modules/shared/MonthToggles";
 import { STRATEGY_ICONS } from "@ui/modules/shared/strategyIcons";
+import { cn } from "@ui/utils/cn";
 import { useTranslations } from "next-intl";
+import { CHOICE_CLASS } from "./choice";
 import type { QuickStartDraft } from "./steps";
 
-const STRATEGY_CARD_CLASS =
-	"flex w-full cursor-pointer items-start gap-3 rounded-[10px] border-[3px] border-(--frame) bg-(--surface-panel) p-3 text-left shadow-(--shadow-brutal-xs) transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-(--shadow-brutal-sm) peer-checked:bg-(--accent) peer-checked:text-(--color-brand-ink) peer-checked:[&_span]:text-(--color-brand-ink) peer-focus-visible:ring-[3px] peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2";
+const STRATEGY_CARD_CLASS = cn(
+	CHOICE_CLASS,
+	"flex w-full items-start gap-3 p-3 text-left peer-checked:[&_span]:text-primary-foreground",
+);
 
 interface QuickStartSettingsStepProps {
 	draft: Pick<QuickStartDraft, "strategy" | "preferredMonths" | "allowPastDays" | "carryOverMonths" | "year">;

@@ -159,7 +159,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 					<div className="space-y-3">
 						<div className="relative">
 							<div className="absolute inset-0 flex items-center">
-								<span className="w-full border-t" />
+								<span className="w-full border-t-2 border-(--frame)/18" />
 							</div>
 							<div className="relative flex justify-center text-xs uppercase">
 								<span className="bg-card px-2 text-muted-foreground">{t("expressCheckout")}</span>
@@ -189,7 +189,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 				<div className="space-y-3">
 					<div className="relative">
 						<div className="absolute inset-0 flex items-center">
-							<span className="w-full border-t" />
+							<span className="w-full border-t-2 border-(--frame)/18" />
 						</div>
 						<div className="relative flex justify-center text-xs uppercase">
 							<span className="bg-card px-2 text-muted-foreground">{t("orPayWithCard")}</span>
@@ -198,23 +198,19 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 					<PaymentElement />
 				</div>
 				{errorMessage && (
-					<div className="relative overflow-hidden rounded-lg border border-destructive/20 bg-destructive/5 p-4 backdrop-blur-sm">
-						<div className="absolute inset-0" />
-						<div className="relative flex items-start gap-3">
-							<div className="shrink-0 size-5 rounded-full bg-destructive/20 flex items-center justify-center mt-0.5">
-								<AlertCircle className="size-3 text-destructive" />
-							</div>
-							<div className="flex-1">
-								<h4 className="text-sm font-medium text-destructive mb-1">{t("paymentError")}</h4>
-								<p className="text-sm text-destructive/80">{errorMessage}</p>
-							</div>
+					<div className="flex items-start gap-3 rounded-[10px] border-[3px] border-(--frame) bg-[color-mix(in_srgb,var(--destructive)_12%,var(--card)_88%)] p-4 shadow-(--shadow-brutal-sm)">
+						<AlertCircle className="mt-0.5 size-4 shrink-0 text-destructive" aria-hidden="true" />
+						<div className="flex-1">
+							<h4 className="mb-1 text-sm font-black text-destructive">{t("paymentError")}</h4>
+							<p className="text-sm">{errorMessage}</p>
 						</div>
 					</div>
 				)}
 				<Button
 					type="submit"
 					disabled={!stripe || isPending || !elements}
-					className="w-full bg-green-600 hover:bg-green-700"
+					variant="success"
+					className="w-full"
 					aria-busy={isPending}
 				>
 					{isPending ? t("processing") : `${t("pay")} ${formattedAmount}`}
