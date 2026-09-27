@@ -982,7 +982,7 @@
 			"engineTitle": "Il motore fa magie.",
 			"engineDescription": "Trova tutte le combinazioni possibili e le ordina per efficienza: quanti giorni liberi ottieni per ogni giorno di PTO usato.",
 			"exportTitle": "Richiedi i giorni liberi.",
-			"exportDescription": "Esporta su Google Calendar, Outlook o in un PDF da allegare alla richiesta all'HR, e non pensarci più. Basta tirare a indovinare."
+			"exportDescription": "Esporta su Google Calendar, Outlook o in un PDF da allegare alla richiesta all'HR, e non pensarci più."
 		},
 		"stats": {
 			"efficiencyLabel": "Efficienza media",

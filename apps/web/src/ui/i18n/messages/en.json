@@ -982,7 +982,7 @@
 			"engineTitle": "The engine does the magic.",
 			"engineDescription": "It crosses your days with official holidays and regional bridges. Finds all possible combos and ranks them by \"rest ratio\".",
 			"exportTitle": "Request your days off.",
-			"exportDescription": "Export to Google Calendar, Outlook, or a PDF you paste into the HR form and forget. No more guessing."
+			"exportDescription": "Export to Google Calendar, Outlook, or a PDF you paste into the HR form and forget."
 		},
 		"stats": {
 			"efficiencyLabel": "Average efficiency",

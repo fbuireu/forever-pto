@@ -982,7 +982,7 @@
 			"engineTitle": "Die Engine zaubert.",
 			"engineDescription": "Die Engine gleicht deine Tage mit offiziellen Feiertagen und regionalen Brücken ab, findet alle möglichen Kombinationen und sortiert sie nach dem Verhältnis von freien Tagen zu eingesetzten PTO-Tagen.",
 			"exportTitle": "PTO-Tage beantragen.",
-			"exportDescription": "Exportiere den Plan nach Google Kalender, Outlook oder als PDF – einfach ins HR-Formular einfügen und fertig. Kein Rätselraten mehr."
+			"exportDescription": "Exportiere den Plan nach Google Kalender, Outlook oder als PDF – einfach ins HR-Formular einfügen und fertig."
 		},
 		"stats": {
 			"efficiencyLabel": "Durchschnittliche Effizienz",

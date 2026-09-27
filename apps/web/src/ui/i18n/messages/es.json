@@ -982,7 +982,7 @@
 			"engineTitle": "El motor hace magia.",
 			"engineDescription": "Cruza tus días con los festivos oficiales y los puentes regionales. Encuentra todas las combinaciones posibles y las ordena por ratio de descanso.",
 			"exportTitle": "Pides los días.",
-			"exportDescription": "Exporta a Google Calendar, Outlook o un PDF que pegas en el formulario de RR.HH. y ya está. Sin dudas."
+			"exportDescription": "Exporta a Google Calendar, Outlook o un PDF que pegas en el formulario de RR.HH. y ya está."
 		},
 		"stats": {
 			"efficiencyLabel": "Eficiencia media",

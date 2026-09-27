@@ -982,7 +982,7 @@
 			"engineTitle": "Le moteur fait la magie.",
 			"engineDescription": "Il croise tes jours avec les jours fériés officiels et les ponts régionaux. Trouve toutes les combinaisons possibles et les classe par ratio de repos.",
 			"exportTitle": "Demande tes jours.",
-			"exportDescription": "Exporte vers Google Agenda, Outlook, ou un PDF à coller dans le formulaire RH, et n'y pense plus. Fini les hésitations."
+			"exportDescription": "Exporte vers Google Agenda, Outlook, ou un PDF à coller dans le formulaire RH, et n'y pense plus."
 		},
 		"stats": {
 			"efficiencyLabel": "Efficacité moyenne",
