@@ -50,6 +50,10 @@ const configuration = (tokens: Tokens, dark: boolean): MermaidConfig => ({
 	startOnLoad: false,
 	securityLevel: "strict",
 	theme: "base",
+	// Pinned rather than inherited: Mermaid 12 switches flowcharts and state diagrams to ELK by default, and a
+	// Renovate bump would otherwise re-lay out every diagram on the site. A fence can still opt into ELK in its
+	// own frontmatter, which outranks this.
+	layout: "dagre",
 	fontFamily: `${FONT_FAMILY}, system-ui, sans-serif`,
 	// SVG text rather than `<foreignObject>` HTML: the label sizes then come from the font metrics of the
 	// face loaded below, not from a page stylesheet this renderer does not have, so the layout matches what
