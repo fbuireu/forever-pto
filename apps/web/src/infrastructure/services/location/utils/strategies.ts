@@ -2,7 +2,7 @@ import { logger } from "@infrastructure/logging/logger";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { Effect } from "effect";
 import type { NextRequest } from "next/server";
-import { normalizeCountryCode, noStoreFetch } from "./normalize";
+import { normalizeCountryCode, noStoreFetch, stringField } from "./normalize";
 
 const LOCATION_IDENTIFIER = "loc=";
 const CDN_TRACE = "cdn-cgi/trace";
@@ -45,7 +45,8 @@ const detectCountryFromEgressIPEffect = Effect.gen(function* () {
 
 	if (!ipResponse.ok) return "";
 
-	const { ip } = yield* Effect.tryPromise(() => ipResponse.json() as Promise<{ ip: string }>);
+	const ipBody: unknown = yield* Effect.tryPromise(() => ipResponse.json());
+	const ip = stringField({ body: ipBody, field: "ip" });
 	if (!ip) return "";
 
 	const geoResponse = yield* Effect.tryPromise(() =>
@@ -54,8 +55,8 @@ const detectCountryFromEgressIPEffect = Effect.gen(function* () {
 
 	if (!geoResponse.ok) return "";
 
-	const geoData = yield* Effect.tryPromise(() => geoResponse.json() as Promise<{ country?: string }>);
-	return normalizeCountryCode(geoData.country);
+	const geoBody: unknown = yield* Effect.tryPromise(() => geoResponse.json());
+	return normalizeCountryCode(stringField({ body: geoBody, field: "country" }));
 });
 
 export async function detectCountryFromEgressIP() {

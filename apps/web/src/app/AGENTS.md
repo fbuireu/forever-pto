@@ -578,6 +578,12 @@ mock is gone and the real `noStore` runs, which is what makes the body assertion
   declaring files and fails when the set changes.
 - **More than one guard protects the confirmation page.** The proxy redirects when `payment_intent` is missing
   *and* `page.tsx` redirects again. Removing either leaves the Effect program running with `undefined`.
+  The page's own guard reads the query through `paymentConfirmationQuerySchema.validate`, because Next hands a
+  repeated parameter over as an array and the props used to declare `payment_intent?: string` regardless:
+  `?payment_intent=a&payment_intent=b` reached Stripe as an array, and a repeated `activation` compared unequal
+  to `failed` and claimed Premium was active. A query that fails the schema is read as empty, so it redirects
+  home like a missing `payment_intent`. The proxy's check is `searchParams.has`, which a repeated parameter
+  passes, so this one is the guard that catches it.
 - **That redirect sets `pathname` on a parsed URL; it must never resolve a path as a relative reference.**
   The target is the request path with `/payment/confirmation` sliced off, and it was built as
   `new URL(homePath, request.url)`. A pathname beginning with two slashes is *protocol-relative*, so that

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createPaymentSchema, createPaymentSchemaWithMessages } from "./schema";
+import { createPaymentSchema, createPaymentSchemaWithMessages, paymentConfirmationQuerySchema } from "./schema";
 
 const VALID = { amount: 9.99, email: "user@example.com" };
 
@@ -113,4 +113,21 @@ describe("createPaymentSchemaWithMessages", () => {
 		expect(result.success).toBe(false);
 		if (!result.success) expect(result.error.issues[0]?.message).toBe("Promo code too long");
 	});
+});
+
+describe("paymentConfirmationQuerySchema", () => {
+	it.each([
+		[{ payment_intent: "pi_123" }],
+		[{ payment_intent: "pi_123", activation: "failed", redirect_status: "succeeded" }],
+		[{}],
+	])("accepts %o", (query) => {
+		expect(paymentConfirmationQuerySchema.validate(query)).toBe(true);
+	});
+
+	it.each([[{ payment_intent: ["pi_123", "pi_456"] }], [{ payment_intent: "pi_123", activation: ["failed"] }]])(
+		"rejects a repeated parameter in %o",
+		(query) => {
+			expect(paymentConfirmationQuerySchema.validate(query)).toBe(false);
+		},
+	);
 });

@@ -235,10 +235,13 @@ than *reads* is still the odd part; this makes it cheap rather than correct.
 
 **`checkExistingSession` clears Premium only on an authoritative "no session", never on a failed check.**
 `getExistingSession` returns `null` when the server answered and said there is no session (a genuine
-expiry, which should clear the stored `premiumKey`), and **throws** when the request itself failed. They
+expiry, which should clear the stored `premiumKey`), and **throws** when the request itself failed or the
+body is neither a session nor the route's no-session answer. They
 used to collapse into the same `null`, so a 500 or a dropped connection revoked a donor's Premium locally
 until they went and recovered it, which ADR 0008 says never happens. The store's `catch` deliberately
-writes only `lastVerified` and `needsSessionCheck`; adding `premiumKey: null` there reinstates the bug.
+writes only `lastVerified` and `needsSessionCheck`; adding `premiumKey: null` there reinstates the bug. An
+unrecognised 200 body is the same case as a 500: the server has not said "no session", so reading it as
+`null` would revoke a donor locally on a malformed answer.
 
 **A PTO Day is only ever spent on a Workday, and `toggleDaySelection` enforces it.** Adding a Manual Day is
 refused when the date is a weekend or is already covered by any Holiday, Custom included, which the

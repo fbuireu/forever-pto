@@ -1,4 +1,5 @@
 import { hasSucceeded, wasCharged } from "@application/dto/payment/dto";
+import { paymentConfirmationQuerySchema } from "@application/dto/payment/schema";
 import { Link } from "@application/i18n/navigation";
 import { ApplicationLayer } from "@infrastructure/layers";
 import { routeMetadata } from "@infrastructure/seo/routeMetadata";
@@ -18,11 +19,7 @@ import { getFormatter, getTranslations } from "next-intl/server";
 export const generateMetadata = routeMetadata("/payment/confirmation");
 
 interface PaymentSuccessParams {
-	searchParams: Promise<{
-		payment_intent?: string;
-		redirect_status?: string;
-		activation?: string;
-	}>;
+	searchParams: Promise<Record<string, string | string[] | undefined>>;
 	params: Promise<{ locale: Locale }>;
 }
 
@@ -81,7 +78,8 @@ async function PaymentError({ charged }: { charged: boolean }) {
 }
 
 export default async function PaymentSuccessPage({ searchParams, params }: Readonly<PaymentSuccessParams>) {
-	const [{ payment_intent: paymentIntentId, activation }, { locale }] = await Promise.all([searchParams, params]);
+	const [query, { locale }] = await Promise.all([searchParams, params]);
+	const { payment_intent: paymentIntentId, activation } = paymentConfirmationQuerySchema.validate(query) ? query : {};
 	const hasActivated = activation !== ACTIVATION_FAILED;
 
 	if (!paymentIntentId) {
