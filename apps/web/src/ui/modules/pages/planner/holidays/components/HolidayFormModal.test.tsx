@@ -87,7 +87,7 @@ describe("HolidayFormModal", () => {
 
 		await userEvent.click(screen.getByRole("button", { name: en.modals.addHoliday.submit }));
 
-		expect(mockToastError).toHaveBeenCalledOnce();
+		expect(mockToastError).toHaveBeenCalledExactlyOnceWith(en.modals.addHoliday.existsTitle, expect.any(Object));
 		expect(mockToastSuccess).not.toHaveBeenCalled();
 	});
 

@@ -7,6 +7,7 @@ afterEach(() => {
 
 describe("track", () => {
 	it("is a no-op when window is undefined (SSR)", () => {
+		vi.stubGlobal("window", undefined);
 		expect(() => track({ event: "payment_started" })).not.toThrow();
 	});
 
@@ -53,6 +54,7 @@ describe("track", () => {
 
 describe("identifyUser", () => {
 	it("is a no-op when window is undefined (SSR)", () => {
+		vi.stubGlobal("window", undefined);
 		expect(() => identifyUser({ email: "a@b.com", plan: "premium" })).not.toThrow();
 	});
 

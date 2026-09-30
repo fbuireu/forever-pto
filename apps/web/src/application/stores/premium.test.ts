@@ -41,12 +41,18 @@ beforeEach(() => {
 
 describe("setPremiumStatus", () => {
 	it("sets premiumKey, userEmail, lastVerified, and clears needsSessionCheck", () => {
-		const before = Date.now();
-		usePremiumStore.getState().setPremiumStatus({ email: "user@example.com", premiumKey: "key123" });
+		const verifiedAt = new Date(2026, 3, 14, 10, 30);
+		vi.useFakeTimers({ now: verifiedAt, toFake: ["Date"] });
+		try {
+			usePremiumStore.setState({ needsSessionCheck: true });
+			usePremiumStore.getState().setPremiumStatus({ email: "user@example.com", premiumKey: "key123" });
+		} finally {
+			vi.useRealTimers();
+		}
 		const state = usePremiumStore.getState();
 		expect(state.premiumKey).toBe("key123");
 		expect(state.userEmail).toBe("user@example.com");
-		expect(state.lastVerified).toBeGreaterThanOrEqual(before);
+		expect(state.lastVerified).toBe(verifiedAt.getTime());
 		expect(state.needsSessionCheck).toBe(false);
 	});
 

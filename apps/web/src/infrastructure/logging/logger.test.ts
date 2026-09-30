@@ -37,12 +37,6 @@ describe("the platform is the transport", () => {
 		}
 	});
 
-	it("has a method for every level the log contract names", () => {
-		for (const level of Object.values(LOG_LEVEL)) {
-			expect(typeof logger[level as LogLevel]).toBe("function");
-		}
-	});
-
 	it("writes a line with no context at all rather than an empty object", () => {
 		logger.info({ message: "bare" });
 

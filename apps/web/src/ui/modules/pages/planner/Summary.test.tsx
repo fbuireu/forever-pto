@@ -5,7 +5,7 @@ import { render } from "@testing-library/react";
 import type { Locale } from "next-intl";
 import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { locationState, premiumState, loaders } = vi.hoisted(() => ({
 	locationState: {
@@ -18,23 +18,35 @@ const { locationState, premiumState, loaders } = vi.hoisted(() => ({
 
 const JAN = (day: number) => new Date(2025, 0, day);
 
-const filtersState = {
+const initialFilters = () => ({
 	ptoDays: 3,
 	country: "ES",
 	region: "",
 	strategy: "grouped",
 	year: 2025,
 	carryOverMonths: 0,
-};
+});
 
-const holidaysState = {
+const initialHolidays = () => ({
 	suggestion: null as unknown,
 	holidays: [] as unknown[],
 	alternatives: [] as unknown[],
 	currentSelection: null as unknown,
 	manuallySelectedDays: [] as Date[],
 	removedSuggestedDays: [] as Date[],
-};
+});
+
+const filtersState = initialFilters();
+
+const holidaysState = initialHolidays();
+
+beforeEach(() => {
+	Object.assign(filtersState, initialFilters());
+	Object.assign(holidaysState, initialHolidays());
+	locationState.countries = [];
+	locationState.regions = [];
+	premiumState.premiumKey = "key";
+});
 
 vi.mock("@application/stores/filters", () => ({
 	useFiltersStore: (selector: (state: typeof filtersState) => unknown) => selector(filtersState),
@@ -138,8 +150,6 @@ describe("Summary budget badges at a budget of one", () => {
 
 		expect(container.textContent).toContain("presupuesto de 1 día");
 		expect(container.textContent).not.toContain("presupuesto de 1 días");
-
-		filtersState.ptoDays = 3;
 	});
 
 	it("says one Tag, not one Tagen, in German", () => {
@@ -149,8 +159,6 @@ describe("Summary budget badges at a budget of one", () => {
 
 		expect(container.textContent).toContain("Budget von 1 Tag");
 		expect(container.textContent).not.toContain("Budget von 1 Tagen");
-
-		filtersState.ptoDays = 3;
 	});
 });
 
@@ -187,8 +195,6 @@ describe("Summary manual-adjustment banner", () => {
 		expect(container.textContent).toContain(
 			"Du hast 1 Tag hinzugefügt und 2 Tage aus dem ursprünglichen Vorschlag entfernt.",
 		);
-
-		filtersState.ptoDays = 3;
 	});
 });
 
@@ -339,13 +345,6 @@ describe("Summary heading", () => {
 		filtersState.country = "ES";
 	};
 
-	const restore = () => {
-		locationState.countries = [];
-		locationState.regions = [];
-		filtersState.country = "ES";
-		filtersState.region = "";
-	};
-
 	it("names the country and the region it was planned for, flag first, matching them without regard to case", () => {
 		spain();
 		filtersState.region = "CT";
@@ -358,8 +357,6 @@ describe("Summary heading", () => {
 		expect(container.textContent).toContain("Catalonia");
 		expect(container.textContent).toContain("1 of your holidays are specific to Catalonia.");
 		expect(container.textContent).not.toContain(enMessages.summary.summaryParagraph.noRegionHintTitle);
-
-		restore();
 	});
 
 	it("nudges the reader to pick a region while none is set, and names no region it does not have", () => {
@@ -369,8 +366,6 @@ describe("Summary heading", () => {
 
 		expect(container.textContent).toContain(enMessages.summary.summaryParagraph.noRegionHintTitle);
 		expect(container.textContent).not.toContain("Catalonia");
-
-		restore();
 	});
 });
 
@@ -393,8 +388,6 @@ describe("Summary before there is a plan", () => {
 
 		expect(container.textContent).toContain(enMessages.summary.metrics.effectiveDays);
 		expect(container.textContent).not.toContain(enMessages.summary.notifications.canImprove.title);
-
-		filtersState.carryOverMonths = 0;
 	});
 });
 
@@ -459,7 +452,5 @@ describe("the banner that says a better plan exists, for a reader without Premiu
 
 		expect(container.textContent).toContain(enMessages.summary.notifications.canImprove.considerPremium);
 		expect(container.textContent).not.toContain(enMessages.summary.notifications.canImprove.reviewOptions);
-
-		premiumState.premiumKey = "key";
 	});
 });

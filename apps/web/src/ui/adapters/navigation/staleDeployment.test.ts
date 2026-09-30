@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockIsUnrecognized = vi.fn();
 
@@ -14,6 +14,10 @@ describe("recoverFromStaleDeployment", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		vi.stubGlobal("location", { reload });
+	});
+
+	afterEach(() => {
+		vi.unstubAllGlobals();
 	});
 
 	it("reloads the page when the server no longer knows the action", () => {

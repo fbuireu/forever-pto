@@ -8,7 +8,7 @@ interface RawParams {
 }
 
 const raw = ({ name, type }: RawParams): RawHoliday =>
-	({ date: "2025-01-01 00:00:00", start: new Date(), end: new Date(), name, type }) as RawHoliday;
+	({ date: "2025-01-01 00:00:00", start: new Date(2025, 0, 1), end: new Date(2025, 0, 2), name, type }) as RawHoliday;
 
 describe("keepNonWorking", () => {
 	it("keeps public and bank days", () => {

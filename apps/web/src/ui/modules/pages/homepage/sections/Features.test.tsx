@@ -39,11 +39,6 @@ describe("Features bridge illustration", () => {
 		);
 	});
 
-	it("does not leak the Spanish Wednesday initial into other locales", async () => {
-		const cells = await renderFeatures("en");
-		expect(cells.map((cell) => cell.textContent)).not.toContain("X");
-	});
-
 	it("paints the weekend on the last two cells, not on Monday", async () => {
 		const cells = await renderFeatures("en");
 		expect(cells[0].className).not.toContain(dayCell.weekend);

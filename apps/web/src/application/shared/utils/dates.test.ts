@@ -289,11 +289,6 @@ describe("getWeekdayNames", () => {
 		expect(names).toHaveLength(7);
 	});
 
-	it("starts on Monday when weekStartsOn is 1", () => {
-		const names = getWeekdayNames({ locale: "en-US", weekStartsOn: 1, format: "long" });
-		expect(names[0].toLowerCase()).toContain("mon");
-	});
-
 	it.each([
 		["narrow", "M"],
 		["short", "Mon"],

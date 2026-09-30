@@ -116,6 +116,7 @@ describe("generateSuggestions", () => {
 	it("never suggests a day that is already a holiday", () => {
 		const holiday = makeHoliday(makeDate({ year: 2025, month: 1, day: 6 }));
 		const result = planSuggestions({ ...BASE, ptoDays: 5, holidays: [holiday], strategy: FilterStrategy.GROUPED });
+		expect(result.days.length).toBeGreaterThan(0);
 		expect(
 			result.days.some((day) => day.toDateString() === makeDate({ year: 2025, month: 1, day: 6 }).toDateString()),
 		).toBe(false);
@@ -134,6 +135,7 @@ describe("generateSuggestions", () => {
 
 	it("does not return weekend days", () => {
 		const result = planSuggestions({ ...BASE, ptoDays: 10, strategy: FilterStrategy.OPTIMIZED });
+		expect(result.days.length).toBeGreaterThan(0);
 		for (const day of result.days) {
 			expect(day.getDay()).not.toBe(0);
 			expect(day.getDay()).not.toBe(6);
@@ -157,6 +159,7 @@ describe("generateSuggestions", () => {
 			removedDays: [removed],
 			strategy: FilterStrategy.GROUPED,
 		});
+		expect(result.days.length).toBeGreaterThan(0);
 		expect(result.days.some((day) => day.toDateString() === removed.toDateString())).toBe(false);
 	});
 
@@ -168,6 +171,7 @@ describe("generateSuggestions", () => {
 			removedDays: [removed],
 			strategy: FilterStrategy.GROUPED,
 		});
+		expect(result.bridges?.length).toBeGreaterThan(0);
 		const covering = result.bridges?.filter(
 			(bridge) => bridge.startDate.getTime() <= removed.getTime() && removed.getTime() <= bridge.endDate.getTime(),
 		);

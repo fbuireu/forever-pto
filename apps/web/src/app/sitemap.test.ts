@@ -31,7 +31,7 @@ describe("sitemap", () => {
 
 		expect(urls).toContain(`${BASE_URL}/`);
 		expect(urls).toContain(`${BASE_URL}/planner`);
-		expect(urls).not.toContain(expect.stringContaining(`/${routing.defaultLocale}`));
+		expect(urls.filter((url) => url.startsWith(`${BASE_URL}/${routing.defaultLocale}`))).toEqual([]);
 	});
 
 	it("includes locale prefix for non-default locales", async () => {

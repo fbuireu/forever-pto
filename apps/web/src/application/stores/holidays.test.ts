@@ -76,7 +76,7 @@ interface MakeHolidayParams {
 
 const makeHoliday = ({ id, dateStr, variant = HolidayVariant.NATIONAL }: MakeHolidayParams): HolidayDTO => ({
 	id,
-	date: new Date(dateStr),
+	date: new Date(`${dateStr}T00:00:00`),
 	name: `Holiday ${id}`,
 	variant,
 	isInPlanningWindow: true,
@@ -103,22 +103,11 @@ const makeSuggestion = (days: Date[]): MeasuredSuggestion => ({
 	metrics: { totalDays: days.length } as never,
 });
 
-const INITIAL = {
-	holidays: [],
-	suggestion: null,
-	maxAlternatives: 4,
-	alternatives: [],
-	currentSelection: null,
-	previewAlternativeIndex: 0,
-	currentSelectionIndex: 0,
-	manuallySelectedDays: [],
-	removedSuggestedDays: [],
-	isCalculating: false,
-};
-
 beforeEach(() => {
-	useHolidaysStore.setState(INITIAL);
+	useHolidaysStore.setState(useHolidaysStore.getInitialState());
+	useFiltersStore.setState(useFiltersStore.getInitialState());
 	vi.clearAllMocks();
+	mockGetHolidays.mockResolvedValue([]);
 	mockRunPlanningPipeline.mockReturnValue({ planned: true, suggestion: makeSuggestion([]), alternatives: [] });
 });
 
@@ -188,7 +177,7 @@ describe("toggleDaySelection refuses days that are already off", () => {
 	});
 
 	it("names the weekend as the reason, so the caller need not re-derive it", () => {
-		const saturday = new Date("2026-03-14");
+		const saturday = new Date(2026, 2, 14);
 
 		const outcome = useHolidaysStore
 			.getState()
@@ -203,7 +192,7 @@ describe("toggleDaySelection refuses days that are already off", () => {
 		});
 
 		const custom = useHolidaysStore.getState().toggleDaySelection({
-			date: new Date("2026-03-11"),
+			date: new Date(2026, 2, 11),
 			totalPtoDays: 10,
 			locale: "en" as const,
 			allowPastDays: true,
@@ -214,7 +203,7 @@ describe("toggleDaySelection refuses days that are already off", () => {
 		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "national-1", dateStr: "2026-03-11" })] });
 
 		const national = useHolidaysStore.getState().toggleDaySelection({
-			date: new Date("2026-03-11"),
+			date: new Date(2026, 2, 11),
 			totalPtoDays: 10,
 			locale: "en" as const,
 			allowPastDays: true,
@@ -225,13 +214,13 @@ describe("toggleDaySelection refuses days that are already off", () => {
 
 	it("names an exhausted budget as the reason", () => {
 		useHolidaysStore.setState({
-			currentSelection: { days: [new Date("2026-03-09")], bridges: [], metrics: null } as never,
+			currentSelection: { days: [new Date(2026, 2, 9)], bridges: [], metrics: null } as never,
 			manuallySelectedDays: [],
 			removedSuggestedDays: [],
 		});
 
 		const outcome = useHolidaysStore.getState().toggleDaySelection({
-			date: new Date("2026-03-11"),
+			date: new Date(2026, 2, 11),
 			totalPtoDays: 1,
 			locale: "en" as const,
 			allowPastDays: true,
@@ -250,7 +239,7 @@ describe("editHoliday collisions", () => {
 
 		const outcome = useHolidaysStore.getState().editHoliday({
 			holidayId: "custom-1",
-			updates: { name: "Renamed, same day", date: new Date("2026-03-11") },
+			updates: { name: "Renamed, same day", date: new Date(2026, 2, 11) },
 			year: 2026,
 			carryOverMonths: 0,
 		});
@@ -263,18 +252,18 @@ describe("editHoliday collisions", () => {
 	it("refuses to move a holiday onto a date already spent as a PTO day", () => {
 		useHolidaysStore.setState({
 			holidays: [makeHoliday({ id: "custom-1", dateStr: "2026-03-11", variant: HolidayVariant.CUSTOM })],
-			manuallySelectedDays: [new Date("2026-03-12")],
+			manuallySelectedDays: [new Date(2026, 2, 12)],
 		});
 
 		useHolidaysStore.getState().editHoliday({
 			holidayId: "custom-1",
-			updates: { name: "Moved", date: new Date("2026-03-12") },
+			updates: { name: "Moved", date: new Date(2026, 2, 12) },
 			year: 2026,
 			carryOverMonths: 0,
 		});
 
 		const [holiday] = useHolidaysStore.getState().holidays;
-		expect(holiday.date.toDateString()).toBe(new Date("2026-03-11").toDateString());
+		expect(holiday.date.toDateString()).toBe(new Date(2026, 2, 11).toDateString());
 	});
 
 	it("refuses to move a holiday onto another holiday", () => {
@@ -287,30 +276,30 @@ describe("editHoliday collisions", () => {
 
 		useHolidaysStore.getState().editHoliday({
 			holidayId: "custom-1",
-			updates: { name: "Moved", date: new Date("2026-03-12") },
+			updates: { name: "Moved", date: new Date(2026, 2, 12) },
 			year: 2026,
 			carryOverMonths: 0,
 		});
 
 		const moved = useHolidaysStore.getState().holidays.find((h) => h.id === "custom-1");
-		expect(moved?.date.toDateString()).toBe(new Date("2026-03-11").toDateString());
+		expect(moved?.date.toDateString()).toBe(new Date(2026, 2, 11).toDateString());
 	});
 
 	it("still moves a holiday onto a free date", () => {
 		useHolidaysStore.setState({
 			holidays: [makeHoliday({ id: "custom-1", dateStr: "2026-03-11", variant: HolidayVariant.CUSTOM })],
-			manuallySelectedDays: [new Date("2026-03-12")],
+			manuallySelectedDays: [new Date(2026, 2, 12)],
 		});
 
 		useHolidaysStore.getState().editHoliday({
 			holidayId: "custom-1",
-			updates: { name: "Moved", date: new Date("2026-03-13") },
+			updates: { name: "Moved", date: new Date(2026, 2, 13) },
 			year: 2026,
 			carryOverMonths: 0,
 		});
 
 		const [holiday] = useHolidaysStore.getState().holidays;
-		expect(holiday.date.toDateString()).toBe(new Date("2026-03-13").toDateString());
+		expect(holiday.date.toDateString()).toBe(new Date(2026, 2, 13).toDateString());
 	});
 });
 
@@ -320,7 +309,7 @@ describe("the refusal reason crosses the seam", () => {
 		useHolidaysStore.setState({ holidays: [held] });
 
 		const outcome = useHolidaysStore.getState().addHoliday({
-			holiday: { name: "Company day", date: new Date("2026-03-11") },
+			holiday: { name: "Company day", date: new Date(2026, 2, 11) },
 			year: 2026,
 			carryOverMonths: 0,
 		});
@@ -329,10 +318,10 @@ describe("the refusal reason crosses the seam", () => {
 	});
 
 	it("tells a Manual Day collision apart from a Holiday collision", () => {
-		useHolidaysStore.setState({ manuallySelectedDays: [new Date("2026-03-11")] });
+		useHolidaysStore.setState({ manuallySelectedDays: [new Date(2026, 2, 11)] });
 
 		const outcome = useHolidaysStore.getState().addHoliday({
-			holiday: { name: "Company day", date: new Date("2026-03-11") },
+			holiday: { name: "Company day", date: new Date(2026, 2, 11) },
 			year: 2026,
 			carryOverMonths: 0,
 		});
@@ -343,7 +332,7 @@ describe("the refusal reason crosses the seam", () => {
 	it("reports a missing Holiday rather than silently doing nothing", () => {
 		const outcome = useHolidaysStore.getState().editHoliday({
 			holidayId: "nope",
-			updates: { name: "Moved", date: new Date("2026-03-12") },
+			updates: { name: "Moved", date: new Date(2026, 2, 12) },
 			year: 2026,
 			carryOverMonths: 0,
 		});
@@ -354,11 +343,11 @@ describe("the refusal reason crosses the seam", () => {
 
 describe("addHoliday", () => {
 	it("refuses a date already spent as a PTO day, which would otherwise be paid for twice", () => {
-		const date = new Date("2026-03-10");
+		const date = new Date(2026, 2, 10);
 		useHolidaysStore.setState({ manuallySelectedDays: [date] });
 
 		useHolidaysStore.getState().addHoliday({
-			holiday: { name: "Company day", date: new Date("2026-03-10") },
+			holiday: { name: "Company day", date: new Date(2026, 2, 10) },
 			year: 2026,
 			carryOverMonths: 0,
 		});
@@ -367,10 +356,10 @@ describe("addHoliday", () => {
 	});
 
 	it("still adds a holiday on a date no PTO day occupies", () => {
-		useHolidaysStore.setState({ manuallySelectedDays: [new Date("2026-03-10")] });
+		useHolidaysStore.setState({ manuallySelectedDays: [new Date(2026, 2, 10)] });
 
 		useHolidaysStore.getState().addHoliday({
-			holiday: { name: "Company day", date: new Date("2026-03-11") },
+			holiday: { name: "Company day", date: new Date(2026, 2, 11) },
 			year: 2026,
 			carryOverMonths: 0,
 		});
@@ -379,7 +368,7 @@ describe("addHoliday", () => {
 	});
 
 	it("adds a new holiday to the list", () => {
-		const date = new Date("2026-01-01");
+		const date = new Date(2026, 0, 1);
 		useHolidaysStore.getState().addHoliday({
 			holiday: { name: "New Year", date, type: "public" },
 			year: 2026,
@@ -390,7 +379,7 @@ describe("addHoliday", () => {
 	});
 
 	it("does not add a holiday when one already exists on the same date", () => {
-		const date = new Date("2026-01-01");
+		const date = new Date(2026, 0, 1);
 		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })] });
 		useHolidaysStore.getState().addHoliday({
 			holiday: { name: "Duplicate", date, type: "public" },
@@ -401,7 +390,7 @@ describe("addHoliday", () => {
 	});
 
 	it("warns about the duplicate without blocking the action on the logging client", async () => {
-		const date = new Date("2026-01-01");
+		const date = new Date(2026, 0, 1);
 		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })] });
 
 		useHolidaysStore.getState().addHoliday({
@@ -421,7 +410,7 @@ describe("addHoliday", () => {
 
 	it("sorts holidays by date after adding", () => {
 		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "h1", dateStr: "2026-06-01" })] });
-		const earlyDate = new Date("2026-01-15");
+		const earlyDate = new Date(2026, 0, 15);
 		useHolidaysStore.getState().addHoliday({
 			holiday: { name: "Early", date: earlyDate, type: "public" },
 			year: 2026,
@@ -453,7 +442,7 @@ describe("removeHoliday", () => {
 describe("editHoliday", () => {
 	it("replaces the holiday at the matching index", () => {
 		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })] });
-		const newDate = new Date("2026-03-15");
+		const newDate = new Date(2026, 2, 15);
 		useHolidaysStore.getState().editHoliday({
 			holidayId: "h1",
 			updates: { name: "Renamed", date: newDate },
@@ -469,7 +458,7 @@ describe("editHoliday", () => {
 		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })] });
 		useHolidaysStore.getState().editHoliday({
 			holidayId: "missing",
-			updates: { name: "X", date: new Date() },
+			updates: { name: "X", date: new Date(2026, 2, 12) },
 			year: 2026,
 			carryOverMonths: 1,
 		});
@@ -491,8 +480,8 @@ describe("setMaxAlternatives", () => {
 
 describe("setCalculationResult", () => {
 	it("stores suggestion and alternatives", () => {
-		const suggestion = makeSuggestion([new Date("2026-05-01")]);
-		const alternatives = [makeSuggestion([new Date("2026-06-01")])];
+		const suggestion = makeSuggestion([new Date(2026, 4, 1)]);
+		const alternatives = [makeSuggestion([new Date(2026, 5, 1)])];
 		useHolidaysStore.getState().setCalculationResult({ suggestion, alternatives });
 		const state = useHolidaysStore.getState();
 		expect(state.suggestion).toBe(suggestion);
@@ -502,8 +491,8 @@ describe("setCalculationResult", () => {
 	});
 
 	it("preserves currentSelectionIndex within bounds", () => {
-		const s1 = makeSuggestion([new Date("2026-05-01")]);
-		const s2 = makeSuggestion([new Date("2026-06-01")]);
+		const s1 = makeSuggestion([new Date(2026, 4, 1)]);
+		const s2 = makeSuggestion([new Date(2026, 5, 1)]);
 		useHolidaysStore.setState({ currentSelectionIndex: 1 });
 		useHolidaysStore.getState().setCalculationResult({ suggestion: s1, alternatives: [s2] });
 		expect(useHolidaysStore.getState().currentSelectionIndex).toBe(1);
@@ -512,7 +501,7 @@ describe("setCalculationResult", () => {
 
 	it("resets to index 0 when previous index is out of bounds", () => {
 		useHolidaysStore.setState({ currentSelectionIndex: 5 });
-		const s = makeSuggestion([new Date("2026-05-01")]);
+		const s = makeSuggestion([new Date(2026, 4, 1)]);
 		useHolidaysStore.getState().setCalculationResult({ suggestion: s, alternatives: [] });
 		expect(useHolidaysStore.getState().currentSelectionIndex).toBe(0);
 	});
@@ -521,8 +510,8 @@ describe("setCalculationResult", () => {
 describe("resetManualSelection", () => {
 	it("clears manually selected and removed days", () => {
 		useHolidaysStore.setState({
-			manuallySelectedDays: [new Date("2026-01-03")],
-			removedSuggestedDays: [new Date("2026-01-01")],
+			manuallySelectedDays: [new Date(2026, 0, 3)],
+			removedSuggestedDays: [new Date(2026, 0, 1)],
 			currentSelection: null,
 		});
 		useHolidaysStore.getState().resetManualSelection();
@@ -532,7 +521,7 @@ describe("resetManualSelection", () => {
 	});
 
 	it("restores currentSelection to base when index is 0", () => {
-		const suggestion = makeSuggestion([new Date("2026-01-01")]);
+		const suggestion = makeSuggestion([new Date(2026, 0, 1)]);
 		const modified = { ...suggestion, metrics: { totalDays: 99 } as never };
 		useHolidaysStore.setState({
 			suggestion,
@@ -547,13 +536,13 @@ describe("resetManualSelection", () => {
 	});
 
 	it("bumps planRevision so the freed budget is re-planned", () => {
-		const suggestion = makeSuggestion([new Date("2026-01-01")]);
+		const suggestion = makeSuggestion([new Date(2026, 0, 1)]);
 		useHolidaysStore.setState({
 			suggestion,
 			alternatives: [],
 			currentSelection: suggestion,
 			currentSelectionIndex: 0,
-			manuallySelectedDays: [new Date("2026-01-03")],
+			manuallySelectedDays: [new Date(2026, 0, 3)],
 			removedSuggestedDays: [],
 			planRevision: 4,
 		});
@@ -566,7 +555,7 @@ describe("resetManualSelection", () => {
 	it("bumps planRevision even when there is no current selection", () => {
 		useHolidaysStore.setState({
 			currentSelection: null,
-			manuallySelectedDays: [new Date("2026-01-03")],
+			manuallySelectedDays: [new Date(2026, 0, 3)],
 			removedSuggestedDays: [],
 			planRevision: 0,
 		});
@@ -580,7 +569,7 @@ describe("resetManualSelection", () => {
 describe("trimManualDays", () => {
 	it("trims manuallySelectedDays to maxPtoDays", () => {
 		useHolidaysStore.setState({
-			manuallySelectedDays: [new Date("2026-01-01"), new Date("2026-01-02"), new Date("2026-01-03")],
+			manuallySelectedDays: [new Date(2026, 0, 1), new Date(2026, 0, 2), new Date(2026, 0, 3)],
 		});
 		useHolidaysStore.getState().trimManualDays(2);
 		expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(2);
@@ -588,7 +577,7 @@ describe("trimManualDays", () => {
 
 	it("does nothing when length is within limit", () => {
 		useHolidaysStore.setState({
-			manuallySelectedDays: [new Date("2026-01-01")],
+			manuallySelectedDays: [new Date(2026, 0, 1)],
 		});
 		useHolidaysStore.getState().trimManualDays(5);
 		expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(1);
@@ -596,7 +585,7 @@ describe("trimManualDays", () => {
 });
 
 describe("toggleDaySelection", () => {
-	const baseDate = new Date("2026-05-11");
+	const baseDate = new Date(2026, 4, 11);
 	const PARAMS = { totalPtoDays: 5, locale: "en" as const, allowPastDays: false };
 
 	it("refuses with no_plan when there is no currentSelection", () => {
@@ -661,11 +650,11 @@ describe("toggleDaySelection", () => {
 
 	it("returns false and does not add a day when no remaining budget", () => {
 		const suggestion = makeSuggestion([
-			new Date("2026-05-01"),
-			new Date("2026-05-02"),
-			new Date("2026-05-03"),
-			new Date("2026-05-04"),
-			new Date("2026-05-05"),
+			new Date(2026, 4, 1),
+			new Date(2026, 4, 2),
+			new Date(2026, 4, 3),
+			new Date(2026, 4, 4),
+			new Date(2026, 4, 5),
 		]);
 		useHolidaysStore.setState({
 			currentSelection: suggestion,
@@ -680,7 +669,7 @@ describe("toggleDaySelection", () => {
 	});
 
 	it("adds an unselected day when budget allows", () => {
-		const suggestion = makeSuggestion([new Date("2026-05-01")]);
+		const suggestion = makeSuggestion([new Date(2026, 4, 1)]);
 		useHolidaysStore.setState({
 			currentSelection: suggestion,
 			manuallySelectedDays: [],
@@ -709,7 +698,7 @@ describe("setCalculating", () => {
 
 describe("setCurrentAlternativeSelection", () => {
 	it("sets currentSelection and both indices", () => {
-		const suggestion = makeSuggestion([new Date("2026-06-01")]);
+		const suggestion = makeSuggestion([new Date(2026, 5, 1)]);
 		useHolidaysStore.getState().setCurrentAlternativeSelection({ suggestion, index: 2 });
 		const state = useHolidaysStore.getState();
 		expect(state.currentSelection?.days).toEqual(suggestion.days);
@@ -718,13 +707,13 @@ describe("setCurrentAlternativeSelection", () => {
 	});
 
 	it("drops the Removed Days, which named days of the Suggestion being replaced", () => {
-		useHolidaysStore.setState({ removedSuggestedDays: [new Date("2026-01-06")] });
+		useHolidaysStore.setState({ removedSuggestedDays: [new Date(2026, 0, 6)] });
 		useHolidaysStore.getState().setCurrentAlternativeSelection({ suggestion: makeSuggestion([]), index: 0 });
 		expect(useHolidaysStore.getState().removedSuggestedDays).toHaveLength(0);
 	});
 
 	it("keeps the Manual Days, which every Alternative was planned around", () => {
-		const manual = new Date("2026-01-05");
+		const manual = new Date(2026, 0, 5);
 		useHolidaysStore.setState({ manuallySelectedDays: [manual] });
 
 		useHolidaysStore.getState().setCurrentAlternativeSelection({ suggestion: makeSuggestion([]), index: 0 });
@@ -741,7 +730,7 @@ describe("setCurrentAlternativeSelection", () => {
 	});
 
 	it("adopts the chosen plan verbatim, leaving its Bridges for the re-plan to rebuild", () => {
-		const suggestion = makeSuggestion([new Date("2026-06-01")]);
+		const suggestion = makeSuggestion([new Date(2026, 5, 1)]);
 
 		useHolidaysStore.getState().setCurrentAlternativeSelection({ suggestion, index: 1 });
 
@@ -756,10 +745,10 @@ describe("setPreviewAlternativeSelection", () => {
 	});
 
 	it("does not modify currentSelection or manuallySelectedDays", () => {
-		const currentSuggestion = makeSuggestion([new Date("2026-05-01")]);
+		const currentSuggestion = makeSuggestion([new Date(2026, 4, 1)]);
 		useHolidaysStore.setState({
 			currentSelection: currentSuggestion,
-			manuallySelectedDays: [new Date("2026-01-10")],
+			manuallySelectedDays: [new Date(2026, 0, 10)],
 		});
 		useHolidaysStore.getState().setPreviewAlternativeSelection({ index: 1 });
 		const state = useHolidaysStore.getState();
@@ -774,9 +763,9 @@ describe("resetToDefaults", () => {
 			holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })],
 			maxAlternatives: 8,
 			isCalculating: true,
-			manuallySelectedDays: [new Date("2026-01-05")],
+			manuallySelectedDays: [new Date(2026, 0, 5)],
 			currentSelectionIndex: 3,
-			suggestion: makeSuggestion([new Date("2026-05-01")]),
+			suggestion: makeSuggestion([new Date(2026, 4, 1)]),
 		});
 		useHolidaysStore.getState().resetToDefaults();
 		const state = useHolidaysStore.getState();
@@ -882,7 +871,6 @@ describe("fetchHolidays", () => {
 		const { holidays, holidaysKey } = useHolidaysStore.getState();
 		expect(holidays.map(({ id }) => id)).toEqual(["newer"]);
 		expect(holidaysKey).toBe(holidaysKeyOf({ ...FETCH_PARAMS, year: 2027 }));
-		mockGetHolidays.mockResolvedValue([]);
 	});
 
 	it("sets holidays to empty on error when there are no custom holidays", async () => {
@@ -1072,10 +1060,13 @@ describe("persistence", () => {
 	it("clears the stored blob when rehydration fails", () => {
 		const removeItem = vi.fn();
 		vi.stubGlobal("localStorage", { removeItem });
-		const listener = useHolidaysStore.persist.getOptions().onRehydrateStorage?.(useHolidaysStore.getState());
-		expect(() => listener?.(undefined, new Error("deobfuscate failed"))).not.toThrow();
-		expect(removeItem).toHaveBeenCalledWith("holidays-store");
-		vi.unstubAllGlobals();
+		try {
+			const listener = useHolidaysStore.persist.getOptions().onRehydrateStorage?.(useHolidaysStore.getState());
+			expect(() => listener?.(undefined, new Error("deobfuscate failed"))).not.toThrow();
+			expect(removeItem).toHaveBeenCalledWith("holidays-store");
+		} finally {
+			vi.unstubAllGlobals();
+		}
 	});
 });
 
@@ -1136,7 +1127,7 @@ describe("generateSuggestions", () => {
 	});
 
 	it("clears the plan when the pipeline reports it did not plan, since this store has a null state and the wire does not", async () => {
-		useHolidaysStore.setState({ holidays: [], suggestion: makeSuggestion([new Date("2026-06-01")]) });
+		useHolidaysStore.setState({ holidays: [], suggestion: makeSuggestion([new Date(2026, 5, 1)]) });
 		mockRunPlanningPipeline.mockReturnValueOnce({
 			planned: false,
 			suggestion: makeSuggestion([]),
@@ -1155,11 +1146,11 @@ describe("generateSuggestions", () => {
 
 	it("sets suggestion, alternatives, and currentSelection on success", async () => {
 		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })], maxAlternatives: 1 });
-		const days = [new Date("2026-06-01")];
+		const days = [new Date(2026, 5, 1)];
 		mockRunPlanningPipeline.mockReturnValueOnce({
 			planned: true,
 			suggestion: makeSuggestion(days),
-			alternatives: [makeSuggestion([new Date("2026-07-01")])],
+			alternatives: [makeSuggestion([new Date(2026, 6, 1)])],
 		});
 
 		await useHolidaysStore.getState().generateSuggestions(PARAMS);

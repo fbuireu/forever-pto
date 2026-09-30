@@ -35,11 +35,6 @@ describe("getKey", () => {
 			getKey(makeDate({ year: 2025, month: 1, day: 2 })),
 		);
 	});
-
-	it("returns the cached result on repeated calls for the same timestamp", () => {
-		const date = makeDate({ year: 2025, month: 3, day: 20 });
-		expect(getKey(date)).toBe(getKey(date));
-	});
 });
 
 describe("getCombinationKey", () => {
@@ -63,9 +58,7 @@ describe("getCombinationKey", () => {
 			makeDate({ year: 2025, month: 1, day: 1 }),
 			makeDate({ year: 2025, month: 1, day: 2 }),
 		];
-		const parts = getCombinationKey(days).split(",");
-		expect(parts.length).toBe(3);
-		expect(parts).toEqual([...parts].sort((a, b) => a.localeCompare(b)));
+		expect(getCombinationKey(days)).toBe("2025-0-1,2025-0-2,2025-0-3");
 	});
 });
 

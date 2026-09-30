@@ -80,7 +80,7 @@ describe("createPayment", () => {
 
 	it("returns discountInfo when promo code is applied", async () => {
 		const result = await run(createPayment({ params: { ...PARAMS, promoCode: "SAVE20" }, context: CONTEXT }));
-		expect(result.discountInfo).not.toBeNull();
+		expect(result.discountInfo).toEqual({ finalAmount: 799, discountAmount: 200, promoCode: "SAVE20" });
 	});
 
 	it("fails with ValidationError when zodParse fails", async () => {

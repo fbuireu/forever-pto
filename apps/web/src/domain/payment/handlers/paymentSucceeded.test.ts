@@ -61,12 +61,6 @@ describe("handlePaymentSucceeded", () => {
 		await expect(run(handlePaymentSucceeded(EVENT))).resolves.toBeUndefined();
 	});
 
-	it("calls updatePaymentStatus when existing payment is not succeeded", async () => {
-		const { updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
-		await run(handlePaymentSucceeded(EVENT));
-		expect(updatePaymentStatus).toHaveBeenCalledWith({ paymentIntentId: "pi_test", status: "succeeded" });
-	});
-
 	it("never reads the row first, so an unreadable database cannot look like an absent payment", async () => {
 		const { getPaymentById } = await import("@infrastructure/services/payments/repository");
 		await run(handlePaymentSucceeded(EVENT));

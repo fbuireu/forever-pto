@@ -1,8 +1,12 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 const { GET } = await import("./route");
 
 describe("GET /api/health", () => {
+	afterEach(() => {
+		vi.unstubAllEnvs();
+	});
+
 	it("returns 200 with status ok", async () => {
 		const response = await GET();
 		expect(response.status).toBe(200);
@@ -10,14 +14,15 @@ describe("GET /api/health", () => {
 		expect(body.status).toBe("ok");
 	});
 
-	it("returns a valid ISO timestamp", async () => {
-		const before = Date.now();
-		const response = await GET();
-		const after = Date.now();
-		const body = await response.json();
-		const ts = new Date(body.timestamp).getTime();
-		expect(ts).toBeGreaterThanOrEqual(before);
-		expect(ts).toBeLessThanOrEqual(after);
+	it("stamps the answer with the current instant as an ISO string", async () => {
+		const now = new Date("2026-04-14T10:30:00.000Z");
+		vi.useFakeTimers({ now, toFake: ["Date"] });
+		try {
+			const body = await (await GET()).json();
+			expect(body.timestamp).toBe(now.toISOString());
+		} finally {
+			vi.useRealTimers();
+		}
 	});
 
 	it("reports liveness only, without disclosing which secrets are configured", async () => {
@@ -30,8 +35,6 @@ describe("GET /api/health", () => {
 
 		expect(Object.keys(body)).toEqual(["status", "timestamp"]);
 		expect(JSON.stringify(body)).not.toContain("sk_test_123");
-
-		vi.unstubAllEnvs();
 	});
 
 	it("sets Cache-Control: no-store", async () => {

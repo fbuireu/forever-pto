@@ -99,17 +99,21 @@ describe("getHolidays", () => {
 	});
 
 	it("looks the calendar up once when only the Carry-over Months change, and re-flags the window", async () => {
-		const source = createFixtureHolidaySource(CALENDAR);
+		const source = createFixtureHolidaySource({
+			...CALENDAR,
+			national: [...CALENDAR.national, raw({ date: "2028-01-06 00:00:00", name: "Epiphany" })],
+		});
 		const lookup = vi.spyOn(source, "rawHolidays");
+		const inWindow = (holidays: Awaited<ReturnType<typeof getHolidays>>) =>
+			holidays.find(({ name }) => name === "Epiphany")?.isInPlanningWindow;
 
 		const narrow = await getHolidays({ ...BASE_PARAMS, source, carryOverMonths: 0 });
 		const wide = await getHolidays({ ...BASE_PARAMS, source, carryOverMonths: 12 });
 
 		expect(lookup).toHaveBeenCalledOnce();
 		expect(wide.map(({ id }) => id)).toEqual(narrow.map(({ id }) => id));
-		expect(wide.filter(({ isInPlanningWindow }) => isInPlanningWindow).length).toBeGreaterThanOrEqual(
-			narrow.filter(({ isInPlanningWindow }) => isInPlanningWindow).length,
-		);
+		expect(inWindow(narrow)).toBe(false);
+		expect(inWindow(wide)).toBe(true);
 	});
 
 	it("looks the calendar up again for another year", async () => {

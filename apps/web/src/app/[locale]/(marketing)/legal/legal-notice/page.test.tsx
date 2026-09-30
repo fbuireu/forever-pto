@@ -63,8 +63,8 @@ describe("legal-notice/page", () => {
 		expect(mockGetTranslations).toHaveBeenCalledWith(expect.objectContaining({ locale: ES }));
 	});
 
-	it("renders lastUpdated prop", async () => {
+	it("passes the translated last-updated line to the layout", async () => {
 		const element = await LegalNoticePage(makeParams());
-		expect(element.props.lastUpdated).toBeDefined();
+		expect(element.props.lastUpdated).toBe("t:lastUpdated");
 	});
 });

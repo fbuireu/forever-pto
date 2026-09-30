@@ -44,10 +44,10 @@ const COPY = {
 
 const RECT = { left: 0, top: 0, width: 200, height: 100 } as DOMRect;
 
-const renderShapes = () => {
+const renderShapes = (rect: DOMRect = RECT) => {
 	const { container } = render(<CtaShapesClient {...COPY} />);
 	const surface = container.firstElementChild as HTMLElement;
-	vi.spyOn(surface, "getBoundingClientRect").mockReturnValue(RECT);
+	vi.spyOn(surface, "getBoundingClientRect").mockReturnValue(rect);
 	return surface;
 };
 
@@ -119,9 +119,9 @@ describe("CtaShapesClient", () => {
 	});
 
 	it("reads the pointer against its own box rather than against the page", async () => {
-		const surface = renderShapes();
+		const surface = renderShapes({ left: 300, top: 200, width: 200, height: 100 } as DOMRect);
 
-		fireEvent.mouseMove(surface, { clientX: 100, clientY: 50 });
+		fireEvent.mouseMove(surface, { clientX: 400, clientY: 250 });
 		await settle();
 
 		expect(offsets()).toStrictEqual(CENTRED);

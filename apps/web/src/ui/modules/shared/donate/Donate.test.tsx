@@ -193,11 +193,15 @@ describe("a donation with a discount on it", () => {
 	});
 
 	it("charges the discounted amount, not the one typed", async () => {
+		initializePayment.mockResolvedValue({
+			clientSecret: "cs_test",
+			discountInfo: { type: "percentage", value: 70, originalAmount: 10, finalAmount: 3 },
+		});
 		renderDonate();
 
 		donate();
 
-		await waitFor(() => expect(screen.getByTestId("checkout").getAttribute("data-amount")).toBe("5"));
+		await waitFor(() => expect(screen.getByTestId("checkout").getAttribute("data-amount")).toBe("3"));
 	});
 });
 

@@ -91,7 +91,7 @@ describe("Tooltip (popover-based, touch-capable)", () => {
 		expect(screen.getByText("info").getAttribute("data-delay")).toBe("50");
 	});
 
-	it("renders the popup only while open", () => {
+	it("renders no popup while closed", () => {
 		renderTooltip();
 		expect(screen.queryByText("tip content")).toBeNull();
 	});

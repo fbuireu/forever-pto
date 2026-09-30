@@ -20,8 +20,8 @@ const { TursoService, TursoServiceLive } = await import("./service");
 beforeEach(() => {
 	vi.clearAllMocks();
 	mockClose.mockResolvedValue(undefined);
-	process.env.TURSO_DATABASE_URL = "libsql://test.turso.io";
-	process.env.TURSO_AUTH_TOKEN = "test-token";
+	vi.stubEnv("TURSO_DATABASE_URL", "libsql://test.turso.io");
+	vi.stubEnv("TURSO_AUTH_TOKEN", "test-token");
 });
 
 afterEach(() => {

@@ -291,7 +291,7 @@ describe("HolidaysTable select-all", () => {
 });
 
 describe("HolidaysTable clears the selection when a modal is done with it", () => {
-	const closeModal = (view: View, testId: string) => {
+	const clickInsideModal = (view: View, testId: string) => {
 		const modal = view.getByTestId(testId);
 		fireEvent.click(modal);
 		return modal;
@@ -302,7 +302,7 @@ describe("HolidaysTable clears the selection when a modal is done with it", () =
 
 		fireEvent.click(desktopRow(view, "Alpha"));
 
-		expect(closeModal(view, "delete-modal").getAttribute("data-names")).toBe("Alpha");
+		expect(clickInsideModal(view, "delete-modal").getAttribute("data-names")).toBe("Alpha");
 	});
 
 	it("un-picks a Holiday clicked twice, which is the other half of the toggle", () => {

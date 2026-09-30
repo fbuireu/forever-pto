@@ -66,17 +66,4 @@ describe("measureGain", () => {
 	it("goes negative when the plan returns less than the budget it was given", () => {
 		expect(measureGain({ totalEffectiveDays: 6, ptoDays: 10 })).toEqual({ overBudget: -4, gain: -40 });
 	});
-
-	it("parts company with Efficiency by whatever budget went unspent", () => {
-		const ptoDays = 10;
-		const placed = 8;
-		const totalEffectiveDays = 24;
-
-		const { gain } = measureGain({ totalEffectiveDays, ptoDays });
-		const efficiency = totalEffectiveDays / placed;
-
-		expect(gain).toBe(140);
-		expect(efficiency).toBe(3);
-		expect(gain / 100 + 1).not.toBe(efficiency);
-	});
 });

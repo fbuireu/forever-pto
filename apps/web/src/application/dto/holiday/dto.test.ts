@@ -164,7 +164,7 @@ describe("holidayDTO", () => {
 });
 
 describe("holidayDTO.createCustom", () => {
-	const BASE = { name: "Day Off", date: new Date("2024-06-15"), locale: "en", year: 2024, carryOverMonths: 0 };
+	const BASE = { name: "Day Off", date: new Date(2024, 5, 15), locale: "en", year: 2024, carryOverMonths: 0 };
 
 	it("creates a CUSTOM variant holiday", () => {
 		const result = holidayDTO.createCustom(BASE);
@@ -192,12 +192,12 @@ describe("holidayDTO.createCustom", () => {
 	});
 
 	it("marks isInPlanningWindow=false for a date outside the year with carryOverMonths=0", () => {
-		const result = holidayDTO.createCustom({ ...BASE, date: new Date("2025-03-01") });
+		const result = holidayDTO.createCustom({ ...BASE, date: new Date(2025, 2, 1) });
 		expect(result.isInPlanningWindow).toBe(false);
 	});
 
 	it("marks isInPlanningWindow=true for a carry-over date within carryOverMonths", () => {
-		const result = holidayDTO.createCustom({ ...BASE, date: new Date("2025-02-01"), carryOverMonths: 3 });
+		const result = holidayDTO.createCustom({ ...BASE, date: new Date(2025, 1, 1), carryOverMonths: 3 });
 		expect(result.isInPlanningWindow).toBe(true);
 	});
 });

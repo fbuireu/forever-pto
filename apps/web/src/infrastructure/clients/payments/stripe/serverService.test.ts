@@ -60,8 +60,8 @@ const { isWebhookConfigurationError, StripeServerService, StripeServerServiceLiv
 
 beforeEach(() => {
 	vi.clearAllMocks();
-	process.env.STRIPE_SECRET_KEY = "sk_test_key";
-	process.env.STRIPE_WEBHOOK_SECRET = "whsec_test";
+	vi.stubEnv("STRIPE_SECRET_KEY", "sk_test_key");
+	vi.stubEnv("STRIPE_WEBHOOK_SECRET", "whsec_test");
 });
 
 afterEach(() => {
@@ -101,17 +101,6 @@ describe("StripeServerService.paymentIntents.retrieve", () => {
 		expect(result).toEqual(pi);
 	});
 
-	it("wraps SDK errors as PaymentError", async () => {
-		mockPaymentIntentsRetrieve.mockRejectedValue(new Error("network error"));
-		const error = await Effect.runPromise(
-			Effect.gen(function* () {
-				const stripe = yield* StripeServerService;
-				return yield* stripe.paymentIntents.retrieve("pi_bad").pipe(Effect.flip);
-			}).pipe(Effect.provide(StripeServerServiceLive)),
-		);
-		expect(error).toBeInstanceOf(PaymentError);
-	});
-
 	it("wraps a rejected reference as PaymentRequestError, which the API maps to 400 rather than 500", async () => {
 		mockPaymentIntentsRetrieve.mockRejectedValue(new StripeInvalidRequestError("No such payment_intent: 'pi_invalid'"));
 		const error = await Effect.runPromise(
@@ -131,6 +120,7 @@ describe("StripeServerService.paymentIntents.retrieve", () => {
 				return yield* stripe.paymentIntents.retrieve("pi_bad").pipe(Effect.flip);
 			}).pipe(Effect.provide(StripeServerServiceLive)),
 		);
+		expect(error).toBeInstanceOf(PaymentError);
 		expect(error).not.toBeInstanceOf(PaymentRequestError);
 	});
 });
@@ -233,9 +223,7 @@ describe("StripeServerService.promotionCodes.list", () => {
 		);
 		expect(error).toBeInstanceOf(PaymentError);
 	});
-});
 
-describe("StripeServerService.promotionCodes.list", () => {
 	it("passes the coupon expansion through to the SDK", async () => {
 		mockPromotionCodesList.mockResolvedValue({ data: [], has_more: false });
 		await Effect.runPromise(

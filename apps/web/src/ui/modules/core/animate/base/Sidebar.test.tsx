@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { act, fireEvent, render, renderHook } from "@testing-library/react";
 import type { ComponentProps, ReactNode } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 const viewport = vi.hoisted(() => ({ isMobile: false }));
 
@@ -55,6 +55,10 @@ vi.mock("./Tooltip", () => ({
 }));
 
 import { Sidebar, SidebarMenuButton, SidebarProvider, SidebarTrigger, useSidebar } from "./Sidebar";
+
+afterEach(() => {
+	viewport.isMobile = false;
+});
 
 describe("useSidebar", () => {
 	it("throws when used outside SidebarProvider", () => {
@@ -198,6 +202,10 @@ const StateHarness = ({ children }: { children?: ReactNode }) => {
 const readState = (view: ReturnType<typeof render>) => view.getByTestId("state").dataset;
 
 describe("the rail remembers whether it was collapsed", () => {
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
 	it("reopens collapsed when that is what the cookie says", () => {
 		vi.spyOn(document, "cookie", "get").mockReturnValue("sidebar_state=false");
 
@@ -208,7 +216,6 @@ describe("the rail remembers whether it was collapsed", () => {
 		);
 
 		expect(readState(view).state).toBe("collapsed");
-		vi.restoreAllMocks();
 	});
 
 	it("finds its own cookie among the others rather than only as the first", () => {
@@ -221,7 +228,6 @@ describe("the rail remembers whether it was collapsed", () => {
 		);
 
 		expect(readState(view).state).toBe("collapsed");
-		vi.restoreAllMocks();
 	});
 
 	it("stays open on any value that is not the word false", () => {
@@ -234,7 +240,6 @@ describe("the rail remembers whether it was collapsed", () => {
 		);
 
 		expect(readState(view).state).toBe("expanded");
-		vi.restoreAllMocks();
 	});
 
 	it("leaves a caller that owns the state alone, cookie or no cookie", () => {
@@ -247,7 +252,6 @@ describe("the rail remembers whether it was collapsed", () => {
 		);
 
 		expect(readState(view).state).toBe("expanded");
-		vi.restoreAllMocks();
 	});
 });
 

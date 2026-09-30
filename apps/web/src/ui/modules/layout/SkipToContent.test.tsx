@@ -79,7 +79,7 @@ const searchParams = Promise.resolve({ payment_intent: "pi_test_123" });
 
 const CONFIRMATION = { id: "pi_test_123", status: "succeeded", amount: 10, currency: "USD" };
 
-const landmark = (tree: { container: HTMLElement }) => tree.container.querySelector(`#${MAIN_CONTENT_ID}`);
+const landmarks = (tree: { container: HTMLElement }) => tree.container.querySelectorAll(`#${MAIN_CONTENT_ID}`).length;
 
 describe("skip to content", () => {
 	beforeEach(() => {
@@ -95,10 +95,6 @@ describe("skip to content", () => {
 		expect(declaring).toEqual([...SHELLS].sort());
 	});
 
-	it("declares the landmark exactly once per shell, so the link never lands on a duplicate", () => {
-		expect(declaring.length).toBe(new Set(declaring).size);
-	});
-
 	it("shows the destination it received focus, so taking the link is not a silent no-op", () => {
 		const shell = readFileSync(join(SRC_ROOT, "ui/modules/sidebar/AppSidebar.tsx"), "utf8");
 		const landmark = shell.slice(shell.indexOf("<SidebarInset"), shell.indexOf(">", shell.indexOf("<SidebarInset")));
@@ -107,27 +103,27 @@ describe("skip to content", () => {
 		expect(landmark).toContain("focus-visible:ring-[3px]");
 	});
 
-	it("resolves on the legal shell", async () => {
-		expect(landmark(render(await LegalRouteLayout({ children: null, params: locale })))).not.toBeNull();
+	it("resolves exactly once on the legal shell", async () => {
+		expect(landmarks(render(await LegalRouteLayout({ children: null, params: locale })))).toBe(1);
 	});
 
-	it("resolves on the not-found shell", async () => {
-		expect(landmark(render(await NotFoundContent({ locale: EN as never })))).not.toBeNull();
+	it("resolves exactly once on the not-found shell", async () => {
+		expect(landmarks(render(await NotFoundContent({ locale: EN as never })))).toBe(1);
 	});
 
-	it("resolves on the error shell", () => {
+	it("resolves exactly once on the error shell", () => {
 		const error = Object.assign(new Error("boom"), { digest: "abc" });
-		expect(landmark(render(<ErrorContent error={error} reset={vi.fn()} />))).not.toBeNull();
+		expect(landmarks(render(<ErrorContent error={error} reset={vi.fn()} />))).toBe(1);
 	});
 
-	it("resolves on the payment confirmation shell", async () => {
-		expect(landmark(render(await PaymentConfirmationPage({ searchParams, params: locale })))).not.toBeNull();
+	it("resolves exactly once on the payment confirmation shell", async () => {
+		expect(landmarks(render(await PaymentConfirmationPage({ searchParams, params: locale })))).toBe(1);
 	});
 
-	it("resolves on the payment confirmation shell when the payment failed", async () => {
+	it("resolves exactly once on the payment confirmation shell when the payment failed", async () => {
 		mockConfirmation.mockReturnValueOnce(Effect.succeed(null));
 		const element = await PaymentConfirmationPage({ searchParams, params: locale });
 		const resolved = await (element.type as (props: unknown) => Promise<never>)(element.props);
-		expect(landmark(render(resolved))).not.toBeNull();
+		expect(landmarks(render(resolved))).toBe(1);
 	});
 });

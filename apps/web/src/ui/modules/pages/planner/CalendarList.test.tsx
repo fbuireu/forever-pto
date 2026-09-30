@@ -97,6 +97,7 @@ beforeEach(() => {
 	vi.clearAllMocks();
 	mockFiltersState.year = 2026;
 	mockFiltersState.carryOverMonths = 0;
+	mockFiltersState.ptoDays = 10;
 	mockHolidaysState.holidays = [
 		{ id: "h1", date: new Date(2026, 0, 1), name: "New Year", variant: "national", isInPlanningWindow: true },
 	] as never;
@@ -188,11 +189,11 @@ describe("CalendarList", () => {
 	});
 
 	it("prunes when only the carry-over months move, which shifts the window without changing the year", () => {
-		render(<CalendarList />);
+		const { rerender } = render(<CalendarList />);
 		mockPrune.mockClear();
 
 		mockFiltersState.carryOverMonths = 3;
-		render(<CalendarList />);
+		rerender(<CalendarList />);
 
 		expect(mockPrune).toHaveBeenCalledWith({ year: 2026, carryOverMonths: 3 });
 	});
@@ -246,7 +247,6 @@ describe("CalendarList blocks the keyboard on the same terms as the mouse", () =
 		rerender(<CalendarList />);
 
 		expect(capturedDayToggle.current).toBe(before);
-		mockFiltersState.ptoDays = 10;
 	});
 
 	it("reads the budget at the click, not from the render that built the handler", () => {
@@ -256,6 +256,5 @@ describe("CalendarList blocks the keyboard on the same terms as the mouse", () =
 		capturedDayToggle.current?.(new Date(2026, 0, 5));
 
 		expect(mockToggleDaySelection).toHaveBeenCalledWith(expect.objectContaining({ totalPtoDays: 12 }));
-		mockFiltersState.ptoDays = 10;
 	});
 });

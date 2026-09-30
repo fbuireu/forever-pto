@@ -53,7 +53,6 @@ describe("planner/page", () => {
 		});
 
 		it("renders JsonLd with the resolved locale", async () => {
-			await AppPage(makeParams(ES));
 			const element = await AppPage(makeParams(ES));
 			const children = [element.props.children].flat();
 			const jsonLdEl = children.find((c: unknown) => (c as { type?: unknown })?.type === MockJsonLd);

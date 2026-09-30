@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 const filtersState = { year: 2027 };
 
@@ -16,6 +16,10 @@ vi.mock("@ui/modules/core/animate/text/SlidingNumber", () => ({
 
 import { SiteTitleYear } from "./SiteTitleYear";
 
+afterEach(() => {
+	filtersState.year = 2027;
+});
+
 describe("SiteTitleYear", () => {
 	it("shows the year the filters hold, so the heading follows the sidebar rather than the clock", () => {
 		const { getByTestId } = render(<SiteTitleYear />);
@@ -30,7 +34,6 @@ describe("SiteTitleYear", () => {
 		rerender(<SiteTitleYear />);
 
 		expect(getByTestId("year").textContent).toBe("2028");
-		filtersState.year = 2027;
 	});
 
 	it("sets the year in the serif face the title pairs with the display face", () => {

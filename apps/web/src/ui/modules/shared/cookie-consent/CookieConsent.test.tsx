@@ -101,6 +101,7 @@ beforeEach(() => {
 
 afterEach(() => {
 	vi.unstubAllGlobals();
+	vi.restoreAllMocks();
 });
 
 describe("the first visit", () => {
@@ -243,11 +244,15 @@ describe("the footer's manage-cookies button", () => {
 	});
 
 	it("stops listening once the component goes away", () => {
+		const added = vi.spyOn(window, "addEventListener");
+		const removed = vi.spyOn(window, "removeEventListener");
 		const { unmount } = renderConsent();
+		const listener = added.mock.calls.find(([type]) => type === "cc:showPreferences")?.[1];
 
 		unmount();
 
-		expect(() => fireEvent(window, new Event("cc:showPreferences"))).not.toThrow();
+		expect(listener).toBeDefined();
+		expect(removed).toHaveBeenCalledWith("cc:showPreferences", listener);
 	});
 });
 

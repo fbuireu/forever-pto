@@ -6,7 +6,7 @@ import {
 	NEUTRALISED_MARKDOWN_PATH,
 } from "@infrastructure/markdown/twin";
 import { type NextRequest, NextResponse } from "next/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockI18nResponse = {
 	cookies: {
@@ -88,6 +88,10 @@ describe("middleware", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		mockI18nResponse.cookies.get.mockReturnValue(null);
+	});
+
+	afterEach(() => {
+		vi.restoreAllMocks();
 	});
 
 	describe("markdown rewrite", () => {

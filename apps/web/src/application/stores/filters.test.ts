@@ -3,6 +3,11 @@ import { DEFAULT_PREFERRED_MONTHS, MAX_CARRY_OVER_MONTHS } from "@domain/calenda
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MAX_PTO_DAYS, MIN_CARRY_OVER_MONTHS, MIN_PTO_DAYS, useFiltersStore } from "./filters";
 
+const CURRENT_YEAR = vi.hoisted(() => {
+	vi.useFakeTimers({ now: new Date(2031, 5, 1), toFake: ["Date"] });
+	return 2031;
+});
+
 const { mockLogError, mockWarn } = vi.hoisted(() => ({ mockLogError: vi.fn(), mockWarn: vi.fn() }));
 
 vi.mock("@infrastructure/logging/logger", () => ({
@@ -19,12 +24,14 @@ vi.mock("./crypto", () => ({
 	},
 }));
 
+vi.useRealTimers();
+
 const INITIAL = {
 	ptoDays: 22,
 	allowPastDays: false,
 	country: "",
 	region: "",
-	year: new Date().getFullYear(),
+	year: CURRENT_YEAR,
 	carryOverMonths: 1,
 	strategy: FilterStrategy.GROUPED,
 	preferredMonths: [6, 7],
@@ -36,14 +43,14 @@ beforeEach(() => {
 
 describe("initial state", () => {
 	it("has correct defaults", () => {
-		const state = useFiltersStore.getState();
+		const state = useFiltersStore.getInitialState();
 		expect(state.ptoDays).toBe(22);
 		expect(state.allowPastDays).toBe(false);
 		expect(state.country).toBe("");
 		expect(state.region).toBe("");
-		expect(state.year).toBe(new Date().getFullYear());
+		expect(state.year).toBe(CURRENT_YEAR);
 		expect(state.carryOverMonths).toBe(1);
-		expect(state.strategy).toBe(FilterStrategy.GROUPED);
+		expect(state.strategy).toBe(DEFAULT_FILTER_STRATEGY);
 	});
 
 	it("starts with no Preferred Month, which lets Main vacation place its block wherever it is longest", () => {
@@ -142,7 +149,7 @@ describe("persistence", () => {
 		await useFiltersStore.persist.rehydrate();
 
 		const state = useFiltersStore.getState();
-		expect(state.year).toBe(new Date().getFullYear());
+		expect(state.year).toBe(CURRENT_YEAR);
 		expect(state.ptoDays).toBe(15);
 		expect(state.carryOverMonths).toBe(3);
 	});
@@ -158,7 +165,7 @@ describe("persistence", () => {
 		const state = useFiltersStore.getState();
 		expect(state.ptoDays).toBe(8);
 		expect(state.country).toBe("IT");
-		expect(state.year).toBe(new Date().getFullYear());
+		expect(state.year).toBe(CURRENT_YEAR);
 	});
 });
 
@@ -266,11 +273,13 @@ describe("resetToDefaults", () => {
 		useFiltersStore.getState().setPtoDays(5);
 		useFiltersStore.getState().setCountry("ES");
 		useFiltersStore.getState().setYear(2027);
+		useFiltersStore.getState().setStrategy(FilterStrategy.OPTIMIZED);
 		useFiltersStore.getState().resetToDefaults();
 		const state = useFiltersStore.getState();
 		expect(state.ptoDays).toBe(22);
 		expect(state.country).toBe("");
-		expect(state.year).toBe(new Date().getFullYear());
-		expect(state.strategy).toBe(FilterStrategy.GROUPED);
+		expect(state.year).toBe(CURRENT_YEAR);
+		expect(state.strategy).toBe(DEFAULT_FILTER_STRATEGY);
+		expect(state.preferredMonths).toEqual([...DEFAULT_PREFERRED_MONTHS]);
 	});
 });

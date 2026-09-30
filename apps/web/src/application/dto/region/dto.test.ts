@@ -17,12 +17,10 @@ describe("regionDTO", () => {
 	it("maps all entries preserving their codes as value", () => {
 		const result = regionDTO.create({ raw: { CA: "Catalonia", MAD: "Madrid", VAL: "Valencia" } });
 
-		expect(result).toHaveLength(3);
-		expect(result.map((r) => r.value)).toEqual(expect.arrayContaining(["CA", "MAD", "VAL"]));
-	});
-
-	it("does not include a flag field on any entry", () => {
-		const result = regionDTO.create({ raw: { CA: "Catalonia", MAD: "Madrid" } });
-		expect(result.every((r) => !("flag" in r))).toBe(true);
+		expect(result).toEqual([
+			{ value: "CA", label: "Catalonia" },
+			{ value: "MAD", label: "Madrid" },
+			{ value: "VAL", label: "Valencia" },
+		]);
 	});
 });

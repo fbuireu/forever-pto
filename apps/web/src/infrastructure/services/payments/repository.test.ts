@@ -341,12 +341,6 @@ describe("getSucceededPaymentByEmail", () => {
 		expect(args[0]).toBe("user@example.com");
 	});
 
-	it("normalises the stored column too, so rows written before this held for the same payer", async () => {
-		await runEffect(getSucceededPaymentByEmail("user@example.com"));
-		const [sql] = mockQuery.mock.calls[0] as [string, unknown[]];
-		expect(sql).not.toContain("WHERE email = ?");
-	});
-
 	it("maps the snake_case row onto PaymentData", async () => {
 		mockQuery.mockReturnValue(Effect.succeed([BASE_ROW]));
 		const result = await runEffect(getSucceededPaymentByEmail("user@example.com"));

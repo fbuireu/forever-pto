@@ -13,7 +13,7 @@ const { getStripeClientInstance } = await import("./client");
 beforeEach(() => {
 	vi.clearAllMocks();
 	mockLoadStripe.mockResolvedValue(mockStripe);
-	process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = "pk_test_123";
+	vi.stubEnv("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY", "pk_test_123");
 });
 
 afterEach(() => {

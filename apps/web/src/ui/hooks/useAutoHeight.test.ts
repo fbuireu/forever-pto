@@ -1,5 +1,5 @@
-import { act, renderHook } from "@testing-library/react";
-import type { RefObject } from "react";
+import { act, render, renderHook } from "@testing-library/react";
+import { createElement, type RefObject } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useAutoHeight } from "./useAutoHeight";
 
@@ -164,7 +164,28 @@ describe("useAutoHeight", () => {
 		el.remove();
 	});
 
-	it("retries the measurement at mount when the element measures zero, and only then", () => {
+	it("retries the measurement at mount when the first reading is zero", () => {
+		stubBox("content-box");
+		vi.spyOn(HTMLElement.prototype, "getBoundingClientRect")
+			.mockReturnValueOnce({ height: 0 } as DOMRect)
+			.mockReturnValue({ height: 50 } as DOMRect);
+		const heights: number[] = [];
+		const Probe = () => {
+			const { ref, height } = useAutoHeight();
+			heights.push(height);
+			return createElement("div", { ref });
+		};
+
+		try {
+			render(createElement(Probe));
+		} finally {
+			vi.restoreAllMocks();
+		}
+
+		expect(heights.at(-1)).toBe(50);
+	});
+
+	it("does not re-measure on a later render whose deps did not change", () => {
 		stubBox("border-box");
 		const { result, rerender } = renderHook(() => useAutoHeight([1]));
 

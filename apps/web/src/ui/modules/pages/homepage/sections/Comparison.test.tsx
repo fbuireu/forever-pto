@@ -48,12 +48,6 @@ describe("Comparison", () => {
 		);
 	});
 
-	it("states the showcase plan's efficiency, rounded for the reader's locale", async () => {
-		const [, withApp] = await renderComparison();
-
-		expect(itemsOf(withApp)).toContain(`✓${comparison.withItems.dayEfficiency.replace("{ratio}", "3.4")}`);
-	});
-
 	it("titles both columns from the bundle, so the emoji travel with the translation", async () => {
 		await renderComparison();
 

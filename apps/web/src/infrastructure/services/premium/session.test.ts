@@ -75,13 +75,17 @@ describe("createSession", () => {
 
 	it("expires the token one session duration from now", async () => {
 		mockSign.mockResolvedValue("token");
-		const before = Math.floor(Date.now() / 1000);
+		const now = new Date("2026-04-14T10:30:00.000Z");
+		vi.useFakeTimers({ now, toFake: ["Date"] });
 
-		await Effect.runPromise(createSession(SESSION_DATA));
+		try {
+			await Effect.runPromise(createSession(SESSION_DATA));
+		} finally {
+			vi.useRealTimers();
+		}
 
 		const [expiration] = mockSetExpirationTime.mock.calls[0] as [number];
-		expect(expiration).toBeGreaterThanOrEqual(before + PREMIUM_SESSION_LIFETIME_SECONDS);
-		expect(expiration).toBeLessThanOrEqual(Math.floor(Date.now() / 1000) + PREMIUM_SESSION_LIFETIME_SECONDS);
+		expect(expiration).toBe(now.getTime() / 1000 + PREMIUM_SESSION_LIFETIME_SECONDS);
 	});
 
 	it("signs with the whole JWT_SECRET, encoded, and not a prefix of it", async () => {

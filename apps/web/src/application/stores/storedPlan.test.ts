@@ -18,10 +18,14 @@ describe("hasStoredPlan", () => {
 	});
 
 	it("answers false when storage refuses to be read", () => {
-		vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+		const getItem = vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
 			throw new Error("denied");
 		});
 
-		expect(hasStoredPlan()).toBe(false);
+		try {
+			expect(hasStoredPlan()).toBe(false);
+		} finally {
+			getItem.mockRestore();
+		}
 	});
 });

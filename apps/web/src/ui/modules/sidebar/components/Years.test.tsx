@@ -81,20 +81,12 @@ describe("Years", () => {
 		expect(trigger().textContent).toContain("2024");
 	});
 
-	it("stores the year that was picked", async () => {
+	it("stores the year that was picked, as a number rather than the string the list item carries", async () => {
 		renderYears(2026);
 
 		await userEvent.click(screen.getByRole("option", { name: "2028" }));
 
 		expect(store.setYear).toHaveBeenCalledExactlyOnceWith(2028);
-	});
-
-	it("hands the store a number, not the string the list item carries", async () => {
-		renderYears(2026);
-
-		await userEvent.click(screen.getByRole("option", { name: "2028" }));
-
-		expect(typeof store.setYear.mock.calls[0]?.[0]).toBe("number");
 	});
 
 	it("names the control, so the field label points at something", () => {

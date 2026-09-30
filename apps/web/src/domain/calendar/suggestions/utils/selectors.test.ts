@@ -384,21 +384,26 @@ describe("MAIN_VACATION", () => {
 		expect(bridges).toEqual([march]);
 	});
 
-	it("ignores the preferred months under every other Strategy", () => {
-		const plain = selectBridgesForStrategy({
-			...NO_CALENDAR,
-			bridges: [march, july],
-			targetPtoDays: 5,
-			strategy: FilterStrategy.GROUPED,
-		});
-		const preferring = selectBridgesForStrategy({
-			...NO_CALENDAR,
-			bridges: [march, july],
-			targetPtoDays: 5,
-			strategy: FilterStrategy.GROUPED,
-			preferredMonths: julyMonths,
-		});
+	it.each([FilterStrategy.OPTIMIZED, FilterStrategy.GROUPED, FilterStrategy.BALANCED])(
+		"%s ignores the preferred months",
+		(strategy) => {
+			const fridayInMarch = makeBridge({
+				from: on({ month: 3, day: 7 }),
+				to: on({ month: 3, day: 9 }),
+				ptoDays: [on({ month: 3, day: 7 })],
+			});
+			const fridayInJuly = makeBridge({
+				from: on({ month: 7, day: 11 }),
+				to: on({ month: 7, day: 13 }),
+				ptoDays: [on({ month: 7, day: 11 })],
+			});
+			const input = { ...NO_CALENDAR, bridges: [fridayInMarch, fridayInJuly], targetPtoDays: 1, strategy };
 
-		expect(preferring.bridges).toEqual(plain.bridges);
-	});
+			const plain = selectBridgesForStrategy(input);
+			const preferring = selectBridgesForStrategy({ ...input, preferredMonths: julyMonths });
+
+			expect(plain.bridges).toEqual([fridayInMarch]);
+			expect(preferring.bridges).toEqual(plain.bridges);
+		},
+	);
 });

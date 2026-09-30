@@ -1,5 +1,5 @@
 import { HolidayVariant } from "@application/dto/holiday/types";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { PTO_CONSTANTS } from "../../const";
 import {
 	calculateLongestVacation,
@@ -362,9 +362,16 @@ describe("getWorkedDaysPerMonth", () => {
 });
 
 describe("calculateMaxWorkStreak", () => {
-	it("returns a positive streak when no PTO or holidays", () => {
+	const TODAY = new Date(2025, 6, 1, 9, 30);
+	const WORKDAYS_FROM_TODAY_TO_YEAR_END = 132;
+
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
+	it("counts every weekday of the year as one streak when no PTO or Holiday breaks it", () => {
 		const result = calculateMaxWorkStreak({ ptoDays: [], holidays: [], year: 2025, allowPastDays: true });
-		expect(result).toBeGreaterThan(0);
+		expect(result).toBe(261);
 	});
 
 	it("returns 0 when the year is fully in the past and allowPastDays is false", () => {
@@ -390,23 +397,20 @@ describe("calculateMaxWorkStreak", () => {
 	});
 
 	it("scans only the planning year when the whole year is still in the future", () => {
-		const futureYear = new Date().getFullYear() + 2;
-		const ptoDays = [makeDate({ year: futureYear, month: 3, day: 2 })];
-		const skippingPast = calculateMaxWorkStreak({ ptoDays, holidays: [], year: futureYear, allowPastDays: false });
-		const wholeYear = calculateMaxWorkStreak({ ptoDays, holidays: [], year: futureYear, allowPastDays: true });
+		vi.useFakeTimers({ now: TODAY, toFake: ["Date"] });
+		const ptoDays = [makeDate({ year: 2027, month: 3, day: 2 })];
+		const skippingPast = calculateMaxWorkStreak({ ptoDays, holidays: [], year: 2027, allowPastDays: false });
+		const wholeYear = calculateMaxWorkStreak({ ptoDays, holidays: [], year: 2027, allowPastDays: true });
 		expect(skippingPast).toBe(wholeYear);
 	});
 
 	it("still skips the elapsed part of the current year", () => {
-		const currentYear = new Date().getFullYear();
-		const skippingPast = calculateMaxWorkStreak({
-			ptoDays: [],
-			holidays: [],
-			year: currentYear,
-			allowPastDays: false,
-		});
-		const wholeYear = calculateMaxWorkStreak({ ptoDays: [], holidays: [], year: currentYear, allowPastDays: true });
-		expect(skippingPast).toBeLessThanOrEqual(wholeYear);
+		vi.useFakeTimers({ now: TODAY, toFake: ["Date"] });
+		const skippingPast = calculateMaxWorkStreak({ ptoDays: [], holidays: [], year: 2025, allowPastDays: false });
+		const wholeYear = calculateMaxWorkStreak({ ptoDays: [], holidays: [], year: 2025, allowPastDays: true });
+
+		expect(skippingPast).toBe(WORKDAYS_FROM_TODAY_TO_YEAR_END);
+		expect(wholeYear).toBe(261);
 	});
 });
 
@@ -419,7 +423,7 @@ describe("calculateLongestVacation", () => {
 		const result = calculateLongestVacation(
 			freeStreaks({ placedDays: [makeDate({ year: 2025, month: 1, day: 3 })], holidays: [] }),
 		);
-		expect(result).toBeGreaterThanOrEqual(3);
+		expect(result).toBe(3);
 	});
 
 	it("returns a longer streak when multiple PTO days bridge weekends", () => {
@@ -431,7 +435,7 @@ describe("calculateLongestVacation", () => {
 			makeDate({ year: 2025, month: 1, day: 10 }),
 		];
 		const result = calculateLongestVacation(freeStreaks({ placedDays: ptoDays, holidays: [] }));
-		expect(result).toBeGreaterThanOrEqual(9);
+		expect(result).toBe(9);
 	});
 
 	it("includes holidays in the free-day streak", () => {
@@ -444,7 +448,8 @@ describe("calculateLongestVacation", () => {
 		const withoutHoliday = calculateLongestVacation(
 			freeStreaks({ placedDays: [makeDate({ year: 2025, month: 1, day: 6 })], holidays: [] }),
 		);
-		expect(withHoliday).toBeGreaterThanOrEqual(withoutHoliday);
+		expect(withoutHoliday).toBe(3);
+		expect(withHoliday).toBe(withoutHoliday + 1);
 	});
 });
 
@@ -456,13 +461,13 @@ describe("calculateLongWeekends", () => {
 	it("counts a Friday PTO adjacent to a weekend as a long weekend", () => {
 		expect(
 			calculateLongWeekends(freeStreaks({ placedDays: [makeDate({ year: 2025, month: 1, day: 3 })], holidays: [] })),
-		).toBeGreaterThanOrEqual(1);
+		).toBe(1);
 	});
 
 	it("counts a Monday PTO adjacent to a weekend as a long weekend", () => {
 		expect(
 			calculateLongWeekends(freeStreaks({ placedDays: [makeDate({ year: 2025, month: 1, day: 6 })], holidays: [] })),
-		).toBeGreaterThanOrEqual(1);
+		).toBe(1);
 	});
 
 	it("does not count isolated mid-week PTO as a long weekend", () => {
@@ -477,7 +482,7 @@ describe("calculateLongWeekends", () => {
 			calculateLongWeekends(
 				freeStreaks({ placedDays: [makeDate({ year: 2025, month: 1, day: 6 })], holidays: [holiday] }),
 			),
-		).toBeGreaterThanOrEqual(1);
+		).toBe(1);
 	});
 });
 
@@ -597,7 +602,9 @@ describe("getLongBlocksPerQuarter anchors on the first day inside the window", (
 
 describe("getTotalEffectiveDays only counts days that are still free", () => {
 	it("stops at a day that is a workday again, however far the Holidays once reached", () => {
-		expect(effectiveDaysOf({ days: [makeDate({ year: 2025, month: 1, day: 3 })] })).toBe(3);
+		const holidays = [makeHoliday(makeDate({ year: 2025, month: 1, day: 7 }))];
+
+		expect(effectiveDaysOf({ days: [makeDate({ year: 2025, month: 1, day: 3 })], holidays })).toBe(3);
 	});
 
 	it("runs through the Holidays that still stand", () => {

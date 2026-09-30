@@ -138,17 +138,6 @@ describe("confirmPayment", () => {
 		expect(result).toEqual({ outcome: ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE, error: "declined by bank" });
 	});
 
-	it("does not claim a charge happened when Stripe declined before taking the money", async () => {
-		(mockElements.submit as ReturnType<typeof vi.fn>).mockResolvedValue({});
-		(mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({
-			error: { message: "declined by bank" },
-		});
-
-		const result = await confirmPayment(BASE_CONFIRM_PARAMS);
-
-		expect(result.outcome).not.toBe(ConfirmPaymentOutcome.FAILED_AFTER_CHARGE);
-	});
-
 	it("marks the failure as post-charge when the activation request itself throws", async () => {
 		(mockElements.submit as ReturnType<typeof vi.fn>).mockResolvedValue({});
 		(mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({ paymentIntent: { id: "pi_123" } });
@@ -167,15 +156,6 @@ describe("confirmPayment", () => {
 		const result = await confirmPayment(BASE_CONFIRM_PARAMS);
 
 		expect(result.outcome).toBe(ConfirmPaymentOutcome.FAILED_AFTER_CHARGE);
-	});
-
-	it("does not claim a charge on the redirect hand-off, where the issuer has not answered yet", async () => {
-		(mockElements.submit as ReturnType<typeof vi.fn>).mockResolvedValue({});
-		(mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({});
-
-		const result = await confirmPayment(BASE_CONFIRM_PARAMS);
-
-		expect(result).toEqual({ outcome: ConfirmPaymentOutcome.HANDED_OFF_TO_ISSUER });
 	});
 
 	it("returns failure and logs when session response is not ok", async () => {
@@ -209,13 +189,13 @@ describe("confirmPayment", () => {
 		});
 	});
 
-	it("returns failure without calling check-session when Stripe handed off to a redirect", async () => {
+	it("does not claim a charge on the redirect hand-off, and does not call check-session before the issuer answers", async () => {
 		(mockElements.submit as ReturnType<typeof vi.fn>).mockResolvedValue({});
 		(mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({});
 
 		const result = await confirmPayment(BASE_CONFIRM_PARAMS);
 
-		expect(result.outcome).toBe(ConfirmPaymentOutcome.HANDED_OFF_TO_ISSUER);
+		expect(result).toEqual({ outcome: ConfirmPaymentOutcome.HANDED_OFF_TO_ISSUER });
 		expect(mockFetch).not.toHaveBeenCalled();
 		await vi.waitFor(() => expect(mockLoggerWarn).toHaveBeenCalled());
 	});

@@ -1,6 +1,6 @@
 import { act, render } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 const { mockAcceptedService, mockIdentifyUser, mockTrackingEnvironment } = vi.hoisted(() => ({
 	mockAcceptedService: vi.fn(),
@@ -26,7 +26,11 @@ vi.mock("next/script", () => ({
 	default: ({ children, id }: { children?: ReactNode; id?: string }) => <script data-testid={id}>{children}</script>,
 }));
 
-process.env.NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN = "test-token";
+vi.stubEnv("NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN", "test-token");
+
+afterAll(() => {
+	vi.unstubAllEnvs();
+});
 
 const { BetterStackTracking } = await import("./BetterStackTracking");
 const { version } = await import("../../../../package.json");

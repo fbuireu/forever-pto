@@ -70,6 +70,14 @@ const unknownYearsWarning = /Holidays are only known for/;
 
 const readout = () => document.body.textContent ?? "";
 
+const counts = () =>
+	Object.fromEntries(
+		(["workdays", "days", "weekendDays", "holidays"] as const).map((key) => [
+			key,
+			screen.getByText(en.workdayCounter[key]).nextElementSibling?.textContent,
+		]),
+	);
+
 beforeEach(() => {
 	holidays.value = [];
 	range.value = undefined;
@@ -88,9 +96,7 @@ describe("WorkdayCounter", () => {
 
 		pick("2026-06-01", "2026-06-07");
 
-		expect(readout()).toContain("5");
-		expect(readout()).toContain("7");
-		expect(readout()).toContain("2");
+		expect(counts()).toStrictEqual({ workdays: "5", days: "7", weekendDays: "2", holidays: "0" });
 	});
 
 	it("does not count a Holiday as a workday, and counts it separately", () => {
@@ -99,8 +105,7 @@ describe("WorkdayCounter", () => {
 
 		pick("2026-06-01", "2026-06-07");
 
-		expect(screen.getByText(en.workdayCounter.holidays)).toBeTruthy();
-		expect(readout()).toContain("4");
+		expect(counts()).toStrictEqual({ workdays: "4", days: "7", weekendDays: "2", holidays: "1" });
 	});
 
 	it("counts a single day as one day", () => {
@@ -108,7 +113,7 @@ describe("WorkdayCounter", () => {
 
 		pick("2026-06-01", "2026-06-01");
 
-		expect(readout()).toContain("1");
+		expect(counts()).toStrictEqual({ workdays: "1", days: "1", weekendDays: "0", holidays: "0" });
 	});
 
 	it("keeps counting nothing while only one end has been picked", () => {

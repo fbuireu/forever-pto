@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveClientIp, UNKNOWN_IP } from "./types";
+import { resolveClientIp } from "./types";
 
 const headers = (entries: Record<string, string>) => new Headers(entries);
 
@@ -28,9 +28,5 @@ describe("resolveClientIp", () => {
 
 	it("answers null when no header carries an address, rather than inventing one", () => {
 		expect(resolveClientIp(headers({}))).toBeNull();
-	});
-
-	it("keeps UNKNOWN_IP out of the answer, because that is the limiter key and not an address", () => {
-		expect(resolveClientIp(headers({}))).not.toBe(UNKNOWN_IP);
 	});
 });

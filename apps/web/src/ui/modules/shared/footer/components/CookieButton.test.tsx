@@ -15,11 +15,14 @@ describe("CookieButton", () => {
 	it("asks the consent library to reopen its preferences through the event it listens for on window", () => {
 		const onShowPreferences = vi.fn();
 		window.addEventListener("cc:showPreferences", onShowPreferences);
-		renderButton();
+		try {
+			renderButton();
 
-		fireEvent.click(screen.getByRole("button", { name: enMessages.footer.manageCookies }));
+			fireEvent.click(screen.getByRole("button", { name: enMessages.footer.manageCookies }));
 
-		expect(onShowPreferences).toHaveBeenCalledOnce();
-		window.removeEventListener("cc:showPreferences", onShowPreferences);
+			expect(onShowPreferences).toHaveBeenCalledOnce();
+		} finally {
+			window.removeEventListener("cc:showPreferences", onShowPreferences);
+		}
 	});
 });

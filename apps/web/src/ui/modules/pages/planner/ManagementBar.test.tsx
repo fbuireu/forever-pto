@@ -4,7 +4,7 @@ import { act, fireEvent, render } from "@testing-library/react";
 import { TUTORIAL_EVENT } from "@ui/modules/tutorial/anchors";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { toastSuccess } = vi.hoisted(() => ({ toastSuccess: vi.fn() }));
 
@@ -69,6 +69,19 @@ vi.mock("./PlannerPanel", () => ({
 vi.mock("./PlannerPanelFixture", () => ({ PlannerPanelFixture: () => null }));
 
 import { DRAWER_SNAP, ManagementBar } from "./ManagementBar";
+
+beforeEach(() => {
+	readyState.areStoresReady = false;
+	Object.assign(holidaysState, {
+		alternatives: [],
+		suggestion: null,
+		currentSelection: null,
+		previewAlternativeIndex: 0,
+		currentSelectionIndex: 0,
+		isCalculating: false,
+		hasCalculated: false,
+	});
+});
 
 interface RenderBarParams {
 	locale: Locale;

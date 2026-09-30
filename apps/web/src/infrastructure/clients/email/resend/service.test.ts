@@ -16,7 +16,7 @@ const { ResendService, ResendServiceLive } = await import("./service");
 
 beforeEach(() => {
 	vi.clearAllMocks();
-	process.env.RESEND_API_KEY = "re_test_key";
+	vi.stubEnv("RESEND_API_KEY", "re_test_key");
 });
 
 afterEach(() => {

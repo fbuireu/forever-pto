@@ -10,6 +10,7 @@ beforeEach(() => {
 
 afterEach(() => {
 	vi.unstubAllGlobals();
+	vi.restoreAllMocks();
 	vi.clearAllMocks();
 });
 
@@ -38,7 +39,6 @@ describe("setCookie", () => {
 		expect(mockCookieStoreSet).toHaveBeenCalledWith(
 			expect.objectContaining({ expires: fakeInstant.add({ seconds: 60 }).epochMilliseconds }),
 		);
-		vi.restoreAllMocks();
 	});
 
 	it("sets expires to undefined when maxAge is not provided", async () => {

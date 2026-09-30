@@ -36,8 +36,12 @@ describe("zodParse", () => {
 	});
 
 	it("carries the Zod message in the ValidationError", async () => {
-		const err = await runFail(zodParse({ schema, data: { name: "A", age: 30 } }));
-		expect(err.message).toBeTruthy();
+		const data = { name: "A", age: 30 };
+		const zodMessage = schema.safeParse(data).error?.issues[0]?.message;
+		const err = await runFail(zodParse({ schema, data }));
+
+		expect(zodMessage).toBeDefined();
+		expect(err.message).toBe(zodMessage);
 	});
 
 	it("rejects with ValidationError for non-Zod errors", async () => {

@@ -1,6 +1,6 @@
 import { TursoService } from "@infrastructure/clients/db/turso/service";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
-import { PromoCodeError, PromoCodeErrors } from "@infrastructure/errors";
+import { PaymentError, PromoCodeError, PromoCodeErrors } from "@infrastructure/errors";
 import { normalizePromoCode } from "@infrastructure/services/payments/normalForms";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -133,13 +133,6 @@ describe("validatePromoCode", () => {
 				finalAmount: 8,
 			});
 		});
-
-		it("uppercases and trims the promo code before listing", async () => {
-			setupMocks({ coupon: makeCoupon() });
-			await run({ code: "  save10  ", amount: 10 });
-			const [params] = mockList.mock.calls[0] as [{ code: string }];
-			expect(params.code).toBe("SAVE10");
-		});
 	});
 
 	describe("validation errors", () => {
@@ -169,15 +162,6 @@ describe("validatePromoCode", () => {
 			const error = await runFlip({ code: "LAUNCH50", amount: 10 });
 
 			expect((error as PromoCodeError).code).toBe(PromoCodeErrors.USAGE_LIMIT_REACHED);
-		});
-
-		it("normalises the code on both sides of the count, since the table holds what the user typed", async () => {
-			setupMocks({ coupon: makeCoupon(), promoCodeOverrides: { max_redemptions: 5 } });
-
-			await run({ code: "  launch50  ", amount: 10 });
-
-			const [, args] = mockQuery.mock.calls[0] ?? [];
-			expect(args?.[0]).toBe("LAUNCH50");
 		});
 
 		it("still accepts the code while the cap has room left", async () => {
@@ -287,11 +271,11 @@ describe("validatePromoCode", () => {
 		});
 
 		it("fails with FAILED_TO_LOAD when list() rejects", async () => {
-			mockList.mockReturnValue(
-				Effect.fail(new PromoCodeError({ code: PromoCodeErrors.FAILED_TO_LOAD, message: "network error" })),
-			);
+			mockList.mockReturnValue(Effect.fail(new PaymentError({ message: "network error" })));
 			const error = await runFlip({ code: "ERR", amount: 10 });
+			expect(error).toBeInstanceOf(PromoCodeError);
 			expect((error as PromoCodeError).code).toBe(PromoCodeErrors.FAILED_TO_LOAD);
+			expect((error as PromoCodeError).message).toBe("network error");
 		});
 	});
 
@@ -316,8 +300,9 @@ describe("validatePromoCode", () => {
 			await run({ code: "  save20 ", amount: 10 });
 
 			const [params] = mockList.mock.calls[0] as [{ code?: string }];
-			expect(params.code).toBe(normalizePromoCode("  save20 "));
-			expect(mockQuery.mock.calls[0]?.[1]).toEqual([normalizePromoCode("  save20 ")]);
+			expect(params.code).toBe("SAVE20");
+			expect(normalizePromoCode("  save20 ")).toBe("SAVE20");
+			expect(mockQuery.mock.calls[0]?.[1]).toEqual(["SAVE20"]);
 		});
 
 		it("asks for the coupon expanded, since a promotion code carries only its id", async () => {

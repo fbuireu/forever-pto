@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterAll, describe, expect, it, vi } from "vitest";
 
 interface ScriptProps {
 	children?: ReactNode;
@@ -17,7 +17,11 @@ vi.mock("next/script", () => ({
 	),
 }));
 
-process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID = "G-TEST123";
+vi.stubEnv("NEXT_PUBLIC_GOOGLE_ANALYTICS_ID", "G-TEST123");
+
+afterAll(() => {
+	vi.unstubAllEnvs();
+});
 
 const { Analytics } = await import("./Analytics");
 
@@ -70,6 +74,5 @@ describe("Analytics without a property", () => {
 		const { container } = render(<Unconfigured />);
 
 		expect(container.querySelectorAll("script")).toHaveLength(0);
-		vi.unstubAllEnvs();
 	});
 });

@@ -1,16 +1,6 @@
 import type Stripe from "stripe";
 import { describe, expect, it } from "vitest";
-import type { DiscountInfo } from "../types";
 import { extractChargeId, extractCustomerId } from "./helpers";
-
-const _DISCOUNT: DiscountInfo = {
-	type: "percent",
-	value: 10,
-	originalAmount: 10,
-	finalAmount: 9,
-	couponId: "coupon_123",
-	couponName: "PROMO10",
-};
 
 describe("extractCustomerId", () => {
 	it("returns the string as-is when customer is already a string", () => {

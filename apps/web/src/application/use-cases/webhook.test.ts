@@ -113,8 +113,7 @@ describe("processWebhookEvent", () => {
 		expect(getPaymentById).not.toHaveBeenCalled();
 		expect(savePayment).toHaveBeenCalledOnce();
 		expect(mockLogger.warn).not.toHaveBeenCalledWith(
-			"Payment was missing from the DB and was created from the webhook",
-			expect.anything(),
+			expect.objectContaining({ message: "Payment was missing from the DB and was created from the webhook" }),
 		);
 	});
 
@@ -147,7 +146,7 @@ describe("processWebhookEvent", () => {
 	it("propagates a handlePaymentSucceeded failure so Stripe retries the delivery", async () => {
 		const { handlePaymentSucceeded } = await import("@domain/payment/handlers/paymentSucceeded");
 		vi.mocked(handlePaymentSucceeded).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "db down" })));
-		await expect(run(processWebhookEvent(succeededEvent({ id: "pi_test" })))).rejects.toBeDefined();
+		await expect(run(processWebhookEvent(succeededEvent({ id: "pi_test" })))).rejects.toThrow("db down");
 	});
 
 	it("logs the error when handlePaymentSucceeded fails", async () => {
@@ -189,7 +188,7 @@ describe("processWebhookEvent", () => {
 	it("propagates a handlePaymentFailed failure so Stripe retries the delivery", async () => {
 		const { handlePaymentFailed } = await import("@domain/payment/handlers/paymentFailed");
 		vi.mocked(handlePaymentFailed).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "db down" })));
-		await expect(run(processWebhookEvent(failedEvent({ id: "pi_test" })))).rejects.toBeDefined();
+		await expect(run(processWebhookEvent(failedEvent({ id: "pi_test" })))).rejects.toThrow("db down");
 	});
 
 	it("calls handlePaymentFailed for payment_intent.payment_failed", async () => {

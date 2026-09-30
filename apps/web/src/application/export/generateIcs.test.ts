@@ -5,7 +5,7 @@ import { generateIcs } from "./generateIcs";
 
 const makeHoliday = (overrides: Partial<HolidayDTO> = {}): HolidayDTO => ({
 	id: "h-1",
-	date: new Date("2025-01-01"),
+	date: new Date(2025, 0, 1),
 	name: "New Year",
 	variant: HolidayVariant.NATIONAL,
 	isInPlanningWindow: true,
@@ -48,7 +48,7 @@ describe("generateIcs", () => {
 		it("includes a holiday event when includeHolidays is true", () => {
 			const result = generateIcs({
 				...baseOptions,
-				holidays: [makeHoliday({ id: "h-1", name: "New Year", date: new Date("2025-01-01") })],
+				holidays: [makeHoliday({ id: "h-1", name: "New Year", date: new Date(2025, 0, 1) })],
 				includeHolidays: true,
 			});
 			expect(result).toContain("BEGIN:VEVENT");
@@ -69,8 +69,8 @@ describe("generateIcs", () => {
 
 		it("includes multiple holidays", () => {
 			const holidays = [
-				makeHoliday({ id: "h-1", name: "New Year", date: new Date("2025-01-01") }),
-				makeHoliday({ id: "h-2", name: "Easter", date: new Date("2025-04-20") }),
+				makeHoliday({ id: "h-1", name: "New Year", date: new Date(2025, 0, 1) }),
+				makeHoliday({ id: "h-2", name: "Easter", date: new Date(2025, 3, 20) }),
 			];
 			const result = generateIcs({ ...baseOptions, holidays, includeHolidays: true });
 			expect(result).toContain("UID:holiday-unknown-h-1@forever-pto");
@@ -82,7 +82,7 @@ describe("generateIcs", () => {
 		it("includes PTO events when includePto is true and days are given", () => {
 			const result = generateIcs({
 				...baseOptions,
-				ptoDays: [new Date("2025-03-10")],
+				ptoDays: [new Date(2025, 2, 10)],
 				includePto: true,
 			});
 			expect(result).toContain("SUMMARY:PTO Day");
@@ -93,7 +93,7 @@ describe("generateIcs", () => {
 		it("excludes PTO events when includePto is false", () => {
 			const result = generateIcs({
 				...baseOptions,
-				ptoDays: [new Date("2025-03-10")],
+				ptoDays: [new Date(2025, 2, 10)],
 				includePto: false,
 			});
 			expect(result).not.toContain("CATEGORIES:PTO");
@@ -105,7 +105,7 @@ describe("generateIcs", () => {
 		});
 
 		it("includes multiple PTO days", () => {
-			const days = [new Date("2025-06-02"), new Date("2025-06-03"), new Date("2025-06-04")];
+			const days = [new Date(2025, 5, 2), new Date(2025, 5, 3), new Date(2025, 5, 4)];
 			const result = generateIcs({ ...baseOptions, ptoDays: days, includePto: true });
 			expect(result).toContain("UID:pto-unknown-20250602@forever-pto");
 			expect(result).toContain("UID:pto-unknown-20250603@forever-pto");
@@ -175,8 +175,8 @@ describe("generateIcs", () => {
 		it("produces both holiday and PTO events when both flags are true", () => {
 			const result = generateIcs({
 				...baseOptions,
-				holidays: [makeHoliday({ id: "h-1", name: "New Year", date: new Date("2025-01-01") })],
-				ptoDays: [new Date("2025-03-10")],
+				holidays: [makeHoliday({ id: "h-1", name: "New Year", date: new Date(2025, 0, 1) })],
+				ptoDays: [new Date(2025, 2, 10)],
 				includeHolidays: true,
 				includePto: true,
 			});
@@ -188,7 +188,7 @@ describe("generateIcs", () => {
 			const result = generateIcs({
 				...baseOptions,
 				holidays: [makeHoliday()],
-				ptoDays: [new Date("2025-03-10")],
+				ptoDays: [new Date(2025, 2, 10)],
 				includeHolidays: false,
 				includePto: false,
 			});

@@ -24,7 +24,7 @@ afterEach(() => {
 
 describe("donate popover", () => {
 	it("initial state has popover closed", () => {
-		const { donatePopoverOpen, donatePopoverIsOpening } = useUIStore.getState();
+		const { donatePopoverOpen, donatePopoverIsOpening } = useUIStore.getInitialState();
 		expect(donatePopoverOpen).toBe(false);
 		expect(donatePopoverIsOpening).toBe(false);
 	});
@@ -74,7 +74,7 @@ describe("donate popover", () => {
 
 describe("quick start", () => {
 	it("starts closed", () => {
-		expect(useUIStore.getState().quickStartOpen).toBe(false);
+		expect(useUIStore.getInitialState().quickStartOpen).toBe(false);
 	});
 
 	it("openQuickStart opens it and reports which call to action did", () => {

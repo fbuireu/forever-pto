@@ -1,5 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const makeStoreMock = (hydrated: boolean) => {
 	const listeners: (() => void)[] = [];
@@ -30,6 +30,12 @@ vi.mock("@application/stores/premium", () => ({ usePremiumStore: premiumStore })
 
 const { useStoresReady } = await import("./useStoresReady");
 
+beforeEach(() => {
+	for (const store of [filtersStore, holidaysStore, locationStore, premiumStore]) {
+		store.persist.hasHydrated.mockReturnValue(false);
+	}
+});
+
 describe("useStoresReady", () => {
 	it("reports not ready when no stores have hydrated", () => {
 		const { result } = renderHook(() => useStoresReady());
@@ -44,11 +50,6 @@ describe("useStoresReady", () => {
 
 		const { result } = renderHook(() => useStoresReady());
 		expect(result.current.areStoresReady).toBe(true);
-
-		filtersStore.persist.hasHydrated.mockReturnValue(false);
-		holidaysStore.persist.hasHydrated.mockReturnValue(false);
-		locationStore.persist.hasHydrated.mockReturnValue(false);
-		premiumStore.persist.hasHydrated.mockReturnValue(false);
 	});
 
 	it("reports not ready on the first render even when every store is already hydrated", () => {
@@ -66,11 +67,6 @@ describe("useStoresReady", () => {
 
 		expect(seen[0]).toBe(false);
 		expect(result.current.areStoresReady).toBe(true);
-
-		filtersStore.persist.hasHydrated.mockReturnValue(false);
-		holidaysStore.persist.hasHydrated.mockReturnValue(false);
-		locationStore.persist.hasHydrated.mockReturnValue(false);
-		premiumStore.persist.hasHydrated.mockReturnValue(false);
 	});
 
 	it("becomes ready after all stores finish hydration", () => {
@@ -119,10 +115,5 @@ describe("useStoresReady", () => {
 		expect(holidaysStore.persist.onFinishHydration).toHaveBeenCalledTimes(1);
 		expect(locationStore.persist.onFinishHydration).toHaveBeenCalledTimes(1);
 		expect(premiumStore.persist.onFinishHydration).toHaveBeenCalledTimes(1);
-
-		filtersStore.persist.hasHydrated.mockReturnValue(false);
-		holidaysStore.persist.hasHydrated.mockReturnValue(false);
-		locationStore.persist.hasHydrated.mockReturnValue(false);
-		premiumStore.persist.hasHydrated.mockReturnValue(false);
 	});
 });

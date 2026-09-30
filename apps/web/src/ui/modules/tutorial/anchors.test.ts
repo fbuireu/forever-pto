@@ -26,7 +26,12 @@ describe("tutorial anchors", () => {
 	});
 
 	it("declares no anchor the tour never targets", () => {
-		expect([...rendered].filter((key) => !(key in TUTORIAL_ANCHOR))).toEqual([]);
+		const tour = readFileSync(join(UI_ROOT, "hooks/useTutorial.tsx"), "utf8");
+		const targeted = new Set(
+			[...tour.matchAll(/tutorialSelector\(TUTORIAL_ANCHOR\.([A-Z0-9_]+)\)/g)].map(([, key]) => key),
+		);
+
+		expect(Object.keys(TUTORIAL_ANCHOR).filter((key) => !targeted.has(key))).toEqual([]);
 	});
 
 	it("builds a selector driver.js can match", () => {

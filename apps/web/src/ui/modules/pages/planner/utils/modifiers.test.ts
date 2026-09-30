@@ -111,8 +111,8 @@ describe("isAlternative", () => {
 		expect(second(THURSDAY)).toBe(true);
 	});
 
-	it("paints nothing at the default sentinel, which lands two before the first Alternative", () => {
-		const paints = isAlternative({ alternatives, suggestion, previewAlternativeIndex: -1, currentSelection: null });
+	it.each([-1, 3])("paints nothing for index %i, which names no plan", (previewAlternativeIndex) => {
+		const paints = isAlternative({ alternatives, suggestion, previewAlternativeIndex, currentSelection: null });
 
 		expect(paints(MONDAY)).toBe(false);
 		expect(paints(WEDNESDAY)).toBe(false);

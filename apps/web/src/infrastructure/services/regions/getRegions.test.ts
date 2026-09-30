@@ -51,18 +51,18 @@ describe("getRegions", () => {
 		mockGetStates.mockReturnValue({ CAT: "Catalonia" });
 		mockRegionDTOCreate.mockReturnValue([{ value: "CAT", label: "Catalonia" }]);
 
-		getRegions({ countryCode: ES });
+		getRegions({ countryCode: "ES" });
 
-		expect(MockHolidays).toHaveBeenCalledWith(ES);
+		expect(MockHolidays).toHaveBeenCalledWith("ES");
 	});
 
 	it("calls getStates with lowercased countryCode", () => {
 		mockGetStates.mockReturnValue({ CAT: "Catalonia" });
 		mockRegionDTOCreate.mockReturnValue([{ value: "CAT", label: "Catalonia" }]);
 
-		getRegions({ countryCode: ES });
+		getRegions({ countryCode: "ES" });
 
-		expect(mockGetStates).toHaveBeenCalledWith(ES);
+		expect(mockGetStates).toHaveBeenCalledWith("es");
 	});
 
 	it("passes raw regions to regionDTO.create", () => {

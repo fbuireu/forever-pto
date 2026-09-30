@@ -19,12 +19,4 @@ describe("LoggerService", () => {
 		const logger = await Effect.runPromise(LoggerService.pipe(Effect.provide(LoggerServiceLive)));
 		expect(logger).toBe(mockLogger);
 	});
-
-	it("exposes all required logging methods", async () => {
-		const logger = await Effect.runPromise(LoggerService.pipe(Effect.provide(LoggerServiceLive)));
-		expect(typeof logger.info).toBe("function");
-		expect(typeof logger.warn).toBe("function");
-		expect(typeof logger.error).toBe("function");
-		expect(typeof logger.logError).toBe("function");
-	});
 });

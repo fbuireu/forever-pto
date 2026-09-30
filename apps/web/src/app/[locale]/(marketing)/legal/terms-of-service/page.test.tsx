@@ -61,9 +61,9 @@ describe("terms-of-service/page", () => {
 		expect(mockGetTranslations).toHaveBeenCalledWith(expect.objectContaining({ locale: ES }));
 	});
 
-	it("renders lastUpdated prop", async () => {
+	it("passes the translated last-updated line to the layout", async () => {
 		const element = await TermsOfServicePage(makeParams());
-		expect(element.props.lastUpdated).toBeDefined();
+		expect(element.props.lastUpdated).toBe("t:lastUpdated");
 	});
 
 	it("renders the bold chunks of the refund exclusions in a strong element", async () => {

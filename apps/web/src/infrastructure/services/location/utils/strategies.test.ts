@@ -50,8 +50,8 @@ describe("detectCountryFromHeaders", () => {
 		expect(detectCountryFromHeaders(makeRequest(ES.toUpperCase()))).toBe(ES);
 	});
 
-	it("lowercases already-lowercase codes", () => {
-		expect(detectCountryFromHeaders(makeRequest("US"))).toBe("us");
+	it("keeps an already-lowercase code as it is", () => {
+		expect(detectCountryFromHeaders(makeRequest("us"))).toBe("us");
 	});
 });
 
@@ -61,7 +61,7 @@ describe("detectCountryFromCDN", () => {
 	});
 
 	afterEach(() => {
-		vi.restoreAllMocks();
+		vi.unstubAllGlobals();
 	});
 
 	it("returns the country code parsed from the CDN trace", async () => {
@@ -107,7 +107,7 @@ describe("detectCountryFromCDN", () => {
 
 describe("detectCountryFromEgressIP", () => {
 	afterEach(() => {
-		vi.restoreAllMocks();
+		vi.unstubAllGlobals();
 	});
 
 	it("returns the country from geo lookup on success", async () => {

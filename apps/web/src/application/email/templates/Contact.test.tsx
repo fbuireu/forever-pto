@@ -17,14 +17,9 @@ const BASE_PROPS = {
 const getHtml = (props = BASE_PROPS) => render(ContactFormEmail(props));
 
 describe("ContactFormEmail", () => {
-	it("renders without throwing", async () => {
-		await expect(getHtml()).resolves.toBeDefined();
-	});
-
 	it("includes the preview text with name and subject", async () => {
 		const html = await getHtml();
-		expect(html).toContain("Alice Smith");
-		expect(html).toContain("Hello there");
+		expect(html).toContain("New contact form submission from Alice Smith: Hello there");
 	});
 
 	it("renders the sender name", async () => {

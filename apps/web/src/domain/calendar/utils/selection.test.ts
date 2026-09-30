@@ -1,8 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { resolveSelectedDays } from "./selection";
 
-const d = (iso: string) => new Date(iso);
-const iso = (dates: Date[]) => dates.map((date) => date.toISOString().slice(0, 10));
+const d = (isoDate: string) => new Date(`${isoDate}T00:00:00`);
+const iso = (dates: Date[]) =>
+	dates.map(
+		(date) =>
+			`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`,
+	);
 
 describe("resolveSelectedDays", () => {
 	it("returns the suggested days untouched when there are no manual changes", () => {

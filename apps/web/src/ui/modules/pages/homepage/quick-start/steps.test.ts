@@ -43,6 +43,7 @@ describe("createDraft", () => {
 		const filters = { ...FILTERS, region: "ct" };
 
 		expect(createDraft({ filters, detectedCountry: "es" }).region).toBe("");
+		expect(createDraft({ filters: { ...filters, country: "es" }, detectedCountry: "fr" }).region).toBe("ct");
 	});
 });
 

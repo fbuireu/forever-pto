@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react";
 import { isValidElement } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockToggleSidebar = vi.hoisted(() => vi.fn());
 const mockStart = vi.hoisted(() => vi.fn());
@@ -35,6 +35,10 @@ beforeEach(() => {
 	mockUseSidebar.mockReturnValue({ open: true, toggleSidebar: mockToggleSidebar });
 });
 
+afterEach(() => {
+	vi.restoreAllMocks();
+});
+
 describe("useTutorial", () => {
 	it("returns a startTutorial function", () => {
 		const { result } = renderHook(() => useTutorial());
@@ -66,17 +70,21 @@ describe("useTutorial", () => {
 	});
 
 	it("includes a mobile-specific step when on mobile", async () => {
-		mockUseIsMobile.mockReturnValue(true);
+		const stepsOn = async (isMobile: boolean) => {
+			mockUseIsMobile.mockReturnValue(isMobile);
+			const { result } = renderHook(() => useTutorial());
+			await act(async () => {
+				await result.current.startTutorial();
+			});
+			const steps = mockStart.mock.lastCall?.[0] as unknown[] | undefined;
+			if (!steps) throw new Error("the tour was not started");
+			return steps.length;
+		};
 
-		const { result } = renderHook(() => useTutorial());
+		const mobileSteps = await stepsOn(true);
+		const desktopSteps = await stepsOn(false);
 
-		await act(async () => {
-			await result.current.startTutorial();
-		});
-
-		const desktopStepCount = 10;
-		const steps = mockStart.mock.lastCall?.[0] as unknown[];
-		expect(steps.length).toBeGreaterThan(desktopStepCount);
+		expect(mobileSteps).toBe(desktopSteps + 1);
 	});
 
 	it("passes translated button labels to driver start", async () => {

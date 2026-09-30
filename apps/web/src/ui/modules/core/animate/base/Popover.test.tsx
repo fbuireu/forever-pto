@@ -68,10 +68,6 @@ describe("PopoverTrigger", () => {
 });
 
 describe("PopoverContent", () => {
-	it("renders without throwing", () => {
-		expect(() => render(<PopoverContent>content</PopoverContent>)).not.toThrow();
-	});
-
 	it("applies className onto the popup", () => {
 		const { container } = render(<PopoverContent className="custom-class">content</PopoverContent>);
 		expect(container.querySelector('[data-primitive="popover-popup"]')?.className).toContain("custom-class");

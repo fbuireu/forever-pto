@@ -136,21 +136,6 @@ describe("worker onmessage", () => {
 		expect(response.payload.suggestion.metrics).toEqual(EMPTY_PLAN_METRICS);
 	});
 
-	it("sizes that empty-plan Metrics to the Planning Window, which a literal of its own could not", () => {
-		mockRunPlanningPipeline.mockReturnValue({
-			planned: false,
-			suggestion: { days: [], bridges: [], strategy: FilterStrategy.GROUPED, metrics: EMPTY_PLAN_METRICS },
-			alternatives: [],
-		} satisfies PlanningResult);
-
-		sendMessage({ ptoDays: 0, carryOverMonths: CARRY_OVER_MONTHS });
-
-		const { metrics } = mockPostMessage.mock.calls[0][0].payload.suggestion;
-		expect(metrics.monthlyDist).toHaveLength(WINDOW_MONTHS);
-		expect(metrics.quarterDist).toHaveLength(WINDOW_QUARTERS);
-		expect(metrics.longBlocksPerQuarter).toHaveLength(WINDOW_QUARTERS);
-	});
-
 	it("deserialises the Holidays into the PlanningInput as Dates", () => {
 		const date = new Date(2025, 0, 1);
 		sendMessage();

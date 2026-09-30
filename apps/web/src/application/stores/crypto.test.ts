@@ -28,7 +28,7 @@ const JSON_STATE = JSON.stringify(STATE_VALUE);
 afterEach(() => {
 	vi.unstubAllGlobals();
 	vi.unstubAllEnvs();
-	vi.clearAllMocks();
+	vi.resetAllMocks();
 });
 
 describe("SSR (no window)", () => {
@@ -209,18 +209,15 @@ describe("prod mode with SECRET_KEY", () => {
 	});
 
 	it("writes an unchanged value again when another tab has replaced what is stored", () => {
-		mockObfuscate.mockReturnValue("obfuscated-result");
 		storage.setItem("test-key", STATE_VALUE as never);
 		mockLocalStorage.getItem.mockReturnValueOnce("another-tab");
 		storage.setItem("test-key", STATE_VALUE as never);
 
 		expect(mockLocalStorage.setItem).toHaveBeenCalledTimes(2);
-		mockObfuscate.mockImplementation(({ text }: { text: string }) => `obf::${text}`);
 	});
 
 	it("writes a changed value", () => {
 		storage.setItem("test-key", STATE_VALUE as never);
-		mockLocalStorage.getItem.mockReturnValueOnce(`obf::${JSON_STATE}`);
 		storage.setItem("test-key", { ...STATE_VALUE, version: 2 } as never);
 
 		expect(mockLocalStorage.setItem).toHaveBeenCalledTimes(2);

@@ -1,5 +1,5 @@
 import { Effect, Layer } from "effect";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@infrastructure/clients/db/turso/service", () => ({
 	TursoServiceLive: Layer.empty,
@@ -35,8 +35,8 @@ const CLIENT_ENV_KEYS = [
 ];
 
 describe("ApplicationLayer", () => {
-	it("is defined", () => {
-		expect(ApplicationLayer).toBeDefined();
+	afterEach(() => {
+		vi.unstubAllEnvs();
 	});
 
 	it("is an Effect Layer", () => {
@@ -55,8 +55,6 @@ describe("ApplicationLayer", () => {
 		const { ApplicationLayer: realLayer } = await import("./layers");
 
 		await expect(Effect.runPromise(Effect.scoped(Layer.build(realLayer)))).resolves.toBeDefined();
-
-		vi.unstubAllEnvs();
 	});
 
 	it("turns a missing client variable into a typed failure at the call, not a defect at the build", async () => {
@@ -68,10 +66,8 @@ describe("ApplicationLayer", () => {
 		vi.doUnmock("@infrastructure/logging/service");
 		vi.doUnmock("@infrastructure/clients/payments/stripe/serverService");
 
-		const [{ ApplicationLayer: realLayer }, { TursoService }] = await Promise.all([
-			import("./layers"),
-			import("@infrastructure/clients/db/turso/service"),
-		]);
+		const { ApplicationLayer: realLayer } = await import("./layers");
+		const { TursoService } = await import("@infrastructure/clients/db/turso/service");
 
 		const error = await Effect.runPromise(
 			Effect.gen(function* () {
@@ -82,7 +78,5 @@ describe("ApplicationLayer", () => {
 
 		expect(error._tag).toBe("DatabaseError");
 		expect(error.message).toContain("TURSO_DATABASE_URL");
-
-		vi.unstubAllEnvs();
 	});
 });

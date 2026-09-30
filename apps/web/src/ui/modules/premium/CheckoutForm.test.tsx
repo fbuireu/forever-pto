@@ -1,6 +1,6 @@
 import deMessages from "@i18n/messages/de.json";
 import enMessages from "@i18n/messages/en.json";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -312,6 +312,8 @@ describe("a payment the issuer took over", () => {
 		submit();
 
 		await waitFor(() => expect(vi.mocked(confirmPayment)).toHaveBeenCalled());
+		await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+
 		expect(premiumState.setPremiumStatus).not.toHaveBeenCalled();
 		expect(onSuccess).not.toHaveBeenCalled();
 		expect(screen.queryByText(enMessages.checkout.paymentFailed)).toBeNull();

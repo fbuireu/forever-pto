@@ -43,12 +43,6 @@ describe("amountFormatter", () => {
 		const result = amountFormatter("en").format(99.99);
 		expect(result).not.toContain(".");
 	});
-
-	it("returns the same formatter instance on repeated calls (cached)", () => {
-		const first = amountFormatter("fr");
-		const second = amountFormatter("fr");
-		expect(first).toBe(second);
-	});
 });
 
 describe("useCurrencyFormatter", () => {

@@ -59,10 +59,6 @@ const ITEMS = [
 ];
 
 describe("RadialNav", () => {
-	it("renders without throwing", () => {
-		expect(() => render(<RadialNav items={ITEMS} />)).not.toThrow();
-	});
-
 	it("is a named group, not a menu it never implemented", () => {
 		const { getByRole, queryByRole } = render(<RadialNav items={ITEMS} aria-label="Feature navigation" />);
 		expect(getByRole("group", { name: "Feature navigation" })).toBeTruthy();

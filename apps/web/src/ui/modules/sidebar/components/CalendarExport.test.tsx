@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const { mockGenerateIcs, holidaysState } = vi.hoisted(() => ({
 	mockGenerateIcs: vi.fn((_params: { holidays: { id: string }[] }) => "BEGIN:VCALENDAR"),
@@ -60,7 +60,7 @@ interface MakeHolidayParams {
 
 const makeHoliday = ({ id, date, isInPlanningWindow }: MakeHolidayParams) => ({
 	id,
-	date: new Date(date),
+	date: new Date(`${date}T00:00:00`),
 	name: `Holiday ${id}`,
 	isInPlanningWindow,
 });
@@ -77,6 +77,10 @@ beforeEach(() => {
 	Object.defineProperty(URL, "revokeObjectURL", { value: vi.fn(), writable: true });
 
 	mockToBlob.mockResolvedValue(new Blob(["%PDF"], { type: "application/pdf" }));
+});
+
+afterEach(() => {
+	vi.restoreAllMocks();
 });
 
 describe("CalendarExport", () => {
