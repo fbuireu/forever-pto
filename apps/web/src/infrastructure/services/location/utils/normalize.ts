@@ -19,3 +19,16 @@ export interface NoStoreFetchParams {
 
 export const noStoreFetch = ({ url, init }: NoStoreFetchParams) =>
 	fetch(url, { ...init, cache: "no-store", signal: AbortSignal.timeout(5000) });
+
+export interface StringFieldParams {
+	body: unknown;
+	field: string;
+}
+
+export const stringField = ({ body, field }: StringFieldParams): string | undefined => {
+	if (typeof body !== "object" || body === null) return undefined;
+
+	const value: unknown = Reflect.get(body, field);
+
+	return typeof value === "string" ? value : undefined;
+};

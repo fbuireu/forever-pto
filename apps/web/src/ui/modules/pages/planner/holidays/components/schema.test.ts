@@ -19,7 +19,7 @@ const A_DATE = new Date("2026-12-25T00:00:00");
 
 describe("createHolidaySchema", () => {
 	it("accepts a named Custom Holiday on a date", () => {
-		expect(schema.safeParse({ name: "Office closure", date: A_DATE }).success).toBe(true);
+		expect(schema.validate({ name: "Office closure", date: A_DATE })).toBe(true);
 	});
 
 	it("refuses an empty name with the message it was given", () => {
@@ -31,7 +31,7 @@ describe("createHolidaySchema", () => {
 	});
 
 	it("accepts a name of exactly a hundred characters", () => {
-		expect(schema.safeParse({ name: "a".repeat(100), date: A_DATE }).success).toBe(true);
+		expect(schema.validate({ name: "a".repeat(100), date: A_DATE })).toBe(true);
 	});
 
 	it("refuses anything that is not a date", () => {

@@ -171,4 +171,29 @@ describe("detectCountryFromEgressIP", () => {
 		vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network error")));
 		expect(await detectCountryFromEgressIP()).toBe("");
 	});
+
+	it.each([
+		["a body that is not an object", null],
+		["an ip that is not a string", { ip: 42 }],
+	])("returns empty string without a geo lookup when ipify answers %s", async (_label, body) => {
+		const mockFetch = vi.fn().mockResolvedValueOnce(makeResponse({ ok: true, body }));
+		vi.stubGlobal("fetch", mockFetch);
+
+		expect(await detectCountryFromEgressIP()).toBe("");
+		expect(mockFetch).toHaveBeenCalledTimes(1);
+	});
+
+	it.each([
+		["a body that is not an object", null],
+		["a country that is not a string", { country: 42 }],
+	])("returns empty string when ipinfo answers %s", async (_label, body) => {
+		vi.stubGlobal(
+			"fetch",
+			vi
+				.fn()
+				.mockResolvedValueOnce(makeResponse({ ok: true, body: { ip: "1.2.3.4" } }))
+				.mockResolvedValueOnce(makeResponse({ ok: true, body })),
+		);
+		expect(await detectCountryFromEgressIP()).toBe("");
+	});
 });

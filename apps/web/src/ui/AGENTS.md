@@ -44,6 +44,29 @@ component and over and over in its test, because there was no type either could 
 now cannot compile without saying which side of the charge it is on; that used to be a rule stated here and
 checked in review.
 
+**The activation's answer is checked, and a body that does not say who is Premium is a post-charge failure.**
+After the charge, the `POST /api/check-session` body is `unknown` until `premiumSessionSchema` from
+[`@application/dto/premium/schema`](../application/dto/premium/schema.ts) validates it: a non-empty `premiumKey`
+and a string `email`. Anything else is logged at error with the PaymentIntent id and answers
+`FAILED_AFTER_CHARGE` with an empty message, the same outcome and copy as a non-ok status, because the card is
+charged and nothing was activated. It used to be a cast, so a 200 carrying no key reported `SUCCEEDED` with
+`undefined` session data. On a non-ok status the body is read for a reason only when `activationFailureSchema`
+accepts it; a body of any other shape yields no reason rather than a failure of its own, so the outcome is
+never harder than the status already made it. A promo failure from `createPaymentAction` becomes a
+`PromoCodeError` only when its code is one of `PromoCodeErrors` (`z.enum` over that object); an unknown code is
+a plain `PaymentError` carrying the string, so `Donate.tsx` shows the generic copy instead of the promo title
+with no description.
+
+**`adapters/session/checkSession.ts` validates both halves of the route and reads a *no* differently for each.**
+`verifyPremiumEmail` answers `null` for a body without a non-empty string `premiumKey`, which is what a non-ok
+status already answered, and the store reads `null` as "not verified" without touching what it holds.
+`getExistingSession` returns the session for `premiumSessionSchema`, `null` only for the route's own
+no-session body (`noPremiumSessionSchema`: `premiumKey` null or absent), and **throws** for anything else,
+because the store clears Premium on `null` and keeps it on a throw;
+[`../application/stores/AGENTS.md`](../application/stores/AGENTS.md) has why that distinction exists. The
+schemas are reached through `import()`, not a static import: this file is in every page's first-load chunk and zod
+is not; [`../application/dto/AGENTS.md`](../application/dto/AGENTS.md) has the measurement.
+
 **The BetterStack logging client is reached through a dynamic `import()`, never a static one, and the reason it was has expired.** Its module graph used to pull `@logtail/edge` and `@opennextjs/cloudflare` in through its own top-level imports, so a static import put both in the client chunk of every component that touched it. Since [ADR 0018](../../../../adr/0018-the-platform-is-the-log-transport.md) it imports its own log contract and nothing else, so a static import would cost nothing. The dynamic form is kept because changing it is a separate decision and not because it still buys anything. No file in this layer writes that out: `logClient` and `logClientError` in
 `@application/shared/utils/clientLog` hold the whole incantation, and [`clientLog.test.ts`](../application/shared/utils/clientLog.test.ts) asserts by reading
 its own source that the import stays dynamic.

@@ -1,28 +1,28 @@
 import { describe, expect, it } from "vitest";
-import { createPaymentSchema, createPaymentSchemaWithMessages } from "./schema";
+import { createPaymentSchema, createPaymentSchemaWithMessages, paymentConfirmationQuerySchema } from "./schema";
 
 const VALID = { amount: 9.99, email: "user@example.com" };
 
 describe("createPaymentSchema", () => {
 	describe("valid input", () => {
 		it("accepts a valid amount and email without promoCode", () => {
-			expect(createPaymentSchema.safeParse(VALID).success).toBe(true);
+			expect(createPaymentSchema.validate(VALID)).toBe(true);
 		});
 
 		it("accepts a valid promoCode when provided", () => {
-			expect(createPaymentSchema.safeParse({ ...VALID, promoCode: "SAVE10" }).success).toBe(true);
+			expect(createPaymentSchema.validate({ ...VALID, promoCode: "SAVE10" })).toBe(true);
 		});
 
 		it("accepts an empty promoCode (optional field)", () => {
-			expect(createPaymentSchema.safeParse({ ...VALID, promoCode: "" }).success).toBe(true);
+			expect(createPaymentSchema.validate({ ...VALID, promoCode: "" })).toBe(true);
 		});
 
 		it("accepts minimum valid amount (1)", () => {
-			expect(createPaymentSchema.safeParse({ ...VALID, amount: 1 }).success).toBe(true);
+			expect(createPaymentSchema.validate({ ...VALID, amount: 1 })).toBe(true);
 		});
 
 		it("accepts maximum valid amount (10000)", () => {
-			expect(createPaymentSchema.safeParse({ ...VALID, amount: 10000 }).success).toBe(true);
+			expect(createPaymentSchema.validate({ ...VALID, amount: 10000 })).toBe(true);
 		});
 	});
 
@@ -40,12 +40,12 @@ describe("createPaymentSchema", () => {
 		});
 
 		it("rejects a non-numeric amount", () => {
-			expect(createPaymentSchema.safeParse({ ...VALID, amount: "ten" }).success).toBe(false);
+			expect(createPaymentSchema.validate({ ...VALID, amount: "ten" })).toBe(false);
 		});
 
 		it("rejects a missing amount", () => {
 			const { amount: _, ...rest } = VALID;
-			expect(createPaymentSchema.safeParse(rest).success).toBe(false);
+			expect(createPaymentSchema.validate(rest)).toBe(false);
 		});
 	});
 
@@ -58,7 +58,7 @@ describe("createPaymentSchema", () => {
 
 		it("rejects a missing email", () => {
 			const { email: _, ...rest } = VALID;
-			expect(createPaymentSchema.safeParse(rest).success).toBe(false);
+			expect(createPaymentSchema.validate(rest)).toBe(false);
 		});
 
 		it("rejects an email over the 254-character cap", () => {
@@ -70,7 +70,7 @@ describe("createPaymentSchema", () => {
 
 	describe("promoCode validation", () => {
 		it("accepts a promoCode of exactly 100 characters", () => {
-			expect(createPaymentSchema.safeParse({ ...VALID, promoCode: "A".repeat(100) }).success).toBe(true);
+			expect(createPaymentSchema.validate({ ...VALID, promoCode: "A".repeat(100) })).toBe(true);
 		});
 
 		it("rejects a promoCode over the cap with a machine code, never Zod prose", () => {
@@ -113,4 +113,21 @@ describe("createPaymentSchemaWithMessages", () => {
 		expect(result.success).toBe(false);
 		if (!result.success) expect(result.error.issues[0]?.message).toBe("Promo code too long");
 	});
+});
+
+describe("paymentConfirmationQuerySchema", () => {
+	it.each([
+		[{ payment_intent: "pi_123" }],
+		[{ payment_intent: "pi_123", activation: "failed", redirect_status: "succeeded" }],
+		[{}],
+	])("accepts %o", (query) => {
+		expect(paymentConfirmationQuerySchema.validate(query)).toBe(true);
+	});
+
+	it.each([[{ payment_intent: ["pi_123", "pi_456"] }], [{ payment_intent: "pi_123", activation: ["failed"] }]])(
+		"rejects a repeated parameter in %o",
+		(query) => {
+			expect(paymentConfirmationQuerySchema.validate(query)).toBe(false);
+		},
+	);
 });

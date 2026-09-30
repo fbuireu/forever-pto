@@ -107,6 +107,22 @@ describe("payment/confirmation page", () => {
 		});
 	});
 
+	describe("query string", () => {
+		it.each([
+			["a repeated payment_intent", { payment_intent: [PAYMENT_INTENT_ID, "pi_other"] }],
+			["a repeated activation flag", { payment_intent: PAYMENT_INTENT_ID, activation: [ACTIVATION_FAILED] }],
+		])("redirects home without reading Stripe when the query carries %s", async (_label, query) => {
+			mockRedirect.mockImplementation(() => {
+				throw new Error("NEXT_REDIRECT");
+			});
+			await expect(
+				PaymentSuccessPage({ searchParams: Promise.resolve(query), params: Promise.resolve({ locale: EN as never }) }),
+			).rejects.toThrow("NEXT_REDIRECT");
+			expect(mockRedirect).toHaveBeenCalledWith(`/${EN}`);
+			expect(mockConfirmation).not.toHaveBeenCalled();
+		});
+	});
+
 	describe("PaymentError state", () => {
 		it("returns PaymentError component when confirmation returns null", async () => {
 			mockConfirmation.mockReturnValueOnce(Effect.succeed(null));

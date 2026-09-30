@@ -35,3 +35,8 @@ export const createPaymentSchema = createPaymentSchemaWithMessages({
 });
 
 export type CreatePaymentInput = z.infer<typeof createPaymentSchema>;
+
+export const paymentConfirmationQuerySchema = z.object({
+	payment_intent: z.string().optional(),
+	activation: z.string().optional(),
+});

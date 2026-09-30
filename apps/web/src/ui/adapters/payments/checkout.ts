@@ -1,11 +1,15 @@
 import type { CreatePaymentInput } from "@application/dto/payment/schema";
 import type { DiscountInfo } from "@application/dto/payment/types";
+import { activationFailureSchema, type PremiumSession, premiumSessionSchema } from "@application/dto/premium/schema";
 import { logClient } from "@application/shared/utils/clientLog";
 import { emailDomain } from "@application/shared/utils/redact";
 import { createPaymentAction } from "@infrastructure/actions/payment";
-import { PaymentError, PromoCodeError, type PromoCodeErrorCode } from "@infrastructure/errors";
+import { PaymentError, PromoCodeError, PromoCodeErrors } from "@infrastructure/errors";
 import type { Stripe, StripeElements } from "@stripe/stripe-js";
 import { Effect } from "effect";
+import { z } from "zod";
+
+const promoCodeErrorCodeSchema = z.enum(PromoCodeErrors);
 
 interface InitializePaymentResult {
 	clientSecret: string;
@@ -16,8 +20,8 @@ export const initializePayment = async (params: CreatePaymentInput): Promise<Ini
 	const result = await createPaymentAction(params);
 
 	if (!result.success) {
-		if (result.isPromoCodeError && result.error) {
-			throw new PromoCodeError({ code: result.error as PromoCodeErrorCode });
+		if (result.isPromoCodeError && promoCodeErrorCodeSchema.validate(result.error)) {
+			throw new PromoCodeError({ code: result.error });
 		}
 		throw new PaymentError({ message: result.error ?? "Payment initialization failed" });
 	}
@@ -45,7 +49,7 @@ export const ConfirmPaymentOutcome = {
 export type ConfirmPaymentOutcome = (typeof ConfirmPaymentOutcome)[keyof typeof ConfirmPaymentOutcome];
 
 export type ConfirmPaymentResult =
-	| { outcome: typeof ConfirmPaymentOutcome.SUCCEEDED; sessionData: { premiumKey: string; email: string } }
+	| { outcome: typeof ConfirmPaymentOutcome.SUCCEEDED; sessionData: PremiumSession }
 	| { outcome: typeof ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE; error: string }
 	| { outcome: typeof ConfirmPaymentOutcome.FAILED_AFTER_CHARGE; error: string }
 	| { outcome: typeof ConfirmPaymentOutcome.HANDED_OFF_TO_ISSUER };
@@ -93,28 +97,41 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
 		);
 
 		if (!sessionResponse.ok) {
-			const errorData = yield* Effect.tryPromise(() => sessionResponse.json() as Promise<{ error?: string }>);
+			const errorBody: unknown = yield* Effect.tryPromise(() => sessionResponse.json());
+			const reason = activationFailureSchema.validate(errorBody) ? errorBody.error : undefined;
 			logClient((logger) =>
 				logger.error({
 					message: "Session activation failed after payment",
 					context: {
 						statusCode: sessionResponse.status,
-						reason: errorData.error,
+						reason,
 						emailDomain: emailDomain(email),
 						paymentIntentId: paymentIntent.id,
 					},
 				}),
 			);
-			return { outcome: ConfirmPaymentOutcome.FAILED_AFTER_CHARGE, error: errorData.error ?? "" };
+			return { outcome: ConfirmPaymentOutcome.FAILED_AFTER_CHARGE, error: reason ?? "" };
 		}
 
-		const sessionData = yield* Effect.tryPromise(
-			() => sessionResponse.json() as Promise<{ premiumKey: string; email: string }>,
-		);
+		const sessionBody: unknown = yield* Effect.tryPromise(() => sessionResponse.json());
+
+		if (!premiumSessionSchema.validate(sessionBody)) {
+			logClient((logger) =>
+				logger.error({
+					message: "Session activation answered an unrecognised body after payment",
+					context: {
+						statusCode: sessionResponse.status,
+						emailDomain: emailDomain(email),
+						paymentIntentId: paymentIntent.id,
+					},
+				}),
+			);
+			return { outcome: ConfirmPaymentOutcome.FAILED_AFTER_CHARGE, error: "" };
+		}
 
 		return {
 			outcome: ConfirmPaymentOutcome.SUCCEEDED,
-			sessionData: { premiumKey: sessionData.premiumKey, email: sessionData.email },
+			sessionData: { premiumKey: sessionBody.premiumKey, email: sessionBody.email },
 		};
 	}).pipe(
 		Effect.catchAll((error) => {

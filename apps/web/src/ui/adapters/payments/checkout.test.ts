@@ -98,6 +98,18 @@ describe("initializePayment", () => {
 		expect(thrown.code).toBe(PromoCodeErrors.USAGE_LIMIT_REACHED);
 	});
 
+	it("does not turn a promo error code this build does not know into a PromoCodeError", async () => {
+		mockCreatePaymentAction.mockResolvedValue({ success: false, isPromoCodeError: true, error: "not_a_promo_code" });
+
+		const thrown = await initializePayment({ amount: 100, email: "user@example.com", promoCode: "ODD" }).catch(
+			(e) => e,
+		);
+
+		expect(thrown).toBeInstanceOf(PaymentError);
+		expect(thrown).not.toBeInstanceOf(PromoCodeError);
+		expect(thrown.message).toBe("not_a_promo_code");
+	});
+
 	it("throws PaymentError on generic failure", async () => {
 		mockCreatePaymentAction.mockResolvedValue({ success: false, error: "card declined" });
 
@@ -171,6 +183,45 @@ describe("confirmPayment", () => {
 
 		expect(result).toEqual({ outcome: ConfirmPaymentOutcome.FAILED_AFTER_CHARGE, error: "session activation failed" });
 		await vi.waitFor(() => expect(mockLoggerError).toHaveBeenCalled());
+	});
+
+	it.each([
+		["a non-string reason", { error: 42 }],
+		["a body that is not an object", null],
+	])("reports no reason when the failed activation answers %s", async (_label, body) => {
+		(mockElements.submit as ReturnType<typeof vi.fn>).mockResolvedValue({});
+		(mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({ paymentIntent: { id: "pi_123" } });
+		mockFetch.mockResolvedValue({ ok: false, status: 500, json: vi.fn().mockResolvedValue(body) });
+
+		const result = await confirmPayment(BASE_CONFIRM_PARAMS);
+
+		expect(result).toEqual({ outcome: ConfirmPaymentOutcome.FAILED_AFTER_CHARGE, error: "" });
+		await vi.waitFor(() =>
+			expect(mockLoggerError).toHaveBeenCalledWith(
+				expect.objectContaining({ context: expect.objectContaining({ statusCode: 500, reason: undefined }) }),
+			),
+		);
+	});
+
+	it.each([
+		["no premium key", { success: true, email: "user@example.com" }],
+		["a non-string premium key", { premiumKey: 42, email: "user@example.com" }],
+		["an empty premium key", { premiumKey: "", email: "user@example.com" }],
+		["no email", { premiumKey: "pk_abc" }],
+		["a body that is not an object", null],
+	])("never reports success after a charge when the activation answers with %s", async (_label, body) => {
+		(mockElements.submit as ReturnType<typeof vi.fn>).mockResolvedValue({});
+		(mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({ paymentIntent: { id: "pi_123" } });
+		mockFetch.mockResolvedValue({ ok: true, status: 200, json: vi.fn().mockResolvedValue(body) });
+
+		const result = await confirmPayment(BASE_CONFIRM_PARAMS);
+
+		expect(result).toEqual({ outcome: ConfirmPaymentOutcome.FAILED_AFTER_CHARGE, error: "" });
+		await vi.waitFor(() =>
+			expect(mockLoggerError).toHaveBeenCalledWith(
+				expect.objectContaining({ context: expect.objectContaining({ statusCode: 200, paymentIntentId: "pi_123" }) }),
+			),
+		);
 	});
 
 	it("returns success with sessionData on the happy path", async () => {

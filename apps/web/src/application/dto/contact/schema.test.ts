@@ -11,7 +11,7 @@ const VALID = {
 describe("contactSchema", () => {
 	describe("valid input", () => {
 		it("accepts a fully valid payload", () => {
-			expect(contactSchema.safeParse(VALID).success).toBe(true);
+			expect(contactSchema.validate(VALID)).toBe(true);
 		});
 	});
 
@@ -24,13 +24,13 @@ describe("contactSchema", () => {
 
 		it("rejects a missing email", () => {
 			const { email: _, ...rest } = VALID;
-			expect(contactSchema.safeParse(rest).success).toBe(false);
+			expect(contactSchema.validate(rest)).toBe(false);
 		});
 	});
 
 	describe("name validation", () => {
 		it("accepts name at minimum length (2)", () => {
-			expect(contactSchema.safeParse({ ...VALID, name: "Jo" }).success).toBe(true);
+			expect(contactSchema.validate({ ...VALID, name: "Jo" })).toBe(true);
 		});
 
 		it("rejects name below minimum (1 char)", () => {
@@ -40,7 +40,7 @@ describe("contactSchema", () => {
 		});
 
 		it("accepts name at maximum length (100)", () => {
-			expect(contactSchema.safeParse({ ...VALID, name: "a".repeat(100) }).success).toBe(true);
+			expect(contactSchema.validate({ ...VALID, name: "a".repeat(100) })).toBe(true);
 		});
 
 		it("rejects name above maximum (101 chars)", () => {
@@ -52,7 +52,7 @@ describe("contactSchema", () => {
 
 	describe("subject validation", () => {
 		it("accepts subject at minimum length (5)", () => {
-			expect(contactSchema.safeParse({ ...VALID, subject: "Hello" }).success).toBe(true);
+			expect(contactSchema.validate({ ...VALID, subject: "Hello" })).toBe(true);
 		});
 
 		it("rejects subject below minimum (4 chars)", () => {
@@ -62,7 +62,7 @@ describe("contactSchema", () => {
 		});
 
 		it("accepts subject at maximum length (200)", () => {
-			expect(contactSchema.safeParse({ ...VALID, subject: "a".repeat(200) }).success).toBe(true);
+			expect(contactSchema.validate({ ...VALID, subject: "a".repeat(200) })).toBe(true);
 		});
 
 		it("rejects subject above maximum (201 chars)", () => {
@@ -74,7 +74,7 @@ describe("contactSchema", () => {
 
 	describe("message validation", () => {
 		it("accepts message at minimum length (10)", () => {
-			expect(contactSchema.safeParse({ ...VALID, message: "1234567890" }).success).toBe(true);
+			expect(contactSchema.validate({ ...VALID, message: "1234567890" })).toBe(true);
 		});
 
 		it("rejects message below minimum (9 chars)", () => {
@@ -84,7 +84,7 @@ describe("contactSchema", () => {
 		});
 
 		it("accepts message at maximum length (1000)", () => {
-			expect(contactSchema.safeParse({ ...VALID, message: "a".repeat(1000) }).success).toBe(true);
+			expect(contactSchema.validate({ ...VALID, message: "a".repeat(1000) })).toBe(true);
 		});
 
 		it("rejects message above maximum (1001 chars)", () => {

@@ -15,7 +15,7 @@ costs one interaction. Nothing downstream should treat the result as authoritati
 | --- | --- |
 | [`detectCountry.ts`](./detectCountry.ts) | Runs the chain. The ordering and nothing else |
 | [`utils/strategies.ts`](./utils/strategies.ts) | The strategies and `CLOUDFLARE_COUNTRY_HEADER` |
-| [`utils/normalize.ts`](./utils/normalize.ts) | `normalizeCountryCode`, the one exit rule, plus `noStoreFetch` and the `UNIDENTIFIED_COUNTRY` / `TOR_COUNTRY` sentinels |
+| [`utils/normalize.ts`](./utils/normalize.ts) | `normalizeCountryCode`, the one exit rule, plus `noStoreFetch`, `stringField` and the `UNIDENTIFIED_COUNTRY` / `TOR_COUNTRY` sentinels |
 
 ## The chain
 
@@ -88,6 +88,22 @@ their own wrapper with `Effect.runPromise`, because the proxy has no `Applicatio
 the same reason logging goes through the `logger` import rather than `LoggerService`,
 the documented logging exception in
 [ADR 0002](../../../../../../adr/0002-effect-for-external-service-boundaries.md).
+
+**The third-party bodies are read as `unknown` and picked with `stringField`, not cast, and not with zod.**
+`api.ipify.org` and `ipinfo.io` answer JSON this app does not control. It used to be cast to `{ ip: string }`
+and `{ country?: string }`, and the cast was not harmless: a `null` body, or a `country` that is not a string,
+threw a `TypeError` inside the generator. Effect records a throw there as a *defect*, and `Effect.orElse` only
+recovers *failures*, so `detectCountryFromEgressIP` rejected and took the middleware with it, breaking the
+"never a throw" rule above. `stringField({ body, field })` answers the field only when the body is an object and
+the value is a string, and `undefined` otherwise, which every caller already reads as `''`.
+
+zod is deliberately not the tool here, although the rest of the app validates foreign JSON with it. This folder
+runs inside [`src/middleware.ts`](../../../middleware.ts), whose import graph does not reach zod at all, and
+the middleware is evaluated on every navigation. zod classic does not tree-shake to a small core: one
+`z.object` with a `validate` call bundles to roughly 25 KB compressed with named imports and about 90 KB through
+the `z` namespace, and `zod/mini`, which does shake, has no `validate`. The path it would guard is the last
+resort of the chain, which production never reaches while `cf-ipcountry` is present. Two `typeof` checks cost
+nothing and give the same answer.
 
 **Only the CDN failure is logged.** It goes through `logger.warn`. The egress-IP chain is closed with
 `Effect.orElse`, so a failure there is invisible: if detection has quietly stopped working, absence of logs

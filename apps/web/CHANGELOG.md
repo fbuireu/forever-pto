@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.13.1](https://github.com/fbuireu/forever-pto/compare/web-v1.13.0...web-v1.13.1) (2026-09-30)
+
+
+### Bug Fixes
+
+* **web:** validate session, payment and confirmation data with zod instead of casting it ([b673ab4](https://github.com/fbuireu/forever-pto/commit/b673ab4e759e2e5d410840b0562fa540c61c625d))
+
 # [forever-pto-web-v1.13.0](https://github.com/fbuireu/forever-pto/compare/web-v1.12.1...web-v1.13.0) (2026-09-27)
 
 

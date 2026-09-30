@@ -1,7 +1,6 @@
-export interface SessionData {
-	premiumKey: string;
-	email: string;
-}
+import type { PremiumSession } from "@application/dto/premium/schema";
+
+const loadSchemas = () => import("@application/dto/premium/schema");
 
 export async function verifyPremiumEmail(email: string) {
 	const response = await fetch("/api/check-session", {
@@ -12,13 +11,17 @@ export async function verifyPremiumEmail(email: string) {
 	});
 
 	if (!response.ok) return null;
-	const { premiumKey } = (await response.json()) as { premiumKey?: string };
-	return premiumKey ? { premiumKey } : null;
+	const body: unknown = await response.json();
+	const { premiumKeySchema } = await loadSchemas();
+	return premiumKeySchema.validate(body) ? { premiumKey: body.premiumKey } : null;
 }
 
-export async function getExistingSession() {
+export async function getExistingSession(): Promise<PremiumSession | null> {
 	const response = await fetch("/api/check-session", { credentials: "include" });
 	if (!response.ok) throw new Error(`check-session answered ${response.status}`);
-	const data = (await response.json()) as SessionData;
-	return data.premiumKey ? data : null;
+	const body: unknown = await response.json();
+	const { premiumSessionSchema, noPremiumSessionSchema } = await loadSchemas();
+	if (premiumSessionSchema.validate(body)) return { premiumKey: body.premiumKey, email: body.email };
+	if (noPremiumSessionSchema.validate(body)) return null;
+	throw new Error("check-session answered an unrecognised body");
 }

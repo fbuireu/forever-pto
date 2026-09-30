@@ -14,11 +14,11 @@ Each concept gets its own folder, and the file names inside it are fixed:
 | --- | --- | --- |
 | `types.ts` | The canonical shape, plus the `Raw*` alias for the foreign one it is built from | every folder |
 | `dto.ts` | The mapper, the object implementing `BaseDTO` | `country/`, `holiday/`, `payment/`, `region/` |
-| `schema.ts` | A Zod schema for a shape the *user* submits, and the `z.infer` type derived from it | `contact/`, `payment/` |
+| `schema.ts` | A Zod schema for a shape the *user* submits, or for a body this app's own endpoint answers that the browser has to check, and the `z.infer` type derived from it | `contact/`, `payment/`, `premium/` |
 | `utils/` | Helpers the mapper needs and nobody else should reach for | `payment/`, `region/` |
 | `rules.ts` | Pure predicates over the concept that are not a mapping | `contact/` |
 
-Not every folder needs every file. `email/` and `premium/` are `types.ts` alone: `SendEmailParams` and `PremiumSessionData` are contracts between our own layers, with no foreign shape to normalise and therefore no mapper to write. Do not add an empty `dto.ts` to satisfy the pattern.
+Not every folder needs every file. `email/` is `types.ts` alone and `premium/` has no `dto.ts`: `SendEmailParams` and `PremiumSessionData` are contracts between our own layers, with no foreign shape to normalise and therefore no mapper to write. Do not add an empty `dto.ts` to satisfy the pattern. `premium/schema.ts` is there because `/api/check-session`'s bodies arrive in the browser as `unknown` JSON, and a contract between our own layers is still a wire the browser cannot take on trust.
 
 | Folder | Canonical shape | Built from |
 | --- | --- | --- |
@@ -27,7 +27,7 @@ Not every folder needs every file. `email/` and `premium/` are `types.ts` alone:
 | `email/` | `SendEmailParams` | None |
 | `holiday/` | `HolidayDTO` | `date-holidays` |
 | `payment/` | `PaymentConfirmationDTO`, `NewPayment` (what `paymentDataDTO` produces) and `PaymentData` (the stored record it grows into), `CreatePaymentInput`, `DiscountInfo` | Stripe `PaymentIntent`, the donation form |
-| `premium/` | `PremiumSessionData` | None |
+| `premium/` | `PremiumSessionData`, plus `PremiumSession` and the `/api/check-session` body schemas in `schema.ts` | None |
 | `region/` | `RegionDTO` | `i18n-iso-countries` localised names |
 
 ## Public API
@@ -190,6 +190,25 @@ now, and each call site builds it once.
 **There is a keep window and a display window, not one window.** `create` drops anything outside the widest Planning Window the data supports (`MAX_CARRY_OVER_MONTHS`, so the chosen year plus the whole of the following one), then sets `isInPlanningWindow` from the *actual* Planning Window (the year plus its Carry-over Months). Holidays between them are kept so the UI can show them for context. They are not hidden from the engine: it plans against the unfiltered set on purpose, and the flag is read only by the display filters listed above.
 
 **Schemas carry message keys, not messages.** `contactSchema` and `createPaymentSchema` are pre-bound with keys such as `invalid_email` for server-side validation. The UI calls `createContactSchema` / `createPaymentSchemaWithMessages` with translated strings instead. Adding a validation rule means adding it to the messages interface too, or the localised form silently loses the message.
+
+**The body and query schemas are checked with `.validate()`, never parsed, because every caller only needs yes or no.**
+`premium/schema.ts` (`premiumSessionSchema`, `premiumKeySchema`, `noPremiumSessionSchema`, `activationFailureSchema`)
+and `paymentConfirmationQuerySchema` in [`payment/schema.ts`](./payment/schema.ts) are read with zod's `validate`, which
+answers a boolean, builds no issue list and narrows the value it was handed rather than returning a copy. Two
+things follow. Nothing is transformed, defaulted or coerced, so a schema here must not grow `.transform`,
+`.default` or `.catch` and expect `validate` to apply it: that is `parse`'s job and `zodParse`'s. And extra keys
+pass through, so a caller copies the fields it needs (`{ premiumKey: body.premiumKey, email: body.email }`)
+rather than handing the validated body on. What each caller does with a *no* is the caller's decision and is
+recorded beside it: [`../../ui/AGENTS.md`](../../ui/AGENTS.md) for the two adapters,
+[`../../app/AGENTS.md`](../../app/AGENTS.md) for the confirmation page.
+
+**`premium/schema.ts` is loaded lazily by one of its two importers, and that is what keeps zod off the first load.**
+[`checkSession.ts`](../../ui/adapters/session/checkSession.ts) is in the first-load chunk of every page, through the
+premium store, and zod is in none of them; a static import would add zod classic, roughly 25 KB compressed at the
+smallest measured, to every visit. It reaches the schemas through `import()` inside the functions that already
+await a fetch. [`checkout.ts`](../../ui/adapters/payments/checkout.ts) imports them statically because its only
+importer, `CheckoutForm.tsx`, already loads zod through `payment/schema.ts`. Keep the dynamic form, and keep anything heavier than `zod`
+out of this file.
 
 **The bounds are exported, and the bundles interpolate them.** `AMOUNT_MIN`/`AMOUNT_MAX` and
 `NAME_MIN_LENGTH`/`SUBJECT_MIN_LENGTH`/`MESSAGE_MIN_LENGTH` come out of the schema modules, so the rule and

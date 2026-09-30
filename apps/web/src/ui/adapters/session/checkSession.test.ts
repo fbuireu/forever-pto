@@ -31,6 +31,16 @@ describe("verifyPremiumEmail", () => {
 		expect(await verifyPremiumEmail("user@example.com")).toEqual({ premiumKey: "pk_abc" });
 	});
 
+	it.each([
+		["a non-string premium key", { premiumKey: 42 }],
+		["an empty premium key", { premiumKey: "" }],
+		["a body that is not an object", null],
+	])("returns null when the body carries %s", async (_label, body) => {
+		mockFetch.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue(body) });
+
+		expect(await verifyPremiumEmail("user@example.com")).toBeNull();
+	});
+
 	it("sends email in request body", async () => {
 		mockFetch.mockResolvedValue({ ok: false });
 
@@ -61,6 +71,32 @@ describe("getExistingSession", () => {
 		});
 
 		expect(await getExistingSession()).toEqual({ premiumKey: "pk_abc", email: "user@example.com" });
+	});
+
+	it("returns null for the body the route answers when there is no session", async () => {
+		mockFetch.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue({ premiumKey: null, email: null }) });
+
+		expect(await getExistingSession()).toBeNull();
+	});
+
+	it("returns only the session fields, whatever else the body carries", async () => {
+		mockFetch.mockResolvedValue({
+			ok: true,
+			json: vi.fn().mockResolvedValue({ premiumKey: "pk_abc", email: "user@example.com", extra: true }),
+		});
+
+		expect(await getExistingSession()).toEqual({ premiumKey: "pk_abc", email: "user@example.com" });
+	});
+
+	it.each([
+		["a non-string premium key", { premiumKey: 42, email: "user@example.com" }],
+		["a premium key without an email", { premiumKey: "pk_abc", email: null }],
+		["an email that is not a string", { premiumKey: "pk_abc", email: 7 }],
+		["a body that is not an object", null],
+	])("throws rather than reading %s as an answer, so a stored session is kept", async (_label, body) => {
+		mockFetch.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue(body) });
+
+		await expect(getExistingSession()).rejects.toThrow("check-session answered an unrecognised body");
 	});
 
 	it("uses a GET request with credentials included", async () => {
