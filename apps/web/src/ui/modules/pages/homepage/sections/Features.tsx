@@ -2,15 +2,17 @@ import { getWeekdayNames } from "@application/shared/utils/dates";
 import { Badge } from "@ui/modules/core/primitives/Badge";
 import { FlagIcon } from "@ui/modules/core/primitives/FlagIcon";
 import { cn } from "@ui/utils/cn";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { brutCard, type DayType, dayCell } from "./shared";
+
+const BEST_EFFICIENCY = 3.5;
 
 const BRIDGE_WEEK = (["work", "work", "work", "holiday", "pto", "weekend", "weekend"] as DayType[]).map(
 	(type, index) => ({ id: `bridge-day-${index}`, type, index }),
 );
 
 export const Features = async () => {
-	const [t, locale] = await Promise.all([getTranslations("homepage"), getLocale()]);
+	const [t, locale, format] = await Promise.all([getTranslations("homepage"), getLocale(), getFormatter()]);
 	const weekdayLabels = getWeekdayNames({ locale, weekStartsOn: 1, format: "narrow" });
 
 	return (
@@ -20,8 +22,7 @@ export const Features = async () => {
 					<Badge variant="outline">{t("features.badge")}</Badge>
 				</div>
 				<h2 className="font-display font-semibold leading-none tracking-[-0.03em] mb-4 text-[clamp(36px,5vw,64px)]">
-					{t("features.titleStart")} <em className="font-serif italic">{t("features.titleEmphasis")}</em>{" "}
-					{t("features.titleEnd")}
+					{t.rich("features.title", { em: (chunks) => <em className="font-serif italic">{chunks}</em> })}
 				</h2>
 				<p className="text-[19px] text-muted-foreground">{t("features.description")}</p>
 			</div>
@@ -64,7 +65,10 @@ export const Features = async () => {
 						{t("features.ratioTag")}
 					</span>
 					<div className="font-display font-extrabold text-[100px] leading-none tracking-[-0.05em] mt-2.5 mb-2">
-						3.5<span className="text-[32px]">×</span>
+						{t.rich("features.ratioValue", {
+							ratio: format.number(BEST_EFFICIENCY, { maximumFractionDigits: 1 }),
+							sign: (chunks) => <span className="text-[32px]">{chunks}</span>,
+						})}
 					</div>
 					<p className="text-foreground text-[15px]">{t("features.ratioDescription")}</p>
 				</div>

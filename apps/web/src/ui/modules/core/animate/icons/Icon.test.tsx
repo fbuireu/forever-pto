@@ -52,6 +52,11 @@ const PersistProbe = () => {
 	return <span data-testid="persist">{String(persistOnAnimateEnd)}</span>;
 };
 
+const EndStateProbe = () => {
+	const { persistOnAnimateEnd, initialOnAnimateEnd } = useAnimateIconContext();
+	return <span data-testid="end-state">{`persist:${persistOnAnimateEnd} initial:${initialOnAnimateEnd}`}</span>;
+};
+
 const Probe = () => {
 	const { active, animation, loop, loopDelay } = useAnimateIconContext();
 
@@ -562,6 +567,12 @@ describe("an icon with no AnimateIcon above it", () => {
 		fireEvent.pointerEnter(container.firstElementChild as HTMLElement, { pointerType: "mouse" });
 
 		expect(isActive(container)).toBe(true);
+	});
+
+	it("keeps the end state it was given in the AnimateIcon it mints", () => {
+		render(<IconWrapper icon={EndStateProbe} animateOnHover persistOnAnimateEnd initialOnAnimateEnd />);
+
+		expect(screen.getByTestId("end-state").textContent).toBe("persist:true initial:true");
 	});
 
 	it("renders flat when nothing asks it to animate", () => {

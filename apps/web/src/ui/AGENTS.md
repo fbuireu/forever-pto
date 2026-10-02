@@ -8,92 +8,77 @@ Everything the user sees, plus the browser plumbing that feeds it: components, h
 
 | Directory | Role |
 | --- | --- |
-| `adapters/` | Where the layer's network I/O belongs, though not the only place it happens; [`modules/shared/WebMCP.tsx`](./modules/shared/WebMCP.tsx) fetches `/api/health` and [`modules/shared/contact/ContactModal.tsx`](./modules/shared/contact/ContactModal.tsx) invokes a server action directly: `payments/checkout.ts` (payment intent creation via the `@infrastructure/actions/payment` server action, Stripe confirmation, session activation) and `session/checkSession.ts` (`/api/check-session` lookups) |
+| `adapters/` | Where the layer's network I/O belongs, though not the only place it happens; [`modules/shared/WebMCP.tsx`](./modules/shared/WebMCP.tsx) fetches `/api/health` and [`modules/shared/contact/ContactModal.tsx`](./modules/shared/contact/ContactModal.tsx) invokes a server action directly: `payments/checkout.ts` (payment intent creation via the `@infrastructure/actions/payment` server action, Stripe confirmation, session activation), `session/checkSession.ts` (`/api/check-session` lookups) and [`navigation/staleDeployment.ts`](./adapters/navigation/staleDeployment.ts) (`recoverFromStaleDeployment`, which reloads the page when the server refuses a Server Action from an older build) |
 | `assets/` | Brand SVGs as plain data: [`icons/types.ts`](./assets/icons/types.ts) defines `SvgIcon`; no React. Aliased `@assets/*`, excluded from the test run and from coverage |
-| `hooks/` | Cross-module React hooks. Some carry real coupling: [`useCalculationsWorker.ts`](./hooks/useCalculationsWorker.ts) owns the Web Worker request lifecycle, [`useStoresReady.ts`](./hooks/useStoresReady.ts) gates rendering on store rehydration, and [`usePlanReadout.ts`](./hooks/usePlanReadout.ts) owns the applied plan, what it has spent and the freeze that keeps the readouts of one number in agreement; its `usePlacedPlan` is the plan and its placed days alone, with no subscription to `isCalculating`, for the Summary and the calendar export, which would otherwise redraw every chart when a calculation starts and again when it ends. [`useHasOpened.ts`](./hooks/useHasOpened.ts) turns an `open` flag into "has ever been open", which is what gates a modal's mount: a mounted modal is downloaded even while it stays shut, and one that has opened stays mounted so its close can animate. The rest are generic ([`useDebounce.ts`](./hooks/useDebounce.ts), [`useMobile.ts`](./hooks/useMobile.ts), [`useAutoHeight.tsx`](./hooks/useAutoHeight.tsx), [`useControlledState.tsx`](./hooks/useControlledState.tsx), [`useIsInView.tsx`](./hooks/useIsInView.tsx), [`useLanguages.ts`](./hooks/useLanguages.ts), [`useTutorial.tsx`](./hooks/useTutorial.tsx)) |
+| `hooks/` | Cross-module React hooks. Some carry real coupling: [`useCalculationsWorker.ts`](./hooks/useCalculationsWorker.ts) owns the Web Worker request lifecycle, [`useStoresReady.ts`](./hooks/useStoresReady.ts) gates rendering on store rehydration, and [`usePlanReadout.ts`](./hooks/usePlanReadout.ts) owns the applied plan, what it has spent and the freeze that keeps the readouts of one number in agreement; its `usePlacedPlan` is the plan and its placed days alone, with no subscription to `isCalculating`, for the Summary and the calendar export. [`useHasOpened.ts`](./hooks/useHasOpened.ts) turns an `open` flag into "has ever been open", which gates a modal's mount. [`useCurrentYear.ts`](./hooks/useCurrentYear.ts) answers the year the server rendered with on the first pass and the visitor's after mount, for the footer's copyright, the sidebar's year list and the quick start. [`useHasStoredPlan.ts`](./hooks/useHasStoredPlan.ts) answers whether a stored plan exists without rehydrating it, for the quick start's resume label; [`useLanguageSwitch.ts`](./hooks/useLanguageSwitch.ts) backs both language switchers; [`useTutorial.tsx`](./hooks/useTutorial.tsx) drives the driver.js tour (see *Gotchas*). The rest are generic ([`useDebounce.ts`](./hooks/useDebounce.ts), [`useMobile.ts`](./hooks/useMobile.ts), [`useAutoHeight.tsx`](./hooks/useAutoHeight.tsx), [`useControlledState.tsx`](./hooks/useControlledState.tsx), [`useIsInView.tsx`](./hooks/useIsInView.tsx), [`useLanguages.ts`](./hooks/useLanguages.ts)) |
 | `i18n/` | The message bundles and nothing else; routing and locale detection are in `@infrastructure/i18n`. Aliased `@i18n/*`. See [`i18n/AGENTS.md`](./i18n/AGENTS.md) |
 | `modules/` | Every component. `core/` is the design system ([`modules/core/AGENTS.md`](./modules/core/AGENTS.md)); `pages/` holds one folder per screen ([`modules/pages/planner/AGENTS.md`](./modules/pages/planner/AGENTS.md)); then `sidebar/`, `shared/`, `premium/`, `providers/`, `layout/`, `export/` (the react-pdf [`HolidayDocument.tsx`](./modules/export/HolidayDocument.tsx)), `stores/` ([`StoresInitializer.tsx`](./modules/stores/StoresInitializer.tsx)), `tracking/` (the consent-gated script mounts), `tutorial/` ([`DriverStyles.tsx`](./modules/tutorial/DriverStyles.tsx)), and `bones/`, skeletons generated by `boneyard-js`, whose [`registry.ts`](./modules/bones/registry.ts) is regenerated, not edited |
-| `styles/` | Tailwind entry point [`styles/index.css`](./styles/index.css), which declares the cascade layer order and imports the partials. [`styles/lazy/index.css`](./styles/lazy/index.css) is deliberately outside it: `DriverStyles.tsx` pulls it in on demand. Aliased `@styles/*`. See [`styles/AGENTS.md`](./styles/AGENTS.md) |
-| `utils/` | Browser-side helpers: [`cn.ts`](./utils/cn.ts), [`cookie.ts`](./utils/cookie.ts), [`currencies.ts`](./utils/currencies.ts) (the EUR constants, the memoised `Intl.NumberFormat` cache behind `amountFormatter`, and `useCurrencyFormatter` for a charge amount), [`context.tsx`](./utils/context.tsx) (`getStrictContext`), [`getCurrentYear.ts`](./utils/getCurrentYear.ts) (an async server helper, evaluated when the page is prerendered), [`getLastUpdatedDate.ts`](./utils/getLastUpdatedDate.ts), [`userCountry.ts`](./utils/userCountry.ts) (`getUserCountryFromCookie`, the one reader of the `user-country` cookie the edge sets, shared by `StoresInitializer` and the homepage quick start) |
+| `styles/` | The cross-cutting CSS: Tailwind entry point [`styles/index.css`](./styles/index.css), which declares the cascade layer order and imports the partials. The tour's stylesheet, [`modules/tutorial/driver.css`](./modules/tutorial/driver.css), sits beside `DriverStyles.tsx`, which pulls it in on demand. Aliased `@styles/*`. See [`styles/AGENTS.md`](./styles/AGENTS.md) |
+| `utils/` | Helpers for both sides: [`cn.ts`](./utils/cn.ts), [`cookie.ts`](./utils/cookie.ts), [`currencies.ts`](./utils/currencies.ts) (the EUR constants, the memoised `Intl.NumberFormat` cache behind `amountFormatter`, and `useCurrencyFormatter` for a charge amount), [`context.tsx`](./utils/context.tsx) (`getStrictContext`), [`getCurrentYear.ts`](./utils/getCurrentYear.ts) (an async server helper, evaluated when the page is prerendered, whose year reaches the client as `serverYear`), [`getLastUpdatedDate.ts`](./utils/getLastUpdatedDate.ts) (the legal pages' date, a constant), [`userCountry.ts`](./utils/userCountry.ts) (`getUserCountryFromCookie`, the browser's reader of the `user-country` cookie the edge sets, shared by `StoresInitializer` and the homepage quick start). The cookie's name is declared once, as `USER_COUNTRY_COOKIE` in `@infrastructure/proxy/cookie`, which the edge writes by; this reader and the cookie table in `modules/shared/cookie-consent/config/config.ts` import it |
 
-## Layer rules
+## Across the layer
 
-This layer may import from `@application/*` (stores, DTO types, `@application/i18n/navigation`, `@application/shared/utils/dates`), and from `@domain/calendar` a short list of **pure value helpers**: the `types`, `resolveSelectedDays`,
-`measureBudget`, `windowMonthCount`/`windowMonthIndex` for the timeline strip, and `planningWindowMonths`,
-which `CalendarList` uses to render one `Calendar` per month of the Planning Window. It must not reach into
-the planning engine itself, no generator, no selector, no `findPlanningCandidates`: Suggestions are
-produced by the worker and read back from the holidays store. The line is between *arithmetic the engine
-happens to own* and *the act of planning*.
-
-Imports from `@infrastructure/*` are allowed where there is no alternative, and the list is short enough to keep honest: `i18n/locales`, `i18n/utils/url` (`localePath`, in [`JsonLd.tsx`](./modules/shared/seo/JsonLd.tsx)), the BetterStack tracking helper (the logging client itself only through a dynamic import, see below), `errors`, the worker types and serializers, `services/env/getPublicEnv`, `services/countries/getCountries`, the Stripe browser client, the driver.js tutorial client, and the `actions/payment` and `actions/contact` server actions. Anything beyond outbound I/O the UI genuinely initiates does not belong here.
-
-**A confirmation without a PaymentIntent is a redirect hand-off, not a failure.** [`adapters/payments/checkout.ts`](./adapters/payments/checkout.ts) confirms with `redirect: 'if_required'`, and Stripe then resolves with no `paymentIntent` when it sent the user off to the issuer instead. The adapter logs a warning and answers `HANDED_OFF_TO_ISSUER`, its own case, neither success nor failure, so no caller has to decide what an empty error string meant: the session is activated by the `api/payment/activate` route Stripe returns to, which sets the cookie and then redirects to `payment/confirmation`. Treating that branch as an error, or activating Premium from it, breaks the redirect flow. [`modules/premium/CheckoutForm.tsx`](./modules/premium/CheckoutForm.tsx) is what points `return_url` at that route; sending it straight to the confirmation page instead silently reinstates the bug where a redirect payer was told Premium was active and was never given it. See [`../app/AGENTS.md`](../app/AGENTS.md) under *The redirect hand-off*.
+**A confirmation without a PaymentIntent is a redirect hand-off, not a failure.** [`adapters/payments/checkout.ts`](./adapters/payments/checkout.ts) confirms with `redirect: 'if_required'`, and Stripe then resolves with no `paymentIntent` when it sent the user off to the issuer instead. The adapter logs a warning and answers `HANDED_OFF_TO_ISSUER`, its own case, neither success nor failure, so no caller has to decide what an empty error string meant: the session is activated by the `api/payment/activate` route Stripe returns to, which sets the cookie and then redirects to `payment/confirmation`. Treating that branch as an error, or activating Premium from it, breaks the redirect flow. [`modules/premium/CheckoutForm.tsx`](./modules/premium/CheckoutForm.tsx) is what points `return_url` at that route; pointed at the confirmation page instead, it would tell a redirect payer Premium is active without activating it. See [`../app/AGENTS.md`](../app/AGENTS.md) under *The redirect hand-off*.
 
 **A failed confirmation is not always a failed payment, and the copy must not say it is.** Once
 `confirmPayment` has a `PaymentIntent` back from Stripe the card is charged, so a failure after that point,
-the `POST /api/check-session` activation, is a *post-charge* failure. Getting that wrong showed a payer
-whose card had just been charged the `internal_error` copy, which reads "Your card has not been charged."
+the `POST /api/check-session` activation, is a *post-charge* failure. Getting that wrong shows a payer whose
+card was just charged the `internal_error` copy, which reads "Your card has not been charged."
 
 **That distinction is a case in the result, not a flag on it.** `confirmPayment` answers a
 `ConfirmPaymentResult`: `SUCCEEDED` carries the session data, `REFUSED_BEFORE_CHARGE` and
 `FAILED_AFTER_CHARGE` carry the message, and `HANDED_OFF_TO_ISSUER` carries nothing because the browser has
-already navigated away. `CheckoutForm.tsx` switches on `outcome` and the compiler makes the switch total. It
-used to be an optional `charged: true` written on some return branches and absent, not `false`, on
-the rest, so every reader narrowed with `'charged' in result && result.charged === true`: once in the
-component and over and over in its test, because there was no type either could lean on. A new failure branch
-now cannot compile without saying which side of the charge it is on; that used to be a rule stated here and
-checked in review.
+already navigated away. `CheckoutForm.tsx` switches on `outcome` with a `satisfies never` default, so a fifth
+outcome fails to compile there until it has a case.
 
 **The activation's answer is checked, and a body that does not say who is Premium is a post-charge failure.**
 After the charge, the `POST /api/check-session` body is `unknown` until `premiumSessionSchema` from
 [`@application/dto/premium/schema`](../application/dto/premium/schema.ts) validates it: a non-empty `premiumKey`
 and a string `email`. Anything else is logged at error with the PaymentIntent id and answers
 `FAILED_AFTER_CHARGE` with an empty message, the same outcome and copy as a non-ok status, because the card is
-charged and nothing was activated. It used to be a cast, so a 200 carrying no key reported `SUCCEEDED` with
-`undefined` session data. On a non-ok status the body is read for a reason only when `activationFailureSchema`
-accepts it; a body of any other shape yields no reason rather than a failure of its own, so the outcome is
-never harder than the status already made it. A promo failure from `createPaymentAction` becomes a
-`PromoCodeError` only when its code is one of `PromoCodeErrors` (`z.enum` over that object); an unknown code is
+charged and nothing was activated. On a non-ok status the body is read for a reason only when
+`activationFailureSchema` accepts it; a body of any other shape yields no reason rather than a failure of its own,
+so the outcome is never harder than the status already made it. A promo failure from `createPaymentAction` becomes
+a `PromoCodeError` only when `promoCodeErrorCodeSchema` (in `application/dto/payment/schema.ts`, a `z.enum` over
+`PromoCodeErrors`) accepts its code; an unknown code is
 a plain `PaymentError` carrying the string, so `Donate.tsx` shows the generic copy instead of the promo title
 with no description.
 
 **`adapters/session/checkSession.ts` validates both halves of the route and reads a *no* differently for each.**
 `verifyPremiumEmail` answers `null` for a body without a non-empty string `premiumKey`, which is what a non-ok
-status already answered, and the store reads `null` as "not verified" without touching what it holds.
+status already answers, and the store reads `null` as "not verified" without touching what it holds.
 `getExistingSession` returns the session for `premiumSessionSchema`, `null` only for the route's own
 no-session body (`noPremiumSessionSchema`: `premiumKey` null or absent), and **throws** for anything else,
 because the store clears Premium on `null` and keeps it on a throw;
 [`../application/stores/AGENTS.md`](../application/stores/AGENTS.md) has why that distinction exists. The
 schemas are reached through `import()`, not a static import: this file is in every page's first-load chunk and zod
-is not; [`../application/dto/AGENTS.md`](../application/dto/AGENTS.md) has the measurement.
+is not; [`../application/dto/AGENTS.md`](../application/dto/AGENTS.md) has the measurement, and
+[`adapters/session/checkSession.test.ts`](./adapters/session/checkSession.test.ts) reads the source to keep it so.
 
-**The BetterStack logging client is reached through a dynamic `import()`, never a static one, and the reason it was has expired.** Its module graph used to pull `@logtail/edge` and `@opennextjs/cloudflare` in through its own top-level imports, so a static import put both in the client chunk of every component that touched it. Since [ADR 0018](../../../../adr/0018-the-platform-is-the-log-transport.md) it imports its own log contract and nothing else, so a static import would cost nothing. The dynamic form is kept because changing it is a separate decision and not because it still buys anything. No file in this layer writes that out: `logClient` and `logClientError` in
-`@application/shared/utils/clientLog` hold the whole incantation, and [`clientLog.test.ts`](../application/shared/utils/clientLog.test.ts) asserts by reading
-its own source that the import stays dynamic.
+**The BetterStack logging client is reached through a dynamic `import()`.** No file in this layer writes that
+import out: `logClient` and `logClientError` in `@application/shared/utils/clientLog` hold it, and
+[`clientLog.test.ts`](../application/shared/utils/clientLog.test.ts) asserts by reading its own source that it
+stays dynamic.
 
-`adapters/payments/checkout.ts` used to wrap that in a local `log(write)` helper because it logs more than once; it calls `logClient` now, and so do the other files in this layer that reached the client directly. Logging stays fire-and-forget (nothing awaits the import), so a component never renders later because of a log. The [`tracking.ts`](../infrastructure/clients/logging/better-stack/tracking.ts) helper is a different thing: it pushes product events at the `window.betterstack` snippet and is safe to import statically. The Zustand stores under `@application/stores/*` reach the same helper; see [`../application/stores/AGENTS.md`](../application/stores/AGENTS.md). The remaining static importers are the lookups under `@infrastructure/services/*` (`getCountries`, `location/utils/strategies`), the Effect service tag in [`logging/service.ts`](../infrastructure/logging/service.ts), and the `payment/confirmation` page. `getHolidays` and `getRegions` run in the browser too, and the stores reach both through a dynamic `import()` so the holiday dataset loads when it is first needed rather than with the planner. Do not add a static importer of either.
+Logging stays fire-and-forget (nothing awaits the import), so a component never renders later because of a log. The [`tracking.ts`](../infrastructure/clients/logging/better-stack/tracking.ts) helper is a different thing: it pushes product events at the `window.betterstack` snippet and is safe to import statically. The Zustand stores under `@application/stores/*` reach the same helper; see [`../application/stores/AGENTS.md`](../application/stores/AGENTS.md). The static importers of the logger are the lookups under `@infrastructure/services/*` (`getCountries`, `getHolidays`, `getRegions`, `location/utils/strategies`) and the Effect service tag in [`logging/service.ts`](../infrastructure/logging/service.ts). `getHolidays` and `getRegions` run in the browser, and the stores reach both through a dynamic `import()` so the holiday dataset loads when it is first needed rather than with the planner.
 
-**Effect reaches a few browser files, some of them in this layer.** `adapters/payments/checkout.ts` orchestrates the fallible Stripe and session calls, and [`modules/export/exportPdf.tsx`](./modules/export/exportPdf.tsx) uses a scoped acquire/release so the PDF's object URL is revoked whatever happens. [`modules/sidebar/components/CalendarExport.tsx`](./modules/sidebar/components/CalendarExport.tsx) imports that module inside its click handler and never imports `effect` itself: a static import put the Effect runtime, about 84 KB compressed, into the planner's first load for one button, and [`CalendarExport.test.tsx`](./modules/sidebar/components/CalendarExport.test.tsx) reads the source to keep it out. The others are outside this layer but still run here: the browser Stripe client under `@infrastructure/clients/payments/stripe/` sequences the load-then-confirm chain, and [`getHolidays.ts`](../infrastructure/services/holidays/getHolidays.ts) wraps a throwing synchronous call. All are deliberate exceptions to "Effect is server-side only"; see [ADR 0002](../../../../adr/0002-effect-for-external-service-boundaries.md). A component that needs another fallible call gets an adapter; it does not grow an Effect program of its own.
+**Effect reaches three browser files, two of them in this layer.** `adapters/payments/checkout.ts` orchestrates the fallible Stripe and session calls, and [`modules/export/exportPdf.tsx`](./modules/export/exportPdf.tsx) uses a scoped acquire/release so the PDF's object URL is revoked whatever happens. [`modules/sidebar/components/CalendarExport.tsx`](./modules/sidebar/components/CalendarExport.tsx) imports that module inside its click handler and never imports `effect` itself: a static import would put the Effect runtime, about 84 KB compressed, into the planner's first load for one button, and [`CalendarExport.test.tsx`](./modules/sidebar/components/CalendarExport.test.tsx) reads the source to keep it out. The third is outside this layer but runs here: [`getHolidays.ts`](../infrastructure/services/holidays/getHolidays.ts) wraps a throwing synchronous call. All are deliberate exceptions to "Effect is server-side only", and [ADR 0002](../../../../adr/0002-effect-for-external-service-boundaries.md) keeps the exact list.
 
-**A component opts out of the server render with `use(browser())`; everything else keeps its `typeof` guard.** React added `browser()` to `react-dom`, and `use(browser())` suspends the calling component on the server and resolves on the client, so a browser-only component no longer has to prove at every access that `document` exists. [`StoresInitializer.tsx`](./modules/stores/StoresInitializer.tsx) and [`modules/tracking/BetterStackTracking.tsx`](./modules/tracking/BetterStackTracking.tsx) call it and have dropped their guards; both are rendered inside a `<Suspense fallback={null}>` in the layout above them, which is not optional: a component that suspends with no boundary above it takes the server render down with it.
-
-What keeps the guard is whatever `use()` cannot be called from. [`utils/cookie.ts`](./utils/cookie.ts) is a plain function, [`stores/crypto.ts`](../application/stores/crypto.ts) decides at module scope, and [`CookieConsent.tsx`](./modules/shared/cookie-consent/CookieConsent.tsx) reads `window.gtag` from inside a consent callback: none of the three is a component render, and in all three the bare identifier still throws `ReferenceError` on the server.
+**[`StoresInitializer.tsx`](./modules/stores/StoresInitializer.tsx) and [`modules/tracking/BetterStackTracking.tsx`](./modules/tracking/BetterStackTracking.tsx) opt out of the server render with `use(browser())`**, `browser()` from `react-dom`, which suspends on the server and resolves on the client. Both are rendered inside a `<Suspense fallback={null}>` in the layout above them, which is not optional: a component that suspends with no boundary above it takes the server render down with it.
 
 **`useMobile.ts` is the deliberate refusal.** It is the exact `useSyncExternalStore` server-snapshot shape React's own notes offer `use(browser())` as the replacement for, and taking that offer here would be a downgrade: `useIsMobile` is read by [`Sidebar.tsx`](./modules/core/animate/base/Sidebar.tsx), so suspending on it empties the whole planner shell out of the server HTML to decide a breakpoint. The fixed `false` server snapshot renders the desktop layout and hydration corrects a phone, which costs one client-side correction and keeps the shell in the HTML. Leave it.
 
-**Navigation goes through `@application/i18n/navigation`.** `Link`, `useRouter` and `usePathname` come from there so the locale prefix is applied; no file in this layer imports `next/link` or `next/navigation` directly, and that should stay true.
+**Server components live here too.** Around a third of the components have no `'use client'`. [`Countries.tsx`](./modules/sidebar/components/Countries.tsx) is a server component that reads the Country list on the server and hands it to a dynamically imported client child; [`JsonLd.tsx`](./modules/shared/seo/JsonLd.tsx) reads public env.
 
-**Server components live here too.** Around a third of the components have no `'use client'`. [`Countries.tsx`](./modules/sidebar/components/Countries.tsx) is an async server component that fetches on the server and hands data to a dynamically imported client child; `JsonLd.tsx` reads public env. Those files must stay free of hooks and store access. No file in this layer declares `'use server'` or touches `next/headers`; server-only work belongs in `src/app/` route handlers and `@infrastructure/actions/*`.
+**One module outside this layer imports from `@ui`**, which inverts the dependency: [`application/stores/premium.ts`](../application/stores/premium.ts) uses [`adapters/session/checkSession.ts`](./adapters/session/checkSession.ts), so moving that file moves the store's import. [`infrastructure/clients/tutorial/driver/client.tsx`](../infrastructure/clients/tutorial/driver/client.tsx) takes the popover's close icon as a `closeIcon` option, and `hooks/useTutorial.tsx` builds the element and passes it to `start()`, so the driver side imports no component.
 
-**One module outside this layer imports from `@ui`**, which inverts the dependency: [`application/stores/premium.ts`](../application/stores/premium.ts) uses [`adapters/session/checkSession.ts`](./adapters/session/checkSession.ts). Known, not endorsed; check before moving that file, and do not add a second. `application/stores/ui.ts` was the other one, reaching for `utils/currencies.ts` to derive a currency that turned out to be a constant; deleting the derivation removed the inversion with it. [`infrastructure/clients/tutorial/driver/client.tsx`](../infrastructure/clients/tutorial/driver/client.tsx) was a third: it now takes the popover's close icon as an injected `closeIcon` prop, and `hooks/useTutorial.tsx`, a `'use client'` module already on this side of the boundary, builds the element and passes it to `start()`. A driver-side component import is the regression to watch for.
-
-None of this is lint-enforced. Biome has no import-boundary rule; these are conventions upheld in review.
+[`tests/docs-consistency.test.ts`](../../../../tests/docs-consistency.test.ts) counts every cross-layer import against the table on the wiki's architecture overview and refuses any import from `infrastructure` into this layer beyond the two readers of the locale bundles.
 
 ## Gotchas
 
 **`hooks/useCalculationsWorker.ts` caps the auto-suggested count only to protect Removed Days.** It compares the budget of the last completed run with the one being requested: an unchanged
-budget caps the request at the number of Suggested Days still active, so the user's Removed Days survive the
-recalculation; a changed budget sends no cap at all, because the user asked for the full new allowance. A cap
+budget caps the request at the number of Suggested Days still active (`measureBudget`'s `suggested`), so the
+user's Removed Days survive the recalculation; a changed budget sends no cap at all, because the user asked for the full new allowance. A cap
 of nought is dropped rather than sent: it is what an emptied selection produces, and honouring it would
 store another empty plan and re-derive nought on every later run.
 
@@ -107,69 +92,37 @@ never grow back: the cap ratchets downwards on every later run.
 re-planning the year.** `manuallySelectedDays`, `removedSuggestedDays` and `currentSelection` all come out
 of `useHolidaysStore.getState()` inside `triggerCalculation`, never through the `useShallow` selector. They
 are inputs to the *next* run, not reasons to start one. [`CalendarList.tsx`](./modules/pages/planner/CalendarList.tsx) lists `triggerCalculation` in its
-effect's dependencies, so anything in that selector is a trigger by construction: while
-`manuallySelectedDays` sat there, picking one day re-ran the whole engine and moved the auto-assigned days
-out from under the user, while removing a Suggested Day, read through `getState()`, correctly changed
-nothing. The store agrees with the fixed shape: `toggleDaySelection` recomputes the metrics itself and never
-touches `holidays`. Adding a field to that selector means adding a re-plan trigger; keep the list to the one
-in [`modules/pages/planner/AGENTS.md`](./modules/pages/planner/AGENTS.md).
+effect's dependencies, so every field of that selector (the two setters, `holidays` and `maxAlternatives`) is
+a re-plan trigger by construction: a hand-edited day there would re-run the engine on every click and move
+the Suggested Days out from under the user. The store agrees: `toggleDaySelection` recomputes the metrics
+itself and never touches `holidays`. The effect's own inputs are listed in
+[`modules/pages/planner/AGENTS.md`](./modules/pages/planner/AGENTS.md).
 
-**`utils/currencies.ts` has one formatter cache and the functions over it, and it had more of each.**
-`getCurrencyForLocale`, `amountFormatter` and a `getCurrencySymbol` each owned a private `Map` and repeated
-the same get/miss/set dance, with options that had drifted: default fraction digits in the first, `0` pinned
-in the second (which also hard-coded `'EUR'` a screen below the `DEFAULT_CURRENCY` const it should have
-read), and `0` plus a `try/catch` in the last that the others lacked.
+**Its unmount cleanup clears `isCalculating` before it terminates the Worker.** Terminating drops the pending
+`onmessage`/`onerror` that would have cleared the flag, and the holidays store is module-global, so the next
+mount would find the whole calendar frozen mid-calculation.
 
-`getCurrencySymbol` had **no production caller** at all, only its own tests: another instance in this
-codebase of a function kept alive by its test suite. It is gone.
+**`utils/currencies.ts` exports `amountFormatter` over one `Intl.NumberFormat` cache keyed on locale,
+`useCurrencyFormatter`, and the two currency constants, and nothing else.** `amountFormatter` pins zero
+fraction digits for a whole-euro choice (the donation presets read `€10`), and `useCurrencyFormatter` wraps
+next-intl's `useFormatter()` with two for an amount about to be taken (the checkout total reads `€10.00`, and the
+promo toast in [`modules/shared/donate/Donate.tsx`](./modules/shared/donate/Donate.tsx) goes through it too). The
+currency is `DEFAULT_CURRENCY`, not a value from a store. No message carries the symbol;
+[`utils/currencies.test.ts`](./utils/currencies.test.ts) pins the position and separator in en, de and fr, and
+walks every bundle for the glyph.
 
-`getCurrencyForLocale` is gone too, and it had the same shape of defect before it went: it round-tripped
-through `resolvedOptions().currency` on a formatter it had just constructed with `DEFAULT_CURRENCY`, so that
-read could only ever answer `'EUR'`, an elaborate way to return a constant beside a localised glyph. What
-consumed it was the store derivation deleted along with `CurrencySync`, which
-[`application/stores/AGENTS.md`](../application/stores/AGENTS.md) records. So the module exports
-`amountFormatter` over the one cache, `useCurrencyFormatter` below it, and the two currency constants, and
-nothing else.
-
-**The cache is keyed on locale alone, because there is one formatter shape.** It was keyed on locale,
-currency and fraction digits, with a paragraph here calling the third component load-bearing because it kept
-the zero-digit donation formatter and the default-digit symbol lookup apart. That second consumer is
-`getCurrencySymbol`, which the paragraph above says is gone, so the key carried axes its one remaining
-producer pins, the `?? "auto"` branch was unreachable, and the test named for the collision could not fail:
-delete the fraction-digits component and the only key ever written is still unique. If a second formatter
-shape returns, the key grows back **with** the caller that needs it.
-
-**The second formatting path is `useCurrencyFormatter`, in this same module, and it is deliberate.** It
-wraps next-intl's `useFormatter()` with `DEFAULT_CURRENCY` and two fraction digits, against
-`amountFormatter`'s zero. That is why the donation presets read `€10` and the checkout total `€10.00`: a
-choice versus an amount about to be taken. Collapsing them would be a copy decision, not a refactor. The
-currency is the constant, **not** a value from the UI store: that derivation went with `CurrencySync`, and
-this paragraph claimed otherwise for a while after it was deleted.
-
-**It is a hook rather than a plain function because the toast needed it too, and had been writing its own.**
-[`modules/shared/donate/Donate.tsx`](./modules/shared/donate/Donate.tsx) interpolated a bare `.toFixed(2)` into
-`toasts.promoSavedDescription`, a message that hard-coded `€` **before** each number in every bundle. Nearly
-all of them write `3,50 €`, so de, fr, es, ca and it saw the symbol on the wrong side *and* a decimal point
-where they use a comma, and because the glyph was baked into the string, no translator could move it. The
-symbol is out of every message now and each value goes through this hook, which is the same one
-`modules/premium/CheckoutForm.tsx` uses. [`utils/currencies.test.ts`](./utils/currencies.test.ts) pins both
-halves: en against de and fr for position and separator, and every bundle for the absence of the symbol.
+**`utils/currencies.ts` cannot declare `'use client'`.** `Pricing.tsx` and the terms-of-service page are
+server components that import it for `amountFormatter`, which would become a client reference they cannot
+call; `useCurrencyFormatter` beside it is called only from client components (`Donate.tsx`, `CheckoutForm.tsx`).
 
 **`hooks/useAutoHeight.tsx` takes `deps` and nothing else, and its zero-height retry fires only at mount.**
-It used to accept an `AutoHeightOptions` of `includeParentBox` and `includeSelfBox`, exposing a matrix of
-configurations of which **one** was reachable: its single caller, [`core/animate/effects/AutoHeight.tsx`](./modules/core/animate/effects/AutoHeight.tsx),
-passes `deps` alone. `includeSelfBox` was not merely unreachable but arithmetically wrong:
-`getBoundingClientRect().height` is already the border-box height, so adding the element's own padding and
-border counts them twice. Its test asserted `98` for a 50px element and could not have told, because the
-bounding rect is stubbed; the fixture had no way to contradict the reading. Both branches were also the same
-lines with `el.parentElement` swapped for `el`; that is one `borderBoxExtra(element)` now.
-
-The retry is worth knowing about because it reads like a safety net for a late layout and is not one. The
-third `useLayoutEffect` is keyed on `[height, measure]` and re-measures while `height === 0`; with the
-options gone `measure` is stable, and `height` cannot change while it is stuck at zero, so the effect runs at
-mount and never again. The old test only exercised it by toggling an option, which changed `measure`'s
-identity, something no production caller ever did. The case now asserts what actually happens. Making the
-retry real is a behaviour change and belongs in its own commit.
+Its single caller, [`core/animate/effects/AutoHeight.tsx`](./modules/core/animate/effects/AutoHeight.tsx),
+passes `deps` alone, and `borderBoxExtra` adds only the parent's padding and border, since
+`getBoundingClientRect().height` already includes the element's own. The retry reads like a safety net for a
+late layout and is not one: the second `useLayoutEffect` is keyed on `[height, measure]` and re-measures
+while `height === 0`, but `measure` is stable and `height` cannot change while it is stuck at zero, so the
+effect runs at mount and never again, which is what its test asserts. Making the retry real is a behaviour
+change and belongs in its own commit.
 
 **`hooks/useStoresReady.ts`'s effect depends on the state it sets, and that costs one pass, not a loop.**
 It reads as churn (its consumers, an effect keyed on `hydrationStatus`, subscriptions torn down and
@@ -182,8 +135,7 @@ React bails out rather than re-rendering. Do not "fix" the dependency array on s
 
 **`hooks/useTutorial.tsx` waits for the first step's anchor to stop moving, and nothing else.** driver.js
 measures its highlight once and re-measures only on resize, scroll or click, so starting mid-animation leaves
-the cutout and popover at the wrong place for the whole step. Timing heuristics were tried here and every
-one was wrong, for reasons worth keeping:
+the cutout and popover at the wrong place for the whole step. Each simpler signal fails here:
 
 - **Waiting for the anchor to *exist* is useless.** `CollapsibleContent` passes `keepMounted` and forces
   `display: block`, so `sidebar-step-1` is in the DOM while the rail is collapsed.
@@ -200,21 +152,20 @@ it measures the thing that actually matters.
 
 **The same hook reads the sidebar flag that matches the viewport, and destroys the tour on
 unmount.** `useSidebar()` exposes independent flags: `open` for the desktop rail and `openMobile` for
-the drawer. `open` defaults to `true` and mobile never writes it, so checking `open` alone meant the tour
-never opened the drawer on a phone and its opening steps, all anchored inside `AppSidebar`, targeted
-elements that were not rendered, landing on driver.js's dummy-element fallback with nothing highlighted. The
-hook now picks the flag by `useIsMobile()`. It also destroys the driver instance on unmount: the client is a
-module-level singleton, so without that the overlay and its window listeners survived a client-side
-navigation away from the planner.
+the drawer. `open` defaults to `true` and mobile never writes it, so the hook picks the flag by
+`useIsMobile()`; reading `open` alone never opens the drawer on a phone, and the opening steps, all anchored
+inside `AppSidebar`, land on driver.js's dummy-element fallback with nothing highlighted. The driver client is
+a module-level singleton, so without the `destroy()` on unmount its overlay and window listeners survive a
+client-side navigation away from the planner.
 
-**The unmount cleanup in the same hook clears `isCalculating` before it terminates the Worker.**
-Terminating drops the pending `onmessage`/`onerror` that would have cleared the flag, and the holidays
-store is module-global, so the next mount would find the whole calendar frozen mid-calculation.
+**driver.js fills `{{current}}` and `{{total}}` in the progress label, and the hook hands them in as ICU
+values.** `tutorial.progressText` is one message per locale (`{current} of {total}`), called with
+`{ current: "{{current}}", total: "{{total}}" }`, so a translator moves `{current}` and `{total}` and never
+writes the double braces; `useTutorial.test.ts` formats it in every locale and fails when either placeholder
+is lost.
 
 ## Testing
 
-Tests are co-located and run under Vitest with `happy-dom`. [`vitest.setup.ts`](../../vitest.setup.ts) registers Testing Library's `cleanup`.
+Tests run under Vitest with `happy-dom`. [`vitest.setup.ts`](../../vitest.setup.ts) registers Testing Library's `cleanup`.
 
-Conventions that hold across the component tests: they render inside `NextIntlClientProvider` with the **real** message bundles, often more than one locale at once, which is what catches a key that exists in [`en.json`](./i18n/messages/en.json) alone; and they replace a store with `vi.mock`, passing a plain state object to the selector rather than mounting the real Zustand store.
-
-Trees are excluded from the run in [`vitest.config.ts`](../../../../vitest.config.ts): `assets/icons/**`, `i18n/messages/**` and `modules/bones/**`. Coverage excludes those plus [`modules/core/animate/icons/`](./modules/core/animate/icons), all but [`Icon.tsx`](./modules/core/animate/icons/Icon.tsx), which is tested. They are data or generated output, and a coverage number over them would be noise.
+Trees are excluded from the run in [`vitest.config.ts`](../../vitest.config.ts): `assets/icons/**`, `i18n/messages/**` and `modules/bones/**`. Coverage excludes those plus [`modules/core/animate/icons/`](./modules/core/animate/icons), all but [`Icon.tsx`](./modules/core/animate/icons/Icon.tsx), which is tested. They are data or generated output, and a coverage number over them would be noise.

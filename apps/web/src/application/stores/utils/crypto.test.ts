@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { BASE64_PATTERN, base64Decode, base64Encode, deobfuscate, obfuscate, TWENTY_FOUR_HOURS } from "./crypto";
+import {
+	BASE64_PATTERN,
+	base64Decode,
+	base64Encode,
+	deobfuscate,
+	type ObfuscationParams,
+	obfuscate,
+	TWENTY_FOUR_HOURS,
+} from "./crypto";
 
 describe("TWENTY_FOUR_HOURS", () => {
 	it("equals 86400000 ms", () => {
@@ -54,7 +62,7 @@ describe("obfuscate / deobfuscate", () => {
 		expect(deobfuscate({ text: obfuscated, key: "wrong" })).not.toBe("hello");
 	});
 
-	const referenceObfuscate = ({ text, key: secret }: { text: string; key: string }) =>
+	const referenceObfuscate = ({ text, key: secret }: ObfuscationParams) =>
 		btoa(
 			Array.from(
 				new TextEncoder().encode(

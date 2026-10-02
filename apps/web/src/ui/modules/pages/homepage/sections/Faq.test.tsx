@@ -1,3 +1,4 @@
+import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import enMessages from "@i18n/messages/en.json";
 import { render, screen } from "@testing-library/react";
 import { createTranslator } from "next-intl";
@@ -7,6 +8,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mockGetTranslations = vi.hoisted(() => vi.fn());
 
 vi.mock("next-intl/server", () => ({ getTranslations: mockGetTranslations }));
+vi.mock("@domain/calendar/window", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@domain/calendar/window")>()),
+	MAX_CARRY_OVER_MONTHS: 9,
+}));
 vi.mock("@application/i18n/navigation", () => ({
 	Link: ({ children, ...props }: ComponentProps<"a">) => <a {...props}>{children}</a>,
 }));
@@ -23,7 +28,7 @@ vi.mock("@ui/modules/core/animate/base/Accordion", () => ({
 vi.mock("@ui/modules/core/primitives/Badge", () => ({
 	Badge: ({ children }: { children: ReactNode }) => <span>{children}</span>,
 }));
-vi.mock("@ui/modules/pages/homepage/support/FaqTabs", () => ({
+vi.mock("../support/FaqTabs", () => ({
 	FaqTabs: ({ tabs }: { tabs: { id: string; title: string; content: ReactNode }[] }) => (
 		<div>
 			{tabs.map((tab) => (
@@ -34,7 +39,7 @@ vi.mock("@ui/modules/pages/homepage/support/FaqTabs", () => ({
 		</div>
 	),
 }));
-vi.mock("@ui/modules/pages/homepage/support/Troubleshooting", () => ({
+vi.mock("../support/Troubleshooting", () => ({
 	Troubleshooting: () => (
 		<button type="button" data-testid="troubleshooting">
 			reset
@@ -104,6 +109,13 @@ describe("Faq", () => {
 		expect(link.getAttribute("href")).toContain("https://github.com/fbuireu/forever-pto/issues/new");
 		expect(link.getAttribute("target")).toBe("_blank");
 		expect(link.getAttribute("rel")).toBe("noopener noreferrer");
+	});
+
+	it("states the Carry-over Months ceiling the engine enforces rather than a number of its own", async () => {
+		const container = await renderFaq();
+		const answer = container.querySelector('[data-value="carry-over"] [data-slot="accordion-panel"]');
+
+		expect(answer?.textContent).toContain(`up to ${MAX_CARRY_OVER_MONTHS} months past December`);
 	});
 
 	it("answers the troubleshooting question with the reset control rather than with copy", async () => {

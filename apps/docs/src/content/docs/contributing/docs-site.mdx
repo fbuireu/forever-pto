@@ -5,7 +5,7 @@ sidebar:
   order: 4
 ---
 
-This site is the `apps/docs` package: an [Astro Starlight](https://starlight.astro.build) build served as static assets from a Cloudflare Worker. What makes it more than a wiki is that the design-system pages render the app's **own** components, imported straight from `apps/web/src/ui`, styled by the app's own stylesheets, and typed against the app's own props. A rename in the app breaks this site's typecheck before it can drift. This page is how that works.
+This site is the `apps/docs` package: an [Astro Starlight](https://starlight.astro.build) build served as static assets from a Cloudflare Worker. What makes it more than a wiki is that the design-system pages render the app's **own** components, imported straight from `apps/web/src/ui`, styled by the app's own stylesheets, and typed against the app's own props. A renamed export or prop in the app breaks this site's typecheck, and a moved module fails the contract suite, before either can drift. This page is how that works.
 
 ```mermaid
 flowchart LR
@@ -13,7 +13,7 @@ flowchart LR
     UI["src/ui/modules/core/*<br/>Button, Dialog, Tabs …"]
     CSS["src/ui/styles/<br/>theme · global · utilities"]
     DOM["src/domain/calendar/types.ts<br/>src/domain/calendar/const.ts"]
-    I18N["src/infrastructure/i18n/locales.ts"]
+    I18N["src/infrastructure/i18n/locales.ts<br/>src/ui/i18n/messages/en.json"]
     PKG["package.json version"]
   end
   subgraph docs ["apps/docs"]
@@ -55,17 +55,17 @@ A demo then imports exactly what the app imports:
 import { Button } from "@ui/modules/core/primitives/Button";
 ```
 
-Not every reach goes through the alias. `HowItWorksDemo.tsx` imports `FilterStrategy` from `apps/web/src/domain/calendar/types.ts` and `LOCALES` from `apps/web/src/infrastructure/i18n/locales.ts` by relative path, and `PlanningEngineDemo.tsx` imports `PTO_CONSTANTS` from `apps/web/src/domain/calendar/const.ts` the same way. All three are dependency-free modules; that is the condition, and the contract suite (below) asserts that every path the site reaches into is also a path the docs workflow rebuilds on.
+Not every reach goes through the alias. `HowItWorksDemo.tsx` imports `FilterStrategy` from `apps/web/src/domain/calendar/types.ts` and `LOCALES` from `apps/web/src/infrastructure/i18n/locales.ts` by relative path, `EffectsDemo.tsx` and `TabsDemo.tsx` import `FilterStrategy` and the app's `en.json`, and `PlanningEngineDemo.tsx` imports `PTO_CONSTANTS` from `apps/web/src/domain/calendar/const.ts` the same way; `src/lib/mermaid-render.ts` reads the palette out of the app's `global/index.css`. All of them are dependency-free; that is the condition, and the contract suite (below) asserts that every path the site reaches into is also a path the docs workflow rebuilds on.
 
 ## What can be rendered, and why
 
-A module can be demoed when nothing in its import graph touches Next.js or an app layer: no `next/*`, no `next-themes`, no `@application`, `@domain` or `@infrastructure` beyond the three files above. That rules out `RichLink` (next-intl's `Link`), `Sonner` (`next-themes`), `Combobox` (app DTO types), `Sidebar` (cookie persistence and the mobile hook), `Form` (react-hook-form) and `FlagIcon` (a stylesheet the app loads); they are documented on the [reference components](/design-system/patterns/reference-components/) page from their source.
+A module can be demoed when nothing in its import graph touches Next.js or an app layer (`W1` in [`CODING_STANDARDS.md`](https://github.com/fbuireu/forever-pto/blob/main/CODING_STANDARDS.md)): no `next/*`, no `next-themes`, no `@application`, `@domain` or `@infrastructure` beyond the dependency-free files above. That rules out `RichLink` (next-intl's `Link`), `Sonner` (`next-themes`), `Combobox` (app DTO types), `Sidebar` (cookie persistence and the mobile hook), `Form` (react-hook-form) and `FlagIcon` (a stylesheet the app loads); they are documented on the [reference components](/design-system/patterns/reference-components/) page from their source.
 
 Everything else renders as a React island with `client:visible`, and a component that needs an app context gets it from `Demo` rather than remembering to ask: `Demo.tsx` wraps every demo in `LazyMotionProvider`, which every `m.*` consumer needs, and in `DemoIntlProvider`, which the two `next-intl` readers in `core/` need (`SlidingNumber` picks its decimal separator from the locale; `Counter` wraps it). Both would throw during prerender otherwise, since `client:visible` still renders on the server. The frame carries `data-demo`, and a chip naming the source sits *outside* it, because the demo suite counts the frame's children and a chip inside would let an empty demo pass as rendered.
 
 ## The drift guards
 
-Prose names a file, never a volatile literal. Where the app exports a constant the page imports it and interpolates; where a component has variants or props, a demo builds a `Record` that is exhaustive over the real type:
+Prose names a file, never a volatile literal (`W2`). Where the app exports a constant the page imports it and interpolates; where a component has variants or props, a demo builds a `Record` that is exhaustive over the real type:
 
 | Guard | Type it is exhaustive over | What breaks it |
 | --- | --- | --- |
@@ -85,7 +85,7 @@ Two more directives close the loop. `@source` points Tailwind at `apps/web/src/u
 
 ## Diagrams
 
-Every diagram on this site is a ```mermaid fence in the page's source, **drawn at build time**. Starlight runs on Sätteri, Astro's default Markdown processor, which takes mdast plugins rather than remark ones, so `src/lib/mermaid-plugin.ts` replaces each fence with two `<figure>` elements, one per theme, and `src/lib/mermaid-render.ts` draws them in a single headless Chromium held open for the whole build, with the site's display face loaded so labels are measured against the real glyphs and the palette read out of the app's own token sheet. Results are memoised by content, so a diagram repeated across locales is drawn once.
+Every diagram on this site is a ```mermaid fence in the page's source, **drawn at build time**. Starlight runs on Sätteri, Astro's default Markdown processor, which takes mdast plugins rather than remark ones, so `src/lib/mermaid-plugin.ts` replaces each fence with two `<figure>` elements, one per theme, and `src/lib/mermaid-render.ts` draws them in a single headless Chromium held open for the whole build, with the site's body face, Space Grotesk, loaded so labels are measured against the real glyphs and the palette read out of the app's own token sheet. Results are memoised by content, so a diagram repeated across locales is drawn once.
 
 What that buys: no Mermaid in the browser bundle, no flash of source text before a draw, a diagram for a reader without JavaScript, and a fence Mermaid cannot parse failing the build with the page named rather than shipping a red frame. The only script a diagram carries is a click-to-enlarge toggle, and which copy shows is decided in CSS from `data-theme`.
 
@@ -95,6 +95,6 @@ Three suites, each catching what the others cannot:
 
 - **`astro check`** typechecks the demos against the app's real props. It does not see MDX, CSS or a `@ui/…` specifier that points at nothing.
 - **The contract suite**, `tests/docs-consistency.test.ts` at the repository root, reads this package as text. It resolves every `@ui` specifier, every relative `@import` and `@source`, every `.ts`/`.tsx` file a page names in backticks and every constant a page names in prose against the tree; asserts the prose uses the glossary's canonical terms rather than retired ones; checks every design token a page names is still declared; and derives the whole reach into `apps/web` from the sources and asserts `docs.yml` triggers on each path. It runs with `pnpm test:docs` and in the app's own CI.
-- **Playwright**, in `apps/docs/e2e/`: `demos.spec.ts` walks every page the build emitted a `data-demo` frame onto and asserts it answers 200, renders something in each frame once scrolled into view, and raises no page error or console error, which is the only thing that sees a demo that builds green and throws on hydration; `tailwind-sources.spec.ts` proves the `@source` directives still generate a class this package never writes; `docs.spec.ts` covers the theme toggle and the token seam; `smoke.spec.ts` runs against the deployed site after every production deploy.
+- **Playwright**, in `apps/docs/e2e/`: `demos.spec.ts` walks every page the build emitted a `data-demo` frame onto and asserts it answers 200, renders something in each frame once scrolled into view, and raises no page error or console error, which is the only thing that sees a demo that builds green and throws on hydration; `tailwind-sources.spec.ts` proves the `@source` directives still generate a class this package never writes; `docs.spec.ts` covers the theme toggle and the token seam; `cookie-consent.spec.ts` drives the consent banner and the trackers it gates; `smoke.spec.ts` runs against the deployed site after every production deploy.
 
 The build, preview and deploy pipeline is the [docs CI](/infra/docs-ci/) page; the conventions for a docs pull request are on the [conventions](/contributing/conventions/) page.

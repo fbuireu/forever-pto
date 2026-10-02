@@ -8,8 +8,4 @@ interface CountriesProps {
 	locale: Locale;
 }
 
-export const Countries = async ({ locale }: CountriesProps) => {
-	const countries = await getCountries(locale);
-
-	return <CountriesClient countries={countries} />;
-};
+export const Countries = ({ locale }: CountriesProps) => <CountriesClient countries={getCountries(locale)} />;

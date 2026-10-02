@@ -19,10 +19,10 @@ what decides when that set is stale. That is the same trade-off, stated without 
 
 *Keep the memo.* The 2026-08-16 amendment called its value unsettled and asked for a probe on a deployed
 preview over a large Planning Window. No probe is needed, because the call graph answers it:
-`createHolidaySet`'s production callers are `getAvailableWorkdays` and `findBridges` in
-[`utils/helpers.ts`](../apps/web/src/domain/calendar/utils/helpers.ts), and `findPlanningCandidates` calls them one after the other on the same
-Holiday list. The memoisation is what makes the second call free; deleting it rebuilds the Holiday set twice
-on every run. What moved was who benefits, not whether anyone does: the sharing is now inside one
+`createHolidaySet`'s production callers are `getAvailableWorkdays`, `findBridges` and `freeDaysAround` in
+[`utils/helpers.ts`](../apps/web/src/domain/calendar/utils/helpers.ts), and `findPlanningCandidates` calls all three on the same
+Holiday list. The memoisation is what makes the later calls free; deleting it rebuilds the Holiday set three
+times on every run. What moved was who benefits, not whether anyone does: the sharing is now inside one
 `findPlanningCandidates` call rather than across the generators, which no longer touch the memo at all.
 [`../apps/web/src/domain/calendar/AGENTS.md`](../apps/web/src/domain/calendar/AGENTS.md) reached this
 conclusion first and recorded it as an amendment to this file; this paragraph is that amendment.
@@ -82,7 +82,7 @@ Worker and the holidays store, pass inputs and read a result, and neither knows 
 - Tests that exercise a generator directly must still clear in setup. The `clearDateKeyCache()` / `clearHolidayCache()` pair exists for that, and the domain guide still requires it per `describe`. Tests that exercise the pipeline need no setup, because it clears for them; `pipeline.test.ts` pins that by running twice with different Holidays and checking the second run answers for its own.
 - The correctness that used to depend on discipline is now structural. What still depends on discipline is the narrower rule above: a generator must not clear.
 - Recorded elsewhere, and each of these is a place an amendment has been written before it reached this file:
-  the Gotchas bullet in [`../apps/web/AGENTS.md`](../apps/web/AGENTS.md), the cache section of
+  `T9` in [`../CODING_STANDARDS.md`](../CODING_STANDARDS.md), the cache section of
   [`../apps/web/src/domain/calendar/AGENTS.md`](../apps/web/src/domain/calendar/AGENTS.md), the pipeline
   section of [`../apps/web/src/application/stores/AGENTS.md`](../apps/web/src/application/stores/AGENTS.md),
   and the invariant in [`../apps/web/src/infrastructure/workers/AGENTS.md`](../apps/web/src/infrastructure/workers/AGENTS.md).

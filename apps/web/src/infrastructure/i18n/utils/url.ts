@@ -1,6 +1,6 @@
+import { LOCALES } from "@infrastructure/i18n/locales";
+import { routing } from "@infrastructure/i18n/routing";
 import { hasLocale, type Locale } from "next-intl";
-import { LOCALES } from "../locales";
-import { routing } from "../routing";
 
 export interface LocalePathParams {
 	locale: string;

@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface UseDebounceParams<T> {
@@ -8,12 +10,12 @@ interface UseDebounceParams<T> {
 
 export const useDebounce = <T>({ value, delay, callback }: UseDebounceParams<T>) => {
 	const [localValue, setLocalValue] = useState(value);
+	const [previousValue, setPreviousValue] = useState(value);
 	const timeoutRef = useRef<NodeJS.Timeout>(undefined);
 	const callbackRef = useRef(callback);
-	const prevValueRef = useRef(value);
 
-	if (prevValueRef.current !== value) {
-		prevValueRef.current = value;
+	if (previousValue !== value) {
+		setPreviousValue(value);
 		setLocalValue(value);
 	}
 

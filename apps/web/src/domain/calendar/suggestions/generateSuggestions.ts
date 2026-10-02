@@ -1,5 +1,5 @@
-import type { FilterStrategy } from "../types";
-import { type PlanningCandidates, selectionInputOf } from "../utils/candidates";
+import type { FilterStrategy } from "@domain/calendar/types";
+import { type PlanningCandidates, selectionInputOf } from "@domain/calendar/utils/candidates";
 import { selectBridgesForStrategy } from "./utils/selectors";
 
 export interface GenerateSuggestionsParams {

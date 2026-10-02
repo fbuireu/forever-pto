@@ -1,5 +1,5 @@
 import type { HolidayDTO } from "@application/dto/holiday/types";
-import type { Bridge } from "../types";
+import type { Bridge } from "@domain/calendar/types";
 import { findBridges, freeDaysAround, getAvailableWorkdays } from "./helpers";
 
 export interface PlanningCandidates {
@@ -34,7 +34,7 @@ export const findPlanningCandidates = ({
 	};
 };
 
-interface SelectionInputParams {
+interface SelectionInputOfParams {
 	candidates: PlanningCandidates;
 	ptoDays: number;
 	preferredMonths?: number[];
@@ -44,7 +44,7 @@ export const selectionInputOf = ({
 	candidates: { bridges, availableWorkdays, alreadyOff },
 	ptoDays,
 	preferredMonths,
-}: SelectionInputParams) => ({
+}: SelectionInputOfParams) => ({
 	bridges,
 	targetPtoDays: ptoDays,
 	preferredMonths,

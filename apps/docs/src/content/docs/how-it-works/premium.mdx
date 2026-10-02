@@ -41,12 +41,12 @@ sequenceDiagram
 
 `apps/web/src/app/api/payment/route.ts`:
 
-1. Resolves the client IP (`cf-connecting-ip`, falling back to `x-forwarded-for`) and runs the [KV rate limiter](/how-it-works/rate-limiting/).
+1. Resolves the client IP (`cf-connecting-ip`, falling back to `x-forwarded-for`) and runs the [rate limiter](/how-it-works/rate-limiting/), the platform's `PAYMENT_RATE_LIMITER` binding.
 2. Delegates to the `createPayment` use-case (`apps/web/src/application/use-cases/payment.ts`): zod validation, optional promo-code resolution, then `createPaymentIntent` (`apps/web/src/infrastructure/services/payments/provider/intent.ts`) with `email`, `promoCode`, `userAgent` and `ipAddress` stored as PaymentIntent metadata.
 3. Returns `clientSecret` + `discountInfo` to the browser.
 4. The Turso `savePayment` is **not** awaited: it is a deferred Effect scheduled with `next/server`'s `after()`, provided with `ApplicationLayer` (`apps/web/src/infrastructure/layers.ts`). If it fails, a warning is logged and the webhook fallback takes over.
 
-Typed Effect errors map to HTTP: `RateLimitError` → 429, `ValidationError`/`PromoCodeError` → 400, `PaymentError` → 500.
+Typed Effect errors map to HTTP through `describeFailure`: `RateLimitError` → 429, `ValidationError`/`PromoCodeError` → 400, a `PaymentRequestError` (a payment reference Stripe refused) → 400, any other `PaymentError` → 500.
 
 ### Promo codes
 

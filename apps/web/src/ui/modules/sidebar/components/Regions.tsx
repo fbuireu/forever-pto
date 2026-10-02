@@ -1,13 +1,14 @@
 "use client";
 
 import { useFiltersStore } from "@application/stores/filters";
+import { useHolidaysStore } from "@application/stores/holidays";
 import { useLocationStore } from "@application/stores/location";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { Combobox } from "@ui/modules/core/primitives/Combobox";
-import { SidebarFieldLabel } from "@ui/modules/sidebar/components/SidebarFieldLabel";
 import { MapPinned } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
+import { SidebarFieldLabel } from "./SidebarFieldLabel";
 
 export const Regions = () => {
 	const t = useTranslations("sidebar.region");
@@ -17,6 +18,7 @@ export const Regions = () => {
 	const country = useFiltersStore((state) => state.country);
 	const region = useFiltersStore((state) => state.region);
 	const setRegion = useFiltersStore((state) => state.setRegion);
+	const askForPlan = useHolidaysStore((state) => state.askForPlan);
 
 	useEffect(() => {
 		if (!country) return;
@@ -24,6 +26,7 @@ export const Regions = () => {
 	}, [country, fetchRegions]);
 
 	const handleRegionChange = (value: string) => {
+		if (value !== region) askForPlan();
 		setRegion(value);
 		track({ event: "planning_input_changed", properties: { input: "region", inputValue: value } });
 	};

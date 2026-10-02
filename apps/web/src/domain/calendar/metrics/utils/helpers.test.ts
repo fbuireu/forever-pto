@@ -1,6 +1,6 @@
 import { HolidayVariant } from "@application/dto/holiday/types";
+import { PTO_CONSTANTS } from "@domain/calendar/const";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { PTO_CONSTANTS } from "../../const";
 import {
 	calculateLongestVacation,
 	calculateLongWeekends,
@@ -363,15 +363,16 @@ describe("getWorkedDaysPerMonth", () => {
 
 describe("calculateMaxWorkStreak", () => {
 	const TODAY = new Date(2025, 6, 1, 9, 30);
+	const WORKDAYS_IN_2025 = 261;
 	const WORKDAYS_FROM_TODAY_TO_YEAR_END = 132;
 
 	afterEach(() => {
 		vi.useRealTimers();
 	});
 
-	it("counts every weekday of the year as one streak when no PTO or Holiday breaks it", () => {
+	it("counts every Workday of the year as one streak when no PTO Day or Holiday breaks it", () => {
 		const result = calculateMaxWorkStreak({ ptoDays: [], holidays: [], year: 2025, allowPastDays: true });
-		expect(result).toBe(261);
+		expect(result).toBe(WORKDAYS_IN_2025);
 	});
 
 	it("returns 0 when the year is fully in the past and allowPastDays is false", () => {
@@ -379,7 +380,7 @@ describe("calculateMaxWorkStreak", () => {
 		expect(result).toBe(0);
 	});
 
-	it("reduces max streak when PTO breaks up consecutive workdays", () => {
+	it("reduces the Max Work Streak when PTO Days break up consecutive Workdays", () => {
 		const noBreak = calculateMaxWorkStreak({ ptoDays: [], holidays: [], year: 2025, allowPastDays: true });
 		const withBreak = calculateMaxWorkStreak({
 			ptoDays: [
@@ -410,7 +411,7 @@ describe("calculateMaxWorkStreak", () => {
 		const wholeYear = calculateMaxWorkStreak({ ptoDays: [], holidays: [], year: 2025, allowPastDays: true });
 
 		expect(skippingPast).toBe(WORKDAYS_FROM_TODAY_TO_YEAR_END);
-		expect(wholeYear).toBe(261);
+		expect(wholeYear).toBe(WORKDAYS_IN_2025);
 	});
 });
 

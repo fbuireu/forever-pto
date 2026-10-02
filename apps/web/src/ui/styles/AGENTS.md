@@ -2,14 +2,16 @@
 
 ## Purpose
 
-Every stylesheet the app ships. Tailwind CSS is configured entirely in CSS; there is no
+The app's cross-cutting stylesheets; a component's own stylesheet sits beside it (`shared/donate/donate.css`,
+`pages/planner/contact.css`, `pages/planner/legend.module.css`, `tutorial/driver.css`). Tailwind CSS is configured entirely in CSS; there is no
 `tailwind.config.*` anywhere in the repo. PostCSS runs a single plugin (`@tailwindcss/postcss`, see
 [`postcss.config.mjs`](../../../postcss.config.mjs)) and [`index.css`](./index.css) is the whole configuration surface: tokens, custom variants and
 custom utilities are all declared here in CSS at-rules.
 
 `index.css` is the entry point, imported through the `@styles/*` alias by `layout.tsx`,
-[`global-error.tsx`](../../app/global-error.tsx) and [`global-not-found.tsx`](../../app/global-not-found.tsx). [`lazy/index.css`](./lazy/index.css) is the deliberate exception: it is
-imported by [`DriverStyles.tsx`](../modules/tutorial/DriverStyles.tsx) so the tutorial CSS only loads when the tutorial does.
+[`global-error.tsx`](../../app/global-error.tsx) and [`global-not-found.tsx`](../../app/global-not-found.tsx). The tour's stylesheet,
+[`driver.css`](../modules/tutorial/driver.css), sits beside [`DriverStyles.tsx`](../modules/tutorial/DriverStyles.tsx), which imports it so the
+tutorial CSS only loads when the tutorial does.
 
 ## Files
 
@@ -22,7 +24,6 @@ imported by [`DriverStyles.tsx`](../modules/tutorial/DriverStyles.tsx) so the tu
 | [`animations/index.css`](./animations/index.css) | `@layer animations`: keyframes, the root view-transition, the reduced-motion block |
 | [`global/index.css`](./global/index.css) | The design tokens: `:root` and the `[data-theme="dark"]` overrides. Deliberately unlayered |
 | [`vendor/index.css`](./vendor/index.css) | `@layer vendor`: `flag-icons`, cookie-consent and boneyard-js overrides, `::selection` |
-| `lazy/index.css` | driver.js tutorial styling, loaded on demand |
 | [`index.test.ts`](./index.test.ts) | Reads the stylesheets as text and guards the invariants a reader is most likely to "tidy away" |
 
 ## The cascade layer order
@@ -35,32 +36,28 @@ Line 1 of `index.css` is `@layer base, theme, animations, tutorial, vendor;`, an
   Tailwind's `components` and `utilities` are appended after `vendor`. That is why a Tailwind utility
   class still beats the vendor overrides, and why those overrides reach for `!important` when they
   need to win anyway.
-- **`tutorial` is a reservation for a stylesheet that is not imported here.** `lazy/index.css` and the
-  `driver.js` CSS it pulls in arrive only when `DriverStyles.tsx` mounts. Without the slot named up
+- **`tutorial` is a reservation for a stylesheet that is not imported here.** `modules/tutorial/driver.css` and
+  the `driver.js` CSS it pulls in arrive only when `DriverStyles.tsx` mounts. Without the slot named up
   front, that layer would be appended last and driver.js's defaults would outrank the app's own
   tutorial styling. Do not remove `tutorial` from the list because nothing in this folder emits into
   it from `index.css`.
 
-**`global` is not in that list, deliberately.** `global/index.css` is *not* wrapped in `@layer global`
-: it is plain `:root` and `[data-theme="dark"]` blocks, and unlayered declarations outrank every layer,
-so the design tokens win outright. The statement used to name a `global` slot that no stylesheet ever
-emitted into; the name invited exactly the wrong repair, because wrapping the file in `@layer global`
-would demote every design token below Tailwind's utilities. Dropping an empty slot from the statement
-changes no relative order and therefore no cascade. The same reasoning covers the `:root` block at the
-top of `lazy/index.css`: leave it unlayered.
+**`global` is not in that list, deliberately.** `global/index.css` is *not* wrapped in `@layer global`:
+it is plain `:root` and `[data-theme="dark"]` blocks, and unlayered declarations outrank every layer, so the
+design tokens win outright. Wrapping the file in `@layer global`, or reserving a `global` slot for it, would
+demote every design token below Tailwind's utilities. The same reasoning covers the `:root` block at the top
+of `modules/tutorial/driver.css`: leave it unlayered.
 
 One consequence worth knowing: `!important` inverts layer precedence, so the reduced-motion block in
 `animations/index.css`, an early layer, outranks important declarations from later layers and from
 unlayered rules. That is why it can flatten animations globally from where it sits.
 
-**It flattens CSS animation, and only CSS animation, which made it the most convincing kind of wrong.**
-`motion/react` drives transform, opacity and filter through the Web Animations API and direct inline style
-writes; a `transition-duration: 0.01ms !important` rule reaches neither. Files all over `apps/web` import
-`motion/react`, so with reduce-motion set at OS level the page still sprang, slid and blurred while this
-block sat there looking like coverage. Review pass after review pass walked past it for that reason. The motion half
-is handled by `<MotionConfig reducedMotion="user">` in
+**It flattens CSS animation, and only CSS animation.** `motion/react` drives transform, opacity and filter
+through the Web Animations API and direct inline style writes; a `transition-duration: 0.01ms !important`
+rule reaches neither, so this block alone would leave the page springing, sliding and blurring with
+reduce-motion set. The motion half is handled by `<MotionConfig reducedMotion="user">` in
 [`../modules/core/animate/providers/LazyMotionProvider.tsx`](../modules/core/animate/providers/LazyMotionProvider.tsx);
-this block still owns everything CSS animates, and they are not substitutes.
+this block owns everything CSS animates, and they are not substitutes.
 
 ## Design tokens
 
@@ -72,8 +69,7 @@ All tokens live in `global/index.css`, in tiers:
    `--secondary`, `--muted`, `--destructive`, `--border`, `--input`, `--ring`, the `--sidebar-*` set
    and `--radius`.
 3. **The shadow scale**: `--shadow-brutal-*`, hard zero-blur offsets drawn in `--frame`. Because
-   `--frame` flips between ink and cream with the theme, every shadow inverts for free; a shadow
-   hard-coded to a hex value will look wrong in one theme.
+   `--frame` flips between ink and cream with the theme, every shadow inverts for free.
 
 Dark mode overrides a subset of those under `[data-theme="dark"]`. [`AppThemeProvider.tsx`](../modules/providers/AppThemeProvider.tsx) configures
 next-themes with `attribute='data-theme'`, so the attribute lands on `<html>`.
@@ -99,21 +95,17 @@ Fonts come from [`fonts.ts`](../../app/fonts.ts) (next/font), which exposes `--f
 ## quiet-link
 
 The nav-and-footer link treatment: a transparent 3px border that fills with `--accent` and `--frame` on
-hover, over 75ms. It was written out by hand **at every call site**, most of them in [`Footer.tsx`](../modules/shared/footer/Footer.tsx), plus
-`ContactButton`, `CookieButton`, `Navigation`, `Faq` and the planner's `Contact`, as a 190-character class
-string, and [`Faq.tsx`](../modules/pages/homepage/sections/Faq.tsx) had already started fixing it locally by hoisting the string to a module const, which
-made one more place for the value to live.
+hover, over 75ms. Its call sites are most of [`Footer.tsx`](../modules/shared/footer/Footer.tsx)'s links,
+`ContactButton`, `CookieButton`, `Navigation`, [`Faq.tsx`](../modules/pages/homepage/sections/Faq.tsx) and the
+planner's `Contact`.
 
 It is a `@utility` rather than a `Button` variant because only a minority of the sites are `Button`s. The
-rest are the locale-aware `Link` and `createRichLink`, so a CVA variant would have covered a fraction of them
-and left the string everywhere else.
+rest are the locale-aware `Link` and `createRichLink`, which a CVA variant would not reach.
 
-**Differences between the call sites survived on purpose, and one of them is real drift.** `h-auto`
-appears only on the `Button` sites, which is correct: `Button` sets a height and `Link` does not.
-`Navigation` uses `px-2 py-1` where everyone else uses `px-1.5 py-0.5`, plausibly because the top nav wants
-a larger target. But the font weight genuinely disagrees: some sites say `font-medium` and others say
-`font-semibold`, and nothing distinguishes them. Picking one is a design decision with visible output, not a
-refactor, so it was left alone rather than flattened inside a change that moves no pixels.
+**The call sites differ, and one difference is drift.** `h-auto` appears only on the `Button` sites, because
+`Button` sets a height and `Link` does not. `Navigation` uses `px-2 py-1` where everyone else uses
+`px-1.5 py-0.5`. The font weight genuinely disagrees: some sites say `font-medium` and others say
+`font-semibold`, and nothing distinguishes them.
 
 ## hit-area-stable
 
@@ -124,7 +116,7 @@ pins the hit area while the box moves, using a transparent `::after` at `inset: 
 (`z-index: -1`) that grows into the vacated space on `:hover` (`inset: 0 -8px -8px 0`) and on
 `:active` (`inset: -8px 0 0 -8px`, mirrored because the press moves the box the other way).
 
-**Add it to any element you give a `hover:-translate-*`.** Current users include [`Button.tsx`](../modules/core/primitives/Button.tsx),
+Its users include [`Button.tsx`](../modules/core/primitives/Button.tsx),
 [`Badge.tsx`](../modules/core/primitives/Badge.tsx), [`Slider.tsx`](../modules/core/primitives/Slider.tsx), the animate primitives ([`Accordion.tsx`](../modules/core/animate/base/Accordion.tsx), [`Collapsible.tsx`](../modules/core/animate/base/Collapsible.tsx), [`Dialog.tsx`](../modules/core/animate/base/Dialog.tsx),
 [`Sidebar.tsx`](../modules/core/animate/base/Sidebar.tsx), [`Tooltip.tsx`](../modules/core/animate/base/Tooltip.tsx)), the planner calendar day cells and the homepage sections.
 
@@ -135,13 +127,13 @@ edge, so its hover inset is symmetric (`inset: -16px`) and it has no `:active` c
 Both set `position: relative` through `:where(&)`, which contributes zero specificity, so a component
 can still set its own positioning without `!important`.
 
-The same trick is hand-written for the driver.js buttons in `lazy/index.css`, because an `@utility` cannot be
+The same trick is hand-written for the driver.js buttons in `modules/tutorial/driver.css`, because an `@utility` cannot be
 applied to markup a library owns, and that file is compiled on its own without importing Tailwind, so
 `@apply` has nothing to resolve either. A comment there names this utility as the thing the copy must
 track; change the insets here and the copy will not follow.
 
 **The driver.js buttons copy `Button`'s variants by value for the same reason.** Next is the `default`
-variant, so it casts the accent trio: an ink face over a frame shadow drew no shadow at all. Done is `success`,
+variant, so it casts the accent trio: an ink face over a frame shadow would show no shadow at all. Done is `success`,
 so its greens are Tailwind's `green-700` and `green-800` written as `oklch()` literals, since the theme
 variables are emitted only into the Tailwind build this file is not part of. Previous is `outline`, and the
 close button is the Dialog's. The step counter takes the quick start's mono kicker, and the title keeps room
@@ -152,14 +144,10 @@ rules will not follow.
 
 Biome's CSS parser rejects Tailwind-only at-rules by default: `@apply` in `base/`, `@theme inline` and
 `@custom-variant` in `theme/`, `@utility` in `utilities/` all parse as errors, and a parse error aborts
-formatting for the whole file. [`biome.json`](../../../../../biome.json) used to answer that by excluding those folders from
-`files.includes`, which gates the *whole* tool: they fell out of `pnpm format:all` and `pnpm lint:all`
-alike, and their formatting drifted apart, with `utilities/index.css` on single quotes and `theme/index.css`
-on CRLF.
-
-The exclusion is gone. `biome.json` sets `css.parser.tailwindDirectives: true` instead, which teaches
-the parser those at-rules, so every file in this folder is formatted and linted like any other. Double
-quotes throughout, LF, 120 columns: Biome's defaults, applied by the tool rather than by hand.
+formatting for the whole file. [`biome.json`](../../../../../biome.json) sets `css.parser.tailwindDirectives: true`, which teaches
+the parser those at-rules, so every file in this folder is formatted and linted like any other: double
+quotes, LF, 120 columns, applied by the tool rather than by hand. Excluding a folder from `files.includes`
+instead would drop it from `pnpm format:all` and `pnpm lint:all` alike.
 
 ## Gotchas
 
@@ -173,25 +161,23 @@ quotes throughout, LF, 120 columns: Biome's defaults, applied by the tool rather
   [`CookieConsentDialog.tsx`](../modules/shared/cookie-consent/CookieConsentDialog.tsx). Do not "fix" this by disabling the library.
 - `[data-boneyard] > div:not([data-boneyard-overlay]) { display: contents }` unwraps the boneyard-js
   skeleton wrapper so it does not break the grid or flex layout it sits inside.
-- **`animations/index.css` declares no `shimmer` keyframe, and must not grow one back.** It carried a
-  `background-position` sweep under that name which nothing could reach: no rule writes `animation: shimmer`,
-  `theme/index.css` declares no `--animate-*` variable so Tailwind can generate no `animate-shimmer` utility,
-  and `boneyard-js` injects its own `@keyframes bs-<uid>` at runtime for `animate: 'shimmer'`, never one
-  called `shimmer`. Every other keyframe in the file has a named caller. It read like the skeleton animation
-  and was not one, which is exactly what makes the next reader wire a component to it.
+- **`animations/index.css` declares no `shimmer` keyframe, and must not grow one.** Nothing could reach it:
+  no rule writes `animation: shimmer`, `theme/index.css` declares no `--animate-*` variable so Tailwind can
+  generate no `animate-shimmer` utility, and `boneyard-js` injects its own `@keyframes bs-<uid>` at runtime for
+  `animate: 'shimmer'`, never one called `shimmer`. Every other keyframe in the file has a named caller. A
+  keyframe by that name would read like the skeleton animation and not be one, which is exactly what makes
+  the next reader wire a component to it.
 - `--container-8xl` in `theme/index.css` exists for one class, `max-w-8xl` in `planner/page.tsx`.
-  Tailwind resolves `max-w-*` from `--max-width-*`, then `--spacing-*`, then `--container-*`, so the
-  `--max-width-8xl` mirror that used to sit beside it was shadowing an identical value and has been
-  removed. Deleting `--container-8xl` as well would silently drop the class.
+  Tailwind resolves `max-w-*` from `--max-width-*`, then `--spacing-*`, then `--container-*`, so a
+  `--max-width-8xl` beside it would shadow it, and deleting `--container-8xl` would silently drop the class.
 
 ## Testing
 
 `index.test.ts` is the only test here, and it reads CSS as text rather than rendering anything. It
 pins the things that look like tidy-ups and are not: the design tokens stay unlayered and the
-layer statement reserves no slot for them, and `theme/index.css` keeps `--container-8xl` without a
-`--max-width-8xl` mirror.
+layer statement reserves no slot for them, the `tutorial` slot stays reserved, `theme/index.css`
+keeps `--container-8xl` without a `--max-width-8xl` mirror, and `index.css` reaches every stylesheet in the
+folder, so one that a single component imports fails until it moves beside that component.
 
-Nothing else is asserted. In particular, nothing checks that a new `hover:-translate-*` carries
-`hit-area-stable`, or that the driver.js copy of it in `lazy/index.css` still matches. Both are
-
-review-time obligations.
+Nothing checks that a new `hover:-translate-*` carries `hit-area-stable`, or that the driver.js copy of it
+in `modules/tutorial/driver.css` still matches.

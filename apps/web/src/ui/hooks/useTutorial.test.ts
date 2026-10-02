@@ -1,3 +1,10 @@
+import caMessages from "@i18n/messages/ca.json";
+import deMessages from "@i18n/messages/de.json";
+import enMessages from "@i18n/messages/en.json";
+import esMessages from "@i18n/messages/es.json";
+import frMessages from "@i18n/messages/fr.json";
+import itMessages from "@i18n/messages/it.json";
+import { LOCALES, type LocaleCode } from "@infrastructure/i18n/locales";
 import { act, renderHook } from "@testing-library/react";
 import { isValidElement } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -17,7 +24,7 @@ const mockUseSidebar = vi.hoisted(() =>
 const track = vi.hoisted(() => vi.fn());
 vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
 
-vi.mock("@ui/hooks/useMobile", () => ({ useIsMobile: mockUseIsMobile }));
+vi.mock("./useMobile", () => ({ useIsMobile: mockUseIsMobile }));
 vi.mock("@ui/modules/core/animate/base/Sidebar", () => ({ useSidebar: mockUseSidebar }));
 vi.mock("next-intl", () => ({ useTranslations: () => (key: string) => key }));
 vi.mock("@infrastructure/clients/tutorial/driver/client", () => ({
@@ -121,18 +128,24 @@ describe("useTutorial", () => {
 		await vi.waitFor(() => expect(mockDestroy).toHaveBeenCalled());
 	});
 
+	const anchors: HTMLElement[] = [];
+
+	afterEach(() => {
+		for (const anchor of anchors.splice(0)) anchor.remove();
+	});
+
 	const mountAnchor = (rect: () => DOMRect) => {
 		const anchor = document.createElement("div");
 		anchor.setAttribute("data-tutorial", "sidebar-step-1");
 		anchor.getBoundingClientRect = rect as typeof anchor.getBoundingClientRect;
 		document.body.appendChild(anchor);
-		return anchor;
+		anchors.push(anchor);
 	};
 
 	it("measures the anchor repeatedly before starting, rather than trusting it has settled", async () => {
 		mockUseSidebar.mockReturnValue({ open: false, toggleSidebar: mockToggleSidebar });
 		const measure = vi.fn(() => ({ x: 10, y: 0, width: 100, height: 20 }) as DOMRect);
-		const anchor = mountAnchor(measure);
+		mountAnchor(measure);
 
 		const { result } = renderHook(() => useTutorial());
 		await act(async () => {
@@ -141,7 +154,6 @@ describe("useTutorial", () => {
 
 		expect(measure.mock.calls.length).toBeGreaterThanOrEqual(6);
 		expect(mockStart).toHaveBeenCalledOnce();
-		anchor.remove();
 	});
 
 	it("keeps waiting while the anchor is still moving, and gives up rather than hanging", async () => {
@@ -151,7 +163,7 @@ describe("useTutorial", () => {
 			left += 40;
 			return { x: left, y: 0, width: 100, height: 20 } as DOMRect;
 		});
-		const anchor = mountAnchor(moving);
+		mountAnchor(moving);
 
 		const { result } = renderHook(() => useTutorial());
 		await act(async () => {
@@ -160,7 +172,6 @@ describe("useTutorial", () => {
 
 		expect(moving.mock.calls.length).toBeGreaterThan(20);
 		expect(mockStart).toHaveBeenCalledOnce();
-		anchor.remove();
 	});
 
 	it("opens the drawer on a phone, where the desktop flag is no guide at all", async () => {
@@ -174,9 +185,6 @@ describe("useTutorial", () => {
 		});
 
 		expect(mockToggleSidebar).toHaveBeenCalled();
-
-		mockUseIsMobile.mockReturnValue(false);
-		mockUseSidebar.mockReturnValue({ open: true, toggleSidebar: mockToggleSidebar });
 	});
 
 	it("collapses the drawer when the tour ends, since expanding it is what covered the screen", async () => {
@@ -206,6 +214,66 @@ describe("useTutorial", () => {
 	});
 });
 
+describe("useTutorial's wait for the first anchor", () => {
+	const frames = new Map<number, FrameRequestCallback>();
+	let lastHandle = 0;
+
+	beforeEach(() => {
+		frames.clear();
+		vi.stubGlobal(
+			"requestAnimationFrame",
+			vi.fn((callback: FrameRequestCallback) => {
+				lastHandle += 1;
+				frames.set(lastHandle, callback);
+				return lastHandle;
+			}),
+		);
+		vi.stubGlobal(
+			"cancelAnimationFrame",
+			vi.fn((handle: number) => {
+				frames.delete(handle);
+			}),
+		);
+		mockUseSidebar.mockReturnValue({ open: false, toggleSidebar: mockToggleSidebar });
+	});
+
+	afterEach(() => {
+		vi.unstubAllGlobals();
+	});
+
+	const runQueuedFrames = () => {
+		for (let guard = 0; frames.size > 0 && guard < 200; guard++) {
+			const [handle, callback] = [...frames][0];
+			frames.delete(handle);
+			callback(0);
+		}
+	};
+
+	it("cancels the frame it is waiting on when the planner unmounts, and never starts the tour", async () => {
+		const { result, unmount } = renderHook(() => useTutorial());
+
+		void result.current.startTutorial();
+		await vi.waitFor(() => expect(frames.size).toBe(1));
+		unmount();
+		runQueuedFrames();
+		await act(async () => {});
+
+		expect(frames.size).toBe(0);
+		expect(mockStart).not.toHaveBeenCalled();
+	});
+
+	it("waits on one frame at a time when the tour is asked for twice", async () => {
+		const { result, unmount } = renderHook(() => useTutorial());
+
+		void result.current.startTutorial();
+		void result.current.startTutorial();
+		await vi.waitFor(() => expect(mockToggleSidebar).toHaveBeenCalledTimes(2));
+
+		expect(frames.size).toBe(1);
+		unmount();
+	});
+});
+
 describe("useTutorial analytics", () => {
 	it("reports the tour starting and on which layout", async () => {
 		track.mockClear();
@@ -217,5 +285,26 @@ describe("useTutorial analytics", () => {
 		});
 
 		expect(track).toHaveBeenCalledExactlyOnceWith({ event: "tutorial_started", properties: { isMobile: true } });
+	});
+});
+
+describe("the tour's progress label", () => {
+	const BUNDLES: Record<LocaleCode, typeof enMessages> = {
+		ca: caMessages,
+		de: deMessages,
+		en: enMessages,
+		es: esMessages,
+		fr: frMessages,
+		it: itMessages,
+	};
+
+	it.each(LOCALES)("is one %s message that hands driver.js both of its placeholders", async (locale) => {
+		const { createTranslator } = await vi.importActual<typeof import("next-intl")>("next-intl");
+		const t = createTranslator({ locale, messages: BUNDLES[locale], namespace: "tutorial" });
+
+		const label = t("progressText", { current: "{{current}}", total: "{{total}}" });
+
+		expect(label).toContain("{{current}}");
+		expect(label).toContain("{{total}}");
 	});
 });

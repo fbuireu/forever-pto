@@ -1,6 +1,6 @@
 "use client";
 import { configureBoneyard } from "boneyard-js/react";
-import "src/ui/modules/bones/registry";
+import "@ui/modules/bones/registry";
 
 configureBoneyard({
 	animate: "shimmer",

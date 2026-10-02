@@ -1,29 +1,16 @@
+import type { activateWithClaimedPayment, activateWithEmail } from "@application/use-cases/activatePremium";
 import { ApiError } from "@infrastructure/api/errors";
 import { INVALID_BODY } from "@infrastructure/api/parseJsonBody";
 import { SessionError, ValidationError } from "@infrastructure/errors";
 import { LoggerService } from "@infrastructure/logging/service";
+import type { verifySession } from "@infrastructure/services/premium/session";
 import { SessionConfigurationError } from "@infrastructure/services/premium/sessionErrors";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mockVerifySession = vi.hoisted(() =>
-	vi.fn<(token: string) => Effect.Effect<{ email: string; paymentIntentId: string }, SessionError>>(),
-);
-const mockActivateWithEmail = vi.hoisted(() =>
-	vi.fn<
-		(
-			email: string,
-		) => Effect.Effect<{ email: string; premiumKey: string; token: string }, ValidationError | SessionError>
-	>(),
-);
-const mockActivateWithClaimedPayment = vi.hoisted(() =>
-	vi.fn<
-		(
-			email: string,
-			key: string,
-		) => Effect.Effect<{ email: string; premiumKey: string; token: string }, ValidationError | SessionError>
-	>(),
-);
+const mockVerifySession = vi.hoisted(() => vi.fn<typeof verifySession>());
+const mockActivateWithEmail = vi.hoisted(() => vi.fn<typeof activateWithEmail>());
+const mockActivateWithClaimedPayment = vi.hoisted(() => vi.fn<typeof activateWithClaimedPayment>());
 const mockClearPremiumCookie = vi.hoisted(() => vi.fn());
 const mockLogError = vi.hoisted(() => vi.fn());
 const mockSetPremiumCookie = vi.hoisted(() => vi.fn());
@@ -142,7 +129,7 @@ describe("POST /api/check-session", () => {
 
 	it("activates with email only when no premiumKey provided", async () => {
 		mockActivateWithEmail.mockReturnValue(
-			Effect.succeed({ email: "user@example.com", premiumKey: "pi_abc", token: "tok" }),
+			Effect.succeed({ email: "user@example.com", premiumKey: "pi_abc", token: "tok", deferred: Effect.void }),
 		);
 		const response = await POST(makeRequest({ email: "user@example.com" }) as never);
 		const body = await response.json();
@@ -155,7 +142,7 @@ describe("POST /api/check-session", () => {
 
 	it("routes a body carrying a premiumKey to the claimed-payment entry point", async () => {
 		mockActivateWithClaimedPayment.mockReturnValue(
-			Effect.succeed({ email: "user@example.com", premiumKey: "pi_abc", token: "tok" }),
+			Effect.succeed({ email: "user@example.com", premiumKey: "pi_abc", token: "tok", deferred: Effect.void }),
 		);
 		const response = await POST(makeRequest({ email: "user@example.com", premiumKey: "pi_abc" }) as never);
 		const body = await response.json();

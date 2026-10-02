@@ -43,8 +43,7 @@
 		"title": "Forever PTO",
 		"heading": "Planificador",
 		"description": "Indica els teus dies de PTO, el país i l'estratègia, i el planificador els col·locarà al voltant de cada festiu.",
-		"titleHighlight1": "El teu any",
-		"titleHighlight2": "lliure",
+		"titleHighlight": "<first>El teu any</first> <second>lliure</second>",
 		"instructions": "Comença afegint els teus dies i la resta de preferències a la barra lateral. Encara tens dubtes?",
 		"quickTour": "Fes un recorregut ràpid"
 	},
@@ -96,7 +95,7 @@
 			"daysCount": "{count, plural, one {dia} other {dies}}"
 		},
 		"summaryParagraph": {
-			"withGain": "Amb els teus {ptoDays} dies de PTO i {totalHolidays} festius, l’estratègia {strategy} els converteix en {effectiveDays} dies lliures efectius, és a dir, {increment} dies per sobre del teu pressupost, un guany del +{percentage}% respecte a usar-los sense optimitzar.",
+			"withGain": "Amb els teus {ptoDays} dies de PTO i {totalHolidays} festius, l’estratègia {strategy} els converteix en {effectiveDays} dies lliures efectius, és a dir, {increment} dies per sobre del teu pressupost, un guany del +{percentage} respecte a usar-los sense optimitzar.",
 			"withoutGain": "Amb els teus {ptoDays} dies de PTO i {totalHolidays} festius, obtens {effectiveDays} dies lliures efectius amb l’estratègia {strategy}.",
 			"noRegionHintTitle": "Afegeix la teva regió",
 			"noRegionHint": "Selecciona la teva regió a la barra lateral per incloure els festius regionals i aconseguir encara més dies lliures.",
@@ -157,7 +156,7 @@
 				},
 				"carryOver": {
 					"question": "Què són els mesos d'arrossegament?",
-					"answer": "Si la teva empresa et deixa fer servir els dies de PTO d'aquest any als primers mesos del següent, els mesos d'arrossegament allarguen el període de planificació fins a 12 mesos després de desembre, perquè el planificador també pugui posar dies, per exemple, al gener o al febrer de l'any següent."
+					"answer": "Si la teva empresa et deixa fer servir els dies de PTO d'aquest any als primers mesos del següent, els mesos d'arrossegament allarguen el període de planificació fins a {max, number} mesos després de desembre, perquè el planificador també pugui posar dies, per exemple, al gener o al febrer de l'any següent."
 				}
 			},
 			"technical": {
@@ -239,8 +238,7 @@
 		"holidays": "Festius",
 		"holidaysOutsideRange": "Només coneixem els festius de {from}–{to}, així que els de fora d’aquest interval compten com a laborables.",
 		"dateRange": "Dates seleccionades",
-		"from": "Des de",
-		"to": "fins a"
+		"selectedRange": "Des de {from} fins a {to}"
 	},
 	"holidaysTable": {
 		"nationalTab": "Nacionals",
@@ -258,12 +256,11 @@
 		"noHolidaysFound": "No s'ha trobat cap festiu",
 		"noHolidays": "No hi ha festius",
 		"allSelected": "Tots seleccionats",
-		"selected": "seleccionats",
+		"selectedCount": "{count} seleccionats",
 		"weekend": "Cap de setmana",
 		"onWeekends": "En cap de setmana",
 		"onWorkdays": "En dies laborables",
-		"showing": "Mostrant",
-		"of": "de",
+		"showingCount": "Mostrant {shown} de {total}",
 		"addHoliday": "Afegeix un festiu",
 		"add": "Afegeix",
 		"editHoliday": "Edita el festiu",
@@ -282,9 +279,7 @@
 		"national": "Nacionals",
 		"regional": "Regionals",
 		"custom": "Personalitzats",
-		"distributionDescription": "Distribució dels teus {ptoDays} dies de PTO, {nationalDays} festius nacionals{regionalPart}{customPart}.",
-		"regionalPart": ", {regionalDays} regionals",
-		"customPart": " i {customDays} personalitzats",
+		"distributionDescription": "Distribució dels teus {ptoDays} dies de PTO, {nationalDays} festius nacionals{regionalDays, plural, =0 {} other {, # regionals}}{customDays, plural, =0 {} other { i # personalitzats}}.",
 		"quarterDescription": "Distribució de {totalDays} dies efectius al llarg de {activeQuarters, plural, one {# trimestre} other {# trimestres}} de la teva finestra de planificació.",
 		"annualTimeline": "Cronologia anual",
 		"annualTimelineFeature": "Gràfica de cronologia anual",
@@ -292,10 +287,9 @@
 		"daysOffLabel": "Dies lliures",
 		"longBlocksPerQuarter": "Blocs llargs per trimestre",
 		"longBlocksFeature": "Gràfica de blocs llargs per trimestre",
-		"blocksDescription": "{totalBlocks} blocs de 3 o més dies consecutius, ideals per a escapades{bestQuarterPart}.",
-		"bestQuarterPart": ". Millor trimestre: Q{bestQuarter} amb {maxBlocks, plural, one {# bloc} other {# blocs}}",
+		"blocksDescription": "{totalBlocks, plural, =0 {# blocs de {minDays, number} o més dies consecutius, ideals per a escapades.} other {# blocs de {minDays, number} o més dies consecutius, ideals per a escapades. Millor trimestre: Q{bestQuarter} amb {maxBlocks, plural, one {# bloc} other {# blocs}}.}}",
 		"blocks": "blocs",
-		"blocksOf3Days": "Blocs de 3+ dies"
+		"blocksOfMinDays": "Blocs de {minDays, number}+ dies"
 	},
 	"modals": {
 		"addHoliday": {
@@ -348,7 +342,7 @@
 		"nextBtn": "Següent",
 		"prevBtn": "Anterior",
 		"doneBtn": "Fet",
-		"progressTextConnector": "de",
+		"progressText": "{current} de {total}",
 		"steps": {
 			"toolsTitle": "Calculadores i eines",
 			"toolsDescription": "Aquí tens les calculadores: estima quants dies de PTO has acumulat, mira quant et costen en sou els dies que no fas servir o compta els dies laborables entre dues dates.",
@@ -438,11 +432,11 @@
 		"errorTitle": "Alguna cosa ha fallat",
 		"failedToSend": "No s'ha pogut enviar el missatge",
 		"errors": {
-			"name_too_short": "El nom ha de tenir almenys 2 caràcters.",
+			"name_too_short": "El nom ha de tenir almenys {min, number} caràcters.",
 			"name_too_long": "El teu nom és massa llarg.",
-			"subject_too_short": "L'assumpte ha de tenir almenys 5 caràcters.",
+			"subject_too_short": "L'assumpte ha de tenir almenys {min, number} caràcters.",
 			"subject_too_long": "L'assumpte és massa llarg.",
-			"message_too_short": "El missatge ha de tenir almenys 10 caràcters.",
+			"message_too_short": "El missatge ha de tenir almenys {min, number} caràcters.",
 			"message_too_long": "El teu missatge és massa llarg.",
 			"contact_already_received": "Ja m'has escrit fa poc. Dona'm una mica de temps per respondre't."
 		}
@@ -452,6 +446,7 @@
 		"recommended": "Recomanada",
 		"totalOff": "Dies efectius",
 		"efficiency": "Eficiència",
+		"efficiencyValue": "{efficiency}x",
 		"vsMain": "vs principal",
 		"alreadyApplied": "Ja aplicada",
 		"applyAlternative": "Aplica l'alternativa",
@@ -459,7 +454,7 @@
 		"nextSuggestion": "Suggeriment següent",
 		"totalDaysOff": "Total de dies efectius",
 		"comparison": "Comparació",
-		"daysUnit": "dies"
+		"effectiveDaysCount": "{count, plural, one {# dia} other {# dies}}"
 	},
 	"toasts": {
 		"suggestionApplied": "Suggeriment aplicat",
@@ -517,9 +512,8 @@
 			"title": "Estratègia",
 			"placeholder": "Selecciona una estratègia...",
 			"search": "Cerca estratègies...",
-			"hide": "Amaga",
-			"expand": "Desplega",
-			"strategyDetails": "els detalls",
+			"showDetails": "Desplega els detalls",
+			"hideDetails": "Amaga els detalls",
 			"grouped": {
 				"label": "Agrupada",
 				"description": "Unes quantes vacances llargues",
@@ -594,23 +588,19 @@
 			"title": "Any"
 		},
 		"step1": {
-			"titleStart": "El teu ",
-			"titleEmphasis": "context",
+			"title": "El teu <em>context</em>",
 			"badge": "pas {step}"
 		},
 		"step2": {
-			"titleStart": "Els teus ",
-			"titleEmphasis": "dies",
+			"title": "Els teus <em>dies</em>",
 			"badge": "pas {step}"
 		},
 		"step3": {
-			"titleStart": "La teva ",
-			"titleEmphasis": "configuració",
+			"title": "La teva <em>configuració</em>",
 			"badge": "pas {step}"
 		},
 		"step4": {
-			"titleStart": "La teva ",
-			"titleEmphasis": "exportació",
+			"title": "La teva <em>exportació</em>",
 			"badge": "pas {step}"
 		},
 		"steps": "Passos"
@@ -641,8 +631,7 @@
 		"calculate": "Calcula",
 		"result": "Resultat:",
 		"days": "dies",
-		"daysMonth": "dies/mes",
-		"months": "mesos",
+		"breakdown": "<rate></rate> dies/mes × <count></count> {months, plural, one {mes} other {mesos}}",
 		"applyToPtoDays": "Aplica als dies de PTO"
 	},
 	"ptoSalaryCalculator": {
@@ -675,7 +664,7 @@
 		"activationFailed": "El teu pagament s’ha completat, però no hem pogut desbloquejar premium automàticament. Recupera el teu accés amb el correu amb què vas pagar o escriu-nos.",
 		"paymentFailed": "El pagament ha fallat",
 		"processing": "S'està processant...",
-		"pay": "Paga",
+		"payAmount": "Paga {amount}",
 		"promoSaved": "Has estalviat {saved}!",
 		"errors": {
 			"internal_error": "Alguna cosa ha fallat per part nostra. No s'ha fet cap càrrec a la teva targeta.",
@@ -704,7 +693,7 @@
 	},
 	"premiumModal": {
 		"premiumRequired": "Es requereix premium",
-		"featureRequiresPremium": "requereix accés premium",
+		"featureRequiresPremium": "<b>{feature}</b> requereix accés premium",
 		"verifyDescription": "Si ja has fet una donació o has pagat, comprovarem el teu correu i et donarem accés de seguida. Si tens cap problema, escriu-nos i ho solucionarem.",
 		"considerDonating": "Encara no has fet cap donació? Dona suport al projecte i desbloqueja les funcions premium.",
 		"enterPremiumEmail": "Introdueix el teu correu",
@@ -807,12 +796,11 @@
 		"analyticsCookies": "Cookies d'anàlisi",
 		"analyticsDescription": "Ens ajuden a entendre el comportament dels visitants mitjançant recopilació anònima de dades.",
 		"savePreferences": "Desa les preferències",
-		"months": "mesos",
-		"year": "any",
-		"years": "anys",
-		"minutes": "minuts",
-		"hours": "hores",
-		"week": "setmana",
+		"months": "{count, plural, one {# mes} other {# mesos}}",
+		"years": "{count, plural, one {# any} other {# anys}}",
+		"minutes": "{count, plural, one {# minut} other {# minuts}}",
+		"hours": "{count, plural, one {# hora} other {# hores}}",
+		"weeks": "{count, plural, one {# setmana} other {# setmanes}}",
 		"userCountryDesc": "Desa el país detectat per mostrar-te els festius inicials.",
 		"ccCookieDesc": "Desa les teves preferències de consentiment de cookies.",
 		"stripeMidDesc": "Prevenció i detecció del frau. La defineix Stripe per processar els pagaments de manera segura.",
@@ -836,19 +824,18 @@
 		"status": "Estat"
 	},
 	"workdayCounterModal": {
-		"selectDateRange": "Selecciona les dates"
+		"selectDateRange": "Selecciona les dates",
+		"selectedRange": "{from} - {to}"
 	},
 	"legal": {
 		"lastUpdated": "Darrera actualització: {date}"
 	},
 	"notFound": {
 		"kicker": "error 404 · ruta perduda",
-		"title": "Aquesta pàgina se n'ha anat de",
-		"titleHighlight": "vacances",
-		"titleEmphasis": "sense avisar.",
+		"title": "Aquesta pàgina se n'ha anat de <highlight>vacances</highlight> <em>sense avisar.</em>",
 		"lede": "Hem buscat a la platja, hem mirat sota el para-sol, hem preguntat al xiringuito… res. L'URL que vols no existeix (o es va perdre entre dos ponts).",
-		"ctaPrimary": "Torna a l'inici",
-		"ctaPlanner": "Obre el planificador",
+		"ctaPrimary": "← Torna a l'inici",
+		"ctaPlanner": "Obre el planificador →",
 		"suggestLabel": "Buscaves alguna cosa així?",
 		"link1": "Com funciona",
 		"link2": "Funcionalitats",
@@ -858,9 +845,7 @@
 	"error": {
 		"retry": "Torna-ho a provar",
 		"kicker": "Internal server error · v{version} · {time} UTC",
-		"title": "El servidor s'ha agafat un",
-		"titleHighlight": "dia lliure",
-		"titleEmphasis": "sense demanar permís.",
+		"title": "El servidor s'ha agafat un <highlight>dia lliure</highlight> <em>sense demanar permís.</em>",
 		"lede": "Alguna cosa s'ha espatllat per part nostra. No és culpa teva (aquesta vegada). El nostre equip ja ho ha vist: els logs treuen fum i ja hi estem treballant. Torna-ho a provar d'aquí a uns minuts o consulta l'estat en temps real.",
 		"statusPage": "Consulta l'estat",
 		"meanwhile": "Mentrestant:",
@@ -879,7 +864,7 @@
 		"contactUs": "Contacta'ns",
 		"legalNavigation": "Enllaços legals i de política",
 		"copyright": "© {year} Forever PTO · Fet des d'una hamaca.",
-		"version": "v{version} · estat: de vacances ●",
+		"version": "v{version} · estat: de vacances <live>●</live>",
 		"planner": "Planificador",
 		"docs": "Documentació"
 	},
@@ -891,8 +876,7 @@
 		"close": "Tanca"
 	},
 	"devFooter": {
-		"madeWith": "Fet amb",
-		"by": "per",
+		"madeWithBy": "Fet amb <emoji></emoji> per <author></author>",
 		"findMeOn": "També em pots trobar a"
 	},
 	"premium": {
@@ -948,9 +932,7 @@
 			"resumeAction": "El meu pla →"
 		},
 		"hero": {
-			"command": "Treballa menys.",
-			"verb": "Viatja",
-			"highlight": "més",
+			"title": "Treballa menys.<br></br>Viatja <highlight>més</highlight>",
 			"description": "Forever PTO calcula <em>exactament</em> quins dies has de demanar perquè els teus 22 dies de PTO es converteixin en <strong>70+ dies fora de l'oficina</strong>. Sense fulls de càlcul. Sense matemàtiques. Sense remordiments.",
 			"plannerCta": "Calcula els meus dies →",
 			"demoLink": "Mira com funciona (30 s)",
@@ -971,11 +953,7 @@
 		},
 		"how": {
 			"badge": "com funciona · {steps} passos",
-			"titleStart": "De",
-			"titleMid": "a",
-			"question1": "què faig",
-			"question2": "ja tinc el viatge",
-			"titleEnd": "en 60 segons.",
+			"title": "De <em>“què faig”</em> a <em>“ja tinc el viatge”</em> en 60 segons.",
 			"description": "Sense instal·lar res. Sense targeta. Sense butlletins. Només has de dir-nos quants dies tens i on vius.",
 			"inputDaysTitle": "Introdueix els teus dies.",
 			"inputDaysDescription": "Quants dies de PTO tens i a quin país o regió treballes. Això és tot.",
@@ -986,6 +964,7 @@
 		},
 		"stats": {
 			"efficiencyLabel": "Eficiència mitjana",
+			"efficiencyValue": "{ratio}×",
 			"daysLabel": "Dies lliures amb {days} PTO",
 			"countriesLabel": "Països disponibles",
 			"plansLabel": "Suggeriments generats",
@@ -993,14 +972,13 @@
 		},
 		"features": {
 			"badge": "trucs del motor",
-			"titleStart": "No és un calendari. És un",
-			"titleEmphasis": "aliat",
-			"titleEnd": "contra el dilluns.",
+			"title": "No és un calendari. És un <em>aliat</em> contra el dilluns.",
 			"description": "Això és el que Forever PTO fa per tu sense que hagis de fer res.",
 			"bridgeTag": "detecció de ponts",
 			"bridgeTitle": "Converteix 1 dia de PTO en 4 lliures.",
 			"bridgeDescription": "Detecta els festius que cauen en dimarts o dijous i et suggereix ponts mínims. Un dia estratègic = un cap de setmana de 4 dies.",
 			"ratioTag": "màxima eficiència",
+			"ratioValue": "{ratio}<sign>×</sign>",
 			"ratioDescription": "Millor eficiència: 8 dies de PTO convertits en 33 lliures (Catalunya).",
 			"syncTag": "sync en 1 clic",
 			"syncTitle": "Google · Outlook · iCal",
@@ -1042,9 +1020,7 @@
 		},
 		"testimonials": {
 			"badge": "la gent diu",
-			"titleStart": "Gent que ja ha recuperat",
-			"titleEmphasis": "setmanes",
-			"titleEnd": "de la seva vida.",
+			"title": "Gent que ja ha recuperat <em>setmanes</em> de la seva vida.",
 			"items": {
 				"martaR": {
 					"text": "Vaig passar de demanar dies solts a tenir 6 escapades planificades. La meva parella creu que m'he tornat organitzada. No li he dit que és una web.",
@@ -1085,8 +1061,7 @@
 			"description": "Sense SaaS. Sense subscripció. Sense \"prova gratuïta que es renova sola\".",
 			"freeName": "Gratis per sempre",
 			"freeTagline": "Prova-ho. Et convencerà.",
-			"freePrice": "{amount}",
-			"freePer": "/sempre",
+			"freePrice": "{amount}<per>/sempre</per>",
 			"freeNote": "Sense targeta. Sense correu. Res.",
 			"freeFeatures": {
 				"optimizedPlan": "Pla de vacances auto-optimitzat",
@@ -1097,8 +1072,7 @@
 			"freeCta": "Comença gratis",
 			"lifetimeName": "Passi de suport",
 			"lifetimeTagline": "Donació mínima de {amount}. Fes-lo servir per sempre.",
-			"lifetimePrice": "Des de {amount}",
-			"lifetimePer": " una vegada",
+			"lifetimePrice": "Des de {amount}<per> una vegada</per>",
 			"lifetimeNote": "100% opcional. Manté el projecte viu.",
 			"lifetimeFeatures": {
 				"manualEditing": "Edició manual del calendari",
@@ -1116,9 +1090,7 @@
 			"title": "Preguntes? Tenim respostes."
 		},
 		"closing": {
-			"titleStart": "El teu pròxim any",
-			"titleEmphasis": "lliure",
-			"titleEnd": "comença avui.",
+			"title": "El teu pròxim any <em>lliure</em><br></br>comença avui.",
 			"description": "22 dies poden ser més de 70. Només cal saber on col·locar-los. Això ho fem nosaltres.",
 			"cta": "Calcula els meus dies lliures →",
 			"shapes": {
@@ -1142,8 +1114,7 @@
 			"description": "El país decideix quins festius fa servir el planificador. La regió hi afegeix els locals.",
 			"country": "País",
 			"detected": "Detectat a partir de la teva connexió. Canvia'l si no és correcte.",
-			"region": "Regió",
-			"optional": "opcional",
+			"region": "Regió <optional>(opcional)</optional>",
 			"noRegions": "Aquest país no té calendaris regionals, així que es fa servir el nacional."
 		},
 		"ptoDays": {

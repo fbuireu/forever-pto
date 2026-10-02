@@ -1,4 +1,5 @@
 import {
+	DROPDOWN_MENU_CONTENT_DEFAULTS,
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
@@ -52,9 +53,14 @@ export const DROPDOWN_MENU_PROP_ROWS = propRows({
 });
 
 export const DROPDOWN_MENU_CONTENT_PROP_ROWS = propRows({
-	sideOffset: { type: "number", description: "Gap between the trigger and the menu, in pixels." },
+	sideOffset: {
+		type: "number",
+		defaultValue: String(DROPDOWN_MENU_CONTENT_DEFAULTS.sideOffset),
+		description: "Gap between the trigger and the menu, in pixels.",
+	},
 	align: {
 		type: '"start" | "center" | "end"',
+		defaultValue: JSON.stringify(DROPDOWN_MENU_CONTENT_DEFAULTS.align),
 		description: "Alignment along the trigger's edge, from Base UI's positioner.",
 	},
 });

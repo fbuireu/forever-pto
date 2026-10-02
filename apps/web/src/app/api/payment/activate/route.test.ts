@@ -1,15 +1,17 @@
-import { RateLimitError } from "@infrastructure/errors";
+import { ACTIVATION_FAILED, ACTIVATION_PARAM } from "@application/dto/payment/schema";
+import type { activateWithPayment } from "@application/use-cases/activatePremium";
+import { RateLimitError, ValidationError } from "@infrastructure/errors";
 import { EN, ES } from "@infrastructure/i18n/locales";
 import { LoggerService } from "@infrastructure/logging/service";
-import { ACTIVATION_FAILED, ACTIVATION_PARAM } from "@infrastructure/services/premium/activation";
+import type { checkRateLimit } from "@infrastructure/services/payments/rateLimit";
 import { PREMIUM_COOKIE } from "@infrastructure/services/premium/cookie";
 import { Effect, Layer } from "effect";
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { mockActivateWithPayment, mockCheckRateLimit, mockAfter } = vi.hoisted(() => ({
-	mockActivateWithPayment: vi.fn(),
-	mockCheckRateLimit: vi.fn(),
+	mockActivateWithPayment: vi.fn<typeof activateWithPayment>(),
+	mockCheckRateLimit: vi.fn<typeof checkRateLimit>(),
 	mockAfter: vi.fn(),
 }));
 
@@ -111,7 +113,7 @@ describe("GET /api/payment/activate", () => {
 	});
 
 	it("flags the failure instead of the cookie when activation fails", async () => {
-		mockActivateWithPayment.mockReturnValue(Effect.fail(new Error("mismatch")));
+		mockActivateWithPayment.mockReturnValue(Effect.fail(new ValidationError({ message: "Client secret mismatch" })));
 
 		const response = await GET(makeRequest({ query: successfulQuery }));
 

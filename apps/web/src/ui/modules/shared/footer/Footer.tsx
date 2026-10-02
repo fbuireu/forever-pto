@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { version } from "../../../../../package.json";
 import { ContactButton } from "../contact/ContactButton";
 import { CookieButton } from "./components/CookieButton";
+import { Copyright } from "./components/Copyright";
 import { DevFooter } from "./components/DevFooter";
 
 export const Footer = async () => {
@@ -28,8 +29,10 @@ export const Footer = async () => {
 						</div>
 					</Link>
 					<span className="font-mono text-[11px] text-muted-foreground">
-						{t("version", { version }).replace("●", "")}
-						<span className="text-red-500 animate-pulse">●</span>
+						{t.rich("version", {
+							version,
+							live: (chunks) => <span className="text-red-500 animate-pulse">{chunks}</span>,
+						})}
 					</span>
 				</div>
 
@@ -66,8 +69,8 @@ export const Footer = async () => {
 				</nav>
 
 				<div className="px-7 py-3 border-t-[2px] border-dashed border-[var(--frame)]/18 flex justify-center">
-					<span className="font-mono text-[11px] text-muted-foreground text-center" suppressHydrationWarning>
-						{t("copyright", { year })}
+					<span className="font-mono text-[11px] text-muted-foreground text-center">
+						<Copyright serverYear={year} />
 					</span>
 				</div>
 			</div>

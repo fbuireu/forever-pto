@@ -12,6 +12,8 @@ const withModelContext = (value: ModelContext | undefined) => {
 	Object.defineProperty(navigator, "modelContext", { value, configurable: true, writable: true });
 };
 
+const RETIRED_NAMES = [/vacation days?/i, /bridge days?/i, /days? off/i, /carryover/i];
+
 const registeredTools = (): Tool[] => provideContext.mock.calls[0]?.[0].tools ?? [];
 
 const toolNamed = (name: string) => {
@@ -60,6 +62,15 @@ describe("WebMCP", () => {
 		expect(info.locales).toEqual(LOCALES);
 		expect(info.strategies).toEqual(["grouped", "optimized", "balanced", "mainVacation"]);
 		expect(info.url).toBe(globalThis.location.origin);
+	});
+
+	it("describes the product without a retired name for a PTO Day, a Bridge, a Suggested Day or the Carry-over Months", async () => {
+		render(<WebMCP />);
+
+		const info = (await toolNamed("get_site_info").execute({})) as { description: string; features: string[] };
+		const copy = [info.description, ...info.features].join("\n");
+
+		for (const retired of RETIRED_NAMES) expect(copy).not.toMatch(retired);
 	});
 
 	it("answers a status check with the health endpoint's own body", async () => {

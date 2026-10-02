@@ -3,7 +3,7 @@
 import { cn } from "@ui/utils/cn";
 import { type LucideIcon, MousePointer2 } from "lucide-react";
 import { m, type SVGMotionProps, type Transition, type Variants } from "motion/react";
-import { type ComponentType, type HTMLAttributes, useCallback, useMemo, useRef, useState } from "react";
+import { type ComponentType, useCallback, useState } from "react";
 
 type RadialNavProps = {
 	size?: number;
@@ -11,7 +11,8 @@ type RadialNavProps = {
 	menuButtonConfig?: MenuButtonConfig;
 	defaultActiveId?: number;
 	onActiveChange?: (id: number) => void;
-} & HTMLAttributes<HTMLDivElement>;
+	"aria-label"?: string;
+};
 
 type RadialNavItem = {
 	id: number;
@@ -19,7 +20,8 @@ type RadialNavItem = {
 	label: string;
 	angle: number;
 	badgeClass?: string;
-} & Omit<HTMLAttributes<HTMLDivElement>, "id">;
+	className?: string;
+};
 
 type MenuButtonConfig = {
 	iconSize?: number;
@@ -81,17 +83,14 @@ function getPolarCoordinates({ angleDeg, r }: GetPolarCoordinatesParams) {
 	return { x: r * Math.cos(rad), y: r * Math.sin(rad) };
 }
 
-function calculateIconOffset({
-	buttonSize,
-	iconSize,
-	buttonPadding,
-	bias = 0,
-}: {
+interface CalculateIconOffsetParams {
 	buttonSize: number;
 	iconSize: number;
 	buttonPadding: number;
 	bias?: number;
-}) {
+}
+
+function calculateIconOffset({ buttonSize, iconSize, buttonPadding, bias = 0 }: CalculateIconOffsetParams) {
 	const centerOffset = (buttonSize - iconSize) / 2;
 	return centerOffset - buttonPadding + bias;
 }
@@ -122,12 +121,15 @@ function toNearestTurn({ prev, target }: ToNearestTurnParams) {
 }
 
 function useShortestRotation(target: number) {
-	const prevRef = useRef<number | undefined>(undefined);
-	return useMemo(() => {
-		const next = toNearestTurn({ prev: prevRef.current, target });
-		prevRef.current = next;
-		return next;
-	}, [target]);
+	const [rotation, setRotation] = useState(() => ({ target, angle: toNearestTurn({ prev: undefined, target }) }));
+
+	if (rotation.target !== target) {
+		const next = { target, angle: toNearestTurn({ prev: rotation.angle, target }) };
+		setRotation(next);
+		return next.angle;
+	}
+
+	return rotation.angle;
 }
 
 type MenuButtonProps = Readonly<{
@@ -204,7 +206,8 @@ function RadialNav({
 		[onActiveChange],
 	);
 
-	const baseAngle = (items.find((it) => it.id === activeId)?.angle ?? 0) + POINTER_BASE_DEG;
+	const activeItem = items.find((item) => item.id === activeId);
+	const baseAngle = (activeItem?.angle ?? 0) + POINTER_BASE_DEG;
 	const rotateAngle = useShortestRotation(baseAngle);
 
 	const resolvedMenuButtonConfig = withDefaults({ defaults: defaultMenuButtonConfig, overrides: menuButtonConfig });
@@ -217,10 +220,7 @@ function RadialNav({
 		>
 			<m.div
 				initial={false}
-				className={cn(
-					"absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
-					activeId && items[activeId - 1].className,
-				)}
+				className={cn("absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2", activeItem?.className)}
 				animate={{ rotate: rotateAngle }}
 				transition={POINTER_ROT_SPRING}
 				style={{ originX: 0.5, originY: 0.5 }}

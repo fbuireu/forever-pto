@@ -1,16 +1,10 @@
+import type { sendContactEmail } from "@application/use-cases/contact";
 import { INVALID_BODY } from "@infrastructure/api/parseJsonBody";
-import type { EmailError, ValidationError } from "@infrastructure/errors";
+import { DuplicateContactError } from "@infrastructure/errors";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mockSendContactEmail = vi.hoisted(() =>
-	vi.fn<
-		(
-			data: unknown,
-			config: unknown,
-		) => Effect.Effect<{ deferred: Effect.Effect<void, never, never> }, ValidationError | EmailError>
-	>(),
-);
+const mockSendContactEmail = vi.hoisted(() => vi.fn<typeof sendContactEmail>());
 
 vi.mock("@application/use-cases/contact", () => ({
 	sendContactEmail: mockSendContactEmail,
@@ -74,5 +68,18 @@ describe("POST /api/contact", () => {
 		expect(response.status).toBe(400);
 		expect(await response.json()).toEqual({ success: false, error: INVALID_BODY });
 		expect(mockSendContactEmail).not.toHaveBeenCalled();
+	});
+
+	it("keeps every answer out of any cache, since each one is this sender's outcome", async () => {
+		mockSendContactEmail.mockReturnValueOnce(Effect.fail(new DuplicateContactError({ reason: "cooldown" })));
+
+		const answers = [
+			await POST(makeRequest(JSON.stringify(SUBMISSION)) as never),
+			await POST(makeRequest(JSON.stringify(SUBMISSION)) as never),
+			await POST(makeRequest("{not json") as never),
+		];
+
+		expect(answers.map(({ status }) => status)).toEqual([429, 200, 400]);
+		expect(answers.map(({ headers }) => headers.get("Cache-Control"))).toEqual(["no-store", "no-store", "no-store"]);
 	});
 });

@@ -3,7 +3,9 @@
 import { ThemeProvider } from "next-themes";
 import type { ComponentProps } from "react";
 
-export function AppThemeProvider({ children }: Pick<ComponentProps<typeof ThemeProvider>, "children">) {
+type AppThemeProviderProps = Pick<ComponentProps<typeof ThemeProvider>, "children">;
+
+export function AppThemeProvider({ children }: AppThemeProviderProps) {
 	return (
 		<ThemeProvider
 			attribute="data-theme"

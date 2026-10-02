@@ -35,6 +35,12 @@ describe("QuickStartPtoDaysStep", () => {
 		expect(onChange).toHaveBeenNthCalledWith(2, { ptoDays: 21 });
 	});
 
+	it("hands the counter the unit in the bundle's own case, leaving the upper case to its class", () => {
+		renderStep();
+
+		expect(screen.getByText(ptoDaysMessages.days).className.split(" ")).toContain("uppercase");
+	});
+
 	it("disables the step that would leave the allowed range", () => {
 		renderStep({ ptoDays: MIN_PTO_DAYS });
 		expect((screen.getByRole("button", { name: ptoDaysMessages.decrease }) as HTMLButtonElement).disabled).toBe(true);

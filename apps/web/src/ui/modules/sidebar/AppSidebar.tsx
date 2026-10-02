@@ -42,13 +42,15 @@ const CalendarExport = dynamic(() => import("./components/CalendarExport").then(
 const STEP_CARD_CLASS =
 	"bg-sidebar border-[3px] border-[var(--frame)] rounded-[14px] shadow-[var(--shadow-brutal-md)] p-[18px]";
 
+const stepTitleEmphasis = (chunks: ReactNode) => <em className="font-serif italic font-normal">{chunks}</em>;
+
 interface AppSidebarProps {
 	children: ReactNode;
 	locale: Locale;
 }
 
 export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
-	const [t, tA11y, currentYear] = await Promise.all([
+	const [t, tA11y, serverYear] = await Promise.all([
 		getTranslations("sidebar"),
 		getTranslations("a11y"),
 		getCurrentYear(),
@@ -86,10 +88,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
 									<div className="px-1 pt-2 pb-1 space-y-[18px]">
 										<div data-tutorial={TUTORIAL_ANCHOR.SIDEBAR_STEP_1} className={STEP_CARD_CLASS}>
 											<h3 className="font-display font-semibold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none">
-												<span>
-													{t("step1.titleStart")}
-													<em className="font-serif italic font-normal">{t("step1.titleEmphasis")}</em>
-												</span>
+												<span>{t.rich("step1.title", { em: stepTitleEmphasis })}</span>
 												<span className="ml-auto shrink-0 font-mono text-[10px] font-bold uppercase bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] px-1.5 py-0.5 rounded-[5px] tracking-[0.08em]">
 													{t("step1.badge", { step: 1 })}
 												</span>
@@ -99,16 +98,13 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
 													<Countries locale={locale} />
 												</Suspense>
 												<Regions />
-												<Years currentYear={currentYear} />
+												<Years serverYear={serverYear} />
 											</div>
 										</div>
 
 										<div data-tutorial={TUTORIAL_ANCHOR.SIDEBAR_STEP_2} className={STEP_CARD_CLASS}>
 											<h3 className="font-display font-semibold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none">
-												<span>
-													{t("step2.titleStart")}
-													<em className="font-serif italic font-normal">{t("step2.titleEmphasis")}</em>
-												</span>
+												<span>{t.rich("step2.title", { em: stepTitleEmphasis })}</span>
 												<span className="ml-auto shrink-0 font-mono text-[10px] font-bold uppercase bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] px-1.5 py-0.5 rounded-[5px] tracking-[0.08em]">
 													{t("step2.badge", { step: 2 })}
 												</span>
@@ -120,10 +116,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
 
 										<div data-tutorial={TUTORIAL_ANCHOR.SIDEBAR_STEP_3} className={STEP_CARD_CLASS}>
 											<h3 className="font-display font-semibold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none">
-												<span>
-													{t("step3.titleStart")}
-													<em className="font-serif italic font-normal">{t("step3.titleEmphasis")}</em>
-												</span>
+												<span>{t.rich("step3.title", { em: stepTitleEmphasis })}</span>
 												<span className="ml-auto shrink-0 font-mono text-[10px] font-bold uppercase bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] px-1.5 py-0.5 rounded-[5px] tracking-[0.08em]">
 													{t("step3.badge", { step: 3 })}
 												</span>
@@ -137,10 +130,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
 
 										<div data-tutorial={TUTORIAL_ANCHOR.SIDEBAR_STEP_4} className={STEP_CARD_CLASS}>
 											<h3 className="font-display font-semibold text-[18px] tracking-tight mb-3.5 flex items-center gap-2 leading-none">
-												<span>
-													{t("step4.titleStart")}
-													<em className="font-serif italic font-normal">{t("step4.titleEmphasis")}</em>
-												</span>
+												<span>{t.rich("step4.title", { em: stepTitleEmphasis })}</span>
 												<span className="ml-auto shrink-0 font-mono text-[10px] font-bold uppercase bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] px-1.5 py-0.5 rounded-[5px] tracking-[0.08em]">
 													{t("step4.badge", { step: 4 })}
 												</span>

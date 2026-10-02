@@ -1,8 +1,14 @@
+import caMessages from "@i18n/messages/ca.json";
+import deMessages from "@i18n/messages/de.json";
 import enMessages from "@i18n/messages/en.json";
+import esMessages from "@i18n/messages/es.json";
+import frMessages from "@i18n/messages/fr.json";
+import itMessages from "@i18n/messages/it.json";
 import { render, screen } from "@testing-library/react";
-import { createTranslator } from "next-intl";
+import { createTranslator, type Locale, NextIntlClientProvider } from "next-intl";
 import type { ComponentProps } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { renderToString } from "react-dom/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { version } from "../../../../../package.json";
 
 const mockGetTranslations = vi.hoisted(() => vi.fn());
@@ -33,14 +39,39 @@ import { Footer } from "./Footer";
 
 const footer = enMessages.footer;
 
-const renderFooter = async () => {
-	mockGetTranslations.mockResolvedValue(createTranslator({ locale: "en", messages: enMessages, namespace: "footer" }));
-	return render(await Footer());
+const BUNDLES: Record<string, typeof enMessages> = {
+	en: enMessages,
+	es: esMessages,
+	ca: caMessages,
+	it: itMessages,
+	de: deMessages,
+	fr: frMessages,
 };
+
+interface RenderFooterParams {
+	locale?: Locale;
+	messages?: typeof enMessages;
+}
+
+const footerTree = async ({ locale = "en", messages = enMessages }: RenderFooterParams = {}) => {
+	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "footer" }));
+	return (
+		<NextIntlClientProvider locale={locale} messages={messages}>
+			{await Footer()}
+		</NextIntlClientProvider>
+	);
+};
+
+const renderFooter = async (params: RenderFooterParams = {}) => render(await footerTree(params));
 
 describe("Footer", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		vi.useFakeTimers({ now: new Date(2026, 5, 15), toFake: ["Date"] });
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
 	});
 
 	it("labels the legal navigation, since the page carries more than one nav landmark", async () => {
@@ -78,10 +109,33 @@ describe("Footer", () => {
 		expect(container.querySelector(".animate-pulse")?.textContent).toBe("●");
 	});
 
-	it("stamps the copyright with the cached year rather than the render's clock", async () => {
+	it.each(Object.entries(BUNDLES))("renders the %s version line with its live dot", async (locale, messages) => {
+		const { container } = await renderFooter({ locale: locale as Locale, messages });
+		const line = container.querySelector(".animate-pulse")?.parentElement;
+
+		expect(container.querySelector(".animate-pulse")?.textContent).toBe("●");
+		expect(line?.textContent).toContain(`v${version}`);
+		expect(line?.textContent).not.toMatch(/[<>{}]|footer\./);
+	});
+
+	it("stamps the copyright with the year the server rendered with, so the prerendered HTML and the first pass agree", async () => {
+		vi.useFakeTimers({ now: new Date(2031, 0, 1), toFake: ["Date"] });
+
+		expect(renderToString(await footerTree())).toContain(footer.copyright.replace("{year}", "2026"));
+	});
+
+	it("moves the copyright to the visitor's year once mounted, after a deploy from an earlier year", async () => {
+		vi.useFakeTimers({ now: new Date(2031, 0, 1), toFake: ["Date"] });
+
 		const { container } = await renderFooter();
 
-		expect(container.textContent).toContain(footer.copyright.replace("{year}", "2026"));
+		expect(container.textContent).toContain(footer.copyright.replace("{year}", "2031"));
+	});
+
+	it.each(Object.entries(BUNDLES))("renders the %s copyright with the year in place", async (locale, messages) => {
+		const { container } = await renderFooter({ locale: locale as Locale, messages });
+
+		expect(container.textContent).toContain(messages.footer.copyright.replace("{year}", "2026"));
 	});
 
 	it("keeps the cookie and contact controls inside the legal navigation", async () => {

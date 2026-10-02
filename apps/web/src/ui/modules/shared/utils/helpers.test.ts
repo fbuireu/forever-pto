@@ -1,34 +1,37 @@
+import caMessages from "@i18n/messages/ca.json";
+import deMessages from "@i18n/messages/de.json";
 import en from "@i18n/messages/en.json";
+import esMessages from "@i18n/messages/es.json";
+import frMessages from "@i18n/messages/fr.json";
+import itMessages from "@i18n/messages/it.json";
+import { LOCALES, type LocaleCode } from "@infrastructure/i18n/locales";
+import { createTranslator } from "next-intl";
 import { describe, expect, it } from "vitest";
 import { getViewBoxFromSvg, resolveApiErrorMessage } from "./helpers";
 
-const MESSAGES: Record<string, string> = {
-	"errors.internal_error": "Something went wrong on our side. Please try again later.",
-	"errors.email_required": "Please enter your email address.",
+const MESSAGES = {
+	internal_error: "Something went wrong on our side. Please try again later.",
+	email_required: "Please enter your email address.",
 };
 
-const t = {
-	has: (key: string) => key in MESSAGES,
-	raw: (key: string) => MESSAGES[key],
-};
+const t = createTranslator({ locale: "en", messages: { feature: { errors: MESSAGES } }, namespace: "feature" });
 
-const SHARED_MESSAGES: Record<string, string> = { invalid_body: "We could not read that request." };
-
-const shared = {
-	has: (key: string) => key in SHARED_MESSAGES,
-	raw: (key: string) => SHARED_MESSAGES[key],
-};
+const shared = createTranslator({
+	locale: "en",
+	messages: { errors: { invalid_body: "We could not read that request." } },
+	namespace: "errors",
+});
 
 describe("resolveApiErrorMessage", () => {
 	it("translates a known machine code", () => {
 		expect(resolveApiErrorMessage({ code: "internal_error", t, shared, fallback: "Failed" })).toBe(
-			MESSAGES["errors.internal_error"],
+			MESSAGES.internal_error,
 		);
 	});
 
 	it("translates a Zod code the server sent back verbatim", () => {
 		expect(resolveApiErrorMessage({ code: "email_required", t, shared, fallback: "Failed" })).toBe(
-			MESSAGES["errors.email_required"],
+			MESSAGES.email_required,
 		);
 	});
 
@@ -48,15 +51,7 @@ describe("resolveApiErrorMessage", () => {
 	});
 });
 
-const translatorOver = (scope: unknown) => {
-	const lookup = (key: string) =>
-		key.split(".").reduce<unknown>((node, part) => (node as Record<string, unknown> | undefined)?.[part], scope);
-
-	return { has: (key: string) => typeof lookup(key) === "string", raw: lookup };
-};
-
-const bundleTranslator = (namespace: "contact" | "checkout") => translatorOver(en[namespace]);
-const sharedBundle = translatorOver(en.errors);
+const sharedBundle = createTranslator({ locale: "en", messages: en, namespace: "errors" });
 
 describe("resolveApiErrorMessage against the shipped en.json bundle", () => {
 	interface ResolveInParams {
@@ -65,7 +60,12 @@ describe("resolveApiErrorMessage against the shipped en.json bundle", () => {
 	}
 
 	const resolveIn = ({ namespace, code }: ResolveInParams) =>
-		resolveApiErrorMessage({ code, t: bundleTranslator(namespace), shared: sharedBundle, fallback: "Failed" });
+		resolveApiErrorMessage({
+			code,
+			t: createTranslator({ locale: "en", messages: en, namespace }),
+			shared: sharedBundle,
+			fallback: "Failed",
+		});
 
 	it("resolves invalid_body from the shared base for both namespaces", () => {
 		const expected = "We could not read that request. Please try again.";
@@ -91,6 +91,40 @@ describe("resolveApiErrorMessage against the shipped en.json bundle", () => {
 
 	it("leaves rate_limit_exceeded out of the contact namespace, which never rate-limits", () => {
 		expect(resolveIn({ namespace: "contact", code: "rate_limit_exceeded" })).toBe("Failed");
+	});
+});
+
+describe("resolveApiErrorMessage with the values a code carries", () => {
+	const BUNDLES: Record<LocaleCode, typeof en> = {
+		en,
+		es: esMessages,
+		ca: caMessages,
+		it: itMessages,
+		de: deMessages,
+		fr: frMessages,
+	};
+	const VALUES = new Map([
+		["name_too_short", { min: 3 }],
+		["subject_too_short", { min: 6 }],
+		["message_too_short", { min: 11 }],
+	]);
+
+	it.each(LOCALES)("states each bound it is handed in the %s contact errors", (locale) => {
+		const resolve = (code: string) =>
+			resolveApiErrorMessage({
+				code,
+				t: createTranslator({ locale, messages: BUNDLES[locale], namespace: "contact" }),
+				shared: createTranslator({ locale, messages: BUNDLES[locale], namespace: "errors" }),
+				fallback: "Failed",
+				values: VALUES,
+			});
+
+		for (const [code, { min }] of VALUES) {
+			const message = resolve(code);
+
+			expect(message.match(/\d+/g)).toEqual([String(min)]);
+			expect(message).not.toMatch(/[{}]|contact\./);
+		}
 	});
 });
 

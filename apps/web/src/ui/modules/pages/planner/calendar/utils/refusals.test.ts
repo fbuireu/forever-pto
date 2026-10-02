@@ -10,7 +10,12 @@ const t = ((key: string, values?: Record<string, string>) =>
 	typeof describeHolidayRefusal
 >[0]["t"];
 
-const refusal = (reason: HolidayRefusal, heldBy?: { name: string }): Extract<HolidayOutcome, { applied: false }> => ({
+interface RefusalParams {
+	reason: HolidayRefusal;
+	heldBy?: { name: string };
+}
+
+const refusal = ({ reason, heldBy }: RefusalParams): Extract<HolidayOutcome, { applied: false }> => ({
 	applied: false,
 	reason,
 	heldBy: heldBy && {
@@ -47,7 +52,7 @@ describe("describeHolidayRefusal", () => {
 	it("names the Holiday already holding the date", () => {
 		expect(
 			describeHolidayRefusal({
-				outcome: refusal(HolidayRefusal.DATE_HELD_BY_HOLIDAY, { name: "Christmas" }),
+				outcome: refusal({ reason: HolidayRefusal.DATE_HELD_BY_HOLIDAY, heldBy: { name: "Christmas" } }),
 				t,
 				formattedDate: FORMATTED_DATE,
 			}),
@@ -60,7 +65,7 @@ describe("describeHolidayRefusal", () => {
 	it("names no Holiday when the refusal carries none", () => {
 		expect(
 			describeHolidayRefusal({
-				outcome: refusal(HolidayRefusal.DATE_HELD_BY_HOLIDAY),
+				outcome: refusal({ reason: HolidayRefusal.DATE_HELD_BY_HOLIDAY }),
 				t,
 				formattedDate: FORMATTED_DATE,
 			})?.description,
@@ -70,7 +75,7 @@ describe("describeHolidayRefusal", () => {
 	it("describes a date held by a hand-picked day", () => {
 		expect(
 			describeHolidayRefusal({
-				outcome: refusal(HolidayRefusal.DATE_HELD_BY_MANUAL_DAY),
+				outcome: refusal({ reason: HolidayRefusal.DATE_HELD_BY_MANUAL_DAY }),
 				t,
 				formattedDate: FORMATTED_DATE,
 			}),
@@ -83,7 +88,7 @@ describe("describeHolidayRefusal", () => {
 	it("leaves the one refusal with no copy of its own to the modals", () => {
 		expect(
 			describeHolidayRefusal({
-				outcome: refusal(HolidayRefusal.HOLIDAY_NOT_FOUND),
+				outcome: refusal({ reason: HolidayRefusal.HOLIDAY_NOT_FOUND }),
 				t,
 				formattedDate: FORMATTED_DATE,
 			}),

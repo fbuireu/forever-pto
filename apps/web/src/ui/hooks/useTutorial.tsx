@@ -1,14 +1,14 @@
 "use client";
 
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
-import { useIsMobile } from "@ui/hooks/useMobile";
 import { useSidebar } from "@ui/modules/core/animate/base/Sidebar";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
 import { X } from "@ui/modules/core/animate/icons/X";
 import { TUTORIAL_ANCHOR, TUTORIAL_EVENT, tutorialSelector } from "@ui/modules/tutorial/anchors";
 import type { DriveStep } from "driver.js";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect } from "react";
+import { type RefObject, useCallback, useEffect, useRef } from "react";
+import { useIsMobile } from "./useMobile";
 
 const FIRST_STEP_SELECTOR = tutorialSelector(TUTORIAL_ANCHOR.SIDEBAR_STEP_1);
 const ANCHOR_MIN_FRAMES = 6;
@@ -22,8 +22,15 @@ const measure = (selector: string) => {
 	return `${Math.round(x)},${Math.round(y)},${Math.round(width)},${Math.round(height)}`;
 };
 
-const waitForAnchorToSettle = (selector: string) =>
+interface WaitForAnchorToSettleParams {
+	selector: string;
+	frame: RefObject<number | null>;
+}
+
+const waitForAnchorToSettle = ({ selector, frame }: WaitForAnchorToSettleParams) =>
 	new Promise<void>((resolve) => {
+		if (frame.current !== null) cancelAnimationFrame(frame.current);
+
 		let frames = 0;
 		let stableFrames = 0;
 		let previous: string | null = null;
@@ -36,14 +43,15 @@ const waitForAnchorToSettle = (selector: string) =>
 
 			const settled = frames >= ANCHOR_MIN_FRAMES && stableFrames >= ANCHOR_STABLE_FRAMES;
 			if (settled || frames >= ANCHOR_MAX_FRAMES) {
+				frame.current = null;
 				resolve();
 				return;
 			}
 
-			requestAnimationFrame(check);
+			frame.current = requestAnimationFrame(check);
 		};
 
-		requestAnimationFrame(check);
+		frame.current = requestAnimationFrame(check);
 	});
 
 export const useTutorial = () => {
@@ -51,6 +59,7 @@ export const useTutorial = () => {
 	const isMobile = useIsMobile();
 	const t = useTranslations("tutorial.steps");
 	const tUi = useTranslations("tutorial");
+	const anchorFrame = useRef<number | null>(null);
 
 	const startTutorial = useCallback(async () => {
 		track({ event: "tutorial_started", properties: { isMobile } });
@@ -171,7 +180,7 @@ export const useTutorial = () => {
 
 		if (!isSidebarOpen) {
 			toggleSidebar();
-			await waitForAnchorToSettle(FIRST_STEP_SELECTOR);
+			await waitForAnchorToSettle({ selector: FIRST_STEP_SELECTOR, frame: anchorFrame });
 		}
 
 		driverClient.start(steps, {
@@ -183,13 +192,15 @@ export const useTutorial = () => {
 			nextBtnText: tUi("nextBtn"),
 			prevBtnText: tUi("prevBtn"),
 			doneBtnText: tUi("doneBtn"),
-			progressText: `{{current}} ${tUi("progressTextConnector")} {{total}}`,
+			progressText: tUi("progressText", { current: "{{current}}", total: "{{total}}" }),
 			onDestroyStarted: isMobile ? collapseDrawer : undefined,
 		});
 	}, [open, openMobile, isMobile, t, tUi, toggleSidebar]);
 
 	useEffect(() => {
 		return () => {
+			if (anchorFrame.current !== null) cancelAnimationFrame(anchorFrame.current);
+
 			const destroyTour = async () => {
 				try {
 					const { getDriverClientInstance } = await import("@infrastructure/clients/tutorial/driver/client");

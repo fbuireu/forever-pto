@@ -2,7 +2,12 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./Card";
 
-const slot = (container: HTMLElement, name: string) =>
+interface SlotParams {
+	container: HTMLElement;
+	name: string;
+}
+
+const slot = ({ container, name }: SlotParams) =>
 	container.querySelector(`[data-slot="${name}"]`) as HTMLElement | null;
 
 describe("Card", () => {
@@ -18,11 +23,11 @@ describe("Card", () => {
 		);
 
 		for (const name of ["card", "card-header", "card-title", "card-description", "card-content"]) {
-			expect(slot(container, name)).not.toBeNull();
+			expect(slot({ container, name })).not.toBeNull();
 		}
-		expect(slot(container, "card-title")?.textContent).toBe("Summary");
-		expect(slot(container, "card-description")?.textContent).toBe("What the plan buys");
-		expect(slot(container, "card-content")?.textContent).toBe("12 days");
+		expect(slot({ container, name: "card-title" })?.textContent).toBe("Summary");
+		expect(slot({ container, name: "card-description" })?.textContent).toBe("What the plan buys");
+		expect(slot({ container, name: "card-content" })?.textContent).toBe("12 days");
 	});
 
 	it("renders the title as a plain div unless asked for a heading, so a card cannot invent an outline level", () => {
@@ -49,11 +54,11 @@ describe("Card", () => {
 			</Card>,
 		);
 
-		expect(slot(container, "card")?.className).toContain("w-64");
-		expect(slot(container, "card-header")?.className).toContain("pb-0");
-		expect(slot(container, "card-title")?.className).toContain("text-lg");
-		expect(slot(container, "card-description")?.className).toContain("italic");
-		expect(slot(container, "card-content")?.className).toContain("px-0");
-		expect(slot(container, "card-content")?.className).not.toContain("px-6");
+		expect(slot({ container, name: "card" })?.className).toContain("w-64");
+		expect(slot({ container, name: "card-header" })?.className).toContain("pb-0");
+		expect(slot({ container, name: "card-title" })?.className).toContain("text-lg");
+		expect(slot({ container, name: "card-description" })?.className).toContain("italic");
+		expect(slot({ container, name: "card-content" })?.className).toContain("px-0");
+		expect(slot({ container, name: "card-content" })?.className).not.toContain("px-6");
 	});
 });

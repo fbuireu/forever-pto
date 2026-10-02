@@ -1,7 +1,8 @@
 import { ES } from "@infrastructure/i18n/locales";
+import type { RoutePath } from "@infrastructure/seo/routes";
 import { expect, test } from "@playwright/test";
 
-const PATH = "/legal/privacy-policy";
+const PATH = "/legal/privacy-policy" satisfies RoutePath;
 
 test.describe("(marketing) privacy-policy", () => {
 	test("returns 200", async ({ page }) => {

@@ -1,7 +1,8 @@
 import { ES } from "@infrastructure/i18n/locales";
+import type { RoutePath } from "@infrastructure/seo/routes";
 import { expect, test } from "@playwright/test";
 
-const CONFIRMATION_PATH = "/payment/confirmation";
+const CONFIRMATION_PATH = "/payment/confirmation" satisfies RoutePath;
 
 test.describe("(app) payment/confirmation", () => {
 	test("redirects to the same-origin home when no payment_intent param", async ({ page, baseURL }) => {

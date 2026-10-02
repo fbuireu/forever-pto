@@ -49,9 +49,7 @@ export const HolidaysDistributionChart = memo(function HolidaysDistributionChart
 			{ name: t("custom"), value: customDays, color: COLOR_SCHEMES[1] },
 		].filter((item) => item.value > 0);
 
-		const regionalPart = regionalDays > 0 ? t("regionalPart", { regionalDays }) : "";
-		const customPart = customDays > 0 ? t("customPart", { customDays }) : "";
-		const description = t("distributionDescription", { ptoDays, nationalDays, regionalPart, customPart });
+		const description = t("distributionDescription", { ptoDays, nationalDays, regionalDays, customDays });
 
 		return { data, description, nationalDays, regionalDays, customDays };
 	}, [ptoDays, holidays, t]);

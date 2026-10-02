@@ -1,8 +1,5 @@
+import { Bone } from "@ui/modules/core/primitives/Bone";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
-const Bone = ({ className }: { className: string }) => (
-	<div className={`rounded-[8px] border-[2px] border-[var(--frame)]/30 bg-[var(--surface-panel-soft)] ${className}`} />
-);
 
 export const PlannerPanelFixture = () => (
 	<div className="w-full rounded-[10px] border-[3px] border-[var(--frame)] bg-card p-3 shadow-[var(--shadow-brutal-md)]">

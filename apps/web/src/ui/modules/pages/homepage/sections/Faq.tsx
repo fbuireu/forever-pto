@@ -1,10 +1,11 @@
+import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from "@ui/modules/core/animate/base/Accordion";
 import { Badge } from "@ui/modules/core/primitives/Badge";
 import { createRichLink } from "@ui/modules/core/primitives/RichLink";
-import { FaqTabs } from "@ui/modules/pages/homepage/support/FaqTabs";
-import { Troubleshooting } from "@ui/modules/pages/homepage/support/Troubleshooting";
-import type { FaqData } from "@ui/modules/pages/homepage/support/types";
 import { getTranslations } from "next-intl/server";
+import { FaqTabs } from "../support/FaqTabs";
+import { Troubleshooting } from "../support/Troubleshooting";
+import type { FaqData } from "../support/types";
 
 const GITHUB_ISSUE_URL =
 	"https://github.com/fbuireu/forever-pto/issues/new?template=feature_request.yml&labels=enhancement";
@@ -52,7 +53,7 @@ export const Faq = async () => {
 				{
 					id: "carry-over",
 					question: t("sections.general.carryOver.question"),
-					answer: t("sections.general.carryOver.answer"),
+					answer: t("sections.general.carryOver.answer", { max: MAX_CARRY_OVER_MONTHS }),
 				},
 			],
 		},

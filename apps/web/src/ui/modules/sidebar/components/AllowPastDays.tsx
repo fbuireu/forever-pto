@@ -1,14 +1,15 @@
 "use client";
 
 import { useFiltersStore } from "@application/stores/filters";
+import { useHolidaysStore } from "@application/stores/holidays";
 import { PremiumFeatureId } from "@application/stores/premium";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { Switch } from "@ui/modules/core/animate/base/Switch";
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
-import { SidebarFieldLabel } from "@ui/modules/sidebar/components/SidebarFieldLabel";
 import { Undo2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/react/shallow";
+import { SidebarFieldLabel } from "./SidebarFieldLabel";
 
 export const AllowPastDays = () => {
 	const t = useTranslations("sidebar.allowPastDays");
@@ -18,8 +19,10 @@ export const AllowPastDays = () => {
 			setAllowPastDays: state.setAllowPastDays,
 		})),
 	);
+	const askForPlan = useHolidaysStore((state) => state.askForPlan);
 
 	const handleChange = (value: boolean) => {
+		askForPlan();
 		setAllowPastDays(value);
 		track({ event: "planning_input_changed", properties: { input: "allowPastDays", inputValue: value } });
 	};

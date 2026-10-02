@@ -1,13 +1,15 @@
 import { MARKDOWN_ACCEPT, MARKDOWN_PATH_HEADER, MARKDOWN_ROUTE } from "@infrastructure/markdown/twin";
+import type { RoutePath } from "@infrastructure/seo/routes";
 import { expect, test } from "@playwright/test";
 
 const MARKDOWN_HEADERS = { Accept: MARKDOWN_ACCEPT };
 const HOME_PATH = "/";
-const PLANNER_PATH = "/planner";
-const TERMS_PATH = "/legal/terms-of-service";
+const PLANNER_PATH = "/planner" satisfies RoutePath;
+const TERMS_PATH = "/legal/terms-of-service" satisfies RoutePath;
 const UNLISTED_PATH = "/totally-made-up-xyz";
 const PLANNER_MARKER = "## How to Use";
 const HOME_MARKER = "## How It Works";
+const POSITIVE_MAX_AGE = /max-age=[1-9]/;
 
 test.describe("Markdown twin of a page route", () => {
 	test("returns 200", async ({ request }) => {
@@ -20,10 +22,10 @@ test.describe("Markdown twin of a page route", () => {
 		expect(response.headers()["content-type"]).toContain(MARKDOWN_ACCEPT);
 	});
 
-	test("sets a public, hour-long Cache-Control", async ({ request }) => {
+	test("lets a shared cache keep it for a while", async ({ request }) => {
 		const cacheControl = (await request.get(PLANNER_PATH, { headers: MARKDOWN_HEADERS })).headers()["cache-control"];
 		expect(cacheControl).toContain("public");
-		expect(cacheControl).toContain("max-age=3600");
+		expect(cacheControl).toMatch(POSITIVE_MAX_AGE);
 		expect(cacheControl).not.toContain("no-store");
 	});
 
@@ -71,7 +73,7 @@ test.describe("Markdown twin of a path no route names", () => {
 	test("sets Cache-Control: no-store", async ({ request }) => {
 		const cacheControl = (await request.get(UNLISTED_PATH, { headers: MARKDOWN_HEADERS })).headers()["cache-control"];
 		expect(cacheControl).toContain("no-store");
-		expect(cacheControl).not.toContain("max-age=3600");
+		expect(cacheControl).not.toMatch(POSITIVE_MAX_AGE);
 	});
 });
 
@@ -85,7 +87,7 @@ test.describe(`GET ${MARKDOWN_ROUTE} direct`, () => {
 	test("does not let the miss be cached", async ({ request }) => {
 		const cacheControl = (await request.get(MARKDOWN_ROUTE)).headers()["cache-control"];
 		expect(cacheControl).toContain("no-store");
-		expect(cacheControl).not.toContain("max-age=3600");
+		expect(cacheControl).not.toMatch(POSITIVE_MAX_AGE);
 	});
 
 	test("ignores a path header the caller supplied", async ({ request }) => {

@@ -1,13 +1,10 @@
+import type { sendContactEmail } from "@application/use-cases/contact";
 import { ApiError } from "@infrastructure/api/errors";
 import { EmailError, ValidationError } from "@infrastructure/errors";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mockSendContactEmail = vi.hoisted(() =>
-	vi.fn<
-		(body: unknown, config: unknown) => Effect.Effect<{ deferred: Effect.Effect<void> }, ValidationError | EmailError>
-	>(),
-);
+const mockSendContactEmail = vi.hoisted(() => vi.fn<typeof sendContactEmail>());
 const mockAfter = vi.hoisted(() => vi.fn((work: () => unknown) => work()));
 
 vi.mock("@application/use-cases/contact", () => ({ sendContactEmail: mockSendContactEmail }));

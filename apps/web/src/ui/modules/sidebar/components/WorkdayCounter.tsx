@@ -14,12 +14,12 @@ import {
 	calculateWeekends,
 	calculateWorkdays,
 } from "@ui/modules/pages/planner/utils/helpers";
-import { SidebarFieldLabel } from "@ui/modules/sidebar/components/SidebarFieldLabel";
 import { CalendarDays } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
+import { SidebarFieldLabel } from "./SidebarFieldLabel";
 
 const CalendarModal = dynamic(() =>
 	import("./WorkdayCounterCalendarModal").then((module) => ({ default: module.WorkdayCounterCalendarModal })),
@@ -153,8 +153,10 @@ export const WorkdayCounter = () => {
 					<div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded text-xs">
 						<p className="text-blue-700 dark:text-blue-400 font-display font-medium">{t("dateRange")}</p>
 						<p className="text-blue-600 dark:text-blue-300">
-							{t("from")} {formatDate({ date: selectedRange.from, locale, format: "EEEE, MMMM d, yyyy" })} {t("to")}{" "}
-							{formatDate({ date: selectedRange.to, locale, format: "EEEE, MMMM d, yyyy" })}
+							{t("selectedRange", {
+								from: formatDate({ date: selectedRange.from, locale, format: "EEEE, MMMM d, yyyy" }),
+								to: formatDate({ date: selectedRange.to, locale, format: "EEEE, MMMM d, yyyy" }),
+							})}
 						</p>
 					</div>
 				</div>

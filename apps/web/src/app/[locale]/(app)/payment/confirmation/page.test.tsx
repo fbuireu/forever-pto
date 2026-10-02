@@ -1,6 +1,6 @@
+import { ACTIVATION_FAILED } from "@application/dto/payment/schema";
 import type { PaymentConfirmationDTO } from "@application/dto/payment/types";
-import { DE, EN } from "@infrastructure/i18n/locales";
-import { ACTIVATION_FAILED } from "@infrastructure/services/premium/activation";
+import { DE, EN, ES } from "@infrastructure/i18n/locales";
 import { render } from "@testing-library/react";
 import { Effect, Layer } from "effect";
 import { createFormatter, type Locale } from "next-intl";
@@ -57,7 +57,7 @@ vi.mock("lucide-react", () => ({
 	XCircle: vi.fn().mockReturnValue(null),
 }));
 
-const { default: PaymentSuccessPage } = await import("./page");
+const { default: PaymentConfirmationPage } = await import("./page");
 
 interface MakeParamsParams {
 	locale?: unknown;
@@ -72,7 +72,7 @@ const makeParams = ({ locale = EN, paymentIntent }: MakeParamsParams = {}) => ({
 const makeSuccessParams = () => makeParams({ locale: EN, paymentIntent: PAYMENT_INTENT_ID });
 
 const renderErrorPage = async () => {
-	const element = await PaymentSuccessPage(makeSuccessParams());
+	const element = await PaymentConfirmationPage(makeSuccessParams());
 	const resolved = await (element.type as (props: unknown) => Promise<never>)(element.props);
 	return render(resolved);
 };
@@ -98,12 +98,20 @@ describe("payment/confirmation page", () => {
 	});
 
 	describe("redirect", () => {
-		it("redirects when no payment_intent", async () => {
+		beforeEach(() => {
 			mockRedirect.mockImplementation(() => {
 				throw new Error("NEXT_REDIRECT");
 			});
-			await expect(PaymentSuccessPage(makeParams({ locale: EN }))).rejects.toThrow("NEXT_REDIRECT");
-			expect(mockRedirect).toHaveBeenCalledWith(`/${EN}`);
+		});
+
+		it("sends an English visitor with no payment_intent to the unprefixed home", async () => {
+			await expect(PaymentConfirmationPage(makeParams({ locale: EN }))).rejects.toThrow("NEXT_REDIRECT");
+			expect(mockRedirect).toHaveBeenCalledExactlyOnceWith("/");
+		});
+
+		it("sends any other visitor with no payment_intent to the home under their locale prefix", async () => {
+			await expect(PaymentConfirmationPage(makeParams({ locale: ES }))).rejects.toThrow("NEXT_REDIRECT");
+			expect(mockRedirect).toHaveBeenCalledExactlyOnceWith(`/${ES}`);
 		});
 	});
 
@@ -116,9 +124,12 @@ describe("payment/confirmation page", () => {
 				throw new Error("NEXT_REDIRECT");
 			});
 			await expect(
-				PaymentSuccessPage({ searchParams: Promise.resolve(query), params: Promise.resolve({ locale: EN as never }) }),
+				PaymentConfirmationPage({
+					searchParams: Promise.resolve(query),
+					params: Promise.resolve({ locale: EN as never }),
+				}),
 			).rejects.toThrow("NEXT_REDIRECT");
-			expect(mockRedirect).toHaveBeenCalledWith(`/${EN}`);
+			expect(mockRedirect).toHaveBeenCalledExactlyOnceWith("/");
 			expect(mockConfirmation).not.toHaveBeenCalled();
 		});
 	});
@@ -126,7 +137,7 @@ describe("payment/confirmation page", () => {
 	describe("PaymentError state", () => {
 		it("returns PaymentError component when confirmation returns null", async () => {
 			mockConfirmation.mockReturnValueOnce(Effect.succeed(null));
-			const element = await PaymentSuccessPage(makeSuccessParams());
+			const element = await PaymentConfirmationPage(makeSuccessParams());
 			expect(typeof element.type).toBe("function");
 			expect((element.type as { name?: string }).name).toBe("PaymentError");
 		});
@@ -135,7 +146,7 @@ describe("payment/confirmation page", () => {
 			mockConfirmation.mockReturnValueOnce(
 				Effect.succeed({ id: PAYMENT_INTENT_ID, status: "processing", amount: 10, currency: "USD" }),
 			);
-			const element = await PaymentSuccessPage(makeSuccessParams());
+			const element = await PaymentConfirmationPage(makeSuccessParams());
 			expect(typeof element.type).toBe("function");
 			expect((element.type as { name?: string }).name).toBe("PaymentError");
 		});
@@ -155,6 +166,13 @@ describe("payment/confirmation page", () => {
 			expect(container.textContent).toContain("t:unconfirmedTitle");
 		});
 
+		it("translates the failure card in the locale of the route", async () => {
+			mockConfirmation.mockReturnValueOnce(Effect.succeed(null));
+			const element = await PaymentConfirmationPage(makeParams({ locale: DE, paymentIntent: PAYMENT_INTENT_ID }));
+			await (element.type as (props: unknown) => Promise<never>)(element.props);
+			expect(mockGetTranslations).toHaveBeenCalledWith({ locale: DE, namespace: "paymentConfirmation.failed" });
+		});
+
 		it("still says the card was untouched when Stripe says the intent was never charged", async () => {
 			mockConfirmation.mockReturnValueOnce(
 				Effect.succeed({ id: PAYMENT_INTENT_ID, status: "requires_payment_method", amount: 10, currency: "USD" }),
@@ -167,33 +185,33 @@ describe("payment/confirmation page", () => {
 
 	describe("success state", () => {
 		it("returns a main landmark on success", async () => {
-			const element = await PaymentSuccessPage(makeSuccessParams());
+			const element = await PaymentConfirmationPage(makeSuccessParams());
 			expect(element.type).toBe("main");
 		});
 
 		it("success landmark has m-auto class", async () => {
-			const element = await PaymentSuccessPage(makeSuccessParams());
+			const element = await PaymentConfirmationPage(makeSuccessParams());
 			expect(element.props.className).toContain("m-auto");
 		});
 
-		it("calls getTranslations with paymentConfirmation.success namespace", async () => {
-			await PaymentSuccessPage(makeSuccessParams());
-			expect(mockGetTranslations).toHaveBeenCalledWith("paymentConfirmation.success");
+		it("translates the success card in the locale of the route", async () => {
+			await PaymentConfirmationPage(makeParams({ locale: DE, paymentIntent: PAYMENT_INTENT_ID }));
+			expect(mockGetTranslations).toHaveBeenCalledWith({ locale: DE, namespace: "paymentConfirmation.success" });
 		});
 
 		it("builds the formatter for the requested locale", async () => {
-			await PaymentSuccessPage(makeParams({ locale: DE, paymentIntent: PAYMENT_INTENT_ID }));
+			await PaymentConfirmationPage(makeParams({ locale: DE, paymentIntent: PAYMENT_INTENT_ID }));
 			expect(mockGetFormatter).toHaveBeenCalledWith({ locale: DE });
 		});
 
 		it("reports Premium as active when the activation route did not flag a failure", async () => {
-			const { container } = render(await PaymentSuccessPage(makeSuccessParams()));
+			const { container } = render(await PaymentConfirmationPage(makeSuccessParams()));
 			expect(container.textContent).toContain("t:premiumActivated");
 			expect(container.textContent).not.toContain("t:premiumActivationFailed");
 		});
 
 		it("never claims Premium is active when the activation route says it failed", async () => {
-			const { container } = render(await PaymentSuccessPage(makeFailedActivationParams()));
+			const { container } = render(await PaymentConfirmationPage(makeFailedActivationParams()));
 			expect(container.textContent).toContain("t:premiumActivationFailed");
 			expect(container.textContent).not.toContain("t:premiumActivated");
 		});
@@ -211,7 +229,9 @@ describe("payment/confirmation page", () => {
 			mockConfirmation.mockReturnValueOnce(
 				Effect.succeed({ id: PAYMENT_INTENT_ID, status: "succeeded", amount, currency }),
 			);
-			const { container } = render(await PaymentSuccessPage(makeParams({ locale, paymentIntent: PAYMENT_INTENT_ID })));
+			const { container } = render(
+				await PaymentConfirmationPage(makeParams({ locale, paymentIntent: PAYMENT_INTENT_ID })),
+			);
 			return (container.textContent ?? "").replace(NON_BREAKING_SPACES, " ");
 		};
 

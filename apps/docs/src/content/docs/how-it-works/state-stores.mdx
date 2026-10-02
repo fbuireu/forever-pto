@@ -5,7 +5,7 @@ sidebar:
   order: 6
 ---
 
-All client state lives in Zustand stores under `apps/web/src/application/stores/`. Most of them persist; each is created as `create()(devtools(persist(...)))` with a versioned storage name. The `ui` store is devtools-only. Store conventions are documented in `apps/web/src/application/stores/AGENTS.md`.
+All client state lives in Zustand stores under `apps/web/src/application/stores/`. Most of them persist; each is created as `create()(devtools(persist(...)))` with a versioned storage name. The `ui` store is devtools-only. The folder's map and gotchas are in `apps/web/src/application/stores/AGENTS.md`, and the rules a store follows (`A8` to `A10`, `A12`, `A16` to `A18`) in [`CODING_STANDARDS.md`](https://github.com/fbuireu/forever-pto/blob/main/CODING_STANDARDS.md).
 ```mermaid
 flowchart LR
   subgraph stores [Zustand stores]
@@ -59,7 +59,7 @@ User-facing planner configuration: `ptoDays`, `allowPastDays`, `country`, `regio
 The largest store: `holidays` (the `HolidayDTO[]`), the current `suggestion`, `alternatives` (capped by `maxAlternatives`), selection/preview indexes, `manuallySelectedDays`, `removedSuggestedDays` and `isCalculating`. Key actions:
 
 - `fetchHolidays` dynamic-imports `@infrastructure/services/holidays/getHolidays`, preserves user-created (`CUSTOM`) holidays and dedupes by date. It records `holidaysKey`, which filters the Holidays were fetched for (`holidaysKeyOf`), on success and on failure alike, and the planner plans only while that key matches the screen; the key is not persisted, so a reload waits for a fresh fetch rather than planning on the stored list. Each call also takes a sequence number and gives up if a newer call started while it awaited, so a slow answer for the previous year cannot overwrite the current one.
-- `generateSuggestions` / `generateAlternatives` dynamic-import the domain functions for the synchronous path; `setCalculationResult` is the entry point used by the [Web Worker path](/how-it-works/calculation-worker/), preserving the selected alternative index across recalculations.
+- `generateSuggestions` dynamic-imports `runPlanningPipeline` for the synchronous path; `setCalculationResult` is the entry point used by the [Web Worker path](/how-it-works/calculation-worker/), preserving the selected alternative index across recalculations.
 - `addHoliday` / `editHoliday` / `removeHoliday` manage custom holidays, and all of them ask one predicate, `heldOn`, whether the date is already taken and by what; `toggleDaySelection` implements manual day editing with PTO-budget enforcement; `trimManualDays` supports the calendar UI. Remaining Budget comes from `measureBudget` in the calendar domain rather than from a store action.
 
 Because `Date` does not survive JSON, `partialize` serializes every date (including nested bridge dates) to ISO strings and `onRehydrateStorage` revives them.

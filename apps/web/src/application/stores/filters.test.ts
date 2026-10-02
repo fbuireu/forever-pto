@@ -1,6 +1,6 @@
 import { DEFAULT_FILTER_STRATEGY, FilterStrategy } from "@domain/calendar/types";
 import { DEFAULT_PREFERRED_MONTHS, MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { MAX_PTO_DAYS, MIN_CARRY_OVER_MONTHS, MIN_PTO_DAYS, useFiltersStore } from "./filters";
 
 const CURRENT_YEAR = vi.hoisted(() => {
@@ -24,21 +24,12 @@ vi.mock("./crypto", () => ({
 	},
 }));
 
-vi.useRealTimers();
-
-const INITIAL = {
-	ptoDays: 22,
-	allowPastDays: false,
-	country: "",
-	region: "",
-	year: CURRENT_YEAR,
-	carryOverMonths: 1,
-	strategy: FilterStrategy.GROUPED,
-	preferredMonths: [6, 7],
-};
-
 beforeEach(() => {
-	useFiltersStore.setState(INITIAL);
+	useFiltersStore.setState(useFiltersStore.getInitialState());
+});
+
+afterAll(() => {
+	vi.useRealTimers();
 });
 
 describe("initial state", () => {
@@ -177,7 +168,7 @@ describe("onRehydrateStorage", () => {
 	};
 
 	it("does not clamp a partially rehydrated state it is about to throw away", () => {
-		useFiltersStore.setState({ ptoDays: 9999, carryOverMonths: 99 } as never);
+		useFiltersStore.setState({ ptoDays: 9999, carryOverMonths: 99 });
 
 		runRehydrate(new Error("deobfuscate failed"));
 

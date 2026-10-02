@@ -110,4 +110,10 @@ describe("the catalogue writes no currency symbol", () => {
 			expect(collect({ value: messages, path: "", out: [] })).toEqual([]);
 		},
 	);
+
+	it("reports a symbol a message does carry, so a walk that reads nothing cannot pass", () => {
+		const planted = { toasts: { saved: `3,50 ${DEFAULT_CURRENCY_SYMBOL}` } };
+
+		expect(collect({ value: planted, path: "", out: [] })).toEqual([`toasts.saved -> 3,50 ${DEFAULT_CURRENCY_SYMBOL}`]);
+	});
 });

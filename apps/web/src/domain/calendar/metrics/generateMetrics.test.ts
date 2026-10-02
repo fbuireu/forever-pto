@@ -1,6 +1,6 @@
 import { HolidayVariant } from "@application/dto/holiday/types";
+import { FilterStrategy } from "@domain/calendar/types";
 import { describe, expect, it } from "vitest";
-import { FilterStrategy } from "../types";
 import { generateMetrics } from "./generateMetrics";
 
 interface MakeDateParams {

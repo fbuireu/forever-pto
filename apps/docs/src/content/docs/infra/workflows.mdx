@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-All workflows live in `.github/workflows/`. Repo-wide conventions, enforced socially and by zizmor: every third-party action is SHA-pinned (with a version comment), and every checkout uses `persist-credentials: false`.
+All workflows live in `.github/workflows/`. Repo-wide conventions: every action from another repository is pinned to a full commit SHA with its version in a trailing comment, no YAML file in the repository carries any other comment (a tool directive and the line Renovate writes into `pnpm-workspace.yaml` aside; the reason for a line goes in the commit, the pull request, an ADR or a rule, and a trap goes in the root `AGENTS.md`'s *Gotchas*), and every checkout uses `persist-credentials: false`. The contract suite holds the first two and zizmor the third.
 
 | Workflow | Trigger | Purpose |
 | --- | --- | --- |

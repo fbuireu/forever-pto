@@ -3,9 +3,9 @@
 import { usePathname, useRouter } from "@application/i18n/navigation";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import type { LocaleCode } from "@infrastructure/i18n/locales";
-import { useLanguages } from "@ui/hooks/useLanguages";
 import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useMemo } from "react";
+import { useLanguages } from "./useLanguages";
 
 export const useLanguageSwitch = () => {
 	const locale = useLocale();

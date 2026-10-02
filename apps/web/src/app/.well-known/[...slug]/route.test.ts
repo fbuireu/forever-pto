@@ -1,3 +1,4 @@
+import { ApiError } from "@infrastructure/api/errors";
 import { WELL_KNOWN_CACHE_CONTROL, WELL_KNOWN_MISSING_CACHE_CONTROL } from "@infrastructure/well-known/slugs";
 import { describe, expect, it, vi } from "vitest";
 
@@ -47,7 +48,7 @@ describe("GET /.well-known/[...slug]", () => {
 		const response = await GET(new Request("http://localhost"), makeContext(["unknown"]));
 		expect(response.status).toBe(404);
 		const body = await response.json();
-		expect(body.error).toBeDefined();
+		expect(body.error).toBe(ApiError.NOT_FOUND);
 	});
 
 	it.each([["constructor"], ["toString"], ["hasOwnProperty"], ["valueOf"], ["__proto__"]])(

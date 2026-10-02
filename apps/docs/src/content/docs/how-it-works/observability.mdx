@@ -76,9 +76,11 @@ Every application line is the same shape, written by `write` in `apps/web/src/in
 {"ip":"203.0.113.9","reason":"rate_limit_exceeded","service":"forever-pto-web","level":"warn","message":"Payment request refused"}
 ```
 
-Three things about it are deliberate. The caller's context is spread **first**, so a context carrying its own `level` or `service` cannot relabel the line; `service` is `LOG_SERVICE`, the same value contribKit's logger writes, so the two sinks answer the same query; and a `url` in the context has its query string removed by `stripQuery` before serialisation, because Stripe appends the client secret to the return URL. The whole call sits in a `try` that returns, so a circular reference or a `BigInt` in a context cannot take down the Zustand action or the payment handler that was logging.
+Three things about it are deliberate. The caller's context is spread **first**, so a context carrying its own `level` or `service` cannot relabel the line; `service` is `LOG_SERVICE`, the same value contribKit's logger writes, so the two sinks answer the same query; and a `url` in the context has its query string removed by `stripQuery` before serialisation, because Stripe appends the client secret to the return URL. A context value that cannot be serialised, a circular reference or a `BigInt`, is written as `"[unserializable]"` and the rest of the line still goes out, and the whole call sits in a `try` that returns, so nothing in a context can take down the Zustand action or the payment handler that was logging.
 
-There is no `debug` level and no request-scoped transport: the levels are `info`, `warn` and `error`, indexed by the contract's own union so a level `console` has no method for fails to compile, and the line reaches the sink through the platform rather than through a batcher the Worker owns. [ADR 0018](https://github.com/fbuireu/forever-pto/blob/main/adr/0018-the-platform-is-the-log-transport.md) records why the batcher went: as a module-level instance it delivered request B's lines from a timer armed in request A, which workerd refuses as I/O on behalf of a different request.
+There is no `debug` level and no request-scoped transport: the levels are `info`, `warn` and `error`, indexed by the contract's own union so a level `console` has no method for fails to compile, and the line reaches the sink through the platform rather than through a batcher the Worker owns.
+
+The production build keeps exactly those levels. `compiler.removeConsole` in `apps/web/next.config.ts` deletes every other `console` call from the app's code at build time and excludes `LOG_LEVEL`'s values, so a stray `console.log` never ships while the logger's lines always do, and a level the contract gains is kept with no second edit. The contract suite loads the production config and holds that list equal to `LOG_LEVEL`. [ADR 0018](https://github.com/fbuireu/forever-pto/blob/main/adr/0018-the-platform-is-the-log-transport.md) records why the batcher went: as a module-level instance it delivered request B's lines from a timer armed in request A, which workerd refuses as I/O on behalf of a different request.
 
 ## Where the configuration lives
 
@@ -128,7 +130,7 @@ The planner and the rest of the app report these, under the same rule: a setting
 
 | Event | Fires when | Carries |
 | --- | --- | --- |
-| `planner_generated` | The worker settles a plan (every replan) | The PTO Day budget, Strategy, Preferred Months (as a comma-separated list), year, Carry-over Months, past days, the number of Alternatives and the plan's quality: Efficiency, Effective Days, Bonus Days, Long Weekends, Rest Blocks, Longest Vacation, Max Work Streak |
+| `planner_generated` | The worker settles a plan a person asked for: a planning input changed from the sidebar, the calculator or the quick start, a Custom Holiday added, edited or deleted, an Alternative applied or the manual changes reset. Never a load or a restore, and once for asks that settle as one run | The PTO Day budget, Strategy, Preferred Months (as a comma-separated list), year, Carry-over Months, past days, the number of Alternatives and the plan's quality: Efficiency, Effective Days, Bonus Days, Long Weekends, Rest Blocks, Longest Vacation, Max Work Streak |
 | `planning_input_changed` | A sidebar control changes a planning input | `input` (`country`, `region`, `year`, `ptoDays`, `strategy`, `preferredMonths`, `allowPastDays`, `carryOverMonths`) and `inputValue`, its new value (the Preferred Months as a comma-separated list); the budget applied from the calculator adds `source: ptoCalculator`. The property is not called `value` because GA4 reserves that name for the monetary value of a key event |
 | `calendar_day_toggled` | A day is clicked | `applied` with what changed (`manual_day_added`, `manual_day_removed`, `suggested_day_removed`, `removed_day_restored`), or `applied: false` with the store's refusal (`budget_exhausted`, `day_is_holiday`…) or `premium_required` when the gate stopped it |
 | `alternative_applied` | An Alternative becomes the Suggestion | Its index and its Efficiency and Effective Days |
@@ -136,7 +138,7 @@ The planner and the rest of the app report these, under the same rule: a setting
 | `holiday_tab_changed` | A Holiday table tab is opened | The Holiday Variant of the tab |
 | `holiday_selection_changed` | A Holiday is picked or un-picked, or select-all is used | The Holiday Variant, `scope` (`one` or `all`) and `selected` |
 | `holidays_sorted` | A Holiday table column is sorted | The Holiday Variant and the column `key` |
-| `holidays_searched` | A search in a Holiday table starts (once per search, never the text) | The Holiday Variant |
+| `holidays_searched` | A search in a Holiday table starts, on its first keystroke (once per search, never the text) | The Holiday Variant |
 | `holiday_modal_opened` | The add, edit or delete button of a Holiday table is pressed | `action` (`add`, `edit`, `delete`) and the tab's Holiday Variant |
 | `custom_holiday_saved` | A Custom Holiday is added or edited | `mode` (`add` or `edit`), `applied` and the refusal reason if any |
 | `custom_holiday_deleted` | Custom Holidays are deleted | `count` |

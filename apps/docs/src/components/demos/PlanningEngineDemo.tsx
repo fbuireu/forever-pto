@@ -53,7 +53,7 @@ const readTunable = (key: TunableKey): number =>
 		.split(".")
 		.reduce<unknown>((value, segment) => (value as Record<string, unknown>)[segment], PTO_CONSTANTS) as number;
 
-const GROUP_OF = (key: TunableKey) => (key.includes(".") ? key.split(".")[0] : "ROOT");
+const groupOf = (key: TunableKey) => (key.includes(".") ? key.split(".")[0] : "ROOT");
 
 export const TunablesTable = () => {
 	const keys = Object.keys(TUNABLE_DESCRIPTIONS) as TunableKey[];
@@ -78,7 +78,7 @@ export const TunablesTable = () => {
 				{keys.map((key) => (
 					<tr key={key}>
 						<td>
-							<code>{GROUP_OF(key)}</code>
+							<code>{groupOf(key)}</code>
 						</td>
 						<td>
 							<code>{key.includes(".") ? key.split(".").slice(1).join(".") : key}</code>

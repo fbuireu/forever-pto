@@ -1,6 +1,7 @@
 "use client";
 
 import { PremiumFeatureId } from "@application/stores/premium";
+import { PTO_CONSTANTS } from "@domain/calendar/const";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/modules/core/primitives/Card";
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
 import { Calendar } from "lucide-react";
@@ -9,13 +10,13 @@ import { memo, useMemo } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { COLOR_SCHEMES } from "./const";
 
-interface BlockPerQuarterChartProps {
+interface BlocksPerQuarterChartProps {
 	blocksPerQuarter: number[];
 }
 
 export const BlocksPerQuarterChart = memo(function BlocksPerQuarterChart({
 	blocksPerQuarter,
-}: BlockPerQuarterChartProps) {
+}: BlocksPerQuarterChartProps) {
 	const t = useTranslations("charts");
 	const data = useMemo(
 		() =>
@@ -31,8 +32,8 @@ export const BlocksPerQuarterChart = memo(function BlocksPerQuarterChart({
 	const bestQuarterIndex = blocksPerQuarter.indexOf(Math.max(...blocksPerQuarter));
 	const bestQuarter = bestQuarterIndex + 1;
 	const maxBlocks = Math.max(...blocksPerQuarter);
-	const bestQuarterPart = totalBlocks > 0 ? t("bestQuarterPart", { bestQuarter, maxBlocks }) : "";
-	const description = t("blocksDescription", { totalBlocks, bestQuarterPart });
+	const minDays = PTO_CONSTANTS.METRICS.LONG_BLOCK_MINIMUM_DAYS;
+	const description = t("blocksDescription", { totalBlocks, bestQuarter, maxBlocks, minDays });
 
 	return (
 		<PremiumFeature
@@ -61,7 +62,7 @@ export const BlocksPerQuarterChart = memo(function BlocksPerQuarterChart({
 								))}
 							</Bar>
 							<Tooltip
-								formatter={(value) => [`${value} ${t("blocks")}`, t("blocksOf3Days")]}
+								formatter={(value) => [`${value} ${t("blocks")}`, t("blocksOfMinDays", { minDays })]}
 								contentStyle={{
 									backgroundColor: "var(--primary)",
 									border: "3px solid var(--frame)",

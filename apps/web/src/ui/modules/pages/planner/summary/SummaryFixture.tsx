@@ -1,21 +1,18 @@
+import { Bone } from "@ui/modules/core/primitives/Bone";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@ui/modules/core/primitives/Card";
-
-const Bone = ({ className }: { className: string }) => (
-	<div className={`rounded-[8px] border-[2px] border-[var(--frame)]/30 bg-[var(--surface-panel-soft)] ${className}`} />
-);
 
 const CHART_KEYS_A = ["holidays-dist", "quarter-dist"];
 const CHART_KEYS_B = ["blocks-quarter", "monthly-dist"];
-const METRIC_KEYS = ["vacation-days", "holidays", "effective-days", "multiplier"];
+const METRIC_KEYS = ["pto-days", "holidays", "effective-days", "gain"];
 const COMPACT_KEYS = [
 	"long-weekends",
-	"vacation-periods",
-	"day-off-ratio",
+	"rest-blocks",
+	"efficiency",
 	"bridges-used",
-	"workdays-month",
+	"worked-days-per-month",
 	"longest-vacation",
 ];
-const YEAR_SUMMARY_KEYS = ["first-break", "max-streak", "last-break"];
+const YEAR_SUMMARY_KEYS = ["first-rest-block", "max-work-streak", "last-rest-block"];
 
 export const SummaryFixture = () => (
 	<div className="w-full max-w-4xl mx-auto space-y-6 z-1">

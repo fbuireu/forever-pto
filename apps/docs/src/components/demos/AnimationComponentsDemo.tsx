@@ -51,8 +51,7 @@ export const FeatureListDemo = () => (
 );
 
 // Typed against the real component props so an API change in RadialNav
-// breaks `astro check` here. Ids must be sequential and 1-based: the pointer
-// looks the active item up by `items[activeId - 1]`.
+// breaks `astro check` here.
 const NAV_ITEMS: RadialNavProps["items"] = [
 	{ id: 1, icon: Calendar, label: "Calendar", angle: 0 },
 	{ id: 2, icon: Star, label: "Favorites", angle: 90, badgeClass: "bg-[var(--color-brand-teal)]" },

@@ -33,12 +33,14 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
 	const t = useTranslations("modals.deleteHoliday");
 	const tA11y = useTranslations("a11y");
 	const removeHoliday = useHolidaysStore((state) => state.removeHoliday);
+	const askForPlan = useHolidaysStore((state) => state.askForPlan);
 	const [isPending, startTransition] = useTransition();
 	const isMultiple = holidays.length > 1;
 
 	const handleDelete = () => {
 		startTransition(() => {
 			try {
+				if (holidays.length > 0) askForPlan();
 				holidays.forEach((holiday) => {
 					removeHoliday(holiday.id);
 				});

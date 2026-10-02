@@ -1,6 +1,6 @@
 import en from "@i18n/messages/en.json";
-import { SITE_ROUTES } from "@infrastructure/seo/routes";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { SITE_ROUTES } from "./routes";
 
 const { mockGetTranslations, mockGetPublicEnv } = vi.hoisted(() => ({
 	mockGetTranslations: vi.fn(),

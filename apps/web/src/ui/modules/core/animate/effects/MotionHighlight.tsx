@@ -50,6 +50,8 @@ type MotionHighlightContextType<T extends string> = {
 	forceUpdateBounds?: boolean;
 };
 
+const DEFAULT_TRANSITION: Transition = { type: "spring", stiffness: 350, damping: 35 };
+
 // biome-ignore lint/suspicious/noExplicitAny: generic context; T is contravariant in setActiveValue, string does not satisfy all subtypes of T
 const MotionHighlightContext = createContext<MotionHighlightContextType<any> | undefined>(undefined);
 
@@ -123,7 +125,7 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
 		defaultValue,
 		onValueChange,
 		className,
-		transition = { type: "spring", stiffness: 350, damping: 35 },
+		transition = DEFAULT_TRANSITION,
 		hover = false,
 		enabled = true,
 		controlledItems,
@@ -182,7 +184,7 @@ function MotionHighlight<T extends string>({ ref, ...props }: MotionHighlightPro
 				return newBounds;
 			});
 		},
-		// biome-ignore lint/correctness/useExhaustiveDependencies: props intentionally omitted to avoid stale closure on every render
+		// biome-ignore lint/correctness/useExhaustiveDependencies: props is new each render, so in parent mode every render re-measures the active item; depending on boundsOffset alone would stop that
 		[props],
 	);
 
@@ -358,7 +360,7 @@ function MotionHighlightItem({
 	value,
 	className,
 	transition,
-	disabled = false,
+	disabled,
 	activeClassName,
 	exitDelay,
 	asChild = false,

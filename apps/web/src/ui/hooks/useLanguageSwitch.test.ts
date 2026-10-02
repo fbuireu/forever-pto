@@ -19,7 +19,7 @@ vi.mock("next-intl", () => ({
 	useTranslations: () => (key: string, values: Record<string, string>) => `${key}:${JSON.stringify(values ?? {})}`,
 }));
 
-vi.mock("@ui/hooks/useLanguages", () => ({
+vi.mock("./useLanguages", () => ({
 	useLanguages: () => [
 		{ code: "en", label: "English" },
 		{ code: "es", label: "Espanol" },

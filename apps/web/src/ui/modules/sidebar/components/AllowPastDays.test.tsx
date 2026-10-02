@@ -11,6 +11,10 @@ const premiumState = {
 };
 
 const track = vi.hoisted(() => vi.fn());
+const askForPlan = vi.hoisted(() => vi.fn());
+vi.mock("@application/stores/holidays", () => ({
+	useHolidaysStore: (selector: (state: unknown) => unknown) => selector({ askForPlan }),
+}));
 vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
 
 vi.mock("@application/stores/filters", () => ({
@@ -56,12 +60,14 @@ describe("AllowPastDays", () => {
 describe("AllowPastDays analytics", () => {
 	it("reports the switch's new state once Premium lets it be flipped", () => {
 		track.mockClear();
+		askForPlan.mockClear();
 		premiumState.premiumKey = "key";
 		renderField();
 
 		fireEvent.click(screen.getByRole("switch", { name: enMessages.sidebar.allowPastDays.title }));
 
 		expect(filtersState.setAllowPastDays).toHaveBeenCalledExactlyOnceWith(true);
+		expect(askForPlan).toHaveBeenCalledOnce();
 		expect(track).toHaveBeenCalledExactlyOnceWith({
 			event: "planning_input_changed",
 			properties: { input: "allowPastDays", inputValue: true },

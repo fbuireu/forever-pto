@@ -133,8 +133,19 @@ function composeEventHandlers<E extends SyntheticEvent<unknown>>({ theirs, ours 
 	};
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: vendored component
-type AnyProps = Record<string, any>;
+interface StartAnimParams {
+	anim: "initial" | "animate";
+	method?: "start" | "set";
+}
+
+type PointerHandler = (event: PointerEvent<unknown>) => void;
+
+type ChildPointerHandlers = {
+	onPointerEnter?: PointerHandler;
+	onPointerLeave?: PointerHandler;
+	onPointerDown?: PointerHandler;
+	onPointerUp?: PointerHandler;
+};
 
 function AnimateIcon({
 	asChild = false,
@@ -242,7 +253,7 @@ function AnimateIcon({
 	});
 
 	const startAnim = useCallback(
-		async (anim: "initial" | "animate", method: "start" | "set" = "start") => {
+		async ({ anim, method = "start" }: StartAnimParams) => {
 			await Promise.resolve(controls[method](anim)).catch(() => {});
 			statusRef.current = anim;
 		},
@@ -261,7 +272,7 @@ function AnimateIcon({
 
 		async function run() {
 			if (cancelledRef.current || gen !== runGenRef.current) {
-				await startAnim("initial");
+				await startAnim({ anim: "initial" });
 				return;
 			}
 
@@ -271,20 +282,20 @@ function AnimateIcon({
 				}
 				if (!persistOnAnimateEnd) {
 					if (cancelledRef.current || gen !== runGenRef.current) {
-						await startAnim("initial");
+						await startAnim({ anim: "initial" });
 						return;
 					}
-					await startAnim("initial");
+					await startAnim({ anim: "initial" });
 				}
 				return;
 			}
 
 			if (loop) {
 				if (cancelledRef.current || gen !== runGenRef.current) {
-					await startAnim("initial");
+					await startAnim({ anim: "initial" });
 					return;
 				}
-				await startAnim("initial", "set");
+				await startAnim({ anim: "initial", method: "set" });
 			}
 
 			isAnimateInProgressRef.current = true;
@@ -297,18 +308,18 @@ function AnimateIcon({
 				resolveAnimateEndRef.current?.();
 				resolveAnimateEndRef.current = null;
 				animateEndPromiseRef.current = null;
-				await startAnim("initial");
+				await startAnim({ anim: "initial" });
 				return;
 			}
 
-			await startAnim("animate");
+			await startAnim({ anim: "animate" });
 
 			if (cancelledRef.current || gen !== runGenRef.current) {
 				isAnimateInProgressRef.current = false;
 				resolveAnimateEndRef.current?.();
 				resolveAnimateEndRef.current = null;
 				animateEndPromiseRef.current = null;
-				await startAnim("initial");
+				await startAnim({ anim: "initial" });
 				return;
 			}
 
@@ -319,10 +330,10 @@ function AnimateIcon({
 
 			if (initialOnAnimateEnd) {
 				if (cancelledRef.current || gen !== runGenRef.current) {
-					await startAnim("initial");
+					await startAnim({ anim: "initial" });
 					return;
 				}
-				await startAnim("initial", "set");
+				await startAnim({ anim: "initial", method: "set" });
 			}
 
 			if (loop) {
@@ -335,21 +346,21 @@ function AnimateIcon({
 					});
 
 					if (cancelledRef.current || gen !== runGenRef.current) {
-						await startAnim("initial");
+						await startAnim({ anim: "initial" });
 						return;
 					}
 					if (!activeRef.current) {
-						if (statusRef.current !== "initial" && !persistOnAnimateEnd) await startAnim("initial");
+						if (statusRef.current !== "initial" && !persistOnAnimateEnd) await startAnim({ anim: "initial" });
 						return;
 					}
 				} else {
 					if (!activeRef.current) {
-						if (statusRef.current !== "initial" && !persistOnAnimateEnd) await startAnim("initial");
+						if (statusRef.current !== "initial" && !persistOnAnimateEnd) await startAnim({ anim: "initial" });
 						return;
 					}
 				}
 				if (cancelledRef.current || gen !== runGenRef.current) {
-					await startAnim("initial");
+					await startAnim({ anim: "initial" });
 					return;
 				}
 				await run();
@@ -371,7 +382,7 @@ function AnimateIcon({
 		};
 	}, [localAnimate, initialOnAnimateEnd, loop, startAnim, persistOnAnimateEnd, loopDelay, completeOnStop]);
 
-	const childProps = (isValidElement(children) ? (children as ReactElement).props : {}) as AnyProps;
+	const childProps: ChildPointerHandlers = isValidElement<ChildPointerHandlers>(children) ? children.props : {};
 
 	const handlePointerEnter = composeEventHandlers<PointerEvent<unknown>>({
 		theirs: childProps.onPointerEnter,
@@ -596,6 +607,8 @@ function IconWrapper<T extends string>({
 				animation={animationProp}
 				loop={loop}
 				loopDelay={loopDelay}
+				persistOnAnimateEnd={persistOnAnimateEnd}
+				initialOnAnimateEnd={initialOnAnimateEnd}
 				delay={delay}
 				completeOnStop={completeOnStop}
 				asChild

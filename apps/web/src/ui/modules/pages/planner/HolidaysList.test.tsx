@@ -63,8 +63,20 @@ describe("HolidaysList", () => {
 	it("keeps the regional tab inert while the region has no holidays, rather than opening an empty table", () => {
 		renderList();
 
-		expect(screen.queryByRole("tab", { name: en.holidaysTable.regionalTab })).toBeNull();
-		expect(screen.getByText(en.holidaysTable.regionalTab).className).toContain("cursor-not-allowed");
+		expect(screen.getByRole("tab", { name: en.holidaysTable.regionalTab })).toHaveProperty("disabled", true);
+	});
+
+	it("puts nothing but tabs in the tab list, so the inert regional one is a disabled tab rather than a bare label", () => {
+		renderList();
+		const list = screen.getByRole("tablist");
+		const labelledOutsideATab = [...list.querySelectorAll("*")].filter(
+			(node) =>
+				!node.closest('[role="tab"]') &&
+				[...node.childNodes].some((child) => child.nodeType === Node.TEXT_NODE && child.textContent?.trim()),
+		);
+
+		expect(screen.getAllByRole("tab")).toHaveLength(3);
+		expect(labelledOutsideATab).toEqual([]);
 	});
 
 	it("turns the regional tab on once regional holidays exist, and shows their table on click", async () => {
@@ -95,7 +107,7 @@ describe("HolidaysList", () => {
 		renderList();
 
 		expect(screen.queryByTestId("table")).toBeNull();
-		expect(screen.queryByRole("tab", { name: en.holidaysTable.regionalTab })).toBeNull();
+		expect(screen.getByRole("tab", { name: en.holidaysTable.regionalTab })).toHaveProperty("disabled", true);
 	});
 });
 

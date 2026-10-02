@@ -4,7 +4,15 @@ Date: 2026-09-12
 
 ## Status
 
-Accepted.
+Accepted. Amended 2026-09-28: three statements below no longer hold. The docs package versions itself
+([ADR 0011](./0011-per-package-versioning-with-a-bridge-tag.md)), so its version moves with every docs release
+rather than staying at `0.0.0`, and the wiki still sends no `release`; the site serves the six locales the app
+does, not two; and the consent banner starts whether or not the two variables are set, because
+[`Head.astro`](../apps/docs/src/components/Head.astro) always calls `startCookieConsent`. Amended 2026-10-02: the
+banner speaks all six of those locales, not English and Spanish, picked off `document.documentElement.lang` as
+below, and the answers it shares with the app's banner (accept all, reject all, the preferences title, close) use
+the app's words in each one; `tests/docs-consistency.test.ts` holds the locales to `astro.config.ts` and those
+words to the app's bundles.
 
 ## Context
 

@@ -27,7 +27,11 @@ const LEVEL_COLORS: Record<LogLevel, string> = {
 
 const LOG_LINE_REGEX = /^(\[\d{2}:\d{2}:\d{2}\])\s+(INFO|WARN|ERROR|OK)\s+(.*)$/;
 
-function TerminalLine({ line }: { line: string }) {
+interface TerminalLineProps {
+	line: string;
+}
+
+function TerminalLine({ line }: TerminalLineProps) {
 	const m = line.match(LOG_LINE_REGEX);
 	if (m) {
 		const [, ts, level, rest] = m;
@@ -78,7 +82,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
 	const t = useTranslations("error");
 	const [contactOpen, setContactOpen] = useState(false);
 	const [visibleCount, setVisibleCount] = useState(0);
-	const capturedAt = useRef(new Date());
+	const [capturedAt] = useState(() => new Date());
 	const terminalRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -93,11 +97,11 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
 	}, [error]);
 
 	const ts = [
-		capturedAt.current.getUTCHours().toString().padStart(2, "0"),
-		capturedAt.current.getUTCMinutes().toString().padStart(2, "0"),
-		capturedAt.current.getUTCSeconds().toString().padStart(2, "0"),
+		capturedAt.getUTCHours().toString().padStart(2, "0"),
+		capturedAt.getUTCMinutes().toString().padStart(2, "0"),
+		capturedAt.getUTCSeconds().toString().padStart(2, "0"),
 	].join(":");
-	const year = capturedAt.current.getFullYear();
+	const year = capturedAt.getFullYear();
 
 	const [traceLines] = useState(() =>
 		[
@@ -167,11 +171,14 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
 						</span>
 
 						<h1 className="font-display font-semibold leading-none tracking-[-0.035em] mb-[18px] text-wrap-pretty text-[clamp(28px,3.8vw,48px)]">
-							{t("title")}{" "}
-							<span className="relative inline-block bg-[var(--color-brand-orange)] text-white px-2 border-[3px] border-[var(--frame)] rounded-[6px] mx-0.5 [animation:highlight-shake_4s_ease-in-out_infinite_1.5s]">
-								{t("titleHighlight")}
-							</span>{" "}
-							<em className="font-serif italic font-normal">{t("titleEmphasis")}</em>
+							{t.rich("title", {
+								highlight: (chunks) => (
+									<span className="relative inline-block bg-[var(--color-brand-orange)] text-white px-2 border-[3px] border-[var(--frame)] rounded-[6px] mx-0.5 [animation:highlight-shake_4s_ease-in-out_infinite_1.5s]">
+										{chunks}
+									</span>
+								),
+								em: (chunks) => <em className="font-serif italic font-normal">{chunks}</em>,
+							})}
 						</h1>
 
 						<p className="text-[18px] leading-[1.55] text-muted-foreground max-w-[46ch] mb-8">{t("lede")}</p>

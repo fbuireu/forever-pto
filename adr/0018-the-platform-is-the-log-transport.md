@@ -19,6 +19,12 @@ on every preview Worker, where `NODE_ENV` is `production` too). `LOG_SERVICE` is
 one logger knows them all; what stays specific to this app is named in
 [`apps/web/src/infrastructure/AGENTS.md`](../apps/web/src/infrastructure/AGENTS.md).
 
+Amended 2026-10-02. A context value that cannot be serialised no longer costs the line; see the amendment at the
+end.
+
+Amended 2026-10-02, a second time. The production build keeps the console methods this transport writes through
+and strips every other; see the last amendment.
+
 ## Context
 
 [ADR 0017](./0017-observability-is-the-platform-export.md) recorded a consequence that turned out to be the
@@ -120,5 +126,36 @@ The rejected alternatives are the ones listed above.
   [`apps/web/src/infrastructure/clients/AGENTS.md`](../apps/web/src/infrastructure/clients/AGENTS.md), the
   dynamic-import paragraphs in [`apps/web/src/ui/AGENTS.md`](../apps/web/src/ui/AGENTS.md) and
   [`apps/web/src/application/stores/AGENTS.md`](../apps/web/src/application/stores/AGENTS.md), the
-  `@logtail/edge` gotcha in [`AGENTS.md`](../AGENTS.md), and the published wiki's *Observability*, *Secrets*
+  `noConsole` gotcha in [`AGENTS.md`](../AGENTS.md), and the published wiki's *Observability*, *Secrets*
   and *Tooling* pages.
+
+## Amendment, 2026-10-02: an unserialisable value no longer costs the line
+
+**The guarantee below held for the caller and failed the sink.** *A log call cannot fail its caller* was kept by
+dropping the whole line when `JSON.stringify` threw, so a context carrying a circular reference or a `BigInt`
+left no record that anything had happened, which is the one thing a log line exists to leave. And `logError`
+described the error before the `try`, so a thrown object with no prototype and no JSON (`String()` throws on it)
+reached the caller after all.
+
+**Every method now runs inside one `try`, and each context value is tried on its own.** A value `JSON.stringify`
+cannot write is written as `"[unserializable]"`, so the line still reaches Better Stack with its service, level,
+message and every other field; an own field of an `Error` gets the same treatment inside `error`, so the message,
+name and stack survive it; and a thrown object that has neither JSON nor a `toString` is described by its tag.
+A line that serialised before is byte for byte what it was. `logger.ts` is still byte for byte what the
+sibling repositories carry, and they changed with it.
+
+## Amendment, 2026-10-02: the production build keeps the transport's levels
+
+**`console` is the transport, and the production build deleted `console` calls.** `compiler.removeConsole: isProd`
+in [`apps/web/next.config.ts`](../apps/web/next.config.ts) strips every literal `console.*` call from the app's
+code in a production build. The logger's lines survived only because `write` indexes `console[level]`, which the
+transform does not match, so a rewrite of `write` into literal calls would have deleted every line this ADR
+exists to deliver, with nothing failing.
+
+**The build now excludes the logger's levels by name.** `removeConsole` is `{ exclude: Object.values(LOG_LEVEL) }`
+in production, so `info`, `warn` and `error` survive however they are written and a level `LOG_LEVEL` gains is
+kept with no second edit, while `console.log`, `console.debug` and the rest are still deleted. The contract suite
+loads the production config and holds the list equal to `LOG_LEVEL`. The cost is small and visible: Next's own
+route templates are compiled as the app's code, so their three `console.error` calls on failure paths and one
+`console.warn` now reach the platform log too, as plain text beside the JSON lines, where before they were
+deleted with everything else.

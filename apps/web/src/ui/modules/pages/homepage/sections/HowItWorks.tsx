@@ -5,48 +5,47 @@ import { brutCard } from "./shared";
 
 export const HowItWorks = async () => {
 	const t = await getTranslations("homepage");
+	const steps = [
+		{
+			num: "1",
+			bg: "var(--color-brand-yellow)",
+			iconBg: "var(--color-brand-orange)",
+			icon: "📥",
+			title: t("how.inputDaysTitle"),
+			desc: t("how.inputDaysDescription"),
+		},
+		{
+			num: "2",
+			bg: "var(--color-brand-teal)",
+			iconBg: "var(--color-brand-sky)",
+			icon: "🧮",
+			title: t("how.engineTitle"),
+			desc: t("how.engineDescription"),
+		},
+		{
+			num: "3",
+			bg: "var(--color-brand-purple)",
+			iconBg: "var(--color-brand-pink)",
+			icon: "📤",
+			title: t("how.exportTitle"),
+			desc: t("how.exportDescription"),
+		},
+	];
 
 	return (
 		<section className="px-7 py-24" id="how">
 			<div className="max-w-[900px] mx-auto mb-14 text-center">
 				<div className="flex justify-center mb-4">
-					<Badge variant="outline">{t("how.badge", { steps: 3 })}</Badge>
+					<Badge variant="outline">{t("how.badge", { steps: steps.length })}</Badge>
 				</div>
 				<h2 className="font-display font-semibold leading-none tracking-[-0.03em] mb-4 text-[clamp(36px,5vw,64px)]">
-					{t("how.titleStart")} <em className="font-serif italic">&ldquo;{t("how.question1")}&rdquo;</em>{" "}
-					{t("how.titleMid")} <em className="font-serif italic">&ldquo;{t("how.question2")}&rdquo;</em>{" "}
-					{t("how.titleEnd")}
+					{t.rich("how.title", { em: (chunks) => <em className="font-serif italic">{chunks}</em> })}
 				</h2>
 				<p className="text-[19px] text-muted-foreground max-w-[640px] mx-auto">{t("how.description")}</p>
 			</div>
 
 			<div className="max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-7">
-				{[
-					{
-						num: "1",
-						bg: "var(--color-brand-yellow)",
-						iconBg: "var(--color-brand-orange)",
-						icon: "📥",
-						title: t("how.inputDaysTitle"),
-						desc: t("how.inputDaysDescription"),
-					},
-					{
-						num: "2",
-						bg: "var(--color-brand-teal)",
-						iconBg: "var(--color-brand-sky)",
-						icon: "🧮",
-						title: t("how.engineTitle"),
-						desc: t("how.engineDescription"),
-					},
-					{
-						num: "3",
-						bg: "var(--color-brand-purple)",
-						iconBg: "var(--color-brand-pink)",
-						icon: "📤",
-						title: t("how.exportTitle"),
-						desc: t("how.exportDescription"),
-					},
-				].map(({ num, bg, iconBg, icon, title, desc }) => (
+				{steps.map(({ num, bg, iconBg, icon, title, desc }) => (
 					<div
 						key={num}
 						className={cn(

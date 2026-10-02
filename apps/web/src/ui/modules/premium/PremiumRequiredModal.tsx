@@ -35,7 +35,12 @@ interface PremiumRequiredModalProps {
 const MS_PER_SECOND = 1000;
 const AUTO_CLOSE_MS = 5 * MS_PER_SECOND;
 
-const createEmailSchema = ({ invalid, required }: { invalid: string; required: string }) =>
+interface CreateEmailSchemaParams {
+	invalid: string;
+	required: string;
+}
+
+const createEmailSchema = ({ invalid, required }: CreateEmailSchemaParams) =>
 	z.object({
 		email: z.email(invalid).min(1, required),
 	});
@@ -56,7 +61,10 @@ export const PremiumRequiredModal = ({
 	const tEmail = useTranslations("validation.email");
 	const featureLabel = usePremiumFeatureLabel();
 	const [step, setStep] = useState<Step>(Step.INPUT);
+	const [shownFeature, setShownFeature] = useState(feature);
 	const autoCloseRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+	if (feature !== null && feature !== shownFeature) setShownFeature(feature);
 
 	const emailSchema = useMemo(
 		() => createEmailSchema({ invalid: tEmail("invalid"), required: tEmail("required") }),
@@ -116,7 +124,11 @@ export const PremiumRequiredModal = ({
 					</DialogTitle>
 					<Banner icon={Lock} title={t("premiumRequired")} colorScheme="indigo">
 						<span>
-							{feature && <strong className="capitalize">{featureLabel(feature)}</strong>} {t("featureRequiresPremium")}
+							{shownFeature &&
+								t.rich("featureRequiresPremium", {
+									feature: featureLabel(shownFeature),
+									b: (chunks) => <strong className="capitalize">{chunks}</strong>,
+								})}
 						</span>
 					</Banner>
 					<DialogDescription>{t("verifyDescription")}</DialogDescription>

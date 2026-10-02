@@ -9,7 +9,7 @@ Source: `apps/web/src/ui/modules/pages/planner/summary/`. These components are *
 
 ## The Recharts components
 
-They all follow the same skeleton: a core `Card` with an icon-and-title header, a description line computed from the data, and a `ResponsiveContainer` chart body, each wrapped in `PremiumFeature`,, which blurs the chart and pitches the upgrade for free users.
+They all follow the same skeleton: a core `Card` with an icon-and-title header, a description line computed from the data, and a `ResponsiveContainer` chart body, each wrapped in `PremiumFeature`, which blurs the chart and pitches Premium to free users.
 
 ### QuarterDistributionChart
 
@@ -21,7 +21,7 @@ They all follow the same skeleton: a core `Card` with an icon-and-title header, 
 
 ### HolidaysDistributionChart
 
-`HolidaysDistributionChart.tsx` is a `PieChart` splitting the year's free days into national holidays, regional holidays (via `HolidayVariant` from `@application/dto/holiday/types`) and PTO days (`ptoDays`, `holidays: HolidayDTO[]`). A custom legend reuses the planner calendar's `MODIFIERS_CLASS_NAMES` colors (`apps/web/src/ui/modules/pages/planner/calendar/utils/helpers.ts`) so pie slices match the day colors users see in the calendar.
+`HolidaysDistributionChart.tsx` is a `PieChart` of PTO Days against National, Regional and Custom Holidays (via `HolidayVariant` from `@application/dto/holiday/types`; `ptoDays`, `holidays: HolidayDTO[]`). Each slice and its entry in the custom legend take their colour from `COLOR_SCHEMES` in `apps/web/src/ui/modules/pages/planner/summary/const.ts`, the cycle every chart here shares.
 
 ### BlocksPerQuarterChart
 

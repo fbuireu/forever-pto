@@ -2,7 +2,8 @@ import type { CreatePaymentInput } from "@application/dto/payment/schema";
 import { createPaymentRequest } from "@infrastructure/api/operations/payment";
 import { resolveClientIp } from "@infrastructure/api/operations/types";
 import { parseJsonBody } from "@infrastructure/api/parseJsonBody";
-import { type NextRequest, NextResponse } from "next/server";
+import { noStore } from "@infrastructure/api/response";
+import type { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
 	const { status, body } = await createPaymentRequest({
@@ -13,5 +14,5 @@ export async function POST(request: NextRequest) {
 		},
 	});
 
-	return NextResponse.json(body, { status });
+	return noStore({ body, init: { status } });
 }

@@ -5,13 +5,15 @@ import { describe, expect, it } from "vitest";
 import { ContactFormEmail } from "./Contact";
 
 const PUBLIC_DIR = join(import.meta.dirname, "../../../../public");
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
+if (!SITE_URL) throw new Error("vitest.config.ts sets NEXT_PUBLIC_SITE_URL for the unit suite");
 
 const BASE_PROPS = {
 	email: "alice@example.com",
 	name: "Alice Smith",
 	subject: "Hello there",
 	message: "This is my message.",
-	baseUrl: process.env.NEXT_PUBLIC_SITE_URL,
+	baseUrl: SITE_URL,
 };
 
 const getHtml = (props = BASE_PROPS) => render(ContactFormEmail(props));
@@ -49,7 +51,7 @@ describe("ContactFormEmail", () => {
 
 	it("logo src uses baseUrl", async () => {
 		const html = await getHtml();
-		expect(html).toContain(`${process.env.NEXT_PUBLIC_SITE_URL}/static/images/forever-pto-logo.png`);
+		expect(html).toContain(`${SITE_URL}/static/images/forever-pto-logo.png`);
 	});
 
 	it("logo src updates when baseUrl changes", async () => {

@@ -1,8 +1,8 @@
 import { Link } from "@application/i18n/navigation";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { MAIN_CONTENT_ID } from "@ui/modules/layout/SkipToContent";
-import { Header } from "@ui/modules/pages/homepage/navigation/Navigation";
 import { Footer } from "@ui/modules/shared/footer/Footer";
+import { Header } from "@ui/modules/shared/Header";
 import { cn } from "@ui/utils/cn";
 import type { Locale } from "next-intl";
 import { getTranslations } from "next-intl/server";
@@ -48,11 +48,14 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
 						</span>
 
 						<h1 className="font-display font-semibold leading-none tracking-[-0.035em] mb-[18px] text-wrap-pretty text-[clamp(34px,4.4vw,56px)]">
-							{t("title")}{" "}
-							<span className="inline-block bg-[var(--accent)] px-2 border-[3px] border-[var(--frame)] rounded-[6px] mx-0.5 rotate-[-1.5deg]">
-								{t("titleHighlight")}
-							</span>{" "}
-							<em className="font-serif italic font-normal">{t("titleEmphasis")}</em>
+							{t.rich("title", {
+								highlight: (chunks) => (
+									<span className="inline-block bg-[var(--accent)] px-2 border-[3px] border-[var(--frame)] rounded-[6px] mx-0.5 rotate-[-1.5deg]">
+										{chunks}
+									</span>
+								),
+								em: (chunks) => <em className="font-serif italic font-normal">{chunks}</em>,
+							})}
 						</h1>
 
 						<p className="text-[18px] leading-[1.55] text-muted-foreground max-w-[46ch] mb-8">{t("lede")}</p>
@@ -64,10 +67,10 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
 								asChild
 								className="text-[var(--accent)] dark:text-primary-foreground [filter:none] hover:[filter:none] active:[filter:none] shadow-[var(--shadow-brutal-btn-accent)] hover:shadow-[var(--shadow-brutal-btn-accent-hover)] active:shadow-[var(--shadow-brutal-btn-accent-active)]"
 							>
-								<Link href="/">← {t("ctaPrimary")}</Link>
+								<Link href="/">{t("ctaPrimary")}</Link>
 							</Button>
 							<Button variant="outline" size="lg" asChild>
-								<Link href="/planner">{t("ctaPlanner")} →</Link>
+								<Link href="/planner">{t("ctaPlanner")}</Link>
 							</Button>
 						</div>
 

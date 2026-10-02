@@ -25,6 +25,8 @@ const [LocalTooltipProvider, useTooltip] = getStrictContext<TooltipContextType>(
 
 const TooltipDelayContext = createContext(0);
 
+const FOLLOW_CURSOR_SPRING: SpringOptions = { stiffness: 200, damping: 17 };
+
 type TooltipProviderProps = { delay?: number; children?: ReactNode };
 function TooltipProvider({ delay = 0, children }: TooltipProviderProps) {
 	return <TooltipDelayContext value={delay}>{children}</TooltipDelayContext>;
@@ -34,11 +36,7 @@ type TooltipProps = ComponentProps<typeof PopoverPrimitive.Root> & {
 	followCursor?: boolean | "x" | "y";
 	followCursorSpringOptions?: SpringOptions;
 };
-function Tooltip({
-	followCursor = false,
-	followCursorSpringOptions = { stiffness: 200, damping: 17 },
-	...props
-}: TooltipProps) {
+function Tooltip({ followCursor = false, followCursorSpringOptions = FOLLOW_CURSOR_SPRING, ...props }: TooltipProps) {
 	const [isOpen, setIsOpen] = useControlledState({
 		value: props?.open,
 		defaultValue: props?.defaultOpen ?? false,

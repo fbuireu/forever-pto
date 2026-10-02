@@ -17,13 +17,13 @@ vi.mock("next/dynamic", () => ({
 		);
 	},
 }));
-vi.mock("@ui/modules/shared/donate/Donate", () => ({ Donate: MockDonate }));
+vi.mock("./Donate", () => ({ Donate: MockDonate }));
 
 const { DonateClient } = await import("./DonateClient");
 
 describe("DonateClient", () => {
 	it("defers the popover to the client, since Stripe cannot mount on the server", () => {
-		render(<DonateClient />);
+		render(<DonateClient bottomClassName="bottom-4" />);
 
 		expect(screen.getByTestId("donate")).toBeDefined();
 		expect(dynamic.options?.ssr).toBe(false);
@@ -36,7 +36,7 @@ describe("DonateClient", () => {
 	});
 
 	it("loads the real popover module behind the split", async () => {
-		render(<DonateClient />);
+		render(<DonateClient bottomClassName="bottom-4" />);
 
 		expect((await dynamic.loader?.())?.default).toBe(MockDonate);
 	});

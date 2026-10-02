@@ -2,9 +2,9 @@ import type { NewPayment, PaymentData } from "@application/dto/payment/types";
 import type { ReportedPaymentStatus } from "@domain/payment/events/types";
 import { TursoService } from "@infrastructure/clients/db/turso/service";
 import type { DatabaseError } from "@infrastructure/errors";
-import { normalizePromoCode } from "@infrastructure/services/payments/normalForms";
-import { normalizeEmail } from "@infrastructure/services/payments/normalizeEmail";
 import { Effect } from "effect";
+import { normalizePromoCode } from "./normalForms";
+import { normalizeEmail } from "./normalizeEmail";
 
 export const savePayment = (data: NewPayment): Effect.Effect<boolean, DatabaseError, TursoService> =>
 	Effect.gen(function* () {

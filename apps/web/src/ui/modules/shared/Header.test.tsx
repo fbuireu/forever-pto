@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import enMessages from "@i18n/messages/en.json";
 import { render, screen } from "@testing-library/react";
 import { createTranslator } from "next-intl";
@@ -10,7 +12,7 @@ vi.mock("next-intl/server", () => ({ getTranslations: mockGetTranslations }));
 vi.mock("@application/i18n/navigation", () => ({
 	Link: ({ children, ...props }: ComponentProps<"a">) => <a {...props}>{children}</a>,
 }));
-vi.mock("@ui/modules/pages/homepage/quick-start/QuickStartTrigger", () => ({
+vi.mock("./QuickStartTrigger", () => ({
 	QuickStartTrigger: ({ children, source }: { children: ReactNode; source: string }) => (
 		<button type="button" data-testid="quick-start-trigger" data-source={source}>
 			{children}
@@ -33,7 +35,7 @@ vi.mock("./HomepageLanguageSwitcher", () => ({
 }));
 vi.mock("next/image", () => ({ default: () => null }));
 
-import { Header } from "./Navigation";
+import { Header } from "./Header";
 
 const nav = enMessages.homepage.nav;
 
@@ -77,5 +79,13 @@ describe("Header", () => {
 
 		expect(landmark.contains(screen.getByTestId("theme"))).toBe(true);
 		expect(landmark.contains(screen.getByTestId("language"))).toBe(true);
+	});
+});
+
+describe("Header's imports", () => {
+	it("reaches into no screen's folder, since every screen that renders it may import it", () => {
+		const source = readFileSync(join(__dirname, "Header.tsx"), "utf8");
+
+		expect(source).not.toMatch(/modules\/pages\/|\.\.\/pages\//);
 	});
 });

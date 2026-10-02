@@ -6,8 +6,7 @@ import { isSameDay, isWeekend } from "@application/shared/utils/dates";
 import { generateMetrics } from "@domain/calendar/metrics/generateMetrics";
 import type { MeasuredSuggestion, Suggestion } from "@domain/calendar/types";
 import { measureBudget } from "@domain/calendar/utils/budget";
-import { isInPlanningWindow, planningWindowInterval } from "@domain/calendar/window";
-import type { Locale } from "next-intl";
+import { isInPlanningWindow, type PlanningWindow, planningWindowInterval } from "@domain/calendar/window";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { obfuscatedStorage } from "./crypto";
@@ -23,11 +22,12 @@ import {
 	DayRefusal,
 	type EditHolidayParams,
 	type FetchHolidaysParams,
+	type GenerateSuggestionsParams,
 	type HolidayOutcome,
 	HolidayRefusal,
 	holidaysKeyOf,
-	type MainThreadSuggestionsParams,
-	type PlanningWindowParams,
+	type SetCalculationResultParams,
+	type ToggleDaySelectionParams,
 } from "./types";
 
 export interface HolidaysState {
@@ -44,6 +44,7 @@ export interface HolidaysState {
 	hasCalculated: boolean;
 	planRevision: number;
 	holidaysKey: string | null;
+	planAskedFor: boolean;
 }
 
 interface HeldOnParams {
@@ -58,10 +59,11 @@ interface DateHolder {
 
 interface HolidaysActions {
 	fetchHolidays: (params: FetchHolidaysParams) => Promise<void>;
-	generateSuggestions: (params: MainThreadSuggestionsParams) => Promise<void>;
+	generateSuggestions: (params: GenerateSuggestionsParams) => Promise<void>;
 	setCalculating: (v: boolean) => void;
-	setCalculationResult: (result: { suggestion: MeasuredSuggestion; alternatives: MeasuredSuggestion[] }) => void;
-	setMaxAlternatives: (max: number) => void;
+	askForPlan: () => void;
+	claimPlanAskedFor: () => boolean;
+	setCalculationResult: (params: SetCalculationResultParams) => void;
 	setCurrentAlternativeSelection: (params: AlternativeSelectionBaseParams) => void;
 	setPreviewAlternativeSelection: (params: AlternativePreviewParams) => void;
 	resetToDefaults: () => void;
@@ -69,13 +71,8 @@ interface HolidaysActions {
 	addHoliday: (params: AddHolidayParams) => HolidayOutcome;
 	editHoliday: (params: EditHolidayParams) => HolidayOutcome;
 	removeHoliday: (holidayId: string) => void;
-	toggleDaySelection: (params: {
-		date: Date;
-		totalPtoDays: number;
-		locale: Locale;
-		allowPastDays: boolean;
-	}) => DayOutcome;
-	pruneDaysOutsideWindow: (params?: PlanningWindowParams) => void;
+	toggleDaySelection: (params: ToggleDaySelectionParams) => DayOutcome;
+	pruneDaysOutsideWindow: (window?: PlanningWindow) => void;
 	clearCalculation: () => void;
 	resetManualSelection: () => void;
 	trimManualDays: (maxPtoDays: number) => void;
@@ -102,6 +99,7 @@ const holidaysInitialState: HolidaysState = {
 	hasCalculated: false,
 	planRevision: 0,
 	holidaysKey: null,
+	planAskedFor: false,
 };
 
 export type PersistedHolidays = ReturnType<typeof partializeHolidays>;
@@ -172,8 +170,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 					strategy,
 					preferredMonths,
 					locale,
-					autoSuggestCount,
-				}: MainThreadSuggestionsParams) => {
+				}: GenerateSuggestionsParams) => {
 					const { holidays, maxAlternatives, manuallySelectedDays, removedSuggestedDays } = get();
 
 					try {
@@ -182,7 +179,6 @@ export const useHolidaysStore = create<HolidaysStore>()(
 						const { planned, suggestion, alternatives } = runPlanningPipeline({
 							window: { year, carryOverMonths },
 							ptoDays,
-							autoSuggestCount,
 							holidays,
 							manuallySelectedDays,
 							removedSuggestedDays,
@@ -238,13 +234,17 @@ export const useHolidaysStore = create<HolidaysStore>()(
 					set({ isCalculating: v });
 				},
 
-				setCalculationResult: ({
-					suggestion,
-					alternatives,
-				}: {
-					suggestion: MeasuredSuggestion;
-					alternatives: MeasuredSuggestion[];
-				}) => {
+				askForPlan: () => {
+					set({ planAskedFor: true });
+				},
+
+				claimPlanAskedFor: () => {
+					const { planAskedFor } = get();
+					if (planAskedFor) set({ planAskedFor: false });
+					return planAskedFor;
+				},
+
+				setCalculationResult: ({ suggestion, alternatives }: SetCalculationResultParams) => {
 					const { currentSelectionIndex } = get();
 					const allSuggestions = [suggestion, ...alternatives];
 					const preservedIndex = currentSelectionIndex < allSuggestions.length ? currentSelectionIndex : 0;
@@ -259,10 +259,6 @@ export const useHolidaysStore = create<HolidaysStore>()(
 						removedSuggestedDays: [],
 						hasCalculated: true,
 					});
-				},
-
-				setMaxAlternatives: (max: number) => {
-					set({ maxAlternatives: Math.max(0, max) });
 				},
 
 				setCurrentAlternativeSelection: ({ suggestion, index }: AlternativeSelectionBaseParams) => {
@@ -465,8 +461,8 @@ export const useHolidaysStore = create<HolidaysStore>()(
 					return { applied: true, change };
 				},
 
-				pruneDaysOutsideWindow: (params?: PlanningWindowParams) => {
-					const { year, carryOverMonths } = params ?? useFiltersStore.getState();
+				pruneDaysOutsideWindow: (window?: PlanningWindow) => {
+					const { year, carryOverMonths } = window ?? useFiltersStore.getState();
 					const { manuallySelectedDays, removedSuggestedDays } = get();
 
 					const planningWindow = planningWindowInterval({ year, carryOverMonths });

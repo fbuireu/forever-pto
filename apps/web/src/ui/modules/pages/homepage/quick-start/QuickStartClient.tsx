@@ -2,6 +2,7 @@
 
 import type { CountryDTO } from "@application/dto/country/types";
 import { useUIStore } from "@application/stores/ui";
+import { useCurrentYear } from "@ui/hooks/useCurrentYear";
 import { useHasOpened } from "@ui/hooks/useHasOpened";
 import dynamic from "next/dynamic";
 
@@ -16,12 +17,13 @@ const PremiumModal = dynamic(
 
 interface QuickStartClientProps {
 	countries: CountryDTO[];
-	currentYear: number;
+	serverYear: number;
 }
 
-export const QuickStartClient = ({ countries, currentYear }: QuickStartClientProps) => {
+export const QuickStartClient = ({ countries, serverYear }: QuickStartClientProps) => {
 	const open = useUIStore((state) => state.quickStartOpen);
 	const hasOpened = useHasOpened({ open });
+	const currentYear = useCurrentYear({ serverYear });
 
 	if (!hasOpened) return null;
 

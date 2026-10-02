@@ -1,3 +1,4 @@
+import { AMOUNT_MAX, AMOUNT_MIN } from "@application/dto/payment/schema";
 import enMessages from "@i18n/messages/en.json";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
@@ -5,8 +6,14 @@ import { useForm } from "react-hook-form";
 import { describe, expect, it, vi } from "vitest";
 import { DonationForm } from "./DonationForm";
 
+vi.mock("@application/dto/payment/schema", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@application/dto/payment/schema")>()),
+	AMOUNT_MIN: 3,
+	AMOUNT_MAX: 500,
+}));
+
 const Harness = ({ isPending }: { isPending: boolean }) => {
-	const form = useForm({ defaultValues: { email: "", amount: 10, promoCode: "" } });
+	const form = useForm({ defaultValues: { email: "", amount: "10", promoCode: "" } });
 
 	return (
 		<NextIntlClientProvider locale="en" messages={enMessages}>
@@ -100,6 +107,13 @@ describe("DonationForm", () => {
 		}
 	});
 
+	it("bounds the amount field with the limits the payment schema enforces", () => {
+		render(<Harness isPending={false} />);
+		const amount = screen.getByPlaceholderText(enMessages.donationForm.enterAmount);
+
+		expect([amount.getAttribute("min"), amount.getAttribute("max")]).toEqual([String(AMOUNT_MIN), String(AMOUNT_MAX)]);
+	});
+
 	it("lands the amount label on the input rather than on the group wrapping it", () => {
 		render(<Harness isPending={false} />);
 
@@ -114,7 +128,7 @@ describe("DonationForm", () => {
 		expect(screen.getByTestId("amount").textContent).toBe("15");
 	});
 
-	it("stores the typed amount as a number, and an emptied field as zero rather than NaN", () => {
+	it("holds the typed amount as text, an emptied field included, for the schema to convert when it is used", () => {
 		render(<Harness isPending={false} />);
 		const amount = screen.getByPlaceholderText(enMessages.donationForm.enterAmount);
 
@@ -122,7 +136,16 @@ describe("DonationForm", () => {
 		expect(screen.getByTestId("amount").textContent).toBe("25");
 
 		fireEvent.change(amount, { target: { value: "" } });
-		expect(screen.getByTestId("amount").textContent).toBe("0");
+		expect(screen.getByTestId("amount").textContent).toBe("");
+	});
+
+	it("writes no 0 into the amount field when the browser reports it empty, emptied or holding a partial amount", () => {
+		render(<Harness isPending={false} />);
+		const amount = screen.getByPlaceholderText<HTMLInputElement>(enMessages.donationForm.enterAmount);
+
+		fireEvent.change(amount, { target: { value: "" } });
+
+		expect(amount.value).toBe("");
 	});
 
 	it("promises no description on a field that has none", () => {

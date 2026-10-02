@@ -6,8 +6,9 @@ payment and contact records and nothing else. Read this before your first pull r
 rejected commit.
 
 If you want the shape of the codebase, that is [AGENTS.md](../AGENTS.md) and the package guides it links.
-If you want the vocabulary, that is [CONTEXT.md](../CONTEXT.md). If you want the *why*, that is
-[adr/](../adr/).
+If you want how code here is written, and what a review holds a diff to, that is
+[CODING_STANDARDS.md](../CODING_STANDARDS.md). If you want the vocabulary, that is [CONTEXT.md](../CONTEXT.md).
+If you want the *why*, that is [adr/](../adr/).
 
 ## Code of Conduct
 
@@ -43,7 +44,8 @@ already being talked about.
 
 Use the [documentation template](ISSUE_TEMPLATE/documentation.yml), or just open a pull request. The
 user-facing documentation is the docs site, built from `apps/docs`; the agent-facing guides (`AGENTS.md` and
-friends) are held to the code by a test, so read *The docs are part of the change* below before editing one.
+friends) and `CODING_STANDARDS.md` are held to the code by a test, so read *The docs are part of the change*
+below before editing one.
 
 ## Getting started
 
@@ -86,22 +88,15 @@ The hook runs the changed-only variant rather than `verify` because the coverage
 cannot both hold; CI runs the full `pnpm verify` on the pushed sha, so a push whose coverage dropped still
 fails its check. [AGENTS.md](../AGENTS.md) explains the trade.
 
-## Conventions that will bite you if you skip them
+## Code conventions
 
-- **Use the glossary's words.** [CONTEXT.md](../CONTEXT.md) names one canonical term per concept: PTO Day,
-  Bridge, Suggestion, Donation. A variable named after a retired term is a defect, not a style preference.
-- **No explanatory comments in TypeScript sources.** The folder's `AGENTS.md` carries the explanation
-  instead.
-- **One argument is positional and two or more are a single object typed `<FunctionName>Params`**:
-  `localePath({ locale, path }: LocalePathParams)`. The exception is a function a runtime calls back, such
-  as a `toSorted` comparator, which is handed its arguments one at a time.
-- **`Temporal` comes from `temporal-polyfill`, never the global**: the global does not resolve in the
-  deployed Workers runtime.
-- **Cross-layer imports use the path aliases; same-folder imports stay relative.** No re-export barrel
-  files: import from the source module.
-- **Don't bump Next or TypeScript on your own.** Next and the Cloudflare adapter move as a pair, and the
-  docs package is held to an older TypeScript line than the app; the *Versions* section of
-  [AGENTS.md](../AGENTS.md) explains why raising either breaks the build or the deployed Worker.
+How code here is written is [CODING_STANDARDS.md](../CODING_STANDARDS.md), the file a review holds a diff to. It
+opens with what Biome, the type checkers and the tests already enforce; the rules after that are the ones a
+reviewer checks by hand.
+
+**Don't bump Next or TypeScript on your own.** Next and the Cloudflare adapter move as a pair, and the docs
+package stays on an older TypeScript line than the app; the *Versions* section of [AGENTS.md](../AGENTS.md)
+says why raising either breaks the build or the deployed Worker.
 
 ## Commit rules
 
@@ -138,8 +133,8 @@ Do **not** add a `Co-Authored-By` trailer for an AI assistant to a commit or a p
 This repo treats its documentation as part of the code: change one, update the other **in the same
 commit**. A follow-up commit is a promise, not a fix.
 [`tests/docs-consistency.test.ts`](../tests/docs-consistency.test.ts) runs with the unit tests and fails the
-build when the mechanical half of that contract is broken: scripts that no longer exist, links that no
-longer resolve, aliases that moved. When it fails, the docs and the code disagree; fix whichever is wrong,
+build when the mechanical half of that contract is broken: a script, a link or an alias a document names that
+the repository does not have. When it fails, the docs and the code disagree; fix whichever is wrong,
 and never delete an assertion to get green. [AGENTS.md](../AGENTS.md) has the full table of what to update
 for a given change.
 

@@ -112,7 +112,7 @@ does not control the traffic to, in order to keep a toolchain version the app ga
 - **`/[locale]/payment/confirmation` renders at request time too**, and escapes the e2e suite only because
   [`middleware.ts`](../apps/web/src/middleware.ts) redirects it away when `payment_intent` is absent. It was never confirmed broken or
   healthy under 16.3; whoever revisits this pin should check it with a real payment intent first.
-- Recorded in [`AGENTS.md`](../apps/web/AGENTS.md) under *Versions* and *Structure & aliases*.
+- Recorded in the *Versions* section of [`../AGENTS.md`](../AGENTS.md) and under *Commands* in [`../apps/web/AGENTS.md`](../apps/web/AGENTS.md).
 
 ## Amendment, 2026-08-29: what moved and what is still unverified
 

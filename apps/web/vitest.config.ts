@@ -33,10 +33,7 @@ export default defineConfig({
 			include: ["src/**/*.{ts,tsx}"],
 			exclude: [
 				"src/**/*.test.{ts,tsx}",
-				"src/**/*.spec.{ts,tsx}",
-				"src/**/*.d.ts",
 				"src/**/types.ts",
-				"src/**/*.types.ts",
 				"src/app/fonts.ts",
 				"src/ui/modules/bones/**",
 				"src/ui/assets/icons/**",

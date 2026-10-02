@@ -6,15 +6,9 @@ vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track 
 
 import { DonateSource, QuickStartSource, useUIStore } from "./ui";
 
-const INITIAL = {
-	donatePopoverOpen: false,
-	donatePopoverIsOpening: false,
-	quickStartOpen: false,
-};
-
 beforeEach(() => {
 	track.mockClear();
-	useUIStore.setState(INITIAL);
+	useUIStore.setState(useUIStore.getInitialState());
 	vi.useFakeTimers();
 });
 

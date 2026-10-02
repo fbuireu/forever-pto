@@ -1,7 +1,7 @@
 import { addDays } from "@application/shared/utils/dates";
 import { MAX_CARRY_OVER_MONTHS, planningWindowInterval } from "@domain/calendar/window";
 import { describe, expect, it } from "vitest";
-import { holidayDTO } from "./dto";
+import { type CreateCustomHolidayParams, holidayDTO } from "./dto";
 import type { RawHoliday } from "./types";
 import { HolidayVariant } from "./types";
 
@@ -164,7 +164,12 @@ describe("holidayDTO", () => {
 });
 
 describe("holidayDTO.createCustom", () => {
-	const BASE = { name: "Day Off", date: new Date(2024, 5, 15), locale: "en", year: 2024, carryOverMonths: 0 };
+	const BASE: CreateCustomHolidayParams = {
+		name: "Company closure",
+		date: new Date(2024, 5, 15),
+		year: 2024,
+		carryOverMonths: 0,
+	};
 
 	it("creates a CUSTOM variant holiday", () => {
 		const result = holidayDTO.createCustom(BASE);

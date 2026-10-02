@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@styles/lazy/index.css", () => ({}));
+vi.mock("./driver.css", () => ({}));
 
 const { DriverStyles } = await import("./DriverStyles");
 

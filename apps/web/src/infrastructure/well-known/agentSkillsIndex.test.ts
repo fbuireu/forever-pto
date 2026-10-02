@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { agentSkillsIndex } from "./agentSkillsIndex";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL;
+if (!BASE_URL) throw new Error("vitest.config.ts sets NEXT_PUBLIC_SITE_URL for the unit suite");
 
 describe("agentSkillsIndex", () => {
 	it("includes all expected skill names", () => {
@@ -16,7 +17,10 @@ describe("agentSkillsIndex", () => {
 
 	it("prefixes every advertised url with baseUrl", () => {
 		const { skills } = agentSkillsIndex(BASE_URL);
-		for (const skill of skills.filter((entry: { url?: string }) => entry.url)) {
+		const advertised = skills.filter((entry: { url?: string }) => entry.url);
+
+		expect(advertised.length).toBeGreaterThan(0);
+		for (const skill of advertised) {
 			expect(skill.url).toMatch(new RegExp(`^${BASE_URL}`));
 		}
 	});
@@ -24,14 +28,17 @@ describe("agentSkillsIndex", () => {
 	it("advertises only documents the .well-known handler actually serves", () => {
 		const { skills } = agentSkillsIndex(BASE_URL);
 		const served = [`${BASE_URL}/.well-known/api-catalog`, `${BASE_URL}/.well-known/mcp/server-card.json`];
+		const advertised = skills.filter((entry: { url?: string }) => entry.url);
 
-		for (const skill of skills.filter((entry: { url?: string }) => entry.url)) {
+		expect(advertised.length).toBeGreaterThan(0);
+		for (const skill of advertised) {
 			expect(served).toContain(skill.url);
 		}
 	});
 
 	it("claims no digest, since nothing here is a file whose contents could be hashed", () => {
 		const { skills } = agentSkillsIndex(BASE_URL);
+		expect(skills.length).toBeGreaterThan(0);
 		for (const skill of skills) {
 			expect(skill).not.toHaveProperty("sha256");
 		}

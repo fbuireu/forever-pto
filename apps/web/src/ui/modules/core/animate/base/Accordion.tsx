@@ -101,7 +101,7 @@ function AccordionTrigger({
 				ref={triggerRef}
 				data-slot="accordion-trigger"
 				className={cn(
-					"flex flex-1 text-start items-center justify-between py-4 font-semibold cursor-pointer outline-none",
+					"flex flex-1 text-start items-center justify-between py-4 font-semibold cursor-pointer outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2",
 					className,
 				)}
 				{...props}

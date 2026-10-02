@@ -102,7 +102,7 @@ The Tuesday to Friday after that Holiday form a second candidate: a four-day run
 
 ## Stage 3: the Strategy
 
-A Strategy is an **objective**, not an ordering: a marginal floor and a ranking, both read against the plan built so far. `STRATEGY_OBJECTIVE` in `apps/web/src/domain/calendar/suggestions/utils/selectors.ts` holds one per `FilterStrategy`, and a single selector, `selectBridges`, applies whichever it is given. The table is rendered from the imported `FilterStrategy` constant, so it cannot drift from the code:
+A Strategy is an **objective**, not an ordering: a marginal floor and a ranking, both read against the plan built so far, and an aim, which ranks a whole plan by what the Strategy is for when the search compares its runs. `STRATEGY_OBJECTIVE` in `apps/web/src/domain/calendar/suggestions/utils/selectors.ts` holds one per `FilterStrategy`, and a single selector, `selectBridges`, applies whichever it is given. The table is rendered from the imported `FilterStrategy` constant, so it cannot drift from the code:
 
 <StrategiesTable />
 

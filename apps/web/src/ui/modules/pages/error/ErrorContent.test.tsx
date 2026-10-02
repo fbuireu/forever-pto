@@ -1,8 +1,14 @@
+import caMessages from "@i18n/messages/ca.json";
+import deMessages from "@i18n/messages/de.json";
 import en from "@i18n/messages/en.json";
+import esMessages from "@i18n/messages/es.json";
+import frMessages from "@i18n/messages/fr.json";
+import itMessages from "@i18n/messages/it.json";
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { NextIntlClientProvider } from "next-intl";
+import { type Locale, NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { version } from "../../../../../package.json";
+import type { ErrorBoundaryProps } from "./types";
 
 const { logClientError } = vi.hoisted(() => ({ logClientError: vi.fn() }));
 
@@ -26,9 +32,23 @@ const boom = (message = "palm tree overflow") => {
 	return error;
 };
 
-const renderError = (error = boom(), reset = vi.fn()) => {
+const BUNDLES: Record<string, typeof en> = {
+	en,
+	es: esMessages,
+	ca: caMessages,
+	it: itMessages,
+	de: deMessages,
+	fr: frMessages,
+};
+
+interface RenderErrorParams extends Partial<ErrorBoundaryProps> {
+	locale?: Locale;
+	messages?: typeof en;
+}
+
+const renderError = ({ error = boom(), reset = vi.fn(), locale = "en", messages = en }: RenderErrorParams = {}) => {
 	const view = render(
-		<NextIntlClientProvider locale="en" messages={en}>
+		<NextIntlClientProvider locale={locale} messages={messages}>
 			<ErrorContent error={error} reset={reset} />
 		</NextIntlClientProvider>,
 	);
@@ -72,6 +92,26 @@ describe("what the error page reports back", () => {
 	});
 });
 
+describe("the title", () => {
+	it("draws the title from one message, with the highlight and the emphasis inside it", () => {
+		renderError();
+		const heading = screen.getByRole("heading", { level: 1 });
+
+		expect(heading.textContent).toBe("The server took a day off without asking.");
+		expect(heading.querySelector("span")?.textContent).toBe("day off");
+		expect(heading.querySelector("em")?.textContent).toBe("without asking.");
+	});
+
+	it.each(Object.entries(BUNDLES))("renders the %s title with its highlight and emphasis", (locale, messages) => {
+		renderError({ locale: locale as Locale, messages });
+		const heading = screen.getByRole("heading", { level: 1 });
+
+		expect(heading.querySelector("span")?.textContent).toMatch(/\S/);
+		expect(heading.querySelector("em")?.textContent).toMatch(/\S/);
+		expect(heading.textContent).not.toMatch(/[<>{}]|error\./);
+	});
+});
+
 describe("the terminal the page types out", () => {
 	it("shows nothing at first, then a line at a time", () => {
 		renderError();
@@ -108,7 +148,7 @@ describe("the terminal the page types out", () => {
 	});
 
 	it("falls back to a generic message when the error carries none", () => {
-		renderError(Object.assign(new Error(""), { digest: undefined }));
+		renderError({ error: Object.assign(new Error(""), { digest: undefined }) });
 
 		revealEverything();
 

@@ -1,20 +1,13 @@
+import type { DiscountInfo } from "@application/dto/payment/types";
+import { PromoCodeErrors } from "@application/dto/payment/types";
+import type { createPayment } from "@application/use-cases/payment";
 import { ApiError } from "@infrastructure/api/errors";
-import { PaymentError, PromoCodeError, PromoCodeErrors, RateLimitError, ValidationError } from "@infrastructure/errors";
+import { PaymentError, PromoCodeError, RateLimitError, ValidationError } from "@infrastructure/errors";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockCheckRateLimit = vi.hoisted(() => vi.fn<(ip: string) => Effect.Effect<void, RateLimitError>>());
-const mockCreatePayment = vi.hoisted(() =>
-	vi.fn<
-		(
-			body: unknown,
-			ctx: unknown,
-		) => Effect.Effect<
-			{ clientSecret: string; discountInfo: null; deferred?: Effect.Effect<void> },
-			ValidationError | PaymentError
-		>
-	>(),
-);
+const mockCreatePayment = vi.hoisted(() => vi.fn<typeof createPayment>());
 const mockAfter = vi.hoisted(() => vi.fn((work: () => unknown) => work()));
 
 vi.mock("@infrastructure/services/payments/rateLimit", () => ({ checkRateLimit: mockCheckRateLimit }));
@@ -31,7 +24,7 @@ beforeEach(() => {
 	vi.clearAllMocks();
 	mockCheckRateLimit.mockReturnValue(Effect.succeed(undefined));
 	mockCreatePayment.mockReturnValue(
-		Effect.succeed({ clientSecret: "pi_secret", discountInfo: null, deferred: Effect.void }),
+		Effect.succeed({ clientSecret: "client-secret-abc", discountInfo: null, deferred: Effect.void }),
 	);
 });
 
@@ -41,7 +34,7 @@ describe("createPaymentRequest", () => {
 
 		expect(outcome).toEqual({
 			status: 200,
-			body: { success: true, clientSecret: "pi_secret", discountInfo: undefined },
+			body: { success: true, clientSecret: "client-secret-abc", discountInfo: undefined },
 		});
 	});
 
@@ -87,9 +80,7 @@ describe("createPaymentRequest", () => {
 	});
 
 	it("maps a promo-code failure to 400 carrying the code and its own flag", async () => {
-		mockCreatePayment.mockReturnValue(
-			Effect.fail(new PromoCodeError({ code: PromoCodeErrors.USAGE_LIMIT_REACHED })) as never,
-		);
+		mockCreatePayment.mockReturnValue(Effect.fail(new PromoCodeError({ code: PromoCodeErrors.USAGE_LIMIT_REACHED })));
 
 		const outcome = await createPaymentRequest({ input: Effect.succeed(INPUT), context: CONTEXT });
 
@@ -100,14 +91,21 @@ describe("createPaymentRequest", () => {
 	});
 
 	it("carries a discount through to the body, where a null one is dropped", async () => {
-		const discountInfo = { finalAmount: 7.99, originalAmount: 9.99, percentOff: 20, code: "SAVE20" };
+		const discountInfo: DiscountInfo = {
+			type: "percent",
+			value: 20,
+			originalAmount: 9.99,
+			finalAmount: 7.99,
+			couponId: "coup_abc",
+			couponName: "SAVE20",
+		};
 		mockCreatePayment.mockReturnValue(
-			Effect.succeed({ clientSecret: "pi_secret", discountInfo, deferred: Effect.void } as never),
+			Effect.succeed({ clientSecret: "client-secret-abc", discountInfo, deferred: Effect.void }),
 		);
 
 		const outcome = await createPaymentRequest({ input: Effect.succeed(INPUT), context: CONTEXT });
 
-		expect(outcome.body).toEqual({ success: true, clientSecret: "pi_secret", discountInfo });
+		expect(outcome.body).toEqual({ success: true, clientSecret: "client-secret-abc", discountInfo });
 	});
 
 	it("maps a payment failure to 500 without leaking the reason", async () => {
@@ -129,7 +127,7 @@ describe("createPaymentRequest", () => {
 	it("defers the record write so it cannot delay the reply", async () => {
 		const persisted = vi.fn();
 		mockCreatePayment.mockReturnValue(
-			Effect.succeed({ clientSecret: "pi_secret", discountInfo: null, deferred: Effect.sync(persisted) }),
+			Effect.succeed({ clientSecret: "client-secret-abc", discountInfo: null, deferred: Effect.sync(persisted) }),
 		);
 
 		await createPaymentRequest({ input: Effect.succeed(INPUT), context: CONTEXT });

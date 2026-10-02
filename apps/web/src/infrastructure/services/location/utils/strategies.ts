@@ -50,7 +50,10 @@ const detectCountryFromEgressIPEffect = Effect.gen(function* () {
 	if (!ip) return "";
 
 	const geoResponse = yield* Effect.tryPromise(() =>
-		noStoreFetch({ url: `${GEO_SERVICE}/${ip}/${FORMAT}`, init: { headers: { Accept: "application/json" } } }),
+		noStoreFetch({
+			url: `${GEO_SERVICE}/${encodeURIComponent(ip)}/${FORMAT}`,
+			init: { headers: { Accept: "application/json" } },
+		}),
 	);
 
 	if (!geoResponse.ok) return "";

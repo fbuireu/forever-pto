@@ -39,7 +39,9 @@ export const QuickStartLocationStep = ({ countries, regions, draft, onChange }: 
 			</div>
 			<div className="space-y-2">
 				<Label htmlFor={REGION_ID}>
-					{t("region")} <span className="font-normal text-muted-foreground">({t("optional")})</span>
+					{t.rich("region", {
+						optional: (chunks) => <span className="font-normal text-muted-foreground">{chunks}</span>,
+					})}
 				</Label>
 				<Combobox
 					id={REGION_ID}

@@ -11,6 +11,10 @@ const filters = vi.hoisted(() => ({ country: "", setCountry: vi.fn() }));
 const location = vi.hoisted(() => ({ setCountries: vi.fn() }));
 
 const track = vi.hoisted(() => vi.fn());
+const askForPlan = vi.hoisted(() => vi.fn());
+vi.mock("@application/stores/holidays", () => ({
+	useHolidaysStore: (selector: (state: unknown) => unknown) => selector({ askForPlan }),
+}));
 vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
 
 vi.mock("@application/stores/filters", () => ({
@@ -83,6 +87,15 @@ describe("CountriesClient", () => {
 });
 
 describe("CountriesClient analytics", () => {
+	it("asks for a plan when another country is picked", async () => {
+		askForPlan.mockClear();
+		renderCountries();
+
+		await userEvent.click(screen.getByRole("option", { name: "France" }));
+
+		expect(askForPlan).toHaveBeenCalledOnce();
+	});
+
 	it("reports the country that was picked as a planning input change", async () => {
 		track.mockClear();
 		renderCountries();

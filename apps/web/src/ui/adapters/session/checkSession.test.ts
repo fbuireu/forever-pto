@@ -1,7 +1,13 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockFetch = vi.fn();
 vi.stubGlobal("fetch", mockFetch);
+
+afterAll(() => {
+	vi.unstubAllGlobals();
+});
 
 const { verifyPremiumEmail, getExistingSession } = await import("./checkSession");
 
@@ -64,7 +70,7 @@ describe("getExistingSession", () => {
 		expect(await getExistingSession()).toBeNull();
 	});
 
-	it("returns full SessionData when premiumKey is present", async () => {
+	it("returns the session when the body carries a premium key and an email", async () => {
 		mockFetch.mockResolvedValue({
 			ok: true,
 			json: vi.fn().mockResolvedValue({ premiumKey: "pk_abc", email: "user@example.com" }),
@@ -107,5 +113,17 @@ describe("getExistingSession", () => {
 		const [url, options] = mockFetch.mock.calls[0] as [string, RequestInit];
 		expect(url).toBe("/api/check-session");
 		expect(options).toEqual({ credentials: "include" });
+	});
+});
+
+describe("the import that keeps zod out of every page's first load", () => {
+	const source = readFileSync(resolve(process.cwd(), "src/ui/adapters/session/checkSession.ts"), "utf8");
+
+	it("reaches the premium schemas through a dynamic import", () => {
+		expect(source).toMatch(/import\(["']@application\/dto\/premium\/schema["']\)/);
+	});
+
+	it("has no value-level static import of them, nor of zod", () => {
+		expect(source).not.toMatch(/^import (?!type )[^\n]*(?:dto\/premium\/schema|["']zod["'])/m);
 	});
 });

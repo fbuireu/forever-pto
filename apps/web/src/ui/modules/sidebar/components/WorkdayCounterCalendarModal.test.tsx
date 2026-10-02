@@ -8,8 +8,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const PICKED = { from: new Date(2026, 5, 1), to: new Date(2026, 5, 7) };
 
 vi.mock("@ui/modules/pages/planner/calendar/Calendar", () => ({
-	Calendar: ({ onSelect, selected }: { onSelect: (range: unknown) => void; selected?: unknown }) => (
-		<button type="button" data-selected={JSON.stringify(selected ?? null)} onClick={() => onSelect(PICKED)}>
+	Calendar: ({ onSelect, initialSelected }: { onSelect: (range: unknown) => void; initialSelected?: unknown }) => (
+		<button type="button" data-selected={JSON.stringify(initialSelected ?? null)} onClick={() => onSelect(PICKED)}>
 			pick
 		</button>
 	),

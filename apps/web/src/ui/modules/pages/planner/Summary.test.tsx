@@ -198,7 +198,12 @@ describe("Summary manual-adjustment banner", () => {
 	});
 });
 
-const planOf = (days: Date[], totalEffectiveDays = 5) => ({
+interface PlanOfParams {
+	days: Date[];
+	totalEffectiveDays?: number;
+}
+
+const planOf = ({ days, totalEffectiveDays = 5 }: PlanOfParams) => ({
 	days,
 	bridges: [],
 	strategy: "grouped",
@@ -207,7 +212,7 @@ const planOf = (days: Date[], totalEffectiveDays = 5) => ({
 
 const resetPlan = () => {
 	filtersState.ptoDays = 3;
-	holidaysState.suggestion = planOf([JAN(6), JAN(7), JAN(8)]);
+	holidaysState.suggestion = planOf({ days: [JAN(6), JAN(7), JAN(8)] });
 	holidaysState.currentSelection = null;
 	holidaysState.alternatives = [];
 	holidaysState.manuallySelectedDays = [];
@@ -218,7 +223,10 @@ const resetPlan = () => {
 describe("the banner that says a better plan exists", () => {
 	it("stays quiet when no Alternative beats the applied plan", () => {
 		resetPlan();
-		holidaysState.alternatives = [planOf([JAN(6)], 4), planOf([JAN(7)], 5)];
+		holidaysState.alternatives = [
+			planOf({ days: [JAN(6)], totalEffectiveDays: 4 }),
+			planOf({ days: [JAN(7)], totalEffectiveDays: 5 }),
+		];
 
 		const { container } = renderSummary();
 
@@ -227,7 +235,11 @@ describe("the banner that says a better plan exists", () => {
 
 	it("says how many days the best Alternative would add, not how many Alternatives there are", () => {
 		resetPlan();
-		holidaysState.alternatives = [planOf([JAN(6)], 6), planOf([JAN(7)], 8), planOf([JAN(8)], 7)];
+		holidaysState.alternatives = [
+			planOf({ days: [JAN(6)], totalEffectiveDays: 6 }),
+			planOf({ days: [JAN(7)], totalEffectiveDays: 8 }),
+			planOf({ days: [JAN(8)], totalEffectiveDays: 7 }),
+		];
 
 		const { container } = renderSummary();
 
@@ -237,7 +249,7 @@ describe("the banner that says a better plan exists", () => {
 
 	it("reads in the singular when the best Alternative adds one day", () => {
 		resetPlan();
-		holidaysState.alternatives = [planOf([JAN(6)], 6)];
+		holidaysState.alternatives = [planOf({ days: [JAN(6)], totalEffectiveDays: 6 })];
 
 		const { container } = renderSummary();
 
@@ -247,7 +259,10 @@ describe("the banner that says a better plan exists", () => {
 
 	it("compares only with the Alternatives the chosen Strategy found, not with another Strategy's plan", () => {
 		resetPlan();
-		holidaysState.alternatives = [{ ...planOf([JAN(6)], 9), strategy: "optimized" }, planOf([JAN(7)], 6)];
+		holidaysState.alternatives = [
+			{ ...planOf({ days: [JAN(6)], totalEffectiveDays: 9 }), strategy: "optimized" },
+			planOf({ days: [JAN(7)], totalEffectiveDays: 6 }),
+		];
 
 		const { container } = renderSummary();
 
@@ -257,7 +272,7 @@ describe("the banner that says a better plan exists", () => {
 
 	it("names the Strategy that found the plan on screen, not only the one chosen in the sidebar", () => {
 		resetPlan();
-		holidaysState.currentSelection = { ...planOf([JAN(6)], 9), strategy: "optimized" };
+		holidaysState.currentSelection = { ...planOf({ days: [JAN(6)], totalEffectiveDays: 9 }), strategy: "optimized" };
 
 		const { container } = renderSummary();
 
@@ -266,7 +281,7 @@ describe("the banner that says a better plan exists", () => {
 
 	it("ignores an Alternative carrying no metrics rather than counting it as nought", () => {
 		resetPlan();
-		holidaysState.alternatives = [null, planOf([JAN(6)], 7)];
+		holidaysState.alternatives = [null, planOf({ days: [JAN(6)], totalEffectiveDays: 7 })];
 
 		const { container } = renderSummary();
 
@@ -275,7 +290,12 @@ describe("the banner that says a better plan exists", () => {
 });
 
 describe("the banner about Custom Holidays", () => {
-	const custom = (day: number, isInPlanningWindow = true) => ({
+	interface CustomParams {
+		day: number;
+		isInPlanningWindow?: boolean;
+	}
+
+	const custom = ({ day, isInPlanningWindow = true }: CustomParams) => ({
 		id: `c-${day}`,
 		date: JAN(day),
 		name: "Company shutdown",
@@ -293,7 +313,7 @@ describe("the banner about Custom Holidays", () => {
 
 	it("counts the ones inside the Planning Window", () => {
 		resetPlan();
-		holidaysState.holidays = [custom(10), custom(11)];
+		holidaysState.holidays = [custom({ day: 10 }), custom({ day: 11 })];
 
 		const { container } = renderSummary();
 
@@ -303,7 +323,7 @@ describe("the banner about Custom Holidays", () => {
 
 	it("reads in the singular for one, and leaves out the ones outside the window", () => {
 		resetPlan();
-		holidaysState.holidays = [custom(10), custom(11, false)];
+		holidaysState.holidays = [custom({ day: 10 }), custom({ day: 11, isInPlanningWindow: false })];
 
 		const { container } = renderSummary();
 
@@ -312,7 +332,13 @@ describe("the banner about Custom Holidays", () => {
 	});
 });
 
-const holidayOf = (variant: string, day: number, isInPlanningWindow = true) => ({
+interface HolidayOfParams {
+	variant: string;
+	day: number;
+	isInPlanningWindow?: boolean;
+}
+
+const holidayOf = ({ variant, day, isInPlanningWindow = true }: HolidayOfParams) => ({
 	id: `${variant}-${day}`,
 	date: JAN(day),
 	name: `Holiday ${day}`,
@@ -348,7 +374,7 @@ describe("Summary heading", () => {
 	it("names the country and the region it was planned for, flag first, matching them without regard to case", () => {
 		spain();
 		filtersState.region = "CT";
-		holidaysState.holidays = [holidayOf("regional", 10)];
+		holidaysState.holidays = [holidayOf({ variant: "regional", day: 10 })];
 
 		const { container } = renderSummary();
 
@@ -395,10 +421,10 @@ describe("Summary holiday badge", () => {
 	it("breaks the count down by Variant, naming only the Variants that have any", () => {
 		resetPlan();
 		holidaysState.holidays = [
-			holidayOf("national", 1),
-			holidayOf("national", 6),
-			holidayOf("regional", 10),
-			holidayOf("custom", 20),
+			holidayOf({ variant: "national", day: 1 }),
+			holidayOf({ variant: "national", day: 6 }),
+			holidayOf({ variant: "regional", day: 10 }),
+			holidayOf({ variant: "custom", day: 20 }),
 		];
 
 		const { container } = renderSummary();
@@ -408,7 +434,7 @@ describe("Summary holiday badge", () => {
 
 	it("names the national count alone when that is all there is", () => {
 		resetPlan();
-		holidaysState.holidays = [holidayOf("national", 1)];
+		holidaysState.holidays = [holidayOf({ variant: "national", day: 1 })];
 
 		const { container } = renderSummary();
 
@@ -422,7 +448,7 @@ describe("Summary year summary", () => {
 	it("appears once the engine has found a first and a last break, with the streak between them", () => {
 		resetPlan();
 		holidaysState.suggestion = {
-			...planOf([JAN(6), JAN(7), JAN(8)]),
+			...planOf({ days: [JAN(6), JAN(7), JAN(8)] }),
 			metrics: { ...METRICS, firstLastBreak: { first: "Jan 6", last: "Dec 24" }, maxWorkStreak: 45, bonusDays: 3 },
 		};
 
@@ -446,11 +472,31 @@ describe("the banner that says a better plan exists, for a reader without Premiu
 	it("offers Premium rather than the Alternatives it cannot show", () => {
 		resetPlan();
 		premiumState.premiumKey = null;
-		holidaysState.alternatives = [planOf([JAN(6)], 7)];
+		holidaysState.alternatives = [planOf({ days: [JAN(6)], totalEffectiveDays: 7 })];
 
 		const { container } = renderSummary();
 
 		expect(container.textContent).toContain(enMessages.summary.notifications.canImprove.considerPremium);
 		expect(container.textContent).not.toContain(enMessages.summary.notifications.canImprove.reviewOptions);
+	});
+});
+
+describe("Summary Gain sentence", () => {
+	const NARROW_SPACES = /[\u00A0\u202F]/g;
+
+	it.each([
+		["en", enMessages, "+67% gain"],
+		["de", deMessages, "+67 % gegenüber"],
+		["es", esMessages, "+67 % respecto"],
+	] as const)("writes the %s Gain in the locale's own percent format", (locale, messages, expected) => {
+		filtersState.ptoDays = 3;
+		holidaysState.suggestion = { days: [JAN(6), JAN(7), JAN(8)], bridges: [], strategy: "grouped", metrics: METRICS };
+		holidaysState.currentSelection = null;
+		holidaysState.manuallySelectedDays = [];
+		holidaysState.removedSuggestedDays = [];
+
+		const { container } = renderSummary({ locale, messages });
+
+		expect((container.textContent ?? "").replace(NARROW_SPACES, " ")).toContain(expected);
 	});
 });

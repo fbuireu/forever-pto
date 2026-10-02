@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ACTIVATION_FAILED, ACTIVATION_PARAM, matchesClientSecret } from "./activation";
+import { matchesClientSecret } from "./activation";
 
 const SECRET = ["pi", "3Qabc123", "secret", "XyZ789"].join("_");
 
@@ -34,12 +34,5 @@ describe("matchesClientSecret", () => {
 
 	it("is case sensitive", () => {
 		expect(matchesClientSecret({ expected: SECRET, provided: SECRET.toLowerCase() })).toBe(false);
-	});
-});
-
-describe("activation redirect flag", () => {
-	it("names the query parameter the confirmation page reads", () => {
-		expect(ACTIVATION_PARAM).toBe("activation");
-		expect(ACTIVATION_FAILED).toBe("failed");
 	});
 });

@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const filters = vi.hoisted(() => ({ ptoDays: 23, setPtoDays: vi.fn() }));
 
-const holidays = vi.hoisted(() => ({ resetManualSelection: vi.fn(), trimManualDays: vi.fn() }));
+const holidays = vi.hoisted(() => ({ resetManualSelection: vi.fn(), trimManualDays: vi.fn(), askForPlan: vi.fn() }));
 
 const readout = vi.hoisted(() => ({ suggested: 4, manual: 2, remaining: 17, hasManualChanges: false }));
 
@@ -45,6 +45,7 @@ beforeEach(() => {
 	filters.setPtoDays.mockClear();
 	holidays.resetManualSelection.mockClear();
 	holidays.trimManualDays.mockClear();
+	holidays.askForPlan.mockClear();
 	readout.suggested = 4;
 	readout.manual = 2;
 	readout.remaining = 17;
@@ -63,6 +64,12 @@ describe("PtoDays", () => {
 		const { container } = renderField();
 
 		expect(container.querySelectorAll("label")).toHaveLength(0);
+	});
+
+	it("hands the counter the unit in the bundle's own case, leaving the upper case to its class", () => {
+		renderField();
+
+		expect(screen.getByText(en.ptoDays.days).className.split(" ")).toContain("uppercase");
 	});
 
 	it("stores one more day and trims the manual picks to the new budget in the same step", async () => {
@@ -101,12 +108,22 @@ describe("PtoDays", () => {
 		expect(decrease()).toHaveProperty("disabled", false);
 	});
 
-	it("reports the three counts by name, since the digits themselves are hidden from assistive tech", () => {
+	it("reads each count once, as text after its own label, since the rolling digits are hidden from assistive tech", () => {
 		renderField();
 
-		expect(screen.getByRole("img", { name: `${en.ptoDays.autoAssigned}: 4` })).toBeTruthy();
-		expect(screen.getByRole("img", { name: `${en.ptoDays.manuallySelected}: 2` })).toBeTruthy();
-		expect(screen.getByRole("img", { name: `${en.ptoDays.remaining}: 17` })).toBeTruthy();
+		for (const [label, count] of [
+			[en.ptoDays.autoAssigned, "4"],
+			[en.ptoDays.manuallySelected, "2"],
+			[en.ptoDays.remaining, "17"],
+		]) {
+			const row = screen.getByText(label).parentElement as HTMLElement;
+			const read = [...row.querySelectorAll("*")]
+				.filter((node) => node.children.length === 0 && !node.closest('[aria-hidden="true"]'))
+				.map((node) => node.textContent);
+
+			expect(read).toEqual([label, count]);
+			expect(row.querySelector("[role], [aria-label]")).toBeNull();
+		}
 	});
 
 	it("invites manual picks while days remain", () => {
@@ -144,6 +161,26 @@ describe("PtoDays", () => {
 });
 
 describe("PtoDays analytics", () => {
+	it("asks for a plan on every change of the budget and on a reset, the plans a person asks for", async () => {
+		readout.hasManualChanges = true;
+		renderField();
+
+		await userEvent.click(increase());
+		await userEvent.click(decrease());
+		await userEvent.click(screen.getByRole("button", { name: en.ptoDays.resetManualChanges }));
+
+		expect(holidays.askForPlan).toHaveBeenCalledTimes(3);
+	});
+
+	it("asks for no plan when the counter cannot move", async () => {
+		filters.ptoDays = 1;
+		renderField();
+
+		await userEvent.click(decrease());
+
+		expect(holidays.askForPlan).not.toHaveBeenCalled();
+	});
+
 	it("reports the new budget on every change", async () => {
 		track.mockClear();
 		renderField();

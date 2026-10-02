@@ -5,13 +5,17 @@ import { useAutoHeight } from "./useAutoHeight";
 
 const disconnect = vi.fn();
 const observe = vi.fn();
+const resizeCallbacks: (() => void)[] = [];
+const attached: HTMLElement[] = [];
 
 function MockResizeObserver(this: object, cb: () => void) {
 	Object.assign(this, { observe, disconnect, _cb: cb });
+	resizeCallbacks.push(cb);
 }
 
 beforeEach(() => {
 	vi.clearAllMocks();
+	resizeCallbacks.length = 0;
 	vi.stubGlobal("ResizeObserver", MockResizeObserver);
 
 	vi.stubGlobal(
@@ -27,6 +31,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+	for (const el of attached.splice(0)) el.remove();
 	vi.unstubAllGlobals();
 });
 
@@ -38,6 +43,7 @@ interface AttachRefParams {
 const attachRef = ({ result, rectHeight = 0 }: AttachRefParams) => {
 	const el = document.createElement("div");
 	document.body.appendChild(el);
+	attached.push(el);
 	el.getBoundingClientRect = () => ({ height: rectHeight }) as DOMRect;
 	result.ref.current = el;
 	return el;
@@ -75,14 +81,13 @@ describe("useAutoHeight", () => {
 		});
 
 		expect(observe).toHaveBeenCalledWith(el);
-		el.remove();
 	});
 
 	it("disconnects the ResizeObserver on unmount", () => {
 		let deps = [1];
 		const { result, rerender, unmount } = renderHook(() => useAutoHeight(deps));
 
-		const el = attachRef({ result: result.current });
+		attachRef({ result: result.current });
 
 		act(() => {
 			deps = [2];
@@ -91,14 +96,13 @@ describe("useAutoHeight", () => {
 
 		unmount();
 		expect(disconnect).toHaveBeenCalled();
-		el.remove();
 	});
 
 	it("re-creates the observer when deps change", () => {
 		let deps = [1];
 		const { result, rerender } = renderHook(() => useAutoHeight(deps));
 
-		const el = attachRef({ result: result.current });
+		attachRef({ result: result.current });
 
 		act(() => {
 			deps = [2];
@@ -112,7 +116,6 @@ describe("useAutoHeight", () => {
 		});
 
 		expect(observe.mock.calls.length).toBeGreaterThan(firstCount);
-		el.remove();
 	});
 
 	it("reports the element rect height plus the parent border-box padding and border", () => {
@@ -120,7 +123,7 @@ describe("useAutoHeight", () => {
 		let deps = [1];
 		const { result, rerender } = renderHook(() => useAutoHeight(deps));
 
-		const el = attachRef({ result: result.current, rectHeight: 50 });
+		attachRef({ result: result.current, rectHeight: 50 });
 
 		act(() => {
 			deps = [2];
@@ -128,7 +131,6 @@ describe("useAutoHeight", () => {
 		});
 
 		expect(result.current.height).toBe(74);
-		el.remove();
 	});
 
 	it("adds nothing for a content-box parent", () => {
@@ -136,7 +138,7 @@ describe("useAutoHeight", () => {
 		let deps = [1];
 		const { result, rerender } = renderHook(() => useAutoHeight(deps));
 
-		const el = attachRef({ result: result.current, rectHeight: 50 });
+		attachRef({ result: result.current, rectHeight: 50 });
 
 		act(() => {
 			deps = [2];
@@ -144,7 +146,6 @@ describe("useAutoHeight", () => {
 		});
 
 		expect(result.current.height).toBe(50);
-		el.remove();
 	});
 
 	it("rounds the total up to a whole device pixel", () => {
@@ -153,7 +154,7 @@ describe("useAutoHeight", () => {
 		let deps = [1];
 		const { result, rerender } = renderHook(() => useAutoHeight(deps));
 
-		const el = attachRef({ result: result.current, rectHeight: 50.1 });
+		attachRef({ result: result.current, rectHeight: 50.1 });
 
 		act(() => {
 			deps = [2];
@@ -161,7 +162,6 @@ describe("useAutoHeight", () => {
 		});
 
 		expect(result.current.height).toBeCloseTo(151 / 3, 5);
-		el.remove();
 	});
 
 	it("retries the measurement at mount when the first reading is zero", () => {
@@ -189,7 +189,7 @@ describe("useAutoHeight", () => {
 		stubBox("border-box");
 		const { result, rerender } = renderHook(() => useAutoHeight([1]));
 
-		const el = attachRef({ result: result.current, rectHeight: 50 });
+		attachRef({ result: result.current, rectHeight: 50 });
 		expect(result.current.height).toBe(0);
 
 		act(() => {
@@ -197,6 +197,62 @@ describe("useAutoHeight", () => {
 		});
 
 		expect(result.current.height).toBe(0);
-		el.remove();
+	});
+});
+
+describe("useAutoHeight's animation frame", () => {
+	const pending = new Map<number, FrameRequestCallback>();
+	let nextHandle = 0;
+
+	beforeEach(() => {
+		pending.clear();
+		vi.stubGlobal(
+			"requestAnimationFrame",
+			vi.fn((callback: FrameRequestCallback) => {
+				nextHandle += 1;
+				pending.set(nextHandle, callback);
+				return nextHandle;
+			}),
+		);
+		vi.stubGlobal(
+			"cancelAnimationFrame",
+			vi.fn((handle: number) => {
+				pending.delete(handle);
+			}),
+		);
+	});
+
+	const observeResizes = () => {
+		let deps = [1];
+		const hook = renderHook(() => useAutoHeight(deps));
+		attachRef({ result: hook.result.current, rectHeight: 50 });
+
+		act(() => {
+			deps = [2];
+			hook.rerender();
+		});
+
+		const resize = resizeCallbacks.at(-1);
+		if (!resize) throw new Error("no ResizeObserver was created");
+		return { ...hook, resize };
+	};
+
+	it("cancels the frame a resize scheduled when the component unmounts before it runs", () => {
+		const { resize, unmount } = observeResizes();
+
+		resize();
+		unmount();
+
+		expect(pending.size).toBe(0);
+	});
+
+	it("keeps one frame in flight, replacing the one a previous resize left pending", () => {
+		const { resize, unmount } = observeResizes();
+
+		resize();
+		resize();
+
+		expect(pending.size).toBe(1);
+		unmount();
 	});
 });

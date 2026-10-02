@@ -34,10 +34,6 @@ vi.mock("./crypto", () => ({
 	},
 }));
 
-vi.mock("./location", () => ({
-	useLocationStore: { getState: vi.fn().mockReturnValue({ regions: [] }) },
-}));
-
 vi.mock("@application/dto/holiday/dto", () => ({
 	holidayDTO: {
 		createCustom: vi.fn(({ name, date }: { name: string; date: Date }) => ({
@@ -466,15 +462,9 @@ describe("editHoliday", () => {
 	});
 });
 
-describe("setMaxAlternatives", () => {
-	it("sets the value", () => {
-		useHolidaysStore.getState().setMaxAlternatives(6);
-		expect(useHolidaysStore.getState().maxAlternatives).toBe(6);
-	});
-
-	it("clamps to 0 for negative values", () => {
-		useHolidaysStore.getState().setMaxAlternatives(-1);
-		expect(useHolidaysStore.getState().maxAlternatives).toBe(0);
+describe("maxAlternatives", () => {
+	it("offers no setter, since nothing in the app changes how many Alternatives the screen shows", () => {
+		expect(useHolidaysStore.getState()).not.toHaveProperty("setMaxAlternatives");
 	});
 });
 
@@ -648,7 +638,7 @@ describe("toggleDaySelection", () => {
 		expect(vi.mocked(generateMetrics).mock.lastCall?.[0].planningWindow.year).toBe(2029);
 	});
 
-	it("returns false and does not add a day when no remaining budget", () => {
+	it("refuses and does not add a day when no budget remains", () => {
 		const suggestion = makeSuggestion([
 			new Date(2026, 4, 1),
 			new Date(2026, 4, 2),
@@ -693,6 +683,30 @@ describe("setCalculating", () => {
 		useHolidaysStore.setState({ isCalculating: true });
 		useHolidaysStore.getState().setCalculating(false);
 		expect(useHolidaysStore.getState().isCalculating).toBe(false);
+	});
+});
+
+describe("askForPlan and claimPlanAskedFor", () => {
+	it("hands one ask to one plan, so a second plan nobody asked for claims nothing", () => {
+		useHolidaysStore.getState().askForPlan();
+		useHolidaysStore.getState().askForPlan();
+
+		expect([useHolidaysStore.getState().claimPlanAskedFor(), useHolidaysStore.getState().claimPlanAskedFor()]).toEqual([
+			true,
+			false,
+		]);
+	});
+
+	it("starts with no ask, which is what a load or a restore finds", () => {
+		expect(useHolidaysStore.getState().claimPlanAskedFor()).toBe(false);
+	});
+
+	it("drops a pending ask on resetToDefaults", () => {
+		useHolidaysStore.getState().askForPlan();
+
+		useHolidaysStore.getState().resetToDefaults();
+
+		expect(useHolidaysStore.getState().claimPlanAskedFor()).toBe(false);
 	});
 });
 
@@ -783,7 +797,7 @@ describe("resetToDefaults", () => {
 describe("fetchHolidays", () => {
 	const FETCH_PARAMS = { year: 2026, country: "ES", region: "", carryOverMonths: 1, locale: "en" as const };
 
-	it("recomputes isInPlanningWindow on carried-over Custom Holidays, since only flagged ones can anchor a Bridge", async () => {
+	it("recomputes isInPlanningWindow on carried-over Custom Holidays, since the display filters read it", async () => {
 		const custom = makeHoliday({ id: "custom-1", dateStr: "2026-06-15", variant: HolidayVariant.CUSTOM });
 		useHolidaysStore.setState({ holidays: [custom] });
 		mockGetHolidays.mockResolvedValueOnce([]);
@@ -970,6 +984,10 @@ describe("persistence", () => {
 		expect(persist({ holidaysKey: "ES||2026|1|en" })).not.toHaveProperty("holidaysKey");
 	});
 
+	it("never persists an ask for a plan, so a restore cannot report a plan nobody asked for", () => {
+		expect(persist({ planAskedFor: true })).not.toHaveProperty("planAskedFor");
+	});
+
 	it("revives persisted days as Date instances", async () => {
 		const state = await rehydrateFrom({
 			holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })],
@@ -1104,14 +1122,13 @@ describe("generateSuggestions", () => {
 		});
 	});
 
-	it("hands the pipeline the planning inputs its caller passed, budget and cap included", async () => {
+	it("hands the pipeline the planning inputs its caller passed, the budget included", async () => {
 		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })] });
 
 		await useHolidaysStore.getState().generateSuggestions({
 			...PARAMS,
 			ptoDays: 10,
 			carryOverMonths: 2,
-			autoSuggestCount: 3,
 			allowPastDays: true,
 			strategy: FilterStrategy.OPTIMIZED,
 		});
@@ -1119,7 +1136,6 @@ describe("generateSuggestions", () => {
 		expect(planningInput()).toMatchObject({
 			window: { year: 2026, carryOverMonths: 2 },
 			ptoDays: 10,
-			autoSuggestCount: 3,
 			allowPastDays: true,
 			strategy: FilterStrategy.OPTIMIZED,
 			locale: "en",

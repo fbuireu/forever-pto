@@ -1,10 +1,10 @@
 "use client";
 
-import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
-import { SearchIcon } from "@ui/modules/core/animate/icons/Search";
 import { cn } from "@ui/utils/cn";
 import { Command as CommandPrimitive } from "cmdk";
 import type { ComponentProps } from "react";
+import { AnimateIcon } from "../animate/icons/Icon";
+import { SearchIcon } from "../animate/icons/Search";
 
 function Command({ className, ...props }: ComponentProps<typeof CommandPrimitive>) {
 	return (

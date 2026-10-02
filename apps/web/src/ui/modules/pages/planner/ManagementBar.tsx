@@ -9,13 +9,14 @@ import { Drawer, DrawerContent, DrawerTitle } from "@ui/modules/core/animate/bas
 import { useSidebar } from "@ui/modules/core/animate/base/Sidebar";
 import { TUTORIAL_ANCHOR, TUTORIAL_EVENT } from "@ui/modules/tutorial/anchors";
 import { Skeleton } from "boneyard-js/react";
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/react/shallow";
 import { LegendItems } from "./Legend";
 import { PlannerPanel } from "./PlannerPanel";
 import { PlannerPanelFixture } from "./PlannerPanelFixture";
+import { EFFICIENCY_FORMAT } from "./utils/helpers";
 
 export const DRAWER_SNAP = {
 	COLLAPSED: 0.15,
@@ -27,6 +28,7 @@ export const ManagementBar = () => {
 	const tAlt = useTranslations("alternativesManager");
 	const tPlanner = useTranslations("planner");
 	const tA11y = useTranslations("a11y");
+	const format = useFormatter();
 	const { areStoresReady } = useStoresReady();
 	const isMobile = useIsMobile();
 	const { openMobile } = useSidebar();
@@ -37,6 +39,7 @@ export const ManagementBar = () => {
 		currentSelection,
 		setPreviewAlternativeSelection,
 		setCurrentAlternativeSelection,
+		askForPlan,
 		previewAlternativeIndex,
 		currentSelectionIndex,
 		isCalculating,
@@ -48,6 +51,7 @@ export const ManagementBar = () => {
 			currentSelection: state.currentSelection,
 			setPreviewAlternativeSelection: state.setPreviewAlternativeSelection,
 			setCurrentAlternativeSelection: state.setCurrentAlternativeSelection,
+			askForPlan: state.askForPlan,
 			previewAlternativeIndex: state.previewAlternativeIndex,
 			isCalculating: state.isCalculating,
 			hasCalculated: state.hasCalculated,
@@ -75,6 +79,7 @@ export const ManagementBar = () => {
 
 	const handleSelectionChange = useCallback(
 		(params: AlternativeSelectionBaseParams) => {
+			askForPlan();
 			setCurrentAlternativeSelection(params);
 			track({
 				event: "alternative_applied",
@@ -87,7 +92,7 @@ export const ManagementBar = () => {
 			toast.success(t("suggestionApplied"));
 			setSnap(DRAWER_SNAP.COLLAPSED);
 		},
-		[setCurrentAlternativeSelection, t],
+		[setCurrentAlternativeSelection, askForPlan, t],
 	);
 
 	const baseSuggestions = [suggestion, ...alternatives].filter(
@@ -152,10 +157,10 @@ export const ManagementBar = () => {
 									</span>
 									<div className="flex items-center gap-2 shrink-0">
 										<span className="font-mono text-sm font-semibold text-green-600 dark:text-green-400">
-											{effectiveDays} {tAlt("daysUnit")}
+											{tAlt("effectiveDaysCount", { count: effectiveDays })}
 										</span>
 										<span className="font-mono text-sm font-semibold text-purple-600 dark:text-purple-400">
-											{efficiency.toFixed(1)}x
+											{tAlt("efficiencyValue", { efficiency: format.number(efficiency, EFFICIENCY_FORMAT) })}
 										</span>
 									</div>
 								</div>

@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import type { ComponentType, ReactNode } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 type MotionProps = Record<string, unknown> & { initial?: unknown; animate?: unknown; transition?: unknown };
 
@@ -39,6 +39,10 @@ const indicator = (container: HTMLElement) => container.querySelector('[data-slo
 const overlay = (container: HTMLElement) => container.querySelector("span[aria-hidden]");
 
 describe("Progress", () => {
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
 	it("exposes the value as a progressbar", () => {
 		renderProgress(40);
 
@@ -78,10 +82,8 @@ describe("Progress", () => {
 	});
 
 	it("refuses a track outside Progress, since it has no value to draw", () => {
-		const error = vi.spyOn(console, "error").mockImplementation(() => {});
+		vi.spyOn(console, "error").mockImplementation(() => {});
 
 		expect(() => render(<ProgressTrack />)).toThrow("useContext must be used within ProgressContext");
-
-		error.mockRestore();
 	});
 });

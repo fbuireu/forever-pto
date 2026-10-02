@@ -5,7 +5,7 @@
 The server-side flows that combine more than one external service: taking a Donation, activating
 Premium, handling the Stripe webhook, and sending a contact message. A use-case is an Effect *program*: a
 value, not a call. It composes service tags and repository functions, declares what it can fail with, and
-returns. It never runs itself, never reaches for a request, and never decides an HTTP status.
+returns.
 
 ## Files
 
@@ -14,64 +14,57 @@ returns. It never runs itself, never reaches for a request, and never decides an
 | [`payment.ts`](./payment.ts) | `createPayment` | promo-code validation, Stripe intent creation, deferred persistence |
 | [`activatePremium.ts`](./activatePremium.ts) | `activateWithPayment`, `activateWithClaimedPayment`, `activateWithEmail` | Stripe intent lookup, payment repository, session minting |
 | [`webhook.ts`](./webhook.ts) | `processWebhookEvent` | payment repository, the `@domain/payment` event factory and handlers |
-| [`contact.ts`](./contact.ts) | `sendContactEmail` | Zod validation, React Email render, Resend, deferred persistence |
+| [`contact.ts`](./contact.ts) | `sendContactEmail` | Zod validation, the contact guard's lookups, React Email render, Resend, deferred persistence |
 
 ## The entry-point convention
 
-Every export is `(input, …) => Effect.Effect<A, E, R>` built with `Effect.gen`, with every type
-parameter written out explicitly rather than inferred. That signature is the contract:
+Every export is `(input) => Effect.Effect<A, E, R>`. `activateWithPayment` and `activateWithClaimedPayment` write
+it through the `DonationActivation` alias and delegate to the private `activateFromDonation`, which is the
+`Effect.gen`. That signature is the contract:
 
 - **`R`** lists the service tags the caller must provide: `StripeServerService`, `TursoService`,
   `ResendService`, `LoggerService`. Tags are `yield*`-ed out of context; no client is ever constructed here.
-- **`E`** lists the tagged errors from `errors.ts` the caller has to map. The boundary matches on
-  `_tag` via `Effect.catchTags`, so adding a failure mode to `E` turns every unhandled call site into a
-  type error instead of a silent 500 ([ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md)).
+- **`E`** lists the tagged errors from `errors.ts` the caller has to map. The operations map them with
+  `describeFailure` in `@infrastructure/api/errors`, a table keyed on `_tag` whose parameter is the
+  `TaggedFailure` union, so a failure mode added to `E` and missing there is a type error instead of a silent
+  500 ([ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md)). The Stripe webhook
+  route is the exception: it answers 500 for anything but a `WebhookError`, which is what makes Stripe
+  redeliver.
 - Success values are plain objects. Nothing here builds a `NextResponse`.
-- **Every export ends in `Effect.withSpan` named after itself**: `createPayment`, `sendContactEmail`,
-  `processWebhookEvent`, `activateWithPayment`, `activateWithClaimedPayment`, `activateWithEmail`. `withSpan`
-  is plain Effect and adds nothing to `R`; what turns the span into an OpenTelemetry one is the `Tracer`
-  that `ApplicationLayer` provides, so a use-case names its span and knows nothing about where it goes. The
-  Stripe, Turso and Resend calls made inside then nest under it as `fetch` children, which is the whole
-  point: a trace reads `createPayment → fetch api.stripe.com → fetch turso`. A new export without a span is
-  a request that shows up in BetterStack as an anonymous run of `fetch` calls. Annotate with
-  `Effect.annotateCurrentSpan` rather than logging an id twice; see
-  [`../../infrastructure/clients/AGENTS.md`](../../infrastructure/clients/AGENTS.md).
+- **Every export ends in `Effect.withSpan` named after itself**, which adds nothing to `R` and which nothing
+  consumes: `ApplicationLayer` provides no `Tracer`. The span a trace shows is the platform's, which the entry point
+  opens around the whole run with `traced` from `@infrastructure/span` under the use case's name; see
+  [`../../infrastructure/AGENTS.md`](../../infrastructure/AGENTS.md) and
+  [ADR 0017](../../../../../adr/0017-observability-is-the-platform-export.md).
 
-Failures the flow is expected to survive are absorbed in place rather than widening `E`: a deferred write
-that no longer has a response to fail, a charge lookup that only adds reporting detail. **A database failure
-on the critical path is not one of them.** `handlePaymentSucceeded` absorbed its read to `undefined` and read
-that as "no such row", which turned an unreachable Turso into a 200 Stripe never redelivered; see
-[`../../domain/payment/AGENTS.md`](../../domain/payment/AGENTS.md). Absorb a failure only where the answer
-you substitute is one the flow could genuinely have got.
-
-Logging comes in a few shapes here and the choice is about *when* the line runs, never about safety. A log
-attached to a failure sits in `Effect.sync` inside `tapError` (`webhook.ts`, `payment.ts`) or inside
-`catchAll` where the failure is also being absorbed (`contact.ts`, `activatePremium.ts`); a log describing a
-successful branch is a bare statement in the generator body (`webhook.ts` lines around the dispatch). None of
-them needs a guard, because `logger` cannot throw; see
-[`../../infrastructure/AGENTS.md`](../../infrastructure/AGENTS.md). Do not add `Effect.sync`
-for protection: a throw inside it is a defect too, so it would buy nothing.
+A deferred write that has no response left to fail and a charge lookup that only adds reporting detail are absorbed
+in place rather than widening `E`; a database failure on the critical path propagates (see
+[`../../domain/payment/AGENTS.md`](../../domain/payment/AGENTS.md)). The logs sit where the failure is handled: in
+`tapError` (`webhook.ts`, `payment.ts`, `activatePremium.ts`), in a `catchAll` that absorbs it (`payment.ts`,
+`contact.ts`, `activatePremium.ts`) or in the `catch` of `Effect.tryPromise` (`contact.ts`'s render); `logger` cannot
+throw, so none of them needs a guard (see [`../../infrastructure/AGENTS.md`](../../infrastructure/AGENTS.md)).
 
 ## Termination is the caller's job, not ours
 
-Nothing in this folder calls `Effect.runPromise` or provides a layer. Each entry point (the route handlers
-under `src/app/api/` and the server actions in `@infrastructure/actions`) pipes the program through
-`Effect.provide(ApplicationLayer)` ([`layers.ts`](../../infrastructure/layers.ts)), maps the typed errors to a status, adds a
-`catchAll` fallback for the untyped remainder, and runs it. Forgetting the layer is a compile error, not a
-runtime one.
+Nothing in this folder calls `Effect.runPromise` or provides a layer. The operations under
+`@infrastructure/api/operations` (`createPaymentRequest`, `sendContactRequest`, `activatePremiumRequest`) and
+the Stripe webhook route run each program: they pipe it through `Effect.provide(ApplicationLayer)`
+([`layers.ts`](../../infrastructure/layers.ts)), map the typed errors to a status, add a `catchAll` fallback
+for the untyped remainder, and run it. Forgetting the layer is a compile error, not a runtime one.
 
-Separate entry points exist for the same operation: `/api/payment` and the `createPaymentAction` server action
-both call `createPayment`, and both must keep behaving identically (rate limit first, same error mapping).
-The same holds for `sendContactEmail`.
+A route handler and a server action that expose the same operation call the same function in
+`@infrastructure/api/operations`: `/api/payment` and `createPaymentAction` both go through
+`createPaymentRequest`, which rate-limits before `createPayment` runs, and `/api/contact` and
+`sendContactEmailAction` both go through `sendContactRequest`. Behaving identically is structural there, not
+something to keep in step.
 
 ## Configuration arrives as plain values
 
-A use-case must not call `getCloudflareContext()`. The Cloudflare context is only valid inside a request,
-and a use-case is a value that may be run later, including from inside `after()`, after the response has
-been sent ([ADR 0004](../../../../../adr/0004-cloudflare-workers-as-deployment-target.md)). The caller reads
-the context and passes what it found down as an ordinary object: `sendContactEmail` takes
-`{ siteUrl, contactEmail }`, `createPayment` takes `{ userAgent, ipAddress }`. Anything read from headers,
-cookies or `env` belongs in that parameter.
+The Cloudflare context is only valid inside a request, and a use-case is a value that may be run later, including
+from inside `after()`, after the response has been sent
+([ADR 0004](../../../../../adr/0004-cloudflare-workers-as-deployment-target.md)). So the caller reads the context
+and passes what it found down as an ordinary object: `sendContactEmail` takes `{ siteUrl, contactEmail }`,
+`createPayment` takes `{ userAgent, ipAddress }`.
 
 ## The deferred effect
 
@@ -79,8 +72,6 @@ Most of the use-cases return a `deferred: Effect.Effect<void, never, TursoServic
 result. It holds the database writes that the user's response does not depend on; the caller schedules it
 with `after(() => Effect.runPromise(deferred.pipe(Effect.provide(ApplicationLayer))))`. The layer has to be
 provided a second time: the outer program's runtime is gone by then.
-
-These properties of that type are deliberate:
 
 - **`never` in the error channel.** Every failure inside is caught and logged, because there is no longer a
   response to fail. A lost write is invisible outside the logs, which is why `processWebhookEvent` re-creates
@@ -94,7 +85,7 @@ caller can treat them all uniformly.
 ## Premium activation
 
 `activatePremium.ts` is the code behind [ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md):
-there is no accounts table, so a succeeded payment record *is* the entitlement, and both exports end by
+there is no accounts table, so a succeeded payment record *is* the entitlement, and every export ends by
 minting the same 30-day session token via `createSession` in [`session.ts`](../../infrastructure/services/premium/session.ts).
 
 The paths are deliberately asymmetric, and this is the trap:
@@ -108,9 +99,8 @@ The paths are deliberately asymmetric, and this is the trap:
   clientSecret })` for `GET /api/payment/activate`, which holds the secret Stripe appended to the
   `return_url`; `activateWithClaimedPayment({ paymentIntentId, expectedEmail })` for `POST
   /api/check-session`, which holds an email the browser typed. The secret is the stronger of them, since
-  only someone who completed the payment has it. It was one function with both fields optional and a body
-  reading `if (clientSecret && …)`, so omitting the field skipped the guard. No caller did, but nothing said
-  they could not, and half the tests called it with no guard at all. Deriving the email from the intent is
+  only someone who completed the payment has it. Inside `activateFromDonation` both are optional, so a third
+  caller of it would skip whichever guard it omits. Deriving the email from the intent is
   what lets the redirect path activate at all, since the payer may come back in a browser that never held
   their address. See [`../../app/AGENTS.md`](../../app/AGENTS.md).
 - `activateWithEmail` (the "I already donated" recovery path) **does not verify**. It looks up a succeeded
@@ -121,19 +111,17 @@ that must succeed; creating or repairing the payment row happens in the deferred
 therefore does not require `TursoService` at all: that requirement lives only on its deferred.
 
 `ValidationError` is the only failure the boundary turns into a 400 here, and its `message` is returned to
-the client verbatim, so keep those strings safe to show and free of anything about the payer.
+the client verbatim.
 
-**That is why the Stripe read is not relabelled, and it used to be.** `stripe.paymentIntents.retrieve` was
-piped through `Effect.mapError((e) => new ValidationError({ message: e.message }))`, which took an outage or
-a bad key (a `PaymentError`, mapped to 500 `INTERNAL_ERROR` everywhere else) and turned it into the one tag
-whose message is shown. The path that reaches it is the post-charge one: `confirmPayment` POSTs to
-`/api/check-session` immediately after the card clears, and on a non-ok response the checkout adapter returns
-`FAILED_AFTER_CHARGE` carrying `errorData.error`, which `resolveApiErrorMessage` renders as prose because it
-*is* prose. So a Stripe blip after the money moved showed the payer something like
-`No such payment_intent: 'pi_3ABC…'`, under a 400 telling every layer above that the request was wrong and
-there was nothing to retry. `PaymentError` now travels in `activateWithPayment`'s error channel and
-`check-session` maps it beside `SessionError` and `DatabaseError`. `ValidationError` is reserved for the
-conditions this file decides for itself: secret mismatch, not succeeded, email mismatch.
+**That is why the Stripe read is not relabelled.** A failed `stripe.paymentIntents.retrieve` (an outage, a
+bad key) is a `PaymentError`, mapped to 500 `INTERNAL_ERROR`. Relabelled as `ValidationError`, it would reach
+the payer on the post-charge path: `confirmPayment` POSTs to `/api/check-session` immediately after the card
+clears, and on a non-ok response the checkout adapter returns `FAILED_AFTER_CHARGE` carrying the body's
+`error`, once `activationFailureSchema` accepts the body, which `resolveApiErrorMessage` renders as prose. The payer would read Stripe's own text
+(`No such payment_intent: 'pi_3ABC…'`) under a 400 telling every layer above that there was nothing to retry.
+`PaymentError` travels in `activateWithPayment`'s error channel and `check-session` maps it beside
+`SessionError` and `DatabaseError`. `ValidationError` is reserved for the conditions this file decides for
+itself: secret mismatch, not succeeded, email mismatch, no payment found.
 
 ## The contact guard runs before the send, and it is not an IP rate limit
 
@@ -143,9 +131,24 @@ call and no `contacts` row:
 - **A cooldown.** The same sender wrote inside the last `CONTACT_COOLDOWN_HOURS`.
 - **A repeat.** The same sender sent this exact message before, whatever the window says.
 
-Both lookups run concurrently against the `contacts` table the flow already writes, so this needs no new
-binding and no new store. Both are keyed on `contactSenderKey`, which strips a `+alias`; see
-[`../dto/AGENTS.md`](../dto/AGENTS.md) for why that normaliser is separate from the payments one.
+**One conditional statement holds both, so two submissions at the same moment send one email.**
+`reserveContactSlot` inserts the sender's row only when no row for that sender exists since the window's start
+and none carries the same message, and the email goes out only when the insert took. A read followed by an
+insert lets two requests both read nothing and both send ([`CODING_STANDARDS.md`](../../../../../CODING_STANDARDS.md)
+`D9`). When the insert does not take, `findContactWithMessage` names the `reason`, `repeated` before `cooldown`.
+The guard needs no new binding and no new store, and it is keyed on `contactSenderKey`, which strips a `+alias`;
+see [`../dto/AGENTS.md`](../dto/AGENTS.md) for why that normaliser is separate from the payments one.
+
+- **The window is compared as an instant.** `created_date` holds SQLite's `datetime('now')` text and the
+  window's start arrives as an ISO string, so the statement reads `created_date >= datetime(?)`: compared as
+  text, the space and the `T` would drop every row from the previous UTC day.
+- **A failed email frees the slot.** If the render or the send fails, the reserved row is deleted so the sender
+  can try again, and the release is logged at `warn` with the email's failure, or at `error` when the delete
+  fails too and the slot stays held for the window. The answer is the `EmailError` either way.
+- **The deferred write records the message id.** The row exists from the reservation on; `after()` sets
+  Resend's `messageId` on it, and a failure there only logs.
+- **The cost is a slot held with nothing sent** when the Worker dies between the reservation and the send: the
+  sender is refused for the window. Holding the slot after the send instead would let the same crash send twice.
 
 **Why not `checkRateLimit`.** The platform limiter keys on the IP, which is the right shape for the card
 processor in front of `POST /api/payment`: there the attacker is anonymous and the cost is Stripe's. Here
@@ -166,21 +169,19 @@ domain event through the `@domain/payment` factory, and delegates to `handlePaym
 
 **The `switch` is the narrowing, and nothing re-asserts the payload type.** `Stripe.Event` is a discriminated
 union, so inside `case "payment_intent.succeeded"` the compiler already knows `event.data.object` is a
-`Stripe.PaymentIntent`. Both branches used to write `event.data.object as Stripe.PaymentIntent`, which threw
-that away: relabelling either case to `charge.succeeded` compiled cleanly and handed a `Stripe.Charge` to
-`paymentDataDTO.create` and into the payments row. The test could not catch it because its event helper took
-`type: string` and cast the whole literal to `Stripe.Event`, so it laundered the same misreading. The helpers
-are per-member now (`succeededEvent`, `failedEvent`, `unhandledEvent`) and take a
-`Partial<Stripe.PaymentIntent>`. Do not reintroduce a cast on `event.data.object`. Unknown types are logged and ignored, never rejected: Stripe sends event types nobody
-subscribed to and a non-2xx would put them into retry.
+`Stripe.PaymentIntent`. A cast there would let a case relabelled to `charge.succeeded` compile and hand a
+`Stripe.Charge` to `paymentDataDTO.create` and into the payments row. The test's event helpers are per-member
+(`succeededEvent`, `failedEvent`, `unhandledEvent`) and take a `Partial<Stripe.PaymentIntent>`, so the test
+cannot launder the same misreading. Unknown types are logged and ignored, never rejected: Stripe sends event
+types nobody subscribed to and a non-2xx would put them into retry.
 
-Genuine failures must propagate. A handler error is logged *and* re-raised as `DatabaseError` so the route
-answers 500 and Stripe redelivers; swallowing it would drop the event permanently. Before delegating, the
-succeeded branch re-creates the payment row if it is missing, which is what makes a failed deferred write
-from `createPayment` or `activateWithPayment` recoverable.
+A `handlePaymentSucceeded` error is logged *and* propagates as
+`DatabaseError`, so the route answers 500 and Stripe redelivers; swallowing it would drop the event
+permanently. Before delegating, the succeeded branch re-creates the payment row if it is missing, which is
+what makes a failed deferred write from `createPayment` or `activateWithPayment` recoverable.
 
 **`MissingDonorEmailError` is the one failure that goes the other way**, and the asymmetry is the point. The
-event factory now refuses to invent an email when a succeeded intent carries neither `metadata.email` nor
+event factory refuses to invent an email when a succeeded intent carries neither `metadata.email` nor
 `receipt_email`, because that address is the only key Premium can ever be recovered by
 ([ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md)) and a blank one orphans the Donation
 permanently. But redelivering the same intent will produce the same missing email forever, so the succeeded
@@ -190,16 +191,12 @@ someone has to go and find them, which is why the message says so rather than re
 
 ## Testing
 
-Each file has a co-located `.test.ts`. The pattern is identical across them and worth copying:
-
-- Build a `TestLayer` with `Layer.succeed(Tag, mockImplementation)` for every tag in `R`. No test constructs
-  a real Stripe, Turso or Resend client.
-- Define local `run` / `runFail` / `runDeferred` helpers over that layer. `runFail` uses `Effect.flip` so the
-  assertion can be `expect(err).toBeInstanceOf(ValidationError)` rather than a `rejects` matcher.
-- `vi.mock` the repository and service modules so they return `Effect.succeed(...)`; validation via
-  [`zodParse.ts`](../shared/utils/zodParse.ts) is mocked to a pass-through where the flow under test is not the schema.
-- Assert the deferred separately from the critical path: that persistence was *not* called during `run`,
-  and *was* called after `runDeferred`. That split is the invariant, so it is what the tests protect.
+Each file has a co-located `.test.ts` built on a `TestLayer` of `Layer.succeed(Tag, mockImplementation)` for every
+tag in `R`, with local `run` / `runFail` / `runDeferred` helpers over it (`runFail` uses `Effect.flip`, so the
+assertion is `expect(err).toBeInstanceOf(ValidationError)`). Validation via
+[`zodParse.ts`](../shared/utils/zodParse.ts) is mocked to a pass-through where the flow under test is not the schema,
+and the deferred is asserted separately from the critical path: persistence *not* called during `run`, and called
+after `runDeferred`.
 - [`activatePremium.test.ts`](./activatePremium.test.ts) additionally runs `activateWithEmail` against a layer providing `TursoService`
   alone. The recovery path never logs, so `LoggerService` must stay out of its requirements channel; that
   test fails to compile (not at runtime) the moment a tag creeps back in.

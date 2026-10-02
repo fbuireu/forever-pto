@@ -1,3 +1,5 @@
+"use client";
+
 import { hasStoredPlan } from "@application/stores/storedPlan";
 import { useSyncExternalStore } from "react";
 

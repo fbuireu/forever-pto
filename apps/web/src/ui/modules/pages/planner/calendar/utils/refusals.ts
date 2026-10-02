@@ -1,6 +1,11 @@
 import { DayRefusal, type HolidayOutcome, HolidayRefusal } from "@application/stores/types";
 import type { useTranslations } from "next-intl";
 
+interface RefusalCopy {
+	title: string;
+	description: string;
+}
+
 export const DAY_REFUSAL_COPY = {
 	[DayRefusal.NO_PLAN]: null,
 	[DayRefusal.PLAN_IN_FLIGHT]: null,
@@ -11,7 +16,7 @@ export const DAY_REFUSAL_COPY = {
 	},
 	[DayRefusal.DAY_IS_WEEKEND]: { title: "cannotSelectFreeDay", description: "cannotSelectWeekendDescription" },
 	[DayRefusal.BUDGET_EXHAUSTED]: { title: "noPtoDaysRemaining", description: "removeDaysToFree" },
-} as const;
+} as const satisfies Record<DayRefusal, RefusalCopy | null>;
 
 type HolidayRefusalTranslator = ReturnType<typeof useTranslations<"modals.addHoliday">>;
 
@@ -25,7 +30,7 @@ export const describeHolidayRefusal = ({
 	outcome,
 	t,
 	formattedDate,
-}: DescribeHolidayRefusalParams): { title: string; description: string } | null => {
+}: DescribeHolidayRefusalParams): RefusalCopy | null => {
 	switch (outcome.reason) {
 		case HolidayRefusal.DATE_HELD_BY_HOLIDAY:
 			return {

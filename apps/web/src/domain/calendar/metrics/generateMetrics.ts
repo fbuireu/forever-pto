@@ -1,8 +1,8 @@
 import type { HolidayDTO } from "@application/dto/holiday/types";
+import type { Suggestion } from "@domain/calendar/types";
+import { resolveSelectedDays } from "@domain/calendar/utils/selection";
+import type { PlanningWindow } from "@domain/calendar/window";
 import type { Locale } from "next-intl";
-import type { Suggestion } from "../types";
-import { resolveSelectedDays } from "../utils/selection";
-import type { PlanningWindow } from "../window";
 import {
 	calculateLongestVacation,
 	calculateLongWeekends,

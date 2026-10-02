@@ -1,7 +1,7 @@
 import { localeAlternates, localePath } from "@infrastructure/i18n/utils/url";
-import { isIndexable } from "@infrastructure/seo/routes";
 import type { Metadata } from "next";
 import type { Locale } from "next-intl";
+import { isIndexable } from "./routes";
 
 const SITE_NAME = "Forever PTO";
 const OG_IMAGE = "/static/images/forever-pto-logo.png";

@@ -1,13 +1,19 @@
+export const PLANNER_PATH = "/planner";
+
 interface ApiErrorTranslator {
+	(key: never, values: never): string;
 	has: (key: never) => boolean;
 	raw: (key: never) => unknown;
 }
+
+export type ApiErrorValues = ReadonlyMap<string, Record<string, number>>;
 
 interface ResolveApiErrorMessageParams {
 	code: string | null | undefined;
 	t: ApiErrorTranslator;
 	shared: ApiErrorTranslator;
 	fallback: string;
+	values?: ApiErrorValues;
 }
 
 const MACHINE_CODE = /^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$/;
@@ -15,21 +21,24 @@ const MACHINE_CODE = /^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$/;
 interface MessageFromParams {
 	translator: ApiErrorTranslator;
 	key: string;
+	values: Record<string, number> | undefined;
 }
 
-const messageFrom = ({ translator, key }: MessageFromParams) => {
+const messageFrom = ({ translator, key, values }: MessageFromParams) => {
 	if (!translator.has(key as never)) return undefined;
 
-	const message = translator.raw(key as never);
+	if (typeof translator.raw(key as never) !== "string") return undefined;
 
-	return typeof message === "string" ? message : undefined;
+	return translator(key as never, values as never);
 };
 
-export const resolveApiErrorMessage = ({ code, t, shared, fallback }: ResolveApiErrorMessageParams) => {
+export const resolveApiErrorMessage = ({ code, t, shared, fallback, values }: ResolveApiErrorMessageParams) => {
 	if (!code) return fallback;
 
+	const codeValues = values?.get(code);
 	const message =
-		messageFrom({ translator: t, key: `errors.${code}` }) ?? messageFrom({ translator: shared, key: code });
+		messageFrom({ translator: t, key: `errors.${code}`, values: codeValues }) ??
+		messageFrom({ translator: shared, key: code, values: codeValues });
 
 	if (message !== undefined) return message;
 

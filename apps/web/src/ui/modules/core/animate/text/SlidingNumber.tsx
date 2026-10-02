@@ -19,6 +19,7 @@ import {
 	useImperativeHandle,
 	useMemo,
 	useRef,
+	useState,
 } from "react";
 import useMeasure from "react-use-measure";
 
@@ -149,9 +150,12 @@ function SlidingNumber({
 	});
 	const isInView = !inView || inViewResult;
 
-	const prevNumberRef = useRef<number>(0);
-
 	const effectiveNumber = useMemo(() => (!isInView ? 0 : Math.abs(Number(number))), [number, isInView]);
+	const [shown, setShown] = useState({ number: effectiveNumber, previous: 0 });
+
+	if (isInView && shown.number !== effectiveNumber) {
+		setShown({ number: effectiveNumber, previous: shown.number });
+	}
 
 	const formatNumber = useCallback(
 		(num: number) => (decimalPlaces != null ? num.toFixed(decimalPlaces) : num.toString()),
@@ -162,7 +166,7 @@ function SlidingNumber({
 	const [newIntStrRaw, newDecStrRaw = ""] = numberStr.split(".");
 	const newIntStr = padStart && newIntStrRaw?.length === 1 ? `0${newIntStrRaw}` : newIntStrRaw;
 
-	const prevFormatted = formatNumber(prevNumberRef.current);
+	const prevFormatted = formatNumber(shown.previous);
 	const [prevIntStrRaw = "", prevDecStrRaw = ""] = prevFormatted.split(".");
 	const prevIntStr = padStart && prevIntStrRaw.length === 1 ? `0${prevIntStrRaw}` : prevIntStrRaw;
 
@@ -178,10 +182,6 @@ function SlidingNumber({
 			? prevDecStrRaw.slice(0, newDecStrRaw.length)
 			: prevDecStrRaw.padEnd(newDecStrRaw.length, "0");
 	}, [prevDecStrRaw, newDecStrRaw]);
-
-	useEffect(() => {
-		if (isInView) prevNumberRef.current = effectiveNumber;
-	}, [effectiveNumber, isInView]);
 
 	const intDigitCount = newIntStr?.length ?? 0;
 	const intPlaces = useMemo(

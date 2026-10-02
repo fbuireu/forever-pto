@@ -14,6 +14,10 @@ const store = vi.hoisted(() => ({
 }));
 
 const track = vi.hoisted(() => vi.fn());
+const askForPlan = vi.hoisted(() => vi.fn());
+vi.mock("@application/stores/holidays", () => ({
+	useHolidaysStore: (selector: (state: unknown) => unknown) => selector({ askForPlan }),
+}));
 vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
 
 vi.mock("@application/stores/filters", () => ({
@@ -58,6 +62,15 @@ describe("PreferredMonths", () => {
 			event: "planning_input_changed",
 			properties: { input: "preferredMonths", inputValue: "5,6,7" },
 		});
+	});
+
+	it("asks for a plan when a month is added or dropped", () => {
+		askForPlan.mockClear();
+		renderMonths();
+
+		fireEvent.click(screen.getByRole("button", { name: /^June \d{4}$/ }));
+
+		expect(askForPlan).toHaveBeenCalledOnce();
 	});
 
 	it("drops a month that was preferred", () => {

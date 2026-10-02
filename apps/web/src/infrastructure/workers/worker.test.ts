@@ -1,6 +1,6 @@
 import type { PlanningResult, runPlanningPipeline } from "@domain/calendar/pipeline";
 import { FilterStrategy, type MeasuredSuggestion, type Metrics } from "@domain/calendar/types";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { CalculateSuggestionsRequest } from "./types";
 import { WORKER_MESSAGE_TYPE } from "./types";
 
@@ -53,6 +53,10 @@ const mockPostMessage = vi.hoisted(() => vi.fn());
 vi.mock("@domain/calendar/pipeline", () => ({ runPlanningPipeline: mockRunPlanningPipeline }));
 
 vi.stubGlobal("self", { postMessage: mockPostMessage });
+
+afterAll(() => {
+	vi.unstubAllGlobals();
+});
 
 await import("./worker");
 

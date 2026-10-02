@@ -13,10 +13,6 @@ export interface GenerateSuggestionsParams {
 	locale: Locale;
 }
 
-export interface MainThreadSuggestionsParams extends GenerateSuggestionsParams {
-	autoSuggestCount?: number;
-}
-
 export interface FetchHolidaysParams extends Pick<FiltersState, "year" | "country" | "region" | "carryOverMonths"> {
 	locale: Locale;
 }
@@ -24,7 +20,17 @@ export interface FetchHolidaysParams extends Pick<FiltersState, "year" | "countr
 export const holidaysKeyOf = ({ year, country, region, carryOverMonths, locale }: FetchHolidaysParams) =>
 	[country, region, year, carryOverMonths, locale].join("|");
 
-export type PlanningWindowParams = Pick<FiltersState, "year" | "carryOverMonths">;
+export interface SetCalculationResultParams {
+	suggestion: MeasuredSuggestion;
+	alternatives: MeasuredSuggestion[];
+}
+
+export interface ToggleDaySelectionParams {
+	date: Date;
+	totalPtoDays: number;
+	locale: Locale;
+	allowPastDays: boolean;
+}
 
 export interface AddHolidayParams {
 	holiday: Omit<HolidayDTO, "id" | "variant" | "isInPlanningWindow">;

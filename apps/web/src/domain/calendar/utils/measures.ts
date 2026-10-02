@@ -1,6 +1,6 @@
 import { dayIndex } from "@application/shared/utils/dates";
-import type { Suggestion } from "../types";
-import { inPreferredMonths, monthKeyOf } from "../window";
+import type { Suggestion } from "@domain/calendar/types";
+import { inPreferredMonths, monthKeyOf } from "@domain/calendar/window";
 import { longestWorkStretch } from "./stretches";
 
 export interface PlanMeasures {
@@ -19,7 +19,9 @@ interface MeasurePlanParams {
 	preferredMonths: number[];
 }
 
-const coveredSetOf = ({ plan: { days, bridges = [] }, alreadyOff }: Pick<MeasurePlanParams, "plan" | "alreadyOff">) => {
+type CoveredSetOfParams = Pick<MeasurePlanParams, "plan" | "alreadyOff">;
+
+const coveredSetOf = ({ plan: { days, bridges = [] }, alreadyOff }: CoveredSetOfParams) => {
 	const covered = new Set([...days, ...alreadyOff].map(dayIndex));
 	for (const bridge of bridges) {
 		for (let day = dayIndex(bridge.startDate); day <= dayIndex(bridge.endDate); day++) covered.add(day);

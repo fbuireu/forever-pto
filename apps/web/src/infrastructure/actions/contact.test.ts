@@ -1,15 +1,9 @@
-import { EmailError, type ValidationError } from "@infrastructure/errors";
+import type { sendContactEmail } from "@application/use-cases/contact";
+import { EmailError } from "@infrastructure/errors";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mockSendContactEmail = vi.hoisted(() =>
-	vi.fn<
-		(
-			data: unknown,
-			config: unknown,
-		) => Effect.Effect<{ deferred: Effect.Effect<void, never, never> }, ValidationError | EmailError>
-	>(),
-);
+const mockSendContactEmail = vi.hoisted(() => vi.fn<typeof sendContactEmail>());
 
 vi.mock("@application/use-cases/contact", () => ({
 	sendContactEmail: mockSendContactEmail,

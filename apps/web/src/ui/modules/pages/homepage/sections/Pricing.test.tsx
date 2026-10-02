@@ -1,7 +1,11 @@
 import { AMOUNT_MIN } from "@application/dto/payment/schema";
 import { FilterStrategy } from "@domain/calendar/types";
+import caMessages from "@i18n/messages/ca.json";
 import deMessages from "@i18n/messages/de.json";
 import enMessages from "@i18n/messages/en.json";
+import esMessages from "@i18n/messages/es.json";
+import frMessages from "@i18n/messages/fr.json";
+import itMessages from "@i18n/messages/it.json";
 import { render, screen } from "@testing-library/react";
 import { createTranslator, type Locale } from "next-intl";
 import type { ReactNode } from "react";
@@ -11,10 +15,14 @@ const mockGetTranslations = vi.hoisted(() => vi.fn());
 const mockGetLocale = vi.hoisted(() => vi.fn());
 
 vi.mock("next-intl/server", () => ({ getTranslations: mockGetTranslations, getLocale: mockGetLocale }));
+vi.mock("@application/dto/payment/schema", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@application/dto/payment/schema")>()),
+	AMOUNT_MIN: 7,
+}));
 vi.mock("@ui/modules/core/primitives/Badge", () => ({
 	Badge: ({ children }: { children: ReactNode }) => <span>{children}</span>,
 }));
-vi.mock("@ui/modules/pages/homepage/quick-start/QuickStartTrigger", () => ({
+vi.mock("@ui/modules/shared/QuickStartTrigger", () => ({
 	QuickStartTrigger: ({ children, className, source }: { children: ReactNode; className?: string; source: string }) => (
 		<button type="button" data-testid="quick-start-trigger" className={className} data-source={source}>
 			{children}
@@ -39,10 +47,23 @@ interface RenderPricingParams {
 	messages: typeof enMessages;
 }
 
-const renderPricing = async ({ locale, messages }: RenderPricingParams) => {
+const BUNDLES: Record<string, typeof enMessages> = {
+	en: enMessages,
+	es: esMessages,
+	ca: caMessages,
+	it: itMessages,
+	de: deMessages,
+	fr: frMessages,
+};
+
+const mountPricing = async ({ locale, messages }: RenderPricingParams) => {
 	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "homepage" }));
 	mockGetLocale.mockResolvedValue(locale);
-	const { container } = render(await Pricing());
+	return render(await Pricing());
+};
+
+const renderPricing = async (params: RenderPricingParams) => {
+	const { container } = await mountPricing(params);
 	return (container.textContent ?? "").replace(NON_BREAKING_SPACES, " ");
 };
 
@@ -60,8 +81,22 @@ describe("Pricing", () => {
 		const text = await renderPricing({ locale: "en", messages: enMessages });
 
 		expect(text).toContain(pricing.lifetimeTagline.replace("{amount}", `€${AMOUNT_MIN}`));
-		expect(text).toContain(pricing.lifetimePrice.replace("{amount}", `€${AMOUNT_MIN}`));
+		expect(text).toContain(pricing.lifetimePrice.replace("{amount}", `€${AMOUNT_MIN}`).replace(/<\/?per>/g, ""));
 	});
+
+	it.each(Object.entries(BUNDLES))(
+		"prints each %s price with its period from one message",
+		async (locale, messages) => {
+			const { container } = await mountPricing({ locale: locale as Locale, messages });
+			const prices = [...container.querySelectorAll(".text-\\[64px\\]")];
+
+			expect(prices).toHaveLength(2);
+			for (const price of prices) {
+				expect(price.querySelector("span")?.textContent).toMatch(/\S/);
+				expect(price.textContent).not.toMatch(/[<>{}]|homepage\./);
+			}
+		},
+	);
 
 	it("counts the strategies through the message rather than hardcoding the digit in the copy", async () => {
 		expect(await renderPricing({ locale: "en", messages: enMessages })).toContain(

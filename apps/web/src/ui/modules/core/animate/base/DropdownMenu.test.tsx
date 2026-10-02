@@ -31,6 +31,8 @@ vi.mock("motion/react", async () => {
 	};
 });
 
+const positioned = vi.hoisted((): { sideOffset?: number; align?: string }[] => []);
+
 vi.mock("@base-ui/react/menu", async () => {
 	const { createElement, cloneElement, isValidElement } = await import("react");
 	type RootProps = ComponentProps<"div"> & {
@@ -40,7 +42,6 @@ vi.mock("@base-ui/react/menu", async () => {
 	};
 	type WithRender = ComponentProps<"div"> & { render?: ReactElement; keepMounted?: boolean };
 	type ItemProps = ComponentProps<"div"> & { render?: ReactElement; disabled?: boolean };
-	type SeparatorProps = ComponentProps<"hr">;
 	const Menu = {
 		Root: ({ children, onOpenChange: _oc, open: _o, defaultOpen: _do, ...props }: RootProps) =>
 			createElement("div", props, children),
@@ -51,24 +52,19 @@ vi.mock("@base-ui/react/menu", async () => {
 		Portal: ({ children, keepMounted: _km, ...props }: WithRender) => createElement("div", props, children),
 		Positioner: ({
 			children,
+			sideOffset,
+			align,
+			positionMethod: _pm,
 			...props
-		}: ComponentProps<"div"> & { sideOffset?: number; align?: string; positionMethod?: string }) =>
-			createElement("div", props, children),
+		}: ComponentProps<"div"> & { sideOffset?: number; align?: string; positionMethod?: string }) => {
+			positioned.push({ sideOffset, align });
+			return createElement("div", props, children);
+		},
 		Popup: ({ children, render: renderProp, ...props }: WithRender) =>
 			renderProp && isValidElement(renderProp)
 				? cloneElement(renderProp, props, children)
 				: createElement("div", { "data-slot": "dropdown-menu-content", ...props }, children),
 		Item: ({ children, render: _r, disabled: _d, ...props }: ItemProps) => createElement("div", props, children),
-		Group: ({ children, ...props }: ComponentProps<"div">) => createElement("div", props, children),
-		GroupLabel: ({ children, ...props }: ComponentProps<"div">) => createElement("div", props, children),
-		Separator: (props: SeparatorProps) => createElement("hr", props),
-		CheckboxItem: ({ children, render: _r, ...props }: WithRender) => createElement("div", props, children),
-		CheckboxItemIndicator: ({ children, ...props }: ComponentProps<"span">) => createElement("span", props, children),
-		RadioGroup: ({ children, ...props }: ComponentProps<"div">) => createElement("div", props, children),
-		RadioItem: ({ children, render: _r, ...props }: WithRender) => createElement("div", props, children),
-		RadioItemIndicator: ({ children, ...props }: ComponentProps<"span">) => createElement("span", props, children),
-		SubmenuRoot: ({ children, ...props }: ComponentProps<"div">) => createElement("div", props, children),
-		SubmenuTrigger: ({ children, render: _r, ...props }: WithRender) => createElement("div", props, children),
 	};
 	return { Menu };
 });
@@ -78,11 +74,13 @@ vi.mock("../effects/MotionHighlight", () => ({
 	MotionHighlightItem: ({ children }: { children?: ReactNode }) => <>{children}</>,
 }));
 
-vi.mock("../icons/Check", () => ({ Check: () => <svg /> }));
-vi.mock("../icons/ChevronRight", () => ({ ChevronRight: () => <svg /> }));
-vi.mock("lucide-react", () => ({ Circle: () => <svg /> }));
-
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./DropdownMenu";
+import {
+	DROPDOWN_MENU_CONTENT_DEFAULTS,
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "./DropdownMenu";
 
 describe("DropdownMenu", () => {
 	it('renders with data-slot="dropdown-menu"', () => {
@@ -114,6 +112,30 @@ describe("DropdownMenu", () => {
 });
 
 describe("DropdownMenuContent", () => {
+	it("places the menu by the defaults it publishes when the caller sets none", () => {
+		positioned.length = 0;
+		render(
+			<DropdownMenu defaultOpen>
+				<DropdownMenuContent>item</DropdownMenuContent>
+			</DropdownMenu>,
+		);
+
+		expect(positioned.at(-1)).toEqual(DROPDOWN_MENU_CONTENT_DEFAULTS);
+	});
+
+	it("places the menu where the caller asks", () => {
+		positioned.length = 0;
+		render(
+			<DropdownMenu defaultOpen>
+				<DropdownMenuContent sideOffset={12} align="end">
+					item
+				</DropdownMenuContent>
+			</DropdownMenu>,
+		);
+
+		expect(positioned.at(-1)).toEqual({ sideOffset: 12, align: "end" });
+	});
+
 	it("throws when rendered outside DropdownMenu", () => {
 		expect(() => render(<DropdownMenuContent>item</DropdownMenuContent>)).toThrow(
 			"useDropdownMenu must be used within a DropdownMenu",

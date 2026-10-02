@@ -60,7 +60,7 @@ function TooltipContent({ className, sideOffset = 4, children, style, ...props }
 	);
 }
 
-type TooltipInfoTriggerProps = Omit<TooltipTriggerProps, "children"> & { className?: string };
+type TooltipInfoTriggerProps = Omit<TooltipTriggerProps, "children"> & { className?: string; "aria-label": string };
 function TooltipInfoTrigger({ className, ...props }: TooltipInfoTriggerProps) {
 	return (
 		<TooltipTriggerPrimitive

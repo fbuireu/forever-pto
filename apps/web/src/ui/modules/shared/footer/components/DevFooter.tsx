@@ -6,11 +6,13 @@ import { githubIcon } from "@ui/assets/icons/github";
 import { linkedinIcon } from "@ui/assets/icons/linkedin";
 import { RotatingText } from "@ui/modules/core/animate/text/Rotating";
 import { Me } from "@ui/modules/pages/legal/Me";
-import { Icon } from "@ui/modules/shared/Icon";
 import { useTranslations } from "next-intl";
 import { type CSSProperties, useEffect, useRef, useState } from "react";
+import { Icon } from "../../Icon";
 
 const EMOJIS: string[] = ["☕", "🍺", "❤️", "🚀", "⚡", "🔥", "💻", "🌮", "🍕", "🎵", "🎮", "😴", "🤯", "💡"];
+
+const EMOJI_TRANSITION = { type: "spring", bounce: 0.5, stiffness: 300, duration: 2 } as const;
 
 const SOCIAL_NETWORKS = {
 	GITHUB: {
@@ -62,12 +64,14 @@ export const DevFooter = () => {
 	return (
 		<div className="p-4 flex flex-col items-center justify-center gap-4">
 			<div className="text-sm flex items-baseline gap-1.5 text-muted-foreground text-center">
-				{t("madeWith")}
-				<RotatingText text={currentEmoji} transition={{ type: "spring", bounce: 0.5, stiffness: 300, duration: 2 }} />
-				{t("by")}
-				<span className="font-medium text-foreground hover:text-primary p-0 h-auto min-w-0">
-					<Me />
-				</span>
+				{t.rich("madeWithBy", {
+					emoji: () => <RotatingText text={currentEmoji} transition={EMOJI_TRANSITION} />,
+					author: () => (
+						<span className="font-medium text-foreground hover:text-primary p-0 h-auto min-w-0">
+							<Me />
+						</span>
+					),
+				})}
 			</div>
 			<p className="text-sm text-muted-foreground text-center">{t("findMeOn")}</p>
 			<div className="flex gap-5 items-center gap-x-1 text-xs text-muted-foreground/70">

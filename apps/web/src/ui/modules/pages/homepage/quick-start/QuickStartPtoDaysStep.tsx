@@ -33,7 +33,7 @@ export const QuickStartPtoDaysStep = ({ currentYear, draft, onChange }: QuickSta
 					setNumber={setPtoDays}
 					decrementLabel={tPtoDays("decrease")}
 					incrementLabel={tPtoDays("increase")}
-					label={tPtoDays("days").toUpperCase()}
+					label={tPtoDays("days")}
 					decrementButtonProps={{ disabled: draft.ptoDays <= MIN_PTO_DAYS }}
 					incrementButtonProps={{ disabled: draft.ptoDays >= MAX_PTO_DAYS }}
 				/>

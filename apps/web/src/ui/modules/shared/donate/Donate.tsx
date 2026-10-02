@@ -3,16 +3,17 @@
 import {
 	AMOUNT_MAX,
 	AMOUNT_MIN,
+	amountFromInput,
 	type CreatePaymentInput,
-	createPaymentSchemaWithMessages,
+	createDonationFormSchemaWithMessages,
 } from "@application/dto/payment/schema";
-import type { DiscountInfo } from "@application/dto/payment/types";
+import { type DiscountInfo, type PromoCodeErrorCode, PromoCodeErrors } from "@application/dto/payment/types";
 import { usePremiumStore } from "@application/stores/premium";
 import { DonateSource, useUIStore } from "@application/stores/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { getStripeClientInstance } from "@infrastructure/clients/payments/stripe/client";
-import { PromoCodeError, PromoCodeErrors } from "@infrastructure/errors";
+import { PromoCodeError } from "@infrastructure/errors";
 import { Elements } from "@stripe/react-stripe-js";
 import type { StripeElementsOptions } from "@stripe/stripe-js";
 import { initializePayment } from "@ui/adapters/payments/checkout";
@@ -43,7 +44,11 @@ interface PaymentState {
 
 const stripePromise = getStripeClientInstance().getStripePromise();
 
-export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
+export interface DonateProps {
+	bottomClassName: string;
+}
+
+export const Donate = ({ bottomClassName }: DonateProps) => {
 	const locale = useLocale();
 	const t = useTranslations("toasts");
 	const tDonate = useTranslations("donate");
@@ -80,7 +85,7 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 		[setDonatePopoverOpen],
 	);
 
-	const paymentSchema = createPaymentSchemaWithMessages({
+	const donationFormSchema = createDonationFormSchemaWithMessages({
 		amountMin: tValidation("amountMin", { min: AMOUNT_MIN }),
 		amountMax: tValidation("amountMax", { max: AMOUNT_MAX }),
 		invalidEmail: tEmail("invalid"),
@@ -88,17 +93,17 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 		promoCodeTooLong: tValidation("promoCodeTooLong"),
 	});
 
-	const form = useForm<CreatePaymentInput>({
-		resolver: zodResolver(paymentSchema),
+	const form = useForm({
+		resolver: zodResolver(donationFormSchema),
 		resetOptions: { keepDirtyValues: true },
 		values: {
-			amount: 5,
+			amount: "5",
 			promoCode: "",
 			email: userEmail ?? "",
 		},
 	});
 
-	const currentAmount = form.watch("amount");
+	const currentAmount = amountFromInput(form.watch("amount"));
 
 	const onSubmit = useCallback(
 		(data: CreatePaymentInput) => {
@@ -161,7 +166,7 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 							[PromoCodeErrors.COUPON_INVALID]: t("promoCodeErrors.coupon_invalid"),
 							[PromoCodeErrors.FAILED_TO_LOAD]: t("promoCodeErrors.failed_to_load"),
 							[PromoCodeErrors.MIN_AMOUNT_EXCEEDED]: t("promoCodeErrors.min_amount_exceeded"),
-						};
+						} satisfies Record<PromoCodeErrorCode, string>;
 						toast.error(t("promoCodeError"), {
 							description: descriptions[error.code],
 						});
@@ -214,7 +219,7 @@ export const Donate = ({ bottomClassName }: { bottomClassName?: string }) => {
 			<div
 				className={cn(
 					"donate-trigger pointer-events-none fixed w-full right-0 md:w-auto md:right-4 z-50",
-					bottomClassName ?? "bottom-[calc(15dvh+8px)] md:bottom-4",
+					bottomClassName,
 				)}
 			>
 				<div

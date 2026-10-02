@@ -36,6 +36,7 @@ describe("robots", () => {
 	});
 
 	it("disallows every private route, in every locale", () => {
+		expect(privateRoutes()).not.toHaveLength(0);
 		for (const locale of LOCALES) {
 			for (const { path } of privateRoutes()) {
 				expect(rule.disallow).toContain(localePath({ locale, path }));
@@ -45,6 +46,7 @@ describe("robots", () => {
 
 	it("never disallows a route the sitemap advertises", () => {
 		const indexable = SITE_ROUTES.filter((route) => route.indexable);
+		expect(indexable).not.toHaveLength(0);
 
 		for (const locale of LOCALES) {
 			for (const { path } of indexable) {

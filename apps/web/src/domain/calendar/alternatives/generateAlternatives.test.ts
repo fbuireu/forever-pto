@@ -1,12 +1,12 @@
 import type { HolidayDTO } from "@application/dto/holiday/types";
 import { HolidayVariant } from "@application/dto/holiday/types";
+import { PTO_CONSTANTS } from "@domain/calendar/const";
+import { selectBridgesForStrategy } from "@domain/calendar/suggestions/utils/selectors";
+import { FilterStrategy, type Suggestion } from "@domain/calendar/types";
+import { clearDateKeyCache, clearHolidayCache } from "@domain/calendar/utils/cache";
+import { findPlanningCandidates, type PlanningCandidates, selectionInputOf } from "@domain/calendar/utils/candidates";
+import { measurePlan } from "@domain/calendar/utils/measures";
 import { beforeEach, describe, expect, it } from "vitest";
-import { PTO_CONSTANTS } from "../const";
-import { selectBridgesForStrategy } from "../suggestions/utils/selectors";
-import { FilterStrategy, type Suggestion } from "../types";
-import { clearDateKeyCache, clearHolidayCache } from "../utils/cache";
-import { findPlanningCandidates, type PlanningCandidates, selectionInputOf } from "../utils/candidates";
-import { measurePlan } from "../utils/measures";
 import { generateAlternatives } from "./generateAlternatives";
 import { planDistance } from "./utils/helpers";
 
@@ -129,7 +129,10 @@ describe("generateAlternatives", () => {
 	});
 
 	it("returns at most maxAlternatives alternatives", () => {
-		expect(planAlternatives({ ...BASE, ptoDays: 3, maxAlternatives: 2 }).alternatives.length).toBeLessThanOrEqual(2);
+		const { alternatives } = planAlternatives({ ...BASE, ptoDays: 3, maxAlternatives: 2 });
+
+		expect(alternatives.length).toBeGreaterThan(0);
+		expect(alternatives.length).toBeLessThanOrEqual(2);
 	});
 
 	it.each(Object.values(FilterStrategy))(

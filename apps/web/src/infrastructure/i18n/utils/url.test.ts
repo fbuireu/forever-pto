@@ -1,8 +1,8 @@
+import { LOCALES } from "@infrastructure/i18n/locales";
 import { describe, expect, it, vi } from "vitest";
-import { LOCALES } from "../locales";
 
 vi.mock("../routing", async () => {
-	const { EN, LOCALES: L } = await import("../locales");
+	const { EN, LOCALES: L } = await import("@infrastructure/i18n/locales");
 	return { routing: { defaultLocale: EN, locales: L } };
 });
 

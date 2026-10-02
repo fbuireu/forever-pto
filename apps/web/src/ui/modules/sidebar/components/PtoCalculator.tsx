@@ -10,11 +10,11 @@ import { SlidingNumber } from "@ui/modules/core/animate/text/SlidingNumber";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { Combobox } from "@ui/modules/core/primitives/Combobox";
 import { Input } from "@ui/modules/core/primitives/Input";
-import { SidebarFieldTooltip } from "@ui/modules/sidebar/components/SidebarFieldLabel";
 import { Calculator } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
+import { SidebarFieldTooltip } from "./SidebarFieldLabel";
 
 interface MonthOption {
 	value: string;
@@ -24,7 +24,7 @@ interface MonthOption {
 export const PtoCalculator = () => {
 	const locale = useLocale();
 	const t = useTranslations("ptoCalculator");
-	const [daysPerMonth, setDaysPerMonth] = useState<number>(2.5);
+	const [daysPerMonthInput, setDaysPerMonthInput] = useState("2.5");
 	const [selectedMonth, setSelectedMonth] = useState<string>("1");
 	const [result, setResult] = useState<{ total: number; days: number; month: number } | null>(null);
 
@@ -35,6 +35,7 @@ export const PtoCalculator = () => {
 		})),
 	);
 	const trimManualDays = useHolidaysStore((state) => state.trimManualDays);
+	const askForPlan = useHolidaysStore((state) => state.askForPlan);
 
 	const monthOptions: MonthOption[] = useMemo(() => {
 		const monthNames = getMonthNames({ locale, format: "long" });
@@ -47,6 +48,7 @@ export const PtoCalculator = () => {
 
 	const handleCalculate = () => {
 		track({ event: "tool_used", properties: { tool: "ptoCalculator" } });
+		const daysPerMonth = Number(daysPerMonthInput);
 		const monthNumber = Number(selectedMonth);
 		const accumulated = daysPerMonth * monthNumber;
 
@@ -61,6 +63,7 @@ export const PtoCalculator = () => {
 		const nextBudget = Math.max(MIN_PTO_DAYS, Math.round(days));
 		if (nextBudget === ptoDays) return;
 
+		askForPlan();
 		setPtoDays(nextBudget);
 		trimManualDays(nextBudget);
 		track({
@@ -91,8 +94,8 @@ export const PtoCalculator = () => {
 					step="0.1"
 					min="0"
 					max="8"
-					value={daysPerMonth}
-					onChange={(e) => setDaysPerMonth(Number(e.target.value))}
+					value={daysPerMonthInput}
+					onChange={(e) => setDaysPerMonthInput(e.target.value)}
 				/>
 			</div>
 
@@ -123,8 +126,11 @@ export const PtoCalculator = () => {
 							<span>{t("days")}</span>
 						</div>
 						<p className="text-muted-foreground flex gap-0.5">
-							<SlidingNumber number={result.days} decimalPlaces={1} /> {t("daysMonth")} ×{" "}
-							<SlidingNumber number={result.month} decimalPlaces={0} /> {t("months")}
+							{t.rich("breakdown", {
+								rate: () => <SlidingNumber number={result.days} decimalPlaces={1} />,
+								count: () => <SlidingNumber number={result.month} decimalPlaces={0} />,
+								months: result.month,
+							})}
 						</p>
 					</div>
 					<AnimateIcon animateOnHover>

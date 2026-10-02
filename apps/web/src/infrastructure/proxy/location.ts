@@ -2,12 +2,12 @@ import { detectCountry } from "@infrastructure/services/location/detectCountry";
 import type { NextRequest, NextResponse } from "next/server";
 import { setLocationCookie, USER_COUNTRY_COOKIE } from "./cookie";
 
-interface MiddlewareParams {
+interface LocationParams {
 	request: NextRequest;
 	response: NextResponse;
 }
 
-export async function location({ request, response }: MiddlewareParams) {
+export async function location({ request, response }: LocationParams) {
 	const knownCountry = request.cookies.get(USER_COUNTRY_COOKIE)?.value;
 
 	if (knownCountry) {

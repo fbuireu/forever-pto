@@ -1,9 +1,9 @@
+import type { PaymentFailedEvent } from "@domain/payment/events/types";
 import { TursoService } from "@infrastructure/clients/db/turso/service";
 import { DatabaseError } from "@infrastructure/errors";
 import { LoggerService } from "@infrastructure/logging/service";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { PaymentFailedEvent } from "../events/types";
 import { handlePaymentFailed } from "./paymentFailed";
 
 vi.mock("@infrastructure/services/payments/repository", () => ({
@@ -43,16 +43,14 @@ describe("handlePaymentFailed", () => {
 
 	it("fails with DatabaseError when updatePaymentStatus fails", async () => {
 		const { updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
-		vi.mocked(updatePaymentStatus).mockReturnValueOnce(
-			Effect.fail(new DatabaseError({ message: "db error" })) as never,
-		);
+		vi.mocked(updatePaymentStatus).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "db error" })));
 		const err = await runFail(handlePaymentFailed(EVENT));
 		expect(err).toBeInstanceOf(DatabaseError);
 	});
 
 	it("warns rather than retrying when the guarded update touched no row", async () => {
 		const { updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
-		vi.mocked(updatePaymentStatus).mockReturnValueOnce(Effect.succeed(false) as never);
+		vi.mocked(updatePaymentStatus).mockReturnValueOnce(Effect.succeed(false));
 		await run(handlePaymentFailed(EVENT));
 		expect(mockLogger.warn).toHaveBeenCalledWith({
 			message: "Ignoring failed-payment event for an already-succeeded or absent payment",
@@ -73,9 +71,7 @@ describe("handlePaymentFailed", () => {
 
 	it("calls logError when updatePaymentStatus fails", async () => {
 		const { updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
-		vi.mocked(updatePaymentStatus).mockReturnValueOnce(
-			Effect.fail(new DatabaseError({ message: "db error" })) as never,
-		);
+		vi.mocked(updatePaymentStatus).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "db error" })));
 		await runFail(handlePaymentFailed(EVENT));
 		expect(mockLogger.logError).toHaveBeenCalledOnce();
 	});

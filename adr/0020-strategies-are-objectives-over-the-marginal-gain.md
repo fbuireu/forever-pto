@@ -100,5 +100,6 @@ cannot express the double count at all.
   the Optimized plan with more days than their own. It is enforced once, in `generateAlternatives`, with the same
   measure the Metrics use; a second check on the measured Metrics was removed because it dropped plans after the
   search had spent its runs, and the list came back short.
-- The rules and their traps are in [`apps/web/src/domain/calendar/AGENTS.md`](../apps/web/src/domain/calendar/AGENTS.md);
+- The rules are `D10` to `D15` in [`CODING_STANDARDS.md`](../CODING_STANDARDS.md), and their traps are in
+  [`apps/web/src/domain/calendar/AGENTS.md`](../apps/web/src/domain/calendar/AGENTS.md);
   the wiki's planning algorithm page explains the objectives to a reader.

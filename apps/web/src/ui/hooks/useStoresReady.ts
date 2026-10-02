@@ -1,3 +1,5 @@
+"use client";
+
 import { useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
 import { useLocationStore } from "@application/stores/location";

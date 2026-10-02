@@ -13,10 +13,16 @@ import { useCurrencyFormatter } from "@ui/utils/currencies";
 import { Skeleton } from "boneyard-js/react";
 import { AlertCircle } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { type FormEvent, useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { ExpressCheckoutFixture } from "./ExpressCheckoutFixture";
 
 const UNKNOWN_PAYMENT_ERROR = "unknown_error";
+const HAND_BACK_DELAY_MS = 1000;
+
+interface PendingHandBack {
+	timer: ReturnType<typeof setTimeout>;
+	handBack: () => void;
+}
 
 async function fireConfetti() {
 	const confetti = (await import("canvas-confetti")).default;
@@ -59,10 +65,23 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 	const [isPending, startTransition] = useTransition();
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const setPremiumStatus = usePremiumStore((state) => state.setPremiumStatus);
+	const pendingHandBack = useRef<PendingHandBack | null>(null);
 
 	useEffect(() => {
 		void import("canvas-confetti");
 	}, []);
+
+	useEffect(
+		() => () => {
+			const pending = pendingHandBack.current;
+			if (!pending) return;
+
+			pendingHandBack.current = null;
+			clearTimeout(pending.timer);
+			pending.handBack();
+		},
+		[],
+	);
 
 	const formattedAmount = useMemo(() => formatCurrency(amount), [amount, formatCurrency]);
 	const discountText = useMemo(() => {
@@ -79,7 +98,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 			stripe,
 			elements,
 			email,
-			returnUrl: `${globalThis.location.origin}/api/payment/activate?locale=${locale}`,
+			returnUrl: `${globalThis.location.origin}/api/payment/activate?locale=${encodeURIComponent(locale)}`,
 		});
 
 		switch (result.outcome) {
@@ -102,10 +121,17 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 				setPremiumStatus({ email: result.sessionData.email, premiumKey: result.sessionData.premiumKey });
 				track({ event: "payment_completed", properties: { amount } });
 				void fireConfetti();
-				setTimeout(() => {
-					onSuccess();
-				}, 1000);
+				pendingHandBack.current = {
+					timer: setTimeout(() => {
+						pendingHandBack.current = null;
+						onSuccess();
+					}, HAND_BACK_DELAY_MS),
+					handBack: onSuccess,
+				};
 				return;
+
+			default:
+				return result satisfies never;
 		}
 	}, [stripe, elements, email, onSuccess, setPremiumStatus, t, tErrors, locale, amount]);
 
@@ -213,7 +239,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 					className="w-full"
 					aria-busy={isPending}
 				>
-					{isPending ? t("processing") : `${t("pay")} ${formattedAmount}`}
+					{isPending ? t("processing") : t("payAmount", { amount: formattedAmount })}
 				</Button>
 			</form>
 		</div>

@@ -46,15 +46,11 @@ export const HolidaysList = () => {
 						<TabsHighlightItem value={HolidayVariant.NATIONAL}>
 							<TabsTrigger value={HolidayVariant.NATIONAL}>{t("nationalTab")}</TabsTrigger>
 						</TabsHighlightItem>
-						{hasRegionalHolidays ? (
-							<TabsHighlightItem value={HolidayVariant.REGIONAL}>
-								<TabsTrigger value={HolidayVariant.REGIONAL}>{t("regionalTab")}</TabsTrigger>
-							</TabsHighlightItem>
-						) : (
-							<div className="inline-flex cursor-not-allowed items-center size-full justify-center whitespace-nowrap rounded-sm px-2 py-1 text-sm font-medium opacity-50">
+						<TabsHighlightItem value={HolidayVariant.REGIONAL}>
+							<TabsTrigger value={HolidayVariant.REGIONAL} disabled={!hasRegionalHolidays}>
 								{t("regionalTab")}
-							</div>
-						)}
+							</TabsTrigger>
+						</TabsHighlightItem>
 						<PremiumFeature
 							feature={PremiumFeatureId.CUSTOM_HOLIDAYS}
 							description={t("customHolidaysDescription")}

@@ -42,7 +42,7 @@ export const EditHolidayModal = ({ open, onClose, locale, holiday }: EditHoliday
 					carryOverMonths,
 				});
 			}}
-			successDescription={(data) => t("successDescription", { name: data.name })}
+			successDescription={({ data }) => t("successDescription", { name: data.name })}
 		/>
 	);
 };

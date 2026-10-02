@@ -35,4 +35,4 @@ At runtime this is backed by the R2 bucket bound as `NEXT_INC_CACHE_R2_BUCKET` i
 
 ## What is deliberately not cached
 
-API routes that carry user state opt out explicitly: `apps/web/src/app/api/check-session/route.ts` wraps every response in `noStore()` from `apps/web/src/infrastructure/api/response.ts`, since premium-session payloads must never be shared between users.
+API routes that carry user state opt out explicitly: `check-session`, `payment` and `contact` under `apps/web/src/app/api/` wrap every response in `noStore()` from `apps/web/src/infrastructure/api/response.ts`, since a premium-session payload, a PaymentIntent's client secret and one sender's contact outcome must never be shared between users.

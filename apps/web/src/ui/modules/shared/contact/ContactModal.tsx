@@ -28,7 +28,13 @@ import { useForm } from "react-hook-form";
 import { useShallow } from "zustand/react/shallow";
 import { FormButtons } from "../FormButtons";
 import { Step, StepOutcome, StepOutcomeTone } from "../StepOutcome";
-import { resolveApiErrorMessage } from "../utils/helpers";
+import { type ApiErrorValues, resolveApiErrorMessage } from "../utils/helpers";
+
+const CONTACT_ERROR_VALUES: ApiErrorValues = new Map([
+	["name_too_short", { min: NAME_MIN_LENGTH }],
+	["subject_too_short", { min: SUBJECT_MIN_LENGTH }],
+	["message_too_short", { min: MESSAGE_MIN_LENGTH }],
+]);
 
 interface ContactModalProps {
 	open: boolean;
@@ -94,7 +100,13 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
 					setStep(Step.SUCCESS);
 				} else {
 					setErrorMessage(
-						resolveApiErrorMessage({ code: result.error, t, shared: tErrors, fallback: t("failedToSend") }),
+						resolveApiErrorMessage({
+							code: result.error,
+							t,
+							shared: tErrors,
+							fallback: t("failedToSend"),
+							values: CONTACT_ERROR_VALUES,
+						}),
 					);
 					setStep(Step.ERROR);
 				}

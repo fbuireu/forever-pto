@@ -9,13 +9,13 @@ import { memo, useMemo } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { COLOR_SCHEMES } from "./const";
 
-interface QuarterDistributionChartChartProps {
+interface QuarterDistributionChartProps {
 	quarterDist: number[];
 }
 
 export const QuarterDistributionChart = memo(function QuarterDistributionChart({
 	quarterDist,
-}: QuarterDistributionChartChartProps) {
+}: QuarterDistributionChartProps) {
 	const t = useTranslations("charts");
 
 	const data = useMemo(

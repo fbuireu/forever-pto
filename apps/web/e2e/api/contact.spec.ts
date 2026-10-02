@@ -29,8 +29,9 @@ test.describe("POST /api/contact", () => {
 		expect(body.success).toBe(false);
 	});
 
-	test("returns JSON content-type", async ({ request }) => {
+	test("returns JSON that no cache keeps", async ({ request }) => {
 		const response = await request.post(URL, { data: {} });
 		expect(response.headers()["content-type"]).toContain("application/json");
+		expect(response.headers()["cache-control"]).toContain("no-store");
 	});
 });

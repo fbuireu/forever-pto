@@ -51,7 +51,7 @@ import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipTrigger } from '@ui
 </Tooltip>
 
 <Tooltip>
-  <TooltipInfoTrigger />
+  <TooltipInfoTrigger aria-label='What Efficiency measures' />
   <TooltipContent>Shown on hover or focus.</TooltipContent>
 </Tooltip>
 ```
@@ -68,7 +68,7 @@ Tooltips are hover/focus-only hints, so content must be non-essential.
 
 - Base UI renders the bubble with `role='tooltip'` and points the trigger's `aria-describedby` at it, so the text is read as a description of the trigger. It opens on hover **and** on keyboard focus, and Escape dismisses it.
 - A tooltip is never the only place for information: the trigger has to make sense without it, and touch screens cannot hover.
-- `TooltipInfoTrigger` renders an `aria-hidden` "i", so the trigger itself needs an `aria-label` (or the tooltip text is all a screen reader gets, as a description of an unnamed button).
+- `TooltipInfoTrigger` renders an `aria-hidden` "i", so its `aria-label` is required: the type refuses a trigger with no name, which would leave the tooltip text as the description of an unnamed button.
 
 ## In the app
 

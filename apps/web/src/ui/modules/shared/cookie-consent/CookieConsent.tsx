@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as CookieConsentLib from "vanilla-cookieconsent";
 
-import { CookieConsentDialog } from "./CookieConsentDialog";
+import { CookieConsentDialog, type ServiceChangeParams } from "./CookieConsentDialog";
 import {
 	ANALYTICS_CATEGORY,
 	allAnalyticsServices,
@@ -66,7 +66,7 @@ export const CookieConsent = () => {
 		setServiceStates(checked ? allServicesEnabled : allServicesDisabled);
 	}, []);
 
-	const handleServiceChange = useCallback((serviceId: string, checked: boolean) => {
+	const handleServiceChange = useCallback(({ serviceId, checked }: ServiceChangeParams) => {
 		setServiceStates((prev) => ({ ...prev, [serviceId]: checked }));
 	}, []);
 

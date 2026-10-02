@@ -14,8 +14,9 @@ import { TUTORIAL_ANCHOR } from "@ui/modules/tutorial/anchors";
 import { cn } from "@ui/utils/cn";
 import { BarChart3, CalendarDays, Sparkles, TrendingUp } from "lucide-react";
 import { m, type Transition, type Variants } from "motion/react";
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { useCallback } from "react";
+import { EFFICIENCY_FORMAT } from "./utils/helpers";
 
 const STAT_CARD_MOTION_CONFIG = {
 	initial: "rest",
@@ -53,6 +54,10 @@ const BADGE_VARIANTS: Variants = {
 	},
 };
 
+const STEP_BUTTON_TAP = { filter: "brightness(0.85)" } as const;
+
+const PROGRESS_TRANSITION: Transition = { type: "tween", duration: 0.15, ease: "easeOut" };
+
 interface AlternativesProps {
 	allSuggestions: MeasuredSuggestion[];
 	onSelectionChange: (params: AlternativeSelectionBaseParams) => void;
@@ -69,6 +74,7 @@ function Alternatives({
 	currentSelectionIndex,
 }: AlternativesProps) {
 	const t = useTranslations("alternativesManager");
+	const format = useFormatter();
 	const currentIndex = selectedIndex;
 	const totalOptions = allSuggestions.length;
 	const currentSuggestion = allSuggestions[currentIndex];
@@ -93,7 +99,7 @@ function Alternatives({
 			<div className="flex shrink-0 grow items-stretch overflow-hidden rounded-xl border-[3px] border-[var(--frame)] bg-[var(--surface-panel)] shadow-[var(--shadow-brutal-xs)]">
 				<m.button
 					type="button"
-					whileTap={{ filter: "brightness(0.85)" }}
+					whileTap={STEP_BUTTON_TAP}
 					disabled={currentIndex === 0}
 					onClick={handlePrevious}
 					aria-label={t("previousSuggestion")}
@@ -124,7 +130,7 @@ function Alternatives({
 				</div>
 				<m.button
 					type="button"
-					whileTap={{ filter: "brightness(0.85)" }}
+					whileTap={STEP_BUTTON_TAP}
 					disabled={currentIndex === totalOptions - 1}
 					onClick={handleNext}
 					aria-label={t("nextSuggestion")}
@@ -175,8 +181,10 @@ function Alternatives({
 					className="flex h-11 items-center gap-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_20%,white_80%)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]"
 				>
 					<span className="sr-only">
-						{t("efficiency")}: {efficiency.toFixed(1)}x
-						{isMainSuggestion ? "" : ` (${efficiencyDiff >= 0 ? "+" : ""}${efficiencyDiff.toFixed(1)})`}
+						{t("efficiency")}: {t("efficiencyValue", { efficiency: format.number(efficiency, EFFICIENCY_FORMAT) })}
+						{isMainSuggestion
+							? ""
+							: ` (${format.number(efficiencyDiff, { ...EFFICIENCY_FORMAT, signDisplay: "always" })})`}
 					</span>
 					<TrendingUp size={20} className="text-purple-600 dark:text-purple-400 shrink-0" aria-hidden="true" />
 					<div className="flex items-center gap-1" aria-hidden="true">
@@ -214,7 +222,7 @@ function Alternatives({
 						className="flex h-11 items-center gap-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-3 py-2 shadow-[var(--shadow-brutal-xs)]"
 					>
 						<span className="sr-only">
-							{t("comparison")}: {Math.round((efficiency / mainEfficiency) * 100)}%
+							{t("comparison")}: {format.number(efficiency / mainEfficiency, { style: "percent" })}
 						</span>
 						<BarChart3 size={20} className="text-neutral-600 dark:text-neutral-400 shrink-0" aria-hidden="true" />
 						<div className="flex items-center gap-1" aria-hidden="true">
@@ -264,6 +272,7 @@ function Alternatives({
 function Status() {
 	const t = useTranslations("ptoStatus");
 	const resetManualSelection = useHolidaysStore((state) => state.resetManualSelection);
+	const askForPlan = useHolidaysStore((state) => state.askForPlan);
 	const {
 		ptoDays,
 		suggested: activeSuggestedCount,
@@ -273,6 +282,7 @@ function Status() {
 		hasManualChanges,
 	} = usePlanReadout();
 	const handleReset = () => {
+		askForPlan();
 		resetManualSelection();
 		track({ event: "manual_changes_reset", properties: { surface: "panel" } });
 	};
@@ -352,12 +362,9 @@ function Status() {
 						<ProgressTrack
 							className="h-[22px] rounded-full bg-background shadow-[var(--shadow-brutal-3)] flex items-center"
 							indicatorClassName="rounded-full border-r-[3px] border-[var(--frame)]"
-							transition={{ type: "tween", duration: 0.15, ease: "easeOut" }}
+							transition={PROGRESS_TRANSITION}
 						/>
-						<ProgressOverlayLabel
-							overlayClassName="text-[var(--color-brand-ink)]"
-							transition={{ type: "tween", duration: 0.15, ease: "easeOut" }}
-						>
+						<ProgressOverlayLabel overlayClassName="text-[var(--color-brand-ink)]" transition={PROGRESS_TRANSITION}>
 							{t("usedDays", { used: usedDays, total: ptoDays, pct: usedPct })}
 						</ProgressOverlayLabel>
 					</div>
@@ -367,12 +374,9 @@ function Status() {
 						<ProgressTrack
 							className="h-[22px] rounded-full bg-background shadow-[var(--shadow-brutal-3)] flex items-center"
 							indicatorClassName="rounded-full border-r-[3px] border-[var(--frame)] bg-[var(--color-brand-teal)]"
-							transition={{ type: "tween", duration: 0.15, ease: "easeOut" }}
+							transition={PROGRESS_TRANSITION}
 						/>
-						<ProgressOverlayLabel
-							overlayClassName="text-[var(--color-brand-ink)]"
-							transition={{ type: "tween", duration: 0.15, ease: "easeOut" }}
-						>
+						<ProgressOverlayLabel overlayClassName="text-[var(--color-brand-ink)]" transition={PROGRESS_TRANSITION}>
 							{t("remainingDays", { remaining, pct: remainingPct })}
 						</ProgressOverlayLabel>
 					</div>

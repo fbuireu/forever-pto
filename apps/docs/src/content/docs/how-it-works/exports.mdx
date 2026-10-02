@@ -11,7 +11,7 @@ Users can take their plan with them as a printable **PDF** or an **ICS** file th
 
 `apps/web/src/ui/modules/sidebar/components/CalendarExport.tsx` (a sidebar tool, tutorial anchor `data-tutorial='calendar-export'`) reads `year` from the filters store, the Holidays inside the Planning Window from the holidays store, and the PTO Days through `usePlacedPlan` (`apps/web/src/ui/hooks/usePlanReadout.ts`): the applied plan, `currentSelection ?? suggestion`, with the Manual Days added and the Removed Days struck, so the file carries what the calendar shows. That hook does not subscribe to `isCalculating`, so a calculation starting and ending does not redraw the tool. Two toggle buttons choose what to include: holidays, PTO days, or both; the download buttons disable when the resulting selection is empty.
 
-The download buttons, and only the buttons, are wrapped in `PremiumFeature` (`apps/web/src/ui/modules/premium/PremiumFeature.tsx`), so free users see the tool blurred with a lock and get the upgrade modal on interaction. See [premium](/how-it-works/premium/).
+The download buttons, and only the buttons, are wrapped in `PremiumFeature` (`apps/web/src/ui/modules/premium/PremiumFeature.tsx`), so free users see the tool blurred with a lock and get the Premium modal on interaction. See [premium](/how-it-works/premium/).
 ```mermaid
 flowchart LR
   ST[(holidays + filters stores)] --> SEL[Holidays in the window, and the placed PTO Days<br/>usePlacedPlan]

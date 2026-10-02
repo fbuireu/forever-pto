@@ -1,6 +1,5 @@
 "use client";
 
-import { AutoHeight } from "@ui/modules/core/animate/effects/AutoHeight";
 import { cn } from "@ui/utils/cn";
 import { AnimatePresence, type HTMLMotionProps, m, type Transition } from "motion/react";
 import {
@@ -20,6 +19,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { AutoHeight } from "../effects/AutoHeight";
 import { MotionHighlight, MotionHighlightItem } from "../effects/MotionHighlight";
 
 type TabsContextType = {
@@ -70,6 +70,8 @@ const activateSiblingTab = ({ from, key }: ActivateSiblingTabParams) => {
 	tabs[target].click();
 	return true;
 };
+
+const HIGHLIGHT_TRANSITION: Transition = { type: "spring", stiffness: 200, damping: 25 };
 
 const TabsContext = createContext<TabsContextType | undefined>(undefined);
 
@@ -125,11 +127,7 @@ type TabsHighlightProps = {
 	transition?: Transition;
 };
 
-function TabsHighlight({
-	children,
-	activeClassName,
-	transition = { type: "spring", stiffness: 200, damping: 25 },
-}: Readonly<TabsHighlightProps>) {
+function TabsHighlight({ children, activeClassName, transition = HIGHLIGHT_TRANSITION }: Readonly<TabsHighlightProps>) {
 	const { activeValue } = useTabs();
 
 	return (
@@ -266,15 +264,19 @@ type TabsContentProps = Omit<HTMLMotionProps<"div">, "value"> & {
 };
 
 function TabsContent({
-	value: _value,
+	value,
 	children,
 	className,
 	transition = { duration: 0.22, ease: "easeOut" },
 	...props
 }: TabsContentProps) {
+	const { triggerId, panelId } = useTabs();
+
 	return (
 		<m.div
 			role="tabpanel"
+			id={panelId(value)}
+			aria-labelledby={triggerId(value)}
 			data-slot="tabs-content"
 			initial={{ opacity: 0, filter: "blur(4px)" }}
 			animate={{ opacity: 1, filter: "blur(0px)" }}

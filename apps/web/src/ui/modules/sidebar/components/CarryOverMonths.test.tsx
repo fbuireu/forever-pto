@@ -7,6 +7,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const store = vi.hoisted(() => ({ carryOverMonths: 1, setCarryOverMonths: vi.fn() }));
 
 const track = vi.hoisted(() => vi.fn());
+const askForPlan = vi.hoisted(() => vi.fn());
+vi.mock("@application/stores/holidays", () => ({
+	useHolidaysStore: (selector: (state: unknown) => unknown) => selector({ askForPlan }),
+}));
 vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
 
 vi.mock("@application/stores/filters", () => ({
@@ -124,6 +128,26 @@ describe("CarryOverMonths debounce", () => {
 		});
 
 		expect(store.setCarryOverMonths).toHaveBeenCalledExactlyOnceWith(4);
+	});
+
+	it("asks for a plan once the slider rests on a new value, and none when it comes back to where it was", () => {
+		askForPlan.mockClear();
+		const { unmount } = renderField();
+		nudgeUp();
+		act(() => {
+			vi.advanceTimersByTime(300);
+		});
+		expect(askForPlan).toHaveBeenCalledOnce();
+		unmount();
+		askForPlan.mockClear();
+
+		renderField();
+		nudgeUp();
+		fireEvent.keyDown(slider(), { key: "ArrowLeft" });
+		act(() => {
+			vi.advanceTimersByTime(300);
+		});
+		expect(askForPlan).not.toHaveBeenCalled();
 	});
 
 	it("drops a pending write when it unmounts, rather than writing into a store nobody is watching", () => {

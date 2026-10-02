@@ -1,7 +1,10 @@
+"use client";
+
 import { Button } from "@ui/modules/core/primitives/Button";
 import { cn } from "@ui/utils/cn";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import type { ComponentProps } from "react";
 
 interface FormButtonsProps {
 	onCancel?: () => void;
@@ -11,7 +14,7 @@ interface FormButtonsProps {
 	hideCancel?: boolean;
 	submitClassName?: string;
 	cancelClassName?: string;
-	submitVariant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "success";
+	submitVariant?: ComponentProps<typeof Button>["variant"];
 	pending: boolean;
 }
 

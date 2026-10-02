@@ -8,7 +8,7 @@ interface QuickStartProps {
 }
 
 export const QuickStart = async ({ locale }: QuickStartProps) => {
-	const [countries, currentYear] = await Promise.all([getCountries(locale), getCurrentYear()]);
+	const [countries, serverYear] = await Promise.all([getCountries(locale), getCurrentYear()]);
 
-	return <QuickStartClient countries={countries} currentYear={currentYear} />;
+	return <QuickStartClient countries={countries} serverYear={serverYear} />;
 };

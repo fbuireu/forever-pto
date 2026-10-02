@@ -1,10 +1,10 @@
-import { PTO_CONSTANTS } from "../const";
-import { restBlocksOf } from "../metrics/utils/helpers";
-import { objectiveFor, outranks, selectBridges } from "../suggestions/utils/selectors";
-import { FilterStrategy, type Suggestion } from "../types";
-import { getCombinationKey } from "../utils/cache";
-import { type PlanningCandidates, selectionInputOf } from "../utils/candidates";
-import { measurePlan } from "../utils/measures";
+import { PTO_CONSTANTS } from "@domain/calendar/const";
+import { restBlocksOf } from "@domain/calendar/metrics/utils/helpers";
+import { objectiveFor, outranks, selectBridges } from "@domain/calendar/suggestions/utils/selectors";
+import { FilterStrategy, type Suggestion } from "@domain/calendar/types";
+import { getCombinationKey } from "@domain/calendar/utils/cache";
+import { type PlanningCandidates, selectionInputOf } from "@domain/calendar/utils/candidates";
+import { measurePlan } from "@domain/calendar/utils/measures";
 import { planDistance } from "./utils/helpers";
 
 export interface GenerateAlternativesParams {

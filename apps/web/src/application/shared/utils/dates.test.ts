@@ -21,15 +21,12 @@ import {
 } from "./dates";
 
 describe("dayIndex in a zone that changes its clocks", () => {
-	const runnerZone = process.env.TZ;
-
 	beforeAll(() => {
-		process.env.TZ = "Europe/Madrid";
+		vi.stubEnv("TZ", "Europe/Madrid");
 	});
 
 	afterAll(() => {
-		if (runnerZone === undefined) delete process.env.TZ;
-		else process.env.TZ = runnerZone;
+		vi.unstubAllEnvs();
 	});
 
 	it("keeps a one-day step across both daylight-saving changes", () => {

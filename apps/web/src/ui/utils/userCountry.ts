@@ -1,4 +1,4 @@
-const USER_COUNTRY_COOKIE = "user-country";
+import { USER_COUNTRY_COOKIE } from "@infrastructure/proxy/cookie";
 
 export function getUserCountryFromCookie(): string | undefined {
 	if (typeof document === "undefined") return undefined;

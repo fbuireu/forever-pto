@@ -18,8 +18,9 @@ raises the question) `domain/calendar/` in several: [`window.ts`](../apps/web/sr
 from the layer above it, which is the wrong direction for a dependency arrow.
 
 **What carries the rule is the specifier list, not the file count, and it is unchanged.**
-`domain/AGENTS.md` enumerates what the calendar domain may import from outside itself, and a new *file*
-reaching an already-listed specifier adds nothing to that list; `window.ts` is exactly that. `dates.ts` is one
+[`apps/web/src/domain/AGENTS.md`](../apps/web/src/domain/AGENTS.md) enumerates what the calendar domain may import
+from outside itself, and the contract suite holds the code to that list. A new *file* reaching an already-listed specifier
+adds nothing to that list, and `window.ts` is exactly that. `dates.ts` is one
 of the upward imports the calendar domain has (`@application/dto/holiday/types` is the other), and
 the remaining entries on that list are the bare `temporal-polyfill` and `next-intl`.
 

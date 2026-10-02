@@ -1,3 +1,4 @@
+import { PromoCodeErrors } from "@application/dto/payment/types";
 import { describe, expect, it } from "vitest";
 import {
 	DatabaseError,
@@ -5,25 +6,11 @@ import {
 	MissingDonorEmailError,
 	PaymentError,
 	PromoCodeError,
-	PromoCodeErrors,
 	RateLimitError,
 	SessionError,
 	ValidationError,
 	WebhookError,
 } from "./errors";
-
-describe("PromoCodeErrors", () => {
-	it("exposes the expected wire-format codes", () => {
-		expect(PromoCodeErrors).toEqual({
-			INVALID_OR_EXPIRED: "invalid_or_expired",
-			USAGE_LIMIT_REACHED: "usage_limit_reached",
-			COUPON_EXPIRED: "coupon_expired",
-			COUPON_INVALID: "coupon_invalid",
-			FAILED_TO_LOAD: "failed_to_load",
-			MIN_AMOUNT_EXCEEDED: "min_amount_exceeded",
-		});
-	});
-});
 
 describe("DatabaseError", () => {
 	it("has the correct _tag", () => {

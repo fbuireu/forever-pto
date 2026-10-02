@@ -1,3 +1,4 @@
+import type { PaymentSucceededEvent } from "@domain/payment/events/types";
 import type { TursoService } from "@infrastructure/clients/db/turso/service";
 import type { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import type { DatabaseError } from "@infrastructure/errors";
@@ -5,7 +6,6 @@ import { LoggerService } from "@infrastructure/logging/service";
 import { retrieveCharge } from "@infrastructure/services/payments/provider/charge";
 import { updatePaymentCharge, updatePaymentStatus } from "@infrastructure/services/payments/repository";
 import { Effect } from "effect";
-import type { PaymentSucceededEvent } from "../events/types";
 
 const updateCharge = (
 	event: PaymentSucceededEvent,

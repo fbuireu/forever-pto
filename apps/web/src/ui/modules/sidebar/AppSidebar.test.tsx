@@ -1,9 +1,15 @@
+import caMessages from "@i18n/messages/ca.json";
+import deMessages from "@i18n/messages/de.json";
+import enMessages from "@i18n/messages/en.json";
+import esMessages from "@i18n/messages/es.json";
+import frMessages from "@i18n/messages/fr.json";
+import itMessages from "@i18n/messages/it.json";
 import { render, screen, within } from "@testing-library/react";
 import { MAIN_CONTENT_ID } from "@ui/modules/layout/SkipToContent";
 import { TUTORIAL_ANCHOR } from "@ui/modules/tutorial/anchors";
-import type { Locale } from "next-intl";
+import { createTranslator, type Locale } from "next-intl";
 import type { ComponentProps, ReactNode } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 interface CollapsibleGroupProps {
 	defaultOpen?: boolean;
@@ -12,18 +18,43 @@ interface CollapsibleGroupProps {
 	"data-tutorial"?: string;
 }
 
-vi.mock("next-intl/server", () => ({
-	getTranslations: async (namespace: string) => (key: string) => `${namespace}.${key}`,
+const { mockGetTranslations, loaders, lazy } = vi.hoisted(() => ({
+	mockGetTranslations: vi.fn(),
+	loaders: new Map<string, () => Promise<unknown>>(),
+	lazy: {
+		Regions: () => null,
+		Years: () => null,
+		Strategy: () => null,
+		AllowPastDays: () => null,
+		CarryOverMonths: () => null,
+		PtoCalculator: () => null,
+		PtoSalaryCalculator: () => null,
+		WorkdayCounter: () => null,
+		CalendarExport: () => null,
+	},
 }));
+
+vi.mock("next-intl/server", () => ({ getTranslations: mockGetTranslations }));
 
 vi.mock("@ui/utils/getCurrentYear", () => ({ getCurrentYear: async () => 2026 }));
 
 vi.mock("next/dynamic", () => ({
 	default: (loader: () => Promise<unknown>) => {
 		const name = /components\/(\w+)/.exec(loader.toString())?.[1] ?? "unknown";
+		loaders.set(name, loader);
 		return (props: Record<string, unknown>) => <div data-dynamic={name} data-props={JSON.stringify(props)} />;
 	},
 }));
+
+vi.mock("./components/Regions", () => ({ Regions: lazy.Regions }));
+vi.mock("./components/Years", () => ({ Years: lazy.Years }));
+vi.mock("./components/Strategy", () => ({ Strategy: lazy.Strategy }));
+vi.mock("./components/AllowPastDays", () => ({ AllowPastDays: lazy.AllowPastDays }));
+vi.mock("./components/CarryOverMonths", () => ({ CarryOverMonths: lazy.CarryOverMonths }));
+vi.mock("./components/PtoCalculator", () => ({ PtoCalculator: lazy.PtoCalculator }));
+vi.mock("./components/PtoSalaryCalculator", () => ({ PtoSalaryCalculator: lazy.PtoSalaryCalculator }));
+vi.mock("./components/WorkdayCounter", () => ({ WorkdayCounter: lazy.WorkdayCounter }));
+vi.mock("./components/CalendarExport", () => ({ CalendarExport: lazy.CalendarExport }));
 
 vi.mock("@ui/modules/core/animate/base/Sidebar", () => ({
 	Sidebar: ({ children, landmarkLabel }: { children?: ReactNode; landmarkLabel?: string }) => (
@@ -69,10 +100,33 @@ vi.mock("./components/SidebarCollapsibleGroup", () => ({
 
 const { AppSidebar } = await import("./AppSidebar");
 
+const BUNDLES: Record<string, typeof enMessages> = {
+	en: enMessages,
+	es: esMessages,
+	ca: caMessages,
+	it: itMessages,
+	de: deMessages,
+	fr: frMessages,
+};
+
+interface TranslateInParams {
+	locale: Locale;
+	messages: typeof enMessages;
+}
+
+const translateIn = ({ locale, messages }: TranslateInParams) =>
+	mockGetTranslations.mockImplementation(async (namespace: "sidebar" | "a11y") =>
+		createTranslator({ locale, messages, namespace }),
+	);
+
 const renderSidebar = async () => {
 	const element = await AppSidebar({ locale: "en" as Locale, children: <p>page content</p> });
 	return render(element);
 };
+
+beforeEach(() => {
+	translateIn({ locale: "en", messages: enMessages });
+});
 
 const dynamicProps = (name: string) => {
 	const node = document.querySelector(`[data-dynamic="${name}"]`);
@@ -83,14 +137,14 @@ describe("AppSidebar", () => {
 	it("labels the landmark from the a11y bundle rather than the sidebar one", async () => {
 		await renderSidebar();
 
-		expect(screen.getByRole("complementary", { name: "a11y.sidebarLandmark" })).toBeTruthy();
+		expect(screen.getByRole("complementary", { name: enMessages.a11y.sidebarLandmark })).toBeTruthy();
 	});
 
 	it("heads the configuration and the tools groups so assistive tech can jump between them", async () => {
 		await renderSidebar();
 
-		expect(screen.getByRole("heading", { level: 2, name: "sidebar.configuration" })).toBeTruthy();
-		expect(screen.getByRole("heading", { level: 2, name: "sidebar.tools" })).toBeTruthy();
+		expect(screen.getByRole("heading", { level: 2, name: enMessages.sidebar.configuration })).toBeTruthy();
+		expect(screen.getByRole("heading", { level: 2, name: enMessages.sidebar.tools })).toBeTruthy();
 	});
 
 	it("anchors the four steps and the tools group for the tutorial, in tour order", async () => {
@@ -119,19 +173,36 @@ describe("AppSidebar", () => {
 		expect(groups).toStrictEqual(["true", "false"]);
 	});
 
-	it("numbers each step card in its own heading", async () => {
+	it("numbers each step card in its own heading, after the title drawn from one message", async () => {
 		await renderSidebar();
 
-		for (const step of [1, 2, 3, 4]) {
-			const heading = screen.getByRole("heading", { level: 3, name: new RegExp(`sidebar.step${step}\\.badge`) });
-			expect(heading.textContent).toContain(`sidebar.step${step}.titleStart`);
+		expect(screen.getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toStrictEqual([
+			"Your contextstep 1",
+			"Your daysstep 2",
+			"Your configurationstep 3",
+			"Your exportstep 4",
+		]);
+		expect(
+			screen.getAllByRole("heading", { level: 3 }).map((heading) => heading.querySelector("em")?.textContent),
+		).toStrictEqual(["context", "days", "configuration", "export"]);
+	});
+
+	it.each(Object.entries(BUNDLES))("renders the %s step titles with their emphasis", async (locale, messages) => {
+		translateIn({ locale: locale as Locale, messages });
+		await renderSidebar();
+		const headings = screen.getAllByRole("heading", { level: 3 });
+
+		expect(headings).toHaveLength(4);
+		for (const heading of headings) {
+			expect(heading.querySelector("em")?.textContent).toMatch(/\S/);
+			expect(heading.textContent).not.toMatch(/[<>{}]|sidebar\./);
 		}
 	});
 
-	it("hands the current year to Years, and none to PtoCalculator, whose month names carry no year", async () => {
+	it("hands Years the year the server rendered with, and none to PtoCalculator, whose month names carry no year", async () => {
 		await renderSidebar();
 
-		expect(dynamicProps("Years")).toStrictEqual({ currentYear: 2026 });
+		expect(dynamicProps("Years")).toStrictEqual({ serverYear: 2026 });
 		expect(dynamicProps("PtoCalculator")).toStrictEqual({});
 	});
 
@@ -184,7 +255,16 @@ describe("AppSidebar", () => {
 	it("labels the sidebar toggle from the a11y bundle", async () => {
 		await renderSidebar();
 
-		expect(screen.getByRole("button", { name: "a11y.toggleSidebar" })).toBeTruthy();
+		expect(screen.getByRole("button", { name: enMessages.a11y.toggleSidebar })).toBeTruthy();
+	});
+
+	it("resolves every lazy control to the component its module exports", async () => {
+		await renderSidebar();
+
+		expect([...loaders.keys()].toSorted()).toStrictEqual(Object.keys(lazy).toSorted());
+		for (const [name, loader] of loaders) {
+			expect(await loader()).toBe(lazy[name as keyof typeof lazy]);
+		}
 	});
 
 	it("mounts the footer buttons and the logo inside the rail", async () => {

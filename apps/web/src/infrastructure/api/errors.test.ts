@@ -1,5 +1,6 @@
 import {
 	DatabaseError,
+	DuplicateContactError,
 	EmailError,
 	PaymentError,
 	PaymentRequestError,
@@ -57,6 +58,16 @@ describe("describeFailure", () => {
 			error: ApiError.RATE_LIMIT_EXCEEDED,
 		});
 	});
+
+	it.each(["cooldown", "repeated"] as const)(
+		"returns a contact refused as %s as 429 under its own code, not the rate limit's",
+		(reason) => {
+			expect(describeFailure(new DuplicateContactError({ reason }))).toEqual({
+				status: 429,
+				error: ApiError.CONTACT_ALREADY_RECEIVED,
+			});
+		},
+	);
 
 	it("falls back to 500 for a value whose tag is not in the table, so the safety net survives", () => {
 		expect(describeFailure({ _tag: "SomethingElse" } as never)).toEqual({

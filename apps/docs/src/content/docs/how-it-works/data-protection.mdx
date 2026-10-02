@@ -73,7 +73,7 @@ There is **no user table and no password**, so there is nothing to hash: Premium
 Two rules, both enforced in code rather than by review:
 
 - **Query strings are stripped.** `stripQuery` in `apps/web/src/infrastructure/logging/contract.ts` removes the query from any `url` field before the line is serialised, because Stripe appends `payment_intent_client_secret` to the return URL. Separately, `redact_query_string = true` in `wrangler.toml` does the same for the request URL the platform records, which is a different guarantee over a different value.
-- **Email domains, not addresses.** Call sites log `emailDomain(email)` (`apps/web/src/application/shared/utils/redact.ts`) plus ids and flags. A full address in a log context is a defect.
+- **Email domains, not addresses.** Call sites log `emailDomain(email)` (`apps/web/src/application/shared/utils/redact.ts`) plus ids and flags; a full address in a log context is a defect under `E8` in [`CODING_STANDARDS.md`](https://github.com/fbuireu/forever-pto/blob/main/CODING_STANDARDS.md).
 
 The [observability](/how-it-works/observability/) page covers where those lines go and who can read them.
 

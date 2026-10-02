@@ -36,7 +36,10 @@ export const WorkdayCounterCalendarModal = ({
 				<Button variant="outline" className="w-full justify-start">
 					<CalendarIcon className="size-3 mr-1" />
 					{selectedRange
-						? `${formatDate({ date: selectedRange.from, locale, format: "MMM d" })} - ${formatDate({ date: selectedRange.to, locale, format: "MMM d" })}`
+						? t("selectedRange", {
+								from: formatDate({ date: selectedRange.from, locale, format: "MMM d" }),
+								to: formatDate({ date: selectedRange.to, locale, format: "MMM d" }),
+							})
 						: t("selectDateRange")}
 				</Button>
 			</DialogTrigger>
@@ -47,7 +50,7 @@ export const WorkdayCounterCalendarModal = ({
 				<div className="border-[3px] border-[var(--frame)] rounded-[10px] p-3 shadow-[var(--shadow-brutal-xs)]">
 					<Calendar
 						mode={CalendarSelectionMode.RANGE}
-						selected={selectedRange}
+						initialSelected={selectedRange}
 						onSelect={handleRangeSelect}
 						showNavigation
 						locale={locale}

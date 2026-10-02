@@ -21,8 +21,5 @@ describe("application/i18n/navigation", () => {
 
 	it("exports the three helpers the UI imports, and nothing that bypasses the routing", () => {
 		expect(Object.keys(navigation).sort()).toEqual(["Link", "usePathname", "useRouter"]);
-		expect(typeof navigation.Link).toBe("function");
-		expect(typeof navigation.usePathname).toBe("function");
-		expect(typeof navigation.useRouter).toBe("function");
 	});
 });

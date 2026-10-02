@@ -1,7 +1,11 @@
 import { CA, DE, EN, ES, FR, IT, LOCALES } from "@infrastructure/i18n/locales";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mockNotFound = vi.fn();
+const NOT_FOUND = "NEXT_NOT_FOUND";
+
+const mockNotFound = vi.fn(() => {
+	throw new Error(NOT_FOUND);
+});
 const mockSetRequestLocale = vi.fn();
 const mockGetTranslations = vi.fn().mockResolvedValue((key: string) => key);
 const mockGetMessages = vi.fn().mockResolvedValue({ a11y: { skipToMainContent: "Skip" }, homepage: { title: "Home" } });
@@ -27,7 +31,6 @@ vi.mock("@ui/modules/core/animate/providers/LazyMotionProvider", () => ({
 vi.mock("@ui/modules/providers/AppThemeProvider", () => ({
 	AppThemeProvider: ({ children }: { children: unknown }) => children,
 }));
-vi.mock("@ui/utils/cn", () => ({ cn: (...args: unknown[]) => args.filter(Boolean).join(" ") }));
 vi.mock("@styles/index.css", () => ({}));
 vi.mock("@app/fonts", () => ({
 	DOCUMENT_BODY_CLASS: "var-bricolage var-space-grotesk var-instrument-serif var-jetbrains-mono font-sans antialiased",
@@ -50,9 +53,12 @@ describe("[locale]/layout", () => {
 	});
 
 	describe("Layout", () => {
-		it("calls notFound for an unrecognised locale", async () => {
-			await Layout({ children: null, params: Promise.resolve({ locale: "xx" as never }) });
+		it("stops at notFound for an unrecognised locale, before any locale is set", async () => {
+			await expect(Layout({ children: null, params: Promise.resolve({ locale: "xx" as never }) })).rejects.toThrow(
+				NOT_FOUND,
+			);
 			expect(mockNotFound).toHaveBeenCalledOnce();
+			expect(mockSetRequestLocale).not.toHaveBeenCalled();
 		});
 
 		it("does not call notFound for a valid locale", async () => {

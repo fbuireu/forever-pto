@@ -7,11 +7,11 @@ the thing it happens to, and `@domain/*` holds the rules. Nothing here construct
 socket or reads a request.
 
 It is unusual in one respect: it has a server half and a browser half, and they share almost nothing. The
-server half (`use-cases/`, the Zod schemas in `dto/`, [`shared/utils/zodParse.ts`](./shared/utils/zodParse.ts), `email/`) is Effect
+server half (`use-cases/`, [`shared/utils/zodParse.ts`](./shared/utils/zodParse.ts), `email/`) is Effect
 programs run at a route handler or a server action. The browser half (`stores/`, `export/`,
 [`i18n/navigation.ts`](./i18n/navigation.ts)) is Zustand and plain functions, and it is where most of the product actually lives,
 because the planner runs client-side ([ADR 0001](../../../../adr/0001-planner-runs-in-the-browser.md)). The
-halves are joined only by `dto/` and [`shared/utils/dates.ts`](./shared/utils/dates.ts).
+halves share `dto/` and `shared/`, apart from `zodParse.ts` (server) and [`shared/utils/clientLog.ts`](./shared/utils/clientLog.ts) (browser).
 
 ## Structure
 
@@ -21,120 +21,87 @@ halves are joined only by `dto/` and [`shared/utils/dates.ts`](./shared/utils/da
 | `stores/` | The Zustand stores and the storage wrapper. See [`stores/AGENTS.md`](./stores/AGENTS.md) | browser |
 | `use-cases/` | The Effect programs that combine more than one service. See [`use-cases/AGENTS.md`](./use-cases/AGENTS.md) | server |
 | [`email/templates/`](./email/templates) | `Contact.tsx`, the React Email document `sendContactEmail` renders to HTML | server |
-| `export/` | [`generateIcs.ts`](./export/generateIcs.ts) builds an RFC 5545 calendar string from Holidays and PTO Days; `utils/sanitizer.ts` escapes the characters that would break a line; [`utils/serializers.ts`](./export/utils/serializers.ts) holds the ICS date formats, which live here rather than in the shared date library because nothing else speaks them | browser |
+| `export/` | [`generateIcs.ts`](./export/generateIcs.ts) builds an RFC 5545 calendar string from Holidays and PTO Days; `utils/sanitizer.ts` turns a property into an escaped, folded content line; [`utils/serializers.ts`](./export/utils/serializers.ts) holds the ICS date formats, which live here rather than in the shared date library because nothing else speaks them | browser |
 | `i18n/` | `navigation.ts`: `Link`, `useRouter`, `usePathname` bound to the next-intl routing config, so every internal link carries the locale prefix | browser |
 | [`shared/dto/`](./shared/dto) | [`baseDTO.ts`](./shared/dto/baseDTO.ts), the `BaseDTO<INPUT, OUTPUT, PARAMS>` contract every mapper implements | both |
-| [`shared/utils/`](./shared/utils) | `dates.ts`: calendar arithmetic, comparison and formatting; [`dateIntake.ts`](./shared/utils/dateIntake.ts): the ways a date arrives from outside; `zodParse.ts`: Zod validation lifted into an Effect that fails with `ValidationError`; [`collate.ts`](./shared/utils/collate.ts): `collateByLabel`, the one place a localised option list is ordered | `dates.ts`, `dateIntake.ts` and `collate.ts` both, `zodParse.ts` server |
+| [`shared/utils/`](./shared/utils) | `dates.ts`: calendar arithmetic, comparison and formatting; [`dateIntake.ts`](./shared/utils/dateIntake.ts): the ways a date arrives from outside; `zodParse.ts`: Zod validation lifted into an Effect that fails with `ValidationError`; [`collate.ts`](./shared/utils/collate.ts): `collateByLabel`, the one place a localised option list is ordered; [`redact.ts`](./shared/utils/redact.ts): `emailDomain`, the one form an address takes in a log; `clientLog.ts`: `logClient` and `logClientError`, the browser's way to the `logger` | `zodParse.ts` server, `clientLog.ts` browser, the rest both |
 
 ## Layer rules
 
-May import from `@domain/*` and `@infrastructure/*`. Must not import React components, build a
-`NextResponse`, or reach for `getCloudflareContext()`: configuration arrives as plain values
+May import from `@domain/*` and `@infrastructure/*`; configuration arrives as plain values
 ([ADR 0004](../../../../adr/0004-cloudflare-workers-as-deployment-target.md)).
 
-**One file imports from `@ui/*`, inverting the dependency.** [`stores/premium.ts`](./stores/premium.ts) uses
-`@ui/adapters/session/checkSession`. It is noted in [`../ui/AGENTS.md`](../ui/AGENTS.md) as known and not
-endorsed; check before moving that target file. Do not add a second. There used to be another: `stores/ui.ts` reached
-for `@ui/utils/currencies` to derive a currency that was a constant, and deleting the derivation removed the
-inversion with it.
+**One file imports from `@ui/*`, inverting the dependency**: [`stores/premium.ts`](./stores/premium.ts) uses
+`@ui/adapters/session/checkSession`, so moving that target file moves this import too; [`../ui/AGENTS.md`](../ui/AGENTS.md)
+notes it from the other side.
 
-**No SDK is constructed here.** Stripe, Turso and Resend arrive as Effect service tags that the caller
-provides ([ADR 0002](../../../../adr/0002-effect-for-external-service-boundaries.md)), so a use-case stays
-substitutable in tests. The one exception is logging: the stores log against the BetterStack singleton rather
-than a tag, because a Zustand action has no Effect context to yield one out of. They reach it through a
-`void import(...)` helper declared in each file, never a static import and never a module-scope `logger`,
-because that client's own top-level imports would land in the client chunk of every component that reads a
-store. Both halves of that exception are deliberate; see [`stores/AGENTS.md`](./stores/AGENTS.md).
+Stripe, Turso and Resend arrive as Effect service tags that the caller provides
+([ADR 0002](../../../../adr/0002-effect-for-external-service-boundaries.md)). Logging is the exception: a Zustand
+action has no Effect context to yield a tag out of, so the stores log through `logClient` and `logClientError` in
+`shared/utils/clientLog.ts`, which import the plain `logger` dynamically; see [`stores/AGENTS.md`](./stores/AGENTS.md).
 
 **[`email/templates/Contact.tsx`](./email/templates/Contact.tsx) is the only React in the layer**, and it is not DOM React: its elements
 come from `@react-email/components` and it is rendered to a string by `render()` inside `sendContactEmail`.
 Tailwind classes on it are compiled by React Email's own `Tailwind` wrapper, not by the app's stylesheet.
 
-None of this is lint-enforced. Biome has no import-boundary rule; these are conventions upheld in review.
+[`tests/docs-consistency.test.ts`](../../../../tests/docs-consistency.test.ts) counts every cross-layer import
+against the table on the wiki's architecture overview, so a new edge fails it until that table changes.
 
 ## Dates
 
 `shared/utils/dates.ts` is the app's date library: there is no `date-fns` and no second implementation of
-the arithmetic. Every function converts to `Temporal.PlainDate`, does the work there and converts back
-([ADR 0005](../../../../adr/0005-temporal-polyfill.md)); `dateIntake.ts` beside it is the only other file on
-this side of the tree that imports `temporal-polyfill`.
+the arithmetic. The arithmetic converts to `Temporal.PlainDate`, does the work there and converts back
+([ADR 0005](../../../../adr/0005-temporal-polyfill.md)), except where a round trip per call is the cost that
+matters; `dateIntake.ts` beside it is the only other file on this side of the tree that imports `temporal-polyfill`.
 
-**`isSameDay` and `isSameMonth` compare the local year, month and day directly, and that is the same answer.**
-They built two `Temporal.PlainDate`s per call from exactly those three fields and compared them, and the planner's
-calendar calls them hundreds of thousands of times per render; the comparison is the whole of what the
-round trip did.
+**`isSameDay`, `isSameMonth` and `isWeekend` read the local year, month, day or weekday directly**, which is
+the same answer: the planner's calendar calls them for every cell on every render. `startOfToday` reads the
+clock the same way.
 
-**`dayIndex` and `fromDayIndex` are the other exceptions, and they are arithmetic, not dates.** `dayIndex` turns a
-calendar day into an integer (days since 1 January 1970, read from the local year, month and day through
-`Date.UTC`) and `fromDayIndex` turns it back into local midnight. The planning engine counts in those integers
-inside loops that run once per candidate per pick, where a `Temporal.PlainDate` round trip per comparison is the
-cost that matters; no `Date` with a time component and no UTC instant ever leaves either function.
+**`dayIndex`, `fromDayIndex`, `isWeekendIndex` and `eachDayOfInterval` are arithmetic, not dates.** `dayIndex`
+turns a calendar day into an integer (days since 1 January 1970, read from the local year, month and day through
+`Date.UTC`), `fromDayIndex` turns it back into local midnight, `isWeekendIndex` answers from the integer alone,
+and `eachDayOfInterval` walks the integers. The planning engine counts in them inside loops that run once per
+candidate per pick, where a `Temporal.PlainDate` round trip per comparison is the cost that matters; no `Date`
+with a time component and no UTC instant ever leaves them.
 `dates.test.ts` pins that they round-trip across both daylight-saving changes with the zone set to
 Europe/Madrid, since a UTC runner could not tell a wrong implementation from a right one.
 
 Consequences worth holding on to:
 
-- **Every `Date` this layer produces is local midnight**, built with `new Date(y, m, d)`. There is no time
-  component and no UTC anywhere. Comparing with `toISOString()` across a time zone will shift the day;
-  compare with `isSameDay`, `compareAsc` or `isWithinInterval` instead.
-- **A date arriving from outside goes through `dateIntake.ts`, and which function you want is a question
-  about the source, not about the type.** The module's entry points are named for
-  their contracts, because they are not interchangeable:
+- **Every calendar day this layer produces is a `Date` at local midnight**, built with `new Date(y, m, d)`, so
+  `toISOString()` shifts it across a time zone. Payment timestamps (`stripeCreatedAt`) are instants, and nothing
+  compares them as days.
+- **`dateIntake.ts`'s entry points are named for their sources, and they are not interchangeable:**
   - `fromUpstreamCalendarDay(value)`: the source named a **calendar day**. It keeps the leading
     `YYYY-MM-DD` and drops whatever follows.
   - `fromStoredInstant(value)`: this app wrote the value with `toISOString()`, so the **instant** is the
     thing being round-tripped, and `new Date()` is correct.
 
-  They used to be `toLocalDay` and `ensureDate`, similarly-generic names sharing one flat namespace with
-  every other date helper, both `Date | string → Date`, and picking the wrong one is a real bug that
-  shipped: `date-holidays` emits its Islamic-calendar entries with an explicit offset
-  (`'2027-03-09 00:00:00 -0600'`), and `new Date()` reads that as a fixed instant, `06:00Z`, which is still
-  8 March for anyone at UTC−07:00 or further west. `holidayDTO.create` used the instant parser, so Eid
-  al-Fitr landed a day early for a visitor in Denver, Los Angeles, Anchorage or Honolulu: the planner
-  protected the wrong day and placed a PTO Day on the real Holiday. [`dateIntake.test.ts`](./shared/utils/dateIntake.test.ts) pins that they
-  answer differently for the same string, which is the whole reason they are separate functions.
-- **`formatDate` understands exactly the patterns in its map, and the compiler now says so.** `format` is
-  typed `DateFormat` (the keys of `INTL_FORMAT_MAP` plus the ISO forms), so an unrecognised pattern is a
-  compile error. It used to be `string` with a `toLocaleDateString` fall-through that silently ignored the
-  pattern and returned plausible-looking wrong output, and that branch is gone.
+  `date-holidays` emits some entries with an explicit offset (`'2027-03-09 00:00:00 -0600'`), and `new Date()`
+  reads that as a fixed instant, which is still 8 March for anyone at UTC−07:00 or further west: the instant
+  parser would protect the wrong day and let a PTO Day land on the real Holiday.
+  [`dateIntake.test.ts`](./shared/utils/dateIntake.test.ts) pins that the two answer differently for the same
+  string, which is the whole reason they are separate functions.
+- **`formatDate` understands exactly the patterns in its map.** `format` is typed `DateFormat` (the keys of
+  `INTL_FORMAT_MAP` plus the ISO forms), so an unrecognised pattern is a compile error, and it memoises every
+  `Intl.DateTimeFormat` it builds. `getWeekdayNames` and `getMonthNames` go through it (the private `WEEKDAY_FORMAT` and
+  `MONTH_FORMAT` maps translate their public `format` into a pattern), and `dates.test.ts` pins the memo by
+  counting `Intl.DateTimeFormat` constructions through a passthrough spy.
 
-  **This is also the only place an `Intl.DateTimeFormat` is constructed and memoised.** Files across the app had routed
-  around the whitelist and rebuilt both halves (private `Map<string, Intl.DateTimeFormat>` caches plus
-  uncached `toLocaleDateString` calls), and some of those constructed option objects byte-identical to
-  entries already in the map. The map gained `'MMM'` and `'EE, MMM d'`, which is all they needed, and the
-  caches are gone. A caller wanting a new combination adds a row here rather than another cache.
-
-  **That sentence was untrue in its own file for a while.** `getWeekdayNames` kept a cache of its own one screen
-  below `formatDate`, and its options duplicated rows of the very map that replaced the rest:
-  `EEEE` and `EE` were already there, and only `narrow` was genuinely new. It is a row now (`EEEEE`), and
-  `getWeekdayNames` is a caller of `formatDate` through the private `WEEKDAY_FORMAT` map, which is the only
-  thing that translates its public `'narrow' | 'short' | 'long'` into a pattern. The whitelist and the
-  memoisation had no test at all until then: the single `formatDate` case asked for `'yyyy-MM-dd'`, which
-  returns before either is reached. Both are pinned now, the cache by counting `Intl.DateTimeFormat`
-  constructions through a passthrough spy.
-
-Weekday numbers are ISO throughout: `Temporal.PlainDate`'s `dayOfWeek` runs 1 (Monday) to 7 (Sunday), which
-is why `isWeekend` tests for 6 and 7. The `weekStartsOn` option is the date-fns convention instead (0 for
-Sunday through 6 for Saturday), so `startOfWeek` and `endOfWeek` normalise it with
+Two weekday conventions meet here. Temporal's `dayOfWeek` is ISO, 1 (Monday) to 7 (Sunday); `isWeekend`,
+`isWeekendIndex` and the `weekStartsOn` option use the JavaScript one, 0 (Sunday) to 6 (Saturday), which is
+why both weekend tests look for 0 and 6. `startOfWeek` and `endOfWeek` bridge them with
 `options?.weekStartsOn || 7`: 0 is falsy, so Sunday falls through to the ISO 7, and 1–6 already agree between
 the two conventions. `getWeekdayNames` anchors on `new Date(2023, 0, 2)` because that date is a Monday and
 the function walks seven days from the start of its week; a different anchor rotates every localised weekday
 header.
 
-**Some exports are gone and should not come back.** `differenceInCalendarDays` was byte-identical to
-`differenceInDays` (both operate on `PlainDate`, so there is no partial day for them to disagree about), and
-had one caller, kept only so a call site read the way its date-fns predecessor did. `isInSelectedRange` was a
-pure alias of `isWithinInterval` with its bounds renamed, had **no** caller outside its own tests,
-and actively misled: the `HolidayDTO` flag is computed by `isInPlanningWindow` in
-[`../domain/calendar/window.ts`](../domain/calendar/window.ts), not by this. A rename of a parameter is
-not a module. The flag has since taken that name too, so nothing in the tree spells the retired term any
-more; this paragraph keeps it only to name what was deleted.
-
 ## Gotchas
 
 **`zodParse.ts` is server-only despite living under `shared/`.** It requires `LoggerService` in its Effect
 context, so calling it from a store or a component will not compile. Browser-side validation goes through the
-schema factories in `dto/` instead (`createContactSchema`, `createPaymentSchemaWithMessages`), which take
+schema factories in `dto/` instead (`createContactSchema`, `createDonationFormSchemaWithMessages`), which take
 translated messages and hand back a schema the form parses itself.
 
 **The payment mappers disagree about the unit of `amount`, deliberately**; see
@@ -143,78 +110,52 @@ holds.
 
 **Escaping and folding are properties of a content line, not of a call site.** RFC 5545 has one rule for
 every property: escape the value, then fold anything past 75 **octets** onto a continuation line.
-`contentLine(name, value)` in [`export/utils/sanitizer.ts`](./export/utils/sanitizer.ts) does both, and `buildEvent` is a list of calls to
-it, `X-WR-CALNAME`, `UID` and `CATEGORIES` included.
+`contentLine({ name, value })` in [`export/utils/sanitizer.ts`](./export/utils/sanitizer.ts) does both, and every
+line built from data goes through it: all of `buildEvent`'s, `UID` and `CATEGORIES` included, and `X-WR-CALNAME`
+in the envelope. A Custom Holiday name is user-typed and unbounded, and the fold counts octets rather than
+characters (`é` takes more than one), which is what keeps a long non-English name inside the limit.
 
-It used to be `sanitize`, applied by hand at `SUMMARY` alone, which is why this guide carried "if
-`X-WR-CALNAME` ever becomes user-typed it needs the same treatment" as an instruction to a future reader.
-Folding was absent entirely and unasserted, and a Custom Holiday name is user-typed and unbounded, so a long
-one produced a line a strict parser is entitled to reject. `sanitize` also handled `\n` but not `\r`, so a
-pasted CRLF left a bare carriage return inside a value. The fold counts octets rather than characters
-(`é` takes more than one), which is what makes it correct for the non-English names this app is full of.
+**Every `VEVENT` carries `DTSTAMP` and `UID`, which RFC 5545 makes mandatory.** One stamp is computed per call,
+so every event in a download shares it.
 
-**`DTSTAMP` is required on every `VEVENT`, and it was missing.** RFC 5545 lists it alongside `UID` as
-mandatory; without it a strict parser is entitled to reject the file, and the ones that accept it have no
-"when was this written" to order revisions by. One stamp is computed per call so every event in a download
-shares it.
-
-**A `UID` must be unique across every calendar it might land in, not just within one file.** It was
-`holiday-${holiday.id}`, and `holiday.id` is `national-<upstream date>`, the same string for the same day in
-every country. Importing a Spanish and a French export into one calendar therefore silently dropped events:
-the second New Year's Day overwrote the first. UIDs are now scoped by Country and Region, which is why
-`generateIcs` takes them and [`CalendarExport.tsx`](../ui/modules/sidebar/components/CalendarExport.tsx) widened its filters selector to pass them. They also run
+**A `UID` must be unique across every calendar it might land in, not just within one file.** `holiday.id` is
+`national-<upstream date>`, the same string for the same day in every Country, so two exports imported into
+one calendar would overwrite each other's events. UIDs are scoped by Country and Region, which is why
+`generateIcs` takes them and [`CalendarExport.tsx`](../ui/modules/sidebar/components/CalendarExport.tsx) passes them. They also run
 through `toUidToken`, which strips everything outside `[a-zA-Z0-9-]`: the id embeds the raw upstream date,
 which carries a space and sometimes a UTC offset, and a space inside a `UID` is what content-line folding
 eats first.
 
-**`email/templates/Contact.tsx` encodes both halves of its `mailto:`.** The reply button's `href` was
-`mailto:${email}?subject=Re: ${subject}`, and `subject` is whatever the sender typed, so `&bcc=` in a
-subject line added a recipient to the operator's reply the moment they clicked it. Both the address and the
-subject go through `encodeURIComponent` now. Anything else appended to that URL has to as well.
+**`email/templates/Contact.tsx` encodes both halves of its `mailto:`.** `subject` is whatever the sender
+typed, so an unencoded `&bcc=` in a subject line would add a recipient to the operator's reply. The address and
+the subject go through `encodeURIComponent`; anything else appended to that URL has to as well.
 
 **Pin that one on the `href`, never on the whole document.** The rendered email prints the raw subject twice
 as ordinary text (in the preview block and beside the "Subject:" label), and React escapes `&` to `&amp;`
 in both, so a document-wide `expect(html).not.toContain('&bcc=')` passes whatever the template does, and
 `not.toContain('&amp;bcc=')` fails even when the template is right. [`Contact.test.tsx`](./email/templates/Contact.test.tsx) extracts the reply
-button's `href` with a regex and asserts on that string alone. Both assertions were checked by reverting the
-template and watching them go red.
+button's `href` with a regex and asserts on that string alone.
 
-**The logo `src` is `/static/images/…`, and it was `/static/logo/…` for as long as its own test restated the
-same wrong literal.** `public/static/` holds exactly one subdirectory, `images/`, and
-[`next.config.ts`](../../next.config.ts) declares no rewrite, so every contact notification rendered a broken
-image while both assertions on that `src` passed: they were written from the template, not from the tree, and
-that is the vacuous-fixture pattern [`../app/AGENTS.md`](../app/AGENTS.md) already records for `check-session`
-and `health`. A third assertion
-resolves the rendered `src` against `public/` on disk now, so a path naming no file fails whatever literal the
-others hold. Every other consumer of the logo already used `images/`; the template was the single outlier.
+**The logo `src` is `/static/images/…`.** `public/static/` holds one subdirectory, `images/`, and
+[`next.config.ts`](../../next.config.ts) declares no rewrite. Besides the assertions on the literal,
+`Contact.test.tsx` resolves the rendered `src` against `public/` on disk, so a path naming no file fails
+whatever literal the others hold; [`../app/AGENTS.md`](../app/AGENTS.md) records the same vacuous-fixture
+pattern for `check-session` and `health`.
 
 ## Logging a failed write
 
-**Never log an email address; log `emailDomain(email)`.** That rule was written out at sites all over the app as
-`email?.split('@')[1]`: in both use-cases that defer a write, the premium store and the checkout adapter,
-twice on a value already narrowed to non-null. [`shared/utils/redact.ts`](./shared/utils/redact.ts) owns it now, and its test pins the
-part that matters: a value with no `@` answers `undefined` rather than falling back to the whole string, so a
-malformed address cannot leak through the redaction.
+`emailDomain(email)` in [`shared/utils/redact.ts`](./shared/utils/redact.ts) answers `undefined` for a value with no
+`@` rather than the whole string, so a malformed address cannot leak through the redaction.
 
-**The severity follows whether there is a backstop, not which file the log sits in.** A deferred write that
-fails is logged and swallowed: the error channel is `never`, because the response has already gone out. What
-differed was the level: [`payment.ts`](./use-cases/payment.ts) warned "will use webhook fallback", [`activatePremium.ts`](./use-cases/activatePremium.ts) errored, and
-both write the same payments row through the same repository with the same Stripe webhook behind them. They
-both warn now. [`contact.ts`](./use-cases/contact.ts) keeps `error` and that is the distinction: a lost contact write has no backstop,
-so it is genuinely lost.
-
-There is deliberately no `deferWrite` combinator. The bodies compose differently (one is
-`Effect.suspend` over a single `catchAll`, one an `Effect.gen` with `tap`/`tapError`/`catchAll` over a pair of
-writes), so a shared helper would need the message, the severity and the shape as parameters, which is as
-much interface as implementation.
+A deferred write that fails is logged and swallowed: its error channel is `never`, because the response has already
+gone out. The payments row that [`payment.ts`](./use-cases/payment.ts) and [`activatePremium.ts`](./use-cases/activatePremium.ts) save has the Stripe webhook
+behind it, so a failed save warns; [`contact.ts`](./use-cases/contact.ts) logs `error`, because a lost contact write has no backstop.
 
 ## Testing
 
-Every module has a co-located `.test.ts`, with the type-only DTO folders as the deliberate exception (see
-[`dto/AGENTS.md`](./dto/AGENTS.md)). The patterns split by half:
-
-- **Use-cases** build a `TestLayer` of `Layer.succeed(Tag, mock)` and assert the deferred effect separately
-  from the critical path.
-- **Stores** mock the storage wrapper, the logging client and every dynamically imported module, then drive
-  the store through `getState()`.
-- **DTOs and `shared/utils/`** are pure and are tested with literal inputs and no mocks at all.
+Every module with behaviour has a co-located `.test.ts(x)` except three that the store suites exercise instead:
+`stores/rehydration.ts`, `holidaysKeyOf` in `stores/types.ts` and `isHolidayVariant` in `dto/holiday/types.ts`.
+The type-only files have none (see [`dto/AGENTS.md`](./dto/AGENTS.md)). Use-case tests assert the deferred effect
+separately from the critical path; store tests mock the storage wrapper, the logging client and every dynamically
+imported module, then drive the store through `getState()`; `dates.test.ts` spies on `Intl.DateTimeFormat` only to
+count constructions, and `clientLog.ts`'s test mocks the logger module.

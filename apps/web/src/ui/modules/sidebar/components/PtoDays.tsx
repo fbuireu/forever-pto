@@ -7,12 +7,12 @@ import { usePlanReadout } from "@ui/hooks/usePlanReadout";
 import { Counter } from "@ui/modules/core/animate/components/Counter";
 import { SlidingNumber } from "@ui/modules/core/animate/text/SlidingNumber";
 import { Button } from "@ui/modules/core/primitives/Button";
-import { SidebarFieldLabel } from "@ui/modules/sidebar/components/SidebarFieldLabel";
 import { cn } from "@ui/utils/cn";
 import { CalendarDays, Clock } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback } from "react";
 import { useShallow } from "zustand/react/shallow";
+import { SidebarFieldLabel } from "./SidebarFieldLabel";
 
 export const PtoDays = () => {
 	const t = useTranslations("ptoDays");
@@ -22,22 +22,19 @@ export const PtoDays = () => {
 			setPtoDays: state.setPtoDays,
 		})),
 	);
-	const { resetManualSelection, trimManualDays } = useHolidaysStore(
+	const { resetManualSelection, trimManualDays, askForPlan } = useHolidaysStore(
 		useShallow((state) => ({
 			resetManualSelection: state.resetManualSelection,
 			trimManualDays: state.trimManualDays,
+			askForPlan: state.askForPlan,
 		})),
 	);
 	const handleReset = () => {
+		askForPlan();
 		resetManualSelection();
 		track({ event: "manual_changes_reset", properties: { surface: "sidebar" } });
 	};
-	const {
-		suggested: activeSuggestedCount,
-		manual: manualSelectedCount,
-		remaining,
-		hasManualChanges,
-	} = usePlanReadout();
+	const { suggested: activeSuggestedCount, manual: manualCount, remaining, hasManualChanges } = usePlanReadout();
 	const isDecrementDisabled = ptoDays <= MIN_PTO_DAYS;
 	const isIncrementDisabled = ptoDays >= MAX_PTO_DAYS;
 
@@ -46,6 +43,7 @@ export const PtoDays = () => {
 			const newValue = Math.min(MAX_PTO_DAYS, Math.max(MIN_PTO_DAYS, value));
 			if (newValue === ptoDays) return;
 
+			askForPlan();
 			setPtoDays(newValue);
 			trimManualDays(newValue);
 			track({
@@ -53,7 +51,7 @@ export const PtoDays = () => {
 				properties: { input: "ptoDays", inputValue: newValue },
 			});
 		},
-		[setPtoDays, trimManualDays, ptoDays],
+		[setPtoDays, trimManualDays, ptoDays, askForPlan],
 	);
 
 	return (
@@ -66,7 +64,7 @@ export const PtoDays = () => {
 					setNumber={handleChange}
 					decrementLabel={t("decrease")}
 					incrementLabel={t("increase")}
-					label={t("days").toUpperCase()}
+					label={t("days")}
 					decrementButtonProps={{
 						disabled: isDecrementDisabled,
 					}}
@@ -80,7 +78,8 @@ export const PtoDays = () => {
 				<div className="space-y-2 w-full">
 					<div className="flex items-center justify-between text-sm">
 						<span className="text-muted-foreground">{t("autoAssigned")}</span>
-						<span role="img" aria-label={`${t("autoAssigned")}: ${activeSuggestedCount}`}>
+						<span>
+							<span className="sr-only">{activeSuggestedCount}</span>
 							<SlidingNumber
 								number={activeSuggestedCount}
 								className="font-semibold text-teal-600 dark:text-teal-400"
@@ -90,9 +89,10 @@ export const PtoDays = () => {
 					</div>
 					<div className="flex items-center justify-between text-sm">
 						<span className="text-muted-foreground">{t("manuallySelected")}</span>
-						<span role="img" aria-label={`${t("manuallySelected")}: ${manualSelectedCount}`}>
+						<span>
+							<span className="sr-only">{manualCount}</span>
 							<SlidingNumber
-								number={manualSelectedCount}
+								number={manualCount}
 								className="font-semibold text-blue-600 dark:text-blue-400"
 								aria-hidden="true"
 							/>
@@ -101,7 +101,8 @@ export const PtoDays = () => {
 					<div className="h-px bg-border my-2" />
 					<div className="flex items-center justify-between text-sm">
 						<span className="font-medium">{t("remaining")}</span>
-						<span role="img" aria-label={`${t("remaining")}: ${remaining}`}>
+						<span>
+							<span className="sr-only">{remaining}</span>
 							<SlidingNumber
 								number={remaining}
 								className={cn(

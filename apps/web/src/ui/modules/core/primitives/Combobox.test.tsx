@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import type { ComponentProps, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@ui/modules/core/animate/base/Popover", () => ({
+vi.mock("../animate/base/Popover", () => ({
 	Popover: ({ children }: { children?: ReactNode }) => <div data-primitive="popover">{children}</div>,
 	PopoverTrigger: ({ children }: { children?: ReactNode }) => <div data-primitive="popover-trigger">{children}</div>,
 	PopoverContent: ({

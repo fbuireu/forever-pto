@@ -74,7 +74,7 @@ sequenceDiagram
 
 ## The planning loop
 
-Everything after that is one loop, closed inside the browser. `CalendarList` (`apps/web/src/ui/modules/pages/planner/CalendarList.tsx`) owns it: one effect refetches Holidays when the Country, Region, year or Carry-over Months change, and a second one triggers a calculation when any planning input changes or the store bumps its `planRevision`.
+Everything after that is one loop, closed inside the browser. `CalendarList` (`apps/web/src/ui/modules/pages/planner/CalendarList.tsx`) owns it: one effect refetches Holidays when the Country, Region, year, Carry-over Months or locale change, and another triggers a calculation when any planning input changes or the store bumps its `planRevision`.
 
 ```mermaid
 sequenceDiagram

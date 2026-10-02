@@ -44,7 +44,7 @@ Customizations happen in `onPopoverRender`:
 
 ## Styling
 
-`DriverStyles.tsx` is a render-null component whose only job is importing `apps/web/src/ui/styles/lazy/index.css`. That file pulls `driver.js/dist/driver.css` into the `tutorial` CSS layer and then overrides it with the app's neobrutalist theme: card background, 3px `--frame` border, 14px radius, `--shadow-brutal-xl`, the Space Grotesk font variable, and a transparent overlay replaced by a 5000px outline trick on the highlight stage. Because it lives in a dedicated `@layer tutorial` (declared in `apps/web/src/ui/styles/index.css`), the overrides are ordered predictably against the rest of the styles.
+`DriverStyles.tsx` is a render-null component whose only job is importing `apps/web/src/ui/modules/tutorial/driver.css`, the stylesheet beside it. That file pulls `driver.js/dist/driver.css` into the `tutorial` CSS layer and then overrides it with the app's neobrutalist theme: card background, 3px `--frame` border, 14px radius, `--shadow-brutal-xl`, the Space Grotesk font variable, and a transparent overlay replaced by a 5000px outline trick on the highlight stage. Because it lives in a dedicated `@layer tutorial` (declared in `apps/web/src/ui/styles/index.css`), the overrides are ordered predictably against the rest of the styles.
 
 ## Adding a step
 

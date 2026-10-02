@@ -32,7 +32,7 @@ vi.mock("@ui/modules/providers/AppThemeProvider", () => ({
 }));
 vi.mock("@ui/modules/pages/not-found/HtmlLangSync", () => ({ HtmlLangSync: vi.fn().mockReturnValue(null) }));
 vi.mock("@ui/modules/pages/not-found/NotFoundContent", () => ({ NotFoundContent: vi.fn().mockReturnValue(null) }));
-vi.mock("@app/fonts", () => ({
+vi.mock("./fonts", () => ({
 	DOCUMENT_BODY_CLASS: "bricolage-var space-grotesk-var instrument-serif-var jetbrains-mono-var font-sans antialiased",
 }));
 vi.mock("@styles/index.css", () => ({}));

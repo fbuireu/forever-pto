@@ -9,9 +9,8 @@ import {
 	startOfToday,
 	startOfYear,
 } from "@application/shared/utils/dates";
-import type { Locale } from "next-intl";
-import { PTO_CONSTANTS } from "../../const";
-import type { Bridge } from "../../types";
+import { PTO_CONSTANTS } from "@domain/calendar/const";
+import type { Bridge } from "@domain/calendar/types";
 import {
 	MONTHS_IN_QUARTER,
 	MONTHS_IN_YEAR,
@@ -19,7 +18,8 @@ import {
 	type PlanningWindow,
 	windowMonthCount,
 	windowQuarterCount,
-} from "../../window";
+} from "@domain/calendar/window";
+import type { Locale } from "next-intl";
 import { dayKey, dayOffKeys } from "./dayOff";
 import type { FreeStreak } from "./streaks";
 
@@ -108,12 +108,12 @@ interface CalculateMaxWorkStreakParams {
 
 export const calculateMaxWorkStreak = ({ ptoDays, holidays, year, allowPastDays }: CalculateMaxWorkStreakParams) => {
 	const yearStart = startOfYear(new Date(year, 0, 1));
-	const yearEnd = endOfYear(new Date(year, 11, 31));
+	const yearEnd = endOfYear(yearStart);
 	const today = startOfToday();
 	const scanStart = allowPastDays || today < yearStart ? yearStart : today;
 	if (scanStart > yearEnd) return 0;
 
-	const restDays = dayOffKeys({ placedDays: ptoDays, holidays });
+	const off = dayOffKeys({ placedDays: ptoDays, holidays });
 
 	let maxWorkStreak = 0;
 	let currentStreak = 0;
@@ -121,7 +121,7 @@ export const calculateMaxWorkStreak = ({ ptoDays, holidays, year, allowPastDays 
 	for (const day of eachDayOfInterval({ start: scanStart, end: yearEnd })) {
 		if (isWeekend(day)) continue;
 
-		if (restDays.has(dayKey(day))) {
+		if (off.has(dayKey(day))) {
 			maxWorkStreak = Math.max(maxWorkStreak, currentStreak);
 			currentStreak = 0;
 		} else {
@@ -133,11 +133,13 @@ export const calculateMaxWorkStreak = ({ ptoDays, holidays, year, allowPastDays 
 
 	return maxWorkStreak;
 };
-interface GetFirstLastBreak {
+
+interface GetFirstLastBreakParams {
 	dates: Date[];
 	locale: Locale;
 }
-export const getFirstLastBreak = ({ dates, locale }: GetFirstLastBreak) => {
+
+export const getFirstLastBreak = ({ dates, locale }: GetFirstLastBreakParams) => {
 	if (dates.length === 0) return null;
 
 	const sorted = dates.toSorted((a, b) => a.getTime() - b.getTime());
@@ -174,15 +176,15 @@ interface GetWorkedDaysPerMonthParams {
 
 export const getWorkedDaysPerMonth = ({ ptoDays, holidays, year }: GetWorkedDaysPerMonthParams) => {
 	const yearStart = startOfYear(new Date(year, 0, 1));
-	const yearEnd = endOfYear(new Date(year, 11, 31));
+	const yearEnd = endOfYear(yearStart);
 	const allDaysInYear = eachDayOfInterval({ start: yearStart, end: yearEnd });
 	const workdaysInYear = allDaysInYear.filter((day) => !isWeekend(day)).length;
 	const isWorkdayInYear = (date: Date) => getYear(date) === year && !isWeekend(date);
-	const daysOffOnWorkdays = dayOffKeys({
+	const offWorkdays = dayOffKeys({
 		placedDays: ptoDays.filter(isWorkdayInYear),
 		holidays: holidays.filter(({ date }) => isWorkdayInYear(date)),
 	});
-	const workedDays = workdaysInYear - daysOffOnWorkdays.size;
+	const workedDays = workdaysInYear - offWorkdays.size;
 	const avgPerMonth = workedDays / MONTHS_IN_YEAR;
 
 	return Number.parseFloat(avgPerMonth.toFixed(1));

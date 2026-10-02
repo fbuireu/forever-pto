@@ -1,7 +1,9 @@
+import type { DiscountInfo } from "@application/dto/payment/types";
 import { TursoService } from "@infrastructure/clients/db/turso/service";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
-import { PaymentError, ValidationError } from "@infrastructure/errors";
+import { DatabaseError, PaymentError, ValidationError } from "@infrastructure/errors";
 import { LoggerService } from "@infrastructure/logging/service";
+import type * as PromoCode from "@infrastructure/services/payments/provider/promoCode";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createPayment } from "./payment";
@@ -18,12 +20,23 @@ vi.mock("@infrastructure/services/payments/provider/intent", () => ({
 	createPaymentIntent: vi.fn(() => Effect.succeed({ id: "pi_test", client_secret: "cs_test_secret" })),
 }));
 
+const SAVE20_DISCOUNT = vi.hoisted(
+	(): DiscountInfo => ({
+		type: "fixed",
+		value: 200,
+		originalAmount: 999,
+		finalAmount: 799,
+		couponId: "coupon_save20",
+		couponName: "SAVE20",
+	}),
+);
+
 vi.mock("@infrastructure/services/payments/provider/promoCode", () => ({
-	validatePromoCode: vi.fn(() => Effect.succeed({ finalAmount: 799, discountAmount: 200, promoCode: "SAVE20" })),
+	validatePromoCode: vi.fn<typeof PromoCode.validatePromoCode>(() => Effect.succeed(SAVE20_DISCOUNT)),
 }));
 
 vi.mock("@infrastructure/services/payments/repository", () => ({
-	savePayment: vi.fn(() => Effect.succeed(undefined)),
+	savePayment: vi.fn(() => Effect.succeed(true)),
 	getPaymentById: vi.fn(() => Effect.succeed(undefined)),
 	getSucceededPaymentByEmail: vi.fn(() => Effect.succeed(undefined)),
 	updatePaymentStatus: vi.fn(() => Effect.succeed(undefined)),
@@ -80,7 +93,7 @@ describe("createPayment", () => {
 
 	it("returns discountInfo when promo code is applied", async () => {
 		const result = await run(createPayment({ params: { ...PARAMS, promoCode: "SAVE20" }, context: CONTEXT }));
-		expect(result.discountInfo).toEqual({ finalAmount: 799, discountAmount: 200, promoCode: "SAVE20" });
+		expect(result.discountInfo).toEqual(SAVE20_DISCOUNT);
 	});
 
 	it("fails with ValidationError when zodParse fails", async () => {
@@ -119,7 +132,7 @@ describe("createPayment", () => {
 
 	it("deferred effect recovers and warns when savePayment fails", async () => {
 		const { savePayment } = await import("@infrastructure/services/payments/repository");
-		vi.mocked(savePayment).mockReturnValueOnce(Effect.fail({ _tag: "DatabaseError", message: "db error" } as never));
+		vi.mocked(savePayment).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "db error" })));
 		const result = await run(createPayment({ params: PARAMS, context: CONTEXT }));
 		expect(result.clientSecret).toBe("cs_test_secret");
 		await expect(runDeferred(result.deferred)).resolves.toBeUndefined();

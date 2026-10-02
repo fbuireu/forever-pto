@@ -1,7 +1,7 @@
 {
 	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
 	"files": {
-		"includes": ["**", "!apps/web/next-env.d.ts", "!apps/docs/src/styles"]
+		"includes": ["**", "!apps/web/next-env.d.ts"]
 	},
 	"vcs": {
 		"enabled": true,
@@ -33,6 +33,14 @@
 			"complexity": {
 				"noImportantStyles": "off"
 			},
+			"performance": {
+				"noBarrelFile": "error",
+				"noReExportAll": "error"
+			},
+			"style": {
+				"noDefaultExport": "error",
+				"noEnum": "error"
+			},
 			"suspicious": {
 				"noConsole": "error"
 			}
@@ -46,6 +54,30 @@
 					"correctness": {
 						"noUnusedImports": "off",
 						"noUnusedVariables": "off"
+					}
+				}
+			}
+		},
+		{
+			"includes": [
+				"**/*.config.ts",
+				"**/*.config.mjs",
+				"**/apps/web/src/app/**/page.tsx",
+				"**/apps/web/src/app/**/layout.tsx",
+				"**/apps/web/src/app/**/loading.tsx",
+				"**/apps/web/src/app/**/error.tsx",
+				"**/apps/web/src/app/**/not-found.tsx",
+				"**/apps/web/src/app/global-error.tsx",
+				"**/apps/web/src/app/global-not-found.tsx",
+				"**/apps/web/src/app/robots.ts",
+				"**/apps/web/src/app/sitemap.ts",
+				"**/apps/web/src/infrastructure/i18n/config.ts",
+				"**/apps/web/e2e/warm-up.ts"
+			],
+			"linter": {
+				"rules": {
+					"style": {
+						"noDefaultExport": "off"
 					}
 				}
 			}

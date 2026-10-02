@@ -26,6 +26,7 @@ const holidaysState = {
 	currentSelection: null,
 	setPreviewAlternativeSelection: vi.fn(),
 	setCurrentAlternativeSelection: vi.fn(),
+	askForPlan: vi.fn(),
 	previewAlternativeIndex: 0,
 	currentSelectionIndex: 0,
 };
@@ -120,9 +121,6 @@ describe("ManagementBar empty plan", () => {
 
 		expect(container.querySelector('[data-tutorial="planner-drawer"]')).toBeNull();
 		expect(container.textContent).not.toContain(esMessages.planner.heading);
-
-		readyState.areStoresReady = false;
-		(holidaysState as { hasCalculated?: boolean }).hasCalculated = false;
 	});
 
 	it("says so out loud, so a finished-and-empty run is not a broken page", () => {
@@ -136,9 +134,6 @@ describe("ManagementBar empty plan", () => {
 		const { container } = renderBar({ locale: "es", messages: esMessages });
 
 		expect(container.querySelector('[role="status"]')?.textContent).toBe(esMessages.a11y.noPlan);
-
-		readyState.areStoresReady = false;
-		(holidaysState as { hasCalculated?: boolean }).hasCalculated = false;
 	});
 
 	it("stays quiet while there is still a plan on the page", () => {
@@ -148,8 +143,6 @@ describe("ManagementBar empty plan", () => {
 		const { container } = renderBar({ locale: "es", messages: esMessages });
 
 		expect(container.querySelector('[role="status"]')?.textContent).toBe("");
-
-		readyState.areStoresReady = false;
 	});
 
 	it("keeps the panel on a cold load, before any calculation has ever completed", () => {
@@ -162,8 +155,6 @@ describe("ManagementBar empty plan", () => {
 		const { container } = renderBar({ locale: "es", messages: esMessages });
 
 		expect(container.textContent).toContain(esMessages.planner.heading);
-
-		readyState.areStoresReady = false;
 	});
 
 	it("still shows the skeleton while a calculation is genuinely in flight", () => {
@@ -175,9 +166,6 @@ describe("ManagementBar empty plan", () => {
 		const { container } = renderBar({ locale: "es", messages: esMessages });
 
 		expect(container.textContent).toContain(esMessages.planner.heading);
-
-		readyState.areStoresReady = false;
-		(holidaysState as { isCalculating?: boolean }).isCalculating = false;
 	});
 });
 
@@ -208,14 +196,22 @@ describe("ManagementBar drawer header", () => {
 		const text = container.textContent ?? "";
 
 		expect(text).toContain(`${esMessages.alternativesManager.option} 2`);
-		expect(text).toContain("9");
-		expect(text).toContain("4.5x");
+		expect(text).toContain("9 días");
+		expect(text).toContain("4,5x");
+	});
 
-		readyState.areStoresReady = false;
-		holidaysState.suggestion = null;
-		holidaysState.currentSelection = null;
-		holidaysState.alternatives = [];
+	it("counts a single Effective Day in the singular, which a number glued to a plural noun could not", () => {
+		const single = makeSuggestion({ effectiveDays: 1, efficiency: 1 });
+		readyState.areStoresReady = true;
+		holidaysState.suggestion = single as never;
+		holidaysState.currentSelection = single as never;
+		holidaysState.currentSelectionIndex = 0;
 		holidaysState.previewAlternativeIndex = 0;
+
+		const text = renderBar({ locale: "es", messages: esMessages }).container.textContent ?? "";
+
+		expect(text).toContain("1 día");
+		expect(text).not.toContain("1 días");
 	});
 });
 
@@ -272,14 +268,8 @@ describe("ManagementBar hands the panel's choices to the store", () => {
 		holidaysState.alternatives = [plan(9)] as never;
 		holidaysState.setPreviewAlternativeSelection.mockClear();
 		holidaysState.setCurrentAlternativeSelection.mockClear();
+		holidaysState.askForPlan.mockClear();
 		toastSuccess.mockClear();
-	};
-
-	const settle = () => {
-		readyState.areStoresReady = false;
-		holidaysState.suggestion = null;
-		holidaysState.currentSelection = null;
-		holidaysState.alternatives = [];
 	};
 
 	it("previews the Alternative the panel asks for", () => {
@@ -289,7 +279,7 @@ describe("ManagementBar hands the panel's choices to the store", () => {
 		fireEvent.click(getByRole("button", { name: "preview next" }));
 
 		expect(holidaysState.setPreviewAlternativeSelection).toHaveBeenCalledExactlyOnceWith({ index: 1 });
-		settle();
+		expect(holidaysState.askForPlan).not.toHaveBeenCalled();
 	});
 
 	it("applies it, says so, and pulls the drawer back down to the collapsed snap", () => {
@@ -308,7 +298,7 @@ describe("ManagementBar hands the panel's choices to the store", () => {
 		});
 		expect(toastSuccess).toHaveBeenCalledExactlyOnceWith(esMessages.toasts.suggestionApplied);
 		expect(getByTestId("drawer").getAttribute("data-active-snap")).toBe(String(DRAWER_SNAP.COLLAPSED));
-		settle();
+		expect(holidaysState.askForPlan).toHaveBeenCalledOnce();
 	});
 
 	it("reports the applied Alternative by its index and quality, never its days", () => {
@@ -323,7 +313,6 @@ describe("ManagementBar hands the panel's choices to the store", () => {
 			properties: expect.objectContaining({ index: 1 }),
 		});
 		expect(JSON.stringify(track.mock.calls)).not.toContain("days");
-		settle();
 	});
 
 	it("waits for an applied selection, not merely a Suggestion, before it shows the panel", () => {
@@ -333,7 +322,6 @@ describe("ManagementBar hands the panel's choices to the store", () => {
 		const { queryByRole } = renderBar({ locale: "es", messages: esMessages });
 
 		expect(queryByRole("button", { name: "apply" })).toBeNull();
-		settle();
 	});
 
 	it("treats a plan with no days as not ready, so the panel is never handed an empty Suggestion", () => {
@@ -345,6 +333,5 @@ describe("ManagementBar hands the panel's choices to the store", () => {
 
 		expect(queryByRole("button", { name: "apply" })).toBeNull();
 		expect(container.textContent).not.toContain(esMessages.alternativesManager.option);
-		settle();
 	});
 });

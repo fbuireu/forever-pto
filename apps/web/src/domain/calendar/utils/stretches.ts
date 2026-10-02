@@ -8,11 +8,7 @@ const onlyWeekendBetween = ({ start, end }: DaySpan) => {
 	return true;
 };
 
-interface WorkStretchesOfParams {
-	workdays: number[];
-}
-
-export const workStretchesOf = ({ workdays }: WorkStretchesOfParams): DaySpan[] => {
+export const workStretchesOf = (workdays: number[]): DaySpan[] => {
 	const stretches: DaySpan[] = [];
 
 	workdays.forEach((day, position) => {
@@ -34,7 +30,7 @@ interface LongestWorkStretchParams {
 }
 
 export const longestWorkStretch = ({ workdays, off }: LongestWorkStretchParams) =>
-	workStretchesOf({ workdays: workdays.filter((day) => !off.has(day)) }).reduce(
+	workStretchesOf(workdays.filter((day) => !off.has(day))).reduce(
 		(longest, stretch) => Math.max(longest, spanLength(stretch)),
 		0,
 	);

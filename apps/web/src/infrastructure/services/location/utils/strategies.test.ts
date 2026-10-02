@@ -130,9 +130,22 @@ describe("detectCountryFromEgressIP", () => {
 
 		await detectCountryFromEgressIP();
 
+		expect(mockFetch).toHaveBeenCalledTimes(2);
 		for (const [, init] of mockFetch.mock.calls) {
 			expect(init).toEqual(expect.objectContaining({ cache: "no-store" }));
 		}
+	});
+
+	it("encodes the address before putting it in the lookup URL, since a third party supplied it", async () => {
+		const mockFetch = vi
+			.fn()
+			.mockResolvedValueOnce(makeResponse({ ok: true, body: { ip: "1.2.3.4/../admin?x=1" } }))
+			.mockResolvedValueOnce(makeResponse({ ok: true, body: { country: FR.toUpperCase() } }));
+		vi.stubGlobal("fetch", mockFetch);
+
+		await detectCountryFromEgressIP();
+
+		expect(mockFetch.mock.calls[1]?.[0]).toBe(`https://ipinfo.io/${encodeURIComponent("1.2.3.4/../admin?x=1")}/json`);
 	});
 
 	it("returns empty string when ipify response is not ok", async () => {

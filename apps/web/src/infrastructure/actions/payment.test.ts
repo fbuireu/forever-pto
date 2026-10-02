@@ -1,18 +1,9 @@
-import { type PaymentError, type PromoCodeError, RateLimitError, type ValidationError } from "@infrastructure/errors";
+import type { createPayment } from "@application/use-cases/payment";
+import { RateLimitError } from "@infrastructure/errors";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mockCreatePayment = vi.hoisted(() =>
-	vi.fn<
-		(
-			params: unknown,
-			ctx: unknown,
-		) => Effect.Effect<
-			{ clientSecret: string; discountInfo: null | { finalAmount: number } },
-			ValidationError | PaymentError | PromoCodeError
-		>
-	>(),
-);
+const mockCreatePayment = vi.hoisted(() => vi.fn<typeof createPayment>());
 
 const mockHeaders = vi.hoisted(() =>
 	vi.fn().mockResolvedValue({
@@ -59,7 +50,9 @@ describe("createPaymentAction", () => {
 	});
 
 	it("returns the operation's body", async () => {
-		mockCreatePayment.mockReturnValue(Effect.succeed({ clientSecret: "client-secret-abc", discountInfo: null }));
+		mockCreatePayment.mockReturnValue(
+			Effect.succeed({ clientSecret: "client-secret-abc", discountInfo: null, deferred: Effect.void }),
+		);
 
 		const result = await createPaymentAction(validInput);
 
@@ -67,7 +60,9 @@ describe("createPaymentAction", () => {
 	});
 
 	it("builds the RequestContext from the request headers", async () => {
-		mockCreatePayment.mockReturnValue(Effect.succeed({ clientSecret: "pi_secret", discountInfo: null }));
+		mockCreatePayment.mockReturnValue(
+			Effect.succeed({ clientSecret: "client-secret-abc", discountInfo: null, deferred: Effect.void }),
+		);
 
 		await createPaymentAction(validInput);
 

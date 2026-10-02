@@ -38,10 +38,20 @@ export const stripeFonts = (origin: string) => [{ cssSrc: `${origin}${FONTS_STYL
 
 const SHADOW = { XS: 2, MD: 6, BUTTON: 5, BUTTON_HOVER: 7 } as const;
 
-const shadow = ({ offset, color }: { offset: number; color: string }) => `${offset}px ${offset}px 0 0 ${color}`;
+interface ShadowParams {
+	offset: number;
+	color: string;
+}
 
-const focusRing = ({ base, surface, ring }: { base: string; surface: string; ring: string }) =>
-	`0 0 0 2px ${surface}, 0 0 0 5px ${ring}, ${base}`;
+const shadow = ({ offset, color }: ShadowParams) => `${offset}px ${offset}px 0 0 ${color}`;
+
+interface FocusRingParams {
+	base: string;
+	surface: string;
+	ring: string;
+}
+
+const focusRing = ({ base, surface, ring }: FocusRingParams) => `0 0 0 2px ${surface}, 0 0 0 5px ${ring}, ${base}`;
 
 interface StripeAppearanceParams {
 	isDark: boolean;

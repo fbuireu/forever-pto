@@ -18,6 +18,7 @@ vi.mock("../../../package.json", () => ({
 import { buildMarkdownPage } from "./buildMarkdownPage";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL;
+if (!BASE_URL) throw new Error("vitest.config.ts sets NEXT_PUBLIC_SITE_URL for the unit suite");
 
 describe("stays free of request-scoped translation APIs", () => {
 	it("never imports next-intl/server", () => {

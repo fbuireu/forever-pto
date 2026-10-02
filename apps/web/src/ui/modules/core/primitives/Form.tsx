@@ -1,6 +1,5 @@
 "use client";
 
-import { Label } from "@ui/modules/core/primitives/Label";
 import { cn } from "@ui/utils/cn";
 import { type ComponentProps, createContext, use, useEffect, useId, useMemo, useState } from "react";
 import {
@@ -13,6 +12,7 @@ import {
 	useFormState,
 } from "react-hook-form";
 import { Slot } from "../animate/base/Slot";
+import { Label } from "./Label";
 
 const Form = FormProvider;
 
@@ -36,9 +36,10 @@ const FormItemContext = createContext<FormItemContextValue>({} as FormItemContex
 const FormField = <
 	TFieldValues extends FieldValues = FieldValues,
 	TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+	TTransformedValues = TFieldValues,
 >({
 	...props
-}: ControllerProps<TFieldValues, TName>) => {
+}: ControllerProps<TFieldValues, TName, TTransformedValues>) => {
 	const fieldContextValue = useMemo(() => ({ name: props.name }), [props.name]);
 	return (
 		<FormFieldContext value={fieldContextValue}>
@@ -101,6 +102,19 @@ function FormLabel({ className, ...props }: Omit<ComponentProps<"label">, "htmlF
 	);
 }
 
+function FormHeading({ className, ...props }: ComponentProps<"p">) {
+	const { error } = useFormField();
+
+	return (
+		<p
+			data-slot="form-heading"
+			data-error={!!error}
+			className={cn("text-sm font-medium leading-none data-[error=true]:text-destructive", className)}
+			{...props}
+		/>
+	);
+}
+
 function FormControl({ ...props }: ComponentProps<typeof Slot>) {
 	const { error, hasDescription, formItemId, formDescriptionId, formMessageId } = useFormField();
 	const describedBy = [hasDescription ? formDescriptionId : null, error ? formMessageId : null]
@@ -157,4 +171,4 @@ function FormMessage({ className, ...props }: ComponentProps<"p">) {
 	);
 }
 
-export { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage };
+export { Form, FormControl, FormDescription, FormField, FormHeading, FormItem, FormLabel, FormMessage };

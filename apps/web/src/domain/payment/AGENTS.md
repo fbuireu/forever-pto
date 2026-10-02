@@ -38,50 +38,36 @@ event through the factory; the layer is provided at the route.
 
 ## Stripe stops at the factory
 
-`Stripe` appears in this folder twice, in `events/factory/events.ts` and `events/factory/resolvers.ts`, and
-both are `import type`; no SDK is constructed, so nothing here pulls the Stripe runtime in behind it. The
+`Stripe` appears in this folder only under `events/factory/` (the factory, its resolver and the factory's test),
+always as `import type`; no SDK is constructed, so nothing here pulls the Stripe runtime in behind it. The
 handlers see only the event interfaces.
 
-Things the factory settles that everything downstream then assumes:
-
-- **`amount` stays in Stripe's minor units.** It is copied straight from `paymentIntent.amount` and written
-  to the payments table unchanged. Only `paymentConfirmationDTO`, which feeds a screen, divides by 100.
-- **`email` must resolve, or the event is not built at all.** `createPaymentSucceededEvent` is therefore the
-  only factory here returning an Effect: `Effect<PaymentSucceededEvent, MissingDonorEmailError>`. It takes the
-  first non-blank of `metadata.email` and `receipt_email`, trimmed, and fails with `MissingDonorEmailError`
-  when neither yields one. Trimming is the point: `metadata` is `{ [k: string]: string }` with no
-  `noUncheckedIndexedAccess`, so `??` alone would happily accept the empty string Stripe allows. A blank email
-  used to be persisted as the payments row's key, and since Premium is keyed by that address
-  ([ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md)) the payer could never be found again by
-  the "I already donated" path. The failure is caught in `webhook.ts`, not here; see below.
+**`email` must resolve, or the event is not built at all.** `createPaymentSucceededEvent` is therefore the
+only factory here returning an Effect: `Effect<PaymentSucceededEvent, MissingDonorEmailError>`. It reads the
+address through `readDonationMetadata`, which takes the first non-blank of `metadata.email` and `receipt_email`,
+trimmed, and fails with `MissingDonorEmailError` when neither yields one. Trimming is the point: `metadata` is
+`{ [k: string]: string }` with no `noUncheckedIndexedAccess`, so `??` alone would happily accept the empty string
+Stripe allows. A blank email would become the payments row's key, and since Premium is keyed by that address
+([ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md)) the payer could never be found again by
+the "I already donated" path. The failure is caught in `webhook.ts`, not here; see below.
 
 Both factories are annotated with the interface they produce (`createPaymentSucceededEvent` through the
 success channel of its Effect), so a field dropped from `events/types.ts` (or one the factory forgets to set)
-is a compile error in `events/factory/events.ts` itself rather than at the call site in another layer. Keep
-the annotations when adding a field.
+is a compile error in `events/factory/events.ts` itself rather than at the call site in another layer.
 
 ## An event carries what a handler acts on, not a copy of the intent
 
-`PaymentSucceededEvent` is `paymentId`, `email`, `status` and `latestChargeId`, and
-`handlePaymentSucceeded` reads every one. It used to carry more. The rest were not extra detail; they were
-the `Stripe.PaymentIntent` leaking through the seam in pieces:
+`PaymentSucceededEvent` is `paymentId`, `email`, `status` and `latestChargeId`. `handlePaymentSucceeded` reads
+all but `email`, which `processWebhookEvent` reads to write the row: `email` stays because the factory's
+`MissingDonorEmailError` guard is what proves it resolved, and a caller must not have to re-derive that.
 
-- `amount` had **no reader at all** in production. `paymentDataDTO.create` takes the intent as `raw` and reads
-  `raw.amount` itself.
-- `promoCode`, `userAgent` and `ipAddress` existed so `processWebhookEvent` could hand them to a mapper that
-  already held the intent they came from. A domain event carrying a user agent and an IP address is transport
-  detail crossing into the domain, which is the one thing this folder exists to stop. `webhook.ts` calls
-  `readDonationMetadata` for them now, beside the `raw` it passes.
-- `type` discriminated nothing. Nothing switched on it; `processWebhookEvent` switches on Stripe's own
-  discriminated union and calls one handler per branch. `PaymentFailedEvent` had the same field with the same
-  zero readers.
+Everything else the intent holds stays with the intent. `processWebhookEvent` passes the intent itself to
+`paymentDataDTO.create` as `raw`, which reads `raw.amount` and keeps Stripe's minor units, and reads the promo
+code, the user agent and the IP address through `readDonationMetadata` beside it. No event carries a `type`
+either: `processWebhookEvent` switches on Stripe's own discriminated union and calls one handler per branch.
 
-`email` stays because the factory's `MissingDonorEmailError` guard is what proves it resolved, and a caller
-must not have to re-derive that.
-
-**`errorMessage` was captured and thrown away.** `handlePaymentFailed`'s warn logged `paymentId` alone, so
-Stripe's decline reason reached the domain and stopped there. It goes in the log as `reason` now; that is
-the only field on `PaymentFailedEvent` whose reason to exist is the log line.
+`PaymentFailedEvent.errorMessage` exists for the log: `handlePaymentFailed`'s warn carries it as `reason`, and
+that line is its only reader.
 
 ## The entitlement value is typed where it can be proved, and named where it cannot
 
@@ -90,22 +76,15 @@ from it: the list is not imported from the SDK, because this folder keeps Stripe
 set of statuses **this product reasons about**, which is not the same claim as the set Stripe can send.
 
 **Stripe's enums are open, so what an event carries is `ReportedPaymentStatus`, not `PaymentStatus`.** Stripe
-adds members to an enum on an API version already pinned, and `stripe@22.6.1` said so in the types by
-widening `PaymentIntent.Status` with its `OtherString` marker. `ReportedPaymentStatus` is the union widened
-the same way, so a status this product has never modelled reaches the database exactly as Stripe sent it
-rather than being dropped, renamed to a sentinel, or turned into a failed webhook that Stripe then retries
-forever. Every consumer asks *is it succeeded* and never *which of the seven is it*, so none of them needs
-the closed union to be correct.
+adds members to an enum on an API version already pinned, and the SDK's types say so: `PaymentIntent.Status`
+ends in its `OtherString` marker. `ReportedPaymentStatus` is the union widened the same way, so a status this
+product has never modelled reaches the database exactly as Stripe sent it rather than being dropped, renamed to
+a sentinel, or turned into a failed webhook that Stripe then retries forever. Every consumer asks *is it
+succeeded* and never *which of the seven is it*, so none of them needs the closed union to be correct.
 
-The guarantee that used to come from the compiler comes from the contract suite instead, and it reaches
-further: the old one was an assignment in the factory, which caught a member Stripe added only because
-something happened to assign it there. `tests/docs-consistency.test.ts` now compares `PAYMENT_STATUSES`
-against the `type Status` union the installed SDK publishes, so a member Stripe adds fails the suite whether
-or not any code assigns it. [ADR 0014](../../../../../adr/0014-ddd-where-it-pays.md) records the rerun of its
-own worked example that this replaced.
-
-`updatePaymentStatus`'s parameter takes the same widened type, a function that used to take
-`(paymentIntentId: string, status: string)`, where swapping the arguments compiled.
+`tests/docs-consistency.test.ts` compares `PAYMENT_STATUSES` against the `type Status` union the installed SDK
+publishes, so a member Stripe adds fails the suite whether or not any code assigns it. `updatePaymentStatus`'s
+`status` takes the same widened type.
 
 **`PaymentData.status` deliberately stays `string`, and the union would be a lie there.** Its
 producers are: `paymentDataDTO`, which reads a `Stripe.PaymentIntent`, and `toPaymentData` in
@@ -116,52 +95,47 @@ nothing: no consumer switches on the status, they all test it against one value.
 
 That is what `PAYMENT_SUCCEEDED` is for. It is redundant where the union already applies, and it is the
 spelling to reach for wherever a `PaymentData.status` meets the entitlement value. **No handler compares
-against it any more** (the `WHERE` clause owns that rule, see below), so its remaining live uses are
-`activatePremium`, which passes it to `updatePaymentStatus` as the value to write, and
-`repository.test.ts`, which ties the `succeeded_at` `CASE` to it by assertion, and `activatePremium`'s guard
-on a raw `Stripe.PaymentIntent.status`.
+against it**: the `WHERE` clause owns that rule, see below. Its readers are all outside this folder,
+`activatePremium`'s guard on a raw `Stripe.PaymentIntent.status` among them, and the contract suite lets no
+production module spell the literal instead, the repository's SQL and two modules that use the word for something
+else aside.
 
-**`PaymentConfirmationDTO.status` is widened like the events, and the page no longer reads it.** Which
+**`PaymentConfirmationDTO.status` is widened like the events, and the page does not read it.** Which
 statuses mean *charged* is a business rule, and `app` never imports `domain`, so
 [`@application/dto/payment/dto`](../../application/dto/payment/dto.ts) owns it: `hasSucceeded` and
 `wasCharged` are what the confirmation page calls, and the set of not-charged statuses lives beside them.
-The page used to carry that set as bare literals, which is also why the rule above could not see it.
 
 **Copies of the literal remain, all inside SQL, and none of them can take the constant.**
-`repository.ts` spells `'succeeded'` in the `succeeded_at` `CASE`, in `getSucceededPaymentByEmail`'s `WHERE` and in
-`countPromoCodeRedemptions`'. Interpolating a TypeScript value into a query string to remove them would
-trade a checkable drift for something that reads as injection. `repository.test.ts` ties the first to the
-constant by assertion instead; the others are covered by their own query assertions.
+`repository.ts` spells `'succeeded'` in the `succeeded_at` `CASE`, in `updatePaymentStatus`'s guard, in
+`getSucceededPaymentByEmail`'s `WHERE` and in `countPromoCodeRedemptions`'. Interpolating a TypeScript value into
+a query string to remove them would trade a checkable drift for something that reads as injection.
+`tests/docs-consistency.test.ts` ties every status comparison in that file to `PAYMENT_SUCCEEDED` instead, and
+`repository.test.ts` asserts the `CASE`.
 
 ## Invariants and traps
 
 **Stripe redelivers, and does not guarantee order.** Both handlers are written to be replayed. A failure
 event can arrive after the retry has already succeeded, and that row is the entitlement, so it must not be
-overwritten, but **the rule lives in the `WHERE` clause now, not in either handler**.
+overwritten, but **the rule lives in the `WHERE` clause, not in either handler**.
 `updatePaymentStatus` carries `AND status != 'succeeded'` and answers whether it wrote, so
-`handlePaymentFailed` calls it and warns when nothing was touched instead of reading the row first. That
-read never guarded anything: `TursoService` opens a connection per call, so a redelivery racing the original
-could have both reads see `processing`. See
+`handlePaymentFailed` calls it and warns when nothing was touched instead of reading the row first. A read
+guards nothing here: `TursoService` opens a connection per call, so a redelivery racing the original can have
+both reads see `processing`. See
 [`../../infrastructure/services/payments/AGENTS.md`](../../infrastructure/services/payments/AGENTS.md).
 
-**Neither handler reads before it writes, and `handlePaymentSucceeded` was the last one that did.** It ran
-`getPaymentById` absorbed to `undefined` and returned early on a falsy answer. The only reachable way that
-answer was falsy was the read itself failing, because `processWebhookEvent` runs `savePayment`, an
-`INSERT OR IGNORE`, immediately before calling in, so the row exists by then. So an unreachable database
-looked exactly like a payment that was never created: the handler warned, returned, `processWebhookEvent`
-completed with no error, the route answered 200 and Stripe never redelivered. The row kept whatever status
-the insert wrote, `getSucceededPaymentByEmail` filters `AND status = 'succeeded'`, and by
-[ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md) that row *is* the entitlement, so that
-donor's recovery path was dead for good, with one warning line to show for it.
+**Neither handler reads before it writes.** `processWebhookEvent` runs `savePayment`, an `INSERT OR IGNORE`,
+immediately before calling `handlePaymentSucceeded`, so the row exists by then, and the only way a read could
+answer "no such row" is by failing. An absorbed read failure looks exactly like a payment that was never created:
+the handler returns, the route answers 200, Stripe never redelivers, and by
+[ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md) that donor's recovery path is dead for good.
 
 `updatePaymentStatus` answers the same question in one fewer round trip and cannot lie about it. Its `WHERE`
 is `id = ? AND status != 'succeeded'` and it returns whether it wrote, so `false` means "absent or already
-succeeded" and a `DatabaseError` propagates as "we could not tell". Both handlers branch on that one boolean
-now; they used to disagree, `handlePaymentFailed` reading it and `handlePaymentSucceeded` discarding it.
-The branches are no longer distinguished and do not need to be. `updatePaymentCharge`'s own
+succeeded" and a `DatabaseError` propagates as "we could not tell". Both handlers branch on that one boolean,
+and the branches are not distinguished and do not need to be. `updatePaymentCharge`'s own
 `WHERE id = ?` touches nothing when the row is absent, and a redelivery landing on an already-succeeded row
-is exactly when charge enrichment is worth retrying. `paymentSucceeded.test.ts` pins that `getPaymentById`
-is never called; that case goes red the moment the read comes back.
+is exactly when charge enrichment is worth retrying. Both handler suites pin that `getPaymentById` is never
+called; that case goes red the moment the read comes back.
 
 **A Donation with no email is dropped, loudly, by the caller.** `processWebhookEvent` catches
 `MissingDonorEmailError`, logs it through `logger.logError` and returns without touching the payments table,
@@ -169,8 +143,9 @@ so Stripe gets its 2xx. That is deliberate: the condition is permanent, and a 50
 an event that can never succeed. The log line is the only signal, which is why it is at error level.
 
 **A missing payment row is not this folder's problem.** Creating the row from the webhook happens *before*
-either handler is called, in `webhook.ts`, because it needs `paymentDataDTO` from the application layer and
-the raw `PaymentIntent` the handlers no longer have. Do not move that fallback in here to make a handler
+`handlePaymentSucceeded` is called, in `webhook.ts`, because it needs `paymentDataDTO` from the application layer
+and the raw `PaymentIntent` the handlers do not have. The failed path creates no row, so on an absent row
+`handlePaymentFailed`'s write touches nothing and it warns. Do not move that fallback in here to make a handler
 self-sufficient, and do not add a read to tell a missing row from an already-succeeded one: the write already
 reports that it touched nothing, and a read cannot report why.
 
@@ -183,21 +158,16 @@ the payment record. It also returns `Effect.void` immediately when `latestCharge
 surfaces as `DatabaseError`, the route answers 500, and Stripe redelivers. Swallowing it drops the event
 permanently and the user keeps their Donation without Premium.
 
-**Nothing in here absorbs a database failure any more.** There is no `Effect.catchAll` over a repository
-call in either handler, and adding one back re-creates the defect above: an absorbed read failure is
-indistinguishable from a row that is not there, and the difference decides whether Stripe redelivers.
-`updateCharge` is the single exception and is not a repository guard; see *Charge enrichment* below.
+**Nothing in here absorbs a database failure.** There is no `Effect.catchAll` over a repository call in either
+handler, and adding one re-creates the defect above: an absorbed read failure is indistinguishable from a row
+that is not there, and the difference decides whether Stripe redelivers. `updateCharge` is the single exception
+and is not a repository guard; see *Charge enrichment* above.
 
-**Error-path logs go in `Effect.sync` inside `tapError`; the guard-path logs do not.** The wrapper is
-about *when* the line runs, not about safety: `tapError` fires only on the failure it is attached to, and each
-one must sit on the step it names: in `updateCharge` the retrieval log is piped directly onto
-`retrieveCharge`, before the `Effect.flatMap`, because on the composed pipeline it would also fire for a
-failed write and log it a second time as a retrieval failure that never happened. The early-return
-warnings (in both handlers, on a write that touched no row) are
-bare statements in the generator body, because there is no failure to tap: the condition is a successful
-write that touched no row. That is safe only because `logger` cannot throw; see
-[`../../infrastructure/AGENTS.md`](../../infrastructure/AGENTS.md). `Effect.sync` would not
-buy safety anyway; a throw inside it is a defect just the same.
+**The retrieval log in `updateCharge` is piped directly onto `retrieveCharge`, before the `Effect.flatMap`**:
+on the composed pipeline its `tapError` would also fire for a failed write and log it a second time as a retrieval
+failure that never happened. The early-return warnings (in both handlers, on a write that touched no row) are bare
+statements in the generator body, because the condition is a successful write, and `logger` cannot throw; see
+[`../../infrastructure/AGENTS.md`](../../infrastructure/AGENTS.md).
 
 ## Out of scope
 
@@ -212,27 +182,20 @@ buy safety anyway; a throw inside it is a defect just the same.
 ## Testing
 
 `events.ts`, `paymentSucceeded.ts` and `paymentFailed.ts` each have a co-located `.test.ts`;
-`events/types.ts` has none and should not grow one. `resolvers.ts` is covered through [`events.test.ts`](./events/factory/events.test.ts).
+`events/types.ts` has none. `resolvers.ts` is covered through [`events.test.ts`](./events/factory/events.test.ts).
 
 The factory needs no layer (it requires nothing), so `events.test.ts` drives it with `Effect.runSync`, and
 `Effect.runSync(… .pipe(Effect.flip))` where the assertion is about `MissingDonorEmailError`.
 
-Handler tests build a `Layer.succeed(Tag, mock)` for every tag in the requirement channel and run the
-program over it; no Stripe or Turso client is ever constructed. The repository and provider modules are
-`vi.mock`-ed to return `Effect.succeed(...)`, and the assertions worth copying are the negative ones: that a
-failing charge retrieval leaves the handler's success channel intact, and that `handlePaymentFailed` does
-*not* warn when the write reports it touched a row.
+Handler tests build a `Layer.succeed(Tag, mock)` for every tag in the requirement channel and run the program
+over it, with the repository and provider modules `vi.mock`-ed to return `Effect.succeed(...)`. They pin the
+negative cases: a failing charge retrieval leaves the handler's success channel intact, and `handlePaymentFailed`
+does *not* warn when the write reports it touched a row.
 
-**`updatePaymentStatus`'s double must succeed with `true`, not `undefined`.** The real function is
-`Effect<boolean, DatabaseError, TursoService>` and `handlePaymentFailed` branches on the value. Both handler
-suites mocked it as `Effect.succeed(undefined)`, which is falsy, so every case using the default double took
-the "nothing was written" branch: the warn fired throughout, the case that mocks `Effect.succeed(false)`
-would have passed with the branch deleted, and nothing covered a successful write at all. A double that
-disagrees with its subject's return type cannot falsify anything the subject does with it.
+`updatePaymentStatus` is `Effect<boolean, DatabaseError, TursoService>` and `handlePaymentFailed` branches on the
+value, so its default double succeeds with `true`: a falsy default would send every case down the "nothing was
+written" branch, and a case that mocks `false` would pass with the branch deleted. A failing double fails with the
+error the real function declares (`retrieveCharge` with `PaymentError`, the repository with `DatabaseError`).
 
-**Do not drive a function the same file has pinned as never called.** `paymentFailed.test.ts` asserts
-`getPaymentById` is never reached, and then carried cases below it setting up `mockReturnValueOnce` on
-that same function: a no-op, leaving both byte-identical in effect to the plain "calls updatePaymentStatus"
-case above. They are deleted; the never-called assertion is the one that means something.
-`paymentSucceeded.test.ts` carries the same assertion for the same reason, and its `getPaymentById` entry in
-the `vi.mock` factory exists only so that assertion has something to be about.
+Both handler suites assert `getPaymentById` is never reached; its entry in their `vi.mock` factories exists only so
+that assertion has something to be about, and a `mockReturnValueOnce` on it is a no-op.

@@ -67,6 +67,7 @@ requests in production is not worth a few cached constants.
 - **Re-enabling the flag is a decision, not a cleanup.** It has to come with the reproduction above run
   green on workerd: `pnpm cf:build`, `wrangler dev --local`, the paths in the experiment, zero
   "code had hung" errors.
-- Where this bites: [`apps/web/AGENTS.md`](../apps/web/AGENTS.md), the env section of
+- Where this bites: the contract suite, which fails a `'use cache'` or `cacheComponents` (the *Tooling already
+  enforces* section of [`CODING_STANDARDS.md`](../CODING_STANDARDS.md)), the env section of
   [`apps/web/src/infrastructure/AGENTS.md`](../apps/web/src/infrastructure/AGENTS.md), and the docs site's
   caching page.

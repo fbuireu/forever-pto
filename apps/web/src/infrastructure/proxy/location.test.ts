@@ -1,7 +1,8 @@
+import type { detectCountry } from "@infrastructure/services/location/detectCountry";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { mockDetectCountry } = vi.hoisted(() => ({
-	mockDetectCountry: vi.fn(),
+	mockDetectCountry: vi.fn<typeof detectCountry>(),
 }));
 
 const { mockSetLocationCookie } = vi.hoisted(() => ({
@@ -20,11 +21,11 @@ vi.mock("./cookie", () => ({
 import { location } from "./location";
 
 interface MakeParamsParams {
-	country?: string | null;
+	country?: string;
 	cookieValue?: string;
 }
 
-function makeParams({ country = null, cookieValue }: MakeParamsParams = {}) {
+function makeParams({ country = "", cookieValue }: MakeParamsParams = {}) {
 	mockDetectCountry.mockResolvedValue(country);
 	const response = { cookies: { set: vi.fn() } };
 	const request = {
@@ -50,13 +51,13 @@ describe("location", () => {
 	});
 
 	it("does not call setLocationCookie when no country is detected", async () => {
-		const { request, response } = makeParams({ country: null });
+		const { request, response } = makeParams({ country: "" });
 		await location({ request, response } as never);
 		expect(mockSetLocationCookie).not.toHaveBeenCalled();
 	});
 
 	it("still returns the response when no country is detected", async () => {
-		const { request, response } = makeParams({ country: null });
+		const { request, response } = makeParams({ country: "" });
 		await expect(location({ request, response } as never)).resolves.toBe(response);
 	});
 

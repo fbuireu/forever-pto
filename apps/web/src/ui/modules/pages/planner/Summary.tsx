@@ -24,34 +24,34 @@ import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
 import { Skeleton } from "boneyard-js/react";
 import { Award, BarChart3, Calendar, CalendarDays, Palmtree, TrendingUp, Zap } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { type ReactNode, useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { MetricCard, MetricCardSize } from "./summary/MetricCard";
 import { SummaryFixture } from "./summary/SummaryFixture";
 
 const HolidaysDistributionChart = dynamic(() =>
-	import("src/ui/modules/pages/planner/summary/HolidaysDistributionChart").then((module) => ({
+	import("./summary/HolidaysDistributionChart").then((module) => ({
 		default: module.HolidaysDistributionChart,
 	})),
 );
 const QuarterDistributionChart = dynamic(() =>
-	import("src/ui/modules/pages/planner/summary/QuarterDistributionChart").then((module) => ({
+	import("./summary/QuarterDistributionChart").then((module) => ({
 		default: module.QuarterDistributionChart,
 	})),
 );
 const BlocksPerQuarterChart = dynamic(() =>
-	import("src/ui/modules/pages/planner/summary/BlocksPerQuarterChart").then((module) => ({
+	import("./summary/BlocksPerQuarterChart").then((module) => ({
 		default: module.BlocksPerQuarterChart,
 	})),
 );
 const MonthlyDistributionChart = dynamic(() =>
-	import("src/ui/modules/pages/planner/summary/MonthlyDistributionChart").then((module) => ({
+	import("./summary/MonthlyDistributionChart").then((module) => ({
 		default: module.MonthlyDistributionChart,
 	})),
 );
 const YearTimelineChart = dynamic(() =>
-	import("src/ui/modules/pages/planner/summary/YearTimelineChart").then((module) => ({
+	import("./summary/YearTimelineChart").then((module) => ({
 		default: module.YearTimelineChart,
 	})),
 );
@@ -63,6 +63,7 @@ function BoldText(chunks: ReactNode) {
 export const Summary = () => {
 	const t = useTranslations("summary");
 	const tSidebar = useTranslations("sidebar");
+	const format = useFormatter();
 	const { areStoresReady } = useStoresReady();
 
 	const { ptoDays, country, region, strategy, year, carryOverMonths } = useFiltersStore(
@@ -180,7 +181,7 @@ export const Summary = () => {
 											strategy: tSidebar(`strategy.${planStrategy}.label`),
 											effectiveDays,
 											increment,
-											percentage: gain.toFixed(0),
+											percentage: format.number(gain / 100, { style: "percent" }),
 										})
 									: t("summaryParagraph.withoutGain", {
 											ptoDays,
