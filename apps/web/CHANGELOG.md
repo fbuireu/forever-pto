@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.13.2](https://github.com/fbuireu/forever-pto/compare/web-v1.13.1...web-v1.13.2) (2026-10-02)
+
+
+### Bug Fixes
+
+* write down the coding standards and fix what reviewing against them found ([3799f27](https://github.com/fbuireu/forever-pto/commit/3799f27b6be9fa5489ecb6071fe4eef90acb3a96))
+
 # [forever-pto-web-v1.13.1](https://github.com/fbuireu/forever-pto/compare/web-v1.13.0...web-v1.13.1) (2026-09-30)
 
 
