@@ -33,6 +33,7 @@ describe("getAvailableWorkdays", () => {
 			holidays: [],
 			allowPastDays: true,
 		});
+		expect(workdays.length).toBeGreaterThan(0);
 		for (const day of workdays) {
 			expect(day.getDay()).not.toBe(0);
 			expect(day.getDay()).not.toBe(6);

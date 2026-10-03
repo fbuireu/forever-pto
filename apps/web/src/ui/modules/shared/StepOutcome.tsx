@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@ui/modules/core/primitives/Button";
 import { cn } from "@ui/utils/cn";
 import { useTranslations } from "next-intl";

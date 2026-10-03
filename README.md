@@ -126,7 +126,8 @@ See [`apps/web/.env.example`](apps/web/.env.example) for the full list. Key vari
 
 | Document | What it answers |
 | --- | --- |
-| [`AGENTS.md`](AGENTS.md) | How the repository is put together, and the rules for changing it. Start here |
+| [`AGENTS.md`](AGENTS.md) | How the repository is put together, and what a change has to carry. Start here |
+| [`CODING_STANDARDS.md`](CODING_STANDARDS.md) | How code here is written: the rules a review holds a diff to |
 | [`apps/web/README.md`](apps/web/README.md) | The planner: what it does, how to run it, how it releases |
 | [`apps/docs/README.md`](apps/docs/README.md) | The wiki: how to run it, and how to write a page |
 | [`CONTEXT.md`](CONTEXT.md) | The domain glossary: one canonical name per concept |

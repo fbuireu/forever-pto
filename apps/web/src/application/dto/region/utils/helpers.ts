@@ -1,4 +1,4 @@
-import type { RegionDTO } from "../types";
+import type { RegionDTO } from "@application/dto/region/types";
 
 export interface GetRegionNameParams {
 	regionCode: string;

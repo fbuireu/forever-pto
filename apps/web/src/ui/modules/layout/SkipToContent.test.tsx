@@ -1,8 +1,10 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
+import en from "@i18n/messages/en.json";
 import { EN } from "@infrastructure/i18n/locales";
 import { render } from "@testing-library/react";
 import { Effect, Layer } from "effect";
+import { createFormatter, createTranslator, type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MAIN_CONTENT_ID, SkipToContent } from "./SkipToContent";
@@ -32,16 +34,18 @@ const declaring = componentFiles(SRC_ROOT)
 	.sort();
 
 const mockConfirmation = vi.hoisted(() => vi.fn());
+const mockGetTranslations = vi.hoisted(() => vi.fn());
+const mockGetFormatter = vi.hoisted(() => vi.fn());
 const mockLogger = { warn: vi.fn(), logError: vi.fn() };
 
-vi.mock("next-intl", async (importOriginal) => ({
-	...(await importOriginal<typeof import("next-intl")>()),
-	useTranslations: () => (key: string) => key,
-}));
+interface GetTranslationsParams {
+	locale: Locale;
+	namespace: "notFound" | "paymentConfirmation.failed" | "paymentConfirmation.success";
+}
 
 vi.mock("next-intl/server", () => ({
-	getTranslations: vi.fn(async () => (key: string) => key),
-	getFormatter: vi.fn(async () => ({ number: (value: number) => String(value) })),
+	getTranslations: mockGetTranslations,
+	getFormatter: mockGetFormatter,
 	setRequestLocale: vi.fn(),
 }));
 
@@ -66,7 +70,7 @@ vi.mock("@ui/modules/core/primitives/Card", () => {
 	};
 });
 vi.mock("@ui/modules/premium/PremiumSessionSync", () => ({ PremiumSessionSync: () => null }));
-vi.mock("@ui/modules/pages/homepage/navigation/Navigation", () => ({ Header: () => null }));
+vi.mock("@ui/modules/shared/Header", () => ({ Header: () => null }));
 vi.mock("@ui/modules/shared/footer/Footer", () => ({ Footer: () => null }));
 
 const { default: LegalRouteLayout } = await import("@app/[locale]/(marketing)/legal/layout");
@@ -74,7 +78,7 @@ const { default: PaymentConfirmationPage } = await import("@app/[locale]/(app)/p
 const { NotFoundContent } = await import("@ui/modules/pages/not-found/NotFoundContent");
 const { ErrorContent } = await import("@ui/modules/pages/error/ErrorContent");
 
-const locale = Promise.resolve({ locale: EN as never });
+const locale = Promise.resolve<{ locale: Locale }>({ locale: EN });
 const searchParams = Promise.resolve({ payment_intent: "pi_test_123" });
 
 const CONFIRMATION = { id: "pi_test_123", status: "succeeded", amount: 10, currency: "USD" };
@@ -84,6 +88,10 @@ const landmarks = (tree: { container: HTMLElement }) => tree.container.querySele
 describe("skip to content", () => {
 	beforeEach(() => {
 		mockConfirmation.mockReturnValue(Effect.succeed(CONFIRMATION));
+		mockGetTranslations.mockImplementation(async ({ locale, namespace }: GetTranslationsParams) =>
+			createTranslator({ locale, messages: en, namespace }),
+		);
+		mockGetFormatter.mockImplementation(async ({ locale }: { locale: Locale }) => createFormatter({ locale }));
 	});
 
 	it("points the link at the landmark id", () => {
@@ -108,12 +116,18 @@ describe("skip to content", () => {
 	});
 
 	it("resolves exactly once on the not-found shell", async () => {
-		expect(landmarks(render(await NotFoundContent({ locale: EN as never })))).toBe(1);
+		expect(landmarks(render(await NotFoundContent({ locale: EN })))).toBe(1);
 	});
 
 	it("resolves exactly once on the error shell", () => {
 		const error = Object.assign(new Error("boom"), { digest: "abc" });
-		expect(landmarks(render(<ErrorContent error={error} reset={vi.fn()} />))).toBe(1);
+		const shell = render(
+			<NextIntlClientProvider locale={EN} messages={en}>
+				<ErrorContent error={error} reset={vi.fn()} />
+			</NextIntlClientProvider>,
+		);
+
+		expect(landmarks(shell)).toBe(1);
 	});
 
 	it("resolves exactly once on the payment confirmation shell", async () => {

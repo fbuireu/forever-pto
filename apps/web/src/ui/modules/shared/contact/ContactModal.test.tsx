@@ -1,3 +1,4 @@
+import { SUBJECT_MIN_LENGTH } from "@application/dto/contact/schema";
 import enMessages from "@i18n/messages/en.json";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
@@ -5,12 +6,17 @@ import { describe, expect, it, vi } from "vitest";
 
 const premiumState = { setEmail: vi.fn(), userEmail: null };
 const sendContactEmailAction = vi.fn();
+const track = vi.hoisted(() => vi.fn());
 
 vi.mock("@application/stores/premium", () => ({
 	usePremiumStore: (selector: (state: typeof premiumState) => unknown) => selector(premiumState),
 }));
-vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track: vi.fn() }));
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
 vi.mock("@infrastructure/actions/contact", () => ({ sendContactEmailAction }));
+vi.mock("@application/dto/contact/schema", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@application/dto/contact/schema")>()),
+	SUBJECT_MIN_LENGTH: 6,
+}));
 
 import { ContactModal } from "./ContactModal";
 
@@ -88,6 +94,16 @@ describe("ContactModal failure reporting", () => {
 		await waitFor(() => expect(screen.getByText(enMessages.contact.failedToSend)).toBeTruthy());
 	});
 
+	it("states the minimum the schema enforces when the server refuses a short field", async () => {
+		sendContactEmailAction.mockResolvedValue({ success: false, error: "subject_too_short" });
+
+		await submitMessage({ messages: enMessages });
+
+		await waitFor(() =>
+			expect(screen.getByText(`The subject needs at least ${SUBJECT_MIN_LENGTH} characters.`)).toBeTruthy(),
+		);
+	});
+
 	it("shows the thrown error's own words when the action itself fails rather than answering", async () => {
 		sendContactEmailAction.mockRejectedValue(new Error("Mailbox unavailable"));
 
@@ -103,6 +119,28 @@ describe("ContactModal failure reporting", () => {
 		await submitMessage({ messages: messagesWithErrors });
 
 		await waitFor(() => expect(screen.getByText(enMessages.contact.failedToSend)).toBeTruthy());
+	});
+});
+
+describe("ContactModal analytics", () => {
+	it("reports a sent message and nothing the visitor typed into it", async () => {
+		track.mockClear();
+		sendContactEmailAction.mockResolvedValue({ success: true });
+
+		await submitMessage({ messages: messagesWithErrors });
+
+		await waitFor(() => expect(track).toHaveBeenCalled());
+		expect(track.mock.calls).toStrictEqual([[{ event: "contact_form_submitted" }]]);
+	});
+
+	it("reports nothing for a message that did not go out", async () => {
+		track.mockClear();
+		sendContactEmailAction.mockResolvedValue({ success: false, error: "internal_error" });
+
+		await submitMessage({ messages: messagesWithErrors });
+
+		await waitFor(() => expect(screen.getByText(INTERNAL_ERROR_MESSAGE)).toBeTruthy());
+		expect(track).not.toHaveBeenCalled();
 	});
 });
 

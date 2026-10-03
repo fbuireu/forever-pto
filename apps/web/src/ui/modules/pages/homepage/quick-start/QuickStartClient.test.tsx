@@ -1,5 +1,5 @@
 import { act, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 type Loader = () => Promise<{ default: unknown }>;
 
@@ -42,11 +42,16 @@ const setOpen = (open: boolean) => {
 	});
 };
 
-const renderClient = () => render(<QuickStartClient countries={[]} currentYear={2026} />);
+const renderClient = () => render(<QuickStartClient countries={[]} serverYear={2026} />);
 
 beforeEach(() => {
 	ui.quickStartOpen = false;
 	ui.listeners.clear();
+	vi.useFakeTimers({ now: new Date(2026, 5, 15), toFake: ["Date"] });
+});
+
+afterEach(() => {
+	vi.useRealTimers();
 });
 
 describe("QuickStartClient", () => {
@@ -65,6 +70,17 @@ describe("QuickStartClient", () => {
 			currentYear: 2026,
 		});
 		expect(screen.getByTestId("split-2")).toBeDefined();
+	});
+
+	it("hands the dialog the visitor's year rather than the one the server rendered with", () => {
+		vi.useFakeTimers({ now: new Date(2031, 0, 1), toFake: ["Date"] });
+		renderClient();
+		setOpen(true);
+
+		expect(JSON.parse(screen.getByTestId("split-1").getAttribute("data-props") ?? "")).toStrictEqual({
+			countries: [],
+			currentYear: 2031,
+		});
 	});
 
 	it("keeps both mounted once opened, so closing animates and reopening fetches nothing", () => {

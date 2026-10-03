@@ -22,6 +22,8 @@ type DropdownMenuContextType = {
 	animateOnHover: boolean;
 };
 
+const HIGHLIGHT_TRANSITION: Transition = { type: "spring", stiffness: 350, damping: 35 };
+
 const DropdownMenuContext = createContext<DropdownMenuContextType | undefined>(undefined);
 
 const useDropdownMenu = () => {
@@ -39,7 +41,7 @@ type DropdownMenuProps = ComponentProps<typeof DropdownMenuPrimitive.Root> & {
 
 function DropdownMenu({
 	children,
-	transition = { type: "spring", stiffness: 350, damping: 35 },
+	transition = HIGHLIGHT_TRANSITION,
 	animateOnHover = true,
 	...props
 }: DropdownMenuProps) {
@@ -93,11 +95,16 @@ type DropdownMenuContentProps = Omit<ComponentProps<typeof DropdownMenuPrimitive
 		align?: "start" | "center" | "end";
 	};
 
+const DROPDOWN_MENU_CONTENT_DEFAULTS = {
+	sideOffset: 4,
+	align: "start",
+} as const satisfies Pick<DropdownMenuContentProps, "sideOffset" | "align">;
+
 function DropdownMenuContent({
 	className,
 	children,
-	sideOffset = 4,
-	align = "start",
+	sideOffset = DROPDOWN_MENU_CONTENT_DEFAULTS.sideOffset,
+	align = DROPDOWN_MENU_CONTENT_DEFAULTS.align,
 	transition = { duration: 0.2 },
 	...props
 }: DropdownMenuContentProps) {
@@ -193,4 +200,4 @@ function DropdownMenuItem({
 	);
 }
 
-export { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger };
+export { DROPDOWN_MENU_CONTENT_DEFAULTS, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger };

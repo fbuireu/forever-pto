@@ -21,7 +21,7 @@ const renderCalendar = (props: Partial<Parameters<typeof Calendar>[0]> = {}) =>
 		<NextIntlClientProvider locale="en" messages={en}>
 			<Calendar
 				mode={CalendarSelectionMode.NONE}
-				month={MONTH}
+				initialMonth={MONTH}
 				locale="en"
 				holidays={[HOLIDAY]}
 				allowPastDays
@@ -67,17 +67,17 @@ describe("Calendar day cells", () => {
 describe("Calendar header", () => {
 	const headerOf = (container: HTMLElement) => ({
 		title: container.querySelector("h3")?.textContent,
-		freeDays: container.querySelector("span.tabular-nums"),
+		holidayCount: container.querySelector("span.tabular-nums"),
 	});
 
-	it("renders the same title and Free Day count whether or not it carries navigation", () => {
+	it("renders the same title and Holiday count whether or not it carries navigation", () => {
 		const plain = headerOf(renderCalendar().container);
 		const navigating = headerOf(renderCalendar({ showNavigation: true }).container);
 
 		expect(plain.title).toBe("June 2026");
 		expect(navigating.title).toBe(plain.title);
-		expect(navigating.freeDays?.textContent).toBe(plain.freeDays?.textContent);
-		expect(navigating.freeDays?.className).toBe(plain.freeDays?.className);
+		expect(navigating.holidayCount?.textContent).toBe(plain.holidayCount?.textContent);
+		expect(navigating.holidayCount?.className).toBe(plain.holidayCount?.className);
 	});
 
 	it("lets showNavigation decide only whether the month controls render", () => {
@@ -185,7 +185,7 @@ describe("Calendar picking one date", () => {
 	});
 
 	it("starts from the date it was given rather than from nothing", () => {
-		renderCalendar({ mode: CalendarSelectionMode.SINGLE, selected: new Date(2026, 5, 12) });
+		renderCalendar({ mode: CalendarSelectionMode.SINGLE, initialSelected: new Date(2026, 5, 12) });
 
 		expect(june(12).className).toContain(MODIFIERS_CLASS_NAMES.selected);
 	});
@@ -207,7 +207,7 @@ describe("Calendar picking several dates", () => {
 	it("starts from the dates it was given", () => {
 		renderCalendar({
 			mode: CalendarSelectionMode.MULTIPLE,
-			selected: [new Date(2026, 5, 3), new Date(2026, 5, 4)],
+			initialSelected: [new Date(2026, 5, 3), new Date(2026, 5, 4)],
 		});
 
 		expect(june(3).className).toContain(MODIFIERS_CLASS_NAMES.selected);
@@ -285,7 +285,7 @@ describe("Calendar picking a range", () => {
 
 	it("starts from the range it was given", () => {
 		const selected: FromTo = { from: new Date(2026, 5, 3), to: new Date(2026, 5, 6) };
-		renderCalendar({ mode: CalendarSelectionMode.RANGE, selected });
+		renderCalendar({ mode: CalendarSelectionMode.RANGE, initialSelected: selected });
 
 		expect(june(4).className).toContain(MODIFIERS_CLASS_NAMES.inRange);
 	});
@@ -293,7 +293,7 @@ describe("Calendar picking a range", () => {
 	it("continues a range it was given rather than restarting it", () => {
 		const onSelect = vi.fn();
 		const selected: FromTo = { from: new Date(2026, 5, 3), to: new Date(2026, 5, 6) };
-		renderCalendar({ mode: CalendarSelectionMode.RANGE, selected, onSelect });
+		renderCalendar({ mode: CalendarSelectionMode.RANGE, initialSelected: selected, onSelect });
 
 		clickJune(20);
 
@@ -401,9 +401,36 @@ describe("Calendar with no month of its own", () => {
 		vi.useFakeTimers({ toFake: ["Date"] });
 		vi.setSystemTime(new Date(2026, 8, 15));
 
-		const { container } = renderCalendar({ month: undefined });
+		const { container } = renderCalendar({ initialMonth: undefined });
 
 		expect(title(container)).toBe("September 2026");
+	});
+});
+
+describe("Calendar's mount-only props", () => {
+	const rerenderWith = (props: Partial<Parameters<typeof Calendar>[0]>) => (
+		<NextIntlClientProvider locale="en" messages={en}>
+			<Calendar mode={CalendarSelectionMode.NONE} locale="en" holidays={[HOLIDAY]} allowPastDays {...props} />
+		</NextIntlClientProvider>
+	);
+
+	it("opens on initialMonth and keeps its own month when a later render passes another", () => {
+		const { container, rerender } = renderCalendar({ initialMonth: MONTH });
+
+		rerender(rerenderWith({ initialMonth: new Date(2026, 8, 1) }));
+
+		expect(title(container)).toBe("June 2026");
+	});
+
+	it("marks initialSelected and keeps its own selection when a later render passes another", () => {
+		const { rerender } = renderCalendar({ mode: CalendarSelectionMode.SINGLE, initialSelected: new Date(2026, 5, 12) });
+
+		rerender(
+			rerenderWith({ mode: CalendarSelectionMode.SINGLE, initialMonth: MONTH, initialSelected: new Date(2026, 5, 20) }),
+		);
+
+		expect(june(12).className).toContain(MODIFIERS_CLASS_NAMES.selected);
+		expect(june(20).className).not.toContain(MODIFIERS_CLASS_NAMES.selected);
 	});
 });
 

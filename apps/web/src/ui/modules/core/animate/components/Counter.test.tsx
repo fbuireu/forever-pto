@@ -78,6 +78,22 @@ describe("Counter", () => {
 		expect(getByText("days")).toBeTruthy();
 	});
 
+	it("upper-cases the label with a class, so the caller passes copy in its own case", () => {
+		const { getByText } = render(
+			<Counter
+				decrementLabel="Fewer PTO days"
+				incrementLabel="More PTO days"
+				number={5}
+				setNumber={vi.fn()}
+				label="días"
+			/>,
+		);
+
+		const label = getByText("días");
+		expect(label.textContent).toBe("días");
+		expect(label.className.split(" ")).toContain("uppercase");
+	});
+
 	it("does not render a label element when label is omitted", () => {
 		const { container } = render(
 			<Counter decrementLabel="Fewer PTO days" incrementLabel="More PTO days" number={5} setNumber={vi.fn()} />,
@@ -105,6 +121,22 @@ describe("Counter", () => {
 			/>,
 		);
 		expect(container.querySelector('[data-slot="counter"]')?.className).toContain("my-class");
+	});
+
+	it("puts the class shared through buttonProps on both buttons, beside each button's own", () => {
+		const { getByText } = render(
+			<Counter
+				decrementLabel="Fewer PTO days"
+				incrementLabel="More PTO days"
+				number={5}
+				setNumber={vi.fn()}
+				buttonProps={{ className: "shared" }}
+				incrementButtonProps={{ className: "own" }}
+			/>,
+		);
+
+		expect(getByText("−").className.split(" ")).toContain("shared");
+		expect(getByText("+").className.split(" ")).toEqual(expect.arrayContaining(["shared", "own"]));
 	});
 
 	it("disables decrement button via decrementButtonProps", () => {

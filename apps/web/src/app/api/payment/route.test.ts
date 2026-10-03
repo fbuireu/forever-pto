@@ -1,22 +1,14 @@
+import type { createPayment } from "@application/use-cases/payment";
 import { INVALID_BODY } from "@infrastructure/api/parseJsonBody";
-import type { PaymentError, PromoCodeError, RateLimitError, ValidationError } from "@infrastructure/errors";
+import { RateLimitError } from "@infrastructure/errors";
+import type { checkRateLimit } from "@infrastructure/services/payments/rateLimit";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mockCheckRateLimit = vi.hoisted(() => vi.fn<(ip: string) => Effect.Effect<void, RateLimitError>>());
+const mockCheckRateLimit = vi.hoisted(() => vi.fn<typeof checkRateLimit>());
 const mockAfter = vi.hoisted(() => vi.fn((work: () => unknown) => work()));
 
-const mockCreatePayment = vi.hoisted(() =>
-	vi.fn<
-		(
-			body: unknown,
-			ctx: unknown,
-		) => Effect.Effect<
-			{ clientSecret: string; discountInfo: null; deferred?: Effect.Effect<void> },
-			ValidationError | PaymentError | PromoCodeError
-		>
-	>(),
-);
+const mockCreatePayment = vi.hoisted(() => vi.fn<typeof createPayment>());
 
 vi.mock("@infrastructure/services/payments/rateLimit", () => ({
 	checkRateLimit: mockCheckRateLimit,
@@ -95,5 +87,21 @@ describe("POST /api/payment", () => {
 		expect(response.status).toBe(400);
 		expect(await response.json()).toEqual({ success: false, error: INVALID_BODY });
 		expect(mockCreatePayment).not.toHaveBeenCalled();
+	});
+
+	it("keeps every answer out of any cache, the one carrying the client secret first", async () => {
+		mockCheckRateLimit.mockReturnValueOnce(Effect.succeed(undefined));
+		mockCreatePayment.mockReturnValueOnce(
+			Effect.succeed({ clientSecret: "client-secret-abc", discountInfo: null, deferred: Effect.void }),
+		);
+		mockCheckRateLimit.mockReturnValueOnce(Effect.fail(new RateLimitError({ ip: "1.2.3.4" })));
+
+		const answers = [
+			await POST(makeRequest({ body: { amount: 9.99, email: "user@example.com" } }) as never),
+			await POST(makeRequest({ body: { amount: 9.99, email: "user@example.com" } }) as never),
+		];
+
+		expect(answers.map(({ status }) => status)).toEqual([200, 429]);
+		expect(answers.map(({ headers }) => headers.get("Cache-Control"))).toEqual(["no-store", "no-store"]);
 	});
 });

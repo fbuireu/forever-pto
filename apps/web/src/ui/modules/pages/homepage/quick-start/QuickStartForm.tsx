@@ -3,12 +3,14 @@
 import type { CountryDTO } from "@application/dto/country/types";
 import { useRouter } from "@application/i18n/navigation";
 import { useFiltersStore } from "@application/stores/filters";
+import { useHolidaysStore } from "@application/stores/holidays";
 import { useLocationStore } from "@application/stores/location";
 import { useUIStore } from "@application/stores/ui";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@ui/modules/core/animate/base/Dialog";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { Progress, ProgressTrack } from "@ui/modules/core/primitives/Progress";
+import { PLANNER_PATH } from "@ui/modules/shared/utils/helpers";
 import { getUserCountryFromCookie } from "@ui/utils/userCountry";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
@@ -19,7 +21,6 @@ import { QuickStartSettingsStep } from "./QuickStartSettingsStep";
 import {
 	canLeaveStep,
 	createDraft,
-	PLANNER_PATH,
 	QUICK_START_STEPS,
 	type QuickStartDraft,
 	QuickStartStep,
@@ -83,6 +84,7 @@ export const QuickStartForm = ({ countries, currentYear, onStepChange }: QuickSt
 		filters.setPreferredMonths(draft.preferredMonths);
 		filters.setAllowPastDays(draft.allowPastDays);
 		filters.setCarryOverMonths(draft.carryOverMonths);
+		useHolidaysStore.getState().askForPlan();
 		track({ event: "quick_start_completed", properties: trackedDraft(draft) });
 		closeQuickStart();
 		router.push(PLANNER_PATH);

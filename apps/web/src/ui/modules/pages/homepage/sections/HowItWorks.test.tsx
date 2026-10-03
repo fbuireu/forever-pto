@@ -1,6 +1,11 @@
+import caMessages from "@i18n/messages/ca.json";
+import deMessages from "@i18n/messages/de.json";
 import enMessages from "@i18n/messages/en.json";
+import esMessages from "@i18n/messages/es.json";
+import frMessages from "@i18n/messages/fr.json";
+import itMessages from "@i18n/messages/it.json";
 import { render, screen } from "@testing-library/react";
-import { createTranslator } from "next-intl";
+import { createTranslator, type Locale } from "next-intl";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -15,10 +20,22 @@ import { HowItWorks } from "./HowItWorks";
 
 const how = enMessages.homepage.how;
 
-const renderHowItWorks = async () => {
-	mockGetTranslations.mockResolvedValue(
-		createTranslator({ locale: "en", messages: enMessages, namespace: "homepage" }),
-	);
+const BUNDLES: Record<string, typeof enMessages> = {
+	en: enMessages,
+	es: esMessages,
+	ca: caMessages,
+	it: itMessages,
+	de: deMessages,
+	fr: frMessages,
+};
+
+interface RenderHowItWorksParams {
+	locale?: Locale;
+	messages?: typeof enMessages;
+}
+
+const renderHowItWorks = async ({ locale = "en", messages = enMessages }: RenderHowItWorksParams = {}) => {
+	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "homepage" }));
 	const { container } = render(await HowItWorks());
 	return container;
 };
@@ -49,13 +66,24 @@ describe("HowItWorks", () => {
 		]);
 	});
 
-	it("quotes both questions inside the title with typographic quotes", async () => {
+	it("draws the title from one message, each question emphasised inside its quotes", async () => {
 		await renderHowItWorks();
-		const heading = screen.getByRole("heading", { level: 2 }).textContent ?? "";
+		const heading = screen.getByRole("heading", { level: 2 });
 
-		expect(heading).toContain(`“${how.question1}”`);
-		expect(heading).toContain(`“${how.question2}”`);
-		expect(heading.startsWith(how.titleStart)).toBe(true);
-		expect(heading.endsWith(how.titleEnd)).toBe(true);
+		expect(heading.textContent).toBe("From “what do I do” to “trip is booked” in 60 seconds.");
+		expect([...heading.querySelectorAll("em")].map((em) => em.textContent)).toEqual([
+			"“what do I do”",
+			"“trip is booked”",
+		]);
+	});
+
+	it.each(Object.entries(BUNDLES))("renders the %s title with both questions emphasised", async (locale, messages) => {
+		await renderHowItWorks({ locale: locale as Locale, messages });
+		const heading = screen.getByRole("heading", { level: 2 });
+		const questions = [...heading.querySelectorAll("em")].map((em) => em.textContent ?? "");
+
+		expect(questions).toHaveLength(2);
+		expect(questions.every((question) => /\S/.test(question))).toBe(true);
+		expect(heading.textContent).not.toMatch(/[<>{}]|homepage\./);
 	});
 });

@@ -17,10 +17,20 @@ import { matchesClientSecret } from "@infrastructure/services/premium/activation
 import { createSession } from "@infrastructure/services/premium/session";
 import { Effect } from "effect";
 
-interface DonationActivationParams {
+interface ActivateFromDonationParams {
 	paymentIntentId: string;
 	expectedEmail: string | undefined;
 	clientSecret: string | undefined;
+}
+
+export interface ActivateWithPaymentParams {
+	paymentIntentId: string;
+	clientSecret: string;
+}
+
+export interface ActivateWithClaimedPaymentParams {
+	paymentIntentId: string;
+	expectedEmail: string;
 }
 
 type DonationActivation = Effect.Effect<
@@ -33,7 +43,7 @@ const activateFromDonation = ({
 	paymentIntentId,
 	expectedEmail,
 	clientSecret,
-}: DonationActivationParams): DonationActivation =>
+}: ActivateFromDonationParams): DonationActivation =>
 	Effect.gen(function* () {
 		const logger = yield* LoggerService;
 		const stripe = yield* StripeServerService;
@@ -103,13 +113,7 @@ const activateFromDonation = ({
 		return { email, premiumKey: paymentIntentId, token, deferred };
 	});
 
-export const activateWithPayment = ({
-	paymentIntentId,
-	clientSecret,
-}: {
-	paymentIntentId: string;
-	clientSecret: string;
-}): DonationActivation =>
+export const activateWithPayment = ({ paymentIntentId, clientSecret }: ActivateWithPaymentParams): DonationActivation =>
 	activateFromDonation({ paymentIntentId, clientSecret, expectedEmail: undefined }).pipe(
 		Effect.withSpan("activateWithPayment"),
 	);
@@ -117,10 +121,7 @@ export const activateWithPayment = ({
 export const activateWithClaimedPayment = ({
 	paymentIntentId,
 	expectedEmail,
-}: {
-	paymentIntentId: string;
-	expectedEmail: string;
-}): DonationActivation =>
+}: ActivateWithClaimedPaymentParams): DonationActivation =>
 	activateFromDonation({ paymentIntentId, expectedEmail, clientSecret: undefined }).pipe(
 		Effect.withSpan("activateWithClaimedPayment"),
 	);

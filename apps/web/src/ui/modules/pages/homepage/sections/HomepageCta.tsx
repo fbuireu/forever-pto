@@ -1,5 +1,5 @@
 import { QuickStartSource } from "@application/stores/ui";
-import { QuickStartTrigger } from "@ui/modules/pages/homepage/quick-start/QuickStartTrigger";
+import { QuickStartTrigger } from "@ui/modules/shared/QuickStartTrigger";
 import { getTranslations } from "next-intl/server";
 import { CtaShapesClient } from "./CtaShapesClient";
 
@@ -17,10 +17,10 @@ export const HomepageCta = async () => {
 
 			<div className="max-w-[900px] mx-auto text-center relative z-[2]">
 				<h2 className="font-display font-semibold leading-none tracking-[-0.03em] mb-5 text-[clamp(40px,6vw,80px)]">
-					{t("closing.titleStart")}{" "}
-					<em className="font-serif italic text-[var(--accent)]">{t("closing.titleEmphasis")}</em>
-					<br />
-					{t("closing.titleEnd")}
+					{t.rich("closing.title", {
+						em: (chunks) => <em className="font-serif italic text-[var(--accent)]">{chunks}</em>,
+						br: () => <br />,
+					})}
 				</h2>
 				<p className="text-[19px] opacity-85 mb-8">{t("closing.description")}</p>
 				<QuickStartTrigger

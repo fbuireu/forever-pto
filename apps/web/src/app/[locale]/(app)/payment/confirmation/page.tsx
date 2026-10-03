@@ -1,10 +1,10 @@
 import { hasSucceeded, wasCharged } from "@application/dto/payment/dto";
-import { paymentConfirmationQuerySchema } from "@application/dto/payment/schema";
+import { ACTIVATION_FAILED, paymentConfirmationQuerySchema } from "@application/dto/payment/schema";
 import { Link } from "@application/i18n/navigation";
+import { localePath } from "@infrastructure/i18n/utils/url";
 import { ApplicationLayer } from "@infrastructure/layers";
 import { routeMetadata } from "@infrastructure/seo/routeMetadata";
 import { confirmation } from "@infrastructure/services/payments/confirmation";
-import { ACTIVATION_FAILED } from "@infrastructure/services/premium/activation";
 import { traced } from "@infrastructure/span";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@ui/modules/core/primitives/Card";
@@ -18,13 +18,18 @@ import { getFormatter, getTranslations } from "next-intl/server";
 
 export const generateMetadata = routeMetadata("/payment/confirmation");
 
-interface PaymentSuccessParams {
+interface PaymentConfirmationPageProps {
 	searchParams: Promise<Record<string, string | string[] | undefined>>;
 	params: Promise<{ locale: Locale }>;
 }
 
-async function PaymentError({ charged }: { charged: boolean }) {
-	const t = await getTranslations("paymentConfirmation.failed");
+interface PaymentErrorProps {
+	charged: boolean;
+	locale: Locale;
+}
+
+async function PaymentError({ charged, locale }: PaymentErrorProps) {
+	const t = await getTranslations({ locale, namespace: "paymentConfirmation.failed" });
 
 	if (charged) {
 		return (
@@ -77,13 +82,16 @@ async function PaymentError({ charged }: { charged: boolean }) {
 	);
 }
 
-export default async function PaymentSuccessPage({ searchParams, params }: Readonly<PaymentSuccessParams>) {
+export default async function PaymentConfirmationPage({
+	searchParams,
+	params,
+}: Readonly<PaymentConfirmationPageProps>) {
 	const [query, { locale }] = await Promise.all([searchParams, params]);
 	const { payment_intent: paymentIntentId, activation } = paymentConfirmationQuerySchema.validate(query) ? query : {};
 	const hasActivated = activation !== ACTIVATION_FAILED;
 
 	if (!paymentIntentId) {
-		redirect(`/${locale}`);
+		redirect(localePath({ locale }));
 	}
 
 	const data = await traced({
@@ -92,10 +100,13 @@ export default async function PaymentSuccessPage({ searchParams, params }: Reado
 	});
 
 	if (!data || !hasSucceeded(data)) {
-		return <PaymentError charged={wasCharged(data)} />;
+		return <PaymentError charged={wasCharged(data)} locale={locale} />;
 	}
 
-	const [t, format] = await Promise.all([getTranslations("paymentConfirmation.success"), getFormatter({ locale })]);
+	const [t, format] = await Promise.all([
+		getTranslations({ locale, namespace: "paymentConfirmation.success" }),
+		getFormatter({ locale }),
+	]);
 	const formattedAmount = format.number(data.amount, {
 		style: "currency",
 		currency: data.currency,

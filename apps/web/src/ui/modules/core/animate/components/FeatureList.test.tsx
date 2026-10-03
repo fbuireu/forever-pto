@@ -35,7 +35,7 @@ vi.mock("motion/react", async () => {
 	};
 });
 
-vi.mock("@ui/modules/core/primitives/Badge", () => ({
+vi.mock("../../primitives/Badge", () => ({
 	Badge: ({ children, ...props }: ComponentProps<"span">) => (
 		<span data-testid="badge" {...props}>
 			{children}

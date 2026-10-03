@@ -13,11 +13,6 @@ vi.mock("next/dynamic", () => ({
 
 vi.mock("@ui/modules/shared/seo/JsonLd", () => ({ JsonLd: MockJsonLd }));
 
-vi.mock("@infrastructure/i18n/config", async () => {
-	const { LOCALES } = await import("@infrastructure/i18n/locales");
-	return { LOCALES };
-});
-
 const { default: AppPage, generateStaticParams } = await import("./page");
 
 const makeParams = (locale = EN) => ({ params: Promise.resolve({ locale: locale as never }) });

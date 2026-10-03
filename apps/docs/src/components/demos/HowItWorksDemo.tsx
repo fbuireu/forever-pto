@@ -3,10 +3,9 @@ import { LOCALES } from "../../../../web/src/infrastructure/i18n/locales";
 
 // These two app modules are dependency-free (no Next.js imports, no path
 // aliases), so they are safe to import here via relative path even though they
-// live outside `src/ui/`. Re-exporting them lets the MDX pages interpolate the
-// real constants instead of hard-coding values that could drift.
+// live outside `src/ui/`. Re-exporting LOCALES lets the MDX pages interpolate
+// the real list instead of hard-coding values that could drift.
 export const APP_LOCALES = LOCALES;
-export { FilterStrategy };
 
 // Exhaustive Record over the real FilterStrategy const object: adding,
 // renaming or removing a strategy in `src/domain/calendar/types.ts` makes

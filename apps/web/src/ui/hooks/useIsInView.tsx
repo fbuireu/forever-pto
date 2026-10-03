@@ -1,3 +1,5 @@
+"use client";
+
 import { type UseInViewOptions, useInView } from "motion/react";
 import { type Ref, type RefObject, useImperativeHandle, useRef } from "react";
 

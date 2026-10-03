@@ -1,7 +1,7 @@
+import { LOCALES } from "@infrastructure/i18n/locales";
+import { localePath } from "@infrastructure/i18n/utils/url";
+import { privateRoutes } from "@infrastructure/seo/routes";
 import { expect, test } from "@playwright/test";
-import { LOCALES } from "src/infrastructure/i18n/locales";
-import { localePath } from "src/infrastructure/i18n/utils/url";
-import { privateRoutes } from "src/infrastructure/seo/routes";
 
 const ROBOTS_URL = "/robots.txt";
 const DISALLOW_PREFIX = "Disallow: ";
@@ -27,6 +27,7 @@ test.describe("robots.txt", () => {
 
 	test("disallows every private route, fully expanded, for every locale", async ({ request }) => {
 		const paths = disallowedPaths(await (await request.get(ROBOTS_URL)).text());
+		expect(privateRoutes().length).toBeGreaterThan(0);
 		for (const locale of LOCALES) {
 			for (const { path } of privateRoutes()) {
 				expect(paths).toContain(localePath({ locale, path }));

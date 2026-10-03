@@ -3,7 +3,7 @@ import { addDays } from "@application/shared/utils/dates";
 import { contentLine } from "./utils/sanitizer";
 import { toIcsDate, toIcsTimestamp } from "./utils/serializers";
 
-interface IcsEvent {
+interface BuildEventParams {
 	uid: string;
 	stamp: string;
 	start: Date;
@@ -13,7 +13,7 @@ interface IcsEvent {
 
 const toUidToken = (value: string) => value.replace(/[^a-zA-Z0-9-]/g, "");
 
-function buildEvent({ uid, stamp, start, summary, categories }: IcsEvent) {
+function buildEvent({ uid, stamp, start, summary, categories }: BuildEventParams) {
 	return [
 		"BEGIN:VEVENT",
 		contentLine({ name: "DTSTAMP", value: stamp }),
@@ -26,7 +26,7 @@ function buildEvent({ uid, stamp, start, summary, categories }: IcsEvent) {
 	].join("\r\n");
 }
 
-export interface GenerateIcsOptions {
+export interface GenerateIcsParams {
 	year: number;
 	calendarName: string;
 	ptoDayLabel: string;
@@ -48,7 +48,7 @@ export function generateIcs({
 	includePto,
 	country,
 	region,
-}: GenerateIcsOptions) {
+}: GenerateIcsParams) {
 	const events: string[] = [];
 	const stamp = toIcsTimestamp(new Date());
 	const scope = toUidToken([country, region].filter(Boolean).join("-")) || "unknown";

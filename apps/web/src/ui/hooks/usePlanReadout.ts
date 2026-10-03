@@ -4,7 +4,7 @@ import { useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
 import { measureBudget } from "@domain/calendar/utils/budget";
 import { resolveSelectedDays } from "@domain/calendar/utils/selection";
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 
 export const usePlacedPlan = () => {
@@ -50,17 +50,15 @@ export const usePlanReadout = () => {
 		removedSuggestedDays,
 	});
 
-	const lastSettledRemaining = useRef(budget.remaining);
-	useEffect(() => {
-		if (!isCalculating) lastSettledRemaining.current = budget.remaining;
-	});
+	const [lastSettledRemaining, setLastSettledRemaining] = useState(budget.remaining);
+	if (!isCalculating && lastSettledRemaining !== budget.remaining) setLastSettledRemaining(budget.remaining);
 
 	return {
 		ptoDays,
 		suggested: budget.suggested,
 		manual: budget.manual,
 		spent: budget.spent,
-		remaining: isCalculating ? lastSettledRemaining.current : budget.remaining,
+		remaining: isCalculating ? lastSettledRemaining : budget.remaining,
 		hasManualChanges: budget.manual > 0 || removedSuggestedDays.length > 0,
 	};
 };

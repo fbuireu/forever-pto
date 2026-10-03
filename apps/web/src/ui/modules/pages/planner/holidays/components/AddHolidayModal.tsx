@@ -29,7 +29,9 @@ export const AddHolidayModal = ({ open, onClose, locale }: AddHolidayModalProps)
 			mode={HolidayFormMode.ADD}
 			icon={<Plus className="size-5 text-primary" animateOnHover />}
 			onCommit={(data) => addHoliday({ holiday: { name: data.name, date: data.date }, carryOverMonths, year })}
-			successDescription={(data, formattedDate) => t("successDescription", { name: data.name, date: formattedDate })}
+			successDescription={({ data, formattedDate }) =>
+				t("successDescription", { name: data.name, date: formattedDate })
+			}
 		/>
 	);
 };

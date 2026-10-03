@@ -13,6 +13,10 @@ const location = vi.hoisted(() => ({
 }));
 
 const track = vi.hoisted(() => vi.fn());
+const askForPlan = vi.hoisted(() => vi.fn());
+vi.mock("@application/stores/holidays", () => ({
+	useHolidaysStore: (selector: (state: unknown) => unknown) => selector({ askForPlan }),
+}));
 vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
 
 vi.mock("@application/stores/filters", () => ({
@@ -120,9 +124,19 @@ describe("Regions", () => {
 });
 
 describe("Regions analytics", () => {
+	it("asks for a plan when another Region is picked", async () => {
+		askForPlan.mockClear();
+		location.regions = [{ value: "CT", label: "Catalonia" }];
+		renderRegions();
+
+		await userEvent.click(screen.getByRole("option", { name: /Catalonia/ }));
+
+		expect(askForPlan).toHaveBeenCalledOnce();
+	});
+
 	it("reports the Region that was picked, by its code", async () => {
 		track.mockClear();
-		location.regions = [{ value: "CT", label: "Catalonia" }] as never;
+		location.regions = [{ value: "CT", label: "Catalonia" }];
 		renderRegions();
 
 		await userEvent.click(screen.getByRole("option", { name: /Catalonia/ }));

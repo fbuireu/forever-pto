@@ -1,3 +1,4 @@
+import type { PromoCodeErrorCode } from "@application/dto/payment/types";
 import { Data } from "effect";
 
 export class DatabaseError extends Data.TaggedError("DatabaseError")<{
@@ -23,17 +24,6 @@ export class PaymentRequestError extends PaymentError {}
 
 export const isPaymentRequestError = (error: PaymentError): error is PaymentRequestError =>
 	error instanceof PaymentRequestError;
-
-export const PromoCodeErrors = {
-	INVALID_OR_EXPIRED: "invalid_or_expired",
-	USAGE_LIMIT_REACHED: "usage_limit_reached",
-	COUPON_EXPIRED: "coupon_expired",
-	COUPON_INVALID: "coupon_invalid",
-	FAILED_TO_LOAD: "failed_to_load",
-	MIN_AMOUNT_EXCEEDED: "min_amount_exceeded",
-} as const;
-
-export type PromoCodeErrorCode = (typeof PromoCodeErrors)[keyof typeof PromoCodeErrors];
 
 export class PromoCodeError extends Data.TaggedError("PromoCodeError")<{
 	code: PromoCodeErrorCode;

@@ -26,6 +26,7 @@ describe("countryDTO", () => {
 
 	it("generates a flag for every entry", () => {
 		const result = countryDTO.create({ raw: { DE: "Germany", IT: "Italy" } });
+		expect(result).toHaveLength(2);
 		expect(result.every((c) => c.flag.length > 0)).toBe(true);
 	});
 });

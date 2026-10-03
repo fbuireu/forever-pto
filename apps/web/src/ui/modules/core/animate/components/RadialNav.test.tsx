@@ -1,5 +1,5 @@
-import { fireEvent, render } from "@testing-library/react";
-import type { ComponentProps } from "react";
+import { act, fireEvent, render } from "@testing-library/react";
+import { type ComponentProps, StrictMode, Suspense } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 type MotionDivProps = ComponentProps<"div"> & {
@@ -26,8 +26,8 @@ vi.mock("motion/react", async () => {
 	const { createElement } = await import("react");
 	return {
 		m: {
-			div: ({ children, initial: _i, animate: _a, transition: _t, style, ...props }: MotionDivProps) =>
-				createElement("div", { style, ...props }, children),
+			div: ({ children, initial: _i, animate, transition: _t, style, ...props }: MotionDivProps) =>
+				createElement("div", { style, "data-animate": JSON.stringify(animate ?? null), ...props }, children),
 			button: ({
 				children,
 				initial: _i,
@@ -117,6 +117,16 @@ describe("RadialNav", () => {
 		expect(getByRole("button", { name: "Item 2" }).getAttribute("aria-pressed")).toBe("false");
 	});
 
+	it("finds the active item by its id, wherever that item sits in the list", () => {
+		const items = [
+			{ id: 10, icon: MockIcon, label: "Done", angle: 0, className: "text-teal-500" },
+			{ id: 20, icon: MockIcon, label: "Next", angle: 180, className: "text-sky-500" },
+		];
+		const { container } = render(<RadialNav items={items} defaultActiveId={20} />);
+
+		expect(container.querySelector('[aria-hidden="true"]')?.className).toContain("text-sky-500");
+	});
+
 	it("moves the selected state with the click", () => {
 		const { getByRole } = render(<RadialNav items={ITEMS} defaultActiveId={1} />);
 
@@ -124,5 +134,50 @@ describe("RadialNav", () => {
 
 		expect(getByRole("button", { name: "Item 1" }).getAttribute("aria-pressed")).toBe("false");
 		expect(getByRole("button", { name: "Item 3" }).getAttribute("aria-pressed")).toBe("true");
+	});
+});
+
+describe("RadialNav pointer", () => {
+	const suspense = { active: false, pending: new Promise<never>(() => undefined) };
+
+	const SuspendingIcon = () => {
+		if (suspense.active) throw suspense.pending;
+		return <svg />;
+	};
+
+	const AROUND = [
+		{ id: 1, icon: SuspendingIcon, label: "North", angle: 0 },
+		{ id: 2, icon: MockIcon, label: "South", angle: 170 },
+		{ id: 3, icon: MockIcon, label: "North-west", angle: 350 },
+	];
+
+	const rotationOf = (container: HTMLElement) =>
+		(
+			JSON.parse(container.querySelector("[data-animate]")?.getAttribute("data-animate") ?? "null") as {
+				rotate: number;
+			}
+		).rotate;
+
+	it("turns the short way from the item it shows, whatever an abandoned render was about to show", async () => {
+		const { container, getByRole } = render(
+			<StrictMode>
+				<Suspense fallback={null}>
+					<RadialNav items={AROUND} defaultActiveId={1} />
+				</Suspense>
+			</StrictMode>,
+		);
+		const shown = rotationOf(container);
+
+		suspense.active = true;
+		await act(async () => {
+			fireEvent.click(getByRole("button", { name: "South" }));
+		});
+		suspense.active = false;
+		await act(async () => {
+			fireEvent.click(getByRole("button", { name: "North-west", hidden: true }));
+		});
+
+		expect(getByRole("button", { name: "North-west" }).getAttribute("aria-pressed")).toBe("true");
+		expect(Math.abs(rotationOf(container) - shown)).toBeLessThanOrEqual(180);
 	});
 });

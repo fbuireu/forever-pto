@@ -7,7 +7,7 @@ sidebar:
 
 import { IconsGalleryDemo, IconTriggersDemo, ICON_COUNT } from '../../../../components/demos/IconsGalleryDemo';
 
-Source: `apps/web/src/ui/modules/core/animate/icons/`. The directory holds {ICON_COUNT} icon components plus the shared machinery in `Icon.tsx` (`AnimateIcon`, `IconWrapper`, `useAnimateIconContext`, `useVariants`). Every icon draws itself with `m.svg`/`m.path` from Motion, so any subtree that renders one needs a `LazyMotionProvider` ancestor; the demos on this page provide their own.
+Source: `apps/web/src/ui/modules/core/animate/icons/`. The directory holds {ICON_COUNT} icon components plus the shared machinery in `Icon.tsx` (`AnimateIcon`, `IconWrapper`, `useAnimateIconContext`, `useVariants`). Every icon draws itself with `m.svg`/`m.path` from Motion, so any subtree that renders one needs a `LazyMotionProvider` ancestor; `Demo.tsx` provides one for every demo.
 
 ## Gallery
 

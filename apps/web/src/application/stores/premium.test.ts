@@ -24,18 +24,8 @@ vi.mock("./crypto", () => ({
 	},
 }));
 
-const INITIAL = {
-	premiumKey: null,
-	userEmail: null,
-	lastVerified: null,
-	isLoading: false,
-	modalOpen: false,
-	currentFeature: null,
-	needsSessionCheck: false,
-};
-
 beforeEach(() => {
-	usePremiumStore.setState(INITIAL);
+	usePremiumStore.setState(usePremiumStore.getInitialState());
 	vi.clearAllMocks();
 });
 

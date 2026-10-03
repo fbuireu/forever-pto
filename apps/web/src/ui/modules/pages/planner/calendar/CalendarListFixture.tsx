@@ -1,15 +1,12 @@
 import { formatDate, getWeekdayNames } from "@application/shared/utils/dates";
 import { EN } from "@infrastructure/i18n/locales";
+import { Bone } from "@ui/modules/core/primitives/Bone";
 
 const MONTH_KEYS = Array.from({ length: 12 }, (_, i) =>
 	formatDate({ date: new Date(2024, i, 1), locale: EN, format: "MMMM" }),
 );
 const WEEKDAY_KEYS = getWeekdayNames({ locale: EN, weekStartsOn: 1 });
 const DAY_KEYS = Array.from({ length: 42 }, (_, i) => `d${i + 1}`);
-
-const Bone = ({ className }: { className: string }) => (
-	<div className={`rounded-[8px] border-[2px] border-[var(--frame)]/30 bg-[var(--surface-panel-soft)] ${className}`} />
-);
 
 export const CalendarListFixture = () => (
 	<div className="grid [grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-5 mx-auto w-full">

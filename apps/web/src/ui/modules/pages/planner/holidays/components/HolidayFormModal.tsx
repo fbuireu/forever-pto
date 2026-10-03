@@ -15,16 +15,16 @@ import {
 	DialogTitle,
 } from "@ui/modules/core/animate/base/Dialog";
 import { Button } from "@ui/modules/core/primitives/Button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@ui/modules/core/primitives/Form";
-import { Input } from "@ui/modules/core/primitives/Input";
 import {
-	Calendar,
-	CalendarSelectionMode,
-	type DayStates,
-	type FromTo,
-} from "@ui/modules/pages/planner/calendar/Calendar";
-import { describeHolidayRefusal } from "@ui/modules/pages/planner/calendar/utils/refusals";
-import { isSuggestion } from "@ui/modules/pages/planner/utils/modifiers";
+	Form,
+	FormControl,
+	FormField,
+	FormHeading,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@ui/modules/core/primitives/Form";
+import { Input } from "@ui/modules/core/primitives/Input";
 import { CalendarDays, Calendar as CalendarIcon } from "lucide-react";
 import type { Locale } from "next-intl";
 import { useTranslations } from "next-intl";
@@ -32,6 +32,9 @@ import { type ReactNode, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useShallow } from "zustand/react/shallow";
+import { Calendar, CalendarSelectionMode, type DayStates, type FromTo } from "../../calendar/Calendar";
+import { describeHolidayRefusal } from "../../calendar/utils/refusals";
+import { isSuggestion } from "../../utils/modifiers";
 import { createHolidaySchema, type HolidayFormData } from "./schema";
 
 export const HolidayFormMode = {
@@ -41,6 +44,11 @@ export const HolidayFormMode = {
 
 export type HolidayFormMode = (typeof HolidayFormMode)[keyof typeof HolidayFormMode];
 
+interface SuccessDescriptionParams {
+	data: HolidayFormData;
+	formattedDate: string;
+}
+
 interface HolidayFormModalProps {
 	open: boolean;
 	onClose: () => void;
@@ -49,7 +57,7 @@ interface HolidayFormModalProps {
 	icon: ReactNode;
 	defaultValues?: Partial<HolidayFormData>;
 	onCommit: (data: HolidayFormData) => HolidayOutcome | null;
-	successDescription: (data: HolidayFormData, formattedDate: string) => string;
+	successDescription: (params: SuccessDescriptionParams) => string;
 }
 
 export const HolidayFormModal = ({
@@ -66,10 +74,11 @@ export const HolidayFormModal = ({
 	const tFields = useTranslations(HolidayFormMode.ADD);
 	const tA11y = useTranslations("a11y");
 	const tValidation = useTranslations("validation.holiday");
-	const { holidays, currentSelection } = useHolidaysStore(
+	const { holidays, currentSelection, askForPlan } = useHolidaysStore(
 		useShallow((state) => ({
 			holidays: state.holidays,
 			currentSelection: state.currentSelection,
+			askForPlan: state.askForPlan,
 		})),
 	);
 	const dayStates = useMemo<DayStates>(() => ({ suggested: isSuggestion({ currentSelection }) }), [currentSelection]);
@@ -108,6 +117,7 @@ export const HolidayFormModal = ({
 				const outcome = onCommit(data);
 
 				if (!outcome) return;
+				if (outcome.applied) askForPlan();
 
 				track({
 					event: "custom_holiday_saved",
@@ -126,7 +136,7 @@ export const HolidayFormModal = ({
 					return;
 				}
 
-				toast.success(t("successTitle"), { description: successDescription(data, formattedDate) });
+				toast.success(t("successTitle"), { description: successDescription({ data, formattedDate }) });
 				handleClose();
 			} catch (error) {
 				logClientError({
@@ -181,13 +191,13 @@ export const HolidayFormModal = ({
 							name="date"
 							render={() => (
 								<FormItem>
-									<FormLabel>{tFields("dateLabel")}</FormLabel>
+									<FormHeading>{tFields("dateLabel")}</FormHeading>
 									<FormControl>
 										<div className="border-[3px] border-[var(--frame)] rounded-[10px] p-3 shadow-[var(--shadow-brutal-xs)]">
 											<Calendar
 												mode={CalendarSelectionMode.SINGLE}
 												showNavigation
-												selected={selectedDate}
+												initialSelected={selectedDate}
 												onSelect={handleDateSelect}
 												locale={locale}
 												holidays={holidays}

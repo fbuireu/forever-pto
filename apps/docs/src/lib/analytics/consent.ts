@@ -81,11 +81,137 @@ const TRANSLATIONS = {
 			],
 		},
 	},
+	ca: {
+		consentModal: {
+			title: "Cookies",
+			description:
+				"Aquesta wiki fa servir cookies només per mesurar quines pàgines es llegeixen. No en necessites cap per navegar-hi, i rebutjar-les no et costa res.",
+			acceptAllBtn: "Accepta-les totes",
+			acceptNecessaryBtn: "Rebutja-les totes",
+			showPreferencesBtn: "Tria",
+		},
+		preferencesModal: {
+			title: "Preferències de cookies",
+			acceptAllBtn: "Accepta-les totes",
+			acceptNecessaryBtn: "Rebutja-les totes",
+			savePreferencesBtn: "Desa la meva elecció",
+			closeIconLabel: "Tanca",
+			sections: [
+				{
+					title: "Estrictament necessàries",
+					description: "Recorda l'elecció que facis aquí. No es pot desactivar, perquè és el que guarda la resposta.",
+					linkedCategory: "necessary",
+				},
+				{
+					title: "Analítica",
+					description:
+						"Pàgines vistes i errors, per millorar la wiki allà on de debò es llegeix. Cada servei s'activa per separat.",
+					linkedCategory: ANALYTICS_CATEGORY,
+				},
+			],
+		},
+	},
+	it: {
+		consentModal: {
+			title: "Cookie",
+			description:
+				"Questa wiki usa i cookie solo per misurare quali pagine vengono lette. Non ne serve nessuno per navigarla, e rifiutarli non ti costa nulla.",
+			acceptAllBtn: "Accetta tutti",
+			acceptNecessaryBtn: "Rifiuta tutti",
+			showPreferencesBtn: "Scegli",
+		},
+		preferencesModal: {
+			title: "Preferenze cookie",
+			acceptAllBtn: "Accetta tutti",
+			acceptNecessaryBtn: "Rifiuta tutti",
+			savePreferencesBtn: "Salva la mia scelta",
+			closeIconLabel: "Chiudi",
+			sections: [
+				{
+					title: "Strettamente necessari",
+					description: "Ricorda la scelta che fai qui. Non si può disattivare, perché è ciò che conserva la risposta.",
+					linkedCategory: "necessary",
+				},
+				{
+					title: "Analisi",
+					description:
+						"Pagine viste ed errori, per migliorare la wiki dove viene letta davvero. Ogni servizio si attiva da solo.",
+					linkedCategory: ANALYTICS_CATEGORY,
+				},
+			],
+		},
+	},
+	fr: {
+		consentModal: {
+			title: "Cookies",
+			description:
+				"Ce wiki utilise des cookies uniquement pour mesurer quelles pages sont lues. Aucun n'est nécessaire pour le parcourir, et les refuser ne te coûte rien.",
+			acceptAllBtn: "Tout accepter",
+			acceptNecessaryBtn: "Tout refuser",
+			showPreferencesBtn: "Choisir",
+		},
+		preferencesModal: {
+			title: "Préférences de cookies",
+			acceptAllBtn: "Tout accepter",
+			acceptNecessaryBtn: "Tout refuser",
+			savePreferencesBtn: "Enregistrer mon choix",
+			closeIconLabel: "Fermer",
+			sections: [
+				{
+					title: "Strictement nécessaires",
+					description:
+						"Retient le choix que tu fais ici. Ne peut pas être désactivé, car c'est ce qui enregistre la réponse.",
+					linkedCategory: "necessary",
+				},
+				{
+					title: "Mesure d'audience",
+					description:
+						"Pages vues et erreurs, pour améliorer le wiki là où il est vraiment lu. Chaque service s'active séparément.",
+					linkedCategory: ANALYTICS_CATEGORY,
+				},
+			],
+		},
+	},
+	de: {
+		consentModal: {
+			title: "Cookies",
+			description:
+				"Dieses Wiki verwendet Cookies nur, um zu messen, welche Seiten gelesen werden. Zum Lesen brauchst du keines davon, und Ablehnen kostet dich nichts.",
+			acceptAllBtn: "Alle akzeptieren",
+			acceptNecessaryBtn: "Alle ablehnen",
+			showPreferencesBtn: "Auswählen",
+		},
+		preferencesModal: {
+			title: "Cookie-Einstellungen",
+			acceptAllBtn: "Alle akzeptieren",
+			acceptNecessaryBtn: "Alle ablehnen",
+			savePreferencesBtn: "Meine Auswahl speichern",
+			closeIconLabel: "Schließen",
+			sections: [
+				{
+					title: "Unbedingt erforderlich",
+					description:
+						"Merkt sich die Auswahl, die du hier triffst. Lässt sich nicht abschalten, weil es die Antwort speichert.",
+					linkedCategory: "necessary",
+				},
+				{
+					title: "Analyse",
+					description:
+						"Seitenaufrufe und Fehler, damit das Wiki dort besser wird, wo es wirklich gelesen wird. Jeder Dienst lässt sich einzeln einschalten.",
+					linkedCategory: ANALYTICS_CATEGORY,
+				},
+			],
+		},
+	},
 };
 
-const language = () => (document.documentElement.lang.startsWith("es") ? "es" : "en");
+type Language = keyof typeof TRANSLATIONS;
 
-export const isServiceConsented = (serviceId: string): boolean =>
+const LANGUAGES = Object.keys(TRANSLATIONS) as Language[];
+
+const language = (): Language => LANGUAGES.find((code) => document.documentElement.lang.startsWith(code)) ?? "en";
+
+const isServiceConsented = (serviceId: string): boolean =>
 	CookieConsentLib.acceptedService(serviceId, ANALYTICS_CATEGORY);
 
 const updateGoogleConsent = () => {

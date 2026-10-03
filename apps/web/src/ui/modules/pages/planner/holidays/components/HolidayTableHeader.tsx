@@ -1,3 +1,5 @@
+"use client";
+
 import type { HolidayDTO } from "@application/dto/holiday/types";
 import { ArrowDown } from "@ui/modules/core/animate/icons/ArrowDown";
 import { ArrowUp } from "@ui/modules/core/animate/icons/ArrowUp";

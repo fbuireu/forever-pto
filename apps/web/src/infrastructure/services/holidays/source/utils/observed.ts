@@ -1,12 +1,16 @@
 import type { RawHoliday } from "@application/dto/holiday/types";
 
-interface ResolveObservedParams {
+interface ResolveObservedHolidaysParams {
 	national: RawHoliday[];
 	regional: RawHoliday[];
 	hasRegion: boolean;
 }
 
-export function resolveObservedHolidays({ national, regional, hasRegion }: ResolveObservedParams): RawHoliday[] {
+export function resolveObservedHolidays({
+	national,
+	regional,
+	hasRegion,
+}: ResolveObservedHolidaysParams): RawHoliday[] {
 	if (!hasRegion) return national;
 
 	const observedDates = new Set(regional.map(({ date }) => date));

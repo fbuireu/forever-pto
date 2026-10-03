@@ -1,4 +1,4 @@
-import { type ScrambledChar, ScrambledText } from "@ui/modules/pages/legal/ScrambledText";
+import { type ScrambledChar, ScrambledText } from "./ScrambledText";
 
 const CHARS: readonly ScrambledChar[] = [
 	{ character: "B", order: 7 },

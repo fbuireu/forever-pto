@@ -6,7 +6,7 @@ import { BETTER_STACK_SERVICE_ID, isServiceConsented } from "@ui/modules/shared/
 import Script from "next/script";
 import { use, useEffect, useState } from "react";
 import { browser } from "react-dom";
-import { useShallow } from "zustand/shallow";
+import { useShallow } from "zustand/react/shallow";
 import { version } from "../../../../package.json";
 
 const TRACKING_TOKEN = process.env.NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN;

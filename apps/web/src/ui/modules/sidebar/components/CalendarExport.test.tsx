@@ -1,7 +1,14 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import caMessages from "@i18n/messages/ca.json";
+import deMessages from "@i18n/messages/de.json";
+import en from "@i18n/messages/en.json";
+import esMessages from "@i18n/messages/es.json";
+import frMessages from "@i18n/messages/fr.json";
+import itMessages from "@i18n/messages/it.json";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -33,11 +40,6 @@ vi.mock("@ui/modules/premium/PremiumFeature", () => ({
 	PremiumFeature: ({ children }: { children: ReactNode }) => children,
 }));
 
-vi.mock("next-intl", () => ({
-	useLocale: () => "en",
-	useTranslations: () => Object.assign((key: string) => key, { rich: (key: string) => key }),
-}));
-
 const { mockToastError, mockToastSuccess, mockToBlob } = vi.hoisted(() => ({
 	mockToastError: vi.fn(),
 	mockToastSuccess: vi.fn(),
@@ -51,6 +53,29 @@ vi.mock("@react-pdf/renderer", () => ({ pdf: () => ({ toBlob: mockToBlob }) }));
 vi.mock("@ui/modules/export/HolidayDocument", () => ({ HolidayDocument: () => null }));
 
 const { CalendarExport } = await import("./CalendarExport");
+
+const BUNDLES: Record<string, typeof en> = {
+	en,
+	es: esMessages,
+	ca: caMessages,
+	it: itMessages,
+	de: deMessages,
+	fr: frMessages,
+};
+
+const copy = en.calendarExport;
+
+interface RenderExportParams {
+	locale?: Locale;
+	messages?: typeof en;
+}
+
+const renderExport = ({ locale = "en", messages = en }: RenderExportParams = {}) =>
+	render(
+		<NextIntlClientProvider locale={locale} messages={messages}>
+			<CalendarExport />
+		</NextIntlClientProvider>,
+	);
 
 interface MakeHolidayParams {
 	id: string;
@@ -92,8 +117,8 @@ describe("CalendarExport", () => {
 			makeHoliday({ id: "out-2", date: "2027-12-25", isInPlanningWindow: false }),
 		];
 
-		render(<CalendarExport />);
-		await userEvent.click(screen.getByRole("button", { name: "download" }));
+		renderExport();
+		await userEvent.click(screen.getByRole("button", { name: copy.download }));
 
 		expect(mockGenerateIcs).toHaveBeenCalled();
 		const passed = mockGenerateIcs.mock.lastCall?.[0];
@@ -101,8 +126,8 @@ describe("CalendarExport", () => {
 	});
 
 	it("says whether the file will carry the Holidays, rather than only colouring the button", async () => {
-		render(<CalendarExport />);
-		const includeHolidays = screen.getByRole("button", { name: "includeHolidays" });
+		renderExport();
+		const includeHolidays = screen.getByRole("button", { name: copy.includeHolidays });
 
 		expect(includeHolidays.getAttribute("aria-pressed")).toBe("true");
 
@@ -112,8 +137,8 @@ describe("CalendarExport", () => {
 	});
 
 	it("says the same about the PTO Days", async () => {
-		render(<CalendarExport />);
-		const includePto = screen.getByRole("button", { name: "includePto" });
+		renderExport();
+		const includePto = screen.getByRole("button", { name: copy.includePto });
 
 		expect(includePto.getAttribute("aria-pressed")).toBe("true");
 
@@ -125,9 +150,9 @@ describe("CalendarExport", () => {
 	it("treats a window with no Holidays in it as nothing to export", () => {
 		holidaysState.holidays = [makeHoliday({ id: "out-1", date: "2027-01-01", isInPlanningWindow: false })];
 
-		render(<CalendarExport />);
+		renderExport();
 
-		expect(screen.getByRole("button", { name: "download" })).toHaveProperty("disabled", true);
+		expect(screen.getByRole("button", { name: copy.download })).toHaveProperty("disabled", true);
 	});
 });
 
@@ -145,7 +170,7 @@ const downloadPdf = async () => {
 	});
 
 	try {
-		await userEvent.click(screen.getByRole("button", { name: "downloadPdf" }));
+		await userEvent.click(screen.getByRole("button", { name: copy.downloadPdf }));
 		await waitFor(() =>
 			expect(mockToastSuccess.mock.calls.length + mockToastError.mock.calls.length).toBeGreaterThan(0),
 		);
@@ -155,6 +180,32 @@ const downloadPdf = async () => {
 
 	return clicks;
 };
+
+describe("CalendarExport copy", () => {
+	it("counts the Holidays inside the Planning Window in its description, in bold", () => {
+		holidaysState.holidays = [
+			makeHoliday({ id: "in-1", date: "2026-01-01", isInPlanningWindow: true }),
+			makeHoliday({ id: "in-2", date: "2026-12-25", isInPlanningWindow: true }),
+			makeHoliday({ id: "out-1", date: "2027-01-01", isInPlanningWindow: false }),
+		];
+
+		const { container } = renderExport();
+		const count = container.querySelector("p strong");
+
+		expect(count?.textContent).toBe("2");
+		expect(count?.parentElement?.textContent).toBe("Download your 2 holidays as a calendar file.");
+	});
+
+	it.each(Object.entries(BUNDLES))("renders the %s description with the count in bold", (locale, messages) => {
+		holidaysState.holidays = [makeHoliday({ id: "in-1", date: "2026-01-01", isInPlanningWindow: true })];
+
+		const { container } = renderExport({ locale: locale as Locale, messages });
+		const count = container.querySelector("p strong");
+
+		expect(count?.textContent).toBe("1");
+		expect(count?.parentElement?.textContent).not.toMatch(/[<>{}]|calendarExport\./);
+	});
+});
 
 describe("CalendarExport keeps the PDF machinery out of the first load", () => {
 	it("imports neither Effect nor the PDF module until the download is asked for", () => {
@@ -171,7 +222,7 @@ describe("CalendarExport as a PDF", () => {
 	});
 
 	it("hands the reader a file named for the year it covers", async () => {
-		render(<CalendarExport />);
+		renderExport();
 
 		const clicks = await downloadPdf();
 
@@ -181,17 +232,19 @@ describe("CalendarExport as a PDF", () => {
 	});
 
 	it("says the file is ready", async () => {
-		render(<CalendarExport />);
+		renderExport();
 
 		await downloadPdf();
 
 		await waitFor(() =>
-			expect(mockToastSuccess).toHaveBeenCalledWith("pdf.successTitle", { description: "pdf.successDescription" }),
+			expect(mockToastSuccess).toHaveBeenCalledWith(copy.pdf.successTitle, {
+				description: copy.pdf.successDescription,
+			}),
 		);
 	});
 
 	it("lets go of the object URL once the download has started, which is what the scope is for", async () => {
-		render(<CalendarExport />);
+		renderExport();
 
 		await downloadPdf();
 
@@ -199,7 +252,7 @@ describe("CalendarExport as a PDF", () => {
 	});
 
 	it("lets go of it even when the download itself fails", async () => {
-		render(<CalendarExport />);
+		renderExport();
 		vi.spyOn(document.body, "appendChild").mockImplementationOnce(() => {
 			throw new Error("detached");
 		});
@@ -207,17 +260,17 @@ describe("CalendarExport as a PDF", () => {
 		await downloadPdf();
 
 		await waitFor(() => expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:x"));
-		expect(mockToastError).toHaveBeenCalledWith("pdf.errorTitle", { description: "pdf.errorDescription" });
+		expect(mockToastError).toHaveBeenCalledWith(copy.pdf.errorTitle, { description: copy.pdf.errorDescription });
 	});
 
 	it("reports a render that never produced a file, rather than failing silently", async () => {
 		mockToBlob.mockRejectedValue(new Error("no fonts"));
-		render(<CalendarExport />);
+		renderExport();
 
 		await downloadPdf();
 
 		await waitFor(() =>
-			expect(mockToastError).toHaveBeenCalledWith("pdf.errorTitle", { description: "pdf.errorDescription" }),
+			expect(mockToastError).toHaveBeenCalledWith(copy.pdf.errorTitle, { description: copy.pdf.errorDescription }),
 		);
 		expect(mockToastSuccess).not.toHaveBeenCalled();
 		expect(URL.createObjectURL).not.toHaveBeenCalled();
@@ -230,10 +283,10 @@ describe("CalendarExport analytics", () => {
 	});
 
 	it("reports an ICS export with what it carried", async () => {
-		render(<CalendarExport />);
+		renderExport();
 
-		await userEvent.click(screen.getByRole("button", { name: "includePto" }));
-		await userEvent.click(screen.getByRole("button", { name: "download" }));
+		await userEvent.click(screen.getByRole("button", { name: copy.includePto }));
+		await userEvent.click(screen.getByRole("button", { name: copy.download }));
 
 		expect(track).toHaveBeenCalledExactlyOnceWith({
 			event: "calendar_exported",
@@ -242,7 +295,7 @@ describe("CalendarExport analytics", () => {
 	});
 
 	it("reports a PDF export, and whether it failed", async () => {
-		render(<CalendarExport />);
+		renderExport();
 
 		await downloadPdf();
 		await waitFor(() =>

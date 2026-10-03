@@ -9,12 +9,29 @@ const cookieNames = async (page: Page) => (await page.context().cookies()).map((
 
 const betterStackScripts = (page: Page) => page.locator('script[src*="betterstack.net/b.js"]');
 
+const ACCEPT_ALL_BY_PAGE = [
+	["/", "Accept all"],
+	["/es/", "Aceptar todas"],
+	["/ca/", "Accepta-les totes"],
+	["/it/", "Accetta tutti"],
+	["/fr/", "Tout accepter"],
+	["/de/", "Alle akzeptieren"],
+] as const;
+
 test.describe("cookie consent gates every analytics service", () => {
 	test.beforeEach(async ({ page }) => {
 		await page.addInitScript(() => {
 			Object.defineProperty(navigator, "webdriver", { get: () => false });
 		});
 	});
+
+	for (const [path, acceptAll] of ACCEPT_ALL_BY_PAGE) {
+		test(`speaks the language of ${path}, in the app's words for the answer they share`, async ({ page }) => {
+			await page.goto(path);
+
+			await expect(page.locator(BANNER).getByRole("button", { name: acceptAll, exact: true })).toBeVisible();
+		});
+	}
 
 	test("shows the banner on a first visit", async ({ page }) => {
 		await page.goto("/");

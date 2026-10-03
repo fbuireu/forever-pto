@@ -1,6 +1,11 @@
 import { AMOUNT_MIN } from "@application/dto/payment/schema";
+import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
+import caMessages from "@i18n/messages/ca.json";
 import deMessages from "@i18n/messages/de.json";
 import enMessages from "@i18n/messages/en.json";
+import esMessages from "@i18n/messages/es.json";
+import frMessages from "@i18n/messages/fr.json";
+import itMessages from "@i18n/messages/it.json";
 import { LOCALES } from "@infrastructure/i18n/locales";
 import { render } from "@testing-library/react";
 import { createTranslator, type Locale } from "next-intl";
@@ -10,6 +15,10 @@ const SITE_URL = "https://forever-pto.com";
 const mockGetTranslations = vi.hoisted(() => vi.fn());
 
 vi.mock("next-intl/server", () => ({ getTranslations: mockGetTranslations }));
+vi.mock("@domain/calendar/window", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@domain/calendar/window")>()),
+	MAX_CARRY_OVER_MONTHS: 9,
+}));
 vi.mock("@infrastructure/services/env/getPublicEnv", () => ({
 	getPublicEnv: vi
 		.fn()
@@ -18,7 +27,14 @@ vi.mock("@infrastructure/services/env/getPublicEnv", () => ({
 
 import { FaqJsonLd, JsonLd } from "./JsonLd";
 
-const MESSAGES: Partial<Record<Locale, typeof enMessages>> = { en: enMessages, de: deMessages };
+const MESSAGES: Record<Locale, typeof enMessages> = {
+	en: enMessages,
+	es: esMessages,
+	ca: caMessages,
+	it: itMessages,
+	de: deMessages,
+	fr: frMessages,
+};
 
 interface GetTranslationsParams {
 	locale: Locale;
@@ -48,7 +64,7 @@ const answeredQuestions = (messages: typeof enMessages) =>
 beforeEach(() => {
 	vi.clearAllMocks();
 	mockGetTranslations.mockImplementation(async ({ locale, namespace }: GetTranslationsParams) =>
-		createTranslator({ locale, messages: MESSAGES[locale] ?? enMessages, namespace }),
+		createTranslator({ locale, messages: MESSAGES[locale], namespace }),
 	);
 });
 
@@ -116,6 +132,27 @@ describe("FaqJsonLd", () => {
 		expect(answers.some((text) => text.includes("privacy policy"))).toBe(true);
 		expect(answers.some((text) => text.includes("Open issues or pull requests"))).toBe(true);
 		expect(answers.every((text) => !text.includes("<") && text.length > 0)).toBe(true);
+	});
+
+	it.each(LOCALES)("answers in %s with every link tag stripped and every message resolved", async (locale) => {
+		const faq = await renderFaqJsonLd(locale);
+		const entries = faq.mainEntity as { name: string; acceptedAnswer: { text: string } }[];
+
+		expect(entries).toHaveLength(answeredQuestions(MESSAGES[locale]).length);
+		for (const { name, acceptedAnswer } of entries) {
+			expect(name).not.toMatch(/[<>{}]|^faq\./);
+			expect(acceptedAnswer.text).toMatch(/\S/);
+			expect(acceptedAnswer.text).not.toMatch(/[<>{}]|^faq\./);
+		}
+	});
+
+	it.each(LOCALES)("answers the %s carry-over question with the ceiling the engine enforces", async (locale) => {
+		const faq = await renderFaqJsonLd(locale);
+		const entries = faq.mainEntity as { name: string; acceptedAnswer: { text: string } }[];
+		const carryOver = entries.find(({ name }) => name === MESSAGES[locale].faq.sections.general.carryOver.question)
+			?.acceptedAnswer.text;
+
+		expect(carryOver?.match(/\d+/g)).toEqual([String(MAX_CARRY_OVER_MONTHS)]);
 	});
 
 	it("asks the questions in the reader's language", async () => {

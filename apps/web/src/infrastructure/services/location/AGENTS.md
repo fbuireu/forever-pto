@@ -25,8 +25,8 @@ costs one interaction. Nothing downstream should treat the result as authoritati
    request. Synchronous, no I/O, and the only signal derived from the visitor's own connection, which is why
    it goes first. **When the header is present its answer is final, even an empty one.** Cloudflare sends `XX`
    or `T1` when it cannot place the visitor, and the two strategies below would then locate the Worker's own
-   egress rather than the visitor, while no cookie is set on failure, so every navigation repeated up to three
-   sequential subrequests for a wrong answer. They run only when the header is absent, which is local
+   egress rather than the visitor, while no cookie is set on failure, so every navigation would repeat up to
+   three sequential subrequests for a wrong answer. They run only when the header is absent, which is local
    development and nothing in production.
 2. **`detectCountryFromCDN()`** resolves the Cloudflare context, fetches
    `${env.NEXT_PUBLIC_SITE_URL}/cdn-cgi/trace` with a 5 s `AbortSignal.timeout`, and reads the `loc=` line.
@@ -50,38 +50,16 @@ unset the fetch simply fails and the chain continues; if it points at another en
 that environment's answer. The value is environment-specific configuration, not a constant
 ([ADR 0004](../../../../../../adr/0004-cloudflare-workers-as-deployment-target.md)).
 
-**Every fetch is `cache: 'no-store'`, and must stay that way.** Every response here identifies whoever
-asked for it, so a stored copy would hand one visitor's Country to the next, which then gets written to the
-week-long `user-country` cookie by `proxy/location.ts`. Nothing in the chain re-validates, so the only safe
-setting is no storage at all.
-
 **`detectCountryFromEgressIP` does not measure the visitor, and its name says so.** Both of its fetches
 originate inside the proxy Worker, so `api.ipify.org` reports the runtime's *egress* address and
-`ipinfo.io` returns that address's country. On Cloudflare that is the colo the request landed in: usually
-near the visitor, never derived from their connection; off Cloudflare it is whatever network the process
-sits on. It is kept as the last resort precisely because it is the only strategy that still answers when
-there is no `cf-ipcountry` header and the trace has nothing to read either, which in practice means local
-development, and it is last because a guess about the server
-must never beat a fact about the visitor. Do not read its result as visitor geolocation, and do not promote
-it up the chain.
+`ipinfo.io` returns that address's country: on Cloudflare the colo the request landed in, off Cloudflare
+whatever network the process sits on. It is last because a guess about the server must never beat a fact about
+the visitor, and its result is not visitor geolocation.
 
-**The same reservation applies to the trace, in weaker form.** It is fetched by the Worker rather than by the
-browser, so `loc=` describes the subrequest's client. `cf-ipcountry` is the only signal derived from the
-visitor's own connection ([ADR 0004](../../../../../../adr/0004-cloudflare-workers-as-deployment-target.md);
-the edge exposing the country on the request is the reason no geolocation service is needed on the common
-path).
-
-**`XX` and `T1` are filtered, and now in every strategy.** They mean unidentified traffic and a Tor exit
-node, not countries, and not values `date-holidays` could do anything with. The filter used to live in the
-header strategy alone: the CDN trace's `loc` line was passed through as-is and the egress-IP answer was
-`geoData.country?.toLowerCase() ?? ''`, so the same codes could reach the week-long `user-country` cookie
-by either route. Each strategy also spelled its own exit normalisation, differently, and none
-checked the shape, so a malformed header reached the cookie and then `new Holidays(country)`.
-
-`normalizeCountryCode` is that one rule: trim, lower-case, reject anything that is not two ASCII letters,
-reject the sentinels. `noStoreFetch` beside it owns `cache: 'no-store'` and the 5 s timeout, which were
-re-typed at every fetch, and the cache mode is a privacy invariant, not a preference, so a new
-strategy must not be able to forget it.
+**`normalizeCountryCode` is the exit of every strategy:** trim, lower-case, reject anything that is not two
+ASCII letters, and reject the sentinels `XX` and `T1`, which mean unidentified traffic and a Tor exit node.
+Whatever a strategy answers reaches the week-long `user-country` cookie and then `new Holidays(country)`.
+`noStoreFetch` beside it owns `cache: 'no-store'` and the 5 s timeout.
 
 **Effect is used here but never escapes.** Both async strategies are `Effect.gen` programs terminated inside
 their own wrapper with `Effect.runPromise`, because the proxy has no `ApplicationLayer` to provide. For
@@ -90,14 +68,14 @@ the documented logging exception in
 [ADR 0002](../../../../../../adr/0002-effect-for-external-service-boundaries.md).
 
 **The third-party bodies are read as `unknown` and picked with `stringField`, not cast, and not with zod.**
-`api.ipify.org` and `ipinfo.io` answer JSON this app does not control. It used to be cast to `{ ip: string }`
-and `{ country?: string }`, and the cast was not harmless: a `null` body, or a `country` that is not a string,
-threw a `TypeError` inside the generator. Effect records a throw there as a *defect*, and `Effect.orElse` only
-recovers *failures*, so `detectCountryFromEgressIP` rejected and took the middleware with it, breaking the
-"never a throw" rule above. `stringField({ body, field })` answers the field only when the body is an object and
-the value is a string, and `undefined` otherwise, which every caller already reads as `''`.
+`api.ipify.org` and `ipinfo.io` answer JSON this app does not control, and a cast is not harmless here: a `null`
+body, or a `country` that is not a string, would throw a `TypeError` inside the generator. Effect records a throw
+there as a *defect*, and `Effect.orElse` recovers only *failures*, so `detectCountryFromEgressIP` would reject and
+take the middleware with it, against the "never a throw" rule above. `stringField({ body, field })` answers the
+field only when the body is an object and the value is a string, and `undefined` otherwise, which every caller
+reads as `''`.
 
-zod is deliberately not the tool here, although the rest of the app validates foreign JSON with it. This folder
+zod is deliberately not the tool here, although the rest of the app checks the JSON it reads with it. This folder
 runs inside [`src/middleware.ts`](../../../middleware.ts), whose import graph does not reach zod at all, and
 the middleware is evaluated on every navigation. zod classic does not tree-shake to a small core: one
 `z.object` with a `validate` call bundles to roughly 25 KB compressed with named imports and about 90 KB through
@@ -111,13 +89,13 @@ is not evidence.
 
 ## Testing
 
-Both files have a co-located test. [`detectCountry.test.ts`](./detectCountry.test.ts) mocks `./utils/strategies` outright and asserts
+Each file has a co-located test. [`detectCountry.test.ts`](./detectCountry.test.ts) mocks `./utils/strategies` outright and asserts
 only the fallthrough, including that a later strategy is *not* called once an earlier one answers, and
 that a present header stops the chain even when Cloudflare could not resolve it.
 [`utils/strategies.test.ts`](./utils/strategies.test.ts) stubs `getCloudflareContext` and the global `fetch`, and covers each failure mode
 separately, since every one of them has to produce `''` rather than an exception.
+[`utils/normalize.test.ts`](./utils/normalize.test.ts) pins the exit rule on its own.
 
-Both use the locale constants from [`locales.ts`](../../i18n/locales.ts) as country codes, which is a coincidence of spelling (`es`,
-`de`, `fr`) and not a claim that locale and Country are the same thing. They are not, and the Country is
-
-never inferred from the language.
+`utils/strategies.test.ts` uses the locale constants from [`locales.ts`](../../i18n/locales.ts) as country
+codes, which is a coincidence of spelling (`es`, `de`, `fr`) and not a claim that locale and Country are the
+same thing; the Country is never inferred from the language.

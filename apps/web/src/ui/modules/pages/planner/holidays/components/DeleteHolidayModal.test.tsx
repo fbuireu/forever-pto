@@ -3,12 +3,13 @@ import en from "@i18n/messages/en.json";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
-const { mockToastError, mockToastSuccess, removeHoliday, logClientError } = vi.hoisted(() => ({
+const { mockToastError, mockToastSuccess, removeHoliday, askForPlan, logClientError } = vi.hoisted(() => ({
 	mockToastError: vi.fn(),
 	mockToastSuccess: vi.fn(),
 	removeHoliday: vi.fn(),
+	askForPlan: vi.fn(),
 	logClientError: vi.fn(),
 }));
 
@@ -20,12 +21,18 @@ vi.mock("sonner", () => ({ toast: { error: mockToastError, success: mockToastSuc
 vi.mock("@application/shared/utils/clientLog", () => ({ logClientError }));
 
 vi.mock("@application/stores/holidays", () => ({
-	useHolidaysStore: (selector: (state: unknown) => unknown) => selector({ removeHoliday }),
+	useHolidaysStore: (selector: (state: unknown) => unknown) => selector({ removeHoliday, askForPlan }),
 }));
 
 const { DeleteHolidayModal } = await import("./DeleteHolidayModal");
 
-const holiday = (id: string, name: string, day: number): HolidayDTO => ({
+interface HolidayParams {
+	id: string;
+	name: string;
+	day: number;
+}
+
+const holiday = ({ id, name, day }: HolidayParams): HolidayDTO => ({
 	id,
 	date: new Date(2026, 5, day),
 	name,
@@ -33,10 +40,15 @@ const holiday = (id: string, name: string, day: number): HolidayDTO => ({
 	isInPlanningWindow: true,
 });
 
-const SHUTDOWN = holiday("1", "Company shutdown", 3);
-const OFFSITE = holiday("2", "Team offsite", 9);
+const SHUTDOWN = holiday({ id: "1", name: "Company shutdown", day: 3 });
+const OFFSITE = holiday({ id: "2", name: "Team offsite", day: 9 });
 
-const renderModal = (holidays: HolidayDTO[], onClose = vi.fn()) => {
+interface RenderModalParams {
+	holidays: HolidayDTO[];
+	onClose?: Mock<() => void>;
+}
+
+const renderModal = ({ holidays, onClose = vi.fn() }: RenderModalParams) => {
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
 			<DeleteHolidayModal open onClose={onClose} locale="en" holidays={holidays} />
@@ -51,12 +63,13 @@ beforeEach(() => {
 	mockToastError.mockClear();
 	mockToastSuccess.mockClear();
 	removeHoliday.mockClear();
+	askForPlan.mockClear();
 	logClientError.mockClear();
 });
 
 describe("DeleteHolidayModal", () => {
 	it("names every Holiday it is about to delete, with the date that tells two of a name apart", () => {
-		renderModal([SHUTDOWN, OFFSITE]);
+		renderModal({ holidays: [SHUTDOWN, OFFSITE] });
 
 		expect(screen.getByText("Company shutdown")).toBeTruthy();
 		expect(screen.getByText("Team offsite")).toBeTruthy();
@@ -65,28 +78,29 @@ describe("DeleteHolidayModal", () => {
 	});
 
 	it("asks about one Holiday in the singular", () => {
-		renderModal([SHUTDOWN]);
+		renderModal({ holidays: [SHUTDOWN] });
 
 		expect(screen.getByRole("heading", { name: en.modals.deleteHoliday.titleSingular })).toBeTruthy();
 	});
 
 	it("asks about several in the plural, and says how many", () => {
-		renderModal([SHUTDOWN, OFFSITE]);
+		renderModal({ holidays: [SHUTDOWN, OFFSITE] });
 
 		expect(screen.getByRole("heading", { name: en.modals.deleteHoliday.title })).toBeTruthy();
 		expect(document.body.textContent).toContain(en.modals.deleteHoliday.description.replace("{count}", "2"));
 	});
 
 	it("deletes every Holiday it listed, one call each", async () => {
-		renderModal([SHUTDOWN, OFFSITE]);
+		renderModal({ holidays: [SHUTDOWN, OFFSITE] });
 
 		await confirm();
 
 		expect(removeHoliday.mock.calls).toStrictEqual([["1"], ["2"]]);
+		expect(askForPlan).toHaveBeenCalledOnce();
 	});
 
 	it("says so and closes once they are gone", async () => {
-		const onClose = renderModal([SHUTDOWN, OFFSITE]);
+		const onClose = renderModal({ holidays: [SHUTDOWN, OFFSITE] });
 
 		await confirm();
 
@@ -97,7 +111,7 @@ describe("DeleteHolidayModal", () => {
 	});
 
 	it("says it in the singular for a single Holiday", async () => {
-		renderModal([SHUTDOWN]);
+		renderModal({ holidays: [SHUTDOWN] });
 
 		await confirm();
 
@@ -110,7 +124,7 @@ describe("DeleteHolidayModal", () => {
 		removeHoliday.mockImplementationOnce(() => {
 			throw new Error("store refused");
 		});
-		const onClose = renderModal([SHUTDOWN]);
+		const onClose = renderModal({ holidays: [SHUTDOWN] });
 
 		await confirm();
 
@@ -123,19 +137,29 @@ describe("DeleteHolidayModal", () => {
 	});
 
 	it("goes away without deleting anything when the answer is no", async () => {
-		const onClose = renderModal([SHUTDOWN]);
+		const onClose = renderModal({ holidays: [SHUTDOWN] });
 
 		await userEvent.click(screen.getByRole("button", { name: en.modals.deleteHoliday.cancel }));
 
 		expect(removeHoliday).not.toHaveBeenCalled();
+		expect(askForPlan).not.toHaveBeenCalled();
 		expect(onClose).toHaveBeenCalledOnce();
+	});
+
+	it("asks for no plan when it was handed nothing to delete, since nothing changes", async () => {
+		renderModal({ holidays: [] });
+
+		await confirm();
+
+		expect(removeHoliday).not.toHaveBeenCalled();
+		expect(askForPlan).not.toHaveBeenCalled();
 	});
 });
 
 describe("DeleteHolidayModal analytics", () => {
 	it("reports how many Custom Holidays went, never which", async () => {
 		track.mockClear();
-		renderModal([SHUTDOWN, OFFSITE]);
+		renderModal({ holidays: [SHUTDOWN, OFFSITE] });
 
 		await confirm();
 

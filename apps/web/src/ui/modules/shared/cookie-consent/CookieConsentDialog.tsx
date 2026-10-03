@@ -1,3 +1,5 @@
+"use client";
+
 import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from "@ui/modules/core/animate/base/Accordion";
 import {
 	Dialog,
@@ -15,13 +17,18 @@ import { useTranslations } from "next-intl";
 import type { CookieEntry } from "./config/config";
 import { COOKIE_SECTIONS } from "./config/config";
 
+export interface ServiceChangeParams {
+	serviceId: string;
+	checked: boolean;
+}
+
 interface CookieConsentDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	analyticsEnabled: boolean;
 	onAnalyticsChange: (checked: boolean) => void;
 	serviceStates: Record<string, boolean>;
-	onServiceChange: (serviceId: string, checked: boolean) => void;
+	onServiceChange: (params: ServiceChangeParams) => void;
 	onAcceptAll: () => void;
 	onRejectAll: () => void;
 	onSave: () => void;
@@ -50,7 +57,7 @@ export const CookieConsentDialog = ({
 			<div className="flex items-center justify-between">
 				<span className="font-mono text-sm font-medium">{cookie.name}</span>
 				<span className="text-xs text-muted-foreground">
-					{cookie.expiryParams ? t(cookie.expiryKey, cookie.expiryParams) : t(cookie.expiryKey)}
+					{cookie.expiryKey === "session" ? t("session") : t(cookie.expiryKey, { count: cookie.expiryCount })}
 				</span>
 			</div>
 			<p className="text-sm text-muted-foreground">
@@ -111,7 +118,7 @@ export const CookieConsentDialog = ({
 												<Switch
 													id={switchId(service.id)}
 													checked={serviceStates[service.id] ?? false}
-													onCheckedChange={(checked) => onServiceChange(service.id, checked)}
+													onCheckedChange={(checked) => onServiceChange({ serviceId: service.id, checked })}
 												/>
 											</div>
 										))}

@@ -31,15 +31,6 @@ describe("FaqTabs", () => {
 		expect(screen.getByRole("tablist").style.gridTemplateColumns).toBe("repeat(2, 1fr)");
 	});
 
-	it("renders the heading only when a title is given, under the id the page anchors to", () => {
-		const { rerender } = render(<FaqTabs tabs={TABS} />);
-		expect(screen.queryByRole("heading", { level: 2 })).toBeNull();
-
-		rerender(<FaqTabs tabs={TABS} title="Questions" />);
-
-		expect(screen.getByRole("heading", { level: 2, name: "Questions" }).id).toBe("faq-title");
-	});
-
 	it("survives an empty section list without a tab to select", () => {
 		render(<FaqTabs tabs={[]} />);
 

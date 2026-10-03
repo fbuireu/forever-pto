@@ -1,4 +1,4 @@
-export interface PremiumSessionData {
+export interface PremiumSessionClaims {
 	email: string;
 	paymentIntentId: string;
 }

@@ -1,8 +1,8 @@
+import { ACTIVATION_FAILED, ACTIVATION_PARAM } from "@application/dto/payment/schema";
 import { activateWithPayment } from "@application/use-cases/activatePremium";
 import { activatePremiumRequest } from "@infrastructure/api/operations/activatePremium";
 import { resolveClientIp } from "@infrastructure/api/operations/types";
 import { localePath, resolveLocale } from "@infrastructure/i18n/utils/url";
-import { ACTIVATION_FAILED, ACTIVATION_PARAM } from "@infrastructure/services/premium/activation";
 import { setPremiumCookie } from "@infrastructure/services/premium/cookie";
 import { type NextRequest, NextResponse } from "next/server";
 

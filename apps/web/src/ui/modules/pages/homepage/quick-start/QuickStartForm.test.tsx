@@ -1,5 +1,6 @@
 import type { CountryDTO } from "@application/dto/country/types";
 import { useFiltersStore } from "@application/stores/filters";
+import { useHolidaysStore } from "@application/stores/holidays";
 import { useLocationStore } from "@application/stores/location";
 import { useUIStore } from "@application/stores/ui";
 import { FilterStrategy } from "@domain/calendar/types";
@@ -59,7 +60,8 @@ beforeEach(() => {
 	getRegions.mockReset();
 	getRegions.mockImplementation(({ countryCode }: { countryCode: string }) => REGIONS_BY_COUNTRY[countryCode] ?? []);
 	useFiltersStore.getState().resetToDefaults();
-	useLocationStore.setState({ countries: [], regions: [] });
+	useLocationStore.setState(useLocationStore.getInitialState());
+	useHolidaysStore.setState({ planAskedFor: false });
 	useUIStore.setState({ quickStartOpen: true });
 });
 
@@ -142,6 +144,7 @@ describe("QuickStartForm", () => {
 		expect(filters.carryOverMonths).toBe(4);
 		expect(useUIStore.getState().quickStartOpen).toBe(false);
 		expect(router.push).toHaveBeenCalledExactlyOnceWith("/planner");
+		expect(useHolidaysStore.getState().planAskedFor).toBe(true);
 	});
 
 	it("writes the Preferred Months picked for Main vacation into the filters store", () => {
@@ -216,5 +219,6 @@ describe("QuickStartForm", () => {
 		expect(useFiltersStore.getState().ptoDays).toBe(22);
 		expect(useFiltersStore.getState().country).toBe("");
 		expect(router.push).not.toHaveBeenCalled();
+		expect(useHolidaysStore.getState().planAskedFor).toBe(false);
 	});
 });

@@ -4,7 +4,7 @@ Date: 2026-08-15
 
 ## Status
 
-Accepted.
+Accepted. Amended 2026-10-02: `biome.json` keeps one exclusion, [`next-env.d.ts`](../apps/web/next-env.d.ts), which Next writes; the docs styles directory is formatted and linted like every other file, so the consequence below that counts two exclusions now has one to re-prefix on a move.
 
 ## Context
 

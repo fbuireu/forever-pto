@@ -10,8 +10,9 @@ import { type DatabaseError, DuplicateContactError, EmailError, type ValidationE
 import { LoggerService } from "@infrastructure/logging/service";
 import {
 	findContactWithMessage,
-	findLatestContactSince,
-	saveContact,
+	recordContactMessageId,
+	releaseContactSlot,
+	reserveContactSlot,
 } from "@infrastructure/services/contact/repository";
 import { render } from "@react-email/render";
 import { Effect } from "effect";
@@ -40,15 +41,21 @@ export const sendContactEmail = ({
 		const validated = yield* zodParse({ schema: contactSchema, data });
 		const senderKey = contactSenderKey(validated.email);
 
-		const [withinCooldown, repeated] = yield* Effect.all(
-			[
-				findLatestContactSince({ senderKey, since: contactCooldownStart({ now: new Date() }) }),
-				findContactWithMessage({ senderKey, message: validated.message }),
-			],
-			{ concurrency: "unbounded" },
-		);
+		const slot = yield* reserveContactSlot({
+			senderKey,
+			since: contactCooldownStart({ now: new Date() }),
+			contact: {
+				email: validated.email,
+				name: validated.name,
+				subject: validated.subject,
+				message: validated.message,
+				messageId: null,
+				origin: null,
+			},
+		});
 
-		if (withinCooldown || repeated) {
+		if (slot === null) {
+			const repeated = yield* findContactWithMessage({ senderKey, message: validated.message });
 			const reason = repeated ? "repeated" : "cooldown";
 			logger.info({
 				message: "Contact refused before sending",
@@ -60,6 +67,28 @@ export const sendContactEmail = ({
 
 			return yield* Effect.fail(new DuplicateContactError({ reason }));
 		}
+
+		const releaseAfter = (failure: EmailError) =>
+			releaseContactSlot(slot).pipe(
+				Effect.tapBoth({
+					onFailure: (error) =>
+						Effect.sync(() =>
+							logger.error({
+								message: "Contact reservation could not be released after the email failed",
+								context: { reason: error.message, emailDomain: emailDomain(validated.email) },
+							}),
+						),
+					onSuccess: () =>
+						Effect.sync(() =>
+							logger.warn({
+								message: "Contact reservation released after the email failed",
+								context: { reason: failure.message, emailDomain: emailDomain(validated.email) },
+							}),
+						),
+				}),
+				Effect.ignore,
+				Effect.andThen(Effect.fail(failure)),
+			);
 
 		const emailHtml = yield* Effect.tryPromise({
 			try: () => render(ContactFormEmail({ ...validated, baseUrl: config.siteUrl })),
@@ -75,27 +104,22 @@ export const sendContactEmail = ({
 				});
 				return new EmailError({ message: "Email render failed", cause: error });
 			},
-		});
+		}).pipe(Effect.catchAll(releaseAfter));
 
 		const resend = yield* ResendService;
-		const { messageId } = yield* resend.send({
-			from: `Forever PTO <${config.contactEmail}>`,
-			to: config.contactEmail,
-			subject: `[Forever PTO Contact] ${validated.subject}`,
-			html: emailHtml,
-			replyTo: validated.email,
-			tags: [{ name: "category", value: "web_contact_form" }],
-		});
+		const { messageId } = yield* resend
+			.send({
+				from: `Forever PTO <${config.contactEmail}>`,
+				to: config.contactEmail,
+				subject: `[Forever PTO Contact] ${validated.subject}`,
+				html: emailHtml,
+				replyTo: validated.email,
+				tags: [{ name: "category", value: "web_contact_form" }],
+			})
+			.pipe(Effect.catchAll(releaseAfter));
 
 		const deferred = Effect.suspend(() =>
-			saveContact({
-				email: validated.email,
-				name: validated.name,
-				subject: validated.subject,
-				message: validated.message,
-				messageId: messageId ?? null,
-				origin: null,
-			}).pipe(
+			recordContactMessageId({ id: slot, messageId: messageId ?? null }).pipe(
 				Effect.catchAll((e) =>
 					Effect.sync(() => {
 						logger.error({

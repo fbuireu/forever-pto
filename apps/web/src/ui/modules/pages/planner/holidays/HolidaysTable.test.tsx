@@ -1,5 +1,6 @@
 import { HolidayVariant } from "@application/dto/holiday/types";
 import enMessages from "@i18n/messages/en.json";
+import frMessages from "@i18n/messages/fr.json";
 import { fireEvent, render } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
@@ -21,7 +22,10 @@ vi.mock("@application/stores/premium", () => ({
 	usePremiumStore: (selector: (state: { premiumKey: string }) => unknown) => selector({ premiumKey: "unlocked" }),
 	PremiumFeatureId: { SELECT_HOLIDAY: "selectHoliday", SELECT_ALL_HOLIDAYS: "selectAllHolidays" },
 }));
-vi.mock("@ui/hooks/useDebounce", () => ({ useDebounce: ({ value }: { value: string }) => [value] }));
+const debounce = vi.hoisted(() => ({ settled: true }));
+vi.mock("@ui/hooks/useDebounce", () => ({
+	useDebounce: ({ value }: { value: string }) => [debounce.settled ? value : ""],
+}));
 vi.mock("@ui/modules/premium/PremiumFeature", () => ({
 	PremiumFeature: ({ children }: { children: ReactNode }) => children,
 	PremiumFeatureVariant: { STACK: "stack" },
@@ -136,10 +140,18 @@ const renderTable = () => {
 
 type View = ReturnType<typeof renderTable>;
 
-const desktopRow = (view: View, name: string) => view.getAllByLabelText(`Select ${name}`)[0] as HTMLInputElement;
-const mobileCard = (view: View, name: string) => view.getAllByLabelText(`Select ${name}`)[1] as HTMLInputElement;
+interface HolidayCheckboxParams {
+	view: View;
+	name: string;
+}
+
+const desktopRow = ({ view, name }: HolidayCheckboxParams) =>
+	view.getAllByLabelText(`Select ${name}`)[0] as HTMLInputElement;
+const mobileCard = ({ view, name }: HolidayCheckboxParams) =>
+	view.getAllByLabelText(`Select ${name}`)[1] as HTMLInputElement;
 
 beforeEach(() => {
+	debounce.settled = true;
 	holidaysState.holidays = [
 		holiday({ id: "national-2026-01-01", name: "Alpha", date: new Date(2026, 0, 1) }),
 		holiday({ id: "national-2026-06-01", name: "Beta", date: new Date(2026, 5, 1) }),
@@ -150,22 +162,23 @@ beforeEach(() => {
 describe("HolidaysTable selection survives the rows moving", () => {
 	it("keeps a Holiday selected when a search reorders it under a different row index", () => {
 		const view = renderTable();
-		fireEvent.click(desktopRow(view, "Gamma"));
-		expect(desktopRow(view, "Gamma").checked).toBe(true);
+		fireEvent.click(desktopRow({ view, name: "Gamma" }));
+		expect(desktopRow({ view, name: "Gamma" }).checked).toBe(true);
 
 		fireEvent.change(view.getByPlaceholderText(enMessages.holidaysTable.searchPlaceholder), {
 			target: { value: "Gamma" },
 		});
 
-		expect(desktopRow(view, "Gamma").checked).toBe(true);
+		expect(desktopRow({ view, name: "Gamma" }).checked).toBe(true);
+		openDelete(view);
 		expect(view.getByTestId("delete-modal").getAttribute("data-names")).toBe("Gamma");
-		press(view, EDIT);
+		press({ view, name: EDIT });
 		expect(view.getByTestId("edit-modal").getAttribute("data-name")).toBe("Gamma");
 	});
 
 	it("keeps a Holiday selected when sorting by name reorders it", () => {
 		const view = renderTable();
-		fireEvent.click(desktopRow(view, "Alpha"));
+		fireEvent.click(desktopRow({ view, name: "Alpha" }));
 
 		const sortByName = view.getByRole("button", { name: enMessages.holidayTableHeader.holiday });
 		fireEvent.click(sortByName);
@@ -174,7 +187,8 @@ describe("HolidaysTable selection survives the rows moving", () => {
 		expect(
 			view.getByRole("columnheader", { name: enMessages.holidayTableHeader.holiday }).getAttribute("aria-sort"),
 		).toBe("descending");
-		expect(desktopRow(view, "Alpha").checked).toBe(true);
+		expect(desktopRow({ view, name: "Alpha" }).checked).toBe(true);
+		openDelete(view);
 		expect(view.getByTestId("delete-modal").getAttribute("data-names")).toBe("Alpha");
 	});
 });
@@ -182,16 +196,18 @@ describe("HolidaysTable selection survives the rows moving", () => {
 describe("HolidaysTable toolbar counts what it will act on", () => {
 	it("offers to delete exactly the Holidays the modal will receive", () => {
 		const view = renderTable();
-		fireEvent.click(desktopRow(view, "Alpha"));
-		fireEvent.click(desktopRow(view, "Beta"));
+		fireEvent.click(desktopRow({ view, name: "Alpha" }));
+		fireEvent.click(desktopRow({ view, name: "Beta" }));
 
-		expect(view.getByTestId("delete-modal").getAttribute("data-names")).toBe("Alpha,Beta");
 		expect(view.getAllByText("Delete (2)").length).toBeGreaterThan(0);
+		openDelete(view);
+		expect(view.getByTestId("delete-modal").getAttribute("data-names")).toBe("Alpha,Beta");
 	});
 
 	it("drops a selected Holiday from the count once it leaves the list entirely", () => {
 		const view = renderTable();
-		fireEvent.click(desktopRow(view, "Gamma"));
+		fireEvent.click(desktopRow({ view, name: "Gamma" }));
+		openDelete(view);
 
 		holidaysState.holidays = holidaysState.holidays.slice(0, 2);
 		fireEvent.change(view.getByPlaceholderText(enMessages.holidaysTable.searchPlaceholder), {
@@ -207,23 +223,37 @@ describe("HolidaysTable names both of its checkboxes", () => {
 	it("names the mobile card's checkbox the way the desktop row names its own", () => {
 		const view = renderTable();
 
-		expect(mobileCard(view, "Gamma").getAttribute("aria-label")).toBe("Select Gamma");
+		expect(mobileCard({ view, name: "Gamma" }).getAttribute("aria-label")).toBe("Select Gamma");
 	});
 
 	it("toggles the same Holiday from the mobile card", () => {
 		const view = renderTable();
 
-		fireEvent.click(mobileCard(view, "Beta"));
+		fireEvent.click(mobileCard({ view, name: "Beta" }));
 
-		expect(desktopRow(view, "Beta").checked).toBe(true);
+		expect(desktopRow({ view, name: "Beta" }).checked).toBe(true);
 	});
 });
 
-const selectAllBoxes = (view: View, label: string) => view.getAllByLabelText(label) as HTMLInputElement[];
+interface SelectAllBoxesParams {
+	view: View;
+	label: string;
+}
+
+const selectAllBoxes = ({ view, label }: SelectAllBoxesParams) => view.getAllByLabelText(label) as HTMLInputElement[];
 
 const names = (view: View) => view.queryByTestId("delete-modal")?.getAttribute("data-names") ?? null;
 
-const search = (view: View, term: string) =>
+const DELETE_ANY = /Delete \(\d+\)/;
+
+const openDelete = (view: View) => fireEvent.click(view.getByRole("button", { name: DELETE_ANY }));
+
+interface SearchParams {
+	view: View;
+	term: string;
+}
+
+const search = ({ view, term }: SearchParams) =>
 	fireEvent.change(view.getByPlaceholderText(enMessages.holidaysTable.searchPlaceholder), {
 		target: { value: term },
 	});
@@ -232,13 +262,14 @@ describe("HolidaysTable select-all", () => {
 	it("offers to select everything while nothing is picked", () => {
 		const view = renderTable();
 
-		expect(selectAllBoxes(view, enMessages.holidaysTable.selectAll)[0]?.checked).toBe(false);
+		expect(selectAllBoxes({ view, label: enMessages.holidaysTable.selectAll })[0]?.checked).toBe(false);
 	});
 
 	it("takes the whole list in one click", () => {
 		const view = renderTable();
 
-		fireEvent.click(selectAllBoxes(view, enMessages.holidaysTable.selectAll)[0]);
+		fireEvent.click(selectAllBoxes({ view, label: enMessages.holidaysTable.selectAll })[0]);
+		openDelete(view);
 
 		expect(names(view)).toBe("Alpha,Beta,Gamma");
 	});
@@ -246,52 +277,61 @@ describe("HolidaysTable select-all", () => {
 	it("says the selection is partial while only some are picked, rather than saying nothing", () => {
 		const view = renderTable();
 
-		fireEvent.click(desktopRow(view, "Beta"));
+		fireEvent.click(desktopRow({ view, name: "Beta" }));
 
-		expect(selectAllBoxes(view, enMessages.holidaysTable.partialSelection)[0]).toBeTruthy();
+		expect(selectAllBoxes({ view, label: enMessages.holidaysTable.partialSelection })[0]).toBeTruthy();
 	});
 
 	it("offers to clear the selection once the whole list is picked, and clears it", () => {
 		const view = renderTable();
-		fireEvent.click(selectAllBoxes(view, enMessages.holidaysTable.selectAll)[0]);
+		fireEvent.click(selectAllBoxes({ view, label: enMessages.holidaysTable.selectAll })[0]);
+		openDelete(view);
 
-		fireEvent.click(selectAllBoxes(view, enMessages.holidaysTable.deselectAll)[0]);
+		fireEvent.click(selectAllBoxes({ view, label: enMessages.holidaysTable.deselectAll })[0]);
 
 		expect(names(view)).toBe("");
 	});
 
 	it("takes only the rows a search left visible, which is what select-all means with a filter on", () => {
 		const view = renderTable();
-		search(view, "et");
+		search({ view, term: "et" });
 
-		fireEvent.click(selectAllBoxes(view, enMessages.holidaysTable.selectAll)[0]);
+		fireEvent.click(selectAllBoxes({ view, label: enMessages.holidaysTable.selectAll })[0]);
+		openDelete(view);
 
 		expect(names(view)).toBe("Beta");
 	});
 
 	it("adds the visible rows to a selection made outside the filter rather than replacing it", () => {
 		const view = renderTable();
-		fireEvent.click(desktopRow(view, "Gamma"));
-		search(view, "Alpha");
+		fireEvent.click(desktopRow({ view, name: "Gamma" }));
+		search({ view, term: "Alpha" });
 
-		fireEvent.click(selectAllBoxes(view, enMessages.holidaysTable.selectAll)[0]);
+		fireEvent.click(selectAllBoxes({ view, label: enMessages.holidaysTable.selectAll })[0]);
+		openDelete(view);
 
 		expect(names(view)).toBe("Alpha,Gamma");
 	});
 
 	it("clears only the visible rows, leaving a selection the filter hides alone", () => {
 		const view = renderTable();
-		fireEvent.click(selectAllBoxes(view, enMessages.holidaysTable.selectAll)[0]);
-		search(view, "Alpha");
+		fireEvent.click(selectAllBoxes({ view, label: enMessages.holidaysTable.selectAll })[0]);
+		search({ view, term: "Alpha" });
 
-		fireEvent.click(selectAllBoxes(view, enMessages.holidaysTable.deselectAll)[0]);
+		fireEvent.click(selectAllBoxes({ view, label: enMessages.holidaysTable.deselectAll })[0]);
+		openDelete(view);
 
 		expect(names(view)).toBe("Beta,Gamma");
 	});
 });
 
 describe("HolidaysTable clears the selection when a modal is done with it", () => {
-	const clickInsideModal = (view: View, testId: string) => {
+	interface ClickInsideModalParams {
+		view: View;
+		testId: string;
+	}
+
+	const clickInsideModal = ({ view, testId }: ClickInsideModalParams) => {
 		const modal = view.getByTestId(testId);
 		fireEvent.click(modal);
 		return modal;
@@ -300,19 +340,20 @@ describe("HolidaysTable clears the selection when a modal is done with it", () =
 	it("keeps the selection while the delete modal is still open", () => {
 		const view = renderTable();
 
-		fireEvent.click(desktopRow(view, "Alpha"));
+		fireEvent.click(desktopRow({ view, name: "Alpha" }));
+		openDelete(view);
 
-		expect(clickInsideModal(view, "delete-modal").getAttribute("data-names")).toBe("Alpha");
+		expect(clickInsideModal({ view, testId: "delete-modal" }).getAttribute("data-names")).toBe("Alpha");
 	});
 
 	it("un-picks a Holiday clicked twice, which is the other half of the toggle", () => {
 		const view = renderTable();
 
-		fireEvent.click(desktopRow(view, "Alpha"));
-		fireEvent.click(desktopRow(view, "Alpha"));
+		fireEvent.click(desktopRow({ view, name: "Alpha" }));
+		fireEvent.click(desktopRow({ view, name: "Alpha" }));
 
-		expect(names(view)).toBe("");
-		expect(desktopRow(view, "Alpha").checked).toBe(false);
+		expect(view.queryByRole("button", { name: DELETE_ANY })).toBeNull();
+		expect(desktopRow({ view, name: "Alpha" }).checked).toBe(false);
 	});
 });
 
@@ -329,7 +370,12 @@ const renderCustomTable = () => {
 	return view;
 };
 
-const press = (view: View, name: RegExp) => fireEvent.click(view.getByRole("button", { name }));
+interface PressParams {
+	view: View;
+	name: RegExp;
+}
+
+const press = ({ view, name }: PressParams) => fireEvent.click(view.getByRole("button", { name }));
 
 const ADD = new RegExp(enMessages.holidaysTable.addHoliday);
 const EDIT = new RegExp(enMessages.holidaysTable.editHoliday);
@@ -348,54 +394,55 @@ describe("HolidaysTable toolbar", () => {
 		const view = renderTable();
 		expect(view.queryByRole("button", { name: EDIT })).toBeNull();
 
-		fireEvent.click(desktopRow(view, "Alpha"));
+		fireEvent.click(desktopRow({ view, name: "Alpha" }));
 		expect(view.getByRole("button", { name: EDIT })).toBeTruthy();
 
-		fireEvent.click(desktopRow(view, "Beta"));
+		fireEvent.click(desktopRow({ view, name: "Beta" }));
 		expect(view.queryByRole("button", { name: EDIT })).toBeNull();
 	});
 });
 
 describe("HolidaysTable modals", () => {
-	it("mounts the add and edit forms only once one is opened, so their form code loads on demand", () => {
+	it("mounts the add, edit and delete forms only once one is opened, so their code loads on demand", () => {
 		const view = renderCustomTable();
-		fireEvent.click(desktopRow(view, "Shutdown"));
+		fireEvent.click(desktopRow({ view, name: "Shutdown" }));
 
 		expect(view.queryByTestId("add-modal")).toBeNull();
 		expect(view.queryByTestId("edit-modal")).toBeNull();
+		expect(view.queryByTestId("delete-modal")).toBeNull();
 	});
 
 	it("opens the add form and clears the selection when it closes", () => {
 		const view = renderCustomTable();
-		fireEvent.click(desktopRow(view, "Shutdown"));
+		fireEvent.click(desktopRow({ view, name: "Shutdown" }));
 
-		press(view, ADD);
+		press({ view, name: ADD });
 		expect(view.getByTestId("add-modal").dataset.open).toBe("true");
 
 		fireEvent.click(view.getByRole("button", { name: "close add" }));
 
 		expect(view.getByTestId("add-modal").dataset.open).toBe("false");
-		expect(names(view)).toBe("");
+		expect(desktopRow({ view, name: "Shutdown" }).checked).toBe(false);
 	});
 
 	it("opens the edit form on the Holiday that is selected, and clears it on close", () => {
 		const view = renderTable();
-		fireEvent.click(desktopRow(view, "Beta"));
+		fireEvent.click(desktopRow({ view, name: "Beta" }));
 
-		press(view, EDIT);
+		press({ view, name: EDIT });
 		expect(view.getByTestId("edit-modal").dataset.name).toBe("Beta");
 
 		fireEvent.click(view.getByRole("button", { name: "close edit" }));
 
-		expect(names(view)).toBe("");
+		expect(desktopRow({ view, name: "Beta" }).checked).toBe(false);
 	});
 
 	it("clears the selection when the delete form closes, so the count cannot outlive it", () => {
 		const view = renderTable();
-		fireEvent.click(desktopRow(view, "Alpha"));
-		fireEvent.click(desktopRow(view, "Beta"));
+		fireEvent.click(desktopRow({ view, name: "Alpha" }));
+		fireEvent.click(desktopRow({ view, name: "Beta" }));
 
-		press(view, DELETE_TWO);
+		press({ view, name: DELETE_TWO });
 		expect(view.getByTestId("delete-modal").dataset.open).toBe("true");
 
 		fireEvent.click(view.getByRole("button", { name: "close delete" }));
@@ -409,9 +456,9 @@ describe("HolidaysTable with nothing to show", () => {
 	it("says so, and offers a select-all that selects nothing", () => {
 		const view = renderTable();
 
-		search(view, "no such holiday");
+		search({ view, term: "no such holiday" });
 
-		expect(selectAllBoxes(view, enMessages.holidaysTable.selectAll)[0]?.checked).toBe(false);
+		expect(selectAllBoxes({ view, label: enMessages.holidaysTable.selectAll })[0]?.checked).toBe(false);
 		expect(view.getAllByText(enMessages.holidaysTable.noHolidaysFound).length).toBeGreaterThan(0);
 	});
 });
@@ -505,17 +552,48 @@ describe("HolidaysTable card details", () => {
 		];
 		const view = renderTable();
 
-		search(view, "barcel");
+		search({ view, term: "barcel" });
 		expect(view.getAllByLabelText(/^Select (?!all$)/).map((box) => box.getAttribute("aria-label"))).toStrictEqual([
 			"Select Alpha",
 			"Select Alpha",
 		]);
 
-		search(view, "bank");
+		search({ view, term: "bank" });
 		expect(view.getAllByLabelText(/^Select (?!all$)/).map((box) => box.getAttribute("aria-label"))).toStrictEqual([
 			"Select Beta",
 			"Select Beta",
 		]);
+	});
+});
+
+describe("HolidaysTable counts in one message per sentence", () => {
+	it("says how many rows are picked, and how many it shows out of how many, in English", () => {
+		const view = renderTable();
+		fireEvent.click(desktopRow({ view, name: "Alpha" }));
+		fireEvent.click(desktopRow({ view, name: "Beta" }));
+
+		expect(view.container.textContent).toContain("2 selected");
+
+		search({ view, term: "et" });
+
+		expect(view.container.textContent).toContain("Showing 1 of 3");
+	});
+
+	it("lets French word both counts its own way", () => {
+		const view = render(
+			<NextIntlClientProvider locale="fr" messages={frMessages}>
+				<HolidaysTable title="Jours fériés nationaux" variant={HolidayVariant.NATIONAL} open />
+			</NextIntlClientProvider>,
+		);
+		fireEvent.click(view.getByTestId("trigger"));
+
+		expect(view.container.textContent).toContain("Affichage de 3 sur 3");
+
+		for (const name of ["Alpha", "Beta"]) {
+			fireEvent.click(view.getAllByLabelText(frMessages.holidayRow.select.replace("{name}", name))[0]);
+		}
+
+		expect(view.container.textContent).toContain("2 sélectionnés");
 	});
 });
 
@@ -534,10 +612,10 @@ describe("HolidaysTable analytics", () => {
 		track.mockClear();
 		const view = renderCustomTable();
 
-		press(view, ADD);
-		fireEvent.click(desktopRow(view, "Shutdown"));
-		press(view, EDIT);
-		press(view, /Delete \(1\)/);
+		press({ view, name: ADD });
+		fireEvent.click(desktopRow({ view, name: "Shutdown" }));
+		press({ view, name: EDIT });
+		press({ view, name: /Delete \(1\)/ });
 
 		const opened = track.mock.calls.map(([call]) => call).filter(({ event }) => event === "holiday_modal_opened");
 		expect(opened).toStrictEqual([
@@ -554,9 +632,9 @@ describe("HolidaysTable analytics on the rows", () => {
 	it("reports a row picked and un-picked, and a select-all, with the tab and never the name", () => {
 		const view = renderTable();
 
-		fireEvent.click(desktopRow(view, "Alpha"));
-		fireEvent.click(desktopRow(view, "Alpha"));
-		fireEvent.click(selectAllBoxes(view, enMessages.holidaysTable.selectAll)[0]);
+		fireEvent.click(desktopRow({ view, name: "Alpha" }));
+		fireEvent.click(desktopRow({ view, name: "Alpha" }));
+		fireEvent.click(selectAllBoxes({ view, label: enMessages.holidaysTable.selectAll })[0]);
 
 		expect(track.mock.calls.map(([call]) => call)).toStrictEqual([
 			{
@@ -600,5 +678,19 @@ describe("HolidaysTable analytics on the rows", () => {
 			{ event: "holidays_searched", properties: { variant: HolidayVariant.NATIONAL } },
 		]);
 		expect(JSON.stringify(track.mock.calls)).not.toContain("Al");
+	});
+
+	it("reports a search as the person starts typing it, before the list has settled on the term", () => {
+		debounce.settled = false;
+		const view = renderTable();
+
+		fireEvent.change(view.getByPlaceholderText(enMessages.holidaysTable.searchPlaceholder), {
+			target: { value: "Al" },
+		});
+
+		expect(track).toHaveBeenCalledExactlyOnceWith({
+			event: "holidays_searched",
+			properties: { variant: HolidayVariant.NATIONAL },
+		});
 	});
 });

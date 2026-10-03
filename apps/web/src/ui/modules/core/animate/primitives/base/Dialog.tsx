@@ -70,12 +70,9 @@ function DialogBackdrop({ transition = { duration: 0.2, ease: "easeInOut" }, ...
 	);
 }
 
-type DialogFlipDirection = "top" | "bottom" | "left" | "right";
-type DialogPopupProps = Omit<ComponentProps<typeof DialogPrimitive.Popup>, "render"> &
-	HTMLMotionProps<"div"> & { from?: DialogFlipDirection };
+type DialogPopupProps = Omit<ComponentProps<typeof DialogPrimitive.Popup>, "render"> & HTMLMotionProps<"div">;
 
 function DialogPopup({
-	from = "top",
 	initialFocus,
 	finalFocus,
 	transition = { duration: 0.2, ease: "easeInOut" },

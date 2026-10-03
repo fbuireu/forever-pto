@@ -9,12 +9,12 @@ import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { usePlacedPlan } from "@ui/hooks/usePlanReadout";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
-import { SidebarFieldTooltip } from "@ui/modules/sidebar/components/SidebarFieldLabel";
 import { Download, FileText } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { type ReactNode, useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/react/shallow";
+import { SidebarFieldTooltip } from "./SidebarFieldLabel";
 
 function BoldText(chunks: ReactNode) {
 	return <strong className="font-black text-foreground">{chunks}</strong>;

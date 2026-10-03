@@ -21,7 +21,7 @@ Exports: `Drawer`, `DrawerContent`, `DrawerTitle`. There is intentionally no `Dr
 
 - `Drawer` wraps `vaul`'s root with `shouldScaleBackground` defaulting to `false` (the app's brutal layout should not zoom out behind the sheet). All other vaul root props (`open`, `onOpenChange`, `dismissible`, snap points…) pass through.
 - `DrawerContent` renders the portal, an optional black/50 overlay (`overlay` prop, default `true`), and the sheet itself: fixed to the bottom edge, `rounded-t-[14px]`, 3px frame border on top and sides, `bg-card`, capped at `max-h-[85dvh]`. A pill-shaped vaul `Handle` is always rendered above your content for drag affordance.
-- `DrawerTitle` is visually hidden (`sr-only`) by default, and vaul warns when a drawer has no accessible title,, so always include one and override the class only if you want it visible.
+- `DrawerTitle` is visually hidden (`sr-only`) by default, and vaul warns when a drawer has no accessible title, so always include one and override the class only if you want it visible.
 
 ## Props
 

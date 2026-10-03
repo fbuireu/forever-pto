@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import type { ComponentProps, ReactElement, ReactNode } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 type MotionDivProps = ComponentProps<"div"> & {
 	initial?: unknown;
@@ -116,6 +116,10 @@ const body = () => screen.queryByText("Body");
 const slot = (name: string) => document.querySelector(`[data-slot="${name}"]`);
 
 describe("Popover", () => {
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
 	it("keeps the portal empty until the primitive reports an open, then mounts it", () => {
 		renderPopover();
 		expect(body()).toBeNull();
@@ -214,10 +218,8 @@ describe("Popover", () => {
 	});
 
 	it("refuses a portal outside Popover, since it has no open state to read", () => {
-		const error = vi.spyOn(console, "error").mockImplementation(() => {});
+		vi.spyOn(console, "error").mockImplementation(() => {});
 
 		expect(() => render(<PopoverPortal />)).toThrow("useContext must be used within PopoverContext");
-
-		error.mockRestore();
 	});
 });

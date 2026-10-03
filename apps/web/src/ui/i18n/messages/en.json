@@ -43,8 +43,7 @@
 		"title": "Forever PTO",
 		"heading": "Planner",
 		"description": "Set your PTO days, country and strategy, and the planner places your days around the public holidays.",
-		"titleHighlight1": "Your year",
-		"titleHighlight2": "free",
+		"titleHighlight": "<first>Your year</first> <second>free</second>",
 		"instructions": "Start by adding your days in the left sidebar, then adjust the rest of your settings. Still have questions?",
 		"quickTour": "Take a quick tour"
 	},
@@ -96,7 +95,7 @@
 			"daysCount": "{count, plural, one {day} other {days}}"
 		},
 		"summaryParagraph": {
-			"withGain": "With your {ptoDays} PTO days and {totalHolidays} public holidays, the {strategy} strategy turns them into {effectiveDays} effective days off, that’s {increment} days over your budget, a +{percentage}% gain over simply using them as-is.",
+			"withGain": "With your {ptoDays} PTO days and {totalHolidays} public holidays, the {strategy} strategy turns them into {effectiveDays} effective days off, that’s {increment} days over your budget, a +{percentage} gain over simply using them as-is.",
 			"withoutGain": "With your {ptoDays} PTO days and {totalHolidays} public holidays, you get {effectiveDays} effective days off using the {strategy} strategy.",
 			"noRegionHintTitle": "Add your region",
 			"noRegionHint": "Select your region in the sidebar to include regional holidays and squeeze out even more days off.",
@@ -157,7 +156,7 @@
 				},
 				"carryOver": {
 					"question": "What are carry-over months?",
-					"answer": "If your company lets you use this year's PTO days in the first months of next year, carry-over months extend the planning window up to 12 months past December, so the planner can also place days in, say, January or February of the following year."
+					"answer": "If your company lets you use this year's PTO days in the first months of next year, carry-over months extend the planning window up to {max, number} months past December, so the planner can also place days in, say, January or February of the following year."
 				}
 			},
 			"technical": {
@@ -239,8 +238,7 @@
 		"holidays": "Holidays",
 		"holidaysOutsideRange": "Holidays are only known for {from}–{to}, so any outside that span are counted as workdays.",
 		"dateRange": "Selected dates",
-		"from": "From",
-		"to": "to"
+		"selectedRange": "From {from} to {to}"
 	},
 	"holidaysTable": {
 		"nationalTab": "National",
@@ -258,12 +256,11 @@
 		"noHolidaysFound": "No holidays found",
 		"noHolidays": "No holidays",
 		"allSelected": "All selected",
-		"selected": "selected",
+		"selectedCount": "{count} selected",
 		"weekend": "Weekend",
 		"onWeekends": "On weekends",
 		"onWorkdays": "On workdays",
-		"showing": "Showing",
-		"of": "of",
+		"showingCount": "Showing {shown} of {total}",
 		"addHoliday": "Add holiday",
 		"add": "Add",
 		"editHoliday": "Edit holiday",
@@ -282,9 +279,7 @@
 		"national": "National",
 		"regional": "Regional",
 		"custom": "Custom",
-		"distributionDescription": "Distribution of your {ptoDays} PTO days, {nationalDays} national holidays{regionalPart}{customPart}.",
-		"regionalPart": ", {regionalDays} regional",
-		"customPart": " and {customDays} custom",
+		"distributionDescription": "Distribution of your {ptoDays} PTO days, {nationalDays} national holidays{regionalDays, plural, =0 {} other {, # regional}}{customDays, plural, =0 {} other { and # custom}}.",
 		"quarterDescription": "Distribution of {totalDays} effective days across {activeQuarters, plural, one {# quarter} other {# quarters}} of your planning window.",
 		"annualTimeline": "Annual timeline",
 		"annualTimelineFeature": "Annual timeline chart",
@@ -292,10 +287,9 @@
 		"daysOffLabel": "Days off",
 		"longBlocksPerQuarter": "Long blocks per quarter",
 		"longBlocksFeature": "Long blocks per quarter chart",
-		"blocksDescription": "{totalBlocks} long blocks (3+ consecutive days) ideal for vacation{bestQuarterPart}.",
-		"bestQuarterPart": ". Best quarter: Q{bestQuarter} with {maxBlocks, plural, one {# block} other {# blocks}}",
+		"blocksDescription": "{totalBlocks, plural, =0 {# long blocks ({minDays, number}+ consecutive days) ideal for vacation.} other {# long blocks ({minDays, number}+ consecutive days) ideal for vacation. Best quarter: Q{bestQuarter} with {maxBlocks, plural, one {# block} other {# blocks}}.}}",
 		"blocks": "blocks",
-		"blocksOf3Days": "Blocks of 3+ days"
+		"blocksOfMinDays": "Blocks of {minDays, number}+ days"
 	},
 	"modals": {
 		"addHoliday": {
@@ -348,7 +342,7 @@
 		"nextBtn": "Next",
 		"prevBtn": "Previous",
 		"doneBtn": "Done",
-		"progressTextConnector": "of",
+		"progressText": "{current} of {total}",
 		"steps": {
 			"toolsTitle": "Calculators & tools",
 			"toolsDescription": "Calculators live here: estimate how many PTO days you've accrued, see what unused days cost you in salary, or count workdays between two dates.",
@@ -438,11 +432,11 @@
 		"errorTitle": "Something went wrong",
 		"failedToSend": "Failed to send message",
 		"errors": {
-			"name_too_short": "Your name needs at least 2 characters.",
+			"name_too_short": "Your name needs at least {min, number} characters.",
 			"name_too_long": "Your name is too long.",
-			"subject_too_short": "The subject needs at least 5 characters.",
+			"subject_too_short": "The subject needs at least {min, number} characters.",
 			"subject_too_long": "The subject is too long.",
-			"message_too_short": "Your message needs at least 10 characters.",
+			"message_too_short": "Your message needs at least {min, number} characters.",
 			"message_too_long": "Your message is too long.",
 			"contact_already_received": "I have already heard from you recently. Please give me a little time to reply."
 		}
@@ -452,6 +446,7 @@
 		"recommended": "Recommended",
 		"totalOff": "Effective days",
 		"efficiency": "Efficiency",
+		"efficiencyValue": "{efficiency}x",
 		"vsMain": "vs main",
 		"alreadyApplied": "Already applied",
 		"applyAlternative": "Apply alternative",
@@ -459,7 +454,7 @@
 		"nextSuggestion": "Next suggestion",
 		"totalDaysOff": "Total effective days",
 		"comparison": "Comparison",
-		"daysUnit": "days"
+		"effectiveDaysCount": "{count, plural, one {# day} other {# days}}"
 	},
 	"toasts": {
 		"suggestionApplied": "Suggestion applied",
@@ -517,9 +512,8 @@
 			"title": "Strategy",
 			"placeholder": "Select strategy...",
 			"search": "Search strategies...",
-			"hide": "Hide",
-			"expand": "Expand",
-			"strategyDetails": "details",
+			"showDetails": "Expand details",
+			"hideDetails": "Hide details",
 			"grouped": {
 				"label": "Grouped",
 				"description": "A few long vacations",
@@ -594,23 +588,19 @@
 			"title": "Year"
 		},
 		"step1": {
-			"titleStart": "Your ",
-			"titleEmphasis": "context",
+			"title": "Your <em>context</em>",
 			"badge": "step {step}"
 		},
 		"step2": {
-			"titleStart": "Your ",
-			"titleEmphasis": "days",
+			"title": "Your <em>days</em>",
 			"badge": "step {step}"
 		},
 		"step3": {
-			"titleStart": "Your ",
-			"titleEmphasis": "configuration",
+			"title": "Your <em>configuration</em>",
 			"badge": "step {step}"
 		},
 		"step4": {
-			"titleStart": "Your ",
-			"titleEmphasis": "export",
+			"title": "Your <em>export</em>",
 			"badge": "step {step}"
 		},
 		"steps": "Steps"
@@ -641,8 +631,7 @@
 		"calculate": "Calculate",
 		"result": "Result:",
 		"days": "days",
-		"daysMonth": "days/month",
-		"months": "months",
+		"breakdown": "<rate></rate> days/month × <count></count> {months, plural, one {month} other {months}}",
 		"applyToPtoDays": "Apply to PTO days"
 	},
 	"ptoSalaryCalculator": {
@@ -675,7 +664,7 @@
 		"activationFailed": "Your payment went through, but we could not unlock premium automatically. Recover your access with the email you paid with, or contact us.",
 		"paymentFailed": "Payment failed",
 		"processing": "Processing...",
-		"pay": "Pay",
+		"payAmount": "Pay {amount}",
 		"promoSaved": "You saved {saved}!",
 		"errors": {
 			"internal_error": "Something went wrong on our side. Your card has not been charged.",
@@ -704,7 +693,7 @@
 	},
 	"premiumModal": {
 		"premiumRequired": "Premium feature required",
-		"featureRequiresPremium": "requires premium access",
+		"featureRequiresPremium": "<b>{feature}</b> requires premium access",
 		"verifyDescription": "If you've already donated or paid, we'll check your email and grant access right away. If you run into any trouble, reach out and we'll sort it.",
 		"considerDonating": "Haven't donated yet? Consider supporting the project to unlock premium features.",
 		"enterPremiumEmail": "Enter your email",
@@ -807,12 +796,11 @@
 		"analyticsCookies": "Analytics cookies",
 		"analyticsDescription": "Help us understand visitor behavior through anonymous data collection.",
 		"savePreferences": "Save preferences",
-		"months": "months",
-		"year": "year",
-		"years": "years",
-		"minutes": "minutes",
-		"hours": "hours",
-		"week": "week",
+		"months": "{count, plural, one {# month} other {# months}}",
+		"years": "{count, plural, one {# year} other {# years}}",
+		"minutes": "{count, plural, one {# minute} other {# minutes}}",
+		"hours": "{count, plural, one {# hour} other {# hours}}",
+		"weeks": "{count, plural, one {# week} other {# weeks}}",
 		"userCountryDesc": "Stores your detected country for the initial holiday suggestion.",
 		"ccCookieDesc": "Stores your cookie consent preferences.",
 		"stripeMidDesc": "Fraud prevention and detection. Set by Stripe for secure payment processing.",
@@ -836,19 +824,18 @@
 		"status": "Status"
 	},
 	"workdayCounterModal": {
-		"selectDateRange": "Select dates"
+		"selectDateRange": "Select dates",
+		"selectedRange": "{from} - {to}"
 	},
 	"legal": {
 		"lastUpdated": "Last updated: {date}"
 	},
 	"notFound": {
 		"kicker": "error 404 · route lost",
-		"title": "This page went on",
-		"titleHighlight": "vacation",
-		"titleEmphasis": "without notice.",
+		"title": "This page went on <highlight>vacation</highlight> <em>without notice.</em>",
 		"lede": "We searched the beach, checked under the umbrella, asked the beach bar… nothing. The URL you want doesn't exist (or got lost between two long weekends).",
-		"ctaPrimary": "Back to home",
-		"ctaPlanner": "Open the Planner",
+		"ctaPrimary": "← Back to home",
+		"ctaPlanner": "Open the Planner →",
 		"suggestLabel": "Looking for something like this?",
 		"link1": "How it works",
 		"link2": "Features",
@@ -858,9 +845,7 @@
 	"error": {
 		"retry": "Try again",
 		"kicker": "Internal server error · v{version} · {time} UTC",
-		"title": "The server took a",
-		"titleHighlight": "day off",
-		"titleEmphasis": "without asking.",
+		"title": "The server took a <highlight>day off</highlight> <em>without asking.</em>",
 		"lede": "Something broke on our end. Not your fault (this time). The logs are smoking and we're already on it. Try again in a few minutes, or check the live status.",
 		"statusPage": "View status",
 		"meanwhile": "Meanwhile:",
@@ -879,7 +864,7 @@
 		"contactUs": "Contact us",
 		"legalNavigation": "Legal and policy links",
 		"copyright": "© {year} Forever PTO · Made from a hammock.",
-		"version": "v{version} · status: on vacation ●",
+		"version": "v{version} · status: on vacation <live>●</live>",
 		"planner": "Planner",
 		"docs": "Docs"
 	},
@@ -891,8 +876,7 @@
 		"close": "Close"
 	},
 	"devFooter": {
-		"madeWith": "Made with",
-		"by": "by",
+		"madeWithBy": "Made with <emoji></emoji> by <author></author>",
 		"findMeOn": "You can also find me"
 	},
 	"premium": {
@@ -948,9 +932,7 @@
 			"resumeAction": "My plan →"
 		},
 		"hero": {
-			"command": "Work less.",
-			"verb": "Travel",
-			"highlight": "more",
+			"title": "Work less.<br></br>Travel <highlight>more</highlight>",
 			"description": "Forever PTO calculates <em>exactly</em> which days to request off so your 22 PTO days become <strong>70+ days out of the office</strong>. No spreadsheets. No math. No guilt.",
 			"plannerCta": "Calculate my days →",
 			"demoLink": "See how it works (30s)",
@@ -971,11 +953,7 @@
 		},
 		"how": {
 			"badge": "how it works · {steps} steps",
-			"titleStart": "From",
-			"titleMid": "to",
-			"question1": "what do I do",
-			"question2": "trip is booked",
-			"titleEnd": "in 60 seconds.",
+			"title": "From <em>“what do I do”</em> to <em>“trip is booked”</em> in 60 seconds.",
 			"description": "No install. No credit card. No newsletter. Just tell us how many days you have and where you live.",
 			"inputDaysTitle": "Enter your days.",
 			"inputDaysDescription": "How many PTO days you have and which country or region you work in. That's it.",
@@ -986,6 +964,7 @@
 		},
 		"stats": {
 			"efficiencyLabel": "Average efficiency",
+			"efficiencyValue": "{ratio}×",
 			"daysLabel": "Days off with {days} PTO",
 			"countriesLabel": "Supported countries",
 			"plansLabel": "Suggestions generated",
@@ -993,14 +972,13 @@
 		},
 		"features": {
 			"badge": "engine tricks",
-			"titleStart": "Not a calendar. An",
-			"titleEmphasis": "ally",
-			"titleEnd": "against Mondays.",
+			"title": "Not a calendar. An <em>ally</em> against Mondays.",
 			"description": "What Forever PTO works out for you.",
 			"bridgeTag": "bridges",
 			"bridgeTitle": "Turn 1 PTO day into 4 days off.",
 			"bridgeDescription": "Detects holidays on Tuesdays and Thursdays and suggests minimal bridges. One strategic day = a 4-day weekend.",
 			"ratioTag": "max efficiency",
+			"ratioValue": "{ratio}<sign>×</sign>",
 			"ratioDescription": "Best efficiency: 8 PTO days turned into 32 free days (Madrid).",
 			"syncTag": "sync in 1 click",
 			"syncTitle": "Google · Outlook · iCal",
@@ -1042,9 +1020,7 @@
 		},
 		"testimonials": {
 			"badge": "people are saying",
-			"titleStart": "People who already reclaimed",
-			"titleEmphasis": "weeks",
-			"titleEnd": "of their lives.",
+			"title": "People who already reclaimed <em>weeks</em> of their lives.",
 			"items": {
 				"martaR": {
 					"text": "I went from taking random days off to having 6 trips planned. My partner thinks I've become organized. I haven't told her it's a website.",
@@ -1085,8 +1061,7 @@
 			"description": "No SaaS. No subscription. No \"7-day trial that auto-renews\".",
 			"freeName": "Free Forever",
 			"freeTagline": "Try it. It will convince you.",
-			"freePrice": "{amount}",
-			"freePer": "/always",
+			"freePrice": "{amount}<per>/always</per>",
 			"freeNote": "No credit card. No email. Nothing.",
 			"freeFeatures": {
 				"optimizedPlan": "Auto-optimized vacation plan",
@@ -1097,8 +1072,7 @@
 			"freeCta": "Start for free",
 			"lifetimeName": "Supporter Pass",
 			"lifetimeTagline": "Minimum donation of {amount}. Use it forever.",
-			"lifetimePrice": "From {amount}",
-			"lifetimePer": " one time",
+			"lifetimePrice": "From {amount}<per> one time</per>",
 			"lifetimeNote": "100% optional. Keeps the project alive.",
 			"lifetimeFeatures": {
 				"manualEditing": "Manual calendar editing",
@@ -1116,9 +1090,7 @@
 			"title": "Questions? We have answers."
 		},
 		"closing": {
-			"titleStart": "Your next",
-			"titleEmphasis": "free",
-			"titleEnd": "year starts today.",
+			"title": "Your next <em>free</em><br></br>year starts today.",
 			"description": "22 days can become more than 70. You just need to know where to place them. That's what we do.",
 			"cta": "Calculate my free days →",
 			"shapes": {
@@ -1142,8 +1114,7 @@
 			"description": "The country decides which public holidays the planner builds on. A region adds the local ones.",
 			"country": "Country",
 			"detected": "Detected from your connection. Change it if it's wrong.",
-			"region": "Region",
-			"optional": "optional",
+			"region": "Region <optional>(optional)</optional>",
 			"noRegions": "This country has no regional calendars, so the national one is used."
 		},
 		"ptoDays": {

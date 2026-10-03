@@ -5,11 +5,6 @@ const mockSetRequestLocale = vi.fn();
 
 vi.mock("next-intl/server", () => ({ setRequestLocale: mockSetRequestLocale }));
 
-vi.mock("@infrastructure/i18n/config", async () => {
-	const { LOCALES } = await import("@infrastructure/i18n/locales");
-	return { LOCALES };
-});
-
 const MockHero = vi.fn().mockReturnValue(null);
 const MockMarquee = vi.fn().mockReturnValue(null);
 const MockHowItWorks = vi.fn().mockReturnValue(null);

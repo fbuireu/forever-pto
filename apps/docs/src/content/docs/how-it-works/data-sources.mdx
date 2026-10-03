@@ -63,7 +63,7 @@ The upstream word `type` is reserved for that classification; the app's own Nati
 | --- | --- | --- |
 | Source | `i18n-iso-countries`, with the language files for {APP_LOCALES.length} locales registered at module load (`apps/web/src/infrastructure/services/countries/getCountries.ts`) | The same `date-holidays` adapter: `regionsOf(country)` returns the subdivisions the package knows a calendar for (`apps/web/src/infrastructure/services/regions/getRegions.ts`) |
 | Why | Country names have to render in the user's language, and the ISO list is the one the Holiday package keys on | Only a Region with a calendar of its own is worth offering; a list from a geographic database would include Regions that change nothing |
-| Runs | On the server, in the async `Countries.tsx` and `QuickStart.tsx`, which hand the list to their client halves | In the browser, through `fetchRegions`, which imports the lookup only when it runs so `date-holidays` stays out of the first load |
+| Runs | On the server, in `Countries.tsx` and `QuickStart.tsx`, which hand the list to their client halves | In the browser, through `fetchRegions`, which imports the lookup only when it runs so `date-holidays` stays out of the first load |
 | Cache | Rendered with the page and pushed into the location store on mount; not persisted | Recomputed whenever the Country changes; not persisted |
 | Ordering | Both go through `collateByLabel` (`apps/web/src/application/shared/utils/collate.ts`), a locale-aware sort, so accented names land where a speaker expects them | Same |
 | Failure | Empty list and a log entry | Empty list and a log entry; the Region field disables |

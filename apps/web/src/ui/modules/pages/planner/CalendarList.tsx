@@ -166,7 +166,7 @@ export const CalendarList = () => {
 						key={month.toISOString()}
 						mode={CalendarSelectionMode.NONE}
 						className="rounded-[14px] border-[3px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-md)] [content-visibility:auto] [contain-intrinsic-block-size:310px]"
-						month={month}
+						initialMonth={month}
 						weekStartsOn={1}
 						locale={locale}
 						holidays={holidays}

@@ -1,7 +1,7 @@
 "use client";
 
-import { Badge } from "@ui/modules/core/primitives/Badge";
 import { m, type Transition } from "motion/react";
+import { Badge } from "../../primitives/Badge";
 
 interface RoadmapFeature {
 	id: string;

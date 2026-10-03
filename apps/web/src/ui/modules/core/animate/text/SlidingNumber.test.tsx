@@ -5,6 +5,8 @@ import { describe, expect, it, vi } from "vitest";
 
 type MotionSpanProps = ComponentProps<"span"> & { style?: unknown; transition?: unknown };
 
+const springStarts = vi.hoisted((): number[] => []);
+
 vi.mock("motion/react", async () => {
 	const { createElement } = await import("react");
 	return {
@@ -13,7 +15,10 @@ vi.mock("motion/react", async () => {
 				createElement("span", props, children),
 		},
 		useInView: () => true,
-		useSpring: () => ({ set: vi.fn() }),
+		useSpring: (initial: number) => {
+			springStarts.push(initial);
+			return { set: vi.fn() };
+		},
 		useTransform: () => 0,
 	};
 });
@@ -58,5 +63,29 @@ describe("SlidingNumber", () => {
 		const { container } = renderIn({ locale: "de", children: <SlidingNumber number={2026} /> });
 		expect(separatorOf(container)).not.toContain(",");
 		expect(separatorOf(container)).not.toContain(".");
+	});
+});
+
+describe("SlidingNumber rollers", () => {
+	it("rolls every digit up from nought the first time it shows a number", () => {
+		springStarts.length = 0;
+		renderIn({ locale: "en", children: <SlidingNumber number={47} /> });
+
+		expect(springStarts).toEqual([0, 0]);
+	});
+
+	it("hands every roller the number it moved from until the number moves again", () => {
+		const showing = (number: number) => (
+			<NextIntlClientProvider locale="en">
+				<SlidingNumber number={number} />
+			</NextIntlClientProvider>
+		);
+		const { rerender } = render(showing(9));
+		springStarts.length = 0;
+
+		rerender(showing(10));
+		rerender(showing(10));
+
+		expect(springStarts).toEqual([0, 9, 0, 9]);
 	});
 });

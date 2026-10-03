@@ -1,5 +1,5 @@
-import type { PublicEnv } from "@infrastructure/services/env/getPublicEnv";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
+import type { PublicEnv } from "./getPublicEnv";
 
 export function getRequestPublicEnv(): PublicEnv {
 	const { env } = getCloudflareContext();

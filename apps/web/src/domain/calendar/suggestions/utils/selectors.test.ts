@@ -2,17 +2,11 @@ import { dayIndex } from "@application/shared/utils/dates";
 import { PTO_CONSTANTS } from "@domain/calendar/const";
 import type { Bridge } from "@domain/calendar/types";
 import { FilterStrategy } from "@domain/calendar/types";
-import { clearDateKeyCache, clearHolidayCache } from "@domain/calendar/utils/cache";
 import { monthKeyOf } from "@domain/calendar/window";
-import { beforeEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { objectiveFor, STRATEGY_OBJECTIVE, selectBridges, selectBridgesForStrategy } from "./selectors";
 
 const NO_CALENDAR = { workdays: [], alreadyOff: [] };
-
-beforeEach(() => {
-	clearDateKeyCache();
-	clearHolidayCache();
-});
 
 const jan = (day: number) => new Date(2025, 0, day);
 interface OnParams {
@@ -65,7 +59,7 @@ const fridayBeforeHoliday = makeBridge({ from: jan(3), to: jan(6), ptoDays: [jan
 
 const toStrings = (days: Date[]) => days.map((day) => day.toDateString());
 
-interface DateRangeParams {
+interface WorkdaysBetweenParams {
 	from: Date;
 	to: Date;
 }
@@ -84,6 +78,7 @@ describe("selectBridgesForStrategy, every Strategy", () => {
 			targetPtoDays: 2,
 			strategy,
 		});
+		expect(result.bridges.length).toBeGreaterThan(0);
 		expect(result.bridges.reduce((sum, bridge) => sum + bridge.ptoDaysNeeded, 0)).toBeLessThanOrEqual(2);
 	});
 
@@ -97,14 +92,22 @@ describe("selectBridgesForStrategy, every Strategy", () => {
 			strategy,
 		});
 
+		expect(result.days.length).toBeGreaterThan(0);
 		expect(new Set(toStrings(result.days)).size).toBe(result.days.length);
 	});
 
 	it.each(Object.values(FilterStrategy))("%s: skips a Bridge that costs more than the budget left", (strategy) => {
 		const thursdayFriday = makeBridge({ from: jan(9), to: jan(12), ptoDays: [jan(9), jan(10)] });
 		const result = selectBridgesForStrategy({ ...NO_CALENDAR, bridges: [thursdayFriday], targetPtoDays: 1, strategy });
+		const affordable = selectBridgesForStrategy({
+			...NO_CALENDAR,
+			bridges: [thursdayFriday],
+			targetPtoDays: 2,
+			strategy,
+		});
 
 		expect(result.days).toEqual([]);
+		expect(affordable.days).toHaveLength(2);
 	});
 
 	it.each(Object.values(FilterStrategy))("%s: returns its days chronologically", (strategy) => {
@@ -114,6 +117,7 @@ describe("selectBridgesForStrategy, every Strategy", () => {
 			targetPtoDays: 3,
 			strategy,
 		});
+		expect(result.days.length).toBeGreaterThan(1);
 		expect(result.days.map((day) => day.getTime())).toEqual(
 			result.days.map((day) => day.getTime()).toSorted((a, b) => a - b),
 		);
@@ -255,7 +259,7 @@ describe("GROUPED", () => {
 });
 
 describe("BALANCED", () => {
-	const weekdaysBetween = ({ from, to }: DateRangeParams) => {
+	const workdaysBetween = ({ from, to }: WorkdaysBetweenParams) => {
 		const days: Date[] = [];
 		for (let day = new Date(from); day <= to; day = new Date(day.getFullYear(), day.getMonth(), day.getDate() + 1)) {
 			if (day.getDay() !== 0 && day.getDay() !== 6) days.push(day);
@@ -264,7 +268,7 @@ describe("BALANCED", () => {
 	};
 	const fridayOn = (date: Date) =>
 		makeBridge({ from: date, to: new Date(date.getFullYear(), date.getMonth(), date.getDate() + 2), ptoDays: [date] });
-	const winter = weekdaysBetween({ from: jan(13), to: on({ month: 2, day: 28 }) });
+	const winter = workdaysBetween({ from: jan(13), to: on({ month: 2, day: 28 }) });
 	const fridays = [jan(17), jan(31), on({ month: 2, day: 14 }), on({ month: 2, day: 28 })].map(fridayOn);
 
 	it("splits the longest stretch of Workdays first, where OPTIMIZED would take the earliest tie", () => {

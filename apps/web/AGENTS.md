@@ -2,17 +2,18 @@
 
 ## What this is
 
-**forever-pto**: a planner that turns a fixed budget of paid days off into the longest possible stretches
-away from work. The user picks a Country, an optional Region, a year and a PTO budget; the planner finds the
-Bridges that turn that budget into the longest stretches off, and reports how well it did.
+**forever-pto**: a planner that turns a fixed budget of paid days off into the longest possible stretches away from
+work. The user picks a Country, an optional Region, a year and a PTO budget; the planner finds the Bridges that turn
+that budget into the longest stretches off, and reports how well it did.
 
 **The whole planner runs in the browser**: the server holds payment and contact records and nothing else
 ([ADR 0001](../../adr/0001-planner-runs-in-the-browser.md)). The server side is the API route handlers
 (`check-session`, `contact`, `health`, `markdown`, `payment`, `payment/activate` and the Stripe webhook at
-`webhooks/stripe`), a `.well-known` catch-all, [`middleware.ts`](./src/middleware.ts), and some static rendering.
+`webhooks/stripe`), a `.well-known` catch-all, [`middleware.ts`](./src/middleware.ts), and the pages: prerendered, but
+for `payment/confirmation` and the global not-found page, which render per request.
 
-Premium (advanced metrics, manual editing of a Suggestion) is unlocked by a Donation. There are no accounts:
-the payment record *is* the entitlement ([ADR 0008](../../adr/0008-premium-derived-from-payment.md)).
+Premium (advanced metrics, manual editing of a Suggestion) is unlocked by a Donation. There are no accounts: the
+payment record *is* the entitlement ([ADR 0008](../../adr/0008-premium-derived-from-payment.md)).
 
 The vocabulary is the repo glossary's; see [`CONTEXT.md`](../../CONTEXT.md).
 
@@ -21,15 +22,13 @@ The vocabulary is the repo glossary's; see [`CONTEXT.md`](../../CONTEXT.md).
 - **Next.js** App Router + **React**, `next-intl` for i18n across the supported locales (en, es, ca, it, de, fr)
 - **Zustand** stores for all client state, persisted to local storage through an obfuscating wrapper
   ([ADR 0007](../../adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md))
-- **Effect** on every server path that talks to Stripe, Turso or Resend: typed error channel, dependencies
-  injected as service tags ([ADR 0002](../../adr/0002-effect-for-external-service-boundaries.md))
-- **Temporal** via `temporal-polyfill`, never the global
-  ([ADR 0005](../../adr/0005-temporal-polyfill.md))
-- **Tailwind CSS** + shadcn/ui; **Turso** via `@tursodatabase/serverless`: hand-written SQL, no ORM;
-  **Stripe**; **Resend**; **BetterStack**, reached through the platform's log export rather than an SDK
-- **Cloudflare Workers** via `@opennextjs/cloudflare`, R2 for the incremental cache, the platform's own
-  rate-limiting binding for the payment limiter
-  ([ADR 0004](../../adr/0004-cloudflare-workers-as-deployment-target.md))
+- **Effect** on every server path that talks to Stripe, Turso or Resend
+  ([ADR 0002](../../adr/0002-effect-for-external-service-boundaries.md))
+- **Temporal** through `temporal-polyfill` ([ADR 0005](../../adr/0005-temporal-polyfill.md))
+- **Tailwind CSS** + shadcn/ui; **Turso** via `@tursodatabase/serverless`: hand-written SQL, no ORM; **Stripe**;
+  **Resend**; **BetterStack**, reached through the platform's log export rather than an SDK
+- **Cloudflare Workers** via `@opennextjs/cloudflare`, R2 for the incremental cache, the platform's own rate-limiting
+  binding for the payment limiter ([ADR 0004](../../adr/0004-cloudflare-workers-as-deployment-target.md))
 - **Biome** (lint + format), **Vitest** (unit, `happy-dom`), **Playwright** (e2e)
 
 ## Commands
@@ -45,135 +44,52 @@ pnpm deploy             # cf:build && opennextjs-cloudflare deploy
 pnpm cf:typegen         # regenerate cloudflare-env.d.ts from wrangler.toml (reference only)
 
 pnpm lint:all           # biome lint over this package
-pnpm typecheck  # tsc --noEmit
+pnpm typecheck          # tsc --noEmit
 
 pnpm test:ut            # vitest run
-pnpm test:ut:coverage      # vitest run --coverage
+pnpm test:ut:coverage   # vitest run --coverage
 pnpm test:e2e           # playwright, against BASE_URL (see below)
 ```
 
 **`pnpm test:e2e` takes `BASE_URL` when it is set and starts `next dev` when it is not.** CI always sets it, to a
-deployed preview, which is the only place the Workers runtime is real: `ci.yml` passes the same URL to the `e2e` job's `BASE_URL` as
-[`_deploy-web.yml`](../../.github/workflows/_deploy-web.yml) passes to `--var NEXT_PUBLIC_SITE_URL`, so `e2e/sitemap.spec.ts` can assert that the
-sitemap names the host it is served from. A preview also needs `CF_ACCESS_CLIENT_ID` and
-`CF_ACCESS_CLIENT_SECRET`, which the config turns into request headers.
+deployed preview, which is the only place the Workers runtime is real: `ci.yml` passes the `e2e` job the same URL
+[`_deploy-web.yml`](../../.github/workflows/_deploy-web.yml) passes to `--var NEXT_PUBLIC_SITE_URL`, so
+`e2e/sitemap.spec.ts` can assert that the sitemap names the host it is served from. A preview also needs
+`CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET`, which the config turns into request headers.
 
 ```bash
 BASE_URL=https://pr-123-forever-pto-development.fbuireu.workers.dev pnpm test:e2e
 ```
 
-The local target is `next dev`, deliberately, and not the faithful one. `pnpm preview` would exercise the
-Workers runtime, but it runs `cf:build` first, which fails on the maintainer's Windows machine
-([ADR 0009](../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) records the same limitation blocking a local reproduction), so on the one machine that
-would reach it, the fallback would not start at all. `next dev` is fast, runs everywhere, and is enough to
-write and debug a spec; what it cannot show is a Workers-only failure such as Cloudflare Error 1101, and
-that is what the preview run in CI is for. `reuseExistingServer` is on, so a dev server you already have
-answering on 3000 is used rather than a second one being started.
+The local target is `next dev`: `pnpm preview` would exercise the Workers runtime, but its `cf:build` fails on Windows
+([ADR 0009](../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)), and a Workers-only failure such as
+Cloudflare Error 1101 is what the preview run in CI is for. `reuseExistingServer` is on, so a dev server already
+answering on 3000 is used.
 
-This is the shape every sibling repository now uses: `BASE_URL` if set, a locally started server otherwise.
-Only the command differs, because the stacks do.
-
-**The `e2e/` suite has no case that renders an error boundary, and no longer pretends otherwise.**
-A spec of its own under `e2e/[locale]/` plus copies of a `[data-testid="error-boundary"]`
-`not.toBeAttached()` assertion asserted the absence of a selector nothing in the suite ever makes
-present, so renaming the `data-testid` on
-[`src/ui/modules/pages/error/ErrorContent.tsx`](./src/ui/modules/pages/error/ErrorContent.tsx) would have left every one of them green.
-They were deleted; the pages they sat on already assert a 200 and their own content, which is what a
-thrown server component would break. Reinstating the check means first finding a URL that provokes a
-boundary. `/payment/confirmation?payment_intent=<unknown>` is not one: `confirmation` in
-[`src/infrastructure/services/payments/confirmation.ts`](./src/infrastructure/services/payments/confirmation.ts) types its error channel `never` and returns `null`, so the
-page renders its own failure card.
-
-What the boundary *does* once something reaches it is pinned by
-[`src/ui/modules/pages/error/ErrorContent.test.tsx`](./src/ui/modules/pages/error/ErrorContent.test.tsx), which is a unit
-test rather than a substitute for the e2e case above: it renders the component directly, so it can assert the
-report that goes out (the log call carrying the digest, and the running version in the kicker) and the terminal
-that types the failure out a line at a time, including the error's own message and stack. Finding a URL that
-provokes a real boundary is still open.
+No e2e case renders an error boundary, because no URL is known to provoke one:
+`/payment/confirmation?payment_intent=<unknown>` renders the page's own failure card, since `confirmation` in
+[`src/infrastructure/services/payments/confirmation.ts`](./src/infrastructure/services/payments/confirmation.ts) types
+its error channel `never`. What the boundary does is pinned by
+[`src/ui/modules/pages/error/ErrorContent.test.tsx`](./src/ui/modules/pages/error/ErrorContent.test.tsx).
 
 Env: copy [`.env.example`](./.env.example). Local Worker secrets go in `.dev.vars`. The typed surface the build uses is
-[`environment.d.ts`](./environment.d.ts) and nothing else; it hand-declares both `ProcessEnv` and the global `CloudflareEnv` the
-Cloudflare context is read through, and it is tracked.
+[`environment.d.ts`](./environment.d.ts) and nothing else; it hand-declares both `ProcessEnv` and the global
+`CloudflareEnv` the Cloudflare context is read through, and it is tracked.
 
-**A `NEXT_PUBLIC_*` is inlined at build time, and until this branch nothing noticed when one was empty.**
-The deploy's preflight covers the Worker **secrets**; the public variables had no equivalent, so an
-empty one would compile, deploy, pass the smoke run and reach a browser. What it costs is not hypothetical:
-`getStripeClientInstance` throws when `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is missing, and
-[`Donate.tsx`](./src/ui/modules/shared/donate/Donate.tsx) calls it in module scope, so an empty variable does
-not degrade the checkout, it throws while the chunk is being evaluated. Reproduced against a local
-production build, which reports `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not defined` at module evaluation.
+**A `NEXT_PUBLIC_*` is inlined at build time, and `PUBLIC_ENV` in [`next.config.ts`](./next.config.ts) is what fails
+the build on a wrong one.** Each name maps to a zod schema, or to the `RUNTIME_ONLY` sentinel for the ones never
+inlined (`NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_CONTACT_EMAIL`, read server-side off `CloudflareEnv`, which is why
+`wrangler.toml` declares them in `[vars]` and the build step passes neither). A variable that may be absent says
+`.optional()`, and `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` must start with `pk_`, so a secret key pasted there fails the
+build instead of shipping in a bundle. The guard is gated on `isProd`, so a fresh clone runs `pnpm dev` without a
+Stripe key. A new public variable is a new entry: the contract suite holds `PUBLIC_ENV` to exactly the names
+`environment.d.ts` declares, and each to where its kind says it is read.
 
-**That is the hazard the guard closes, and it is not the explanation for any failure this repository has
-seen.** A checkout that would not open in production was what sent someone looking here, and the guard
-answered the question on its first run: the `Build` step passed, so the key is set and non-empty on
-`web-production`. Whatever breaks that checkout is something else, and this paragraph is not evidence about
-it. Do not read the guard as a fix for a bug; it is a guard for a hole that was open and is measured now.
-
-`PUBLIC_ENV` in [`next.config.ts`](./next.config.ts) is that equivalent. Each name maps to a zod schema, or
-to the `RUNTIME_ONLY` sentinel for the ones that are never inlined: `NEXT_PUBLIC_SITE_URL` and
-`NEXT_PUBLIC_CONTACT_EMAIL` are read server-side off `CloudflareEnv`, which is why `wrangler.toml` declares
-them in `[vars]` and the build step deliberately passes neither. Everything else is parsed against its
-schema at build, and a rejection lists every offender rather than the first.
-
-**The schema is the statement, which is why there is no `required` flag beside it.** A variable that may be
-absent says so with `.optional()`, and one that may not says `.min(1)`; a label and a schema can disagree,
-and only one of them is what actually runs. zod is already a direct dependency of this package and is used
-across the app, so this borrows the tool it already validates with rather than adding one.
-
-**What earns the schema over a truthiness check is `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().startsWith("pk_")`.**
-An empty variable breaks the checkout, which is bad and visible. Pasting the **secret** key into the public
-one is worse and invisible: it compiles, it deploys, and it ships `sk_live_…` inside a bundle any visitor can
-read. The guard refuses it with *Invalid string: must start with `pk_`*, verified by building with an `sk_`
-value. Nothing else in the tree would have caught that.
-
-**Both sibling Astro repositories already had this, which is why only this package needed a hand-rolled
-one.** `env.schema` in their `astro.config.ts` is Astro's own typed surface, and it fails the build on a
-missing field: `isOptional` there is `options.optional || options.default !== undefined`, read from Astro's
-validator rather than assumed, so contribKit's `PUBLIC_*` fields, which declare neither, are required
-and stop a build that would otherwise ship them empty. biancafiore's `SITE_URL`, `BIANCA_EMAIL` and
-`TWITTER_HANDLE` carry `default: import.meta.env.<the same name>`, which reads as a hole and is not one: an
-unset variable makes that default `undefined`, the field stays required and the build still fails. Those
-lines are a no-op, not a gap. Next ships no equivalent of `env.schema`, and that absence is the whole
-reason `PUBLIC_ENV` exists here and nowhere else.
-
-**Checked against the installed Next rather than assumed, so it does not need re-litigating.** `env` in
-`next.config.ts` is a `Record<string, string | undefined>` inlined at build: a flat map with no schema, no
-required/optional and no client/server split, which is what `envField` gives Astro.
-`experimental.typedEnv` reads as the answer and is not one: it calls `createEnvDefinitions` from the dev
-bundler to emit a `.d.ts` of the names in the `.env` files, so it generates types, never validates, and an
-empty string is still a `string`; it would also duplicate the surface `environment.d.ts` declares by hand.
-`reportSystemEnvInlining` is Turbopack-only and is the opposite concern, flagging *system* variables that
-leak into the bundle rather than declared ones that are missing. The off-the-shelf option is
-`@t3-oss/env-nextjs`, which is `env.schema` ported, and it buys a dependency and a zod tree to replace
-few lines the contract already polices, on top of the zod this package already depends on.
-
-The guard sits in the config rather than in `_deploy-web.yml` on purpose: it runs on **every** build, not
-only the one CI does, so a local `pnpm build` and a fork are covered too. It is gated on `isProd`, so a fresh
-clone still runs `pnpm dev` without a Stripe key. `tests/docs-consistency.test.ts` imports `PUBLIC_ENV`
-rather than reading the source, holds it to exactly the `NEXT_PUBLIC_*` names `environment.d.ts` declares in
-both directions, and asserts each one is wired where its kind says it is read.
-
-**Nothing type-checks the names inside it.** `skipLibCheck: true` plus the `.d.ts` extension means
-`pnpm typecheck` never looks at a single identifier there, so an unbound one sits in a type the whole build
-trusts. `Formats: typeof getRequestConfig` did, for as long as it took someone to run
-`tsc --skipLibCheck false` over the file by hand: the identifier was never imported, and the augmentation was
-dead besides, because the `getRequestConfig` callback in [`src/infrastructure/i18n/config.ts`](./src/infrastructure/i18n/config.ts)
-returns no `formats` and every formatter call site passes its options inline.
-`tests/docs-consistency.test.ts` compiles the file on its own now, with `skipLibCheck` off, and fails on any
-`Cannot find name`. It leaves the imports unresolved on purpose, so the check stays local to this file: an
-unresolved module still binds the names imported from it, and only a genuinely undeclared identifier surfaces.
-
-`pnpm cf:typegen` writes wrangler's own inference to `cloudflare-env.d.ts` in this folder. It is reference
-material, not part of the program: read it when adding a binding, then widen `environment.d.ts` by hand. The
-lines that keep it that way are both load-bearing: [`.gitignore`](../../.gitignore) so it never gets committed, and an explicit
-`cloudflare-env.d.ts` entry in [`tsconfig.json`](./tsconfig.json)'s `exclude`, because `include` is `**/*.ts` and would
-otherwise pull a package-root `.d.ts` straight into the program.
-
-Letting it in does not fail the way you would expect. It declares `CloudflareEnv` a second time, with `[vars]`
-typed as string literals where `environment.d.ts` says `string`, but `skipLibCheck: true` means those
-declarations are never compared; that clash only surfaces with `skipLibCheck: false`. What actually breaks is
-the rest of it: the workerd runtime globals replace `lib.dom`'s `Response`, and call
-sites across the app start reporting `'body' is of type 'unknown'`.
+`pnpm cf:typegen` writes wrangler's own inference to `cloudflare-env.d.ts` in this folder. It is reference material,
+not part of the program: read it when adding a binding, then widen `environment.d.ts` by hand. It stays out of git
+([`.gitignore`](../../.gitignore)) and out of the program ([`tsconfig.json`](./tsconfig.json)'s `exclude`, because
+`include` is `**/*.ts`): let in, its workerd globals replace `lib.dom`'s `Response` and call sites across the app
+report `'body' is of type 'unknown'`.
 
 ## Structure & aliases
 
@@ -184,82 +100,35 @@ src/
   application/        # use-cases, DTOs, Zustand stores, export, email templates. Orchestration, no I/O clients
   domain/             # calendar/ (pure planning engine) and payment/ (Effect programs)
   infrastructure/     # everything outbound: clients, services, workers, proxy, api operations, seo route table
-  ui/                 # adapters, hooks, i18n, modules (components), styles, assets
+  ui/                 # adapters, hooks, i18n, modules (components), styles, utils, assets
 e2e/                  # Playwright specs
 public/               # static assets
 ```
 
-Path aliases (`tsconfig.json` `compilerOptions.paths`): `src/*`, `@app/*`, `@application/*`, `@domain/*`,
-`@infrastructure/*`, `@ui/*`, `@assets/*` (→ [`src/ui/assets`](./src/ui/assets)), `@styles/*` (→ [`src/ui/styles`](./src/ui/styles)), `@i18n/*`
-(→ [`src/ui/i18n`](./src/ui/i18n)). Prefer aliases over relative paths for cross-layer imports; keep same-folder imports
-relative. There is no `baseUrl`, so every target resolves against this `tsconfig.json`; the aliases needed
-no edit when the package moved. [`vitest.config.ts`](./vitest.config.ts) sets `resolve.tsconfigPaths`, so a new alias needs exactly
-one edit, in `tsconfig.json`.
+Path aliases (`tsconfig.json` `compilerOptions.paths`): `@app/*`, `@application/*`, `@domain/*`, `@infrastructure/*`,
+`@ui/*`, `@assets/*` (→ [`src/ui/assets`](./src/ui/assets)), `@styles/*` (→ [`src/ui/styles`](./src/ui/styles)),
+`@i18n/*` (→ [`src/ui/i18n`](./src/ui/i18n)). There is no `baseUrl`, so every target resolves against this
+`tsconfig.json`, and [`vitest.config.ts`](./vitest.config.ts) sets `resolve.tsconfigPaths`, so a new alias needs
+exactly one edit, in `tsconfig.json`.
 
-**Mock history is cleared before every test, so a suite asserting an import-time call has to snapshot it.**
-That is Vitest's default and it stays on. A file that mocks a module, imports the module under test at top
-level and then asserts the call the import made is asserting against a record no test can re-trigger: the
-clear empties it and the case fails against a mock that genuinely was called. Copy the calls into a
-module-scope const beside the import (`const configuredAtLoad = [...mock.calls]`) and assert on that;
+**Mock history is cleared before every test, so a suite asserting an import-time call has to snapshot it.** That is
+Vitest's default. A file that asserts the call its top-level import made copies the calls into a module-scope const
+beside the import (`const configuredAtLoad = [...mock.calls]`), as
 [`src/ui/modules/providers/BonesProvider.test.tsx`](./src/ui/modules/providers/BonesProvider.test.tsx),
 [`src/application/i18n/navigation.test.ts`](./src/application/i18n/navigation.test.ts) and
 [`src/infrastructure/services/countries/getCountries.test.ts`](./src/infrastructure/services/countries/getCountries.test.ts)
-are the three that do. It reads better than the alternative, too: what the mock itself still holds inside a
-test is then exactly what *that* test caused, which is what "configures nothing more on mount" wants to say.
+do.
 
-**`testTimeout` is raised well above the default, and the number is covering for something else.** The suite
-builds a fresh `happy-dom` per file, close to half its wall clock, and the cases that resolve every lazy
-chunk of a page in one go were timing out under that load while passing in seconds on their own. The real fix
-is the environment cost (`pool: 'vmThreads'` or `isolate: false` builds the DOM once per worker instead of
-once per file), and neither has been measured against this suite yet.
+**`testTimeout` is raised well above the default**, because the suite builds a fresh `happy-dom` per file and the cases
+that resolve every lazy chunk of a page are slow under that load. `pool: 'vmThreads'` or `isolate: false` would
+build the DOM once per worker instead; neither has been measured against this suite.
 
-**Backticked paths in this guide and the ones below it are package-relative.** [`src/domain/calendar/types.ts`](./src/domain/calendar/types.ts)
-means `apps/web/src/domain/calendar/types.ts`; the contract suite matches source-file citations by suffix, so
-both forms resolve.
+**Next owns [`next-env.d.ts`](./next-env.d.ts), and it flaps**: a production build points its route import at
+`.next/types/`, a dev run at `.next/dev/types/`. Leave whichever version is committed alone.
 
-**Next owns [`next-env.d.ts`](./next-env.d.ts) outright, and it flaps.** A production build points its route import at
-`.next/types/`, a dev run at `.next/dev/types/`, so the file shows as modified depending on which ran
-last. It is generated and says so; leave whichever version is committed alone rather than committing the
-flip back and forth.
-
-**`next build` fills in `tsconfig.json`, so the settings there are not redundant.** It rewrites the file on
-every run and writes its own default for any key that is absent: `strict: false` and `allowJs: true`. Both
-land at the *next build* rather than at the deletion site, so deleting either as noise turns strict mode off,
-or lets JavaScript into a TypeScript-only codebase, a long way from the change.
-`tests/docs-consistency.test.ts` asserts both, asserts that this `tsconfig.json` stays beside the
-[`next.config.ts`](./next.config.ts) that rewrites it, and asserts that `cloudflare-env.d.ts` stays excluded and ignored.
-
-**Next and TypeScript moved together, to the 16.3 line and to 7, because neither could move alone.** Next 16.3
-used to crash the deployed Worker on any route rendered at request time, which is the whole of
-[ADR 0009](../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md): `@opennextjs/cloudflare` 1.20.2 was
-the newest adapter and predated 16.3.0, and the symptom was the 404 page answering with Cloudflare **Error
-1101 (Worker threw exception)** instead of itself, caught by `e2e/[locale]/not-found.spec.ts`. `/_not-found`
-is the only page that renders per request; everything else is prerendered and served from cache, so nothing
-else shows it. The adapter has since moved: **1.20.3 raised its `next` peer floor to `>=16.3.3` and dropped
-16.2 from the 16 line**, which is the first release built against the version this app needs. The pin came off
-with that, and the ADR records what is verified and what is not.
-
-TypeScript could not move before Next did. TypeScript 7 ships the Go compiler and no `lib/typescript.js`, and
-Next's type-checking path on 16.2 loads exactly that file; only from 16.3 does `next build` shell out to the
-project-local `tsc`. That is why the pair is one decision, and why Next went first.
-
-**`apps/docs` stays on TypeScript 6, and that is not an oversight.** `astro check` refuses to run under 7 and
-says so itself: *the TypeScript module loaded does not expose the programmatic API `astro check` relies on*,
-with a link to the Astro roadmap issue tracking support. So the repo runs more than one TypeScript: an exact pin at the root
-and here, and a `6.` line in the docs package until Astro can read the native compiler.
-[`tests/docs-consistency.test.ts`](../../tests/docs-consistency.test.ts) asserts that shape rather than plain
-equality now: every pin **exact**, the root and this package **identical**, and the docs package on a
-`6.` line. Exactness is the part that was already load-bearing, because a `rangeStrategy` flip writes `^7.0.2`
-into every manifest at once, which is equal and no longer a pin.
-
-Consequences to know. `cacheComponents` is off and `partialPrefetching`, which requires it, is gone from
-`next.config.ts`: Cache Components hang requests on workerd, reproduced locally and recorded in
-[ADR 0015](../../adr/0015-cache-components-stay-off-on-the-workers-runtime.md), so the `[locale]` pages are
-plain SSG and no file carries `'use cache'`. And that same contract suite imports `typescript` for its
-compiler-API parsing, which under 7 resolves to a module with no API at all: the import is
-`@typescript/typescript6`, the compatibility package pinning the 6.x API, declared at the root.
-
-Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.tsx` for components).
+**`next build` rewrites `tsconfig.json` and writes its own default for any key that is absent**: `strict: false` and
+`allowJs: true`. Neither setting is redundant, and the contract suite asserts both, and that this `tsconfig.json` stays
+beside the [`next.config.ts`](./next.config.ts) that rewrites it.
 
 **Nested guides**. Read the one for the folder you are touching; they carry the detail this file omits:
 
@@ -285,302 +154,98 @@ Unit tests are co-located with the code they cover (`src/**/*.test.ts`, `.test.t
 | [`./src/ui/modules/AGENTS.md`](./src/ui/modules/AGENTS.md) | How component folders are organised |
 | [`./src/ui/modules/core/AGENTS.md`](./src/ui/modules/core/AGENTS.md) | Primitives and the animation layer |
 | [`./src/ui/modules/pages/planner/AGENTS.md`](./src/ui/modules/pages/planner/AGENTS.md) | The planner screen: calendar, holidays, summary |
-| [`./src/ui/styles/AGENTS.md`](./src/ui/styles/AGENTS.md) | Layer order, tokens, what Biome does not format |
+| [`./src/ui/styles/AGENTS.md`](./src/ui/styles/AGENTS.md) | Layer order, tokens, the cross-cutting stylesheets |
 
 ## Conventions
 
-- **No explanatory comments in TypeScript sources under `src/`.** The folder's `AGENTS.md` carries the
-  explanation instead: a magic constant, a deliberate deviation, an ordering that looks wrong but is not, all
-  belong in that folder's *Invariants* or *Gotchas* section, not above the line. A comment is invisible to
-  everyone who is not already reading that file and nothing checks it against the code; a guide is read before
-  the folder is touched, and `tests/docs-consistency.test.ts` does check it. Directives (`'use client'`,
-  `'use server'`, `'use cache'`) are strings, not comments, and are unaffected. Some things are **not**
-  explanatory comments and stay: a `biome-ignore` suppression, which changes what the linter does and must
-  carry its reason on the same line; and the do-not-edit banner on generated output
-  ([`src/ui/modules/bones/registry.ts`](./src/ui/modules/bones/registry.ts)). A suppression counts in either form, including the
-  `{/* biome-ignore … */}` shape JSX forces. The rule is asserted wherever a comment sits: opening a line,
-  trailing code, or inside JSX.
-- **Two or more parameters means one named object, typed `SomeFunctionParams`.** `formatDate` takes
-  `FormatDateParams`, `matchesClientSecret` takes `MatchesClientSecretParams`, `noStore` takes
-  `NoStoreParams`. Exactly one parameter is passed directly, with no wrapper and no interface:
-  `createHolidaySet(holidays)`, `amountFormatter(locale)`. The point is that the *order* of arguments stops
-  being load-bearing: two adjacent positionals of the same type is the classic silent defect, and this
-  codebase has got `isBefore` and `differenceInDays` backwards before.
-
-  **Count every parameter, including the optional ones.** `noStore(body, init?)` is two, so it takes
-  `NoStoreParams` with `init` optional inside the object, and a caller writes
-  `noStore({ body: { premiumKey, email } })`. That nesting is correct: the payload is the value of `body`.
-  The same goes for `createRichLink(href, options?)`, `track(event, properties?)` and
-  `collateByLabel(options, locale?)`. The threshold is the parameter list's length, not how many of them the
-  caller must supply.
-
-  This guide stated the opposite for a while, as "count the *required* parameters, an optional tail does not
-  count", and several functions were converted back to positional on the strength of it. That reading came
-  from a correction about one call site's double wrapping and was generalised the wrong way.
-  `GET /api/health` is what it cost: the route already passed `noStore({ body: { status, timestamp } })`,
-  `body: object` accepts anything, so it typechecked and the endpoint served
-  `{"body":{"status":"ok","timestamp":…}}` for as long as the declaration stayed positional.
-
-  Some places do not follow the rule and cannot. `GET(request, context)` under `src/app/` is Next's own
-  route-handler signature, and `compareByEfficiency({ a, b })` is called from `.sort()`/`.toSorted()`, which
-  invoke a comparator with two positional arguments, so its call sites wrap it rather than the function
-  bending to a runtime contract it does not own.
-- **No ALL-CAPS in translation strings.** Uppercasing is a presentation choice; do it with a CSS class in the
-  component, so the bundles stay comparable and other scripts are not mangled.
-  `tests/docs-consistency.test.ts` scans every bundle for it now, against a named acronym allow-list; the same
-  bullet in [`./src/ui/i18n/AGENTS.md`](./src/ui/i18n/AGENTS.md) says what the keys that shouted were and
-  why whole-token matching is what keeps `iOS` out of the report.
-- **A `typeof window`/`typeof document` guard stays wherever `use(browser())` cannot reach.** The guard looks
-  redundant to a linter and is not: the bare identifier throws `ReferenceError` on the server. React gives
-  a *component* a better tool, `use(browser())`, which opts its subtree out of the server render outright, so
-  inside a component the guard is now the fallback rather than the rule. Module scope, plain utilities and event
-  handlers cannot call it and keep the guard; [`./src/ui/AGENTS.md`](./src/ui/AGENTS.md) names which files sit
-  on which side and why `useMobile.ts` deliberately stays as it is.
-- **Cross-layer imports use the alias, same-folder imports stay relative.** Mixed forms of the same module
-  break Biome's import sorting.
+- **No comments in the TypeScript under `src/`**, doc comments included, bar a `biome-ignore` suppression, which
+  carries its reason on the same line (in either form, `{/* biome-ignore … */}` included), and the do-not-edit banner
+  on generated output ([`src/ui/modules/bones/registry.ts`](./src/ui/modules/bones/registry.ts)). The reason for a
+  line goes in the commit message, the pull request, an ADR or [CODING_STANDARDS.md](../../CODING_STANDARDS.md).
+  Directives (`'use client'`, `'use server'`) are strings, not comments. The contract suite fails on a comment wherever
+  it sits: opening a line, trailing code, or inside JSX.
 
 ## Gotchas
 
-- **Trusted Types is report-only, and enforcing it is a project rather than a flag.** React stopped
-  coercing `TrustedHTML` to a string on its way to a DOM sink, which is what made
-  `require-trusted-types-for 'script'` enforceable here at all, so [`next.config.ts`](./next.config.ts) now
-  sends it on a `Content-Security-Policy-Report-Only` header. Turning it into the enforcing
-  `Content-Security-Policy` blanks the page until every sink has a policy, and the list is longer than this
-  tree: [`JsonLd.tsx`](./src/ui/modules/shared/seo/JsonLd.tsx) writes three `ld+json` blocks and
-  [`HtmlLangSync.tsx`](./src/ui/modules/pages/not-found/HtmlLangSync.tsx) an inline `lang` assignment, both
-  through `dangerouslySetInnerHTML`, and Tag Manager, Stripe, `vanilla-cookieconsent` and `boneyard-js` each
-  inject their own. The report-only header deliberately carries **no** `trusted-types` allowlist: policy names
-  we have only guessed at would silence the violations the header exists to collect. Read them first, wrap the
-  sinks, then promote the directive. `driver.js`'s `closeButton.innerHTML = ""` is not one of them: the empty
-  string is the one assignment the spec exempts.
-
-- **Every build renames every Server Action, so a page from the previous deploy cannot call the current
-  one.** Action ids are per-build; a tab, a cached page or a prerendered shell served before a deploy carries
-  the old id, and the new Worker answers it with `NEXT_ACTION_NOT_FOUND`: the action never runs, and the
-  visitor saw a generic payment-failed toast for a problem a reload fixes. Found from a breakpoint in
-  production: the checkout POST returned that header while every layer below it measured clean.
-  [`recoverFromStaleDeployment`](./src/ui/adapters/navigation/staleDeployment.ts) closes the visible half: it
-  wraps `unstable_isUnrecognizedActionError` from `next/navigation`, Next's own detector for exactly this
-  rather than a string match, and reloads, so the visitor lands on the current build instead of an error. The
-  invisible half is the closure encryption key, which also rotates per build unless
-  `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` pins it: `_deploy-web.yml` passes that secret through to the Worker
-  **optionally**, so deploys keep working while it is unset, and setting it on both `web-*` environments
-  (`openssl rand -base64 32`, the same value on both) is what closes the window. This repository deploys on
-  every push to `main`, so the window is not rare; it reopens on each deploy for every page served before it.
-- **The calculation caches are cleared by the pipeline, not the engine and no longer by each caller.**
-  [`cache.ts`](./src/domain/calendar/utils/cache.ts) memoises the holiday set in one module-level slot and never evicts it, so a second run silently
-  reuses the first run's holidays. `runPlanningPipeline` clears both on entry; a generator still must not.
-  [ADR 0006](../../adr/0006-caller-owned-calculation-caches.md), as amended; its `## Status` block is the
-  record of how many times, so do not pin a date here.
-- **`Temporal` comes from `temporal-polyfill`, never the global.** The global does not resolve in the deployed
-  Workers runtime, and a local run proves nothing. Do not let a codemod "modernise" the import.
-  [ADR 0005](../../adr/0005-temporal-polyfill.md).
-- **Persisted store state is obfuscated, not encrypted.** XOR + base64 with a key shipped in the bundle. Never
-  call it encryption and never put anything confidential behind it.
-  [ADR 0007](../../adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md).
-- **The "I already donated" path is unverified, and Premium is never revoked.** v1 ships with no accounts and
-  no user authentication, so the recovery path grants Premium to anyone who types an address with a succeeded
-  payment behind it, and there is no revocation path for a donor. Both follow from the decision, not from an
-  oversight; do not "harden" either in passing. There *is* a session layer: the entitlement travels in a
-  signed HTTP-only cookie.
-  [ADR 0008](../../adr/0008-premium-derived-from-payment.md).
-- **The layer graph is published as a counted table, not drawn.** The layers plus
-  [`src/middleware.ts`](./src/middleware.ts) make more production import edges than the figure that used to stand
-  for them ever drew. The table on the documentation site's architecture overview is asserted against the tree in
-  both directions by [`tests/docs-consistency.test.ts`](../../tests/docs-consistency.test.ts), so a new
-  cross-layer import fails the contract suite until the table is updated. What is a constraint here and what
-  is a technique applied only where it pays is
-  [ADR 0014](../../adr/0014-ddd-where-it-pays.md).
-- **The bounded contexts under [`src/domain/`](./src/domain) follow different rules.** `calendar/` is pure because it runs
-  in a Web Worker; `payment/` composes Effect against infrastructure tags. Neither is lint-enforced.
-  [ADR 0003](../../adr/0003-pure-calendar-domain-effectful-payment-domain.md).
-- **Logging is the one external call that does not go through Effect.** The logger has both a service tag and
-  a plain module export, `logger`, and the export is what the stores, lookups and components use.
-  [ADR 0002](../../adr/0002-effect-for-external-service-boundaries.md).
-- **The Cloudflare context is request-scoped.** Route handlers and server actions may read it; use-cases may
-  not, and must receive configuration as plain values.
-  [ADR 0004](../../adr/0004-cloudflare-workers-as-deployment-target.md).
-- **The planning pipeline exists once, and used to exist twice.** `runPlanningPipeline` under
-  [`src/domain/calendar/`](./src/domain/calendar) is the whole run: caches, pseudo-Holidays, budget, both planning calls, the Metrics.
-  The Web Worker and the holidays store's own action are its callers and add only transport. They were separate
-  copies held together by mirrored test blocks, they drifted, and the symptom was one Planning Window
-  producing different plans depending on which path ran. Do not reintroduce orchestration at a caller.
-  See [`./src/application/stores/AGENTS.md`](./src/application/stores/AGENTS.md).
-- **The package version is load-bearing at runtime, not just at release time.** Source files across the app import
-  [`package.json`](./package.json) and read `version` to render the footer, the hero, the error page, the `/api/markdown` output
-  and both `.well-known` documents, the agent-skills index and the MCP server card. The docs site reads it too,
-  and so does the Better Stack tag, which files every browser error under it as the release. The number is
-  only as current as the last `release-web` that pushed: a release run that fails after the deploy leaves
-  production serving new code while every one of those surfaces still names the previous version, which is
-  what the root guide's release-window rule exists to prevent.
+- **Trusted Types is report-only, and enforcing it is a project rather than a flag.**
+  [`next.config.ts`](./next.config.ts) sends `require-trusted-types-for 'script'` on a
+  `Content-Security-Policy-Report-Only` header with **no** `trusted-types` allowlist, because policy names only guessed
+  at would silence the violations the header collects. Enforcing it blanks the page until every sink has a policy:
+  [`JsonLd.tsx`](./src/ui/modules/shared/seo/JsonLd.tsx) and
+  [`HtmlLangSync.tsx`](./src/ui/modules/pages/not-found/HtmlLangSync.tsx) write through `dangerouslySetInnerHTML`, and
+  Tag Manager, Stripe, `vanilla-cookieconsent` and `boneyard-js` each inject their own. Read the reports, wrap the
+  sinks, then promote the directive.
+- **Every build renames every Server Action, so a page from the previous deploy cannot call the current one.** The new
+  Worker answers an old id with `NEXT_ACTION_NOT_FOUND` and the action never runs.
+  [`recoverFromStaleDeployment`](./src/ui/adapters/navigation/staleDeployment.ts) wraps
+  `unstable_isUnrecognizedActionError` from `next/navigation` and reloads. The closure encryption key also rotates per
+  build unless `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` pins it: `_deploy-web.yml` passes that secret through optionally,
+  and setting it on both `web-*` environments (the same `openssl rand -base64 32` value on both) closes the window,
+  which reopens on every deploy for every page served before it.
+- **The "I already donated" path is unverified, and Premium is never revoked.** With no accounts and no user
+  authentication, the recovery path grants Premium to anyone who types an address with a succeeded payment behind it,
+  and there is no revocation path for a donor. Both follow from
+  [ADR 0008](../../adr/0008-premium-derived-from-payment.md); do not "harden" either in passing. The entitlement
+  travels in a signed HTTP-only cookie.
+- **The layer graph is published as a counted table on the documentation site's architecture overview**, and
+  [`tests/docs-consistency.test.ts`](../../tests/docs-consistency.test.ts) asserts it against the tree in both
+  directions, so a new cross-layer import fails the contract suite until the table is updated
+  ([ADR 0014](../../adr/0014-ddd-where-it-pays.md)).
+- **The package version is read at runtime, not only at release time.** Source files import
+  [`package.json`](./package.json) for `version` to render the footer, the hero, the error page, the `/api/markdown`
+  output and both `.well-known` documents; the docs site reads it too, and so does the Better Stack tag, which files
+  every browser error under it as the release. A release run that fails after the deploy leaves production serving new
+  code under the previous version.
 
 ## Deploy
 
-Cloudflare Workers via wrangler ([`wrangler.toml`](./wrangler.toml)): `.open-next/worker.js` as the
-entrypoint, exactly what OpenNext generates and nothing wrapped around it, `.open-next/assets` served through
-the `ASSETS` binding, an R2 bucket for the incremental cache, a `PAYMENT_RATE_LIMITER` `[[ratelimits]]`
-binding for the payment limiter, and smart placement. Only `env.production` binds a
-route (`forever-pto.com/*`); `env.development` supplies the preview bindings and CI deploys one worker per PR
-from it: `pr-<number>-forever-pto-development.fbuireu.workers.dev`, deleted when the PR closes.
+Cloudflare Workers via wrangler ([`wrangler.toml`](./wrangler.toml)): `.open-next/worker.js` as the entrypoint,
+exactly what OpenNext generates, `.open-next/assets` served through the `ASSETS` binding, an R2 bucket for the
+incremental cache, a `PAYMENT_RATE_LIMITER` `[[ratelimits]]` binding for the payment limiter, and smart placement. Only
+`env.production` binds a route (`forever-pto.com/*`); `env.development` supplies the preview bindings, and CI deploys
+one worker per PR from it: `pr-<number>-forever-pto-development.fbuireu.workers.dev`, deleted when the PR closes. Build
+config lives in `next.config.ts` and [`open-next.config.ts`](./open-next.config.ts).
 
-**The hashed build output is cached for good, and [`public/_headers`](./public/_headers) is what says so.** Workers
-Static Assets serve every file with `max-age=0, must-revalidate` unless a `_headers` file in the assets directory
-says otherwise, so every page load revalidated its 30 to 40 chunks, its CSS and its fonts one round trip each.
-OpenNext copies `public/` into `.open-next/assets`, which is where the rule has to land; it covers the
-`_next/static` tree, whose file names carry a content hash, with the year-long `immutable` rule, and nothing a
-deploy can change under the same URL. The one other rule covers [`public/fonts/stripe/`](./public/fonts/stripe/fonts.css), the font copy the Stripe
-Elements iframe loads: it needs `Access-Control-Allow-Origin` because the request comes from Stripe's origin,
-and it takes a week's `max-age` without `immutable`, since those names carry no hash.
-`tests/docs-consistency.test.ts` asserts the rule. The docs site carries a `_headers` of its own for other reasons.
+**[`public/_headers`](./public/_headers) is what caches the hashed build output for good**, since Workers Static Assets
+revalidate every file unless a `_headers` file in the assets directory says otherwise; OpenNext copies `public/` into
+`.open-next/assets`, which is where it has to land. It gives `_next/static` the year-long `immutable` rule (asserted),
+and [`public/fonts/stripe/`](./public/fonts/stripe/fonts.css), the font copy the Stripe Elements iframe loads, an
+`Access-Control-Allow-Origin` and a week's `max-age` without `immutable`, since those names carry no hash.
 
-**Logs and traces reach BetterStack through Cloudflare's own OTLP export, and nothing in this tree carries
-them.** `[observability.logs]` and `[observability.traces]` each name a `destinations` entry,
-one pair per stage, configured in the Cloudflare dashboard with the OTLP
-endpoint and its bearer token. The platform instruments handler invocations, outbound `fetch` and **binding**
-calls with no code, attributes `console` output to the active span, and puts the trace id on every log record
-it exports. `head_sampling_rate` is `1` on both, in every environment, which is the platform's own default written
-down so the knob stays visible; `enabled = true` is written on the logs block for the same reason, even though
-the parent's switch already turns logs on, so the block reads like its `traces` neighbour, whose own switch is
-not optional; and `redact_query_string` is on, which
-is what keeps `payment_intent_client_secret` out of a request URL the platform records.
-
-**The app's own log lines are in that export because `console` is what the logger writes to, and for one
-release they were not.** The logger held a `@logtail/edge` transport and posted over HTTP from inside
-the Worker, which the runtime cannot see, so the spans and the logs both reached BetterStack with nothing
-joining them: the trace id column was empty on every line the app produced.
-[ADR 0018](../../adr/0018-the-platform-is-the-log-transport.md) is the fix and records its price, which is that
-the structured fields are serialised here and parsed back by the sink rather than handed over as an object.
-Nothing in the deploy carries a BetterStack credential any more, and no `NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN`
-or `NEXT_PUBLIC_BETTER_STACK_INGESTING_URL` exists: the host and the token live on the Cloudflare destination.
-`NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN` is unrelated and stays, for the browser tag.
-
-**What follows from the destinations is not obvious, and none of it is in a file.** The destination names are
-*settings*: a `destinations` entry naming one that has not been created in the dashboard exports nowhere, and
-nothing in this repository can assert it. A destination belongs to the **account** rather than to the Worker,
-created in the account's Workers Observability section and referenced by bare name, so those names share a
-namespace with the docs site, every per-pull-request preview and the sibling repositories, which is why they
-carry `forever-pto` and not a generic `better-stack`. And a destination has no environment of its own: every
-environment here names its own pair, because Better Stack has a source per stage and a Worker naming another
-stage's destination exports happily into it, filing preview traffic with the live site's. The top level names
-production's, since it shares production's `name` and vars. The spelling is
-`<repo>-<package>-<stage>-<signal>`, whose middle pair matches the GitHub environments and the release tags, so `apps/docs` has
-a name waiting for it, though it declares no `[observability]` at all today. `tests/docs-consistency.test.ts`
-asserts the split, because the names resolve against an account no test can read. And rotating the BetterStack
-source is a dashboard change with no deploy.
-
-**Every use case still ends in `Effect.withSpan` and nothing consumes it, deliberately.** The bridge that used
-to turn those into OpenTelemetry spans is gone with the wrapper: Effect's `Tracer.Span` needs a `traceId` and
-a `spanId` on a span constructed synchronously, and the runtime's `cloudflare:workers` span has neither and
-exists only inside a callback. The calls cost nothing, they mark the boundary of each use case, and they are
-what a future bridge attaches to if Cloudflare ships `spanContext()`. Deleting them is the change to undo.
-[ADR 0017](../../adr/0017-observability-is-the-platform-export.md) records the decision, the alternatives it
-beat and what it costs;
-[ADR 0016](../../adr/0016-traces-reach-betterstack-by-wrapping-the-opennext-entrypoint.md) is the superseded
-one and says which of its own claims expired.
-
-Every path in `wrangler.toml` is relative to the file itself, so the deploy runs with this package as the
-working directory. Build config lives in `next.config.ts` and [`open-next.config.ts`](./open-next.config.ts).
+**Logs and traces leave through `[observability.logs]` and `[observability.traces]`**, whose `destinations` name
+settings in the Cloudflare dashboard that hold the OTLP endpoint and its token, so nothing in the deploy carries a
+BetterStack credential and rotating the source needs no deploy.
+[`logger.ts`](./src/infrastructure/logging/logger.ts) writes to `console`, which the platform attributes to the active
+span ([ADR 0018](../../adr/0018-the-platform-is-the-log-transport.md)); every use case ends in `Effect.withSpan`,
+which nothing consumes ([ADR 0017](../../adr/0017-observability-is-the-platform-export.md), which supersedes
+[ADR 0016](../../adr/0016-traces-reach-betterstack-by-wrapping-the-opennext-entrypoint.md)). A destination belongs to
+the account rather than to the Worker, and nothing here can assert that it exists: every environment names its own
+pair, because a Worker naming another stage's destination exports into it, and the top level names production's.
+`redact_query_string` stays on: it keeps `payment_intent_client_secret` out of the request URLs the platform records.
+`NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN` is unrelated: it feeds the browser tag.
 
 **Wrangler inherits configuration into a named environment but never a binding, so the repeated `[[ratelimits]]`
-blocks are not duplication.** `[assets]` and `[placement]` are declared once at the top
-level and every environment gets them, which is the pattern `apps/docs/AGENTS.md` teaches, but `vars`,
-`ratelimits` and `r2_buckets` are bindings: an environment that does not declare one does
-not have it. Deleting `[[env.production.ratelimits]]` as a copy of the top-level block is the most ordinary
-tidy-up in the file, and it makes `env.PAYMENT_RATE_LIMITER` `undefined` in production. The limiter fails
-open **by design for errors** (`Effect.catchAll` turns a throwing `.limit()` into "not limited"), which is
-right for a flaky binding and catastrophic for a missing one: `POST /api/payment` and `POST /api/check-session`
-go unbounded in front of Stripe, silently. `tests/docs-consistency.test.ts` asserts every binding name
-`environment.d.ts` declares is present in every environment, and that the rate limiter is bounded
-identically in each. It also asserts each named environment declares every binding **kind** the top level
-declares: `CloudflareEnv` names bindings of its own and `r2_buckets` is not one of them,
-so deleting that block from `env.production` passed the name check untouched.
+blocks are not duplication.** An environment that does not declare `vars`, `ratelimits` or `r2_buckets` does not have
+them, and the limiter fails open for errors by design, so deleting `[[env.production.ratelimits]]` leaves
+`POST /api/payment` and `POST /api/check-session` unbounded in front of Stripe, silently. `[observability]` is
+restated in every environment on purpose, and `[assets]` and `[placement]` are written once; the contract suite
+asserts all of it.
 
-**`[observability]` is inheritable too, and this file restates it in every environment anyway.** It was the example
-the paragraph above used for the safe-to-inherit kind while the file restated it in both named environments,
-so a reader who trusted the sentence and tidied the copies away would have deleted the wrong block. The
-copies are kept rather than collapsed because sampling is the setting whose wrong value hides every other
-symptom, and reading it per environment costs nothing; `tests/docs-consistency.test.ts` now asserts that they
-are identical, and separately that `[assets]` and `[placement]` are written once and nowhere else. If
-you would rather collapse them, change the assertion in the same commit.
+**`NEXT_PUBLIC_SITE_URL` resolves differently per request and at build.** Per request, on the deployed Worker, it is
+the runtime var `_deploy-web.yml` passes (`--var NEXT_PUBLIC_SITE_URL:<inputs.url>`), so `sitemap.xml`, the API
+routes and the `.well-known` handler name the host being served. During `next build` there is no request, so
+`getCloudflareContext({ async: true })` reads `wrangler.toml`'s **top-level** `[vars]`, and every build bakes
+`https://forever-pto.com` into what it prerenders: `robots.txt`, and the `canonical`, `hrefLang` and `og:url` of the
+`[locale]` shells. A preview's `robots.txt` therefore advertises the production sitemap, tolerated because previews
+sit behind Cloudflare Access. Do not give the build step the override without checking the value for production,
+which shares that build path.
 
-**`NEXT_PUBLIC_SITE_URL` is resolved in more than one place, and the resolutions disagree on a preview.** No file reads
-`process.env.NEXT_PUBLIC_SITE_URL`; every read goes through the Cloudflare context. But that context resolves
-differently depending on when it is asked:
+**The rest of `[env.development.vars]` is load-bearing on every preview.** `--var` merges rather than replaces, so
+`NEXT_PUBLIC_CONTACT_EMAIL`, `NEXTJS_ENV` and `TURSO_DATABASE_URL` reach every per-PR worker straight from
+`wrangler.toml`, and its `NEXT_PUBLIC_SITE_URL` is what a hand-run `wrangler deploy --env development` advertises.
 
-- **Per request**, on the deployed worker, it is the Worker's runtime var. [`_deploy-web.yml`](../../.github/workflows/_deploy-web.yml) passes
-  `--var NEXT_PUBLIC_SITE_URL:<inputs.url>`, so `sitemap.xml`, the API routes and the `.well-known` handler
-  all name the host actually being served; a per-PR preview names itself.
-- **During `next build`**, there is no request, so `getCloudflareContext({ async: true })` falls back to
-  `getPlatformProxy`, which reads `wrangler.toml`'s **top-level** `[vars]`. `cf:build` passes no `--env`, so
-  every build, production and preview alike, bakes `https://forever-pto.com` into whatever is prerendered.
-  `robots.txt` is fully static with no revalidation and keeps it for the life of the deployment; the
-  `[locale]` shells carry it in `canonical`, `hrefLang` and `og:url` for the life of the deployment too: no
-  route revalidates, so a prerendered page changes only with the next deploy.
-
-So a preview's `robots.txt` advertises the production sitemap. That is tolerated rather than fixed because
-previews sit behind Cloudflare Access: nothing crawls them, which is why [`playwright.config.ts`](./playwright.config.ts) has to send
-`CF-Access-Client-Id`/`Secret` to reach one. Do not "fix" it by giving the build step the override without
-first checking whether the value is still correct for production, which shares that build path. The
-`NEXT_PUBLIC_SITE_URL` line inside `[env.development.vars]` is the fallback for a hand-run
-`wrangler deploy --env development` only: CI always overrides that one key, and the build never reads it.
-
-**The rest of `[env.development.vars]` is load-bearing on every preview, and deleting the block breaks
-them.** `--var` merges, it does not replace: wrangler reads the selected environment's `[vars]` into the
-binding set and only then overwrites the individual keys the flag names. `_deploy-web.yml` passes exactly
-one, `NEXT_PUBLIC_SITE_URL`, so `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXTJS_ENV` and `TURSO_DATABASE_URL` reach every
-per-PR worker straight from `wrangler.toml`. Only the site URL is dead weight there, and it is not removable
-either: without it a hand-run development deploy would fall through to the top-level `[vars]` and advertise
-itself as `forever-pto.com`. Read the whole block as configuration, not residue.
-
-**The deploy passes `--message`, and the value is one hyphenated token on purpose.** In this package
-`wrangler deploy` is not wrangler: it detects the OpenNext project and hands the whole command to
-`opennextjs-cloudflare deploy`, which re-spawns wrangler through a shell with the arguments concatenated
-rather than escaped (Node prints `DEP0190` for exactly that on every deploy). So a quoted
-`--message "<sha> <separator> <event>"` reaches the shell unquoted: with a space the last word arrived as a
-second positional beside `deploy [path]` (`Unknown argument: push`, on wrangler 4.115), and with a
-parenthesis the line does not parse at all (`/bin/sh: 1: Syntax error: "(" unexpected`, on 4.126.0, the day
-the deploying repositories were normalised onto `<sha> (<event>)` and this one failed its first
-production deploy behind it). It was never the quoting on our side, and `nick-fields/retry` was wrongly
-blamed for it first. `_deploy-web.yml` passes `${{ github.sha }}-${{ github.event_name }}`, which contains
-nothing a shell reads, and biancafiore and contribKit pass the same token so the format cannot drift apart
-again. The rollback jobs keep a multi-word message: wrangler redirects only `deploy` to OpenNext, so
-`wrangler rollback` receives its argv untouched.
-
-**No `wrangler deploy` in this repo is wrapped in `nick-fields/retry`'s usual forgiveness for argument
-errors**: not the app's in `_deploy-web.yml`, and not the docs site's in `docs.yml`. A wrapper that retries
-every failure cannot tell a bad argument from a bad network, and this failure burned repeated identical attempts
-per run before reporting. Only the preview delete keeps its retry; it is idempotent, it takes no argument
-built from an input, and it already treats *does not exist* as success.
-`tests/docs-consistency.test.ts` counts the deploy steps
-rather than naming one workflow, so a further deploy is covered the day it appears.
-
-**The secret writes had kept theirs, and now there are no secret writes.** `wrangler secret bulk` in
-`_deploy-web.yml`, and `wrangler secret put` in the `deploy-tail` job that no longer exists, were each
-wrapped, and each began with a guard that fails on an empty value: a missing environment secret was therefore
-reported several retries and half a minute late, by a wrapper that could not have fixed it on any of them. The
-one that survived is folded into the deploy as `wrangler deploy --secrets-file`, which uploads it **with the
-version** rather than as a second one.
-
-That fold is worth more than the wrapper it removes. `wrangler secret bulk` creates a Worker version and a
-deployment of its own, so every deploy here produced an extra one, and between them the freshly deployed code ran
-against the *previous* deploy's secret values. The order was forced rather than chosen: a secret write needs
-the Worker to already exist, so on a new per-PR Worker the reverse order fails with
-`script_not_found [code: 10007]`, which is why the secrets ran after the deploy in the first place.
-`--secrets-file` makes the question moot. It is additive exactly as `secret bulk` was: a key the file omits is
-not deleted. The file is written under `$RUNNER_TEMP`, never inside the workspace where an `upload-artifact`
-step could sweep it up, at mode `600`, and removed by an `if: always()` step. The Node guard survives as the
-step that writes it, and now fails before anything is deployed instead of after.
-`tests/docs-consistency.test.ts` carries a rule for `wrangler secret` with **no floor**, deliberately: a floor
-of one would fail the day the last such step went away, which is the state this repository is now in.
-
-**The same now goes for the build, which was the rule's largest exception and was never on its list.**
-`_deploy-web.yml`'s `Build` step wrapped `pnpm run cf:build` in `nick-fields/retry` with `max_attempts: 3`
-and `timeout_minutes: 10`, so a type error, or the `partialPrefetching`-on-16.2 config error
-[ADR 0009](../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) warns about, burned up to half an
-hour across identical attempts before reporting. `next build` fails deterministically far more often
-than it fails for a reason a second attempt can fix, so the wrapper is gone and the step is a plain `run:`
-scoped with `working-directory`. The contract suite counts build steps the same way it counts deploys, so
-`docs.yml`'s build is covered too.
+**The Worker secrets ride the deploy** through `--secrets-file`, written under `$RUNNER_TEMP` and removed in an
+`if: always()` step. The upload is additive: a secret the file omits is not deleted.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

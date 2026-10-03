@@ -22,7 +22,7 @@ vi.mock("next-intl", async (importOriginal) => {
 		NextIntlClientProvider: ({ children }: { children: ReactNode }) => children,
 	};
 });
-vi.mock("@app/fonts", () => ({
+vi.mock("./fonts", () => ({
 	DOCUMENT_BODY_CLASS: "bricolage-var space-grotesk-var instrument-serif-var jetbrains-mono-var font-sans antialiased",
 }));
 vi.mock("@styles/index.css", () => ({}));

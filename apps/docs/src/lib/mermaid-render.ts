@@ -12,7 +12,15 @@ const MERMAID_UMD = require.resolve("mermaid/dist/mermaid.min.js");
 const FONT_FILE = require.resolve("@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2");
 const FONT_FAMILY = "Space Grotesk Variable";
 
-const TOKEN_NAMES = ["frame", "accent", "foreground", "surface-panel", "surface-panel-alt", "muted"] as const;
+const TOKEN_NAMES = [
+	"frame",
+	"accent",
+	"foreground",
+	"surface-panel",
+	"surface-panel-alt",
+	"muted",
+	"color-brand-ink",
+] as const;
 type Tokens = Record<(typeof TOKEN_NAMES)[number], string>;
 
 /**
@@ -51,8 +59,8 @@ const configuration = (tokens: Tokens, dark: boolean): MermaidConfig => ({
 	securityLevel: "strict",
 	theme: "base",
 	// Pinned rather than inherited: Mermaid 12 switches flowcharts and state diagrams to ELK by default, and a
-	// Renovate bump would otherwise re-lay out every diagram on the site. A fence can still opt into ELK in its
-	// own frontmatter, which outranks this.
+	// Renovate bump would otherwise re-lay out every diagram on the site. A fence's own frontmatter outranks this,
+	// and the contract suite fails one that sets another layout.
 	layout: "dagre",
 	fontFamily: `${FONT_FAMILY}, system-ui, sans-serif`,
 	// SVG text rather than `<foreignObject>` HTML: the label sizes then come from the font metrics of the
@@ -66,7 +74,7 @@ const configuration = (tokens: Tokens, dark: boolean): MermaidConfig => ({
 		background: tokens["surface-panel"],
 		fontSize: "14px",
 		primaryColor: tokens.accent,
-		primaryTextColor: "#0e0e0e",
+		primaryTextColor: tokens["color-brand-ink"],
 		primaryBorderColor: tokens.frame,
 		secondaryColor: tokens["surface-panel-alt"],
 		secondaryTextColor: tokens.foreground,
@@ -91,14 +99,14 @@ const configuration = (tokens: Tokens, dark: boolean): MermaidConfig => ({
 		signalTextColor: tokens.foreground,
 		labelBoxBkgColor: tokens.accent,
 		labelBoxBorderColor: tokens.frame,
-		labelTextColor: "#0e0e0e",
+		labelTextColor: tokens["color-brand-ink"],
 		loopTextColor: tokens.foreground,
 		noteBkgColor: tokens.accent,
 		noteBorderColor: tokens.frame,
-		noteTextColor: "#0e0e0e",
+		noteTextColor: tokens["color-brand-ink"],
 		activationBkgColor: tokens.muted,
 		activationBorderColor: tokens.frame,
-		sequenceNumberColor: "#0e0e0e",
+		sequenceNumberColor: tokens["color-brand-ink"],
 		attributeBackgroundColorOdd: tokens["surface-panel"],
 		attributeBackgroundColorEven: tokens["surface-panel-alt"],
 	},
@@ -106,10 +114,10 @@ const configuration = (tokens: Tokens, dark: boolean): MermaidConfig => ({
 
 let browser: Promise<Browser> | undefined;
 let page: Promise<Page> | undefined;
-const rendered = new Map<string, Promise<{ light: string; dark: string }>>();
+const rendered = new Map<string, Promise<RenderedDiagram>>();
 
 /**
- * One headless Chromium for the whole build, with the site's own display face loaded so Mermaid measures
+ * One headless Chromium for the whole build, with the site's own body face loaded so Mermaid measures
  * labels against the glyphs the reader will see; a fallback font would size every box wrong.
  */
 const renderer = async (): Promise<Page> => {

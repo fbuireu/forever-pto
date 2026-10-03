@@ -4,8 +4,8 @@ import { LOCALES } from "@infrastructure/i18n/locales";
 import { Badge } from "@ui/modules/core/primitives/Badge";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { FlagIcon } from "@ui/modules/core/primitives/FlagIcon";
-import { QuickStartTrigger } from "@ui/modules/pages/homepage/quick-start/QuickStartTrigger";
 import { MODIFIERS_CLASS_NAMES } from "@ui/modules/pages/planner/calendar/utils/helpers";
+import { QuickStartTrigger } from "@ui/modules/shared/QuickStartTrigger";
 import { cn } from "@ui/utils/cn";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
@@ -52,12 +52,14 @@ export const Hero = async () => {
 					</div>
 
 					<h1 className="font-display font-semibold leading-[0.95] tracking-[-0.035em] mb-7 text-[clamp(48px,7vw,92px)]">
-						{t("hero.command")}
-						<br />
-						{t("hero.verb")}{" "}
-						<span className="relative inline-block bg-[var(--accent)] text-[var(--color-brand-ink)] px-3 pb-1 border-[4px] border-[var(--frame)] rounded-[10px] shadow-[var(--shadow-brutal-btn)] mx-1 [animation:highlight-shake_4s_ease-in-out_infinite_1.5s]">
-							{t("hero.highlight")}
-						</span>
+						{t.rich("hero.title", {
+							br: () => <br />,
+							highlight: (chunks) => (
+								<span className="relative inline-block bg-[var(--accent)] text-[var(--color-brand-ink)] px-3 pb-1 border-[4px] border-[var(--frame)] rounded-[10px] shadow-[var(--shadow-brutal-btn)] mx-1 [animation:highlight-shake_4s_ease-in-out_infinite_1.5s]">
+									{chunks}
+								</span>
+							),
+						})}
 						<span className="inline-block text-[0.75em] rotate-[15deg]">🌴</span>
 					</h1>
 

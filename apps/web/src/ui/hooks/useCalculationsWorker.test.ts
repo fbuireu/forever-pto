@@ -1,6 +1,6 @@
 import { type CalculateSuggestionsRequest, WORKER_MESSAGE_TYPE } from "@infrastructure/workers/types";
 import { act, renderHook } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockSetCalculating = vi.hoisted(() => vi.fn());
 const mockSetCalculationResult = vi.hoisted(() => vi.fn());
@@ -10,6 +10,7 @@ const storeState = vi.hoisted(() => ({
 	currentSelection: null as { days: Date[] } | null,
 	holidays: [] as never[],
 	maxAlternatives: 3,
+	planAskedFor: false,
 }));
 const mockGetState = vi.hoisted(() =>
 	vi.fn(() => ({
@@ -17,6 +18,11 @@ const mockGetState = vi.hoisted(() =>
 		currentSelection: storeState.currentSelection,
 		manuallySelectedDays: storeState.manuallySelectedDays,
 		setCalculating: mockSetCalculating,
+		claimPlanAskedFor: () => {
+			const asked = storeState.planAskedFor;
+			storeState.planAskedFor = false;
+			return asked;
+		},
 	})),
 );
 
@@ -67,6 +73,10 @@ const MockWorker = vi.fn(function MockWorker() {
 });
 
 vi.stubGlobal("Worker", MockWorker);
+
+afterAll(() => {
+	vi.unstubAllGlobals();
+});
 
 const { useCalculationsWorker } = await import("./useCalculationsWorker");
 
@@ -470,8 +480,58 @@ describe("useCalculationsWorker", () => {
 });
 
 describe("planner_generated", () => {
-	it("reports the settled plan's inputs and quality, never the days or the break dates", () => {
+	beforeEach(() => {
 		track.mockClear();
+		storeState.planAskedFor = false;
+	});
+
+	it("reports nothing for a plan nobody asked for, which is what a load or a restore settles", () => {
+		const { result } = renderHook(() => useCalculationsWorker());
+		act(() => {
+			result.current.triggerCalculation(BASE_PARAMS);
+		});
+
+		deliverResult();
+
+		expect(track).not.toHaveBeenCalled();
+	});
+
+	it("reports one plan for two asks that settle as one", () => {
+		storeState.planAskedFor = true;
+		const { result } = renderHook(() => useCalculationsWorker());
+		act(() => {
+			result.current.triggerCalculation(BASE_PARAMS);
+		});
+		deliverResult();
+		act(() => {
+			result.current.triggerCalculation({ ...BASE_PARAMS, ptoDays: 6 });
+		});
+		deliverResult();
+
+		expect(track.mock.calls.map(([call]) => call.event)).toStrictEqual(["planner_generated"]);
+	});
+
+	it("reports the plan that lands for the ask, not the one it superseded", () => {
+		storeState.planAskedFor = true;
+		const { result } = renderHook(() => useCalculationsWorker());
+		act(() => {
+			result.current.triggerCalculation(BASE_PARAMS);
+		});
+		const superseded = lastRequest().requestId;
+		act(() => {
+			result.current.triggerCalculation({ ...BASE_PARAMS, ptoDays: 6 });
+		});
+
+		deliverResultFor(superseded);
+		expect(track).not.toHaveBeenCalled();
+
+		deliverResult();
+		expect(track).toHaveBeenCalledOnce();
+		expect(track.mock.calls[0]?.[0].properties?.ptoDays).toBe(6);
+	});
+
+	it("reports the asked-for plan's inputs and quality, never the days or the break dates", () => {
+		storeState.planAskedFor = true;
 		const { result } = renderHook(() => useCalculationsWorker());
 		act(() => {
 			result.current.triggerCalculation(BASE_PARAMS);
@@ -511,7 +571,7 @@ describe("planner_generated", () => {
 	});
 
 	it("reports nothing for a stale response, which is not a plan the user sees", () => {
-		track.mockClear();
+		storeState.planAskedFor = true;
 		const { result } = renderHook(() => useCalculationsWorker());
 		act(() => {
 			result.current.triggerCalculation(BASE_PARAMS);

@@ -123,14 +123,19 @@ export const endOfWeek = ({ date, options }: WeekBoundaryParams): Date => {
 	return toDate(pd.subtract({ days: diff }).add({ days: 6 }));
 };
 
-export const eachDayOfInterval = ({ start, end }: { start: Date; end: Date }): Date[] => {
+export interface EachDayOfIntervalParams {
+	start: Date;
+	end: Date;
+}
+
+export const eachDayOfInterval = ({ start, end }: EachDayOfIntervalParams): Date[] => {
 	const days: Date[] = [];
 	const last = dayIndex(end);
 	for (let day = dayIndex(start); day <= last; day++) days.push(fromDayIndex(day));
 	return days;
 };
 
-export const eachWeekendOfInterval = (interval: { start: Date; end: Date }): Date[] =>
+export const eachWeekendOfInterval = (interval: EachDayOfIntervalParams): Date[] =>
 	eachDayOfInterval(interval).filter(isWeekend);
 
 export const getMonth = (date: Date): number => toPlainDate(date).month - 1;

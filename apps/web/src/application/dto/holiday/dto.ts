@@ -24,7 +24,7 @@ type HolidayDTOShape = BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> & {
 };
 
 export const holidayDTO: HolidayDTOShape = {
-	create: ({ raw, params }: { raw: RawHoliday[]; params: HolidayDTOParams }) => {
+	create: ({ raw, params }) => {
 		const { year, carryOverMonths, regions } = params;
 		const processedDates = new Set<string>();
 

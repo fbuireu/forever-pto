@@ -1,6 +1,6 @@
 import { fireEvent, render } from "@testing-library/react";
 import type { ComponentProps, ReactNode } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 type MotionDivProps = ComponentProps<"div"> & {
 	layoutId?: string;
@@ -93,6 +93,18 @@ describe("MotionHighlight (children mode)", () => {
 				</MotionHighlightItem>
 			</MotionHighlight>,
 		);
+		expect(container.querySelector('[data-slot="motion-highlight"]')).toBeNull();
+	});
+
+	it("hides the highlight of every item when the whole highlight is disabled", () => {
+		const { container } = render(
+			<MotionHighlight controlledItems defaultValue="a" disabled>
+				<MotionHighlightItem value="a">
+					<button type="button">A</button>
+				</MotionHighlightItem>
+			</MotionHighlight>,
+		);
+		expect(container.querySelector('[data-value="a"][data-active="true"]')).not.toBeNull();
 		expect(container.querySelector('[data-slot="motion-highlight"]')).toBeNull();
 	});
 
@@ -205,8 +217,12 @@ describe("MotionHighlight (hover mode)", () => {
 });
 
 describe("MotionHighlightItem", () => {
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
 	it("throws when rendered outside MotionHighlight", () => {
-		const err = vi.spyOn(console, "error").mockImplementation(() => {});
+		vi.spyOn(console, "error").mockImplementation(() => {});
 		expect(() =>
 			render(
 				<MotionHighlightItem value="x">
@@ -214,6 +230,5 @@ describe("MotionHighlightItem", () => {
 				</MotionHighlightItem>,
 			),
 		).toThrow("useMotionHighlight must be used within a MotionHighlightProvider");
-		err.mockRestore();
 	});
 });

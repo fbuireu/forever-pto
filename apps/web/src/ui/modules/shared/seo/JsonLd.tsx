@@ -1,4 +1,5 @@
 import { AMOUNT_MIN } from "@application/dto/payment/schema";
+import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import { LOCALES } from "@infrastructure/i18n/locales";
 import { localePath } from "@infrastructure/i18n/utils/url";
 import { getPublicEnv } from "@infrastructure/services/env/getPublicEnv";
@@ -135,7 +136,7 @@ export async function FaqJsonLd({ locale }: JsonLdProps) {
 				name: tFaq("sections.general.carryOver.question"),
 				acceptedAnswer: {
 					"@type": "Answer",
-					text: tFaq("sections.general.carryOver.answer"),
+					text: tFaq("sections.general.carryOver.answer", { max: MAX_CARRY_OVER_MONTHS }),
 				},
 			},
 			{

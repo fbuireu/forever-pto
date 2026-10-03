@@ -1,5 +1,5 @@
-import type { HolidayDocumentProps } from "@ui/modules/export/HolidayDocument";
 import { Effect } from "effect";
+import type { HolidayDocumentProps } from "./HolidayDocument";
 
 export interface ExportPdfParams extends HolidayDocumentProps {
 	filename: string;
@@ -14,7 +14,7 @@ const makeObjectUrl = (blob: Blob) =>
 const pdfExportEffect = ({ filename, ...docProps }: ExportPdfParams) =>
 	Effect.gen(function* () {
 		const [renderer, { HolidayDocument }] = yield* Effect.tryPromise(() =>
-			Promise.all([import("@react-pdf/renderer"), import("@ui/modules/export/HolidayDocument")]),
+			Promise.all([import("@react-pdf/renderer"), import("./HolidayDocument")]),
 		);
 		const blob = yield* Effect.tryPromise(() => renderer.pdf(<HolidayDocument {...docProps} />).toBlob());
 		const url = yield* makeObjectUrl(blob);

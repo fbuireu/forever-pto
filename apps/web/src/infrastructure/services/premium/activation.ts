@@ -1,6 +1,3 @@
-export const ACTIVATION_PARAM = "activation";
-export const ACTIVATION_FAILED = "failed";
-
 export interface MatchesClientSecretParams {
 	expected: string | null;
 	provided: string;

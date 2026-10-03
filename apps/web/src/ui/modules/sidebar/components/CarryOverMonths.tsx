@@ -1,6 +1,7 @@
 "use client";
 
 import { MIN_CARRY_OVER_MONTHS, useFiltersStore } from "@application/stores/filters";
+import { useHolidaysStore } from "@application/stores/holidays";
 import { PremiumFeatureId } from "@application/stores/premium";
 import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
@@ -9,9 +10,9 @@ import { SlidersHorizontal } from "@ui/modules/core/animate/icons/SlidersHorizon
 import { SlidingNumber } from "@ui/modules/core/animate/text/SlidingNumber";
 import { Slider } from "@ui/modules/core/primitives/Slider";
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
-import { SidebarFieldLabel } from "@ui/modules/sidebar/components/SidebarFieldLabel";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { SidebarFieldLabel } from "./SidebarFieldLabel";
 
 const MIN_VALUE = MIN_CARRY_OVER_MONTHS;
 const MAX_VALUE = MAX_CARRY_OVER_MONTHS;
@@ -21,12 +22,13 @@ export const CarryOverMonths = () => {
 	const t = useTranslations("sidebar.carryOverMonths");
 	const carryOverMonths = useFiltersStore((state) => state.carryOverMonths);
 	const setCarryOverMonths = useFiltersStore((state) => state.setCarryOverMonths);
+	const askForPlan = useHolidaysStore((state) => state.askForPlan);
 	const [localValue, setLocalValue] = useState(carryOverMonths);
+	const [storedValue, setStoredValue] = useState(carryOverMonths);
 	const timeoutRef = useRef<NodeJS.Timeout>(undefined);
-	const prevCarryOverRef = useRef(carryOverMonths);
 
-	if (prevCarryOverRef.current !== carryOverMonths) {
-		prevCarryOverRef.current = carryOverMonths;
+	if (storedValue !== carryOverMonths) {
+		setStoredValue(carryOverMonths);
 		setLocalValue(carryOverMonths);
 	}
 
@@ -49,11 +51,12 @@ export const CarryOverMonths = () => {
 			}
 
 			timeoutRef.current = setTimeout(() => {
+				if (newValue !== carryOverMonths) askForPlan();
 				setCarryOverMonths(newValue);
 				track({ event: "planning_input_changed", properties: { input: "carryOverMonths", inputValue: newValue } });
 			}, DEBOUNCE_DELAY);
 		},
-		[setCarryOverMonths],
+		[setCarryOverMonths, askForPlan, carryOverMonths],
 	);
 
 	return (

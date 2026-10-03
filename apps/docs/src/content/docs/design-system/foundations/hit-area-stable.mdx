@@ -43,4 +43,4 @@ The utility is baked into the base classes of every lifting element, so consumer
 - The Accordion chevron square, Collapsible trigger, Dialog close button, Tooltip info trigger, and sidebar menu buttons (`apps/web/src/ui/modules/core/animate/base/`)
 - Page-level uses in the planner calendar (`apps/web/src/ui/modules/pages/planner/calendar/utils/helpers.ts`), `Summary.tsx`, and homepage sections
 
-**Rule of thumb:** any new element that combines `hover:-translate-*` with a brutal shadow must include `hit-area-stable` (or the `-tilt` variant if it rotates). The [button choreography](/design-system/foundations/shadows/) assumes it.
+**The rule** is `S2` in [`CODING_STANDARDS.md`](https://github.com/fbuireu/forever-pto/blob/main/CODING_STANDARDS.md): an element that combines `hover:-translate-*` with a brutal shadow carries `hit-area-stable` (or the `-tilt` variant if it rotates). The [button choreography](/design-system/foundations/shadows/) assumes it.

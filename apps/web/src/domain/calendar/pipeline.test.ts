@@ -1,5 +1,5 @@
 import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { runPlanningPipeline } from "./pipeline";
 import { FilterStrategy } from "./types";
 
@@ -32,6 +32,10 @@ const baseInput = {
 };
 
 describe("runPlanningPipeline", () => {
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
 	it("plans a Suggestion and measures it in one call", () => {
 		const result = runPlanningPipeline(baseInput);
 
@@ -46,6 +50,7 @@ describe("runPlanningPipeline", () => {
 
 		const result = runPlanningPipeline({ ...baseInput, ptoDays: 5, manuallySelectedDays: manual });
 
+		expect(result.suggestion.days.length).toBeGreaterThan(0);
 		expect(result.suggestion.days.length).toBeLessThanOrEqual(3);
 		expect(result.suggestion.days.some((day) => day.getTime() === manual[0].getTime())).toBe(false);
 	});
@@ -69,7 +74,6 @@ describe("runPlanningPipeline", () => {
 		});
 		expect(args?.removedDays).toEqual([removed]);
 		expect(args?.holidays.some(({ date }) => date.getTime() === removed.getTime())).toBe(false);
-		findPlanningCandidates.mockRestore();
 	});
 
 	it("lets autoSuggestCount win over the budget it would otherwise derive", async () => {
@@ -87,8 +91,6 @@ describe("runPlanningPipeline", () => {
 
 		expect(generateSuggestions.mock.lastCall?.[0].ptoDays).toBe(2);
 		expect(generateAlternatives.mock.lastCall?.[0].ptoDays).toBe(2);
-		generateSuggestions.mockRestore();
-		generateAlternatives.mockRestore();
 	});
 
 	it("measures every Suggestion with the Manual Days, not only the days it placed itself", async () => {
@@ -110,7 +112,6 @@ describe("runPlanningPipeline", () => {
 			expect(args.holidays.some(({ id }) => id === "manual-0")).toBe(true);
 			expect(args.holidays.some(({ date }) => date.getTime() === removed.getTime())).toBe(false);
 		}
-		generateMetrics.mockRestore();
 	});
 
 	it("measures every Suggestion against the Planning Window it was given, Alternatives included", async () => {
@@ -123,7 +124,6 @@ describe("runPlanningPipeline", () => {
 		expect(result.alternatives.length).toBeGreaterThan(0);
 		expect(generateMetrics.mock.calls).toHaveLength(1 + result.alternatives.length);
 		for (const [args] of generateMetrics.mock.calls) expect(args.planningWindow).toEqual(window);
-		generateMetrics.mockRestore();
 	});
 
 	describe("the empty result", () => {
@@ -184,6 +184,7 @@ describe("runPlanningPipeline", () => {
 			});
 
 			expect(result.planned).toBe(true);
+			expect(result.suggestion.days.length).toBeGreaterThan(0);
 			expect(result.suggestion.days.some((day) => day.getTime() === removed.getTime())).toBe(false);
 		});
 
@@ -225,7 +226,6 @@ describe("runPlanningPipeline", () => {
 		runPlanningPipeline(baseInput);
 
 		expect(findBridges).toHaveBeenCalledTimes(1);
-		findBridges.mockRestore();
 	});
 
 	it("treats a Preferred Month already past as not chosen, so Main vacation's block goes where it can still be taken", () => {

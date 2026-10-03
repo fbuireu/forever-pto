@@ -1,7 +1,8 @@
+import { AMOUNT_MIN } from "@application/dto/payment/schema";
 import { DonateSource, QuickStartSource } from "@application/stores/ui";
 import { FilterStrategy } from "@domain/calendar/types";
 import { Badge } from "@ui/modules/core/primitives/Badge";
-import { QuickStartTrigger } from "@ui/modules/pages/homepage/quick-start/QuickStartTrigger";
+import { QuickStartTrigger } from "@ui/modules/shared/QuickStartTrigger";
 import { SupportButton } from "@ui/modules/shared/SupportButton";
 import { cn } from "@ui/utils/cn";
 import { amountFormatter } from "@ui/utils/currencies";
@@ -9,7 +10,6 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { brutCard } from "./shared";
 
 const FREE_AMOUNT = 0;
-const MINIMUM_DONATION = 1;
 const STRATEGY_COUNT = Object.values(FilterStrategy).length;
 
 export const Pricing = async () => {
@@ -38,8 +38,10 @@ export const Pricing = async () => {
 					<h3 className="font-display font-semibold text-[28px] tracking-[-0.02em] mb-2">{t("pricing.freeName")}</h3>
 					<p className="text-[14px] text-muted-foreground mb-4">{t("pricing.freeTagline")}</p>
 					<div className="font-display font-extrabold text-[64px] leading-none tracking-[-0.04em] mb-1.5">
-						{t("pricing.freePrice", { amount: money.format(FREE_AMOUNT) })}
-						<span className="text-[18px] text-muted-foreground font-semibold">{t("pricing.freePer")}</span>
+						{t.rich("pricing.freePrice", {
+							amount: money.format(FREE_AMOUNT),
+							per: (chunks) => <span className="text-[18px] text-muted-foreground font-semibold">{chunks}</span>,
+						})}
 					</div>
 					<p className="font-mono text-[12px] text-muted-foreground mb-5">{t("pricing.freeNote")}</p>
 					<ul className="list-none mb-6">
@@ -78,13 +80,15 @@ export const Pricing = async () => {
 						{t("pricing.lifetimeName")}
 					</h3>
 					<p className="text-[14px] text-[var(--color-brand-ink)]/60 mb-4">
-						{t("pricing.lifetimeTagline", { amount: money.format(MINIMUM_DONATION) })}
+						{t("pricing.lifetimeTagline", { amount: money.format(AMOUNT_MIN) })}
 					</p>
 					<div className="font-display font-extrabold text-[64px] leading-none tracking-[-0.04em] mb-1.5">
-						{t("pricing.lifetimePrice", { amount: money.format(MINIMUM_DONATION) })}
-						<span className="text-[18px] text-[var(--color-brand-ink)]/60 font-semibold">
-							{t("pricing.lifetimePer")}
-						</span>
+						{t.rich("pricing.lifetimePrice", {
+							amount: money.format(AMOUNT_MIN),
+							per: (chunks) => (
+								<span className="text-[18px] text-[var(--color-brand-ink)]/60 font-semibold">{chunks}</span>
+							),
+						})}
 					</div>
 					<p className="font-mono text-[12px] text-[var(--color-brand-ink)]/60 mb-5">{t("pricing.lifetimeNote")}</p>
 					<ul className="list-none mb-6">

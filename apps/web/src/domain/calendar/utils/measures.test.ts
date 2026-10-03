@@ -1,6 +1,6 @@
+import type { Bridge } from "@domain/calendar/types";
 import { monthKeyOf } from "@domain/calendar/window";
 import { describe, expect, it } from "vitest";
-import type { Bridge } from "../types";
 import { measurePlan } from "./measures";
 
 const jan = (day: number) => new Date(2025, 0, day);

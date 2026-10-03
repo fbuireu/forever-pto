@@ -1,15 +1,18 @@
 import type messages from "@i18n/messages/en.json";
+import { USER_COUNTRY_COOKIE } from "@infrastructure/proxy/cookie";
 
 type CookiesKey = keyof (typeof messages)["cookies"];
 
-export interface CookieEntry {
+type CookieDuration = Extract<CookiesKey, "minutes" | "hours" | "weeks" | "months" | "years">;
+
+type CookieExpiry = { expiryKey: Extract<CookiesKey, "session"> } | { expiryKey: CookieDuration; expiryCount: number };
+
+export type CookieEntry = CookieExpiry & {
 	name: string;
-	expiryKey: CookiesKey;
-	expiryParams?: Record<string, number>;
 	descriptionKey: CookiesKey;
 	provider: string;
 	learnMoreUrl?: string;
-}
+};
 
 export interface CookieService {
 	id: string;
@@ -28,29 +31,30 @@ export const COOKIE_SECTIONS: CookieSection[] = [
 		id: "necessary",
 		cookies: [
 			{
-				name: "user-country",
-				expiryKey: "week",
+				name: USER_COUNTRY_COOKIE,
+				expiryKey: "weeks",
+				expiryCount: 1,
 				descriptionKey: "userCountryDesc",
 				provider: "Forever PTO",
 			},
 			{
 				name: "cc_cookie",
 				expiryKey: "months",
-				expiryParams: { count: 6 },
+				expiryCount: 6,
 				descriptionKey: "ccCookieDesc",
 				provider: "Forever PTO",
 			},
 			{
 				name: "__stripe_mid",
-				expiryKey: "year",
-				expiryParams: { count: 1 },
+				expiryKey: "years",
+				expiryCount: 1,
 				descriptionKey: "stripeMidDesc",
 				provider: "Stripe",
 			},
 			{
 				name: "__stripe_sid",
 				expiryKey: "minutes",
-				expiryParams: { count: 30 },
+				expiryCount: 30,
 				descriptionKey: "stripeSidDesc",
 				provider: "Stripe",
 			},
@@ -66,7 +70,7 @@ export const COOKIE_SECTIONS: CookieSection[] = [
 					{
 						name: "_ga",
 						expiryKey: "years",
-						expiryParams: { count: 2 },
+						expiryCount: 2,
 						descriptionKey: "gaDesc",
 						provider: "Google Analytics",
 						learnMoreUrl: "https://policies.google.com/technologies/cookies",
@@ -74,14 +78,14 @@ export const COOKIE_SECTIONS: CookieSection[] = [
 					{
 						name: "_ga_*",
 						expiryKey: "years",
-						expiryParams: { count: 2 },
+						expiryCount: 2,
 						descriptionKey: "gaStarDesc",
 						provider: "Google Analytics",
 					},
 					{
 						name: "_gid",
 						expiryKey: "hours",
-						expiryParams: { count: 24 },
+						expiryCount: 24,
 						descriptionKey: "gidDesc",
 						provider: "Google Analytics",
 					},
@@ -93,8 +97,8 @@ export const COOKIE_SECTIONS: CookieSection[] = [
 				cookies: [
 					{
 						name: "_bs_uid",
-						expiryKey: "year",
-						expiryParams: { count: 1 },
+						expiryKey: "years",
+						expiryCount: 1,
 						descriptionKey: "bsUidDesc",
 						provider: "Better Stack",
 					},

@@ -9,8 +9,8 @@ const getCurrentYear = vi.hoisted(() => vi.fn());
 vi.mock("@infrastructure/services/countries/getCountries", () => ({ getCountries }));
 vi.mock("@ui/utils/getCurrentYear", () => ({ getCurrentYear }));
 vi.mock("./QuickStartClient", () => ({
-	QuickStartClient: ({ countries, currentYear }: { countries: CountryDTO[]; currentYear: number }) => (
-		<div data-testid="client" data-year={currentYear}>
+	QuickStartClient: ({ countries, serverYear }: { countries: CountryDTO[]; serverYear: number }) => (
+		<div data-testid="client" data-year={serverYear}>
 			<ul>
 				{countries.map((country) => (
 					<li key={country.value}>{country.label}</li>
@@ -43,7 +43,7 @@ describe("QuickStart", () => {
 		expect(getCountries).toHaveBeenCalledExactlyOnceWith("fr");
 	});
 
-	it("hands the client shell the list it fetched and the year it resolved", async () => {
+	it("hands the client shell the list it fetched and the year the server rendered with", async () => {
 		await renderQuickStart();
 
 		expect(screen.getAllByRole("listitem").map((item) => item.textContent)).toStrictEqual(["Spain", "France"]);

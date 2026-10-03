@@ -11,7 +11,7 @@ sidebar:
 import { SWITCH_PROP_ROWS, SwitchDemo } from '../../../../components/demos/SwitchDemo';
 import { PropsTable } from '../../../../components/PropsTable';
 
-Source: `apps/web/src/ui/modules/core/animate/base/Switch.tsx`, beside `Checkbox` and `Collapsible`. It sat in `animate/primitives/base/`, the unstyled layer, while carrying the full 3px frame and hard shadow,, which made it the one thing feature components had to reach into that folder for. Rendered as `m.button`, so it needs a `LazyMotionProvider` ancestor.
+Source: `apps/web/src/ui/modules/core/animate/base/Switch.tsx`, beside `Checkbox` and `Collapsible` in the styled layer, since it carries the full 3px frame and hard shadow. Rendered as `m.button`, so it needs a `LazyMotionProvider` ancestor.
 
 Exports: `Switch` (the thumb is an internal sub-component, rendered automatically unless you pass `children`).
 

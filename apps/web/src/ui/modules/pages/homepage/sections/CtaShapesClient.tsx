@@ -10,9 +10,9 @@ type CtaShapesClientProps = {
 	zeroRegrets: string;
 };
 
-const SHAPE_SPAN = "font-display font-black text-[#0e0e0e] leading-tight text-center px-1";
+const SHAPE_SPAN = "font-display font-black text-[var(--color-brand-ink)] leading-tight text-center px-1";
 const SHAPE_BASE =
-	"hidden md:flex items-center justify-center absolute border-[4px] border-[#fff5e1] dark:border-[#0e0e0e] shadow-[6px_6px_0_0_#fff5e1] dark:shadow-[6px_6px_0_0_#0e0e0e] pointer-events-none";
+	"hidden md:flex items-center justify-center absolute border-[4px] border-[var(--color-brand-cream)] dark:border-[var(--color-brand-ink)] shadow-[6px_6px_0_0_var(--color-brand-cream)] dark:shadow-[6px_6px_0_0_var(--color-brand-ink)] pointer-events-none";
 
 const SPRING = { stiffness: 80, damping: 20, mass: 0.5 };
 

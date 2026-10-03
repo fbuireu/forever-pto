@@ -1,4 +1,4 @@
-import type { PremiumSessionData } from "@application/dto/premium/types";
+import type { PremiumSessionClaims } from "@application/dto/premium/types";
 import type { SessionError } from "@infrastructure/errors";
 import { Effect } from "effect";
 import { jwtVerify, SignJWT } from "jose";
@@ -11,10 +11,10 @@ const getJWTSecret = () => {
 	return new TextEncoder().encode(secret);
 };
 
-export const createSession = (data: PremiumSessionData): Effect.Effect<string, SessionError> =>
+export const createSession = (claims: PremiumSessionClaims): Effect.Effect<string, SessionError> =>
 	Effect.tryPromise({
 		try: () =>
-			new SignJWT({ email: data.email, paymentIntentId: data.paymentIntentId })
+			new SignJWT({ email: claims.email, paymentIntentId: claims.paymentIntentId })
 				.setProtectedHeader({ alg: "HS256" })
 				.setIssuedAt()
 				.setExpirationTime(Math.floor(Date.now() / 1000) + PREMIUM_SESSION_LIFETIME_SECONDS)
@@ -22,7 +22,7 @@ export const createSession = (data: PremiumSessionData): Effect.Effect<string, S
 		catch: wrapSessionError,
 	});
 
-export const verifySession = (token: string): Effect.Effect<{ email: string; paymentIntentId: string }, SessionError> =>
+export const verifySession = (token: string): Effect.Effect<PremiumSessionClaims, SessionError> =>
 	Effect.tryPromise({
 		try: async () => {
 			const { payload } = await jwtVerify(token, getJWTSecret());

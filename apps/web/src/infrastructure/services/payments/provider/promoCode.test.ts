@@ -1,6 +1,7 @@
+import { PromoCodeErrors } from "@application/dto/payment/types";
 import { TursoService } from "@infrastructure/clients/db/turso/service";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
-import { PaymentError, PromoCodeError, PromoCodeErrors } from "@infrastructure/errors";
+import { DatabaseError, PaymentError, PromoCodeError } from "@infrastructure/errors";
 import { normalizePromoCode } from "@infrastructure/services/payments/normalForms";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -182,7 +183,7 @@ describe("validatePromoCode", () => {
 
 		it("lets the code through when the count itself fails, rather than blocking a paying donor", async () => {
 			setupMocks({ coupon: makeCoupon(), promoCodeOverrides: { max_redemptions: 1 } });
-			mockQuery.mockReturnValueOnce(Effect.fail(new Error("db down")) as never);
+			mockQuery.mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "db down" })) as never);
 
 			await expect(run({ code: "LAUNCH50", amount: 10 })).resolves.toMatchObject({ finalAmount: 9 });
 		});

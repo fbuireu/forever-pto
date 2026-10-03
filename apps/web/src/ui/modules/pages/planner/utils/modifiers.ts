@@ -57,7 +57,7 @@ interface IsAlternativeParams {
 	alternatives: HolidaysState["alternatives"];
 	suggestion: Suggestion | null;
 	previewAlternativeIndex: number;
-	currentSelection?: Suggestion | null;
+	currentSelection: Suggestion | null;
 }
 
 export const isAlternative = ({
@@ -78,16 +78,8 @@ export const isAlternative = ({
 	};
 };
 
-const holidayDaysOf = (holidays: HolidayDTO[], variants: readonly HolidayDTO["variant"][]) =>
-	daySetOf(holidays.filter(({ variant }) => variants.includes(variant)).map(({ date }) => date));
-
 export const isCustom = (holidays: HolidayDTO[]) => {
-	const days = holidayDaysOf(holidays, [HolidayVariant.CUSTOM]);
-	return (date: Date) => days.has(dayIndex(date));
-};
-
-export const isNationalOrRegionalHoliday = (holidays: HolidayDTO[]) => {
-	const days = holidayDaysOf(holidays, [HolidayVariant.NATIONAL, HolidayVariant.REGIONAL]);
+	const days = daySetOf(holidays.filter(({ variant }) => variant === HolidayVariant.CUSTOM).map(({ date }) => date));
 	return (date: Date) => days.has(dayIndex(date));
 };
 

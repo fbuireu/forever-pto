@@ -1,5 +1,5 @@
-import { resolveLocale } from "@infrastructure/i18n/utils/url";
 import { getRequestConfig } from "next-intl/server";
+import { resolveLocale } from "./utils/url";
 
 export default getRequestConfig(async ({ requestLocale }) => {
 	const locale = resolveLocale(await requestLocale);

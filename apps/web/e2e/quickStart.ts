@@ -1,16 +1,13 @@
 import enMessages from "@i18n/messages/en.json";
+import { USER_COUNTRY_COOKIE } from "@infrastructure/proxy/cookie";
 import { expect, type Locator, type Page } from "@playwright/test";
 
 const DIALOG_OPEN_TIMEOUT = 3_000;
 const PLANNER_NAVIGATION_TIMEOUT = 60_000;
 
-interface QuickStartParams {
-	page: Page;
-}
-
-export const openQuickStart = async ({ page }: QuickStartParams): Promise<Locator> => {
+export const openQuickStart = async (page: Page): Promise<Locator> => {
 	await page.goto("/");
-	await page.context().addCookies([{ name: "user-country", value: "es", url: page.url() }]);
+	await page.context().addCookies([{ name: USER_COUNTRY_COOKIE, value: "es", url: page.url() }]);
 	await page.reload();
 
 	const trigger = page.locator("#hero").getByRole("button", { name: enMessages.homepage.hero.plannerCta });
@@ -23,7 +20,8 @@ export const openQuickStart = async ({ page }: QuickStartParams): Promise<Locato
 	return dialog;
 };
 
-interface FinishQuickStartParams extends QuickStartParams {
+interface FinishQuickStartParams {
+	page: Page;
 	dialog: Locator;
 }
 

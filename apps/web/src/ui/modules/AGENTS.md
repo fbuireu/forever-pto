@@ -10,102 +10,70 @@ Every React component the product renders. Nothing else in `src/ui/` holds compo
 | --- | --- | --- |
 | `core/` | The design system: `primitives/` plus the `animate/` layer. See [core/AGENTS.md](./core/AGENTS.md) | Yes, everywhere |
 | `pages/` | One folder per screen: `homepage/`, `planner/`, `legal/`, `error/`, `not-found/`. See [pages/planner/AGENTS.md](./pages/planner/AGENTS.md). `homepage/quick-start/` is the stepped dialog every planner call to action on the homepage opens, see below | No, by definition |
-| `shared/` | Cross-page pieces that are not primitives: footer, donate, contact, cookie consent, JSON-LD, [`shared/Logo.tsx`](./shared/Logo.tsx), [`shared/Icon.tsx`](./shared/Icon.tsx), [`shared/FormButtons.tsx`](./shared/FormButtons.tsx), [`shared/StepOutcome.tsx`](./shared/StepOutcome.tsx), [`shared/SupportButton.tsx`](./shared/SupportButton.tsx), [`shared/ConditionalWrapper.tsx`](./shared/ConditionalWrapper.tsx), [`shared/WebMCP.tsx`](./shared/WebMCP.tsx), [`shared/MonthToggles.tsx`](./shared/MonthToggles.tsx) (the month picker the sidebar and the quick start share), plus [`shared/utils/helpers.ts`](./shared/utils/helpers.ts) for the helpers those pieces need | Yes |
+| `shared/` | Cross-page pieces that are not primitives: footer, donate, contact, cookie consent, JSON-LD, the marketing header [`shared/Header.tsx`](./shared/Header.tsx) with its [`shared/HomepageLanguageSwitcher.tsx`](./shared/HomepageLanguageSwitcher.tsx) and [`shared/QuickStartTrigger.tsx`](./shared/QuickStartTrigger.tsx), which the homepage, the legal pages and the 404 page render, [`shared/Logo.tsx`](./shared/Logo.tsx), [`shared/Icon.tsx`](./shared/Icon.tsx), [`shared/FormButtons.tsx`](./shared/FormButtons.tsx), [`shared/StepOutcome.tsx`](./shared/StepOutcome.tsx), [`shared/SupportButton.tsx`](./shared/SupportButton.tsx), [`shared/ConditionalWrapper.tsx`](./shared/ConditionalWrapper.tsx), [`shared/WebMCP.tsx`](./shared/WebMCP.tsx), and what the sidebar and the quick start share: [`shared/MonthToggles.tsx`](./shared/MonthToggles.tsx), the month picker, and [`shared/strategyIcons.ts`](./shared/strategyIcons.ts), the Strategy icons; plus [`shared/utils/helpers.ts`](./shared/utils/helpers.ts) for the helpers those pieces need | Yes |
 | `layout/` | [`layout/LegalLayout.tsx`](./layout/LegalLayout.tsx), the card chrome the legal pages share, and [`layout/SkipToContent.tsx`](./layout/SkipToContent.tsx), which owns the skip link **and** the `MAIN_CONTENT_ID` every route shell's landmark is keyed on | Between sibling routes |
-| `sidebar/` | [`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) and its controls: country, region, year, Strategy and its Preferred Months, PTO Day budget, the calculators, calendar export | One screen, but not a page section |
-| `premium/` | The Premium gate and the Donation checkout: [`premium/PremiumFeature.tsx`](./premium/PremiumFeature.tsx), [`premium/featureLabels.ts`](./premium/featureLabels.ts), [`premium/PremiumModal.tsx`](./premium/PremiumModal.tsx), [`premium/PremiumRequiredModal.tsx`](./premium/PremiumRequiredModal.tsx), [`premium/CheckoutForm.tsx`](./premium/CheckoutForm.tsx) | Yes |
-| `providers/` | Context wrappers mounted once in the locale layout: [`providers/AppThemeProvider.tsx`](./providers/AppThemeProvider.tsx), [`providers/BonesProvider.tsx`](./providers/BonesProvider.tsx) | Once |
+| `sidebar/` | [`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) and its controls: Country, Region, year, Strategy and its Preferred Months, past days, Carry-over Months, the PTO Day budget, the calculators, the calendar export, and the language and theme switchers | One screen, but not a page section |
+| `premium/` | The Premium gate and the Donation checkout: [`premium/PremiumFeature.tsx`](./premium/PremiumFeature.tsx), [`premium/featureLabels.ts`](./premium/featureLabels.ts), [`premium/PremiumModal.tsx`](./premium/PremiumModal.tsx), [`premium/PremiumRequiredModal.tsx`](./premium/PremiumRequiredModal.tsx), [`premium/CheckoutForm.tsx`](./premium/CheckoutForm.tsx) with its [`premium/ExpressCheckoutFixture.tsx`](./premium/ExpressCheckoutFixture.tsx), and [`premium/PremiumSessionSync.tsx`](./premium/PremiumSessionSync.tsx), the render-nothing session check the payment confirmation mounts | Yes |
+| `providers/` | What the locale layout mounts once around the page: [`providers/AppThemeProvider.tsx`](./providers/AppThemeProvider.tsx), the `next-themes` context, which the two global pages mount too, and [`providers/BonesProvider.tsx`](./providers/BonesProvider.tsx), which renders `null` and configures `boneyard-js` | Once |
 | `stores/` | [`stores/StoresInitializer.tsx`](./stores/StoresInitializer.tsx), a render-nothing component that seeds the filters store from the `user-country` cookie, read through [`utils/userCountry.ts`](../utils/userCountry.ts) | Once |
-| `tutorial/` | [`tutorial/DriverStyles.tsx`](./tutorial/DriverStyles.tsx) only, a render-nothing component whose single job is to make the driver.js stylesheet import lazy | Once |
+| `tutorial/` | [`tutorial/anchors.ts`](./tutorial/anchors.ts), the tour's anchor names and window events, and [`tutorial/DriverStyles.tsx`](./tutorial/DriverStyles.tsx), the module `useTutorial` imports for the driver.js stylesheet | Once |
 | `tracking/` | The third-party script mounts: [`tracking/Analytics.tsx`](./tracking/Analytics.tsx) (Google gtag consent defaults and config; nothing at all when the build has no `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID`, so a preview or a local build loads no Google script) and [`tracking/BetterStackTracking.tsx`](./tracking/BetterStackTracking.tsx) (the Better Stack snippet, gated on the cookieconsent `betterStack` **service**, not the category) | Once |
-| `export/` | [`export/HolidayDocument.tsx`](./export/HolidayDocument.tsx), the `@react-pdf/renderer` document tree. Not DOM React; it renders in the PDF reconciler only | Once |
+| `export/` | [`export/HolidayDocument.tsx`](./export/HolidayDocument.tsx), the `@react-pdf/renderer` document tree (not DOM React; it renders in the PDF reconciler only), and [`export/exportPdf.tsx`](./export/exportPdf.tsx), the Effect program that renders it and hands the file over | Once |
 | `bones/` | Generated skeleton data, see below. Not hand-written | n/a |
 
-`core/` is the only folder allowed to be imported by everything else. It is also the only folder that
-must not import anything back: no stores, no `useTranslations`, no data fetching.
-
-## Where a new component goes
-
-Walk the questions in order and stop at the first yes.
-
-1. Is it a stateless visual element with no product vocabulary in it: a button, a field, a badge, an
-   animated icon? → `core/`. It takes strings as props; it never calls `useTranslations`.
-2. Does it exist because one screen needs it? → `pages/<screen>/`. Split further into a subfolder once
-   the screen folder outgrows a flat list, as `planner/` has.
-3. Is it mounted by more than one screen and does it carry product meaning? → `shared/`.
-4. Does it gate something behind Premium, or move money? → `premium/`, whatever screen uses it. Access
-   is derived from the payment record, not stored as a flag. [ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md).
-5. Is it a context provider, or a component whose whole job is a side effect and whose render is
-   `null`? → `providers/`, `stores/`, `tracking/` or `tutorial/` depending on what the effect is: a
-   context wrapper, seeding a store, mounting a consent-gated third-party script, or loading the
-   tutorial's lazy stylesheet.
-
-The awkward case is a `shared/` component that needs a helper living under `pages/`. That import points
-the dependency the wrong way, so the helper moves up to `shared/utils/helpers.ts` instead, which is what
-`getViewBoxFromSvg` did once `shared/Icon.tsx` became its only caller. The same rule settles a component
-one screen keeps in its own folder while a second screen renders it: it moves to `shared/`, not sideways
-into the other screen.
-
-## Conventions
-
-**No barrel files.** There is not a single `index.ts` anywhere in `src/`. Import the module directly.
-
-**Named exports only.** `default` appears only inside `dynamic()` calls, where Next.js requires it;
-hence the `.then((m) => ({ default: m.X }))` dance you will see repeatedly.
-
-**Tests sit next to the component** as `*.test.tsx`, never in a `__tests__/` folder. So do
-co-located stylesheets: [`pages/planner/legend.module.css`](./pages/planner/legend.module.css), [`pages/planner/contact.css`](./pages/planner/contact.css) and
-[`shared/donate/donate.css`](./shared/donate/donate.css) live beside the component that imports them. Only cross-cutting CSS belongs
-in `src/ui/styles/`.
+## File names
 
 **`*Client.tsx` means more than one thing.** The suffix is not a single convention, and reading it as
 one will mislead you:
 
-- A thin `'use client'` shell that `dynamic()`-imports the real component with `ssr: false`, purely to
-  keep a heavy dependency out of the server bundle: [`shared/donate/DonateClient.tsx`](./shared/donate/DonateClient.tsx),
-  [`shared/cookie-consent/CookieConsentClient.tsx`](./shared/cookie-consent/CookieConsentClient.tsx),
-  [`pages/homepage/quick-start/QuickStartClient.tsx`](./pages/homepage/quick-start/QuickStartClient.tsx). The shell takes the same props and forwards them.
-- The interactive half of a server/client pair, where the server sibling does the fetching:
-  [`sidebar/components/Countries.tsx`](./sidebar/components/Countries.tsx) awaits `getCountries` and hands the result to
+- A `'use client'` shell that `dynamic()`-imports the real component with `ssr: false` and forwards its
+  props, so the component and what it drags in stay out of the server render:
+  [`shared/donate/DonateClient.tsx`](./shared/donate/DonateClient.tsx),
+  [`shared/cookie-consent/CookieConsentClient.tsx`](./shared/cookie-consent/CookieConsentClient.tsx), and
+  [`pages/homepage/quick-start/QuickStartClient.tsx`](./pages/homepage/quick-start/QuickStartClient.tsx),
+  which also waits for the first open.
+- The interactive half of a server/client pair, where the server sibling reads the data:
+  [`sidebar/components/Countries.tsx`](./sidebar/components/Countries.tsx) reads `getCountries` and hands the result to
   [`sidebar/components/CountriesClient.tsx`](./sidebar/components/CountriesClient.tsx). [`pages/homepage/sections/HomepageCta.tsx`](./pages/homepage/sections/HomepageCta.tsx) and
   [`pages/homepage/sections/CtaShapesClient.tsx`](./pages/homepage/sections/CtaShapesClient.tsx) are the same pair for translated strings.
-
-Whichever it is, the export carries the file's name. Without barrel files every import site has to spell
-the module path anyway, so a file whose export is named something else just makes it unfindable.
 
 **`*Fixture.tsx` is a static placeholder**, not a test fixture. See the skeleton section.
 
 ## The quick start
 
 Every planner call to action on the homepage (the header's trial action, the hero, the free plan in
-`Pricing.tsx` and the closing section) is a [`pages/homepage/quick-start/QuickStartTrigger.tsx`](./pages/homepage/quick-start/QuickStartTrigger.tsx), a
-button that flips `quickStartOpen` on the `ui` store, not a link into `/planner`. The header's trial action is the one exception, and only for a returning visitor: it passes a
-`resumeLabel`, and once `useHasStoredPlan` finds the holidays store's blob in local storage the trigger renders
-that label as a link straight to `/planner` instead, since someone with a plan has nothing to set up. The check
-is presence of the key, read through [`application/stores/storedPlan.ts`](../../application/stores/storedPlan.ts), not a parse of the blob: it
-is obfuscated, and reading it would pull the whole holidays store into the homepage. The server snapshot is
-`false`, so the prerendered header always offers the trial and hydration swaps in the link. The dialog itself is
-mounted once, from the marketing layout, as [`pages/homepage/quick-start/QuickStart.tsx`](./pages/homepage/quick-start/QuickStart.tsx): a server
-component that fetches the Country list and the current year and hands them to
-[`pages/homepage/quick-start/QuickStartClient.tsx`](./pages/homepage/quick-start/QuickStartClient.tsx). That shell renders nothing until the
-store's flag first turns true, and only then `dynamic()`-imports, with `ssr: false`, the
-[`pages/homepage/quick-start/QuickStartDialog.tsx`](./pages/homepage/quick-start/QuickStartDialog.tsx) and the Premium modal beside it, so a visitor who
-never clicks a call to action downloads none of it: not the dialog, not the Counter, and not the Stripe client
-the Premium modal reaches. The regions lookup is further out still: the location store imports it only when
-`fetchRegions` runs, because it drags `date-holidays` in, so nothing downloads that dataset until a Country's
-Regions are asked for. Once opened the
-pair stays mounted, which is what lets the close animate and a second open cost no fetch. The content is [`pages/homepage/quick-start/QuickStartForm.tsx`](./pages/homepage/quick-start/QuickStartForm.tsx), one component per step
-next to it, and the step list, the draft shape and the pure rules ([`pages/homepage/quick-start/steps.ts`](./pages/homepage/quick-start/steps.ts)).
+`Pricing.tsx` and the closing section) is a [`shared/QuickStartTrigger.tsx`](./shared/QuickStartTrigger.tsx), a
+button that calls `openQuickStart(source)` on the `ui` store, not a link into `/planner`. The header's trial
+action is the one exception, and only for a returning visitor: it passes a `resumeLabel`, and once
+`useHasStoredPlan` finds the holidays store's key in local storage the trigger renders that label as a link
+straight to `/planner`. The check is presence of the key, read through
+[`application/stores/storedPlan.ts`](../../application/stores/storedPlan.ts), never a parse of the blob: it is
+obfuscated, and reading it would pull the whole holidays store into the homepage. The server snapshot is
+`false`, so the prerendered header always offers the trial and hydration swaps in the link.
 
-**The steps are the sidebar's first three cards, asked one at a time.** Location (Country, with the
-`user-country` cookie as the default, and an optional Region), the PTO Day budget with the year, then
-Strategy (with the Preferred Months when it is Main Vacation), past days and Carry-over Months. The last two sit behind the same `PremiumFeature` gate the
-sidebar uses, which is why `QuickStart.tsx` mounts `PremiumModal`: the marketing layout carried none, and a
-gated control whose click opens nothing reads as broken.
+The dialog is mounted once, from the marketing layout, as
+[`pages/homepage/quick-start/QuickStart.tsx`](./pages/homepage/quick-start/QuickStart.tsx): a server component
+that reads the Country list and the current year and hands them to
+[`pages/homepage/quick-start/QuickStartClient.tsx`](./pages/homepage/quick-start/QuickStartClient.tsx). The
+year is read when the page is prerendered, so the year chips follow the build, not the visitor's clock, until
+the next deploy. The shell renders nothing until the store's flag first turns true (`useHasOpened`, state set
+during render rather than in an effect, so the dialog mounts in the click's own render), and only then
+`dynamic()`-imports, with `ssr: false`,
+[`pages/homepage/quick-start/QuickStartDialog.tsx`](./pages/homepage/quick-start/QuickStartDialog.tsx) and the
+Premium modal beside it: a visitor who never clicks a call to action downloads neither, nor the Counter, nor
+the Stripe client the Premium modal reaches. The Regions lookup loads later still, inside the location store's
+`fetchRegions`, because it drags `date-holidays` in. Once opened the pair stays mounted, so the close animates
+and a second open fetches nothing. The content is
+[`pages/homepage/quick-start/QuickStartForm.tsx`](./pages/homepage/quick-start/QuickStartForm.tsx), one
+component per step beside it, and [`pages/homepage/quick-start/steps.ts`](./pages/homepage/quick-start/steps.ts)
+for the step list, the draft shape and the pure rules.
 
-**The gate is a `useState` seeded from the flag and set during render, not an effect.** An effect would mount
-the dialog one render after the click; setting state while rendering is React's own pattern for deriving
-"has this ever been true" from a prop, and it costs the one re-render the docs say it does.
+**The steps ask what the sidebar's first three cards hold, one at a time, with the year moved next to the
+budget.** Location (the Country the filters store already holds, else the `user-country` cookie, and an
+optional Region), the PTO Day budget with the year (four chips from `yearOptions`, not the sidebar's ten), then
+Strategy (with the Preferred Months when it is Main Vacation), past days and Carry-over Months. The last two sit
+behind the same `PremiumFeature` gate the sidebar uses, which is why `QuickStartClient.tsx` mounts
+`PremiumModal`: the marketing layout mounts none, and a gated control whose click opens nothing reads as broken.
 
 **The form edits a draft and writes the store once, on the last step.** Closing the dialog before that
 changes nothing, which the sidebar controls, writing on every change, cannot offer. Base UI unmounts the
@@ -113,80 +81,69 @@ popup when the dialog closes, so the draft resets for free: it is a `useState` i
 `useFiltersStore.getState()` and the cookie, not an effect keyed on `open`. On finish the form calls the
 same setters the sidebar does, in the order that survives `setCountry` clearing the Region, closes, and
 pushes `/planner` through `@application/i18n/navigation`, where `CalendarList.tsx` recomputes from the
-store as it always has. No search params are involved.
+store. No search params are involved.
 
-**The funnel is four `track()` events.** `openQuickStart(source)` on the
-`ui` store reports `quick_start_opened` with the call to action (`nav`, `hero`, `pricing`, `closing`), which is
-why `QuickStartTrigger` takes a `source` rather than the store guessing one. The form reports
-`quick_start_step_completed` on every Next and `quick_start_completed` on finish with `trackedDraft(draft)`
-from `steps.ts`: the PTO Day budget, Country, Region, year, Strategy, Preferred Months, past days and Carry-over Months. The dialog
-reports `quick_start_abandoned` from `onOpenChange(false)`, the close button, the backdrop and Escape, naming
-the step the form last announced through `onStepChange`; a finish closes through the store, which fires no
-`onOpenChange`, so it is never counted as an abandonment.
+**The funnel is reported from the handlers, and a finish is never counted as an abandonment.**
+`openQuickStart(source)` reports `quick_start_opened` with the call to action, which is why `QuickStartTrigger`
+takes a `source`; the form reports `quick_start_step_completed` from Next and `quick_start_completed` from
+the finish, with `trackedDraft(draft)`. The dialog reports `quick_start_abandoned` from `onOpenChange(false)`
+(the close button, the backdrop, Escape), naming the step the form last announced through `onStepChange`; a
+finish closes through the store, which fires no `onOpenChange`.
 
-**The planner reports its own interactions the same way, at the handler and never in the store.** Every
-sidebar control, the day click, the Alternatives, the Custom Holiday modals, the export, the calculators, the
-tutorial, the language and theme switchers and the contact form call `track()` where the click lands; the
-catalogue is the observability page of the docs site. The stores stay quiet because their setters also run on
-rehydration and on the quick start's finish, where a "change" event would report a change nobody made. Two producers are the
-exception, and both are opens: `openDonatePopover(source)` and `openQuickStart(source)` on the `ui` store, so
-that every trigger reports the same event with its own `source`. `planner_generated` fires in
-`hooks/useCalculationsWorker.ts` when the worker's answer lands, the one place that holds the inputs and the
-measured plan together, and it reports the plan's quality metrics and never its days. What never travels is
-a date, a Manual Day, a Custom Holiday's name or a salary, and the leak guards in the tests
-(`JSON.stringify(track.mock.calls)` not containing the value) are what keep that true; the budget is a setting
+**The planner reports its own interactions the same way, from the handler.** Every sidebar control, the day
+click, the Alternatives, the Custom Holiday modals, the export, the calculators, the tutorial, the language and
+theme switchers and the contact form call `track()` where the interaction lands; the catalogue is the
+observability page of the docs site. The store actions that report are the opens several triggers share, so each trigger reports the same event
+with its own `source` (`openDonatePopover(source)` and `openQuickStart(source)` on the `ui` store,
+`showPremiumModal(feature, origin)` on the premium store), and `setPremiumStatus`, which reports
+`premium_activated` on the move from free to Premium only. `planner_generated` counts the plans a person asks
+for: every handler that changes what the plan is built from calls the holidays store's `askForPlan` (a sidebar
+control or the calculator on a new value, the quick start's finish, a Custom Holiday that lands or goes, an
+Alternative applied, a reset), and `hooks/useCalculationsWorker.ts` reports it when the worker's answer lands and
+`claimPlanAskedFor` hands it that ask, the one place that holds the inputs and the measured plan together. A load
+or a restore asks nothing and reports nothing. It reports the plan's quality metrics and never its days. The one
+`track()` an effect runs is `Contact.tsx`'s `contact_opened` with `source: hash`, which counts the view a
+`#contact` link opens rather than an interaction, and the contract suite fails on any other. The budget is a setting
 and travels as its number, which is a decision the docs site's data sources page states. `track()` itself fans
 every event out to Better Stack and to Google Analytics under the same name, so the call sites know nothing
 about destinations; the split of what each one is for is on the docs site's observability page.
 
-**Year is offered as four chips, not the sidebar's ten.** Last year, this year and the two after cover the
-question the wizard asks; a stored year outside that span is kept in the list rather than lost, and the
-sidebar still offers the full range.
-
-**Server by default.** A file gets `'use client'` only when it needs state, an effect, a store or a
-browser API. `sidebar/AppSidebar.tsx` and `layout/LegalLayout.tsx` are `async` server components that
-call `getTranslations` from `next-intl/server`; client components use the `useTranslations` hook. The
-planner itself is client-side end to end. [ADR 0001](../../../../../adr/0001-planner-runs-in-the-browser.md).
+`sidebar/AppSidebar.tsx`, `layout/LegalLayout.tsx` and `shared/footer/Footer.tsx` are `async` server
+components that call `getTranslations` from `next-intl/server`; client components use the `useTranslations`
+hook. The footer's copyright is its one translated client island,
+[`shared/footer/components/Copyright.tsx`](./shared/footer/components/Copyright.tsx), because its year moves from
+the one the server rendered with to the visitor's after mount. The planner itself is client-side end to end. [ADR 0001](../../../../../adr/0001-planner-runs-in-the-browser.md).
 
 ## A stepped form modal
 
-`shared/StepOutcome.tsx` holds what `premium/PremiumRequiredModal.tsx` and
-[`shared/contact/ContactModal.tsx`](./shared/contact/ContactModal.tsx) were writing out twice: the `Step`
-(`INPUT | SUCCESS | ERROR`) const both declared identically, and the success and
-error panels they both render once the form is done.
+`premium/PremiumRequiredModal.tsx` and [`shared/contact/ContactModal.tsx`](./shared/contact/ContactModal.tsx)
+share two pieces. [`shared/StepOutcome.tsx`](./shared/StepOutcome.tsx) holds the `Step` const
+(`INPUT | SUCCESS | ERROR`) and the panel either modal renders once the form is done: it takes a `tone`
+(`SUCCESS` or `ERROR`), an icon, a title, a description and an optional `onTryAgain`, whose presence decides
+between one Close button and the Try-again/Close pair. [`shared/FormButtons.tsx`](./shared/FormButtons.tsx) is
+the submit row. Their labels (`submit`, `processing`, `cancel`, `tryAgain`, `close`) live in the `formButtons`
+namespace.
 
-The panels had **drifted visually**, not just structurally. `ContactModal` used the
-neo-brutalist treatment (a 64px tile with a 3px frame and hard shadow, and an
-uppercase mono badge over the description), while the Premium modal rendered a plain
-centred icon and heading. They are both brutalist now; `StepOutcome` takes a `tone`
-(`SUCCESS` or `ERROR`), an icon, a title, a description, and an `onTryAgain` whose
-presence is what decides between one Close button and the Try-again/Close pair.
+**The Premium modal's auto-close handle lives in a ref that `handleClose` and the unmount cleanup both
+clear.** Once opened, the modal stays mounted for the life of the page (`useHasOpened` in
+[`premium/PremiumModal.tsx`](./premium/PremiumModal.tsx)), so a timer nobody kept would close a modal reopened
+before it elapsed and `form.reset()` the address being typed.
+[`premium/PremiumRequiredModal.test.tsx`](./premium/PremiumRequiredModal.test.tsx) drives the steps on fake
+timers and counts `onClose`. The timer and the `welcomeToPremium` countdown both read `AUTO_CLOSE_MS`.
 
-Other things they disagreed about are gone with it:
+**The Premium modal names the feature inside one message, and keeps it while it closes.**
+`premiumModal.featureRequiresPremium` takes the feature's label as `{feature}` inside a `<b>`, so each bundle puts
+it where its sentence wants it. `closeModal` clears the store's `currentFeature` while the dialog is still
+animating out, so the modal keeps the last feature it was given in its own state; reading the prop would drop the
+name from the sentence for the length of the exit animation.
 
-- **The Premium modal hand-wrote the submit row**, including a verbatim copy of
-  `FormButtons`' own `<Loader2 className='size-4 mr-2 animate-spin' />`, while
-  `FormButtons` exists for exactly that. It uses it now.
-- **It reported one failure twice**: `form.setError('email', …)` *and* the ERROR
-  panel, with near-identical strings. The field error was invisible anyway,
-  because the ERROR step unmounts the form that would render it. Only the panel
-  remains.
-- **`setTimeout(handleClose, 5000)` sat beside `t('welcomeToPremium', { seconds: 5 })`**
-  with nothing tying the numbers together. Both read `AUTO_CLOSE_MS` now.
-
-`tryAgain` and `close` moved from the `contact` and Premium modal namespaces into
-`formButtons`, where `submit`, `processing` and `cancel` already live. They were
-character-identical in every locale, so those translations are recovered and
-there is one place left to edit.
-
-**Its auto-close is held in a ref and cleared twice, and it used to be held nowhere.** The modal is mounted
-for the life of the planner by [`app/[locale]/(app)/planner/layout.tsx`](../../app/[locale]/(app)/planner/layout.tsx),
-so a `setTimeout(handleClose, AUTO_CLOSE_MS)` nobody kept a handle to outlived the panel that scheduled it:
-close the success panel, reopen the modal before it elapses, and the orphaned timer shut it again and
-`form.reset()` wiped the address that had just been typed. `handleClose` and an unmount cleanup both call
-`cancelAutoClose` now. [`premium/PremiumRequiredModal.test.tsx`](./premium/PremiumRequiredModal.test.tsx)
-drives the steps on fake timers and counts `onClose`, which is what goes red if the handle is dropped
-again.
+**The checkout hands back exactly once, after a moment on screen or when it leaves the screen, whichever comes
+first.** Once a payment succeeds, [`premium/CheckoutForm.tsx`](./premium/CheckoutForm.tsx) grants Premium and
+reports `payment_completed` at once, then keeps the confirmation on screen for `HAND_BACK_DELAY_MS` before calling
+`onSuccess`, which thanks the donor, resets `Donate`'s form and closes the popover. Closing the popover unmounts
+the form, so the timer's handle sits in a ref the unmount cleanup reaches, and the cleanup runs the pending
+hand-back at once instead of dropping it: a dropped one would leave the paid checkout in place for the next
+opening.
 
 ## Skeletons and bones
 
@@ -209,268 +166,156 @@ The `animate: 'shimmer'` in that config names a boneyard-js animation style, not
 The library injects `@keyframes bs-<uid>` beside each skeleton at runtime, so no CSS under `ui/styles/`
 declares, or should declare, a keyframe called `shimmer`.
 
-**`fixture` and `fallback` are not the same thing, and passing only the first renders
-nothing.** `Skeleton` computes `showFallback = loading && !activeBones` and then renders
-`showFallback ? fallback : children`; `fixture` appears nowhere in that path. It is build-time only:
-the component returns early and renders `fixture ?? children` when the CLI sets
-`window.__BONEYARD_BUILD`, so the capture has a shape to measure even when real data cannot be
-reached. So a `<Skeleton>` whose bone is missing and which passes no `fallback` renders an empty
-container for the whole loading window. Pass **both**, pointing at the same fixture component, which is
-what [`pages/planner/CalendarList.tsx`](./pages/planner/CalendarList.tsx) and [`pages/planner/Summary.tsx`](./pages/planner/Summary.tsx) already did and what
-[`ManagementBar.tsx`](./pages/planner/ManagementBar.tsx) and `premium/CheckoutForm.tsx` now do. The fixtures
-([`pages/planner/calendar/CalendarListFixture.tsx`](./pages/planner/calendar/CalendarListFixture.tsx), [`pages/planner/PlannerPanelFixture.tsx`](./pages/planner/PlannerPanelFixture.tsx),
-[`pages/planner/summary/SummaryFixture.tsx`](./pages/planner/summary/SummaryFixture.tsx), [`premium/ExpressCheckoutFixture.tsx`](./premium/ExpressCheckoutFixture.tsx)) are hand-written
-approximations kept beside their component.
+**`fixture` and `fallback` are not the same thing, and passing only the first renders nothing.** `fixture`
+is build-time only: the component renders `fixture ?? children` when the CLI sets `window.__BONEYARD_BUILD`,
+so the capture has a shape to measure even when real data cannot be reached. At run time a `<Skeleton>` whose
+bone is missing renders `fallback`, and an empty container for the whole loading window when there is none.
+Every `<Skeleton>` passes both, pointing at the same fixture component:
+[`pages/planner/CalendarList.tsx`](./pages/planner/CalendarList.tsx), [`pages/planner/Summary.tsx`](./pages/planner/Summary.tsx),
+[`pages/planner/ManagementBar.tsx`](./pages/planner/ManagementBar.tsx) and `premium/CheckoutForm.tsx`. The
+fixtures ([`pages/planner/calendar/CalendarListFixture.tsx`](./pages/planner/calendar/CalendarListFixture.tsx),
+[`pages/planner/PlannerPanelFixture.tsx`](./pages/planner/PlannerPanelFixture.tsx),
+[`pages/planner/summary/SummaryFixture.tsx`](./pages/planner/summary/SummaryFixture.tsx),
+[`premium/ExpressCheckoutFixture.tsx`](./premium/ExpressCheckoutFixture.tsx)) are hand-written approximations
+kept beside their component.
 
-**A stale `.bones.json` re-registers itself, so closing a drift means deleting the file.** The CLI
-merges what it captured this run with every descriptor still on disk (`mergePreservingExisting`, absent
-`--force`), which is how `alternatives-manager` and `pto-status` stayed in the registry long after the
-last `<Skeleton>` asking for them was removed: empty descriptors, registered because they
-existed rather than because anything wanted them. Both files are gone and the registry is down to the
-bones actually requested by name: `calendar-list`, `planner-panel` and `summary`.
+**A stale `.bones.json` re-registers itself, so closing a drift means deleting the file.** The CLI merges
+what it captured with every descriptor still on disk (`mergePreservingExisting`, absent `--force`), so a
+descriptor no `<Skeleton>` asks for stays registered until its file goes. The registry holds the bones
+requested by name: `calendar-list`, `planner-panel` and `summary`.
 
-`express-checkout` in `premium/CheckoutForm.tsx` is still requested and still uncaptured, and that is
-now a cosmetic gap rather than a blank box, because it has a `fallback`. Capturing it does **not**
-require reaching a live Stripe client secret, contrary to what closing this looked like from the
-outside: the CLI renders the `fixture`, not the real children, so `ExpressCheckoutFixture` is what a
-build would measure.
+`express-checkout`, which `premium/CheckoutForm.tsx` requests, has no captured descriptor, so it shows its
+`fallback`. The CLI renders the `fixture`, not the real children, so capturing it needs no Stripe client
+secret.
 
 ## Testing
 
-Vitest, `happy-dom`, co-located `.test.tsx`. The exclusions in [`vitest.config.ts`](../../../../../vitest.config.ts) that matter here:
+Vitest, `happy-dom`, co-located `.test.tsx`. The exclusions in [`vitest.config.ts`](../../../vitest.config.ts) that matter here:
 
 - `src/ui/modules/bones/**`: excluded from both the test run *and* the coverage report. It is
   generated data; asserting on it would only assert that the generator ran.
 - `src/ui/modules/core/animate/icons/`: excluded from the **coverage report** only, and the glob spares
   `Icon.tsx`, whose co-located test runs with everything else.
 
-**Coverage used to be deliberately uneven here, and this section is the record of it stopping.** It read
-*you should not read a missing test as an oversight to fix in passing*, and named `core/primitives/` as
-barely tested, after saying for months that it carried nothing at all. Every folder under `modules/` is covered
-file for file now, so the sentence that mattered is the inverse one: a component landing here without a
-co-located test is the oversight, and the paragraphs below say what each suite is actually asserting so the
-number cannot be mistaken for the guarantee. [`core/primitives/utils/helpers.test.ts`](./core/primitives/utils/helpers.test.ts) is still worth
-naming rather than counting: it is the whole of the logic in that folder, `hasFlag`, and the reason an empty
-`flag` string has to read as no flag is that a Region has none and the picker would otherwise render a blank
-slot.
+A module with no test of its own is data (`shared/strategyIcons.ts`, `shared/cookie-consent/config/config.ts`)
+or is exercised through its one caller's test (`export/exportPdf.tsx` through
+`sidebar/components/CalendarExport.test.tsx`, `shared/contact/LazyContactModal.tsx` through
+`shared/contact/ContactButton.test.tsx`).
+[`core/primitives/utils/helpers.test.ts`](./core/primitives/utils/helpers.test.ts) holds the whole of the logic
+in that folder, `hasFlag`: an empty `flag` string reads as no flag, because a Region has none and the picker
+would otherwise render a blank slot.
 
-The tests that predate that sweep are the ones sitting on logic (`ManagementBar`, `Summary` charts,
-homepage sections, `shared/utils/helpers.ts`, the forms that render an API failure,
-[`sidebar/components/WorkdayCounter.tsx`](./sidebar/components/WorkdayCounter.tsx), which is the one component
-in that folder that *counts* rather than renders and whose cases pin that a Holiday leaves the workday total
-and enters the Holiday one, and that a range reaching past the years it has Holidays for says so rather than
-counting the gap as workdays, and, because both
-held a defect that no type or lint rule can catch, [`sidebar/components/PtoCalculator.tsx`](./sidebar/components/PtoCalculator.tsx) and
-[`PtoSalaryCalculator.tsx`](./sidebar/components/PtoSalaryCalculator.tsx), whose cases drive the real inputs and assert on what the field and the caption
-actually show). The rest of `sidebar/` carries tests for the state each component owns rather than for its
-markup: `sidebar/components/SidebarCollapsibleGroup.test.tsx` pins that a collapsed rail reads a group as closed
-without discarding its own open state, `sidebar/components/CarryOverMonths.test.tsx` the debounce and the store
-write it drops on unmount, `sidebar/components/LanguageSelector.test.tsx` the code-versus-label switch by rail
-state, `sidebar/components/WorkdayCounterCalendarModal.test.tsx` that open and close both go through the owner
-that holds the state, and [`sidebar/AppSidebar.test.tsx`](./sidebar/AppSidebar.test.tsx) the tutorial anchors, the
-landmark the skip link targets and the year handed to the Years control.
-
-**A component whose body is markup plus translation calls is no longer left to `e2e/`, and what its test
-asserts is chosen so it can fail.** Re-rendering the markup back as an expectation proves only that the file
-parses. So these assert the seam instead: the key resolves in a bundle rather than falling through to its own
-name, the accessible name reaches the element that carries the behaviour, an `href` points where the copy
-says, and a `dynamic()` loader resolves to the export it names. That last one is the reason the fixtures
-([`pages/planner/PlannerPanelFixture.tsx`](./pages/planner/PlannerPanelFixture.tsx) and its siblings) are
-asserted on their **shape**: a skeleton that grows a button or a word has stopped being a skeleton, and
-nothing else in the tree would say so.
-
-**An accessible name is behaviour, so the components that grew one grew a test with it.**
 [`shared/cookie-consent/CookieConsentDialog.test.tsx`](./shared/cookie-consent/CookieConsentDialog.test.tsx)
 walks `COOKIE_SECTIONS` and asks for each switch **by name**, so a section or a service added to the config
-without a label fails rather than shipping a nameless toggle;
-[`sidebar/components/PtoDays.test.tsx`](./sidebar/components/PtoDays.test.tsx) and
+without a label fails; [`sidebar/components/PtoDays.test.tsx`](./sidebar/components/PtoDays.test.tsx) and
 [`sidebar/components/CarryOverMonths.test.tsx`](./sidebar/components/CarryOverMonths.test.tsx) assert the
-name through the real widget rather than beside a synthetic `<input>`, which is what
-`SidebarFieldLabel.test.tsx` used to do and what let a label naming a `div` pass.
-[`shared/ConditionalWrapper.test.tsx`](./shared/ConditionalWrapper.test.tsx) and
-[`pages/homepage/sections/Testimonials.test.tsx`](./pages/homepage/sections/Testimonials.test.tsx) are the
-other additions.
+name through the real widget.
 
-**Be precise about what that buys, because it is less than "covered".** The `e2e/` specs are smoke tests: a
-page answers 200, has a non-empty `<title>`, carries the right `lang`, and a handful of section ids and links
-are visible. Nothing there drives the planner (no budget change, no calculation, no day toggled, no Premium
-gate), so a component reached only through `e2e/` is proven to *mount inside a page that renders*, and
-nothing more. Reading "covered by e2e" as "its behaviour is asserted somewhere" is how a defect in an
-untested component survives a green suite. If a component has behaviour, it needs a co-located test.
+**`e2e/` walks one flow here, the quick start from the homepage to `/planner`** (its steps, the Strategy, the
+mobile drawer); the rest of it answers routes and HTTP contracts. Nothing there toggles a day, changes the
+budget or reaches a Premium gate, so a component reached only through `e2e/` is proven to *mount inside a page
+that renders*, and nothing more.
 
-**A motion value read straight after the event that changed it reads the old number, and against a baseline
-of nought that passes vacuously.** `useTransform` does not recompute when its source is set; motion
-propagates on its own frame loop, so `raw.set(1)` followed by `mapped.get()` in the same tick answers whatever
-`mapped` held before. [`pages/homepage/sections/CtaShapesClient.test.tsx`](./pages/homepage/sections/CtaShapesClient.test.tsx)
-is the case that needs this: the parallax it asserts rests at nought, so every reading agreed with the
-expectation until the frame was flushed and the real offsets appeared. Await a frame (`act` around a short
-`setTimeout`) between the event and the read, and assert the moved state before asserting the return to
-centre, or the reset case cannot fail. Subscribing to the value does not substitute for the flush; verified
-by trying it.
+**A motion value read in the tick of the event that changed it still holds the old number, and against a
+baseline of nought that passes vacuously.** `useTransform` recomputes on motion's own frame loop, so
+`raw.set(1)` followed by `mapped.get()` answers whatever `mapped` held before, and subscribing to the value
+does not replace the flush.
+[`pages/homepage/sections/CtaShapesClient.test.tsx`](./pages/homepage/sections/CtaShapesClient.test.tsx), whose
+parallax rests at nought, awaits a frame between the event and the read.
 
-When a component is mocked in a sibling's test, mock the module path it actually imports:
-[`premium/CheckoutForm.test.tsx`](./premium/CheckoutForm.test.tsx) mocks both `boneyard-js/react` and `./ExpressCheckoutFixture`, because
-leaving either real drags the Stripe element tree into the test.
+**Mock the module a component imports, not its package root.**
+[`premium/CheckoutForm.test.tsx`](./premium/CheckoutForm.test.tsx) mocks `boneyard-js/react`, which is what
+`CheckoutForm.tsx` imports; a mock of `boneyard-js` would leave it real. `vi.mock` resolves its path, so an
+alias and a relative path to the same file are one mock.
 
 ## Gotchas
 
 **The skip link and every landmark it can reach read one const.** `layout/SkipToContent.tsx` exports
-`MAIN_CONTENT_ID` and builds its own `href` from it; the route shells interpolate the same const onto
-their landmark. It was a string literal on both sides, and several shells did not hold up their end:
-`pages/error/ErrorContent.tsx` rendered a `<main>` with no `id` (reached from `[locale]/error.tsx`,
-`[locale]/(marketing)/error.tsx` and `global-error.tsx`, both of those inside the layout that emits the link)
-and `app/[locale]/(app)/payment/confirmation/page.tsx` opened every one of its branches with a bare
-`<div>` and had **no `main` landmark at all**. Pressing Tab then Enter did nothing on any of them, which is
-the same class as the `htmlFor='remaining-days'` and `AllowPastDays` defects below: a promise to a screen
-reader that never resolves. [`layout/SkipToContent.test.tsx`](./layout/SkipToContent.test.tsx) renders each
-shell it can and asserts the landmark is in the tree, and scans `src/` for the declaring files so the list
-cannot silently shrink or grow a duplicate. Every shell reads the const; the scan still accepts the literal
-form, because it is what tells a new shell apart from a renamed one.
+`MAIN_CONTENT_ID` and builds its own `href` from it; each route shell interpolates the same const onto its
+landmark. A shell that forgets it leaves a promise to a screen reader that never resolves: Tab then Enter does
+nothing. [`layout/SkipToContent.test.tsx`](./layout/SkipToContent.test.tsx) renders each shell it can and
+asserts the landmark is in the tree, and scans `src/` for the declaring files so the list cannot silently
+shrink or grow a duplicate; the scan also accepts the literal `"main-content"`, which is what tells a new shell
+apart from a renamed one.
 
-**The destination has to show it received focus, and for a while it showed nothing.** `SidebarInset` is the
-skip link's target and carries `tabIndex={-1}` so the fragment jump can land on it; it also carried a bare
-`outline-none`, so taking the link moved focus and changed nothing on screen. Every keyboard user's
-confirmation that the skip link worked was that the next Tab landed somewhere new. It pairs the suppression
-with `focus-visible:ring-[3px] … ring-inset` now, which is the same pairing every primitive in `core/` uses;
+**The skip link's destination shows it received focus.** `SidebarInset` carries `tabIndex={-1}` so the
+fragment jump can land on it, and pairs `outline-none` with `focus-visible:ring-[3px] … ring-inset`;
 `layout/SkipToContent.test.tsx` reads the `<SidebarInset` opening tag and fails on a suppression with no ring
 beside it.
 
-**`focus:outline-none` is always wrong, and `outline-none` on its own is the house style.** `:focus-visible`
-is a subset of `:focus`, so scoping the suppression to `:focus` kills the focus-visible ring as well, and no
-`focus-visible:ring-*` written afterwards can bring it back. `premium/PremiumFeature.tsx` had it, and that
-gate is rendered all over the screen (every gated chart, every gated Holiday row, the Custom tab, the
-calendar export), so a free user tabbing through the Summary landed on a blurred chart again and again with
-nothing on screen changing. `shared/Logo.tsx` had the unconditional form with no ring, and it is the **first**
-focusable element in the planner sidebar, so it was the first thing a keyboard user met after the skip link.
-Both pair `outline-none` with the `focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2`
-treatment now. A panel that is only focused programmatically (`core/animate/base/Drawer.tsx`'s content) is the
-one place a bare suppression is fine, because nothing tabs onto it.
+**`focus:outline-none` kills the focus ring too.** `:focus-visible` is a subset of `:focus`, so no
+`focus-visible:ring-*` written after it brings the ring back. A panel that is only focused programmatically
+(`core/animate/base/Drawer.tsx`'s content) goes without a ring because nothing tabs onto it.
+`premium/PremiumFeature.tsx` (on every gated chart, Holiday row, the Custom tab and the export) and
+`shared/Logo.tsx` (the first focusable element in the planner sidebar) carry the
+`focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2` treatment, and their tests pin
+the ring.
 
-**`String.replace` with a string pattern replaces the first match only, and one accessible name was built
-that way.** [`shared/footer/components/DevFooter.tsx`](./shared/footer/components/DevFooter.tsx) derives each
-social link's name from its config key, `key.toLowerCase().replace("_", " ")`, so all but one read
-correctly and `BUY_ME_A_COFFEE` announced as *Visit my buy me_a_coffee profile*. It is `replaceAll` now.
-A name assembled from an identifier is the kind that nobody reads aloud in review, which is why
+**[`shared/footer/components/DevFooter.tsx`](./shared/footer/components/DevFooter.tsx) builds each social link's
+name from its config key** with `replaceAll("_", " ")`: `replace` with a string pattern changes the first match
+only, and `BUY_ME_A_COFFEE` would announce as *buy me_a_coffee*;
 [`DevFooter.test.tsx`](./shared/footer/components/DevFooter.test.tsx) asks for each link **by name**.
 
-**Some of `shared/donate/DonationForm.tsx`'s controls said nothing about what they were about to charge.**
-The amount presets were `variant={currentAmount === preset ? "default" : "outline"}` and no
-`aria-pressed`, so a reader heard the same string before and after pressing the button that *decides how much
-money is taken*; `sidebar/components/CalendarExport.tsx`'s include-toggles had the same shape over the
-contents of a downloaded file. Both carry `aria-pressed` now. A `variant=` that flips on state is the tell:
-if the colour means "on", something has to say so.
+**In `shared/donate/DonationForm.tsx`, `FormControl` sits inside `InputGroup`, around `InputGroupInput`**, so
+the amount label's `for` and the `aria-describedby` land on the input rather than on the `role="group"`
+wrapper; `InputGroup`'s `has-[>input]` selectors still hold, because `Slot` renders its child directly. The
+form sets `noValidate`, and the email and amount inputs declare `required`, which puts it in the accessible
+tree without turning native validation back on. The promo-code input has a `FormLabel` of its own, since a
+placeholder vanishes on the first keystroke.
 
-**The promo-code field had no label at all, and the amount field's label named a `<div>`.** The promo input
-had only a `placeholder`, which vanishes on the first keystroke, so a payer correcting a half-typed code heard
-"edit, FOREV" and had no click target; it takes a `FormLabel` and a new `donationForm.promoCode` key in every
-bundle. The amount field had a `FormLabel`, but `FormControl` wrapped the whole `InputGroup`, so its `id`
-and `aria-describedby` landed on the `role="group"` wrapper and the `<label for>` pointed at a `div`.
-`FormControl` sits **inside** `InputGroup`, around `InputGroupInput`, now. `InputGroup`'s `has-[>input]`
-selectors still hold: `Slot` renders its child directly, so the DOM stays `div > input`. The form also sets
-`noValidate` and carried no `required` anywhere, though the Zod schema refuses both email and amount; both
-inputs declare it now, which is what puts `required` in the accessible tree without turning native validation
-back on.
-
-**The legal identity modules derive their own accessible name; they do not take one.**
-`pages/legal/Me.tsx`, `pages/legal/Nif.tsx` and `pages/legal/Address.tsx` are a `{ character, order }` table
-rendered into flexbox-`order`-scrambled spans, so the DOM text is nonsense and `role="img"` makes the
-`aria-label` the *only* thing announced. The prop was called `ariaLabel` and most call sites
-passed the field **label**; a screen reader on the legal notice heard "NIF: NIF:" and never the number, and
-the same on the address and the owner's name on the privacy policy. Both pages exist to state that identity.
-[`pages/legal/ScrambledText.tsx`](./pages/legal/ScrambledText.tsx) now holds the single render and
-`decodeScrambledText`, which sorts the table by `order`; each module is its data plus a one-line render and
-there is no prop to get wrong. [`pages/legal/identity.test.tsx`](./pages/legal/identity.test.tsx) pins the
-decoded strings, so a transposed `order` on a compliance page fails red instead of shipping a wrong
-NIF. `legalNotice.…items.owner.value` and `privacyPolicy.…dataController.items.name.value` were `"{author}"`
-in every bundle with no caller and no `author` source; those entries are deleted.
+**The legal identity modules derive their own accessible name; they take no prop.** `pages/legal/Me.tsx`,
+`pages/legal/Nif.tsx` and `pages/legal/Address.tsx` are `{ character, order }` tables that
+[`pages/legal/ScrambledText.tsx`](./pages/legal/ScrambledText.tsx) renders into flexbox-`order`-scrambled
+spans, so the DOM text is nonsense and `role="img"` makes the `aria-label`, which `decodeScrambledText` builds
+by sorting on `order`, the only thing announced. [`pages/legal/identity.test.tsx`](./pages/legal/identity.test.tsx) pins the
+decoded strings, so a transposed `order` fails there rather than shipping a wrong NIF.
 
 **vanilla-cookieconsent dispatches its `cc:*` events on `window`, never on `document`.** Its emitter is a
-bare `dispatchEvent(new CustomEvent(...))`, which resolves to `window`, and an event dispatched on `window`
-does not reach a listener on `document`. `tracking/BetterStackTracking.tsx` listened on `document`, so its
-`cc:onConsent`/`cc:onChange` handlers never fired and the snippet was never injected: `window.betterstack`
-stayed undefined and every `track()` and `identifyUser()` call no-opped for **every** consenting visitor.
-[`shared/cookie-consent/CookieConsent.tsx`](./shared/cookie-consent/CookieConsent.tsx) already used `window` for `cc:showPreferences`; they now agree.
+bare `dispatchEvent(new CustomEvent(...))`, which resolves to `window`, and a listener on `document` never
+hears it. `tracking/BetterStackTracking.tsx` and
+[`shared/cookie-consent/CookieConsent.tsx`](./shared/cookie-consent/CookieConsent.tsx) both listen on `window`,
+and `BetterStackTracking.test.tsx` fails when an event dispatched on `document` mounts the snippet.
 
-**One module answers what has been consented to, and every reader uses it.**
-[`shared/cookie-consent/utils/consent.ts`](./shared/cookie-consent/utils/consent.ts) holds the analytics service ids and the functions over them:
-`isServiceConsented`, `consentedAnalyticsServices`, `allAnalyticsServices`. `CookieConsent.tsx` derived that
-state inline at separate call sites (the initial read, `onConsent` and `onChange`), and
-`tracking/BetterStackTracking.tsx` answered the same question through a different library call. More than one
-mechanism for one question is exactly how the category-versus-service bug below shipped; both now read
-`acceptedService`, through this module.
+**[`shared/cookie-consent/utils/consent.ts`](./shared/cookie-consent/utils/consent.ts) answers what has been
+consented to.** It holds the analytics service ids and the functions over them:
+`isServiceConsented`, `consentedAnalyticsServices`, `allAnalyticsServices`. `CookieConsent.tsx` and
+`tracking/BetterStackTracking.tsx` both read `acceptedService` through it.
 
-**`utils/consent.ts` has a test now, and it reproduces the defect below.** The module had none, against
-shipped defects on record. Its cases pin the thing that went wrong: `isServiceConsented` is called with the
-*service* id and the category, `consentedAnalyticsServices` reports one service off while the other is on
-(which asking the category could not), and it covers every id the dialog config declares, so a gate can never
-read `undefined` for one. Swapping the service id for the category turns cases red.
+**The library keeps `acceptedCategory('analytics')` true while *any* service in the category is on.** The
+preferences dialog offers `ga4` and `betterStack` as separate switches, so a gate that asked the category
+would grant Google Analytics to a visitor who refused it; the services are declared in
+[`config/config.ts`](./shared/cookie-consent/config/config.ts).
 
-**Consent is *answered* one way and *notified* another, and that second part is structural rather than drift.**
+**Consent is *answered* one way and *notified* another, and that is structural rather than drift.**
 `CookieConsent.tsx` owns the config it hands to `CookieConsentLib.run`, so it reacts through that config's
-`onConsent`/`onChange` callbacks. `tracking/BetterStackTracking.tsx` is a separate component and cannot add a
-callback to someone else's config, so it listens for the `cc:onConsent`/`cc:onChange` window events the
-library dispatches. Collapsing them would mean making `CookieConsent` listen for its own library's events
-instead of using the callbacks it already registers: plausible, but the callbacks fire synchronously with the
-decision and `updateGtagConsent` runs inside one, so the timing is not something a unit test can vouch for.
-Left as is, deliberately, and written down so it does not read as an oversight.
+`onConsent`/`onChange` callbacks. `tracking/BetterStackTracking.tsx` cannot add a callback to someone else's
+config, so it listens for the `cc:onConsent`/`cc:onChange` window events the library dispatches. Collapsing
+them would move `updateGtagConsent` out of the callback that fires synchronously with the decision, a timing
+no unit test can vouch for.
 
-**Consent is collected per service, so it has to be *read* per service.** The preferences dialog offers
-`ga4` and `betterStack` as separate switches, but both gates asked `acceptedCategory('analytics')`, which the
-library keeps true while *any* service in the category is on. Turning Google Analytics off and leaving Better
-Stack on therefore granted `analytics_storage` and fired a `page_view`: Google Analytics writing `_ga` for a
-user who had just refused it, and the mirror case mounting Better Stack for someone who had refused *that*.
-Both now read `acceptedService(id, 'analytics')`. A new service in [`config/config.ts`](./shared/cookie-consent/config/config.ts) needs its own gate; the
-category is not a proxy for it.
+**The consent banner and the preferences dialog never render together.** `CookieConsent`'s
+`if (showBanner) return …` comes first, so every path that opens the preferences clears the banner: the
+banner's own "Manage preferences" button and the `cc:showPreferences` handler the footer's `CookieButton`
+reaches.
 
-**The footer's "Manage cookies" was dead while the first-visit banner was up.** `CookieButton` dispatches
-`cc:showPreferences`, and `CookieConsent`'s handler set `showPreferences` without clearing `showBanner`; the
-`if (showBanner) return …banner…` early return then short-circuited before the dialog could render, so the
-click did nothing at all. The handler now clears the banner first, which is exactly what the banner's own
-"Manage preferences" button already did; the entry points had silently disagreed.
+**`sidebar/components/PtoCalculator.tsx` keeps the total and the inputs it came from in one state object.**
+React bails out of an equal update, so a ref read during render would leave the caption describing the
+previous inputs when a second Calculate lands on the same total; `PtoCalculator.test.tsx` pins the redraw.
 
-**Anything the render reads has to be state, not a ref: React bails out of equal updates.**
-`sidebar/components/PtoCalculator.tsx` kept the inputs behind the accrual result in a
-`calculationSnapshotRef` written by the Calculate handler and read during render. The only re-render on that
-path was `setCalculatedDays`, so a second Calculate landing on the *same* total scheduled no render at all
-and the caption went on describing the previous inputs: 2 days/month × 6 months, then 1 × 12, both totalling
-12, and the caption still read "2 × 6". Total and snapshot are now one state object, so a fresh identity
-makes `Object.is` fail and the render happens. A ref is for values the render does not read.
-
-**An input whose state starts `undefined` mounts uncontrolled and cannot be cleared afterwards.**
-`sidebar/components/PtoSalaryCalculator.tsx` held its salary as `useState<number | undefined>()` and spread
-`value={undefined}` onto a bare `<input>`, so React mounted the field uncontrolled and warned on the first
-keystroke. Worse, `onChange` did `Number(e.target.value)`, and an emptied `type='number'` field gives `''`,
-which is `0`; React wrote that `0` straight back into the box and re-applied it on every Backspace, so the
-placeholder could never return. Hold a text field as a string and parse at the point of use; the numeric
-state is derived, not stored.
-
-**`"to" in date` is true for a `to` that is present and undefined, which is exactly what a range picker
-emits mid-selection.** `sidebar/components/WorkdayCounter.tsx` guarded its `onSelect` with
-`"from" in date && "to" in date`, narrowing to `FromTo` a value whose `to` was `undefined`, stored it, and
-then ran `calculateWorkdays`, `differenceInDays`, `calculateWeekends` and `calculateHolidaysInRange` against
-it on the very next render: `Temporal.PlainDate.from({ year: undefined, … })` throws, so clicking the first
-date of a range crashed the counter. The component already half-knew, because the line below it tested
-`date.from && date.to` before closing the calendar; the guard declined to close and stored the range anyway.
-It uses [`isFromToObject`](./pages/planner/calendar/utils/helpers.ts) now, which is the predicate `Calendar`
-itself narrows with and checks both ends are really `Date`s, so the incomplete value is simply ignored and
-the close becomes unconditional. Nothing is lost by dropping it: `Calendar` holds its own `rangeSelection`
-while a range is being picked and paints the first end from that, never from the `selected` prop.
-An `in` check is a test for a **key**, not for a value; where the value is what you are about to use, narrow
-on the value.
+**`sidebar/components/WorkdayCounter.tsx` narrows the range picker's value with
+[`isFromToObject`](./pages/planner/calendar/utils/helpers.ts)**, which checks that both ends are `Date`s. A
+range picker emits `{ from, to: undefined }` mid-selection, and `"to" in date` is true for it: an `in` check
+tests for a **key**, not a value. `Calendar` holds its own `rangeSelection` while a range is being picked, so
+ignoring the half value loses nothing.
 
 [`core/animate/primitives/`](./core/animate/primitives) is a second, lower layer under `core/animate/`: the unstyled wrappers over
-`@base-ui/react` that `core/animate/base/*` builds on. [`MotionSlot.tsx`](./core/animate/primitives/animate/MotionSlot.tsx) there is the shared `asChild`
+`@base-ui/react` that [`core/animate/base/`](./core/animate/base) builds on. [`MotionSlot.tsx`](./core/animate/primitives/animate/MotionSlot.tsx) there is the shared `asChild`
 mechanism used by [`core/animate/effects/AutoHeight.tsx`](./core/animate/effects/AutoHeight.tsx) and [`core/animate/icons/Icon.tsx`](./core/animate/icons/Icon.tsx).
 
-It is internal to `core/animate/`, and that is now true rather than aspirational; it has zero importers
-from outside. It used to have them. `DevFooter` took `RotatingTextContainer`, which turned out to publish into a
-context nothing read; it is deleted. `CookieConsentDialog` and `AllowPastDays` took `Switch`, which was never
-unstyled (it carried the full frame and shadow), so it moved up to [`core/animate/base/`](./core/animate/base) rather than getting
-a wrapper. Promote what a feature needs; do not reach in.
-
-`tutorial/DriverStyles.tsx` renders `null` and exists solely to make its CSS import lazy; [`useTutorial.tsx`](../hooks/useTutorial.tsx)
-dynamic-imports it alongside the driver client so the tutorial stylesheet never lands in the initial
-bundle. Deleting the "empty" component silently ships the CSS eagerly.
+**`tutorial/DriverStyles.tsx` exists for its import, not its render.** It imports the driver.js stylesheet,
+and [`useTutorial.tsx`](../hooks/useTutorial.tsx) dynamic-imports the module alongside the driver client, so the
+stylesheet loads with the tour and never in the initial bundle. Nothing renders the `null` component it
+exports; deleting the "empty" module silently ships the CSS eagerly.
 
 `export/HolidayDocument.tsx` is JSX but not DOM. Its elements come from `@react-pdf/renderer` and its
 styles are `StyleSheet.create` objects, so Tailwind classes and `cn()` do nothing there. It is loaded
@@ -478,14 +323,12 @@ through a dynamic import inside the Effect program in [`export/exportPdf.tsx`](.
 [`sidebar/components/CalendarExport.tsx`](./sidebar/components/CalendarExport.tsx) itself imports only when the button is pressed; importing
 either statically would pull the PDF renderer, or the Effect runtime, into the planner's first load.
 
-`data-tutorial` attributes scattered through `sidebar/` and [`pages/planner/`](./pages/planner) are the tutorial's anchors, and
-both sides now name them through `TUTORIAL_ANCHOR` in [`tutorial/anchors.ts`](./tutorial/anchors.ts) rather than as strings. They look
-like dead attributes and are not, **but some of them were**. The components declared more anchors than
-`useTutorial` targeted, and the gap was invisible in either direction: a step whose anchor is not
-rendered lands on driver.js's dummy-element fallback with nothing highlighted and no error, which is exactly
-how the mobile `open`-vs-`openMobile` bug stayed hidden. The unclaimed ones are gone; a future step adds
-its anchor back through the const. [`tutorial/anchors.test.ts`](./tutorial/anchors.test.ts) reads the component tree and asserts the
-sets match in both directions.
+**`data-tutorial` attributes in `sidebar/` and [`pages/planner/`](./pages/planner) are the tour's anchors**, named
+on both sides through `TUTORIAL_ANCHOR` in [`tutorial/anchors.ts`](./tutorial/anchors.ts). They look like dead
+attributes and are not: a step whose anchor is not rendered lands on driver.js's dummy-element fallback with
+nothing highlighted and no error. [`tutorial/anchors.test.ts`](./tutorial/anchors.test.ts) reads the component
+tree and fails on an anchor the const declares that no component renders, and on one rendered that the const
+does not declare.
 
 `resolveApiErrorMessage` in `shared/utils/helpers.ts` tells a machine code from prose by shape. A
 failure payload from this app carries a code (an `ApiError` value, or a Zod code such as
@@ -495,21 +338,14 @@ whitespace. An unrecognised code falls back to the generic message; prose is sho
 `as never` on the lookup key is next-intl narrowing its keys to the literals present in the bundle:
 this key is only known at runtime, which is the question `has` exists to answer.
 
-Payment analytics send the machine code, never the rendered message. `premium/CheckoutForm.tsx` shows
-the user `resolveApiErrorMessage(...)` and passes the raw `result.error` to `track`; a translated
-string would split one failure mode across every locale.
+`premium/CheckoutForm.tsx` shows the user `resolveApiErrorMessage(...)` and passes the raw `result.error` to
+`track`.
 
-**The Premium gate broke that same rule at every one of its call sites, and the fix is a second
-type.** `PremiumFeature` took `feature: string`, showed it to the user *and* handed it to
-`showPremiumModal`, which is what `track('upgrade_modal_opened', { feature, origin })` reports; `origin` is the
-gate's optional prop, `planner` by default and `quick_start` from the homepage dialog, so the same feature's
-gates on the two surfaces are two rows rather than one. Every producer was a
-`useTranslations` call (`t('editHolidays')`, `t('metrics.advancedMetrics')`, `t('title')` from
-different namespaces), so every gate in every locale was its own value in one dimension
-and no two locales' funnels could be compared. The prop is a `PremiumFeatureId` now, declared beside the
-state it sets in [`../../application/stores/premium.ts`](../../application/stores/premium.ts): the gate takes
-the id, the store tracks the id, and `premium/featureLabels.ts` maps each id to the message key that already
-held its label, so no translation moved and the modal still names the feature in the reader's language.
+**`PremiumFeature` takes a `PremiumFeatureId`.** The id is declared beside the state it sets in
+[`../../application/stores/premium.ts`](../../application/stores/premium.ts): the gate hands it to
+`showPremiumModal`, which reports `upgrade_modal_opened` with it and the gate's `origin` (`planner` by default,
+`quick_start` from the homepage dialog), and `premium/featureLabels.ts` maps each id to the message key that
+holds its label.
 [`premium/PremiumFeature.test.tsx`](./premium/PremiumFeature.test.tsx) clicks the gate in en and in de and
 asserts the store receives the same value both times.
 
@@ -518,11 +354,8 @@ The label map is the one place where an id and a message path meet, and it resol
 `satisfies Record<PremiumFeatureId, string>` is what makes a new id a compile error rather than a blank
 banner.
 
-**The analytics event is still called `upgrade_modal_opened`, and that is deliberate.** `CONTEXT.md` retires
-*upgrade* as a word for Premium, and the identifiers went with it: `PremiumRequiredModal`,
-`showPremiumModal`, the `premiumModal` message namespace, `premium.becomePremium`. The event id did not,
-because it is a key in a Better Stack funnel that this repo cannot see: renaming it splits the series
-with no way to stitch it back together. It is the one surviving instance of the retired word, in
+**`upgrade_modal_opened` is the one identifier that keeps the word `CONTEXT.md` retires for Premium**, because
+it is a key in a Better Stack funnel this repository cannot see. It is declared in
 [`../../infrastructure/clients/logging/better-stack/tracking.ts`](../../infrastructure/clients/logging/better-stack/tracking.ts)'s event union.
 
 The Stripe Elements appearance lives in [`shared/donate/stripeAppearance.ts`](./shared/donate/stripeAppearance.ts), and it repeats the theme as hex
@@ -532,112 +365,65 @@ mirror `--surface-panel`, `--surface-panel-alt`, `--sidebar`, `--foreground`, `-
 shadow offsets mirror the `--shadow-brutal-*` scale. Change a token there and this module has to be changed by
 hand, or the donation form drifts from the page around it.
 
-**The model is the sidebar, not the `Input` primitive.** A field is drawn like the sidebar's comboboxes, which
-are `Button` `outline`: the panel face, a resting 5px frame shadow that grows to 7px on hover, the value in
-bold and the orange focus ring; a label takes the sidebar's mono face at 14px; a payment method in the
-accordion is a sidebar step card, on `--sidebar` with the 14px radius and the 6px shadow. What Stripe cannot
-do is move an element, so a field lifts by its shadow alone, and it cannot load `next/font`'s files, whose names
-carry a per-build hash, so the faces it types in come from a copy of their own:
-[`public/fonts/stripe/fonts.css`](../../../public/fonts/stripe/fonts.css) declares Space Grotesk and JetBrains Mono over
-woff2 files beside it, and `stripeFonts` hands its absolute URL to Elements as `cssSrc`. That copy does not
-follow a font upgrade in `app/fonts.ts`; refresh the files by hand when the faces change. The iframe fetches
-them from Stripe's origin, which is why `public/_headers` gives that folder `Access-Control-Allow-Origin`. A selected picker item is drawn like a selected
-`default` Button, ink with the accent shadow at the same depth as its unselected neighbours.
-`CheckoutForm.tsx` pins the Payment Element to `layout: 'accordion'`, which is what the narrow popover made
-Stripe choose anyway, because the two layouts share the `.TabIcon--selected` rule: an ink selected tab wants a
-light icon, a cream accordion card a dark one, and one value was always invisible in the other. The rule and
-`colorIconTabSelected` are the frame colour, which the accordion needs. The input text
-is 16px on phones, read from `useIsMobile`, because the browser zooms into anything smaller.
+**What the Elements iframe cannot load, it gets from a copy.** It cannot load `next/font`'s files, whose
+names carry a per-build hash, so the faces it types in come from
+[`public/fonts/stripe/fonts.css`](../../../public/fonts/stripe/fonts.css), which declares Space Grotesk and
+JetBrains Mono over woff2 files beside it; `stripeFonts` hands its absolute URL to Elements as `cssSrc`. That
+copy does not follow a font upgrade in `app/fonts.ts`; refresh the files by hand when the faces change. The
+iframe fetches them from Stripe's origin, which is why `public/_headers` gives that folder
+`Access-Control-Allow-Origin`. `CheckoutForm.tsx` pins the Payment Element to `layout: 'accordion'`, because
+the two layouts share the `.TabIcon--selected` rule: an ink selected tab wants a light icon, a cream accordion
+card a dark one, and the rule and `colorIconTabSelected` are the frame colour the accordion needs. The input
+text is 16px on phones, read from `useIsMobile`, because the browser zooms into anything smaller.
 
-**One module answers how a sidebar control is labelled, and its interface is where the accessibility
-defects came from.** [`sidebar/components/SidebarFieldLabel.tsx`](./sidebar/components/SidebarFieldLabel.tsx) exports `SidebarFieldLabel` (icon, title,
-optional tooltip, optional `controlId`) and `SidebarFieldTooltip` (the
-provider/trigger/content block, which several widgets use without a label around it). Call sites had
-written both out by hand, and the copies had drifted in ways nothing could see:
+**[`sidebar/components/SidebarFieldLabel.tsx`](./sidebar/components/SidebarFieldLabel.tsx) is how a sidebar control is
+labelled.** `SidebarFieldLabel` (icon, title, optional tooltip, optional `controlId`) renders a `<label for>`
+when handed a `controlId` and a `div` heading otherwise; `SidebarFieldTooltip` is the tooltip block alone,
+which `PtoCalculator.tsx`, `PtoSalaryCalculator.tsx` and `CalendarExport.tsx` use without a label. The
+combobox triggers of Country, Region and Strategy and the `Years` trigger are labelable, but `Counter` in
+[`PtoDays.tsx`](./sidebar/components/PtoDays.tsx) and `Slider` in
+[`CarryOverMonths.tsx`](./sidebar/components/CarryOverMonths.tsx) render a `div` root, so those fields render a
+heading and the widget names itself (see [`core/AGENTS.md`](./core/AGENTS.md)); `PtoDays.test.tsx`,
+`CarryOverMonths.test.tsx` and `AllowPastDays.test.tsx` fail on a `<label>`.
 
-- **[`PtoDays.tsx`](./sidebar/components/PtoDays.tsx) carried `<label htmlFor='remaining-days'>` over a read-only status group, and no element
-  in the tree has that id.** A label naming nothing is not inert: it is a promise to a screen reader that
-  never resolves. It is a heading, so it takes no `controlId` now and renders a `div`; the module's test
-  fails if that branch emits a `<label>` instead.
-- **[`Years.tsx`](./sidebar/components/Years.tsx) used `id='years'` twice**: on the popover trigger and again on the `Command` inside the
-  popover. With the popover open the document held two `#years`, and the label resolved to whichever came
-  first. Nothing referenced the second one; it is gone.
+The per-caller differences go through `className`: the tooltip width (`w-50` for the fields, `w-60` for the
+calculators and the Workday counter), `Strategy`'s `font-medium` with no vertical margin and the counter's
+`my-0`.
 
-**`controlId` may only name a labelable element, and some call sites named a `<div>`.**
-`<label for>` resolves against the HTML labelable set (`button`, `input`, `select`, `textarea` and a
-couple more), so the sites pointing at a combobox trigger or a switch button are honest.
-[`PtoDays.tsx`](./sidebar/components/PtoDays.tsx) named `Counter`, whose outer element is an `m.div`, and
-[`CarryOverMonths.tsx`](./sidebar/components/CarryOverMonths.tsx) named `Slider`, whose Base UI `Root` is
-also a `div`; in both cases the `id` was reaching the wrong element through `...props` and the label
-resolved to nothing. Both drop `controlId` and render a heading instead, and both widgets carry their
-own names; see [`core/AGENTS.md`](./core/AGENTS.md).
+**`useFormStatus` reports nothing in this app.** React reports `pending` only for a parent `<form>` submitted
+through a form **action**, and every form here submits through `onSubmit`. So `shared/FormButtons.tsx` takes
+`pending` as a **required** `boolean`, fed by the caller's transition or loading flag, and in
+`shared/donate/DonationForm.tsx` every control a submission reads, the address the receipt goes to included,
+disables on that same flag.
 
-The alternative was to make `SidebarFieldLabel` emit `aria-labelledby` against a generated id, and it is
-worse: it would strip a working `htmlFor` from the honest sites and still need every caller to thread
-the id onto its own control, because this module renders no control. Naming the control is one edit in the
-control; naming it from outside is an edit in both.
-
-[`WorkdayCounter.tsx`](./sidebar/components/WorkdayCounter.tsx) was another hand-written copy: a bare
-`Label` with the icon, the title and a `SidebarFieldTooltip` inside it, over a modal trigger it did not
-name. It uses `SidebarFieldLabel` now, with `className='my-0'` to keep its own spacing.
-
-The tooltip width is the caller's (`w-50` for the fields, `w-60` for the calculators) and `Strategy`
-keeps `font-medium` with no vertical margin, both passed through `className` so the render is unchanged.
-That drift is real but cosmetic, and flattening it silently would have been a visual change hiding inside a
-refactor.
-
-**`useFormStatus` cannot report anything in this app, and one field had already drifted onto it.** React
-reports `pending` only for a parent `<form>` submitted through a form **action**; every form here submits
-through `onSubmit` and none has an `action`, so `pending` was a constant `false`, invisibly, because the type
-is `boolean` either way. In `shared/donate/DonationForm.tsx` it was doubly dead: the hook was called by the
-same module that renders the `<form>`, which React documents as never reporting. The drift it produced is the
-part a payer met: the email field took `disabled={pending}` while the amount, the presets, the promo code and
-the submit all took the real transition, so during the charge the one control still editable was the address
-the receipt goes to, and the value being charged was the one captured at submit, so an edit mid-flight was
-discarded without a word. `shared/FormButtons.tsx` had the same call behind a `pendingProp ?? pendingStatus`
-fallback that every one of its callers already satisfied. Both are gone and `pending` is a **required**
-`boolean`, so a new form cannot forget to say whose transition it is on.
-
-**One module owns the locale switch, and the line that looked like the mechanism was dead.**
-`sidebar/components/LanguageSelector.tsx` and `pages/homepage/navigation/HomepageLanguageSwitcher.tsx` wrote
-out the same policy character for character. `hooks/useLanguageSwitch.ts` holds it now; both keep only
+**One module owns the locale switch.** `hooks/useLanguageSwitch.ts` holds the policy;
+`sidebar/components/LanguageSelector.tsx` and `shared/HomepageLanguageSwitcher.tsx` keep only
 their triggers, which genuinely differ (the sidebar's collapses to a code and wraps in `AnimateIcon`).
+`usePathname` from `@application/i18n/navigation` returns the pathname already unprefixed, so
+`push(pathname, { locale })` is the whole switch; rewriting the prefix by hand would turn a locale-looking
+segment such as `/es-guide` into `/en-guide`, which the hook's test pins.
 
-Both copies carried `push(pathname.replace(`/${locale}`, `/${newLocale}`), { locale: newLocale })`, and the
-`replace` could never match: `usePathname` from `@application/i18n/navigation` is next-intl's
-`useBasePathname`, which returns the pathname **already unprefixed**. `push(…, { locale })` is what performs
-the switch. Worse than useless: a route with a locale-looking segment, `/es-guide`, would have been rewritten
-to `/en-guide`, which is the case the hook's test pins. `LanguageSelector` also held a `useState` mirroring
-the menu's own uncontrolled open state, read by nothing but the props it fed back.
-
-**`shared/ConditionalWrapper.tsx` has one arm, and it used to advertise another.** That one took `as` and
-`wrapperProps` and rendered `<Component {...wrapperProps}>`, behind a `<T extends ElementType>` generic that
-existed only to type it. Nothing ever called it: both call sites (`pages/planner/calendar/Calendar.tsx` for
-the Holiday tooltip and `sidebar/components/PtoSalaryCalculator.tsx`) pass `wrapper`. The union, the
-generic and the `"wrapper" in props` narrowing are gone; a conditional `<div>` is `doWrap && <div>`, which
-needs no component.
-
-**`pages/homepage/sections/Testimonials.tsx` does not shuffle, and the shuffle it had did nothing, in several
-ways.** It was a `'use cache'` server component with `cacheLife('days')` then, and is a prerendered one now,
-so `TESTIMONIAL_KEYS.toSorted(() => Math.random() - 0.5)` ran once per cache period, and would run once per
-build, rather than per visitor: the order every reader saw was
-whatever one render happened to produce. `toSorted` with a random comparator is a biased shuffle regardless,
-and `CARD_STYLES[idx]` keys the avatar colour and the tilt to the *slot*, so a re-render silently repainted
-every testimonial. Rendering `TESTIMONIAL_KEYS` in order makes the colour a property of the person. Bringing
-a real shuffle back means moving it out of the cached body, and choosing between styles keyed by index
-and styles keyed by testimonial.
+**`pages/homepage/sections/Testimonials.tsx` pairs each style with a slot, not with a person.**
+`CARD_STYLES[idx]` gives the avatar colour and the tilt by position in `TESTIMONIAL_KEYS`, which renders in
+order, so reordering the keys repaints the cards.
 
 `BRIDGE_WEEK` in [`pages/homepage/sections/Features.tsx`](./pages/homepage/sections/Features.tsx) is the shape the card's copy describes:
 Workdays Monday to Wednesday, a Thursday Holiday, a Friday PTO Day, then the weekend: a Bridge.
 Reordering the array desyncs the illustration from the translated text beside it.
 
-**[`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) mounts no `SidebarProvider` and must not grow one back.** It returns a
+**One Country count is written three times.** `Features.tsx` passes `count: 203` and prints six flags and
+`+197`, and `Stats.tsx` prints `format.number(203)`; nothing ties the three literals together, so change them
+as one.
+
+**[`pages/homepage/sections/shared.ts`](./pages/homepage/sections/shared.ts) is read by the docs site.**
+`homepage.mdx` and `HomepagePatternsDemo.tsx` import its exports, and the docs Tailwind build scans its class
+strings through `@source`, so renaming an export or a class there is a change to `apps/docs`.
+
+**[`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) mounts no `SidebarProvider` and must not grow one.** It returns a
 fragment of `Sidebar` plus `SidebarInset` and reads the context from `app/[locale]/(app)/planner/layout.tsx`,
-the app's only mount site. It used to open a second provider inside the layout's, which gave the tree a
-second independent `open`/`openMobile` pair and nested `div.flex.min-h-svh.w-full` wrappers; consumers agreed
-with each other only because they all happened to render inside the inner one. `Sidebar.test.tsx` fails on a
-second mount anywhere under `src/`. It also means `AppSidebar` is not self-contained: a host other than that
-layout has to supply the provider.
+the app's only mount site; a second provider would give the tree a second, independent `open`/`openMobile`
+pair. `Sidebar.test.tsx` fails on a second mount anywhere under `src/`. A host other than that layout has to
+supply the provider.
 
 **[`shared/donate/Donate.tsx`](./shared/donate/Donate.tsx)'s trigger is a `fixed` band, and the band is `pointer-events-none` while the
 button inside it is `pointer-events-auto`.** Below `md` the container is `w-full` and the `Button` inside
@@ -648,9 +434,8 @@ for the last 12% of every four-second cycle, and `md:w-auto` reverses the coinci
 caller passes a narrower child. A `fixed` element at `z-50` spanning the viewport is worth making inert by
 construction rather than by measurement.
 
-**The `bottom-[calc(15dvh+8px)]` default in the same file is the mobile planner drawer's collapsed snap
-point, written out by hand.** `DRAWER_SNAP.COLLAPSED` in [`pages/planner/ManagementBar.tsx`](./pages/planner/ManagementBar.tsx) is `0.15` and
-nothing keeps them in step: change the snap point and the donate button either rides on top of the drawer
-or floats away from it. The marketing page already overrides the whole value with `bottomClassName`, which is
-the seam a fix would use: the planner layout passing its own offset, rather than a shared component holding
-one screen's number as its default.
+**`Donate` takes its bottom offset from its caller and holds none of its own.** `bottomClassName` is required:
+the marketing page passes `bottom-3 md:bottom-4`, and the planner layout passes `bottom-[calc(15dvh+8px)] md:bottom-4`,
+the mobile drawer's collapsed snap point (`DRAWER_SNAP.COLLAPSED`, `0.15`, in
+[`pages/planner/ManagementBar.tsx`](./pages/planner/ManagementBar.tsx)) written out as a class, since Tailwind
+reads literals only. The planner layout's test fails when the two drift apart.

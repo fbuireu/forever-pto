@@ -5,7 +5,7 @@ test("landing page renders", async ({ page }) => {
 	await expect(page).toHaveTitle(/Forever PTO/);
 });
 
-test("Button island hydrates and lifts on hover with app tokens", async ({ page }) => {
+test("Button demo carries a shadow and lifts on hover", async ({ page }) => {
 	await page.goto("/design-system/components/button/");
 	const button = page.locator('[data-slot="button"]').first();
 	await expect(button).toBeVisible();

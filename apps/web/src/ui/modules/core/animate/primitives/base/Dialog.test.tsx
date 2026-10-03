@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import type { ComponentProps, ReactElement, ReactNode } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 type MotionDivProps = ComponentProps<"div"> & {
 	initial?: unknown;
@@ -101,7 +101,7 @@ const renderDialog = ({ open, defaultOpen, onOpenChange, asChild }: RenderDialog
 			<DialogTrigger asChild={asChild}>{asChild ? <a href="/settings">settings</a> : "settings"}</DialogTrigger>
 			<DialogPortal>
 				<DialogBackdrop />
-				<DialogPopup className="modal" from="bottom">
+				<DialogPopup className="modal">
 					<DialogHeader>
 						<DialogTitle>Title</DialogTitle>
 						<DialogDescription>Body</DialogDescription>
@@ -118,6 +118,10 @@ const body = () => screen.queryByText("Body");
 const slot = (name: string) => document.querySelector(`[data-slot="${name}"]`) as HTMLElement | null;
 
 describe("Dialog", () => {
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
 	it("keeps the portal empty until the primitive reports an open, then mounts it", () => {
 		renderDialog();
 		expect(body()).toBeNull();
@@ -188,12 +192,6 @@ describe("Dialog", () => {
 		expect(JSON.parse(popup.dataset.transition ?? "{}")).toEqual({ duration: 0.2, ease: "easeInOut" });
 	});
 
-	it("keeps the from prop to itself rather than leaking it onto the element", () => {
-		renderDialog({ defaultOpen: true });
-
-		expect((slot("dialog-popup") as HTMLElement).getAttribute("from")).toBeNull();
-	});
-
 	it("lets the caller replace the popup's and the backdrop's transitions", () => {
 		render(
 			<Dialog defaultOpen>
@@ -226,10 +224,8 @@ describe("Dialog", () => {
 	});
 
 	it("refuses a portal outside Dialog, since it has no open state to read", () => {
-		const error = vi.spyOn(console, "error").mockImplementation(() => {});
+		vi.spyOn(console, "error").mockImplementation(() => {});
 
 		expect(() => render(<DialogPortal />)).toThrow("useContext must be used within DialogContext");
-
-		error.mockRestore();
 	});
 });

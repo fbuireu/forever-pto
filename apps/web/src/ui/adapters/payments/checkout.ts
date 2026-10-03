@@ -1,15 +1,12 @@
-import type { CreatePaymentInput } from "@application/dto/payment/schema";
+import { type CreatePaymentInput, promoCodeErrorCodeSchema } from "@application/dto/payment/schema";
 import type { DiscountInfo } from "@application/dto/payment/types";
 import { activationFailureSchema, type PremiumSession, premiumSessionSchema } from "@application/dto/premium/schema";
 import { logClient } from "@application/shared/utils/clientLog";
 import { emailDomain } from "@application/shared/utils/redact";
 import { createPaymentAction } from "@infrastructure/actions/payment";
-import { PaymentError, PromoCodeError, PromoCodeErrors } from "@infrastructure/errors";
+import { PaymentError, PromoCodeError } from "@infrastructure/errors";
 import type { Stripe, StripeElements } from "@stripe/stripe-js";
 import { Effect } from "effect";
-import { z } from "zod";
-
-const promoCodeErrorCodeSchema = z.enum(PromoCodeErrors);
 
 interface InitializePaymentResult {
 	clientSecret: string;
@@ -78,7 +75,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
 					message: "Payment confirmation resolved without a payment intent",
 					context: {
 						emailDomain: emailDomain(email),
-						returnUrl,
+						url: returnUrl,
 					},
 				}),
 			);
@@ -141,7 +138,7 @@ export const confirmPayment = async (params: ConfirmPaymentParams): Promise<Conf
 					error,
 					context: {
 						emailDomain: emailDomain(email),
-						returnUrl,
+						url: returnUrl,
 					},
 				}),
 			);

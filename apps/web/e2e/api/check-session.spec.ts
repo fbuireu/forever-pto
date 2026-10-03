@@ -1,3 +1,4 @@
+import { ApiError } from "@infrastructure/api/errors";
 import { expect, test } from "@playwright/test";
 
 const URL = "/api/check-session";
@@ -22,7 +23,7 @@ test.describe("POST /api/check-session", () => {
 		const response = await request.post(URL, { data: { premiumKey: "pi_test" } });
 		expect(response.status()).toBe(400);
 		const body = await response.json();
-		expect(body.error).toBe("email_required");
+		expect(body.error).toBe(ApiError.EMAIL_REQUIRED);
 	});
 
 	test("returns 400 when email has no associated payment", async ({ request }) => {

@@ -1,13 +1,29 @@
+import ca from "@i18n/messages/ca.json";
+import de from "@i18n/messages/de.json";
 import en from "@i18n/messages/en.json";
-import { render, screen } from "@testing-library/react";
-import { NextIntlClientProvider } from "next-intl";
+import es from "@i18n/messages/es.json";
+import fr from "@i18n/messages/fr.json";
+import itMessages from "@i18n/messages/it.json";
+import { USER_COUNTRY_COOKIE } from "@infrastructure/proxy/cookie";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { type Locale, NextIntlClientProvider } from "next-intl";
 import { describe, expect, it, vi } from "vitest";
 import { CookieConsentDialog } from "./CookieConsentDialog";
 import { COOKIE_SECTIONS } from "./config/config";
 
-const renderDialog = () =>
+vi.mock("@infrastructure/proxy/cookie", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@infrastructure/proxy/cookie")>()),
+	USER_COUNTRY_COOKIE: "visitor-country",
+}));
+
+interface RenderDialogParams {
+	locale?: Locale;
+	messages?: typeof en;
+}
+
+const renderDialog = ({ locale = "en", messages = en }: RenderDialogParams = {}) =>
 	render(
-		<NextIntlClientProvider locale="en" messages={en}>
+		<NextIntlClientProvider locale={locale} messages={messages}>
 			<CookieConsentDialog
 				open
 				onOpenChange={vi.fn()}
@@ -23,6 +39,11 @@ const renderDialog = () =>
 	);
 
 const SERVICES = COOKIE_SECTIONS.flatMap((section) => section.services ?? []);
+
+const openEveryDetailsPanel = (messages = en) => {
+	const triggers = screen.getAllByRole("button", { name: (name) => name.startsWith(messages.cookies.cookieDetails) });
+	for (const trigger of triggers) fireEvent.click(trigger);
+};
 
 describe("CookieConsentDialog", () => {
 	it("names every section switch after the section it turns off", () => {
@@ -52,5 +73,49 @@ describe("CookieConsentDialog", () => {
 		});
 
 		expect(nameless).toEqual([]);
+	});
+
+	it("lists the Country cookie under the name the edge writes it by", async () => {
+		renderDialog();
+		openEveryDetailsPanel();
+
+		expect(await screen.findByText(USER_COUNTRY_COOKIE)).toBeTruthy();
+	});
+});
+
+describe("CookieConsentDialog lifetimes", () => {
+	const BUNDLES: Record<Locale, typeof en> = { en, es, ca, it: itMessages, de, fr };
+	const COOKIES = COOKIE_SECTIONS.flatMap((section) => [
+		...(section.cookies ?? []),
+		...(section.services ?? []).flatMap((service) => service.cookies),
+	]);
+
+	const lifetimeOf = (name: string) => screen.getByText(name).nextElementSibling?.textContent ?? "";
+
+	it("prints how long each cookie lives, the count included", async () => {
+		renderDialog();
+		openEveryDetailsPanel();
+		await screen.findByText(USER_COUNTRY_COOKIE);
+
+		expect(lifetimeOf(USER_COUNTRY_COOKIE)).toBe("1 week");
+		expect(lifetimeOf("cc_cookie")).toBe("6 months");
+		expect(lifetimeOf("__stripe_sid")).toBe("30 minutes");
+		expect(lifetimeOf("_ga")).toBe("2 years");
+		expect(lifetimeOf("_bs_sid")).toBe(en.cookies.session);
+	});
+
+	it.each(Object.entries(BUNDLES))("prints every %s lifetime whole, with its count", async (locale, messages) => {
+		renderDialog({ locale: locale as Locale, messages });
+		openEveryDetailsPanel(messages);
+		await screen.findByText(USER_COUNTRY_COOKIE);
+
+		expect(COOKIES.length).toBeGreaterThan(0);
+		for (const cookie of COOKIES) {
+			const lifetime = lifetimeOf(cookie.name);
+
+			expect(lifetime).not.toMatch(/[{}]|cookies\./);
+			if (cookie.expiryKey === "session") expect(lifetime).toBe(messages.cookies.session);
+			else expect(lifetime.startsWith(`${cookie.expiryCount} `)).toBe(true);
+		}
 	});
 });

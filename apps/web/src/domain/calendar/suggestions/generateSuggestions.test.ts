@@ -1,27 +1,22 @@
 import type { HolidayDTO } from "@application/dto/holiday/types";
 import { HolidayVariant } from "@application/dto/holiday/types";
+import { FilterStrategy } from "@domain/calendar/types";
+import { clearDateKeyCache, clearHolidayCache } from "@domain/calendar/utils/cache";
+import { findPlanningCandidates } from "@domain/calendar/utils/candidates";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { FilterStrategy } from "../types";
-import { clearDateKeyCache, clearHolidayCache } from "../utils/cache";
-import { findPlanningCandidates } from "../utils/candidates";
 import { generateSuggestions } from "./generateSuggestions";
 import { selectBridgesForStrategy } from "./utils/selectors";
 
-const planSuggestions = ({
-	ptoDays,
-	holidays,
-	allowPastDays,
-	months,
-	strategy,
-	removedDays,
-}: {
+interface PlanSuggestionsParams {
 	ptoDays: number;
 	holidays: HolidayDTO[];
 	allowPastDays: boolean;
 	months: Date[];
 	strategy: FilterStrategy;
 	removedDays?: Date[];
-}) =>
+}
+
+const planSuggestions = ({ ptoDays, holidays, allowPastDays, months, strategy, removedDays }: PlanSuggestionsParams) =>
 	generateSuggestions({
 		ptoDays,
 		strategy,
@@ -147,6 +142,7 @@ describe("generateSuggestions", () => {
 		(strategy) => {
 			const ptoDays = 5;
 			const result = planSuggestions({ ...BASE, ptoDays, strategy });
+			expect(result.days.length).toBeGreaterThan(0);
 			expect(result.days.length).toBeLessThanOrEqual(ptoDays);
 		},
 	);
@@ -175,11 +171,13 @@ describe("generateSuggestions", () => {
 		const covering = result.bridges?.filter(
 			(bridge) => bridge.startDate.getTime() <= removed.getTime() && removed.getTime() <= bridge.endDate.getTime(),
 		);
+		expect(result.bridges?.length).toBeGreaterThan(0);
 		expect(covering).toEqual([]);
 	});
 
 	it("caps to available workdays if ptoDays exceeds them", () => {
 		const result = planSuggestions({ ...BASE, ptoDays: 9999, strategy: FilterStrategy.GROUPED });
+		expect(result.days.length).toBeGreaterThan(0);
 		expect(result.days.length).toBeLessThanOrEqual(23);
 	});
 

@@ -1,6 +1,6 @@
 "use client";
 
-import "@styles/lazy/index.css";
+import "./driver.css";
 
 export function DriverStyles() {
 	return null;

@@ -21,14 +21,14 @@ export function WebMCP() {
 					execute: async () => ({
 						name: "Forever PTO",
 						description:
-							"Free PTO optimization tool that maximizes vacation days by combining PTO with public holidays and bridge days.",
+							"Free PTO optimization tool that makes the most of your PTO days by combining them with public holidays and bridges.",
 						features: [
 							"National and regional holiday detection",
-							"Bridge day optimizer",
+							"Bridge optimizer",
 							"Four strategies: Grouped, Optimized, Balanced, Main vacation",
 							"Custom holidays: add, edit, and delete national and regional holidays",
-							"Manual editing of suggested days off",
-							"Year selection and carryover months configuration",
+							"Manual editing of the suggested days",
+							"Year selection and carry-over months configuration",
 							"PTO accrual calculator",
 							"PTO vs salary calculator",
 							"Workday counter",

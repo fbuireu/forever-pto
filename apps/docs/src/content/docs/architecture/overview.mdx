@@ -14,7 +14,7 @@ Forever PTO is a Next.js App Router application organized into layers under `app
 | App | `apps/web/src/app/` | Next.js App Router: routes, layouts, API handlers, metadata, sitemap/robots. Composition only; see [routing](/architecture/routing/). |
 | Application | `apps/web/src/application/` | Data contracts (DTOs), Zustand stores, Effect use-cases, `next-intl` navigation glue (`apps/web/src/application/i18n/navigation.ts`), email templates and export generators. |
 | Domain | `apps/web/src/domain/` | Pure business logic: the calendar suggestion engine (`apps/web/src/domain/calendar/`) and payment domain events/handlers (`apps/web/src/domain/payment/`). |
-| Infrastructure | `apps/web/src/infrastructure/` | Everything that talks to the outside world: SDK clients, services, the proxy proxy helpers, the calculation Web Worker (`apps/web/src/infrastructure/workers/`), i18n runtime config and `.well-known` payloads. |
+| Infrastructure | `apps/web/src/infrastructure/` | Everything that talks to the outside world: SDK clients, services, the proxy helpers, the calculation Web Worker (`apps/web/src/infrastructure/workers/`), i18n runtime config and `.well-known` payloads. |
 | UI | `apps/web/src/ui/` | React modules (`apps/web/src/ui/modules/`), hooks, styles (`apps/web/src/ui/styles/`), assets and i18n message catalogs (`apps/web/src/ui/i18n/messages/`). |
 
 ## Dependency direction
@@ -33,11 +33,11 @@ either direction, so it is a measurement rather than a drawing.
 
 | from / to | `app` | `ui` | `application` | `domain` | `infrastructure` |
 | --- | --- | --- | --- | --- | --- |
-| `app` | | 82/16 | 8/6 | | 67/20 |
-| `ui` | | | 163/80 | 22/16 | 50/39 |
+| `app` | | 82/16 | 9/6 | | 68/20 |
+| `ui` | | | 172/80 | 25/19 | 52/41 |
 | `application` | | 1/1 | | 15/8 | 36/11 |
 | `domain` | | | 18/13 | | 12/3 |
-| `infrastructure` | | 7/2 | 34/24 | 7/5 | |
+| `infrastructure` | | 7/2 | 35/25 | 7/5 | |
 | `middleware.ts` | | | | | 5/1 |
 
 The same graph drawn, every arrow an `imports` edge that exists in the tree and its weight the count above. The
@@ -53,17 +53,17 @@ flowchart LR
   INFRA[infrastructure]
   MW[middleware.ts]
   APP -->|82| UI
-  APP -->|8| APPL
-  APP -->|67| INFRA
-  UI -->|163| APPL
-  UI -->|22| DOM
-  UI -->|50| INFRA
+  APP -->|9| APPL
+  APP -->|68| INFRA
+  UI -->|172| APPL
+  UI -->|25| DOM
+  UI -->|52| INFRA
   APPL -->|15| DOM
   APPL -->|36| INFRA
   APPL -.->|1, the known inversion| UI
   DOM -.->|18, ADR 0012| APPL
   DOM -.->|12, ADR 0003| INFRA
-  INFRA -->|34| APPL
+  INFRA -->|35| APPL
   INFRA -->|7| DOM
   INFRA -.->|7, via @i18n| UI
   MW -->|5| INFRA
@@ -85,18 +85,18 @@ figure said were not there:
   corrected: imports in a couple of files reach `apps/web/src/ui/i18n/messages/*.json` through the `@i18n`
   shorthand. The infrastructure guide said nothing there imports from `@ui/*`, which was true of the literal
   specifier and false of the layer.
-- **`application → ui` is a single import**, recorded as a known inversion in
-  `apps/web/src/application/AGENTS.md`. One is the number; a second is a regression.
+- **`application → ui` is a single import**, `stores/premium.ts` reaching `checkSession`, the known inversion
+  `apps/web/src/application/AGENTS.md` records. One is the number; the contract suite fails a second.
 
-The normative statements stay with the code, in the layer contracts, and this page links rather than restates
-them:
+The normative statements live in [`CODING_STANDARDS.md`](https://github.com/fbuireu/forever-pto/blob/main/CODING_STANDARDS.md), and this page links rather than restates them:
 
-- `apps/web/src/domain/AGENTS.md` enumerates exactly what the pure calendar context may import from outside
-  itself, and why the test for a fifth entry is the runtime rather than the layer.
-- `apps/web/src/application/AGENTS.md` carries the orchestration rules and the one `@ui/*` inversion.
-- `apps/web/src/infrastructure/AGENTS.md` carries what the outward-facing layer may reach back into.
-- `apps/web/src/ui/AGENTS.md` lists the short set of pure value helpers the UI may take from
-  `@domain/calendar`, and why it must not reach the planning engine itself.
+- Its *Tooling already enforces* section lists the import rules the contract suite holds the code to: what each
+  domain context may import from outside itself, what the application layer may not reach, and what the UI takes
+  from where. `apps/web/src/domain/AGENTS.md` says why the test for a new calendar entry is the runtime rather
+  than the layer.
+- `I1` to `I16` say how the outward-facing layer is built.
+- `U1` and `U2` list the pure value helpers the UI may take from `@domain/calendar` and the infrastructure seams
+  it may import, and why it must not reach the planning engine itself.
 
 Facts about the system that no import arrow carries, and that the old figure tried to put on one:
 
@@ -111,7 +111,7 @@ Which practices this tree takes from domain-driven design, which it takes in par
 
 ## An AGENTS.md per folder
 
-Per the repo's root `AGENTS.md`, every significant folder carries its own `AGENTS.md` describing what may be changed there and what its rules are; read it before touching the folder. Examples: `apps/web/src/domain/AGENTS.md` (layer rules and allowed imports), `apps/web/src/infrastructure/clients/AGENTS.md` (the Effect client pattern), `apps/web/src/application/stores/AGENTS.md` (store conventions). Those files are the source of truth for layer boundaries; this page summarizes them. `CONTEXT.md` is a different document and exists **only** at the repo root, where it is the domain glossary. A nested one is forbidden, because the name would be ambiguous.
+Per the repo's root `AGENTS.md`, every significant folder carries its own `AGENTS.md`: the folder's map, the couplings a change there has to carry, its runtime gotchas and its guardrails; read it before touching the folder. Examples: `apps/web/src/domain/AGENTS.md` (the two contexts and their imports), `apps/web/src/infrastructure/clients/AGENTS.md` (the Effect client pattern), `apps/web/src/application/stores/AGENTS.md` (the stores and what each persists). The rules a review holds each layer to are in [`CODING_STANDARDS.md`](https://github.com/fbuireu/forever-pto/blob/main/CODING_STANDARDS.md); this page summarizes them. `CONTEXT.md` is a different document and exists **only** at the repo root, where it is the domain glossary. A nested one is forbidden, because the name would be ambiguous.
 
 ## Path aliases
 
@@ -122,7 +122,6 @@ Declared in `apps/web/tsconfig.json` (`compilerOptions.paths`), not at the repo 
 
 | Alias | Target |
 | --- | --- |
-| `src/*` | `./src/*` |
 | `@app/*` | `./src/app/*` |
 | `@infrastructure/*` | `./src/infrastructure/*` |
 | `@domain/*` | `./src/domain/*` |

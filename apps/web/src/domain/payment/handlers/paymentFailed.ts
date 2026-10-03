@@ -1,9 +1,9 @@
+import type { PaymentFailedEvent } from "@domain/payment/events/types";
 import type { TursoService } from "@infrastructure/clients/db/turso/service";
 import type { DatabaseError } from "@infrastructure/errors";
 import { LoggerService } from "@infrastructure/logging/service";
 import { updatePaymentStatus } from "@infrastructure/services/payments/repository";
 import { Effect } from "effect";
-import type { PaymentFailedEvent } from "../events/types";
 
 export const handlePaymentFailed = (
 	event: PaymentFailedEvent,

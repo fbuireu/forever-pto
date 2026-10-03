@@ -2,622 +2,366 @@
 
 ## Purpose
 
-The planner screen: the month calendars, the Holiday tables, the Alternative switcher, the PTO
-budget readout and the analytics. This is where the product's whole surface lives, and, because the
-planner runs entirely in the browser ([ADR 0001](../../../../../../../adr/0001-planner-runs-in-the-browser.md)),
-where the loop of *filter changes → recalculation → repaint* actually closes.
+The planner screen: the month calendars, the Holiday tables, the Alternative switcher, the PTO budget readout
+and the analytics. The planner runs in the browser
+([ADR 0001](../../../../../../../adr/0001-planner-runs-in-the-browser.md)), so this is where the loop of
+*filter changes → recalculation → repaint* closes.
 
-Nothing here computes a Suggestion. [`CalendarList.tsx`](./CalendarList.tsx) asks `useCalculationsWorker` to run the engine
-off the main thread and every other component reads the result back out of the holidays store.
+Nothing here computes a Suggestion. [`CalendarList.tsx`](./CalendarList.tsx) asks `useCalculationsWorker` to run
+the engine off the main thread, and every other component reads the result back out of the holidays store.
 
 ## Sections
 
-`src/app/[locale]/(app)/planner/page.tsx` `dynamic()`-imports its components and renders them in
-this order; the layout adds [`SiteTitle.tsx`](./SiteTitle.tsx) and [`SiteSubtitle.tsx`](./SiteSubtitle.tsx) above them.
-`SiteTitle` is a server component but the year in it is not: [`SiteTitleYear.tsx`](./SiteTitleYear.tsx) is the client island that
-reads `year` off the filters store and animates it through `SlidingNumber`, which is why the heading is split
-in two rather than one component reading the store.
+`src/app/[locale]/(app)/planner/page.tsx` `dynamic()`-imports these components and renders them in this order;
+the layout adds [`SiteTitle.tsx`](./SiteTitle.tsx) and [`SiteSubtitle.tsx`](./SiteSubtitle.tsx) above them.
+`SiteTitle` is a server component and the year in it is [`SiteTitleYear.tsx`](./SiteTitleYear.tsx), the client
+island that reads `year` off the filters store and animates it through `SlidingNumber`, showing the year the server
+rendered with (`serverYear`) until the stores are ready.
 
 | Component | Role |
 | --- | --- |
 | [`HolidaysList.tsx`](./HolidaysList.tsx) | Tabs over [`HolidaysTable.tsx`](./holidays/HolidaysTable.tsx), one per Holiday Variant. The Custom tab is behind the Premium gate; the Regional tab is inert when the Region has no Holidays |
-| [`ManagementBar.tsx`](./ManagementBar.tsx) | Sticky host for [`PlannerPanel.tsx`](./PlannerPanel.tsx). On desktop it renders it inline; on mobile it renders it inside a `vaul` drawer, with [`PlannerPanelFixture.tsx`](./PlannerPanelFixture.tsx) as both its fixture and its fallback |
-| `CalendarList.tsx` | Expands the Planning Window for rendering (`planningWindowMonths`, from `@domain/calendar/window`), owns the Holiday fetch and the worker trigger. Renders one `Calendar` per month. It no longer *owns* the window: the trigger sends `{ year, carryOverMonths }` and the engine expands its own |
-| [`Legend.tsx`](./Legend.tsx) | Explains the day colours. Exports `Legend` *and* `LegendItems`, which `ManagementBar` reuses inside the mobile drawer |
-| [`Summary.tsx`](./Summary.tsx) | Metric cards plus the charts, all `dynamic()`-imported from here rather than from the route |
+| [`ManagementBar.tsx`](./ManagementBar.tsx) | Sticky host for [`PlannerPanel.tsx`](./PlannerPanel.tsx): inline on desktop, inside a `vaul` drawer on mobile, with [`PlannerPanelFixture.tsx`](./PlannerPanelFixture.tsx) as its skeleton fixture and fallback |
+| `CalendarList.tsx` | Owns the Holiday fetch and the worker trigger, and renders one `Calendar` per month of the Planning Window (`planningWindowMonths`, from `@domain/calendar/window`). The trigger sends `year` and `carryOverMonths`; the engine expands the window itself |
+| [`Legend.tsx`](./Legend.tsx) | Explains the day colours. Exports `Legend` and `LegendItems`, which `ManagementBar` reuses inside the mobile drawer |
+| [`Summary.tsx`](./Summary.tsx) | Metric cards and charts; the charts are `dynamic()`-imported from here rather than from the route |
 | [`Roadmap.tsx`](./Roadmap.tsx) | Feature map over `RadialNav` and `FeatureList` from `core/animate/components/` |
-| [`Contact.tsx`](./Contact.tsx) | The feedback prompt; opens [`shared/contact/ContactModal.tsx`](../../shared/contact/ContactModal.tsx) through [`shared/contact/LazyContactModal.tsx`](../../shared/contact/LazyContactModal.tsx), the one gate the footer button and the error page share: it downloads the modal only once it has been opened |
+| [`Contact.tsx`](./Contact.tsx) | The feedback prompt; opens [`shared/contact/ContactModal.tsx`](../../shared/contact/ContactModal.tsx) through [`shared/contact/LazyContactModal.tsx`](../../shared/contact/LazyContactModal.tsx), which the footer button and the error page share and which downloads the modal only once it has opened |
 
 ## Subdirectories
 
 | Directory | Contents |
 | --- | --- |
-| `calendar/` | [`calendar/Calendar.tsx`](./calendar/Calendar.tsx): one month grid, its selection modes, and nothing that knows what a planner is; [`calendar/usePlannerDayClick.tsx`](./calendar/usePlannerDayClick.tsx): the planner's click policy, which used to live inside it; [`calendar/utils/helpers.ts`](./calendar/utils/helpers.ts): `MODIFIERS_CLASS_NAMES` and `getDayClassNames`; [`calendar/utils/refusals.ts`](./calendar/utils/refusals.ts); [`calendar/CalendarListFixture.tsx`](./calendar/CalendarListFixture.tsx) |
-| `holidays/` | `holidays/HolidaysTable.tsx` plus [`holidays/components/`](./holidays/components): [`HolidayRow.tsx`](./holidays/components/HolidayRow.tsx), [`HolidayTableHeader.tsx`](./holidays/components/HolidayTableHeader.tsx), [`HolidayFormModal.tsx`](./holidays/components/HolidayFormModal.tsx) and the thin callers that configure it, [`DeleteHolidayModal.tsx`](./holidays/components/DeleteHolidayModal.tsx), and the Zod factory in [`holidays/components/schema.ts`](./holidays/components/schema.ts) |
+| `calendar/` | [`calendar/Calendar.tsx`](./calendar/Calendar.tsx): one month grid and its selection modes, and nothing that knows what a planner is; [`calendar/usePlannerDayClick.tsx`](./calendar/usePlannerDayClick.tsx): the planner's click policy; [`calendar/utils/helpers.ts`](./calendar/utils/helpers.ts): `MODIFIERS_CLASS_NAMES`, `getDayClassNames`, `getDayStateLabelKeys` and `isFromToObject`; [`calendar/utils/refusals.ts`](./calendar/utils/refusals.ts); [`calendar/CalendarListFixture.tsx`](./calendar/CalendarListFixture.tsx) |
+| `holidays/` | `holidays/HolidaysTable.tsx` plus [`holidays/components/`](./holidays/components): [`HolidayRow.tsx`](./holidays/components/HolidayRow.tsx), [`HolidayTableHeader.tsx`](./holidays/components/HolidayTableHeader.tsx), [`HolidayFormModal.tsx`](./holidays/components/HolidayFormModal.tsx) and the two callers that configure it, [`DeleteHolidayModal.tsx`](./holidays/components/DeleteHolidayModal.tsx), and the Zod factory in [`holidays/components/schema.ts`](./holidays/components/schema.ts) |
 | `summary/` | The charts, [`summary/MetricCard.tsx`](./summary/MetricCard.tsx), [`summary/SummaryFixture.tsx`](./summary/SummaryFixture.tsx) and [`summary/const.ts`](./summary/const.ts) |
-| `utils/` | [`utils/helpers.ts`](./utils/helpers.ts): Planning Window and calendar-grid construction, workday/weekend counting, and the `MONTHS_IN_YEAR` constant every `12 + carryOverMonths` on this screen is built from; [`utils/modifiers.ts`](./utils/modifiers.ts): the day predicates |
+| `utils/` | [`utils/helpers.ts`](./utils/helpers.ts): the month grid (`getCalendarDays`), the range counters (`calculateWorkdays`, `calculateWeekends`, `calculateHolidaysInRange`) and the Planning Window's month labels (`getWindowMonthLabels`); [`utils/modifiers.ts`](./utils/modifiers.ts): the day predicates |
 
-**Adding and editing a Holiday are one form, `HolidayFormModal`.** They were separate long components sharing
-their imports, the schema construction, the `useForm` setup, `handleClose`, the date-select narrowing, the
-whole refusal chain and both `FormField`s character for character. The duplication was already showing: the
-Edit modal imported a *second* translator, `tAdd = useTranslations('modals.addHoliday')`, and rendered the
-Add modal's copy for its labels, its placeholder, its footer **and** its refusals.
+**Adding and editing a Holiday are one form, `HolidayFormModal`.** `AddHolidayModal` and `EditHolidayModal` each
+supply an icon, a copy namespace and an `onCommit` bound to their own store action. `onCommit` answers the
+store's `HolidayOutcome`, or `null`, which is how Edit says nothing changed without the form knowing what an
+edit is. The field chrome reads `modals.addHoliday` in both modes.
 
-`Add` and `Edit` are ~35-line callers now: each supplies its icon, its copy namespace and an `onCommit` bound
-to its own store action. `onCommit` answers the store's `HolidayOutcome`, or **`null`**, which is how Edit
-says "nothing changed" without the shared form needing to know what an edit is. The field chrome is read
-from `modals.addHoliday` deliberately rather than accidentally; that namespace is now shared and the honest
-follow-up is renaming it, which costs an edit in every bundle.
+**The planner's click policy is `calendar/usePlannerDayClick.tsx`, not the calendar.** `Calendar` has three
+callers: `CalendarList` spends days, `HolidayFormModal` picks a date and `WorkdayCounterCalendarModal` picks a
+range. In `NONE` mode it calls `onDayToggle?.(date)` and ignores the answer; the hook wraps the `toggleDay`
+`CalendarList` hands it, gates on `premiumKey` and toasts the refusal that comes back.
 
-[`HolidayFormModal.test.tsx`](./holidays/components/HolidayFormModal.test.tsx) is the first test either modal has had: applied, a refusal with copy, a refusal
-without copy falling through to the generic error, and the `null` no-op.
-[`AddHolidayModal.test.tsx`](./holidays/components/AddHolidayModal.test.tsx) and
-[`EditHolidayModal.test.tsx`](./holidays/components/EditHolidayModal.test.tsx) drive both callers through the real
-form: what each hands its store action, including the window it is checked against, and that Edit answers `null` for
-a form submitted untouched.
-
-**The planner's click policy lives in `calendar/usePlannerDayClick.tsx`, not in the calendar.** `Calendar`
-serves several callers and only one of them is the planner: `CalendarList` picks days out of a plan,
-`HolidayFormModal` picks a single date and `WorkdayCounterCalendarModal` picks a range. The Premium gate and
-the refusal toast were written inside `Calendar.handleDayClick` anyway, so the modals paid for the
-premium store subscription, extra translators, `SupportButton`, `LockIcon`, `toast` and
-`DAY_REFUSAL_COPY` to reach a branch neither of them can take. `Calendar` now calls `onDayToggle?.(date)` in
-`NONE` mode and does nothing with the answer; the hook wraps the store action `CalendarList` already had.
-
-The policy is a handful of branches (no Premium, applied, a refusal with copy, a refusal without), and
-[`usePlannerDayClick.test.tsx`](./calendar/usePlannerDayClick.test.tsx) drives each one. It is the first test any of them has had; the component was
-526 lines and testing a toast through it meant mounting the whole grid.
-
-**Extracting it turned up a fifth branch that could never run**, and it is gone. `handleDayClick` warned
-`cannotSelectPastDays` when a day was past, not manual and not suggested, but `isPast(allowPastDays, …)`
-already returns `() => false` while past days are allowed, so that condition is *character for character*
-the one the render uses to set `disabled` on the cell's `<Button>`. A native disabled button fires no
-`onClick`. The translation keys behind it are deleted from every bundle.
-
-`calendar/utils/refusals.ts` holds both refusal mappings, and neither is a rule: the rules are in the store.
-`DAY_REFUSAL_COPY` is the reason-to-message-key map `Calendar` renders. `describeHolidayRefusal` is the same
-idea for the Holiday modals, written as a function rather than a table because its cases interpolate
-different values; it returns `null` for the one refusal that has no copy of its own, and both modals render
-their own generic error for that case. Adding a `HolidayRefusal` without a branch there is a compile error,
-which is the point: the modals used to hand-write the same chain and one refusal reached neither.
+`calendar/utils/refusals.ts` holds both refusal mappings; the rules are in the store. `DAY_REFUSAL_COPY` maps
+every `DayRefusal` to its toast keys, or to `null` for no toast, and is declared
+`satisfies Record<DayRefusal, …>`. `describeHolidayRefusal` does the same for the Holiday modals as a function,
+because its cases interpolate; it answers `null` for the one refusal with no copy of its own, which both modals
+render as their generic error. A refusal added without an entry is a compile error in either.
 
 ## Day classification
 
-`utils/modifiers.ts` exports curried predicates (`isHoliday`, `isSuggestion`, `isManuallySelected`,
-`isAlternative`, `isCustom`, `isNationalOrRegionalHoliday`, `isPast`, `isToday`, and the range family). `Calendar`
-builds them into one `modifiers` object and hands it to `getDayClassNames`, which looks each name up
-in `MODIFIERS_CLASS_NAMES`. Adding a day state therefore means an edit in each place: the predicate, the entry in
-`modifiers`, and the class-name entry under the same key.
+`utils/modifiers.ts` exports curried predicates (`isHoliday`, `isCustom`, `isSuggestion`, `isManuallySelected`,
+`isAlternative`, `isPast`, `isToday`, and the selection and range family). `Calendar` builds them into one
+`modifiers` object and hands it to `getDayClassNames`, which looks each name up in `MODIFIERS_CLASS_NAMES`.
+Adding a day state means an edit in each place: the predicate, the entry in `modifiers`, the class-name entry
+under the same key and, for a state a reader should hear, a row in `DAY_STATE_LABELS`, which appends it to the
+day's accessible name.
 
 **`Calendar` builds only the states it can answer for itself, and the caller supplies the rest.** Weekend,
-Holiday, Custom, national-or-regional, today, past and the whole range family come from what `Calendar`
-already has: `holidays`, `allowPastDays`, its own `today` and its own selection. The states that describe a
-*plan* (`suggested`, `alternative`, `manuallySelected`) arrive as a `dayStates` prop, which is a
-`Partial<Record<DayStateName, (date: Date) => boolean>>`. `CalendarList.tsx` builds them all from the
-holidays store; [`holidays/components/HolidayFormModal.tsx`](./holidays/components/HolidayFormModal.tsx) supplies `suggested` alone, so its
-single-date picker still shows which dates the plan has already spent;
-[`sidebar/components/WorkdayCounterCalendarModal.tsx`](../../sidebar/components/WorkdayCounterCalendarModal.tsx) supplies none.
+Holiday, Custom, today, past and the selection and range family come from `holidays`, `allowPastDays`, its own
+`today` and its own selection. The plan's states (`suggested`, `alternative`, `manuallySelected`) arrive through
+the `dayStates` prop: `CalendarList.tsx` builds all three from the holidays store,
+[`holidays/components/HolidayFormModal.tsx`](./holidays/components/HolidayFormModal.tsx) supplies `suggested`
+alone, so its date picker still shows which dates the plan has spent, and
+[`sidebar/components/WorkdayCounterCalendarModal.tsx`](../../sidebar/components/WorkdayCounterCalendarModal.tsx)
+supplies none. A caller that omits `dayStates` paints no plan state.
 
-That prop replaced a run of them: `currentSelection`, `alternatives`, `suggestion`, `previewAlternativeIndex`,
-`manuallySelectedDays` and `removedSuggestedDays`, and with them the store-type imports that gave a
-component described as knowing "nothing that knows what a planner is" the store's own vocabulary. It also
-removed a sentinel that worked by accident: `previewAlternativeIndex` defaulted to `-1`, and `isAlternative`
-resolved that as `alternatives[-2]`, `undefined`, `false`. No branch said so; the arithmetic happened to
-land outside the array. A caller that omits `dayStates` now paints no plan state because there is no
-predicate, which is a reason rather than a coincidence.
+Precedence inside `getDayClassNames` is not the object order:
 
-`getDayClassNames` therefore types `modifiers` as `Record<string, ((date: Date) => boolean) | undefined>`,
-and every lookup inside it was already an optional call.
-
-Precedence inside `getDayClassNames` is not the object order, and reading it as such will mislead you:
-
-1. The loop is skipped entirely when the date is in the `selectedDates` prop or the calendar is
-   `disabled`. The `selected` class is appended at the end instead, so it wins outright.
+1. The loop is skipped when the day is selected (single or multiple mode) or disabled; `selected` is appended
+   at the end instead, so it wins outright.
 2. `today` short-circuits the loop: when it matches, no other modifier class is applied.
-3. Otherwise every matching modifier contributes, in object-key order, except `inRange`, `rangeStart`
-   and `rangeEnd`, which are appended afterwards so a range boundary paints over a Holiday.
-4. A `disabled` calendar then adds `!opacity-20` / `!opacity-40`, which beats everything above.
+3. Otherwise every matching modifier contributes, in object-key order, except `inRange`, `rangeStart` and
+   `rangeEnd`, which are appended afterwards so a range boundary paints over a Holiday.
+4. A disabled day (the calendar's `disabled`, or a past day the plan does not hold) then adds `!opacity-20` /
+   `!opacity-40`, which beats everything above.
 
-Some modifiers carry no class of their own: `nationalOrRegionalHoliday` and `disabled` (which is `isPast`) exist only
-so `Calendar`'s click handler can branch on them. Adding an entry for either under the same key would
-silently start painting them.
+`disabled`, the bound `isPast({ allowPastDays, today })`, carries no class of its own: the render reads it for
+each cell's `disabled` attribute and `getDayClassNames` reads it for the past-day fade, so the rule has one
+author. A class entry under that key would paint every past day.
+[`calendar/utils/helpers.test.ts`](./calendar/utils/helpers.test.ts) drives the fade through the real `isPast`.
 
-**A mistyped key is a compile error now, and was not.** `MODIFIERS_CLASS_NAMES` was annotated
-`Record<string, string>` above its own `as const`, which widened the keys straight back and made every
-lookup, including `Legend`'s swatches, unchecked; a typo painted nothing, silently. The annotation is
-a `satisfies` now, so the keys stay literal. Typing them also exposed dead lookups: the quarter
-charts indexed the record by `Q1`…`Q4` and the pie chart's legend by a translated label, none of which can
-match a day state, so every one of them always fell through to `entry.color`, and a Tailwind class list is not a
-valid SVG `fill` in any case. The fall-throughs are gone.
+`MODIFIERS_CLASS_NAMES` is `as const satisfies Record<string, string>`, so its keys stay literal and a mistyped
+lookup is a compile error; the `Legend` swatches read the same record.
 
-`isAlternative` deliberately returns `false` for any date already in `currentSelection`: an Alternative
-is only ever painted where it *differs* from the applied Suggestion.
-
-**The past-day rule has one author, and it used to have more.** `isPast(allowPastDays, today)` is what
-`Calendar` binds as `modifiers.disabled` and what its click handler branches on. `getDayClassNames` used to
-take `allowPastDays` and `today` and recompute the same question for its `opacity-60` fade, with the left
-operand normalised differently (`startOfDay(date)` in one, the bare `date` in the other), agreeing only
-because `getCalendarDays` happens to emit midnight dates. It reads `modifiers.disabled?.(date)` now and both
-parameters are gone from `GetDayClassNamesParams`. [`calendar/utils/helpers.test.ts`](./calendar/utils/helpers.test.ts) drives that case
-through the real `isPast` rather than through the parameters, which is why it can tell the difference at
-all.
+`isAlternative` returns `false` for any date already in `currentSelection`, a required parameter: an
+Alternative is painted only where it differs from the applied Suggestion.
 
 ## Invariants
 
-**`CalendarList` also *clears* the plan, and that is the other half of the same effect.** Its trigger is
-gated on `ptoDays > 0 && holidays.length > 0 && months.length > 0`; when the gate closes the worker is never
-asked, and nothing else in the app nulls a Suggestion: `fetchHolidays` writes only `holidays` and `holidaysKey`, on both its
-success and its catch branch. So a Country whose Holidays fail to load, or a Region that has none, used to
-leave the previous Country's plan painted over a calendar that no longer existed, with no way to re-trigger
-a run. The effect now calls `clearCalculation()` when the gate closes **and** a Suggestion is still standing.
-The second condition matters: without it, the cold load (where the gate is also closed, because Holidays
-have not arrived yet) would clear a plan that was never there and mark the store as having calculated.
+**`CalendarList` also clears the plan.** Its trigger is gated on
+`ptoDays > 0 && holidays.length > 0 && months.length > 0` (`canCalculate`), and when that gate closes while a
+Suggestion stands, the effect calls `clearCalculation()`. `fetchHolidays` writes only `holidays` and
+`holidaysKey`, so without it a Country whose Holidays fail to load, or a Region with none, keeps the previous
+Country's plan painted. The Suggestion condition keeps the cold load, where the gate is also closed, from
+clearing a plan that was never there and marking the store as calculated. The pipeline itself does not need
+the `holidays.length > 0` term (see [`@application/stores/AGENTS.md`](../../../../application/stores/AGENTS.md));
+removing it changes when this clear fires as well as when a run starts.
 
-**Only `CalendarList.tsx` triggers a calculation, and only on the Holidays of the filters on screen.** It
-fires `triggerCalculation` on any change to year, PTO budget, Strategy, Preferred Months, past-days flag,
-locale or the Holiday list, and on `planRevision`, but only once `holidaysKey` in the holidays store names the
-same Country, Region, year, Carry-over Months and locale the filters do (`holidaysKeyOf`). Without that gate a
-year change planned twice, the first time on the previous year's Holidays, and so did every reload, on the
-persisted ones; `holidaysKey` is not persisted, so a reload waits for its first fetch. `planRevision` is the
-signal `setCurrentAlternativeSelection` bumps so that applying a plan re-plans it; see
-[`@application/stores/AGENTS.md`](../../../../application/stores/AGENTS.md). [`Troubleshooting.tsx`](../homepage/support/Troubleshooting.tsx), which now
-lives under `pages/homepage/support/`, is the one other caller and it goes the other way:
-`useHolidaysStore().generateSuggestions`, on the main thread. Those are the *UI* entry points; the
-callers [ADR 0006](../../../../../../../adr/0006-caller-owned-calculation-caches.md) counts are the ones that
-own the clear a level down (the Web Worker and the holidays store), and `CalendarList` reaches the first
-through `triggerCalculation` while `Troubleshooting` reaches the second directly. A further entry point added
-here would silently reuse the previous run's Holiday set and produce a wrong Suggestion with no error.
+**Only `CalendarList.tsx` triggers a calculation, and only on the Holidays of the filters on screen.** Its
+effect depends on year, Carry-over Months, PTO budget, Strategy, Preferred Months, the past-days flag, locale
+and `planRevision`, and on `triggerCalculation`, whose identity changes with the `holidays` and
+`maxAlternatives` that `useCalculationsWorker` selects. It fires only while `holidaysKey` in the holidays store
+names the Country, Region, year, Carry-over Months and locale the filters do (`holidaysKeyOf`); without that gate
+a year change plans once on the previous year's Holidays, and a reload on the persisted ones. `holidaysKey` is
+not persisted, so a reload waits for its first fetch. `planRevision` is the signal
+`setCurrentAlternativeSelection` and `resetManualSelection` bump so that applying or resetting a plan re-plans
+it; see [`@application/stores/AGENTS.md`](../../../../application/stores/AGENTS.md).
+[`Troubleshooting.tsx`](../homepage/support/Troubleshooting.tsx) is the one other caller: it runs the holidays
+store's `generateSuggestions` on the main thread. Both paths reach `runPlanningPipeline`, which clears the
+calculation caches on entry ([ADR 0006](../../../../../../../adr/0006-caller-owned-calculation-caches.md)).
 
-**`CalendarList` prunes hand-edited days when the Planning Window moves.** `pruneDaysOutsideWindow` runs on
-every change to `year` or `carryOverMonths`, before the calculation effect. Without it a Manual Day left in a
-year the user has navigated away from keeps counting against the budget (`remainingDays` here subtracts
-`manuallySelectedDays.length` unconditionally), so the allowance shrinks with no visible cause and only
-recovers on a reload, because the store's other caller is `onRehydrateStorage`.
+**`CalendarList` prunes Manual and Removed Days when the Planning Window moves.** `pruneDaysOutsideWindow` runs
+on every change to `year` or `carryOverMonths`, before the calculation effect. `measureBudget` counts every
+Manual Day, inside the window or not, so without it a Manual Day left in a year the user navigated away from
+keeps spending budget with no visible cause, until a reload runs the store's other caller,
+`onRehydrateStorage`.
 
-**Nothing renders real numbers before the stores rehydrate.** `CalendarList`, `ManagementBar` and
-`Summary` all gate on `useStoresReady()` and show a `<Skeleton>` until every persisted store reports
-hydrated. Rendering store values on the first pass produces a hydration mismatch, not just a flash.
+**Store-backed numbers wait for rehydration.** `CalendarList`, `ManagementBar`, `Summary` and `HolidaysList` gate
+on `useStoresReady()` and show a `<Skeleton>`, or nothing, until every persisted store reports hydrated;
+rendering store values on the first pass produces a hydration mismatch. The hook reports not ready on its first
+render, always, and raises the status in an effect: `obfuscatedStorage` is synchronous, so `hasHydrated()` is
+already `true` on the first client render, while the server rendered these `dynamic()` sections (no
+`ssr: false`) with empty stores. Seeding the hook from `hasHydrated()` would reproduce the mismatch.
+`SiteTitleYear` and the sidebar's `Years` gate `year` for another reason: it is not persisted, but it defaults to
+the clock's year at module load, which the prerendered HTML fixed at build time, so from New Year until the next
+deploy the client's first pass would disagree with that HTML. Both show the year the server rendered with until
+the stores are ready.
 
-What makes that gate work is that it reports **not ready on its first render, always**: never
-`store.persist.hasHydrated()` read during render. `obfuscatedStorage` is synchronous, so persist rehydrates
-while the store module is evaluating and `hasHydrated()` is already `true` by the first client render; these
-sections are `dynamic()`-imported without `ssr: false`, so the server renders them too, with an empty store.
-Seeding the hook's state from `hasHydrated()` therefore made the server emit defaults and the first client
-render emit the persisted values, the exact mismatch the gate exists to prevent, with the skeleton never
-shown. The status is seeded `false` and raised in an effect, so both sides agree on the first pass.
-
-**Premium is a store read, never a prop.** `PremiumFeature` from `@ui/modules/premium` wraps the gated
-parts (the Custom Holiday tab, row editing, the advanced charts) and `Calendar` checks `premiumKey`
-directly before honouring a day click. Access is derived from the payment record
-([ADR 0008](../../../../../../../adr/0008-premium-derived-from-payment.md)), so there is no boolean to
-thread through props and no point caching one.
-
-**And `PremiumFeature` already answers "is this user a donor" for itself, so no caller re-asks.**
-Its first statement is `if (premiumKey) return <>{children}</>`, which is the whole of the gate.
-`holidays/HolidaysTable.tsx` used to read `premiumKey` from the store and wrap each `PremiumFeature` in a
-`ConditionalWrapper doWrap={!premiumKey}`, a second copy of the same predicate, evaluated a render earlier,
-which meant the gate could be opened by either read of one store field. The wrapper, the prop it
-threaded to `HolidayCard`, the store read and the memo dependency are gone. `ConditionalWrapper` itself
-stays: `calendar/Calendar.tsx` and [`sidebar/components/PtoSalaryCalculator.tsx`](../../sidebar/components/PtoSalaryCalculator.tsx) use it for wrappers that
-have no such short-circuit of their own.
+**`PremiumFeature` from `@ui/modules/premium` wraps the gated parts** (the Custom Holiday tab, the row
+checkboxes, the advanced charts) and renders its children as soon as `premiumKey` is set;
+`calendar/usePlannerDayClick.tsx` reads `premiumKey` before a day click reaches the store. Access is derived
+from the payment record ([ADR 0008](../../../../../../../adr/0008-premium-derived-from-payment.md)).
 
 ## Gotchas
 
-**A Quarter here is a Quarter of the Planning Window, so the default plan shows more of them than a
-calendar year has and `Q5` is not a bug.** `QuarterDistributionChart` and `BlocksPerQuarterChart` both label their bars `Q${index + 1}`
-over an array the engine sizes with `windowQuarterCount`, which is `ceil((12 + carryOverMonths) / 3)`. The
-default Carry-over Month count is 1, so the default window already runs past the calendar year, and the
-bucket count grows with it up to `MAX_CARRY_OVER_MONTHS`. Both charts already read the array's length
-rather than a calendar-year literal, and
-the copy already says *of your planning window*; what was missing was the word in
-[`CONTEXT.md`](../../../../../../../CONTEXT.md), which now defines Quarter and says it is not a calendar
-quarter. Do not "fix" either chart to calendar quarters, and do not relabel them with month names: the count is
-correct and the glossary is where the question is answered.
+**A Quarter here is a Quarter of the Planning Window, so `Q5` is not a bug.** `QuarterDistributionChart` and
+`BlocksPerQuarterChart` label their bars `Q${index + 1}` over the array the engine sizes with
+`windowQuarterCount`, `ceil((12 + carryOverMonths) / 3)`. The default Carry-over Month count is 1, so the
+default window already holds five. [`CONTEXT.md`](../../../../../../../CONTEXT.md) defines Quarter.
 
-**`pointer-events-none` blocks the mouse and nothing else, so the mid-calculation guard had to move into
-the handler.** `CalendarList.tsx` expressed "a run is in flight" as `isCalculating && "pointer-events-none"`
-on the grid. That removes hit-testing; it does not remove the day buttons from the tab order and does not
-stop Enter or Space firing `click` on a focused one, so the guard did not apply to keyboard users at all.
-What the race produces is specific and silent, and worth knowing before anyone loosens it:
+**`CalendarList`'s `toggleDay` answers `DayRefusal.PLAN_IN_FLIGHT` while a calculation runs**, before the store
+is reached. The grid's `pointer-events-none` during `isCalculating` stops the mouse and not Enter or Space on a
+focused day. The race the refusal closes is silent:
 
-- Removing a Suggested Day mid-run appends to `removedSuggestedDays`, and `setCalculationResult` clears that
-  array unconditionally when the worker answers. The removal is discarded and the day comes back.
-- Adding a Manual Day mid-run appends to `manuallySelectedDays`, which `setCalculationResult` does *not*
-  clear, while the request already in flight was posted with the older list and with `autoSuggestCount`
-  computed from it. The arriving plan therefore spends the full budget alongside a Manual Day it never knew
-  about, and the total spend can exceed `ptoDays`. See the budget-cap notes in
-  [`../../../AGENTS.md`](../../../AGENTS.md).
+- Removing a Suggested Day mid-run appends to `removedSuggestedDays`, which `setCalculationResult` clears when
+  the worker answers: the removal is discarded and the day comes back.
+- Adding a Manual Day mid-run appends to `manuallySelectedDays`, which `setCalculationResult` does not clear,
+  while the request in flight was posted with the older list and an `autoSuggestCount` computed from it: the
+  arriving plan spends the full budget beside a Manual Day it never saw, and the total can exceed `ptoDays`. See
+  the budget-cap notes in [`../../../AGENTS.md`](../../../AGENTS.md).
 
-`toggleDay` answers `DayRefusal.PLAN_IN_FLIGHT` while `isCalculating`, so the store is never reached. The
-`Calendar` component's own `disabled` prop was rejected for this: it reaches every day button and a focused
-button that becomes disabled drops focus to `<body>`, on every recalculation, which is worse than the bug.
-`PLAN_IN_FLIGHT` maps to `null` in `calendar/utils/refusals.ts` like `NO_PLAN`, because the live region
-below already says what is happening and a toast per keypress would not.
+The `Calendar`'s own `disabled` prop is not the guard: it reaches every day button, and a focused button that
+becomes disabled drops focus to `<body>` on every recalculation. `PLAN_IN_FLIGHT` maps to `null` in
+`calendar/utils/refusals.ts`, like `NO_PLAN`, because the live region already says a run is in progress.
 
-**The planner had no live region at all, and several states were therefore silent.** `aria-live` across
-`src/ui` returned hits only in `premium/CheckoutForm.tsx`, and `role="status"` only the remaining-budget
-readout in `PlannerPanel.tsx`. More exist now:
-
-- `CalendarList.tsx` carries `aria-busy` on the grid and an `sr-only` `role="status"` that says
-  `a11y.calculating` during a run and `a11y.planUpdated` once one has completed. A budget change used to
-  repaint every calendar with nothing announced.
-- `ManagementBar.tsx` announces `a11y.noPlan` when `isSettledEmpty`, which used to render nothing at all, so
-  a reader could not tell a finished-and-empty run from a broken page.
-
-**`sidebar/components/PtoDays.tsx` deliberately did *not* get one.** It renders the same remaining figure as
-`PlannerPanel`'s `Status`, and both are on screen together on desktop; a second live region over one number
-means every change is announced twice. Its `role="img"` + `aria-label` spans name the numbers without
-speaking. One readout is live, and it is the one inside the panel.
+**Each fact has one live region.** `CalendarList.tsx` carries `aria-busy` on the grid and an `sr-only`
+`role="status"` that says `a11y.calculating` during a run and `a11y.planUpdated` after one; `ManagementBar.tsx`
+announces `a11y.noPlan` when `isSettledEmpty`; `Status` in `PlannerPanel.tsx` holds the Remaining Budget's
+`role="status"`. [`sidebar/components/PtoDays.tsx`](../../sidebar/components/PtoDays.tsx) renders the same number
+beside it on desktop and is deliberately not live: each number is `sr-only` text after its visible label, read
+where the reader reaches it, so a change is announced once.
 
 **The mobile drawer is a `region`, not a `dialog`.** `ManagementBar.tsx` mounts vaul with
-`modal={false} dismissible={false} open={!openMobile}`, so what `DrawerContent` rendered was a `role="dialog"`
-that is permanently open, cannot be dismissed and has no close button: promises a dialog makes and this
-element keeps none of. It passes `role="region"` through to `DrawerPrimitive.Content`, which works because
-Radix writes its own `role="dialog"` *before* spreading `contentProps`. No `aria-label` goes with it: Radix
-also sets `aria-labelledby` ahead of the spread, pointing at the `DrawerTitle` this file already renders, and
-`aria-labelledby` wins over `aria-label`. Its snap geometry is a separate decision recorded above; leave it
-alone.
+`modal={false} dismissible={false} open={!openMobile}`: always open, never dismissed, no close button. It
+passes `role="region"` through to `DrawerPrimitive.Content`, which works because Radix writes its own
+`role="dialog"` before spreading `contentProps`. No `aria-label` goes with it: Radix also sets `aria-labelledby`
+ahead of the spread, pointing at the `DrawerTitle` this file renders, and `aria-labelledby` wins.
 
-**`Legend.tsx` is a real disclosure now, and used to be an invisible checkbox with no name.** The card is a
-CSS-only toggle: an `<input type="checkbox">` with `opacity: 0; pointer-events: none` driving
-`.toggle:checked ~ .section`, and a `<label>` that is `display: none` until the scroll-state container query
-promotes it. `pointer-events: none` does not remove an input from the tab order and a `display: none` label
-contributes nothing to an accessible name, so a keyboard user landed on an invisible control announced as
-"checkbox, not checked", and Space expanded a card elsewhere with no announcement. A checkbox is the wrong
-role for a disclosure besides.
+**`Legend.tsx` is a disclosure.** A `<button aria-expanded aria-controls>` whose text names the state toggles
+`.section.expanded`; the button stays `display: none`, and so out of the tab order, until the stuck container
+query promotes it. The collapsed content stays readable (`grid-template-rows: 0fr` clips it rather than hiding
+it), because only the container query knows whether the card is stuck.
 
-It is a `'use client'` component with a `useState` and a `<button aria-expanded aria-controls>` whose text is
-the label, so the name changes with the state rather than through paired spans and a CSS swap. The button keeps
-`display: none` until the container query promotes it, which is what removes the phantom tab stop: a
-`display: none` button is not focusable. `.toggle:checked ~ .section` became `.section.expanded`; the
-`@container` nesting inside it is unchanged. `aria-expanded` reports the button, and the collapsed content
-stays readable (`grid-template-rows: 0fr` clips it rather than hiding it), which is deliberate: only the
-container query knows whether the card is stuck, and JavaScript here does not.
+**The Legend's stuck state is CSS alone.** [`legend.module.css`](./legend.module.css) declares
+`container-type: scroll-state` on `.sticky_container` and styles the compact form under
+`@container pto-legend scroll-state(stuck: bottom)`. A fallback for browsers without `scroll-state()` belongs
+beside `Legend.tsx`, with a CSS rule that consumes it, not in another component reaching in by DOM id.
 
-**`Calendar` is not a grid, and the `role="grid"` it used to declare was the only ARIA the pattern got.**
-There was no `role="row"`, no `role="gridcell"`, no `columnheader` (the weekday strip is a sibling
-*outside* the day container) and, more to the point, no grid keyboard model: a grid promises arrow-key
-navigation between cells, and every cell here is an ordinary `<button>` in the tab order. Implementing the
-pattern would have meant grouping `getCalendarDays`' flat 42 into weeks, moving the header inside, and
-writing roving focus, for a widget that already gives every day a complete accessible name:
-`Monday, June 1, 2026`, with the Holiday appended. So the role is gone along with its suppression, and the
-labelled buttons stand. The container's `aria-label` went with it: it named the month, which is in every
-button's own name already, and `aria-label` on a role-less `div` is ignored. Reintroducing any of it means
-implementing the whole pattern, and [`calendar/Calendar.test.tsx`](./calendar/Calendar.test.tsx) fails on a bare grid role.
+**The sticky container never changes height, which is what stops the Legend flickering at the edge.** The
+compact stuck form is shorter than the open card, and a `bottom: 0` sticky box unsticks once its natural bottom
+rises into view, so a card that shrank on sticking would toggle every frame inside a band as tall as the
+difference. `Legend.tsx` renders an inert, `aria-hidden`, invisible copy of the open card (`.ghost`, no toggle)
+in the same grid cell as the real one (`.live`), so the container keeps the open height; only `.live` answers
+the stuck query, and the container passes pointer events through everywhere but the card. The copy is not dead
+markup.
 
-**The month header is one block, not one per `showNavigation` branch.** The branches rendered a
-character-identical `<h3>` and a Free Day count that differed only by `font-black` against `font-semibold`,
-with nothing distinguishing them, and since `CalendarList` passes no `showNavigation`, `font-semibold` is
-what the product shows on every month calendar while `font-black` reached the modals alone. The title
-and the count are hoisted out; `showNavigation` now decides only whether the prev/today/next controls
-render. Keep it that way: a second fork here is how the first drift happened.
+**`Calendar` is not a grid.** It declares no `grid`, `row`, `gridcell` or `columnheader` role and has no roving
+focus: every day is a `<button>` in the tab order, named with its full date, its Holiday and its plan state.
+[`calendar/Calendar.test.tsx`](./calendar/Calendar.test.tsx) fails on a bare grid role.
 
-**`today` is state initialised to `null`, not `new Date()`.** `Calendar` sets it in an effect on
-mount. The server has no "today" that will still be true on the client, so the first paint has no
-today marker and no past-day dimming on purpose. Every predicate taking `today` handles `null`.
+**The month header is one block.** The title and the month's Holiday count render once; `showNavigation` decides
+only whether the previous, today and next controls render.
 
-**The remaining-days counter freezes during a recalculation, and one module owns the freeze.**
-`@ui/hooks/usePlanReadout` keeps a `lastSettledRemaining` ref updated by an effect *with no dependency
-array*: it runs every render and snapshots the value only while `isCalculating` is false. That looks like a
-mistake and is not: without it the budget readout drops to zero for the length of every worker round-trip.
+**`today` is state initialised to `null`, not `new Date()`.** `Calendar` sets it in an effect on mount, so the
+first paint has no today marker and no past-day fade, and server and client agree. Every predicate taking
+`today` handles `null`.
 
-`Status` in `PlannerPanel.tsx` and [`sidebar/components/PtoDays.tsx`](../../sidebar/components/PtoDays.tsx) each held their own copy of that ref,
-that effect, that `useShallow` subscription and that `measureBudget` call: the same statements duplicated, and this
-paragraph was the only thing keeping them in step. They had already drifted in a small way: one passed
-`currentSelection.days`, the other `currentSelection?.days`. Both read fields off the hook now, and the
-freeze is pinned by [`usePlanReadout.test.ts`](../../../hooks/usePlanReadout.test.ts) rather than by the sentence you are reading. A further readout
-gets the frozen number by construction.
+**The Remaining Budget readout freezes during a recalculation, and `@ui/hooks/usePlanReadout` owns the freeze.**
+It holds `lastSettledRemaining` in state and updates it during render only while `isCalculating` is false, so
+the readout does not drop to zero for every worker round trip. `Status` in `PlannerPanel.tsx` and
+[`sidebar/components/PtoDays.tsx`](../../sidebar/components/PtoDays.tsx) both read it, and the number is
+`measureBudget`'s, the rule `toggleDaySelection` consults before spending a day.
 
-**Neither of them computes that number.** The Remaining Budget comes from `measureBudget` in
-`@domain/calendar/utils`, which is also what `toggleDaySelection` consults before spending a day, so the
-readout and the rule that refuses a day cannot drift. Subtracting `days.length` and `manuallySelectedDays.length`
-by hand is how they drifted before, and it also skipped `resolveSelectedDays`, which is the count Efficiency
-is measured against.
+**"No plan" is not "still loading", and `ManagementBar` keeps them apart.** `isReady` needs a Suggestion and an
+applied selection with days in them. `isSettledEmpty` is stores hydrated, a calculation completed at least once
+(`hasCalculated`, set by `setCalculationResult` and `clearCalculation`, not persisted), nothing in flight, and
+still not ready; the panel then renders nothing rather than a skeleton that never resolves. Every term is
+needed: without `hasCalculated` the cold load qualifies, because `isCalculating` is a worker-only flag the
+Holiday fetch never raises.
 
-**"No plan" is not "still loading", and `ManagementBar` keeps them apart.** Its `isReady` requires a
-Suggestion with days in it, so a run that legitimately produces nothing (a past year with the past-days
-switch off, which is the default and is Premium-gated, so a free user cannot even turn it on) used to leave
-the desktop panel as a `<Skeleton loading>` and the mobile drawer as a bare pulse, for ever. `isSettledEmpty` is the distinction, and every one of its terms is load-bearing: stores hydrated, a
-calculation has completed at least once (`hasCalculated`, set by `setCalculationResult` and not persisted),
-nothing in flight, and still no plan. Without `hasCalculated` the cold load qualifies: `isCalculating` is a
-worker-only flag that the Holiday fetch never raises, so the window between hydration and the first run
-looked "settled" and the panel vanished on every visit. The panel is then not rendered at all
-rather than pretending to load. What it *should* say instead is an open copy question; showing nothing is
-merely the honest floor.
+**The mobile drawer header reads `previewAlternativeIndex`, not `currentSelectionIndex`.** The figures beside it
+come from `allSuggestions[previewAlternativeIndex]`, and the label names the index the figures are read from.
 
-**The mobile drawer header reads `previewAlternativeIndex`, not `currentSelectionIndex`.** The numbers
-beside it, Effective Days and Efficiency, come from `allSuggestions[previewAlternativeIndex]`, so labelling
-them with the *applied* index meant that paging through Alternatives showed "Option 1" above Option 3's
-figures. Whatever index the metrics are read from is the one the label has to name.
+**`PlannerPanel` is remounted by `key={previewAlternativeIndex}`**, so the entry animations replay when the user
+pages through Alternatives. Any state inside it is discarded on every Alternative change, which is why
+`Alternatives` reads the store's index through `selectedIndex` and keeps none of its own. `onPreviewChange`
+takes an index and `ManagementBar` hands the store `{ index }` (`AlternativePreviewParams`);
+`onSelectionChange` passes the Suggestion too, because `setCurrentAlternativeSelection` applies it.
 
-**`PlannerPanel` is remounted by `key={previewAlternativeIndex}`.** `ManagementBar` does this so the
-entry animations replay when the user pages through Alternatives. Any state added inside `PlannerPanel`
-is therefore discarded on every Alternative change.
-
-**Which is why `Alternatives` holds no index of its own.** It used to keep `useState(selectedIndex)` and
-write it in both handlers *beside* calling `onPreviewChange`, which reaches the store; the remount above then
-re-seeded that state from the prop. The local copy could never hold a value the store did not, so it was a
-second source of truth that happened to agree. `currentIndex` is `selectedIndex` now, and
-[`PlannerPanel.test.tsx`](./PlannerPanel.test.tsx) pins both halves: a click round-trips through a stand-in store, and a change to
-`selectedIndex` with no click still moves the readout. Dead `= 0` defaults sat on props the same
-interface declared required; they are gone too.
-
-**`onPreviewChange` takes an index, not an `AlternativeSelectionBaseParams`.** The store's
-`setPreviewAlternativeSelection` destructures `{ index }` and ignores `suggestion`, so the component was
-looking up `allSuggestions[newIndex]` to hand over a value nothing read, and paying for it in the handlers'
-dependency arrays. `ManagementBar` passes `{ suggestion: null, index }` at the store seam because the shared
-param type still requires the field; narrowing that type belongs with the store, not here.
-`onSelectionChange` is unchanged, because `setCurrentAlternativeSelection` genuinely uses the Suggestion.
-
-**`PlannerPanel` no longer takes `currentSelection`.** It destructured the prop and never referenced it,
-while `ManagementBar` computed a `currentSelection ?? allSuggestions[currentSelectionIndex]` fallback to
-supply it. Both are gone; the panel's props are exactly `Alternatives`'.
-
-**`Contact.tsx` reads the `roadmap` namespace, not `contact`.** The `contact` namespace belongs to the
-modal in `shared/contact/`. It also imports [`contact.css`](./contact.css), which is global CSS, not a module: the
-`.dashed-card` class it defines is visible to the whole app.
+**`Contact.tsx` reads the `roadmap` namespace, not `contact`**, which belongs to the modal in `shared/contact/`.
+It imports [`contact.css`](./contact.css), global CSS rather than a module, so `.dashed-card` is visible to the
+whole app. It opens the modal on arrival when the address carries `#contact`, the `id` it renders; no link in
+the repository points there.
 
 **The "alternatives that add more days" banner compares only with the Alternatives the chosen Strategy found.**
 `canImprove` reads `maxAlternative` over the Alternatives whose `strategy` equals the filters store's; the other
-Strategies' plans carry their own value there (see the Alternatives section of the
-[engine guide](../../../../domain/calendar/AGENTS.md)). Counting them would tell a Grouped user, on every plan, that
-Optimized covers more days, which is the trade they chose. The engine never hands out an Alternative ahead of the
-Suggestion, so the banner speaks up when the plan on screen is behind one of them: after a hand edit, or when the
-applied Alternative is itself one of the weaker ones. The header badge and the summary sentence name the Strategy
-of the plan on screen (its own `strategy`, narrowed with `isFilterStrategy`), so an applied plan another Strategy
-found is not credited to the one in the sidebar.
+Strategies' plans carry their own value there (see *Invariants and traps* in the
+[engine guide](../../../../domain/calendar/AGENTS.md)). The engine never hands out an Alternative ahead of the
+Suggestion, so the banner speaks up only when the plan on screen is behind one: after a hand edit, or when the
+applied Alternative is itself a weaker one. The header badge and the summary sentence name the Strategy of the
+plan on screen (its own `strategy`, narrowed with `isFilterStrategy`). The banner's button links to `#calendar`,
+the `id` `CalendarList.tsx` gives its grid.
 
-**`Summary.tsx` measures against different denominators, and several of its numbers depend on which.**
-`ptoDays` here is the *budget*, read from the filters store; the engine's `Metrics` are computed against the
-days the plan actually *placed* (`days.length` in [`generateMetrics.ts`](../../../../domain/calendar/metrics/generateMetrics.ts)). So:
+**`Summary.tsx` measures against different denominators.** `ptoDays` here is the budget, read from the filters
+store; the engine's Metrics are computed against the days the plan placed (`days.length` in
+[`generateMetrics.ts`](../../../../domain/calendar/metrics/generateMetrics.ts)). So:
 
-- `gain` comes from `measureGain` in `@domain/calendar/utils/budget`: `(totalEffectiveDays - ptoDays) / ptoDays * 100`, budget-based. It was derived inline here until it got an owner and a test.
-- `metrics.averageEfficiency` is `totalEffectiveDays / days.length`, placed-based.
-- the badge on the Effective Days card shows `increment`, budget-based, while `yearSummary.totalBonusDays`
-  further down shows `metrics.bonusDays`, placed-based.
+- `gain` comes from `measureGain` in `@domain/calendar/utils/budget`, budget-based;
+- `metrics.averageEfficiency` is placed-based;
+- the Effective Days badge shows `overBudget`, budget-based, while `yearSummary.totalBonusDays` shows
+  `metrics.bonusDays`, placed-based.
 
-The denominators are equal only when the plan spends the whole budget, and it deliberately does not
-always: a Removed Day, or a Bridge that no longer fits, leaves budget standing (see
-[`@domain/calendar/AGENTS.md`](../../../../domain/calendar/AGENTS.md)). Gain is therefore **not** Efficiency
-minus one, and the badge is **not** a Bonus Day count as [`CONTEXT.md`](../../../../../../../CONTEXT.md) defines it,
-which is why its label says "over budget" and never the word bonus. Collapsing any of these into one
-another ships a number that is silently wrong by however much budget went unspent.
+They agree only when the plan spends the whole budget, and a Removed Day or a Bridge that no longer fits leaves
+budget standing. So Gain is not Efficiency minus one, and the badge is not a Bonus Day count as
+[`CONTEXT.md`](../../../../../../../CONTEXT.md) defines it, which is why its label says "over budget". The screen
+names each figure's baseline instead of aligning them: the Effective Days and Gain badges interpolate `ptoDays`,
+and the Efficiency card's `hint` names the days placed.
 
-**That question is now answered: name the baseline, never align the numbers.** Both figures are correct for
-what they measure, so the screen states what each is measured against rather than picking a winner. The
-Effective Days badge and the Gain badge interpolate `ptoDays`, and the Efficiency card carries a `hint`
-naming the days the plan actually placed. A future change that makes
-them agree by moving a denominator is a regression, not a simplification; the disagreement is information.
+**The Efficiency hint counts days the way `generateMetrics` does.** `toggleDaySelection` never rewrites
+`currentSelection.days`, so the stored list is the plan as the engine placed it. `Summary` reads `placedDays`
+from `usePlacedPlan`, the half of `usePlanReadout` with no `isCalculating` subscription, which applies
+`resolveSelectedDays` with the lists the store holds;
+[`sidebar/components/CalendarExport.tsx`](../../sidebar/components/CalendarExport.tsx) reads the same field.
+Anything else on this screen that wants the days spent takes them from the hook.
 
-**The hint has to be counted the way `generateMetrics` counts, which is not `activeSuggestion.days.length`.**
-`toggleDaySelection` never rewrites `currentSelection.days` (it records the edit in `manuallySelectedDays`
-and `removedSuggestedDays` and recomputes the Metrics), so the stored day list is the plan as the engine
-first placed it, for ever. Efficiency is `totalEffectiveDays / resolveSelectedDays(…).length`, so a hint
-reading the raw array named the wrong number the moment anything was hand-edited, which is precisely when a
-label naming the baseline earns its place: with no Manual or Removed Days they agree and nobody needed
-the label. `Summary` therefore reads `placedDays` off `usePlacedPlan`, the half of `usePlanReadout` with no
-`isCalculating` subscription, which applies `resolveSelectedDays` with the same lists the store holds. [`sidebar/components/CalendarExport.tsx`](../../sidebar/components/CalendarExport.tsx) reads the same field: it
-wants the array rather than the count, so the exported calendar carries exactly the days the Metrics were
-measured from. Anything else on this screen that wants "the days spent" takes it from the hook; those callers
-used to fold it themselves and this sentence was the whole mechanism keeping them in step.
+**The budget badges carry an ICU plural in the five bundles that need one.** `MIN_PTO_DAYS` is 1, so
+`metrics.overBudget` and `metrics.perPtoDay` are reachable at a budget of one; `es`, `ca`, `it`, `de` and `fr`
+put a noun after the number and select it with `{ptoDays, plural, …}`, while `en` reads "your 1-day budget".
 
-**The badges that interpolate `ptoDays` need an ICU plural, and most bundles once lacked one.**
-`MIN_PTO_DAYS` is 1, so `metrics.overBudget` and `metrics.perPtoDay` are reachable at a count of one; `en`
-survives it because "your 1-day budget" is an attributive, while `es`, `ca`, `it`, `de` and `fr` all put a
-bare plural noun after the number. Both keys select the noun with `{ptoDays, plural, one {…} other {…}}` in
-every bundle now. A new string interpolating a count belongs in the same shape; see
-[`../../../i18n/AGENTS.md`](../../../i18n/AGENTS.md).
+**`MetricCard`'s props are a union on `size`.** `hint` exists only on the compact card and `badge` only on the
+full-size one, so either passed to the other layout is a compile error. The card rounds to whole numbers unless
+given `decimalPlaces` (`SlidingNumber` runs `toFixed`), so a fractional metric passes `decimalPlaces={1}`, as
+Efficiency and `workedDaysPerMonth` do.
 
-**`MetricCard` renders `hint` in the compact layout only.** The default branch destructures the prop and
-never uses it, so passing a hint to a full-size card is silently dropped rather than misplaced. Every
-current caller passing one is compact; a new full-size caller needs the element added, not just the prop.
+**`usePlannerDayClick` checks Premium, hands the day to the store and renders whatever refusal comes back
+through `DAY_REFUSAL_COPY`.** A new refusal is a new reason in the stores'
+[`types.ts`](../../../../application/stores/types.ts) plus an entry in that map.
 
-**`MetricCard` rounds to whole numbers unless told otherwise, and some of these values are fractional.**
-`SlidingNumber` runs `value.toFixed(decimalPlaces)`, and the card defaulted every caller to `0` with no way
-to override it, so Efficiency arrived as `'1.6'` and rendered `2`, and `workedDaysPerMonth`, which
-`getWorkedDaysPerMonth` deliberately returns as `Number.parseFloat(avg.toFixed(1))`, rendered as an integer.
-Both now pass `decimalPlaces={1}`. A new fractional metric has to do the same.
+**`getHolidayId` in `holidays/HolidaysTable.tsx` returns `` `${holiday.id}::${holiday.name}` ``.** The toolbar count and the modals read
+`selectedHolidaysList`, resolved against `variantHolidays` rather than the visible rows, so a selection a search
+hides still counts and one left over from a Holiday that no longer exists drops out. The select-all checkbox is
+the exception: it reads and writes the visible rows, which is what "select all" means with a filter on.
 
-**`Calendar` no longer predicts what the store will accept.** Its click handler keeps the rules it owns
-(the Premium gate and the past-day rule, which depend on `premiumKey` and on `today`, neither of which the
-store sees), then calls `onDayToggle` and renders whatever refusal comes back through `DAY_REFUSAL_COPY`. It
-used to test for a Holiday, a Custom Holiday, a weekend and an exhausted budget *before* calling, so the same
-condition existed on both sides of the seam and the store's own answer was discarded. A new refusal is a new
-reason in the stores' [`types.ts`](../../../../application/stores/types.ts) plus an entry in that map;
-it is never a new branch in the handler. `canSelectMoreDays` is gone from the component's interface for the
-same reason: the budget question is answered by the refusal, not predicted by the caller.
+**The three Holiday modals are `dynamic()` and mount only once opened** (`useHasOpened`), then stay mounted so
+their close animates; Edit also unmounts when the selection stops being one Holiday.
 
-**Holiday selection is keyed on the Holiday, never on the row's position.** `getHolidayId` in
-`holidays/HolidaysTable.tsx` returns `` `${holiday.id}::${holiday.name}` ``, and it used to append the index
-the row was rendered at, which belongs to the *filtered and sorted* list, so typing in the search box or
-clicking a column header renamed every selection under it. The checkboxes silently cleared while the toolbar
-went on offering "Delete (1)", the delete modal received an empty list, and the edit button rendered above a
-modal that was never mounted, because the count came from the Set's size and the modal from a list resolved
-by index. Both now come from `selectedHolidaysList`, resolved against `variantHolidays` rather than the
-visible rows: the toolbar counts exactly what the modals will act on, a selection scrolled out of view by a
-search still counts, and an id left over from a Holiday that no longer exists resolves to nothing and drops
-out. The select-all checkbox is the deliberate exception: it reads and writes the *visible* rows, which is
-what "select all" means with a filter applied.
+**The sortable column headers are buttons inside the `th`, and the `th` carries `aria-sort`.** In
+`holidays/components/HolidayTableHeader.tsx` the cell's padding is on the button (`p-0` on the `TableHead`,
+`h-11 px-3` on the button), so the whole cell stays clickable.
 
-**The sortable column headers are buttons inside the `th`, and the `th` carries `aria-sort`.** They were
-`<th onClick>`, which no keyboard can reach and which announces no sort state. Anything added to
-`holidays/components/HolidayTableHeader.tsx` keeps that shape: the cell's own padding moves to the button
-(`p-0` on the `TableHead`, `h-11 px-3` on the button) so the whole cell stays clickable.
+**There is more than one unrelated `COLOR_SCHEMES`.** `summary/const.ts` exports an array of brand CSS variables
+the recharts charts index into; `summary/MetricCard.tsx` declares its own record keyed by colour name. Neither
+is derived from the other.
 
-**There is more than one unrelated `COLOR_SCHEMES`.** `summary/const.ts` exports an array of brand CSS variables that
-the recharts charts index into; `summary/MetricCard.tsx` declares its own record keyed by colour name.
-They are not interchangeable and neither is derived from the other.
-
-**[`YearTimelineChart.tsx`](./summary/YearTimelineChart.tsx) is not a recharts chart.** It is hand-built positioned `div`s using
-`Temporal.PlainYearMonth` for month lengths ([ADR 0005](../../../../../../../adr/0005-temporal-polyfill.md)).
-The other charts use recharts and are the reason `Summary.tsx` loads them all through `dynamic()`.
-
-**It spans the Planning Window, not the calendar year, and both halves of that were once wrong.** `segPos`
-positioned a segment from `getMonth(date)` and `getDayOfMonth(date)` alone (the year was discarded) over a
-hard-coded a calendar year of columns, while `Summary` handed it the raw two-year `holidays` array. So every Holiday of
-`year + 1` was painted onto the `year` strip: for ES/2026 the National row marked 26 March, which is Good
-Friday **2027** and an ordinary Workday in 2026. The defects are independent, and filtering alone does
-not fix it: with the default `carryOverMonths: 1` the window itself reaches into January of `year + 1`, so
-an in-window date there still folded onto the January column. The chart now takes `carryOverMonths` and calls the
-engine's own `windowMonthCount` and `windowMonthIndex` rather than restating them. It carried a private
-`windowColumn` that was `windowMonthIndex` character for character, kept in step by this sentence; a rule
-separate files hold and a paragraph reconciles is a rule that will drift.
-`Summary` passes `holidaysInWindow`, matching `HolidaysDistributionChart`. A stretch crossing 31 December
-now also gets a real width instead of hitting the `Math.max(…, 0.005)` clamp.
-
-**Its month labels repeat, so they cannot be React keys.** With a Carry-over Month the strip shows January
-twice, and the header keyed on the localised label. Each cell now carries a `${year}-${month}` key built from
-the date it represents.
+**[`YearTimelineChart.tsx`](./summary/YearTimelineChart.tsx) is not a recharts chart.** It is positioned `div`s,
+with `Temporal.PlainYearMonth` for month lengths ([ADR 0005](../../../../../../../adr/0005-temporal-polyfill.md));
+the other charts use recharts and are the reason `Summary.tsx` loads them through `dynamic()`. It spans the
+Planning Window: it takes `carryOverMonths` and positions through the engine's `windowMonthCount` and
+`windowMonthIndex` rather than restating them, and `Summary` hands it `holidaysInWindow`. Its month labels repeat
+with a Carry-over Month, so each cell is keyed `${year}-${month}` from the date it represents.
 
 **A past day stays clickable when it is already a Manual Day or a Suggested Day.** `calendar/Calendar.tsx`
-computes each cell's `isDisabled` as the past-day modifier *minus* those states, so a day the plan already
-contains can still be edited once its date has gone by. Disabling every past day instead would strand
-those days in the Suggestion with no way to remove them.
+computes each cell's `isDisabled` as the past-day modifier minus those states, so a day the plan holds can still
+be edited once its date has gone by. The expression combines with `||`, not `??`: `disabled` is destructured
+with a default of `false`, so `disabled ?? (…)` would never reach the past-day branch.
 
-That expression is combined with `||`, not `??`, and the difference is the whole rule. `disabled` is
-destructured with a default of `false`, so `disabled ?? (…)` never reached the past-day branch at all: every
-past day rendered as an enabled, focusable button with the hover lift, dimmed only by the independent
-opacity class. `||` is what makes a caller's explicit `disabled` and the past-day rule both count.
-
-**The Summary counts Holidays inside the Planning Window only.** The store holds two years so the UI can
-show the extra ones for context, so the Holidays metric card, the composition pie, the "specific to your
-region" line and the custom-Holiday banner all read a list filtered on `isInPlanningWindow`; otherwise the
-headline figure is roughly double what the Holidays table beside it lists. This is a *display* filter and
-belongs here; the same narrowing applied to `generateMetrics` was tried and reverted, for the reason in
-[`@domain/calendar/AGENTS.md`](../../../../domain/calendar/AGENTS.md).
-
-**The Legend's stuck state is CSS, and the JavaScript that shadowed it was dead.** [`legend.module.css`](./legend.module.css)
-declares `container-type: scroll-state` on `.sticky_container` and styles the collapsed form under
-`@container pto-legend scroll-state(stuck: bottom)`. [`shared/donate/Donate.tsx`](../../shared/donate/Donate.tsx) also carried an effect that
-found the Legend by a `legend-sticky` id, listened on `scroll` unthrottled, called `getBoundingClientRect()`
-per frame and toggled `data-legend-stuck` on `<html>`, an attribute no stylesheet in the package ever read,
-so it was not the `@supports` fallback it looked like. Both the effect and the id are gone. If a fallback for
-browsers without `scroll-state()` is ever wanted, it belongs beside `Legend.tsx` **with a CSS rule that
-consumes the attribute**, not in a cross-screen component reaching in by DOM id.
-
-**The sticky container never changes height, which is what stops the Legend flickering at the edge.** The
-compact stuck form is shorter than the open card, and a `bottom: 0` sticky box is stuck while its natural bottom
-is below the viewport's. So shrinking on stick raised that bottom back into view, the card unstuck, grew, stuck
-again, and inside a band as tall as the difference it toggled every frame. `Legend.tsx` now renders an inert,
-`aria-hidden`, invisible copy of the open card (`.ghost`, no toggle) in the same grid cell as the real one
-(`.live`), so the container is always the open height; only `.live` answers the stuck container query, it sits
-at the bottom of the cell, and the container passes pointer events through everywhere but the card. No script
-measures anything.
+**The Summary counts Holidays inside the Planning Window only.** The store holds two years, so the Holidays card,
+the composition pie, the "specific to your region" line, the Custom Holiday banner and the timeline read
+`holidaysInPlanningWindow(holidays)`; otherwise the headline figure is roughly double what the Holidays table
+lists. This is a display filter and belongs here: `generateMetrics` must not take the same narrowing, for the
+reason in [`@domain/calendar/AGENTS.md`](../../../../domain/calendar/AGENTS.md).
 
 **`data-tutorial` attributes are load-bearing, and they come from `TUTORIAL_ANCHOR`.** `CALENDAR_LIST`,
-`HOLIDAYS_LIST`, `PLANNER_DRAWER`, `ALTERNATIVES_MANAGER` and `PTO_STATUS` are this screen's driver.js
-anchors; the const in [`../../tutorial/anchors.ts`](../../tutorial/anchors.ts) is the only place their
-strings are written, so a rename is a compile error rather than a step that silently highlights nothing. `ManagementBar` additionally listens
-for the window events in `TUTORIAL_EVENT`, dispatched by [`hooks/useTutorial.tsx`](../../../hooks/useTutorial.tsx), a deliberately
-loose coupling so the tutorial does not import planner state, and invisible to a search for the
-listener's caller.
+`HOLIDAYS_LIST`, `PLANNER_DRAWER`, `ALTERNATIVES_MANAGER` and `PTO_STATUS` are this screen's driver.js anchors,
+written once in [`../../tutorial/anchors.ts`](../../tutorial/anchors.ts). `ManagementBar` also listens for the
+window events in `TUTORIAL_EVENT`, which [`hooks/useTutorial.tsx`](../../../hooks/useTutorial.tsx) dispatches on
+mobile: `EXPAND_DRAWER` when the `ALTERNATIVES_MANAGER` step is highlighted, `COLLAPSE_DRAWER` from
+`onDestroyStarted`, which fires on the done button, the close button and an outside click alike. The coupling is
+loose on purpose, so the tutorial imports no planner state, and a search for the listener's caller finds
+nothing. Applying an Alternative collapses the drawer too.
 
-**The expand event needs a matching collapse, and for a while it had none.** The tutorial expanded the
-drawer at its `ALTERNATIVES_MANAGER` step and nothing ever brought it back down: the only reset was inside
-`handleSelectionChange`, so the drawer stayed expanded until the user applied an Alternative. The tour end
-now dispatches `COLLAPSE_DRAWER` from `onDestroyStarted`, which fires on the done button, the close button
-and an outside click alike. Both events live in `TUTORIAL_EVENT` rather than as literals in separate files,
-because a listener and a dispatcher that disagree about a string fail silently in exactly this way.
-
-**`DRAWER_SNAP.EXPANDED` is 0.85 and must stay below 1.** The drawer is `h-[100dvh] max-h-none`, which is
-what makes a snap point mean "this fraction of the viewport is visible": vaul translates a viewport-sized
-element down by `innerHeight - snap * innerHeight`. At a snap of exactly 1 the translation is zero, so the
-element covers the screen edge to edge; `dismissible={false}`, `overlay={false}` and no close button then
-leave nothing to tap to get out of it, and vaul's own `[data-vaul-drawer] { touch-action: none }` kills
-scrolling wherever it lands. Capping the top snap at 0.85 keeps 15dvh of page reachable above it, which is
-also where the floating sidebar trigger sits. Do not raise it to 1 to "use the whole screen", and do not
-delete `max-h-none` while the height is `100dvh`: the base `max-h-[85dvh]` in
-[`Drawer.tsx`](../../core/animate/base/Drawer.tsx) would clamp the box while vaul kept translating it as
-though it were still full height.
-
-## Conventions
-
-- `'use client'` at the top of anything with state, an effect, a store read or a recharts chart. Declare it
-  even when every current importer is already a client module: inheriting the boundary compiles, but the
-  build then breaks a long way from the cause the day a server component imports the file.
-- Consume several store fields through one `useShallow` selector, not one `useState`-shaped read per field.
-- Motion configuration lives at module scope (`STAT_CARD_MOTION_CONFIG`, `LABEL_VARIANTS`,
-  `BADGE_VARIANTS` in `PlannerPanel.tsx`), so the object identity is stable across renders.
-- `<Skeleton name='…' fixture={…} fallback={…}>` for loading states, never a hand-rolled shimmer. The
-  bones `calendar-list`, `planner-panel` and `summary` are registered in [`modules/bones/registry.ts`](../../bones/registry.ts).
-  Both props take the same fixture component and both are required: `fixture` is read only by the
-  capture CLI, `fallback` is what renders when no bone resolves, so passing `fixture` alone shows an
-  empty container. See [`../../AGENTS.md`](../../AGENTS.md).
+**`DRAWER_SNAP.EXPANDED` is 0.85 and must stay below 1.** The drawer is `h-[100dvh] max-h-none`, so a snap point
+is the fraction of the viewport showing: vaul translates the element down by `innerHeight - snap * innerHeight`.
+At exactly 1 it covers the screen, and with `dismissible={false}`, `overlay={false}` and no close button nothing
+is left to tap, while vaul's `[data-vaul-drawer] { touch-action: none }` kills scrolling. 0.85 keeps 15dvh of
+page above it, where the floating sidebar trigger sits. Keep `max-h-none` while the height is `100dvh`: the base
+`max-h-[85dvh]` in [`Drawer.tsx`](../../core/animate/base/Drawer.tsx) would clamp the box while vaul kept
+translating it as though it were full height. `DRAWER_SNAP.COLLAPSED` (0.15) is written out again as the donate
+button's offset the planner layout passes to [`shared/donate/Donate.tsx`](../../shared/donate/Donate.tsx), and the
+layout's test fails when the two drift apart.
 
 ## Screen boundaries
 
-Anything more than one screen shares belongs in `shared/`, never in the other screen's folder. Both directions
-between this screen and the homepage used to be crossed and are not any more:
+The bones this screen requests (`calendar-list`, `planner-panel` and `summary`) are registered in
+[`modules/bones/registry.ts`](../../bones/registry.ts); see [`../../AGENTS.md`](../../AGENTS.md).
+[`SupportButton.tsx`](../../shared/SupportButton.tsx), mounted by `calendar/usePlannerDayClick.tsx` inside the
+Premium toast and by [`pages/homepage/sections/Pricing.tsx`](../homepage/sections/Pricing.tsx), lives in `shared/`.
 
-- [`SupportButton.tsx`](../../shared/SupportButton.tsx) (mounted by `calendar/usePlannerDayClick.tsx` inside the "this is a Premium feature" toast
-  *and* by [`pages/homepage/sections/Pricing.tsx`](../homepage/sections/Pricing.tsx)) lives in `shared/`.
-- [`FaqTabs.tsx`](../homepage/support/FaqTabs.tsx), `Troubleshooting.tsx` and their [`types.ts`](../homepage/support/types.ts) sat here while [`pages/homepage/sections/Faq.tsx`](../homepage/sections/Faq.tsx)
-  was their only consumer; they now live under `pages/homepage/support/`.
-- `getViewBoxFromSvg` moved out of `calendar/utils/helpers.ts` into [`shared/utils/helpers.ts`](../../shared/utils/helpers.ts), so
-  [`shared/Icon.tsx`](../../shared/Icon.tsx) no longer reaches into this screen.
+Two sets of imports reach into this folder from outside it:
 
-One import still points the other way, and it is a util rather than a component:
-[`pages/homepage/sections/Hero.tsx`](../homepage/sections/Hero.tsx) reads `MODIFIERS_CLASS_NAMES` from this screen's `utils/`. Promote it to
-`shared/` before a second caller appears. `Troubleshooting.tsx` was the other one, for `getTotalMonths`; that
-function moved into `@domain/calendar/window` as `planningWindowMonths` and the component no longer needs it
-at all, because `generateSuggestions` takes the window rather than its expansion.
+- [`pages/homepage/sections/Hero.tsx`](../homepage/sections/Hero.tsx) reads `MODIFIERS_CLASS_NAMES` from
+  `calendar/utils/helpers.ts`, the one import from another screen.
+- The sidebar belongs to this screen: [`sidebar/components/WorkdayCounter.tsx`](../../sidebar/components/WorkdayCounter.tsx)
+  imports `FromTo`, `isFromToObject` and the range counters in `utils/helpers.ts`, and
+  `WorkdayCounterCalendarModal.tsx` renders `Calendar` in range mode. A change to those signatures is a change to
+  the sidebar.
 
 ## Testing
 
-Every component on this screen carries a co-located test except `HolidayRow`, `HolidayTableHeader` and
-`MetricCard`, which are exercised through the table and the summary that render them; the fixtures are
-asserted on their shape, since a skeleton that grows a button or a word is a defect. The Playwright suite in
-`e2e/` asserts only that `/planner` answers 200, has a title, and does not trip the error boundary. No e2e
-spec drives a calculation, so nothing outside these files pins planner *behaviour*.
+`HolidayRow` and `MetricCard` have no test of their own; the table and Summary tests exercise them. The
+Playwright suite in `e2e/` asserts only that `/planner` answers 200 with and without a locale prefix, has a
+title, carries the requested `lang` and links back to the homepage, and the quick start's spec that it arrives
+there, so nothing outside these files pins planner behaviour.
 
-**This paragraph used to open with a count of the test files, and the count is what went wrong with it**: it
-said one number while the tree held another, then fell further behind as the tree grew. A number in prose has
-no way to stay true and nothing checks it, so the rule it stood for is written out instead. `ls` answers the
-other question in less time than it takes to distrust the sentence.
-
-Some of them cover this screen's remaining pure modules.
-[`calendar/utils/refusals.test.ts`](./calendar/utils/refusals.test.ts) asserts `DAY_REFUSAL_COPY` against
-`DayRefusal` itself, key set for key set, so a refusal added to the stores without copy fails here rather
-than rendering nothing on the calendar; it also pins that `describeHolidayRefusal` answers `null` for the one
-refusal with no copy of its own, which is the branch both Holiday modals fall through to. `HOLIDAY_NOT_FOUND`
-is a compile error to add a case for and a silent gap to omit copy for, and only the second half needed a
-test. [`holidays/components/schema.test.ts`](./holidays/components/schema.test.ts) drives the Custom Holiday
-factory at both ends of the name length and on a date that is not one.
-
-Others are recent, and each covers something no type could. [`utils/modifiers.test.ts`](./utils/modifiers.test.ts) drives the day
-predicates directly: `isAlternative` at index 0, at n, and against a date the applied Suggestion already
-holds, and `isSuggestion` with a Removed Day. Nothing had touched that module before: the only test file
-mentioning `modifiers` was `calendar/utils/helpers.test.ts`, and every one of its modifiers was a synthetic
-`() => true`. [`calendar/Calendar.test.tsx`](./calendar/Calendar.test.tsx) is the component's first test, and covers the
-decisions above plus what `dayStates` paints. [`PlannerPanel.test.tsx`](./PlannerPanel.test.tsx) covers the Alternative index
-round-trip.
-
-`calendar/utils/helpers.test.ts` is the one that pins the precedence chain documented under *Day
-classification*, which is the only ordering on this screen that a reader is likely to get wrong from the
-source: the object-key order is not the precedence order, `today` short-circuits, and `selected` is appended
-after the loop it skipped. It calls `getDayClassNames` directly with synthetic modifier predicates and
-asserts on the returned string, so it needs no render and no store.
-
-**It asserts by substring, and some of the class strings are identical.** `rangeStart` and `rangeEnd` in
-`MODIFIERS_CLASS_NAMES` are the same value character for character, so no substring test can tell which of
-them produced a match, and a test claiming to is passing on the other one. The distinction the tests do
-draw is the real one: `inRange` is suppressed by `selected` and `rangeStart` is not, because they sit
-behind separate guards.
-
-`Summary.test.tsx` covers the things on that screen a type cannot catch: which denominator the Efficiency
-hint names, and whether the budget badges read grammatically at a budget of one. It mocks the stores,
-`next/dynamic` (so none of the charts render) and `SlidingNumber`, then asserts on `container.textContent`.
-Leave `core/animate/icons/Icon` real: mocking it drops `IconWrapper`, which every animated icon on the screen
-renders through.
-
-The chart tests are the pattern worth copying: mock `recharts` down to inert elements and mock
-`@ui/modules/premium/PremiumFeature` to a pass-through, then assert on the data the component derived
-rather than on the SVG. Component tests render inside `NextIntlClientProvider` with the real message
-bundles, often more than one locale at once, which is what catches a key that only exists in [`en.json`](../../../i18n/messages/en.json).
-
-**`YearTimelineChart` is the exception: it renders no recharts and is asserted on inline geometry.** Its
-tests read `style.left` off the segment `div`s, and they read `left` rather than `width` for a reason:
-happy-dom drops any declaration whose value it cannot parse, and the width is `max(8px, N%)`, so
-`style.width` comes back as the empty string no matter what the component computed. Asserting a width here
-passes vacuously. Positions are exact fractions of the strip, so assert them with `toBeCloseTo` against
-`column / monthCount`.
+- `calendar/utils/helpers.test.ts` pins the precedence chain under *Day classification*, calling
+  `getDayClassNames` with synthetic modifiers. It asserts by substring, and `rangeStart` and `rangeEnd` in
+  `MODIFIERS_CLASS_NAMES` are the same string, so no substring test can tell which of them produced a match; the
+  distinction it draws is `inRange` suppressed by `selected` while `rangeStart` is not.
+- `Summary.test.tsx` mocks the stores, `next/dynamic` (so no chart renders) and `SlidingNumber`, and asserts on
+  `container.textContent`. Leave `core/animate/icons/Icon` real: mocking it drops `IconWrapper`, which every
+  animated icon on the screen renders through.
+- The chart tests mock `recharts` down to inert elements and `@ui/modules/premium/PremiumFeature` to a
+  pass-through, then assert on the data the component derived rather than on the SVG. The
+  `HolidaysDistributionChart`, `BlocksPerQuarterChart` and `SiteTitle` suites render their one-message sentences in all six bundles, so a broken message fails there.
+- `HolidaysTable.test.tsx` reads the selection off the delete modal's stand-in, which mounts only once the delete
+  button has opened it.
+- `YearTimelineChart` is asserted on inline geometry. Read `style.left`, not `style.width`: happy-dom drops a
+  declaration it cannot parse, and the width is `max(8px, N%)`, so `style.width` comes back empty whatever the
+  component computed. Positions are exact fractions of the strip; assert them with `toBeCloseTo` against
+  `column / monthCount`.

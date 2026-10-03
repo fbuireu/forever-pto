@@ -26,7 +26,12 @@ afterAll(() => {
 const { Analytics } = await import("./Analytics");
 
 const scriptsOf = (container: HTMLElement) => [...container.querySelectorAll("script")];
-const scriptNamed = (container: HTMLElement, id: string) => {
+interface ScriptNamedParams {
+	container: HTMLElement;
+	id: string;
+}
+
+const scriptNamed = ({ container, id }: ScriptNamedParams) => {
 	const script = scriptsOf(container).find((candidate) => candidate.getAttribute("data-testid") === id);
 	if (!script) throw new Error(`script ${id} not rendered`);
 	return script;
@@ -35,7 +40,7 @@ const scriptNamed = (container: HTMLElement, id: string) => {
 describe("Analytics", () => {
 	it("denies every storage category before the tag itself loads", () => {
 		const { container } = render(<Analytics />);
-		const consent = scriptNamed(container, "gtag-consent").textContent ?? "";
+		const consent = scriptNamed({ container, id: "gtag-consent" }).textContent ?? "";
 
 		for (const category of ["analytics_storage", "ad_storage", "ad_user_data", "ad_personalization"]) {
 			expect(consent).toContain(`'${category}': 'denied'`);
@@ -50,10 +55,10 @@ describe("Analytics", () => {
 	it("loads and configures the property named by the public variable", () => {
 		const { container } = render(<Analytics />);
 
-		expect(scriptNamed(container, "gtag-js").getAttribute("data-src")).toBe(
+		expect(scriptNamed({ container, id: "gtag-js" }).getAttribute("data-src")).toBe(
 			"https://www.googletagmanager.com/gtag/js?id=G-TEST123",
 		);
-		expect(scriptNamed(container, "gtag-config").textContent).toContain("gtag('config', 'G-TEST123')");
+		expect(scriptNamed({ container, id: "gtag-config" }).textContent).toContain("gtag('config', 'G-TEST123')");
 	});
 
 	it("waits for hydration before any of the three run", () => {

@@ -19,39 +19,31 @@ type TabSection = {
 
 type FaqTabsProps = {
 	tabs: TabSection[];
-	title?: string;
 };
 
-export const FaqTabs = ({ tabs, title }: FaqTabsProps) => {
+export const FaqTabs = ({ tabs }: FaqTabsProps) => {
 	const [active, setActive] = useState(tabs[0]?.id ?? "");
 
 	return (
-		<>
-			{title && (
-				<h2 id="faq-title" className="text-3xl font-semibold text-center">
-					{title}
-				</h2>
-			)}
-			<Tabs value={active} onValueChange={setActive}>
-				<div className="overflow-x-auto">
-					<TabsHighlight>
-						<TabsList className="grid min-w-max w-full" style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}>
-							{tabs.map((tab) => (
-								<TabsHighlightItem key={tab.id} value={tab.id}>
-									<TabsTrigger value={tab.id}>{tab.title}</TabsTrigger>
-								</TabsHighlightItem>
-							))}
-						</TabsList>
-					</TabsHighlight>
-				</div>
-				<TabsContents>
-					{tabs.map((tab) => (
-						<TabsContent key={tab.id} value={tab.id}>
-							{tab.content}
-						</TabsContent>
-					))}
-				</TabsContents>
-			</Tabs>
-		</>
+		<Tabs value={active} onValueChange={setActive}>
+			<div className="overflow-x-auto">
+				<TabsHighlight>
+					<TabsList className="grid min-w-max w-full" style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}>
+						{tabs.map((tab) => (
+							<TabsHighlightItem key={tab.id} value={tab.id}>
+								<TabsTrigger value={tab.id}>{tab.title}</TabsTrigger>
+							</TabsHighlightItem>
+						))}
+					</TabsList>
+				</TabsHighlight>
+			</div>
+			<TabsContents>
+				{tabs.map((tab) => (
+					<TabsContent key={tab.id} value={tab.id}>
+						{tab.content}
+					</TabsContent>
+				))}
+			</TabsContents>
+		</Tabs>
 	);
 };

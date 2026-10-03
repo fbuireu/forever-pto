@@ -9,7 +9,6 @@ import {
 	isHoliday,
 	isInRange,
 	isManuallySelected,
-	isNationalOrRegionalHoliday,
 	isPast,
 	isRangeEnd,
 	isRangeSelected,
@@ -148,11 +147,6 @@ describe("the Holiday predicates", () => {
 	it("isCustom matches only a Custom Holiday", () => {
 		expect(isCustom(holidays)(TUESDAY)).toBe(true);
 		expect(isCustom(holidays)(MONDAY)).toBe(false);
-	});
-
-	it("isNationalOrRegionalHoliday is the complement a Custom Holiday falls outside of", () => {
-		expect(isNationalOrRegionalHoliday(holidays)(MONDAY)).toBe(true);
-		expect(isNationalOrRegionalHoliday(holidays)(TUESDAY)).toBe(false);
 	});
 });
 

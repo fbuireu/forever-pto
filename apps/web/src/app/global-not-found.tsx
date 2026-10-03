@@ -1,5 +1,4 @@
 import "@styles/index.css";
-import { DOCUMENT_BODY_CLASS } from "@app/fonts";
 import { clientMessagesOf } from "@infrastructure/i18n/clientMessages";
 import { LOCALE_COOKIE, LOCALES } from "@infrastructure/i18n/locales";
 import { routing } from "@infrastructure/i18n/routing";
@@ -13,6 +12,7 @@ import { cookies, headers } from "next/headers";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
+import { DOCUMENT_BODY_CLASS } from "./fonts";
 
 async function detectLocale() {
 	const [headersList, cookieStore] = await Promise.all([headers(), cookies()]);

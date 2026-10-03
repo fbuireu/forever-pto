@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
-import type { IconProps } from "@ui/modules/core/animate/icons/Icon";
 import type { ComponentProps, ComponentType } from "react";
 import { describe, expect, it } from "vitest";
+import type { IconProps } from "../animate/icons/Icon";
 import { Banner } from "./Banner";
 
 type IconStubProps = { className?: string; "aria-hidden"?: ComponentProps<"svg">["aria-hidden"] };

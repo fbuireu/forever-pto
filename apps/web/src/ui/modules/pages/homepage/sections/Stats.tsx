@@ -11,7 +11,9 @@ export const Stats = async () => {
 			<div className="max-w-[1240px] mx-auto grid grid-cols-2 md:grid-cols-4 border-[4px] border-[var(--frame)] rounded-[14px] overflow-hidden bg-card shadow-[var(--shadow-brutal-xl)]">
 				{[
 					{
-						num: `${format.number(SHOWCASE_RATIO, { maximumFractionDigits: 1 })}×`,
+						num: t("stats.efficiencyValue", {
+							ratio: format.number(SHOWCASE_RATIO, { maximumFractionDigits: 1 }),
+						}),
 						label: t("stats.efficiencyLabel"),
 						bg: "var(--color-brand-yellow)",
 					},

@@ -45,8 +45,6 @@ const DeleteHolidayModal = dynamic(() =>
 	import("./components/DeleteHolidayModal").then((module) => ({ default: module.DeleteHolidayModal })),
 );
 
-const _holidayDateFmtCache = new Map<string, Intl.DateTimeFormat>();
-
 const HolidayCard = ({
 	holiday,
 	isSelected,
@@ -119,6 +117,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const addModalHasOpened = useHasOpened({ open: showAddModal });
 	const editModalHasOpened = useHasOpened({ open: showEditModal });
+	const deleteModalHasOpened = useHasOpened({ open: showDeleteModal });
 	const [innerOpen, setInnerOpen] = useState(false);
 	const [selectedHolidays, setSelectedHolidays] = useState<Set<string>>(new Set());
 	const [sortConfig, setSortConfig] = useState<{
@@ -190,13 +189,10 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 		[variant],
 	);
 
-	const wasSearching = useRef(false);
-
-	useEffect(() => {
-		const isSearching = debouncedSearchTerm !== "";
-		if (isSearching && !wasSearching.current) track({ event: "holidays_searched", properties: { variant } });
-		wasSearching.current = isSearching;
-	}, [debouncedSearchTerm, variant]);
+	const handleSearchChange = (value: string) => {
+		if (searchTerm === "" && value !== "") track({ event: "holidays_searched", properties: { variant } });
+		setSearchTerm(value);
+	};
 
 	const getHolidayId = useCallback((holiday: HolidayDTO) => `${holiday.id}::${holiday.name}`, []);
 
@@ -400,7 +396,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 							value={searchTerm}
 							inputMode="text"
 							autoComplete="off"
-							onChange={(e) => setSearchTerm(e.target.value)}
+							onChange={(e) => handleSearchChange(e.target.value)}
 							className="pl-8 w-full"
 						/>
 					</div>
@@ -460,7 +456,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 										{selectionState.type === "all"
 											? t("allSelected")
 											: selectionState.type === "some"
-												? `${selectionState.count} ${t("selected")}`
+												? t("selectedCount", { count: selectionState.count })
 												: t("selectAll")}
 									</span>
 								</div>
@@ -505,7 +501,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 					</div>
 					<div className="flex items-center gap-x-2">
 						<span className="whitespace-nowrap">
-							{t("showing")} {filteredHolidays.length} {t("of")} {variantHolidays.length}
+							{t("showingCount", { shown: filteredHolidays.length, total: variantHolidays.length })}
 						</span>
 					</div>
 				</div>
@@ -519,12 +515,14 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 					holiday={selectedHolidaysList[0]}
 				/>
 			)}
-			<DeleteHolidayModal
-				open={showDeleteModal}
-				onClose={handleCloseDeleteModal}
-				locale={locale}
-				holidays={selectedHolidaysList}
-			/>
+			{deleteModalHasOpened && (
+				<DeleteHolidayModal
+					open={showDeleteModal}
+					onClose={handleCloseDeleteModal}
+					locale={locale}
+					holidays={selectedHolidaysList}
+				/>
+			)}
 		</Collapsible>
 	);
 };

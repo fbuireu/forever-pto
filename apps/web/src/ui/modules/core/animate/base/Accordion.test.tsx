@@ -104,6 +104,18 @@ describe("AccordionTrigger", () => {
 		expect(container.querySelector('[data-slot="accordion-trigger"]')).not.toBeNull();
 	});
 
+	it("shows keyboard focus, since it suppresses the browser's outline", () => {
+		const { container } = render(
+			<AccordionItem value="item-1">
+				<AccordionTrigger>trigger</AccordionTrigger>
+			</AccordionItem>,
+		);
+		const classes = (container.querySelector('[data-slot="accordion-trigger"]')?.className ?? "").split(" ");
+
+		expect(classes).toContain("outline-none");
+		expect(classes).toEqual(expect.arrayContaining(["focus-visible:ring-[3px]", "focus-visible:ring-ring"]));
+	});
+
 	it("rotates the chevron once the primitive marks the panel open", async () => {
 		const { container } = render(
 			<AccordionItem value="item-1">

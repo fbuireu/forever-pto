@@ -1,13 +1,14 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { act, fireEvent, render, renderHook } from "@testing-library/react";
+import type { setCookie } from "@ui/utils/cookie";
 import type { ComponentProps, ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const viewport = vi.hoisted(() => ({ isMobile: false }));
 
 vi.mock("@ui/hooks/useMobile", () => ({ useIsMobile: () => viewport.isMobile }));
-vi.mock("@ui/utils/cookie", () => ({ setCookie: vi.fn().mockResolvedValue(undefined) }));
+vi.mock("@ui/utils/cookie", () => ({ setCookie: vi.fn<typeof setCookie>().mockResolvedValue(undefined) }));
 
 type MotionDivProps = ComponentProps<"div"> & {
 	initial?: unknown;
@@ -157,7 +158,6 @@ describe("Sidebar mobile drawer focus", () => {
 		fireEvent.click(getByRole("button", { name: "Toggle sidebar" }));
 
 		expect(document.activeElement).toBe(getByRole("dialog", { name: "Planner controls" }));
-		viewport.isMobile = false;
 	});
 
 	it("closes on Escape, which is the only exit a keyboard has", () => {
@@ -170,7 +170,6 @@ describe("Sidebar mobile drawer focus", () => {
 		});
 
 		expect(queryByRole("dialog")).toBeNull();
-		viewport.isMobile = false;
 	});
 
 	it("hands focus back to the trigger on close, so the tab order does not restart", () => {
@@ -186,7 +185,6 @@ describe("Sidebar mobile drawer focus", () => {
 
 		expect(queryByRole("dialog")).toBeNull();
 		expect(document.activeElement).toBe(trigger);
-		viewport.isMobile = false;
 	});
 });
 
@@ -303,7 +301,6 @@ describe("the keyboard shortcut", () => {
 
 		expect(readState(view).openMobile).toBe("true");
 		expect(readState(view).state).toBe("expanded");
-		viewport.isMobile = false;
 	});
 
 	it("tells a caller that owns the state instead of writing its own", () => {
@@ -370,7 +367,6 @@ describe("a menu button in a collapsed rail", () => {
 
 		expect(readState(view).state).toBe("collapsed");
 		expect(view.onClick).toHaveBeenCalledOnce();
-		viewport.isMobile = false;
 	});
 
 	it("names itself with a tooltip once the rail is collapsed and the label is gone", () => {
@@ -390,6 +386,5 @@ describe("a menu button in a collapsed rail", () => {
 		const view = renderMenu({ defaultOpen: false, tooltip: "Countries" });
 
 		expect(view.getAllByText("Countries")).toHaveLength(1);
-		viewport.isMobile = false;
 	});
 });

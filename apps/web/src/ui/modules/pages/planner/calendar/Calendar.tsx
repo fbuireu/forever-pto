@@ -27,7 +27,6 @@ import {
 	isCustom as isCustomFn,
 	isHoliday,
 	isInRange,
-	isNationalOrRegionalHoliday as isNationalOrRegionalHolidayFn,
 	isPast,
 	isRangeEnd,
 	isRangeSelected,
@@ -64,9 +63,9 @@ export type DayStates = Partial<Record<DayStateName, (date: Date) => boolean>>;
 
 interface CalendarProps {
 	mode?: CalendarSelectionMode;
-	selected?: Date | Date[] | FromTo;
+	initialSelected?: Date | Date[] | FromTo;
 	onSelect?: (date: Date | Date[] | FromTo | undefined) => void;
-	month?: Date;
+	initialMonth?: Date;
 	showNavigation?: boolean;
 	className?: string;
 	weekStartsOn?: Day;
@@ -90,9 +89,9 @@ const NO_DAY_STATES: DayStates = {};
 
 export const Calendar = memo(function Calendar({
 	mode = CalendarSelectionMode.SINGLE,
-	selected,
+	initialSelected,
 	onSelect,
-	month: initialMonth,
+	initialMonth,
 	showNavigation = false,
 	className,
 	weekStartsOn = 1,
@@ -116,10 +115,10 @@ export const Calendar = memo(function Calendar({
 		setToday(new Date());
 	}, []);
 	const [rangeSelection, setRangeSelection] = useState<RangeState>(() => {
-		if (mode === CalendarSelectionMode.RANGE && isFromToObject(selected)) {
+		if (mode === CalendarSelectionMode.RANGE && isFromToObject(initialSelected)) {
 			return {
-				from: selected.from,
-				to: selected.to,
+				from: initialSelected.from,
+				to: initialSelected.to,
 				selecting: RangeSelection.FROM,
 			};
 		}
@@ -129,11 +128,11 @@ export const Calendar = memo(function Calendar({
 	const [selectedDates, setSelectedDates] = useState<Date[]>(() => {
 		switch (mode) {
 			case CalendarSelectionMode.MULTIPLE:
-				return Array.isArray(selected) ? selected : [];
+				return Array.isArray(initialSelected) ? initialSelected : [];
 			case CalendarSelectionMode.SINGLE:
-				return selected instanceof Date ? [selected] : [];
+				return initialSelected instanceof Date ? [initialSelected] : [];
 			case CalendarSelectionMode.RANGE:
-				return isFromToObject(selected) ? [selected.from, selected.to] : [];
+				return isFromToObject(initialSelected) ? [initialSelected.from, initialSelected.to] : [];
 			default:
 				return [];
 		}
@@ -142,7 +141,6 @@ export const Calendar = memo(function Calendar({
 	const modifiers = useMemo(() => {
 		const holidayFn = isHoliday(holidays);
 		const customFn = isCustomFn(holidays);
-		const nationalOrRegionalHolidayFn = isNationalOrRegionalHolidayFn(holidays);
 		const isPastFn = isPast({ allowPastDays, today });
 		const isSelectedModifier =
 			mode === CalendarSelectionMode.RANGE ? isRangeSelected(rangeSelection) : isSelected(selectedDates);
@@ -151,7 +149,6 @@ export const Calendar = memo(function Calendar({
 			weekend: isWeekend,
 			holiday: holidayFn,
 			custom: customFn,
-			nationalOrRegionalHoliday: nationalOrRegionalHolidayFn,
 			today: isToday(today),
 			suggested: dayStates.suggested,
 			alternative: dayStates.alternative,
@@ -178,7 +175,7 @@ export const Calendar = memo(function Calendar({
 	const weekdayNames = useMemo(() => getWeekdayNames({ locale, weekStartsOn }), [locale, weekStartsOn]);
 	const monthLabel = useMemo(() => formatDate({ date: currentMonth, locale, format: "MMMM" }), [currentMonth, locale]);
 	const yearLabel = useMemo(() => formatDate({ date: currentMonth, locale, format: "yyyy" }), [currentMonth, locale]);
-	const monthFreeDays = useMemo(
+	const monthHolidayCount = useMemo(
 		() => holidays.filter((h) => isSameMonth({ a: h.date, b: currentMonth }) && h.isInPlanningWindow).length,
 		[holidays, currentMonth],
 	);
@@ -319,9 +316,9 @@ export const Calendar = memo(function Calendar({
 					</h3>
 				</div>
 				<div className="flex items-center gap-2">
-					{monthFreeDays > 0 && (
+					{monthHolidayCount > 0 && (
 						<span className="text-xs font-semibold text-muted-foreground tabular-nums">
-							{tCalendar("daysOff", { count: monthFreeDays })}
+							{tCalendar("daysOff", { count: monthHolidayCount })}
 						</span>
 					)}
 					{showNavigation && (

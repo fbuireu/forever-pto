@@ -1,6 +1,11 @@
+import caMessages from "@i18n/messages/ca.json";
+import deMessages from "@i18n/messages/de.json";
 import en from "@i18n/messages/en.json";
+import esMessages from "@i18n/messages/es.json";
+import frMessages from "@i18n/messages/fr.json";
+import itMessages from "@i18n/messages/it.json";
 import { act, render, screen } from "@testing-library/react";
-import { NextIntlClientProvider } from "next-intl";
+import { type Locale, NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@ui/modules/core/animate/text/Rotating", () => ({
@@ -9,13 +14,27 @@ vi.mock("@ui/modules/core/animate/text/Rotating", () => ({
 
 vi.mock("@ui/modules/pages/legal/Me", () => ({ Me: () => <span>Ferran</span> }));
 
-vi.mock("@ui/modules/shared/Icon", () => ({ Icon: () => <svg role="presentation" /> }));
+vi.mock("../../Icon", () => ({ Icon: () => <svg role="presentation" /> }));
 
 const { DevFooter } = await import("./DevFooter");
 
-const renderFooter = () =>
+const BUNDLES: Record<string, typeof en> = {
+	en,
+	es: esMessages,
+	ca: caMessages,
+	it: itMessages,
+	de: deMessages,
+	fr: frMessages,
+};
+
+interface RenderFooterParams {
+	locale?: Locale;
+	messages?: typeof en;
+}
+
+const renderFooter = ({ locale = "en", messages = en }: RenderFooterParams = {}) =>
 	render(
-		<NextIntlClientProvider locale="en" messages={en}>
+		<NextIntlClientProvider locale={locale} messages={messages}>
 			<DevFooter />
 		</NextIntlClientProvider>,
 	);
@@ -62,6 +81,27 @@ describe("the emoji it rotates", () => {
 
 		expect(vi.getTimerCount()).toBe(0);
 	});
+});
+
+describe("the credit line", () => {
+	const line = () => screen.getByTestId("emoji").parentElement as HTMLElement;
+
+	it("reads as one sentence with the emoji and the author inside it", () => {
+		renderFooter();
+
+		expect(line().textContent).toBe("Made with ☕ by Ferran");
+	});
+
+	it.each(Object.entries(BUNDLES))(
+		"renders the %s credit line with the emoji and the author in place",
+		(locale, messages) => {
+			renderFooter({ locale: locale as Locale, messages });
+
+			expect(line().textContent).toContain("☕");
+			expect(line().textContent).toContain("Ferran");
+			expect(line().textContent).not.toMatch(/[<>{}]|devFooter\./);
+		},
+	);
 });
 
 describe("where it says the developer can be found", () => {

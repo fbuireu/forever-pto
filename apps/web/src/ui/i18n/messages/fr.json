@@ -43,8 +43,7 @@
 		"title": "Forever PTO",
 		"heading": "Planificateur",
 		"description": "Ton planificateur de congés. Indique tes jours de congé, ton pays et ta stratégie pour tirer parti de chaque jour férié.",
-		"titleHighlight1": "Ton année",
-		"titleHighlight2": "libre",
+		"titleHighlight": "<first>Ton année</first> <second>libre</second>",
 		"instructions": "Commence par ajouter tes jours et le reste de ta configuration dans la barre latérale gauche. Encore des questions ?",
 		"quickTour": "Fais la visite guidée"
 	},
@@ -96,7 +95,7 @@
 			"daysCount": "{count, plural, one {jour} other {jours}}"
 		},
 		"summaryParagraph": {
-			"withGain": "Avec tes {ptoDays} jours de congé et {totalHolidays} jours fériés, la stratégie {strategy} les transforme en {effectiveDays} jours de repos effectifs, soit {increment} jours au-dessus de ton budget, un gain de +{percentage}% par rapport à une utilisation classique.",
+			"withGain": "Avec tes {ptoDays} jours de congé et {totalHolidays} jours fériés, la stratégie {strategy} les transforme en {effectiveDays} jours de repos effectifs, soit {increment} jours au-dessus de ton budget, un gain de +{percentage} par rapport à une utilisation classique.",
 			"withoutGain": "Avec tes {ptoDays} jours de congé et {totalHolidays} jours fériés, tu obtiens {effectiveDays} jours de repos effectifs avec la stratégie {strategy}.",
 			"noRegionHintTitle": "Ajoute ta région",
 			"noRegionHint": "Sélectionne ta région dans la barre latérale pour inclure les jours fériés régionaux et gagner encore plus de jours de repos.",
@@ -157,7 +156,7 @@
 				},
 				"carryOver": {
 					"question": "Que sont les mois de report ?",
-					"answer": "Si ton entreprise te permet d'utiliser les jours de PTO de cette année au début de l'année suivante, les mois de report prolongent la période de planification jusqu'à 12 mois après décembre, pour que le planificateur puisse aussi placer des jours en janvier ou en février de l'année suivante, par exemple."
+					"answer": "Si ton entreprise te permet d'utiliser les jours de PTO de cette année au début de l'année suivante, les mois de report prolongent la période de planification jusqu'à {max, number} mois après décembre, pour que le planificateur puisse aussi placer des jours en janvier ou en février de l'année suivante, par exemple."
 				}
 			},
 			"technical": {
@@ -239,8 +238,7 @@
 		"holidays": "Jours fériés",
 		"holidaysOutsideRange": "Nous ne connaissons les jours fériés que pour {from}–{to} ; ceux en dehors comptent comme des jours ouvrés.",
 		"dateRange": "Dates sélectionnées",
-		"from": "Du",
-		"to": "au"
+		"selectedRange": "Du {from} au {to}"
 	},
 	"holidaysTable": {
 		"nationalTab": "Nationaux",
@@ -258,12 +256,11 @@
 		"noHolidaysFound": "Aucun jour férié trouvé",
 		"noHolidays": "Aucun jour férié",
 		"allSelected": "Tous sélectionnés",
-		"selected": "sélectionnés",
+		"selectedCount": "{count} sélectionnés",
 		"weekend": "Week-end",
 		"onWeekends": "Les week-ends",
 		"onWorkdays": "Les jours ouvrés",
-		"showing": "Affichage de",
-		"of": "sur",
+		"showingCount": "Affichage de {shown} sur {total}",
 		"addHoliday": "Ajouter un jour férié",
 		"add": "Ajouter",
 		"editHoliday": "Modifier le jour férié",
@@ -282,9 +279,7 @@
 		"national": "Nationaux",
 		"regional": "Régionaux",
 		"custom": "Personnalisés",
-		"distributionDescription": "Répartition de tes {ptoDays} jours de congé, {nationalDays} jours fériés nationaux{regionalPart}{customPart}.",
-		"regionalPart": ", {regionalDays} régionaux",
-		"customPart": " et {customDays} personnalisés",
+		"distributionDescription": "Répartition de tes {ptoDays} jours de congé, {nationalDays} jours fériés nationaux{regionalDays, plural, =0 {} other {, # régionaux}}{customDays, plural, =0 {} other { et # personnalisés}}.",
 		"quarterDescription": "Répartition de {totalDays} jours effectifs sur {activeQuarters, plural, one {# trimestre} other {# trimestres}} de ta fenêtre de planification.",
 		"annualTimeline": "Chronologie annuelle",
 		"annualTimelineFeature": "Graphique de chronologie annuelle",
@@ -292,10 +287,9 @@
 		"daysOffLabel": "Jours de repos",
 		"longBlocksPerQuarter": "Blocs longs par trimestre",
 		"longBlocksFeature": "Graphique des blocs longs par trimestre",
-		"blocksDescription": "{totalBlocks} blocs longs (3+ jours consécutifs) idéaux pour les vacances{bestQuarterPart}.",
-		"bestQuarterPart": ". Meilleur trimestre : T{bestQuarter} avec {maxBlocks, plural, one {# bloc} other {# blocs}}",
+		"blocksDescription": "{totalBlocks, plural, =0 {# blocs longs ({minDays, number}+ jours consécutifs) idéaux pour les vacances.} other {# blocs longs ({minDays, number}+ jours consécutifs) idéaux pour les vacances. Meilleur trimestre : T{bestQuarter} avec {maxBlocks, plural, one {# bloc} other {# blocs}}.}}",
 		"blocks": "blocs",
-		"blocksOf3Days": "Blocs de 3+ jours"
+		"blocksOfMinDays": "Blocs de {minDays, number}+ jours"
 	},
 	"modals": {
 		"addHoliday": {
@@ -348,7 +342,7 @@
 		"nextBtn": "Suivant",
 		"prevBtn": "Précédent",
 		"doneBtn": "Terminé",
-		"progressTextConnector": "sur",
+		"progressText": "{current} sur {total}",
 		"steps": {
 			"toolsTitle": "Calculateurs et outils",
 			"toolsDescription": "Les calculateurs sont ici : estime combien de jours de congé tu as acquis, découvre ce que tes jours non utilisés te coûtent en salaire, ou compte les jours ouvrés entre deux dates.",
@@ -438,11 +432,11 @@
 		"errorTitle": "Une erreur est survenue",
 		"failedToSend": "Échec de l'envoi du message",
 		"errors": {
-			"name_too_short": "Ton nom doit contenir au moins 2 caractères.",
+			"name_too_short": "Ton nom doit contenir au moins {min, number} caractères.",
 			"name_too_long": "Ton nom est trop long.",
-			"subject_too_short": "Le sujet doit contenir au moins 5 caractères.",
+			"subject_too_short": "Le sujet doit contenir au moins {min, number} caractères.",
 			"subject_too_long": "Le sujet est trop long.",
-			"message_too_short": "Ton message doit contenir au moins 10 caractères.",
+			"message_too_short": "Ton message doit contenir au moins {min, number} caractères.",
 			"message_too_long": "Ton message est trop long.",
 			"contact_already_received": "Tu m'as déjà écrit récemment. Laisse-moi un peu de temps pour te répondre."
 		}
@@ -452,6 +446,7 @@
 		"recommended": "Recommandée",
 		"totalOff": "Jours effectifs",
 		"efficiency": "Efficacité",
+		"efficiencyValue": "{efficiency}x",
 		"vsMain": "vs principal",
 		"alreadyApplied": "Déjà appliquée",
 		"applyAlternative": "Appliquer l'alternative",
@@ -459,7 +454,7 @@
 		"nextSuggestion": "Suggestion suivante",
 		"totalDaysOff": "Total des jours effectifs",
 		"comparison": "Comparaison",
-		"daysUnit": "jours"
+		"effectiveDaysCount": "{count, plural, one {# jour} other {# jours}}"
 	},
 	"toasts": {
 		"suggestionApplied": "Suggestion appliquée",
@@ -517,9 +512,8 @@
 			"title": "Stratégie",
 			"placeholder": "Sélectionner une stratégie...",
 			"search": "Rechercher des stratégies...",
-			"hide": "Masquer",
-			"expand": "Déplier",
-			"strategyDetails": "les détails",
+			"showDetails": "Déplier les détails",
+			"hideDetails": "Masquer les détails",
 			"grouped": {
 				"label": "Groupée",
 				"description": "Quelques longues vacances",
@@ -594,23 +588,19 @@
 			"title": "Année"
 		},
 		"step1": {
-			"titleStart": "Ton ",
-			"titleEmphasis": "contexte",
+			"title": "Ton <em>contexte</em>",
 			"badge": "étape {step}"
 		},
 		"step2": {
-			"titleStart": "Tes ",
-			"titleEmphasis": "jours",
+			"title": "Tes <em>jours</em>",
 			"badge": "étape {step}"
 		},
 		"step3": {
-			"titleStart": "Ta ",
-			"titleEmphasis": "configuration",
+			"title": "Ta <em>configuration</em>",
 			"badge": "étape {step}"
 		},
 		"step4": {
-			"titleStart": "Ton ",
-			"titleEmphasis": "export",
+			"title": "Ton <em>export</em>",
 			"badge": "étape {step}"
 		},
 		"steps": "Étapes"
@@ -641,8 +631,7 @@
 		"calculate": "Calculer",
 		"result": "Résultat :",
 		"days": "jours",
-		"daysMonth": "jours/mois",
-		"months": "mois",
+		"breakdown": "<rate></rate> jours/mois × <count></count> {months, plural, one {mois} other {mois}}",
 		"applyToPtoDays": "Appliquer aux jours de congé"
 	},
 	"ptoSalaryCalculator": {
@@ -675,7 +664,7 @@
 		"activationFailed": "Ton paiement a bien été effectué, mais nous n’avons pas pu débloquer l’accès premium automatiquement. Récupère ton accès avec l’e-mail utilisé pour payer, ou contacte-nous.",
 		"paymentFailed": "Le paiement a échoué",
 		"processing": "Traitement en cours...",
-		"pay": "Payer",
+		"payAmount": "Payer {amount}",
 		"promoSaved": "Tu as économisé {saved} !",
 		"errors": {
 			"internal_error": "Quelque chose s'est mal passé de notre côté. Ta carte n'a pas été débitée.",
@@ -704,7 +693,7 @@
 	},
 	"premiumModal": {
 		"premiumRequired": "Fonctionnalité premium requise",
-		"featureRequiresPremium": "nécessite un accès premium",
+		"featureRequiresPremium": "<b>{feature}</b> nécessite un accès premium",
 		"verifyDescription": "Si tu as déjà fait un don, on vérifie ton e-mail et on te donne l'accès. Si tu as un problème, contacte-nous.",
 		"considerDonating": "Tu n'as pas encore fait de don ? Soutiens le projet pour débloquer les fonctionnalités premium !",
 		"enterPremiumEmail": "Saisis ton e-mail premium",
@@ -807,12 +796,11 @@
 		"analyticsCookies": "Cookies analytiques",
 		"analyticsDescription": "Nous aident à comprendre le comportement des visiteurs grâce à une collecte de données anonyme.",
 		"savePreferences": "Enregistrer les préférences",
-		"months": "mois",
-		"year": "an",
-		"years": "ans",
-		"minutes": "minutes",
-		"hours": "heures",
-		"week": "semaine",
+		"months": "{count, plural, one {# mois} other {# mois}}",
+		"years": "{count, plural, one {# an} other {# ans}}",
+		"minutes": "{count, plural, one {# minute} other {# minutes}}",
+		"hours": "{count, plural, one {# heure} other {# heures}}",
+		"weeks": "{count, plural, one {# semaine} other {# semaines}}",
 		"userCountryDesc": "Stocke ton pays détecté pour te proposer les premiers jours fériés.",
 		"ccCookieDesc": "Stocke tes préférences de consentement aux cookies.",
 		"stripeMidDesc": "Prévention et détection de fraude. Défini par Stripe pour un traitement sécurisé des paiements.",
@@ -836,19 +824,18 @@
 		"status": "Statut"
 	},
 	"workdayCounterModal": {
-		"selectDateRange": "Sélectionner des dates"
+		"selectDateRange": "Sélectionner des dates",
+		"selectedRange": "{from} - {to}"
 	},
 	"legal": {
 		"lastUpdated": "Dernière mise à jour : {date}"
 	},
 	"notFound": {
 		"kicker": "erreur 404 · route perdue",
-		"title": "Cette page est partie en",
-		"titleHighlight": "vacances",
-		"titleEmphasis": "sans prévenir.",
+		"title": "Cette page est partie en <highlight>vacances</highlight> <em>sans prévenir.</em>",
 		"lede": "On a cherché sur la plage, regardé sous le parasol, demandé au bar de la plage… rien. L'URL que tu cherches n'existe pas (ou s'est perdue entre deux longs week-ends).",
-		"ctaPrimary": "Retour à l'accueil",
-		"ctaPlanner": "Ouvrir le planificateur",
+		"ctaPrimary": "← Retour à l'accueil",
+		"ctaPlanner": "Ouvrir le planificateur →",
 		"suggestLabel": "Tu cherchais quelque chose comme ça ?",
 		"link1": "Comment ça marche",
 		"link2": "Fonctionnalités",
@@ -858,9 +845,7 @@
 	"error": {
 		"retry": "Réessayer",
 		"kicker": "Internal server error · v{version} · {time} UTC",
-		"title": "Le serveur a pris un",
-		"titleHighlight": "jour de congé",
-		"titleEmphasis": "sans demander la permission.",
+		"title": "Le serveur a pris un <highlight>jour de congé</highlight> <em>sans demander la permission.</em>",
 		"lede": "Quelque chose a planté de notre côté. Ce n'est pas ta faute (cette fois), et on est déjà dessus. Reviens dans quelques minutes ou consulte le statut en direct.",
 		"statusPage": "Voir le statut",
 		"meanwhile": "En attendant :",
@@ -879,7 +864,7 @@
 		"contactUs": "Nous contacter",
 		"legalNavigation": "Liens légaux",
 		"copyright": "© {year} Forever PTO · Fait depuis un hamac.",
-		"version": "v{version} · statut : en vacances ●",
+		"version": "v{version} · statut : en vacances <live>●</live>",
 		"planner": "Planificateur",
 		"docs": "Documentation"
 	},
@@ -891,8 +876,7 @@
 		"close": "Fermer"
 	},
 	"devFooter": {
-		"madeWith": "Fait avec",
-		"by": "par",
+		"madeWithBy": "Fait avec <emoji></emoji> par <author></author>",
 		"findMeOn": "Tu peux aussi me trouver"
 	},
 	"premium": {
@@ -948,9 +932,7 @@
 			"resumeAction": "Mon plan →"
 		},
 		"hero": {
-			"command": "Travaille moins.",
-			"verb": "Voyage",
-			"highlight": "plus",
+			"title": "Travaille moins.<br></br>Voyage <highlight>plus</highlight>",
 			"description": "Forever PTO calcule <em>exactement</em> quels jours poser pour transformer tes 22 jours de congé en <strong>70+ jours libres</strong>. Pas de tableur. Pas de calculs. Pas de culpabilité.",
 			"plannerCta": "Calculer mes jours →",
 			"demoLink": "Voir comment ça marche (30s)",
@@ -971,11 +953,7 @@
 		},
 		"how": {
 			"badge": "comment ça marche · {steps} étapes",
-			"titleStart": "De",
-			"titleMid": "à",
-			"question1": "que faire",
-			"question2": "voyage réservé",
-			"titleEnd": "en 60 secondes.",
+			"title": "De <em>“que faire”</em> à <em>“voyage réservé”</em> en 60 secondes.",
 			"description": "Sans installation. Sans carte bancaire. Sans newsletter. Dis-nous combien de jours tu as et où tu vis.",
 			"inputDaysTitle": "Saisis tes jours.",
 			"inputDaysDescription": "Combien de jours de congé tu as et dans quel pays ou région tu travailles. C'est tout.",
@@ -986,6 +964,7 @@
 		},
 		"stats": {
 			"efficiencyLabel": "Efficacité moyenne",
+			"efficiencyValue": "{ratio}×",
 			"daysLabel": "Jours libres avec {days} congés",
 			"countriesLabel": "Pays couverts",
 			"plansLabel": "Suggestions générées",
@@ -993,14 +972,13 @@
 		},
 		"features": {
 			"badge": "astuces du moteur",
-			"titleStart": "Pas un calendrier. Un",
-			"titleEmphasis": "allié",
-			"titleEnd": "contre les lundis.",
+			"title": "Pas un calendrier. Un <em>allié</em> contre les lundis.",
 			"description": "Voici les coups que Forever PTO joue pour toi automatiquement.",
 			"bridgeTag": "détection des ponts",
 			"bridgeTitle": "Transforme 1 congé en 4 jours libres.",
 			"bridgeDescription": "Détecte les jours fériés les mardis et jeudis et suggère des ponts minimaux. Un jour stratégique = un week-end de 4 jours.",
 			"ratioTag": "max efficacité",
+			"ratioValue": "{ratio}<sign>×</sign>",
 			"ratioDescription": "Meilleure efficacité : 8 jours de congé en 30 jours libres (France).",
 			"syncTag": "sync en 1 clic",
 			"syncTitle": "Google · Outlook · iCal",
@@ -1042,9 +1020,7 @@
 		},
 		"testimonials": {
 			"badge": "on en parle",
-			"titleStart": "Des gens qui ont récupéré des",
-			"titleEmphasis": "semaines",
-			"titleEnd": "de leur vie.",
+			"title": "Des gens qui ont récupéré des <em>semaines</em> de leur vie.",
 			"items": {
 				"martaR": {
 					"text": "Je suis passée de jours pris au hasard à 6 voyages planifiés. Mon partenaire pense que je suis devenue organisée.",
@@ -1085,8 +1061,7 @@
 			"description": "Pas de SaaS. Pas d'abonnement. Pas d'« essai gratuit qui se renouvelle automatiquement ».",
 			"freeName": "Gratuit pour toujours",
 			"freeTagline": "Essaie, ça va te convaincre.",
-			"freePrice": "{amount}",
-			"freePer": "/toujours",
+			"freePrice": "{amount}<per>/toujours</per>",
 			"freeNote": "Pas de carte. Pas d'e-mail. Rien.",
 			"freeFeatures": {
 				"optimizedPlan": "Plan de vacances auto-optimisé",
@@ -1097,8 +1072,7 @@
 			"freeCta": "Commencer gratuitement",
 			"lifetimeName": "Pass Soutien",
 			"lifetimeTagline": "Don minimum de {amount}, accès à vie.",
-			"lifetimePrice": "À partir de {amount}",
-			"lifetimePer": " en une fois",
+			"lifetimePrice": "À partir de {amount}<per> en une fois</per>",
 			"lifetimeNote": "100% facultatif. Maintient le projet en vie.",
 			"lifetimeFeatures": {
 				"manualEditing": "Édition manuelle du calendrier",
@@ -1116,9 +1090,7 @@
 			"title": "Des questions ? On a des réponses."
 		},
 		"closing": {
-			"titleStart": "Ta prochaine année",
-			"titleEmphasis": "libre",
-			"titleEnd": "commence aujourd'hui.",
+			"title": "Ta prochaine année <em>libre</em><br></br>commence aujourd'hui.",
 			"description": "22 jours peuvent devenir plus de 70. Il suffit de savoir où les placer. C'est ce qu'on fait.",
 			"cta": "Calculer mes jours libres →",
 			"shapes": {
@@ -1142,8 +1114,7 @@
 			"description": "Le pays décide des jours fériés sur lesquels le planificateur s'appuie. Une région ajoute les jours locaux.",
 			"country": "Pays",
 			"detected": "Détecté depuis ta connexion. Modifie-le s'il n'est pas correct.",
-			"region": "Région",
-			"optional": "facultatif",
+			"region": "Région <optional>(facultatif)</optional>",
 			"noRegions": "Ce pays n'a pas de calendriers régionaux, le calendrier national est donc utilisé."
 		},
 		"ptoDays": {

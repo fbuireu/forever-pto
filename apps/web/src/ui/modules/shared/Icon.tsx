@@ -1,5 +1,5 @@
 import type { SvgIcon } from "@ui/assets/icons/types";
-import { getViewBoxFromSvg } from "@ui/modules/shared/utils/helpers";
+import { getViewBoxFromSvg } from "./utils/helpers";
 
 interface IconProps {
 	icon: SvgIcon;

@@ -8,6 +8,7 @@ describe("SITE_ROUTES", () => {
 	});
 
 	it("gives every indexable route the hints the sitemap needs", () => {
+		expect(indexableRoutes().length).toBeGreaterThan(0);
 		for (const route of indexableRoutes()) {
 			expect(route.changeFrequency).toBeDefined();
 			expect(route.priority).toBeDefined();

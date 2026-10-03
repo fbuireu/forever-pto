@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-The [overview](/architecture/overview/) measures the dependency graph; this page walks each node of it. Every layer carries a `AGENTS.md` at its root that is the binding contract; this page is the tour, and it links the contract rather than restating it where the contract is long.
+The [overview](/architecture/overview/) measures the dependency graph; this page walks each node of it. Every layer carries an `AGENTS.md` at its root with its map and gotchas, and the rules a review holds it to are in [`CODING_STANDARDS.md`](https://github.com/fbuireu/forever-pto/blob/main/CODING_STANDARDS.md); this page is the tour, and it links the rules rather than restating them where they are long.
 
 ```mermaid
 flowchart TB
@@ -44,7 +44,7 @@ The split that matters most is not between layers but between **runtimes**: two 
 - **A route handler is a terminator.** It parses the request, runs an Effect program against `ApplicationLayer`, maps the typed failure channel onto a status through `describeFailure`, and closes the tail with `catchAll` so it never rejects. Where a flow exists behind more than one transport (a route *and* a server action), the handler calls an operation under `apps/web/src/infrastructure/api/operations/` and wraps its outcome; see the [rate limiting](/how-it-works/rate-limiting/) page for what that seam owns.
 - **Metadata is one line per route.** `export const generateMetadata = routeMetadata('/legal/privacy-policy')`, reading the route's own row of `SITE_ROUTES`; the shape, the hreflang map and the indexability rule live in `apps/web/src/infrastructure/seo/buildMetadata.ts` ([SEO](/how-it-works/seo/)).
 - **Bodies are parsed inside the program.** `parseJsonBody` lifts `request.json()` into the Effect so a malformed body is a `ValidationError` and a 400, not a bare 500 from a rejection before any `catchTags` exists. The Stripe webhook is the exception: it needs the raw text for signature verification.
-- **Anything carrying Premium state answers `no-store`.** `check-session` and `health` go through `noStore`, and the tests assert the header against the real helper rather than a mock.
+- **Anything carrying one visitor's state answers `no-store`.** `check-session`, `health`, `payment` (its client secret) and `contact` (one sender's outcome) go through `noStore`, and the tests assert the header against the real helper rather than a mock.
 - **Security headers are not here.** They are `SECURITY_HEADERS` in `next.config.ts`, applied to `/(.*)`, which, unlike the proxy's matcher, covers every request.
 
 **Where a change goes.** A new page is a folder with `page.tsx` and one `generateMetadata` line, plus a row in `SITE_ROUTES`. A new endpoint is a route handler that terminates a use case, and an operation the moment a second transport needs the same flow.
@@ -59,9 +59,9 @@ Not a layer but a single file at the root of `src`, kept at the pre-Next-16 name
 
 | Half | Folders | Runs |
 | --- | --- | --- |
-| Server | `use-cases/` (the Effect programs), `email/templates/` (the one React Email document), the Zod schemas in `dto/`, `shared/utils/zodParse.ts` | At a route handler or server action |
+| Server | `use-cases/` (the Effect programs), `email/templates/` (the one React Email document), `shared/utils/zodParse.ts` | At a route handler or server action |
 | Browser | `stores/` (the five Zustand stores), `export/` (the ICS generator), `i18n/navigation.ts` (`Link`, `useRouter`, `usePathname` bound to the locale routing) | In the planner |
-| Both | `dto/` (the translation seam from foreign shapes to the glossary), `shared/dto/baseDTO.ts`, `shared/utils/dates.ts`, `shared/utils/dateIntake.ts`, `shared/utils/collate.ts` | Wherever imported |
+| Both | `dto/` (the translation seam from foreign shapes to the glossary, its Zod schemas included), `shared/dto/baseDTO.ts`, `shared/utils/dates.ts`, `shared/utils/dateIntake.ts`, `shared/utils/collate.ts` | Wherever imported |
 
 **What it may import.** `@domain/*` and `@infrastructure/*`. It must not import a React component, build a `NextResponse` or call `getCloudflareContext()`: configuration arrives as plain values. One file inverts the rule, `stores/premium.ts` reaching `@ui/adapters/session/checkSession`, recorded as known and not endorsed; a second is a regression.
 
@@ -93,7 +93,7 @@ Not a layer but a single file at the root of `src`, kept at the pre-Next-16 name
 - **`runPlanningPipeline` is the only orchestration.** It clears the caches, expands the window, folds Manual Days in, measures the budget, finds candidates once, selects, builds Alternatives and measures every plan. The Web Worker and the store's main-thread action both call it and add transport only; it existed twice once and the copies drifted. The [planning algorithm](/how-it-works/planning-algorithm/) page walks each stage.
 - **The caches are caller-owned.** `utils/cache.ts` memoises date keys and Holiday sets at module level; the pipeline clears both on entry and every test that reaches them clears them in `beforeEach` ([ADR 0006](https://github.com/fbuireu/forever-pto/blob/main/adr/0006-caller-owned-calculation-caches.md)).
 - **An event carries what a handler acts on.** `PaymentSucceededEvent` is `paymentId`, `email`, `status` and `latestChargeId`, and the handler reads every one; the factory fails with `MissingDonorEmailError` rather than build an event with a blank address, because Premium is keyed by that address ([ADR 0008](https://github.com/fbuireu/forever-pto/blob/main/adr/0008-premium-derived-from-payment.md)).
-- **Neither contract is lint-enforced.** Biome has no import-boundary rule; the contract suite compares the measured graph against the overview's table, and the rest holds by review.
+- **Neither contract is lint-enforced.** Biome has no import-boundary rule; the contract suite compares the measured graph against the overview's table and holds each context to the imports its contract allows.
 
 `apps/web/src/domain/calendar/AGENTS.md` is the engine's own guide, with its public API, invariants and the traps a change falls into.
 
@@ -119,7 +119,7 @@ Not a layer but a single file at the root of `src`, kept at the pre-Next-16 name
 **The rules.**
 
 - **Providing `ApplicationLayer` builds every client, and building one reads no environment.** Each client reads its configuration lazily inside the call and reports a missing variable as its own tagged error, which the entry point's map can see. When the layers read at construction, a missing `RESEND_API_KEY` broke the payment route, which sends no mail, as a defect nothing could map.
-- **A log never fails its caller.** `write` is one `console[level](JSON.stringify(...))` inside a `try`; the context is spread first so a caller cannot relabel its own level, and `stripQuery` removes a query string from any `url` field, because Stripe appends the client secret to the return URL.
+- **A log never fails its caller.** `write` is one `console[level](JSON.stringify(...))` inside a `try`, and a context value that cannot be serialised is written as `"[unserializable]"` rather than costing the line; the context is spread first so a caller cannot relabel its own level, and `stripQuery` removes a query string from any `url` field, because Stripe appends the client secret to the return URL.
 - **The holiday source is a seam with two adapters.** `dateHolidaysSource` constructs the package in production and `createFixtureHolidaySource` feeds tests plain data, and the rules (non-working types only, Region over Country) run above both. See the [holidays engine](/how-it-works/holidays-engine/).
 - **The wire type is honest on the outbound leg and narrowed on the inbound one.** `workers/types.ts` spells every date as an ISO string; `worker.ts` narrows `strategy` and `locale` with `isFilterStrategy` and `isLocale` because that is where a value out of persisted storage arrives.
 - **The operations own the order.** Rate limit, then input, then use case, then the deferred hand-off; the routes and the server actions wrap the outcome and differ in nothing else. See [rate limiting](/how-it-works/rate-limiting/) and [Effect layers](/architecture/effect-layers/).
@@ -137,15 +137,15 @@ Not a layer but a single file at the root of `src`, kept at the pre-Next-16 name
 | `hooks/` | `useCalculationsWorker` (the worker lifecycle), `useStoresReady` (gates rendering on rehydration), `usePlanReadout` (the applied plan and its budget), `useTutorial`, and the generic ones |
 | `adapters/` | `payments/checkout.ts` (intent creation, Stripe confirmation, session activation) and `session/checkSession.ts`: the layer's outbound I/O |
 | `i18n/messages/` | One JSON bundle per locale, aliased `@i18n/*`; parity of keys across bundles is asserted |
-| `styles/` | Tailwind configured entirely in CSS: `index.css` declares the cascade layer order and imports the partials (`base`, `theme`, `utilities`, `animations`, `global`, `vendor`); `lazy/index.css` loads with the tutorial |
+| `styles/` | Tailwind configured entirely in CSS: `index.css` declares the cascade layer order and imports the partials (`base`, `theme`, `utilities`, `animations`, `global`, `vendor`); the tutorial's stylesheet sits beside `modules/tutorial/DriverStyles.tsx` and loads with the tour |
 | `utils/` | `cn`, the cookie helper, the currency formatter cache, `getStrictContext` |
 
 **What it may import.** `@application/*` (stores, DTO types, the navigation wrapper, the date helpers) and, from `@domain/calendar`, a short list of **pure value helpers**: the types, `resolveSelectedDays`, `measureBudget`, `windowMonthCount`, `windowMonthIndex` and `planningWindowMonths`. It must not reach the planning engine itself, no generator, no selector, no `findPlanningCandidates`: a Suggestion is produced by the worker and read back from the store. `@infrastructure/*` is allowed where there is no alternative, and the list is short enough to keep honest: the locale codes, the worker types and serialisers, the public env reader, the lookups that run in the browser, the browser Stripe client, the tutorial client, the tracking helper and the two server actions.
 
 **The rules.**
 
-- **`core/` imports nothing back.** No stores, no `useTranslations`, no fetching; components take strings and callbacks. Everything else may import `core/`; where a new component goes is a five-question walk in `apps/web/src/ui/modules/AGENTS.md`.
-- **Navigation goes through `@application/i18n/navigation`.** No file imports `next/link` or `next/navigation` directly, so every internal link carries the locale prefix.
+- **`core/` imports nothing back.** No stores, no `useTranslations`, no fetching; components take strings and callbacks. Everything else may import `core/`; where a new component goes is the walk `U8` sets out.
+- **Navigation goes through `@application/i18n/navigation`.** `Link`, `useRouter` and `usePathname` come from there, so every internal link carries the locale prefix; the one import from `next/navigation` is `unstable_isUnrecognizedActionError`, which navigates nowhere.
 - **Import `m`, never `motion`.** The app wraps everything in `LazyMotionProvider`, which loads `domAnimation` on demand; a `motion.div` re-introduces the full bundle the provider exists to defer.
 - **The worker hook reads the hand-edited days non-reactively.** `manuallySelectedDays`, `removedSuggestedDays` and `currentSelection` come out of `getState()` inside `triggerCalculation`, never through the selector: they are inputs to the next run, not reasons to start one. While they sat in the selector, picking one day re-planned the whole year.
 - **A failed confirmation is not always a failed payment.** `checkout.ts` answers a four-case `ConfirmPaymentResult` (`SUCCEEDED`, `REFUSED_BEFORE_CHARGE`, `FAILED_AFTER_CHARGE`, `HANDED_OFF_TO_ISSUER`) and the checkout form switches on it exhaustively, so a payer whose card was charged is never shown "your card has not been charged".
@@ -156,4 +156,4 @@ The design tokens, the shadow scale and the cascade order are the [design system
 
 ## What holds it together
 
-Nothing above is enforced by a linter: Biome has no import-boundary rule. What is enforced is the **measurement**. `tests/docs-consistency.test.ts` walks every import under `apps/web/src`, counts the edges between layers, and fails when the table on the [overview](/architecture/overview/) page disagrees with the tree in either direction; it also reads every alias that lands inside `src/ui/` and fails on an importer in `infrastructure/` outside the two tolerated files, and it parses every `'use client'` directive to make sure an import sorted above it has not silently turned a client module into a server one. The rest is the folder guides and review, which is what [ADR 0014](https://github.com/fbuireu/forever-pto/blob/main/adr/0014-ddd-where-it-pays.md) decided the tactical half of domain-driven design should cost here.
+Nothing above is enforced by a linter: Biome has no import-boundary rule. What is enforced is the **measurement**. `tests/docs-consistency.test.ts` walks every import under `apps/web/src`, counts the edges between layers, and fails when the table on the [overview](/architecture/overview/) page disagrees with the tree in either direction; it also reads every alias that lands inside `src/ui/` and fails on an importer in `infrastructure/` outside the two tolerated files, and it parses every `'use client'` directive to make sure an import sorted above it has not silently turned a client module into a server one. It also holds each layer to the imports `CODING_STANDARDS.md` hands it (the domain contexts, the application layer's reach, the UI's navigation and `core/`), and the *Tooling already enforces* section there lists them. The rest is the rules in that file and review, which is what [ADR 0014](https://github.com/fbuireu/forever-pto/blob/main/adr/0014-ddd-where-it-pays.md) decided the tactical half of domain-driven design should cost here.

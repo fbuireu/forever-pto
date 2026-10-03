@@ -1,5 +1,5 @@
-import type { CountryDTO, RawCountry } from "@application/dto/country/types";
 import type { BaseDTO } from "@application/shared/dto/baseDTO";
+import type { CountryDTO, RawCountry } from "./types";
 
 export const countryDTO: BaseDTO<RawCountry, CountryDTO[]> = {
 	create: ({ raw }) => {

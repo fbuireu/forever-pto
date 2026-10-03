@@ -1,6 +1,6 @@
 import type { RawHoliday } from "@application/dto/holiday/types";
 import { EN } from "@infrastructure/i18n/locales";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { GetHolidaysParams } from "./getHolidays";
 import { createFixtureHolidaySource } from "./source/fixture";
 import type { HolidaySource } from "./source/types";
@@ -48,6 +48,10 @@ const BASE_PARAMS: GetHolidaysParams = {
 
 beforeEach(() => {
 	vi.clearAllMocks();
+});
+
+afterEach(() => {
+	vi.restoreAllMocks();
 });
 
 describe("getHolidays", () => {

@@ -57,7 +57,7 @@ Each step carries a `data-tutorial` anchor from `TUTORIAL_ANCHOR`, which is what
 
 ## The loop, from the screen's side
 
-`CalendarList` (`apps/web/src/ui/modules/pages/planner/CalendarList.tsx`) owns three effects, and their order is the product's behaviour:
+`CalendarList` (`apps/web/src/ui/modules/pages/planner/CalendarList.tsx`) owns four effects (prune, fetch, calculate, clear), and their order is the product's behaviour:
 
 ```mermaid
 sequenceDiagram
@@ -78,7 +78,7 @@ sequenceDiagram
   Note over CL,H: canCalculate false while a Suggestion exists → clearCalculation
 ```
 
-`planRevision` is a counter the store bumps when a user action should re-plan without any input having changed, such as removing a Holiday. The effect lists it as a dependency and never reads it, which is the one place in the file Biome is told to look away.
+`planRevision` is a counter the store bumps when a user action should re-plan without any input having changed: applying an Alternative, or resetting the hand edits. The effect lists it as a dependency and never reads it, which is the one place in the file Biome is told to look away.
 
 **The effect plans only on the Holidays of the filters on screen.** `holidaysKey` in the holidays store records which Country, Region, year, Carry-over Months and locale the loaded Holidays were fetched for (`holidaysKeyOf` in `apps/web/src/application/stores/types.ts`), and `holidaysAreCurrent` compares it with the filters. Without that gate a filter change planned once on the previous Holidays and again when the new ones arrived, and a reload planned on the persisted list first; the key is not persisted, so a reload waits for its first fetch and plans once.
 
@@ -86,9 +86,9 @@ sequenceDiagram
 
 ## The calendar grid
 
-`Calendar` (`apps/web/src/ui/modules/pages/planner/calendar/Calendar.tsx`) renders one month and knows nothing about planning. It has three selection modes, `SINGLE`, `RANGE` and `NONE`, because three callers use it: the planner picks days out of a plan, the Holiday form picks one date, and the Workday counter picks a range. In `NONE` mode it hands each click to `onDayToggle` and does nothing with the answer.
+`Calendar` (`apps/web/src/ui/modules/pages/planner/calendar/Calendar.tsx`) renders one month and knows nothing about planning. It has four selection modes, `SINGLE`, `MULTIPLE`, `RANGE` and `NONE`, and three callers use it, with no caller for `MULTIPLE`: the planner picks days out of a plan, the Holiday form picks one date, and the Workday counter picks a range. In `NONE` mode it hands each click to `onDayToggle` and does nothing with the answer.
 
-The **planner's click policy** lives in `usePlannerDayClick` (`apps/web/src/ui/modules/pages/planner/calendar/usePlannerDayClick.tsx`) rather than in the grid. It has four branches: no Premium (a toast with an upgrade prompt), applied, a refusal with copy, a refusal without. The refusals themselves come from the store's `toggleDaySelection` as a `DayRefusal`:
+The **planner's click policy** lives in `usePlannerDayClick` (`apps/web/src/ui/modules/pages/planner/calendar/usePlannerDayClick.tsx`) rather than in the grid. It has four branches: no Premium (a toast offering Premium), applied, a refusal with copy, a refusal without. The refusals themselves come from the store's `toggleDaySelection` as a `DayRefusal`:
 
 | Refusal | When |
 | --- | --- |
@@ -103,7 +103,7 @@ Every day cell is painted from one table, `MODIFIERS_CLASS_NAMES` in `apps/web/s
 | State | Predicate | Colour language |
 | --- | --- | --- |
 | Weekend | `isWeekend` | Soft panel, faint frame |
-| Holiday | `isNationalOrRegionalHoliday` | Brand yellow gradient, hard shadow |
+| Holiday | `isHoliday` | Brand yellow gradient, hard shadow |
 | Custom Holiday | `isCustom` | Purple hatch |
 | Suggested Day | `isSuggestion`, minus Removed Days | Brand teal |
 | Alternative preview | `isAlternative` for the previewed index | Orange hatch, pulsing |
@@ -118,26 +118,26 @@ Each cell also carries `aria-label` text built from `DAY_STATE_LABELS`, so a scr
 
 `PlannerPanel` (`apps/web/src/ui/modules/pages/planner/PlannerPanel.tsx`) is the Alternative switcher and the budget readout in one card:
 
-- **Option N / total** with previous and next buttons. Stepping writes `previewAlternativeIndex` to the store, and the calendar paints that Alternative's days in the preview colour while the applied plan stays teal.
+- **Alternative N** with previous and next buttons. Stepping writes `previewAlternativeIndex` to the store, and the calendar paints that Alternative's days in the preview colour while the applied plan stays teal.
 - **Effective Days, Bonus Days and Efficiency** of the previewed plan, each a `SlidingNumber`, with the Efficiency difference against the applied plan and a percentage comparison, so the user can see what an Alternative trades.
-- **Apply**, which writes the previewed plan as `currentSelection` and remembers its index; the applied option reads "already applied".
+- **Apply**, which writes the previewed plan as `currentSelection` and remembers its index; the applied Alternative reads "already applied".
 - **The budget**, from `usePlanReadout` (`apps/web/src/ui/hooks/usePlanReadout.ts`): Suggested, Manual and spent counts plus the Remaining Budget, computed by the domain's `measureBudget`. While a calculation is in flight the readout keeps the **last settled** remaining count rather than flickering through an intermediate one.
 
 ## The Holiday tables
 
 `HolidaysList` (`apps/web/src/ui/modules/pages/planner/HolidaysList.tsx`) renders one `Tabs` set with a tab per Holiday Variant over `HolidaysTable`. The Regional tab is inert when the Region has no Holidays of its own; the Custom tab sits behind the Premium gate.
 
-Each row shows the date, the localised name and whether the Holiday falls on a Workday or a weekend, which is the one thing a user needs to judge whether it is worth bridging. The row's checkbox and the table's select-all are Premium; so are **Add**, **Edit** and **Delete**, which open one shared `HolidayFormModal` with a Zod schema built per locale. Adding or editing asks the store's `heldOn` whether the date is already taken and by what, and the store answers a `HolidayOutcome` the modal turns into copy: a National Holiday already there, a Manual Day already spent, or applied.
+Each row shows the date, the localised name and whether the Holiday falls Monday to Friday or on a weekend, which is the one thing a user needs to judge whether it is worth bridging. The row's checkbox and the table's select-all are Premium; so are **Add** and **Edit**, which open one shared `HolidayFormModal` with a Zod schema built per locale, and **Delete**, which opens `DeleteHolidayModal`. Adding or editing asks the store's `heldOn` whether the date is already taken and by what, and the store answers a `HolidayOutcome` the modal turns into copy: a National Holiday already there, a Manual Day already spent, or applied.
 
 ## Summary
 
-`Summary` (`apps/web/src/ui/modules/pages/planner/Summary.tsx`) renders the Metrics of the applied plan. Four headline cards are free: PTO Days, Holidays in the window, Effective Days and Gain. The rest are Premium, each wrapped in `PremiumFeature` with its own `PremiumFeatureId` so the upgrade modal can name the feature that was clicked:
+`Summary` (`apps/web/src/ui/modules/pages/planner/Summary.tsx`) renders the Metrics of the applied plan. Four headline cards are free: PTO Days, Holidays in the window, Effective Days and Gain. The rest are Premium, each wrapped in `PremiumFeature` with its own `PremiumFeatureId` so the Premium modal can name the feature that was clicked:
 
 | Card or chart | Metric | Component |
 | --- | --- | --- |
 | Long Weekends, Rest Blocks, Efficiency, Bridges used, Worked Days per month | The scalar Metrics | `MetricCard` |
 | Year timeline | Every Free Day and PTO Day across the window | `YearTimelineChart.tsx` |
-| Composition | Weekends vs Holidays vs PTO Days | `HolidaysDistributionChart.tsx`, a pie |
+| Composition | PTO Days vs National, Regional and Custom Holidays | `HolidaysDistributionChart.tsx`, a pie |
 | Quarter distribution | PTO Days per Quarter | `QuarterDistributionChart.tsx` |
 | Long Blocks per Quarter | Rest Blocks of three days or more per Quarter | `BlocksPerQuarterChart.tsx` |
 | Monthly distribution | PTO Days per window month | `MonthlyDistributionChart.tsx` |

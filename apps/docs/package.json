@@ -1,6 +1,6 @@
 {
 	"name": "forever-pto-docs",
-	"version": "1.5.0",
+	"version": "1.5.1",
 	"private": true,
 	"description": "Documentation site for Forever PTO, rendering the app's real components",
 	"license": "AGPL-3.0-only",
@@ -24,9 +24,9 @@
 		"test:e2e": "playwright test"
 	},
 	"dependencies": {
-		"@astrojs/markdown-satteri": "0.4.1",
-		"@astrojs/react": "6.0.5",
-		"@astrojs/starlight": "0.42.0",
+		"@astrojs/markdown-satteri": "0.4.2",
+		"@astrojs/react": "6.0.6",
+		"@astrojs/starlight": "0.42.4",
 		"@astrojs/starlight-tailwind": "5.0.0",
 		"@base-ui/react": "1.8.0",
 		"@fontsource-variable/bricolage-grotesque": "5.3.0",
@@ -34,7 +34,7 @@
 		"@fontsource-variable/space-grotesk": "5.3.0",
 		"@fontsource/instrument-serif": "5.3.0",
 		"@tailwindcss/vite": "4.3.3",
-		"astro": "7.3.2",
+		"astro": "7.3.5",
 		"class-variance-authority": "0.7.1",
 		"clsx": "2.1.1",
 		"cmdk": "1.1.1",

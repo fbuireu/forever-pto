@@ -9,8 +9,11 @@ allowBuilds:
   sharp: true
   workerd: true
 savePrefix: ""
-minimumReleaseAge: 4320 # 3 days
+minimumReleaseAge: 4320
 blockExoticSubdeps: true
 patchedDependencies:
   boneyard-js: patches/boneyard-js.patch
   vaul@1.1.2: patches/vaul@1.1.2.patch
+minimumReleaseAgeExclude:
+  # Renovate security update: next@16.3.6
+  - next@16.3.6

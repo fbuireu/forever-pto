@@ -93,7 +93,7 @@ const BASE_STORED_PAYMENT = {
 
 beforeEach(() => {
 	vi.clearAllMocks();
-	mockExecute.mockReturnValue(Effect.succeed(undefined));
+	mockExecute.mockReturnValue(Effect.succeed(1));
 	mockQuery.mockReturnValue(Effect.succeed([]));
 });
 

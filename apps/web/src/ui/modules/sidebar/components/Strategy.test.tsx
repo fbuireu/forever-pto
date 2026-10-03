@@ -12,6 +12,10 @@ const store = vi.hoisted(() => ({
 }));
 
 const track = vi.hoisted(() => vi.fn());
+const askForPlan = vi.hoisted(() => vi.fn());
+vi.mock("@application/stores/holidays", () => ({
+	useHolidaysStore: (selector: (state: unknown) => unknown) => selector({ askForPlan }),
+}));
 vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
 
 vi.mock("@application/stores/filters", () => ({
@@ -41,7 +45,10 @@ const renderStrategy = () =>
 		</NextIntlClientProvider>,
 	);
 
-const details = () => screen.getByRole("button", { name: new RegExp(en.sidebar.strategy.strategyDetails) });
+const details = () =>
+	screen.getByRole("button", {
+		name: new RegExp(`${en.sidebar.strategy.showDetails}|${en.sidebar.strategy.hideDetails}`),
+	});
 
 const panel = (container: HTMLElement) => container.querySelector('[data-slot="collapsible-content"]') as HTMLElement;
 
@@ -80,11 +87,22 @@ describe("Strategy", () => {
 	});
 
 	it("says nothing when the same strategy is picked again", async () => {
+		askForPlan.mockClear();
 		renderStrategy();
 
 		await userEvent.click(screen.getByRole("option", { name: en.sidebar.strategy.balanced.label }));
 
 		expect(store.setStrategy).not.toHaveBeenCalled();
+		expect(askForPlan).not.toHaveBeenCalled();
+	});
+
+	it("asks for a plan when another strategy is picked", async () => {
+		askForPlan.mockClear();
+		renderStrategy();
+
+		await userEvent.click(screen.getByRole("option", { name: en.sidebar.strategy.optimized.label }));
+
+		expect(askForPlan).toHaveBeenCalledOnce();
 	});
 
 	it("describes the strategy the store holds, not the first one in the list", () => {
@@ -125,7 +143,7 @@ describe("Strategy", () => {
 
 		expect(details().getAttribute("aria-expanded")).toBe("true");
 		expect(panel(container).getAttribute("aria-hidden")).toBeNull();
-		expect(details().textContent).toContain(en.sidebar.strategy.hide);
+		expect(details().textContent).toBe(en.sidebar.strategy.hideDetails);
 	});
 
 	it("closes them again", async () => {
@@ -135,7 +153,7 @@ describe("Strategy", () => {
 		await userEvent.click(details());
 
 		expect(panel(container).getAttribute("aria-hidden")).toBe("true");
-		expect(details().textContent).toContain(en.sidebar.strategy.expand);
+		expect(details().textContent).toBe(en.sidebar.strategy.showDetails);
 	});
 
 	it("shows no details at all for a strategy it does not know", () => {

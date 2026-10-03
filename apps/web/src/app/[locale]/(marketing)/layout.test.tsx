@@ -11,7 +11,7 @@ vi.mock("next-intl/server", () => ({
 	setRequestLocale: mockSetRequestLocale,
 	getTranslations: async () => (key: string) => key,
 }));
-vi.mock("@ui/modules/pages/homepage/navigation/Navigation", () => ({ Header: MockHeader }));
+vi.mock("@ui/modules/shared/Header", () => ({ Header: MockHeader }));
 vi.mock("@ui/modules/shared/footer/Footer", () => ({ Footer: MockFooter }));
 vi.mock("@ui/modules/core/primitives/Sonner", () => ({ Toaster: MockToaster }));
 vi.mock("@ui/modules/pages/homepage/quick-start/QuickStart", () => ({ QuickStart: MockQuickStart }));

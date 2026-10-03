@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PromoCodeErrors } from "./types";
 
 interface PaymentSchemaMessages {
 	amountMin: string;
@@ -36,7 +37,22 @@ export const createPaymentSchema = createPaymentSchemaWithMessages({
 
 export type CreatePaymentInput = z.infer<typeof createPaymentSchema>;
 
+export const amountFromInput = (text: string): number => (text === "" ? 0 : Number.parseFloat(text));
+
+export const createDonationFormSchemaWithMessages = (messages: PaymentSchemaMessages) => {
+	const payment = createPaymentSchemaWithMessages(messages);
+
+	return payment.extend({ amount: z.string().transform(amountFromInput).pipe(payment.shape.amount) });
+};
+
+export type DonationFormValues = z.input<ReturnType<typeof createDonationFormSchemaWithMessages>>;
+
+export const promoCodeErrorCodeSchema = z.enum(PromoCodeErrors);
+
+export const ACTIVATION_PARAM = "activation";
+export const ACTIVATION_FAILED = "failed";
+
 export const paymentConfirmationQuerySchema = z.object({
 	payment_intent: z.string().optional(),
-	activation: z.string().optional(),
+	[ACTIVATION_PARAM]: z.string().optional(),
 });

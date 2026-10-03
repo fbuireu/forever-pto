@@ -1,5 +1,5 @@
-import { LOCALE_COOKIE } from "@infrastructure/i18n/locales";
 import type { NextResponse } from "next/server";
+import { LOCALE_COOKIE } from "./locales";
 
 export const LOCALE_COOKIE_POLICY = {
 	name: LOCALE_COOKIE,

@@ -7,7 +7,7 @@ sidebar:
 
 import { CounterDemo, FeatureListDemo, RadialNavDemo } from '../../../../components/demos/AnimationComponentsDemo';
 
-Source: `apps/web/src/ui/modules/core/animate/components/`. Composite motion components (`Tabs.tsx` in the same directory is documented with the other Base UI wrappers). `FeatureList` and `RadialNav` are framework-clean: Motion, `cn()`, `lucide-react` and the core `Badge` are their only dependencies. `Counter` wraps [SlidingNumber](/design-system/animation/text/), which reads the locale through `next-intl`, so its demo adds a `DemoIntlProvider`. All three render the real components; as always with `m.*` consumers, they need a `LazyMotionProvider` ancestor.
+Source: `apps/web/src/ui/modules/core/animate/components/`. Composite motion components (`Tabs.tsx` in the same directory is documented with the other Base UI wrappers). `FeatureList` and `RadialNav` are framework-clean: Motion, `cn()`, `lucide-react` and the core `Badge` are their only dependencies. `Counter` wraps [SlidingNumber](/design-system/animation/text/), which reads the locale through `next-intl`, and `Demo.tsx` supplies the `DemoIntlProvider` it needs. All three render the real components; as always with `m.*` consumers, they need a `LazyMotionProvider` ancestor.
 
 ## Counter
 
@@ -27,7 +27,7 @@ Source: `apps/web/src/ui/modules/core/animate/components/`. Composite motion com
 
 <RadialNavDemo client:visible />
 
-Props: `items: { id, icon, label, angle, badgeClass? }[]`, where `icon` accepts a Lucide icon or any SVG motion component, including the [animated icons](/design-system/animation/icons/) (the button auto-passes `animateOnHover` when the icon supports it); `badgeClass` recolors the active state (default `bg-accent`). Plus `menuButtonConfig { iconSize, buttonSize, buttonPadding }`, `defaultActiveId` and `onActiveChange`. Note that ids are used as 1-based positional indexes into `items`, so keep them sequential from 1.
+Props: `items: { id, icon, label, angle, badgeClass? }[]`, where `icon` accepts a Lucide icon or any SVG motion component, including the [animated icons](/design-system/animation/icons/) (the button auto-passes `animateOnHover` when the icon supports it); `badgeClass` recolors the active state (default `bg-accent`). Plus `menuButtonConfig { iconSize, buttonSize, buttonPadding }`, `defaultActiveId` and `onActiveChange`. The active item is found by its `id`, so ids need only be unique.
 
 ## Usage
 
@@ -55,6 +55,6 @@ import { RadialNav } from '@ui/modules/core/animate/components/RadialNav';
 
 ## Conventions
 
-- These components stay presentation-only: labels arrive as props, never from `useTranslations`, per the core rules in `apps/web/src/ui/modules/core/AGENTS.md`.
-- `RadialNav` ignores `className` on the root (props are not spread), so wrap it in a positioned container and leave room around the ring for the expanding buttons.
+- These components stay presentation-only: labels arrive as props, never from `useTranslations`, and the contract suite fails a translation inside `core/`.
+- `RadialNav` takes no `className` (its props type has none), so wrap it in a positioned container and leave room around the ring for the expanding buttons.
 - Related: [effects](/design-system/animation/effects/), [text animations](/design-system/animation/text/), [animated icons](/design-system/animation/icons/).

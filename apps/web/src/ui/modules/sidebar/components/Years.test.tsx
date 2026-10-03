@@ -3,11 +3,17 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import type { ComponentProps, ReactNode } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const store = vi.hoisted(() => ({ year: 2026, setYear: vi.fn() }));
+const stores = vi.hoisted(() => ({ ready: true }));
+vi.mock("@ui/hooks/useStoresReady", () => ({ useStoresReady: () => ({ areStoresReady: stores.ready }) }));
 
 const track = vi.hoisted(() => vi.fn());
+const askForPlan = vi.hoisted(() => vi.fn());
+vi.mock("@application/stores/holidays", () => ({
+	useHolidaysStore: (selector: (state: unknown) => unknown) => selector({ askForPlan }),
+}));
 vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
 
 vi.mock("@application/stores/filters", () => ({
@@ -22,12 +28,14 @@ vi.mock("@ui/modules/core/animate/base/Popover", () => ({
 
 const { Years } = await import("./Years");
 
-const renderYears = (currentYear = 2026) =>
+const renderYears = (serverYear = 2026) =>
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
-			<Years currentYear={currentYear} />
+			<Years serverYear={serverYear} />
 		</NextIntlClientProvider>,
 	);
+
+const visitorClockAt = (year: number) => vi.useFakeTimers({ now: new Date(year, 5, 15), toFake: ["Date"] });
 
 const offeredYears = () => screen.getAllByRole("option").map((option) => option.textContent?.trim());
 
@@ -36,10 +44,16 @@ const trigger = () => screen.getByRole("button", { name: en.sidebar.years.title 
 beforeEach(() => {
 	store.year = 2026;
 	store.setYear.mockClear();
+	stores.ready = true;
+	visitorClockAt(2026);
+});
+
+afterEach(() => {
+	vi.useRealTimers();
 });
 
 describe("Years", () => {
-	it("offers ten years around the current one, five behind it and four ahead", () => {
+	it("offers ten years around the visitor's year, five behind it and four ahead", () => {
 		renderYears(2026);
 
 		expect(offeredYears()).toStrictEqual([
@@ -56,7 +70,8 @@ describe("Years", () => {
 		]);
 	});
 
-	it("moves the whole window with the year it is given rather than pinning a decade", () => {
+	it("moves the whole window with the visitor's year rather than pinning a decade", () => {
+		visitorClockAt(2030);
 		renderYears(2030);
 
 		expect(offeredYears()).toStrictEqual([
@@ -71,6 +86,34 @@ describe("Years", () => {
 			"2033",
 			"2034",
 		]);
+	});
+
+	it("centres the window on the visitor's year once mounted, not on the year the server rendered with", () => {
+		visitorClockAt(2031);
+		renderYears(2026);
+
+		expect(offeredYears()).toStrictEqual([
+			"2026",
+			"2027",
+			"2028",
+			"2029",
+			"2030",
+			"2031",
+			"2032",
+			"2033",
+			"2034",
+			"2035",
+		]);
+	});
+
+	it("shows the year the server rendered with until the stores are ready, so the first pass matches the HTML", () => {
+		stores.ready = false;
+		store.year = 2027;
+
+		renderYears(2026);
+
+		expect(trigger().textContent).toContain("2026");
+		expect(trigger().textContent).not.toContain("2027");
 	});
 
 	it("shows the year the store holds, which need not be the current one", () => {
@@ -105,6 +148,17 @@ describe("Years", () => {
 });
 
 describe("Years analytics", () => {
+	it("asks for a plan when another year is picked, and none for the year already set", async () => {
+		askForPlan.mockClear();
+		renderYears(2026);
+
+		await userEvent.click(screen.getByRole("option", { name: "2026" }));
+		expect(askForPlan).not.toHaveBeenCalled();
+
+		await userEvent.click(screen.getByRole("option", { name: "2027" }));
+		expect(askForPlan).toHaveBeenCalledOnce();
+	});
+
 	it("reports the year that was picked", async () => {
 		track.mockClear();
 		renderYears(2026);

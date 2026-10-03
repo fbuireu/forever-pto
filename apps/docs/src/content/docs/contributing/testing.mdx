@@ -37,6 +37,6 @@ Configured in `apps/docs/playwright.config.ts`: every spec in `apps/docs/e2e/` r
 | Kind | Pattern | Location |
 | --- | --- | --- |
 | Unit test | `*.test.ts` / `*.test.tsx` | Colocated next to the source file it tests |
-| E2E test | `*.spec.ts` | Only in `apps/web/e2e/` (or `apps/docs/e2e/`), mirroring routes |
+| E2E test | `*.spec.ts` | Only in `apps/web/e2e/`, mirroring routes, or `apps/docs/e2e/`, by topic |
 
-Keep the split strict: the Vitest runner excludes `apps/web/e2e/**`, and `test:ut:changed`, which `pre-push` runs through `verify:changed`, relies on the colocation to find the tests a change affects (see [tooling](/contributing/tooling/)).
+The split is `T6` in [`CODING_STANDARDS.md`](https://github.com/fbuireu/forever-pto/blob/main/CODING_STANDARDS.md), and the tooling relies on it: the Vitest runner excludes `apps/web/e2e/**`, and `test:ut:changed`, which `pre-push` runs through `verify:changed`, relies on the colocation to find the tests a change affects (see [tooling](/contributing/tooling/)).

@@ -1,3 +1,10 @@
+# [forever-pto-docs-v1.5.1](https://github.com/fbuireu/forever-pto/compare/docs-v1.5.0...docs-v1.5.1) (2026-10-02)
+
+
+### Bug Fixes
+
+* write down the coding standards and fix what reviewing against them found ([3799f27](https://github.com/fbuireu/forever-pto/commit/3799f27b6be9fa5489ecb6071fe4eef90acb3a96))
+
 # [forever-pto-docs-v1.5.0](https://github.com/fbuireu/forever-pto/compare/docs-v1.4.2...docs-v1.5.0) (2026-09-27)
 
 

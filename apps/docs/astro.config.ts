@@ -100,7 +100,13 @@ export default defineConfig({
 				},
 				{
 					label: "Design system",
-					translations: { es: "Design system" },
+					translations: {
+						es: "Design system",
+						ca: "Design system",
+						it: "Design system",
+						fr: "Design system",
+						de: "Design system",
+					},
 					collapsed: true,
 					items: [
 						{

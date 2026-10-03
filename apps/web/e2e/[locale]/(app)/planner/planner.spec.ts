@@ -1,7 +1,8 @@
 import { ES } from "@infrastructure/i18n/locales";
+import type { RoutePath } from "@infrastructure/seo/routes";
 import { expect, test } from "@playwright/test";
 
-const PLANNER_PATH = "/planner";
+const PLANNER_PATH = "/planner" satisfies RoutePath;
 
 test.describe("(app) planner", () => {
 	test("returns 200", async ({ page }) => {

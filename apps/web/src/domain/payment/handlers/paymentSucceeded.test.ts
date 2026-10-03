@@ -1,10 +1,10 @@
+import type { PaymentSucceededEvent } from "@domain/payment/events/types";
 import { TursoService } from "@infrastructure/clients/db/turso/service";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
-import { DatabaseError } from "@infrastructure/errors";
+import { DatabaseError, PaymentError } from "@infrastructure/errors";
 import { LoggerService } from "@infrastructure/logging/service";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { PaymentSucceededEvent } from "../events/types";
 import { handlePaymentSucceeded } from "./paymentSucceeded";
 
 vi.mock("@infrastructure/services/payments/repository", () => ({
@@ -118,21 +118,19 @@ describe("handlePaymentSucceeded", () => {
 
 	it("resolves even when retrieveCharge fails", async () => {
 		const { retrieveCharge } = await import("@infrastructure/services/payments/provider/charge");
-		vi.mocked(retrieveCharge).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "stripe error" })) as never);
+		vi.mocked(retrieveCharge).mockReturnValueOnce(Effect.fail(new PaymentError({ message: "stripe error" })));
 		await expect(run(handlePaymentSucceeded(EVENT))).resolves.toBeUndefined();
 	});
 
 	it("resolves even when updatePaymentCharge fails", async () => {
 		const { updatePaymentCharge } = await import("@infrastructure/services/payments/repository");
-		vi.mocked(updatePaymentCharge).mockReturnValueOnce(
-			Effect.fail(new DatabaseError({ message: "db error" })) as never,
-		);
+		vi.mocked(updatePaymentCharge).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "db error" })));
 		await expect(run(handlePaymentSucceeded(EVENT))).resolves.toBeUndefined();
 	});
 
 	it("logs a failing retrieveCharge once, as a retrieval failure", async () => {
 		const { retrieveCharge } = await import("@infrastructure/services/payments/provider/charge");
-		vi.mocked(retrieveCharge).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "stripe error" })) as never);
+		vi.mocked(retrieveCharge).mockReturnValueOnce(Effect.fail(new PaymentError({ message: "stripe error" })));
 		await run(handlePaymentSucceeded(EVENT));
 		expect(mockLogger.error).toHaveBeenCalledExactlyOnceWith({
 			message: "Failed to retrieve charge details",
@@ -142,9 +140,7 @@ describe("handlePaymentSucceeded", () => {
 
 	it("logs a failing updatePaymentCharge once, as an update failure", async () => {
 		const { updatePaymentCharge } = await import("@infrastructure/services/payments/repository");
-		vi.mocked(updatePaymentCharge).mockReturnValueOnce(
-			Effect.fail(new DatabaseError({ message: "db error" })) as never,
-		);
+		vi.mocked(updatePaymentCharge).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "db error" })));
 		await run(handlePaymentSucceeded(EVENT));
 		expect(mockLogger.error).toHaveBeenCalledExactlyOnceWith({
 			message: "Failed to update charge details",

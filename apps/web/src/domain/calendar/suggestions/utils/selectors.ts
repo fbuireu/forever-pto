@@ -171,7 +171,7 @@ export const selectBridges = ({
 
 	const workdayIndexes = [...new Set(workdays.map(dayIndex))].toSorted((a, b) => a - b);
 	const positionOf = new Map(workdayIndexes.map((day, position) => [day, position]));
-	let stretches = workStretchesOf({ workdays: workdayIndexes });
+	let stretches = workStretchesOf(workdayIndexes);
 	for (const entry of pool) {
 		for (const day of entry.ptoDays) {
 			const position = positionOf.get(day);

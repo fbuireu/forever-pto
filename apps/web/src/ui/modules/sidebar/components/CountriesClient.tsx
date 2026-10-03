@@ -2,14 +2,15 @@
 
 import type { CountryDTO } from "@application/dto/country/types";
 import { useFiltersStore } from "@application/stores/filters";
+import { useHolidaysStore } from "@application/stores/holidays";
 import { useLocationStore } from "@application/stores/location";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
 import { MapPin } from "@ui/modules/core/animate/icons/MapPin";
 import { Combobox } from "@ui/modules/core/primitives/Combobox";
-import { SidebarFieldLabel } from "@ui/modules/sidebar/components/SidebarFieldLabel";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
+import { SidebarFieldLabel } from "./SidebarFieldLabel";
 
 interface CountriesClientProps {
 	countries: CountryDTO[];
@@ -19,6 +20,7 @@ export const CountriesClient = ({ countries }: CountriesClientProps) => {
 	const t = useTranslations("sidebar.country");
 	const country = useFiltersStore((state) => state.country);
 	const setCountry = useFiltersStore((state) => state.setCountry);
+	const askForPlan = useHolidaysStore((state) => state.askForPlan);
 	const setCountries = useLocationStore((state) => state.setCountries);
 
 	useEffect(() => {
@@ -27,6 +29,7 @@ export const CountriesClient = ({ countries }: CountriesClientProps) => {
 	}, [countries, setCountries]);
 
 	const handleCountryChange = (value: string) => {
+		if (value !== country) askForPlan();
 		setCountry(value);
 		track({ event: "planning_input_changed", properties: { input: "country", inputValue: value } });
 	};

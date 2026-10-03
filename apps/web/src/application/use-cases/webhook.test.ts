@@ -42,7 +42,7 @@ vi.mock("@infrastructure/services/payments/provider/metadata", () => ({
 
 vi.mock("@infrastructure/services/payments/repository", () => ({
 	getPaymentById: vi.fn(() => Effect.succeed({ id: "pi_test", status: "pending" })),
-	savePayment: vi.fn(() => Effect.succeed(undefined)),
+	savePayment: vi.fn(() => Effect.succeed(false)),
 }));
 
 vi.mock("@application/dto/payment/dto", () => ({
@@ -106,7 +106,7 @@ describe("processWebhookEvent", () => {
 
 	it("leaves an existing row alone, and says nothing about creating one", async () => {
 		const { savePayment, getPaymentById } = await import("@infrastructure/services/payments/repository");
-		vi.mocked(savePayment).mockReturnValueOnce(Effect.succeed(false) as never);
+		vi.mocked(savePayment).mockReturnValueOnce(Effect.succeed(false));
 
 		await run(processWebhookEvent(succeededEvent({ id: "pi_test" })));
 
@@ -119,7 +119,7 @@ describe("processWebhookEvent", () => {
 
 	it("reports a created row on the answer the insert itself gave", async () => {
 		const { savePayment } = await import("@infrastructure/services/payments/repository");
-		vi.mocked(savePayment).mockReturnValueOnce(Effect.succeed(true) as never);
+		vi.mocked(savePayment).mockReturnValueOnce(Effect.succeed(true));
 		await run(processWebhookEvent(succeededEvent({ id: "pi_test" })));
 		expect(savePayment).toHaveBeenCalledOnce();
 		expect(mockLogger.warn).toHaveBeenCalledWith({

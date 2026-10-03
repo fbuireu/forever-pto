@@ -42,9 +42,11 @@ export function useAutoHeight<T extends HTMLElement = HTMLDivElement>(deps: Depe
 			roRef.current = null;
 		}
 
+		let frame = 0;
 		const ro = new ResizeObserver(() => {
 			const next = measure();
-			requestAnimationFrame(() => setHeight(next));
+			cancelAnimationFrame(frame);
+			frame = requestAnimationFrame(() => setHeight(next));
 		});
 
 		ro.observe(el);
@@ -53,10 +55,11 @@ export function useAutoHeight<T extends HTMLElement = HTMLDivElement>(deps: Depe
 		roRef.current = ro;
 
 		return () => {
+			cancelAnimationFrame(frame);
 			ro.disconnect();
 			roRef.current = null;
 		};
-		// biome-ignore lint/correctness/useExhaustiveDependencies: props intentionally omitted to avoid stale closure on every render
+		// biome-ignore lint/correctness/useExhaustiveDependencies: the effect re-runs on the caller's deps list, which is not a literal Biome can read
 	}, deps);
 
 	useLayoutEffect(() => {

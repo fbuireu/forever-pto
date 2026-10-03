@@ -133,12 +133,33 @@ describe("TooltipContent", () => {
 
 describe("TooltipInfoTrigger", () => {
 	it('renders with the "i" label', () => {
-		const { getByText } = render(<TooltipInfoTrigger />);
+		const { getByText } = render(<TooltipInfoTrigger aria-label="About Efficiency" />);
 		expect(getByText("i")).toBeTruthy();
 	});
 
 	it("applies additional className", () => {
-		const { container } = render(<TooltipInfoTrigger className="extra" />);
+		const { container } = render(<TooltipInfoTrigger className="extra" aria-label="About Efficiency" />);
 		expect(container.querySelector('[data-primitive="tooltip-trigger"]')?.className).toContain("extra");
+	});
+});
+
+type Assignable<TCandidate, TTarget> = TCandidate extends TTarget ? true : false;
+
+const NAMELESS_INFO_TRIGGER_IS_REJECTED: Assignable<
+	{ className: string },
+	ComponentProps<typeof TooltipInfoTrigger>
+> = false;
+
+describe("TooltipInfoTrigger's name", () => {
+	it("requires one, since the i it draws is hidden from assistive tech", () => {
+		expect(NAMELESS_INFO_TRIGGER_IS_REJECTED).toBe(false);
+	});
+
+	it("puts the name on the button that carries the tooltip", () => {
+		const { container } = render(<TooltipInfoTrigger aria-label="About Efficiency" />);
+
+		expect(container.querySelector('[data-primitive="tooltip-trigger"]')?.getAttribute("aria-label")).toBe(
+			"About Efficiency",
+		);
 	});
 });

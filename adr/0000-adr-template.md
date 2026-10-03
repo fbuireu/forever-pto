@@ -10,7 +10,7 @@ Template. Not a decision; copy this file, do not edit it in place.
 
 Copy this file to `NNNN-kebab-title.md`, numbered one above the highest existing ADR. The `# N. Title` heading carries that same number and states the decision in one line; the file slug is the short form of it.
 
-Write an ADR only when the decision is **hard to reverse**, **surprising without context** and **the result of a real trade-off**. All of them, or it is not an ADR: an easily reversed choice will simply be reversed, an unsurprising one raises no question, and one with no alternative records nothing but "we did the obvious thing".
+Write an ADR only when the decision is **hard to reverse**, **surprising without context** and **the result of a real trade-off**. All of them, or it is not an ADR.
 
 This section holds the forces, not the answer: what the situation was, what the alternatives were, and why the obvious option was not obviously right. Someone reading it two years from now has none of the context you have today, and the constraint that made this hard is the part they will be missing.
 
@@ -24,4 +24,4 @@ What follows from this, including what it costs. The bullets someone needs befor
 
 - What is now load-bearing and must not be removed, and what breaks if it is.
 - What this makes harder, slower, or impossible. An ADR with no cost recorded is usually not describing a real trade-off.
-- Where the decision bites in the rest of the docs: the Gotchas bullet in [`AGENTS.md`](../AGENTS.md), the nested guide, the [`CONTEXT.md`](../CONTEXT.md) entry that has to link back here. There is no index; an ADR nothing links to will not be read, and [`tests/docs-consistency.test.ts`](../tests/docs-consistency.test.ts) fails on one that nothing outside `adr/` links to.
+- Where the decision bites in the rest of the docs: the rule in [`CODING_STANDARDS.md`](../CODING_STANDARDS.md) a reviewer holds a diff to, the Gotchas bullet in [`AGENTS.md`](../AGENTS.md), the nested guide, the [`CONTEXT.md`](../CONTEXT.md) entry that has to link back here. There is no index; an ADR nothing links to will not be read, and [`tests/docs-consistency.test.ts`](../tests/docs-consistency.test.ts) fails on one that nothing outside `adr/` links to.

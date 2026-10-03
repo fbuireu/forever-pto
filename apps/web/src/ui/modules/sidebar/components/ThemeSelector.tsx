@@ -15,7 +15,11 @@ import { Button } from "@ui/modules/core/primitives/Button";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 
-export const ThemeSelector = ({ buttonClassName }: { buttonClassName?: string }) => {
+interface ThemeSelectorProps {
+	buttonClassName?: string;
+}
+
+export const ThemeSelector = ({ buttonClassName }: ThemeSelectorProps) => {
 	const { setTheme, themes, theme: currentTheme } = useTheme();
 	const t = useTranslations("theme");
 

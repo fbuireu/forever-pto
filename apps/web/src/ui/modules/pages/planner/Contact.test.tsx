@@ -14,7 +14,7 @@ const track = vi.hoisted(() => vi.fn());
 vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
 
 vi.mock("./contact.css", () => ({}));
-vi.mock("src/ui/modules/shared/contact/ContactModal", () => ({
+vi.mock("@ui/modules/shared/contact/ContactModal", () => ({
 	ContactModal: ({ open, onClose }: ContactModalMockProps) => (
 		<div data-testid="contact-modal" data-open={String(open)}>
 			<button type="button" onClick={onClose}>
@@ -74,7 +74,7 @@ describe("Contact", () => {
 		expect(await modalState()).toBe("false");
 	});
 
-	it("opens the form on arrival when the address names #contact, which is what the footer links to", async () => {
+	it("opens the form on arrival when the address names #contact", async () => {
 		globalThis.location.hash = "#contact";
 
 		renderContact();

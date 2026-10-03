@@ -1,18 +1,28 @@
-import { TursoService } from "@infrastructure/clients/db/turso/service";
+import { contactCooldownStart } from "@application/dto/contact/rules";
+import type { ContactData } from "@application/dto/contact/types";
+import type { TursoService } from "@infrastructure/clients/db/turso/service";
 import { DatabaseError } from "@infrastructure/errors";
-import { Effect, Layer } from "effect";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { Effect } from "effect";
+import { beforeEach, describe, expect, it } from "vitest";
+import { createContactsFixture } from "./fixture";
+import { findContactWithMessage, recordContactMessageId, releaseContactSlot, reserveContactSlot } from "./repository";
 
-const { findContactWithMessage, findLatestContactSince, saveContact } = await import("./repository");
+let contacts = createContactsFixture();
 
-const mockExecute = vi.fn();
-
-const MockTursoLayer = Layer.succeed(TursoService, {
-	execute: mockExecute,
-	query: vi.fn(),
+beforeEach(() => {
+	contacts = createContactsFixture();
 });
 
-const CONTACT_DATA = {
+const run = <A>(effect: Effect.Effect<A, DatabaseError, TursoService>) =>
+	Effect.runPromise(effect.pipe(Effect.provide(contacts.layer)));
+
+const runFail = <A>(effect: Effect.Effect<A, DatabaseError, TursoService>) =>
+	Effect.runPromise(Effect.flip(effect).pipe(Effect.provide(contacts.layer)));
+
+const SINCE = contactCooldownStart({ now: new Date("2026-10-02T13:40:00Z") });
+const SENDER_KEY = "user@example.com";
+
+const CONTACT: ContactData = {
 	email: "user@example.com",
 	name: "Test User",
 	subject: "Hello",
@@ -21,159 +31,140 @@ const CONTACT_DATA = {
 	origin: null,
 };
 
-beforeEach(() => {
-	vi.clearAllMocks();
-	vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
-	mockExecute.mockReturnValue(Effect.succeed(undefined));
+interface SeedParams {
+	email: string;
+	message: string;
+	createdDate: string;
+}
+
+const seed = ({ email, message, createdDate }: SeedParams) =>
+	contacts.database
+		.prepare(
+			`INSERT INTO contacts (id, email, name, subject, message, message_id, origin, created_date, updated_at)
+       VALUES (?, ?, 'Earlier', 'Earlier', ?, NULL, NULL, ?, ?)`,
+		)
+		.run(crypto.randomUUID(), email, message, createdDate, createdDate);
+
+const reserve = (contact: ContactData = CONTACT) =>
+	reserveContactSlot({ senderKey: SENDER_KEY, since: SINCE, contact });
+
+const storedRows = () => contacts.database.prepare("SELECT id, email, message, message_id FROM contacts").all();
+
+describe("reserveContactSlot over a real SQLite", () => {
+	it("takes the slot when the sender has never written, and answers the new row's id", async () => {
+		const id = await run(reserve());
+
+		expect(storedRows()).toEqual([{ id, email: CONTACT.email, message: CONTACT.message, message_id: null }]);
+	});
+
+	it("refuses inside the window and writes nothing", async () => {
+		seed({ email: CONTACT.email, message: "An earlier message", createdDate: "2026-10-02 12:00:00" });
+
+		await expect(run(reserve())).resolves.toBeNull();
+		expect(storedRows()).toHaveLength(1);
+	});
+
+	it("holds the window across midnight UTC, comparing the stored time and the window's start as instants", async () => {
+		seed({ email: CONTACT.email, message: "An earlier message", createdDate: "2026-10-01 20:00:00" });
+
+		await expect(run(reserve())).resolves.toBeNull();
+	});
+
+	it("counts the window's first second inside it", async () => {
+		seed({ email: CONTACT.email, message: "An earlier message", createdDate: "2026-10-01 13:40:00" });
+
+		await expect(run(reserve())).resolves.toBeNull();
+	});
+
+	it("takes the slot once the sender's last message is older than the window", async () => {
+		seed({ email: CONTACT.email, message: "An earlier message", createdDate: "2026-10-01 13:39:59" });
+
+		await expect(run(reserve())).resolves.toEqual(expect.any(String));
+		expect(storedRows()).toHaveLength(2);
+	});
+
+	it("refuses the same message at any age", async () => {
+		seed({ email: CONTACT.email, message: CONTACT.message, createdDate: "2025-01-01 00:00:00" });
+
+		await expect(run(reserve())).resolves.toBeNull();
+	});
+
+	it("keys on the sender with the case, the spaces and a plus-alias stripped", async () => {
+		seed({ email: "  User+news@Example.com ", message: "An earlier message", createdDate: "2026-10-02 12:00:00" });
+
+		await expect(run(reserve())).resolves.toBeNull();
+	});
+
+	it("leaves another sender's slot alone", async () => {
+		seed({ email: "other@example.com", message: CONTACT.message, createdDate: "2026-10-02 12:00:00" });
+
+		await expect(run(reserve())).resolves.toEqual(expect.any(String));
+	});
+
+	it("gives one of two reservations made at the same moment the slot, and the other nothing", async () => {
+		const ids = await run(
+			Effect.all([reserve(), reserve({ ...CONTACT, message: "A second message" })], { concurrency: "unbounded" }),
+		);
+
+		expect(ids.filter((id) => id === null)).toHaveLength(1);
+		expect(storedRows()).toHaveLength(1);
+	});
+
+	it("propagates a DatabaseError rather than reading it as a refusal", async () => {
+		contacts.database.exec("DROP TABLE contacts");
+
+		expect(await runFail(reserve())).toBeInstanceOf(DatabaseError);
+	});
 });
 
-afterEach(() => {
-	vi.restoreAllMocks();
-});
+describe("releaseContactSlot", () => {
+	it("deletes the reserved row and no other", async () => {
+		seed({ email: "other@example.com", message: "Someone else's message", createdDate: "2026-10-02 12:00:00" });
+		const id = await run(reserve());
+		if (id === null) throw new Error("the slot was free");
 
-describe("saveContact", () => {
-	it("executes an INSERT with the generated UUID and contact data", async () => {
-		await Effect.runPromise(saveContact(CONTACT_DATA).pipe(Effect.provide(MockTursoLayer)));
+		await run(releaseContactSlot(id));
 
-		expect(mockExecute).toHaveBeenCalledOnce();
-		const [sql, args] = mockExecute.mock.calls[0] as [string, unknown[]];
-		expect(sql).toContain("INSERT INTO contacts");
-		expect(args[0]).toBe("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
-		expect(args[1]).toBe(CONTACT_DATA.email);
-		expect(args[2]).toBe(CONTACT_DATA.name);
-		expect(args[3]).toBe(CONTACT_DATA.subject);
-		expect(args[4]).toBe(CONTACT_DATA.message);
-	});
-
-	it("passes null for messageId and origin when they are null", async () => {
-		await Effect.runPromise(saveContact(CONTACT_DATA).pipe(Effect.provide(MockTursoLayer)));
-
-		const [, args] = mockExecute.mock.calls[0] as [string, unknown[]];
-		expect(args[5]).toBeNull();
-		expect(args[6]).toBeNull();
-	});
-
-	it("passes messageId and origin when provided", async () => {
-		const data = { ...CONTACT_DATA, messageId: "msg-123", origin: process.env.NEXT_PUBLIC_SITE_URL };
-		await Effect.runPromise(saveContact(data).pipe(Effect.provide(MockTursoLayer)));
-
-		const [, args] = mockExecute.mock.calls[0] as [string, unknown[]];
-		expect(args[5]).toBe("msg-123");
-		expect(args[6]).toBe(process.env.NEXT_PUBLIC_SITE_URL);
-	});
-
-	it("propagates DatabaseError when execute fails", async () => {
-		const dbError = new DatabaseError({ message: "connection refused", cause: new Error("test-error") });
-		mockExecute.mockReturnValue(Effect.fail(dbError));
-
-		const error = await Effect.runPromise(saveContact(CONTACT_DATA).pipe(Effect.provide(MockTursoLayer), Effect.flip));
-
-		expect(error).toBeInstanceOf(DatabaseError);
-		expect(error.message).toBe("connection refused");
+		expect(storedRows()).toEqual([
+			{ id: expect.any(String), email: "other@example.com", message: "Someone else's message", message_id: null },
+		]);
 	});
 });
 
-const mockQuery = vi.fn();
+describe("recordContactMessageId", () => {
+	it("records the message id on the reserved row only", async () => {
+		seed({ email: "other@example.com", message: "Someone else's message", createdDate: "2026-10-02 12:00:00" });
+		const id = await run(reserve());
+		if (id === null) throw new Error("the slot was free");
 
-const MockQueryLayer = Layer.succeed(TursoService, {
-	execute: vi.fn(),
-	query: mockQuery,
+		await run(recordContactMessageId({ id, messageId: "msg-123" }));
+
+		expect(storedRows()).toEqual([
+			{ id: expect.any(String), email: "other@example.com", message: "Someone else's message", message_id: null },
+			{ id, email: CONTACT.email, message: CONTACT.message, message_id: "msg-123" },
+		]);
+	});
 });
 
-const runQuery = <A>(effect: Effect.Effect<A, DatabaseError, TursoService>) =>
-	Effect.runPromise(effect.pipe(Effect.provide(MockQueryLayer)));
+describe("findContactWithMessage over a real SQLite", () => {
+	it("answers true when the same sender already sent that message, under any alias", async () => {
+		seed({ email: "User+news@example.com", message: "Hello", createdDate: "2025-01-01 00:00:00" });
 
-const sqlOf = () => (mockQuery.mock.calls[0] as [string, unknown[]])[0];
-
-const argsOf = () => (mockQuery.mock.calls[0] as [string, unknown[]])[1];
-
-describe("findLatestContactSince", () => {
-	beforeEach(() => {
-		mockQuery.mockReturnValue(Effect.succeed([]));
+		await expect(run(findContactWithMessage({ senderKey: SENDER_KEY, message: "Hello" }))).resolves.toBe(true);
 	});
 
-	it("answers true when a row already exists in the window", async () => {
-		mockQuery.mockReturnValue(Effect.succeed([{ id: "existing" }]));
+	it("answers false for another message or another sender", async () => {
+		seed({ email: "other@example.com", message: "Hello", createdDate: "2026-10-02 12:00:00" });
+		seed({ email: CONTACT.email, message: "Goodbye", createdDate: "2026-10-02 12:00:00" });
 
-		await expect(
-			runQuery(findLatestContactSince({ senderKey: "user@example.com", since: "2026-08-30T00:00:00Z" })),
-		).resolves.toBe(true);
-	});
-
-	it("answers false when nothing has been sent in the window", async () => {
-		await expect(
-			runQuery(findLatestContactSince({ senderKey: "user@example.com", since: "2026-08-30T00:00:00Z" })),
-		).resolves.toBe(false);
-	});
-
-	it("asks for one row only, since the answer is a yes or a no", async () => {
-		await runQuery(findLatestContactSince({ senderKey: "user@example.com", since: "2026-08-30T00:00:00Z" }));
-
-		expect(sqlOf()).toContain("LIMIT 1");
-		expect(argsOf()).toEqual(["user@example.com", "2026-08-30T00:00:00Z"]);
-	});
-
-	it("compares on the normalised sender, so a plus tag cannot buy a second submission", async () => {
-		await runQuery(findLatestContactSince({ senderKey: "user@example.com", since: "2026-08-30T00:00:00Z" }));
-
-		const sql = sqlOf();
-
-		expect(sql).toContain("lower(trim(email))");
-		expect(sql).toContain("'+'");
-		expect(sql).toContain("'@'");
+		await expect(run(findContactWithMessage({ senderKey: SENDER_KEY, message: "Hello" }))).resolves.toBe(false);
 	});
 
 	it("propagates a DatabaseError rather than reading it as no match", async () => {
-		mockQuery.mockReturnValue(Effect.fail(new DatabaseError({ message: "connection refused", cause: null })));
+		contacts.database.exec("DROP TABLE contacts");
 
-		const error = await Effect.runPromise(
-			findLatestContactSince({ senderKey: "user@example.com", since: "2026-08-30T00:00:00Z" }).pipe(
-				Effect.provide(MockQueryLayer),
-				Effect.flip,
-			),
+		expect(await runFail(findContactWithMessage({ senderKey: SENDER_KEY, message: "Hello" }))).toBeInstanceOf(
+			DatabaseError,
 		);
-
-		expect(error).toBeInstanceOf(DatabaseError);
-	});
-});
-
-describe("findContactWithMessage", () => {
-	beforeEach(() => {
-		mockQuery.mockReturnValue(Effect.succeed([]));
-	});
-
-	it("answers true when the same sender already sent that message", async () => {
-		mockQuery.mockReturnValue(Effect.succeed([{ id: "existing" }]));
-
-		await expect(runQuery(findContactWithMessage({ senderKey: "user@example.com", message: "Hello" }))).resolves.toBe(
-			true,
-		);
-	});
-
-	it("answers false for a message nobody has sent", async () => {
-		await expect(runQuery(findContactWithMessage({ senderKey: "user@example.com", message: "Hello" }))).resolves.toBe(
-			false,
-		);
-	});
-
-	it("matches on the message and the normalised sender together", async () => {
-		await runQuery(findContactWithMessage({ senderKey: "user@example.com", message: "Hello" }));
-
-		expect(sqlOf()).toContain("message = ?");
-		expect(sqlOf()).toContain("lower(trim(email))");
-		expect(argsOf()).toEqual(["user@example.com", "Hello"]);
-	});
-
-	it("propagates a DatabaseError rather than reading it as no match", async () => {
-		mockQuery.mockReturnValue(Effect.fail(new DatabaseError({ message: "connection refused", cause: null })));
-
-		const error = await Effect.runPromise(
-			findContactWithMessage({ senderKey: "user@example.com", message: "Hello" }).pipe(
-				Effect.provide(MockQueryLayer),
-				Effect.flip,
-			),
-		);
-
-		expect(error).toBeInstanceOf(DatabaseError);
 	});
 });

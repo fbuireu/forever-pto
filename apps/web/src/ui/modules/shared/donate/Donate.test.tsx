@@ -1,12 +1,14 @@
+import type { DiscountInfo } from "@application/dto/payment/types";
 import enMessages from "@i18n/messages/en.json";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import type * as Checkout from "@ui/adapters/payments/checkout";
 import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { initializePayment, track, logClientError, toastError, toastSuccess, recoverFromStaleDeployment, promoCode } =
 	vi.hoisted(() => ({
-		initializePayment: vi.fn(),
+		initializePayment: vi.fn<typeof Checkout.initializePayment>(),
 		track: vi.fn(),
 		logClientError: vi.fn(),
 		toastError: vi.fn(),
@@ -91,7 +93,7 @@ import { Donate } from "./Donate";
 const renderDonate = () =>
 	render(
 		<NextIntlClientProvider locale="en" messages={enMessages}>
-			<Donate />
+			<Donate bottomClassName="bottom-4 md:bottom-4" />
 		</NextIntlClientProvider>,
 	);
 
@@ -153,7 +155,7 @@ describe("starting a donation", () => {
 		});
 	});
 
-	it("says a code was used without putting the code itself in the report", async () => {
+	it("says a code was used without putting the code itself, or the address, in the report", async () => {
 		promoCode.current = "FOREVER";
 		renderDonate();
 
@@ -161,6 +163,7 @@ describe("starting a donation", () => {
 
 		await waitFor(() => expect(track).toHaveBeenCalled());
 		expect(JSON.stringify(track.mock.calls)).not.toContain("FOREVER");
+		expect(JSON.stringify(track.mock.calls)).not.toContain("someone@example.test");
 		expect(track.mock.calls.at(-1)?.[0]).toMatchObject({ properties: { hasPromoCode: true } });
 	});
 });
@@ -169,7 +172,14 @@ describe("a donation with a discount on it", () => {
 	beforeEach(() => {
 		initializePayment.mockResolvedValue({
 			clientSecret: "cs_test",
-			discountInfo: { type: "percentage", value: 50, originalAmount: 10, finalAmount: 5 },
+			discountInfo: {
+				type: "percent",
+				value: 50,
+				originalAmount: 10,
+				finalAmount: 5,
+				couponId: "coupon_half",
+				couponName: "Half",
+			} satisfies DiscountInfo,
 		});
 	});
 
@@ -195,7 +205,14 @@ describe("a donation with a discount on it", () => {
 	it("charges the discounted amount, not the one typed", async () => {
 		initializePayment.mockResolvedValue({
 			clientSecret: "cs_test",
-			discountInfo: { type: "percentage", value: 70, originalAmount: 10, finalAmount: 3 },
+			discountInfo: {
+				type: "percent",
+				value: 70,
+				originalAmount: 10,
+				finalAmount: 3,
+				couponId: "coupon_seventy",
+				couponName: "Seventy",
+			},
 		});
 		renderDonate();
 
@@ -265,7 +282,8 @@ describe("the popover's open state", () => {
 
 describe("a donation that never starts", () => {
 	it("names the reason a promo code was refused rather than reporting a generic failure", async () => {
-		const { PromoCodeError, PromoCodeErrors } = await import("@infrastructure/errors");
+		const { PromoCodeError } = await import("@infrastructure/errors");
+		const { PromoCodeErrors } = await import("@application/dto/payment/types");
 		initializePayment.mockRejectedValue(new PromoCodeError({ code: PromoCodeErrors.USAGE_LIMIT_REACHED }));
 		renderDonate();
 
@@ -279,7 +297,8 @@ describe("a donation that never starts", () => {
 	});
 
 	it("has a message for every code it can be refused with", async () => {
-		const { PromoCodeError, PromoCodeErrors } = await import("@infrastructure/errors");
+		const { PromoCodeError } = await import("@infrastructure/errors");
+		const { PromoCodeErrors } = await import("@application/dto/payment/types");
 
 		for (const code of Object.values(PromoCodeErrors)) {
 			toastError.mockClear();

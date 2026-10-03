@@ -1,10 +1,13 @@
+import caMessages from "@i18n/messages/ca.json";
 import deMessages from "@i18n/messages/de.json";
 import enMessages from "@i18n/messages/en.json";
+import esMessages from "@i18n/messages/es.json";
+import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
 import { render } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("recharts", () => {
 	const passthrough = ({ children }: { children?: ReactNode }) => <div>{children}</div>;
@@ -20,6 +23,23 @@ vi.mock("recharts", () => {
 		),
 		XAxis: empty,
 		YAxis: empty,
+	};
+});
+
+const longBlockMinimum = vi.hoisted(() => ({ override: undefined as number | undefined }));
+
+vi.mock("@domain/calendar/const", async (importOriginal) => {
+	const { PTO_CONSTANTS } = await importOriginal<typeof import("@domain/calendar/const")>();
+	return {
+		PTO_CONSTANTS: {
+			...PTO_CONSTANTS,
+			METRICS: {
+				...PTO_CONSTANTS.METRICS,
+				get LONG_BLOCK_MINIMUM_DAYS() {
+					return longBlockMinimum.override ?? PTO_CONSTANTS.METRICS.LONG_BLOCK_MINIMUM_DAYS;
+				},
+			},
+		},
 	};
 });
 
@@ -64,9 +84,7 @@ describe("BlocksPerQuarterChart tooltip", () => {
 	it("labels a bar with its block count and what a block is", () => {
 		const { getByTestId } = renderChart({ locale: "en", messages: enMessages, blocksPerQuarter: [2, 1, 0, 0] });
 
-		expect(getByTestId("tooltip").textContent).toBe(
-			`2 ${enMessages.charts.blocks} | ${enMessages.charts.blocksOf3Days}`,
-		);
+		expect(getByTestId("tooltip").textContent).toBe(`2 ${enMessages.charts.blocks} | Blocks of 3+ days`);
 	});
 });
 
@@ -77,4 +95,54 @@ describe("BlocksPerQuarterChart with no blocks at all", () => {
 		expect(container.textContent).toContain("0 long blocks (3+ consecutive days) ideal for vacation.");
 		expect(container.textContent).not.toContain("Best quarter");
 	});
+});
+
+describe("BlocksPerQuarterChart description", () => {
+	const BUNDLES = { en: enMessages, es: esMessages, ca: caMessages, it: itMessages, de: deMessages, fr: frMessages };
+
+	it("names the best quarter in the same sentence as the total", () => {
+		const { container } = renderChart({ locale: "en", messages: enMessages, blocksPerQuarter: [2, 1, 0, 0] });
+
+		expect(container.textContent).toContain(
+			"3 long blocks (3+ consecutive days) ideal for vacation. Best quarter: Q1 with 2 blocks.",
+		);
+	});
+
+	it.each(Object.entries(BUNDLES))("renders the %s sentence whole, with blocks and without", (locale, messages) => {
+		for (const blocksPerQuarter of [
+			[2, 1, 0, 0],
+			[0, 0, 0, 0],
+		]) {
+			const { container, unmount } = renderChart({ locale: locale as Locale, messages, blocksPerQuarter });
+
+			expect(container.textContent).toContain(String(blocksPerQuarter[0] + blocksPerQuarter[1]));
+			expect(container.textContent).not.toMatch(/[{}]|charts\./);
+			unmount();
+		}
+	});
+});
+
+describe("BlocksPerQuarterChart Long Block minimum", () => {
+	const BUNDLES = { en: enMessages, es: esMessages, ca: caMessages, it: itMessages, de: deMessages, fr: frMessages };
+	const STATED_MINIMUM = /\b(\d+)(?:\+| o més)/g;
+
+	afterEach(() => {
+		longBlockMinimum.override = undefined;
+	});
+
+	it.each(Object.entries(BUNDLES))(
+		"states in %s the minimum the engine counts a Long Block from, in the description and the tooltip",
+		(locale, messages) => {
+			longBlockMinimum.override = 5;
+			const { container, getByTestId } = renderChart({
+				locale: locale as Locale,
+				messages,
+				blocksPerQuarter: [2, 1, 0, 0],
+			});
+			const stated = [...(container.textContent ?? "").matchAll(STATED_MINIMUM)].map(([, days]) => days);
+
+			expect(stated).toEqual(["5", "5"]);
+			expect(getByTestId("tooltip").textContent).toMatch(/\b5\+/);
+		},
+	);
 });

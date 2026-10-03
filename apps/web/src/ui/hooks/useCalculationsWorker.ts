@@ -14,13 +14,13 @@ import { deserializeSuggestion, serializeHolidays } from "@infrastructure/worker
 import { useCallback, useEffect, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
 
-interface PlannerGeneratedParams {
+interface PlannerGeneratedPropertiesParams {
 	params: GenerateSuggestionsParams;
 	measured: MeasuredSuggestion;
 	alternatives: readonly unknown[];
 }
 
-function plannerGeneratedProperties({ params, measured, alternatives }: PlannerGeneratedParams) {
+function plannerGeneratedProperties({ params, measured, alternatives }: PlannerGeneratedPropertiesParams) {
 	const { metrics } = measured;
 
 	return {
@@ -92,10 +92,12 @@ export function useCalculationsWorker() {
 							suggestion: measured,
 							alternatives: alternatives.map(deserializeSuggestion),
 						});
-						track({
-							event: "planner_generated",
-							properties: plannerGeneratedProperties({ params, measured, alternatives }),
-						});
+						if (useHolidaysStore.getState().claimPlanAskedFor()) {
+							track({
+								event: "planner_generated",
+								properties: plannerGeneratedProperties({ params, measured, alternatives }),
+							});
+						}
 					}
 				};
 
@@ -117,7 +119,7 @@ export function useCalculationsWorker() {
 				const hasRemovedDays = removedSuggestedDays.length > 0;
 				const activeSuggestedDays =
 					currentSelection && hasRemovedDays
-						? Math.max(0, currentSelection.days.length - removedSuggestedDays.length)
+						? measureBudget({ ptoDays: params.ptoDays, days: currentSelection.days, removedSuggestedDays }).suggested
 						: undefined;
 
 				const ptoDaysChanged =

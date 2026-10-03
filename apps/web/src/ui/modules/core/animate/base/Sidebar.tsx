@@ -1,7 +1,6 @@
 "use client";
 
 import { useIsMobile } from "@ui/hooks/useMobile";
-import { Button } from "@ui/modules/core/primitives/Button";
 import { cn } from "@ui/utils/cn";
 import { setCookie } from "@ui/utils/cookie";
 import type { VariantProps } from "class-variance-authority";
@@ -19,6 +18,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { Button } from "../../primitives/Button";
 import { MotionHighlight, MotionHighlightItem } from "../effects/MotionHighlight";
 import { PanelLeftIcon } from "../icons/PanelLeft";
 import { Slot } from "./Slot";
@@ -30,6 +30,7 @@ const SIDEBAR_WIDTH = "20rem";
 const SIDEBAR_WIDTH_MOBILE = "20rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
+const HIGHLIGHT_TRANSITION: Transition = { type: "spring", stiffness: 350, damping: 35 };
 
 type SidebarContextProps = {
 	state: "expanded" | "collapsed";
@@ -174,7 +175,7 @@ function Sidebar({
 	children,
 	animateOnHover = true,
 	containerClassName,
-	transition = { type: "spring", stiffness: 350, damping: 35 },
+	transition = HIGHLIGHT_TRANSITION,
 	landmarkLabel = "Sidebar",
 	...props
 }: SidebarProps) {

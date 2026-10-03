@@ -5,10 +5,11 @@ import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { mockToastError, mockToastSuccess, logClientError, PICKED } = vi.hoisted(() => ({
+const { mockToastError, mockToastSuccess, logClientError, askForPlan, PICKED } = vi.hoisted(() => ({
 	mockToastError: vi.fn(),
 	mockToastSuccess: vi.fn(),
 	logClientError: vi.fn(),
+	askForPlan: vi.fn(),
 	PICKED: new Date(2026, 4, 15),
 }));
 
@@ -21,10 +22,10 @@ vi.mock("@application/shared/utils/clientLog", () => ({ logClientError }));
 
 vi.mock("@application/stores/holidays", () => ({
 	useHolidaysStore: (selector: (state: unknown) => unknown) =>
-		selector({ holidays: [], currentSelection: null, alternatives: [], suggestion: null }),
+		selector({ holidays: [], currentSelection: null, alternatives: [], suggestion: null, askForPlan }),
 }));
 
-vi.mock("@ui/modules/pages/planner/calendar/Calendar", () => ({
+vi.mock("../../calendar/Calendar", () => ({
 	Calendar: ({ onSelect }: { onSelect?: (date: Date | Date[]) => void }) => (
 		<>
 			<button type="button" onClick={() => onSelect?.(PICKED)}>
@@ -44,12 +45,13 @@ const DATE = new Date(2026, 4, 1);
 
 type Commit = (data: { name: string; date: Date }) => HolidayOutcome | null;
 
-interface RenderModalOptions {
+interface RenderModalParams {
+	onCommit: Commit;
 	withDefaults?: boolean;
 	onClose?: () => void;
 }
 
-const renderModal = (onCommit: Commit, { withDefaults = true, onClose = vi.fn() }: RenderModalOptions = {}) =>
+const renderModal = ({ onCommit, withDefaults = true, onClose = vi.fn() }: RenderModalParams) =>
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
 			<HolidayFormModal
@@ -72,7 +74,7 @@ beforeEach(() => vi.clearAllMocks());
 describe("HolidayFormModal", () => {
 	it("reports the store outcome as a success toast when the commit lands", async () => {
 		const onCommit = vi.fn(() => ({ applied: true as const }));
-		renderModal(onCommit);
+		renderModal({ onCommit });
 
 		await userEvent.click(screen.getByRole("button", { name: en.modals.addHoliday.submit }));
 
@@ -83,7 +85,7 @@ describe("HolidayFormModal", () => {
 
 	it("renders the refusal the store gave, not a guess of its own", async () => {
 		const onCommit = vi.fn(() => ({ applied: false as const, reason: HolidayRefusal.DATE_HELD_BY_HOLIDAY }));
-		renderModal(onCommit);
+		renderModal({ onCommit });
 
 		await userEvent.click(screen.getByRole("button", { name: en.modals.addHoliday.submit }));
 
@@ -93,7 +95,7 @@ describe("HolidayFormModal", () => {
 
 	it("falls back to its own error copy for a refusal with no message of its own", async () => {
 		const onCommit = vi.fn(() => ({ applied: false as const, reason: "unmapped" as never }));
-		renderModal(onCommit);
+		renderModal({ onCommit });
 
 		await userEvent.click(screen.getByRole("button", { name: en.modals.addHoliday.submit }));
 
@@ -104,7 +106,7 @@ describe("HolidayFormModal", () => {
 
 	it("stays silent when the caller answers null, which is how Edit says nothing changed", async () => {
 		const onCommit = vi.fn(() => null);
-		renderModal(onCommit);
+		renderModal({ onCommit });
 
 		await userEvent.click(screen.getByRole("button", { name: en.modals.addHoliday.submit }));
 
@@ -117,7 +119,7 @@ describe("HolidayFormModal", () => {
 describe("HolidayFormModal date picking", () => {
 	it("shows the date picked on the calendar and hands it to the commit", async () => {
 		const onCommit = vi.fn(() => ({ applied: true as const }));
-		renderModal(onCommit, { withDefaults: false });
+		renderModal({ onCommit, withDefaults: false });
 		await userEvent.type(screen.getByLabelText(en.modals.addHoliday.nameLabel), "Offsite");
 
 		await userEvent.click(screen.getByRole("button", { name: "pick" }));
@@ -130,10 +132,7 @@ describe("HolidayFormModal date picking", () => {
 	});
 
 	it("ignores a calendar answer that is not a single date, since only the single mode reaches it", async () => {
-		renderModal(
-			vi.fn(() => null),
-			{ withDefaults: false },
-		);
+		renderModal({ onCommit: vi.fn(() => null), withDefaults: false });
 
 		await userEvent.click(screen.getByRole("button", { name: "pick many" }));
 
@@ -141,7 +140,7 @@ describe("HolidayFormModal date picking", () => {
 	});
 
 	it("shows the date it was opened with as already selected", () => {
-		renderModal(vi.fn(() => null));
+		renderModal({ onCommit: vi.fn(() => null) });
 
 		expect(screen.getByText(`${en.modals.addHoliday.selected}: Friday, May 1, 2026`)).toBeTruthy();
 	});
@@ -150,7 +149,7 @@ describe("HolidayFormModal date picking", () => {
 describe("HolidayFormModal validation", () => {
 	it("refuses to submit without a name, and says so beside the field rather than in a toast", async () => {
 		const onCommit = vi.fn(() => ({ applied: true as const }));
-		renderModal(onCommit);
+		renderModal({ onCommit });
 		await userEvent.clear(screen.getByLabelText(en.modals.addHoliday.nameLabel));
 
 		await submit();
@@ -164,12 +163,12 @@ describe("HolidayFormModal validation", () => {
 describe("HolidayFormModal when the commit throws", () => {
 	it("reports its own error copy and leaves a record, and does not close on a success it never got", async () => {
 		const onClose = vi.fn();
-		renderModal(
-			() => {
+		renderModal({
+			onCommit: () => {
 				throw new Error("store refused");
 			},
-			{ onClose },
-		);
+			onClose,
+		});
 
 		await submit();
 
@@ -188,7 +187,7 @@ describe("HolidayFormModal closing", () => {
 	it("closes without committing when cancelled", async () => {
 		const onCommit = vi.fn(() => ({ applied: true as const }));
 		const onClose = vi.fn();
-		renderModal(onCommit, { onClose });
+		renderModal({ onCommit, onClose });
 
 		await userEvent.click(screen.getByRole("button", { name: en.modals.addHoliday.cancel }));
 
@@ -198,10 +197,7 @@ describe("HolidayFormModal closing", () => {
 
 	it("closes once a commit has landed, so the form does not linger over a saved Holiday", async () => {
 		const onClose = vi.fn();
-		renderModal(
-			vi.fn(() => ({ applied: true as const })),
-			{ onClose },
-		);
+		renderModal({ onCommit: vi.fn(() => ({ applied: true as const })), onClose });
 
 		await submit();
 
@@ -211,7 +207,7 @@ describe("HolidayFormModal closing", () => {
 
 describe("HolidayFormModal analytics", () => {
 	it("reports a saved Custom Holiday by mode and outcome, never by name or date", async () => {
-		renderModal(vi.fn(() => ({ applied: true as const })));
+		renderModal({ onCommit: vi.fn(() => ({ applied: true as const })) });
 
 		await submit();
 
@@ -224,7 +220,7 @@ describe("HolidayFormModal analytics", () => {
 	});
 
 	it("reports a refusal with the store's reason", async () => {
-		renderModal(vi.fn(() => ({ applied: false as const, reason: HolidayRefusal.DATE_HELD_BY_HOLIDAY })));
+		renderModal({ onCommit: vi.fn(() => ({ applied: false as const, reason: HolidayRefusal.DATE_HELD_BY_HOLIDAY })) });
 
 		await submit();
 
@@ -232,5 +228,39 @@ describe("HolidayFormModal analytics", () => {
 			event: "custom_holiday_saved",
 			properties: { mode: "add", applied: false, reason: HolidayRefusal.DATE_HELD_BY_HOLIDAY },
 		});
+	});
+
+	it("asks for a plan when the Custom Holiday lands, and not for a refusal or for no change", async () => {
+		const applied = renderModal({ onCommit: vi.fn(() => ({ applied: true as const })) });
+		await submit();
+		expect(askForPlan).toHaveBeenCalledOnce();
+		applied.unmount();
+
+		const refused = renderModal({
+			onCommit: vi.fn(() => ({ applied: false as const, reason: HolidayRefusal.DATE_HELD_BY_HOLIDAY })),
+		});
+		await submit();
+		refused.unmount();
+
+		renderModal({ onCommit: vi.fn(() => null) });
+		await submit();
+
+		expect(askForPlan).toHaveBeenCalledOnce();
+	});
+});
+
+describe("HolidayFormModal labels", () => {
+	const LABELABLE = new Set(["BUTTON", "INPUT", "METER", "OUTPUT", "PROGRESS", "SELECT", "TEXTAREA"]);
+
+	it("points every label at an element a label can name, heading the date picker instead", () => {
+		renderModal({ onCommit: vi.fn(() => ({ applied: true as const })) });
+		const labels = [...document.querySelectorAll("label[for]")];
+		const pointingAtNothingNameable = labels.filter(
+			(label) => !LABELABLE.has(document.getElementById(label.getAttribute("for") ?? "")?.tagName ?? ""),
+		);
+
+		expect(labels.length).toBeGreaterThan(0);
+		expect(pointingAtNothingNameable).toEqual([]);
+		expect(screen.getByText(en.modals.addHoliday.dateLabel).tagName).not.toBe("LABEL");
 	});
 });

@@ -14,6 +14,8 @@ import {
 import { MONTHS_IN_YEAR } from "@domain/calendar/window";
 import type { FromTo } from "../calendar/Calendar";
 
+export const EFFICIENCY_FORMAT = { minimumFractionDigits: 1, maximumFractionDigits: 1 } as const;
+
 const CALENDAR_WEEKS = 6;
 const DAYS_PER_WEEK = 7;
 const CALENDAR_SIZE = CALENDAR_WEEKS * DAYS_PER_WEEK;

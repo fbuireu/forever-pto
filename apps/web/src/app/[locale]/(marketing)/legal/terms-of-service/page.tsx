@@ -5,6 +5,7 @@ import { LegalLayout } from "@ui/modules/layout/LegalLayout";
 import { amountFormatter } from "@ui/utils/currencies";
 import { getLastUpdatedDate } from "@ui/utils/getLastUpdatedDate";
 import type { Locale } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 
 const githubLink = createRichLink({ href: "https://github.com/fbuireu/forever-pto", options: { external: true } });
@@ -15,8 +16,6 @@ const MAXIMUM_LIABILITY = 50;
 function BoldText(chunks: ReactNode) {
 	return <strong>{chunks}</strong>;
 }
-
-import { getTranslations } from "next-intl/server";
 
 export const generateMetadata = routeMetadata("/legal/terms-of-service");
 

@@ -1,12 +1,13 @@
 "use client";
 
 import { useFiltersStore } from "@application/stores/filters";
+import { useHolidaysStore } from "@application/stores/holidays";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { MonthToggles } from "@ui/modules/shared/MonthToggles";
-import { SidebarFieldLabel } from "@ui/modules/sidebar/components/SidebarFieldLabel";
 import { CalendarHeart } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useShallow } from "zustand/react/shallow";
+import { SidebarFieldLabel } from "./SidebarFieldLabel";
 
 export const PreferredMonths = () => {
 	const t = useTranslations("sidebar.preferredMonths");
@@ -19,8 +20,10 @@ export const PreferredMonths = () => {
 			allowPastDays: state.allowPastDays,
 		})),
 	);
+	const askForPlan = useHolidaysStore((state) => state.askForPlan);
 
 	const handleChange = (months: number[]) => {
+		askForPlan();
 		setPreferredMonths(months);
 		track({
 			event: "planning_input_changed",

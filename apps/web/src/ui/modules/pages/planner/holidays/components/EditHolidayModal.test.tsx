@@ -5,10 +5,11 @@ import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { mockToastError, mockToastSuccess, editHoliday } = vi.hoisted(() => ({
+const { mockToastError, mockToastSuccess, editHoliday, askForPlan } = vi.hoisted(() => ({
 	mockToastError: vi.fn(),
 	mockToastSuccess: vi.fn(),
 	editHoliday: vi.fn(() => ({ applied: true as const })),
+	askForPlan: vi.fn(),
 }));
 
 const MOVED_TO = new Date(2026, 4, 8);
@@ -16,12 +17,12 @@ const MOVED_TO = new Date(2026, 4, 8);
 vi.mock("sonner", () => ({ toast: { error: mockToastError, success: mockToastSuccess } }));
 vi.mock("@application/stores/holidays", () => ({
 	useHolidaysStore: (selector: (state: unknown) => unknown) =>
-		selector({ holidays: [], currentSelection: null, editHoliday }),
+		selector({ holidays: [], currentSelection: null, editHoliday, askForPlan }),
 }));
 vi.mock("@application/stores/filters", () => ({
 	useFiltersStore: (selector: (state: unknown) => unknown) => selector({ year: 2026, carryOverMonths: 2 }),
 }));
-vi.mock("@ui/modules/pages/planner/calendar/Calendar", () => ({
+vi.mock("../../calendar/Calendar", () => ({
 	Calendar: ({ onSelect }: { onSelect?: (date: Date) => void }) => (
 		<button type="button" onClick={() => onSelect?.(MOVED_TO)}>
 			move the date
@@ -82,6 +83,7 @@ describe("EditHolidayModal", () => {
 			year: 2026,
 			carryOverMonths: 2,
 		});
+		expect(askForPlan).toHaveBeenCalledOnce();
 		expect(mockToastSuccess).toHaveBeenCalledWith(en.modals.editHoliday.successTitle, {
 			description: "Summer closure has been updated",
 		});

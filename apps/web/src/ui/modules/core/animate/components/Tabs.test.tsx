@@ -192,6 +192,24 @@ describe("TabsContent", () => {
 		expect(queryByText("Panel B")).toBeNull();
 	});
 
+	it("names the open panel after its tab, and it is the panel the tab says it controls", () => {
+		render(
+			<Tabs defaultValue="a">
+				<TabsList>
+					<TabsTrigger value="a">A</TabsTrigger>
+					<TabsTrigger value="b">B</TabsTrigger>
+				</TabsList>
+				<TabsContents>
+					<TabsContent value="a">Panel A</TabsContent>
+					<TabsContent value="b">Panel B</TabsContent>
+				</TabsContents>
+			</Tabs>,
+		);
+
+		const panel = screen.getByRole("tabpanel", { name: "A" });
+		expect(screen.getByRole("tab", { name: "A" }).getAttribute("aria-controls")).toBe(panel.id);
+	});
+
 	it("switches to new content after clicking a trigger", () => {
 		const { getByText, queryByText } = render(
 			<Tabs defaultValue="a">
@@ -211,6 +229,11 @@ describe("TabsContent", () => {
 	});
 });
 
+interface PressParams {
+	label: string;
+	key: string;
+}
+
 describe("moving between tabs from the keyboard", () => {
 	const renderTabs = () =>
 		render(
@@ -228,7 +251,7 @@ describe("moving between tabs from the keyboard", () => {
 			</Tabs>,
 		);
 
-	const press = (label: string, key: string) => fireEvent.keyDown(screen.getByRole("tab", { name: label }), { key });
+	const press = ({ label, key }: PressParams) => fireEvent.keyDown(screen.getByRole("tab", { name: label }), { key });
 
 	const openPanel = () => screen.getByRole("tabpanel").textContent;
 
@@ -237,7 +260,7 @@ describe("moving between tabs from the keyboard", () => {
 	it("goes to the next tab on the right arrow", () => {
 		renderTabs();
 
-		press("A", "ArrowRight");
+		press({ label: "A", key: "ArrowRight" });
 
 		expect(openPanel()).toBe("Panel B");
 		expect(focused()).toBe("B");
@@ -245,26 +268,26 @@ describe("moving between tabs from the keyboard", () => {
 
 	it("goes to the previous tab on the left arrow", () => {
 		renderTabs();
-		press("A", "ArrowRight");
+		press({ label: "A", key: "ArrowRight" });
 
-		press("B", "ArrowLeft");
+		press({ label: "B", key: "ArrowLeft" });
 
 		expect(openPanel()).toBe("Panel A");
 	});
 
 	it("wraps round the end rather than stopping there", () => {
 		renderTabs();
-		press("A", "ArrowLeft");
+		press({ label: "A", key: "ArrowLeft" });
 
 		expect(openPanel()).toBe("Panel C");
 	});
 
 	it("wraps round the start too", () => {
 		renderTabs();
-		press("A", "ArrowRight");
-		press("B", "ArrowRight");
+		press({ label: "A", key: "ArrowRight" });
+		press({ label: "B", key: "ArrowRight" });
 
-		press("C", "ArrowRight");
+		press({ label: "C", key: "ArrowRight" });
 
 		expect(openPanel()).toBe("Panel A");
 	});
@@ -272,17 +295,17 @@ describe("moving between tabs from the keyboard", () => {
 	it("jumps to the first tab on Home and the last on End", () => {
 		renderTabs();
 
-		press("A", "End");
+		press({ label: "A", key: "End" });
 		expect(openPanel()).toBe("Panel C");
 
-		press("C", "Home");
+		press({ label: "C", key: "Home" });
 		expect(openPanel()).toBe("Panel A");
 	});
 
 	it("leaves any other key to the browser", () => {
 		renderTabs();
 
-		press("A", "ArrowDown");
+		press({ label: "A", key: "ArrowDown" });
 
 		expect(openPanel()).toBe("Panel A");
 	});

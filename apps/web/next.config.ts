@@ -2,6 +2,7 @@ import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import { z } from "zod";
+import { LOG_LEVEL } from "./src/infrastructure/logging/contract";
 
 const withNextIntl = createNextIntlPlugin({
 	requestConfig: "./src/infrastructure/i18n/config.ts",
@@ -106,7 +107,7 @@ const nextConfig: NextConfig = {
 	poweredByHeader: false,
 	cacheComponents: false,
 	compiler: {
-		removeConsole: isProd,
+		removeConsole: isProd ? { exclude: Object.values(LOG_LEVEL) } : false,
 	},
 	async headers() {
 		return [

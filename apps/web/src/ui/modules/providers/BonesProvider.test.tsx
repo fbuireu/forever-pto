@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 const configureBoneyard = vi.hoisted(() => vi.fn());
 
 vi.mock("boneyard-js/react", () => ({ configureBoneyard }));
-vi.mock("src/ui/modules/bones/registry", () => ({}));
+vi.mock("@ui/modules/bones/registry", () => ({}));
 
 const { BonesProvider } = await import("./BonesProvider");
 const configuredAtLoad = [...configureBoneyard.mock.calls];

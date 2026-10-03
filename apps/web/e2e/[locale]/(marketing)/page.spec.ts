@@ -1,12 +1,14 @@
 import enMessages from "@i18n/messages/en.json";
 import { LOCALES } from "@infrastructure/i18n/locales";
 import { localePath } from "@infrastructure/i18n/utils/url";
+import type { RoutePath } from "@infrastructure/seo/routes";
 import { expect, test } from "@playwright/test";
 import { finishQuickStart, openQuickStart } from "../../quickStart";
 
 const MAIN = "main#main-content";
 const HOMEPAGE_NAMESPACE = "homepage.";
 const PHONE_VIEWPORT = { width: 390, height: 664 };
+const PLANNER_PATH = "/planner" satisfies RoutePath;
 
 test.describe("(marketing) homepage", () => {
 	test("returns 200", async ({ page }) => {
@@ -46,11 +48,11 @@ test.describe("(marketing) homepage", () => {
 
 	test("has a link to the planner", async ({ page }) => {
 		await page.goto("/");
-		await expect(page.locator('a[href="/planner"]').first()).toBeVisible();
+		await expect(page.locator(`a[href="${PLANNER_PATH}"]`).first()).toBeVisible();
 	});
 
 	test("the hero call to action opens the quick start and lands in the planner", async ({ page }) => {
-		const dialog = await openQuickStart({ page });
+		const dialog = await openQuickStart(page);
 		await expect(dialog.getByRole("heading", { name: enMessages.quickStart.location.title })).toBeVisible();
 
 		await dialog.getByRole("button", { name: enMessages.quickStart.next }).click();
@@ -64,7 +66,7 @@ test.describe("(marketing) homepage", () => {
 		test.use({ viewport: PHONE_VIEWPORT });
 
 		test("the quick start stays inside the screen and finishes from its longest step", async ({ page }) => {
-			const dialog = await openQuickStart({ page });
+			const dialog = await openQuickStart(page);
 
 			await dialog.getByRole("button", { name: enMessages.quickStart.next }).click();
 			await dialog.getByRole("button", { name: enMessages.quickStart.next }).click();

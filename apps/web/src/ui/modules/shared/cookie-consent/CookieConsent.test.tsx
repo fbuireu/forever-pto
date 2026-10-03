@@ -2,6 +2,7 @@ import en from "@i18n/messages/en.json";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { ServiceChangeParams } from "./CookieConsentDialog";
 
 const DIALOG_LAYER = 200;
 
@@ -10,7 +11,7 @@ interface DialogProps {
 	analyticsEnabled: boolean;
 	serviceStates: Record<string, boolean>;
 	onAnalyticsChange: (checked: boolean) => void;
-	onServiceChange: (serviceId: string, checked: boolean) => void;
+	onServiceChange: (params: ServiceChangeParams) => void;
 	onAcceptAll: () => void;
 	onRejectAll: () => void;
 	onSave: () => void;
@@ -49,7 +50,7 @@ vi.mock("./CookieConsentDialog", () => ({
 			<button type="button" onClick={() => props.onAnalyticsChange(false)}>
 				disable analytics
 			</button>
-			<button type="button" onClick={() => props.onServiceChange("betterStack", true)}>
+			<button type="button" onClick={() => props.onServiceChange({ serviceId: "betterStack", checked: true })}>
 				enable betterStack
 			</button>
 			<button type="button" onClick={props.onSave}>

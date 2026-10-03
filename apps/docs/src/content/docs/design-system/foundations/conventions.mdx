@@ -1,15 +1,15 @@
 ---
 title: Conventions
-description: The rules every core component follows, from CVA with exported variants and data-slot hooks to asChild via the local Slot, named exports, and cn().
+description: How the core components are built, from CVA and data-slot hooks to asChild via the local Slot, named exports and cn(), and where the rules they follow are written.
 sidebar:
   order: 6
 ---
 
-The design system lives in `apps/web/src/ui/modules/core/` and its governing rules are written down in `apps/web/src/ui/modules/core/AGENTS.md`. This page documents each rule and the mechanics behind it.
+The design system lives in `apps/web/src/ui/modules/core/`. The rules it follows are written once, in [`CODING_STANDARDS.md`](https://github.com/fbuireu/forever-pto/blob/main/CODING_STANDARDS.md) (`U11`, `U12` and `X1` among them, with the mechanical ones under *Tooling already enforces*), and `apps/web/src/ui/modules/core/AGENTS.md` is the folder's map. This page documents the mechanics behind them.
 
-## CVA variants, always exported
+## CVA variants, exported where they exist
 
-Every primitive with visual variants uses [CVA](https://cva.style) (`class-variance-authority`), and the CVA object is **exported alongside the component**, as `buttonVariants`, `badgeVariants`, `sidebarMenuButtonVariants`, and so on:
+Four components use [CVA](https://cva.style) (`class-variance-authority`): `Button`, `Badge`, `InputGroup` and the sidebar. The two whose variants other code reuses export the CVA object **alongside the component**, `buttonVariants` and `badgeVariants`:
 
 ```tsx
 export { Button, buttonVariants };
@@ -19,6 +19,8 @@ Reasons:
 
 1. Other components can reuse the exact class recipe without importing the component (e.g. styling a link as a button).
 2. `VariantProps<typeof buttonVariants>` gives consumers, including these docs, the variant union as a *type*. The demo wrappers here build exhaustive `Record<Variant, …>` maps from it, so renaming a variant in the app breaks `astro check` instead of letting the [Button page](/design-system/components/button/) drift.
+
+A single short variant is a `cn()` call or a local record instead: `Banner` and the planner's `MetricCard` take a `colorScheme` key into a local `COLOR_SCHEMES` record.
 
 ## `data-slot` attributes
 
@@ -40,19 +42,15 @@ Polymorphism uses the `asChild` pattern, but the `Slot` is **local**: `apps/web/
 </Button>
 ```
 
-Note the headless layer throughout core is **Base UI** (`@base-ui/react`). That guide named Radix for a while,, but no Radix packages are installed; the accessibility primitives (Dialog, Popover, Tooltip, Menu, Accordion…) all come from `@base-ui/react/*`. A motion-aware sibling, `MotionSlot` (`apps/web/src/ui/modules/core/animate/primitives/animate/MotionSlot.tsx`), does the same job for `m.*` components. Do not reinvent either.
+Note the headless layer throughout core is **Base UI** (`@base-ui/react`). No Radix package is a direct dependency (`vaul` and `cmdk` bring one in transitively), and the accessibility primitives (Dialog, Popover, Tooltip, Menu, Accordion…) all come from `@base-ui/react/*`. A motion-aware sibling, `MotionSlot` (`apps/web/src/ui/modules/core/animate/primitives/animate/MotionSlot.tsx`), does the same job for `m.*` components.
 
-## Named exports only
+## Named exports
 
-No `default export` anywhere in core: named exports improve tree-shaking and autocomplete,, and make renames traceable. Sub-components that exist only for internal composition are prefixed with `_` and left unexported (e.g. `_CardFooter` in `apps/web/src/ui/modules/core/primitives/Card.tsx`).
+Core exports by name, as the rest of the app does, and Biome fails a default export: a `dynamic()` loader picks the named export, and without barrels the import path is the only index.
 
 ## No business logic in core
 
-Core components are presentational:
-
-- No store access, no API calls, no data fetching.
-- No translation keys: components accept strings, and `useTranslations` lives in the feature modules that render them.
-- App-domain types don't belong here. The exceptions that break this rule (`Combobox` with its DTO props, `RichLink` with the next-intl `Link`, `Toaster` with `next-themes`) are exactly the components these docs cannot render live, so they are documented reference-only.
+Core components are presentational, and the contract suite holds them to it: no store access, no API calls, no data fetching, and no translation keys, since components accept strings and `useTranslations` lives in the feature modules that render them. The components that reach app code (`Combobox` with its DTO props, `RichLink` with the next-intl `Link`, `Toaster` with `next-themes`) are exactly the ones these docs cannot render live, so they are documented reference-only.
 
 ## `cn()`
 
@@ -64,8 +62,8 @@ export function cn(...inputs: ClassValue[]) {
 }
 ```
 
-`clsx` handles conditional composition, `tailwind-merge` resolves conflicting utilities (last one wins per property group), so `cn(buttonVariants({ variant }), className)` lets a caller's `className` override variant classes predictably. Always pipe user-supplied `className` through `cn()`; never concatenate strings.
+`clsx` handles conditional composition, `tailwind-merge` resolves conflicting utilities (last one wins per property group), so `cn(buttonVariants({ variant }), className)` lets a caller's `className` override variant classes predictably. `U11` says when a received `className` goes through `cn()` and when a static class list stays a plain string, because `cn()` drops a class twMerge reads as a conflict.
 
 ## Client/server split
 
-Nearly every core file is `'use client'`, because everything animated needs Motion's `m.*` components,, which in turn require an ancestor `LazyMotionProvider` (`apps/web/src/ui/modules/core/animate/providers/LazyMotionProvider.tsx`). The server-safe set (no directive, no hooks) is the plain primitives: Badge, Banner, Button, Card, Input, Textarea, Label, Separator, FlagIcon, plus the Slot. Keep new primitives server-safe unless they genuinely need state or motion.
+Nearly every core file is `'use client'`, because everything animated needs Motion's `m.*` components, which in turn require an ancestor `LazyMotionProvider` (`apps/web/src/ui/modules/core/animate/providers/LazyMotionProvider.tsx`). The server-safe set (no directive, no hooks) is the plain primitives: Badge, Banner, Bone, Button, Card, FlagIcon, Input, Label, RichLink, Separator, Textarea, plus the Slot. `U5` says when a file takes the directive.

@@ -1,6 +1,11 @@
 "use client";
 
-import type { CreatePaymentInput } from "@application/dto/payment/schema";
+import {
+	AMOUNT_MAX,
+	AMOUNT_MIN,
+	type CreatePaymentInput,
+	type DonationFormValues,
+} from "@application/dto/payment/schema";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@ui/modules/core/animate/base/Collapsible";
 import { ChevronDown } from "@ui/modules/core/animate/icons/ChevronDown";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
@@ -27,7 +32,7 @@ import { FormButtons } from "../FormButtons";
 const PRESET_AMOUNTS = [5, 10, 15] as const;
 
 interface DonationFormProps {
-	form: UseFormReturn<CreatePaymentInput>;
+	form: UseFormReturn<DonationFormValues, unknown, CreatePaymentInput>;
 	onSubmit: (data: CreatePaymentInput) => void;
 	currentAmount: number;
 	locale: Locale;
@@ -53,7 +58,7 @@ export function DonationForm({
 
 	const handlePresetClick = useCallback(
 		(value: number) => {
-			setValue("amount", value, { shouldValidate: true });
+			setValue("amount", String(value), { shouldValidate: true });
 		},
 		[setValue],
 	);
@@ -118,16 +123,11 @@ export function DonationForm({
 										placeholder={t("enterAmount")}
 										autoComplete="off"
 										step="1"
-										min="1"
-										max="10000"
+										min={AMOUNT_MIN}
+										max={AMOUNT_MAX}
 										disabled={isPending}
 										required
 										{...field}
-										value={field.value ?? ""}
-										onChange={(e) => {
-											const value = e.target.value;
-											field.onChange(value === "" ? 0 : parseFloat(value));
-										}}
 									/>
 								</FormControl>
 							</InputGroup>

@@ -238,6 +238,6 @@ rejections matter as much as the fixes: a rule is only as clear as the cases it 
   The contract suite can tell you that the graph table matches the tree. It cannot tell you that an edge
   should not exist. That judgement stays with the layer contracts under
   [`../apps/web/src/`](../apps/web/src), and with review.
-- Where this bites elsewhere: the *Conventions* section of [`../AGENTS.md`](../AGENTS.md), the layer
+- Where this bites elsewhere: `M1` and the smell overrides in [`../CODING_STANDARDS.md`](../CODING_STANDARDS.md), the layer
   contracts under [`../apps/web/src/`](../apps/web/src), and the architecture overview on the documentation
   site, which links here rather than restating any of it.

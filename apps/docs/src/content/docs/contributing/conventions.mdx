@@ -1,6 +1,6 @@
 ---
 title: Conventions
-description: Commit types, code style and component rules.
+description: Commit types, and where the code style and component rules are written.
 sidebar:
   order: 0
 ---
@@ -28,11 +28,9 @@ The release commit is created by semantic-release as `chore(web): release x.y.z 
 
 ## Code conventions
 
-- **No barrel files.** Import directly from the source module; never create pass-through `index.ts` re-export files.
-- **Named exports.** Default exports are used only where Next.js requires them (route files, config files). Everything else exports by name, including the CVA variants object next to its component.
-- **CVA pattern.** Styled primitives define a `cva()` object and export it alongside the component (e.g. `buttonVariants` in `apps/web/src/ui/modules/core/primitives/Button.tsx`) so variants stay reusable and type-derivable. See the [Button page](/design-system/components/button/) for how the docs exploit this.
-- **An `AGENTS.md` per folder.** Significant directories carry an `AGENTS.md` describing what may be changed there, its public API, invariants and gotchas. Read it before modifying a folder; update it in the same commit when the rules change. The convention is declared in the root `AGENTS.md`. `CONTEXT.md` is the domain glossary and lives at the repo root only; never create a nested one.
-- **No uppercase in i18n strings.** Translation strings in `apps/web/src/ui/i18n/messages/` are written in normal casing; if a design calls for uppercase, apply it with a CSS `uppercase` class in the component. Casing is presentation, not content.
+How code here is written is [`CODING_STANDARDS.md`](https://github.com/fbuireu/forever-pto/blob/main/CODING_STANDARDS.md), the file a review holds a diff to: each rule has an id (`D10`, `U12`, `L2`), is marked **hard** or **judgement**, and a finding cites it by that id. It opens with what Biome, the type checkers and the contract suite already enforce.
+
+- **An `AGENTS.md` per folder.** Significant directories carry an `AGENTS.md` with the folder's map, the couplings a change there has to carry ("if you change X, update Y"), its runtime gotchas and its guardrails. Read it before modifying a folder; update it in the same commit when what it describes changes. The convention is declared in the root `AGENTS.md`. `CONTEXT.md` is the domain glossary and lives at the repo root only; never create a nested one.
 
 ## Formatting
 

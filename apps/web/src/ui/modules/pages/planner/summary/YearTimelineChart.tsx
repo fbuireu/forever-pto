@@ -81,14 +81,22 @@ interface YearTimelineChartProps {
 	manuallySelectedDays: Date[];
 }
 
-const ROW_COLOR: Record<string, string> = {
+type TimelineRow = "national" | "regional" | "custom" | "pto" | "bridges" | "manual";
+
+interface TimelineRowData {
+	key: TimelineRow;
+	label: string;
+	segs: Seg[];
+}
+
+const ROW_COLOR = {
 	national: "bg-[var(--color-brand-yellow)]",
 	regional: "bg-[var(--color-brand-yellow)]",
 	custom: "bg-[color-mix(in_srgb,var(--color-brand-purple)_28%,white_72%)]",
 	pto: "bg-[var(--color-brand-teal)]",
 	bridges: "bg-[var(--color-brand-orange)]",
 	manual: "bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,var(--color-brand-teal)_82%)]",
-};
+} satisfies Record<TimelineRow, string>;
 
 export const YearTimelineChart = memo(function YearTimelineChart({
 	year,
@@ -107,7 +115,7 @@ export const YearTimelineChart = memo(function YearTimelineChart({
 				const date = new Date(year, i, 1);
 				return {
 					key: `${getYear(date)}-${getMonth(date)}`,
-					label: formatDate({ date, locale, format: "MMM" }).toUpperCase(),
+					label: formatDate({ date, locale, format: "MMM" }),
 				};
 			}),
 		[year, locale, monthCount],
@@ -133,14 +141,16 @@ export const YearTimelineChart = memo(function YearTimelineChart({
 
 		const manual = manuallySelectedDays.map((d) => ({ start: d, end: d }));
 
-		return [
+		const timelineRows: TimelineRowData[] = [
 			{ key: "national", label: t("yearTimeline.rows.national"), segs: national },
 			{ key: "regional", label: t("yearTimeline.rows.regional"), segs: regional },
 			{ key: "custom", label: t("yearTimeline.rows.custom"), segs: custom },
 			{ key: "pto", label: t("yearTimeline.rows.pto"), segs: pto },
 			{ key: "bridges", label: t("yearTimeline.rows.bridges"), segs: bridges },
 			{ key: "manual", label: t("yearTimeline.rows.manual"), segs: manual },
-		].filter((row) => row.segs.length > 0);
+		];
+
+		return timelineRows.filter((row) => row.segs.length > 0);
 	}, [holidays, suggestion, manuallySelectedDays, t]);
 
 	return (
@@ -152,7 +162,7 @@ export const YearTimelineChart = memo(function YearTimelineChart({
 						<div
 							key={key}
 							className={cn(
-								"py-2 px-1 text-center text-[11px] font-mono font-bold tracking-[0.05em]",
+								"py-2 px-1 text-center text-[11px] font-mono font-bold uppercase tracking-[0.05em]",
 								i < monthCount - 1 && "border-r-[2px] border-[var(--frame)]",
 							)}
 						>

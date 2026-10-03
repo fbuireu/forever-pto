@@ -26,9 +26,9 @@ import { Demo } from "../Demo";
 
 type AnimatedIcon = ComponentType<{ size?: number }>;
 
-// Exhaustive gallery: every icon module in src/ui/modules/core/animate/icons/
-// is imported here by its real export name, so a renamed or removed icon in
-// the app breaks `astro check` instead of silently dropping out of the docs.
+// Exhaustive gallery: every icon module in src/ui/modules/core/animate/icons/,
+// by its real export name. A renamed export fails `astro check`; a module added
+// or gone over there fails the contract suite, which `astro check` cannot see.
 const ICONS: ReadonlyArray<{ name: string; Icon: AnimatedIcon }> = [
 	{ name: "ArrowDown", Icon: ArrowDown },
 	{ name: "ArrowUp", Icon: ArrowUp },
@@ -69,31 +69,31 @@ export const IconsGalleryDemo = () => (
 	</Demo>
 );
 
-const tileClass =
+const TILE_CLASS =
 	"flex w-40 flex-col items-center gap-2 rounded-xl border-[3px] border-[var(--frame)] bg-card p-3 shadow-[var(--shadow-brutal-xs)]";
 
 export const IconTriggersDemo = () => (
 	<Demo>
 		<AnimateIcon animate loop loopDelay={1200}>
-			<span className={tileClass}>
+			<span className={TILE_CLASS}>
 				<Clock size={28} />
 				<code className="text-[11px] leading-none">animate loop</code>
 			</span>
 		</AnimateIcon>
 		<AnimateIcon animateOnHover animation="path">
-			<span className={`${tileClass} cursor-pointer`}>
+			<span className={`${TILE_CLASS} cursor-pointer`}>
 				<Settings size={28} />
 				<code className="text-[11px] leading-none">hover, path</code>
 			</span>
 		</AnimateIcon>
 		<AnimateIcon animateOnTap>
-			<span className={`${tileClass} cursor-pointer`}>
+			<span className={`${TILE_CLASS} cursor-pointer`}>
 				<Star size={28} />
 				<code className="text-[11px] leading-none">animateOnTap</code>
 			</span>
 		</AnimateIcon>
 		<AnimateIcon animateOnView animateOnViewOnce={false} delay={300}>
-			<span className={tileClass}>
+			<span className={TILE_CLASS}>
 				<MapPin size={28} />
 				<code className="text-[11px] leading-none">animateOnView</code>
 			</span>

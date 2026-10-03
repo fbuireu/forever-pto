@@ -31,7 +31,12 @@ vi.mock("@react-pdf/renderer", async () => {
 
 const { HolidayDocument } = await import("./HolidayDocument");
 
-const holiday = (isoDate: string, name: string): HolidayDTO => ({
+interface HolidayParams {
+	isoDate: string;
+	name: string;
+}
+
+const holiday = ({ isoDate, name }: HolidayParams): HolidayDTO => ({
 	id: isoDate,
 	date: new Date(`${isoDate}T00:00:00`),
 	name,
@@ -77,9 +82,9 @@ const monthLabels = () =>
 		.filter((text) => /^[A-Z][a-z]+ \d{4}$/.test(text));
 
 const HOLIDAYS = [
-	holiday("2026-03-19", "Sant Josep"),
-	holiday("2026-01-06", "Reyes"),
-	holiday("2026-01-01", "New Year"),
+	holiday({ isoDate: "2026-03-19", name: "Sant Josep" }),
+	holiday({ isoDate: "2026-01-06", name: "Reyes" }),
+	holiday({ isoDate: "2026-01-01", name: "New Year" }),
 ];
 
 beforeEach(() => {
@@ -107,7 +112,10 @@ describe("HolidayDocument", () => {
 
 	it("keeps a month of the following year after the same month of this one", () => {
 		renderDocument({
-			holidays: [holiday("2027-01-01", "New Year"), holiday("2026-01-01", "New Year")],
+			holidays: [
+				holiday({ isoDate: "2027-01-01", name: "New Year" }),
+				holiday({ isoDate: "2026-01-01", name: "New Year" }),
+			],
 		});
 
 		expect(monthLabels()).toStrictEqual(["January 2026", "January 2027"]);
@@ -120,7 +128,7 @@ describe("HolidayDocument", () => {
 	});
 
 	it("lists each Holiday with the weekday, which is the point of exporting it", () => {
-		renderDocument({ holidays: [holiday("2026-01-06", "Reyes")] });
+		renderDocument({ holidays: [holiday({ isoDate: "2026-01-06", name: "Reyes" })] });
 
 		expect(screen.getByText("Tue, Jan 6")).toBeTruthy();
 		expect(screen.getByText("Reyes")).toBeTruthy();

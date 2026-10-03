@@ -1,7 +1,7 @@
 import { Toaster } from "@ui/modules/core/primitives/Sonner";
-import { Header } from "@ui/modules/pages/homepage/navigation/Navigation";
 import { QuickStart } from "@ui/modules/pages/homepage/quick-start/QuickStart";
 import { Footer } from "@ui/modules/shared/footer/Footer";
+import { Header } from "@ui/modules/shared/Header";
 import type { Locale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { ReactNode } from "react";

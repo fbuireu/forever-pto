@@ -15,7 +15,7 @@ const MockStripeLayer = Layer.succeed(StripeServerService, {
 	webhooks: { constructEvent: vi.fn() },
 });
 
-const MOCK_INTENT = { id: "pi_123", client_secret: "pi_123_secret" };
+const MOCK_INTENT = { id: "pi_123", client_secret: "fixture-client-secret" };
 
 const run = (params: Parameters<typeof createPaymentIntent>[0]) =>
 	Effect.runPromise(createPaymentIntent(params).pipe(Effect.provide(MockStripeLayer)));

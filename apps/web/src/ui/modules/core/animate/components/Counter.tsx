@@ -57,7 +57,12 @@ function Counter({
 				{...(decrementButtonProps as object)}
 				aria-label={decrementLabel}
 				onClick={() => setNumber(number - 1)}
-				className={cn(btnBase, "border-r-[3px] border-(--frame)", decrementButtonProps?.className)}
+				className={cn(
+					btnBase,
+					"border-r-[3px] border-(--frame)",
+					buttonProps?.className,
+					decrementButtonProps?.className,
+				)}
 			>
 				−
 			</m.button>
@@ -69,7 +74,7 @@ function Counter({
 					className={cn("font-display font-black text-[22px] leading-none", slidingNumberProps?.className)}
 				/>
 				{label && (
-					<small className="font-mono text-[10px] font-semibold text-muted-foreground -mt-px tracking-[0.06em]">
+					<small className="font-mono text-[10px] font-semibold uppercase text-muted-foreground -mt-px tracking-[0.06em]">
 						{label}
 					</small>
 				)}
@@ -82,7 +87,12 @@ function Counter({
 				{...(incrementButtonProps as object)}
 				aria-label={incrementLabel}
 				onClick={() => setNumber(number + 1)}
-				className={cn(btnBase, "border-l-[3px] border-(--frame)", incrementButtonProps?.className)}
+				className={cn(
+					btnBase,
+					"border-l-[3px] border-(--frame)",
+					buttonProps?.className,
+					incrementButtonProps?.className,
+				)}
 			>
 				+
 			</m.button>

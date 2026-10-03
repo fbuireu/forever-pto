@@ -5,7 +5,7 @@ sidebar:
   order: 0
 ---
 
-All core components live in `apps/web/src/ui/modules/core/` and follow the conventions in `apps/web/src/ui/modules/core/AGENTS.md`: CVA variants, `data-slot` attributes, named exports, no business logic or translations inside components. See [Philosophy](/design-system/foundations/philosophy/) for the visual language.
+All core components live in `apps/web/src/ui/modules/core/`, and the rules they follow are in [`CODING_STANDARDS.md`](https://github.com/fbuireu/forever-pto/blob/main/CODING_STANDARDS.md): `data-slot` attributes and CVA only for orthogonal variant axes (`U11`, `U12`), and named exports and no stores, translations or fetching inside a component, which Biome and the contract suite enforce. See [Philosophy](/design-system/foundations/philosophy/) for the visual language.
 
 ```mermaid
 flowchart TB
@@ -37,7 +37,7 @@ flowchart TB
 These docs import the real components through the `@ui` alias and render them as Astro islands. Portability determines what a page can show:
 
 - **Live** means a framework-clean module (no Next.js in its import graph); the docs render the real component.
-- **Live (motion)** is also portable, but built on `motion`'s `m.*` components,, so demos wrap it in `LazyMotionProvider` (`apps/web/src/ui/modules/core/animate/providers/LazyMotionProvider.tsx`).
+- **Live (motion)** is also portable, but built on `motion`'s `m.*` components, so `Demo.tsx` wraps every demo in `LazyMotionProvider` (`apps/web/src/ui/modules/core/animate/providers/LazyMotionProvider.tsx`).
 - **Reference-only** means the module (or a transitive import) touches Next.js or app layers; documented without importing it.
 
 ## Catalog

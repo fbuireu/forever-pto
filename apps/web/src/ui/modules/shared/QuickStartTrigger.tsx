@@ -5,7 +5,7 @@ import { type QuickStartSource, useUIStore } from "@application/stores/ui";
 import { useHasStoredPlan } from "@ui/hooks/useHasStoredPlan";
 import { Button } from "@ui/modules/core/primitives/Button";
 import type { ComponentProps, ReactNode } from "react";
-import { PLANNER_PATH } from "./steps";
+import { PLANNER_PATH } from "./utils/helpers";
 
 type QuickStartTriggerProps = Pick<ComponentProps<typeof Button>, "children" | "className" | "size" | "variant"> & {
 	source: QuickStartSource;

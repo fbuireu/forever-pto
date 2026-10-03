@@ -1,8 +1,9 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { PaymentError, PromoCodeError, PromoCodeErrors } from "@infrastructure/errors";
+import { PromoCodeErrors } from "@application/dto/payment/types";
+import { PaymentError, PromoCodeError } from "@infrastructure/errors";
 import type { Stripe, StripeElements } from "@stripe/stripe-js";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockCreatePaymentAction = vi.hoisted(() => vi.fn());
 const mockLogError = vi.hoisted(() => vi.fn());
@@ -17,6 +18,10 @@ vi.mock("@infrastructure/logging/logger", () => ({
 const mockFetch = vi.fn();
 vi.stubGlobal("fetch", mockFetch);
 
+afterAll(() => {
+	vi.unstubAllGlobals();
+});
+
 const { initializePayment, confirmPayment, ConfirmPaymentOutcome } = await import("./checkout");
 
 const mockStripe = { confirmPayment: vi.fn() } as unknown as Stripe;
@@ -26,7 +31,7 @@ const BASE_CONFIRM_PARAMS = {
 	stripe: mockStripe,
 	elements: mockElements,
 	email: "user@example.com",
-	returnUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/en/payment/confirmation`,
+	returnUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/api/payment/activate?locale=en`,
 };
 
 describe("logging imports", () => {
@@ -258,5 +263,46 @@ describe("confirmPayment", () => {
 
 		expect(result.outcome).toBe(ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE);
 		await vi.waitFor(() => expect(mockLogError).toHaveBeenCalled());
+	});
+});
+
+describe("confirmPayment's logs", () => {
+	const writtenByTheLogger = async (context: Record<string, unknown>) => {
+		const { logger } = await vi.importActual<typeof import("@infrastructure/logging/logger")>(
+			"@infrastructure/logging/logger",
+		);
+		const sink = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+		try {
+			logger.warn({ message: "written", context });
+			const [line] = sink.mock.calls[0] ?? [];
+			return String(line);
+		} finally {
+			sink.mockRestore();
+		}
+	};
+
+	it("puts the return URL under url, so the logger writes it without its query string", async () => {
+		(mockElements.submit as ReturnType<typeof vi.fn>).mockResolvedValue({});
+		(mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({});
+
+		await confirmPayment(BASE_CONFIRM_PARAMS);
+		await vi.waitFor(() => expect(mockLoggerWarn).toHaveBeenCalled());
+		const [{ context }] = mockLoggerWarn.mock.lastCall ?? [];
+		const line = await writtenByTheLogger(context);
+
+		expect(JSON.parse(line).url).toBe(BASE_CONFIRM_PARAMS.returnUrl.split("?")[0]);
+		expect(line).not.toContain("?");
+	});
+
+	it("puts the return URL under url on the unexpected-error path too", async () => {
+		(mockElements.submit as ReturnType<typeof vi.fn>).mockRejectedValue(new Error("network timeout"));
+
+		await confirmPayment(BASE_CONFIRM_PARAMS);
+		await vi.waitFor(() => expect(mockLogError).toHaveBeenCalled());
+		const [{ context }] = mockLogError.mock.lastCall ?? [];
+		const line = await writtenByTheLogger(context);
+
+		expect(JSON.parse(line).url).toBe(BASE_CONFIRM_PARAMS.returnUrl.split("?")[0]);
+		expect(line).not.toContain("?");
 	});
 });

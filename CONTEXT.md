@@ -9,7 +9,7 @@ One day from the user's annual budget of paid days off. It is a unit of budget, 
 _Avoid_: vacation day, day off, holiday
 
 **Country**:
-The territory whose Holiday calendar drives the plan. It is detected on first visit and can be overridden; it is never inferred from the user's language.
+The territory whose Holiday calendar drives the plan. It is never inferred from the user's language.
 _Avoid_: locale
 
 **Region**:
@@ -20,7 +20,7 @@ _Avoid_: state
 How many months past the end of the planning year the user is still allowed to spend this year's PTO Days in.
 
 **Planning Window**:
-The full span the planner considers: the chosen year plus its Carry-over Months. Holidays outside it are still shown for context but cannot anchor a Bridge.
+The full span the planner considers: the chosen year plus its Carry-over Months.
 _Avoid_: selected range, date range
 
 **Strategy**:
@@ -28,20 +28,18 @@ The rule that decides which Bridges make it into a Suggestion when the PTO budge
 _Avoid_: filter, algorithm
 
 **Preferred Months**:
-The months of the Planning Window in which the user wants the block the Main Vacation Strategy builds first. Each is one month of one year: a Carry-over Month is a month of the next year, distinct from the same month of the chosen one. None chosen means any month: the block goes wherever it can be longest. A month the plan can no longer reach, because it has passed and past days are not allowed, cannot be chosen and counts as not chosen.
+The months of the Planning Window in which the user wants the block the Main Vacation Strategy builds first. Each is one month of one year: a Carry-over Month is a month of the next year, distinct from the same month of the chosen one. None chosen means any month: the block goes wherever it can be longest. A month the plan can no longer reach counts as not chosen.
 _Avoid_: season, favourite months
 
 ## The calendar
 
 **Holiday**:
-A public non-working day that the user does not have to spend a PTO Day on. In this product "holiday" never means time off taken voluntarily; that is a PTO Day. English user-facing copy may say "public holiday", and only there: the bare word means vacation in British English, which is the one thing a Holiday is not, so the qualifier is what keeps the sentence unambiguous. Every other language has a single word for it and needs no qualifier. In code, in identifiers and in these documents the term is Holiday.
+A public non-working day that the user does not have to spend a PTO Day on. In this product "holiday" never means time off taken voluntarily; that is a PTO Day.
 _Avoid_: bank holiday, vacation, day off
 
 **Holiday Variant**:
-Where a Holiday comes from: National, Regional or Custom. It drives how the Holiday is displayed and whether the user may edit it.
+Where a Holiday comes from: National, Regional or Custom.
 _Avoid_: type, kind, category
-
-The word "type" is reserved: the upstream holiday data uses it for a classification of its own, so it must never be reused for the Variant.
 
 **Custom Holiday**:
 A non-working day the user added or overrode themselves, for company closures, local festivities, or corrections to the published calendar. It outranks a National or Regional Holiday falling on the same date.
@@ -52,7 +50,7 @@ A date inside the Planning Window that is neither a weekend nor a Holiday, and i
 _Avoid_: working day, business day, weekday
 
 **Worked Day**:
-A Workday the plan leaves standing: one the user will actually spend working, once Holidays and the PTO Days the plan placed are taken out. Reported as a monthly average, so fewer Worked Days per month is what the budget bought.
+A Workday the plan leaves standing: one the user will actually spend working, once Holidays and the PTO Days the plan placed are taken out.
 _Avoid_: actual working day, business day
 
 **Free Day**:
@@ -104,7 +102,7 @@ Effective Days divided by the PTO Days spent to get them. It is the single quali
 _Avoid_: multiplier, ratio, performance
 
 **Gain**:
-The Effective Days a plan produces beyond the user's whole PTO budget, divided by that budget and shown as a percentage. It answers "how much more did optimising get me than spending my allowance naively?", where Efficiency answers "what did each PTO Day I actually placed return?". They are measured against different denominators (the budget, against the days actually placed), so they coincide only when the plan spends the budget in full, and part company by whatever it leaves unspent.
+The Effective Days a plan produces beyond the user's whole PTO budget, divided by that budget. It answers "how much more did optimising get me than spending my allowance naively?", where Efficiency answers "what did each PTO Day I actually placed return?".
 _Avoid_: improvement, multiplier, performance
 
 **Long Weekend**:
@@ -115,11 +113,11 @@ One separated period of time off within the year, however long. Counting them te
 _Avoid_: vacation period, period, break
 
 **Quarter**:
-Three consecutive months of the Planning Window, counted from its start rather than from January. A Planning Window is the year plus its Carry-over Months, so it holds more Quarters than a calendar year does, and gains them as the Carry-over Months grow. A Quarter is therefore not a calendar quarter, and one past the last calendar quarter is not an error.
+Three consecutive months of the Planning Window, counted from its start rather than from January, so a Planning Window holds more Quarters than a calendar year does and gains them as the Carry-over Months grow.
 _Avoid_: trimester
 
 **Long Block**:
-A Rest Block of three or more consecutive days: the shape most people mean by "a proper holiday". Reported per Quarter to expose imbalance across the Planning Window.
+A Rest Block of three or more consecutive days: the shape most people mean by "a proper holiday".
 
 **Longest Vacation**:
 The single longest unbroken stretch of Free Days the plan produces. The headline number when a user wants one real trip rather than many small breaks.
@@ -136,5 +134,5 @@ The voluntary payment that unlocks Premium. It is framed as supporting the proje
 _Avoid_: purchase, subscription
 
 **Premium**:
-The tier of the product unlocked by a Donation, covering the advanced metrics and manual editing of a Suggestion. Access is tied to the email address used for the Donation.
+The tier of the product unlocked by a Donation, covering the advanced metrics and manual editing of a Suggestion.
 _Avoid_: upgrade, subscription

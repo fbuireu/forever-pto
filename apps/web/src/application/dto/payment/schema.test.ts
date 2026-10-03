@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { createPaymentSchema, createPaymentSchemaWithMessages, paymentConfirmationQuerySchema } from "./schema";
+import {
+	ACTIVATION_FAILED,
+	ACTIVATION_PARAM,
+	amountFromInput,
+	createDonationFormSchemaWithMessages,
+	createPaymentSchema,
+	createPaymentSchemaWithMessages,
+	paymentConfirmationQuerySchema,
+	promoCodeErrorCodeSchema,
+} from "./schema";
+import { PromoCodeErrors } from "./types";
 
 const VALID = { amount: 9.99, email: "user@example.com" };
 
@@ -115,7 +125,75 @@ describe("createPaymentSchemaWithMessages", () => {
 	});
 });
 
+describe("createDonationFormSchemaWithMessages", () => {
+	const schema = createDonationFormSchemaWithMessages({
+		amountMin: "Amount too small",
+		amountMax: "Amount too big",
+		invalidEmail: "Bad email",
+		emailRequired: "Email needed",
+		promoCodeTooLong: "Promo code too long",
+	});
+
+	it.each([
+		["25", 25],
+		["4.", 4],
+		["12.5", 12.5],
+	])("converts the text %j the field holds into %d on submit", (amount, expected) => {
+		expect(schema.parse({ ...VALID, amount })).toEqual({ ...VALID, amount: expected });
+	});
+
+	it("answers an emptied field with the minimum's own message, never Zod's", () => {
+		const result = schema.safeParse({ ...VALID, amount: "" });
+		expect(result.success).toBe(false);
+		if (!result.success) expect(result.error.issues.map(({ message }) => message)).toEqual(["Amount too small"]);
+	});
+
+	it("keeps the payment schema's ceiling and its message", () => {
+		const result = schema.safeParse({ ...VALID, amount: "99999" });
+		expect(result.success).toBe(false);
+		if (!result.success) expect(result.error.issues.map(({ message }) => message)).toEqual(["Amount too big"]);
+	});
+});
+
+describe("amountFromInput", () => {
+	it.each([
+		["", 0],
+		["4.", 4],
+		["10", 10],
+		["2.5", 2.5],
+	])("reads %j as %d", (text, expected) => {
+		expect(amountFromInput(text)).toBe(expected);
+	});
+});
+
+describe("promoCodeErrorCodeSchema", () => {
+	it("keeps the wire-format codes a refused promo code answers with", () => {
+		expect(PromoCodeErrors).toEqual({
+			INVALID_OR_EXPIRED: "invalid_or_expired",
+			USAGE_LIMIT_REACHED: "usage_limit_reached",
+			COUPON_EXPIRED: "coupon_expired",
+			COUPON_INVALID: "coupon_invalid",
+			FAILED_TO_LOAD: "failed_to_load",
+			MIN_AMOUNT_EXCEEDED: "min_amount_exceeded",
+		});
+	});
+
+	it.each(Object.values(PromoCodeErrors))("accepts %s", (code) => {
+		expect(promoCodeErrorCodeSchema.validate(code)).toBe(true);
+	});
+
+	it.each([["promo_code_too_long"], ["INVALID_OR_EXPIRED"], [""], [undefined]])("refuses %o", (code) => {
+		expect(promoCodeErrorCodeSchema.validate(code)).toBe(false);
+	});
+});
+
 describe("paymentConfirmationQuerySchema", () => {
+	it("reads the activation flag under the parameter the activation route writes", () => {
+		expect(ACTIVATION_PARAM).toBe("activation");
+		expect(ACTIVATION_FAILED).toBe("failed");
+		expect(Object.keys(paymentConfirmationQuerySchema.shape)).toContain(ACTIVATION_PARAM);
+	});
+
 	it.each([
 		[{ payment_intent: "pi_123" }],
 		[{ payment_intent: "pi_123", activation: "failed", redirect_status: "succeeded" }],

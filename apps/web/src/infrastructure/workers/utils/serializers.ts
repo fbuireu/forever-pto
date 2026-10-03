@@ -1,7 +1,7 @@
 import type { HolidayDTO } from "@application/dto/holiday/types";
 import { fromStoredInstant } from "@application/shared/utils/dateIntake";
 import type { Bridge, MeasuredSuggestion } from "@domain/calendar/types";
-import type { SerializedBridge, SerializedHolidayDTO, SerializedSuggestion } from "../types";
+import type { SerializedBridge, SerializedHolidayDTO, SerializedSuggestion } from "@infrastructure/workers/types";
 
 export function serializeHolidays(holidays: HolidayDTO[]) {
 	return holidays.map((holiday) => ({

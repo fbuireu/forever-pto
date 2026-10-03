@@ -1,13 +1,18 @@
+import caMessages from "@i18n/messages/ca.json";
+import deMessages from "@i18n/messages/de.json";
 import enMessages from "@i18n/messages/en.json";
+import esMessages from "@i18n/messages/es.json";
+import frMessages from "@i18n/messages/fr.json";
+import itMessages from "@i18n/messages/it.json";
 import { render, screen } from "@testing-library/react";
-import { createTranslator } from "next-intl";
+import { createTranslator, type Locale } from "next-intl";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetTranslations = vi.hoisted(() => vi.fn());
 
 vi.mock("next-intl/server", () => ({ getTranslations: mockGetTranslations }));
-vi.mock("@ui/modules/pages/homepage/quick-start/QuickStartTrigger", () => ({
+vi.mock("@ui/modules/shared/QuickStartTrigger", () => ({
 	QuickStartTrigger: ({ children, source }: { children: ReactNode; source: string }) => (
 		<button type="button" data-testid="quick-start-trigger" data-source={source}>
 			{children}
@@ -30,10 +35,22 @@ import { HomepageCta } from "./HomepageCta";
 
 const closing = enMessages.homepage.closing;
 
-const renderCta = async () => {
-	mockGetTranslations.mockResolvedValue(
-		createTranslator({ locale: "en", messages: enMessages, namespace: "homepage" }),
-	);
+const BUNDLES: Record<string, typeof enMessages> = {
+	en: enMessages,
+	es: esMessages,
+	ca: caMessages,
+	it: itMessages,
+	de: deMessages,
+	fr: frMessages,
+};
+
+interface RenderCtaParams {
+	locale?: Locale;
+	messages?: typeof enMessages;
+}
+
+const renderCta = async ({ locale = "en", messages = enMessages }: RenderCtaParams = {}) => {
+	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "homepage" }));
 	return render(await HomepageCta());
 };
 
@@ -62,11 +79,24 @@ describe("HomepageCta", () => {
 		expect(shapes).toEqual(closing.shapes);
 	});
 
-	it("builds the title from its three parts with the emphasis in the middle", async () => {
+	it("draws the title from one message, the emphasis and the line break where the translation puts them", async () => {
 		await renderCta();
 		const heading = screen.getByRole("heading", { level: 2 });
 
-		expect(heading.textContent).toBe(`${closing.titleStart} ${closing.titleEmphasis}${closing.titleEnd}`);
-		expect(heading.querySelector("em")?.textContent).toBe(closing.titleEmphasis);
+		expect(heading.textContent).toBe("Your next freeyear starts today.");
+		expect(heading.querySelector("em")?.textContent).toBe("free");
+		expect(heading.querySelector("em + br")).not.toBeNull();
 	});
+
+	it.each(Object.entries(BUNDLES))(
+		"renders the %s title with its emphasis and its line break",
+		async (locale, messages) => {
+			await renderCta({ locale: locale as Locale, messages });
+			const heading = screen.getByRole("heading", { level: 2 });
+
+			expect(heading.querySelector("em")?.textContent).toMatch(/\S/);
+			expect(heading.querySelector("br")).not.toBeNull();
+			expect(heading.textContent).not.toMatch(/[<>{}]|homepage\./);
+		},
+	);
 });

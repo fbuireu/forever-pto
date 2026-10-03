@@ -1,16 +1,13 @@
+import type { DiscountInfo } from "@application/dto/payment/types";
 import deMessages from "@i18n/messages/de.json";
 import enMessages from "@i18n/messages/en.json";
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const uiState = { getCurrencyFromLocale: vi.fn(), currency: "EUR" };
 const premiumState = { setPremiumStatus: vi.fn() };
 
-vi.mock("@application/stores/ui", () => ({
-	useUIStore: (selector: (state: typeof uiState) => unknown) => selector(uiState),
-}));
 vi.mock("@application/stores/premium", () => ({
 	usePremiumStore: (selector: (state: typeof premiumState) => unknown) => selector(premiumState),
 }));
@@ -65,13 +62,20 @@ import { CheckoutForm } from "./CheckoutForm";
 
 const NON_BREAKING_SPACES = /[  ]/g;
 
-const DISCOUNT = { originalAmount: 15, finalAmount: 12.5, code: "LAUNCH50", percentOff: 50 };
+const DISCOUNT: DiscountInfo = {
+	type: "fixed",
+	value: 2.5,
+	originalAmount: 15,
+	finalAmount: 12.5,
+	couponId: "coupon_launch",
+	couponName: "Launch",
+};
 
 interface RenderFormParams {
 	locale: Locale;
 	messages: object;
 	amount: number;
-	discountInfo?: unknown;
+	discountInfo?: DiscountInfo | null;
 }
 
 const renderForm = ({ locale, messages, amount, discountInfo = null }: RenderFormParams) => {
@@ -80,7 +84,7 @@ const renderForm = ({ locale, messages, amount, discountInfo = null }: RenderFor
 			<CheckoutForm
 				amount={amount}
 				email="donor@example.com"
-				discountInfo={discountInfo as never}
+				discountInfo={discountInfo}
 				onSuccess={vi.fn()}
 				onCancel={vi.fn()}
 			/>
@@ -100,7 +104,7 @@ describe("CheckoutForm amount rendering", () => {
 
 	it("formats the amount on the pay button too", () => {
 		const text = renderForm({ locale: "de", messages: deMessages, amount: 12.5 });
-		expect(text).toContain(`${deMessages.checkout.pay} 12,50 €`);
+		expect(text).toContain("Bezahlen 12,50 €");
 	});
 
 	it("formats the promo saving instead of prefixing a hardcoded euro sign", () => {
@@ -239,7 +243,7 @@ const succeeds = () =>
 	vi.mocked(confirmPayment).mockResolvedValue({
 		outcome: ConfirmPaymentOutcome.SUCCEEDED,
 		sessionData: { email: "donor@example.com", premiumKey: "key_123" },
-	} as never);
+	});
 
 beforeEach(() => {
 	vi.mocked(track).mockClear();
@@ -268,14 +272,25 @@ describe("a payment that goes through", () => {
 		);
 	});
 
-	it("reports the amount that was actually taken", async () => {
+	it("reports the amount that was actually taken, and nothing about the payer", async () => {
 		succeeds();
 		const { submit } = renderCheckout();
 
 		submit();
 
-		await waitFor(() =>
-			expect(vi.mocked(track)).toHaveBeenCalledWith({ event: "payment_completed", properties: { amount: 12.5 } }),
+		await waitFor(() => expect(premiumState.setPremiumStatus).toHaveBeenCalled());
+		expect(vi.mocked(track).mock.calls).toStrictEqual([[{ event: "payment_completed", properties: { amount: 12.5 } }]]);
+	});
+
+	it("sends the issuer back to the activation route, which grants Premium, in the reader's locale", async () => {
+		succeeds();
+		const { submit } = renderCheckout();
+
+		submit();
+
+		await waitFor(() => expect(vi.mocked(confirmPayment)).toHaveBeenCalledOnce());
+		expect(vi.mocked(confirmPayment).mock.calls[0]?.[0].returnUrl).toBe(
+			`${globalThis.location.origin}/api/payment/activate?locale=en`,
 		);
 	});
 
@@ -288,6 +303,45 @@ describe("a payment that goes through", () => {
 
 		expect(onSuccess).not.toHaveBeenCalled();
 		await waitFor(() => expect(onSuccess).toHaveBeenCalledOnce(), { timeout: 2000 });
+	});
+
+	it("hands back at once when the checkout leaves the screen during that moment, so the hand-back is never dropped", async () => {
+		succeeds();
+		const onSuccess = vi.fn();
+		const { submit } = renderCheckout({ onSuccess });
+
+		submit();
+		await waitFor(() => expect(premiumState.setPremiumStatus).toHaveBeenCalled());
+		cleanup();
+
+		expect(onSuccess).toHaveBeenCalledOnce();
+	});
+
+	it("hands back exactly once and reports the payment exactly once, however the moment ends", async () => {
+		succeeds();
+		const onSuccess = vi.fn();
+		const { submit } = renderCheckout({ onSuccess });
+
+		submit();
+		await waitFor(() => expect(premiumState.setPremiumStatus).toHaveBeenCalled());
+		cleanup();
+		await act(() => new Promise((resolve) => setTimeout(resolve, 1100)));
+
+		expect(onSuccess).toHaveBeenCalledOnce();
+		expect(premiumState.setPremiumStatus).toHaveBeenCalledOnce();
+		expect(vi.mocked(track).mock.calls).toStrictEqual([[{ event: "payment_completed", properties: { amount: 12.5 } }]]);
+	});
+
+	it("hands back once when the moment ends before the checkout leaves the screen", async () => {
+		succeeds();
+		const onSuccess = vi.fn();
+		const { submit } = renderCheckout({ onSuccess });
+
+		submit();
+		await waitFor(() => expect(onSuccess).toHaveBeenCalledOnce(), { timeout: 2000 });
+		cleanup();
+
+		expect(onSuccess).toHaveBeenCalledOnce();
 	});
 
 	it("shows no failure message on the way through", async () => {
@@ -304,9 +358,7 @@ describe("a payment that goes through", () => {
 
 describe("a payment the issuer took over", () => {
 	it("says nothing and grants nothing, because the browser has already left", async () => {
-		vi.mocked(confirmPayment).mockResolvedValue({
-			outcome: ConfirmPaymentOutcome.HANDED_OFF_TO_ISSUER,
-		} as never);
+		vi.mocked(confirmPayment).mockResolvedValue({ outcome: ConfirmPaymentOutcome.HANDED_OFF_TO_ISSUER });
 		const { submit, onSuccess } = renderCheckout();
 
 		submit();
@@ -335,7 +387,7 @@ describe("paying through the express button", () => {
 		vi.mocked(confirmPayment).mockResolvedValue({
 			outcome: ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE,
 			error: "internal_error",
-		} as never);
+		});
 		renderCheckout();
 
 		fireEvent.click(screen.getByRole("button", { name: "express confirm" }));

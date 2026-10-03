@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { apiCatalog } from "./apiCatalog";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL;
+if (!BASE_URL) throw new Error("vitest.config.ts sets NEXT_PUBLIC_SITE_URL for the unit suite");
 
 describe("apiCatalog", () => {
 	it("anchors linkset to baseUrl", () => {

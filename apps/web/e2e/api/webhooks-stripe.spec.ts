@@ -1,3 +1,4 @@
+import { ApiError } from "@infrastructure/api/errors";
 import { expect, test } from "@playwright/test";
 
 const URL = "/api/webhooks/stripe";
@@ -10,7 +11,7 @@ test.describe("POST /api/webhooks/stripe", () => {
 		});
 		expect(response.status()).toBe(400);
 		const body = await response.json();
-		expect(body.error).toBe("missing_signature");
+		expect(body.error).toBe(ApiError.MISSING_SIGNATURE);
 	});
 
 	test("returns 400 when signature is invalid", async ({ request }) => {
@@ -23,7 +24,7 @@ test.describe("POST /api/webhooks/stripe", () => {
 		});
 		expect(response.status()).toBe(400);
 		const body = await response.json();
-		expect(body.error).toBe("invalid_signature");
+		expect(body.error).toBe(ApiError.INVALID_SIGNATURE);
 	});
 
 	test("returns JSON content-type", async ({ request }) => {

@@ -1,11 +1,14 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { createRequire } from "node:module";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { isDeepStrictEqual } from "node:util";
 import ts from "@typescript/typescript6";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import webNextConfig, { PUBLIC_ENV, RUNTIME_ONLY } from "../apps/web/next.config";
 import { PAYMENT_STATUSES, PAYMENT_SUCCEEDED } from "../apps/web/src/domain/payment/events/types";
+import { LOG_LEVEL } from "../apps/web/src/infrastructure/logging/contract";
 
 const ROOT = resolve(__dirname, "..");
 const WEB = "apps/web";
@@ -61,8 +64,8 @@ const CITED_PACKAGE_REF = new RegExp(String.raw`${PNPM_PACKAGE_FLAG}(?:\s+|=)(\S
 const WORKFLOW_SHELL_STEP = /^(\s*)-?[ \t]*(?:run|command):[ \t]*(\|[-+]?)?[ \t]*(.*)$/;
 // The two censuses below count steps, and both were counting a spelling rather than a job. `BUILD_COMMAND`
 // read `pnpm … build` and nothing else, so `pnpm -F <pkg> build`, `pnpm exec astro build` and `npx next
-// build` were all invisible; the deploy census substring-matched `wrangler deploy`, which is two of this
-// repo's four deploys. The other two arrive through `cloudflare/wrangler-action`'s `command:` input and
+// build` were all invisible; the deploy census substring-matched `wrangler deploy`, which was two of the
+// repo's four deploys then. The others arrived through `cloudflare/wrangler-action`'s `command:` input and
 // through a script name (`apps/docs`'s `deploy` is `astro build && wrangler deploy`). A tool name is what
 // survives a change of runner, so that is what these match, plus the script names that resolve to one.
 const BUILD_TOOL_COMMAND = /\b(?:astro|next|opennextjs-cloudflare|vite|tsc|turbo) build\b/;
@@ -77,8 +80,6 @@ const GITHUB_REF_EXPRESSION = /\$\{\{\s*github\.ref\s*\}\}/;
 const PULL_REQUEST_MERGE_REF = `refs/pull/\${{ github.event.pull_request.number }}/merge`;
 const AGGREGATE_NEEDS = /name: Check(?: \(docs\))?\n\s+needs: \[([^\]]+)\]\n\s+if: \$\{\{ always\(\) \}\}/;
 const FONT_VARIABLE = /variable: ["'](--[\w-]+)["']/g;
-
-const escapeForRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 // A compound noun does not always pluralise on its last word. `term + "s?"` matched "day offs", which
 // nobody writes, and could not match "days off", which the wiki wrote seven times across four pages while
@@ -106,6 +107,11 @@ const trackedFiles = execFileSync("git", ["ls-files", "--cached", "--others", "-
 const markdownFiles = trackedFiles.filter((path) => path.endsWith(".md"));
 const contentFiles = trackedFiles.filter((path) => path.endsWith(".mdx"));
 const authoredMarkdown = markdownFiles.filter((path) => !GENERATED_MARKDOWN.has(path));
+const GITHUB_DIR = ".github";
+const githubMarkdown = readdirSync(join(ROOT, GITHUB_DIR))
+	.filter((file) => file.endsWith(".md"))
+	.map((file) => `${GITHUB_DIR}/${file}`);
+const linkedMarkdown = [...authoredMarkdown, ...githubMarkdown];
 const sourceFiles = trackedFiles.filter((path) => SOURCE_FILE.test(path));
 const read = (path: string) => readFileSync(join(ROOT, path), "utf8");
 
@@ -204,6 +210,89 @@ const UI_ROOT = join(ROOT, DOCS, (docsTsconfigPaths[UI_ALIAS]?.[0] ?? "").replac
 const UI_ROOT_RELATIVE = relative(ROOT, UI_ROOT).replace(/\\/g, "/");
 const resolveUiSpecifier = (specifier: string) => join(UI_ROOT, specifier.replace("@ui/", ""));
 
+const WEB_SRC = `${WEB}/src`;
+const TEST_FILE = /\.test\.tsx?$/;
+const IMPORT_SPECIFIER =
+	/from\s*["']([^"']+)["']|import\s*\(\s*["'`]([^"'`]+)["'`]\s*\)|(?:^|\n)\s*import\s*["']([^"']+)["']|require\s*\(\s*["']([^"']+)["']\s*\)|vi\.mock\(\s*["']([^"']+)["']/g;
+
+// Derived from the tsconfig rather than restated, so a new alias is followed the day it is declared.
+const aliasTargets = Object.entries(webTsconfigPaths).map(
+	([alias, [target]]) =>
+		[
+			alias.replace(ALIAS_WILDCARD_SUFFIX, ""),
+			`${WEB}/${(target ?? "").replace(ALIAS_WILDCARD_SUFFIX, "").replace(/^\.\//, "")}`,
+		] as const,
+);
+
+const webProduction = sourceFiles.filter((path) => path.startsWith(`${WEB_SRC}/`) && !TEST_FILE.test(path));
+
+// Parsed once: several rules read the same module, and the parser is what tells an import from a string that
+// looks like one.
+const parsedSources = new Map<string, ts.SourceFile>();
+const parse = (path: string): ts.SourceFile => {
+	const cached = parsedSources.get(path);
+	if (cached) return cached;
+	const kind = path.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
+	const parsed = ts.createSourceFile(path, read(path), ts.ScriptTarget.Latest, true, kind);
+	parsedSources.set(path, parsed);
+	return parsed;
+};
+
+interface ModuleImport {
+	specifier: string;
+	names: string[];
+	namespace: boolean;
+	typeOnly: boolean;
+	dynamic: boolean;
+}
+
+const importsOf = (path: string): ModuleImport[] => {
+	const found: ModuleImport[] = [];
+	const visit = (node: ts.Node) => {
+		if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
+			const clause = node.importClause;
+			const bindings = clause?.namedBindings;
+			const named = bindings && ts.isNamedImports(bindings) ? [...bindings.elements] : [];
+			const namespace = Boolean(bindings && ts.isNamespaceImport(bindings));
+			const bindsValue = Boolean(clause?.name) || namespace || named.some((element) => !element.isTypeOnly);
+			found.push({
+				specifier: node.moduleSpecifier.text,
+				names: named.map((element) => (element.propertyName ?? element.name).text),
+				namespace,
+				typeOnly: Boolean(clause?.isTypeOnly) || (clause !== undefined && !bindsValue),
+				dynamic: false,
+			});
+		} else if (ts.isExportDeclaration(node) && node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier)) {
+			found.push({
+				specifier: node.moduleSpecifier.text,
+				names: [],
+				namespace: false,
+				typeOnly: node.isTypeOnly,
+				dynamic: false,
+			});
+		} else if (ts.isCallExpression(node) && node.expression.kind === ts.SyntaxKind.ImportKeyword) {
+			const [argument] = node.arguments;
+			if (argument && ts.isStringLiteralLike(argument))
+				found.push({ specifier: argument.text, names: [], namespace: false, typeOnly: false, dynamic: true });
+		}
+		ts.forEachChild(node, visit);
+	};
+	visit(parse(path));
+	return found;
+};
+
+interface ResolveSpecifierParams {
+	from: string;
+	specifier: string;
+}
+
+// The repository path a relative or aliased specifier lands on, extension left off; a package resolves to "".
+const resolveSpecifier = ({ from, specifier }: ResolveSpecifierParams): string => {
+	if (specifier.startsWith(".")) return join(dirname(from), specifier).replace(/\\/g, "/");
+	const alias = aliasTargets.find(([prefix]) => specifier === prefix || specifier.startsWith(`${prefix}/`));
+	return alias ? `${alias[1]}${specifier.slice(alias[0].length)}` : "";
+};
+
 // A workflow is not markdown, so nothing above reaches it, and `.github/` sits under a dotfolder, which
 // `trackedFiles` drops wholesale. The commands are read out of it by hand: the value when it is inline, and
 // every line indented under it when it is a block scalar. `command:` counts as well as `run:`: no deploy,
@@ -217,10 +306,13 @@ const QUOTED_VERSION = /\d+\.\d+/;
 const workflowFiles = readdirSync(join(ROOT, WORKFLOW_DIR))
 	.filter((file) => file.endsWith(".yml"))
 	.map((file) => `${WORKFLOW_DIR}/${file}`);
+const compositeActionFiles = readdirSync(join(ROOT, COMPOSITE_ACTION_DIR)).map(
+	(action) => `${COMPOSITE_ACTION_DIR}/${action}/action.yml`,
+);
 
-// `_deploy-web.yml` is the one workflow written with CRLF, and `$` in a non-multiline pattern will not match
-// past the carriage return, so splitting on "\n" alone left every line of it unmatched and the rule silently
-// checking nothing there.
+// A Windows checkout writes CRLF although the index is all LF, and `$` in a non-multiline pattern will not
+// match past the carriage return, so splitting on "\n" alone left every line of `_deploy-web.yml` unmatched
+// there and the rule silently checking nothing.
 const runCommands = (workflow: string) => {
 	const lines = workflow.split(/\r?\n/);
 	const collected: string[] = [];
@@ -357,10 +449,26 @@ const cloudflareEnvBindings = [
 	),
 ].map(([, name]) => name as string);
 
+describe("the contract has a corpus to read", () => {
+	it("reads every corpus its rules scan out of the tree at all", () => {
+		expect(trackedFiles.length).toBeGreaterThan(500);
+		expect(authoredMarkdown).toEqual(
+			expect.arrayContaining(["AGENTS.md", "CODING_STANDARDS.md", "CONTEXT.md", ...PACKAGE_GUIDES]),
+		);
+		expect(githubMarkdown).toEqual(
+			expect.arrayContaining([`${GITHUB_DIR}/CONTRIBUTING.md`, `${GITHUB_DIR}/PULL_REQUEST_TEMPLATE.md`]),
+		);
+		expect(contentFiles.length).toBeGreaterThan(50);
+		expect(sourceFiles.length).toBeGreaterThan(500);
+		expect(workflowFiles.length).toBeGreaterThan(0);
+	});
+});
+
 describe("CONTEXT.md is the domain glossary and nothing else", () => {
 	const glossary = read("CONTEXT.md");
 
 	it("lives only at the repo root", () => {
+		expect(markdownFiles).toContain("CONTEXT.md");
 		expect(markdownFiles.filter((path) => path.endsWith("/CONTEXT.md"))).toEqual([]);
 	});
 
@@ -406,16 +514,22 @@ describe("CONTEXT.md is the domain glossary and nothing else", () => {
 	});
 
 	it("never leaves an _Avoid_ list empty", () => {
-		const empty = [...glossary.matchAll(GLOSSARY_AVOID_LINE)].filter(([, list]) => list.trim().length === 0);
+		const avoidLines = [...glossary.matchAll(GLOSSARY_AVOID_LINE)];
+		const empty = avoidLines.filter(([, list]) => list.trim().length === 0);
+
+		expect(avoidLines.length).toBeGreaterThan(20);
 		expect(empty).toEqual([]);
 	});
 
 	it("never lists a term as its own alternative", () => {
+		const avoiding = [...glossary.matchAll(GLOSSARY_TERM_WITH_AVOID)];
 		const selfAvoiding: string[] = [];
-		for (const [, term, , avoided] of glossary.matchAll(GLOSSARY_TERM_WITH_AVOID)) {
+		for (const [, term, , avoided] of avoiding) {
 			const alternatives = avoided.split(",").map((entry) => entry.trim().toLowerCase());
 			if (alternatives.includes(term.toLowerCase())) selfAvoiding.push(term);
 		}
+
+		expect(avoiding.length).toBeGreaterThan(20);
 		expect(selfAvoiding).toEqual([]);
 	});
 });
@@ -428,6 +542,8 @@ describe("the workspace is shaped the way the guides describe it", () => {
 			const [base] = glob.split("/*");
 			return !existsSync(join(ROOT, base ?? "")) || !statSync(join(ROOT, base ?? "")).isDirectory();
 		});
+
+		expect(workspaceGlobs.length).toBeGreaterThan(0);
 		expect(dangling).toEqual([]);
 	});
 
@@ -455,11 +571,12 @@ describe("the workspace is shaped the way the guides describe it", () => {
 
 	it("resolves every repo-relative path biome's includes list excludes", () => {
 		const includes: string[] = readJson("biome.json").files.includes;
-		const dangling = includes
+		const excluded = includes
 			.filter((entry) => entry.startsWith("!") && !entry.includes("*"))
-			.map((entry) => entry.slice(1))
-			.filter((path) => !existsSync(join(ROOT, path)));
-		expect(dangling).toEqual([]);
+			.map((entry) => entry.slice(1));
+
+		expect(excluded.length).toBeGreaterThan(0);
+		expect(excluded.filter((path) => !existsSync(join(ROOT, path)))).toEqual([]);
 	});
 
 	it("classifies every public variable the app declares, and no other", () => {
@@ -484,6 +601,27 @@ describe("the workspace is shaped the way the guides describe it", () => {
 
 		expect(unwired.sort()).toEqual([]);
 		expect(buildStep).not.toBe("");
+	});
+
+	it("strips every console call from the production build but the logger's levels, which carry its lines to the platform", async () => {
+		const levels = Object.values(LOG_LEVEL).toSorted();
+		vi.stubEnv("NODE_ENV", "production");
+		vi.stubEnv("NEXT_PUBLIC_STORAGE_KEY", "contract-suite");
+		vi.stubEnv("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY", "pk_contract_suite");
+		vi.resetModules();
+
+		try {
+			const { default: productionConfig } = await import("../apps/web/next.config");
+			const stripped = productionConfig.compiler?.removeConsole;
+
+			expect(typeof stripped === "object" ? stripped.exclude?.toSorted() : stripped).toEqual(levels);
+		} finally {
+			vi.unstubAllEnvs();
+			vi.resetModules();
+		}
+
+		expect(webNextConfig.compiler?.removeConsole).toBe(false);
+		expect(levels.length).toBeGreaterThan(0);
 	});
 
 	it("pairs every patched dependency with a Renovate rule a human merges", () => {
@@ -542,8 +680,8 @@ describe("pinned runtimes", () => {
 
 	// The rules around this one hold the pins to each other and none of them reads the section the digits
 	// were removed from, so a bullet could quote a version again and everything would still pass. Only the
-	// line that opens a bullet is checked: the prose beneath narrates the versions this guide used to state
-	// wrongly, and that history is the reason the decision exists.
+	// line that opens a bullet is checked: a continuation line may carry a number that is not a pin (the major
+	// `astro check` refuses to run under, an ADR's slug), and the stated-versions rule below reads every line.
 	it("quotes a version for none of them, since nothing here would keep one current", () => {
 		const section = read("AGENTS.md").match(VERSIONS_SECTION)?.[1] ?? "";
 		const quoting = section.split("\n").filter((line) => line.startsWith("- ") && QUOTED_VERSION.test(line));
@@ -567,10 +705,7 @@ describe("pinned runtimes", () => {
 	});
 
 	it("lets no workflow or composite action pin a runtime the manifest already pins", () => {
-		const composites = readdirSync(join(ROOT, COMPOSITE_ACTION_DIR)).map(
-			(action) => `${COMPOSITE_ACTION_DIR}/${action}/action.yml`,
-		);
-		const candidates = [...workflowFiles, ...composites];
+		const candidates = [...workflowFiles, ...compositeActionFiles];
 		const repinned = candidates.filter((file) => REPINNED_RUNTIME.test(read(file)));
 
 		expect(candidates.length).toBeGreaterThan(workflowFiles.length);
@@ -771,6 +906,8 @@ describe("folder guides exist where they are promised", () => {
 			const [heading, , body] = read(path).split("\n");
 			return heading !== `# ${dirname(path)}` || !body?.trim();
 		});
+
+		expect(nestedGuides.length).toBeGreaterThan(LAYER_ROOTS.length);
 		expect(malformed).toEqual([]);
 	});
 });
@@ -789,6 +926,8 @@ describe("architecture decision records", () => {
 
 	it("are numbered contiguously from 0001", () => {
 		const numbers = decisions.map((file) => Number(file.slice(0, 4))).sort((a, b) => a - b);
+
+		expect(numbers.length).toBeGreaterThan(0);
 		expect(numbers).toEqual(numbers.map((_, index) => index + 1));
 	});
 
@@ -822,6 +961,8 @@ describe("architecture decision records", () => {
 	it("are each linked from a document outside adr/", () => {
 		const elsewhere = authoredMarkdown.filter((path) => !path.startsWith(`${ADR_DIR}/`)).map(read);
 		const orphaned = decisions.filter((file) => !elsewhere.some((body) => body.includes(file)));
+
+		expect(decisions.length).toBeGreaterThan(0);
 		expect(orphaned).toEqual([]);
 	});
 
@@ -842,6 +983,7 @@ describe("architecture decision records", () => {
 	it("name back every document outside adr/ that ties an amendment to them", () => {
 		const byNumber = new Map(decisions.map((file) => [file.slice(0, 4), read(`${ADR_DIR}/${file}`)]));
 		const unrecorded: string[] = [];
+		let checked = 0;
 
 		for (const file of authoredMarkdown.filter((path) => !path.startsWith(`${ADR_DIR}/`))) {
 			const body = read(file);
@@ -851,12 +993,14 @@ describe("architecture decision records", () => {
 				for (const [, fromLink, fromProse] of window.matchAll(ADR_REFERENCE)) {
 					const number = fromLink ?? fromProse;
 					const adr = number ? byNumber.get(number) : undefined;
-					if (!adr || adr.includes(file)) continue;
-					unrecorded.push(`${file} amends ADR ${number}, which never names ${file}`);
+					if (!adr) continue;
+					checked += 1;
+					if (!adr.includes(file)) unrecorded.push(`${file} amends ADR ${number}, which never names ${file}`);
 				}
 			}
 		}
 
+		expect(checked).toBeGreaterThan(0);
 		expect([...new Set(unrecorded)]).toEqual([]);
 	});
 });
@@ -864,16 +1008,20 @@ describe("architecture decision records", () => {
 describe("documentation does not point at things that are gone", () => {
 	const IGNORED_LINK = /^(https?:|mailto:|#|webcal:)/;
 
-	it("resolves every relative markdown link", () => {
+	it("resolves every relative markdown link, the contributing guide and the pull request template included", () => {
 		const broken: string[] = [];
-		for (const file of authoredMarkdown) {
+		let checked = 0;
+		for (const file of linkedMarkdown) {
 			for (const [, , target] of read(file).matchAll(MARKDOWN_LINK)) {
 				if (IGNORED_LINK.test(target)) continue;
 				const [path] = target.split("#");
 				if (!path) continue;
+				checked += 1;
 				if (!existsSync(resolve(ROOT, dirname(file), path))) broken.push(`${file} -> ${target}`);
 			}
 		}
+
+		expect(checked).toBeGreaterThan(100);
 		expect(broken).toEqual([]);
 	});
 
@@ -891,6 +1039,7 @@ describe("documentation does not point at things that are gone", () => {
 	// row is about.
 	it("keeps a table row that names a package from linking the root twin of that package's own file", () => {
 		const mistargeted: string[] = [];
+		let checked = 0;
 
 		for (const file of authoredMarkdown) {
 			for (const line of read(file).split(/\r?\n/)) {
@@ -904,6 +1053,7 @@ describe("documentation does not point at things that are gone", () => {
 					if (!target || IGNORED_LINK.test(target)) continue;
 					const [path] = target.split("#");
 					if (!path) continue;
+					checked += 1;
 
 					const resolved = relative(ROOT, resolve(ROOT, dirname(file), path)).replace(/\\/g, "/");
 					if (resolved === named || resolved.startsWith(`${named}/`)) continue;
@@ -914,6 +1064,7 @@ describe("documentation does not point at things that are gone", () => {
 			}
 		}
 
+		expect(checked).toBeGreaterThan(0);
 		expect(mistargeted).toEqual([]);
 	});
 
@@ -934,31 +1085,42 @@ describe("documentation does not point at things that are gone", () => {
 		file.startsWith("adr/") && /^## Status\n\n(?:.*\n)*?Superseded by /m.test(read(file));
 
 	const exists = (token: string) => sourceFiles.some((path) => path === token || path.endsWith(`/${token}`));
-	const citedSourceFiles = (files: string[]) => {
+
+	interface SourceFileCitations {
+		missing: string[];
+		checked: number;
+	}
+
+	const citedSourceFiles = (files: string[]): SourceFileCitations => {
 		const missing: string[] = [];
+		let checked = 0;
 		for (const file of files) {
 			if (isSupersededAdr(file)) continue;
 			for (const [, token] of read(file).matchAll(BACKTICKED_SOURCE_FILE)) {
 				if (token.includes("*") || token.startsWith(".") || GENERATED.has(token) || DELIBERATELY_ABSENT.has(token))
 					continue;
+				checked += 1;
 				if (!exists(token)) missing.push(`${file} -> ${token}`);
 			}
 		}
-		return missing;
+		return { missing, checked };
 	};
 
 	it("names only source files that still exist somewhere", () => {
-		expect(citedSourceFiles(authoredMarkdown)).toEqual([]);
+		const { missing, checked } = citedSourceFiles(authoredMarkdown);
+
+		expect(checked).toBeGreaterThan(100);
+		expect(missing).toEqual([]);
 	});
 
 	it("names only source files that still exist, in the published wiki too", () => {
+		const { missing, checked } = citedSourceFiles(contentFiles);
+
 		expect(contentFiles.length).toBeGreaterThan(50);
-		expect(citedSourceFiles(contentFiles)).toEqual([]);
+		expect(checked).toBeGreaterThan(100);
+		expect(missing).toEqual([]);
 	});
 
-	// A guide may write `src/…` because it sits inside the package it describes, and the rules above
-	// match a citation by suffix so both forms resolve. The wiki has no such context: `src/` alone names
-	// neither package. Every repo path it prints has to carry its own prefix.
 	// The root guide forbids a nested CONTEXT.md outright: the name would mean two things, and the
 	// domain-modeling skill reads it as vocabulary. The wiki taught the opposite under a heading of
 	// "CONTEXT.md per folder" and cited five paths that have never existed. A relative-link rule cannot
@@ -1039,9 +1201,11 @@ describe("documentation does not point at things that are gone", () => {
 	it("resolves every @ui specifier the docs sources import to a file that exists", () => {
 		const UI_SPECIFIER = /from\s*['"](@ui\/[^'"]+)['"]/g;
 		const dangling: string[] = [];
+		let checked = 0;
 
 		for (const file of trackedFiles.filter((path) => path.startsWith(`${DOCS}/src/`))) {
 			for (const [, specifier] of read(file).matchAll(UI_SPECIFIER)) {
+				checked += 1;
 				const base = resolveUiSpecifier(specifier);
 				const resolved = [`${base}.tsx`, `${base}.ts`, `${base}/index.tsx`, `${base}/index.ts`, base].some(
 					(candidate) => existsSync(candidate),
@@ -1050,6 +1214,7 @@ describe("documentation does not point at things that are gone", () => {
 			}
 		}
 
+		expect(checked).toBeGreaterThan(50);
 		expect(dangling).toEqual([]);
 	});
 
@@ -1173,6 +1338,8 @@ describe("documentation does not point at things that are gone", () => {
 		// The old form required the segment after the `../` run to be literally `web/`, so an escape written
 		// `../../apps/web/src/…` (the same reach, spelled from one directory deeper) matched nothing at all.
 		const RELATIVE_ESCAPE = /['"(]((?:\.\.\/)+(?:apps\/)?web\/[^'")]+)['")]/g;
+		const JOINED_ESCAPE = /\bjoin\(\s*(?:import\.meta\.dirname|__dirname)((?:\s*,\s*["'][^"']*["'])+)/g;
+		const JOINED_SEGMENT = /["']([^"']*)["']/g;
 
 		for (const file of docsSources) {
 			const source = read(file);
@@ -1181,6 +1348,11 @@ describe("documentation does not point at things that are gone", () => {
 			}
 			for (const [, specifier] of source.matchAll(RELATIVE_ESCAPE)) {
 				reached.add(join(dirname(file), specifier).replace(/\\/g, "/"));
+			}
+			for (const [, segments = ""] of source.matchAll(JOINED_ESCAPE)) {
+				const parts = [...segments.matchAll(JOINED_SEGMENT)].map(([, segment]) => segment);
+				const joined = join(dirname(file), ...parts).replace(/\\/g, "/");
+				if (joined.startsWith(`${WEB}/`)) reached.add(joined);
 			}
 		}
 
@@ -1434,7 +1606,7 @@ describe("documentation does not point at things that are gone", () => {
 
 	// The rule above is named for `search.ctrlKey` and cannot see it. It flags an override byte-identical to
 	// the vendor string, and the defect was `"Ctrl K"` against a vendor `"Ctrl"`: not equal, so not flagged,
-	// so re-adding the key would reship "Ctrl K K" on all 76 Spanish pages with the suite green.
+	// so re-adding the key would reship "Ctrl K K" on every Spanish page with the suite green.
 	//
 	// Starlight renders the value in a `<kbd>` of its own beside a literal `<kbd>K</kbd>`, so the only
 	// correct value is a modifier on its own. That is what this asserts, and the vendor markup is read first
@@ -1467,17 +1639,21 @@ describe("documentation does not point at things that are gone", () => {
 		expect(offenders).toEqual([]);
 	});
 
+	// A guide may write `src/…` because it sits inside the package it describes, and the rules above
+	// match a citation by suffix so both forms resolve. The wiki has no such context: `src/` alone names
+	// neither package. Every repo path it prints has to carry its own prefix.
 	it("prints repo-relative paths in the published wiki, never package-relative ones", () => {
-		// A trailing `/*` makes the token a path-alias specifier rather than a path: `src/*` is the ninth entry
-		// in the web tsconfig's `paths` and is spelled exactly that way there, so the alias table has to print
-		// it verbatim. No file is named `*`, so exempting the wildcard form costs this rule nothing.
-		const ambiguous = /^(src|e2e|workers|public)\/(?!\*$)/;
+		const ambiguous = /^(src|e2e|workers|public)\//;
 		const offenders: string[] = [];
+		let checked = 0;
 		for (const file of contentFiles) {
 			for (const [, token] of read(file).matchAll(BACKTICKED_TOKEN)) {
+				checked += 1;
 				if (ambiguous.test(token)) offenders.push(`${file} -> ${token}`);
 			}
 		}
+
+		expect(checked).toBeGreaterThan(100);
 		expect(offenders).toEqual([]);
 	});
 });
@@ -1538,8 +1714,9 @@ describe("apps/web/src carries no explanatory comments", () => {
 		expect(webSources.length).toBeGreaterThan(100);
 	});
 
-	it("leaves the rationale in the folder guides instead", () => {
+	it("carries no comment but a suppression or a generated banner, since a line's reason lives in the commit, the pull request, an ADR or CODING_STANDARDS.md", () => {
 		const offenders: string[] = [];
+		let allowed = 0;
 		for (const file of webSources) {
 			const source = read(file);
 			// parsing every file is what made this rule time out under parallel load; a file holding neither
@@ -1547,9 +1724,12 @@ describe("apps/web/src carries no explanatory comments", () => {
 			if (!source.includes("//") && !source.includes("/*")) continue;
 
 			for (const { line, text } of commentsIn({ path: file, source })) {
-				if (!ALLOWED.test(text)) offenders.push(`${file}:${line}`);
+				if (ALLOWED.test(text)) allowed += 1;
+				else offenders.push(`${file}:${line}`);
 			}
 		}
+
+		expect(allowed).toBeGreaterThan(0);
 		expect(offenders).toEqual([]);
 	});
 });
@@ -1664,6 +1844,7 @@ describe("directives sit where the compiler can see them", () => {
 
 	it("keeps every directive a bare string literal in first position", () => {
 		const offenders: string[] = [];
+		let checked = 0;
 
 		for (const file of packageSources) {
 			const source = read(file);
@@ -1682,6 +1863,7 @@ describe("directives sit where the compiler can see them", () => {
 				}
 				if (!ts.isStringLiteral(expression) || !DIRECTIVES.has(expression.text)) return;
 
+				checked += 1;
 				const line = parsed.getLineAndCharacterOfPosition(statement.getStart(parsed)).line + 1;
 				if (parenthesised)
 					offenders.push(`${file}:${line} '${expression.text}' is parenthesised, so it is not a directive`);
@@ -1689,6 +1871,7 @@ describe("directives sit where the compiler can see them", () => {
 			});
 		}
 
+		expect(checked).toBeGreaterThan(50);
 		expect(offenders).toEqual([]);
 	});
 });
@@ -1703,22 +1886,10 @@ describe("the published layer graph is the one the imports make", () => {
 	// ships. Every alias that resolves inside `apps/web/src` is followed, which is the half the old prose rule
 	// missed: `@i18n/`, `@styles/` and `@assets/` all land in `src/ui/`, so an `@i18n/...` import is a
 	// `ui` edge however little it looks like one.
-	const WEB_SRC = `${WEB}/src`;
 	const LAYER_NAMES = ["app", "application", "domain", "infrastructure", "ui"];
 	const MIDDLEWARE_NODE = "middleware.ts";
 	const OVERVIEW = `${DOCS}/src/content/docs/architecture/overview.mdx`;
 	const GRAPH_TABLE_HEADER = "from / to";
-	const IMPORT_SPECIFIER =
-		/from\s*["']([^"']+)["']|import\s*\(\s*["'`]([^"'`]+)["'`]\s*\)|(?:^|\n)\s*import\s*["']([^"']+)["']|require\s*\(\s*["']([^"']+)["']\s*\)|vi\.mock\(\s*["']([^"']+)["']/g;
-
-	// Derived from the tsconfig rather than restated, so a new alias is followed the day it is declared.
-	const aliasTargets = Object.entries(webTsconfigPaths).map(
-		([alias, [target]]) =>
-			[
-				alias.replace(ALIAS_WILDCARD_SUFFIX, ""),
-				`${WEB}/${(target ?? "").replace(ALIAS_WILDCARD_SUFFIX, "").replace(/^\.\//, "")}`,
-			] as const,
-	);
 
 	const nodeOf = (path: string): string | null => {
 		if (!path.startsWith(`${WEB_SRC}/`)) return null;
@@ -1733,10 +1904,8 @@ describe("the published layer graph is the one the imports make", () => {
 		to: string;
 	}
 
-	const productionSources = sourceFiles.filter((path) => path.startsWith(`${WEB_SRC}/`) && !/\.test\.tsx?$/.test(path));
-
 	const reaches: (Edge & { file: string })[] = [];
-	for (const file of productionSources) {
+	for (const file of webProduction) {
 		const from = nodeOf(file);
 		if (!from) continue;
 		const source = read(file);
@@ -1828,7 +1997,7 @@ describe("the published layer graph is the one the imports make", () => {
 	const LOCALE_BUNDLE = `${WEB_SRC}/ui/i18n/messages/`;
 
 	// The anti-corruption layer only works while the foreign shape stops at it. `Raw*` is spellable in
-	// `application/dto/` and in the adapter that produces it (`services/holidays/source/`, eight files);
+	// `application/dto/` and in the adapter that produces it (`services/holidays/source/`, seven files);
 	// anywhere past the mapper means a mapping step was skipped. The dto guide stated the rule as if it
 	// reached nowhere outside the folder, which the adapter has always contradicted, so the half that is
 	// true is the half asserted here.
@@ -1850,16 +2019,16 @@ describe("the published layer graph is the one the imports make", () => {
 	});
 
 	it("lets infrastructure reach nothing under src/ui but the two locale-bundle readers", () => {
-		const offenders = reaches
-			.filter(({ from, to }) => from === "infrastructure" && to === "ui")
-			.filter(({ file }) => !UI_DATA_IMPORTERS.has(file))
-			.map(({ file }) => file);
+		const intoUi = reaches.filter(({ from, to }) => from === "infrastructure" && to === "ui");
+		const offenders = intoUi.filter(({ file }) => !UI_DATA_IMPORTERS.has(file)).map(({ file }) => file);
 
+		expect(intoUi.length).toBeGreaterThan(0);
 		expect([...new Set(offenders)]).toEqual([]);
 	});
 
 	it("keeps those two on the locale bundles and nothing else in the ui layer", () => {
 		const strayed: string[] = [];
+		let checked = 0;
 		for (const file of UI_DATA_IMPORTERS) {
 			const source = read(file);
 			IMPORT_SPECIFIER.lastIndex = 0;
@@ -1868,14 +2037,1439 @@ describe("the published layer graph is the one the imports make", () => {
 				const specifier = match[1] ?? match[2] ?? match[3] ?? match[4] ?? match[5];
 				const alias = specifier ? aliasTargets.find(([prefix]) => specifier.startsWith(prefix)) : undefined;
 				const target = alias && specifier ? `${alias[1]}${specifier.slice(alias[0].length)}` : null;
-				if (target && nodeOf(target) === "ui" && !target.startsWith(LOCALE_BUNDLE)) {
-					strayed.push(`${file} -> ${specifier}`);
+				if (target && nodeOf(target) === "ui") {
+					checked += 1;
+					if (!target.startsWith(LOCALE_BUNDLE)) strayed.push(`${file} -> ${specifier}`);
 				}
 				match = IMPORT_SPECIFIER.exec(source);
 			}
 		}
 
+		expect(checked).toBeGreaterThan(0);
 		expect(strayed).toEqual([]);
+	});
+});
+
+describe("the imports CODING_STANDARDS.md hands to this suite", () => {
+	const CALENDAR = `${WEB_SRC}/domain/calendar/`;
+	const PAYMENT = `${WEB_SRC}/domain/payment/`;
+	const APPLICATION = `${WEB_SRC}/application/`;
+	const UI = `${WEB_SRC}/ui/`;
+	const CORE = `${UI}modules/core/`;
+	const ANIMATE = `${CORE}animate/`;
+	const ANIMATE_PRIMITIVES = `${ANIMATE}primitives/`;
+	const inFolder = (folder: string) => webProduction.filter((path) => path.startsWith(folder));
+	const lands = ({ from, specifier }: ResolveSpecifierParams) => `${resolveSpecifier({ from, specifier })}/`;
+
+	const EFFECT_PACKAGE = /^(?:effect|@effect\/[^/]+)(?:\/|$)/;
+	const sourceModules = new Set(sourceFiles);
+
+	const eagerEffectImports = (entry: string) => {
+		const reached = new Set([entry]);
+		const queue = [entry];
+		const found: string[] = [];
+		for (let file = queue.shift(); file !== undefined; file = queue.shift())
+			for (const { specifier, typeOnly, dynamic } of importsOf(file)) {
+				if (typeOnly || dynamic) continue;
+				if (EFFECT_PACKAGE.test(specifier)) found.push(`${entry}: ${file} -> ${specifier}`);
+				const target = resolveSpecifier({ from: file, specifier });
+				const module = [`${target}.ts`, `${target}.tsx`].find((candidate) => sourceModules.has(candidate));
+				if (target && module && !reached.has(module)) {
+					reached.add(module);
+					queue.push(module);
+				}
+			}
+		return found;
+	};
+
+	it("keeps Effect out of everything a DTO module loads, so a page that reads a bound or a code loads no Effect runtime", () => {
+		const dto = inFolder(`${APPLICATION}dto/`);
+
+		expect(eagerEffectImports(`${WEB_SRC}/ui/adapters/payments/checkout.ts`).length).toBeGreaterThan(0);
+		expect(dto.length).toBeGreaterThan(10);
+		expect(dto.flatMap(eagerEffectImports)).toEqual([]);
+	});
+
+	const MODULES = `${UI}modules/`;
+
+	const folderOf = (file: string) => {
+		const directory = `${dirname(file)}/`;
+		if (file.startsWith(MODULES) && directory !== MODULES) {
+			const [row, screen] = directory.slice(MODULES.length).split("/");
+			return { root: row === "pages" && screen ? `${MODULES}pages/${screen}/` : `${MODULES}${row}/`, nested: true };
+		}
+		const depth = directory.slice(`${WEB_SRC}/`.length).split("/").filter(Boolean).length;
+		return { root: directory, nested: depth > 1 };
+	};
+
+	interface InsideParams {
+		file: string;
+		target: string;
+	}
+
+	const inside = ({ file, target }: InsideParams) => {
+		const { root, nested } = folderOf(file);
+		return nested ? target.startsWith(root) : `${dirname(target)}/` === root;
+	};
+
+	it("imports across folders through the alias and within one by relative path, a screen and a row of ui/modules each one folder", () => {
+		const imports = sourceFiles
+			.filter((file) => file.startsWith(`${WEB_SRC}/`))
+			.flatMap((file) =>
+				importsOf(file).flatMap(({ specifier }) => {
+					const target = resolveSpecifier({ from: file, specifier });
+					return target.startsWith(`${WEB_SRC}/`)
+						? [{ file, specifier, relative: specifier.startsWith("."), within: inside({ file, target }) }]
+						: [];
+				}),
+			);
+		const offenders = imports
+			.filter(({ relative, within }) => relative !== within)
+			.map(({ file, specifier, within }) => `${file} -> ${specifier} ${within ? "stays in" : "leaves"} its folder`);
+
+		expect(
+			inside({ file: `${MODULES}pages/planner/holidays/Row.tsx`, target: `${MODULES}pages/planner/CalendarList` }),
+		).toBe(true);
+		expect(
+			inside({
+				file: `${WEB_SRC}/infrastructure/layers.ts`,
+				target: `${WEB_SRC}/infrastructure/clients/db/turso/service`,
+			}),
+		).toBe(false);
+		expect(
+			inside({ file: `${WEB_SRC}/domain/calendar/utils/helpers.ts`, target: `${WEB_SRC}/domain/calendar/types` }),
+		).toBe(false);
+		expect(imports.filter(({ within }) => within).length).toBeGreaterThan(300);
+		expect(imports.filter(({ within }) => !within).length).toBeGreaterThan(300);
+		expect(offenders).toEqual([]);
+	});
+
+	it("keeps the calendar and payment contexts apart, tests included", () => {
+		const contexts = sourceFiles.filter((path) => path.startsWith(CALENDAR) || path.startsWith(PAYMENT));
+		const crossed = contexts.flatMap((file) => {
+			const other = file.startsWith(CALENDAR) ? PAYMENT : CALENDAR;
+			return importsOf(file)
+				.filter(({ specifier }) => lands({ from: file, specifier }).startsWith(other))
+				.map(({ specifier }) => `${file} -> ${specifier}`);
+		});
+
+		expect(contexts.length).toBeGreaterThan(30);
+		expect(crossed).toEqual([]);
+	});
+
+	// The calendar runs in the Web Worker as well as on the main thread, so its imports are the ones that
+	// evaluate there. `next-intl` is its `Locale` type and nothing else, which leaves nothing in the bundle.
+	const CALENDAR_OUTSIDE_IMPORTS = new Set([
+		"@application/dto/holiday/types",
+		"@application/shared/utils/dates",
+		"temporal-polyfill",
+	]);
+	const CALENDAR_TYPE_IMPORTS = new Set(["next-intl"]);
+
+	it("lets the calendar context import only the Holiday DTO types, the date helpers, the polyfill and the Locale type", () => {
+		const outside = inFolder(CALENDAR).flatMap((file) =>
+			importsOf(file)
+				.filter(({ specifier }) => !lands({ from: file, specifier }).startsWith(CALENDAR))
+				.map((imported) => ({ file, ...imported })),
+		);
+		const offenders = outside
+			.filter(
+				({ specifier, typeOnly }) =>
+					!CALENDAR_OUTSIDE_IMPORTS.has(specifier) && !(typeOnly && CALENDAR_TYPE_IMPORTS.has(specifier)),
+			)
+			.map(({ file, specifier }) => `${file} -> ${specifier}`);
+
+		expect(outside.length).toBeGreaterThan(0);
+		expect(offenders).toEqual([]);
+	});
+
+	const STRIPE_SEAM = `${PAYMENT}events/factory/`;
+
+	it("keeps Stripe at the payment event factory, as import type", () => {
+		const stripe = inFolder(PAYMENT).flatMap((file) =>
+			importsOf(file)
+				.filter(({ specifier }) => specifier === "stripe" || specifier.startsWith("stripe/"))
+				.map((imported) => ({ file, ...imported })),
+		);
+		const offenders = stripe
+			.filter(({ file, typeOnly }) => !typeOnly || !file.startsWith(STRIPE_SEAM))
+			.map(({ file }) => file);
+
+		expect(stripe.length).toBeGreaterThan(0);
+		expect(offenders).toEqual([]);
+	});
+
+	const APPLICATION_UNREACHABLE = [
+		"next/server",
+		"next/headers",
+		"@opennextjs/cloudflare",
+		"@tursodatabase/serverless",
+		"resend",
+		"@stripe/stripe-js",
+	];
+	const EMAIL_TEMPLATES = `${APPLICATION}email/templates/`;
+	const SDK_CONSTRUCTION = /\bnew\s+(?:Stripe|Resend)\s*\(/;
+
+	it("keeps the application layer free of the request, the runtime context, SDK construction and components", () => {
+		const application = inFolder(APPLICATION);
+		const offenders = application.flatMap((file) => [
+			...importsOf(file)
+				.filter(({ specifier }) =>
+					APPLICATION_UNREACHABLE.some((module) => specifier === module || specifier.startsWith(`${module}/`)),
+				)
+				.map(({ specifier }) => `${file} -> ${specifier}`),
+			...(SDK_CONSTRUCTION.test(read(file)) ? [`${file} constructs an SDK client`] : []),
+			...(file.endsWith(".tsx") && !file.startsWith(EMAIL_TEMPLATES) ? [`${file} is a component`] : []),
+		]);
+
+		expect(application.length).toBeGreaterThan(30);
+		expect(offenders).toEqual([]);
+	});
+
+	// One inversion is recorded and known; a second is a regression.
+	const UI_INVERSION = `${APPLICATION}stores/premium.ts`;
+
+	it("lets stores/premium.ts alone reach the ui layer from application", () => {
+		const application = inFolder(APPLICATION);
+		const intoUi = application.filter(
+			(file) =>
+				file !== UI_INVERSION &&
+				importsOf(file).some(({ specifier }) => lands({ from: file, specifier }).startsWith(UI)),
+		);
+
+		expect(application.length).toBeGreaterThan(30);
+		expect(intoUi).toEqual([]);
+	});
+
+	// These pull the `date-holidays` dataset with them, and a store module is read by every page.
+	const DEFERRED_MODULES = new Set([
+		`${WEB_SRC}/domain/calendar/pipeline`,
+		`${WEB_SRC}/infrastructure/services/holidays/getHolidays`,
+		`${WEB_SRC}/infrastructure/services/regions/getRegions`,
+	]);
+
+	it("reaches the planning pipeline and the holiday lookups from the stores through import() alone", () => {
+		const reached = inFolder(`${APPLICATION}stores/`).flatMap((file) =>
+			importsOf(file)
+				.filter(({ specifier }) => DEFERRED_MODULES.has(resolveSpecifier({ from: file, specifier })))
+				.map((imported) => ({ file, ...imported })),
+		);
+		const eager = reached
+			.filter(({ dynamic, typeOnly }) => !dynamic && !typeOnly)
+			.map(({ file, specifier }) => `${file} -> ${specifier}`);
+
+		expect(reached.some(({ dynamic }) => dynamic)).toBe(true);
+		expect(eager).toEqual([]);
+	});
+
+	const TURSO_CLIENT = `${WEB_SRC}/infrastructure/clients/db/turso/service.ts`;
+	const CONNECTION_STATEMENTS = new Set(["all", "run"]);
+
+	it("runs every Turso statement with all or run inside withConnection, and nowhere but the client", () => {
+		const driverImporters = sourceFiles.filter(
+			(file) =>
+				file.startsWith(`${WEB}/`) &&
+				!TEST_FILE.test(file) &&
+				importsOf(file).some(({ specifier }) => specifier.startsWith("@tursodatabase/")),
+		);
+		const client = parse(TURSO_CLIENT);
+		const statements: string[] = [];
+		const stray: string[] = [];
+		const insideWithConnection = (node: ts.Node): boolean => {
+			for (let parent = node.parent; parent; parent = parent.parent)
+				if (ts.isCallExpression(parent) && parent.expression.getText(client) === "withConnection") return true;
+			return false;
+		};
+		const visit = (node: ts.Node) => {
+			if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
+				const method = node.expression.name.text;
+				const line = client.getLineAndCharacterOfPosition(node.getStart(client)).line + 1;
+				if (node.expression.expression.getText(client) === "connection") {
+					statements.push(method);
+					if (!CONNECTION_STATEMENTS.has(method) && method !== "close") stray.push(`line ${line}: ${method}`);
+					else if (CONNECTION_STATEMENTS.has(method) && !insideWithConnection(node))
+						stray.push(`line ${line}: ${method} outside withConnection`);
+				}
+			}
+			ts.forEachChild(node, visit);
+		};
+		visit(client);
+
+		expect(driverImporters).toEqual([TURSO_CLIENT]);
+		expect(statements.filter((method) => CONNECTION_STATEMENTS.has(method)).length).toBeGreaterThan(1);
+		expect(stray).toEqual([]);
+	});
+
+	// Follows every file a route handler reaches inside `apps/web/src`, because `getTranslations` memoises its
+	// message loading across requests and workerd refuses the second one.
+	const REQUEST_SCOPED_TRANSLATOR = "next-intl/server";
+	const SOURCE_EXTENSIONS = [".ts", ".tsx"];
+
+	it("keeps next-intl/server out of every route handler and everything it reaches", () => {
+		const handlers = webProduction.filter((file) => file.endsWith("/route.ts"));
+		const reached = new Set<string>();
+		const pending = [...handlers];
+		while (pending.length > 0) {
+			const file = pending.pop() as string;
+			if (reached.has(file)) continue;
+			reached.add(file);
+			for (const { specifier, typeOnly } of importsOf(file)) {
+				if (typeOnly) continue;
+				const target = resolveSpecifier({ from: file, specifier });
+				const next = SOURCE_EXTENSIONS.map((extension) => `${target}${extension}`).find(
+					(candidate) => target !== "" && existsSync(join(ROOT, candidate)),
+				);
+				if (next) pending.push(next);
+			}
+		}
+		const offenders = [...reached].filter((file) =>
+			importsOf(file).some(({ specifier, typeOnly }) => specifier === REQUEST_SCOPED_TRANSLATOR && !typeOnly),
+		);
+
+		expect(handlers.length).toBeGreaterThan(5);
+		expect(reached.size).toBeGreaterThan(handlers.length);
+		expect(offenders).toEqual([]);
+	});
+
+	const COUNTRY_DETECTION = `${WEB_SRC}/infrastructure/services/location/`;
+	const NO_STORE_FETCH = `${COUNTRY_DETECTION}utils/normalize.ts`;
+	const BARE_FETCH = /\bfetch\s*\(/;
+
+	it("fetches for Country detection only through noStoreFetch, which stores nothing", () => {
+		const fetching = inFolder(COUNTRY_DETECTION).filter((file) => BARE_FETCH.test(read(file)));
+
+		expect(fetching).toEqual([NO_STORE_FETCH]);
+		expect(read(NO_STORE_FETCH)).toContain('cache: "no-store"');
+	});
+
+	// The `next/navigation` names the locale-aware module replaces; anything else from it (the stale
+	// Server Action predicate) navigates nowhere.
+	const LOCALE_UNAWARE_NAVIGATION = new Set(["Link", "useRouter", "usePathname", "redirect", "permanentRedirect"]);
+	const LOCALE_AWARE_NAVIGATION = "@application/i18n/navigation";
+
+	it("takes Link, useRouter and usePathname in the ui layer from the locale-aware navigation", () => {
+		const ui = inFolder(UI);
+		const offenders = ui.flatMap((file) =>
+			importsOf(file)
+				.filter(
+					({ specifier, names }) =>
+						specifier === "next/link" ||
+						(specifier === "next/navigation" && names.some((name) => LOCALE_UNAWARE_NAVIGATION.has(name))),
+				)
+				.map(({ specifier }) => `${file} -> ${specifier}`),
+		);
+
+		expect(ui.some((file) => importsOf(file).some(({ specifier }) => specifier === LOCALE_AWARE_NAVIGATION))).toBe(
+			true,
+		);
+		expect(offenders).toEqual([]);
+	});
+
+	const SERVER_ACTION_DIRECTIVE = /^\s*["']use server["']/m;
+
+	it("declares no server action and reads no request headers in the ui layer", () => {
+		const ui = inFolder(UI);
+		const offenders = ui.filter(
+			(file) =>
+				SERVER_ACTION_DIRECTIVE.test(read(file)) ||
+				importsOf(file).some(({ specifier }) => specifier === "next/headers"),
+		);
+
+		expect(ui.length).toBeGreaterThan(100);
+		expect(offenders).toEqual([]);
+	});
+
+	const TRANSLATION = /\b(?:useTranslations|getTranslations)\b/;
+
+	it("keeps core free of stores, translations and fetching", () => {
+		const core = inFolder(CORE);
+		const offenders = core.flatMap((file) => {
+			const source = read(file);
+			return [
+				...(TRANSLATION.test(source) ? [`${file} translates`] : []),
+				...(BARE_FETCH.test(source) ? [`${file} fetches`] : []),
+				...importsOf(file)
+					.filter(({ specifier }) => lands({ from: file, specifier }).startsWith(`${APPLICATION}stores/`))
+					.map(({ specifier }) => `${file} -> ${specifier}`),
+			];
+		});
+
+		expect(core.length).toBeGreaterThan(50);
+		expect(offenders).toEqual([]);
+	});
+
+	it("keeps core/animate/primitives internal to core/animate, in both packages", () => {
+		const reachesPrimitives = (file: string) =>
+			importsOf(file).some(({ specifier }) => lands({ from: file, specifier }).startsWith(ANIMATE_PRIMITIVES));
+		const packages = sourceFiles.filter((file) => file.startsWith(`${WEB}/`) || file.startsWith(`${DOCS}/`));
+		const offenders = packages.filter((file) => !file.startsWith(ANIMATE) && reachesPrimitives(file));
+
+		expect(packages.some((file) => file.startsWith(ANIMATE) && reachesPrimitives(file))).toBe(true);
+		expect(offenders).toEqual([]);
+	});
+
+	// `motion` is the eager component set; `m` is what `LazyMotionProvider` feeds on demand.
+	it("imports m from motion/react, never motion or framer-motion", () => {
+		const web = sourceFiles.filter((file) => file.startsWith(`${WEB}/`));
+		const offenders = web.flatMap((file) =>
+			importsOf(file)
+				.filter(
+					({ specifier, names, namespace }) =>
+						specifier === "framer-motion" ||
+						specifier.startsWith("framer-motion/") ||
+						(specifier === "motion/react" && (namespace || names.includes("motion"))),
+				)
+				.map(({ specifier }) => `${file} -> ${specifier}`),
+		);
+
+		expect(
+			web.some((file) =>
+				importsOf(file).some(({ specifier, names }) => specifier === "motion/react" && names.includes("m")),
+			),
+		).toBe(true);
+		expect(offenders).toEqual([]);
+	});
+
+	const TEMPORAL_USE = /\bTemporal\./;
+
+	it("takes Temporal from temporal-polyfill wherever apps/web uses it", () => {
+		const users = sourceFiles.filter((file) => file.startsWith(`${WEB}/`) && TEMPORAL_USE.test(read(file)));
+		const offenders = users.filter(
+			(file) =>
+				!importsOf(file).some(
+					({ specifier, names }) => specifier === "temporal-polyfill" && names.includes("Temporal"),
+				),
+		);
+
+		expect(users.length).toBeGreaterThan(0);
+		expect(offenders).toEqual([]);
+	});
+
+	const INDEX_MODULE = /(?:^|\/)index\.tsx?$/;
+
+	it("has no index module in either package", () => {
+		const packages = sourceFiles.filter((file) => file.startsWith(`${WEB}/`) || file.startsWith(`${DOCS}/`));
+
+		expect(packages.length).toBeGreaterThan(500);
+		expect(packages.filter((file) => INDEX_MODULE.test(file))).toEqual([]);
+	});
+});
+
+describe("the code keeps the mechanical rules CODING_STANDARDS.md hands to this suite", () => {
+	const CALENDAR = `${WEB_SRC}/domain/calendar/`;
+
+	// A signature the runtime owns stays positional: the HTTP method handlers Next calls with a request and
+	// a context. A method, and a callback handed to a hook or a library, is the reviewer's to read.
+	const HTTP_METHODS = new Set(["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]);
+
+	interface PositionalFunctionsParams {
+		path: string;
+		parsed: ts.SourceFile;
+	}
+
+	const positionalFunctions = ({ path, parsed }: PositionalFunctionsParams) => {
+		const found: string[] = [];
+		const arity = (signature: ts.SignatureDeclarationBase) =>
+			signature.parameters.filter((parameter) => !(ts.isIdentifier(parameter.name) && parameter.name.text === "this"))
+				.length;
+		const visit = (node: ts.Node) => {
+			let name: string | undefined;
+			let signature: ts.SignatureDeclarationBase | undefined;
+			if (ts.isFunctionDeclaration(node) && node.name) {
+				name = node.name.text;
+				signature = node;
+			} else if (
+				ts.isVariableDeclaration(node) &&
+				ts.isIdentifier(node.name) &&
+				node.initializer &&
+				(ts.isArrowFunction(node.initializer) || ts.isFunctionExpression(node.initializer))
+			) {
+				name = node.name.text;
+				signature = node.initializer;
+			}
+			if (name && signature && arity(signature) > 1 && !(path.endsWith("/route.ts") && HTTP_METHODS.has(name)))
+				found.push(`${path}:${parsed.getLineAndCharacterOfPosition(node.getStart(parsed)).line + 1} ${name}`);
+			ts.forEachChild(node, visit);
+		};
+		visit(parsed);
+		return found;
+	};
+
+	it("gives no function two positional parameters, in apps/web, its tests, its e2e specs or this suite", () => {
+		const scope = sourceFiles.filter(
+			(file) => file.startsWith(`${WEB_SRC}/`) || file.startsWith(`${WEB}/e2e/`) || file.startsWith("tests/"),
+		);
+		const synthetic = ts.createSourceFile(
+			"synthetic.ts",
+			"const pair = (a: number, b: number) => a + b;",
+			ts.ScriptTarget.Latest,
+			true,
+			ts.ScriptKind.TS,
+		);
+		const offenders = scope.flatMap((path) => positionalFunctions({ path, parsed: parse(path) }));
+
+		expect(positionalFunctions({ path: "synthetic.ts", parsed: synthetic })).toEqual(["synthetic.ts:1 pair"]);
+		expect(scope.length).toBeGreaterThan(500);
+		expect(offenders).toEqual([]);
+	});
+
+	const EFFECT_HOOKS = new Set(["useEffect", "useLayoutEffect", "useInsertionEffect"]);
+	const VIEWS_AN_EFFECT_COUNTS = [`${WEB_SRC}/ui/modules/pages/planner/Contact.tsx contact_opened`];
+
+	interface TracksInEffectsParams {
+		path: string;
+		parsed: ts.SourceFile;
+	}
+
+	const tracksInEffects = ({ path, parsed }: TracksInEffectsParams) => {
+		const found: string[] = [];
+		const visit = (inEffect: boolean) => (node: ts.Node) => {
+			const callee = ts.isCallExpression(node) && ts.isIdentifier(node.expression) ? node.expression.text : undefined;
+			if (inEffect && callee === "track")
+				found.push(`${path} ${node.getText(parsed).match(/event:\s*"([^"]+)"/)?.[1] ?? "unnamed"}`);
+			ts.forEachChild(node, visit(inEffect || (callee !== undefined && EFFECT_HOOKS.has(callee))));
+		};
+		visit(false)(parsed);
+		return found;
+	};
+
+	it("calls track() where the interaction lands and never inside an effect, bar the view a #contact link opens", () => {
+		const synthetic = ts.createSourceFile(
+			"synthetic.tsx",
+			'useEffect(() => { track({ event: "a" }); }, []); const onClick = () => track({ event: "b" });',
+			ts.ScriptTarget.Latest,
+			true,
+			ts.ScriptKind.TSX,
+		);
+		const found = webProduction.flatMap((path) => tracksInEffects({ path, parsed: parse(path) }));
+
+		expect(tracksInEffects({ path: "synthetic.tsx", parsed: synthetic })).toEqual(["synthetic.tsx a"]);
+		expect(found.filter((site) => VIEWS_AN_EFFECT_COUNTS.includes(site))).toEqual(VIEWS_AN_EFFECT_COUNTS);
+		expect(found.filter((site) => !VIEWS_AN_EFFECT_COUNTS.includes(site))).toEqual([]);
+	});
+
+	// `const.ts` declares the tunables and `window.ts` the calendar's own arithmetic (months in a year and a
+	// quarter). An identity is not a tunable, and a percentage's `* 100` is a unit conversion.
+	const ENGINE_DECLARATIONS = new Set([`${CALENDAR}const.ts`, `${CALENDAR}window.ts`]);
+	const IDENTITIES = new Set(["0", "1"]);
+	const PERCENTAGE = "100";
+
+	it("keeps every other number in the planning engine in PTO_CONSTANTS", () => {
+		const engine = webProduction.filter((file) => file.startsWith(CALENDAR) && !ENGINE_DECLARATIONS.has(file));
+		const bare: string[] = [];
+		for (const file of engine) {
+			const parsed = parse(file);
+			const visit = (node: ts.Node) => {
+				const percentage =
+					node.parent !== undefined &&
+					ts.isBinaryExpression(node.parent) &&
+					node.parent.operatorToken.kind === ts.SyntaxKind.AsteriskToken;
+				if (ts.isNumericLiteral(node) && !IDENTITIES.has(node.text) && !(node.text === PERCENTAGE && percentage))
+					bare.push(`${file}:${parsed.getLineAndCharacterOfPosition(node.getStart(parsed)).line + 1} ${node.text}`);
+				ts.forEachChild(node, visit);
+			};
+			visit(parsed);
+		}
+
+		expect(engine.length).toBeGreaterThan(15);
+		expect(bare).toEqual([]);
+	});
+
+	const DATE_LIBRARY = `${WEB_SRC}/application/shared/utils/dates.ts`;
+	const DATE_FORMATTING = /\bIntl\.DateTimeFormat\s*\(|\.toLocale(?:Date|Time)String\s*\(/;
+
+	it("builds a date format in the date library alone", () => {
+		expect(webProduction.filter((file) => DATE_FORMATTING.test(read(file)))).toEqual([DATE_LIBRARY]);
+	});
+
+	const JSON_BODY_READER = `${WEB_SRC}/infrastructure/api/parseJsonBody.ts`;
+	const RAW_BODY_READER = `${WEB_SRC}/app/api/webhooks/stripe/route.ts`;
+	const JSON_BODY = /\b(?:request|req)\.json\s*\(/;
+	const RAW_BODY = /\b(?:request|req)\.text\s*\(/;
+
+	it("reads a JSON body only through parseJsonBody, and raw text only in the Stripe webhook", () => {
+		expect({
+			json: webProduction.filter((file) => JSON_BODY.test(read(file))),
+			text: webProduction.filter((file) => RAW_BODY.test(read(file))),
+		}).toEqual({ json: [JSON_BODY_READER], text: [RAW_BODY_READER] });
+	});
+
+	const isJsonRead = (node: ts.Node): boolean => {
+		let inner = node;
+		while (ts.isParenthesizedExpression(inner) || ts.isAwaitExpression(inner) || ts.isYieldExpression(inner)) {
+			if (!inner.expression) return false;
+			inner = inner.expression;
+		}
+		if (!ts.isCallExpression(inner)) return false;
+		if (ts.isPropertyAccessExpression(inner.expression) && inner.expression.name.text === "json")
+			return inner.arguments.length === 0;
+		const [thunk] = inner.arguments;
+		return inner.arguments.length === 1 && thunk !== undefined && ts.isArrowFunction(thunk) && isJsonRead(thunk.body);
+	};
+
+	interface UncheckedJsonReadsParams {
+		path: string;
+		parsed: ts.SourceFile;
+	}
+
+	const uncheckedJsonReads = ({ path, parsed }: UncheckedJsonReadsParams) => {
+		const found: string[] = [];
+		const visit = (node: ts.Node) => {
+			const cast = (ts.isAsExpression(node) || ts.isTypeAssertionExpression(node)) && isJsonRead(node.expression);
+			const typed =
+				ts.isVariableDeclaration(node) &&
+				node.initializer !== undefined &&
+				isJsonRead(node.initializer) &&
+				node.type?.kind !== ts.SyntaxKind.UnknownKeyword;
+			if (cast || typed) found.push(`${path}:${parsed.getLineAndCharacterOfPosition(node.getStart(parsed)).line + 1}`);
+			ts.forEachChild(node, visit);
+		};
+		visit(parsed);
+		return found;
+	};
+
+	it("reads every JSON answer as unknown, never through a cast or a typed binding", () => {
+		const synthetic = ts.createSourceFile(
+			"synthetic.ts",
+			[
+				"async function* read() {",
+				"	const cast = (await response.json()) as Session;",
+				"	const typed: Session = await response.json();",
+				"	const inferred = yield* Effect.tryPromise(() => response.json());",
+				"	const checked: unknown = yield* Effect.tryPromise(() => response.json());",
+				"}",
+			].join("\n"),
+			ts.ScriptTarget.Latest,
+			true,
+			ts.ScriptKind.TS,
+		);
+
+		expect(uncheckedJsonReads({ path: "synthetic.ts", parsed: synthetic })).toEqual([
+			"synthetic.ts:2",
+			"synthetic.ts:3",
+			"synthetic.ts:4",
+		]);
+		expect(webProduction.flatMap((path) => uncheckedJsonReads({ path, parsed: parse(path) }))).toEqual([]);
+	});
+
+	const ZOD_SPECIFIER = /^zod(?:\/|$)/;
+	const SCHEMA_NAME = /^[a-z][A-Za-z]*Schema$/;
+
+	const calleeRoot = (expression: ts.Expression): string | undefined => {
+		let node = expression;
+		while (ts.isPropertyAccessExpression(node) || ts.isCallExpression(node)) node = node.expression;
+		return ts.isIdentifier(node) ? node.text : undefined;
+	};
+
+	const moduleSchemas = (parsed: ts.SourceFile): string[] => {
+		const roots = new Set(
+			parsed.statements.flatMap((statement) => {
+				if (
+					!ts.isImportDeclaration(statement) ||
+					!ts.isStringLiteral(statement.moduleSpecifier) ||
+					!ZOD_SPECIFIER.test(statement.moduleSpecifier.text)
+				)
+					return [];
+				const clause = statement.importClause;
+				const bindings = clause?.namedBindings;
+				return [
+					...(clause?.name ? [clause.name.text] : []),
+					...(bindings && ts.isNamespaceImport(bindings) ? [bindings.name.text] : []),
+					...(bindings && ts.isNamedImports(bindings) ? bindings.elements.map((element) => element.name.text) : []),
+				];
+			}),
+		);
+		const factories = new Set<string>();
+		const schemas: string[] = [];
+		for (const statement of parsed.statements) {
+			if (!ts.isVariableStatement(statement)) continue;
+			for (const { name, initializer } of statement.declarationList.declarations) {
+				if (!ts.isIdentifier(name) || initializer === undefined) continue;
+				if (ts.isArrowFunction(initializer)) {
+					if (!ts.isBlock(initializer.body) && roots.has(calleeRoot(initializer.body) ?? "")) factories.add(name.text);
+					continue;
+				}
+				const root = calleeRoot(initializer) ?? "";
+				if (roots.has(root) || factories.has(root) || schemas.includes(root)) schemas.push(name.text);
+			}
+		}
+		return schemas;
+	};
+
+	it("names every module-level schema <concept>Schema, after what it checks", () => {
+		const synthetic = ts.createSourceFile(
+			"synthetic.ts",
+			[
+				'import { z } from "zod";',
+				"export const bodyShape = z.object({});",
+				"const querySchema = z.object({ q: z.string() });",
+				"const loose = querySchema.partial();",
+				"const createFormSchema = (message: string) => z.string().min(1, message);",
+				'const formSchema = createFormSchema("x");',
+			].join("\n"),
+			ts.ScriptTarget.Latest,
+			true,
+			ts.ScriptKind.TS,
+		);
+		const schemas = webProduction.flatMap((path) => moduleSchemas(parse(path)).map((name) => ({ path, name })));
+
+		expect(moduleSchemas(synthetic)).toEqual(["bodyShape", "querySchema", "loose", "formSchema"]);
+		expect(schemas.length).toBeGreaterThan(5);
+		expect(schemas.filter(({ name }) => !SCHEMA_NAME.test(name)).map(({ path, name }) => `${path}: ${name}`)).toEqual(
+			[],
+		);
+	});
+
+	const NEXT_SEARCH_PARAMS = "Promise<Record<string, string | string[] | undefined>>";
+
+	interface SearchParamsTypesParams {
+		path: string;
+		parsed: ts.SourceFile;
+	}
+
+	const searchParamsTypes = ({ path, parsed }: SearchParamsTypesParams) => {
+		const found: { path: string; type: string }[] = [];
+		const visit = (node: ts.Node) => {
+			if (ts.isPropertySignature(node) && node.name.getText(parsed) === "searchParams" && node.type)
+				found.push({ path, type: node.type.getText(parsed).replace(/\s+/g, " ") });
+			ts.forEachChild(node, visit);
+		};
+		visit(parsed);
+		return found;
+	};
+
+	it("types every page's searchParams as the record Next hands over, a repeated parameter included", () => {
+		const pages = sourceFiles.filter((file) => file.startsWith(`${WEB_SRC}/app/`) && file.endsWith("/page.tsx"));
+		const declared = pages.flatMap((path) => searchParamsTypes({ path, parsed: parse(path) }));
+
+		expect(declared.length).toBeGreaterThan(0);
+		expect(declared.filter(({ type }) => type !== NEXT_SEARCH_PARAMS)).toEqual([]);
+	});
+
+	const ROUTE_METADATA_LINE = /^export const generateMetadata = routeMetadata\("[^"]*"\);$/m;
+
+	it("declares every page's metadata as one routeMetadata line, with no metadata module beside it", () => {
+		const app = sourceFiles.filter((file) => file.startsWith(`${WEB_SRC}/app/`));
+		const pages = app.filter((file) => file.endsWith("/page.tsx"));
+		const offenders = [
+			...pages.filter((file) => !ROUTE_METADATA_LINE.test(read(file))),
+			...app.filter((file) => /\/metadata\.tsx?$/.test(file)),
+		];
+
+		expect(pages.length).toBeGreaterThan(5);
+		expect(offenders).toEqual([]);
+	});
+
+	const CACHE_DIRECTIVE = /["']use cache(?::\s*\w+)?["']/;
+
+	it("leaves 'use cache' and cacheComponents out", () => {
+		expect(webProduction.length).toBeGreaterThan(300);
+		expect(webProduction.filter((file) => CACHE_DIRECTIVE.test(read(file)))).toEqual([]);
+		expect(webNextConfig.cacheComponents ?? false).toBe(false);
+	});
+
+	interface JsxElementsParams {
+		parsed: ts.SourceFile;
+		tag: string;
+	}
+
+	// Every attribute of every `<tag …>`, as its initializer's source text.
+	const jsxElements = ({ parsed, tag }: JsxElementsParams) => {
+		const found: Map<string, string | undefined>[] = [];
+		const visit = (node: ts.Node) => {
+			if ((ts.isJsxSelfClosingElement(node) || ts.isJsxOpeningElement(node)) && node.tagName.getText(parsed) === tag)
+				found.push(
+					new Map(
+						node.attributes.properties
+							.filter((property) => ts.isJsxAttribute(property))
+							.map((property) => [property.name.getText(parsed), property.initializer?.getText(parsed)]),
+					),
+				);
+			ts.forEachChild(node, visit);
+		};
+		visit(parsed);
+		return found;
+	};
+
+	const components = webProduction.filter((file) => file.endsWith(".tsx"));
+
+	it("gives every Skeleton with a fixture that same component as its fallback", () => {
+		const skeletons = components.flatMap((file) =>
+			jsxElements({ parsed: parse(file), tag: "Skeleton" }).map((attributes) => ({ file, attributes })),
+		);
+		const withFixture = skeletons.filter(({ attributes }) => attributes.has("fixture"));
+		const mismatched = withFixture
+			.filter(({ attributes }) => attributes.get("fallback") !== attributes.get("fixture"))
+			.map(({ file }) => file);
+
+		expect(withFixture.length).toBeGreaterThan(0);
+		expect(mismatched).toEqual([]);
+	});
+
+	const DIALOG_SIZING = /\bmax-h-|\boverflow-/;
+
+	it("leaves a dialog's height and scroll to Dialog", () => {
+		const dialogs = components.flatMap((file) =>
+			jsxElements({ parsed: parse(file), tag: "DialogContent" }).map((attributes) => ({ file, attributes })),
+		);
+		const sized = dialogs
+			.filter(({ attributes }) => DIALOG_SIZING.test(attributes.get("className") ?? ""))
+			.map(({ file }) => file);
+
+		expect(dialogs.length).toBeGreaterThan(3);
+		expect(sized).toEqual([]);
+	});
+
+	// A panel focused only programmatically goes without a ring, because nothing tabs onto it.
+	const PROGRAMMATIC_FOCUS = new Set([`${WEB_SRC}/ui/modules/core/animate/base/Drawer.tsx`]);
+	const RING_SUPPRESSION = /(?<![\w-])focus:outline-none/;
+
+	it("drops the focus ring with focus:outline-none only on the programmatically focused drawer panel", () => {
+		const suppressing = webProduction.filter((file) => RING_SUPPRESSION.test(read(file)));
+
+		expect(RING_SUPPRESSION.test("rounded focus:outline-none")).toBe(true);
+		expect(suppressing.filter((file) => !PROGRAMMATIC_FOCUS.has(file))).toEqual([]);
+	});
+
+	it("gives every route handler a co-located route.test.ts, and tucks no test into a __tests__ folder", () => {
+		const handlers = webProduction.filter((file) => file.endsWith("/route.ts"));
+
+		expect(handlers.length).toBeGreaterThan(5);
+		expect({
+			untested: handlers.filter((file) => !existsSync(join(ROOT, file.replace(/\.ts$/, ".test.ts")))),
+			tucked: trackedFiles.filter((file) => file.includes("/__tests__/")),
+		}).toEqual({ untested: [], tucked: [] });
+	});
+
+	const tests = sourceFiles.filter(
+		(file) =>
+			(file.startsWith(`${WEB}/`) && (TEST_FILE.test(file) || file.includes("/e2e/"))) || file.startsWith("tests/"),
+	);
+
+	// Secret scanners match `pi_<id>_secret_<rest>` and cannot tell a test double from a leak.
+	const CLIENT_SECRET_SHAPE = /\bpi_[A-Za-z0-9]+_secret_/;
+
+	it("shapes no fixture like a real Stripe client secret", () => {
+		expect(CLIENT_SECRET_SHAPE.test(["pi", "3AbC", "secret", "xyz"].join("_"))).toBe(true);
+		expect(tests.length).toBeGreaterThan(300);
+		expect(tests.filter((file) => CLIENT_SECRET_SHAPE.test(read(file)))).toEqual([]);
+	});
+
+	// A date-only ISO string parses as UTC midnight, the previous day anywhere west of UTC.
+	const DATE_ONLY_STRING = /new Date\(\s*["'`]\d{4}-\d{2}-\d{2}["'`]\s*\)/;
+
+	it("builds no fixture day from a date-only ISO string", () => {
+		expect(DATE_ONLY_STRING.test(`new Date("${"2025-01-06"}")`)).toBe(true);
+		expect(tests.filter((file) => DATE_ONLY_STRING.test(read(file)))).toEqual([]);
+	});
+
+	const unitTests = sourceFiles.filter((file) => file.startsWith(`${WEB_SRC}/`) && TEST_FILE.test(file));
+
+	const REAL_YEAR = /new Date\(\)\.getFullYear\(\)/;
+	const CLOCK_BRACKET = /\bconst\s+(?:before|after)\w*\s*=\s*(?:Math\.floor\()?Date\.now\(\)/;
+
+	it("pins the clock rather than reading the year off it or bracketing Date.now()", () => {
+		expect(REAL_YEAR.test("year: new Date().getFullYear(),")).toBe(true);
+		expect(CLOCK_BRACKET.test("const before = Math.floor(Date.now() / 1000);")).toBe(true);
+		expect(unitTests.length).toBeGreaterThan(300);
+		expect(unitTests.filter((file) => REAL_YEAR.test(read(file)) || CLOCK_BRACKET.test(read(file)))).toEqual([]);
+	});
+
+	const UNDONE_BY = new Map([
+		["stubGlobal", "unstubAllGlobals"],
+		["stubEnv", "unstubAllEnvs"],
+		["spyOn", "restoreAllMocks"],
+		["useFakeTimers", "useRealTimers"],
+	]);
+	const TEARDOWN_HOOKS = new Set(["afterEach", "afterAll"]);
+
+	const callsIn = (node: ts.Node): ts.CallExpression[] => {
+		const found: ts.CallExpression[] = [];
+		const visit = (child: ts.Node) => {
+			if (ts.isCallExpression(child)) found.push(child);
+			ts.forEachChild(child, visit);
+		};
+		visit(node);
+		return found;
+	};
+
+	const viMethod = (call: ts.CallExpression): string | undefined =>
+		ts.isPropertyAccessExpression(call.expression) &&
+		ts.isIdentifier(call.expression.expression) &&
+		call.expression.expression.text === "vi"
+			? call.expression.name.text
+			: undefined;
+
+	const bindingOf = (change: ts.CallExpression): string | undefined => {
+		let node: ts.Node = change;
+		while (
+			(ts.isPropertyAccessExpression(node.parent) || ts.isCallExpression(node.parent)) &&
+			node.parent.expression === node
+		)
+			node = node.parent;
+		const { parent } = node;
+		if (ts.isVariableDeclaration(parent) && ts.isIdentifier(parent.name)) return parent.name.text;
+		return ts.isBinaryExpression(parent) &&
+			parent.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+			ts.isIdentifier(parent.left)
+			? parent.left.text
+			: undefined;
+	};
+
+	interface UndoesParams {
+		scope: ts.Node;
+		method: string;
+		binding: string | undefined;
+	}
+
+	const undoes = ({ scope, method, binding }: UndoesParams) =>
+		callsIn(scope).some(
+			(call) =>
+				viMethod(call) === UNDONE_BY.get(method) ||
+				(method === "spyOn" &&
+					binding !== undefined &&
+					ts.isPropertyAccessExpression(call.expression) &&
+					call.expression.name.text === "mockRestore" &&
+					call.expression.expression.getText() === binding),
+		);
+
+	interface GuardedByFinallyParams {
+		change: ts.CallExpression;
+		method: string;
+		binding: string | undefined;
+	}
+
+	const guardedByFinally = ({ change, method, binding }: GuardedByFinallyParams) => {
+		for (let node: ts.Node = change; node.parent !== undefined; node = node.parent) {
+			const { parent } = node;
+			if (
+				ts.isTryStatement(parent) &&
+				parent.tryBlock === node &&
+				parent.finallyBlock !== undefined &&
+				undoes({ scope: parent.finallyBlock, method, binding })
+			)
+				return true;
+			if (!ts.isBlock(parent) && !ts.isSourceFile(parent)) continue;
+			for (const next of parent.statements.slice(parent.statements.indexOf(node as ts.Statement) + 1)) {
+				if (ts.isTryStatement(next) && next.finallyBlock && undoes({ scope: next.finallyBlock, method, binding }))
+					return true;
+				if (callsIn(next).some((call) => calleeRoot(call.expression) === "expect")) break;
+			}
+		}
+		return false;
+	};
+
+	interface UnrestoredChangesParams {
+		path: string;
+		parsed: ts.SourceFile;
+	}
+
+	const unrestoredChanges = ({ path, parsed }: UnrestoredChangesParams) => {
+		const calls = callsIn(parsed);
+		const hooks = calls.filter((call) => ts.isIdentifier(call.expression) && TEARDOWN_HOOKS.has(call.expression.text));
+		return calls.flatMap((change) => {
+			const method = viMethod(change);
+			if (method === undefined || !UNDONE_BY.has(method)) return [];
+			const binding = bindingOf(change);
+			const hooked = hooks.some((hook) => {
+				const scope = ts.isExpressionStatement(hook.parent) ? hook.parent.parent : hook.parent;
+				return (
+					(ts.isSourceFile(scope) || (change.pos >= scope.pos && change.end <= scope.end)) &&
+					undoes({ scope: hook, method, binding })
+				);
+			});
+			return hooked || guardedByFinally({ change, method, binding })
+				? []
+				: [`${path}:${parsed.getLineAndCharacterOfPosition(change.getStart(parsed)).line + 1} vi.${method}`];
+		});
+	};
+
+	it("undoes every stubbed global, stubbed variable, spy and faked clock in an afterEach, an afterAll or a finally around it, which a failing assertion cannot skip", () => {
+		const synthetic = ts.createSourceFile(
+			"synthetic.test.ts",
+			[
+				'it("a", () => { vi.stubGlobal("a", 1); expect(a).toBe(1); vi.unstubAllGlobals(); });',
+				'it("b", () => { const spy = vi.spyOn(console, "warn"); try { run(); } finally { spy.mockRestore(); } });',
+				'describe("c", () => { afterEach(() => { vi.useRealTimers(); }); it("d", () => { vi.useFakeTimers(); }); });',
+				'it("e", () => { vi.useFakeTimers(); });',
+			].join("\n"),
+			ts.ScriptTarget.Latest,
+			true,
+			ts.ScriptKind.TS,
+		);
+		const changed = new Set(unitTests.flatMap((path) => callsIn(parse(path)).flatMap((call) => viMethod(call) ?? [])));
+
+		expect(unrestoredChanges({ path: "synthetic.test.ts", parsed: synthetic })).toEqual([
+			"synthetic.test.ts:1 vi.stubGlobal",
+			"synthetic.test.ts:4 vi.useFakeTimers",
+		]);
+		expect([...UNDONE_BY.keys()].filter((method) => !changed.has(method))).toEqual([]);
+		expect(unitTests.flatMap((path) => unrestoredChanges({ path, parsed: parse(path) }))).toEqual([]);
+	});
+
+	const PROCESS_ENV_WRITE = /\bprocess\.env(?:\.\w+|\[[^\]]+\])\s*=(?!=)|\bdelete\s+process\.env\b/;
+
+	it("varies the environment under test through vi.stubEnv, never by writing to the process environment", () => {
+		const testCode = sourceFiles.filter(
+			(file) => TEST_FILE.test(file) || file.includes("/e2e/") || file.startsWith("tests/"),
+		);
+
+		expect(PROCESS_ENV_WRITE.test(`${["process", "env", "TZ"].join(".")} = "UTC";`)).toBe(true);
+		expect(testCode.length).toBeGreaterThan(300);
+		expect(testCode.filter((file) => PROCESS_ENV_WRITE.test(read(file)))).toEqual([]);
+	});
+
+	interface IssueFreeSafeParsesParams {
+		path: string;
+		parsed: ts.SourceFile;
+	}
+
+	const issueFreeSafeParses = ({ path, parsed }: IssueFreeSafeParsesParams) => {
+		const found: string[] = [];
+		const visit = (node: ts.Node) => {
+			if (
+				ts.isCallExpression(node) &&
+				ts.isPropertyAccessExpression(node.expression) &&
+				node.expression.name.text === "safeParse"
+			) {
+				const { parent } = node;
+				let scope: ts.Node = parent;
+				while (!ts.isBlock(scope) && !ts.isSourceFile(scope)) scope = scope.parent;
+				const readsIssue =
+					(ts.isPropertyAccessExpression(parent) && parent.name.text === "error") ||
+					(ts.isVariableDeclaration(parent) &&
+						ts.isIdentifier(parent.name) &&
+						new RegExp(`\\b${parent.name.text}\\.error\\b`).test(scope.getText(parsed)));
+				if (!readsIssue) found.push(`${path}:${parsed.getLineAndCharacterOfPosition(node.getStart(parsed)).line + 1}`);
+			}
+			ts.forEachChild(node, visit);
+		};
+		visit(parsed);
+		return found;
+	};
+
+	it("asserts a schema's answer with validate, and keeps safeParse for a case that reads the issue", () => {
+		const synthetic = ts.createSourceFile(
+			"synthetic.test.ts",
+			[
+				'it("accepts", () => { expect(schema.safeParse(value).success).toBe(true); });',
+				'it("refuses", () => { const result = schema.safeParse(value); expect(result.success).toBe(false); });',
+				'it("names", () => { const result = schema.safeParse(value); expect(result.error?.issues[0]?.message).toBe("x"); });',
+			].join("\n"),
+			ts.ScriptTarget.Latest,
+			true,
+			ts.ScriptKind.TS,
+		);
+
+		expect(issueFreeSafeParses({ path: "synthetic.test.ts", parsed: synthetic })).toEqual([
+			"synthetic.test.ts:1",
+			"synthetic.test.ts:2",
+		]);
+		expect(unitTests.flatMap((path) => issueFreeSafeParses({ path, parsed: parse(path) }))).toEqual([]);
+	});
+});
+
+describe("the docs site keeps the rules CODING_STANDARDS.md hands to this suite", () => {
+	const COMPONENT_PAGES = `${DOCS}/src/content/docs/design-system/components/`;
+	const COMPONENT_SECTIONS = ["Props", "Usage", "Conventions", "Accessibility", "In the app"];
+	const SECTION_HEADING = /^## (.+)$/gm;
+	const LIVE_BADGE = /^\s+badge:\s*\r?\n\s+text: Live$/m;
+	const DEMO = "client:visible";
+
+	it("gives every component page its sections in order, after the demos, and the Live badge when it renders one", () => {
+		const pages = contentFiles.filter((file) => file.startsWith(COMPONENT_PAGES) && !file.endsWith("/overview.mdx"));
+		const offenders = pages.flatMap((file) => {
+			const source = read(file);
+			const headings = [...source.matchAll(SECTION_HEADING)].map(([, heading = ""]) => heading.trim());
+			const fixed = headings.filter((heading) => COMPONENT_SECTIONS.includes(heading));
+			const live = source.includes(DEMO);
+			return [
+				...(fixed.join("|") === COMPONENT_SECTIONS.join("|") &&
+				headings.slice(-COMPONENT_SECTIONS.length).join("|") === COMPONENT_SECTIONS.join("|")
+					? []
+					: [`${file} sections: ${headings.join(", ")}`]),
+				...(live && source.lastIndexOf(DEMO) > source.indexOf("\n## Props")
+					? [`${file} renders a demo after Props`]
+					: []),
+				...(live && !LIVE_BADGE.test(source) ? [`${file} renders a demo without the Live badge`] : []),
+			];
+		});
+
+		expect(pages.length).toBeGreaterThan(15);
+		expect(offenders).toEqual([]);
+	});
+
+	const propertyKey = (name: ts.PropertyName) =>
+		ts.isIdentifier(name) || ts.isStringLiteral(name) ? name.text : name.getText();
+
+	interface PropertyParams {
+		object: ts.ObjectLiteralExpression;
+		name: string;
+	}
+
+	const property = ({ object, name }: PropertyParams) =>
+		object.properties.find(
+			(candidate): candidate is ts.PropertyAssignment =>
+				ts.isPropertyAssignment(candidate) && propertyKey(candidate.name) === name,
+		)?.initializer;
+
+	it("translates every sidebar group into every locale the site serves besides the root", () => {
+		const objects: ts.ObjectLiteralExpression[] = [];
+		const collect = (node: ts.Node) => {
+			if (ts.isObjectLiteralExpression(node)) objects.push(node);
+			ts.forEachChild(node, collect);
+		};
+		collect(parse(`${DOCS}/astro.config.ts`));
+		const locales = objects
+			.map((object) => property({ object, name: "locales" }))
+			.find((value): value is ts.ObjectLiteralExpression => value !== undefined && ts.isObjectLiteralExpression(value));
+		const served = (locales?.properties ?? [])
+			.flatMap((entry) => (entry.name ? [propertyKey(entry.name)] : []))
+			.filter((locale) => locale !== "root");
+		const groups = objects.filter(
+			(object) =>
+				property({ object, name: "label" }) !== undefined && property({ object, name: "items" }) !== undefined,
+		);
+		const untranslated = groups.flatMap((group) => {
+			const translations = property({ object: group, name: "translations" });
+			const given =
+				translations && ts.isObjectLiteralExpression(translations)
+					? translations.properties.flatMap((entry) => (entry.name ? [propertyKey(entry.name)] : []))
+					: [];
+			const missing = served.filter((locale) => !given.includes(locale));
+			return missing.length > 0
+				? [`${property({ object: group, name: "label" })?.getText()}: ${missing.join(", ")}`]
+				: [];
+		});
+
+		expect(served.length).toBeGreaterThan(0);
+		expect(groups.length).toBeGreaterThan(5);
+		expect(untranslated).toEqual([]);
+	});
+
+	const APP_STYLES_ENTRY = `${WEB_SRC}/ui/styles/index.css`;
+	const CSS_IMPORT = /@import\s+["']([^"']+)["']/g;
+
+	it("brings the app's styles in through global.css, never the app's own entry point", () => {
+		const stylesheets = trackedFiles.filter((file) => file.startsWith(`${DOCS}/`) && file.endsWith(".css"));
+		const cssImports = stylesheets.flatMap((file) =>
+			[...read(file).matchAll(CSS_IMPORT)].map(([, specifier = ""]) => resolveSpecifier({ from: file, specifier })),
+		);
+		const codeImports = sourceFiles
+			.filter((file) => file.startsWith(`${DOCS}/`))
+			.flatMap((file) => importsOf(file).map(({ specifier }) => resolveSpecifier({ from: file, specifier })));
+
+		expect(cssImports.filter((target) => target.startsWith(`${WEB_SRC}/ui/styles/`)).length).toBeGreaterThan(0);
+		expect([...cssImports, ...codeImports].filter((target) => target === APP_STYLES_ENTRY)).toEqual([]);
+	});
+
+	const CONSENT_CONSTANT = /^export const (ANALYTICS_CATEGORY|\w+_SERVICE_ID) = "([^"]+)";$/gm;
+	const consentIdsIn = (file: string) =>
+		Object.fromEntries([...read(file).matchAll(CONSENT_CONSTANT)].map(([, name, value]) => [name, value]));
+
+	it("keeps the site's consent category and service ids equal to the app's", () => {
+		const app = consentIdsIn(`${WEB_SRC}/ui/modules/shared/cookie-consent/utils/consent.ts`);
+
+		expect(Object.keys(app).length).toBeGreaterThanOrEqual(3);
+		expect(consentIdsIn(`${DOCS}/src/lib/analytics/consent.ts`)).toEqual(app);
+	});
+
+	const BANNER_WORDS_THE_APP_SHARES = [
+		["consentModal.acceptAllBtn", "cookies.acceptAll"],
+		["consentModal.acceptNecessaryBtn", "cookies.rejectAll"],
+		["preferencesModal.acceptAllBtn", "cookies.acceptAll"],
+		["preferencesModal.acceptNecessaryBtn", "cookies.rejectAll"],
+		["preferencesModal.title", "cookies.preferencesTitle"],
+		["preferencesModal.closeIconLabel", "a11y.closeDialog"],
+	] as const;
+
+	interface StringLeavesParams {
+		node: ts.Node;
+		path?: string;
+		out?: Map<string, string>;
+	}
+
+	const stringLeaves = ({ node, path = "", out = new Map<string, string>() }: StringLeavesParams) => {
+		const below = (key: string) => (path ? `${path}.${key}` : key);
+		if (ts.isObjectLiteralExpression(node))
+			for (const entry of node.properties.filter(ts.isPropertyAssignment))
+				stringLeaves({ node: entry.initializer, path: below(propertyKey(entry.name)), out });
+		if (ts.isArrayLiteralExpression(node))
+			for (const [index, element] of node.elements.entries())
+				stringLeaves({ node: element, path: below(`${index}`), out });
+		if (ts.isStringLiteralLike(node)) out.set(path, node.text);
+		return out;
+	};
+
+	const objectLiteralsIn = (path: string) => {
+		const objects: ts.ObjectLiteralExpression[] = [];
+		const collect = (node: ts.Node) => {
+			if (ts.isObjectLiteralExpression(node)) objects.push(node);
+			ts.forEachChild(node, collect);
+		};
+		collect(parse(path));
+		return objects;
+	};
+
+	it("speaks every language the site serves in its consent banner, in the app's words for the answers the two share", () => {
+		const locales = objectLiteralsIn(`${DOCS}/astro.config.ts`)
+			.map((object) => property({ object, name: "locales" }))
+			.find((value): value is ts.ObjectLiteralExpression => value !== undefined && ts.isObjectLiteralExpression(value));
+		const served = (locales?.properties ?? []).flatMap((entry) => {
+			const lang =
+				ts.isPropertyAssignment(entry) && ts.isObjectLiteralExpression(entry.initializer)
+					? property({ object: entry.initializer, name: "lang" })
+					: undefined;
+			return lang && ts.isStringLiteralLike(lang) ? [lang.text] : [];
+		});
+		const translations = objectLiteralsIn(`${DOCS}/src/lib/analytics/consent.ts`).find(
+			(object) =>
+				ts.isVariableDeclaration(object.parent) &&
+				ts.isIdentifier(object.parent.name) &&
+				object.parent.name.text === "TRANSLATIONS",
+		);
+		const languages: readonly ts.ObjectLiteralElementLike[] = translations?.properties ?? [];
+		const banner = new Map(
+			languages
+				.filter(ts.isPropertyAssignment)
+				.map((entry) => [propertyKey(entry.name), stringLeaves({ node: entry.initializer })] as const),
+		);
+		const english = [...(banner.get("en")?.keys() ?? [])].sort();
+		const mismatches = [...banner].flatMap(([language, leaves]) => {
+			const app = readJson(`${LOCALES_DIR}/${language}.json`);
+			const missing = english.filter((key) => !leaves.has(key)).map((key) => `${language} ${key}: missing`);
+			const differing = BANNER_WORDS_THE_APP_SHARES.flatMap(([bannerKey, appKey]) => {
+				const appWords = appKey.split(".").reduce((value, key) => value?.[key], app);
+				return leaves.get(bannerKey) === appWords
+					? []
+					: [`${language} ${bannerKey}: "${leaves.get(bannerKey)}", the app's ${appKey} says "${appWords}"`];
+			});
+			return [...missing, ...differing];
+		});
+
+		expect(served.length).toBeGreaterThan(1);
+		expect(english.length).toBeGreaterThan(BANNER_WORDS_THE_APP_SHARES.length);
+		expect([...banner.keys()].sort()).toEqual(served.sort());
+		expect(mismatches).toEqual([]);
+	});
+
+	const MERMAID_RENDERER = `${DOCS}/src/lib/mermaid-render.ts`;
+	const MERMAID_FENCE = /```mermaid\n([\s\S]*?)```/g;
+	const MERMAID_FRONTMATTER = /^---\n([\s\S]*?)\n---\n/;
+	const MERMAID_DIRECTIVE = /%%\{([\s\S]*?)\}%%/g;
+	const LAYOUT_SETTING = /\b(?:layout|defaultRenderer)["']?\s*:\s*["']?([\w-]+)/g;
+	const ELK_DIAGRAM = /^\s*flowchart-elk\b/m;
+
+	const fenceLayouts = (fence: string): string[] => [
+		...[
+			MERMAID_FRONTMATTER.exec(fence)?.[1] ?? "",
+			...[...fence.matchAll(MERMAID_DIRECTIVE)].map(([, body = ""]) => body),
+		].flatMap((settings) => [...settings.matchAll(LAYOUT_SETTING)].map(([, layout = ""]) => layout)),
+		...(ELK_DIAGRAM.test(fence) ? ["elk"] : []),
+	];
+
+	it("holds every Mermaid diagram to the layout: dagre it was drawn with, which the renderer sets and no fence overrides", () => {
+		const rendererLayouts: string[] = [];
+		const collect = (node: ts.Node) => {
+			if (ts.isPropertyAssignment(node) && propertyKey(node.name) === "layout")
+				rendererLayouts.push(node.initializer.getText());
+			ts.forEachChild(node, collect);
+		};
+		collect(parse(MERMAID_RENDERER));
+		const fences = [...markdownFiles, ...contentFiles].flatMap((file) =>
+			[...read(file).matchAll(MERMAID_FENCE)].map(([, fence = ""]) => ({ file, fence })),
+		);
+		const redrawn = fences.flatMap(({ file, fence }) =>
+			fenceLayouts(fence)
+				.filter((layout) => layout !== "dagre")
+				.map((layout) => `${file}: ${layout}`),
+		);
+
+		expect(fenceLayouts("---\nconfig:\n  layout: elk\n---\nflowchart LR\n  A --> B\n")).toEqual(["elk"]);
+		expect(fenceLayouts('%%{init: {"flowchart": {"defaultRenderer": "elk"}}}%%\nflowchart LR\n')).toEqual(["elk"]);
+		expect(fenceLayouts("flowchart-elk TD\n  subgraph layout [x]\n  end\n")).toEqual(["elk"]);
+		expect(rendererLayouts).toEqual(['"dagre"']);
+		expect(fences.length).toBeGreaterThan(20);
+		expect(redrawn).toEqual([]);
+	});
+});
+
+describe("workflows and package scripts keep the rules CODING_STANDARDS.md hands to this suite", () => {
+	const loadYaml = (() => {
+		const parser: unknown = ["semantic-release", "cosmiconfig"].reduce(
+			(from, name) => createRequire(from.resolve(name)),
+			createRequire(join(ROOT, "package.json")),
+		)("js-yaml");
+		if (typeof parser !== "object" || parser === null || !("load" in parser) || typeof parser.load !== "function")
+			throw new Error("js-yaml is out of reach through semantic-release");
+		const { load } = parser;
+		return (source: string): unknown => load(source);
+	})();
+	const LOCKFILE = "pnpm-lock.yaml";
+	const RENOVATE_FILE = "pnpm-workspace.yaml";
+	const yamlFiles = execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard"], {
+		cwd: ROOT,
+		encoding: "utf8",
+	})
+		.split("\n")
+		.filter((path) => /\.ya?ml$/.test(path) && path !== LOCKFILE && existsSync(join(ROOT, path)));
+	const SHA_PINNED_USES = /^\s*(?:-\s*)?uses:\s*[\w.-]+\/[\w./-]+@[0-9a-f]{40}\s+#\s*\S+$/;
+	const USES_LINE = /^\s*(?:-\s*)?uses:\s*(\S+)/;
+	const TOOL_DIRECTIVE = /^#\s*(?:zizmor:|yaml-language-server:)/;
+	const RENOVATE_LINE = /^#\s*Renovate security update: \S+@\S+$/;
+
+	interface YamlCommentsParams {
+		file: string;
+		source: string;
+	}
+
+	const yamlComments = ({ file, source }: YamlCommentsParams) => {
+		const lines = source.split("\n");
+		const parsed = loadYaml(source);
+		const unchangedWithout = ({ index, column }: { index: number; column: number }) => {
+			const without = [...lines.slice(0, index), lines[index]?.slice(0, column).trimEnd(), ...lines.slice(index + 1)];
+			try {
+				return isDeepStrictEqual(loadYaml(without.join("\n")), parsed);
+			} catch {
+				return false;
+			}
+		};
+		return lines.flatMap((line, index) => {
+			const column = [...line.matchAll(/#/g)]
+				.map((match) => match.index)
+				.find((at) => (at === 0 || /\s/.test(line[at - 1] ?? "")) && unchangedWithout({ index, column: at }));
+			return column === undefined ? [] : [{ file, line: index + 1, text: line, comment: line.slice(column).trim() }];
+		});
+	};
+
+	it("pins every action and workflow from another repository to a full SHA, its version or branch in a trailing comment", () => {
+		const usesLines = yamlFiles.flatMap((file) =>
+			read(file)
+				.split("\n")
+				.flatMap((line, index) => (USES_LINE.test(line) ? [{ file, line: index + 1, text: line }] : [])),
+		);
+		const parsedUses = yamlFiles.flatMap((file) => {
+			const found: string[] = [];
+			const walk = (value: unknown) => {
+				if (Array.isArray(value)) value.forEach(walk);
+				else if (value && typeof value === "object")
+					for (const [key, child] of Object.entries(value)) {
+						if (key === "uses" && typeof child === "string") found.push(child);
+						else walk(child);
+					}
+			};
+			walk(loadYaml(read(file)));
+			return found;
+		});
+		const remote = usesLines.filter(({ text }) => !/^[.$]\//.test(USES_LINE.exec(text)?.[1] ?? ""));
+		const unpinned = remote
+			.filter(({ text }) => !SHA_PINNED_USES.test(text))
+			.map(({ file, line, text }) => `${file}:${line} ${text.trim()}`);
+
+		expect(usesLines.length).toBe(parsedUses.length);
+		expect(remote.length).toBeGreaterThan(20);
+		expect(unpinned).toEqual([]);
+	});
+
+	it("keeps every YAML file free of comments but a pin's version, a tool directive and the line Renovate writes", () => {
+		const synthetic = yamlComments({
+			file: "synthetic.yml",
+			source: 'a: 1 # why\nb: "not # a comment"\nrun: |\n  # shell, not YAML\n  echo\n# heading\nc: 2',
+		});
+		const comments = yamlFiles.flatMap((file) => yamlComments({ file, source: read(file) }));
+		const stray = comments
+			.filter(
+				({ file, text, comment }) =>
+					!SHA_PINNED_USES.test(text) &&
+					!TOOL_DIRECTIVE.test(comment) &&
+					!(file === RENOVATE_FILE && RENOVATE_LINE.test(text.trim())),
+			)
+			.map(({ file, line, comment }) => `${file}:${line} ${comment}`);
+
+		expect(synthetic.map(({ line, comment }) => `${line} ${comment}`)).toEqual(["1 # why", "6 # heading"]);
+		expect(yamlFiles.length).toBeGreaterThan(10);
+		expect(comments.length).toBeGreaterThan(20);
+		expect(stray).toEqual([]);
+	});
+
+	const PREPARE_ENV = `${COMPOSITE_ACTION_DIR}/prepare-env/action.yml`;
+	const TOOLCHAIN_SETUP = /uses:\s*(?:actions\/setup-node|pnpm\/action-setup)@/;
+	const FILTERED_INSTALL = /\bpnpm\s+(?:install|i)\b[^\n]*\s(?:--filter|-F)\b/;
+
+	it("sets the toolchain up through prepare-env alone, and installs unfiltered", () => {
+		const files = [...workflowFiles, ...compositeActionFiles];
+
+		expect(TOOLCHAIN_SETUP.test(read(PREPARE_ENV))).toBe(true);
+		expect(workflowFiles.some((file) => read(file).includes("/.github/actions/prepare-env"))).toBe(true);
+		expect({
+			setUpElsewhere: files.filter((file) => file !== PREPARE_ENV && TOOLCHAIN_SETUP.test(read(file))),
+			filtered: files.filter((file) => FILTERED_INSTALL.test(read(file))),
+		}).toEqual({ setUpElsewhere: [], filtered: [] });
+	});
+
+	// A job's `defaults.run.working-directory` does not reach its `uses:` steps.
+	const defaultsWithWorkingDirectory = (workflow: string) => {
+		const lines = workflow.split(/\r?\n/);
+		return lines.some((line, index) => {
+			const opening = /^(\s*)defaults:\s*$/.exec(line);
+			if (!opening) return false;
+			const indent = opening[1]?.length ?? 0;
+			for (const body of lines.slice(index + 1)) {
+				if (body.trim().length > 0 && body.length - body.trimStart().length <= indent) return false;
+				if (/^\s+working-directory:/.test(body)) return true;
+			}
+			return false;
+		});
+	};
+
+	it("scopes a step with its own working-directory, never a defaults block", () => {
+		expect(defaultsWithWorkingDirectory("jobs:\n  a:\n    defaults:\n      run:\n        working-directory: x\n")).toBe(
+			true,
+		);
+		expect(workflowFiles.some((file) => /^\s+working-directory:/m.test(read(file)))).toBe(true);
+		expect(workflowFiles.filter((file) => defaultsWithWorkingDirectory(read(file)))).toEqual([]);
+	});
+
+	const scripts = [
+		{ manifest: "package.json", scripts: rootScripts },
+		{ manifest: `${WEB}/package.json`, scripts: webScripts },
+		{ manifest: `${DOCS}/package.json`, scripts: docsScripts },
+	].flatMap(({ manifest, scripts: bodies }) =>
+		Object.entries(bodies).map(([name, body]) => ({ script: `${manifest} ${name}`, body })),
+	);
+	// Scripts run under `cmd` on Windows, where none of these means anything.
+	const SHELL_SUBSTITUTION = /\$\(|`|\$\{|\$[A-Za-z_]/;
+	// Biome reads its base from `vcs.defaultBranch`; Vitest and Playwright take theirs on the command line.
+	const CHANGED_ONLY = /--(?:only-)?changed(?![\w-])(?:[ =]([^\s&|;]+))?/g;
+	const BIOME_COMMAND = /^(?:pnpm\s+(?:lint|format)\b|biome\b)/;
+
+	it("keeps package scripts free of shell substitution, and names a literal base on every changed-only run", () => {
+		const changedOnly = scripts.flatMap(({ script, body }) =>
+			body
+				.split(/&&|\|\|/)
+				.map((command) => command.trim())
+				.filter((command) => !BIOME_COMMAND.test(command))
+				.flatMap((command) => [...command.matchAll(CHANGED_ONLY)].map(([, base]) => ({ script, command, base }))),
+		);
+
+		expect(changedOnly.length).toBeGreaterThan(0);
+		expect({
+			substituted: scripts.filter(({ body }) => SHELL_SUBSTITUTION.test(body)).map(({ script }) => script),
+			baseless: changedOnly.filter(({ base }) => !base || base.startsWith("-")).map(({ command }) => command),
+		}).toEqual({ substituted: [], baseless: [] });
+	});
+
+	// Flags after `pnpm run <script> --` reach the script as file filters rather than as flags.
+	const FORWARDED_FLAG = /\bpnpm\s+(?:(?:--filter|-F|--dir|-C)(?:\s+|=)\S+\s+)*(?:run\s+)?[a-z][\w:-]*\s+--\s+-/;
+
+	it("passes Playwright flags through pnpm exec, never after pnpm run <script> --", () => {
+		const bodies = [
+			...workflowFiles.map((file) => ({ source: file, body: runCommands(read(file)) })),
+			...scripts.map(({ script, body }) => ({ source: script, body })),
+		];
+
+		expect(FORWARDED_FLAG.test("pnpm test:e2e -- --grep smoke")).toBe(true);
+		expect(bodies.filter(({ body }) => FORWARDED_FLAG.test(body)).map(({ source }) => source)).toEqual([]);
 	});
 });
 
@@ -1921,7 +3515,10 @@ describe("the guides describe the project as it is configured", () => {
 	];
 
 	it("cites only root scripts that the root manifest has", () => {
-		expect(citedScripts(rootGuide).filter((script) => !(script in rootScripts))).toEqual([]);
+		const cited = citedScripts(rootGuide);
+
+		expect(cited.length).toBeGreaterThan(0);
+		expect(cited.filter((script) => !(script in rootScripts))).toEqual([]);
 	});
 
 	// A README is where someone copies a command from, so a script it names has to exist somewhere
@@ -1932,7 +3529,10 @@ describe("the guides describe the project as it is configured", () => {
 		[`${DOCS}/README.md`, { ...rootScripts, ...docsScripts }],
 		[`${DOCS}/AGENTS.md`, { ...rootScripts, ...docsScripts }],
 	])("%s cites only scripts a reader could run", (file, available) => {
-		expect(citedScripts(readIfPresent(file)).filter((script) => !(script in available))).toEqual([]);
+		const body = readIfPresent(file);
+
+		expect(body).not.toBe("");
+		expect(citedScripts(body).filter((script) => !(script in available))).toEqual([]);
 	});
 
 	// A workflow is the one citation site that fails in CI rather than under a reader, and it was unchecked:
@@ -1969,7 +3569,7 @@ describe("the guides describe the project as it is configured", () => {
 			const rootGuide = read("AGENTS.md");
 			const wiki = read(`${DOCS}/src/content/docs/infra/workflows.mdx`);
 
-			// A bare `includes(name)` was not a listing test: `ci.yml` is named twelve times in that guide,
+			// A bare `includes(name)` was not a listing test: `ci.yml` is named more than ten times in that guide,
 			// so deleting the paragraph that documents it and leaving any one incidental mention kept this
 			// green. The guide links every workflow it lists to the file, and the link is what a reader
 			// follows, so that is the thing to require.
@@ -2135,11 +3735,15 @@ describe("the guides describe the project as it is configured", () => {
 	});
 
 	it("cites only web scripts that resolve in the web or root manifest", () => {
-		const unknown = citedScripts(webGuide).filter((script) => !(script in webScripts) && !(script in rootScripts));
+		const cited = citedScripts(webGuide);
+		const unknown = cited.filter((script) => !(script in webScripts) && !(script in rootScripts));
+
+		expect(cited.length).toBeGreaterThan(0);
 		expect(unknown).toEqual([]);
 	});
 
 	it("documents every path alias the web tsconfig declares", () => {
+		expect(Object.keys(webTsconfigPaths).length).toBeGreaterThan(0);
 		expect(Object.keys(webTsconfigPaths).filter((alias) => !documentedAliases.has(alias))).toEqual([]);
 	});
 
@@ -2193,13 +3797,13 @@ describe("the guides describe the project as it is configured", () => {
 			target: ts.ScriptTarget.ESNext,
 			lib: ["lib.esnext.d.ts", "lib.dom.d.ts"],
 		});
+		const compiled = entry.replace(/\\/g, "/");
 		const unbound = ts
 			.getPreEmitDiagnostics(program)
-			.filter(
-				(diagnostic) => diagnostic.code === UNDECLARED_NAME && diagnostic.file?.fileName === entry.replace(/\\/g, "/"),
-			)
+			.filter((diagnostic) => diagnostic.code === UNDECLARED_NAME && diagnostic.file?.fileName === compiled)
 			.map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, " "));
 
+		expect(program.getSourceFiles().map(({ fileName }) => fileName)).toContain(compiled);
 		expect(unbound).toEqual([]);
 	});
 });
@@ -2232,6 +3836,44 @@ describe("translation bundles stay in step", () => {
 			missing: reference.filter((key) => !keys.includes(key)),
 			extra: keys.filter((key) => !reference.includes(key)),
 		}).toEqual({ missing: [], extra: [] });
+	});
+
+	// A key under `errors` or `promoCodeErrors` is a machine code looked up at runtime, so it keeps the code's
+	// spelling; `next-intl` cannot interpolate into anything but a string.
+	const MACHINE_CODE_PARENT = /(?:^|\.)(?:errors|promoCodeErrors)$/;
+	const CAMEL_CASE_KEY = /^[a-z][a-zA-Z0-9]*$/;
+
+	interface CensusParams {
+		value: unknown;
+		path: string;
+		found: { keys: string[]; values: string[] };
+	}
+
+	const census = ({ value, path, found }: CensusParams) => {
+		if (value !== null && typeof value === "object" && !Array.isArray(value)) {
+			for (const [key, child] of Object.entries(value)) {
+				if (!MACHINE_CODE_PARENT.test(path) && !CAMEL_CASE_KEY.test(key)) found.keys.push(`${path}.${key}`);
+				census({ value: child, path: path ? `${path}.${key}` : key, found });
+			}
+		} else if (typeof value !== "string") found.values.push(path);
+		return found;
+	};
+
+	it("writes every key in camelCase but the machine codes, and every value as a string", () => {
+		const breaches = localeFiles.flatMap((file) => {
+			const { keys, values } = census({
+				value: JSON.parse(read(`${LOCALES_DIR}/${file}`)),
+				path: "",
+				found: { keys: [], values: [] },
+			});
+			return [...keys.map((key) => `${file} key ${key}`), ...values.map((path) => `${file} value ${path}`)];
+		});
+
+		expect(census({ value: { a_b: [1] }, path: "", found: { keys: [], values: [] } })).toEqual({
+			keys: [".a_b"],
+			values: ["a_b"],
+		});
+		expect(breaches).toEqual([]);
 	});
 
 	const FORMAL_ADDRESS: Record<string, RegExp> = {
@@ -2357,8 +3999,8 @@ describe("translation bundles stay in step", () => {
 // A version written into prose is a claim a bot invalidates on its own, and the rule above reads one section
 // of one guide. This one reads every document: a tool named beside a version states what its manifest already
 // states, and the manifest is the only copy Renovate keeps current. ADRs are exempt because a decision is
-// dated and quotes the versions it decided on; the entries below are the sentences that narrate a past bump
-// or a past mistake by its number, which is history rather than a claim about the tree.
+// dated and quotes the versions it decided on; no other document narrates a past bump by its number, because
+// that history stays in git.
 // Which names are policed is read from the manifests: a repository that never declared Astro has no business
 // forbidding "Astro 7", and a dependency added tomorrow is policed the day its manifest names it. The runtimes
 // are the only names every repository carries.
@@ -2371,7 +4013,9 @@ const VERSIONED_DEPENDENCIES: Record<string, string[]> = {
 	tailwindcss: ["Tailwind", "Tailwind CSS"],
 	typescript: ["TypeScript"],
 	wrangler: ["wrangler", "Wrangler"],
+	zod: ["Zod", "zod"],
 };
+const escapeForRegExp = (name: string): string => name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const statedVersionPattern = (names: string[]): RegExp =>
 	new RegExp(`\\b(?:${names.map(escapeForRegExp).join("|")})\\s+(?:v|@)?\\d+(?:\\.\\d+)*\\b`, "g");
 interface PolicedNamesParams {
@@ -2391,10 +4035,6 @@ const POLICED_NAMES = policedNames({
 	runtimes: ["Node", "Node.js", "pnpm"],
 });
 const STATED_VERSION = statedVersionPattern(POLICED_NAMES);
-const NARRATED_VERSIONS: Record<string, string[]> = {
-	"AGENTS.md": ["Flutter 3.47.2", "Next 16.3.3"],
-	"apps/web/AGENTS.md": ["Next 16.3", "TypeScript 7", "TypeScript 6", "wrangler 4.115"],
-};
 
 describe("stated versions", () => {
 	it("polices the runtimes and every versioned dependency the manifests declare, and nothing else", () => {
@@ -2408,10 +4048,7 @@ describe("stated versions", () => {
 				(file.endsWith(".md") || file.endsWith(".mdx")) && !file.startsWith("adr/") && !file.endsWith("CHANGELOG.md"),
 		);
 		const stated = documents.flatMap((file) =>
-			[...read(file).matchAll(STATED_VERSION)]
-				.map(([match]) => match)
-				.filter((match) => !(NARRATED_VERSIONS[file] ?? []).includes(match))
-				.map((match) => `${file}: ${match}`),
+			[...read(file).matchAll(STATED_VERSION)].map(([match]) => `${file}: ${match}`),
 		);
 
 		expect(documents.length).toBeGreaterThan(0);

@@ -1,3 +1,4 @@
+import de from "@i18n/messages/de.json";
 import en from "@i18n/messages/en.json";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -6,9 +7,10 @@ import type { ReactElement } from "react";
 import { useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { setPreviewAlternativeSelection, resetManualSelection, readout } = vi.hoisted(() => ({
+const { setPreviewAlternativeSelection, resetManualSelection, askForPlan, readout } = vi.hoisted(() => ({
 	setPreviewAlternativeSelection: vi.fn(),
 	resetManualSelection: vi.fn(),
+	askForPlan: vi.fn(),
 	readout: {
 		ptoDays: 10,
 		suggested: 6,
@@ -24,7 +26,7 @@ vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track 
 
 vi.mock("@application/stores/holidays", () => ({
 	useHolidaysStore: (selector: (state: unknown) => unknown) =>
-		selector({ resetManualSelection, setPreviewAlternativeSelection }),
+		selector({ resetManualSelection, setPreviewAlternativeSelection, askForPlan }),
 }));
 
 vi.mock("@ui/hooks/usePlanReadout", () => ({ usePlanReadout: () => readout }));
@@ -68,7 +70,7 @@ const StoreHost = () => {
 			selectedIndex={previewAlternativeIndex}
 			onSelectionChange={vi.fn()}
 			onPreviewChange={(index) => {
-				setPreviewAlternativeSelection({ suggestion: null, index });
+				setPreviewAlternativeSelection({ index });
 				setPreviewIndex(index);
 			}}
 		/>
@@ -93,12 +95,12 @@ describe("PlannerPanel Alternatives", () => {
 
 		await userEvent.click(screen.getByRole("button", { name: en.alternativesManager.nextSuggestion }));
 
-		expect(setPreviewAlternativeSelection).toHaveBeenCalledWith({ suggestion: null, index: 1 });
+		expect(setPreviewAlternativeSelection).toHaveBeenCalledWith({ index: 1 });
 		expect(optionReadout(container)).toContain(`${en.alternativesManager.option}2/ 3`);
 
 		await userEvent.click(screen.getByRole("button", { name: en.alternativesManager.previousSuggestion }));
 
-		expect(setPreviewAlternativeSelection).toHaveBeenLastCalledWith({ suggestion: null, index: 0 });
+		expect(setPreviewAlternativeSelection).toHaveBeenLastCalledWith({ index: 0 });
 		expect(optionReadout(container)).toContain(`${en.alternativesManager.option}1/ 3`);
 	});
 
@@ -238,6 +240,25 @@ describe("PlannerPanel budget readout", () => {
 		await userEvent.click(reset);
 
 		expect(resetManualSelection).toHaveBeenCalledOnce();
+		expect(askForPlan).toHaveBeenCalledOnce();
 		expect(track).toHaveBeenCalledExactlyOnceWith({ event: "manual_changes_reset", properties: { surface: "panel" } });
+	});
+});
+
+describe("PlannerPanel numbers in the reader's own format", () => {
+	const NARROW_SPACES = /[\u00A0\u202F]/g;
+
+	it("writes the German readouts with a decimal comma and a spaced percent sign", () => {
+		const { container } = render(
+			<NextIntlClientProvider locale="de" messages={de}>
+				<PlannerPanel {...panelProps} selectedIndex={1} />
+			</NextIntlClientProvider>,
+		);
+		const readouts = Array.from(container.querySelectorAll(".sr-only")).map((node) =>
+			(node.textContent ?? "").replace(NARROW_SPACES, " "),
+		);
+
+		expect(readouts).toContain(`${de.alternativesManager.efficiency}: 1,8x (-0,2)`);
+		expect(readouts).toContain(`${de.alternativesManager.comparison}: 90 %`);
 	});
 });

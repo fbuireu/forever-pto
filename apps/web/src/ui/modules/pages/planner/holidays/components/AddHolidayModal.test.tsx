@@ -4,10 +4,11 @@ import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { mockToastError, mockToastSuccess, addHoliday } = vi.hoisted(() => ({
+const { mockToastError, mockToastSuccess, addHoliday, askForPlan } = vi.hoisted(() => ({
 	mockToastError: vi.fn(),
 	mockToastSuccess: vi.fn(),
 	addHoliday: vi.fn(() => ({ applied: true as const })),
+	askForPlan: vi.fn(),
 }));
 
 const PICKED = new Date(2026, 4, 1);
@@ -15,12 +16,12 @@ const PICKED = new Date(2026, 4, 1);
 vi.mock("sonner", () => ({ toast: { error: mockToastError, success: mockToastSuccess } }));
 vi.mock("@application/stores/holidays", () => ({
 	useHolidaysStore: (selector: (state: unknown) => unknown) =>
-		selector({ holidays: [], currentSelection: null, addHoliday }),
+		selector({ holidays: [], currentSelection: null, addHoliday, askForPlan }),
 }));
 vi.mock("@application/stores/filters", () => ({
 	useFiltersStore: (selector: (state: unknown) => unknown) => selector({ year: 2026, carryOverMonths: 3 }),
 }));
-vi.mock("@ui/modules/pages/planner/calendar/Calendar", () => ({
+vi.mock("../../calendar/Calendar", () => ({
 	Calendar: ({ onSelect }: { onSelect?: (date: Date) => void }) => (
 		<button type="button" onClick={() => onSelect?.(PICKED)}>
 			pick a date
@@ -55,6 +56,7 @@ describe("AddHolidayModal", () => {
 			carryOverMonths: 3,
 			year: 2026,
 		});
+		expect(askForPlan).toHaveBeenCalledOnce();
 		expect(mockToastSuccess).toHaveBeenCalledWith(en.modals.addHoliday.successTitle, {
 			description: "Company shutdown has been added on May 1, 2026",
 		});

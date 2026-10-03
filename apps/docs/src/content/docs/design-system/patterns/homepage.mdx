@@ -9,7 +9,7 @@ import { brutCard, SHOWCASE_PLAN } from '@ui/modules/pages/homepage/sections/sha
 import { BrutCardDemo, DayCellsDemo, DAY_TYPE_ROWS } from '../../../../components/demos/HomepagePatternsDemo';
 import { VariantsTable } from '../../../../components/VariantsTable';
 
-Source: `apps/web/src/ui/modules/pages/homepage/sections/shared.ts`. The homepage sections (`Hero`, `Features`, `Comparison`, `HowItWorks`, `Pricing`, `Testimonials` under `apps/web/src/ui/modules/pages/homepage/sections/`) do not share components; they share **class-string constants**. This file is pure data (a type, two class maps, a fixture array and the showcase plan), which is why this page can import it and render the real styles live.
+Source: `apps/web/src/ui/modules/pages/homepage/sections/shared.ts`. The homepage sections (`Hero`, `Features`, `Comparison`, `HowItWorks`, `Pricing`, `Stats`, `Testimonials` under `apps/web/src/ui/modules/pages/homepage/sections/`) share **class-string constants** rather than components, the planner call to action (`QuickStartTrigger`) aside. This file is pure data (a type, the `dayCell` class map, the `brutCard` class string, a fixture array, the showcase plan and its ratio), which is why this page can import it and render the real styles live.
 
 ## brutCard
 

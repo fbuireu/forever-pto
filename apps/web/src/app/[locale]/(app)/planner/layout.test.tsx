@@ -108,4 +108,19 @@ describe("planner/layout", () => {
 		const innerChildren = [(appSidebarEl as { props: { children: unknown } }).props.children].flat();
 		expect(innerChildren).toContain(child);
 	});
+
+	it("lifts the donate button clear of the mobile drawer's collapsed snap point", async () => {
+		const { DRAWER_SNAP } = await import("@ui/modules/pages/planner/ManagementBar");
+		const element = await AppLayout(makeParams());
+		const sidebarProviderChildren = [element.props.children].flat();
+		const appSidebarEl = sidebarProviderChildren.find(
+			(c: unknown) => (c as { type?: unknown })?.type === MockAppSidebar,
+		);
+		const innerChildren = [(appSidebarEl as { props: { children: unknown } }).props.children].flat();
+		const donate = innerChildren.find((c: unknown) => (c as { type?: unknown })?.type === MockDonateClient) as {
+			props: { bottomClassName?: string };
+		};
+
+		expect(donate.props.bottomClassName).toContain(`bottom-[calc(${Math.round(DRAWER_SNAP.COLLAPSED * 100)}dvh+8px)]`);
+	});
 });

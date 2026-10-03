@@ -1,6 +1,7 @@
 "use client";
 
 import { useFiltersStore } from "@application/stores/filters";
+import { useHolidaysStore } from "@application/stores/holidays";
 import { FilterStrategy } from "@domain/calendar/types";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@ui/modules/core/animate/base/Collapsible";
@@ -9,13 +10,13 @@ import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
 import { Card, CardDescription } from "@ui/modules/core/primitives/Card";
 import { Combobox } from "@ui/modules/core/primitives/Combobox";
 import { STRATEGY_ICONS } from "@ui/modules/shared/strategyIcons";
-import { PreferredMonths } from "@ui/modules/sidebar/components/PreferredMonths";
-import { SidebarFieldLabel } from "@ui/modules/sidebar/components/SidebarFieldLabel";
 import { cn } from "@ui/utils/cn";
 import { AlertCircle, CheckCircle2, DicesIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
+import { PreferredMonths } from "./PreferredMonths";
+import { SidebarFieldLabel } from "./SidebarFieldLabel";
 
 interface StrategyDetails {
 	label: string;
@@ -33,6 +34,7 @@ export const Strategy = () => {
 			setStrategy: state.setStrategy,
 		})),
 	);
+	const askForPlan = useHolidaysStore((state) => state.askForPlan);
 	const [detailsOpen, setDetailsOpen] = useState(false);
 
 	const strategies = useMemo(() => {
@@ -71,6 +73,7 @@ export const Strategy = () => {
 	}, [t]);
 
 	const handleStrategyChange = (value: FilterStrategy) => {
+		if (value !== strategy) askForPlan();
 		setStrategy(value);
 		track({ event: "planning_input_changed", properties: { input: "strategy", inputValue: value } });
 	};
@@ -101,9 +104,7 @@ export const Strategy = () => {
 				<Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
 					<AnimateIcon animateOnHover>
 						<CollapsibleTrigger className="flex items-center justify-between w-full mt-4 px-2 py-1 text-xs font-medium cursor-pointer rounded-md border-0 shadow-none bg-transparent hover:bg-[var(--surface-panel-soft)] hover:shadow-none hover:translate-x-0 hover:translate-y-0 active:shadow-none active:translate-x-0 active:translate-y-0 aria-expanded:shadow-none aria-expanded:translate-x-0 aria-expanded:translate-y-0 before:hidden">
-							<span>
-								{detailsOpen ? t("hide") : t("expand")} {t("strategyDetails")}
-							</span>
+							<span>{detailsOpen ? t("hideDetails") : t("showDetails")}</span>
 							<ChevronDown className={cn("size-4 transition-transform duration-200", detailsOpen && "rotate-180")} />
 						</CollapsibleTrigger>
 					</AnimateIcon>

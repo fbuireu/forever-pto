@@ -8,11 +8,11 @@ import type { ComponentType, ReactNode } from "react";
 export const MetricCardSize = {
 	DEFAULT: "default",
 	COMPACT: "compact",
-};
+} as const;
 
 export type MetricCardSize = (typeof MetricCardSize)[keyof typeof MetricCardSize];
 
-interface MetricCardProps {
+interface MetricCardBaseProps {
 	label: string;
 	value: string | number;
 	icon:
@@ -23,14 +23,25 @@ interface MetricCardProps {
 					className?: string;
 				} & Omit<SVGMotionProps<SVGSVGElement>, "animate">
 		  >;
-	badge?: string | ReactNode;
 	colorScheme: keyof typeof COLOR_SCHEMES;
-	size?: MetricCardSize;
 	className?: string;
 	symbol?: string;
-	hint?: string;
 	decimalPlaces?: number;
 }
+
+interface DefaultMetricCardProps extends MetricCardBaseProps {
+	size?: typeof MetricCardSize.DEFAULT;
+	badge?: ReactNode;
+	hint?: never;
+}
+
+interface CompactMetricCardProps extends MetricCardBaseProps {
+	size: typeof MetricCardSize.COMPACT;
+	hint?: string;
+	badge?: never;
+}
+
+type MetricCardProps = DefaultMetricCardProps | CompactMetricCardProps;
 
 const COLOR_SCHEMES = {
 	blue: {
@@ -87,21 +98,13 @@ const COLOR_SCHEMES = {
 	},
 };
 
-export const MetricCard = ({
-	label,
-	value,
-	icon: Icon,
-	badge,
-	colorScheme,
-	symbol,
-	hint,
-	decimalPlaces = 0,
-	size = MetricCardSize.DEFAULT,
-	className = "",
-}: MetricCardProps) => {
+export const MetricCard = (props: MetricCardProps) => {
+	const { label, value, icon: Icon, colorScheme, symbol, decimalPlaces = 0, className = "" } = props;
 	const colors = COLOR_SCHEMES[colorScheme];
 
-	if (size === MetricCardSize.COMPACT) {
+	if (props.size === MetricCardSize.COMPACT) {
+		const { hint } = props;
+
 		return (
 			<div
 				className={cn(
@@ -125,6 +128,8 @@ export const MetricCard = ({
 			</div>
 		);
 	}
+
+	const { badge } = props;
 
 	return (
 		<div

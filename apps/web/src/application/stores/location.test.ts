@@ -22,18 +22,13 @@ vi.mock("@infrastructure/services/regions/getRegions", () => ({
 	getRegions: vi.fn().mockReturnValue([]),
 }));
 
-const INITIAL = {
-	countries: [],
-	regions: [],
-};
-
 const MOCK_COUNTRIES: CountryDTO[] = [
 	{ value: "ES", label: "Spain", flag: "es" },
 	{ value: "FR", label: "France", flag: "fr" },
 ];
 
 beforeEach(() => {
-	useLocationStore.setState(INITIAL);
+	useLocationStore.setState(useLocationStore.getInitialState());
 	vi.clearAllMocks();
 });
 

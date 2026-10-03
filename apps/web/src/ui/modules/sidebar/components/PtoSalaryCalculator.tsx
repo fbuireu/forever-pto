@@ -4,14 +4,19 @@ import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { SlidingNumber } from "@ui/modules/core/animate/text/SlidingNumber";
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@ui/modules/core/primitives/InputGroup";
 import { ConditionalWrapper } from "@ui/modules/shared/ConditionalWrapper";
-import { SidebarFieldTooltip } from "@ui/modules/sidebar/components/SidebarFieldLabel";
 import { DEFAULT_CURRENCY, DEFAULT_CURRENCY_SYMBOL } from "@ui/utils/currencies";
 import { Euro } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
+import { SidebarFieldTooltip } from "./SidebarFieldLabel";
 
 const WORKING_DAYS_PER_YEAR = 252;
 const HOURS_PER_DAY = 8;
+
+const parseSalary = (input: string) => {
+	const parsed = Number.parseFloat(input);
+	return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+};
 
 interface CurrencyNumberProps {
 	value: number;
@@ -48,7 +53,7 @@ export const PtoSalaryCalculator = () => {
 	const locale = useLocale();
 	const t = useTranslations("ptoSalaryCalculator");
 	const [annualSalaryInput, setAnnualSalaryInput] = useState("");
-	const [unusedPTODays, setUnusedPTODays] = useState<number>(5);
+	const [unusedPTODaysInput, setUnusedPTODaysInput] = useState("5");
 
 	const currencyPosition = useMemo(() => {
 		try {
@@ -62,8 +67,8 @@ export const PtoSalaryCalculator = () => {
 		}
 	}, [locale]);
 
-	const parsedSalary = Number.parseFloat(annualSalaryInput);
-	const annualSalary = Number.isFinite(parsedSalary) && parsedSalary > 0 ? parsedSalary : 0;
+	const annualSalary = parseSalary(annualSalaryInput);
+	const unusedPTODays = Number(unusedPTODaysInput);
 
 	const dailyRate = annualSalary / WORKING_DAYS_PER_YEAR;
 	const unusedPTOValue = dailyRate * unusedPTODays;
@@ -71,12 +76,20 @@ export const PtoSalaryCalculator = () => {
 	const workedDays = WORKING_DAYS_PER_YEAR + unusedPTODays;
 	const effectiveHourlyRate = annualSalary / workedDays / HOURS_PER_DAY;
 	const showResults = annualSalary > 0 && unusedPTODays >= 0;
-	const hadResults = useRef(false);
 
-	useEffect(() => {
-		if (showResults && !hadResults.current) track({ event: "tool_used", properties: { tool: "ptoSalaryCalculator" } });
-		hadResults.current = showResults;
-	}, [showResults]);
+	const reportFirstFigures = (willShowResults: boolean) => {
+		if (willShowResults && !showResults) track({ event: "tool_used", properties: { tool: "ptoSalaryCalculator" } });
+	};
+
+	const handleSalaryChange = (value: string) => {
+		setAnnualSalaryInput(value);
+		reportFirstFigures(parseSalary(value) > 0 && unusedPTODays >= 0);
+	};
+
+	const handleUnusedDaysChange = (value: string) => {
+		setUnusedPTODaysInput(value);
+		reportFirstFigures(annualSalary > 0 && Number(value) >= 0);
+	};
 
 	return (
 		<div className="space-y-2 w-full">
@@ -101,7 +114,7 @@ export const PtoSalaryCalculator = () => {
 						min="0"
 						step="1000"
 						value={annualSalaryInput}
-						onChange={(e) => setAnnualSalaryInput(e.target.value)}
+						onChange={(e) => handleSalaryChange(e.target.value)}
 						placeholder={t("annualSalaryPlaceholder", { amount: 50_000 })}
 					/>
 				</InputGroup>
@@ -117,8 +130,8 @@ export const PtoSalaryCalculator = () => {
 						max="50"
 						inputMode="numeric"
 						autoComplete="off"
-						value={unusedPTODays}
-						onChange={(e) => setUnusedPTODays(Number(e.target.value))}
+						value={unusedPTODaysInput}
+						onChange={(e) => handleUnusedDaysChange(e.target.value)}
 						placeholder={t("unusedPtoDaysPlaceholder", { days: 5 })}
 					/>
 				</InputGroup>

@@ -15,7 +15,7 @@ vi.mock("next/dynamic", () => ({
 		return () => <div data-testid="cookie-consent" />;
 	},
 }));
-vi.mock("@ui/modules/shared/cookie-consent/CookieConsent", () => ({ CookieConsent: MockCookieConsent }));
+vi.mock("./CookieConsent", () => ({ CookieConsent: MockCookieConsent }));
 
 const { CookieConsentClient } = await import("./CookieConsentClient");
 

@@ -33,3 +33,14 @@ describe("Toaster", () => {
 		expect(screen.getAllByRole("button", { name: "Close toast" }).length).toBeGreaterThan(0);
 	});
 });
+
+describe("Toaster close button", () => {
+	it("holds its hit area still while it lifts on hover", async () => {
+		await showToast();
+		const [close] = screen.getAllByRole("button", { name: "Close toast" });
+		const classes = (close?.className ?? "").split(" ");
+
+		expect(classes).toContain("hover:!-translate-x-0.5");
+		expect(classes).toContain("hit-area-stable");
+	});
+});

@@ -1,27 +1,30 @@
 "use client";
 
 import { useFiltersStore } from "@application/stores/filters";
+import { useHolidaysStore } from "@application/stores/holidays";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
+import { useCurrentYear } from "@ui/hooks/useCurrentYear";
+import { useStoresReady } from "@ui/hooks/useStoresReady";
 import { Popover, PopoverContent, PopoverTrigger } from "@ui/modules/core/animate/base/Popover";
 import { Check } from "@ui/modules/core/animate/icons/Check";
 import { ChevronDown } from "@ui/modules/core/animate/icons/ChevronDown";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { Command, CommandGroup, CommandItem, CommandList } from "@ui/modules/core/primitives/Command";
-import { SidebarFieldLabel } from "@ui/modules/sidebar/components/SidebarFieldLabel";
 import { cn } from "@ui/utils/cn";
 import { Calendar } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useShallow } from "zustand/react/shallow";
+import { SidebarFieldLabel } from "./SidebarFieldLabel";
 
 const MAX_YEARS = 10;
 
 interface YearsProps {
-	currentYear: number;
+	serverYear: number;
 }
 
-export const Years = ({ currentYear }: YearsProps) => {
+export const Years = ({ serverYear }: YearsProps) => {
 	const t = useTranslations("sidebar.years");
 	const [open, setOpen] = useState(false);
 	const { year, setYear } = useFiltersStore(
@@ -30,6 +33,9 @@ export const Years = ({ currentYear }: YearsProps) => {
 			setYear: state.setYear,
 		})),
 	);
+	const askForPlan = useHolidaysStore((state) => state.askForPlan);
+	const currentYear = useCurrentYear({ serverYear });
+	const { areStoresReady } = useStoresReady();
 
 	const years = Array.from({ length: MAX_YEARS }, (_, index) => currentYear - MAX_YEARS / 2 + index);
 
@@ -43,9 +49,9 @@ export const Years = ({ currentYear }: YearsProps) => {
 						variant="outline"
 						aria-expanded={open}
 						aria-haspopup="listbox"
-						className={cn("w-full justify-between")}
+						className="w-full justify-between"
 					>
-						{year}
+						{areStoresReady ? year : serverYear}
 						<AnimateIcon animateOnHover>
 							<ChevronDown className={cn("opacity-50 transition-transform duration-200", open && "rotate-180")} />
 						</AnimateIcon>
@@ -61,6 +67,7 @@ export const Years = ({ currentYear }: YearsProps) => {
 											key={yearOption}
 											value={String(yearOption)}
 											onSelect={() => {
+												if (yearOption !== year) askForPlan();
 												setYear(yearOption);
 												track({
 													event: "planning_input_changed",
