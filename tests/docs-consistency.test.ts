@@ -74,6 +74,7 @@ const DEPLOY_TOOL_COMMAND = /\b(?:wrangler|opennextjs-cloudflare) deploy\b/;
 const SECRET_TOOL_COMMAND = /\bwrangler secret\b/;
 const WRANGLER_ACTION_DEPLOY = /\bcommand:[ \t]*deploy\b/;
 const ALIAS_WILDCARD_SUFFIX = /\/\*$/;
+const WORKSPACE_PACKAGES_BLOCK = /^packages:\r?\n((?:[ \t]+-.*\r?\n?)+)/m;
 const WORKSPACE_PACKAGE_GLOB = /^\s*-\s*['"]?([^'"\s#]+)['"]?\s*$/gm;
 const GITHUB_WORKFLOW_EXPRESSION = /\$\{\{\s*github\.workflow\s*\}\}/;
 const GITHUB_REF_EXPRESSION = /\$\{\{\s*github\.ref\s*\}\}/;
@@ -535,7 +536,8 @@ describe("CONTEXT.md is the domain glossary and nothing else", () => {
 });
 
 describe("the workspace is shaped the way the guides describe it", () => {
-	const workspaceGlobs = [...read("pnpm-workspace.yaml").matchAll(WORKSPACE_PACKAGE_GLOB)].map(([, glob]) => glob);
+	const packagesBlock = read("pnpm-workspace.yaml").match(WORKSPACE_PACKAGES_BLOCK)?.[1] ?? "";
+	const workspaceGlobs = [...packagesBlock.matchAll(WORKSPACE_PACKAGE_GLOB)].map(([, glob]) => glob);
 
 	it("declares package globs that match a directory holding a manifest", () => {
 		const dangling = workspaceGlobs.filter((glob) => {
