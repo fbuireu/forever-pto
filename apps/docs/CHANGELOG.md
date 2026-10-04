@@ -1,3 +1,10 @@
+# [forever-pto-docs-v1.5.2](https://github.com/fbuireu/forever-pto/compare/docs-v1.5.1...docs-v1.5.2) (2026-10-04)
+
+
+### Bug Fixes
+
+* guard the checkout hand-back, report redirect activations and name concepts by their term ([cf66e57](https://github.com/fbuireu/forever-pto/commit/cf66e57da189c1af80a449dae791ba5798ca454b))
+
 # [forever-pto-docs-v1.5.1](https://github.com/fbuireu/forever-pto/compare/docs-v1.5.0...docs-v1.5.1) (2026-10-02)
 
 
