@@ -7,8 +7,6 @@ import type { VariantRow } from "../VariantsTable";
 
 type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>["variant"]>;
 
-// Exhaustive Record over the real CVA types: adding, renaming or removing a
-// variant in the app makes `astro check` fail here, keeping the docs honest.
 const VARIANT_LABELS: Record<BadgeVariant, string> = {
 	default: "Default",
 	secondary: "Secondary",

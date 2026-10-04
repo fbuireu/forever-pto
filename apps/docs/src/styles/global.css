@@ -1,22 +1,3 @@
-/*
- * Docs stylesheet. Reuses the app's real design tokens and Tailwind v4 theme so
- * the live component demos render exactly as in production.
- *
- * Import order matters:
- * 1. App theme first: its @custom-variant (dark, hover) get defined...
- * 2. ...then @astrojs/starlight-tailwind re-declares `dark` (root + descendants,
- *    a superset of the app's descendants-only variant) and wins.
- * 3. Tailwind theme + utilities WITHOUT preflight, since Starlight owns base styles;
- *    importing 'tailwindcss' wholesale would double the preflight.
- * Never import apps/web/src/ui/styles/index.css here (full tailwindcss + app layers).
- *
- * The @layer statement below reads as if it were dropped: the emitted bundle carries
- * only `@layer starlight,theme,components;`. It is not. Lightning CSS prunes the names
- * it can already see declared in the right position, and the shipped first appearances
- * are base, then that statement, then utilities, which is this line exactly. Delete it
- * and the bundle changes: the @theme variables land unlayered and the order becomes
- * base, utilities, theme, starlight, so Starlight outranks the app's own utilities.
- */
 @layer base, starlight, theme, components, utilities;
 
 @import "../../../web/src/ui/styles/theme/index.css";
@@ -33,17 +14,10 @@
 @import "@fontsource/instrument-serif";
 @import "@fontsource/instrument-serif/400-italic.css";
 
-/* Generate the Tailwind utilities used by the app components living outside
-   the docs root. @source only extracts class strings, so scanning Next-coupled
-   files (Sonner, RichLink...) is harmless. */
 @source "../../../web/src/ui/modules/core";
-/* Homepage pattern constants (brutCard, dayCell) demoed on
-   design-system/patterns/homepage; their classes live outside core. */
 
 @source "../../../web/src/ui/modules/pages/homepage/sections/shared.ts";
 
-/* The app sets these via next/font; here @fontsource self-hosts the same
-   families and we point the raw variables at them. */
 :root {
 	--font-bricolage: "Bricolage Grotesque Variable";
 	--font-space-grotesk: "Space Grotesk Variable";
@@ -54,8 +28,6 @@
 	--sl-font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 }
 
-/* Map the brand onto Starlight's chrome: starlight-tailwind wires the
-   accent/gray Tailwind scales into the --sl-color-* custom properties. */
 @theme {
 	--color-accent-50: #fffbeb;
 	--color-accent-100: #fff5c7;
@@ -80,14 +52,10 @@
 	--color-gray-900: #1a1612;
 }
 
-/* Brutal touches on Starlight chrome */
 :root {
 	--sl-text-h1: 2.75rem;
 }
 
-/* Scoped copy of the app's base [data-slot] transition block
-   (apps/web/src/ui/styles/base/index.css is not importable wholesale) so demoed
-   components keep their color/filter easing. */
 button[data-slot],
 [data-slot="button"],
 [data-slot="badge"],
@@ -103,9 +71,6 @@ button[data-slot],
 		color 120ms ease;
 }
 
-/* Mermaid diagrams, drawn at build time by src/lib/mermaid-plugin.ts as two
-   figures, one per theme; the mermaid-light/-dark rules below show one.
-   The frame matches the demo canvas; a click toggles the natural size. */
 figure.mermaid {
 	background: var(--surface-panel);
 	background-image: var(--page-glow);
@@ -137,8 +102,6 @@ figure.mermaid {
 	justify-content: center;
 }
 
-/* One copy per theme, picked the way the app picks its tokens: light by default, the system preference
-   when the reader has not chosen, and the explicit choice above both. */
 figure.mermaid-dark {
 	display: none;
 }
@@ -191,13 +154,6 @@ figure.mermaid.mermaid-expanded > svg {
 	max-width: none;
 }
 
-/* ---------------------------------------------------------------------------
-   Neobrutalist chrome. Starlight's defaults are soft and rounded; the app is
-   hard frames, offset shadows and a display face. Every rule below reads the
-   app's own tokens (--frame, --accent, --surface-panel-*, --shadow-brutal-*)
-   so the wiki re-themes with the app and flips with data-theme like it does.
-   --------------------------------------------------------------------------- */
-
 :root {
 	--sl-color-hairline: color-mix(in srgb, var(--frame) 18%, transparent);
 	--sl-color-hairline-light: color-mix(in srgb, var(--frame) 28%, transparent);
@@ -221,9 +177,6 @@ figure.mermaid.mermaid-expanded > svg {
 	font-weight: 600;
 }
 
-/* Tables: the app's Table primitive, in markdown */
-/* Starlight renders a table as display: block so it can scroll; that also stops it
-   filling the column. A real table at full width, wrapping long cells instead. */
 .sl-markdown-content table:not(:where(.not-content *)) {
 	border: 3px solid var(--frame);
 	border-collapse: separate;
@@ -232,9 +185,6 @@ figure.mermaid.mermaid-expanded > svg {
 	box-shadow: var(--shadow-brutal-sm);
 	display: table;
 	margin-block: 1.5rem;
-	/* `break-word`, never `anywhere`: `anywhere` is taken into account when the browser computes a
-     column's minimum width, so a narrow column collapses to one character per line. The Value
-     column of the tunables table read as a vertical "V A L U E" until this changed. */
 	overflow-wrap: break-word;
 	width: 100%;
 }
@@ -246,7 +196,6 @@ figure.mermaid.mermaid-expanded > svg {
 	font-weight: 900;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
-	/* A header is two or three words; wrapping one is what made it unreadable. */
 	white-space: nowrap;
 }
 
@@ -273,20 +222,12 @@ figure.mermaid.mermaid-expanded > svg {
 	border-bottom: 0;
 }
 
-/* A long identifier does not wrap, so it sets its column's minimum width and squeezes the prose
-   beside it. The generated tables (props, variants, tunables, strategies) pin their columns with a
-   colgroup instead, and only there is the eager break wanted: inside a fixed layout a token that
-   does not fit has nowhere else to go. */
 .sl-markdown-content table[style*="fixed"] :is(td, th) code {
-	/* Tighter than prose code: the padding of the default chrome is what pushed a nine-character
-     token past its pinned column and broke the closing quote onto its own line. */
 	font-size: 0.78em;
 	overflow-wrap: anywhere;
 	padding-inline: 0.3em;
 }
 
-/* Below the sidebar breakpoint the column is too narrow for a wide table to fill honestly, so it
-   goes back to Starlight's scrolling block instead of squeezing every column. */
 @media (max-width: 50rem) {
 	.sl-markdown-content table:not(:where(.not-content *)) {
 		display: block;
@@ -294,7 +235,6 @@ figure.mermaid.mermaid-expanded > svg {
 	}
 }
 
-/* The theme and language pickers, framed the way the app frames a control */
 starlight-theme-select > label,
 starlight-lang-select > label {
 	background: var(--surface-panel);
@@ -334,7 +274,6 @@ starlight-lang-select select option {
 	color: var(--foreground);
 }
 
-/* Asides: full frame, hard shadow, the tint kept */
 .starlight-aside {
 	border: 3px solid var(--frame);
 	border-inline-start-width: 3px;
@@ -348,18 +287,12 @@ starlight-lang-select select option {
 	letter-spacing: -0.01em;
 }
 
-/* A `pre` a component renders itself is not an Expressive Code block and inherits none of its chrome,
-   overflow included, so a line wider than the column pushes the whole page sideways instead of
-   scrolling inside its own box. The old Balanced score formula did exactly that on a phone; StrategyRanking relies on this rule.
-   `min-width: 0` is the half that matters: the content column is a grid item, and without it the
-   block's min-content width sets the column's, so `overflow-x` alone has nothing to clip against. */
 .sl-markdown-content pre:not(:where(.expressive-code *, .not-content *)) {
 	max-width: 100%;
 	min-width: 0;
 	overflow-x: auto;
 }
 
-/* Code blocks: Expressive Code exposes its frame through variables */
 .expressive-code {
 	--ec-brdCol: var(--frame);
 	--ec-brdWd: 3px;
@@ -370,7 +303,6 @@ starlight-lang-select select option {
 	box-shadow: var(--shadow-brutal-sm);
 }
 
-/* Landing hero and its actions */
 .hero h1 {
 	font-family: var(--font-bricolage), var(--sl-font);
 	font-weight: 900;
@@ -394,7 +326,6 @@ starlight-lang-select select option {
 		box-shadow 80ms linear;
 }
 
-/* Starlight zeroes the inline padding of the minimal variant; with a frame on it, that reads as clipped */
 .sl-link-button.minimal {
 	padding-inline: 1.125rem !important;
 }
@@ -420,7 +351,6 @@ starlight-lang-select select option {
 	translate: -2px -2px;
 }
 
-/* Card grid on the landing pages */
 .sl-markdown-content .card {
 	background: var(--surface-panel);
 	border: 3px solid var(--frame);
@@ -431,8 +361,6 @@ starlight-lang-select select option {
 		box-shadow 80ms linear;
 }
 
-/* `translate`, not `transform`: CardGrid's stagger positions the second column with a transform, and a
-   hover transform would replace it, so the card jumped up by the whole stagger height. */
 .sl-markdown-content .card:hover {
 	box-shadow: var(--shadow-brutal-lg);
 	translate: -2px -2px;
@@ -452,7 +380,6 @@ starlight-lang-select select option {
 	padding: 0.3rem;
 }
 
-/* Sidebar: the current page is a lifted accent pill */
 .sidebar-content .large {
 	font-family: var(--font-bricolage), var(--sl-font);
 	font-weight: 800;
@@ -484,7 +411,6 @@ starlight-lang-select select option {
 	--sl-badge-success-text: var(--color-brand-ink);
 }
 
-/* Search trigger and pagination */
 site-search > button {
 	border: 2px solid var(--frame);
 	border-radius: 8px;
@@ -505,7 +431,6 @@ site-search > button {
 	translate: -2px -2px;
 }
 
-/* Live demo frames carry a chip naming where the component comes from */
 .demo-frame {
 	position: relative;
 }
@@ -528,8 +453,6 @@ site-search > button {
 	z-index: 1;
 }
 
-/* The site's own chrome: the cream page glow behind everything, the 4px ink rule
-   under the header and the panel-tinted sidebar, all as the app draws them. */
 body {
 	background-color: var(--background);
 	background-image: var(--page-glow);
@@ -557,11 +480,6 @@ header.header {
 	border-inline-start: 2px solid var(--sl-color-hairline);
 }
 
-/* The app's components assume Tailwind's preflight, which this site deliberately does not import
-   (Starlight owns the base layer). Without it a `ghost` Button keeps the browser's own ButtonFace
-   grey and every form control renders in the UA font. This is the slice of preflight the demos
-   depend on, scoped to `.not-content` so Starlight's own chrome keeps its styles, and inside
-   `@layer base` so a `bg-*` utility still wins: unlayered, it would flatten every filled Button. */
 @layer base {
 	.not-content :is(button, input, optgroup, select, textarea) {
 		background-color: transparent;

@@ -7,9 +7,6 @@ import type { VariantRow } from "../VariantsTable";
 
 type AddonAlign = NonNullable<ComponentProps<typeof InputGroupAddon>["align"]>;
 
-// Exhaustive Record over the real `align` prop union (derived from the CVA
-// object through the component's props): a renamed, added or removed align
-// value in the app makes `astro check` fail here.
 const ALIGN_LABELS: Record<AddonAlign, string> = {
 	"inline-start": "Inline start",
 	"inline-end": "Inline end",

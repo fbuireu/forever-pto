@@ -2,10 +2,6 @@ import { Badge } from "@ui/modules/core/primitives/Badge";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { Demo } from "../Demo";
 
-/**
- * Anatomy of the brutal language rendered with the real app primitives:
- * hard border, offset shadow, hover lift, and a rotated accent.
- */
 export const PhilosophyDemo = () => (
 	<Demo>
 		<Button variant="accent">Hover for the lift</Button>

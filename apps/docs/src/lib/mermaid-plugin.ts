@@ -17,11 +17,6 @@ export const mermaidPlugin: MdastPlugin = {
 			throw new Error(`Mermaid could not draw a diagram in ${context.fileURL ?? "an unknown page"}: ${String(error)}`);
 		}
 
-		// One figure per theme, replacing the fence with two nodes rather than one holding both. Parsed
-		// together, a label drawn as `<foreignObject>` HTML keeps the parser inside the first diagram's
-		// subtree and the second `<svg>` lands in it; `mermaid-render.ts` draws labels as SVG text, and
-		// each raw node is parsed on its own besides, so the two stay siblings. `global.css` shows one,
-		// keyed on `data-theme` the way the app's own tokens are.
 		const source = encodeURIComponent(node.value);
 		const figure = (svg: string, theme: "light" | "dark") => ({
 			raw: `<figure class="${MERMAID_LANG} mermaid-${theme}" data-mermaid="${source}">${svg}</figure>`,

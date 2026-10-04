@@ -5,13 +5,6 @@ export interface VariantRow {
 	notes?: string;
 }
 
-/**
- * Renders a component's variant axes. Demo wrappers build the rows from
- * `Record<Variant, …>` maps typed against the real CVA exports
- * (`VariantProps<typeof buttonVariants>`), so a renamed, added or removed
- * variant in the app breaks `astro check` instead of silently letting this
- * documentation drift.
- */
 export const VariantsTable = ({ rows }: { rows: VariantRow[] }) => {
 	return (
 		<table style={{ tableLayout: "fixed" }}>

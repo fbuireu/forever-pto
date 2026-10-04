@@ -79,7 +79,7 @@ Each fails `astro check`, which runs in `pnpm typecheck` at the repository root 
 
 ## The app's stylesheets, reused
 
-`src/styles/global.css` imports the app's `theme/index.css`, `global/index.css` and `utilities/index.css` directly, so the tokens the demos read (`--frame`, `--accent`, the `--shadow-brutal-*` scale) are the app's values, in light and dark. It never imports the app's `index.css`: that carries a full Tailwind preflight and a layer order that collides with Starlight's. The import order in that file is deliberate and its header comment says why; read it before touching it.
+`src/styles/global.css` imports the app's `theme/index.css`, `global/index.css` and `utilities/index.css` directly, so the tokens the demos read (`--frame`, `--accent`, the `--shadow-brutal-*` scale) are the app's values, in light and dark. It never imports the app's `index.css`: that carries a full Tailwind preflight and a layer order that collides with Starlight's. The import order in that file is deliberate and `apps/docs/AGENTS.md` says why; read it before touching the file.
 
 Two more directives close the loop. `@source` points Tailwind at `apps/web/src/ui/modules/core` and at the homepage's `shared.ts`, so the utilities those files name are generated here even though no file in this package writes them. And the four font families the app registers through `next/font` are self-hosted here through `@fontsource` and pointed at the same `--font-*` variable names, since there is no Next here to inject them; the contract suite asserts every registered variable is declared.
 

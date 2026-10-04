@@ -2,8 +2,6 @@ import { brutCard, CAL_ENTRIES, type DayType, dayCell } from "@ui/modules/pages/
 import { Demo } from "../Demo";
 import type { VariantRow } from "../VariantsTable";
 
-// Exhaustive Record over the app's DayType union: adding, renaming or removing
-// a day type in shared.ts makes `astro check` fail here, keeping the docs honest.
 const DAY_LABELS: Record<DayType, string> = {
 	work: "Work day",
 	holiday: "Public holiday",

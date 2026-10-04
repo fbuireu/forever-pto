@@ -23,10 +23,6 @@ const TOKEN_NAMES = [
 ] as const;
 type Tokens = Record<(typeof TOKEN_NAMES)[number], string>;
 
-/**
- * The app's own light and dark palettes, read out of the stylesheet the demos are styled by rather than
- * spelled here a second time. A token the sheet stops declaring fails the build by name.
- */
 const readTokens = (): { light: Tokens; dark: Tokens } => {
 	const css = readFileSync(APP_TOKENS, "utf8");
 	const block = (selector: RegExp) => {
@@ -44,8 +40,6 @@ const readTokens = (): { light: Tokens; dark: Tokens } => {
 		}),
 	) as Tokens;
 
-	// The dark block restates only the tokens that change; the rest cascade from `:root`, so a name
-	// missing there is inheritance rather than an omission.
 	const darkBlock = block(/\[data-theme="dark"\]\s*\{([\s\S]*?)\n\}/);
 	const dark = Object.fromEntries(
 		TOKEN_NAMES.map((name) => [name, declared(darkBlock, name) ?? light[name]]),
@@ -58,14 +52,8 @@ const configuration = (tokens: Tokens, dark: boolean): MermaidConfig => ({
 	startOnLoad: false,
 	securityLevel: "strict",
 	theme: "base",
-	// Pinned rather than inherited: Mermaid 12 switches flowcharts and state diagrams to ELK by default, and a
-	// Renovate bump would otherwise re-lay out every diagram on the site. A fence's own frontmatter outranks this,
-	// and the contract suite fails one that sets another layout.
 	layout: "dagre",
 	fontFamily: `${FONT_FAMILY}, system-ui, sans-serif`,
-	// SVG text rather than `<foreignObject>` HTML: the label sizes then come from the font metrics of the
-	// face loaded below, not from a page stylesheet this renderer does not have, so the layout matches what
-	// a browser would draw. It also keeps HTML out of the SVG, which is what let the two copies nest.
 	flowchart: { curve: "basis", padding: 12, htmlLabels: false },
 	htmlLabels: false,
 	sequence: { mirrorActors: false, actorMargin: 40, boxMargin: 8, messageMargin: 32 },
@@ -116,10 +104,6 @@ let browser: Promise<Browser> | undefined;
 let page: Promise<Page> | undefined;
 const rendered = new Map<string, Promise<RenderedDiagram>>();
 
-/**
- * One headless Chromium for the whole build, with the site's own body face loaded so Mermaid measures
- * labels against the glyphs the reader will see; a fallback font would size every box wrong.
- */
 const renderer = async (): Promise<Page> => {
 	if (page) return page;
 	browser = chromium.launch();
@@ -144,11 +128,6 @@ export interface RenderedDiagram {
 	dark: string;
 }
 
-/**
- * Renders one Mermaid source twice, once per theme, at build time. The result is memoised by content, so a
- * diagram repeated across locales is drawn once. A source Mermaid cannot parse rejects with its own message,
- * which the plugin turns into a build failure naming the page.
- */
 export const renderMermaid = (source: string): Promise<RenderedDiagram> => {
 	const key = createHash("sha1").update(source).digest("hex").slice(0, 12);
 	const cached = rendered.get(key);

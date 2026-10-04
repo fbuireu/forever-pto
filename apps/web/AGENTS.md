@@ -158,12 +158,13 @@ beside the [`next.config.ts`](./next.config.ts) that rewrites it.
 
 ## Conventions
 
-- **No comments in the TypeScript under `src/`**, doc comments included, bar a `biome-ignore` suppression, which
-  carries its reason on the same line (in either form, `{/* biome-ignore … */}` included), and the do-not-edit banner
-  on generated output ([`src/ui/modules/bones/registry.ts`](./src/ui/modules/bones/registry.ts)). The reason for a
-  line goes in the commit message, the pull request, an ADR or [CODING_STANDARDS.md](../../CODING_STANDARDS.md).
-  Directives (`'use client'`, `'use server'`) are strings, not comments. The contract suite fails on a comment wherever
-  it sits: opening a line, trailing code, or inside JSX.
+- **No comments in this package's hand-written source** (`src/`, `e2e/`, the configs and the stylesheets), doc comments
+  included, bar a tool directive (`@ts-expect-error`, `/// <reference>`, `@vitest-environment`, or a `biome-ignore`,
+  which carries its reason on the same line in either form, `{/* biome-ignore … */}` included) and the do-not-edit
+  banner on generated output ([`src/ui/modules/bones/registry.ts`](./src/ui/modules/bones/registry.ts),
+  `next-env.d.ts`). The reason for a line goes in the commit message, the pull request, an ADR or
+  [CODING_STANDARDS.md](../../CODING_STANDARDS.md). Directives (`'use client'`, `'use server'`) are strings, not
+  comments. The contract suite fails on a comment wherever it sits: opening a line, trailing code, or inside JSX.
 
 ## Gotchas
 

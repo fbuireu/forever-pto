@@ -7,9 +7,6 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 import { mermaidPlugin } from "./src/lib/mermaid-plugin";
 
-// tsconfig.json is the single declaration of where the app's UI layer sits: `astro check` reads it, and
-// this file derives the build-time alias from the same string rather than spelling it a second time.
-// Both resolve against this directory, so the value needs no adjustment.
 const UI_ALIAS = "@ui/*";
 const tsconfig = JSON.parse(readFileSync(new URL("./tsconfig.json", import.meta.url), "utf8")) as {
 	compilerOptions: { paths: Record<string, string[] | undefined> };
@@ -47,9 +44,6 @@ export default defineConfig({
 			customCss: ["./src/styles/global.css"],
 			components: { Head: "./src/components/Head.astro", SiteTitle: "./src/components/SiteTitle.astro" },
 			defaultLocale: "root",
-			// The same six the app serves (LOCALES in apps/web/src/infrastructure/i18n/locales.ts), so the
-			// language picker offers what the planner does. Starlight ships the chrome translations for all
-			// of them and falls back to English for a page with no translation of its own.
 			locales: {
 				root: { label: "English", lang: "en" },
 				es: { label: "Español", lang: "es" },
@@ -176,8 +170,6 @@ export default defineConfig({
 	],
 	vite: {
 		plugins: [tailwindcss()],
-		// Tailwind runs via the Vite plugin; an inline (empty) PostCSS config stops
-		// Vite from walking up and loading the app's postcss.config.mjs.
 		css: { postcss: { plugins: [] } },
 		resolve: {
 			alias: {

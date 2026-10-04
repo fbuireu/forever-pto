@@ -1,12 +1,7 @@
 interface TokenSwatchProps {
-	/** CSS custom property names, e.g. ['--color-brand-yellow', '--accent'] */
 	tokens: string[];
 }
 
-/**
- * Color swatches that read the CSS variables at render time, so the values
- * shown always match the imported app stylesheets (light and dark).
- */
 export const TokenSwatch = ({ tokens }: TokenSwatchProps) => {
 	return (
 		<div className="not-content grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3 my-4">

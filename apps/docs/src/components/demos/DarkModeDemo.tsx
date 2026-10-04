@@ -4,11 +4,6 @@ import { Demo } from "../Demo";
 
 const SURFACE_TOKENS = ["--surface-panel", "--surface-panel-alt", "--surface-panel-soft"] as const;
 
-/**
- * Real app primitives plus the surface tokens they sit on. Flip Starlight's
- * theme toggle: the same [data-theme='dark'] attribute the app sets via
- * next-themes is what Starlight stamps on <html>, so everything re-skins live.
- */
 export const DarkModeDemo = () => (
 	<Demo>
 		<Button>Primary</Button>

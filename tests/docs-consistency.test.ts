@@ -20,13 +20,11 @@ const LOCALES_DIR = `${WEB}/src/ui/i18n/messages`;
 const STARLIGHT_VENDOR = `${DOCS}/node_modules/@astrojs/starlight/dist`;
 const ADR_DIR = "adr";
 const ADR_TEMPLATE = "0000-adr-template.md";
-// Written by `pnpm cf:typegen` into the web package, so it is absent from the tracked tree by design.
 const GENERATED_ENV_TYPES = "cloudflare-env.d.ts";
 const HAND_WRITTEN_ENV_TYPES = "environment.d.ts";
 const UNDECLARED_NAME = 2304;
 const GENERATED_MARKDOWN = new Set([`${WEB}/CHANGELOG.md`]);
 
-// `pnpm <word>` occurrences in a guide that are not package scripts.
 const NON_SCRIPT_PNPM = new Set(["install", "lint-staged", "commitlint", "vitest", "dlx", "exec"]);
 
 const SOURCE_FILE = /\.(ts|tsx)$/;
@@ -49,11 +47,6 @@ const TABLE_ROW = /^\s*\|(.*)\|\s*$/;
 const TABLE_SEPARATOR_ROW = /^[\s|:-]+$/;
 const PACKAGE_IN_CELL = new RegExp(String.raw`\x60(${WORKSPACE_PACKAGES.join("|")})\x60`);
 const BACKTICKED_ALIAS = /`([^`.]+\/\*)`/g;
-// `pnpm` spells the package flag four ways and the two rules reading citations knew one of them, so
-// `pnpm -F forever-pto-docs bulid` was invisible to both: the bare pattern met a `-` where it wanted
-// `[a-z]` and yielded nothing at all, and the filtered pattern wanted the literal `--filter`. One parser
-// reads every invocation now, so a flag spelling cannot switch a rule off. `--dir` and `-C` name a
-// directory where `--filter` and `-F` name a package, which is why both forms of ref have to resolve.
 const PNPM_PACKAGE_FLAG = "(?:--filter|-F|--dir|-C)";
 const PNPM_INVOCATION = new RegExp(
 	String.raw`\bpnpm((?:\s+${PNPM_PACKAGE_FLAG}(?:\s+|=)\S+|\s+-{1,2}[\w-]+)*)\s+(?:run\s+)?([a-z][a-z0-9:-]*)`,
@@ -62,12 +55,6 @@ const PNPM_INVOCATION = new RegExp(
 const PNPM_INVOCATION_START = /\bpnpm\s+\S/g;
 const CITED_PACKAGE_REF = new RegExp(String.raw`${PNPM_PACKAGE_FLAG}(?:\s+|=)(\S+)`);
 const WORKFLOW_SHELL_STEP = /^(\s*)-?[ \t]*(?:run|command):[ \t]*(\|[-+]?)?[ \t]*(.*)$/;
-// The two censuses below count steps, and both were counting a spelling rather than a job. `BUILD_COMMAND`
-// read `pnpm … build` and nothing else, so `pnpm -F <pkg> build`, `pnpm exec astro build` and `npx next
-// build` were all invisible; the deploy census substring-matched `wrangler deploy`, which was two of the
-// repo's four deploys then. The others arrived through `cloudflare/wrangler-action`'s `command:` input and
-// through a script name (`apps/docs`'s `deploy` is `astro build && wrangler deploy`). A tool name is what
-// survives a change of runner, so that is what these match, plus the script names that resolve to one.
 const BUILD_TOOL_COMMAND = /\b(?:astro|next|opennextjs-cloudflare|vite|tsc|turbo) build\b/;
 const BUILD_SCRIPT_NAME = /^(?:cf:)?build$/;
 const DEPLOY_TOOL_COMMAND = /\b(?:wrangler|opennextjs-cloudflare) deploy\b/;
@@ -82,10 +69,6 @@ const PULL_REQUEST_MERGE_REF = `refs/pull/\${{ github.event.pull_request.number 
 const AGGREGATE_NEEDS = /name: Check(?: \(docs\))?\n\s+needs: \[([^\]]+)\]\n\s+if: \$\{\{ always\(\) \}\}/;
 const FONT_VARIABLE = /variable: ["'](--[\w-]+)["']/g;
 
-// A compound noun does not always pluralise on its last word. `term + "s?"` matched "day offs", which
-// nobody writes, and could not match "days off", which the wiki wrote seven times across four pages while
-// this rule reported nothing. Every word takes the optional `s` now, and the gaps take any run of
-// whitespace, so a compound broken across a wrapped line is still read as one term.
 const retiredTermPattern = (term: string) =>
 	new RegExp(
 		`\\b${term
@@ -95,9 +78,6 @@ const retiredTermPattern = (term: string) =>
 		"gi",
 	);
 
-// Everything the repo would ship, staged or not, so a rule fires before the offending file is committed.
-// Ignored paths and vendored tooling under dotfolders are excluded: they are not ours to fix.
-// The index can lie (a stash cycle leaves deleted paths cached), so every entry is confirmed on disk.
 const trackedFiles = execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard"], {
 	cwd: ROOT,
 	encoding: "utf8",
@@ -151,8 +131,6 @@ const rootManifest = readJson("package.json");
 const rootScripts: Record<string, string> = rootManifest.scripts ?? {};
 const webScripts: Record<string, string> = readJson(`${WEB}/package.json`).scripts ?? {};
 const docsScripts: Record<string, string> = readJson(`${DOCS}/package.json`).scripts ?? {};
-// Keyed by every ref a citation can name a package with: its manifest name for `--filter` and `-F`, and
-// its directory, bare or dot-prefixed, for `--dir` and `-C`.
 const scriptsByPackageRef = new Map(
 	WORKSPACE_PACKAGES.flatMap((pkg) => {
 		const manifest = readJson(`${pkg}/package.json`);
@@ -171,10 +149,6 @@ const pnpmCitations = (body: string): PnpmCitation[] =>
 		.map(([, flags = "", script = ""]) => ({ pkg: CITED_PACKAGE_REF.exec(flags)?.[1] ?? null, script }))
 		.filter(({ script }) => !NON_SCRIPT_PNPM.has(script));
 
-// A workflow step naming a script runs everything the chain ends in, and the chains here are three deep:
-// root `deploy` is `pnpm --filter forever-pto-web deploy`, which is `pnpm run cf:build && opennextjs-cloudflare
-// deploy`. A census that reads the step text alone sees the script name and none of that. An unfiltered
-// citation inside a package's own script resolves against that package, which is why the ref is inherited.
 interface ExpandScriptParams {
 	citation: PnpmCitation;
 	seen?: Set<string>;
@@ -200,10 +174,6 @@ const webTsconfigOptions: Record<string, unknown> = webTsconfig.compilerOptions;
 const webTsconfigExclude: string[] = webTsconfig.exclude ?? [];
 const webTsconfigPaths: Record<string, string[]> = webTsconfigOptions.paths as Record<string, string[]>;
 
-// The cross-package seam had three declarations of one string (the vite alias, `astro check`'s paths entry
-// and two hardcoded copies down in this file), and nothing compared them. `apps/docs/tsconfig.json` is the
-// declaration now; `astro.config.ts` derives the vite alias from it, and every rule below resolves through
-// this one map rather than spelling `apps/web/src/ui` again.
 const UI_ALIAS = "@ui/*";
 const docsTsconfigPaths: Record<string, string[] | undefined> =
 	readJson(`${DOCS}/tsconfig.json`).compilerOptions?.paths ?? {};
@@ -216,7 +186,6 @@ const TEST_FILE = /\.test\.tsx?$/;
 const IMPORT_SPECIFIER =
 	/from\s*["']([^"']+)["']|import\s*\(\s*["'`]([^"'`]+)["'`]\s*\)|(?:^|\n)\s*import\s*["']([^"']+)["']|require\s*\(\s*["']([^"']+)["']\s*\)|vi\.mock\(\s*["']([^"']+)["']/g;
 
-// Derived from the tsconfig rather than restated, so a new alias is followed the day it is declared.
 const aliasTargets = Object.entries(webTsconfigPaths).map(
 	([alias, [target]]) =>
 		[
@@ -227,8 +196,6 @@ const aliasTargets = Object.entries(webTsconfigPaths).map(
 
 const webProduction = sourceFiles.filter((path) => path.startsWith(`${WEB_SRC}/`) && !TEST_FILE.test(path));
 
-// Parsed once: several rules read the same module, and the parser is what tells an import from a string that
-// looks like one.
 const parsedSources = new Map<string, ts.SourceFile>();
 const parse = (path: string): ts.SourceFile => {
 	const cached = parsedSources.get(path);
@@ -287,18 +254,12 @@ interface ResolveSpecifierParams {
 	specifier: string;
 }
 
-// The repository path a relative or aliased specifier lands on, extension left off; a package resolves to "".
 const resolveSpecifier = ({ from, specifier }: ResolveSpecifierParams): string => {
 	if (specifier.startsWith(".")) return join(dirname(from), specifier).replace(/\\/g, "/");
 	const alias = aliasTargets.find(([prefix]) => specifier === prefix || specifier.startsWith(`${prefix}/`));
 	return alias ? `${alias[1]}${specifier.slice(alias[0].length)}` : "";
 };
 
-// A workflow is not markdown, so nothing above reaches it, and `.github/` sits under a dotfolder, which
-// `trackedFiles` drops wholesale. The commands are read out of it by hand: the value when it is inline, and
-// every line indented under it when it is a block scalar. `command:` counts as well as `run:`: no deploy,
-// build or secret write is wrapped in `nick-fields/retry` any more, but the two preview-Worker deletes still
-// are, and that action takes its shell script on `command:`, so a rule reading only `run:` would miss them.
 const WORKFLOW_DIR = ".github/workflows";
 const COMPOSITE_ACTION_DIR = ".github/actions";
 const REPINNED_RUNTIME = /^\s*(?:node-version|version|ruby-version|wranglerVersion):\s*["']?\d/m;
@@ -311,9 +272,6 @@ const compositeActionFiles = readdirSync(join(ROOT, COMPOSITE_ACTION_DIR)).map(
 	(action) => `${COMPOSITE_ACTION_DIR}/${action}/action.yml`,
 );
 
-// A Windows checkout writes CRLF although the index is all LF, and `$` in a non-multiline pattern will not
-// match past the carriage return, so splitting on "\n" alone left every line of `_deploy-web.yml` unmatched
-// there and the rule silently checking nothing.
 const runCommands = (workflow: string) => {
 	const lines = workflow.split(/\r?\n/);
 	const collected: string[] = [];
@@ -340,10 +298,6 @@ interface YamlBlockParams {
 	key: string;
 }
 
-// `yamlBlock` finds the *first* line whose trim equals the key, which is the workflow-level block when there
-// is one. Once a key is declared per job there is more than one, and reading the first would compare one job
-// against every claim. This narrows to a job's own body first: from `  <job>:` to the next line at that same
-// indent.
 interface JobBodyParams {
 	workflow: string;
 	job: string;
@@ -494,13 +448,7 @@ describe("CONTEXT.md is the domain glossary and nothing else", () => {
 		expect(undefined_.map(([, term]) => term)).toEqual([]);
 	});
 
-	// A glossary is the ubiquitous language only while the rest of the tree speaks it. A term nothing outside
-	// this file uses is either a concept that was renamed and left a headstone, or one that was never real:
-	// either way the next reader is told a word is canonical when nothing canonical uses it. Prose is the
-	// scope, because that is where a term appears as a term; the same word inside an identifier is checked by
-	// the retired-name rules instead. Compound terms pluralise on every word, for the reason the header of
-	// this file records: `Carry-over Month` has to match `Carry-over Months`.
-	it("uses every term it defines somewhere outside itself", () => {
+	it("uses every term it defines in prose somewhere outside itself, since a term nothing else speaks is canonical in name only", () => {
 		const elsewhere = authoredMarkdown
 			.filter((path) => path !== "CONTEXT.md")
 			.concat(contentFiles)
@@ -659,13 +607,6 @@ describe("the workspace is shaped the way the guides describe it", () => {
 	});
 });
 
-// A pinned version is the one fact in a guide that a bot rewrites on its own, and both ways of writing it
-// down have failed in this family of repositories. contribKit asserted the digit in prose against the
-// manifest, so every Renovate bump failed on `CLAUDE.md does not state Flutter 3.47.2`: a documentation edit
-// the bot cannot make, punishing the bump instead of the drift. The guides that dropped the assertion and
-// kept the digit rotted instead, this one included. So the Versions section names the file each runtime is
-// pinned in and never what the pin says, and nothing here reads a digit out of prose. What is asserted is
-// the shape a bump cannot change, which is the same thing the typescript rule above already does.
 describe("pinned runtimes", () => {
 	const manifest = readJson("package.json");
 	const [packageManagerName, packageManagerVersion] = manifest.packageManager.split("@");
@@ -680,10 +621,6 @@ describe("pinned runtimes", () => {
 		expect(named).toEqual([]);
 	});
 
-	// The rules around this one hold the pins to each other and none of them reads the section the digits
-	// were removed from, so a bullet could quote a version again and everything would still pass. Only the
-	// line that opens a bullet is checked: a continuation line may carry a number that is not a pin (the major
-	// `astro check` refuses to run under, an ADR's slug), and the stated-versions rule below reads every line.
 	it("quotes a version for none of them, since nothing here would keep one current", () => {
 		const section = read("AGENTS.md").match(VERSIONS_SECTION)?.[1] ?? "";
 		const quoting = section.split("\n").filter((line) => line.startsWith("- ") && QUOTED_VERSION.test(line));
@@ -765,16 +702,15 @@ describe("the security header policy covers every request", () => {
 		expect(REQUIRED_CSP_DIRECTIVES.filter((directive) => !directives.includes(directive))).toEqual([]);
 	});
 
-	// A tag loads from one host and reports to another, and admitting only the first is invisible: the script
-	// runs, the browser refuses its beacons in the console alone, and the dashboard is merely empty. It has
-	// happened three times here, on Better Stack, on GA4's regional endpoint and on the Cloudflare beacon, so
-	// the pairing is a rule rather than a gotcha. Whichever side is admitted, both must be.
-	it.each(VENDOR_HOST_PAIRS)("admits %s and the host it reports to, %s, or neither", (from, to) => {
-		const directives = (sent.get("Content-Security-Policy") ?? "").split(";").map((directive) => directive.trim());
-		const directive = (name: string) => directives.find((entry) => entry.startsWith(`${name} `)) ?? "";
+	it.each(VENDOR_HOST_PAIRS)(
+		"admits %s and the host it reports to, %s, or neither, since a refused beacon shows in the console alone",
+		(from, to) => {
+			const directives = (sent.get("Content-Security-Policy") ?? "").split(";").map((directive) => directive.trim());
+			const directive = (name: string) => directives.find((entry) => entry.startsWith(`${name} `)) ?? "";
 
-		expect(directive("script-src").includes(from)).toBe(directive("connect-src").includes(to));
-	});
+			expect(directive("script-src").includes(from)).toBe(directive("connect-src").includes(to));
+		},
+	);
 
 	it("holds a browser to HTTPS for a year, subdomains included", () => {
 		const hsts = sent.get("Strict-Transport-Security") ?? "";
@@ -787,9 +723,6 @@ describe("the security header policy covers every request", () => {
 		expect(sent.get("X-Content-Type-Options")).toBe("nosniff");
 	});
 
-	// `next/font/google` downloads and self-hosts at build time, so no runtime request reaches a Google font
-	// host. The two allowances that named them were dead, and a dead allowance reads as evidence that the app
-	// fetches fonts cross-origin, which is the opposite of what it does.
 	it("allows no font CDN, because next/font/google self-hosts at build time", () => {
 		expect(read(`${WEB}/src/app/fonts.ts`)).toContain('from "next/font/google"');
 		expect(sent.get("Content-Security-Policy") ?? "").not.toMatch(/fonts\.(?:googleapis|gstatic)\.com/);
@@ -816,10 +749,6 @@ describe("every wrangler environment carries the whole binding set", () => {
 		expect([...wranglerBindingTables("")].filter((table) => !declared.has(table))).toEqual([]);
 	});
 
-	// The guide teaches which blocks may be deleted as duplication, and it used `[observability]` as its
-	// example of the safe-to-inherit kind while the file restated it in both named environments. `[assets]`
-	// and `[placement]` are the blocks that really are written once. A reader trusting the old sentence would
-	// delete the wrong one, and observability is the setting whose absence hides every other symptom.
 	it.each(["assets", "placement"])("declares [%s] once, at the top level, and lets inheritance carry it", (table) => {
 		expect(wranglerSection({ environment: "", table }).length).toBe(1);
 		const restated = NAMED_WRANGLER_ENVIRONMENTS.filter(
@@ -828,10 +757,6 @@ describe("every wrangler environment carries the whole binding set", () => {
 		expect(restated).toEqual([]);
 	});
 
-	// Sampling is what this rule is for: a rate that differs between environments makes every other symptom
-	// read differently for a reason nobody remembers. `destinations` is the one key here that is *meant* to
-	// differ, since each stage ships to its own Better Stack source, so the rule below covers it instead.
-	// Folding it back in would force the stages to share a source.
 	const OBSERVABILITY_TABLES = ["observability", "observability.logs", "observability.traces"];
 	const withoutDestinations = (entries: Record<string, string>) =>
 		Object.fromEntries(Object.entries(entries).filter(([key]) => key !== "destinations"));
@@ -853,12 +778,7 @@ describe("every wrangler environment carries the whole binding set", () => {
 		expect(new Set(blocks.map((block) => JSON.stringify(block))).size).toBe(1);
 	});
 
-	// An export destination is an account-level resource referenced by a bare name, so nothing in the name
-	// says which stage owns it and nothing fails when two stages name the same one. Better Stack has a source
-	// per stage here, and a development Worker exporting into the production source is invisible: the events
-	// arrive, they are just filed with the live site's. The top level is production's twin, sharing its
-	// `name` and its vars, so a bare `wrangler deploy` has to reach the production source and not the other.
-	it("ships each stage into its own export destinations, and the top level into production's", () => {
+	it("ships each stage into its own export destinations, and the top level into production's, since nothing fails when two stages name the same one", () => {
 		const development = destinationsOf("env.development");
 		const production = destinationsOf("env.production");
 
@@ -891,7 +811,6 @@ describe("folder guides exist where they are promised", () => {
 		expect(existsSync(join(ROOT, guide))).toBe(true);
 	});
 
-	// The reverse direction of the link check, in two levels: a guide no index points at will not be read.
 	it("lists every package guide in the root AGENTS.md", () => {
 		expect(PACKAGE_GUIDES.filter((guide) => !rootGuide.includes(`./${guide}`))).toEqual([]);
 	});
@@ -902,7 +821,6 @@ describe("folder guides exist where they are promised", () => {
 		expect(missing).toEqual([]);
 	});
 
-	// The heading is the guide's only self-identification; a wrong one sends a reader to another folder.
 	it("titles every nested guide with its own folder path, then a body", () => {
 		const malformed = nestedGuides.filter((path) => {
 			const [heading, , body] = read(path).split("\n");
@@ -959,7 +877,6 @@ describe("architecture decision records", () => {
 		expect(malformed).toEqual([]);
 	});
 
-	// An ADR only its own folder points at will not be read.
 	it("are each linked from a document outside adr/", () => {
 		const elsewhere = authoredMarkdown.filter((path) => !path.startsWith(`${ADR_DIR}/`)).map(read);
 		const orphaned = decisions.filter((file) => !elsewhere.some((body) => body.includes(file)));
@@ -968,21 +885,7 @@ describe("architecture decision records", () => {
 		expect(orphaned).toEqual([]);
 	});
 
-	// Twice in one audit a nested guide recorded a change and the ADR it amends did not, and both guides
-	// named the ADR they were amending. The maintenance contract's "amend it, or supersede it and say so"
-	// row is the rule that slipped, and it slipped the worse way round: the guide was right and the ADR was
-	// wrong, while the ADR is what every future agent is told not to re-litigate. `domain/calendar/AGENTS.md`
-	// said outright "That is an amendment to ADR 0006" and then answered, in the opposite direction, a
-	// question ADR 0006 was still asking a reader to settle with a probe on a deployed preview.
-	//
-	// The detectable half is the round trip: a document that ties the word "amend" to an ADR has to be named
-	// back by that ADR. Naming it is what makes the amendment reachable from the file people are pointed at,
-	// and it is also what forces the author to open the ADR, which is where the stale sentence is.
-	//
-	// Proximity rather than grammar, because "an amendment to ADR 0006", "the 2026-08-14 amendment to ADR
-	// 0006" and "ADR 0006, amended" all have to count and no phrasing rule separates a claim from a
-	// citation. Both readings want the same round trip anyway.
-	it("name back every document outside adr/ that ties an amendment to them", () => {
+	it("name back every document outside adr/ that ties an amendment to them, so an amendment is reachable from the ADR it changes", () => {
 		const byNumber = new Map(decisions.map((file) => [file.slice(0, 4), read(`${ADR_DIR}/${file}`)]));
 		const unrecorded: string[] = [];
 		let checked = 0;
@@ -1027,18 +930,6 @@ describe("documentation does not point at things that are gone", () => {
 		expect(broken).toEqual([]);
 	});
 
-	// A resolver cannot tell a right link from a wrong one that happens to resolve. ADR 0011's release table
-	// wrote the app's row as `[`package.json`](../package.json)`, which from `adr/` is the **root** manifest:
-	// the one that same ADR insists stays private at `0.0.0` with no dependencies, and the one semantic-release
-	// does not write. The cell beside it said `../apps/web/CHANGELOG.md` correctly, which is exactly what makes
-	// the wrong one easy to read past, and the relative-link rule above passed it happily because the file is
-	// there.
-	//
-	// The mechanical form of the mistake is a row that names one package and then points outside it at a file
-	// that package has its own copy of. `.github/workflows/docs.yml` in a row about `apps/docs` is fine and has
-	// to stay fine: there is no `apps/docs/docs.yml`, so the link cannot have meant a different file. A root
-	// `package.json` in a row about `apps/web` is not, because `apps/web/package.json` exists and is what the
-	// row is about.
 	it("keeps a table row that names a package from linking the root twin of that package's own file", () => {
 		const mistargeted: string[] = [];
 		let checked = 0;
@@ -1070,19 +961,10 @@ describe("documentation does not point at things that are gone", () => {
 		expect(mistargeted).toEqual([]);
 	});
 
-	// Absent from the tracked tree by design, yet the guides have to name it.
 	const GENERATED = new Set([GENERATED_ENV_TYPES]);
 
-	// Absent because a decision put it there. ADR 0009 records why the per-request chain is at `middleware.ts`
-	// and not at `proxy.ts`, which is a statement about a file that does not exist and cannot be written
-	// without naming it. Everything else in this rule stays as strict as it was: a name lands here only when
-	// the absence is the point, never to quiet a citation that has merely rotted.
 	const DELIBERATELY_ABSENT = new Set(["proxy.ts", "index.ts"]);
 
-	// A superseded ADR is a historical record: it has to go on describing the tree it decided on, and the
-	// files it names are exactly the ones its successor deleted. Policing its citations would force either a
-	// rewrite that destroys the record or a growing exemption list of names nobody may reuse. The live
-	// documents are still policed, which is where a rotten citation actually misleads someone.
 	const isSupersededAdr = (file: string) =>
 		file.startsWith("adr/") && /^## Status\n\n(?:.*\n)*?Superseded by /m.test(read(file));
 
@@ -1123,10 +1005,6 @@ describe("documentation does not point at things that are gone", () => {
 		expect(missing).toEqual([]);
 	});
 
-	// The root guide forbids a nested CONTEXT.md outright: the name would mean two things, and the
-	// domain-modeling skill reads it as vocabulary. The wiki taught the opposite under a heading of
-	// "CONTEXT.md per folder" and cited five paths that have never existed. A relative-link rule cannot
-	// catch it, because these are prose citations rather than links.
 	it("never teaches a nested CONTEXT.md, which the root guide forbids", () => {
 		const offenders: string[] = [];
 		for (const file of [...authoredMarkdown, ...contentFiles]) {
@@ -1137,26 +1015,10 @@ describe("documentation does not point at things that are gone", () => {
 		expect(offenders).toEqual([]);
 	});
 
-	// The wiki forked from the app and kept teaching behaviour the app had already fixed, and the worst of it
-	// was named in backticks: `MARKDOWN_CACHE_CONTROL` existed in exactly two places in the whole repo, both
-	// of them wiki lines claiming the middleware set a cache policy it does not set; `DISALLOWED_PAGES` and
-	// `RATE_LIMIT_KV` named a prefix list and a KV namespace that had both been replaced. Nothing could catch
-	// them: `astro check` registers no MDX plugin, the source-file rules match paths, and the `tsx`-fence rule
-	// only reaches an identifier that is imported in a fence. A constant is the shape that rots invisibly,
-	// because prose keeps reading correctly around it.
-	//
-	// The bar is existence, not export: `MIN_FINAL_AMOUNT` is module-private and `NEXT_LOCALE` is a cookie's
-	// value rather than its identifier, and the wiki is right to name both. What it may not do is invent one.
-	//
-	// Prose only, and the title says so. A fenced block is the app's own code quoted verbatim, where a
-	// constant is either real or a compile error in the file it came from; the fence-stripping above is the
-	// point rather than an oversight, so the title had to stop promising the whole page.
 	it("names only constants that exist somewhere in apps/web, in the published wiki's prose", () => {
 		const SCREAMING_SNAKE = /^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+$/;
 		const CONSTANT_NAME = /[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+/g;
 
-		// A binding, a var and a workflow secret are all spelled like a constant and declared outside the
-		// sources, so the corpus is the package plus the workflows rather than `src/` alone.
 		const CONFIGURATION = [
 			`${WEB}/environment.d.ts`,
 			`${WEB}/wrangler.toml`,
@@ -1178,10 +1040,6 @@ describe("documentation does not point at things that are gone", () => {
 		let checked = 0;
 
 		for (const file of contentFiles) {
-			// A fenced block opens with three backticks, and `BACKTICKED_TOKEN` pairs them one at a time: the
-			// fence body becomes a token and the two backticks left over pair with the next one in prose, so
-			// every span after the first fence on a page is off by one. Nothing downstream of a fence was being
-			// read, which is how a reinstated `MARKDOWN_CACHE_CONTROL` first went unnoticed here.
 			const prose = read(file).replace(/```[\s\S]*?```/g, "");
 			for (const [, token] of prose.matchAll(BACKTICKED_TOKEN)) {
 				if (!SCREAMING_SNAKE.test(token)) continue;
@@ -1195,12 +1053,7 @@ describe("documentation does not point at things that are gone", () => {
 		expect(offenders).toEqual([]);
 	});
 
-	// `astro check` does not resolve a `@ui/…` specifier that points at nothing: moving Switch from
-	// animate/primitives/base/ to animate/base/ left SwitchDemo importing the old path, `astro check`
-	// reported zero errors, and only `astro build` failed, in the Docs workflow, after the app's own CI
-	// had gone green. The guides claim the `astro check` tail covers this seam; for a missing module it
-	// does not, and this is the cheaper place to catch it than a build is.
-	it("resolves every @ui specifier the docs sources import to a file that exists", () => {
+	it("resolves every @ui specifier the docs sources import to a file that exists, since astro check reports none that points at nothing", () => {
 		const UI_SPECIFIER = /from\s*['"](@ui\/[^'"]+)['"]/g;
 		const dangling: string[] = [];
 		let checked = 0;
@@ -1220,18 +1073,7 @@ describe("documentation does not point at things that are gone", () => {
 		expect(dangling).toEqual([]);
 	});
 
-	// The same seam, one file type over, and nothing resolved it at all: `astro check` does not read CSS, and
-	// the docs workflow's trigger list proves only that a change under `apps/web/src/ui/` rebuilds this site,
-	// not that what `global.css` reaches for still exists. A renamed `@import` target fails `astro build`
-	// loudly but late, in the Docs workflow, after the app's own CI has gone green. A renamed `@source` target
-	// does not fail at all: Tailwind extracts no class from a path matching nothing, the build stays green and
-	// the demos ship unstyled, which `demos.spec.ts` cannot see because it asserts a 200, a child count and a
-	// silent console. Bare package specifiers are the resolver's problem, so only the relative reaches count.
 	it("resolves every relative @import and @source the docs stylesheets reach for", () => {
-		// The scope was `src/styles/**.css`, which is one file. CSS is not the only place this site writes
-		// CSS: an `.astro` component carries its own scoped `<style>`, and a stylesheet added anywhere else
-		// under the package would have been unscanned. Every `.css` the package tracks counts now, and every
-		// `<style>` body in an `.astro` file, whose relative reaches resolve from the component's own folder.
 		const CSS_REACH = /@(?:import|source)\s+['"](\.[^'"]+)['"]/g;
 		const STYLE_BLOCK = /<style[^>]*>([\s\S]*?)<\/style>/g;
 		const dangling: string[] = [];
@@ -1257,9 +1099,6 @@ describe("documentation does not point at things that are gone", () => {
 		expect(dangling).toEqual([]);
 	});
 
-	// The wiki's copy-pasteable Usage blocks are the largest slice of the cross-package seam and the only
-	// one nothing checked: `astro check` registers no MDX plugin, and the citation rules above match file
-	// paths rather than exported symbols. A rename in apps/web silently published a wrong import.
 	it("imports only symbols apps/web still exports, in the published wiki fences", () => {
 		const FENCE = /```(?:tsx?|ts)\n([\s\S]*?)```/g;
 		const UI_IMPORT = /import\s*\{([^}]+)\}\s*from\s*["'](@ui\/[^"']+)["']/g;
@@ -1314,10 +1153,6 @@ describe("documentation does not point at things that are gone", () => {
 		expect(offenders).toEqual([]);
 	});
 
-	// The docs site imports app sources, so a change under apps/web has to retrigger the docs jobs or the
-	// published site keeps serving the old build. docs.yml enumerates that reach by hand, as the DOCS_PATHS
-	// regex its `changes` job gates on (it used to be two identical `paths:` trigger blocks, which made the
-	// workflow impossible to require), and nothing compared the list against what the site actually imports.
 	it("triggers the docs workflow on every apps/web path the docs site reaches into", () => {
 		const workflow = read(".github/workflows/docs.yml");
 		const filter = /DOCS_PATHS: '\^\(([^']+)\)'/.exec(workflow)?.[1] ?? "";
@@ -1329,16 +1164,11 @@ describe("documentation does not point at things that are gone", () => {
 
 		expect(filter).not.toBe("");
 
-		// The scan used to stop at `${DOCS}/src/`, which left the two files that decide where the seam points,
-		// (`astro.config.ts` and `tsconfig.json`) outside it, along with `e2e/`. Markdown stays out on
-		// purpose: a guide linking to an app file is a citation, not something the site builds from.
 		const docsSources = trackedFiles.filter(
 			(path) => path.startsWith(`${DOCS}/`) && !path.endsWith(".md") && !path.endsWith(".mdx"),
 		);
 		const reached = new Set<string>();
 
-		// The old form required the segment after the `../` run to be literally `web/`, so an escape written
-		// `../../apps/web/src/…` (the same reach, spelled from one directory deeper) matched nothing at all.
 		const RELATIVE_ESCAPE = /['"(]((?:\.\.\/)+(?:apps\/)?web\/[^'")]+)['")]/g;
 		const JOINED_ESCAPE = /\bjoin\(\s*(?:import\.meta\.dirname|__dirname)((?:\s*,\s*["'][^"']*["'])+)/g;
 		const JOINED_SEGMENT = /["']([^"']*)["']/g;
@@ -1364,9 +1194,6 @@ describe("documentation does not point at things that are gone", () => {
 		expect(unwatched).toEqual([]);
 	});
 
-	// The seam was declared three times (the vite alias in `astro.config.ts`, the `paths` entry `astro check`
-	// reads, and two hardcoded copies in this file), and nothing compared them, so a move under `apps/web`
-	// could satisfy one and break another. `tsconfig.json` is the declaration; everything else derives.
 	it("declares the @ui seam target once, in the docs tsconfig", () => {
 		expect(docsTsconfigPaths[UI_ALIAS]).toBeDefined();
 		expect(existsSync(UI_ROOT)).toBe(true);
@@ -1379,13 +1206,7 @@ describe("documentation does not point at things that are gone", () => {
 		);
 	});
 
-	// An output the `changes` job declares but never writes is the empty string, and a job guarded on
-	// `== 'true'` then never runs: silently, with a green tick, forever. The `deploy-tail` job, since
-	// removed with the tail consumer Worker, shipped that way: the Filter step wrote `tail=false` on its
-	// no-base-commit early exit and nothing at all on the normal path, so that Worker was never deployed
-	// while four documents said it was. Nothing catches this by reading the workflow, because both halves
-	// are individually well-formed.
-	it("writes every output the changes job declares, on both paths through its Filter step", () => {
+	it("writes every output the changes job declares, on both paths through its Filter step, since an output nobody writes is the empty string and the job gated on it never runs", () => {
 		const workflow = read(".github/workflows/ci.yml");
 		const declared = [
 			...(workflow.match(/outputs:\n((?:\s+\w+: \$\{\{ steps\.filter\.outputs\.\w+ \}\}\n)+)/)?.[1] ?? "").matchAll(
@@ -1401,19 +1222,10 @@ describe("documentation does not point at things that are gone", () => {
 		const missingFromEarlyExit = declared.filter((name) => !earlyExit.includes(`echo '${name}=`));
 		expect(missingFromEarlyExit, "not written before the early exit, so it stays empty there").toEqual([]);
 
-		// Checking the whole script rather than this half is what let the original defect through: `tail` was
-		// written once, on the early-exit path, and a substring search over the script found it there.
 		const missingFromMainPath = declared.filter((name) => !mainPath?.includes(`echo '${name}=`));
 		expect(missingFromMainPath, "never written on the normal path, so it stays empty on every real run").toEqual([]);
 	});
 
-	// `cloudflare/wrangler-action` installs the version its `wranglerVersion` input names, and that input used
-	// to be a literal in two places. Renovate bumps the manifest (wrangler is an npm devDependency) and nothing
-	// touches a workflow literal, so the first bump desynchronised them, and the rule that compared the two
-	// then failed the bump rather than the drift: a workflow edit the bot cannot make. The workflow reads the
-	// version out of the docs manifest now, so what is asserted is the shape: every input is that expression,
-	// and each is preceded by the step that reads the manifest. `apps/web` has no equivalent exposure:
-	// `_deploy-web.yml` runs `pnpm exec wrangler`, which is the pinned one.
 	it("hands wrangler-action the wrangler the docs manifest pins, read from the manifest rather than written twice", () => {
 		const workflow = read(".github/workflows/docs.yml");
 		const inputs = workflow.match(/^\s+wranglerVersion: .+$/gm) ?? [];
@@ -1426,10 +1238,6 @@ describe("documentation does not point at things that are gone", () => {
 		expect(readers.length).toBe(inputs.length);
 	});
 
-	// CONTEXT.md names one canonical term per concept and lists the retired ones, and the root guide says to
-	// use those names "in code, copy and docs". The published wiki is the one place that was unenforced: it
-	// kept a second, diverged glossary that headed a section `FilterStrategy` (Avoid: filter) and described
-	// a Donation as "a premium purchase" (Avoid: purchase).
 	it("heads the published glossary with canonical terms, never retired ones", () => {
 		const glossary = read("CONTEXT.md");
 		const canonical = new Set([...glossary.matchAll(GLOSSARY_TERM)].map(([, term]) => term.toLowerCase()));
@@ -1449,18 +1257,7 @@ describe("documentation does not point at things that are gone", () => {
 		expect(headings.filter((heading) => !canonical.has(heading.toLowerCase()))).toEqual([]);
 	});
 
-	// The rule above reads headings only, and the headings had already been fixed; the prose had not. The
-	// glossary's own Bridge entry ended "a **bridge day** is one of the PTO days inside a bridge", and the
-	// wiki's front page said "vacation days" twice, both under a canonical heading.
-	//
-	// Only the **multi-word** retired names are checked, and only those the glossary does not also declare
-	// canonical somewhere. A blanket scan is unusable: the retired list holds `type`, `state`, `variant`,
-	// `locale`, `filter`, `period` and `break`, which this wiki uses correctly as ordinary technical English
-	// on 90 lines: the glossary retires them as names for a *domain concept*, not as words. A compound like
-	// "bridge day" or "max working period" has no innocent reading here, so it needs no allowlist at all.
-	// `holiday` and `free day` drop out on the canonical test, which is also what lets "public holiday"
-	// through: the one phrasing CONTEXT.md blesses for English user-facing copy.
-	it("writes the canonical name in the published wiki's prose, not a retired one, outside the landing pages marketing owns", () => {
+	it("writes the canonical name in the published wiki's prose outside the landing pages marketing owns, not a multi-word retired one, since single retired words such as type and state are ordinary English there", () => {
 		const glossary = read("CONTEXT.md");
 		const canonical = new Set([...glossary.matchAll(GLOSSARY_TERM)].map(([, term]) => term.toLowerCase()));
 		const compounds = [
@@ -1481,8 +1278,6 @@ describe("documentation does not point at things that are gone", () => {
 
 		const offenders: string[] = [];
 		for (const file of contentFiles.filter((path) => !landingPages.includes(path))) {
-			// Frontmatter is metadata, fenced code and inline code are the app's own identifiers, and neither
-			// is prose the glossary governs.
 			const prose = read(file)
 				.replace(/^---[\s\S]*?\n---\n/, "")
 				.replace(/```[\s\S]*?```/g, "")
@@ -1497,10 +1292,7 @@ describe("documentation does not point at things that are gone", () => {
 		expect(offenders).toEqual([]);
 	});
 
-	// IconsGalleryDemo says it is exhaustive, and a rename does break the build through import resolution,
-	// but an addition does not, because ICONS is a hand-written array rather than a union over the directory.
-	// The 23rd icon would simply be absent from the published gallery.
-	it("shows every animated icon in the published gallery", () => {
+	it("shows every animated icon in the published gallery, since an added icon module breaks no build", () => {
 		const ICONS_DIR = `${WEB}/src/ui/modules/core/animate/icons`;
 		const shipped = trackedFiles
 			.filter((path) => path.startsWith(`${ICONS_DIR}/`) && path.endsWith(".tsx") && !path.includes(".test."))
@@ -1516,16 +1308,7 @@ describe("documentation does not point at things that are gone", () => {
 		expect(shipped.filter((name) => !listed.has(name))).toEqual([]);
 	});
 
-	// TokenSwatch and ShadowScale take string[], so a renamed token renders `background: var(--gone)`,
-	// transparent, which reads as a legitimate pale colour rather than an error. Nothing else checks these:
-	// astro check does not see .mdx, and the citation rules match file paths.
-	//
-	// Matching `var(--x)` alone read 5 of the 66 tokens those two visualizers actually render: every swatch on
-	// the colors and shadows pages arrives as a bare string inside a `tokens={[…]}` array, so the whole brand
-	// palette and every `--shadow-brutal-*` sat outside the one rule written for them, and the docs' own
-	// components were outside the file set entirely. The floor is on both sides now: with one only on the
-	// declared side, prose that stopped naming tokens would empty the citation set and pass this vacuously.
-	it("names only design tokens the stylesheets still declare", () => {
+	it("names only design tokens the stylesheets still declare, since a swatch of a missing token renders transparent instead of failing", () => {
 		const stylesheets = trackedFiles.filter(
 			(path) =>
 				path.endsWith(".css") && (path.startsWith(`${WEB}/src/ui/styles/`) || path.startsWith(`${DOCS}/src/styles/`)),
@@ -1536,11 +1319,6 @@ describe("documentation does not point at things that are gone", () => {
 			...fontVariables,
 		]);
 
-		// `.astro` was outside the file set, and the reason was `SiteTitle.astro` naming three `--sl-*`
-		// tokens: Starlight declares those, this repo does not, and the whole extension was excluded to keep
-		// them out. That also excluded every token in an `.astro` file that *is* ours, so a typo'd
-		// `var(--color-brand-yelow)` there rendered transparent with nothing to catch it. The carve-out is
-		// the vendor prefix now, which is what was actually meant.
 		const VENDOR_TOKEN = /^--sl-/;
 		const citing = [
 			...contentFiles.filter((path) => path.includes("/design-system/")),
@@ -1568,11 +1346,6 @@ describe("documentation does not point at things that are gone", () => {
 		expect([...cited].filter((token) => !declared.has(token))).toEqual([]);
 	});
 
-	// The four families are spelled in three places and nothing tied them: `next/font/google`'s `variable:` in
-	// the app, this site's `:root`, which points those same names at the self-hosted @fontsource faces, and
-	// `TypeSpecimen`'s human-readable label. Swap a family over there and `theme/index.css` repoints
-	// `--font-sans` at a variable the docs never declare, so the wiki renders in the browser default while the
-	// specimen beside it still prints the old family name. The label half stays prose; nothing mechanises it.
 	it("declares every font variable the app registers in the docs stylesheet's :root", () => {
 		const rootBlocks = [...read(`${DOCS}/src/styles/global.css`).matchAll(/:root\s*\{([^}]*)\}/g)].map(
 			([, body]) => body,
@@ -1586,8 +1359,6 @@ describe("documentation does not point at things that are gone", () => {
 		expect(registered.filter((token) => !declared.has(token))).toEqual([]);
 	});
 
-	// An override restating the vendor string byte for byte is worse than no override: it pins a value
-	// upstream may later correct, and it buries the handful that are real.
 	it("overrides only the Starlight strings the docs site actually changes", async () => {
 		const overrides = trackedFiles.filter(
 			(path) => path.startsWith(`${DOCS}/src/content/i18n/`) && path.endsWith(".json"),
@@ -1612,17 +1383,6 @@ describe("documentation does not point at things that are gone", () => {
 		expect(restated).toEqual([]);
 	});
 
-	// The rule above is named for `search.ctrlKey` and cannot see it. It flags an override byte-identical to
-	// the vendor string, and the defect was `"Ctrl K"` against a vendor `"Ctrl"`: not equal, so not flagged,
-	// so re-adding the key would reship "Ctrl K K" on every Spanish page with the suite green.
-	//
-	// Starlight renders the value in a `<kbd>` of its own beside a literal `<kbd>K</kbd>`, so the only
-	// correct value is a modifier on its own. That is what this asserts, and the vendor markup is read first
-	// so the rule fails loudly rather than quietly if upstream stops rendering the K itself.
-	//
-	// What it does not cover: any other key. There is no general test for "the default plus more" because a
-	// legitimate reword may well contain the default as a substring; this key is checkable because its
-	// rendered shape is fixed, and the others are prose.
 	it("overrides search.ctrlKey with a modifier alone, because Starlight renders the K itself", () => {
 		const SEARCH_SHORTCUT = /<kbd>\{[^}]*search\.ctrlKey[^}]*\}<\/kbd><kbd>K<\/kbd>/;
 		const MODIFIER_ALONE = /^\S{1,5}$/;
@@ -1631,8 +1391,6 @@ describe("documentation does not point at things that are gone", () => {
 		expect(existsSync(join(ROOT, search)), `${search} is absent, so this rule would read nothing`).toBe(true);
 		expect(SEARCH_SHORTCUT.test(read(search))).toBe(true);
 
-		// No floor on the count: the key is absent from the overrides today, which is the state this rule
-		// exists to keep. The vendor-markup assertion above is what stops it reading nothing by accident.
 		const offenders: string[] = [];
 
 		for (const file of trackedFiles.filter(
@@ -1647,9 +1405,6 @@ describe("documentation does not point at things that are gone", () => {
 		expect(offenders).toEqual([]);
 	});
 
-	// A guide may write `src/…` because it sits inside the package it describes, and the rules above
-	// match a citation by suffix so both forms resolve. The wiki has no such context: `src/` alone names
-	// neither package. Every repo path it prints has to carry its own prefix.
 	it("prints repo-relative paths in the published wiki, never package-relative ones", () => {
 		const ambiguous = /^(src|e2e|workers|public)\//;
 		const offenders: string[] = [];
@@ -1666,74 +1421,258 @@ describe("documentation does not point at things that are gone", () => {
 	});
 });
 
-describe("apps/web/src carries no explanatory comments", () => {
-	// A suppression changes what the linter does, and a generated file's banner is not ours to delete.
-	// Both comment forms count: a11y suppressions on JSX are written `{/* biome-ignore … */}`.
-	const ALLOWED = /(?:\/\/|\/\*)\s*(biome-ignore\b|Auto-generated by\b)/;
-	const webSources = sourceFiles.filter((path) => path.startsWith(`${WEB}/src/`));
+interface Comment {
+	at: number;
+	text: string;
+}
 
-	// This parses the file rather than matching comment delimiters by hand. Four hand-rolled versions were
-	// written and every one was wrong somewhere: a URL inside a multi-line template read as a comment; a stray
-	// backtick switched the rule off for the rest of the file; an escaped backtick did the same by flipping a
-	// parity count; a character class swallowed the delimiter it was meant to protect. JavaScript's lexical
-	// grammar is not a regular language. Scanning alone is not enough either: only the parser knows whether a
-	// slash opens a regex or divides, so a regex literal holding an escaped slash reads as a comment to a bare
-	// scanner. Comments are trivia, so they hang off node boundaries rather than appearing in the tree.
-	interface CommentsInParams {
-		path: string;
-		source: string;
-	}
+interface ScriptCommentsParams {
+	source: string;
+	kind: ts.ScriptKind;
+}
 
-	const commentsIn = ({ path, source }: CommentsInParams) => {
-		const parsed = ts.createSourceFile(path, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
-		const seen = new Set<number>();
-		const found: { line: number; text: string }[] = [];
+const scriptComments = ({ source, kind }: ScriptCommentsParams): Comment[] => {
+	const parsed = ts.createSourceFile("scanned", source, ts.ScriptTarget.Latest, true, kind);
+	const found = new Map<number, string>();
 
-		const collect = (ranges: ts.CommentRange[] | undefined) => {
-			for (const range of ranges ?? []) {
-				if (seen.has(range.pos)) continue;
-				seen.add(range.pos);
-				found.push({
-					line: parsed.getLineAndCharacterOfPosition(range.pos).line + 1,
-					text: source.slice(range.pos, range.end),
-				});
-			}
-		};
+	const visit = (node: ts.Node): void => {
+		if (node.kind >= ts.SyntaxKind.FirstJSDocNode && node.kind <= ts.SyntaxKind.LastJSDocNode) return;
 
-		const walk = (node: ts.Node) => {
-			collect(ts.getLeadingCommentRanges(source, node.pos));
-			collect(ts.getTrailingCommentRanges(source, node.end));
-			// `{/* … */}` holds its comment between the braces, so it is trivia of nothing the walk reaches. It
-			// has to be asked for as *trailing*: TypeScript only calls a comment leading when a line break comes
-			// first, and here the brace does. This is the shape every a11y suppression on JSX takes.
-			if (ts.isJsxExpression(node)) collect(ts.getTrailingCommentRanges(source, node.getStart() + 1));
-			// `forEachChild` yields nodes but never punctuation tokens, so a comment sitting against a `{`, `}`,
-			// `]` or `)` is trivia of nothing it reaches: the last line inside a block escaped entirely, which
-			// is how a probe file with an explanatory comment was committed under `src/` while this was green.
-			// `getChildren` includes the tokens, and needs the `setParentNodes` argument above to be true.
-			for (const child of node.getChildren(parsed)) walk(child);
-		};
+		const children = node.getChildren(parsed);
 
-		walk(parsed);
-		return found.sort((a, b) => a.line - b.line);
+		if (children.length === 0) {
+			const start = node.getStart(parsed);
+			const trivia = [
+				...(ts.getTrailingCommentRanges(source, node.getFullStart()) ?? []),
+				...(ts.getLeadingCommentRanges(source, node.getFullStart()) ?? []),
+			];
+
+			for (const { pos, end } of trivia) if (end <= start) found.set(pos, source.slice(pos, end));
+		}
+
+		for (const child of children) visit(child);
 	};
 
-	it("has app sources to check at all", () => {
-		expect(webSources.length).toBeGreaterThan(100);
+	visit(parsed);
+
+	return [...found].map(([at, text]) => ({ at, text }));
+};
+
+const CSS_TOKEN = /"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'|\/\*[\s\S]*?\*\//g;
+
+const cssComments = (source: string): Comment[] =>
+	[...source.matchAll(CSS_TOKEN)].flatMap((match) =>
+		match[0].startsWith("/*") ? [{ at: match.index ?? 0, text: match[0] }] : [],
+	);
+
+const ASTRO_FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---/;
+const ASTRO_SCRIPT = /<script\b[^>]*>([\s\S]*?)<\/script>/g;
+const ASTRO_STYLE = /<style\b[^>]*>([\s\S]*?)<\/style>/g;
+const MARKUP_COMMENT = /<!--[\s\S]*?-->|\{\s*\/\*[\s\S]*?\*\/\s*\}/g;
+
+interface EmbeddedCommentsParams {
+	source: string;
+	pattern: RegExp;
+	scan: (body: string) => Comment[];
+}
+
+const embeddedComments = ({ source, pattern, scan }: EmbeddedCommentsParams): Comment[] =>
+	[...source.matchAll(pattern)].flatMap((match) => {
+		const offset = (match.index ?? 0) + match[0].indexOf(">") + 1;
+
+		return scan(match[1] ?? "").map(({ at, text }) => ({ at: offset + at, text }));
 	});
 
-	it("carries no comment but a suppression or a generated banner, since a line's reason lives in the commit, the pull request, an ADR or CODING_STANDARDS.md", () => {
+const astroComments = (source: string): Comment[] => {
+	const frontmatter = ASTRO_FRONTMATTER.exec(source);
+
+	return [
+		...(frontmatter
+			? scriptComments({ source: frontmatter[1] ?? "", kind: ts.ScriptKind.TS }).map(({ at, text }) => ({
+					at: frontmatter[0].indexOf("\n") + 1 + at,
+					text,
+				}))
+			: []),
+		...embeddedComments({
+			source,
+			pattern: ASTRO_SCRIPT,
+			scan: (body) => scriptComments({ source: body, kind: ts.ScriptKind.TS }),
+		}),
+		...embeddedComments({ source, pattern: ASTRO_STYLE, scan: cssComments }),
+		...[...source.matchAll(MARKUP_COMMENT)].map((match) => ({ at: match.index ?? 0, text: match[0] })),
+	];
+};
+
+interface HashCommentsParams {
+	source: string;
+	multilineStrings: boolean;
+}
+
+const hashComments = ({ source, multilineStrings }: HashCommentsParams): Comment[] => {
+	const found: Comment[] = [];
+	let quote = "";
+	let at = 0;
+
+	while (at < source.length) {
+		const char = source[at] ?? "";
+
+		if (char === "\n" && !multilineStrings) quote = "";
+
+		if (quote) {
+			if (char === "\\" && quote === '"') at += 1;
+			else if (char === quote) quote = "";
+		} else if (char === '"' || char === "'") quote = char;
+		else if (char === "#" && (at === 0 || /\s/.test(source[at - 1] ?? ""))) {
+			const newline = source.indexOf("\n", at);
+			const end = newline === -1 ? source.length : newline;
+
+			found.push({ at, text: source.slice(at, end).trimEnd() });
+			at = end;
+			continue;
+		}
+
+		at += 1;
+	}
+
+	return found;
+};
+
+const SCRIPT_FILE = /\.(?:[cm]?[jt]sx?|json)$/;
+const STYLESHEET_FILE = /\.css$/;
+const ASTRO_FILE = /\.astro$/;
+const HASH_COMMENTED_FILE = /(?:\.toml|\.env\.example|\/_headers)$/;
+const HUSKY_DIR = ".husky";
+const DOTFILE_CONFIGS = [".github/renovate.json", ".lintstagedrc.json"];
+const SOURCE_DIRECTIVE =
+	/^(?:\/\/\/\s*<reference\b|\/\/\s*(?:biome-ignore|@ts-expect-error|@vitest-environment)\b|\/\*\s*biome-ignore\b)/;
+const GENERATED_BANNER =
+	/^\/\/\s*(?:Auto-generated by\b|NOTE: This file should not be edited$|see https:\/\/nextjs\.org\/docs\/app\/api-reference\/config\/typescript for more information\.$)/;
+
+interface CommentsInParams {
+	file: string;
+	source: string;
+}
+
+const isShebang = ({ at, text }: Comment) => at === 0 && text.startsWith("#!");
+
+const scriptKindOf = (file: string) => {
+	if (file.endsWith(".tsx") || file.endsWith(".jsx")) return ts.ScriptKind.TSX;
+	if (file.endsWith(".json")) return ts.ScriptKind.JSON;
+	return /\.[cm]?js$/.test(file) ? ts.ScriptKind.JS : ts.ScriptKind.TS;
+};
+
+const commentsIn = ({ file, source }: CommentsInParams): Comment[] => {
+	const found = (() => {
+		if (ASTRO_FILE.test(file)) return astroComments(source);
+		if (STYLESHEET_FILE.test(file)) return cssComments(source);
+		if (file.startsWith(`${HUSKY_DIR}/`)) return hashComments({ source, multilineStrings: true });
+		if (HASH_COMMENTED_FILE.test(file)) return hashComments({ source, multilineStrings: false });
+		if (!source.includes("//") && !source.includes("/*")) return [];
+
+		return scriptComments({ source, kind: scriptKindOf(file) });
+	})();
+
+	return found.sort((a, b) => a.at - b.at);
+};
+
+interface LineAtParams {
+	source: string;
+	at: number;
+}
+
+const lineAt = ({ source, at }: LineAtParams) => source.slice(0, at).split("\n").length;
+
+describe("the hand-written source carries no explanatory comments", () => {
+	const huskyHooks = readdirSync(join(ROOT, HUSKY_DIR), { withFileTypes: true })
+		.filter((entry) => entry.isFile())
+		.map((entry) => `${HUSKY_DIR}/${entry.name}`);
+	const commentedFiles = [
+		...trackedFiles.filter(
+			(path) =>
+				SCRIPT_FILE.test(path) || STYLESHEET_FILE.test(path) || ASTRO_FILE.test(path) || HASH_COMMENTED_FILE.test(path),
+		),
+		...huskyHooks,
+		...DOTFILE_CONFIGS.filter((path) => existsSync(join(ROOT, path))),
+	];
+	const areas: Record<string, string[]> = {
+		"the contract suite": commentedFiles.filter((path) => path.startsWith("tests/") && SCRIPT_FILE.test(path)),
+		"the app's TypeScript": commentedFiles.filter((path) => path.startsWith(`${WEB}/src/`) && SCRIPT_FILE.test(path)),
+		"the app's e2e specs and configs": commentedFiles.filter(
+			(path) => path.startsWith(`${WEB}/`) && !path.startsWith(`${WEB}/src/`) && SCRIPT_FILE.test(path),
+		),
+		"the app's stylesheets": commentedFiles.filter(
+			(path) => path.startsWith(`${WEB}/src/`) && STYLESHEET_FILE.test(path),
+		),
+		"the docs site's TypeScript": commentedFiles.filter(
+			(path) => path.startsWith(`${DOCS}/`) && SCRIPT_FILE.test(path),
+		),
+		"the docs site's Astro components": commentedFiles.filter((path) => ASTRO_FILE.test(path)),
+		"the docs site's stylesheet": commentedFiles.filter(
+			(path) => path.startsWith(`${DOCS}/`) && STYLESHEET_FILE.test(path),
+		),
+		"the root configs": commentedFiles.filter((path) => !path.includes("/") && SCRIPT_FILE.test(path)),
+		"the Worker configs, env examples and headers": commentedFiles.filter((path) => HASH_COMMENTED_FILE.test(path)),
+		"the Husky hooks": huskyHooks,
+		"the configs under a dotfile name": commentedFiles.filter((path) => DOTFILE_CONFIGS.includes(path)),
+	};
+
+	it("has hand-written sources of every kind to check", () => {
+		expect(
+			Object.entries(areas)
+				.filter(([, files]) => files.length === 0)
+				.map(([area]) => area),
+		).toEqual([]);
+		expect(areas["the contract suite"]).toContain("tests/docs-consistency.test.ts");
+		expect(areas["the app's TypeScript"].length).toBeGreaterThan(100);
+	});
+
+	it("reads each kind of source for its comments and mistakes no string, URL or regex for one", () => {
+		const spoken = (sample: CommentsInParams) => commentsIn(sample).map(({ text }) => text);
+
+		expect(spoken({ file: "a.ts", source: 'const url = "https://a.b"; const slash = /\\/\\//; // said' })).toEqual([
+			"// said",
+		]);
+		expect(
+			spoken({ file: "a.ts", source: "const open = { a: 1, /* said */ };\nconst last = [1, // said\n];" }),
+		).toEqual(["/* said */", "// said"]);
+		expect(spoken({ file: "a.tsx", source: 'const link = <a href="https://a.b">//text, not a comment</a>;' })).toEqual(
+			[],
+		);
+		expect(spoken({ file: "a.tsx", source: "const node = <p>{/* said */}</p>;" })).toEqual(["/* said */"]);
+		expect(spoken({ file: "a.ts", source: "/** said */\nexport const a = 1;" })).toEqual(["/** said */"]);
+		expect(spoken({ file: "a.json", source: '{ "url": "https://a.b", /* said */ "a": 1 }' })).toEqual(["/* said */"]);
+		expect(spoken({ file: "a.css", source: '.a { content: "/* not */"; } /* said */' })).toEqual(["/* said */"]);
+		expect(
+			spoken({
+				file: "a.astro",
+				source:
+					"---\nconst a = 1; // said\n---\n<p>a</p><!-- said -->\n<script>// said\n</script>\n<style>.a { color: red; } /* said */</style>",
+			}),
+		).toEqual(["// said", "<!-- said -->", "// said", "/* said */"]);
+		expect(spoken({ file: "a.toml", source: 'a = "x # not" # said\n# said\nb = [1]' })).toEqual(["# said", "# said"]);
+		expect(spoken({ file: ".husky/a", source: 'echo "a\n# not" $# # said' })).toEqual(["# said"]);
+		expect(lineAt({ source: "a\nb\nc", at: 4 })).toBe(3);
+		expect(SOURCE_DIRECTIVE.test("// biome-ignore lint/style/noArguments: the vendor reads them")).toBe(true);
+		expect(SOURCE_DIRECTIVE.test("/* biome-ignore lint/a11y/useSemanticElements: a group */")).toBe(true);
+		expect(SOURCE_DIRECTIVE.test('/// <reference types="next" />')).toBe(true);
+		expect(SOURCE_DIRECTIVE.test("// @ts-expect-error")).toBe(true);
+		expect(SOURCE_DIRECTIVE.test(["// @vitest", "environment jsdom"].join("-"))).toBe(true);
+		expect(SOURCE_DIRECTIVE.test("// @ts-ignore")).toBe(false);
+		expect(SOURCE_DIRECTIVE.test("// said")).toBe(false);
+		expect(isShebang({ at: 0, text: "#!/usr/bin/env sh" })).toBe(true);
+		expect(isShebang({ at: 12, text: "#!/usr/bin/env sh" })).toBe(false);
+	});
+
+	it("carries no comment but a tool directive or a generated file's banner, since a line's reason lives in the commit, the pull request, an ADR or CODING_STANDARDS.md", () => {
 		const offenders: string[] = [];
 		let allowed = 0;
-		for (const file of webSources) {
-			const source = read(file);
-			// parsing every file is what made this rule time out under parallel load; a file holding neither
-			// delimiter anywhere cannot hold a comment, and that is most of them
-			if (!source.includes("//") && !source.includes("/*")) continue;
 
-			for (const { line, text } of commentsIn({ path: file, source })) {
-				if (ALLOWED.test(text)) allowed += 1;
-				else offenders.push(`${file}:${line}`);
+		for (const file of commentedFiles) {
+			const source = read(file);
+
+			for (const { at, text } of commentsIn({ file, source })) {
+				if (SOURCE_DIRECTIVE.test(text) || GENERATED_BANNER.test(text) || isShebang({ at, text })) allowed += 1;
+				else offenders.push(`${file}:${lineAt({ source, at })}`);
 			}
 		}
 
@@ -1743,29 +1682,12 @@ describe("apps/web/src carries no explanatory comments", () => {
 });
 
 describe("the succeeded-payment status is one value in both languages", () => {
-	// A payments row *is* the Premium entitlement (ADR 0008), so `succeeded` is the whole of the access rule.
-	// It is declared once in the domain, as `PAYMENT_SUCCEEDED`, and written four more times as a bare literal
-	// inside the repository's SQL, which is the half no typechecker reads: rename the union member, or write a
-	// fifth predicate against a different spelling, and every gate stays green while
-	// `getSucceededPaymentByEmail` quietly stops matching and no donor recovers Premium again.
-	//
-	// Stripe owns the value, so nothing in this tree can produce a divergent one. That makes it a guard rather
-	// than a defect, and an assertion the proportionate answer: interpolating the constant into four SQL
-	// strings would buy a coupling to a word Stripe cannot change and pay for it by making the statements less
-	// readable than the SQL they are.
 	const PAYMENTS_REPOSITORY = `${WEB}/src/infrastructure/services/payments/repository.ts`;
 	const SQL_STATUS_COMPARISON = /status\s*(?:!=|=)\s*'([^']*)'|WHEN \? = '([^']*)'/g;
 	const SUCCEEDED_LITERAL = /['"]succeeded['"]/;
 	const PAYMENT_STATUS_MODULE = `${WEB}/src/domain/payment/events/types.ts`;
-	// Its `succeeded` is a different word for a different thing: the outcome of a browser-side confirm, whose
-	// siblings are `refused_before_charge` and `handed_off_to_issuer`. The exemption is checked below, because
-	// one granted by name outlives the reason it was granted for.
 	const CONFIRM_OUTCOME_MODULE = `${WEB}/src/ui/adapters/payments/checkout.ts`;
-	// And this one reads Stripe's `redirect_status` query parameter, whose values are `succeeded`, `failed`
-	// and `pending`: a third vocabulary that happens to share the word. It was annotated
-	// `Stripe.PaymentIntent.Status`, which is the mistake the exemption exists to stop being made again.
 	const REDIRECT_STATUS_MODULE = `${WEB}/src/app/api/payment/activate/route.ts`;
-	// Stripe publishes the union this list mirrors. `OtherString` is its open-enum marker, not a member.
 	const STRIPE_PAYMENT_INTENTS = `${WEB}/node_modules/stripe/cjs/resources/PaymentIntents.d.ts`;
 	const STRIPE_STATUS_UNION = /^\s*type Status = (.+);$/m;
 	const STRIPE_STATUS_MEMBER = /'([^']+)'/g;
@@ -1775,20 +1697,10 @@ describe("the succeeded-payment status is one value in both languages", () => {
 			([, quoted, whenQuoted]) => quoted ?? whenQuoted,
 		);
 
-		// A floor, because a rewritten statement that stops matching the pattern would otherwise satisfy an
-		// empty set: the rule has to fail when it can no longer see the predicates it exists to compare.
 		expect(compared.length).toBeGreaterThanOrEqual(4);
 		expect([...new Set(compared)]).toEqual([PAYMENT_SUCCEEDED]);
 	});
 
-	// Production sources only. A test asserting the SQL has to write the wire value out, and
-	// `repository.test.ts` does exactly that, deliberately. The repository is exempt because the rule above is
-	// what holds its four SQL predicates; the domain module is where the word is declared.
-	//
-	// This used to read `source.includes("PAYMENT_SUCCEEDED") && …`, which made it blind to exactly the file
-	// that needed it: `confirmation/page.tsx` compared against a bare `"succeeded"` and imported nothing, so
-	// it was never a candidate. A module that does not import the constant is the one to worry about, not the
-	// one that does.
 	it("lets no production module spell the literal, whether or not it imports the constant", () => {
 		const exempt = new Set([
 			PAYMENT_STATUS_MODULE,
@@ -1814,10 +1726,6 @@ describe("the succeeded-payment status is one value in both languages", () => {
 		expect(source).not.toContain("PaymentStatus");
 	});
 
-	// The domain union mirrors an enum Stripe calls *open*: it may send a value this list does not carry, on a
-	// pinned API version, which is why the carrier type is widened rather than closed. Mirroring only pays
-	// while the mirror is accurate, and nothing but this compares the two: a status Stripe adds to the SDK
-	// would otherwise sit outside `PAYMENT_STATUSES` with every gate green.
 	it("carries every status the installed Stripe SDK knows, and none it does not", () => {
 		expect(
 			existsSync(join(ROOT, STRIPE_PAYMENT_INTENTS)),
@@ -1835,12 +1743,6 @@ describe("the succeeded-payment status is one value in both languages", () => {
 });
 
 describe("directives sit where the compiler can see them", () => {
-	// A directive is a bare string literal as the file's first statement. Wrap it in parentheses or let an
-	// import sort above it and it silently becomes an ordinary expression: `'use client'` stops applying, the
-	// module is treated as a Server Component, and nothing here notices. Typecheck passes, Biome passes, every
-	// unit test passes; only `next build` fails, in CI, on a full production build. Six planner files spent
-	// several commits in that state after an added import was hoisted over the directive and the formatter
-	// parenthesised what was left behind.
 	const DIRECTIVES = new Set(["use client", "use server", "use cache", "use strict"]);
 	const packageSources = sourceFiles.filter(
 		(path) => path.startsWith(`${WEB}/src/`) || path.startsWith(`${DOCS}/src/`),
@@ -1885,15 +1787,6 @@ describe("directives sit where the compiler can see them", () => {
 });
 
 describe("the published layer graph is the one the imports make", () => {
-	// The overview page drew `app -> ui -> application -> domain` for as long as nobody walked the tree. Five
-	// of the sixteen production edges were on it, `app -> infrastructure` (63 imports across 20 files) was not,
-	// and one arrow head carried a call path rather than an import. A diagram read off the intent will always
-	// drift back to the intent, so the page publishes a counted table and this rule counts the same thing.
-	//
-	// Tests are excluded on both sides: a `vi.mock` of another layer is a fact about the test, not about what
-	// ships. Every alias that resolves inside `apps/web/src` is followed, which is the half the old prose rule
-	// missed: `@i18n/`, `@styles/` and `@assets/` all land in `src/ui/`, so an `@i18n/...` import is a
-	// `ui` edge however little it looks like one.
 	const LAYER_NAMES = ["app", "application", "domain", "infrastructure", "ui"];
 	const MIDDLEWARE_NODE = "middleware.ts";
 	const OVERVIEW = `${DOCS}/src/content/docs/architecture/overview.mdx`;
@@ -1936,10 +1829,7 @@ describe("the published layer graph is the one the imports make", () => {
 		measured.set(key, `${all.length}/${new Set(all.map((edge) => edge.file)).size}`);
 	}
 
-	// The table is read as data: the header names the columns, every later row names its own source node.
 	const publishedGraph = () => {
-		// One contiguous run of rows, not every table row on the page: the alias table further down is also a
-		// table, and a filter over the whole file swallowed it and invented ten edges out of its cells.
 		const lines = read(OVERVIEW).split(/\r?\n/);
 		const header = lines.findIndex(
 			(line) => TABLE_ROW.test(line) && line.split("|")[1]?.trim().replace(/`/g, "") === GRAPH_TABLE_HEADER,
@@ -1994,21 +1884,12 @@ describe("the published layer graph is the one the imports make", () => {
 		expect(invented).toEqual([]);
 	});
 
-	// The layer contract this replaced said "must not import from `@ui/*`" and asserted that nothing did.
-	// `@i18n/`, `@styles/` and `@assets/` all resolve inside `src/ui/`, so seven imports walked past the rule
-	// while it read as enforced. Two files reach the locale bundles and are named here; a third, or a reach
-	// into anything but `i18n/messages/`, is what this catches.
 	const UI_DATA_IMPORTERS = new Set([
 		`${WEB_SRC}/infrastructure/i18n/config.ts`,
 		`${WEB_SRC}/infrastructure/markdown/buildMarkdownPage.ts`,
 	]);
 	const LOCALE_BUNDLE = `${WEB_SRC}/ui/i18n/messages/`;
 
-	// The anti-corruption layer only works while the foreign shape stops at it. `Raw*` is spellable in
-	// `application/dto/` and in the adapter that produces it (`services/holidays/source/`, seven files);
-	// anywhere past the mapper means a mapping step was skipped. The dto guide stated the rule as if it
-	// reached nowhere outside the folder, which the adapter has always contradicted, so the half that is
-	// true is the half asserted here.
 	const RAW_TYPE = /\bRaw[A-Z]\w*/;
 	const PAST_THE_MAPPER = [
 		`${WEB_SRC}/app/`,
@@ -2165,8 +2046,6 @@ describe("the imports CODING_STANDARDS.md hands to this suite", () => {
 		expect(crossed).toEqual([]);
 	});
 
-	// The calendar runs in the Web Worker as well as on the main thread, so its imports are the ones that
-	// evaluate there. `next-intl` is its `Locale` type and nothing else, which leaves nothing in the bundle.
 	const CALENDAR_OUTSIDE_IMPORTS = new Set([
 		"@application/dto/holiday/types",
 		"@application/shared/utils/dates",
@@ -2234,7 +2113,6 @@ describe("the imports CODING_STANDARDS.md hands to this suite", () => {
 		expect(offenders).toEqual([]);
 	});
 
-	// One inversion is recorded and known; a second is a regression.
 	const UI_INVERSION = `${APPLICATION}stores/premium.ts`;
 
 	it("lets stores/premium.ts alone reach the ui layer from application", () => {
@@ -2249,7 +2127,6 @@ describe("the imports CODING_STANDARDS.md hands to this suite", () => {
 		expect(intoUi).toEqual([]);
 	});
 
-	// These pull the `date-holidays` dataset with them, and a store module is read by every page.
 	const DEFERRED_MODULES = new Set([
 		`${WEB_SRC}/domain/calendar/pipeline`,
 		`${WEB_SRC}/infrastructure/services/holidays/getHolidays`,
@@ -2308,8 +2185,6 @@ describe("the imports CODING_STANDARDS.md hands to this suite", () => {
 		expect(stray).toEqual([]);
 	});
 
-	// Follows every file a route handler reaches inside `apps/web/src`, because `getTranslations` memoises its
-	// message loading across requests and workerd refuses the second one.
 	const REQUEST_SCOPED_TRANSLATOR = "next-intl/server";
 	const SOURCE_EXTENSIONS = [".ts", ".tsx"];
 
@@ -2350,8 +2225,6 @@ describe("the imports CODING_STANDARDS.md hands to this suite", () => {
 		expect(read(NO_STORE_FETCH)).toContain('cache: "no-store"');
 	});
 
-	// The `next/navigation` names the locale-aware module replaces; anything else from it (the stale
-	// Server Action predicate) navigates nowhere.
 	const LOCALE_UNAWARE_NAVIGATION = new Set(["Link", "useRouter", "usePathname", "redirect", "permanentRedirect"]);
 	const LOCALE_AWARE_NAVIGATION = "@application/i18n/navigation";
 
@@ -2416,7 +2289,6 @@ describe("the imports CODING_STANDARDS.md hands to this suite", () => {
 		expect(offenders).toEqual([]);
 	});
 
-	// `motion` is the eager component set; `m` is what `LazyMotionProvider` feeds on demand.
 	it("imports m from motion/react, never motion or framer-motion", () => {
 		const web = sourceFiles.filter((file) => file.startsWith(`${WEB}/`));
 		const offenders = web.flatMap((file) =>
@@ -2466,8 +2338,6 @@ describe("the imports CODING_STANDARDS.md hands to this suite", () => {
 describe("the code keeps the mechanical rules CODING_STANDARDS.md hands to this suite", () => {
 	const CALENDAR = `${WEB_SRC}/domain/calendar/`;
 
-	// A signature the runtime owns stays positional: the HTTP method handlers Next calls with a request and
-	// a context. A method, and a callback handed to a hook or a library, is the reviewer's to read.
 	const HTTP_METHODS = new Set(["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]);
 
 	interface PositionalFunctionsParams {
@@ -2556,8 +2426,6 @@ describe("the code keeps the mechanical rules CODING_STANDARDS.md hands to this 
 		expect(found.filter((site) => !VIEWS_AN_EFFECT_COUNTS.includes(site))).toEqual([]);
 	});
 
-	// `const.ts` declares the tunables and `window.ts` the calendar's own arithmetic (months in a year and a
-	// quarter). An identity is not a tunable, and a percentage's `* 100` is a unit conversion.
 	const ENGINE_DECLARATIONS = new Set([`${CALENDAR}const.ts`, `${CALENDAR}window.ts`]);
 	const IDENTITIES = new Set(["0", "1"]);
 	const PERCENTAGE = "100";
@@ -2781,7 +2649,6 @@ describe("the code keeps the mechanical rules CODING_STANDARDS.md hands to this 
 		tag: string;
 	}
 
-	// Every attribute of every `<tag …>`, as its initializer's source text.
 	const jsxElements = ({ parsed, tag }: JsxElementsParams) => {
 		const found: Map<string, string | undefined>[] = [];
 		const visit = (node: ts.Node) => {
@@ -2828,7 +2695,6 @@ describe("the code keeps the mechanical rules CODING_STANDARDS.md hands to this 
 		expect(sized).toEqual([]);
 	});
 
-	// A panel focused only programmatically goes without a ring, because nothing tabs onto it.
 	const PROGRAMMATIC_FOCUS = new Set([`${WEB_SRC}/ui/modules/core/animate/base/Drawer.tsx`]);
 	const RING_SUPPRESSION = /(?<![\w-])focus:outline-none/;
 
@@ -2854,19 +2720,17 @@ describe("the code keeps the mechanical rules CODING_STANDARDS.md hands to this 
 			(file.startsWith(`${WEB}/`) && (TEST_FILE.test(file) || file.includes("/e2e/"))) || file.startsWith("tests/"),
 	);
 
-	// Secret scanners match `pi_<id>_secret_<rest>` and cannot tell a test double from a leak.
 	const CLIENT_SECRET_SHAPE = /\bpi_[A-Za-z0-9]+_secret_/;
 
-	it("shapes no fixture like a real Stripe client secret", () => {
+	it("shapes no fixture like a real Stripe client secret, which secret scanners cannot tell from a leak", () => {
 		expect(CLIENT_SECRET_SHAPE.test(["pi", "3AbC", "secret", "xyz"].join("_"))).toBe(true);
 		expect(tests.length).toBeGreaterThan(300);
 		expect(tests.filter((file) => CLIENT_SECRET_SHAPE.test(read(file)))).toEqual([]);
 	});
 
-	// A date-only ISO string parses as UTC midnight, the previous day anywhere west of UTC.
 	const DATE_ONLY_STRING = /new Date\(\s*["'`]\d{4}-\d{2}-\d{2}["'`]\s*\)/;
 
-	it("builds no fixture day from a date-only ISO string", () => {
+	it("builds no fixture day from a date-only ISO string, which parses as UTC midnight and so as the previous day west of UTC", () => {
 		expect(DATE_ONLY_STRING.test(`new Date("${"2025-01-06"}")`)).toBe(true);
 		expect(tests.filter((file) => DATE_ONLY_STRING.test(read(file)))).toEqual([]);
 	});
@@ -3350,25 +3214,32 @@ describe("workflows and package scripts keep the rules CODING_STANDARDS.md hands
 		});
 	};
 
+	interface StringsUnderKeyParams {
+		file: string;
+		key: string;
+	}
+
+	const stringsUnderKey = ({ file, key }: StringsUnderKeyParams) => {
+		const found: string[] = [];
+		const walk = (value: unknown) => {
+			if (Array.isArray(value)) value.forEach(walk);
+			else if (value && typeof value === "object")
+				for (const [name, child] of Object.entries(value)) {
+					if (name === key && typeof child === "string") found.push(child);
+					else walk(child);
+				}
+		};
+		walk(loadYaml(read(file)));
+		return found;
+	};
+
 	it("pins every action and workflow from another repository to a full SHA, its version or branch in a trailing comment", () => {
 		const usesLines = yamlFiles.flatMap((file) =>
 			read(file)
 				.split("\n")
 				.flatMap((line, index) => (USES_LINE.test(line) ? [{ file, line: index + 1, text: line }] : [])),
 		);
-		const parsedUses = yamlFiles.flatMap((file) => {
-			const found: string[] = [];
-			const walk = (value: unknown) => {
-				if (Array.isArray(value)) value.forEach(walk);
-				else if (value && typeof value === "object")
-					for (const [key, child] of Object.entries(value)) {
-						if (key === "uses" && typeof child === "string") found.push(child);
-						else walk(child);
-					}
-			};
-			walk(loadYaml(read(file)));
-			return found;
-		});
+		const parsedUses = yamlFiles.flatMap((file) => stringsUnderKey({ file, key: "uses" }));
 		const remote = usesLines.filter(({ text }) => !/^[.$]\//.test(USES_LINE.exec(text)?.[1] ?? ""));
 		const unpinned = remote
 			.filter(({ text }) => !SHA_PINNED_USES.test(text))
@@ -3400,6 +3271,20 @@ describe("workflows and package scripts keep the rules CODING_STANDARDS.md hands
 		expect(stray).toEqual([]);
 	});
 
+	it("keeps the shell of every step free of comments, a shebang aside", () => {
+		const shells = yamlFiles.flatMap((file) =>
+			["run", "command"].flatMap((key) => stringsUnderKey({ file, key }).map((script) => ({ file, script }))),
+		);
+		const stray = shells.flatMap(({ file, script }) =>
+			hashComments({ source: script, multilineStrings: true })
+				.filter((comment) => !isShebang(comment))
+				.map(({ text }) => `${file}: ${text}`),
+		);
+
+		expect(shells.length).toBeGreaterThan(40);
+		expect(stray).toEqual([]);
+	});
+
 	const PREPARE_ENV = `${COMPOSITE_ACTION_DIR}/prepare-env/action.yml`;
 	const TOOLCHAIN_SETUP = /uses:\s*(?:actions\/setup-node|pnpm\/action-setup)@/;
 	const FILTERED_INSTALL = /\bpnpm\s+(?:install|i)\b[^\n]*\s(?:--filter|-F)\b/;
@@ -3415,7 +3300,6 @@ describe("workflows and package scripts keep the rules CODING_STANDARDS.md hands
 		}).toEqual({ setUpElsewhere: [], filtered: [] });
 	});
 
-	// A job's `defaults.run.working-directory` does not reach its `uses:` steps.
 	const defaultsWithWorkingDirectory = (workflow: string) => {
 		const lines = workflow.split(/\r?\n/);
 		return lines.some((line, index) => {
@@ -3430,7 +3314,7 @@ describe("workflows and package scripts keep the rules CODING_STANDARDS.md hands
 		});
 	};
 
-	it("scopes a step with its own working-directory, never a defaults block", () => {
+	it("scopes a step with its own working-directory, never a defaults block, which does not reach a uses: step", () => {
 		expect(defaultsWithWorkingDirectory("jobs:\n  a:\n    defaults:\n      run:\n        working-directory: x\n")).toBe(
 			true,
 		);
@@ -3445,13 +3329,11 @@ describe("workflows and package scripts keep the rules CODING_STANDARDS.md hands
 	].flatMap(({ manifest, scripts: bodies }) =>
 		Object.entries(bodies).map(([name, body]) => ({ script: `${manifest} ${name}`, body })),
 	);
-	// Scripts run under `cmd` on Windows, where none of these means anything.
 	const SHELL_SUBSTITUTION = /\$\(|`|\$\{|\$[A-Za-z_]/;
-	// Biome reads its base from `vcs.defaultBranch`; Vitest and Playwright take theirs on the command line.
 	const CHANGED_ONLY = /--(?:only-)?changed(?![\w-])(?:[ =]([^\s&|;]+))?/g;
 	const BIOME_COMMAND = /^(?:pnpm\s+(?:lint|format)\b|biome\b)/;
 
-	it("keeps package scripts free of shell substitution, and names a literal base on every changed-only run", () => {
+	it("keeps package scripts free of shell substitution, which means nothing under cmd on Windows, and names a literal base on every changed-only run, since only Biome reads its base from vcs.defaultBranch", () => {
 		const changedOnly = scripts.flatMap(({ script, body }) =>
 			body
 				.split(/&&|\|\|/)
@@ -3467,10 +3349,9 @@ describe("workflows and package scripts keep the rules CODING_STANDARDS.md hands
 		}).toEqual({ substituted: [], baseless: [] });
 	});
 
-	// Flags after `pnpm run <script> --` reach the script as file filters rather than as flags.
 	const FORWARDED_FLAG = /\bpnpm\s+(?:(?:--filter|-F|--dir|-C)(?:\s+|=)\S+\s+)*(?:run\s+)?[a-z][\w:-]*\s+--\s+-/;
 
-	it("passes Playwright flags through pnpm exec, never after pnpm run <script> --", () => {
+	it("passes Playwright flags through pnpm exec, never after pnpm run <script> --, since flags after the -- reach the script as file filters", () => {
 		const bodies = [
 			...workflowFiles.map((file) => ({ source: file, body: runCommands(read(file)) })),
 			...scripts.map(({ script, body }) => ({ source: script, body })),
@@ -3482,19 +3363,7 @@ describe("workflows and package scripts keep the rules CODING_STANDARDS.md hands
 });
 
 describe("the guides describe the project as it is configured", () => {
-	// Backticked `foo/*` tokens are aliases; the dot filter drops the wrangler route pattern
-	// `forever-pto.com/*`. Whole backticked tokens, not substrings: the rule this replaced stripped the
-	// `/*` and searched the raw file, so `@app` matched inside `@application` and `src/*` reduced to `src`,
-	// and either alias could be deleted from the guide with every assertion still green.
 	const documentedAliases = new Set([...webGuide.matchAll(BACKTICKED_ALIAS)].map(([, alias]) => alias));
-	// The same table is published on the architecture overview, and this rule read only the guide, so the wiki
-	// copy carried `@mocks/*` and `@types/*` (neither declared, neither directory existing) for as long as
-	// nobody opened the tsconfig beside it. Both copies are held to the declaration now.
-	//
-	// The page's table is read as a table rather than scanned like the guide: the prose around it names the
-	// two aliases it is explaining are *gone*, and a whole-page scan reads those as declarations, along with
-	// every backticked `<something>/*` in a sentence. The first column of the run under the `Alias` header is
-	// the list; nothing else on the page is.
 	const OVERVIEW_PAGE = `${DOCS}/src/content/docs/architecture/overview.mdx`;
 	const ALIAS_TABLE_HEADER = "Alias";
 	const publishedAliases = (() => {
@@ -3511,9 +3380,6 @@ describe("the guides describe the project as it is configured", () => {
 
 		return found;
 	})();
-	// The unfiltered citations only. A `--filter`/`-F`/`--dir`/`-C` invocation names the manifest it means,
-	// so it is resolved against that one rather than against whichever of the three happens to have the
-	// script, by the rule further down.
 	const citedScripts = (guide: string) => [
 		...new Set(
 			pnpmCitations(guide)
@@ -3529,8 +3395,6 @@ describe("the guides describe the project as it is configured", () => {
 		expect(cited.filter((script) => !(script in rootScripts))).toEqual([]);
 	});
 
-	// A README is where someone copies a command from, so a script it names has to exist somewhere
-	// a reader could run it: the root, or the package the README belongs to.
 	it.each([
 		["README.md", rootScripts],
 		[`${WEB}/README.md`, { ...rootScripts, ...webScripts }],
@@ -3543,16 +3407,6 @@ describe("the guides describe the project as it is configured", () => {
 		expect(citedScripts(body).filter((script) => !(script in available))).toEqual([]);
 	});
 
-	// A workflow is the one citation site that fails in CI rather than under a reader, and it was unchecked:
-	// `docs.yml`'s Typecheck step ran `pnpm --filter forever-pto-docs check`, a script the docs manifest has
-	// never had. Every job runs from the repo root or from one of the two packages, so a bare script has to
-	// resolve in one of the three manifests.
-	//
-	// `docs.yml` reached this rule asserting `[] === []`, which is the workflow the rule was written for:
-	// all four of its pnpm invocations are filter-form, and the bare pattern this used to read could not see
-	// one. Both forms are checked here now, and the count of invocations the parser could read is compared
-	// with the count present, so the next spelling nobody anticipated fails loudly instead of emptying the
-	// citation list.
 	it.each(workflowFiles)("%s runs only scripts a manifest declares", (file) => {
 		const commands = runCommands(read(file));
 		const available = { ...rootScripts, ...webScripts, ...docsScripts };
@@ -3577,10 +3431,6 @@ describe("the guides describe the project as it is configured", () => {
 			const rootGuide = read("AGENTS.md");
 			const wiki = read(`${DOCS}/src/content/docs/infra/workflows.mdx`);
 
-			// A bare `includes(name)` was not a listing test: `ci.yml` is named more than ten times in that guide,
-			// so deleting the paragraph that documents it and leaving any one incidental mention kept this
-			// green. The guide links every workflow it lists to the file, and the link is what a reader
-			// follows, so that is the thing to require.
 			const linked = new RegExp(String.raw`\]\([^)]*\.github/workflows/${escapeForRegExp(name)}\)`);
 
 			expect({ rootGuide: linked.test(rootGuide), wiki: wiki.includes(`## \`${name}\``) }).toEqual({
@@ -3590,13 +3440,6 @@ describe("the guides describe the project as it is configured", () => {
 		},
 	);
 
-	// This once saw only the deploys written as plain step text, and its floor was satisfied by those alone,
-	// so the rest were unguarded. `docs.yml` deploys through `cloudflare/wrangler-action`, whose script
-	// arrives on a `command:` input rather than in the step text, and a script name reaches a deploy of its
-	// own: the `deploy` of `apps/docs` is `astro build && wrangler deploy`. Replacing the docs production
-	// deploy with a retry-wrapped `pnpm --filter forever-pto-docs deploy` kept the count unchanged, kept
-	// `wrapped` empty, and retried a wrangler deploy on an argv error. The floor tracks what the repo
-	// actually has, so losing sight of one fails rather than passes; raise it whenever a deploy is added.
 	it("runs every wrangler deploy without a retry wrapper, so an argv error reports on the first attempt", () => {
 		const wrapped: string[] = [];
 		let deploySteps = 0;
@@ -3617,12 +3460,6 @@ describe("the guides describe the project as it is configured", () => {
 		expect(wrapped).toEqual([]);
 	});
 
-	// The deploy census cannot see a secret write, and a secret write is where the wrapper survived the last
-	// pass: `wrangler secret bulk` and `wrangler secret put` each ran inside one, retrying a missing value
-	// three times fifteen seconds apart before saying which variable was empty. Both are folded into the
-	// deploy through `--secrets-file` now, so on most days this rule finds nothing at all: it deliberately
-	// carries no floor, because a floor of one would fail the moment the last `wrangler secret` step went
-	// away, which is the state this repository is trying to be in.
 	it("runs any wrangler secret write without a retry wrapper, whether or not one still exists", () => {
 		const wrapped: string[] = [];
 
@@ -3636,9 +3473,6 @@ describe("the guides describe the project as it is configured", () => {
 		expect(wrapped).toEqual([]);
 	});
 
-	// The same reasoning one command over. A build fails deterministically far more often than it fails for a
-	// reason a second attempt can fix, and the web build carried `max_attempts: 3` with `timeout_minutes: 10`,
-	// so a type error or a config error burned up to half an hour before it reported.
 	it("runs every build without a retry wrapper, so a deterministic failure reports on the first attempt", () => {
 		const wrapped: string[] = [];
 		let buildSteps = 0;
@@ -3661,17 +3495,6 @@ describe("the guides describe the project as it is configured", () => {
 		expect(wrapped).toEqual([]);
 	});
 
-	// The cleanup used to declare one workflow-level group, `ci.yml`'s, over both of its jobs. That queued
-	// `cleanup-docs` behind the wrong workflow: the Worker it deletes is deployed by the `preview` job in
-	// `docs.yml`, which has a group of its own, so the delete could land while that preview was still being
-	// used. Each job carries its own group now, and each is checked against the workflow that actually
-	// deploys the Worker that job deletes.
-	//
-	// The group is spelled from the pull request number rather than from `github.ref`. On a merged pull
-	// request the closed event's `github.ref` is the base branch, not `refs/pull/<n>/merge`, so a group built
-	// from it joined the push's run instead of the pull request's, ran the delete under the E2E job and was
-	// cancelled whenever two merges came close together. The expected group is therefore the deployer's with
-	// its workflow name substituted and its `github.ref` replaced by the merge ref of the pull request.
 	it.each([
 		["cleanup-web", "ci.yml"],
 		["cleanup-docs", "docs.yml"],
@@ -3694,10 +3517,6 @@ describe("the guides describe the project as it is configured", () => {
 		expect(cleanupConcurrency["cancel-in-progress"]).toBe("false");
 	});
 
-	// `Check` is the one context the ruleset names in each workflow, and it is an aggregate under `always()`
-	// so that a job skipped by its own `if:` counts as success. It gates a merge only on what it needs, so the
-	// preview E2E job has to be in the list: it was not a required check, and Renovate merged pull requests
-	// while the suite was still red.
 	it.each([
 		["ci.yml", ["verify", "deploy-development", "e2e", "deploy-production", "smoke", "release-web"]],
 		["docs.yml", ["build", "preview", "deploy", "smoke", "release-docs"]],
@@ -3709,10 +3528,6 @@ describe("the guides describe the project as it is configured", () => {
 		expect(needs).toEqual(expect.arrayContaining(gated));
 	});
 
-	// The filtered form names its own package, so it can be checked wherever it is written, including the
-	// published wiki, where a bare `pnpm build` is ambiguous between three manifests and this one is not.
-	// It was invisible to the rule above: `\bpnpm ` matches and `[a-z]` then meets the `-` of `--filter`, so
-	// the whole match fails and the line yields no script at all.
 	it("resolves every filtered pnpm citation against the package it names", () => {
 		const sources = [
 			"AGENTS.md",
@@ -3775,9 +3590,6 @@ describe("the guides describe the project as it is configured", () => {
 		expect(dangling.map(([alias]) => alias)).toEqual([]);
 	});
 
-	// `next build` rewrites apps/web/tsconfig.json on every run and fills in its own defaults for any key
-	// that is absent: `strict: false` and `allowJs: true`. Both would land at the next build rather than at
-	// the deletion site, so neither is safe to drop as redundant.
 	it("keeps strict on, because next build writes it false when the key is missing", () => {
 		expect(webTsconfigOptions.strict).toBe(true);
 	});
@@ -3786,11 +3598,7 @@ describe("the guides describe the project as it is configured", () => {
 		expect(webTsconfigOptions.allowJs).toBe(false);
 	});
 
-	// `include` is `**/*.ts`, so a generated .d.ts at the package root joins the program and the workerd
-	// globals in it replace lib.dom's Response. Both halves of the guard are asserted because either alone
-	// is useless. The ignore half is asked of git rather than matched against .gitignore as a substring,
-	// so an unanchored pattern that stops covering the file is caught.
-	it("keeps the generated Cloudflare env types out of the program and out of git", () => {
+	it("keeps the generated Cloudflare env types out of the program, where their workerd globals would replace lib.dom's Response, and out of git", () => {
 		expect(webTsconfigExclude).toContain(GENERATED_ENV_TYPES);
 		expect(isGitIgnored(`${WEB}/${GENERATED_ENV_TYPES}`)).toBe(true);
 	});
@@ -3846,8 +3654,6 @@ describe("translation bundles stay in step", () => {
 		}).toEqual({ missing: [], extra: [] });
 	});
 
-	// A key under `errors` or `promoCodeErrors` is a machine code looked up at runtime, so it keeps the code's
-	// spelling; `next-intl` cannot interpolate into anything but a string.
 	const MACHINE_CODE_PARENT = /(?:^|\.)(?:errors|promoCodeErrors)$/;
 	const CAMEL_CASE_KEY = /^[a-z][a-zA-Z0-9]*$/;
 
@@ -4004,14 +3810,6 @@ describe("translation bundles stay in step", () => {
 	});
 });
 
-// A version written into prose is a claim a bot invalidates on its own, and the rule above reads one section
-// of one guide. This one reads every document: a tool named beside a version states what its manifest already
-// states, and the manifest is the only copy Renovate keeps current. ADRs are exempt because a decision is
-// dated and quotes the versions it decided on; no other document narrates a past bump by its number, because
-// that history stays in git.
-// Which names are policed is read from the manifests: a repository that never declared Astro has no business
-// forbidding "Astro 7", and a dependency added tomorrow is policed the day its manifest names it. The runtimes
-// are the only names every repository carries.
 const VERSIONED_DEPENDENCIES: Record<string, string[]> = {
 	astro: ["Astro"],
 	"@astrojs/starlight": ["Starlight"],
@@ -4107,11 +3905,6 @@ describe("the release configs parse the commit grammar commitlint accepts", () =
 		expect(wrong).toEqual([]);
 	});
 
-	// A release commit that omits `[skip ci]` starts the run that cuts the next release, and a scope the
-	// workspace does not name is the one commit on main commitlint never sees, because the hook runs on a
-	// branch and `commit-message.yml` reads the pull request title. The shape is `chore(<package>): release
-	// <version> [skip ci]` in a monorepo, which this is; the single-package siblings drop the package and say
-	// `chore(release): <version> [skip ci]`.
 	const gitMessages = () =>
 		configs
 			.map((file) => {
@@ -4124,11 +3917,6 @@ describe("the release configs parse the commit grammar commitlint accepts", () =
 			})
 			.filter(({ message }) => message !== "");
 
-	// Both packages push a release commit to `main` and they release from different workflows, so the only
-	// thing ordering them is that both jobs name the same concurrency group. GitHub serialises a group across
-	// workflows, and each job checks out at its own start, so the second one branches from the first one's
-	// push rather than racing it. Take the group off either job and the loser fails its push *after*
-	// `@semantic-release/git` has created its tag: a version that exists as a tag with no commit behind it.
 	it("serialises every job that pushes a release commit into one concurrency group", () => {
 		const groups = ["ci.yml", "docs.yml"].map((workflow) => {
 			const body = read(`.github/workflows/${workflow}`);
@@ -4140,10 +3928,6 @@ describe("the release configs parse the commit grammar commitlint accepts", () =
 		expect(groups).toEqual(["release", "release"]);
 	});
 
-	// Every package that cuts a release keeps a changelog in the tree, and the plugin that writes one is
-	// useless without the plugin that commits it. apps/docs had neither for eight tags: its notes existed on
-	// a GitHub release and nowhere a reader would look, and its package.json sat at 0.0.0 while its tags said
-	// otherwise.
 	it("writes, versions and commits a changelog wherever it cuts a release", () => {
 		const missing = configs.flatMap((file) => {
 			const { plugins } = readJson(file) as { plugins: ReleasePlugin[] };
@@ -4158,10 +3942,6 @@ describe("the release configs parse the commit grammar commitlint accepts", () =
 		expect(missing).toEqual([]);
 	});
 
-	// A release commit that omits `[skip ci]` starts the run that cuts the next release, and the scope is the
-	// one commit on main commitlint never sees, because the hook runs on a branch and `commit-message.yml`
-	// reads the pull request title. The shape is `chore(<package>): release <version> [skip ci]` in a
-	// monorepo; the single-package siblings drop the package and say `chore(release): <version> [skip ci]`.
 	it("commits the release under its own package's scope, and tells CI to leave it alone", () => {
 		const wrong = gitMessages().filter(
 			({ app, message }) =>

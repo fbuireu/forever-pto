@@ -12,10 +12,6 @@ const SPECIMENS: Specimen[] = [
 	{ token: "--font-mono", label: "Mono, JetBrains Mono", sample: 'strategy: "optimized"' },
 ];
 
-/**
- * Live type specimens using the same font tokens the app maps in
- * src/ui/styles/theme/index.css.
- */
 export const TypeSpecimen = () => {
 	return (
 		<div className="not-content flex flex-col gap-5 my-6 p-6 bg-background rounded-[14px] border-[3px] border-[var(--frame)]">

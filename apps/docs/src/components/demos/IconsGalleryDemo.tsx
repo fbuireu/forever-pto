@@ -26,9 +26,6 @@ import { Demo } from "../Demo";
 
 type AnimatedIcon = ComponentType<{ size?: number }>;
 
-// Exhaustive gallery: every icon module in src/ui/modules/core/animate/icons/,
-// by its real export name. A renamed export fails `astro check`; a module added
-// or gone over there fails the contract suite, which `astro check` cannot see.
 const ICONS: ReadonlyArray<{ name: string; Icon: AnimatedIcon }> = [
 	{ name: "ArrowDown", Icon: ArrowDown },
 	{ name: "ArrowUp", Icon: ArrowUp },

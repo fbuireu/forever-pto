@@ -35,8 +35,10 @@ No rule below restates these, and a diff that breaks one fails CI:
   (`strategies.test.ts`) and a new obfuscation writing what the old one wrote (`utils/crypto.test.ts`).
 - `pnpm test:docs` ([`tests/docs-consistency.test.ts`](./tests/docs-consistency.test.ts)), which holds every document
   to the claims it can check and holds the code to these:
-  - no comment in the TypeScript under `apps/web/src`, doc comments included, bar a `biome-ignore` suppression and a
-    generated file's banner;
+  - no comment in hand-written source (the TypeScript of both packages, this suite and the root configs, the Astro
+    files, every stylesheet, the Workers' `wrangler.toml`, the `.env.example` and `_headers` files, the Husky hooks and
+    the shell of a workflow step), doc comments included, bar the tool directives `biome-ignore`, `@ts-expect-error`,
+    `/// <reference>` and `@vitest-environment`, and a generated file's banner;
   - every `'use client'`, `'use server'` and `'use cache'` in either package a bare string literal in first position;
   - the layer graph the architecture overview publishes equal to the one the imports make, no `Raw*` shape past the
     DTO seam, and `infrastructure` reaching `src/ui` only through the two readers of the locale bundles;

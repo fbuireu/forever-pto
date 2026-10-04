@@ -8,8 +8,6 @@ import type { VariantRow } from "../VariantsTable";
 type ButtonVariant = NonNullable<VariantProps<typeof buttonVariants>["variant"]>;
 type ButtonSize = NonNullable<VariantProps<typeof buttonVariants>["size"]>;
 
-// Exhaustive Record over the real CVA types: adding, renaming or removing a
-// variant in the app makes `astro check` fail here, keeping the docs honest.
 const VARIANT_LABELS: Record<ButtonVariant, string> = {
 	default: "Default",
 	accent: "Accent",

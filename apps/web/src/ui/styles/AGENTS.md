@@ -135,8 +135,8 @@ can still set its own positioning without `!important`.
 
 The same trick is hand-written for the driver.js buttons in `modules/tutorial/driver.css`, because an `@utility` cannot be
 applied to markup a library owns, and that file is compiled on its own without importing Tailwind, so
-`@apply` has nothing to resolve either. A comment there names this utility as the thing the copy must
-track; change the insets here and the copy will not follow.
+`@apply` has nothing to resolve either. Keep the three insets of its `::after` rules in step with this
+utility; change the insets here and the copy will not follow, and nothing fails when they drift.
 
 **The driver.js buttons copy `Button`'s variants by value for the same reason.** Next is the `default`
 variant, so it casts the accent trio: an ink face over a frame shadow would show no shadow at all. Done is `success`,

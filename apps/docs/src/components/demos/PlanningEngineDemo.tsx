@@ -1,8 +1,5 @@
 import { PTO_CONSTANTS } from "../../../../web/src/domain/calendar/const";
 
-// `const.ts` is dependency-free (no imports at all), so it is safe to import by relative path even
-// though it lives outside `src/ui/`. Interpolating the real values keeps the tunables the wiki
-// quotes equal to the ones the engine runs on.
 export { PTO_CONSTANTS };
 
 type Leaves<T, PREFIX extends string = ""> = {
@@ -11,8 +8,6 @@ type Leaves<T, PREFIX extends string = ""> = {
 
 type TunableKey = Leaves<typeof PTO_CONSTANTS>;
 
-// Exhaustive over every leaf of PTO_CONSTANTS: adding, renaming or removing a tunable in
-// `apps/web/src/domain/calendar/const.ts` makes `astro check` fail here, so this table cannot drift.
 const TUNABLE_DESCRIPTIONS: Record<TunableKey, string> = {
 	SAFETY_LIMIT:
 		"Upper bound on how many days a Bridge may expand into adjacent Free Days in either direction. A guard against a runaway loop, not a planning rule; one year of days is unreachable in practice.",

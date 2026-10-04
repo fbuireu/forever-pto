@@ -124,7 +124,10 @@ run, `docs-vX.Y.Z` from [`docs.yml`](./.github/workflows/docs.yml) after the doc
 published [release page](./apps/docs/src/content/docs/infra/release.mdx) walks through the chain.
 
 - Both release jobs share the `release` concurrency group and fast-forward onto `origin/main` before releasing, so a
-  merge that lands mid-run joins that release.
+  merge that lands mid-run joins that release. GitHub serialises a group across workflows and each job checks out at its
+  own start, so the second release branches from the first one's push; take the group off either job and the loser
+  fails its push after `@semantic-release/git` has created its tag, a version that exists as a tag with no commit
+  behind it.
 - **Annotate every bridge tag with its own reason.** semantic-release reads the **highest** tag matching `tagFormat`,
   so an unannotated one reads as debris and invites a tidy-up that deletes the wrong tag.
 - **On a history rewrite, push the tag before the branch, never after**, and never force-push `main` while a release
@@ -219,8 +222,8 @@ cited files, scripts, aliases, workflows, ADR numbering and references, the glos
 table, the wiki's constants and tokens), plus the code rules `CODING_STANDARDS.md` lists as enforced. It runs inside
 `pnpm test:ut`, so CI runs it on every pull request, and alone with `pnpm test:docs`; it reads staged and unstaged
 files, so a rule fires before the offending file is committed. A failure means a document and the code disagree: fix
-whichever one is wrong. It cannot check rationale, and that part is on you. A rule's title says what it holds, and
-the comment above it, where there is one, says why.
+whichever one is wrong. It cannot check rationale, and that part is on you. A rule's title says what it holds and
+why, because the suite carries no comments.
 
 A new ADR starts as a copy of [ADR 0000](./adr/0000-adr-template.md), the template, which says when a decision earns
 one and where to link it from.
@@ -257,6 +260,23 @@ one and where to link it from.
   `minimumReleaseAge`, renovate[bot] adds a `# Renovate security update: <pkg>@<version>` line beside the entry and
   never reads it back. It is bot output, like the lockfile: the contract suite's no-comment rule for YAML allows
   exactly that line, in that file alone, so removing it by hand only makes the next security PR write it again.
+- **The contract suite reads the tree git would ship, and a few of its readers are hand-made on purpose.** It lists
+  tracked, staged and unstaged files, leaves the dotfolders out (`.github` and `.husky` are read by name) and confirms
+  every path on disk, because a stash cycle leaves deleted paths in the index. A workflow is read for its `run:` and
+  its `command:` inputs, since `nick-fields/retry` takes its script on `command:`, and split on CRLF as well as LF,
+  because a Windows checkout writes CRLF and a `$` anchor would miss the carriage return. A step that names a script
+  is expanded through the chain the script ends in (root `deploy` is `pnpm --filter forever-pto-web deploy`, which is
+  `pnpm run cf:build && opennextjs-cloudflare deploy`), and an unfiltered citation inside a package's own script
+  resolves against that package. The deploy census carries a floor equal to the deploys the repository has, raised
+  when one is added. A superseded ADR keeps describing the tree it decided on, so the citation rules skip it.
+- **The no-comment check parses instead of matching delimiters.** JavaScript's lexical grammar is not regular: a URL in
+  a multi-line template, a stray or escaped backtick, a character class holding a delimiter and a regex literal with an
+  escaped slash each fooled a hand-rolled scanner, and only the parser knows whether a slash opens a regex or divides.
+  Comments are trivia, so the check asks for those before each token, which reaches one against a `{`, `}`, `]` or `)`
+  and one inside JSX (`{/* … */}`) as well, and JSX text that starts with `//` is not a comment. A file holding neither
+  `//` nor `/*` is skipped unparsed, because parsing every file made the rule time out under parallel load.
+  Stylesheets, Astro files, the TOML, env and headers files, the Husky hooks and the shell of a workflow step each have
+  a scanner that knows their strings and their comment form.
 - **The contract suite reads YAML with the js-yaml that semantic-release brings in through cosmiconfig.** No package
   here declares a YAML parser, so the suite resolves it along that chain; if semantic-release stops bringing it, the
   YAML rules fail on that lookup rather than pass over an unread file.

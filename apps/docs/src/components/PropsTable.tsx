@@ -7,12 +7,6 @@ export interface PropRow {
 
 type RowBody = Omit<PropRow, "prop">;
 
-/**
- * The props a component adds on top of the element or primitive it wraps. `Exclude`ing the base's
- * keys from the component's own is what makes a `Record` over the result exhaustive: a prop the app
- * adds, renames or removes fails `astro check` here until the row is written, the same guard the
- * variant tables get from `VariantProps`.
- */
 export type OwnProps<PROPS, BASE> = Exclude<keyof PROPS, keyof BASE>;
 
 export const propRows = <NAME extends string>(rows: Record<NAME, RowBody>): PropRow[] =>
@@ -20,7 +14,6 @@ export const propRows = <NAME extends string>(rows: Record<NAME, RowBody>): Prop
 
 interface PropsTableProps {
 	rows: PropRow[];
-	/** What the component wraps, so the reader knows where the rest of the props come from. */
 	extends?: string;
 }
 

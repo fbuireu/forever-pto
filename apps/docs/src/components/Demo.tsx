@@ -4,18 +4,9 @@ import { DemoIntlProvider } from "./DemoIntlProvider";
 
 interface DemoProps {
 	children: ReactNode;
-	/** Extra utility classes for the demo canvas (e.g. flex direction, gap). */
 	className?: string;
 }
 
-/**
- * Frame for live component demos: renders children on the app's real page
- * background so tokens, shadows and dark mode look exactly like production,
- * and supplies the two app contexts a real component may reach for. A demo
- * that needs one must not have to remember it; see apps/docs/AGENTS.md. The chip sits outside the
- * `data-demo` frame on purpose: e2e/demos.spec.ts counts that frame's children, and a chip inside it
- * would let a demo that renders nothing pass as rendered.
- */
 export const Demo = ({ children, className }: DemoProps) => {
 	return (
 		<LazyMotionProvider>

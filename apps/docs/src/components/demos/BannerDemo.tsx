@@ -8,8 +8,6 @@ import type { VariantRow } from "../VariantsTable";
 
 type BannerColorScheme = ComponentProps<typeof Banner>["colorScheme"];
 
-// Exhaustive Record over the component's real `colorScheme` prop type: adding,
-// renaming or removing a scheme in the app makes `astro check` fail here.
 const SCHEME_EXAMPLES: Record<BannerColorScheme, { icon: LucideIcon; title: string; message: string }> = {
 	orange: { icon: Lightbulb, title: "Tip", message: "Two PTO days around a Thursday holiday unlock a 5-day break." },
 	blue: { icon: Info, title: "Heads up", message: "Regional holidays depend on the selected region." },
