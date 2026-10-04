@@ -3,7 +3,7 @@
 import {
 	AMOUNT_MAX,
 	AMOUNT_MIN,
-	amountFromInput,
+	amountFromField,
 	type CreatePaymentInput,
 	createDonationFormSchemaWithMessages,
 } from "@application/dto/payment/schema";
@@ -12,9 +12,7 @@ import { usePremiumStore } from "@application/stores/premium";
 import { DonateSource, useUIStore } from "@application/stores/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
-import { getStripeClientInstance } from "@infrastructure/clients/payments/stripe/client";
 import { PromoCodeError } from "@infrastructure/errors";
-import { Elements } from "@stripe/react-stripe-js";
 import type { StripeElementsOptions } from "@stripe/stripe-js";
 import { initializePayment } from "@ui/adapters/payments/checkout";
 import { useIsMobile } from "@ui/hooks/useMobile";
@@ -35,14 +33,13 @@ import "./donate.css";
 import { logClientError } from "@application/shared/utils/clientLog";
 import { recoverFromStaleDeployment } from "@ui/adapters/navigation/staleDeployment";
 import { CheckoutForm } from "@ui/modules/premium/CheckoutForm";
+import { StripeElementsProvider } from "@ui/modules/premium/StripeElementsProvider";
 
 interface PaymentState {
 	clientSecret: string;
 	data: CreatePaymentInput;
 	discountInfo: DiscountInfo | null;
 }
-
-const stripePromise = getStripeClientInstance().getStripePromise();
 
 export interface DonateProps {
 	bottomClassName: string;
@@ -97,13 +94,13 @@ export const Donate = ({ bottomClassName }: DonateProps) => {
 		resolver: zodResolver(donationFormSchema),
 		resetOptions: { keepDirtyValues: true },
 		values: {
-			amount: "5",
+			amount: 5,
 			promoCode: "",
 			email: userEmail ?? "",
 		},
 	});
 
-	const currentAmount = amountFromInput(form.watch("amount"));
+	const currentAmount = amountFromField(form.watch("amount"));
 
 	const onSubmit = useCallback(
 		(data: CreatePaymentInput) => {
@@ -264,7 +261,7 @@ export const Donate = ({ bottomClassName }: DonateProps) => {
 						/>
 					) : (
 						elementsOptions && (
-							<Elements stripe={stripePromise} options={elementsOptions}>
+							<StripeElementsProvider options={elementsOptions} onCancel={handlePaymentCancel}>
 								<CheckoutForm
 									amount={finalAmount}
 									email={paymentState.data.email}
@@ -272,7 +269,7 @@ export const Donate = ({ bottomClassName }: DonateProps) => {
 									onSuccess={handlePaymentSuccess}
 									onCancel={handlePaymentCancel}
 								/>
-							</Elements>
+							</StripeElementsProvider>
 						)
 					)}
 				</div>

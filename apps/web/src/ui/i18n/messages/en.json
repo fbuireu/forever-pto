@@ -5,6 +5,7 @@
 		"toggleSidebar": "Toggle sidebar",
 		"sidebarLandmark": "Planner controls",
 		"radialNavigation": "Feature navigation",
+		"numberField": "Number field",
 		"selectLanguage": "Select language, current: {current}",
 		"calculating": "Calculating your plan",
 		"planUpdated": "Plan updated",
@@ -644,9 +645,9 @@
 		"perHour": "/hour",
 		"standardWorkingHours": "Standard working hours",
 		"effectiveHourlyRate": "Effective hourly rate:",
-		"whenWorkingExtraDays": "When working {days} extra unpaid days",
+		"whenWorkingExtraDays": "When working {days, number} extra unpaid days",
 		"opportunityCost": "Opportunity cost",
-		"opportunityCostDescription": "You worked {days} days that you could have taken as paid vacation. That's <amount>value</amount> worth of paid time off you gave up. Your salary stays the same, but you worked extra days for free."
+		"opportunityCostDescription": "You worked {days, number} days that you could have taken as paid vacation. That's <amount>value</amount> worth of paid time off you gave up. Your salary stays the same, but you worked extra days for free."
 	},
 	"checkout": {
 		"back": "Back",
@@ -660,6 +661,9 @@
 		"processing": "Processing...",
 		"payAmount": "Pay {amount}",
 		"promoSaved": "You saved {saved}!",
+		"formUnavailable": "The payment form could not load",
+		"formUnavailableDescription": "Stripe, which handles our payments, did not load. A content blocker, a privacy extension or your network may be blocking it. Allow Stripe on this site and try again. Your card has not been charged.",
+		"tryAgain": "Try again",
 		"errors": {
 			"internal_error": "Something went wrong on our side. Your card has not been charged.",
 			"rate_limit_exceeded": "Too many attempts. Please wait a moment and try again.",

@@ -2086,6 +2086,82 @@ describe("the imports CODING_STANDARDS.md hands to this suite", () => {
 		expect(offenders).toEqual([]);
 	});
 
+	const STRIPE_JS = "@stripe/stripe-js";
+	const STRIPE_JS_PURE = `${STRIPE_JS}/pure`;
+	const STRIPE_LOADERS = new Set(["getStripeClientInstance", "getStripePromise"]);
+
+	interface CallsNamedParams {
+		source: ts.SourceFile;
+		names: ReadonlySet<string>;
+	}
+
+	const callsNamed = ({ source, names }: CallsNamedParams) => {
+		const found = { all: 0, atModuleScope: 0 };
+		const visit = ({ node, inFunction }: { node: ts.Node; inFunction: boolean }) => {
+			if (ts.isCallExpression(node)) {
+				const callee = ts.isPropertyAccessExpression(node.expression)
+					? node.expression.name.text
+					: ts.isIdentifier(node.expression)
+						? node.expression.text
+						: "";
+				if (names.has(callee)) {
+					found.all += 1;
+					if (!inFunction) found.atModuleScope += 1;
+				}
+			}
+			ts.forEachChild(node, (child) => visit({ node: child, inFunction: inFunction || ts.isFunctionLike(node) }));
+		};
+		visit({ node: source, inFunction: false });
+		return found;
+	};
+
+	it("imports Stripe.js through its pure entry, because the bare entry fetches the script the moment it is imported", () => {
+		const stripe = webProduction.flatMap((file) =>
+			importsOf(file)
+				.filter(({ specifier }) => specifier === STRIPE_JS || specifier === STRIPE_JS_PURE)
+				.map((imported) => ({ file, ...imported })),
+		);
+		const offenders = stripe
+			.filter(({ specifier, typeOnly }) => specifier === STRIPE_JS && !typeOnly)
+			.map(({ file }) => file);
+
+		expect(stripe.some(({ specifier, typeOnly }) => specifier === STRIPE_JS_PURE && !typeOnly)).toBe(true);
+		expect(stripe.some(({ specifier, typeOnly }) => specifier === STRIPE_JS && typeOnly)).toBe(true);
+		expect(offenders).toEqual([]);
+	});
+
+	it("asks for Stripe.js only inside a function, never while a module loads, so a visitor who never donates never fetches it", () => {
+		const callers = webProduction.map((file) => ({
+			file,
+			...callsNamed({ source: parse(file), names: STRIPE_LOADERS }),
+		}));
+		const offenders = callers.filter(({ atModuleScope }) => atModuleScope > 0).map(({ file }) => file);
+
+		expect(callers.reduce((total, { all }) => total + all, 0)).toBeGreaterThan(0);
+		expect(offenders).toEqual([]);
+	});
+
+	it("tells a Stripe load made while a module loads from one made inside a function", () => {
+		const probe = (text: string) =>
+			callsNamed({
+				source: ts.createSourceFile("probe.ts", text, ts.ScriptTarget.Latest, true),
+				names: STRIPE_LOADERS,
+			});
+
+		expect(probe("const promise = getStripeClientInstance().getStripePromise();")).toEqual({
+			all: 2,
+			atModuleScope: 2,
+		});
+		expect(probe("const load = () => getStripeClientInstance().getStripePromise();")).toEqual({
+			all: 2,
+			atModuleScope: 0,
+		});
+		expect(probe("export function Donate() { useEffect(() => { getStripePromise(); }, []); }")).toEqual({
+			all: 1,
+			atModuleScope: 0,
+		});
+	});
+
 	const APPLICATION_UNREACHABLE = [
 		"next/server",
 		"next/headers",
@@ -2693,6 +2769,38 @@ describe("the code keeps the mechanical rules CODING_STANDARDS.md hands to this 
 
 		expect(dialogs.length).toBeGreaterThan(3);
 		expect(sized).toEqual([]);
+	});
+
+	const NUMBER_TYPE = /^\{?\s*["']number["']\s*\}?$/;
+
+	const numberInputsIn = (parsed: ts.SourceFile) => {
+		const found: number[] = [];
+		const visit = (node: ts.Node) => {
+			if (ts.isJsxSelfClosingElement(node) || ts.isJsxOpeningElement(node)) {
+				const typed = node.attributes.properties.find(
+					(property): property is ts.JsxAttribute =>
+						ts.isJsxAttribute(property) &&
+						property.name.getText(parsed) === "type" &&
+						NUMBER_TYPE.test(property.initializer?.getText(parsed) ?? ""),
+				);
+				if (typed) found.push(parsed.getLineAndCharacterOfPosition(typed.getStart(parsed)).line + 1);
+			}
+			ts.forEachChild(node, visit);
+		};
+		visit(parsed);
+		return found;
+	};
+
+	it('draws a number the visitor types with NumberInput and never as type="number", whose browser reads no separator but the point', () => {
+		const probe = (text: string) =>
+			numberInputsIn(ts.createSourceFile("probe.tsx", text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX));
+		const offenders = components.flatMap((file) => numberInputsIn(parse(file)).map((line) => `${file}:${line}`));
+
+		expect(components.length).toBeGreaterThan(100);
+		expect(probe('const field = <input type="number" min={0} />;')).toEqual([1]);
+		expect(probe("const field = <Input type={'number'} />;")).toEqual([1]);
+		expect(probe('const field = <Input type="text" inputMode="numeric" />;')).toEqual([]);
+		expect(offenders).toEqual([]);
 	});
 
 	const PROGRAMMATIC_FOCUS = new Set([`${WEB_SRC}/ui/modules/core/animate/base/Drawer.tsx`]);

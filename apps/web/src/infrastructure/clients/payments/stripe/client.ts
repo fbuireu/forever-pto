@@ -1,4 +1,5 @@
-import { loadStripe, type Stripe } from "@stripe/stripe-js";
+import type { Stripe } from "@stripe/stripe-js";
+import { loadStripe } from "@stripe/stripe-js/pure";
 
 class StripeClient {
 	private stripePromise: Promise<Stripe | null> | null = null;
@@ -9,7 +10,10 @@ class StripeClient {
 	}
 
 	getStripePromise() {
-		this.stripePromise ??= loadStripe(this.publishableKey);
+		this.stripePromise ??= loadStripe(this.publishableKey).catch((error: unknown) => {
+			this.stripePromise = null;
+			throw error;
+		});
 		return this.stripePromise;
 	}
 }

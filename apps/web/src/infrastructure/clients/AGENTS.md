@@ -84,11 +84,17 @@ There is a client on each side, and the split is the trap:
   and `StripeNode.createFetchHttpClient()` because the Workers runtime has no Node HTTP stack
   ([ADR 0004](../../../../../adr/0004-cloudflare-workers-as-deployment-target.md)). Every server-side Stripe
   call goes through this tag. It also exports `WebhookConfigurationError` and `isWebhookConfigurationError`.
-- [`payments/stripe/client.ts`](./payments/stripe/client.ts), browser only, `@stripe/stripe-js`, and it does exactly one thing:
-  memoise `loadStripe(publishableKey)`. The `StripeClient` class is **not** exported; the module's only
+- [`payments/stripe/client.ts`](./payments/stripe/client.ts), browser only, `@stripe/stripe-js/pure`, and it does exactly one thing:
+  memoise `loadStripe(publishableKey)`, forgetting the promise when it rejects. The `StripeClient` class is **not** exported; the module's only
   export is `getStripeClientInstance()`, a lazy singleton that throws if
-  `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is absent, and its only method is `getStripePromise()`, which is
-  all [`Donate.tsx`](../../ui/modules/shared/donate/Donate.tsx) needs to hand a promise to Stripe's `<Elements>` provider.
+  `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is absent, and its only method is `getStripePromise()`, which
+  [`StripeElementsProvider.tsx`](../../ui/modules/premium/StripeElementsProvider.tsx) calls when the checkout mounts and
+  nothing calls while a module loads. The `pure` entry is what makes that true: the bare `@stripe/stripe-js` entry
+  injects the script tag the moment it is imported, so a visitor who never donates would still fetch Stripe.js on every
+  planner load, and the contract suite fails an import of it as a value and a module-scope ask for the promise.
+  A load that fails (`Failed to load Stripe.js`, which a content blocker, a privacy extension or a proxy that blocks
+  `js.stripe.com` causes) is cleared from the memo, so the next ask loads again; it is an expected condition the
+  checkout shows, not a defect, and nothing here logs it.
   The confirm-and-classify path that runs in the browser is
   [`../../ui/adapters/payments/checkout.ts`](../../ui/adapters/payments/checkout.ts): it takes the `stripe`
   instance from Elements, calls `stripe.confirmPayment` itself and classifies the outcome as
@@ -135,7 +141,7 @@ boundary; the contract suite fails an import from `@ui/*` here.
 
 Each Effect service has a co-located `.test.ts` that mocks the SDK module and asserts the Effect surface: the
 success value, that a rejection becomes the right tagged error, and the missing-variable path. The other clients'
-tests stub `window`, `driver.js` or `@stripe/stripe-js` instead. [`layers.test.ts`](../layers.test.ts) is the
+tests stub `window`, `driver.js` or `@stripe/stripe-js/pure` instead. [`layers.test.ts`](../layers.test.ts) is the
 reference for a test that imports `layers.ts`.
 
 **SQL that has to hold under concurrency runs against a real engine.** [`db/turso/fixture.ts`](./db/turso/fixture.ts)

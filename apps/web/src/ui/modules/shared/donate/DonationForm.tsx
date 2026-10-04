@@ -21,6 +21,7 @@ import {
 } from "@ui/modules/core/primitives/Form";
 import { Input } from "@ui/modules/core/primitives/Input";
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@ui/modules/core/primitives/InputGroup";
+import { NumberInput } from "@ui/modules/core/primitives/NumberInput";
 import { cn } from "@ui/utils/cn";
 import { amountFormatter } from "@ui/utils/currencies";
 import type { Locale } from "next-intl";
@@ -30,6 +31,7 @@ import type { UseFormReturn } from "react-hook-form";
 import { FormButtons } from "../FormButtons";
 
 const PRESET_AMOUNTS = [5, 10, 15] as const;
+const AMOUNT_FRACTION_DIGITS = 2;
 
 interface DonationFormProps {
 	form: UseFormReturn<DonationFormValues, unknown, CreatePaymentInput>;
@@ -51,6 +53,7 @@ export function DonationForm({
 	isPending,
 }: Readonly<DonationFormProps>) {
 	const t = useTranslations("donationForm");
+	const tA11y = useTranslations("a11y");
 	const [showPromoCode, setShowPromoCode] = useState(false);
 	const { setValue } = form;
 
@@ -58,7 +61,7 @@ export function DonationForm({
 
 	const handlePresetClick = useCallback(
 		(value: number) => {
-			setValue("amount", String(value), { shouldValidate: true });
+			setValue("amount", value, { shouldValidate: true });
 		},
 		[setValue],
 	);
@@ -117,17 +120,24 @@ export function DonationForm({
 									<InputGroupText>{currencySymbol}</InputGroupText>
 								</InputGroupAddon>
 								<FormControl>
-									<InputGroupInput
-										type="number"
+									<NumberInput
+										render={<InputGroupInput className="pl-2" />}
+										locale={locale}
+										roleDescription={tA11y("numberField")}
+										maximumFractionDigits={AMOUNT_FRACTION_DIGITS}
 										inputMode="numeric"
 										placeholder={t("enterAmount")}
 										autoComplete="off"
-										step="1"
+										step={1}
 										min={AMOUNT_MIN}
 										max={AMOUNT_MAX}
 										disabled={isPending}
 										required
-										{...field}
+										name={field.name}
+										value={field.value}
+										onValueChange={field.onChange}
+										onBlur={field.onBlur}
+										ref={field.ref}
 									/>
 								</FormControl>
 							</InputGroup>

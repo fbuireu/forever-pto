@@ -3,6 +3,7 @@
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { SlidingNumber } from "@ui/modules/core/animate/text/SlidingNumber";
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@ui/modules/core/primitives/InputGroup";
+import { NumberInput } from "@ui/modules/core/primitives/NumberInput";
 import { ConditionalWrapper } from "@ui/modules/shared/ConditionalWrapper";
 import { DEFAULT_CURRENCY, DEFAULT_CURRENCY_SYMBOL } from "@ui/utils/currencies";
 import { Euro } from "lucide-react";
@@ -12,11 +13,11 @@ import { SidebarFieldTooltip } from "./SidebarFieldLabel";
 
 const WORKING_DAYS_PER_YEAR = 252;
 const HOURS_PER_DAY = 8;
+const SALARY_FRACTION_DIGITS = 2;
+const UNUSED_DAYS_FRACTION_DIGITS = 2;
+const DEFAULT_UNUSED_PTO_DAYS = 5;
 
-const parseSalary = (input: string) => {
-	const parsed = Number.parseFloat(input);
-	return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
-};
+const positive = (amount: number | null) => (amount !== null && amount > 0 ? amount : 0);
 
 interface CurrencyNumberProps {
 	value: number;
@@ -52,8 +53,9 @@ const CurrencyNumber = ({ value, decimalPlaces = 0, currencyPosition, currencySy
 export const PtoSalaryCalculator = () => {
 	const locale = useLocale();
 	const t = useTranslations("ptoSalaryCalculator");
-	const [annualSalaryInput, setAnnualSalaryInput] = useState("");
-	const [unusedPTODaysInput, setUnusedPTODaysInput] = useState("5");
+	const tA11y = useTranslations("a11y");
+	const [annualSalaryValue, setAnnualSalaryValue] = useState<number | null>(null);
+	const [unusedPTODaysValue, setUnusedPTODaysValue] = useState<number | null>(DEFAULT_UNUSED_PTO_DAYS);
 
 	const currencyPosition = useMemo(() => {
 		try {
@@ -67,8 +69,8 @@ export const PtoSalaryCalculator = () => {
 		}
 	}, [locale]);
 
-	const annualSalary = parseSalary(annualSalaryInput);
-	const unusedPTODays = Number(unusedPTODaysInput);
+	const annualSalary = positive(annualSalaryValue);
+	const unusedPTODays = unusedPTODaysValue ?? 0;
 
 	const dailyRate = annualSalary / WORKING_DAYS_PER_YEAR;
 	const unusedPTOValue = dailyRate * unusedPTODays;
@@ -81,14 +83,14 @@ export const PtoSalaryCalculator = () => {
 		if (willShowResults && !showResults) track({ event: "tool_used", properties: { tool: "ptoSalaryCalculator" } });
 	};
 
-	const handleSalaryChange = (value: string) => {
-		setAnnualSalaryInput(value);
-		reportFirstFigures(parseSalary(value) > 0 && unusedPTODays >= 0);
+	const handleSalaryChange = (value: number | null) => {
+		setAnnualSalaryValue(value);
+		reportFirstFigures(positive(value) > 0 && unusedPTODays >= 0);
 	};
 
-	const handleUnusedDaysChange = (value: string) => {
-		setUnusedPTODaysInput(value);
-		reportFirstFigures(annualSalary > 0 && Number(value) >= 0);
+	const handleUnusedDaysChange = (value: number | null) => {
+		setUnusedPTODaysValue(value);
+		reportFirstFigures(annualSalary > 0 && (value ?? 0) >= 0);
 	};
 
 	return (
@@ -106,15 +108,18 @@ export const PtoSalaryCalculator = () => {
 					<InputGroupAddon>
 						<InputGroupText>{DEFAULT_CURRENCY_SYMBOL}</InputGroupText>
 					</InputGroupAddon>
-					<InputGroupInput
+					<NumberInput
 						id="annualSalary"
-						type="number"
+						render={<InputGroupInput className="pl-2" />}
+						locale={locale}
+						roleDescription={tA11y("numberField")}
+						maximumFractionDigits={SALARY_FRACTION_DIGITS}
 						inputMode="numeric"
 						autoComplete="off"
-						min="0"
-						step="1000"
-						value={annualSalaryInput}
-						onChange={(e) => handleSalaryChange(e.target.value)}
+						min={0}
+						step={1000}
+						value={annualSalaryValue}
+						onValueChange={handleSalaryChange}
 						placeholder={t("annualSalaryPlaceholder", { amount: 50_000 })}
 					/>
 				</InputGroup>
@@ -123,16 +128,19 @@ export const PtoSalaryCalculator = () => {
 			<div className="space-y-2 w-full">
 				<p className="text-xs text-muted-foreground">{t("unusedPtoDays")}</p>
 				<InputGroup>
-					<InputGroupInput
+					<NumberInput
 						id="unusedPTO"
-						type="number"
-						min="0"
-						max="50"
+						render={<InputGroupInput />}
+						locale={locale}
+						roleDescription={tA11y("numberField")}
+						maximumFractionDigits={UNUSED_DAYS_FRACTION_DIGITS}
+						min={0}
+						max={50}
 						inputMode="numeric"
 						autoComplete="off"
-						value={unusedPTODaysInput}
-						onChange={(e) => handleUnusedDaysChange(e.target.value)}
-						placeholder={t("unusedPtoDaysPlaceholder", { days: 5 })}
+						value={unusedPTODaysValue}
+						onValueChange={handleUnusedDaysChange}
+						placeholder={t("unusedPtoDaysPlaceholder", { days: DEFAULT_UNUSED_PTO_DAYS })}
 					/>
 				</InputGroup>
 			</div>

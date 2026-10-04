@@ -8,7 +8,7 @@ export const LabelDemo = () => (
 	<Demo className="flex-col items-stretch">
 		<div className="grid gap-2">
 			<Label htmlFor="label-demo-days">PTO days per year</Label>
-			<Input id="label-demo-days" type="number" defaultValue={23} min={0} />
+			<Input id="label-demo-days" inputMode="numeric" defaultValue="23" />
 		</div>
 		<div className="grid gap-2">
 			<Input id="label-demo-disabled" className="peer order-2" defaultValue="Disabled control" disabled />

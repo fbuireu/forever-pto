@@ -63,7 +63,7 @@ go hunting for a key:
   files may not call `useTranslations` ([`../modules/core/AGENTS.md`](../modules/core/AGENTS.md)), so the
   *caller* supplies them: `closeDialog` for every modal's close button, `closeToast` for the sonner toaster,
   `toggleSidebar` and `sidebarLandmark` for the sidebar, `radialNavigation` for the roadmap dial,
-  `skipToMainContent` for `SkipToContent`. Names more than one feature needs: `selectLanguage`, read through
+  `numberField` for the `aria-roledescription` of every `NumberInput`, `skipToMainContent` for `SkipToContent`. Names more than one feature needs: `selectLanguage`, read through
   `useLanguageSwitch` by both the sidebar's `LanguageSelector` and the homepage's switcher. And text that exists
   only to be *announced*: `calculating`, `planUpdated` and `noPlan` are the planner's live-region strings, read
   by `CalendarList.tsx` and `ManagementBar.tsx` into `sr-only` `role="status"` spans.

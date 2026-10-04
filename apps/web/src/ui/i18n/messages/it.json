@@ -5,6 +5,7 @@
 		"toggleSidebar": "Mostra o nascondi la barra laterale",
 		"sidebarLandmark": "Controlli del pianificatore",
 		"radialNavigation": "Navigazione delle funzioni",
+		"numberField": "Campo numerico",
 		"selectLanguage": "Seleziona lingua, attuale: {current}",
 		"calculating": "Calcolo del tuo piano",
 		"planUpdated": "Piano aggiornato",
@@ -644,9 +645,9 @@
 		"perHour": "/ora",
 		"standardWorkingHours": "Ore di lavoro standard",
 		"effectiveHourlyRate": "Tariffa oraria effettiva:",
-		"whenWorkingExtraDays": "Lavorando {days} giorni extra non retribuiti",
+		"whenWorkingExtraDays": "Lavorando {days, number} giorni extra non retribuiti",
 		"opportunityCost": "Costo opportunità",
-		"opportunityCostDescription": "Hai lavorato {days} giorni che avresti potuto prendere come ferie pagate. Equivalgono a <amount>valore</amount> di tempo libero retribuito a cui hai rinunciato. Il tuo stipendio resta lo stesso, ma hai lavorato giorni in più gratis."
+		"opportunityCostDescription": "Hai lavorato {days, number} giorni che avresti potuto prendere come ferie pagate. Equivalgono a <amount>valore</amount> di tempo libero retribuito a cui hai rinunciato. Il tuo stipendio resta lo stesso, ma hai lavorato giorni in più gratis."
 	},
 	"checkout": {
 		"back": "Indietro",
@@ -660,6 +661,9 @@
 		"processing": "Elaborazione...",
 		"payAmount": "Paga {amount}",
 		"promoSaved": "Hai risparmiato {saved}!",
+		"formUnavailable": "Impossibile caricare il modulo di pagamento",
+		"formUnavailableDescription": "Stripe, che gestisce i nostri pagamenti, non si è caricato. Potrebbe bloccarlo un ad blocker, un'estensione per la privacy o la tua rete. Consenti Stripe su questo sito e riprova. Non è stato addebitato nulla sulla tua carta.",
+		"tryAgain": "Riprova",
 		"errors": {
 			"internal_error": "Qualcosa è andato storto da parte nostra. Non è stato addebitato nulla sulla tua carta.",
 			"rate_limit_exceeded": "Troppi tentativi. Attendi un momento e riprova.",

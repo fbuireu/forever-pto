@@ -58,16 +58,18 @@ No rule below restates these, and a diff that breaks one fails CI:
     page's `searchParams` typed as the record Next hands over (a repeated parameter is an array), every page's
     metadata one `routeMetadata` line with no metadata module beside it, and no `'use cache'` or `cacheComponents`;
   - the UI: `Link`, `useRouter` and `usePathname` taken from `@application/i18n/navigation`, no `'use server'` or
-    `next/headers` in `src/ui`, `core/` free of stores, translations and fetching, `core/animate/primitives` imported
+    `next/headers` in `src/ui`, no `type="number"` input (`NumberInput` reads the visitor's own separators), `core/`
+    free of stores, translations and fetching, `core/animate/primitives` imported
     only inside `core/animate` (the docs site included), `m` from `motion/react` rather than `motion` or
     `framer-motion`, every `<Skeleton>` fixture repeated as its fallback, no `max-h` or `overflow` on a
     `DialogContent`, `focus:outline-none` only on the programmatically focused drawer panel, and no `track()` inside
     an effect but the view a `#contact` link opens;
-  - the code at large: `Temporal` from `temporal-polyfill`, no `index` module, no declared function or `const`
-    arrow taking two positional parameters in `apps/web`, its tests, its e2e specs or this suite (a route's HTTP
-    method handlers aside), no number in the planning engine but 0, 1 and a percentage's `* 100` outside `const.ts`
-    and `window.ts`, a date format built in `dates.ts` alone, every `json()` answer bound as `unknown`, never cast or
-    typed, and every module-level schema named `<concept>Schema`;
+  - the code at large: `Temporal` from `temporal-polyfill`, Stripe.js imported through `@stripe/stripe-js/pure` and
+    asked for only inside a function (the bare entry and a module-scope ask both fetch the script on every load), no
+    `index` module, no declared function or `const` arrow taking two positional parameters in `apps/web`, its tests,
+    its e2e specs or this suite (a route's HTTP method handlers aside), no number in the planning engine but 0, 1 and
+    a percentage's `* 100` outside `const.ts` and `window.ts`, a date format built in `dates.ts` alone, every `json()`
+    answer bound as `unknown`, never cast or typed, and every module-level schema named `<concept>Schema`;
   - the tests: a `route.test.ts` beside every route handler, no `__tests__` folder, no fixture shaped like a Stripe
     client secret, no fixture day built from a date-only ISO string, no year read off the real clock and no
     `Date.now()` bracket in a unit test, no test writing the process environment, every `vi.stubGlobal`,
@@ -405,10 +407,11 @@ No rule below restates these, and a diff that breaks one fails CI:
 - `U14` **hard**: Declare at module scope a motion configuration object that feeds a dependency list, a context or
   `m.create`, and any `MotionSlot` child, so its identity is stable across renders; motion compares an inline
   `initial`, `animate` or `transition` by value, so those may stay inline.
-- `U15` **hard**: Keep what the render reads in state, not a ref; hold a text input as a string and parse it where it
-  is used (the accrual and salary calculators, the Donation amount), because a number input reports an emptied
-  field, and a partial number the visitor's locale cannot read yet (`4.` where the comma is the decimal), as an empty
-  string, and state that converts every keystroke writes `0` over what is being typed.
+- `U15` **hard**: Keep what the render reads in state, not a ref; draw a number the visitor types with `NumberInput`,
+  never `type="number"`, and hold it as `number | null`, where `null` is an emptied field or text it cannot read and
+  the owner converts it where it is used (the accrual and salary calculators, the Donation amount), because
+  `NumberInput` keeps the typed text and reads it in the visitor's language, and state that converted every keystroke
+  would write `0` over what is being typed ([ADR 0021](./adr/0021-numbers-a-visitor-types-are-localised-text-fields.md)).
 - `U16` **hard**: Keep a timer's or an animation frame's handle where its cleanup reaches it (the effect that set it,
   or a ref when several callbacks share it) and clear it on close and on unmount.
 - `U17` **hard**: Key selections and list items by the item (the Holiday's id and name, a key built from the date),

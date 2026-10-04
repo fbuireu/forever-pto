@@ -5,6 +5,7 @@
 		"toggleSidebar": "Mostra o amaga la barra lateral",
 		"sidebarLandmark": "Controls del planificador",
 		"radialNavigation": "Navegació de funcions",
+		"numberField": "Camp numèric",
 		"selectLanguage": "Selecciona l'idioma, actual: {current}",
 		"calculating": "S'està calculant el teu pla",
 		"planUpdated": "Pla actualitzat",
@@ -644,9 +645,9 @@
 		"perHour": "/hora",
 		"standardWorkingHours": "Hores de treball estàndard",
 		"effectiveHourlyRate": "Tarifa per hora efectiva:",
-		"whenWorkingExtraDays": "Si treballes {days} dies extra no retribuïts",
+		"whenWorkingExtraDays": "Si treballes {days, number} dies extra no retribuïts",
 		"opportunityCost": "Cost d'oportunitat",
-		"opportunityCostDescription": "Has treballat {days} dies que podries haver fet com a vacances pagades. Això són <amount>valor</amount> de temps lliure pagat al qual has renunciat, i el sou no t'ha augmentat gens."
+		"opportunityCostDescription": "Has treballat {days, number} dies que podries haver fet com a vacances pagades. Això són <amount>valor</amount> de temps lliure pagat al qual has renunciat, i el sou no t'ha augmentat gens."
 	},
 	"checkout": {
 		"back": "Torna",
@@ -660,6 +661,9 @@
 		"processing": "S'està processant...",
 		"payAmount": "Paga {amount}",
 		"promoSaved": "Has estalviat {saved}!",
+		"formUnavailable": "No s'ha pogut carregar el formulari de pagament",
+		"formUnavailableDescription": "Stripe, que gestiona els nostres pagaments, no s'ha carregat. Pot ser que ho estigui bloquejant un bloquejador de contingut, una extensió de privadesa o la teva xarxa. Permet Stripe en aquest lloc i torna-ho a provar. No s'ha fet cap càrrec a la teva targeta.",
+		"tryAgain": "Torna-ho a provar",
 		"errors": {
 			"internal_error": "Alguna cosa ha fallat per part nostra. No s'ha fet cap càrrec a la teva targeta.",
 			"rate_limit_exceeded": "Massa intents. Espera un moment i torna-ho a provar.",

@@ -148,6 +148,18 @@ opening. From the success on, the form disables Back and Pay and its confirmatio
 button's included: Back in that moment would report `payment_cancelled` for a paid Donation, and Pay would
 confirm a PaymentIntent that has already succeeded.
 
+**The checkout fetches Stripe.js when it mounts, and says so when it cannot.**
+[`premium/StripeElementsProvider.tsx`](./premium/StripeElementsProvider.tsx) wraps `CheckoutForm` in Stripe's `<Elements>`
+and asks `getStripeClientInstance()` for Stripe.js in an effect, so a visitor who never donates never fetches it and
+importing `Donate` fetches nothing. It hands `Elements` the loaded instance and never the promise: `Elements` chains handlers onto a promise it is given,
+so a rejection would escape as an uncaught one whatever the caller catches. While the script loads it draws
+[`premium/StripeLoadingFixture.tsx`](./premium/StripeLoadingFixture.tsx) and mounts nothing of the checkout, so a blocked
+script, which fails within milliseconds, never mounts the form it would then unmount. A visitor whose browser blocks `js.stripe.com` (a content blocker, a privacy extension, a
+proxy) is an expected case, so the failed load logs nothing and tracks nothing: the checkout shows
+`checkout.formUnavailable` with a Try again button that asks the client again and the same Back the checkout has, and
+reopening the popover loads again too. `StripeElementsProvider.test.tsx` fails an uncaught rejection and any
+`console.error` or `logClientError` on the failure.
+
 ## Skeletons and bones
 
 Loading states go through `boneyard-js`, not hand-rolled shimmer divs. These pieces cooperate:
@@ -259,11 +271,13 @@ name from its config key** with `replaceAll("_", " ")`: `replace` with a string 
 only, and `BUY_ME_A_COFFEE` would announce as *buy me_a_coffee*;
 [`DevFooter.test.tsx`](./shared/footer/components/DevFooter.test.tsx) asks for each link **by name**.
 
-**In `shared/donate/DonationForm.tsx`, `FormControl` sits inside `InputGroup`, around `InputGroupInput`**, so
+**In `shared/donate/DonationForm.tsx`, `FormControl` sits inside `InputGroup`, around `NumberInput`**, so
 the amount label's `for` and the `aria-describedby` land on the input rather than on the `role="group"`
-wrapper; `InputGroup`'s `has-[>input]` selectors still hold, because `Slot` renders its child directly. The
-form sets `noValidate`, and the email and amount inputs declare `required`, which puts it in the accessible
-tree without turning native validation back on. The promo-code input has a `FormLabel` of its own, since a
+wrapper: `NumberInput` hands the `id` to Base UI's field root and every other prop to the `<input>`. Its wrapper
+`div` is `display: contents`, so the input is the group's flex item without being the group's direct
+child, and `InputGroup`'s `[&>input]` padding selectors do not reach it, which is why the amount and the salary pass
+`pl-2` themselves. The form sets `noValidate`, and the email and amount inputs declare `required`, which puts it in the
+accessible tree without turning native validation back on. The promo-code input has a `FormLabel` of its own, since a
 placeholder vanishes on the first keystroke.
 
 **The legal identity modules derive their own accessible name; they take no prop.** `pages/legal/Me.tsx`,

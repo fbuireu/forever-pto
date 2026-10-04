@@ -5,6 +5,7 @@
 		"toggleSidebar": "Seitenleiste ein- oder ausblenden",
 		"sidebarLandmark": "Planer-Einstellungen",
 		"radialNavigation": "Funktionsnavigation",
+		"numberField": "Zahlenfeld",
 		"selectLanguage": "Sprache auswählen, aktuell: {current}",
 		"calculating": "Dein Plan wird berechnet",
 		"planUpdated": "Plan aktualisiert",
@@ -644,9 +645,9 @@
 		"perHour": "/Stunde",
 		"standardWorkingHours": "Reguläre Arbeitsstunden",
 		"effectiveHourlyRate": "Effektiver Stundensatz:",
-		"whenWorkingExtraDays": "Bei {days} zusätzlichen unbezahlten Arbeitstagen",
+		"whenWorkingExtraDays": "Bei {days, number} zusätzlichen unbezahlten Arbeitstagen",
 		"opportunityCost": "Opportunitätskosten",
-		"opportunityCostDescription": "Du hast {days} Tage gearbeitet, die du als bezahlten Urlaub hättest nehmen können. Das entspricht <amount>value</amount> an bezahlter Freizeit, die ungenutzt blieb. Dein Gehalt bleibt gleich, aber die Tage sind weg."
+		"opportunityCostDescription": "Du hast {days, number} Tage gearbeitet, die du als bezahlten Urlaub hättest nehmen können. Das entspricht <amount>value</amount> an bezahlter Freizeit, die ungenutzt blieb. Dein Gehalt bleibt gleich, aber die Tage sind weg."
 	},
 	"checkout": {
 		"back": "Zurück",
@@ -660,6 +661,9 @@
 		"processing": "Wird verarbeitet...",
 		"payAmount": "Bezahlen {amount}",
 		"promoSaved": "Du hast {saved} gespart!",
+		"formUnavailable": "Das Zahlungsformular konnte nicht geladen werden",
+		"formUnavailableDescription": "Stripe, über das wir Zahlungen abwickeln, wurde nicht geladen. Möglicherweise blockiert es ein Werbeblocker, eine Datenschutz-Erweiterung oder dein Netzwerk. Erlaube Stripe auf dieser Seite und versuche es erneut. Deine Karte wurde nicht belastet.",
+		"tryAgain": "Erneut versuchen",
 		"errors": {
 			"internal_error": "Bei uns ist etwas schiefgelaufen. Deine Karte wurde nicht belastet.",
 			"rate_limit_exceeded": "Zu viele Versuche. Warte einen Moment und versuche es noch einmal.",

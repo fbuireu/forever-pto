@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
 	ACTIVATION_FAILED,
 	ACTIVATION_PARAM,
-	amountFromInput,
+	amountFromField,
 	createDonationFormSchemaWithMessages,
 	createPaymentSchema,
 	createPaymentSchemaWithMessages,
@@ -134,35 +134,32 @@ describe("createDonationFormSchemaWithMessages", () => {
 		promoCodeTooLong: "Promo code too long",
 	});
 
-	it.each([
-		["25", 25],
-		["4.", 4],
-		["12.5", 12.5],
-	])("converts the text %j the field holds into %d on submit", (amount, expected) => {
-		expect(schema.parse({ ...VALID, amount })).toEqual({ ...VALID, amount: expected });
+	it.each([[25], [4], [12.5], [2.5], [1], [10_000]])("keeps the number %d the field holds on submit", (amount) => {
+		expect(schema.parse({ ...VALID, amount })).toEqual({ ...VALID, amount });
 	});
 
 	it("answers an emptied field with the minimum's own message, never Zod's", () => {
-		const result = schema.safeParse({ ...VALID, amount: "" });
+		const result = schema.safeParse({ ...VALID, amount: null });
 		expect(result.success).toBe(false);
 		if (!result.success) expect(result.error.issues.map(({ message }) => message)).toEqual(["Amount too small"]);
 	});
 
 	it("keeps the payment schema's ceiling and its message", () => {
-		const result = schema.safeParse({ ...VALID, amount: "99999" });
+		const result = schema.safeParse({ ...VALID, amount: 99_999 });
 		expect(result.success).toBe(false);
 		if (!result.success) expect(result.error.issues.map(({ message }) => message)).toEqual(["Amount too big"]);
 	});
 });
 
-describe("amountFromInput", () => {
+describe("amountFromField", () => {
 	it.each([
-		["", 0],
-		["4.", 4],
-		["10", 10],
-		["2.5", 2.5],
-	])("reads %j as %d", (text, expected) => {
-		expect(amountFromInput(text)).toBe(expected);
+		[null, 0],
+		[0, 0],
+		[4, 4],
+		[10, 10],
+		[2.5, 2.5],
+	])("reads %j as %d", (amount, expected) => {
+		expect(amountFromField(amount)).toBe(expected);
 	});
 });
 

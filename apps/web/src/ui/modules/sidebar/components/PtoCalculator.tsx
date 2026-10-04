@@ -9,12 +9,15 @@ import { Plus } from "@ui/modules/core/animate/icons/Plus";
 import { SlidingNumber } from "@ui/modules/core/animate/text/SlidingNumber";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { Combobox } from "@ui/modules/core/primitives/Combobox";
-import { Input } from "@ui/modules/core/primitives/Input";
+import { NumberInput } from "@ui/modules/core/primitives/NumberInput";
 import { Calculator } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { SidebarFieldTooltip } from "./SidebarFieldLabel";
+
+const DEFAULT_DAYS_PER_MONTH = 2.5;
+const DAYS_PER_MONTH_FRACTION_DIGITS = 2;
 
 interface MonthOption {
 	value: string;
@@ -24,7 +27,8 @@ interface MonthOption {
 export const PtoCalculator = () => {
 	const locale = useLocale();
 	const t = useTranslations("ptoCalculator");
-	const [daysPerMonthInput, setDaysPerMonthInput] = useState("2.5");
+	const tA11y = useTranslations("a11y");
+	const [daysPerMonthValue, setDaysPerMonthValue] = useState<number | null>(DEFAULT_DAYS_PER_MONTH);
 	const [selectedMonth, setSelectedMonth] = useState<string>("1");
 	const [result, setResult] = useState<{ total: number; days: number; month: number } | null>(null);
 
@@ -48,7 +52,7 @@ export const PtoCalculator = () => {
 
 	const handleCalculate = () => {
 		track({ event: "tool_used", properties: { tool: "ptoCalculator" } });
-		const daysPerMonth = Number(daysPerMonthInput);
+		const daysPerMonth = daysPerMonthValue ?? 0;
 		const monthNumber = Number(selectedMonth);
 		const accumulated = daysPerMonth * monthNumber;
 
@@ -87,15 +91,17 @@ export const PtoCalculator = () => {
 
 			<div className="space-y-2 w-full">
 				<p className="text-xs text-muted-foreground">{t("daysPerMonth")}</p>
-				<Input
+				<NumberInput
 					id="daysPerMonth"
-					type="number"
+					locale={locale}
+					roleDescription={tA11y("numberField")}
+					maximumFractionDigits={DAYS_PER_MONTH_FRACTION_DIGITS}
 					inputMode="decimal"
-					step="0.1"
-					min="0"
-					max="8"
-					value={daysPerMonthInput}
-					onChange={(e) => setDaysPerMonthInput(e.target.value)}
+					step={0.1}
+					min={0}
+					max={8}
+					value={daysPerMonthValue}
+					onValueChange={setDaysPerMonthValue}
 				/>
 			</div>
 

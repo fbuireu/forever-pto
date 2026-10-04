@@ -5,6 +5,7 @@
 		"toggleSidebar": "Mostrar u ocultar la barra lateral",
 		"sidebarLandmark": "Controles del planificador",
 		"radialNavigation": "Navegación de funciones",
+		"numberField": "Campo numérico",
 		"selectLanguage": "Seleccionar idioma, actual: {current}",
 		"calculating": "Calculando tu plan",
 		"planUpdated": "Plan actualizado",
@@ -644,9 +645,9 @@
 		"perHour": "/hora",
 		"standardWorkingHours": "Horas de trabajo estándar",
 		"effectiveHourlyRate": "Sueldo por hora efectivo:",
-		"whenWorkingExtraDays": "Si trabajas {days} días de más sin cobrar",
+		"whenWorkingExtraDays": "Si trabajas {days, number} días de más sin cobrar",
 		"opportunityCost": "Coste de oportunidad",
-		"opportunityCostDescription": "Has trabajado {days} días que podrías haber disfrutado como vacaciones pagadas. Son <amount>valor</amount> en tiempo libre pagado al que has renunciado cobrando lo mismo."
+		"opportunityCostDescription": "Has trabajado {days, number} días que podrías haber disfrutado como vacaciones pagadas. Son <amount>valor</amount> en tiempo libre pagado al que has renunciado cobrando lo mismo."
 	},
 	"checkout": {
 		"back": "Volver",
@@ -660,6 +661,9 @@
 		"processing": "Procesando...",
 		"payAmount": "Pagar {amount}",
 		"promoSaved": "¡Has ahorrado {saved}!",
+		"formUnavailable": "No se ha podido cargar el formulario de pago",
+		"formUnavailableDescription": "Stripe, que gestiona nuestros pagos, no se ha cargado. Puede que lo esté bloqueando un bloqueador de contenido, una extensión de privacidad o tu red. Permite Stripe en este sitio y vuelve a intentarlo. No se ha hecho ningún cargo en tu tarjeta.",
+		"tryAgain": "Reintentar",
 		"errors": {
 			"internal_error": "Algo ha fallado por nuestra parte. No se ha hecho ningún cargo en tu tarjeta.",
 			"rate_limit_exceeded": "Demasiados intentos. Espera un momento e inténtalo de nuevo.",

@@ -32,7 +32,7 @@ All native `input` attributes pass through, including `type`. File inputs get de
 ```tsx
 import { Input } from '@ui/modules/core/primitives/Input';
 
-<Input type='number' min={0} value={ptoDays} onChange={handleChange} />
+<Input type='email' value={email} onChange={handleChange} />
 
 <Input aria-invalid={Boolean(error)} />
 ```
@@ -43,6 +43,7 @@ import { Input } from '@ui/modules/core/primitives/Input';
 - Validation styling is driven by `aria-invalid`, not a prop, so set it from your form state so styling and accessibility stay in sync.
 - `h-11` matches the default [Button](/design-system/components/button/) height, so inputs and buttons align in rows.
 - Pair with [Label](/design-system/components/label/); for prefixes, suffixes and inline buttons use [InputGroup](/design-system/components/input-group/).
+- A number the visitor types is not `type='number'`: that input reads the point as the only decimal mark whatever the language. Use `NumberInput` (`apps/web/src/ui/modules/core/primitives/NumberInput.tsx`), which draws this same field over Base UI's `NumberField` and reads the language's own separators.
 
 ## Accessibility
 
@@ -52,4 +53,4 @@ import { Input } from '@ui/modules/core/primitives/Input';
 
 ## In the app
 
-The PTO budget field in `PtoDays.tsx` and the accrual calculator in `PtoCalculator.tsx`, the Holiday form (`HolidayFormModal.tsx`), the email field in `PremiumRequiredModal.tsx`, the contact form (`ContactModal.tsx`) and the Donation form (`DonationForm.tsx`).
+The PTO budget field in `PtoDays.tsx` and, through `NumberInput`, the accrual calculator in `PtoCalculator.tsx`, the Holiday form (`HolidayFormModal.tsx`), the email field in `PremiumRequiredModal.tsx`, the contact form (`ContactModal.tsx`) and the Donation form (`DonationForm.tsx`).

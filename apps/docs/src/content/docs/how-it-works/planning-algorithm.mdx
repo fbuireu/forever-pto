@@ -77,7 +77,7 @@ flowchart LR
 4. **Efficiency.** Effective Days divided by the PTO Days the run spends. A candidate under `EFFICIENCY.BLOCK_MINIMUM` ({PTO_CONSTANTS.EFFICIENCY.BLOCK_MINIMUM}) is discarded. That is the lowest floor any Strategy applies, and a Bridge can never add more to a plan than it is worth on its own, so the prune only drops candidates no Strategy could take. A lone Friday returns 3; a Thursday and Friday before a weekend return exactly {PTO_CONSTANTS.EFFICIENCY.MINIMUM}; a working week between two weekends returns 9 for 5.
 5. **Ranking.** `compareByEfficiency` orders the survivors by Efficiency, and when two differ by less than `EFFICIENCY_COMPARISON_THRESHOLD` ({PTO_CONSTANTS.BRIDGE_GENERATION.EFFICIENCY_COMPARISON_THRESHOLD}) it prefers the one with more Effective Days. No Strategy reads that order as a ranking any more; it is only the last tie-break, so two equal candidates always resolve the same way.
 
-The candidates and the Workdays are computed **once** per run, by `findPlanningCandidates` in `apps/web/src/domain/calendar/utils/candidates.ts`, and handed to both the Suggestion and the Alternatives. They used to be recomputed by each, and a Planning Window then cost two Bridge searches for one plan.
+The candidates and the Workdays are computed **once** per run, by `findPlanningCandidates` in `apps/web/src/domain/calendar/utils/candidates.ts`, and handed to both the Suggestion and the Alternatives, so a Planning Window costs one Bridge search for one plan.
 
 ### A worked example
 

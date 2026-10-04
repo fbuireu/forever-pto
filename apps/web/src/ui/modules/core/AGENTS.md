@@ -18,7 +18,7 @@ code, so a component from Animate UI is ported by hand rather than added over a 
 
 | Folder | Contents |
 | --- | --- |
-| `primitives/` | The plain layer: [`Button.tsx`](./primitives/Button.tsx), [`Card.tsx`](./primitives/Card.tsx), [`Badge.tsx`](./primitives/Badge.tsx), [`Input.tsx`](./primitives/Input.tsx), [`Textarea.tsx`](./primitives/Textarea.tsx), [`Label.tsx`](./primitives/Label.tsx), [`Table.tsx`](./primitives/Table.tsx), [`Separator.tsx`](./primitives/Separator.tsx), [`Banner.tsx`](./primitives/Banner.tsx), [`Form.tsx`](./primitives/Form.tsx) (react-hook-form context), [`InputGroup.tsx`](./primitives/InputGroup.tsx), [`Command.tsx`](./primitives/Command.tsx) (cmdk), [`Combobox.tsx`](./primitives/Combobox.tsx), [`FlagIcon.tsx`](./primitives/FlagIcon.tsx), [`Progress.tsx`](./primitives/Progress.tsx), [`Slider.tsx`](./primitives/Slider.tsx), [`Sonner.tsx`](./primitives/Sonner.tsx) (the toaster), [`RichLink.tsx`](./primitives/RichLink.tsx), [`Bone.tsx`](./primitives/Bone.tsx) (the placeholder block every `*Fixture.tsx` draws with). Plus [`primitives/utils/helpers.ts`](./primitives/utils/helpers.ts): one predicate, `hasFlag` |
+| `primitives/` | The plain layer: [`Button.tsx`](./primitives/Button.tsx), [`Card.tsx`](./primitives/Card.tsx), [`Badge.tsx`](./primitives/Badge.tsx), [`Input.tsx`](./primitives/Input.tsx), [`Textarea.tsx`](./primitives/Textarea.tsx), [`Label.tsx`](./primitives/Label.tsx), [`Table.tsx`](./primitives/Table.tsx), [`Separator.tsx`](./primitives/Separator.tsx), [`Banner.tsx`](./primitives/Banner.tsx), [`Form.tsx`](./primitives/Form.tsx) (react-hook-form context), [`InputGroup.tsx`](./primitives/InputGroup.tsx), [`NumberInput.tsx`](./primitives/NumberInput.tsx) (Base UI's `NumberField` drawn as an `Input`), [`Command.tsx`](./primitives/Command.tsx) (cmdk), [`Combobox.tsx`](./primitives/Combobox.tsx), [`FlagIcon.tsx`](./primitives/FlagIcon.tsx), [`Progress.tsx`](./primitives/Progress.tsx), [`Slider.tsx`](./primitives/Slider.tsx), [`Sonner.tsx`](./primitives/Sonner.tsx) (the toaster), [`RichLink.tsx`](./primitives/RichLink.tsx), [`Bone.tsx`](./primitives/Bone.tsx) (the placeholder block every `*Fixture.tsx` draws with). Plus [`primitives/utils/helpers.ts`](./primitives/utils/helpers.ts): one predicate, `hasFlag` |
 | `animate/primitives/` | Unstyled wrappers, the bottom of the animated stack and internal to `animate/`: [`animate/primitives/base/Dialog.tsx`](./animate/primitives/base/Dialog.tsx) and `Popover.tsx` over `@base-ui/react`, `Tooltip.tsx` over Base UI's popover so a tap opens it as well as a hover; [`animate/primitives/animate/MotionSlot.tsx`](./animate/primitives/animate/MotionSlot.tsx) |
 | `animate/base/` | The styled, motion-aware components built on the layer above or directly on `@base-ui/react`: [`Accordion.tsx`](./animate/base/Accordion.tsx), [`Checkbox.tsx`](./animate/base/Checkbox.tsx), [`Collapsible.tsx`](./animate/base/Collapsible.tsx), `Dialog.tsx`, [`DropdownMenu.tsx`](./animate/base/DropdownMenu.tsx), [`Popover.tsx`](./animate/base/Popover.tsx), [`Switch.tsx`](./animate/base/Switch.tsx), [`Tooltip.tsx`](./animate/base/Tooltip.tsx), [`Sidebar.tsx`](./animate/base/Sidebar.tsx), plus [`animate/base/Drawer.tsx`](./animate/base/Drawer.tsx) (vaul) and [`animate/base/Slot.tsx`](./animate/base/Slot.tsx) |
 | `animate/components/` | Compositions with their own behaviour: [`Counter.tsx`](./animate/components/Counter.tsx), [`Tabs.tsx`](./animate/components/Tabs.tsx), [`FeatureList.tsx`](./animate/components/FeatureList.tsx), [`RadialNav.tsx`](./animate/components/RadialNav.tsx) |
@@ -104,6 +104,9 @@ required and the compiler is the check:
 
 `TooltipInfoTrigger` renders an `aria-hidden` "i", so its `aria-label` is required, pinned by a type assignment in
 `Tooltip.test.tsx`.
+[`primitives/NumberInput.tsx`](./primitives/NumberInput.tsx) takes `roleDescription: string` and `locale: string`, both
+required: Base UI's own `aria-roledescription` is the English "Number field", and a locale it was not given would be the
+browser's, which the server cannot know, so each caller passes `a11y.numberField` and the route's locale.
 `RadialNav` is a `<fieldset aria-label>` of `aria-pressed` buttons: it picks a category and navigates nowhere,
 so it declares no `menu` role, and Biome's `useSemanticElements` wants the element over `role="group"`.
 
@@ -165,6 +168,18 @@ from its longest step at a phone's viewport.
 **`primitives/Form.tsx` names in `aria-describedby` only parts that are on the page.** `FormDescription`
 registers itself with its `FormItem` from an effect, which costs one extra render on a described field, and
 `FormMessage` renders only when it has a body.
+
+**`primitives/NumberInput.tsx` reads the text the field shows, and does not trust the number Base UI parsed from it.**
+`NumberField` removes the group mark wherever it sits, so on the Spanish page it reads `2.5` as 25 and `2.50` as
+250, which `type="number"` reads right. [`ReadingField`](./primitives/NumberInput.tsx) reports
+`readLocalizedNumber` of `state.inputValue` in an effect on every change of that text, so the owner's `number | null`
+is the reading of what the visitor sees (a lone mark that cannot be a group mark is a decimal point; `1.2.3` and `.`
+read as `null`), and `onValueChange` vetoes the number Base UI would write when the field is left if it differs from
+that reading. A veto leaves the text as typed, so the blur handler also redraws, which is when `NumberField` rewrites
+the text from the held value: `2.5` becomes `2,5` in Spanish and text with no reading becomes empty. The wrapper
+`div` is `display: contents` and Base UI's hidden `type="number"` mirror sits beside it, `position: fixed`, outside the
+layout. Typed values are not clamped (`allowOutOfRange`); the arrow keys, Home and End clamp to `min` and `max` and snap
+to `step` ([ADR 0021](../../../../../../adr/0021-numbers-a-visitor-types-are-localised-text-fields.md)).
 
 **`primitives/Slider.tsx` exists to pin the value type.** `@base-ui/react` hands its callbacks a
 `number | readonly number[]`; every caller wants a mutable `number[]`, so the wrapper copies the array or boxes

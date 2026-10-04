@@ -37,12 +37,12 @@ export const createPaymentSchema = createPaymentSchemaWithMessages({
 
 export type CreatePaymentInput = z.infer<typeof createPaymentSchema>;
 
-export const amountFromInput = (text: string): number => (text === "" ? 0 : Number.parseFloat(text));
+export const amountFromField = (amount: number | null): number => amount ?? 0;
 
 export const createDonationFormSchemaWithMessages = (messages: PaymentSchemaMessages) => {
 	const payment = createPaymentSchemaWithMessages(messages);
 
-	return payment.extend({ amount: z.string().transform(amountFromInput).pipe(payment.shape.amount) });
+	return payment.extend({ amount: z.number().nullable().transform(amountFromField).pipe(payment.shape.amount) });
 };
 
 export type DonationFormValues = z.input<ReturnType<typeof createDonationFormSchemaWithMessages>>;

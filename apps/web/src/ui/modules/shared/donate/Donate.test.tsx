@@ -6,16 +6,25 @@ import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { initializePayment, track, logClientError, toastError, toastSuccess, recoverFromStaleDeployment, promoCode } =
-	vi.hoisted(() => ({
-		initializePayment: vi.fn<typeof Checkout.initializePayment>(),
-		track: vi.fn(),
-		logClientError: vi.fn(),
-		toastError: vi.fn(),
-		toastSuccess: vi.fn(),
-		recoverFromStaleDeployment: vi.fn(() => false),
-		promoCode: { current: "" },
-	}));
+const {
+	initializePayment,
+	track,
+	logClientError,
+	toastError,
+	toastSuccess,
+	recoverFromStaleDeployment,
+	promoCode,
+	getStripePromise,
+} = vi.hoisted(() => ({
+	initializePayment: vi.fn<typeof Checkout.initializePayment>(),
+	track: vi.fn(),
+	logClientError: vi.fn(),
+	toastError: vi.fn(),
+	toastSuccess: vi.fn(),
+	recoverFromStaleDeployment: vi.fn(() => false),
+	promoCode: { current: "" },
+	getStripePromise: vi.fn(() => Promise.resolve({})),
+}));
 
 const premiumState = { premiumKey: null, userEmail: null, setEmail: vi.fn() };
 const uiState = {
@@ -40,7 +49,7 @@ vi.mock("@application/stores/ui", () => ({
 vi.mock("@application/shared/utils/clientLog", () => ({ logClientError }));
 vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
 vi.mock("@infrastructure/clients/payments/stripe/client", () => ({
-	getStripeClientInstance: () => ({ getStripePromise: () => Promise.resolve(null) }),
+	getStripeClientInstance: () => ({ getStripePromise }),
 }));
 vi.mock("@stripe/react-stripe-js", () => ({ Elements: ({ children }: { children: ReactNode }) => <>{children}</> }));
 vi.mock("@ui/adapters/navigation/staleDeployment", () => ({ recoverFromStaleDeployment }));
@@ -90,6 +99,8 @@ vi.mock("./donate.css", () => ({}));
 
 import { Donate } from "./Donate";
 
+const stripeLoadsAtImport = getStripePromise.mock.calls.length;
+
 const renderDonate = () =>
 	render(
 		<NextIntlClientProvider locale="en" messages={enMessages}>
@@ -122,6 +133,7 @@ const donate = () => fireEvent.click(screen.getByRole("button", { name: "donate"
 const trackedEvents = () => track.mock.calls.map(([call]) => (call as { event: string }).event);
 
 beforeEach(() => {
+	getStripePromise.mockClear();
 	promoCode.current = "";
 	initializePayment.mockReset();
 	initializePayment.mockResolvedValue({ clientSecret: "cs_test", discountInfo: null });
@@ -257,6 +269,40 @@ describe("once the checkout is on screen", () => {
 		expect(screen.getByRole("button", { name: "donate" })).toBeDefined();
 		expect(uiState.setDonatePopoverOpen).not.toHaveBeenCalled();
 		expect(track).toHaveBeenLastCalledWith({ event: "payment_cancelled" });
+	});
+});
+
+describe("Stripe.js", () => {
+	it("is not fetched when the module loads, whoever never donates included", () => {
+		expect(stripeLoadsAtImport).toBe(0);
+	});
+
+	it("is not fetched while the donation form is the only thing on screen", () => {
+		renderDonate();
+
+		expect(screen.getByRole("button", { name: "donate" })).toBeDefined();
+		expect(getStripePromise).not.toHaveBeenCalled();
+	});
+
+	it("is fetched once, when the checkout opens", async () => {
+		renderDonate();
+
+		donate();
+		await waitFor(() => expect(screen.getByTestId("checkout")).toBeDefined());
+
+		expect(getStripePromise).toHaveBeenCalledOnce();
+	});
+
+	it("is asked for again when the checkout opens again after going back to the form", async () => {
+		renderDonate();
+		donate();
+		await waitFor(() => expect(screen.getByTestId("checkout")).toBeDefined());
+
+		fireEvent.click(screen.getByRole("button", { name: "back" }));
+		donate();
+		await waitFor(() => expect(screen.getByTestId("checkout")).toBeDefined());
+
+		expect(getStripePromise).toHaveBeenCalledTimes(2);
 	});
 });
 

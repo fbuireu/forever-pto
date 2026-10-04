@@ -169,6 +169,158 @@ describe("PtoSalaryCalculator", () => {
 	});
 });
 
+describe("the salary calculator's fields in the visitor's own language", () => {
+	const inLocale = (locale: string) => {
+		intl.locale = locale;
+		return renderCalculator({ locale: locale as Locale, messages: BUNDLES[locale] as typeof en });
+	};
+
+	it.each([
+		["en", "50,400", "€1000", "€200", "€25.00"],
+		["es", "50.400", "1000€", "200€", "25.00€"],
+		["ca", "50.400", "1000€", "200€", "25.00€"],
+		["it", "50.400", "1000€", "200€", "25.00€"],
+		["de", "50.400", "1000€", "200€", "25.00€"],
+		["fr", "50 400", "1000€", "200€", "25.00€"],
+	])(
+		"reads the salary %s %j as fifty thousand four hundred",
+		async (locale, typed, unusedValue, dailyRate, hourlyRate) => {
+			const user = userEvent.setup();
+			const input = inLocale(locale);
+
+			await user.type(input, typed);
+
+			expect(text()).toContain(unusedValue);
+			expect(text()).toContain(dailyRate);
+			expect(text()).toContain(hourlyRate);
+		},
+	);
+
+	it.each([
+		["en", "2.5"],
+		["es", "2,5"],
+		["de", "2,5"],
+	])("reads %s %j unused days as two and a half, which the effective rate shows", async (locale, days) => {
+		const user = userEvent.setup();
+		const input = inLocale(locale);
+		await user.type(input, locale === "en" ? "50,400" : "50.400");
+
+		await user.clear(unusedDays());
+		await user.type(unusedDays(), days);
+
+		expect(text()).toContain(locale === "en" ? "€24.75" : "24.75€");
+	});
+
+	it.each([
+		["en", "2.5", "2.5 extra unpaid days"],
+		["es", "2,5", "2,5 días de más"],
+		["ca", "2,5", "2,5 dies extra"],
+		["it", "2,5", "2,5 giorni extra"],
+		["de", "2,5", "2,5 zusätzlichen"],
+		["fr", "2,5", "2,5 jours supplémentaires"],
+	])("echoes %s unused days %j with the language's own decimal mark", async (locale, days, echoed) => {
+		const user = userEvent.setup();
+		const input = inLocale(locale);
+		await user.type(input, locale === "en" ? "50,400" : locale === "fr" ? "50 400" : "50.400");
+
+		await user.clear(unusedDays());
+		await user.type(unusedDays(), days);
+
+		expect(text()).toContain(echoed);
+	});
+
+	it("shows the starting five unused days as the language writes them", () => {
+		inLocale("es");
+
+		expect(unusedDays().value).toBe("5");
+	});
+
+	it("reads the other language's decimal separator in the unused days too", async () => {
+		const user = userEvent.setup();
+		const input = inLocale("es");
+		await user.type(input, "50.400");
+
+		await user.clear(unusedDays());
+		await user.type(unusedDays(), "2.5");
+
+		expect(text()).toContain("24.75€");
+	});
+
+	it("counts what it cannot read in the salary as an emptied field: no figures, and nothing reported", async () => {
+		track.mockClear();
+		const user = userEvent.setup();
+		const input = renderCalculator();
+
+		await user.type(input, ".");
+
+		expect(screen.queryByText(copy.valueOfUnusedPto)).toBeNull();
+		expect(track).not.toHaveBeenCalled();
+	});
+
+	it("leaves a field empty once it is left holding what it cannot read", async () => {
+		const user = userEvent.setup();
+		const input = inLocale("es");
+
+		await user.type(input, "1.2.3");
+		await user.tab();
+
+		expect(input.value).toBe("");
+		expect(screen.queryByText(copy.valueOfUnusedPto)).toBeNull();
+	});
+
+	it("counts unreadable unused days as none, keeping the rates and dropping the opportunity cost", async () => {
+		const user = userEvent.setup();
+		const input = renderCalculator();
+		await user.type(input, "50400");
+
+		await user.clear(unusedDays());
+		await user.type(unusedDays(), ",");
+
+		expect(screen.queryByText(copy.opportunityCost)).toBeNull();
+		expect(screen.getByText(copy.yourDailyRate)).toBeTruthy();
+	});
+
+	it("names both fields in the visitor's language, as number fields", () => {
+		const input = renderCalculator();
+
+		expect(input.getAttribute("aria-roledescription")).toBe(en.a11y.numberField);
+		expect(unusedDays().getAttribute("aria-roledescription")).toBe(en.a11y.numberField);
+	});
+
+	it("steps the salary by a thousand and the unused days by one, with the arrow keys", async () => {
+		const user = userEvent.setup();
+		const input = renderCalculator();
+		await user.type(input, "50400");
+
+		await user.keyboard("{ArrowUp}");
+		expect(input.value).toBe("51,000");
+
+		await user.click(unusedDays());
+		await user.keyboard("{ArrowUp}{ArrowUp}{ArrowDown}");
+		expect(unusedDays().value).toBe("6");
+
+		await user.keyboard("{End}");
+		expect(unusedDays().value).toBe("50");
+
+		await user.keyboard("{Home}");
+		expect(unusedDays().value).toBe("0");
+	});
+
+	it("keeps the group's left padding on the salary, which has a currency before it, and none on the unused days", () => {
+		const input = renderCalculator();
+
+		expect(input.className).toContain("pl-2");
+		expect(unusedDays().className).not.toContain("pl-2");
+	});
+
+	it("offers the numeric keypad on both fields", () => {
+		const input = renderCalculator();
+
+		expect(input.getAttribute("inputmode")).toBe("numeric");
+		expect(unusedDays().getAttribute("inputmode")).toBe("numeric");
+	});
+});
+
 describe("PtoSalaryCalculator copy", () => {
 	it.each(Object.entries(BUNDLES))(
 		"renders the %s opportunity cost with the amount inside it",

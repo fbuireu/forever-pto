@@ -12,7 +12,7 @@ export const InputStatesDemo = () => (
 
 export const InputTypesDemo = () => (
 	<Demo className="flex-col items-stretch">
-		<Input type="number" defaultValue={23} min={0} aria-label="PTO days" />
+		<Input type="email" defaultValue="you@example.com" aria-label="Email" />
 		<Input type="date" aria-label="Custom holiday date" />
 		<Input type="file" aria-label="File input" />
 	</Demo>

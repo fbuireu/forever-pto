@@ -5,6 +5,7 @@
 		"toggleSidebar": "Afficher ou masquer la barre latérale",
 		"sidebarLandmark": "Réglages du planificateur",
 		"radialNavigation": "Navigation des fonctionnalités",
+		"numberField": "Champ numérique",
 		"selectLanguage": "Sélectionner la langue, actuelle : {current}",
 		"calculating": "Calcul de ton plan en cours",
 		"planUpdated": "Plan mis à jour",
@@ -644,9 +645,9 @@
 		"perHour": "/heure",
 		"standardWorkingHours": "Heures de travail standard",
 		"effectiveHourlyRate": "Taux horaire effectif :",
-		"whenWorkingExtraDays": "En travaillant {days} jours supplémentaires non payés",
+		"whenWorkingExtraDays": "En travaillant {days, number} jours supplémentaires non payés",
 		"opportunityCost": "Coût d'opportunité",
-		"opportunityCostDescription": "Tu as travaillé {days} jours que tu aurais pu prendre en congés payés. Cela représente <amount>value</amount> de congés payés auxquels tu as renoncé. Ton salaire reste le même, mais tu as travaillé des jours supplémentaires gratuitement."
+		"opportunityCostDescription": "Tu as travaillé {days, number} jours que tu aurais pu prendre en congés payés. Cela représente <amount>value</amount> de congés payés auxquels tu as renoncé. Ton salaire reste le même, mais tu as travaillé des jours supplémentaires gratuitement."
 	},
 	"checkout": {
 		"back": "Retour",
@@ -660,6 +661,9 @@
 		"processing": "Traitement en cours...",
 		"payAmount": "Payer {amount}",
 		"promoSaved": "Tu as économisé {saved} !",
+		"formUnavailable": "Le formulaire de paiement n'a pas pu se charger",
+		"formUnavailableDescription": "Stripe, qui gère nos paiements, ne s'est pas chargé. Il est peut-être bloqué par un bloqueur de contenu, une extension de confidentialité ou ton réseau. Autorise Stripe sur ce site, puis réessaie. Ta carte n'a pas été débitée.",
+		"tryAgain": "Réessayer",
 		"errors": {
 			"internal_error": "Quelque chose s'est mal passé de notre côté. Ta carte n'a pas été débitée.",
 			"rate_limit_exceeded": "Trop de tentatives. Patiente un instant et réessaie.",

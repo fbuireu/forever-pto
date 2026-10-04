@@ -49,8 +49,8 @@ leaving a stale one produces a plan with holidays from the wrong place.
 **The numeric filters are clamped in the store, because the controls are not the only writers.** `MIN_PTO_DAYS`,
 `MAX_PTO_DAYS` and `MIN_CARRY_OVER_MONTHS` live in `filters.ts` and the setters hold them;
 [`PtoDays.tsx`](../../ui/modules/sidebar/components/PtoDays.tsx) and [`CarryOverMonths.tsx`](../../ui/modules/sidebar/components/CarryOverMonths.tsx) import the same constants rather than declaring their own. The accrual calculator
-in [`PtoCalculator.tsx`](../../ui/modules/sidebar/components/PtoCalculator.tsx) writes a computed budget straight through `setPtoDays` (its `max='8'` is an
-HTML attribute, which stops the stepper and not a typed number), and a persisted blob carries whatever a
+in [`PtoCalculator.tsx`](../../ui/modules/sidebar/components/PtoCalculator.tsx) writes a computed budget straight through `setPtoDays` (its `max={8}` bounds
+the arrow keys and End, not a typed number), and a persisted blob carries whatever a
 previous version allowed, so `onRehydrateStorage` clamps as well: `migrate` only runs on a version change, and a
 stored out-of-range value would otherwise outlive the bound for ever.
 

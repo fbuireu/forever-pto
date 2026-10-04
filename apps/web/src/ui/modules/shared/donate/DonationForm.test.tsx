@@ -1,6 +1,7 @@
 import { AMOUNT_MAX, AMOUNT_MIN } from "@application/dto/payment/schema";
 import enMessages from "@i18n/messages/en.json";
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import { useForm } from "react-hook-form";
 import { describe, expect, it, vi } from "vitest";
@@ -13,7 +14,7 @@ vi.mock("@application/dto/payment/schema", async (importOriginal) => ({
 }));
 
 const Harness = ({ isPending }: { isPending: boolean }) => {
-	const form = useForm({ defaultValues: { email: "", amount: "10", promoCode: "" } });
+	const form = useForm({ defaultValues: { email: "", amount: 10 as number | null, promoCode: "" } });
 
 	return (
 		<NextIntlClientProvider locale="en" messages={enMessages}>
@@ -26,7 +27,7 @@ const Harness = ({ isPending }: { isPending: boolean }) => {
 				currencySymbol="€"
 				isPending={isPending}
 			/>
-			<output data-testid="amount">{String(form.watch("amount"))}</output>
+			<output data-testid="amount">{JSON.stringify(form.watch("amount"))}</output>
 		</NextIntlClientProvider>
 	);
 };
@@ -34,7 +35,7 @@ const Harness = ({ isPending }: { isPending: boolean }) => {
 const enabledControls = () =>
 	screen
 		.getAllByRole("textbox")
-		.concat(screen.getAllByRole("spinbutton"), screen.getAllByRole("button"))
+		.concat(screen.getAllByRole("button"))
 		.filter((control) => !control.hasAttribute("disabled"));
 
 const PRESET_LABELS = ["€5", "€10", "€15"];
@@ -107,11 +108,32 @@ describe("DonationForm", () => {
 		}
 	});
 
-	it("bounds the amount field with the limits the payment schema enforces", () => {
+	it("bounds the amount field with the limits the payment schema enforces, which Home and End go to", async () => {
+		const user = userEvent.setup();
 		render(<Harness isPending={false} />);
 		const amount = screen.getByPlaceholderText(enMessages.donationForm.enterAmount);
 
-		expect([amount.getAttribute("min"), amount.getAttribute("max")]).toEqual([String(AMOUNT_MIN), String(AMOUNT_MAX)]);
+		await user.click(amount);
+		await user.keyboard("{Home}");
+		expect(screen.getByTestId("amount").textContent).toBe(String(AMOUNT_MIN));
+
+		await user.keyboard("{End}");
+		expect(screen.getByTestId("amount").textContent).toBe(String(AMOUNT_MAX));
+	});
+
+	it("is a text field named by its label, which says in the visitor's language that it holds a number", () => {
+		render(<Harness isPending={false} />);
+		const amount = screen.getByRole("textbox", { name: enMessages.donationForm.donationAmount });
+
+		expect(amount.getAttribute("type")).toBe("text");
+		expect(amount.getAttribute("aria-roledescription")).toBe(enMessages.a11y.numberField);
+		expect(amount.getAttribute("inputmode")).toBe("numeric");
+	});
+
+	it("keeps the group's left padding on the amount, which no longer sits directly in the group", () => {
+		render(<Harness isPending={false} />);
+
+		expect(screen.getByRole("textbox", { name: enMessages.donationForm.donationAmount }).className).toContain("pl-2");
 	});
 
 	it("lands the amount label on the input rather than on the group wrapping it", () => {
@@ -128,22 +150,27 @@ describe("DonationForm", () => {
 		expect(screen.getByTestId("amount").textContent).toBe("15");
 	});
 
-	it("holds the typed amount as text, an emptied field included, for the schema to convert when it is used", () => {
-		render(<Harness isPending={false} />);
-		const amount = screen.getByPlaceholderText(enMessages.donationForm.enterAmount);
-
-		fireEvent.change(amount, { target: { value: "25" } });
-		expect(screen.getByTestId("amount").textContent).toBe("25");
-
-		fireEvent.change(amount, { target: { value: "" } });
-		expect(screen.getByTestId("amount").textContent).toBe("");
-	});
-
-	it("writes no 0 into the amount field when the browser reports it empty, emptied or holding a partial amount", () => {
+	it("holds the typed amount as a number, an emptied field as none, for the schema to read when it is used", async () => {
+		const user = userEvent.setup();
 		render(<Harness isPending={false} />);
 		const amount = screen.getByPlaceholderText<HTMLInputElement>(enMessages.donationForm.enterAmount);
 
-		fireEvent.change(amount, { target: { value: "" } });
+		await user.clear(amount);
+		await user.type(amount, "25");
+		expect(screen.getByTestId("amount").textContent).toBe("25");
+
+		await user.clear(amount);
+		expect(screen.getByTestId("amount").textContent).toBe("null");
+		expect(amount.value).toBe("");
+	});
+
+	it("writes no 0 into the amount field when it is emptied, nor when it is left empty", async () => {
+		const user = userEvent.setup();
+		render(<Harness isPending={false} />);
+		const amount = screen.getByPlaceholderText<HTMLInputElement>(enMessages.donationForm.enterAmount);
+
+		await user.clear(amount);
+		await user.tab();
 
 		expect(amount.value).toBe("");
 	});

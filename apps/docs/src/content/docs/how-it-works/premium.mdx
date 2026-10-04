@@ -35,7 +35,9 @@ sequenceDiagram
 
 ## The Donate popover
 
-`apps/web/src/ui/modules/shared/donate/Donate.tsx` renders the donation UI, mounted through `DonateClient.tsx` (a `dynamic(..., { ssr: false })` wrapper) in the planner layout and homepage. It combines `react-hook-form` + zod (`createPaymentSchemaWithMessages`), Stripe Elements via `getStripeClientInstance()` (`apps/web/src/infrastructure/clients/payments/stripe/client.ts`), theming from `next-themes`, and `initializePayment` from `apps/web/src/ui/adapters/payments/checkout.ts`. The checkout itself is `apps/web/src/ui/modules/premium/CheckoutForm.tsx`. Popover open state lives in the [ui store](/how-it-works/state-stores/).
+`apps/web/src/ui/modules/shared/donate/Donate.tsx` renders the donation UI, mounted through `DonateClient.tsx` (a `dynamic(..., { ssr: false })` wrapper) in the planner layout and homepage. It combines `react-hook-form` + zod (`createPaymentSchemaWithMessages`), Stripe Elements through `StripeElementsProvider` (`apps/web/src/ui/modules/premium/StripeElementsProvider.tsx`), theming from `next-themes`, and `initializePayment` from `apps/web/src/ui/adapters/payments/checkout.ts`. The checkout itself is `apps/web/src/ui/modules/premium/CheckoutForm.tsx`. Popover open state lives in the [ui store](/how-it-works/state-stores/).
+
+Stripe.js loads when the checkout opens, not with the page: `StripeElementsProvider` asks `getStripeClientInstance()` (`apps/web/src/infrastructure/clients/payments/stripe/client.ts`) for it on mount, so a visitor who never donates never fetches it. When it cannot load, because a content blocker, a privacy extension or a proxy blocks `js.stripe.com`, the checkout says the payment form could not load and offers to try again; the client forgets the failed load, so reopening the checkout loads again too. The failure is an expected condition of the visitor's browser, so it is neither an uncaught error nor a log line.
 
 ## Creating the payment: `POST /api/payment`
 
