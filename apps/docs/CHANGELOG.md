@@ -1,3 +1,10 @@
+# [forever-pto-docs-v1.5.3](https://github.com/fbuireu/forever-pto/compare/docs-v1.5.2...docs-v1.5.3) (2026-10-04)
+
+
+### Bug Fixes
+
+* read typed numbers in the page's language and load Stripe.js only for the checkout ([b148722](https://github.com/fbuireu/forever-pto/commit/b1487221512bd16891aea64764bdf6eca0cdc224))
+
 # [forever-pto-docs-v1.5.2](https://github.com/fbuireu/forever-pto/compare/docs-v1.5.1...docs-v1.5.2) (2026-10-04)
 
 
