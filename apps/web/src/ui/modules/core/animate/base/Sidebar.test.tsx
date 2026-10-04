@@ -48,11 +48,29 @@ vi.mock("../effects/MotionHighlight", () => ({
 
 vi.mock("../icons/PanelLeft", () => ({ PanelLeftIcon: () => <svg /> }));
 
+interface TooltipTriggerMockProps {
+	children?: ReactNode;
+	asChild?: boolean;
+	nativeButton?: boolean;
+	tabIndex?: number;
+	role?: string;
+}
+
 vi.mock("./Tooltip", () => ({
 	Tooltip: ({ children }: { children?: ReactNode }) => <>{children}</>,
 	TooltipContent: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
 	TooltipProvider: ({ children }: { children?: ReactNode }) => <>{children}</>,
-	TooltipTrigger: ({ children, ...props }: ComponentProps<"button">) => <button {...props}>{children}</button>,
+	TooltipTrigger: ({ children, asChild, nativeButton, tabIndex, role }: TooltipTriggerMockProps) => (
+		<div
+			data-testid="tooltip-trigger"
+			data-as-child={String(asChild)}
+			data-native-button={String(nativeButton)}
+			data-tab-index={String(tabIndex)}
+			data-role={String(role)}
+		>
+			{children}
+		</div>
+	),
 }));
 
 import { Sidebar, SidebarMenuButton, SidebarProvider, SidebarTrigger, useSidebar } from "./Sidebar";
@@ -373,6 +391,20 @@ describe("a menu button in a collapsed rail", () => {
 		const view = renderMenu({ defaultOpen: false, tooltip: "Countries" });
 
 		expect(view.getAllByText("Countries")).toHaveLength(2);
+	});
+
+	it("hangs its tooltip on the highlight wrapper as a hover target that is no button and no tab stop", () => {
+		const view = renderMenu({ defaultOpen: false, tooltip: "Countries" });
+		const trigger = view.getByTestId("tooltip-trigger");
+
+		expect({ ...trigger.dataset }).toEqual({
+			testid: "tooltip-trigger",
+			asChild: "true",
+			nativeButton: "false",
+			tabIndex: "-1",
+			role: "none",
+		});
+		expect(view.getAllByRole("button", { name: "Countries" })).toHaveLength(1);
 	});
 
 	it("needs no tooltip while the label is on screen", () => {

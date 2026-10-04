@@ -91,6 +91,12 @@ go hunting for a key:
   bold wrapper, `n` renders the counter and ignores its chunks, and `#` is the plural's own number, so the tag
   is still positioned by the translator. `manualAdjustments.addedAndRemoved` carries a count each way and
   therefore a tag each, `a` and `r`. Tags nest, and `#` resolves inside one.
+- **A label and its number are one message too.** The planner's readouts (`alternativesManager.position` and
+  `ptoStatus.suggestedCount`, `manualCount` and `remainingCount`) write `<label>Suggested:</label> <n>{count}</n>`:
+  the component styles the label and draws the counter, and the translator orders and punctuates them, which is
+  how French spaces its colon. The `sr-only` copy renders the same message with tags that return their chunks. A
+  tag never shares a name with an argument, because the tag's function replaces the value: `position` closes on
+  `<of> / {total}</of>`, not on a `total` tag.
 - **[`../utils/currencies.test.ts`](../utils/currencies.test.ts) asserts that no message carries a currency
   symbol.** The value arrives already formatted, as `{amount}`: `amountFormatter` for a whole-euro price in a
   server component (`homepage.pricing.*`, `termsOfService.…maxLiability`) and `useCurrencyFormatter` for a
@@ -123,9 +129,8 @@ UI rather than the copy. The parity test above is what keeps that from reaching 
 ## Key names that carry a retired term
 
 Some **key names** hold a term [`CONTEXT.md`](../../../../../CONTEXT.md) retires, for example
-`alternativesManager.option` and `summary.notifications.canImprove.reviewOptions` (Alternative),
-`alternativesManager.totalOff` and `alternativesManager.totalDaysOff` (Effective Day), `ptoStatus.autoAssigned`
-and `ptoDays.autoAssigned` (Suggested Day), `workdayCounter.dateRange` (Planning Window) and
+`summary.notifications.canImprove.reviewOptions` (Alternative), `alternativesManager.totalOff` (Effective Day),
+`ptoDays.autoAssigned` (Suggested Day), `workdayCounter.dateRange` (Planning Window) and
 `summary.yearSummary.firstBreak` (Rest Block). Renaming one edits every bundle and every call site, and the key
 parity check fails a rename that stops halfway.
 

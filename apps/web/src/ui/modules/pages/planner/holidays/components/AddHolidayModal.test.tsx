@@ -77,7 +77,7 @@ describe("AddHolidayModal", () => {
 		renderModal();
 
 		expect((screen.getByLabelText(en.modals.addHoliday.nameLabel) as HTMLInputElement).value).toBe("");
-		expect(screen.queryByText(new RegExp(`^${en.modals.addHoliday.selected}:`))).toBeNull();
+		expect(screen.queryByText(/^Selected:/)).toBeNull();
 	});
 
 	it("reads its copy from the add namespace", () => {

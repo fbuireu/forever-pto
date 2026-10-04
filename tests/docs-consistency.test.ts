@@ -1460,7 +1460,7 @@ describe("documentation does not point at things that are gone", () => {
 	// "bridge day" or "max working period" has no innocent reading here, so it needs no allowlist at all.
 	// `holiday` and `free day` drop out on the canonical test, which is also what lets "public holiday"
 	// through: the one phrasing CONTEXT.md blesses for English user-facing copy.
-	it("writes the canonical name in the published wiki's prose, not a retired one", () => {
+	it("writes the canonical name in the published wiki's prose, not a retired one, outside the landing pages marketing owns", () => {
 		const glossary = read("CONTEXT.md");
 		const canonical = new Set([...glossary.matchAll(GLOSSARY_TERM)].map(([, term]) => term.toLowerCase()));
 		const compounds = [
@@ -1473,8 +1473,14 @@ describe("documentation does not point at things that are gone", () => {
 
 		expect(compounds.length).toBeGreaterThan(10);
 
+		const landingPages = contentFiles.filter((file) =>
+			/^template: splash$/m.test(read(file).match(/^---\n[\s\S]*?\n---\n/)?.[0] ?? ""),
+		);
+		expect(landingPages.length).toBeGreaterThan(0);
+		expect(landingPages.every((file) => file.endsWith("/index.mdx"))).toBe(true);
+
 		const offenders: string[] = [];
-		for (const file of contentFiles) {
+		for (const file of contentFiles.filter((path) => !landingPages.includes(path))) {
 			// Frontmatter is metadata, fenced code and inline code are the app's own identifiers, and neither
 			// is prose the glossary governs.
 			const prose = read(file)

@@ -1,8 +1,10 @@
 import { HolidayVariant } from "@application/dto/holiday/types";
+import deMessages from "@i18n/messages/de.json";
 import enMessages from "@i18n/messages/en.json";
+import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import { fireEvent, render } from "@testing-library/react";
-import { NextIntlClientProvider } from "next-intl";
+import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -693,4 +695,51 @@ describe("HolidaysTable analytics on the rows", () => {
 			properties: { variant: HolidayVariant.NATIONAL },
 		});
 	});
+});
+
+describe("HolidaysTable names a Holiday by when it falls", () => {
+	const withOneOnAWeekend = () => {
+		holidaysState.holidays = [
+			...holidaysState.holidays,
+			holiday({ id: "national-2026-08-15", name: "Delta", date: new Date(2026, 7, 15) }),
+		];
+	};
+
+	it("calls a Holiday on a weekday a Weekday Holiday, never a Workday, and counts each kind in its own sentence", () => {
+		withOneOnAWeekend();
+
+		const view = renderTable();
+		const text = view.container.textContent ?? "";
+
+		expect(view.getAllByText("Weekday holiday")).toHaveLength(3);
+		expect(text).toContain("On weekends: 1");
+		expect(text).toContain("Weekday holidays: 3");
+		expect(text).toContain("4 total");
+		expect(text).not.toMatch(/workday/i);
+	});
+
+	it.each([
+		["es", esMessages, "Festivo entre semana", "En fin de semana: 1", "Festivos entre semana: 3", "4 en total"],
+		["fr", frMessages, "Jour férié en semaine", "Les week-ends : 1", "Jours fériés en semaine : 3", "4 au total"],
+		["de", deMessages, "Feiertag unter der Woche", "An Wochenenden: 1", "Feiertage unter der Woche: 3", "4 insgesamt"],
+	] as const)(
+		"words the badge and every count in %s, the total included",
+		(locale, messages, badge, weekends, weekdays, total) => {
+			withOneOnAWeekend();
+
+			const view = render(
+				<NextIntlClientProvider locale={locale as Locale} messages={messages}>
+					<HolidaysTable title="National" variant={HolidayVariant.NATIONAL} open />
+				</NextIntlClientProvider>,
+			);
+			fireEvent.click(view.getByTestId("trigger"));
+			const text = view.container.textContent ?? "";
+
+			expect(view.getAllByText(badge)).toHaveLength(3);
+			expect(text).toContain(weekends);
+			expect(text).toContain(weekdays);
+			expect(text).toContain(total);
+			expect(text).not.toContain("4 total");
+		},
+	);
 });

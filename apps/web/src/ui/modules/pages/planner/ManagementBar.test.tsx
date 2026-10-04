@@ -195,7 +195,7 @@ describe("ManagementBar drawer header", () => {
 		const { container } = renderBar({ locale: "es", messages: esMessages });
 		const text = container.textContent ?? "";
 
-		expect(text).toContain(`${esMessages.alternativesManager.option} 2`);
+		expect(text).toContain("Alternativa 2 / 2");
 		expect(text).toContain("9 días");
 		expect(text).toContain("4,5x");
 	});
@@ -332,6 +332,6 @@ describe("ManagementBar hands the panel's choices to the store", () => {
 		const { queryByRole, container } = renderBar({ locale: "es", messages: esMessages });
 
 		expect(queryByRole("button", { name: "apply" })).toBeNull();
-		expect(container.textContent).not.toContain(esMessages.alternativesManager.option);
+		expect(container.textContent).not.toContain("Alternativa");
 	});
 });

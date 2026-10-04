@@ -51,9 +51,6 @@ vi.mock("@ui/modules/core/animate/icons/Icon", () => ({
 	AnimateIcon: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 vi.mock("@ui/modules/core/animate/icons/ChevronLeft", () => ({ ChevronLeft: () => null }));
-vi.mock("@ui/modules/core/primitives/Button", () => ({
-	Button: ({ children }: { children: ReactNode }) => <button type="button">{children}</button>,
-}));
 vi.mock("./ExpressCheckoutFixture", () => ({ ExpressCheckoutFixture: () => null }));
 
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
@@ -330,6 +327,47 @@ describe("a payment that goes through", () => {
 		expect(onSuccess).toHaveBeenCalledOnce();
 		expect(premiumState.setPremiumStatus).toHaveBeenCalledOnce();
 		expect(vi.mocked(track).mock.calls).toStrictEqual([[{ event: "payment_completed", properties: { amount: 12.5 } }]]);
+	});
+
+	it("goes back when Back is pressed before anything is paid", () => {
+		const { onCancel } = renderCheckout();
+
+		fireEvent.click(screen.getByRole("button", { name: enMessages.checkout.goBackToDonation }));
+
+		expect(onCancel).toHaveBeenCalledOnce();
+	});
+
+	it("neither cancels nor pays again while the confirmation is on screen, whichever control is pressed", async () => {
+		succeeds();
+		const { submit, onCancel } = renderCheckout();
+		const pay = () => screen.getByRole("button", { name: enMessages.checkout.payAmount.replace("{amount}", "€12.50") });
+
+		submit();
+		await waitFor(() => expect(pay()).toBeTruthy());
+
+		fireEvent.click(screen.getByRole("button", { name: enMessages.checkout.goBackToDonation }));
+		fireEvent.click(pay());
+		fireEvent.click(screen.getByRole("button", { name: "express confirm" }));
+
+		expect(onCancel).not.toHaveBeenCalled();
+		expect(vi.mocked(confirmPayment)).toHaveBeenCalledOnce();
+		expect(vi.mocked(track).mock.calls).toStrictEqual([[{ event: "payment_completed", properties: { amount: 12.5 } }]]);
+	});
+
+	it("leaves Back and Pay disabled once the payment has gone through", async () => {
+		succeeds();
+		const { submit } = renderCheckout();
+
+		submit();
+		await waitFor(() => expect(premiumState.setPremiumStatus).toHaveBeenCalled());
+
+		await waitFor(() =>
+			expect(
+				[enMessages.checkout.goBackToDonation, enMessages.checkout.payAmount.replace("{amount}", "€12.50")].map(
+					(name) => screen.getByRole<HTMLButtonElement>("button", { name }).disabled,
+				),
+			).toEqual([true, true]),
+		);
 	});
 
 	it("hands back once when the moment ends before the checkout leaves the screen", async () => {

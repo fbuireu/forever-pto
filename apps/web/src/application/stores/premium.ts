@@ -51,6 +51,7 @@ interface SetPremiumStatusParams {
 interface PremiumActions {
 	verifyEmail: (email: string) => Promise<boolean>;
 	checkExistingSession: (options?: { force?: boolean }) => Promise<void>;
+	confirmActivation: () => Promise<void>;
 	showPremiumModal: (feature: PremiumFeatureId, origin?: PremiumOrigin) => void;
 	closeModal: () => void;
 	setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => void;
@@ -65,6 +66,9 @@ const STORAGE_NAME = "premium-store";
 const STORAGE_VERSION = 1;
 
 let sessionCheckInFlight: Promise<void> | null = null;
+let activationInFlight: Promise<void> | null = null;
+
+const reportActivation = () => track({ event: "premium_activated", properties: { plan: "premium" } });
 
 const premiumInitialState: PremiumState = {
 	premiumKey: null,
@@ -136,6 +140,22 @@ export const usePremiumStore = create<PremiumStore>()(
 					return sessionCheckInFlight;
 				},
 
+				confirmActivation: () => {
+					if (activationInFlight) return activationInFlight;
+
+					const wasPremium = !!get().premiumKey;
+					activationInFlight = get()
+						.checkExistingSession({ force: true })
+						.then(() => {
+							if (!wasPremium && get().premiumKey) reportActivation();
+						})
+						.finally(() => {
+							activationInFlight = null;
+						});
+
+					return activationInFlight;
+				},
+
 				setEmail: (email: string) => {
 					set({ userEmail: email });
 				},
@@ -150,9 +170,7 @@ export const usePremiumStore = create<PremiumStore>()(
 						needsSessionCheck: false,
 					});
 
-					if (!wasPremium && premiumKey) {
-						track({ event: "premium_activated", properties: { plan: "premium" } });
-					}
+					if (!wasPremium && premiumKey) reportActivation();
 				},
 
 				resetPremiumStore: () => {

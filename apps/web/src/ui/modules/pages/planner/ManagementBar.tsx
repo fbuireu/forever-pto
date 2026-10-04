@@ -152,8 +152,13 @@ export const ManagementBar = () => {
 							{isReady ? (
 								<div className="flex items-center justify-between gap-2 flex-wrap">
 									<span className="text-sm font-black shrink-0">
-										{tAlt("option")} {previewAlternativeIndex + 1}
-										<span className="font-normal text-muted-foreground"> / {allSuggestions.length}</span>
+										{tAlt.rich("position", {
+											position: previewAlternativeIndex + 1,
+											total: allSuggestions.length,
+											label: (chunks) => chunks,
+											n: (chunks) => chunks,
+											of: (chunks) => <span className="font-normal text-muted-foreground">{chunks}</span>,
+										})}
 									</span>
 									<div className="flex items-center gap-2 shrink-0">
 										<span className="font-mono text-sm font-semibold text-green-600 dark:text-green-400">

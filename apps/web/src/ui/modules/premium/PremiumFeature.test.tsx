@@ -2,7 +2,7 @@ import deMessages from "@i18n/messages/de.json";
 import enMessages from "@i18n/messages/en.json";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const premiumState = {
 	premiumKey: null as string | null,
@@ -35,6 +35,60 @@ const renderGate = ({ locale, messages }: RenderGateParams) =>
 beforeEach(() => {
 	premiumState.premiumKey = null;
 	vi.clearAllMocks();
+});
+
+afterEach(() => {
+	vi.restoreAllMocks();
+});
+
+const DESCRIPTION = "Add holidays your company closes for.";
+
+const renderDescribedGate = () => {
+	const errors = vi.spyOn(console, "error");
+	const view = render(
+		<NextIntlClientProvider locale="en" messages={enMessages}>
+			<PremiumFeature feature={PremiumFeatureId.CUSTOM_HOLIDAYS} description={DESCRIPTION}>
+				<span>the custom tab</span>
+			</PremiumFeature>
+		</NextIntlClientProvider>,
+	);
+	const lock = view.container.querySelector<HTMLElement>('[data-slot="tooltip-trigger"]');
+	if (!lock) throw new Error("the described gate drew no lock");
+	return { ...view, errors, lock };
+};
+
+describe("PremiumFeature's lock, the one that carries the description", () => {
+	it("is a native button, so Base UI finds the element its trigger expects and says nothing", () => {
+		const { errors, lock } = renderDescribedGate();
+
+		expect(lock.tagName).toBe("BUTTON");
+		expect(errors.mock.calls.flat().join(" ")).not.toContain("Base UI");
+	});
+
+	it("stays out of the tab order, so the gate is the one stop and the one name a keyboard meets", () => {
+		const { container, lock } = renderDescribedGate();
+		const stops = [...container.querySelectorAll<HTMLElement>("button, [tabindex]")].filter((el) => el.tabIndex >= 0);
+
+		expect(lock.tabIndex).toBe(-1);
+		expect(stops.map((el) => el.getAttribute("aria-label"))).toEqual([DESCRIPTION]);
+	});
+
+	it("opens the modal once when the lock is clicked", () => {
+		const { lock } = renderDescribedGate();
+
+		fireEvent.click(lock);
+
+		expect(premiumState.showPremiumModal).toHaveBeenCalledExactlyOnceWith("customHolidays", undefined);
+	});
+
+	it("opens the modal once when Enter is pressed on the lock, which a click had focused", () => {
+		const { lock } = renderDescribedGate();
+		lock.focus();
+
+		fireEvent.keyDown(lock, { key: "Enter" });
+
+		expect(premiumState.showPremiumModal).toHaveBeenCalledExactlyOnceWith("customHolidays", undefined);
+	});
 });
 
 describe("PremiumFeature", () => {

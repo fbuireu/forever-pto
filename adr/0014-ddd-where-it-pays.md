@@ -12,6 +12,9 @@ Amended on 2026-09-11. Worked example 2 answered *Reachable: no* on the grounds 
 status, and that was wrong: Stripe's enums are **open**, so it adds values on an API version already pinned.
 The rerun and what it bought are recorded in that example.
 
+Amended on 2026-10-04. Point 1 of the strategic half now scopes the glossary to code, documents and product copy;
+the marketing copy speaks the visitor's words. See *Amendment, 2026-10-04* at the end.
+
 ## Context
 
 This tree speaks domain-driven design fluently and never says so. `CONTEXT.md` opens by calling itself "the
@@ -241,3 +244,18 @@ rejections matter as much as the fixes: a rule is only as clear as the cases it 
 - Where this bites elsewhere: `M1` and the smell overrides in [`../CODING_STANDARDS.md`](../CODING_STANDARDS.md), the layer
   contracts under [`../apps/web/src/`](../apps/web/src), and the architecture overview on the documentation
   site, which links here rather than restating any of it.
+
+## Amendment, 2026-10-04: the marketing copy speaks the visitor's words
+
+**The glossary binds code, documents and product copy.** Point 1 made `CONTEXT.md` the authority over all
+user-facing copy, which held the homepage to the planner's vocabulary: a visitor searches for "days off" and
+"vacation plan", and the homepage could not say either. The rival numbers the glossary keeps apart are read and
+acted on in the planner, its exports, the wiki and the code, so that is where it binds. Marketing copy, which is
+the homepage with its sections and the docs site's landing pages, may use the words people search for. `N1` in
+[`../CODING_STANDARDS.md`](../CODING_STANDARDS.md) carries the scope, and the contract suite's rule on the
+published wiki's prose skips the landing pages (the `template: splash` ones).
+
+**Product copy names each concept by its term, in every bundle.** The planner had called the month's Holidays
+"days off", the PTO Days of its charts "effective days" and "days off", and a Holiday on a weekday a Workday,
+which the glossary defines as a date that is no Holiday. The glossary gained **Weekday Holiday** for that last one,
+and the six bundles use it.

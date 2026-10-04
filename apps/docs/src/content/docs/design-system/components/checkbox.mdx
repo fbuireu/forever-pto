@@ -26,7 +26,7 @@ Exports: `Checkbox`.
 
 ## Props
 
-<PropsTable rows={CHECKBOX_PROP_ROWS} extends='the Base UI checkbox root, minus render' />
+<PropsTable rows={CHECKBOX_PROP_ROWS} extends='the Base UI checkbox root, minus render and nativeButton' />
 
 ## Usage
 
@@ -42,7 +42,7 @@ Pair with [Label](/design-system/components/label/) via `id`/`htmlFor`. For an o
 ## Conventions
 
 - `data-slot='checkbox'` and `data-slot='checkbox-indicator'` for CSS containment hooks; checked styling keys off Base UI's `data-checked` attribute.
-- The `render` prop is reserved by the component (it injects the `m.button`), so it is omitted from the public prop type.
+- The `render` and `nativeButton` props are reserved by the component (it injects the `m.button` and tells Base UI it is a native button), so both are omitted from the public prop type.
 
 ## Accessibility
 

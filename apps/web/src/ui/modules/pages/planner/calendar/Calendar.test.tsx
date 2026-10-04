@@ -1,5 +1,6 @@
 import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
 import en from "@i18n/messages/en.json";
+import es from "@i18n/messages/es.json";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -91,6 +92,37 @@ describe("Calendar header", () => {
 		expect(withNavigation.getByRole("button", { name: en.calendar.previousMonth })).toBeTruthy();
 		expect(withNavigation.getByRole("button", { name: en.calendar.nextMonth })).toBeTruthy();
 	});
+
+	const SECOND_HOLIDAY: HolidayDTO = {
+		...HOLIDAY,
+		id: "es-2026-06-29",
+		date: new Date(2026, 5, 29),
+		name: "Sant Pere",
+	};
+
+	it.each([
+		["en", en, [HOLIDAY], "1 holiday"],
+		["en", en, [HOLIDAY, SECOND_HOLIDAY], "2 holidays"],
+		["es", es, [HOLIDAY], "1 festivo"],
+		["es", es, [HOLIDAY, SECOND_HOLIDAY], "2 festivos"],
+	] as const)(
+		"counts the month's Holidays as Holidays in %s, not as days off",
+		(locale, messages, holidays, expected) => {
+			const { container } = render(
+				<NextIntlClientProvider locale={locale} messages={messages}>
+					<Calendar
+						mode={CalendarSelectionMode.NONE}
+						initialMonth={MONTH}
+						locale={locale}
+						holidays={[...holidays]}
+						allowPastDays
+					/>
+				</NextIntlClientProvider>,
+			);
+
+			expect(container.querySelector("span.tabular-nums")?.textContent).toBe(expected);
+		},
+	);
 });
 
 describe("Calendar day states", () => {

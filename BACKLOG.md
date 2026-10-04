@@ -36,6 +36,19 @@ Each line names where the tree breaks a rule of [`CODING_STANDARDS.md`](./CODING
   Efficiency), `manuallySelectedDays` ("selected day" for Manual Day, a persisted key, so the stored blob migrates with
   it) and `dayOffKeys` in `metrics/utils/dayOff.ts` ("day off"): rename each with its callers, the guides, the wiki
   pages and the demos that name it, giving `CONTEXT.md` a term for the placed days plus the Holidays first.
+- **Product copy that still names a concept by a retired word** (`N1`, in all six bundles): "days off" for Effective
+  Days or for PTO Days and Holidays together (`summary.yearSummary.featureDescription`,
+  `summary.summaryParagraph.noRegionHint`, `charts.daysOffComposition` and `daysOffCompositionFeature`,
+  `sidebar.strategy.optimized.description`), "auto-assigned" and "manually selected" days for Suggested and Manual
+  Days (`tutorial.steps.statusDescription` and `calendarDescription`), "unused days" and "remaining days" for the
+  Remaining Budget (`tutorial.steps.toolsDescription`, `ptoDays.clickToAssign`, `premium.unlockDescription`) and
+  "break" for a Rest Block (`summary.yearSummary.firstBreak` and `lastBreak`): reword each with the canonical term.
+- **Numbers on the planner with a glyph glued on** (`L3`): the `x` after the Efficiency, the sign of its difference,
+  the `%` of the comparison and the `(+…)` around the Bonus Days in `PlannerPanel.tsx`, the `✓` before
+  `ptoStatus.allAssigned`, and the Gain's `toFixed(0)` with its `%` and the `+` before the Bonus Days in `Summary.tsx`:
+  format each with `format.number` (`signDisplay`, `style: "percent"`) or place it in a message around the counter.
+  The month header of `calendar/Calendar.tsx` joins two `formatDate` calls (`A7`): format the month and the year
+  as one date pattern and style its parts.
 - **`MonthlyDistributionChart` sizes its axis from the filters' window and pads the engine's array with zeros**
   (`U23`): size it from `monthlyDist.length`, drop `carryOverMonths` from its props, and rewrite the test that asserts
   the padding.

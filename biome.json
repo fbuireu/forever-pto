@@ -38,8 +38,7 @@
 				"noReExportAll": "error"
 			},
 			"style": {
-				"noDefaultExport": "error",
-				"noEnum": "error"
+				"noDefaultExport": "error"
 			},
 			"suspicious": {
 				"noConsole": "error"

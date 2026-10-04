@@ -63,6 +63,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 	const [isExpressReady, setIsExpressReady] = useState(false);
 	const [hasExpressOptions, setHasExpressOptions] = useState<boolean | null>(null);
 	const [isPending, startTransition] = useTransition();
+	const [hasPaid, setHasPaid] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const setPremiumStatus = usePremiumStore((state) => state.setPremiumStatus);
 	const pendingHandBack = useRef<PendingHandBack | null>(null);
@@ -90,7 +91,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 	}, [discountInfo, t, formatCurrency]);
 
 	const processPayment = useCallback(async () => {
-		if (!stripe || !elements) return;
+		if (!stripe || !elements || hasPaid) return;
 
 		setErrorMessage(null);
 
@@ -118,6 +119,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 				return;
 
 			case ConfirmPaymentOutcome.SUCCEEDED:
+				setHasPaid(true);
 				setPremiumStatus({ email: result.sessionData.email, premiumKey: result.sessionData.premiumKey });
 				track({ event: "payment_completed", properties: { amount } });
 				void fireConfetti();
@@ -133,7 +135,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 			default:
 				return result satisfies never;
 		}
-	}, [stripe, elements, email, onSuccess, setPremiumStatus, t, tErrors, locale, amount]);
+	}, [stripe, elements, hasPaid, email, onSuccess, setPremiumStatus, t, tErrors, locale, amount]);
 
 	const handleSubmit = useCallback(
 		async (e: FormEvent) => {
@@ -160,7 +162,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 						variant="ghost"
 						size="sm"
 						onClick={onCancel}
-						disabled={isPending}
+						disabled={isPending || hasPaid}
 						className="gap-2"
 						aria-label={t("goBackToDonation")}
 					>
@@ -234,7 +236,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 				)}
 				<Button
 					type="submit"
-					disabled={!stripe || isPending || !elements}
+					disabled={!stripe || isPending || !elements || hasPaid}
 					variant="success"
 					className="w-full"
 					aria-busy={isPending}

@@ -127,7 +127,7 @@ Each cell also carries `aria-label` text built from `DAY_STATE_LABELS`, so a scr
 
 `HolidaysList` (`apps/web/src/ui/modules/pages/planner/HolidaysList.tsx`) renders one `Tabs` set with a tab per Holiday Variant over `HolidaysTable`. The Regional tab is inert when the Region has no Holidays of its own; the Custom tab sits behind the Premium gate.
 
-Each row shows the date, the localised name and whether the Holiday falls Monday to Friday or on a weekend, which is the one thing a user needs to judge whether it is worth bridging. The row's checkbox and the table's select-all are Premium; so are **Add** and **Edit**, which open one shared `HolidayFormModal` with a Zod schema built per locale, and **Delete**, which opens `DeleteHolidayModal`. Adding or editing asks the store's `heldOn` whether the date is already taken and by what, and the store answers a `HolidayOutcome` the modal turns into copy: a National Holiday already there, a Manual Day already spent, or applied.
+Each row shows the date, the localised name and whether it is a Weekday Holiday or falls on a weekend, which is the one thing a user needs to judge whether it is worth bridging; the footer counts both kinds. The row's checkbox and the table's select-all are Premium; so are **Add** and **Edit**, which open one shared `HolidayFormModal` with a Zod schema built per locale, and **Delete**, which opens `DeleteHolidayModal`. Adding or editing asks the store's `heldOn` whether the date is already taken and by what, and the store answers a `HolidayOutcome` the modal turns into copy: a National Holiday already there, a Manual Day already spent, or applied.
 
 ## Summary
 

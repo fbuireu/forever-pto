@@ -2,42 +2,54 @@ import { render } from "@testing-library/react";
 import { StrictMode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+const confirmActivation = vi.fn().mockResolvedValue(undefined);
 const checkExistingSession = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("@application/stores/premium", () => ({
-	usePremiumStore: (selector: (state: { checkExistingSession: typeof checkExistingSession }) => unknown) =>
-		selector({ checkExistingSession }),
+	usePremiumStore: (
+		selector: (state: {
+			confirmActivation: typeof confirmActivation;
+			checkExistingSession: typeof checkExistingSession;
+		}) => unknown,
+	) => selector({ confirmActivation, checkExistingSession }),
 }));
 
 import { PremiumSessionSync } from "./PremiumSessionSync";
 
 beforeEach(() => {
+	confirmActivation.mockClear();
 	checkExistingSession.mockClear();
 });
 
 describe("PremiumSessionSync", () => {
-	it("forces one session check on mount, bypassing the store's own throttle", () => {
+	it("confirms the activation the payment route reported, once, on mount", () => {
 		render(<PremiumSessionSync />);
 
-		expect(checkExistingSession).toHaveBeenCalledExactlyOnceWith({ force: true });
+		expect(confirmActivation).toHaveBeenCalledExactlyOnceWith();
 	});
 
-	it("checks once even under strict mode's doubled effects, so the cookie is not read twice", () => {
+	it("runs the confirmation rather than a plain session check, which would restore Premium without counting it", () => {
+		render(<PremiumSessionSync />);
+
+		expect(checkExistingSession).not.toHaveBeenCalled();
+	});
+
+	it("confirms once even under strict mode's doubled effects, so the cookie is not read twice", () => {
 		render(
 			<StrictMode>
 				<PremiumSessionSync />
 			</StrictMode>,
 		);
 
-		expect(checkExistingSession).toHaveBeenCalledOnce();
+		expect(confirmActivation).toHaveBeenCalledOnce();
 	});
 
-	it("does not check again on a re-render", () => {
+	it("does not confirm again on a re-render", () => {
 		const { rerender } = render(<PremiumSessionSync />);
 
 		rerender(<PremiumSessionSync />);
 
-		expect(checkExistingSession).toHaveBeenCalledOnce();
+		expect(confirmActivation).toHaveBeenCalledOnce();
 	});
 
 	it("renders nothing", () => {

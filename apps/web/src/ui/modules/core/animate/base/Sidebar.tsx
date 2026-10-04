@@ -565,7 +565,9 @@ function SidebarMenuButton({
 
 	return (
 		<Tooltip>
-			<TooltipTrigger asChild>{button}</TooltipTrigger>
+			<TooltipTrigger asChild nativeButton={false} tabIndex={-1} role="none">
+				{button}
+			</TooltipTrigger>
 			<TooltipContent side="right" align="center" {...tooltip} />
 		</Tooltip>
 	);

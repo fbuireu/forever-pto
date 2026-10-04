@@ -79,7 +79,7 @@ export const MonthlyDistributionChart = memo(function MonthlyDistributionChart({
 								activeDot={{ r: 6, stroke: COLOR_SCHEMES[3], strokeWidth: 2 }}
 							/>
 							<Tooltip
-								formatter={(value) => [`${value} ${t("days")}`, t("daysOffLabel")]}
+								formatter={(value) => [t("daysValue", { count: Number(value) }), t("ptoDays")]}
 								contentStyle={{
 									backgroundColor: "var(--primary)",
 									border: "3px solid var(--frame)",

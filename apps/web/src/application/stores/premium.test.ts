@@ -271,6 +271,104 @@ describe("checkExistingSession", () => {
 	});
 });
 
+describe("which ways into Premium report premium_activated", () => {
+	const ACTIVATED = [[{ event: "premium_activated", properties: { plan: "premium" } }]];
+	const SESSION = { premiumKey: "pk_redirect", email: "donor@example.com" };
+
+	const tracked = async () => {
+		const { track } = await import("@infrastructure/clients/logging/better-stack/tracking");
+		return vi.mocked(track).mock.calls;
+	};
+
+	const sessionAnswers = async (answer: typeof SESSION | null | Error) => {
+		const { getExistingSession } = await import("@ui/adapters/session/checkSession");
+		if (answer instanceof Error) vi.mocked(getExistingSession).mockRejectedValueOnce(answer);
+		else vi.mocked(getExistingSession).mockResolvedValueOnce(answer);
+		return vi.mocked(getExistingSession);
+	};
+
+	it("reports a payment confirmed in the page, once", async () => {
+		usePremiumStore.getState().setPremiumStatus({ email: SESSION.email, premiumKey: "pk_card" });
+
+		expect(await tracked()).toStrictEqual(ACTIVATED);
+	});
+
+	it("reports an address the 'I already donated' path verifies, once", async () => {
+		const { verifyPremiumEmail } = await import("@ui/adapters/session/checkSession");
+		vi.mocked(verifyPremiumEmail).mockResolvedValueOnce({ premiumKey: "pk_recovered" });
+
+		await usePremiumStore.getState().verifyEmail(SESSION.email);
+
+		expect(await tracked()).toStrictEqual(ACTIVATED);
+	});
+
+	it("reports the activation a redirect payer lands on the confirmation page with, once, with the in-page properties", async () => {
+		await sessionAnswers(SESSION);
+
+		await usePremiumStore.getState().confirmActivation();
+
+		expect(await tracked()).toStrictEqual(ACTIVATED);
+		expect(usePremiumStore.getState().premiumKey).toBe(SESSION.premiumKey);
+	});
+
+	it("reports one activation and asks once however many confirmations land together", async () => {
+		const check = await sessionAnswers(SESSION);
+
+		await Promise.all([
+			usePremiumStore.getState().confirmActivation(),
+			usePremiumStore.getState().confirmActivation(),
+			usePremiumStore.getState().confirmActivation(),
+		]);
+
+		expect(check).toHaveBeenCalledOnce();
+		expect(await tracked()).toStrictEqual(ACTIVATED);
+	});
+
+	it("reports nothing on the confirmation page for a donor this device already holds as Premium", async () => {
+		await sessionAnswers(SESSION);
+		usePremiumStore.setState({ premiumKey: "pk_earlier", userEmail: SESSION.email });
+
+		await usePremiumStore.getState().confirmActivation();
+
+		expect(await tracked()).toStrictEqual([]);
+	});
+
+	it("reports nothing on the confirmation page when the cookie holds no session", async () => {
+		await sessionAnswers(null);
+
+		await usePremiumStore.getState().confirmActivation();
+
+		expect(await tracked()).toStrictEqual([]);
+	});
+
+	it("reports nothing on the confirmation page when the session check fails", async () => {
+		await sessionAnswers(new Error("check-session answered 500"));
+
+		await usePremiumStore.getState().confirmActivation();
+
+		expect(await tracked()).toStrictEqual([]);
+	});
+
+	it("reports nothing for a session an ordinary page load restores from the cookie", async () => {
+		await sessionAnswers(SESSION);
+		usePremiumStore.setState({ needsSessionCheck: true });
+
+		await usePremiumStore.getState().checkExistingSession();
+
+		expect(usePremiumStore.getState().premiumKey).toBe(SESSION.premiumKey);
+		expect(await tracked()).toStrictEqual([]);
+	});
+
+	it("reports nothing for a forced restore outside the confirmation page", async () => {
+		await sessionAnswers(SESSION);
+
+		await usePremiumStore.getState().checkExistingSession({ force: true });
+
+		expect(usePremiumStore.getState().premiumKey).toBe(SESSION.premiumKey);
+		expect(await tracked()).toStrictEqual([]);
+	});
+});
+
 describe("refreshPremiumStatus", () => {
 	it("calls verifyEmail with the stored email", async () => {
 		const { verifyPremiumEmail } = await import("@ui/adapters/session/checkSession");

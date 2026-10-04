@@ -44,8 +44,7 @@
 		"heading": "Pianificatore",
 		"description": "Il tuo pianificatore PTO. Configura i tuoi giorni di PTO, il paese e la strategia per ottenere il massimo da ogni festività.",
 		"titleHighlight": "<first>Il tuo anno</first> <second>libero</second>",
-		"instructions": "Inizia inserendo i tuoi giorni e le altre impostazioni nella barra laterale a sinistra. Hai ancora dubbi?",
-		"quickTour": "Fai un tour veloce"
+		"instructions": "Inizia inserendo i tuoi giorni e le altre impostazioni nella barra laterale a sinistra. Hai ancora dubbi? <tour>Fai un tour veloce</tour>."
 	},
 	"languages": {
 		"en": "Inglese",
@@ -67,11 +66,9 @@
 			"ptoDays": "Giorni di PTO",
 			"days": "giorni",
 			"holidays": "Festivi",
-			"national": "naz.",
-			"regional": "reg.",
-			"custom": "pers.",
+			"holidayBreakdown": "{national} naz.{regional, plural, =0 {} other { + # reg.}}{custom, plural, =0 {} other { + # pers.}}",
 			"effectiveDays": "Giorni effettivi",
-			"overBudget": "oltre il tuo budget di {ptoDays} {ptoDays, plural, one {giorno} other {giorni}}",
+			"overBudget": "{increment, plural, =0 {0} other {+#}} oltre il tuo budget di {ptoDays, plural, one {# giorno} other {# giorni}}",
 			"gain": "Guadagno",
 			"perPtoDay": "del tuo budget di {ptoDays} {ptoDays, plural, one {giorno} other {giorni}}",
 			"longWeekends": "Weekend lunghi",
@@ -92,14 +89,14 @@
 			"lastBreak": "Ultima pausa",
 			"totalBonusDays": "Giorni bonus totali",
 			"bonusDaysCaption": "giorni bonus dall’ottimizzazione",
-			"daysCount": "{count, plural, one {giorno} other {giorni}}"
+			"daysCount": "{count, plural, one {<n>#</n> giorno} other {<n>#</n> giorni}}"
 		},
 		"summaryParagraph": {
-			"withGain": "Con i tuoi {ptoDays} giorni di PTO e {totalHolidays} festivi, la strategia {strategy} li trasforma in {effectiveDays} giorni liberi effettivi, ovvero {increment} giorni oltre il tuo budget, un guadagno del +{percentage} rispetto a usarli senza ottimizzare.",
-			"withoutGain": "Con i tuoi {ptoDays} giorni di PTO e {totalHolidays} festivi, ottieni {effectiveDays} giorni liberi effettivi usando la strategia {strategy}.",
+			"withGain": "Con {ptoDays, plural, one {# giorno di PTO} other {i tuoi # giorni di PTO}} e {totalHolidays, plural, one {# festivo} other {# festivi}}, la strategia {strategy} li trasforma in {effectiveDays, plural, one {# giorno effettivo} other {# giorni effettivi}}, ovvero {increment, plural, one {# giorno} other {# giorni}} oltre il tuo budget, un guadagno del +{percentage} rispetto a usarli senza ottimizzare.",
+			"withoutGain": "Con {ptoDays, plural, one {# giorno di PTO} other {i tuoi # giorni di PTO}} e {totalHolidays, plural, one {# festivo} other {# festivi}}, ottieni {effectiveDays, plural, one {# giorno effettivo} other {# giorni effettivi}} usando la strategia {strategy}.",
 			"noRegionHintTitle": "Aggiungi la tua regione",
 			"noRegionHint": "Seleziona la tua regione nella barra laterale per includere i festivi regionali e ottenere ancora più giorni liberi.",
-			"withRegion": "{regionalDays} dei tuoi festivi sono specifici di {region}."
+			"withRegion": "{regionalDays, plural, one {# dei tuoi festivi è specifico di {region}.} other {# dei tuoi festivi sono specifici di {region}.}}"
 		},
 		"notifications": {
 			"canImprove": {
@@ -258,37 +255,37 @@
 		"allSelected": "Tutti selezionati",
 		"selectedCount": "{count} selezionati",
 		"weekend": "Fine settimana",
-		"onWeekends": "Nel fine settimana",
-		"onWorkdays": "Nei giorni lavorativi",
+		"weekendCount": "Nel fine settimana: {count}",
+		"weekdayHolidayCount": "Festivi infrasettimanali: {count}",
 		"showingCount": "Mostra {shown} di {total}",
+		"totalCount": "{count} in totale",
 		"addHoliday": "Aggiungi festivo",
 		"add": "Aggiungi",
 		"editHoliday": "Modifica festivo",
 		"edit": "Modifica",
 		"deleteHolidays": "{count, plural, one {Elimina {count} festivo} other {Elimina {count} festivi}}",
-		"delete": "Elimina"
+		"deleteCount": "Elimina ({count})"
 	},
 	"charts": {
 		"daysOffComposition": "Composizione dei giorni liberi",
 		"daysOffCompositionFeature": "Grafico di composizione dei giorni liberi",
 		"quarterDistribution": "Distribuzione per trimestre",
 		"quarterDistributionFeature": "Grafico di distribuzione per trimestre",
-		"days": "giorni",
-		"daysOff": "Giorni liberi",
+		"daysValue": "{count, plural, one {# giorno} other {# giorni}}",
+		"ptoDays": "Giorni di PTO",
 		"pto": "PTO",
 		"national": "Nazionali",
 		"regional": "Regionali",
 		"custom": "Personalizzati",
-		"distributionDescription": "Distribuzione dei tuoi {ptoDays} giorni di PTO, {nationalDays} festivi nazionali{regionalDays, plural, =0 {} other {, # regionali}}{customDays, plural, =0 {} other { e # personalizzati}}.",
-		"quarterDescription": "Distribuzione di {totalDays} giorni effettivi su {activeQuarters, plural, one {# trimestre} other {# trimestri}} della tua finestra di pianificazione.",
+		"distributionDescription": "Distribuzione {ptoDays, plural, one {di # giorno di PTO} other {dei tuoi # giorni di PTO}}, {nationalDays, plural, one {# festivo nazionale} other {# festivi nazionali}}{regionalDays, plural, =0 {} one {, # regionale} other {, # regionali}}{customDays, plural, =0 {} one { e # personalizzato} other { e # personalizzati}}.",
+		"quarterDescription": "Distribuzione di {totalDays, plural, one {# giorno di PTO} other {# giorni di PTO}} su {activeQuarters, plural, one {# trimestre} other {# trimestri}} della tua finestra di pianificazione.",
 		"annualTimeline": "Andamento annuale",
 		"annualTimelineFeature": "Grafico dell'andamento annuale",
-		"timelineDescription": "Evoluzione mensile di {totalDays} giorni liberi distribuiti in {activeMonths} mesi. Picco a {peakMonth} con {peakDays} giorni.",
-		"daysOffLabel": "Giorni liberi",
+		"timelineDescription": "Evoluzione mensile di {totalDays, plural, one {# giorno di PTO distribuito} other {# giorni di PTO distribuiti}} in {activeMonths, plural, one {# mese} other {# mesi}}. Picco a {peakMonth} con {peakDays, plural, one {# giorno} other {# giorni}}.",
 		"longBlocksPerQuarter": "Blocchi lunghi per trimestre",
 		"longBlocksFeature": "Grafico blocchi lunghi per trimestre",
-		"blocksDescription": "{totalBlocks, plural, =0 {# blocchi lunghi ({minDays, number}+ giorni consecutivi) ideali per le vacanze.} other {# blocchi lunghi ({minDays, number}+ giorni consecutivi) ideali per le vacanze. Miglior trimestre: Q{bestQuarter} con {maxBlocks, plural, one {# blocco} other {# blocchi}}.}}",
-		"blocks": "blocchi",
+		"blocksDescription": "{totalBlocks, plural, =0 {# blocchi lunghi ({minDays, number}+ giorni consecutivi) ideali per le vacanze.} one {# blocco lungo ({minDays, number}+ giorni consecutivi) ideale per le vacanze. Miglior trimestre: Q{bestQuarter} con {maxBlocks, plural, one {# blocco} other {# blocchi}}.} other {# blocchi lunghi ({minDays, number}+ giorni consecutivi) ideali per le vacanze. Miglior trimestre: Q{bestQuarter} con {maxBlocks, plural, one {# blocco} other {# blocchi}}.}}",
+		"blocksValue": "{count, plural, one {# blocco} other {# blocchi}}",
 		"blocksOfMinDays": "Blocchi di {minDays, number}+ giorni"
 	},
 	"modals": {
@@ -298,7 +295,7 @@
 			"nameLabel": "Nome del festivo",
 			"namePlaceholder": "es. Il mio compleanno",
 			"dateLabel": "Seleziona data",
-			"selected": "Selezionato",
+			"selectedDate": "Selezionato: {date}",
 			"submit": "Aggiungi festivo",
 			"submitting": "Aggiunta in corso...",
 			"cancel": "Annulla",
@@ -308,7 +305,7 @@
 			"errorDescription": "Qualcosa è andato storto. Riprova.",
 			"existsTitle": "Il festivo esiste già",
 			"manualDayExistsTitle": "Quel giorno è già un giorno di PTO",
-			"manualDayExistsDescription": "Hai già segnato il {date} come giorno libero. Rimuovilo prima dal piano, poi aggiungi il festivo.",
+			"manualDayExistsDescription": "Hai già segnato il {date} come giorno di PTO. Rimuovilo prima dal piano, poi aggiungi il festivo.",
 			"existsDescription": "Esiste già un festivo il {date}: {name}"
 		},
 		"editHoliday": {
@@ -323,17 +320,13 @@
 			"errorDescription": "Qualcosa è andato storto. Riprova."
 		},
 		"deleteHoliday": {
-			"title": "Elimina festivi",
-			"titleSingular": "Elimina festivo",
-			"description": "Sei sicuro di voler eliminare {count} festivi? Questa azione non può essere annullata.",
-			"descriptionSingular": "Sei sicuro di voler eliminare questo festivo? Questa azione non può essere annullata.",
+			"title": "{count, plural, one {Elimina festivo} other {Elimina festivi}}",
+			"description": "{count, plural, one {Sei sicuro di voler eliminare questo festivo? Questa azione non può essere annullata.} other {Sei sicuro di voler eliminare # festivi? Questa azione non può essere annullata.}}",
 			"submit": "Elimina",
 			"submitting": "Eliminazione in corso...",
 			"cancel": "Annulla",
-			"successTitle": "Festivi eliminati",
-			"successTitleSingular": "Festivo eliminato",
-			"successDescription": "{count} festivi sono stati eliminati",
-			"successDescriptionSingular": "Il festivo è stato eliminato",
+			"successTitle": "{count, plural, one {Festivo eliminato} other {Festivi eliminati}}",
+			"successDescription": "{count, plural, one {Il festivo è stato eliminato} other {# festivi sono stati eliminati}}",
 			"errorTitle": "Impossibile eliminare i festivi",
 			"errorDescription": "Qualcosa è andato storto. Riprova."
 		}
@@ -405,12 +398,12 @@
 		}
 	},
 	"ptoStatus": {
-		"autoAssigned": "Suggeriti",
-		"manual": "Manuale",
-		"remaining": "Rimanenti",
+		"suggestedCount": "<label>Suggeriti:</label> <n>{count}</n>",
+		"manualCount": "<label>Manuale:</label> <n>{count}</n>",
+		"remainingCount": "<label>Rimanenti:</label> <n>{count}</n>",
 		"allAssigned": "Tutti i giorni assegnati!",
 		"resetManual": "Ripristina modifiche manuali",
-		"usedDays": "{used} / {total} giorni usati · {pct}%",
+		"usedDays": "{used} / {total, plural, one {# giorno usato} other {# giorni usati}} · {pct}%",
 		"remainingDays": "{remaining} rimanenti · {pct}%"
 	},
 	"contact": {
@@ -442,18 +435,19 @@
 		}
 	},
 	"alternativesManager": {
-		"option": "Alternativa",
+		"position": "<label>Alternativa</label> <n>{position}</n><of> / {total}</of>",
 		"recommended": "Consigliata",
 		"totalOff": "Giorni effettivi",
 		"efficiency": "Efficienza",
 		"efficiencyValue": "{efficiency}x",
+		"efficiencyReadout": "{suggestion, select, recommended {Efficienza: {efficiency}x} other {Efficienza: {efficiency}x ({difference})}}",
 		"vsMain": "vs principale",
 		"alreadyApplied": "Già applicata",
 		"applyAlternative": "Applica alternativa",
 		"previousSuggestion": "Suggerimento precedente",
 		"nextSuggestion": "Prossimo suggerimento",
-		"totalDaysOff": "Totale giorni effettivi",
-		"comparison": "Confronto",
+		"effectiveDaysReadout": "Totale giorni effettivi: {effectiveDays} (+{bonusDays})",
+		"comparisonReadout": "Confronto: {ratio}",
 		"effectiveDaysCount": "{count, plural, one {# giorno} other {# giorni}}"
 	},
 	"toasts": {
@@ -741,10 +735,7 @@
 		"detailedView": "Vista dettagliata",
 		"haveSuggestion": "Hai un suggerimento?",
 		"feedbackShapes": "La roadmap nasce anche dal tuo feedback. Raccontaci le tue idee.",
-		"gotAnIdea": "Hai un'idea che ti semplificherebbe la vita?",
-		"letsTalk": "Parliamone",
-		"or": "o",
-		"openIssue": "Apri un issue su GitHub",
+		"ideaPrompt": "Hai un'idea che ti semplificherebbe la vita? <talk>Parliamone</talk> o <issue>apri un issue su GitHub</issue>",
 		"features": {
 			"corePtoCalculator": "Calcolatore PTO principale",
 			"corePtoCalculatorDescription": "Pianificazione delle ferie con ottimizzazione dei festivi e rilevamento dei ponti",
@@ -891,11 +882,11 @@
 		"previousMonth": "Mese precedente",
 		"nextMonth": "Mese successivo",
 		"today": "Oggi",
-		"daysOff": "{count, plural, one {# giorno libero} other {# giorni liberi}}"
+		"holidaysCount": "{count, plural, one {# festivo} other {# festivi}}"
 	},
 	"holidayRow": {
 		"weekend": "Fine settimana",
-		"workday": "Lavorativo",
+		"weekdayHoliday": "Festivo infrasettimanale",
 		"select": "Seleziona {name}",
 		"editHolidays": "Modifica festivi"
 	},

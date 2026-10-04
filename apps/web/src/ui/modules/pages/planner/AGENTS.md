@@ -263,15 +263,24 @@ Anything else on this screen that wants the days spent takes them from the hook.
 **The budget badges carry an ICU plural in the five bundles that need one.** `MIN_PTO_DAYS` is 1, so
 `metrics.overBudget` and `metrics.perPtoDay` are reachable at a budget of one; `es`, `ca`, `it`, `de` and `fr`
 put a noun after the number and select it with `{ptoDays, plural, …}`, while `en` reads "your 1-day budget".
+`overBudget` also carries the days over budget, `{increment, plural, =0 {0} other {+#}}`, and `Summary` hands it
+`Math.max(0, …)`, because a plan that returns less than its budget reads nought rather than a negative number.
 
 **`MetricCard`'s props are a union on `size`.** `hint` exists only on the compact card and `badge` only on the
 full-size one, so either passed to the other layout is a compile error. The card rounds to whole numbers unless
 given `decimalPlaces` (`SlidingNumber` runs `toFixed`), so a fractional metric passes `decimalPlaces={1}`, as
-Efficiency and `workedDaysPerMonth` do.
+Efficiency and `workedDaysPerMonth` do. A unit that agrees with the number goes through `renderValue`, which
+receives the counter and returns the message around it: Longest Vacation passes `yearSummary.daysCount`, whose
+`<n>#</n>` places the counter. The value row is a flex row, where the message's space collapses, so `renderValue`
+adds a gap; the Max Work Streak beside it carries the same gap.
 
 **`usePlannerDayClick` checks Premium, hands the day to the store and renders whatever refusal comes back
 through `DAY_REFUSAL_COPY`.** A new refusal is a new reason in the stores'
 [`types.ts`](../../../../application/stores/types.ts) plus an entry in that map.
+
+**A Holiday's status badge says whether it is a Weekday Holiday or falls on a weekend.** `HolidayRow` draws it, and
+the table's footer counts each kind (`holidaysTable.weekendCount` and `weekdayHolidayCount`). Neither calls a
+Holiday a Workday, the term [`CONTEXT.md`](../../../../../../../CONTEXT.md) keeps for a date that is no Holiday.
 
 **`getHolidayId` in `holidays/HolidaysTable.tsx` returns `` `${holiday.id}::${holiday.name}` ``.** The toolbar count and the modals read
 `selectedHolidaysList`, resolved against `variantHolidays` rather than the visible rows, so a selection a search

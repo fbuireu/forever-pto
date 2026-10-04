@@ -17,9 +17,9 @@ per pull request) is [CONTRIBUTING.md](./.github/CONTRIBUTING.md)'s.
 No rule below restates these, and a diff that breaks one fails CI:
 
 - Biome ([`biome.json`](./biome.json)) over both packages: formatting, import order, the recommended rules,
-  `noConsole` everywhere but [`logger.ts`](./apps/web/src/infrastructure/logging/logger.ts), no `enum`, no barrel or
-  `export *` module, and no default export outside the Next file conventions, the `next-intl` request config, the
-  Playwright global setup and the tools' config files.
+  `noConsole` everywhere but [`logger.ts`](./apps/web/src/infrastructure/logging/logger.ts), no barrel or `export *`
+  module, and no default export outside the Next file conventions, the `next-intl` request config, the Playwright
+  global setup and the tools' config files.
 - Strict `tsc` over the root program and `apps/web` ([`apps/web/tsconfig.json`](./apps/web/tsconfig.json)), and
   `astro check` over `apps/docs`, which types every demo against the app's real props.
 - commitlint ([`commitlint.config.ts`](./commitlint.config.ts)): the commit format, on the commit and on the pull
@@ -93,8 +93,8 @@ No rule below restates these, and a diff that breaks one fails CI:
     writes into `pnpm-workspace.yaml`, a `#` counting as a comment when removing it leaves the parsed document
     unchanged;
   - the package scripts: no shell substitution, and a literal base on every changed-only Vitest or Playwright run;
-  - the published wiki: canonical glossary terms, repo-relative paths, and only constants, tokens, icons and `@ui`
-    exports that exist;
+  - the published wiki: canonical glossary terms outside its landing pages, repo-relative paths, and only constants,
+    tokens, icons and `@ui` exports that exist;
   - the docs site: every component page's sections in order after its demos and the Live badge on it, every sidebar
     group translated into each locale the site serves, the app's styles brought in through `global.css` and never
     the app's own `index.css`, the consent category and service ids equal to the app's, the consent banner in each
@@ -111,9 +111,11 @@ No rule below restates these, and a diff that breaks one fails CI:
 
 ## Naming and vocabulary
 
-- `N1` **hard**: Name identifiers, copy and docs with the glossary's canonical term; a retired `_Avoid_` name lets
-  rival numbers share a word, so it is a defect even on a symbol nothing calls
-  ([ADR 0014](./adr/0014-ddd-where-it-pays.md)).
+- `N1` **hard**: Name identifiers, product copy and docs with the glossary's canonical term; a retired `_Avoid_` name
+  lets rival numbers share a word, so it is a defect even on a symbol nothing calls
+  ([ADR 0014](./adr/0014-ddd-where-it-pays.md)). The glossary binds code, documents and product copy; marketing copy,
+  which is the homepage with its sections and the docs site's landing pages, may use the words people search for
+  ("days off", "free days", "vacation plan").
 - `N2` **hard**: Call a public non-working day `Holiday` in code and docs; "public holiday" belongs only in English
   user-facing copy, where the bare word would read as vacation.
 - `N3` **hard**: Keep the Holiday Variant in `variant`; `type` is the upstream classification's field and means
@@ -507,8 +509,10 @@ No rule below restates these, and a diff that breaks one fails CI:
 - `P1` **hard**: Call `track()` in the handler where the interaction lands, or in a store action the interaction
   calls, never where a rehydration or an effect would run it again. A result that lands later is asked for in the
   handler and reported where it lands, only when asked: `planner_generated` counts the plans a person asks for
-  (`askForPlan` in the handler, `claimPlanAskedFor` where the worker's answer lands), never a load or a restore. The
-  one `track()` inside an effect counts a view rather than an interaction: the contact form a `#contact` link opens.
+  (`askForPlan` in the handler, `claimPlanAskedFor` where the worker's answer lands), never a load or a restore, and
+  a Donation the issuer took over lands on the payment confirmation page, whose mount calls `confirmActivation` once
+  to report `premium_activated` on the move into Premium, never on a reload. The one `track()` inside an effect
+  counts a view rather than an interaction: the contact form a `#contact` link opens.
 - `P2` **hard**: Send ids and machine codes in events (a `PremiumFeatureId`, an `ApiError` code), never translated
   strings, dates, Manual Days, Custom Holiday names or a salary.
 - `P3` **hard**: Read consent per service through `consent.ts` (`acceptedService`), and give a new service its own

@@ -59,7 +59,7 @@ export const QuarterDistributionChart = memo(function QuarterDistributionChart({
 								))}
 							</Bar>
 							<Tooltip
-								formatter={(value) => [`${value} ${t("days")}`, t("daysOff")]}
+								formatter={(value) => [t("daysValue", { count: Number(value) }), t("ptoDays")]}
 								contentStyle={{
 									backgroundColor: "var(--primary)",
 									border: "3px solid var(--frame)",

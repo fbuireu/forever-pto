@@ -1,8 +1,12 @@
+import caMessages from "@i18n/messages/ca.json";
 import de from "@i18n/messages/de.json";
 import en from "@i18n/messages/en.json";
+import esMessages from "@i18n/messages/es.json";
+import frMessages from "@i18n/messages/fr.json";
+import itMessages from "@i18n/messages/it.json";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { NextIntlClientProvider } from "next-intl";
+import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactElement } from "react";
 import { useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -91,17 +95,17 @@ describe("PlannerPanel Alternatives", () => {
 	it("round-trips the previewed index through the store rather than mirroring it", async () => {
 		const { container } = renderPanel(<StoreHost />);
 
-		expect(optionReadout(container)).toContain(`${en.alternativesManager.option}1/ 3`);
+		expect(optionReadout(container)).toContain("Alternative 1 / 3");
 
 		await userEvent.click(screen.getByRole("button", { name: en.alternativesManager.nextSuggestion }));
 
 		expect(setPreviewAlternativeSelection).toHaveBeenCalledWith({ index: 1 });
-		expect(optionReadout(container)).toContain(`${en.alternativesManager.option}2/ 3`);
+		expect(optionReadout(container)).toContain("Alternative 2 / 3");
 
 		await userEvent.click(screen.getByRole("button", { name: en.alternativesManager.previousSuggestion }));
 
 		expect(setPreviewAlternativeSelection).toHaveBeenLastCalledWith({ index: 0 });
-		expect(optionReadout(container)).toContain(`${en.alternativesManager.option}1/ 3`);
+		expect(optionReadout(container)).toContain("Alternative 1 / 3");
 	});
 
 	it("follows selectedIndex on its own, so a store change with no click still moves the readout", () => {
@@ -114,7 +118,7 @@ describe("PlannerPanel Alternatives", () => {
 
 		const { container, rerender } = renderPanel(<PlannerPanel {...props} selectedIndex={0} />);
 
-		expect(optionReadout(container)).toContain(`${en.alternativesManager.option}1/ 3`);
+		expect(optionReadout(container)).toContain("Alternative 1 / 3");
 
 		rerender(
 			<NextIntlClientProvider locale="en" messages={en}>
@@ -122,7 +126,7 @@ describe("PlannerPanel Alternatives", () => {
 			</NextIntlClientProvider>,
 		);
 
-		expect(optionReadout(container)).toContain(`${en.alternativesManager.option}3/ 3`);
+		expect(optionReadout(container)).toContain("Alternative 3 / 3");
 	});
 });
 
@@ -159,8 +163,8 @@ describe("PlannerPanel comparing an Alternative to the recommended one", () => {
 	it("shows the efficiency gap and the ratio against the first option, which is the recommended one", () => {
 		const { container } = renderPanel(<PlannerPanel {...panelProps} selectedIndex={1} />);
 
-		expect(srOnly(container)).toContain(`${en.alternativesManager.efficiency}: 1.8x (-0.2)`);
-		expect(srOnly(container)).toContain(`${en.alternativesManager.comparison}: 90%`);
+		expect(srOnly(container)).toContain("Efficiency: 1.8x (-0.2)");
+		expect(srOnly(container)).toContain("Comparison: 90%");
 		expect(container.textContent).not.toContain(en.alternativesManager.recommended);
 	});
 
@@ -171,8 +175,8 @@ describe("PlannerPanel comparing an Alternative to the recommended one", () => {
 		];
 		const { container } = renderPanel(<PlannerPanel {...panelProps} allSuggestions={better} selectedIndex={1} />);
 
-		expect(srOnly(container)).toContain(`${en.alternativesManager.efficiency}: 2.4x (+0.4)`);
-		expect(srOnly(container)).toContain(`${en.alternativesManager.comparison}: 120%`);
+		expect(srOnly(container)).toContain("Efficiency: 2.4x (+0.4)");
+		expect(srOnly(container)).toContain("Comparison: 120%");
 	});
 
 	it("greys the ratio out once the Alternative falls more than half a point behind", () => {
@@ -182,15 +186,15 @@ describe("PlannerPanel comparing an Alternative to the recommended one", () => {
 		];
 		const { container } = renderPanel(<PlannerPanel {...panelProps} allSuggestions={farBehind} selectedIndex={1} />);
 
-		expect(srOnly(container)).toContain(`${en.alternativesManager.comparison}: 50%`);
+		expect(srOnly(container)).toContain("Comparison: 50%");
 		expect(container.querySelector(".text-neutral-600.font-semibold")).not.toBeNull();
 	});
 
 	it("shows no gap and no ratio on the recommended option itself, only its badge", () => {
 		const { container } = renderPanel(<PlannerPanel {...panelProps} selectedIndex={0} />);
 
-		expect(srOnly(container)).toContain(`${en.alternativesManager.efficiency}: 2.0x`);
-		expect(srOnly(container).some((text) => text?.startsWith(en.alternativesManager.comparison))).toBe(false);
+		expect(srOnly(container)).toContain("Efficiency: 2.0x");
+		expect(srOnly(container).some((text) => text?.startsWith("Comparison"))).toBe(false);
 		expect(container.textContent).toContain(en.alternativesManager.recommended);
 	});
 });
@@ -258,7 +262,86 @@ describe("PlannerPanel numbers in the reader's own format", () => {
 			(node.textContent ?? "").replace(NARROW_SPACES, " "),
 		);
 
-		expect(readouts).toContain(`${de.alternativesManager.efficiency}: 1,8x (-0,2)`);
-		expect(readouts).toContain(`${de.alternativesManager.comparison}: 90 %`);
+		expect(readouts).toContain("Effizienz: 1,8x (-0,2)");
+		expect(readouts).toContain("Vergleich: 90 %");
 	});
+});
+
+interface RenderInParams {
+	locale: Locale;
+	messages: object;
+	selectedIndex?: number;
+}
+
+const renderIn = ({ locale, messages, selectedIndex = 0 }: RenderInParams) =>
+	render(
+		<NextIntlClientProvider locale={locale} messages={messages}>
+			<PlannerPanel {...panelProps} selectedIndex={selectedIndex} />
+		</NextIntlClientProvider>,
+	);
+
+describe("PlannerPanel budget readout at the plural edges", () => {
+	it.each([
+		["en", 0, 0, "0 / 0 days used · 0%", en],
+		["en", 1, 1, "1 / 1 day used · 100%", en],
+		["en", 10, 6, "6 / 10 days used · 60%", en],
+		["es", 0, 0, "0 / 0 días usados · 0%", esMessages],
+		["es", 1, 1, "1 / 1 día usado · 100%", esMessages],
+		["es", 10, 6, "6 / 10 días usados · 60%", esMessages],
+	] as const)(
+		"writes the %s budget of %i with %i used as one sentence",
+		(locale, ptoDays, spent, expected, messages) => {
+			Object.assign(readout, { ptoDays, spent, suggested: spent, remaining: ptoDays - spent });
+
+			const { container } = renderIn({ locale, messages });
+
+			expect(container.textContent).toContain(expected);
+		},
+	);
+});
+
+describe("PlannerPanel readouts as whole sentences", () => {
+	const srOnly = (container: HTMLElement) =>
+		Array.from(container.querySelectorAll(".sr-only")).map((node) => node.textContent);
+
+	it("lets French put its space before the colon, which a colon glued on by the component could not", () => {
+		const { container } = renderIn({ locale: "fr", messages: frMessages });
+
+		expect(srOnly(container)).toEqual(expect.arrayContaining(["Suggérés : 6", "Manuel : 0", "Restants : 4"]));
+		expect(container.textContent).toContain("Suggérés :");
+	});
+
+	it("reads the Alternative's position and readouts for a screen reader in plain words", () => {
+		const { container } = renderIn({ locale: "en", messages: en, selectedIndex: 1 });
+
+		expect(srOnly(container)).toEqual(
+			expect.arrayContaining([
+				"Alternative 2 / 3",
+				"Total effective days: 9 (+2)",
+				"Efficiency: 1.8x (-0.2)",
+				"Comparison: 90%",
+				"Suggested: 6",
+				"Manual: 0",
+				"Remaining: 4",
+			]),
+		);
+	});
+
+	it.each([
+		["en", en, "Alternative 2 / 3"],
+		["es", esMessages, "Alternativa 2 / 3"],
+		["ca", caMessages, "Alternativa 2 / 3"],
+		["it", itMessages, "Alternativa 2 / 3"],
+		["de", de, "Alternative 2 / 3"],
+		["fr", frMessages, "Alternative 2 / 3"],
+	] as const)(
+		"renders the %s position and budget sentences whole, with no raw tag, brace or key",
+		(locale, messages, position) => {
+			const { container } = renderIn({ locale, messages, selectedIndex: 1 });
+
+			expect(srOnly(container)).toContain(position);
+			expect(container.textContent).toContain(position);
+			expect(container.textContent).not.toMatch(/[<>{}]|alternativesManager\.|ptoStatus\./);
+		},
+	);
 });

@@ -86,7 +86,7 @@ export const HolidaysDistributionChart = memo(function HolidaysDistributionChart
 								))}
 							</Pie>
 							<Tooltip
-								formatter={(value, name) => [`${value} ${t("days")}`, name]}
+								formatter={(value, name) => [t("daysValue", { count: Number(value) }), name]}
 								contentStyle={{
 									backgroundColor: "var(--primary)",
 									border: "3px solid var(--frame)",

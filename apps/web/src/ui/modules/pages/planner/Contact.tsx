@@ -48,26 +48,30 @@ export function Contact() {
 				</CardHeader>
 				<CardContent>
 					<div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground px-3 py-2">
-						<span>{t("gotAnIdea")}</span>
-						<Button
-							variant="ghost"
-							className="px-1.5 py-0.5 h-auto text-sm font-semibold hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground"
-							onClick={() => {
-								setContactModalOpen(true);
-								track({ event: "contact_opened", properties: { source: "click" } });
-							}}
-						>
-							{t("letsTalk")}
-						</Button>
-						<span>{t("or")}</span>
-						<a
-							href={GITHUB_ISSUE_URL}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="text-sm font-semibold px-1.5 py-0.5 quiet-link"
-						>
-							{t("openIssue")}
-						</a>
+						{t.rich("ideaPrompt", {
+							talk: (chunks) => (
+								<Button
+									variant="ghost"
+									className="px-1.5 py-0.5 h-auto text-sm font-semibold hover:bg-[var(--accent)] hover:border-[var(--frame)] hover:text-accent-foreground"
+									onClick={() => {
+										setContactModalOpen(true);
+										track({ event: "contact_opened", properties: { source: "click" } });
+									}}
+								>
+									{chunks}
+								</Button>
+							),
+							issue: (chunks) => (
+								<a
+									href={GITHUB_ISSUE_URL}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-sm font-semibold px-1.5 py-0.5 quiet-link"
+								>
+									{chunks}
+								</a>
+							),
+						})}
 					</div>
 				</CardContent>
 			</Card>

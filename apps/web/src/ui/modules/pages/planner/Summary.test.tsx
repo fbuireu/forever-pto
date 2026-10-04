@@ -1,6 +1,9 @@
+import caMessages from "@i18n/messages/ca.json";
 import deMessages from "@i18n/messages/de.json";
 import enMessages from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
+import frMessages from "@i18n/messages/fr.json";
+import itMessages from "@i18n/messages/it.json";
 import { render } from "@testing-library/react";
 import type { Locale } from "next-intl";
 import { NextIntlClientProvider } from "next-intl";
@@ -95,6 +98,7 @@ const METRICS = {
 	longBlocksPerQuarter: [0, 0, 0, 0],
 	totalEffectiveDays: 5,
 	workedDaysPerMonth: 20,
+	longestVacation: 16,
 };
 
 interface RenderSummaryParams {
@@ -381,7 +385,7 @@ describe("Summary heading", () => {
 		expect(container.querySelector(".fi-es")).not.toBeNull();
 		expect(container.textContent).toContain("Spain");
 		expect(container.textContent).toContain("Catalonia");
-		expect(container.textContent).toContain("1 of your holidays are specific to Catalonia.");
+		expect(container.textContent).toContain("1 of your holidays is specific to Catalonia.");
 		expect(container.textContent).not.toContain(enMessages.summary.summaryParagraph.noRegionHintTitle);
 	});
 
@@ -498,5 +502,133 @@ describe("Summary Gain sentence", () => {
 		const { container } = renderSummary({ locale, messages });
 
 		expect((container.textContent ?? "").replace(NARROW_SPACES, " ")).toContain(expected);
+	});
+});
+
+describe("Summary sentences at the plural edges", () => {
+	const onePlan = () => {
+		resetPlan();
+		filtersState.ptoDays = 1;
+		holidaysState.suggestion = planOf({ days: [JAN(6)], totalEffectiveDays: 1 });
+		holidaysState.holidays = [holidayOf({ variant: "national", day: 1 })];
+	};
+
+	it.each([
+		["en", enMessages, "With your 1 PTO day and 1 public holiday, you get 1 effective day using the Grouped strategy."],
+		["es", esMessages, "Con 1 día de PTO y 1 festivo, obtienes 1 día efectivo usando la estrategia Agrupada."],
+	] as const)("says one of each in the %s singular", (locale, messages, expected) => {
+		onePlan();
+
+		const { container } = renderSummary({ locale, messages });
+
+		expect(container.textContent).toContain(expected);
+	});
+
+	it.each([
+		[
+			"en",
+			enMessages,
+			"With your 3 PTO days and 0 public holidays, the Grouped strategy turns them into 5 effective days, that’s 2 days over your budget",
+		],
+		[
+			"es",
+			esMessages,
+			"Con tus 3 días de PTO y 0 festivos, la estrategia Agrupada los convierte en 5 días efectivos, es decir, 2 días por encima de tu presupuesto",
+		],
+	] as const)(
+		"counts nought and many in the %s plural, and calls the result Effective Days",
+		(locale, messages, expected) => {
+			resetPlan();
+
+			const { container } = renderSummary({ locale, messages });
+
+			expect(container.textContent).toContain(expected);
+			expect(container.querySelector('[data-slot="card-description"] p')?.textContent).not.toMatch(
+				/days off|días libres/,
+			);
+		},
+	);
+
+	it.each([
+		["en", 1, "1 of your holidays is specific to Catalonia.", enMessages],
+		["en", 2, "2 of your holidays are specific to Catalonia.", enMessages],
+		["es", 1, "1 de tus festivos es específico de Catalonia.", esMessages],
+		["es", 2, "2 de tus festivos son específicos de Catalonia.", esMessages],
+	] as const)("agrees the %s Region sentence with %i Regional Holidays", (locale, count, expected, messages) => {
+		resetPlan();
+		locationState.regions = [{ value: "ct", label: "Catalonia" }];
+		filtersState.region = "CT";
+		holidaysState.holidays = Array.from({ length: count }, (_, index) =>
+			holidayOf({ variant: "regional", day: 10 + index }),
+		);
+
+		const { container } = renderSummary({ locale, messages });
+
+		expect(container.textContent).toContain(expected);
+	});
+
+	it.each([
+		["en", 16, "16 days", enMessages],
+		["en", 1, "1 day", enMessages],
+		["es", 16, "16 días", esMessages],
+		["es", 1, "1 día", esMessages],
+	] as const)(
+		"writes the %s Longest Vacation of %i with its unit in one message",
+		(locale, longestVacation, expected, messages) => {
+			resetPlan();
+			holidaysState.suggestion = { ...planOf({ days: [JAN(6)] }), metrics: { ...METRICS, longestVacation } };
+
+			const { container } = renderSummary({ locale, messages });
+			const label = Array.from(container.querySelectorAll("div")).find(
+				(node) => node.textContent === messages.summary.metrics.longestVacation,
+			);
+
+			expect(label?.previousElementSibling?.textContent).toBe(expected);
+			expect(label?.previousElementSibling?.className).toContain("gap-1");
+		},
+	);
+});
+
+describe("Summary Effective Days badge", () => {
+	it("puts the days over budget inside the sentence that names the budget", () => {
+		resetPlan();
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain("+2 over your 3-day budget");
+	});
+
+	it("reads nought, not a negative number, when the plan returns less than the budget", () => {
+		resetPlan();
+		holidaysState.suggestion = planOf({ days: [JAN(6), JAN(7), JAN(8)], totalEffectiveDays: 2 });
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain("0 over your 3-day budget");
+		expect(container.textContent).not.toContain("-1");
+	});
+});
+
+describe("Summary rich-text messages in every bundle", () => {
+	it.each(
+		Object.entries({ en: enMessages, es: esMessages, ca: caMessages, it: itMessages, de: deMessages, fr: frMessages }),
+	)("renders the %s day counts whole, with no raw tag, brace or key", (locale, messages) => {
+		resetPlan();
+		holidaysState.suggestion = {
+			...planOf({ days: [JAN(6), JAN(7), JAN(8)] }),
+			metrics: {
+				...METRICS,
+				firstLastBreak: { first: "Jan 6", last: "Dec 24" },
+				maxWorkStreak: 45,
+				longestVacation: 16,
+			},
+		};
+
+		const { container } = renderSummary({ locale: locale as Locale, messages });
+		const text = container.textContent ?? "";
+
+		expect(text).toMatch(/45\s\p{L}+/u);
+		expect(text).toMatch(/16\s\p{L}+/u);
+		expect(text).not.toMatch(/[<>{}]|summary\.|charts\./);
 	});
 });

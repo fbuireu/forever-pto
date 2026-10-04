@@ -13,7 +13,7 @@ Every React component the product renders. Nothing else in `src/ui/` holds compo
 | `shared/` | Cross-page pieces that are not primitives: footer, donate, contact, cookie consent, JSON-LD, the marketing header [`shared/Header.tsx`](./shared/Header.tsx) with its [`shared/HomepageLanguageSwitcher.tsx`](./shared/HomepageLanguageSwitcher.tsx) and [`shared/QuickStartTrigger.tsx`](./shared/QuickStartTrigger.tsx), which the homepage, the legal pages and the 404 page render, [`shared/Logo.tsx`](./shared/Logo.tsx), [`shared/Icon.tsx`](./shared/Icon.tsx), [`shared/FormButtons.tsx`](./shared/FormButtons.tsx), [`shared/StepOutcome.tsx`](./shared/StepOutcome.tsx), [`shared/SupportButton.tsx`](./shared/SupportButton.tsx), [`shared/ConditionalWrapper.tsx`](./shared/ConditionalWrapper.tsx), [`shared/WebMCP.tsx`](./shared/WebMCP.tsx), and what the sidebar and the quick start share: [`shared/MonthToggles.tsx`](./shared/MonthToggles.tsx), the month picker, and [`shared/strategyIcons.ts`](./shared/strategyIcons.ts), the Strategy icons; plus [`shared/utils/helpers.ts`](./shared/utils/helpers.ts) for the helpers those pieces need | Yes |
 | `layout/` | [`layout/LegalLayout.tsx`](./layout/LegalLayout.tsx), the card chrome the legal pages share, and [`layout/SkipToContent.tsx`](./layout/SkipToContent.tsx), which owns the skip link **and** the `MAIN_CONTENT_ID` every route shell's landmark is keyed on | Between sibling routes |
 | `sidebar/` | [`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) and its controls: Country, Region, year, Strategy and its Preferred Months, past days, Carry-over Months, the PTO Day budget, the calculators, the calendar export, and the language and theme switchers | One screen, but not a page section |
-| `premium/` | The Premium gate and the Donation checkout: [`premium/PremiumFeature.tsx`](./premium/PremiumFeature.tsx), [`premium/featureLabels.ts`](./premium/featureLabels.ts), [`premium/PremiumModal.tsx`](./premium/PremiumModal.tsx), [`premium/PremiumRequiredModal.tsx`](./premium/PremiumRequiredModal.tsx), [`premium/CheckoutForm.tsx`](./premium/CheckoutForm.tsx) with its [`premium/ExpressCheckoutFixture.tsx`](./premium/ExpressCheckoutFixture.tsx), and [`premium/PremiumSessionSync.tsx`](./premium/PremiumSessionSync.tsx), the render-nothing session check the payment confirmation mounts | Yes |
+| `premium/` | The Premium gate and the Donation checkout: [`premium/PremiumFeature.tsx`](./premium/PremiumFeature.tsx), [`premium/featureLabels.ts`](./premium/featureLabels.ts), [`premium/PremiumModal.tsx`](./premium/PremiumModal.tsx), [`premium/PremiumRequiredModal.tsx`](./premium/PremiumRequiredModal.tsx), [`premium/CheckoutForm.tsx`](./premium/CheckoutForm.tsx) with its [`premium/ExpressCheckoutFixture.tsx`](./premium/ExpressCheckoutFixture.tsx), and [`premium/PremiumSessionSync.tsx`](./premium/PremiumSessionSync.tsx), the render-nothing activation check the payment confirmation mounts | Yes |
 | `providers/` | What the locale layout mounts once around the page: [`providers/AppThemeProvider.tsx`](./providers/AppThemeProvider.tsx), the `next-themes` context, which the two global pages mount too, and [`providers/BonesProvider.tsx`](./providers/BonesProvider.tsx), which renders `null` and configures `boneyard-js` | Once |
 | `stores/` | [`stores/StoresInitializer.tsx`](./stores/StoresInitializer.tsx), a render-nothing component that seeds the filters store from the `user-country` cookie, read through [`utils/userCountry.ts`](../utils/userCountry.ts) | Once |
 | `tutorial/` | [`tutorial/anchors.ts`](./tutorial/anchors.ts), the tour's anchor names and window events, and [`tutorial/DriverStyles.tsx`](./tutorial/DriverStyles.tsx), the module `useTutorial` imports for the driver.js stylesheet | Once |
@@ -96,7 +96,8 @@ theme switchers and the contact form call `track()` where the interaction lands;
 observability page of the docs site. The store actions that report are the opens several triggers share, so each trigger reports the same event
 with its own `source` (`openDonatePopover(source)` and `openQuickStart(source)` on the `ui` store,
 `showPremiumModal(feature, origin)` on the premium store), and `setPremiumStatus`, which reports
-`premium_activated` on the move from free to Premium only. `planner_generated` counts the plans a person asks
+`premium_activated` on the move from free to Premium only, as `confirmActivation` does for the payer the issuer
+redirected, from the confirmation page. `planner_generated` counts the plans a person asks
 for: every handler that changes what the plan is built from calls the holidays store's `askForPlan` (a sidebar
 control or the calculator on a new value, the quick start's finish, a Custom Holiday that lands or goes, an
 Alternative applied, a reset), and `hooks/useCalculationsWorker.ts` reports it when the worker's answer lands and
@@ -143,7 +144,9 @@ reports `payment_completed` at once, then keeps the confirmation on screen for `
 `onSuccess`, which thanks the donor, resets `Donate`'s form and closes the popover. Closing the popover unmounts
 the form, so the timer's handle sits in a ref the unmount cleanup reaches, and the cleanup runs the pending
 hand-back at once instead of dropping it: a dropped one would leave the paid checkout in place for the next
-opening.
+opening. From the success on, the form disables Back and Pay and its confirmation refuses to run, the express
+button's included: Back in that moment would report `payment_cancelled` for a paid Donation, and Pay would
+confirm a PaymentIntent that has already succeeded.
 
 ## Skeletons and bones
 

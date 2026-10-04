@@ -44,8 +44,7 @@
 		"heading": "Planificateur",
 		"description": "Ton planificateur de congés. Indique tes jours de congé, ton pays et ta stratégie pour tirer parti de chaque jour férié.",
 		"titleHighlight": "<first>Ton année</first> <second>libre</second>",
-		"instructions": "Commence par ajouter tes jours et le reste de ta configuration dans la barre latérale gauche. Encore des questions ?",
-		"quickTour": "Fais la visite guidée"
+		"instructions": "Commence par ajouter tes jours et le reste de ta configuration dans la barre latérale gauche. Encore des questions ? <tour>Fais la visite guidée</tour>."
 	},
 	"languages": {
 		"en": "Anglais",
@@ -67,11 +66,9 @@
 			"ptoDays": "Jours de congé",
 			"days": "jours",
 			"holidays": "Jours fériés",
-			"national": "nat.",
-			"regional": "rég.",
-			"custom": "perso.",
+			"holidayBreakdown": "{national} nat.{regional, plural, =0 {} other { + # rég.}}{custom, plural, =0 {} other { + # perso.}}",
 			"effectiveDays": "Jours effectifs",
-			"overBudget": "au-delà de ton budget de {ptoDays} {ptoDays, plural, one {jour} other {jours}}",
+			"overBudget": "{increment, plural, =0 {0} other {+#}} au-delà de ton budget de {ptoDays, plural, one {# jour} other {# jours}}",
 			"gain": "Gain",
 			"perPtoDay": "de ton budget de {ptoDays} {ptoDays, plural, one {jour} other {jours}}",
 			"longWeekends": "Longs week-ends",
@@ -92,14 +89,14 @@
 			"lastBreak": "Dernière pause",
 			"totalBonusDays": "Total des jours bonus",
 			"bonusDaysCaption": "jours bonus grâce à l’optimisation",
-			"daysCount": "{count, plural, one {jour} other {jours}}"
+			"daysCount": "{count, plural, one {<n>#</n> jour} other {<n>#</n> jours}}"
 		},
 		"summaryParagraph": {
-			"withGain": "Avec tes {ptoDays} jours de congé et {totalHolidays} jours fériés, la stratégie {strategy} les transforme en {effectiveDays} jours de repos effectifs, soit {increment} jours au-dessus de ton budget, un gain de +{percentage} par rapport à une utilisation classique.",
-			"withoutGain": "Avec tes {ptoDays} jours de congé et {totalHolidays} jours fériés, tu obtiens {effectiveDays} jours de repos effectifs avec la stratégie {strategy}.",
+			"withGain": "Avec {ptoDays, plural, one {# jour de congé} other {tes # jours de congé}} et {totalHolidays, plural, one {# jour férié} other {# jours fériés}}, la stratégie {strategy} les transforme en {effectiveDays, plural, one {# jour effectif} other {# jours effectifs}}, soit {increment, plural, one {# jour} other {# jours}} au-dessus de ton budget, un gain de +{percentage} par rapport à une utilisation classique.",
+			"withoutGain": "Avec {ptoDays, plural, one {# jour de congé} other {tes # jours de congé}} et {totalHolidays, plural, one {# jour férié} other {# jours fériés}}, tu obtiens {effectiveDays, plural, one {# jour effectif} other {# jours effectifs}} avec la stratégie {strategy}.",
 			"noRegionHintTitle": "Ajoute ta région",
 			"noRegionHint": "Sélectionne ta région dans la barre latérale pour inclure les jours fériés régionaux et gagner encore plus de jours de repos.",
-			"withRegion": "{regionalDays} de tes jours fériés sont spécifiques à {region}."
+			"withRegion": "{regionalDays, plural, one {# de tes jours fériés est spécifique à {region}.} other {# de tes jours fériés sont spécifiques à {region}.}}"
 		},
 		"notifications": {
 			"canImprove": {
@@ -258,37 +255,37 @@
 		"allSelected": "Tous sélectionnés",
 		"selectedCount": "{count} sélectionnés",
 		"weekend": "Week-end",
-		"onWeekends": "Les week-ends",
-		"onWorkdays": "Les jours ouvrés",
+		"weekendCount": "Les week-ends : {count}",
+		"weekdayHolidayCount": "Jours fériés en semaine : {count}",
 		"showingCount": "Affichage de {shown} sur {total}",
+		"totalCount": "{count} au total",
 		"addHoliday": "Ajouter un jour férié",
 		"add": "Ajouter",
 		"editHoliday": "Modifier le jour férié",
 		"edit": "Modifier",
 		"deleteHolidays": "{count, plural, one {Supprimer {count} jour férié} other {Supprimer {count} jours fériés}}",
-		"delete": "Supprimer"
+		"deleteCount": "Supprimer ({count})"
 	},
 	"charts": {
 		"daysOffComposition": "Composition des jours de repos",
 		"daysOffCompositionFeature": "Graphique de composition des jours de repos",
 		"quarterDistribution": "Répartition par trimestre",
 		"quarterDistributionFeature": "Graphique de répartition par trimestre",
-		"days": "jours",
-		"daysOff": "Jours de repos",
+		"daysValue": "{count, plural, one {# jour} other {# jours}}",
+		"ptoDays": "Jours de congé",
 		"pto": "Congés",
 		"national": "Nationaux",
 		"regional": "Régionaux",
 		"custom": "Personnalisés",
-		"distributionDescription": "Répartition de tes {ptoDays} jours de congé, {nationalDays} jours fériés nationaux{regionalDays, plural, =0 {} other {, # régionaux}}{customDays, plural, =0 {} other { et # personnalisés}}.",
-		"quarterDescription": "Répartition de {totalDays} jours effectifs sur {activeQuarters, plural, one {# trimestre} other {# trimestres}} de ta fenêtre de planification.",
+		"distributionDescription": "Répartition de {ptoDays, plural, one {# jour de congé} other {tes # jours de congé}}, {nationalDays, plural, one {# jour férié national} other {# jours fériés nationaux}}{regionalDays, plural, =0 {} one {, # régional} other {, # régionaux}}{customDays, plural, =0 {} one { et # personnalisé} other { et # personnalisés}}.",
+		"quarterDescription": "Répartition de {totalDays, plural, one {# jour de congé} other {# jours de congé}} sur {activeQuarters, plural, one {# trimestre} other {# trimestres}} de ta fenêtre de planification.",
 		"annualTimeline": "Chronologie annuelle",
 		"annualTimelineFeature": "Graphique de chronologie annuelle",
-		"timelineDescription": "Évolution mensuelle de {totalDays} jours de repos répartis sur {activeMonths} mois. Pic en {peakMonth} avec {peakDays} jours.",
-		"daysOffLabel": "Jours de repos",
+		"timelineDescription": "Évolution mensuelle de {totalDays, plural, one {# jour de congé réparti} other {# jours de congé répartis}} sur {activeMonths, plural, one {# mois} other {# mois}}. Pic en {peakMonth} avec {peakDays, plural, one {# jour} other {# jours}}.",
 		"longBlocksPerQuarter": "Blocs longs par trimestre",
 		"longBlocksFeature": "Graphique des blocs longs par trimestre",
-		"blocksDescription": "{totalBlocks, plural, =0 {# blocs longs ({minDays, number}+ jours consécutifs) idéaux pour les vacances.} other {# blocs longs ({minDays, number}+ jours consécutifs) idéaux pour les vacances. Meilleur trimestre : T{bestQuarter} avec {maxBlocks, plural, one {# bloc} other {# blocs}}.}}",
-		"blocks": "blocs",
+		"blocksDescription": "{totalBlocks, plural, =0 {# blocs longs ({minDays, number}+ jours consécutifs) idéaux pour les vacances.} one {# bloc long ({minDays, number}+ jours consécutifs) idéal pour les vacances. Meilleur trimestre : T{bestQuarter} avec {maxBlocks, plural, one {# bloc} other {# blocs}}.} other {# blocs longs ({minDays, number}+ jours consécutifs) idéaux pour les vacances. Meilleur trimestre : T{bestQuarter} avec {maxBlocks, plural, one {# bloc} other {# blocs}}.}}",
+		"blocksValue": "{count, plural, one {# bloc} other {# blocs}}",
 		"blocksOfMinDays": "Blocs de {minDays, number}+ jours"
 	},
 	"modals": {
@@ -298,7 +295,7 @@
 			"nameLabel": "Nom du jour férié",
 			"namePlaceholder": "Ex. : Mon anniversaire",
 			"dateLabel": "Sélectionner une date",
-			"selected": "Sélectionné",
+			"selectedDate": "Sélectionné : {date}",
 			"submit": "Ajouter le jour férié",
 			"submitting": "Ajout en cours...",
 			"cancel": "Annuler",
@@ -323,17 +320,13 @@
 			"errorDescription": "Une erreur s'est produite. Réessaie."
 		},
 		"deleteHoliday": {
-			"title": "Supprimer les jours fériés",
-			"titleSingular": "Supprimer le jour férié",
-			"description": "Veux-tu vraiment supprimer {count} jours fériés ? Cette action est irréversible.",
-			"descriptionSingular": "Veux-tu vraiment supprimer ce jour férié ? Cette action est irréversible.",
+			"title": "{count, plural, one {Supprimer le jour férié} other {Supprimer les jours fériés}}",
+			"description": "{count, plural, one {Veux-tu vraiment supprimer ce jour férié ? Cette action est irréversible.} other {Veux-tu vraiment supprimer # jours fériés ? Cette action est irréversible.}}",
 			"submit": "Supprimer",
 			"submitting": "Suppression...",
 			"cancel": "Annuler",
-			"successTitle": "Jours fériés supprimés",
-			"successTitleSingular": "Jour férié supprimé",
-			"successDescription": "{count} jours fériés ont été supprimés",
-			"successDescriptionSingular": "Le jour férié a été supprimé",
+			"successTitle": "{count, plural, one {Jour férié supprimé} other {Jours fériés supprimés}}",
+			"successDescription": "{count, plural, one {Le jour férié a été supprimé} other {# jours fériés ont été supprimés}}",
 			"errorTitle": "Impossible de supprimer les jours fériés",
 			"errorDescription": "Une erreur s'est produite. Réessaie."
 		}
@@ -405,12 +398,12 @@
 		}
 	},
 	"ptoStatus": {
-		"autoAssigned": "Suggérés",
-		"manual": "Manuel",
-		"remaining": "Restants",
+		"suggestedCount": "<label>Suggérés :</label> <n>{count}</n>",
+		"manualCount": "<label>Manuel :</label> <n>{count}</n>",
+		"remainingCount": "<label>Restants :</label> <n>{count}</n>",
 		"allAssigned": "Tous tes jours sont attribués !",
 		"resetManual": "Réinitialiser les modifications manuelles",
-		"usedDays": "{used} / {total} jours utilisés · {pct}%",
+		"usedDays": "{used} / {total, plural, one {# jour utilisé} other {# jours utilisés}} · {pct}%",
 		"remainingDays": "{remaining} restants · {pct}%"
 	},
 	"contact": {
@@ -442,18 +435,19 @@
 		}
 	},
 	"alternativesManager": {
-		"option": "Alternative",
+		"position": "<label>Alternative</label> <n>{position}</n><of> / {total}</of>",
 		"recommended": "Recommandée",
 		"totalOff": "Jours effectifs",
 		"efficiency": "Efficacité",
 		"efficiencyValue": "{efficiency}x",
+		"efficiencyReadout": "{suggestion, select, recommended {Efficacité : {efficiency}x} other {Efficacité : {efficiency}x ({difference})}}",
 		"vsMain": "vs principal",
 		"alreadyApplied": "Déjà appliquée",
 		"applyAlternative": "Appliquer l'alternative",
 		"previousSuggestion": "Suggestion précédente",
 		"nextSuggestion": "Suggestion suivante",
-		"totalDaysOff": "Total des jours effectifs",
-		"comparison": "Comparaison",
+		"effectiveDaysReadout": "Total des jours effectifs : {effectiveDays} (+{bonusDays})",
+		"comparisonReadout": "Comparaison : {ratio}",
 		"effectiveDaysCount": "{count, plural, one {# jour} other {# jours}}"
 	},
 	"toasts": {
@@ -741,10 +735,7 @@
 		"detailedView": "Vue détaillée",
 		"haveSuggestion": "Tu as une suggestion ?",
 		"feedbackShapes": "Tes retours orientent notre feuille de route. Partage tes idées pour nous aider à améliorer le planificateur.",
-		"gotAnIdea": "Tu as une idée qui te faciliterait la vie ?",
-		"letsTalk": "Parlons-en",
-		"or": "ou",
-		"openIssue": "ouvre un ticket sur GitHub",
+		"ideaPrompt": "Tu as une idée qui te faciliterait la vie ? <talk>Parlons-en</talk> ou <issue>ouvre un ticket sur GitHub</issue>",
 		"features": {
 			"corePtoCalculator": "Calculateur de congés principal",
 			"corePtoCalculatorDescription": "Planification des vacances autour des jours fériés, avec détection des ponts",
@@ -891,11 +882,11 @@
 		"previousMonth": "Mois précédent",
 		"nextMonth": "Mois suivant",
 		"today": "Aujourd'hui",
-		"daysOff": "{count, plural, one {# jour libre} other {# jours libres}}"
+		"holidaysCount": "{count, plural, one {# jour férié} other {# jours fériés}}"
 	},
 	"holidayRow": {
 		"weekend": "Week-end",
-		"workday": "Jour ouvré",
+		"weekdayHoliday": "Jour férié en semaine",
 		"select": "Sélectionner {name}",
 		"editHolidays": "Modifier les jours fériés"
 	},

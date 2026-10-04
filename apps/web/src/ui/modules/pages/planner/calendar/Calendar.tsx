@@ -318,7 +318,7 @@ export const Calendar = memo(function Calendar({
 				<div className="flex items-center gap-2">
 					{monthHolidayCount > 0 && (
 						<span className="text-xs font-semibold text-muted-foreground tabular-nums">
-							{tCalendar("daysOff", { count: monthHolidayCount })}
+							{tCalendar("holidaysCount", { count: monthHolidayCount })}
 						</span>
 					)}
 					{showNavigation && (

@@ -7,7 +7,7 @@ import { type ComponentProps, useCallback, useEffect, useState } from "react";
 
 type CheckboxAccessibleName = { id: string } | { "aria-label": string } | { "aria-labelledby": string };
 
-type CheckboxProps = Omit<ComponentProps<typeof CheckboxPrimitive.Root>, "render"> & {
+type CheckboxProps = Omit<ComponentProps<typeof CheckboxPrimitive.Root>, "render" | "nativeButton"> & {
 	motionProps?: HTMLMotionProps<"button">;
 } & CheckboxAccessibleName;
 
@@ -36,6 +36,7 @@ function Checkbox({ className, onCheckedChange, motionProps, ...props }: Checkbo
 			)}
 			{...props}
 			onCheckedChange={handleCheckedChange}
+			nativeButton
 			render={<m.button whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.05 }} {...motionProps} />}
 		>
 			<CheckboxPrimitive.Indicator

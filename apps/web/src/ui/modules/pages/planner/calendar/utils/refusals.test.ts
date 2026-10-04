@@ -1,5 +1,12 @@
 import { HolidayVariant } from "@application/dto/holiday/types";
 import { DayRefusal, type HolidayOutcome, HolidayRefusal } from "@application/stores/types";
+import ca from "@i18n/messages/ca.json";
+import de from "@i18n/messages/de.json";
+import en from "@i18n/messages/en.json";
+import es from "@i18n/messages/es.json";
+import fr from "@i18n/messages/fr.json";
+import itMessages from "@i18n/messages/it.json";
+import { createTranslator } from "next-intl";
 import { describe, expect, it } from "vitest";
 import { DAY_REFUSAL_COPY, describeHolidayRefusal } from "./refusals";
 
@@ -93,5 +100,27 @@ describe("describeHolidayRefusal", () => {
 				formattedDate: FORMATTED_DATE,
 			}),
 		).toBeNull();
+	});
+});
+
+describe("describeHolidayRefusal copy", () => {
+	it.each([
+		["en", en, "as a PTO day"],
+		["es", es, "como día de PTO"],
+		["ca", ca, "com a dia de PTO"],
+		["it", itMessages, "come giorno di PTO"],
+		["de", de, "bereits als PTO-Tag"],
+		["fr", fr, "comme jour de congé"],
+	] as const)("calls the hand-picked day a PTO Day in %s, not a day off", (locale, messages, ptoDay) => {
+		const translator = createTranslator({ locale, messages, namespace: "modals.addHoliday" });
+
+		const copy = describeHolidayRefusal({
+			outcome: refusal({ reason: HolidayRefusal.DATE_HELD_BY_MANUAL_DAY }),
+			t: translator as unknown as Parameters<typeof describeHolidayRefusal>[0]["t"],
+			formattedDate: FORMATTED_DATE,
+		});
+
+		expect(copy?.description).toContain(FORMATTED_DATE);
+		expect(copy?.description).toContain(ptoDay);
 	});
 });

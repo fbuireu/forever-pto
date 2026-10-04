@@ -421,6 +421,14 @@ The guard is the previous `premiumKey`: no key before, a key after. Without it, 
 counted another activation for the same donor. `checkExistingSession` restores the same entitlement from the
 cookie and deliberately emits nothing: a session restored on a second device is not a second activation.
 
+**`confirmActivation` is the one session check that reports, and only the payment confirmation page calls it.**
+A payer the issuer redirected never returns to the checkout that would have called `setPremiumStatus`: the
+activation route sets the cookie and the confirmation page's `PremiumSessionSync` calls `confirmActivation`,
+a forced `checkExistingSession` that reports `premium_activated`, with the checkout's properties, when the
+answer moved the store from no key to a key. A reload of that page finds the key already persisted and reports
+nothing, and concurrent calls share one check and one report through a module-level promise, the way
+`checkExistingSession` shares its request. Every other check, `PremiumFeature`'s included, stays silent.
+
 `refreshPremiumStatus` is the action that guard was written for, and it currently has **no caller** outside
 its own test: nothing re-verifies the stored email on a later visit, so `setPremiumStatus` is reached only
 from the checkout and the "I already donated" modal. Treat it as an entry point that is wired up but unused,

@@ -116,6 +116,17 @@ provider: `SidebarProvider`, `PremiumFeature`, `SidebarFieldLabel` and the plann
 one, whose default is `TOOLTIP_DELAY_MS` (200 ms), and a tooltip under none of them opens at once.
 `Tooltip.test.tsx` pins both halves.
 
+**`TooltipTrigger` is Base UI's popover trigger, so `asChild` must hand it a `<button>` or say it is none.** It
+expects a native button and logs an error in development on anything else. A trigger that is only a hover target
+inside a control passes `nativeButton={false}`, and with it `tabIndex={-1}` and `role="none"`, because Base UI
+then makes the element a focusable `role="button"`: the collapsed rail's highlight wrapper in
+[`animate/base/Sidebar.tsx`](./animate/base/Sidebar.tsx), whose menu button stays the one control. A trigger the
+pointer can focus inside a control that reports on Enter is a real `<button>` out of the tab order instead, as
+`PremiumFeature`'s lock is: a focused non-native trigger answers Enter with a click of its own, and the control
+around it would report twice. The opposite error comes from a root rendered as `m.button` without `nativeButton`:
+[`animate/base/Checkbox.tsx`](./animate/base/Checkbox.tsx) and [`animate/base/Switch.tsx`](./animate/base/Switch.tsx)
+pass it, because Base UI's checkbox and switch default to a `<span>` and log an error in development on a button.
+
 **`SidebarProvider` is mounted exactly once, in `app/[locale]/(app)/planner/layout.tsx`.** A second one nested
 inside it would give its subtree an independent `open` state that no other consumer sees. `Sidebar.test.tsx`
 walks every `.tsx` under `src/` to assert the single mount site; it is the one test here that reads the rest of

@@ -209,8 +209,9 @@ export const HolidayFormModal = ({
 											{selectedDate && (
 												<div className="mt-3 p-2 bg-muted rounded text-sm flex align-items-center">
 													<CalendarIcon className="size-4 inline mr-2" />
-													{tFields("selected")}:{" "}
-													{formatDate({ date: selectedDate, locale, format: "EEEE, MMMM d, yyyy" })}
+													{tFields("selectedDate", {
+														date: formatDate({ date: selectedDate, locale, format: "EEEE, MMMM d, yyyy" }),
+													})}
 												</div>
 											)}
 										</div>

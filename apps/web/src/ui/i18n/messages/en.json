@@ -44,8 +44,7 @@
 		"heading": "Planner",
 		"description": "Set your PTO days, country and strategy, and the planner places your days around the public holidays.",
 		"titleHighlight": "<first>Your year</first> <second>free</second>",
-		"instructions": "Start by adding your days in the left sidebar, then adjust the rest of your settings. Still have questions?",
-		"quickTour": "Take a quick tour"
+		"instructions": "Start by adding your days in the left sidebar, then adjust the rest of your settings. Still have questions? <tour>Take a quick tour</tour>."
 	},
 	"languages": {
 		"en": "English",
@@ -67,11 +66,9 @@
 			"ptoDays": "PTO days",
 			"days": "days",
 			"holidays": "Holidays",
-			"national": "nat.",
-			"regional": "reg.",
-			"custom": "cust.",
+			"holidayBreakdown": "{national} nat.{regional, plural, =0 {} other { + # reg.}}{custom, plural, =0 {} other { + # cust.}}",
 			"effectiveDays": "Effective days",
-			"overBudget": "over your {ptoDays}-day budget",
+			"overBudget": "{increment, plural, =0 {0} other {+#}} over your {ptoDays}-day budget",
 			"gain": "Gain",
 			"perPtoDay": "of your {ptoDays}-day budget",
 			"longWeekends": "Long weekends",
@@ -92,14 +89,14 @@
 			"lastBreak": "Last break",
 			"totalBonusDays": "Total bonus days",
 			"bonusDaysCaption": "bonus days from optimizing",
-			"daysCount": "{count, plural, one {day} other {days}}"
+			"daysCount": "{count, plural, one {<n>#</n> day} other {<n>#</n> days}}"
 		},
 		"summaryParagraph": {
-			"withGain": "With your {ptoDays} PTO days and {totalHolidays} public holidays, the {strategy} strategy turns them into {effectiveDays} effective days off, that’s {increment} days over your budget, a +{percentage} gain over simply using them as-is.",
-			"withoutGain": "With your {ptoDays} PTO days and {totalHolidays} public holidays, you get {effectiveDays} effective days off using the {strategy} strategy.",
+			"withGain": "With your {ptoDays, plural, one {# PTO day} other {# PTO days}} and {totalHolidays, plural, one {# public holiday} other {# public holidays}}, the {strategy} strategy turns them into {effectiveDays, plural, one {# effective day} other {# effective days}}, that’s {increment, plural, one {# day} other {# days}} over your budget, a +{percentage} gain over simply using them as-is.",
+			"withoutGain": "With your {ptoDays, plural, one {# PTO day} other {# PTO days}} and {totalHolidays, plural, one {# public holiday} other {# public holidays}}, you get {effectiveDays, plural, one {# effective day} other {# effective days}} using the {strategy} strategy.",
 			"noRegionHintTitle": "Add your region",
 			"noRegionHint": "Select your region in the sidebar to include regional holidays and squeeze out even more days off.",
-			"withRegion": "{regionalDays} of your holidays are specific to {region}."
+			"withRegion": "{regionalDays, plural, one {# of your holidays is specific to {region}.} other {# of your holidays are specific to {region}.}}"
 		},
 		"notifications": {
 			"canImprove": {
@@ -258,37 +255,37 @@
 		"allSelected": "All selected",
 		"selectedCount": "{count} selected",
 		"weekend": "Weekend",
-		"onWeekends": "On weekends",
-		"onWorkdays": "On workdays",
+		"weekendCount": "On weekends: {count}",
+		"weekdayHolidayCount": "Weekday holidays: {count}",
 		"showingCount": "Showing {shown} of {total}",
+		"totalCount": "{count} total",
 		"addHoliday": "Add holiday",
 		"add": "Add",
 		"editHoliday": "Edit holiday",
 		"edit": "Edit",
 		"deleteHolidays": "{count, plural, one {Delete {count} holiday} other {Delete {count} holidays}}",
-		"delete": "Delete"
+		"deleteCount": "Delete ({count})"
 	},
 	"charts": {
 		"daysOffComposition": "Days off composition",
 		"daysOffCompositionFeature": "Days off composition chart",
 		"quarterDistribution": "Quarter distribution",
 		"quarterDistributionFeature": "Quarter distribution chart",
-		"days": "days",
-		"daysOff": "Days off",
+		"daysValue": "{count, plural, one {# day} other {# days}}",
+		"ptoDays": "PTO days",
 		"pto": "PTO",
 		"national": "National",
 		"regional": "Regional",
 		"custom": "Custom",
-		"distributionDescription": "Distribution of your {ptoDays} PTO days, {nationalDays} national holidays{regionalDays, plural, =0 {} other {, # regional}}{customDays, plural, =0 {} other { and # custom}}.",
-		"quarterDescription": "Distribution of {totalDays} effective days across {activeQuarters, plural, one {# quarter} other {# quarters}} of your planning window.",
+		"distributionDescription": "Distribution of your {ptoDays, plural, one {# PTO day} other {# PTO days}}, {nationalDays, plural, one {# national holiday} other {# national holidays}}{regionalDays, plural, =0 {} other {, # regional}}{customDays, plural, =0 {} other { and # custom}}.",
+		"quarterDescription": "Distribution of {totalDays, plural, one {# PTO day} other {# PTO days}} across {activeQuarters, plural, one {# quarter} other {# quarters}} of your planning window.",
 		"annualTimeline": "Annual timeline",
 		"annualTimelineFeature": "Annual timeline chart",
-		"timelineDescription": "Monthly evolution of {totalDays} days off distributed across {activeMonths} months. Peak in {peakMonth} with {peakDays} days.",
-		"daysOffLabel": "Days off",
+		"timelineDescription": "Monthly evolution of {totalDays, plural, one {# PTO day} other {# PTO days}} distributed across {activeMonths, plural, one {# month} other {# months}}. Peak in {peakMonth} with {peakDays, plural, one {# day} other {# days}}.",
 		"longBlocksPerQuarter": "Long blocks per quarter",
 		"longBlocksFeature": "Long blocks per quarter chart",
-		"blocksDescription": "{totalBlocks, plural, =0 {# long blocks ({minDays, number}+ consecutive days) ideal for vacation.} other {# long blocks ({minDays, number}+ consecutive days) ideal for vacation. Best quarter: Q{bestQuarter} with {maxBlocks, plural, one {# block} other {# blocks}}.}}",
-		"blocks": "blocks",
+		"blocksDescription": "{totalBlocks, plural, =0 {# long blocks ({minDays, number}+ consecutive days) ideal for vacation.} one {# long block ({minDays, number}+ consecutive days) ideal for vacation. Best quarter: Q{bestQuarter} with {maxBlocks, plural, one {# block} other {# blocks}}.} other {# long blocks ({minDays, number}+ consecutive days) ideal for vacation. Best quarter: Q{bestQuarter} with {maxBlocks, plural, one {# block} other {# blocks}}.}}",
+		"blocksValue": "{count, plural, one {# block} other {# blocks}}",
 		"blocksOfMinDays": "Blocks of {minDays, number}+ days"
 	},
 	"modals": {
@@ -298,7 +295,7 @@
 			"nameLabel": "Holiday name",
 			"namePlaceholder": "e.g. My birthday",
 			"dateLabel": "Select date",
-			"selected": "Selected",
+			"selectedDate": "Selected: {date}",
 			"submit": "Add holiday",
 			"submitting": "Adding...",
 			"cancel": "Cancel",
@@ -308,7 +305,7 @@
 			"errorDescription": "Something went wrong. Try again.",
 			"existsTitle": "Holiday already exists",
 			"manualDayExistsTitle": "That day is already a PTO day",
-			"manualDayExistsDescription": "You have already booked {date} as a day off. Remove it from your plan first, then add the holiday.",
+			"manualDayExistsDescription": "You have already booked {date} as a PTO day. Remove it from your plan first, then add the holiday.",
 			"existsDescription": "There's already a holiday on {date}: {name}"
 		},
 		"editHoliday": {
@@ -323,17 +320,13 @@
 			"errorDescription": "Something went wrong. Try again."
 		},
 		"deleteHoliday": {
-			"title": "Delete holidays",
-			"titleSingular": "Delete holiday",
-			"description": "Are you sure you want to delete {count} holidays? This action cannot be undone.",
-			"descriptionSingular": "Are you sure you want to delete this holiday? This action cannot be undone.",
+			"title": "{count, plural, one {Delete holiday} other {Delete holidays}}",
+			"description": "{count, plural, one {Are you sure you want to delete this holiday? This action cannot be undone.} other {Are you sure you want to delete # holidays? This action cannot be undone.}}",
 			"submit": "Delete",
 			"submitting": "Deleting...",
 			"cancel": "Cancel",
-			"successTitle": "Holidays deleted",
-			"successTitleSingular": "Holiday deleted",
-			"successDescription": "{count} holidays have been removed",
-			"successDescriptionSingular": "The holiday has been removed",
+			"successTitle": "{count, plural, one {Holiday deleted} other {Holidays deleted}}",
+			"successDescription": "{count, plural, one {The holiday has been removed} other {# holidays have been removed}}",
 			"errorTitle": "Couldn't delete holidays",
 			"errorDescription": "Something went wrong. Try again."
 		}
@@ -405,12 +398,12 @@
 		}
 	},
 	"ptoStatus": {
-		"autoAssigned": "Suggested",
-		"manual": "Manual",
-		"remaining": "Remaining",
+		"suggestedCount": "<label>Suggested:</label> <n>{count}</n>",
+		"manualCount": "<label>Manual:</label> <n>{count}</n>",
+		"remainingCount": "<label>Remaining:</label> <n>{count}</n>",
 		"allAssigned": "All days assigned!",
 		"resetManual": "Reset manual changes",
-		"usedDays": "{used} / {total} days used · {pct}%",
+		"usedDays": "{used} / {total, plural, one {# day used} other {# days used}} · {pct}%",
 		"remainingDays": "{remaining} remaining · {pct}%"
 	},
 	"contact": {
@@ -442,18 +435,19 @@
 		}
 	},
 	"alternativesManager": {
-		"option": "Alternative",
+		"position": "<label>Alternative</label> <n>{position}</n><of> / {total}</of>",
 		"recommended": "Recommended",
 		"totalOff": "Effective days",
 		"efficiency": "Efficiency",
 		"efficiencyValue": "{efficiency}x",
+		"efficiencyReadout": "{suggestion, select, recommended {Efficiency: {efficiency}x} other {Efficiency: {efficiency}x ({difference})}}",
 		"vsMain": "vs main",
 		"alreadyApplied": "Already applied",
 		"applyAlternative": "Apply alternative",
 		"previousSuggestion": "Previous suggestion",
 		"nextSuggestion": "Next suggestion",
-		"totalDaysOff": "Total effective days",
-		"comparison": "Comparison",
+		"effectiveDaysReadout": "Total effective days: {effectiveDays} (+{bonusDays})",
+		"comparisonReadout": "Comparison: {ratio}",
 		"effectiveDaysCount": "{count, plural, one {# day} other {# days}}"
 	},
 	"toasts": {
@@ -741,10 +735,7 @@
 		"detailedView": "Detailed view",
 		"haveSuggestion": "Have a suggestion?",
 		"feedbackShapes": "Your feedback decides what gets built next. Share an idea or tell us what's missing.",
-		"gotAnIdea": "Got an idea that would make your life easier?",
-		"letsTalk": "Let's talk",
-		"or": "or",
-		"openIssue": "Open an issue on GitHub",
+		"ideaPrompt": "Got an idea that would make your life easier? <talk>Let's talk</talk> or <issue>open an issue on GitHub</issue>",
 		"features": {
 			"corePtoCalculator": "Core PTO calculator",
 			"corePtoCalculatorDescription": "Vacation planning around public holidays, with bridge detection",
@@ -891,11 +882,11 @@
 		"previousMonth": "Previous month",
 		"nextMonth": "Next month",
 		"today": "Today",
-		"daysOff": "{count, plural, one {# day off} other {# days off}}"
+		"holidaysCount": "{count, plural, one {# holiday} other {# holidays}}"
 	},
 	"holidayRow": {
 		"weekend": "Weekend",
-		"workday": "Workday",
+		"weekdayHoliday": "Weekday holiday",
 		"select": "Select {name}",
 		"editHolidays": "Edit holidays"
 	},

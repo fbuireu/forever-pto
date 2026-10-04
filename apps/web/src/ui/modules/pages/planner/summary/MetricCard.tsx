@@ -26,6 +26,7 @@ interface MetricCardBaseProps {
 	colorScheme: keyof typeof COLOR_SCHEMES;
 	className?: string;
 	symbol?: string;
+	renderValue?: (counter: ReactNode) => ReactNode;
 	decimalPlaces?: number;
 }
 
@@ -98,8 +99,24 @@ const COLOR_SCHEMES = {
 	},
 };
 
+interface WithUnitParams {
+	counter: ReactNode;
+	symbol?: string;
+	renderValue?: (counter: ReactNode) => ReactNode;
+}
+
+const withUnit = ({ counter, symbol, renderValue }: WithUnitParams) =>
+	renderValue ? (
+		renderValue(counter)
+	) : (
+		<>
+			{counter}
+			{symbol}
+		</>
+	);
+
 export const MetricCard = (props: MetricCardProps) => {
-	const { label, value, icon: Icon, colorScheme, symbol, decimalPlaces = 0, className = "" } = props;
+	const { label, value, icon: Icon, colorScheme, symbol, renderValue, decimalPlaces = 0, className = "" } = props;
 	const colors = COLOR_SCHEMES[colorScheme];
 
 	if (props.size === MetricCardSize.COMPACT) {
@@ -115,13 +132,18 @@ export const MetricCard = (props: MetricCardProps) => {
 				)}
 			>
 				<Icon className={cn("size-4", colors.icon, "mx-auto mb-1")} />
-				<div className={cn("text-lg font-display font-bold flex justify-center", colors.text)}>
-					<SlidingNumber
-						number={value}
-						className={cn("text-lg font-display font-bold", colors.text)}
-						decimalPlaces={decimalPlaces}
-					/>
-					{symbol}
+				<div className={cn("text-lg font-display font-bold flex justify-center", renderValue && "gap-1", colors.text)}>
+					{withUnit({
+						counter: (
+							<SlidingNumber
+								number={value}
+								className={cn("text-lg font-display font-bold", colors.text)}
+								decimalPlaces={decimalPlaces}
+							/>
+						),
+						symbol,
+						renderValue,
+					})}
 				</div>
 				<div className={cn("text-xs", colors.text)}>{label}</div>
 				{hint && <div className={cn("text-[0.65rem] opacity-70", colors.text)}>{hint}</div>}
@@ -145,9 +167,8 @@ export const MetricCard = (props: MetricCardProps) => {
 			</span>
 			<div className={cn("flex items-center gap-2")}>
 				<Icon className={cn("size-4", colors.icon)} />
-				<span className={cn("text-xl font-display font-bold flex", colors.text)}>
-					<SlidingNumber number={value} decimalPlaces={decimalPlaces} />
-					{symbol}
+				<span className={cn("text-xl font-display font-bold flex", renderValue && "gap-1", colors.text)}>
+					{withUnit({ counter: <SlidingNumber number={value} decimalPlaces={decimalPlaces} />, symbol, renderValue })}
 				</span>
 			</div>
 			{badge && (

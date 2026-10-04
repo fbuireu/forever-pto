@@ -49,6 +49,10 @@ _Avoid_: manual holiday
 A date inside the Planning Window that is neither a weekend nor a Holiday, and is therefore a candidate for spending a PTO Day on.
 _Avoid_: working day, business day, weekday
 
+**Weekday Holiday**:
+A Holiday that falls Monday to Friday, on a date that would otherwise be a Workday. It is the kind of Holiday that frees a day: one on a weekend frees nothing the weekend had not already freed.
+_Avoid_: workday holiday, midweek holiday
+
 **Worked Day**:
 A Workday the plan leaves standing: one the user will actually spend working, once Holidays and the PTO Days the plan placed are taken out.
 _Avoid_: actual working day, business day

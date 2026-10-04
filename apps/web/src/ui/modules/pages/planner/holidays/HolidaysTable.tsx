@@ -309,7 +309,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 
 	const selectedCount = selectedHolidaysList.length;
 	const weekendCount = variantHolidays.filter((h) => isWeekend(h.date)).length;
-	const workdayCount = variantHolidays.filter((h) => !isWeekend(h.date)).length;
+	const weekdayHolidayCount = variantHolidays.filter((h) => !isWeekend(h.date)).length;
 
 	return (
 		<Collapsible open={innerOpen} onOpenChange={setInnerOpen} className="space-y-4 w-full">
@@ -326,7 +326,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 						</span>
 						<span className="flex items-center gap-x-2 ml-auto shrink-0">
 							<Badge variant="outline" className="text-xs sm:text-sm">
-								{variantHolidays.length} total
+								{t("totalCount", { count: variantHolidays.length })}
 							</Badge>
 						</span>
 					</span>
@@ -381,9 +381,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 									>
 										<Trash2 className="size-4 mr-1" />
 										<span className="hidden xs:inline">{t("deleteHolidays", { count: selectedCount })}</span>
-										<span className="xs:hidden">
-											{t("delete")} ({selectedCount})
-										</span>
+										<span className="xs:hidden">{t("deleteCount", { count: selectedCount })}</span>
 									</Button>
 								</AnimateIcon>
 							</div>
@@ -492,12 +490,8 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 
 				<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs sm:text-sm text-muted-foreground px-1">
 					<div className="flex flex-wrap items-center gap-2 sm:gap-4">
-						<span className="whitespace-nowrap">
-							{t("onWeekends")}: {weekendCount}
-						</span>
-						<span className="whitespace-nowrap">
-							{t("onWorkdays")}: {workdayCount}
-						</span>
+						<span className="whitespace-nowrap">{t("weekendCount", { count: weekendCount })}</span>
+						<span className="whitespace-nowrap">{t("weekdayHolidayCount", { count: weekdayHolidayCount })}</span>
 					</div>
 					<div className="flex items-center gap-x-2">
 						<span className="whitespace-nowrap">

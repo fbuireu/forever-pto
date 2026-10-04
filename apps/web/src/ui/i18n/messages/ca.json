@@ -44,8 +44,7 @@
 		"heading": "Planificador",
 		"description": "Indica els teus dies de PTO, el país i l'estratègia, i el planificador els col·locarà al voltant de cada festiu.",
 		"titleHighlight": "<first>El teu any</first> <second>lliure</second>",
-		"instructions": "Comença afegint els teus dies i la resta de preferències a la barra lateral. Encara tens dubtes?",
-		"quickTour": "Fes un recorregut ràpid"
+		"instructions": "Comença afegint els teus dies i la resta de preferències a la barra lateral. Encara tens dubtes? <tour>Fes un recorregut ràpid</tour>."
 	},
 	"languages": {
 		"en": "Anglès",
@@ -67,11 +66,9 @@
 			"ptoDays": "Dies de PTO",
 			"days": "dies",
 			"holidays": "Festius",
-			"national": "nac.",
-			"regional": "reg.",
-			"custom": "prop.",
+			"holidayBreakdown": "{national} nac.{regional, plural, =0 {} other { + # reg.}}{custom, plural, =0 {} other { + # prop.}}",
 			"effectiveDays": "Dies efectius",
-			"overBudget": "per sobre del teu pressupost de {ptoDays} {ptoDays, plural, one {dia} other {dies}}",
+			"overBudget": "{increment, plural, =0 {0} other {+#}} per sobre del teu pressupost de {ptoDays, plural, one {# dia} other {# dies}}",
 			"gain": "Guany",
 			"perPtoDay": "del teu pressupost de {ptoDays} {ptoDays, plural, one {dia} other {dies}}",
 			"longWeekends": "Caps de setmana llargs",
@@ -92,14 +89,14 @@
 			"lastBreak": "Última pausa",
 			"totalBonusDays": "Total de dies extra",
 			"bonusDaysCaption": "dies extra gràcies a l'optimització",
-			"daysCount": "{count, plural, one {dia} other {dies}}"
+			"daysCount": "{count, plural, one {<n>#</n> dia} other {<n>#</n> dies}}"
 		},
 		"summaryParagraph": {
-			"withGain": "Amb els teus {ptoDays} dies de PTO i {totalHolidays} festius, l’estratègia {strategy} els converteix en {effectiveDays} dies lliures efectius, és a dir, {increment} dies per sobre del teu pressupost, un guany del +{percentage} respecte a usar-los sense optimitzar.",
-			"withoutGain": "Amb els teus {ptoDays} dies de PTO i {totalHolidays} festius, obtens {effectiveDays} dies lliures efectius amb l’estratègia {strategy}.",
+			"withGain": "Amb {ptoDays, plural, one {# dia de PTO} other {els teus # dies de PTO}} i {totalHolidays, plural, one {# festiu} other {# festius}}, l’estratègia {strategy} els converteix en {effectiveDays, plural, one {# dia efectiu} other {# dies efectius}}, és a dir, {increment, plural, one {# dia} other {# dies}} per sobre del teu pressupost, un guany del +{percentage} respecte a usar-los sense optimitzar.",
+			"withoutGain": "Amb {ptoDays, plural, one {# dia de PTO} other {els teus # dies de PTO}} i {totalHolidays, plural, one {# festiu} other {# festius}}, obtens {effectiveDays, plural, one {# dia efectiu} other {# dies efectius}} amb l’estratègia {strategy}.",
 			"noRegionHintTitle": "Afegeix la teva regió",
 			"noRegionHint": "Selecciona la teva regió a la barra lateral per incloure els festius regionals i aconseguir encara més dies lliures.",
-			"withRegion": "{regionalDays} dels teus festius són específics de {region}."
+			"withRegion": "{regionalDays, plural, one {# dels teus festius és específic de {region}.} other {# dels teus festius són específics de {region}.}}"
 		},
 		"notifications": {
 			"canImprove": {
@@ -258,37 +255,37 @@
 		"allSelected": "Tots seleccionats",
 		"selectedCount": "{count} seleccionats",
 		"weekend": "Cap de setmana",
-		"onWeekends": "En cap de setmana",
-		"onWorkdays": "En dies laborables",
+		"weekendCount": "En cap de setmana: {count}",
+		"weekdayHolidayCount": "Festius entre setmana: {count}",
 		"showingCount": "Mostrant {shown} de {total}",
+		"totalCount": "{count} en total",
 		"addHoliday": "Afegeix un festiu",
 		"add": "Afegeix",
 		"editHoliday": "Edita el festiu",
 		"edit": "Edita",
 		"deleteHolidays": "{count, plural, one {Elimina {count} festiu} other {Elimina {count} festius}}",
-		"delete": "Elimina"
+		"deleteCount": "Elimina ({count})"
 	},
 	"charts": {
 		"daysOffComposition": "Composició de dies lliures",
 		"daysOffCompositionFeature": "Gràfica de composició de dies lliures",
 		"quarterDistribution": "Distribució per trimestre",
 		"quarterDistributionFeature": "Gràfica de distribució per trimestre",
-		"days": "dies",
-		"daysOff": "Dies lliures",
+		"daysValue": "{count, plural, one {# dia} other {# dies}}",
+		"ptoDays": "Dies de PTO",
 		"pto": "PTO",
 		"national": "Nacionals",
 		"regional": "Regionals",
 		"custom": "Personalitzats",
-		"distributionDescription": "Distribució dels teus {ptoDays} dies de PTO, {nationalDays} festius nacionals{regionalDays, plural, =0 {} other {, # regionals}}{customDays, plural, =0 {} other { i # personalitzats}}.",
-		"quarterDescription": "Distribució de {totalDays} dies efectius al llarg de {activeQuarters, plural, one {# trimestre} other {# trimestres}} de la teva finestra de planificació.",
+		"distributionDescription": "Distribució {ptoDays, plural, one {d’# dia de PTO} other {dels teus # dies de PTO}}, {nationalDays, plural, one {# festiu nacional} other {# festius nacionals}}{regionalDays, plural, =0 {} one {, # regional} other {, # regionals}}{customDays, plural, =0 {} one { i # personalitzat} other { i # personalitzats}}.",
+		"quarterDescription": "Distribució de {totalDays, plural, one {# dia de PTO} other {# dies de PTO}} al llarg de {activeQuarters, plural, one {# trimestre} other {# trimestres}} de la teva finestra de planificació.",
 		"annualTimeline": "Cronologia anual",
 		"annualTimelineFeature": "Gràfica de cronologia anual",
-		"timelineDescription": "Evolució mensual de {totalDays} dies lliures repartits en {activeMonths} mesos. Pic: {peakMonth}, amb {peakDays} dies.",
-		"daysOffLabel": "Dies lliures",
+		"timelineDescription": "Evolució mensual de {totalDays, plural, one {# dia de PTO repartit} other {# dies de PTO repartits}} en {activeMonths, plural, one {# mes} other {# mesos}}. Pic: {peakMonth}, amb {peakDays, plural, one {# dia} other {# dies}}.",
 		"longBlocksPerQuarter": "Blocs llargs per trimestre",
 		"longBlocksFeature": "Gràfica de blocs llargs per trimestre",
-		"blocksDescription": "{totalBlocks, plural, =0 {# blocs de {minDays, number} o més dies consecutius, ideals per a escapades.} other {# blocs de {minDays, number} o més dies consecutius, ideals per a escapades. Millor trimestre: Q{bestQuarter} amb {maxBlocks, plural, one {# bloc} other {# blocs}}.}}",
-		"blocks": "blocs",
+		"blocksDescription": "{totalBlocks, plural, =0 {# blocs de {minDays, number} o més dies consecutius, ideals per a escapades.} one {# bloc de {minDays, number} o més dies consecutius, ideal per a escapades. Millor trimestre: Q{bestQuarter} amb {maxBlocks, plural, one {# bloc} other {# blocs}}.} other {# blocs de {minDays, number} o més dies consecutius, ideals per a escapades. Millor trimestre: Q{bestQuarter} amb {maxBlocks, plural, one {# bloc} other {# blocs}}.}}",
+		"blocksValue": "{count, plural, one {# bloc} other {# blocs}}",
 		"blocksOfMinDays": "Blocs de {minDays, number}+ dies"
 	},
 	"modals": {
@@ -298,7 +295,7 @@
 			"nameLabel": "Nom del festiu",
 			"namePlaceholder": "p. ex. El meu aniversari",
 			"dateLabel": "Selecciona una data",
-			"selected": "Seleccionat",
+			"selectedDate": "Seleccionat: {date}",
 			"submit": "Afegeix el festiu",
 			"submitting": "S'està afegint...",
 			"cancel": "Cancel·la",
@@ -308,7 +305,7 @@
 			"errorDescription": "Alguna cosa ha anat malament. Torna-ho a provar.",
 			"existsTitle": "El festiu ja existeix",
 			"manualDayExistsTitle": "Aquest dia ja és un dia lliure",
-			"manualDayExistsDescription": "Ja has reservat el {date} com a dia lliure. Primer treu-lo del pla i després afegeix el festiu.",
+			"manualDayExistsDescription": "Ja has reservat el {date} com a dia de PTO. Primer treu-lo del pla i després afegeix el festiu.",
 			"existsDescription": "Ja hi ha un festiu el {date}: {name}"
 		},
 		"editHoliday": {
@@ -323,17 +320,13 @@
 			"errorDescription": "Alguna cosa ha anat malament. Torna-ho a provar."
 		},
 		"deleteHoliday": {
-			"title": "Elimina els festius",
-			"titleSingular": "Elimina el festiu",
-			"description": "Vols eliminar {count} festius? Aquesta acció no es pot desfer.",
-			"descriptionSingular": "Vols eliminar aquest festiu? Aquesta acció no es pot desfer.",
+			"title": "{count, plural, one {Elimina el festiu} other {Elimina els festius}}",
+			"description": "{count, plural, one {Vols eliminar aquest festiu? Aquesta acció no es pot desfer.} other {Vols eliminar # festius? Aquesta acció no es pot desfer.}}",
 			"submit": "Elimina",
 			"submitting": "S'està eliminant...",
 			"cancel": "Cancel·la",
-			"successTitle": "Festius eliminats",
-			"successTitleSingular": "Festiu eliminat",
-			"successDescription": "S'han eliminat {count} festius",
-			"successDescriptionSingular": "S'ha eliminat el festiu",
+			"successTitle": "{count, plural, one {Festiu eliminat} other {Festius eliminats}}",
+			"successDescription": "{count, plural, one {S'ha eliminat el festiu} other {S'han eliminat # festius}}",
 			"errorTitle": "No s'han pogut eliminar els festius",
 			"errorDescription": "Alguna cosa ha anat malament. Torna-ho a provar."
 		}
@@ -405,12 +398,12 @@
 		}
 	},
 	"ptoStatus": {
-		"autoAssigned": "Suggerits",
-		"manual": "Manual",
-		"remaining": "Restants",
+		"suggestedCount": "<label>Suggerits:</label> <n>{count}</n>",
+		"manualCount": "<label>Manual:</label> <n>{count}</n>",
+		"remainingCount": "<label>Restants:</label> <n>{count}</n>",
 		"allAssigned": "Ja tens tots els dies assignats!",
 		"resetManual": "Restableix els canvis manuals",
-		"usedDays": "{used} / {total} dies utilitzats · {pct}%",
+		"usedDays": "{used} / {total, plural, one {# dia utilitzat} other {# dies utilitzats}} · {pct}%",
 		"remainingDays": "{remaining} restants · {pct}%"
 	},
 	"contact": {
@@ -442,18 +435,19 @@
 		}
 	},
 	"alternativesManager": {
-		"option": "Alternativa",
+		"position": "<label>Alternativa</label> <n>{position}</n><of> / {total}</of>",
 		"recommended": "Recomanada",
 		"totalOff": "Dies efectius",
 		"efficiency": "Eficiència",
 		"efficiencyValue": "{efficiency}x",
+		"efficiencyReadout": "{suggestion, select, recommended {Eficiència: {efficiency}x} other {Eficiència: {efficiency}x ({difference})}}",
 		"vsMain": "vs principal",
 		"alreadyApplied": "Ja aplicada",
 		"applyAlternative": "Aplica l'alternativa",
 		"previousSuggestion": "Suggeriment anterior",
 		"nextSuggestion": "Suggeriment següent",
-		"totalDaysOff": "Total de dies efectius",
-		"comparison": "Comparació",
+		"effectiveDaysReadout": "Total de dies efectius: {effectiveDays} (+{bonusDays})",
+		"comparisonReadout": "Comparació: {ratio}",
 		"effectiveDaysCount": "{count, plural, one {# dia} other {# dies}}"
 	},
 	"toasts": {
@@ -741,10 +735,7 @@
 		"detailedView": "Vista detallada",
 		"haveSuggestion": "Tens un suggeriment?",
 		"feedbackShapes": "El que ens expliques decideix què fem després. Digues-nos què hi trobes a faltar.",
-		"gotAnIdea": "Tens alguna idea per millorar l'app?",
-		"letsTalk": "Parlem",
-		"or": "o",
-		"openIssue": "Obre una incidència a GitHub",
+		"ideaPrompt": "Tens alguna idea per millorar l'app? <talk>Parlem</talk> o <issue>obre una incidència a GitHub</issue>",
 		"features": {
 			"corePtoCalculator": "Calculadora de PTO principal",
 			"corePtoCalculatorDescription": "Planificació de vacances al voltant dels festius, amb detecció de ponts",
@@ -891,11 +882,11 @@
 		"previousMonth": "Mes anterior",
 		"nextMonth": "Mes següent",
 		"today": "Avui",
-		"daysOff": "{count, plural, one {# dia lliure} other {# dies lliures}}"
+		"holidaysCount": "{count, plural, one {# festiu} other {# festius}}"
 	},
 	"holidayRow": {
 		"weekend": "Cap de setmana",
-		"workday": "Laborable",
+		"weekdayHoliday": "Festiu entre setmana",
 		"select": "Selecciona {name}",
 		"editHolidays": "Edita els festius"
 	},

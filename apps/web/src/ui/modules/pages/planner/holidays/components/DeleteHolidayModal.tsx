@@ -35,7 +35,7 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
 	const removeHoliday = useHolidaysStore((state) => state.removeHoliday);
 	const askForPlan = useHolidaysStore((state) => state.askForPlan);
 	const [isPending, startTransition] = useTransition();
-	const isMultiple = holidays.length > 1;
+	const count = holidays.length;
 
 	const handleDelete = () => {
 		startTransition(() => {
@@ -46,11 +46,7 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
 				});
 				track({ event: "custom_holiday_deleted", properties: { count: holidays.length } });
 
-				toast.success(isMultiple ? t("successTitle") : t("successTitleSingular"), {
-					description: isMultiple
-						? t("successDescription", { count: holidays.length })
-						: t("successDescriptionSingular"),
-				});
+				toast.success(t("successTitle", { count }), { description: t("successDescription", { count }) });
 
 				onClose();
 			} catch (error) {
@@ -68,15 +64,11 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
 				<DialogHeader>
 					<DialogTitle className="flex items-center gap-2 text-destructive">
 						<AlertTriangle className="size-5" />
-						{isMultiple ? t("title") : t("titleSingular")}
+						{t("title", { count })}
 					</DialogTitle>
-					<DialogDescription className="sr-only">
-						{isMultiple ? t("description", { count: holidays.length }) : t("descriptionSingular")}
-					</DialogDescription>
+					<DialogDescription className="sr-only">{t("description", { count })}</DialogDescription>
 					<div className="space-y-3">
-						<span className="block my-2 text-sm text-muted-foreground">
-							{isMultiple ? t("description", { count: holidays.length }) : t("descriptionSingular")}
-						</span>
+						<span className="block my-2 text-sm text-muted-foreground">{t("description", { count })}</span>
 						<div className="bg-[var(--surface-panel-soft)] rounded-[10px] border-[3px] border-[var(--frame)] p-3 max-h-32 overflow-y-auto shadow-[var(--shadow-brutal-xs)]">
 							<div className="space-y-2">
 								{holidays.map((holiday) => (

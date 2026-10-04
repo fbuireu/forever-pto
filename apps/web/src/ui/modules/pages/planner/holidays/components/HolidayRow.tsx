@@ -22,16 +22,16 @@ interface HolidayRowProps {
 const HolidayRowComponent = ({ holiday, isSelected, locale, onToggle }: HolidayRowProps) => {
 	const t = useTranslations("holidayRow");
 
-	const getWorkdayStatus = (date: Date) => {
+	const getDayStatus = (date: Date) => {
 		const isWeekendDay = isWeekend(date);
 		return {
-			isWorkday: !isWeekendDay,
+			isWeekdayHoliday: !isWeekendDay,
 			variant: isWeekendDay ? ("destructive" as const) : ("default" as const),
 			className: cn(!isWeekendDay && "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"),
 		};
 	};
 
-	const workdayStatus = getWorkdayStatus(holiday.date);
+	const dayStatus = getDayStatus(holiday.date);
 
 	return (
 		<TableRow className={cn("hover:bg-muted/50 [contain:layout]", isSelected && "bg-muted/25")}>
@@ -68,8 +68,8 @@ const HolidayRowComponent = ({ holiday, isSelected, locale, onToggle }: HolidayR
 				</Badge>
 			</TableCell>
 			<TableCell>
-				<Badge variant={workdayStatus.variant} className={cn("text-xs", workdayStatus.className)}>
-					{workdayStatus.isWorkday ? t("workday") : t("weekend")}
+				<Badge variant={dayStatus.variant} className={cn("text-xs", dayStatus.className)}>
+					{dayStatus.isWeekdayHoliday ? t("weekdayHoliday") : t("weekend")}
 				</Badge>
 			</TableCell>
 		</TableRow>

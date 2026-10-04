@@ -124,7 +124,7 @@ describe("HolidayFormModal date picking", () => {
 
 		await userEvent.click(screen.getByRole("button", { name: "pick" }));
 
-		expect(screen.getByText(`${en.modals.addHoliday.selected}: Friday, May 15, 2026`)).toBeTruthy();
+		expect(screen.getByText("Selected: Friday, May 15, 2026")).toBeTruthy();
 
 		await submit();
 
@@ -136,13 +136,13 @@ describe("HolidayFormModal date picking", () => {
 
 		await userEvent.click(screen.getByRole("button", { name: "pick many" }));
 
-		expect(screen.queryByText(new RegExp(`^${en.modals.addHoliday.selected}:`))).toBeNull();
+		expect(screen.queryByText(/^Selected:/)).toBeNull();
 	});
 
 	it("shows the date it was opened with as already selected", () => {
 		renderModal({ onCommit: vi.fn(() => null) });
 
-		expect(screen.getByText(`${en.modals.addHoliday.selected}: Friday, May 1, 2026`)).toBeTruthy();
+		expect(screen.getByText("Selected: Friday, May 1, 2026")).toBeTruthy();
 	});
 });
 

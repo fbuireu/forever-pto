@@ -62,7 +62,7 @@ export const BlocksPerQuarterChart = memo(function BlocksPerQuarterChart({
 								))}
 							</Bar>
 							<Tooltip
-								formatter={(value) => [`${value} ${t("blocks")}`, t("blocksOfMinDays", { minDays })]}
+								formatter={(value) => [t("blocksValue", { count: Number(value) }), t("blocksOfMinDays", { minDays })]}
 								contentStyle={{
 									backgroundColor: "var(--primary)",
 									border: "3px solid var(--frame)",

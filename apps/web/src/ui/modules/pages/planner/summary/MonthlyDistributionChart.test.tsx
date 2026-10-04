@@ -1,6 +1,7 @@
 import en from "@i18n/messages/en.json";
+import es from "@i18n/messages/es.json";
 import { render, screen } from "@testing-library/react";
-import { NextIntlClientProvider } from "next-intl";
+import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -25,6 +26,7 @@ vi.mock("recharts", () => {
 		Tooltip: ({ formatter, labelFormatter }: TooltipMockProps) => (
 			<div>
 				<span data-testid="value">{formatter(3).join(" | ")}</span>
+				<span data-testid="value-one">{formatter(1).join(" | ")}</span>
 				<span data-testid="january">{labelFormatter("Jan")}</span>
 				<span data-testid="carry-over">{labelFormatter("Jan '27")}</span>
 				<span data-testid="unknown">{labelFormatter("not a month")}</span>
@@ -45,11 +47,19 @@ interface RenderChartParams {
 	monthlyDist: number[];
 	year?: number;
 	carryOverMonths?: number;
+	locale?: Locale;
+	messages?: typeof en;
 }
 
-const renderChart = ({ monthlyDist, year = 2026, carryOverMonths = 0 }: RenderChartParams) =>
+const renderChart = ({
+	monthlyDist,
+	year = 2026,
+	carryOverMonths = 0,
+	locale = "en",
+	messages = en,
+}: RenderChartParams) =>
 	render(
-		<NextIntlClientProvider locale="en" messages={en}>
+		<NextIntlClientProvider locale={locale} messages={messages}>
 			<MonthlyDistributionChart monthlyDist={monthlyDist} year={year} carryOverMonths={carryOverMonths} />
 		</NextIntlClientProvider>,
 	);
@@ -57,20 +67,6 @@ const renderChart = ({ monthlyDist, year = 2026, carryOverMonths = 0 }: RenderCh
 const points = () => JSON.parse(screen.getByTestId("area-data").textContent ?? "[]") as { mes: string; days: number }[];
 
 const evenlySpread = new Array(12).fill(1);
-
-interface DescribedAsParams {
-	totalDays: string;
-	activeMonths: string;
-	peakMonth: string;
-	peakDays: string;
-}
-
-const describedAs = ({ totalDays, activeMonths, peakMonth, peakDays }: DescribedAsParams) =>
-	en.charts.timelineDescription
-		.replace("{totalDays}", totalDays)
-		.replace("{activeMonths}", activeMonths)
-		.replace("{peakMonth}", peakMonth)
-		.replace("{peakDays}", peakDays);
 
 describe("MonthlyDistributionChart", () => {
 	it("plots one point per month of the year", () => {
@@ -110,7 +106,7 @@ describe("MonthlyDistributionChart", () => {
 		renderChart({ monthlyDist: [0, 0, 2, 0, 1, 0, 0, 5, 0, 0, 0, 0] });
 
 		expect(document.body.textContent).toContain(
-			describedAs({ totalDays: "8", activeMonths: "3", peakMonth: "Aug", peakDays: "5" }),
+			"Monthly evolution of 8 PTO days distributed across 3 months. Peak in Aug with 5 days.",
 		);
 	});
 
@@ -118,7 +114,7 @@ describe("MonthlyDistributionChart", () => {
 		renderChart({ monthlyDist: [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] });
 
 		expect(document.body.textContent).toContain(
-			describedAs({ totalDays: "4", activeMonths: "1", peakMonth: "Jan", peakDays: "4" }),
+			"Monthly evolution of 4 PTO days distributed across 1 month. Peak in Jan with 4 days.",
 		);
 	});
 
@@ -126,7 +122,7 @@ describe("MonthlyDistributionChart", () => {
 		renderChart({ monthlyDist: [3, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0] });
 
 		expect(document.body.textContent).toContain(
-			describedAs({ totalDays: "6", activeMonths: "2", peakMonth: "Jan", peakDays: "3" }),
+			"Monthly evolution of 6 PTO days distributed across 2 months. Peak in Jan with 3 days.",
 		);
 	});
 
@@ -151,6 +147,43 @@ describe("MonthlyDistributionChart", () => {
 	it("says what the hovered number counts", () => {
 		renderChart({ monthlyDist: evenlySpread });
 
-		expect(screen.getByTestId("value").textContent).toBe(`3 ${en.charts.days} | ${en.charts.daysOffLabel}`);
+		expect(screen.getByTestId("value").textContent).toBe("3 days | PTO days");
+		expect(screen.getByTestId("value-one").textContent).toBe("1 day | PTO days");
+	});
+});
+
+describe("MonthlyDistributionChart description at the plural edges", () => {
+	const onlyJanuary = (days: number) => [days, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+	it.each([
+		[
+			"en",
+			en,
+			onlyJanuary(1),
+			/^Monthly evolution of 1 PTO day distributed across 1 month\. Peak in \S+ with 1 day\.$/,
+		],
+		[
+			"en",
+			en,
+			onlyJanuary(0),
+			/^Monthly evolution of 0 PTO days distributed across 0 months\. Peak in \S+ with 0 days\.$/,
+		],
+		["es", es, onlyJanuary(1), /^Evolución mensual de 1 día de PTO distribuido en 1 mes\. Pico en \S+ con 1 día\.$/],
+		[
+			"es",
+			es,
+			onlyJanuary(0),
+			/^Evolución mensual de 0 días de PTO distribuidos en 0 meses\. Pico en \S+ con 0 días\.$/,
+		],
+		[
+			"es",
+			es,
+			[3, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			/^Evolución mensual de 8 días de PTO distribuidos en 2 meses\. Pico en \S+ con 5 días\.$/,
+		],
+	] as const)("counts the %s PTO Days in one sentence", (locale, messages, monthlyDist, expected) => {
+		const { container } = renderChart({ monthlyDist: [...monthlyDist], locale, messages });
+
+		expect(container.querySelector(".text-xs.text-muted-foreground.mt-1")?.textContent).toMatch(expected);
 	});
 });

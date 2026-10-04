@@ -45,6 +45,28 @@ describe("cascade layer order", () => {
 	});
 });
 
+describe("the reduced-motion block", () => {
+	const block = read("animations/index.css").match(/@media \(prefers-reduced-motion: reduce\) \{([\s\S]*?)\n\t\}/)?.[1];
+	const MOTION_PANELS = {
+		"collapsible-content": "../modules/core/animate/base/Collapsible.tsx",
+		"accordion-panel": "../modules/core/animate/base/Accordion.tsx",
+	};
+
+	it("lets the panels motion animates out of its durations, so Base UI never reads a CSS animation and a transition on one", () => {
+		const exempted = [...(block ?? "").matchAll(/\[data-slot="([^"]+)"\][^{]*?(?=[,{])/g)].map(([, slot]) => slot);
+		const rule = (block ?? "").match(/\[data-slot="[^{]+\{([^}]*)\}/)?.[1] ?? "";
+
+		expect(block).toBeDefined();
+		expect(exempted).toEqual(Object.keys(MOTION_PANELS));
+		expect(rule).toMatch(/animation-duration:\s*0s\s*!important/);
+		expect(rule).toMatch(/transition-duration:\s*0s\s*!important/);
+	});
+
+	it.each(Object.entries(MOTION_PANELS))("names %s, the slot %s renders its panel under", (slot, source) => {
+		expect(read(source)).toContain(`data-slot="${slot}"`);
+	});
+});
+
 describe("theme tokens", () => {
 	it("leaves max-w-8xl resolving from the --container-* namespace alone", () => {
 		expect(theme).toMatch(/--container-8xl:/);

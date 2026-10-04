@@ -15,7 +15,7 @@ import { cn } from "@ui/utils/cn";
 import { BarChart3, CalendarDays, Sparkles, TrendingUp } from "lucide-react";
 import { m, type Transition, type Variants } from "motion/react";
 import { useFormatter, useTranslations } from "next-intl";
-import { useCallback } from "react";
+import { type ReactNode, useCallback } from "react";
 import { EFFICIENCY_FORMAT } from "./utils/helpers";
 
 const STAT_CARD_MOTION_CONFIG = {
@@ -57,6 +57,8 @@ const BADGE_VARIANTS: Variants = {
 const STEP_BUTTON_TAP = { filter: "brightness(0.85)" } as const;
 
 const PROGRESS_TRANSITION: Transition = { type: "tween", duration: 0.15, ease: "easeOut" };
+
+const plain = (chunks: ReactNode) => chunks;
 
 interface AlternativesProps {
 	allSuggestions: MeasuredSuggestion[];
@@ -109,12 +111,18 @@ function Alternatives({
 				</m.button>
 				<div className="mx-2 flex grow flex-col items-center justify-center relative duration-300 ease-out py-2">
 					<span className="sr-only">
-						{t("option")} {currentIndex + 1} / {totalOptions}
+						{t.rich("position", { position: currentIndex + 1, total: totalOptions, label: plain, n: plain, of: plain })}
 					</span>
 					<div className="flex items-center gap-x-1 text-sm tabular-nums" aria-hidden="true">
-						<span className="text-xs text-muted-foreground">{t("option")}</span>
-						<SlidingNumber className="text-base font-semibold text-foreground" padStart number={currentIndex + 1} />
-						<span className="text-muted-foreground">/ {totalOptions}</span>
+						{t.rich("position", {
+							position: currentIndex + 1,
+							total: totalOptions,
+							label: (chunks) => <span className="text-xs text-muted-foreground">{chunks}</span>,
+							n: () => (
+								<SlidingNumber className="text-base font-semibold text-foreground" padStart number={currentIndex + 1} />
+							),
+							of: (chunks) => <span className="text-muted-foreground">{chunks}</span>,
+						})}
 					</div>
 					{isMainSuggestion && (
 						<m.span
@@ -152,9 +160,7 @@ function Alternatives({
 					{...STAT_CARD_MOTION_CONFIG}
 					className="flex h-11 items-center gap-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_16%,black_84%)]"
 				>
-					<span className="sr-only">
-						{t("totalDaysOff")}: {effectiveDays ?? 0} (+{bonusDays})
-					</span>
+					<span className="sr-only">{t("effectiveDaysReadout", { effectiveDays: effectiveDays ?? 0, bonusDays })}</span>
 					<CalendarDays size={20} className="text-green-600 dark:text-green-400 shrink-0" aria-hidden="true" />
 					<div className="flex items-center gap-1" aria-hidden="true">
 						<SlidingNumber
@@ -181,10 +187,11 @@ function Alternatives({
 					className="flex h-11 items-center gap-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_20%,white_80%)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]"
 				>
 					<span className="sr-only">
-						{t("efficiency")}: {t("efficiencyValue", { efficiency: format.number(efficiency, EFFICIENCY_FORMAT) })}
-						{isMainSuggestion
-							? ""
-							: ` (${format.number(efficiencyDiff, { ...EFFICIENCY_FORMAT, signDisplay: "always" })})`}
+						{t("efficiencyReadout", {
+							suggestion: isMainSuggestion ? "recommended" : "alternative",
+							efficiency: format.number(efficiency, EFFICIENCY_FORMAT),
+							difference: format.number(efficiencyDiff, { ...EFFICIENCY_FORMAT, signDisplay: "always" }),
+						})}
 					</span>
 					<TrendingUp size={20} className="text-purple-600 dark:text-purple-400 shrink-0" aria-hidden="true" />
 					<div className="flex items-center gap-1" aria-hidden="true">
@@ -222,7 +229,7 @@ function Alternatives({
 						className="flex h-11 items-center gap-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-soft)] px-3 py-2 shadow-[var(--shadow-brutal-xs)]"
 					>
 						<span className="sr-only">
-							{t("comparison")}: {format.number(efficiency / mainEfficiency, { style: "percent" })}
+							{t("comparisonReadout", { ratio: format.number(efficiency / mainEfficiency, { style: "percent" }) })}
 						</span>
 						<BarChart3 size={20} className="text-neutral-600 dark:text-neutral-400 shrink-0" aria-hidden="true" />
 						<div className="flex items-center gap-1" aria-hidden="true">
@@ -295,47 +302,68 @@ function Status() {
 				<div className="flex items-center gap-4 flex-wrap gap-y-2">
 					<div className="flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_25%,black_75%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]">
 						<span className="sr-only">
-							{t("autoAssigned")}: {activeSuggestedCount}
+							{t.rich("suggestedCount", { count: activeSuggestedCount, label: plain, n: plain })}
 						</span>
 						<div className="size-3 rounded-full bg-teal-500" aria-hidden="true" />
-						<span className="text-sm text-muted-foreground" aria-hidden="true">
-							{t("autoAssigned")}:
-						</span>
-						<SlidingNumber
-							aria-hidden="true"
-							number={activeSuggestedCount}
-							className="font-display font-black text-teal-700 dark:text-teal-300"
-						/>
+						{t.rich("suggestedCount", {
+							count: activeSuggestedCount,
+							label: (chunks) => (
+								<span className="text-sm text-muted-foreground" aria-hidden="true">
+									{chunks}
+								</span>
+							),
+							n: () => (
+								<SlidingNumber
+									aria-hidden="true"
+									number={activeSuggestedCount}
+									className="font-display font-black text-teal-700 dark:text-teal-300"
+								/>
+							),
+						})}
 					</div>
 					<div className="flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_25%,black_75%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]">
 						<span className="sr-only">
-							{t("manual")}: {manualSelectedCount}
+							{t.rich("manualCount", { count: manualSelectedCount, label: plain, n: plain })}
 						</span>
 						<div className="size-3 rounded-full bg-blue-500" aria-hidden="true" />
-						<span className="text-sm text-muted-foreground" aria-hidden="true">
-							{t("manual")}:
-						</span>
-						<SlidingNumber
-							aria-hidden="true"
-							number={manualSelectedCount}
-							className="font-display font-black text-blue-700 dark:text-blue-300"
-						/>
+						{t.rich("manualCount", {
+							count: manualSelectedCount,
+							label: (chunks) => (
+								<span className="text-sm text-muted-foreground" aria-hidden="true">
+									{chunks}
+								</span>
+							),
+							n: () => (
+								<SlidingNumber
+									aria-hidden="true"
+									number={manualSelectedCount}
+									className="font-display font-black text-blue-700 dark:text-blue-300"
+								/>
+							),
+						})}
 					</div>
 					<div className="h-8 w-[2px] bg-[var(--frame)]/15 hidden sm:block" />
 					<div className="flex flex-col items-center rounded-[10px] border-[3px] border-[var(--frame)] bg-[var(--surface-panel-alt)] px-3 py-1.5 shadow-[var(--shadow-brutal-xs)]">
 						<span role="status" className="sr-only">
-							{t("remaining")}: {remaining}
+							{t.rich("remainingCount", { count: remaining, label: plain, n: plain })}
 							{remaining === 0 && !hasManualChanges ? ` ${t("allAssigned")}` : ""}
 						</span>
 						<div className="flex items-center gap-2" aria-hidden="true">
-							<span className="text-sm font-display font-black uppercase tracking-[0.08em]">{t("remaining")}:</span>
-							<SlidingNumber
-								number={remaining}
-								className={cn(
-									"font-display font-black",
-									remaining > 0 ? "text-green-600 dark:text-green-400" : "text-muted-foreground",
-								)}
-							/>
+							{t.rich("remainingCount", {
+								count: remaining,
+								label: (chunks) => (
+									<span className="text-sm font-display font-black uppercase tracking-[0.08em]">{chunks}</span>
+								),
+								n: () => (
+									<SlidingNumber
+										number={remaining}
+										className={cn(
+											"font-display font-black",
+											remaining > 0 ? "text-green-600 dark:text-green-400" : "text-muted-foreground",
+										)}
+									/>
+								),
+							})}
 						</div>
 						{remaining === 0 && !hasManualChanges && (
 							<span className="text-[10px] text-green-700 dark:text-green-400 font-medium" aria-hidden="true">

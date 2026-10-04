@@ -274,11 +274,13 @@ that hop. The `activation` query parameter is the signal; the cookie is the enti
 `needsSessionCheck` is set, and only rehydration raises that flag, only when `lastVerified` is missing or
 over 24 hours old: false for any donor who opened the planner before donating, since `PremiumFeature`'s own
 mount stamps it. [`PremiumFeature.tsx`](../ui/modules/premium/PremiumFeature.tsx) calling `checkExistingSession()` unconditionally therefore does
-nothing for the payer who has just come back. `PremiumSessionSync` renders `null` and calls
-`checkExistingSession({ force: true })` once; it activates nothing (the cookie is already set, server side,
-before this page renders); it only invalidates a client-side cache, which is the one thing a server
-component cannot do. Deleting it as redundant reinstates the bug where a redirect donor is charged, holds a
-valid cookie, is told Premium is active, and finds every feature blurred.
+nothing for the payer who has just come back. `PremiumSessionSync` renders `null` and calls the premium
+store's `confirmActivation()` once: a `checkExistingSession({ force: true })` that reports
+`premium_activated` when it moved this device from free to Premium, which is how a redirect payer is counted
+the way `setPremiumStatus` counts one who paid in the page. It activates nothing (the cookie is already set,
+server side, before this page renders); it only invalidates a client-side cache, which is the one thing a
+server component cannot do. Deleting it as redundant reinstates the bug where a redirect donor is charged,
+holds a valid cookie, is told Premium is active, and finds every feature blurred.
 
 ## The `.well-known` catch-all
 

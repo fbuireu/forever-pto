@@ -1,8 +1,9 @@
 import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
 import en from "@i18n/messages/en.json";
+import es from "@i18n/messages/es.json";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { NextIntlClientProvider } from "next-intl";
+import { type Locale, NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
 const { mockToastError, mockToastSuccess, removeHoliday, askForPlan, logClientError } = vi.hoisted(() => ({
@@ -46,12 +47,14 @@ const OFFSITE = holiday({ id: "2", name: "Team offsite", day: 9 });
 interface RenderModalParams {
 	holidays: HolidayDTO[];
 	onClose?: Mock<() => void>;
+	locale?: Locale;
+	messages?: typeof en;
 }
 
-const renderModal = ({ holidays, onClose = vi.fn() }: RenderModalParams) => {
+const renderModal = ({ holidays, onClose = vi.fn(), locale = "en", messages = en }: RenderModalParams) => {
 	render(
-		<NextIntlClientProvider locale="en" messages={en}>
-			<DeleteHolidayModal open onClose={onClose} locale="en" holidays={holidays} />
+		<NextIntlClientProvider locale={locale} messages={messages}>
+			<DeleteHolidayModal open onClose={onClose} locale={locale} holidays={holidays} />
 		</NextIntlClientProvider>,
 	);
 	return onClose;
@@ -80,14 +83,15 @@ describe("DeleteHolidayModal", () => {
 	it("asks about one Holiday in the singular", () => {
 		renderModal({ holidays: [SHUTDOWN] });
 
-		expect(screen.getByRole("heading", { name: en.modals.deleteHoliday.titleSingular })).toBeTruthy();
+		expect(screen.getByRole("heading", { name: "Delete holiday" })).toBeTruthy();
+		expect(document.body.textContent).toContain("Are you sure you want to delete this holiday?");
 	});
 
 	it("asks about several in the plural, and says how many", () => {
 		renderModal({ holidays: [SHUTDOWN, OFFSITE] });
 
-		expect(screen.getByRole("heading", { name: en.modals.deleteHoliday.title })).toBeTruthy();
-		expect(document.body.textContent).toContain(en.modals.deleteHoliday.description.replace("{count}", "2"));
+		expect(screen.getByRole("heading", { name: "Delete holidays" })).toBeTruthy();
+		expect(document.body.textContent).toContain("Are you sure you want to delete 2 holidays?");
 	});
 
 	it("deletes every Holiday it listed, one call each", async () => {
@@ -104,9 +108,7 @@ describe("DeleteHolidayModal", () => {
 
 		await confirm();
 
-		expect(mockToastSuccess).toHaveBeenCalledWith(en.modals.deleteHoliday.successTitle, {
-			description: en.modals.deleteHoliday.successDescription.replace("{count}", "2"),
-		});
+		expect(mockToastSuccess).toHaveBeenCalledWith("Holidays deleted", { description: "2 holidays have been removed" });
 		expect(onClose).toHaveBeenCalledOnce();
 	});
 
@@ -115,9 +117,7 @@ describe("DeleteHolidayModal", () => {
 
 		await confirm();
 
-		expect(mockToastSuccess).toHaveBeenCalledWith(en.modals.deleteHoliday.successTitleSingular, {
-			description: en.modals.deleteHoliday.successDescriptionSingular,
-		});
+		expect(mockToastSuccess).toHaveBeenCalledWith("Holiday deleted", { description: "The holiday has been removed" });
 	});
 
 	it("reports a failure rather than closing on it, and leaves a record behind", async () => {
@@ -166,4 +166,37 @@ describe("DeleteHolidayModal analytics", () => {
 		expect(track).toHaveBeenCalledExactlyOnceWith({ event: "custom_holiday_deleted", properties: { count: 2 } });
 		expect(JSON.stringify(track.mock.calls)).not.toContain("shutdown");
 	});
+});
+
+describe("DeleteHolidayModal in Spanish", () => {
+	it.each([
+		[
+			1,
+			[SHUTDOWN],
+			"Eliminar festivo",
+			"¿Estás seguro de que quieres eliminar este festivo?",
+			"Festivo eliminado",
+			"Se ha eliminado el festivo",
+		],
+		[
+			2,
+			[SHUTDOWN, OFFSITE],
+			"Eliminar festivos",
+			"¿Estás seguro de que quieres eliminar 2 festivos?",
+			"Festivos eliminados",
+			"Se han eliminado 2 festivos",
+		],
+	] as const)(
+		"agrees every sentence with a count of %i",
+		async (_, holidays, title, question, toastTitle, toastDescription) => {
+			renderModal({ holidays: [...holidays], locale: "es", messages: es });
+
+			expect(screen.getByRole("heading", { name: title })).toBeTruthy();
+			expect(document.body.textContent).toContain(question);
+
+			await userEvent.click(screen.getByRole("button", { name: es.modals.deleteHoliday.submit }));
+
+			expect(mockToastSuccess).toHaveBeenCalledWith(toastTitle, { description: toastDescription });
+		},
+	);
 });

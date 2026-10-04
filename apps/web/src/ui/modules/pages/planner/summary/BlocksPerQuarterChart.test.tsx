@@ -19,7 +19,10 @@ vi.mock("recharts", () => {
 		Cell: empty,
 		ResponsiveContainer: passthrough,
 		Tooltip: ({ formatter }: { formatter: (value: number) => [string, string] }) => (
-			<span data-testid="tooltip">{formatter(2).join(" | ")}</span>
+			<>
+				<span data-testid="tooltip">{formatter(2).join(" | ")}</span>
+				<span data-testid="tooltip-one">{formatter(1).join(" | ")}</span>
+			</>
 		),
 		XAxis: empty,
 		YAxis: empty,
@@ -84,7 +87,8 @@ describe("BlocksPerQuarterChart tooltip", () => {
 	it("labels a bar with its block count and what a block is", () => {
 		const { getByTestId } = renderChart({ locale: "en", messages: enMessages, blocksPerQuarter: [2, 1, 0, 0] });
 
-		expect(getByTestId("tooltip").textContent).toBe(`2 ${enMessages.charts.blocks} | Blocks of 3+ days`);
+		expect(getByTestId("tooltip").textContent).toBe("2 blocks | Blocks of 3+ days");
+		expect(getByTestId("tooltip-one").textContent).toBe("1 block | Blocks of 3+ days");
 	});
 });
 
@@ -141,8 +145,43 @@ describe("BlocksPerQuarterChart Long Block minimum", () => {
 			});
 			const stated = [...(container.textContent ?? "").matchAll(STATED_MINIMUM)].map(([, days]) => days);
 
-			expect(stated).toEqual(["5", "5"]);
+			expect(stated).toEqual(["5", "5", "5"]);
 			expect(getByTestId("tooltip").textContent).toMatch(/\b5\+/);
 		},
 	);
+});
+
+describe("BlocksPerQuarterChart description at the plural edges", () => {
+	it.each([
+		["en", [0, 0, 0, 0], "0 long blocks (3+ consecutive days) ideal for vacation.", enMessages],
+		[
+			"en",
+			[1, 0, 0, 0],
+			"1 long block (3+ consecutive days) ideal for vacation. Best quarter: Q1 with 1 block.",
+			enMessages,
+		],
+		[
+			"en",
+			[0, 1, 2, 0],
+			"3 long blocks (3+ consecutive days) ideal for vacation. Best quarter: Q3 with 2 blocks.",
+			enMessages,
+		],
+		["es", [0, 0, 0, 0], "0 bloques largos (3+ días consecutivos) ideales para vacaciones.", esMessages],
+		[
+			"es",
+			[1, 0, 0, 0],
+			"1 bloque largo (3+ días consecutivos) ideal para vacaciones. Mejor trimestre: Q1 con 1 bloque.",
+			esMessages,
+		],
+		[
+			"es",
+			[0, 1, 2, 0],
+			"3 bloques largos (3+ días consecutivos) ideales para vacaciones. Mejor trimestre: Q3 con 2 bloques.",
+			esMessages,
+		],
+	] as const)("counts the %s Long Blocks of %j in one sentence", (locale, blocksPerQuarter, expected, messages) => {
+		const { container } = renderChart({ locale, messages, blocksPerQuarter: [...blocksPerQuarter] });
+
+		expect(container.textContent).toContain(expected);
+	});
 });

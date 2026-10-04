@@ -149,7 +149,7 @@ describe("HolidaysDistributionChart", () => {
 		renderChart({ ptoDays: 20, holidays: oneOfEach, locale: "de", messages: de });
 
 		expect(document.body.textContent).toContain(
-			"Verteilung deiner 20 PTO-Tage, 2 nationalen Feiertage, 1 regionalen und 1 eigenen.",
+			"Verteilung von deinen 20 PTO-Tagen, 2 nationalen Feiertagen, 1 regionalen und 1 eigenen.",
 		);
 	});
 
@@ -186,6 +186,35 @@ describe("HolidaysDistributionChart tooltip", () => {
 	it("labels a slice with its day count and keeps the series name recharts handed it", () => {
 		renderChart({ ptoDays: 20, holidays: oneOfEach });
 
-		expect(screen.getByTestId("tooltip").textContent).toBe(`5 ${en.charts.days} | PTO`);
+		expect(screen.getByTestId("tooltip").textContent).toBe("5 days | PTO");
 	});
+});
+
+describe("HolidaysDistributionChart description at the plural edges", () => {
+	const oneEach = [
+		holiday({ variant: HolidayVariant.NATIONAL, id: "1" }),
+		holiday({ variant: HolidayVariant.REGIONAL, id: "2" }),
+		holiday({ variant: HolidayVariant.CUSTOM, id: "3" }),
+	];
+
+	it.each([
+		["en", 1, oneEach, "Distribution of your 1 PTO day, 1 national holiday, 1 regional and 1 custom.", en],
+		["en", 0, [], "Distribution of your 0 PTO days, 0 national holidays.", en],
+		["es", 1, oneEach, "Distribución de 1 día de PTO, 1 festivo nacional, 1 regional y 1 personalizado.", es],
+		["es", 0, [], "Distribución de tus 0 días de PTO, 0 festivos nacionales.", es],
+		[
+			"es",
+			20,
+			oneOfEach,
+			"Distribución de tus 20 días de PTO, 2 festivos nacionales, 1 regional y 1 personalizado.",
+			es,
+		],
+	] as const)(
+		"agrees every %s count of %i PTO Days with its own noun",
+		(locale, ptoDays, holidays, expected, messages) => {
+			renderChart({ ptoDays, holidays: [...holidays], locale, messages });
+
+			expect(document.body.textContent).toContain(expected);
+		},
+	);
 });

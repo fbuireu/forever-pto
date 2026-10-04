@@ -239,14 +239,18 @@ export const Summary = () => {
 								label={t("metrics.holidays")}
 								value={holidayMetrics.totalHolidays}
 								icon={CalendarDays}
-								badge={`${holidayMetrics.nationalDays} ${t("metrics.national")}${holidayMetrics.regionalDays > 0 ? ` + ${holidayMetrics.regionalDays} ${t("metrics.regional")}` : ""}${holidayMetrics.customDays > 0 ? ` + ${holidayMetrics.customDays} ${t("metrics.custom")}` : ""}`}
+								badge={t("metrics.holidayBreakdown", {
+									national: holidayMetrics.nationalDays,
+									regional: holidayMetrics.regionalDays,
+									custom: holidayMetrics.customDays,
+								})}
 								colorScheme="green"
 							/>
 							<MetricCard
 								label={t("metrics.effectiveDays")}
 								value={effectiveDays}
 								icon={TrendingUp}
-								badge={`${increment > 0 ? `+${increment}` : "0"} ${t("metrics.overBudget", { ptoDays })}`}
+								badge={t("metrics.overBudget", { increment: Math.max(0, increment), ptoDays })}
 								colorScheme="purple"
 							/>
 							<MetricCard
@@ -306,7 +310,9 @@ export const Summary = () => {
 							<MetricCard
 								label={t("metrics.longestVacation")}
 								value={metrics.longestVacation}
-								symbol={` ${t("yearSummary.daysCount", { count: metrics.longestVacation })}`}
+								renderValue={(counter) =>
+									t.rich("yearSummary.daysCount", { count: metrics.longestVacation, n: () => counter })
+								}
 								icon={Palmtree}
 								colorScheme="rose"
 								size={MetricCardSize.COMPACT}
@@ -336,9 +342,11 @@ export const Summary = () => {
 											</div>
 											<div>
 												<div className="text-sm text-muted-foreground">{t("yearSummary.maxWorkStreak")}</div>
-												<div className="text-lg font-display font-bold text-[color-mix(in_srgb,var(--color-brand-purple)_85%,black_15%)] flex justify-center dark:text-[color-mix(in_srgb,var(--color-brand-purple)_70%,white_30%)]">
-													<SlidingNumber number={metrics.maxWorkStreak} />{" "}
-													{t("yearSummary.daysCount", { count: metrics.maxWorkStreak })}
+												<div className="text-lg font-display font-bold text-[color-mix(in_srgb,var(--color-brand-purple)_85%,black_15%)] flex justify-center gap-1 dark:text-[color-mix(in_srgb,var(--color-brand-purple)_70%,white_30%)]">
+													{t.rich("yearSummary.daysCount", {
+														count: metrics.maxWorkStreak,
+														n: () => <SlidingNumber number={metrics.maxWorkStreak} />,
+													})}
 												</div>
 											</div>
 											<div>

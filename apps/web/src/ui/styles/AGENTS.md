@@ -59,6 +59,12 @@ reduce-motion set. The motion half is handled by `<MotionConfig reducedMotion="u
 [`../modules/core/animate/providers/LazyMotionProvider.tsx`](../modules/core/animate/providers/LazyMotionProvider.tsx);
 this block owns everything CSS animates, and they are not substitutes.
 
+**The two panels motion animates take `0s` instead.** Base UI reads a Collapsible or Accordion panel's computed
+durations to pick how it animates the panel, and `0.01ms` on both an animation and a transition makes it warn
+on every panel that mounts open; `[data-slot="collapsible-content"]` and `[data-slot="accordion-panel"]` are
+animated by motion, so no CSS duration on them draws anything. `index.test.ts` holds the two slots to the ones
+the components render.
+
 ## Design tokens
 
 All tokens live in `global/index.css`, in tiers:
