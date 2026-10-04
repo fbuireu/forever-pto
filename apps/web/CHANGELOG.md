@@ -1,3 +1,11 @@
+# [forever-pto-web-v1.13.3](https://github.com/fbuireu/forever-pto/compare/web-v1.13.2...web-v1.13.3) (2026-10-04)
+
+
+### Bug Fixes
+
+* **deps:** update dependency next to v16.3.6 [security] ([#406](https://github.com/fbuireu/forever-pto/issues/406)) ([d9b98bd](https://github.com/fbuireu/forever-pto/commit/d9b98bd7d5e6632d7d2d0c92c45d7100da5b601f))
+* guard the checkout hand-back, report redirect activations and name concepts by their term ([cf66e57](https://github.com/fbuireu/forever-pto/commit/cf66e57da189c1af80a449dae791ba5798ca454b))
+
 # [forever-pto-web-v1.13.2](https://github.com/fbuireu/forever-pto/compare/web-v1.13.1...web-v1.13.2) (2026-10-02)
 
 
