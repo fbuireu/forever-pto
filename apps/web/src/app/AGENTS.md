@@ -261,8 +261,10 @@ guards:
 per failure: `warn` for a refusal the payer caused, `error` for Stripe, the session and the database. The
 route keeps only what is its own: the redirect, the cookie and the `no-store` header.
 
-Failure is never silent and never a lie: the handler redirects with `activation=failed` and the page then
-renders `premiumActivationFailed`: the payer is told their money went through and their access did not,
+The redirect names its outcome in the `activation` query parameter: `fresh` once the handler has granted Premium,
+`failed` when it did not (`ACTIVATION_PARAM`, `ACTIVATION_FRESH` and `ACTIVATION_FAILED` in
+[`@application/dto/payment/types`](../application/dto/payment/types.ts)). Failure is never silent and never a lie: the
+page then renders `premiumActivationFailed`: the payer is told their money went through and their access did not,
 instead of the page claiming Premium is active.
 
 The cookie is `sameSite: 'strict'`, so the confirmation page must **not** infer success from the cookie
@@ -274,13 +276,19 @@ that hop. The `activation` query parameter is the signal; the cookie is the enti
 `needsSessionCheck` is set, and only rehydration raises that flag, only when `lastVerified` is missing or
 over 24 hours old: false for any donor who opened the planner before donating, since `PremiumFeature`'s own
 mount stamps it. [`PremiumFeature.tsx`](../ui/modules/premium/PremiumFeature.tsx) calling `checkExistingSession()` unconditionally therefore does
-nothing for the payer who has just come back. `PremiumSessionSync` renders `null` and calls the premium
-store's `confirmActivation()` once: a `checkExistingSession({ force: true })` that reports
-`premium_activated` when it moved this device from free to Premium, which is how a redirect payer is counted
-the way `setPremiumStatus` counts one who paid in the page. It activates nothing (the cookie is already set,
-server side, before this page renders); it only invalidates a client-side cache, which is the one thing a
-server component cannot do. Deleting it as redundant reinstates the bug where a redirect donor is charged,
-holds a valid cookie, is told Premium is active, and finds every feature blurred.
+nothing for the payer who has just come back. `PremiumSessionSync` renders `null` and reads the address it arrived at.
+With `activation=fresh` in it, the marker the activation route just wrote, it calls the premium store's
+`confirmActivation()` once: a `checkExistingSession({ force: true })` that reports `premium_activated` when it moved
+this device from free to Premium, which is how a redirect payer is counted the way `setPremiumStatus` counts one who
+paid in the page. Once that call settles it removes the marker with `history.replaceState(null, …)`, if the address is
+still the one it arrived at, so a reload or a revisit is an ordinary load. Without the marker (a reload, a bookmark, a
+payer whose `localStorage` was cleared while the cookie lives) it runs the same forced check and reports nothing:
+restoring a session that already existed is not an activation, and the store, starting without a key, would read the
+restore as one. The state passed to `replaceState` is `null`, never `window.history.state`: Next patches
+`replaceState`, and a state carrying its own `__NA` marker makes it skip the router's sync with the new address. The
+component activates nothing (the cookie is already set, server side, before this page renders); it only invalidates a
+client-side cache, which is the one thing a server component cannot do. Without it a redirect donor is charged, holds a
+valid cookie, is told Premium is active, and finds every feature blurred.
 
 ## The `.well-known` catch-all
 

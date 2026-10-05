@@ -120,3 +120,23 @@ describe("getDayClassNames month and past-day handling", () => {
 		expect(classesFor({ modifiers: { today: always } })).not.toContain("hit-area-stable");
 	});
 });
+
+describe("the text of a day on a brand fill", () => {
+	const BRAND_FILLED = ["holiday", "suggested", "alternative", "custom", "manuallySelected"] as const;
+	const INK = "text-[var(--color-brand-ink)]";
+	const TEXT_COLOUR = /(?<![\w-])text-\[var\(--[\w-]+\)\]/g;
+
+	it.each(BRAND_FILLED)(
+		"reads a %s day in the ink token, which both themes keep, whatever colour the page inherits",
+		(name) => {
+			expect(MODIFIERS_CLASS_NAMES[name].match(TEXT_COLOUR)).toEqual([INK]);
+		},
+	);
+
+	it("gives every brand-filled day the same ink, so a Manual Day reads like a Suggested one", () => {
+		const inks = BRAND_FILLED.map((name) => MODIFIERS_CLASS_NAMES[name].match(TEXT_COLOUR)?.[0]);
+
+		expect(new Set(inks).size).toBe(1);
+		expect(inks).toHaveLength(BRAND_FILLED.length);
+	});
+});

@@ -8,3 +8,7 @@
 @import "./animations/index.css";
 @import "./global/index.css";
 @import "./vendor/index.css";
+
+@source not "../../../**/*.test.{ts,tsx}";
+@source not "../../../e2e";
+@source not "../../../**/*.{md,mdx}";

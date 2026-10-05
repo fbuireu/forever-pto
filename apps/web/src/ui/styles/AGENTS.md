@@ -13,11 +13,17 @@ custom utilities are all declared here in CSS at-rules.
 [`driver.css`](../modules/tutorial/driver.css), sits beside [`DriverStyles.tsx`](../modules/tutorial/DriverStyles.tsx), which imports it so the
 tutorial CSS only loads when the tutorial does.
 
+Tailwind finds the classes to emit by scanning every file under `apps/web` that git does not ignore, so `index.css` ends
+with three `@source not` lines that take out the test files, the `e2e` folder and the Markdown and MDX: a class that only
+a fixture or an example spells would otherwise become a rule in the shipped stylesheet. A new kind of file the app does
+not ship gets a line of its own. The contract suite builds the stylesheet with Tailwind's own compiler and scanner, and
+fails on a scanned test, e2e spec or Markdown file and on any palette utility in the output.
+
 ## Files
 
 | File | Role |
 | --- | --- |
-| `index.css` | Declares the cascade layer order, then imports Tailwind, `tw-animate-css` and every partial below |
+| `index.css` | Declares the cascade layer order, imports Tailwind, `tw-animate-css` and every partial below, and ends with the `@source not` exclusions |
 | [`base/index.css`](./base/index.css) | `@layer base`: element defaults: border/outline colour, body background and glow, scrollbar styling, the shared transition on buttons and shadcn slots |
 | [`theme/index.css`](./theme/index.css) | `@theme inline` bridges the design tokens into Tailwind's namespaces; also the `dark` and `hover` custom variants |
 | [`utilities/index.css`](./utilities/index.css) | `@utility hit-area-stable`, `hit-area-stable-tilt` and `quiet-link` |
@@ -26,6 +32,7 @@ tutorial CSS only loads when the tutorial does.
 | [`vendor/index.css`](./vendor/index.css) | `@layer vendor`: `flag-icons`, cookie-consent and boneyard-js overrides, `::selection` |
 | [`palette.ts`](./palette.ts) | The tokens' JS twin: the colours a consumer that cannot read a custom property takes by value (the Stripe iframe, the skeletons, the PDF, the confetti) |
 | [`palette.test.ts`](./palette.test.ts) | Holds `palette.ts` equal to the tokens it repeats, and keeps every colour out of `boneyard.config.json` and the registry generated from it |
+| [`contrast.test.ts`](./contrast.test.ts) | Evaluates the fill, the stripe and the ink of every brand-filled calendar day in both themes and holds the ink at WCAG AA |
 | [`index.test.ts`](./index.test.ts) | Reads the stylesheets as text and guards the invariants a reader is most likely to "tidy away" |
 
 ## The cascade layer order
@@ -95,6 +102,15 @@ All tokens live in `global/index.css`, in tiers:
 shadow scale are. A colour with no token gets one in both blocks of `global/index.css`; a literal anywhere else in
 `apps/web/src` fails the contract suite.
 
+**The ink on a brand fill is `--color-brand-ink`, in both themes.** No `--color-brand-*` hue is overridden under
+`[data-theme="dark"]`, so a day filled with one keeps its fill in dark mode, and the text on it keeps its ink:
+`--foreground` flips to cream there and does not reach AA on those fills. [`contrast.test.ts`](./contrast.test.ts)
+evaluates each brand-filled day of `MODIFIERS_CLASS_NAMES` in both themes (the fill, the stripe laid over it and the
+ink) and holds the ink at 4.5:1 or better. A `var(--x)` that nothing declares resolves to nothing and the property
+falls back to the inherited value, so the contract suite fails a custom property read in `apps/web/src` that no
+stylesheet, style key, arbitrary property, `setProperty`, font `variable`, Base UI `CssVars` module or Tailwind default
+theme declares.
+
 **A consumer that cannot read a custom property takes a constant from [`palette.ts`](./palette.ts).** The Stripe
 Elements iframe, `boneyard-js` (which computes with the colour), the PDF renderer and `canvas-confetti` receive a value,
 not a stylesheet: `STRIPE_LIGHT_PALETTE` and `STRIPE_DARK_PALETTE`, `BONES_COLORS`, `PDF_PALETTE` and `CONFETTI_COLORS`.
@@ -107,7 +123,11 @@ the message. The four token modules are the only files of `apps/web/src` that ho
 literal in any other, generated or not.
 
 Dark mode overrides a subset of those under `[data-theme="dark"]`. [`AppThemeProvider.tsx`](../modules/providers/AppThemeProvider.tsx) configures
-next-themes with `attribute='data-theme'`, so the attribute lands on `<html>`.
+next-themes with `attribute={['data-theme', 'class']}`, so `<html>` carries the theme twice: as `data-theme`, which the
+tokens and the `dark` variant read, and as a `dark` or `light` class, which `boneyard-js` reads to pick the dark
+colours of a skeleton (it looks for `.dark` on `<html>` or an ancestor and for nothing else). The first-paint script
+writes both before the first frame. The class exists for that reader alone: the theme is styled through the
+`data-theme` tokens, and a stylesheet rule keyed on `.dark` or `.light` would be a second source of it.
 
 `theme/index.css` is the bridge from tokens to utility classes. `@theme inline` matters: the generated
 theme variable holds `var(--background)` rather than a resolved colour, so the `[data-theme="dark"]`
@@ -208,13 +228,15 @@ instead would drop it from `pnpm format:all` and `pnpm lint:all` alike.
 
 ## Testing
 
-`index.test.ts` is the only test here, and it reads CSS as text rather than rendering anything. It
+`index.test.ts` reads CSS as text rather than rendering anything. It
 pins the things that look like tidy-ups and are not: the design tokens stay unlayered and the
 layer statement reserves no slot for them, the `tutorial` slot stays reserved, `theme/index.css`
 keeps `--container-8xl` without a `--max-width-8xl` mirror, and `index.css` reaches every stylesheet in the
 folder, so one that a single component imports fails until it moves beside that component. `palette.test.ts` holds
-the palette module to the tokens, and the contract suite (`tests/docs-consistency.test.ts`) holds every other file of
-`apps/web/src` free of a literal colour, a hex, a colour function, a palette class or a `white` or `black`.
+the palette module to the tokens, `contrast.test.ts` holds the ink on every brand-filled calendar day at AA in both
+themes, and the contract suite (`tests/docs-consistency.test.ts`) holds every other file of `apps/web/src` free of a
+literal colour, a hex, a colour function, a palette class or a `white` or `black`, holds every custom property read
+there to a declaration, and builds the shipped stylesheet to fail on a scanned fixture or a palette utility.
 
 Nothing checks that a new `hover:-translate-*` carries `hit-area-stable`, or that the driver.js copy of it
 in `modules/tutorial/driver.css` still matches.

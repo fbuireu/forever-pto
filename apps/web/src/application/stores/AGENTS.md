@@ -423,11 +423,14 @@ cookie and deliberately emits nothing: a session restored on a second device is 
 
 **`confirmActivation` is the one session check that reports, and only the payment confirmation page calls it.**
 A payer the issuer redirected never returns to the checkout that would have called `setPremiumStatus`: the
-activation route sets the cookie and the confirmation page's `PremiumSessionSync` calls `confirmActivation`,
-a forced `checkExistingSession` that reports `premium_activated`, with the checkout's properties, when the
-answer moved the store from no key to a key. A reload of that page finds the key already persisted and reports
-nothing, and concurrent calls share one check and one report through a module-level promise, the way
-`checkExistingSession` shares its request. Every other check, `PremiumFeature`'s included, stays silent.
+activation route sets the cookie and redirects with `activation=fresh`, and the confirmation page's
+`PremiumSessionSync` calls `confirmActivation` while that marker is in the address, a forced `checkExistingSession`
+that reports `premium_activated`, with the checkout's properties, when the answer moved the store from no key to a key.
+The store cannot tell a first arrival from a return on its own: with `localStorage` cleared and the cookie alive it
+starts without a key, and the restore reads as a move into Premium. The page decides, by the marker it removes once the
+call settles, so a reload, a revisit and a cleared-storage return all run the silent `checkExistingSession` instead.
+Concurrent calls share one check and one report through a module-level promise, the way `checkExistingSession` shares
+its request. Every other check, `PremiumFeature`'s included, stays silent.
 
 `refreshPremiumStatus` is the action that guard was written for, and it currently has **no caller** outside
 its own test: nothing re-verifies the stored email on a later visit, so `setPremiumStatus` is reached only

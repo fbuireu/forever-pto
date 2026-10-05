@@ -64,4 +64,4 @@ flowchart TD
 
 ## The docs site's previews
 
-This documentation site previews the same way, one Worker per pull request named `pr-<n>-forever-pto-docs-development`, deleted by its own `cleanup-docs` job when the pull request closes. What differs is what it does *not* need: no bindings, no `--secrets-file`, no `--var` override, and no second build, since it ships the `docs-dist` artifact the `build` job already produced. This section used to say the docs previews were immutable Worker versions with no teardown; they were, until both packages were aligned on the per-PR Worker model. See [docs CI](/infra/docs-ci/).
+This documentation site previews the same way, one Worker per pull request named `pr-<n>-forever-pto-docs-development`, deleted by its own `cleanup-docs` job when the pull request closes. What differs is what it does *not* need: no bindings, no `--secrets-file`, no `--var` override, and no second build, since it ships the `docs-dist` artifact the `build` job already produced. See [docs CI](/infra/docs-ci/).

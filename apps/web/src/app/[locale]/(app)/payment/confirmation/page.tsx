@@ -1,5 +1,6 @@
 import { hasSucceeded, wasCharged } from "@application/dto/payment/dto";
-import { ACTIVATION_FAILED, paymentConfirmationQuerySchema } from "@application/dto/payment/schema";
+import { paymentConfirmationQuerySchema } from "@application/dto/payment/schema";
+import { ACTIVATION_FAILED } from "@application/dto/payment/types";
 import { Link } from "@application/i18n/navigation";
 import { localePath } from "@infrastructure/i18n/utils/url";
 import { ApplicationLayer } from "@infrastructure/layers";

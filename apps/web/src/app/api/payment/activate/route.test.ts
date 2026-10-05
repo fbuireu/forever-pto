@@ -1,4 +1,4 @@
-import { ACTIVATION_FAILED, ACTIVATION_PARAM } from "@application/dto/payment/schema";
+import { ACTIVATION_FAILED, ACTIVATION_FRESH, ACTIVATION_PARAM } from "@application/dto/payment/types";
 import type { activateWithPayment } from "@application/use-cases/activatePremium";
 import { RateLimitError, ValidationError } from "@infrastructure/errors";
 import { EN, ES } from "@infrastructure/i18n/locales";
@@ -70,7 +70,21 @@ describe("GET /api/payment/activate", () => {
 		expect(response.status).toBe(307);
 		expect(response.cookies.get(PREMIUM_COOKIE)?.value).toBe("jwt");
 		expect(locationOf(response).pathname).toBe("/payment/confirmation");
-		expect(locationOf(response).searchParams.get(ACTIVATION_PARAM)).toBeNull();
+	});
+
+	it("marks the redirect it sends after an activation as fresh, the one marker the confirmation page reports from", async () => {
+		const response = await GET(makeRequest({ query: successfulQuery }));
+
+		expect(locationOf(response).searchParams.get(ACTIVATION_PARAM)).toBe(ACTIVATION_FRESH);
+		expect(locationOf(response).searchParams.get("payment_intent")).toBe(PAYMENT_INTENT_ID);
+	});
+
+	it("never marks a redirect fresh when it failed to activate", async () => {
+		const refused = await GET(makeRequest({ query: { payment_intent: PAYMENT_INTENT_ID } }));
+		const declined = await GET(makeRequest({ query: { ...successfulQuery, redirect_status: "failed" } }));
+
+		expect(locationOf(refused).searchParams.getAll(ACTIVATION_PARAM)).toEqual([ACTIVATION_FAILED]);
+		expect(locationOf(declined).searchParams.getAll(ACTIVATION_PARAM)).toEqual([ACTIVATION_FAILED]);
 	});
 
 	it("passes the client secret through so activation can prove the caller completed the payment", async () => {

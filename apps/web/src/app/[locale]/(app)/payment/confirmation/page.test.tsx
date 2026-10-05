@@ -1,5 +1,4 @@
-import { ACTIVATION_FAILED } from "@application/dto/payment/schema";
-import type { PaymentConfirmationDTO } from "@application/dto/payment/types";
+import { ACTIVATION_FAILED, ACTIVATION_FRESH, type PaymentConfirmationDTO } from "@application/dto/payment/types";
 import { DE, EN, ES } from "@infrastructure/i18n/locales";
 import { render } from "@testing-library/react";
 import { Effect, Layer } from "effect";
@@ -49,7 +48,7 @@ vi.mock("@ui/modules/core/primitives/Card", () => {
 });
 
 vi.mock("@ui/modules/premium/PremiumSessionSync", () => ({
-	PremiumSessionSync: () => null,
+	PremiumSessionSync: () => <span data-testid="premium-session-sync" />,
 }));
 
 vi.mock("lucide-react", () => ({
@@ -76,6 +75,11 @@ const renderErrorPage = async () => {
 	const resolved = await (element.type as (props: unknown) => Promise<never>)(element.props);
 	return render(resolved);
 };
+
+const makeFreshActivationParams = () => ({
+	searchParams: Promise.resolve({ payment_intent: PAYMENT_INTENT_ID, activation: ACTIVATION_FRESH }),
+	params: Promise.resolve({ locale: EN as never }),
+});
 
 const makeFailedActivationParams = () => ({
 	searchParams: Promise.resolve({ payment_intent: PAYMENT_INTENT_ID, activation: ACTIVATION_FAILED }),
@@ -214,6 +218,25 @@ describe("payment/confirmation page", () => {
 			const { container } = render(await PaymentConfirmationPage(makeFailedActivationParams()));
 			expect(container.textContent).toContain("t:premiumActivationFailed");
 			expect(container.textContent).not.toContain("t:premiumActivated");
+		});
+
+		it("reports Premium as active for the activation the redirect just made", async () => {
+			const { container } = render(await PaymentConfirmationPage(makeFreshActivationParams()));
+			expect(container.textContent).toContain("t:premiumActivated");
+			expect(container.textContent).not.toContain("t:premiumActivationFailed");
+		});
+
+		it.each([
+			["an ordinary load", makeSuccessParams],
+			["the activation the redirect just made", makeFreshActivationParams],
+		])("mounts the session sync for %s", async (_label, makeQuery) => {
+			const { queryByTestId } = render(await PaymentConfirmationPage(makeQuery()));
+			expect(queryByTestId("premium-session-sync")).not.toBeNull();
+		});
+
+		it("mounts no session sync when the activation route says it failed, since there is no cookie to restore", async () => {
+			const { queryByTestId } = render(await PaymentConfirmationPage(makeFailedActivationParams()));
+			expect(queryByTestId("premium-session-sync")).toBeNull();
 		});
 	});
 

@@ -13,7 +13,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 interface CollapsibleGroupProps {
 	defaultOpen?: boolean;
-	trigger: ReactNode;
+	icon: ReactNode;
+	label: string;
+	tooltip: string;
 	children: ReactNode;
 	"data-tutorial"?: string;
 }
@@ -66,11 +68,6 @@ vi.mock("@ui/modules/core/animate/base/Sidebar", () => ({
 	SidebarHeader: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
 	SidebarInset: ({ children, ...props }: ComponentProps<"div">) => <main {...props}>{children}</main>,
 	SidebarMenu: ({ children }: { children?: ReactNode }) => <ul>{children}</ul>,
-	SidebarMenuButton: ({ children, tooltip }: { children?: ReactNode; tooltip?: string }) => (
-		<button type="button" title={tooltip}>
-			{children}
-		</button>
-	),
 	SidebarMenuItem: ({ children }: { children?: ReactNode }) => <li>{children}</li>,
 	SidebarTrigger: ({ label }: { label?: string }) => <button type="button" aria-label={label} />,
 }));
@@ -78,7 +75,6 @@ vi.mock("@ui/modules/core/animate/base/Sidebar", () => ({
 vi.mock("@ui/modules/core/animate/icons/Icon", () => ({
 	AnimateIcon: ({ children }: { children: ReactNode }) => children,
 }));
-vi.mock("@ui/modules/core/animate/icons/ChevronDown", () => ({ ChevronDown: () => <svg /> }));
 vi.mock("@ui/modules/core/animate/icons/Settings", () => ({ Settings: () => <svg /> }));
 vi.mock("@ui/modules/shared/Logo", () => ({ Logo: () => <div data-testid="logo" /> }));
 
@@ -90,9 +86,22 @@ vi.mock("./components/SidebarFooterButtons", () => ({
 	SidebarFooterButtons: () => <div data-testid="footer-buttons" />,
 }));
 vi.mock("./components/SidebarCollapsibleGroup", () => ({
-	SidebarCollapsibleGroup: ({ defaultOpen = false, trigger, children, ...props }: CollapsibleGroupProps) => (
-		<div data-group data-tutorial={props["data-tutorial"]} data-default-open={String(defaultOpen)}>
-			{trigger}
+	SidebarCollapsibleGroup: ({
+		defaultOpen = false,
+		icon,
+		label,
+		tooltip,
+		children,
+		...props
+	}: CollapsibleGroupProps) => (
+		<div
+			data-group
+			data-tutorial={props["data-tutorial"]}
+			data-default-open={String(defaultOpen)}
+			data-label={label}
+			data-tooltip={tooltip}
+		>
+			<span data-icon>{icon}</span>
 			{children}
 		</div>
 	),
@@ -171,6 +180,38 @@ describe("AppSidebar", () => {
 		);
 
 		expect(groups).toStrictEqual(["true", "false"]);
+	});
+
+	it("hands each group its label and its tooltip as text, and never a trigger of its own to draw", async () => {
+		const { container } = await renderSidebar();
+
+		const groups = [...container.querySelectorAll<HTMLElement>("[data-group]")];
+
+		expect(groups.map((group) => [group.dataset.label, group.dataset.tooltip])).toStrictEqual([
+			[enMessages.sidebar.steps, enMessages.sidebar.steps],
+			[enMessages.sidebar.calculators, enMessages.sidebar.tools],
+		]);
+		expect(container.querySelectorAll("[data-group] button")).toHaveLength(0);
+	});
+
+	it("hands each group an icon to draw inside its trigger", async () => {
+		const { container } = await renderSidebar();
+
+		const icons = [...container.querySelectorAll("[data-group] > [data-icon]")];
+
+		expect(icons).toHaveLength(2);
+		for (const icon of icons) expect(icon.querySelector("svg")).not.toBeNull();
+	});
+
+	it.each(Object.entries(BUNDLES))("labels both groups in %s from words the bundle has", async (locale, messages) => {
+		translateIn({ locale: locale as Locale, messages });
+		const { container } = await renderSidebar();
+
+		for (const group of container.querySelectorAll<HTMLElement>("[data-group]")) {
+			expect(group.dataset.label).toMatch(/\S/);
+			expect(group.dataset.tooltip).toMatch(/\S/);
+			expect(`${group.dataset.label}${group.dataset.tooltip}`).not.toMatch(/[<>{}]|sidebar\./);
+		}
 	});
 
 	it("numbers each step card in its own heading, after the title drawn from one message", async () => {

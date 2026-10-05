@@ -20,7 +20,7 @@ Everything runs on Cloudflare. The account hosts the Workers from this repo, plu
 
 ### There is no tail Worker
 
-There was one, `forever-pto-tail`, with its own `wrangler.toml` and its own deploy job. It received the app Worker's logs and exceptions through `[[tail_consumers]]` and forwarded them to Better Stack, because the platform exported nothing. It does not exist any more: `[observability.logs]` names an OTLP destination and Cloudflare posts the same events itself, with the trace id attached, which the tail Worker could never do because it never received spans. Reissuing the Better Stack source is now a change to the destination in the Cloudflare dashboard, with no deploy at all. See [ADR 0017](https://github.com/fbuireu/forever-pto/blob/main/adr/0017-observability-is-the-platform-export.md).
+The app Worker's logs and exceptions need no `[[tail_consumers]]` Worker to forward them to Better Stack: `[observability.logs]` names an OTLP destination and Cloudflare posts the same events itself, with the trace id attached, which a tail Worker could never do because it never receives spans. Reissuing the Better Stack source is a change to the destination in the Cloudflare dashboard, with no deploy at all. See [ADR 0017](https://github.com/fbuireu/forever-pto/blob/main/adr/0017-observability-is-the-platform-export.md).
 
 ### The docs Worker
 
@@ -29,7 +29,7 @@ There was one, `forever-pto-tail`, with its own `wrangler.toml` and its own depl
 ## Storage
 
 - **R2: incremental cache.** `open-next.config.ts` wires OpenNext's `incrementalCache` to R2, using the `NEXT_INC_CACHE_R2_BUCKET` binding. Production uses the `forever-pto-next-inc-cache` bucket; development (and every PR preview) shares `forever-pto-next-inc-cache-dev`. This is where ISR/`use cache` output lives between requests.
-- **The rate-limiting binding.** `[[ratelimits]]` declares `PAYMENT_RATE_LIMITER` with `simple = { limit = 10, period = 60 }`, once at the top level and again per environment. There is **no KV namespace in this repo**: the counter used to be a read-modify-write over one, which KV cannot make atomic; see [rate limiting](/how-it-works/rate-limiting/).
+- **The rate-limiting binding.** `[[ratelimits]]` declares `PAYMENT_RATE_LIMITER` with `simple = { limit = 10, period = 60 }`, once at the top level and again per environment. There is **no KV namespace in this repo**: a counter kept in one would be a read-modify-write, which KV cannot make atomic; see [rate limiting](/how-it-works/rate-limiting/).
 - **Turso: database.** libSQL over HTTP; one database per environment, configured as the `TURSO_DATABASE_URL` var in `wrangler.toml` with the `TURSO_AUTH_TOKEN` pushed as a [runtime secret](/infra/secrets/). Turso is external to Cloudflare but fits the Worker model (no TCP pooling required).
 
 ## Platform features

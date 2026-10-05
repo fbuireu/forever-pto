@@ -71,14 +71,3 @@ Each line names where the tree breaks a rule of [`CODING_STANDARDS.md`](./CODING
   move them to a `rules.ts` in their folders.
 - **Components in a folder their callers do not share** (`U8`): `ThemeSelector` sits in `sidebar/components` while
   `shared/Header.tsx` mounts it too, and `DevFooter` imports `Me` from `pages/legal`: move both to `shared/`.
-- **`SidebarCollapsibleGroup` takes its `trigger` as an element a server component built, and one that arrives lazy
-  makes Base UI draw a `<button>` of its own** (`U19`, `AppSidebar.tsx` and `SidebarCollapsibleGroup.tsx`):
-  `CollapsibleTrigger`'s `asChild` hands the element to Base UI's `render`, which clones only a valid element, so a lazy
-  one leaves a `<button>` around the `SidebarMenuButton` and the first client pass does not match the server's (seen
-  in 3 of about 70 loads, intermittent): give `SidebarCollapsibleGroup` the icon and the label as props and let it draw
-  the `SidebarMenuButton` itself.
-- **`premium_activated` is counted again when a visitor returns to the payment confirmation page with `localStorage`
-  cleared and the session cookie alive** (`P1`, `confirmActivation` in `apps/web/src/application/stores/premium.ts`):
-  the store starts without Premium, `checkExistingSession` finds the cookie and the move reads as an activation, though
-  P1 says never on a reload: have `verifySession` return the token's `iat`, `/api/check-session` answer it, and
-  `confirmActivation` report only a session issued in the last few minutes.

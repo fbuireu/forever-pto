@@ -14,7 +14,7 @@ Every React component the product renders. Nothing else in `src/ui/` holds compo
 | `layout/` | [`layout/LegalLayout.tsx`](./layout/LegalLayout.tsx), the card chrome the legal pages share, and [`layout/SkipToContent.tsx`](./layout/SkipToContent.tsx), which owns the skip link **and** the `MAIN_CONTENT_ID` every route shell's landmark is keyed on | Between sibling routes |
 | `sidebar/` | [`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) and its controls: Country, Region, year, Strategy and its Preferred Months, past days, Carry-over Months, the PTO Day budget, the calculators, the calendar export, and the language and theme switchers | One screen, but not a page section |
 | `premium/` | The Premium gate and the Donation checkout: [`premium/PremiumFeature.tsx`](./premium/PremiumFeature.tsx), [`premium/featureLabels.ts`](./premium/featureLabels.ts), [`premium/PremiumModal.tsx`](./premium/PremiumModal.tsx), [`premium/PremiumRequiredModal.tsx`](./premium/PremiumRequiredModal.tsx), [`premium/CheckoutForm.tsx`](./premium/CheckoutForm.tsx) with its [`premium/ExpressCheckoutFixture.tsx`](./premium/ExpressCheckoutFixture.tsx), and [`premium/PremiumSessionSync.tsx`](./premium/PremiumSessionSync.tsx), the render-nothing activation check the payment confirmation mounts | Yes |
-| `providers/` | What the locale layout mounts once around the page: [`providers/AppThemeProvider.tsx`](./providers/AppThemeProvider.tsx), the `next-themes` context, which the two global pages mount too, and [`providers/BonesProvider.tsx`](./providers/BonesProvider.tsx), which renders `null` and configures `boneyard-js` | Once |
+| `providers/` | What the locale layout mounts once around the page: [`providers/AppThemeProvider.tsx`](./providers/AppThemeProvider.tsx), the `next-themes` context, which stamps `<html>` with the theme as `data-theme` (the tokens) and as a class (the `boneyard-js` skeletons) and which the two global pages mount too, and [`providers/BonesProvider.tsx`](./providers/BonesProvider.tsx), which renders `null` and configures `boneyard-js` | Once |
 | `stores/` | [`stores/StoresInitializer.tsx`](./stores/StoresInitializer.tsx), a render-nothing component that seeds the filters store from the `user-country` cookie, read through [`utils/userCountry.ts`](../utils/userCountry.ts) | Once |
 | `tutorial/` | [`tutorial/anchors.ts`](./tutorial/anchors.ts), the tour's anchor names and window events, and [`tutorial/DriverStyles.tsx`](./tutorial/DriverStyles.tsx), the module `useTutorial` imports for the driver.js stylesheet | Once |
 | `tracking/` | The third-party script mounts: [`tracking/Analytics.tsx`](./tracking/Analytics.tsx) (Google gtag consent defaults and config; nothing at all when the build has no `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID`, so a preview or a local build loads no Google script) and [`tracking/BetterStackTracking.tsx`](./tracking/BetterStackTracking.tsx) (the Better Stack snippet, gated on the cookieconsent `betterStack` **service**, not the category) | Once |
@@ -97,7 +97,7 @@ observability page of the docs site. The store actions that report are the opens
 with its own `source` (`openDonatePopover(source)` and `openQuickStart(source)` on the `ui` store,
 `showPremiumModal(feature, origin)` on the premium store), and `setPremiumStatus`, which reports
 `premium_activated` on the move from free to Premium only, as `confirmActivation` does for the payer the issuer
-redirected, from the confirmation page. `planner_generated` counts the plans a person asks
+redirected, from the confirmation page and only while the redirect's `activation=fresh` marker is in the address. `planner_generated` counts the plans a person asks
 for: every handler that changes what the plan is built from calls the holidays store's `askForPlan` (a sidebar
 control or the calculator on a new value, the quick start's finish, a Custom Holiday that lands or goes, an
 Alternative applied, a reset), and `hooks/useCalculationsWorker.ts` reports it when the worker's answer lands and
@@ -443,6 +443,13 @@ fragment of `Sidebar` plus `SidebarInset` and reads the context from `app/[local
 the app's only mount site; a second provider would give the tree a second, independent `open`/`openMobile`
 pair. `Sidebar.test.tsx` fails on a second mount anywhere under `src/`. A host other than that layout has to
 supply the provider.
+
+**[`sidebar/components/SidebarCollapsibleGroup.tsx`](./sidebar/components/SidebarCollapsibleGroup.tsx) takes the pieces of
+its trigger, not the trigger.** `AppSidebar` is a server component and hands the group an `icon`, a `label` and a
+`tooltip`; the group draws the `SidebarMenuButton`, its chevron and the `CollapsibleTrigger` itself, in the client module
+that owns the `Collapsible`. An element a server component builds and passes down can arrive as a lazy reference, which
+`CollapsibleTrigger asChild` does not clone (the core guide has the mechanism), so a `trigger` prop would draw a second
+`<button>` around the menu button on some first passes.
 
 **[`shared/donate/Donate.tsx`](./shared/donate/Donate.tsx)'s trigger is a `fixed` band, and the band is `pointer-events-none` while the
 button inside it is `pointer-events-auto`.** Below `md` the container is `w-full` and the `Button` inside

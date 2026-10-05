@@ -19,6 +19,10 @@ export const PromoCodeErrors = {
 
 export type PromoCodeErrorCode = (typeof PromoCodeErrors)[keyof typeof PromoCodeErrors];
 
+export const ACTIVATION_PARAM = "activation";
+export const ACTIVATION_FAILED = "failed";
+export const ACTIVATION_FRESH = "fresh";
+
 export type DiscountInfo = {
 	type: "percent" | "fixed";
 	value: number;

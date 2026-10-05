@@ -27,7 +27,7 @@ sequenceDiagram
   ACT->>S: retrieve the PaymentIntent, require status = succeeded
   ACT->>ACT: mint the JWT, set premium-token (httpOnly, 30 days)
   ACT--)DB: after(): upsert the payment row
-  ACT-->>U: 302 /payment/confirmation, no-store
+  ACT-->>U: 302 /payment/confirmation?activation=fresh, no-store
   S-)WH: payment_intent.succeeded
   WH->>DB: create the row if the deferred save never landed
 ```

@@ -40,7 +40,7 @@ Customizations happen in `onPopoverRender`:
 
 - Steps target elements by `data-tutorial` attributes: `sidebar-step-1` through `sidebar-step-4`, `sidebar-tools`, `alternatives-manager`, `pto-status`, `holidays-list`, `calendar-list`, plus a final unanchored step. Titles and descriptions come from the `tutorial.steps` i18n namespace; button labels and the progress text from `tutorial` (see [internationalization](/how-it-works/i18n/)).
 - **Mobile** (`useIsMobile`) inserts an extra `planner-drawer` step, and the alternatives step dispatches a `tutorial:expand-drawer` custom event so the drawer opens before it is highlighted.
-- If the sidebar is closed, the hook toggles it first and waits for the first anchor to stop moving before starting; otherwise the first highlights would target collapsed elements. It measures the anchor rather than listening for `transitionend`, which was tried and does not fire reliably here.
+- If the sidebar is closed, the hook toggles it first and waits for the first anchor to stop moving before starting; otherwise the first highlights would target collapsed elements. It measures the anchor rather than listening for `transitionend`, which does not fire reliably here.
 
 ## Styling
 

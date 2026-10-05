@@ -1419,6 +1419,90 @@ describe("documentation does not point at things that are gone", () => {
 		expect(checked).toBeGreaterThan(100);
 		expect(offenders).toEqual([]);
 	});
+
+	const FENCED_BLOCK = /```[\s\S]*?```/g;
+	const CODE_SPAN = /`[^`\n]*`/g;
+	const QUOTED_PHRASE = /"[^"\n]*"|“[^”\n]*”/g;
+	const HISTORY_MARKERS: Record<string, RegExp> = {
+		"used to": /(?<=\w\s+)(?<!\b(?:is|are|was|were|be|been|being|get|gets|got|and|or)\s+)\bused\s+to\b/gi,
+		"no longer": /\bno\s+longer\b(?!\s+exists?\b)/gi,
+		"any more": /\banymore\b|\bany\s+more(?=\s*[.,;:)])/gi,
+		previously: /\bpreviously\b/gi,
+		formerly: /\bformerly\b/gi,
+		"until now": /\buntil\s+(?:now|this\s+(?:page|section|change|commit|release|fix|job|rule|entry))\b/gi,
+		"a dated event": /\b20\d\d-\d\d-\d\d\b/g,
+		"was … until": /\b(?:was|were)\b[^.;:!?]{0,100}?\buntil\b/gi,
+		"a change narrated":
+			/\b(?:was|were|has\s+been|have\s+been)\s+(?:weighed|tried|rejected|rewritten|reverted|retired|superseded|dropped|replaced|renamed)\b/gi,
+	};
+
+	const proseOf = (source: string) =>
+		[FENCED_BLOCK, CODE_SPAN, QUOTED_PHRASE].reduce(
+			(text, pattern) => text.replace(pattern, (span) => span.replace(/[^\n]/g, " ")),
+			source,
+		);
+
+	const historyIn = (source: string) => {
+		const prose = proseOf(source);
+
+		return Object.entries(HISTORY_MARKERS).flatMap(([marker, pattern]) =>
+			[...prose.matchAll(pattern)].map((match) => ({
+				marker,
+				line: source.slice(0, match.index).split("\n").length,
+				excerpt: source.slice(match.index, match.index + 60).replace(/\s+/g, " "),
+			})),
+		);
+	};
+
+	it("tells no history in the prose of a published page, which states the present while git keeps the past", () => {
+		const offenders = contentFiles.flatMap((file) =>
+			historyIn(read(file)).map(({ line, marker, excerpt }) => `${file}:${line} ${marker}: ${excerpt}`),
+		);
+		const scanned = contentFiles.reduce((total, file) => total + proseOf(read(file)).replace(/\s/g, "").length, 0);
+
+		expect(contentFiles.length).toBeGreaterThan(50);
+		expect(scanned).toBeGreaterThan(150000);
+		expect(offenders).toEqual([]);
+	});
+
+	it("reads every history marker in prose, and none in a code span, a fence, a quotation or a participle", () => {
+		const TELLS_HISTORY: Record<string, string[]> = {
+			"used to": ["It used to centre on phones.", "the list\nused to be a filter", "values that used to be cached"],
+			"no longer": ["so the type no longer has to compensate", "No longer reachable."],
+			"any more": ["It does not exist any more: the platform", "not anymore.", "are not any\nmore, they"],
+			previously: ["where it previously could not"],
+			formerly: ["formerly a tail Worker"],
+			"until now": ["undocumented until this page was corrected", "until now the recovery"],
+			"a dated event": ["so on 2026-08-29 they reverted", "(2026-09-12)"],
+			"was … until": ["The flag was on, with sites, until it was found", "they were,\nuntil both packages"],
+			"a change narrated": ["that was weighed and rejected", "has been replaced by", "was tried and"],
+		};
+		const TELLS_NONE = [
+			"a code, used to pre-select the calendar",
+			"Used to pre-select the calendar",
+			"| `user-country` | Detected code, used to pre-select | no |",
+			"the helper is used to build the key",
+			"it was built and used to sign it",
+			"`it used to be` in a code span",
+			"```\nno longer\nformerly\n```",
+			'the phrase "previously" quoted',
+			"the phrase “no longer” quoted",
+			"a Worker that no longer exists",
+			"any more specific rule",
+			"until the visitor consents, or until then",
+			"on 1 May",
+			"why it was chosen",
+		];
+		const markersIn = (source: string) => historyIn(source).map(({ marker }) => marker);
+
+		const missed = Object.entries(TELLS_HISTORY).flatMap(([marker, samples]) =>
+			samples.filter((sample) => !markersIn(sample).includes(marker)).map((sample) => `${marker}: ${sample}`),
+		);
+
+		expect(Object.keys(TELLS_HISTORY).sort()).toEqual(Object.keys(HISTORY_MARKERS).sort());
+		expect(missed).toEqual([]);
+		expect(TELLS_NONE.filter((sample) => historyIn(sample).length > 0)).toEqual([]);
+	});
 });
 
 interface Comment {
@@ -3258,6 +3342,309 @@ describe("the colours of apps/web are drawn from the token files", () => {
 		const offenders = scanned.filter((path) => !COLOUR_TOKEN_FILES.has(path)).flatMap((path) => sitesIn(path));
 
 		expect(offenders).toEqual([]);
+	});
+});
+
+describe("the custom properties of apps/web are declared where something sets them", () => {
+	const NAME = "--[A-Za-z0-9_-]+";
+	const VAR_READ = new RegExp(String.raw`var\(\s*(${NAME})`, "g");
+	const SHORTHAND_READ = new RegExp(String.raw`\(\s*(?:[a-z-]+:)?(${NAME})\s*\)`, "g");
+	const BRACKET_READ = new RegExp(String.raw`\[\s*(${NAME})\s*\]`, "g");
+	const ARBITRARY_PROPERTY = new RegExp(String.raw`\[(${NAME}):`, "g");
+	const CSS_DECLARATION = new RegExp(String.raw`(?<![\w-])(${NAME})\s*:`, "g");
+	const PROPERTY_KEY = new RegExp(`^${NAME}$`);
+	const THEME_INLINE = /@theme\s+inline\s*\{/g;
+	const THEME_DEFAULT = /@theme\s+default\s*\{/;
+	const CSS_COMMENT = /\/\*[\s\S]*?\*\//g;
+	const COLOUR_NAMESPACE = /^--color-/;
+	const LIBRARY_CSS_VARS = /CssVars\.js$/;
+	const LIBRARY_CSS_VAR = new RegExp(`'(${NAME})'`, "g");
+	const BASE_UI = `${WEB}/node_modules/@base-ui/react`;
+	const TAILWIND_THEME = `${WEB}/node_modules/tailwindcss/theme.css`;
+
+	interface Use {
+		name: string;
+		at: string;
+	}
+
+	interface Uses {
+		reads: Use[];
+		declarations: Use[];
+	}
+
+	interface ScanParams {
+		path: string;
+		text: string;
+	}
+
+	interface ReadsInParams {
+		path: string;
+		text: string;
+		lineOf: (index: number) => number;
+	}
+
+	const readsIn = ({ path, text, lineOf }: ReadsInParams): Use[] => {
+		const seen = new Set<string>();
+		return [VAR_READ, SHORTHAND_READ, BRACKET_READ].flatMap((pattern) =>
+			[...text.matchAll(pattern)].flatMap((match) => {
+				const use = { name: match[1] as string, at: `${path}:${lineOf(match.index)}` };
+				const key = `${use.at} ${use.name}`;
+				if (seen.has(key)) return [];
+				seen.add(key);
+				return [use];
+			}),
+		);
+	};
+
+	const lineAt = (text: string) => (index: number) => text.slice(0, index).split("\n").length;
+
+	const blankedLike = (text: string) => text.replace(/[^\n]/g, " ");
+
+	interface ClosingBraceParams {
+		css: string;
+		open: number;
+	}
+
+	const closingBrace = ({ css, open }: ClosingBraceParams) => {
+		let depth = 0;
+		for (let at = open; at < css.length; at += 1) {
+			if (css[at] === "{") depth += 1;
+			if (css[at] === "}") depth -= 1;
+			if (depth === 0) return at + 1;
+		}
+		return css.length;
+	};
+
+	const withoutThemeInline = (css: string) =>
+		[...css.matchAll(THEME_INLINE)]
+			.map((match) => (match.index ?? 0) + match[0].length - 1)
+			.reduce((text, open) => {
+				const close = closingBrace({ css, open });
+				return text.slice(0, open) + blankedLike(text.slice(open, close)) + text.slice(close);
+			}, css);
+
+	const cssUses = ({ path, text }: ScanParams): Uses => {
+		const stripped = text.replace(CSS_COMMENT, blankedLike);
+		const emitted = withoutThemeInline(stripped);
+		return {
+			reads: readsIn({ path, text: stripped, lineOf: lineAt(stripped) }),
+			declarations: [...emitted.matchAll(CSS_DECLARATION)].map((match) => ({
+				name: match[1] as string,
+				at: `${path}:${lineAt(emitted)(match.index)}`,
+			})),
+		};
+	};
+
+	const isText = (node: ts.Node) =>
+		(ts.isStringLiteral(node) ||
+			ts.isNoSubstitutionTemplateLiteral(node) ||
+			ts.isTemplateHead(node) ||
+			ts.isTemplateMiddle(node) ||
+			ts.isTemplateTail(node)) &&
+		!ts.isImportDeclaration(node.parent) &&
+		!ts.isExportDeclaration(node.parent);
+
+	const tsUses = ({ path, text }: ScanParams): Uses => {
+		const parsed = ts.createSourceFile(
+			path,
+			text,
+			ts.ScriptTarget.Latest,
+			true,
+			path.endsWith("x") ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+		);
+		const reads: Use[] = [];
+		const declarations: Use[] = [];
+		const visit = (node: ts.Node) => {
+			const line = parsed.getLineAndCharacterOfPosition(node.getStart(parsed)).line + 1;
+			const at = `${path}:${line}`;
+			if (isText(node)) {
+				const literal = (node as ts.StringLiteral).text;
+				reads.push(...readsIn({ path, text: literal, lineOf: () => line }));
+				declarations.push(
+					...[...literal.matchAll(ARBITRARY_PROPERTY)].map((match) => ({ name: match[1] as string, at })),
+				);
+			}
+			if (ts.isPropertyAssignment(node)) {
+				const key = ts.isStringLiteralLike(node.name) ? node.name.text : undefined;
+				if (key !== undefined && PROPERTY_KEY.test(key)) declarations.push({ name: key, at });
+				const font =
+					ts.isIdentifier(node.name) && node.name.text === "variable" && ts.isStringLiteralLike(node.initializer);
+				if (font && PROPERTY_KEY.test((node.initializer as ts.StringLiteral).text))
+					declarations.push({ name: (node.initializer as ts.StringLiteral).text, at });
+			}
+			if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
+				const [first] = node.arguments;
+				if (first !== undefined && ts.isStringLiteralLike(first) && PROPERTY_KEY.test(first.text)) {
+					if (node.expression.name.text === "setProperty") declarations.push({ name: first.text, at });
+					if (node.expression.name.text === "getPropertyValue") reads.push({ name: first.text, at });
+				}
+			}
+			ts.forEachChild(node, visit);
+		};
+		visit(parsed);
+		return { reads, declarations };
+	};
+
+	const filesUnder = (folder: string): string[] =>
+		readdirSync(join(ROOT, folder), { withFileTypes: true }).flatMap((entry) =>
+			entry.isDirectory() ? filesUnder(`${folder}/${entry.name}`) : [`${folder}/${entry.name}`],
+		);
+
+	const declaredNames = (css: string) => [...css.matchAll(CSS_DECLARATION)].map((match) => match[1] as string);
+
+	const libraryNames = filesUnder(BASE_UI)
+		.filter((file) => LIBRARY_CSS_VARS.test(file))
+		.flatMap((file) => [...read(file).matchAll(LIBRARY_CSS_VAR)].map((match) => match[1] as string));
+
+	const themeText = read(TAILWIND_THEME);
+	const themeOpen = THEME_DEFAULT.exec(themeText);
+	const themeBlock = themeOpen
+		? themeText.slice(
+				themeOpen.index,
+				closingBrace({ css: themeText, open: themeOpen.index + themeOpen[0].length - 1 }),
+			)
+		: "";
+	const tailwindNames = declaredNames(themeBlock).filter((name) => !COLOUR_NAMESPACE.test(name));
+
+	const stylesheets = trackedFiles.filter((path) => path.startsWith(`${WEB_SRC}/`) && path.endsWith(".css"));
+	const scanned: Uses[] = [
+		...webProduction.map((path) => tsUses({ path, text: read(path) })),
+		...stylesheets.map((path) => cssUses({ path, text: read(path) })),
+	];
+	const reads = scanned.flatMap((uses) => uses.reads);
+	const sheetNames = stylesheets.flatMap((path) =>
+		cssUses({ path, text: read(path) }).declarations.map((use) => use.name),
+	);
+	const setterNames = webProduction.flatMap((path) =>
+		tsUses({ path, text: read(path) }).declarations.map((use) => use.name),
+	);
+
+	const declared = new Set([...sheetNames, ...setterNames, ...libraryNames, ...tailwindNames]);
+
+	interface UndeclaredParams {
+		uses: Uses[];
+		known: Set<string>;
+	}
+
+	const undeclared = ({ uses, known }: UndeclaredParams) => {
+		const own = new Set([...known, ...uses.flatMap((use) => use.declarations.map((declaration) => declaration.name))]);
+		return uses.flatMap((use) =>
+			use.reads.filter((read) => !own.has(read.name)).map((read) => `${read.at} ${read.name}`),
+		);
+	};
+
+	it("flags a read nothing declares and passes one a stylesheet, a style key, an arbitrary property or a setter declares", () => {
+		interface SyntheticParams {
+			source?: string;
+			css?: string;
+		}
+
+		const synthetic = ({ source = "", css = "" }: SyntheticParams) =>
+			undeclared({
+				uses: [tsUses({ path: "synthetic.tsx", text: source }), cssUses({ path: "synthetic.css", text: css })],
+				known: new Set(),
+			});
+		const inSource = (source: string) => synthetic({ source });
+		const inCss = (css: string) => synthetic({ css });
+
+		expect(inSource('<p className="text-[var(--color-brand-paper)] w-(--missing) h-[--legacy]" />')).toEqual([
+			"synthetic.tsx:1 --color-brand-paper",
+			"synthetic.tsx:1 --missing",
+			"synthetic.tsx:1 --legacy",
+		]);
+		expect(
+			synthetic({ source: '<p className="text-[var(--declared)]" />', css: ":root { --declared: red; }" }),
+		).toEqual([]);
+		expect(inSource('<p style={{ "--tint": tint }} className="bg-(--tint) text-[var(--tint)]" />')).toEqual([]);
+		expect(inSource('<p className="[--delay:20s] animate-[spin_var(--delay)_linear]" />')).toEqual([]);
+		expect(inSource('node.style.setProperty("--live", "1"); const css = "var(--live)";')).toEqual([]);
+		expect(inSource('const font = { variable: "--font-x" }; const css = "var(--font-x)";')).toEqual([]);
+		expect(inSource('node.getPropertyValue("--read-by-js")')).toEqual(["synthetic.tsx:1 --read-by-js"]);
+		expect(inSource('<p className="w-[calc(var(--a)+(--spacing(4)))]" />')).toEqual(["synthetic.tsx:1 --a"]);
+		expect(inCss(".a { width: var(--nowhere); }")).toEqual(["synthetic.css:1 --nowhere"]);
+		expect(inCss("@apply scrollbar-thumb-(--thumb);")).toEqual(["synthetic.css:1 --thumb"]);
+	});
+
+	it("takes a variable only an @theme inline block declares for undeclared, because Tailwind inlines it and never emits the property", () => {
+		const bridged =
+			":root { --real: red; }\n@theme inline {\n\t--color-real: var(--real);\n}\n.a { color: var(--color-real); }";
+
+		expect(undeclared({ uses: [cssUses({ path: "synthetic.css", text: bridged })], known: new Set() })).toEqual([
+			"synthetic.css:5 --color-real",
+		]);
+	});
+
+	it("reads a census that holds every kind of declaration the tree makes", () => {
+		expect(webProduction.length).toBeGreaterThan(300);
+		expect(stylesheets.length).toBeGreaterThan(5);
+		expect(reads.length).toBeGreaterThan(150);
+		expect(new Set(sheetNames).size).toBeGreaterThan(150);
+		expect(new Set(setterNames).size).toBeGreaterThan(6);
+		expect(new Set(libraryNames).size).toBeGreaterThan(30);
+		expect(libraryNames).toEqual(
+			expect.arrayContaining(["--anchor-width", "--available-height", "--transform-origin"]),
+		);
+		expect(tailwindNames.length).toBeGreaterThan(80);
+		expect(tailwindNames).toEqual(expect.arrayContaining(["--spacing", "--container-7xl", "--text-sm", "--shadow-lg"]));
+		expect(tailwindNames.filter((name) => COLOUR_NAMESPACE.test(name))).toEqual([]);
+	});
+
+	it("declares every custom property a class, a style or a stylesheet reads, in a token file, in the code that sets it or in the library that does", () => {
+		expect(undeclared({ uses: scanned, known: declared })).toEqual([]);
+	});
+});
+
+describe("the stylesheet apps/web ships is built from the sources it ships", () => {
+	const ENTRY = `${WEB_SRC}/ui/styles/index.css`;
+	const SOURCE_NOT = /^@source not .*$/gm;
+	const NOT_SHIPPED = /\.test\.tsx?$|\.mdx?$|^e2e\//;
+	const PALETTE_UTILITY =
+		/\.(?:bg|text|border|ring|fill|stroke|from|via|to|shadow|decoration|accent|outline|divide|placeholder)-(?:black|white|(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3})(?![\w-])/g;
+	const tailwind = createRequire(createRequire(join(ROOT, WEB, "package.json")).resolve("@tailwindcss/postcss"));
+	const { compile } = tailwind("@tailwindcss/node");
+	const { Scanner } = tailwind("@tailwindcss/oxide");
+
+	const built = async (css: string) => {
+		const compiler = await compile(css, { base: dirname(join(ROOT, ENTRY)), onDependency() {} });
+		const sources = [
+			...(compiler.root === null ? [{ base: join(ROOT, WEB), pattern: "**/*", negated: false }] : []),
+			...compiler.sources,
+		];
+		const scanner = new Scanner({ sources });
+		const candidates: string[] = scanner.scan();
+		const files = (scanner.files as string[]).map((file) => relative(join(ROOT, WEB), file).replace(/\\/g, "/"));
+
+		return { files, css: compiler.build(candidates) as string };
+	};
+
+	const entry = read(ENTRY);
+	const withoutExclusions = entry.replace(SOURCE_NOT, "");
+	const excluded = [...entry.matchAll(/^@source not "([^"]+)";$/gm)].map(([, glob]) => glob as string);
+
+	it("holds a stylesheet that excludes sources, and a build that sees both sides of the exclusion", async () => {
+		const [excluding, including] = await Promise.all([built(entry), built(withoutExclusions)]);
+
+		expect((entry.match(SOURCE_NOT) ?? []).length).toBeGreaterThan(0);
+		expect(excluded.some((glob) => /\bmd\b/.test(glob) && /\bmdx\b/.test(glob))).toBe(true);
+		expect(including.files.filter((file) => NOT_SHIPPED.test(file)).length).toBeGreaterThan(300);
+		expect(excluding.files.length).toBeGreaterThan(400);
+		expect(excluding.files).toEqual(
+			expect.arrayContaining(["src/ui/modules/core/primitives/Button.tsx", "src/app/fonts.ts"]),
+		);
+		expect((including.css.match(PALETTE_UTILITY) ?? []).length).toBeGreaterThan(0);
+	});
+
+	it("scans no test, no end-to-end spec and no Markdown, so a fixture's class names never become shipped rules", async () => {
+		const { files } = await built(entry);
+
+		expect(files.filter((file) => NOT_SHIPPED.test(file))).toEqual([]);
+	});
+
+	it("emits no palette utility, which only a test fixture or a documented example could have asked for", async () => {
+		const { css } = await built(entry);
+
+		expect(css.length).toBeGreaterThan(50_000);
+		expect(css.match(PALETTE_UTILITY) ?? []).toEqual([]);
 	});
 });
 

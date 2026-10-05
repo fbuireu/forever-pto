@@ -1,4 +1,4 @@
-import { ACTIVATION_FAILED, ACTIVATION_PARAM } from "@application/dto/payment/schema";
+import { ACTIVATION_FAILED, ACTIVATION_FRESH, ACTIVATION_PARAM } from "@application/dto/payment/types";
 import { activateWithPayment } from "@application/use-cases/activatePremium";
 import { activatePremiumRequest } from "@infrastructure/api/operations/activatePremium";
 import { resolveClientIp } from "@infrastructure/api/operations/types";
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 	if (paymentIntentId) destination.searchParams.set("payment_intent", paymentIntentId);
 
 	const redirectTo = (activated: boolean) => {
-		if (!activated) destination.searchParams.set(ACTIVATION_PARAM, ACTIVATION_FAILED);
+		destination.searchParams.set(ACTIVATION_PARAM, activated ? ACTIVATION_FRESH : ACTIVATION_FAILED);
 		const response = NextResponse.redirect(destination);
 		response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
 		return response;

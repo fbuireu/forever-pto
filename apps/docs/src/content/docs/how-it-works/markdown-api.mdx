@@ -53,13 +53,13 @@ One module states the cache policy, and it is the one that knows the outcome: `m
 | `Cache-Control` | `public, max-age=3600` | `no-store` |
 | `Vary` | `Accept` | `Accept` |
 
-A miss is `no-store` because it used to inherit the hit's hour, and a shared cache would then answer "Not Found" to everyone for that hour. `Vary: Accept` is on both branches: the body served under an HTML URL depends on the `Accept` header, so a cache keyed on the URL alone would hand the Markdown twin to the next visitor asking for HTML.
+A miss is `no-store` because it would otherwise inherit the hit's hour, and a shared cache would then answer "Not Found" to everyone for that hour. `Vary: Accept` is on both branches: the body served under an HTML URL depends on the `Accept` header, so a cache keyed on the URL alone would hand the Markdown twin to the next visitor asking for HTML.
 
 ## Building the page
 
 `apps/web/src/infrastructure/markdown/buildMarkdownPage.ts` reads `SITE_ROUTES`: the same table the sitemap, `robots.txt` and every `generateMetadata` read, with `titleKey` and `descriptionKey` on the row. It strips the locale segment with `routePathFromPathname` and looks the result up with `findRoute`, on an **exact** match:
 
-- **No row**: `null`, which the route turns into a 404. The lookup was once `pathname.includes(path)`, which resolved `/planner-comparison` *as* the planner and `/legal/privacy-policy-2024` as the privacy policy.
+- **No row**: `null`, which the route turns into a 404. A lookup by `pathname.includes(path)` would resolve `/planner-comparison` *as* the planner and `/legal/privacy-policy-2024` as the privacy policy.
 - **`/planner`**: title and description from the `metadata` and `planner` i18n namespaces, a feature list, step-by-step usage, the app version (read from `apps/web/package.json`) and the locale-prefixed planner URL.
 - **The homepage**, a site-level document: features, how it works, a pointer to `GET /api/health`, version and site URL.
 - **Every other listed route**: its title, its description when it has one, the version and its URL.

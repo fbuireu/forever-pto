@@ -21,7 +21,7 @@ Exports: `Switch` (the thumb is an internal sub-component, rendered automaticall
 
 - The root is a Base UI switch rendered through an `m.button`: a 60px-wide pill with 3px frame border and hard shadow. Controlled and uncontrolled modes go through `useControlledState` (`apps/web/src/ui/hooks/useControlledState.tsx`), so `checked`, `defaultChecked` and `onCheckedChange` behave like the rest of the system.
 - The thumb is an `m.div` that translates 28px to the right when checked (via Base UI's `data-checked` attribute) and flips from frame-on-frame to accent-on-frame coloring. The travel uses a linear 0.15s tween.
-- Press feedback is context-driven: the root tracks tap state (`onTapStart`/`onTapCancel`/`onTap`) and shares it with the thumb, which can react through its `pressedAnimation` prop. Pass custom `children` to `Switch` if you want a thumb with icons or a squish animation. Press state is the *only* thing on that context; it used to also carry the checked value and its setter, which nothing read.
+- Press feedback is context-driven: the root tracks tap state (`onTapStart`/`onTapCancel`/`onTap`) and shares it with the thumb, which can react through its `pressedAnimation` prop. Pass custom `children` to `Switch` if you want a thumb with icons or a squish animation. Press state is the *only* thing on that context.
 - Disabled state washes out border, background and shadow with `color-mix` so the hard shadow fades consistently in both themes.
 
 ## Props

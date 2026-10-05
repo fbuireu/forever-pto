@@ -22,6 +22,7 @@ import {
 	use,
 	useCallback,
 	useEffect,
+	useLayoutEffect,
 	useMemo,
 	useRef,
 	useState,
@@ -185,6 +186,14 @@ function AnimateIcon({
 
 	const runGenRef = useRef(0);
 	const cancelledRef = useRef(false);
+	const mountedRef = useRef(false);
+
+	useLayoutEffect(() => {
+		mountedRef.current = true;
+		return () => {
+			mountedRef.current = false;
+		};
+	}, []);
 
 	const bumpGeneration = useCallback(() => {
 		runGenRef.current++;
@@ -254,6 +263,7 @@ function AnimateIcon({
 
 	const startAnim = useCallback(
 		async ({ anim, method = "start" }: StartAnimParams) => {
+			if (!mountedRef.current) return;
 			await Promise.resolve(controls[method](anim)).catch(() => {});
 			statusRef.current = anim;
 		},

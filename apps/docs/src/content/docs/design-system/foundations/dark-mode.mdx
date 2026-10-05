@@ -13,7 +13,7 @@ Theming is a single attribute: `data-theme='dark'` on a root element. No duplica
 
 ## The mechanism
 
-Dark values are declared in `apps/web/src/ui/styles/global/index.css` under a `[data-theme="dark"]` selector that overrides the `:root` light values. In the app, `apps/web/src/ui/modules/providers/AppThemeProvider.tsx` wraps the tree in `next-themes`' `ThemeProvider` configured with `attribute='data-theme'`, a light default, system-preference support, and localStorage persistence (see the file for the exact config). next-themes stamps the attribute on `<html>` before first paint, so there is no flash of the wrong theme.
+Dark values are declared in `apps/web/src/ui/styles/global/index.css` under a `[data-theme="dark"]` selector that overrides the `:root` light values. In the app, `apps/web/src/ui/modules/providers/AppThemeProvider.tsx` wraps the tree in `next-themes`' `ThemeProvider` configured with `attribute={['data-theme', 'class']}`, a light default, system-preference support, and localStorage persistence (see the file for the exact config). next-themes stamps both on `<html>` before first paint, so there is no flash of the wrong theme. The attribute is what the tokens and the `dark:` variant read; the `dark` or `light` class is what `boneyard-js` reads to pick the dark colours of a loading skeleton, which it looks for on `<html>` or an ancestor and nowhere else.
 
 ## Which tokens flip
 

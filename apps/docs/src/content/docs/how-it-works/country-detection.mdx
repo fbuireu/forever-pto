@@ -47,7 +47,7 @@ Every strategy leaves through `normalizeCountryCode` (`apps/web/src/infrastructu
 
 Reads the `cf-ipcountry` request header (`CLOUDFLARE_COUNTRY_HEADER`), which Cloudflare stamps on every request based on the **visitor's** IP. Synchronous, no I/O.
 
-**When the header is present, its answer is final, even an empty one.** Cloudflare sends `XX` or `T1` when it cannot place the visitor, and the strategies below would then locate the Worker's own egress instead. Since no cookie is set on a failure, every navigation from such a visitor used to repeat up to three sequential subrequests for a wrong answer. In production the header is always there, so the two network strategies run only where it is not, which is local development.
+**When the header is present, its answer is final, even an empty one.** Cloudflare sends `XX` or `T1` when it cannot place the visitor, and the strategies below would then locate the Worker's own egress instead. Since no cookie is set on a failure, every navigation from such a visitor would repeat up to three sequential subrequests for a wrong answer if the empty answer were not final. In production the header is always there, so the two network strategies run only where it is not, which is local development.
 
 ### 2. Cloudflare trace (`detectCountryFromCDN`)
 

@@ -32,7 +32,12 @@ No rule below restates these, and a diff that breaks one fails CI:
   reading only the namespaces the client is sent (`clientMessages.test.ts`), the dialog popup's height cap
   (`Dialog.test.tsx`), the overlay layers (`Popover.test.tsx`, `Tooltip.test.tsx`), `BLOCK_MINIMUM` as the lowest
   floor any Strategy applies (`utils/helpers.test.ts`), what each Strategy means over a real calendar
-  (`strategies.test.ts`) and a new obfuscation writing what the old one wrote (`utils/crypto.test.ts`).
+  (`strategies.test.ts`), a new obfuscation writing what the old one wrote (`utils/crypto.test.ts`), the ink on every
+  brand-filled calendar day at AA in both themes (`contrast.test.ts`), the theme written to `<html>` as `data-theme` and
+  as the class a skeleton reads (`AppThemeProvider.document.test.tsx`), one button in the sidebar group whichever way
+  its icon arrives (`SidebarCollapsibleGroup.test.tsx`), an animated icon that asks its controls for nothing while it is
+  unmounted (`Icon.mounted.test.tsx`) and `premium_activated` reported from the activation redirect alone
+  (`PremiumSessionSync.activation.test.tsx`).
 - `pnpm test:docs` ([`tests/docs-consistency.test.ts`](./tests/docs-consistency.test.ts)), which holds every document
   to the claims it can check and holds the code to these:
   - no comment in hand-written source (the TypeScript of both packages, this suite and the root configs, the Astro
@@ -69,6 +74,11 @@ No rule below restates these, and a diff that breaks one fails CI:
     outside the token modules, `ui/styles/global/index.css`, `ui/styles/theme/index.css`, `ui/styles/palette.ts` and
     `application/email/palette.ts`, with no exception for a consumer that cannot read a custom property or for
     generated code; a test may pin a resolved value;
+  - the custom properties: every `var(--x)` read in `apps/web/src`, by a class, a stylesheet or a style key, declared by
+    a stylesheet outside `@theme inline`, a style key, an arbitrary property, `setProperty`, a font's `variable`, a Base
+    UI `CssVars` module or Tailwind's default theme;
+  - the shipped stylesheet: built with Tailwind's own compiler and scanner from `index.css`, it scans no test, no
+    end-to-end spec and no Markdown and emits no palette utility;
   - the code at large: `Temporal` from `temporal-polyfill`, Stripe.js imported through `@stripe/stripe-js/pure` and
     asked for only inside a function (the bare entry and a module-scope ask both fetch the script on every load), no
     `index` module, no declared function or `const` arrow taking two positional parameters in `apps/web`, its tests,
@@ -102,8 +112,9 @@ No rule below restates these, and a diff that breaks one fails CI:
     writes into `pnpm-workspace.yaml`, a `#` counting as a comment when removing it leaves the parsed document
     unchanged;
   - the package scripts: no shell substitution, and a literal base on every changed-only Vitest or Playwright run;
-  - the published wiki: canonical glossary terms outside its landing pages, repo-relative paths, and only constants,
-    tokens, icons and `@ui` exports that exist;
+  - the published wiki: canonical glossary terms outside its landing pages, repo-relative paths, only constants,
+    tokens, icons and `@ui` exports that exist, and no history in the prose (`used to`, `no longer`, `previously`,
+    `any more`, `until now`, a dated event), outside code and quotes;
   - the docs site: every component page's sections in order after its demos and the Live badge on it, every sidebar
     group translated into each locale the site serves, the app's styles brought in through `global.css` and never
     the app's own `index.css`, the consent category and service ids equal to the app's, the consent banner in each
@@ -491,6 +502,14 @@ No rule below restates these, and a diff that breaks one fails CI:
   every page layer (the planner drawer, the mobile sidebar), because until it is answered it must stay within reach,
   and below the dialog its own preferences open in.
 - `S6` **judgement**: Restore a body-level lock in the same effect's cleanup, never in an animation callback.
+- `S7` **hard**: Read a custom property only where something declares it: a token in `global/index.css`, a stylesheet,
+  code that sets it (a style key, an arbitrary property, `setProperty`, a font's `variable`) or a library that does (a
+  Base UI `CssVars` module, Tailwind's default theme). A name only an `@theme inline` block declares does not count,
+  because Tailwind inlines it and never emits the property. An undeclared `var()` resolves to nothing and the property
+  falls back to the inherited value in silence, so a typo or a deleted token ships unnoticed.
+- `S8` **hard**: Keep what the app does not ship out of its stylesheet: `index.css` ends with the `@source not` lines for
+  the test files, the `e2e` folder and the Markdown, because Tailwind scans every file under `apps/web` that git does
+  not ignore, and a class that only a fixture or an example spells becomes a rule in the shipped CSS.
 
 ## Message bundles (`apps/web/src/ui/i18n`)
 
@@ -525,9 +544,11 @@ No rule below restates these, and a diff that breaks one fails CI:
   calls, never where a rehydration or an effect would run it again. A result that lands later is asked for in the
   handler and reported where it lands, only when asked: `planner_generated` counts the plans a person asks for
   (`askForPlan` in the handler, `claimPlanAskedFor` where the worker's answer lands), never a load or a restore, and
-  a Donation the issuer took over lands on the payment confirmation page, whose mount calls `confirmActivation` once
-  to report `premium_activated` on the move into Premium, never on a reload. The one `track()` inside an effect
-  counts a view rather than an interaction: the contact form a `#contact` link opens.
+  a Donation the issuer took over lands on the payment confirmation page, whose mount calls `confirmActivation` once,
+  and only while the redirect's own `activation=fresh` marker is in the address, to report `premium_activated` on the
+  move into Premium; the page removes the marker once the call settles, so a reload, a revisit, a restored session or a
+  visitor whose `localStorage` was cleared reports nothing. The one `track()` inside an effect counts a view rather
+  than an interaction: the contact form a `#contact` link opens.
 - `P2` **hard**: Send ids and machine codes in events (a `PremiumFeatureId`, an `ApiError` code), never translated
   strings, dates, Manual Days, Custom Holiday names or a salary.
 - `P3` **hard**: Read consent per service through `consent.ts` (`acceptedService`), and give a new service its own
@@ -690,6 +711,11 @@ No rule below restates these, and a diff that breaks one fails CI:
 - `G4` **hard**: Write a guide in the present tense, holding what an implementer needs while working; the reason for
   a line goes in the commit message, the pull request, an ADR or a rule here, and history ("used to", "was",
   "until …") stays in git, because a guide is loaded into every session that works in its folder.
+- `G8` **judgement**: Write a published wiki page in the present tense and leave its history to git: a reader needs what
+  the system does and why, so a correction rewrites the sentence instead of narrating the one it replaces ("used to",
+  "no longer", "until …", a dated incident), because the wiki is published and nobody opens its history to learn what is
+  true now. The contract suite fails the plainest of those phrases outside code and quotes; a participle ("used to
+  pre-select") and a state ("no longer exists") are not history, and the rest is a call.
 - `G5` **hard**: Keep `CONTEXT.md` to vocabulary: the term, one or two sentences on what it is, and the words it
   displaces, never how it is built, because mechanism belongs to the folder guide or an ADR.
 - `G6` **hard**: State a rule once: a rule about how code is written here, a coupling or a gotcha in the guide of the

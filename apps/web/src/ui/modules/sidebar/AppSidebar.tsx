@@ -6,11 +6,9 @@ import {
 	SidebarHeader,
 	SidebarInset,
 	SidebarMenu,
-	SidebarMenuButton,
 	SidebarMenuItem,
 	SidebarTrigger,
 } from "@ui/modules/core/animate/base/Sidebar";
-import { ChevronDown } from "@ui/modules/core/animate/icons/ChevronDown";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
 import { Settings } from "@ui/modules/core/animate/icons/Settings";
 import { MAIN_CONTENT_ID } from "@ui/modules/layout/SkipToContent";
@@ -75,15 +73,13 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
 							<SidebarMenuItem>
 								<SidebarCollapsibleGroup
 									defaultOpen
-									trigger={
-										<SidebarMenuButton variant="outline" tooltip={t("steps")}>
-											<AnimateIcon animateOnHover>
-												<Settings className="size-5 shrink-0" />
-											</AnimateIcon>
-											<span className="group-data-[collapsible=icon]:hidden">{t("steps")}</span>
-											<ChevronDown className="ml-auto -rotate-90 transition-transform group-data-[open]/collapsible:rotate-0 group-data-[collapsible=icon]:hidden" />
-										</SidebarMenuButton>
+									icon={
+										<AnimateIcon animateOnHover>
+											<Settings className="size-5 shrink-0" />
+										</AnimateIcon>
 									}
+									label={t("steps")}
+									tooltip={t("steps")}
 								>
 									<div className="px-1 pt-2 pb-1 space-y-[18px]">
 										<div data-tutorial={TUTORIAL_ANCHOR.SIDEBAR_STEP_1} className={STEP_CARD_CLASS}>
@@ -151,15 +147,13 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
 							<SidebarMenuItem>
 								<SidebarCollapsibleGroup
 									data-tutorial={TUTORIAL_ANCHOR.SIDEBAR_TOOLS}
-									trigger={
-										<SidebarMenuButton variant="outline" tooltip={t("tools")}>
-											<AnimateIcon animateOnHover>
-												<Calculator className="size-5 shrink-0" />
-											</AnimateIcon>
-											<span className="group-data-[collapsible=icon]:hidden">{t("calculators")}</span>
-											<ChevronDown className="ml-auto -rotate-90 transition-transform group-data-[open]/collapsible:rotate-0 group-data-[collapsible=icon]:hidden" />
-										</SidebarMenuButton>
+									icon={
+										<AnimateIcon animateOnHover>
+											<Calculator className="size-5 shrink-0" />
+										</AnimateIcon>
 									}
+									label={t("calculators")}
+									tooltip={t("tools")}
 								>
 									<div className="px-1 pt-2 pb-1 space-y-[18px]">
 										<div className={STEP_CARD_CLASS}>

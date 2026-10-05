@@ -130,6 +130,15 @@ around it would report twice. The opposite error comes from a root rendered as `
 [`animate/base/Checkbox.tsx`](./animate/base/Checkbox.tsx) and [`animate/base/Switch.tsx`](./animate/base/Switch.tsx)
 pass it, because Base UI's checkbox and switch default to a `<span>` and log an error in development on a button.
 
+**`CollapsibleTrigger asChild` clones only a valid element.** [`animate/base/Collapsible.tsx`](./animate/base/Collapsible.tsx)
+hands `children` to Base UI as `render` when `isValidElement(children)` holds and otherwise draws its own styled
+`<button>` around them. A node a server component builds and passes down as a prop can reach the client component as a
+lazy reference, which is not a valid element, so the first client pass wraps a `SidebarMenuButton` in a second button
+that the server's markup does not have: nested buttons and a hydration mismatch, intermittent because the chunk may or
+may not have arrived. Build the trigger in the client module that renders the `Collapsible` and give that module the
+pieces it draws, an icon and a label, as [`sidebar/components/SidebarCollapsibleGroup.tsx`](../sidebar/components/SidebarCollapsibleGroup.tsx)
+does; its test hands it a lazy icon and asserts one button.
+
 **`SidebarProvider` is mounted exactly once, in `app/[locale]/(app)/planner/layout.tsx`.** A second one nested
 inside it would give its subtree an independent `open` state that no other consumer sees. `Sidebar.test.tsx`
 walks every `.tsx` under `src/` to assert the single mount site; it is the one test here that reads the rest of
@@ -215,6 +224,15 @@ and `aria-modal="true"` change together if it ever becomes modal. The desktop ra
 **`MotionSlot` calls `m.create(children.type)` inside `useMemo`, keyed on the child's type.** A child
 whose component identity changes between renders (anything defined inline) remints the motion
 component every render and drops the animation state.
+
+**`AnimateIcon` touches its controls only while it is mounted.** A run is asynchronous and outlives the icon: its
+cancelled branches still ask the controls for the first frame after an unmount, and motion's `controls.start()` and
+`controls.set()` throw an invariant in development when the component that owns the controls is not mounted (a no-op
+in production). `startAnim`, the one function every start goes through, returns unless `mountedRef` is set. A layout
+effect sets it, so it flips in the commit phase where motion flips its own `hasMounted`; a `try`/`catch` around the
+call would hide the same message when a caller really misuses the controls.
+[`Icon.mounted.test.tsx`](./animate/icons/Icon.mounted.test.tsx) runs the real controls, which the mocked
+[`Icon.test.tsx`](./animate/icons/Icon.test.tsx) cannot.
 
 ## Testing
 

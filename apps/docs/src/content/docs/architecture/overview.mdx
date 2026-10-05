@@ -19,13 +19,13 @@ Forever PTO is a Next.js App Router application organized into layers under `app
 
 ## Dependency direction
 
-This section used to draw `app → ui → application → domain` with a couple of side arrows, and that picture was read
-off the intent rather than off the tree. Walking every `import`, `import type`, dynamic `import()` and
-`vi.mock` specifier under `apps/web/src` gives **more** production edges between the layers plus
-`middleware.ts` than the old figure drew. The largest one it left out was `app → infrastructure`,
-one of the heaviest edges in the package. It also mixed separate relations under one
-arrow head, labelling infrastructure as *reached through use-cases, services and adapters*: that is a call
-path, not an import, and a diagram whose arrows mean `imports` cannot carry both.
+The diagram and the table below are read off the tree, not off the intent. Walking every `import`, `import type`,
+dynamic `import()` and `vi.mock` specifier under `apps/web/src` gives **more** production edges between the layers
+plus `middleware.ts` than a drawing of the intended layering, such as `app → ui → application → domain` with a
+couple of side arrows, carries. The largest one such a drawing leaves out is `app → infrastructure`, one of the
+heaviest edges in the package. It also mixes separate relations under one arrow head, labelling infrastructure as
+*reached through use-cases, services and adapters*: that is a call path, not an import, and a diagram whose
+arrows mean `imports` cannot carry both.
 
 The table below is the graph, counted from the tree with tests excluded, as `imports/files`. An empty cell is
 an edge that does not exist. `tests/docs-consistency.test.ts` fails when this table and the tree disagree in
@@ -33,8 +33,8 @@ either direction, so it is a measurement rather than a drawing.
 
 | from / to | `app` | `ui` | `application` | `domain` | `infrastructure` |
 | --- | --- | --- | --- | --- | --- |
-| `app` | | 82/16 | 9/6 | | 68/20 |
-| `ui` | | | 172/80 | 25/19 | 52/42 |
+| `app` | | 82/16 | 10/6 | | 68/20 |
+| `ui` | | | 173/80 | 25/19 | 52/42 |
 | `application` | | 1/1 | | 15/8 | 36/11 |
 | `domain` | | | 18/13 | | 12/3 |
 | `infrastructure` | | 7/2 | 35/25 | 7/5 | |
@@ -53,9 +53,9 @@ flowchart LR
   INFRA[infrastructure]
   MW[middleware.ts]
   APP -->|82| UI
-  APP -->|9| APPL
+  APP -->|10| APPL
   APP -->|68| INFRA
-  UI -->|172| APPL
+  UI -->|173| APPL
   UI -->|25| DOM
   UI -->|52| INFRA
   APPL -->|15| DOM
@@ -69,8 +69,8 @@ flowchart LR
   MW -->|5| INFRA
 ```
 
-Read the shape rather than the numbers. These are worth naming, and most of them are arrows the old
-figure said were not there:
+Read the shape rather than the numbers. These are worth naming, and most of them are arrows a drawing of the
+intended layering leaves out:
 
 - **`app` never imports `domain`.** It is the only empty cell a reader would expect to be full, and it is the
   layering claim this package actually keeps: a route handler or a page reaches a business rule through
@@ -81,10 +81,9 @@ figure said were not there:
   records what every alternative costs. `domain → infrastructure` is the payment context composing Effect
   programs against service tags, which is
   [ADR 0003](https://github.com/fbuireu/forever-pto/blob/main/adr/0003-pure-calendar-domain-effectful-payment-domain.md).
-- **`infrastructure` imports upwards too**, and one of those edges was undocumented until this page was
-  corrected: imports in a couple of files reach `apps/web/src/ui/i18n/messages/*.json` through the `@i18n`
-  shorthand. The infrastructure guide said nothing there imports from `@ui/*`, which was true of the literal
-  specifier and false of the layer.
+- **`infrastructure` imports upwards too**: imports in a couple of files reach
+  `apps/web/src/ui/i18n/messages/*.json` through the `@i18n` shorthand. "Nothing in `infrastructure` imports from
+  `@ui/*`" holds for the literal specifier and not for the layer, so the table counts the edge.
 - **`application → ui` is a single import**, `stores/premium.ts` reaching `checkSession`, the known inversion
   `apps/web/src/application/AGENTS.md` records. One is the number; the contract suite fails a second.
 
@@ -98,7 +97,7 @@ The normative statements live in [`CODING_STANDARDS.md`](https://github.com/fbui
 - `U1` and `U2` list the pure value helpers the UI may take from `@domain/calendar` and the infrastructure seams
   it may import, and why it must not reach the planning engine itself.
 
-Facts about the system that no import arrow carries, and that the old figure tried to put on one:
+Facts about the system that no import arrow carries:
 
 - Stores in `apps/web/src/application/stores/` never call SDK clients directly; they delegate to
   `apps/web/src/infrastructure/services/*`.
@@ -131,10 +130,9 @@ Declared in `apps/web/tsconfig.json` (`compilerOptions.paths`), not at the repo 
 | `@styles/*` | `./src/ui/styles/*` |
 | `@i18n/*` | `./src/ui/i18n/*` |
 
-That is the whole list. This page carried extra rows, `@mocks/*` and `@types/*`, pointing at
-`apps/web/src/mocks` and `apps/web/src/types`; neither alias is declared and neither directory exists. The
-rule keeping the same table honest in `apps/web/AGENTS.md` read only that file, so the published copy could
-drift and did. It reads both now.
+That is the whole list: no `@mocks/*` or `@types/*` alias is declared, and neither `apps/web/src/mocks` nor
+`apps/web/src/types` exists. The rule keeping the same table honest reads both `apps/web/AGENTS.md` and this
+page, so the published copy cannot drift.
 
 `@assets`, `@styles` and `@i18n` all point inside `apps/web/src/ui/`: they are shorthands, not separate
 layers, which is why an `@i18n/...` import from `apps/web/src/infrastructure/` is an `infrastructure → ui`

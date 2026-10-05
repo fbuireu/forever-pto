@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PromoCodeErrors } from "./types";
+import { ACTIVATION_PARAM, PromoCodeErrors } from "./types";
 
 interface PaymentSchemaMessages {
 	amountMin: string;
@@ -48,9 +48,6 @@ export const createDonationFormSchemaWithMessages = (messages: PaymentSchemaMess
 export type DonationFormValues = z.input<ReturnType<typeof createDonationFormSchemaWithMessages>>;
 
 export const promoCodeErrorCodeSchema = z.enum(PromoCodeErrors);
-
-export const ACTIVATION_PARAM = "activation";
-export const ACTIVATION_FAILED = "failed";
 
 export const paymentConfirmationQuerySchema = z.object({
 	payment_intent: z.string().optional(),
