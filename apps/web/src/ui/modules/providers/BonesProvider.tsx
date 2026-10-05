@@ -1,13 +1,11 @@
 "use client";
+import { BONES_COLORS } from "@styles/palette";
 import { configureBoneyard } from "boneyard-js/react";
 import "@ui/modules/bones/registry";
 
 configureBoneyard({
 	animate: "shimmer",
-	color: "#fff8ee",
-	darkColor: "#1e1914",
-	shimmerColor: "#fffdf8",
-	darkShimmerColor: "#241e18",
+	...BONES_COLORS,
 	boneClass: "boneyard-bordered",
 	transition: true,
 });

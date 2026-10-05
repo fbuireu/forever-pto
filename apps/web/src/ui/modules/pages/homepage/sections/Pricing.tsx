@@ -55,7 +55,7 @@ export const Pricing = async () => {
 						).map((key) => (
 							<li
 								key={key}
-								className="flex gap-2.5 py-2 border-b-[2px] border-dashed border-black/15 last:border-b-0 text-[15px]"
+								className="flex gap-2.5 py-2 border-b-[2px] border-dashed border-divider last:border-b-0 text-[15px]"
 							>
 								<span className="font-black">✓</span>{" "}
 								{key === "pricing.freeFeatures.strategies" ? t(key, { count: STRATEGY_COUNT }) : t(key)}
@@ -104,7 +104,7 @@ export const Pricing = async () => {
 						).map((key) => (
 							<li
 								key={key}
-								className="flex gap-2.5 py-2 border-b-[2px] border-dashed border-black/15 last:border-b-0 text-[15px]"
+								className="flex gap-2.5 py-2 border-b-[2px] border-dashed border-shade/15 last:border-b-0 text-[15px]"
 							>
 								<span className="font-black">✓</span> {t(key)}
 							</li>
@@ -113,7 +113,7 @@ export const Pricing = async () => {
 					<SupportButton
 						source={DonateSource.PRICING}
 						label={t("pricing.lifetimeCta")}
-						className="w-full justify-center !bg-[var(--color-brand-ink)] !text-white !border-transparent !shadow-[var(--shadow-brutal-btn-orange)] hover:!shadow-[var(--shadow-brutal-btn-orange-hover)] active:!shadow-[var(--shadow-brutal-btn-orange-active)]"
+						className="w-full justify-center !bg-[var(--color-brand-ink)] !text-on-fill !border-transparent !shadow-[var(--shadow-brutal-btn-orange)] hover:!shadow-[var(--shadow-brutal-btn-orange-hover)] active:!shadow-[var(--shadow-brutal-btn-orange-active)]"
 					/>
 				</div>
 			</div>

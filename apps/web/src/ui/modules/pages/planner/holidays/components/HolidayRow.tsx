@@ -27,7 +27,7 @@ const HolidayRowComponent = ({ holiday, isSelected, locale, onToggle }: HolidayR
 		return {
 			isWeekdayHoliday: !isWeekendDay,
 			variant: isWeekendDay ? ("destructive" as const) : ("default" as const),
-			className: cn(!isWeekendDay && "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"),
+			className: cn(!isWeekendDay && "bg-workday-surface text-workday-ink"),
 		};
 	};
 

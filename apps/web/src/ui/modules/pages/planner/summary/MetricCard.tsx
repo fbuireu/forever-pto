@@ -46,56 +46,52 @@ type MetricCardProps = DefaultMetricCardProps | CompactMetricCardProps;
 
 const COLOR_SCHEMES = {
 	blue: {
-		bg: "bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_16%,black_84%)]",
-		icon: "text-[var(--color-brand-teal-deep)] dark:text-teal-300",
-		text: "text-[var(--color-brand-teal-deep)] dark:text-teal-200",
-		badge:
-			"bg-[color-mix(in_srgb,var(--color-brand-teal)_30%,white_70%)] text-[var(--color-brand-teal-deep)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_22%,black_78%)]",
+		bg: "bg-wash-teal",
+		icon: "text-wash-teal-icon",
+		text: "text-wash-teal-title",
+		badge: "bg-wash-teal-badge text-[var(--color-brand-teal-deep)]",
 	},
 	green: {
-		bg: "bg-[color-mix(in_srgb,var(--color-brand-yellow)_26%,white_74%)] dark:bg-[color-mix(in_srgb,var(--color-brand-yellow)_18%,black_82%)]",
-		icon: "text-[var(--color-brand-yellow-deep)] dark:text-yellow-300",
-		text: "text-[var(--color-brand-yellow-deep)] dark:text-yellow-200",
-		badge:
-			"bg-[color-mix(in_srgb,var(--color-brand-yellow)_40%,white_60%)] text-[var(--color-brand-yellow-deep)] dark:bg-[color-mix(in_srgb,var(--color-brand-yellow)_22%,black_78%)]",
+		bg: "bg-wash-yellow",
+		icon: "text-wash-yellow-icon",
+		text: "text-wash-yellow-title",
+		badge: "bg-wash-yellow-badge text-[var(--color-brand-yellow-deep)]",
 	},
 	purple: {
-		bg: "bg-[color-mix(in_srgb,var(--color-brand-purple)_20%,white_80%)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]",
-		icon: "text-[var(--color-brand-purple-deep)] dark:text-purple-300",
-		text: "text-[var(--color-brand-purple-deep)] dark:text-purple-200",
-		badge:
-			"bg-[color-mix(in_srgb,var(--color-brand-purple)_32%,white_68%)] text-[var(--color-brand-purple-deep)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_22%,black_78%)]",
+		bg: "bg-wash-purple",
+		icon: "text-wash-purple-icon",
+		text: "text-wash-purple-title",
+		badge: "bg-wash-purple-badge text-[var(--color-brand-purple-deep)]",
 	},
 	amber: {
-		bg: "bg-[color-mix(in_srgb,var(--color-brand-orange)_20%,white_80%)] dark:bg-[color-mix(in_srgb,var(--color-brand-orange)_18%,black_82%)]",
-		icon: "text-[var(--color-brand-orange-deep)] dark:text-orange-300",
-		text: "text-[var(--color-brand-orange-deep)] dark:text-orange-200",
-		badge:
-			"bg-[color-mix(in_srgb,var(--color-brand-orange)_32%,white_68%)] text-[var(--color-brand-orange-deep)] dark:bg-[color-mix(in_srgb,var(--color-brand-orange)_22%,black_78%)]",
+		bg: "bg-wash-orange-card",
+		icon: "text-wash-orange-icon",
+		text: "text-wash-orange-title",
+		badge: "bg-wash-orange-badge text-[var(--color-brand-orange-deep)]",
 	},
 	emerald: {
-		bg: "bg-emerald-100 dark:bg-emerald-900/20",
-		icon: "text-emerald-500",
-		text: "text-emerald-700 dark:text-emerald-300",
-		badge: "bg-emerald-200 text-emerald-700 dark:bg-emerald-900/30",
+		bg: "bg-wash-emerald",
+		icon: "text-wash-emerald-icon",
+		text: "text-wash-emerald-title",
+		badge: "bg-wash-emerald-badge text-wash-emerald-badge-ink",
 	},
 	cyan: {
-		bg: "bg-cyan-100 dark:bg-cyan-900/20",
-		icon: "text-cyan-500",
-		text: "text-cyan-700 dark:text-cyan-300",
-		badge: "bg-cyan-200 text-cyan-700 dark:bg-cyan-900/30",
+		bg: "bg-wash-cyan",
+		icon: "text-wash-cyan-icon",
+		text: "text-wash-cyan-title",
+		badge: "bg-wash-cyan-badge text-wash-cyan-badge-ink",
 	},
 	violet: {
-		bg: "bg-violet-100 dark:bg-violet-900/20",
-		icon: "text-violet-500",
-		text: "text-violet-700 dark:text-violet-300",
-		badge: "bg-violet-200 text-violet-700 dark:bg-violet-900/30",
+		bg: "bg-wash-violet",
+		icon: "text-wash-violet-icon",
+		text: "text-wash-violet-title",
+		badge: "bg-wash-violet-badge text-wash-violet-badge-ink",
 	},
 	rose: {
-		bg: "bg-rose-100 dark:bg-rose-900/20",
-		icon: "text-rose-500",
-		text: "text-rose-700 dark:text-rose-300",
-		badge: "bg-rose-200 text-rose-700 dark:bg-rose-900/30",
+		bg: "bg-wash-rose",
+		icon: "text-wash-rose-icon",
+		text: "text-wash-rose-title",
+		badge: "bg-wash-rose-badge text-wash-rose-badge-ink",
 	},
 };
 

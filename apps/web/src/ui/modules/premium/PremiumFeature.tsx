@@ -109,7 +109,7 @@ export const PremiumFeature = ({
 								<Lock className={cn(iconSize, "text-foreground")} />
 							</div>
 							{inlineDescription && (
-								<div className="text-sm text-foreground dark:[text-shadow:0_2px_4px_rgba(0,0,0,1)]">{description}</div>
+								<div className="text-sm text-foreground dark:[text-shadow:0_2px_4px_var(--shade)]">{description}</div>
 							)}
 						</div>
 					)}

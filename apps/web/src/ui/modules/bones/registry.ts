@@ -6,14 +6,7 @@ import _calendar_list from "./calendar-list.bones.json";
 import _planner_panel from "./planner-panel.bones.json";
 import _summary from "./summary.bones.json";
 
-configureBoneyard({
-	color: "#fff8ee",
-	darkColor: "#1e1914",
-	animate: "shimmer",
-	shimmerColor: "#fffdf8",
-	darkShimmerColor: "#241e18",
-	transition: true,
-});
+configureBoneyard({ animate: "shimmer", transition: true });
 
 registerBones({
 	"calendar-list": _calendar_list,

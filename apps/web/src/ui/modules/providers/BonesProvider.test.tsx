@@ -1,3 +1,4 @@
+import { BONES_COLORS } from "@styles/palette";
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -17,6 +18,10 @@ describe("BonesProvider", () => {
 			boneClass: "boneyard-bordered",
 			transition: true,
 		});
+	});
+
+	it("takes the four skeleton colours from the palette module, since the generated registry carries none", () => {
+		expect(configuredAtLoad[0]?.[0]).toMatchObject(BONES_COLORS);
 	});
 
 	it("names a light and a dark colour for both the bone and its shimmer", () => {

@@ -92,7 +92,7 @@ interface TimelineRowData {
 const ROW_COLOR = {
 	national: "bg-[var(--color-brand-yellow)]",
 	regional: "bg-[var(--color-brand-yellow)]",
-	custom: "bg-[color-mix(in_srgb,var(--color-brand-purple)_28%,white_72%)]",
+	custom: "bg-day-custom",
 	pto: "bg-[var(--color-brand-teal)]",
 	bridges: "bg-[var(--color-brand-orange)]",
 	manual: "bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,var(--color-brand-teal)_82%)]",

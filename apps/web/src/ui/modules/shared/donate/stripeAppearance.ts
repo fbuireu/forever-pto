@@ -1,32 +1,5 @@
 import type { Appearance } from "@stripe/stripe-js";
-
-const LIGHT_PALETTE = {
-	surface: "#FFFDF8",
-	panel: "#FFF5E1",
-	field: "#FFFDF8",
-	fieldHover: "#FFF5E1",
-	foreground: "#0E0E0E",
-	frame: "#0E0E0E",
-	primaryForeground: "#FFFAF0",
-	accent: "#FFD93D",
-	destructive: "#D32F2F",
-	muted: "#6B5E4E",
-	ring: "#FF7A45",
-};
-
-const DARK_PALETTE: typeof LIGHT_PALETTE = {
-	surface: "#1A1612",
-	panel: "#141008",
-	field: "#1A1612",
-	fieldHover: "#241E18",
-	foreground: "#FFF5E1",
-	frame: "#FFF5E1",
-	primaryForeground: "#0E0E0E",
-	accent: "#FFD93D",
-	destructive: "#D32F2F",
-	muted: "#C6B8A5",
-	ring: "#FF7A45",
-};
+import { STRIPE_DARK_PALETTE, STRIPE_LIGHT_PALETTE } from "@styles/palette";
 
 const FONT_SIZE_DESKTOP = "14px";
 const FONT_SIZE_MOBILE = "16px";
@@ -59,7 +32,7 @@ interface StripeAppearanceParams {
 }
 
 export const stripeAppearance = ({ isDark, isMobile }: StripeAppearanceParams): Appearance => {
-	const palette = isDark ? DARK_PALETTE : LIGHT_PALETTE;
+	const palette = isDark ? STRIPE_DARK_PALETTE : STRIPE_LIGHT_PALETTE;
 	const fontSize = isMobile ? FONT_SIZE_MOBILE : FONT_SIZE_DESKTOP;
 	const frameBorder = { borderWidth: "3px", borderStyle: "solid", borderColor: palette.frame };
 	const rest = shadow({ offset: SHADOW.BUTTON, color: palette.frame });

@@ -123,7 +123,7 @@ export const Strategy = () => {
 										{currentStrategy.pros.map((pro) => (
 											<span
 												key={pro}
-												className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded border border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400"
+												className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded border border-positive-base/30 bg-positive-base/10 text-positive-note"
 											>
 												<CheckCircle2 className="size-2.5 shrink-0" />
 												{pro}
@@ -134,7 +134,7 @@ export const Strategy = () => {
 										{currentStrategy.cons.map((con) => (
 											<span
 												key={con}
-												className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded border border-orange-500/30 bg-orange-500/10 text-orange-700 dark:text-orange-400"
+												className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded border border-warning-base/30 bg-warning-base/10 text-warning-note"
 											>
 												<AlertCircle className="size-2.5 shrink-0" />
 												{con}

@@ -13,7 +13,7 @@
 
 	#driver-highlighted-element-stage,
 	#driver-page-overlay {
-		outline: 5000px solid rgba(0, 0, 0, 0.75);
+		outline: 5000px solid color-mix(in srgb, var(--shade) 75%, transparent);
 		outline-offset: 0;
 	}
 
@@ -160,13 +160,13 @@
 	}
 
 	.driver-popover-done-btn {
-		background-color: oklch(52.7% 0.154 150.069) !important;
-		color: white !important;
+		background-color: var(--success) !important;
+		color: var(--on-fill) !important;
 		box-shadow: var(--shadow-brutal-btn) !important;
 	}
 
 	.driver-popover-done-btn:not(:disabled):hover {
-		background-color: oklch(44.8% 0.119 151.328) !important;
+		background-color: var(--success-hover) !important;
 		box-shadow: var(--shadow-brutal-btn-hover) !important;
 		transform: translate(-2px, -2px) !important;
 	}
@@ -254,7 +254,7 @@
 
 	[data-theme="dark"] #driver-highlighted-element-stage,
 	[data-theme="dark"] #driver-page-overlay {
-		outline: 5000px solid rgba(0, 0, 0, 0.85);
+		outline: 5000px solid color-mix(in srgb, var(--shade) 85%, transparent);
 	}
 
 	@container root (max-width: 640px) {

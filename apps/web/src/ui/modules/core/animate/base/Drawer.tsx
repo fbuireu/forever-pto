@@ -16,7 +16,7 @@ function DrawerOverlay({ className, ...props }: ComponentProps<typeof DrawerPrim
 	return (
 		<DrawerPrimitive.Overlay
 			data-slot="drawer-overlay"
-			className={cn("fixed inset-0 z-50 bg-black/50", className)}
+			className={cn("fixed inset-0 z-50 bg-shade/50", className)}
 			{...props}
 		/>
 	);
@@ -34,7 +34,7 @@ function DrawerContent({
 			<DrawerPrimitive.Content
 				data-slot="drawer-content"
 				className={cn(
-					"fixed inset-x-0 bottom-0 z-51 flex flex-col rounded-t-[14px] border-t-[3px] border-x-[3px] border-(--frame) bg-card focus:outline-none max-h-[85dvh] shadow-[0_-3px_16px_0_rgba(0,0,0,0.12)]",
+					"fixed inset-x-0 bottom-0 z-51 flex flex-col rounded-t-[14px] border-t-[3px] border-x-[3px] border-(--frame) bg-card focus:outline-none max-h-[85dvh] shadow-[var(--shadow-drawer)]",
 					className,
 				)}
 				{...props}

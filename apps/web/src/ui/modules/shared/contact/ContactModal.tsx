@@ -236,7 +236,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
 				{step === Step.ERROR && (
 					<StepOutcome
 						tone={StepOutcomeTone.ERROR}
-						icon={<AlertCircle className="size-8 text-white" />}
+						icon={<AlertCircle className="size-8 text-on-fill" />}
 						title={t("errorTitle")}
 						description={errorMessage}
 						onClose={handleClose}

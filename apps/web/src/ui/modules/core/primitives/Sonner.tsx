@@ -27,9 +27,9 @@ const Toaster = ({ closeLabel = "Close toast", ...props }: ToasterOwnProps) => {
 					warning:
 						"![--toast-bg:var(--accent)] !text-[var(--color-brand-ink)] [&_[data-title]]:!text-[var(--color-brand-ink)] [&_[data-description]]:!text-[var(--color-brand-ink)]/70",
 					error:
-						"![--toast-bg:var(--color-brand-red)] !text-white [&_[data-title]]:!text-white [&_[data-description]]:!text-white/80",
+						"![--toast-bg:var(--color-brand-red)] !text-on-fill [&_[data-title]]:!text-on-fill [&_[data-description]]:!text-on-fill/80",
 					info: "![--toast-bg:var(--color-brand-sky)] !text-[var(--color-brand-ink)] [&_[data-title]]:!text-[var(--color-brand-ink)] [&_[data-description]]:!text-[var(--color-brand-ink)]/70",
-					icon: "!size-8 !rounded-[6px] !border-[2.5px] !border-[var(--color-brand-ink)] !bg-white !text-[var(--color-brand-ink)] !font-black !flex !items-center [&_svg]:!m-auto !justify-center",
+					icon: "!size-8 !rounded-[6px] !border-[2.5px] !border-[var(--color-brand-ink)] !bg-on-fill !text-[var(--color-brand-ink)] !font-black !flex !items-center [&_svg]:!m-auto !justify-center",
 					actionButton:
 						"!rounded-[8px] !border-[3px] !border-[var(--frame)] !bg-[var(--color-brand-teal)] !text-[var(--color-brand-ink)] !shadow-[var(--shadow-brutal-xs)]",
 					cancelButton:

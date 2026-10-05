@@ -14,28 +14,28 @@ interface BannerProps {
 
 const COLOR_SCHEMES = {
 	orange: {
-		bg: "bg-[color-mix(in_srgb,var(--color-brand-orange)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-orange)_16%,black_84%)]",
-		icon: "text-[var(--color-brand-orange-deep)] dark:text-orange-300",
-		title: "text-[var(--color-brand-orange-deep)] dark:text-orange-200",
-		message: "text-[var(--color-brand-ink)] dark:text-orange-100",
+		bg: "bg-wash-orange",
+		icon: "text-wash-orange-icon",
+		title: "text-wash-orange-title",
+		message: "text-wash-orange-message",
 	},
 	blue: {
-		bg: "bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_16%,black_84%)]",
-		icon: "text-[var(--color-brand-teal-deep)] dark:text-teal-300",
-		title: "text-[var(--color-brand-teal-deep)] dark:text-teal-200",
-		message: "text-[var(--color-brand-ink)] dark:text-teal-100",
+		bg: "bg-wash-teal",
+		icon: "text-wash-teal-icon",
+		title: "text-wash-teal-title",
+		message: "text-wash-teal-message",
 	},
 	indigo: {
-		bg: "bg-[color-mix(in_srgb,var(--color-brand-purple)_20%,white_80%)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]",
-		icon: "text-[var(--color-brand-purple-deep)] dark:text-purple-300",
-		title: "text-[var(--color-brand-purple-deep)] dark:text-purple-200",
-		message: "text-[var(--color-brand-ink)] dark:text-purple-100",
+		bg: "bg-wash-purple",
+		icon: "text-wash-purple-icon",
+		title: "text-wash-purple-title",
+		message: "text-wash-purple-message",
 	},
 	green: {
-		bg: "bg-[color-mix(in_srgb,var(--color-brand-green)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-green)_16%,black_84%)]",
-		icon: "text-[#3f6212] dark:text-[var(--color-brand-green)]",
-		title: "text-[#3f6212] dark:text-[var(--color-brand-green)]",
-		message: "text-[var(--color-brand-ink)] dark:text-green-100",
+		bg: "bg-wash-green",
+		icon: "text-wash-green-ink",
+		title: "text-wash-green-ink",
+		message: "text-wash-green-message",
 	},
 };
 

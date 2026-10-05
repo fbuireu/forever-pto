@@ -82,7 +82,7 @@ export const PtoDays = () => {
 							<span className="sr-only">{activeSuggestedCount}</span>
 							<SlidingNumber
 								number={activeSuggestedCount}
-								className="font-semibold text-teal-600 dark:text-teal-400"
+								className="font-semibold text-suggested"
 								aria-hidden="true"
 							/>
 						</span>
@@ -91,11 +91,7 @@ export const PtoDays = () => {
 						<span className="text-muted-foreground">{t("manuallySelected")}</span>
 						<span>
 							<span className="sr-only">{manualCount}</span>
-							<SlidingNumber
-								number={manualCount}
-								className="font-semibold text-blue-600 dark:text-blue-400"
-								aria-hidden="true"
-							/>
+							<SlidingNumber number={manualCount} className="font-semibold text-manual" aria-hidden="true" />
 						</span>
 					</div>
 					<div className="h-px bg-border my-2" />
@@ -105,10 +101,7 @@ export const PtoDays = () => {
 							<span className="sr-only">{remaining}</span>
 							<SlidingNumber
 								number={remaining}
-								className={cn(
-									"font-bold text-lg",
-									remaining > 0 ? "text-green-600 dark:text-green-400" : "text-muted-foreground",
-								)}
+								className={cn("font-bold text-lg", remaining > 0 ? "text-positive" : "text-muted-foreground")}
 								aria-hidden="true"
 							/>
 						</span>

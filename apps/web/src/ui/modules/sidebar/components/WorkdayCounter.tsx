@@ -145,14 +145,14 @@ export const WorkdayCounter = () => {
 					</div>
 
 					{reachesUnknownYears && knownHolidayYears && (
-						<p className="text-[11px] text-amber-700 dark:text-amber-400">
+						<p className="text-[11px] text-caution-note">
 							{t("holidaysOutsideRange", { from: knownHolidayYears.first, to: knownHolidayYears.last })}
 						</p>
 					)}
 
-					<div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded text-xs">
-						<p className="text-blue-700 dark:text-blue-400 font-display font-medium">{t("dateRange")}</p>
-						<p className="text-blue-600 dark:text-blue-300">
+					<div className="bg-info-surface p-3 rounded text-xs">
+						<p className="text-info-title font-display font-medium">{t("dateRange")}</p>
+						<p className="text-info-text">
 							{t("selectedRange", {
 								from: formatDate({ date: selectedRange.from, locale, format: "EEEE, MMMM d, yyyy" }),
 								to: formatDate({ date: selectedRange.to, locale, format: "EEEE, MMMM d, yyyy" }),

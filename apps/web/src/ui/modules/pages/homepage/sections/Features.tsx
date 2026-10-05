@@ -120,7 +120,7 @@ export const Features = async () => {
 								className="border-[2.5px] border-[var(--frame)] rounded-[6px] px-2 py-1 font-mono text-[12px] font-semibold"
 								style={{
 									background: alert ? "var(--destructive)" : "var(--background)",
-									color: alert ? "white" : "inherit",
+									color: alert ? "var(--on-fill)" : "inherit",
 								}}
 							>
 								{t(key)}

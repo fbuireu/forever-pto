@@ -32,7 +32,7 @@ export const Comparison = async () => {
 						).map((key) => (
 							<li
 								key={key}
-								className="flex gap-2.5 items-start py-2.5 border-b-[2px] border-dashed border-black/15 last:border-b-0 text-[15px]"
+								className="flex gap-2.5 items-start py-2.5 border-b-[2px] border-dashed border-divider last:border-b-0 text-[15px]"
 							>
 								<span className="font-black text-muted-foreground w-[22px] text-center shrink-0">✗</span>
 								{t(key)}
@@ -62,7 +62,7 @@ export const Comparison = async () => {
 						).map((key) => (
 							<li
 								key={key}
-								className="flex gap-2.5 items-start py-2.5 border-b-[2px] border-dashed border-black/15 last:border-b-0 text-[15px]"
+								className="flex gap-2.5 items-start py-2.5 border-b-[2px] border-dashed border-shade/15 last:border-b-0 text-[15px]"
 							>
 								<span className="font-black w-[22px] text-center shrink-0">✓</span>
 								{key === "comparison.withItems.dayEfficiency"

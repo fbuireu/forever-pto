@@ -58,12 +58,12 @@ export const Testimonials = async ({ locale }: TestimonialsProps) => {
 							>
 								&quot;
 							</span>
-							<div className="text-[#FFB800] tracking-[2px] text-sm mt-2 mb-2.5">★★★★★</div>
+							<div className="text-star tracking-[2px] text-sm mt-2 mb-2.5">★★★★★</div>
 							<p className="font-serif text-[22px] leading-[1.3] mb-4">{text}</p>
 							<div className="flex gap-3 items-center pt-3.5 border-t-[2.5px] border-[var(--frame)]">
 								<div
 									className={cn(
-										"size-[42px] rounded-full border-[3px] border-[var(--frame)] grid place-items-center font-display font-extrabold text-white shrink-0",
+										"size-[42px] rounded-full border-[3px] border-[var(--frame)] grid place-items-center font-display font-extrabold text-on-fill shrink-0",
 										avatarBg,
 									)}
 								>

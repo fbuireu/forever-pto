@@ -119,7 +119,7 @@ export const PremiumRequiredModal = ({
 			<DialogContent className="sm:max-w-md" closeLabel={tA11y("closeDialog")} initialFocus={false}>
 				<DialogHeader>
 					<DialogTitle className="flex items-center gap-2">
-						<Crown className="size-5 text-yellow-500" />
+						<Crown className="size-5 text-crown" />
 						{t("premiumRequired")}
 					</DialogTitle>
 					<Banner icon={Lock} title={t("premiumRequired")} colorScheme="indigo">
@@ -188,7 +188,7 @@ export const PremiumRequiredModal = ({
 				{step === Step.ERROR && (
 					<StepOutcome
 						tone={StepOutcomeTone.ERROR}
-						icon={<AlertCircle className="size-8 text-white" />}
+						icon={<AlertCircle className="size-8 text-on-fill" />}
 						title={t("accessDenied")}
 						description={t("emailNotFound")}
 						onClose={handleClose}

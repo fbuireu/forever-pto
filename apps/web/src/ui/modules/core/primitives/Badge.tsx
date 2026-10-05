@@ -13,7 +13,7 @@ const badgeVariants = cva(
 				secondary:
 					"bg-secondary text-secondary-foreground [a&]:hover:-translate-x-0.5 [a&]:hover:-translate-y-0.5 [a&]:hover:shadow-[var(--shadow-brutal-sm)]",
 				destructive:
-					"bg-destructive text-white [a&]:hover:-translate-x-0.5 [a&]:hover:-translate-y-0.5 [a&]:hover:shadow-[var(--shadow-brutal-sm)]",
+					"bg-destructive text-on-fill [a&]:hover:-translate-x-0.5 [a&]:hover:-translate-y-0.5 [a&]:hover:shadow-[var(--shadow-brutal-sm)]",
 				outline:
 					"bg-[var(--surface-panel)] text-foreground [a&]:hover:-translate-x-0.5 [a&]:hover:-translate-y-0.5 [a&]:hover:bg-[var(--surface-panel-alt)]",
 			},

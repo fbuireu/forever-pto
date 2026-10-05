@@ -35,7 +35,7 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
 							<span className="inline-block bg-[var(--color-brand-teal)] border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[var(--shadow-brutal-xl)] leading-[0.85]">
 								0
 							</span>
-							<span className="inline-block bg-[var(--color-brand-orange)] text-white border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[var(--shadow-brutal-xl)] leading-[0.85]">
+							<span className="inline-block bg-[var(--color-brand-orange)] text-on-fill border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[var(--shadow-brutal-xl)] leading-[0.85]">
 								4
 							</span>
 						</div>

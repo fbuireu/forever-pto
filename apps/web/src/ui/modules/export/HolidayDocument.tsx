@@ -1,15 +1,9 @@
 import type { HolidayDTO } from "@application/dto/holiday/types";
 import { formatDate, getMonth, getYear } from "@application/shared/utils/dates";
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { PDF_PALETTE } from "@styles/palette";
 
-const C = {
-	orange: "#f97316",
-	teal: "#2dd4bf",
-	ink: "#0e0e0e",
-	paper: "#fafaf7",
-	muted: "#71717a",
-	border: "#d4d4d8",
-} as const;
+const C = PDF_PALETTE;
 
 const s = StyleSheet.create({
 	page: {

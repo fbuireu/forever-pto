@@ -24,8 +24,9 @@ The `[data-theme="dark"]` block overrides:
 - **Surfaces**: `--surface-panel`, `--surface-panel-alt` and `--surface-panel-soft` move from warm creams to warm near-blacks.
 - **Muted/secondary pairs** and `--accent-foreground` (re-pinned to brand ink so text on yellow stays readable).
 - **Effects**: `--grid-color` and `--page-glow` get slightly stronger to survive the dark background.
+- **Role tokens**: the tones (`--positive`, `--efficiency`, `--caution`…), the washes (`--wash-teal`…) and `--divider` re-pick their step in dark, so a component writes one class and no `dark:` pair.
 
-What does **not** flip: the brand palette (`--color-brand-*`), `--accent` (brand yellow in both themes), `--destructive`, and `--radius`. The identity colors are constants; only the paper and ink swap.
+What does **not** flip: the brand palette (`--color-brand-*`), `--accent` (brand yellow in both themes), `--destructive`, `--radius`, and the fixed role tokens (`--on-fill`, `--shade`, `--success`, the terminal greys). The identity colors are constants; only the paper and ink swap.
 
 ## The Tailwind side
 

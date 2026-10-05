@@ -37,7 +37,7 @@ function TerminalLine({ line }: TerminalLineProps) {
 		const [, ts, level, rest] = m;
 		return (
 			<div>
-				<span className="text-[#666]">{ts} </span>
+				<span className="text-terminal-dim">{ts} </span>
 				<span className="font-bold inline-block min-w-[3.5em]" style={{ color: LEVEL_COLORS[level as LogLevel] }}>
 					{level}
 				</span>
@@ -54,8 +54,8 @@ function TerminalLine({ line }: TerminalLineProps) {
 		);
 	}
 
-	if (line.startsWith("  at ")) return <div className="text-[#666]">{line}</div>;
-	if (line === "---") return <div className="text-[#444]">---</div>;
+	if (line.startsWith("  at ")) return <div className="text-terminal-dim">{line}</div>;
+	if (line === "---") return <div className="text-terminal-faint">---</div>;
 
 	if (line.startsWith("$ ")) {
 		const content = line.slice(2);
@@ -154,7 +154,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
 				<div className="max-w-[1320px] mx-auto grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-[60px] px-7 items-center">
 					<div className="flex flex-col">
 						<div className="flex items-start gap-[10px] mb-[26px] font-display font-extrabold tracking-[-0.06em] leading-[0.82] text-[clamp(90px,13vw,200px)]">
-							<span className="inline-block bg-[var(--color-brand-orange)] text-white border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[var(--shadow-brutal-xl)] leading-[0.85]">
+							<span className="inline-block bg-[var(--color-brand-orange)] text-on-fill border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[var(--shadow-brutal-xl)] leading-[0.85]">
 								5
 							</span>
 							<span className="inline-block bg-[var(--accent)] border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[var(--shadow-brutal-xl)] leading-[0.85]">
@@ -165,7 +165,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
 							</span>
 						</div>
 
-						<span className="inline-flex items-center gap-2 self-start bg-destructive text-white px-3 py-1.5 rounded-[6px] font-mono text-[11px] font-bold tracking-[0.12em] uppercase mb-[14px]">
+						<span className="inline-flex items-center gap-2 self-start bg-destructive text-on-fill px-3 py-1.5 rounded-[6px] font-mono text-[11px] font-bold tracking-[0.12em] uppercase mb-[14px]">
 							<span className="size-2 rounded-full bg-[var(--accent)]" />
 							{t("kicker", { version, time: ts })}
 						</span>
@@ -173,7 +173,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
 						<h1 className="font-display font-semibold leading-none tracking-[-0.035em] mb-[18px] text-wrap-pretty text-[clamp(28px,3.8vw,48px)]">
 							{t.rich("title", {
 								highlight: (chunks) => (
-									<span className="relative inline-block bg-[var(--color-brand-orange)] text-white px-2 border-[3px] border-[var(--frame)] rounded-[6px] mx-0.5 [animation:highlight-shake_4s_ease-in-out_infinite_1.5s]">
+									<span className="relative inline-block bg-[var(--color-brand-orange)] text-on-fill px-2 border-[3px] border-[var(--frame)] rounded-[6px] mx-0.5 [animation:highlight-shake_4s_ease-in-out_infinite_1.5s]">
 										{chunks}
 									</span>
 								),
@@ -212,7 +212,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
 									onClick={() => setContactOpen(true)}
 									className="w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[var(--shadow-brutal-3)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-px active:translate-y-px active:shadow-[var(--shadow-brutal-btn-active)]"
 								>
-									<span className="shrink-0 size-6 bg-[var(--color-brand-purple)] text-white border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold">
+									<span className="shrink-0 size-6 bg-[var(--color-brand-purple)] text-on-fill border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold">
 										@
 									</span>
 									{t("contact")}
@@ -235,7 +235,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
 									className="w-full justify-start gap-2.5 px-3 py-2.5 h-auto text-[13px] border-[2px] shadow-[var(--shadow-brutal-3)] hover:bg-card hover:-translate-x-px hover:-translate-y-px hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-px active:translate-y-px active:shadow-[var(--shadow-brutal-btn-active)]"
 								>
 									<a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer">
-										<span className="shrink-0 size-6 bg-[var(--color-brand-orange)] text-white border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold">
+										<span className="shrink-0 size-6 bg-[var(--color-brand-orange)] text-on-fill border-[2px] border-[var(--frame)] rounded-[6px] grid place-items-center text-[13px] font-extrabold">
 											!
 										</span>
 										{t("support")}
@@ -247,14 +247,16 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
 
 					<div className="flex items-center justify-center">
 						<div className="w-full max-w-[520px] rounded-[14px] overflow-hidden border-[4px] border-[var(--frame)] [box-shadow:var(--shadow-brutal-xl-orange)]">
-							<div className="flex items-center gap-2 bg-[#1a1a1a] border-b-2 border-black/80 px-3.5 py-2.5">
-								<span className="size-3 rounded-full bg-[var(--color-brand-red)] border border-black/20" />
-								<span className="size-3 rounded-full bg-[var(--color-brand-yellow)] border border-black/20" />
-								<span className="size-3 rounded-full bg-[var(--color-brand-green)] border border-black/20" />
-								<span className="ml-auto font-mono text-[11px] text-[#888] tracking-[0.06em]">server.log: pty/0</span>
+							<div className="flex items-center gap-2 bg-terminal-bg border-b-2 border-shade/80 px-3.5 py-2.5">
+								<span className="size-3 rounded-full bg-[var(--color-brand-red)] border border-shade/20" />
+								<span className="size-3 rounded-full bg-[var(--color-brand-yellow)] border border-shade/20" />
+								<span className="size-3 rounded-full bg-[var(--color-brand-green)] border border-shade/20" />
+								<span className="ml-auto font-mono text-[11px] text-terminal-muted tracking-[0.06em]">
+									server.log: pty/0
+								</span>
 							</div>
-							<div ref={terminalRef} className="overflow-y-auto max-h-[420px] bg-[#1a1a1a]">
-								<pre className="font-mono text-[13px] leading-[1.55] text-[#ccc] p-[18px_20px_22px] whitespace-pre-wrap break-words m-0">
+							<div ref={terminalRef} className="overflow-y-auto max-h-[420px] bg-terminal-bg">
+								<pre className="font-mono text-[13px] leading-[1.55] text-terminal-text p-[18px_20px_22px] whitespace-pre-wrap break-words m-0">
 									{traceLines.slice(0, visibleCount).map(({ id, line }) => (
 										<TerminalLine key={id} line={line} />
 									))}

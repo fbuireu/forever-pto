@@ -33,7 +33,7 @@ export const usePlannerDayClick = (onDayToggle: (date: Date) => DayOutcome) => {
 						<SupportButton
 							source={DonateSource.PLANNER_TOAST}
 							label={tPremium("becomePremium")}
-							className="w-full py-3 px-2 !bg-[var(--color-brand-ink)] !text-white !border-transparent !shadow-[var(--shadow-brutal-btn-orange)] hover:!shadow-[var(--shadow-brutal-btn-orange-hover)] active:!shadow-[var(--shadow-brutal-btn-orange-active)]"
+							className="w-full py-3 px-2 !bg-[var(--color-brand-ink)] !text-on-fill !border-transparent !shadow-[var(--shadow-brutal-btn-orange)] hover:!shadow-[var(--shadow-brutal-btn-orange-hover)] active:!shadow-[var(--shadow-brutal-btn-orange-active)]"
 						/>
 					),
 				});

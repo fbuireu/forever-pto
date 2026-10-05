@@ -4,6 +4,7 @@ import type { DiscountInfo } from "@application/dto/payment/types";
 import { usePremiumStore } from "@application/stores/premium";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { ExpressCheckoutElement, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { CONFETTI_COLORS } from "@styles/palette";
 import { ConfirmPaymentOutcome, confirmPayment } from "@ui/adapters/payments/checkout";
 import { ChevronLeft } from "@ui/modules/core/animate/icons/ChevronLeft";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
@@ -29,7 +30,7 @@ async function fireConfetti() {
 	const count = 200;
 	const defaults = {
 		origin: { y: 0.7 },
-		colors: ["#10b981", "#059669", "#047857", "#065f46", "#fbbf24", "#f59e0b", "#d97706", "#b45309"],
+		colors: CONFETTI_COLORS,
 	};
 	interface FireParams {
 		particleRatio: number;
@@ -176,7 +177,7 @@ export function CheckoutForm({ amount, email, discountInfo, onSuccess, onCancel 
 						{formattedAmount}
 					</p>
 					{discountText && (
-						<p className="text-xs text-green-600 dark:text-green-400" aria-live="polite">
+						<p className="text-xs text-positive" aria-live="polite">
 							{discountText}
 						</p>
 					)}

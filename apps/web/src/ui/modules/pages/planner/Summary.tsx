@@ -326,23 +326,23 @@ export const Summary = () => {
 								inlineDescription
 							>
 								<AnimateIcon animateOnHover asChild>
-									<div className="rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,white_82%)] p-4 shadow-[var(--shadow-brutal-sm)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]">
+									<div className="rounded-[10px] border-[3px] border-[var(--frame)] bg-wash-purple-panel p-4 shadow-[var(--shadow-brutal-sm)]">
 										<div className="flex items-center gap-2 mb-3">
 											<Clock className="size-4 text-[var(--color-brand-purple)]" />
-											<span className="text-sm font-display font-medium text-[color-mix(in_srgb,var(--color-brand-purple)_85%,black_15%)] dark:text-[color-mix(in_srgb,var(--color-brand-purple)_70%,white_30%)]">
+											<span className="text-sm font-display font-medium text-wash-purple-figure">
 												{t("yearSummary.title")}
 											</span>
 										</div>
 										<div className="grid grid-cols-3 gap-4 text-center">
 											<div>
 												<div className="text-sm text-muted-foreground">{t("yearSummary.firstBreak")}</div>
-												<div className="text-lg flex justify-center font-display font-bold text-[color-mix(in_srgb,var(--color-brand-purple)_85%,black_15%)] dark:text-[color-mix(in_srgb,var(--color-brand-purple)_70%,white_30%)]">
+												<div className="text-lg flex justify-center font-display font-bold text-wash-purple-figure">
 													<RotatingText text={metrics.firstLastBreak.first} />
 												</div>
 											</div>
 											<div>
 												<div className="text-sm text-muted-foreground">{t("yearSummary.maxWorkStreak")}</div>
-												<div className="text-lg font-display font-bold text-[color-mix(in_srgb,var(--color-brand-purple)_85%,black_15%)] flex justify-center gap-1 dark:text-[color-mix(in_srgb,var(--color-brand-purple)_70%,white_30%)]">
+												<div className="text-lg font-display font-bold text-wash-purple-figure flex justify-center gap-1">
 													{t.rich("yearSummary.daysCount", {
 														count: metrics.maxWorkStreak,
 														n: () => <SlidingNumber number={metrics.maxWorkStreak} />,
@@ -351,19 +351,17 @@ export const Summary = () => {
 											</div>
 											<div>
 												<div className="text-sm text-muted-foreground">{t("yearSummary.lastBreak")}</div>
-												<div className="text-lg font-display font-bold text-[color-mix(in_srgb,var(--color-brand-purple)_85%,black_15%)] dark:text-[color-mix(in_srgb,var(--color-brand-purple)_70%,white_30%)]">
+												<div className="text-lg font-display font-bold text-wash-purple-figure">
 													<RotatingText text={metrics.firstLastBreak.last} />
 												</div>
 											</div>
 										</div>
 										<div className="mt-3 text-center">
 											<div className="text-xs text-muted-foreground mb-1">{t("yearSummary.totalBonusDays")}</div>
-											<div className="text-2xl font-display font-bold text-[color-mix(in_srgb,var(--color-brand-purple)_85%,black_15%)] dark:text-[color-mix(in_srgb,var(--color-brand-purple)_70%,white_30%)] flex justify-center">
+											<div className="text-2xl font-display font-bold text-wash-purple-figure flex justify-center">
 												+<SlidingNumber number={metrics.bonusDays} />
 											</div>
-											<div className="text-xs text-[var(--color-brand-purple)] dark:text-[color-mix(in_srgb,var(--color-brand-purple)_60%,white_40%)]">
-												{t("yearSummary.bonusDaysCaption")}
-											</div>
+											<div className="text-xs text-wash-purple-caption">{t("yearSummary.bonusDaysCaption")}</div>
 										</div>
 									</div>
 								</AnimateIcon>

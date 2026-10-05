@@ -1,6 +1,7 @@
 import type { DiscountInfo } from "@application/dto/payment/types";
 import deMessages from "@i18n/messages/de.json";
 import enMessages from "@i18n/messages/en.json";
+import { CONFETTI_COLORS } from "@styles/palette";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
@@ -45,7 +46,17 @@ vi.mock("@stripe/react-stripe-js", () => ({
 	useStripe: () => ({}),
 }));
 
-const drawingContext = new Proxy({}, { get: () => () => undefined });
+const confettiFills = vi.hoisted(() => new Set<string>());
+const drawingContext = new Proxy(
+	{},
+	{
+		get: () => () => undefined,
+		set: (_target, property, value) => {
+			if (property === "fillStyle") confettiFills.add(String(value));
+			return true;
+		},
+	},
+);
 vi.mock("boneyard-js/react", () => ({ Skeleton: ({ children }: { children: ReactNode }) => <div>{children}</div> }));
 vi.mock("@ui/modules/core/animate/icons/Icon", () => ({
 	AnimateIcon: ({ children }: { children: ReactNode }) => <div>{children}</div>,
@@ -243,6 +254,7 @@ const succeeds = () =>
 	});
 
 beforeEach(() => {
+	confettiFills.clear();
 	vi.mocked(track).mockClear();
 	vi.mocked(confirmPayment).mockReset();
 	premiumState.setPremiumStatus.mockClear();
@@ -267,6 +279,20 @@ describe("a payment that goes through", () => {
 				premiumKey: "key_123",
 			}),
 		);
+	});
+
+	it("throws the confetti in the palette module's colours, since the canvas cannot read a custom property", async () => {
+		succeeds();
+		const { submit } = renderCheckout();
+		const channels = (hex: string) =>
+			[1, 3, 5].map((start) => Number.parseInt(hex.slice(start, start + 2), 16)).join(", ");
+		const palette = CONFETTI_COLORS.map(channels);
+
+		submit();
+
+		await waitFor(() => expect(confettiFills.size).toBeGreaterThan(0));
+		const unknown = [...confettiFills].filter((fill) => !palette.some((rgb) => fill.startsWith(`rgba(${rgb}, `)));
+		expect(unknown).toEqual([]);
 	});
 
 	it("reports the amount that was actually taken, and nothing about the payer", async () => {

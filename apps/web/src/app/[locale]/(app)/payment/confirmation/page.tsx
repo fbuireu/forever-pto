@@ -34,12 +34,12 @@ async function PaymentError({ charged, locale }: PaymentErrorProps) {
 	if (charged) {
 		return (
 			<main id={MAIN_CONTENT_ID} className="min-h-screen flex items-center justify-center p-4 bg-background">
-				<Card className="w-full max-w-md border-amber-500/50">
+				<Card className="w-full max-w-md border-caution-base/50">
 					<CardHeader className="text-center">
-						<div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-amber-500/10">
-							<XCircle className="size-6 text-amber-500" />
+						<div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-caution-base/10">
+							<XCircle className="size-6 text-caution-base" />
 						</div>
-						<CardTitle className="text-amber-600 dark:text-amber-400">{t("unconfirmedTitle")}</CardTitle>
+						<CardTitle className="text-caution">{t("unconfirmedTitle")}</CardTitle>
 						<CardDescription>{t("unconfirmedDescription")}</CardDescription>
 					</CardHeader>
 					<CardContent>
@@ -115,12 +115,12 @@ export default async function PaymentConfirmationPage({
 
 	return (
 		<main id={MAIN_CONTENT_ID} className="min-h-screen flex items-center justify-center p-4 bg-background m-auto">
-			<Card className="w-full max-w-md border-green-500/50">
+			<Card className="w-full max-w-md border-positive-base/50">
 				<CardHeader className="text-center">
-					<div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-green-500/10">
-						<CheckCircle2 className="size-6 text-green-500" />
+					<div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-positive-base/10">
+						<CheckCircle2 className="size-6 text-positive-base" />
 					</div>
-					<CardTitle className="text-green-600 dark:text-green-400">{t("title")}</CardTitle>
+					<CardTitle className="text-positive">{t("title")}</CardTitle>
 					<CardDescription>{t("thankYou")}</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-4">
@@ -131,7 +131,7 @@ export default async function PaymentConfirmationPage({
 						</div>
 						<div className="flex justify-between text-sm">
 							<span className="text-muted-foreground">{t("status")}</span>
-							<span className="font-medium text-green-600 dark:text-green-400">{t("confirmed")}</span>
+							<span className="font-medium text-positive">{t("confirmed")}</span>
 						</div>
 						<div className="flex justify-between text-sm">
 							<span className="text-muted-foreground">{t("paymentId")}</span>
@@ -141,8 +141,8 @@ export default async function PaymentConfirmationPage({
 
 					{hasActivated && <PremiumSessionSync />}
 					{hasActivated ? (
-						<div className="rounded-lg bg-green-500/10 border border-green-500/20 p-4 text-sm">
-							<p className="text-green-700 dark:text-green-300">{t("premiumActivated")}</p>
+						<div className="rounded-lg bg-positive-base/10 border border-positive-base/20 p-4 text-sm">
+							<p className="text-positive-strong">{t("premiumActivated")}</p>
 						</div>
 					) : (
 						<div className="rounded-lg bg-destructive/10 border border-destructive/20 p-4 text-sm">
@@ -150,7 +150,7 @@ export default async function PaymentConfirmationPage({
 						</div>
 					)}
 
-					<Button asChild className="w-full bg-green-600 hover:bg-green-700">
+					<Button asChild className="w-full bg-positive-action hover:bg-success">
 						<Link href="/">{t("continueHome")}</Link>
 					</Button>
 				</CardContent>

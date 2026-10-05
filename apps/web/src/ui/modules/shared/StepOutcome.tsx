@@ -27,12 +27,12 @@ const TILE_CLASS: Record<StepOutcomeTone, string> = {
 
 const BADGE_CLASS: Record<StepOutcomeTone, string> = {
 	[StepOutcomeTone.SUCCESS]: "bg-[var(--color-brand-teal)]",
-	[StepOutcomeTone.ERROR]: "bg-destructive text-white",
+	[StepOutcomeTone.ERROR]: "bg-destructive text-on-fill",
 };
 
 const DOT_CLASS: Record<StepOutcomeTone, string> = {
 	[StepOutcomeTone.SUCCESS]: "bg-[var(--color-brand-ink)]",
-	[StepOutcomeTone.ERROR]: "bg-white",
+	[StepOutcomeTone.ERROR]: "bg-on-fill",
 };
 
 interface StepOutcomeProps {

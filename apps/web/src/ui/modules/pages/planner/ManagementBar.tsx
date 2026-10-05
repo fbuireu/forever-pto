@@ -161,10 +161,10 @@ export const ManagementBar = () => {
 										})}
 									</span>
 									<div className="flex items-center gap-2 shrink-0">
-										<span className="font-mono text-sm font-semibold text-green-600 dark:text-green-400">
+										<span className="font-mono text-sm font-semibold text-positive">
 											{tAlt("effectiveDaysCount", { count: effectiveDays })}
 										</span>
-										<span className="font-mono text-sm font-semibold text-purple-600 dark:text-purple-400">
+										<span className="font-mono text-sm font-semibold text-efficiency">
 											{tAlt("efficiencyValue", { efficiency: format.number(efficiency, EFFICIENCY_FORMAT) })}
 										</span>
 									</div>

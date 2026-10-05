@@ -1,4 +1,5 @@
 import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
+import { PDF_PALETTE } from "@styles/palette";
 import { render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -81,6 +82,15 @@ const monthLabels = () =>
 		.map((node) => node.textContent ?? "")
 		.filter((text) => /^[A-Z][a-z]+ \d{4}$/.test(text));
 
+const COLOUR_PROPERTY = /color$/i;
+
+const paintedColours = () =>
+	[...document.querySelectorAll("[data-style]")]
+		.flatMap((node) => [JSON.parse(node.getAttribute("data-style") ?? "null")].flat())
+		.flatMap((style) => Object.entries(style ?? {}))
+		.filter(([property]) => COLOUR_PROPERTY.test(property))
+		.map(([, colour]) => String(colour));
+
 const HOLIDAYS = [
 	holiday({ isoDate: "2026-03-19", name: "Sant Josep" }),
 	holiday({ isoDate: "2026-01-06", name: "Reyes" }),
@@ -102,6 +112,15 @@ describe("HolidayDocument", () => {
 
 		expect(document.querySelector('[data-pdf="document"]')?.getAttribute("data-title")).toBe("Forever PTO 2026");
 		expect(screen.getByText("2026")).toBeTruthy();
+	});
+
+	it("paints only with the palette module's colours, since a PDF cannot read a stylesheet", () => {
+		renderDocument({ holidays: HOLIDAYS, ptoDays: [new Date(2026, 6, 2)] });
+		const palette = new Set<string>(Object.values(PDF_PALETTE));
+		const painted = paintedColours();
+
+		expect(painted.length).toBeGreaterThan(8);
+		expect(painted.filter((colour) => !palette.has(colour))).toEqual([]);
 	});
 
 	it("groups the Holidays by month and puts the months in order", () => {

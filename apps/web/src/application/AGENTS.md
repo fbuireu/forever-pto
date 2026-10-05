@@ -21,6 +21,7 @@ halves share `dto/` and `shared/`, apart from `zodParse.ts` (server) and [`share
 | `stores/` | The Zustand stores and the storage wrapper. See [`stores/AGENTS.md`](./stores/AGENTS.md) | browser |
 | `use-cases/` | The Effect programs that combine more than one service. See [`use-cases/AGENTS.md`](./use-cases/AGENTS.md) | server |
 | [`email/templates/`](./email/templates) | `Contact.tsx`, the React Email document `sendContactEmail` renders to HTML | server |
+| [`email/palette.ts`](./email/palette.ts) | `EMAIL_PALETTE`, the template's colours: a token module, since a mail client reads no custom property | server |
 | `export/` | [`generateIcs.ts`](./export/generateIcs.ts) builds an RFC 5545 calendar string from Holidays and PTO Days; `utils/sanitizer.ts` turns a property into an escaped, folded content line; [`utils/serializers.ts`](./export/utils/serializers.ts) holds the ICS date formats, which live here rather than in the shared date library because nothing else speaks them | browser |
 | `i18n/` | `navigation.ts`: `Link`, `useRouter`, `usePathname` bound to the next-intl routing config, so every internal link carries the locale prefix | browser |
 | [`shared/dto/`](./shared/dto) | [`baseDTO.ts`](./shared/dto/baseDTO.ts), the `BaseDTO<INPUT, OUTPUT, PARAMS>` contract every mapper implements | both |
@@ -42,7 +43,8 @@ action has no Effect context to yield a tag out of, so the stores log through `l
 
 **[`email/templates/Contact.tsx`](./email/templates/Contact.tsx) is the only React in the layer**, and it is not DOM React: its elements
 come from `@react-email/components` and it is rendered to a string by `render()` inside `sendContactEmail`.
-Tailwind classes on it are compiled by React Email's own `Tailwind` wrapper, not by the app's stylesheet.
+Tailwind classes on it are compiled by React Email's own `Tailwind` wrapper, not by the app's stylesheet, and the
+wrapper's theme takes its colours from [`email/palette.ts`](./email/palette.ts).
 
 [`tests/docs-consistency.test.ts`](../../../../tests/docs-consistency.test.ts) counts every cross-layer import
 against the table on the wiki's architecture overview, so a new edge fails it until that table changes.

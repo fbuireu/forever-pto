@@ -3049,6 +3049,218 @@ describe("the code keeps the mechanical rules CODING_STANDARDS.md hands to this 
 	});
 });
 
+describe("the colours of apps/web are drawn from the token files", () => {
+	const COLOUR_TOKEN_FILES = new Set([
+		`${WEB_SRC}/ui/styles/global/index.css`,
+		`${WEB_SRC}/ui/styles/theme/index.css`,
+		`${WEB_SRC}/ui/styles/palette.ts`,
+		`${WEB_SRC}/application/email/palette.ts`,
+	]);
+	const PALETTE_HUES =
+		"slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose";
+	const COLOUR_UTILITIES =
+		"bg|text|border(?:-[xytrblse])?|ring(?:-offset)?|outline|fill|stroke|from|via|to|shadow|decoration|accent|caret|divide|placeholder|inset-ring|inset-shadow|drop-shadow|scrollbar-thumb|scrollbar-track";
+	const LITERAL_COLOUR_PATTERNS = [
+		/(?<![A-Za-z0-9&/-])#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})(?![A-Za-z0-9-])/gi,
+		/(?<![A-Za-z0-9-])(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/g,
+		new RegExp(
+			String.raw`(?<![A-Za-z0-9-])(?:${COLOUR_UTILITIES})-(?:black|white|(?:${PALETTE_HUES})-\d{2,3})(?![A-Za-z0-9-])`,
+			"g",
+		),
+		/(?<![A-Za-z0-9#.-])(?:white|black)(?![A-Za-z0-9-])/g,
+	];
+	const CSS_NAMED_COLOURS = new Set(
+		"aliceblue antiquewhite aqua aquamarine azure beige bisque blanchedalmond blue blueviolet brown burlywood cadetblue chartreuse chocolate coral cornflowerblue cornsilk crimson cyan darkblue darkcyan darkgoldenrod darkgray darkgreen darkgrey darkkhaki darkmagenta darkolivegreen darkorange darkorchid darkred darksalmon darkseagreen darkslateblue darkslategray darkslategrey darkturquoise darkviolet deeppink deepskyblue dimgray dimgrey dodgerblue firebrick floralwhite forestgreen fuchsia gainsboro ghostwhite gold goldenrod gray green greenyellow grey honeydew hotpink indianred indigo ivory khaki lavender lavenderblush lawngreen lemonchiffon lightblue lightcoral lightcyan lightgoldenrodyellow lightgray lightgreen lightgrey lightpink lightsalmon lightseagreen lightskyblue lightslategray lightslategrey lightsteelblue lightyellow lime limegreen linen magenta maroon mediumaquamarine mediumblue mediumorchid mediumpurple mediumseagreen mediumslateblue mediumspringgreen mediumturquoise mediumvioletred midnightblue mintcream mistyrose moccasin navajowhite navy oldlace olive olivedrab orange orangered orchid palegoldenrod palegreen paleturquoise palevioletred papayawhip peachpuff peru pink plum powderblue purple rebeccapurple red rosybrown royalblue saddlebrown salmon sandybrown seagreen seashell sienna silver skyblue slateblue slategray slategrey snow springgreen steelblue tan teal thistle tomato turquoise violet wheat whitesmoke yellow yellowgreen".split(
+			" ",
+		),
+	);
+	const ARBITRARY_PROPERTY_COLOUR = new RegExp(
+		String.raw`(?<![A-Za-z0-9-])\[(?:[a-z-]*color|background|fill|stroke):(?:${[...CSS_NAMED_COLOURS].join("|")})(?![A-Za-z0-9-])`,
+		"g",
+	);
+	const STYLE_COLOUR_KEYS = new Set([
+		"color",
+		"background",
+		"backgroundColor",
+		"borderColor",
+		"outlineColor",
+		"fill",
+		"stroke",
+		"caretColor",
+		"accentColor",
+		"textDecorationColor",
+		"stopColor",
+		"floodColor",
+		"lightingColor",
+		"borderTopColor",
+		"borderRightColor",
+		"borderBottomColor",
+		"borderLeftColor",
+		"columnRuleColor",
+		"textEmphasisColor",
+		"scrollbarColor",
+		"fillStyle",
+		"strokeStyle",
+		"shadowColor",
+		"colors",
+	]);
+	const CSS_COMMENT = /\/\*[\s\S]*?\*\//g;
+	const CSS_DECLARATION = /([\w-]+)\s*:\s*([^;{}]+)(?=[;}])/g;
+	const CSS_VALUE_WORD = /[a-z]+(?:-[a-z]+)*/g;
+	const CSS_OPAQUE_VALUE = /var\([^)]*\)|url\([^)]*\)|"[^"]*"|'[^']*'/g;
+
+	interface ColourSitesParams {
+		path: string;
+		text: string;
+	}
+
+	interface ColourMatchesParams {
+		text: string;
+		lineOf: (index: number) => number;
+		path: string;
+	}
+
+	const colourMatches = ({ text, lineOf, path }: ColourMatchesParams) =>
+		[...LITERAL_COLOUR_PATTERNS, ARBITRARY_PROPERTY_COLOUR].flatMap((pattern) =>
+			[...text.matchAll(pattern)].map((match) => `${path}:${lineOf(match.index)} ${match[0]}`),
+		);
+
+	const lineNumberOf = (text: string) => (index: number) => text.slice(0, index).split("\n").length;
+
+	const cssColourSites = ({ path, text }: ColourSitesParams) => {
+		const stripped = text.replace(CSS_COMMENT, (comment) => comment.replace(/[^\n]/g, " "));
+		const lineOf = lineNumberOf(stripped);
+		const named = [...stripped.matchAll(CSS_DECLARATION)].flatMap((declaration) =>
+			(declaration[2].replace(CSS_OPAQUE_VALUE, " ").match(CSS_VALUE_WORD) ?? [])
+				.filter((word) => CSS_NAMED_COLOURS.has(word.toLowerCase()))
+				.map((word) => `${path}:${lineOf(declaration.index)} ${word}`),
+		);
+
+		return [...colourMatches({ text: stripped, lineOf, path }), ...named];
+	};
+
+	interface TsColourSitesParams {
+		path: string;
+		parsed: ts.SourceFile;
+	}
+
+	interface StyleKeyParams {
+		node: ts.Node;
+		parsed: ts.SourceFile;
+	}
+
+	const styleKeyOf = ({ node, parsed }: StyleKeyParams): string => {
+		let owner = node;
+		while (
+			ts.isConditionalExpression(owner.parent) ||
+			ts.isParenthesizedExpression(owner.parent) ||
+			ts.isAsExpression(owner.parent) ||
+			ts.isJsxExpression(owner.parent) ||
+			ts.isArrayLiteralExpression(owner.parent) ||
+			(ts.isBinaryExpression(owner.parent) && owner.parent.operatorToken.kind !== ts.SyntaxKind.EqualsToken)
+		)
+			owner = owner.parent;
+
+		const { parent } = owner;
+		if (ts.isPropertyAssignment(parent) || ts.isJsxAttribute(parent)) return parent.name.getText(parsed);
+		if (ts.isBinaryExpression(parent) && parent.right === owner && ts.isPropertyAccessExpression(parent.left))
+			return parent.left.name.text;
+
+		return "";
+	};
+
+	const tsColourSites = ({ path, parsed }: TsColourSitesParams) => {
+		const found: string[] = [];
+		const visit = (node: ts.Node) => {
+			const isText =
+				ts.isStringLiteral(node) ||
+				ts.isNoSubstitutionTemplateLiteral(node) ||
+				ts.isTemplateHead(node) ||
+				ts.isTemplateMiddle(node) ||
+				ts.isTemplateTail(node);
+			if (isText && !ts.isImportDeclaration(node.parent) && !ts.isExportDeclaration(node.parent)) {
+				const lineOf = () => parsed.getLineAndCharacterOfPosition(node.getStart(parsed)).line + 1;
+				found.push(...colourMatches({ text: node.text, lineOf, path }));
+				const key = styleKeyOf({ node, parsed });
+				if (STYLE_COLOUR_KEYS.has(key) && CSS_NAMED_COLOURS.has(node.text.trim().toLowerCase()))
+					found.push(`${path}:${lineOf()} ${node.text}`);
+			}
+			ts.forEachChild(node, visit);
+		};
+		visit(parsed);
+		return found;
+	};
+
+	const sourceOf = (path: string) => ({ path, text: read(path) });
+	const scanned = [
+		...webProduction,
+		...trackedFiles.filter((path) => path.startsWith(`${WEB_SRC}/`) && path.endsWith(".css")),
+	];
+	const sitesIn = (path: string) =>
+		path.endsWith(".css") ? cssColourSites(sourceOf(path)) : tsColourSites({ path, parsed: parse(path) });
+	const synthetic = (source: string) =>
+		tsColourSites({
+			path: "synthetic.tsx",
+			parsed: ts.createSourceFile("synthetic.tsx", source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX),
+		});
+
+	it("flags a palette class, a hex, a colour function, a named colour and a CSS keyword, and passes a token", () => {
+		expect(synthetic('<p className="text-red-500 bg-white border-black/15 dark:text-green-400" />')).toHaveLength(4);
+		expect(synthetic('<p className="bg-[#fff] text-[rgb(0,0,0)] shadow-[0_0_0_2px_#0e0e0e80]" />')).toHaveLength(3);
+		expect(synthetic('<p className="bg-[color-mix(in_srgb,var(--a)_10%,white_90%)]" />')).toHaveLength(1);
+		expect(synthetic('<p style={{ color: "white", background: "var(--card)" }} />')).toHaveLength(1);
+		expect(synthetic('<p style={{ color: "tomato" }} />')).toHaveLength(1);
+		expect(synthetic('<svg fill="crimson"><stop stopColor="gold" /></svg>')).toHaveLength(2);
+		expect(synthetic('<p style={{ color: alert ? "tomato" : "inherit" }} />')).toHaveLength(1);
+		expect(synthetic('<p style={{ color: "inherit" }} data-tone={alert ? "red" : "blue"} />')).toEqual([]);
+		expect(synthetic('context.fillStyle = "red"; context.shadowColor = alert ? "gold" : "inherit";')).toHaveLength(2);
+		expect(synthetic('element.style.color = "tomato"; element.style.borderTopColor = "teal";')).toHaveLength(2);
+		expect(synthetic('element.style.color = "inherit"; element.dataset.tone = "red";')).toEqual([]);
+		expect(synthetic('<Confetti colors={["gold", "hotpink"]} tones={["red"]} />')).toHaveLength(2);
+		expect(
+			synthetic('<p className="[color:red] [background:var(--card)] [fill:currentColor] [mask-type:alpha]" />'),
+		).toHaveLength(1);
+		expect(cssColourSites({ path: "synthetic.css", text: ".a { color: red; border: 1px solid #fff; }" })).toHaveLength(
+			2,
+		);
+		expect(
+			cssColourSites({ path: "synthetic.css", text: ".a { outline: 5000px solid rgba(0, 0, 0, 0.75); }" }),
+		).toHaveLength(1);
+		expect(
+			synthetic(
+				'<p className="bg-card text-positive font-black border-divider bg-[var(--wash-teal)] text-(--x)" href="#contact" style={{ color: "inherit", fill: "currentColor", background: "transparent" }} />',
+			),
+		).toEqual([]);
+		expect(
+			cssColourSites({
+				path: "synthetic.css",
+				text: "/* white #fff */ #cc-main { color: var(--card); background: transparent; }",
+			}),
+		).toEqual([]);
+	});
+
+	it("reads a census that holds the real token file's literals", () => {
+		const tokenSites = [...COLOUR_TOKEN_FILES].flatMap((path) => sitesIn(path));
+
+		expect(scanned.length).toBeGreaterThan(300);
+		expect(scanned.filter((path) => path.endsWith(".css")).length).toBeGreaterThan(5);
+		expect(tokenSites.length).toBeGreaterThan(150);
+		expect(scanned).toEqual(
+			expect.arrayContaining([
+				`${WEB_SRC}/application/email/templates/Contact.tsx`,
+				`${WEB_SRC}/ui/modules/bones/registry.ts`,
+				...COLOUR_TOKEN_FILES,
+			]),
+		);
+	});
+
+	it("draws every colour from the token files, a TSX class, a CSS file or an inline style alike", () => {
+		const offenders = scanned.filter((path) => !COLOUR_TOKEN_FILES.has(path)).flatMap((path) => sitesIn(path));
+
+		expect(offenders).toEqual([]);
+	});
+});
+
 describe("the docs site keeps the rules CODING_STANDARDS.md hands to this suite", () => {
 	const COMPONENT_PAGES = `${DOCS}/src/content/docs/design-system/components/`;
 	const COMPONENT_SECTIONS = ["Props", "Usage", "Conventions", "Accessibility", "In the app"];

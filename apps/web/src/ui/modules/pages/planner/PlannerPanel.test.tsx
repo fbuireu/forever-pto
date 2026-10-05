@@ -187,7 +187,7 @@ describe("PlannerPanel comparing an Alternative to the recommended one", () => {
 		const { container } = renderPanel(<PlannerPanel {...panelProps} allSuggestions={farBehind} selectedIndex={1} />);
 
 		expect(srOnly(container)).toContain("Comparison: 50%");
-		expect(container.querySelector(".text-neutral-600.font-semibold")).not.toBeNull();
+		expect(container.querySelector(".text-comparison-neutral.font-semibold")).not.toBeNull();
 	});
 
 	it("shows no gap and no ratio on the recommended option itself, only its badge", () => {

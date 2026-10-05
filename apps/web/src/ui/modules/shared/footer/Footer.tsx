@@ -31,7 +31,7 @@ export const Footer = async () => {
 					<span className="font-mono text-[11px] text-muted-foreground">
 						{t.rich("version", {
 							version,
-							live: (chunks) => <span className="text-red-500 animate-pulse">{chunks}</span>,
+							live: (chunks) => <span className="text-live animate-pulse">{chunks}</span>,
 						})}
 					</span>
 				</div>

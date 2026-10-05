@@ -129,7 +129,7 @@ function Alternatives({
 							variants={BADGE_VARIANTS}
 							initial="initial"
 							animate="animate"
-							className="mt-1 flex items-center gap-1 rounded-full border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-yellow)_28%,white_72%)] px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-[var(--color-brand-orange-deep)] shadow-[var(--shadow-brutal-xs)]"
+							className="mt-1 flex items-center gap-1 rounded-full border-[3px] border-[var(--frame)] bg-wash-yellow-chip px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-[var(--color-brand-orange-deep)] shadow-[var(--shadow-brutal-xs)]"
 						>
 							<Sparkles size={8} />
 							{t("recommended")}
@@ -158,16 +158,13 @@ function Alternatives({
 			>
 				<m.div
 					{...STAT_CARD_MOTION_CONFIG}
-					className="flex h-11 items-center gap-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_16%,black_84%)]"
+					className="flex h-11 items-center gap-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-wash-teal px-3 py-2 shadow-[var(--shadow-brutal-xs)]"
 				>
 					<span className="sr-only">{t("effectiveDaysReadout", { effectiveDays: effectiveDays ?? 0, bonusDays })}</span>
-					<CalendarDays size={20} className="text-green-600 dark:text-green-400 shrink-0" aria-hidden="true" />
+					<CalendarDays size={20} className="text-positive shrink-0" aria-hidden="true" />
 					<div className="flex items-center gap-1" aria-hidden="true">
-						<SlidingNumber
-							className="text-sm font-semibold text-green-700 dark:text-green-300"
-							number={effectiveDays ?? 0}
-						/>
-						<span className="text-xs text-green-600 dark:text-green-400 flex">
+						<SlidingNumber className="text-sm font-semibold text-positive-strong" number={effectiveDays ?? 0} />
+						<span className="text-xs text-positive flex">
 							(+
 							<SlidingNumber number={bonusDays} />)
 						</span>
@@ -176,7 +173,7 @@ function Alternatives({
 						aria-hidden="true"
 						variants={LABEL_VARIANTS}
 						transition={LABEL_TRANSITION}
-						className="invisible text-sm text-green-600 dark:text-green-400"
+						className="invisible text-sm text-positive"
 					>
 						{t("totalOff")}
 					</m.span>
@@ -184,7 +181,7 @@ function Alternatives({
 
 				<m.div
 					{...STAT_CARD_MOTION_CONFIG}
-					className="flex h-11 items-center gap-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_20%,white_80%)] px-3 py-2 shadow-[var(--shadow-brutal-xs)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_16%,black_84%)]"
+					className="flex h-11 items-center gap-x-2 overflow-hidden whitespace-nowrap rounded-[10px] border-[3px] border-[var(--frame)] bg-wash-purple px-3 py-2 shadow-[var(--shadow-brutal-xs)]"
 				>
 					<span className="sr-only">
 						{t("efficiencyReadout", {
@@ -193,21 +190,16 @@ function Alternatives({
 							difference: format.number(efficiencyDiff, { ...EFFICIENCY_FORMAT, signDisplay: "always" }),
 						})}
 					</span>
-					<TrendingUp size={20} className="text-purple-600 dark:text-purple-400 shrink-0" aria-hidden="true" />
+					<TrendingUp size={20} className="text-efficiency shrink-0" aria-hidden="true" />
 					<div className="flex items-center gap-1" aria-hidden="true">
 						<SlidingNumber
-							className="text-sm font-semibold text-purple-700 dark:text-purple-300"
+							className="text-sm font-semibold text-efficiency-strong"
 							number={parseFloat(efficiency.toFixed(1))}
 							decimalPlaces={1}
 						/>
-						<span className="text-sm font-semibold text-purple-700 dark:text-purple-300">x</span>
+						<span className="text-sm font-semibold text-efficiency-strong">x</span>
 						{!isMainSuggestion && (
-							<span
-								className={cn(
-									"text-xs flex",
-									efficiencyDiff >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400",
-								)}
-							>
+							<span className={cn("text-xs flex", efficiencyDiff >= 0 ? "text-positive" : "text-negative")}>
 								{efficiencyDiff >= 0 ? "+" : ""}
 								<SlidingNumber number={parseFloat(efficiencyDiff.toFixed(1))} decimalPlaces={1} />
 							</span>
@@ -217,7 +209,7 @@ function Alternatives({
 						aria-hidden="true"
 						variants={LABEL_VARIANTS}
 						transition={LABEL_TRANSITION}
-						className="invisible text-sm text-purple-600 dark:text-purple-400"
+						className="invisible text-sm text-efficiency"
 					>
 						{t("efficiency")}
 					</m.span>
@@ -231,23 +223,19 @@ function Alternatives({
 						<span className="sr-only">
 							{t("comparisonReadout", { ratio: format.number(efficiency / mainEfficiency, { style: "percent" }) })}
 						</span>
-						<BarChart3 size={20} className="text-neutral-600 dark:text-neutral-400 shrink-0" aria-hidden="true" />
+						<BarChart3 size={20} className="text-comparison-neutral shrink-0" aria-hidden="true" />
 						<div className="flex items-center gap-1" aria-hidden="true">
 							<SlidingNumber
 								className={cn(
 									"text-sm font-semibold",
-									efficiencyDiff >= -0.5
-										? "text-amber-600 dark:text-amber-400"
-										: "text-neutral-600 dark:text-neutral-400",
+									efficiencyDiff >= -0.5 ? "text-caution" : "text-comparison-neutral",
 								)}
 								number={Math.round((efficiency / mainEfficiency) * 100)}
 							/>
 							<span
 								className={cn(
 									"text-sm font-semibold",
-									efficiencyDiff >= -0.5
-										? "text-amber-600 dark:text-amber-400"
-										: "text-neutral-600 dark:text-neutral-400",
+									efficiencyDiff >= -0.5 ? "text-caution" : "text-comparison-neutral",
 								)}
 							>
 								%
@@ -257,7 +245,7 @@ function Alternatives({
 							aria-hidden="true"
 							variants={LABEL_VARIANTS}
 							transition={LABEL_TRANSITION}
-							className="invisible text-sm text-neutral-600 dark:text-neutral-400"
+							className="invisible text-sm text-comparison-neutral"
 						>
 							{t("vsMain")}
 						</m.span>
@@ -300,11 +288,11 @@ function Status() {
 		<div className="pt-3" data-tutorial={TUTORIAL_ANCHOR.PTO_STATUS}>
 			<div className="flex items-center justify-between flex-wrap gap-4">
 				<div className="flex items-center gap-4 flex-wrap gap-y-2">
-					<div className="flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-teal)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-teal)_25%,black_75%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]">
+					<div className="flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-wash-teal-chip px-3 py-1 shadow-[var(--shadow-brutal-xs)]">
 						<span className="sr-only">
 							{t.rich("suggestedCount", { count: activeSuggestedCount, label: plain, n: plain })}
 						</span>
-						<div className="size-3 rounded-full bg-teal-500" aria-hidden="true" />
+						<div className="size-3 rounded-full bg-suggested-base" aria-hidden="true" />
 						{t.rich("suggestedCount", {
 							count: activeSuggestedCount,
 							label: (chunks) => (
@@ -316,16 +304,16 @@ function Status() {
 								<SlidingNumber
 									aria-hidden="true"
 									number={activeSuggestedCount}
-									className="font-display font-black text-teal-700 dark:text-teal-300"
+									className="font-display font-black text-suggested-strong"
 								/>
 							),
 						})}
 					</div>
-					<div className="flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,white_82%)] dark:bg-[color-mix(in_srgb,var(--color-brand-purple)_25%,black_75%)] px-3 py-1 shadow-[var(--shadow-brutal-xs)]">
+					<div className="flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-wash-purple-chip px-3 py-1 shadow-[var(--shadow-brutal-xs)]">
 						<span className="sr-only">
 							{t.rich("manualCount", { count: manualSelectedCount, label: plain, n: plain })}
 						</span>
-						<div className="size-3 rounded-full bg-blue-500" aria-hidden="true" />
+						<div className="size-3 rounded-full bg-info-base" aria-hidden="true" />
 						{t.rich("manualCount", {
 							count: manualSelectedCount,
 							label: (chunks) => (
@@ -337,7 +325,7 @@ function Status() {
 								<SlidingNumber
 									aria-hidden="true"
 									number={manualSelectedCount}
-									className="font-display font-black text-blue-700 dark:text-blue-300"
+									className="font-display font-black text-manual-strong"
 								/>
 							),
 						})}
@@ -357,16 +345,13 @@ function Status() {
 								n: () => (
 									<SlidingNumber
 										number={remaining}
-										className={cn(
-											"font-display font-black",
-											remaining > 0 ? "text-green-600 dark:text-green-400" : "text-muted-foreground",
-										)}
+										className={cn("font-display font-black", remaining > 0 ? "text-positive" : "text-muted-foreground")}
 									/>
 								),
 							})}
 						</div>
 						{remaining === 0 && !hasManualChanges && (
-							<span className="text-[10px] text-green-700 dark:text-green-400 font-medium" aria-hidden="true">
+							<span className="text-[10px] text-positive-note font-medium" aria-hidden="true">
 								✓ {t("allAssigned")}
 							</span>
 						)}

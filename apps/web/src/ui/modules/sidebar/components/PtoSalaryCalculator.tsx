@@ -149,8 +149,8 @@ export const PtoSalaryCalculator = () => {
 				<div className="space-y-2 w-full bg-muted rounded-md p-3">
 					<div className="space-y-2 w-full">
 						<div className="text-xs">
-							<span className="font-display font-medium text-red-600">{t("valueOfUnusedPto")}</span>
-							<div className="text-lg font-display font-bold text-red-600 flex items-center gap-1">
+							<span className="font-display font-medium text-unused-value">{t("valueOfUnusedPto")}</span>
+							<div className="text-lg font-display font-bold text-unused-value flex items-center gap-1">
 								<CurrencyNumber
 									value={unusedPTOValue}
 									decimalPlaces={0}
@@ -191,8 +191,8 @@ export const PtoSalaryCalculator = () => {
 						{unusedPTODays > 0 && (
 							<>
 								<div className="text-xs">
-									<span className="font-display font-medium text-orange-600">{t("effectiveHourlyRate")}</span>
-									<div className="text-sm font-display font-bold text-orange-600 flex items-center gap-1">
+									<span className="font-display font-medium text-effective-rate">{t("effectiveHourlyRate")}</span>
+									<div className="text-sm font-display font-bold text-effective-rate flex items-center gap-1">
 										<CurrencyNumber
 											value={effectiveHourlyRate}
 											decimalPlaces={2}
@@ -204,9 +204,9 @@ export const PtoSalaryCalculator = () => {
 									<p className="text-muted-foreground">{t("whenWorkingExtraDays", { days: unusedPTODays })}</p>
 								</div>
 
-								<div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded text-xs">
-									<p className="text-blue-700 dark:text-blue-400 font-display font-medium">{t("opportunityCost")}</p>
-									<p className="text-blue-600 dark:text-blue-300">
+								<div className="bg-info-surface p-3 rounded text-xs">
+									<p className="text-info-title font-display font-medium">{t("opportunityCost")}</p>
+									<p className="text-info-text">
 										{t.rich("opportunityCostDescription", {
 											days: unusedPTODays,
 											amount: (_chunks) => (

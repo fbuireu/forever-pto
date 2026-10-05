@@ -64,6 +64,11 @@ No rule below restates these, and a diff that breaks one fails CI:
     `framer-motion`, every `<Skeleton>` fixture repeated as its fallback, no `max-h` or `overflow` on a
     `DialogContent`, `focus:outline-none` only on the programmatically focused drawer panel, and no `track()` inside
     an effect but the view a `#contact` link opens;
+  - the colours: in the TypeScript and CSS of `apps/web/src`, no hex, no colour function (`rgb()`, `oklch()`...), no
+    palette class (`bg-red-500`, `text-black/50`, `border-white`), no `white` or `black` and no CSS colour keyword
+    outside the token modules, `ui/styles/global/index.css`, `ui/styles/theme/index.css`, `ui/styles/palette.ts` and
+    `application/email/palette.ts`, with no exception for a consumer that cannot read a custom property or for
+    generated code; a test may pin a resolved value;
   - the code at large: `Temporal` from `temporal-polyfill`, Stripe.js imported through `@stripe/stripe-js/pure` and
     asked for only inside a function (the bare entry and a module-scope ask both fetch the script on every load), no
     `index` module, no declared function or `const` arrow taking two positional parameters in `apps/web`, its tests,
@@ -469,13 +474,18 @@ No rule below restates these, and a diff that breaks one fails CI:
 ## Styles (`apps/web/src/ui/styles` and component CSS)
 
 - `S1` **hard**: Draw colours, frames and shadows with the tokens in `global/index.css` (`--frame`,
-  `--shadow-brutal-*`, `--color-brand-*`); a literal is wrong in one of the two themes.
+  `--shadow-brutal-*`, `--color-brand-*`, and a role token such as `--positive` or `--wash-teal` for the rest); a
+  literal is wrong in one of the two themes, so a colour with no token gets one named for its role, declared in both
+  themes and mapped in `theme/index.css`, and a consumer that cannot read a custom property (the Stripe iframe, the
+  PDF, the skeletons, the confetti) takes a named constant from `ui/styles/palette.ts`, and the email templates one
+  from `application/email/palette.ts`, never a literal of its own; `palette.test.ts` holds each constant that repeats
+  a token equal to it.
 - `S2` **hard**, *check pending*: Pair every `hover:-translate-*` with `hit-area-stable`, and a hover rotation with
   `hit-area-stable-tilt`, on the element that receives the pointer, so the hit area holds still under it; a child that
   moves on its parent's `group-hover` needs neither.
 - `S3` **hard**: Style nav and footer links with the `quiet-link` utility.
 - `S4` **hard**: Co-locate a stylesheet with the component that imports it; `src/ui/styles/` holds only cross-cutting
-  CSS.
+  CSS and `palette.ts`, the tokens' JS twin.
 - `S5` **hard**: Place overlays on the z-index scale: modal surfaces up to `200`, popover and dropdown positioners at
   `210`, tooltips at `220`, a new transient overlay above `210`. The cookie banner is the exception at `100`, above
   every page layer (the planner drawer, the mobile sidebar), because until it is answered it must stay within reach,
@@ -711,10 +721,11 @@ No rule below restates these, and a diff that breaks one fails CI:
   parameters as the bodies have lines.
 - **Duplicated Code**: `amountFormatter` (a whole-euro choice) and `useCurrencyFormatter` (an amount about to be
   charged) stay two formatting paths.
-- **Duplicated Code**: the Stripe Elements appearance (`stripeAppearance.ts`) repeats theme tokens and the shadow
-  scale by value, and `public/fonts/stripe/` copies the two faces it types in, since the iframe reads neither CSS
-  variables nor `next/font`'s hashed files; the driver.js buttons repeat the `hit-area-stable` insets and `Button`'s
-  variants in `ui/modules/tutorial/driver.css`.
+- **Duplicated Code**: the Stripe Elements appearance (`stripeAppearance.ts`) draws with the palette that
+  `ui/styles/palette.ts` repeats from the theme tokens and repeats the shadow scale by value, and
+  `public/fonts/stripe/` copies the two faces it types in, since the iframe reads neither CSS variables nor
+  `next/font`'s hashed files; the driver.js buttons repeat the `hit-area-stable` insets and `Button`'s variants in
+  `ui/modules/tutorial/driver.css`.
 - **Duplicated Code**: consent is answered through the config callbacks in `CookieConsent.tsx` and heard through
   window events in `BetterStackTracking.tsx`.
 - **Duplicated Code**: `dayKey` (the metrics), `getKey` (the cache) and `dayIndex` (the selector and `measurePlan`)

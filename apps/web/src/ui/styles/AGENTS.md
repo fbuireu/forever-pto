@@ -24,6 +24,8 @@ tutorial CSS only loads when the tutorial does.
 | [`animations/index.css`](./animations/index.css) | `@layer animations`: keyframes, the root view-transition, the reduced-motion block |
 | [`global/index.css`](./global/index.css) | The design tokens: `:root` and the `[data-theme="dark"]` overrides. Deliberately unlayered |
 | [`vendor/index.css`](./vendor/index.css) | `@layer vendor`: `flag-icons`, cookie-consent and boneyard-js overrides, `::selection` |
+| [`palette.ts`](./palette.ts) | The tokens' JS twin: the colours a consumer that cannot read a custom property takes by value (the Stripe iframe, the skeletons, the PDF, the confetti) |
+| [`palette.test.ts`](./palette.test.ts) | Holds `palette.ts` equal to the tokens it repeats, and keeps every colour out of `boneyard.config.json` and the registry generated from it |
 | [`index.test.ts`](./index.test.ts) | Reads the stylesheets as text and guards the invariants a reader is most likely to "tidy away" |
 
 ## The cascade layer order
@@ -76,6 +78,33 @@ All tokens live in `global/index.css`, in tiers:
    and `--radius`.
 3. **The shadow scale**: `--shadow-brutal-*`, hard zero-blur offsets drawn in `--frame`. Because
    `--frame` flips between ink and cream with the theme, every shadow inverts for free.
+4. **Role tokens**: a colour a component needs that no tier above holds, named for the part it plays and declared with
+   both of its values, so the component writes one class (`text-positive`) and no `dark:` pair.
+
+| Family | Tokens | Part they play |
+| --- | --- | --- |
+| Fixed | `--on-fill`, `--shade`, `--success`, `--success-hover`, `--star`, `--crown`, `--live`, `--terminal-*` | White on any solid fill; black taken at an alpha for scrims, hairlines and shadows; the success `Button` green, which the tour's Done button casts; the rating star, the crown and the pulsing dot; the error page's console, dark in both themes |
+| Tones | `--positive`, `--positive-strong`, `--positive-note`, `--positive-base`, `--positive-action`, `--negative`, `--unused-value`, `--caution`, `--caution-note`, `--caution-base`, `--effective-rate`, `--warning-note`, `--warning-base`, `--comparison-neutral` | Text, icon and tinted border of a figure by what it says: the bare name for an icon or a label, `-strong` for a headline figure, `-note` for small print, `-base` for the shade that takes an alpha |
+| Series | `--efficiency*`, `--suggested*`, `--manual*`, `--info-*`, `--workday-*` | The planner's own colours: efficiency, Suggested Days, Manual Days, the information box and the workday badge |
+| Washes | `--wash-<hue>` with its `-chip`, `-card`, `-badge`, `-panel`, `-icon`, `-title`, `-message`, `-ink`, `-figure`, `-caption` and `-badge-ink` parts, `--day-alternative`, `--day-custom` | A brand hue tinted into a surface, toward white in light and toward black in dark, and the ink that reads on it; `Banner`, `MetricCard`, the stat cards and the calendar's day fills draw with them |
+| Overlays | `--divider`, `--dialog-scrim`, `--shadow-drawer`, `--stripe-*`, `--holiday-fill` | The hairline between list rows on a themed surface (black at 15 % in light, the frame at 15 % in dark, where black vanished on the dark panel; a brand-coloured card does not flip, so its rows keep `border-shade/15`), the dialog's backdrop, the drawer's shadow, the hatching on alternative, custom and manual days, and the holiday gradient |
+| Networks | `--social-github`, `--social-linkedin`, `--social-bluesky`, `--social-coffee` | The footer icons' hover colours, which are the networks' own |
+
+`theme/index.css` maps every role token that is a single colour (all but the gradients, the stripes and the networks), so
+`text-positive`, `bg-wash-teal` and `border-divider` are utilities; the rest are read with `var()`, as `--frame` and the
+shadow scale are. A colour with no token gets one in both blocks of `global/index.css`; a literal anywhere else in
+`apps/web/src` fails the contract suite.
+
+**A consumer that cannot read a custom property takes a constant from [`palette.ts`](./palette.ts).** The Stripe
+Elements iframe, `boneyard-js` (which computes with the colour), the PDF renderer and `canvas-confetti` receive a value,
+not a stylesheet: `STRIPE_LIGHT_PALETTE` and `STRIPE_DARK_PALETTE`, `BONES_COLORS`, `PDF_PALETTE` and `CONFETTI_COLORS`.
+`palette.test.ts` holds the Stripe palettes and the skeleton colours equal to the tokens they repeat. `BonesProvider.tsx`
+hands the skeleton colours to `boneyard-js`, so `boneyard.config.json` and the `bones/registry.ts` the CLI generates from
+it carry none. The email has a token module of its own, [`application/email/palette.ts`](../../application/email/palette.ts),
+because the application layer reaches `src/ui` through one module only and a mail client reads no custom property: the
+template hands `EMAIL_PALETTE` to react-email's Tailwind config, which inlines `text-email-ink` and `bg-brand-teal` into
+the message. The four token modules are the only files of `apps/web/src` that hold a colour: the contract suite fails a
+literal in any other, generated or not.
 
 Dark mode overrides a subset of those under `[data-theme="dark"]`. [`AppThemeProvider.tsx`](../modules/providers/AppThemeProvider.tsx) configures
 next-themes with `attribute='data-theme'`, so the attribute lands on `<html>`.
@@ -140,8 +169,8 @@ utility; change the insets here and the copy will not follow, and nothing fails 
 
 **The driver.js buttons copy `Button`'s variants by value for the same reason.** Next is the `default`
 variant, so it casts the accent trio: an ink face over a frame shadow would show no shadow at all. Done is `success`,
-so its greens are Tailwind's `green-700` and `green-800` written as `oklch()` literals, since the theme
-variables are emitted only into the Tailwind build this file is not part of. Previous is `outline`, and the
+so it reads `--success`, `--success-hover` and `--on-fill` as custom properties of the page, since the theme
+variables Tailwind emits belong to a build this file is not part of. Previous is `outline`, and the
 close button is the Dialog's. The step counter takes the quick start's mono kicker, and the title keeps room
 on its right for the close button, as a Dialog header row does. Retune a variant in `Button.tsx` and these
 rules will not follow.
@@ -183,7 +212,9 @@ instead would drop it from `pnpm format:all` and `pnpm lint:all` alike.
 pins the things that look like tidy-ups and are not: the design tokens stay unlayered and the
 layer statement reserves no slot for them, the `tutorial` slot stays reserved, `theme/index.css`
 keeps `--container-8xl` without a `--max-width-8xl` mirror, and `index.css` reaches every stylesheet in the
-folder, so one that a single component imports fails until it moves beside that component.
+folder, so one that a single component imports fails until it moves beside that component. `palette.test.ts` holds
+the palette module to the tokens, and the contract suite (`tests/docs-consistency.test.ts`) holds every other file of
+`apps/web/src` free of a literal colour, a hex, a colour function, a palette class or a `white` or `black`.
 
 Nothing checks that a new `hover:-translate-*` carries `hit-area-stable`, or that the driver.js copy of it
 in `modules/tutorial/driver.css` still matches.

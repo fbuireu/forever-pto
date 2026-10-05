@@ -1,6 +1,6 @@
 ---
 title: Colors
-description: Brand palette, semantic tokens, surfaces and the frame, with live swatches read from the real app stylesheets.
+description: Brand palette, semantic tokens, role tokens (tones and washes), surfaces and the frame, with live swatches read from the real app stylesheets.
 sidebar:
   order: 1
 ---
@@ -74,6 +74,59 @@ Panel backgrounds come in warmth steps plus an inset alias, and `--frame` is the
 
 `--frame` is the pivot of the whole system: it is cream-on-ink in light mode and ink-on-cream in dark mode, and because every `--shadow-brutal-*` token references it, the [shadows](/design-system/foundations/shadows/) re-theme automatically.
 
+## Status tones
+
+Text, icons and tinted borders that say something about a figure. Each re-picks its step in dark, so a component writes `text-positive` and no `dark:` pair; `-strong` is for a headline figure, `-note` for small print and `-base` for the shade that takes an alpha (`bg-positive-base/10`):
+
+<TokenSwatch tokens={[
+  '--positive',
+  '--positive-strong',
+  '--positive-note',
+  '--positive-base',
+  '--negative',
+  '--caution',
+  '--caution-note',
+  '--caution-base',
+  '--warning-note',
+  '--warning-base',
+  '--comparison-neutral',
+]} />
+
+The planner's own series have their own family: `--efficiency`, `--suggested` (Suggested Days), `--manual` (Manual Days), `--info-*` and `--workday-*`.
+
+## Washes
+
+A brand hue tinted into a surface, toward white in light and toward black in dark, with the ink that reads on it. `Banner`, `MetricCard`, the planner's stat cards and the calendar's day fills draw with them (`bg-wash-teal`, `text-wash-teal-icon`):
+
+<TokenSwatch tokens={[
+  '--wash-teal',
+  '--wash-orange',
+  '--wash-purple',
+  '--wash-yellow',
+  '--wash-green',
+  '--wash-emerald',
+  '--wash-cyan',
+  '--wash-violet',
+  '--wash-rose',
+  '--day-alternative',
+  '--day-custom',
+]} />
+
+## Fixed colors and overlays
+
+White on a solid fill, black taken at an alpha, the hairline between list rows and the error page's console:
+
+<TokenSwatch tokens={[
+  '--on-fill',
+  '--shade',
+  '--divider',
+  '--success',
+  '--terminal-bg',
+  '--terminal-text',
+]} />
+
+`--divider` is black at 15% in light and the frame at 15% in dark; a card in a brand color does not flip, so its rows keep `border-shade/15`. A consumer that cannot read a custom property (the Stripe iframe, the skeletons, the PDF, the confetti, the email template) takes named constants from `apps/web/src/ui/styles/palette.ts`, which a test holds equal to the tokens it repeats, and the email template from `apps/web/src/application/email/palette.ts`; no other file of the app writes a literal color, generated code included.
+
 ## Sidebar
 
 The app sidebar has its own token family (same naming scheme, `--sidebar-*`) so it can be tinted independently of the page:
@@ -104,4 +157,4 @@ Separate files, separate jobs:
 - `apps/web/src/ui/styles/global/index.css` declares the raw values (`:root` and `[data-theme='dark']`).
 - `apps/web/src/ui/styles/theme/index.css` re-exposes a subset under Tailwind's `@theme inline` block: `--color-background: var(--background)`, `--color-accent: var(--accent)`, and so on.
 
-Only the tokens aliased inside `@theme inline` become Tailwind utilities (`bg-background`, `text-muted-foreground`, `border-border`, `ring-ring`…). Everything else, meaning brand colors, surfaces, `--frame` and shadows, is consumed through arbitrary values, e.g. `bg-[var(--surface-panel)]`, `border-[var(--frame)]`, `shadow-[var(--shadow-brutal-md)]`. When adding a component, prefer the semantic utilities and reach for `var()` arbitraries only for surfaces and frames, matching the existing primitives in `apps/web/src/ui/modules/core/primitives/`.
+Only the tokens aliased inside `@theme inline` become Tailwind utilities (`bg-background`, `text-muted-foreground`, `border-border`, `ring-ring`, and the role tokens: `text-positive`, `bg-wash-teal`, `border-divider`…). Everything else, meaning brand colors, surfaces, `--frame` and shadows, is consumed through arbitrary values, e.g. `bg-[var(--surface-panel)]`, `border-[var(--frame)]`, `shadow-[var(--shadow-brutal-md)]`. When adding a component, prefer the semantic utilities and reach for `var()` arbitraries only for surfaces and frames, matching the existing primitives in `apps/web/src/ui/modules/core/primitives/`.

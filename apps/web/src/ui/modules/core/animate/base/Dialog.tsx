@@ -35,10 +35,7 @@ type DialogBackdropProps = DialogBackdropPrimitiveProps;
 function DialogBackdrop({ className, ...props }: DialogBackdropProps) {
 	return (
 		<DialogBackdropPrimitive
-			className={cn(
-				"fixed inset-0 z-200 bg-[linear-gradient(180deg,rgba(20,17,15,0.66),rgba(20,17,15,0.82))] backdrop-blur-[2px]",
-				className,
-			)}
+			className={cn("fixed inset-0 z-200 bg-[image:var(--dialog-scrim)] backdrop-blur-[2px]", className)}
 			{...props}
 		/>
 	);

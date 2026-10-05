@@ -157,8 +157,8 @@ function AccordionPanel({
 							exit={{ height: 0, opacity: 0, "--mask-stop": "0%" }}
 							transition={transition}
 							style={{
-								maskImage: "linear-gradient(black var(--mask-stop), transparent var(--mask-stop))",
-								WebkitMaskImage: "linear-gradient(black var(--mask-stop), transparent var(--mask-stop))",
+								maskImage: "linear-gradient(var(--shade) var(--mask-stop), transparent var(--mask-stop))",
+								WebkitMaskImage: "linear-gradient(var(--shade) var(--mask-stop), transparent var(--mask-stop))",
 							}}
 							className="overflow-hidden"
 							{...motionProps}

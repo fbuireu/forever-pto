@@ -40,7 +40,7 @@ export function Roadmap() {
 				label: t("completed"),
 				angle: 0,
 				status: CategoryStatus.COMPLETED,
-				className: "text-green-500",
+				className: "text-positive-base",
 				badgeClass: "bg-[var(--color-brand-green)] text-[var(--color-brand-ink)] border-[var(--frame)]",
 			},
 			{
@@ -49,7 +49,7 @@ export function Roadmap() {
 				label: t("inProgress"),
 				angle: 90,
 				status: CategoryStatus.IN_PROGRESS,
-				className: "text-blue-500",
+				className: "text-info-base",
 				badgeClass: "bg-[var(--color-brand-sky)] text-[var(--color-brand-ink)] border-[var(--frame)]",
 			},
 			{
@@ -58,7 +58,7 @@ export function Roadmap() {
 				label: t("planned"),
 				angle: 180,
 				status: CategoryStatus.PLANNED,
-				className: "text-orange-500",
+				className: "text-warning-base",
 				badgeClass: "bg-[var(--color-brand-orange)] text-[var(--color-brand-ink)] border-[var(--frame)]",
 			},
 			{
@@ -67,8 +67,8 @@ export function Roadmap() {
 				label: t("future"),
 				angle: 270,
 				status: CategoryStatus.FUTURE,
-				className: "text-purple-500",
-				badgeClass: "bg-[var(--color-brand-purple)] text-white border-[var(--frame)]",
+				className: "text-efficiency-base",
+				badgeClass: "bg-[var(--color-brand-purple)] text-on-fill border-[var(--frame)]",
 			},
 		],
 		[t],

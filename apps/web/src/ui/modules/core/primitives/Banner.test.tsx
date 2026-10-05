@@ -52,8 +52,8 @@ describe("Banner", () => {
 		renderBanner({ colorScheme: "green" });
 
 		const note = screen.getByRole("note");
-		expect(note.className).toContain("brand-green");
-		expect(note.className).not.toContain("brand-orange");
+		expect(note.className).toContain("bg-wash-green");
+		expect(note.className).not.toContain("bg-wash-orange");
 	});
 
 	it("appends the caller's className to the frame", () => {

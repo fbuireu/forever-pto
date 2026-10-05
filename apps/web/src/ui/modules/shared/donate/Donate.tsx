@@ -234,17 +234,15 @@ export const Donate = ({ bottomClassName }: DonateProps) => {
 						<h2 className="text-lg leading-none font-black tracking-[-0.03em]">{tDonate("supportAndUnblock")}</h2>
 						<p className="text-muted-foreground text-sm">{tDonate("makeDonation")}</p>
 						{premiumKey && (
-							<div className="flex items-center gap-2 rounded-[10px] border-[3px] border-(--frame) bg-[color-mix(in_srgb,var(--color-brand-green)_18%,white_82%)] p-2 shadow-(--shadow-brutal-xs) dark:bg-[color-mix(in_srgb,var(--color-brand-green)_16%,black_84%)]">
+							<div className="flex items-center gap-2 rounded-[10px] border-[3px] border-(--frame) bg-wash-green p-2 shadow-(--shadow-brutal-xs)">
 								<Star
-									className="size-4 text-[#3f6212] dark:text-(--color-brand-green)"
+									className="size-4 text-wash-green-ink"
 									fill="currentColor"
 									aria-hidden="true"
 									animateOnView
 									loop
 								/>
-								<span className="text-sm font-black text-[#3f6212] dark:text-(--color-brand-green)">
-									{tDonate("alreadyPremium")}
-								</span>
+								<span className="text-sm font-black text-wash-green-ink">{tDonate("alreadyPremium")}</span>
 							</div>
 						)}
 					</div>

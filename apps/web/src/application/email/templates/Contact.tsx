@@ -1,3 +1,4 @@
+import { EMAIL_PALETTE } from "@application/email/palette";
 import {
 	Body,
 	Button,
@@ -23,13 +24,6 @@ interface ContactFormEmailProps {
 	baseUrl: string;
 }
 
-const BRAND_COLORS = {
-	yellow: "#eab308",
-	teal: "#14b8a6",
-	orange: "#f97316",
-	purple: "#a855f7",
-};
-
 export const ContactFormEmail = ({ email, name, subject, message, baseUrl }: ContactFormEmailProps) => {
 	const previewText = `New contact form submission from ${name}: ${subject}`;
 
@@ -38,13 +32,13 @@ export const ContactFormEmail = ({ email, name, subject, message, baseUrl }: Con
 			<Tailwind
 				config={{
 					presets: [pixelBasedPreset],
-					theme: { extend: { colors: { brand: BRAND_COLORS } } },
+					theme: { extend: { colors: EMAIL_PALETTE } },
 				}}
 			>
 				<Head />
-				<Body className="mx-auto my-auto bg-linear-to-br from-zinc-50 to-zinc-100 px-2 font-sans">
+				<Body className="mx-auto my-auto bg-linear-to-br from-email-page-from to-email-page-to px-2 font-sans">
 					<Preview>{previewText}</Preview>
-					<Container className="mx-auto my-10 max-w-141.25 rounded-xl border border-zinc-200 border-solid bg-white p-8 shadow-lg">
+					<Container className="mx-auto my-10 max-w-141.25 rounded-xl border border-email-line border-solid bg-email-card p-8 shadow-lg">
 						<Section className="mt-2 mb-6 text-center">
 							<Heading className="inline-block m-0 mr-2 text-[28px] font-bold align-middle">Forever</Heading>
 							<Img
@@ -55,22 +49,22 @@ export const ContactFormEmail = ({ email, name, subject, message, baseUrl }: Con
 								className="inline-block align-middle m-0"
 							/>
 						</Section>
-						<Heading className="mx-0 my-0 mb-2 p-0 text-center font-bold text-[28px] text-zinc-900 tracking-tight">
+						<Heading className="mx-0 my-0 mb-2 p-0 text-center font-bold text-[28px] text-email-ink tracking-tight">
 							New Contact Message
 						</Heading>
-						<Text className="text-center text-[14px] text-zinc-500 mt-0 mb-8">
+						<Text className="text-center text-[14px] text-email-muted mt-0 mb-8">
 							{name} reached out through your Forever PTO website
 						</Text>
-						<Section className="bg-linear-to-br from-teal-50 to-orange-50 rounded-xl p-6 my-6 border border-brand-teal border-solid shadow-sm">
+						<Section className="bg-linear-to-br from-email-wash-from to-email-wash-to rounded-xl p-6 my-6 border border-brand-teal border-solid shadow-sm">
 							<div className="mb-2">
-								<Text className="text-[14px] text-zinc-600 leading-5 m-0 inline-block mr-2">
-									<strong className="text-zinc-900">From:</strong>
+								<Text className="text-[14px] text-email-label leading-5 m-0 inline-block mr-2">
+									<strong className="text-email-ink">From:</strong>
 								</Text>
-								<Text className="text-[14px] text-zinc-900 leading-5 m-0 inline-block font-medium">{name}</Text>
+								<Text className="text-[14px] text-email-ink leading-5 m-0 inline-block font-medium">{name}</Text>
 							</div>
 							<div className="mb-2">
-								<Text className="text-[14px] text-zinc-600 leading-5 m-0 inline-block mr-2">
-									<strong className="text-zinc-900">Email:</strong>
+								<Text className="text-[14px] text-email-label leading-5 m-0 inline-block mr-2">
+									<strong className="text-email-ink">Email:</strong>
 								</Text>
 								<Link
 									href={`mailto:${encodeURIComponent(email)}`}
@@ -80,36 +74,36 @@ export const ContactFormEmail = ({ email, name, subject, message, baseUrl }: Con
 								</Link>
 							</div>
 							<div>
-								<Text className="text-[14px] text-zinc-600 leading-5 m-0 inline-block mr-2">
-									<strong className="text-zinc-900">Subject:</strong>
+								<Text className="text-[14px] text-email-label leading-5 m-0 inline-block mr-2">
+									<strong className="text-email-ink">Subject:</strong>
 								</Text>
-								<Text className="text-[14px] text-zinc-900 leading-5 m-0 inline-block font-medium">{subject}</Text>
+								<Text className="text-[14px] text-email-ink leading-5 m-0 inline-block font-medium">{subject}</Text>
 							</div>
 						</Section>
 						<Section className="my-6">
-							<Text className="text-[14px] text-zinc-700 leading-5 font-semibold mb-3 mt-0">Message:</Text>
-							<Section className="bg-zinc-50 rounded-xl p-5 border border-zinc-200 border-solid shadow-sm">
-								<Text className="text-[15px] text-zinc-800 leading-6 m-0 whitespace-pre-wrap font-normal">
+							<Text className="text-[14px] text-email-strong leading-5 font-semibold mb-3 mt-0">Message:</Text>
+							<Section className="bg-email-well rounded-xl p-5 border border-email-line border-solid shadow-sm">
+								<Text className="text-[15px] text-email-body leading-6 m-0 whitespace-pre-wrap font-normal">
 									{message}
 								</Text>
 							</Section>
 						</Section>
 						<Section className="mt-8 mb-8 text-center">
 							<Button
-								className="rounded-lg bg-brand-teal px-8 py-3.5 text-center font-semibold text-[15px] text-white no-underline shadow-md"
+								className="rounded-lg bg-brand-teal px-8 py-3.5 text-center font-semibold text-[15px] text-email-inverse no-underline shadow-md"
 								href={`mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(`Re: ${subject}`)}`}
 							>
 								Reply to {name}
 							</Button>
 						</Section>
-						<Hr className="mx-0 my-8 w-full border border-zinc-200 border-solid" />
-						<Text className="text-zinc-500 text-[12px] leading-5.5 text-center">
+						<Hr className="mx-0 my-8 w-full border border-email-line border-solid" />
+						<Text className="text-email-muted text-[12px] leading-5.5 text-center">
 							This message was sent through the contact form on{" "}
 							<Link href={baseUrl} className="text-brand-teal no-underline font-medium">
 								{new URL(baseUrl).hostname}
 							</Link>
 							<br />
-							<span className="text-zinc-400">If this looks like spam, you can safely ignore this email.</span>
+							<span className="text-email-faint">If this looks like spam, you can safely ignore this email.</span>
 						</Text>
 					</Container>
 				</Body>

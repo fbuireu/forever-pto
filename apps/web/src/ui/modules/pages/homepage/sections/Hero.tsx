@@ -80,7 +80,7 @@ export const Hero = async () => {
 					</div>
 
 					<div className="flex gap-2.5 items-center font-mono text-sm">
-						<span className="text-[#FFB800] tracking-[2px] text-lg">★★★★★</span>
+						<span className="text-star tracking-[2px] text-lg">★★★★★</span>
 						<span>
 							{t("hero.stars", {
 								rating: format.number(SOCIAL_PROOF_RATING),
@@ -93,10 +93,10 @@ export const Hero = async () => {
 				<div className="group">
 					<div className="bg-card border-[5px] border-[var(--frame)] rounded-[14px] shadow-[var(--shadow-brutal-xl)] overflow-hidden rotate-[1.2deg] group-hover:rotate-0 transition-transform duration-[250ms] ease-out">
 						<div className="flex items-center gap-2.5 px-4 py-[10px] bg-[var(--frame)]">
-							<div className="size-3 rounded-full bg-[var(--color-brand-red)] border-[1.5px] border-black" />
-							<div className="size-3 rounded-full bg-[var(--color-brand-yellow)] border-[1.5px] border-black" />
-							<div className="size-3 rounded-full bg-[var(--color-brand-green)] border-[1.5px] border-black" />
-							<span className="ml-auto mr-auto font-mono text-[12px] text-white/75">forever-pto.com / planner</span>
+							<div className="size-3 rounded-full bg-[var(--color-brand-red)] border-[1.5px] border-shade" />
+							<div className="size-3 rounded-full bg-[var(--color-brand-yellow)] border-[1.5px] border-shade" />
+							<div className="size-3 rounded-full bg-[var(--color-brand-green)] border-[1.5px] border-shade" />
+							<span className="ml-auto mr-auto font-mono text-[12px] text-on-fill/75">forever-pto.com / planner</span>
 						</div>
 						<div className="p-[22px] bg-card">
 							<div className="grid grid-cols-2 gap-3.5 mb-4">

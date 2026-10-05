@@ -233,7 +233,7 @@ function Sidebar({
 					<>
 						<m.div
 							key="sidebar-backdrop"
-							className="fixed inset-0 z-51 bg-black/80"
+							className="fixed inset-0 z-51 bg-shade/80"
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1 }}
 							exit={{ opacity: 0 }}

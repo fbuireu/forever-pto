@@ -19,25 +19,25 @@ const SOCIAL_NETWORKS = {
 		USERNAME: "fbuireu",
 		BASE_URL: "https://github.com",
 		ICON: githubIcon,
-		COLOR: "light-dark(#24292f, #f0f6fc)",
+		COLOR: "var(--social-github)",
 	},
 	LINKEDIN: {
 		USERNAME: "ferran-buireu",
 		BASE_URL: "https://linkedin.com/in",
 		ICON: linkedinIcon,
-		COLOR: "#0077B5",
+		COLOR: "var(--social-linkedin)",
 	},
 	BLUESKY: {
 		USERNAME: "fbuireu.bsky.social",
 		BASE_URL: "https://bsky.app/profile",
 		ICON: blueskyIcon,
-		COLOR: "#0085FF",
+		COLOR: "var(--social-bluesky)",
 	},
 	BUY_ME_A_COFFEE: {
 		USERNAME: "ferranbuireu",
 		BASE_URL: "https://www.buymeacoffee.com",
 		ICON: buyMeACoffeeIcon,
-		COLOR: "#FFDD00",
+		COLOR: "var(--social-coffee)",
 	},
 } as const;
 

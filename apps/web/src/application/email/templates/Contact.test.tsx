@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { EMAIL_PALETTE } from "@application/email/palette";
 import { render } from "@react-email/render";
 import { describe, expect, it } from "vitest";
 import { ContactFormEmail } from "./Contact";
@@ -17,6 +18,29 @@ const BASE_PROPS = {
 };
 
 const getHtml = (props = BASE_PROPS) => render(ContactFormEmail(props));
+
+const { brand, email: roles } = EMAIL_PALETTE;
+
+const rgbOf = (hex: string) =>
+	`rgb(${[1, 3, 5].map((start) => Number.parseInt(hex.slice(start, start + 2), 16)).join(",")})`;
+
+const declares = ({ html, declaration }: { html: string; declaration: string }) =>
+	[`style="${declaration}`, `;${declaration}`].some((start) => html.includes(start));
+
+const PAINTED_WITH_THE_PALETTE = [
+	{ role: "the card", declaration: `background-color:${rgbOf(roles.card)}` },
+	{ role: "the message box", declaration: `background-color:${rgbOf(roles.well)}` },
+	{ role: "the card, the message box and the rule", declaration: `border-color:${rgbOf(roles.line)}` },
+	{ role: "the heading and the field values", declaration: `color:${rgbOf(roles.ink)}` },
+	{ role: "the message", declaration: `color:${rgbOf(roles.body)}` },
+	{ role: "the message label", declaration: `color:${rgbOf(roles.strong)}` },
+	{ role: "the field labels", declaration: `color:${rgbOf(roles.label)}` },
+	{ role: "the subtitle and the footer", declaration: `color:${rgbOf(roles.muted)}` },
+	{ role: "the spam note", declaration: `color:${rgbOf(roles.faint)}` },
+	{ role: "the reply button's text", declaration: `color:${rgbOf(roles.inverse)}` },
+	{ role: "the reply button", declaration: `background-color:${rgbOf(brand.teal)}` },
+	{ role: "the links and the details border", declaration: `color:${rgbOf(brand.teal)}` },
+];
 
 describe("ContactFormEmail", () => {
 	it("includes the preview text with name and subject", async () => {
@@ -65,6 +89,26 @@ describe("ContactFormEmail", () => {
 
 		expect(src).toBeDefined();
 		expect(existsSync(join(PUBLIC_DIR, new URL(src ?? "https://example.com").pathname))).toBe(true);
+	});
+
+	it.each(PAINTED_WITH_THE_PALETTE)("draws $role with the palette's colour", async ({ declaration }) => {
+		const html = await getHtml();
+
+		expect(declares({ html, declaration })).toBe(true);
+	});
+
+	it("paints nothing with a colour the palette does not hold", async () => {
+		const html = await getHtml();
+		const held = new Set(
+			[
+				...Object.values(brand),
+				...Object.values(roles).flatMap((role) => (typeof role === "string" ? [role] : Object.values(role))),
+			].map(rgbOf),
+		);
+		const painted = new Set(html.match(/rgb\(\d+,\d+,\d+\)/g));
+
+		expect(painted.size).toBeGreaterThan(8);
+		expect([...painted].filter((colour) => !held.has(colour))).toEqual([]);
 	});
 
 	it("does not let a crafted subject add headers to the reply", async () => {
