@@ -1,3 +1,10 @@
+# [forever-pto-docs-v1.5.4](https://github.com/fbuireu/forever-pto/compare/docs-v1.5.3...docs-v1.5.4) (2026-10-05)
+
+
+### Bug Fixes
+
+* declared tokens only, themed skeletons, one count per redirect activation, a present-tense wiki ([8f9ed5f](https://github.com/fbuireu/forever-pto/commit/8f9ed5f9939c747a7a9be7572f6eee2b46a94911))
+
 # [forever-pto-docs-v1.5.3](https://github.com/fbuireu/forever-pto/compare/docs-v1.5.2...docs-v1.5.3) (2026-10-04)
 
 
