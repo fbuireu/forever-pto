@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.13.5](https://github.com/fbuireu/forever-pto/compare/web-v1.13.4...web-v1.13.5) (2026-10-05)
+
+
+### Bug Fixes
+
+* declared tokens only, themed skeletons, one count per redirect activation, a present-tense wiki ([8f9ed5f](https://github.com/fbuireu/forever-pto/commit/8f9ed5f9939c747a7a9be7572f6eee2b46a94911))
+
 # [forever-pto-web-v1.13.4](https://github.com/fbuireu/forever-pto/compare/web-v1.13.3...web-v1.13.4) (2026-10-04)
 
 
