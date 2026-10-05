@@ -10,7 +10,7 @@ import {
 	calculateQuarterDistribution,
 	calculateRestBlocks,
 	getBridgesInUse,
-	getFirstLastBreak,
+	getFirstLastRestBlock,
 	getLongBlocksPerQuarter,
 	getMonthlyDist,
 	getTotalEffectiveDays,
@@ -24,7 +24,7 @@ interface GenerateMetricsParams {
 	planningWindow: PlanningWindow;
 	holidays: HolidayDTO[];
 	allowPastDays: boolean;
-	manuallySelectedDays: Date[];
+	manualDays: Date[];
 	removedSuggestedDays: Date[];
 }
 
@@ -34,12 +34,12 @@ export const generateMetrics = ({
 	planningWindow,
 	holidays,
 	allowPastDays,
-	manuallySelectedDays,
+	manualDays,
 	removedSuggestedDays,
 }: GenerateMetricsParams) => {
 	const { bridges } = suggestion;
 	const { year } = planningWindow;
-	const days = resolveSelectedDays({ days: suggestion.days, manuallySelectedDays, removedSuggestedDays });
+	const days = resolveSelectedDays({ days: suggestion.days, manualDays, removedSuggestedDays });
 
 	const monthlyDist = getMonthlyDist({ days, window: planningWindow });
 	const streaks = freeStreaks({ placedDays: days, holidays });
@@ -56,7 +56,7 @@ export const generateMetrics = ({
 		allowPastDays,
 		year,
 	});
-	const firstLastBreak = getFirstLastBreak({ dates: days, locale });
+	const firstLastRestBlock = getFirstLastRestBlock({ dates: days, locale });
 	const quarterDist = calculateQuarterDistribution({ dates: days, window: planningWindow });
 	const workedDaysPerMonth = getWorkedDaysPerMonth({
 		ptoDays: days,
@@ -71,7 +71,7 @@ export const generateMetrics = ({
 		longWeekends,
 		restBlocks,
 		maxWorkStreak,
-		firstLastBreak,
+		firstLastRestBlock,
 		averageEfficiency: efficiency,
 		bonusDays,
 		quarterDist,

@@ -17,11 +17,14 @@ vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track 
 vi.mock("@application/stores/holidays", () => ({
 	useHolidaysStore: (selector: (state: typeof holidaysState) => unknown) => selector(holidaysState),
 }));
-vi.mock("@application/stores/premium", () => ({ PremiumFeatureId: { CUSTOM_HOLIDAYS: "customHolidays" } }));
+vi.mock("@application/stores/premium", () => ({
+	PremiumFeatureId: { CUSTOM_HOLIDAYS: "customHolidays" },
+	PremiumOrigin: { PLANNER: "planner" },
+}));
 vi.mock("@ui/hooks/useStoresReady", () => ({ useStoresReady: () => readyState }));
 vi.mock("@ui/modules/premium/PremiumFeature", () => ({
-	PremiumFeature: ({ children, feature }: { children: ReactNode; feature: string }) => (
-		<div data-testid="premium-gate" data-feature={feature}>
+	PremiumFeature: ({ children, feature, origin }: { children: ReactNode; feature: string; origin: string }) => (
+		<div data-testid="premium-gate" data-feature={feature} data-origin={origin}>
 			{children}
 		</div>
 	),
@@ -94,6 +97,7 @@ describe("HolidaysList", () => {
 
 		const gate = screen.getByTestId("premium-gate");
 		expect(gate.dataset.feature).toBe("customHolidays");
+		expect(gate.dataset.origin).toBe("planner");
 		expect(gate.querySelector('[role="tab"]')?.textContent).toBe(en.holidaysTable.customTab);
 
 		await userEvent.click(screen.getByRole("tab", { name: en.holidaysTable.customTab }));

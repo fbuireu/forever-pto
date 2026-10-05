@@ -1,10 +1,12 @@
 "use client";
 
+import { holidaysInPlanningWindow } from "@application/dto/holiday/rules";
 import type { HolidayDTO } from "@application/dto/holiday/types";
 import {
 	addMonths,
 	type Day,
 	formatDate,
+	formatDateParts,
 	getWeekdayNames,
 	isSameDay,
 	isSameMonth,
@@ -20,7 +22,7 @@ import { ConditionalWrapper } from "@ui/modules/shared/ConditionalWrapper";
 import { cn } from "@ui/utils/cn";
 import type { Locale } from "next-intl";
 import { useTranslations } from "next-intl";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, memo, useCallback, useEffect, useMemo, useState } from "react";
 import { getCalendarDays } from "../utils/helpers";
 import {
 	getPreviewRange,
@@ -57,7 +59,7 @@ const RangeSelection = {
 
 type RangeSelection = (typeof RangeSelection)[keyof typeof RangeSelection];
 
-export type DayStateName = "suggested" | "alternative" | "manuallySelected";
+export type DayStateName = "suggested" | "alternative" | "manual";
 
 export type DayStates = Partial<Record<DayStateName, (date: Date) => boolean>>;
 
@@ -154,7 +156,7 @@ export const Calendar = memo(function Calendar({
 			alternative: dayStates.alternative,
 			disabled: isPastFn,
 			selected: isSelectedModifier,
-			manuallySelected: dayStates.manuallySelected,
+			manual: dayStates.manual,
 		};
 
 		return {
@@ -173,10 +175,12 @@ export const Calendar = memo(function Calendar({
 	}, [holidays, allowPastDays, dayStates, selectedDates, mode, rangeSelection, hoverDate, today]);
 
 	const weekdayNames = useMemo(() => getWeekdayNames({ locale, weekStartsOn }), [locale, weekStartsOn]);
-	const monthLabel = useMemo(() => formatDate({ date: currentMonth, locale, format: "MMMM" }), [currentMonth, locale]);
-	const yearLabel = useMemo(() => formatDate({ date: currentMonth, locale, format: "yyyy" }), [currentMonth, locale]);
+	const monthParts = useMemo(
+		() => formatDateParts({ date: currentMonth, locale, format: "LLLL yyyy" }),
+		[currentMonth, locale],
+	);
 	const monthHolidayCount = useMemo(
-		() => holidays.filter((h) => isSameMonth({ a: h.date, b: currentMonth }) && h.isInPlanningWindow).length,
+		() => holidaysInPlanningWindow(holidays).filter((h) => isSameMonth({ a: h.date, b: currentMonth })).length,
 		[holidays, currentMonth],
 	);
 	const calendarDays = useMemo(
@@ -312,7 +316,15 @@ export const Calendar = memo(function Calendar({
 						</AnimateIcon>
 					)}
 					<h3 className="text-sm font-semibold">
-						{monthLabel} <span className="font-serif">{yearLabel}</span>
+						{monthParts.map(({ type, value }) =>
+							type === "year" ? (
+								<span key={`${type}:${value}`} className="font-serif">
+									{value}
+								</span>
+							) : (
+								<Fragment key={`${type}:${value}`}>{value}</Fragment>
+							),
+						)}
 					</h3>
 				</div>
 				<div className="flex items-center gap-2">
@@ -364,7 +376,7 @@ export const Calendar = memo(function Calendar({
 			<div className="grid grid-cols-7 gap-2 px-4 pb-4">
 				{calendarDays.map((date) => {
 					const isPastDay = modifiers.disabled(date);
-					const isManualDay = modifiers.manuallySelected?.(date) ?? false;
+					const isManualDay = modifiers.manual?.(date) ?? false;
 					const isSuggestedDay = modifiers.suggested?.(date) ?? false;
 
 					const isDisabled = disabled || (isPastDay && !isManualDay && !isSuggestedDay);

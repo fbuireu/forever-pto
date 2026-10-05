@@ -9,7 +9,7 @@ import {
 } from "@domain/calendar/window";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { useLocale, useTranslations } from "next-intl";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 interface MonthTogglesProps {
 	label: string;
@@ -31,9 +31,15 @@ export const MonthToggles = ({
 	const locale = useLocale();
 	const t = useTranslations("sidebar.preferredMonths");
 	const { year, carryOverMonths } = planningWindow;
+	const [today, setToday] = useState<Date | null>(null);
+
+	useEffect(() => {
+		setToday(startOfToday());
+	}, []);
+
 	const reachable = useMemo(
-		() => reachableMonths({ year, carryOverMonths, allowPastDays, today: startOfToday() }),
-		[year, carryOverMonths, allowPastDays],
+		() => reachableMonths({ year, carryOverMonths, allowPastDays, today }),
+		[year, carryOverMonths, allowPastDays, today],
 	);
 	const chosen = reachablePreferredMonths({ preferredMonths: months, reachable });
 	const years = useMemo(() => {

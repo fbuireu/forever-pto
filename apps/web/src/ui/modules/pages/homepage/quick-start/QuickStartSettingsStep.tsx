@@ -2,7 +2,7 @@
 
 import { MIN_CARRY_OVER_MONTHS } from "@application/stores/filters";
 import { PremiumFeatureId, PremiumOrigin } from "@application/stores/premium";
-import { FilterStrategy } from "@domain/calendar/types";
+import { Strategy } from "@domain/calendar/types";
 import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import { Switch } from "@ui/modules/core/animate/base/Switch";
 import { Slider } from "@ui/modules/core/primitives/Slider";
@@ -34,7 +34,7 @@ export const QuickStartSettingsStep = ({ draft, onChange }: QuickStartSettingsSt
 			<fieldset className="space-y-2">
 				<legend className="text-sm font-medium leading-none mb-2">{tSidebar("strategy.title")}</legend>
 				<div className="grid gap-2">
-					{Object.values(FilterStrategy).map((value) => {
+					{Object.values(Strategy).map((value) => {
 						const Icon = STRATEGY_ICONS[value];
 						const id = `quick-start-strategy-${value}`;
 
@@ -62,7 +62,7 @@ export const QuickStartSettingsStep = ({ draft, onChange }: QuickStartSettingsSt
 				</div>
 			</fieldset>
 
-			{draft.strategy === FilterStrategy.MAIN_VACATION && (
+			{draft.strategy === Strategy.MAIN_VACATION && (
 				<MonthToggles
 					label={tSidebar("preferredMonths.title")}
 					legendClassName="text-sm font-medium leading-none mb-2"

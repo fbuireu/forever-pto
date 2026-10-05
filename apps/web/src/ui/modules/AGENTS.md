@@ -9,10 +9,10 @@ Every React component the product renders. Nothing else in `src/ui/` holds compo
 | Folder | Holds | Reused across screens? |
 | --- | --- | --- |
 | `core/` | The design system: `primitives/` plus the `animate/` layer. See [core/AGENTS.md](./core/AGENTS.md) | Yes, everywhere |
-| `pages/` | One folder per screen: `homepage/`, `planner/`, `legal/`, `error/`, `not-found/`. See [pages/planner/AGENTS.md](./pages/planner/AGENTS.md). `homepage/quick-start/` is the stepped dialog every planner call to action on the homepage opens, see below | No, by definition |
-| `shared/` | Cross-page pieces that are not primitives: footer, donate, contact, cookie consent, JSON-LD, the marketing header [`shared/Header.tsx`](./shared/Header.tsx) with its [`shared/HomepageLanguageSwitcher.tsx`](./shared/HomepageLanguageSwitcher.tsx) and [`shared/QuickStartTrigger.tsx`](./shared/QuickStartTrigger.tsx), which the homepage, the legal pages and the 404 page render, [`shared/Logo.tsx`](./shared/Logo.tsx), [`shared/Icon.tsx`](./shared/Icon.tsx), [`shared/FormButtons.tsx`](./shared/FormButtons.tsx), [`shared/StepOutcome.tsx`](./shared/StepOutcome.tsx), [`shared/SupportButton.tsx`](./shared/SupportButton.tsx), [`shared/ConditionalWrapper.tsx`](./shared/ConditionalWrapper.tsx), [`shared/WebMCP.tsx`](./shared/WebMCP.tsx), and what the sidebar and the quick start share: [`shared/MonthToggles.tsx`](./shared/MonthToggles.tsx), the month picker, and [`shared/strategyIcons.ts`](./shared/strategyIcons.ts), the Strategy icons; plus [`shared/utils/helpers.ts`](./shared/utils/helpers.ts) for the helpers those pieces need | Yes |
+| `pages/` | One folder per screen: `homepage/`, `planner/`, `error/`, `not-found/`. See [pages/planner/AGENTS.md](./pages/planner/AGENTS.md). `homepage/quick-start/` is the stepped dialog every planner call to action on the homepage opens, see below | No, by definition |
+| `shared/` | Cross-page pieces that are not primitives: footer, donate, contact, cookie consent, JSON-LD, the marketing header [`shared/Header.tsx`](./shared/Header.tsx) with its [`shared/HomepageLanguageSwitcher.tsx`](./shared/HomepageLanguageSwitcher.tsx) and [`shared/QuickStartTrigger.tsx`](./shared/QuickStartTrigger.tsx), which the homepage, the legal pages and the 404 page render, [`shared/Logo.tsx`](./shared/Logo.tsx), [`shared/ThemeSelector.tsx`](./shared/ThemeSelector.tsx), the theme menu the marketing header and the sidebar footer both mount, [`shared/legal-identity/`](./shared/legal-identity), the scrambled owner, NIF and address the legal pages and the developer footer render, [`shared/Icon.tsx`](./shared/Icon.tsx), [`shared/FormButtons.tsx`](./shared/FormButtons.tsx), [`shared/StepOutcome.tsx`](./shared/StepOutcome.tsx), [`shared/SupportButton.tsx`](./shared/SupportButton.tsx), [`shared/ConditionalWrapper.tsx`](./shared/ConditionalWrapper.tsx), [`shared/WebMCP.tsx`](./shared/WebMCP.tsx), and what the sidebar and the quick start share: [`shared/MonthToggles.tsx`](./shared/MonthToggles.tsx), the month picker, and [`shared/strategyIcons.ts`](./shared/strategyIcons.ts), the Strategy icons; plus [`shared/utils/helpers.ts`](./shared/utils/helpers.ts) for the helpers those pieces need | Yes |
 | `layout/` | [`layout/LegalLayout.tsx`](./layout/LegalLayout.tsx), the card chrome the legal pages share, and [`layout/SkipToContent.tsx`](./layout/SkipToContent.tsx), which owns the skip link **and** the `MAIN_CONTENT_ID` every route shell's landmark is keyed on | Between sibling routes |
-| `sidebar/` | [`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) and its controls: Country, Region, year, Strategy and its Preferred Months, past days, Carry-over Months, the PTO Day budget, the calculators, the calendar export, and the language and theme switchers | One screen, but not a page section |
+| `sidebar/` | [`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) and its controls: Country, Region, year, Strategy and its Preferred Months, past days, Carry-over Months, the PTO Day budget, the calculators, the calendar export, and the language switcher, with the footer buttons that mount the shared theme menu | One screen, but not a page section |
 | `premium/` | The Premium gate and the Donation checkout: [`premium/PremiumFeature.tsx`](./premium/PremiumFeature.tsx), [`premium/featureLabels.ts`](./premium/featureLabels.ts), [`premium/PremiumModal.tsx`](./premium/PremiumModal.tsx), [`premium/PremiumRequiredModal.tsx`](./premium/PremiumRequiredModal.tsx), [`premium/CheckoutForm.tsx`](./premium/CheckoutForm.tsx) with its [`premium/ExpressCheckoutFixture.tsx`](./premium/ExpressCheckoutFixture.tsx), and [`premium/PremiumSessionSync.tsx`](./premium/PremiumSessionSync.tsx), the render-nothing activation check the payment confirmation mounts | Yes |
 | `providers/` | What the locale layout mounts once around the page: [`providers/AppThemeProvider.tsx`](./providers/AppThemeProvider.tsx), the `next-themes` context, which stamps `<html>` with the theme as `data-theme` (the tokens) and as a class (the `boneyard-js` skeletons) and which the two global pages mount too, and [`providers/BonesProvider.tsx`](./providers/BonesProvider.tsx), which renders `null` and configures `boneyard-js` | Once |
 | `stores/` | [`stores/StoresInitializer.tsx`](./stores/StoresInitializer.tsx), a render-nothing component that seeds the filters store from the `user-country` cookie, read through [`utils/userCountry.ts`](../utils/userCountry.ts) | Once |
@@ -95,7 +95,7 @@ click, the Alternatives, the Custom Holiday modals, the export, the calculators,
 theme switchers and the contact form call `track()` where the interaction lands; the catalogue is the
 observability page of the docs site. The store actions that report are the opens several triggers share, so each trigger reports the same event
 with its own `source` (`openDonatePopover(source)` and `openQuickStart(source)` on the `ui` store,
-`showPremiumModal(feature, origin)` on the premium store), and `setPremiumStatus`, which reports
+`showPremiumModal({ feature, origin })` on the premium store), and `setPremiumStatus`, which reports
 `premium_activated` on the move from free to Premium only, as `confirmActivation` does for the payer the issuer
 redirected, from the confirmation page and only while the redirect's `activation=fresh` marker is in the address. `planner_generated` counts the plans a person asks
 for: every handler that changes what the plan is built from calls the holidays store's `askForPlan` (a sidebar
@@ -281,12 +281,13 @@ child, and `InputGroup`'s `[&>input]` padding selectors do not reach it, which i
 accessible tree without turning native validation back on. The promo-code input has a `FormLabel` of its own, since a
 placeholder vanishes on the first keystroke.
 
-**The legal identity modules derive their own accessible name; they take no prop.** `pages/legal/Me.tsx`,
-`pages/legal/Nif.tsx` and `pages/legal/Address.tsx` are `{ character, order }` tables that
-[`pages/legal/ScrambledText.tsx`](./pages/legal/ScrambledText.tsx) renders into flexbox-`order`-scrambled
+**The legal identity modules derive their own accessible name; they take no prop.** `shared/legal-identity/Me.tsx`,
+`shared/legal-identity/Nif.tsx` and `shared/legal-identity/Address.tsx` are `{ character, order }` tables that
+[`shared/legal-identity/ScrambledText.tsx`](./shared/legal-identity/ScrambledText.tsx) renders into flexbox-`order`-scrambled
 spans, so the DOM text is nonsense and `role="img"` makes the `aria-label`, which `decodeScrambledText` builds
-by sorting on `order`, the only thing announced. [`pages/legal/identity.test.tsx`](./pages/legal/identity.test.tsx) pins the
-decoded strings, so a transposed `order` fails there rather than shipping a wrong NIF.
+by sorting on `order`, the only thing announced. [`shared/legal-identity/identity.test.tsx`](./shared/legal-identity/identity.test.tsx) pins the
+decoded strings, so a transposed `order` fails there rather than shipping a wrong NIF. They live in `shared/` because
+three places render them, two legal pages and the developer footer, and `U8` puts what several screens share there.
 
 **vanilla-cookieconsent dispatches its `cc:*` events on `window`, never on `document`.** Its emitter is a
 bare `dispatchEvent(new CustomEvent(...))`, which resolves to `window`, and a listener on `document` never
@@ -314,7 +315,9 @@ no unit test can vouch for.
 **The consent banner and the preferences dialog never render together.** `CookieConsent`'s
 `if (showBanner) return …` comes first, so every path that opens the preferences clears the banner: the
 banner's own "Manage preferences" button and the `cc:showPreferences` handler the footer's `CookieButton`
-reaches.
+reaches. The banner is a `section` labelled by its title, which exposes a `region`, and not a `dialog`: it moves no
+focus into itself, traps none and answers no Escape, which a dialog's role promises (`X2`), and it must stay
+reachable by Tab in the page's own order until it is answered (`S5`). The preferences are the dialog.
 
 **`sidebar/components/PtoCalculator.tsx` keeps the total and the inputs it came from in one state object.**
 React bails out of an equal update, so a ref read during render would leave the caption describing the
@@ -361,8 +364,8 @@ this key is only known at runtime, which is the question `has` exists to answer.
 
 **`PremiumFeature` takes a `PremiumFeatureId`.** The id is declared beside the state it sets in
 [`../../application/stores/premium.ts`](../../application/stores/premium.ts): the gate hands it to
-`showPremiumModal`, which reports `upgrade_modal_opened` with it and the gate's `origin` (`planner` by default,
-`quick_start` from the homepage dialog), and `premium/featureLabels.ts` maps each id to the message key that
+`showPremiumModal`, which reports `upgrade_modal_opened` with it and the gate's `origin` (`planner` from the planner's gates,
+`quick_start` from the homepage dialog; every gate names its own, so one that forgot it would not count as the planner), and `premium/featureLabels.ts` maps each id to the message key that
 holds its label.
 [`premium/PremiumFeature.test.tsx`](./premium/PremiumFeature.test.tsx) clicks the gate in en and in de and
 asserts the store receives the same value both times.
@@ -430,9 +433,12 @@ order, so reordering the keys repaints the cards.
 Workdays Monday to Wednesday, a Thursday Holiday, a Friday PTO Day, then the weekend: a Bridge.
 Reordering the array desyncs the illustration from the translated text beside it.
 
-**One Country count is written three times.** `Features.tsx` passes `count: 203` and prints six flags and
-`+197`, and `Stats.tsx` prints `format.number(203)`; nothing ties the three literals together, so change them
-as one.
+**One constant owns the Country count, `COUNTRY_COUNT` in
+[`pages/homepage/sections/shared.ts`](./pages/homepage/sections/shared.ts).** `Features.tsx` passes it to
+`features.countriesTag`, shows `FEATURED_COUNTRIES` as flags and writes what is left, `COUNTRY_COUNT` less the
+flags shown, as a signed `format.number`, and `Stats.tsx` prints it. Both tests replace the constant and expect
+every figure to follow, so a literal left in one of them fails there. The figure is the marketing claim, not a
+count read off the data, which would pull the `date-holidays` dataset into the homepage.
 
 **[`pages/homepage/sections/shared.ts`](./pages/homepage/sections/shared.ts) is read by the docs site.**
 `homepage.mdx` and `HomepagePatternsDemo.tsx` import its exports, and the docs Tailwind build scans its class

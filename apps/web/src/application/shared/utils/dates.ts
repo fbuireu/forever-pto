@@ -176,7 +176,9 @@ const INTL_FORMAT_MAP = {
 const ISO_DATE = "yyyy-MM-dd";
 const ISO_DATE_TIME = "yyyy-MM-dd HH:mm:ss";
 
-export type DateFormat = keyof typeof INTL_FORMAT_MAP | typeof ISO_DATE | typeof ISO_DATE_TIME;
+type IntlDateFormat = keyof typeof INTL_FORMAT_MAP;
+
+export type DateFormat = IntlDateFormat | typeof ISO_DATE | typeof ISO_DATE_TIME;
 
 export interface FormatDateParams {
 	date: Date;
@@ -184,12 +186,20 @@ export interface FormatDateParams {
 	format: DateFormat;
 }
 
+export interface FormatDatePartsParams {
+	date: Date;
+	locale: string;
+	format: IntlDateFormat;
+}
+
 const dateFormatCache = new Map<string, Intl.DateTimeFormat>();
 
-export const formatDate = ({ date, locale, format }: FormatDateParams): string => {
-	if (format === ISO_DATE) return isoDate(date);
-	if (format === ISO_DATE_TIME) return isoDateTime(date);
+interface DateFormatterParams {
+	locale: string;
+	format: IntlDateFormat;
+}
 
+const dateFormatter = ({ locale, format }: DateFormatterParams): Intl.DateTimeFormat => {
 	const key = `${locale}-${format}`;
 	let fmt = dateFormatCache.get(key);
 	if (!fmt) {
@@ -197,8 +207,18 @@ export const formatDate = ({ date, locale, format }: FormatDateParams): string =
 		dateFormatCache.set(key, fmt);
 	}
 
-	return fmt.format(date);
+	return fmt;
 };
+
+export const formatDate = ({ date, locale, format }: FormatDateParams): string => {
+	if (format === ISO_DATE) return isoDate(date);
+	if (format === ISO_DATE_TIME) return isoDateTime(date);
+
+	return dateFormatter({ locale, format }).format(date);
+};
+
+export const formatDateParts = ({ date, locale, format }: FormatDatePartsParams): Intl.DateTimeFormatPart[] =>
+	dateFormatter({ locale, format }).formatToParts(date);
 
 const WEEKDAY_FORMAT = {
 	narrow: "EEEEE",

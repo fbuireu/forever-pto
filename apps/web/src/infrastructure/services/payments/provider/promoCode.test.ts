@@ -1,5 +1,5 @@
 import { PromoCodeErrors } from "@application/dto/payment/types";
-import { TursoService } from "@infrastructure/clients/db/turso/service";
+import { type StatementParams, TursoService } from "@infrastructure/clients/db/turso/service";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import { DatabaseError, PaymentError, PromoCodeError } from "@infrastructure/errors";
 import { normalizePromoCode } from "@infrastructure/services/payments/normalForms";
@@ -10,7 +10,7 @@ const { validatePromoCode } = await import("./promoCode");
 
 const mockList = vi.fn();
 
-const mockQuery = vi.fn((_sql: string, _args: unknown[]) => Effect.succeed([{ redemptions: 0 }]));
+const mockQuery = vi.fn((_statement: StatementParams) => Effect.succeed([{ redemptions: 0 }]));
 
 const MockTursoLayer = Layer.succeed(TursoService, {
 	query: mockQuery,
@@ -303,7 +303,7 @@ describe("validatePromoCode", () => {
 			const [params] = mockList.mock.calls[0] as [{ code?: string }];
 			expect(params.code).toBe("SAVE20");
 			expect(normalizePromoCode("  save20 ")).toBe("SAVE20");
-			expect(mockQuery.mock.calls[0]?.[1]).toEqual(["SAVE20"]);
+			expect(mockQuery.mock.calls[0]?.[0].args).toEqual(["SAVE20"]);
 		});
 
 		it("asks for the coupon expanded, since a promotion code carries only its id", async () => {

@@ -9,6 +9,11 @@ interface DriverConfig extends Omit<Config, "steps"> {
 	closeIcon?: ReactNode;
 }
 
+interface StartParams {
+	steps?: DriveStep[];
+	overrides?: Partial<DriverConfig>;
+}
+
 export class DriverClient {
 	private driver: Driver | null = null;
 	private closeButtonRoots: Root[] = [];
@@ -62,7 +67,7 @@ export class DriverClient {
 		return this.driver;
 	}
 
-	start(steps?: DriveStep[], overrides?: Partial<DriverConfig>) {
+	start({ steps, overrides }: StartParams = {}) {
 		if (steps) {
 			this.config.steps = steps;
 		}

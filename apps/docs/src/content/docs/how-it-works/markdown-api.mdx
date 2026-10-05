@@ -45,7 +45,7 @@ Markdown negotiation is the **first** thing `apps/web/src/middleware.ts` decides
 
 ## The headers
 
-One module states the cache policy, and it is the one that knows the outcome: `markdownTwinHeaders({ found })` in `apps/web/src/infrastructure/markdown/twin.ts` returns the content type, `Cache-Control` and `Vary` together.
+One module states the cache policy, and it is the one that knows the outcome: `markdownTwinHeaders(found)` in `apps/web/src/infrastructure/markdown/twin.ts` returns the content type, `Cache-Control` and `Vary` together.
 
 | | Found | Not found |
 | --- | --- | --- |

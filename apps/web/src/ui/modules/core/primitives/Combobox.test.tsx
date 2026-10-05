@@ -89,9 +89,15 @@ describe("Combobox", () => {
 		expect(screen.getAllByRole("option").map((option) => option.textContent)).toEqual(["Spain"]);
 	});
 
-	it("renders no element carrying the hard-coded combobox-listbox id", () => {
+	it("opens a listbox under an id of its own, which is never the hard-coded combobox-listbox", async () => {
 		const { container } = render(<Combobox options={COUNTRIES} value="" onChange={vi.fn()} />);
 
+		await userEvent.click(screen.getByRole("button"));
+		const listbox = screen.getByRole("listbox");
+
+		expect(listbox.id).not.toBe("");
+		expect(container.ownerDocument.getElementById(listbox.id)).toBe(listbox);
+		expect(listbox.id).not.toBe("combobox-listbox");
 		expect(container.ownerDocument.getElementById("combobox-listbox")).toBeNull();
 	});
 });

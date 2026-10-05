@@ -83,9 +83,10 @@ the `z` namespace, and `zod/mini`, which does shake, has no `validate`. The path
 resort of the chain, which production never reaches while `cf-ipcountry` is present. Two `typeof` checks cost
 nothing and give the same answer.
 
-**Only the CDN failure is logged.** It goes through `logger.warn`. The egress-IP chain is closed with
-`Effect.orElse`, so a failure there is invisible: if detection has quietly stopped working, absence of logs
-is not evidence.
+**Only the CDN failure is logged.** It goes through `logger.warn` with a `reason`: the message of the call that
+rejected (the `UnknownException` Effect wraps it in says only that something failed) or of the refusal itself, since an
+`Error` in a log context serialises to nothing. The egress-IP chain is closed with `Effect.orElse`, so a failure there
+is invisible: if detection has quietly stopped working, absence of logs is not evidence.
 
 ## Testing
 

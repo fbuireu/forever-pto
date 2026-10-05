@@ -1,5 +1,5 @@
 import { PremiumFeatureId, PremiumOrigin } from "@application/stores/premium";
-import { FilterStrategy } from "@domain/calendar/types";
+import { Strategy } from "@domain/calendar/types";
 import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import enMessages from "@i18n/messages/en.json";
 import { fireEvent, render, screen } from "@testing-library/react";
@@ -22,7 +22,7 @@ import { QuickStartSettingsStep } from "./QuickStartSettingsStep";
 const sidebar = enMessages.sidebar;
 
 interface RenderStepParams {
-	strategy?: FilterStrategy;
+	strategy?: Strategy;
 	preferredMonths?: number[];
 	allowPastDays?: boolean;
 	carryOverMonths?: number;
@@ -30,7 +30,7 @@ interface RenderStepParams {
 }
 
 const renderStep = ({
-	strategy = FilterStrategy.GROUPED,
+	strategy = Strategy.GROUPED,
 	preferredMonths = [6, 7],
 	allowPastDays = false,
 	carryOverMonths = 1,
@@ -57,13 +57,13 @@ beforeEach(() => {
 
 describe("QuickStartSettingsStep", () => {
 	it("offers every strategy with the draft's one checked", () => {
-		renderStep({ strategy: FilterStrategy.BALANCED });
+		renderStep({ strategy: Strategy.BALANCED });
 
 		expect(screen.getAllByRole("radio").map((radio) => (radio as HTMLInputElement).value)).toStrictEqual([
-			FilterStrategy.GROUPED,
-			FilterStrategy.OPTIMIZED,
-			FilterStrategy.BALANCED,
-			FilterStrategy.MAIN_VACATION,
+			Strategy.GROUPED,
+			Strategy.OPTIMIZED,
+			Strategy.BALANCED,
+			Strategy.MAIN_VACATION,
 		]);
 		expect((screen.getByLabelText(new RegExp(sidebar.strategy.balanced.label)) as HTMLInputElement).checked).toBe(true);
 	});
@@ -73,17 +73,17 @@ describe("QuickStartSettingsStep", () => {
 
 		fireEvent.click(screen.getByLabelText(new RegExp(sidebar.strategy.optimized.label)));
 
-		expect(onChange).toHaveBeenCalledExactlyOnceWith({ strategy: FilterStrategy.OPTIMIZED });
+		expect(onChange).toHaveBeenCalledExactlyOnceWith({ strategy: Strategy.OPTIMIZED });
 	});
 
 	it("asks for the Preferred Months only when Main vacation is picked", () => {
-		renderStep({ strategy: FilterStrategy.OPTIMIZED });
+		renderStep({ strategy: Strategy.OPTIMIZED });
 
 		expect(screen.queryByRole("group", { name: sidebar.preferredMonths.title })).toBeNull();
 	});
 
 	it("hands back the Preferred Months with a month added", () => {
-		const onChange = renderStep({ strategy: FilterStrategy.MAIN_VACATION });
+		const onChange = renderStep({ strategy: Strategy.MAIN_VACATION });
 
 		expect(screen.getByRole("group", { name: sidebar.preferredMonths.title })).toBeDefined();
 		fireEvent.click(screen.getByRole("button", { name: /^June \d{4}$/ }));
@@ -92,7 +92,7 @@ describe("QuickStartSettingsStep", () => {
 	});
 
 	it("says the block may land anywhere once no month is picked", () => {
-		renderStep({ strategy: FilterStrategy.MAIN_VACATION, preferredMonths: [] });
+		renderStep({ strategy: Strategy.MAIN_VACATION, preferredMonths: [] });
 
 		expect(screen.getByText(sidebar.preferredMonths.anyMonth)).toBeDefined();
 	});
@@ -134,7 +134,7 @@ describe("QuickStartSettingsStep", () => {
 		});
 
 		it("refuses a Preferred Month already past", () => {
-			renderStep({ strategy: FilterStrategy.MAIN_VACATION, year: 2026, carryOverMonths: 0 });
+			renderStep({ strategy: Strategy.MAIN_VACATION, year: 2026, carryOverMonths: 0 });
 
 			expect(screen.getByRole("button", { name: /^August \d{4}$/ })).toHaveProperty("disabled", true);
 			expect(screen.getByRole("button", { name: /^October \d{4}$/ })).toHaveProperty("disabled", false);

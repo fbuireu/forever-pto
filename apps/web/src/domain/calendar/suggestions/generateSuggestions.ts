@@ -1,11 +1,11 @@
-import type { FilterStrategy } from "@domain/calendar/types";
+import type { Strategy } from "@domain/calendar/types";
 import { type PlanningCandidates, selectionInputOf } from "@domain/calendar/utils/candidates";
 import { selectBridgesForStrategy } from "./utils/selectors";
 
 export interface GenerateSuggestionsParams {
 	ptoDays: number;
 	candidates: PlanningCandidates;
-	strategy: FilterStrategy;
+	strategy: Strategy;
 	preferredMonths?: number[];
 }
 

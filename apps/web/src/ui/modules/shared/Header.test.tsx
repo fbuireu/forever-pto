@@ -19,7 +19,7 @@ vi.mock("./QuickStartTrigger", () => ({
 		</button>
 	),
 }));
-vi.mock("@ui/modules/sidebar/components/ThemeSelector", () => ({
+vi.mock("./ThemeSelector", () => ({
 	ThemeSelector: ({ buttonClassName }: { buttonClassName?: string }) => (
 		<button type="button" data-testid="theme" className={buttonClassName}>
 			theme

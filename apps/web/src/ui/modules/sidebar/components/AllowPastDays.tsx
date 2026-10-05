@@ -2,7 +2,7 @@
 
 import { useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
-import { PremiumFeatureId } from "@application/stores/premium";
+import { PremiumFeatureId, PremiumOrigin } from "@application/stores/premium";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { Switch } from "@ui/modules/core/animate/base/Switch";
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
@@ -34,7 +34,7 @@ export const AllowPastDays = () => {
 				title={t("title")}
 				tooltip={{ label: t("tooltipLabel"), content: t("tooltip") }}
 			/>
-			<PremiumFeature feature={PremiumFeatureId.ALLOW_PAST_DAYS}>
+			<PremiumFeature feature={PremiumFeatureId.ALLOW_PAST_DAYS} origin={PremiumOrigin.PLANNER}>
 				<div className="flex gap-2 w-full items-center">
 					<Switch checked={allowPastDays} aria-label={t("title")} onCheckedChange={handleChange} />
 					<p className="font-normal text-sm">{allowPastDays ? t("enabled") : t("disabled")}</p>

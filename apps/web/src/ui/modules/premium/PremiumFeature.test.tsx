@@ -15,18 +15,19 @@ vi.mock("@application/stores/premium", async (importOriginal) => ({
 	usePremiumStore: (selector: (state: typeof premiumState) => unknown) => selector(premiumState),
 }));
 
-import { PremiumFeatureId } from "@application/stores/premium";
+import { PremiumFeatureId, PremiumOrigin } from "@application/stores/premium";
 import { PremiumFeature } from "./PremiumFeature";
 
 interface RenderGateParams {
 	locale: Locale;
 	messages: object;
+	origin?: PremiumOrigin;
 }
 
-const renderGate = ({ locale, messages }: RenderGateParams) =>
+const renderGate = ({ locale, messages, origin = PremiumOrigin.PLANNER }: RenderGateParams) =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
-			<PremiumFeature feature={PremiumFeatureId.CALENDAR_EXPORT}>
+			<PremiumFeature feature={PremiumFeatureId.CALENDAR_EXPORT} origin={origin}>
 				<span>the export buttons</span>
 			</PremiumFeature>
 		</NextIntlClientProvider>,
@@ -47,7 +48,11 @@ const renderDescribedGate = () => {
 	const errors = vi.spyOn(console, "error");
 	const view = render(
 		<NextIntlClientProvider locale="en" messages={enMessages}>
-			<PremiumFeature feature={PremiumFeatureId.CUSTOM_HOLIDAYS} description={DESCRIPTION}>
+			<PremiumFeature
+				feature={PremiumFeatureId.CUSTOM_HOLIDAYS}
+				origin={PremiumOrigin.PLANNER}
+				description={DESCRIPTION}
+			>
 				<span>the custom tab</span>
 			</PremiumFeature>
 		</NextIntlClientProvider>,
@@ -78,7 +83,10 @@ describe("PremiumFeature's lock, the one that carries the description", () => {
 
 		fireEvent.click(lock);
 
-		expect(premiumState.showPremiumModal).toHaveBeenCalledExactlyOnceWith("customHolidays", undefined);
+		expect(premiumState.showPremiumModal).toHaveBeenCalledExactlyOnceWith({
+			feature: "customHolidays",
+			origin: "planner",
+		});
 	});
 
 	it("opens the modal once when Enter is pressed on the lock, which a click had focused", () => {
@@ -87,7 +95,10 @@ describe("PremiumFeature's lock, the one that carries the description", () => {
 
 		fireEvent.keyDown(lock, { key: "Enter" });
 
-		expect(premiumState.showPremiumModal).toHaveBeenCalledExactlyOnceWith("customHolidays", undefined);
+		expect(premiumState.showPremiumModal).toHaveBeenCalledExactlyOnceWith({
+			feature: "customHolidays",
+			origin: "planner",
+		});
 	});
 });
 
@@ -97,7 +108,15 @@ describe("PremiumFeature", () => {
 
 		fireEvent.click(screen.getByRole("button"));
 
-		expect(premiumState.showPremiumModal).toHaveBeenCalledWith("calendarExport", undefined);
+		expect(premiumState.showPremiumModal).toHaveBeenCalledWith({ feature: "calendarExport", origin: "planner" });
+	});
+
+	it("hands the store the origin the gate was given, so the homepage dialog reports itself", () => {
+		renderGate({ locale: "en", messages: enMessages, origin: PremiumOrigin.QUICK_START });
+
+		fireEvent.click(screen.getByRole("button"));
+
+		expect(premiumState.showPremiumModal).toHaveBeenCalledWith({ feature: "calendarExport", origin: "quick_start" });
 	});
 
 	it("sends the same id from a German render, so one gate is one value in the funnel", () => {
@@ -105,7 +124,7 @@ describe("PremiumFeature", () => {
 
 		fireEvent.click(screen.getByRole("button"));
 
-		expect(premiumState.showPremiumModal).toHaveBeenCalledWith("calendarExport", undefined);
+		expect(premiumState.showPremiumModal).toHaveBeenCalledWith({ feature: "calendarExport", origin: "planner" });
 	});
 
 	it("keeps a focus ring, so tabbing onto a gated chart changes something on screen", () => {

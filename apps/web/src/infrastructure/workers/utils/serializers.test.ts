@@ -30,7 +30,7 @@ const EMPTY_METRICS: Metrics = {
 	longWeekends: 0,
 	restBlocks: 0,
 	maxWorkStreak: 0,
-	firstLastBreak: null,
+	firstLastRestBlock: null,
 	averageEfficiency: 0,
 	bonusDays: 0,
 	quarterDist: [],

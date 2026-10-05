@@ -3,11 +3,11 @@ import { markdownTwinHeaders } from "./twin";
 
 describe("markdownTwinHeaders", () => {
 	it("caches a page that exists", () => {
-		expect(markdownTwinHeaders({ found: true })["Cache-Control"]).toBe("public, max-age=3600");
+		expect(markdownTwinHeaders(true)["Cache-Control"]).toBe("public, max-age=3600");
 	});
 
 	it("never lets a shared cache keep a miss, which a policy set before the lookup could not express", () => {
-		const cacheControl = markdownTwinHeaders({ found: false })["Cache-Control"];
+		const cacheControl = markdownTwinHeaders(false)["Cache-Control"];
 
 		expect(cacheControl).toBe("no-store");
 		expect(cacheControl).not.toContain("max-age");
@@ -15,12 +15,12 @@ describe("markdownTwinHeaders", () => {
 	});
 
 	it("serves markdown only when there is a page, and plain text for the miss body", () => {
-		expect(markdownTwinHeaders({ found: true })["Content-Type"]).toBe("text/markdown; charset=utf-8");
-		expect(markdownTwinHeaders({ found: false })["Content-Type"]).toBe("text/plain; charset=utf-8");
+		expect(markdownTwinHeaders(true)["Content-Type"]).toBe("text/markdown; charset=utf-8");
+		expect(markdownTwinHeaders(false)["Content-Type"]).toBe("text/plain; charset=utf-8");
 	});
 
 	it("varies on Accept in both cases, so no cache can serve one representation for the other", () => {
-		expect(markdownTwinHeaders({ found: true }).Vary).toBe("Accept");
-		expect(markdownTwinHeaders({ found: false }).Vary).toBe("Accept");
+		expect(markdownTwinHeaders(true).Vary).toBe("Accept");
+		expect(markdownTwinHeaders(false).Vary).toBe("Accept");
 	});
 });

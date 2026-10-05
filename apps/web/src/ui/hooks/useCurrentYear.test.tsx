@@ -6,7 +6,7 @@ import { useCurrentYear } from "./useCurrentYear";
 const SERVER_YEAR = 2026;
 const VISITOR_YEAR = 2031;
 
-const YearProbe = () => <>{useCurrentYear({ serverYear: SERVER_YEAR })}</>;
+const YearProbe = () => <>{useCurrentYear(SERVER_YEAR)}</>;
 
 afterEach(() => {
 	vi.useRealTimers();
@@ -24,7 +24,7 @@ describe("useCurrentYear", () => {
 		const answers: number[] = [];
 
 		renderHook(() => {
-			const year = useCurrentYear({ serverYear: SERVER_YEAR });
+			const year = useCurrentYear(SERVER_YEAR);
 			answers.push(year);
 			return year;
 		});
@@ -35,7 +35,7 @@ describe("useCurrentYear", () => {
 	it("keeps the server's year when the visitor's clock agrees with it", () => {
 		vi.useFakeTimers({ now: new Date(SERVER_YEAR, 11, 31), toFake: ["Date"] });
 
-		const { result } = renderHook(() => useCurrentYear({ serverYear: SERVER_YEAR }));
+		const { result } = renderHook(() => useCurrentYear(SERVER_YEAR));
 
 		expect(result.current).toBe(SERVER_YEAR);
 	});

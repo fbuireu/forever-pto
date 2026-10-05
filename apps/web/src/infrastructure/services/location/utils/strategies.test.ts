@@ -14,6 +14,8 @@ vi.mock("@opennextjs/cloudflare", () => ({
 const { detectCountryFromCDN, detectCountryFromHeaders, detectCountryFromEgressIP, CLOUDFLARE_COUNTRY_HEADER } =
 	await import("./strategies");
 
+const { logger } = await import("@infrastructure/logging/logger");
+
 const { UNIDENTIFIED_COUNTRY, TOR_COUNTRY } = await import("./normalize");
 
 function makeRequest(country: string | null) {
@@ -95,6 +97,47 @@ describe("detectCountryFromCDN", () => {
 	it("returns empty string when fetch rejects", async () => {
 		vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network error")));
 		expect(await detectCountryFromCDN()).toBe("");
+	});
+
+	it("logs the reason a refused trace failed as a string, since an Error serialises to nothing", async () => {
+		vi.stubGlobal("fetch", vi.fn().mockResolvedValue(makeResponse({ ok: false, body: "" })));
+
+		await detectCountryFromCDN();
+
+		expect(logger.warn).toHaveBeenCalledExactlyOnceWith({
+			message: "Error while detecting country from CDN",
+			context: { reason: "Error while getting information from the CDN" },
+		});
+	});
+
+	it("logs the message of the fetch that rejected, not Effect's own wording", async () => {
+		vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network error")));
+
+		await detectCountryFromCDN();
+
+		expect(logger.warn).toHaveBeenCalledExactlyOnceWith({
+			message: "Error while detecting country from CDN",
+			context: { reason: "network error" },
+		});
+	});
+
+	it("logs the message of the context lookup that rejected", async () => {
+		mockGetCloudflareContext.mockRejectedValue(new Error("no context"));
+
+		await detectCountryFromCDN();
+
+		expect(logger.warn).toHaveBeenCalledExactlyOnceWith({
+			message: "Error while detecting country from CDN",
+			context: { reason: "no context" },
+		});
+	});
+
+	it("says nothing when the trace answers", async () => {
+		vi.stubGlobal("fetch", vi.fn().mockResolvedValue(makeResponse({ ok: true, body: `loc=${ES.toUpperCase()}\n` })));
+
+		await detectCountryFromCDN();
+
+		expect(logger.warn).not.toHaveBeenCalled();
 	});
 
 	it("never lets the per-visitor trace be served from a cache", async () => {

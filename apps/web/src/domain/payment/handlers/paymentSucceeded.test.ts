@@ -3,14 +3,14 @@ import { TursoService } from "@infrastructure/clients/db/turso/service";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import { DatabaseError, PaymentError } from "@infrastructure/errors";
 import { LoggerService } from "@infrastructure/logging/service";
+import type * as Repository from "@infrastructure/services/payments/repository";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { handlePaymentSucceeded } from "./paymentSucceeded";
 
 vi.mock("@infrastructure/services/payments/repository", () => ({
-	getPaymentById: vi.fn(() => Effect.succeed({ id: "pi_test", status: "pending" })),
-	updatePaymentStatus: vi.fn(() => Effect.succeed(true)),
-	updatePaymentCharge: vi.fn(() => Effect.succeed(undefined)),
+	updatePaymentStatus: vi.fn<typeof Repository.updatePaymentStatus>(() => Effect.succeed(true)),
+	updatePaymentCharge: vi.fn<typeof Repository.updatePaymentCharge>(() => Effect.succeed(undefined)),
 }));
 
 vi.mock("@infrastructure/services/payments/provider/charge", () => ({
@@ -33,9 +33,10 @@ vi.mock("@infrastructure/services/payments/provider/charge", () => ({
 }));
 
 const mockLogger = { info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
+const mockTurso = { query: vi.fn(), execute: vi.fn(() => Effect.succeed(1)) };
 const TestLayer = Layer.mergeAll(
 	Layer.succeed(LoggerService, mockLogger),
-	Layer.succeed(TursoService, { query: vi.fn(), execute: vi.fn() }),
+	Layer.succeed(TursoService, mockTurso),
 	Layer.succeed(StripeServerService, {
 		paymentIntents: { create: vi.fn(), retrieve: vi.fn() },
 		charges: { retrieve: vi.fn() },
@@ -62,9 +63,14 @@ describe("handlePaymentSucceeded", () => {
 	});
 
 	it("never reads the row first, so an unreadable database cannot look like an absent payment", async () => {
-		const { getPaymentById } = await import("@infrastructure/services/payments/repository");
+		const { updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
+		const repository = await vi.importActual<typeof Repository>("@infrastructure/services/payments/repository");
+		vi.mocked(updatePaymentStatus).mockImplementationOnce(repository.updatePaymentStatus);
+
 		await run(handlePaymentSucceeded(EVENT));
-		expect(getPaymentById).not.toHaveBeenCalled();
+
+		expect(mockTurso.execute).toHaveBeenCalledOnce();
+		expect(mockTurso.query).not.toHaveBeenCalled();
 	});
 
 	it("calls updatePaymentStatus exactly once, whatever the row holds, since the WHERE clause is the guard", async () => {

@@ -1,10 +1,10 @@
 "use client";
 
-import { holidaysInPlanningWindow } from "@application/dto/holiday/dto";
+import { holidaysInPlanningWindow } from "@application/dto/holiday/rules";
 import { generateIcs } from "@application/export/generateIcs";
 import { useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
-import { PremiumFeatureId } from "@application/stores/premium";
+import { PremiumFeatureId, PremiumOrigin } from "@application/stores/premium";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { usePlacedPlan } from "@ui/hooks/usePlanReadout";
 import { Button } from "@ui/modules/core/primitives/Button";
@@ -131,7 +131,7 @@ export const CalendarExport = () => {
 				</Button>
 				<SidebarFieldTooltip label={t("tooltipLabel")}>{t("tooltip")}</SidebarFieldTooltip>
 			</div>
-			<PremiumFeature feature={PremiumFeatureId.CALENDAR_EXPORT}>
+			<PremiumFeature feature={PremiumFeatureId.CALENDAR_EXPORT} origin={PremiumOrigin.PLANNER}>
 				<div className="flex flex-col gap-2">
 					<Button onClick={handleDownloadPdf} disabled={!hasData || isPdfPending} className="w-full" variant="outline">
 						<FileText className="size-3" />

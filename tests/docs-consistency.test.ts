@@ -2500,16 +2500,14 @@ describe("the code keeps the mechanical rules CODING_STANDARDS.md hands to this 
 
 	const HTTP_METHODS = new Set(["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]);
 
-	interface PositionalFunctionsParams {
-		path: string;
-		parsed: ts.SourceFile;
+	interface DeclaredFunction {
+		name: string;
+		signature: ts.SignatureDeclarationBase;
+		line: number;
 	}
 
-	const positionalFunctions = ({ path, parsed }: PositionalFunctionsParams) => {
-		const found: string[] = [];
-		const arity = (signature: ts.SignatureDeclarationBase) =>
-			signature.parameters.filter((parameter) => !(ts.isIdentifier(parameter.name) && parameter.name.text === "this"))
-				.length;
+	const declaredFunctions = (parsed: ts.SourceFile): DeclaredFunction[] => {
+		const found: DeclaredFunction[] = [];
 		const visit = (node: ts.Node) => {
 			let name: string | undefined;
 			let signature: ts.SignatureDeclarationBase | undefined;
@@ -2525,13 +2523,28 @@ describe("the code keeps the mechanical rules CODING_STANDARDS.md hands to this 
 				name = node.name.text;
 				signature = node.initializer;
 			}
-			if (name && signature && arity(signature) > 1 && !(path.endsWith("/route.ts") && HTTP_METHODS.has(name)))
-				found.push(`${path}:${parsed.getLineAndCharacterOfPosition(node.getStart(parsed)).line + 1} ${name}`);
+			if (name && signature)
+				found.push({ name, signature, line: parsed.getLineAndCharacterOfPosition(node.getStart(parsed)).line + 1 });
 			ts.forEachChild(node, visit);
 		};
 		visit(parsed);
 		return found;
 	};
+
+	interface PositionalFunctionsParams {
+		path: string;
+		parsed: ts.SourceFile;
+	}
+
+	const positionalFunctions = ({ path, parsed }: PositionalFunctionsParams) =>
+		declaredFunctions(parsed)
+			.filter(
+				({ name, signature }) =>
+					signature.parameters.filter(
+						(parameter) => !(ts.isIdentifier(parameter.name) && parameter.name.text === "this"),
+					).length > 1 && !(path.endsWith("/route.ts") && HTTP_METHODS.has(name)),
+			)
+			.map(({ name, line }) => `${path}:${line} ${name}`);
 
 	it("gives no function two positional parameters, in apps/web, its tests, its e2e specs or this suite", () => {
 		const scope = sourceFiles.filter(
@@ -2549,6 +2562,113 @@ describe("the code keeps the mechanical rules CODING_STANDARDS.md hands to this 
 		expect(positionalFunctions({ path: "synthetic.ts", parsed: synthetic })).toEqual(["synthetic.ts:1 pair"]);
 		expect(scope.length).toBeGreaterThan(500);
 		expect(offenders).toEqual([]);
+	});
+
+	const PARAMS_TYPE_NAME = /Params$/;
+	const COMPONENT_NAME = /^[A-Z]/;
+	const CHILDREN_PROP = "children";
+
+	interface ParamsDeclaration {
+		name: string;
+		fields: number;
+		extended: boolean;
+		line: number;
+	}
+
+	const paramsDeclarations = (parsed: ts.SourceFile): ParamsDeclaration[] => {
+		const found: ParamsDeclaration[] = [];
+		const visit = (node: ts.Node) => {
+			const members = ts.isInterfaceDeclaration(node)
+				? node.members
+				: ts.isTypeAliasDeclaration(node) && ts.isTypeLiteralNode(node.type)
+					? node.type.members
+					: undefined;
+			if ((ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node)) && members !== undefined) {
+				if (PARAMS_TYPE_NAME.test(node.name.text))
+					found.push({
+						name: node.name.text,
+						fields: members.length,
+						extended: ts.isInterfaceDeclaration(node) && (node.heritageClauses?.length ?? 0) > 0,
+						line: parsed.getLineAndCharacterOfPosition(node.getStart(parsed)).line + 1,
+					});
+			}
+			ts.forEachChild(node, visit);
+		};
+		visit(parsed);
+		return found;
+	};
+
+	interface InlineParameterType {
+		function: string;
+		fields: ts.NodeArray<ts.TypeElement>;
+		line: number;
+	}
+
+	const inlineParameterTypes = (parsed: ts.SourceFile): InlineParameterType[] =>
+		declaredFunctions(parsed).flatMap(({ name, signature, line }) =>
+			signature.parameters.flatMap((parameter) =>
+				parameter.type !== undefined && ts.isTypeLiteralNode(parameter.type)
+					? [{ function: name, fields: parameter.type.members, line }]
+					: [],
+			),
+		);
+
+	const takesProps = ({ function: name, fields }: InlineParameterType) =>
+		COMPONENT_NAME.test(name) || (fields.length === 1 && fields[0]?.name?.getText() === CHILDREN_PROP);
+
+	interface SingleFieldParametersParams {
+		path: string;
+		parsed: ts.SourceFile;
+	}
+
+	const singleFieldParameters = ({ path, parsed }: SingleFieldParametersParams) => [
+		...paramsDeclarations(parsed)
+			.filter(({ fields, extended }) => fields < 2 && !extended)
+			.map(({ name, line }) => `${path}:${line} ${name}`),
+		...inlineParameterTypes(parsed)
+			.filter((inline) => inline.fields.length < 2 && !takesProps(inline))
+			.map(({ function: name, line }) => `${path}:${line} ${name}`),
+	];
+
+	it("gives no params type, and no inline parameter type, a single field of its own", () => {
+		const scope = sourceFiles.filter(
+			(file) => file.startsWith(`${WEB_SRC}/`) || file.startsWith(`${WEB}/e2e/`) || file.startsWith("tests/"),
+		);
+		const synthetic = ts.createSourceFile(
+			"synthetic.tsx",
+			[
+				"interface OneParams { a: string }",
+				"type PairParams = { a: string; check: (value: string) => boolean }",
+				"type AliasParams = { a: string }",
+				"interface ExtendedParams extends Base { a: string }",
+				"const one = ({ a }: { a: string }) => a;",
+				"function plain(tree: { container: HTMLElement }) { return tree; }",
+				"const Component = ({ label }: { label: string }) => label;",
+				"const wrapper = ({ children }: { children: ReactNode }) => children;",
+				"const pair = ({ a, b }: { a: string; b: string }) => a + b;",
+				"const callback = (state: { open: boolean }) => state.open;",
+			].join("\n"),
+			ts.ScriptTarget.Latest,
+			true,
+			ts.ScriptKind.TSX,
+		);
+		const parsed = scope.map((path) => parse(path));
+
+		expect(singleFieldParameters({ path: "synthetic.tsx", parsed: synthetic })).toEqual([
+			"synthetic.tsx:1 OneParams",
+			"synthetic.tsx:3 AliasParams",
+			"synthetic.tsx:5 one",
+			"synthetic.tsx:6 plain",
+			"synthetic.tsx:10 callback",
+		]);
+		expect(parsed.flatMap(paramsDeclarations).length).toBeGreaterThan(200);
+		expect(
+			parsed.flatMap((file) => paramsDeclarations(file).filter(({ fields }) => fields > 1)).length,
+		).toBeGreaterThan(150);
+		expect(parsed.flatMap(inlineParameterTypes).filter(takesProps).length).toBeGreaterThan(10);
+		expect(
+			scope.flatMap((path, index) => singleFieldParameters({ path, parsed: parsed[index] as ts.SourceFile })),
+		).toEqual([]);
 	});
 
 	const EFFECT_HOOKS = new Set(["useEffect", "useLayoutEffect", "useInsertionEffect"]);
@@ -2616,6 +2736,13 @@ describe("the code keeps the mechanical rules CODING_STANDARDS.md hands to this 
 
 	it("builds a date format in the date library alone", () => {
 		expect(webProduction.filter((file) => DATE_FORMATTING.test(read(file)))).toEqual([DATE_LIBRARY]);
+	});
+
+	const HOLIDAY_RULES = `${WEB_SRC}/application/dto/holiday/rules.ts`;
+	const WINDOW_FLAG_READ = /\.isInPlanningWindow\b/;
+
+	it("reads a Holiday's isInPlanningWindow in the Holiday rules alone", () => {
+		expect(webProduction.filter((file) => WINDOW_FLAG_READ.test(read(file)))).toEqual([HOLIDAY_RULES]);
 	});
 
 	const JSON_BODY_READER = `${WEB_SRC}/infrastructure/api/parseJsonBody.ts`;
@@ -2937,6 +3064,19 @@ describe("the code keeps the mechanical rules CODING_STANDARDS.md hands to this 
 		expect(CLOCK_BRACKET.test("const before = Math.floor(Date.now() / 1000);")).toBe(true);
 		expect(unitTests.length).toBeGreaterThan(300);
 		expect(unitTests.filter((file) => REAL_YEAR.test(read(file)) || CLOCK_BRACKET.test(read(file)))).toEqual([]);
+	});
+
+	const DTO_IMPORT = /from\s+["']@application\/dto\//;
+	const DTO_MODULE_MOCK = /vi\.(?:mock|doMock)\(\s*["']@application\/dto\/[a-z]+\/dto["']/;
+
+	it("mocks no DTO module in a unit test, so the real mapping runs over the fixture", () => {
+		expect(DTO_MODULE_MOCK.test('vi.mock("@application/dto/payment/dto", () => ({}));')).toBe(true);
+		expect(DTO_MODULE_MOCK.test('vi.doMock("@application/dto/region/dto", () => ({}));')).toBe(true);
+		expect(DTO_MODULE_MOCK.test('vi.mock("@application/dto/payment/schema", async (importOriginal) => ({}));')).toBe(
+			false,
+		);
+		expect(unitTests.filter((file) => DTO_IMPORT.test(read(file))).length).toBeGreaterThan(40);
+		expect(unitTests.filter((file) => DTO_MODULE_MOCK.test(read(file)))).toEqual([]);
 	});
 
 	const UNDONE_BY = new Map([
@@ -3354,7 +3494,9 @@ describe("the custom properties of apps/web are declared where something sets th
 	const CSS_DECLARATION = new RegExp(String.raw`(?<![\w-])(${NAME})\s*:`, "g");
 	const PROPERTY_KEY = new RegExp(`^${NAME}$`);
 	const THEME_INLINE = /@theme\s+inline\s*\{/g;
+	const THEME_ON_DEMAND = /@theme\s*(?:default\s*)?\{/g;
 	const THEME_DEFAULT = /@theme\s+default\s*\{/;
+	const CSS_MODULE = /\.module\.css$/;
 	const CSS_COMMENT = /\/\*[\s\S]*?\*\//g;
 	const COLOUR_NAMESPACE = /^--color-/;
 	const LIBRARY_CSS_VARS = /CssVars\.js$/;
@@ -3368,8 +3510,10 @@ describe("the custom properties of apps/web are declared where something sets th
 	}
 
 	interface Uses {
+		path: string;
 		reads: Use[];
 		declarations: Use[];
+		unconditional: Use[];
 	}
 
 	interface ScanParams {
@@ -3415,23 +3559,34 @@ describe("the custom properties of apps/web are declared where something sets th
 		return css.length;
 	};
 
-	const withoutThemeInline = (css: string) =>
-		[...css.matchAll(THEME_INLINE)]
+	interface WithoutBlocksParams {
+		css: string;
+		opener: RegExp;
+	}
+
+	const withoutBlocks = ({ css, opener }: WithoutBlocksParams) =>
+		[...css.matchAll(opener)]
 			.map((match) => (match.index ?? 0) + match[0].length - 1)
 			.reduce((text, open) => {
 				const close = closingBrace({ css, open });
 				return text.slice(0, open) + blankedLike(text.slice(open, close)) + text.slice(close);
 			}, css);
 
+	const declarationsOf = ({ path, css }: { path: string; css: string }): Use[] =>
+		[...css.matchAll(CSS_DECLARATION)].map((match) => ({
+			name: match[1] as string,
+			at: `${path}:${lineAt(css)(match.index)}`,
+		}));
+
 	const cssUses = ({ path, text }: ScanParams): Uses => {
 		const stripped = text.replace(CSS_COMMENT, blankedLike);
-		const emitted = withoutThemeInline(stripped);
+		const emitted = withoutBlocks({ css: stripped, opener: THEME_INLINE });
+		const always = withoutBlocks({ css: emitted, opener: THEME_ON_DEMAND });
 		return {
+			path,
 			reads: readsIn({ path, text: stripped, lineOf: lineAt(stripped) }),
-			declarations: [...emitted.matchAll(CSS_DECLARATION)].map((match) => ({
-				name: match[1] as string,
-				at: `${path}:${lineAt(emitted)(match.index)}`,
-			})),
+			declarations: declarationsOf({ path, css: emitted }),
+			unconditional: declarationsOf({ path, css: always }),
 		};
 	};
 
@@ -3482,7 +3637,7 @@ describe("the custom properties of apps/web are declared where something sets th
 			ts.forEachChild(node, visit);
 		};
 		visit(parsed);
-		return { reads, declarations };
+		return { path, reads, declarations, unconditional: declarations };
 	};
 
 	const filesUnder = (folder: string): string[] =>
@@ -3515,22 +3670,33 @@ describe("the custom properties of apps/web are declared where something sets th
 	const sheetNames = stylesheets.flatMap((path) =>
 		cssUses({ path, text: read(path) }).declarations.map((use) => use.name),
 	);
+	const alwaysEmittedSheetNames = stylesheets.flatMap((path) =>
+		cssUses({ path, text: read(path) }).unconditional.map((use) => use.name),
+	);
 	const setterNames = webProduction.flatMap((path) =>
 		tsUses({ path, text: read(path) }).declarations.map((use) => use.name),
 	);
 
 	const declared = new Set([...sheetNames, ...setterNames, ...libraryNames, ...tailwindNames]);
+	const declaredForModules = new Set([...alwaysEmittedSheetNames, ...setterNames, ...libraryNames]);
 
 	interface UndeclaredParams {
 		uses: Uses[];
 		known: Set<string>;
+		knownForModules?: Set<string>;
 	}
 
-	const undeclared = ({ uses, known }: UndeclaredParams) => {
-		const own = new Set([...known, ...uses.flatMap((use) => use.declarations.map((declaration) => declaration.name))]);
-		return uses.flatMap((use) =>
-			use.reads.filter((read) => !own.has(read.name)).map((read) => `${read.at} ${read.name}`),
-		);
+	const undeclared = ({ uses, known, knownForModules = known }: UndeclaredParams) => {
+		const ownAnywhere = new Set(uses.flatMap(({ declarations }) => declarations.map(({ name }) => name)));
+		const ownAlways = new Set(uses.flatMap(({ unconditional }) => unconditional.map(({ name }) => name)));
+		return uses.flatMap((use) => {
+			const inModule = CSS_MODULE.test(use.path);
+			const visible = inModule ? knownForModules : known;
+			const own = inModule ? ownAlways : ownAnywhere;
+			return use.reads
+				.filter((read) => !visible.has(read.name) && !own.has(read.name))
+				.map((read) => `${read.at} ${read.name}`);
+		});
 	};
 
 	it("flags a read nothing declares and passes one a stylesheet, a style key, an arbitrary property or a setter declares", () => {
@@ -3574,6 +3740,25 @@ describe("the custom properties of apps/web are declared where something sets th
 		]);
 	});
 
+	it("takes a variable only Tailwind's on-demand theme emits for undeclared in a CSS module, which Tailwind never compiles, and for declared in a stylesheet it does", () => {
+		const reading = ".a { font-size: var(--text-sm); }";
+		const themed = { known: new Set(["--text-sm"]), knownForModules: new Set<string>() };
+
+		expect(undeclared({ uses: [cssUses({ path: "synthetic.module.css", text: reading })], ...themed })).toEqual([
+			"synthetic.module.css:1 --text-sm",
+		]);
+		expect(undeclared({ uses: [cssUses({ path: "synthetic.css", text: reading })], ...themed })).toEqual([]);
+	});
+
+	it("counts a name an @theme static block declares for a CSS module, which Tailwind always emits, and not one a plain @theme block declares, which it emits only when a utility uses it", () => {
+		const reading = cssUses({ path: "synthetic.module.css", text: ".a { gap: var(--legend-gap); }" });
+		const declaring = (css: string) =>
+			undeclared({ uses: [reading, cssUses({ path: "synthetic.css", text: css })], known: new Set() });
+
+		expect(declaring("@theme static {\n\t--legend-gap: 1rem;\n}")).toEqual([]);
+		expect(declaring("@theme {\n\t--legend-gap: 1rem;\n}")).toEqual(["synthetic.module.css:1 --legend-gap"]);
+	});
+
 	it("reads a census that holds every kind of declaration the tree makes", () => {
 		expect(webProduction.length).toBeGreaterThan(300);
 		expect(stylesheets.length).toBeGreaterThan(5);
@@ -3587,10 +3772,14 @@ describe("the custom properties of apps/web are declared where something sets th
 		expect(tailwindNames.length).toBeGreaterThan(80);
 		expect(tailwindNames).toEqual(expect.arrayContaining(["--spacing", "--container-7xl", "--text-sm", "--shadow-lg"]));
 		expect(tailwindNames.filter((name) => COLOUR_NAMESPACE.test(name))).toEqual([]);
+		expect(scanned.filter(({ path }) => CSS_MODULE.test(path)).flatMap(({ reads }) => reads).length).toBeGreaterThan(
+			10,
+		);
+		expect(declaredForModules.size).toBeGreaterThan(150);
 	});
 
 	it("declares every custom property a class, a style or a stylesheet reads, in a token file, in the code that sets it or in the library that does", () => {
-		expect(undeclared({ uses: scanned, known: declared })).toEqual([]);
+		expect(undeclared({ uses: scanned, known: declared, knownForModules: declaredForModules })).toEqual([]);
 	});
 });
 
@@ -4442,6 +4631,144 @@ describe("translation bundles stay in step", () => {
 			return !pattern || !found || !pattern.test(found[1]);
 		});
 
+		expect(stale).toEqual([]);
+	});
+
+	const phrasesOf = (phrases: string[]) => new RegExp(`(?<!\\p{L})(?:${phrases.join("|")})(?!\\p{L})`, "iu");
+
+	const RETIRED_COPY: Record<string, RegExp> = {
+		"en.json": phrasesOf([
+			"days? off",
+			"auto-assigned",
+			"manually selected",
+			"unused days",
+			"remaining days",
+			"available days",
+			"(?:first|last) break",
+		]),
+		"es.json": phrasesOf([
+			"d[ií]as? libres?",
+			"d[ií]as? restantes?",
+			"d[ií]as? disponibles?",
+			"d[ií]as? sin usar",
+			"seleccionad[oa]s? manualmente",
+			"asignad[oa]s? autom[aá]ticamente",
+			"(?:primer|[uú]ltimo) descanso",
+		]),
+		"ca.json": phrasesOf([
+			"di(?:a|es) lliures?",
+			"di(?:a|es) restants?",
+			"di(?:a|es) disponibles?",
+			"dies sense (?:usar|fer servir)",
+			"dies que no fas servir",
+			"seleccionats? manualment",
+			"assignats? autom[aà]ticament",
+			"(?:primera|[uú]ltima) pausa",
+		]),
+		"it.json": phrasesOf([
+			"giorn(?:o|i) liber[oi]",
+			"giorn(?:o|i) rimanent[ei]",
+			"giorn(?:o|i) disponibil[ei]",
+			"giorni non usati",
+			"selezionat[aeio] manualmente",
+			"assegnat[aeio] automaticamente",
+			"(?:prima|ultima) pausa",
+		]),
+		"de.json": phrasesOf([
+			"freie[nr]? Tage?",
+			"verbleibende[nr]? Tage?",
+			"verf[uü]gbare[nr]? Tage?",
+			"ungenutzte[nr]? Tage?",
+			"manuell ausgew[aä]hlte[nr]?",
+			"automatisch zugewiesene[nr]?",
+			"(?:erste|letzte) Auszeit",
+		]),
+		"fr.json": phrasesOf([
+			"jours? de repos",
+			"jours? restants?",
+			"jours? disponibles?",
+			"jours? non utilis[ée]s?",
+			"s[ée]lectionn[ée]s? manuellement",
+			"attribu[ée]s? automatiquement",
+			"(?:premi[eè]re|derni[eè]re) pause",
+		]),
+	};
+
+	const MARKETING_NAMESPACES = new Set(["homepage", "faq", "quickStart", "troubleshooting", "metadata"]);
+	const LEGAL_NAMESPACES = new Set(["cookiePolicy", "privacyPolicy", "termsOfService", "legalNotice"]);
+	const namespaceOf = (path: string) => path.split(".")[0] ?? "";
+	const isProductCopy = (path: string) =>
+		!MARKETING_NAMESPACES.has(namespaceOf(path)) && !LEGAL_NAMESPACES.has(namespaceOf(path));
+
+	const RETIRED_COPY_ALLOWED = new Set([
+		"en.json error.title",
+		"es.json error.title",
+		"ca.json error.title",
+		"it.json error.title",
+		"de.json error.title",
+	]);
+
+	it("holds a retired-phrase list for every bundle", () => {
+		expect(Object.keys(RETIRED_COPY).sort()).toEqual([...localeFiles].sort());
+	});
+
+	it.each(Object.keys(RETIRED_COPY))(
+		"%s names no concept by a phrase the glossary retires, outside the marketing and legal copy",
+		(file) => {
+			const pattern = RETIRED_COPY[file] as RegExp;
+			const retired = entriesOf(file)
+				.filter(
+					([path, value]) => isProductCopy(path) && pattern.test(value) && !RETIRED_COPY_ALLOWED.has(`${file} ${path}`),
+				)
+				.map(([path, value]) => `${path} -> ${value}`);
+
+			expect(retired).toEqual([]);
+		},
+	);
+
+	it.each(Object.keys(RETIRED_COPY))(
+		"%s still finds those phrases in the marketing copy N1 lets use them, so no list is empty",
+		(file) => {
+			const pattern = RETIRED_COPY[file] as RegExp;
+			const marketing = entriesOf(file).filter(
+				([path, value]) => MARKETING_NAMESPACES.has(namespaceOf(path)) && pattern.test(value),
+			);
+
+			expect(marketing.length).toBeGreaterThan(0);
+		},
+	);
+
+	const STYLED_ARGUMENT = /\{\s*\w+\s*,\s*(?:number|date|time)\s*,/;
+	const PLAIN_NUMBER_ARGUMENT = /\{\s*\w+\s*,\s*number\s*\}/;
+
+	it.each(localeFiles)(
+		"%s styles no number, date or time argument in a message, because production precompiles the bundles and knows no named format",
+		(file) => {
+			const styled = entriesOf(file)
+				.filter(([, value]) => STYLED_ARGUMENT.test(value))
+				.map(([path, value]) => `${path} -> ${value}`);
+
+			expect(styled).toEqual([]);
+		},
+	);
+
+	it("reads the arguments the bundles do hold, so the styled pattern is not blind", () => {
+		expect(STYLED_ARGUMENT.test("{pct, number, percent}")).toBe(true);
+		expect(STYLED_ARGUMENT.test("{when, date, short}")).toBe(true);
+		expect(STYLED_ARGUMENT.test("{amount, number, ::currency/EUR}")).toBe(true);
+		expect(STYLED_ARGUMENT.test("({minDays, number}+ days)")).toBe(false);
+		expect(entriesOf("en.json").filter(([, value]) => PLAIN_NUMBER_ARGUMENT.test(value)).length).toBeGreaterThan(5);
+	});
+
+	it("allows only retired phrases that still stand in the line they excuse", () => {
+		const stale = [...RETIRED_COPY_ALLOWED].filter((entry) => {
+			const [file = "", path = ""] = entry.split(" ");
+			const pattern = RETIRED_COPY[file];
+			const found = entriesOf(file).find(([key]) => key === path);
+			return !pattern || !found || !pattern.test(found[1]);
+		});
+
+		expect(RETIRED_COPY_ALLOWED.size).toBeGreaterThan(0);
 		expect(stale).toEqual([]);
 	});
 

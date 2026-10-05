@@ -2,7 +2,9 @@ export type DayType = "work" | "holiday" | "pto" | "weekend";
 
 export const SHOWCASE_PLAN = { ptoDays: 22, effectiveDays: 74, holidays: 12 } as const;
 
-export const SHOWCASE_RATIO = SHOWCASE_PLAN.effectiveDays / SHOWCASE_PLAN.ptoDays;
+export const SHOWCASE_EFFICIENCY = SHOWCASE_PLAN.effectiveDays / SHOWCASE_PLAN.ptoDays;
+
+export const COUNTRY_COUNT = 203;
 
 const CAL_PATTERN: DayType[] = [
 	"work",

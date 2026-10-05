@@ -1,17 +1,13 @@
 import { DatabaseSync, type SQLInputValue } from "node:sqlite";
 import { DatabaseError } from "@infrastructure/errors";
-import { type Context, Effect, Layer } from "effect";
-import { TursoService } from "./service";
+import { Effect, Layer } from "effect";
+import { type StatementParams, TursoService } from "./service";
 
-type TursoArgs = NonNullable<Parameters<Context.Tag.Service<typeof TursoService>["query"]>[1]>;
+type TursoArgs = NonNullable<StatementParams["args"]>;
 
 export interface FixtureTurso {
 	layer: Layer.Layer<TursoService>;
 	database: DatabaseSync;
-}
-
-export interface CreateFixtureTursoParams {
-	schema: string;
 }
 
 const bindable = (value: TursoArgs[number]): SQLInputValue => {
@@ -28,16 +24,16 @@ const onALaterTask = <T>(statement: () => T): Effect.Effect<T, DatabaseError> =>
 			new DatabaseError({ message: error instanceof Error ? error.message : String(error), cause: error }),
 	});
 
-export const createFixtureTurso = ({ schema }: CreateFixtureTursoParams): FixtureTurso => {
+export const createFixtureTurso = (schema: string): FixtureTurso => {
 	const database = new DatabaseSync(":memory:");
 	database.exec(schema);
 
 	return {
 		database,
 		layer: Layer.succeed(TursoService, {
-			query: <T = unknown>(sql: string, args: TursoArgs = []) =>
+			query: <T = unknown>({ sql, args = [] }: StatementParams) =>
 				onALaterTask(() => database.prepare(sql).all(...args.map(bindable)) as T[]),
-			execute: (sql: string, args: TursoArgs = []) =>
+			execute: ({ sql, args = [] }: StatementParams) =>
 				onALaterTask(() => Number(database.prepare(sql).run(...args.map(bindable)).changes)),
 		}),
 	};

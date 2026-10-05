@@ -119,8 +119,7 @@ export const CookieConsent = () => {
 
 	if (showBanner) {
 		return (
-			<div
-				role="dialog"
+			<section
 				aria-labelledby="cookie-banner-title"
 				aria-describedby="cookie-banner-description"
 				className="fixed bottom-4 inset-x-4 sm:right-auto z-100 sm:max-w-2xl rounded-[14px] border-[3px] border-(--frame) bg-card p-5 sm:p-8 shadow-(--shadow-brutal-lg)"
@@ -148,7 +147,7 @@ export const CookieConsent = () => {
 						{t("acceptAll")}
 					</Button>
 				</div>
-			</div>
+			</section>
 		);
 	}
 

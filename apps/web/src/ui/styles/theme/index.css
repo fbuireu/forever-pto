@@ -1,6 +1,14 @@
 @custom-variant dark (&:is([data-theme="dark"] *));
 @custom-variant hover (&:hover);
 
+@theme static {
+	--spacing: 0.25rem;
+	--text-xs: 0.75rem;
+	--text-sm: 0.875rem;
+	--text-3xl: 1.875rem;
+	--shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
 @theme inline {
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);

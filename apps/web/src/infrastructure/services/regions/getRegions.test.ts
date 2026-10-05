@@ -10,7 +10,6 @@ const { mockGetStates, MockHolidays } = vi.hoisted(() => {
 	});
 	return { mockGetStates, MockHolidays };
 });
-const { mockRegionDTOCreate } = vi.hoisted(() => ({ mockRegionDTOCreate: vi.fn() }));
 
 vi.mock("@infrastructure/logging/logger", () => ({
 	logger: { logError: mockLogError },
@@ -18,15 +17,10 @@ vi.mock("@infrastructure/logging/logger", () => ({
 
 vi.mock("date-holidays", () => ({ default: MockHolidays }));
 
-vi.mock("@application/dto/region/dto", () => ({
-	regionDTO: { create: mockRegionDTOCreate },
-}));
-
 const { getRegions } = await import("./getRegions");
 
 beforeEach(() => {
 	vi.clearAllMocks();
-	mockRegionDTOCreate.mockReturnValue([]);
 });
 
 describe("getRegions", () => {
@@ -49,7 +43,6 @@ describe("getRegions", () => {
 
 	it("passes countryCode to Holidays constructor", () => {
 		mockGetStates.mockReturnValue({ CAT: "Catalonia" });
-		mockRegionDTOCreate.mockReturnValue([{ value: "CAT", label: "Catalonia" }]);
 
 		getRegions({ countryCode: "ES" });
 
@@ -58,39 +51,27 @@ describe("getRegions", () => {
 
 	it("calls getStates with lowercased countryCode", () => {
 		mockGetStates.mockReturnValue({ CAT: "Catalonia" });
-		mockRegionDTOCreate.mockReturnValue([{ value: "CAT", label: "Catalonia" }]);
 
 		getRegions({ countryCode: "ES" });
 
 		expect(mockGetStates).toHaveBeenCalledWith("es");
 	});
 
-	it("passes raw regions to regionDTO.create", () => {
-		const raw = { CAT: "Catalonia", MAD: "Madrid" };
-		mockGetStates.mockReturnValue(raw);
-		mockRegionDTOCreate.mockReturnValue([
+	it("offers each region the source holds as a value, its code, and a label, its name", () => {
+		mockGetStates.mockReturnValue({ CAT: "Catalonia", MAD: "Madrid" });
+
+		expect(getRegions({ countryCode: ES })).toEqual([
 			{ value: "CAT", label: "Catalonia" },
 			{ value: "MAD", label: "Madrid" },
 		]);
-
-		getRegions({ countryCode: ES });
-
-		expect(mockRegionDTOCreate).toHaveBeenCalledWith({ raw });
 	});
 
 	it("returns regions sorted alphabetically by label", () => {
 		mockGetStates.mockReturnValue({ MAD: "Madrid", CAT: "Catalonia", AND: "Andalucia" });
-		mockRegionDTOCreate.mockReturnValue([
-			{ value: "MAD", label: "Madrid" },
-			{ value: "CAT", label: "Catalonia" },
-			{ value: "AND", label: "Andalucia" },
-		]);
 
 		const result = getRegions({ countryCode: ES });
 
-		expect(result[0].label).toBe("Andalucia");
-		expect(result[1].label).toBe("Catalonia");
-		expect(result[2].label).toBe("Madrid");
+		expect(result.map(({ label }) => label)).toEqual(["Andalucia", "Catalonia", "Madrid"]);
 	});
 
 	it("returns empty array and logs error when an exception is thrown", () => {

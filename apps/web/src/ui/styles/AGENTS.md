@@ -25,7 +25,7 @@ fails on a scanned test, e2e spec or Markdown file and on any palette utility in
 | --- | --- |
 | `index.css` | Declares the cascade layer order, imports Tailwind, `tw-animate-css` and every partial below, and ends with the `@source not` exclusions |
 | [`base/index.css`](./base/index.css) | `@layer base`: element defaults: border/outline colour, body background and glow, scrollbar styling, the shared transition on buttons and shadcn slots |
-| [`theme/index.css`](./theme/index.css) | `@theme inline` bridges the design tokens into Tailwind's namespaces; also the `dark` and `hover` custom variants |
+| [`theme/index.css`](./theme/index.css) | `@theme inline` bridges the design tokens into Tailwind's namespaces; `@theme static` always emits the Tailwind theme variables a CSS module reads (`--spacing`, `--text-xs`, `--text-sm`, `--text-3xl`, `--shadow-lg`, at Tailwind's own values); also the `dark` and `hover` custom variants |
 | [`utilities/index.css`](./utilities/index.css) | `@utility hit-area-stable`, `hit-area-stable-tilt` and `quiet-link` |
 | [`animations/index.css`](./animations/index.css) | `@layer animations`: keyframes, the root view-transition, the reduced-motion block |
 | [`global/index.css`](./global/index.css) | The design tokens: `:root` and the `[data-theme="dark"]` overrides. Deliberately unlayered |
@@ -109,7 +109,11 @@ evaluates each brand-filled day of `MODIFIERS_CLASS_NAMES` in both themes (the f
 ink) and holds the ink at 4.5:1 or better. A `var(--x)` that nothing declares resolves to nothing and the property
 falls back to the inherited value, so the contract suite fails a custom property read in `apps/web/src` that no
 stylesheet, style key, arbitrary property, `setProperty`, font `variable`, Base UI `CssVars` module or Tailwind default
-theme declares.
+theme declares. A CSS module is held to a stricter list: Tailwind emits its default theme variables only while a
+utility uses them and never compiles a module, so `legend.module.css` could lose `--text-sm` or `--shadow-lg` to a
+refactor of some unrelated class. Whatever a module reads of Tailwind's scale, `theme/index.css` declares in its
+`@theme static` block, which Tailwind always emits, and the check counts no default theme and no plain `@theme` block
+for a module.
 
 **A consumer that cannot read a custom property takes a constant from [`palette.ts`](./palette.ts).** The Stripe
 Elements iframe, `boneyard-js` (which computes with the colour), the PDF renderer and `canvas-confetti` receive a value,
@@ -214,8 +218,13 @@ instead would drop it from `pnpm format:all` and `pnpm lint:all` alike.
 - `vendor/index.css` hides `#cc-main` with `display: none !important`. `vanilla-cookieconsent` still
   runs and still owns consent state; only its UI is suppressed, because the app renders its own
   [`CookieConsentDialog.tsx`](../modules/shared/cookie-consent/CookieConsentDialog.tsx). Do not "fix" this by disabling the library.
-- `[data-boneyard] > div:not([data-boneyard-overlay]) { display: contents }` unwraps the boneyard-js
-  skeleton wrapper so it does not break the grid or flex layout it sits inside.
+- **No rule here makes the boneyard-js content wrapper `display: contents`, and none may.** The CLI snapshots the
+  `firstElementChild` of `[data-boneyard]` (the `data-boneyard-content` wrapper that server rendering put there and
+  hydration keeps), and an element with `display: contents` answers every `getBoundingClientRect()` with zeros, so
+  every bone recorded a width of 0 and a document offset for its top: the registry held 4px slits until the rule that
+  unwrapped it went. The wrapper is a plain block in the `position: relative` box the skeleton already is, which lays
+  its content out as before. `skeleton.test.tsx` fails on a stylesheet that unwraps it and holds every bone the
+  registry carries to a width and a place inside its container.
 - **`animations/index.css` declares no `shimmer` keyframe, and must not grow one.** Nothing could reach it:
   no rule writes `animation: shimmer`, `theme/index.css` declares no `--animate-*` variable so Tailwind can
   generate no `animate-shimmer` utility, and `boneyard-js` injects its own `@keyframes bs-<uid>` at runtime for

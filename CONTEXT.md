@@ -57,6 +57,10 @@ _Avoid_: workday holiday, midweek holiday
 A Workday the plan leaves standing: one the user will actually spend working, once Holidays and the PTO Days the plan placed are taken out.
 _Avoid_: actual working day, business day
 
+**Closed Day**:
+A date from Monday to Friday on which the user does not work: a Weekday Holiday, or a PTO Day the plan placed, whether it is a Suggested Day or a Manual Day. What the Closed Days leave standing are the Worked Days, and joined to the weekends beside them they make the stretches the Metrics measure.
+_Avoid_: day off, off day
+
 **Free Day**:
 Any date the user is already off (a weekend or a Holiday) without spending any budget. Free Days are what make Bridges worth building.
 _Avoid_: rest day

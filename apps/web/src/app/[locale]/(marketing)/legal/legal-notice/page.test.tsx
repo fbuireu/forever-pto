@@ -22,7 +22,7 @@ vi.mock("@ui/modules/core/primitives/RichLink", () => ({
 	createRichLink: mockCreateRichLink,
 }));
 
-vi.mock("@ui/modules/pages/legal/Me", () => ({
+vi.mock("@ui/modules/shared/legal-identity/Me", () => ({
 	Me: MockMe,
 }));
 

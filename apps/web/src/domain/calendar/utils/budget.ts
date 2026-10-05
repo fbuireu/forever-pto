@@ -3,7 +3,7 @@ import { resolveSelectedDays } from "./selection";
 interface MeasureBudgetParams {
 	ptoDays: number;
 	days?: Date[];
-	manuallySelectedDays?: Date[];
+	manualDays?: Date[];
 	removedSuggestedDays?: Date[];
 }
 
@@ -17,11 +17,11 @@ export interface BudgetMeasure {
 export function measureBudget({
 	ptoDays,
 	days = [],
-	manuallySelectedDays = [],
+	manualDays = [],
 	removedSuggestedDays = [],
 }: MeasureBudgetParams): BudgetMeasure {
-	const manual = manuallySelectedDays.length;
-	const spent = resolveSelectedDays({ days, manuallySelectedDays, removedSuggestedDays }).length;
+	const manual = manualDays.length;
+	const spent = resolveSelectedDays({ days, manualDays, removedSuggestedDays }).length;
 
 	return {
 		suggested: spent - manual,

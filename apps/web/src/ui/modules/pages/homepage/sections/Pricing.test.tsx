@@ -1,5 +1,5 @@
 import { AMOUNT_MIN } from "@application/dto/payment/schema";
-import { FilterStrategy } from "@domain/calendar/types";
+import { Strategy } from "@domain/calendar/types";
 import caMessages from "@i18n/messages/ca.json";
 import deMessages from "@i18n/messages/de.json";
 import enMessages from "@i18n/messages/en.json";
@@ -100,7 +100,7 @@ describe("Pricing", () => {
 
 	it("counts the strategies through the message rather than hardcoding the digit in the copy", async () => {
 		expect(await renderPricing({ locale: "en", messages: enMessages })).toContain(
-			pricing.freeFeatures.strategies.replace("{count}", String(Object.values(FilterStrategy).length)),
+			pricing.freeFeatures.strategies.replace("{count}", String(Object.values(Strategy).length)),
 		);
 	});
 
@@ -121,7 +121,7 @@ describe("Pricing", () => {
 
 		expect(free).toEqual(
 			Object.values(pricing.freeFeatures).map((text) =>
-				text.replace("{count}", String(Object.values(FilterStrategy).length)),
+				text.replace("{count}", String(Object.values(Strategy).length)),
 			),
 		);
 		expect(lifetime).toEqual(Object.values(pricing.lifetimeFeatures));

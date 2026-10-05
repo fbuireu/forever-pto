@@ -3,7 +3,7 @@ import { useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
 import { useLocationStore } from "@application/stores/location";
 import { useUIStore } from "@application/stores/ui";
-import { FilterStrategy } from "@domain/calendar/types";
+import { Strategy } from "@domain/calendar/types";
 import enMessages from "@i18n/messages/en.json";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
@@ -139,7 +139,7 @@ describe("QuickStartForm", () => {
 		expect(filters.region).toBe("");
 		expect(filters.ptoDays).toBe(23);
 		expect(filters.year).toBe(2027);
-		expect(filters.strategy).toBe(FilterStrategy.OPTIMIZED);
+		expect(filters.strategy).toBe(Strategy.OPTIMIZED);
 		expect(filters.allowPastDays).toBe(true);
 		expect(filters.carryOverMonths).toBe(4);
 		expect(useUIStore.getState().quickStartOpen).toBe(false);
@@ -160,7 +160,7 @@ describe("QuickStartForm", () => {
 			finish();
 
 			const filters = useFiltersStore.getState();
-			expect(filters.strategy).toBe(FilterStrategy.MAIN_VACATION);
+			expect(filters.strategy).toBe(Strategy.MAIN_VACATION);
 			expect(filters.preferredMonths).toStrictEqual([5]);
 		} finally {
 			vi.useRealTimers();
@@ -186,7 +186,7 @@ describe("QuickStartForm", () => {
 					country: "es",
 					region: "",
 					year: expect.any(Number),
-					strategy: FilterStrategy.GROUPED,
+					strategy: Strategy.GROUPED,
 					preferredMonths: "",
 					allowPastDays: false,
 					carryOverMonths: 1,

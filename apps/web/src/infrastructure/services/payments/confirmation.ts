@@ -13,7 +13,7 @@ export const confirmation = (
 		const logger = yield* LoggerService;
 
 		return yield* stripe.paymentIntents.retrieve(paymentIntentId).pipe(
-			Effect.map((raw) => paymentConfirmationDTO.create({ raw })),
+			Effect.map((raw) => paymentConfirmationDTO.create(raw)),
 			Effect.tap((confirmed) =>
 				Effect.sync(() => {
 					if (confirmed.status === PAYMENT_SUCCEEDED) return;

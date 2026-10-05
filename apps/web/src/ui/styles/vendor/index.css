@@ -5,10 +5,6 @@
 		display: none !important;
 	}
 
-	[data-boneyard] > div:not([data-boneyard-overlay]) {
-		display: contents;
-	}
-
 	.boneyard-bordered {
 		border: 2px solid color-mix(in srgb, var(--frame) 30%, transparent);
 		box-sizing: border-box;

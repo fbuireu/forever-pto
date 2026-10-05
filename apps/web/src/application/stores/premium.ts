@@ -48,11 +48,16 @@ interface SetPremiumStatusParams {
 	premiumKey: string | null;
 }
 
+interface ShowPremiumModalParams {
+	feature: PremiumFeatureId;
+	origin: PremiumOrigin;
+}
+
 interface PremiumActions {
 	verifyEmail: (email: string) => Promise<boolean>;
-	checkExistingSession: (options?: { force?: boolean }) => Promise<void>;
+	checkExistingSession: (force?: boolean) => Promise<void>;
 	confirmActivation: () => Promise<void>;
-	showPremiumModal: (feature: PremiumFeatureId, origin?: PremiumOrigin) => void;
+	showPremiumModal: (params: ShowPremiumModalParams) => void;
 	closeModal: () => void;
 	setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => void;
 	refreshPremiumStatus: () => Promise<void>;
@@ -111,7 +116,7 @@ export const usePremiumStore = create<PremiumStore>()(
 					}
 				},
 
-				checkExistingSession: async ({ force }: { force?: boolean } = {}) => {
+				checkExistingSession: async (force = false) => {
 					const { needsSessionCheck } = get();
 					if (!needsSessionCheck && !force) return;
 					if (sessionCheckInFlight) return sessionCheckInFlight;
@@ -145,7 +150,7 @@ export const usePremiumStore = create<PremiumStore>()(
 
 					const wasPremium = !!get().premiumKey;
 					activationInFlight = get()
-						.checkExistingSession({ force: true })
+						.checkExistingSession(true)
 						.then(() => {
 							if (!wasPremium && get().premiumKey) reportActivation();
 						})
@@ -184,7 +189,7 @@ export const usePremiumStore = create<PremiumStore>()(
 					}
 				},
 
-				showPremiumModal: (feature: PremiumFeatureId, origin: PremiumOrigin = PremiumOrigin.PLANNER) => {
+				showPremiumModal: ({ feature, origin }: ShowPremiumModalParams) => {
 					set({ currentFeature: feature, modalOpen: true });
 					track({ event: "upgrade_modal_opened", properties: { feature, origin } });
 				},

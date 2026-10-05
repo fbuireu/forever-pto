@@ -1,8 +1,7 @@
 "use client";
 
 import { formatDate } from "@application/shared/utils/dates";
-import { PremiumFeatureId } from "@application/stores/premium";
-import { MONTHS_IN_YEAR } from "@domain/calendar/window";
+import { PremiumFeatureId, PremiumOrigin } from "@application/stores/premium";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/modules/core/primitives/Card";
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
 import { TrendingUp } from "lucide-react";
@@ -15,29 +14,22 @@ import { COLOR_SCHEMES } from "./const";
 interface MonthlyDistributionChartProps {
 	monthlyDist: number[];
 	year: number;
-	carryOverMonths: number;
 }
 
 export const MonthlyDistributionChart = memo(function MonthlyDistributionChart({
 	monthlyDist,
 	year,
-	carryOverMonths,
 }: MonthlyDistributionChartProps) {
 	const locale = useLocale();
 	const t = useTranslations("charts");
 	const { monthNames, timelineData, monthLabelMap } = useMemo(() => {
-		const totalMonths = MONTHS_IN_YEAR + carryOverMonths;
-		const names = getWindowMonthLabels({ locale, monthCount: totalMonths, startYear: year });
-		const paddedMonthlyDist = [...monthlyDist, ...Array(Math.max(0, totalMonths - monthlyDist.length)).fill(0)];
-		const data = paddedMonthlyDist.map((value, index) => ({
-			mes: names[index] || `Month ${index + 1}`,
-			days: value,
-		}));
+		const names = getWindowMonthLabels({ locale, monthCount: monthlyDist.length, startYear: year });
+		const data = names.map((name, index) => ({ mes: name, days: monthlyDist[index] ?? 0 }));
 		const labelMap = new Map(
 			names.map((name, idx) => [name, formatDate({ date: new Date(year, idx, 1), locale, format: "LLLL yyyy" })]),
 		);
 		return { monthNames: names, timelineData: data, monthLabelMap: labelMap };
-	}, [locale, carryOverMonths, year, monthlyDist]);
+	}, [locale, year, monthlyDist]);
 
 	const totalDays = monthlyDist.reduce((sum, days) => sum + days, 0);
 	const activeMonths = monthlyDist.filter((days) => days > 0).length;
@@ -50,6 +42,7 @@ export const MonthlyDistributionChart = memo(function MonthlyDistributionChart({
 	return (
 		<PremiumFeature
 			feature={PremiumFeatureId.ANNUAL_TIMELINE}
+			origin={PremiumOrigin.PLANNER}
 			description={description}
 			iconSize="size-7"
 			inlineDescription

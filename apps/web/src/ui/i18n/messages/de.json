@@ -71,6 +71,7 @@
 			"effectiveDays": "Effektive Tage",
 			"overBudget": "{increment, plural, =0 {0} other {+#}} über deinem Budget von {ptoDays, plural, one {# Tag} other {# Tagen}}",
 			"gain": "Gewinn",
+			"gainValue": "<n>{gain}</n> %",
 			"perPtoDay": "deines Budgets von {ptoDays} {ptoDays, plural, one {Tag} other {Tagen}}",
 			"longWeekends": "Lange Wochenenden",
 			"restBlocks": "Ruheblöcke",
@@ -83,20 +84,21 @@
 		},
 		"yearSummary": {
 			"feature": "Jahresübersicht",
-			"featureDescription": "Detaillierte Analyse deiner freien Tage.",
+			"featureDescription": "Detaillierte Analyse deiner effektiven Tage.",
 			"title": "Jahresübersicht",
-			"firstBreak": "Erste Auszeit",
+			"firstBreak": "Erster Ruheblock",
 			"maxWorkStreak": "Längste Arbeitsphase",
-			"lastBreak": "Letzte Auszeit",
+			"lastBreak": "Letzter Ruheblock",
 			"totalBonusDays": "Bonustage insgesamt",
 			"bonusDaysCaption": "Bonustage durch Optimierung",
+			"bonusDaysCount": "+<n>{count}</n>",
 			"daysCount": "{count, plural, one {<n>#</n> Tag} other {<n>#</n> Tage}}"
 		},
 		"summaryParagraph": {
 			"withGain": "Mit {ptoDays, plural, one {# PTO-Tag} other {deinen # PTO-Tagen}} und {totalHolidays, plural, one {# Feiertag} other {# Feiertagen}} macht die {strategy}-Strategie daraus {effectiveDays, plural, one {# effektiven Tag} other {# effektive Tage}}. Das {increment, plural, one {ist # Tag} other {sind # Tage}} über deinem Budget, ein Gewinn von +{percentage} gegenüber einer Planung ohne Optimierung.",
 			"withoutGain": "Mit {ptoDays, plural, one {# PTO-Tag} other {deinen # PTO-Tagen}} und {totalHolidays, plural, one {# Feiertag} other {# Feiertagen}} erhältst du {effectiveDays, plural, one {# effektiven Tag} other {# effektive Tage}} mit der {strategy}-Strategie.",
 			"noRegionHintTitle": "Region hinzufügen",
-			"noRegionHint": "Wähle deine Region in der Seitenleiste aus, um regionale Feiertage einzubeziehen und möglicherweise noch mehr freie Tage zu erhalten.",
+			"noRegionHint": "Wähle deine Region in der Seitenleiste aus, um regionale Feiertage einzubeziehen und möglicherweise noch mehr effektive Tage zu erhalten.",
 			"withRegion": "{regionalDays, plural, one {# deiner Feiertage gilt nur in {region}.} other {# deiner Feiertage gelten nur in {region}.}}"
 		},
 		"notifications": {
@@ -268,8 +270,8 @@
 		"deleteCount": "Löschen ({count})"
 	},
 	"charts": {
-		"daysOffComposition": "Zusammensetzung der freien Tage",
-		"daysOffCompositionFeature": "Diagramm: Zusammensetzung der freien Tage",
+		"daysOffComposition": "PTO-Tage und Feiertage",
+		"daysOffCompositionFeature": "Diagramm: PTO-Tage und Feiertage",
 		"quarterDistribution": "Quartalsverteilung",
 		"quarterDistributionFeature": "Diagramm: Quartalsverteilung",
 		"daysValue": "{count, plural, one {# Tag} other {# Tage}}",
@@ -339,17 +341,17 @@
 		"progressText": "{current} von {total}",
 		"steps": {
 			"toolsTitle": "Rechner & Werkzeuge",
-			"toolsDescription": "Hier findest du die Rechner: Schätze, wie viele PTO-Tage du angesammelt hast, sieh, was dich ungenutzte Tage an Gehalt kosten, oder zähle die Arbeitstage zwischen zwei Daten.",
+			"toolsDescription": "Hier findest du die Rechner: Schätze, wie viele PTO-Tage du angesammelt hast, sieh, was dich nicht genommene PTO-Tage an Gehalt kosten, oder zähle die Arbeitstage zwischen zwei Daten.",
 			"alternativesTitle": "Alternativen-Manager",
 			"alternativesDescription": "Sieh dir die verschiedenen Vorschläge an, die wir für dich berechnet haben, und vergleiche Effizienz und effektive Tage. Die erste Alternative ist immer unsere Empfehlung und mit einem Funkelsymbol markiert. Blättere mit den Pfeilen und klicke auf „Alternative anwenden“, um zu wechseln.",
 			"statusTitle": "PTO-Status",
-			"statusDescription": "Hier siehst du deine PTO-Tage auf einen Blick: automatisch zugewiesene Tage, manuell ausgewählte Tage und wie viele noch übrig sind. Du kannst manuelle Änderungen jederzeit zurücksetzen, um zum vorgeschlagenen Plan zurückzukehren.",
+			"statusDescription": "Hier siehst du deine PTO-Tage auf einen Blick: vorgeschlagene Tage, manuelle Tage und wie viele noch übrig sind. Du kannst manuelle Änderungen jederzeit zurücksetzen, um zum vorgeschlagenen Plan zurückzukehren.",
 			"calendarTitle": "Dein interaktiver PTO-Kalender",
-			"calendarDescription": "Hier siehst du dein ganzes Jahr auf einen Blick. Feiertage erscheinen in Grau, vorgeschlagene PTO-Tage in Türkis und manuell ausgewählte Tage in Blau. Klicke auf einen beliebigen Arbeitstag, um ihn manuell aus- oder abzuwählen. Der Kalender aktualisiert sich sofort, wenn du verschiedene Alternativen durchgehst.",
+			"calendarDescription": "Hier siehst du dein ganzes Jahr auf einen Blick. Feiertage erscheinen in Grau, vorgeschlagene PTO-Tage in Türkis und manuelle Tage in Blau. Klicke auf einen beliebigen Arbeitstag, um ihn manuell aus- oder abzuwählen. Der Kalender aktualisiert sich sofort, wenn du verschiedene Alternativen durchgehst.",
 			"finishTitle": "Du bist startklar!",
 			"finishDescription": "Leg deine Einstellungen in der Seitenleiste fest und wir schlagen dir die besten PTO-Tage vor.",
 			"holidaysListTitle": "Passe deine Feiertage an",
-			"holidaysListDescription": "Hier kannst du die Feiertagsdaten an deine genaue Situation anpassen. Bearbeite oder lösche nationale oder regionale Feiertage und füge eigene freie Tage hinzu, etwa Firmenfeiertage, lokale Bräuche oder jedes andere Datum, das dir wichtig ist. Je genauer die Daten, desto besser die Vorschläge.",
+			"holidaysListDescription": "Hier kannst du die Feiertagsdaten an deine genaue Situation anpassen. Bearbeite oder lösche nationale oder regionale Feiertage und füge eigene Feiertage hinzu, etwa Firmenfeiertage, lokale Bräuche oder jedes andere Datum, das dir wichtig ist. Je genauer die Daten, desto besser die Vorschläge.",
 			"step1Title": "Dein Kontext",
 			"step1Description": "Wähle dein Land, deine Region und das Jahr, für das du planen möchtest. Damit richten wir deinen Feiertagskalender ein und finden die besten Brücken.",
 			"step2Title": "Deine PTO-Tage",
@@ -404,8 +406,8 @@
 		"remainingCount": "<label>Verbleibend:</label> <n>{count}</n>",
 		"allAssigned": "Alle Tage zugewiesen!",
 		"resetManual": "Manuelle Änderungen zurücksetzen",
-		"usedDays": "{used} / {total, plural, one {# Tag genutzt} other {# Tage genutzt}} · {pct}%",
-		"remainingDays": "{remaining} verbleibend · {pct}%"
+		"usedDays": "{used} / {total, plural, one {# Tag genutzt} other {# Tage genutzt}} · {pct}",
+		"remainingDays": "{remaining} verbleibend · {pct}"
 	},
 	"contact": {
 		"title": "Kontakt",
@@ -440,7 +442,9 @@
 		"recommended": "Empfohlen",
 		"totalOff": "Effektive Tage",
 		"efficiency": "Effizienz",
-		"efficiencyValue": "{efficiency}x",
+		"efficiencyValue": "<n>{efficiency}</n>x",
+		"comparisonPercent": "<n>{percent}</n> %",
+		"bonusDaysBadge": "(+<n>{bonusDays}</n>)",
 		"efficiencyReadout": "{suggestion, select, recommended {Effizienz: {efficiency}x} other {Effizienz: {efficiency}x ({difference})}}",
 		"vsMain": "vs. Haupt",
 		"alreadyApplied": "Bereits angewendet",
@@ -524,7 +528,7 @@
 			},
 			"optimized": {
 				"label": "Optimiert",
-				"description": "Maximiert deine freien Tage insgesamt",
+				"description": "Maximiert deine effektiven Tage insgesamt",
 				"subtitle": "Jeder PTO-Tag bringt so viel wie möglich",
 				"pros": {
 					"maximumEfficiency": "Maximale Effizienz",
@@ -608,11 +612,11 @@
 		"increase": "PTO-Tage erhöhen",
 		"status": "Status der PTO-Tage",
 		"autoAssigned": "Vorgeschlagen:",
-		"manuallySelected": "Manuell ausgewählt:",
+		"manuallySelected": "Manuell:",
 		"remaining": "Verbleibend:",
 		"resetManualChanges": "Manuelle Änderungen zurücksetzen",
 		"allAssigned": "Alle Tage zugewiesen!",
-		"clickToAssign": "Klicke auf Tage im Kalender, um verbleibende Tage manuell zuzuweisen."
+		"clickToAssign": "Klicke auf Tage im Kalender, um dein verbleibendes Budget manuell zuzuweisen."
 	},
 	"ptoCalculator": {
 		"title": "PTO-Rechner",
@@ -879,7 +883,7 @@
 		"selectAllHolidays": "Alle Feiertage auswählen",
 		"unlockFeature": "Premium-Funktion freischalten: {feature}",
 		"premiumFeature": "Premium-Funktion",
-		"unlockDescription": "Mit Premium kannst du Vorschläge manuell anpassen und verbleibende Tage frei vergeben oder entfernen.",
+		"unlockDescription": "Mit Premium kannst du Vorschläge manuell anpassen und dein verbleibendes Budget frei einsetzen.",
 		"becomePremium": "Premium freischalten"
 	},
 	"calendar": {

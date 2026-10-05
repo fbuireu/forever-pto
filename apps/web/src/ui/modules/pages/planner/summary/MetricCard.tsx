@@ -25,7 +25,6 @@ interface MetricCardBaseProps {
 		  >;
 	colorScheme: keyof typeof COLOR_SCHEMES;
 	className?: string;
-	symbol?: string;
 	renderValue?: (counter: ReactNode) => ReactNode;
 	decimalPlaces?: number;
 }
@@ -95,24 +94,15 @@ const COLOR_SCHEMES = {
 	},
 };
 
-interface WithUnitParams {
+interface DisplayedParams {
 	counter: ReactNode;
-	symbol?: string;
 	renderValue?: (counter: ReactNode) => ReactNode;
 }
 
-const withUnit = ({ counter, symbol, renderValue }: WithUnitParams) =>
-	renderValue ? (
-		renderValue(counter)
-	) : (
-		<>
-			{counter}
-			{symbol}
-		</>
-	);
+const displayed = ({ counter, renderValue }: DisplayedParams) => (renderValue ? renderValue(counter) : counter);
 
 export const MetricCard = (props: MetricCardProps) => {
-	const { label, value, icon: Icon, colorScheme, symbol, renderValue, decimalPlaces = 0, className = "" } = props;
+	const { label, value, icon: Icon, colorScheme, renderValue, decimalPlaces = 0, className = "" } = props;
 	const colors = COLOR_SCHEMES[colorScheme];
 
 	if (props.size === MetricCardSize.COMPACT) {
@@ -129,7 +119,7 @@ export const MetricCard = (props: MetricCardProps) => {
 			>
 				<Icon className={cn("size-4", colors.icon, "mx-auto mb-1")} />
 				<div className={cn("text-lg font-display font-bold flex justify-center", renderValue && "gap-1", colors.text)}>
-					{withUnit({
+					{displayed({
 						counter: (
 							<SlidingNumber
 								number={value}
@@ -137,7 +127,6 @@ export const MetricCard = (props: MetricCardProps) => {
 								decimalPlaces={decimalPlaces}
 							/>
 						),
-						symbol,
 						renderValue,
 					})}
 				</div>
@@ -164,7 +153,7 @@ export const MetricCard = (props: MetricCardProps) => {
 			<div className={cn("flex items-center gap-2")}>
 				<Icon className={cn("size-4", colors.icon)} />
 				<span className={cn("text-xl font-display font-bold flex", renderValue && "gap-1", colors.text)}>
-					{withUnit({ counter: <SlidingNumber number={value} decimalPlaces={decimalPlaces} />, symbol, renderValue })}
+					{displayed({ counter: <SlidingNumber number={value} decimalPlaces={decimalPlaces} />, renderValue })}
 				</span>
 			</div>
 			{badge && (

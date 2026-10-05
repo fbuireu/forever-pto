@@ -35,7 +35,7 @@ const initialHolidays = () => ({
 	holidays: [] as unknown[],
 	alternatives: [] as unknown[],
 	currentSelection: null as unknown,
-	manuallySelectedDays: [] as Date[],
+	manualDays: [] as Date[],
 	removedSuggestedDays: [] as Date[],
 });
 
@@ -63,6 +63,7 @@ vi.mock("@application/stores/location", () => ({
 vi.mock("@application/stores/premium", () => ({
 	usePremiumStore: (selector: (state: typeof premiumState) => unknown) => selector(premiumState),
 	PremiumFeatureId: { ADVANCED_METRICS: "advancedMetrics", YEAR_SUMMARY: "yearSummary" },
+	PremiumOrigin: { PLANNER: "planner" },
 }));
 vi.mock("@ui/hooks/useStoresReady", () => ({ useStoresReady: () => ({ areStoresReady: true }) }));
 vi.mock("@application/i18n/navigation", () => ({
@@ -78,9 +79,20 @@ vi.mock("boneyard-js/react", () => ({ Skeleton: ({ children }: { children: React
 vi.mock("@ui/modules/premium/PremiumFeature", () => ({
 	PremiumFeature: ({ children }: { children: ReactNode }) => <>{children}</>,
 }));
-vi.mock("@ui/modules/core/animate/text/SlidingNumber", () => ({
-	SlidingNumber: ({ number }: { number: string | number }) => <span>{number}</span>,
-}));
+vi.mock("@ui/modules/core/animate/text/SlidingNumber", async () => {
+	const { useLocale } = await import("next-intl");
+
+	return {
+		SlidingNumber: ({ number, decimalPlaces = 0 }: { number: string | number; decimalPlaces?: number }) => (
+			<span>
+				{new Intl.NumberFormat(useLocale(), {
+					minimumFractionDigits: decimalPlaces,
+					maximumFractionDigits: decimalPlaces,
+				}).format(Math.abs(Number(number)))}
+			</span>
+		),
+	};
+});
 vi.mock("@ui/modules/core/animate/text/Rotating", () => ({ RotatingText: () => null }));
 
 import { Summary } from "./Summary";
@@ -89,7 +101,7 @@ const METRICS = {
 	longWeekends: 0,
 	restBlocks: 0,
 	maxWorkStreak: 0,
-	firstLastBreak: null,
+	firstLastRestBlock: null,
 	averageEfficiency: 2.5,
 	bonusDays: 0,
 	quarterDist: [0, 0, 0, 0],
@@ -117,7 +129,7 @@ describe("Summary efficiency hint", () => {
 	it("names the days the metrics were measured against, not the days the engine first placed", () => {
 		holidaysState.suggestion = { days: [JAN(6), JAN(7), JAN(8)], bridges: [], strategy: "grouped", metrics: METRICS };
 		holidaysState.currentSelection = null;
-		holidaysState.manuallySelectedDays = [];
+		holidaysState.manualDays = [];
 		holidaysState.removedSuggestedDays = [JAN(7)];
 
 		const { container } = renderSummary();
@@ -129,7 +141,7 @@ describe("Summary efficiency hint", () => {
 	it("counts a hand-picked day the engine never placed", () => {
 		holidaysState.suggestion = { days: [JAN(6), JAN(7), JAN(8)], bridges: [], strategy: "grouped", metrics: METRICS };
 		holidaysState.currentSelection = null;
-		holidaysState.manuallySelectedDays = [JAN(20)];
+		holidaysState.manualDays = [JAN(20)];
 		holidaysState.removedSuggestedDays = [];
 
 		const { container } = renderSummary();
@@ -143,7 +155,7 @@ describe("Summary budget badges at a budget of one", () => {
 		filtersState.ptoDays = 1;
 		holidaysState.suggestion = { days: [JAN(6)], bridges: [], strategy: "grouped", metrics: METRICS };
 		holidaysState.currentSelection = null;
-		holidaysState.manuallySelectedDays = [];
+		holidaysState.manualDays = [];
 		holidaysState.removedSuggestedDays = [];
 	};
 
@@ -171,7 +183,7 @@ describe("Summary manual-adjustment banner", () => {
 		filtersState.ptoDays = 5;
 		holidaysState.suggestion = { days: [JAN(6), JAN(7), JAN(8)], bridges: [], strategy: "grouped", metrics: METRICS };
 		holidaysState.currentSelection = null;
-		holidaysState.manuallySelectedDays = added;
+		holidaysState.manualDays = added;
 		holidaysState.removedSuggestedDays = removed;
 	};
 
@@ -219,7 +231,7 @@ const resetPlan = () => {
 	holidaysState.suggestion = planOf({ days: [JAN(6), JAN(7), JAN(8)] });
 	holidaysState.currentSelection = null;
 	holidaysState.alternatives = [];
-	holidaysState.manuallySelectedDays = [];
+	holidaysState.manualDays = [];
 	holidaysState.removedSuggestedDays = [];
 	holidaysState.holidays = [];
 };
@@ -453,7 +465,7 @@ describe("Summary year summary", () => {
 		resetPlan();
 		holidaysState.suggestion = {
 			...planOf({ days: [JAN(6), JAN(7), JAN(8)] }),
-			metrics: { ...METRICS, firstLastBreak: { first: "Jan 6", last: "Dec 24" }, maxWorkStreak: 45, bonusDays: 3 },
+			metrics: { ...METRICS, firstLastRestBlock: { first: "Jan 6", last: "Dec 24" }, maxWorkStreak: 45, bonusDays: 3 },
 		};
 
 		const { container } = renderSummary();
@@ -496,12 +508,96 @@ describe("Summary Gain sentence", () => {
 		filtersState.ptoDays = 3;
 		holidaysState.suggestion = { days: [JAN(6), JAN(7), JAN(8)], bridges: [], strategy: "grouped", metrics: METRICS };
 		holidaysState.currentSelection = null;
-		holidaysState.manuallySelectedDays = [];
+		holidaysState.manualDays = [];
 		holidaysState.removedSuggestedDays = [];
 
 		const { container } = renderSummary({ locale, messages });
 
 		expect((container.textContent ?? "").replace(NARROW_SPACES, " ")).toContain(expected);
+	});
+});
+
+describe("Summary numbers carry the glyphs their own bundle gives them", () => {
+	const LOCALES = [
+		["en", enMessages],
+		["es", esMessages],
+		["ca", caMessages],
+		["it", itMessages],
+		["de", deMessages],
+		["fr", frMessages],
+	] as const;
+
+	const gainPlan = () => {
+		filtersState.ptoDays = 3;
+		holidaysState.suggestion = {
+			days: [JAN(6), JAN(7), JAN(8)],
+			bridges: [],
+			strategy: "grouped",
+			metrics: { ...METRICS, firstLastRestBlock: { first: "Jan 6", last: "Dec 24" }, bonusDays: 3 },
+		};
+		holidaysState.currentSelection = null;
+		holidaysState.manualDays = [];
+		holidaysState.removedSuggestedDays = [];
+	};
+
+	it.each(LOCALES)("%s writes the Gain card with the percent sign its own typography wants", (locale, messages) => {
+		gainPlan();
+
+		const { container } = renderSummary({ locale, messages });
+
+		expect(container.textContent).toContain(
+			`${messages.summary.metrics.gain}${new Intl.NumberFormat(locale, { style: "percent" }).format(0.67)}`,
+		);
+	});
+
+	it.each(LOCALES)("%s rounds the Gain card with the counter and never by hand", (locale, messages) => {
+		gainPlan();
+
+		const { container } = renderSummary({ locale, messages });
+
+		expect(container.textContent).not.toContain("66.67");
+		expect(container.textContent).not.toContain("66,67");
+	});
+
+	it("takes the percent sign of the Gain card from the bundle, so a translator owns it", () => {
+		gainPlan();
+		const messages = {
+			...enMessages,
+			summary: {
+				...enMessages.summary,
+				metrics: { ...enMessages.summary.metrics, gainValue: "<n>{gain}</n> per cent" },
+			},
+		};
+
+		const { container } = renderSummary({ messages });
+
+		expect(container.textContent).toContain(`${messages.summary.metrics.gain}67 per cent`);
+		expect(container.textContent).not.toContain(`${messages.summary.metrics.gain}67%`);
+	});
+
+	it("takes the plus before the Bonus Days from the bundle, so a translator owns it", () => {
+		gainPlan();
+		const messages = {
+			...enMessages,
+			summary: {
+				...enMessages.summary,
+				yearSummary: { ...enMessages.summary.yearSummary, bonusDaysCount: "<n>{count}</n> extra" },
+			},
+		};
+
+		const { container } = renderSummary({ messages });
+
+		expect(container.textContent).toContain("3 extra");
+		expect(container.textContent).not.toContain("+3");
+	});
+
+	it.each(LOCALES)("%s writes the Bonus Days with a plus inside one message", (locale, messages) => {
+		gainPlan();
+
+		const { container } = renderSummary({ locale, messages });
+
+		expect(container.textContent).toContain("+3");
+		expect(container.textContent).not.toMatch(/[<>{}]|summary\./);
 	});
 });
 
@@ -618,7 +714,7 @@ describe("Summary rich-text messages in every bundle", () => {
 			...planOf({ days: [JAN(6), JAN(7), JAN(8)] }),
 			metrics: {
 				...METRICS,
-				firstLastBreak: { first: "Jan 6", last: "Dec 24" },
+				firstLastRestBlock: { first: "Jan 6", last: "Dec 24" },
 				maxWorkStreak: 45,
 				longestVacation: 16,
 			},

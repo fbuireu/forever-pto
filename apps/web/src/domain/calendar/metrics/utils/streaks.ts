@@ -1,7 +1,7 @@
 import type { HolidayDTO } from "@application/dto/holiday/types";
 import { addDays, eachDayOfInterval, isWeekend } from "@application/shared/utils/dates";
 import { PTO_CONSTANTS } from "@domain/calendar/const";
-import { dayKey, dayOffKeys } from "./dayOff";
+import { closedDayKeys, dayKey } from "./closedDays";
 
 export interface FreeStreak {
 	days: Date[];
@@ -19,7 +19,7 @@ export function freeStreaks({ placedDays, holidays }: FreeStreaksParams): FreeSt
 	if (placedDays.length === 0) return [];
 
 	const placed = new Set(placedDays.map(dayKey));
-	const free = dayOffKeys({ placedDays, holidays });
+	const free = closedDayKeys({ placedDays, holidays });
 
 	const allDates = [...placedDays, ...holidays.map((holiday) => holiday.date)].toSorted(
 		(a, b) => a.getTime() - b.getTime(),

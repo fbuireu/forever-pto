@@ -55,7 +55,7 @@ render as their generic error. A refusal added without an entry is a compile err
 
 ## Day classification
 
-`utils/modifiers.ts` exports curried predicates (`isHoliday`, `isCustom`, `isSuggestion`, `isManuallySelected`,
+`utils/modifiers.ts` exports curried predicates (`isHoliday`, `isCustom`, `isSuggestion`, `isManual`,
 `isAlternative`, `isPast`, `isToday`, and the selection and range family). `Calendar` builds them into one
 `modifiers` object and hands it to `getDayClassNames`, which looks each name up in `MODIFIERS_CLASS_NAMES`.
 Adding a day state means an edit in each place: the predicate, the entry in `modifiers`, the class-name entry
@@ -64,7 +64,7 @@ day's accessible name.
 
 **`Calendar` builds only the states it can answer for itself, and the caller supplies the rest.** Weekend,
 Holiday, Custom, today, past and the selection and range family come from `holidays`, `allowPastDays`, its own
-`today` and its own selection. The plan's states (`suggested`, `alternative`, `manuallySelected`) arrive through
+`today` and its own selection. The plan's states (`suggested`, `alternative`, `manual`) arrive through
 the `dayStates` prop: `CalendarList.tsx` builds all three from the holidays store,
 [`holidays/components/HolidayFormModal.tsx`](./holidays/components/HolidayFormModal.tsx) supplies `suggested`
 alone, so its date picker still shows which dates the plan has spent, and
@@ -144,6 +144,9 @@ from the payment record ([ADR 0008](../../../../../../../adr/0008-premium-derive
 `BlocksPerQuarterChart` label their bars `Q${index + 1}` over the array the engine sizes with
 `windowQuarterCount`, `ceil((12 + carryOverMonths) / 3)`. The default Carry-over Month count is 1, so the
 default window already holds five. [`CONTEXT.md`](../../../../../../../CONTEXT.md) defines Quarter.
+`MonthlyDistributionChart` sizes its axis the same way, from `monthlyDist.length`, and takes no
+`carryOverMonths`: the filters can move on while a plan from the older window is still on screen, and a chart
+that read them would pad that plan with months it never measured or name its last months `Month 13`.
 
 **`CalendarList`'s `toggleDay` answers `DayRefusal.PLAN_IN_FLIGHT` while a calculation runs**, before the store
 is reached. The grid's `pointer-events-none` during `isCalculating` stops the mouse and not Enter or Space on a
@@ -151,7 +154,7 @@ focused day. The race the refusal closes is silent:
 
 - Removing a Suggested Day mid-run appends to `removedSuggestedDays`, which `setCalculationResult` clears when
   the worker answers: the removal is discarded and the day comes back.
-- Adding a Manual Day mid-run appends to `manuallySelectedDays`, which `setCalculationResult` does not clear,
+- Adding a Manual Day mid-run appends to `manualDays`, which `setCalculationResult` does not clear,
   while the request in flight was posted with the older list and an `autoSuggestCount` computed from it: the
   arriving plan spends the full budget beside a Manual Day it never saw, and the total can exceed `ptoDays`. See
   the budget-cap notes in [`../../../AGENTS.md`](../../../AGENTS.md).
@@ -196,7 +199,10 @@ focus: every day is a `<button>` in the tab order, named with its full date, its
 [`calendar/Calendar.test.tsx`](./calendar/Calendar.test.tsx) fails on a bare grid role.
 
 **The month header is one block.** The title and the month's Holiday count render once; `showNavigation` decides
-only whether the previous, today and next controls render.
+only whether the previous, today and next controls render. The title is one date, `formatDateParts` over
+`LLLL yyyy`, and only its `year` part is styled, so a locale that joins the month and the year with a word writes
+it ("junio de 2026", "juny del 2026") and one that orders them the other way writes the year first; two
+`formatDate` calls with a space between them assume an order and a joining word that only English has.
 
 **`today` is state initialised to `null`, not `new Date()`.** `Calendar` sets it in an effect on mount, so the
 first paint has no today marker and no past-day fade, and server and client agree. Every predicate taking
@@ -235,7 +241,7 @@ Strategies' plans carry their own value there (see *Invariants and traps* in the
 [engine guide](../../../../domain/calendar/AGENTS.md)). The engine never hands out an Alternative ahead of the
 Suggestion, so the banner speaks up only when the plan on screen is behind one: after a hand edit, or when the
 applied Alternative is itself a weaker one. The header badge and the summary sentence name the Strategy of the
-plan on screen (its own `strategy`, narrowed with `isFilterStrategy`). The banner's button links to `#calendar`,
+plan on screen (its own `strategy`, narrowed with `isStrategy`). The banner's button links to `#calendar`,
 the `id` `CalendarList.tsx` gives its grid.
 
 **`Summary.tsx` measures against different denominators.** `ptoDays` here is the budget, read from the filters
@@ -272,7 +278,22 @@ given `decimalPlaces` (`SlidingNumber` runs `toFixed`), so a fractional metric p
 Efficiency and `workedDaysPerMonth` do. A unit that agrees with the number goes through `renderValue`, which
 receives the counter and returns the message around it: Longest Vacation passes `yearSummary.daysCount`, whose
 `<n>#</n>` places the counter. The value row is a flex row, where the message's space collapses, so `renderValue`
-adds a gap; the Max Work Streak beside it carries the same gap.
+adds a gap; the Max Work Streak beside it carries the same gap. The Gain passes `metrics.gainValue` the same way,
+inside a `flex` span of its own, because a `%` sits tight against its number in English and Italian and a gap
+would pull them apart. The card has no `symbol` prop: a glyph is part of the message `renderValue` places.
+
+**A sign, a unit or a bracket around a counter is part of the message, never a sibling of the counter.**
+`alternativesManager.efficiencyValue`, `comparisonPercent` and `bonusDaysBadge`, `summary.metrics.gainValue` and
+`summary.yearSummary.bonusDaysCount` each hold the glyph and a `<n>` tag where the counter goes, so a bundle puts
+the `x`, the `%` (after a no-break space in Spanish, Catalan, German and French) or the `+` where its language
+writes them. The Efficiency gap beside the card's value is not a counter: it goes through `format.number` with
+`signDisplay: "exceptZero"`, which writes the plus and the minus its locale uses and no sign at all for a gap that
+rounds to nought. The budget's two percentages are `{pct, number, percent}` inside `ptoStatus.usedDays` and
+`remainingDays`, handed the fraction. The drawer header of `ManagementBar` shows the same `efficiencyValue` as
+plain text, so it renders it with `t.rich` and `n: (chunks) => chunks`. The assigned note draws a `Check` icon, not
+a `✓` typed in front of the sentence. `PlannerPanel.test.tsx`, `Summary.test.tsx` and `ManagementBar.test.tsx`
+render each of these in all six bundles, and each has a case that swaps the glyph in the bundle and expects the
+page to follow.
 
 **`usePlannerDayClick` checks Premium, hands the day to the store and renders whatever refusal comes back
 through `DAY_REFUSAL_COPY`.** A new refusal is a new reason in the stores'

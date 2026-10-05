@@ -16,7 +16,13 @@ vi.mock("next-intl/server", () => ({
 	getFormatter: mockGetFormatter,
 }));
 
+vi.mock("./shared", async (importOriginal) => ({
+	...(await importOriginal<typeof import("./shared")>()),
+	COUNTRY_COUNT: 150,
+}));
+
 import { Stats } from "./Stats";
+import { COUNTRY_COUNT } from "./shared";
 
 const BUNDLES: Record<string, typeof enMessages> = {
 	en: enMessages,
@@ -63,4 +69,21 @@ describe("Stats", () => {
 		expect(text).toMatch(/3[.,]4×/);
 		expect(text).not.toMatch(/[<>{}]|homepage\./);
 	});
+});
+
+describe("Stats Country count", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it.each(Object.entries(BUNDLES))(
+		"writes the %s count from the one constant that owns it",
+		async (locale, messages) => {
+			const text = await renderStats({ locale: locale as Locale, messages });
+
+			expect(text).toContain(
+				new Intl.NumberFormat(locale).format(COUNTRY_COUNT) + messages.homepage.stats.countriesLabel,
+			);
+		},
+	);
 });

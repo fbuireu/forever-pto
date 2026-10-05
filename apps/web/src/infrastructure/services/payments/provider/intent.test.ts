@@ -2,7 +2,8 @@ import { StripeServerService } from "@infrastructure/clients/payments/stripe/ser
 import { PaymentError } from "@infrastructure/errors";
 import { PAYMENT_CURRENCY } from "@infrastructure/services/payments/normalForms";
 import { Effect, Layer } from "effect";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { donationMetadata } from "./metadata";
 
 const { createPaymentIntent } = await import("./intent");
 
@@ -23,6 +24,10 @@ const run = (params: Parameters<typeof createPaymentIntent>[0]) =>
 beforeEach(() => {
 	vi.clearAllMocks();
 	mockIntentsCreate.mockReturnValue(Effect.succeed(MOCK_INTENT));
+});
+
+afterEach(() => {
+	vi.useRealTimers();
 });
 
 describe("createPaymentIntent", () => {
@@ -87,6 +92,38 @@ describe("createPaymentIntent", () => {
 		const [params] = mockIntentsCreate.mock.calls[0] as [{ metadata: Record<string, unknown> }];
 		expect(params.metadata.userAgent).toBe("Mozilla/5.0");
 		expect(params.metadata.ipAddress).toBe("1.2.3.4");
+	});
+
+	it("sends the metadata block donationMetadata builds, and nothing of its own", async () => {
+		vi.useFakeTimers({ now: new Date("2025-01-15T10:00:00.000Z"), toFake: ["Date"] });
+		const discountInfo = {
+			type: "fixed",
+			value: 200,
+			originalAmount: 10,
+			finalAmount: 8,
+			couponId: "coup_abc",
+			couponName: null,
+		} as const;
+
+		await run({
+			amount: 8,
+			email: "user@example.com",
+			promoCode: "SAVE2",
+			discountInfo,
+			userAgent: "Mozilla/5.0",
+			ipAddress: "1.2.3.4",
+		});
+		const [params] = mockIntentsCreate.mock.calls[0] as [{ metadata: Record<string, string> }];
+
+		expect(params.metadata).toStrictEqual(
+			donationMetadata({
+				email: "user@example.com",
+				promoCode: "SAVE2",
+				userAgent: "Mozilla/5.0",
+				ipAddress: "1.2.3.4",
+				discountInfo,
+			}),
+		);
 	});
 
 	it("propagates PaymentError when Stripe fails", async () => {

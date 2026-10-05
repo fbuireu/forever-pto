@@ -1,7 +1,7 @@
 import { PTO_CONSTANTS } from "@domain/calendar/const";
 import { restBlocksOf } from "@domain/calendar/metrics/utils/helpers";
 import { objectiveFor, outranks, selectBridges } from "@domain/calendar/suggestions/utils/selectors";
-import { FilterStrategy, type Suggestion } from "@domain/calendar/types";
+import { Strategy, type Suggestion } from "@domain/calendar/types";
 import { getCombinationKey } from "@domain/calendar/utils/cache";
 import { type PlanningCandidates, selectionInputOf } from "@domain/calendar/utils/candidates";
 import { measurePlan } from "@domain/calendar/utils/measures";
@@ -12,7 +12,7 @@ export interface GenerateAlternativesParams {
 	candidates: PlanningCandidates;
 	maxAlternatives: number;
 	existingSuggestion: Suggestion;
-	strategy: FilterStrategy;
+	strategy: Strategy;
 	preferredMonths?: number[];
 }
 
@@ -97,7 +97,7 @@ export function generateAlternatives(params: GenerateAlternativesParams): PlanCh
 		into.push(score(plan));
 	};
 
-	for (const other of Object.values(FilterStrategy)) {
+	for (const other of Object.values(Strategy)) {
 		if (other === strategy) continue;
 		runs++;
 		offer({

@@ -26,7 +26,7 @@ async function handleStripeWebhook(request: NextRequest) {
 	return Effect.runPromise(
 		Effect.gen(function* () {
 			const stripe = yield* StripeServerService;
-			const event = yield* stripe.webhooks.constructEvent(body, signature);
+			const event = yield* stripe.webhooks.constructEvent({ payload: body, signature });
 			yield* processWebhookEvent(event);
 			return NextResponse.json({ received: true });
 		}).pipe(

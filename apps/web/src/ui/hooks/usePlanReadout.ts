@@ -8,11 +8,11 @@ import { useMemo, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 
 export const usePlacedPlan = () => {
-	const { currentSelection, suggestion, manuallySelectedDays, removedSuggestedDays } = useHolidaysStore(
+	const { currentSelection, suggestion, manualDays, removedSuggestedDays } = useHolidaysStore(
 		useShallow((state) => ({
 			currentSelection: state.currentSelection,
 			suggestion: state.suggestion,
-			manuallySelectedDays: state.manuallySelectedDays,
+			manualDays: state.manualDays,
 			removedSuggestedDays: state.removedSuggestedDays,
 		})),
 	);
@@ -22,21 +22,21 @@ export const usePlacedPlan = () => {
 		() =>
 			resolveSelectedDays({
 				days: activeSuggestion?.days ?? [],
-				manuallySelectedDays,
+				manualDays,
 				removedSuggestedDays,
 			}),
-		[activeSuggestion, manuallySelectedDays, removedSuggestedDays],
+		[activeSuggestion, manualDays, removedSuggestedDays],
 	);
 
-	return { activeSuggestion, placedDays, manuallySelectedDays, removedSuggestedDays };
+	return { activeSuggestion, placedDays, manualDays, removedSuggestedDays };
 };
 
 export const usePlanReadout = () => {
-	const { currentSelection, suggestion, manuallySelectedDays, removedSuggestedDays, isCalculating } = useHolidaysStore(
+	const { currentSelection, suggestion, manualDays, removedSuggestedDays, isCalculating } = useHolidaysStore(
 		useShallow((state) => ({
 			currentSelection: state.currentSelection,
 			suggestion: state.suggestion,
-			manuallySelectedDays: state.manuallySelectedDays,
+			manualDays: state.manualDays,
 			removedSuggestedDays: state.removedSuggestedDays,
 			isCalculating: state.isCalculating,
 		})),
@@ -46,7 +46,7 @@ export const usePlanReadout = () => {
 	const budget = measureBudget({
 		ptoDays,
 		days: (currentSelection ?? suggestion)?.days,
-		manuallySelectedDays,
+		manualDays,
 		removedSuggestedDays,
 	});
 

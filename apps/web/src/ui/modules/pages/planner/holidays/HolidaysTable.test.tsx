@@ -23,6 +23,7 @@ vi.mock("@application/stores/holidays", () => ({
 vi.mock("@application/stores/premium", () => ({
 	usePremiumStore: (selector: (state: { premiumKey: string }) => unknown) => selector({ premiumKey: "unlocked" }),
 	PremiumFeatureId: { SELECT_HOLIDAY: "selectHoliday", SELECT_ALL_HOLIDAYS: "selectAllHolidays" },
+	PremiumOrigin: { PLANNER: "planner" },
 }));
 const debounce = vi.hoisted(() => ({ settled: true }));
 vi.mock("@ui/hooks/useDebounce", () => ({
@@ -118,16 +119,17 @@ interface HolidayParams {
 	date: Date;
 	type?: string;
 	location?: string;
+	isInPlanningWindow?: boolean;
 }
 
-const holiday = ({ id, name, date, type, location }: HolidayParams) => ({
+const holiday = ({ id, name, date, type, location, isInPlanningWindow = true }: HolidayParams) => ({
 	id,
 	name,
 	date,
 	type,
 	location,
 	variant: HolidayVariant.NATIONAL,
-	isInPlanningWindow: true,
+	isInPlanningWindow,
 });
 
 const renderTable = () => {
@@ -218,6 +220,20 @@ describe("HolidaysTable toolbar counts what it will act on", () => {
 
 		expect(view.queryByTestId("delete-modal")?.getAttribute("data-names")).toBe("");
 		expect(view.queryByTestId("edit-modal")).toBeNull();
+	});
+});
+
+describe("HolidaysTable lists the Planning Window's Holidays", () => {
+	it("leaves out a Holiday that falls outside the Planning Window, which the rest of the planner never counts", () => {
+		holidaysState.holidays = [
+			...holidaysState.holidays,
+			holiday({ id: "national-2028-01-01", name: "Delta", date: new Date(2028, 0, 1), isInPlanningWindow: false }),
+		];
+
+		const view = renderTable();
+
+		expect(view.queryAllByLabelText("Select Delta")).toHaveLength(0);
+		expect(view.getAllByLabelText("Select Alpha").length).toBeGreaterThan(0);
 	});
 });
 

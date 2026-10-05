@@ -26,13 +26,13 @@ export const reserveContactSlot = ({
 	Effect.gen(function* () {
 		const turso = yield* TursoService;
 		const id = crypto.randomUUID();
-		const inserted = yield* turso.execute(
-			`INSERT INTO contacts (id, email, name, subject, message, message_id, origin, created_date, updated_at)
+		const inserted = yield* turso.execute({
+			sql: `INSERT INTO contacts (id, email, name, subject, message, message_id, origin, created_date, updated_at)
        SELECT ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')
        WHERE NOT EXISTS (
          SELECT 1 FROM contacts WHERE ${SENDER_KEY} = ? AND (created_date >= datetime(?) OR message = ?)
        )`,
-			[
+			args: [
 				id,
 				contact.email,
 				contact.name,
@@ -44,7 +44,7 @@ export const reserveContactSlot = ({
 				since,
 				contact.message,
 			],
-		);
+		});
 
 		return inserted > 0 ? id : null;
 	});
@@ -52,7 +52,7 @@ export const reserveContactSlot = ({
 export const releaseContactSlot = (id: string): Effect.Effect<void, DatabaseError, TursoService> =>
 	Effect.gen(function* () {
 		const turso = yield* TursoService;
-		yield* turso.execute("DELETE FROM contacts WHERE id = ?", [id]);
+		yield* turso.execute({ sql: "DELETE FROM contacts WHERE id = ?", args: [id] });
 	});
 
 export interface RecordContactMessageIdParams {
@@ -66,10 +66,10 @@ export const recordContactMessageId = ({
 }: RecordContactMessageIdParams): Effect.Effect<void, DatabaseError, TursoService> =>
 	Effect.gen(function* () {
 		const turso = yield* TursoService;
-		yield* turso.execute("UPDATE contacts SET message_id = ?, updated_at = datetime('now') WHERE id = ?", [
-			messageId,
-			id,
-		]);
+		yield* turso.execute({
+			sql: "UPDATE contacts SET message_id = ?, updated_at = datetime('now') WHERE id = ?",
+			args: [messageId, id],
+		});
 	});
 
 export interface FindContactWithMessageParams {
@@ -83,10 +83,10 @@ export const findContactWithMessage = ({
 }: FindContactWithMessageParams): Effect.Effect<boolean, DatabaseError, TursoService> =>
 	Effect.gen(function* () {
 		const turso = yield* TursoService;
-		const rows = yield* turso.query<{ id: string }>(
-			`SELECT id FROM contacts WHERE ${SENDER_KEY} = ? AND message = ? LIMIT 1`,
-			[senderKey, message],
-		);
+		const rows = yield* turso.query<{ id: string }>({
+			sql: `SELECT id FROM contacts WHERE ${SENDER_KEY} = ? AND message = ? LIMIT 1`,
+			args: [senderKey, message],
+		});
 
 		return rows.length > 0;
 	});

@@ -1,6 +1,6 @@
 "use client";
 
-import { PremiumFeatureId } from "@application/stores/premium";
+import { PremiumFeatureId, PremiumOrigin } from "@application/stores/premium";
 import { PTO_CONSTANTS } from "@domain/calendar/const";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/modules/core/primitives/Card";
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
@@ -38,6 +38,7 @@ export const BlocksPerQuarterChart = memo(function BlocksPerQuarterChart({
 	return (
 		<PremiumFeature
 			feature={PremiumFeatureId.LONG_BLOCKS}
+			origin={PremiumOrigin.PLANNER}
 			description={description}
 			iconSize="size-7"
 			inlineDescription

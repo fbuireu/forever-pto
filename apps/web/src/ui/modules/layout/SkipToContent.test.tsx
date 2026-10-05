@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import en from "@i18n/messages/en.json";
 import { EN } from "@infrastructure/i18n/locales";
-import { render } from "@testing-library/react";
+import { type RenderResult, render } from "@testing-library/react";
 import { Effect, Layer } from "effect";
 import { createFormatter, createTranslator, type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
@@ -83,7 +83,7 @@ const searchParams = Promise.resolve({ payment_intent: "pi_test_123" });
 
 const CONFIRMATION = { id: "pi_test_123", status: "succeeded", amount: 10, currency: "USD" };
 
-const landmarks = (tree: { container: HTMLElement }) => tree.container.querySelectorAll(`#${MAIN_CONTENT_ID}`).length;
+const landmarks = (tree: RenderResult) => tree.container.querySelectorAll(`#${MAIN_CONTENT_ID}`).length;
 
 describe("skip to content", () => {
 	beforeEach(() => {

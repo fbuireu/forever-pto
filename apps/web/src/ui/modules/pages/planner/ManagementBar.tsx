@@ -165,7 +165,10 @@ export const ManagementBar = () => {
 											{tAlt("effectiveDaysCount", { count: effectiveDays })}
 										</span>
 										<span className="font-mono text-sm font-semibold text-efficiency">
-											{tAlt("efficiencyValue", { efficiency: format.number(efficiency, EFFICIENCY_FORMAT) })}
+											{tAlt.rich("efficiencyValue", {
+												efficiency: format.number(efficiency, EFFICIENCY_FORMAT),
+												n: (chunks) => chunks,
+											})}
 										</span>
 									</div>
 								</div>

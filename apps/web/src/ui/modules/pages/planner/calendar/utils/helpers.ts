@@ -21,7 +21,7 @@ export const MODIFIERS_CLASS_NAMES = {
 		"rounded-lg bg-day-alternative text-[var(--color-brand-ink)] font-black animate-pulse border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] transition-[background-color,box-shadow,opacity] duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_4px,var(--stripe-alternative)_4px,var(--stripe-alternative)_8px)]",
 	custom:
 		"rounded-lg bg-day-custom text-[var(--color-brand-ink)] font-black border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] transition-[background-color,box-shadow,opacity] duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_4px,var(--stripe-custom)_4px,var(--stripe-custom)_8px)]",
-	manuallySelected:
+	manual:
 		"rounded-lg bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,var(--color-brand-teal)_82%)] text-[var(--color-brand-ink)] font-black border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] transition-[background-color,box-shadow,opacity] duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_4px,var(--stripe-manual)_4px,var(--stripe-manual)_8px)]",
 	selected:
 		"rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground font-black border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] transition-[background-color,box-shadow] duration-200",
@@ -40,7 +40,7 @@ export type DayStateClass = keyof typeof MODIFIERS_CLASS_NAMES;
 const RANGE_KEYS: string[] = ["inRange", "rangeStart", "rangeEnd"];
 
 export const DAY_STATE_LABELS = [
-	{ modifier: "manuallySelected", labelKey: "manual" },
+	{ modifier: "manual", labelKey: "manual" },
 	{ modifier: "suggested", labelKey: "suggested" },
 	{ modifier: "alternative", labelKey: "alternatives" },
 	{ modifier: "custom", labelKey: "custom" },

@@ -1,7 +1,7 @@
 import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { runPlanningPipeline } from "./pipeline";
-import { FilterStrategy } from "./types";
+import { Strategy } from "./types";
 
 const YEAR = 2025;
 
@@ -25,8 +25,10 @@ const baseInput = {
 		holiday({ id: "new-year", date: new Date(YEAR, 0, 1) }),
 		holiday({ id: "epiphany", date: new Date(YEAR, 0, 6) }),
 	],
+	manualDays: [],
+	removedSuggestedDays: [],
 	allowPastDays: true,
-	strategy: FilterStrategy.GROUPED,
+	strategy: Strategy.GROUPED,
 	locale: "en" as const,
 	maxAlternatives: 2,
 };
@@ -45,10 +47,21 @@ describe("runPlanningPipeline", () => {
 		expect(result.alternatives.every((alternative) => alternative.metrics !== undefined)).toBe(true);
 	});
 
+	it("takes the hand-edited days as required inputs, so a caller cannot lose them in silence", () => {
+		const { manualDays, removedSuggestedDays, ...withoutHandEditedDays } = baseInput;
+
+		// @ts-expect-error the hand-edited days are required
+		const planWithoutThem = () => runPlanningPipeline(withoutHandEditedDays);
+
+		expect(manualDays).toEqual([]);
+		expect(removedSuggestedDays).toEqual([]);
+		expect(planWithoutThem).toThrow(TypeError);
+	});
+
 	it("takes Manual Days out of the budget and plans around them", () => {
 		const manual = [new Date(YEAR, 6, 7), new Date(YEAR, 6, 8)];
 
-		const result = runPlanningPipeline({ ...baseInput, ptoDays: 5, manuallySelectedDays: manual });
+		const result = runPlanningPipeline({ ...baseInput, ptoDays: 5, manualDays: manual });
 
 		expect(result.suggestion.days.length).toBeGreaterThan(0);
 		expect(result.suggestion.days.length).toBeLessThanOrEqual(3);
@@ -61,7 +74,7 @@ describe("runPlanningPipeline", () => {
 		const manual = new Date(YEAR, 6, 7);
 		const removed = new Date(YEAR, 6, 21);
 
-		runPlanningPipeline({ ...baseInput, manuallySelectedDays: [manual], removedSuggestedDays: [removed] });
+		runPlanningPipeline({ ...baseInput, manualDays: [manual], removedSuggestedDays: [removed] });
 
 		const [args] = findPlanningCandidates.mock.lastCall ?? [];
 		expect(args?.holidays.map(({ id }) => id)).toEqual(["new-year", "epiphany", "manual-0"]);
@@ -85,7 +98,7 @@ describe("runPlanningPipeline", () => {
 		runPlanningPipeline({
 			...baseInput,
 			ptoDays: 10,
-			manuallySelectedDays: [new Date(YEAR, 6, 7)],
+			manualDays: [new Date(YEAR, 6, 7)],
 			autoSuggestCount: 2,
 		});
 
@@ -101,13 +114,13 @@ describe("runPlanningPipeline", () => {
 
 		const result = runPlanningPipeline({
 			...baseInput,
-			manuallySelectedDays: [manual],
+			manualDays: [manual],
 			removedSuggestedDays: [removed],
 		});
 
 		expect(generateMetrics.mock.calls).toHaveLength(1 + result.alternatives.length);
 		for (const [args] of generateMetrics.mock.calls) {
-			expect(args.manuallySelectedDays).toEqual([manual]);
+			expect(args.manualDays).toEqual([manual]);
 			expect(args.removedSuggestedDays).toEqual([removed]);
 			expect(args.holidays.some(({ id }) => id === "manual-0")).toBe(true);
 			expect(args.holidays.some(({ date }) => date.getTime() === removed.getTime())).toBe(false);
@@ -141,7 +154,7 @@ describe("runPlanningPipeline", () => {
 			expect(suggestion.metrics).toBeDefined();
 			expect(suggestion.metrics.averageEfficiency).toBe(0);
 			expect(suggestion.metrics.totalEffectiveDays).toBe(0);
-			expect(suggestion.metrics.firstLastBreak).toBeNull();
+			expect(suggestion.metrics.firstLastRestBlock).toBeNull();
 		});
 
 		it("sizes those Metrics to the Planning Window, not to a hard-coded twelve months", () => {
@@ -192,7 +205,7 @@ describe("runPlanningPipeline", () => {
 			const result = runPlanningPipeline({
 				...baseInput,
 				ptoDays: 2,
-				manuallySelectedDays: [new Date(YEAR, 2, 5), new Date(YEAR, 2, 6), new Date(YEAR, 2, 7)],
+				manualDays: [new Date(YEAR, 2, 5), new Date(YEAR, 2, 6), new Date(YEAR, 2, 7)],
 			});
 
 			expect(result.planned).toBe(false);
@@ -231,7 +244,7 @@ describe("runPlanningPipeline", () => {
 	it("treats a Preferred Month already past as not chosen, so Main vacation's block goes where it can still be taken", () => {
 		vi.useFakeTimers({ now: new Date(YEAR, 8, 15), toFake: ["Date"] });
 		try {
-			const input = { ...baseInput, ptoDays: 10, allowPastDays: false, strategy: FilterStrategy.MAIN_VACATION };
+			const input = { ...baseInput, ptoDays: 10, allowPastDays: false, strategy: Strategy.MAIN_VACATION };
 			const passed = runPlanningPipeline({ ...input, preferredMonths: [0] });
 			const none = runPlanningPipeline({ ...input, preferredMonths: [] });
 

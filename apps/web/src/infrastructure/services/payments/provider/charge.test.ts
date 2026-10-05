@@ -40,7 +40,7 @@ beforeEach(() => {
 describe("retrieveCharge", () => {
 	it("expands the balance transaction, without which Stripe never returns the fee", async () => {
 		await run("ch_abc");
-		expect(mockChargesRetrieve).toHaveBeenCalledWith("ch_abc", { expand: ["balance_transaction"] });
+		expect(mockChargesRetrieve).toHaveBeenCalledWith({ id: "ch_abc", params: { expand: ["balance_transaction"] } });
 	});
 
 	it("returns ChargeData with all mapped fields", async () => {

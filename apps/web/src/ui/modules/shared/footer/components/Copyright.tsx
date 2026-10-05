@@ -9,7 +9,7 @@ interface CopyrightProps {
 
 export const Copyright = ({ serverYear }: CopyrightProps) => {
 	const t = useTranslations("footer");
-	const year = useCurrentYear({ serverYear });
+	const year = useCurrentYear(serverYear);
 
 	return t("copyright", { year });
 };

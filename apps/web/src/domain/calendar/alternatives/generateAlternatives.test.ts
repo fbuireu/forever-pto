@@ -2,7 +2,7 @@ import type { HolidayDTO } from "@application/dto/holiday/types";
 import { HolidayVariant } from "@application/dto/holiday/types";
 import { PTO_CONSTANTS } from "@domain/calendar/const";
 import { selectBridgesForStrategy } from "@domain/calendar/suggestions/utils/selectors";
-import { FilterStrategy, type Suggestion } from "@domain/calendar/types";
+import { Strategy, type Suggestion } from "@domain/calendar/types";
 import { clearDateKeyCache, clearHolidayCache } from "@domain/calendar/utils/cache";
 import { findPlanningCandidates, type PlanningCandidates, selectionInputOf } from "@domain/calendar/utils/candidates";
 import { measurePlan } from "@domain/calendar/utils/measures";
@@ -29,7 +29,7 @@ interface PlanAlternativesParams {
 	holidays: HolidayDTO[];
 	allowPastDays: boolean;
 	months: Date[];
-	strategy: FilterStrategy;
+	strategy: Strategy;
 	removedDays?: Date[];
 	maxAlternatives: number;
 	existingSuggestion?: Suggestion;
@@ -89,7 +89,7 @@ const BASE = {
 	holidays: [] as ReturnType<typeof makeHoliday>[],
 	allowPastDays: true,
 	months: [makeDate({ year: 2025, month: 1, day: 1 })],
-	strategy: FilterStrategy.GROUPED,
+	strategy: Strategy.GROUPED,
 };
 
 const YEAR = { ...BASE, months: FULL_YEAR, holidays: HOLIDAYS, ptoDays: 10, maxAlternatives: 4 };
@@ -106,7 +106,7 @@ describe("generateAlternatives", () => {
 		const placed = {
 			days: [makeDate({ year: 2025, month: 1, day: 3 })],
 			bridges: [],
-			strategy: FilterStrategy.GROUPED,
+			strategy: Strategy.GROUPED,
 		};
 		const { suggestion, alternatives } = planAlternatives({
 			...YEAR,
@@ -135,14 +135,11 @@ describe("generateAlternatives", () => {
 		expect(alternatives.length).toBeLessThanOrEqual(2);
 	});
 
-	it.each(Object.values(FilterStrategy))(
-		"%s: fills maxAlternatives on a full year that has bridges to spare",
-		(strategy) => {
-			expect(planAlternatives({ ...YEAR, strategy }).alternatives).toHaveLength(4);
-		},
-	);
+	it.each(Object.values(Strategy))("%s: fills maxAlternatives on a full year that has bridges to spare", (strategy) => {
+		expect(planAlternatives({ ...YEAR, strategy }).alternatives).toHaveLength(4);
+	});
 
-	it.each(Object.values(FilterStrategy))(
+	it.each(Object.values(Strategy))(
 		"%s: never offers a plan that covers more days than the Suggestion, or returns more per PTO Day",
 		(strategy) => {
 			const { suggestion, alternatives, candidates } = planAlternatives({ ...YEAR, strategy });
@@ -158,28 +155,28 @@ describe("generateAlternatives", () => {
 	);
 
 	it("offers another Strategy's plan only when it covers fewer days than the Suggestion", () => {
-		const { candidates, alternatives } = planAlternatives({ ...YEAR, strategy: FilterStrategy.OPTIMIZED });
-		const planOf = (strategy: FilterStrategy) =>
+		const { candidates, alternatives } = planAlternatives({ ...YEAR, strategy: Strategy.OPTIMIZED });
+		const planOf = (strategy: Strategy) =>
 			selectBridgesForStrategy({ ...selectionInputOf({ candidates, ptoDays: YEAR.ptoDays }), strategy });
 		const offered = alternatives.map((alternative) => toStrings(alternative.days).join());
 
-		expect(offered).toContain(toStrings(planOf(FilterStrategy.GROUPED).days).join());
+		expect(offered).toContain(toStrings(planOf(Strategy.GROUPED).days).join());
 		expect(
-			planAlternatives({ ...YEAR, strategy: FilterStrategy.GROUPED }).alternatives.map((alternative) =>
+			planAlternatives({ ...YEAR, strategy: Strategy.GROUPED }).alternatives.map((alternative) =>
 				toStrings(alternative.days).join(),
 			),
-		).not.toContain(toStrings(planOf(FilterStrategy.OPTIMIZED).days).join());
+		).not.toContain(toStrings(planOf(Strategy.OPTIMIZED).days).join());
 	});
 
 	it("makes a better plan the chosen Strategy found the Suggestion, and offers the weaker one instead", () => {
 		const weak = {
 			days: [makeDate({ year: 2025, month: 1, day: 3 })],
 			bridges: [],
-			strategy: FilterStrategy.OPTIMIZED,
+			strategy: Strategy.OPTIMIZED,
 		};
 		const { suggestion, alternatives, candidates } = planAlternatives({
 			...YEAR,
-			strategy: FilterStrategy.OPTIMIZED,
+			strategy: Strategy.OPTIMIZED,
 			existingSuggestion: weak,
 		});
 
@@ -191,7 +188,7 @@ describe("generateAlternatives", () => {
 	});
 
 	it("keeps every Alternative at least MIN_DIFFERENCE away from the Suggestion and from each other", () => {
-		const { suggestion, alternatives } = planAlternatives({ ...YEAR, strategy: FilterStrategy.OPTIMIZED });
+		const { suggestion, alternatives } = planAlternatives({ ...YEAR, strategy: Strategy.OPTIMIZED });
 		const plans = [suggestion.days, ...alternatives.map((alt) => alt.days)];
 
 		expect(alternatives.length).toBeGreaterThan(1);
@@ -205,14 +202,14 @@ describe("generateAlternatives", () => {
 	});
 
 	it("may reuse a Bridge of the Suggestion, since distinct no longer means disjoint", () => {
-		const { suggestion, alternatives } = planAlternatives({ ...YEAR, strategy: FilterStrategy.OPTIMIZED });
+		const { suggestion, alternatives } = planAlternatives({ ...YEAR, strategy: Strategy.OPTIMIZED });
 		const placed = new Set(toStrings(suggestion.days));
 
 		expect(alternatives.some((alt) => alt.days.some((day) => placed.has(day.toDateString())))).toBe(true);
 	});
 
 	it("each alternative has days sorted chronologically even where it took a later Bridge first", () => {
-		const { alternatives } = planAlternatives({ ...YEAR, strategy: FilterStrategy.OPTIMIZED, maxAlternatives: 3 });
+		const { alternatives } = planAlternatives({ ...YEAR, strategy: Strategy.OPTIMIZED, maxAlternatives: 3 });
 
 		expect(alternatives).toHaveLength(3);
 		for (const alt of alternatives) {
@@ -232,7 +229,7 @@ describe("generateAlternatives", () => {
 		const removed = makeDate({ year: 2025, month: 1, day: 6 });
 		const { alternatives } = planAlternatives({
 			...YEAR,
-			strategy: FilterStrategy.OPTIMIZED,
+			strategy: Strategy.OPTIMIZED,
 			removedDays: [removed],
 		});
 
@@ -248,18 +245,16 @@ describe("generateAlternatives", () => {
 	});
 
 	it("stamps each Alternative with the Strategy that found it", () => {
-		const { candidates, alternatives } = planAlternatives({ ...YEAR, strategy: FilterStrategy.OPTIMIZED });
+		const { candidates, alternatives } = planAlternatives({ ...YEAR, strategy: Strategy.OPTIMIZED });
 		const groupedPlan = toStrings(
 			selectBridgesForStrategy({
 				...selectionInputOf({ candidates, ptoDays: YEAR.ptoDays }),
-				strategy: FilterStrategy.GROUPED,
+				strategy: Strategy.GROUPED,
 			}).days,
 		).join();
 
-		expect(alternatives.find((alt) => toStrings(alt.days).join() === groupedPlan)?.strategy).toBe(
-			FilterStrategy.GROUPED,
-		);
-		expect(alternatives.at(-1)?.strategy).toBe(FilterStrategy.OPTIMIZED);
+		expect(alternatives.find((alt) => toStrings(alt.days).join() === groupedPlan)?.strategy).toBe(Strategy.GROUPED);
+		expect(alternatives.at(-1)?.strategy).toBe(Strategy.OPTIMIZED);
 	});
 
 	it("returns no alternatives when no workdays are available (past months, allowPastDays=false)", () => {

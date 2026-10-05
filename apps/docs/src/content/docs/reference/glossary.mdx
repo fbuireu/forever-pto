@@ -21,7 +21,7 @@ One day of the continuous stretch off a Bridge or Suggestion produces. The total
 
 ### Strategy
 
-The rule that decides which Bridges make it into a Suggestion when the budget cannot cover them all. Its values, exported as the `FilterStrategy` const object in `apps/web/src/domain/calendar/types.ts`:
+The rule that decides which Bridges make it into a Suggestion when the budget cannot cover them all. Its values, exported as the `Strategy` const object in `apps/web/src/domain/calendar/types.ts`:
 
 - **`grouped`** grows a few blocks of about two weeks each, accepting a lower return per PTO Day to get there. Fewer, longer stretches off.
 - **`optimized`** takes whatever adds the most Effective Days per PTO Day to the plan so far. The most Effective Days for the budget.

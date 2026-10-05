@@ -13,7 +13,7 @@ in [`CONTEXT.md`](../../../../../CONTEXT.md).
 
 | File | Contents |
 | --- | --- |
-| [`types.ts`](./types.ts) | `Bridge`, `Suggestion`, `MeasuredSuggestion`, `Metrics`, `FirstLastBreak`, the `FilterStrategy` const object plus its type, and the pair that guards the wire: `isFilterStrategy` and `DEFAULT_FILTER_STRATEGY`. It imports nothing, because the docs site reads it by relative path |
+| [`types.ts`](./types.ts) | `Bridge`, `Suggestion`, `MeasuredSuggestion`, `Metrics`, `FirstLastRestBlock`, the `Strategy` const object plus its type, and the pair that guards the wire: `isStrategy` and `DEFAULT_STRATEGY`. It imports nothing, because the docs site reads it by relative path |
 | [`const.ts`](./const.ts) | `PTO_CONSTANTS`: every tunable in the engine; the unit and meaning of each are in [Constants](#constants) below. It imports nothing either: the docs site reads it by relative path too |
 | [`utils/cache.ts`](./utils/cache.ts) | `getKey`, `getCombinationKey`, `createHolidaySet`, and the two `clear*` functions `runPlanningPipeline` opens with |
 | [`utils/helpers.ts`](./utils/helpers.ts) | `getAvailableWorkdays` (Workday enumeration), `findBridges` (candidate generation, sorted into the tie-break order `compareByEfficiency` defines) and `freeDaysAround` (the Free Days each Manual Day leans on, which become `alreadyOff`) |
@@ -30,7 +30,7 @@ in [`CONTEXT.md`](../../../../../CONTEXT.md).
 | [`alternatives/generateAlternatives.ts`](./alternatives/generateAlternatives.ts) | Re-runs selection under the other Strategies and without one Rest Block of the Suggestion at a time, keeping plans at least `MIN_DIFFERENCE` apart |
 | [`alternatives/utils/helpers.ts`](./alternatives/utils/helpers.ts) | `planDistance`: one minus the Jaccard index of two day sets |
 | [`metrics/generateMetrics.ts`](./metrics/generateMetrics.ts) | Assembles the `Metrics` object for a Suggestion or an Alternative |
-| [`metrics/utils/dayOff.ts`](./metrics/utils/dayOff.ts) | `dayKey` and `dayOffKeys`: the metrics' spelling of a day's identity, and the set of placed days and Holidays that the streaks, Max Work Streak and Worked Days per month count against |
+| [`metrics/utils/closedDays.ts`](./metrics/utils/closedDays.ts) | `dayKey` and `closedDayKeys`: the metrics' spelling of a day's identity, and the set of Closed Days, the placed days and the Holidays, that the streaks, Max Work Streak and Worked Days per month count against |
 | [`metrics/utils/streaks.ts`](./metrics/utils/streaks.ts) | `freeStreaks`: the one scan of the free-day runs the plan produces |
 | [`metrics/utils/helpers.ts`](./metrics/utils/helpers.ts) | One function per metric (Effective Days, Long Weekends, Long Blocks per Quarter, Rest Blocks, Max Work Streak, Longest Vacation, Worked Days per month, the first and last months, quarterly and monthly distribution) plus `windowMonthIndex`, which places a date in one of the buckets `window.ts` sizes and which `YearTimelineChart.tsx` reads too, `restBlocksOf`, the one owner of the Rest Block separation rule, and `getBridgesInUse` |
 
@@ -40,7 +40,7 @@ in [`CONTEXT.md`](../../../../../CONTEXT.md).
 result:
 
 ```
-runPlanningPipeline({ window, ptoDays, autoSuggestCount?, holidays, manuallySelectedDays?,
+runPlanningPipeline({ window, ptoDays, autoSuggestCount?, holidays, manualDays?,
                       removedSuggestedDays?, allowPastDays, strategy, preferredMonths?, locale, maxAlternatives })
   → { planned, suggestion, alternatives }
 ```
@@ -67,7 +67,7 @@ directly:
 
 - `generateSuggestions({ ptoDays, candidates, strategy, preferredMonths? })` → `{ days, bridges, strategy }`, the greedy plan the search starts from
 - `generateAlternatives({ ptoDays, candidates, maxAlternatives, existingSuggestion, strategy, preferredMonths? })` → `{ suggestion, alternatives }`, the best plan the chosen Strategy found and the ones offered beside it
-- `generateMetrics({ suggestion, locale, planningWindow, holidays, allowPastDays, manuallySelectedDays, removedSuggestedDays })` → `Metrics`
+- `generateMetrics({ suggestion, locale, planningWindow, holidays, allowPastDays, manualDays, removedSuggestedDays })` → `Metrics`
 
 **Outside the domain, the app reads `runPlanningPipeline` (the worker and the holidays store), `generateMetrics`
 (the holidays store), `measureBudget`, `measureGain`, `resolveSelectedDays`, `windowMonthIndex`, the types and the
@@ -86,7 +86,7 @@ the calendar export read exactly the days the Metrics were computed from. It mat
 `Date` carrying a time component still lines up, and it returns the original array unchanged when there are no
 Manual or Removed Days.
 
-**`generateMetrics` requires both `manuallySelectedDays` and `removedSuggestedDays`, and neither defaults.** A
+**`generateMetrics` requires both `manualDays` and `removedSuggestedDays`, and neither defaults.** A
 caller that omitted them would get Metrics measured against the days the engine placed *by itself*, while the
 streaks run straight through the Manual Days, which the pseudo-Holidays make Free Days: Efficiency
 (`totalEffectiveDays / days.length`), Bonus Days (`totalEffectiveDays - days.length`) and the monthly and
@@ -205,7 +205,11 @@ the selector only `reachablePreferredMonths`: the positions `reachableMonths` st
 the current month on. When every chosen month has passed, that leaves none chosen, so Main Vacation still builds
 its block wherever it can be longest instead of falling straight to its Optimized stage. Both month pickers
 take the same set and disable the rest, keeping the stored choice so it returns when past days are allowed;
-`pipeline.test.ts` pins the pruning.
+`pipeline.test.ts` pins the pruning. `reachableMonths` takes `today: Date | null`, and `null` means no day has been
+read yet, so every month is reachable: the picker is prerendered, and a day read during render would be the build's,
+frozen into the `disabled` attributes hydration keeps. `MonthToggles` starts `today` as `null` and sets it in an
+effect after mount, the way `Calendar` does, and `MonthToggles.test.tsx` renders the server pass and expects no month
+disabled.
 
 Ranks compare lexicographically within `SELECTION.RANK_TOLERANCE`, because the gain is a float division. A tie on every key falls
 to the order `findBridges` handed over, and only then.
@@ -270,7 +274,7 @@ in rank order, so the days it flattens out of them are not, and it sorts once be
 
 **There is one fallback for an unknown Strategy value, `objectiveFor`, and both generators reach it**, so one bad
 string cannot put a Suggestion of one Strategy beside Alternatives of another.
-[`worker.ts`](../../infrastructure/workers/worker.ts) narrows with `isFilterStrategy` before any of this; the
+[`worker.ts`](../../infrastructure/workers/worker.ts) narrows with `isStrategy` before any of this; the
 fallback is depth against a caller that has not been type-checked, not an error path.
 
 **Leaving budget unspent is a correct outcome, not a gap to fill.** The selector stops when no remaining candidate
@@ -306,8 +310,8 @@ then predicates over that sequence: `hasPlacedDay` (summed for the first, maximi
 `length >= LONG_WEEKEND_MINIMUM_DAYS && hasWeekend && hasPlacedDay`, and
 `length >= LONG_BLOCK_MINIMUM_DAYS && hasPlacedDay` anchored on the first day inside the window.
 
-**The set of placed days and Holidays has one owner: `dayOffKeys` in
-[`metrics/utils/dayOff.ts`](./metrics/utils/dayOff.ts).** `freeStreaks`, `calculateMaxWorkStreak` and
+**The set of Closed Days has one owner: `closedDayKeys` in
+[`metrics/utils/closedDays.ts`](./metrics/utils/closedDays.ts).** `freeStreaks`, `calculateMaxWorkStreak` and
 `getWorkedDaysPerMonth` all build it there. `getWorkedDaysPerMonth` filters its inputs to the year's days outside
 the weekend first and then unions them through the same helper, because a Manual Day reaches it both as a placed day and as
 a pseudo-Holiday, and subtracting the two lists as independent counts would take it out twice.
@@ -498,7 +502,7 @@ last, so a stretch straddling the edge of the data is still counted whole.
 **`generateMetrics` has one construction of `Metrics`, with no zero-day branch.** Every helper already answers for
 an empty day list: `getMonthlyDist`, `calculateQuarterDistribution` and `getLongBlocksPerQuarter` size themselves
 from the Planning Window and fill zeros, `freeStreaks` short-circuits to `[]`, `getBridgesInUse` filters
-everything out, `calculateRestBlocks` and `getFirstLastBreak` have their own empty answers. Only the Efficiency
+everything out, `calculateRestBlocks` and `getFirstLastRestBlock` have their own empty answers. Only the Efficiency
 division needs a guard, because `0 / 0` is `NaN`. Max Work Streak and Worked Days per month are scoped to the
 calendar year, not to the plan, so with nothing placed they are the whole year still standing, around 261 and
 21.8, not 0: `CONTEXT.md` defines Max Work Streak as the longest run of Workdays *left standing after the plan is

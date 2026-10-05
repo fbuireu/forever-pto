@@ -78,7 +78,7 @@ interface YearTimelineChartProps {
 	carryOverMonths: number;
 	holidays: HolidayDTO[];
 	suggestion: Suggestion | null;
-	manuallySelectedDays: Date[];
+	manualDays: Date[];
 }
 
 type TimelineRow = "national" | "regional" | "custom" | "pto" | "bridges" | "manual";
@@ -103,7 +103,7 @@ export const YearTimelineChart = memo(function YearTimelineChart({
 	carryOverMonths,
 	holidays,
 	suggestion,
-	manuallySelectedDays,
+	manualDays,
 }: YearTimelineChartProps) {
 	const t = useTranslations("summary");
 	const locale = useLocale();
@@ -139,7 +139,7 @@ export const YearTimelineChart = memo(function YearTimelineChart({
 			end: b.endDate,
 		}));
 
-		const manual = manuallySelectedDays.map((d) => ({ start: d, end: d }));
+		const manual = manualDays.map((d) => ({ start: d, end: d }));
 
 		const timelineRows: TimelineRowData[] = [
 			{ key: "national", label: t("yearTimeline.rows.national"), segs: national },
@@ -151,7 +151,7 @@ export const YearTimelineChart = memo(function YearTimelineChart({
 		];
 
 		return timelineRows.filter((row) => row.segs.length > 0);
-	}, [holidays, suggestion, manuallySelectedDays, t]);
+	}, [holidays, suggestion, manualDays, t]);
 
 	return (
 		<div className="w-full border-[3px] border-[var(--frame)] rounded-[10px] shadow-[var(--shadow-brutal-sm)] overflow-hidden bg-card">

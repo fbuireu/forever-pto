@@ -5,7 +5,7 @@ const holidaysState = vi.hoisted(() => ({
 	current: {
 		currentSelection: null as { days: Date[] } | null,
 		suggestion: null as { days: Date[] } | null,
-		manuallySelectedDays: [] as Date[],
+		manualDays: [] as Date[],
 		removedSuggestedDays: [] as Date[],
 		isCalculating: false,
 	},
@@ -29,7 +29,7 @@ beforeEach(() => {
 	holidaysState.current = {
 		currentSelection: null,
 		suggestion: null,
-		manuallySelectedDays: [],
+		manualDays: [],
 		removedSuggestedDays: [],
 		isCalculating: false,
 	};
@@ -83,10 +83,10 @@ describe("usePlanReadout", () => {
 	it("reports hand edits from either direction", () => {
 		expect(renderHook(() => usePlanReadout()).result.current.hasManualChanges).toBe(false);
 
-		holidaysState.current.manuallySelectedDays = [day(4)];
+		holidaysState.current.manualDays = [day(4)];
 		expect(renderHook(() => usePlanReadout()).result.current.hasManualChanges).toBe(true);
 
-		holidaysState.current.manuallySelectedDays = [];
+		holidaysState.current.manualDays = [];
 		holidaysState.current.removedSuggestedDays = [day(4)];
 		expect(renderHook(() => usePlanReadout()).result.current.hasManualChanges).toBe(true);
 	});

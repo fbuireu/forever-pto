@@ -2,7 +2,7 @@
 
 import { useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
-import { FilterStrategy } from "@domain/calendar/types";
+import { Strategy as StrategyName } from "@domain/calendar/types";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@ui/modules/core/animate/base/Collapsible";
 import { ChevronDown } from "@ui/modules/core/animate/icons/ChevronDown";
@@ -38,29 +38,29 @@ export const Strategy = () => {
 	const [detailsOpen, setDetailsOpen] = useState(false);
 
 	const strategies = useMemo(() => {
-		const details: Record<FilterStrategy, StrategyDetails> = {
-			[FilterStrategy.GROUPED]: {
+		const details: Record<StrategyName, StrategyDetails> = {
+			[StrategyName.GROUPED]: {
 				label: t("grouped.label"),
 				description: t("grouped.description"),
 				subtitle: t("grouped.subtitle"),
 				pros: [t("grouped.pros.longVacations"), t("grouped.pros.wholeWeeks")],
 				cons: [t("grouped.cons.fewerDays"), t("grouped.cons.lowerEfficiency")],
 			},
-			[FilterStrategy.OPTIMIZED]: {
+			[StrategyName.OPTIMIZED]: {
 				label: t("optimized.label"),
 				description: t("optimized.description"),
 				subtitle: t("optimized.subtitle"),
 				pros: [t("optimized.pros.maximumEfficiency"), t("optimized.pros.moreDays")],
 				cons: [t("optimized.cons.mostlyLongWeekends"), t("optimized.cons.noLongTrip")],
 			},
-			[FilterStrategy.BALANCED]: {
+			[StrategyName.BALANCED]: {
 				label: t("balanced.label"),
 				description: t("balanced.description"),
 				subtitle: t("balanced.subtitle"),
 				pros: [t("balanced.pros.noLongStretch"), t("balanced.pros.restAllYear")],
 				cons: [t("balanced.cons.noMaximization"), t("balanced.cons.noLongTrip")],
 			},
-			[FilterStrategy.MAIN_VACATION]: {
+			[StrategyName.MAIN_VACATION]: {
 				label: t("mainVacation.label"),
 				description: t("mainVacation.description"),
 				subtitle: t("mainVacation.subtitle"),
@@ -69,10 +69,10 @@ export const Strategy = () => {
 			},
 		};
 
-		return Object.values(FilterStrategy).map((value) => ({ value, icon: STRATEGY_ICONS[value], ...details[value] }));
+		return Object.values(StrategyName).map((value) => ({ value, icon: STRATEGY_ICONS[value], ...details[value] }));
 	}, [t]);
 
-	const handleStrategyChange = (value: FilterStrategy) => {
+	const handleStrategyChange = (value: StrategyName) => {
 		if (value !== strategy) askForPlan();
 		setStrategy(value);
 		track({ event: "planning_input_changed", properties: { input: "strategy", inputValue: value } });
@@ -99,7 +99,7 @@ export const Strategy = () => {
 				placeholder={t("placeholder")}
 				searchPlaceholder={t("search")}
 			/>
-			{strategy === FilterStrategy.MAIN_VACATION && <PreferredMonths />}
+			{strategy === StrategyName.MAIN_VACATION && <PreferredMonths />}
 			{currentStrategy && (
 				<Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
 					<AnimateIcon animateOnHover>

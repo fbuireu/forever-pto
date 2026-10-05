@@ -137,6 +137,12 @@ describe("reachableMonths", () => {
 		expect(reachableMonths({ year: 2027, carryOverMonths: 0, allowPastDays: false, today }).size).toBe(MONTHS_IN_YEAR);
 	});
 
+	it("reaches every month while today is not known yet, since nothing can be behind a day nobody has read", () => {
+		const reachable = reachableMonths({ year: 2026, carryOverMonths: 0, allowPastDays: false, today: null });
+
+		expect(reachable.size).toBe(MONTHS_IN_YEAR);
+	});
+
 	it("keeps only the Preferred Months the window can still reach", () => {
 		const reachable = reachableMonths({ year: 2026, carryOverMonths: 0, allowPastDays: false, today });
 

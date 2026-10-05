@@ -1,9 +1,9 @@
 "use client";
 
 import { SidebarFooter, SidebarMenu, SidebarMenuItem, useSidebar } from "@ui/modules/core/animate/base/Sidebar";
+import { ThemeSelector } from "@ui/modules/shared/ThemeSelector";
 import { cn } from "@ui/utils/cn";
 import { LanguageSelector } from "./LanguageSelector";
-import { ThemeSelector } from "./ThemeSelector";
 
 export const SidebarFooterButtons = () => {
 	const { state } = useSidebar();

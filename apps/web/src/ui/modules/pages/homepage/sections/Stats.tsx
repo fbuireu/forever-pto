@@ -1,5 +1,5 @@
 import { getFormatter, getTranslations } from "next-intl/server";
-import { SHOWCASE_PLAN, SHOWCASE_RATIO } from "./shared";
+import { COUNTRY_COUNT, SHOWCASE_EFFICIENCY, SHOWCASE_PLAN } from "./shared";
 
 const PLANS_GENERATED = 12_000;
 
@@ -12,7 +12,7 @@ export const Stats = async () => {
 				{[
 					{
 						num: t("stats.efficiencyValue", {
-							ratio: format.number(SHOWCASE_RATIO, { maximumFractionDigits: 1 }),
+							ratio: format.number(SHOWCASE_EFFICIENCY, { maximumFractionDigits: 1 }),
 						}),
 						label: t("stats.efficiencyLabel"),
 						bg: "var(--color-brand-yellow)",
@@ -22,7 +22,7 @@ export const Stats = async () => {
 						label: t("stats.daysLabel", { days: SHOWCASE_PLAN.ptoDays }),
 						bg: "var(--color-brand-teal)",
 					},
-					{ num: format.number(203), label: t("stats.countriesLabel"), bg: "var(--color-brand-orange)" },
+					{ num: format.number(COUNTRY_COUNT), label: t("stats.countriesLabel"), bg: "var(--color-brand-orange)" },
 					{
 						num: t("stats.plansValue", { value: format.number(PLANS_GENERATED, { notation: "compact" }) }),
 						label: t("stats.plansLabel"),

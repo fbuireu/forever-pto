@@ -1,6 +1,6 @@
 import { logger } from "@infrastructure/logging/logger";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { Effect } from "effect";
+import { Cause, Effect } from "effect";
 import type { NextRequest } from "next/server";
 import { normalizeCountryCode, noStoreFetch, stringField } from "./normalize";
 
@@ -25,11 +25,14 @@ const detectCountryFromCDNEffect = Effect.gen(function* () {
 	return normalizeCountryCode(location?.substring(LOCATION_IDENTIFIER.length));
 });
 
+const reasonOf = (failure: Error): string =>
+	failure instanceof Cause.UnknownException && failure.error instanceof Error ? failure.error.message : failure.message;
+
 export async function detectCountryFromCDN() {
 	return Effect.runPromise(
 		detectCountryFromCDNEffect.pipe(
-			Effect.catchAll((error) => {
-				logger.warn({ message: "Error while detecting country from CDN", context: { error } });
+			Effect.catchAll((failure) => {
+				logger.warn({ message: "Error while detecting country from CDN", context: { reason: reasonOf(failure) } });
 				return Effect.succeed("");
 			}),
 		),

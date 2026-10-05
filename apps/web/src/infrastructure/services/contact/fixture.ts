@@ -12,4 +12,4 @@ export const CONTACTS_TABLE = `CREATE TABLE contacts (
   updated_at TEXT NOT NULL
 )`;
 
-export const createContactsFixture = (): FixtureTurso => createFixtureTurso({ schema: CONTACTS_TABLE });
+export const createContactsFixture = (): FixtureTurso => createFixtureTurso(CONTACTS_TABLE);

@@ -20,7 +20,7 @@ import {
 	windowQuarterCount,
 } from "@domain/calendar/window";
 import type { Locale } from "next-intl";
-import { dayKey, dayOffKeys } from "./dayOff";
+import { closedDayKeys, dayKey } from "./closedDays";
 import type { FreeStreak } from "./streaks";
 
 export interface WindowMonthIndexParams {
@@ -113,7 +113,7 @@ export const calculateMaxWorkStreak = ({ ptoDays, holidays, year, allowPastDays 
 	const scanStart = allowPastDays || today < yearStart ? yearStart : today;
 	if (scanStart > yearEnd) return 0;
 
-	const off = dayOffKeys({ placedDays: ptoDays, holidays });
+	const off = closedDayKeys({ placedDays: ptoDays, holidays });
 
 	let maxWorkStreak = 0;
 	let currentStreak = 0;
@@ -134,12 +134,12 @@ export const calculateMaxWorkStreak = ({ ptoDays, holidays, year, allowPastDays 
 	return maxWorkStreak;
 };
 
-interface GetFirstLastBreakParams {
+interface GetFirstLastRestBlockParams {
 	dates: Date[];
 	locale: Locale;
 }
 
-export const getFirstLastBreak = ({ dates, locale }: GetFirstLastBreakParams) => {
+export const getFirstLastRestBlock = ({ dates, locale }: GetFirstLastRestBlockParams) => {
 	if (dates.length === 0) return null;
 
 	const sorted = dates.toSorted((a, b) => a.getTime() - b.getTime());
@@ -180,7 +180,7 @@ export const getWorkedDaysPerMonth = ({ ptoDays, holidays, year }: GetWorkedDays
 	const allDaysInYear = eachDayOfInterval({ start: yearStart, end: yearEnd });
 	const workdaysInYear = allDaysInYear.filter((day) => !isWeekend(day)).length;
 	const isWorkdayInYear = (date: Date) => getYear(date) === year && !isWeekend(date);
-	const offWorkdays = dayOffKeys({
+	const offWorkdays = closedDayKeys({
 		placedDays: ptoDays.filter(isWorkdayInYear),
 		holidays: holidays.filter(({ date }) => isWorkdayInYear(date)),
 	});

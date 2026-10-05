@@ -71,6 +71,7 @@
 			"effectiveDays": "Jours effectifs",
 			"overBudget": "{increment, plural, =0 {0} other {+#}} au-delà de ton budget de {ptoDays, plural, one {# jour} other {# jours}}",
 			"gain": "Gain",
+			"gainValue": "<n>{gain}</n> %",
 			"perPtoDay": "de ton budget de {ptoDays} {ptoDays, plural, one {jour} other {jours}}",
 			"longWeekends": "Longs week-ends",
 			"restBlocks": "Blocs de repos",
@@ -83,20 +84,21 @@
 		},
 		"yearSummary": {
 			"feature": "Résumé de l'année",
-			"featureDescription": "Analyse détaillée de tes jours de repos.",
+			"featureDescription": "Analyse détaillée de tes jours effectifs.",
 			"title": "Résumé de l'année",
-			"firstBreak": "Première pause",
+			"firstBreak": "Premier bloc de repos",
 			"maxWorkStreak": "Plus longue série de travail",
-			"lastBreak": "Dernière pause",
+			"lastBreak": "Dernier bloc de repos",
 			"totalBonusDays": "Total des jours bonus",
 			"bonusDaysCaption": "jours bonus grâce à l’optimisation",
+			"bonusDaysCount": "+<n>{count}</n>",
 			"daysCount": "{count, plural, one {<n>#</n> jour} other {<n>#</n> jours}}"
 		},
 		"summaryParagraph": {
 			"withGain": "Avec {ptoDays, plural, one {# jour de congé} other {tes # jours de congé}} et {totalHolidays, plural, one {# jour férié} other {# jours fériés}}, la stratégie {strategy} les transforme en {effectiveDays, plural, one {# jour effectif} other {# jours effectifs}}, soit {increment, plural, one {# jour} other {# jours}} au-dessus de ton budget, un gain de +{percentage} par rapport à une utilisation classique.",
 			"withoutGain": "Avec {ptoDays, plural, one {# jour de congé} other {tes # jours de congé}} et {totalHolidays, plural, one {# jour férié} other {# jours fériés}}, tu obtiens {effectiveDays, plural, one {# jour effectif} other {# jours effectifs}} avec la stratégie {strategy}.",
 			"noRegionHintTitle": "Ajoute ta région",
-			"noRegionHint": "Sélectionne ta région dans la barre latérale pour inclure les jours fériés régionaux et gagner encore plus de jours de repos.",
+			"noRegionHint": "Sélectionne ta région dans la barre latérale pour inclure les jours fériés régionaux et gagner encore plus de jours effectifs.",
 			"withRegion": "{regionalDays, plural, one {# de tes jours fériés est spécifique à {region}.} other {# de tes jours fériés sont spécifiques à {region}.}}"
 		},
 		"notifications": {
@@ -268,8 +270,8 @@
 		"deleteCount": "Supprimer ({count})"
 	},
 	"charts": {
-		"daysOffComposition": "Composition des jours de repos",
-		"daysOffCompositionFeature": "Graphique de composition des jours de repos",
+		"daysOffComposition": "Jours de congé et jours fériés",
+		"daysOffCompositionFeature": "Graphique des jours de congé et des jours fériés",
 		"quarterDistribution": "Répartition par trimestre",
 		"quarterDistributionFeature": "Graphique de répartition par trimestre",
 		"daysValue": "{count, plural, one {# jour} other {# jours}}",
@@ -339,17 +341,17 @@
 		"progressText": "{current} sur {total}",
 		"steps": {
 			"toolsTitle": "Calculateurs et outils",
-			"toolsDescription": "Les calculateurs sont ici : estime combien de jours de congé tu as acquis, découvre ce que tes jours non utilisés te coûtent en salaire, ou compte les jours ouvrés entre deux dates.",
+			"toolsDescription": "Les calculateurs sont ici : estime combien de jours de congé tu as acquis, découvre ce que te coûtent en salaire les jours de congé que tu ne poses pas, ou compte les jours ouvrés entre deux dates.",
 			"alternativesTitle": "Gestionnaire d'alternatives",
 			"alternativesDescription": "Parcours les autres plans calculés pour toi et compare leur efficacité et leur total de jours effectifs. La première alternative est toujours la suggestion recommandée, marquée d'une étincelle. Utilise les flèches pour passer de l'une à l'autre et clique sur \"Appliquer l'alternative\" pour en choisir une autre.",
 			"statusTitle": "Suivi du statut des congés",
-			"statusDescription": "Suis l'utilisation de tes congés en temps réel. Tu vois les jours attribués automatiquement (suggérés par l'app), les jours sélectionnés manuellement et les jours restants. Tu peux réinitialiser les modifications manuelles à tout moment pour revenir à la suggestion d'origine.",
+			"statusDescription": "Suis l'utilisation de tes congés en temps réel. Tu vois les jours suggérés, les jours manuels et ceux qui te restent. Tu peux réinitialiser les modifications manuelles à tout moment pour revenir à la suggestion d'origine.",
 			"calendarTitle": "Ton calendrier interactif de congés",
-			"calendarDescription": "Voici ton calendrier annuel en un coup d'œil. Les jours fériés apparaissent en gris, les jours de congé suggérés en bleu-vert et les jours sélectionnés manuellement en bleu. Clique sur n'importe quel jour ouvré pour le sélectionner ou le désélectionner manuellement. Le calendrier se met à jour instantanément lorsque tu explores différentes alternatives.",
+			"calendarDescription": "Voici ton calendrier annuel en un coup d'œil. Les jours fériés apparaissent en gris, les jours de congé suggérés en bleu-vert et les jours manuels en bleu. Clique sur n'importe quel jour ouvré pour le sélectionner ou le désélectionner manuellement. Le calendrier se met à jour instantanément lorsque tu explores différentes alternatives.",
 			"finishTitle": "C'est tout bon !",
 			"finishDescription": "Tu sais maintenant comment utiliser Forever PTO. Configure tes préférences dans la barre latérale et l'application te suggérera les meilleurs jours à poser. Bonnes vacances !",
 			"holidaysListTitle": "Personnalise tes jours fériés",
-			"holidaysListDescription": "Ici, tu peux affiner les données des jours fériés pour qu'elles correspondent exactement à ta situation. Modifie ou supprime n'importe quel jour férié national ou régional, et ajoute tes propres jours de repos : jours fériés d'entreprise, fêtes locales ou toute date qui compte pour toi. Plus les données sont précises, meilleures seront les suggestions.",
+			"holidaysListDescription": "Ici, tu peux affiner les données des jours fériés pour qu'elles correspondent exactement à ta situation. Modifie ou supprime n'importe quel jour férié national ou régional, et ajoute les tiens : jours fériés d'entreprise, fêtes locales ou toute date qui compte pour toi. Plus les données sont précises, meilleures seront les suggestions.",
 			"step1Title": "Ton contexte",
 			"step1Description": "Sélectionne ton pays, ta région et l'année que tu veux planifier. On en déduit tes jours fériés, qui servent à trouver les meilleurs ponts.",
 			"step2Title": "Tes jours de congé",
@@ -404,8 +406,8 @@
 		"remainingCount": "<label>Restants :</label> <n>{count}</n>",
 		"allAssigned": "Tous tes jours sont attribués !",
 		"resetManual": "Réinitialiser les modifications manuelles",
-		"usedDays": "{used} / {total, plural, one {# jour utilisé} other {# jours utilisés}} · {pct}%",
-		"remainingDays": "{remaining} restants · {pct}%"
+		"usedDays": "{used} / {total, plural, one {# jour utilisé} other {# jours utilisés}} · {pct}",
+		"remainingDays": "{remaining} restants · {pct}"
 	},
 	"contact": {
 		"title": "Nous contacter",
@@ -440,7 +442,9 @@
 		"recommended": "Recommandée",
 		"totalOff": "Jours effectifs",
 		"efficiency": "Efficacité",
-		"efficiencyValue": "{efficiency}x",
+		"efficiencyValue": "<n>{efficiency}</n>x",
+		"comparisonPercent": "<n>{percent}</n> %",
+		"bonusDaysBadge": "(+<n>{bonusDays}</n>)",
 		"efficiencyReadout": "{suggestion, select, recommended {Efficacité : {efficiency}x} other {Efficacité : {efficiency}x ({difference})}}",
 		"vsMain": "vs principal",
 		"alreadyApplied": "Déjà appliquée",
@@ -524,7 +528,7 @@
 			},
 			"optimized": {
 				"label": "Optimisée",
-				"description": "Maximise tes jours de repos au total",
+				"description": "Maximise tes jours effectifs au total",
 				"subtitle": "Chaque jour de congé rapporte le plus possible",
 				"pros": {
 					"maximumEfficiency": "Efficacité maximale",
@@ -608,15 +612,15 @@
 		"increase": "Augmenter les jours de congé",
 		"status": "Statut des jours de congé",
 		"autoAssigned": "Suggérés :",
-		"manuallySelected": "Sélectionnés manuellement :",
+		"manuallySelected": "Manuels :",
 		"remaining": "Restants :",
 		"resetManualChanges": "Réinitialiser les modifications manuelles",
 		"allAssigned": "Tous tes jours sont attribués !",
-		"clickToAssign": "Clique sur les jours du calendrier pour attribuer manuellement les jours restants"
+		"clickToAssign": "Clique sur les jours du calendrier pour attribuer manuellement ton budget restant"
 	},
 	"ptoCalculator": {
 		"title": "Calculateur de congés acquis",
-		"tooltip": "Calcule tes jours de congé acquis selon un rythme mensuel. La plupart des entreprises accordent 2 à 3 jours par mois. Sélectionne le mois cible pour voir le total de jours disponibles.",
+		"tooltip": "Calcule tes jours de congé acquis selon un rythme mensuel. La plupart des entreprises accordent 2 à 3 jours par mois. Sélectionne le mois cible pour voir ton total.",
 		"tooltipLabel": "Plus d'informations sur le calculateur de congés",
 		"daysPerMonth": "Jours par mois",
 		"calculateThrough": "Calculer jusqu'à",
@@ -879,7 +883,7 @@
 		"selectAllHolidays": "Sélectionner tous les jours fériés",
 		"unlockFeature": "Débloquer la fonctionnalité premium : {feature}",
 		"premiumFeature": "Fonctionnalité premium",
-		"unlockDescription": "Passe à premium pour modifier manuellement les suggestions et gérer tes jours restants.",
+		"unlockDescription": "Passe à premium pour modifier manuellement les suggestions et gérer ton budget restant.",
 		"becomePremium": "Passer à premium"
 	},
 	"calendar": {

@@ -1,12 +1,14 @@
 import { PAYMENT_SUCCEEDED } from "@domain/payment/events/types";
+import type { StatementParams } from "@infrastructure/clients/db/turso/service";
 import { TursoService } from "@infrastructure/clients/db/turso/service";
 import { DatabaseError } from "@infrastructure/errors";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { PaymentChargeData } from "./repository";
 
-const { savePayment, updatePaymentStatus, updatePaymentCharge, getPaymentById, getSucceededPaymentByEmail } =
-	await import("./repository");
+const { savePayment, updatePaymentStatus, updatePaymentCharge, getSucceededPaymentByEmail } = await import(
+	"./repository"
+);
 
 const mockExecute = vi.fn();
 const mockQuery = vi.fn();
@@ -125,20 +127,20 @@ describe("savePayment", () => {
 	it("executes an INSERT INTO payments", async () => {
 		await runEffect(savePayment(BASE_PAYMENT));
 		expect(mockExecute).toHaveBeenCalledOnce();
-		const [sql] = mockExecute.mock.calls[0] as [string, unknown[]];
+		const [{ sql }] = mockExecute.mock.calls[0] as [Required<StatementParams>];
 		expect(sql).toContain("INSERT OR IGNORE INTO payments");
 	});
 
 	it("binds exactly one value per placeholder", async () => {
 		await runEffect(savePayment(BASE_PAYMENT));
-		const [sql, args] = mockExecute.mock.calls[0] as [string, unknown[]];
+		const [{ sql, args }] = mockExecute.mock.calls[0] as [Required<StatementParams>];
 		expect(sql.split("?")).toHaveLength(args.length + 1);
 		expect(insertedColumns(sql)).toHaveLength(args.length);
 	});
 
 	it("binds every value under the column the INSERT names at that position", async () => {
 		await runEffect(savePayment(BASE_PAYMENT));
-		const [sql, args] = mockExecute.mock.calls[0] as [string, unknown[]];
+		const [{ sql, args }] = mockExecute.mock.calls[0] as [Required<StatementParams>];
 		expect(boundRow({ columns: insertedColumns(sql), args })).toEqual({
 			id: "pi_test",
 			stripe_created_at: "2024-01-15T10:00:00.000Z",
@@ -174,7 +176,7 @@ describe("savePayment", () => {
 
 	it("passes null for optional fields when they are null", async () => {
 		await runEffect(savePayment({ ...BASE_PAYMENT, customerId: null, chargeId: null, promoCode: null }));
-		const [sql, args] = mockExecute.mock.calls[0] as [string, unknown[]];
+		const [{ sql, args }] = mockExecute.mock.calls[0] as [Required<StatementParams>];
 		const row = boundRow({ columns: insertedColumns(sql), args });
 		expect(row.stripe_customer_id).toBeNull();
 		expect(row.stripe_charge_id).toBeNull();
@@ -191,14 +193,14 @@ describe("savePayment", () => {
 describe("updatePaymentStatus", () => {
 	it("executes an UPDATE payments SET status", async () => {
 		await runEffect(updatePaymentStatus({ paymentIntentId: "pi_test", status: "succeeded" }));
-		const [sql] = mockExecute.mock.calls[0] as [string, unknown[]];
+		const [{ sql }] = mockExecute.mock.calls[0] as [Required<StatementParams>];
 		expect(sql).toContain("UPDATE payments");
 		expect(sql).toContain("SET status");
 	});
 
 	it("refuses to overwrite a succeeded row, in the WHERE clause rather than at the caller", async () => {
 		await runEffect(updatePaymentStatus({ paymentIntentId: "pi_test", status: "canceled" }));
-		const [sql] = mockExecute.mock.calls[0] as [string, unknown[]];
+		const [{ sql }] = mockExecute.mock.calls[0] as [Required<StatementParams>];
 		const where = sql.slice(sql.indexOf("WHERE"));
 
 		expect(where).toContain("status != 'succeeded'");
@@ -218,14 +220,14 @@ describe("updatePaymentStatus", () => {
 
 	it("passes status and paymentIntentId as arguments", async () => {
 		await runEffect(updatePaymentStatus({ paymentIntentId: "pi_test", status: "succeeded" }));
-		const [, args] = mockExecute.mock.calls[0] as [string, unknown[]];
+		const [{ args }] = mockExecute.mock.calls[0] as [Required<StatementParams>];
 		expect(args[0]).toBe("succeeded");
 		expect(args[2]).toBe("pi_test");
 	});
 
 	it("stamps succeeded_at against the same literal the domain calls the entitlement", async () => {
 		await runEffect(updatePaymentStatus({ paymentIntentId: "pi_test", status: PAYMENT_SUCCEEDED }));
-		const [sql] = mockExecute.mock.calls[0] as [string, unknown[]];
+		const [{ sql }] = mockExecute.mock.calls[0] as [Required<StatementParams>];
 		expect(sql).toContain(`WHEN ? = '${PAYMENT_SUCCEEDED}'`);
 	});
 
@@ -255,14 +257,14 @@ describe("updatePaymentCharge", () => {
 
 	it("executes an UPDATE payments SET stripe_charge_id", async () => {
 		await runEffect(updatePaymentCharge(chargeData));
-		const [sql] = mockExecute.mock.calls[0] as [string, unknown[]];
+		const [{ sql }] = mockExecute.mock.calls[0] as [Required<StatementParams>];
 		expect(sql).toContain("UPDATE payments");
 		expect(sql).toContain("stripe_charge_id");
 	});
 
 	it("binds every value under the column the SET clause assigns it to", async () => {
 		await runEffect(updatePaymentCharge(chargeData));
-		const [sql, args] = mockExecute.mock.calls[0] as [string, unknown[]];
+		const [{ sql, args }] = mockExecute.mock.calls[0] as [Required<StatementParams>];
 		expect(sql.split("?")).toHaveLength(args.length + 1);
 		expect(boundRow({ columns: updatedColumns(sql), args })).toEqual({
 			stripe_charge_id: "ch_abc",
@@ -288,47 +290,10 @@ describe("updatePaymentCharge", () => {
 	});
 });
 
-describe("getPaymentById", () => {
-	it("queries payments by id", async () => {
-		await runEffect(getPaymentById("pi_test"));
-		const [sql, args] = mockQuery.mock.calls[0] as [string, unknown[]];
-		expect(sql).toContain("WHERE id = ?");
-		expect(args[0]).toBe("pi_test");
-	});
-
-	it("maps the snake_case row onto PaymentData", async () => {
-		mockQuery.mockReturnValue(Effect.succeed([BASE_ROW]));
-		const result = await runEffect(getPaymentById("pi_test"));
-		expect(result).toEqual(BASE_STORED_PAYMENT);
-	});
-
-	it("converts the text timestamp columns to dates", async () => {
-		mockQuery.mockReturnValue(
-			Effect.succeed([{ ...BASE_ROW, refunded_at: "2024-02-01T09:30:00.000Z", disputed_at: null }]),
-		);
-		const result = await runEffect(getPaymentById("pi_test"));
-		expect(result?.stripeCreatedAt).toEqual(new Date("2024-01-15T10:00:00.000Z"));
-		expect(result?.refundedAt).toEqual(new Date("2024-02-01T09:30:00.000Z"));
-		expect(result?.disputedAt).toBeNull();
-	});
-
-	it("returns undefined when no rows found", async () => {
-		mockQuery.mockReturnValue(Effect.succeed([]));
-		const result = await runEffect(getPaymentById("pi_unknown"));
-		expect(result).toBeUndefined();
-	});
-
-	it("propagates DatabaseError when query fails", async () => {
-		mockQuery.mockReturnValue(Effect.fail(new DatabaseError({ message: "query failed" })));
-		const error = await runFlipEffect(getPaymentById("pi_test"));
-		expect(error).toBeInstanceOf(DatabaseError);
-	});
-});
-
 describe("getSucceededPaymentByEmail", () => {
 	it("filters on the email column, which is the only key Premium is recoverable by", async () => {
 		await runEffect(getSucceededPaymentByEmail("user@example.com"));
-		const [sql, args] = mockQuery.mock.calls[0] as [string, unknown[]];
+		const [{ sql, args }] = mockQuery.mock.calls[0] as [Required<StatementParams>];
 		expect(sql).toContain("WHERE lower(trim(email)) = ?");
 		expect(sql).toContain("status = 'succeeded'");
 		expect(sql).toContain("ORDER BY stripe_created_at DESC");
@@ -337,7 +302,7 @@ describe("getSucceededPaymentByEmail", () => {
 
 	it("matches an address the payer retyped with different capitalisation or a stray space", async () => {
 		await runEffect(getSucceededPaymentByEmail("  User@Example.COM "));
-		const [, args] = mockQuery.mock.calls[0] as [string, unknown[]];
+		const [{ args }] = mockQuery.mock.calls[0] as [Required<StatementParams>];
 		expect(args[0]).toBe("user@example.com");
 	});
 
@@ -345,6 +310,16 @@ describe("getSucceededPaymentByEmail", () => {
 		mockQuery.mockReturnValue(Effect.succeed([BASE_ROW]));
 		const result = await runEffect(getSucceededPaymentByEmail("user@example.com"));
 		expect(result).toEqual(BASE_STORED_PAYMENT);
+	});
+
+	it("converts the text timestamp columns to dates", async () => {
+		mockQuery.mockReturnValue(
+			Effect.succeed([{ ...BASE_ROW, refunded_at: "2024-02-01T09:30:00.000Z", disputed_at: null }]),
+		);
+		const result = await runEffect(getSucceededPaymentByEmail("user@example.com"));
+		expect(result?.stripeCreatedAt).toEqual(new Date("2024-01-15T10:00:00.000Z"));
+		expect(result?.refundedAt).toEqual(new Date("2024-02-01T09:30:00.000Z"));
+		expect(result?.disputedAt).toBeNull();
 	});
 
 	it("returns undefined when no rows found", async () => {

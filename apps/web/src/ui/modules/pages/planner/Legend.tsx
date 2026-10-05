@@ -38,7 +38,7 @@ export const LegendItems = ({ className, itemClassName }: LegendItemsProps) => {
 				<span>{t("alternatives")}</span>
 			</div>
 			<div className={cn("flex items-center", itemClassName)}>
-				<div className={cn("mr-2 size-8", MODIFIERS_CLASS_NAMES.manuallySelected)} />
+				<div className={cn("mr-2 size-8", MODIFIERS_CLASS_NAMES.manual)} />
 				<span>{t("manual")}</span>
 			</div>
 			<div className={cn("flex items-center", itemClassName)}>

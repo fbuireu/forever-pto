@@ -1,4 +1,4 @@
-import { FilterStrategy } from "@domain/calendar/types";
+import { Strategy as StrategyName } from "@domain/calendar/types";
 import en from "@i18n/messages/en.json";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -53,7 +53,7 @@ const details = () =>
 const panel = (container: HTMLElement) => container.querySelector('[data-slot="collapsible-content"]') as HTMLElement;
 
 beforeEach(() => {
-	store.strategy = FilterStrategy.BALANCED;
+	store.strategy = StrategyName.BALANCED;
 	store.setStrategy.mockClear();
 });
 
@@ -73,7 +73,7 @@ describe("Strategy", () => {
 		renderStrategy();
 		expect(screen.queryByRole("group", { name: en.sidebar.preferredMonths.title })).toBeNull();
 
-		store.strategy = FilterStrategy.MAIN_VACATION;
+		store.strategy = StrategyName.MAIN_VACATION;
 		renderStrategy();
 		expect(screen.getByRole("group", { name: en.sidebar.preferredMonths.title })).toBeTruthy();
 	});
@@ -83,7 +83,7 @@ describe("Strategy", () => {
 
 		await userEvent.click(screen.getByRole("option", { name: en.sidebar.strategy.optimized.label }));
 
-		expect(store.setStrategy).toHaveBeenCalledExactlyOnceWith(FilterStrategy.OPTIMIZED);
+		expect(store.setStrategy).toHaveBeenCalledExactlyOnceWith(StrategyName.OPTIMIZED);
 	});
 
 	it("says nothing when the same strategy is picked again", async () => {
@@ -113,7 +113,7 @@ describe("Strategy", () => {
 	});
 
 	it("follows the store to another strategy's description", () => {
-		store.strategy = FilterStrategy.GROUPED;
+		store.strategy = StrategyName.GROUPED;
 
 		renderStrategy();
 
@@ -121,7 +121,7 @@ describe("Strategy", () => {
 	});
 
 	it("lists what the chosen strategy is good and bad at, since that is what the choice costs", () => {
-		store.strategy = FilterStrategy.OPTIMIZED;
+		store.strategy = StrategyName.OPTIMIZED;
 
 		renderStrategy();
 
@@ -174,7 +174,7 @@ describe("Strategy analytics", () => {
 
 		expect(track).toHaveBeenCalledExactlyOnceWith({
 			event: "planning_input_changed",
-			properties: { input: "strategy", inputValue: FilterStrategy.OPTIMIZED },
+			properties: { input: "strategy", inputValue: StrategyName.OPTIMIZED },
 		});
 	});
 });

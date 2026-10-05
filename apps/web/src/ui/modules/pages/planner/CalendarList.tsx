@@ -15,7 +15,7 @@ import { useShallow } from "zustand/react/shallow";
 import { Calendar, CalendarSelectionMode, type DayStates } from "./calendar/Calendar";
 import { CalendarListFixture } from "./calendar/CalendarListFixture";
 import { usePlannerDayClick } from "./calendar/usePlannerDayClick";
-import { isAlternative, isManuallySelected, isSuggestion } from "./utils/modifiers";
+import { isAlternative, isManual, isSuggestion } from "./utils/modifiers";
 
 export const CalendarList = () => {
 	const locale = useLocale();
@@ -41,7 +41,7 @@ export const CalendarList = () => {
 		currentSelection,
 		isCalculating,
 		hasCalculated,
-		manuallySelectedDays,
+		manualDays,
 		removedSuggestedDays,
 		fetchHolidays,
 		previewAlternativeIndex,
@@ -58,7 +58,7 @@ export const CalendarList = () => {
 			currentSelection: state.currentSelection,
 			isCalculating: state.isCalculating,
 			hasCalculated: state.hasCalculated,
-			manuallySelectedDays: state.manuallySelectedDays,
+			manualDays: state.manualDays,
 			removedSuggestedDays: state.removedSuggestedDays,
 			fetchHolidays: state.fetchHolidays,
 			previewAlternativeIndex: state.previewAlternativeIndex,
@@ -78,9 +78,9 @@ export const CalendarList = () => {
 		() => ({
 			suggested: isSuggestion({ currentSelection, removedSuggestedDays }),
 			alternative: isAlternative({ alternatives, suggestion, previewAlternativeIndex, currentSelection }),
-			manuallySelected: isManuallySelected(manuallySelectedDays),
+			manual: isManual(manualDays),
 		}),
-		[currentSelection, removedSuggestedDays, alternatives, suggestion, previewAlternativeIndex, manuallySelectedDays],
+		[currentSelection, removedSuggestedDays, alternatives, suggestion, previewAlternativeIndex, manualDays],
 	);
 
 	const toggleDay = useCallback(

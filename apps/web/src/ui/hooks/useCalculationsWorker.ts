@@ -113,9 +113,9 @@ export function useCalculationsWorker() {
 					settle();
 				};
 
-				const { removedSuggestedDays, currentSelection, manuallySelectedDays } = useHolidaysStore.getState();
+				const { removedSuggestedDays, currentSelection, manualDays } = useHolidaysStore.getState();
 
-				const budgetForAutoSuggest = measureBudget({ ptoDays: params.ptoDays, manuallySelectedDays }).remaining;
+				const budgetForAutoSuggest = measureBudget({ ptoDays: params.ptoDays, manualDays }).remaining;
 				const hasRemovedDays = removedSuggestedDays.length > 0;
 				const activeSuggestedDays =
 					currentSelection && hasRemovedDays
@@ -143,7 +143,7 @@ export function useCalculationsWorker() {
 						preferredMonths: params.preferredMonths,
 						locale: params.locale,
 						maxAlternatives,
-						manualDays: manuallySelectedDays.map((d) => d.toISOString()),
+						manualDays: manualDays.map((d) => d.toISOString()),
 						removedDays: removedSuggestedDays.map((d) => d.toISOString()),
 						autoSuggestCount,
 					},

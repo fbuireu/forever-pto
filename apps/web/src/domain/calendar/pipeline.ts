@@ -4,7 +4,7 @@ import type { Locale } from "next-intl";
 import { generateAlternatives } from "./alternatives/generateAlternatives";
 import { generateMetrics } from "./metrics/generateMetrics";
 import { generateSuggestions } from "./suggestions/generateSuggestions";
-import type { FilterStrategy, MeasuredSuggestion, Suggestion } from "./types";
+import type { MeasuredSuggestion, Strategy, Suggestion } from "./types";
 import { measureBudget } from "./utils/budget";
 import { clearDateKeyCache, clearHolidayCache } from "./utils/cache";
 import { findPlanningCandidates } from "./utils/candidates";
@@ -16,15 +16,15 @@ import {
 	reachablePreferredMonths,
 } from "./window";
 
-export interface PlanningInput {
+export interface RunPlanningPipelineParams {
 	window: PlanningWindow;
 	ptoDays: number;
 	autoSuggestCount?: number;
 	holidays: HolidayDTO[];
-	manuallySelectedDays?: Date[];
-	removedSuggestedDays?: Date[];
+	manualDays: Date[];
+	removedSuggestedDays: Date[];
 	allowPastDays: boolean;
-	strategy: FilterStrategy;
+	strategy: Strategy;
 	preferredMonths?: number[];
 	locale: Locale;
 	maxAlternatives: number;
@@ -41,14 +41,14 @@ export function runPlanningPipeline({
 	ptoDays,
 	autoSuggestCount,
 	holidays,
-	manuallySelectedDays = [],
-	removedSuggestedDays = [],
+	manualDays,
+	removedSuggestedDays,
 	allowPastDays,
 	strategy,
 	preferredMonths: requestedMonths = [],
 	locale,
 	maxAlternatives,
-}: PlanningInput): PlanningResult {
+}: RunPlanningPipelineParams): PlanningResult {
 	clearDateKeyCache();
 	clearHolidayCache();
 
@@ -60,7 +60,7 @@ export function runPlanningPipeline({
 			reachable: reachableMonths({ ...window, allowPastDays, today: startOfToday() }),
 		}),
 	});
-	const manualPseudoHolidays: HolidayDTO[] = manuallySelectedDays.map((date, index) => ({
+	const manualPseudoHolidays: HolidayDTO[] = manualDays.map((date, index) => ({
 		id: `manual-${index}`,
 		date,
 		name: MANUAL_DAY_NAME,
@@ -68,7 +68,7 @@ export function runPlanningPipeline({
 		isInPlanningWindow: true,
 	}));
 	const holidaysWithManual = [...holidays, ...manualPseudoHolidays];
-	const effectivePtoDays = autoSuggestCount ?? measureBudget({ ptoDays, manuallySelectedDays }).remaining;
+	const effectivePtoDays = autoSuggestCount ?? measureBudget({ ptoDays, manualDays }).remaining;
 
 	const measure = (suggestion: Suggestion): MeasuredSuggestion => ({
 		...suggestion,
@@ -78,7 +78,7 @@ export function runPlanningPipeline({
 			planningWindow: window,
 			holidays: holidaysWithManual,
 			allowPastDays,
-			manuallySelectedDays,
+			manualDays,
 			removedSuggestedDays,
 		}),
 	});
@@ -96,7 +96,7 @@ export function runPlanningPipeline({
 		months,
 		allowPastDays,
 		removedDays: removedSuggestedDays,
-		manualDays: manuallySelectedDays,
+		manualDays: manualDays,
 	});
 
 	if (candidates.bridges.length === 0) return unplanned();

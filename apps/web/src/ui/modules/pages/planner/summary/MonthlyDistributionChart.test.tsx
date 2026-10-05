@@ -46,21 +46,14 @@ import { MonthlyDistributionChart } from "./MonthlyDistributionChart";
 interface RenderChartParams {
 	monthlyDist: number[];
 	year?: number;
-	carryOverMonths?: number;
 	locale?: Locale;
 	messages?: typeof en;
 }
 
-const renderChart = ({
-	monthlyDist,
-	year = 2026,
-	carryOverMonths = 0,
-	locale = "en",
-	messages = en,
-}: RenderChartParams) =>
+const renderChart = ({ monthlyDist, year = 2026, locale = "en", messages = en }: RenderChartParams) =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
-			<MonthlyDistributionChart monthlyDist={monthlyDist} year={year} carryOverMonths={carryOverMonths} />
+			<MonthlyDistributionChart monthlyDist={monthlyDist} year={year} />
 		</NextIntlClientProvider>,
 	);
 
@@ -77,21 +70,17 @@ describe("MonthlyDistributionChart", () => {
 		expect(points().at(-1)?.mes).toBe("Dec");
 	});
 
-	it("widens the plot by the carried-over months, and names them with the year they fall in", () => {
-		renderChart({ monthlyDist: evenlySpread, carryOverMonths: 3 });
+	it("plots every month the engine measured, and names one past December with the year it falls in", () => {
+		renderChart({ monthlyDist: new Array(15).fill(1) });
 
 		expect(points()).toHaveLength(15);
 		expect(points().at(-1)?.mes).toBe("Mar '27");
 	});
 
-	it("pads the carried-over months with nought rather than leaving the plot short", () => {
-		renderChart({ monthlyDist: evenlySpread, carryOverMonths: 2 });
+	it("sizes the plot from the array it was given, never padding it with months the engine did not measure", () => {
+		renderChart({ monthlyDist: [1, 0, 2] });
 
-		expect(
-			points()
-				.slice(12)
-				.map(({ days }) => days),
-		).toStrictEqual([0, 0]);
+		expect(points().map(({ days }) => days)).toStrictEqual([1, 0, 2]);
 	});
 
 	it("plots the days it was given, month for month", () => {
@@ -133,7 +122,7 @@ describe("MonthlyDistributionChart", () => {
 	});
 
 	it("spells a carried-over month out with the year it belongs to", () => {
-		renderChart({ monthlyDist: evenlySpread, carryOverMonths: 1 });
+		renderChart({ monthlyDist: new Array(13).fill(1) });
 
 		expect(screen.getByTestId("carry-over").textContent).toBe("January 2027");
 	});

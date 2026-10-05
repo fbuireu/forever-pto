@@ -10,27 +10,26 @@ export interface Bridge {
 export interface Suggestion {
 	days: Date[];
 	bridges?: Bridge[];
-	strategy?: FilterStrategy;
+	strategy?: Strategy;
 	metrics?: Metrics;
 }
 
 export type MeasuredSuggestion = Suggestion & { metrics: Metrics };
 
-export const FilterStrategy = {
+export const Strategy = {
 	GROUPED: "grouped",
 	OPTIMIZED: "optimized",
 	BALANCED: "balanced",
 	MAIN_VACATION: "mainVacation",
 } as const;
 
-export type FilterStrategy = (typeof FilterStrategy)[keyof typeof FilterStrategy];
+export type Strategy = (typeof Strategy)[keyof typeof Strategy];
 
-export const DEFAULT_FILTER_STRATEGY: FilterStrategy = FilterStrategy.GROUPED;
+export const DEFAULT_STRATEGY: Strategy = Strategy.GROUPED;
 
-export const isFilterStrategy = (value: unknown): value is FilterStrategy =>
-	Object.values(FilterStrategy).includes(value as FilterStrategy);
+export const isStrategy = (value: unknown): value is Strategy => Object.values(Strategy).includes(value as Strategy);
 
-export interface FirstLastBreak {
+export interface FirstLastRestBlock {
 	first: string;
 	last: string;
 }
@@ -39,7 +38,7 @@ export interface Metrics {
 	longWeekends: number;
 	restBlocks: number;
 	maxWorkStreak: number;
-	firstLastBreak: FirstLastBreak | null;
+	firstLastRestBlock: FirstLastRestBlock | null;
 	averageEfficiency: number;
 	bonusDays: number;
 	quarterDist: number[];

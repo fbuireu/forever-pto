@@ -20,7 +20,7 @@ The heaviest work in here runs in the browser: the Web Worker.
 | `clients/` | SDK wrappers: Effect service tags plus modules that are deliberately not services. See [`clients/AGENTS.md`](./clients/AGENTS.md) |
 | `i18n/` | [`routing.ts`](./i18n/routing.ts) (next-intl routing, `localePrefix: 'as-needed'`), [`config.ts`](./i18n/config.ts) (request config + message loading), [`locales.ts`](./i18n/locales.ts) (the locale codes, `isLocale` and `LOCALE_COOKIE`), [`cookie.ts`](./i18n/cookie.ts) (`LOCALE_COOKIE_POLICY`, the one statement of the `NEXT_LOCALE` attributes, plus `setLocaleCookie`), [`clientMessages.ts`](./i18n/clientMessages.ts) (`clientMessagesOf`, the catalogue the browser is sent, minus `SERVER_ONLY_NAMESPACES`), [`utils/url.ts`](./i18n/utils/url.ts) (`localePath`, `resolveLocale`, `getLocaleFromPathname`, `routePathFromPathname`, `localeFromAcceptLanguage`, `localeAlternates`) |
 | `logging/` | [`logger.ts`](./logging/logger.ts), the `logger` object every log line in the app goes through; [`contract.ts`](./logging/contract.ts), its service name, levels and `stripQuery`; [`service.ts`](./logging/service.ts), the `LoggerService` tag wrapping that same object. See *`logging/`* below |
-| `markdown/` | `buildMarkdownPage.ts`: the Markdown twin of a page, served when the request asks for `text/markdown`. Translates through `createTranslator` over statically imported bundles, never `next-intl/server`; see *Gotchas*. [`twin.ts`](./markdown/twin.ts) beside it holds how the twin is *requested* and *cached*: the route path, the `Accept` token, the `x-markdown-path` header the proxy sets, and `markdownTwinHeaders({ found })`. Both the proxy and the route read it, so the cache policy is chosen after the lookup; see [`../app/AGENTS.md`](../app/AGENTS.md) |
+| `markdown/` | `buildMarkdownPage.ts`: the Markdown twin of a page, served when the request asks for `text/markdown`. Translates through `createTranslator` over statically imported bundles, never `next-intl/server`; see *Gotchas*. [`twin.ts`](./markdown/twin.ts) beside it holds how the twin is *requested* and *cached*: the route path, the `Accept` token, the `x-markdown-path` header the proxy sets, and `markdownTwinHeaders(found)`. Both the proxy and the route read it, so the cache policy is chosen after the lookup; see [`../app/AGENTS.md`](../app/AGENTS.md) |
 | `seo/` | [`buildMetadata.ts`](./seo/buildMetadata.ts): the `Metadata` shape every route's `generateMetadata` fills in; [`routeMetadata.ts`](./seo/routeMetadata.ts): that `generateMetadata`, built from a route's own row so a route file is one line; [`routes.ts`](./seo/routes.ts): `SITE_ROUTES`, the one list of pages and whether each is indexable, plus `routeFor`, the total lookup keyed by the table's own literal paths |
 | `proxy/` | Middleware helpers: `location.ts` (country detection + cookie) and [`cookie.ts`](./proxy/cookie.ts) (`user-country`, one week) |
 | `services/` | Everything with a purpose but no SDK of its own: `contact/`, `countries/`, `env/`, `holidays/`, `location/`, `payments/`, `premium/`, `regions/`. Some carry their own guides: [holidays](./services/holidays/AGENTS.md), [location](./services/location/AGENTS.md), [payments](./services/payments/AGENTS.md) |
@@ -44,7 +44,7 @@ the runtime's span API is callback-scoped and hands out no span id, so Effect's 
 onto it; [ADR 0017](../../../../adr/0017-observability-is-the-platform-export.md) has the detail. The
 `Effect.withSpan` each use case ends in is not what produces these.
 
-There is no `services/calendar/`. The planning engine is `@domain/calendar/`, and `FilterStrategy` is declared
+There is no `services/calendar/`. The planning engine is `@domain/calendar/`, and `Strategy` is declared
 there, not here.
 
 ## Locales
@@ -54,7 +54,7 @@ there, not here.
   locale fails to compile until it has a bundle row there.
 - **`isLocale` sits beside the codes rather than being derived from `resolveLocale`**, because the Web Worker
   needs it and `resolveLocale` pulls `routing`. The worker narrows the incoming `locale` with it exactly as it
-  narrows `strategy` with `isFilterStrategy`; the wire value is genuinely unvalidated there.
+  narrows `strategy` with `isStrategy`; the wire value is genuinely unvalidated there.
 - **`NEXT_LOCALE`'s attributes are stated once, in `cookie.ts`, and `routing.ts` hands that same object to
   next-intl.** More than one writer uses it: the proxy writes the cookie on the response through
   `setLocaleCookie`, and next-intl's `syncLocaleCookie` writes it from `document.cookie` when a language switcher
@@ -79,7 +79,7 @@ import a React component, a style or an asset out of `@ui/*`.
 **`@domain/*` is reached from the Web Worker and from two payment modules.** [`workers/types.ts`](./workers/types.ts),
 [`workers/utils/serializers.ts`](./workers/utils/serializers.ts) and [`workers/worker.ts`](./workers/worker.ts)
 take the calendar types, `runPlanningPipeline` and the boundary predicates the worker narrows with
-(`isFilterStrategy`, `isPreferredMonths`). The payment context reaches two modules under `services/payments/`:
+(`isStrategy`, `isPreferredMonths`). The payment context reaches two modules under `services/payments/`:
 [`repository.ts`](./services/payments/repository.ts) takes `ReportedPaymentStatus`, as `import type`, because
 the column it writes is that union and the alternative is a second declaration of the same strings one layer
 down; [`confirmation.ts`](./services/payments/confirmation.ts) takes `PAYMENT_SUCCEEDED`, the one value it

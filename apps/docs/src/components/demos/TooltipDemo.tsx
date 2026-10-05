@@ -32,7 +32,7 @@ export const TooltipInfoTriggerDemo = () => (
 			Efficiency score
 			<Tooltip>
 				<TooltipInfoTrigger className="ml-0" aria-label="About the Efficiency score" />
-				<TooltipContent>Days off gained per PTO day spent.</TooltipContent>
+				<TooltipContent>Effective days gained per PTO day spent.</TooltipContent>
 			</Tooltip>
 		</div>
 	</Demo>

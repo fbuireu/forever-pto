@@ -16,7 +16,7 @@ vi.mock("@ui/modules/core/animate/base/Sidebar", () => ({
 }));
 
 vi.mock("./LanguageSelector", () => ({ LanguageSelector: () => <div data-testid="language" /> }));
-vi.mock("./ThemeSelector", () => ({ ThemeSelector: () => <div data-testid="theme" /> }));
+vi.mock("@ui/modules/shared/ThemeSelector", () => ({ ThemeSelector: () => <div data-testid="theme" /> }));
 
 const { SidebarFooterButtons } = await import("./SidebarFooterButtons");
 

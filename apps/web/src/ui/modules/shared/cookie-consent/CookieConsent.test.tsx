@@ -109,7 +109,14 @@ describe("the first visit", () => {
 	it("shows the banner when nothing has been consented to yet", () => {
 		renderConsent();
 
-		expect(screen.getByRole("dialog", { name: en.cookies.title })).toBeTruthy();
+		expect(screen.getByRole("region", { name: en.cookies.title })).toBeTruthy();
+	});
+
+	it("is a labelled region and no dialog, since it moves no focus and traps none, which a dialog promises", () => {
+		renderConsent();
+
+		expect(screen.getByRole("region", { name: en.cookies.title })).toBeTruthy();
+		expect(screen.queryByRole("dialog")).toBeNull();
 	});
 
 	it("shows the banner when the stored consent is empty rather than absent", () => {
@@ -117,7 +124,7 @@ describe("the first visit", () => {
 
 		renderConsent();
 
-		expect(screen.getByRole("dialog", { name: en.cookies.title })).toBeTruthy();
+		expect(screen.getByRole("region", { name: en.cookies.title })).toBeTruthy();
 	});
 
 	it("does not show it to a returning visitor who has already answered", () => {
@@ -125,12 +132,12 @@ describe("the first visit", () => {
 
 		renderConsent();
 
-		expect(screen.queryByRole("dialog", { name: en.cookies.title })).toBeNull();
+		expect(screen.queryByRole("region", { name: en.cookies.title })).toBeNull();
 	});
 
 	it("sits below dialogs and popovers, so a prompt never covers a modal or the list a control opens", () => {
 		renderConsent();
-		const layer = screen.getByRole("dialog").className.match(/\bz-(\d+)\b/);
+		const layer = screen.getByRole("region", { name: en.cookies.title }).className.match(/\bz-(\d+)\b/);
 
 		expect(Number(layer?.[1])).toBeLessThan(DIALOG_LAYER);
 	});
@@ -168,7 +175,7 @@ describe("accepting and refusing from the banner", () => {
 
 		press(en.cookies.acceptAll);
 
-		expect(screen.queryByRole("dialog", { name: en.cookies.title })).toBeNull();
+		expect(screen.queryByRole("region", { name: en.cookies.title })).toBeNull();
 	});
 
 	it("swaps the banner for the preferences dialog rather than showing both", () => {
@@ -176,7 +183,7 @@ describe("accepting and refusing from the banner", () => {
 
 		press(en.cookies.managePreferences);
 
-		expect(screen.queryByRole("dialog", { name: en.cookies.title })).toBeNull();
+		expect(screen.queryByRole("region", { name: en.cookies.title })).toBeNull();
 		expect(dialog().dataset.open).toBe("true");
 	});
 });
@@ -236,11 +243,11 @@ describe("the footer's manage-cookies button", () => {
 
 	it("closes the first-visit banner rather than being short-circuited by it", () => {
 		renderConsent();
-		expect(screen.getByRole("dialog", { name: en.cookies.title })).toBeTruthy();
+		expect(screen.getByRole("region", { name: en.cookies.title })).toBeTruthy();
 
 		fireEvent(window, new Event("cc:showPreferences"));
 
-		expect(screen.queryByRole("dialog", { name: en.cookies.title })).toBeNull();
+		expect(screen.queryByRole("region", { name: en.cookies.title })).toBeNull();
 		expect(dialog().dataset.open).toBe("true");
 	});
 

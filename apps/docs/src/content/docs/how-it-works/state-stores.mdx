@@ -49,14 +49,14 @@ This prevents re-renders when unrelated fields change. Stores never fetch data t
 
 ## `filters` (`useFiltersStore`, storage `filters-store`)
 
-User-facing planner configuration: `ptoDays`, `allowPastDays`, `country`, `region`, `year`, `carryOverMonths`, `strategy` (a `FilterStrategy`, defaulting to grouped; see [holidays engine](/how-it-works/holidays-engine/)), `preferredMonths` (the Preferred Months the Main Vacation Strategy builds its block in, none by default, which means any month, guarded on rehydration by `isPreferredMonths`). Quirks:
+User-facing planner configuration: `ptoDays`, `allowPastDays`, `country`, `region`, `year`, `carryOverMonths`, `strategy` (a `Strategy`, defaulting to grouped; see [holidays engine](/how-it-works/holidays-engine/)), `preferredMonths` (the Preferred Months the Main Vacation Strategy builds its block in, none by default, which means any month, guarded on rehydration by `isPreferredMonths`). Quirks:
 
 - `partialize` persists everything **except `year`**, since the year deliberately resets to the current year on every visit.
 - `setCountry` resets `region` to `''`, since regions belong to a country.
 
 ## `holidays` (`useHolidaysStore`, storage `holidays-store`)
 
-The largest store: `holidays` (the `HolidayDTO[]`), the current `suggestion`, `alternatives` (capped by `maxAlternatives`), selection/preview indexes, `manuallySelectedDays`, `removedSuggestedDays` and `isCalculating`. Key actions:
+The largest store: `holidays` (the `HolidayDTO[]`), the current `suggestion`, `alternatives` (capped by `maxAlternatives`), selection/preview indexes, `manualDays`, `removedSuggestedDays` and `isCalculating`. Key actions:
 
 - `fetchHolidays` dynamic-imports `@infrastructure/services/holidays/getHolidays`, preserves user-created (`CUSTOM`) holidays and dedupes by date. It records `holidaysKey`, which filters the Holidays were fetched for (`holidaysKeyOf`), on success and on failure alike, and the planner plans only while that key matches the screen; the key is not persisted, so a reload waits for a fresh fetch rather than planning on the stored list. Each call also takes a sequence number and gives up if a newer call started while it awaited, so a slow answer for the previous year cannot overwrite the current one.
 - `generateSuggestions` dynamic-imports `runPlanningPipeline` for the synchronous path; `setCalculationResult` is the entry point used by the [Web Worker path](/how-it-works/calculation-worker/), preserving the selected alternative index across recalculations.

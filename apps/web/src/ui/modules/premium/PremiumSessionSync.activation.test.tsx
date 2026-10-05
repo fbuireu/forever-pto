@@ -104,6 +104,25 @@ describe("which loads of the payment confirmation page report premium_activated"
 		expect(reported()).toStrictEqual([]);
 	});
 
+	it("counts the donor once when the payer leaves before the confirmation settles, and the entry they left is visited again", async () => {
+		const session = Promise.withResolvers<typeof SESSION>();
+		vi.mocked(getExistingSession).mockReturnValue(session.promise);
+		window.history.replaceState(null, "", REDIRECT);
+		usePremiumStore.setState(usePremiumStore.getInitialState());
+
+		const page = render(<PremiumSessionSync />);
+		const entry = window.location.href;
+		page.unmount();
+		window.history.pushState(null, "", "/planner");
+		session.resolve(SESSION);
+		await settled();
+		expect(reported()).toStrictEqual([ACTIVATED]);
+
+		await load({ address: entry, storage: "cleared" });
+
+		expect(reported()).toStrictEqual([ACTIVATED]);
+	});
+
 	it("counts the donor once however the page is visited afterwards", async () => {
 		await load({ address: REDIRECT, storage: "cleared" });
 		await reload("kept");

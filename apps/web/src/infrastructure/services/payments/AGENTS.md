@@ -16,13 +16,13 @@ read by the premium activation path as well as by the payment one.
 
 | File | Exports | Requires |
 | --- | --- | --- |
-| `repository.ts` | `savePayment`, `updatePaymentStatus`, `updatePaymentCharge`, `getPaymentById`, `getSucceededPaymentByEmail`, `countPromoCodeRedemptions`, the `PaymentChargeData` shape | `TursoService` |
+| `repository.ts` | `savePayment`, `updatePaymentStatus`, `updatePaymentCharge`, `getSucceededPaymentByEmail`, `countPromoCodeRedemptions`, the `PaymentChargeData` shape | `TursoService` |
 | [`normalizeEmail.ts`](./normalizeEmail.ts) | `normalizeEmail(email)`: trim and lower-case, applied on both sides of every address comparison | None |
 | [`normalForms.ts`](./normalForms.ts) | `PAYMENT_CURRENCY` and `normalizePromoCode(code)`: the forms every payment value has to be written in, at every site that writes one | None |
 | [`confirmation.ts`](./confirmation.ts) | `confirmation(paymentIntentId)`: a `PaymentConfirmationDTO`, or `null` on any failure; warns through the tag when the intent is not `succeeded`, so the page renders and never logs | `StripeServerService`, `LoggerService` |
 | [`rateLimit.ts`](./rateLimit.ts) | `checkRateLimit(ip)`: fails with `RateLimitError` | the Cloudflare `PAYMENT_RATE_LIMITER` binding |
-| [`provider/intent.ts`](./provider/intent.ts) | `createPaymentIntent(params)`: the Stripe intent behind a Donation, and the only writer of its metadata block | `StripeServerService` |
-| [`provider/metadata.ts`](./provider/metadata.ts) | `readDonationMetadata(intent)` and `clampMetadata(value)`: the reader of that block and the clamp every free-text field goes through | None |
+| [`provider/intent.ts`](./provider/intent.ts) | `createPaymentIntent(params)`: the Stripe intent behind a Donation, which takes its metadata block from `donationMetadata` | `StripeServerService` |
+| [`provider/metadata.ts`](./provider/metadata.ts) | `donationMetadata(params)` and `readDonationMetadata(intent)`: the writer and the reader of that block, and `clampMetadata(value)`, the clamp every free-text field goes through | None |
 | [`provider/charge.ts`](./provider/charge.ts) | `retrieveCharge(chargeId)`: normalises a Stripe `Charge` into flat, nullable fields | `StripeServerService` |
 | [`provider/promoCode.ts`](./provider/promoCode.ts) | `validatePromoCode({ code, amount })`: a `DiscountInfo`, or a `PromoCodeError` | `StripeServerService`, `TursoService` |
 
@@ -41,7 +41,8 @@ read by the premium activation path as well as by the payment one.
 | [`api/operations/payment.ts`](../../api/operations/payment.ts) and [`api/operations/activatePremium.ts`](../../api/operations/activatePremium.ts) | `checkRateLimit` |
 | The confirmation page | `confirmation` |
 
-`getPaymentById` has no production caller.
+The repository reads only by email and by promotion code: no function reads a payment by its id, which is what
+keeps the webhook handlers from reading a row before they write it.
 
 The domain handlers importing infrastructure directly is the deliberate asymmetry in
 [ADR 0003](../../../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md); see
@@ -93,12 +94,13 @@ table of this size. Do not "optimise" it back to a bare `email = ?` without firs
 values.
 
 **Every field the entitlement later depends on travels in the intent's `metadata`.** Both donation entry
-points read the payer address from `metadata.email`, and `paymentDataDTO` reads `promoCode`, `userAgent` and `ipAddress` from there.
+points read the payer address from `metadata.email`, and the use cases read `promoCode`, `userAgent` and `ipAddress` from there, all through `readDonationMetadata`.
 Stripe metadata values must be strings, which is why the builder is full of `?? ''` and `.toFixed(2)`; a
 value dropped here cannot be recovered from Stripe afterwards.
 
-**`provider/metadata.ts` holds the reader of that block, and `createPaymentIntent` is its only writer.**
-`readDonationMetadata` takes the first non-blank of `metadata.email` and `receipt_email` after trimming. It returns `email: string | undefined` rather than failing, because the
+**`provider/metadata.ts` holds the writer and the reader of that block, so the keys are spelled in one file, and
+`createPaymentIntent` is the only caller of the writer.** `metadata.test.ts` reads what `donationMetadata` wrote back
+through `readDonationMetadata`, so a key renamed on one side fails there. `readDonationMetadata` takes the first non-blank of `metadata.email` and `receipt_email` after trimming. It returns `email: string | undefined` rather than failing, because the
 callers owe different errors: `MissingDonorEmailError` in the factory, `ValidationError` at the use-case.
 
 **Stripe caps a metadata value at 500 characters.** `promoCode`, `userAgent` and `ipAddress` go through

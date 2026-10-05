@@ -89,7 +89,7 @@ placed fewer days than the budget would then be re-planned smaller than the one 
 never grow back: the cap ratchets downwards on every later run.
 
 **The same hook reads the hand-edited days non-reactively, and that is what keeps a manual edit from
-re-planning the year.** `manuallySelectedDays`, `removedSuggestedDays` and `currentSelection` all come out
+re-planning the year.** `manualDays`, `removedSuggestedDays` and `currentSelection` all come out
 of `useHolidaysStore.getState()` inside `triggerCalculation`, never through the `useShallow` selector. They
 are inputs to the *next* run, not reasons to start one. [`CalendarList.tsx`](./modules/pages/planner/CalendarList.tsx) lists `triggerCalculation` in its
 effect's dependencies, so every field of that selector (the two setters, `holidays` and `maxAlternatives`) is

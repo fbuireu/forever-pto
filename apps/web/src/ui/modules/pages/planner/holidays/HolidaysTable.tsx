@@ -1,10 +1,11 @@
 "use client";
 
+import { holidaysInPlanningWindow } from "@application/dto/holiday/rules";
 import type { HolidayDTO } from "@application/dto/holiday/types";
 import { HolidayVariant } from "@application/dto/holiday/types";
 import { formatDate, isWeekend } from "@application/shared/utils/dates";
 import { useHolidaysStore } from "@application/stores/holidays";
-import { PremiumFeatureId } from "@application/stores/premium";
+import { PremiumFeatureId, PremiumOrigin } from "@application/stores/premium";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { useDebounce } from "@ui/hooks/useDebounce";
 import { useHasOpened } from "@ui/hooks/useHasOpened";
@@ -72,6 +73,7 @@ const HolidayCard = ({
 				<div className="flex items-start gap-3 flex-1 min-w-0">
 					<PremiumFeature
 						feature={PremiumFeatureId.SELECT_HOLIDAY}
+						origin={PremiumOrigin.PLANNER}
 						variant={PremiumFeatureVariant.STACK}
 						iconSize="size-4"
 					>
@@ -115,9 +117,9 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 	const [showAddModal, setShowAddModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
-	const addModalHasOpened = useHasOpened({ open: showAddModal });
-	const editModalHasOpened = useHasOpened({ open: showEditModal });
-	const deleteModalHasOpened = useHasOpened({ open: showDeleteModal });
+	const addModalHasOpened = useHasOpened(showAddModal);
+	const editModalHasOpened = useHasOpened(showEditModal);
+	const deleteModalHasOpened = useHasOpened(showDeleteModal);
 	const [innerOpen, setInnerOpen] = useState(false);
 	const [selectedHolidays, setSelectedHolidays] = useState<Set<string>>(new Set());
 	const [sortConfig, setSortConfig] = useState<{
@@ -141,7 +143,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 	}, [open]);
 
 	const variantHolidays = useMemo(
-		() => holidays.filter((holiday) => holiday.variant === variant && holiday.isInPlanningWindow),
+		() => holidaysInPlanningWindow(holidays).filter((holiday) => holiday.variant === variant),
 		[variant, holidays],
 	);
 
@@ -293,6 +295,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 		return (
 			<PremiumFeature
 				feature={PremiumFeatureId.SELECT_ALL_HOLIDAYS}
+				origin={PremiumOrigin.PLANNER}
 				variant={PremiumFeatureVariant.STACK}
 				iconSize="size-4"
 			>

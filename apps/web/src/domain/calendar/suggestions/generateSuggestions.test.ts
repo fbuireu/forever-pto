@@ -1,6 +1,6 @@
 import type { HolidayDTO } from "@application/dto/holiday/types";
 import { HolidayVariant } from "@application/dto/holiday/types";
-import { FilterStrategy } from "@domain/calendar/types";
+import { Strategy } from "@domain/calendar/types";
 import { clearDateKeyCache, clearHolidayCache } from "@domain/calendar/utils/cache";
 import { findPlanningCandidates } from "@domain/calendar/utils/candidates";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -12,7 +12,7 @@ interface PlanSuggestionsParams {
 	holidays: HolidayDTO[];
 	allowPastDays: boolean;
 	months: Date[];
-	strategy: FilterStrategy;
+	strategy: Strategy;
 	removedDays?: Date[];
 }
 
@@ -60,12 +60,12 @@ describe("generateSuggestions", () => {
 	});
 
 	it("returns empty days when ptoDays is 0", () => {
-		const result = planSuggestions({ ...BASE, ptoDays: 0, strategy: FilterStrategy.GROUPED });
+		const result = planSuggestions({ ...BASE, ptoDays: 0, strategy: Strategy.GROUPED });
 		expect(result.days).toHaveLength(0);
 	});
 
 	it("returns empty days when ptoDays is negative", () => {
-		const result = planSuggestions({ ...BASE, ptoDays: -1, strategy: FilterStrategy.GROUPED });
+		const result = planSuggestions({ ...BASE, ptoDays: -1, strategy: Strategy.GROUPED });
 		expect(result.days).toHaveLength(0);
 	});
 
@@ -75,14 +75,14 @@ describe("generateSuggestions", () => {
 			ptoDays: 5,
 			months: [makeDate({ year: 2020, month: 1, day: 1 })],
 			allowPastDays: false,
-			strategy: FilterStrategy.GROUPED,
+			strategy: Strategy.GROUPED,
 		});
 		expect(result.days).toHaveLength(0);
 	});
 
 	it("includes the strategy in the result", () => {
-		const result = planSuggestions({ ...BASE, ptoDays: 3, strategy: FilterStrategy.OPTIMIZED });
-		expect(result.strategy).toBe(FilterStrategy.OPTIMIZED);
+		const result = planSuggestions({ ...BASE, ptoDays: 3, strategy: Strategy.OPTIMIZED });
+		expect(result.strategy).toBe(Strategy.OPTIMIZED);
 	});
 
 	it("returns days sorted chronologically even where the Strategy picks a later Bridge first", () => {
@@ -97,7 +97,7 @@ describe("generateSuggestions", () => {
 			months,
 			holidays,
 			ptoDays: 10,
-			strategy: FilterStrategy.OPTIMIZED,
+			strategy: Strategy.OPTIMIZED,
 		});
 		const bridgeOrder = (result.bridges ?? []).flatMap((bridge) => bridge.ptoDays);
 
@@ -110,7 +110,7 @@ describe("generateSuggestions", () => {
 
 	it("never suggests a day that is already a holiday", () => {
 		const holiday = makeHoliday(makeDate({ year: 2025, month: 1, day: 6 }));
-		const result = planSuggestions({ ...BASE, ptoDays: 5, holidays: [holiday], strategy: FilterStrategy.GROUPED });
+		const result = planSuggestions({ ...BASE, ptoDays: 5, holidays: [holiday], strategy: Strategy.GROUPED });
 		expect(result.days.length).toBeGreaterThan(0);
 		expect(
 			result.days.some((day) => day.toDateString() === makeDate({ year: 2025, month: 1, day: 6 }).toDateString()),
@@ -123,13 +123,13 @@ describe("generateSuggestions", () => {
 			...BASE,
 			ptoDays: 5,
 			holidays: [weekendHoliday],
-			strategy: FilterStrategy.GROUPED,
+			strategy: Strategy.GROUPED,
 		});
 		expect(result.days.length).toBeGreaterThan(0);
 	});
 
 	it("does not return weekend days", () => {
-		const result = planSuggestions({ ...BASE, ptoDays: 10, strategy: FilterStrategy.OPTIMIZED });
+		const result = planSuggestions({ ...BASE, ptoDays: 10, strategy: Strategy.OPTIMIZED });
 		expect(result.days.length).toBeGreaterThan(0);
 		for (const day of result.days) {
 			expect(day.getDay()).not.toBe(0);
@@ -137,7 +137,7 @@ describe("generateSuggestions", () => {
 		}
 	});
 
-	it.each([[FilterStrategy.GROUPED], [FilterStrategy.OPTIMIZED], [FilterStrategy.BALANCED]] as const)(
+	it.each([[Strategy.GROUPED], [Strategy.OPTIMIZED], [Strategy.BALANCED]] as const)(
 		"%s: returned days do not exceed ptoDays budget",
 		(strategy) => {
 			const ptoDays = 5;
@@ -153,7 +153,7 @@ describe("generateSuggestions", () => {
 			...BASE,
 			ptoDays: 5,
 			removedDays: [removed],
-			strategy: FilterStrategy.GROUPED,
+			strategy: Strategy.GROUPED,
 		});
 		expect(result.days.length).toBeGreaterThan(0);
 		expect(result.days.some((day) => day.toDateString() === removed.toDateString())).toBe(false);
@@ -165,7 +165,7 @@ describe("generateSuggestions", () => {
 			...BASE,
 			ptoDays: 5,
 			removedDays: [removed],
-			strategy: FilterStrategy.GROUPED,
+			strategy: Strategy.GROUPED,
 		});
 		expect(result.bridges?.length).toBeGreaterThan(0);
 		const covering = result.bridges?.filter(
@@ -176,13 +176,13 @@ describe("generateSuggestions", () => {
 	});
 
 	it("caps to available workdays if ptoDays exceeds them", () => {
-		const result = planSuggestions({ ...BASE, ptoDays: 9999, strategy: FilterStrategy.GROUPED });
+		const result = planSuggestions({ ...BASE, ptoDays: 9999, strategy: Strategy.GROUPED });
 		expect(result.days.length).toBeGreaterThan(0);
 		expect(result.days.length).toBeLessThanOrEqual(23);
 	});
 
 	describe("strategy dispatch", () => {
-		it.each([[FilterStrategy.GROUPED], [FilterStrategy.OPTIMIZED], [FilterStrategy.BALANCED]] as const)(
+		it.each([[Strategy.GROUPED], [Strategy.OPTIMIZED], [Strategy.BALANCED]] as const)(
 			"hands %s to the selector unchanged",
 			(strategy) => {
 				planSuggestions({ ...BASE, ptoDays: 3, strategy });
@@ -191,8 +191,8 @@ describe("generateSuggestions", () => {
 		);
 
 		it("plans an unknown strategy as GROUPED", () => {
-			const unknown = planSuggestions({ ...BASE, ptoDays: 3, strategy: "unknown" as FilterStrategy });
-			const grouped = planSuggestions({ ...BASE, ptoDays: 3, strategy: FilterStrategy.GROUPED });
+			const unknown = planSuggestions({ ...BASE, ptoDays: 3, strategy: "unknown" as Strategy });
+			const grouped = planSuggestions({ ...BASE, ptoDays: 3, strategy: Strategy.GROUPED });
 
 			expect(unknown.days.map((day) => day.toDateString())).toEqual(grouped.days.map((day) => day.toDateString()));
 		});

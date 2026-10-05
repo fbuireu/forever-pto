@@ -1,5 +1,5 @@
 import { HolidayVariant } from "@application/dto/holiday/types";
-import { FilterStrategy } from "@domain/calendar/types";
+import { Strategy } from "@domain/calendar/types";
 import { describe, expect, it } from "vitest";
 import { generateMetrics } from "./generateMetrics";
 
@@ -31,7 +31,7 @@ describe("generateMetrics", () => {
 				planningWindow: { year: YEAR, carryOverMonths: 0 },
 				holidays: [],
 				allowPastDays: true,
-				manuallySelectedDays: [],
+				manualDays: [],
 				removedSuggestedDays: [],
 			});
 
@@ -40,7 +40,7 @@ describe("generateMetrics", () => {
 
 			expect(result.longWeekends).toBe(0);
 			expect(result.restBlocks).toBe(0);
-			expect(result.firstLastBreak).toBeNull();
+			expect(result.firstLastRestBlock).toBeNull();
 			expect(result.bonusDays).toBe(0);
 			expect(result.bridgesUsed).toBe(0);
 			expect(result.totalEffectiveDays).toBe(0);
@@ -69,12 +69,12 @@ describe("generateMetrics", () => {
 
 	it("returns non-zero metrics for a populated suggestion", () => {
 		const result = generateMetrics({
-			suggestion: { days: [makeDate({ year: 2025, month: 1, day: 6 })], strategy: FilterStrategy.GROUPED },
+			suggestion: { days: [makeDate({ year: 2025, month: 1, day: 6 })], strategy: Strategy.GROUPED },
 			locale: LOCALE,
 			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
 			allowPastDays: true,
-			manuallySelectedDays: [],
+			manualDays: [],
 			removedSuggestedDays: [],
 		});
 		expect(result.restBlocks).toBe(1);
@@ -90,26 +90,26 @@ describe("generateMetrics", () => {
 			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
 			allowPastDays: true,
-			manuallySelectedDays: [],
+			manualDays: [],
 			removedSuggestedDays: [],
 		});
 		expect(result.monthlyDist[0]).toBe(2);
 		expect(result.quarterDist[0]).toBe(2);
 	});
 
-	it("returns correct firstLastBreak months", () => {
+	it("returns correct firstLastRestBlock months", () => {
 		const result = generateMetrics({
 			suggestion: { days: [makeDate({ year: 2025, month: 1, day: 6 }), makeDate({ year: 2025, month: 3, day: 10 })] },
 			locale: LOCALE,
 			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
 			allowPastDays: true,
-			manuallySelectedDays: [],
+			manualDays: [],
 			removedSuggestedDays: [],
 		});
-		expect(result.firstLastBreak).not.toBeNull();
-		expect(result.firstLastBreak?.first).toMatch(/January|january/i);
-		expect(result.firstLastBreak?.last).toMatch(/March|march/i);
+		expect(result.firstLastRestBlock).not.toBeNull();
+		expect(result.firstLastRestBlock?.first).toMatch(/January|january/i);
+		expect(result.firstLastRestBlock?.last).toMatch(/March|march/i);
 	});
 
 	it("counts bridges used when bridges are provided", () => {
@@ -127,7 +127,7 @@ describe("generateMetrics", () => {
 			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
 			allowPastDays: true,
-			manuallySelectedDays: [],
+			manualDays: [],
 			removedSuggestedDays: [],
 		});
 		expect(result.bridgesUsed).toBe(1);
@@ -136,14 +136,14 @@ describe("generateMetrics", () => {
 		expect(result.bonusDays).toBe(2);
 	});
 
-	it("applies manuallySelectedDays by merging with suggestion days", () => {
+	it("applies manualDays by merging with suggestion days", () => {
 		const result = generateMetrics({
 			suggestion: { days: [makeDate({ year: 2025, month: 1, day: 6 })] },
 			locale: LOCALE,
 			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
 			allowPastDays: true,
-			manuallySelectedDays: [makeDate({ year: 2025, month: 1, day: 7 })],
+			manualDays: [makeDate({ year: 2025, month: 1, day: 7 })],
 			removedSuggestedDays: [],
 		});
 		expect(result.monthlyDist[0]).toBe(2);
@@ -157,7 +157,7 @@ describe("generateMetrics", () => {
 			holidays: [],
 			allowPastDays: true,
 			removedSuggestedDays: [makeDate({ year: 2025, month: 1, day: 6 })],
-			manuallySelectedDays: [],
+			manualDays: [],
 		});
 		expect(result.monthlyDist[0]).toBe(1);
 	});
@@ -169,7 +169,7 @@ describe("generateMetrics", () => {
 			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [],
 			allowPastDays: true,
-			manuallySelectedDays: [],
+			manualDays: [],
 			removedSuggestedDays: [],
 		});
 		expect(result.longBlocksPerQuarter).toEqual([1, 0, 0, 0]);
@@ -182,7 +182,7 @@ describe("generateMetrics", () => {
 			planningWindow: { year: YEAR, carryOverMonths: 0 },
 			holidays: [makeHoliday(makeDate({ year: 2025, month: 1, day: 10 }))],
 			allowPastDays: true,
-			manuallySelectedDays: [],
+			manualDays: [],
 			removedSuggestedDays: [],
 		});
 		expect(result.longBlocksPerQuarter).toEqual([1, 0, 0, 0]);
@@ -199,13 +199,13 @@ describe("generateMetrics", () => {
 		const planned = generateMetrics({
 			...params,
 			planningWindow: { year: 2025, carryOverMonths: 0 },
-			manuallySelectedDays: [],
+			manualDays: [],
 			removedSuggestedDays: [],
 		});
 		const inferred = generateMetrics({
 			...params,
 			planningWindow: { year: 2026, carryOverMonths: 0 },
-			manuallySelectedDays: [],
+			manualDays: [],
 			removedSuggestedDays: [],
 		});
 
@@ -223,7 +223,7 @@ describe("generateMetrics", () => {
 			holidays: [],
 			allowPastDays: true,
 			removedSuggestedDays: [makeDate({ year: 2025, month: 1, day: 6 })],
-			manuallySelectedDays: [],
+			manualDays: [],
 		});
 		expect(result.bonusDays).toBe(0);
 		expect(result.totalEffectiveDays).toBe(0);
@@ -258,7 +258,7 @@ describe("generateMetrics", () => {
 			holidays: [],
 			allowPastDays: true,
 			removedSuggestedDays: [dropped[0] as Date],
-			manuallySelectedDays: [],
+			manualDays: [],
 		});
 
 		expect(result.bridgesUsed).toBe(2);
@@ -286,7 +286,7 @@ describe("generateMetrics", () => {
 			holidays: [],
 			allowPastDays: true,
 			removedSuggestedDays: [friday],
-			manuallySelectedDays: [],
+			manualDays: [],
 		});
 
 		expect(result.bridgesUsed).toBe(0);

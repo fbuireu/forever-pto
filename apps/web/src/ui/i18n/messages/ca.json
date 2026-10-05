@@ -71,6 +71,7 @@
 			"effectiveDays": "Dies efectius",
 			"overBudget": "{increment, plural, =0 {0} other {+#}} per sobre del teu pressupost de {ptoDays, plural, one {# dia} other {# dies}}",
 			"gain": "Guany",
+			"gainValue": "<n>{gain}</n> %",
 			"perPtoDay": "del teu pressupost de {ptoDays} {ptoDays, plural, one {dia} other {dies}}",
 			"longWeekends": "Caps de setmana llargs",
 			"restBlocks": "Blocs de descans",
@@ -83,20 +84,21 @@
 		},
 		"yearSummary": {
 			"feature": "Resum anual",
-			"featureDescription": "Anàlisi detallada dels teus dies lliures.",
+			"featureDescription": "Anàlisi detallada dels teus dies efectius.",
 			"title": "Resum de l'any",
-			"firstBreak": "Primera pausa",
+			"firstBreak": "Primer bloc de descans",
 			"maxWorkStreak": "Ratxa de feina més llarga",
-			"lastBreak": "Última pausa",
+			"lastBreak": "Últim bloc de descans",
 			"totalBonusDays": "Total de dies extra",
 			"bonusDaysCaption": "dies extra gràcies a l'optimització",
+			"bonusDaysCount": "+<n>{count}</n>",
 			"daysCount": "{count, plural, one {<n>#</n> dia} other {<n>#</n> dies}}"
 		},
 		"summaryParagraph": {
 			"withGain": "Amb {ptoDays, plural, one {# dia de PTO} other {els teus # dies de PTO}} i {totalHolidays, plural, one {# festiu} other {# festius}}, l’estratègia {strategy} els converteix en {effectiveDays, plural, one {# dia efectiu} other {# dies efectius}}, és a dir, {increment, plural, one {# dia} other {# dies}} per sobre del teu pressupost, un guany del +{percentage} respecte a usar-los sense optimitzar.",
 			"withoutGain": "Amb {ptoDays, plural, one {# dia de PTO} other {els teus # dies de PTO}} i {totalHolidays, plural, one {# festiu} other {# festius}}, obtens {effectiveDays, plural, one {# dia efectiu} other {# dies efectius}} amb l’estratègia {strategy}.",
 			"noRegionHintTitle": "Afegeix la teva regió",
-			"noRegionHint": "Selecciona la teva regió a la barra lateral per incloure els festius regionals i aconseguir encara més dies lliures.",
+			"noRegionHint": "Selecciona la teva regió a la barra lateral per incloure els festius regionals i aconseguir encara més dies efectius.",
 			"withRegion": "{regionalDays, plural, one {# dels teus festius és específic de {region}.} other {# dels teus festius són específics de {region}.}}"
 		},
 		"notifications": {
@@ -268,8 +270,8 @@
 		"deleteCount": "Elimina ({count})"
 	},
 	"charts": {
-		"daysOffComposition": "Composició de dies lliures",
-		"daysOffCompositionFeature": "Gràfica de composició de dies lliures",
+		"daysOffComposition": "Dies de PTO i festius",
+		"daysOffCompositionFeature": "Gràfica de dies de PTO i festius",
 		"quarterDistribution": "Distribució per trimestre",
 		"quarterDistributionFeature": "Gràfica de distribució per trimestre",
 		"daysValue": "{count, plural, one {# dia} other {# dies}}",
@@ -305,7 +307,7 @@
 			"errorTitle": "No s'ha pogut afegir el festiu",
 			"errorDescription": "Alguna cosa ha anat malament. Torna-ho a provar.",
 			"existsTitle": "El festiu ja existeix",
-			"manualDayExistsTitle": "Aquest dia ja és un dia lliure",
+			"manualDayExistsTitle": "Aquest dia ja és un dia de PTO",
 			"manualDayExistsDescription": "Ja has reservat el {date} com a dia de PTO. Primer treu-lo del pla i després afegeix el festiu.",
 			"existsDescription": "Ja hi ha un festiu el {date}: {name}"
 		},
@@ -339,15 +341,15 @@
 		"progressText": "{current} de {total}",
 		"steps": {
 			"toolsTitle": "Calculadores i eines",
-			"toolsDescription": "Aquí tens les calculadores: estima quants dies de PTO has acumulat, mira quant et costen en sou els dies que no fas servir o compta els dies laborables entre dues dates.",
+			"toolsDescription": "Aquí tens les calculadores: estima quants dies de PTO has acumulat, mira quant et costen en sou els dies de PTO que deixes sense gastar o compta els dies laborables entre dues dates.",
 			"alternativesTitle": "Gestor d'alternatives",
 			"alternativesDescription": "Aquí tens les alternatives al teu suggeriment. Compara l'eficiència i els dies efectius de cadascuna. La primera alternativa és sempre la recomanada (marcada amb una espurna). Fes servir les fletxes per explorar-les i fes clic a \"Aplica l'alternativa\" per canviar-hi.",
 			"statusTitle": "Seguiment del PTO",
-			"statusDescription": "Controla el teu PTO d'un cop d'ull: els dies assignats automàticament, els seleccionats manualment i quants te'n queden. Pots restablir els canvis manuals en qualsevol moment per tornar al pla suggerit.",
+			"statusDescription": "Controla el teu PTO d'un cop d'ull: els dies suggerits, els manuals i quants te'n queden. Pots restablir els canvis manuals en qualsevol moment per tornar al pla suggerit.",
 			"calendarTitle": "El teu calendari de PTO interactiu",
-			"calendarDescription": "Aquest és el teu calendari anual d'un cop d'ull. Els festius apareixen en gris, els dies de PTO suggerits en verd blavós i els dies seleccionats manualment en blau. Fes clic a qualsevol dia laborable per seleccionar-lo o desseleccionar-lo manualment. El calendari s'actualitza a l'instant mentre explores les diferents alternatives.",
+			"calendarDescription": "Aquest és el teu calendari anual d'un cop d'ull. Els festius apareixen en gris, els dies de PTO suggerits en verd blavós i els dies manuals en blau. Fes clic a qualsevol dia laborable per seleccionar-lo o desseleccionar-lo manualment. El calendari s'actualitza a l'instant mentre explores les diferents alternatives.",
 			"finishTitle": "Ja ho tens tot a punt!",
-			"finishDescription": "Ara ja saps com funciona. Configura les preferències a la barra lateral i l'app et suggerirà els millors dies. Gaudeix dels dies lliures!",
+			"finishDescription": "Ara ja saps com funciona. Configura les preferències a la barra lateral i l'app et suggerirà els millors dies. Gaudeix de les vacances!",
 			"holidaysListTitle": "Personalitza els teus festius",
 			"holidaysListDescription": "Aquí pots adaptar els festius a la teva situació. Edita o elimina qualsevol festiu nacional o regional i afegeix-hi els teus: festius d'empresa, festes locals o qualsevol altra data que et calgui. Com més precises siguin les dades, millors seran els suggeriments.",
 			"step1Title": "El teu context",
@@ -404,8 +406,8 @@
 		"remainingCount": "<label>Restants:</label> <n>{count}</n>",
 		"allAssigned": "Ja tens tots els dies assignats!",
 		"resetManual": "Restableix els canvis manuals",
-		"usedDays": "{used} / {total, plural, one {# dia utilitzat} other {# dies utilitzats}} · {pct}%",
-		"remainingDays": "{remaining} restants · {pct}%"
+		"usedDays": "{used} / {total, plural, one {# dia utilitzat} other {# dies utilitzats}} · {pct}",
+		"remainingDays": "{remaining} restants · {pct}"
 	},
 	"contact": {
 		"title": "Contacta'ns",
@@ -440,7 +442,9 @@
 		"recommended": "Recomanada",
 		"totalOff": "Dies efectius",
 		"efficiency": "Eficiència",
-		"efficiencyValue": "{efficiency}x",
+		"efficiencyValue": "<n>{efficiency}</n>x",
+		"comparisonPercent": "<n>{percent}</n> %",
+		"bonusDaysBadge": "(+<n>{bonusDays}</n>)",
 		"efficiencyReadout": "{suggestion, select, recommended {Eficiència: {efficiency}x} other {Eficiència: {efficiency}x ({difference})}}",
 		"vsMain": "vs principal",
 		"alreadyApplied": "Ja aplicada",
@@ -524,7 +528,7 @@
 			},
 			"optimized": {
 				"label": "Optimitzada",
-				"description": "Maximitza els teus dies lliures totals",
+				"description": "Maximitza els teus dies efectius totals",
 				"subtitle": "Cada dia de PTO rendeix tot el possible",
 				"pros": {
 					"maximumEfficiency": "Màxima eficiència",
@@ -608,15 +612,15 @@
 		"increase": "Augmenta els dies de PTO",
 		"status": "Estat dels dies de PTO",
 		"autoAssigned": "Suggerits:",
-		"manuallySelected": "Seleccionats manualment:",
+		"manuallySelected": "Manuals:",
 		"remaining": "Restants:",
 		"resetManualChanges": "Restableix els canvis manuals",
 		"allAssigned": "Ja tens tots els dies assignats!",
-		"clickToAssign": "Fes clic als dies del calendari per assignar manualment els dies restants"
+		"clickToAssign": "Fes clic als dies del calendari per assignar manualment el pressupost restant"
 	},
 	"ptoCalculator": {
 		"title": "Calculadora d'acumulació de PTO",
-		"tooltip": "Calcula quants dies de PTO has acumulat segons un ritme mensual. La majoria d'empreses donen 2-3 dies per mes. Selecciona el mes objectiu per veure el total de dies disponibles.",
+		"tooltip": "Calcula quants dies de PTO has acumulat segons un ritme mensual. La majoria d'empreses donen 2-3 dies per mes. Selecciona el mes objectiu per veure el total.",
 		"tooltipLabel": "Més informació sobre la calculadora de PTO",
 		"daysPerMonth": "Dies per mes",
 		"calculateThrough": "Calcula fins a",
@@ -879,7 +883,7 @@
 		"selectAllHolidays": "Selecciona tots els festius",
 		"unlockFeature": "Desbloqueja la funció premium: {feature}",
 		"premiumFeature": "Funció premium",
-		"unlockDescription": "Passa a premium per editar els suggeriments i gestionar els dies restants manualment.",
+		"unlockDescription": "Passa a premium per editar els suggeriments i gestionar el teu pressupost restant manualment.",
 		"becomePremium": "Fes-te premium"
 	},
 	"calendar": {

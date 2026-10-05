@@ -48,8 +48,8 @@ export const isSuggestion = ({ currentSelection, removedSuggestedDays = [] }: Is
 	};
 };
 
-export const isManuallySelected = (manuallySelectedDays: Date[]) => {
-	const days = daySetOf(manuallySelectedDays);
+export const isManual = (manualDays: Date[]) => {
+	const days = daySetOf(manualDays);
 	return (date: Date) => days.has(dayIndex(date));
 };
 

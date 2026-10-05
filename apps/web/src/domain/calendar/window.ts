@@ -43,7 +43,7 @@ export const planningWindowMonths = (window: PlanningWindow): Date[] => {
 
 export interface ReachableMonthsParams extends PlanningWindow {
 	allowPastDays: boolean;
-	today: Date;
+	today: Date | null;
 }
 
 export const reachableMonths = ({
@@ -52,11 +52,11 @@ export const reachableMonths = ({
 	allowPastDays,
 	today,
 }: ReachableMonthsParams): ReadonlySet<number> => {
-	const currentMonth = startOfMonth(today).getTime();
+	const currentMonth = today === null ? null : startOfMonth(today).getTime();
 
 	return new Set(
 		planningWindowMonths({ year, carryOverMonths }).flatMap((month, position) =>
-			allowPastDays || month.getTime() >= currentMonth ? [position] : [],
+			allowPastDays || currentMonth === null || month.getTime() >= currentMonth ? [position] : [],
 		),
 	);
 };

@@ -28,23 +28,23 @@ const DATA_PARAMS = {
 
 describe("paymentConfirmationDTO", () => {
 	it("converts amount from cents to major currency units", () => {
-		const result = paymentConfirmationDTO.create({ raw: makeIntent({ amount: 1099 }) });
+		const result = paymentConfirmationDTO.create(makeIntent({ amount: 1099 }));
 		expect(result.amount).toBeCloseTo(10.99);
 	});
 
 	it("uppercases the currency", () => {
-		const result = paymentConfirmationDTO.create({ raw: makeIntent({ currency: "eur" }) });
+		const result = paymentConfirmationDTO.create(makeIntent({ currency: "eur" }));
 		expect(result.currency).toBe("EUR");
 	});
 
 	it("preserves id and status unchanged", () => {
-		const result = paymentConfirmationDTO.create({ raw: makeIntent() });
+		const result = paymentConfirmationDTO.create(makeIntent());
 		expect(result.id).toBe("pi_test_123");
 		expect(result.status).toBe("succeeded");
 	});
 
 	it("handles an already uppercase currency without double-uppercasing", () => {
-		const result = paymentConfirmationDTO.create({ raw: makeIntent({ currency: "USD" }) });
+		const result = paymentConfirmationDTO.create(makeIntent({ currency: "USD" }));
 		expect(result.currency).toBe("USD");
 	});
 });

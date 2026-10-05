@@ -1,5 +1,5 @@
 import type { PlanningResult, runPlanningPipeline } from "@domain/calendar/pipeline";
-import { FilterStrategy, type MeasuredSuggestion, type Metrics } from "@domain/calendar/types";
+import { type MeasuredSuggestion, type Metrics, Strategy } from "@domain/calendar/types";
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { CalculateSuggestionsRequest } from "./types";
 import { WORKER_MESSAGE_TYPE } from "./types";
@@ -12,7 +12,7 @@ const METRICS: Metrics = {
 	longWeekends: 3,
 	restBlocks: 2,
 	maxWorkStreak: 9,
-	firstLastBreak: { first: "2025-03-08", last: "2025-03-16" },
+	firstLastRestBlock: { first: "2025-03-08", last: "2025-03-16" },
 	averageEfficiency: 2.5,
 	bonusDays: 4,
 	quarterDist: [2, 1, 0, 2],
@@ -28,7 +28,7 @@ const EMPTY_PLAN_METRICS: Metrics = {
 	longWeekends: 0,
 	restBlocks: 0,
 	maxWorkStreak: 0,
-	firstLastBreak: null,
+	firstLastRestBlock: null,
 	averageEfficiency: 0,
 	bonusDays: 0,
 	quarterDist: Array.from({ length: WINDOW_QUARTERS }, () => 0),
@@ -43,7 +43,7 @@ const EMPTY_PLAN_METRICS: Metrics = {
 const measured = (days: Date[]): MeasuredSuggestion => ({
 	days,
 	bridges: [],
-	strategy: FilterStrategy.GROUPED,
+	strategy: Strategy.GROUPED,
 	metrics: METRICS,
 });
 
@@ -128,7 +128,7 @@ describe("worker onmessage", () => {
 	it("carries the pipeline's own Metrics onto the wire rather than a literal of its own", () => {
 		mockRunPlanningPipeline.mockReturnValue({
 			planned: false,
-			suggestion: { days: [], bridges: [], strategy: FilterStrategy.GROUPED, metrics: EMPTY_PLAN_METRICS },
+			suggestion: { days: [], bridges: [], strategy: Strategy.GROUPED, metrics: EMPTY_PLAN_METRICS },
 			alternatives: [],
 		} satisfies PlanningResult);
 
@@ -140,7 +140,7 @@ describe("worker onmessage", () => {
 		expect(response.payload.suggestion.metrics).toEqual(EMPTY_PLAN_METRICS);
 	});
 
-	it("deserialises the Holidays into the PlanningInput as Dates", () => {
+	it("deserialises the Holidays into the RunPlanningPipelineParams as Dates", () => {
 		const date = new Date(2025, 0, 1);
 		sendMessage();
 
@@ -154,7 +154,7 @@ describe("worker onmessage", () => {
 		const removed = new Date(2025, 2, 20);
 		sendMessage({ manualDays: [manual.toISOString()], removedDays: [removed.toISOString()] });
 
-		expect(planningInput()?.manuallySelectedDays).toEqual([manual]);
+		expect(planningInput()?.manualDays).toEqual([manual]);
 		expect(planningInput()?.removedSuggestedDays).toEqual([removed]);
 	});
 
@@ -169,7 +169,7 @@ describe("worker onmessage", () => {
 	it("defaults both hand-edited lists to empty when the request omits them", () => {
 		sendMessage({ manualDays: undefined as never, removedDays: undefined });
 
-		expect(planningInput()?.manuallySelectedDays).toEqual([]);
+		expect(planningInput()?.manualDays).toEqual([]);
 		expect(planningInput()?.removedSuggestedDays).toEqual([]);
 	});
 
@@ -192,12 +192,12 @@ describe("worker onmessage", () => {
 
 	it("passes a recognised strategy through to the pipeline", () => {
 		sendMessage({ strategy: "optimized" });
-		expect(planningInput()?.strategy).toBe(FilterStrategy.OPTIMIZED);
+		expect(planningInput()?.strategy).toBe(Strategy.OPTIMIZED);
 	});
 
 	it("replaces an unrecognised strategy with the default, so the pipeline never dispatches on a bad string", () => {
 		sendMessage({ strategy: "balanced-ish" as never });
-		expect(planningInput()?.strategy).toBe(FilterStrategy.GROUPED);
+		expect(planningInput()?.strategy).toBe(Strategy.GROUPED);
 	});
 
 	it("passes valid preferred months through to the pipeline", () => {

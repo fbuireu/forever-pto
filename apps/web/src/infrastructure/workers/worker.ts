@@ -1,6 +1,6 @@
 import { fromStoredInstant } from "@application/shared/utils/dateIntake";
 import { runPlanningPipeline } from "@domain/calendar/pipeline";
-import { DEFAULT_FILTER_STRATEGY, isFilterStrategy } from "@domain/calendar/types";
+import { DEFAULT_STRATEGY, isStrategy } from "@domain/calendar/types";
 import { isPreferredMonths } from "@domain/calendar/window";
 import { EN, isLocale } from "@infrastructure/i18n/locales";
 import { type CalculateSuggestionsRequest, WORKER_MESSAGE_TYPE, type WorkerResponse } from "./types";
@@ -32,10 +32,10 @@ globalThis.onmessage = (e: MessageEvent<CalculateSuggestionsRequest>) => {
 			ptoDays,
 			autoSuggestCount,
 			holidays: deserializeHolidays(rawHolidays),
-			manuallySelectedDays: manualDays.map(fromStoredInstant),
+			manualDays: manualDays.map(fromStoredInstant),
 			removedSuggestedDays: removedDays.map(fromStoredInstant),
 			allowPastDays,
-			strategy: isFilterStrategy(strategy) ? strategy : DEFAULT_FILTER_STRATEGY,
+			strategy: isStrategy(strategy) ? strategy : DEFAULT_STRATEGY,
 			preferredMonths: isPreferredMonths(preferredMonths) ? preferredMonths : [],
 			locale: isLocale(locale) ? locale : EN,
 			maxAlternatives,

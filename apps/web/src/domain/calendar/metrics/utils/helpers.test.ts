@@ -7,7 +7,7 @@ import {
 	calculateMaxWorkStreak,
 	calculateQuarterDistribution,
 	calculateRestBlocks,
-	getFirstLastBreak,
+	getFirstLastRestBlock,
 	getLongBlocksPerQuarter,
 	getMonthlyDist,
 	getTotalEffectiveDays,
@@ -266,19 +266,19 @@ describe("calculateQuarterDistribution", () => {
 	});
 });
 
-describe("getFirstLastBreak", () => {
+describe("getFirstLastRestBlock", () => {
 	it("returns null for empty input", () => {
-		expect(getFirstLastBreak({ dates: [], locale: "en" })).toBeNull();
+		expect(getFirstLastRestBlock({ dates: [], locale: "en" })).toBeNull();
 	});
 
 	it("returns the same month for a single date", () => {
-		const result = getFirstLastBreak({ dates: [makeDate({ year: 2025, month: 1, day: 6 })], locale: "en" });
+		const result = getFirstLastRestBlock({ dates: [makeDate({ year: 2025, month: 1, day: 6 })], locale: "en" });
 		expect(result).not.toBeNull();
 		expect(result?.first).toBe(result?.last);
 	});
 
 	it("returns first and last months when dates span multiple months", () => {
-		const result = getFirstLastBreak({
+		const result = getFirstLastRestBlock({
 			dates: [makeDate({ year: 2025, month: 3, day: 1 }), makeDate({ year: 2025, month: 1, day: 6 })],
 			locale: "en",
 		});

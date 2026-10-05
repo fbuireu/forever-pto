@@ -50,7 +50,10 @@ const activateFromDonation = ({
 
 		const paymentIntent = yield* stripe.paymentIntents.retrieve(paymentIntentId);
 
-		if (clientSecret && !matchesClientSecret({ expected: paymentIntent.client_secret, provided: clientSecret })) {
+		if (
+			clientSecret !== undefined &&
+			!matchesClientSecret({ expected: paymentIntent.client_secret, provided: clientSecret })
+		) {
 			return yield* Effect.fail(new ValidationError({ message: "Client secret mismatch" }));
 		}
 
@@ -60,7 +63,7 @@ const activateFromDonation = ({
 
 		const { email: intentEmail, promoCode, userAgent, ipAddress } = readDonationMetadata(paymentIntent);
 		const email = intentEmail ? normalizeEmail(intentEmail) : undefined;
-		if (!email || (expectedEmail && normalizeEmail(expectedEmail) !== email)) {
+		if (!email || (expectedEmail !== undefined && normalizeEmail(expectedEmail) !== email)) {
 			return yield* Effect.fail(new ValidationError({ message: "Email mismatch" }));
 		}
 
@@ -94,7 +97,7 @@ const activateFromDonation = ({
 			yield* updatePaymentStatus({ paymentIntentId, status: PAYMENT_SUCCEEDED }).pipe(
 				Effect.catchAll((e) =>
 					Effect.sync(() => {
-						logger.error({
+						logger.warn({
 							message: "Failed to update payment status",
 							context: {
 								reason: e.message,

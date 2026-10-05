@@ -1,4 +1,4 @@
-import { DEFAULT_FILTER_STRATEGY, type FilterStrategy, isFilterStrategy } from "@domain/calendar/types";
+import { DEFAULT_STRATEGY, isStrategy, type Strategy } from "@domain/calendar/types";
 import { DEFAULT_PREFERRED_MONTHS, isPreferredMonths, MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
@@ -12,7 +12,7 @@ export interface FiltersState {
 	region: string;
 	year: number;
 	carryOverMonths: number;
-	strategy: FilterStrategy;
+	strategy: Strategy;
 	preferredMonths: number[];
 }
 
@@ -23,7 +23,7 @@ interface FilterActions {
 	setRegion: (region: string) => void;
 	setYear: (year: number) => void;
 	setCarryOverMonths: (months: number) => void;
-	setStrategy: (strategy: FilterStrategy) => void;
+	setStrategy: (strategy: Strategy) => void;
 	setPreferredMonths: (months: number[]) => void;
 	resetToDefaults: () => void;
 }
@@ -55,7 +55,7 @@ const initialState: FiltersState = {
 	region: "",
 	year: new Date().getFullYear(),
 	carryOverMonths: 1,
-	strategy: DEFAULT_FILTER_STRATEGY,
+	strategy: DEFAULT_STRATEGY,
 	preferredMonths: [...DEFAULT_PREFERRED_MONTHS],
 };
 
@@ -98,7 +98,7 @@ export const useFiltersStore = create<FiltersStore>()(
 						false,
 						"setCarryOverMonths",
 					),
-				setStrategy: (strategy: FilterStrategy) => set({ strategy }, false, "setStrategy"),
+				setStrategy: (strategy: Strategy) => set({ strategy }, false, "setStrategy"),
 				setPreferredMonths: (months: number[]) =>
 					set(
 						{
@@ -131,7 +131,7 @@ export const useFiltersStore = create<FiltersStore>()(
 							min: MIN_CARRY_OVER_MONTHS,
 							max: MAX_CARRY_OVER_MONTHS,
 						});
-						state.strategy = isFilterStrategy(state.strategy) ? state.strategy : DEFAULT_FILTER_STRATEGY;
+						state.strategy = isStrategy(state.strategy) ? state.strategy : DEFAULT_STRATEGY;
 						state.preferredMonths = preferredMonthsOf(state.preferredMonths);
 					}
 				},

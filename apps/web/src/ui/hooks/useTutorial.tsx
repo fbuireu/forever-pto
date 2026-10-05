@@ -183,17 +183,20 @@ export const useTutorial = () => {
 			await waitForAnchorToSettle({ selector: FIRST_STEP_SELECTOR, frame: anchorFrame });
 		}
 
-		driverClient.start(steps, {
-			closeIcon: (
-				<AnimateIcon animateOnHover>
-					<X className="size-4" />
-				</AnimateIcon>
-			),
-			nextBtnText: tUi("nextBtn"),
-			prevBtnText: tUi("prevBtn"),
-			doneBtnText: tUi("doneBtn"),
-			progressText: tUi("progressText", { current: "{{current}}", total: "{{total}}" }),
-			onDestroyStarted: isMobile ? collapseDrawer : undefined,
+		driverClient.start({
+			steps,
+			overrides: {
+				closeIcon: (
+					<AnimateIcon animateOnHover>
+						<X className="size-4" />
+					</AnimateIcon>
+				),
+				nextBtnText: tUi("nextBtn"),
+				prevBtnText: tUi("prevBtn"),
+				doneBtnText: tUi("doneBtn"),
+				progressText: tUi("progressText", { current: "{{current}}", total: "{{total}}" }),
+				onDestroyStarted: isMobile ? collapseDrawer : undefined,
+			},
 		});
 	}, [open, openMobile, isMobile, t, tUi, toggleSidebar]);
 

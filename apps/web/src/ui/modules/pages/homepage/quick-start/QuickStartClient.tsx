@@ -22,8 +22,8 @@ interface QuickStartClientProps {
 
 export const QuickStartClient = ({ countries, serverYear }: QuickStartClientProps) => {
 	const open = useUIStore((state) => state.quickStartOpen);
-	const hasOpened = useHasOpened({ open });
-	const currentYear = useCurrentYear({ serverYear });
+	const hasOpened = useHasOpened(open);
+	const currentYear = useCurrentYear(serverYear);
 
 	if (!hasOpened) return null;
 

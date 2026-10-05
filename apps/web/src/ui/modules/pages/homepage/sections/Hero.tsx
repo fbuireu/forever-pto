@@ -10,7 +10,7 @@ import { cn } from "@ui/utils/cn";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 import { version } from "../../../../../../package.json";
-import { CAL_ENTRIES, type DayType, SHOWCASE_PLAN, SHOWCASE_RATIO } from "./shared";
+import { CAL_ENTRIES, type DayType, SHOWCASE_EFFICIENCY, SHOWCASE_PLAN } from "./shared";
 
 const LOCALE_FLAG: Record<string, string> = { en: "gb", ca: "es-ct" };
 
@@ -138,7 +138,7 @@ export const Hero = async () => {
 								<div className="font-display font-extrabold text-[56px] leading-none tracking-[-0.03em] flex items-baseline gap-2.5">
 									{SHOWCASE_PLAN.effectiveDays}
 									<span className="text-[18px] font-semibold opacity-70">
-										{t("hero.mockupRatio", { ratio: format.number(SHOWCASE_RATIO, { maximumFractionDigits: 2 }) })}
+										{t("hero.mockupRatio", { ratio: format.number(SHOWCASE_EFFICIENCY, { maximumFractionDigits: 2 }) })}
 									</span>
 								</div>
 								<div className="mt-2 font-serif italic text-[18px]">{t("hero.mockupQuote")}</div>

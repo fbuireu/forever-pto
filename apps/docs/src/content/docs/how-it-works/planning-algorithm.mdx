@@ -12,7 +12,7 @@ The engine lives in `apps/web/src/domain/calendar/` and is pure: same inputs, sa
 
 ```mermaid
 flowchart TD
-  IN[PlanningInput<br/>window · budget · Holidays · Manual and Removed Days · Strategy · locale]
+  IN[RunPlanningPipelineParams<br/>window · budget · Holidays · Manual and Removed Days · Strategy · locale]
   CLR[Clear the date-key and Holiday caches]
   WIN[Expand the Planning Window into months]
   PSEUDO[Manual Days → pseudo-Holidays]
@@ -102,7 +102,7 @@ The Tuesday to Friday after that Holiday form a second candidate: a four-day run
 
 ## Stage 3: the Strategy
 
-A Strategy is an **objective**, not an ordering: a marginal floor and a ranking, both read against the plan built so far, and an aim, which ranks a whole plan by what the Strategy is for when the search compares its runs. `STRATEGY_OBJECTIVE` in `apps/web/src/domain/calendar/suggestions/utils/selectors.ts` holds one per `FilterStrategy`, and a single selector, `selectBridges`, applies whichever it is given. The table is rendered from the imported `FilterStrategy` constant, so it cannot drift from the code:
+A Strategy is an **objective**, not an ordering: a marginal floor and a ranking, both read against the plan built so far, and an aim, which ranks a whole plan by what the Strategy is for when the search compares its runs. `STRATEGY_OBJECTIVE` in `apps/web/src/domain/calendar/suggestions/utils/selectors.ts` holds one per `Strategy`, and a single selector, `selectBridges`, applies whichever it is given. The table is rendered from the imported `Strategy` constant, so it cannot drift from the code:
 
 <StrategiesTable />
 
@@ -115,7 +115,7 @@ A Strategy is an **objective**, not an ordering: a marginal floor and a ranking,
 
 Over a real calendar the engine's own tests pin what each is for: Optimized produces the most Effective Days, Balanced the next most with the shortest stretch of work, Grouped the fewest and the longest stretch off, and Main Vacation a block in the Preferred Months while still beating Grouped on Effective Days.
 
-An unknown Strategy string cannot reach this table: `worker.ts` narrows the inbound value with `isFilterStrategy` and falls back to `DEFAULT_FILTER_STRATEGY`, and `objectiveFor` falls back to Grouped for the same reason.
+An unknown Strategy string cannot reach this table: `worker.ts` narrows the inbound value with `isStrategy` and falls back to `DEFAULT_STRATEGY`, and `objectiveFor` falls back to Grouped for the same reason.
 
 ## Stage 4: selection by marginal gain
 
@@ -174,7 +174,7 @@ Every Alternative is stamped with the Strategy that found it: the other Strategi
 | Bridges used | The plan's Bridges with at least one PTO Day still placed, so a Bridge that lost one of its days but still leads into a weekend is still counted |
 | First and last break | The first and last placed dates, formatted for the locale |
 
-Two details keep the Metrics honest across a hand-edited plan. **Free streaks** (`freeStreaks` in `apps/web/src/domain/calendar/metrics/utils/streaks.ts`) scan from `STREAK_SCAN_MARGIN_DAYS` ({PTO_CONSTANTS.METRICS.STREAK_SCAN_MARGIN_DAYS}) days before the first relevant date to as many after the last, so a stretch that begins on a weekend outside the placed days is measured whole. And every Metric that reads Holidays and placed days together builds its set through one helper, `dayOffKeys` in `apps/web/src/domain/calendar/metrics/utils/dayOff.ts`, because Manual Days appear in both lists by construction and a Metric that subtracted them independently counted each one twice. `getWorkedDaysPerMonth` did exactly that once.
+Two details keep the Metrics honest across a hand-edited plan. **Free streaks** (`freeStreaks` in `apps/web/src/domain/calendar/metrics/utils/streaks.ts`) scan from `STREAK_SCAN_MARGIN_DAYS` ({PTO_CONSTANTS.METRICS.STREAK_SCAN_MARGIN_DAYS}) days before the first relevant date to as many after the last, so a stretch that begins on a weekend outside the placed days is measured whole. And every Metric that reads Holidays and placed days together builds its set through one helper, `closedDayKeys` in `apps/web/src/domain/calendar/metrics/utils/closedDays.ts`, because Manual Days appear in both lists by construction and a Metric that subtracted them independently counted each one twice. `getWorkedDaysPerMonth` did exactly that once.
 
 ## The tunables
 

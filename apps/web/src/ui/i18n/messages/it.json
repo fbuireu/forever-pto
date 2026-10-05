@@ -71,6 +71,7 @@
 			"effectiveDays": "Giorni effettivi",
 			"overBudget": "{increment, plural, =0 {0} other {+#}} oltre il tuo budget di {ptoDays, plural, one {# giorno} other {# giorni}}",
 			"gain": "Guadagno",
+			"gainValue": "<n>{gain}</n>%",
 			"perPtoDay": "del tuo budget di {ptoDays} {ptoDays, plural, one {giorno} other {giorni}}",
 			"longWeekends": "Weekend lunghi",
 			"restBlocks": "Blocchi di riposo",
@@ -83,20 +84,21 @@
 		},
 		"yearSummary": {
 			"feature": "Riepilogo annuale",
-			"featureDescription": "Analisi dettagliata dei tuoi giorni liberi.",
+			"featureDescription": "Analisi dettagliata dei tuoi giorni effettivi.",
 			"title": "Riepilogo dell'anno",
-			"firstBreak": "Prima pausa",
+			"firstBreak": "Primo blocco di riposo",
 			"maxWorkStreak": "Periodo lavorativo più lungo",
-			"lastBreak": "Ultima pausa",
+			"lastBreak": "Ultimo blocco di riposo",
 			"totalBonusDays": "Giorni bonus totali",
 			"bonusDaysCaption": "giorni bonus dall’ottimizzazione",
+			"bonusDaysCount": "+<n>{count}</n>",
 			"daysCount": "{count, plural, one {<n>#</n> giorno} other {<n>#</n> giorni}}"
 		},
 		"summaryParagraph": {
 			"withGain": "Con {ptoDays, plural, one {# giorno di PTO} other {i tuoi # giorni di PTO}} e {totalHolidays, plural, one {# festivo} other {# festivi}}, la strategia {strategy} li trasforma in {effectiveDays, plural, one {# giorno effettivo} other {# giorni effettivi}}, ovvero {increment, plural, one {# giorno} other {# giorni}} oltre il tuo budget, un guadagno del +{percentage} rispetto a usarli senza ottimizzare.",
 			"withoutGain": "Con {ptoDays, plural, one {# giorno di PTO} other {i tuoi # giorni di PTO}} e {totalHolidays, plural, one {# festivo} other {# festivi}}, ottieni {effectiveDays, plural, one {# giorno effettivo} other {# giorni effettivi}} usando la strategia {strategy}.",
 			"noRegionHintTitle": "Aggiungi la tua regione",
-			"noRegionHint": "Seleziona la tua regione nella barra laterale per includere i festivi regionali e ottenere ancora più giorni liberi.",
+			"noRegionHint": "Seleziona la tua regione nella barra laterale per includere i festivi regionali e ottenere ancora più giorni effettivi.",
 			"withRegion": "{regionalDays, plural, one {# dei tuoi festivi è specifico di {region}.} other {# dei tuoi festivi sono specifici di {region}.}}"
 		},
 		"notifications": {
@@ -268,8 +270,8 @@
 		"deleteCount": "Elimina ({count})"
 	},
 	"charts": {
-		"daysOffComposition": "Composizione dei giorni liberi",
-		"daysOffCompositionFeature": "Grafico di composizione dei giorni liberi",
+		"daysOffComposition": "Giorni di PTO e festivi",
+		"daysOffCompositionFeature": "Grafico dei giorni di PTO e dei festivi",
 		"quarterDistribution": "Distribuzione per trimestre",
 		"quarterDistributionFeature": "Grafico di distribuzione per trimestre",
 		"daysValue": "{count, plural, one {# giorno} other {# giorni}}",
@@ -339,13 +341,13 @@
 		"progressText": "{current} di {total}",
 		"steps": {
 			"toolsTitle": "Calcolatori e strumenti",
-			"toolsDescription": "Qui trovi i calcolatori: stima quanti giorni di PTO hai maturato, scopri quanto ti costano in stipendio i giorni non usati o conta i giorni lavorativi tra due date.",
+			"toolsDescription": "Qui trovi i calcolatori: stima quanti giorni di PTO hai maturato, scopri quanto ti costano in stipendio i giorni di PTO che non spendi o conta i giorni lavorativi tra due date.",
 			"alternativesTitle": "Gestore alternative",
 			"alternativesDescription": "Sfoglia i diversi suggerimenti che abbiamo generato. Confronta efficienza e giorni effettivi e scegli quella che fa per te. La prima alternativa è sempre la nostra preferita, contrassegnata da una scintilla. Usa le frecce per esplorarle, poi clicca \"Applica alternativa\" per passare a quella.",
 			"statusTitle": "Stato PTO",
-			"statusDescription": "Tieni d'occhio i tuoi giorni di PTO: quelli assegnati automaticamente, quelli selezionati manualmente e quanti ne restano. Puoi ripristinare le modifiche manuali in qualsiasi momento per tornare al piano suggerito.",
+			"statusDescription": "Tieni d'occhio i tuoi giorni di PTO: quelli suggeriti, quelli manuali e quanti ne restano. Puoi ripristinare le modifiche manuali in qualsiasi momento per tornare al piano suggerito.",
 			"calendarTitle": "Il tuo calendario PTO interattivo",
-			"calendarDescription": "È la panoramica dell'anno. I festivi appaiono in grigio, i giorni di PTO suggeriti in turchese e quelli selezionati manualmente in blu. Clicca su qualsiasi giorno lavorativo per selezionarlo o deselezionarlo manualmente. Il calendario si aggiorna in tempo reale.",
+			"calendarDescription": "È la panoramica dell'anno. I festivi appaiono in grigio, i giorni di PTO suggeriti in turchese e quelli manuali in blu. Clicca su qualsiasi giorno lavorativo per selezionarlo o deselezionarlo manualmente. Il calendario si aggiorna in tempo reale.",
 			"finishTitle": "Tutto pronto!",
 			"finishDescription": "Ora sai come usare Forever PTO. Configura le tue preferenze nella barra laterale e lascia che l'app trovi i migliori giorni per te.",
 			"holidaysListTitle": "Personalizza le tue festività",
@@ -404,8 +406,8 @@
 		"remainingCount": "<label>Rimanenti:</label> <n>{count}</n>",
 		"allAssigned": "Tutti i giorni assegnati!",
 		"resetManual": "Ripristina modifiche manuali",
-		"usedDays": "{used} / {total, plural, one {# giorno usato} other {# giorni usati}} · {pct}%",
-		"remainingDays": "{remaining} rimanenti · {pct}%"
+		"usedDays": "{used} / {total, plural, one {# giorno usato} other {# giorni usati}} · {pct}",
+		"remainingDays": "{remaining} rimanenti · {pct}"
 	},
 	"contact": {
 		"title": "Contattaci",
@@ -440,7 +442,9 @@
 		"recommended": "Consigliata",
 		"totalOff": "Giorni effettivi",
 		"efficiency": "Efficienza",
-		"efficiencyValue": "{efficiency}x",
+		"efficiencyValue": "<n>{efficiency}</n>x",
+		"comparisonPercent": "<n>{percent}</n>%",
+		"bonusDaysBadge": "(+<n>{bonusDays}</n>)",
 		"efficiencyReadout": "{suggestion, select, recommended {Efficienza: {efficiency}x} other {Efficienza: {efficiency}x ({difference})}}",
 		"vsMain": "vs principale",
 		"alreadyApplied": "Già applicata",
@@ -524,7 +528,7 @@
 			},
 			"optimized": {
 				"label": "Ottimizzata",
-				"description": "Massimizza i tuoi giorni liberi totali",
+				"description": "Massimizza i tuoi giorni effettivi totali",
 				"subtitle": "Ogni giorno di PTO rende il più possibile",
 				"pros": {
 					"maximumEfficiency": "Massima efficienza",
@@ -608,11 +612,11 @@
 		"increase": "Aumenta giorni di PTO",
 		"status": "Stato dei giorni di PTO",
 		"autoAssigned": "Suggeriti:",
-		"manuallySelected": "Selezionati manualmente:",
+		"manuallySelected": "Manuali:",
 		"remaining": "Rimanenti:",
 		"resetManualChanges": "Ripristina modifiche manuali",
 		"allAssigned": "Tutti i giorni assegnati!",
-		"clickToAssign": "Clicca sui giorni nel calendario per assegnare manualmente i giorni rimanenti"
+		"clickToAssign": "Clicca sui giorni nel calendario per assegnare manualmente il budget rimanente"
 	},
 	"ptoCalculator": {
 		"title": "Calcolatore di maturazione PTO",
@@ -879,7 +883,7 @@
 		"selectAllHolidays": "Seleziona tutti i festivi",
 		"unlockFeature": "Sblocca funzione premium: {feature}",
 		"premiumFeature": "Funzione premium",
-		"unlockDescription": "Passa a premium per modificare manualmente i suggerimenti e gestire i giorni rimanenti.",
+		"unlockDescription": "Passa a premium per modificare manualmente i suggerimenti e gestire il tuo budget rimanente.",
 		"becomePremium": "Passa a premium"
 	},
 	"calendar": {

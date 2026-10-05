@@ -5,13 +5,13 @@ import { getTranslations } from "next-intl/server";
 import { buildMetadata } from "./buildMetadata";
 import { type RoutePath, routeFor } from "./routes";
 
-interface RouteSegmentParams {
+interface RouteSegmentProps {
 	params: Promise<{ locale: Locale }>;
 }
 
 export const routeMetadata =
 	(path: RoutePath) =>
-	async ({ params }: RouteSegmentParams): Promise<Metadata> => {
+	async ({ params }: RouteSegmentProps): Promise<Metadata> => {
 		const { locale } = await params;
 		const route = routeFor(path);
 		const [{ siteUrl: baseUrl }, t] = await Promise.all([

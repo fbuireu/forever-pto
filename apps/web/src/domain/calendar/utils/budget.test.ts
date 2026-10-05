@@ -23,7 +23,7 @@ describe("measureBudget", () => {
 	});
 
 	it("charges a Manual Day against the budget", () => {
-		expect(measureBudget({ ptoDays: 5, days: [JAN(6)], manuallySelectedDays: [JAN(20), JAN(21)] })).toEqual({
+		expect(measureBudget({ ptoDays: 5, days: [JAN(6)], manualDays: [JAN(20), JAN(21)] })).toEqual({
 			suggested: 1,
 			manual: 2,
 			spent: 3,
@@ -35,7 +35,7 @@ describe("measureBudget", () => {
 		const measure = measureBudget({
 			ptoDays: 10,
 			days: [JAN(6), JAN(7), JAN(8)],
-			manuallySelectedDays: [JAN(20)],
+			manualDays: [JAN(20)],
 			removedSuggestedDays: [JAN(7)],
 		});
 
@@ -43,7 +43,7 @@ describe("measureBudget", () => {
 	});
 
 	it("reports nothing left rather than a negative allowance when a plan overspends", () => {
-		const measure = measureBudget({ ptoDays: 1, days: [JAN(6), JAN(7)], manuallySelectedDays: [JAN(20)] });
+		const measure = measureBudget({ ptoDays: 1, days: [JAN(6), JAN(7)], manualDays: [JAN(20)] });
 
 		expect(measure.spent).toBe(3);
 		expect(measure.remaining).toBe(0);

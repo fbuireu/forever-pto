@@ -41,12 +41,12 @@ describe("getDayClassNames precedence", () => {
 	it("lets a selected day suppress the modifiers and win outright", () => {
 		const classes = classesFor({
 			isSelected: true,
-			modifiers: { holiday: always, suggested: always, manuallySelected: always },
+			modifiers: { holiday: always, suggested: always, manual: always },
 		});
 		expect(has({ classes, name: "selected" })).toBe(true);
 		expect(has({ classes, name: "holiday" })).toBe(false);
 		expect(has({ classes, name: "suggested" })).toBe(false);
-		expect(has({ classes, name: "manuallySelected" })).toBe(false);
+		expect(has({ classes, name: "manual" })).toBe(false);
 	});
 
 	it("stacks the non-range modifiers that match, since none of them outranks another", () => {
@@ -122,7 +122,7 @@ describe("getDayClassNames month and past-day handling", () => {
 });
 
 describe("the text of a day on a brand fill", () => {
-	const BRAND_FILLED = ["holiday", "suggested", "alternative", "custom", "manuallySelected"] as const;
+	const BRAND_FILLED = ["holiday", "suggested", "alternative", "custom", "manual"] as const;
 	const INK = "text-[var(--color-brand-ink)]";
 	const TEXT_COLOUR = /(?<![\w-])text-\[var\(--[\w-]+\)\]/g;
 

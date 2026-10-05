@@ -1,5 +1,5 @@
 import type { FiltersState } from "@application/stores/filters";
-import { FilterStrategy } from "@domain/calendar/types";
+import { Strategy } from "@domain/calendar/types";
 import { describe, expect, it } from "vitest";
 import { canLeaveStep, createDraft, QUICK_START_STEPS, QuickStartStep, trackedDraft, yearOptions } from "./steps";
 
@@ -10,7 +10,7 @@ const FILTERS: FiltersState = {
 	region: "",
 	year: 2026,
 	carryOverMonths: 1,
-	strategy: FilterStrategy.GROUPED,
+	strategy: Strategy.GROUPED,
 	preferredMonths: [6, 7],
 };
 
@@ -26,7 +26,7 @@ describe("QUICK_START_STEPS", () => {
 
 describe("createDraft", () => {
 	it("copies every planning input out of the filters store", () => {
-		const filters = { ...FILTERS, country: "es", region: "ct", ptoDays: 30, strategy: FilterStrategy.BALANCED };
+		const filters = { ...FILTERS, country: "es", region: "ct", ptoDays: 30, strategy: Strategy.BALANCED };
 
 		expect(createDraft({ filters, detectedCountry: "fr" })).toStrictEqual(filters);
 	});
@@ -72,14 +72,14 @@ describe("yearOptions", () => {
 
 describe("trackedDraft", () => {
 	it("reports every planning input, the budget and the Region included", () => {
-		const draft = { ...FILTERS, country: "es", region: "ct", ptoDays: 30, strategy: FilterStrategy.BALANCED };
+		const draft = { ...FILTERS, country: "es", region: "ct", ptoDays: 30, strategy: Strategy.BALANCED };
 
 		expect(trackedDraft(draft)).toStrictEqual({
 			ptoDays: 30,
 			country: "es",
 			region: "ct",
 			year: 2026,
-			strategy: FilterStrategy.BALANCED,
+			strategy: Strategy.BALANCED,
 			preferredMonths: "6,7",
 			allowPastDays: false,
 			carryOverMonths: 1,

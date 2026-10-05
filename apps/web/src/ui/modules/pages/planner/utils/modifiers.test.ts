@@ -8,7 +8,7 @@ import {
 	isCustom,
 	isHoliday,
 	isInRange,
-	isManuallySelected,
+	isManual,
 	isPast,
 	isRangeEnd,
 	isRangeSelected,
@@ -81,12 +81,12 @@ describe("isSuggestion", () => {
 	});
 });
 
-describe("isManuallySelected", () => {
+describe("isManual", () => {
 	it("matches by day, not by instant", () => {
 		const sameDayLaterHour = new Date(2026, 5, 1, 18, 30);
 
-		expect(isManuallySelected([MONDAY])(sameDayLaterHour)).toBe(true);
-		expect(isManuallySelected([MONDAY])(TUESDAY)).toBe(false);
+		expect(isManual([MONDAY])(sameDayLaterHour)).toBe(true);
+		expect(isManual([MONDAY])(TUESDAY)).toBe(false);
 	});
 });
 

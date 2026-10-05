@@ -22,7 +22,7 @@ describe("resolveSelectedDays", () => {
 
 	it("adds days the user selected by hand", () => {
 		const days = [d("2026-03-10")];
-		const result = resolveSelectedDays({ days, manuallySelectedDays: [d("2026-07-01")] });
+		const result = resolveSelectedDays({ days, manualDays: [d("2026-07-01")] });
 		expect(iso(result)).toEqual(["2026-03-10", "2026-07-01"]);
 	});
 
@@ -30,7 +30,7 @@ describe("resolveSelectedDays", () => {
 		const days = [d("2026-03-10"), d("2026-03-11")];
 		const result = resolveSelectedDays({
 			days,
-			manuallySelectedDays: [d("2026-01-05")],
+			manualDays: [d("2026-01-05")],
 			removedSuggestedDays: [d("2026-03-10")],
 		});
 		expect(iso(result)).toEqual(["2026-01-05", "2026-03-11"]);
@@ -39,7 +39,7 @@ describe("resolveSelectedDays", () => {
 	it("returns the result in chronological order regardless of input order", () => {
 		const result = resolveSelectedDays({
 			days: [d("2026-06-01"), d("2026-02-01")],
-			manuallySelectedDays: [d("2026-04-01")],
+			manualDays: [d("2026-04-01")],
 		});
 		expect(iso(result)).toEqual(["2026-02-01", "2026-04-01", "2026-06-01"]);
 	});

@@ -41,12 +41,7 @@ vi.mock("@infrastructure/services/payments/provider/metadata", () => ({
 }));
 
 vi.mock("@infrastructure/services/payments/repository", () => ({
-	getPaymentById: vi.fn(() => Effect.succeed({ id: "pi_test", status: "pending" })),
 	savePayment: vi.fn(() => Effect.succeed(false)),
-}));
-
-vi.mock("@application/dto/payment/dto", () => ({
-	paymentDataDTO: { create: vi.fn().mockReturnValue({ id: "pi_test" }) },
 }));
 
 const mockLogger = { info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
@@ -63,6 +58,20 @@ const TestLayer = Layer.mergeAll(
 
 type WebhookR = LoggerService | TursoService | StripeServerService;
 const run = <E>(eff: Effect.Effect<void, E, WebhookR>) => Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
+
+const STRIPE_CREATED_SECONDS = 1_736_000_000;
+
+const STRIPE_INTENT = {
+	id: "pi_test",
+	status: "succeeded" as const,
+	created: STRIPE_CREATED_SECONDS,
+	amount: 1000,
+	currency: "eur",
+	customer: "cus_test",
+	latest_charge: "ch_test",
+	payment_method_types: ["card"],
+	description: "Donation from donor@example.com",
+};
 
 const succeededEvent = (object: Partial<Stripe.PaymentIntent>) =>
 	({
@@ -105,12 +114,11 @@ describe("processWebhookEvent", () => {
 	});
 
 	it("leaves an existing row alone, and says nothing about creating one", async () => {
-		const { savePayment, getPaymentById } = await import("@infrastructure/services/payments/repository");
+		const { savePayment } = await import("@infrastructure/services/payments/repository");
 		vi.mocked(savePayment).mockReturnValueOnce(Effect.succeed(false));
 
 		await run(processWebhookEvent(succeededEvent({ id: "pi_test" })));
 
-		expect(getPaymentById).not.toHaveBeenCalled();
 		expect(savePayment).toHaveBeenCalledOnce();
 		expect(mockLogger.warn).not.toHaveBeenCalledWith(
 			expect.objectContaining({ message: "Payment was missing from the DB and was created from the webhook" }),
@@ -128,18 +136,24 @@ describe("processWebhookEvent", () => {
 		});
 	});
 
-	it("reads the transport metadata off the intent, not off the domain event", async () => {
-		const { paymentDataDTO } = await import("@application/dto/payment/dto");
-		await run(processWebhookEvent(succeededEvent({ id: "pi_test" })));
+	it("saves the payment the intent describes, with the transport metadata read off the intent and the address off the event", async () => {
+		const { savePayment } = await import("@infrastructure/services/payments/repository");
+		await run(processWebhookEvent(succeededEvent(STRIPE_INTENT)));
 
-		expect(paymentDataDTO.create).toHaveBeenCalledWith({
-			raw: expect.objectContaining({ id: "pi_test" }),
-			params: {
-				email: "donor@example.com",
-				promoCode: "SAVE20",
-				userAgent: "Mozilla/5.0",
-				ipAddress: "1.2.3.4",
-			},
+		expect(savePayment).toHaveBeenCalledExactlyOnceWith({
+			id: "pi_test",
+			stripeCreatedAt: new Date(STRIPE_CREATED_SECONDS * 1000),
+			customerId: "cus_test",
+			chargeId: "ch_test",
+			email: "donor@example.com",
+			amount: 1000,
+			currency: "eur",
+			status: "succeeded",
+			paymentMethodType: "card",
+			description: "Donation from donor@example.com",
+			promoCode: "SAVE20",
+			userAgent: "Mozilla/5.0",
+			ipAddress: "1.2.3.4",
 		});
 	});
 

@@ -4,7 +4,7 @@ import { StrictMode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const confirmActivation = vi.fn<() => Promise<void>>();
-const checkExistingSession = vi.fn<(options?: { force?: boolean }) => Promise<void>>();
+const checkExistingSession = vi.fn<(force?: boolean) => Promise<void>>();
 
 vi.mock("@application/stores/premium", () => ({
 	usePremiumStore: (
@@ -60,25 +60,41 @@ describe("PremiumSessionSync on the page the activation redirect lands on", () =
 		expect(checkExistingSession).not.toHaveBeenCalled();
 	});
 
-	it("consumes the marker once the confirmation has settled, so a reload finds none", async () => {
+	it("consumes the marker as it reads it, so a reload finds none", async () => {
 		render(<PremiumSessionSync />);
 		await flush();
 
 		expect(window.location.search).toBe(reloadedSearch);
 	});
 
-	it("leaves the marker in the address until the confirmation has settled, so a reload before it counts it once", async () => {
+	it("consumes the marker before the confirmation settles, since the store settles it with or without this page", async () => {
 		const confirmation = Promise.withResolvers<void>();
 		confirmActivation.mockReturnValue(confirmation.promise);
 
 		render(<PremiumSessionSync />);
-		await flush();
-		expect(window.location.search).toBe(redirectedSearch);
+
+		expect(window.location.search).toBe(reloadedSearch);
+		expect(confirmActivation).toHaveBeenCalledOnce();
 
 		confirmation.resolve();
 		await flush();
 
 		expect(window.location.search).toBe(reloadedSearch);
+	});
+
+	it("consumes the marker before it asks the store to confirm, so no leave can come between the two", () => {
+		const order: string[] = [];
+		vi.spyOn(window.history, "replaceState").mockImplementation(() => {
+			order.push("consume");
+		});
+		confirmActivation.mockImplementation(() => {
+			order.push("confirm");
+			return Promise.resolve();
+		});
+
+		render(<PremiumSessionSync />);
+
+		expect(order).toStrictEqual(["consume", "confirm"]);
 	});
 
 	it("keeps every other parameter and the fragment when it consumes the marker", async () => {
@@ -114,7 +130,7 @@ describe("PremiumSessionSync on the page the activation redirect lands on", () =
 		expect(replace).toHaveBeenCalledExactlyOnceWith(null, "", expect.any(URL));
 	});
 
-	it("leaves an address alone that the payer has already left by the time the confirmation settles", async () => {
+	it("leaves an address alone that the payer goes to before the confirmation settles", async () => {
 		const confirmation = Promise.withResolvers<void>();
 		confirmActivation.mockReturnValue(confirmation.promise);
 		render(<PremiumSessionSync />);
@@ -158,7 +174,7 @@ describe("PremiumSessionSync on any other load of the confirmation page", () => 
 		render(<PremiumSessionSync />);
 		await flush();
 
-		expect(checkExistingSession).toHaveBeenCalledExactlyOnceWith({ force: true });
+		expect(checkExistingSession).toHaveBeenCalledExactlyOnceWith(true);
 		expect(confirmActivation).not.toHaveBeenCalled();
 	});
 

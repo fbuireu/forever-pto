@@ -3,9 +3,11 @@ import { Badge } from "@ui/modules/core/primitives/Badge";
 import { FlagIcon } from "@ui/modules/core/primitives/FlagIcon";
 import { cn } from "@ui/utils/cn";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
-import { brutCard, type DayType, dayCell } from "./shared";
+import { brutCard, COUNTRY_COUNT, type DayType, dayCell } from "./shared";
 
 const BEST_EFFICIENCY = 3.5;
+
+const FEATURED_COUNTRIES = ["es", "it", "de", "fr", "gb", "us"] as const;
 
 const BRIDGE_WEEK = (["work", "work", "work", "holiday", "pto", "weekend", "weekend"] as DayType[]).map(
 	(type, index) => ({ id: `bridge-day-${index}`, type, index }),
@@ -137,7 +139,7 @@ export const Features = async () => {
 					style={{ background: "var(--color-brand-orange)" }}
 				>
 					<span className="inline-block px-2.5 py-1 bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[6px] font-mono text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--frame)] shadow-[var(--shadow-brutal-xs)]">
-						{t("features.countriesTag", { count: 203 })}
+						{t("features.countriesTag", { count: COUNTRY_COUNT })}
 					</span>
 					<h3 className="font-display font-semibold text-[26px] mt-3.5 mb-2 tracking-[-0.02em] text-[var(--color-brand-ink)]">
 						{t("features.countriesTitle")}
@@ -146,7 +148,7 @@ export const Features = async () => {
 						{t("features.countriesDescription")}
 					</p>
 					<div className="flex flex-wrap gap-2">
-						{(["es", "it", "de", "fr", "gb", "us"] as const).map((code) => (
+						{FEATURED_COUNTRIES.map((code) => (
 							<span
 								key={code}
 								className="bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[8px] px-2.5 py-1.5 shadow-[var(--shadow-brutal-xs)]"
@@ -155,7 +157,7 @@ export const Features = async () => {
 							</span>
 						))}
 						<span className="bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[8px] px-2.5 py-1.5 text-[13px] font-semibold shadow-[var(--shadow-brutal-xs)]">
-							+197
+							{format.number(COUNTRY_COUNT - FEATURED_COUNTRIES.length, { signDisplay: "always" })}
 						</span>
 					</div>
 				</div>

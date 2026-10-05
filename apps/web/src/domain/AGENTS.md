@@ -63,8 +63,8 @@ Every module with behaviour has a co-located `.test.ts`, run by Vitest, except
 which the generator, selector and stretch suites exercise. A few have none:
 [`calendar/const.ts`](./calendar/const.ts) is a tunables object, [`payment/events/types.ts`](./payment/events/types.ts) is types plus `PAYMENT_SUCCEEDED`,
 and [`payment/events/factory/resolvers.ts`](./payment/events/factory/resolvers.ts) is covered through [`events.test.ts`](./payment/events/factory/events.test.ts). [`calendar/types.ts`](./calendar/types.ts) has one:
-it holds `isFilterStrategy`, the predicate the Web Worker narrows an incoming strategy string with, and
-`DEFAULT_FILTER_STRATEGY`, the value both that fallback and the filters store's initial state read.
+it holds `isStrategy`, the predicate the Web Worker narrows an incoming strategy string with, and
+`DEFAULT_STRATEGY`, the value both that fallback and the filters store's initial state read.
 
 - `calendar/` tests take literal inputs and assert on returned values; the two that spy (`pipeline.test.ts`,
   `generateSuggestions.test.ts`) wrap the real functions. The caches in

@@ -12,7 +12,7 @@ vi.mock("@ui/modules/core/animate/text/Rotating", () => ({
 	RotatingText: ({ text }: { text: string }) => <span data-testid="emoji">{text}</span>,
 }));
 
-vi.mock("@ui/modules/pages/legal/Me", () => ({ Me: () => <span>Ferran</span> }));
+vi.mock("../../legal-identity/Me", () => ({ Me: () => <span>Ferran</span> }));
 
 vi.mock("../../Icon", () => ({ Icon: () => <svg role="presentation" /> }));
 

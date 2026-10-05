@@ -1,4 +1,4 @@
-import { DEFAULT_FILTER_STRATEGY, FilterStrategy } from "@domain/calendar/types";
+import { DEFAULT_STRATEGY, Strategy } from "@domain/calendar/types";
 import { DEFAULT_PREFERRED_MONTHS, MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { MAX_PTO_DAYS, MIN_CARRY_OVER_MONTHS, MIN_PTO_DAYS, useFiltersStore } from "./filters";
@@ -41,7 +41,7 @@ describe("initial state", () => {
 		expect(state.region).toBe("");
 		expect(state.year).toBe(CURRENT_YEAR);
 		expect(state.carryOverMonths).toBe(1);
-		expect(state.strategy).toBe(DEFAULT_FILTER_STRATEGY);
+		expect(state.strategy).toBe(DEFAULT_STRATEGY);
 	});
 
 	it("starts with no Preferred Month, which lets Main vacation place its block wherever it is longest", () => {
@@ -112,8 +112,8 @@ describe("setters", () => {
 	});
 
 	it("setStrategy updates strategy", () => {
-		useFiltersStore.getState().setStrategy(FilterStrategy.OPTIMIZED);
-		expect(useFiltersStore.getState().strategy).toBe(FilterStrategy.OPTIMIZED);
+		useFiltersStore.getState().setStrategy(Strategy.OPTIMIZED);
+		expect(useFiltersStore.getState().strategy).toBe(Strategy.OPTIMIZED);
 	});
 });
 
@@ -133,7 +133,7 @@ describe("setCountry", () => {
 describe("persistence", () => {
 	it("discards the year stored by a pre-partialize payload", async () => {
 		mockStorageGetItem.mockResolvedValueOnce({
-			state: { ptoDays: 15, carryOverMonths: 3, strategy: FilterStrategy.OPTIMIZED, year: 2020 },
+			state: { ptoDays: 15, carryOverMonths: 3, strategy: Strategy.OPTIMIZED, year: 2020 },
 			version: 1,
 		});
 
@@ -215,11 +215,11 @@ describe("onRehydrateStorage", () => {
 	it.each(["efficient", "", "GROUPED"])(
 		"replaces the stored strategy %s, which names no Strategy, with the default the worker would fall back to",
 		(stored) => {
-			useFiltersStore.setState({ strategy: stored as FilterStrategy });
+			useFiltersStore.setState({ strategy: stored as Strategy });
 
 			runRehydrate();
 
-			expect(useFiltersStore.getState().strategy).toBe(DEFAULT_FILTER_STRATEGY);
+			expect(useFiltersStore.getState().strategy).toBe(DEFAULT_STRATEGY);
 		},
 	);
 
@@ -251,11 +251,11 @@ describe("onRehydrateStorage", () => {
 	});
 
 	it("keeps a stored strategy that does name one", () => {
-		useFiltersStore.setState({ strategy: FilterStrategy.BALANCED });
+		useFiltersStore.setState({ strategy: Strategy.BALANCED });
 
 		runRehydrate();
 
-		expect(useFiltersStore.getState().strategy).toBe(FilterStrategy.BALANCED);
+		expect(useFiltersStore.getState().strategy).toBe(Strategy.BALANCED);
 	});
 });
 
@@ -264,13 +264,13 @@ describe("resetToDefaults", () => {
 		useFiltersStore.getState().setPtoDays(5);
 		useFiltersStore.getState().setCountry("ES");
 		useFiltersStore.getState().setYear(2027);
-		useFiltersStore.getState().setStrategy(FilterStrategy.OPTIMIZED);
+		useFiltersStore.getState().setStrategy(Strategy.OPTIMIZED);
 		useFiltersStore.getState().resetToDefaults();
 		const state = useFiltersStore.getState();
 		expect(state.ptoDays).toBe(22);
 		expect(state.country).toBe("");
 		expect(state.year).toBe(CURRENT_YEAR);
-		expect(state.strategy).toBe(DEFAULT_FILTER_STRATEGY);
+		expect(state.strategy).toBe(DEFAULT_STRATEGY);
 		expect(state.preferredMonths).toEqual([...DEFAULT_PREFERRED_MONTHS]);
 	});
 });

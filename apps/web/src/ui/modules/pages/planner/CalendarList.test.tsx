@@ -30,7 +30,7 @@ const {
 		currentSelection: null,
 		isCalculating: false,
 		hasCalculated: false,
-		manuallySelectedDays: [],
+		manualDays: [],
 		removedSuggestedDays: [],
 		previewAlternativeIndex: 0,
 		planRevision: 0,

@@ -2,7 +2,7 @@
 
 import { HolidayVariant } from "@application/dto/holiday/types";
 import { useHolidaysStore } from "@application/stores/holidays";
-import { PremiumFeatureId } from "@application/stores/premium";
+import { PremiumFeatureId, PremiumOrigin } from "@application/stores/premium";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { useStoresReady } from "@ui/hooks/useStoresReady";
 import {
@@ -53,6 +53,7 @@ export const HolidaysList = () => {
 						</TabsHighlightItem>
 						<PremiumFeature
 							feature={PremiumFeatureId.CUSTOM_HOLIDAYS}
+							origin={PremiumOrigin.PLANNER}
 							description={t("customHolidaysDescription")}
 							className="p-0"
 						>

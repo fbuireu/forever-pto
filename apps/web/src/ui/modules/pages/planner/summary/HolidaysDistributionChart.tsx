@@ -1,7 +1,7 @@
 "use client";
 
 import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
-import { PremiumFeatureId } from "@application/stores/premium";
+import { PremiumFeatureId, PremiumOrigin } from "@application/stores/premium";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/modules/core/primitives/Card";
 import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
 import { PieChart } from "lucide-react";
@@ -57,6 +57,7 @@ export const HolidaysDistributionChart = memo(function HolidaysDistributionChart
 	return (
 		<PremiumFeature
 			feature={PremiumFeatureId.DAYS_OFF_COMPOSITION}
+			origin={PremiumOrigin.PLANNER}
 			description={chartData.description}
 			iconSize="size-7"
 			inlineDescription

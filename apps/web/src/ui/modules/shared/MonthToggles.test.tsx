@@ -1,6 +1,7 @@
 import en from "@i18n/messages/en.json";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
+import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MonthToggles } from "./MonthToggles";
 
@@ -42,6 +43,31 @@ beforeEach(() => {
 
 afterEach(() => {
 	vi.useRealTimers();
+});
+
+describe("MonthToggles on the server pass", () => {
+	const serverPass = (allowPastDays: boolean) =>
+		renderToString(
+			<NextIntlClientProvider locale="en" messages={en}>
+				<MonthToggles
+					label="Months"
+					planningWindow={{ year: YEAR, carryOverMonths: 0 }}
+					allowPastDays={allowPastDays}
+					months={[6, 7]}
+					onChange={vi.fn()}
+				/>
+			</NextIntlClientProvider>,
+		);
+
+	it("disables no month, whatever day the prerender ran on, so hydration keeps nothing a build-time clock decided", () => {
+		expect(serverPass(false)).not.toContain('disabled=""');
+	});
+
+	it("disables the months already past once the visitor's own day is read, which the effect after mount does", () => {
+		renderToggles({ allowPastDays: false });
+
+		expect(screen.getByRole("button", { name: "March 2026" })).toHaveProperty("disabled", true);
+	});
 });
 
 describe("MonthToggles", () => {

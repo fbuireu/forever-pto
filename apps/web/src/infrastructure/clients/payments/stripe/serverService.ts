@@ -9,6 +9,16 @@ export class WebhookConfigurationError extends WebhookError {}
 export const isWebhookConfigurationError = (error: WebhookError): error is WebhookConfigurationError =>
 	error instanceof WebhookConfigurationError;
 
+export interface RetrieveChargeParams {
+	id: string;
+	params?: StripeNode.ChargeRetrieveParams;
+}
+
+export interface ConstructEventParams {
+	payload: string;
+	signature: string;
+}
+
 export class StripeServerService extends Context.Tag("StripeServerService")<
 	StripeServerService,
 	{
@@ -17,7 +27,7 @@ export class StripeServerService extends Context.Tag("StripeServerService")<
 			retrieve(id: string): Effect.Effect<StripeNode.PaymentIntent, PaymentError>;
 		};
 		charges: {
-			retrieve(id: string, params?: StripeNode.ChargeRetrieveParams): Effect.Effect<StripeNode.Charge, PaymentError>;
+			retrieve(charge: RetrieveChargeParams): Effect.Effect<StripeNode.Charge, PaymentError>;
 		};
 		promotionCodes: {
 			list(
@@ -25,7 +35,7 @@ export class StripeServerService extends Context.Tag("StripeServerService")<
 			): Effect.Effect<StripeNode.ApiList<StripeNode.PromotionCode>, PaymentError>;
 		};
 		webhooks: {
-			constructEvent(payload: string, signature: string): Effect.Effect<StripeNode.Event, WebhookError>;
+			constructEvent(event: ConstructEventParams): Effect.Effect<StripeNode.Event, WebhookError>;
 		};
 	}
 >() {}
@@ -77,14 +87,14 @@ export const StripeServerServiceLive = Layer.sync(StripeServerService, () => {
 			retrieve: (id) => Effect.tryPromise({ try: () => getStripe().paymentIntents.retrieve(id), catch: wrapError }),
 		},
 		charges: {
-			retrieve: (id, params) =>
+			retrieve: ({ id, params }) =>
 				Effect.tryPromise({ try: () => getStripe().charges.retrieve(id, params ?? {}), catch: wrapError }),
 		},
 		promotionCodes: {
 			list: (params) => Effect.tryPromise({ try: () => getStripe().promotionCodes.list(params), catch: wrapError }),
 		},
 		webhooks: {
-			constructEvent: (payload, signature) =>
+			constructEvent: ({ payload, signature }) =>
 				Effect.try({
 					try: () => {
 						const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;

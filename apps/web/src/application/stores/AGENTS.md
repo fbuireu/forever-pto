@@ -22,6 +22,7 @@ The rest of the application layer contract is in [`../AGENTS.md`](../AGENTS.md).
 | [`rehydration.ts`](./rehydration.ts) | `onRehydrateFailure`, the one thing every persisted store does when a stored blob will not come back. Not a store |
 | [`storedPlan.ts`](./storedPlan.ts) | `HOLIDAYS_STORAGE_NAME`, the holidays store's key, and `hasStoredPlan`, which reads whether that blob exists without rehydrating anything (the quick start's resume label, through `useHasStoredPlan`). Not a store |
 | [`utils/crypto.ts`](./utils/crypto.ts) | `obfuscate` / `deobfuscate` / `base64Encode` / `base64Decode`, plus `TWENTY_FOUR_HOURS` and `BASE64_PATTERN`. Not a store |
+| [`utils/holidaysMigration.ts`](./utils/holidaysMigration.ts) | `migrateHolidays`, the holidays store's `migrate`: what a stored blob of each older `STORAGE_VERSION` becomes. Not a store |
 | [`types.ts`](./types.ts) | The action parameter objects shared between the stores and their callers (`GenerateSuggestionsParams`, `FetchHolidaysParams`, `SetCalculationResultParams`, `ToggleDaySelectionParams`, `AddHolidayParams`, `EditHolidayParams`, `AlternativeSelectionBaseParams`, `AlternativePreviewParams`), `holidaysKeyOf`, and the outcomes the actions answer with: `DayRefusal`/`DayChange`/`DayOutcome` and `HolidayRefusal`/`HolidayOutcome` |
 
 ## The stores
@@ -29,7 +30,7 @@ The rest of the application layer contract is in [`../AGENTS.md`](../AGENTS.md).
 | Store | Owns | Persisted |
 | --- | --- | --- |
 | `filters` | `ptoDays`, `allowPastDays`, `country`, `region`, `year`, `carryOverMonths`, `strategy`, `preferredMonths` | all but `year` |
-| `holidays` | `holidays`, `suggestion`, `alternatives`, `maxAlternatives`, `currentSelection`, `currentSelectionIndex`, `previewAlternativeIndex`, `manuallySelectedDays`, `removedSuggestedDays`, `isCalculating`, `hasCalculated`, `planRevision`, `holidaysKey`, `planAskedFor` | all but `previewAlternativeIndex`, `isCalculating`, `hasCalculated`, `planRevision`, `holidaysKey` and `planAskedFor` |
+| `holidays` | `holidays`, `suggestion`, `alternatives`, `maxAlternatives`, `currentSelection`, `currentSelectionIndex`, `previewAlternativeIndex`, `manualDays`, `removedSuggestedDays`, `isCalculating`, `hasCalculated`, `planRevision`, `holidaysKey`, `planAskedFor` | all but `previewAlternativeIndex`, `isCalculating`, `hasCalculated`, `planRevision`, `holidaysKey` and `planAskedFor` |
 | `location` | `countries`, `regions` | nothing |
 | `premium` | `premiumKey`, `userEmail`, `lastVerified`, `needsSessionCheck`, `isLoading`, `modalOpen`, `currentFeature` | everything up to `needsSessionCheck` |
 | `ui` | `donatePopoverOpen`, `donatePopoverIsOpening`, `quickStartOpen` | nothing |
@@ -104,6 +105,12 @@ design, and some of those omissions are load-bearing:
   empty object: dropping is the honest answer here, and without a `migrate` zustand logs an error instead of
   dropping quietly.
 
+**`holidays` moves the keys its version 2 renamed, through `migrateHolidays`.** `manuallySelectedDays` becomes
+`manualDays` and each stored plan's `firstLastBreak` becomes `firstLastRestBlock`, so the Manual Days a person kept
+survive the rename. It adds no key a blob lacked, because the merge would let an added `undefined` overwrite the
+initial state's value. A blob older than version 1 has a shape no step was written for, so it becomes an empty
+object: the drop the store made before it had a `migrate`, without zustand's error.
+
 **`Date` survives the write and not the read, so only the read half is written.** `obfuscatedStorage`
 is a `createJSONStorage`, so what `partialize` returns is `JSON.stringify`d, and `JSON.stringify` already
 calls `Date.prototype.toJSON`, which *is* `toISOString`; `partializeHolidays` just names the fields that
@@ -120,7 +127,7 @@ as `Date`s through the suggestion, the current selection and an alternative.
 **A rehydrated sealed union is narrowed there too.** The blob is obfuscated,
 not encrypted ([ADR 0007](../../../../../adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md)), so
 every persisted field is user-editable, and `migrate` runs only on a version change. `filters.ts` narrows
-`strategy` with `isFilterStrategy` and falls back to `DEFAULT_FILTER_STRATEGY`, the predicate and the fallback
+`strategy` with `isStrategy` and falls back to `DEFAULT_STRATEGY`, the predicate and the fallback
 `worker.ts` applies to the incoming string, so the engine and the screen agree on a stale value: without it,
 [`Strategy.tsx`](../../ui/modules/sidebar/components/Strategy.tsx)'s `strategies.find` would match nothing,
 and [`Summary.tsx`](../../ui/modules/pages/planner/Summary.tsx), which falls back to the stored Strategy when
@@ -263,7 +270,7 @@ stored Suggestion go stale the moment it is adopted, and neither can be repaired
 
 - Its size. The worker built it against the Remaining Budget **at that run**, and `toggleDaySelection`
   deliberately never re-plans, so a Manual Day added afterwards is unreserved in every stored plan. Keep the
-  Manual Days and `days.length + manuallySelectedDays.length` can exceed the budget; `measureBudget` clamps the
+  Manual Days and `days.length + manualDays.length` can exceed the budget; `measureBudget` clamps the
   Remaining Budget at zero, so the overdraft reads as nothing left rather than as a negative allowance: correct
   for the user, and invisible to anyone debugging.
 - Its Bridges. They were expanded through the Manual Days as pseudo-Holidays, so clearing those days leaves
@@ -327,7 +334,7 @@ produces a wrong plan:
   `getAvailableWorkdays` and nothing else: a day the user told us they will work stops being a placement
   candidate without becoming a Free Day. Routed through the holidays array, it would count as a Free Day when a
   neighbouring Bridge expanded and was scored, inflating its Efficiency.
-- **The budget is `autoSuggestCount ?? measureBudget({ ptoDays, manuallySelectedDays }).remaining`.** Only the
+- **The budget is `autoSuggestCount ?? measureBudget({ ptoDays, manualDays }).remaining`.** Only the
   worker path sends `autoSuggestCount`, which `useCalculationsWorker.ts` derives after a manual edit; this
   store's `generateSuggestions` sends none, because its one caller runs after the manual edits are cleared.
 - **The pipeline measures every plan against the Planning Window it is handed**, `window: { year, carryOverMonths }`,
@@ -404,7 +411,7 @@ survive the next fetch; that is the intended behaviour, not a leak.
 `toggleDaySelection` asks it whether anything is left.
 
 **`toggleDaySelection` recomputes metrics but does not re-plan.** It moves a date between
-`manuallySelectedDays` and `removedSuggestedDays`, calls `generateMetrics` with the updated sets against the
+`manualDays` and `removedSuggestedDays`, calls `generateMetrics` with the updated sets against the
 filters' Planning Window, writes the result onto `currentSelection` and answers `{ applied: true, change }`,
 leaving `suggestion` and `alternatives` untouched. With the budget exhausted it answers a `BUDGET_EXHAUSTED`
 refusal and changes nothing. Re-planning is a separate worker run.
@@ -427,8 +434,10 @@ activation route sets the cookie and redirects with `activation=fresh`, and the 
 `PremiumSessionSync` calls `confirmActivation` while that marker is in the address, a forced `checkExistingSession`
 that reports `premium_activated`, with the checkout's properties, when the answer moved the store from no key to a key.
 The store cannot tell a first arrival from a return on its own: with `localStorage` cleared and the cookie alive it
-starts without a key, and the restore reads as a move into Premium. The page decides, by the marker it removes once the
-call settles, so a reload, a revisit and a cleared-storage return all run the silent `checkExistingSession` instead.
+starts without a key, and the restore reads as a move into Premium. The page decides, by the marker it removes as it
+reads it, before it calls, so a reload, a revisit, a return to the history entry after leaving early and a
+cleared-storage return all run the silent `checkExistingSession` instead; the call settles in this module-level
+promise even when the page has unmounted.
 Concurrent calls share one check and one report through a module-level promise, the way `checkExistingSession` shares
 its request. Every other check, `PremiumFeature`'s included, stays silent.
 

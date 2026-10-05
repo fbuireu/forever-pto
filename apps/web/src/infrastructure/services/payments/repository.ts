@@ -9,8 +9,8 @@ import { normalizeEmail } from "./normalizeEmail";
 export const savePayment = (data: NewPayment): Effect.Effect<boolean, DatabaseError, TursoService> =>
 	Effect.gen(function* () {
 		const turso = yield* TursoService;
-		const rowsAffected = yield* turso.execute(
-			`INSERT OR IGNORE INTO payments (
+		const rowsAffected = yield* turso.execute({
+			sql: `INSERT OR IGNORE INTO payments (
         id, stripe_created_at, stripe_customer_id, stripe_charge_id,
         email, amount, currency, status, payment_method_type,
         description, receipt_url, promo_code, user_agent, ip_address, country,
@@ -21,7 +21,7 @@ export const savePayment = (data: NewPayment): Effect.Effect<boolean, DatabaseEr
         parent_payment_id, origin,
         created_at, updated_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-			[
+			args: [
 				data.id,
 				data.stripeCreatedAt.toISOString(),
 				data.customerId ?? null,
@@ -52,7 +52,7 @@ export const savePayment = (data: NewPayment): Effect.Effect<boolean, DatabaseEr
 				null,
 				null,
 			],
-		);
+		});
 
 		return rowsAffected > 0;
 	});
@@ -68,14 +68,14 @@ export const updatePaymentStatus = ({
 }: UpdatePaymentStatusParams): Effect.Effect<boolean, DatabaseError, TursoService> =>
 	Effect.gen(function* () {
 		const turso = yield* TursoService;
-		const rowsAffected = yield* turso.execute(
-			`UPDATE payments
+		const rowsAffected = yield* turso.execute({
+			sql: `UPDATE payments
        SET status = ?,
            succeeded_at = CASE WHEN ? = 'succeeded' THEN datetime('now') ELSE succeeded_at END,
            updated_at = datetime('now')
        WHERE id = ? AND status != 'succeeded'`,
-			[status, status, paymentIntentId],
-		);
+			args: [status, status, paymentIntentId],
+		});
 
 		return rowsAffected > 0;
 	});
@@ -99,15 +99,15 @@ export interface PaymentChargeData {
 export const updatePaymentCharge = (data: PaymentChargeData): Effect.Effect<void, DatabaseError, TursoService> =>
 	Effect.gen(function* () {
 		const turso = yield* TursoService;
-		yield* turso.execute(
-			`UPDATE payments
+		yield* turso.execute({
+			sql: `UPDATE payments
        SET stripe_charge_id = ?, receipt_url = ?, payment_method_type = ?, country = ?,
            customer_name = ?, postal_code = ?, city = ?, state = ?,
            payment_brand = ?, payment_last4 = ?,
            fee_amount = ?, net_amount = ?,
            updated_at = datetime('now')
        WHERE id = ?`,
-			[
+			args: [
 				data.chargeId,
 				data.receiptUrl,
 				data.paymentMethodType,
@@ -122,7 +122,7 @@ export const updatePaymentCharge = (data: PaymentChargeData): Effect.Effect<void
 				data.netAmount,
 				data.paymentIntentId,
 			],
-		);
+		});
 	});
 
 interface PaymentRow {
@@ -189,25 +189,15 @@ const toPaymentData = (row: PaymentRow): PaymentData => ({
 	origin: row.origin,
 });
 
-export const getPaymentById = (
-	paymentIntentId: string,
-): Effect.Effect<PaymentData | undefined, DatabaseError, TursoService> =>
-	Effect.gen(function* () {
-		const turso = yield* TursoService;
-		const rows = yield* turso.query<PaymentRow>("SELECT * FROM payments WHERE id = ? LIMIT 1", [paymentIntentId]);
-		const row = rows[0];
-		return row ? toPaymentData(row) : undefined;
-	});
-
 export const getSucceededPaymentByEmail = (
 	email: string,
 ): Effect.Effect<PaymentData | undefined, DatabaseError, TursoService> =>
 	Effect.gen(function* () {
 		const turso = yield* TursoService;
-		const rows = yield* turso.query<PaymentRow>(
-			`SELECT * FROM payments WHERE lower(trim(email)) = ? AND status = 'succeeded' ORDER BY stripe_created_at DESC LIMIT 1`,
-			[normalizeEmail(email)],
-		);
+		const rows = yield* turso.query<PaymentRow>({
+			sql: `SELECT * FROM payments WHERE lower(trim(email)) = ? AND status = 'succeeded' ORDER BY stripe_created_at DESC LIMIT 1`,
+			args: [normalizeEmail(email)],
+		});
 		const row = rows[0];
 		return row ? toPaymentData(row) : undefined;
 	});
@@ -215,9 +205,9 @@ export const getSucceededPaymentByEmail = (
 export const countPromoCodeRedemptions = (code: string): Effect.Effect<number, DatabaseError, TursoService> =>
 	Effect.gen(function* () {
 		const turso = yield* TursoService;
-		const rows = yield* turso.query<{ redemptions: number }>(
-			`SELECT COUNT(*) AS redemptions FROM payments WHERE upper(trim(promo_code)) = ? AND status = 'succeeded'`,
-			[normalizePromoCode(code)],
-		);
+		const rows = yield* turso.query<{ redemptions: number }>({
+			sql: `SELECT COUNT(*) AS redemptions FROM payments WHERE upper(trim(promo_code)) = ? AND status = 'succeeded'`,
+			args: [normalizePromoCode(code)],
+		});
 		return Number(rows[0]?.redemptions ?? 0);
 	});

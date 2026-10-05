@@ -72,7 +72,7 @@ describe("ApplicationLayer", () => {
 		const error = await Effect.runPromise(
 			Effect.gen(function* () {
 				const turso = yield* TursoService;
-				return yield* turso.query("SELECT 1").pipe(Effect.flip);
+				return yield* turso.query({ sql: "SELECT 1" }).pipe(Effect.flip);
 			}).pipe(Effect.provide(realLayer)),
 		);
 

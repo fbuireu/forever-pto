@@ -5,10 +5,10 @@ import { buyMeACoffeeIcon } from "@ui/assets/icons/buyMeACoffee";
 import { githubIcon } from "@ui/assets/icons/github";
 import { linkedinIcon } from "@ui/assets/icons/linkedin";
 import { RotatingText } from "@ui/modules/core/animate/text/Rotating";
-import { Me } from "@ui/modules/pages/legal/Me";
 import { useTranslations } from "next-intl";
 import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { Icon } from "../../Icon";
+import { Me } from "../../legal-identity/Me";
 
 const EMOJIS: string[] = ["☕", "🍺", "❤️", "🚀", "⚡", "🔥", "💻", "🌮", "🍕", "🎵", "🎮", "😴", "🤯", "💡"];
 

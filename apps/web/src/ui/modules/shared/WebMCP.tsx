@@ -1,6 +1,6 @@
 "use client";
 
-import { FilterStrategy } from "@domain/calendar/types";
+import { Strategy } from "@domain/calendar/types";
 import { LOCALES } from "@infrastructure/i18n/locales";
 import { useEffect } from "react";
 
@@ -37,7 +37,7 @@ export function WebMCP() {
 							"Export to Google Calendar, Outlook, Apple Calendar",
 						],
 						locales: LOCALES,
-						strategies: Object.values(FilterStrategy),
+						strategies: Object.values(Strategy),
 						url: globalThis.location.origin,
 					}),
 				},

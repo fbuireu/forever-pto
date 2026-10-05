@@ -35,9 +35,21 @@ vi.mock("@application/stores/holidays", () => ({
 
 vi.mock("@ui/hooks/usePlanReadout", () => ({ usePlanReadout: () => readout }));
 
-vi.mock("@ui/modules/core/animate/text/SlidingNumber", () => ({
-	SlidingNumber: ({ number }: { number: number }) => <span>{number}</span>,
-}));
+vi.mock("@ui/modules/core/animate/text/SlidingNumber", async () => {
+	const { useLocale } = await import("next-intl");
+
+	return {
+		SlidingNumber: ({ number, decimalPlaces = 0 }: { number: number; decimalPlaces?: number }) => (
+			<span>
+				{number < 0 ? "-" : ""}
+				{new Intl.NumberFormat(useLocale(), {
+					minimumFractionDigits: decimalPlaces,
+					maximumFractionDigits: decimalPlaces,
+				}).format(Math.abs(number))}
+			</span>
+		),
+	};
+});
 
 const { PlannerPanel } = await import("./PlannerPanel");
 
@@ -249,6 +261,151 @@ describe("PlannerPanel budget readout", () => {
 	});
 });
 
+describe("PlannerPanel numbers carry the glyphs their own bundle gives them", () => {
+	const NBSP = /\u00A0/g;
+	const LOCALES = [
+		["en", en],
+		["es", esMessages],
+		["ca", caMessages],
+		["it", itMessages],
+		["de", de],
+		["fr", frMessages],
+	] as const;
+
+	const visible = (container: HTMLElement) =>
+		Array.from(container.querySelectorAll('[aria-hidden="true"]'))
+			.map((node) => node.textContent ?? "")
+			.join("|");
+
+	interface NumberInParams {
+		locale: string;
+		value: number;
+	}
+
+	const percentOf = ({ locale, value }: NumberInParams) =>
+		new Intl.NumberFormat(locale, { style: "percent" }).format(value);
+
+	const decimalOf = ({ locale, value }: NumberInParams) =>
+		new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(value);
+
+	it.each(LOCALES)("%s writes the comparison with the percent sign its own typography wants", (locale, messages) => {
+		const { container } = renderIn({ locale, messages, selectedIndex: 1 });
+
+		expect(visible(container)).toContain(percentOf({ locale, value: 0.9 }));
+	});
+
+	it.each(LOCALES)("%s signs the efficiency gap and writes its decimal the way the locale does", (locale, messages) => {
+		const { container } = renderIn({ locale, messages, selectedIndex: 1 });
+
+		expect(visible(container)).toContain(`${decimalOf({ locale, value: 1.8 })}x`);
+		expect(visible(container)).toContain(
+			new Intl.NumberFormat(locale, {
+				minimumFractionDigits: 1,
+				maximumFractionDigits: 1,
+				signDisplay: "exceptZero",
+			}).format(-0.2),
+		);
+	});
+
+	it.each(LOCALES)("%s signs a gap in the Alternative's favour with the plus its locale writes", (locale, messages) => {
+		const better = [
+			suggestionOf({ effectiveDays: 12, efficiency: 2 }),
+			suggestionOf({ effectiveDays: 14, efficiency: 2.4 }),
+		];
+		const { container } = render(
+			<NextIntlClientProvider locale={locale} messages={messages}>
+				<PlannerPanel {...panelProps} allSuggestions={better} selectedIndex={1} />
+			</NextIntlClientProvider>,
+		);
+
+		expect(visible(container)).toContain(
+			new Intl.NumberFormat(locale, {
+				minimumFractionDigits: 1,
+				maximumFractionDigits: 1,
+				signDisplay: "exceptZero",
+			}).format(0.4),
+		);
+	});
+
+	it("writes no sign on a gap that rounds to nought, which is no gain and no loss", () => {
+		const level = [
+			suggestionOf({ effectiveDays: 12, efficiency: 2 }),
+			suggestionOf({ effectiveDays: 12, efficiency: 2 }),
+		];
+		const { container } = render(
+			<NextIntlClientProvider locale="en" messages={en}>
+				<PlannerPanel {...panelProps} allSuggestions={level} selectedIndex={1} />
+			</NextIntlClientProvider>,
+		);
+
+		expect(visible(container)).toContain("0.0");
+		expect(visible(container)).not.toContain("+0.0");
+	});
+
+	it.each(LOCALES)("%s writes the Bonus Days inside a message, not around a counter", (locale, messages) => {
+		const { container } = renderIn({ locale, messages, selectedIndex: 1 });
+
+		expect(visible(container)).toContain("(+2)");
+	});
+
+	it.each(LOCALES)(
+		"%s draws no check glyph beside the assigned note, which the sentence needs none of",
+		(locale, messages) => {
+			Object.assign(readout, { spent: 10, remaining: 0, hasManualChanges: false });
+
+			const { container } = renderIn({ locale, messages });
+
+			expect(container.textContent).not.toContain("\u2713");
+			expect(visible(container)).toContain(messages.ptoStatus.allAssigned);
+		},
+	);
+
+	it("takes the multiplication sign from the bundle, so a translator owns it", () => {
+		const messages = {
+			...en,
+			alternativesManager: { ...en.alternativesManager, efficiencyValue: "<n>{efficiency}</n> \u00D7" },
+		};
+
+		const { container } = renderIn({ locale: "en", messages, selectedIndex: 1 });
+
+		expect(visible(container)).toContain("1.8 \u00D7");
+		expect(visible(container)).not.toContain("1.8x");
+	});
+
+	it("takes the percent sign from the bundle, so a translator owns it", () => {
+		const messages = {
+			...en,
+			alternativesManager: { ...en.alternativesManager, comparisonPercent: "<n>{percent}</n> per cent" },
+		};
+
+		const { container } = renderIn({ locale: "en", messages, selectedIndex: 1 });
+
+		expect(visible(container)).toContain("90 per cent");
+		expect(visible(container)).not.toContain("90%");
+	});
+
+	it("takes the brackets and the plus of the Bonus Days from the bundle, so a translator owns them", () => {
+		const messages = {
+			...en,
+			alternativesManager: { ...en.alternativesManager, bonusDaysBadge: "[+<n>{bonusDays}</n>]" },
+		};
+
+		const { container } = renderIn({ locale: "en", messages, selectedIndex: 1 });
+
+		expect(visible(container)).toContain("[+2]");
+		expect(visible(container)).not.toContain("(+2)");
+	});
+
+	it("writes the used and remaining budget with the percent sign the locale writes", () => {
+		Object.assign(readout, { ptoDays: 10, spent: 6, suggested: 6, remaining: 4 });
+
+		const { container } = renderIn({ locale: "de", messages: de });
+
+		expect(container.textContent?.replace(NBSP, " ")).toContain("60 %");
+		expect(container.textContent?.replace(NBSP, " ")).toContain("40 %");
+	});
+});
+
 describe("PlannerPanel numbers in the reader's own format", () => {
 	const NARROW_SPACES = /[\u00A0\u202F]/g;
 
@@ -285,9 +442,9 @@ describe("PlannerPanel budget readout at the plural edges", () => {
 		["en", 0, 0, "0 / 0 days used · 0%", en],
 		["en", 1, 1, "1 / 1 day used · 100%", en],
 		["en", 10, 6, "6 / 10 days used · 60%", en],
-		["es", 0, 0, "0 / 0 días usados · 0%", esMessages],
-		["es", 1, 1, "1 / 1 día usado · 100%", esMessages],
-		["es", 10, 6, "6 / 10 días usados · 60%", esMessages],
+		["es", 0, 0, "0 / 0 días usados · 0\u00A0%", esMessages],
+		["es", 1, 1, "1 / 1 día usado · 100\u00A0%", esMessages],
+		["es", 10, 6, "6 / 10 días usados · 60\u00A0%", esMessages],
 	] as const)(
 		"writes the %s budget of %i with %i used as one sentence",
 		(locale, ptoDays, spent, expected, messages) => {

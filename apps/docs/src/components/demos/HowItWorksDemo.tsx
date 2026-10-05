@@ -1,9 +1,9 @@
-import { FilterStrategy } from "../../../../web/src/domain/calendar/types";
+import { Strategy } from "../../../../web/src/domain/calendar/types";
 import { LOCALES } from "../../../../web/src/infrastructure/i18n/locales";
 
 export const APP_LOCALES = LOCALES;
 
-const STRATEGY_DESCRIPTIONS: Record<FilterStrategy, string> = {
+const STRATEGY_DESCRIPTIONS: Record<Strategy, string> = {
 	grouped:
 		"A few long vacations. Ranks a Bridge by the length of the block it grows, towards about two weeks, and accepts a lower marginal return to get there. This is the default (initial value of the filters store).",
 	optimized:
@@ -27,7 +27,7 @@ export const StrategiesTable = () => (
 			</tr>
 		</thead>
 		<tbody>
-			{Object.values(FilterStrategy).map((strategy) => (
+			{Object.values(Strategy).map((strategy) => (
 				<tr key={strategy}>
 					<td>
 						<code>{strategy}</code>

@@ -18,7 +18,7 @@ const { mockGenerateIcs, holidaysState } = vi.hoisted(() => ({
 		holidays: [] as { id: string; date: Date; name: string; isInPlanningWindow: boolean }[],
 		suggestion: null as { days: Date[] } | null,
 		currentSelection: null as { days: Date[] } | null,
-		manuallySelectedDays: [] as Date[],
+		manualDays: [] as Date[],
 		removedSuggestedDays: [] as Date[],
 	},
 }));
@@ -95,7 +95,7 @@ beforeEach(() => {
 	holidaysState.holidays = [];
 	holidaysState.suggestion = null;
 	holidaysState.currentSelection = null;
-	holidaysState.manuallySelectedDays = [];
+	holidaysState.manualDays = [];
 	holidaysState.removedSuggestedDays = [];
 
 	Object.defineProperty(URL, "createObjectURL", { value: vi.fn(() => "blob:x"), writable: true });

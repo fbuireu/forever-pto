@@ -87,14 +87,14 @@ check that the field is present, so a wire message genuinely missing `metrics` w
 else produces these messages, which is what makes the claim safe.
 
 **Neither direction of `serializers.ts` casts, because the wire type tells the truth.**
-`SerializedHolidayDTO.variant` is `HolidayVariant` and `SerializedSuggestion.strategy` is `FilterStrategy`: the
+`SerializedHolidayDTO.variant` is `HolidayVariant` and `SerializedSuggestion.strategy` is `Strategy`: the
 values on the outbound leg were produced by `serializeHolidays` and `serializeSuggestionResult` from types that
 were already sealed, so a bare string in either serialiser is a compile error rather than a cast that absorbs
 it. The *inbound* leg is where a value out of persisted storage arrives, so `CalculateSuggestionsPayload.strategy`
 and `locale` stay `string` and `preferredMonths` stays `unknown`.
 
-`worker.ts` is the inbound direction and parses, one predicate per untyped field: `isFilterStrategy` from
-[`@domain/calendar/types`](../../domain/calendar/types.ts) falls back to `DEFAULT_FILTER_STRATEGY`, which is also
+`worker.ts` is the inbound direction and parses, one predicate per untyped field: `isStrategy` from
+[`@domain/calendar/types`](../../domain/calendar/types.ts) falls back to `DEFAULT_STRATEGY`, which is also
 what the filters store initialises to, so the wire default and the store default cannot drift; `isLocale`
 falls back to `EN`; `isPreferredMonths` falls back to an empty list, the one value the Main Vacation objective
 already reads as any month, rather than a guess. The engine keeps its own fallback for an unknown Strategy,
@@ -106,7 +106,7 @@ wire type.
 ## Manual and Removed Days
 
 The worker hands the hand-edited days to the pipeline by name and folds neither into `holidays`: Manual Days as
-`manuallySelectedDays`, Removed Days as `removedSuggestedDays`, each deserialised with `fromStoredInstant` and
+`manualDays`, Removed Days as `removedSuggestedDays`, each deserialised with `fromStoredInstant` and
 defaulting to an empty list when the request omits it. What the pipeline does with them (Manual Days as `manual-N`
 pseudo-Holidays and as the streaks `findPlanningCandidates` treats as already off, Removed Days out of the
 Workday list and never a Free Day) is the domain's; see the *Public API* section of
@@ -156,10 +156,10 @@ weaker copy of each and nothing else.
 
 The remaining claim is genuinely this side's, because this side builds the array it is about: a Removed Day
 reaches the pipeline as `removedSuggestedDays` and appears in `holidays` not at all. `worker.test.ts` keeps
-that one, asserted against the recorded `PlanningInput`.
+that one, asserted against the recorded `RunPlanningPipelineParams`.
 
 What it pins: the message-type guard, deserialisation into the pipeline's own input names, the wire
-narrowings (`isFilterStrategy`, `isLocale` and `isPreferredMonths`), serialisation of the reply, that an
+narrowings (`isStrategy`, `isLocale` and `isPreferredMonths`), serialisation of the reply, that an
 unplanned result reaches the wire carrying the pipeline's own `Metrics` rather than a literal, and that a throw
 becomes `WORKER_ERROR` rather than an unhandled rejection.
 

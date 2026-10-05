@@ -2,11 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-interface UseCurrentYearParams {
-	serverYear: number;
-}
-
-export const useCurrentYear = ({ serverYear }: UseCurrentYearParams) => {
+export const useCurrentYear = (serverYear: number) => {
 	const [year, setYear] = useState(serverYear);
 
 	useEffect(() => {

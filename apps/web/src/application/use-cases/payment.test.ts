@@ -12,12 +12,23 @@ vi.mock("@application/shared/utils/zodParse", () => ({
 	zodParse: vi.fn(({ data }) => Effect.succeed(data)),
 }));
 
-vi.mock("@application/dto/payment/dto", () => ({
-	paymentDataDTO: { create: vi.fn().mockReturnValue({ id: "pi_test" }) },
+const STRIPE_CREATED_SECONDS = 1_736_000_000;
+
+const PAYMENT_INTENT = vi.hoisted(() => ({
+	id: "pi_test",
+	client_secret: "cs_test_secret",
+	created: 1_736_000_000,
+	amount: 999,
+	currency: "eur",
+	status: "requires_payment_method",
+	customer: null,
+	latest_charge: null,
+	payment_method_types: ["card"],
+	description: "Donation from buyer@example.com",
 }));
 
 vi.mock("@infrastructure/services/payments/provider/intent", () => ({
-	createPaymentIntent: vi.fn(() => Effect.succeed({ id: "pi_test", client_secret: "cs_test_secret" })),
+	createPaymentIntent: vi.fn(() => Effect.succeed(PAYMENT_INTENT)),
 }));
 
 const SAVE20_DISCOUNT = vi.hoisted(
@@ -37,7 +48,6 @@ vi.mock("@infrastructure/services/payments/provider/promoCode", () => ({
 
 vi.mock("@infrastructure/services/payments/repository", () => ({
 	savePayment: vi.fn(() => Effect.succeed(true)),
-	getPaymentById: vi.fn(() => Effect.succeed(undefined)),
 	getSucceededPaymentByEmail: vi.fn(() => Effect.succeed(undefined)),
 	updatePaymentStatus: vi.fn(() => Effect.succeed(undefined)),
 }));
@@ -123,11 +133,25 @@ describe("createPayment", () => {
 		expect(savePayment).not.toHaveBeenCalled();
 	});
 
-	it("persists the payment when the deferred effect runs", async () => {
+	it("persists the payment the intent describes when the deferred effect runs", async () => {
 		const { savePayment } = await import("@infrastructure/services/payments/repository");
 		const { deferred } = await run(createPayment({ params: PARAMS, context: CONTEXT }));
 		await runDeferred(deferred);
-		expect(savePayment).toHaveBeenCalledOnce();
+		expect(savePayment).toHaveBeenCalledExactlyOnceWith({
+			id: "pi_test",
+			stripeCreatedAt: new Date(STRIPE_CREATED_SECONDS * 1000),
+			customerId: null,
+			chargeId: null,
+			email: "buyer@example.com",
+			amount: 999,
+			currency: "eur",
+			status: "requires_payment_method",
+			paymentMethodType: "card",
+			description: "Donation from buyer@example.com",
+			promoCode: null,
+			userAgent: "test-agent",
+			ipAddress: "127.0.0.1",
+		});
 	});
 
 	it("deferred effect recovers and warns when savePayment fails", async () => {

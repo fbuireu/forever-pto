@@ -91,7 +91,7 @@ the strings, and asserts the cache headers directionally (a hit is `public` with
 
 **One module states the cache policy, and it is the one that knows the outcome.**
 [`src/infrastructure/markdown/twin.ts`](../infrastructure/markdown/twin.ts) owns `MARKDOWN_ROUTE`, `MARKDOWN_ACCEPT`, `MARKDOWN_PATH_HEADER` and
-`markdownTwinHeaders({ found })`: content type, `Cache-Control` and `Vary` together. A hit is
+`markdownTwinHeaders(found)`: content type, `Cache-Control` and `Vary` together. A hit is
 `public, max-age=3600` and a miss is `no-store`; the proxy states no cache policy at all, because it runs
 before `buildMarkdownPage` and cannot know whether the page exists.
 
@@ -277,11 +277,15 @@ that hop. The `activation` query parameter is the signal; the cookie is the enti
 over 24 hours old: false for any donor who opened the planner before donating, since `PremiumFeature`'s own
 mount stamps it. [`PremiumFeature.tsx`](../ui/modules/premium/PremiumFeature.tsx) calling `checkExistingSession()` unconditionally therefore does
 nothing for the payer who has just come back. `PremiumSessionSync` renders `null` and reads the address it arrived at.
-With `activation=fresh` in it, the marker the activation route just wrote, it calls the premium store's
-`confirmActivation()` once: a `checkExistingSession({ force: true })` that reports `premium_activated` when it moved
-this device from free to Premium, which is how a redirect payer is counted the way `setPremiumStatus` counts one who
-paid in the page. Once that call settles it removes the marker with `history.replaceState(null, …)`, if the address is
-still the one it arrived at, so a reload or a revisit is an ordinary load. Without the marker (a reload, a bookmark, a
+With `activation=fresh` in it, the marker the activation route just wrote, it removes the marker with
+`history.replaceState(null, …)` and then calls the premium store's `confirmActivation()` once: a
+`checkExistingSession(true)` that reports `premium_activated` when it moved this device from free to Premium, which
+is how a redirect payer is counted the way `setPremiumStatus` counts one who paid in the page. The marker goes first,
+synchronously, never once the call settles: the call lives in the store and settles whether or not this page is
+still mounted, so a payer who leaves before it settles would leave the history entry marked, and a later visit to
+that entry would count the same Donation again. A reload while the call is in flight finds no marker and restores the
+session silently, which can lose that one report and never repeats it; `PremiumSessionSync.activation.test.tsx` leaves
+before the call settles and visits the entry again. Without the marker (a reload, a bookmark, a
 payer whose `localStorage` was cleared while the cookie lives) it runs the same forced check and reports nothing:
 restoring a session that already existed is not an activation, and the store, starting without a key, would read the
 restore as one. The state passed to `replaceState` is `null`, never `window.history.state`: Next patches

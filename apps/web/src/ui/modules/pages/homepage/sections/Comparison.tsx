@@ -1,7 +1,7 @@
 import { Badge } from "@ui/modules/core/primitives/Badge";
 import { cn } from "@ui/utils/cn";
 import { getFormatter, getTranslations } from "next-intl/server";
-import { brutCard, SHOWCASE_RATIO } from "./shared";
+import { brutCard, SHOWCASE_EFFICIENCY } from "./shared";
 
 export const Comparison = async () => {
 	const [t, format] = await Promise.all([getTranslations("homepage"), getFormatter()]);
@@ -66,7 +66,7 @@ export const Comparison = async () => {
 							>
 								<span className="font-black w-[22px] text-center shrink-0">✓</span>
 								{key === "comparison.withItems.dayEfficiency"
-									? t(key, { ratio: format.number(SHOWCASE_RATIO, { maximumFractionDigits: 1 }) })
+									? t(key, { ratio: format.number(SHOWCASE_EFFICIENCY, { maximumFractionDigits: 1 }) })
 									: t(key)}
 							</li>
 						))}

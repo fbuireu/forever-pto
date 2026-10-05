@@ -26,8 +26,13 @@ vi.mock("@ui/modules/core/primitives/Badge", () => ({
 
 vi.mock("@ui/modules/core/primitives/FlagIcon", () => ({ FlagIcon: () => null }));
 
+vi.mock("./shared", async (importOriginal) => ({
+	...(await importOriginal<typeof import("./shared")>()),
+	COUNTRY_COUNT: 150,
+}));
+
 import { Features } from "./Features";
-import { dayCell } from "./shared";
+import { COUNTRY_COUNT, dayCell } from "./shared";
 
 const BUNDLES: Record<string, typeof enMessages> = {
 	en: enMessages,
@@ -111,6 +116,33 @@ describe("Features best-efficiency figure", () => {
 			expect(figure?.textContent).toBe(DECIMAL_COMMA.includes(locale as Locale) ? "3,5×" : "3.5×");
 			expect(figure?.querySelector(".text-\\[32px\\]")?.textContent).toBe("×");
 			expect(figure?.textContent).not.toMatch(/[<>{}]|homepage\./);
+		},
+	);
+});
+
+describe("Features Country count", () => {
+	const flagsCardOf = (container: HTMLElement) => {
+		const chip = Array.from(container.querySelectorAll("span")).find((node) => node.textContent?.startsWith("+"));
+		if (!chip?.parentElement) throw new Error("flag chip not rendered");
+		return { chip, flagsShown: chip.parentElement.children.length - 1 };
+	};
+
+	it("draws the tag from the one constant that owns the count", async () => {
+		await renderFeatures({ locale: "en" });
+
+		expect(screen.getByText(`${COUNTRY_COUNT} countries`)).toBeTruthy();
+	});
+
+	it.each(Object.entries(BUNDLES))(
+		"derives the figure left after the flags from that constant, signed the way %s signs it",
+		async (locale, messages) => {
+			const { container } = await renderFeatures({ locale: locale as Locale, messages });
+			const { chip, flagsShown } = flagsCardOf(container);
+
+			expect(flagsShown).toBeGreaterThan(0);
+			expect(chip.textContent).toBe(
+				new Intl.NumberFormat(locale, { signDisplay: "always" }).format(COUNTRY_COUNT - flagsShown),
+			);
 		},
 	);
 });

@@ -1,13 +1,13 @@
 "use client";
 
-import { holidaysInPlanningWindow } from "@application/dto/holiday/dto";
+import { holidaysInPlanningWindow } from "@application/dto/holiday/rules";
 import { HolidayVariant } from "@application/dto/holiday/types";
 import { Link } from "@application/i18n/navigation";
 import { useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
 import { useLocationStore } from "@application/stores/location";
-import { PremiumFeatureId, usePremiumStore } from "@application/stores/premium";
-import { isFilterStrategy } from "@domain/calendar/types";
+import { PremiumFeatureId, PremiumOrigin, usePremiumStore } from "@application/stores/premium";
+import { isStrategy } from "@domain/calendar/types";
 import { measureGain } from "@domain/calendar/utils/budget";
 import { usePlacedPlan } from "@ui/hooks/usePlanReadout";
 import { useStoresReady } from "@ui/hooks/useStoresReady";
@@ -94,7 +94,7 @@ export const Summary = () => {
 		})),
 	);
 
-	const { activeSuggestion, placedDays, manuallySelectedDays, removedSuggestedDays } = usePlacedPlan();
+	const { activeSuggestion, placedDays, manualDays, removedSuggestedDays } = usePlacedPlan();
 
 	const holidaysInWindow = useMemo(() => holidaysInPlanningWindow(holidays), [holidays]);
 
@@ -143,11 +143,11 @@ export const Summary = () => {
 		};
 	}, [activeSuggestion, ptoDays, alternatives, placedDays.length, strategy]);
 
-	const planStrategy = isFilterStrategy(activeSuggestion?.strategy) ? activeSuggestion.strategy : strategy;
+	const planStrategy = isStrategy(activeSuggestion?.strategy) ? activeSuggestion.strategy : strategy;
 
 	const manualAdjustmentsCase = (() => {
-		if (manuallySelectedDays.length > 0 && removedSuggestedDays.length > 0) return "addedAndRemoved";
-		return manuallySelectedDays.length > 0 ? "addedOnly" : "removedOnly";
+		if (manualDays.length > 0 && removedSuggestedDays.length > 0) return "addedAndRemoved";
+		return manualDays.length > 0 ? "addedOnly" : "removedOnly";
 	})();
 
 	const content = (() => {
@@ -212,7 +212,7 @@ export const Summary = () => {
 								carryOverMonths={carryOverMonths}
 								holidays={holidaysInWindow}
 								suggestion={activeSuggestion}
-								manuallySelectedDays={manuallySelectedDays}
+								manualDays={manualDays}
 							/>
 						</div>
 						<div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -221,11 +221,7 @@ export const Summary = () => {
 						</div>
 						<div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
 							<BlocksPerQuarterChart blocksPerQuarter={metrics.longBlocksPerQuarter} />
-							<MonthlyDistributionChart
-								monthlyDist={metrics.monthlyDist}
-								year={year}
-								carryOverMonths={carryOverMonths}
-							/>
+							<MonthlyDistributionChart monthlyDist={metrics.monthlyDist} year={year} />
 						</div>
 						<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 							<MetricCard
@@ -255,15 +251,21 @@ export const Summary = () => {
 							/>
 							<MetricCard
 								label={t("metrics.gain")}
-								value={gain.toFixed(0)}
-								symbol={"%"}
+								value={gain}
+								renderValue={(counter) => (
+									<span className="flex">{t.rich("metrics.gainValue", { gain, n: () => counter })}</span>
+								)}
 								icon={Zap}
 								badge={t("metrics.perPtoDay", { ptoDays })}
 								colorScheme="amber"
 							/>
 						</div>
 						<div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-							<PremiumFeature feature={PremiumFeatureId.ADVANCED_METRICS} iconSize="size-7">
+							<PremiumFeature
+								feature={PremiumFeatureId.ADVANCED_METRICS}
+								origin={PremiumOrigin.PLANNER}
+								iconSize="size-7"
+							>
 								<MetricCard
 									label={t("metrics.longWeekends")}
 									value={metrics.longWeekends}
@@ -272,7 +274,11 @@ export const Summary = () => {
 									size={MetricCardSize.COMPACT}
 								/>
 							</PremiumFeature>
-							<PremiumFeature feature={PremiumFeatureId.ADVANCED_METRICS} iconSize="size-7">
+							<PremiumFeature
+								feature={PremiumFeatureId.ADVANCED_METRICS}
+								origin={PremiumOrigin.PLANNER}
+								iconSize="size-7"
+							>
 								<MetricCard
 									label={t("metrics.restBlocks")}
 									value={metrics.restBlocks}
@@ -283,14 +289,18 @@ export const Summary = () => {
 							</PremiumFeature>
 							<MetricCard
 								label={t("metrics.efficiency")}
-								value={metrics.averageEfficiency.toFixed(1)}
+								value={metrics.averageEfficiency}
 								decimalPlaces={1}
 								hint={t("metrics.perPlacedDay", { placedDays: placedDayCount })}
 								icon={TrendingUp}
 								colorScheme="amber"
 								size={MetricCardSize.COMPACT}
 							/>
-							<PremiumFeature feature={PremiumFeatureId.ADVANCED_METRICS} iconSize="size-7">
+							<PremiumFeature
+								feature={PremiumFeatureId.ADVANCED_METRICS}
+								origin={PremiumOrigin.PLANNER}
+								iconSize="size-7"
+							>
 								<MetricCard
 									label={t("metrics.bridgesUsed")}
 									value={metrics.bridgesUsed}
@@ -318,9 +328,10 @@ export const Summary = () => {
 								size={MetricCardSize.COMPACT}
 							/>
 						</div>
-						{metrics.firstLastBreak && (
+						{metrics.firstLastRestBlock && (
 							<PremiumFeature
 								feature={PremiumFeatureId.YEAR_SUMMARY}
+								origin={PremiumOrigin.PLANNER}
 								description={t("yearSummary.featureDescription")}
 								iconSize="size-7"
 								inlineDescription
@@ -337,7 +348,7 @@ export const Summary = () => {
 											<div>
 												<div className="text-sm text-muted-foreground">{t("yearSummary.firstBreak")}</div>
 												<div className="text-lg flex justify-center font-display font-bold text-wash-purple-figure">
-													<RotatingText text={metrics.firstLastBreak.first} />
+													<RotatingText text={metrics.firstLastRestBlock.first} />
 												</div>
 											</div>
 											<div>
@@ -352,14 +363,17 @@ export const Summary = () => {
 											<div>
 												<div className="text-sm text-muted-foreground">{t("yearSummary.lastBreak")}</div>
 												<div className="text-lg font-display font-bold text-wash-purple-figure">
-													<RotatingText text={metrics.firstLastBreak.last} />
+													<RotatingText text={metrics.firstLastRestBlock.last} />
 												</div>
 											</div>
 										</div>
 										<div className="mt-3 text-center">
 											<div className="text-xs text-muted-foreground mb-1">{t("yearSummary.totalBonusDays")}</div>
 											<div className="text-2xl font-display font-bold text-wash-purple-figure flex justify-center">
-												+<SlidingNumber number={metrics.bonusDays} />
+												{t.rich("yearSummary.bonusDaysCount", {
+													count: metrics.bonusDays,
+													n: () => <SlidingNumber number={metrics.bonusDays} />,
+												})}
 											</div>
 											<div className="text-xs text-wash-purple-caption">{t("yearSummary.bonusDaysCaption")}</div>
 										</div>
@@ -390,7 +404,7 @@ export const Summary = () => {
 								})}
 							</Banner>
 						)}
-						{(manuallySelectedDays.length > 0 || removedSuggestedDays.length > 0) && (
+						{(manualDays.length > 0 || removedSuggestedDays.length > 0) && (
 							<Banner
 								icon={CalendarDays}
 								title={t("notifications.manualAdjustments.title")}
@@ -398,10 +412,10 @@ export const Summary = () => {
 								className="mt-2"
 							>
 								{t.rich(`notifications.manualAdjustments.${manualAdjustmentsCase}`, {
-									added: manuallySelectedDays.length,
+									added: manualDays.length,
 									removed: removedSuggestedDays.length,
 									b: BoldText,
-									a: () => <SlidingNumber number={manuallySelectedDays.length} />,
+									a: () => <SlidingNumber number={manualDays.length} />,
 									r: () => <SlidingNumber number={removedSuggestedDays.length} />,
 								})}
 							</Banner>

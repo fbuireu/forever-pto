@@ -3,11 +3,16 @@ import { type Connection, connect } from "@tursodatabase/serverless";
 import type { InValue } from "@tursodatabase/serverless/compat";
 import { Context, Effect, Layer } from "effect";
 
+export interface StatementParams {
+	sql: string;
+	args?: InValue[];
+}
+
 export class TursoService extends Context.Tag("TursoService")<
 	TursoService,
 	{
-		query<T = unknown>(sql: string, args?: InValue[]): Effect.Effect<T[], DatabaseError>;
-		execute(sql: string, args?: InValue[]): Effect.Effect<number, DatabaseError>;
+		query<T = unknown>(statement: StatementParams): Effect.Effect<T[], DatabaseError>;
+		execute(statement: StatementParams): Effect.Effect<number, DatabaseError>;
 	}
 >() {}
 
@@ -40,13 +45,13 @@ export const TursoServiceLive = Layer.sync(TursoService, () => {
 		});
 
 	return {
-		query: <T = unknown>(sql: string, args?: InValue[]): Effect.Effect<T[], DatabaseError> =>
+		query: <T = unknown>({ sql, args }: StatementParams): Effect.Effect<T[], DatabaseError> =>
 			Effect.tryPromise({
 				try: () => withConnection(async (connection) => (await connection.all(sql, args ?? [])) as T[]),
 				catch: wrapError,
 			}),
 
-		execute: (sql: string, args?: InValue[]): Effect.Effect<number, DatabaseError> =>
+		execute: ({ sql, args }: StatementParams): Effect.Effect<number, DatabaseError> =>
 			Effect.tryPromise({
 				try: () =>
 					withConnection(async (connection) => {

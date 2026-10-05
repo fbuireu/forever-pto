@@ -11,7 +11,7 @@ interface LazyContactModalProps {
 }
 
 export const LazyContactModal = ({ open, onClose }: LazyContactModalProps) => {
-	const hasOpened = useHasOpened({ open });
+	const hasOpened = useHasOpened(open);
 
 	return hasOpened ? <ContactModal open={open} onClose={onClose} /> : null;
 };

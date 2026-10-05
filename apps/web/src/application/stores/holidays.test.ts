@@ -1,7 +1,7 @@
 import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
 import type { generateMetrics } from "@domain/calendar/metrics/generateMetrics";
 import type { runPlanningPipeline } from "@domain/calendar/pipeline";
-import { FilterStrategy, type MeasuredSuggestion } from "@domain/calendar/types";
+import { type MeasuredSuggestion, Strategy } from "@domain/calendar/types";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useFiltersStore } from "./filters";
 import { type HolidaysState, useHolidaysStore } from "./holidays";
@@ -34,24 +34,12 @@ vi.mock("./crypto", () => ({
 	},
 }));
 
-vi.mock("@application/dto/holiday/dto", () => ({
-	holidayDTO: {
-		createCustom: vi.fn(({ name, date }: { name: string; date: Date }) => ({
-			id: `custom-${date.toISOString()}`,
-			name,
-			date,
-			variant: HolidayVariant.CUSTOM,
-			isInPlanningWindow: true,
-		})),
-	},
-}));
-
 vi.mock("@domain/calendar/metrics/generateMetrics", () => ({
 	generateMetrics: vi.fn<typeof generateMetrics>().mockReturnValue({
 		longWeekends: 0,
 		restBlocks: 0,
 		maxWorkStreak: 0,
-		firstLastBreak: null,
+		firstLastRestBlock: null,
 		averageEfficiency: 0,
 		bonusDays: 0,
 		quarterDist: [0, 0, 0, 0],
@@ -113,7 +101,7 @@ describe("toggleDaySelection refuses days that are already off", () => {
 	beforeEach(() => {
 		useHolidaysStore.setState({
 			currentSelection: SUGGESTION,
-			manuallySelectedDays: [],
+			manualDays: [],
 			removedSuggestedDays: [],
 			holidays: [],
 		});
@@ -128,7 +116,7 @@ describe("toggleDaySelection refuses days that are already off", () => {
 			.toggleDaySelection({ date: saturday, totalPtoDays: 10, locale: "en" as const, allowPastDays: true });
 
 		expect(accepted.applied).toBe(false);
-		expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(0);
+		expect(useHolidaysStore.getState().manualDays).toHaveLength(0);
 	});
 
 	it("refuses a day that any Holiday already covers, Custom ones included", () => {
@@ -142,7 +130,7 @@ describe("toggleDaySelection refuses days that are already off", () => {
 			.toggleDaySelection({ date, totalPtoDays: 10, locale: "en" as const, allowPastDays: true });
 
 		expect(accepted.applied).toBe(false);
-		expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(0);
+		expect(useHolidaysStore.getState().manualDays).toHaveLength(0);
 	});
 
 	it("still accepts an ordinary Workday", () => {
@@ -154,13 +142,13 @@ describe("toggleDaySelection refuses days that are already off", () => {
 			.toggleDaySelection({ date: wednesday, totalPtoDays: 10, locale: "en" as const, allowPastDays: true });
 
 		expect(accepted.applied).toBe(true);
-		expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(1);
+		expect(useHolidaysStore.getState().manualDays).toHaveLength(1);
 	});
 
 	it("still lets an existing Manual Day be removed even once a Holiday has landed on it", () => {
 		const date = new Date(2026, 2, 11);
 		useHolidaysStore.setState({
-			manuallySelectedDays: [date],
+			manualDays: [date],
 			holidays: [makeHoliday({ id: "national-1", dateStr: "2026-03-11" })],
 		});
 
@@ -169,7 +157,7 @@ describe("toggleDaySelection refuses days that are already off", () => {
 			.toggleDaySelection({ date, totalPtoDays: 10, locale: "en" as const, allowPastDays: true });
 
 		expect(accepted.applied).toBe(true);
-		expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(0);
+		expect(useHolidaysStore.getState().manualDays).toHaveLength(0);
 	});
 
 	it("names the weekend as the reason, so the caller need not re-derive it", () => {
@@ -211,7 +199,7 @@ describe("toggleDaySelection refuses days that are already off", () => {
 	it("names an exhausted budget as the reason", () => {
 		useHolidaysStore.setState({
 			currentSelection: { days: [new Date(2026, 2, 9)], bridges: [], metrics: null } as never,
-			manuallySelectedDays: [],
+			manualDays: [],
 			removedSuggestedDays: [],
 		});
 
@@ -230,7 +218,7 @@ describe("editHoliday collisions", () => {
 	it("lets a holiday keep its own date, since it cannot collide with itself", () => {
 		useHolidaysStore.setState({
 			holidays: [makeHoliday({ id: "custom-1", dateStr: "2026-03-11", variant: HolidayVariant.CUSTOM })],
-			manuallySelectedDays: [],
+			manualDays: [],
 		});
 
 		const outcome = useHolidaysStore.getState().editHoliday({
@@ -248,7 +236,7 @@ describe("editHoliday collisions", () => {
 	it("refuses to move a holiday onto a date already spent as a PTO day", () => {
 		useHolidaysStore.setState({
 			holidays: [makeHoliday({ id: "custom-1", dateStr: "2026-03-11", variant: HolidayVariant.CUSTOM })],
-			manuallySelectedDays: [new Date(2026, 2, 12)],
+			manualDays: [new Date(2026, 2, 12)],
 		});
 
 		useHolidaysStore.getState().editHoliday({
@@ -284,7 +272,7 @@ describe("editHoliday collisions", () => {
 	it("still moves a holiday onto a free date", () => {
 		useHolidaysStore.setState({
 			holidays: [makeHoliday({ id: "custom-1", dateStr: "2026-03-11", variant: HolidayVariant.CUSTOM })],
-			manuallySelectedDays: [new Date(2026, 2, 12)],
+			manualDays: [new Date(2026, 2, 12)],
 		});
 
 		useHolidaysStore.getState().editHoliday({
@@ -314,7 +302,7 @@ describe("the refusal reason crosses the seam", () => {
 	});
 
 	it("tells a Manual Day collision apart from a Holiday collision", () => {
-		useHolidaysStore.setState({ manuallySelectedDays: [new Date(2026, 2, 11)] });
+		useHolidaysStore.setState({ manualDays: [new Date(2026, 2, 11)] });
 
 		const outcome = useHolidaysStore.getState().addHoliday({
 			holiday: { name: "Company day", date: new Date(2026, 2, 11) },
@@ -340,7 +328,7 @@ describe("the refusal reason crosses the seam", () => {
 describe("addHoliday", () => {
 	it("refuses a date already spent as a PTO day, which would otherwise be paid for twice", () => {
 		const date = new Date(2026, 2, 10);
-		useHolidaysStore.setState({ manuallySelectedDays: [date] });
+		useHolidaysStore.setState({ manualDays: [date] });
 
 		useHolidaysStore.getState().addHoliday({
 			holiday: { name: "Company day", date: new Date(2026, 2, 10) },
@@ -352,7 +340,7 @@ describe("addHoliday", () => {
 	});
 
 	it("still adds a holiday on a date no PTO day occupies", () => {
-		useHolidaysStore.setState({ manuallySelectedDays: [new Date(2026, 2, 10)] });
+		useHolidaysStore.setState({ manualDays: [new Date(2026, 2, 10)] });
 
 		useHolidaysStore.getState().addHoliday({
 			holiday: { name: "Company day", date: new Date(2026, 2, 11) },
@@ -404,6 +392,24 @@ describe("addHoliday", () => {
 		);
 	});
 
+	it("builds a Custom Holiday through the DTO, flagged by the Planning Window the caller hands over", () => {
+		useHolidaysStore.getState().addHoliday({
+			holiday: { name: "Company day", date: new Date(2026, 2, 11) },
+			year: 2026,
+			carryOverMonths: 0,
+		});
+		useHolidaysStore.getState().addHoliday({
+			holiday: { name: "Next year", date: new Date(2027, 0, 5) },
+			year: 2026,
+			carryOverMonths: 0,
+		});
+
+		const [inside, outside] = useHolidaysStore.getState().holidays;
+
+		expect(inside).toMatchObject({ name: "Company day", variant: HolidayVariant.CUSTOM, isInPlanningWindow: true });
+		expect(outside).toMatchObject({ name: "Next year", variant: HolidayVariant.CUSTOM, isInPlanningWindow: false });
+	});
+
 	it("sorts holidays by date after adding", () => {
 		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "h1", dateStr: "2026-06-01" })] });
 		const earlyDate = new Date(2026, 0, 15);
@@ -448,6 +454,23 @@ describe("editHoliday", () => {
 		const { holidays } = useHolidaysStore.getState();
 		expect(holidays[0].name).toBe("Renamed");
 		expect(holidays[0].date).toEqual(newDate);
+	});
+
+	it("flags the edited Holiday against the Planning Window it was handed, so a move out of it leaves the display", () => {
+		useHolidaysStore.setState({ holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })] });
+
+		useHolidaysStore.getState().editHoliday({
+			holidayId: "h1",
+			updates: { name: "Moved", date: new Date(2027, 5, 15) },
+			year: 2026,
+			carryOverMonths: 1,
+		});
+
+		expect(useHolidaysStore.getState().holidays[0]).toMatchObject({
+			name: "Moved",
+			variant: HolidayVariant.CUSTOM,
+			isInPlanningWindow: false,
+		});
 	});
 
 	it("does nothing when holidayId is not found", () => {
@@ -498,15 +521,15 @@ describe("setCalculationResult", () => {
 });
 
 describe("resetManualSelection", () => {
-	it("clears manually selected and removed days", () => {
+	it("clears the Manual Days and the Removed Days", () => {
 		useHolidaysStore.setState({
-			manuallySelectedDays: [new Date(2026, 0, 3)],
+			manualDays: [new Date(2026, 0, 3)],
 			removedSuggestedDays: [new Date(2026, 0, 1)],
 			currentSelection: null,
 		});
 		useHolidaysStore.getState().resetManualSelection();
 		const state = useHolidaysStore.getState();
-		expect(state.manuallySelectedDays).toHaveLength(0);
+		expect(state.manualDays).toHaveLength(0);
 		expect(state.removedSuggestedDays).toHaveLength(0);
 	});
 
@@ -518,7 +541,7 @@ describe("resetManualSelection", () => {
 			alternatives: [],
 			currentSelection: modified,
 			currentSelectionIndex: 0,
-			manuallySelectedDays: [],
+			manualDays: [],
 			removedSuggestedDays: [],
 		});
 		useHolidaysStore.getState().resetManualSelection();
@@ -532,7 +555,7 @@ describe("resetManualSelection", () => {
 			alternatives: [],
 			currentSelection: suggestion,
 			currentSelectionIndex: 0,
-			manuallySelectedDays: [new Date(2026, 0, 3)],
+			manualDays: [new Date(2026, 0, 3)],
 			removedSuggestedDays: [],
 			planRevision: 4,
 		});
@@ -545,7 +568,7 @@ describe("resetManualSelection", () => {
 	it("bumps planRevision even when there is no current selection", () => {
 		useHolidaysStore.setState({
 			currentSelection: null,
-			manuallySelectedDays: [new Date(2026, 0, 3)],
+			manualDays: [new Date(2026, 0, 3)],
 			removedSuggestedDays: [],
 			planRevision: 0,
 		});
@@ -557,20 +580,20 @@ describe("resetManualSelection", () => {
 });
 
 describe("trimManualDays", () => {
-	it("trims manuallySelectedDays to maxPtoDays", () => {
+	it("trims manualDays to maxPtoDays", () => {
 		useHolidaysStore.setState({
-			manuallySelectedDays: [new Date(2026, 0, 1), new Date(2026, 0, 2), new Date(2026, 0, 3)],
+			manualDays: [new Date(2026, 0, 1), new Date(2026, 0, 2), new Date(2026, 0, 3)],
 		});
 		useHolidaysStore.getState().trimManualDays(2);
-		expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(2);
+		expect(useHolidaysStore.getState().manualDays).toHaveLength(2);
 	});
 
 	it("does nothing when length is within limit", () => {
 		useHolidaysStore.setState({
-			manuallySelectedDays: [new Date(2026, 0, 1)],
+			manualDays: [new Date(2026, 0, 1)],
 		});
 		useHolidaysStore.getState().trimManualDays(5);
-		expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(1);
+		expect(useHolidaysStore.getState().manualDays).toHaveLength(1);
 	});
 });
 
@@ -586,23 +609,23 @@ describe("toggleDaySelection", () => {
 		});
 	});
 
-	it("removes a day from manuallySelectedDays when already manually selected", () => {
+	it("removes a day from manualDays when it is already a Manual Day", () => {
 		const suggestion = makeSuggestion([]);
 		useHolidaysStore.setState({
 			currentSelection: suggestion,
-			manuallySelectedDays: [baseDate],
+			manualDays: [baseDate],
 			removedSuggestedDays: [],
 		});
 		const result = useHolidaysStore.getState().toggleDaySelection({ date: baseDate, ...PARAMS });
 		expect(result).toEqual({ applied: true, change: DayChange.MANUAL_DAY_REMOVED });
-		expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(0);
+		expect(useHolidaysStore.getState().manualDays).toHaveLength(0);
 	});
 
 	it("re-adds a suggested day that was removed", () => {
 		const suggestion = makeSuggestion([baseDate]);
 		useHolidaysStore.setState({
 			currentSelection: suggestion,
-			manuallySelectedDays: [],
+			manualDays: [],
 			removedSuggestedDays: [baseDate],
 		});
 		expect(useHolidaysStore.getState().toggleDaySelection({ date: baseDate, ...PARAMS })).toEqual({
@@ -616,7 +639,7 @@ describe("toggleDaySelection", () => {
 		const suggestion = makeSuggestion([baseDate]);
 		useHolidaysStore.setState({
 			currentSelection: suggestion,
-			manuallySelectedDays: [],
+			manualDays: [],
 			removedSuggestedDays: [],
 		});
 		expect(useHolidaysStore.getState().toggleDaySelection({ date: baseDate, ...PARAMS })).toEqual({
@@ -631,7 +654,7 @@ describe("toggleDaySelection", () => {
 		useFiltersStore.setState({ year: 2029 });
 		useHolidaysStore.setState({
 			currentSelection: makeSuggestion([baseDate]),
-			manuallySelectedDays: [],
+			manualDays: [],
 			removedSuggestedDays: [],
 		});
 		useHolidaysStore.getState().toggleDaySelection({ date: baseDate, ...PARAMS });
@@ -648,28 +671,28 @@ describe("toggleDaySelection", () => {
 		]);
 		useHolidaysStore.setState({
 			currentSelection: suggestion,
-			manuallySelectedDays: [],
+			manualDays: [],
 			removedSuggestedDays: [],
 		});
 		const result = useHolidaysStore
 			.getState()
 			.toggleDaySelection({ date: baseDate, totalPtoDays: 5, locale: "en" as const, allowPastDays: false });
 		expect(result.applied).toBe(false);
-		expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(0);
+		expect(useHolidaysStore.getState().manualDays).toHaveLength(0);
 	});
 
 	it("adds an unselected day when budget allows", () => {
 		const suggestion = makeSuggestion([new Date(2026, 4, 1)]);
 		useHolidaysStore.setState({
 			currentSelection: suggestion,
-			manuallySelectedDays: [],
+			manualDays: [],
 			removedSuggestedDays: [],
 		});
 		const result = useHolidaysStore
 			.getState()
 			.toggleDaySelection({ date: baseDate, totalPtoDays: 5, locale: "en" as const, allowPastDays: false });
 		expect(result.applied).toBe(true);
-		expect(useHolidaysStore.getState().manuallySelectedDays).toHaveLength(1);
+		expect(useHolidaysStore.getState().manualDays).toHaveLength(1);
 	});
 });
 
@@ -728,11 +751,11 @@ describe("setCurrentAlternativeSelection", () => {
 
 	it("keeps the Manual Days, which every Alternative was planned around", () => {
 		const manual = new Date(2026, 0, 5);
-		useHolidaysStore.setState({ manuallySelectedDays: [manual] });
+		useHolidaysStore.setState({ manualDays: [manual] });
 
 		useHolidaysStore.getState().setCurrentAlternativeSelection({ suggestion: makeSuggestion([]), index: 0 });
 
-		expect(useHolidaysStore.getState().manuallySelectedDays).toEqual([manual]);
+		expect(useHolidaysStore.getState().manualDays).toEqual([manual]);
 	});
 
 	it("asks for a re-plan, which is what reconciles a Manual Day added since the last run", () => {
@@ -758,16 +781,16 @@ describe("setPreviewAlternativeSelection", () => {
 		expect(useHolidaysStore.getState().previewAlternativeIndex).toBe(1);
 	});
 
-	it("does not modify currentSelection or manuallySelectedDays", () => {
+	it("does not modify currentSelection or manualDays", () => {
 		const currentSuggestion = makeSuggestion([new Date(2026, 4, 1)]);
 		useHolidaysStore.setState({
 			currentSelection: currentSuggestion,
-			manuallySelectedDays: [new Date(2026, 0, 10)],
+			manualDays: [new Date(2026, 0, 10)],
 		});
 		useHolidaysStore.getState().setPreviewAlternativeSelection({ index: 1 });
 		const state = useHolidaysStore.getState();
 		expect(state.currentSelection).toBe(currentSuggestion);
-		expect(state.manuallySelectedDays).toHaveLength(1);
+		expect(state.manualDays).toHaveLength(1);
 	});
 });
 
@@ -777,7 +800,7 @@ describe("resetToDefaults", () => {
 			holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })],
 			maxAlternatives: 8,
 			isCalculating: true,
-			manuallySelectedDays: [new Date(2026, 0, 5)],
+			manualDays: [new Date(2026, 0, 5)],
 			currentSelectionIndex: 3,
 			suggestion: makeSuggestion([new Date(2026, 4, 1)]),
 		});
@@ -786,7 +809,7 @@ describe("resetToDefaults", () => {
 		expect(state.holidays).toHaveLength(0);
 		expect(state.maxAlternatives).toBe(4);
 		expect(state.isCalculating).toBe(false);
-		expect(state.manuallySelectedDays).toHaveLength(0);
+		expect(state.manualDays).toHaveLength(0);
 		expect(state.currentSelectionIndex).toBe(0);
 		expect(state.suggestion).toBeNull();
 		expect(state.currentSelection).toBeNull();
@@ -923,17 +946,17 @@ describe("pruneDaysOutsideWindow", () => {
 	it("keeps the last day of the last carry-over month, which is where the two window definitions could differ", () => {
 		const lastDay = new Date(2027, 0, 31);
 		const firstDayAfter = new Date(2027, 1, 1);
-		useHolidaysStore.setState({ manuallySelectedDays: [lastDay, firstDayAfter] });
+		useHolidaysStore.setState({ manualDays: [lastDay, firstDayAfter] });
 
 		useHolidaysStore.getState().pruneDaysOutsideWindow(WINDOW);
 
-		expect(useHolidaysStore.getState().manuallySelectedDays).toEqual([lastDay]);
+		expect(useHolidaysStore.getState().manualDays).toEqual([lastDay]);
 	});
 
 	it("keeps only the manual days inside the planning window", () => {
-		useHolidaysStore.setState({ manuallySelectedDays: [beforeWindow, inYear, inCarryOver, afterWindow] });
+		useHolidaysStore.setState({ manualDays: [beforeWindow, inYear, inCarryOver, afterWindow] });
 		useHolidaysStore.getState().pruneDaysOutsideWindow(WINDOW);
-		expect(useHolidaysStore.getState().manuallySelectedDays).toEqual([inYear, inCarryOver]);
+		expect(useHolidaysStore.getState().manualDays).toEqual([inYear, inCarryOver]);
 	});
 
 	it("keeps only the removed suggested days inside the planning window", () => {
@@ -943,23 +966,23 @@ describe("pruneDaysOutsideWindow", () => {
 	});
 
 	it("drops carry-over days once the window no longer reaches them", () => {
-		useHolidaysStore.setState({ manuallySelectedDays: [inYear, inCarryOver] });
+		useHolidaysStore.setState({ manualDays: [inYear, inCarryOver] });
 		useHolidaysStore.getState().pruneDaysOutsideWindow({ year: 2026, carryOverMonths: 0 });
-		expect(useHolidaysStore.getState().manuallySelectedDays).toEqual([inYear]);
+		expect(useHolidaysStore.getState().manualDays).toEqual([inYear]);
 	});
 
 	it("leaves the arrays untouched when every day is inside the window", () => {
-		const manuallySelectedDays = [inYear, inCarryOver];
-		useHolidaysStore.setState({ manuallySelectedDays });
+		const manualDays = [inYear, inCarryOver];
+		useHolidaysStore.setState({ manualDays });
 		useHolidaysStore.getState().pruneDaysOutsideWindow(WINDOW);
-		expect(useHolidaysStore.getState().manuallySelectedDays).toBe(manuallySelectedDays);
+		expect(useHolidaysStore.getState().manualDays).toBe(manualDays);
 	});
 
 	it("falls back to the window held by the filters store", () => {
 		useFiltersStore.setState({ year: 2026, carryOverMonths: 1 });
-		useHolidaysStore.setState({ manuallySelectedDays: [inYear, afterWindow] });
+		useHolidaysStore.setState({ manualDays: [inYear, afterWindow] });
 		useHolidaysStore.getState().pruneDaysOutsideWindow();
-		expect(useHolidaysStore.getState().manuallySelectedDays).toEqual([inYear]);
+		expect(useHolidaysStore.getState().manualDays).toEqual([inYear]);
 	});
 });
 
@@ -971,9 +994,20 @@ describe("persistence", () => {
 	};
 
 	const rehydrateFrom = async (state: Partial<HolidaysState>) => {
-		mockStorageGetItem.mockResolvedValueOnce({ state: persist(state), version: 1 });
+		mockStorageGetItem.mockResolvedValueOnce({ state: persist(state), version: 2 });
 		await useHolidaysStore.persist.rehydrate();
 		return useHolidaysStore.getState();
+	};
+
+	const rehydrateBlobOf = async (blob: Record<string, unknown>) => {
+		mockStorageGetItem.mockResolvedValueOnce({ state: blob, version: 1 });
+		await useHolidaysStore.persist.rehydrate();
+		return useHolidaysStore.getState();
+	};
+
+	const versionOneBlob = (state: Partial<HolidaysState>) => {
+		const { manualDays, ...rest } = persist(state);
+		return { ...rest, manuallySelectedDays: manualDays };
 	};
 
 	beforeEach(() => {
@@ -993,13 +1027,13 @@ describe("persistence", () => {
 			holidays: [makeHoliday({ id: "h1", dateStr: "2026-01-01" })],
 			suggestion: makeSuggestion([new Date(2026, 4, 1)]),
 			currentSelection: makeSuggestion([new Date(2026, 4, 1)]),
-			manuallySelectedDays: [new Date(2026, 6, 15)],
+			manualDays: [new Date(2026, 6, 15)],
 			removedSuggestedDays: [new Date(2026, 7, 20)],
 		});
 		expect(state.holidays[0].date).toBeInstanceOf(Date);
 		expect(state.suggestion?.days[0]).toBeInstanceOf(Date);
 		expect(state.currentSelection?.days[0]).toBeInstanceOf(Date);
-		expect(state.manuallySelectedDays[0]).toEqual(new Date(2026, 6, 15));
+		expect(state.manualDays[0]).toEqual(new Date(2026, 6, 15));
 		expect(state.removedSuggestedDays[0]).toEqual(new Date(2026, 7, 20));
 	});
 
@@ -1068,11 +1102,53 @@ describe("persistence", () => {
 
 	it("prunes days belonging to another planning window", async () => {
 		const state = await rehydrateFrom({
-			manuallySelectedDays: [new Date(2026, 6, 15), new Date(2027, 6, 15)],
+			manualDays: [new Date(2026, 6, 15), new Date(2027, 6, 15)],
 			removedSuggestedDays: [new Date(2027, 6, 16)],
 		});
-		expect(state.manuallySelectedDays).toEqual([new Date(2026, 6, 15)]);
+		expect(state.manualDays).toEqual([new Date(2026, 6, 15)]);
 		expect(state.removedSuggestedDays).toEqual([]);
+	});
+
+	it("keeps the Manual Days a version 1 blob stored under their old key", async () => {
+		const state = await rehydrateBlobOf(versionOneBlob({ manualDays: [new Date(2026, 6, 15), new Date(2026, 6, 16)] }));
+
+		expect(state.manualDays).toEqual([new Date(2026, 6, 15), new Date(2026, 6, 16)]);
+	});
+
+	it("keeps the first and last Rest Block of every plan a version 1 blob stored under their old key", async () => {
+		interface LegacyPlanParams {
+			day: Date;
+			firstLastBreak: { first: string; last: string } | null;
+		}
+		const legacyPlan = ({ day, firstLastBreak }: LegacyPlanParams) => {
+			const { firstLastRestBlock: _renamed, ...metrics } = {
+				...makeSuggestion([day]).metrics,
+				firstLastRestBlock: null,
+			};
+			return { ...makeSuggestion([day]), metrics: { ...metrics, firstLastBreak } };
+		};
+		const blob = versionOneBlob({});
+		const state = await rehydrateBlobOf({
+			...blob,
+			suggestion: legacyPlan({ day: new Date(2026, 4, 1), firstLastBreak: { first: "May", last: "May" } }),
+			alternatives: [legacyPlan({ day: new Date(2026, 5, 2), firstLastBreak: { first: "June", last: "June" } })],
+			currentSelection: legacyPlan({ day: new Date(2026, 4, 1), firstLastBreak: null }),
+		});
+
+		expect(state.suggestion?.metrics.firstLastRestBlock).toEqual({ first: "May", last: "May" });
+		expect(state.alternatives[0]?.metrics.firstLastRestBlock).toEqual({ first: "June", last: "June" });
+		expect(state.currentSelection?.metrics.firstLastRestBlock).toBeNull();
+		expect(state.suggestion?.metrics).not.toHaveProperty("firstLastBreak");
+	});
+
+	it("reads a version 2 blob as it was written, with nothing to migrate", async () => {
+		const state = await rehydrateFrom({
+			manualDays: [new Date(2026, 6, 15)],
+			suggestion: makeSuggestion([new Date(2026, 4, 1)]),
+		});
+
+		expect(state.manualDays).toEqual([new Date(2026, 6, 15)]);
+		expect(state.suggestion?.days).toEqual([new Date(2026, 4, 1)]);
 	});
 
 	it("clears the stored blob when rehydration fails", () => {
@@ -1094,7 +1170,7 @@ describe("generateSuggestions", () => {
 		ptoDays: 5,
 		allowPastDays: false,
 		carryOverMonths: 0,
-		strategy: FilterStrategy.GROUPED,
+		strategy: Strategy.GROUPED,
 		preferredMonths: [6, 7],
 		locale: "en" as const,
 	};
@@ -1107,7 +1183,7 @@ describe("generateSuggestions", () => {
 		const removed = new Date(2026, 2, 12);
 		useHolidaysStore.setState({
 			holidays: [holiday],
-			manuallySelectedDays: [manual],
+			manualDays: [manual],
 			removedSuggestedDays: [removed],
 			maxAlternatives: 2,
 		});
@@ -1116,7 +1192,7 @@ describe("generateSuggestions", () => {
 
 		expect(planningInput()).toMatchObject({
 			holidays: [holiday],
-			manuallySelectedDays: [manual],
+			manualDays: [manual],
 			removedSuggestedDays: [removed],
 			maxAlternatives: 2,
 		});
@@ -1130,14 +1206,14 @@ describe("generateSuggestions", () => {
 			ptoDays: 10,
 			carryOverMonths: 2,
 			allowPastDays: true,
-			strategy: FilterStrategy.OPTIMIZED,
+			strategy: Strategy.OPTIMIZED,
 		});
 
 		expect(planningInput()).toMatchObject({
 			window: { year: 2026, carryOverMonths: 2 },
 			ptoDays: 10,
 			allowPastDays: true,
-			strategy: FilterStrategy.OPTIMIZED,
+			strategy: Strategy.OPTIMIZED,
 			locale: "en",
 		});
 	});
@@ -1201,7 +1277,7 @@ describe("every Metrics writer measures against the same Planning Window", () =>
 		useFiltersStore.setState({ carryOverMonths: 2, year: 2026 });
 		useHolidaysStore.setState({
 			currentSelection: { days: [], bridges: [], metrics: null } as never,
-			manuallySelectedDays: [],
+			manualDays: [],
 			removedSuggestedDays: [],
 			holidays: [],
 		});

@@ -5,7 +5,7 @@ import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 const mockSetCalculating = vi.hoisted(() => vi.fn());
 const mockSetCalculationResult = vi.hoisted(() => vi.fn());
 const storeState = vi.hoisted(() => ({
-	manuallySelectedDays: [] as Date[],
+	manualDays: [] as Date[],
 	removedSuggestedDays: [] as Date[],
 	currentSelection: null as { days: Date[] } | null,
 	holidays: [] as never[],
@@ -16,7 +16,7 @@ const mockGetState = vi.hoisted(() =>
 	vi.fn(() => ({
 		removedSuggestedDays: storeState.removedSuggestedDays,
 		currentSelection: storeState.currentSelection,
-		manuallySelectedDays: storeState.manuallySelectedDays,
+		manualDays: storeState.manualDays,
 		setCalculating: mockSetCalculating,
 		claimPlanAskedFor: () => {
 			const asked = storeState.planAskedFor;
@@ -37,7 +37,7 @@ vi.mock("@application/stores/holidays", () => ({
 				setCalculationResult: mockSetCalculationResult,
 				holidays: storeState.holidays,
 				maxAlternatives: storeState.maxAlternatives,
-				manuallySelectedDays: storeState.manuallySelectedDays,
+				manualDays: storeState.manualDays,
 				removedSuggestedDays: storeState.removedSuggestedDays,
 				currentSelection: storeState.currentSelection,
 			}),
@@ -106,7 +106,7 @@ const PLAN = {
 		quarterDist: [],
 		monthlyDist: [],
 		longBlocksPerQuarter: [],
-		firstLastBreak: { first: "2025-01-01", last: "2025-12-24" },
+		firstLastRestBlock: { first: "2025-01-01", last: "2025-12-24" },
 	},
 };
 
@@ -141,7 +141,7 @@ beforeEach(() => {
 	workerInstance.onmessage = null;
 	workerInstance.onerror = null;
 	workerInstance.onmessageerror = null;
-	storeState.manuallySelectedDays = [];
+	storeState.manualDays = [];
 	storeState.removedSuggestedDays = [];
 	storeState.currentSelection = null;
 });
@@ -177,7 +177,7 @@ describe("useCalculationsWorker", () => {
 		const { result, rerender } = renderHook(() => useCalculationsWorker());
 		const before = result.current.triggerCalculation;
 
-		storeState.manuallySelectedDays = MANUAL_DAYS;
+		storeState.manualDays = MANUAL_DAYS;
 		rerender();
 
 		expect(result.current.triggerCalculation).toBe(before);
@@ -186,7 +186,7 @@ describe("useCalculationsWorker", () => {
 	it("still reads the hand-picked days set after mount, so a stale identity never sends a stale budget", () => {
 		const { result, rerender } = renderHook(() => useCalculationsWorker());
 
-		storeState.manuallySelectedDays = MANUAL_DAYS;
+		storeState.manualDays = MANUAL_DAYS;
 		rerender();
 		act(() => {
 			result.current.triggerCalculation(BASE_PARAMS);
@@ -310,7 +310,7 @@ describe("useCalculationsWorker", () => {
 	});
 
 	it("sends the manual and removed days in the payload", () => {
-		storeState.manuallySelectedDays = MANUAL_DAYS;
+		storeState.manualDays = MANUAL_DAYS;
 		storeState.removedSuggestedDays = [REMOVED_DAY];
 		const { result } = renderHook(() => useCalculationsWorker());
 
@@ -323,7 +323,7 @@ describe("useCalculationsWorker", () => {
 	});
 
 	it("caps autoSuggestCount to the days still active in the current selection", () => {
-		storeState.manuallySelectedDays = MANUAL_DAYS;
+		storeState.manualDays = MANUAL_DAYS;
 		storeState.removedSuggestedDays = [REMOVED_DAY];
 		storeState.currentSelection = { days: SUGGESTED_DAYS };
 		const { result } = renderHook(() => useCalculationsWorker());

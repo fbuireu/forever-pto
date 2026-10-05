@@ -1,4 +1,4 @@
-import { hasSucceeded, wasCharged } from "@application/dto/payment/dto";
+import { hasSucceeded, wasCharged } from "@application/dto/payment/rules";
 import { paymentConfirmationQuerySchema } from "@application/dto/payment/schema";
 import { ACTIVATION_FAILED } from "@application/dto/payment/types";
 import { Link } from "@application/i18n/navigation";

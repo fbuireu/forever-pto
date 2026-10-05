@@ -2,7 +2,7 @@ import { routeMetadata } from "@infrastructure/seo/routeMetadata";
 import { getPublicEnv } from "@infrastructure/services/env/getPublicEnv";
 import { createRichLink } from "@ui/modules/core/primitives/RichLink";
 import { LegalLayout } from "@ui/modules/layout/LegalLayout";
-import { Me } from "@ui/modules/pages/legal/Me";
+import { Me } from "@ui/modules/shared/legal-identity/Me";
 import { getLastUpdatedDate } from "@ui/utils/getLastUpdatedDate";
 import type { Locale } from "next-intl";
 import { getTranslations } from "next-intl/server";

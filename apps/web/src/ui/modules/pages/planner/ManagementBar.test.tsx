@@ -1,5 +1,9 @@
+import caMessages from "@i18n/messages/ca.json";
 import deMessages from "@i18n/messages/de.json";
+import enMessages from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
+import frMessages from "@i18n/messages/fr.json";
+import itMessages from "@i18n/messages/it.json";
 import { act, fireEvent, render } from "@testing-library/react";
 import { TUTORIAL_EVENT } from "@ui/modules/tutorial/anchors";
 import { type Locale, NextIntlClientProvider } from "next-intl";
@@ -199,6 +203,30 @@ describe("ManagementBar drawer header", () => {
 		expect(text).toContain("9 días");
 		expect(text).toContain("4,5x");
 	});
+
+	it.each([
+		["en", enMessages],
+		["es", esMessages],
+		["ca", caMessages],
+		["it", itMessages],
+		["de", deMessages],
+		["fr", frMessages],
+	] as const)(
+		"writes the %s efficiency whole, in its own decimal, with no raw tag, brace or key",
+		(locale, messages) => {
+			readyState.areStoresReady = true;
+			holidaysState.suggestion = applied as never;
+			holidaysState.currentSelection = applied as never;
+			holidaysState.alternatives = [previewed] as never;
+			holidaysState.currentSelectionIndex = 0;
+			holidaysState.previewAlternativeIndex = 1;
+
+			const text = renderBar({ locale, messages }).container.textContent ?? "";
+
+			expect(text).toContain(`${new Intl.NumberFormat(locale, { minimumFractionDigits: 1 }).format(4.5)}x`);
+			expect(text).not.toMatch(/[<>{}]|alternativesManager\./);
+		},
+	);
 
 	it("counts a single Effective Day in the singular, which a number glued to a plural noun could not", () => {
 		const single = makeSuggestion({ effectiveDays: 1, efficiency: 1 });

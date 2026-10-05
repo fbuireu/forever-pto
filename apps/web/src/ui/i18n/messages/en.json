@@ -71,6 +71,7 @@
 			"effectiveDays": "Effective days",
 			"overBudget": "{increment, plural, =0 {0} other {+#}} over your {ptoDays}-day budget",
 			"gain": "Gain",
+			"gainValue": "<n>{gain}</n>%",
 			"perPtoDay": "of your {ptoDays}-day budget",
 			"longWeekends": "Long weekends",
 			"restBlocks": "Rest blocks",
@@ -83,20 +84,21 @@
 		},
 		"yearSummary": {
 			"feature": "Year summary",
-			"featureDescription": "Detailed analysis of your days off.",
+			"featureDescription": "Detailed analysis of your effective days.",
 			"title": "Year summary",
-			"firstBreak": "First break",
+			"firstBreak": "First rest block",
 			"maxWorkStreak": "Max work streak",
-			"lastBreak": "Last break",
+			"lastBreak": "Last rest block",
 			"totalBonusDays": "Total bonus days",
 			"bonusDaysCaption": "bonus days from optimizing",
+			"bonusDaysCount": "+<n>{count}</n>",
 			"daysCount": "{count, plural, one {<n>#</n> day} other {<n>#</n> days}}"
 		},
 		"summaryParagraph": {
 			"withGain": "With your {ptoDays, plural, one {# PTO day} other {# PTO days}} and {totalHolidays, plural, one {# public holiday} other {# public holidays}}, the {strategy} strategy turns them into {effectiveDays, plural, one {# effective day} other {# effective days}}, that’s {increment, plural, one {# day} other {# days}} over your budget, a +{percentage} gain over simply using them as-is.",
 			"withoutGain": "With your {ptoDays, plural, one {# PTO day} other {# PTO days}} and {totalHolidays, plural, one {# public holiday} other {# public holidays}}, you get {effectiveDays, plural, one {# effective day} other {# effective days}} using the {strategy} strategy.",
 			"noRegionHintTitle": "Add your region",
-			"noRegionHint": "Select your region in the sidebar to include regional holidays and squeeze out even more days off.",
+			"noRegionHint": "Select your region in the sidebar to include regional holidays and squeeze out even more effective days.",
 			"withRegion": "{regionalDays, plural, one {# of your holidays is specific to {region}.} other {# of your holidays are specific to {region}.}}"
 		},
 		"notifications": {
@@ -268,8 +270,8 @@
 		"deleteCount": "Delete ({count})"
 	},
 	"charts": {
-		"daysOffComposition": "Days off composition",
-		"daysOffCompositionFeature": "Days off composition chart",
+		"daysOffComposition": "PTO days and public holidays",
+		"daysOffCompositionFeature": "PTO days and public holidays chart",
 		"quarterDistribution": "Quarter distribution",
 		"quarterDistributionFeature": "Quarter distribution chart",
 		"daysValue": "{count, plural, one {# day} other {# days}}",
@@ -339,13 +341,13 @@
 		"progressText": "{current} of {total}",
 		"steps": {
 			"toolsTitle": "Calculators & tools",
-			"toolsDescription": "Calculators live here: estimate how many PTO days you've accrued, see what unused days cost you in salary, or count workdays between two dates.",
+			"toolsDescription": "Calculators live here: estimate how many PTO days you've accrued, see what the PTO days you leave unspent cost you in salary, or count workdays between two dates.",
 			"alternativesTitle": "Alternatives manager",
 			"alternativesDescription": "Browse the alternatives we generated and compare their efficiency and effective days. The first one is our top pick, marked with a sparkle. Use the arrows to move between them, then click \"Apply alternative\" to switch.",
 			"statusTitle": "PTO status tracker",
-			"statusDescription": "Track your PTO at a glance: auto-assigned days, manually selected days, and how many are left. Reset manual changes anytime to go back to the suggested plan.",
+			"statusDescription": "Track your PTO at a glance: suggested days, manual days, and how many are left. Reset manual changes anytime to go back to the suggested plan.",
 			"calendarTitle": "Your PTO calendar",
-			"calendarDescription": "This calendar shows your whole year. Holidays appear in gray, suggested PTO days in teal, and manually selected days in blue. Click any Workday to manually toggle selection. It updates as you switch between alternatives.",
+			"calendarDescription": "This calendar shows your whole year. Holidays appear in gray, suggested PTO days in teal, and manual days in blue. Click any Workday to manually toggle selection. It updates as you switch between alternatives.",
 			"finishTitle": "You're all set!",
 			"finishDescription": "Configure your preferences in the sidebar and we'll suggest the best PTO days to take.",
 			"holidaysListTitle": "Customize your holidays",
@@ -404,8 +406,8 @@
 		"remainingCount": "<label>Remaining:</label> <n>{count}</n>",
 		"allAssigned": "All days assigned!",
 		"resetManual": "Reset manual changes",
-		"usedDays": "{used} / {total, plural, one {# day used} other {# days used}} · {pct}%",
-		"remainingDays": "{remaining} remaining · {pct}%"
+		"usedDays": "{used} / {total, plural, one {# day used} other {# days used}} · {pct}",
+		"remainingDays": "{remaining} remaining · {pct}"
 	},
 	"contact": {
 		"title": "Contact us",
@@ -440,7 +442,9 @@
 		"recommended": "Recommended",
 		"totalOff": "Effective days",
 		"efficiency": "Efficiency",
-		"efficiencyValue": "{efficiency}x",
+		"efficiencyValue": "<n>{efficiency}</n>x",
+		"comparisonPercent": "<n>{percent}</n>%",
+		"bonusDaysBadge": "(+<n>{bonusDays}</n>)",
 		"efficiencyReadout": "{suggestion, select, recommended {Efficiency: {efficiency}x} other {Efficiency: {efficiency}x ({difference})}}",
 		"vsMain": "vs main",
 		"alreadyApplied": "Already applied",
@@ -524,7 +528,7 @@
 			},
 			"optimized": {
 				"label": "Optimized",
-				"description": "Maximizes your total days off",
+				"description": "Maximizes your total effective days",
 				"subtitle": "Every PTO day returns as much as it can",
 				"pros": {
 					"maximumEfficiency": "Maximum efficiency",
@@ -608,11 +612,11 @@
 		"increase": "Increase PTO days",
 		"status": "PTO days status",
 		"autoAssigned": "Suggested:",
-		"manuallySelected": "Manually selected:",
+		"manuallySelected": "Manual:",
 		"remaining": "Remaining:",
 		"resetManualChanges": "Reset manual changes",
 		"allAssigned": "All days assigned!",
-		"clickToAssign": "Click on days in the calendar to manually assign remaining days"
+		"clickToAssign": "Click on days in the calendar to manually assign your remaining budget"
 	},
 	"ptoCalculator": {
 		"title": "PTO accrual calculator",
@@ -879,7 +883,7 @@
 		"selectAllHolidays": "Select all holidays",
 		"unlockFeature": "Unlock premium feature: {feature}",
 		"premiumFeature": "Premium feature",
-		"unlockDescription": "Get premium to manually add or remove suggestions and manage your remaining days.",
+		"unlockDescription": "Get premium to manually add or remove suggestions and manage your remaining budget.",
 		"becomePremium": "Get premium"
 	},
 	"calendar": {

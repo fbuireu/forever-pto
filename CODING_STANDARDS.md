@@ -76,26 +76,33 @@ No rule below restates these, and a diff that breaks one fails CI:
     generated code; a test may pin a resolved value;
   - the custom properties: every `var(--x)` read in `apps/web/src`, by a class, a stylesheet or a style key, declared by
     a stylesheet outside `@theme inline`, a style key, an arbitrary property, `setProperty`, a font's `variable`, a Base
-    UI `CssVars` module or Tailwind's default theme;
+    UI `CssVars` module or Tailwind's default theme, except that a CSS module counts none of Tailwind's on-demand
+    theme (its default and a plain `@theme` block) and reads what an `@theme static` block or a token declares;
   - the shipped stylesheet: built with Tailwind's own compiler and scanner from `index.css`, it scans no test, no
     end-to-end spec and no Markdown and emits no palette utility;
   - the code at large: `Temporal` from `temporal-polyfill`, Stripe.js imported through `@stripe/stripe-js/pure` and
     asked for only inside a function (the bare entry and a module-scope ask both fetch the script on every load), no
-    `index` module, no declared function or `const` arrow taking two positional parameters in `apps/web`, its tests,
-    its e2e specs or this suite (a route's HTTP method handlers aside), no number in the planning engine but 0, 1 and
-    a percentage's `* 100` outside `const.ts` and `window.ts`, a date format built in `dates.ts` alone, every `json()`
-    answer bound as `unknown`, never cast or typed, and every module-level schema named `<concept>Schema`;
+    `index` module, one argument passed positionally and two or more as one object in `apps/web`, its tests, its e2e
+    specs and this suite (no declared function or `const` arrow taking two positional parameters, a route's HTTP
+    method handlers aside, and no `…Params` type, nor inline parameter type of a function that takes no props, with a
+    single field of its own), no number in the planning engine but 0, 1 and a percentage's `* 100` outside `const.ts`
+    and `window.ts`, a date format built in `dates.ts` alone, a Holiday's `isInPlanningWindow` read in
+    `dto/holiday/rules.ts` alone, every `json()` answer bound as `unknown`, never cast or typed, and every
+    module-level schema named `<concept>Schema`;
   - the tests: a `route.test.ts` beside every route handler, no `__tests__` folder, no fixture shaped like a Stripe
-    client secret, no fixture day built from a date-only ISO string, no year read off the real clock and no
-    `Date.now()` bracket in a unit test, no test writing the process environment, every `vi.stubGlobal`,
-    `vi.stubEnv`, `vi.spyOn` and `vi.useFakeTimers` in a test file undone by `vi.unstubAllGlobals()`,
+    client secret, no fixture day built from a date-only ISO string, no DTO module mocked in a unit test, no year read
+    off the real clock and no `Date.now()` bracket in a unit test, no test writing the process environment, every
+    `vi.stubGlobal`, `vi.stubEnv`, `vi.spyOn` and `vi.useFakeTimers` in a test file undone by `vi.unstubAllGlobals()`,
     `vi.unstubAllEnvs()`, `vi.restoreAllMocks()` (or the spy's `mockRestore()`) or `vi.useRealTimers()` in an
     `afterEach` or `afterAll`, or in a `finally` around it, and a schema's answer asserted with `validate`, with
     `safeParse` only in a case that reads the issue;
   - `succeeded` compared as one value in the payments SQL, spelled by no other production module, and
     `PAYMENT_STATUSES` equal to the statuses the installed Stripe SDK knows;
   - the locale bundles holding exactly `en.json`'s keys, every key in camelCase but the machine codes and every value
-    a string, shouting nothing outside the acronym list, and addressing the user informally in German and French;
+    a string, shouting nothing outside the acronym list, addressing the user informally in German and French, styling
+    no number, date or time argument (`{n, number, percent}`), and naming no concept by a phrase the glossary retires
+    ("days off", "unused days", "manually selected" and their translations, one list per bundle) outside the marketing
+    namespaces and the legal texts;
   - the configuration: `strict` on and `allowJs` off, `cloudflare-env.d.ts` out of the program and out of git,
     `PUBLIC_ENV` classifying exactly the `NEXT_PUBLIC_*` names `environment.d.ts` declares and each wired where it is
     read, the security headers, `immutable` on `/_next/static`, every binding in every wrangler environment, the
@@ -135,7 +142,8 @@ No rule below restates these, and a diff that breaks one fails CI:
   lets rival numbers share a word, so it is a defect even on a symbol nothing calls
   ([ADR 0014](./adr/0014-ddd-where-it-pays.md)). The glossary binds code, documents and product copy; marketing copy,
   which is the homepage with its sections and the docs site's landing pages, may use the words people search for
-  ("days off", "free days", "vacation plan").
+  ("days off", "free days", "vacation plan"). In the bundles that means `homepage`, `faq`, `quickStart`,
+  `troubleshooting` and `metadata`; every other namespace, bar the four legal texts, is product copy.
 - `N2` **hard**: Call a public non-working day `Holiday` in code and docs; "public holiday" belongs only in English
   user-facing copy, where the bare word would read as vacation.
 - `N3` **hard**: Keep the Holiday Variant in `variant`; `type` is the upstream classification's field and means
@@ -156,7 +164,7 @@ No rule below restates these, and a diff that breaks one fails CI:
   assertion, a guide line, an ADR) instead of encoding it, and three yeses let a type be proposed, never require one
   ([ADR 0014](./adr/0014-ddd-where-it-pays.md)).
 - `M2` **hard**: Narrow a sealed union or a bounded shape where it crosses an untrusted boundary (persisted state,
-  the worker wire, a query string) with its own predicate, once (`isFilterStrategy`, `isHolidayVariant`,
+  the worker wire, a query string) with its own predicate, once (`isStrategy`, `isHolidayVariant`,
   `isPreferredMonths`); a value that fails it takes the default or is dropped, never guessed, and the rest of that
   wire stays typed ([ADR 0014](./adr/0014-ddd-where-it-pays.md)).
 - `M3` **hard**: Make a wrong call unrepresentable: a value the caller holds and could lose in silence behind a
@@ -205,12 +213,15 @@ No rule below restates these, and a diff that breaks one fails CI:
 
 ## Functions and modules
 
-- `F1` **hard**: Give a class or object method two or more parameters only as one object too, which the contract
-  suite does not read, so argument order carries no meaning. Name a parameter object after the function that takes it,
-  `<FunctionName>Params`, so a reader landing on the type finds what takes it; a function handed one record keeps that
-  record's type. Sibling functions that take the same input may share one type named for that role (`DatePairParams`,
-  `ObfuscationParams`), and a component's object is its `…Props`. Only a signature a runtime owns (a route handler, a
-  `.sort()` comparator, a library's callback) stays positional, and a rest list of one kind (`cn(...inputs)`) counts as
+- `F1` **hard**: Pass one argument positionally and two or more as one object, so argument order carries no meaning and
+  no `…Params` type or inline parameter type declares a single field of its own, because a wrapper around one value adds
+  a type and a destructure for nothing. The contract suite reads a declared function or a `const` arrow; a class or
+  object method follows the rule too, which the suite does not read. Name a parameter object after the function that
+  takes it, `<FunctionName>Params`, so a reader landing on the type finds what takes it; a function handed one record
+  keeps that record's type. Sibling functions that take the same input may share one type named for that role
+  (`DatePairParams`, `ObfuscationParams`), and a component takes its props as one object whatever their number, which
+  is React's contract (`…Props`). Only a signature a runtime owns (a route handler, a page's props, a `.sort()`
+  comparator, a library's callback) stays as its owner wrote it, and a rest list of one kind (`cn(...inputs)`) counts as
   one parameter. A test helper follows the same rule.
 - `F5` **hard**: Add a parameter, a cache key, an interface method or a service-tag method in the same change as its
   first caller, and remove it with its last; a demo in `apps/docs` that renders the component counts as a caller.
@@ -264,7 +275,7 @@ No rule below restates these, and a diff that breaks one fails CI:
   ([ADR 0006](./adr/0006-caller-owned-calculation-caches.md)).
 - `D5` **hard**: Compute the Remaining Budget and Gain through `measureBudget` and `measureGain`, never by
   subtracting lengths at the call site.
-- `D6` **hard**: Under `metrics/`, build a set of days off through `dayOffKeys` and write a stretch metric as a
+- `D6` **hard**: Under `metrics/`, build the set of Closed Days through `closedDayKeys` and write a stretch metric as a
   predicate over `freeStreaks`; the selector and `measurePlan` count the same days as `dayIndex` integers, and no
   fourth spelling of a day joins `dayKey`, `getKey` and `dayIndex`.
 - `D7` **hard**: Route Removed Days to `getAvailableWorkdays` only, and Manual Days to the planning calls as
@@ -310,7 +321,10 @@ No rule below restates these, and a diff that breaks one fails CI:
 - `A3` **hard**, *check pending*: Write a use-case export as `Effect.gen` with its `Effect.Effect<A, E, R>` return
   type spelled out, ending in `Effect.withSpan` named after the export; the annotation is what turns a stray
   `LoggerService` into a compile error ([ADR 0013](./adr/0013-loggerservice-stays-a-tag.md),
-  [ADR 0017](./adr/0017-observability-is-the-platform-export.md)).
+  [ADR 0017](./adr/0017-observability-is-the-platform-export.md)). Exports that differ only in the check each owes
+  (`activateWithPayment`, `activateWithClaimedPayment`) may delegate to one private `Effect.gen` and share its
+  return type as one named alias, because the annotation then bites where the requirements are yielded
+  ([ADR 0008](./adr/0008-premium-derived-from-payment.md)).
 - `A4` **hard**: Keep a use-case a value: it never runs itself, reads a request or picks an HTTP status.
 - `A5` **hard**: Do date arithmetic in `dates.ts`: on Temporal underneath, or on a local date's own fields and the
   `dayIndex` integers where a round trip per call is the cost (`isSameDay`, `dayIndex`, `fromDayIndex`); every `Date`
@@ -470,7 +484,7 @@ No rule below restates these, and a diff that breaks one fails CI:
   component renders a nameless control (`Label`'s `htmlFor`, the `Switch` and `Checkbox` name union, `Slider`'s
   `label`, `TooltipInfoTrigger`'s `aria-label`).
 - `X2` **hard**: Declare an ARIA role only together with its whole pattern (ownership, keyboard model); otherwise use
-  the semantic element.
+  the semantic element (the consent banner is a labelled `section`, and its preferences are the dialog).
 - `X3` **hard**: Pair `outline-none` with a visible focus treatment (a `focus-visible:ring-*`, the shadow an input uses,
   the background a menu item takes); only a programmatically focused popup (`PopoverContent`, `DrawerContent`) goes
   without one.
@@ -505,7 +519,10 @@ No rule below restates these, and a diff that breaks one fails CI:
 - `S7` **hard**: Read a custom property only where something declares it: a token in `global/index.css`, a stylesheet,
   code that sets it (a style key, an arbitrary property, `setProperty`, a font's `variable`) or a library that does (a
   Base UI `CssVars` module, Tailwind's default theme). A name only an `@theme inline` block declares does not count,
-  because Tailwind inlines it and never emits the property. An undeclared `var()` resolves to nothing and the property
+  because Tailwind inlines it and never emits the property, and a CSS module counts none that Tailwind emits on demand
+  (its default theme and a plain `@theme` block): it never compiles the module, so the variable exists only while some
+  utility uses it. A module reads a token, or a name an `@theme static` block declares (`--spacing` and the `--text-*`
+  and `--shadow-lg` scale steps `legend.module.css` takes). An undeclared `var()` resolves to nothing and the property
   falls back to the inherited value in silence, so a typo or a deleted token ships unnoticed.
 - `S8` **hard**: Keep what the app does not ship out of its stylesheet: `index.css` ends with the `@source not` lines for
   the test files, the `e2e` folder and the Markdown, because Tailwind scans every file under `apps/web` that git does
@@ -520,7 +537,9 @@ No rule below restates these, and a diff that breaks one fails CI:
   in the component.
 - `L3` **hard**: Pass amounts, large numbers, decimals and percentages in already formatted (`amountFormatter`,
   `useCurrencyFormatter`, `format.number`), never abbreviated or rounded by hand (`toFixed`, a `%` or `x` glued on),
-  because five of the six locales write the decimal with a comma.
+  because five of the six locales write the decimal with a comma. A message takes the formatted value as `{n}` or a
+  count as `{n, number}`, never with a style (`{pct, number, percent}`): production precompiles the bundles, and the
+  precompiled runtime knows no named format, so the argument would print a bare `1`.
 - `L4` **hard**: Keep in the `a11y` namespace every screen-reader announcement and the accessible names several
   features share; a name one feature alone uses stays in that feature's namespace, whichever component renders it.
 - `L6` **hard**: Add the key for a user-visible code in the same change as the code; a feature's `errors` carries
@@ -546,8 +565,9 @@ No rule below restates these, and a diff that breaks one fails CI:
   (`askForPlan` in the handler, `claimPlanAskedFor` where the worker's answer lands), never a load or a restore, and
   a Donation the issuer took over lands on the payment confirmation page, whose mount calls `confirmActivation` once,
   and only while the redirect's own `activation=fresh` marker is in the address, to report `premium_activated` on the
-  move into Premium; the page removes the marker once the call settles, so a reload, a revisit, a restored session or a
-  visitor whose `localStorage` was cleared reports nothing. The one `track()` inside an effect counts a view rather
+  move into Premium; the page removes the marker as it reads it, before it makes the call, so a reload, a revisit, a
+  history entry the payer left early and returned to, a restored session or a visitor whose `localStorage` was cleared
+  reports nothing. The one `track()` inside an effect counts a view rather
   than an interaction: the contact form a `#contact` link opens.
 - `P2` **hard**: Send ids and machine codes in events (a `PremiumFeatureId`, an `ApiError` code), never translated
   strings, dates, Manual Days, Custom Holiday names or a salary.
@@ -581,7 +601,7 @@ No rule below restates these, and a diff that breaks one fails CI:
   `next-intl/server` double handed `createTranslator`, whose overloads `vi.fn<typeof …>` cannot express. A double
   built from the code's reading of the API agrees with the bug.
 - `T3` **hard**: Assert through the real helper (`noStore`, the real DTO over a fixture source), not a mock that
-  re-implements it.
+  re-implements it; a unit test mocks no DTO module, whatever it returns.
 - `T4` **hard**: Give an assertion of absence, or a loop over results, a positive control: assert the list is
   non-empty, or that the suite can make the selector appear, because an assertion over an empty set passes whatever
   the code does.

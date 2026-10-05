@@ -12,7 +12,7 @@ import { Button } from "@ui/modules/core/primitives/Button";
 import { Progress, ProgressOverlayLabel, ProgressTrack } from "@ui/modules/core/primitives/Progress";
 import { TUTORIAL_ANCHOR } from "@ui/modules/tutorial/anchors";
 import { cn } from "@ui/utils/cn";
-import { BarChart3, CalendarDays, Sparkles, TrendingUp } from "lucide-react";
+import { BarChart3, CalendarDays, Check, Sparkles, TrendingUp } from "lucide-react";
 import { m, type Transition, type Variants } from "motion/react";
 import { useFormatter, useTranslations } from "next-intl";
 import { type ReactNode, useCallback } from "react";
@@ -165,8 +165,7 @@ function Alternatives({
 					<div className="flex items-center gap-1" aria-hidden="true">
 						<SlidingNumber className="text-sm font-semibold text-positive-strong" number={effectiveDays ?? 0} />
 						<span className="text-xs text-positive flex">
-							(+
-							<SlidingNumber number={bonusDays} />)
+							{t.rich("bonusDaysBadge", { bonusDays, n: () => <SlidingNumber number={bonusDays} /> })}
 						</span>
 					</div>
 					<m.span
@@ -192,16 +191,15 @@ function Alternatives({
 					</span>
 					<TrendingUp size={20} className="text-efficiency shrink-0" aria-hidden="true" />
 					<div className="flex items-center gap-1" aria-hidden="true">
-						<SlidingNumber
-							className="text-sm font-semibold text-efficiency-strong"
-							number={parseFloat(efficiency.toFixed(1))}
-							decimalPlaces={1}
-						/>
-						<span className="text-sm font-semibold text-efficiency-strong">x</span>
+						<span className="flex items-center text-sm font-semibold text-efficiency-strong">
+							{t.rich("efficiencyValue", {
+								efficiency: format.number(efficiency, EFFICIENCY_FORMAT),
+								n: () => <SlidingNumber number={efficiency} decimalPlaces={1} />,
+							})}
+						</span>
 						{!isMainSuggestion && (
-							<span className={cn("text-xs flex", efficiencyDiff >= 0 ? "text-positive" : "text-negative")}>
-								{efficiencyDiff >= 0 ? "+" : ""}
-								<SlidingNumber number={parseFloat(efficiencyDiff.toFixed(1))} decimalPlaces={1} />
+							<span className={cn("text-xs", efficiencyDiff >= 0 ? "text-positive" : "text-negative")}>
+								{format.number(efficiencyDiff, { ...EFFICIENCY_FORMAT, signDisplay: "exceptZero" })}
 							</span>
 						)}
 					</div>
@@ -225,20 +223,16 @@ function Alternatives({
 						</span>
 						<BarChart3 size={20} className="text-comparison-neutral shrink-0" aria-hidden="true" />
 						<div className="flex items-center gap-1" aria-hidden="true">
-							<SlidingNumber
-								className={cn(
-									"text-sm font-semibold",
-									efficiencyDiff >= -0.5 ? "text-caution" : "text-comparison-neutral",
-								)}
-								number={Math.round((efficiency / mainEfficiency) * 100)}
-							/>
 							<span
 								className={cn(
-									"text-sm font-semibold",
+									"flex items-center text-sm font-semibold",
 									efficiencyDiff >= -0.5 ? "text-caution" : "text-comparison-neutral",
 								)}
 							>
-								%
+								{t.rich("comparisonPercent", {
+									percent: (efficiency / mainEfficiency) * 100,
+									n: () => <SlidingNumber number={(efficiency / mainEfficiency) * 100} />,
+								})}
 							</span>
 						</div>
 						<m.span
@@ -266,12 +260,13 @@ function Alternatives({
 
 function Status() {
 	const t = useTranslations("ptoStatus");
+	const format = useFormatter();
 	const resetManualSelection = useHolidaysStore((state) => state.resetManualSelection);
 	const askForPlan = useHolidaysStore((state) => state.askForPlan);
 	const {
 		ptoDays,
 		suggested: activeSuggestedCount,
-		manual: manualSelectedCount,
+		manual: manualCount,
 		spent: usedDays,
 		remaining,
 		hasManualChanges,
@@ -310,12 +305,10 @@ function Status() {
 						})}
 					</div>
 					<div className="flex items-center gap-2 rounded-[10px] border-[3px] border-[var(--frame)] bg-wash-purple-chip px-3 py-1 shadow-[var(--shadow-brutal-xs)]">
-						<span className="sr-only">
-							{t.rich("manualCount", { count: manualSelectedCount, label: plain, n: plain })}
-						</span>
+						<span className="sr-only">{t.rich("manualCount", { count: manualCount, label: plain, n: plain })}</span>
 						<div className="size-3 rounded-full bg-info-base" aria-hidden="true" />
 						{t.rich("manualCount", {
-							count: manualSelectedCount,
+							count: manualCount,
 							label: (chunks) => (
 								<span className="text-sm text-muted-foreground" aria-hidden="true">
 									{chunks}
@@ -324,7 +317,7 @@ function Status() {
 							n: () => (
 								<SlidingNumber
 									aria-hidden="true"
-									number={manualSelectedCount}
+									number={manualCount}
 									className="font-display font-black text-manual-strong"
 								/>
 							),
@@ -351,8 +344,12 @@ function Status() {
 							})}
 						</div>
 						{remaining === 0 && !hasManualChanges && (
-							<span className="text-[10px] text-positive-note font-medium" aria-hidden="true">
-								✓ {t("allAssigned")}
+							<span
+								className="inline-flex items-center gap-1 text-[10px] text-positive-note font-medium"
+								aria-hidden="true"
+							>
+								<Check size={10} strokeWidth={3} />
+								{t("allAssigned")}
 							</span>
 						)}
 					</div>
@@ -378,7 +375,11 @@ function Status() {
 							transition={PROGRESS_TRANSITION}
 						/>
 						<ProgressOverlayLabel overlayClassName="text-[var(--color-brand-ink)]" transition={PROGRESS_TRANSITION}>
-							{t("usedDays", { used: usedDays, total: ptoDays, pct: usedPct })}
+							{t("usedDays", {
+								used: usedDays,
+								total: ptoDays,
+								pct: format.number(usedPct / 100, { style: "percent" }),
+							})}
 						</ProgressOverlayLabel>
 					</div>
 				</Progress>
@@ -390,7 +391,7 @@ function Status() {
 							transition={PROGRESS_TRANSITION}
 						/>
 						<ProgressOverlayLabel overlayClassName="text-[var(--color-brand-ink)]" transition={PROGRESS_TRANSITION}>
-							{t("remainingDays", { remaining, pct: remainingPct })}
+							{t("remainingDays", { remaining, pct: format.number(remainingPct / 100, { style: "percent" }) })}
 						</ProgressOverlayLabel>
 					</div>
 				</Progress>

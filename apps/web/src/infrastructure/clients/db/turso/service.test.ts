@@ -39,7 +39,7 @@ describe("TursoServiceLive initialisation", () => {
 		const error = await Effect.runPromise(
 			Effect.gen(function* () {
 				const turso = yield* TursoService;
-				return yield* turso.query("SELECT 1").pipe(Effect.flip);
+				return yield* turso.query({ sql: "SELECT 1" }).pipe(Effect.flip);
 			}).pipe(Effect.provide(TursoServiceLive)),
 		);
 		expect(error).toBeInstanceOf(DatabaseError);
@@ -52,7 +52,7 @@ describe("TursoServiceLive initialisation", () => {
 		const error = await Effect.runPromise(
 			Effect.gen(function* () {
 				const turso = yield* TursoService;
-				return yield* turso.execute("DELETE FROM test").pipe(Effect.flip);
+				return yield* turso.execute({ sql: "DELETE FROM test" }).pipe(Effect.flip);
 			}).pipe(Effect.provide(TursoServiceLive)),
 		);
 		expect(error).toBeInstanceOf(DatabaseError);
@@ -66,7 +66,7 @@ describe("TursoService.query", () => {
 		const rows = await Effect.runPromise(
 			Effect.gen(function* () {
 				const turso = yield* TursoService;
-				return yield* turso.query("SELECT * FROM test");
+				return yield* turso.query({ sql: "SELECT * FROM test" });
 			}).pipe(Effect.provide(TursoServiceLive)),
 		);
 		expect(rows).toEqual([{ id: 1 }, { id: 2 }]);
@@ -78,7 +78,7 @@ describe("TursoService.query", () => {
 		await Effect.runPromise(
 			Effect.gen(function* () {
 				const turso = yield* TursoService;
-				return yield* turso.query("SELECT * FROM test WHERE id = ?", [42]);
+				return yield* turso.query({ sql: "SELECT * FROM test WHERE id = ?", args: [42] });
 			}).pipe(Effect.provide(TursoServiceLive)),
 		);
 		expect(mockAll).toHaveBeenCalledWith("SELECT * FROM test WHERE id = ?", [42]);
@@ -89,7 +89,7 @@ describe("TursoService.query", () => {
 		await Effect.runPromise(
 			Effect.gen(function* () {
 				const turso = yield* TursoService;
-				return yield* turso.query("SELECT 1");
+				return yield* turso.query({ sql: "SELECT 1" });
 			}).pipe(Effect.provide(TursoServiceLive)),
 		);
 		expect(mockPrepare).not.toHaveBeenCalled();
@@ -100,7 +100,7 @@ describe("TursoService.query", () => {
 		const error = await Effect.runPromise(
 			Effect.gen(function* () {
 				const turso = yield* TursoService;
-				return yield* turso.query("SELECT 1").pipe(Effect.flip);
+				return yield* turso.query({ sql: "SELECT 1" }).pipe(Effect.flip);
 			}).pipe(Effect.provide(TursoServiceLive)),
 		);
 		expect(error).toBeInstanceOf(DatabaseError);
@@ -114,7 +114,7 @@ describe("TursoService.execute", () => {
 			Effect.runPromise(
 				Effect.gen(function* () {
 					const turso = yield* TursoService;
-					return yield* turso.execute("DELETE FROM test WHERE id = ?", [1]);
+					return yield* turso.execute({ sql: "DELETE FROM test WHERE id = ?", args: [1] });
 				}).pipe(Effect.provide(TursoServiceLive)),
 			),
 		).resolves.toBe(1);
@@ -127,7 +127,7 @@ describe("TursoService.execute", () => {
 			Effect.runPromise(
 				Effect.gen(function* () {
 					const turso = yield* TursoService;
-					return yield* turso.execute("UPDATE test SET a = 1 WHERE id = ?", [1]);
+					return yield* turso.execute({ sql: "UPDATE test SET a = 1 WHERE id = ?", args: [1] });
 				}).pipe(Effect.provide(TursoServiceLive)),
 			),
 		).resolves.toBe(0);
@@ -138,7 +138,7 @@ describe("TursoService.execute", () => {
 		await Effect.runPromise(
 			Effect.gen(function* () {
 				const turso = yield* TursoService;
-				return yield* turso.execute("DELETE FROM test");
+				return yield* turso.execute({ sql: "DELETE FROM test" });
 			}).pipe(Effect.provide(TursoServiceLive)),
 		);
 		expect(mockPrepare).not.toHaveBeenCalled();
@@ -149,7 +149,7 @@ describe("TursoService.execute", () => {
 		const error = await Effect.runPromise(
 			Effect.gen(function* () {
 				const turso = yield* TursoService;
-				return yield* turso.execute("INSERT INTO test VALUES (?)").pipe(Effect.flip);
+				return yield* turso.execute({ sql: "INSERT INTO test VALUES (?)" }).pipe(Effect.flip);
 			}).pipe(Effect.provide(TursoServiceLive)),
 		);
 		expect(error).toBeInstanceOf(DatabaseError);
@@ -162,7 +162,7 @@ describe("the server-side stream is always released", () => {
 		await Effect.runPromise(
 			Effect.gen(function* () {
 				const turso = yield* TursoService;
-				return yield* turso.query("SELECT 1");
+				return yield* turso.query({ sql: "SELECT 1" });
 			}).pipe(Effect.provide(TursoServiceLive)),
 		);
 		expect(mockClose).toHaveBeenCalledOnce();
@@ -173,7 +173,7 @@ describe("the server-side stream is always released", () => {
 		await Effect.runPromise(
 			Effect.gen(function* () {
 				const turso = yield* TursoService;
-				return yield* turso.execute("DELETE FROM test");
+				return yield* turso.execute({ sql: "DELETE FROM test" });
 			}).pipe(Effect.provide(TursoServiceLive)),
 		);
 		expect(mockClose).toHaveBeenCalledOnce();
@@ -184,7 +184,7 @@ describe("the server-side stream is always released", () => {
 		await Effect.runPromise(
 			Effect.gen(function* () {
 				const turso = yield* TursoService;
-				return yield* turso.query("SELECT 1").pipe(Effect.flip);
+				return yield* turso.query({ sql: "SELECT 1" }).pipe(Effect.flip);
 			}).pipe(Effect.provide(TursoServiceLive)),
 		);
 		expect(mockClose).toHaveBeenCalledOnce();
@@ -195,7 +195,7 @@ describe("the server-side stream is always released", () => {
 		await Effect.runPromise(
 			Effect.gen(function* () {
 				const turso = yield* TursoService;
-				return yield* turso.execute("DELETE FROM test").pipe(Effect.flip);
+				return yield* turso.execute({ sql: "DELETE FROM test" }).pipe(Effect.flip);
 			}).pipe(Effect.provide(TursoServiceLive)),
 		);
 		expect(mockClose).toHaveBeenCalledOnce();

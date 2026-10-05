@@ -34,7 +34,7 @@ export const Years = ({ serverYear }: YearsProps) => {
 		})),
 	);
 	const askForPlan = useHolidaysStore((state) => state.askForPlan);
-	const currentYear = useCurrentYear({ serverYear });
+	const currentYear = useCurrentYear(serverYear);
 	const { areStoresReady } = useStoresReady();
 
 	const years = Array.from({ length: MAX_YEARS }, (_, index) => currentYear - MAX_YEARS / 2 + index);

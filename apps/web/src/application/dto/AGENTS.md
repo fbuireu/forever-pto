@@ -13,10 +13,10 @@ Each concept gets its own folder, and the file names inside it are fixed:
 | File | Role | Present in |
 | --- | --- | --- |
 | `types.ts` | The canonical shape, plus the `Raw*` alias for the foreign one it is built from | every folder |
-| `dto.ts` | The mapper, the object implementing `BaseDTO`; `holiday/` and `payment/` also export predicates over what it produces (`holidaysInPlanningWindow`, `hasSucceeded`, `wasCharged`) | `country/`, `holiday/`, `payment/`, `region/` |
+| `dto.ts` | The mapper, the object implementing `BaseDTO` | `country/`, `holiday/`, `payment/`, `region/` |
 | `schema.ts` | A Zod schema for a shape the *user* submits (a form, a query string), or for a body this app's own endpoint answers that the browser has to check, and the `z.infer` type derived from it | `contact/`, `payment/`, `premium/` |
 | `utils/` | Helpers the mappers need and nothing outside this folder reaches for; `holidayDTO` uses `region/`'s | `payment/`, `region/` |
-| `rules.ts` | Pure rules over the concept that are not a mapping | `contact/` |
+| `rules.ts` | Pure rules over the concept that are not a mapping: `holiday/` has `holidaysInPlanningWindow`, `payment/` has `hasSucceeded` and `wasCharged`, `contact/` has the sender identity | `contact/`, `holiday/`, `payment/` |
 
 Not every folder needs every file. `email/` is `types.ts` alone and `premium/` has no `dto.ts`: `SendEmailParams` and `PremiumSessionClaims` are contracts between our own layers, with no foreign shape to normalise and therefore no mapper to write. `premium/schema.ts` exists because the `/api/check-session` bodies arrive in the browser as `unknown` JSON, and a contract between our own layers is still a wire the browser cannot take on trust.
 
@@ -36,15 +36,15 @@ Every mapper implements `BaseDTO` from [`../shared/dto/baseDTO.ts`](../shared/dt
 
 ```typescript
 type BaseDTO<INPUT, OUTPUT, PARAMS = undefined> = [PARAMS] extends [undefined]
-  ? { create: (args: { raw: INPUT }) => OUTPUT }
+  ? { create: (raw: INPUT) => OUTPUT }
   : { create: (args: { raw: INPUT; params: PARAMS }) => OUTPUT };
 ```
 
 **The shape depends on whether the mapper declared a `PARAMS` type, so the requirement is stated once.**
 `holidayDTO` and `paymentDataDTO` need params (there is no sane default for a Planning Window or for the
 request metadata attached to a Donation), and omitting them is a compile error. `countryDTO`, `regionDTO` and
-`paymentConfirmationDTO` declare none and cannot be handed a spurious one. A mapper's `create` takes its
-parameter types from that annotation rather than restating them.
+`paymentConfirmationDTO` declare none, take the `raw` alone as their one positional argument and cannot be handed a
+spurious one. A mapper's `create` takes its parameter types from that annotation rather than restating them.
 
 `holidayDTO` widens `BaseDTO` with extra entry points:
 
@@ -64,8 +64,8 @@ of a stored Holiday is a string a user can edit and a string an older build may 
 compare against a member of the union, so a value outside it fails nowhere: the Holiday drops out of the
 counts, the charts and the table while still occupying its date and still blocking a PTO Day.
 `onRehydrateStorage` in [`../stores/holidays.ts`](../stores/holidays.ts) drops the entry instead. It lives beside the union rather than in a
-`rules.ts` because it is the union's own membership test, which is what `isFilterStrategy` is to
-`FilterStrategy` in [`../../domain/calendar/types.ts`](../../domain/calendar/types.ts).
+`rules.ts` because it is the union's own membership test, which is what `isStrategy` is to
+`Strategy` in [`../../domain/calendar/types.ts`](../../domain/calendar/types.ts).
 
 **`Raw*` types reach exactly one place outside this folder.** `RawHoliday` is named across the files under
 [`../../infrastructure/services/holidays/source/`](../../infrastructure/services/holidays/source), which is
@@ -105,9 +105,9 @@ the flag from the year they were created in.
 
 **The reason to recompute it is display, not Bridge anchoring.** `createHolidaySet` applies no window filter,
 and no code under `@domain/calendar/` reads the flag; the one write there is `runPlanningPipeline` stamping
-`true` on each `manual-N` pseudo-Holiday. The readers are the display: `holidaysInPlanningWindow` in
-[`holiday/dto.ts`](./holiday/dto.ts) (the Summary and the calendar export), the Holidays table and the
-calendar's per-month count.
+`true` on each `manual-N` pseudo-Holiday. The readers are the display, and every one of them reads it through
+`holidaysInPlanningWindow` in [`holiday/rules.ts`](./holiday/rules.ts): the Summary, the calendar export, the
+Holidays table and the calendar's per-month count. The contract suite fails on a read of the flag anywhere else.
 
 **The bounds live in [`../../domain/calendar/window.ts`](../../domain/calendar/window.ts).**
 `planningWindowInterval` and `isInPlanningWindow` sit beside `planningWindowMonths`, which is the other
@@ -161,4 +161,4 @@ The maximum lengths are not exported, and no copy states them.
 
 ## Testing
 
-Every `dto.ts`, `schema.ts`, `rules.ts` and `utils/*.ts` has a co-located `.test.ts`; the type-only folders have none. Tests call `create` with a literal `raw` object and assert on the output: there is nothing to mock.
+Every `dto.ts`, `schema.ts`, `rules.ts` and `utils/*.ts` has a co-located `.test.ts`; the type-only folders have none. Tests call `create` with a literal `raw` object and assert on the output: there is nothing to mock. A caller's test runs the real `create` over its fixture too, and the contract suite fails a unit test that mocks a `dto` module.

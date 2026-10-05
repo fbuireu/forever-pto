@@ -6,7 +6,6 @@ const { mockGetNames, mockRegisterLocale } = vi.hoisted(() => ({
 	mockGetNames: vi.fn(),
 	mockRegisterLocale: vi.fn(),
 }));
-const { mockCountryDTOCreate } = vi.hoisted(() => ({ mockCountryDTOCreate: vi.fn() }));
 
 vi.mock("@infrastructure/logging/logger", () => ({
 	logger: { logError: mockLogError },
@@ -23,16 +22,11 @@ vi.mock("i18n-iso-countries/langs/es.json", () => ({ default: { locale: "es" as 
 vi.mock("i18n-iso-countries/langs/fr.json", () => ({ default: { locale: "fr" as const } }));
 vi.mock("i18n-iso-countries/langs/it.json", () => ({ default: { locale: "it" as const } }));
 
-vi.mock("@application/dto/country/dto", () => ({
-	countryDTO: { create: mockCountryDTOCreate },
-}));
-
 const { getCountries } = await import("./getCountries");
 const registeredAtLoad = [...mockRegisterLocale.mock.calls];
 
 beforeEach(() => {
 	mockGetNames.mockReset();
-	mockCountryDTOCreate.mockReset();
 	mockLogError.mockReset();
 });
 
@@ -49,22 +43,16 @@ describe("locale registration", () => {
 
 describe("getCountries", () => {
 	it("returns country DTOs sorted alphabetically by label", () => {
-		const raw = { US: "United States", ES: "Spain", FR: "France" };
-		mockGetNames.mockReturnValue(raw);
-		mockCountryDTOCreate.mockReturnValue([
-			{ value: "US", label: "United States", flag: "us" },
-			{ value: "ES", label: "Spain", flag: "es" },
-			{ value: "FR", label: "France", flag: "fr" },
-		]);
+		mockGetNames.mockReturnValue({ US: "United States", ES: "Spain", FR: "France" });
 
 		const result = getCountries(EN);
 
 		expect(mockGetNames).toHaveBeenCalledWith(EN);
-		expect(mockCountryDTOCreate).toHaveBeenCalledWith({ raw });
-		expect(result).toHaveLength(3);
-		expect(result[0].label).toBe("France");
-		expect(result[1].label).toBe("Spain");
-		expect(result[2].label).toBe("United States");
+		expect(result).toEqual([
+			{ value: "FR", label: "France", flag: "fr" },
+			{ value: "ES", label: "Spain", flag: "es" },
+			{ value: "US", label: "United States", flag: "us" },
+		]);
 	});
 
 	it("returns empty array and logs error when getNames throws", () => {
@@ -82,11 +70,8 @@ describe("getCountries", () => {
 		});
 	});
 
-	it("returns empty array and logs error when countryDTO.create throws", () => {
-		mockGetNames.mockReturnValue({ US: "United States" });
-		mockCountryDTOCreate.mockImplementation(() => {
-			throw new Error("dto error");
-		});
+	it("returns empty array and logs error when the library hands back no names to turn into countries", () => {
+		mockGetNames.mockReturnValue(undefined);
 
 		const result = getCountries("en");
 

@@ -17,7 +17,7 @@ export function getRegions({ countryCode, source = dateHolidaysSource }: GetRegi
 
 		if (!regions || !Object.values(regions).length) return [];
 
-		return collateByLabel({ options: regionDTO.create({ raw: regions }) });
+		return collateByLabel({ options: regionDTO.create(regions) });
 	} catch (error) {
 		logger.logError({ message: "Error in getRegions", error, context: { countryCode } });
 		return [];

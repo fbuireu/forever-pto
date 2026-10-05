@@ -55,7 +55,7 @@ A demo then imports exactly what the app imports:
 import { Button } from "@ui/modules/core/primitives/Button";
 ```
 
-Not every reach goes through the alias. `HowItWorksDemo.tsx` imports `FilterStrategy` from `apps/web/src/domain/calendar/types.ts` and `LOCALES` from `apps/web/src/infrastructure/i18n/locales.ts` by relative path, `EffectsDemo.tsx` and `TabsDemo.tsx` import `FilterStrategy` and the app's `en.json`, and `PlanningEngineDemo.tsx` imports `PTO_CONSTANTS` from `apps/web/src/domain/calendar/const.ts` the same way; `src/lib/mermaid-render.ts` reads the palette out of the app's `global/index.css`. All of them are dependency-free; that is the condition, and the contract suite (below) asserts that every path the site reaches into is also a path the docs workflow rebuilds on.
+Not every reach goes through the alias. `HowItWorksDemo.tsx` imports `Strategy` from `apps/web/src/domain/calendar/types.ts` and `LOCALES` from `apps/web/src/infrastructure/i18n/locales.ts` by relative path, `EffectsDemo.tsx` and `TabsDemo.tsx` import `Strategy` and the app's `en.json`, and `PlanningEngineDemo.tsx` imports `PTO_CONSTANTS` from `apps/web/src/domain/calendar/const.ts` the same way; `src/lib/mermaid-render.ts` reads the palette out of the app's `global/index.css`. All of them are dependency-free; that is the condition, and the contract suite (below) asserts that every path the site reaches into is also a path the docs workflow rebuilds on.
 
 ## What can be rendered, and why
 
@@ -71,7 +71,7 @@ Prose names a file, never a volatile literal (`W2`). Where the app exports a con
 | --- | --- | --- |
 | `VariantsTable` rows | `VariantProps<typeof buttonVariants>` | A variant added, renamed or removed in the app |
 | `PropsTable` rows | `OwnProps<ComponentProps<typeof X>, Base>`: the component's keys minus the element or primitive it wraps | A prop the app adds, renames or removes |
-| `StrategiesTable` | `Record<FilterStrategy, string>` | A Strategy added or renamed in `types.ts` |
+| `StrategiesTable` | `Record<Strategy, string>` | A Strategy added or renamed in `types.ts` |
 | `TunablesTable` | Every leaf of `PTO_CONSTANTS`, by a recursive key type | A tunable added, renamed or removed in `const.ts` |
 | `TokenSwatch`, `ShadowScale`, `TypeSpecimen` | None; they read CSS variables at render time | A renamed token renders transparent, which the contract suite catches instead |
 

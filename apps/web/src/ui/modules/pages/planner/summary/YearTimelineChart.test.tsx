@@ -23,14 +23,7 @@ const makeHoliday = ({ date, variant = HolidayVariant.NATIONAL }: MakeHolidayPar
 const renderChart = (props: Partial<Parameters<typeof YearTimelineChart>[0]> = {}) =>
 	render(
 		<NextIntlClientProvider locale="en" messages={enMessages}>
-			<YearTimelineChart
-				year={YEAR}
-				carryOverMonths={0}
-				holidays={[]}
-				suggestion={null}
-				manuallySelectedDays={[]}
-				{...props}
-			/>
+			<YearTimelineChart year={YEAR} carryOverMonths={0} holidays={[]} suggestion={null} manualDays={[]} {...props} />
 		</NextIntlClientProvider>,
 	);
 
@@ -161,7 +154,7 @@ describe("YearTimelineChart rows", () => {
 
 	it("draws each hand-picked day on its own", () => {
 		const { container } = renderChart({
-			manuallySelectedDays: [day({ month: 5, date: 1 }), day({ month: 8, date: 12 })],
+			manualDays: [day({ month: 5, date: 1 }), day({ month: 8, date: 12 })],
 		});
 
 		expect(segmentCount({ container, label: enMessages.summary.yearTimeline.rows.manual })).toBe(2);

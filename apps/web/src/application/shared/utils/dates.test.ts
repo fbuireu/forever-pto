@@ -8,6 +8,7 @@ import {
 	eachDayOfInterval,
 	endOfMonth,
 	formatDate,
+	formatDateParts,
 	fromDayIndex,
 	getMonthNames,
 	getWeekdayNames,
@@ -254,6 +255,66 @@ describe("formatDate", () => {
 		});
 
 		expect(constructions).toBe(1);
+	});
+});
+
+describe("formatDateParts", () => {
+	const JUNE = new Date(2026, 5, 1);
+
+	it.each([
+		[
+			"en",
+			[
+				["month", "June"],
+				["literal", " "],
+				["year", "2026"],
+			],
+		],
+		[
+			"es",
+			[
+				["month", "junio"],
+				["literal", " de "],
+				["year", "2026"],
+			],
+		],
+		[
+			"ca",
+			[
+				["month", "juny"],
+				["literal", " del "],
+				["year", "2026"],
+			],
+		],
+		[
+			"de",
+			[
+				["month", "Juni"],
+				["literal", " "],
+				["year", "2026"],
+			],
+		],
+	] as const)("splits the %s month and year into the parts its own pattern writes", (locale, expected) => {
+		expect(
+			formatDateParts({ date: JUNE, locale, format: "LLLL yyyy" }).map(({ type, value }) => [type, value]),
+		).toEqual(expected);
+	});
+
+	it("joins back into what formatDate writes for the same pattern", () => {
+		const parts = formatDateParts({ date: JUNE, locale: "es", format: "LLLL yyyy" });
+
+		expect(parts.map(({ value }) => value).join("")).toBe(
+			formatDate({ date: JUNE, locale: "es", format: "LLLL yyyy" }),
+		);
+	});
+
+	it("shares the memoised formatter formatDate built for the same locale and pattern", () => {
+		formatDate({ date: JUNE, locale: "en-GB", format: "LLLL yyyy" });
+		const constructions = countConstructions(() => {
+			formatDateParts({ date: new Date(2026, 7, 1), locale: "en-GB", format: "LLLL yyyy" });
+		});
+
+		expect(constructions).toBe(0);
 	});
 });
 

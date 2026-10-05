@@ -102,7 +102,7 @@ else aside.
 
 **`PaymentConfirmationDTO.status` is widened like the events, and the page does not read it.** Which
 statuses mean *charged* is a business rule, and `app` never imports `domain`, so
-[`@application/dto/payment/dto`](../../application/dto/payment/dto.ts) owns it: `hasSucceeded` and
+[`@application/dto/payment/rules`](../../application/dto/payment/rules.ts) owns it: `hasSucceeded` and
 `wasCharged` are what the confirmation page calls, and the set of not-charged statuses lives beside them.
 
 **Copies of the literal remain, all inside SQL, and none of them can take the constant.**
@@ -134,8 +134,9 @@ is `id = ? AND status != 'succeeded'` and it returns whether it wrote, so `false
 succeeded" and a `DatabaseError` propagates as "we could not tell". Both handlers branch on that one boolean,
 and the branches are not distinguished and do not need to be. `updatePaymentCharge`'s own
 `WHERE id = ?` touches nothing when the row is absent, and a redelivery landing on an already-succeeded row
-is exactly when charge enrichment is worth retrying. Both handler suites pin that `getPaymentById` is never
-called; that case goes red the moment the read comes back.
+is exactly when charge enrichment is worth retrying. Both handler suites run the real `updatePaymentStatus` over a
+`TursoService` double and pin that it issues one statement and no query; that case goes red the moment a read comes
+back.
 
 **A Donation with no email is dropped, loudly, by the caller.** `processWebhookEvent` catches
 `MissingDonorEmailError`, logs it through `logger.logError` and returns without touching the payments table,
@@ -197,5 +198,5 @@ value, so its default double succeeds with `true`: a falsy default would send ev
 written" branch, and a case that mocks `false` would pass with the branch deleted. A failing double fails with the
 error the real function declares (`retrieveCharge` with `PaymentError`, the repository with `DatabaseError`).
 
-Both handler suites assert `getPaymentById` is never reached; its entry in their `vi.mock` factories exists only so
-that assertion has something to be about, and a `mockReturnValueOnce` on it is a no-op.
+Both handler suites hand `updatePaymentStatus` the real function once, over a `TursoService` double whose `execute`
+answers a row count, and assert that `query` never ran.

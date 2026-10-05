@@ -81,6 +81,25 @@ describe("Calendar header", () => {
 		expect(navigating.holidayCount?.className).toBe(plain.holidayCount?.className);
 	});
 
+	it.each(["en", "es", "ca", "it", "de", "fr"] as const)(
+		"names the month and the year in %s as one date, the way the locale writes them",
+		(locale) => {
+			const { container } = renderCalendar({ locale });
+
+			expect(headerOf(container).title).toBe(
+				new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(MONTH),
+			);
+		},
+	);
+
+	it("sets the year apart in the serif face, and nothing else", () => {
+		const { container } = renderCalendar({ locale: "es" });
+
+		const serif = container.querySelectorAll("h3 .font-serif");
+
+		expect(Array.from(serif).map((node) => node.textContent)).toEqual(["2026"]);
+	});
+
 	it("lets showNavigation decide only whether the month controls render", () => {
 		const { queryByRole } = renderCalendar();
 
@@ -125,6 +144,22 @@ describe("Calendar header", () => {
 	);
 });
 
+describe("Calendar month Holiday count", () => {
+	it("counts only the Holidays inside the Planning Window, so one outside it never reaches the month", () => {
+		const outside: HolidayDTO = {
+			...HOLIDAY,
+			id: "es-2026-06-29",
+			date: new Date(2026, 5, 29),
+			name: "Sant Pere",
+			isInPlanningWindow: false,
+		};
+
+		const { container } = renderCalendar({ holidays: [HOLIDAY, outside] });
+
+		expect(container.querySelector("span.tabular-nums")?.textContent).toBe("1 holiday");
+	});
+});
+
 describe("Calendar day states", () => {
 	const isTheFifth = (date: Date) => date.getDate() === 5 && date.getMonth() === 5;
 
@@ -144,7 +179,7 @@ describe("Calendar day states", () => {
 
 		expect(markup).not.toContain(MODIFIERS_CLASS_NAMES.suggested);
 		expect(markup).not.toContain(MODIFIERS_CLASS_NAMES.alternative);
-		expect(markup).not.toContain(MODIFIERS_CLASS_NAMES.manuallySelected);
+		expect(markup).not.toContain(MODIFIERS_CLASS_NAMES.manual);
 	});
 });
 
@@ -157,7 +192,7 @@ describe("Calendar day state in the accessible tree", () => {
 	});
 
 	it("names the plan state the colour carries, so a Suggestion is not a teal square and nothing else", () => {
-		renderCalendar({ dayStates: { suggested: isTheFifth, manuallySelected: isTheEighth } });
+		renderCalendar({ dayStates: { suggested: isTheFifth, manual: isTheEighth } });
 
 		expect(screen.getByRole("button", { name: `Friday, June 5, 2026, ${en.legend.suggested}` })).toBeTruthy();
 		expect(screen.getByRole("button", { name: `Monday, June 8, 2026, ${en.legend.manual}` })).toBeTruthy();
@@ -173,7 +208,7 @@ describe("Calendar day state in the accessible tree", () => {
 	});
 
 	it("reports whether a day is spent, so toggling it changes something a reader can hear", () => {
-		renderCalendar({ onDayToggle: vi.fn(), dayStates: { suggested: isTheFifth, manuallySelected: isTheEighth } });
+		renderCalendar({ onDayToggle: vi.fn(), dayStates: { suggested: isTheFifth, manual: isTheEighth } });
 
 		expect(screen.getByRole("button", { name: /June 5, 2026/ }).getAttribute("aria-pressed")).toBe("true");
 		expect(screen.getByRole("button", { name: /June 8, 2026/ }).getAttribute("aria-pressed")).toBe("true");
@@ -480,7 +515,7 @@ describe("Calendar past days", () => {
 
 		renderCalendar({
 			allowPastDays: false,
-			dayStates: { suggested: isTheTwelfth, manuallySelected: isTheEleventh },
+			dayStates: { suggested: isTheTwelfth, manual: isTheEleventh },
 		});
 
 		expect((june(10) as HTMLButtonElement).disabled).toBe(true);

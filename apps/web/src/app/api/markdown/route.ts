@@ -2,7 +2,7 @@ import { buildMarkdownPage } from "@infrastructure/markdown/buildMarkdownPage";
 import { isProxiedMarkdownPath, MARKDOWN_PATH_HEADER, markdownTwinHeaders } from "@infrastructure/markdown/twin";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
-const notFound = () => new Response("Not Found", { status: 404, headers: markdownTwinHeaders({ found: false }) });
+const notFound = () => new Response("Not Found", { status: 404, headers: markdownTwinHeaders(false) });
 
 export async function GET(request: Request) {
 	const pathname = request.headers.get(MARKDOWN_PATH_HEADER);
@@ -14,5 +14,5 @@ export async function GET(request: Request) {
 
 	if (body === null) return notFound();
 
-	return new Response(body, { headers: markdownTwinHeaders({ found: true }) });
+	return new Response(body, { headers: markdownTwinHeaders(true) });
 }

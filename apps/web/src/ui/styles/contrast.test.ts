@@ -15,7 +15,7 @@ const FUNCTION_RGBA = /^rgba?\(\s*(\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\s*\)$
 const GRADIENT = /^linear-gradient\((.+)\)$/;
 
 const AA = 4.5;
-const BRAND_FILLED = ["holiday", "suggested", "alternative", "custom", "manuallySelected"] as const;
+const BRAND_FILLED = ["holiday", "suggested", "alternative", "custom", "manual"] as const;
 const DAY_STATES_BY_THEME = ["light", "dark"] as const;
 
 type Theme = (typeof DAY_STATES_BY_THEME)[number];
@@ -159,7 +159,7 @@ describe("the ink on a brand-filled day", () => {
 
 	it("fails the cream a dark page inherits on the Manual Day fill, which is the pairing the ink replaces", () => {
 		const [cream = [0, 0, 0] as Colour] = coloursOf({ theme: "dark", value: "var(--foreground)" });
-		const fills = coloursOf({ theme: "dark", value: fillOf(MODIFIERS_CLASS_NAMES.manuallySelected) });
+		const fills = coloursOf({ theme: "dark", value: fillOf(MODIFIERS_CLASS_NAMES.manual) });
 
 		expect(fills).toHaveLength(1);
 		expect(fills.map((background) => contrast({ foreground: cream, background }) < AA)).toEqual([true]);

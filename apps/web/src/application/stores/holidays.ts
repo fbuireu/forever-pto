@@ -29,6 +29,7 @@ import {
 	type SetCalculationResultParams,
 	type ToggleDaySelectionParams,
 } from "./types";
+import { migrateHolidays } from "./utils/holidaysMigration";
 
 export interface HolidaysState {
 	holidays: HolidayDTO[];
@@ -38,7 +39,7 @@ export interface HolidaysState {
 	currentSelection: MeasuredSuggestion | null;
 	previewAlternativeIndex: number;
 	currentSelectionIndex: number;
-	manuallySelectedDays: Date[];
+	manualDays: Date[];
 	removedSuggestedDays: Date[];
 	isCalculating: boolean;
 	hasCalculated: boolean;
@@ -83,7 +84,7 @@ type HolidaysStore = HolidaysState & HolidaysActions;
 const STORAGE_NAME = HOLIDAYS_STORAGE_NAME;
 
 let latestHolidaysFetch = 0;
-const STORAGE_VERSION = 1;
+const STORAGE_VERSION = 2;
 
 const holidaysInitialState: HolidaysState = {
 	holidays: [],
@@ -93,7 +94,7 @@ const holidaysInitialState: HolidaysState = {
 	currentSelection: null,
 	previewAlternativeIndex: 0,
 	currentSelectionIndex: 0,
-	manuallySelectedDays: [],
+	manualDays: [],
 	removedSuggestedDays: [],
 	isCalculating: false,
 	hasCalculated: false,
@@ -111,7 +112,7 @@ const partializeHolidays = (state: HolidaysStore) => ({
 	alternatives: state.alternatives,
 	currentSelection: state.currentSelection,
 	currentSelectionIndex: state.currentSelectionIndex,
-	manuallySelectedDays: state.manuallySelectedDays,
+	manualDays: state.manualDays,
 	removedSuggestedDays: state.removedSuggestedDays,
 });
 
@@ -171,7 +172,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 					preferredMonths,
 					locale,
 				}: GenerateSuggestionsParams) => {
-					const { holidays, maxAlternatives, manuallySelectedDays, removedSuggestedDays } = get();
+					const { holidays, maxAlternatives, manualDays, removedSuggestedDays } = get();
 
 					try {
 						const { runPlanningPipeline } = await import("@domain/calendar/pipeline");
@@ -180,7 +181,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 							window: { year, carryOverMonths },
 							ptoDays,
 							holidays,
-							manuallySelectedDays,
+							manualDays,
 							removedSuggestedDays,
 							allowPastDays,
 							strategy,
@@ -282,13 +283,13 @@ export const useHolidaysStore = create<HolidaysStore>()(
 				},
 
 				heldOn: ({ date, exceptHolidayIndex }) => {
-					const { holidays, manuallySelectedDays } = get();
+					const { holidays, manualDays } = get();
 
 					return {
 						holiday: holidays.find(
 							(holiday, index) => index !== exceptHolidayIndex && isSameDay({ a: holiday.date, b: date }),
 						),
-						manualDay: manuallySelectedDays.some((day) => isSameDay({ a: day, b: date })),
+						manualDay: manualDays.some((day) => isSameDay({ a: day, b: date })),
 					};
 				},
 
@@ -378,7 +379,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 				},
 
 				toggleDaySelection: ({ date, totalPtoDays, locale, allowPastDays }) => {
-					const { manuallySelectedDays, currentSelection, removedSuggestedDays, holidays } = get();
+					const { manualDays, currentSelection, removedSuggestedDays, holidays } = get();
 					const dateStr = date.toDateString();
 
 					if (!currentSelection) return { applied: false, reason: DayRefusal.NO_PLAN };
@@ -386,9 +387,9 @@ export const useHolidaysStore = create<HolidaysStore>()(
 					const isSuggested = currentSelection.days.some((day) => isSameDay({ a: day, b: date }));
 					const wasRemoved = removedSuggestedDays.some((day) => isSameDay({ a: day, b: date }));
 
-					const { holiday: holidayOnDate, manualDay: isManuallySelected } = get().heldOn({ date });
+					const { holiday: holidayOnDate, manualDay: isManual } = get().heldOn({ date });
 
-					if (!isSuggested && !isManuallySelected && (isWeekend(date) || holidayOnDate)) {
+					if (!isSuggested && !isManual && (isWeekend(date) || holidayOnDate)) {
 						logClient((logger) =>
 							logger.warn({ message: "Refused to spend a PTO day on a day that is already off", context: { dateStr } }),
 						);
@@ -406,12 +407,12 @@ export const useHolidaysStore = create<HolidaysStore>()(
 						return { applied: false, reason: DayRefusal.DAY_IS_WEEKEND };
 					}
 
-					let updatedManualDays = manuallySelectedDays;
+					let updatedManualDays = manualDays;
 					let updatedRemovedDays = removedSuggestedDays;
 					let change: DayChange;
 
-					if (isManuallySelected) {
-						updatedManualDays = manuallySelectedDays.filter((day) => !isSameDay({ a: day, b: date }));
+					if (isManual) {
+						updatedManualDays = manualDays.filter((day) => !isSameDay({ a: day, b: date }));
 						change = DayChange.MANUAL_DAY_REMOVED;
 					} else if (isSuggested && wasRemoved) {
 						updatedRemovedDays = removedSuggestedDays.filter((day) => !isSameDay({ a: day, b: date }));
@@ -423,7 +424,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 						const budget = measureBudget({
 							ptoDays: totalPtoDays,
 							days: currentSelection.days,
-							manuallySelectedDays,
+							manualDays,
 							removedSuggestedDays,
 						});
 
@@ -437,7 +438,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 							return { applied: false, reason: DayRefusal.BUDGET_EXHAUSTED };
 						}
 
-						updatedManualDays = [...manuallySelectedDays, date].toSorted((a, b) => a.getTime() - b.getTime());
+						updatedManualDays = [...manualDays, date].toSorted((a, b) => a.getTime() - b.getTime());
 						change = DayChange.MANUAL_DAY_ADDED;
 					}
 
@@ -448,12 +449,12 @@ export const useHolidaysStore = create<HolidaysStore>()(
 						planningWindow: { year, carryOverMonths },
 						holidays,
 						allowPastDays,
-						manuallySelectedDays: updatedManualDays,
+						manualDays: updatedManualDays,
 						removedSuggestedDays: updatedRemovedDays,
 					});
 
 					set({
-						manuallySelectedDays: updatedManualDays,
+						manualDays: updatedManualDays,
 						removedSuggestedDays: updatedRemovedDays,
 						currentSelection: { ...currentSelection, metrics: updatedMetrics },
 					});
@@ -463,21 +464,21 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
 				pruneDaysOutsideWindow: (window?: PlanningWindow) => {
 					const { year, carryOverMonths } = window ?? useFiltersStore.getState();
-					const { manuallySelectedDays, removedSuggestedDays } = get();
+					const { manualDays, removedSuggestedDays } = get();
 
 					const planningWindow = planningWindowInterval({ year, carryOverMonths });
 					const isInWindow = (date: Date) => isInPlanningWindow({ date, window: planningWindow });
-					const prunedManualDays = manuallySelectedDays.filter(isInWindow);
+					const prunedManualDays = manualDays.filter(isInWindow);
 					const prunedRemovedDays = removedSuggestedDays.filter(isInWindow);
 
 					if (
-						prunedManualDays.length === manuallySelectedDays.length &&
+						prunedManualDays.length === manualDays.length &&
 						prunedRemovedDays.length === removedSuggestedDays.length
 					) {
 						return;
 					}
 
-					set({ manuallySelectedDays: prunedManualDays, removedSuggestedDays: prunedRemovedDays });
+					set({ manualDays: prunedManualDays, removedSuggestedDays: prunedRemovedDays });
 				},
 
 				clearCalculation: () => {
@@ -497,7 +498,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
 					if (!currentSelection) {
 						set({
-							manuallySelectedDays: [],
+							manualDays: [],
 							removedSuggestedDays: [],
 							planRevision: planRevision + 1,
 						});
@@ -508,14 +509,14 @@ export const useHolidaysStore = create<HolidaysStore>()(
 
 					if (baseSelection) {
 						set({
-							manuallySelectedDays: [],
+							manualDays: [],
 							removedSuggestedDays: [],
 							currentSelection: baseSelection,
 							planRevision: planRevision + 1,
 						});
 					} else {
 						set({
-							manuallySelectedDays: [],
+							manualDays: [],
 							removedSuggestedDays: [],
 							planRevision: planRevision + 1,
 						});
@@ -523,9 +524,9 @@ export const useHolidaysStore = create<HolidaysStore>()(
 				},
 
 				trimManualDays: (maxPtoDays: number) => {
-					const { manuallySelectedDays } = get();
-					if (manuallySelectedDays.length > maxPtoDays) {
-						set({ manuallySelectedDays: manuallySelectedDays.slice(0, maxPtoDays) });
+					const { manualDays } = get();
+					if (manualDays.length > maxPtoDays) {
+						set({ manualDays: manualDays.slice(0, maxPtoDays) });
 					}
 				},
 			}),
@@ -534,6 +535,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 				version: STORAGE_VERSION,
 				storage: obfuscatedStorage,
 				partialize: partializeHolidays,
+				migrate: (persisted, version) => migrateHolidays({ persisted, version }) as PersistedHolidays,
 				onRehydrateStorage: () => (state, error) => {
 					if (error) {
 						onRehydrateFailure({ storeName: STORAGE_NAME, error, state });
@@ -583,8 +585,8 @@ export const useHolidaysStore = create<HolidaysStore>()(
 							state.currentSelection = reviveSuggestion(stored.currentSelection);
 						}
 
-						if (stored.manuallySelectedDays) {
-							state.manuallySelectedDays = stored.manuallySelectedDays.map(fromStoredInstant);
+						if (stored.manualDays) {
+							state.manualDays = stored.manualDays.map(fromStoredInstant);
 						}
 
 						if (stored.removedSuggestedDays) {

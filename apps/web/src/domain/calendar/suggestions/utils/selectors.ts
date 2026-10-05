@@ -1,7 +1,7 @@
 import { dayIndex } from "@application/shared/utils/dates";
 import { PTO_CONSTANTS } from "@domain/calendar/const";
 import type { Bridge } from "@domain/calendar/types";
-import { FilterStrategy } from "@domain/calendar/types";
+import { Strategy } from "@domain/calendar/types";
 import type { PlanMeasures } from "@domain/calendar/utils/measures";
 import { type DaySpan, spanLength } from "@domain/calendar/utils/spans";
 import { workStretchesOf } from "@domain/calendar/utils/stretches";
@@ -42,9 +42,9 @@ const OPTIMIZED_OBJECTIVE: Objective = {
 	rank: ({ marginalEfficiency, runLength, gap }) => [marginalEfficiency, runLength, gap],
 };
 
-export const STRATEGY_OBJECTIVE: Record<FilterStrategy, Objective> = {
-	[FilterStrategy.OPTIMIZED]: OPTIMIZED_OBJECTIVE,
-	[FilterStrategy.GROUPED]: {
+export const STRATEGY_OBJECTIVE: Record<Strategy, Objective> = {
+	[Strategy.OPTIMIZED]: OPTIMIZED_OBJECTIVE,
+	[Strategy.GROUPED]: {
 		floor: PTO_CONSTANTS.EFFICIENCY.BLOCK_MINIMUM,
 		aim: ({ longestVacation }) =>
 			cappedRun({ runLength: longestVacation, cap: PTO_CONSTANTS.SELECTION.GROUPED_MAX_BLOCK_DAYS }),
@@ -54,7 +54,7 @@ export const STRATEGY_OBJECTIVE: Record<FilterStrategy, Objective> = {
 			gap,
 		],
 	},
-	[FilterStrategy.BALANCED]: {
+	[Strategy.BALANCED]: {
 		floor: PTO_CONSTANTS.EFFICIENCY.MINIMUM,
 		aim: ({ longestWorkStretch }) => -longestWorkStretch,
 		rank: ({ bridge, longestStretchAfter, stretchRelief, runLength, marginalEfficiency, gap }) => [
@@ -65,7 +65,7 @@ export const STRATEGY_OBJECTIVE: Record<FilterStrategy, Objective> = {
 			gap,
 		],
 	},
-	[FilterStrategy.MAIN_VACATION]: {
+	[Strategy.MAIN_VACATION]: {
 		floor: PTO_CONSTANTS.EFFICIENCY.BLOCK_MINIMUM,
 		aim: ({ longestPreferredVacation }) =>
 			Math.min(longestPreferredVacation, PTO_CONSTANTS.SELECTION.MAIN_VACATION_BLOCK_DAYS),
@@ -76,8 +76,8 @@ export const STRATEGY_OBJECTIVE: Record<FilterStrategy, Objective> = {
 	},
 };
 
-export const objectiveFor = (strategy: FilterStrategy) =>
-	STRATEGY_OBJECTIVE[strategy] ?? STRATEGY_OBJECTIVE[FilterStrategy.GROUPED];
+export const objectiveFor = (strategy: Strategy) =>
+	STRATEGY_OBJECTIVE[strategy] ?? STRATEGY_OBJECTIVE[Strategy.GROUPED];
 
 interface OutranksParams {
 	rank: number[];
@@ -342,7 +342,7 @@ export const selectBridges = ({
 };
 
 interface SelectBridgesForStrategyParams extends Omit<SelectBridgesParams, "objective" | "forbiddenDays"> {
-	strategy: FilterStrategy;
+	strategy: Strategy;
 }
 
 export const selectBridgesForStrategy = ({ strategy, ...params }: SelectBridgesForStrategyParams) =>

@@ -20,7 +20,7 @@ export const PremiumModal = () => {
 		})),
 	);
 
-	const hasOpened = useHasOpened({ open: modalOpen });
+	const hasOpened = useHasOpened(modalOpen);
 	if (!hasOpened) return null;
 
 	return (

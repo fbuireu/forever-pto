@@ -35,7 +35,7 @@ The visual language matches the real planner: holidays get the yellow gradient w
 
 ## SHOWCASE_PLAN
 
-Every figure the homepage quotes about a plan comes from one constant, `SHOWCASE_PLAN`, a plan the engine produced: {SHOWCASE_PLAN.ptoDays} PTO Days turned into {SHOWCASE_PLAN.effectiveDays} Effective Days, around {SHOWCASE_PLAN.holidays} Holidays (the values above are read from the app, not copied). `SHOWCASE_RATIO` beside it is the division, never a typed number. `Hero` shows the plan in its mock-up, `Stats` quotes the ratio and the Effective Days, and `Comparison` quotes the ratio in its copy; each formats the ratio with the locale's number format, and the translations take it as a `{ratio}` placeholder.
+Every figure the homepage quotes about a plan comes from one constant, `SHOWCASE_PLAN`, a plan the engine produced: {SHOWCASE_PLAN.ptoDays} PTO Days turned into {SHOWCASE_PLAN.effectiveDays} Effective Days, around {SHOWCASE_PLAN.holidays} Holidays (the values above are read from the app, not copied). `SHOWCASE_EFFICIENCY` beside it is the division, never a typed number. `Hero` shows the plan in its mock-up, `Stats` quotes the ratio and the Effective Days, and `Comparison` quotes the ratio in its copy; each formats the ratio with the locale's number format, and the translations take it as a `{ratio}` placeholder.
 
 It exists so the ratio is written once: typed three times, it would read 3.3, 3.36 and 3.4 on one page. It names no year on purpose, so the homepage does not go stale when the calendar turns. When the engine changes what it produces, re-run the plan and change this constant, and every section follows.
 

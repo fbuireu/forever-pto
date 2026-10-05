@@ -60,7 +60,7 @@ describe("useTutorial", () => {
 		});
 
 		expect(mockStart).toHaveBeenCalledOnce();
-		expect(mockStart).toHaveBeenCalledWith(expect.any(Array), expect.any(Object));
+		expect(mockStart).toHaveBeenCalledWith({ steps: expect.any(Array), overrides: expect.any(Object) });
 	});
 
 	it("opens the sidebar before starting when it is closed", async () => {
@@ -83,9 +83,9 @@ describe("useTutorial", () => {
 			await act(async () => {
 				await result.current.startTutorial();
 			});
-			const steps = mockStart.mock.lastCall?.[0] as unknown[] | undefined;
-			if (!steps) throw new Error("the tour was not started");
-			return steps.length;
+			const started = mockStart.mock.lastCall?.[0] as { steps: unknown[] } | undefined;
+			if (!started) throw new Error("the tour was not started");
+			return started.steps.length;
 		};
 
 		const mobileSteps = await stepsOn(true);
@@ -101,7 +101,7 @@ describe("useTutorial", () => {
 			await result.current.startTutorial();
 		});
 
-		const options = mockStart.mock.lastCall?.[1] as Record<string, string>;
+		const options = mockStart.mock.lastCall?.[0].overrides as Record<string, string>;
 		expect(options).toHaveProperty("nextBtnText");
 		expect(options).toHaveProperty("prevBtnText");
 		expect(options).toHaveProperty("doneBtnText");
@@ -115,7 +115,7 @@ describe("useTutorial", () => {
 			await result.current.startTutorial();
 		});
 
-		const options = mockStart.mock.lastCall?.[1] as { closeIcon?: unknown };
+		const options = mockStart.mock.lastCall?.[0].overrides as { closeIcon?: unknown };
 		expect(isValidElement(options.closeIcon)).toBe(true);
 	});
 
@@ -198,7 +198,7 @@ describe("useTutorial", () => {
 
 		const collapsed = vi.fn();
 		globalThis.addEventListener(TUTORIAL_EVENT.COLLAPSE_DRAWER, collapsed);
-		mockStart.mock.calls[0][1].onDestroyStarted();
+		mockStart.mock.calls[0][0].overrides.onDestroyStarted();
 		globalThis.removeEventListener(TUTORIAL_EVENT.COLLAPSE_DRAWER, collapsed);
 
 		expect(collapsed).toHaveBeenCalledTimes(1);
@@ -210,7 +210,7 @@ describe("useTutorial", () => {
 			await result.current.startTutorial();
 		});
 
-		expect(mockStart.mock.calls[0][1].onDestroyStarted).toBeUndefined();
+		expect(mockStart.mock.calls[0][0].overrides.onDestroyStarted).toBeUndefined();
 	});
 });
 

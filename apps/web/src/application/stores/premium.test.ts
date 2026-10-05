@@ -76,7 +76,10 @@ describe("setPremiumStatus", () => {
 
 describe("showPremiumModal / closeModal", () => {
 	it("showPremiumModal opens modal with feature", () => {
-		usePremiumStore.getState().showPremiumModal(PremiumFeatureId.CALENDAR_EXPORT);
+		usePremiumStore.getState().showPremiumModal({
+			feature: PremiumFeatureId.CALENDAR_EXPORT,
+			origin: PremiumOrigin.PLANNER,
+		});
 		const state = usePremiumStore.getState();
 		expect(state.modalOpen).toBe(true);
 		expect(state.currentFeature).toBe(PremiumFeatureId.CALENDAR_EXPORT);
@@ -84,19 +87,35 @@ describe("showPremiumModal / closeModal", () => {
 
 	it("sends the gate id to analytics, never the label the gate shows", async () => {
 		const { track } = await import("@infrastructure/clients/logging/better-stack/tracking");
-		usePremiumStore.getState().showPremiumModal(PremiumFeatureId.ADVANCED_METRICS);
+		usePremiumStore.getState().showPremiumModal({
+			feature: PremiumFeatureId.ADVANCED_METRICS,
+			origin: PremiumOrigin.PLANNER,
+		});
 		expect(track).toHaveBeenCalledWith({
 			event: "upgrade_modal_opened",
 			properties: { feature: "advancedMetrics", origin: "planner" },
 		});
 	});
 
-	it("names where the gate was, defaulting to the planner and taking the quick start when told", async () => {
+	it.each([
+		[PremiumOrigin.PLANNER, "planner"],
+		[PremiumOrigin.QUICK_START, "quick_start"],
+	])("reports the origin the gate names, %s, and none of its own", async (origin, reported) => {
 		const { track } = await import("@infrastructure/clients/logging/better-stack/tracking");
-		usePremiumStore.getState().showPremiumModal(PremiumFeatureId.ALLOW_PAST_DAYS, PremiumOrigin.QUICK_START);
+		usePremiumStore.getState().showPremiumModal({ feature: PremiumFeatureId.ALLOW_PAST_DAYS, origin });
 		expect(track).toHaveBeenLastCalledWith({
 			event: "upgrade_modal_opened",
-			properties: { feature: "allowPastDays", origin: "quick_start" },
+			properties: { feature: "allowPastDays", origin: reported },
+		});
+	});
+
+	it("takes no default origin, so a gate that forgets it does not compile rather than count as the planner", async () => {
+		const { track } = await import("@infrastructure/clients/logging/better-stack/tracking");
+		// @ts-expect-error origin is required
+		usePremiumStore.getState().showPremiumModal({ feature: PremiumFeatureId.ALLOW_PAST_DAYS });
+		expect(track).toHaveBeenLastCalledWith({
+			event: "upgrade_modal_opened",
+			properties: { feature: "allowPastDays", origin: undefined },
 		});
 	});
 
@@ -220,7 +239,7 @@ describe("checkExistingSession", () => {
 		vi.mocked(getExistingSession).mockResolvedValueOnce({ premiumKey: "pk_redirect", email: "donor@example.com" });
 		usePremiumStore.setState({ needsSessionCheck: false, premiumKey: null, userEmail: null });
 
-		await usePremiumStore.getState().checkExistingSession({ force: true });
+		await usePremiumStore.getState().checkExistingSession(true);
 
 		expect(getExistingSession).toHaveBeenCalled();
 		expect(usePremiumStore.getState().premiumKey).toBe("pk_redirect");
@@ -362,7 +381,7 @@ describe("which ways into Premium report premium_activated", () => {
 	it("reports nothing for a forced restore outside the confirmation page", async () => {
 		await sessionAnswers(SESSION);
 
-		await usePremiumStore.getState().checkExistingSession({ force: true });
+		await usePremiumStore.getState().checkExistingSession(true);
 
 		expect(usePremiumStore.getState().premiumKey).toBe(SESSION.premiumKey);
 		expect(await tracked()).toStrictEqual([]);

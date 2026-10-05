@@ -31,8 +31,8 @@ sequenceDiagram
     HK->>WK: CALCULATE_SUGGESTIONS { requestId, payload }
   end
   WK->>WK: drop any other message type
-  WK->>WK: deserialise: fromStoredInstant, isFilterStrategy, isPreferredMonths, isLocale
-  WK->>PL: PlanningInput
+  WK->>WK: deserialise: fromStoredInstant, isStrategy, isPreferredMonths, isLocale
+  WK->>PL: RunPlanningPipelineParams
   PL-->>WK: PlanningResult (planned or unplanned, always measured)
   alt success
     WK-->>HK: CALCULATE_SUGGESTIONS_RESULT { requestId, suggestion, alternatives }
@@ -86,7 +86,7 @@ The way back from a string is `fromStoredInstant` (`apps/web/src/application/sha
 | `year`, `carryOverMonths` | Filters | The engine expands the Planning Window itself |
 | `ptoDays` | Filters | The whole budget; the engine subtracts Manual Days |
 | `holidays` | The holidays store, through `serializeHolidays` | National, Regional and Custom |
-| `allowPastDays`, `strategy`, `preferredMonths`, `locale` | Filters | `strategy`, `preferredMonths` and `locale` are **narrowed** on arrival, with `isFilterStrategy`, `isPreferredMonths` and `isLocale`, falling back to `DEFAULT_FILTER_STRATEGY`, no preferred month and English, because this is the inbound leg where a value out of persisted storage arrives |
+| `allowPastDays`, `strategy`, `preferredMonths`, `locale` | Filters | `strategy`, `preferredMonths` and `locale` are **narrowed** on arrival, with `isStrategy`, `isPreferredMonths` and `isLocale`, falling back to `DEFAULT_STRATEGY`, no preferred month and English, because this is the inbound leg where a value out of persisted storage arrives |
 | `maxAlternatives` | The holidays store | Four |
 | `manualDays`, `removedDays` | The holidays store, as ISO strings | Manual Days become pseudo-Holidays **inside the pipeline**; Removed Days are struck from the Workdays and never become Free Days |
 | `autoSuggestCount` | Computed by the hook | See below |

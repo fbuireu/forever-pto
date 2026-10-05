@@ -169,7 +169,7 @@ describe("StripeServerService.charges.retrieve", () => {
 		const result = await Effect.runPromise(
 			Effect.gen(function* () {
 				const stripe = yield* StripeServerService;
-				return yield* stripe.charges.retrieve("ch_123");
+				return yield* stripe.charges.retrieve({ id: "ch_123" });
 			}).pipe(Effect.provide(StripeServerServiceLive)),
 		);
 		expect(result).toEqual(charge);
@@ -181,7 +181,7 @@ describe("StripeServerService.charges.retrieve", () => {
 		await Effect.runPromise(
 			Effect.gen(function* () {
 				const stripe = yield* StripeServerService;
-				return yield* stripe.charges.retrieve("ch_123", { expand: ["balance_transaction"] });
+				return yield* stripe.charges.retrieve({ id: "ch_123", params: { expand: ["balance_transaction"] } });
 			}).pipe(Effect.provide(StripeServerServiceLive)),
 		);
 		expect(mockChargesRetrieve).toHaveBeenCalledWith("ch_123", { expand: ["balance_transaction"] });
@@ -192,7 +192,7 @@ describe("StripeServerService.charges.retrieve", () => {
 		const error = await Effect.runPromise(
 			Effect.gen(function* () {
 				const stripe = yield* StripeServerService;
-				return yield* stripe.charges.retrieve("ch_bad").pipe(Effect.flip);
+				return yield* stripe.charges.retrieve({ id: "ch_bad" }).pipe(Effect.flip);
 			}).pipe(Effect.provide(StripeServerServiceLive)),
 		);
 		expect(error).toBeInstanceOf(PaymentError);
@@ -243,10 +243,21 @@ describe("StripeServerService.webhooks.constructEvent", () => {
 		const result = await Effect.runPromise(
 			Effect.gen(function* () {
 				const stripe = yield* StripeServerService;
-				return yield* stripe.webhooks.constructEvent("payload", "sig");
+				return yield* stripe.webhooks.constructEvent({ payload: "payload", signature: "sig" });
 			}).pipe(Effect.provide(StripeServerServiceLive)),
 		);
 		expect(result).toEqual(event);
+	});
+
+	it("hands the SDK the payload, the signature and the secret, in the order it reads them", async () => {
+		mockWebhooksConstructEvent.mockReturnValue({ type: "payment_intent.succeeded", id: "evt_1" });
+		await Effect.runPromise(
+			Effect.gen(function* () {
+				const stripe = yield* StripeServerService;
+				return yield* stripe.webhooks.constructEvent({ payload: "the-payload", signature: "the-signature" });
+			}).pipe(Effect.provide(StripeServerServiceLive)),
+		);
+		expect(mockWebhooksConstructEvent).toHaveBeenCalledExactlyOnceWith("the-payload", "the-signature", "whsec_test");
 	});
 
 	it("wraps signature verification errors as WebhookError with isSignatureError=true", async () => {
@@ -256,7 +267,7 @@ describe("StripeServerService.webhooks.constructEvent", () => {
 		const error = await Effect.runPromise(
 			Effect.gen(function* () {
 				const stripe = yield* StripeServerService;
-				return yield* stripe.webhooks.constructEvent("payload", "bad-sig").pipe(Effect.flip);
+				return yield* stripe.webhooks.constructEvent({ payload: "payload", signature: "bad-sig" }).pipe(Effect.flip);
 			}).pipe(Effect.provide(StripeServerServiceLive)),
 		);
 		expect(error).toBeInstanceOf(WebhookError);
@@ -270,7 +281,7 @@ describe("StripeServerService.webhooks.constructEvent", () => {
 		const error = await Effect.runPromise(
 			Effect.gen(function* () {
 				const stripe = yield* StripeServerService;
-				return yield* stripe.webhooks.constructEvent("payload", "sig").pipe(Effect.flip);
+				return yield* stripe.webhooks.constructEvent({ payload: "payload", signature: "sig" }).pipe(Effect.flip);
 			}).pipe(Effect.provide(StripeServerServiceLive)),
 		);
 		expect(error).toBeInstanceOf(WebhookError);
@@ -282,7 +293,7 @@ describe("StripeServerService.webhooks.constructEvent", () => {
 		const error = await Effect.runPromise(
 			Effect.gen(function* () {
 				const stripe = yield* StripeServerService;
-				return yield* stripe.webhooks.constructEvent("payload", "sig").pipe(Effect.flip);
+				return yield* stripe.webhooks.constructEvent({ payload: "payload", signature: "sig" }).pipe(Effect.flip);
 			}).pipe(Effect.provide(StripeServerServiceLive)),
 		);
 		expect(error).toBeInstanceOf(WebhookError);
@@ -294,7 +305,7 @@ describe("StripeServerService.webhooks.constructEvent", () => {
 		const error = await Effect.runPromise(
 			Effect.gen(function* () {
 				const stripe = yield* StripeServerService;
-				return yield* stripe.webhooks.constructEvent("payload", "sig").pipe(Effect.flip);
+				return yield* stripe.webhooks.constructEvent({ payload: "payload", signature: "sig" }).pipe(Effect.flip);
 			}).pipe(Effect.provide(StripeServerServiceLive)),
 		);
 		expect(isWebhookConfigurationError(error)).toBe(true);
@@ -306,7 +317,7 @@ describe("StripeServerService.webhooks.constructEvent", () => {
 		const error = await Effect.runPromise(
 			Effect.gen(function* () {
 				const stripe = yield* StripeServerService;
-				return yield* stripe.webhooks.constructEvent("payload", "sig").pipe(Effect.flip);
+				return yield* stripe.webhooks.constructEvent({ payload: "payload", signature: "sig" }).pipe(Effect.flip);
 			}).pipe(Effect.provide(StripeServerServiceLive)),
 		);
 		expect(isWebhookConfigurationError(error)).toBe(true);
@@ -319,7 +330,7 @@ describe("StripeServerService.webhooks.constructEvent", () => {
 		const error = await Effect.runPromise(
 			Effect.gen(function* () {
 				const stripe = yield* StripeServerService;
-				return yield* stripe.webhooks.constructEvent("payload", "bad-sig").pipe(Effect.flip);
+				return yield* stripe.webhooks.constructEvent({ payload: "payload", signature: "bad-sig" }).pipe(Effect.flip);
 			}).pipe(Effect.provide(StripeServerServiceLive)),
 		);
 		expect(isWebhookConfigurationError(error)).toBe(false);

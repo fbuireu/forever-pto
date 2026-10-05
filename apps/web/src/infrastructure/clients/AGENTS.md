@@ -134,7 +134,7 @@ on a detached container, on a singleton that survives the navigation.
 
 `DriverClient` mounts a close button only when a `closeIcon` was injected; `onPopoverRender` leaves
 driver.js's own markup alone otherwise. The caller supplies it: the UI layer's [`hooks/useTutorial.tsx`](../../ui/hooks/useTutorial.tsx) passes the
-element in the overrides argument to `start()`, which keeps the icon components on the `@ui` side of the layer
+element in the `overrides` of `start({ steps, overrides })`, which keeps the icon components on the `@ui` side of the layer
 boundary; the contract suite fails an import from `@ui/*` here.
 
 ## Testing

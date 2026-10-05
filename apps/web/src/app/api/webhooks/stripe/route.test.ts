@@ -87,7 +87,7 @@ describe("POST /api/webhooks/stripe", () => {
 
 		await POST(makeRequest({ body: raw }) as never);
 
-		expect(mockConstructEvent).toHaveBeenCalledWith(raw, "sig-1");
+		expect(mockConstructEvent).toHaveBeenCalledWith({ payload: raw, signature: "sig-1" });
 	});
 
 	it("returns 400 on signature verification failure", async () => {

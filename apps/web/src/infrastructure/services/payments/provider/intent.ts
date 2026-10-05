@@ -4,7 +4,7 @@ import type { PaymentError } from "@infrastructure/errors";
 import { PAYMENT_CURRENCY } from "@infrastructure/services/payments/normalForms";
 import { Effect } from "effect";
 import type StripeNode from "stripe";
-import { clampMetadata } from "./metadata";
+import { donationMetadata } from "./metadata";
 
 interface CreatePaymentIntentParams {
 	amount: number;
@@ -27,22 +27,7 @@ export const createPaymentIntent = (
 			currency: PAYMENT_CURRENCY,
 			description: discountInfo ? `Donation from ${email} (${promoCode} applied)` : `Donation from ${email}`,
 			receipt_email: email,
-			metadata: {
-				type: "donation",
-				email,
-				promoCode: clampMetadata(promoCode),
-				userAgent: clampMetadata(userAgent),
-				ipAddress: clampMetadata(ipAddress),
-				...(discountInfo && {
-					couponId: discountInfo.couponId,
-					couponName: discountInfo.couponName ?? "",
-					originalAmount: discountInfo.originalAmount.toFixed(2),
-					discountType: discountInfo.type,
-					discountValue: discountInfo.value.toString(),
-					discountAmount: (discountInfo.originalAmount - discountInfo.finalAmount).toFixed(2),
-				}),
-				timestamp: new Date().toISOString(),
-			},
+			metadata: donationMetadata({ email, promoCode, userAgent, ipAddress, discountInfo }),
 			automatic_payment_methods: { enabled: true },
 		});
 	});

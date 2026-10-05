@@ -1,6 +1,6 @@
 import type StripeNode from "stripe";
-import { describe, expect, it } from "vitest";
-import { clampMetadata, readDonationMetadata } from "./metadata";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { clampMetadata, donationMetadata, readDonationMetadata } from "./metadata";
 
 interface IntentParams {
 	metadata: Record<string, string>;
@@ -53,5 +53,91 @@ describe("clampMetadata", () => {
 	it("turns an absent value into the empty string Stripe requires", () => {
 		expect(clampMetadata(undefined)).toBe("");
 		expect(clampMetadata(null)).toBe("");
+	});
+});
+
+describe("donationMetadata", () => {
+	const DISCOUNT = {
+		type: "percent",
+		value: 10,
+		originalAmount: 10,
+		finalAmount: 9,
+		couponId: "coup_abc",
+		couponName: "SAVE10",
+	} as const;
+
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
+	it("is read back by readDonationMetadata, so the writer and the reader name the same keys", () => {
+		const metadata = donationMetadata({
+			email: "a@b.com",
+			promoCode: "SAVE20",
+			userAgent: "Firefox",
+			ipAddress: "1.2.3.4",
+			discountInfo: null,
+		});
+
+		expect(readDonationMetadata(intent({ metadata }))).toEqual({
+			email: "a@b.com",
+			promoCode: "SAVE20",
+			userAgent: "Firefox",
+			ipAddress: "1.2.3.4",
+		});
+	});
+
+	it("writes the block Stripe keeps on the intent, stamped with the instant it was built", () => {
+		vi.useFakeTimers({ now: new Date("2025-01-15T10:00:00.000Z"), toFake: ["Date"] });
+
+		expect(donationMetadata({ email: "a@b.com", discountInfo: null })).toStrictEqual({
+			type: "donation",
+			email: "a@b.com",
+			promoCode: "",
+			userAgent: "",
+			ipAddress: "",
+			timestamp: "2025-01-15T10:00:00.000Z",
+		});
+	});
+
+	it("adds the coupon and the discount as strings when a promotion code was applied", () => {
+		vi.useFakeTimers({ now: new Date("2025-01-15T10:00:00.000Z"), toFake: ["Date"] });
+
+		expect(donationMetadata({ email: "a@b.com", promoCode: "SAVE10", discountInfo: DISCOUNT })).toStrictEqual({
+			type: "donation",
+			email: "a@b.com",
+			promoCode: "SAVE10",
+			userAgent: "",
+			ipAddress: "",
+			couponId: "coup_abc",
+			couponName: "SAVE10",
+			originalAmount: "10.00",
+			discountType: "percent",
+			discountValue: "10",
+			discountAmount: "1.00",
+			timestamp: "2025-01-15T10:00:00.000Z",
+		});
+	});
+
+	it("writes an unnamed coupon as the empty string Stripe requires", () => {
+		const metadata = donationMetadata({ email: "a@b.com", discountInfo: { ...DISCOUNT, couponName: null } });
+
+		expect(metadata.couponName).toBe("");
+	});
+
+	it("clamps the free text to the cap and leaves the address whole", () => {
+		const email = `${"a".repeat(240)}@example.com`;
+		const metadata = donationMetadata({
+			email,
+			promoCode: "P".repeat(900),
+			userAgent: "U".repeat(900),
+			ipAddress: "I".repeat(900),
+			discountInfo: null,
+		});
+
+		expect(metadata.email).toBe(email);
+		expect([metadata.promoCode, metadata.userAgent, metadata.ipAddress].map((value) => value?.length)).toEqual([
+			500, 500, 500,
+		]);
 	});
 });

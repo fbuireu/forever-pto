@@ -64,7 +64,7 @@ describe("DriverClient.start", () => {
 	it("calls setSteps when steps are provided", () => {
 		const steps = [{ element: "#foo", popover: { title: "Step 1" } }];
 		const client = new DriverClient({});
-		client.start(steps);
+		client.start({ steps });
 		expect(mockSetSteps).toHaveBeenCalledWith(steps);
 		expect(mockDrive).toHaveBeenCalledOnce();
 	});
@@ -79,7 +79,7 @@ describe("DriverClient.start", () => {
 
 	it("applies overrides to config", () => {
 		const client = new DriverClient({ showProgress: false });
-		client.start(undefined, { showProgress: true });
+		client.start({ overrides: { showProgress: true } });
 		expect(mockDriverFn).toHaveBeenCalledWith(expect.objectContaining({ showProgress: true }));
 	});
 });

@@ -17,7 +17,7 @@ They all follow the same skeleton: a core `Card` with an icon-and-title header, 
 
 ### MonthlyDistributionChart
 
-`MonthlyDistributionChart.tsx` is an `AreaChart` of the PTO Days the plan places per month (`monthlyDist: number[]`, plus `year` and `carryOverMonths`). When carryover months are configured the x-axis extends past December, with month names localized via `useLocale` and `getWindowMonthLabels` from `../utils/helpers`, which names a month past December with its year. The description calls out the peak month.
+`MonthlyDistributionChart.tsx` is an `AreaChart` of the PTO Days the plan places per month (`monthlyDist: number[]`, plus `year`). The x-axis has one tick per entry of the array the engine returned, so a Planning Window with Carry-over Months extends past December without the chart reading the filters, with month names localized via `useLocale` and `getWindowMonthLabels` from `../utils/helpers`, which names a month past December with its year. The description calls out the peak month.
 
 ### HolidaysDistributionChart
 

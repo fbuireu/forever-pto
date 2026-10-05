@@ -27,7 +27,7 @@ const getSettlement = (charge: Stripe.Charge) => {
 export const retrieveCharge = (chargeId: string): Effect.Effect<ChargeData, PaymentError, StripeServerService> =>
 	Effect.gen(function* () {
 		const stripe = yield* StripeServerService;
-		const charge = yield* stripe.charges.retrieve(chargeId, { expand: ["balance_transaction"] });
+		const charge = yield* stripe.charges.retrieve({ id: chargeId, params: { expand: ["balance_transaction"] } });
 		const billingDetails = charge.billing_details;
 		const paymentMethodDetails = charge.payment_method_details;
 		const { feeAmount, netAmount } = getSettlement(charge);

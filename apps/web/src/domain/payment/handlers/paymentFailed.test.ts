@@ -2,20 +2,18 @@ import type { PaymentFailedEvent } from "@domain/payment/events/types";
 import { TursoService } from "@infrastructure/clients/db/turso/service";
 import { DatabaseError } from "@infrastructure/errors";
 import { LoggerService } from "@infrastructure/logging/service";
+import type * as Repository from "@infrastructure/services/payments/repository";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { handlePaymentFailed } from "./paymentFailed";
 
 vi.mock("@infrastructure/services/payments/repository", () => ({
-	getPaymentById: vi.fn(() => Effect.succeed({ id: "pi_test", status: "processing" })),
-	updatePaymentStatus: vi.fn(() => Effect.succeed(true)),
+	updatePaymentStatus: vi.fn<typeof Repository.updatePaymentStatus>(() => Effect.succeed(true)),
 }));
 
 const mockLogger = { info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
-const TestLayer = Layer.mergeAll(
-	Layer.succeed(LoggerService, mockLogger),
-	Layer.succeed(TursoService, { query: vi.fn(), execute: vi.fn() }),
-);
+const mockTurso = { query: vi.fn(), execute: vi.fn(() => Effect.succeed(1)) };
+const TestLayer = Layer.mergeAll(Layer.succeed(LoggerService, mockLogger), Layer.succeed(TursoService, mockTurso));
 
 type R = LoggerService | TursoService;
 const run = <E>(eff: Effect.Effect<void, E, R>) => Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
@@ -64,9 +62,14 @@ describe("handlePaymentFailed", () => {
 	});
 
 	it("reads nothing before writing, so the succeeded row is protected by the WHERE clause", async () => {
-		const { getPaymentById } = await import("@infrastructure/services/payments/repository");
+		const { updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
+		const repository = await vi.importActual<typeof Repository>("@infrastructure/services/payments/repository");
+		vi.mocked(updatePaymentStatus).mockImplementationOnce(repository.updatePaymentStatus);
+
 		await run(handlePaymentFailed(EVENT));
-		expect(getPaymentById).not.toHaveBeenCalled();
+
+		expect(mockTurso.execute).toHaveBeenCalledOnce();
+		expect(mockTurso.query).not.toHaveBeenCalled();
 	});
 
 	it("calls logError when updatePaymentStatus fails", async () => {

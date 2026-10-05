@@ -100,7 +100,8 @@ The paths are deliberately asymmetric, and this is the trap:
   `return_url`; `activateWithClaimedPayment({ paymentIntentId, expectedEmail })` for `POST
   /api/check-session`, which holds an email the browser typed. The secret is the stronger of them, since
   only someone who completed the payment has it. Inside `activateFromDonation` both are optional, so a third
-  caller of it would skip whichever guard it omits. Deriving the email from the intent is
+  caller of it would skip whichever guard it omits; the secret's guard is skipped only when it is `undefined`, so an
+  empty secret fails it as any wrong one does. Deriving the email from the intent is
   what lets the redirect path activate at all, since the payer may come back in a browser that never held
   their address. See [`../../app/AGENTS.md`](../../app/AGENTS.md).
 - `activateWithEmail` (the "I already donated" recovery path) **does not verify**. It looks up a succeeded

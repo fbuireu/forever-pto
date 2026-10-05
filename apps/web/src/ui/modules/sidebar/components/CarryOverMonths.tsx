@@ -2,7 +2,7 @@
 
 import { MIN_CARRY_OVER_MONTHS, useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
-import { PremiumFeatureId } from "@application/stores/premium";
+import { PremiumFeatureId, PremiumOrigin } from "@application/stores/premium";
 import { MAX_CARRY_OVER_MONTHS } from "@domain/calendar/window";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
@@ -67,7 +67,7 @@ export const CarryOverMonths = () => {
 					title={t("title")}
 					tooltip={{ label: t("tooltipLabel"), content: t("tooltip") }}
 				/>
-				<PremiumFeature feature={PremiumFeatureId.CARRY_OVER_MONTHS}>
+				<PremiumFeature feature={PremiumFeatureId.CARRY_OVER_MONTHS} origin={PremiumOrigin.PLANNER}>
 					<div className="flex gap-4 items-center w-full">
 						<p className="font-normal text-sm">{MIN_VALUE}</p>
 						<div className="relative flex-1">

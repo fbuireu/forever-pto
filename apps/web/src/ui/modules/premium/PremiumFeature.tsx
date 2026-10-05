@@ -20,7 +20,7 @@ export type PremiumFeatureVariant = (typeof PremiumFeatureVariant)[keyof typeof 
 
 interface PremiumFeatureProps {
 	feature: PremiumFeatureId;
-	origin?: PremiumOrigin;
+	origin: PremiumOrigin;
 	children: ReactNode;
 	className?: string;
 	description?: string;
@@ -68,11 +68,11 @@ export const PremiumFeature = ({
 					className,
 				)}
 				aria-label={description ?? t("unlockFeature", { feature: featureLabel(feature) })}
-				onClick={() => showPremiumModal(feature, origin)}
+				onClick={() => showPremiumModal({ feature, origin })}
 				onKeyDown={(e) => {
 					if (e.key === "Enter" || e.key === " ") {
 						e.preventDefault();
-						showPremiumModal(feature, origin);
+						showPremiumModal({ feature, origin });
 					}
 				}}
 			>

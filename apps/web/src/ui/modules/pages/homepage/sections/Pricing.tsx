@@ -1,6 +1,6 @@
 import { AMOUNT_MIN } from "@application/dto/payment/schema";
 import { DonateSource, QuickStartSource } from "@application/stores/ui";
-import { FilterStrategy } from "@domain/calendar/types";
+import { Strategy } from "@domain/calendar/types";
 import { Badge } from "@ui/modules/core/primitives/Badge";
 import { QuickStartTrigger } from "@ui/modules/shared/QuickStartTrigger";
 import { SupportButton } from "@ui/modules/shared/SupportButton";
@@ -10,7 +10,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { brutCard } from "./shared";
 
 const FREE_AMOUNT = 0;
-const STRATEGY_COUNT = Object.values(FilterStrategy).length;
+const STRATEGY_COUNT = Object.values(Strategy).length;
 
 export const Pricing = async () => {
 	const [t, locale] = await Promise.all([getTranslations("homepage"), getLocale()]);

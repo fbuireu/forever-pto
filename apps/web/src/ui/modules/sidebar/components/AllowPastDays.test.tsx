@@ -23,6 +23,7 @@ vi.mock("@application/stores/filters", () => ({
 vi.mock("@application/stores/premium", () => ({
 	usePremiumStore: (selector: (state: typeof premiumState) => unknown) => selector(premiumState),
 	PremiumFeatureId: { ALLOW_PAST_DAYS: "allowPastDays" },
+	PremiumOrigin: { PLANNER: "planner" },
 }));
 
 import { AllowPastDays } from "./AllowPastDays";

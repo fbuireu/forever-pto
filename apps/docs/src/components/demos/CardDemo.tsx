@@ -9,10 +9,10 @@ export const CardDemo = () => (
 		<Card className="max-w-sm">
 			<CardHeader>
 				<CardTitle>Summer bridge</CardTitle>
-				<CardDescription>4 PTO days connect two public holidays into a 9-day break.</CardDescription>
+				<CardDescription>4 PTO days connect two public holidays into one 9-day rest block.</CardDescription>
 			</CardHeader>
 			<CardContent className="flex items-center gap-3 text-sm">
-				<Badge>9 days off</Badge>
+				<Badge>9 effective days</Badge>
 				<span className="text-muted-foreground">efficiency ×2.25</span>
 			</CardContent>
 		</Card>

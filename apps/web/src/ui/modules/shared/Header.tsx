@@ -1,10 +1,10 @@
 import { Link } from "@application/i18n/navigation";
 import { QuickStartSource } from "@application/stores/ui";
-import { ThemeSelector } from "@ui/modules/sidebar/components/ThemeSelector";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { HomepageLanguageSwitcher } from "./HomepageLanguageSwitcher";
 import { QuickStartTrigger } from "./QuickStartTrigger";
+import { ThemeSelector } from "./ThemeSelector";
 
 export const Header = async () => {
 	const t = await getTranslations("homepage");

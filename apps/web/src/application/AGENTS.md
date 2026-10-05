@@ -89,7 +89,9 @@ Consequences worth holding on to:
   `INTL_FORMAT_MAP` plus the ISO forms), so an unrecognised pattern is a compile error, and it memoises every
   `Intl.DateTimeFormat` it builds. `getWeekdayNames` and `getMonthNames` go through it (the private `WEEKDAY_FORMAT` and
   `MONTH_FORMAT` maps translate their public `format` into a pattern), and `dates.test.ts` pins the memo by
-  counting `Intl.DateTimeFormat` constructions through a passthrough spy.
+  counting `Intl.DateTimeFormat` constructions through a passthrough spy. `formatDateParts` takes the same pattern
+  keys, without the ISO forms, and returns the `Intl` parts of one date from the same memo, so a header that styles
+  one part (the month header styles the year) formats the date once and lets the locale order and join its parts.
 
 Two weekday conventions meet here. Temporal's `dayOfWeek` is ISO, 1 (Monday) to 7 (Sunday); `isWeekend`,
 `isWeekendIndex` and the `weekStartsOn` option use the JavaScript one, 0 (Sunday) to 6 (Saturday), which is
@@ -150,8 +152,9 @@ pattern for `check-session` and `health`.
 `@` rather than the whole string, so a malformed address cannot leak through the redaction.
 
 A deferred write that fails is logged and swallowed: its error channel is `never`, because the response has already
-gone out. The payments row that [`payment.ts`](./use-cases/payment.ts) and [`activatePremium.ts`](./use-cases/activatePremium.ts) save has the Stripe webhook
-behind it, so a failed save warns; [`contact.ts`](./use-cases/contact.ts) logs `error`, because a lost contact write has no backstop.
+gone out. The payments row that [`payment.ts`](./use-cases/payment.ts) and [`activatePremium.ts`](./use-cases/activatePremium.ts) save, and the
+move of that row to `succeeded` the activation makes, have the Stripe webhook behind them, so a failed save or a failed
+status update warns; [`contact.ts`](./use-cases/contact.ts) logs `error`, because a lost contact write has no backstop.
 
 ## Testing
 

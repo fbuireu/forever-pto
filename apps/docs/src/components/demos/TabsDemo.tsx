@@ -8,12 +8,12 @@ import {
 	TabsTrigger,
 } from "@ui/modules/core/animate/components/Tabs";
 import type { ComponentProps } from "react";
-import { FilterStrategy } from "../../../../web/src/domain/calendar/types";
+import { Strategy } from "../../../../web/src/domain/calendar/types";
 import en from "../../../../web/src/ui/i18n/messages/en.json";
 import { Demo } from "../Demo";
 import { type OwnProps, propRows } from "../PropsTable";
 
-const TABS = Object.values(FilterStrategy).map((id) => ({
+const TABS = Object.values(Strategy).map((id) => ({
 	id,
 	label: en.sidebar.strategy[id].label,
 	content: en.sidebar.strategy[id].subtitle,

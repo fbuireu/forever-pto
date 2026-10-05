@@ -43,7 +43,7 @@ flowchart TB
 | | Region | `Regions.tsx`, a `Combobox` derived from the Country's calendar; disabled when the Country has no Regions | `region` |
 | | Year | `Years.tsx` | `year` |
 | | PTO budget | `PtoDays.tsx` | `ptoDays` |
-| | Strategy | `Strategy.tsx`, a `Combobox` over `FilterStrategy` | `strategy` |
+| | Strategy | `Strategy.tsx`, a `Combobox` over `Strategy` | `strategy` |
 | | Preferred Months | `PreferredMonths.tsx`, one toggle per month of the Planning Window, in order, shown under the Strategy only while Main Vacation is chosen. When the window spans two years, the months are grouped under a heading per year and the Carry-over Months follow December under the next one, because January of the next year is a different choice from January of this one. With past days not allowed, a month that has already ended is disabled; a stored choice there is kept and returns when past days are allowed | `preferredMonths` |
 | | Allow past days | `AllowPastDays.tsx`, a `Switch` behind the Premium gate | `allowPastDays` |
 | | Carry-over Months | `CarryOverMonths.tsx`, a `Slider` behind the Premium gate | `carryOverMonths` |
@@ -107,7 +107,7 @@ Every day cell is painted from one table, `MODIFIERS_CLASS_NAMES` in `apps/web/s
 | Custom Holiday | `isCustom` | Purple hatch |
 | Suggested Day | `isSuggestion`, minus Removed Days | Brand teal |
 | Alternative preview | `isAlternative` for the previewed index | Orange hatch, pulsing |
-| Manual Day | `isManuallySelected` | Teal-purple hatch |
+| Manual Day | `isManual` | Teal-purple hatch |
 | Today | `isToday` | Ink, flips to yellow on hover |
 
 Each cell also carries `aria-label` text built from `DAY_STATE_LABELS`, so a screen reader hears "suggested" or "manual" where a sighted user sees a colour.

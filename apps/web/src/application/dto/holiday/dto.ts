@@ -61,6 +61,3 @@ export const holidayDTO: HolidayDTOShape = {
 		isInPlanningWindow: isInPlanningWindow({ date, window: planningWindowInterval({ year, carryOverMonths }) }),
 	}),
 };
-
-export const holidaysInPlanningWindow = (holidays: HolidayDTO[] | undefined): HolidayDTO[] =>
-	(holidays ?? []).filter((holiday) => holiday.isInPlanningWindow);
