@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.13.6](https://github.com/fbuireu/forever-pto/compare/web-v1.13.5...web-v1.13.6) (2026-10-05)
+
+
+### Bug Fixes
+
+* close the backlog, from the canonical copy in six bundles to real DTOs in every test ([79369e0](https://github.com/fbuireu/forever-pto/commit/79369e0f4a07968860cbbcdb8f895dd242582f4f))
+
 # [forever-pto-web-v1.13.5](https://github.com/fbuireu/forever-pto/compare/web-v1.13.4...web-v1.13.5) (2026-10-05)
 
 
