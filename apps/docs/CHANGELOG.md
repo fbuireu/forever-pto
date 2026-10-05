@@ -1,3 +1,10 @@
+# [forever-pto-docs-v1.5.5](https://github.com/fbuireu/forever-pto/compare/docs-v1.5.4...docs-v1.5.5) (2026-10-05)
+
+
+### Bug Fixes
+
+* close the backlog, from the canonical copy in six bundles to real DTOs in every test ([79369e0](https://github.com/fbuireu/forever-pto/commit/79369e0f4a07968860cbbcdb8f895dd242582f4f))
+
 # [forever-pto-docs-v1.5.4](https://github.com/fbuireu/forever-pto/compare/docs-v1.5.3...docs-v1.5.4) (2026-10-05)
 
 
