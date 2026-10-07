@@ -6,7 +6,7 @@
 
 **The wiki.** Astro Starlight on Cloudflare Workers, rendering the app's real components.
 
-**[docs.forever-pto.com](https://docs.forever-pto.com)** · **[Repository README](../../README.md)** · **[Agent guide](./AGENTS.md)** · **[Glossary](../../CONTEXT.md)**
+**[docs.forever-pto.com](https://docs.forever-pto.com)** · **[Repository README](../../README.md)** · **[Agent guide](./AGENTS.md)** · **[Glossary](../../GLOSSARY.md)**
 
 </div>
 

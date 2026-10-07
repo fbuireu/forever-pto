@@ -2,7 +2,7 @@
 
 The business rules, in bounded contexts that deliberately do not follow the same rule. Nothing here
 renders, routes, reads a request or reaches for a browser global. The vocabulary is
-[`CONTEXT.md`](../../../../CONTEXT.md).
+[`GLOSSARY.md`](../../../../GLOSSARY.md).
 
 ## Bounded contexts
 

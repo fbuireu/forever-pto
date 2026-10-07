@@ -15,7 +15,7 @@ for `payment/confirmation` and the global not-found page, which render per reque
 Premium (advanced metrics, manual editing of a Suggestion) is unlocked by a Donation. There are no accounts: the
 payment record *is* the entitlement ([ADR 0008](../../adr/0008-premium-derived-from-payment.md)).
 
-The vocabulary is the repo glossary's; see [`CONTEXT.md`](../../CONTEXT.md).
+The vocabulary is the repo glossary's; see [`GLOSSARY.md`](../../GLOSSARY.md).
 
 ## Stack
 

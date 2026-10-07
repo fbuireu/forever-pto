@@ -128,7 +128,7 @@ UI rather than the copy. The parity test above is what keeps that from reaching 
 
 ## Key names that carry a retired term
 
-Some **key names** hold a term [`CONTEXT.md`](../../../../../CONTEXT.md) retires, for example
+Some **key names** hold a term [`GLOSSARY.md`](../../../../../GLOSSARY.md) retires, for example
 `summary.notifications.canImprove.reviewOptions` (Alternative), `alternativesManager.totalOff` (Effective Day),
 `ptoDays.autoAssigned` (Suggested Day), `workdayCounter.dateRange` (Planning Window) and
 `summary.yearSummary.firstBreak` (Rest Block). Renaming one edits every bundle and every call site, and the key

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The translation seam between external shapes and the vocabulary in [`CONTEXT.md`](../../../../../CONTEXT.md). A holiday arrives from `date-holidays` as a `RawHoliday`, a payment arrives from Stripe as a `PaymentIntent`, a country list arrives from `i18n-iso-countries` as a map of code to name. Nothing downstream should have to know any of that. A DTO takes the foreign shape in and hands back the canonical one (`HolidayDTO`, `PaymentData`, `CountryDTO`), so stores, use-cases, the domain and the UI only ever speak the glossary.
+The translation seam between external shapes and the vocabulary in [`GLOSSARY.md`](../../../../../GLOSSARY.md). A holiday arrives from `date-holidays` as a `RawHoliday`, a payment arrives from Stripe as a `PaymentIntent`, a country list arrives from `i18n-iso-countries` as a map of code to name. Nothing downstream should have to know any of that. A DTO takes the foreign shape in and hands back the canonical one (`HolidayDTO`, `PaymentData`, `CountryDTO`), so stores, use-cases, the domain and the UI only ever speak the glossary.
 
 The rest of the application layer contract is in [`../AGENTS.md`](../AGENTS.md).
 

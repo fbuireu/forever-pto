@@ -7,7 +7,7 @@ turn that budget into the longest stretches away from work, picks a set of them 
 offers Alternatives, and measures the result. Pure functions throughout: same inputs, same output, no
 clock beyond `startOfToday()`, no I/O. The layer contract it sits under is in [`../AGENTS.md`](../AGENTS.md)
 ([ADR 0003](../../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md)); the words it uses are
-in [`CONTEXT.md`](../../../../../CONTEXT.md).
+in [`GLOSSARY.md`](../../../../../GLOSSARY.md).
 
 ## Files
 
@@ -77,7 +77,7 @@ internal.
 **`measureBudget` is the one place the budget arithmetic lives, and it is built on `resolveSelectedDays` so it
 cannot disagree with the Metrics.** It answers `{ suggested, manual, spent, remaining }` for a budget and a
 plan; `spent` is exactly `resolveSelectedDays(...).length`, which is the same denominator Efficiency uses, and
-`remaining` is the Remaining Budget as [`CONTEXT.md`](../../../../../CONTEXT.md) defines it, clamped at zero.
+`remaining` is the Remaining Budget as [`GLOSSARY.md`](../../../../../GLOSSARY.md) defines it, clamped at zero.
 `toggleDaySelection`, `PlannerPanel`'s status readout and the sidebar's budget control all route through it.
 
 **`resolveSelectedDays` is applied twice, on purpose.** `generateMetrics` applies it to its own input, and
@@ -297,7 +297,7 @@ That rule leaves the Metrics seeing Holidays from outside the Planning Window, a
 what stops them being counted as the plan's own work**: a stretch scores only when it contains a day the plan
 actually placed, not merely any free weekday. Holidays still extend a stretch (that is what a Bridge is for),
 but a run that next year's Holidays form on their own does not count. This is the standard
-[`CONTEXT.md`](../../../../../CONTEXT.md) sets for Longest Vacation, *the longest stretch the plan produces*, and
+[`GLOSSARY.md`](../../../../../GLOSSARY.md) sets for Longest Vacation, *the longest stretch the plan produces*, and
 it is why the rule belongs in the streak test rather than in the Holiday list the engine is handed.
 
 **The streak metrics walk the free-day runs, and they walk them once.** `generateMetrics` calls `freeStreaks`
@@ -505,7 +505,7 @@ from the Planning Window and fill zeros, `freeStreaks` short-circuits to `[]`, `
 everything out, `calculateRestBlocks` and `getFirstLastRestBlock` have their own empty answers. Only the Efficiency
 division needs a guard, because `0 / 0` is `NaN`. Max Work Streak and Worked Days per month are scoped to the
 calendar year, not to the plan, so with nothing placed they are the whole year still standing, around 261 and
-21.8, not 0: `CONTEXT.md` defines Max Work Streak as the longest run of Workdays *left standing after the plan is
+21.8, not 0: `GLOSSARY.md` defines Max Work Streak as the longest run of Workdays *left standing after the plan is
 applied*.
 
 ## The cache protocol

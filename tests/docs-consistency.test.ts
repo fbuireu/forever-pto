@@ -408,7 +408,7 @@ describe("the contract has a corpus to read", () => {
 	it("reads every corpus its rules scan out of the tree at all", () => {
 		expect(trackedFiles.length).toBeGreaterThan(500);
 		expect(authoredMarkdown).toEqual(
-			expect.arrayContaining(["AGENTS.md", "CODING_STANDARDS.md", "CONTEXT.md", ...PACKAGE_GUIDES]),
+			expect.arrayContaining(["AGENTS.md", "CODING_STANDARDS.md", "GLOSSARY.md", ...PACKAGE_GUIDES]),
 		);
 		expect(githubMarkdown).toEqual(
 			expect.arrayContaining([`${GITHUB_DIR}/CONTRIBUTING.md`, `${GITHUB_DIR}/PULL_REQUEST_TEMPLATE.md`]),
@@ -419,16 +419,16 @@ describe("the contract has a corpus to read", () => {
 	});
 });
 
-describe("CONTEXT.md is the domain glossary and nothing else", () => {
-	const glossary = read("CONTEXT.md");
+describe("GLOSSARY.md is the domain glossary and nothing else", () => {
+	const glossary = read("GLOSSARY.md");
 
 	it("lives only at the repo root", () => {
-		expect(markdownFiles).toContain("CONTEXT.md");
-		expect(markdownFiles.filter((path) => path.endsWith("/CONTEXT.md"))).toEqual([]);
+		expect(markdownFiles).toContain("GLOSSARY.md");
+		expect(markdownFiles.filter((path) => path.endsWith("/GLOSSARY.md"))).toEqual([]);
 	});
 
 	it("is linked from AGENTS.md so it is discoverable", () => {
-		expect(rootGuide).toContain("CONTEXT.md");
+		expect(rootGuide).toContain("GLOSSARY.md");
 	});
 
 	it("carries no file paths, identifiers or call signatures", () => {
@@ -450,7 +450,7 @@ describe("CONTEXT.md is the domain glossary and nothing else", () => {
 
 	it("uses every term it defines in prose somewhere outside itself, since a term nothing else speaks is canonical in name only", () => {
 		const elsewhere = authoredMarkdown
-			.filter((path) => path !== "CONTEXT.md")
+			.filter((path) => path !== "GLOSSARY.md")
 			.concat(contentFiles)
 			.map((path) => read(path))
 			.join("\n");
@@ -1005,7 +1005,7 @@ describe("documentation does not point at things that are gone", () => {
 		expect(missing).toEqual([]);
 	});
 
-	it("never teaches a nested CONTEXT.md, which the root guide forbids", () => {
+	it("never teaches a nested GLOSSARY.md, which the root guide forbids", () => {
 		const offenders: string[] = [];
 		for (const file of [...authoredMarkdown, ...contentFiles]) {
 			for (const [, token] of read(file).matchAll(NESTED_CONTEXT_CITATION)) {
@@ -1239,7 +1239,7 @@ describe("documentation does not point at things that are gone", () => {
 	});
 
 	it("heads the published glossary with canonical terms, never retired ones", () => {
-		const glossary = read("CONTEXT.md");
+		const glossary = read("GLOSSARY.md");
 		const canonical = new Set([...glossary.matchAll(GLOSSARY_TERM)].map(([, term]) => term.toLowerCase()));
 		const retired = new Set(
 			[...glossary.matchAll(GLOSSARY_AVOID_LINE)].flatMap(([, list]) =>
@@ -1258,7 +1258,7 @@ describe("documentation does not point at things that are gone", () => {
 	});
 
 	it("writes the canonical name in the published wiki's prose outside the landing pages marketing owns, not a multi-word retired one, since single retired words such as type and state are ordinary English there", () => {
-		const glossary = read("CONTEXT.md");
+		const glossary = read("GLOSSARY.md");
 		const canonical = new Set([...glossary.matchAll(GLOSSARY_TERM)].map(([, term]) => term.toLowerCase()));
 		const compounds = [
 			...new Set(

@@ -17,11 +17,11 @@ the marketing copy speaks the visitor's words. See *Amendment, 2026-10-04* at th
 
 ## Context
 
-This tree speaks domain-driven design fluently and never says so. `CONTEXT.md` opens by calling itself "the
+This tree speaks domain-driven design fluently and never says so. `GLOSSARY.md` opens by calling itself "the
 ubiquitous language" and is the only document in the repository that uses the phrase. *Bounded context* is
 load-bearing across the ADRs and the layer guides. *Domain event* is the vocabulary of the payment context's own
 guide, of other guides and of the wiki. There is a `domain/` layer holding its bounded contexts, an `application/use-cases/` folder, and an `application/dto/` folder whose own guide describes it as
-"the translation seam between external shapes and the vocabulary in `CONTEXT.md`", which is an
+"the translation seam between external shapes and the vocabulary in `GLOSSARY.md`", which is an
 anti-corruption layer under a different name. The string `DDD` appears in no file in the repository.
 
 So the approach is everywhere in the vocabulary and nowhere in the decisions, and the suffix people reach for
@@ -52,7 +52,7 @@ deliberate and named, the second because the claims become measurements.
 
 **The strategic half is not negotiable.** These are it, and a change to any of them is a change to this ADR:
 
-1. **Ubiquitous language.** [`../CONTEXT.md`](../CONTEXT.md) is the authority over names in code, in
+1. **Ubiquitous language.** [`../GLOSSARY.md`](../GLOSSARY.md) is the authority over names in code, in
    user-facing copy and in these documents. One canonical term per concept, with the competing names listed
    under `_Avoid_`. A variable named for a retired term is a defect, not a style preference; the glossary is
    the only thing keeping the rival names for the same number apart.
@@ -88,7 +88,7 @@ a deferred refactor.
 
 | Practice | Verdict | The concrete reason, in this tree |
 | --- | --- | --- |
-| Ubiquitous language | **Taken whole** | The product's whole difficulty is that rival numbers share one word in ordinary speech, and the glossary retires that word outright. `CONTEXT.md` and its `_Avoid_` lists are the only thing separating PTO Day, Effective Day, Free Day and Bonus Day, and the contract suite fails on a retired term in the published wiki |
+| Ubiquitous language | **Taken whole** | The product's whole difficulty is that rival numbers share one word in ordinary speech, and the glossary retires that word outright. `GLOSSARY.md` and its `_Avoid_` lists are the only thing separating PTO Day, Effective Day, Free Day and Bonus Day, and the contract suite fails on a retired term in the published wiki |
 | Bounded contexts | **Taken whole** | Not for modelling reasons: the contexts run in different *runtimes*. `calendar/` is evaluated inside a Web Worker with no DOM and no server context, `payment/` never leaves the server. A shared type would be a shared runtime constraint |
 | Layered architecture | **Taken, with the real graph published** | Layers with per-folder contracts. What is rejected is the *idealised* graph: the arrows are counted, not drawn, because a diagram read off the intent drifts back to the intent |
 | Anti-corruption layer | **Taken, at exactly one seam** | `application/dto/`. The foreign vocabularies arrive (`date-holidays`, Stripe, `i18n-iso-countries`) and one glossary leaves. There is no second ACL and no need for one: nothing else in the tree consumes a foreign shape |
@@ -102,7 +102,7 @@ a deferred refactor.
 ### What the "ish" is, measured against the sibling repositories
 
 The suffix is not a hedge and not an apology. It has a size, and the cheapest way to see it is that the same
-maintainer runs the sibling repositories on the same conventions (the same `CONTEXT.md` glossary, the same
+maintainer runs the sibling repositories on the same conventions (the same `GLOSSARY.md` glossary, the same
 nested `AGENTS.md` per folder, the same contract suite, the same Cloudflare Workers deploy), and each takes a
 *different* amount of tactical DDD. Read against them, the "ish" here is a measurement rather than a mood.
 
@@ -201,7 +201,7 @@ rejections matter as much as the fixes: a rule is only as clear as the cases it 
    measured against different denominators and coincide only when a plan spends its budget in full, so
    passing one where the other is wanted is a real error. No call site can make it: both arrive inside
    `Metrics` under their own field names and are read at separate call sites, so there is no position where
-   either could be substituted. The rule lives in `CONTEXT.md`, which states both denominators and why they
+   either could be substituted. The rule lives in `GLOSSARY.md`, which states both denominators and why they
    part company.
 5. **A `Payment` aggregate root with an invariant-enforcing constructor. Reachable: yes. Read: yes.
    Crosses: yes, and still rejected.** Every question answers yes and the answer is still no, because the
@@ -247,7 +247,7 @@ rejections matter as much as the fixes: a rule is only as clear as the cases it 
 
 ## Amendment, 2026-10-04: the marketing copy speaks the visitor's words
 
-**The glossary binds code, documents and product copy.** Point 1 made `CONTEXT.md` the authority over all
+**The glossary binds code, documents and product copy.** Point 1 made `GLOSSARY.md` the authority over all
 user-facing copy, which held the homepage to the planner's vocabulary: a visitor searches for "days off" and
 "vacation plan", and the homepage could not say either. The rival numbers the glossary keeps apart are read and
 acted on in the planner, its exports, the wiki and the code, so that is where it binds. Marketing copy, which is

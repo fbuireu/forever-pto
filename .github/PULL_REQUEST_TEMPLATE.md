@@ -47,9 +47,9 @@
 - [ ] `pnpm verify` passes (format check, typecheck and coverage, then the contract suite)
 - [ ] I have reviewed my own diff against [`CODING_STANDARDS.md`](../CODING_STANDARDS.md)
 - [ ] My change adds no comment to hand-written source; rationale lives in this PR, the commit messages, an ADR or a rule in [`CODING_STANDARDS.md`](../CODING_STANDARDS.md)
-- [ ] I used the glossary's words ([`CONTEXT.md`](../CONTEXT.md)) rather than synonyms
+- [ ] I used the glossary's words ([`GLOSSARY.md`](../GLOSSARY.md)) rather than synonyms
 - [ ] This PR touches one package, `apps/web` or `apps/docs`, unless the change genuinely spans both
-- [ ] I updated any `AGENTS.md`, [`CODING_STANDARDS.md`](../CODING_STANDARDS.md), [`CONTEXT.md`](../CONTEXT.md), ADR or docs-site page my change affects, in this same PR, and `pnpm test:docs` passes
+- [ ] I updated any `AGENTS.md`, [`CODING_STANDARDS.md`](../CODING_STANDARDS.md), [`GLOSSARY.md`](../GLOSSARY.md), ADR or docs-site page my change affects, in this same PR, and `pnpm test:docs` passes
 - [ ] My changes generate no new warnings or errors
 - [ ] I have added tests that prove my fix is effective or that my feature works
 

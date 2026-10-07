@@ -1,7 +1,7 @@
 # AGENTS.md
 
 Agent-facing guide for the **forever-pto** repository, a workspace holding the Forever PTO planner and its
-documentation site. [CONTEXT.md](./CONTEXT.md) is the domain glossary (PTO Day, Bridge, Suggestion, Alternative,
+documentation site. [GLOSSARY.md](./GLOSSARY.md) is the domain glossary (PTO Day, Bridge, Suggestion, Alternative,
 Effective Day, Efficiency, Donation…); do not duplicate it here.
 
 Reviewing a diff: [CODING_STANDARDS.md](./CODING_STANDARDS.md).
@@ -28,7 +28,7 @@ patches/              patchedDependencies, applied by pnpm
 .github/              Workflows and the prepare-env composite action
 biome.json            Lint and format for both packages
 CODING_STANDARDS.md   What a review holds a diff to
-CONTEXT.md            The domain glossary, root only
+GLOSSARY.md            The domain glossary, root only
 ```
 
 There is no `packages/` tier. It is added to [`pnpm-workspace.yaml`](./pnpm-workspace.yaml) the day a real shared
@@ -135,7 +135,7 @@ published [release page](./apps/docs/src/content/docs/infra/release.mdx) walks t
   `fatal: tag '<version>' already exists`, and the GitHub Release that carries it is `immutable`, so the tag cannot
   be moved: `git merge -s ours` of the orphaned release commit into `main` makes it reachable again without changing a
   file. A further rewrite orphans it again.
-- A change confined to the repo root (`adr/`, `tests/`, `README.md`, `CONTEXT.md`, this file) releases nothing.
+- A change confined to the repo root (`adr/`, `tests/`, `README.md`, `GLOSSARY.md`, this file) releases nothing.
   `WEB_PATHS` in `ci.yml` also matches the root [`package.json`](./package.json), the lockfile,
   `pnpm-workspace.yaml`, [`patches/`](./patches), [`biome.json`](./biome.json), `.nvmrc`,
   [`.github/actions/`](./.github/actions) and the two web workflows, which redeploy the app and run `release-web`, and
@@ -162,7 +162,7 @@ and rulesets behind them are settings, on the [environments](./apps/docs/src/con
 
 - **`Check` and `Check (docs)` are the contexts the ruleset requires**, each an aggregate under `always()` that fails
   when a job it needs failed or was cancelled; a job that must gate a merge goes in its `needs`.
-- **`verify` runs on every push**, because the contract suite reads `CONTEXT.md`, `adr/` and every guide; `changes`
+- **`verify` runs on every push**, because the contract suite reads `GLOSSARY.md`, `adr/` and every guide; `changes`
   gates only the deploys and the releases.
 - **`smoke` runs the `@smoke` cases in [`apps/web/e2e/smoke.spec.ts`](./apps/web/e2e/smoke.spec.ts) against
   production**, with `BASE_URL` read from the `WEB_SITE_URL` **repository** variable (the job declares no
@@ -194,7 +194,7 @@ a promise, not a fix.
 
 | Document | Answers | Update it when |
 | --- | --- | --- |
-| [`CONTEXT.md`](./CONTEXT.md) (root only) | *What does this word mean?* A domain glossary, and nothing else | A domain term changes meaning, a new one appears, or a second name for an existing concept shows up in the code or the UI |
+| [`GLOSSARY.md`](./GLOSSARY.md) (root only) | *What does this word mean?* A domain glossary, and nothing else | A domain term changes meaning, a new one appears, or a second name for an existing concept shows up in the code or the UI |
 | [`CODING_STANDARDS.md`](./CODING_STANDARDS.md) | *What does a review hold a diff to?* How code here is written, each rule hard or judgement | A convention changes, or a check lands that makes a rule mechanical |
 | This file | *How is the repository put together?* Layout, shared tooling, releases, CI | You change the workspace, the release setup, a workflow, or a coupling that spans both packages |
 | `apps/*/README.md` | *What is this package, and how do I run it?* | The package's capabilities, scripts or required setup change |
@@ -206,7 +206,7 @@ a promise, not a fix.
 
 | If you change | Update |
 | --- | --- |
-| What a domain word means, or introduce a new one | [`CONTEXT.md`](./CONTEXT.md): the glossary, vocabulary only |
+| What a domain word means, or introduce a new one | [`GLOSSARY.md`](./GLOSSARY.md): the glossary, vocabulary only |
 | A rule about how code is written | [`CODING_STANDARDS.md`](./CODING_STANDARDS.md) |
 | A folder's layout, the files a concept is made of, or a coupling or gotcha its guide states | that folder's nested `AGENTS.md` |
 | A behaviour a doc states as a coupling or a gotcha | that bullet, or delete it if it stopped being true |

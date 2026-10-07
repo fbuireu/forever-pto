@@ -70,7 +70,7 @@ On `main`, the deploy job reuses the build job's `apps/docs/dist` artifact and r
 
 ## Accepted cost: docs PRs still run app CI
 
-`ci.yml` opens with a `changes` job that derives whether `apps/web` was touched, and gates `deploy-production`, `release-web` and `deploy-development` on it, so a docs-only PR deploys no app preview Worker and runs no app E2E. The `Verify` job stays unconditional, because the documentation contract suite reads `CONTEXT.md`, `adr/` and every guide and must not be skipped by a markdown-only change.
+`ci.yml` opens with a `changes` job that derives whether `apps/web` was touched, and gates `deploy-production`, `release-web` and `deploy-development` on it, so a docs-only PR deploys no app preview Worker and runs no app E2E. The `Verify` job stays unconditional, because the documentation contract suite reads `GLOSSARY.md`, `adr/` and every guide and must not be skipped by a markdown-only change.
 
 The obvious fix, `paths-ignore: ['apps/docs/**']` on the app workflows, has a branch-protection caveat: required status checks that never run **never report**, and GitHub blocks the merge waiting for them. That is why neither workflow carries a path filter: each has a `changes` job that gates its own jobs with `if:`, and an aggregate job that always reports, `Check` in `ci.yml` and `Check (docs)` in `docs.yml`, is what the ruleset requires. The redundancy that remains, the contract suite running on every pull request, is deliberate.
 

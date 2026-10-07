@@ -143,7 +143,7 @@ from the payment record ([ADR 0008](../../../../../../../adr/0008-premium-derive
 **A Quarter here is a Quarter of the Planning Window, so `Q5` is not a bug.** `QuarterDistributionChart` and
 `BlocksPerQuarterChart` label their bars `Q${index + 1}` over the array the engine sizes with
 `windowQuarterCount`, `ceil((12 + carryOverMonths) / 3)`. The default Carry-over Month count is 1, so the
-default window already holds five. [`CONTEXT.md`](../../../../../../../CONTEXT.md) defines Quarter.
+default window already holds five. [`GLOSSARY.md`](../../../../../../../GLOSSARY.md) defines Quarter.
 `MonthlyDistributionChart` sizes its axis the same way, from `monthlyDist.length`, and takes no
 `carryOverMonths`: the filters can move on while a plan from the older window is still on screen, and a chart
 that read them would pad that plan with months it never measured or name its last months `Month 13`.
@@ -255,7 +255,7 @@ store; the engine's Metrics are computed against the days the plan placed (`days
 
 They agree only when the plan spends the whole budget, and a Removed Day or a Bridge that no longer fits leaves
 budget standing. So Gain is not Efficiency minus one, and the badge is not a Bonus Day count as
-[`CONTEXT.md`](../../../../../../../CONTEXT.md) defines it, which is why its label says "over budget". The screen
+[`GLOSSARY.md`](../../../../../../../GLOSSARY.md) defines it, which is why its label says "over budget". The screen
 names each figure's baseline instead of aligning them: the Effective Days and Gain badges interpolate `ptoDays`,
 and the Efficiency card's `hint` names the days placed.
 
@@ -301,7 +301,7 @@ through `DAY_REFUSAL_COPY`.** A new refusal is a new reason in the stores'
 
 **A Holiday's status badge says whether it is a Weekday Holiday or falls on a weekend.** `HolidayRow` draws it, and
 the table's footer counts each kind (`holidaysTable.weekendCount` and `weekdayHolidayCount`). Neither calls a
-Holiday a Workday, the term [`CONTEXT.md`](../../../../../../../CONTEXT.md) keeps for a date that is no Holiday.
+Holiday a Workday, the term [`GLOSSARY.md`](../../../../../../../GLOSSARY.md) keeps for a date that is no Holiday.
 
 **`getHolidayId` in `holidays/HolidaysTable.tsx` returns `` `${holiday.id}::${holiday.name}` ``.** The toolbar count and the modals read
 `selectedHolidaysList`, resolved against `variantHolidays` rather than the visible rows, so a selection a search

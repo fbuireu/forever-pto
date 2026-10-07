@@ -375,7 +375,7 @@ The label map is the one place where an id and a message path meet, and it resol
 `satisfies Record<PremiumFeatureId, string>` is what makes a new id a compile error rather than a blank
 banner.
 
-**`upgrade_modal_opened` is the one identifier that keeps the word `CONTEXT.md` retires for Premium**, because
+**`upgrade_modal_opened` is the one identifier that keeps the word `GLOSSARY.md` retires for Premium**, because
 it is a key in a Better Stack funnel this repository cannot see. It is declared in
 [`../../infrastructure/clients/logging/better-stack/tracking.ts`](../../infrastructure/clients/logging/better-stack/tracking.ts)'s event union.
 

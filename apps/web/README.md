@@ -9,7 +9,7 @@
 
 **The planner.** Next.js on Cloudflare Workers through OpenNext.
 
-**[forever-pto.com](https://forever-pto.com)** · **[Repository README](../../README.md)** · **[Agent guide](./AGENTS.md)** · **[Glossary](../../CONTEXT.md)**
+**[forever-pto.com](https://forever-pto.com)** · **[Repository README](../../README.md)** · **[Agent guide](./AGENTS.md)** · **[Glossary](../../GLOSSARY.md)**
 
 </div>
 

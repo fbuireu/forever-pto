@@ -130,7 +130,7 @@ See [`apps/web/.env.example`](apps/web/.env.example) for the full list. Key vari
 | [`CODING_STANDARDS.md`](CODING_STANDARDS.md) | How code here is written: the rules a review holds a diff to |
 | [`apps/web/README.md`](apps/web/README.md) | The planner: what it does, how to run it, how it releases |
 | [`apps/docs/README.md`](apps/docs/README.md) | The wiki: how to run it, and how to write a page |
-| [`CONTEXT.md`](CONTEXT.md) | The domain glossary: one canonical name per concept |
+| [`GLOSSARY.md`](GLOSSARY.md) | The domain glossary: one canonical name per concept |
 | [`adr/`](adr/) | Why it is like this. One hard-to-reverse decision per file |
 
 **The architecture is domain-driven in its strategic half and deliberately not in its tactical half.** The
