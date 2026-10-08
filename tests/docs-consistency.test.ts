@@ -4357,6 +4357,20 @@ describe("the guides describe the project as it is configured", () => {
 		expect(wrapped).toEqual([]);
 	});
 
+	it("names every wrangler deploy with a --message of its own, the sha and the event, so a deployment reads as the commit it shipped", () => {
+		const deployLines = workflowFiles.flatMap((file) =>
+			read(file)
+				.split(/\r?\n/)
+				.filter((line) => DEPLOY_TOOL_COMMAND.test(line) || WRANGLER_ACTION_DEPLOY.test(line))
+				.map((line) => ({ file, line: line.trim() })),
+		);
+
+		expect(deployLines.length).toBeGreaterThan(2);
+		expect(
+			deployLines.filter(({ line }) => !line.includes("--message")).map(({ file, line }) => `${file} -> ${line}`),
+		).toEqual([]);
+	});
+
 	it("runs any wrangler secret write without a retry wrapper, whether or not one still exists", () => {
 		const wrapped: string[] = [];
 

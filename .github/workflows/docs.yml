@@ -129,7 +129,7 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/docs
           wranglerVersion: ${{ steps.wrangler.outputs.version }}
-          command: deploy --env development --name pr-${{ github.event.pull_request.number }}-forever-pto-docs-development
+          command: deploy --env development --name pr-${{ github.event.pull_request.number }}-forever-pto-docs-development --message ${{ github.sha }}-${{ github.event_name }}
       - name: Find existing comment
         uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4.0.0
         id: find-comment
@@ -182,7 +182,7 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/docs
           wranglerVersion: ${{ steps.wrangler.outputs.version }}
-          command: deploy --env production
+          command: deploy --env production --message ${{ github.sha }}-${{ github.event_name }}
 
   smoke:
     name: Production smoke tests (docs)
