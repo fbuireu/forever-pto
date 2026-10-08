@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.13.7](https://github.com/fbuireu/forever-pto/compare/web-v1.13.6...web-v1.13.7) (2026-10-08)
+
+
+### Bug Fixes
+
+* **deps:** update dependency next to v16.3.8 [security] ([#414](https://github.com/fbuireu/forever-pto/issues/414)) ([3b713d6](https://github.com/fbuireu/forever-pto/commit/3b713d630f8f03da8eef6954a7da1e600984d377))
+
 # [forever-pto-web-v1.13.6](https://github.com/fbuireu/forever-pto/compare/web-v1.13.5...web-v1.13.6) (2026-10-05)
 
 
