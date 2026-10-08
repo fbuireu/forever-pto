@@ -41,13 +41,13 @@
 		"test:ut": "pnpm --filter forever-pto-web test:ut && vitest run",
 		"test:ut:watch": "pnpm --filter forever-pto-web test:ut:watch",
 		"test:ut:coverage": "pnpm --filter forever-pto-web test:ut:coverage && vitest run",
-		"test:ut:changed": "pnpm --filter forever-pto-web test:ut:changed && vitest run --changed origin/main",
+		"test:ut:changed": "pnpm --filter forever-pto-web test:ut:changed",
 		"test:docs": "vitest run",
 		"test:e2e": "pnpm --filter forever-pto-web test:e2e",
 		"test:e2e:ui": "pnpm --filter forever-pto-web test:e2e:ui",
 		"verify:static": "pnpm format:check && pnpm typecheck",
 		"verify": "pnpm verify:static && pnpm test:ut:coverage",
-		"verify:changed": "pnpm verify:static && pnpm test:ut:changed",
+		"verify:changed": "pnpm verify:static && pnpm test:ut:changed && pnpm test:docs",
 		"prepare": "husky"
 	},
 	"devDependencies": {

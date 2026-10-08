@@ -73,7 +73,7 @@ pnpm test:ut:coverage   # apps/web with coverage, then the contract suite withou
 pnpm test:e2e           # apps/web playwright
 pnpm verify:static      # format:check && typecheck: everything verify does but the suites
 pnpm verify             # verify:static && test:ut:coverage; the CI Check job
-pnpm verify:changed     # verify:static && test:ut:changed; what pre-push runs
+pnpm verify:changed     # verify:static && test:ut:changed && test:docs; what pre-push runs
 ```
 
 `pnpm --filter forever-pto-docs dev` runs the docs site; it has no root passthrough.
@@ -85,9 +85,10 @@ headed by the `summaryLabel` the root config registers.
 
 Husky runs `lint-staged` on `pre-commit`, `commitlint` on `commit-msg` and `verify:changed` on `pre-push`. The hook is
 weaker than the CI `Verify` job on purpose: a changed-only run and the coverage floor cannot both hold, so coverage
-stays in CI, which runs the full `pnpm verify` on the pushed sha. **`pre-push` also fires inside the release job**,
-because `@semantic-release/git` pushes and husky is installed on the runner, so a broken `test:ut:changed` stops a
-release too.
+stays in CI, which runs the full `pnpm verify` on the pushed sha. The contract suite runs whole all the same:
+`--changed` picks tests through the import graph and no document is in it, so a push that touched only a guide would
+reach CI unchecked. **`pre-push` also fires inside the release job**, because `@semantic-release/git` pushes and husky
+is installed on the runner, so a broken `test:ut:changed` or contract suite stops a release too.
 
 `typecheck` ends with `astro check`, which types every docs demo against the app's real props and so puts the
 cross-package seam in front of the author. Run it that way, never as `tsc -p apps/docs`, which reports artefacts of

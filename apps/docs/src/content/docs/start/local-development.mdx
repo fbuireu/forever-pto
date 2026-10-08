@@ -50,10 +50,10 @@ All scripts live in the root `package.json` (which is the source of truth if thi
 | `format:check` | Biome check with no writes, the read-only gate `verify` runs |
 | `typecheck` | The root program, then `apps/web`, then `astro check` over `apps/docs` |
 | `test:ut` / `test:ut:coverage` | `apps/web`'s unit tests then the contract suite / with v8 coverage |
-| `test:ut:changed` | `apps/web`'s unit tests over what changed, then the contract suite |
+| `test:ut:changed` | `apps/web`'s unit tests over what changed |
 | `test:docs` | The contract suite alone |
 | `verify` | `format:check` + `typecheck` + `test:ut:coverage`, the gate CI runs |
-| `verify:changed` | `format:check` + `typecheck` + `test:ut:changed`, what `pre-push` runs |
+| `verify:changed` | `format:check` + `typecheck` + `test:ut:changed` + `test:docs`, what `pre-push` runs |
 | `test:e2e` / `test:e2e:ui` | Playwright end-to-end tests / UI mode |
 
 The docs package has its own scripts (`apps/docs/package.json`): `dev`, `build`, `preview`, `deploy`, `upload`, `typecheck`, `test:e2e`.

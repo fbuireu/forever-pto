@@ -26,7 +26,7 @@ Installed by the `prepare` script on `pnpm install`. The hooks in `.husky/`:
 | --- | --- | --- |
 | `pre-commit` | `pnpm lint-staged` | Format + lint staged files |
 | `commit-msg` | `pnpm exec commitlint --edit` | Enforce conventional commits (see [conventions](/contributing/conventions/)) |
-| `pre-push` | `pnpm verify:changed` | `format:check`, `typecheck` across both packages and the unit tests over what changed. CI's `Verify` job runs the full `pnpm verify`, coverage included, because the coverage floor cannot hold over a changed-only subset |
+| `pre-push` | `pnpm verify:changed` | `format:check`, `typecheck` across both packages, the unit tests over what changed and the whole contract suite, which a changed-only run never selects because it reads documents rather than importing them. CI's `Verify` job runs the full `pnpm verify`, coverage included, because the coverage floor cannot hold over a changed-only subset |
 
 ### lint-staged
 
