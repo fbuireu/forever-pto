@@ -255,11 +255,13 @@ one and where to link it from.
   `.github/renovate.json` in days, and Renovate's has to stay the stricter, because the installer re-checks the age
   on every install. A security update is the case that hits it, since `dependabot-auto-merge.yml` merges one the hour
   its advisory lands: the escape hatch is an exact `name@version` in `minimumReleaseAgeExclude`, deleted once the
-  release ages past the floor.
+  release ages past the floor. A second fix for the same package before that joins the entry as
+  `name@version || version`, and the install accepts the union.
 - **Renovate writes a comment into `pnpm-workspace.yaml`, and it stays.** When it exempts a security fix from
   `minimumReleaseAge`, renovate[bot] adds a `# Renovate security update: <pkg>@<version>` line beside the entry and
-  never reads it back. It is bot output, like the lockfile: the contract suite's no-comment rule for YAML allows
-  exactly that line, in that file alone, so removing it by hand only makes the next security PR write it again.
+  never reads it back; on a union entry the line repeats the union, `<pkg>@<version> || <version>`. It is bot output,
+  like the lockfile: the contract suite's no-comment rule for YAML allows any line with that prefix, in that file
+  alone, matching the sibling repositories, so removing it by hand only makes the next security PR write it again.
 - **The contract suite reads the tree git would ship, and a few of its readers are hand-made on purpose.** It lists
   tracked, staged and unstaged files, leaves the dotfolders out (`.github` and `.husky` are read by name) and confirms
   every path on disk, because a stash cycle leaves deleted paths in the index. A workflow is read for its `run:` and

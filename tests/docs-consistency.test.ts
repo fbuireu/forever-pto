@@ -4084,7 +4084,7 @@ describe("workflows and package scripts keep the rules CODING_STANDARDS.md hands
 	const SHA_PINNED_USES = /^\s*(?:-\s*)?uses:\s*[\w.-]+\/[\w./-]+@[0-9a-f]{40}\s+#\s*\S+$/;
 	const USES_LINE = /^\s*(?:-\s*)?uses:\s*(\S+)/;
 	const TOOL_DIRECTIVE = /^#\s*(?:zizmor:|yaml-language-server:)/;
-	const RENOVATE_LINE = /^#\s*Renovate security update: \S+@\S+$/;
+	const RENOVATE_LINE = /^# Renovate security update: \S/;
 
 	interface YamlCommentsParams {
 		file: string;
@@ -4162,6 +4162,7 @@ describe("workflows and package scripts keep the rules CODING_STANDARDS.md hands
 			.map(({ file, line, comment }) => `${file}:${line} ${comment}`);
 
 		expect(synthetic.map(({ line, comment }) => `${line} ${comment}`)).toEqual(["1 # why", "6 # heading"]);
+		expect(RENOVATE_LINE.test("# Renovate security update: next@16.3.6 || 16.3.8")).toBe(true);
 		expect(yamlFiles.length).toBeGreaterThan(10);
 		expect(comments.length).toBeGreaterThan(20);
 		expect(stray).toEqual([]);
