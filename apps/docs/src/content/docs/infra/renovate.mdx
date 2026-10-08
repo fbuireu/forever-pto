@@ -30,7 +30,9 @@ Package rules label each PR by update type and set its automerge:
 | major | `major-update` | no, manual review |
 | lockfile maintenance | `lock-maintenance` | yes |
 
-Automerge uses squash (`automergeStrategy: squash`), which matters for [releases](/infra/release/): Renovate's PR titles are conventional (`chore(deps): …` / `fix(deps): …`), so most dependency merges do not cut a release.
+A GitHub Actions update also carries `ci`, beside its update-type label, so a pin bump reads as CI work in the PR list.
+
+Automerge uses squash (`automergeStrategy: squash`), which matters for [releases](/infra/release/): Renovate's PR titles are conventional (`chore(deps): …` / `fix(deps): …`), set explicitly with `semanticCommits: enabled` rather than left to its detection, so most dependency merges do not cut a release.
 
 The ruleset on `main` requires no approval, only the checks, so Renovate merges through GitHub's auto-merge on its own once they are green, and no workflow submits an approval first. Automerged updates still pass the full lint/typecheck/test gauntlet, the preview E2E run, and get a [preview deploy](/infra/environments/).
 
