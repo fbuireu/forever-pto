@@ -60,6 +60,9 @@ const BUILD_SCRIPT_NAME = /^(?:cf:)?build$/;
 const DEPLOY_TOOL_COMMAND = /\b(?:wrangler|opennextjs-cloudflare) deploy\b/;
 const SECRET_TOOL_COMMAND = /\bwrangler secret\b/;
 const WRANGLER_ACTION_DEPLOY = /\bcommand:[ \t]*deploy\b/;
+const SHARED_DEPLOY_MESSAGE = /^\$\{\{ github\.sha \}\}-\$\{\{ github\.event_name \}\}$/;
+const DEPLOY_MESSAGE_ARGUMENT = /--message[ =]("?)((?:\$\{\{[^}]*\}\}|[^\s"])+)\1/;
+const SHELL_VARIABLE = /^\$\{?(\w+)\}?$/;
 const ALIAS_WILDCARD_SUFFIX = /\/\*$/;
 const WORKSPACE_PACKAGES_BLOCK = /^packages:\r?\n((?:[ \t]+-.*\r?\n?)+)/m;
 const WORKSPACE_PACKAGE_GLOB = /^\s*-\s*['"]?([^'"\s#]+)['"]?\s*$/gm;
@@ -4357,17 +4360,39 @@ describe("the guides describe the project as it is configured", () => {
 		expect(wrapped).toEqual([]);
 	});
 
-	it("names every wrangler deploy with a --message of its own, the sha and the event, so a deployment reads as the commit it shipped", () => {
-		const deployLines = workflowFiles.flatMap((file) =>
+	interface DeployMessageParams {
+		step: string;
+		line: string;
+	}
+
+	const deployMessage = ({ step, line }: DeployMessageParams): string => {
+		const argument = DEPLOY_MESSAGE_ARGUMENT.exec(line)?.[2] ?? "";
+		const variable = SHELL_VARIABLE.exec(argument)?.[1];
+		if (variable === undefined) return argument;
+		const declaration = step
+			.split(/\r?\n/)
+			.map((text) => text.trim())
+			.find((text) => text.startsWith(`${variable}:`));
+		return declaration?.slice(variable.length + 1).trim() ?? "";
+	};
+
+	it("names every wrangler deploy with the --message the deploying repositories share, <sha>-<event> as one token, because OpenNext re-spawns wrangler through a shell", () => {
+		const deploys = workflowFiles.flatMap((file) =>
 			read(file)
-				.split(/\r?\n/)
-				.filter((line) => DEPLOY_TOOL_COMMAND.test(line) || WRANGLER_ACTION_DEPLOY.test(line))
-				.map((line) => ({ file, line: line.trim() })),
+				.split("- name:")
+				.flatMap((step) =>
+					step
+						.split(/\r?\n/)
+						.filter((line) => DEPLOY_TOOL_COMMAND.test(line) || WRANGLER_ACTION_DEPLOY.test(line))
+						.map((line) => ({ at: `${file} -> ${line.trim()}`, message: deployMessage({ step, line }) })),
+				),
 		);
 
-		expect(deployLines.length).toBeGreaterThan(2);
+		expect(deploys.length).toBeGreaterThan(2);
 		expect(
-			deployLines.filter(({ line }) => !line.includes("--message")).map(({ file, line }) => `${file} -> ${line}`),
+			deploys
+				.filter(({ message }) => !SHARED_DEPLOY_MESSAGE.test(message))
+				.map(({ at, message }) => `${at} (${message})`),
 		).toEqual([]);
 	});
 

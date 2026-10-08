@@ -109,12 +109,13 @@ No rule below restates these, and a diff that breaks one fails CI:
     TypeScript pins, and the production build stripping every `console` call but the logger's levels
     (`removeConsole` excluding exactly `LOG_LEVEL`'s values), because the logger's lines reach Better Stack only as
     console output and a stray `console.log` must never ship;
-  - the workflows: no deploy, build or secret write in a retry wrapper, a `--message` on every deploy, only scripts a
-    manifest declares, the preview cleanup queued behind the run that deployed it, every gated job under a `Check`
-    aggregate, release configs that parse the commit grammar commitlint accepts, the toolchain set up through
-    `prepare-env` alone and installed unfiltered, a `working-directory` on the step rather than in a `defaults` block,
-    no flag forwarded after `pnpm run <script> --`, and every `uses:` of another repository pinned to a full commit SHA
-    with its version or branch in a trailing comment;
+  - the workflows: no deploy, build or secret write in a retry wrapper, every deploy's `--message` the one token
+    `<sha>-<event>` the deploying repositories share (`C6`), only scripts a manifest declares, the preview cleanup
+    queued behind the run that deployed it, every gated job under a `Check` aggregate, release configs that parse the
+    commit grammar commitlint accepts, the toolchain set up through `prepare-env` alone and installed unfiltered, a
+    `working-directory` on the step rather than in a `defaults` block, no flag forwarded after `pnpm run <script> --`,
+    and every `uses:` of another repository pinned to a full commit SHA with its version or branch in a trailing
+    comment;
   - the YAML, every file of it: no comment but a SHA pin's trailing comment, a tool directive and the line Renovate
     writes into `pnpm-workspace.yaml`, a `#` counting as a comment when removing it leaves the parsed document
     unchanged;
