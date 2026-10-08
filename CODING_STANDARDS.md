@@ -702,8 +702,8 @@ No rule below restates these, and a diff that breaks one fails CI:
   request, an ADR or a rule here, and a gotcha an implementer would otherwise trip on goes in the *Gotchas* of
   [AGENTS.md](./AGENTS.md). The trailing comment on a SHA pin is the one exception. A tool directive
   (`# zizmor: ignore[...]`, `# yaml-language-server: ...`) counts as a directive, not a comment, and what a bot writes
-  is its output, not ours: the lockfile, and the `# Renovate security update: <pkg>@<version>` line Renovate adds to
-  `pnpm-workspace.yaml`.
+  is its output, not ours: the lockfile, and the `# Renovate security update: …` line Renovate adds to
+  `pnpm-workspace.yaml`, whichever versions it names.
 
 ## Docs site (`apps/docs`)
 
