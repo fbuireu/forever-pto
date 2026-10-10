@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.14.0](https://github.com/fbuireu/forever-pto/compare/web-v1.13.10...web-v1.14.0) (2026-10-10)
+
+
+### Features
+
+* **web:** plan from the homepage, and show only the plan made for the filters on screen ([#415](https://github.com/fbuireu/forever-pto/issues/415)) ([e9a0446](https://github.com/fbuireu/forever-pto/commit/e9a0446d01185c92b83177f52964558b92f41bc4))
+
 # [forever-pto-web-v1.13.10](https://github.com/fbuireu/forever-pto/compare/web-v1.13.9...web-v1.13.10) (2026-10-10)
 
 
