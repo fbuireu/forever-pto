@@ -1,3 +1,11 @@
+# [forever-pto-docs-v1.5.6](https://github.com/fbuireu/forever-pto/compare/docs-v1.5.5...docs-v1.5.6) (2026-10-10)
+
+
+### Bug Fixes
+
+* **docs:** hydrate the rotating-text demo, and assert once every island has hydrated ([6313948](https://github.com/fbuireu/forever-pto/commit/631394853523a2bc36c9ec7c89908f94156601c0)), closes [#418](https://github.com/fbuireu/forever-pto/issues/418)
+* load Stripe.js on every page, count one activation exactly once, and claim the true 205 ([e7cd064](https://github.com/fbuireu/forever-pto/commit/e7cd0647f8d9379cc34fc5e0646280118ee36786))
+
 # [forever-pto-docs-v1.5.5](https://github.com/fbuireu/forever-pto/compare/docs-v1.5.4...docs-v1.5.5) (2026-10-05)
 
 
