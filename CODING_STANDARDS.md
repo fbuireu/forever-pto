@@ -658,8 +658,8 @@ No rule below restates these, and a diff that breaks one fails CI:
   `localePath`, never a list of its own.
 - `T19` **hard**: Tag a case `@smoke` only for what proves the Worker answers on every deploy, never a result that
   depends on the caller's address, and keep the four cases every repository that deploys runs (a titled homepage, an
-  unknown path answering 404, `robots.txt` served, `security.txt` served in date with its `Canonical` the URL asked
-  for when `PRODUCTION_URL` names the target) word for word, because a failing smoke run rolls production back. The
+  unknown path answering 404, `robots.txt` served, `security.txt` served in date and byte for byte the file in
+  `public/`) word for word, because a failing smoke run rolls production back. The
   docs site runs the same four against its own deploy.
 - `T20` **hard**: Guard every list a contract-suite assertion derives from the repository (files, rows, matches) with
   a non-empty assertion or a synthetic self-test, because an assertion over an empty census passes whatever the tree

@@ -105,6 +105,11 @@ two years after their last renewal, and `pnpm test:docs` fails 30 days before
 that date, so `main` turns red a month before a file lapses. To renew one, move
 its `Expires` forward, at most two years from the day you do it.
 
+The files in this repository are the only ones: a `security.txt` configured in the
+Cloudflare zone (Security Center) answers before the Worker and hides them, so it
+stays off, and the production smoke run fails when the body it gets is not that
+site's file byte for byte.
+
 ## Security Updates
 
 Security fixes ship as ordinary commits to `main`, which deploys them; there is

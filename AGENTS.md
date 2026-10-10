@@ -172,8 +172,8 @@ and rulesets behind them are settings, on the [environments](./apps/docs/src/con
   needs it, and a failed smoke run rolls production back through `rollback`. The docs site has the same pair, over
   [`apps/docs/e2e/smoke.spec.ts`](./apps/docs/e2e/smoke.spec.ts) and the `DOCS_SITE_URL` variable. Both specs carry
   the four cases every repository that deploys runs, word for word; the fourth asks for `/.well-known/security.txt`
-  and, when `PRODUCTION_URL` names the `BASE_URL` it runs against, holds its `Canonical:` to the URL it asked for.
-  Each smoke job sets `PRODUCTION_URL` from the same variable as its `BASE_URL`, and no other run sets it.
+  and wants it byte for byte the package's `public/.well-known/security.txt`, so a `security.txt` the Cloudflare zone
+  serves itself, which answers before the Worker, fails the run instead of standing in for the repository's.
 - **Each site's `security.txt` lapses unless it is renewed**: `apps/web/public/.well-known/security.txt` and
   `apps/docs/public/.well-known/security.txt` carry an `Expires` two years after their last renewal, the longest the
   contract suite allows, and the suite fails 30 days before that date, reading the real clock on purpose, so `main`

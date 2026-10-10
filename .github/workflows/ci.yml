@@ -109,7 +109,6 @@ jobs:
     timeout-minutes: 30
     env:
       BASE_URL: ${{ vars.WEB_SITE_URL }}
-      PRODUCTION_URL: ${{ vars.WEB_SITE_URL }}
     steps:
       - name: Require the production URL
         run: |
