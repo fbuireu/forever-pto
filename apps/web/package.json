@@ -1,6 +1,6 @@
 {
 	"name": "forever-pto-web",
-	"version": "1.13.7",
+	"version": "1.13.8",
 	"private": true,
 	"description": "Combine your PTO days with public holidays to get the longest breaks from the fewest days off",
 	"keywords": [

@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.13.8](https://github.com/fbuireu/forever-pto/compare/web-v1.13.7...web-v1.13.8) (2026-10-10)
+
+
+### Bug Fixes
+
+* load Stripe.js on every page, count one activation exactly once, and claim the true 205 ([e7cd064](https://github.com/fbuireu/forever-pto/commit/e7cd0647f8d9379cc34fc5e0646280118ee36786))
+
 # [forever-pto-web-v1.13.7](https://github.com/fbuireu/forever-pto/compare/web-v1.13.6...web-v1.13.7) (2026-10-08)
 
 
