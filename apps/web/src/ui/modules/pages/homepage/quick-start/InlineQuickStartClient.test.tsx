@@ -1,21 +1,26 @@
 import { render, screen } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 type Loader = () => Promise<{ default: unknown }>;
 
 const { dynamic, MockInlineQuickStartForm, view } = vi.hoisted(() => ({
-	dynamic: [] as { loader: Loader; options?: { ssr?: boolean } }[],
+	dynamic: [] as { loader: Loader; options?: { ssr?: boolean; loading?: () => ReactNode } }[],
 	MockInlineQuickStartForm: vi.fn().mockReturnValue(null),
 	view: { isInView: false },
 }));
 
 vi.mock("next/dynamic", () => ({
-	default: (loader: Loader, options?: { ssr?: boolean }) => {
+	default: (loader: Loader, options?: { ssr?: boolean; loading?: () => ReactNode }) => {
 		dynamic.push({ loader, options });
 		return (props: Record<string, unknown>) => <div data-testid="split" data-props={JSON.stringify(props)} />;
 	},
 }));
 vi.mock("./InlineQuickStartForm", () => ({ InlineQuickStartForm: MockInlineQuickStartForm }));
+vi.mock("./InlineQuickStartFixture", () => ({ InlineQuickStartFixture: () => <div data-testid="fixture" /> }));
+vi.mock("boneyard-js/react", () => ({
+	Skeleton: ({ name, fallback }: { name: string; fallback: ReactNode }) => <div data-bones={name}>{fallback}</div>,
+}));
 vi.mock("@ui/hooks/useIsInView", () => ({
 	useIsInView: () => ({ ref: { current: null }, isInView: view.isInView }),
 }));
@@ -39,6 +44,17 @@ describe("InlineQuickStartClient", () => {
 
 		expect(screen.queryByTestId("split")).toBeNull();
 		expect(container.firstElementChild?.className).toContain("min-h-");
+	});
+
+	it("shows the form's skeleton until it mounts, and while its chunk loads", () => {
+		const { container } = renderClient();
+
+		expect(container.querySelector('[data-bones="inline-quick-start"]')).not.toBeNull();
+		expect(screen.getByTestId("fixture")).toBeDefined();
+
+		const { container: loading } = render(<>{dynamic[0]?.options?.loading?.()}</>);
+
+		expect(loading.querySelector('[data-bones="inline-quick-start"]')).not.toBeNull();
 	});
 
 	it("mounts the form in view, with the visitor's year", () => {
