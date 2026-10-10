@@ -495,7 +495,7 @@ describe("setCalculationResult", () => {
 	it("stores suggestion and alternatives", () => {
 		const suggestion = makeSuggestion([new Date(2026, 4, 1)]);
 		const alternatives = [makeSuggestion([new Date(2026, 5, 1)])];
-		useHolidaysStore.getState().setCalculationResult({ suggestion, alternatives });
+		useHolidaysStore.getState().setCalculationResult({ suggestion, alternatives, planKey: null });
 		const state = useHolidaysStore.getState();
 		expect(state.suggestion).toBe(suggestion);
 		expect(state.alternatives).toEqual(alternatives);
@@ -507,7 +507,7 @@ describe("setCalculationResult", () => {
 		const s1 = makeSuggestion([new Date(2026, 4, 1)]);
 		const s2 = makeSuggestion([new Date(2026, 5, 1)]);
 		useHolidaysStore.setState({ currentSelectionIndex: 1 });
-		useHolidaysStore.getState().setCalculationResult({ suggestion: s1, alternatives: [s2] });
+		useHolidaysStore.getState().setCalculationResult({ suggestion: s1, alternatives: [s2], planKey: null });
 		expect(useHolidaysStore.getState().currentSelectionIndex).toBe(1);
 		expect(useHolidaysStore.getState().currentSelection).toBe(s2);
 	});
@@ -515,8 +515,20 @@ describe("setCalculationResult", () => {
 	it("resets to index 0 when previous index is out of bounds", () => {
 		useHolidaysStore.setState({ currentSelectionIndex: 5 });
 		const s = makeSuggestion([new Date(2026, 4, 1)]);
-		useHolidaysStore.getState().setCalculationResult({ suggestion: s, alternatives: [] });
+		useHolidaysStore.getState().setCalculationResult({ suggestion: s, alternatives: [], planKey: null });
 		expect(useHolidaysStore.getState().currentSelectionIndex).toBe(0);
+	});
+
+	it("records the filters the plan was made for", () => {
+		const s = makeSuggestion([new Date(2026, 4, 1)]);
+		useHolidaysStore.getState().setCalculationResult({ suggestion: s, alternatives: [], planKey: "FR||2026|0|en" });
+		expect(useHolidaysStore.getState().planKey).toBe("FR||2026|0|en");
+	});
+
+	it("forgets them when the plan is cleared, since no plan is left to describe", () => {
+		useHolidaysStore.setState({ planKey: "FR||2026|0|en" });
+		useHolidaysStore.getState().clearCalculation();
+		expect(useHolidaysStore.getState().planKey).toBeNull();
 	});
 });
 
@@ -1018,6 +1030,10 @@ describe("persistence", () => {
 		expect(persist({ holidaysKey: "ES||2026|1|en" })).not.toHaveProperty("holidaysKey");
 	});
 
+	it("persists the filters the plan was made for, so a reload with the same ones shows it at once", () => {
+		expect(persist({ planKey: "ES||2026|1|en" })).toHaveProperty("planKey", "ES||2026|1|en");
+	});
+
 	it("never persists an ask for a plan, so a restore cannot report a plan nobody asked for", () => {
 		expect(persist({ planAskedFor: true })).not.toHaveProperty("planAskedFor");
 	});
@@ -1245,9 +1261,12 @@ describe("generateSuggestions", () => {
 			alternatives: [makeSuggestion([new Date(2026, 6, 1)])],
 		});
 
+		useHolidaysStore.setState({ holidaysKey: "ES||2026|0|en" });
+
 		await useHolidaysStore.getState().generateSuggestions(PARAMS);
 
 		const state = useHolidaysStore.getState();
+		expect(state.planKey).toBe("ES||2026|0|en");
 		expect(state.suggestion).toMatchObject({ days });
 		expect(state.alternatives).toHaveLength(1);
 		expect(state.currentSelection).toBe(state.suggestion);

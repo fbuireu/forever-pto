@@ -5,8 +5,16 @@ const filters = vi.hoisted(() => ({ country: "", setCountry: vi.fn() }));
 
 const ready = vi.hoisted(() => ({ value: true }));
 
+const location = vi.hoisted(() => ({ setCountries: vi.fn() }));
+
+const COUNTRIES = [{ value: "es", label: "Spain", flag: "es" }];
+
 vi.mock("@application/stores/filters", () => ({
 	useFiltersStore: (selector: (state: unknown) => unknown) => selector(filters),
+}));
+
+vi.mock("@application/stores/location", () => ({
+	useLocationStore: (selector: (state: unknown) => unknown) => selector(location),
 }));
 
 vi.mock("@ui/hooks/useStoresReady", () => ({
@@ -20,6 +28,7 @@ const withCookie = (value: string) => vi.spyOn(document, "cookie", "get").mockRe
 beforeEach(() => {
 	filters.country = "";
 	filters.setCountry.mockClear();
+	location.setCountries.mockClear();
 	ready.value = true;
 	withCookie("");
 });
@@ -30,7 +39,7 @@ afterEach(() => {
 
 describe("StoresInitializer", () => {
 	it("renders nothing: it exists for its effect", () => {
-		const { container } = render(<StoresInitializer />);
+		const { container } = render(<StoresInitializer countries={COUNTRIES} />);
 
 		expect(container.innerHTML).toBe("");
 	});
@@ -38,7 +47,7 @@ describe("StoresInitializer", () => {
 	it("seeds the country the edge detected", () => {
 		withCookie("user-country=ES");
 
-		render(<StoresInitializer />);
+		render(<StoresInitializer countries={COUNTRIES} />);
 
 		expect(filters.setCountry).toHaveBeenCalledExactlyOnceWith("ES");
 	});
@@ -46,7 +55,7 @@ describe("StoresInitializer", () => {
 	it("finds the cookie among the others rather than only as the first one", () => {
 		withCookie("sidebar_state=true; user-country=FR; NEXT_LOCALE=fr");
 
-		render(<StoresInitializer />);
+		render(<StoresInitializer countries={COUNTRIES} />);
 
 		expect(filters.setCountry).toHaveBeenCalledExactlyOnceWith("FR");
 	});
@@ -54,7 +63,7 @@ describe("StoresInitializer", () => {
 	it("does not mistake another cookie whose name ends the same way", () => {
 		withCookie("preferred-user-country=ES");
 
-		render(<StoresInitializer />);
+		render(<StoresInitializer countries={COUNTRIES} />);
 
 		expect(filters.setCountry).not.toHaveBeenCalled();
 	});
@@ -63,7 +72,7 @@ describe("StoresInitializer", () => {
 		ready.value = false;
 		withCookie("user-country=ES");
 
-		render(<StoresInitializer />);
+		render(<StoresInitializer countries={COUNTRIES} />);
 
 		expect(filters.setCountry).not.toHaveBeenCalled();
 	});
@@ -72,14 +81,20 @@ describe("StoresInitializer", () => {
 		filters.country = "IT";
 		withCookie("user-country=ES");
 
-		render(<StoresInitializer />);
+		render(<StoresInitializer countries={COUNTRIES} />);
 
 		expect(filters.setCountry).not.toHaveBeenCalled();
 	});
 
 	it("stays quiet when the edge detected nothing", () => {
-		render(<StoresInitializer />);
+		render(<StoresInitializer countries={COUNTRIES} />);
 
 		expect(filters.setCountry).not.toHaveBeenCalled();
+	});
+
+	it("hands the Country list to the store, so the Summary can name the Country with the sidebar closed", () => {
+		render(<StoresInitializer countries={COUNTRIES} />);
+
+		expect(location.setCountries).toHaveBeenCalledExactlyOnceWith(COUNTRIES);
 	});
 });

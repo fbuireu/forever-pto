@@ -23,6 +23,7 @@ export const holidaysKeyOf = ({ year, country, region, carryOverMonths, locale }
 export interface SetCalculationResultParams {
 	suggestion: MeasuredSuggestion;
 	alternatives: MeasuredSuggestion[];
+	planKey: string | null;
 }
 
 export interface ToggleDaySelectionParams {

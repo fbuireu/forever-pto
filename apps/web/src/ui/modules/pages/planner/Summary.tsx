@@ -7,6 +7,7 @@ import { useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
 import { useLocationStore } from "@application/stores/location";
 import { PremiumFeatureId, PremiumOrigin, usePremiumStore } from "@application/stores/premium";
+import { holidaysKeyOf } from "@application/stores/types";
 import { isStrategy } from "@domain/calendar/types";
 import { measureGain } from "@domain/calendar/utils/budget";
 import { usePlacedPlan } from "@ui/hooks/usePlanReadout";
@@ -24,7 +25,7 @@ import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
 import { Skeleton } from "boneyard-js/react";
 import { Award, BarChart3, Calendar, CalendarDays, Palmtree, TrendingUp, Zap } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useFormatter, useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { type ReactNode, useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { MetricCard, MetricCardSize } from "./summary/MetricCard";
@@ -64,6 +65,7 @@ export const Summary = () => {
 	const t = useTranslations("summary");
 	const tSidebar = useTranslations("sidebar");
 	const format = useFormatter();
+	const locale = useLocale();
 	const { areStoresReady } = useStoresReady();
 
 	const { ptoDays, country, region, strategy, year, carryOverMonths } = useFiltersStore(
@@ -76,10 +78,11 @@ export const Summary = () => {
 			carryOverMonths: state.carryOverMonths ?? 0,
 		})),
 	);
-	const { holidays, alternatives } = useHolidaysStore(
+	const { holidays, alternatives, planKey } = useHolidaysStore(
 		useShallow((state) => ({
 			holidays: state.holidays,
 			alternatives: state.alternatives,
+			planKey: state.planKey,
 		})),
 	);
 	const { countries, regions } = useLocationStore(
@@ -111,6 +114,8 @@ export const Summary = () => {
 		const userRegion = regions.find(({ value }) => value.toLowerCase() === region?.toLowerCase());
 		return { userCountry, userRegion };
 	}, [countries, country, regions, region]);
+
+	const isPlanForFilters = planKey === holidaysKeyOf({ country, region, year, carryOverMonths, locale });
 
 	const metricsData = useMemo(() => {
 		if (!activeSuggestion?.metrics) {
@@ -151,7 +156,7 @@ export const Summary = () => {
 	})();
 
 	const content = (() => {
-		if (!metricsData) return null;
+		if (!metricsData || !isPlanForFilters) return null;
 		const { metrics, effectiveDays, increment, gain, placedDayCount, canImprove } = metricsData;
 		return (
 			<div className="w-full max-w-4xl mx-auto space-y-6 z-1">

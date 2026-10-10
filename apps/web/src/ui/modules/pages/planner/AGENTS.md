@@ -331,6 +331,13 @@ computes each cell's `isDisabled` as the past-day modifier minus those states, s
 be edited once its date has gone by. The expression combines with `||`, not `??`: `disabled` is destructured
 with a default of `false`, so `disabled ?? (…)` would never reach the past-day branch.
 
+**The Summary paints only the plan made for the filters on screen.** It compares the holidays store's
+`planKey` with `holidaysKeyOf` over the Country, Region, year, Carry-over Months and locale, and renders nothing
+until they match; the Skeleton keeps its place. A change to the budget or the Strategy keeps the key, so the
+charts do not blank while those recalculate. The Country and Region badges read the location store, which
+`StoresInitializer` fills from the layout, not the sidebar: on a phone the sidebar mounts its controls only while
+the drawer is open.
+
 **The Summary counts Holidays inside the Planning Window only.** The store holds two years, so the Holidays card,
 the composition pie, the "specific to your region" line, the Custom Holiday banner and the timeline read
 `holidaysInPlanningWindow(holidays)`; otherwise the headline figure is roughly double what the Holidays table

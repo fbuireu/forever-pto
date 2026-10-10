@@ -45,6 +45,7 @@ export interface HolidaysState {
 	hasCalculated: boolean;
 	planRevision: number;
 	holidaysKey: string | null;
+	planKey: string | null;
 	planAskedFor: boolean;
 }
 
@@ -100,6 +101,7 @@ const holidaysInitialState: HolidaysState = {
 	hasCalculated: false,
 	planRevision: 0,
 	holidaysKey: null,
+	planKey: null,
 	planAskedFor: false,
 };
 
@@ -114,6 +116,7 @@ const partializeHolidays = (state: HolidaysStore) => ({
 	currentSelectionIndex: state.currentSelectionIndex,
 	manualDays: state.manualDays,
 	removedSuggestedDays: state.removedSuggestedDays,
+	planKey: state.planKey,
 });
 
 export const useHolidaysStore = create<HolidaysStore>()(
@@ -172,7 +175,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 					preferredMonths,
 					locale,
 				}: GenerateSuggestionsParams) => {
-					const { holidays, maxAlternatives, manualDays, removedSuggestedDays } = get();
+					const { holidays, maxAlternatives, manualDays, removedSuggestedDays, holidaysKey } = get();
 
 					try {
 						const { runPlanningPipeline } = await import("@domain/calendar/pipeline");
@@ -197,6 +200,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 								currentSelection: null,
 								previewAlternativeIndex: 0,
 								currentSelectionIndex: 0,
+								planKey: null,
 							});
 							return;
 						}
@@ -207,6 +211,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 							currentSelection: suggestion,
 							previewAlternativeIndex: 0,
 							currentSelectionIndex: 0,
+							planKey: holidaysKey,
 						});
 					} catch (error) {
 						logClientError({
@@ -227,6 +232,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 							currentSelection: null,
 							previewAlternativeIndex: 0,
 							currentSelectionIndex: 0,
+							planKey: null,
 						});
 					}
 				},
@@ -245,7 +251,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 					return planAskedFor;
 				},
 
-				setCalculationResult: ({ suggestion, alternatives }: SetCalculationResultParams) => {
+				setCalculationResult: ({ suggestion, alternatives, planKey }: SetCalculationResultParams) => {
 					const { currentSelectionIndex } = get();
 					const allSuggestions = [suggestion, ...alternatives];
 					const preservedIndex = currentSelectionIndex < allSuggestions.length ? currentSelectionIndex : 0;
@@ -259,6 +265,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 						currentSelectionIndex: preservedIndex,
 						removedSuggestedDays: [],
 						hasCalculated: true,
+						planKey,
 					});
 				},
 
@@ -490,6 +497,7 @@ export const useHolidaysStore = create<HolidaysStore>()(
 						currentSelectionIndex: 0,
 						removedSuggestedDays: [],
 						hasCalculated: true,
+						planKey: null,
 					});
 				},
 

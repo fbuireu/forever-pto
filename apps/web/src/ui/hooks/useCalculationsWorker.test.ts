@@ -11,12 +11,14 @@ const storeState = vi.hoisted(() => ({
 	holidays: [] as never[],
 	maxAlternatives: 3,
 	planAskedFor: false,
+	holidaysKey: null as string | null,
 }));
 const mockGetState = vi.hoisted(() =>
 	vi.fn(() => ({
 		removedSuggestedDays: storeState.removedSuggestedDays,
 		currentSelection: storeState.currentSelection,
 		manualDays: storeState.manualDays,
+		holidaysKey: storeState.holidaysKey,
 		setCalculating: mockSetCalculating,
 		claimPlanAskedFor: () => {
 			const asked = storeState.planAskedFor;
@@ -144,6 +146,7 @@ beforeEach(() => {
 	storeState.manualDays = [];
 	storeState.removedSuggestedDays = [];
 	storeState.currentSelection = null;
+	storeState.holidaysKey = null;
 });
 
 describe("useCalculationsWorker caps only to protect Removed Days", () => {
@@ -395,6 +398,19 @@ describe("useCalculationsWorker", () => {
 
 		expect(mockSetCalculating).toHaveBeenCalledWith(false);
 		expect(mockSetCalculationResult).toHaveBeenCalled();
+	});
+
+	it("stamps the plan with the Holidays it was asked on, not the ones loaded while it ran", () => {
+		storeState.holidaysKey = "ES||2025|0|en";
+		const { result } = renderHook(() => useCalculationsWorker());
+
+		act(() => {
+			result.current.triggerCalculation(BASE_PARAMS);
+		});
+		storeState.holidaysKey = "FR||2025|0|en";
+		deliverResult();
+
+		expect(mockSetCalculationResult).toHaveBeenCalledWith(expect.objectContaining({ planKey: "ES||2025|0|en" }));
 	});
 
 	it("ignores responses with a stale requestId", () => {

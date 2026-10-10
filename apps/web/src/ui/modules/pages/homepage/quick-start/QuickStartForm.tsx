@@ -3,7 +3,6 @@
 import type { CountryDTO } from "@application/dto/country/types";
 import { useRouter } from "@application/i18n/navigation";
 import { useFiltersStore } from "@application/stores/filters";
-import { useHolidaysStore } from "@application/stores/holidays";
 import { useLocationStore } from "@application/stores/location";
 import { useUIStore } from "@application/stores/ui";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
@@ -18,6 +17,7 @@ import { useShallow } from "zustand/react/shallow";
 import { QuickStartLocationStep } from "./QuickStartLocationStep";
 import { QuickStartPtoDaysStep } from "./QuickStartPtoDaysStep";
 import { QuickStartSettingsStep } from "./QuickStartSettingsStep";
+import { startPlanning } from "./startPlanning";
 import {
 	canLeaveStep,
 	createDraft,
@@ -75,16 +75,7 @@ export const QuickStartForm = ({ countries, currentYear, onStepChange }: QuickSt
 	};
 
 	const finish = () => {
-		const filters = useFiltersStore.getState();
-		filters.setCountry(draft.country);
-		filters.setRegion(draft.region);
-		filters.setYear(draft.year);
-		filters.setPtoDays(draft.ptoDays);
-		filters.setStrategy(draft.strategy);
-		filters.setPreferredMonths(draft.preferredMonths);
-		filters.setAllowPastDays(draft.allowPastDays);
-		filters.setCarryOverMonths(draft.carryOverMonths);
-		useHolidaysStore.getState().askForPlan();
+		startPlanning(draft);
 		track({ event: "quick_start_completed", properties: trackedDraft(draft) });
 		closeQuickStart();
 		router.push(PLANNER_PATH);

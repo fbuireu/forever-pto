@@ -928,6 +928,10 @@
 		}
 	},
 	"homepage": {
+		"inlineQuickStart": {
+			"title": "Pianifica proprio qui",
+			"description": "Scegli il tuo paese e i tuoi giorni di ferie. Il pianificatore li distribuisce per te."
+		},
 		"nav": {
 			"how": "Come funziona",
 			"features": "Funzioni",

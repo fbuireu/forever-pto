@@ -1,3 +1,4 @@
+import { holidaysKeyOf } from "@application/stores/types";
 import caMessages from "@i18n/messages/ca.json";
 import deMessages from "@i18n/messages/de.json";
 import enMessages from "@i18n/messages/en.json";
@@ -37,6 +38,7 @@ const initialHolidays = () => ({
 	currentSelection: null as unknown,
 	manualDays: [] as Date[],
 	removedSuggestedDays: [] as Date[],
+	planKey: undefined as string | null | undefined,
 });
 
 const filtersState = initialFilters();
@@ -118,12 +120,21 @@ interface RenderSummaryParams {
 	messages?: object;
 }
 
-const renderSummary = ({ locale = "en", messages = enMessages }: RenderSummaryParams = {}) =>
-	render(
+const renderSummary = ({ locale = "en", messages = enMessages }: RenderSummaryParams = {}) => {
+	if (holidaysState.planKey === undefined) {
+		holidaysState.planKey = holidaysKeyOf({
+			...filtersState,
+			carryOverMonths: filtersState.carryOverMonths ?? 0,
+			locale,
+		});
+	}
+
+	return render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<Summary />
 		</NextIntlClientProvider>,
 	);
+};
 
 describe("Summary efficiency hint", () => {
 	it("names the days the metrics were measured against, not the days the engine first placed", () => {
@@ -408,6 +419,45 @@ describe("Summary heading", () => {
 
 		expect(container.textContent).toContain(enMessages.summary.summaryParagraph.noRegionHintTitle);
 		expect(container.textContent).not.toContain("Catalonia");
+	});
+});
+
+describe("Summary against a plan made for other filters", () => {
+	const spanishPlan = () => {
+		resetPlan();
+		locationState.countries = [
+			{ value: "es", label: "Spain", flag: "es" },
+			{ value: "fr", label: "France", flag: "fr" },
+		];
+		holidaysState.planKey = holidaysKeyOf({ country: "ES", region: "", year: 2025, carryOverMonths: 0, locale: "en" });
+	};
+
+	it("holds back the previous country's numbers until the new country's plan lands", () => {
+		spanishPlan();
+		filtersState.country = "FR";
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).not.toContain(enMessages.summary.metrics.effectiveDays);
+		expect(container.textContent).not.toContain("France");
+	});
+
+	it("shows the plan once it was made for the country on screen", () => {
+		spanishPlan();
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain(enMessages.summary.metrics.effectiveDays);
+		expect(container.textContent).toContain("Spain");
+	});
+
+	it("holds back a plan stored before plans named their filters", () => {
+		resetPlan();
+		holidaysState.planKey = null;
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).not.toContain(enMessages.summary.metrics.effectiveDays);
 	});
 });
 

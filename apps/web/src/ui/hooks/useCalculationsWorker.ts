@@ -91,6 +91,7 @@ export function useCalculationsWorker() {
 						setCalculationResult({
 							suggestion: measured,
 							alternatives: alternatives.map(deserializeSuggestion),
+							planKey,
 						});
 						if (useHolidaysStore.getState().claimPlanAskedFor()) {
 							track({
@@ -113,7 +114,12 @@ export function useCalculationsWorker() {
 					settle();
 				};
 
-				const { removedSuggestedDays, currentSelection, manualDays } = useHolidaysStore.getState();
+				const {
+					removedSuggestedDays,
+					currentSelection,
+					manualDays,
+					holidaysKey: planKey,
+				} = useHolidaysStore.getState();
 
 				const budgetForAutoSuggest = measureBudget({ ptoDays: params.ptoDays, manualDays }).remaining;
 				const hasRemovedDays = removedSuggestedDays.length > 0;

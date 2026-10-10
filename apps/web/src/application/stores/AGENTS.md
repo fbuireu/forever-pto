@@ -30,7 +30,7 @@ The rest of the application layer contract is in [`../AGENTS.md`](../AGENTS.md).
 | Store | Owns | Persisted |
 | --- | --- | --- |
 | `filters` | `ptoDays`, `allowPastDays`, `country`, `region`, `year`, `carryOverMonths`, `strategy`, `preferredMonths` | all but `year` |
-| `holidays` | `holidays`, `suggestion`, `alternatives`, `maxAlternatives`, `currentSelection`, `currentSelectionIndex`, `previewAlternativeIndex`, `manualDays`, `removedSuggestedDays`, `isCalculating`, `hasCalculated`, `planRevision`, `holidaysKey`, `planAskedFor` | all but `previewAlternativeIndex`, `isCalculating`, `hasCalculated`, `planRevision`, `holidaysKey` and `planAskedFor` |
+| `holidays` | `holidays`, `suggestion`, `alternatives`, `maxAlternatives`, `currentSelection`, `currentSelectionIndex`, `previewAlternativeIndex`, `manualDays`, `removedSuggestedDays`, `isCalculating`, `hasCalculated`, `planRevision`, `holidaysKey`, `planKey`, `planAskedFor` | all but `previewAlternativeIndex`, `isCalculating`, `hasCalculated`, `planRevision`, `holidaysKey` and `planAskedFor` |
 | `location` | `countries`, `regions` | nothing |
 | `premium` | `premiumKey`, `userEmail`, `lastVerified`, `needsSessionCheck`, `isLoading`, `modalOpen`, `currentFeature` | everything up to `needsSessionCheck` |
 | `ui` | `donatePopoverOpen`, `donatePopoverIsOpening`, `quickStartOpen` | nothing |
@@ -401,6 +401,14 @@ deliberately not in `partialize`: after a reload the persisted Holidays are for 
 and the planner waits for the fresh fetch instead of planning on them. Each call also takes a sequence number
 and gives up if a newer call started while it awaited, so a slow answer for the previous year cannot overwrite
 the current one.
+
+**`planKey` says which filters the plan was made for.** It is the `holidaysKey` the plan was computed on:
+`useCalculationsWorker` reads it when it posts the request, not when the answer lands, so Holidays fetched
+for a newer Country while the worker ran cannot relabel the older plan; `generateSuggestions` stamps it the same
+way and `clearCalculation` empties it. Unlike `holidaysKey` it is in `partialize`, so a reload with unchanged
+filters shows the stored plan at once. `Summary` paints nothing while `planKey` differs from the key of the
+filters on screen, which is what keeps the previous Country's numbers from appearing under a new Country after
+the quick start. A plan stored before the field existed comes back with `null` and waits for its first run.
 
 **A Custom Holiday wins the date it lands on.** `fetchHolidays` keeps the existing Custom Holidays, drops any
 fetched Holiday sharing a date with one, and re-sorts. `editHoliday` rebuilds through

@@ -15,7 +15,7 @@ Every React component the product renders. Nothing else in `src/ui/` holds compo
 | `sidebar/` | [`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) and its controls: Country, Region, year, Strategy and its Preferred Months, past days, Carry-over Months, the PTO Day budget, the calculators, the calendar export, and the language switcher, with the footer buttons that mount the shared theme menu | One screen, but not a page section |
 | `premium/` | The Premium gate and the Donation checkout: [`premium/PremiumFeature.tsx`](./premium/PremiumFeature.tsx), [`premium/featureLabels.ts`](./premium/featureLabels.ts), [`premium/PremiumModal.tsx`](./premium/PremiumModal.tsx), [`premium/PremiumRequiredModal.tsx`](./premium/PremiumRequiredModal.tsx), [`premium/CheckoutForm.tsx`](./premium/CheckoutForm.tsx) with its [`premium/ExpressCheckoutFixture.tsx`](./premium/ExpressCheckoutFixture.tsx), and [`premium/PremiumSessionSync.tsx`](./premium/PremiumSessionSync.tsx), the render-nothing activation check the payment confirmation mounts | Yes |
 | `providers/` | What the locale layout mounts once around the page: [`providers/AppThemeProvider.tsx`](./providers/AppThemeProvider.tsx), the `next-themes` context, which stamps `<html>` with the theme as `data-theme` (the tokens) and as a class (the `boneyard-js` skeletons) and which the two global pages mount too, [`providers/BonesProvider.tsx`](./providers/BonesProvider.tsx), which renders `null` and configures `boneyard-js`, and [`providers/StripePreload.tsx`](./providers/StripePreload.tsx), which renders `null` and asks for Stripe.js as the page mounts | Once |
-| `stores/` | [`stores/StoresInitializer.tsx`](./stores/StoresInitializer.tsx), a render-nothing component that seeds the filters store from the `user-country` cookie, read through [`utils/userCountry.ts`](../utils/userCountry.ts) | Once |
+| `stores/` | [`stores/StoresInitializer.tsx`](./stores/StoresInitializer.tsx), a render-nothing component that seeds the filters store from the `user-country` cookie, read through [`utils/userCountry.ts`](../utils/userCountry.ts), and the location store with the Country list the planner layout reads | Once |
 | `tutorial/` | [`tutorial/anchors.ts`](./tutorial/anchors.ts), the tour's anchor names and window events, and [`tutorial/DriverStyles.tsx`](./tutorial/DriverStyles.tsx), the module `useTutorial` imports for the driver.js stylesheet | Once |
 | `tracking/` | The third-party script mounts: [`tracking/Analytics.tsx`](./tracking/Analytics.tsx) (Google gtag consent defaults and config; nothing at all when the build has no `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID`, so a preview or a local build loads no Google script) and [`tracking/BetterStackTracking.tsx`](./tracking/BetterStackTracking.tsx) (the Better Stack snippet, gated on the cookieconsent `betterStack` **service**, not the category) | Once |
 | `export/` | [`export/HolidayDocument.tsx`](./export/HolidayDocument.tsx), the `@react-pdf/renderer` document tree (not DOM React; it renders in the PDF reconciler only), and [`export/exportPdf.tsx`](./export/exportPdf.tsx), the Effect program that renders it and hands the file over | Once |
@@ -67,6 +67,21 @@ and a second open fetches nothing. The content is
 component per step beside it, and [`pages/homepage/quick-start/steps.ts`](./pages/homepage/quick-start/steps.ts)
 for the step list, the draft shape and the pure rules.
 
+**The homepage also carries a two-field quick start, under the hero.**
+[`pages/homepage/sections/InlineQuickStart.tsx`](./pages/homepage/sections/InlineQuickStart.tsx) is a server
+section that reads the Country list and the year, and
+[`pages/homepage/quick-start/InlineQuickStartClient.tsx`](./pages/homepage/quick-start/InlineQuickStartClient.tsx)
+holds a fixed-height box and `dynamic()`-imports, with `ssr: false`,
+[`pages/homepage/quick-start/InlineQuickStartForm.tsx`](./pages/homepage/quick-start/InlineQuickStartForm.tsx)
+once the box comes within `200px` of the viewport, so the Combobox and the Counter stay off the first load
+and the box keeps the layout from shifting when they arrive. The form asks for the Country, the PTO Day
+budget and the year, and takes every other input from the same draft the dialog starts from, so a returning
+visitor keeps their Strategy, and their Region while the Country stays. It never loads Regions, and so never
+`date-holidays`. Both forms finish through
+[`pages/homepage/quick-start/startPlanning.ts`](./pages/homepage/quick-start/startPlanning.ts), the setters in
+the order that survives `setCountry` clearing the Region, then `askForPlan`. The Country list reaches the page
+twice, once for this form and once for the dialog the layout mounts.
+
 **The steps ask what the sidebar's first three cards hold, one at a time, with the year moved next to the
 budget.** Location (the Country the filters store already holds, else the `user-country` cookie, and an
 optional Region), the PTO Day budget with the year (four chips from `yearOptions`, not the sidebar's ten), then
@@ -84,7 +99,8 @@ store. No search params are involved.
 
 **The funnel is reported from the handlers, and a finish is never counted as an abandonment.**
 `openQuickStart(source)` reports `quick_start_opened` with the call to action, which is why `QuickStartTrigger`
-takes a `source`; the form reports `quick_start_step_completed` from Next and `quick_start_completed` from
+takes a `source`; the homepage form reports the same event with `source: inline` on its first change, and its
+`quick_start_completed` adds `source: inline`, which the dialog's does not carry; the form reports `quick_start_step_completed` from Next and `quick_start_completed` from
 the finish, with `trackedDraft(draft)`. The dialog reports `quick_start_abandoned` from `onOpenChange(false)`
 (the close button, the backdrop, Escape), naming the step the form last announced through `onStepChange`; a
 finish closes through the store, which fires no `onOpenChange`.
