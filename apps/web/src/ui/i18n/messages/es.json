@@ -923,6 +923,10 @@
 		}
 	},
 	"homepage": {
+		"inlineQuickStart": {
+			"title": "Planifícalo aquí mismo",
+			"description": "Elige tu país y tus días de vacaciones. El planificador los coloca por ti."
+		},
 		"nav": {
 			"how": "Cómo va",
 			"features": "Trucos",

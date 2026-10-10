@@ -923,6 +923,10 @@
 		}
 	},
 	"homepage": {
+		"inlineQuickStart": {
+			"title": "Plan it right here",
+			"description": "Pick your country and your PTO days. The planner places them for you."
+		},
 		"nav": {
 			"how": "How it works",
 			"features": "Features",

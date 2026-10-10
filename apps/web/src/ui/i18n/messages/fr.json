@@ -923,6 +923,10 @@
 		}
 	},
 	"homepage": {
+		"inlineQuickStart": {
+			"title": "Planifie-le ici même",
+			"description": "Choisis ton pays et tes jours de congé. Le planificateur les place pour toi."
+		},
 		"nav": {
 			"how": "Comment ça marche",
 			"features": "Fonctionnalités",

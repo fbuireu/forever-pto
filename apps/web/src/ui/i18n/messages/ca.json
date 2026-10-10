@@ -923,6 +923,10 @@
 		}
 	},
 	"homepage": {
+		"inlineQuickStart": {
+			"title": "Planifica-ho aquí mateix",
+			"description": "Tria el teu país i els teus dies de vacances. El planificador els col·loca per tu."
+		},
 		"nav": {
 			"how": "Com funciona",
 			"features": "Funcionalitats",

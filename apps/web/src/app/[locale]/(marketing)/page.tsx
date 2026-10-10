@@ -7,6 +7,7 @@ import { Features } from "@ui/modules/pages/homepage/sections/Features";
 import { Hero } from "@ui/modules/pages/homepage/sections/Hero";
 import { HomepageCta } from "@ui/modules/pages/homepage/sections/HomepageCta";
 import { HowItWorks } from "@ui/modules/pages/homepage/sections/HowItWorks";
+import { InlineQuickStart } from "@ui/modules/pages/homepage/sections/InlineQuickStart";
 import { Marquee } from "@ui/modules/pages/homepage/sections/Marquee";
 import { Pricing } from "@ui/modules/pages/homepage/sections/Pricing";
 import { Stats } from "@ui/modules/pages/homepage/sections/Stats";
@@ -33,6 +34,7 @@ const HomePage = async ({ params }: PageProps) => {
 	return (
 		<main id={MAIN_CONTENT_ID} className="flex-1">
 			<Hero />
+			<InlineQuickStart locale={locale} />
 			<Marquee />
 			<HowItWorks />
 			<Stats />

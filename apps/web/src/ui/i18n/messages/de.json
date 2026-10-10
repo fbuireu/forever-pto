@@ -923,6 +923,10 @@
 		}
 	},
 	"homepage": {
+		"inlineQuickStart": {
+			"title": "Gleich hier planen",
+			"description": "Wähle dein Land und deine Urlaubstage. Der Planer verteilt sie für dich."
+		},
 		"nav": {
 			"how": "Wie es funktioniert",
 			"features": "Funktionen",

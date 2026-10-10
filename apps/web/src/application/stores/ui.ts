@@ -16,6 +16,7 @@ export const QuickStartSource = {
 	HERO: "hero",
 	PRICING: "pricing",
 	CLOSING: "closing",
+	INLINE: "inline",
 } as const;
 
 export type QuickStartSource = (typeof QuickStartSource)[keyof typeof QuickStartSource];
