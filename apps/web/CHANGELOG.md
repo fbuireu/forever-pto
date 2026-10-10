@@ -1,3 +1,11 @@
+# [forever-pto-web-v1.15.0](https://github.com/fbuireu/forever-pto/compare/web-v1.14.0...web-v1.15.0) (2026-10-10)
+
+
+### Features
+
+* **web:** lay the homepage quick start out on one aligned row, two on a tablet and stacked on a phone ([ada6f12](https://github.com/fbuireu/forever-pto/commit/ada6f12b7050ed658e1172294f09156a03cc388f))
+* **web:** show the homepage quick start's skeleton until the form loads ([1b6492f](https://github.com/fbuireu/forever-pto/commit/1b6492f3027c24766968b060382c410a4433deb7))
+
 # [forever-pto-web-v1.14.0](https://github.com/fbuireu/forever-pto/compare/web-v1.13.10...web-v1.14.0) (2026-10-10)
 
 
