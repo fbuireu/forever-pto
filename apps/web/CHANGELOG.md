@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.13.9](https://github.com/fbuireu/forever-pto/compare/web-v1.13.8...web-v1.13.9) (2026-10-10)
+
+
+### Bug Fixes
+
+* **web:** name every cookie the app sets, drop the holiday-API claims, and let nothing frame it ([8fbebd5](https://github.com/fbuireu/forever-pto/commit/8fbebd5fa8984697bade0ce89f3a0cf4a0c4666e))
+
 # [forever-pto-web-v1.13.8](https://github.com/fbuireu/forever-pto/compare/web-v1.13.7...web-v1.13.8) (2026-10-10)
 
 
