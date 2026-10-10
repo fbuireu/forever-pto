@@ -19,7 +19,7 @@ Both tools take no input (`inputSchema: { type: 'object', properties: {} }`) and
 
 ## `.well-known` endpoints
 
-`apps/web/src/app/.well-known/[...slug]/route.ts` is a catch-all GET handler with an explicit route table; unknown slugs get a 404. Each handler lives in `apps/web/src/infrastructure/well-known/` and receives the base URL from the Cloudflare context (`NEXT_PUBLIC_SITE_URL`). All of them respond with `Cache-Control: public, max-age=86400`.
+`apps/web/src/app/.well-known/[...slug]/route.ts` is a catch-all GET handler with an explicit route table; unknown slugs get a 404. `/.well-known/security.txt` is not in the table: it is a static file in `apps/web/public/`, answered as `text/plain` before the handler runs. Each handler lives in `apps/web/src/infrastructure/well-known/` and receives the base URL from the Cloudflare context (`NEXT_PUBLIC_SITE_URL`). All of them respond with `Cache-Control: public, max-age=86400`.
 
 | Path | Builder | What it serves |
 | --- | --- | --- |

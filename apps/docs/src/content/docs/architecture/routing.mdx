@@ -76,6 +76,8 @@ API routes live outside `[locale]` and are excluded from the proxy matcher (exce
 
 **The document modules return plain objects; the route owns the envelope.** Each builder takes the base URL from the Cloudflare environment (`getCloudflareContext`) and returns a value; the route serialises it and sets the per-document `Content-Type` and the shared `WELL_KNOWN_CACHE_CONTROL` (`apps/web/src/infrastructure/well-known/slugs.ts`). A fourth document is a fourth entry in the map and nothing else. Together with the markdown rewrite in the proxy, this is the app's agent-facing surface.
 
+**`/.well-known/security.txt` never reaches the catch-all.** It is a static file, `apps/web/public/.well-known/security.txt`, and the static layer answers it first on both targets: `next start` serves the public folder ahead of a dynamic route, and on the Worker, Workers Static Assets answers a path that matches a file in `.open-next/assets` before the Worker runs. The handler would answer that slug with its JSON 404.
+
 ## Error and not-found surfaces
 
 There are per-locale boundaries (`apps/web/src/app/[locale]/error.tsx`, `apps/web/src/app/[locale]/not-found.tsx`) plus root-level `apps/web/src/app/global-error.tsx` and `apps/web/src/app/global-not-found.tsx`. The latter requires `experimental.globalNotFound: true` in `next.config.ts` and handles URLs that never match the `[locale]` segment. All four render the shared brutal designs; see [error pages](/architecture/error-pages/) for the full breakdown.
