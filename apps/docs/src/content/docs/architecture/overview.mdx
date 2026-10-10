@@ -34,7 +34,7 @@ either direction, so it is a measurement rather than a drawing.
 | from / to | `app` | `ui` | `application` | `domain` | `infrastructure` |
 | --- | --- | --- | --- | --- | --- |
 | `app` | | 83/16 | 10/6 | | 68/20 |
-| `ui` | | | 175/80 | 24/18 | 53/43 |
+| `ui` | | | 176/81 | 24/18 | 55/43 |
 | `application` | | 1/1 | | 15/8 | 36/11 |
 | `domain` | | | 18/13 | | 12/3 |
 | `infrastructure` | | 7/2 | 37/27 | 7/5 | |
@@ -55,9 +55,9 @@ flowchart LR
   APP -->|83| UI
   APP -->|10| APPL
   APP -->|68| INFRA
-  UI -->|175| APPL
+  UI -->|176| APPL
   UI -->|24| DOM
-  UI -->|53| INFRA
+  UI -->|55| INFRA
   APPL -->|15| DOM
   APPL -->|36| INFRA
   APPL -.->|1, the known inversion| UI

@@ -90,8 +90,9 @@ Everything is HTTPS, with `Strict-Transport-Security` for a year including subdo
 | Cookie | Carries | `httpOnly` | `sameSite` | Life |
 | --- | --- | --- | --- | --- |
 | `premium-token` | The signed session JWT | yes | `strict` | 30 days |
+| `premium-activation` | A one-shot proof that a payment just activated Premium, deleted once the session is confirmed | no, the browser spends it | `strict` | 1 hour at most |
 | `user-country` | A two-letter country code | no, the store reads it | `strict` | 7 days |
 | `NEXT_LOCALE` | The resolved locale | no, the switcher writes it | `lax` | session |
 | The sidebar cookie | Whether the sidebar is expanded | no, the browser writes it | `lax` | 7 days |
 
-The two that are not `httpOnly` are deliberate and documented at the [cookies reference](/reference/cookies/): each has a browser-side writer or reader, and adding the flag silently broke the locale switch once.
+The ones the server sets without `httpOnly` are deliberate and documented at the [cookies reference](/reference/cookies/): each has a browser-side writer or reader, and adding the flag silently broke the locale switch once.

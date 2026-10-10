@@ -11,7 +11,7 @@ Configured in `apps/web/vitest.config.ts` with `resolve.tsconfigPaths: true`, so
 
 - **Environment**: happy-dom.
 - **Setup** (`vitest.setup.ts`): runs Testing Library's `cleanup` after each test.
-- **Excluded from the runner**: `apps/web/e2e/**`, generated bones, icon directories and i18n message JSON.
+- **Excluded from the runner**: the end-to-end specs (`apps/web/e2e/**/*.spec.ts`), generated bones, icon directories and i18n message JSON.
 - **Coverage**: v8 provider over `apps/web/src/**/*.{ts,tsx}` (tests, `*.d.ts`, `types.ts` files and generated code excluded), reported as text + lcov. `ci.yml` runs `pnpm test:ut:coverage` and uploads `apps/web/coverage/lcov.info` to Codecov on every push and PR.
 
 Run locally with `pnpm test:ut` (or `pnpm test:ut:coverage`).
@@ -25,7 +25,7 @@ There are **independent suites**:
 Configured in `apps/web/playwright.config.ts`. Specs mirror the app's route structure (`apps/web/e2e/[locale]/(app)/planner/planner.spec.ts`, `apps/web/e2e/api/health.spec.ts`, …), which makes it obvious which route a failing spec covers.
 
 - `baseURL` comes from the `BASE_URL` env var; without it the config starts `pnpm dev` and targets `http://localhost:3000`.
-- In CI these tests run **against the live per-PR preview deployment**, authenticating through Cloudflare Access with a service token (`CF_ACCESS_CLIENT_ID`/`CF_ACCESS_CLIENT_SECRET` injected as headers by the config). See [environments](/infra/environments/).
+- In CI these tests run **against the live per-PR preview deployment**, authenticating through Cloudflare Access with a service token (`CF_ACCESS_CLIENT_ID`/`CF_ACCESS_CLIENT_SECRET`). Every spec takes `test` and `expect` from `apps/web/e2e/fixtures.ts`, which adds the token as `CF-Access-Client-Id`/`CF-Access-Client-Secret` to the requests whose origin is the preview's and to the `request` fixture, and to nothing a third party serves: `extraHTTPHeaders` in the config would send it to Stripe and Tag Manager too, so no config sets it. See [environments](/infra/environments/).
 - Every spec runs in two projects, `chromium` (Desktop Chrome) and `webkit` (Desktop Safari), in CI and locally alike; CI adds retries.
 
 ### Docs suite, `apps/docs/e2e/`
@@ -36,7 +36,7 @@ Configured in `apps/docs/playwright.config.ts`: every spec in `apps/docs/e2e/` r
 
 | Kind | Pattern | Location |
 | --- | --- | --- |
-| Unit test | `*.test.ts` / `*.test.tsx` | Colocated next to the source file it tests |
+| Unit test | `*.test.ts` / `*.test.tsx` | Colocated next to the source file it tests, `apps/web/e2e/previewAccess.test.ts` included |
 | E2E test | `*.spec.ts` | Only in `apps/web/e2e/`, mirroring routes, or `apps/docs/e2e/`, by topic |
 
-The split is `T6` in [`CODING_STANDARDS.md`](https://github.com/fbuireu/forever-pto/blob/main/CODING_STANDARDS.md), and the tooling relies on it: the Vitest runner excludes `apps/web/e2e/**`, and `test:ut:changed`, which `pre-push` runs through `verify:changed`, relies on the colocation to find the tests a change affects (see [tooling](/contributing/tooling/)).
+The split is `T6` in [`CODING_STANDARDS.md`](https://github.com/fbuireu/forever-pto/blob/main/CODING_STANDARDS.md), and the tooling relies on it: the Vitest runner excludes the specs, Playwright matches `*.spec.ts` alone, and `test:ut:changed`, which `pre-push` runs through `verify:changed`, relies on the colocation to find the tests a change affects (see [tooling](/contributing/tooling/)).
