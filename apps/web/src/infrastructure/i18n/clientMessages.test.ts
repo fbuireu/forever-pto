@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join, relative, resolve } from "node:path";
+import { join, relative, resolve, sep } from "node:path";
 import en from "@i18n/messages/en.json";
 import { describe, expect, it } from "vitest";
 import { clientMessagesOf, isServerOnlyNamespace, SERVER_ONLY_NAMESPACES } from "./clientMessages";
@@ -13,7 +13,10 @@ const sourceFiles = (dir: string): string[] =>
 		return /\.tsx?$/.test(name) && !/\.test\.tsx?$/.test(name) ? [path] : [];
 	});
 
-const FILES = sourceFiles(SRC).map((path) => ({ path: relative(SRC, path), source: readFileSync(path, "utf8") }));
+const FILES = sourceFiles(SRC).map((path) => ({
+	path: relative(SRC, path).split(sep).join("/"),
+	source: readFileSync(path, "utf8"),
+}));
 const rootOf = (key: string) => key.split(".")[0] ?? key;
 
 const TRANSLATION_CALL = /useTranslations\(([^)]*)\)/g;
