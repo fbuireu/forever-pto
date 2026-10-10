@@ -743,6 +743,38 @@ describe("the security header policy covers every request", () => {
 		expect(sent.get("X-Content-Type-Options")).toBe("nosniff");
 	});
 
+	it("answers framing alike in X-Frame-Options and in frame-ancestors, because a browser without frame-ancestors obeys the older header alone", () => {
+		const FRAMING_BY_ANCESTORS: Record<string, string> = { "'none'": "DENY", "'self'": "SAMEORIGIN" };
+		const framingFor = (policy: string) =>
+			FRAMING_BY_ANCESTORS[
+				(policy.split(";").find((directive) => directive.trim().startsWith("frame-ancestors ")) ?? "")
+					.trim()
+					.replace("frame-ancestors ", "")
+			];
+		const docsSite = new Map(
+			read(`${DOCS}/public/_headers`)
+				.split(/\r?\n/)
+				.map((line) => /^\s+([\w-]+): (.+)$/.exec(line))
+				.filter((match) => match !== null)
+				.map(([, key = "", value = ""]) => [key, value]),
+		);
+
+		expect(framingFor("default-src 'self'; frame-ancestors 'none'")).toBe("DENY");
+		expect(framingFor("frame-ancestors 'self'; object-src 'none'")).toBe("SAMEORIGIN");
+		expect(framingFor("default-src 'self'")).toBeUndefined();
+		expect(docsSite.get("X-Frame-Options")).toBeDefined();
+		expect(sent.get("X-Frame-Options")).toBe(framingFor(sent.get("Content-Security-Policy") ?? ""));
+		expect(docsSite.get("X-Frame-Options")).toBe(framingFor(docsSite.get("Content-Security-Policy") ?? ""));
+	});
+
+	it("documents the X-Frame-Options value the app sends, since the data protection page quotes it", () => {
+		const PAGE = `${DOCS}/src/content/docs/how-it-works/data-protection.mdx`;
+		const quoted = [...read(PAGE).matchAll(/`X-Frame-Options: ([A-Z-]+)`/g)].map(([, value]) => value);
+
+		expect(quoted.length).toBeGreaterThan(0);
+		expect(quoted.filter((value) => value !== sent.get("X-Frame-Options"))).toEqual([]);
+	});
+
 	it("allows no font CDN, because next/font/google self-hosts at build time", () => {
 		expect(read(`${WEB}/src/app/fonts.ts`)).toContain('from "next/font/google"');
 		expect(sent.get("Content-Security-Policy") ?? "").not.toMatch(/fonts\.(?:googleapis|gstatic)\.com/);
@@ -4431,6 +4463,75 @@ describe("the end-to-end browsers", () => {
 	});
 });
 
+const ACCESS_FIXTURE = `${WEB}/e2e/fixtures.ts`;
+const PLAYWRIGHT_PACKAGE = "@playwright/test";
+const EXTRA_HEADERS_OPTION = "extraHTTPHeaders";
+const EXTRA_HEADERS_SETTER = "setExtraHTTPHeaders";
+const E2E_SOURCE = /^apps\/(?:web|docs)\/e2e\/.+\.ts$/;
+
+const importsPlaywrightValues = (source: string): boolean =>
+	ts
+		.createSourceFile("spec.ts", source, ts.ScriptTarget.Latest, true)
+		.statements.filter(ts.isImportDeclaration)
+		.filter(({ moduleSpecifier }) => ts.isStringLiteral(moduleSpecifier) && moduleSpecifier.text === PLAYWRIGHT_PACKAGE)
+		.some(({ importClause }) => {
+			if (!importClause) return true;
+			if (importClause.isTypeOnly) return false;
+			if (importClause.name) return true;
+			const bindings = importClause.namedBindings;
+
+			return !bindings || ts.isNamespaceImport(bindings) || bindings.elements.some((element) => !element.isTypeOnly);
+		});
+
+const setsExtraHeaders = (source: string): boolean => {
+	const file = ts.createSourceFile("source.ts", source, ts.ScriptTarget.Latest, true);
+	let found = false;
+	const visit = (node: ts.Node): void => {
+		if (
+			(ts.isPropertyAssignment(node) || ts.isShorthandPropertyAssignment(node)) &&
+			node.name.getText(file) === EXTRA_HEADERS_OPTION
+		)
+			found = true;
+		if (ts.isPropertyAccessExpression(node) && node.name.text === EXTRA_HEADERS_SETTER) found = true;
+
+		ts.forEachChild(node, visit);
+	};
+
+	visit(file);
+
+	return found;
+};
+
+describe("the preview's Access token", () => {
+	const e2eSources = trackedFiles.filter((file) => E2E_SOURCE.test(file) && file !== ACCESS_FIXTURE);
+
+	it("reaches every spec of the app through apps/web/e2e/fixtures.ts, which sends it to the preview's origin alone, so no spec there takes a value from @playwright/test", () => {
+		const webSources = e2eSources.filter((file) => file.startsWith(`${WEB}/e2e/`));
+
+		expect(importsPlaywrightValues('import { expect, test } from "@playwright/test";')).toBe(true);
+		expect(importsPlaywrightValues('import { expect, type Page, test } from "@playwright/test";')).toBe(true);
+		expect(importsPlaywrightValues('import * as playwright from "@playwright/test";')).toBe(true);
+		expect(importsPlaywrightValues('import type { Page } from "@playwright/test";')).toBe(false);
+		expect(importsPlaywrightValues('import { type Page } from "@playwright/test";')).toBe(false);
+		expect(importsPlaywrightValues('import { expect, test } from "./fixtures";')).toBe(false);
+		expect(existsSync(join(ROOT, ACCESS_FIXTURE))).toBe(true);
+		expect(webSources.filter((file) => file.endsWith(".spec.ts")).length).toBeGreaterThan(0);
+		expect(webSources.filter((file) => importsPlaywrightValues(read(file)))).toEqual([]);
+	});
+
+	it("is set as extraHTTPHeaders by no Playwright config and no spec, because Playwright sends those on every request a page makes, to every third party included", () => {
+		const configs = trackedFiles.filter((file) => PLAYWRIGHT_CONFIG.test(file));
+
+		expect(setsExtraHeaders("export default defineConfig({ use: { extraHTTPHeaders: headers } });")).toBe(true);
+		expect(setsExtraHeaders("test.use({ extraHTTPHeaders });")).toBe(true);
+		expect(setsExtraHeaders("await page.setExtraHTTPHeaders(headers);")).toBe(true);
+		expect(setsExtraHeaders('export default defineConfig({ use: { baseURL: "http://localhost" } });')).toBe(false);
+		expect(configs.length).toBeGreaterThan(0);
+		expect(e2eSources.some((file) => file.startsWith(`${DOCS}/e2e/`))).toBe(true);
+		expect([...configs, ...e2eSources].filter((file) => setsExtraHeaders(read(file)))).toEqual([]);
+	});
+});
+
 describe("the guides describe the project as it is configured", () => {
 	const documentedAliases = new Set([...webGuide.matchAll(BACKTICKED_ALIAS)].map(([, alias]) => alias));
 	const OVERVIEW_PAGE = `${DOCS}/src/content/docs/architecture/overview.mdx`;
@@ -4823,6 +4924,112 @@ describe("translation bundles stay in step", () => {
 		return out;
 	};
 
+	const COOKIE_WRITES = [
+		/\.cookies\.set\(\s*([A-Z][A-Z0-9_]*)\s*,/g,
+		/\.cookies\.set\(\s*\{\s*\.\.\.([A-Z][A-Z0-9_]*)/g,
+		/\bsetCookie\(\s*\{\s*name:\s*([A-Z][A-Z0-9_]*)/g,
+		/\bdocument\.cookie\s*=\s*`\$\{([A-Z][A-Z0-9_]*)\}=/g,
+	];
+	const STRING_CONSTANT = /\bconst ([A-Z][A-Z0-9_]*)\s*=\s*"([^"]+)"/g;
+	const FIRST_PARTY_CONSENT_ENTRY = /name:\s*(?:"([^"]+)"|([A-Z][A-Z0-9_]*)),[^}]*?provider:\s*"Forever PTO"/g;
+	const CONSENT_CONFIG = `${WEB_SRC}/ui/modules/shared/cookie-consent/config/config.ts`;
+
+	const cookieNameIdentifiers = (source: string) =>
+		COOKIE_WRITES.flatMap((pattern) => [...source.matchAll(pattern)].map(([, name = ""]) => name));
+	const stringConstants = new Map(
+		webProduction.flatMap((file) =>
+			[...read(file).matchAll(STRING_CONSTANT)].map(([, name = "", value = ""]) => [name, value] as const),
+		),
+	);
+	const objectNameField = (identifier: string) =>
+		webProduction
+			.map(
+				(file) =>
+					new RegExp(`\\bconst ${identifier}\\s*=\\s*\\{[^}]*?\\bname:\\s*([A-Z][A-Z0-9_]*)`).exec(read(file))?.[1],
+			)
+			.find((name) => name !== undefined);
+	const cookieNameOf = (identifier: string) =>
+		stringConstants.get(identifier) ?? stringConstants.get(objectNameField(identifier) ?? "");
+	const firstPartyEntries = (source: string) =>
+		[...source.matchAll(FIRST_PARTY_CONSENT_ENTRY)].map(
+			([, literal, identifier = ""]) => literal ?? cookieNameOf(identifier) ?? identifier,
+		);
+	const writtenIdentifiers = () => [...new Set(webProduction.flatMap((file) => cookieNameIdentifiers(read(file))))];
+
+	it("lists in the consent dialog's catalogue, as the app's own, every cookie the app writes, so the dialog shows what a browser finds", () => {
+		const written = writtenIdentifiers().map(cookieNameOf);
+		const catalogued = firstPartyEntries(read(CONSENT_CONFIG));
+
+		expect(
+			firstPartyEntries(
+				'{ name: USER_COUNTRY_COOKIE, expiryKey: "weeks", provider: "Forever PTO" }, { name: "cc_cookie", expiryKey: "months", provider: "Forever PTO" }, { name: "__stripe_mid", expiryKey: "years", provider: "Stripe" }',
+			),
+		).toEqual(["user-country", "cc_cookie"]);
+		expect(written.length).toBeGreaterThanOrEqual(5);
+		expect(written.filter((name) => name === undefined || !catalogued.includes(name))).toEqual([]);
+	});
+
+	it("names in every bundle's cookie policy every cookie the app sets, its consent cookie included, so the policy lists what a browser finds", () => {
+		const written = writtenIdentifiers();
+		const consented = firstPartyEntries(read(CONSENT_CONFIG));
+		const cookies = [...new Set([...written.map(cookieNameOf), ...consented])];
+		const policyText = (file: string) =>
+			entriesOf(file)
+				.filter(([path]) => path.startsWith("cookiePolicy."))
+				.map(([, value]) => value)
+				.join("\n");
+
+		expect(cookieNameIdentifiers("response.cookies.set(PREMIUM_COOKIE, token, {")).toEqual(["PREMIUM_COOKIE"]);
+		expect(cookieNameIdentifiers("response.cookies.set({ ...LOCALE_COOKIE_POLICY, value });")).toEqual([
+			"LOCALE_COOKIE_POLICY",
+		]);
+		expect(cookieNameIdentifiers("setCookie({ name: SIDEBAR_COOKIE_NAME, value })")).toEqual(["SIDEBAR_COOKIE_NAME"]);
+		expect(cookieNameIdentifiers(`document.cookie = \`\${ACTIVATION_COOKIE}=; path=/\`;`)).toEqual([
+			"ACTIVATION_COOKIE",
+		]);
+		expect(cookieNameIdentifiers("cookieStore.get(PREMIUM_COOKIE)?.value")).toEqual([]);
+		expect(written.filter((identifier) => cookieNameOf(identifier) === undefined)).toEqual([]);
+		expect(cookies).toEqual(expect.arrayContaining(["premium-token", "premium-activation", "cc_cookie"]));
+		expect(cookies.length).toBeGreaterThanOrEqual(6);
+		expect(
+			localeFiles.flatMap((file) =>
+				cookies
+					.filter((name) => name !== undefined && !policyText(file).includes(name))
+					.map((name) => `${file} ${name}`),
+			),
+		).toEqual([]);
+	});
+
+	const HOLIDAY_WORD: Record<string, RegExp> = {
+		"en.json": /holiday/i,
+		"es.json": /festiv/i,
+		"ca.json": /festiu/i,
+		"it.json": /festivit/i,
+		"de.json": /feiertag/i,
+		"fr.json": /férié/i,
+	};
+	const API_WORD = /\bAPIs?\b|-APIs?\b/;
+
+	it("holds a holiday word for every bundle", () => {
+		expect(Object.keys(HOLIDAY_WORD).sort()).toEqual([...localeFiles].sort());
+	});
+
+	it.each(Object.keys(HOLIDAY_WORD))(
+		"%s never says the holiday data comes from an API, because the dataset ships inside the app and nothing is fetched",
+		(file) => {
+			const holiday = HOLIDAY_WORD[file] as RegExp;
+			const claims = entriesOf(file)
+				.filter(([, value]) => holiday.test(value) && API_WORD.test(value))
+				.map(([path, value]) => `${path} -> ${value}`);
+
+			expect(entriesOf(file).filter(([, value]) => holiday.test(value)).length).toBeGreaterThan(0);
+			expect(API_WORD.test("Holiday APIs:")).toBe(true);
+			expect(API_WORD.test("stammen aus Drittanbieter-APIs")).toBe(true);
+			expect(API_WORD.test("rapid response")).toBe(false);
+			expect(claims).toEqual([]);
+		},
+	);
+
 	it.each(Object.keys(FORMAL_ADDRESS))("%s addresses the user informally, like every other bundle", (file) => {
 		const pattern = FORMAL_ADDRESS[file] as RegExp;
 		const formal = entriesOf(file)
@@ -4981,13 +5188,12 @@ describe("translation bundles stay in step", () => {
 		expect(stale).toEqual([]);
 	});
 
-	const UPPERCASE_RUN = /(?<![\p{L}\p{N}])\p{Lu}{2,}(?![\p{L}\p{N}])/gu;
+	const UPPERCASE_RUN = /(?<![\p{L}\p{N}_])\p{Lu}{2,}(?![\p{L}\p{N}_])/gu;
 
 	const ACRONYMS = new Set([
 		"AEPD",
 		"AI",
 		"APDCAT",
-		"API",
 		"CE",
 		"CNIL",
 		"DSGVO",
@@ -5028,6 +5234,14 @@ describe("translation bundles stay in step", () => {
 		"UX",
 		"XOR",
 	]);
+
+	it("reads a name joined by underscores as an identifier, not as shouting, since the cookie policy names NEXT_LOCALE", () => {
+		const runs = (text: string) => [...text.matchAll(UPPERCASE_RUN)].map(([run]) => run);
+
+		expect(runs("Language (NEXT_LOCALE): remembers it")).toEqual([]);
+		expect(runs("PLEASE read the GDPR text")).toEqual(["PLEASE", "GDPR"]);
+		expect(runs("a NEXT step")).toEqual(["NEXT"]);
+	});
 
 	it.each(localeFiles)("%s shouts nothing an acronym does not explain", (file) => {
 		const shouted = entriesOf(file)

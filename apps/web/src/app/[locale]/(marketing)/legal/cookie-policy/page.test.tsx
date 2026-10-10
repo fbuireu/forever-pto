@@ -4,8 +4,10 @@ import enMessages from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { EN, ES } from "@infrastructure/i18n/locales";
+import { EN, ES, LOCALES } from "@infrastructure/i18n/locales";
+import { render } from "@testing-library/react";
 import { COOKIE_SECTIONS } from "@ui/modules/shared/cookie-consent/config/config";
+import { createTranslator } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const NAMESPACE = "cookiePolicy";
@@ -36,6 +38,8 @@ const { default: CookiePolicyPage } = await import("./page");
 
 const makeParams = (locale = EN) => ({ params: Promise.resolve({ locale: locale as never }) });
 
+const BUNDLES = { ca: caMessages, de: deMessages, en: enMessages, es: esMessages, fr: frMessages, it: itMessages };
+
 describe("cookie-policy/page", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
@@ -65,15 +69,15 @@ describe("cookie-policy/page", () => {
 		expect(mockGetTranslations).toHaveBeenCalledWith(expect.objectContaining({ locale: ES }));
 	});
 
-	it("passes the translated last-updated line to the layout", async () => {
+	it("hands the layout this page's own date alone, which the layout labels once", async () => {
 		const element = await CookiePolicyPage(makeParams());
-		expect(element.props.lastUpdated).toBe("t:lastUpdated");
+
+		expect(element.props.lastUpdatedDate).toBe("October 10, 2026");
 	});
 });
 
 describe("the cookie policy's Stripe paragraph", () => {
 	const STRIPE = "Stripe";
-	const BUNDLES = { ca: caMessages, de: deMessages, en: enMessages, es: esMessages, fr: frMessages, it: itMessages };
 
 	it.each(Object.entries(BUNDLES))(
 		"names in %s every Stripe cookie the consent banner lists as necessary, since Stripe.js sets them on any page",
@@ -86,6 +90,30 @@ describe("the cookie policy's Stripe paragraph", () => {
 
 			expect(necessaryStripeCookies.length).toBeGreaterThan(1);
 			expect(necessaryStripeCookies.filter((name) => !paragraph.includes(name))).toEqual([]);
+		},
+	);
+});
+
+describe("the cookie policy's own cookies", () => {
+	const OWN_PROVIDER = "Forever PTO";
+	const ownCookies = COOKIE_SECTIONS.flatMap(({ cookies = [] }) => cookies)
+		.filter(({ provider }) => provider === OWN_PROVIDER)
+		.map(({ name }) => name);
+
+	it.each(LOCALES)(
+		"renders in %s a line naming each of the app's own cookies the consent catalogue lists",
+		async (locale) => {
+			mockGetCloudflareContext.mockResolvedValue({ env: ENV });
+			mockGetTranslations.mockResolvedValue(
+				createTranslator({ locale, messages: BUNDLES[locale], namespace: NAMESPACE }),
+			);
+
+			const element = await CookiePolicyPage(makeParams(locale));
+			const { container } = render(element.props.children);
+			const text = container.textContent ?? "";
+
+			expect(ownCookies.length).toBeGreaterThanOrEqual(6);
+			expect(ownCookies.filter((name) => !text.includes(name))).toEqual([]);
 		},
 	);
 });

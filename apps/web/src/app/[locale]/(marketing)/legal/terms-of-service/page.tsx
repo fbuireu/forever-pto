@@ -29,10 +29,10 @@ export default async function TermsOfServicePage({ params }: Readonly<TermsOfSer
 		getPublicEnv(),
 		getTranslations({ locale, namespace: "termsOfService" }),
 	]);
-	const lastUpdatedDate = getLastUpdatedDate(locale);
+	const lastUpdatedDate = getLastUpdatedDate({ page: "termsOfService", locale });
 
 	return (
-		<LegalLayout title={t("title")} lastUpdated={t("lastUpdated", { date: lastUpdatedDate })}>
+		<LegalLayout title={t("title")} lastUpdatedDate={lastUpdatedDate}>
 			<section>
 				<h2 className="text-2xl font-semibold mt-6 mb-4">{t("sections.acceptance.title")}</h2>
 				<p>{t("sections.acceptance.p1")}</p>
@@ -229,7 +229,6 @@ export default async function TermsOfServicePage({ params }: Readonly<TermsOfSer
 				<p>{t("sections.thirdPartyServices.description")}</p>
 				<ul className="list-disc pl-6 mt-4 space-y-2">
 					<li>{t("sections.thirdPartyServices.items.payment")}</li>
-					<li>{t("sections.thirdPartyServices.items.holidayApis")}</li>
 					<li>{t("sections.thirdPartyServices.items.analytics")}</li>
 					<li>{t("sections.thirdPartyServices.items.external")}</li>
 				</ul>

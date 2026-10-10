@@ -103,13 +103,16 @@ No rule below restates these, and a diff that breaks one fails CI:
     a string, shouting nothing outside the acronym list, addressing the user informally in German and French, styling
     no number, date or time argument (`{n, number, percent}`), and naming no concept by a phrase the glossary retires
     ("days off", "unused days", "manually selected" and their translations, one list per bundle) outside the marketing
-    namespaces and the legal texts;
+    namespaces and the legal texts, naming in the cookie policy every cookie the app sets, which the consent dialog's
+    catalogue lists too, and never saying the holiday data comes from an API, since the dataset ships inside the app;
   - the configuration: `strict` on and `allowJs` off, `cloudflare-env.d.ts` out of the program and out of git,
     `PUBLIC_ENV` classifying exactly the `NEXT_PUBLIC_*` names `environment.d.ts` declares and each wired where it is
-    read, the security headers with the sources Stripe.js asks of the CSP, `immutable` on `/_next/static`, every
-    binding in every wrangler environment, the TypeScript pins, and the production build stripping every `console`
-    call but the logger's levels (`removeConsole` excluding exactly `LOG_LEVEL`'s values), because the logger's lines
-    reach Better Stack only as console output and a stray `console.log` must never ship;
+    read, the security headers with the sources Stripe.js asks of the CSP, an `X-Frame-Options` that answers framing
+    as `frame-ancestors` does, in the app and on the docs site, and is the value the data protection page quotes,
+    `immutable` on `/_next/static`, every binding in every wrangler environment, the TypeScript pins, and the
+    production build stripping every `console` call but the logger's levels (`removeConsole` excluding exactly
+    `LOG_LEVEL`'s values), because the logger's lines reach Better Stack only as console output and a stray
+    `console.log` must never ship;
   - the workflows: no deploy, build or secret write in a retry wrapper, every deploy's `--message` the one token
     `<sha>-<event>` the deploying repositories share (`C6`), only scripts a manifest declares, the preview cleanup
     queued behind the run that deployed it, every gated job under a `Check` aggregate, release configs that parse the
@@ -119,6 +122,8 @@ No rule below restates these, and a diff that breaks one fails CI:
     comment;
   - Playwright running the `chromium` and `webkit` projects alone in both packages, in CI and locally alike, and every
     workflow job that runs it installing both browsers behind a cache keyed on them;
+  - every spec of the app taking `test` and `expect` from `apps/web/e2e/fixtures.ts`, which hands the preview's
+    Cloudflare Access token to the preview's origin alone, and no Playwright config or spec setting `extraHTTPHeaders`;
   - the YAML, every file of it: no comment but a SHA pin's trailing comment, a tool directive and the line Renovate
     writes into `pnpm-workspace.yaml`, a `#` counting as a comment when removing it leaves the parsed document
     unchanged;
@@ -419,7 +424,8 @@ No rule below restates these, and a diff that breaks one fails CI:
   worker through the holidays store, never from a generator or a selector.
 - `U2` **hard**: Import from `@infrastructure/*` only the listed seams: the locales and `localePath`, the tracking
   helper, `errors`, the worker types and serializers, `getPublicEnv`, `getCountries`, the Country cookie's name
-  (`proxy/cookie`), the Stripe browser client, the driver.js client and the `payment` and `contact` server actions.
+  (`proxy/cookie`), the Premium session cookie's name (`services/premium/cookie`, whose `NextResponse` import is
+  type-only), the Stripe browser client, the driver.js client and the `payment` and `contact` server actions.
 - `U4` **hard**: Keep server components free of hooks and store access.
 - `U5` **hard**, *check pending*: Render on the server by default and add `'use client'` to any file with state, an
   effect, a store read, an event handler or a recharts chart, even when every current importer is already a client

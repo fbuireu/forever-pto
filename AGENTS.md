@@ -172,7 +172,9 @@ and rulesets behind them are settings, on the [environments](./apps/docs/src/con
   needs it, and a failed smoke run rolls production back through `rollback`. The docs site has the same pair, over
   [`apps/docs/e2e/smoke.spec.ts`](./apps/docs/e2e/smoke.spec.ts) and the `DOCS_SITE_URL` variable.
 - [`apps/web/e2e/warm-up.ts`](./apps/web/e2e/warm-up.ts) is Playwright's `globalSetup`: with `BASE_URL` set it requests
-  the homepage and an unknown path once, before any worker starts, so no spec meets the Worker's first render.
+  the homepage and an unknown path once, before any worker starts, so no spec meets the Worker's first render. It
+  carries the Cloudflare Access token the way the specs do, from
+  [`apps/web/e2e/previewAccess.ts`](./apps/web/e2e/previewAccess.ts), to the preview's origin alone.
 - **The preview cleanup queues behind the run that deployed the Worker it deletes**: `cleanup-web` in the group
   `CI-refs/pull/<number>/merge`, which is the group `ci.yml` computes for that pull request's run, and `cleanup-docs`
   in the docs one. The coupling is by `ci.yml`'s `name:`, `CI`, so renaming it unqueues the cleanup; the contract suite

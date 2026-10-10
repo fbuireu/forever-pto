@@ -1,6 +1,6 @@
 import { MARKDOWN_ACCEPT, MARKDOWN_PATH_HEADER, MARKDOWN_ROUTE } from "@infrastructure/markdown/twin";
 import type { RoutePath } from "@infrastructure/seo/routes";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../fixtures";
 
 const MARKDOWN_HEADERS = { Accept: MARKDOWN_ACCEPT };
 const HOME_PATH = "/";

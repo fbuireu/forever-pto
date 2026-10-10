@@ -14,7 +14,7 @@ const renderLayout = async () => {
 	return render(
 		await LegalLayout({
 			title: "Terms of Service",
-			lastUpdated: "1 January 2026",
+			lastUpdatedDate: "1 January 2026",
 			children: <p>the terms themselves</p>,
 		}),
 	);

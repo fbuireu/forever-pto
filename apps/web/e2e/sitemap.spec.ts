@@ -1,7 +1,7 @@
 import { LOCALES } from "@infrastructure/i18n/locales";
 import { localePath } from "@infrastructure/i18n/utils/url";
 import { indexableRoutes } from "@infrastructure/seo/routes";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 const SITEMAP_URL = "/sitemap.xml";
 const LOCATION = /<loc>([^<]*)<\/loc>/g;

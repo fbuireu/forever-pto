@@ -799,9 +799,14 @@
 		"years": "{count, plural, one {# any} other {# anys}}",
 		"minutes": "{count, plural, one {# minut} other {# minuts}}",
 		"hours": "{count, plural, one {# hora} other {# hores}}",
+		"days": "{count, plural, one {# dia} other {# dies}}",
 		"weeks": "{count, plural, one {# setmana} other {# setmanes}}",
 		"userCountryDesc": "Desa el país detectat per mostrar-te els festius inicials.",
 		"ccCookieDesc": "Desa les teves preferències de consentiment de cookies.",
+		"premiumTokenDesc": "Manté Premium desbloquejat en aquest navegador després d'una donació.",
+		"premiumActivationDesc": "Marca un pagament que acaba de desbloquejar Premium, per registrar l'activació una sola vegada.",
+		"localeDesc": "Recorda l'idioma en què llegeixes el lloc.",
+		"sidebarStateDesc": "Recorda si vas deixar oberta o tancada la barra lateral.",
 		"stripeMidDesc": "Prevenció i detecció del frau. La defineix Stripe per processar els pagaments de manera segura.",
 		"stripeSidDesc": "Identificador de sessió per a la prevenció del frau. Necessari per al procés de pagament.",
 		"gaDesc": "Distingeix usuaris únics.",
@@ -1132,7 +1137,6 @@
 	},
 	"cookiePolicy": {
 		"title": "Política de cookies",
-		"lastUpdated": "Darrera actualització: {date}",
 		"sections": {
 			"introduction": {
 				"title": "Introducció",
@@ -1154,7 +1158,7 @@
 					"socialMedia": "Cookies de xarxes socials"
 				},
 				"strictlyNecessary": {
-					"title": "Cookies estrictament necessàries (emmagatzematge local)",
+					"title": "Cookies estrictament necessàries i emmagatzematge local",
 					"description": "Utilitzem l'emmagatzematge local del navegador per guardar les teves preferències i l'estat de l'aplicació. Són essencials per al funcionament del lloc web i no es poden desactivar:",
 					"items": {
 						"filters": {
@@ -1185,6 +1189,31 @@
 					"duration": {
 						"label": "Durada:",
 						"description": "Aquestes dades s'emmagatzemen de manera permanent a l'emmagatzematge local del teu navegador fins que les eliminis manualment."
+					},
+					"cookies": {
+						"description": "També fem servir aquestes cookies pròpies. Cadascuna és estrictament necessària i cap no es comparteix amb tercers:",
+						"items": {
+							"premiumSession": {
+								"label": "Sessió Premium (premium-token):",
+								"description": "Manté Premium desbloquejat en aquest navegador després que facis una donació. És pròpia, només el nostre servidor la pot llegir i dura 30 dies."
+							},
+							"activationProof": {
+								"label": "Prova d'activació (premium-activation):",
+								"description": "Indica a l'aplicació que un pagament acaba de desbloquejar Premium, perquè l'activació es registri una sola vegada. És pròpia i dura com a màxim una hora: l'aplicació l'elimina tan bon punt ha confirmat la teva sessió."
+							},
+							"country": {
+								"label": "País (user-country):",
+								"description": "Recorda el país que hem detectat per a tu, perquè el planificador s'obri amb els seus festius. És pròpia i dura 7 dies."
+							},
+							"language": {
+								"label": "Idioma (NEXT_LOCALE):",
+								"description": "Recorda l'idioma en què llegeixes el lloc. És pròpia i s'elimina quan tanques el navegador."
+							},
+							"sidebar": {
+								"label": "Barra lateral (sidebar_state):",
+								"description": "Recorda si vas deixar oberta o tancada la barra lateral. És pròpia i dura 7 dies."
+							}
+						}
 					}
 				}
 			},
@@ -1254,10 +1283,6 @@
 						"label": "Stripe (processament de pagaments):",
 						"description": "Stripe es carrega a totes les pàgines de Forever PTO, no només quan fas una donació, perquè la seva prevenció del frau vegi com s'utilitza el lloc abans d'un pagament. Pot establir les seves cookies de prevenció del frau (__stripe_mid i __stripe_sid) a qualsevol pàgina; són estrictament necessàries, així que s'estableixen tant si acceptes les cookies analítiques com si no. Consulta la Política de cookies de Stripe."
 					},
-					"holidayApis": {
-						"label": "API de festius:",
-						"description": "Utilitzem API externes per obtenir dades de festius, però aquestes no estableixen cookies al nostre lloc."
-					},
 					"analytics": {
 						"label": "Better Stack (analítica):",
 						"description": "Quan acceptes les cookies analítiques, Better Stack pot establir cookies per fer un seguiment de les interaccions i mesurar l'ús del producte."
@@ -1323,7 +1348,6 @@
 	},
 	"privacyPolicy": {
 		"title": "Política de privadesa",
-		"lastUpdated": "Darrera actualització: {date}",
 		"sections": {
 			"introduction": {
 				"title": "Introducció",
@@ -1359,7 +1383,7 @@
 						},
 						"holidayData": {
 							"label": "Dades de festius:",
-							"description": "Festius obtinguts d'API externes i desats localment a la memòria cau."
+							"description": "Els festius del teu país i la teva regió, presos de les dades de festius que s'inclouen a l'aplicació i desats localment. Cap petició no surt del teu navegador per obtenir-los."
 						},
 						"customHolidays": {
 							"label": "Festius personalitzats:",
@@ -1451,10 +1475,6 @@
 					"paymentProcessors": {
 						"label": "Stripe (processament de pagaments):",
 						"description": "Gestiona tot el processament de pagaments de manera segura. Consulta la Política de privadesa de Stripe."
-					},
-					"holidayProviders": {
-						"label": "Proveïdors de dades de festius:",
-						"description": "Obtenim dades de festius d'API externes, però no compartim la teva informació personal amb aquests proveïdors."
 					},
 					"analytics": {
 						"label": "Google Analytics (si hi consents):",
@@ -1571,7 +1591,6 @@
 	},
 	"termsOfService": {
 		"title": "Condicions del servei",
-		"lastUpdated": "Darrera actualització: {date}",
 		"sections": {
 			"acceptance": {
 				"title": "Acceptació de les condicions",
@@ -1712,7 +1731,7 @@
 				"items": {
 					"accuracy": {
 						"label": "Exactitud de les dades de festius:",
-						"description": "Tot i que ens esforcem per ser precisos, les dades de festius provenen d'API de tercers i poden contenir errors. Verifica-les sempre amb fonts oficials."
+						"description": "Tot i que ens esforcem per ser precisos, les dades de festius provenen d'un conjunt de dades de codi obert de tercers que s'inclou a l'aplicació i poden contenir errors. Verifica-les sempre amb fonts oficials."
 					},
 					"availability": {
 						"label": "Disponibilitat del servei:",
@@ -1768,7 +1787,6 @@
 				"description": "Forever PTO s'integra amb serveis de tercers, incloent-hi:",
 				"items": {
 					"payment": "Stripe per al processament de pagaments",
-					"holidayApis": "API externes per a dades de festius",
 					"analytics": "Google Analytics per a estadístiques d'ús (si hi consents)",
 					"external": "Enllaços a llocs web externs"
 				},
@@ -1879,7 +1897,6 @@
 	},
 	"legalNotice": {
 		"title": "Avís legal",
-		"lastUpdated": "Darrera actualització: {date}",
 		"sections": {
 			"identification": {
 				"title": "Identificació del titular del lloc web",

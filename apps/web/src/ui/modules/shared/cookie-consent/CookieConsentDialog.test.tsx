@@ -1,11 +1,15 @@
+import { ACTIVATION_COOKIE } from "@application/dto/payment/types";
 import ca from "@i18n/messages/ca.json";
 import de from "@i18n/messages/de.json";
 import en from "@i18n/messages/en.json";
 import es from "@i18n/messages/es.json";
 import fr from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
+import { LOCALE_COOKIE } from "@infrastructure/i18n/locales";
 import { USER_COUNTRY_COOKIE } from "@infrastructure/proxy/cookie";
+import { PREMIUM_COOKIE } from "@infrastructure/services/premium/cookie";
 import { fireEvent, render, screen } from "@testing-library/react";
+import { SIDEBAR_COOKIE_NAME } from "@ui/utils/sidebarCookie";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import { describe, expect, it, vi } from "vitest";
 import { CookieConsentDialog } from "./CookieConsentDialog";
@@ -15,6 +19,34 @@ vi.mock("@infrastructure/proxy/cookie", async (importOriginal) => ({
 	...(await importOriginal<typeof import("@infrastructure/proxy/cookie")>()),
 	USER_COUNTRY_COOKIE: "visitor-country",
 }));
+
+vi.mock("@infrastructure/services/premium/cookie", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@infrastructure/services/premium/cookie")>()),
+	PREMIUM_COOKIE: "visitor-premium-session",
+}));
+
+vi.mock("@application/dto/payment/types", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@application/dto/payment/types")>()),
+	ACTIVATION_COOKIE: "visitor-activation-proof",
+}));
+
+vi.mock("@infrastructure/i18n/locales", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@infrastructure/i18n/locales")>()),
+	LOCALE_COOKIE: "visitor-locale",
+}));
+
+vi.mock("@ui/utils/sidebarCookie", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@ui/utils/sidebarCookie")>()),
+	SIDEBAR_COOKIE_NAME: "visitor-sidebar",
+}));
+
+const FIRST_PARTY_COOKIES = [
+	USER_COUNTRY_COOKIE,
+	PREMIUM_COOKIE,
+	ACTIVATION_COOKIE,
+	LOCALE_COOKIE,
+	SIDEBAR_COOKIE_NAME,
+];
 
 interface RenderDialogParams {
 	locale?: Locale;
@@ -75,11 +107,13 @@ describe("CookieConsentDialog", () => {
 		expect(nameless).toEqual([]);
 	});
 
-	it("lists the Country cookie under the name the edge writes it by", async () => {
+	it("lists every first-party cookie under the name the code writes it by", async () => {
 		renderDialog();
 		openEveryDetailsPanel();
+		await screen.findByText(USER_COUNTRY_COOKIE);
 
-		expect(await screen.findByText(USER_COUNTRY_COOKIE)).toBeTruthy();
+		expect(FIRST_PARTY_COOKIES.filter((name) => !name.startsWith("visitor-"))).toEqual([]);
+		expect(FIRST_PARTY_COOKIES.filter((name) => screen.queryByText(name) === null)).toEqual([]);
 	});
 });
 
@@ -99,6 +133,10 @@ describe("CookieConsentDialog lifetimes", () => {
 
 		expect(lifetimeOf(USER_COUNTRY_COOKIE)).toBe("1 week");
 		expect(lifetimeOf("cc_cookie")).toBe("6 months");
+		expect(lifetimeOf(PREMIUM_COOKIE)).toBe("30 days");
+		expect(lifetimeOf(ACTIVATION_COOKIE)).toBe("1 hour");
+		expect(lifetimeOf(LOCALE_COOKIE)).toBe(en.cookies.session);
+		expect(lifetimeOf(SIDEBAR_COOKIE_NAME)).toBe("1 week");
 		expect(lifetimeOf("__stripe_sid")).toBe("30 minutes");
 		expect(lifetimeOf("_ga")).toBe("2 years");
 		expect(lifetimeOf("_bs_sid")).toBe(en.cookies.session);

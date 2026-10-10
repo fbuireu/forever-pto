@@ -1,9 +1,13 @@
+import { ACTIVATION_COOKIE } from "@application/dto/payment/types";
 import type messages from "@i18n/messages/en.json";
+import { LOCALE_COOKIE } from "@infrastructure/i18n/locales";
 import { USER_COUNTRY_COOKIE } from "@infrastructure/proxy/cookie";
+import { PREMIUM_COOKIE } from "@infrastructure/services/premium/cookie";
+import { SIDEBAR_COOKIE_NAME } from "@ui/utils/sidebarCookie";
 
 type CookiesKey = keyof (typeof messages)["cookies"];
 
-type CookieDuration = Extract<CookiesKey, "minutes" | "hours" | "weeks" | "months" | "years">;
+type CookieDuration = Extract<CookiesKey, "minutes" | "hours" | "days" | "weeks" | "months" | "years">;
 
 type CookieExpiry = { expiryKey: Extract<CookiesKey, "session"> } | { expiryKey: CookieDuration; expiryCount: number };
 
@@ -42,6 +46,33 @@ export const COOKIE_SECTIONS: CookieSection[] = [
 				expiryKey: "months",
 				expiryCount: 6,
 				descriptionKey: "ccCookieDesc",
+				provider: "Forever PTO",
+			},
+			{
+				name: PREMIUM_COOKIE,
+				expiryKey: "days",
+				expiryCount: 30,
+				descriptionKey: "premiumTokenDesc",
+				provider: "Forever PTO",
+			},
+			{
+				name: ACTIVATION_COOKIE,
+				expiryKey: "hours",
+				expiryCount: 1,
+				descriptionKey: "premiumActivationDesc",
+				provider: "Forever PTO",
+			},
+			{
+				name: LOCALE_COOKIE,
+				expiryKey: "session",
+				descriptionKey: "localeDesc",
+				provider: "Forever PTO",
+			},
+			{
+				name: SIDEBAR_COOKIE_NAME,
+				expiryKey: "weeks",
+				expiryCount: 1,
+				descriptionKey: "sidebarStateDesc",
 				provider: "Forever PTO",
 			},
 			{

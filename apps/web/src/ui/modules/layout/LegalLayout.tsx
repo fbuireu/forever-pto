@@ -4,11 +4,11 @@ import type { ReactNode } from "react";
 
 interface LegalLayoutProps {
 	title: string;
-	lastUpdated: string;
+	lastUpdatedDate: string;
 	children: ReactNode;
 }
 
-export const LegalLayout = async ({ title, lastUpdated, children }: LegalLayoutProps) => {
+export const LegalLayout = async ({ title, lastUpdatedDate, children }: LegalLayoutProps) => {
 	const t = await getTranslations("legal");
 
 	return (
@@ -18,7 +18,7 @@ export const LegalLayout = async ({ title, lastUpdated, children }: LegalLayoutP
 					<CardTitle as="h1" className="text-3xl font-bold">
 						{title}
 					</CardTitle>
-					<p className="text-sm text-muted-foreground">{t("lastUpdated", { date: lastUpdated })}</p>
+					<p className="text-sm text-muted-foreground">{t("lastUpdated", { date: lastUpdatedDate })}</p>
 				</CardHeader>
 				<CardContent className="prose prose-sm dark:prose-invert max-w-none">{children}</CardContent>
 			</Card>

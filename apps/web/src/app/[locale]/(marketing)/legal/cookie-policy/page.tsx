@@ -19,10 +19,10 @@ export default async function CookiePolicyPage({ params }: Readonly<CookiePolicy
 		getTranslations({ locale, namespace: "cookiePolicy" }),
 	]);
 	const siteLink = createRichLink({ href: siteUrl });
-	const lastUpdatedDate = getLastUpdatedDate(locale);
+	const lastUpdatedDate = getLastUpdatedDate({ page: "cookiePolicy", locale });
 
 	return (
-		<LegalLayout title={t("title")} lastUpdated={t("lastUpdated", { date: lastUpdatedDate })}>
+		<LegalLayout title={t("title")} lastUpdatedDate={lastUpdatedDate}>
 			<section>
 				<h2 className="text-2xl font-semibold mt-6 mb-4">{t("sections.introduction.title")}</h2>
 				<p>{t.rich("sections.introduction.p1", { link: siteLink })}</p>
@@ -74,6 +74,29 @@ export default async function CookiePolicyPage({ params }: Readonly<CookiePolicy
 					<strong>{t("sections.typesOfCookies.strictlyNecessary.duration.label")}</strong>{" "}
 					{t("sections.typesOfCookies.strictlyNecessary.duration.description")}
 				</p>
+				<p className="mt-4">{t("sections.typesOfCookies.strictlyNecessary.cookies.description")}</p>
+				<ul className="list-disc pl-6 mt-4 space-y-3">
+					<li>
+						<strong>{t("sections.typesOfCookies.strictlyNecessary.cookies.items.premiumSession.label")}</strong>{" "}
+						{t("sections.typesOfCookies.strictlyNecessary.cookies.items.premiumSession.description")}
+					</li>
+					<li>
+						<strong>{t("sections.typesOfCookies.strictlyNecessary.cookies.items.activationProof.label")}</strong>{" "}
+						{t("sections.typesOfCookies.strictlyNecessary.cookies.items.activationProof.description")}
+					</li>
+					<li>
+						<strong>{t("sections.typesOfCookies.strictlyNecessary.cookies.items.country.label")}</strong>{" "}
+						{t("sections.typesOfCookies.strictlyNecessary.cookies.items.country.description")}
+					</li>
+					<li>
+						<strong>{t("sections.typesOfCookies.strictlyNecessary.cookies.items.language.label")}</strong>{" "}
+						{t("sections.typesOfCookies.strictlyNecessary.cookies.items.language.description")}
+					</li>
+					<li>
+						<strong>{t("sections.typesOfCookies.strictlyNecessary.cookies.items.sidebar.label")}</strong>{" "}
+						{t("sections.typesOfCookies.strictlyNecessary.cookies.items.sidebar.description")}
+					</li>
+				</ul>
 			</section>
 
 			<section>
@@ -160,10 +183,6 @@ export default async function CookiePolicyPage({ params }: Readonly<CookiePolicy
 					<li>
 						<strong>{t("sections.thirdPartyCookies.items.analytics.label")}</strong>{" "}
 						{t("sections.thirdPartyCookies.items.analytics.description")}
-					</li>
-					<li>
-						<strong>{t("sections.thirdPartyCookies.items.holidayApis.label")}</strong>{" "}
-						{t("sections.thirdPartyCookies.items.holidayApis.description")}
 					</li>
 				</ul>
 				<p className="mt-4">{t("sections.thirdPartyCookies.disclaimer")}</p>

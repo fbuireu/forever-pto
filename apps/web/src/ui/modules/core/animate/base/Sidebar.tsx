@@ -3,6 +3,7 @@
 import { useIsMobile } from "@ui/hooks/useMobile";
 import { cn } from "@ui/utils/cn";
 import { setCookie } from "@ui/utils/cookie";
+import { SIDEBAR_COOKIE_MAX_AGE, SIDEBAR_COOKIE_NAME } from "@ui/utils/sidebarCookie";
 import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
 import { AnimatePresence, m, type Transition } from "motion/react";
@@ -24,8 +25,6 @@ import { PanelLeftIcon } from "../icons/PanelLeft";
 import { Slot } from "./Slot";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./Tooltip";
 
-export const SIDEBAR_COOKIE_NAME = "sidebar_state";
-const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = "20rem";
 const SIDEBAR_WIDTH_MOBILE = "20rem";
 const SIDEBAR_WIDTH_ICON = "3rem";

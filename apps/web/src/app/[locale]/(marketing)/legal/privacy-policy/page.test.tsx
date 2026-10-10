@@ -63,8 +63,9 @@ describe("privacy-policy/page", () => {
 		expect(mockGetTranslations).toHaveBeenCalledWith(expect.objectContaining({ locale: ES }));
 	});
 
-	it("passes the translated last-updated line to the layout", async () => {
+	it("hands the layout this page's own date alone, which the layout labels once", async () => {
 		const element = await PrivacyPolicyPage(makeParams());
-		expect(element.props.lastUpdated).toBe("t:lastUpdated");
+
+		expect(element.props.lastUpdatedDate).toBe("October 10, 2026");
 	});
 });

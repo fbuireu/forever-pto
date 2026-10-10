@@ -2,7 +2,7 @@ import enMessages from "@i18n/messages/en.json";
 import { LOCALES } from "@infrastructure/i18n/locales";
 import { localePath } from "@infrastructure/i18n/utils/url";
 import type { RoutePath } from "@infrastructure/seo/routes";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../../fixtures";
 import { finishQuickStart, openQuickStart } from "../../quickStart";
 
 const MAIN = "main#main-content";

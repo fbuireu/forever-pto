@@ -1,5 +1,5 @@
 import { ApiError } from "@infrastructure/api/errors";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../fixtures";
 
 const URL = "/api/webhooks/stripe";
 

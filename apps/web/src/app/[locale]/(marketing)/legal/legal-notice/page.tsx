@@ -23,10 +23,10 @@ export default async function LegalNoticePage({ params }: LegalNoticePageProps) 
 		getPublicEnv(),
 		getTranslations({ locale, namespace: "legalNotice" }),
 	]);
-	const lastUpdatedDate = getLastUpdatedDate(locale);
+	const lastUpdatedDate = getLastUpdatedDate({ page: "legalNotice", locale });
 
 	return (
-		<LegalLayout title={t("title")} lastUpdated={t("lastUpdated", { date: lastUpdatedDate })}>
+		<LegalLayout title={t("title")} lastUpdatedDate={lastUpdatedDate}>
 			<section>
 				<h2 className="text-2xl font-semibold mt-6 mb-4">{t("sections.identification.title")}</h2>
 				<p>{t("sections.identification.description")}</p>

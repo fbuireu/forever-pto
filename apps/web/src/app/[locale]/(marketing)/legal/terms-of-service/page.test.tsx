@@ -61,9 +61,10 @@ describe("terms-of-service/page", () => {
 		expect(mockGetTranslations).toHaveBeenCalledWith(expect.objectContaining({ locale: ES }));
 	});
 
-	it("passes the translated last-updated line to the layout", async () => {
+	it("hands the layout this page's own date alone, which the layout labels once", async () => {
 		const element = await TermsOfServicePage(makeParams());
-		expect(element.props.lastUpdated).toBe("t:lastUpdated");
+
+		expect(element.props.lastUpdatedDate).toBe("October 10, 2026");
 	});
 
 	it("renders the bold chunks of the refund exclusions in a strong element", async () => {

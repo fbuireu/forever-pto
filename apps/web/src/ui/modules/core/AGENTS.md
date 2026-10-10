@@ -64,9 +64,11 @@ Coupling back into the rest of the app is small, but it is not zero. The complet
   the three `animate/primitives/base` wrappers). None of them holds product state.
 - `animate/base/Sidebar.tsx` writes the `sidebar_state` cookie through [`@ui/utils/cookie`](../../utils/cookie.ts), swallowing a
   failed write, and reads it back from `document.cookie` after mount. No server layout passes a `defaultOpen`,
-  so the rail renders expanded and collapses once that effect runs. Nothing in [`apps/web`](../../../..) imports
-  `SIDEBAR_COOKIE_NAME`; the wiki's `reference/cookies.mdx` and `patterns/reference-components.mdx` do, so
-  renaming it breaks the docs build.
+  so the rail renders expanded and collapses once that effect runs. The cookie's name and life,
+  `SIDEBAR_COOKIE_NAME` and `SIDEBAR_COOKIE_MAX_AGE`, live in [`@ui/utils/sidebarCookie`](../../utils/sidebarCookie.ts) and not here,
+  because the consent catalogue lists the cookie and importing this module would load the sidebar and Motion
+  into the consent dialog; the wiki's `reference/cookies.mdx` and `patterns/reference-components.mdx` import
+  the name too, so renaming it breaks the docs build.
 - `animate/text/SlidingNumber.tsx` calls `useLocale()` to pick the decimal separator. It is the only
   `next-intl` import here, and it reads the locale rather than any copy.
 - `primitives/RichLink.tsx` imports the locale-aware `Link` from `@application/i18n/navigation`,
