@@ -1,3 +1,10 @@
+# [forever-pto-docs-v1.5.7](https://github.com/fbuireu/forever-pto/compare/docs-v1.5.6...docs-v1.5.7) (2026-10-10)
+
+
+### Bug Fixes
+
+* **docs:** serve a security.txt from the docs site, with the app's contact and policy ([38f1b0c](https://github.com/fbuireu/forever-pto/commit/38f1b0c8c43a9146706c0aa2033835c51dd3f591))
+
 # [forever-pto-docs-v1.5.6](https://github.com/fbuireu/forever-pto/compare/docs-v1.5.5...docs-v1.5.6) (2026-10-10)
 
 
