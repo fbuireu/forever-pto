@@ -130,6 +130,12 @@ No rule below restates these, and a diff that breaks one fails CI:
   - the package scripts: no shell substitution, and a literal base on every changed-only Vitest or Playwright run;
   - the documents: no `BACKLOG.md` anywhere in the tree and no `Known inconsistencies`, `Known defects` or
     `Known breaches` heading in any of them (`G9`);
+  - the `security.txt` files: one on every site the repository serves, counted under every `public` or `assets`
+    folder, with `Contact`, `Expires`, `Preferred-Languages`, `Canonical` and `Policy` in that order, each `Canonical`
+    the site's origin (`NEXT_PUBLIC_SITE_URL` under `[env.production.vars]`, the docs site's `site`) plus
+    `/.well-known/security.txt`, each `Policy` this repository's, and each `Expires` an ISO 8601 instant 30 days to
+    two years from the day the suite runs, which reads the real clock on purpose so `main` turns red a month before a
+    file lapses;
   - the published wiki: canonical glossary terms outside its landing pages, repo-relative paths, only constants,
     tokens, icons and `@ui` exports that exist, and no history in the prose (`used to`, `no longer`, `previously`,
     `any more`, `until now`, a dated event), outside code and quotes;
@@ -651,9 +657,10 @@ No rule below restates these, and a diff that breaks one fails CI:
   catches a change breaking what is already out there. An e2e spec takes its locales from `LOCALES` and
   `localePath`, never a list of its own.
 - `T19` **hard**: Tag a case `@smoke` only for what proves the Worker answers on every deploy, never a result that
-  depends on the caller's address, and keep the three cases every repository that deploys runs (a titled homepage, an
-  unknown path answering 404, `robots.txt` served) word for word, because a failing smoke run rolls production back.
-  The docs site runs the same three against its own deploy.
+  depends on the caller's address, and keep the four cases every repository that deploys runs (a titled homepage, an
+  unknown path answering 404, `robots.txt` served, `security.txt` served in date with its `Canonical` the URL asked
+  for when `PRODUCTION_URL` names the target) word for word, because a failing smoke run rolls production back. The
+  docs site runs the same four against its own deploy.
 - `T20` **hard**: Guard every list a contract-suite assertion derives from the repository (files, rows, matches) with
   a non-empty assertion or a synthetic self-test, because an assertion over an empty census passes whatever the tree
   holds.
@@ -767,7 +774,7 @@ No rule below restates these, and a diff that breaks one fails CI:
 - **Duplicated Code**: the stated-version helpers (`VERSIONED_DEPENDENCIES` through `declaredIn`) and the
   release-config helpers (`BREAKING_PARSER_OPTS` through `parserOptsOf`) in `tests/docs-consistency.test.ts` are byte
   for byte the same in biancafiore, contribKit and github-star-tracker, so a change to one is made in all three.
-- **Duplicated Code**: the three smoke cases are word for word the same in every repository that deploys, and in
+- **Duplicated Code**: the four smoke cases are word for word the same in every repository that deploys, and in
   both packages here, so a difference between them is drift, not a variant.
 - **Duplicated Code**: `contactSenderKey` and `normalizeEmail` stay two normalisers: one keys the contact guard, the
   other decides who recovers Premium.

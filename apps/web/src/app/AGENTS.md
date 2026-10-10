@@ -308,6 +308,12 @@ enumerates.
 
 These paths contain a dot, so the proxy matcher excludes them; they never see locale negotiation.
 
+**`security.txt` is not one of its documents.** `/.well-known/security.txt` is
+[`public/.well-known/security.txt`](../../public/.well-known/security.txt), and the static layer answers it before
+this handler on both targets: `next start` serves the public folder ahead of a dynamic route, and on the Worker,
+Workers Static Assets answers a path that matches a file in `.open-next/assets` before the Worker runs. The handler
+would answer that slug with its JSON 404; `e2e/.well-known/well-known.spec.ts` asserts the `text/plain` answer.
+
 **The skills index advertises only what this handler serves.** [`well-known/slugs.ts`](../infrastructure/well-known/slugs.ts) holds the slugs and
 `wellKnownUrl`, `well-known/documents.ts` maps each slug to its content type and builder, and the index
 interpolates the same constants. An entry that describes a *behaviour* rather than a served document carries

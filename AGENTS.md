@@ -170,7 +170,16 @@ and rulesets behind them are settings, on the [environments](./apps/docs/src/con
   `environment:`), the same value `deploy-production` passes as the deploy's `url`; a first step fails the job when
   it is empty. The step passes no `--pass-with-no-tests`, so a grep that stops matching fails the job. `release-web`
   needs it, and a failed smoke run rolls production back through `rollback`. The docs site has the same pair, over
-  [`apps/docs/e2e/smoke.spec.ts`](./apps/docs/e2e/smoke.spec.ts) and the `DOCS_SITE_URL` variable.
+  [`apps/docs/e2e/smoke.spec.ts`](./apps/docs/e2e/smoke.spec.ts) and the `DOCS_SITE_URL` variable. Both specs carry
+  the four cases every repository that deploys runs, word for word; the fourth asks for `/.well-known/security.txt`
+  and, when `PRODUCTION_URL` names the `BASE_URL` it runs against, holds its `Canonical:` to the URL it asked for.
+  Each smoke job sets `PRODUCTION_URL` from the same variable as its `BASE_URL`, and no other run sets it.
+- **Each site's `security.txt` lapses unless it is renewed**: `apps/web/public/.well-known/security.txt` and
+  `apps/docs/public/.well-known/security.txt` carry an `Expires` two years after their last renewal, the longest the
+  contract suite allows, and the suite fails 30 days before that date, reading the real clock on purpose, so `main`
+  turns red a month ahead and the fix is to move `Expires` forward, at most two years. The same rule counts one file
+  per site and holds each one's fields and its `Canonical` to the site's origin (`NEXT_PUBLIC_SITE_URL` under
+  `[env.production.vars]` for the app, `site` in `apps/docs/astro.config.ts` for the docs site).
 - [`apps/web/e2e/warm-up.ts`](./apps/web/e2e/warm-up.ts) is Playwright's `globalSetup`: with `BASE_URL` set it requests
   the homepage and an unknown path once, before any worker starts, so no spec meets the Worker's first render. It
   carries the Cloudflare Access token the way the specs do, from
