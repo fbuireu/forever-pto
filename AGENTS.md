@@ -180,6 +180,9 @@ and rulesets behind them are settings, on the [environments](./apps/docs/src/con
   turns red a month ahead and the fix is to move `Expires` forward, at most two years. The same rule counts one file
   per site and holds each one's fields and its `Canonical` to the site's origin (`NEXT_PUBLIC_SITE_URL` under
   `[env.production.vars]` for the app, `site` in `apps/docs/astro.config.ts` for the docs site).
+- **The docs build reaches its deploy as the `docs-dist` artifact, uploaded with `include-hidden-files: true`.**
+  `upload-artifact` drops every dotfolder by default, `public/.well-known` among them, and the deployed site then
+  answers 404 for its `security.txt`. The contract suite holds every artifact a later job downloads to that input.
 - [`apps/web/e2e/warm-up.ts`](./apps/web/e2e/warm-up.ts) is Playwright's `globalSetup`: with `BASE_URL` set it requests
   the homepage and an unknown path once, before any worker starts, so no spec meets the Worker's first render. It
   carries the Cloudflare Access token the way the specs do, from

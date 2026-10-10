@@ -96,6 +96,7 @@ jobs:
         with:
           name: docs-dist
           path: apps/docs/dist/
+          include-hidden-files: true
           retention-days: 1
 
   preview:

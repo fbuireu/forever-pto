@@ -4346,6 +4346,32 @@ describe("workflows and package scripts keep the rules CODING_STANDARDS.md hands
 		expect(FORWARDED_FLAG.test("pnpm test:e2e -- --grep smoke")).toBe(true);
 		expect(bodies.filter(({ body }) => FORWARDED_FLAG.test(body)).map(({ source }) => source)).toEqual([]);
 	});
+
+	interface WorkflowStep {
+		uses?: string;
+		with?: Record<string, unknown>;
+	}
+
+	it("uploads every artifact a later job downloads with its hidden files, since upload-artifact drops public/.well-known unless told not to", () => {
+		const steps = workflowFiles.flatMap((file) =>
+			Object.values((loadYaml(read(file)) as { jobs?: Record<string, { steps?: WorkflowStep[] }> }).jobs ?? {}).flatMap(
+				({ steps: jobSteps = [] }) => jobSteps,
+			),
+		);
+		const downloaded = new Set(
+			steps.filter(({ uses = "" }) => uses.startsWith("actions/download-artifact@")).map((step) => step.with?.name),
+		);
+		const handedOver = steps.filter(
+			({ uses = "", with: inputs }) => uses.startsWith("actions/upload-artifact@") && downloaded.has(inputs?.name),
+		);
+
+		expect(handedOver.length).toBeGreaterThan(0);
+		expect(
+			handedOver
+				.filter(({ with: inputs }) => inputs?.["include-hidden-files"] !== true)
+				.map(({ with: inputs }) => inputs?.name),
+		).toEqual([]);
+	});
 });
 
 const PLAYWRIGHT_CONFIG = /(?:^|\/)playwright\.config\.[cm]?[jt]s$/;
