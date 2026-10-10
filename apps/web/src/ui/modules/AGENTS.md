@@ -74,7 +74,7 @@ section that reads the Country list and the year, and
 holds a fixed-height box and `dynamic()`-imports, with `ssr: false`,
 [`pages/homepage/quick-start/InlineQuickStartForm.tsx`](./pages/homepage/quick-start/InlineQuickStartForm.tsx)
 once the box comes within `200px` of the viewport, so the Combobox and the Counter stay off the first load
-and the box keeps the layout from shifting when they arrive. The form asks for the Country, the PTO Day
+and the box keeps the layout from shifting when they arrive. The box's `min-h` per breakpoint is the height of the form's rows at that breakpoint (four stacked on a phone, two from `md`, one from `lg`), so a change to the form's grid changes it too. The form lays out the pieces of the dialog's PTO step, `PtoDaysCounter` and `YearChoice` from [`pages/homepage/quick-start/QuickStartPtoDaysStep.tsx`](./pages/homepage/quick-start/QuickStartPtoDaysStep.tsx), on its own grid rather than the step itself, whose stacked layout is the dialog's. The form asks for the Country, the PTO Day
 budget and the year, and takes every other input from the same draft the dialog starts from, so a returning
 visitor keeps their Strategy, and their Region while the Country stays. It never loads Regions, and so never
 `date-holidays`. Both forms finish through

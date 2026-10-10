@@ -25,7 +25,7 @@ export const InlineQuickStartClient = ({ countries, serverYear }: InlineQuickSta
 	});
 
 	return (
-		<div ref={ref} className="min-h-[188px] md:min-h-[104px]">
+		<div ref={ref} className="min-h-[360px] md:min-h-[168px] lg:min-h-[74px]">
 			{isInView && <InlineQuickStartForm countries={countries} currentYear={currentYear} />}
 		</div>
 	);

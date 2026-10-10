@@ -9,14 +9,17 @@ import { Button } from "@ui/modules/core/primitives/Button";
 import { Combobox } from "@ui/modules/core/primitives/Combobox";
 import { Label } from "@ui/modules/core/primitives/Label";
 import { PLANNER_PATH } from "@ui/modules/shared/utils/helpers";
+import { cn } from "@ui/utils/cn";
 import { getUserCountryFromCookie } from "@ui/utils/userCountry";
 import { useTranslations } from "next-intl";
 import { type FormEvent, useCallback, useRef, useState } from "react";
-import { QuickStartPtoDaysStep } from "./QuickStartPtoDaysStep";
+import { PtoDaysCounter, YearChoice } from "./QuickStartPtoDaysStep";
 import { startPlanning } from "./startPlanning";
 import { canLeaveStep, createDraft, type QuickStartDraft, QuickStartStep, trackedDraft } from "./steps";
 
 const COUNTRY_ID = "inline-quick-start-country";
+const CONTROL_HEIGHT = "h-[52px]";
+const CONTROL_ROW = cn("flex items-center", CONTROL_HEIGHT);
 
 interface InlineQuickStartFormProps {
 	countries: CountryDTO[];
@@ -51,13 +54,15 @@ export const InlineQuickStartForm = ({ countries, currentYear }: InlineQuickStar
 	return (
 		<form
 			onSubmit={plan}
-			className="grid grid-cols-1 gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] md:items-end"
+			className="grid grid-cols-1 gap-x-6 gap-y-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end lg:grid-cols-[minmax(0,1fr)_auto_auto_auto]"
 		>
-			<div className="space-y-2">
-				<Label htmlFor={COUNTRY_ID}>{t("location.country")}</Label>
+			<div className="space-y-2 min-w-0">
+				<Label htmlFor={COUNTRY_ID} className="block">
+					{t("location.country")}
+				</Label>
 				<Combobox
 					id={COUNTRY_ID}
-					className="w-full"
+					className={cn("w-full", CONTROL_HEIGHT)}
 					options={countries}
 					value={draft.country}
 					onChange={(country) => updateDraft({ country, region: "" })}
@@ -65,15 +70,29 @@ export const InlineQuickStartForm = ({ countries, currentYear }: InlineQuickStar
 					searchPlaceholder={tSidebar("country.search")}
 				/>
 			</div>
-			<QuickStartPtoDaysStep currentYear={currentYear} draft={draft} onChange={updateDraft} />
-			<Button
-				type="submit"
-				variant="accent"
-				size="lg"
-				disabled={!canLeaveStep({ step: QuickStartStep.LOCATION, draft })}
-			>
-				{t("finish")}
-			</Button>
+			<fieldset className="space-y-2">
+				<legend className="text-sm font-medium leading-none mb-2">{t("steps.ptoDays")}</legend>
+				<div className={CONTROL_ROW}>
+					<PtoDaysCounter draft={draft} onChange={updateDraft} />
+				</div>
+			</fieldset>
+			<YearChoice
+				optionsClassName="grid grid-cols-4 items-center md:flex md:min-h-[52px]"
+				currentYear={currentYear}
+				draft={draft}
+				onChange={updateDraft}
+			/>
+			<div className={CONTROL_ROW}>
+				<Button
+					type="submit"
+					variant="accent"
+					size="lg"
+					className={cn("w-full lg:w-auto", CONTROL_HEIGHT)}
+					disabled={!canLeaveStep({ step: QuickStartStep.LOCATION, draft })}
+				>
+					{t("finish")}
+				</Button>
+			</div>
 		</form>
 	);
 };
