@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.13.10](https://github.com/fbuireu/forever-pto/compare/web-v1.13.9...web-v1.13.10) (2026-10-10)
+
+
+### Bug Fixes
+
+* **web:** renew security.txt for two years, name its canonical URL and policy, and watch its expiry ([cafef27](https://github.com/fbuireu/forever-pto/commit/cafef274164af9ad863101e37fac2d59fe637b08))
+
 # [forever-pto-web-v1.13.9](https://github.com/fbuireu/forever-pto/compare/web-v1.13.8...web-v1.13.9) (2026-10-10)
 
 
