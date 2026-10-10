@@ -94,6 +94,22 @@ Whichever way it reaches me, include:
 Reports made in good faith will not result in legal action. Thank you for
 helping keep Forever PTO and its users safe.
 
+## security.txt
+
+Each site serves its own, and both point to this policy:
+[`apps/web/public/.well-known/security.txt`](../apps/web/public/.well-known/security.txt)
+at `https://forever-pto.com/.well-known/security.txt`, and
+[`apps/docs/public/.well-known/security.txt`](../apps/docs/public/.well-known/security.txt)
+at `https://docs.forever-pto.com/.well-known/security.txt`. Their `Expires` is
+two years after their last renewal, and `pnpm test:docs` fails 30 days before
+that date, so `main` turns red a month before a file lapses. To renew one, move
+its `Expires` forward, at most two years from the day you do it.
+
+The files in this repository are the only ones: a `security.txt` configured in the
+Cloudflare zone (Security Center) answers before the Worker and hides them, so it
+stays off, and the production smoke run fails when the body it gets is not that
+site's file byte for byte.
+
 ## Security Updates
 
 Security fixes ship as ordinary commits to `main`, which deploys them; there is

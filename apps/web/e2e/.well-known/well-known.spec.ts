@@ -1,5 +1,5 @@
 import { ApiError } from "@infrastructure/api/errors";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../fixtures";
 
 const BASE = "/.well-known";
 const PROTOTYPE_KEYS = ["constructor", "toString", "valueOf", "hasOwnProperty"];

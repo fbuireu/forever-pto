@@ -41,7 +41,7 @@ The app follows a layered architecture: each directory has an `AGENTS.md` with i
 
 ## `apps/web/e2e/`
 
-End-to-end Playwright specs (`*.spec.ts`) whose folder structure mirrors the app routes (`apps/web/e2e/[locale]/(app)/planner/…`, `apps/web/e2e/api/…`). The docs site has its own smaller suite in `apps/docs/e2e/`. See [testing](/contributing/testing/).
+End-to-end Playwright specs (`*.spec.ts`) whose folder structure mirrors the app routes (`apps/web/e2e/[locale]/(app)/planner/…`, `apps/web/e2e/api/…`). Every spec takes `test` and `expect` from `apps/web/e2e/fixtures.ts`, which hands the preview's Cloudflare Access token to the preview's origin alone. The docs site has its own smaller suite in `apps/docs/e2e/`. See [testing](/contributing/testing/).
 
 ## `patches/`
 

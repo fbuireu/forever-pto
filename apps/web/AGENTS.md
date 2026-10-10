@@ -55,7 +55,15 @@ pnpm test:e2e           # playwright, against BASE_URL (see below)
 deployed preview, which is the only place the Workers runtime is real: `ci.yml` passes the `e2e` job the same URL
 [`_deploy-web.yml`](../../.github/workflows/_deploy-web.yml) passes to `--var NEXT_PUBLIC_SITE_URL`, so
 `e2e/sitemap.spec.ts` can assert that the sitemap names the host it is served from. A preview also needs
-`CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET`, which the config turns into request headers.
+`CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET`, the Cloudflare Access service token, and it reaches the preview's
+origin alone: every spec takes `test` and `expect` from [`e2e/fixtures.ts`](./e2e/fixtures.ts), never from
+`@playwright/test`, and with both variables set that module adds `CF-Access-Client-Id` and `CF-Access-Client-Secret`
+to the requests whose origin is the `baseURL`'s and to the `request` fixture, and to nothing Stripe, Tag Manager or
+any other third party serves; with neither set it adds nothing, and with one alone it throws. The check on the two
+variables, the origin test and the header merge are [`e2e/previewAccess.ts`](./e2e/previewAccess.ts), unit-tested
+beside it, which is why [`playwright.config.ts`](./playwright.config.ts) matches `*.spec.ts` alone and Vitest skips
+only the specs; [`e2e/warm-up.ts`](./e2e/warm-up.ts) takes its headers from the same module. No config sets
+`extraHTTPHeaders`, because Playwright sends those on every request a page makes.
 
 ```bash
 BASE_URL=https://pr-123-forever-pto-development.fbuireu.workers.dev pnpm test:e2e
@@ -212,6 +220,13 @@ revalidate every file unless a `_headers` file in the assets directory says othe
 `.open-next/assets`, which is where it has to land. It gives `_next/static` the year-long `immutable` rule (asserted),
 and [`public/fonts/stripe/`](./public/fonts/stripe/fonts.css), the font copy the Stripe Elements iframe loads, an
 `Access-Control-Allow-Origin` and a week's `max-age` without `immutable`, since those names carry no hash.
+
+**[`public/.well-known/security.txt`](./public/.well-known/security.txt) is a static file, and it wins over the
+`.well-known` catch-all on both targets.** OpenNext copies it into `.open-next/assets`, and Workers Static Assets
+answers a path that matches an asset before the Worker runs, so `src/app/.well-known/[...slug]/route.ts` never sees
+it; `next start` matches the public folder before a dynamic route too. It answers `text/plain`, and neither
+`next.config.ts`'s headers nor `public/_headers` sets anything that changes that. Its `Expires` lapses unless it is
+renewed: the contract suite fails 30 days before that date, and the root guide's *CI* section says how to renew it.
 
 **Logs and traces leave through `[observability.logs]` and `[observability.traces]`**, whose `destinations` name
 settings in the Cloudflare dashboard that hold the OTLP endpoint and its token, so nothing in the deploy carries a

@@ -61,7 +61,7 @@ API routes live outside `[locale]` and are excluded from the proxy matcher (exce
 | Route | File | Purpose |
 | --- | --- | --- |
 | `POST /api/payment` | `apps/web/src/app/api/payment/route.ts` | Creates a Stripe PaymentIntent (rate-limited, Effect-based) |
-| `GET /api/payment/activate` | `apps/web/src/app/api/payment/activate/route.ts` | Stripe's `return_url`. Activates Premium and redirects to the confirmation page with the cookie already set and `activation=fresh` in the address |
+| `GET /api/payment/activate` | `apps/web/src/app/api/payment/activate/route.ts` | Stripe's `return_url`. Activates Premium and redirects to the confirmation page with the session cookie and the one-shot `premium-activation` proof already set, or with `activation=failed` in the address when it could not |
 | `GET/POST /api/check-session` | `apps/web/src/app/api/check-session/route.ts` | Verifies / mints the premium JWT cookie |
 | `POST /api/contact` | `apps/web/src/app/api/contact/route.ts` | Contact form → Resend email + Turso record |
 | `POST /api/webhooks/stripe` | `apps/web/src/app/api/webhooks/stripe/route.ts` | Stripe webhook (payment succeeded/failed fallback) |
@@ -76,6 +76,8 @@ API routes live outside `[locale]` and are excluded from the proxy matcher (exce
 
 **The document modules return plain objects; the route owns the envelope.** Each builder takes the base URL from the Cloudflare environment (`getCloudflareContext`) and returns a value; the route serialises it and sets the per-document `Content-Type` and the shared `WELL_KNOWN_CACHE_CONTROL` (`apps/web/src/infrastructure/well-known/slugs.ts`). A fourth document is a fourth entry in the map and nothing else. Together with the markdown rewrite in the proxy, this is the app's agent-facing surface.
 
+**`/.well-known/security.txt` never reaches the catch-all.** It is a static file, `apps/web/public/.well-known/security.txt`, and the static layer answers it first on both targets: `next start` serves the public folder ahead of a dynamic route, and on the Worker, Workers Static Assets answers a path that matches a file in `.open-next/assets` before the Worker runs. The handler would answer that slug with its JSON 404.
+
 ## Error and not-found surfaces
 
 There are per-locale boundaries (`apps/web/src/app/[locale]/error.tsx`, `apps/web/src/app/[locale]/not-found.tsx`) plus root-level `apps/web/src/app/global-error.tsx` and `apps/web/src/app/global-not-found.tsx`. The latter requires `experimental.globalNotFound: true` in `next.config.ts` and handles URLs that never match the `[locale]` segment. All four render the shared brutal designs; see [error pages](/architecture/error-pages/) for the full breakdown.
@@ -84,4 +86,4 @@ There are per-locale boundaries (`apps/web/src/app/[locale]/error.tsx`, `apps/we
 
 - `apps/web/src/app/robots.ts` and `apps/web/src/app/sitemap.ts` generate `robots.txt` and the sitemap.
 - `apps/web/src/app/fonts.ts` declares the `next/font` families whose CSS variables the root layout applies.
-- `apps/web/src/app/[locale]/layout.tsx` is the composition root for providers: intl client provider, theme, lazy motion, skeleton bones, cookie consent, WebMCP and analytics.
+- `apps/web/src/app/[locale]/layout.tsx` is the composition root for providers: intl client provider, theme, lazy motion, skeleton bones, the Stripe.js load, cookie consent, WebMCP and analytics.

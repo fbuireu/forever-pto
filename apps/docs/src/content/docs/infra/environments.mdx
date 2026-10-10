@@ -30,7 +30,7 @@ Every pull request gets its own throwaway Worker.
 The `deploy-development` job of `.github/workflows/ci.yml` fires on `pull_request` (`opened`, `reopened`, `synchronize`) and calls the reusable `.github/workflows/_deploy-web.yml` with `environment: web-development`, from which it derives the wrangler environment `development`, plus a `worker_name` override of `pr-<n>-forever-pto-development`. The `--name` flag on `wrangler deploy` is what mints a brand-new Worker instead of updating the stable one, and `--secrets-file` on the same call is what gives it the five runtime secrets, which do not exist on a Worker until they are uploaded (see [secrets](/infra/secrets/)). After deploying:
 
 1. A sticky PR comment (upserted via a hidden marker) posts the preview URL.
-2. A Playwright E2E job runs against the live preview, authenticating through Cloudflare Access with a service token (`CF_ACCESS_CLIENT_ID` / `CF_ACCESS_CLIENT_SECRET` injected as `CF-Access-Client-Id/Secret` headers by `playwright.config.ts`).
+2. A Playwright E2E job runs against the live preview, authenticating through Cloudflare Access with a service token (`CF_ACCESS_CLIENT_ID` / `CF_ACCESS_CLIENT_SECRET`), which `apps/web/e2e/fixtures.ts` adds as `CF-Access-Client-Id/Secret` headers to the requests whose origin is the preview's alone, so no third party the page loads receives it.
 
 ### Destroyed
 

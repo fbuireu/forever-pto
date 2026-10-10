@@ -21,7 +21,7 @@ export default defineConfig({
 		},
 		setupFiles: ["./vitest.setup.ts"],
 		exclude: [
-			"e2e/**",
+			"e2e/**/*.spec.ts",
 			"**/node_modules/**",
 			"src/ui/assets/icons/**",
 			"src/ui/i18n/messages/**",

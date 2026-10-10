@@ -1,6 +1,7 @@
 import { clientMessagesOf } from "@infrastructure/i18n/clientMessages";
 import { LOCALES } from "@infrastructure/i18n/locales";
 import { BonesProvider } from "@ui/modules/providers/BonesProvider";
+import { StripePreload } from "@ui/modules/providers/StripePreload";
 import { CookieConsentClient } from "@ui/modules/shared/cookie-consent/CookieConsentClient";
 import { WebMCP } from "@ui/modules/shared/WebMCP";
 import { type ReactNode, Suspense } from "react";
@@ -38,6 +39,7 @@ const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
 			<body className={DOCUMENT_BODY_CLASS}>
 				<SkipToContent label={t("skipToMainContent")} />
 				<BonesProvider />
+				<StripePreload />
 				<NextIntlClientProvider messages={clientMessagesOf(messages)}>
 					<AppThemeProvider>
 						<LazyMotionProvider>

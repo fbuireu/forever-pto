@@ -26,7 +26,7 @@ Not every folder needs every file. `email/` is `types.ts` alone and `premium/` h
 | `country/` | `CountryDTO` | `i18n-iso-countries` localised names |
 | `email/` | `SendEmailParams` | None |
 | `holiday/` | `HolidayDTO` | `date-holidays` |
-| `payment/` | `PaymentConfirmationDTO`, `NewPayment` (what `paymentDataDTO` produces) and `PaymentData` (the stored record it grows into), `CreatePaymentInput`, `CreatePaymentResult`, `DiscountInfo`, the `PromoCodeErrors` a refused promo code answers with, the `ACTIVATION_PARAM`, `ACTIVATION_FRESH` and `ACTIVATION_FAILED` the activation route writes and the confirmation page and `PremiumSessionSync` read, and in `schema.ts` the confirmation page's query | Stripe `PaymentIntent`, the donation form |
+| `payment/` | `PaymentConfirmationDTO`, `NewPayment` (what `paymentDataDTO` produces) and `PaymentData` (the stored record it grows into), `CreatePaymentInput`, `CreatePaymentResult`, `DiscountInfo`, the `PromoCodeErrors` a refused promo code answers with, the `ACTIVATION_PARAM` and `ACTIVATION_FAILED` the activation route writes and the confirmation page reads, the `ACTIVATION_COOKIE` its one-shot proof is named by, and in `schema.ts` the confirmation page's query | Stripe `PaymentIntent`, the donation form |
 | `premium/` | `PremiumSessionClaims`, what the session cookie's token signs (`email`, `paymentIntentId`), plus `PremiumSession`, the same session as `/api/check-session` answers it and the browser keeps it (`premiumKey`, `email`), and the route's other body schemas in `schema.ts` | None |
 | `region/` | `RegionDTO` | `i18n-iso-countries` localised names |
 

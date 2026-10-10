@@ -15,7 +15,7 @@ vi.mock("@application/email/templates/Contact", () => ({
 	ContactFormEmail: vi.fn(() => null),
 }));
 
-vi.mock("@react-email/render", () => ({
+vi.mock("react-email", () => ({
 	render: vi.fn().mockResolvedValue("<html>email</html>"),
 }));
 
@@ -138,7 +138,7 @@ describe("sendContactEmail", () => {
 	});
 
 	it("fails with EmailError when render throws, logs it as before, and frees the slot", async () => {
-		const { render } = await import("@react-email/render");
+		const { render } = await import("react-email");
 		vi.mocked(render).mockRejectedValueOnce(new Error("template error"));
 
 		const err = await runFail(submit());

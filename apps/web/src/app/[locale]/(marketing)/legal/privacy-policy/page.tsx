@@ -21,10 +21,10 @@ export default async function PrivacyPolicyPage({ params }: Readonly<PrivacyPoli
 		getPublicEnv(),
 		getTranslations({ locale, namespace: "privacyPolicy" }),
 	]);
-	const lastUpdatedDate = getLastUpdatedDate(locale);
+	const lastUpdatedDate = getLastUpdatedDate({ page: "privacyPolicy", locale });
 
 	return (
-		<LegalLayout title={t("title")} lastUpdated={t("lastUpdated", { date: lastUpdatedDate })}>
+		<LegalLayout title={t("title")} lastUpdatedDate={lastUpdatedDate}>
 			<section>
 				<h2 className="text-2xl font-semibold mt-6 mb-4">{t("sections.introduction.title")}</h2>
 				<p>{t("sections.introduction.p1")}</p>
@@ -153,10 +153,6 @@ export default async function PrivacyPolicyPage({ params }: Readonly<PrivacyPoli
 					<li>
 						<strong>{t("sections.dataSharing.items.paymentProcessors.label")}</strong>{" "}
 						{t("sections.dataSharing.items.paymentProcessors.description")}
-					</li>
-					<li>
-						<strong>{t("sections.dataSharing.items.holidayProviders.label")}</strong>{" "}
-						{t("sections.dataSharing.items.holidayProviders.description")}
 					</li>
 					<li>
 						<strong>{t("sections.dataSharing.items.analytics.label")}</strong>{" "}

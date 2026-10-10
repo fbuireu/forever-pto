@@ -85,13 +85,16 @@ The plan itself, the Manual Days, the Custom Holidays and the budget never leave
 
 Everything is HTTPS, with `Strict-Transport-Security` for a year including subdomains, plus `nosniff`, `X-Frame-Options: DENY` and a CSP naming `frame-ancestors 'none'`, `object-src 'none'` and `base-uri 'self'`. The app states its policy in `next.config.ts` over `/(.*)`; the wiki, which has no Worker of its own, states an equivalent one in `apps/docs/public/_headers`. The contract suite asserts the app's policy header by header, including the values whose absence is invisible in a browser.
 
+Each site serves a `security.txt` at `/.well-known/security.txt`, naming the contact address, its own canonical URL and the repository's security policy: `apps/web/public/.well-known/security.txt` for the app and `apps/docs/public/.well-known/security.txt` for the wiki. Both are static files answered as `text/plain`, and none of the headers above changes that. Their `Expires` is two years after their last renewal, and the contract suite fails 30 days before that date, so `main` turns red a month before a file lapses; renewing one means moving its `Expires` forward, at most two years.
+
 ## The cookies, in one place
 
 | Cookie | Carries | `httpOnly` | `sameSite` | Life |
 | --- | --- | --- | --- | --- |
 | `premium-token` | The signed session JWT | yes | `strict` | 30 days |
+| `premium-activation` | A one-shot proof that a payment just activated Premium, deleted once the session is confirmed | no, the browser spends it | `strict` | 1 hour at most |
 | `user-country` | A two-letter country code | no, the store reads it | `strict` | 7 days |
 | `NEXT_LOCALE` | The resolved locale | no, the switcher writes it | `lax` | session |
 | The sidebar cookie | Whether the sidebar is expanded | no, the browser writes it | `lax` | 7 days |
 
-The two that are not `httpOnly` are deliberate and documented at the [cookies reference](/reference/cookies/): each has a browser-side writer or reader, and adding the flag silently broke the locale switch once.
+The ones the server sets without `httpOnly` are deliberate and documented at the [cookies reference](/reference/cookies/): each has a browser-side writer or reader, and adding the flag silently broke the locale switch once.

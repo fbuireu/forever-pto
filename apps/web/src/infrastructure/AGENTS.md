@@ -337,6 +337,12 @@ payment, because it does neither itself: that ordering lives in the operation an
   lasts.** [`session.ts`](./services/premium/session.ts) derives the JWT expiry from it, so a cookie can never outlive the token it carries.
   It lives beside the cookie rather than beside the token because the cookie's `maxAge` is what fixes the
   unit (seconds) for both. Do not reintroduce a second constant.
+- **`cookie.ts` also sets the activation proof, and it is readable by script on purpose.** `setActivationCookie`
+  writes `ACTIVATION_COOKIE` with `ACTIVATION_PROOF` for `ACTIVATION_PROOF_LIFETIME_SECONDS`, `httpOnly: false`,
+  beside the session cookie the activation route sets, and the browser spends it in the same task that reports
+  `premium_activated` ([`../app/AGENTS.md`](../app/AGENTS.md) has the flow). Making it `httpOnly` would leave a request
+  as the only way to spend it, and a reload between that request landing and the page reading its answer loses the
+  report.
 - **Turso opens a connection per call**, so two calls are two connections and nothing spans them
   transactionally; see [`clients/AGENTS.md`](./clients/AGENTS.md).
 - **`next-intl/server` breaks a route handler on workerd.** `getTranslations` memoises its message

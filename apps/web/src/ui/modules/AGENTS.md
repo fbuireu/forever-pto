@@ -14,7 +14,7 @@ Every React component the product renders. Nothing else in `src/ui/` holds compo
 | `layout/` | [`layout/LegalLayout.tsx`](./layout/LegalLayout.tsx), the card chrome the legal pages share, and [`layout/SkipToContent.tsx`](./layout/SkipToContent.tsx), which owns the skip link **and** the `MAIN_CONTENT_ID` every route shell's landmark is keyed on | Between sibling routes |
 | `sidebar/` | [`sidebar/AppSidebar.tsx`](./sidebar/AppSidebar.tsx) and its controls: Country, Region, year, Strategy and its Preferred Months, past days, Carry-over Months, the PTO Day budget, the calculators, the calendar export, and the language switcher, with the footer buttons that mount the shared theme menu | One screen, but not a page section |
 | `premium/` | The Premium gate and the Donation checkout: [`premium/PremiumFeature.tsx`](./premium/PremiumFeature.tsx), [`premium/featureLabels.ts`](./premium/featureLabels.ts), [`premium/PremiumModal.tsx`](./premium/PremiumModal.tsx), [`premium/PremiumRequiredModal.tsx`](./premium/PremiumRequiredModal.tsx), [`premium/CheckoutForm.tsx`](./premium/CheckoutForm.tsx) with its [`premium/ExpressCheckoutFixture.tsx`](./premium/ExpressCheckoutFixture.tsx), and [`premium/PremiumSessionSync.tsx`](./premium/PremiumSessionSync.tsx), the render-nothing activation check the payment confirmation mounts | Yes |
-| `providers/` | What the locale layout mounts once around the page: [`providers/AppThemeProvider.tsx`](./providers/AppThemeProvider.tsx), the `next-themes` context, which stamps `<html>` with the theme as `data-theme` (the tokens) and as a class (the `boneyard-js` skeletons) and which the two global pages mount too, and [`providers/BonesProvider.tsx`](./providers/BonesProvider.tsx), which renders `null` and configures `boneyard-js` | Once |
+| `providers/` | What the locale layout mounts once around the page: [`providers/AppThemeProvider.tsx`](./providers/AppThemeProvider.tsx), the `next-themes` context, which stamps `<html>` with the theme as `data-theme` (the tokens) and as a class (the `boneyard-js` skeletons) and which the two global pages mount too, [`providers/BonesProvider.tsx`](./providers/BonesProvider.tsx), which renders `null` and configures `boneyard-js`, and [`providers/StripePreload.tsx`](./providers/StripePreload.tsx), which renders `null` and asks for Stripe.js as the page mounts | Once |
 | `stores/` | [`stores/StoresInitializer.tsx`](./stores/StoresInitializer.tsx), a render-nothing component that seeds the filters store from the `user-country` cookie, read through [`utils/userCountry.ts`](../utils/userCountry.ts), and the location store with the Country list the planner layout reads | Once |
 | `tutorial/` | [`tutorial/anchors.ts`](./tutorial/anchors.ts), the tour's anchor names and window events, and [`tutorial/DriverStyles.tsx`](./tutorial/DriverStyles.tsx), the module `useTutorial` imports for the driver.js stylesheet | Once |
 | `tracking/` | The third-party script mounts: [`tracking/Analytics.tsx`](./tracking/Analytics.tsx) (Google gtag consent defaults and config; nothing at all when the build has no `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID`, so a preview or a local build loads no Google script) and [`tracking/BetterStackTracking.tsx`](./tracking/BetterStackTracking.tsx) (the Better Stack snippet, gated on the cookieconsent `betterStack` **service**, not the category) | Once |
@@ -60,8 +60,7 @@ the next deploy. The shell renders nothing until the store's flag first turns tr
 during render rather than in an effect, so the dialog mounts in the click's own render), and only then
 `dynamic()`-imports, with `ssr: false`,
 [`pages/homepage/quick-start/QuickStartDialog.tsx`](./pages/homepage/quick-start/QuickStartDialog.tsx) and the
-Premium modal beside it: a visitor who never clicks a call to action downloads neither, nor the Counter, nor
-the Stripe client the Premium modal reaches. The Regions lookup loads later still, inside the location store's
+Premium modal beside it: a visitor who never clicks a call to action downloads neither, nor the Counter. The Regions lookup loads later still, inside the location store's
 `fetchRegions`, because it drags `date-holidays` in. Once opened the pair stays mounted, so the close animates
 and a second open fetches nothing. The content is
 [`pages/homepage/quick-start/QuickStartForm.tsx`](./pages/homepage/quick-start/QuickStartForm.tsx), one
@@ -113,7 +112,7 @@ observability page of the docs site. The store actions that report are the opens
 with its own `source` (`openDonatePopover(source)` and `openQuickStart(source)` on the `ui` store,
 `showPremiumModal({ feature, origin })` on the premium store), and `setPremiumStatus`, which reports
 `premium_activated` on the move from free to Premium only, as `confirmActivation` does for the payer the issuer
-redirected, from the confirmation page and only while the redirect's `activation=fresh` marker is in the address. `planner_generated` counts the plans a person asks
+redirected, from the confirmation page and only while the activation route's one-shot proof is unspent. `planner_generated` counts the plans a person asks
 for: every handler that changes what the plan is built from calls the holidays store's `askForPlan` (a sidebar
 control or the calculator on a new value, the quick start's finish, a Custom Holiday that lands or goes, an
 Alternative applied, a reset), and `hooks/useCalculationsWorker.ts` reports it when the worker's answer lands and
@@ -164,17 +163,22 @@ opening. From the success on, the form disables Back and Pay and its confirmatio
 button's included: Back in that moment would report `payment_cancelled` for a paid Donation, and Pay would
 confirm a PaymentIntent that has already succeeded.
 
-**The checkout fetches Stripe.js when it mounts, and says so when it cannot.**
+**Every page asks for Stripe.js as it mounts, and the checkout reuses that load or says it failed.**
+[`providers/StripePreload.tsx`](./providers/StripePreload.tsx), which the locale layout mounts once, asks
+`getStripeClientInstance()` for Stripe.js in an effect, so Stripe's fraud signals see the visit before a payment
+([ADR 0022](../../../../../adr/0022-stripe-js-loads-on-every-page-for-its-fraud-signals.md)); it swallows a failure,
+the missing key of a local build included, because the checkout asks again and answers it.
 [`premium/StripeElementsProvider.tsx`](./premium/StripeElementsProvider.tsx) wraps `CheckoutForm` in Stripe's `<Elements>`
-and asks `getStripeClientInstance()` for Stripe.js in an effect, so a visitor who never donates never fetches it and
-importing `Donate` fetches nothing. It hands `Elements` the loaded instance and never the promise: `Elements` chains handlers onto a promise it is given,
+and asks the same memoised client in an effect, so the payment gets the instance the page loaded, and importing
+`Donate` fetches nothing. It hands `Elements` the loaded instance and never the promise: `Elements` chains handlers onto a promise it is given,
 so a rejection would escape as an uncaught one whatever the caller catches. While the script loads it draws
 [`premium/StripeLoadingFixture.tsx`](./premium/StripeLoadingFixture.tsx) and mounts nothing of the checkout, so a blocked
 script, which fails within milliseconds, never mounts the form it would then unmount. A visitor whose browser blocks `js.stripe.com` (a content blocker, a privacy extension, a
 proxy) is an expected case, so the failed load logs nothing and tracks nothing: the checkout shows
 `checkout.formUnavailable` with a Try again button that asks the client again and the same Back the checkout has, and
 reopening the popover loads again too. `StripeElementsProvider.test.tsx` fails an uncaught rejection and any
-`console.error` or `logClientError` on the failure.
+`console.error` or `logClientError` on the failure, and `providers/StripePreload.test.tsx` does the same for the early
+load and fails a checkout that loads Stripe.js a second time.
 
 ## Skeletons and bones
 
@@ -453,8 +457,14 @@ Reordering the array desyncs the illustration from the translated text beside it
 [`pages/homepage/sections/shared.ts`](./pages/homepage/sections/shared.ts).** `Features.tsx` passes it to
 `features.countriesTag`, shows `FEATURED_COUNTRIES` as flags and writes what is left, `COUNTRY_COUNT` less the
 flags shown, as a signed `format.number`, and `Stats.tsx` prints it. Both tests replace the constant and expect
-every figure to follow, so a literal left in one of them fails there. The figure is the marketing claim, not a
-count read off the data, which would pull the `date-holidays` dataset into the homepage.
+every figure to follow, so a literal left in one of them fails there. **The figure is the number of Countries the
+selector offers that the Holiday source has a calendar for**, and
+[`pages/homepage/sections/shared.test.ts`](./pages/homepage/sections/shared.test.ts) counts them through
+`getCountries` and `observedHolidays` over `dateHolidaysSource`, so a `date-holidays` or `i18n-iso-countries` update
+that moves either list fails there until the constant follows. The selector offers every name the ISO list holds,
+and a Country without a calendar plans around weekends and Custom Holidays alone; `IC`, the Canary Islands, has a
+calendar but no ISO name, and is reached as Spain's Region. The count stays a constant rather than a call at render
+time, because a server component that reads the source bundles a second copy of the dataset into the Worker.
 
 **[`pages/homepage/sections/shared.ts`](./pages/homepage/sections/shared.ts) is read by the docs site.**
 `homepage.mdx` and `HomepagePatternsDemo.tsx` import its exports, and the docs Tailwind build scans its class

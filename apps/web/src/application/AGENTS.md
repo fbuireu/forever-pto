@@ -42,9 +42,11 @@ action has no Effect context to yield a tag out of, so the stores log through `l
 `shared/utils/clientLog.ts`, which import the plain `logger` dynamically; see [`stores/AGENTS.md`](./stores/AGENTS.md).
 
 **[`email/templates/Contact.tsx`](./email/templates/Contact.tsx) is the only React in the layer**, and it is not DOM React: its elements
-come from `@react-email/components` and it is rendered to a string by `render()` inside `sendContactEmail`.
-Tailwind classes on it are compiled by React Email's own `Tailwind` wrapper, not by the app's stylesheet, and the
-wrapper's theme takes its colours from [`email/palette.ts`](./email/palette.ts).
+come from `react-email`, the one package that also exports the `render()` that turns it into a string inside
+`sendContactEmail`. Tailwind classes on it are compiled by React Email's own `Tailwind` wrapper, not by the app's
+stylesheet, and the wrapper's theme takes its colours from [`email/palette.ts`](./email/palette.ts). **`Hr` writes its
+own grey `border-top` after the `border-color` a class gives it**, so the rule names its top edge as well
+(`border-t-email-line`), and `Contact.test.tsx` resolves the colour that edge ends up with.
 
 [`tests/docs-consistency.test.ts`](../../../../tests/docs-consistency.test.ts) counts every cross-layer import
 against the table on the wiki's architecture overview, so a new edge fails it until that table changes.

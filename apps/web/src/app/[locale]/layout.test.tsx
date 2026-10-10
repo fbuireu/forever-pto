@@ -20,7 +20,10 @@ vi.mock("next-intl", () => ({
 	hasLocale: (locales: string[], locale: unknown) => locales.includes(locale as string),
 	NextIntlClientProvider: ({ children }: { children: unknown }) => children,
 }));
+const MockStripePreload = vi.fn().mockReturnValue(null);
+
 vi.mock("@ui/modules/providers/BonesProvider", () => ({ BonesProvider: () => null }));
+vi.mock("@ui/modules/providers/StripePreload", () => ({ StripePreload: MockStripePreload }));
 vi.mock("@ui/modules/shared/cookie-consent/CookieConsentClient", () => ({ CookieConsentClient: () => null }));
 vi.mock("@ui/modules/shared/WebMCP", () => ({ WebMCP: () => null }));
 vi.mock("@ui/modules/tracking/Analytics", () => ({ Analytics: () => null }));
@@ -74,6 +77,18 @@ describe("[locale]/layout", () => {
 		it("sets the lang attribute on the html element", async () => {
 			const element = await Layout({ children: null, params: Promise.resolve({ locale: ES as never }) });
 			expect(element.props.lang).toBe(ES);
+		});
+
+		it("mounts the Stripe.js load on every page it wraps, so Stripe's fraud signals see the visit before a payment", async () => {
+			const typesIn = (node: unknown): unknown[] => {
+				if (!node || typeof node !== "object") return [];
+				const { type, props } = node as { type?: unknown; props?: { children?: unknown } };
+				return [type, ...[props?.children].flat().flatMap(typesIn)];
+			};
+
+			const element = await Layout({ children: null, params: Promise.resolve({ locale: EN as never }) });
+
+			expect(typesIn(element)).toContain(MockStripePreload);
 		});
 
 		it("hands the client provider every namespace but the ones only the server reads", async () => {

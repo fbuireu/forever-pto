@@ -81,7 +81,8 @@ No rule below restates these, and a diff that breaks one fails CI:
   - the shipped stylesheet: built with Tailwind's own compiler and scanner from `index.css`, it scans no test, no
     end-to-end spec and no Markdown and emits no palette utility;
   - the code at large: `Temporal` from `temporal-polyfill`, Stripe.js imported through `@stripe/stripe-js/pure` and
-    asked for only inside a function (the bare entry and a module-scope ask both fetch the script on every load), no
+    asked for only inside a function (the bare entry injects the script on import and writes a failed load to the
+    console, and a module-scope ask runs outside the effect that answers its failure), no
     `index` module, one argument passed positionally and two or more as one object in `apps/web`, its tests, its e2e
     specs and this suite (no declared function or `const` arrow taking two positional parameters, a route's HTTP
     method handlers aside, and no `…Params` type, nor inline parameter type of a function that takes no props, with a
@@ -102,13 +103,16 @@ No rule below restates these, and a diff that breaks one fails CI:
     a string, shouting nothing outside the acronym list, addressing the user informally in German and French, styling
     no number, date or time argument (`{n, number, percent}`), and naming no concept by a phrase the glossary retires
     ("days off", "unused days", "manually selected" and their translations, one list per bundle) outside the marketing
-    namespaces and the legal texts;
+    namespaces and the legal texts, naming in the cookie policy every cookie the app sets, which the consent dialog's
+    catalogue lists too, and never saying the holiday data comes from an API, since the dataset ships inside the app;
   - the configuration: `strict` on and `allowJs` off, `cloudflare-env.d.ts` out of the program and out of git,
     `PUBLIC_ENV` classifying exactly the `NEXT_PUBLIC_*` names `environment.d.ts` declares and each wired where it is
-    read, the security headers, `immutable` on `/_next/static`, every binding in every wrangler environment, the
-    TypeScript pins, and the production build stripping every `console` call but the logger's levels
-    (`removeConsole` excluding exactly `LOG_LEVEL`'s values), because the logger's lines reach Better Stack only as
-    console output and a stray `console.log` must never ship;
+    read, the security headers with the sources Stripe.js asks of the CSP, an `X-Frame-Options` that answers framing
+    as `frame-ancestors` does, in the app and on the docs site, and is the value the data protection page quotes,
+    `immutable` on `/_next/static`, every binding in every wrangler environment, the TypeScript pins, and the
+    production build stripping every `console` call but the logger's levels (`removeConsole` excluding exactly
+    `LOG_LEVEL`'s values), because the logger's lines reach Better Stack only as console output and a stray
+    `console.log` must never ship;
   - the workflows: no deploy, build or secret write in a retry wrapper, every deploy's `--message` the one token
     `<sha>-<event>` the deploying repositories share (`C6`), only scripts a manifest declares, the preview cleanup
     queued behind the run that deployed it, every gated job under a `Check` aggregate, release configs that parse the
@@ -116,10 +120,22 @@ No rule below restates these, and a diff that breaks one fails CI:
     `working-directory` on the step rather than in a `defaults` block, no flag forwarded after `pnpm run <script> --`,
     and every `uses:` of another repository pinned to a full commit SHA with its version or branch in a trailing
     comment;
+  - Playwright running the `chromium` and `webkit` projects alone in both packages, in CI and locally alike, and every
+    workflow job that runs it installing both browsers behind a cache keyed on them;
+  - every spec of the app taking `test` and `expect` from `apps/web/e2e/fixtures.ts`, which hands the preview's
+    Cloudflare Access token to the preview's origin alone, and no Playwright config or spec setting `extraHTTPHeaders`;
   - the YAML, every file of it: no comment but a SHA pin's trailing comment, a tool directive and the line Renovate
     writes into `pnpm-workspace.yaml`, a `#` counting as a comment when removing it leaves the parsed document
     unchanged;
   - the package scripts: no shell substitution, and a literal base on every changed-only Vitest or Playwright run;
+  - the documents: no `BACKLOG.md` anywhere in the tree and no `Known inconsistencies`, `Known defects` or
+    `Known breaches` heading in any of them (`G9`);
+  - the `security.txt` files: one on every site the repository serves, counted under every `public` or `assets`
+    folder, with `Contact`, `Expires`, `Preferred-Languages`, `Canonical` and `Policy` in that order, each `Canonical`
+    the site's origin (`NEXT_PUBLIC_SITE_URL` under `[env.production.vars]`, the docs site's `site`) plus
+    `/.well-known/security.txt`, each `Policy` this repository's, and each `Expires` an ISO 8601 instant 30 days to
+    two years from the day the suite runs, which reads the real clock on purpose so `main` turns red a month before a
+    file lapses;
   - the published wiki: canonical glossary terms outside its landing pages, repo-relative paths, only constants,
     tokens, icons and `@ui` exports that exist, and no history in the prose (`used to`, `no longer`, `previously`,
     `any more`, `until now`, a dated event), outside code and quotes;
@@ -414,7 +430,8 @@ No rule below restates these, and a diff that breaks one fails CI:
   worker through the holidays store, never from a generator or a selector.
 - `U2` **hard**: Import from `@infrastructure/*` only the listed seams: the locales and `localePath`, the tracking
   helper, `errors`, the worker types and serializers, `getPublicEnv`, `getCountries`, the Country cookie's name
-  (`proxy/cookie`), the Stripe browser client, the driver.js client and the `payment` and `contact` server actions.
+  (`proxy/cookie`), the Premium session cookie's name (`services/premium/cookie`, whose `NextResponse` import is
+  type-only), the Stripe browser client, the driver.js client and the `payment` and `contact` server actions.
 - `U4` **hard**: Keep server components free of hooks and store access.
 - `U5` **hard**, *check pending*: Render on the server by default and add `'use client'` to any file with state, an
   effect, a store read, an event handler or a recharts chart, even when every current importer is already a client
@@ -564,12 +581,12 @@ No rule below restates these, and a diff that breaks one fails CI:
   calls, never where a rehydration or an effect would run it again. A result that lands later is asked for in the
   handler and reported where it lands, only when asked: `planner_generated` counts the plans a person asks for
   (`askForPlan` in the handler, `claimPlanAskedFor` where the worker's answer lands), never a load or a restore, and
-  a Donation the issuer took over lands on the payment confirmation page, whose mount calls `confirmActivation` once,
-  and only while the redirect's own `activation=fresh` marker is in the address, to report `premium_activated` on the
-  move into Premium; the page removes the marker as it reads it, before it makes the call, so a reload, a revisit, a
-  history entry the payer left early and returned to, a restored session or a visitor whose `localStorage` was cleared
-  reports nothing. The one `track()` inside an effect counts a view rather
-  than an interaction: the contact form a `#contact` link opens.
+  a Donation the issuer took over lands on the payment confirmation page, whose mount calls `confirmActivation` once
+  to report `premium_activated` on the move into Premium, and only while the one-shot proof the activation route sets
+  (`ACTIVATION_COOKIE`) is unspent; the store spends it in the same task as the report, so a reload during the call
+  reports once and a reload after it, a revisit, a history entry the payer left early and returned to, a restored
+  session or a visitor whose `localStorage` was cleared reports nothing. The one `track()` inside an effect counts a
+  view rather than an interaction: the contact form a `#contact` link opens.
 - `P2` **hard**: Send ids and machine codes in events (a `PremiumFeatureId`, an `ApiError` code), never translated
   strings, dates, Manual Days, Custom Holiday names or a salary.
 - `P3` **hard**: Read consent per service through `consent.ts` (`acceptedService`), and give a new service its own
@@ -640,9 +657,10 @@ No rule below restates these, and a diff that breaks one fails CI:
   catches a change breaking what is already out there. An e2e spec takes its locales from `LOCALES` and
   `localePath`, never a list of its own.
 - `T19` **hard**: Tag a case `@smoke` only for what proves the Worker answers on every deploy, never a result that
-  depends on the caller's address, and keep the three cases every repository that deploys runs (a titled homepage, an
-  unknown path answering 404, `robots.txt` served) word for word, because a failing smoke run rolls production back.
-  The docs site runs the same three against its own deploy.
+  depends on the caller's address, and keep the four cases every repository that deploys runs (a titled homepage, an
+  unknown path answering 404, `robots.txt` served, `security.txt` served in date and byte for byte the file in
+  `public/`) word for word, because a failing smoke run rolls production back. The
+  docs site runs the same four against its own deploy.
 - `T20` **hard**: Guard every list a contract-suite assertion derives from the repository (files, rows, matches) with
   a non-empty assertion or a synthetic self-test, because an assertion over an empty census passes whatever the tree
   holds.
@@ -742,8 +760,8 @@ No rule below restates these, and a diff that breaks one fails CI:
 - `G6` **hard**: State a rule once: a rule about how code is written here, a coupling or a gotcha in the guide of the
   folder it bites, a decision in an ADR; a wiki page says where the rule lives, because the wiki is published and
   nothing checks a copy.
-- `G7` **hard**: Delete a [BACKLOG.md](./BACKLOG.md) item in the change that fixes it, and add a breach a change finds
-  and leaves in place, with its fix, because a stale entry is a false claim about the tree and an unlisted one is lost.
+- `G9` **hard**: Fix a breach in the change that finds it, or report it on the pull request with the rule it breaks;
+  no guide keeps a list of known inconsistencies, because an entry is a claim about the code that nothing keeps true.
 
 ## Deliberate overrides of the smell baseline
 
@@ -756,7 +774,7 @@ No rule below restates these, and a diff that breaks one fails CI:
 - **Duplicated Code**: the stated-version helpers (`VERSIONED_DEPENDENCIES` through `declaredIn`) and the
   release-config helpers (`BREAKING_PARSER_OPTS` through `parserOptsOf`) in `tests/docs-consistency.test.ts` are byte
   for byte the same in biancafiore, contribKit and github-star-tracker, so a change to one is made in all three.
-- **Duplicated Code**: the three smoke cases are word for word the same in every repository that deploys, and in
+- **Duplicated Code**: the four smoke cases are word for word the same in every repository that deploys, and in
   both packages here, so a difference between them is drift, not a variant.
 - **Duplicated Code**: `contactSenderKey` and `normalizeEmail` stay two normalisers: one keys the contact guard, the
   other decides who recovers Premium.

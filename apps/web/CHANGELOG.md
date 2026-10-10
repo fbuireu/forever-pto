@@ -1,3 +1,24 @@
+# [forever-pto-web-v1.13.10](https://github.com/fbuireu/forever-pto/compare/web-v1.13.9...web-v1.13.10) (2026-10-10)
+
+
+### Bug Fixes
+
+* **web:** renew security.txt for two years, name its canonical URL and policy, and watch its expiry ([cafef27](https://github.com/fbuireu/forever-pto/commit/cafef274164af9ad863101e37fac2d59fe637b08))
+
+# [forever-pto-web-v1.13.9](https://github.com/fbuireu/forever-pto/compare/web-v1.13.8...web-v1.13.9) (2026-10-10)
+
+
+### Bug Fixes
+
+* **web:** name every cookie the app sets, drop the holiday-API claims, and let nothing frame it ([8fbebd5](https://github.com/fbuireu/forever-pto/commit/8fbebd5fa8984697bade0ce89f3a0cf4a0c4666e))
+
+# [forever-pto-web-v1.13.8](https://github.com/fbuireu/forever-pto/compare/web-v1.13.7...web-v1.13.8) (2026-10-10)
+
+
+### Bug Fixes
+
+* load Stripe.js on every page, count one activation exactly once, and claim the true 205 ([e7cd064](https://github.com/fbuireu/forever-pto/commit/e7cd0647f8d9379cc34fc5e0646280118ee36786))
+
 # [forever-pto-web-v1.13.7](https://github.com/fbuireu/forever-pto/compare/web-v1.13.6...web-v1.13.7) (2026-10-08)
 
 

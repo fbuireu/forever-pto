@@ -1,10 +1,14 @@
-import { ACTIVATION_FAILED, ACTIVATION_FRESH, ACTIVATION_PARAM } from "@application/dto/payment/types";
+import { ACTIVATION_COOKIE, ACTIVATION_FAILED, ACTIVATION_PARAM } from "@application/dto/payment/types";
 import type { activateWithPayment } from "@application/use-cases/activatePremium";
 import { RateLimitError, ValidationError } from "@infrastructure/errors";
 import { EN, ES } from "@infrastructure/i18n/locales";
 import { LoggerService } from "@infrastructure/logging/service";
 import type { checkRateLimit } from "@infrastructure/services/payments/rateLimit";
-import { PREMIUM_COOKIE } from "@infrastructure/services/premium/cookie";
+import {
+	ACTIVATION_PROOF,
+	ACTIVATION_PROOF_LIFETIME_SECONDS,
+	PREMIUM_COOKIE,
+} from "@infrastructure/services/premium/cookie";
 import { Effect, Layer } from "effect";
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -72,19 +76,38 @@ describe("GET /api/payment/activate", () => {
 		expect(locationOf(response).pathname).toBe("/payment/confirmation");
 	});
 
-	it("marks the redirect it sends after an activation as fresh, the one marker the confirmation page reports from", async () => {
+	it("hands the activation it made a one-shot proof the confirmation page reads, and spends, with script", async () => {
+		const response = await GET(makeRequest({ query: successfulQuery }));
+		const proof = response.cookies.get(ACTIVATION_COOKIE);
+
+		expect(proof?.value).toBe(ACTIVATION_PROOF);
+		expect(proof?.httpOnly).not.toBe(true);
+		expect(proof?.path).toBe("/");
+		expect(proof?.sameSite).toBe("strict");
+		expect(proof?.maxAge).toBe(ACTIVATION_PROOF_LIFETIME_SECONDS);
+	});
+
+	it("puts no activation marker in the address it sends the payer to after an activation, since the proof is the cookie", async () => {
 		const response = await GET(makeRequest({ query: successfulQuery }));
 
-		expect(locationOf(response).searchParams.get(ACTIVATION_PARAM)).toBe(ACTIVATION_FRESH);
+		expect(locationOf(response).searchParams.has(ACTIVATION_PARAM)).toBe(false);
 		expect(locationOf(response).searchParams.get("payment_intent")).toBe(PAYMENT_INTENT_ID);
 	});
 
-	it("never marks a redirect fresh when it failed to activate", async () => {
+	it("never hands out a proof when it failed to activate, and marks the address as failed", async () => {
 		const refused = await GET(makeRequest({ query: { payment_intent: PAYMENT_INTENT_ID } }));
 		const declined = await GET(makeRequest({ query: { ...successfulQuery, redirect_status: "failed" } }));
+		mockActivateWithPayment.mockReturnValue(Effect.fail(new ValidationError({ message: "Client secret mismatch" })));
+		const mismatched = await GET(makeRequest({ query: successfulQuery }));
 
+		expect([refused, declined, mismatched].map((response) => response.cookies.get(ACTIVATION_COOKIE))).toEqual([
+			undefined,
+			undefined,
+			undefined,
+		]);
 		expect(locationOf(refused).searchParams.getAll(ACTIVATION_PARAM)).toEqual([ACTIVATION_FAILED]);
 		expect(locationOf(declined).searchParams.getAll(ACTIVATION_PARAM)).toEqual([ACTIVATION_FAILED]);
+		expect(locationOf(mismatched).searchParams.getAll(ACTIVATION_PARAM)).toEqual([ACTIVATION_FAILED]);
 	});
 
 	it("passes the client secret through so activation can prove the caller completed the payment", async () => {

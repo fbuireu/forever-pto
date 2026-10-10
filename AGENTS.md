@@ -170,9 +170,23 @@ and rulesets behind them are settings, on the [environments](./apps/docs/src/con
   `environment:`), the same value `deploy-production` passes as the deploy's `url`; a first step fails the job when
   it is empty. The step passes no `--pass-with-no-tests`, so a grep that stops matching fails the job. `release-web`
   needs it, and a failed smoke run rolls production back through `rollback`. The docs site has the same pair, over
-  [`apps/docs/e2e/smoke.spec.ts`](./apps/docs/e2e/smoke.spec.ts) and the `DOCS_SITE_URL` variable.
+  [`apps/docs/e2e/smoke.spec.ts`](./apps/docs/e2e/smoke.spec.ts) and the `DOCS_SITE_URL` variable. Both specs carry
+  the four cases every repository that deploys runs, word for word; the fourth asks for `/.well-known/security.txt`
+  and wants it byte for byte the package's `public/.well-known/security.txt`, so a `security.txt` the Cloudflare zone
+  serves itself, which answers before the Worker, fails the run instead of standing in for the repository's.
+- **Each site's `security.txt` lapses unless it is renewed**: `apps/web/public/.well-known/security.txt` and
+  `apps/docs/public/.well-known/security.txt` carry an `Expires` two years after their last renewal, the longest the
+  contract suite allows, and the suite fails 30 days before that date, reading the real clock on purpose, so `main`
+  turns red a month ahead and the fix is to move `Expires` forward, at most two years. The same rule counts one file
+  per site and holds each one's fields and its `Canonical` to the site's origin (`NEXT_PUBLIC_SITE_URL` under
+  `[env.production.vars]` for the app, `site` in `apps/docs/astro.config.ts` for the docs site).
+- **The docs build reaches its deploy as the `docs-dist` artifact, uploaded with `include-hidden-files: true`.**
+  `upload-artifact` drops every dotfolder by default, `public/.well-known` among them, and the deployed site then
+  answers 404 for its `security.txt`. The contract suite holds every artifact a later job downloads to that input.
 - [`apps/web/e2e/warm-up.ts`](./apps/web/e2e/warm-up.ts) is Playwright's `globalSetup`: with `BASE_URL` set it requests
-  the homepage and an unknown path once, before any worker starts, so no spec meets the Worker's first render.
+  the homepage and an unknown path once, before any worker starts, so no spec meets the Worker's first render. It
+  carries the Cloudflare Access token the way the specs do, from
+  [`apps/web/e2e/previewAccess.ts`](./apps/web/e2e/previewAccess.ts), to the preview's origin alone.
 - **The preview cleanup queues behind the run that deployed the Worker it deletes**: `cleanup-web` in the group
   `CI-refs/pull/<number>/merge`, which is the group `ci.yml` computes for that pull request's run, and `cleanup-docs`
   in the docs one. The coupling is by `ci.yml`'s `name:`, `CI`, so renaming it unqueues the cleanup; the contract suite
@@ -203,7 +217,6 @@ a promise, not a fix.
 | `apps/web/src/**/AGENTS.md` | *What is in this folder, and what does a change here carry?* Its files, public API, couplings, gotchas and guardrails. Its `# ` heading is the folder's own path, repo-relative: `# apps/web/src/domain/calendar` | You change a layer's dependencies, a signature, a coupling, or the files in that folder |
 | [`adr/`](./adr/) | *Why is it like this?* One decision per file | You make a decision that is hard to reverse, surprising without context, **and** the result of a real trade-off |
 | [`README.md`](./README.md) | *What is this product and how do I run it?* The human-facing front page | The product's capabilities, the stack table, the scripts or the required versions change |
-| [`BACKLOG.md`](./BACKLOG.md) | *Where does the tree break a rule today, and what fixes it?* The known breaches of `CODING_STANDARDS.md` | A change fixes an item (delete it), or leaves a breach it found in place (add it, with its fix) |
 
 | If you change | Update |
 | --- | --- |

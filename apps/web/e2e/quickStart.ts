@@ -1,6 +1,7 @@
 import enMessages from "@i18n/messages/en.json";
 import { USER_COUNTRY_COOKIE } from "@infrastructure/proxy/cookie";
-import { expect, type Locator, type Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
+import { expect } from "./fixtures";
 
 const DIALOG_OPEN_TIMEOUT = 3_000;
 const PLANNER_NAVIGATION_TIMEOUT = 60_000;

@@ -1,7 +1,7 @@
 import { LOCALES } from "@infrastructure/i18n/locales";
 import { localePath } from "@infrastructure/i18n/utils/url";
 import { privateRoutes } from "@infrastructure/seo/routes";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 const ROBOTS_URL = "/robots.txt";
 const DISALLOW_PREFIX = "Disallow: ";

@@ -1,152 +1,181 @@
-import { ACTIVATION_FRESH, ACTIVATION_PARAM } from "@application/dto/payment/types";
-import { usePremiumStore } from "@application/stores/premium";
-import { track } from "@infrastructure/clients/logging/better-stack/tracking";
+import { ACTIVATION_COOKIE, ACTIVATION_PARAM } from "@application/dto/payment/types";
 import { render } from "@testing-library/react";
-import { getExistingSession } from "@ui/adapters/session/checkSession";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { PremiumSessionSync } from "./PremiumSessionSync";
 
-vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track: vi.fn() }));
-
-vi.mock("@infrastructure/logging/logger", () => ({ logger: { logError: vi.fn(), warn: vi.fn() } }));
-
-vi.mock("@ui/adapters/session/checkSession", () => ({
+const { track, getExistingSession } = vi.hoisted(() => ({
+	track: vi.fn(),
 	getExistingSession: vi.fn(),
-	verifyPremiumEmail: vi.fn(),
 }));
 
-vi.mock("@application/stores/crypto", () => ({
-	obfuscatedStorage: {
-		getItem: vi.fn().mockResolvedValue(null),
-		setItem: vi.fn().mockResolvedValue(undefined),
-		removeItem: vi.fn().mockResolvedValue(undefined),
-	},
+vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
+vi.mock("@infrastructure/logging/logger", () => ({ logger: { logError: vi.fn(), warn: vi.fn() } }));
+vi.mock("@ui/adapters/session/checkSession", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@ui/adapters/session/checkSession")>()),
+	getExistingSession,
 }));
 
 const SESSION = { premiumKey: "pk_redirect", email: "donor@example.com" };
 const ACTIVATED = { event: "premium_activated", properties: { plan: "premium" } };
-const REDIRECT = `/payment/confirmation?payment_intent=pi_probe&${ACTIVATION_PARAM}=${ACTIVATION_FRESH}`;
-
-const reported = () => vi.mocked(track).mock.calls.map(([params]) => params);
-
-const settled = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+const CONFIRMATION = "/payment/confirmation?payment_intent=pi_probe";
+const LANDING = CONFIRMATION;
+const STALE_MARKER = `${CONFIRMATION}&${ACTIVATION_PARAM}=fresh`;
 
 type Storage = "kept" | "cleared";
 
-interface LoadParams {
+interface OpenParams {
 	address: string;
 	storage: Storage;
 }
 
-const load = async ({ address, storage }: LoadParams) => {
-	window.history.replaceState(null, "", address);
-	if (storage === "cleared") usePremiumStore.setState(usePremiumStore.getInitialState());
+const reported = () => track.mock.calls.map(([params]) => params);
 
-	const view = render(<PremiumSessionSync />);
-	await settled();
-	view.unmount();
+const settled = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+const setCookie = (cookie: string) => {
+	// biome-ignore lint/suspicious/noDocumentCookie: the test plays the browser that receives the activation route's Set-Cookie
+	document.cookie = cookie;
 };
 
-const reload = (storage: Storage) => load({ address: window.location.href, storage });
+const hasProof = () => document.cookie.split("; ").some((row) => row.startsWith(`${ACTIVATION_COOKIE}=`));
+
+const landFromTheIssuer = () => {
+	setCookie(`${ACTIVATION_COOKIE}=1; path=/`);
+	return LANDING;
+};
+
+const open = async ({ address, storage }: OpenParams) => {
+	window.history.replaceState(null, "", address);
+	if (storage === "cleared") localStorage.clear();
+	vi.resetModules();
+	const [{ PremiumSessionSync }, { usePremiumStore }] = await Promise.all([
+		import("./PremiumSessionSync"),
+		import("@application/stores/premium"),
+	]);
+	const page = render(<PremiumSessionSync />);
+
+	return { page, usePremiumStore };
+};
+
+const visit = async ({ address, storage }: OpenParams) => {
+	const { page, usePremiumStore } = await open({ address, storage });
+	await settled();
+	page.unmount();
+
+	return usePremiumStore.getState();
+};
+
+const leaveBeforeTheCallSettles = async ({ address, storage }: OpenParams) => {
+	getExistingSession.mockReturnValueOnce(new Promise(() => {}));
+	const { page } = await open({ address, storage });
+	const entry = window.location.href;
+	page.unmount();
+
+	return entry;
+};
 
 beforeEach(() => {
-	usePremiumStore.setState(usePremiumStore.getInitialState());
-	vi.clearAllMocks();
-	vi.mocked(getExistingSession).mockResolvedValue(SESSION);
+	track.mockReset();
+	getExistingSession.mockReset();
+	getExistingSession.mockResolvedValue(SESSION);
+	localStorage.clear();
 });
 
 afterEach(() => {
+	setCookie(`${ACTIVATION_COOKIE}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`);
+	localStorage.clear();
 	window.history.replaceState(null, "", "/");
 });
 
 describe("which loads of the payment confirmation page report premium_activated", () => {
 	it("reports the activation the redirect lands on, once", async () => {
-		await load({ address: REDIRECT, storage: "cleared" });
+		const state = await visit({ address: landFromTheIssuer(), storage: "cleared" });
 
 		expect(reported()).toStrictEqual([ACTIVATED]);
-		expect(usePremiumStore.getState().premiumKey).toBe(SESSION.premiumKey);
+		expect(state.premiumKey).toBe(SESSION.premiumKey);
 	});
 
-	it("reports nothing when that page is reloaded", async () => {
-		await load({ address: REDIRECT, storage: "cleared" });
-		vi.mocked(track).mockClear();
+	it("reports it once when the page is reloaded while the confirmation is still on its way", async () => {
+		const entry = await leaveBeforeTheCallSettles({ address: landFromTheIssuer(), storage: "cleared" });
 
-		await reload("kept");
+		await visit({ address: entry, storage: "kept" });
 
-		expect(reported()).toStrictEqual([]);
+		expect(reported()).toStrictEqual([ACTIVATED]);
 	});
 
-	it("reports nothing when that page is reloaded with the storage cleared and the cookie alive", async () => {
-		await load({ address: REDIRECT, storage: "cleared" });
-		vi.mocked(track).mockClear();
-		usePremiumStore.setState(usePremiumStore.getInitialState());
+	it("reports nothing more when the page is reloaded after the confirmation settled", async () => {
+		await visit({ address: landFromTheIssuer(), storage: "cleared" });
 
-		await reload("cleared");
+		await visit({ address: window.location.href, storage: "kept" });
 
-		expect(reported()).toStrictEqual([]);
-		expect(usePremiumStore.getState().premiumKey).toBe(SESSION.premiumKey);
+		expect(reported()).toStrictEqual([ACTIVATED]);
 	});
 
-	it("reports nothing on an ordinary load, which only restores what the cookie holds", async () => {
-		await load({ address: "/payment/confirmation?payment_intent=pi_probe", storage: "cleared" });
-
-		expect(reported()).toStrictEqual([]);
-		expect(usePremiumStore.getState().premiumKey).toBe(SESSION.premiumKey);
-	});
-
-	it("reports nothing when the planner's own session check restores the cookie, after the page was reloaded", async () => {
-		await load({ address: REDIRECT, storage: "cleared" });
-		vi.mocked(track).mockClear();
-		usePremiumStore.setState({ ...usePremiumStore.getInitialState(), needsSessionCheck: true });
-
-		await usePremiumStore.getState().checkExistingSession();
-
-		expect(reported()).toStrictEqual([]);
-	});
-
-	it("counts the donor once when the payer leaves before the confirmation settles, and the entry they left is visited again", async () => {
+	it("reports it once when the payer leaves for another page of the app before it settles and comes back through the history", async () => {
 		const session = Promise.withResolvers<typeof SESSION>();
-		vi.mocked(getExistingSession).mockReturnValue(session.promise);
-		window.history.replaceState(null, "", REDIRECT);
-		usePremiumStore.setState(usePremiumStore.getInitialState());
-
-		const page = render(<PremiumSessionSync />);
+		getExistingSession.mockReturnValueOnce(session.promise);
+		const { page } = await open({ address: landFromTheIssuer(), storage: "cleared" });
 		const entry = window.location.href;
 		page.unmount();
 		window.history.pushState(null, "", "/planner");
 		session.resolve(SESSION);
 		await settled();
-		expect(reported()).toStrictEqual([ACTIVATED]);
 
-		await load({ address: entry, storage: "cleared" });
-
-		expect(reported()).toStrictEqual([ACTIVATED]);
-	});
-
-	it("counts the donor once however the page is visited afterwards", async () => {
-		await load({ address: REDIRECT, storage: "cleared" });
-		await reload("kept");
-		await reload("cleared");
-		await reload("cleared");
-		await reload("kept");
+		await visit({ address: entry, storage: "cleared" });
 
 		expect(reported()).toStrictEqual([ACTIVATED]);
 	});
 
-	it("reports nothing for a donor this device already holds as Premium, redirect or not", async () => {
-		usePremiumStore.setState({ premiumKey: "pk_earlier", userEmail: SESSION.email });
+	it("reports it once when the page dies before the confirmation settles and the payer comes back through the history", async () => {
+		const entry = await leaveBeforeTheCallSettles({ address: landFromTheIssuer(), storage: "cleared" });
 
-		await load({ address: REDIRECT, storage: "kept" });
+		await visit({ address: entry, storage: "kept" });
+		await visit({ address: entry, storage: "kept" });
+
+		expect(reported()).toStrictEqual([ACTIVATED]);
+	});
+
+	it("reports nothing on a revisit, whatever the address", async () => {
+		await visit({ address: landFromTheIssuer(), storage: "cleared" });
+
+		await visit({ address: CONFIRMATION, storage: "kept" });
+		await visit({ address: STALE_MARKER, storage: "kept" });
+
+		expect(reported()).toStrictEqual([ACTIVATED]);
+	});
+
+	it("reports nothing when the payer returns with local storage cleared, to any address the visit went through", async () => {
+		await visit({ address: landFromTheIssuer(), storage: "cleared" });
+
+		await visit({ address: STALE_MARKER, storage: "cleared" });
+		await visit({ address: CONFIRMATION, storage: "cleared" });
+
+		expect(reported()).toStrictEqual([ACTIVATED]);
+	});
+
+	it("reports nothing on a load the redirect did not land on, which only restores what the cookie holds", async () => {
+		const state = await visit({ address: CONFIRMATION, storage: "cleared" });
+
+		expect(reported()).toStrictEqual([]);
+		expect(state.premiumKey).toBe(SESSION.premiumKey);
+	});
+
+	it("reports nothing for a donor this device already holds as Premium, and spends the proof", async () => {
+		await visit({ address: CONFIRMATION, storage: "cleared" });
+
+		await visit({ address: landFromTheIssuer(), storage: "kept" });
+		await visit({ address: STALE_MARKER, storage: "cleared" });
 
 		expect(reported()).toStrictEqual([]);
 	});
 
-	it("reports nothing when the cookie holds no session, even behind the marker", async () => {
-		vi.mocked(getExistingSession).mockResolvedValue(null);
+	it("keeps the proof while the session cookie holds no session, so a later load can still report it", async () => {
+		getExistingSession.mockResolvedValueOnce(null);
 
-		await load({ address: REDIRECT, storage: "cleared" });
+		const state = await visit({ address: landFromTheIssuer(), storage: "cleared" });
+		await visit({ address: CONFIRMATION, storage: "kept" });
 
-		expect(reported()).toStrictEqual([]);
-		expect(usePremiumStore.getState().premiumKey).toBeNull();
+		expect(state.premiumKey).toBeNull();
+		expect(reported()).toStrictEqual([ACTIVATED]);
+		expect(hasProof()).toBe(false);
 	});
 });

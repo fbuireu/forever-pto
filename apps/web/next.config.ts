@@ -45,13 +45,13 @@ if (isProd) {
 
 const CSP = [
 	"default-src 'self'",
-	"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com https://betterstack.net https://static.cloudflareinsights.com",
+	"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com https://*.js.stripe.com https://betterstack.net https://static.cloudflareinsights.com",
 	"style-src 'self' 'unsafe-inline'",
 	"img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com https://*.stripe.com",
 	"font-src 'self'",
 	"connect-src 'self' https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://www.googletagmanager.com https://stats.g.doubleclick.net https://www.google.com/ads/ https://api.stripe.com https://r.stripe.com https://q.stripe.com https://m.stripe.com https://betterstack.net https://*.betterstackdata.com https://cloudflareinsights.com",
 	"worker-src 'self' blob:",
-	"frame-src https://js.stripe.com https://hooks.stripe.com",
+	"frame-src https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com",
 	"frame-ancestors 'none'",
 	"base-uri 'self'",
 	"form-action 'self'",
@@ -79,7 +79,7 @@ const SECURITY_HEADERS = [
 	},
 	{
 		key: "X-Frame-Options",
-		value: "SAMEORIGIN",
+		value: "DENY",
 	},
 	{
 		key: "X-XSS-Protection",

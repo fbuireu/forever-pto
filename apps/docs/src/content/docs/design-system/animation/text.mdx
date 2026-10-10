@@ -40,5 +40,7 @@ import { RotatingText } from '@ui/modules/core/animate/text/Rotating';
 
 - `SlidingNumber` renders `tabular-nums` rollers, so keep the surrounding type style on the component itself
  (`className`) so the measurement matches the render.
+- `RotatingText` renders a `div`, so it goes in a `div` or another flow container, never in a `<p>` or a heading:
+ the HTML parser closes the paragraph before the `div`, and React fails the hydration (error #418).
 - Both components expose `data-slot` attributes (`sliding-number`, `sliding-number-roller`, `sliding-number-display`) for CSS containment hooks.
 - Related: [animated components](/design-system/animation/components/), [effects](/design-system/animation/effects/).

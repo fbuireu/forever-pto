@@ -7,7 +7,7 @@ import {
 	paymentConfirmationQuerySchema,
 	promoCodeErrorCodeSchema,
 } from "./schema";
-import { ACTIVATION_FAILED, ACTIVATION_FRESH, ACTIVATION_PARAM, PromoCodeErrors } from "./types";
+import { ACTIVATION_FAILED, ACTIVATION_PARAM, PromoCodeErrors } from "./types";
 
 const VALID = { amount: 9.99, email: "user@example.com" };
 
@@ -186,7 +186,6 @@ describe("paymentConfirmationQuerySchema", () => {
 	it("reads the activation flag under the parameter the activation route writes", () => {
 		expect(ACTIVATION_PARAM).toBe("activation");
 		expect(ACTIVATION_FAILED).toBe("failed");
-		expect(ACTIVATION_FRESH).toBe("fresh");
 		expect(Object.keys(paymentConfirmationQuerySchema.shape)).toContain(ACTIVATION_PARAM);
 	});
 

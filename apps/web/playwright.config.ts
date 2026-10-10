@@ -5,6 +5,7 @@ const BASE_URL = process.env.BASE_URL ?? LOCAL_URL;
 
 export default defineConfig({
 	testDir: "./e2e",
+	testMatch: "**/*.spec.ts",
 	globalSetup: "./e2e/warm-up.ts",
 	fullyParallel: true,
 	forbidOnly: !!process.env.CI,
@@ -14,25 +15,12 @@ export default defineConfig({
 	use: {
 		baseURL: BASE_URL,
 		trace: "on-first-retry",
-		extraHTTPHeaders: ((): Record<string, string> => {
-			const id = process.env.CF_ACCESS_CLIENT_ID;
-			const secret = process.env.CF_ACCESS_CLIENT_SECRET;
-			if (!id && !secret) return {};
-			if (!id || !secret)
-				throw new Error(
-					`CF Access misconfigured: ${!id ? "CF_ACCESS_CLIENT_ID" : "CF_ACCESS_CLIENT_SECRET"} is missing`,
-				);
-			return { "CF-Access-Client-Id": id, "CF-Access-Client-Secret": secret };
-		})(),
 	},
 	webServer: process.env.BASE_URL
 		? undefined
 		: { command: "pnpm dev", url: LOCAL_URL, reuseExistingServer: true, timeout: 180_000 },
-	projects: process.env.CI
-		? [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }]
-		: [
-				{ name: "chromium", use: { ...devices["Desktop Chrome"] } },
-				{ name: "firefox", use: { ...devices["Desktop Firefox"] } },
-				{ name: "webkit", use: { ...devices["Desktop Safari"] } },
-			],
+	projects: [
+		{ name: "chromium", use: { ...devices["Desktop Chrome"] } },
+		{ name: "webkit", use: { ...devices["Desktop Safari"] } },
+	],
 });

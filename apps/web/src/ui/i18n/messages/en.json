@@ -799,9 +799,14 @@
 		"years": "{count, plural, one {# year} other {# years}}",
 		"minutes": "{count, plural, one {# minute} other {# minutes}}",
 		"hours": "{count, plural, one {# hour} other {# hours}}",
+		"days": "{count, plural, one {# day} other {# days}}",
 		"weeks": "{count, plural, one {# week} other {# weeks}}",
 		"userCountryDesc": "Stores your detected country for the initial holiday suggestion.",
 		"ccCookieDesc": "Stores your cookie consent preferences.",
+		"premiumTokenDesc": "Keeps Premium unlocked in this browser after a donation.",
+		"premiumActivationDesc": "Marks a payment that just unlocked Premium, so the activation is recorded once.",
+		"localeDesc": "Remembers the language you read the site in.",
+		"sidebarStateDesc": "Remembers whether you left the sidebar open or closed.",
 		"stripeMidDesc": "Fraud prevention and detection. Set by Stripe for secure payment processing.",
 		"stripeSidDesc": "Session identifier for fraud prevention. Required for checkout process.",
 		"gaDesc": "Distinguishes unique users.",
@@ -1136,7 +1141,6 @@
 	},
 	"cookiePolicy": {
 		"title": "Cookie Policy",
-		"lastUpdated": "Last updated: {date}",
 		"sections": {
 			"introduction": {
 				"title": "Introduction",
@@ -1158,7 +1162,7 @@
 					"socialMedia": "Social media cookies"
 				},
 				"strictlyNecessary": {
-					"title": "Strictly necessary cookies (local storage)",
+					"title": "Strictly necessary cookies and local storage",
 					"description": "We use browser local storage to save your preferences and application state. These are essential for the website to function and cannot be disabled:",
 					"items": {
 						"filters": {
@@ -1189,6 +1193,31 @@
 					"duration": {
 						"label": "Duration:",
 						"description": "These are stored permanently in your browser's local storage until you manually clear them."
+					},
+					"cookies": {
+						"description": "We also set these cookies of our own. Each one is strictly necessary, and none is shared with a third party:",
+						"items": {
+							"premiumSession": {
+								"label": "Premium session (premium-token):",
+								"description": "Keeps Premium unlocked in this browser after you donate. It is first-party, only our server can read it, and it lasts 30 days."
+							},
+							"activationProof": {
+								"label": "Activation proof (premium-activation):",
+								"description": "Tells the app that a payment has just unlocked Premium, so the activation is recorded once. It is first-party and lasts one hour at most: the app deletes it as soon as it has confirmed your session."
+							},
+							"country": {
+								"label": "Country (user-country):",
+								"description": "Remembers the country we detected for you, so the planner opens on its holidays. It is first-party and lasts 7 days."
+							},
+							"language": {
+								"label": "Language (NEXT_LOCALE):",
+								"description": "Remembers the language you read the site in. It is first-party and is deleted when you close your browser."
+							},
+							"sidebar": {
+								"label": "Sidebar (sidebar_state):",
+								"description": "Remembers whether you left the sidebar open or closed. It is first-party and lasts 7 days."
+							}
+						}
 					}
 				}
 			},
@@ -1256,11 +1285,7 @@
 				"items": {
 					"payment": {
 						"label": "Stripe (payment processing):",
-						"description": "When you purchase Premium, Stripe may set cookies for fraud prevention and payment processing. See Stripe's Cookie Policy."
-					},
-					"holidayApis": {
-						"label": "Holiday APIs:",
-						"description": "We use external APIs to fetch holiday data, but these don't set cookies on our site."
+						"description": "Stripe loads on every page of Forever PTO, not only when you donate, so that its fraud prevention can see how the site is used before a payment. It may set its fraud-prevention cookies (__stripe_mid and __stripe_sid) on any page; they are strictly necessary, so they are set whether or not you accept analytics cookies. See Stripe's Cookie Policy."
 					},
 					"analytics": {
 						"label": "Better Stack (analytics):",
@@ -1327,7 +1352,6 @@
 	},
 	"privacyPolicy": {
 		"title": "Privacy Policy",
-		"lastUpdated": "Last updated: {date}",
 		"sections": {
 			"introduction": {
 				"title": "Introduction",
@@ -1363,7 +1387,7 @@
 						},
 						"holidayData": {
 							"label": "Holiday data:",
-							"description": "Public holidays fetched from external APIs and cached locally."
+							"description": "The public holidays of your country and region, taken from the holiday data that ships with the app and kept locally. No request leaves your browser for them."
 						},
 						"customHolidays": {
 							"label": "Custom holidays:",
@@ -1455,10 +1479,6 @@
 					"paymentProcessors": {
 						"label": "Stripe (payment processing):",
 						"description": "Handles all payment processing securely. See Stripe's Privacy Policy."
-					},
-					"holidayProviders": {
-						"label": "Holiday data providers:",
-						"description": "We fetch public holiday data from external APIs but do not share your personal information with them."
 					},
 					"analytics": {
 						"label": "Google Analytics (if consented):",
@@ -1575,7 +1595,6 @@
 	},
 	"termsOfService": {
 		"title": "Terms of Service",
-		"lastUpdated": "Last updated: {date}",
 		"sections": {
 			"acceptance": {
 				"title": "Acceptance of terms",
@@ -1716,7 +1735,7 @@
 				"items": {
 					"accuracy": {
 						"label": "Accuracy of holiday data:",
-						"description": "While we strive for accuracy, holiday data is sourced from third-party APIs and may contain errors. Always verify with official sources."
+						"description": "While we strive for accuracy, holiday data comes from a third-party open-source dataset that ships with the app, and it may contain errors. Always verify with official sources."
 					},
 					"availability": {
 						"label": "Service availability:",
@@ -1772,7 +1791,6 @@
 				"description": "Forever PTO integrates with third-party services, including:",
 				"items": {
 					"payment": "Stripe for payment processing",
-					"holidayApis": "External APIs for holiday data",
 					"analytics": "Google Analytics for usage statistics (if consented)",
 					"external": "Links to external websites"
 				},
@@ -1883,7 +1901,6 @@
 	},
 	"legalNotice": {
 		"title": "Legal Notice",
-		"lastUpdated": "Last updated: {date}",
 		"sections": {
 			"identification": {
 				"title": "Website owner identification",

@@ -715,6 +715,23 @@ describe("the security header policy covers every request", () => {
 		},
 	);
 
+	it("admits on every page what Stripe.js asks of a CSP, since the locale layout loads it on every page for Stripe's fraud signals", () => {
+		const directives = (sent.get("Content-Security-Policy") ?? "").split(";").map((directive) => directive.trim());
+		const sources = (name: string) =>
+			(directives.find((entry) => entry.startsWith(`${name} `)) ?? "").split(/\s+/).slice(1);
+		const STRIPE_JS_POLICY = [
+			["script-src", "https://js.stripe.com"],
+			["script-src", "https://*.js.stripe.com"],
+			["frame-src", "https://js.stripe.com"],
+			["frame-src", "https://*.js.stripe.com"],
+			["frame-src", "https://hooks.stripe.com"],
+			["connect-src", "https://api.stripe.com"],
+		];
+
+		expect(sources("frame-src").length).toBeGreaterThan(0);
+		expect(STRIPE_JS_POLICY.filter(([name = "", host = ""]) => !sources(name).includes(host))).toEqual([]);
+	});
+
 	it("holds a browser to HTTPS for a year, subdomains included", () => {
 		const hsts = sent.get("Strict-Transport-Security") ?? "";
 		expect(Number(/max-age=(\d+)/.exec(hsts)?.[1] ?? 0)).toBeGreaterThanOrEqual(HSTS_MINIMUM_MAX_AGE);
@@ -724,6 +741,38 @@ describe("the security header policy covers every request", () => {
 	it("refuses framing and content sniffing outright", () => {
 		expect(FRAMING_REFUSALS).toContain(sent.get("X-Frame-Options"));
 		expect(sent.get("X-Content-Type-Options")).toBe("nosniff");
+	});
+
+	it("answers framing alike in X-Frame-Options and in frame-ancestors, because a browser without frame-ancestors obeys the older header alone", () => {
+		const FRAMING_BY_ANCESTORS: Record<string, string> = { "'none'": "DENY", "'self'": "SAMEORIGIN" };
+		const framingFor = (policy: string) =>
+			FRAMING_BY_ANCESTORS[
+				(policy.split(";").find((directive) => directive.trim().startsWith("frame-ancestors ")) ?? "")
+					.trim()
+					.replace("frame-ancestors ", "")
+			];
+		const docsSite = new Map(
+			read(`${DOCS}/public/_headers`)
+				.split(/\r?\n/)
+				.map((line) => /^\s+([\w-]+): (.+)$/.exec(line))
+				.filter((match) => match !== null)
+				.map(([, key = "", value = ""]) => [key, value]),
+		);
+
+		expect(framingFor("default-src 'self'; frame-ancestors 'none'")).toBe("DENY");
+		expect(framingFor("frame-ancestors 'self'; object-src 'none'")).toBe("SAMEORIGIN");
+		expect(framingFor("default-src 'self'")).toBeUndefined();
+		expect(docsSite.get("X-Frame-Options")).toBeDefined();
+		expect(sent.get("X-Frame-Options")).toBe(framingFor(sent.get("Content-Security-Policy") ?? ""));
+		expect(docsSite.get("X-Frame-Options")).toBe(framingFor(docsSite.get("Content-Security-Policy") ?? ""));
+	});
+
+	it("documents the X-Frame-Options value the app sends, since the data protection page quotes it", () => {
+		const PAGE = `${DOCS}/src/content/docs/how-it-works/data-protection.mdx`;
+		const quoted = [...read(PAGE).matchAll(/`X-Frame-Options: ([A-Z-]+)`/g)].map(([, value]) => value);
+
+		expect(quoted.length).toBeGreaterThan(0);
+		expect(quoted.filter((value) => value !== sent.get("X-Frame-Options"))).toEqual([]);
 	});
 
 	it("allows no font CDN, because next/font/google self-hosts at build time", () => {
@@ -1669,6 +1718,43 @@ interface LineAtParams {
 
 const lineAt = ({ source, at }: LineAtParams) => source.slice(0, at).split("\n").length;
 
+const BACKLOG_FILE = "BACKLOG.md";
+const KNOWN_BREACHES_HEADING = /^#{1,6}\s+(?:\d+\.\s+)?Known (?:inconsistencies|defects|breaches)\b/im;
+
+describe("the guides keep no list of known breaches", () => {
+	const everyPath = execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard"], {
+		cwd: ROOT,
+		encoding: "utf8",
+	})
+		.split("\n")
+		.filter((path) => path.length > 0 && existsSync(join(ROOT, path)));
+	const documents = [...linkedMarkdown, ...contentFiles];
+
+	it("keeps no BACKLOG.md anywhere in the tree, so no file holds a claim about the code that nothing keeps true", () => {
+		const isBacklog = (path: string) => basename(path) === BACKLOG_FILE;
+
+		expect([".github/BACKLOG.md", "apps/web/BACKLOG.md", BACKLOG_FILE].every(isBacklog)).toBe(true);
+		expect(isBacklog("apps/docs/src/content/docs/backlog.mdx")).toBe(false);
+		expect(everyPath.length).toBeGreaterThan(trackedFiles.length);
+		expect(everyPath.filter(isBacklog)).toEqual([]);
+	});
+
+	it("heads no section of any document as a list of known inconsistencies, defects or breaches; fix a breach in the change that finds it", () => {
+		const listing = documents.filter((doc) => KNOWN_BREACHES_HEADING.test(read(doc)));
+
+		expect(
+			[
+				"## 8. Known inconsistencies\n\n- an entry\n",
+				"## Known breaches of the coding standards\n",
+				"### Known defects\n",
+			].every((sample) => KNOWN_BREACHES_HEADING.test(sample)),
+		).toBe(true);
+		expect(KNOWN_BREACHES_HEADING.test("a breach is not a known inconsistencies list")).toBe(false);
+		expect(documents.length).toBeGreaterThan(100);
+		expect(listing).toEqual([]);
+	});
+});
+
 describe("the hand-written source carries no explanatory comments", () => {
 	const huskyHooks = readdirSync(join(ROOT, HUSKY_DIR), { withFileTypes: true })
 		.filter((entry) => entry.isFile())
@@ -2202,7 +2288,7 @@ describe("the imports CODING_STANDARDS.md hands to this suite", () => {
 		return found;
 	};
 
-	it("imports Stripe.js through its pure entry, because the bare entry fetches the script the moment it is imported", () => {
+	it("imports Stripe.js through its pure entry, because the bare entry injects the script the moment it is imported and writes a load that fails before anything asked to the console itself", () => {
 		const stripe = webProduction.flatMap((file) =>
 			importsOf(file)
 				.filter(({ specifier }) => specifier === STRIPE_JS || specifier === STRIPE_JS_PURE)
@@ -2217,7 +2303,7 @@ describe("the imports CODING_STANDARDS.md hands to this suite", () => {
 		expect(offenders).toEqual([]);
 	});
 
-	it("asks for Stripe.js only inside a function, never while a module loads, so a visitor who never donates never fetches it", () => {
+	it("asks for Stripe.js only inside a function, never while a module loads, so the ask runs in the browser, from the locale layout's effect or the checkout, where its failure is answered", () => {
 		const callers = webProduction.map((file) => ({
 			file,
 			...callsNamed({ source: parse(file), names: STRIPE_LOADERS }),
@@ -4260,6 +4346,341 @@ describe("workflows and package scripts keep the rules CODING_STANDARDS.md hands
 		expect(FORWARDED_FLAG.test("pnpm test:e2e -- --grep smoke")).toBe(true);
 		expect(bodies.filter(({ body }) => FORWARDED_FLAG.test(body)).map(({ source }) => source)).toEqual([]);
 	});
+
+	interface WorkflowStep {
+		uses?: string;
+		with?: Record<string, unknown>;
+	}
+
+	it("uploads every artifact a later job downloads with its hidden files, since upload-artifact drops public/.well-known unless told not to", () => {
+		const steps = workflowFiles.flatMap((file) =>
+			Object.values((loadYaml(read(file)) as { jobs?: Record<string, { steps?: WorkflowStep[] }> }).jobs ?? {}).flatMap(
+				({ steps: jobSteps = [] }) => jobSteps,
+			),
+		);
+		const downloaded = new Set(
+			steps.filter(({ uses = "" }) => uses.startsWith("actions/download-artifact@")).map((step) => step.with?.name),
+		);
+		const handedOver = steps.filter(
+			({ uses = "", with: inputs }) => uses.startsWith("actions/upload-artifact@") && downloaded.has(inputs?.name),
+		);
+
+		expect(handedOver.length).toBeGreaterThan(0);
+		expect(
+			handedOver
+				.filter(({ with: inputs }) => inputs?.["include-hidden-files"] !== true)
+				.map(({ with: inputs }) => inputs?.name),
+		).toEqual([]);
+	});
+});
+
+const PLAYWRIGHT_CONFIG = /(?:^|\/)playwright\.config\.[cm]?[jt]s$/;
+const PLAYWRIGHT_PROJECTS = `[
+	{ name: "chromium", use: { ...devices["Desktop Chrome"] } },
+	{ name: "webkit", use: { ...devices["Desktop Safari"] } },
+]`;
+const CODE_WHITESPACE = /\s+/g;
+const COMMA_BEFORE_CLOSER = /,([}\]])/g;
+const WORKFLOW_JOBS = /^jobs:\s*$/m;
+const WORKFLOW_JOB_HEADER = /^ {2}(?=[\w-]+:\s*$)/m;
+const PLAYWRIGHT_RUN = /\bplaywright test\b|\btest:e2e\b/;
+const PLAYWRIGHT_INSTALL = /\bplaywright install(?:-deps)?\b([^\n]*)/g;
+const PLAYWRIGHT_BROWSERS = "chromium webkit";
+const YAML_ITEM_DASH = /^-\s+/;
+const PLAYWRIGHT_BROWSER_STEPS = [
+	/^path: ~\/\.cache\/ms-playwright$/,
+	/^key: .+-playwright-chromium-webkit-.+$/,
+	/^if: steps\.playwright-cache\.outputs\.cache-hit != 'true'$/,
+	/^run: pnpm exec playwright install --with-deps chromium webkit$/,
+	/^if: steps\.playwright-cache\.outputs\.cache-hit == 'true'$/,
+	/^run: pnpm exec playwright install-deps chromium webkit$/,
+];
+
+const compactCode = (code: string): string => code.replace(CODE_WHITESPACE, "").replace(COMMA_BEFORE_CLOSER, "$1");
+
+const playwrightProjects = (config: string): string | undefined => {
+	const file = ts.createSourceFile("playwright.config.ts", config, ts.ScriptTarget.Latest, true);
+	let projects: string | undefined;
+	const visit = (node: ts.Node): void => {
+		if (ts.isPropertyAssignment(node) && node.name.getText(file) === "projects")
+			projects = node.initializer.getText(file);
+
+		ts.forEachChild(node, visit);
+	};
+
+	visit(file);
+
+	return projects;
+};
+
+const jobsIn = (workflow: string): string[] =>
+	(workflow.split(WORKFLOW_JOBS)[1] ?? "").split(WORKFLOW_JOB_HEADER).filter((job) => job.trim() !== "");
+
+const missingBrowserSteps = (job: string): string[] => {
+	const lines = job.split(/\r?\n/).map((line) => line.trim().replace(YAML_ITEM_DASH, ""));
+
+	return PLAYWRIGHT_RUN.test(job)
+		? PLAYWRIGHT_BROWSER_STEPS.filter((step) => !lines.some((line) => step.test(line))).map((step) => step.source)
+		: [];
+};
+
+const installedBrowsers = (workflow: string): string[] =>
+	[...workflow.matchAll(PLAYWRIGHT_INSTALL)].map(([, rest = ""]) =>
+		rest
+			.trim()
+			.split(CODE_WHITESPACE)
+			.filter((word) => !word.startsWith("-"))
+			.join(" "),
+	);
+
+describe("the end-to-end browsers", () => {
+	it("runs every Playwright config in Chromium and WebKit alone, in CI and locally alike", () => {
+		const configs = trackedFiles.filter((file) => PLAYWRIGHT_CONFIG.test(file));
+		const sample = (projects: string) =>
+			compactCode(
+				playwrightProjects(`export default defineConfig({ testDir: "./e2e", projects: ${projects} });`) ?? "",
+			);
+		const expanded = `[\n\t{\n\t\tname: "chromium",\n\t\tuse: { ...devices["Desktop Chrome"] },\n\t},\n\t{\n\t\tname: "webkit",\n\t\tuse: { ...devices["Desktop Safari"] },\n\t},\n]`;
+
+		expect(sample(expanded)).toBe(compactCode(PLAYWRIGHT_PROJECTS));
+		expect(sample(`process.env.CI ? ${PLAYWRIGHT_PROJECTS} : [{ name: "chromium" }]`)).not.toBe(
+			compactCode(PLAYWRIGHT_PROJECTS),
+		);
+		expect(
+			sample(PLAYWRIGHT_PROJECTS.replace("]", `\t{ name: "firefox", use: { ...devices["Desktop Firefox"] } },\n]`)),
+		).not.toBe(compactCode(PLAYWRIGHT_PROJECTS));
+		expect(configs).toEqual([`${DOCS}/playwright.config.ts`, `${WEB}/playwright.config.ts`]);
+		expect(
+			configs.filter((file) => compactCode(playwrightProjects(read(file)) ?? "") !== compactCode(PLAYWRIGHT_PROJECTS)),
+		).toEqual([]);
+	});
+
+	it("installs both browsers in every job that runs Playwright, behind a cache keyed on them, so a cache saved with one is never restored into a run of both", () => {
+		const jobs = workflowFiles.flatMap((file) => jobsIn(read(file)).map((job) => ({ file, job })));
+		const running = jobs.filter(({ job }) => PLAYWRIGHT_RUN.test(job));
+		const steps = [
+			"path: ~/.cache/ms-playwright",
+			"key: os-playwright-chromium-webkit-lockfile",
+			"if: steps.playwright-cache.outputs.cache-hit != 'true'",
+			"run: pnpm exec playwright install --with-deps chromium webkit",
+			"if: steps.playwright-cache.outputs.cache-hit == 'true'",
+			"run: pnpm exec playwright install-deps chromium webkit",
+		];
+		const workflow = (lines: string[]) =>
+			`name: x\njobs:\n  e2e:\n    steps:\n      - name: Browsers\n${lines.map((line) => `        ${line}`).join("\n")}\n      - run: pnpm test:e2e\n  other:\n    steps:\n      - run: echo\n`;
+		const keyedOnChromium = steps.map((step) => step.replace("-playwright-chromium-webkit-", "-playwright-"));
+
+		expect(jobsIn(workflow(steps)).length).toBe(2);
+		expect(jobsIn(workflow(steps)).flatMap(missingBrowserSteps)).toEqual([]);
+		expect(jobsIn(workflow(keyedOnChromium)).flatMap(missingBrowserSteps)).toEqual([
+			PLAYWRIGHT_BROWSER_STEPS[1]?.source,
+		]);
+		expect(installedBrowsers("run: pnpm exec playwright install --with-deps chromium\n")).toEqual(["chromium"]);
+		expect(installedBrowsers(steps.join("\n"))).toEqual([PLAYWRIGHT_BROWSERS, PLAYWRIGHT_BROWSERS]);
+		expect(running.length).toBeGreaterThanOrEqual(4);
+		expect(running.flatMap(({ file, job }) => missingBrowserSteps(job).map((step) => `${file}: ${step}`))).toEqual([]);
+		expect(
+			workflowFiles.flatMap((file) =>
+				installedBrowsers(read(file))
+					.filter((browsers) => browsers !== PLAYWRIGHT_BROWSERS)
+					.map((browsers) => `${file}: ${browsers}`),
+			),
+		).toEqual([]);
+	});
+});
+
+const ACCESS_FIXTURE = `${WEB}/e2e/fixtures.ts`;
+const PLAYWRIGHT_PACKAGE = "@playwright/test";
+const EXTRA_HEADERS_OPTION = "extraHTTPHeaders";
+const EXTRA_HEADERS_SETTER = "setExtraHTTPHeaders";
+const E2E_SOURCE = /^apps\/(?:web|docs)\/e2e\/.+\.ts$/;
+
+const importsPlaywrightValues = (source: string): boolean =>
+	ts
+		.createSourceFile("spec.ts", source, ts.ScriptTarget.Latest, true)
+		.statements.filter(ts.isImportDeclaration)
+		.filter(({ moduleSpecifier }) => ts.isStringLiteral(moduleSpecifier) && moduleSpecifier.text === PLAYWRIGHT_PACKAGE)
+		.some(({ importClause }) => {
+			if (!importClause) return true;
+			if (importClause.isTypeOnly) return false;
+			if (importClause.name) return true;
+			const bindings = importClause.namedBindings;
+
+			return !bindings || ts.isNamespaceImport(bindings) || bindings.elements.some((element) => !element.isTypeOnly);
+		});
+
+const setsExtraHeaders = (source: string): boolean => {
+	const file = ts.createSourceFile("source.ts", source, ts.ScriptTarget.Latest, true);
+	let found = false;
+	const visit = (node: ts.Node): void => {
+		if (
+			(ts.isPropertyAssignment(node) || ts.isShorthandPropertyAssignment(node)) &&
+			node.name.getText(file) === EXTRA_HEADERS_OPTION
+		)
+			found = true;
+		if (ts.isPropertyAccessExpression(node) && node.name.text === EXTRA_HEADERS_SETTER) found = true;
+
+		ts.forEachChild(node, visit);
+	};
+
+	visit(file);
+
+	return found;
+};
+
+describe("the preview's Access token", () => {
+	const e2eSources = trackedFiles.filter((file) => E2E_SOURCE.test(file) && file !== ACCESS_FIXTURE);
+
+	it("reaches every spec of the app through apps/web/e2e/fixtures.ts, which sends it to the preview's origin alone, so no spec there takes a value from @playwright/test", () => {
+		const webSources = e2eSources.filter((file) => file.startsWith(`${WEB}/e2e/`));
+
+		expect(importsPlaywrightValues('import { expect, test } from "@playwright/test";')).toBe(true);
+		expect(importsPlaywrightValues('import { expect, type Page, test } from "@playwright/test";')).toBe(true);
+		expect(importsPlaywrightValues('import * as playwright from "@playwright/test";')).toBe(true);
+		expect(importsPlaywrightValues('import type { Page } from "@playwright/test";')).toBe(false);
+		expect(importsPlaywrightValues('import { type Page } from "@playwright/test";')).toBe(false);
+		expect(importsPlaywrightValues('import { expect, test } from "./fixtures";')).toBe(false);
+		expect(existsSync(join(ROOT, ACCESS_FIXTURE))).toBe(true);
+		expect(webSources.filter((file) => file.endsWith(".spec.ts")).length).toBeGreaterThan(0);
+		expect(webSources.filter((file) => importsPlaywrightValues(read(file)))).toEqual([]);
+	});
+
+	it("is set as extraHTTPHeaders by no Playwright config and no spec, because Playwright sends those on every request a page makes, to every third party included", () => {
+		const configs = trackedFiles.filter((file) => PLAYWRIGHT_CONFIG.test(file));
+
+		expect(setsExtraHeaders("export default defineConfig({ use: { extraHTTPHeaders: headers } });")).toBe(true);
+		expect(setsExtraHeaders("test.use({ extraHTTPHeaders });")).toBe(true);
+		expect(setsExtraHeaders("await page.setExtraHTTPHeaders(headers);")).toBe(true);
+		expect(setsExtraHeaders('export default defineConfig({ use: { baseURL: "http://localhost" } });')).toBe(false);
+		expect(configs.length).toBeGreaterThan(0);
+		expect(e2eSources.some((file) => file.startsWith(`${DOCS}/e2e/`))).toBe(true);
+		expect([...configs, ...e2eSources].filter((file) => setsExtraHeaders(read(file)))).toEqual([]);
+	});
+});
+
+const SECURITY_TXT = /(?:^|\/)(?:public|assets)\/(?:.+\/)?security\.txt$/;
+const SECURITY_TXT_PATH = "/.well-known/security.txt";
+const SECURITY_TXT_FIELD = /^([\w-]+): *(.*)$/gm;
+const SECURITY_TXT_SHAPE = ["Contact", "Expires", "Preferred-Languages", "Canonical", "Policy"].join(", ");
+const SECURITY_TXT_RENEWAL_DAYS = 30;
+const SECURITY_TXT_LIFETIME_YEARS = 2;
+const DAY_IN_MS = 86_400_000;
+const BARE_ORIGIN = /^https:\/\/[^/]+$/;
+const GITHUB_REPOSITORY = /^git\+(https:\/\/github\.com\/[\w.-]+\/[\w-]+)\.git$/;
+const DOCS_SITE_DECLARATION = /^\tsite: "([^"]+)",$/m;
+const QUOTED_VALUE = /^"([^"]*)"$/;
+const SITES_SERVED = 2;
+
+interface SecurityTxtFaultsParams {
+	text: string;
+	origin: string;
+	repository: string;
+	now: number;
+}
+
+const securityTxtFaults = ({ text, origin, repository, now }: SecurityTxtFaultsParams): string[] => {
+	const fields = new Map([...text.matchAll(SECURITY_TXT_FIELD)].map(([, name, value]) => [name, value.trim()]));
+	const shape = [...fields.keys()].join(", ");
+	const expires = fields.get("Expires") ?? "";
+	const instant = Date.parse(expires);
+	const ceiling = new Date(now);
+	const canonical = `${origin}${SECURITY_TXT_PATH}`;
+	const policy = `${repository}/security/policy`;
+
+	ceiling.setUTCFullYear(ceiling.getUTCFullYear() + SECURITY_TXT_LIFETIME_YEARS);
+
+	const checks: [boolean, string][] = [
+		[shape === SECURITY_TXT_SHAPE, `its fields are ${shape}, not ${SECURITY_TXT_SHAPE}`],
+		[
+			!Number.isNaN(instant) && new Date(instant).toISOString() === expires,
+			`Expires ${expires} is not an ISO 8601 instant`,
+		],
+		[
+			!(instant - now < SECURITY_TXT_RENEWAL_DAYS * DAY_IN_MS),
+			`Expires ${expires} is fewer than ${SECURITY_TXT_RENEWAL_DAYS} days away: renew it`,
+		],
+		[!(instant > ceiling.getTime()), `Expires ${expires} is more than ${SECURITY_TXT_LIFETIME_YEARS} years away`],
+		[fields.get("Canonical") === canonical, `Canonical ${fields.get("Canonical")} is not ${canonical}`],
+		[fields.get("Policy") === policy, `Policy ${fields.get("Policy")} is not ${policy}`],
+	];
+
+	return checks.filter(([holds]) => !holds).map(([, fault]) => fault);
+};
+
+describe("security.txt", () => {
+	const [productionVars] = wranglerSection({ environment: "env.production", table: "vars" });
+	const webOrigin = productionVars?.entries.NEXT_PUBLIC_SITE_URL?.match(QUOTED_VALUE)?.[1] ?? "";
+	const docsOrigin = read(`${DOCS}/astro.config.ts`).match(DOCS_SITE_DECLARATION)?.[1] ?? "";
+	const repository = String(rootManifest.repository?.url).match(GITHUB_REPOSITORY)?.[1] ?? "";
+	const sites = new Map([
+		[`${WEB}/public`, webOrigin],
+		[`${DOCS}/public`, docsOrigin],
+	]);
+	const files = trackedFiles.filter((file) => SECURITY_TXT.test(file)).sort();
+
+	it("keeps one security.txt on every site this repository serves, naming a contact, the site's own canonical URL and this repository's policy, and reads the real clock on purpose: an Expires fewer than 30 days away turns main red a month before the file lapses, so the fix is to renew it, and one more than two years away is past the owner's ceiling", () => {
+		const now = Date.UTC(2026, 9, 10);
+		const inDays = (days: number) => new Date(now + days * DAY_IN_MS).toISOString();
+		const sample = (fields: Record<string, string>) =>
+			securityTxtFaults({
+				text: Object.entries(fields)
+					.map(([name, value]) => `${name}: ${value}`)
+					.join("\n"),
+				origin: "https://example.org",
+				repository: "https://github.com/owner/site",
+				now,
+			});
+		const valid = {
+			Contact: "mailto:security@example.org",
+			Expires: inDays(365),
+			"Preferred-Languages": "en",
+			Canonical: "https://example.org/.well-known/security.txt",
+			Policy: "https://github.com/owner/site/security/policy",
+		};
+		const { Canonical: canonical, ...noCanonical } = valid;
+		const { Policy: policy, ...noPolicy } = valid;
+
+		expect(SECURITY_TXT.test("apps/docs/public/.well-known/security.txt")).toBe(true);
+		expect(SECURITY_TXT.test("app/assets/security.txt")).toBe(true);
+		expect(SECURITY_TXT.test("docs/security.txt")).toBe(false);
+		expect(sample(valid)).toEqual([]);
+		expect(sample({ ...valid, Expires: inDays(30) })).toEqual([]);
+		expect(sample({ ...valid, Expires: inDays(29) })).toEqual([
+			`Expires ${inDays(29)} is fewer than 30 days away: renew it`,
+		]);
+		expect(sample({ ...valid, Expires: "2028-10-01T00:00:00.000Z" })).toEqual([]);
+		expect(sample({ ...valid, Expires: "2028-10-11T00:00:00.000Z" })).toEqual([
+			"Expires 2028-10-11T00:00:00.000Z is more than 2 years away",
+		]);
+		expect(sample({ ...valid, Expires: "the first of October" })).toEqual([
+			"Expires the first of October is not an ISO 8601 instant",
+		]);
+		expect(sample(noCanonical)).toEqual([
+			"its fields are Contact, Expires, Preferred-Languages, Policy, not Contact, Expires, Preferred-Languages, Canonical, Policy",
+			`Canonical undefined is not ${canonical}`,
+		]);
+		expect(sample({ ...valid, Canonical: "https://example.com/.well-known/security.txt" })).toEqual([
+			`Canonical https://example.com/.well-known/security.txt is not ${canonical}`,
+		]);
+		expect(sample(noPolicy)).toEqual([
+			"its fields are Contact, Expires, Preferred-Languages, Canonical, not Contact, Expires, Preferred-Languages, Canonical, Policy",
+			`Policy undefined is not ${policy}`,
+		]);
+		expect([...sites.values()].filter((origin) => !BARE_ORIGIN.test(origin))).toEqual([]);
+		expect(repository).not.toBe("");
+		expect(files.length).toBeGreaterThanOrEqual(SITES_SERVED);
+		expect(files).toEqual([...sites.keys()].map((folder) => `${folder}${SECURITY_TXT_PATH}`).sort());
+		expect(
+			files.flatMap((file) =>
+				securityTxtFaults({
+					text: read(file),
+					origin: sites.get(file.slice(0, -SECURITY_TXT_PATH.length)) ?? "",
+					repository,
+					now: Date.now(),
+				}).map((fault) => `${file}: ${fault}`),
+			),
+		).toEqual([]);
+	});
 });
 
 describe("the guides describe the project as it is configured", () => {
@@ -4654,6 +5075,112 @@ describe("translation bundles stay in step", () => {
 		return out;
 	};
 
+	const COOKIE_WRITES = [
+		/\.cookies\.set\(\s*([A-Z][A-Z0-9_]*)\s*,/g,
+		/\.cookies\.set\(\s*\{\s*\.\.\.([A-Z][A-Z0-9_]*)/g,
+		/\bsetCookie\(\s*\{\s*name:\s*([A-Z][A-Z0-9_]*)/g,
+		/\bdocument\.cookie\s*=\s*`\$\{([A-Z][A-Z0-9_]*)\}=/g,
+	];
+	const STRING_CONSTANT = /\bconst ([A-Z][A-Z0-9_]*)\s*=\s*"([^"]+)"/g;
+	const FIRST_PARTY_CONSENT_ENTRY = /name:\s*(?:"([^"]+)"|([A-Z][A-Z0-9_]*)),[^}]*?provider:\s*"Forever PTO"/g;
+	const CONSENT_CONFIG = `${WEB_SRC}/ui/modules/shared/cookie-consent/config/config.ts`;
+
+	const cookieNameIdentifiers = (source: string) =>
+		COOKIE_WRITES.flatMap((pattern) => [...source.matchAll(pattern)].map(([, name = ""]) => name));
+	const stringConstants = new Map(
+		webProduction.flatMap((file) =>
+			[...read(file).matchAll(STRING_CONSTANT)].map(([, name = "", value = ""]) => [name, value] as const),
+		),
+	);
+	const objectNameField = (identifier: string) =>
+		webProduction
+			.map(
+				(file) =>
+					new RegExp(`\\bconst ${identifier}\\s*=\\s*\\{[^}]*?\\bname:\\s*([A-Z][A-Z0-9_]*)`).exec(read(file))?.[1],
+			)
+			.find((name) => name !== undefined);
+	const cookieNameOf = (identifier: string) =>
+		stringConstants.get(identifier) ?? stringConstants.get(objectNameField(identifier) ?? "");
+	const firstPartyEntries = (source: string) =>
+		[...source.matchAll(FIRST_PARTY_CONSENT_ENTRY)].map(
+			([, literal, identifier = ""]) => literal ?? cookieNameOf(identifier) ?? identifier,
+		);
+	const writtenIdentifiers = () => [...new Set(webProduction.flatMap((file) => cookieNameIdentifiers(read(file))))];
+
+	it("lists in the consent dialog's catalogue, as the app's own, every cookie the app writes, so the dialog shows what a browser finds", () => {
+		const written = writtenIdentifiers().map(cookieNameOf);
+		const catalogued = firstPartyEntries(read(CONSENT_CONFIG));
+
+		expect(
+			firstPartyEntries(
+				'{ name: USER_COUNTRY_COOKIE, expiryKey: "weeks", provider: "Forever PTO" }, { name: "cc_cookie", expiryKey: "months", provider: "Forever PTO" }, { name: "__stripe_mid", expiryKey: "years", provider: "Stripe" }',
+			),
+		).toEqual(["user-country", "cc_cookie"]);
+		expect(written.length).toBeGreaterThanOrEqual(5);
+		expect(written.filter((name) => name === undefined || !catalogued.includes(name))).toEqual([]);
+	});
+
+	it("names in every bundle's cookie policy every cookie the app sets, its consent cookie included, so the policy lists what a browser finds", () => {
+		const written = writtenIdentifiers();
+		const consented = firstPartyEntries(read(CONSENT_CONFIG));
+		const cookies = [...new Set([...written.map(cookieNameOf), ...consented])];
+		const policyText = (file: string) =>
+			entriesOf(file)
+				.filter(([path]) => path.startsWith("cookiePolicy."))
+				.map(([, value]) => value)
+				.join("\n");
+
+		expect(cookieNameIdentifiers("response.cookies.set(PREMIUM_COOKIE, token, {")).toEqual(["PREMIUM_COOKIE"]);
+		expect(cookieNameIdentifiers("response.cookies.set({ ...LOCALE_COOKIE_POLICY, value });")).toEqual([
+			"LOCALE_COOKIE_POLICY",
+		]);
+		expect(cookieNameIdentifiers("setCookie({ name: SIDEBAR_COOKIE_NAME, value })")).toEqual(["SIDEBAR_COOKIE_NAME"]);
+		expect(cookieNameIdentifiers(`document.cookie = \`\${ACTIVATION_COOKIE}=; path=/\`;`)).toEqual([
+			"ACTIVATION_COOKIE",
+		]);
+		expect(cookieNameIdentifiers("cookieStore.get(PREMIUM_COOKIE)?.value")).toEqual([]);
+		expect(written.filter((identifier) => cookieNameOf(identifier) === undefined)).toEqual([]);
+		expect(cookies).toEqual(expect.arrayContaining(["premium-token", "premium-activation", "cc_cookie"]));
+		expect(cookies.length).toBeGreaterThanOrEqual(6);
+		expect(
+			localeFiles.flatMap((file) =>
+				cookies
+					.filter((name) => name !== undefined && !policyText(file).includes(name))
+					.map((name) => `${file} ${name}`),
+			),
+		).toEqual([]);
+	});
+
+	const HOLIDAY_WORD: Record<string, RegExp> = {
+		"en.json": /holiday/i,
+		"es.json": /festiv/i,
+		"ca.json": /festiu/i,
+		"it.json": /festivit/i,
+		"de.json": /feiertag/i,
+		"fr.json": /férié/i,
+	};
+	const API_WORD = /\bAPIs?\b|-APIs?\b/;
+
+	it("holds a holiday word for every bundle", () => {
+		expect(Object.keys(HOLIDAY_WORD).sort()).toEqual([...localeFiles].sort());
+	});
+
+	it.each(Object.keys(HOLIDAY_WORD))(
+		"%s never says the holiday data comes from an API, because the dataset ships inside the app and nothing is fetched",
+		(file) => {
+			const holiday = HOLIDAY_WORD[file] as RegExp;
+			const claims = entriesOf(file)
+				.filter(([, value]) => holiday.test(value) && API_WORD.test(value))
+				.map(([path, value]) => `${path} -> ${value}`);
+
+			expect(entriesOf(file).filter(([, value]) => holiday.test(value)).length).toBeGreaterThan(0);
+			expect(API_WORD.test("Holiday APIs:")).toBe(true);
+			expect(API_WORD.test("stammen aus Drittanbieter-APIs")).toBe(true);
+			expect(API_WORD.test("rapid response")).toBe(false);
+			expect(claims).toEqual([]);
+		},
+	);
+
 	it.each(Object.keys(FORMAL_ADDRESS))("%s addresses the user informally, like every other bundle", (file) => {
 		const pattern = FORMAL_ADDRESS[file] as RegExp;
 		const formal = entriesOf(file)
@@ -4812,13 +5339,12 @@ describe("translation bundles stay in step", () => {
 		expect(stale).toEqual([]);
 	});
 
-	const UPPERCASE_RUN = /(?<![\p{L}\p{N}])\p{Lu}{2,}(?![\p{L}\p{N}])/gu;
+	const UPPERCASE_RUN = /(?<![\p{L}\p{N}_])\p{Lu}{2,}(?![\p{L}\p{N}_])/gu;
 
 	const ACRONYMS = new Set([
 		"AEPD",
 		"AI",
 		"APDCAT",
-		"API",
 		"CE",
 		"CNIL",
 		"DSGVO",
@@ -4859,6 +5385,14 @@ describe("translation bundles stay in step", () => {
 		"UX",
 		"XOR",
 	]);
+
+	it("reads a name joined by underscores as an identifier, not as shouting, since the cookie policy names NEXT_LOCALE", () => {
+		const runs = (text: string) => [...text.matchAll(UPPERCASE_RUN)].map(([run]) => run);
+
+		expect(runs("Language (NEXT_LOCALE): remembers it")).toEqual([]);
+		expect(runs("PLEASE read the GDPR text")).toEqual(["PLEASE", "GDPR"]);
+		expect(runs("a NEXT step")).toEqual(["NEXT"]);
+	});
 
 	it.each(localeFiles)("%s shouts nothing an acronym does not explain", (file) => {
 		const shouted = entriesOf(file)

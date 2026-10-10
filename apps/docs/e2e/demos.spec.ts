@@ -57,6 +57,11 @@ for (const path of demoPages) {
 				.toBeGreaterThan(0);
 		}
 
+		await expect(page.locator("astro-island[ssr]"), `${path} has an island that never hydrated`).toHaveCount(0, {
+			timeout: 10_000,
+		});
+		await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+
 		expect(failures, path).toEqual([]);
 	});
 }

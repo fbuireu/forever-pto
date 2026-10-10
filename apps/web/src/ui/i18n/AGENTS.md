@@ -57,8 +57,19 @@ go hunting for a key:
 - **[`tests/docs-consistency.test.ts`](../../../../../tests/docs-consistency.test.ts) fails a string in ALL
   CAPS.** The scan matches a run of two or more uppercase letters that is a whole token, against a named
   acronym allow-list. Whole-token matching is what keeps `iOS` and `BfDI` out of it: a bare `\p{Lu}{2,}` reads
-  `OS` and `DI` inside them and reports both. A second case asserts every name on the allow-list is still used,
-  so the list shrinks with the copy instead of accumulating.
+  `OS` and `DI` inside them and reports both. A run joined to another by an underscore is a name from the code, not
+  shouting, which is how the cookie policy names `NEXT_LOCALE`. A second case asserts every name on the allow-list
+  is still used, so the list shrinks with the copy instead of accumulating.
+- **The cookie policy names every cookie the app sets, by the name a browser shows, and the consent dialog lists
+  it.** The contract suite collects the names from the code (every `cookies.set`, `setCookie` and `document.cookie`
+  write in `src`) and fails a catalogue in `modules/shared/cookie-consent/config/config.ts` that does not list one
+  as Forever PTO's, and a bundle whose `cookiePolicy` leaves one out, so a new cookie arrives with its catalogue
+  entry, its `cookies.*Desc` and its policy line in all six bundles. The names stay literal in the copy,
+  untranslated; a lifetime the code counts in days reads through `cookies.days`.
+- **No bundle says the holiday data comes from an API.** The `date-holidays` dataset ships inside the app and
+  nothing is fetched for it ([`../../infrastructure/services/holidays/AGENTS.md`](../../infrastructure/services/holidays/AGENTS.md)),
+  so the policies call it data that ships with the app; the contract suite fails a value that names a holiday and an
+  API together, with one holiday word per bundle.
 - **`a11y` holds three kinds of string.** Names a `core/` component cannot translate for itself, because those
   files may not call `useTranslations` ([`../modules/core/AGENTS.md`](../modules/core/AGENTS.md)), so the
   *caller* supplies them: `closeDialog` for every modal's close button, `closeToast` for the sonner toaster,

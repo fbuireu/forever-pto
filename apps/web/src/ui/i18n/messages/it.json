@@ -799,9 +799,14 @@
 		"years": "{count, plural, one {# anno} other {# anni}}",
 		"minutes": "{count, plural, one {# minuto} other {# minuti}}",
 		"hours": "{count, plural, one {# ora} other {# ore}}",
+		"days": "{count, plural, one {# giorno} other {# giorni}}",
 		"weeks": "{count, plural, one {# settimana} other {# settimane}}",
 		"userCountryDesc": "Memorizza il paese rilevato per il suggerimento iniziale dei festivi.",
 		"ccCookieDesc": "Memorizza le tue preferenze di consenso ai cookie",
+		"premiumTokenDesc": "Mantiene Premium sbloccato in questo browser dopo una donazione.",
+		"premiumActivationDesc": "Segnala un pagamento che ha appena sbloccato Premium, per registrare l'attivazione una sola volta.",
+		"localeDesc": "Ricorda la lingua in cui leggi il sito.",
+		"sidebarStateDesc": "Ricorda se hai lasciato aperta o chiusa la barra laterale.",
 		"stripeMidDesc": "Prevenzione e rilevamento frodi. Impostato da Stripe per l'elaborazione sicura dei pagamenti.",
 		"stripeSidDesc": "Identificatore di sessione per la prevenzione delle frodi. Richiesto per il processo di checkout.",
 		"gaDesc": "Distingue utenti unici.",
@@ -1136,7 +1141,6 @@
 	},
 	"cookiePolicy": {
 		"title": "Informativa sui cookie",
-		"lastUpdated": "Ultimo aggiornamento: {date}",
 		"sections": {
 			"introduction": {
 				"title": "Introduzione",
@@ -1158,7 +1162,7 @@
 					"socialMedia": "Cookie dei social media"
 				},
 				"strictlyNecessary": {
-					"title": "Cookie strettamente necessari (archiviazione locale)",
+					"title": "Cookie strettamente necessari e archiviazione locale",
 					"description": "Utilizziamo l'archiviazione locale del browser per salvare le tue preferenze e lo stato dell'applicazione. Sono essenziali per il funzionamento del sito web e non possono essere disabilitati:",
 					"items": {
 						"filters": {
@@ -1189,6 +1193,31 @@
 					"duration": {
 						"label": "Durata:",
 						"description": "Questi dati vengono memorizzati in modo permanente nell'archiviazione locale del tuo browser fino a quando non li elimini manualmente."
+					},
+					"cookies": {
+						"description": "Utilizziamo anche questi cookie di prima parte. Ognuno è strettamente necessario e nessuno viene condiviso con terze parti:",
+						"items": {
+							"premiumSession": {
+								"label": "Sessione Premium (premium-token):",
+								"description": "Mantiene Premium sbloccato in questo browser dopo che hai fatto una donazione. È di prima parte, solo il nostro server può leggerlo e dura 30 giorni."
+							},
+							"activationProof": {
+								"label": "Prova di attivazione (premium-activation):",
+								"description": "Segnala all'applicazione che un pagamento ha appena sbloccato Premium, così l'attivazione viene registrata una sola volta. È di prima parte e dura al massimo un'ora: l'applicazione lo elimina non appena ha confermato la tua sessione."
+							},
+							"country": {
+								"label": "Paese (user-country):",
+								"description": "Ricorda il paese che abbiamo rilevato per te, così il pianificatore si apre con le sue festività. È di prima parte e dura 7 giorni."
+							},
+							"language": {
+								"label": "Lingua (NEXT_LOCALE):",
+								"description": "Ricorda la lingua in cui leggi il sito. È di prima parte e viene eliminato quando chiudi il browser."
+							},
+							"sidebar": {
+								"label": "Barra laterale (sidebar_state):",
+								"description": "Ricorda se hai lasciato aperta o chiusa la barra laterale. È di prima parte e dura 7 giorni."
+							}
+						}
 					}
 				}
 			},
@@ -1256,11 +1285,7 @@
 				"items": {
 					"payment": {
 						"label": "Stripe (elaborazione pagamenti):",
-						"description": "Quando acquisti Premium, Stripe potrebbe impostare cookie per la prevenzione delle frodi e l'elaborazione dei pagamenti. Consulta l'Informativa sui cookie di Stripe."
-					},
-					"holidayApis": {
-						"label": "API festività:",
-						"description": "Utilizziamo API esterne per ottenere i dati sulle festività, ma queste non impostano cookie sul nostro sito."
+						"description": "Stripe si carica in tutte le pagine di Forever PTO, non solo quando fai una donazione, perché la sua prevenzione delle frodi veda come viene usato il sito prima di un pagamento. Potrebbe impostare i suoi cookie di prevenzione delle frodi (__stripe_mid e __stripe_sid) in qualsiasi pagina; sono strettamente necessari, quindi vengono impostati che tu accetti o meno i cookie analitici. Consulta l'Informativa sui cookie di Stripe."
 					},
 					"analytics": {
 						"label": "Better Stack (analisi):",
@@ -1327,7 +1352,6 @@
 	},
 	"privacyPolicy": {
 		"title": "Informativa sulla privacy",
-		"lastUpdated": "Ultimo aggiornamento: {date}",
 		"sections": {
 			"introduction": {
 				"title": "Introduzione",
@@ -1363,7 +1387,7 @@
 						},
 						"holidayData": {
 							"label": "Dati sulle festività:",
-							"description": "Festività pubbliche ottenute da API esterne e memorizzate localmente nella cache."
+							"description": "Le festività del tuo paese e della tua regione, prese dai dati sulle festività inclusi nell'applicazione e salvate localmente. Nessuna richiesta lascia il tuo browser per ottenerle."
 						},
 						"customHolidays": {
 							"label": "Festività personalizzate:",
@@ -1455,10 +1479,6 @@
 					"paymentProcessors": {
 						"label": "Stripe (elaborazione pagamenti):",
 						"description": "Gestisce in modo sicuro tutta l'elaborazione dei pagamenti. Consulta l'Informativa sulla privacy di Stripe."
-					},
-					"holidayProviders": {
-						"label": "Fornitori di dati sulle festività:",
-						"description": "Otteniamo dati sulle festività pubbliche da API esterne ma non condividiamo le tue informazioni personali con loro."
 					},
 					"analytics": {
 						"label": "Google Analytics (previo consenso):",
@@ -1575,7 +1595,6 @@
 	},
 	"termsOfService": {
 		"title": "Termini di servizio",
-		"lastUpdated": "Ultimo aggiornamento: {date}",
 		"sections": {
 			"acceptance": {
 				"title": "Accettazione dei termini",
@@ -1716,7 +1735,7 @@
 				"items": {
 					"accuracy": {
 						"label": "Accuratezza dei dati sulle festività:",
-						"description": "Sebbene ci impegniamo per l'accuratezza, i dati sulle festività provengono da API di terze parti e potrebbero contenere errori. Verifica sempre con fonti ufficiali."
+						"description": "Sebbene ci impegniamo per l'accuratezza, i dati sulle festività provengono da un insieme di dati open source di terze parti incluso nell'applicazione e potrebbero contenere errori. Verifica sempre con fonti ufficiali."
 					},
 					"availability": {
 						"label": "Disponibilità del servizio:",
@@ -1772,7 +1791,6 @@
 				"description": "Forever PTO si integra con servizi di terze parti, tra cui:",
 				"items": {
 					"payment": "Stripe per l'elaborazione dei pagamenti",
-					"holidayApis": "API esterne per i dati sulle festività",
 					"analytics": "Google Analytics per le statistiche di utilizzo (previo consenso)",
 					"external": "Link a siti web esterni"
 				},
@@ -1883,7 +1901,6 @@
 	},
 	"legalNotice": {
 		"title": "Note legali",
-		"lastUpdated": "Ultimo aggiornamento: {date}",
 		"sections": {
 			"identification": {
 				"title": "Identificazione del proprietario del sito web",

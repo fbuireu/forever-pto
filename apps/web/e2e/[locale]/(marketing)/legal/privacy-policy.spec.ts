@@ -1,6 +1,6 @@
 import { ES } from "@infrastructure/i18n/locales";
 import type { RoutePath } from "@infrastructure/seo/routes";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../../../fixtures";
 
 const PATH = "/legal/privacy-policy" satisfies RoutePath;
 

@@ -9,7 +9,7 @@ import { brutCard, SHOWCASE_PLAN } from '@ui/modules/pages/homepage/sections/sha
 import { BrutCardDemo, DayCellsDemo, DAY_TYPE_ROWS } from '../../../../components/demos/HomepagePatternsDemo';
 import { VariantsTable } from '../../../../components/VariantsTable';
 
-Source: `apps/web/src/ui/modules/pages/homepage/sections/shared.ts`. The homepage sections (`Hero`, `Features`, `Comparison`, `HowItWorks`, `Pricing`, `Stats`, `Testimonials` under `apps/web/src/ui/modules/pages/homepage/sections/`) share **class-string constants** rather than components, the planner call to action (`QuickStartTrigger`) aside. This file is pure data (a type, the `dayCell` class map, the `brutCard` class string, a fixture array, the showcase plan and its ratio), which is why this page can import it and render the real styles live.
+Source: `apps/web/src/ui/modules/pages/homepage/sections/shared.ts`. The homepage sections (`Hero`, `Features`, `Comparison`, `HowItWorks`, `Pricing`, `Stats`, `Testimonials` under `apps/web/src/ui/modules/pages/homepage/sections/`) share **class-string constants** rather than components, the planner call to action (`QuickStartTrigger`) aside. This file is pure data (a type, the `dayCell` class map, the `brutCard` class string, a fixture array, the showcase plan and its ratio, and `COUNTRY_COUNT`, the Countries the planner has a calendar for), which is why this page can import it and render the real styles live.
 
 ## brutCard
 

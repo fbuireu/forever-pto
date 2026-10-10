@@ -33,13 +33,13 @@ const ROTATING_WORDS = ["vacations", "holidays", "long weekends", "bridge days"]
 
 export const RotatingTextDemo = () => (
 	<Demo>
-		<p className="flex items-center gap-2 text-xl font-semibold">
+		<div className="flex items-center gap-2 text-xl font-semibold">
 			Maximize your
 			<RotatingText
 				text={ROTATING_WORDS}
 				duration={2000}
 				className="font-display font-black text-[var(--color-brand-teal)]"
 			/>
-		</p>
+		</div>
 	</Demo>
 );

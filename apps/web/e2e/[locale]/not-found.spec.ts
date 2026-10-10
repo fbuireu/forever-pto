@@ -1,6 +1,6 @@
 import { LOCALES } from "@infrastructure/i18n/locales";
 import { localePath } from "@infrastructure/i18n/utils/url";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../fixtures";
 
 const NONEXISTENT = "/this-route-does-not-exist-xyz";
 const MAIN = "main#main-content";

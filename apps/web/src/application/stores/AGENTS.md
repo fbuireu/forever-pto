@@ -438,14 +438,16 @@ cookie and deliberately emits nothing: a session restored on a second device is 
 
 **`confirmActivation` is the one session check that reports, and only the payment confirmation page calls it.**
 A payer the issuer redirected never returns to the checkout that would have called `setPremiumStatus`: the
-activation route sets the cookie and redirects with `activation=fresh`, and the confirmation page's
-`PremiumSessionSync` calls `confirmActivation` while that marker is in the address, a forced `checkExistingSession`
-that reports `premium_activated`, with the checkout's properties, when the answer moved the store from no key to a key.
-The store cannot tell a first arrival from a return on its own: with `localStorage` cleared and the cookie alive it
-starts without a key, and the restore reads as a move into Premium. The page decides, by the marker it removes as it
-reads it, before it calls, so a reload, a revisit, a return to the history entry after leaving early and a
-cleared-storage return all run the silent `checkExistingSession` instead; the call settles in this module-level
-promise even when the page has unmounted.
+activation route sets the session cookie and the one-shot activation proof (`ACTIVATION_COOKIE`) and redirects, and the
+confirmation page's `PremiumSessionSync` calls `confirmActivation` on mount, a forced `checkExistingSession` that, once
+the answer holds a session, spends the proof through `claimActivationProof` (`@ui/adapters/session/checkSession`) and
+reports `premium_activated`, with the checkout's properties, when the proof was there and the answer moved the store
+from no key to a key. The store cannot tell a first arrival from a return on its own: with `localStorage` cleared and
+the cookie alive it starts without a key, and the restore reads as a move into Premium. The proof decides, read and
+deleted in the same task as the report, so a reload after the report, a revisit, a return through the history and a
+cleared-storage return find it spent, while a reload during the call finds it unspent and reports; a device already
+Premium spends it without reporting, and an answer with no session leaves it for a later load. The call settles in
+this module-level promise even when the page has unmounted.
 Concurrent calls share one check and one report through a module-level promise, the way `checkExistingSession` shares
 its request. Every other check, `PremiumFeature`'s included, stays silent.
 

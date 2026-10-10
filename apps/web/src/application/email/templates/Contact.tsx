@@ -14,7 +14,7 @@ import {
 	Section,
 	Tailwind,
 	Text,
-} from "@react-email/components";
+} from "react-email";
 
 interface ContactFormEmailProps {
 	email: string;
@@ -96,7 +96,7 @@ export const ContactFormEmail = ({ email, name, subject, message, baseUrl }: Con
 								Reply to {name}
 							</Button>
 						</Section>
-						<Hr className="mx-0 my-8 w-full border border-email-line border-solid" />
+						<Hr className="mx-0 my-8 w-full border border-email-line border-t-email-line border-solid" />
 						<Text className="text-email-muted text-[12px] leading-5.5 text-center">
 							This message was sent through the contact form on{" "}
 							<Link href={baseUrl} className="text-brand-teal no-underline font-medium">

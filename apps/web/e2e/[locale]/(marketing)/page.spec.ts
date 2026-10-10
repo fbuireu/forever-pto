@@ -3,7 +3,7 @@ import { LOCALES } from "@infrastructure/i18n/locales";
 import { localePath } from "@infrastructure/i18n/utils/url";
 import { USER_COUNTRY_COOKIE } from "@infrastructure/proxy/cookie";
 import type { RoutePath } from "@infrastructure/seo/routes";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../../fixtures";
 import { finishQuickStart, openQuickStart } from "../../quickStart";
 
 const MAIN = "main#main-content";
