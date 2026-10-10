@@ -4,7 +4,7 @@ export const SHOWCASE_PLAN = { ptoDays: 22, effectiveDays: 74, holidays: 12 } as
 
 export const SHOWCASE_EFFICIENCY = SHOWCASE_PLAN.effectiveDays / SHOWCASE_PLAN.ptoDays;
 
-export const COUNTRY_COUNT = 203;
+export const COUNTRY_COUNT = 205;
 
 const CAL_PATTERN: DayType[] = [
 	"work",

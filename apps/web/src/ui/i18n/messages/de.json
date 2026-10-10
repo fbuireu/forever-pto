@@ -1252,7 +1252,7 @@
 				"items": {
 					"payment": {
 						"label": "Stripe (Zahlungsabwicklung):",
-						"description": "Wenn du Premium kaufst, kann Stripe Cookies zur Betrugsprävention und Zahlungsabwicklung setzen. Siehe Stripes Cookie-Richtlinie."
+						"description": "Stripe wird auf jeder Seite von Forever PTO geladen, nicht nur wenn du spendest, damit seine Betrugsprävention vor einer Zahlung sieht, wie die Seite genutzt wird. Stripe kann seine Cookies zur Betrugsprävention (__stripe_mid und __stripe_sid) auf jeder Seite setzen; sie sind unbedingt erforderlich und werden daher gesetzt, ob du Analyse-Cookies akzeptierst oder nicht. Siehe Stripes Cookie-Richtlinie."
 					},
 					"holidayApis": {
 						"label": "Feiertags-APIs:",

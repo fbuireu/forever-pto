@@ -5,6 +5,7 @@ sidebar:
   order: 5
 ---
 
+import { COUNTRY_COUNT } from '@ui/modules/pages/homepage/sections/shared';
 import { APP_LOCALES } from '../../../components/demos/HowItWorksDemo';
 
 The planner needs surprisingly little data, and most of it never crosses the network to a third party: the Holiday calendars ship with the app as a chunk the browser loads when it first needs one, and the Country list arrives with the server-rendered page. This page lists every source, what reads it, how it is cached and what happens when it fails.
@@ -67,6 +68,8 @@ The upstream word `type` is reserved for that classification; the app's own Nati
 | Cache | Rendered with the page and pushed into the location store on mount; not persisted | Recomputed whenever the Country changes; not persisted |
 | Ordering | Both go through `collateByLabel` (`apps/web/src/application/shared/utils/collate.ts`), a locale-aware sort, so accented names land where a speaker expects them | Same |
 | Failure | Empty list and a log entry | Empty list and a log entry; the Region field disables |
+
+The Country list is the whole ISO list, and `date-holidays` has a calendar for {COUNTRY_COUNT} of the Countries it names. That is the figure the homepage claims, `COUNTRY_COUNT` in `apps/web/src/ui/modules/pages/homepage/sections/shared.ts`, and `apps/web/src/ui/modules/pages/homepage/sections/shared.test.ts` counts it from the two lists, so a package update that moves either one fails the unit suite until the constant follows. A Country with no calendar plans around weekends and its Custom Holidays alone; the Canary Islands have a calendar under a code the ISO list does not name, and are reached as Spain's Region.
 
 ## The visitor's Country
 

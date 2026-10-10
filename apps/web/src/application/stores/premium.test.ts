@@ -14,6 +14,7 @@ vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({
 vi.mock("@ui/adapters/session/checkSession", () => ({
 	verifyPremiumEmail: vi.fn(),
 	getExistingSession: vi.fn(),
+	claimActivationProof: vi.fn(() => false),
 }));
 
 vi.mock("./crypto", () => ({
@@ -299,6 +300,16 @@ describe("which ways into Premium report premium_activated", () => {
 		return vi.mocked(track).mock.calls;
 	};
 
+	const proofHeld = async (held: boolean) => {
+		const { claimActivationProof } = await import("@ui/adapters/session/checkSession");
+		vi.mocked(claimActivationProof).mockReset().mockReturnValueOnce(held).mockReturnValue(false);
+		return vi.mocked(claimActivationProof);
+	};
+
+	beforeEach(async () => {
+		await proofHeld(false);
+	});
+
 	const sessionAnswers = async (answer: typeof SESSION | null | Error) => {
 		const { getExistingSession } = await import("@ui/adapters/session/checkSession");
 		if (answer instanceof Error) vi.mocked(getExistingSession).mockRejectedValueOnce(answer);
@@ -323,6 +334,7 @@ describe("which ways into Premium report premium_activated", () => {
 
 	it("reports the activation a redirect payer lands on the confirmation page with, once, with the in-page properties", async () => {
 		await sessionAnswers(SESSION);
+		await proofHeld(true);
 
 		await usePremiumStore.getState().confirmActivation();
 
@@ -332,6 +344,7 @@ describe("which ways into Premium report premium_activated", () => {
 
 	it("reports one activation and asks once however many confirmations land together", async () => {
 		const check = await sessionAnswers(SESSION);
+		const claim = await proofHeld(true);
 
 		await Promise.all([
 			usePremiumStore.getState().confirmActivation(),
@@ -340,31 +353,49 @@ describe("which ways into Premium report premium_activated", () => {
 		]);
 
 		expect(check).toHaveBeenCalledOnce();
+		expect(claim).toHaveBeenCalledOnce();
 		expect(await tracked()).toStrictEqual(ACTIVATED);
 	});
 
-	it("reports nothing on the confirmation page for a donor this device already holds as Premium", async () => {
+	it("reports nothing on the confirmation page without the activation route's proof, which a reload, a revisit or a stale address finds spent", async () => {
 		await sessionAnswers(SESSION);
+		const claim = await proofHeld(false);
+
+		await usePremiumStore.getState().confirmActivation();
+
+		expect(claim).toHaveBeenCalledOnce();
+		expect(usePremiumStore.getState().premiumKey).toBe(SESSION.premiumKey);
+		expect(await tracked()).toStrictEqual([]);
+	});
+
+	it("reports nothing on the confirmation page for a donor this device already holds as Premium, and spends the proof", async () => {
+		await sessionAnswers(SESSION);
+		const claim = await proofHeld(true);
 		usePremiumStore.setState({ premiumKey: "pk_earlier", userEmail: SESSION.email });
 
 		await usePremiumStore.getState().confirmActivation();
 
+		expect(claim).toHaveBeenCalledOnce();
 		expect(await tracked()).toStrictEqual([]);
 	});
 
-	it("reports nothing on the confirmation page when the cookie holds no session", async () => {
+	it("reports nothing on the confirmation page when the cookie holds no session, and keeps the proof for a load that finds one", async () => {
 		await sessionAnswers(null);
+		const claim = await proofHeld(true);
 
 		await usePremiumStore.getState().confirmActivation();
 
+		expect(claim).not.toHaveBeenCalled();
 		expect(await tracked()).toStrictEqual([]);
 	});
 
-	it("reports nothing on the confirmation page when the session check fails", async () => {
+	it("reports nothing on the confirmation page when the session check fails, and keeps the proof", async () => {
 		await sessionAnswers(new Error("check-session answered 500"));
+		const claim = await proofHeld(true);
 
 		await usePremiumStore.getState().confirmActivation();
 
+		expect(claim).not.toHaveBeenCalled();
 		expect(await tracked()).toStrictEqual([]);
 	});
 

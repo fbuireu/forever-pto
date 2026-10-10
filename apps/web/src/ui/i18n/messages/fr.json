@@ -1252,7 +1252,7 @@
 				"items": {
 					"payment": {
 						"label": "Stripe (traitement des paiements) :",
-						"description": "Lorsque tu achètes Premium, Stripe peut déposer des cookies pour la prévention de la fraude et le traitement des paiements. Consulte la Politique de cookies de Stripe."
+						"description": "Stripe se charge sur toutes les pages de Forever PTO, pas seulement quand tu fais un don, pour que sa prévention de la fraude voie comment le site est utilisé avant un paiement. Il peut déposer ses cookies de prévention de la fraude (__stripe_mid et __stripe_sid) sur n'importe quelle page ; ils sont strictement nécessaires, donc déposés que tu acceptes ou non les cookies d'analyse. Consulte la Politique de cookies de Stripe."
 					},
 					"holidayApis": {
 						"label": "API de jours fériés :",

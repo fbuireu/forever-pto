@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { EMAIL_PALETTE } from "@application/email/palette";
-import { render } from "@react-email/render";
+import { render } from "react-email";
 import { describe, expect, it } from "vitest";
 import { ContactFormEmail } from "./Contact";
 
@@ -26,6 +26,21 @@ const rgbOf = (hex: string) =>
 
 const declares = ({ html, declaration }: { html: string; declaration: string }) =>
 	[`style="${declaration}`, `;${declaration}`].some((start) => html.includes(start));
+
+const COLOUR_TOKEN = /^(?:#[0-9a-f]{3,8}|rgba?\([^)]*\))$/i;
+
+const topEdgeColourOf = (style: string) =>
+	style
+		.split(";")
+		.map((declaration) => declaration.split(":"))
+		.reduce<string | undefined>((colour, [property = "", value = ""]) => {
+			const tokens = value.trim().split(/\s+(?![^(]*\))/);
+			if (property === "border-top-color") return value.trim();
+			if (property === "border-color") return tokens[0];
+			if (property === "border-top" || property === "border")
+				return tokens.find((token) => COLOUR_TOKEN.test(token)) ?? colour;
+			return colour;
+		}, undefined);
 
 const PAINTED_WITH_THE_PALETTE = [
 	{ role: "the card", declaration: `background-color:${rgbOf(roles.card)}` },
@@ -95,6 +110,16 @@ describe("ContactFormEmail", () => {
 		const html = await getHtml();
 
 		expect(declares({ html, declaration })).toBe(true);
+	});
+
+	it("draws the rule's top edge with the palette's line, over the grey the Hr component writes after the border colour", async () => {
+		const html = await getHtml();
+		const style = /<hr[^>]*style="([^"]*)"/.exec(html)?.[1] ?? "";
+
+		expect(topEdgeColourOf("border:none;border-color:rgb(1,2,3);border-top:1px solid #eaeaea")).toBe("#eaeaea");
+		expect(topEdgeColourOf("border-top:1px solid #eaeaea;border-color:rgb(1,2,3)")).toBe("rgb(1,2,3)");
+		expect(style).toContain("border-top");
+		expect(topEdgeColourOf(style)).toBe(rgbOf(roles.line));
 	});
 
 	it("paints nothing with a colour the palette does not hold", async () => {

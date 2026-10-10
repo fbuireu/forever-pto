@@ -10,7 +10,7 @@ Email is deliberately minimal. There is exactly **one** email in the system toda
 ## The stack
 
 - **Resend** as the provider, wrapped in an Effect service (`ResendService`, `apps/web/src/infrastructure/clients/email/resend/service.ts`) that is part of `ApplicationLayer` in `apps/web/src/infrastructure/layers.ts`, the same dependency-injection pattern as Turso and Stripe.
-- **react-email** for templates: React components rendered to HTML with `@react-email/render` on the server.
+- **react-email** for templates: React components rendered to HTML on the server with the `render` the same `react-email` package exports.
 
 ## The contact pipeline
 

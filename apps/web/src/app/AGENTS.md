@@ -261,36 +261,39 @@ guards:
 per failure: `warn` for a refusal the payer caused, `error` for Stripe, the session and the database. The
 route keeps only what is its own: the redirect, the cookie and the `no-store` header.
 
-The redirect names its outcome in the `activation` query parameter: `fresh` once the handler has granted Premium,
-`failed` when it did not (`ACTIVATION_PARAM`, `ACTIVATION_FRESH` and `ACTIVATION_FAILED` in
-[`@application/dto/payment/types`](../application/dto/payment/types.ts)). Failure is never silent and never a lie: the
-page then renders `premiumActivationFailed`: the payer is told their money went through and their access did not,
-instead of the page claiming Premium is active.
+The redirect names a failure in the `activation` query parameter, `failed` (`ACTIVATION_PARAM` and
+`ACTIVATION_FAILED` in [`@application/dto/payment/types`](../application/dto/payment/types.ts)), and names a success
+by leaving it out. Failure is never silent and never a lie: the page then renders `premiumActivationFailed`: the payer
+is told their money went through and their access did not, instead of the page claiming Premium is active.
 
-The cookie is `sameSite: 'strict'`, so the confirmation page must **not** infer success from the cookie
+The session cookie is `sameSite: 'strict'`, so the confirmation page must **not** infer success from the cookie
 being present: the payer arrives through a chain that started cross-site and the browser may withhold it on
 that hop. The `activation` query parameter is the signal; the cookie is the entitlement.
+
+**A success also sets the activation proof, a one-shot cookie the confirmation spends.** `setActivationCookie` in
+[`@infrastructure/services/premium/cookie`](../infrastructure/services/premium/cookie.ts) writes `ACTIVATION_COOKIE`
+(`premium-activation`) beside the session cookie: readable by script, `sameSite: 'strict'`, `path: '/'`, for
+`ACTIVATION_PROOF_LIFETIME_SECONDS`. It carries no identifier and grants nothing; it says that this browser has an
+activation nobody has reported yet, and the client deletes it in the same task that reports it, so it is the one thing
+that tells the first arrival from a reload, a revisit or a return with `localStorage` cleared. Script reads it because
+an HTTP-only proof could be spent only by a request, and a reload between the server spending it and the page reading
+the answer would lose the report.
 
 **The store does not pick that cookie up on its own, which is why the page mounts
 [`src/ui/modules/premium/PremiumSessionSync.tsx`](../ui/modules/premium/PremiumSessionSync.tsx).** `checkExistingSession()` returns early unless
 `needsSessionCheck` is set, and only rehydration raises that flag, only when `lastVerified` is missing or
 over 24 hours old: false for any donor who opened the planner before donating, since `PremiumFeature`'s own
 mount stamps it. [`PremiumFeature.tsx`](../ui/modules/premium/PremiumFeature.tsx) calling `checkExistingSession()` unconditionally therefore does
-nothing for the payer who has just come back. `PremiumSessionSync` renders `null` and reads the address it arrived at.
-With `activation=fresh` in it, the marker the activation route just wrote, it removes the marker with
-`history.replaceState(null, …)` and then calls the premium store's `confirmActivation()` once: a
-`checkExistingSession(true)` that reports `premium_activated` when it moved this device from free to Premium, which
-is how a redirect payer is counted the way `setPremiumStatus` counts one who paid in the page. The marker goes first,
-synchronously, never once the call settles: the call lives in the store and settles whether or not this page is
-still mounted, so a payer who leaves before it settles would leave the history entry marked, and a later visit to
-that entry would count the same Donation again. A reload while the call is in flight finds no marker and restores the
-session silently, which can lose that one report and never repeats it; `PremiumSessionSync.activation.test.tsx` leaves
-before the call settles and visits the entry again. Without the marker (a reload, a bookmark, a
-payer whose `localStorage` was cleared while the cookie lives) it runs the same forced check and reports nothing:
-restoring a session that already existed is not an activation, and the store, starting without a key, would read the
-restore as one. The state passed to `replaceState` is `null`, never `window.history.state`: Next patches
-`replaceState`, and a state carrying its own `__NA` marker makes it skip the router's sync with the new address. The
-component activates nothing (the cookie is already set, server side, before this page renders); it only invalidates a
+nothing for the payer who has just come back. `PremiumSessionSync` renders `null` and calls the premium store's
+`confirmActivation()` once on mount: a `checkExistingSession(true)` that, once the answer holds a session, spends the
+activation proof and reports `premium_activated` when the proof was there and the answer moved this device from free to
+Premium, which is how a redirect payer is counted the way `setPremiumStatus` counts one who paid in the page. It
+leaves the address alone. The proof is what makes one report per activation: a reload while the call is in flight
+finds the proof unspent and reports, a reload after it, a revisit, a return through the history and a return with
+`localStorage` cleared find it spent and restore the session silently, and a payer who leaves for another page before
+the call settles is reported where the call lands, since it lives in the store. Without a session in the answer the
+proof stays for a later load. `PremiumSessionSync.activation.test.tsx` walks each of those cases over the real store,
+with a fresh module graph per page load. The component activates nothing (the cookie is already set, server side, before this page renders); it only invalidates a
 client-side cache, which is the one thing a server component cannot do. Without it a redirect donor is charged, holds a
 valid cookie, is told Premium is active, and finds every feature blurred.
 

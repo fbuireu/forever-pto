@@ -1,7 +1,7 @@
 import { logClient, logClientError } from "@application/shared/utils/clientLog";
 import { emailDomain } from "@application/shared/utils/redact";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
-import { getExistingSession, verifyPremiumEmail } from "@ui/adapters/session/checkSession";
+import { claimActivationProof, getExistingSession, verifyPremiumEmail } from "@ui/adapters/session/checkSession";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { obfuscatedStorage } from "./crypto";
@@ -152,7 +152,7 @@ export const usePremiumStore = create<PremiumStore>()(
 					activationInFlight = get()
 						.checkExistingSession(true)
 						.then(() => {
-							if (!wasPremium && get().premiumKey) reportActivation();
+							if (get().premiumKey && claimActivationProof() && !wasPremium) reportActivation();
 						})
 						.finally(() => {
 							activationInFlight = null;

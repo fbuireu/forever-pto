@@ -21,7 +21,7 @@ export type PromoCodeErrorCode = (typeof PromoCodeErrors)[keyof typeof PromoCode
 
 export const ACTIVATION_PARAM = "activation";
 export const ACTIVATION_FAILED = "failed";
-export const ACTIVATION_FRESH = "fresh";
+export const ACTIVATION_COOKIE = "premium-activation";
 
 export type DiscountInfo = {
 	type: "percent" | "fixed";

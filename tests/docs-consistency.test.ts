@@ -715,6 +715,23 @@ describe("the security header policy covers every request", () => {
 		},
 	);
 
+	it("admits on every page what Stripe.js asks of a CSP, since the locale layout loads it on every page for Stripe's fraud signals", () => {
+		const directives = (sent.get("Content-Security-Policy") ?? "").split(";").map((directive) => directive.trim());
+		const sources = (name: string) =>
+			(directives.find((entry) => entry.startsWith(`${name} `)) ?? "").split(/\s+/).slice(1);
+		const STRIPE_JS_POLICY = [
+			["script-src", "https://js.stripe.com"],
+			["script-src", "https://*.js.stripe.com"],
+			["frame-src", "https://js.stripe.com"],
+			["frame-src", "https://*.js.stripe.com"],
+			["frame-src", "https://hooks.stripe.com"],
+			["connect-src", "https://api.stripe.com"],
+		];
+
+		expect(sources("frame-src").length).toBeGreaterThan(0);
+		expect(STRIPE_JS_POLICY.filter(([name = "", host = ""]) => !sources(name).includes(host))).toEqual([]);
+	});
+
 	it("holds a browser to HTTPS for a year, subdomains included", () => {
 		const hsts = sent.get("Strict-Transport-Security") ?? "";
 		expect(Number(/max-age=(\d+)/.exec(hsts)?.[1] ?? 0)).toBeGreaterThanOrEqual(HSTS_MINIMUM_MAX_AGE);
@@ -1669,6 +1686,43 @@ interface LineAtParams {
 
 const lineAt = ({ source, at }: LineAtParams) => source.slice(0, at).split("\n").length;
 
+const BACKLOG_FILE = "BACKLOG.md";
+const KNOWN_BREACHES_HEADING = /^#{1,6}\s+(?:\d+\.\s+)?Known (?:inconsistencies|defects|breaches)\b/im;
+
+describe("the guides keep no list of known breaches", () => {
+	const everyPath = execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard"], {
+		cwd: ROOT,
+		encoding: "utf8",
+	})
+		.split("\n")
+		.filter((path) => path.length > 0 && existsSync(join(ROOT, path)));
+	const documents = [...linkedMarkdown, ...contentFiles];
+
+	it("keeps no BACKLOG.md anywhere in the tree, so no file holds a claim about the code that nothing keeps true", () => {
+		const isBacklog = (path: string) => basename(path) === BACKLOG_FILE;
+
+		expect([".github/BACKLOG.md", "apps/web/BACKLOG.md", BACKLOG_FILE].every(isBacklog)).toBe(true);
+		expect(isBacklog("apps/docs/src/content/docs/backlog.mdx")).toBe(false);
+		expect(everyPath.length).toBeGreaterThan(trackedFiles.length);
+		expect(everyPath.filter(isBacklog)).toEqual([]);
+	});
+
+	it("heads no section of any document as a list of known inconsistencies, defects or breaches; fix a breach in the change that finds it", () => {
+		const listing = documents.filter((doc) => KNOWN_BREACHES_HEADING.test(read(doc)));
+
+		expect(
+			[
+				"## 8. Known inconsistencies\n\n- an entry\n",
+				"## Known breaches of the coding standards\n",
+				"### Known defects\n",
+			].every((sample) => KNOWN_BREACHES_HEADING.test(sample)),
+		).toBe(true);
+		expect(KNOWN_BREACHES_HEADING.test("a breach is not a known inconsistencies list")).toBe(false);
+		expect(documents.length).toBeGreaterThan(100);
+		expect(listing).toEqual([]);
+	});
+});
+
 describe("the hand-written source carries no explanatory comments", () => {
 	const huskyHooks = readdirSync(join(ROOT, HUSKY_DIR), { withFileTypes: true })
 		.filter((entry) => entry.isFile())
@@ -2202,7 +2256,7 @@ describe("the imports CODING_STANDARDS.md hands to this suite", () => {
 		return found;
 	};
 
-	it("imports Stripe.js through its pure entry, because the bare entry fetches the script the moment it is imported", () => {
+	it("imports Stripe.js through its pure entry, because the bare entry injects the script the moment it is imported and writes a load that fails before anything asked to the console itself", () => {
 		const stripe = webProduction.flatMap((file) =>
 			importsOf(file)
 				.filter(({ specifier }) => specifier === STRIPE_JS || specifier === STRIPE_JS_PURE)
@@ -2217,7 +2271,7 @@ describe("the imports CODING_STANDARDS.md hands to this suite", () => {
 		expect(offenders).toEqual([]);
 	});
 
-	it("asks for Stripe.js only inside a function, never while a module loads, so a visitor who never donates never fetches it", () => {
+	it("asks for Stripe.js only inside a function, never while a module loads, so the ask runs in the browser, from the locale layout's effect or the checkout, where its failure is answered", () => {
 		const callers = webProduction.map((file) => ({
 			file,
 			...callsNamed({ source: parse(file), names: STRIPE_LOADERS }),
@@ -4259,6 +4313,121 @@ describe("workflows and package scripts keep the rules CODING_STANDARDS.md hands
 
 		expect(FORWARDED_FLAG.test("pnpm test:e2e -- --grep smoke")).toBe(true);
 		expect(bodies.filter(({ body }) => FORWARDED_FLAG.test(body)).map(({ source }) => source)).toEqual([]);
+	});
+});
+
+const PLAYWRIGHT_CONFIG = /(?:^|\/)playwright\.config\.[cm]?[jt]s$/;
+const PLAYWRIGHT_PROJECTS = `[
+	{ name: "chromium", use: { ...devices["Desktop Chrome"] } },
+	{ name: "webkit", use: { ...devices["Desktop Safari"] } },
+]`;
+const CODE_WHITESPACE = /\s+/g;
+const COMMA_BEFORE_CLOSER = /,([}\]])/g;
+const WORKFLOW_JOBS = /^jobs:\s*$/m;
+const WORKFLOW_JOB_HEADER = /^ {2}(?=[\w-]+:\s*$)/m;
+const PLAYWRIGHT_RUN = /\bplaywright test\b|\btest:e2e\b/;
+const PLAYWRIGHT_INSTALL = /\bplaywright install(?:-deps)?\b([^\n]*)/g;
+const PLAYWRIGHT_BROWSERS = "chromium webkit";
+const YAML_ITEM_DASH = /^-\s+/;
+const PLAYWRIGHT_BROWSER_STEPS = [
+	/^path: ~\/\.cache\/ms-playwright$/,
+	/^key: .+-playwright-chromium-webkit-.+$/,
+	/^if: steps\.playwright-cache\.outputs\.cache-hit != 'true'$/,
+	/^run: pnpm exec playwright install --with-deps chromium webkit$/,
+	/^if: steps\.playwright-cache\.outputs\.cache-hit == 'true'$/,
+	/^run: pnpm exec playwright install-deps chromium webkit$/,
+];
+
+const compactCode = (code: string): string => code.replace(CODE_WHITESPACE, "").replace(COMMA_BEFORE_CLOSER, "$1");
+
+const playwrightProjects = (config: string): string | undefined => {
+	const file = ts.createSourceFile("playwright.config.ts", config, ts.ScriptTarget.Latest, true);
+	let projects: string | undefined;
+	const visit = (node: ts.Node): void => {
+		if (ts.isPropertyAssignment(node) && node.name.getText(file) === "projects")
+			projects = node.initializer.getText(file);
+
+		ts.forEachChild(node, visit);
+	};
+
+	visit(file);
+
+	return projects;
+};
+
+const jobsIn = (workflow: string): string[] =>
+	(workflow.split(WORKFLOW_JOBS)[1] ?? "").split(WORKFLOW_JOB_HEADER).filter((job) => job.trim() !== "");
+
+const missingBrowserSteps = (job: string): string[] => {
+	const lines = job.split(/\r?\n/).map((line) => line.trim().replace(YAML_ITEM_DASH, ""));
+
+	return PLAYWRIGHT_RUN.test(job)
+		? PLAYWRIGHT_BROWSER_STEPS.filter((step) => !lines.some((line) => step.test(line))).map((step) => step.source)
+		: [];
+};
+
+const installedBrowsers = (workflow: string): string[] =>
+	[...workflow.matchAll(PLAYWRIGHT_INSTALL)].map(([, rest = ""]) =>
+		rest
+			.trim()
+			.split(CODE_WHITESPACE)
+			.filter((word) => !word.startsWith("-"))
+			.join(" "),
+	);
+
+describe("the end-to-end browsers", () => {
+	it("runs every Playwright config in Chromium and WebKit alone, in CI and locally alike", () => {
+		const configs = trackedFiles.filter((file) => PLAYWRIGHT_CONFIG.test(file));
+		const sample = (projects: string) =>
+			compactCode(
+				playwrightProjects(`export default defineConfig({ testDir: "./e2e", projects: ${projects} });`) ?? "",
+			);
+		const expanded = `[\n\t{\n\t\tname: "chromium",\n\t\tuse: { ...devices["Desktop Chrome"] },\n\t},\n\t{\n\t\tname: "webkit",\n\t\tuse: { ...devices["Desktop Safari"] },\n\t},\n]`;
+
+		expect(sample(expanded)).toBe(compactCode(PLAYWRIGHT_PROJECTS));
+		expect(sample(`process.env.CI ? ${PLAYWRIGHT_PROJECTS} : [{ name: "chromium" }]`)).not.toBe(
+			compactCode(PLAYWRIGHT_PROJECTS),
+		);
+		expect(
+			sample(PLAYWRIGHT_PROJECTS.replace("]", `\t{ name: "firefox", use: { ...devices["Desktop Firefox"] } },\n]`)),
+		).not.toBe(compactCode(PLAYWRIGHT_PROJECTS));
+		expect(configs).toEqual([`${DOCS}/playwright.config.ts`, `${WEB}/playwright.config.ts`]);
+		expect(
+			configs.filter((file) => compactCode(playwrightProjects(read(file)) ?? "") !== compactCode(PLAYWRIGHT_PROJECTS)),
+		).toEqual([]);
+	});
+
+	it("installs both browsers in every job that runs Playwright, behind a cache keyed on them, so a cache saved with one is never restored into a run of both", () => {
+		const jobs = workflowFiles.flatMap((file) => jobsIn(read(file)).map((job) => ({ file, job })));
+		const running = jobs.filter(({ job }) => PLAYWRIGHT_RUN.test(job));
+		const steps = [
+			"path: ~/.cache/ms-playwright",
+			"key: os-playwright-chromium-webkit-lockfile",
+			"if: steps.playwright-cache.outputs.cache-hit != 'true'",
+			"run: pnpm exec playwright install --with-deps chromium webkit",
+			"if: steps.playwright-cache.outputs.cache-hit == 'true'",
+			"run: pnpm exec playwright install-deps chromium webkit",
+		];
+		const workflow = (lines: string[]) =>
+			`name: x\njobs:\n  e2e:\n    steps:\n      - name: Browsers\n${lines.map((line) => `        ${line}`).join("\n")}\n      - run: pnpm test:e2e\n  other:\n    steps:\n      - run: echo\n`;
+		const keyedOnChromium = steps.map((step) => step.replace("-playwright-chromium-webkit-", "-playwright-"));
+
+		expect(jobsIn(workflow(steps)).length).toBe(2);
+		expect(jobsIn(workflow(steps)).flatMap(missingBrowserSteps)).toEqual([]);
+		expect(jobsIn(workflow(keyedOnChromium)).flatMap(missingBrowserSteps)).toEqual([
+			PLAYWRIGHT_BROWSER_STEPS[1]?.source,
+		]);
+		expect(installedBrowsers("run: pnpm exec playwright install --with-deps chromium\n")).toEqual(["chromium"]);
+		expect(installedBrowsers(steps.join("\n"))).toEqual([PLAYWRIGHT_BROWSERS, PLAYWRIGHT_BROWSERS]);
+		expect(running.length).toBeGreaterThanOrEqual(4);
+		expect(running.flatMap(({ file, job }) => missingBrowserSteps(job).map((step) => `${file}: ${step}`))).toEqual([]);
+		expect(
+			workflowFiles.flatMap((file) =>
+				installedBrowsers(read(file))
+					.filter((browsers) => browsers !== PLAYWRIGHT_BROWSERS)
+					.map((browsers) => `${file}: ${browsers}`),
+			),
+		).toEqual([]);
 	});
 });
 

@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { ACTIVATION_COOKIE } from "@application/dto/payment/types";
+import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockFetch = vi.fn();
 vi.stubGlobal("fetch", mockFetch);
@@ -9,7 +10,7 @@ afterAll(() => {
 	vi.unstubAllGlobals();
 });
 
-const { verifyPremiumEmail, getExistingSession } = await import("./checkSession");
+const { verifyPremiumEmail, getExistingSession, claimActivationProof } = await import("./checkSession");
 
 beforeEach(() => {
 	mockFetch.mockReset();
@@ -125,5 +126,44 @@ describe("the import that keeps zod out of every page's first load", () => {
 
 	it("has no value-level static import of them, nor of zod", () => {
 		expect(source).not.toMatch(/^import (?!type )[^\n]*(?:dto\/premium\/schema|["']zod["'])/m);
+	});
+});
+
+describe("claimActivationProof", () => {
+	const setCookie = (cookie: string) => {
+		// biome-ignore lint/suspicious/noDocumentCookie: the test plays the browser that receives the activation route's Set-Cookie
+		document.cookie = cookie;
+	};
+	const proofIsHeld = () => document.cookie.split("; ").some((row) => row.startsWith(`${ACTIVATION_COOKIE}=`));
+
+	afterEach(() => {
+		setCookie(`${ACTIVATION_COOKIE}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`);
+		setCookie("user-country=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT");
+	});
+
+	it("answers yes once for the proof the activation route set, and spends it in the same call", () => {
+		setCookie(`${ACTIVATION_COOKIE}=1; path=/`);
+
+		expect(proofIsHeld()).toBe(true);
+		expect(claimActivationProof()).toBe(true);
+		expect(proofIsHeld()).toBe(false);
+		expect(claimActivationProof()).toBe(false);
+	});
+
+	it("answers no when there is no proof, and leaves the other cookies alone", () => {
+		setCookie("user-country=es; path=/");
+
+		expect(claimActivationProof()).toBe(false);
+		expect(document.cookie).toContain("user-country=es");
+	});
+
+	it("takes a cookie whose name only starts like the proof's for no proof", () => {
+		setCookie(`${ACTIVATION_COOKIE}-other=1; path=/`);
+
+		try {
+			expect(claimActivationProof()).toBe(false);
+		} finally {
+			setCookie(`${ACTIVATION_COOKIE}-other=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`);
+		}
 	});
 });

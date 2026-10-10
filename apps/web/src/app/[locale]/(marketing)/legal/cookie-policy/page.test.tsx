@@ -1,4 +1,11 @@
+import caMessages from "@i18n/messages/ca.json";
+import deMessages from "@i18n/messages/de.json";
+import enMessages from "@i18n/messages/en.json";
+import esMessages from "@i18n/messages/es.json";
+import frMessages from "@i18n/messages/fr.json";
+import itMessages from "@i18n/messages/it.json";
 import { EN, ES } from "@infrastructure/i18n/locales";
+import { COOKIE_SECTIONS } from "@ui/modules/shared/cookie-consent/config/config";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const NAMESPACE = "cookiePolicy";
@@ -62,4 +69,23 @@ describe("cookie-policy/page", () => {
 		const element = await CookiePolicyPage(makeParams());
 		expect(element.props.lastUpdated).toBe("t:lastUpdated");
 	});
+});
+
+describe("the cookie policy's Stripe paragraph", () => {
+	const STRIPE = "Stripe";
+	const BUNDLES = { ca: caMessages, de: deMessages, en: enMessages, es: esMessages, fr: frMessages, it: itMessages };
+
+	it.each(Object.entries(BUNDLES))(
+		"names in %s every Stripe cookie the consent banner lists as necessary, since Stripe.js sets them on any page",
+		(_locale, bundle) => {
+			const necessaryStripeCookies = COOKIE_SECTIONS.filter(({ id }) => id === "necessary")
+				.flatMap(({ cookies = [] }) => cookies)
+				.filter(({ provider }) => provider === STRIPE)
+				.map(({ name }) => name);
+			const paragraph = bundle.cookiePolicy.sections.thirdPartyCookies.items.payment.description;
+
+			expect(necessaryStripeCookies.length).toBeGreaterThan(1);
+			expect(necessaryStripeCookies.filter((name) => !paragraph.includes(name))).toEqual([]);
+		},
+	);
 });

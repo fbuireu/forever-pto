@@ -26,11 +26,11 @@ Configured in `apps/web/playwright.config.ts`. Specs mirror the app's route stru
 
 - `baseURL` comes from the `BASE_URL` env var; without it the config starts `pnpm dev` and targets `http://localhost:3000`.
 - In CI these tests run **against the live per-PR preview deployment**, authenticating through Cloudflare Access with a service token (`CF_ACCESS_CLIENT_ID`/`CF_ACCESS_CLIENT_SECRET` injected as headers by the config). See [environments](/infra/environments/).
-- CI runs chromium only with retries; locally you get chromium, firefox and webkit.
+- Every spec runs in two projects, `chromium` (Desktop Chrome) and `webkit` (Desktop Safari), in CI and locally alike; CI adds retries.
 
 ### Docs suite, `apps/docs/e2e/`
 
-Configured in `apps/docs/playwright.config.ts`: every spec in `apps/docs/e2e/` runs against the built site through `astro preview` (`webServer` block), chromium only, so the site has to be built first; the `@smoke` cases in `smoke.spec.ts` also run against the deployed site after a production deploy. It runs in `.github/workflows/docs.yml` after the build.
+Configured in `apps/docs/playwright.config.ts`: every spec in `apps/docs/e2e/` runs against the built site through `astro preview` (`webServer` block), in the same two projects, `chromium` and `webkit`, so the site has to be built first; the `@smoke` cases in `smoke.spec.ts` also run against the deployed site after a production deploy. It runs in `.github/workflows/docs.yml` after the build.
 
 ## File conventions
 

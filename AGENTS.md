@@ -203,7 +203,6 @@ a promise, not a fix.
 | `apps/web/src/**/AGENTS.md` | *What is in this folder, and what does a change here carry?* Its files, public API, couplings, gotchas and guardrails. Its `# ` heading is the folder's own path, repo-relative: `# apps/web/src/domain/calendar` | You change a layer's dependencies, a signature, a coupling, or the files in that folder |
 | [`adr/`](./adr/) | *Why is it like this?* One decision per file | You make a decision that is hard to reverse, surprising without context, **and** the result of a real trade-off |
 | [`README.md`](./README.md) | *What is this product and how do I run it?* The human-facing front page | The product's capabilities, the stack table, the scripts or the required versions change |
-| [`BACKLOG.md`](./BACKLOG.md) | *Where does the tree break a rule today, and what fixes it?* The known breaches of `CODING_STANDARDS.md` | A change fixes an item (delete it), or leaves a breach it found in place (add it, with its fix) |
 
 | If you change | Update |
 | --- | --- |

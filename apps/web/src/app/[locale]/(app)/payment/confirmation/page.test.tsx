@@ -1,4 +1,4 @@
-import { ACTIVATION_FAILED, ACTIVATION_FRESH, type PaymentConfirmationDTO } from "@application/dto/payment/types";
+import { ACTIVATION_FAILED, type PaymentConfirmationDTO } from "@application/dto/payment/types";
 import { DE, EN, ES } from "@infrastructure/i18n/locales";
 import { render } from "@testing-library/react";
 import { Effect, Layer } from "effect";
@@ -76,8 +76,8 @@ const renderErrorPage = async () => {
 	return render(resolved);
 };
 
-const makeFreshActivationParams = () => ({
-	searchParams: Promise.resolve({ payment_intent: PAYMENT_INTENT_ID, activation: ACTIVATION_FRESH }),
+const makeStaleMarkerParams = () => ({
+	searchParams: Promise.resolve({ payment_intent: PAYMENT_INTENT_ID, activation: "fresh" }),
 	params: Promise.resolve({ locale: EN as never }),
 });
 
@@ -220,15 +220,15 @@ describe("payment/confirmation page", () => {
 			expect(container.textContent).not.toContain("t:premiumActivated");
 		});
 
-		it("reports Premium as active for the activation the redirect just made", async () => {
-			const { container } = render(await PaymentConfirmationPage(makeFreshActivationParams()));
+		it("reports Premium as active for an address an older redirect marked, since only a failure is marked now", async () => {
+			const { container } = render(await PaymentConfirmationPage(makeStaleMarkerParams()));
 			expect(container.textContent).toContain("t:premiumActivated");
 			expect(container.textContent).not.toContain("t:premiumActivationFailed");
 		});
 
 		it.each([
 			["an ordinary load", makeSuccessParams],
-			["the activation the redirect just made", makeFreshActivationParams],
+			["an address an older redirect marked", makeStaleMarkerParams],
 		])("mounts the session sync for %s", async (_label, makeQuery) => {
 			const { queryByTestId } = render(await PaymentConfirmationPage(makeQuery()));
 			expect(queryByTestId("premium-session-sync")).not.toBeNull();

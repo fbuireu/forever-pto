@@ -1252,7 +1252,7 @@
 				"items": {
 					"payment": {
 						"label": "Stripe (processament de pagaments):",
-						"description": "Quan compres Premium, Stripe pot establir cookies per a la prevenció del frau i el processament de pagaments. Consulta la Política de cookies de Stripe."
+						"description": "Stripe es carrega a totes les pàgines de Forever PTO, no només quan fas una donació, perquè la seva prevenció del frau vegi com s'utilitza el lloc abans d'un pagament. Pot establir les seves cookies de prevenció del frau (__stripe_mid i __stripe_sid) a qualsevol pàgina; són estrictament necessàries, així que s'estableixen tant si acceptes les cookies analítiques com si no. Consulta la Política de cookies de Stripe."
 					},
 					"holidayApis": {
 						"label": "API de festius:",

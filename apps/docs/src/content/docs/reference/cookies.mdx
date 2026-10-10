@@ -14,6 +14,7 @@ The app sets its first-party cookies. The sidebar cookie name below is imported 
 | `user-country` | Detected ISO country code, used to pre-select the holiday calendar | no | yes | `strict` | 7 days (`ONE_WEEK`) |
 | `NEXT_LOCALE` | The user's resolved locale for i18n routing | no | yes | `lax` | session |
 | `premium-token` | JWT proving an active premium session | yes | production only | `strict` | 30 days |
+| `premium-activation` | One-shot proof that a payment just activated Premium and nobody has reported it yet | no | production only | `strict` | 1 hour |
 | <code>{SIDEBAR_COOKIE_NAME}</code> | Persists whether the sidebar is expanded or collapsed | no | not set | `lax` | 7 days |
 
 All of them are scoped to `path: '/'`.
@@ -31,6 +32,10 @@ It is deliberately **not** `httpOnly`, and that is the same object `routing.ts` 
 ## `premium-token`
 
 Named by the `PREMIUM_COOKIE` export in `apps/web/src/infrastructure/services/premium/cookie.ts`. `setPremiumCookie()` stores the signed JWT after a successful premium activation, with `secure` enabled only when `NODE_ENV` is `production` (so it works over plain HTTP in local dev). The session duration constant in the same file is 30 days. It is read and refreshed (or cleared via `clearPremiumCookie()`) by `apps/web/src/app/api/check-session/route.ts`.
+
+## `premium-activation`
+
+Named by the `ACTIVATION_COOKIE` export in `apps/web/src/application/dto/payment/types.ts`, so the route that sets it and the browser code that spends it share one name. `setActivationCookie()` in `apps/web/src/infrastructure/services/premium/cookie.ts` sets it beside `premium-token` when `GET /api/payment/activate` grants Premium, for `ACTIVATION_PROOF_LIFETIME_SECONDS`, with the value `1`: it carries no identifier and grants nothing. The premium store's `confirmActivation` reads it once the session check answers with a session, deletes it in the same task and reports `premium_activated` only when it was there, through `claimActivationProof()` in `apps/web/src/ui/adapters/session/checkSession.ts`. It is deliberately **not** `httpOnly`: a proof only the server could spend would need a request to spend it, and a reload between the server spending it and the page reading the answer would lose the report. See [premium](/how-it-works/premium/).
 
 ## <code>{SIDEBAR_COOKIE_NAME}</code>
 

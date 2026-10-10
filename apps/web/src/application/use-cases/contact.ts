@@ -14,8 +14,8 @@ import {
 	releaseContactSlot,
 	reserveContactSlot,
 } from "@infrastructure/services/contact/repository";
-import { render } from "@react-email/render";
 import { Effect } from "effect";
+import { render } from "react-email";
 
 interface ContactEmailConfig {
 	siteUrl: string;

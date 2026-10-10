@@ -87,14 +87,17 @@ There is a client on each side, and the split is the trap:
 - [`payments/stripe/client.ts`](./payments/stripe/client.ts), browser only, `@stripe/stripe-js/pure`, and it does exactly one thing:
   memoise `loadStripe(publishableKey)`, forgetting the promise when it rejects. The `StripeClient` class is **not** exported; the module's only
   export is `getStripeClientInstance()`, a lazy singleton that throws if
-  `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is absent, and its only method is `getStripePromise()`, which
-  [`StripeElementsProvider.tsx`](../../ui/modules/premium/StripeElementsProvider.tsx) calls when the checkout mounts and
-  nothing calls while a module loads. The `pure` entry is what makes that true: the bare `@stripe/stripe-js` entry
-  injects the script tag the moment it is imported, so a visitor who never donates would still fetch Stripe.js on every
-  planner load, and the contract suite fails an import of it as a value and a module-scope ask for the promise.
-  A load that fails (`Failed to load Stripe.js`, which a content blocker, a privacy extension or a proxy that blocks
-  `js.stripe.com` causes) is cleared from the memo, so the next ask loads again; it is an expected condition the
-  checkout shows, not a defect, and nothing here logs it.
+  `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is absent, and its only method is `getStripePromise()`. Two callers ask it, and
+  nothing asks it while a module loads: [`StripePreload.tsx`](../../ui/modules/providers/StripePreload.tsx), which the
+  locale layout mounts on every page so Stripe's fraud signals see the visit
+  ([ADR 0022](../../../../../adr/0022-stripe-js-loads-on-every-page-for-its-fraud-signals.md)), and
+  [`StripeElementsProvider.tsx`](../../ui/modules/premium/StripeElementsProvider.tsx) when the checkout mounts, which
+  gets the instance the page already loaded. The `pure` entry keeps the ask where the app answers it: the bare
+  `@stripe/stripe-js` entry injects the script tag the moment it is imported and writes a load that fails before
+  anything asked to the console itself, and the contract suite fails an import of it as a value and a module-scope
+  ask for the promise. A load that fails (`Failed to load Stripe.js`, which a content blocker, a privacy extension or a
+  proxy that blocks `js.stripe.com` causes) is cleared from the memo, so the next ask loads again; it is an expected
+  condition the checkout shows, not a defect, and nothing here logs it.
   The confirm-and-classify path that runs in the browser is
   [`../../ui/adapters/payments/checkout.ts`](../../ui/adapters/payments/checkout.ts): it takes the `stripe`
   instance from Elements, calls `stripe.confirmPayment` itself and classifies the outcome as
