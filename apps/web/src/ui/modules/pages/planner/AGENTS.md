@@ -4,7 +4,7 @@
 
 The planner screen: the month calendars, the Holiday tables, the Alternative switcher, the PTO budget readout
 and the analytics. The planner runs in the browser
-([ADR 0001](../../../../../../../adr/0001-planner-runs-in-the-browser.md)), so this is where the loop of
+([ADR 0001](../../../../../../../docs/adr/0001-planner-runs-in-the-browser.md)), so this is where the loop of
 *filter changes → recalculation → repaint* closes.
 
 Nothing here computes a Suggestion. [`CalendarList.tsx`](./CalendarList.tsx) asks `useCalculationsWorker` to run
@@ -114,7 +114,7 @@ not persisted, so a reload waits for its first fetch. `planRevision` is the sign
 it; see [`@application/stores/AGENTS.md`](../../../../application/stores/AGENTS.md).
 [`Troubleshooting.tsx`](../homepage/support/Troubleshooting.tsx) is the one other caller: it runs the holidays
 store's `generateSuggestions` on the main thread. Both paths reach `runPlanningPipeline`, which clears the
-calculation caches on entry ([ADR 0006](../../../../../../../adr/0006-caller-owned-calculation-caches.md)).
+calculation caches on entry ([ADR 0006](../../../../../../../docs/adr/0006-caller-owned-calculation-caches.md)).
 
 **`CalendarList` prunes Manual and Removed Days when the Planning Window moves.** `pruneDaysOutsideWindow` runs
 on every change to `year` or `carryOverMonths`, before the calculation effect. `measureBudget` counts every
@@ -136,7 +136,7 @@ the stores are ready.
 **`PremiumFeature` from `@ui/modules/premium` wraps the gated parts** (the Custom Holiday tab, the row
 checkboxes, the advanced charts) and renders its children as soon as `premiumKey` is set;
 `calendar/usePlannerDayClick.tsx` reads `premiumKey` before a day click reaches the store. Access is derived
-from the payment record ([ADR 0008](../../../../../../../adr/0008-premium-derived-from-payment.md)).
+from the payment record ([ADR 0008](../../../../../../../docs/adr/0008-premium-derived-from-payment.md)).
 
 ## Gotchas
 
@@ -320,7 +320,7 @@ the recharts charts index into; `summary/MetricCard.tsx` declares its own record
 is derived from the other.
 
 **[`YearTimelineChart.tsx`](./summary/YearTimelineChart.tsx) is not a recharts chart.** It is positioned `div`s,
-with `Temporal.PlainYearMonth` for month lengths ([ADR 0005](../../../../../../../adr/0005-temporal-polyfill.md));
+with `Temporal.PlainYearMonth` for month lengths ([ADR 0005](../../../../../../../docs/adr/0005-temporal-polyfill.md));
 the other charts use recharts and are the reason `Summary.tsx` loads them through `dynamic()`. It spans the
 Planning Window: it takes `carryOverMonths` and positions through the engine's `windowMonthCount` and
 `windowMonthIndex` rather than restating them, and `Summary` hands it `holidaysInWindow`. Its month labels repeat

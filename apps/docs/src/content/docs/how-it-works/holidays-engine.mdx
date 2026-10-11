@@ -31,7 +31,7 @@ flowchart LR
 
 The production adapter, `dateHolidaysSource` in `apps/web/src/infrastructure/services/holidays/source/dateHolidays.ts`, is the **only** place in the app that constructs the `date-holidays` package. It looks up the chosen year **and the next one**, because Carry-over Months reach into it, and it does so twice: once for the Country alone and once for the Country plus Region. The locale is passed as `languages: [locale]`, so the names come back translated where the package has a translation.
 
-It runs in the browser. The only caller is `fetchHolidays` in the [holidays store](/how-it-works/state-stores/), through a dynamic `import()`, so the package and its data ship in the client bundle and a lookup is a synchronous library call, offline-capable and free of any network round trip. That is a consequence of [ADR 0001](https://github.com/fbuireu/forever-pto/blob/main/adr/0001-planner-runs-in-the-browser.md), and it means nothing in this folder may touch a Node or Cloudflare API.
+It runs in the browser. The only caller is `fetchHolidays` in the [holidays store](/how-it-works/state-stores/), through a dynamic `import()`, so the package and its data ship in the client bundle and a lookup is a synchronous library call, offline-capable and free of any network round trip. That is a consequence of [ADR 0001](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0001-planner-runs-in-the-browser.md), and it means nothing in this folder may touch a Node or Cloudflare API.
 
 ## The rules, above the seam
 

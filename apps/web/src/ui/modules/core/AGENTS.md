@@ -54,7 +54,7 @@ from `motion` (`motion/react`), with `vaul` for the drawer, `cmdk` for the comma
 `next-themes` for the toaster's theme.
 
 `LazyMotionProvider` loads `domAnimation` on demand. Nearly everything here ships to the browser: the
-planner runs there end to end ([ADR 0001](../../../../../../adr/0001-planner-runs-in-the-browser.md)), so a
+planner runs there end to end ([ADR 0001](../../../../../../docs/adr/0001-planner-runs-in-the-browser.md)), so a
 dependency added in this folder is a dependency added to the client bundle of every screen.
 
 Coupling back into the rest of the app is small, but it is not zero. The complete list:
@@ -190,7 +190,7 @@ that reading. A veto leaves the text as typed, so the blur handler also redraws,
 the text from the held value: `2.5` becomes `2,5` in Spanish and text with no reading becomes empty. The wrapper
 `div` is `display: contents` and Base UI's hidden `type="number"` mirror sits beside it, `position: fixed`, outside the
 layout. Typed values are not clamped (`allowOutOfRange`); the arrow keys, Home and End clamp to `min` and `max` and snap
-to `step` ([ADR 0021](../../../../../../adr/0021-numbers-a-visitor-types-are-localised-text-fields.md)).
+to `step` ([ADR 0021](../../../../../../docs/adr/0021-numbers-a-visitor-types-are-localised-text-fields.md)).
 
 **`primitives/Slider.tsx` exists to pin the value type.** `@base-ui/react` hands its callbacks a
 `number | readonly number[]`; every caller wants a mutable `number[]`, so the wrapper copies the array or boxes

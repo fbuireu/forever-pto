@@ -58,6 +58,6 @@ subdomains in `script-src` and `frame-src`, `hooks.stripe.com` in `frame-src` an
   load: `app/[locale]/layout.test.tsx` fails when the layout stops mounting it, and `StripePreload.test.tsx` fails a
   quiet failure that becomes noisy and a checkout that loads the script twice.
 - The contract suite keeps Stripe.js on its `pure` entry and every ask inside a function, and holds the CSP to the
-  sources above ([`CODING_STANDARDS.md`](../CODING_STANDARDS.md)). The client and the component are described in
-  [`apps/web/src/infrastructure/clients/AGENTS.md`](../apps/web/src/infrastructure/clients/AGENTS.md) and
-  [`apps/web/src/ui/modules/AGENTS.md`](../apps/web/src/ui/modules/AGENTS.md).
+  sources above ([`CODING_STANDARDS.md`](../../CODING_STANDARDS.md)). The client and the component are described in
+  [`apps/web/src/infrastructure/clients/AGENTS.md`](../../apps/web/src/infrastructure/clients/AGENTS.md) and
+  [`apps/web/src/ui/modules/AGENTS.md`](../../apps/web/src/ui/modules/AGENTS.md).

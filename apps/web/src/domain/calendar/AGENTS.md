@@ -6,7 +6,7 @@ The planning engine. Given a Planning Window, a set of Holidays and a PTO budget
 turn that budget into the longest stretches away from work, picks a set of them under the chosen Strategy,
 offers Alternatives, and measures the result. Pure functions throughout: same inputs, same output, no
 clock beyond `startOfToday()`, no I/O. The layer contract it sits under is in [`../AGENTS.md`](../AGENTS.md)
-([ADR 0003](../../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md)); the words it uses are
+([ADR 0003](../../../../../docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md)); the words it uses are
 in [`GLOSSARY.md`](../../../../../GLOSSARY.md).
 
 ## Files
@@ -162,7 +162,7 @@ Bridges of the days being measured, which is the pairing `getBridgesInUse` exist
 
 ## Strategies
 
-A Strategy is an `Objective` ([ADR 0020](../../../../../adr/0020-strategies-are-objectives-over-the-marginal-gain.md)):
+A Strategy is an `Objective` ([ADR 0020](../../../../../docs/adr/0020-strategies-are-objectives-over-the-marginal-gain.md)):
 a **floor** on the marginal gain and a **rank**, both applied to a `Candidate` measured against the plan built so
 far, and an **aim**, which ranks a whole plan by its `PlanMeasures`. The marginal gain is the days a Bridge's span
 adds to what the plan already covers, divided by its PTO Days.
@@ -523,7 +523,7 @@ cache anyone keys into.
 knows where a run begins; a `clear` anywhere below it would evict a set the same run is still using.
 `worker.ts` and the holidays store's `generateSuggestions` action pass inputs and read a result; neither knows
 the caches exist, and a new entry point cannot forget a step it never had
-([ADR 0006](../../../../../adr/0006-caller-owned-calculation-caches.md), as amended).
+([ADR 0006](../../../../../docs/adr/0006-caller-owned-calculation-caches.md), as amended).
 
 **The Holiday memo earns its keep inside one `findPlanningCandidates` call.** `createHolidaySet`'s production
 callers are `getAvailableWorkdays`, `findBridges` and `freeDaysAround` in `utils/helpers.ts`, and

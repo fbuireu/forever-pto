@@ -5,11 +5,11 @@
 Every Stripe call and every SQL statement behind a Donation. Nothing here decides a flow: each Stripe and SQL
 export is an Effect *program* composed against `StripeServerService`, `TursoService` or `LoggerService`, and
 something else (a use-case, a webhook handler, a route) provides `ApplicationLayer` and runs it
-([ADR 0002](../../../../../../adr/0002-effect-for-external-service-boundaries.md)). The normalisers and the
+([ADR 0002](../../../../../../docs/adr/0002-effect-for-external-service-boundaries.md)). The normalisers and the
 metadata helpers beside them are plain functions.
 
 The payments table is also the entitlement store. A succeeded row *is* Premium
-([ADR 0008](../../../../../../adr/0008-premium-derived-from-payment.md)), which is why [`repository.ts`](./repository.ts) is
+([ADR 0008](../../../../../../docs/adr/0008-premium-derived-from-payment.md)), which is why [`repository.ts`](./repository.ts) is
 read by the premium activation path as well as by the payment one.
 
 ## Files
@@ -45,7 +45,7 @@ The repository reads only by email and by promotion code: no function reads a pa
 keeps the webhook handlers from reading a row before they write it.
 
 The domain handlers importing infrastructure directly is the deliberate asymmetry in
-[ADR 0003](../../../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md); see
+[ADR 0003](../../../../../../docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md); see
 [`../../../domain/payment/AGENTS.md`](../../../domain/payment/AGENTS.md).
 
 ## Invariants
@@ -86,7 +86,7 @@ at all is refused too, since there is nothing to compare.
 it is applied on both sides of every comparison: `getSucceededPaymentByEmail` matches `lower(trim(email))` against a
 normalised parameter, and `activateWithClaimedPayment` normalises the intent's address and the caller's
 before testing them for equality. Email is the only key Premium can be recovered by
-([ADR 0008](../../../../../../adr/0008-premium-derived-from-payment.md)), and SQLite's `=` on `TEXT` is
+([ADR 0008](../../../../../../docs/adr/0008-premium-derived-from-payment.md)), and SQLite's `=` on `TEXT` is
 case-sensitive, so a payer who typed `Name@Example.com` at checkout and `name@example.com` on the way back
 would be refused access they had paid for. The `lower(trim(...))` on the **column** is what makes rows written
 before this normalisation still match; it forgoes an index on `email`, which is the accepted cost for a
@@ -110,7 +110,7 @@ the same place unvalidated whenever it is whitespace: `createPayment` guards wit
 `if (validated.promoCode?.trim())`, so `'   '` skips `validatePromoCode` and is written verbatim.
 
 **`email` is deliberately *not* clamped, and must not be.** It is the only key Premium can ever be recovered
-by ([ADR 0008](../../../../../../adr/0008-premium-derived-from-payment.md)) and `activateWithClaimedPayment`
+by ([ADR 0008](../../../../../../docs/adr/0008-premium-derived-from-payment.md)) and `activateWithClaimedPayment`
 matches on it exactly, so a truncated address would silently orphan the payer, the same class of failure as writing
 a blank one. An over-long address is refused earlier instead, by the `.max()` on
 `createPaymentSchemaWithMessages`, so it fails as a `ValidationError` and a 400 rather than reaching Stripe.
@@ -154,7 +154,7 @@ change here, not a widening of the tag.
 "not blocked", so payment creation keeps working when the limiter does not. It reads the
 `PAYMENT_RATE_LIMITER` binding through `getCloudflareContext({ async: true })`, the form that also resolves
 outside a request, so what confines this file to a request is the client address it keys on, not
-the context call ([ADR 0004](../../../../../../adr/0004-cloudflare-workers-as-deployment-target.md)).
+the context call ([ADR 0004](../../../../../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)).
 
 **It counts on the platform, because a KV counter cannot be made correct here.** Workers KV offers neither
 compare-and-swap nor atomic increment, so a read-modify-write lets a parallel burst from one IP, which is

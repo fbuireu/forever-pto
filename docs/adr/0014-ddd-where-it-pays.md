@@ -52,7 +52,7 @@ deliberate and named, the second because the claims become measurements.
 
 **The strategic half is not negotiable.** These are it, and a change to any of them is a change to this ADR:
 
-1. **Ubiquitous language.** [`../GLOSSARY.md`](../GLOSSARY.md) is the authority over names in code, in
+1. **Ubiquitous language.** [`../GLOSSARY.md`](../../GLOSSARY.md) is the authority over names in code, in
    user-facing copy and in these documents. One canonical term per concept, with the competing names listed
    under `_Avoid_`. A variable named for a retired term is a defect, not a style preference; the glossary is
    the only thing keeping the rival names for the same number apart.
@@ -63,7 +63,7 @@ deliberate and named, the second because the claims become measurements.
    what it may reach.
 4. **Dependency direction, as measured rather than as intended.** The graph is published as a counted table
    on the architecture overview and
-   [`tests/docs-consistency.test.ts`](../tests/docs-consistency.test.ts) fails when it and the tree disagree
+   [`tests/docs-consistency.test.ts`](../../tests/docs-consistency.test.ts) fails when it and the tree disagree
    in either direction. An arrow that only exists in prose is not a boundary.
 5. **The anti-corruption layer.** `application/dto/` is where a `date-holidays` `RawHoliday`, a Stripe
    `PaymentIntent` and an `i18n-iso-countries` map become `HolidayDTO`, `PaymentData` and `CountryDTO`. No
@@ -194,7 +194,7 @@ rejections matter as much as the fixes: a rule is only as clear as the cases it 
    value object asking to exist, and the collision it would prevent is unreachable: `addHoliday` refuses any
    date already held, so no Custom Holidays can share a day, and `holidayDTO.create` dedupes on the raw
    date string. One "no" on the first question is enough. The rule is written in
-   [`../apps/web/src/application/dto/AGENTS.md`](../apps/web/src/application/dto/AGENTS.md) instead, and the
+   [`../apps/web/src/application/dto/AGENTS.md`](../../apps/web/src/application/dto/AGENTS.md) instead, and the
    defensive `${id}::${name}` composite key in `HolidaysTable.tsx` is the shape to notice: a downstream
    re-application of an invariant nobody had stated.
 4. **`Efficiency` and `Gain` as distinct numeric types. Reachable: no. Read: yes. Crosses: yes.** They are
@@ -240,9 +240,9 @@ rejections matter as much as the fixes: a rule is only as clear as the cases it 
 - **The cost that is harder to see: a rule written and mechanically checked can still be the wrong rule.**
   The contract suite can tell you that the graph table matches the tree. It cannot tell you that an edge
   should not exist. That judgement stays with the layer contracts under
-  [`../apps/web/src/`](../apps/web/src), and with review.
-- Where this bites elsewhere: `M1` and the smell overrides in [`../CODING_STANDARDS.md`](../CODING_STANDARDS.md), the layer
-  contracts under [`../apps/web/src/`](../apps/web/src), and the architecture overview on the documentation
+  [`../apps/web/src/`](../../apps/web/src), and with review.
+- Where this bites elsewhere: `M1` and the smell overrides in [`../CODING_STANDARDS.md`](../../CODING_STANDARDS.md), the layer
+  contracts under [`../apps/web/src/`](../../apps/web/src), and the architecture overview on the documentation
   site, which links here rather than restating any of it.
 
 ## Amendment, 2026-10-04: the marketing copy speaks the visitor's words
@@ -252,7 +252,7 @@ user-facing copy, which held the homepage to the planner's vocabulary: a visitor
 "vacation plan", and the homepage could not say either. The rival numbers the glossary keeps apart are read and
 acted on in the planner, its exports, the wiki and the code, so that is where it binds. Marketing copy, which is
 the homepage with its sections and the docs site's landing pages, may use the words people search for. `N1` in
-[`../CODING_STANDARDS.md`](../CODING_STANDARDS.md) carries the scope, and the contract suite's rule on the
+[`../CODING_STANDARDS.md`](../../CODING_STANDARDS.md) carries the scope, and the contract suite's rule on the
 published wiki's prose skips the landing pages (the `template: splash` ones).
 
 **Product copy names each concept by its term, in every bundle.** The planner had called the month's Holidays

@@ -65,7 +65,7 @@ the `null`, because a payment record should say we do not know the address rathe
 
 ## From a typed failure to a status code
 
-A use-case fails with a tagged error declared in [`src/infrastructure/errors.ts`](../errors.ts) (`DatabaseError`, `DuplicateContactError`, `EmailError`, `MissingDonorEmailError`, `PaymentError`, `PromoCodeError`, `RateLimitError`, `SessionError`, `ValidationError`, `WebhookError`). The entry point, the only place the program is run, turns each tag into a status and a body. That mapping is the whole reason this folder exists; see [ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md).
+A use-case fails with a tagged error declared in [`src/infrastructure/errors.ts`](../errors.ts) (`DatabaseError`, `DuplicateContactError`, `EmailError`, `MissingDonorEmailError`, `PaymentError`, `PromoCodeError`, `RateLimitError`, `SessionError`, `ValidationError`, `WebhookError`). The entry point, the only place the program is run, turns each tag into a status and a body. That mapping is the whole reason this folder exists; see [ADR 0002](../../../../../docs/adr/0002-effect-for-external-service-boundaries.md).
 
 **Most of the table below is `describeFailure` in `errors.ts`; its last column names where each row lives.** The
 mapping is a property of the *error*, not of the transport, so it lives once: `FAILURE_RESPONSES` is typed `{ [TAG in TaggedFailure['_tag']]: … }`, which
@@ -171,6 +171,6 @@ lookup entirely; see [`../../ui/AGENTS.md`](../../ui/AGENTS.md).
 
 [`response.test.ts`](./response.test.ts) covers `noStore` directly: body, default and custom status, the header, and that custom headers survive alongside it. [`parseJsonBody.test.ts`](./parseJsonBody.test.ts) pins its outcomes: an object body succeeds, a malformed body fails with `INVALID_BODY`, and so does a non-object one.
 
-[`errors.test.ts`](./errors.test.ts) asserts the tag→status table row by row. The operation tests under [`operations/`](./operations/) assert the ordering, the deferral and the body each operation builds around that table; a transport test covers what the transport alone decides: the route puts the operation's body and status on a `NextResponse` and hands it `parseJsonBody`, the action drops the status, and each maps the request's own headers or config onto the operation's input.
+[`errors.test.ts`](./errors.test.ts) asserts the tag→status table row by row. The operation tests under [`operations/`](./operations) assert the ordering, the deferral and the body each operation builds around that table; a transport test covers what the transport alone decides: the route puts the operation's body and status on a `NextResponse` and hands it `parseJsonBody`, the action drops the status, and each maps the request's own headers or config onto the operation's input.
 
 The e2e specs compare the codes against `ApiError.*` as well ([`check-session.spec.ts`](../../../e2e/api/check-session.spec.ts), [`webhooks-stripe.spec.ts`](../../../e2e/api/webhooks-stripe.spec.ts), the `.well-known` spec's `ApiError.NOT_FOUND`), and [`markdown.spec.ts`](../../../e2e/api/markdown.spec.ts) imports the twin's header name, Accept value and route, so a rename moves them with it.

@@ -55,12 +55,12 @@ own `Holidays`. It stays in its own folder because a Region list is a location c
 
 The one caller is `fetchHolidays` in [`src/application/stores/holidays.ts`](../../../application/stores/holidays.ts), and it reaches this module
 through a dynamic `import()`. Holiday data ships in the client bundle and is computed on the device
-([ADR 0001](../../../../../../adr/0001-planner-runs-in-the-browser.md)). Consequences that are easy to miss:
+([ADR 0001](../../../../../../docs/adr/0001-planner-runs-in-the-browser.md)). Consequences that are easy to miss:
 
 - **No Node and no Cloudflare APIs may appear here or in anything it imports.** Logging goes through the
   `logger` import rather than `LoggerService`, because there is no Effect layer on
   the browser path, the logging exception in
-  [ADR 0002](../../../../../../adr/0002-effect-for-external-service-boundaries.md).
+  [ADR 0002](../../../../../../docs/adr/0002-effect-for-external-service-boundaries.md).
 - **The work is synchronous and it is not offloaded to the Web Worker.** `Effect.try` wraps a plain
   computation; only suggestion generation goes through [`src/infrastructure/workers/worker.ts`](../../workers/worker.ts). Building
   two years of Holidays blocks the main thread, and it re-runs on every Country, Region, year or locale change;
@@ -139,4 +139,4 @@ anything.
 carry no `location` of their own and one national entry is an `observance`, so the stamp and the filter are
 proved rather than performed by the fixture. [`dateHolidays.test.ts`](./source/dateHolidays.test.ts) asserts how
 the package is asked, never what it returns, since the version bundled is the version shipped
-([ADR 0001](../../../../../../adr/0001-planner-runs-in-the-browser.md)).
+([ADR 0001](../../../../../../docs/adr/0001-planner-runs-in-the-browser.md)).

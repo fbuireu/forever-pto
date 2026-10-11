@@ -18,7 +18,7 @@ const PACKAGE_GUIDES = WORKSPACE_PACKAGES.map((pkg) => `${pkg}/AGENTS.md`);
 const LAYER_ROOTS = ["app", "application", "domain", "infrastructure", "ui"].map((layer) => `${WEB}/src/${layer}`);
 const LOCALES_DIR = `${WEB}/src/ui/i18n/messages`;
 const STARLIGHT_VENDOR = `${DOCS}/node_modules/@astrojs/starlight/dist`;
-const ADR_DIR = "adr";
+const ADR_DIR = "docs/adr";
 const ADR_TEMPLATE = "0000-adr-template.md";
 const GENERATED_ENV_TYPES = "cloudflare-env.d.ts";
 const HAND_WRITTEN_ENV_TYPES = "environment.d.ts";
@@ -929,7 +929,7 @@ describe("architecture decision records", () => {
 		expect(malformed).toEqual([]);
 	});
 
-	it("are each linked from a document outside adr/", () => {
+	it("are each linked from a document outside docs/adr/", () => {
 		const elsewhere = authoredMarkdown.filter((path) => !path.startsWith(`${ADR_DIR}/`)).map(read);
 		const orphaned = decisions.filter((file) => !elsewhere.some((body) => body.includes(file)));
 
@@ -937,7 +937,7 @@ describe("architecture decision records", () => {
 		expect(orphaned).toEqual([]);
 	});
 
-	it("name back every document outside adr/ that ties an amendment to them, so an amendment is reachable from the ADR it changes", () => {
+	it("name back every document outside docs/adr/ that ties an amendment to them, so an amendment is reachable from the ADR it changes", () => {
 		const byNumber = new Map(decisions.map((file) => [file.slice(0, 4), read(`${ADR_DIR}/${file}`)]));
 		const unrecorded: string[] = [];
 		let checked = 0;
@@ -1018,7 +1018,7 @@ describe("documentation does not point at things that are gone", () => {
 	const DELIBERATELY_ABSENT = new Set(["proxy.ts", "index.ts"]);
 
 	const isSupersededAdr = (file: string) =>
-		file.startsWith("adr/") && /^## Status\n\n(?:.*\n)*?Superseded by /m.test(read(file));
+		file.startsWith(`${ADR_DIR}/`) && /^## Status\n\n(?:.*\n)*?Superseded by /m.test(read(file));
 
 	const exists = (token: string) => sourceFiles.some((path) => path === token || path.endsWith(`/${token}`));
 
@@ -5459,7 +5459,9 @@ describe("stated versions", () => {
 	it("states the current version of nothing a bot moves, outside the ADRs", () => {
 		const documents = trackedFiles.filter(
 			(file) =>
-				(file.endsWith(".md") || file.endsWith(".mdx")) && !file.startsWith("adr/") && !file.endsWith("CHANGELOG.md"),
+				(file.endsWith(".md") || file.endsWith(".mdx")) &&
+				!file.startsWith(`${ADR_DIR}/`) &&
+				!file.endsWith("CHANGELOG.md"),
 		);
 		const stated = documents.flatMap((file) =>
 			[...read(file).matchAll(STATED_VERSION)].map(([match]) => `${file}: ${match}`),

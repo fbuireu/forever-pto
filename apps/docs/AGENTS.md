@@ -64,7 +64,7 @@ The wiki measures itself, and everything it measures is browser-side. There is n
 cannot be: `wrangler.toml` declares no `main`, so Cloudflare serves the built assets without invoking a script
 and there is no handler, `fetch` or binding call to trace. Naming a `destinations` entry would create a
 destination that receives its own test message and nothing else.
-[ADR 0019](../../adr/0019-the-wiki-measures-itself-with-its-own-consent-flow.md) records the whole decision.
+[ADR 0019](../../docs/adr/0019-the-wiki-measures-itself-with-its-own-consent-flow.md) records the whole decision.
 
 - [`src/lib/analytics/consent.ts`](./src/lib/analytics/consent.ts) configures `vanilla-cookieconsent` with the
   library's own UI, in every locale the site serves, picked off `document.documentElement.lang`, and wires the
@@ -113,7 +113,7 @@ destination that receives its own test message and nothing else.
   `navigator.webdriver`, so the banner never renders while `run()` resolves without an error, which reads as
   broken code and is the library doing its job. The spec overrides that property in a `beforeEach`. Two of its cases read the Consent Mode calls that `Head.astro`
   writes only when `PUBLIC_GOOGLE_ANALYTICS_ID` is set at build time, so they fail against a local build
-  without it ([`.env.example`](./.env.example) names both variables); the Docs workflow sets it.
+  without it ([`.env.example`](.env.example) names both variables); the Docs workflow sets it.
 
 ## Deploy
 

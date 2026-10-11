@@ -1,7 +1,7 @@
 # Coding standards
 
 What a review checks a diff against. The words are the ones [GLOSSARY.md](./GLOSSARY.md) defines, the reasons are in
-[adr/](./adr/), and what an implementer needs while working is in the `AGENTS.md` guides.
+[docs/adr/](./docs/adr), and what an implementer needs while working is in the `AGENTS.md` guides.
 
 **hard** marks a rule whose breach is a defect: report it with the rule. **judgement** marks a call the reviewer
 weighs against the diff: report it as a question. A rule here outranks the smell baseline; where it endorses
@@ -10,7 +10,7 @@ something a smell would flag, the case is listed under *Deliberate overrides of 
 Every rule carries an id, and a finding cites it with this file: `CODING_STANDARDS.md A3`. A rule applies to
 `apps/web` unless its section names `apps/docs`; `N1` applies to both. A rule marked *check pending* is mechanical,
 and it leaves this body in the commit that lands its check. The process around a change (commit types, one package
-per pull request) is [CONTRIBUTING.md](./.github/CONTRIBUTING.md)'s.
+per pull request) is [CONTRIBUTING.md](.github/CONTRIBUTING.md)'s.
 
 ## Tooling already enforces
 
@@ -157,7 +157,7 @@ No rule below restates these, and a diff that breaks one fails CI:
 
 - `N1` **hard**: Name identifiers, product copy and docs with the glossary's canonical term; a retired `_Avoid_` name
   lets rival numbers share a word, so it is a defect even on a symbol nothing calls
-  ([ADR 0014](./adr/0014-ddd-where-it-pays.md)). The glossary binds code, documents and product copy; marketing copy,
+  ([ADR 0014](./docs/adr/0014-ddd-where-it-pays.md)). The glossary binds code, documents and product copy; marketing copy,
   which is the homepage with its sections and the docs site's landing pages, may use the words people search for
   ("days off", "free days", "vacation plan"). In the bundles that means `homepage`, `faq`, `quickStart`,
   `troubleshooting` and `metadata`; every other namespace, bar the four legal texts, is product copy.
@@ -168,7 +168,7 @@ No rule below restates these, and a diff that breaks one fails CI:
 - `N4` **judgement**: Leave a retired term inside a message key or an analytics event id when renaming it costs a
   change across every bundle or splits a funnel; the text the user reads still uses the canonical word.
 - `N5` **hard**: Name persisted-state helpers for obfuscation (`obfuscate`, `obfuscatedStorage`), because the key
-  ships in the bundle ([ADR 0007](./adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md)).
+  ships in the bundle ([ADR 0007](./docs/adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md)).
 - `N6` **hard**: Put the filter a query applies in its name (`getSucceededPaymentByEmail`), so no caller re-checks
   what the `WHERE` already decided.
 - `N7` **judgement**: Give a module's main export the file's name, or name the file after the concept and the export
@@ -179,11 +179,11 @@ No rule below restates these, and a diff that breaks one fails CI:
 - `M1` **judgement**: Before a concept gets a type of its own, ask in order whether the illegal state can be
   reached, whether anything reads it and whether it crosses a boundary; the first no means writing the rule down (an
   assertion, a guide line, an ADR) instead of encoding it, and three yeses let a type be proposed, never require one
-  ([ADR 0014](./adr/0014-ddd-where-it-pays.md)).
+  ([ADR 0014](./docs/adr/0014-ddd-where-it-pays.md)).
 - `M2` **hard**: Narrow a sealed union or a bounded shape where it crosses an untrusted boundary (persisted state,
   the worker wire, a query string) with its own predicate, once (`isStrategy`, `isHolidayVariant`,
   `isPreferredMonths`); a value that fails it takes the default or is dropped, never guessed, and the rest of that
-  wire stays typed ([ADR 0014](./adr/0014-ddd-where-it-pays.md)).
+  wire stays typed ([ADR 0014](./docs/adr/0014-ddd-where-it-pays.md)).
 - `M3` **hard**: Make a wrong call unrepresentable: a value the caller holds and could lose in silence behind a
   plausible default (the Metrics' Holidays in `generateMetrics`) is a required parameter, and a check one caller owes
   is a required parameter of that caller's own entry point. An optional parameter with a neutral default
@@ -202,7 +202,7 @@ No rule below restates these, and a diff that breaks one fails CI:
 - `M9` **hard**: Declare a list whose members become a type (`LOCALES`) `as const`, or the derived type widens to
   `string`.
 - `M10` **judgement**: Narrow a field only where the value is proved: a `TEXT` column read back stays `string`, and
-  a mirror of an open upstream enum is widened, not closed ([ADR 0014](./adr/0014-ddd-where-it-pays.md)).
+  a mirror of an open upstream enum is widened, not closed ([ADR 0014](./docs/adr/0014-ddd-where-it-pays.md)).
 - `M11` **hard**: Declare in a component's props only what it honours or forwards, so a prop a caller passes is
   never dropped in silence; a prop read only when the component mounts is named `initial…` (`initialMonth`), or
   `default…` where it mirrors a primitive's own prop (`defaultOpen`), and props that exclude each other are a union on
@@ -256,14 +256,14 @@ No rule below restates these, and a diff that breaks one fails CI:
 
 - `E1` **hard**: Write a server path that talks to Stripe, Turso or Resend as an Effect program with a typed error
   channel and service tags; code that only transforms data stays plain TypeScript
-  ([ADR 0002](./adr/0002-effect-for-external-service-boundaries.md)).
+  ([ADR 0002](./docs/adr/0002-effect-for-external-service-boundaries.md)).
 - `E2` **hard**: Map every SDK rejection to the method's tagged error (`DatabaseError`, `EmailError`,
   `PaymentError`), chosen when the method is added and keeping the original in `cause`; the error channel never
   carries a raw SDK exception, and `failureContext` keeps `cause` out of the log
-  ([ADR 0002](./adr/0002-effect-for-external-service-boundaries.md)).
+  ([ADR 0002](./docs/adr/0002-effect-for-external-service-boundaries.md)).
 - `E3` **hard**: Refine a failure with a subclass that keeps the parent's `_tag` (`SessionConfigurationError`); a
   sub-case that needs its own status gets its own tag and its own row in `describeFailure`
-  ([ADR 0002](./adr/0002-effect-for-external-service-boundaries.md)).
+  ([ADR 0002](./docs/adr/0002-effect-for-external-service-boundaries.md)).
 - `E4` **hard**: Absorb a failure only where the substitute is an answer the flow could genuinely have got; a
   database failure on the critical path propagates.
 - `E5` **hard**: Keep `ValidationError` for conditions the code decides itself; its message reaches the client
@@ -277,8 +277,8 @@ No rule below restates these, and a diff that breaks one fails CI:
   `payment_intent_client_secret` never reaches the sink.
 - `E10` **hard**: Log from stores and components through `logClient` or `logClientError`, from the lookups under
   `infrastructure/services` through the `logger` import, and through `LoggerService` only where a layer is provided
-  ([ADR 0002](./adr/0002-effect-for-external-service-boundaries.md),
-  [ADR 0013](./adr/0013-loggerservice-stays-a-tag.md)).
+  ([ADR 0002](./docs/adr/0002-effect-for-external-service-boundaries.md),
+  [ADR 0013](./docs/adr/0013-loggerservice-stays-a-tag.md)).
 - `E11` **judgement**: Log a failure's own enumerable fields (`failureContext`) rather than an assumed `message`.
 - `E12` **judgement**: Attach an error-path log in `Effect.sync` inside a `tapError` on the step it names; a log on a
   successful branch is a plain statement, and `Effect.sync` adds no safety.
@@ -286,10 +286,10 @@ No rule below restates these, and a diff that breaks one fails CI:
 ## Domain (`apps/web/src/domain`)
 
 - `D3` **hard**: Compose `payment/` directly against infrastructure tags; the tags already are the interfaces
-  ([ADR 0003](./adr/0003-pure-calendar-domain-effectful-payment-domain.md)).
+  ([ADR 0003](./docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md)).
 - `D4` **hard**: Keep the engine pure (no clock beyond `startOfToday()`, no I/O) and its orchestration in
   `runPlanningPipeline`; callers pass inputs and read a result
-  ([ADR 0006](./adr/0006-caller-owned-calculation-caches.md)).
+  ([ADR 0006](./docs/adr/0006-caller-owned-calculation-caches.md)).
 - `D5` **hard**: Compute the Remaining Budget and Gain through `measureBudget` and `measureGain`, never by
   subtracting lengths at the call site.
 - `D6` **hard**: Under `metrics/`, build the set of Closed Days through `closedDayKeys` and write a stretch metric as a
@@ -302,28 +302,28 @@ No rule below restates these, and a diff that breaks one fails CI:
   detail (user agent, IP address) stays with the metadata reader.
 - `D9` **hard**: Hold an invariant that must survive concurrent writes in the SQL predicate
   (`status != 'succeeded'`, the contact slot's `WHERE NOT EXISTS`), not in a read followed by a write
-  ([ADR 0014](./adr/0014-ddd-where-it-pays.md)).
+  ([ADR 0014](./docs/adr/0014-ddd-where-it-pays.md)).
 - `D10` **hard**: Write a Strategy as one `Objective` in `STRATEGY_OBJECTIVE` (a floor, a `rank`, an `aim`, and
   `admits` or `next` only when it needs them), applied by the one selector, `selectBridges`; a limit on what a stage
   may take goes in `admits` and a preference in `rank`, and a per-Strategy sort or a second walk is a defect
-  ([ADR 0020](./adr/0020-strategies-are-objectives-over-the-marginal-gain.md)).
+  ([ADR 0020](./docs/adr/0020-strategies-are-objectives-over-the-marginal-gain.md)).
 - `D11` **hard**: Rank a candidate on what it adds to the plan built so far (the marginal gain, the stretch it ends
   up in, its distance from what is taken), never on a score it has alone; a candidate under its Strategy's floor stays
-  out and the budget stays unspent ([ADR 0020](./adr/0020-strategies-are-objectives-over-the-marginal-gain.md)).
+  out and the budget stays unspent ([ADR 0020](./docs/adr/0020-strategies-are-objectives-over-the-marginal-gain.md)).
 - `D12` **hard**: Count what the engine optimises the way the Metrics count it: the free streaks around the placed
   days, the Manual Days' own (`alreadyOff`) included, through `measurePlan`; a selector that believes it gained more
   than the Metrics report has counted a Free Day twice
-  ([ADR 0020](./adr/0020-strategies-are-objectives-over-the-marginal-gain.md)).
+  ([ADR 0020](./docs/adr/0020-strategies-are-objectives-over-the-marginal-gain.md)).
 - `D13` **hard**: Size a search by the engine's own constant and let the caller's count only slice what it returns
   (`ALTERNATIVES.SEARCHED` against `maxAlternatives`), so the Suggestion never depends on how many Alternatives the
-  screen shows ([ADR 0020](./adr/0020-strategies-are-objectives-over-the-marginal-gain.md)).
+  screen shows ([ADR 0020](./docs/adr/0020-strategies-are-objectives-over-the-marginal-gain.md)).
 - `D14` **hard**: Keep selection incremental: after a pick, update only the candidates the new span touches, count
   in `dayIndex` integers and compute once what a run never changes; recomputing every fact per step, or building a
   `Date` or Temporal object per comparison, is the regression
-  ([ADR 0020](./adr/0020-strategies-are-objectives-over-the-marginal-gain.md)).
+  ([ADR 0020](./docs/adr/0020-strategies-are-objectives-over-the-marginal-gain.md)).
 - `D15` **hard**: Treat what `strategies.test.ts` pins as what each Strategy means: an `Objective` change that keeps
   it is a tuning, and one that breaks it changes ADR 0020 and the glossary's Strategy entry in the same commit
-  ([ADR 0020](./adr/0020-strategies-are-objectives-over-the-marginal-gain.md)).
+  ([ADR 0020](./docs/adr/0020-strategies-are-objectives-over-the-marginal-gain.md)).
 - `D16` **hard**: Answer a ratio over an empty denominator with 0, never `NaN`, and pin it in a test
   (`generateMetrics`, `measures`, `budget`).
 - `D17` **hard**: Sort with `toSorted`; `.sort()` is for an array the function has just built, because a sort in
@@ -337,16 +337,16 @@ No rule below restates these, and a diff that breaks one fails CI:
 
 - `A3` **hard**, *check pending*: Write a use-case export as `Effect.gen` with its `Effect.Effect<A, E, R>` return
   type spelled out, ending in `Effect.withSpan` named after the export; the annotation is what turns a stray
-  `LoggerService` into a compile error ([ADR 0013](./adr/0013-loggerservice-stays-a-tag.md),
-  [ADR 0017](./adr/0017-observability-is-the-platform-export.md)). Exports that differ only in the check each owes
+  `LoggerService` into a compile error ([ADR 0013](./docs/adr/0013-loggerservice-stays-a-tag.md),
+  [ADR 0017](./docs/adr/0017-observability-is-the-platform-export.md)). Exports that differ only in the check each owes
   (`activateWithPayment`, `activateWithClaimedPayment`) may delegate to one private `Effect.gen` and share its
   return type as one named alias, because the annotation then bites where the requirements are yielded
-  ([ADR 0008](./adr/0008-premium-derived-from-payment.md)).
+  ([ADR 0008](./docs/adr/0008-premium-derived-from-payment.md)).
 - `A4` **hard**: Keep a use-case a value: it never runs itself, reads a request or picks an HTTP status.
 - `A5` **hard**: Do date arithmetic in `dates.ts`: on Temporal underneath, or on a local date's own fields and the
   `dayIndex` integers where a round trip per call is the cost (`isSameDay`, `dayIndex`, `fromDayIndex`); every `Date`
   it returns is local midnight and compares with `isSameDay`, `compareAsc` or `isWithinInterval`, never through
-  `toISOString()` ([ADR 0005](./adr/0005-temporal-polyfill.md)).
+  `toISOString()` ([ADR 0005](./docs/adr/0005-temporal-polyfill.md)).
 - `A6` **hard**: Bring a date in through `dateIntake.ts`, picked by its source: `fromUpstreamCalendarDay` for a day
   upstream named, `fromStoredInstant` for a value this app wrote.
 - `A8` **hard**: Enforce a store bound in the setter every writer passes and again at rehydration, not at the control
@@ -359,7 +359,7 @@ No rule below restates these, and a diff that breaks one fails CI:
   derive a value when it can be derived instead of reading a store another component fills.
 - `A13` **hard**: Keep a DTO pure: `create` is a function of `raw` and `params`, SDK types arrive as `import type`,
   and `holiday/types.ts` stays evaluable in a Web Worker
-  ([ADR 0003](./adr/0003-pure-calendar-domain-effectful-payment-domain.md)).
+  ([ADR 0003](./docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md)).
 - `A14` **judgement**: Lay out a DTO concept with the fixed names (`types.ts`, `dto.ts`, `schema.ts`, `utils/`,
   `rules.ts`) and only the files it needs.
 - `A15` **hard**: Take a number a message states from the exported constant that owns it (a schema's minimum, the
@@ -369,7 +369,7 @@ No rule below restates these, and a diff that breaks one fails CI:
   matches what is on screen, and the stamp is never persisted.
 - `A17` **hard**: Keep a rewrite of how persisted state is encoded byte-compatible with every blob already stored,
   and pin it with a test against the implementation it replaces (`utils/crypto.test.ts`)
-  ([ADR 0007](./adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md)).
+  ([ADR 0007](./docs/adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md)).
 - `A18` **judgement**: Add a persisted field without a `STORAGE_VERSION` bump when the initial state supplies it and
   rehydration narrows it; bump and migrate only when an old blob would rehydrate into a wrong value.
 
@@ -377,7 +377,7 @@ No rule below restates these, and a diff that breaks one fails CI:
 
 - `I1` **hard**: Construct a server SDK only in `infrastructure/clients`, as a `Context.Tag` plus a `Layer.sync` Live
   layer that builds the client lazily in its closure; a browser SDK (Stripe.js, the tracking and tutorial drivers) is
-  a memoised module instead ([ADR 0002](./adr/0002-effect-for-external-service-boundaries.md)).
+  a memoised module instead ([ADR 0002](./docs/adr/0002-effect-for-external-service-boundaries.md)).
 - `I2` **hard**: Read configuration inside the call, never while a layer is built, so a missing variable fails only
   the routes that reach that client.
 - `I3` **hard**: Implement a flow that a route and a server action share once, under `api/operations/` (rate limit,
@@ -459,7 +459,7 @@ No rule below restates these, and a diff that breaks one fails CI:
   never `type="number"`, and hold it as `number | null`, where `null` is an emptied field or text it cannot read and
   the owner converts it where it is used (the accrual and salary calculators, the Donation amount), because
   `NumberInput` keeps the typed text and reads it in the visitor's language, and state that converted every keystroke
-  would write `0` over what is being typed ([ADR 0021](./adr/0021-numbers-a-visitor-types-are-localised-text-fields.md)).
+  would write `0` over what is being typed ([ADR 0021](./docs/adr/0021-numbers-a-visitor-types-are-localised-text-fields.md)).
 - `U16` **hard**: Keep a timer's or an animation frame's handle where its cleanup reaches it (the effect that set it,
   or a ref when several callbacks share it) and clear it on close and on unmount.
 - `U17` **hard**: Key selections and list items by the item (the Holiday's id and name, a key built from the date),
@@ -480,7 +480,7 @@ No rule below restates these, and a diff that breaks one fails CI:
 - `U25` **judgement**: Keep an Effect program out of a component: a fallible browser call lives in a module of its
   own (`ui/adapters/payments/checkout.ts`, `ui/modules/export/exportPdf.tsx`) that the component imports where it
   needs it, and joins ADR 0002's list of browser files that use Effect
-  ([ADR 0002](./adr/0002-effect-for-external-service-boundaries.md)).
+  ([ADR 0002](./docs/adr/0002-effect-for-external-service-boundaries.md)).
 - `U26` **judgement**: Keep randomness out of a prerendered or cached body, where it runs once per build rather than
   per visitor.
 - `U27` **hard**: Keep a heavy dependency out of the first load: the `date-holidays` dataset, the Effect runtime and
@@ -605,7 +605,7 @@ No rule below restates these, and a diff that breaks one fails CI:
 - `Z5` **hard**: Read the Markdown twin's path only from the `x-markdown-path` header, matched exactly; a query
   fallback lets anyone relabel a URL.
 - `Z6` **hard**: Keep confidential values out of persisted store state; they belong in the signed cookie or on the
-  server ([ADR 0007](./adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md)).
+  server ([ADR 0007](./docs/adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md)).
 - `Z7` **hard**: Resolve a client address with `resolveClientIp`, whose header order is a security decision.
 
 ## Tests
@@ -629,12 +629,12 @@ No rule below restates these, and a diff that breaks one fails CI:
   (routes, HTTP contracts, one flow per entry point), so a component with behaviour carries its own test.
 - `T7` **hard**: Substitute service tags with `Layer.succeed`, and mock every Live layer with `Layer.empty` in a test
   that imports `layers.ts`; no test builds a real Stripe, Turso or Resend client
-  ([ADR 0002](./adr/0002-effect-for-external-service-boundaries.md)).
+  ([ADR 0002](./docs/adr/0002-effect-for-external-service-boundaries.md)).
 - `T8` **hard**: Compare codes against `ApiError.*`; the tag-to-status table is asserted row by row in
   `errors.test.ts`, and an operation's test asserts the states it produces by tag.
 - `T9` **hard**: Clear both calculation caches in the `beforeEach` of every `describe` whose subject reaches `getKey`
   or `createHolidaySet`, unless the subject is the pipeline, which clears them itself on entry
-  ([ADR 0006](./adr/0006-caller-owned-calculation-caches.md)).
+  ([ADR 0006](./docs/adr/0006-caller-owned-calculation-caches.md)).
 - `T10` **judgement**: Build calendar fixtures in January 2025 unless the case is about year boundaries or Quarters,
   or measures a Strategy over a real year (`strategies.test.ts`).
 - `T11` **judgement**: Render components inside `NextIntlClientProvider` with the real bundles, often several
@@ -668,7 +668,7 @@ No rule below restates these, and a diff that breaks one fails CI:
   with the service's tagged error, which is what proves `I2`.
 - `T22` **judgement**: Test an optimiser on what it is for over a real calendar (each Strategy's aim, the selector's
   count equal to the Metrics, no Alternative ahead of the Suggestion), never on the dates it picks
-  ([ADR 0020](./adr/0020-strategies-are-objectives-over-the-marginal-gain.md)).
+  ([ADR 0020](./docs/adr/0020-strategies-are-objectives-over-the-marginal-gain.md)).
 - `T24` **judgement**: Pin a prohibition only the runtime would see (a server-only import, a module the client must
   not bundle) by reading the source in a test.
 - `T25` **judgement**: Test a server page, layout or boundary by calling it and reading the tree it returns, with its
@@ -767,10 +767,10 @@ No rule below restates these, and a diff that breaks one fails CI:
 
 - **Primitive Obsession**: PTO Day counts, Efficiency, Gain, Year, the Preferred Months and Holiday ids stay numbers
   and strings; a sealed union that crosses a boundary gets a membership predicate, not a value object
-  ([ADR 0014](./adr/0014-ddd-where-it-pays.md)).
+  ([ADR 0014](./docs/adr/0014-ddd-where-it-pays.md)).
 - **Duplicated Code**: `logging/logger.ts` is byte for byte what the sibling repositories carry and
   `logging/contract.ts` differs from theirs only in `LOG_SERVICE`, so a change to either is made in all three
-  ([ADR 0018](./adr/0018-the-platform-is-the-log-transport.md)).
+  ([ADR 0018](./docs/adr/0018-the-platform-is-the-log-transport.md)).
 - **Duplicated Code**: the stated-version helpers (`VERSIONED_DEPENDENCIES` through `declaredIn`) and the
   release-config helpers (`BREAKING_PARSER_OPTS` through `parserOptsOf`) in `tests/docs-consistency.test.ts` are byte
   for byte the same in biancafiore, contribKit and github-star-tracker, so a change to one is made in all three.
@@ -781,7 +781,7 @@ No rule below restates these, and a diff that breaks one fails CI:
 - **Duplicated Code**: `getPublicEnv` (build-safe) and `getRequestPublicEnv` (per request) stay two readers, one per
   timing.
 - **Duplicated Code**: the `'succeeded'` literal repeats inside the payments SQL, and the contract suite ties each
-  copy to `PAYMENT_SUCCEEDED` ([ADR 0014](./adr/0014-ddd-where-it-pays.md)).
+  copy to `PAYMENT_SUCCEEDED` ([ADR 0014](./docs/adr/0014-ddd-where-it-pays.md)).
 - **Duplicated Code**: the deferred writes keep their own bodies; a `deferWrite` combinator would take as many
   parameters as the bodies have lines.
 - **Duplicated Code**: `amountFormatter` (a whole-euro choice) and `useCurrencyFormatter` (an amount about to be
@@ -797,21 +797,21 @@ No rule below restates these, and a diff that breaks one fails CI:
   stay three spellings of one day: the metrics must not depend on the cache's clear, and spans need integer
   arithmetic.
 - **Middle Man**: `LoggerService` returns the same `logger` object the import does; it exists so a return-type
-  annotation catches a stray requirement ([ADR 0013](./adr/0013-loggerservice-stays-a-tag.md)).
+  annotation catches a stray requirement ([ADR 0013](./docs/adr/0013-loggerservice-stays-a-tag.md)).
 - **Middle Man**: `activateWithPayment` and `activateWithClaimedPayment` delegate to one private implementation, each
   owning its required parameter.
 - **Middle Man**: the `*Client.tsx` shells that only `dynamic()`-import with `ssr: false`, `LazyContactModal.tsx`,
   which mounts a `dynamic()` modal once it has opened, and `DriverStyles.tsx`, which renders `null`, exist to keep code
   out of a bundle.
 - **Speculative Generality**: every use-case export ends in `Effect.withSpan`, which nothing consumes today; it marks
-  the boundary a tracer would attach to ([ADR 0017](./adr/0017-observability-is-the-platform-export.md)).
+  the boundary a tracer would attach to ([ADR 0017](./docs/adr/0017-observability-is-the-platform-export.md)).
 - **Speculative Generality**: `refreshPremiumStatus` keeps its transition guard with no caller, and the
   promotion-code expiry branches stay as guards although the API filters most of what they test.
 - **Repeated Switches**: `processWebhookEvent` switches on the Stripe event type; there is no dispatcher and no event
-  bus ([ADR 0014](./adr/0014-ddd-where-it-pays.md)).
+  bus ([ADR 0014](./docs/adr/0014-ddd-where-it-pays.md)).
 - **Mysterious Name**: `repository.ts` keeps its name for a table gateway
-  ([ADR 0014](./adr/0014-ddd-where-it-pays.md)), and the `crypto.ts` files keep theirs for obfuscation because the
+  ([ADR 0014](./docs/adr/0014-ddd-where-it-pays.md)), and the `crypto.ts` files keep theirs for obfuscation because the
   guides cite those paths; the exports inside say what they do.
 - **Refused Bequest**: `SessionConfigurationError`, `WebhookConfigurationError` and `PaymentRequestError` add no
   members and keep the parent's `_tag`; they are markers narrowed with `instanceof`
-  ([ADR 0002](./adr/0002-effect-for-external-service-boundaries.md)).
+  ([ADR 0002](./docs/adr/0002-effect-for-external-service-boundaries.md)).

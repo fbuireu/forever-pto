@@ -14,7 +14,7 @@
 [![Uptime](https://uptime.betterstack.com/status-badges/v1/monitor/272ww.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL%20v3-blue?style=flat-square)](./LICENSE)
 
-**[forever-pto.com](https://forever-pto.com)** · **[Documentation](https://docs.forever-pto.com)** · **[Getting Started](#getting-started)** · **[Stack](#stack)** · **[Contributing](./.github/CONTRIBUTING.md)**
+**[forever-pto.com](https://forever-pto.com)** · **[Documentation](https://docs.forever-pto.com)** · **[Getting Started](#getting-started)** · **[Stack](#stack)** · **[Contributing](.github/CONTRIBUTING.md)**
 
 </div>
 
@@ -45,7 +45,7 @@ Given your country, region, year, and number of PTO days, Forever PTO suggests t
 
 The full wiki lives at **[docs.forever-pto.com](https://docs.forever-pto.com)**: architecture, runtime flows (country detection, premium, holidays engine…), the design system with live component demos, and the complete CI/CD and environments lifecycle.
 
-This repo is a workspace holding the app in [`apps/web/`](apps/web/) (`forever-pto-web`) and the docs site in [`apps/docs/`](apps/docs/) (`forever-pto-docs`, Astro Starlight), which reuses the app's real components and tokens and deploys independently. Each versions itself: a commit is attributed to whichever package its paths fall under, so keep a pull request to one package.
+This repo is a workspace holding the app in [`apps/web/`](apps/web) (`forever-pto-web`) and the docs site in [`apps/docs/`](apps/docs) (`forever-pto-docs`, Astro Starlight), which reuses the app's real components and tokens and deploys independently. Each versions itself: a commit is attributed to whichever package its paths fall under, so keep a pull request to one package.
 
 ```bash
 pnpm --filter forever-pto-docs dev   # docs dev server
@@ -75,7 +75,7 @@ pnpm --filter forever-pto-docs dev   # docs dev server
 
 ## Getting started
 
-**Requirements:** Node.js at the version [`.nvmrc`](./.nvmrc) declares (mirrored in `engines.node`) and pnpm, at the version `packageManager` declares; both are exact pins, so match them exactly. No version is repeated here: the manifests are the only copy Renovate keeps current
+**Requirements:** Node.js at the version [`.nvmrc`](.nvmrc) declares (mirrored in `engines.node`) and pnpm, at the version `packageManager` declares; both are exact pins, so match them exactly. No version is repeated here: the manifests are the only copy Renovate keeps current
 
 ```bash
 # Install dependencies
@@ -131,14 +131,14 @@ See [`apps/web/.env.example`](apps/web/.env.example) for the full list. Key vari
 | [`apps/web/README.md`](apps/web/README.md) | The planner: what it does, how to run it, how it releases |
 | [`apps/docs/README.md`](apps/docs/README.md) | The wiki: how to run it, and how to write a page |
 | [`GLOSSARY.md`](GLOSSARY.md) | The domain glossary: one canonical name per concept |
-| [`adr/`](adr/) | Why it is like this. One hard-to-reverse decision per file |
+| [`docs/adr/`](docs/adr) | Why it is like this. One hard-to-reverse decision per file |
 
 **The architecture is domain-driven in its strategic half and deliberately not in its tactical half.** The
 glossary rules the names, the bounded contexts and the layer boundaries are constraints, and the
 dependency graph is measured rather than drawn; aggregates, repositories, entities and an event bus are all
 absent on purpose. Which practices are taken, which are taken in part and which are rejected, with the reason
 for each and worked examples from this tree, is
-[ADR 0014](adr/0014-ddd-where-it-pays.md). Read it before proposing that anything here be "finished".
+[ADR 0014](docs/adr/0014-ddd-where-it-pays.md). Read it before proposing that anything here be "finished".
 
 Selected folders under [`apps/web/src/`](./apps/web/src) carry their own `AGENTS.md` with the detail for that folder: the layer roots plus their sub-folders, all listed in [`apps/web/AGENTS.md`](apps/web/AGENTS.md).
 [`tests/docs-consistency.test.ts`](tests/docs-consistency.test.ts) runs with the unit suite and fails the build
@@ -148,9 +148,9 @@ when the docs and the code disagree.
 
 ## Contributing
 
-See [CONTRIBUTING.md](./.github/CONTRIBUTING.md) for setup, checks and conventions,
-and the [Code of Conduct](./.github/CODE_OF_CONDUCT.md). Security issues follow the
-[Security Policy](./.github/SECURITY.md), never a public issue.
+See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for setup, checks and conventions,
+and the [Code of Conduct](.github/CODE_OF_CONDUCT.md). Security issues follow the
+[Security Policy](.github/SECURITY.md), never a public issue.
 
 - [Open a feature request](https://github.com/fbuireu/forever-pto/issues/new?template=feature_request.yml&labels=enhancement)
 - [Report a bug](https://github.com/fbuireu/forever-pto/issues/new?template=bug_report.yml)

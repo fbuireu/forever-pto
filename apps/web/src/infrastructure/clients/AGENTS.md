@@ -2,7 +2,7 @@
 
 There is no logger in this folder: it is in [`../logging/`](../logging), and [`../AGENTS.md`](../AGENTS.md)
 describes it (the contract, the `stripQuery` rule, the `LoggerService` tag and why it stays one, and why
-nothing here carries a trace id; [ADR 0018](../../../../../adr/0018-the-platform-is-the-log-transport.md)).
+nothing here carries a trace id; [ADR 0018](../../../../../docs/adr/0018-the-platform-is-the-log-transport.md)).
 What is left of Better Stack in this folder is the browser tag, `logging/better-stack/tracking.ts`, in the
 table of things that are not services below.
 
@@ -10,7 +10,7 @@ table of things that are not services below.
 
 One folder per external SDK, and nothing else in the repo constructs one. Some of them are Effect services:
 a `Context.Tag` for the interface and a Live `Layer` for the real implementation, so a test can substitute the
-tag and never reach the network ([ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md)).
+tag and never reach the network ([ADR 0002](../../../../../docs/adr/0002-effect-for-external-service-boundaries.md)).
 The rest are not services at all, for the reasons given below.
 
 ## Effect services
@@ -82,7 +82,7 @@ There is a client on each side, and the split is the trap:
 
 - [`payments/stripe/serverService.ts`](./payments/stripe/serverService.ts): the Effect service. Node SDK, API version pinned in its `apiVersion`,
   and `StripeNode.createFetchHttpClient()` because the Workers runtime has no Node HTTP stack
-  ([ADR 0004](../../../../../adr/0004-cloudflare-workers-as-deployment-target.md)). Every server-side Stripe
+  ([ADR 0004](../../../../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)). Every server-side Stripe
   call goes through this tag. It also exports `WebhookConfigurationError` and `isWebhookConfigurationError`.
 - [`payments/stripe/client.ts`](./payments/stripe/client.ts), browser only, `@stripe/stripe-js/pure`, and it does exactly one thing:
   memoise `loadStripe(publishableKey)`, forgetting the promise when it rejects. The `StripeClient` class is **not** exported; the module's only
@@ -90,7 +90,7 @@ There is a client on each side, and the split is the trap:
   `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is absent, and its only method is `getStripePromise()`. Two callers ask it, and
   nothing asks it while a module loads: [`StripePreload.tsx`](../../ui/modules/providers/StripePreload.tsx), which the
   locale layout mounts on every page so Stripe's fraud signals see the visit
-  ([ADR 0022](../../../../../adr/0022-stripe-js-loads-on-every-page-for-its-fraud-signals.md)), and
+  ([ADR 0022](../../../../../docs/adr/0022-stripe-js-loads-on-every-page-for-its-fraud-signals.md)), and
   [`StripeElementsProvider.tsx`](../../ui/modules/premium/StripeElementsProvider.tsx) when the checkout mounts, which
   gets the instance the page already loaded. The `pure` entry keeps the ask where the app answers it: the bare
   `@stripe/stripe-js` entry injects the script tag the moment it is imported and writes a load that fails before

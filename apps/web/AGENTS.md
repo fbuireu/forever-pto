@@ -7,13 +7,13 @@ work. The user picks a Country, an optional Region, a year and a PTO budget; the
 that budget into the longest stretches off, and reports how well it did.
 
 **The whole planner runs in the browser**: the server holds payment and contact records and nothing else
-([ADR 0001](../../adr/0001-planner-runs-in-the-browser.md)). The server side is the API route handlers
+([ADR 0001](../../docs/adr/0001-planner-runs-in-the-browser.md)). The server side is the API route handlers
 (`check-session`, `contact`, `health`, `markdown`, `payment`, `payment/activate` and the Stripe webhook at
 `webhooks/stripe`), a `.well-known` catch-all, [`middleware.ts`](./src/middleware.ts), and the pages: prerendered, but
 for `payment/confirmation` and the global not-found page, which render per request.
 
 Premium (advanced metrics, manual editing of a Suggestion) is unlocked by a Donation. There are no accounts: the
-payment record *is* the entitlement ([ADR 0008](../../adr/0008-premium-derived-from-payment.md)).
+payment record *is* the entitlement ([ADR 0008](../../docs/adr/0008-premium-derived-from-payment.md)).
 
 The vocabulary is the repo glossary's; see [`GLOSSARY.md`](../../GLOSSARY.md).
 
@@ -21,14 +21,14 @@ The vocabulary is the repo glossary's; see [`GLOSSARY.md`](../../GLOSSARY.md).
 
 - **Next.js** App Router + **React**, `next-intl` for i18n across the supported locales (en, es, ca, it, de, fr)
 - **Zustand** stores for all client state, persisted to local storage through an obfuscating wrapper
-  ([ADR 0007](../../adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md))
+  ([ADR 0007](../../docs/adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md))
 - **Effect** on every server path that talks to Stripe, Turso or Resend
-  ([ADR 0002](../../adr/0002-effect-for-external-service-boundaries.md))
-- **Temporal** through `temporal-polyfill` ([ADR 0005](../../adr/0005-temporal-polyfill.md))
+  ([ADR 0002](../../docs/adr/0002-effect-for-external-service-boundaries.md))
+- **Temporal** through `temporal-polyfill` ([ADR 0005](../../docs/adr/0005-temporal-polyfill.md))
 - **Tailwind CSS** + shadcn/ui; **Turso** via `@tursodatabase/serverless`: hand-written SQL, no ORM; **Stripe**;
   **Resend**; **BetterStack**, reached through the platform's log export rather than an SDK
 - **Cloudflare Workers** via `@opennextjs/cloudflare`, R2 for the incremental cache, the platform's own rate-limiting
-  binding for the payment limiter ([ADR 0004](../../adr/0004-cloudflare-workers-as-deployment-target.md))
+  binding for the payment limiter ([ADR 0004](../../docs/adr/0004-cloudflare-workers-as-deployment-target.md))
 - **Biome** (lint + format), **Vitest** (unit, `happy-dom`), **Playwright** (e2e)
 
 ## Commands
@@ -70,7 +70,7 @@ BASE_URL=https://pr-123-forever-pto-development.fbuireu.workers.dev pnpm test:e2
 ```
 
 The local target is `next dev`: `pnpm preview` would exercise the Workers runtime, but its `cf:build` fails on Windows
-([ADR 0009](../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)), and a Workers-only failure such as
+([ADR 0009](../../docs/adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)), and a Workers-only failure such as
 Cloudflare Error 1101 is what the preview run in CI is for. `reuseExistingServer` is on, so a dev server already
 answering on 3000 is used.
 
@@ -80,7 +80,7 @@ No e2e case renders an error boundary, because no URL is known to provoke one:
 its error channel `never`. What the boundary does is pinned by
 [`src/ui/modules/pages/error/ErrorContent.test.tsx`](./src/ui/modules/pages/error/ErrorContent.test.tsx).
 
-Env: copy [`.env.example`](./.env.example). Local Worker secrets go in `.dev.vars`. The typed surface the build uses is
+Env: copy [`.env.example`](.env.example). Local Worker secrets go in `.dev.vars`. The typed surface the build uses is
 [`environment.d.ts`](./environment.d.ts) and nothing else; it hand-declares both `ProcessEnv` and the global
 `CloudflareEnv` the Cloudflare context is read through, and it is tracked.
 
@@ -194,12 +194,12 @@ beside the [`next.config.ts`](./next.config.ts) that rewrites it.
 - **The "I already donated" path is unverified, and Premium is never revoked.** With no accounts and no user
   authentication, the recovery path grants Premium to anyone who types an address with a succeeded payment behind it,
   and there is no revocation path for a donor. Both follow from
-  [ADR 0008](../../adr/0008-premium-derived-from-payment.md); do not "harden" either in passing. The entitlement
+  [ADR 0008](../../docs/adr/0008-premium-derived-from-payment.md); do not "harden" either in passing. The entitlement
   travels in a signed HTTP-only cookie.
 - **The layer graph is published as a counted table on the documentation site's architecture overview**, and
   [`tests/docs-consistency.test.ts`](../../tests/docs-consistency.test.ts) asserts it against the tree in both
   directions, so a new cross-layer import fails the contract suite until the table is updated
-  ([ADR 0014](../../adr/0014-ddd-where-it-pays.md)).
+  ([ADR 0014](../../docs/adr/0014-ddd-where-it-pays.md)).
 - **The package version is read at runtime, not only at release time.** Source files import
   [`package.json`](./package.json) for `version` to render the footer, the hero, the error page, the `/api/markdown`
   output and both `.well-known` documents; the docs site reads it too, and so does the Better Stack tag, which files
@@ -232,9 +232,9 @@ renewed: the contract suite fails 30 days before that date, and the root guide's
 settings in the Cloudflare dashboard that hold the OTLP endpoint and its token, so nothing in the deploy carries a
 BetterStack credential and rotating the source needs no deploy.
 [`logger.ts`](./src/infrastructure/logging/logger.ts) writes to `console`, which the platform attributes to the active
-span ([ADR 0018](../../adr/0018-the-platform-is-the-log-transport.md)); every use case ends in `Effect.withSpan`,
-which nothing consumes ([ADR 0017](../../adr/0017-observability-is-the-platform-export.md), which supersedes
-[ADR 0016](../../adr/0016-traces-reach-betterstack-by-wrapping-the-opennext-entrypoint.md)). A destination belongs to
+span ([ADR 0018](../../docs/adr/0018-the-platform-is-the-log-transport.md)); every use case ends in `Effect.withSpan`,
+which nothing consumes ([ADR 0017](../../docs/adr/0017-observability-is-the-platform-export.md), which supersedes
+[ADR 0016](../../docs/adr/0016-traces-reach-betterstack-by-wrapping-the-opennext-entrypoint.md)). A destination belongs to
 the account rather than to the Worker, and nothing here can assert that it exists: every environment names its own
 pair, because a Worker naming another stage's destination exports into it, and the top level names production's.
 `redact_query_string` stays on: it keeps `payment_intent_client_secret` out of the request URLs the platform records.

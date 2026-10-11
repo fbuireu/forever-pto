@@ -70,7 +70,7 @@ That makes squash merge load-bearing for a second reason: attribution reads the 
 Consequences:
 
 - **One package per pull request.** A PR spanning both packages appears in both changelogs.
-- **A change confined to the repo root releases nothing**: `.github/`, `biome.json`, `adr/`, `tests/`, the root manifest.
+- **A change confined to the repo root releases nothing**: `.github/`, `biome.json`, `docs/adr/`, `tests/`, the root manifest.
 - A documentation PR needs no `docs:` title, because attribution is by path. The `semanticCommitType: docs` rule in `renovate.json` for `apps/docs/package.json` keeps a docs dependency bump from reading as an app change; attribution already books it against `apps/docs`.
 
 ## Source files

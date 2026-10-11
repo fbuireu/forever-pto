@@ -44,7 +44,7 @@ flowchart TD
 
 `getAvailableWorkdays` in `apps/web/src/domain/calendar/utils/helpers.ts` walks every day of every month in the window and keeps a date only if it is not a weekend, not a Holiday (the pseudo-Holidays included), not a Removed Day and, unless past days are allowed, not before today. What comes out is the set of dates a PTO Day could be spent on: the candidates.
 
-The Holiday lookups go through `createHolidaySet` and `getKey` in `apps/web/src/domain/calendar/utils/cache.ts`, which memoise the string key of every date. Those caches are **caller-owned**: the pipeline clears both on entry, so a worker instance that outlives one run cannot answer with a stale key ([ADR 0006](https://github.com/fbuireu/forever-pto/blob/main/adr/0006-caller-owned-calculation-caches.md)).
+The Holiday lookups go through `createHolidaySet` and `getKey` in `apps/web/src/domain/calendar/utils/cache.ts`, which memoise the string key of every date. Those caches are **caller-owned**: the pipeline clears both on entry, so a worker instance that outlives one run cannot answer with a stale key ([ADR 0006](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0006-caller-owned-calculation-caches.md)).
 
 ## Stage 2: Bridges
 
@@ -191,5 +191,5 @@ For a window of *m* months there are roughly 21·*m* Workdays; each spawns at mo
 - `apps/web/src/domain/calendar/AGENTS.md` is the engine's own guide: files, public API, invariants and the traps a change here falls into.
 - [Holidays engine](/how-it-works/holidays-engine/) covers where the Holidays come from before this page starts.
 - [Calculation worker](/how-it-works/calculation-worker/) covers the boundary the engine runs behind.
-- [ADR 0003](https://github.com/fbuireu/forever-pto/blob/main/adr/0003-pure-calendar-domain-effectful-payment-domain.md) records why this context is pure while the payment one is not.
-- [ADR 0020](https://github.com/fbuireu/forever-pto/blob/main/adr/0020-strategies-are-objectives-over-the-marginal-gain.md) records why every Strategy is an objective over the marginal gain rather than its own heuristic, and what that costs.
+- [ADR 0003](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md) records why this context is pure while the payment one is not.
+- [ADR 0020](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0020-strategies-are-objectives-over-the-marginal-gain.md) records why every Strategy is an objective over the marginal gain rather than its own heuristic, and what that costs.

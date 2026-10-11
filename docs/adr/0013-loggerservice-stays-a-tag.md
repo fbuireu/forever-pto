@@ -5,7 +5,7 @@ Date: 2026-08-17
 ## Status
 
 Accepted. Amended 2026-09-12: the singleton this ADR names, `getBetterStackInstance()`, is the plain `logger`
-export of [`apps/web/src/infrastructure/logging/logger.ts`](../apps/web/src/infrastructure/logging/logger.ts)
+export of [`apps/web/src/infrastructure/logging/logger.ts`](../../apps/web/src/infrastructure/logging/logger.ts)
 now, and the tag's interface is that object's type rather than a second declaration of it. Nothing below
 changes: the tag is still the requirement the annotation turns into a compile-time signal, and the module
 export is still what runs where there is no layer to provide.
@@ -20,7 +20,7 @@ real one) it reads as pure ceremony.
 The cost is real and spread across the tree. Production modules all over carry `LoggerService` in their `R`:
 both payment handlers, the use-cases, `zodParse`, the webhook route, the payments confirmation service and
 the Premium activation operation. Every test that reaches one builds a whole-interface `Layer.succeed(LoggerService, { … })`
-stub. [`api/operations/activatePremium.ts`](../apps/web/src/infrastructure/api/operations/activatePremium.ts) opens an `Effect.gen` inside its `catchAll` for no reason other
+stub. [`api/operations/activatePremium.ts`](../../apps/web/src/infrastructure/api/operations/activatePremium.ts) opens an `Effect.gen` inside its `catchAll` for no reason other
 than to `yield*` a logger. And [ADR 0002](./0002-effect-for-external-service-boundaries.md) already places
 logging *outside* Effect: BetterStack has both a tag and a plain singleton, and the singleton is what the
 stores, the lookups and the components use, so deleting the tag would be that decision carried to
@@ -65,7 +65,7 @@ than stylistic on any Effect program under `@application/use-cases`.
   looks identical.
 - **The tag is not a substitution seam and must not be treated as one.** Providing a stub in a test does not
   silence a module that imports `logger` directly, and several do. See
-  [`../apps/web/src/infrastructure/AGENTS.md`](../apps/web/src/infrastructure/AGENTS.md).
+  [`../apps/web/src/infrastructure/AGENTS.md`](../../apps/web/src/infrastructure/AGENTS.md).
   A test asserting "nothing logged" is only meaningful for code that reaches the tag.
 - **Every test that reaches one pays a whole-interface stub, and that stays.** It is the price of the signal.
   The interface is as small as its callers: `debug` was on it with no caller anywhere, and went, so a stub is

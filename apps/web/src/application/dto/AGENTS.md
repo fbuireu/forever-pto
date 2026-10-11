@@ -59,7 +59,7 @@ date through `fromStoredInstant`. [`holidays.test.ts`](../stores/holidays.test.t
 
 **`isHolidayVariant` is where the sealed union is re-established, and it exists because `HolidayVariant`
 crosses a boundary the app does not control.** Persisted store state is obfuscated, not encrypted
-([ADR 0007](../../../../../adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md)), so the `variant`
+([ADR 0007](../../../../../docs/adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md)), so the `variant`
 of a stored Holiday is a string a user can edit and a string an older build may have written. The readers
 compare against a member of the union, so a value outside it fails nowhere: the Holiday drops out of the
 counts, the charts and the table while still occupying its date and still blocking a PTO Day.
@@ -88,7 +88,7 @@ different decision, on a different table, that this one must not smuggle in.
 
 ## `HolidayDTO` crosses into the domain
 
-`stripe`, `date-holidays` and `i18n-iso-countries` appear here only as `import type`, which is what lets `HolidayDTO` cross into the domain. The pure calendar context imports `@application/dto/holiday/types` directly, which is a layering inversion on paper: the type describes a Holiday, so it belongs in the domain. It is a known pragmatic exception (moving it means touching every calendar module and its tests), and it is safe only because everything in the file is evaluable inside a Web Worker with no DOM: types, one const object, and `isHolidayVariant`, which is `Object.values` over that const object and reaches nothing else. See [ADR 0003](../../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md) and [`../../domain/calendar/AGENTS.md`](../../domain/calendar/AGENTS.md). If anything with a runtime dependency is ever added to [`holiday/types.ts`](./holiday/types.ts), the planner breaks in the worker and no server-side test will catch it.
+`stripe`, `date-holidays` and `i18n-iso-countries` appear here only as `import type`, which is what lets `HolidayDTO` cross into the domain. The pure calendar context imports `@application/dto/holiday/types` directly, which is a layering inversion on paper: the type describes a Holiday, so it belongs in the domain. It is a known pragmatic exception (moving it means touching every calendar module and its tests), and it is safe only because everything in the file is evaluable inside a Web Worker with no DOM: types, one const object, and `isHolidayVariant`, which is `Object.values` over that const object and reaches nothing else. See [ADR 0003](../../../../../docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md) and [`../../domain/calendar/AGENTS.md`](../../domain/calendar/AGENTS.md). If anything with a runtime dependency is ever added to [`holiday/types.ts`](./holiday/types.ts), the planner breaks in the worker and no server-side test will catch it.
 
 `RegionDTO` also crosses outwards, but downwards only: `holidayDTO.create` takes the region list so `getRegionName` can turn a region code into a display label. No domain code imports it.
 
@@ -126,7 +126,7 @@ it guards the derivation, and [`window.test.ts`](../../domain/calendar/window.te
 
 **Schemas carry message keys, not messages.** `contactSchema` and `createPaymentSchema` are pre-bound with keys such as `invalid_email` for server-side validation. The UI calls `createContactSchema` / `createDonationFormSchemaWithMessages` with translated strings instead. Adding a validation rule means adding it to the messages interface too, or the localised form silently loses the message.
 
-**The Donation form holds the amount as `number | null`, and its schema converts it.** `createDonationFormSchemaWithMessages` is `createPaymentSchemaWithMessages` with `amount` read through `amountFromField`, which reads `null` as 0. `null` is an emptied field or text `NumberInput` cannot read, so the field keeps what the visitor types (empty stays empty, because `NumberInput` owns the text and reports `null` rather than `0`) and an empty submit, like an unreadable one, still fails on the minimum's own message rather than Zod's prose. The server's `createPaymentSchema` keeps `amount` a number, because the body `POST /api/payment` reads is JSON the client already converted ([ADR 0021](../../../../../adr/0021-numbers-a-visitor-types-are-localised-text-fields.md)).
+**The Donation form holds the amount as `number | null`, and its schema converts it.** `createDonationFormSchemaWithMessages` is `createPaymentSchemaWithMessages` with `amount` read through `amountFromField`, which reads `null` as 0. `null` is an emptied field or text `NumberInput` cannot read, so the field keeps what the visitor types (empty stays empty, because `NumberInput` owns the text and reports `null` rather than `0`) and an empty submit, like an unreadable one, still fails on the minimum's own message rather than Zod's prose. The server's `createPaymentSchema` keeps `amount` a number, because the body `POST /api/payment` reads is JSON the client already converted ([ADR 0021](../../../../../docs/adr/0021-numbers-a-visitor-types-are-localised-text-fields.md)).
 
 **The body and query schemas are checked with `.validate()`, never parsed, because every caller only needs yes or
 no.** `premium/schema.ts` (`premiumSessionSchema`, `premiumKeySchema`, `noPremiumSessionSchema`,

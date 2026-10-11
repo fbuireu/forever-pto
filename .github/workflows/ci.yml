@@ -58,7 +58,7 @@ jobs:
           fi
           if printf '%s\n' "$changed" | grep -qE '^apps/web/' && printf '%s\n' "$changed" | grep -qE '^apps/docs/'; then
             echo 'cross_package=true' >> "$GITHUB_OUTPUT"
-            echo "::warning::This range touches both apps/web and apps/docs. Releases are attributed by path, so a squash merge of this will appear in both changelogs. See adr/0011."
+            echo "::warning::This range touches both apps/web and apps/docs. Releases are attributed by path, so a squash merge of this will appear in both changelogs. See docs/adr/0011."
           else
             echo 'cross_package=false' >> "$GITHUB_OUTPUT"
           fi
@@ -276,7 +276,7 @@ jobs:
             changelog, under whatever type the PR title carries.
 
             That is sometimes what you want (a change that genuinely spans both). If it is
-            not, split it. See [adr/0011](../blob/main/adr/0011-per-package-versioning-with-a-bridge-tag.md).
+            not, split it. See [adr/0011](../blob/main/docs/adr/0011-per-package-versioning-with-a-bridge-tag.md).
 
             This is advisory. It does not block the merge.
 

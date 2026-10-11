@@ -10,7 +10,7 @@ It is unusual in one respect: it has a server half and a browser half, and they 
 server half (`use-cases/`, [`shared/utils/zodParse.ts`](./shared/utils/zodParse.ts), `email/`) is Effect
 programs run at a route handler or a server action. The browser half (`stores/`, `export/`,
 [`i18n/navigation.ts`](./i18n/navigation.ts)) is Zustand and plain functions, and it is where most of the product actually lives,
-because the planner runs client-side ([ADR 0001](../../../../adr/0001-planner-runs-in-the-browser.md)). The
+because the planner runs client-side ([ADR 0001](../../../../docs/adr/0001-planner-runs-in-the-browser.md)). The
 halves share `dto/` and `shared/`, apart from `zodParse.ts` (server) and [`shared/utils/clientLog.ts`](./shared/utils/clientLog.ts) (browser).
 
 ## Structure
@@ -30,14 +30,14 @@ halves share `dto/` and `shared/`, apart from `zodParse.ts` (server) and [`share
 ## Layer rules
 
 May import from `@domain/*` and `@infrastructure/*`; configuration arrives as plain values
-([ADR 0004](../../../../adr/0004-cloudflare-workers-as-deployment-target.md)).
+([ADR 0004](../../../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)).
 
 **One file imports from `@ui/*`, inverting the dependency**: [`stores/premium.ts`](./stores/premium.ts) uses
 `@ui/adapters/session/checkSession`, so moving that target file moves this import too; [`../ui/AGENTS.md`](../ui/AGENTS.md)
 notes it from the other side.
 
 Stripe, Turso and Resend arrive as Effect service tags that the caller provides
-([ADR 0002](../../../../adr/0002-effect-for-external-service-boundaries.md)). Logging is the exception: a Zustand
+([ADR 0002](../../../../docs/adr/0002-effect-for-external-service-boundaries.md)). Logging is the exception: a Zustand
 action has no Effect context to yield a tag out of, so the stores log through `logClient` and `logClientError` in
 `shared/utils/clientLog.ts`, which import the plain `logger` dynamically; see [`stores/AGENTS.md`](./stores/AGENTS.md).
 
@@ -55,7 +55,7 @@ against the table on the wiki's architecture overview, so a new edge fails it un
 
 `shared/utils/dates.ts` is the app's date library: there is no `date-fns` and no second implementation of
 the arithmetic. The arithmetic converts to `Temporal.PlainDate`, does the work there and converts back
-([ADR 0005](../../../../adr/0005-temporal-polyfill.md)), except where a round trip per call is the cost that
+([ADR 0005](../../../../docs/adr/0005-temporal-polyfill.md)), except where a round trip per call is the cost that
 matters; `dateIntake.ts` beside it is the only other file on this side of the tree that imports `temporal-polyfill`.
 
 **`isSameDay`, `isSameMonth` and `isWeekend` read the local year, month, day or weekday directly**, which is

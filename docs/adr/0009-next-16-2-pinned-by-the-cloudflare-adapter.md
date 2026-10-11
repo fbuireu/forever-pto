@@ -23,7 +23,7 @@ site was affected, and the failure never showed locally.
 
 The asymmetry is the whole story. Every other page is fully prerendered and served from the incremental cache,
 so on Cloudflare it executes no application code at all. `/_not-found` is the one page rendered at request
-time, because [`global-not-found.tsx`](../apps/web/src/app/global-not-found.tsx) detects the locale through `headers()` and `cookies()` inside a
+time, because [`global-not-found.tsx`](../../apps/web/src/app/global-not-found.tsx) detects the locale through `headers()` and `cookies()` inside a
 `<Suspense>` boundary. It is therefore the only page in a position to throw, and it did.
 
 The bisect pull requests narrowed it, each ruling one thing out: the tree from immediately before
@@ -80,8 +80,8 @@ The pin lifts on either of these, and both are things somebody does rather than 
 
 Until one of them happens, a bump is reverted on the pin, not re-diagnosed.
 
-`partialPrefetching` stays out of [`next.config.ts`](../apps/web/next.config.ts): it is a 16.3 option and a config error on 16.2. The
-`@typescript/typescript6` compatibility package is not a dependency, and [`tests/docs-consistency.test.ts`](../tests/docs-consistency.test.ts)
+`partialPrefetching` stays out of [`next.config.ts`](../../apps/web/next.config.ts): it is a 16.3 option and a config error on 16.2. The
+`@typescript/typescript6` compatibility package is not a dependency, and [`tests/docs-consistency.test.ts`](../../tests/docs-consistency.test.ts)
 imports `typescript` directly for its compiler-API parsing, and under TypeScript 7 that import has to become the
 compatibility package, which is why the versions travel together.
 
@@ -110,9 +110,9 @@ does not control the traffic to, in order to keep a toolchain version the app ga
   upstream. Until then the diagnosis is "16.3.x breaks request-time rendering on 1.20.2", which is where the
   evidence stops.
 - **`/[locale]/payment/confirmation` renders at request time too**, and escapes the e2e suite only because
-  [`middleware.ts`](../apps/web/src/middleware.ts) redirects it away when `payment_intent` is absent. It was never confirmed broken or
+  [`middleware.ts`](../../apps/web/src/middleware.ts) redirects it away when `payment_intent` is absent. It was never confirmed broken or
   healthy under 16.3; whoever revisits this pin should check it with a real payment intent first.
-- Recorded in the *Versions* section of [`../AGENTS.md`](../AGENTS.md) and under *Commands* in [`../apps/web/AGENTS.md`](../apps/web/AGENTS.md).
+- Recorded in the *Versions* section of [`../AGENTS.md`](../../AGENTS.md) and under *Commands* in [`../apps/web/AGENTS.md`](../../apps/web/AGENTS.md).
 
 ## Amendment, 2026-08-29: what moved and what is still unverified
 
@@ -131,7 +131,7 @@ build with `partialPrefetching` and `cacheComponents` both on.
 **What was not verified, and it is the bar this ADR set:** condition 2, a green `e2e` run against a preview
 on the candidate version, including `e2e/[locale]/not-found.spec.ts`. The preview deploy cannot authenticate
 until `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` reach the `web-*`/`docs-*` environments, which
-is recorded in [`AGENTS.md`](../AGENTS.md) as the one outstanding settings item. Condition 1, the captured
+is recorded in [`AGENTS.md`](../../AGENTS.md) as the one outstanding settings item. Condition 1, the captured
 Worker stack trace, was not attempted either: the exception is still unknown, and if 16.3.3 with 1.20.3
 renders `/_not-found` correctly it will stay unknown. The fault itself is no longer in doubt, per the
 paragraph above; what is unverified is whether **this** pair clears it. **So this bump is staged on evidence
@@ -166,7 +166,7 @@ catches the fault after users could have seen it, where `e2e` catches it before.
 **TypeScript moved with Next, but not everywhere.** `astro check` refuses to run under
 TypeScript 7 and says so itself: the native compiler exposes no programmatic API for the Astro language
 server to load. So `apps/docs` stays on 6.0.3 while the root and `apps/web` take 7.0.2, and
-[`tests/docs-consistency.test.ts`](../tests/docs-consistency.test.ts) asserts exactly that shape. The
+[`tests/docs-consistency.test.ts`](../../tests/docs-consistency.test.ts) asserts exactly that shape. The
 compiler-API import in that suite is `@typescript/typescript6` now, as this ADR anticipated.
 
 **The pnpm-workspace `overrides` came off with the pin.** `postcss` and `sharp` were lifted there only
@@ -216,7 +216,7 @@ missing from the override list, and the adapter never implemented that half. It 
 the edge and Node.js middleware, so the guard had never run on Cloudflare under either name, and the table
 above credited the rename with a hole that predated it. The fix is in `middleware.ts`, not in the adapter:
 the branch overwrites the header with a sentinel instead of deleting it, which the override mechanism does
-carry. Only the `E2E` suite can see the difference, per [`src/app/AGENTS.md`](../apps/web/src/app/AGENTS.md).
+carry. Only the `E2E` suite can see the difference, per [`src/app/AGENTS.md`](../../apps/web/src/app/AGENTS.md).
 
 **Upgrading is not the fix.** `@opennextjs/cloudflare` 1.20.5 was the latest on 2026-09-01 and its
 `bundle-node-middleware.js` and `useNodeMiddleware` are byte-identical to 1.20.3's. Next 16.3.4 was the latest

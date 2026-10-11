@@ -77,10 +77,10 @@ intended layering leaves out:
   `@application/use-cases/*` or through the calculations worker, never directly.
 - **`domain` imports upwards, in both directions.** `domain → application` is the calendar context reaching
   `HolidayDTO` and the shared date helpers; that arrow points the wrong way on purpose, and
-  [ADR 0012](https://github.com/fbuireu/forever-pto/blob/main/adr/0012-shared-date-helpers-stay-in-the-application-layer.md)
+  [ADR 0012](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0012-shared-date-helpers-stay-in-the-application-layer.md)
   records what every alternative costs. `domain → infrastructure` is the payment context composing Effect
   programs against service tags, which is
-  [ADR 0003](https://github.com/fbuireu/forever-pto/blob/main/adr/0003-pure-calendar-domain-effectful-payment-domain.md).
+  [ADR 0003](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md).
 - **`infrastructure` imports upwards too**: imports in a couple of files reach
   `apps/web/src/ui/i18n/messages/*.json` through the `@i18n` shorthand. "Nothing in `infrastructure` imports from
   `@ui/*`" holds for the literal specifier and not for the layer, so the table counts the edge.
@@ -106,7 +106,7 @@ Facts about the system that no import arrow carries:
   [Effect layers](/architecture/effect-layers/).
 
 Which practices this tree takes from domain-driven design, which it takes in part and which it rejects, is
-[ADR 0014](https://github.com/fbuireu/forever-pto/blob/main/adr/0014-ddd-where-it-pays.md).
+[ADR 0014](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0014-ddd-where-it-pays.md).
 
 ## An AGENTS.md per folder
 

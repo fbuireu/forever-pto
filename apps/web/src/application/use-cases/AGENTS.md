@@ -27,7 +27,7 @@ it through the `DonationActivation` alias and delegate to the private `activateF
 - **`E`** lists the tagged errors from `errors.ts` the caller has to map. The operations map them with
   `describeFailure` in `@infrastructure/api/errors`, a table keyed on `_tag` whose parameter is the
   `TaggedFailure` union, so a failure mode added to `E` and missing there is a type error instead of a silent
-  500 ([ADR 0002](../../../../../adr/0002-effect-for-external-service-boundaries.md)). The Stripe webhook
+  500 ([ADR 0002](../../../../../docs/adr/0002-effect-for-external-service-boundaries.md)). The Stripe webhook
   route is the exception: it answers 500 for anything but a `WebhookError`, which is what makes Stripe
   redeliver.
 - Success values are plain objects. Nothing here builds a `NextResponse`.
@@ -35,7 +35,7 @@ it through the `DonationActivation` alias and delegate to the private `activateF
   consumes: `ApplicationLayer` provides no `Tracer`. The span a trace shows is the platform's, which the entry point
   opens around the whole run with `traced` from `@infrastructure/span` under the use case's name; see
   [`../../infrastructure/AGENTS.md`](../../infrastructure/AGENTS.md) and
-  [ADR 0017](../../../../../adr/0017-observability-is-the-platform-export.md).
+  [ADR 0017](../../../../../docs/adr/0017-observability-is-the-platform-export.md).
 
 A deferred write that has no response left to fail and a charge lookup that only adds reporting detail are absorbed
 in place rather than widening `E`; a database failure on the critical path propagates (see
@@ -62,7 +62,7 @@ something to keep in step.
 
 The Cloudflare context is only valid inside a request, and a use-case is a value that may be run later, including
 from inside `after()`, after the response has been sent
-([ADR 0004](../../../../../adr/0004-cloudflare-workers-as-deployment-target.md)). So the caller reads the context
+([ADR 0004](../../../../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)). So the caller reads the context
 and passes what it found down as an ordinary object: `sendContactEmail` takes `{ siteUrl, contactEmail }`,
 `createPayment` takes `{ userAgent, ipAddress }`.
 
@@ -84,7 +84,7 @@ caller can treat them all uniformly.
 
 ## Premium activation
 
-`activatePremium.ts` is the code behind [ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md):
+`activatePremium.ts` is the code behind [ADR 0008](../../../../../docs/adr/0008-premium-derived-from-payment.md):
 there is no accounts table, so a succeeded payment record *is* the entitlement, and every export ends by
 minting the same 30-day session token via `createSession` in [`session.ts`](../../infrastructure/services/premium/session.ts).
 
@@ -184,7 +184,7 @@ what makes a failed deferred write from `createPayment` or `activateWithPayment`
 **`MissingDonorEmailError` is the one failure that goes the other way**, and the asymmetry is the point. The
 event factory refuses to invent an email when a succeeded intent carries neither `metadata.email` nor
 `receipt_email`, because that address is the only key Premium can ever be recovered by
-([ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md)) and a blank one orphans the Donation
+([ADR 0008](../../../../../docs/adr/0008-premium-derived-from-payment.md)) and a blank one orphans the Donation
 permanently. But redelivering the same intent will produce the same missing email forever, so the succeeded
 branch logs it at error level through `tapError` and then absorbs it, letting the route answer 2xx. Retrying
 a failure that can never succeed is not resilience. The log is the whole remedy here: the payer has paid and

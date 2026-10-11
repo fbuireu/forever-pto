@@ -8,7 +8,7 @@ rejected commit.
 If you want the shape of the codebase, that is [AGENTS.md](../AGENTS.md) and the package guides it links.
 If you want how code here is written, and what a review holds a diff to, that is
 [CODING_STANDARDS.md](../CODING_STANDARDS.md). If you want the vocabulary, that is [GLOSSARY.md](../GLOSSARY.md).
-If you want the *why*, that is [adr/](../adr/).
+If you want the *why*, that is [docs/adr/](../docs/adr).
 
 ## Code of Conduct
 
@@ -121,7 +121,7 @@ request title on every open and edit, because that title is what semantic-releas
 request the way you would title a commit.
 
 **One pull request, one package.** Each package versions itself, and a commit belongs to whichever package
-its paths fall under ([ADR 0011](../adr/0011-per-package-versioning-with-a-bridge-tag.md)). A pull request
+its paths fall under ([ADR 0011](../docs/adr/0011-per-package-versioning-with-a-bridge-tag.md)). A pull request
 spanning `apps/web` and `apps/docs` therefore lands as one commit in both changelogs and can cut both
 releases. Keep a pull request to one package where you can; the `cross-package-notice` job comments when one
 spans both and does not block it, because a change that genuinely spans both is legitimate.

@@ -105,7 +105,7 @@ When the budget has **not** changed since the last run and the user has taken Su
 
 It holds **no planning rule**. Clearing the caches, building the pseudo-Holidays, deriving the window, computing the budget, short-circuiting on an empty budget and measuring each plan all live in `runPlanningPipeline`; the worker deserialises, calls and serialises. The holidays store's own `generateSuggestions` action calls the same pipeline on the main thread, which exists for callers without a worker and is why the two paths cannot drift: there is one orchestration, not two copies kept in step by mirrored tests.
 
-`Temporal` reaches this thread through `temporal-polyfill`, imported explicitly by the engine rather than read off the global, because this worker is one of the realms that has to work ([ADR 0005](https://github.com/fbuireu/forever-pto/blob/main/adr/0005-temporal-polyfill.md)).
+`Temporal` reaches this thread through `temporal-polyfill`, imported explicitly by the engine rather than read off the global, because this worker is one of the realms that has to work ([ADR 0005](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0005-temporal-polyfill.md)).
 
 ## Testing
 

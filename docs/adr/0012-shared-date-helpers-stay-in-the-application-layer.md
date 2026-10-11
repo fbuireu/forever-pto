@@ -13,12 +13,12 @@ take a `Date`, do plain-date arithmetic and hand a `Date` back, plus `formatDate
 which reach `Intl`. There is no I/O in it, no DOM, no framework, no store, and nothing application-specific.
 
 Layers above and below import it. The UI reads it in files all over itself, `application/` in its own, and (the part that
-raises the question) `domain/calendar/` in several: [`window.ts`](../apps/web/src/domain/calendar/window.ts), [`utils/helpers.ts`](../apps/web/src/domain/calendar/utils/helpers.ts),
-[`utils/cache.ts`](../apps/web/src/domain/calendar/utils/cache.ts), [`metrics/utils/helpers.ts`](../apps/web/src/domain/calendar/metrics/utils/helpers.ts) and [`metrics/utils/streaks.ts`](../apps/web/src/domain/calendar/metrics/utils/streaks.ts). That is the domain importing
+raises the question) `domain/calendar/` in several: [`window.ts`](../../apps/web/src/domain/calendar/window.ts), [`utils/helpers.ts`](../../apps/web/src/domain/calendar/utils/helpers.ts),
+[`utils/cache.ts`](../../apps/web/src/domain/calendar/utils/cache.ts), [`metrics/utils/helpers.ts`](../../apps/web/src/domain/calendar/metrics/utils/helpers.ts) and [`metrics/utils/streaks.ts`](../../apps/web/src/domain/calendar/metrics/utils/streaks.ts). That is the domain importing
 from the layer above it, which is the wrong direction for a dependency arrow.
 
 **What carries the rule is the specifier list, not the file count, and it is unchanged.**
-[`apps/web/src/domain/AGENTS.md`](../apps/web/src/domain/AGENTS.md) enumerates what the calendar domain may import
+[`apps/web/src/domain/AGENTS.md`](../../apps/web/src/domain/AGENTS.md) enumerates what the calendar domain may import
 from outside itself, and the contract suite holds the code to that list. A new *file* reaching an already-listed specifier
 adds nothing to that list, and `window.ts` is exactly that. `dates.ts` is one
 of the upward imports the calendar domain has (`@application/dto/holiday/types` is the other), and
@@ -29,11 +29,11 @@ the app, or a real `packages/` workspace member. Neither is as cheap as it looks
 
 - A fourth top-level directory beside `app/`, `application/`, `domain/`, `infrastructure/` and `ui/` needs a
   path alias, an entry in every layer contract that currently enumerates what it may import, a rule in
-  [`tests/docs-consistency.test.ts`](../tests/docs-consistency.test.ts) (which asserts every layer root has a `AGENTS.md`), and an answer to the
+  [`tests/docs-consistency.test.ts`](../../tests/docs-consistency.test.ts) (which asserts every layer root has a `AGENTS.md`), and an answer to the
   question of what else belongs there; a tier with one file in it invites everything.
 - A `packages/` member contradicts [ADR 0010](./0010-apps-web-and-apps-docs-monorepo-layout.md), which says
-  the tier appears the day a real shared package exists. One file that only [`apps/web`](../apps/web) imports is not that
-  day; [`apps/docs`](../apps/docs) reaches app sources through the `@ui` alias and does not import this module at all.
+  the tier appears the day a real shared package exists. One file that only [`apps/web`](../../apps/web) imports is not that
+  day; [`apps/docs`](../../apps/docs) reaches app sources through the `@ui` alias and does not import this module at all.
 - Moving it *down* into `domain/` is worse than the problem. `domain/` holds bounded contexts that
   nothing else, so the file would either become a third thing that is not a context, or land inside
   `calendar/`, from where the UI, the export and the DTOs would all import planning-engine internals to get
@@ -42,7 +42,7 @@ the app, or a real `packages/` workspace member. Neither is as cheap as it looks
 What the import actually costs is also worth stating plainly, because it is close to nothing. The rule the
 calendar domain has to keep is *runtime* purity, not layer purity: it is evaluated inside a Web Worker with
 no DOM and no server context ([ADR 0001](./0001-planner-runs-in-the-browser.md)), so an import that touches
-`window`, `process` or a Node built-in breaks the planner in a way no server-side test catches. [`dates.ts`](../apps/web/src/application/shared/utils/dates.ts)
+`window`, `process` or a Node built-in breaks the planner in a way no server-side test catches. [`dates.ts`](../../apps/web/src/application/shared/utils/dates.ts)
 touches none of them. The arrow points the wrong way on the diagram and correctly at runtime.
 
 ## Decision
@@ -54,7 +54,7 @@ The rejected alternative is a neutral `src/shared/` tier, rejected because it bu
 pays for it with a directory whose membership rule nobody can state, at a moment when barely a module or two
 would move into it.
 
-The list in [`../apps/web/src/domain/AGENTS.md`](../apps/web/src/domain/AGENTS.md) is what makes this
+The list in [`../apps/web/src/domain/AGENTS.md`](../../apps/web/src/domain/AGENTS.md) is what makes this
 enforceable by review: the calendar domain's outside imports are enumerated there and the list is meant to stay
 short. The test for a new one is the runtime, not the layer: does it resolve inside a Web Worker with no DOM
 and no server context.
@@ -72,7 +72,7 @@ and no server context.
   break the planner at runtime with no build error. `formatDate` and `getWeekdayNames` reaching `Intl` is the
   furthest this file goes, and `Intl` exists in workerd.
 - **The same reasoning covers `@application/dto/holiday/types`**, the calendar domain's other upward import,
-  which [`../apps/web/src/application/dto/AGENTS.md`](../apps/web/src/application/dto/AGENTS.md) records as a
+  which [`../apps/web/src/application/dto/AGENTS.md`](../../apps/web/src/application/dto/AGENTS.md) records as a
   known exception safe only while everything in that file stays evaluable inside a Web Worker with no DOM
   and no server context: today its types, one const object and `isHolidayVariant`, the union's own membership
   test.

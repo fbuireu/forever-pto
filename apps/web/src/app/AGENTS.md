@@ -206,7 +206,7 @@ importing it should not pull `jose` and the signing path in behind it. The polic
   session works again, and the operator gets a line instead of a support ticket.
 
 This changes nothing about what the cookie gates.
-[ADR 0007](../../../../adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md) is about the threat
+[ADR 0007](../../../../docs/adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md) is about the threat
 model, not observability.
 
 **A rotated secret lands in the silent branch and cannot be lifted out of it.** Rotation makes every live
@@ -246,7 +246,7 @@ guards:
   [`activatePremium.ts`](../application/use-cases/activatePremium.ts) exports one entry point per caller over one private implementation,
   `activateWithPayment({ paymentIntentId, clientSecret })` for this route and
   `activateWithClaimedPayment({ paymentIntentId, expectedEmail })` for the `POST /api/check-session`
-  recovery path, so neither guard is optional. [ADR 0008](../../../../adr/0008-premium-derived-from-payment.md) accepts that the recovery path grants
+  recovery path, so neither guard is optional. [ADR 0008](../../../../docs/adr/0008-premium-derived-from-payment.md) accepts that the recovery path grants
   Premium to whoever types an address with a succeeded payment behind it.
 - **`redirect_status` short-circuits.** Stripe says whether the redirect succeeded; if it did not, the
   handler never calls Stripe at all.
@@ -346,7 +346,7 @@ subset file derived from `en.json` at build time is the fix, and it needs that b
 ## Cloudflare request context
 
 `getCloudflareContext()` is read here and in server actions, never in a use-case
-([ADR 0004](../../../../adr/0004-cloudflare-workers-as-deployment-target.md)). In this folder the only direct readers are
+([ADR 0004](../../../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)). In this folder the only direct readers are
 `api/markdown/route.ts` and `.well-known/[...slug]/route.ts`. `api/contact/route.ts` reaches it through
 [`getRequestPublicEnv.ts`](../infrastructure/services/env/getRequestPublicEnv.ts), the per-request reader it shares with the contact server action; `sitemap.ts`,
 `robots.ts`, `routeMetadata` and the four `legal/` pages reach it through `getPublicEnv.ts`, the async reader

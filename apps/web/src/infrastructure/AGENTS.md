@@ -7,7 +7,7 @@ Cloudflare runtime or another thread lives here: SDK wrappers, server actions, p
 routing, the `.well-known` endpoints and the calculations Web Worker. It holds no planning rule and no
 orchestration: a use-case decides *what* happens, this layer knows *how* to reach the thing it happens to.
 
-Because the planner runs in the browser ([ADR 0001](../../../../adr/0001-planner-runs-in-the-browser.md)), the
+Because the planner runs in the browser ([ADR 0001](../../../../docs/adr/0001-planner-runs-in-the-browser.md)), the
 server side of this layer is small: payments, one contact form, a Stripe webhook and some static rendering.
 The heaviest work in here runs in the browser: the Web Worker.
 
@@ -41,7 +41,7 @@ The names are the use cases' (`createPayment`, `sendContactEmail`, `activatePrem
 `processWebhookEvent`, `verifySession`, `paymentConfirmation`), so a trace in the log sink reads as the
 operation rather than as `POST`. They sit at the entry point rather than inside the Effect program because
 the runtime's span API is callback-scoped and hands out no span id, so Effect's `Tracer` cannot be bridged
-onto it; [ADR 0017](../../../../adr/0017-observability-is-the-platform-export.md) has the detail. The
+onto it; [ADR 0017](../../../../docs/adr/0017-observability-is-the-platform-export.md) has the detail. The
 `Effect.withSpan` each use case ends in is not what produces these.
 
 There is no `services/calendar/`. The planning engine is `@domain/calendar/`, and `Strategy` is declared
@@ -91,7 +91,7 @@ compares a retrieved intent with. Nothing else here imports from `@domain/*`.
 `@i18n/messages/<locale>.json`. `@i18n/*` resolves to `./src/ui/i18n/*`, so those are `infrastructure -> ui`
 edges. They are tolerated rather than endorsed: the bundles are translation **data**, not UI, no component is
 pulled in behind them, and the alternative is moving `src/ui/i18n/messages/` to a fourth top-level tier, which
-is the move [ADR 0012](../../../../adr/0012-shared-date-helpers-stay-in-the-application-layer.md) already
+is the move [ADR 0012](../../../../docs/adr/0012-shared-date-helpers-stay-in-the-application-layer.md) already
 weighed and rejected for the date helpers. The rule that matters is **no component, no style, no asset**.
 `tests/docs-consistency.test.ts` reads every alias that lands inside `src/ui/` (`@ui/`, `@i18n/`, `@styles/`,
 `@assets/`) and fails on any importer here outside those files.
@@ -109,7 +109,7 @@ overview; the rest holds by review.
 
 Every server path that talks to Stripe, Turso or Resend is an Effect program with a typed error channel and
 its dependencies injected as service tags
-([ADR 0002](../../../../adr/0002-effect-for-external-service-boundaries.md)). The program is *composed* in
+([ADR 0002](../../../../docs/adr/0002-effect-for-external-service-boundaries.md)). The program is *composed* in
 `services/` and `@domain/payment/`, and *terminated* where a request is handled (an operation under
 `api/operations/`, or a route handler or page under `src/app/`) with
 `Effect.runPromise(program.pipe(Effect.provide(ApplicationLayer), …))`.
@@ -132,7 +132,7 @@ deferred one carries its requirements with it and would not compile otherwise.
 what [`getCountries.ts`](./services/countries/getCountries.ts), [`getRegions.ts`](./services/regions/getRegions.ts),
 [`getHolidays.ts`](./services/holidays/getHolidays.ts), the country-detection strategies and, through
 `logClient`, the Zustand stores use, anywhere there is no layer to provide. "All external calls go through
-Effect" is false for logging, on purpose ([ADR 0002](../../../../adr/0002-effect-for-external-service-boundaries.md)).
+Effect" is false for logging, on purpose ([ADR 0002](../../../../docs/adr/0002-effect-for-external-service-boundaries.md)).
 
 ## `logging/`
 
@@ -140,7 +140,7 @@ Effect" is false for logging, on purpose ([ADR 0002](../../../../adr/0002-effect
 `{ message, context }` object (`logError` adds `error`), and it sends nothing anywhere. Each call writes **one
 `JSON.stringify` line to `console[level]`**, and Cloudflare's own observability exports it to Better Stack over
 OTLP, named as a `destinations` entry in [`wrangler.toml`](../../wrangler.toml)
-([ADR 0018](../../../../adr/0018-the-platform-is-the-log-transport.md)). It is the same object, the same line
+([ADR 0018](../../../../docs/adr/0018-the-platform-is-the-log-transport.md)). It is the same object, the same line
 and the same path as contribKit's logger, byte for byte apart from `LOG_SERVICE`, so a reader who knows one
 knows the other; what is specific to this app is the `LoggerService` tag, named below.
 
@@ -175,7 +175,7 @@ there.
 
 The price is that a lost log is silent, and that the structured fields are serialised here rather than handed
 to an API as an object, so the sink parses them back out of the JSON body; see
-[ADR 0018](../../../../adr/0018-the-platform-is-the-log-transport.md).
+[ADR 0018](../../../../docs/adr/0018-the-platform-is-the-log-transport.md).
 
 **The object carries exactly the methods something calls.** `logError` is the one method beyond the three
 levels: every call site with an `Error` to report passes it through it, and it is what serialises `message`,
@@ -232,10 +232,10 @@ nothing: the inferred type widens to include `LoggerService` and the build stays
 the tag and the import hand back the *same object*; substituting the tag in a test does not silence a module
 that imports `logger` directly, and several do. Where there is no layer to provide, the import is the
 documented exception to "every external call goes through Effect"
-([ADR 0002](../../../../adr/0002-effect-for-external-service-boundaries.md)): the lookups under `services/`,
+([ADR 0002](../../../../docs/adr/0002-effect-for-external-service-boundaries.md)): the lookups under `services/`,
 the location strategies, the Zustand stores and the components.
 
-[ADR 0013](../../../../adr/0013-loggerservice-stays-a-tag.md) records the decision and what it costs, so
+[ADR 0013](../../../../docs/adr/0013-loggerservice-stays-a-tag.md) records the decision and what it costs, so
 the next architecture pass does not re-propose deleting it.
 
 ### Traces are the platform's, and no log line carries a trace id from here
@@ -243,7 +243,7 @@ the next architecture pass does not re-propose deleting it.
 There is no tracer in this folder and no OpenTelemetry dependency in the package. Cloudflare instruments
 handler invocations, outbound `fetch` and binding calls itself, attributes `console` output to the active span,
 and stamps the trace id on every log record it exports. Because `console` is what `logger` writes to
-([ADR 0018](../../../../adr/0018-the-platform-is-the-log-transport.md)), the app's own lines are among those
+([ADR 0018](../../../../docs/adr/0018-the-platform-is-the-log-transport.md)), the app's own lines are among those
 records. That holds only for lines the runtime sees: a transport that posts from inside the Worker leaves the
 spans and the logs unjoined.
 
@@ -254,7 +254,7 @@ those and exists only inside a callback, so no bridge can reach it. [`layers.ts`
 ## The Cloudflare context is request-scoped
 
 `getCloudflareContext()` is only valid inside a request
-([ADR 0004](../../../../adr/0004-cloudflare-workers-as-deployment-target.md)), so entry points read it and hand
+([ADR 0004](../../../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)), so entry points read it and hand
 use-cases plain values: [`actions/contact.ts`](./actions/contact.ts) reads `NEXT_PUBLIC_SITE_URL` and
 `NEXT_PUBLIC_CONTACT_EMAIL` through `getRequestPublicEnv` and passes them down as a plain object.
 
@@ -280,7 +280,7 @@ only against a real build.
 
 `getPublicEnv` carries no cache: both values are deploy-time constants, so reading them costs nothing and a
 caller cannot observe a stale one, and `'use cache'` stays out
-([ADR 0015](../../../../adr/0015-cache-components-stay-off-on-the-workers-runtime.md)). Its return type
+([ADR 0015](../../../../docs/adr/0015-cache-components-stay-off-on-the-workers-runtime.md)). Its return type
 `PublicEnv` is exported and is the config shape [`api/operations/contact.ts`](./api/operations/contact.ts)
 takes, so they cannot drift into describing different objects.
 

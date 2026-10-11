@@ -19,7 +19,7 @@
 
 Given a Country, an optional Region, a year and a PTO budget, it finds the Bridges that turn that budget
 into the longest stretches away from work, and reports how well it did. The whole planner runs in the
-browser ([ADR 0001](../../adr/0001-planner-runs-in-the-browser.md)); the server holds payment and contact
+browser ([ADR 0001](../../docs/adr/0001-planner-runs-in-the-browser.md)); the server holds payment and contact
 records and nothing else.
 
 ## Running it
@@ -33,13 +33,13 @@ pnpm build            # next build
 pnpm preview          # the real Workers runtime, via OpenNext
 ```
 
-Or from this directory with `pnpm <script>` directly. Copy [`.env.example`](./.env.example) to `.env.development` and fill
+Or from this directory with `pnpm <script>` directly. Copy [`.env.example`](.env.example) to `.env.development` and fill
 it in; Worker secrets for a local run go in `.dev.vars`.
 
 **Both runtimes are pinned exactly and must match:** Node in [`.nvmrc`](../../.nvmrc), mirrored in
 `engines.node`; pnpm, in the root `packageManager`. Next and `@opennextjs/cloudflare` move as a pair, and the
 docs package stays on an older TypeScript line than this one; see
-[ADR 0009](../../adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) and [`AGENTS.md`](./AGENTS.md) before
+[ADR 0009](../../docs/adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) and [`AGENTS.md`](./AGENTS.md) before
 raising any of them.
 
 ## Layout
@@ -75,7 +75,7 @@ unknown path.
 
 This package versions itself: tags are `web-vX.Y.Z`, and a commit belongs to it if it touches
 `apps/web/`. The release runs after the production deploy, so a tag means the version is live. See
-[ADR 0011](../../adr/0011-per-package-versioning-with-a-bridge-tag.md).
+[ADR 0011](../../docs/adr/0011-per-package-versioning-with-a-bridge-tag.md).
 
 `version` in [`package.json`](./package.json) is read at runtime by source files across the app to render the footer, the hero, the
 error page, the `/api/markdown` output and both `.well-known` documents, the agent-skills index and the MCP

@@ -48,7 +48,7 @@ it is present, the network strategies never sit in front of a production HTML re
 **The trace is fetched from this app's own origin, not from `cloudflare.com`.** If `NEXT_PUBLIC_SITE_URL` is
 unset the fetch simply fails and the chain continues; if it points at another environment, the trace reports
 that environment's answer. The value is environment-specific configuration, not a constant
-([ADR 0004](../../../../../../adr/0004-cloudflare-workers-as-deployment-target.md)).
+([ADR 0004](../../../../../../docs/adr/0004-cloudflare-workers-as-deployment-target.md)).
 
 **`detectCountryFromEgressIP` does not measure the visitor, and its name says so.** Both of its fetches
 originate inside the proxy Worker, so `api.ipify.org` reports the runtime's *egress* address and
@@ -65,7 +65,7 @@ Whatever a strategy answers reaches the week-long `user-country` cookie and then
 their own wrapper with `Effect.runPromise`, because the proxy has no `ApplicationLayer` to provide. For
 the same reason logging goes through the `logger` import rather than `LoggerService`,
 the documented logging exception in
-[ADR 0002](../../../../../../adr/0002-effect-for-external-service-boundaries.md).
+[ADR 0002](../../../../../../docs/adr/0002-effect-for-external-service-boundaries.md).
 
 **The third-party bodies are read as `unknown` and picked with `stringField`, not cast, and not with zod.**
 `api.ipify.org` and `ipinfo.io` answer JSON this app does not control, and a cast is not harmless here: a `null`

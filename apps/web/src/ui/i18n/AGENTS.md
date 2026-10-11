@@ -155,7 +155,7 @@ rendered on the server. The list says what to leave out rather than what to send
 [`clientMessages.test.ts`](../../infrastructure/i18n/clientMessages.test.ts) scans every `useTranslations` call,
 including the few that compute their namespace, and fails when client code reads one the client is not sent.
 Trimming this by rendering more copy on the server is not available: the planner is client-side end to end
-([ADR 0001](../../../../../adr/0001-planner-runs-in-the-browser.md)), so most of the catalogue has to
+([ADR 0001](../../../../../docs/adr/0001-planner-runs-in-the-browser.md)), so most of the catalogue has to
 reach the browser one way or another.
 
 **A key nothing reads still ships, and nothing fails when it stops being read.** Key parity cannot see an

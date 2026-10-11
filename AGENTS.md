@@ -22,7 +22,7 @@ This file covers the repository: its layout, its shared tooling, how versions ar
 apps/
   web/                Next + React + OpenNext → Cloudflare Workers
   docs/               Astro Starlight → Cloudflare Workers (static assets)
-adr/                  Architecture decision records, one decision per file
+docs/adr/             Architecture decision records, one decision per file
 tests/                docs-consistency, the contract suite that holds the documents to the tree
 patches/              patchedDependencies, applied by pnpm
 .github/              Workflows and the prepare-env composite action
@@ -32,22 +32,22 @@ GLOSSARY.md            The domain glossary, root only
 ```
 
 There is no `packages/` tier. It is added to [`pnpm-workspace.yaml`](./pnpm-workspace.yaml) the day a real shared
-package exists, not before; see [ADR 0010](./adr/0010-apps-web-and-apps-docs-monorepo-layout.md).
+package exists, not before; see [ADR 0010](./docs/adr/0010-apps-web-and-apps-docs-monorepo-layout.md).
 
 ## Versions
 
 This section names where each version is pinned and never what the pin says: read the manifest.
-`tests/docs-consistency.test.ts` asserts the shape a bump cannot change, and no document outside `adr/` names a
+`tests/docs-consistency.test.ts` asserts the shape a bump cannot change, and no document outside `docs/adr/` names a
 runtime or a framework beside a version.
 
-- Node ([`.nvmrc`](./.nvmrc), mirrored in `engines.node`): `.nvmrc` is what every CI job installs, and the two
+- Node ([`.nvmrc`](.nvmrc), mirrored in `engines.node`): `.nvmrc` is what every CI job installs, and the two
   spellings are asserted equal
 - pnpm (`packageManager`, and in no workspace manifest): always use pnpm, never npm/yarn
 - TypeScript at the root and in `apps/web` moves as one; `apps/docs` stays on the **6** line, because `astro check`
   refuses to run under 7: the native compiler ships no programmatic API for it to load. The split is asserted, and it
   closes the day Astro supports 7
 - Next with `@opennextjs/cloudflare` ([`apps/web/package.json`](./apps/web/package.json)): they move as a pair
-  ([ADR 0009](./adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)); the reasoning belongs to the app:
+  ([ADR 0009](./docs/adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)); the reasoning belongs to the app:
   [`./apps/web/AGENTS.md`](./apps/web/AGENTS.md)
 
 ## Commands
@@ -103,7 +103,7 @@ has to re-prefix them, and so are the files the `noDefaultExport` override exemp
 entry. `.astro` files keep the linter but lose `noUnusedImports` and `noUnusedVariables` through an `overrides` entry,
 because Biome parses only their frontmatter; `astro check` covers them.
 
-**One lockfile, at the root.** [`.gitignore`](./.gitignore) carries `apps/*/pnpm-lock.yaml` so a stray per-package
+**One lockfile, at the root.** [`.gitignore`](.gitignore) carries `apps/*/pnpm-lock.yaml` so a stray per-package
 lockfile cannot shadow the workspace resolution.
 
 **The root package is `forever-pto-monorepo`: private, at `0.0.0`, with no `dependencies`.** A dependency there would be
@@ -119,9 +119,9 @@ installed for both packages and belong to neither; its `devDependencies` are the
 ## Releases
 
 Each package versions itself, through `semantic-release-monorepo`, and a commit belongs to whichever package its
-paths fall under: `web-vX.Y.Z` from [`ci.yml`](./.github/workflows/ci.yml) after the production deploy and its smoke
-run, `docs-vX.Y.Z` from [`docs.yml`](./.github/workflows/docs.yml) after the docs deploy and its smoke run.
-[ADR 0011](./adr/0011-per-package-versioning-with-a-bridge-tag.md) records the decision and its costs, and the
+paths fall under: `web-vX.Y.Z` from [`ci.yml`](.github/workflows/ci.yml) after the production deploy and its smoke
+run, `docs-vX.Y.Z` from [`docs.yml`](.github/workflows/docs.yml) after the docs deploy and its smoke run.
+[ADR 0011](./docs/adr/0011-per-package-versioning-with-a-bridge-tag.md) records the decision and its costs, and the
 published [release page](./apps/docs/src/content/docs/infra/release.mdx) walks through the chain.
 
 - Both release jobs share the `release` concurrency group and fast-forward onto `origin/main` before releasing, so a
@@ -136,26 +136,26 @@ published [release page](./apps/docs/src/content/docs/infra/release.mdx) walks t
   `fatal: tag '<version>' already exists`, and the GitHub Release that carries it is `immutable`, so the tag cannot
   be moved: `git merge -s ours` of the orphaned release commit into `main` makes it reachable again without changing a
   file. A further rewrite orphans it again.
-- A change confined to the repo root (`adr/`, `tests/`, `README.md`, `GLOSSARY.md`, this file) releases nothing.
+- A change confined to the repo root (`docs/adr/`, `tests/`, `README.md`, `GLOSSARY.md`, this file) releases nothing.
   `WEB_PATHS` in `ci.yml` also matches the root [`package.json`](./package.json), the lockfile,
   `pnpm-workspace.yaml`, [`patches/`](./patches), [`biome.json`](./biome.json), `.nvmrc`,
-  [`.github/actions/`](./.github/actions) and the two web workflows, which redeploy the app and run `release-web`, and
+  [`.github/actions/`](.github/actions) and the two web workflows, which redeploy the app and run `release-web`, and
   the release job then cuts nothing, because it attributes by the package path.
 
 ## CI
 
-**[`ci.yml`](./.github/workflows/ci.yml) holds the whole app graph**: `changes` and `verify` in parallel, then
+**[`ci.yml`](.github/workflows/ci.yml) holds the whole app graph**: `changes` and `verify` in parallel, then
 `deploy-production` → `release-web` → `docs-refresh` and `deploy-production` → `smoke` on `main`, or
 `deploy-development` → `comment` / `e2e` on a PR, and a final `check` job that aggregates every one of them. Both
-deploy jobs call the shared [`_deploy-web.yml`](./.github/workflows/_deploy-web.yml).
-[`docs.yml`](./.github/workflows/docs.yml) holds the docs graph: its own `changes`, then `build`, then `preview` on a
+deploy jobs call the shared [`_deploy-web.yml`](.github/workflows/_deploy-web.yml).
+[`docs.yml`](.github/workflows/docs.yml) holds the docs graph: its own `changes`, then `build`, then `preview` on a
 PR or `deploy` → `smoke` → `release-docs` on `main`, with `rollback` when that smoke run fails, and its own
 aggregate, `Check (docs)`. The rest are
-[`cleanup-development.yml`](./.github/workflows/cleanup-development.yml), a
-[`zizmor.yml`](./.github/workflows/zizmor.yml) audit,
-[`dependency-review.yml`](./.github/workflows/dependency-review.yml),
-[`commit-message.yml`](./.github/workflows/commit-message.yml), which lints the pull request **title** (the commit a
-squash merge lands), and [`dependabot-auto-merge.yml`](./.github/workflows/dependabot-auto-merge.yml), which merges
+[`cleanup-development.yml`](.github/workflows/cleanup-development.yml), a
+[`zizmor.yml`](.github/workflows/zizmor.yml) audit,
+[`dependency-review.yml`](.github/workflows/dependency-review.yml),
+[`commit-message.yml`](.github/workflows/commit-message.yml), which lints the pull request **title** (the commit a
+squash merge lands), and [`dependabot-auto-merge.yml`](.github/workflows/dependabot-auto-merge.yml), which merges
 the security updates GitHub raises; Renovate opens every other update. The published
 [workflows page](./apps/docs/src/content/docs/infra/workflows.mdx) describes each job, and the environments, secrets
 and rulesets behind them are settings, on the [environments](./apps/docs/src/content/docs/infra/environments.mdx) and
@@ -163,7 +163,7 @@ and rulesets behind them are settings, on the [environments](./apps/docs/src/con
 
 - **`Check` and `Check (docs)` are the contexts the ruleset requires**, each an aggregate under `always()` that fails
   when a job it needs failed or was cancelled; a job that must gate a merge goes in its `needs`.
-- **`verify` runs on every push**, because the contract suite reads `GLOSSARY.md`, `adr/` and every guide; `changes`
+- **`verify` runs on every push**, because the contract suite reads `GLOSSARY.md`, `docs/adr/` and every guide; `changes`
   gates only the deploys and the releases.
 - **`smoke` runs the `@smoke` cases in [`apps/web/e2e/smoke.spec.ts`](./apps/web/e2e/smoke.spec.ts) against
   production**, with `BASE_URL` read from the `WEB_SITE_URL` **repository** variable (the job declares no
@@ -215,7 +215,7 @@ a promise, not a fix.
 | `apps/*/README.md` | *What is this package, and how do I run it?* | The package's capabilities, scripts or required setup change |
 | `apps/*/AGENTS.md` | *What do I need while working here?* The agent-facing guide | You change a package's stack, commands, deployment, or a coupling or gotcha it states |
 | `apps/web/src/**/AGENTS.md` | *What is in this folder, and what does a change here carry?* Its files, public API, couplings, gotchas and guardrails. Its `# ` heading is the folder's own path, repo-relative: `# apps/web/src/domain/calendar` | You change a layer's dependencies, a signature, a coupling, or the files in that folder |
-| [`adr/`](./adr/) | *Why is it like this?* One decision per file | You make a decision that is hard to reverse, surprising without context, **and** the result of a real trade-off |
+| [`docs/adr/`](./docs/adr) | *Why is it like this?* One decision per file | You make a decision that is hard to reverse, surprising without context, **and** the result of a real trade-off |
 | [`README.md`](./README.md) | *What is this product and how do I run it?* The human-facing front page | The product's capabilities, the stack table, the scripts or the required versions change |
 
 | If you change | Update |
@@ -239,14 +239,14 @@ files, so a rule fires before the offending file is committed. A failure means a
 whichever one is wrong. It cannot check rationale, and that part is on you. A rule's title says what it holds and
 why, because the suite carries no comments.
 
-A new ADR starts as a copy of [ADR 0000](./adr/0000-adr-template.md), the template, which says when a decision earns
+A new ADR starts as a copy of [ADR 0000](./docs/adr/0000-adr-template.md), the template, which says when a decision earns
 one and where to link it from.
 
 ## Gotchas
 
 - **Biome's `noConsole` is an error with no allowlist but the log sink**:
   [`logger.ts`](./apps/web/src/infrastructure/logging/logger.ts) writes every entry to `console` for the platform to
-  export ([ADR 0018](./adr/0018-the-platform-is-the-log-transport.md)), through the one `overrides` entry that names
+  export ([ADR 0018](./docs/adr/0018-the-platform-is-the-log-transport.md)), through the one `overrides` entry that names
   it.
 - **Biome's `--changed` selects nothing on `main`**: it diffs against `vcs.defaultBranch`, which is `main`, so there
   `pnpm format:changed` answers *Checked 0 files*. Reach for `format:all`, which reads the whole tree in well under a
@@ -263,7 +263,7 @@ one and where to link it from.
   semantic-release's own `git fetch --tags` fails with *would clobber existing tag*.
 - **The patched dependencies are off-limits to Renovate's automerge.** `boneyard-js` is keyed by bare name, so its
   patch applies to whatever version resolves and a bump that no longer patches what the diff was written against is
-  silent; `vaul` is keyed with its version, so a bump fails the install. [`.github/renovate.json`](./.github/renovate.json)
+  silent; `vaul` is keyed with its version, so a bump fails the install. [`.github/renovate.json`](.github/renovate.json)
   turns `automerge` off for both, and the contract suite asserts every patch has that rule.
 - **`minimumReleaseAge` is declared twice**: `pnpm-workspace.yaml` in minutes (`4320` is three days),
   `.github/renovate.json` in days, and Renovate's has to stay the stricter, because the installer re-checks the age

@@ -8,7 +8,7 @@ Accepted. Amended 2026-09-28: three statements below no longer hold. The docs pa
 ([ADR 0011](./0011-per-package-versioning-with-a-bridge-tag.md)), so its version moves with every docs release
 rather than staying at `0.0.0`, and the wiki still sends no `release`; the site serves the six locales the app
 does, not two; and the consent banner starts whether or not the two variables are set, because
-[`Head.astro`](../apps/docs/src/components/Head.astro) always calls `startCookieConsent`. Amended 2026-10-02: the
+[`Head.astro`](../../apps/docs/src/components/Head.astro) always calls `startCookieConsent`. Amended 2026-10-02: the
 banner speaks all six of those locales, not English and Spanish, picked off `document.documentElement.lang` as
 below, and the answers it shares with the app's banner (accept all, reject all, the preferences title, close) use
 the app's words in each one; `tests/docs-consistency.test.ts` holds the locales to `astro.config.ts` and those
@@ -49,10 +49,10 @@ the stores into an Astro island to save a file that is shorter than the port.
 ## Decision
 
 The wiki carries its own consent flow and its own tags, in plain TypeScript with no React island.
-[`src/lib/analytics/consent.ts`](../apps/docs/src/lib/analytics/consent.ts) configures
+[`src/lib/analytics/consent.ts`](../../apps/docs/src/lib/analytics/consent.ts) configures
 `vanilla-cookieconsent` with the library's own UI, in English and Spanish chosen off
 `document.documentElement.lang`, and wires the result to both services;
-[`src/components/Head.astro`](../apps/docs/src/components/Head.astro) is a Starlight `Head` override that
+[`src/components/Head.astro`](../../apps/docs/src/components/Head.astro) is a Starlight `Head` override that
 emits Consent Mode defaults of `denied` before `gtag.js` loads, and boots the consent module.
 
 **Google Analytics uses the app's measurement id, not one of its own.** Both sites are subdomains of
@@ -84,7 +84,7 @@ and observability on a Worker that does not exist.
 ## Consequences
 
 - **No tag loads before consent, and that is asserted rather than reviewed.**
-  [`e2e/cookie-consent.spec.ts`](../apps/docs/e2e/cookie-consent.spec.ts) checks the banner appears, that no
+  [`e2e/cookie-consent.spec.ts`](../../apps/docs/e2e/cookie-consent.spec.ts) checks the banner appears, that no
   `_ga*` cookie and no `betterstack.net` script exist before an answer, that Consent Mode starts `denied`,
   that rejecting stores the choice and still sets nothing, that accepting emits the `granted` update, and that
   the preferences modal offers a switch per service with `necessary` locked. Flipping the default in
@@ -96,7 +96,7 @@ and observability on a Worker that does not exist.
   `beforeEach`. Do not answer this by setting `hideFromBots: false`, which would trade a real production
   default for a test convenience.
 - **The wiki now sets security headers, and it set none before.**
-  [`public/_headers`](../apps/docs/public/_headers) carries the CSP that admits the two tags plus HSTS,
+  [`public/_headers`](../../apps/docs/public/_headers) carries the CSP that admits the two tags plus HSTS,
   `nosniff`, `DENY` framing and a referrer policy. It is a separate statement from the app's, which lives in
   `next.config.ts` and is asserted by the contract suite; this one has no Worker to serve it from, so
   Cloudflare's static-asset `_headers` support is what applies it. The two can drift and nothing compares
@@ -109,7 +109,7 @@ and observability on a Worker that does not exist.
   package version never moves. An error in the wiki is therefore not grouped by version, which is a real loss
   and the reason it is written here rather than discovered.
 - **`apps/docs` reads environment variables for the first time**, so it has an
-  [`.env.example`](../apps/docs/.env.example) now. Both are optional: without them the site builds, serves,
+  [`.env.example`](../../apps/docs/.env.example) now. Both are optional: without them the site builds, serves,
   and shows no banner at all, because there is nothing to ask about.
-- Where this bites: [`apps/docs/AGENTS.md`](../apps/docs/AGENTS.md), and the published wiki's
+- Where this bites: [`apps/docs/AGENTS.md`](../../apps/docs/AGENTS.md), and the published wiki's
   *Cookie consent*, *Observability* and *Secrets* pages.

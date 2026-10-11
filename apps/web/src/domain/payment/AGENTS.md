@@ -5,11 +5,11 @@
 What happens to a Donation once Stripe has decided. The domain events, a factory that builds them out of a
 Stripe `PaymentIntent`, and the handlers that reconcile the payments table with them. Server-only, and the
 one place in `src/domain/` that composes Effect against infrastructure, deliberately, not by accident
-([ADR 0003](../../../../../adr/0003-pure-calendar-domain-effectful-payment-domain.md)). The layer contract is
+([ADR 0003](../../../../../docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md)). The layer contract is
 in [`../AGENTS.md`](../AGENTS.md).
 
 There is no accounts table: a payment row with status `succeeded` *is* Premium
-([ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md)). Everything here is ultimately about
+([ADR 0008](../../../../../docs/adr/0008-premium-derived-from-payment.md)). Everything here is ultimately about
 keeping that row honest.
 
 ## Files
@@ -48,7 +48,7 @@ address through `readDonationMetadata`, which takes the first non-blank of `meta
 trimmed, and fails with `MissingDonorEmailError` when neither yields one. Trimming is the point: `metadata` is
 `{ [k: string]: string }` with no `noUncheckedIndexedAccess`, so `??` alone would happily accept the empty string
 Stripe allows. A blank email would become the payments row's key, and since Premium is keyed by that address
-([ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md)) the payer could never be found again by
+([ADR 0008](../../../../../docs/adr/0008-premium-derived-from-payment.md)) the payer could never be found again by
 the "I already donated" path. The failure is caught in `webhook.ts`, not here; see below.
 
 Both factories are annotated with the interface they produce (`createPaymentSucceededEvent` through the
@@ -127,7 +127,7 @@ both reads see `processing`. See
 immediately before calling `handlePaymentSucceeded`, so the row exists by then, and the only way a read could
 answer "no such row" is by failing. An absorbed read failure looks exactly like a payment that was never created:
 the handler returns, the route answers 200, Stripe never redelivers, and by
-[ADR 0008](../../../../../adr/0008-premium-derived-from-payment.md) that donor's recovery path is dead for good.
+[ADR 0008](../../../../../docs/adr/0008-premium-derived-from-payment.md) that donor's recovery path is dead for good.
 
 `updatePaymentStatus` answers the same question in one fewer round trip and cannot lie about it. Its `WHERE`
 is `id = ? AND status != 'succeeded'` and it returns whether it wrote, so `false` means "absent or already

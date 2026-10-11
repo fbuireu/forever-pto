@@ -9,7 +9,7 @@ platform's own logs onto Cloudflare's OTLP export and left the app's log lines o
 
 Amended 2026-09-12. The port this ADR kept unchanged has since changed shape, and the line it writes has
 not. `BetterStackClient` and `getBetterStackInstance()` are gone: the writer is a plain `logger` object in
-[`apps/web/src/infrastructure/logging/logger.ts`](../apps/web/src/infrastructure/logging/logger.ts), out of
+[`apps/web/src/infrastructure/logging/logger.ts`](../../apps/web/src/infrastructure/logging/logger.ts), out of
 `clients/` because there is no SDK under it, with `info`, `warn`, `error` and `logError` taking one
 `{ message, context }` object each, and without `debug`, `logDuration`, `measureAsync`, `withContext` or the
 `environment` base field, none of which had a caller outside the class itself (`environment` was also wrong
@@ -17,7 +17,7 @@ on every preview Worker, where `NODE_ENV` is `production` too). `LOG_SERVICE` is
 `<repo>-<package>` spelling contribKit's `contribkit-web` already used. The `noConsole` exemption in
 `biome.json` moved with the file. The shape is the one the sibling repositories share, so a reader who knows
 one logger knows them all; what stays specific to this app is named in
-[`apps/web/src/infrastructure/AGENTS.md`](../apps/web/src/infrastructure/AGENTS.md).
+[`apps/web/src/infrastructure/AGENTS.md`](../../apps/web/src/infrastructure/AGENTS.md).
 
 Amended 2026-10-02. A context value that cannot be serialised no longer costs the line; see the amendment at the
 end.
@@ -122,11 +122,11 @@ The rejected alternatives are the ones listed above.
   `LoggerService` is still a tag with one adapter, are both about the port and the `R` channel, neither of
   which the transport touches. `LoggerServiceLive` still returns the same singleton, and the tag's interface is
   byte for byte what it was.
-- Where this bites: the *Deploy* section of [`apps/web/AGENTS.md`](../apps/web/AGENTS.md), the clients guide at
-  [`apps/web/src/infrastructure/clients/AGENTS.md`](../apps/web/src/infrastructure/clients/AGENTS.md), the
-  dynamic-import paragraphs in [`apps/web/src/ui/AGENTS.md`](../apps/web/src/ui/AGENTS.md) and
-  [`apps/web/src/application/stores/AGENTS.md`](../apps/web/src/application/stores/AGENTS.md), the
-  `noConsole` gotcha in [`AGENTS.md`](../AGENTS.md), and the published wiki's *Observability*, *Secrets*
+- Where this bites: the *Deploy* section of [`apps/web/AGENTS.md`](../../apps/web/AGENTS.md), the clients guide at
+  [`apps/web/src/infrastructure/clients/AGENTS.md`](../../apps/web/src/infrastructure/clients/AGENTS.md), the
+  dynamic-import paragraphs in [`apps/web/src/ui/AGENTS.md`](../../apps/web/src/ui/AGENTS.md) and
+  [`apps/web/src/application/stores/AGENTS.md`](../../apps/web/src/application/stores/AGENTS.md), the
+  `noConsole` gotcha in [`AGENTS.md`](../../AGENTS.md), and the published wiki's *Observability*, *Secrets*
   and *Tooling* pages.
 
 ## Amendment, 2026-10-02: an unserialisable value no longer costs the line
@@ -147,7 +147,7 @@ sibling repositories carry, and they changed with it.
 ## Amendment, 2026-10-02: the production build keeps the transport's levels
 
 **`console` is the transport, and the production build deleted `console` calls.** `compiler.removeConsole: isProd`
-in [`apps/web/next.config.ts`](../apps/web/next.config.ts) strips every literal `console.*` call from the app's
+in [`apps/web/next.config.ts`](../../apps/web/next.config.ts) strips every literal `console.*` call from the app's
 code in a production build. The logger's lines survived only because `write` indexes `console[level]`, which the
 transform does not match, so a rewrite of `write` into literal calls would have deleted every line this ADR
 exists to deliver, with nothing failing.

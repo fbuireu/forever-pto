@@ -34,14 +34,14 @@ same and sets `aria-roledescription` on the text input instead, so the role chan
 
 ## Decision
 
-A number the visitor types is a `NumberInput` ([`core/primitives/NumberInput.tsx`](../apps/web/src/ui/modules/core/primitives/NumberInput.tsx)),
+A number the visitor types is a `NumberInput` ([`core/primitives/NumberInput.tsx`](../../apps/web/src/ui/modules/core/primitives/NumberInput.tsx)),
 Base UI's `NumberField` drawn with the app's `Input` (or the group's `InputGroupInput`), and never `type="number"`; the
 contract suite fails the latter.
 
 - It is a text field with the caller's `inputMode`, a translated `aria-roledescription` (`a11y.numberField`, supplied by
   the caller because `core/` renders no copy), the route's locale from `useLocale()` so the server and the browser
   format the same text, and no increment or decrement buttons.
-- The number is read by `readLocalizedNumber` ([`ui/utils/localizedNumber.ts`](../apps/web/src/ui/utils/localizedNumber.ts)):
+- The number is read by `readLocalizedNumber` ([`ui/utils/localizedNumber.ts`](../../apps/web/src/ui/utils/localizedNumber.ts)):
   the language's own group and decimal marks first, then one rule for a mark of the other language. A lone mark that is
   not followed by exactly three digits cannot be a group mark, so it is a decimal point: `2.5` and `2,5` are two and a
   half on every page, `2.50` is two and a half, and `1.234` is 1,234 in Spanish and 1.234 in English. Text that fits
@@ -62,6 +62,6 @@ contract suite fails the latter.
   Neither field had visible step buttons, so nothing is drawn differently besides that glyph.
 - A Base UI upgrade that changes how `NumberField` parses, formats on blur or reports a change needs the
   `NumberInput` tests read again before it lands.
-- Where it bites in the rest of the docs: `U15` in [`CODING_STANDARDS.md`](../CODING_STANDARDS.md), the Donation form
-  paragraph of [`application/dto/AGENTS.md`](../apps/web/src/application/dto/AGENTS.md) (the form holds `amount` as
-  `number | null`) and the `NumberInput` entry of [`ui/modules/core/AGENTS.md`](../apps/web/src/ui/modules/core/AGENTS.md).
+- Where it bites in the rest of the docs: `U15` in [`CODING_STANDARDS.md`](../../CODING_STANDARDS.md), the Donation form
+  paragraph of [`application/dto/AGENTS.md`](../../apps/web/src/application/dto/AGENTS.md) (the form holds `amount` as
+  `number | null`) and the `NumberInput` entry of [`ui/modules/core/AGENTS.md`](../../apps/web/src/ui/modules/core/AGENTS.md).

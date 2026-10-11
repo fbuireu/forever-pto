@@ -128,7 +128,7 @@ about destinations; the split of what each one is for is on the docs site's obse
 components that call `getTranslations` from `next-intl/server`; client components use the `useTranslations`
 hook. The footer's copyright is its one translated client island,
 [`shared/footer/components/Copyright.tsx`](./shared/footer/components/Copyright.tsx), because its year moves from
-the one the server rendered with to the visitor's after mount. The planner itself is client-side end to end. [ADR 0001](../../../../../adr/0001-planner-runs-in-the-browser.md).
+the one the server rendered with to the visitor's after mount. The planner itself is client-side end to end. [ADR 0001](../../../../../docs/adr/0001-planner-runs-in-the-browser.md).
 
 ## A stepped form modal
 
@@ -166,7 +166,7 @@ confirm a PaymentIntent that has already succeeded.
 **Every page asks for Stripe.js as it mounts, and the checkout reuses that load or says it failed.**
 [`providers/StripePreload.tsx`](./providers/StripePreload.tsx), which the locale layout mounts once, asks
 `getStripeClientInstance()` for Stripe.js in an effect, so Stripe's fraud signals see the visit before a payment
-([ADR 0022](../../../../../adr/0022-stripe-js-loads-on-every-page-for-its-fraud-signals.md)); it swallows a failure,
+([ADR 0022](../../../../../docs/adr/0022-stripe-js-loads-on-every-page-for-its-fraud-signals.md)); it swallows a failure,
 the missing key of a local build included, because the checkout asks again and answers it.
 [`premium/StripeElementsProvider.tsx`](./premium/StripeElementsProvider.tsx) wraps `CheckoutForm` in Stripe's `<Elements>`
 and asks the same memoised client in an effect, so the payment gets the instance the page loaded, and importing

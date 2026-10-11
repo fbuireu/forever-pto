@@ -29,7 +29,7 @@ flowchart TB
 
 ## Browser storage is obfuscated, not encrypted
 
-Every persisted store writes through `obfuscatedStorage` (`apps/web/src/application/stores/crypto.ts`), which XORs the serialised JSON against `NEXT_PUBLIC_STORAGE_KEY` and base64-encodes the result (`obfuscate` / `deobfuscate` in `apps/web/src/application/stores/utils/crypto.ts`). The exported names say what it is, and so do these docs: **this is not encryption**. The key is a `NEXT_PUBLIC_*` variable, so it is inlined into the client bundle and anyone who opens the page has it. What it buys is that a plan is not readable at a glance in devtools and not editable with a text edit; what it does not buy is confidentiality against anyone who wants it. [ADR 0007](https://github.com/fbuireu/forever-pto/blob/main/adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md) records why that is the right amount: the data never leaves the device, so the threat it defends against is shoulder-surfing and casual tampering, and real encryption would need a key the user supplies and a lost-plan story nobody wants.
+Every persisted store writes through `obfuscatedStorage` (`apps/web/src/application/stores/crypto.ts`), which XORs the serialised JSON against `NEXT_PUBLIC_STORAGE_KEY` and base64-encodes the result (`obfuscate` / `deobfuscate` in `apps/web/src/application/stores/utils/crypto.ts`). The exported names say what it is, and so do these docs: **this is not encryption**. The key is a `NEXT_PUBLIC_*` variable, so it is inlined into the client bundle and anyone who opens the page has it. What it buys is that a plan is not readable at a glance in devtools and not editable with a text edit; what it does not buy is confidentiality against anyone who wants it. [ADR 0007](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md) records why that is the right amount: the data never leaves the device, so the threat it defends against is shoulder-surfing and casual tampering, and real encryption would need a key the user supplies and a lost-plan story nobody wants.
 
 Three branches, chosen once at module load:
 
@@ -66,7 +66,7 @@ The route carries three more guards beside it: the [rate limiter](/how-it-works/
 | Stripe | The PaymentIntent and its metadata (email, promo code, user agent, IP) | Stripe's own storage |
 | The browser | The plan, the filters, the Custom Holidays, the Premium key and email | Obfuscation, as above |
 
-There is **no user table and no password**, so there is nothing to hash: Premium is derived from a succeeded payment row keyed by email ([ADR 0008](https://github.com/fbuireu/forever-pto/blob/main/adr/0008-premium-derived-from-payment.md)). Addresses are compared after `normalizeEmail` (trim and lowercase) on both sides, never hashed, because the recovery path has to look one up by exact value.
+There is **no user table and no password**, so there is nothing to hash: Premium is derived from a succeeded payment row keyed by email ([ADR 0008](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0008-premium-derived-from-payment.md)). Addresses are compared after `normalizeEmail` (trim and lowercase) on both sides, never hashed, because the recovery path has to look one up by exact value.
 
 ## What never reaches a log
 

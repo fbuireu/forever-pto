@@ -3,7 +3,7 @@
 ## Purpose
 
 The browser Web Worker that runs the planning pipeline off the main thread. The planner computes everything
-client-side ([ADR 0001](../../../../../adr/0001-planner-runs-in-the-browser.md)), so a full run (suggestions,
+client-side ([ADR 0001](../../../../../docs/adr/0001-planner-runs-in-the-browser.md)), so a full run (suggestions,
 alternatives and metrics for each of them) is the one piece of work in the app long enough to freeze a
 slider drag if it stayed on the main thread.
 
@@ -50,12 +50,12 @@ and `onmessageerror` handlers, because a worker that fails to *load* never reach
 ## Invariants
 
 **This worker does not clear the calculation caches**: `runPlanningPipeline` clears them on entry
-([ADR 0006](../../../../../adr/0006-caller-owned-calculation-caches.md)). The pipeline call sits inside the
+([ADR 0006](../../../../../docs/adr/0006-caller-owned-calculation-caches.md)). The pipeline call sits inside the
 handler's `try`, after the message-type guard, so a throw anywhere in a run still becomes a `WORKER_ERROR` and
 an unrelated message never starts one.
 
 **`Temporal` reaches this thread through the engine's own `temporal-polyfill` import**, so this worker is one of
-the realms that import has to work in ([ADR 0005](../../../../../adr/0005-temporal-polyfill.md)).
+the realms that import has to work in ([ADR 0005](../../../../../docs/adr/0005-temporal-polyfill.md)).
 
 **The way back from a string is `fromStoredInstant`**, since everything crossing this boundary was written by
 this app with `toISOString()` ([`@application/shared/utils/dateIntake`](../../application/AGENTS.md)).
