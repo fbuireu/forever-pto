@@ -261,10 +261,10 @@ one and where to link it from.
   means major on any type, as a `BREAKING CHANGE:` footer does.
 - **The `v1` floating tag is stale and nothing maintains it.** When it diverges between local and remote,
   semantic-release's own `git fetch --tags` fails with *would clobber existing tag*.
-- **The patched dependencies are off-limits to Renovate's automerge.** `boneyard-js` is keyed by bare name, so its
-  patch applies to whatever version resolves and a bump that no longer patches what the diff was written against is
-  silent; `vaul` is keyed with its version, so a bump fails the install. [`.github/renovate.json`](.github/renovate.json)
-  turns `automerge` off for both, and the contract suite asserts every patch has that rule.
+- **The patched dependency is off-limits to Renovate's automerge.** `vaul` is keyed with its version, so a bump fails
+  the install until someone reads the upstream diff and regenerates the patch, or drops it once upstream carries the
+  fix. [`.github/renovate.json`](.github/renovate.json) turns `automerge` off for it, and the contract suite asserts
+  every patch has that rule.
 - **`minimumReleaseAge` is declared twice**: `pnpm-workspace.yaml` in minutes (`4320` is three days),
   `.github/renovate.json` in days, and Renovate's has to stay the stricter, because the installer re-checks the age
   on every install. A security update is the case that hits it, since `dependabot-auto-merge.yml` merges one the hour

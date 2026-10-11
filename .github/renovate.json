@@ -59,8 +59,8 @@
 			"groupName": "pnpm"
 		},
 		{
-			"description": "Patched through pnpm patchedDependencies. boneyard-js is keyed by bare name, so a bump that still applies cleanly but no longer patches what the diff was written against is silent; vaul is keyed with its version, so a bump fails the install loudly instead, and a human has to regenerate the patch either way. A human reads the upstream diff.",
-			"matchDepNames": ["boneyard-js", "vaul"],
+			"description": "Patched through pnpm patchedDependencies. vaul is keyed with its version, so a bump fails the install until a human reads the upstream diff and regenerates the patch, or drops it once upstream carries the fix.",
+			"matchDepNames": ["vaul"],
 			"automerge": false,
 			"addLabels": ["patched-dependency"]
 		},
