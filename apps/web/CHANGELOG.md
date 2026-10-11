@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.15.1](https://github.com/fbuireu/forever-pto/compare/web-v1.15.0...web-v1.15.1) (2026-10-11)
+
+
+### Bug Fixes
+
+* **web:** update boneyard-js to 1.10.0 and drop the patch it no longer needs ([dfff4f0](https://github.com/fbuireu/forever-pto/commit/dfff4f08e405fd5a511c3258d8d841480a56894d))
+
 # [forever-pto-web-v1.15.0](https://github.com/fbuireu/forever-pto/compare/web-v1.14.0...web-v1.15.0) (2026-10-10)
 
 
