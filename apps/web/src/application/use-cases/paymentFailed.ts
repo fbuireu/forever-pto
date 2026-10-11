@@ -32,4 +32,4 @@ export const handlePaymentFailed = (
 				},
 			});
 		}
-	});
+	}).pipe(Effect.withSpan("handlePaymentFailed"));

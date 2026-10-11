@@ -106,7 +106,7 @@ src/
   middleware.ts            # locale + country cookies, markdown rewrite; skips /api/* except /api/markdown
   app/                # App Router: [locale]/(app|marketing) pages, api/ route handlers, sitemap, robots
   application/        # use-cases, DTOs, Zustand stores, export, email templates. Orchestration, no I/O clients
-  domain/             # calendar/ (pure planning engine) and payment/ (Effect programs)
+  domain/             # pure: calendar/ (the planning engine) and payment/ (event and status types)
   infrastructure/     # everything outbound: clients, services, workers, proxy, api operations, seo route table
   ui/                 # adapters, hooks, i18n, modules (components), styles, utils, assets
 e2e/                  # Playwright specs
@@ -147,15 +147,15 @@ beside the [`next.config.ts`](./next.config.ts) that rewrites it.
 | [`./src/application/dto/AGENTS.md`](./src/application/dto/AGENTS.md) | The DTO mapping convention, one folder per concept |
 | [`./src/application/stores/AGENTS.md`](./src/application/stores/AGENTS.md) | The Zustand stores, persistence, rehydration |
 | [`./src/application/use-cases/AGENTS.md`](./src/application/use-cases/AGENTS.md) | Effect entry points and how they terminate |
-| [`./src/domain/AGENTS.md`](./src/domain/AGENTS.md) | Layer contract: the bounded contexts and their different rules |
+| [`./src/domain/AGENTS.md`](./src/domain/AGENTS.md) | Layer contract: the bounded contexts, the purity both keep and the calendar's narrower list |
 | [`./src/domain/calendar/AGENTS.md`](./src/domain/calendar/AGENTS.md) | The planning engine: bridges, strategies, metrics, the cache protocol |
-| [`./src/domain/payment/AGENTS.md`](./src/domain/payment/AGENTS.md) | Payment events, factory and handlers |
+| [`./src/domain/payment/AGENTS.md`](./src/domain/payment/AGENTS.md) | The payment events and statuses, and who builds and reads them |
 | [`./src/infrastructure/AGENTS.md`](./src/infrastructure/AGENTS.md) | Layer contract: the only layer that reaches outward |
 | [`./src/infrastructure/api/AGENTS.md`](./src/infrastructure/api/AGENTS.md) | Failure → HTTP status mapping |
 | [`./src/infrastructure/clients/AGENTS.md`](./src/infrastructure/clients/AGENTS.md) | Effect service tags for db, email, logging, payments |
 | [`./src/infrastructure/services/holidays/AGENTS.md`](./src/infrastructure/services/holidays/AGENTS.md) | Holiday lookup and normalisation |
 | [`./src/infrastructure/services/location/AGENTS.md`](./src/infrastructure/services/location/AGENTS.md) | Country detection strategies |
-| [`./src/infrastructure/services/payments/AGENTS.md`](./src/infrastructure/services/payments/AGENTS.md) | Stripe provider, repository, promo codes |
+| [`./src/infrastructure/services/payments/AGENTS.md`](./src/infrastructure/services/payments/AGENTS.md) | Stripe provider and event adapter, repository, promo codes |
 | [`./src/infrastructure/workers/AGENTS.md`](./src/infrastructure/workers/AGENTS.md) | The calculations Web Worker and its message contract |
 | [`./src/ui/AGENTS.md`](./src/ui/AGENTS.md) | Layer contract: adapters, hooks, modules, styles |
 | [`./src/ui/i18n/AGENTS.md`](./src/ui/i18n/AGENTS.md) | Message bundles, namespaces, adding a locale |

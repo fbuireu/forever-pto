@@ -217,7 +217,7 @@ interface ModuleImport {
 	dynamic: boolean;
 }
 
-const importsOf = (path: string): ModuleImport[] => {
+const importsIn = (source: ts.SourceFile): ModuleImport[] => {
 	const found: ModuleImport[] = [];
 	const visit = (node: ts.Node) => {
 		if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
@@ -248,9 +248,11 @@ const importsOf = (path: string): ModuleImport[] => {
 		}
 		ts.forEachChild(node, visit);
 	};
-	visit(parse(path));
+	visit(source);
 	return found;
 };
+
+const importsOf = (path: string): ModuleImport[] => importsIn(parse(path));
 
 interface ResolveSpecifierParams {
 	from: string;
@@ -2243,21 +2245,134 @@ describe("the imports CODING_STANDARDS.md hands to this suite", () => {
 		expect(offenders).toEqual([]);
 	});
 
-	const STRIPE_SEAM = `${PAYMENT}events/factory/`;
+	const DOMAIN = `${WEB_SRC}/domain/`;
+	const INFRASTRUCTURE = `${WEB_SRC}/infrastructure/`;
+	const VENDOR_SDKS = [
+		"stripe",
+		"@stripe/stripe-js",
+		"@stripe/react-stripe-js",
+		"@tursodatabase/serverless",
+		"resend",
+		"@opennextjs/cloudflare",
+	];
+	const DOMAIN_BREACHES = ["effect", "infrastructure", "vendor SDK"] as const;
+	type DomainBreach = (typeof DOMAIN_BREACHES)[number];
+	const MOCKING_CALLS = new Set(["mock", "doMock", "importActual", "importMock"]);
 
-	it("keeps Stripe at the payment event factory, as import type", () => {
-		const stripe = inFolder(PAYMENT).flatMap((file) =>
-			importsOf(file)
-				.filter(({ specifier }) => specifier === "stripe" || specifier.startsWith("stripe/"))
-				.map((imported) => ({ file, ...imported })),
-		);
-		const offenders = stripe
-			.filter(({ file, typeOnly }) => !typeOnly || !file.startsWith(STRIPE_SEAM))
-			.map(({ file }) => file);
+	interface ModuleReference {
+		specifier: string;
+		typeOnly: boolean;
+	}
 
-		expect(stripe.length).toBeGreaterThan(0);
-		expect(offenders).toEqual([]);
+	const referencesIn = (source: ts.SourceFile): ModuleReference[] => {
+		const found: ModuleReference[] = importsIn(source).map(({ specifier, typeOnly }) => ({ specifier, typeOnly }));
+		const visit = (node: ts.Node) => {
+			if (ts.isImportTypeNode(node) && ts.isLiteralTypeNode(node.argument) && ts.isStringLiteral(node.argument.literal))
+				found.push({ specifier: node.argument.literal.text, typeOnly: true });
+			else if (
+				ts.isImportEqualsDeclaration(node) &&
+				ts.isExternalModuleReference(node.moduleReference) &&
+				ts.isStringLiteral(node.moduleReference.expression)
+			)
+				found.push({ specifier: node.moduleReference.expression.text, typeOnly: node.isTypeOnly });
+			else if (ts.isCallExpression(node)) {
+				const [argument] = node.arguments;
+				const callee = node.expression;
+				const requires = ts.isIdentifier(callee) && callee.text === "require";
+				const mocks =
+					ts.isPropertyAccessExpression(callee) &&
+					ts.isIdentifier(callee.expression) &&
+					callee.expression.text === "vi" &&
+					MOCKING_CALLS.has(callee.name.text);
+				if ((requires || mocks) && argument && ts.isStringLiteralLike(argument))
+					found.push({ specifier: argument.text, typeOnly: false });
+			}
+			ts.forEachChild(node, visit);
+		};
+		visit(source);
+		return found;
+	};
+
+	const sdkOf = (specifier: string) => VENDOR_SDKS.find((sdk) => specifier === sdk || specifier.startsWith(`${sdk}/`));
+
+	const breachOf = ({ from, specifier }: ResolveSpecifierParams): DomainBreach | null => {
+		if (EFFECT_PACKAGE.test(specifier)) return "effect";
+		if (lands({ from, specifier }).startsWith(INFRASTRUCTURE)) return "infrastructure";
+		if (sdkOf(specifier)) return "vendor SDK";
+		return null;
+	};
+
+	interface BreachesInParams {
+		file: string;
+		source: ts.SourceFile;
+	}
+
+	const breachesIn = ({ file, source }: BreachesInParams) =>
+		referencesIn(source).flatMap(({ specifier, typeOnly }) => {
+			const breach = breachOf({ from: file, specifier });
+			return breach ? [{ file, specifier, typeOnly, breach }] : [];
+		});
+
+	const domainFiles = sourceFiles.filter((path) => path.startsWith(DOMAIN));
+	const breachesUnder = (files: string[]) => files.flatMap((file) => breachesIn({ file, source: parse(file) }));
+	const domainBreaches = breachesUnder(domainFiles);
+	const breachesElsewhere = breachesUnder(
+		sourceFiles.filter((path) => path.startsWith(`${WEB_SRC}/`) && !path.startsWith(DOMAIN)),
+	);
+
+	it("reads every module under domain/, tests included, through every form one module names another in", () => {
+		const probe = [
+			'import type Stripe from "stripe";',
+			'import { Effect } from "effect";',
+			'import type { DatabaseError } from "@infrastructure/errors";',
+			'export { logger } from "../../../infrastructure/logging/logger";',
+			'type Charge = import("@stripe/stripe-js").PaymentIntent;',
+			'const client = () => import("@tursodatabase/serverless/compat");',
+			'const mail = require("resend");',
+			'vi.mock("@infrastructure/services/payments/repository", () => ({}));',
+			'import type { HolidayDTO } from "@application/dto/holiday/types";',
+			'import { Temporal } from "temporal-polyfill";',
+			'import type { Locale } from "next-intl";',
+		].join("\n");
+		const file = `${DOMAIN}payment/events/probe.test.ts`;
+		const found = breachesIn({ file, source: ts.createSourceFile(file, probe, ts.ScriptTarget.Latest, true) });
+
+		expect(
+			found.map(({ specifier, typeOnly, breach }) => `${breach}: ${specifier}${typeOnly ? " (type)" : ""}`),
+		).toEqual([
+			"vendor SDK: stripe (type)",
+			"effect: effect",
+			"infrastructure: @infrastructure/errors (type)",
+			"infrastructure: ../../../infrastructure/logging/logger",
+			"vendor SDK: @tursodatabase/serverless/compat",
+			"vendor SDK: @stripe/stripe-js (type)",
+			"vendor SDK: resend",
+			"infrastructure: @infrastructure/services/payments/repository",
+		]);
+		expect(domainFiles.length).toBeGreaterThan(30);
+		expect(domainFiles.some((path) => TEST_FILE.test(path))).toBe(true);
 	});
+
+	it("names as a vendor SDK only packages apps/web declares and imports, each of them outside the domain", () => {
+		const declared = Object.keys(readJson(`${WEB}/package.json`).dependencies ?? {});
+		const imported = new Set(breachesElsewhere.map(({ specifier }) => sdkOf(specifier)));
+
+		expect(VENDOR_SDKS.filter((sdk) => !declared.includes(sdk))).toEqual([]);
+		expect(VENDOR_SDKS.filter((sdk) => !imported.has(sdk))).toEqual([]);
+	});
+
+	it.each(DOMAIN_BREACHES)(
+		"imports no %s anywhere under domain/, a type-only import included, so both contexts stay pure",
+		(kind) => {
+			const census = breachesElsewhere.filter(({ breach }) => breach === kind);
+			const offenders = domainBreaches
+				.filter(({ breach }) => breach === kind)
+				.map(({ file, specifier, typeOnly }) => `${file} -> ${specifier}${typeOnly ? " (import type)" : ""}`);
+
+			expect(census.length).toBeGreaterThan(0);
+			expect(offenders).toEqual([]);
+		},
+	);
 
 	const STRIPE_JS = "@stripe/stripe-js";
 	const STRIPE_JS_PURE = `${STRIPE_JS}/pure`;

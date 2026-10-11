@@ -4,7 +4,12 @@ Date: 2026-07-26
 
 ## Status
 
-Accepted. The split it draws inside `src/domain/` is [ADR 0003](./0003-pure-calendar-domain-effectful-payment-domain.md).
+Accepted. Amended 2026-10-11: no Effect program lives under `src/domain/`.
+[ADR 0003](./0003-pure-calendar-domain-effectful-payment-domain.md) split the domain into a pure calendar context and
+an effectful payment one, and [ADR 0023](./0023-the-payment-domain-is-types.md) supersedes its payment half: the
+payment handlers are use cases and the event factory is an infrastructure adapter. Effect has one place per layer:
+infrastructure declares the tags, the layers and the tagged errors, a use case composes them, the edge runs it, and
+the domain imports none of it.
 
 ## Context
 

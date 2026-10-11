@@ -59,8 +59,8 @@ Typed Effect errors map to HTTP through `describeFailure`: `RateLimitError` → 
 
 The route verifies the `stripe-signature` header, then `processWebhookEvent` (`apps/web/src/application/use-cases/webhook.ts`) handles:
 
-- `payment_intent.succeeded`: if the payment row is missing (the deferred save failed), it **creates it from the webhook payload**, then runs the domain handler (`apps/web/src/domain/payment/handlers/paymentSucceeded.ts`).
-- `payment_intent.payment_failed`: `apps/web/src/domain/payment/handlers/paymentFailed.ts`.
+- `payment_intent.succeeded`: if the payment row is missing (the deferred save failed), it **creates it from the webhook payload**, then runs the handler use case (`apps/web/src/application/use-cases/paymentSucceeded.ts`).
+- `payment_intent.payment_failed`: `apps/web/src/application/use-cases/paymentFailed.ts`.
 
 So the database converges even if the original request died after charging.
 

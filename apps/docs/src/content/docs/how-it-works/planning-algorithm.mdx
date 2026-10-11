@@ -191,5 +191,5 @@ For a window of *m* months there are roughly 21·*m* Workdays; each spawns at mo
 - `apps/web/src/domain/calendar/AGENTS.md` is the engine's own guide: files, public API, invariants and the traps a change here falls into.
 - [Holidays engine](/how-it-works/holidays-engine/) covers where the Holidays come from before this page starts.
 - [Calculation worker](/how-it-works/calculation-worker/) covers the boundary the engine runs behind.
-- [ADR 0003](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md) records why this context is pure while the payment one is not.
+- [ADR 0003](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md) records why this context is pure and what it may import, since it runs in a Web Worker; [ADR 0023](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0023-the-payment-domain-is-types.md) holds the payment context to the same purity.
 - [ADR 0020](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0020-strategies-are-objectives-over-the-marginal-gain.md) records why every Strategy is an objective over the marginal gain rather than its own heuristic, and what that costs.

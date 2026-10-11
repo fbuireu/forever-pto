@@ -2,10 +2,12 @@
 
 ## Purpose
 
-The server-side flows that combine more than one external service: taking a Donation, activating
-Premium, handling the Stripe webhook, and sending a contact message. A use-case is an Effect *program*: a
-value, not a call. It composes service tags and repository functions, declares what it can fail with, and
-returns.
+The server-side flows that compose the external services: taking a Donation, activating Premium, handling the
+Stripe webhook and the two payment events it carries, and sending a contact message. A use-case is an Effect
+*program*: a value, not a call. It composes service tags and repository functions, declares what it can fail with,
+and returns. This is the one layer that composes them: `@infrastructure/*` declares the tags, the layers and the
+tagged errors, the edge runs the program, and `@domain/*` stays pure
+([ADR 0023](../../../../../docs/adr/0023-the-payment-domain-is-types.md)).
 
 ## Files
 
@@ -13,7 +15,9 @@ returns.
 | --- | --- | --- |
 | [`payment.ts`](./payment.ts) | `createPayment` | promo-code validation, Stripe intent creation, deferred persistence |
 | [`activatePremium.ts`](./activatePremium.ts) | `activateWithPayment`, `activateWithClaimedPayment`, `activateWithEmail` | Stripe intent lookup, payment repository, session minting |
-| [`webhook.ts`](./webhook.ts) | `processWebhookEvent` | payment repository, the `@domain/payment` event factory and handlers |
+| [`webhook.ts`](./webhook.ts) | `processWebhookEvent` | payment repository, the Stripe event adapter (`@infrastructure/services/payments/provider/events`), the two handlers below |
+| [`paymentSucceeded.ts`](./paymentSucceeded.ts) | `handlePaymentSucceeded` | payment repository (status, then charge), Stripe charge lookup |
+| [`paymentFailed.ts`](./paymentFailed.ts) | `handlePaymentFailed` | payment repository (status) |
 | [`contact.ts`](./contact.ts) | `sendContactEmail` | Zod validation, the contact guard's lookups, React Email render, Resend, deferred persistence |
 
 ## The entry-point convention
@@ -38,8 +42,8 @@ it through the `DonationActivation` alias and delegate to the private `activateF
   [ADR 0017](../../../../../docs/adr/0017-observability-is-the-platform-export.md).
 
 A deferred write that has no response left to fail and a charge lookup that only adds reporting detail are absorbed
-in place rather than widening `E`; a database failure on the critical path propagates (see
-[`../../domain/payment/AGENTS.md`](../../domain/payment/AGENTS.md)). The logs sit where the failure is handled: in
+in place rather than widening `E`; a database failure on the critical path propagates (see *The payment event
+handlers* below). The logs sit where the failure is handled: in
 `tapError` (`webhook.ts`, `payment.ts`, `activatePremium.ts`), in a `catchAll` that absorbs it (`payment.ts`,
 `contact.ts`, `activatePremium.ts`) or in the `catch` of `Effect.tryPromise` (`contact.ts`'s render); `logger` cannot
 throw, so none of them needs a guard (see [`../../infrastructure/AGENTS.md`](../../infrastructure/AGENTS.md)).
@@ -50,7 +54,9 @@ Nothing in this folder calls `Effect.runPromise` or provides a layer. The operat
 `@infrastructure/api/operations` (`createPaymentRequest`, `sendContactRequest`, `activatePremiumRequest`) and
 the Stripe webhook route run each program: they pipe it through `Effect.provide(ApplicationLayer)`
 ([`layers.ts`](../../infrastructure/layers.ts)), map the typed errors to a status, add a `catchAll` fallback
-for the untyped remainder, and run it. Forgetting the layer is a compile error, not a runtime one.
+for the untyped remainder, and run it. Forgetting the layer is a compile error, not a runtime one. The two
+payment event handlers are the use cases no entry point runs directly: `processWebhookEvent` composes them, and the
+webhook route terminates it.
 
 A route handler and a server action that expose the same operation call the same function in
 `@infrastructure/api/operations`: `/api/payment` and `createPaymentAction` both go through
@@ -165,8 +171,9 @@ and the server action) report it the same way without either deciding the policy
 
 `processWebhookEvent` receives an already-verified `Stripe.Event`: signature checking happens at the route,
 because it needs the raw body and the signature header. The use-case switches on `event.type`, builds a
-domain event through the `@domain/payment` factory, and delegates to `handlePaymentSucceeded` /
-`handlePaymentFailed`.
+domain event through the Stripe adapter in
+[`provider/events.ts`](../../infrastructure/services/payments/provider/events.ts), and delegates to
+`handlePaymentSucceeded` / `handlePaymentFailed` beside it.
 
 **The `switch` is the narrowing, and nothing re-asserts the payload type.** `Stripe.Event` is a discriminated
 union, so inside `case "payment_intent.succeeded"` the compiler already knows `event.data.object` is a
@@ -182,13 +189,74 @@ permanently. Before delegating, the succeeded branch re-creates the payment row 
 what makes a failed deferred write from `createPayment` or `activateWithPayment` recoverable.
 
 **`MissingDonorEmailError` is the one failure that goes the other way**, and the asymmetry is the point. The
-event factory refuses to invent an email when a succeeded intent carries neither `metadata.email` nor
+event adapter refuses to invent an email when a succeeded intent carries neither `metadata.email` nor
 `receipt_email`, because that address is the only key Premium can ever be recovered by
 ([ADR 0008](../../../../../docs/adr/0008-premium-derived-from-payment.md)) and a blank one orphans the Donation
 permanently. But redelivering the same intent will produce the same missing email forever, so the succeeded
 branch logs it at error level through `tapError` and then absorbs it, letting the route answer 2xx. Retrying
 a failure that can never succeed is not resilience. The log is the whole remedy here: the payer has paid and
 someone has to go and find them, which is why the message says so rather than reading like a warning.
+
+## The payment event handlers
+
+`handlePaymentSucceeded` and `handlePaymentFailed` reconcile the payments table with an event the adapter built.
+Both return an Effect and neither runs itself. The requirement channels differ, and the difference is the useful
+part:
+
+```typescript
+handlePaymentSucceeded(event): Effect<void, DatabaseError, TursoService | StripeServerService | LoggerService>
+handlePaymentFailed(event):    Effect<void, DatabaseError, TursoService | LoggerService>
+```
+
+`handlePaymentSucceeded` needs Stripe because it goes back for the charge; `handlePaymentFailed` does not. The
+event types are [`@domain/payment/events/types`](../../domain/payment/AGENTS.md)'s.
+
+**Stripe redelivers, and does not guarantee order.** Both handlers are written to be replayed. A failure
+event can arrive after the retry has already succeeded, and that row is the entitlement, so it must not be
+overwritten, but **the rule lives in the `WHERE` clause, not in either handler**.
+`updatePaymentStatus` carries `AND status != 'succeeded'` and answers whether it wrote, so
+`handlePaymentFailed` calls it and warns when nothing was touched instead of reading the row first. A read
+guards nothing here: `TursoService` opens a connection per call, so a redelivery racing the original can have
+both reads see `processing`. See
+[`../../infrastructure/services/payments/AGENTS.md`](../../infrastructure/services/payments/AGENTS.md).
+
+**Neither handler reads before it writes.** `processWebhookEvent` runs `savePayment`, an `INSERT OR IGNORE`,
+immediately before calling `handlePaymentSucceeded`, so the row exists by then, and the only way a read could
+answer "no such row" is by failing. An absorbed read failure looks exactly like a payment that was never created:
+the handler returns, the route answers 200, Stripe never redelivers, and by
+[ADR 0008](../../../../../docs/adr/0008-premium-derived-from-payment.md) that donor's recovery path is dead for good.
+
+`updatePaymentStatus` answers the same question in one fewer round trip and cannot lie about it. Its `WHERE`
+is `id = ? AND status != 'succeeded'` and it returns whether it wrote, so `false` means "absent or already
+succeeded" and a `DatabaseError` propagates as "we could not tell". Both handlers branch on that one boolean,
+and the branches are not distinguished and do not need to be. `updatePaymentCharge`'s own
+`WHERE id = ?` touches nothing when the row is absent, and a redelivery landing on an already-succeeded row
+is exactly when charge enrichment is worth retrying.
+
+**A missing payment row is not the handlers' problem.** Creating the row from the webhook happens *before*
+`handlePaymentSucceeded` is called, in `webhook.ts`, because it needs `paymentDataDTO` and the raw `PaymentIntent`
+the handlers do not have. The failed path creates no row, so on an absent row `handlePaymentFailed`'s write touches
+nothing and it warns. Do not move that fallback into a handler to make it self-sufficient, and do not add a read to
+tell a missing row from an already-succeeded one: the write already reports that it touched nothing, and a read
+cannot report why.
+
+**Charge enrichment must never fail the webhook.** `updateCharge` fetches the charge from Stripe and writes
+receipt URL, card brand, fees and address onto the row. It is typed `Effect<void, never, …>` and ends in
+`Effect.catchAll(() => Effect.void)`: a Stripe outage or a failed write costs some reporting detail, not
+the payment record. It also returns `Effect.void` immediately when `latestChargeId` is null.
+
+**Genuine failures must keep propagating.** `updatePaymentStatus` is *not* caught. A database failure
+surfaces as `DatabaseError`, the route answers 500, and Stripe redelivers. Swallowing it drops the event
+permanently and the user keeps their Donation without Premium. There is no `Effect.catchAll` over a repository
+call in either handler, and adding one re-creates that defect: an absorbed read failure is indistinguishable from
+a row that is not there, and the difference decides whether Stripe redelivers. `updateCharge` is the single
+exception and is not a repository guard.
+
+**The retrieval log in `updateCharge` is piped directly onto `retrieveCharge`, before the `Effect.flatMap`**:
+on the composed pipeline its `tapError` would also fire for a failed write and log it a second time as a retrieval
+failure that never happened. The early-return warnings (in both handlers, on a write that touched no row) are bare
+statements in the generator body, because the condition is a successful write, and `logger` cannot throw; see
+[`../../infrastructure/AGENTS.md`](../../infrastructure/AGENTS.md).
 
 ## Testing
 
@@ -201,3 +269,15 @@ after `runDeferred`.
 - [`activatePremium.test.ts`](./activatePremium.test.ts) additionally runs `activateWithEmail` against a layer providing `TursoService`
   alone. The recovery path never logs, so `LoggerService` must stay out of its requirements channel; that
   test fails to compile (not at runtime) the moment a tag creeps back in.
+- [`webhook.test.ts`](./webhook.test.ts) mocks the event adapter and both handlers (`vi.mock("./paymentSucceeded")`
+  and `vi.mock("./paymentFailed")`), so it asserts the dispatch and the row it re-creates, not the reconciliation.
+- [`paymentSucceeded.test.ts`](./paymentSucceeded.test.ts) and [`paymentFailed.test.ts`](./paymentFailed.test.ts)
+  `vi.mock` the repository and the charge lookup to return `Effect.succeed(...)`, and pin the negative cases: a
+  failing charge retrieval leaves the handler's success channel intact, and `handlePaymentFailed` does *not* warn
+  when the write reports it touched a row. `updatePaymentStatus` is `Effect<boolean, DatabaseError, TursoService>`
+  and `handlePaymentFailed` branches on the value, so its default double succeeds with `true`: a falsy default would
+  send every case down the "nothing was written" branch, and a case that mocks `false` would pass with the branch
+  deleted. A failing double fails with the error the real function declares (`retrieveCharge` with `PaymentError`,
+  the repository with `DatabaseError`). Both suites hand `updatePaymentStatus` the real function once, over a
+  `TursoService` double whose `execute` answers a row count, and assert that `query` never ran: that case goes red
+  the moment a read comes back.

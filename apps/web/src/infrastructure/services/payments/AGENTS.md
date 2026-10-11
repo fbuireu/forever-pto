@@ -2,11 +2,13 @@
 
 ## Purpose
 
-Every Stripe call and every SQL statement behind a Donation. Nothing here decides a flow: each Stripe and SQL
-export is an Effect *program* composed against `StripeServerService`, `TursoService` or `LoggerService`, and
-something else (a use-case, a webhook handler, a route) provides `ApplicationLayer` and runs it
-([ADR 0002](../../../../../../docs/adr/0002-effect-for-external-service-boundaries.md)). The normalisers and the
-metadata helpers beside them are plain functions.
+Every Stripe call and every SQL statement behind a Donation, and the adapter that turns a Stripe `PaymentIntent`
+into the app's own payment event. Nothing here decides a flow: each Stripe and SQL export is an Effect *program*
+composed against `StripeServerService`, `TursoService` or `LoggerService`, and something else (a use-case or a
+route) composes it and provides `ApplicationLayer`
+([ADR 0002](../../../../../../docs/adr/0002-effect-for-external-service-boundaries.md),
+[ADR 0023](../../../../../../docs/adr/0023-the-payment-domain-is-types.md)). The normalisers and the metadata
+helpers beside them are plain functions.
 
 The payments table is also the entitlement store. A succeeded row *is* Premium
 ([ADR 0008](../../../../../../docs/adr/0008-premium-derived-from-payment.md)), which is why [`repository.ts`](./repository.ts) is
@@ -24,10 +26,13 @@ read by the premium activation path as well as by the payment one.
 | [`provider/intent.ts`](./provider/intent.ts) | `createPaymentIntent(params)`: the Stripe intent behind a Donation, which takes its metadata block from `donationMetadata` | `StripeServerService` |
 | [`provider/metadata.ts`](./provider/metadata.ts) | `donationMetadata(params)` and `readDonationMetadata(intent)`: the writer and the reader of that block, and `clampMetadata(value)`, the clamp every free-text field goes through | None |
 | [`provider/charge.ts`](./provider/charge.ts) | `retrieveCharge(chargeId)`: normalises a Stripe `Charge` into flat, nullable fields | `StripeServerService` |
+| [`provider/events.ts`](./provider/events.ts) | `createPaymentSucceededEvent(intent)`, an Effect that fails with `MissingDonorEmailError`, and `createPaymentFailedEvent(intent)`: the domain's payment events built out of a `PaymentIntent` | None |
+| [`provider/resolvers.ts`](./provider/resolvers.ts) | `resolveChargeId(latestCharge)`: flattens `latest_charge`, which Stripe returns as an id, an expanded object or nothing | None |
 | [`provider/promoCode.ts`](./provider/promoCode.ts) | `validatePromoCode({ code, amount })`: a `DiscountInfo`, or a `PromoCodeError` | `StripeServerService`, `TursoService` |
 
-`provider/` is the Stripe side; at the root sit the database, the rate limiter and the address normaliser, and
-`confirmation.ts` sits between: a Stripe read that exists only to render the post-checkout page.
+`provider/` is the Stripe side, the event adapter included; at the root sit the database, the rate limiter and
+the address normaliser, and `confirmation.ts` sits between: a Stripe read that exists only to render the
+post-checkout page.
 
 ## Who calls what
 
@@ -35,18 +40,36 @@ read by the premium activation path as well as by the payment one.
 | --- | --- |
 | `payment.ts` (use-case) | `validatePromoCode`, `createPaymentIntent`, `savePayment` (deferred) |
 | `activatePremium.ts` (use-case) | `getSucceededPaymentByEmail`, `savePayment`, `updatePaymentStatus`, `readDonationMetadata`, `normalizeEmail` |
-| [`webhook.ts`](../../../application/use-cases/webhook.ts) (use-case) | `savePayment`, `readDonationMetadata` |
-| [`events.ts`](../../../domain/payment/events/factory/events.ts) (domain event factory) | `readDonationMetadata` |
-| [`paymentSucceeded.ts`](../../../domain/payment/handlers/paymentSucceeded.ts) / [`paymentFailed.ts`](../../../domain/payment/handlers/paymentFailed.ts) (domain handlers) | `updatePaymentStatus`, `updatePaymentCharge`, `retrieveCharge` |
+| [`webhook.ts`](../../../application/use-cases/webhook.ts) (use-case) | `savePayment`, `readDonationMetadata`, `createPaymentSucceededEvent`, `createPaymentFailedEvent` |
+| [`paymentSucceeded.ts`](../../../application/use-cases/paymentSucceeded.ts) / [`paymentFailed.ts`](../../../application/use-cases/paymentFailed.ts) (use-cases) | `updatePaymentStatus`, `updatePaymentCharge`, `retrieveCharge` |
+| `provider/events.ts` (the event adapter) | `readDonationMetadata` |
 | [`api/operations/payment.ts`](../../api/operations/payment.ts) and [`api/operations/activatePremium.ts`](../../api/operations/activatePremium.ts) | `checkRateLimit` |
 | The confirmation page | `confirmation` |
 
 The repository reads only by email and by promotion code: no function reads a payment by its id, which is what
-keeps the webhook handlers from reading a row before they write it.
+keeps the webhook handlers from reading a row before they write it; their invariants are in
+[`../../../application/use-cases/AGENTS.md`](../../../application/use-cases/AGENTS.md).
 
-The domain handlers importing infrastructure directly is the deliberate asymmetry in
-[ADR 0003](../../../../../../docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md); see
-[`../../../domain/payment/AGENTS.md`](../../../domain/payment/AGENTS.md).
+## The event adapter: Stripe stops here
+
+`provider/events.ts` is the only place a `Stripe.PaymentIntent` becomes a `PaymentSucceededEvent` or a
+`PaymentFailedEvent`, the interfaces in [`@domain/payment/events/types`](../../../domain/payment/AGENTS.md). The
+domain names no Stripe type, so the adapter is where the two vocabularies meet: it reads the intent and its
+metadata and hands back the domain's shapes, and the handlers downstream see only those.
+
+**`email` must resolve, or the event is not built at all.** `createPaymentSucceededEvent` is therefore the
+only factory here returning an Effect: `Effect<PaymentSucceededEvent, MissingDonorEmailError>`. It reads the
+address through `readDonationMetadata`, which takes the first non-blank of `metadata.email` and `receipt_email`,
+trimmed, and fails with `MissingDonorEmailError` when neither yields one. Trimming is the point: `metadata` is
+`{ [k: string]: string }` with no `noUncheckedIndexedAccess`, so `??` alone would happily accept the empty string
+Stripe allows. A blank email would become the payments row's key, and since Premium is keyed by that address
+([ADR 0008](../../../../../../docs/adr/0008-premium-derived-from-payment.md)) the payer could never be found again by
+the "I already donated" path. The failure is caught in `webhook.ts`, not here; see
+[`../../../application/use-cases/AGENTS.md`](../../../application/use-cases/AGENTS.md).
+
+Both factories are annotated with the interface they produce (`createPaymentSucceededEvent` through the
+success channel of its Effect), so a field dropped from the event types (or one the adapter forgets to set)
+is a compile error in `provider/events.ts` itself rather than at the call site in another layer.
 
 ## Invariants
 
@@ -101,7 +124,7 @@ value dropped here cannot be recovered from Stripe afterwards.
 **`provider/metadata.ts` holds the writer and the reader of that block, so the keys are spelled in one file, and
 `createPaymentIntent` is the only caller of the writer.** `metadata.test.ts` reads what `donationMetadata` wrote back
 through `readDonationMetadata`, so a key renamed on one side fails there. `readDonationMetadata` takes the first non-blank of `metadata.email` and `receipt_email` after trimming. It returns `email: string | undefined` rather than failing, because the
-callers owe different errors: `MissingDonorEmailError` in the factory, `ValidationError` at the use-case.
+callers owe different errors: `MissingDonorEmailError` in the event adapter, `ValidationError` at the use-case.
 
 **Stripe caps a metadata value at 500 characters.** `promoCode`, `userAgent` and `ipAddress` go through
 `clampMetadata`: a `User-Agent` over the cap is trivially forgeable and occurs in the wild from AV- and
@@ -217,6 +240,10 @@ has already moved by then and the page is a receipt, not a gate), but it means a
 only in the logs.
 
 ## Testing
+
+[`events.test.ts`](./provider/events.test.ts) covers `resolvers.ts` too. The adapter needs no layer (it requires
+nothing), so it drives the factories with `Effect.runSync`, and `Effect.runSync(… .pipe(Effect.flip))` where the
+assertion is about `MissingDonorEmailError`.
 
 [`rateLimit.test.ts`](./rateLimit.test.ts) mocks `@opennextjs/cloudflare`, since the rate-limiting binding is its only
 dependency; its burst case drives 200 concurrent `checkRateLimit` calls to pin that the count is the

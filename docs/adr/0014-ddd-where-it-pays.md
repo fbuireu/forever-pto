@@ -15,6 +15,10 @@ The rerun and what it bought are recorded in that example.
 Amended on 2026-10-04. Point 1 of the strategic half now scopes the glossary to code, documents and product copy;
 the marketing copy speaks the visitor's words. See *Amendment, 2026-10-04* at the end.
 
+Amended on 2026-10-11. The *Framework-free domain types* row of the practice table reads *taken whole*:
+[ADR 0023](./0023-the-payment-domain-is-types.md) moved the payment handlers into the use cases and the event
+factory into the Stripe adapter, so neither context imports Effect, infrastructure or a vendor SDK.
+
 ## Context
 
 This tree speaks domain-driven design fluently and never says so. `GLOSSARY.md` opens by calling itself "the
@@ -97,7 +101,7 @@ a deferred refactor.
 | Aggregates | **Rejected, and the invariant moved into SQL** | The one candidate is a payments row. Its invariant, *a succeeded row is the entitlement and can never be overwritten*, cannot be held by an in-memory aggregate root here: `TursoService` opens a connection per call, so nothing spans a read and a write, and concurrent webhook deliveries could both read `processing` and both write. `WHERE id = ? AND status != 'succeeded'` holds it atomically where a constructor could not |
 | Repositories | **Rejected as a pattern; the file keeps the name** | `infrastructure/services/payments/repository.ts` is a table gateway: a handful of exported functions over one hand-written SQL statement each, against one table, with no aggregate to reconstitute and no collection illusion. Extracting an interface for it into the domain was weighed and rejected by ADR 0003, because the Effect service tag it composes against already is the substitution seam |
 | Domain events | **Taken in part** | `PaymentSucceededEvent` and `PaymentFailedEvent` are real: they are built by a factory from a Stripe `PaymentIntent`, consumed by handlers that know nothing about webhooks, and they are the reason the payment rules are testable without a network. What is *not* taken is the machinery: no event bus, no store, no subscribers, no replay. `processWebhookEvent` is a `switch` over a couple of cases, and that does not need a dispatcher |
-| Framework-free domain types | **Taken in one context, rejected in the other** | `calendar/` may not touch Effect, `@infrastructure/*` or anything unresolvable in a Web Worker. `payment/` composes Effect directly against infrastructure tags and holds `import type Stripe` in its event factory. Rival rules inside one layer, on purpose; [ADR 0003](./0003-pure-calendar-domain-effectful-payment-domain.md) is the whole argument |
+| Framework-free domain types | **Taken whole** | Nothing under `domain/` imports Effect, `@infrastructure/*` or a vendor SDK, a type-only import included, and the contract suite holds every file there to it. `calendar/` is narrower still, since it must resolve in a Web Worker ([ADR 0003](./0003-pure-calendar-domain-effectful-payment-domain.md)); `payment/` is the event and status types, its handlers are use cases and its factory is the Stripe adapter ([ADR 0023](./0023-the-payment-domain-is-types.md)) |
 
 ### What the "ish" is, measured against the sibling repositories
 

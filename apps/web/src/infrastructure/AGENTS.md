@@ -76,14 +76,18 @@ May import from `@application/*` (DTOs and their schemas, use-cases, and the sha
 helpers) and from `@domain/*`, which is narrower in practice than it reads and is enumerated below. Must not
 import a React component, a style or an asset out of `@ui/*`.
 
-**`@domain/*` is reached from the Web Worker and from two payment modules.** [`workers/types.ts`](./workers/types.ts),
+**`@domain/*` is reached from the Web Worker and from three payment modules.** [`workers/types.ts`](./workers/types.ts),
 [`workers/utils/serializers.ts`](./workers/utils/serializers.ts) and [`workers/worker.ts`](./workers/worker.ts)
 take the calendar types, `runPlanningPipeline` and the boundary predicates the worker narrows with
-(`isStrategy`, `isPreferredMonths`). The payment context reaches two modules under `services/payments/`:
+(`isStrategy`, `isPreferredMonths`). The payment context reaches three modules under `services/payments/`:
+[`provider/events.ts`](./services/payments/provider/events.ts) takes `PaymentSucceededEvent` and
+`PaymentFailedEvent`, as `import type`, because it is the Stripe adapter that builds them
+([ADR 0023](../../../../docs/adr/0023-the-payment-domain-is-types.md));
 [`repository.ts`](./services/payments/repository.ts) takes `ReportedPaymentStatus`, as `import type`, because
 the column it writes is that union and the alternative is a second declaration of the same strings one layer
 down; [`confirmation.ts`](./services/payments/confirmation.ts) takes `PAYMENT_SUCCEEDED`, the one value it
-compares a retrieved intent with. Nothing else here imports from `@domain/*`.
+compares a retrieved intent with. Nothing else here imports from `@domain/*`, and nothing under `@domain/*` imports
+from here.
 
 **Imports in a couple of files reach `apps/web/src/ui/`, through the `@i18n` shorthand.**
 [`i18n/config.ts`](./i18n/config.ts) loads a locale bundle dynamically and
@@ -109,8 +113,9 @@ overview; the rest holds by review.
 
 Every server path that talks to Stripe, Turso or Resend is an Effect program with a typed error channel and
 its dependencies injected as service tags
-([ADR 0002](../../../../docs/adr/0002-effect-for-external-service-boundaries.md)). The program is *composed* in
-`services/` and `@domain/payment/`, and *terminated* where a request is handled (an operation under
+([ADR 0002](../../../../docs/adr/0002-effect-for-external-service-boundaries.md)). This layer *declares* the tags,
+the live layers, the tagged errors and the wrapping of every vendor call; the program is *composed* in `services/`
+and `@application/use-cases/`, and *terminated* where a request is handled (an operation under
 `api/operations/`, or a route handler or page under `src/app/`) with
 `Effect.runPromise(program.pipe(Effect.provide(ApplicationLayer), …))`.
 
@@ -363,7 +368,9 @@ neighbour's test: [`logging/contract.ts`](./logging/contract.ts) through `logger
 [`services/holidays/source/observedHolidays.ts`](./services/holidays/source/observedHolidays.ts) and
 [`services/holidays/source/cachedObservedHolidays.ts`](./services/holidays/source/cachedObservedHolidays.ts)
 through `getHolidays.test.ts`, [`well-known/documents.ts`](./well-known/documents.ts) and
-[`well-known/slugs.ts`](./well-known/slugs.ts) through `agentSkillsIndex.test.ts`, and
+[`well-known/slugs.ts`](./well-known/slugs.ts) through `agentSkillsIndex.test.ts`,
+[`services/payments/provider/resolvers.ts`](./services/payments/provider/resolvers.ts) through
+`provider/events.test.ts`, and
 [`services/env/getRequestPublicEnv.ts`](./services/env/getRequestPublicEnv.ts) through `actions/contact.test.ts`.
 
 [`api/errors.test.ts`](./api/errors.test.ts) asserts the tag→status table row by row; the operation tests assert

@@ -14,7 +14,7 @@ flowchart TB
     MW["middleware.ts<br/>the proxy"]
     INFS["infrastructure/ server half<br/>clients, actions, api, proxy, seo, markdown, well-known"]
     APPS["application/ server half<br/>use-cases, email, schemas"]
-    DP["domain/payment<br/>events + handlers, Effect"]
+    DP["domain/payment<br/>event types, pure"]
   end
   subgraph browser [Runs in the browser]
     UI["ui/<br/>modules, hooks, styles, messages"]
@@ -25,9 +25,10 @@ flowchart TB
   APP --> UI & INFS
   MW --> INFS
   INFS --> APPS --> DP
+  INFS --> DP
   UI --> APPB --> DC
   APPB --> INFB --> DC
-  DP -. tags .-> INFS
+  APPS -. tags .-> INFS
 ```
 
 The split that matters most is not between layers but between **runtimes**: two of the five layers have a server half and a browser half that share almost nothing. The planner runs in the browser ([ADR 0001](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0001-planner-runs-in-the-browser.md)), so the product's weight sits on the right of the diagram, and the server side is a Donation, a session, a contact form and some static rendering.
@@ -77,23 +78,23 @@ Not a layer but a single file at the root of `src`, kept at the pre-Next-16 name
 
 ## `domain/`: the rules
 
-**What it holds.** Two bounded contexts that share no code and no types, and deliberately do not follow the same rule ([ADR 0003](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md)):
+**What it holds.** Two bounded contexts that share no code and no types, held to one rule: neither imports Effect, an infrastructure module or a vendor SDK, a type-only import included ([ADR 0023](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0023-the-payment-domain-is-types.md)), and the calendar keeps a narrower list of its own ([ADR 0003](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md)):
 
 | Context | Responsibility | Runs | Purity |
 | --- | --- | --- | --- |
 | `calendar/` | The planning engine: Workdays, Bridges, Strategy selection, Alternatives, Metrics, the Planning Window and the budget arithmetic | Browser main thread and the Web Worker | Pure: same inputs, same output, no I/O, no clock beyond today |
-| `payment/` | Domain events for a Donation and the Effect programs that handle `payment_intent.succeeded` and `payment_intent.payment_failed` | Server only | Composes against infrastructure service tags on purpose |
+| `payment/` | The events a Donation's webhook turns into and the payment statuses, `PAYMENT_SUCCEEDED` among them | Server only | Types and constants: nothing in it runs |
 
 **What `calendar/` may import.** A short list, kept short: `HolidayDTO` and `HolidayVariant` from `@application/dto/holiday/types`, the date helpers from `@application/shared/utils/dates` (the arrow points upward on purpose; [ADR 0012](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0012-shared-date-helpers-stay-in-the-application-layer.md) weighs the alternatives), `temporal-polyfill` in one file, and the `Locale` type. No `@infrastructure/*`, no `@ui/*`, no Effect. The test for a new entry is the runtime: does the module resolve inside a Web Worker with no DOM and no server context? An import that touches `window` or `process` breaks the planner in a way no test catches, because every test runs on the main thread and the worker only clears its loading flag on error.
 
-**What `payment/` may import.** `@infrastructure/clients/*` tags and `@infrastructure/services/payments/*` programs, plus `import type Stripe` in the event factory. The tags are interfaces, so tests substitute them without a network, and naming the dependency beats pretending it is not there. Do not "fix" it by extracting repository interfaces into the domain: [ADR 0003](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md) records why that costs more than it saves.
+**What `payment/` may import.** Nothing: `apps/web/src/domain/payment/events/types.ts` imports no module. What acts on an event lives where its layer says: `handlePaymentSucceeded` and `handlePaymentFailed` are use cases (`apps/web/src/application/use-cases/paymentSucceeded.ts`, `apps/web/src/application/use-cases/paymentFailed.ts`), and the factory that builds an event out of a Stripe `PaymentIntent` is the Stripe adapter's (`apps/web/src/infrastructure/services/payments/provider/events.ts`). The use cases compose against the infrastructure service tags directly; the tags are the interfaces, so no repository interface is extracted into the domain ([ADR 0023](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0023-the-payment-domain-is-types.md)).
 
 **The rules.**
 
 - **`runPlanningPipeline` is the only orchestration.** It clears the caches, expands the window, folds Manual Days in, measures the budget, finds candidates once, selects, builds Alternatives and measures every plan. The Web Worker and the store's main-thread action both call it and add transport only; it existed twice once and the copies drifted. The [planning algorithm](/how-it-works/planning-algorithm/) page walks each stage.
 - **The caches are caller-owned.** `utils/cache.ts` memoises date keys and Holiday sets at module level; the pipeline clears both on entry and every test that reaches them clears them in `beforeEach` ([ADR 0006](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0006-caller-owned-calculation-caches.md)).
-- **An event carries what a handler acts on.** `PaymentSucceededEvent` is `paymentId`, `email`, `status` and `latestChargeId`, and the handler reads every one; the factory fails with `MissingDonorEmailError` rather than build an event with a blank address, because Premium is keyed by that address ([ADR 0008](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0008-premium-derived-from-payment.md)).
-- **Neither contract is lint-enforced.** Biome has no import-boundary rule; the contract suite compares the measured graph against the overview's table and holds each context to the imports its contract allows.
+- **An event carries what a handler acts on.** `PaymentSucceededEvent` is `paymentId`, `email`, `status` and `latestChargeId`, and the handler reads every one; the Stripe adapter that builds it fails with `MissingDonorEmailError` rather than build an event with a blank address, because Premium is keyed by that address ([ADR 0008](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0008-premium-derived-from-payment.md)).
+- **Neither contract is lint-enforced.** Biome has no import-boundary rule; the contract suite compares the measured graph against the overview's table, holds every file under `apps/web/src/domain/`, tests included, to no Effect, no infrastructure and no vendor SDK, and holds the calendar to its list.
 
 `apps/web/src/domain/calendar/AGENTS.md` is the engine's own guide, with its public API, invariants and the traps a change falls into.
 
@@ -114,7 +115,7 @@ Not a layer but a single file at the root of `src`, kept at the pre-Next-16 name
 | `seo/`, `markdown/`, `well-known/` | `SITE_ROUTES` and `buildMetadata`; the Markdown twin and `markdownTwinHeaders`; the three agent-facing discovery documents | Server |
 | `errors.ts`, `layers.ts`, `span.ts` | Every tagged error; `ApplicationLayer`; `traced`, which names a span after the use case at the entry point | Server |
 
-**What it may import.** `@application/*` (DTO types and schemas, use cases) and, narrowly, `@domain/*`: the calendar types and `runPlanningPipeline` from `workers/`, and one `import type` of `PaymentStatus` in the payments repository. It must not import a component, a style or an asset out of `@ui/*`; the two files that reach `@i18n/messages/*.json` (the request config and the Markdown twin) are the measured `infrastructure → ui` edge, tolerated because a message bundle is data, and the contract suite fails on any other importer.
+**What it may import.** `@application/*` (DTO types and schemas, use cases) and, narrowly, `@domain/*`: the calendar types and `runPlanningPipeline` from `workers/`, and from the payment context the event types the Stripe adapter builds, the status type the payments repository writes and `PAYMENT_SUCCEEDED`, the one value the confirmation compares a retrieved intent with. It must not import a component, a style or an asset out of `@ui/*`; the two files that reach `@i18n/messages/*.json` (the request config and the Markdown twin) are the measured `infrastructure → ui` edge, tolerated because a message bundle is data, and the contract suite fails on any other importer.
 
 **The rules.**
 

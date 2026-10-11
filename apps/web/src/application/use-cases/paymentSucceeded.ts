@@ -82,4 +82,4 @@ export const handlePaymentSucceeded = (
 		}
 
 		yield* updateCharge(event);
-	});
+	}).pipe(Effect.withSpan("handlePaymentSucceeded"));

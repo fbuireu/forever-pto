@@ -6,6 +6,12 @@ Date: 2026-07-26
 
 Accepted. Refines [ADR 0002](./0002-effect-for-external-service-boundaries.md) for the bounded contexts under `src/domain/`.
 
+Its payment half is superseded by [ADR 0023](./0023-the-payment-domain-is-types.md), on 2026-10-11: the payment
+handlers are use cases, the event factory is an infrastructure adapter, and `payment/` holds types, so no Effect,
+no infrastructure and no vendor SDK is imported anywhere under `src/domain/`. The calendar half stands: the purity
+of `calendar/` and its reason, the Web Worker, and the list of what it may import. So does the rejection of
+repository interfaces in the domain, which ADR 0023 keeps.
+
 ## Context
 
 A domain layer is normally held to one rule, and a reader who finds different rules inside the same folder assumes one of them is a mistake. Here they are not.

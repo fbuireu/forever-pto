@@ -1,8 +1,8 @@
 import type { PaymentFailedEvent, PaymentSucceededEvent } from "@domain/payment/events/types";
 import { MissingDonorEmailError } from "@infrastructure/errors";
-import { readDonationMetadata } from "@infrastructure/services/payments/provider/metadata";
 import { Effect } from "effect";
 import type Stripe from "stripe";
+import { readDonationMetadata } from "./metadata";
 import { resolveChargeId } from "./resolvers";
 
 export const createPaymentSucceededEvent = (

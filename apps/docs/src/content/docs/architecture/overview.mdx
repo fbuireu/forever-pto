@@ -13,7 +13,7 @@ Forever PTO is a Next.js App Router application organized into layers under `app
 | --- | --- | --- |
 | App | `apps/web/src/app/` | Next.js App Router: routes, layouts, API handlers, metadata, sitemap/robots. Composition only; see [routing](/architecture/routing/). |
 | Application | `apps/web/src/application/` | Data contracts (DTOs), Zustand stores, Effect use-cases, `next-intl` navigation glue (`apps/web/src/application/i18n/navigation.ts`), email templates and export generators. |
-| Domain | `apps/web/src/domain/` | Pure business logic: the calendar suggestion engine (`apps/web/src/domain/calendar/`) and payment domain events/handlers (`apps/web/src/domain/payment/`). |
+| Domain | `apps/web/src/domain/` | Pure business logic: the calendar suggestion engine (`apps/web/src/domain/calendar/`) and the payment events and statuses (`apps/web/src/domain/payment/`). |
 | Infrastructure | `apps/web/src/infrastructure/` | Everything that talks to the outside world: SDK clients, services, the proxy helpers, the calculation Web Worker (`apps/web/src/infrastructure/workers/`), i18n runtime config and `.well-known` payloads. |
 | UI | `apps/web/src/ui/` | React modules (`apps/web/src/ui/modules/`), hooks, styles (`apps/web/src/ui/styles/`), assets and i18n message catalogs (`apps/web/src/ui/i18n/messages/`). |
 
@@ -35,14 +35,14 @@ either direction, so it is a measurement rather than a drawing.
 | --- | --- | --- | --- | --- | --- |
 | `app` | | 84/16 | 10/6 | | 69/21 |
 | `ui` | | | 185/84 | 24/18 | 57/45 |
-| `application` | | 1/1 | | 15/8 | 36/11 |
-| `domain` | | | 18/13 | | 12/3 |
-| `infrastructure` | | 7/2 | 37/27 | 7/5 | |
+| `application` | | 1/1 | | 14/9 | 47/13 |
+| `domain` | | | 18/13 | | |
+| `infrastructure` | | 7/2 | 37/27 | 8/6 | |
 | `middleware.ts` | | | | | 5/1 |
 
 The same graph drawn, every arrow an `imports` edge that exists in the tree and its weight the count above. The
-two upward arrows out of `domain` and the one out of `infrastructure` are the deliberate inversions the bullets
-below explain:
+upward arrow out of `domain` and the one out of `infrastructure` are the deliberate inversions the bullets below
+explain:
 
 ```mermaid
 flowchart LR
@@ -58,13 +58,12 @@ flowchart LR
   UI -->|185| APPL
   UI -->|24| DOM
   UI -->|57| INFRA
-  APPL -->|15| DOM
-  APPL -->|36| INFRA
+  APPL -->|14| DOM
+  APPL -->|47| INFRA
   APPL -.->|1, the known inversion| UI
   DOM -.->|18, ADR 0012| APPL
-  DOM -.->|12, ADR 0003| INFRA
   INFRA -->|37| APPL
-  INFRA -->|7| DOM
+  INFRA -->|8| DOM
   INFRA -.->|7, via @i18n| UI
   MW -->|5| INFRA
 ```
@@ -75,12 +74,14 @@ intended layering leaves out:
 - **`app` never imports `domain`.** It is the only empty cell a reader would expect to be full, and it is the
   layering claim this package actually keeps: a route handler or a page reaches a business rule through
   `@application/use-cases/*` or through the calculations worker, never directly.
-- **`domain` imports upwards, in both directions.** `domain → application` is the calendar context reaching
-  `HolidayDTO` and the shared date helpers; that arrow points the wrong way on purpose, and
+- **`domain` imports upward once, and never into `infrastructure`.** `domain → application` is the calendar
+  context reaching `HolidayDTO` and the shared date helpers; that arrow points the wrong way on purpose, and
   [ADR 0012](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0012-shared-date-helpers-stay-in-the-application-layer.md)
-  records what every alternative costs. `domain → infrastructure` is the payment context composing Effect
-  programs against service tags, which is
-  [ADR 0003](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md).
+  records what every alternative costs. The `domain → infrastructure` cell is empty: neither context imports
+  Effect, an infrastructure module or a vendor SDK, a type-only import included. The payment context is the
+  event types that its use cases under `apps/web/src/application/use-cases/` and its Stripe adapter under
+  `apps/web/src/infrastructure/services/payments/provider/` share, which is
+  [ADR 0023](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0023-the-payment-domain-is-types.md).
 - **`infrastructure` imports upwards too**: imports in a couple of files reach
   `apps/web/src/ui/i18n/messages/*.json` through the `@i18n` shorthand. "Nothing in `infrastructure` imports from
   `@ui/*`" holds for the literal specifier and not for the layer, so the table counts the edge.

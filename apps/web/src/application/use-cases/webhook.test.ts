@@ -7,7 +7,7 @@ import type Stripe from "stripe";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { processWebhookEvent } from "./webhook";
 
-vi.mock("@domain/payment/events/factory/events", () => ({
+vi.mock("@infrastructure/services/payments/provider/events", () => ({
 	createPaymentSucceededEvent: vi.fn().mockReturnValue(
 		Effect.succeed({
 			paymentId: "pi_test",
@@ -23,11 +23,11 @@ vi.mock("@domain/payment/events/factory/events", () => ({
 	}),
 }));
 
-vi.mock("@domain/payment/handlers/paymentSucceeded", () => ({
+vi.mock("./paymentSucceeded", () => ({
 	handlePaymentSucceeded: vi.fn(() => Effect.succeed(undefined)),
 }));
 
-vi.mock("@domain/payment/handlers/paymentFailed", () => ({
+vi.mock("./paymentFailed", () => ({
 	handlePaymentFailed: vi.fn(() => Effect.succeed(undefined)),
 }));
 
@@ -101,13 +101,13 @@ beforeEach(() => vi.clearAllMocks());
 
 describe("processWebhookEvent", () => {
 	it("calls handlePaymentSucceeded for payment_intent.succeeded", async () => {
-		const { handlePaymentSucceeded } = await import("@domain/payment/handlers/paymentSucceeded");
+		const { handlePaymentSucceeded } = await import("./paymentSucceeded");
 		await run(processWebhookEvent(succeededEvent({ id: "pi_test" })));
 		expect(handlePaymentSucceeded).toHaveBeenCalledOnce();
 	});
 
 	it("calls createPaymentSucceededEvent with the payment intent object", async () => {
-		const { createPaymentSucceededEvent } = await import("@domain/payment/events/factory/events");
+		const { createPaymentSucceededEvent } = await import("@infrastructure/services/payments/provider/events");
 		const intent = { id: "pi_test", status: "succeeded" as const };
 		await run(processWebhookEvent(succeededEvent(intent)));
 		expect(createPaymentSucceededEvent).toHaveBeenCalledWith(intent);
@@ -158,13 +158,13 @@ describe("processWebhookEvent", () => {
 	});
 
 	it("propagates a handlePaymentSucceeded failure so Stripe retries the delivery", async () => {
-		const { handlePaymentSucceeded } = await import("@domain/payment/handlers/paymentSucceeded");
+		const { handlePaymentSucceeded } = await import("./paymentSucceeded");
 		vi.mocked(handlePaymentSucceeded).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "db down" })));
 		await expect(run(processWebhookEvent(succeededEvent({ id: "pi_test" })))).rejects.toThrow("db down");
 	});
 
 	it("logs the error when handlePaymentSucceeded fails", async () => {
-		const { handlePaymentSucceeded } = await import("@domain/payment/handlers/paymentSucceeded");
+		const { handlePaymentSucceeded } = await import("./paymentSucceeded");
 		vi.mocked(handlePaymentSucceeded).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "db down" })));
 		await run(processWebhookEvent(succeededEvent({ id: "pi_test" }))).catch(() => undefined);
 		expect(mockLogger.logError).toHaveBeenCalledWith({
@@ -175,7 +175,7 @@ describe("processWebhookEvent", () => {
 	});
 
 	it("succeeds so Stripe stops redelivering when the intent carries no donor email", async () => {
-		const { createPaymentSucceededEvent } = await import("@domain/payment/events/factory/events");
+		const { createPaymentSucceededEvent } = await import("@infrastructure/services/payments/provider/events");
 		vi.mocked(createPaymentSucceededEvent).mockReturnValueOnce(
 			Effect.fail(new MissingDonorEmailError({ paymentId: "pi_test" })),
 		);
@@ -183,8 +183,8 @@ describe("processWebhookEvent", () => {
 	});
 
 	it("logs an error and touches nothing when the intent carries no donor email", async () => {
-		const { createPaymentSucceededEvent } = await import("@domain/payment/events/factory/events");
-		const { handlePaymentSucceeded } = await import("@domain/payment/handlers/paymentSucceeded");
+		const { createPaymentSucceededEvent } = await import("@infrastructure/services/payments/provider/events");
+		const { handlePaymentSucceeded } = await import("./paymentSucceeded");
 		const { savePayment } = await import("@infrastructure/services/payments/repository");
 		vi.mocked(createPaymentSucceededEvent).mockReturnValueOnce(
 			Effect.fail(new MissingDonorEmailError({ paymentId: "pi_test" })),
@@ -200,19 +200,19 @@ describe("processWebhookEvent", () => {
 	});
 
 	it("propagates a handlePaymentFailed failure so Stripe retries the delivery", async () => {
-		const { handlePaymentFailed } = await import("@domain/payment/handlers/paymentFailed");
+		const { handlePaymentFailed } = await import("./paymentFailed");
 		vi.mocked(handlePaymentFailed).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "db down" })));
 		await expect(run(processWebhookEvent(failedEvent({ id: "pi_test" })))).rejects.toThrow("db down");
 	});
 
 	it("calls handlePaymentFailed for payment_intent.payment_failed", async () => {
-		const { handlePaymentFailed } = await import("@domain/payment/handlers/paymentFailed");
+		const { handlePaymentFailed } = await import("./paymentFailed");
 		await run(processWebhookEvent(failedEvent({ id: "pi_test" })));
 		expect(handlePaymentFailed).toHaveBeenCalledOnce();
 	});
 
 	it("calls createPaymentFailedEvent with the payment intent object", async () => {
-		const { createPaymentFailedEvent } = await import("@domain/payment/events/factory/events");
+		const { createPaymentFailedEvent } = await import("@infrastructure/services/payments/provider/events");
 		const intent = { id: "pi_test" };
 		await run(processWebhookEvent(failedEvent(intent)));
 		expect(createPaymentFailedEvent).toHaveBeenCalledWith(intent);
@@ -227,8 +227,8 @@ describe("processWebhookEvent", () => {
 	});
 
 	it("does not call any handler for unhandled event types", async () => {
-		const { handlePaymentSucceeded } = await import("@domain/payment/handlers/paymentSucceeded");
-		const { handlePaymentFailed } = await import("@domain/payment/handlers/paymentFailed");
+		const { handlePaymentSucceeded } = await import("./paymentSucceeded");
+		const { handlePaymentFailed } = await import("./paymentFailed");
 		await run(processWebhookEvent(unhandledEvent()));
 		expect(handlePaymentSucceeded).not.toHaveBeenCalled();
 		expect(handlePaymentFailed).not.toHaveBeenCalled();

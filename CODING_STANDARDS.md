@@ -51,9 +51,11 @@ No rule below restates these, and a diff that breaks one fails CI:
     relative (a folder takes in its subfolders, except at the root of `src` and of a layer, and a screen under
     `ui/modules/pages` and a row of the `ui/modules` table each count as one folder), so an alias always marks a
     crossed boundary; mixing both forms for one module breaks Biome's import sorting;
-  - the domain: `calendar/` and `payment/` importing nothing from each other, tests included, `calendar/` importing
-    from outside itself only the Holiday DTO types, the date helpers, `temporal-polyfill` and the `next-intl` `Locale`
-    type, and Stripe reaching `payment/` only as `import type` in the event factory;
+  - the domain: nothing under it, tests included, importing `effect`, `@infrastructure/*` or a vendor SDK (`stripe`,
+    Stripe.js and its React bindings, the Turso driver, `resend`, `@opennextjs/cloudflare`), a type-only import, a
+    type-position `import()` and a `vi.mock` path included, `calendar/` and `payment/` importing nothing from each
+    other, and `calendar/` importing from outside itself only the Holiday DTO types, the date helpers,
+    `temporal-polyfill` and the `next-intl` `Locale` type;
   - the application layer: no `next/server`, `next/headers`, `@opennextjs/cloudflare` or SDK package, no SDK
     constructed, no component but the email template, `stores/premium.ts` the one module reaching `src/ui`, and the
     planning pipeline, `getHolidays` and `getRegions` reached from the stores through `import()` alone;
@@ -285,8 +287,6 @@ No rule below restates these, and a diff that breaks one fails CI:
 
 ## Domain (`apps/web/src/domain`)
 
-- `D3` **hard**: Compose `payment/` directly against infrastructure tags; the tags already are the interfaces
-  ([ADR 0003](./docs/adr/0003-pure-calendar-domain-effectful-payment-domain.md)).
 - `D4` **hard**: Keep the engine pure (no clock beyond `startOfToday()`, no I/O) and its orchestration in
   `runPlanningPipeline`; callers pass inputs and read a result
   ([ADR 0006](./docs/adr/0006-caller-owned-calculation-caches.md)).
@@ -328,8 +328,6 @@ No rule below restates these, and a diff that breaks one fails CI:
   (`generateMetrics`, `measures`, `budget`).
 - `D17` **hard**: Sort with `toSorted`; `.sort()` is for an array the function has just built, because a sort in
   place reorders a caller's array.
-- `D18` **hard**: Spell out the `Effect.Effect<A, E, R>` return type of every Effect program in `domain/payment`, for
-  the same reason `A3` gives for use cases.
 - `D19` **judgement**: Export a boundary predicate beside the default it is paired with, and test that it accepts
   that default (`isHolidayVariant`, the Planning Window's bounds).
 
@@ -372,6 +370,11 @@ No rule below restates these, and a diff that breaks one fails CI:
   ([ADR 0007](./docs/adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md)).
 - `A18` **judgement**: Add a persisted field without a `STORAGE_VERSION` bump when the initial state supplies it and
   rehydration narrows it; bump and migrate only when an old blob would rehydrate into a wrong value.
+- `A19` **hard**: Compose a use case directly against the infrastructure service tags and the programs under
+  `infrastructure/services`, and put there every program that asks for a tag, the handlers of a domain event
+  included; the tags already are the interfaces, so no repository interface is extracted into the domain, and a
+  function that reads a vendor's shape is that vendor's adapter in `infrastructure`
+  ([ADR 0023](./docs/adr/0023-the-payment-domain-is-types.md)).
 
 ## Infrastructure (`apps/web/src/infrastructure`)
 

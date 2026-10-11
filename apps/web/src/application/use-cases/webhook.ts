@@ -1,15 +1,18 @@
 import { paymentDataDTO } from "@application/dto/payment/dto";
-import { createPaymentFailedEvent, createPaymentSucceededEvent } from "@domain/payment/events/factory/events";
-import { handlePaymentFailed } from "@domain/payment/handlers/paymentFailed";
-import { handlePaymentSucceeded } from "@domain/payment/handlers/paymentSucceeded";
 import type { TursoService } from "@infrastructure/clients/db/turso/service";
 import type { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import type { DatabaseError } from "@infrastructure/errors";
 import { LoggerService } from "@infrastructure/logging/service";
+import {
+	createPaymentFailedEvent,
+	createPaymentSucceededEvent,
+} from "@infrastructure/services/payments/provider/events";
 import { readDonationMetadata } from "@infrastructure/services/payments/provider/metadata";
 import { savePayment } from "@infrastructure/services/payments/repository";
 import { Effect } from "effect";
 import type Stripe from "stripe";
+import { handlePaymentFailed } from "./paymentFailed";
+import { handlePaymentSucceeded } from "./paymentSucceeded";
 
 export const processWebhookEvent = (
 	event: Stripe.Event,
