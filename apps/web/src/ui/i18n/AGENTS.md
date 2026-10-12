@@ -34,9 +34,11 @@ go hunting for a key:
 
 - The namespace name does not always match the component. [`pages/planner/Contact.tsx`](../modules/pages/planner/Contact.tsx) reads
   `roadmap`, not `contact`; `contact` belongs to the contact form in [`shared/contact/ContactModal.tsx`](../modules/shared/contact/ContactModal.tsx).
-- `metadata` has three readers, none of them a `'use client'` component:
+- `metadata` has four readers, none of them a `'use client'` component:
   [`routeMetadata.ts`](../../infrastructure/seo/routeMetadata.ts) under `@infrastructure/seo` (every page's
   title and description, through `getTranslations({ locale, namespace: 'metadata' })`),
+  [`notFoundMetadata.ts`](../../infrastructure/seo/notFoundMetadata.ts) beside it (the 404's title,
+  `metadata.notFound.title`, for the catch-all in each locale and for the global 404 in the default one),
   [`buildMarkdownPage.ts`](../../infrastructure/markdown/buildMarkdownPage.ts) under `@infrastructure/markdown`
   (the Markdown twin's title and description, through `createTranslator`), and the async server component
   [`modules/shared/seo/JsonLd.tsx`](../modules/shared/seo/JsonLd.tsx), which interpolates `title` and

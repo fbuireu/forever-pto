@@ -13,9 +13,9 @@ Failures are handled by boundary files that all funnel into shared UI modules: `
 | --- | --- | --- |
 | `apps/web/src/app/[locale]/error.tsx` | Any localised route | Client component; wraps `ErrorContent` in a full-height flex shell |
 | `apps/web/src/app/[locale]/(marketing)/error.tsx` | Marketing group | Same `ErrorContent`, no extra wrapper (the group layout provides it) |
-| `apps/web/src/app/[locale]/not-found.tsx` | `notFound()` inside a locale | Resolves the locale with `getLocale()` and renders `NotFoundContent` |
+| `apps/web/src/app/[locale]/(marketing)/not-found.tsx` | `notFound()` inside the marketing group, which the catch-all `apps/web/src/app/[locale]/(marketing)/[...rest]/page.tsx` throws for every unknown path under a locale | Resolves the locale with `getLocale()` and renders `NotFoundContent` inside the marketing shell |
 | `apps/web/src/app/global-error.tsx` | Errors above the locale layout | Must render its own `<html>`/`<body>` |
-| `apps/web/src/app/global-not-found.tsx` | URLs that never match `[locale]` | Requires `experimental.globalNotFound: true` in `next.config.ts` |
+| `apps/web/src/app/global-not-found.tsx` | A URL no locale claims, such as `/missing.txt` | Requires `experimental.globalNotFound: true` in `next.config.ts`; prerendered once, in the default language |
 
 ## Global boundaries rebuild the shell
 
@@ -24,7 +24,21 @@ Because the root layout is gone when they run, the global files recreate everyth
 They differ in how they pick a locale:
 
 - **`global-error.tsx`** is a client component with no intl request context, so it derives the locale from the pathname (`getLocaleFromPathname` in `apps/web/src/infrastructure/i18n/utils/url.ts`) and falls back to the statically imported English message catalog (`@i18n/messages/en.json`): an error page must never itself throw on a missing translation.
-- **`global-not-found.tsx`** runs on the server and detects the locale with a fallback chain: the `x-next-intl-locale` header, then the next-intl locale cookie (`LOCALE_COOKIE` from `apps/web/src/infrastructure/i18n/locales.ts`), then `Accept-Language`, defaulting to the routing default. Since the `<html>` tag is already rendered with the default locale by the time detection finishes, `HtmlLangSync` (`apps/web/src/ui/modules/pages/not-found/HtmlLangSync.tsx`) emits an inline `<script>` that sets `lang` as soon as the streamed chunk parses, without waiting for hydration. It also renders its own skip-link, since the root layout's one is unavailable.
+- **`global-not-found.tsx`** picks none: it renders in the default locale, `routing.defaultLocale` from `apps/web/src/infrastructure/i18n/routing.ts`, on `<html lang>`, in its title and in every translation it asks for, and it reads no header and no cookie, so it is prerendered once and served for every URL no locale claims. It draws the same header, 404 view and footer the marketing shell draws, mounts the quick start the header's trial action opens, and renders its own skip-link, since the root layout's one is unavailable.
+
+## Which URL each 404 answers
+
+The URL names its locale, so the localised 404 comes from a route that matches the URL: `apps/web/src/app/[locale]/(marketing)/[...rest]/page.tsx` calls `notFound()`, and the group's `not-found.tsx` draws the view inside the marketing header and footer. The root layout exports `dynamicParams = false`, so a first segment that is not a locale never reaches a layout on a prerendered route.
+
+| URL | Answer |
+| --- | --- |
+| `/es/x`, `/de/a/b/c`, `/es/x.txt` | 404 from the catch-all, in that locale, inside the shell |
+| `/en/x` | 307 to `/x`, since English carries no prefix |
+| `/x`, `/xx/x` | The proxy rewrites to `/en/…`, and the catch-all answers in English |
+| `/missing.txt` | 404 from `global-not-found.tsx`, in English |
+| `/api/x`, `/foo/bar.txt` | 404 from the catch-all, in English: both layouts narrow a segment no locale claims to the default |
+
+Every one of them carries `noindex`. A `notFound()` thrown by a page is drawn by the browser: the server answers 404 with Next's own error document and the flight data, and the language, the title, the view and the shell arrive once the page's script runs. `global-not-found.tsx` is the one 404 rendered whole on the server. The decision and its cost are [ADR 0024](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0024-unknown-urls-answer-from-a-catch-all-under-the-locale.md), and the rules the contract suite holds are in the *Unknown URLs* section of `apps/web/src/app/AGENTS.md`.
 
 ## ErrorContent: the brutal 500
 
@@ -39,8 +53,8 @@ All copy comes from the `error` translation namespace, so the page is localised 
 
 ## NotFoundContent: the brutal 404
 
-`NotFoundContent` is a server component: it renders the standard `Header` and `Footer`, the same brutal digit-block treatment for "404", CTAs back to the homepage and `/planner` (via the localised `Link` from `apps/web/src/application/i18n/navigation.ts`), and a grid of suggested homepage anchors (`/#how`, `/#features`, `/#pricing`, `/#faq`). Copy comes from the `notFound` namespace via `getTranslations` with an explicit locale, which is why every boundary passes `locale` down to it.
+`NotFoundContent` is a server component that carries the content alone, its `main` landmark: the same brutal digit-block treatment for "404", CTAs back to the homepage and `/planner` (via the localised `Link` from `apps/web/src/application/i18n/navigation.ts`), and a grid of suggested homepage anchors (`/#how`, `/#features`, `/#pricing`, `/#faq`). The marketing layout draws the `Header` and `Footer` around it, and `global-not-found.tsx` draws the same two itself. Copy comes from the `notFound` namespace via `getTranslations` with an explicit locale, which is why every boundary passes `locale` down to it; the page title is `metadata.notFound.title`, from the catch-all's metadata or the global page's.
 
 ## Testing
 
-Each boundary has a colocated test (`error.test.tsx`, `not-found.test.tsx`, `global-error.test.tsx`). Playwright covers the rendered 404 in `apps/web/e2e/[locale]/not-found.spec.ts`; the error boundaries have no end-to-end case, because no URL provokes one. See the *Commands* section of `apps/web/AGENTS.md`.
+Each boundary has a colocated test (`error.test.tsx`, `not-found.test.tsx`, `global-error.test.tsx`, `global-not-found.test.tsx`), and so does the catch-all. Playwright covers the 404 of every locale in `apps/web/e2e/[locale]/(marketing)/not-found.spec.ts` and the dotted-path fallback in `apps/web/e2e/global-not-found.spec.ts`: the status, the language, the title, the heading and the header and footer; the error boundaries have no end-to-end case, because no URL provokes one. See the *Commands* section of `apps/web/AGENTS.md`.

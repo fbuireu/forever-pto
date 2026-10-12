@@ -14,10 +14,23 @@ of the conditions below was met and which was not.
 not cosmetic on this host; it picks the runtime, and the Node.js one loses request-header edits. That
 amendment is the last section of this file.
 
+**Amended 2026-10-12: the adapter has to read the cache keys Next writes.** Next 16.3.8 scopes its response-cache
+keys to the route that owns each entry, and `@opennextjs/cloudflare` before 1.20.8 seeds the R2 cache under the bare
+path, so on the Worker every prerendered page missed the cache. The adapter is 1.20.9 now; the amendment
+*The cache keys moved with Next 16.3.8* at the end of this file says what that hid and what it broke.
+
+**Amended 2026-10-12: the global 404 is static, and the locale comes from the URL.**
+[ADR 0024](./0024-unknown-urls-answer-from-a-catch-all-under-the-locale.md) answers every unknown URL a locale claims
+from a catch-all under `[locale]` and prerenders `global-not-found.tsx` once, in the default language, reading no
+header or cookie. The *Context* below rejects a statically prerendered 404 because it gave up the server-side locale
+detection; nothing is detected now, so that reason is gone, and the page rendered at request time on an unknown path
+is the catch-all's. The citations below of the 404's spec name its current path,
+`e2e/[locale]/(marketing)/not-found.spec.ts`, and `e2e/global-not-found.spec.ts` covers the global page.
+
 ## Context
 
 Next 16.3.0 landed in `81222a48` together with TypeScript 7, and from that commit onward every pull request
-failed the same tests in `e2e/[locale]/not-found.spec.ts`: an unknown path answered **500**, serving
+failed the same tests in `e2e/[locale]/(marketing)/not-found.spec.ts`: an unknown path answered **500**, serving
 Cloudflare's **Error 1101 (Worker threw exception)** page instead of the app's own 404. Nothing else on the
 site was affected, and the failure never showed locally.
 
@@ -50,7 +63,7 @@ reproduction is possible (`cf:build` fails on the maintainer's Windows machine) 
 was never pulled from the tail consumer, so any patch would be a guess at a fault whose shape is unknown.
 Making the 404 statically prerendered was rejected because it removes server-side locale detection from that
 page, trading a real user-facing behaviour for a toolchain convenience. Deleting `global-not-found.tsx` so
-the route-level `[locale]/not-found.tsx` takes over does not work at all: with no root layout in a
+a route-level `not-found.tsx` inside `[locale]` takes over does not work at all: with no root layout in a
 `[locale]`-only app, Next falls back to its built-in "This page could not be found".
 
 TypeScript is dragged along because it cannot move independently. TypeScript 7 ships the Go compiler and no
@@ -74,7 +87,7 @@ The pin lifts on either of these, and both are things somebody does rather than 
    preview, from `wrangler tail` or the `forever-pto-tail` consumer, and either land the fix upstream or
    patch against a fault whose shape is known. This is the one that closes the question rather than deferring
    it, and it is the last Consequence below.
-2. **A preview on the candidate Next version runs the `e2e` suite green**, `e2e/[locale]/not-found.spec.ts`
+2. **A preview on the candidate Next version runs the `e2e` suite green**, `e2e/[locale]/(marketing)/not-found.spec.ts`
    included. That is a per-version result and not a general clearance: a green 16.3.2 says nothing about
    16.3.3, so record the version the run covered alongside the bump.
 
@@ -129,7 +142,7 @@ suite and the contract suite both green, and `pnpm build` producing a full Next 
 build with `partialPrefetching` and `cacheComponents` both on.
 
 **What was not verified, and it is the bar this ADR set:** condition 2, a green `e2e` run against a preview
-on the candidate version, including `e2e/[locale]/not-found.spec.ts`. The preview deploy cannot authenticate
+on the candidate version, including `e2e/[locale]/(marketing)/not-found.spec.ts`. The preview deploy cannot authenticate
 until `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` reach the `web-*`/`docs-*` environments, which
 is recorded in [`AGENTS.md`](../../AGENTS.md) as the one outstanding settings item. Condition 1, the captured
 Worker stack trace, was not attempted either: the exception is still unknown, and if 16.3.3 with 1.20.3
@@ -227,3 +240,36 @@ framework, and the framework's new default is the one that is not carried.
 is a runtime change, not a tidy-up, and it must not be done again until a `proxy.ts` build passes the failing
 cases in the table above on a preview. The published docs page keeps the `/architecture/proxy/` address, since
 the concept is Next's and only the file name is ours.
+
+## Amendment, 2026-10-12: the cache keys moved with Next 16.3.8
+
+**Next 16.3.8 keys its response cache by the route that owns the entry.** It asks the cache handler for
+`/route-cache/APP_PAGE/<sha256 of the app entry>/$/<path>` rather than `/<path>`, and it reads the build's prerendered
+pages through that key too. `@opennextjs/cloudflare` 1.20.6, which carried `@opennextjs/aws` 4.1.4, still seeded the
+R2 bucket under the bare paths (`.open-next/cache/<build id>/en.cache`), so on the Worker every prerendered page was a
+miss. Next 16.3.8 reached `main` on 2026-10-08 as a security update ([#414](https://github.com/fbuireu/forever-pto/pull/414)),
+with the adapter left where it was.
+
+**While every route took any segment, the miss was invisible.** A page whose `dynamicParams` is on renders on a
+miss and writes the entry under the new key, so the site answered 200 and each page rendered once per deploy instead
+of never; the build's prerender went unread.
+
+**Once the root layout closed its segment, the miss was a 404 on every page.**
+[ADR 0024](./0024-unknown-urls-answer-from-a-catch-all-under-the-locale.md) sets `dynamicParams = false` on
+`[locale]/layout.tsx`. Next's app-page handler, outside minimal mode, which is how OpenNext runs it, answers a miss
+on a route whose fallback is `false` with `NoFallbackError` and renders `/_not-found`, whatever the prerender manifest
+says about the path. The routing layer was not the cause: OpenNext's debug log resolves `/` to `/en` and to the
+`/[locale]` route, and Next renders the 404 after that. `next build && next start` showed nothing, because the
+file-system cache there reads and writes the same keys. It reached production on 2026-10-12, the smoke run failed on
+the homepage and rolled the Worker back, and the commits were reverted.
+
+**`@opennextjs/aws` 4.1.7 mirrors the scoped keys** (`dist/utils/routeCacheKey.js`: it picks the app entry with its
+route groups, as Next does, and hashes it), and `@opennextjs/cloudflare` 1.20.8 is the first release that carries it.
+The upstream report is [opennextjs/opennextjs-aws#1269](https://github.com/opennextjs/opennextjs-aws/issues/1269).
+The adapter is **1.20.9** (`@opennextjs/aws` 4.1.8): 1.20.10 needs wrangler 4.148 and had not cleared Renovate's
+four days. Verified with `opennextjs-cloudflare build` and `preview` on this tree: every prerendered page answers 200
+from the cache with `dynamicParams = false`, and every row of ADR 0024's URL table answers as it says.
+
+**What this adds to the pairing rule.** A Next release can change what the adapter has to mirror without changing
+anything the adapter's peer range says: 1.20.6 admitted 16.3.8. The check that would have caught it is the preview's
+`e2e` run, which the direct push to `main` skipped; `next start` cannot catch it, since its cache is Next's own.

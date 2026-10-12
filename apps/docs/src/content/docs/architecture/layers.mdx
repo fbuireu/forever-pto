@@ -132,7 +132,7 @@ Not a layer but a single file at the root of `src`, kept at the pre-Next-16 name
 | Folder | Contents |
 | --- | --- |
 | `modules/core/` | The design system: `primitives/` and the `animate/` tower (`primitives/` wrapping Base UI, `base/` styling and animating them, `components/` composing them, plus `effects/`, `icons/`, `text/`, `providers/`). See the [components overview](/design-system/components/overview/) |
-| `modules/pages/` | One folder per screen: `homepage/`, `planner/`, `legal/`, `error/`, `not-found/`. See the [planner screen](/how-it-works/planner-ui/) |
+| `modules/pages/` | One folder per screen: `homepage/`, `planner/`, `error/`, `not-found/`. See the [planner screen](/how-it-works/planner-ui/) |
 | `modules/sidebar/`, `modules/shared/`, `modules/premium/`, `modules/layout/` | The planner's controls; cross-page pieces (footer, donate, contact, consent, JSON-LD, the logo); the Premium gate and the checkout; the legal card chrome and the skip link |
 | `modules/providers/`, `modules/stores/`, `modules/tracking/`, `modules/tutorial/`, `modules/export/`, `modules/bones/` | Context wrappers mounted once; the cookie-seeding initializer; the consent-gated script mounts; the lazy tutorial stylesheet; the react-pdf document; generated skeletons, never hand-edited |
 | `hooks/` | `useCalculationsWorker` (the worker lifecycle), `useStoresReady` (gates rendering on rehydration), `usePlanReadout` (the applied plan and its budget), `useTutorial`, and the generic ones |

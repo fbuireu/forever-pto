@@ -10,7 +10,8 @@ that budget into the longest stretches off, and reports how well it did.
 ([ADR 0001](../../docs/adr/0001-planner-runs-in-the-browser.md)). The server side is the API route handlers
 (`check-session`, `contact`, `health`, `markdown`, `payment`, `payment/activate` and the Stripe webhook at
 `webhooks/stripe`), a `.well-known` catch-all, [`middleware.ts`](./src/middleware.ts), and the pages: prerendered, but
-for `payment/confirmation` and the global not-found page, which render per request.
+for `payment/confirmation` and the catch-all that answers an unknown path under a locale with its 404, which render
+per request.
 
 Premium (advanced metrics, manual editing of a Suggestion) is unlocked by a Donation. There are no accounts: the
 payment record *is* the entitlement ([ADR 0008](../../docs/adr/0008-premium-derived-from-payment.md)).
@@ -180,8 +181,7 @@ beside the [`next.config.ts`](./next.config.ts) that rewrites it.
   [`next.config.ts`](./next.config.ts) sends `require-trusted-types-for 'script'` on a
   `Content-Security-Policy-Report-Only` header with **no** `trusted-types` allowlist, because policy names only guessed
   at would silence the violations the header collects. Enforcing it blanks the page until every sink has a policy:
-  [`JsonLd.tsx`](./src/ui/modules/shared/seo/JsonLd.tsx) and
-  [`HtmlLangSync.tsx`](./src/ui/modules/pages/not-found/HtmlLangSync.tsx) write through `dangerouslySetInnerHTML`, and
+  [`JsonLd.tsx`](./src/ui/modules/shared/seo/JsonLd.tsx) writes through `dangerouslySetInnerHTML`, and
   Tag Manager, Stripe, `vanilla-cookieconsent` and `boneyard-js` each inject their own. Read the reports, wrap the
   sinks, then promote the directive.
 - **Every build renames every Server Action, so a page from the previous deploy cannot call the current one.** The new
@@ -214,6 +214,14 @@ incremental cache, a `PAYMENT_RATE_LIMITER` `[[ratelimits]]` binding for the pay
 `env.production` binds a route (`forever-pto.com/*`); `env.development` supplies the preview bindings, and CI deploys
 one worker per PR from it: `pr-<number>-forever-pto-development.fbuireu.workers.dev`, deleted when the PR closes. Build
 config lives in `next.config.ts` and [`open-next.config.ts`](./open-next.config.ts).
+
+**The R2 cache serves a page only while the adapter writes the key Next reads, and the root layout turns a miss into a
+404.** Next keys each response-cache entry by the route that owns it
+(`/route-cache/<kind>/<hash of the app entry>/$/<path>`), and OpenNext seeds the bucket from the build's prerendered
+pages under the key it computes. When the two disagree every prerendered page misses, and with `dynamicParams = false`
+on `src/app/[locale]/layout.tsx` Next answers that miss with its 404, on every page. `next start` cannot show it,
+since its file-system cache is Next's own; the preview's `e2e` run is the check, and a Next bump that changes the key
+moves the adapter with it ([ADR 0009](../../docs/adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)).
 
 **[`public/_headers`](./public/_headers) is what caches the hashed build output for good**, since Workers Static Assets
 revalidate every file unless a `_headers` file in the assets directory says otherwise; OpenNext copies `public/` into
