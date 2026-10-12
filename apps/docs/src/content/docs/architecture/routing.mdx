@@ -12,15 +12,13 @@ All user-facing routes live under `apps/web/src/app/[locale]/`. The locale segme
 ```text
 src/app/
 ├── [locale]/
-│   ├── layout.tsx              # root layout: fonts, providers, analytics;
-│   │                           # the locales, dynamicParams = false
+│   ├── layout.tsx              # root layout: fonts, providers, analytics
 │   ├── error.tsx               # locale-scoped error boundary
+│   ├── not-found.tsx           # locale-scoped 404
 │   ├── (marketing)/
 │   │   ├── page.tsx            # homepage
-│   │   ├── layout.tsx          # header, footer, toaster, quick start
+│   │   ├── layout.tsx
 │   │   ├── error.tsx
-│   │   ├── not-found.tsx       # the 404 view, in the request's locale
-│   │   ├── [...rest]/page.tsx  # every unknown path: notFound()
 │   │   └── legal/              # cookie-policy, legal-notice,
 │   │                           # privacy-policy, terms-of-service
 │   └── (app)/
@@ -29,7 +27,7 @@ src/app/
 ├── api/                        # route handlers (unlocalised)
 ├── .well-known/[...slug]/      # agent-facing discovery documents
 ├── global-error.tsx            # root error boundary (own <html> shell)
-├── global-not-found.tsx        # static 404 for a URL no locale claims
+├── global-not-found.tsx        # root 404 (experimental.globalNotFound)
 ├── robots.ts / sitemap.ts / favicon.ico / fonts.ts
 ```
 How a request reaches one of those files:
@@ -38,7 +36,6 @@ How a request reaches one of those files:
 flowchart TD
   REQ[Request] --> M{"Matches the proxy?<br/>not /api, /_next, /_vercel, no dot"}
   M -- no --> API["/api/* route handlers<br/>and /.well-known/*"]
-  M -- "no, a dot in the path" --> DOT{"First segment<br/>a locale?"}
   M -- yes --> PX[Proxy chain<br/>markdown · payment guard · locale · country]
   PX -->|Accept: text/markdown| MD["/api/markdown"]
   PX --> LOC{Locale prefix?}
@@ -47,15 +44,12 @@ flowchart TD
   EN & L --> G{Route group}
   G --> MK["(marketing): homepage, legal/*"]
   G --> AP["(app): planner, payment/confirmation"]
-  G --> CA["(marketing)/[...rest]: notFound()<br/>then (marketing)/not-found.tsx"]
-  DOT -- yes --> G
-  DOT -- "no, one segment" --> GNF[global-not-found.tsx]
-  DOT -- "no, more segments" --> CA
+  G --> NF[not-found.tsx]
 ```
 
 ## Route groups
 
-- **`(marketing)`** holds the public homepage (`apps/web/src/app/[locale]/(marketing)/page.tsx`, composed from sections in `apps/web/src/ui/modules/pages/homepage/sections/`) and the legal pages, each titled by one `routeMetadata` line. The group has its own `layout.tsx`, `error.tsx` and `not-found.tsx`, and the catch-all `apps/web/src/app/[locale]/(marketing)/[...rest]/page.tsx`, which answers every path under a locale that no other page claims by calling `notFound()`, so the 404 renders inside the group's header and footer.
+- **`(marketing)`** holds the public homepage (`apps/web/src/app/[locale]/(marketing)/page.tsx`, composed from sections in `apps/web/src/ui/modules/pages/homepage/sections/`) and the legal pages, each with a colocated `metadata.ts`. The group has its own `layout.tsx` and `error.tsx`.
 - **`(app)`** holds the product itself. `planner/page.tsx` renders the planner; `planner/layout.tsx` wraps it in the sidebar shell (`SidebarProvider`, `AppSidebar`, store initialisation, premium modal, donate widget, footer). `payment/confirmation/page.tsx` reads the `payment_intent` search param and shows the Stripe payment result; requests without that param never reach it, because the [proxy](/architecture/proxy/) redirects them home.
 
 Route groups affect layouts only, not URLs: `/planner` and `/payment/confirmation` have no group segment in the path.
@@ -86,7 +80,7 @@ API routes live outside `[locale]` and are excluded from the proxy matcher (exce
 
 ## Error and not-found surfaces
 
-There are per-locale boundaries (`apps/web/src/app/[locale]/error.tsx`, and `apps/web/src/app/[locale]/(marketing)/error.tsx` and `apps/web/src/app/[locale]/(marketing)/not-found.tsx` inside the marketing shell) plus root-level `apps/web/src/app/global-error.tsx` and `apps/web/src/app/global-not-found.tsx`. The latter requires `experimental.globalNotFound: true` in `next.config.ts`, is prerendered once in the default language and handles a URL no locale claims, such as `/missing.txt`. All of them render the shared brutal designs; see [error pages](/architecture/error-pages/) for the full breakdown and the table of which URL each 404 answers.
+There are per-locale boundaries (`apps/web/src/app/[locale]/error.tsx`, `apps/web/src/app/[locale]/not-found.tsx`) plus root-level `apps/web/src/app/global-error.tsx` and `apps/web/src/app/global-not-found.tsx`. The latter requires `experimental.globalNotFound: true` in `next.config.ts` and handles URLs that never match the `[locale]` segment. All four render the shared brutal designs; see [error pages](/architecture/error-pages/) for the full breakdown.
 
 ## Everything else at the app root
 

@@ -30,7 +30,7 @@ flowchart TD
 - `localePrefix: 'as-needed'`. English lives at `/`, every other locale gets a prefix (`/es/...`, `/ca/...`).
 - `localeCookie: { secure: true, sameSite: 'lax' }`.
 
-The `next-intl` middleware (`createMiddleware(routing)` in `apps/web/src/middleware.ts`) resolves the locale per request. The root layout's `generateStaticParams` returns every locale and it exports `dynamicParams = false`, so a first segment that is not a locale answers 404 at the router; an unknown path under a locale reaches the catch-all, which answers it with that locale's 404 ([error pages](/architecture/error-pages/)).
+The `next-intl` middleware (`createMiddleware(routing)` in `apps/web/src/middleware.ts`) resolves the locale per request. Unknown locales hit `notFound()` in the root layout, which renders `generateStaticParams` over all locales.
 
 ## The NEXT_LOCALE cookie
 
