@@ -38,6 +38,9 @@
 		"planner": {
 			"title": "Planner | Forever PTO",
 			"description": "Plan your PTO days around public holidays. The planner finds the bridges and exports to Google Calendar, Outlook and Apple."
+		},
+		"notFound": {
+			"title": "Page not found | Forever PTO"
 		}
 	},
 	"planner": {

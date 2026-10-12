@@ -65,6 +65,15 @@ describe("(marketing)/layout", () => {
 		expect((quickStart[0] as { props: { locale?: string } }).props.locale).toBe(ES);
 	});
 
+	it("draws the shell in the default language for a segment no locale claims, which only the catch-all receives", async () => {
+		const element = await MarketingLayout({ children: null, params: Promise.resolve({ locale: "wp-admin" }) });
+		const children: unknown[] = [element.props.children].flat();
+		const quickStart = children.find((c: unknown) => (c as { type?: unknown })?.type === MockQuickStart);
+
+		expect(mockSetRequestLocale).toHaveBeenCalledExactlyOnceWith(EN);
+		expect((quickStart as { props: { locale?: string } }).props.locale).toBe(EN);
+	});
+
 	it("hands the Toaster a translated close label, which sonner otherwise hard-codes to English", async () => {
 		const element = await MarketingLayout({ children: null, params: Promise.resolve({ locale: EN as never }) });
 		const children: unknown[] = [element.props.children].flat();

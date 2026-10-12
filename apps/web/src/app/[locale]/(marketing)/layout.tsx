@@ -1,18 +1,18 @@
+import { resolveLocale } from "@infrastructure/i18n/utils/url";
 import { Toaster } from "@ui/modules/core/primitives/Sonner";
 import { QuickStart } from "@ui/modules/pages/homepage/quick-start/QuickStart";
 import { Footer } from "@ui/modules/shared/footer/Footer";
 import { Header } from "@ui/modules/shared/Header";
-import type { Locale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { ReactNode } from "react";
 
 interface MarketingLayoutProps {
 	children: ReactNode;
-	params: Promise<{ locale: Locale }>;
+	params: Promise<{ locale: string }>;
 }
 
 const MarketingLayout = async ({ children, params }: Readonly<MarketingLayoutProps>) => {
-	const { locale } = await params;
+	const locale = resolveLocale((await params).locale);
 	setRequestLocale(locale);
 	const tA11y = await getTranslations({ locale, namespace: "a11y" });
 
