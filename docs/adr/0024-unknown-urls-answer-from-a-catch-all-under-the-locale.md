@@ -88,6 +88,12 @@ second answer for the dotted paths it never sees.
 - **`/_not-found` is static (`○` in the build), and the catch-all is the page rendered at request time**
   (`ƒ /[locale]/[...rest]`). The request-time render ADR 0009's Worker failure was about now runs there, and the
   preview's `e2e` run is what covers it on Workers.
+- **`dynamicParams = false` makes a cache miss a 404 on the Worker.** Next answers a miss on a route whose fallback is
+  `false` with its 404, so every page serves only while the adapter reads the prerendered entries under the keys Next
+  asks for. A first push of this decision met an adapter that did not, and every page answered 404 until the
+  production smoke run rolled it back; ADR 0009's amendment of the same date has the mechanism and the adapter
+  version that fixed it. A Next or adapter bump that breaks the pairing again shows on the preview's `e2e` run, and
+  `next start` cannot show it.
 - **`dynamicParams` exists only while Cache Components stay off**
   ([ADR 0015](./0015-cache-components-stay-off-on-the-workers-runtime.md)); turning them on removes it and with it the
   router's 404 for a first segment that is not a locale.

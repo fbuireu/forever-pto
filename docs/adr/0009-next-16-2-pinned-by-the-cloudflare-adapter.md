@@ -14,6 +14,11 @@ of the conditions below was met and which was not.
 not cosmetic on this host; it picks the runtime, and the Node.js one loses request-header edits. That
 amendment is the last section of this file.
 
+**Amended 2026-10-12: the adapter has to read the cache keys Next writes.** Next 16.3.8 scopes its response-cache
+keys to the route that owns each entry, and `@opennextjs/cloudflare` before 1.20.8 seeds the R2 cache under the bare
+path, so on the Worker every prerendered page missed the cache. The adapter is 1.20.9 now; the amendment
+*The cache keys moved with Next 16.3.8* at the end of this file says what that hid and what it broke.
+
 **Amended 2026-10-12: the global 404 is static, and the locale comes from the URL.**
 [ADR 0024](./0024-unknown-urls-answer-from-a-catch-all-under-the-locale.md) answers every unknown URL a locale claims
 from a catch-all under `[locale]` and prerenders `global-not-found.tsx` once, in the default language, reading no
@@ -235,3 +240,36 @@ framework, and the framework's new default is the one that is not carried.
 is a runtime change, not a tidy-up, and it must not be done again until a `proxy.ts` build passes the failing
 cases in the table above on a preview. The published docs page keeps the `/architecture/proxy/` address, since
 the concept is Next's and only the file name is ours.
+
+## Amendment, 2026-10-12: the cache keys moved with Next 16.3.8
+
+**Next 16.3.8 keys its response cache by the route that owns the entry.** It asks the cache handler for
+`/route-cache/APP_PAGE/<sha256 of the app entry>/$/<path>` rather than `/<path>`, and it reads the build's prerendered
+pages through that key too. `@opennextjs/cloudflare` 1.20.6, which carried `@opennextjs/aws` 4.1.4, still seeded the
+R2 bucket under the bare paths (`.open-next/cache/<build id>/en.cache`), so on the Worker every prerendered page was a
+miss. Next 16.3.8 reached `main` on 2026-10-08 as a security update ([#414](https://github.com/fbuireu/forever-pto/pull/414)),
+with the adapter left where it was.
+
+**While every route took any segment, the miss was invisible.** A page whose `dynamicParams` is on renders on a
+miss and writes the entry under the new key, so the site answered 200 and each page rendered once per deploy instead
+of never; the build's prerender went unread.
+
+**Once the root layout closed its segment, the miss was a 404 on every page.**
+[ADR 0024](./0024-unknown-urls-answer-from-a-catch-all-under-the-locale.md) sets `dynamicParams = false` on
+`[locale]/layout.tsx`. Next's app-page handler, outside minimal mode, which is how OpenNext runs it, answers a miss
+on a route whose fallback is `false` with `NoFallbackError` and renders `/_not-found`, whatever the prerender manifest
+says about the path. The routing layer was not the cause: OpenNext's debug log resolves `/` to `/en` and to the
+`/[locale]` route, and Next renders the 404 after that. `next build && next start` showed nothing, because the
+file-system cache there reads and writes the same keys. It reached production on 2026-10-12, the smoke run failed on
+the homepage and rolled the Worker back, and the commits were reverted.
+
+**`@opennextjs/aws` 4.1.7 mirrors the scoped keys** (`dist/utils/routeCacheKey.js`: it picks the app entry with its
+route groups, as Next does, and hashes it), and `@opennextjs/cloudflare` 1.20.8 is the first release that carries it.
+The upstream report is [opennextjs/opennextjs-aws#1269](https://github.com/opennextjs/opennextjs-aws/issues/1269).
+The adapter is **1.20.9** (`@opennextjs/aws` 4.1.8): 1.20.10 needs wrangler 4.148 and had not cleared Renovate's
+four days. Verified with `opennextjs-cloudflare build` and `preview` on this tree: every prerendered page answers 200
+from the cache with `dynamicParams = false`, and every row of ADR 0024's URL table answers as it says.
+
+**What this adds to the pairing rule.** A Next release can change what the adapter has to mirror without changing
+anything the adapter's peer range says: 1.20.6 admitted 16.3.8. The check that would have caught it is the preview's
+`e2e` run, which the direct push to `main` skipped; `next start` cannot catch it, since its cache is Next's own.

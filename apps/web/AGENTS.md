@@ -215,6 +215,14 @@ incremental cache, a `PAYMENT_RATE_LIMITER` `[[ratelimits]]` binding for the pay
 one worker per PR from it: `pr-<number>-forever-pto-development.fbuireu.workers.dev`, deleted when the PR closes. Build
 config lives in `next.config.ts` and [`open-next.config.ts`](./open-next.config.ts).
 
+**The R2 cache serves a page only while the adapter writes the key Next reads, and the root layout turns a miss into a
+404.** Next keys each response-cache entry by the route that owns it
+(`/route-cache/<kind>/<hash of the app entry>/$/<path>`), and OpenNext seeds the bucket from the build's prerendered
+pages under the key it computes. When the two disagree every prerendered page misses, and with `dynamicParams = false`
+on `src/app/[locale]/layout.tsx` Next answers that miss with its 404, on every page. `next start` cannot show it,
+since its file-system cache is Next's own; the preview's `e2e` run is the check, and a Next bump that changes the key
+moves the adapter with it ([ADR 0009](../../docs/adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)).
+
 **[`public/_headers`](./public/_headers) is what caches the hashed build output for good**, since Workers Static Assets
 revalidate every file unless a `_headers` file in the assets directory says otherwise; OpenNext copies `public/` into
 `.open-next/assets`, which is where it has to land. It gives `_next/static` the year-long `immutable` rule (asserted),
