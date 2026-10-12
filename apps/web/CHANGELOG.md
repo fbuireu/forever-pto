@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.15.2](https://github.com/fbuireu/forever-pto/compare/web-v1.15.1...web-v1.15.2) (2026-10-12)
+
+
+### Bug Fixes
+
+* **web:** answer every unknown URL with the 404 of its language, inside the site's shell ([#416](https://github.com/fbuireu/forever-pto/issues/416)) ([29730cd](https://github.com/fbuireu/forever-pto/commit/29730cdeddc3dbefc8cbd31c9911866cab8288fd))
+
 # [forever-pto-web-v1.15.1](https://github.com/fbuireu/forever-pto/compare/web-v1.15.0...web-v1.15.1) (2026-10-11)
 
 
