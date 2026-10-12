@@ -53,6 +53,10 @@ flowchart TD
 
 The `[skip ci]` marker is load-bearing: without it, the version-bump push to `main` re-triggers the whole graph.
 
+## One configuration in six files
+
+`apps/web/.releaserc.json` and `apps/docs/.releaserc.json` are two of six release configurations, with biancafiore's, github-star-tracker's and contribKit's `web` and `app`, and the six are the same file, laid out the same way, bar what a repository's shape demands: a package of a monorepo, as both here are, extends `semantic-release-monorepo` and sets its own `tagFormat`, github-star-tracker also commits `dist/`, and contribKit's app bumps `pubspec.yaml` through `@semantic-release/exec` where every other one bumps `package.json` through `@semantic-release/npm`. Every one commits its release as `chore(<scope>): release x.y.z [skip ci]`, and here the scope is the folder the package sits in, `web` or `docs`. Both run from the root `package.json`, which declares every plugin they name, and `semantic-release` itself, so none resolves to the copy bundled inside `semantic-release`. The contract suite holds both files to that shape.
+
 ## The bridge tag
 
 `web-v1.8.2` sits on the same commit as the older `v1.8.2` and carries no annotation, so it reads like debris. It is not. semantic-release finds the previous release by `tagFormat`, and the app's earlier releases carry the plain `vX.Y.Z` shape; without a tag matching `web-v*`, the next release is computed as a *first* release and published as `web-v1.0.0` over a 1.8.x line, which cannot be recalled from GitHub Releases.
@@ -76,6 +80,7 @@ Consequences:
 ## Source files
 
 - `apps/web/.releaserc.json`, `apps/docs/.releaserc.json` hold branches, tag formats and plugin chains.
+- `package.json` at the root declares `semantic-release` and every plugin the two name.
 - `.github/workflows/ci.yml` holds the `changes`, `release-web` and `docs-refresh` jobs.
 - `.github/workflows/docs.yml` holds the `release-docs` job.
-- `commitlint.config.ts` + `.husky/commit-msg` provide local enforcement of conventional commits.
+- `commitlint.config.ts` + `.husky/commit-msg` provide local enforcement of conventional commits. The hook also runs in the release jobs, whose install sets it up, and commitlint's `ignores` in `commitlint.config.ts` lets it through: its notes are semantic-release's, and a `BREAKING CHANGES` line longer than `body-max-line-length` would otherwise fail the commit after the tag exists.

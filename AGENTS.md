@@ -120,7 +120,8 @@ installed for both packages and belong to neither; its `devDependencies` are the
 
 Each package versions itself, through `semantic-release-monorepo`, and a commit belongs to whichever package its
 paths fall under: `web-vX.Y.Z` from [`ci.yml`](.github/workflows/ci.yml) after the production deploy and its smoke
-run, `docs-vX.Y.Z` from [`docs.yml`](.github/workflows/docs.yml) after the docs deploy and its smoke run.
+run, `docs-vX.Y.Z` from [`docs.yml`](.github/workflows/docs.yml) after the docs deploy and its smoke run. Both jobs run
+the semantic-release the root [`package.json`](./package.json) declares, beside every plugin the two configurations name.
 [ADR 0011](./docs/adr/0011-per-package-versioning-with-a-bridge-tag.md) records the decision and its costs, and the
 published [release page](./apps/docs/src/content/docs/infra/release.mdx) walks through the chain.
 
@@ -256,7 +257,8 @@ one and where to link it from.
   Vite does not, and `--changed` builds the module graph, which transforms the CSS imports. The Next build still reads
   `postcss.config.mjs` untouched.
 - **Both release configs teach their parsers the `!` grammar through `parserOpts`**, which the contract suite holds
-  equal: without it `feat(web)!: …` is analysed with no type and the job ends green having released nothing, while
+  equal, with the rest of each file, to the configuration the sibling repositories share (the
+  [release page](./apps/docs/src/content/docs/infra/release.mdx) says what differs): without it `feat(web)!: …` is analysed with no type and the job ends green having released nothing, while
   commitlint accepts the `!`. The `preset` route does not work here: the notes step dies on *Missing helper*. `!`
   means major on any type, as a `BREAKING CHANGE:` footer does.
 - **The `v1` floating tag is stale and nothing maintains it.** When it diverges between local and remote,

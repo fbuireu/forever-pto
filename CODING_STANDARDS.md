@@ -117,11 +117,10 @@ No rule below restates these, and a diff that breaks one fails CI:
     `console.log` must never ship;
   - the workflows: no deploy, build or secret write in a retry wrapper, every deploy's `--message` the one token
     `<sha>-<event>` the deploying repositories share (`C6`), only scripts a manifest declares, the preview cleanup
-    queued behind the run that deployed it, every gated job under a `Check` aggregate, release configs that parse the
-    commit grammar commitlint accepts, the toolchain set up through `prepare-env` alone and installed unfiltered, a
-    `working-directory` on the step rather than in a `defaults` block, no flag forwarded after `pnpm run <script> --`,
-    and every `uses:` of another repository pinned to a full commit SHA with its version or branch in a trailing
-    comment;
+    queued behind the run that deployed it, every gated job under a `Check` aggregate, the toolchain set up through
+    `prepare-env` alone and installed unfiltered, a `working-directory` on the step rather than in a `defaults` block,
+    no flag forwarded after `pnpm run <script> --`, and every `uses:` of another repository pinned to a full commit
+    SHA with its version or branch in a trailing comment;
   - Playwright running the `chromium` and `webkit` projects alone in both packages, in CI and locally alike, and every
     workflow job that runs it installing both browsers behind a cache keyed on them;
   - every spec of the app taking `test` and `expect` from `apps/web/e2e/fixtures.ts`, which hands the preview's
@@ -130,6 +129,11 @@ No rule below restates these, and a diff that breaks one fails CI:
     writes into `pnpm-workspace.yaml`, a `#` counting as a comment when removing it leaves the parsed document
     unchanged;
   - the package scripts: no shell substitution, and a literal base on every changed-only Vitest or Playwright run;
+  - every `.releaserc.json` the release configuration the sibling repositories share, with no key or plugin beyond
+    what the repository's shape adds and laid out as Biome lays it out, its release commit
+    `chore(<scope>): release ${nextRelease.version} [skip ci]` scoped to the package it releases, and every plugin
+    it names, and `semantic-release`, declared at one version in the `package.json` that runs it, beside no other
+    release package, and the release commit let past commitlint by its `ignores`, whatever its notes say;
   - the documents: no `BACKLOG.md` anywhere in the tree and no `Known inconsistencies`, `Known defects` or
     `Known breaches` heading in any of them (`G9`);
   - the `security.txt` files: one on every site the repository serves, counted under every `public` or `assets`
@@ -774,9 +778,13 @@ No rule below restates these, and a diff that breaks one fails CI:
 - **Duplicated Code**: `logging/logger.ts` is byte for byte what the sibling repositories carry and
   `logging/contract.ts` differs from theirs only in `LOG_SERVICE`, so a change to either is made in all three
   ([ADR 0018](./docs/adr/0018-the-platform-is-the-log-transport.md)).
-- **Duplicated Code**: the stated-version helpers (`VERSIONED_DEPENDENCIES` through `declaredIn`) and the
-  release-config helpers (`BREAKING_PARSER_OPTS` through `parserOptsOf`) in `tests/docs-consistency.test.ts` are byte
-  for byte the same in biancafiore, contribKit and github-star-tracker, so a change to one is made in all three.
+- **Duplicated Code**: the stated-version helpers (`VERSIONED_DEPENDENCIES` through `declaredIn`) in
+  `tests/docs-consistency.test.ts` are byte for byte the same in biancafiore, contribKit and github-star-tracker, so a
+  change to one is made in all three.
+- **Duplicated Code**: the release-configuration rule (`BREAKING_PARSER_OPTS` through the `describe` that holds
+  every release configuration to the shared one) in `tests/docs-consistency.test.ts` is byte for byte the same in
+  biancafiore, contribKit, forever-pto and github-star-tracker, so a change to it is made in all four; only the
+  shapes declared above it, which name each repository's files, differ.
 - **Duplicated Code**: the four smoke cases are word for word the same in every repository that deploys, and in
   both packages here, so a difference between them is drift, not a variant.
 - **Duplicated Code**: `contactSenderKey` and `normalizeEmail` stay two normalisers: one keys the contact guard, the
