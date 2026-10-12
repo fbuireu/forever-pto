@@ -6,6 +6,7 @@ import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
 import type { LocaleCode } from "@infrastructure/i18n/locales";
 import type { Page } from "@playwright/test";
+import { createTranslator } from "next-intl";
 import { expect } from "./fixtures";
 
 export const NOT_FOUND_BUNDLES = {
@@ -19,7 +20,12 @@ export const NOT_FOUND_BUNDLES = {
 
 const MAIN = "main#main-content";
 const NOINDEX = /<meta name="robots" content="[^"]*noindex/;
-const RICH_TAG = /<\/?\w+>/g;
+
+const headingText = (locale: LocaleCode) =>
+	createTranslator({ locale, messages: NOT_FOUND_BUNDLES[locale], namespace: "notFound" }).markup("title", {
+		highlight: (chunks) => chunks,
+		em: (chunks) => chunks,
+	});
 
 export interface ExpectLocalizedNotFoundParams {
 	page: Page;
@@ -35,9 +41,7 @@ export const expectLocalizedNotFound = async ({ page, path, locale }: ExpectLoca
 	expect(response?.status()).toBe(404);
 	expect(html).toMatch(NOINDEX);
 
-	await expect(page.locator(MAIN).getByRole("heading", { level: 1 })).toHaveText(
-		messages.notFound.title.replace(RICH_TAG, ""),
-	);
+	await expect(page.locator(MAIN).getByRole("heading", { level: 1 })).toHaveText(headingText(locale));
 	await expect(page.locator("html")).toHaveAttribute("lang", locale);
 	await expect(page).toHaveTitle(messages.metadata.notFound.title);
 	await expect(page.getByRole("button", { name: messages.homepage.nav.trialAction })).toBeVisible();
