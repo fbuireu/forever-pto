@@ -1,3 +1,4 @@
+import { LOCALES } from "@infrastructure/i18n/locales";
 import { routeMetadata } from "@infrastructure/seo/routeMetadata";
 import { MAIN_CONTENT_ID } from "@ui/modules/layout/SkipToContent";
 import { Comparison } from "@ui/modules/pages/homepage/sections/Comparison";
@@ -20,6 +21,10 @@ export const generateMetadata = routeMetadata("");
 
 interface PageProps {
 	params: Promise<{ locale: Locale }>;
+}
+
+export function generateStaticParams() {
+	return LOCALES.map((locale) => ({ locale }));
 }
 
 const HomePage = async ({ params }: PageProps) => {

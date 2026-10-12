@@ -38,9 +38,6 @@
 		"planner": {
 			"title": "Planificador | Forever PTO",
 			"description": "Planifica i optimitza els teus dies de PTO. Calendari de PTO que detecta els festius, troba els millors ponts i exporta a Google Calendar, Outlook i Apple."
-		},
-		"notFound": {
-			"title": "Pàgina no trobada | Forever PTO"
 		}
 	},
 	"planner": {

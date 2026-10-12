@@ -38,9 +38,6 @@
 		"planner": {
 			"title": "Planificador | Forever PTO",
 			"description": "Planifica y optimiza tus días de PTO. Calendario de PTO con detección de festivos, optimización de puentes y exportación a Google Calendar, Outlook y Apple."
-		},
-		"notFound": {
-			"title": "Página no encontrada | Forever PTO"
 		}
 	},
 	"planner": {

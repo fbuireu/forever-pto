@@ -1,45 +1,58 @@
 import "@styles/index.css";
 import { clientMessagesOf } from "@infrastructure/i18n/clientMessages";
+import { LOCALE_COOKIE, LOCALES } from "@infrastructure/i18n/locales";
 import { routing } from "@infrastructure/i18n/routing";
-import { notFoundTitle } from "@infrastructure/seo/notFoundMetadata";
+import { localeFromAcceptLanguage, resolveLocale } from "@infrastructure/i18n/utils/url";
 import { LazyMotionProvider } from "@ui/modules/core/animate/providers/LazyMotionProvider";
 import { SkipToContent } from "@ui/modules/layout/SkipToContent";
-import { QuickStart } from "@ui/modules/pages/homepage/quick-start/QuickStart";
+import { HtmlLangSync } from "@ui/modules/pages/not-found/HtmlLangSync";
 import { NotFoundContent } from "@ui/modules/pages/not-found/NotFoundContent";
 import { AppThemeProvider } from "@ui/modules/providers/AppThemeProvider";
-import { Footer } from "@ui/modules/shared/footer/Footer";
-import { Header } from "@ui/modules/shared/Header";
-import { NextIntlClientProvider } from "next-intl";
+import { cookies, headers } from "next/headers";
+import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
+import { Suspense } from "react";
 import { DOCUMENT_BODY_CLASS } from "./fonts";
 
-const DEFAULT_LOCALE = routing.defaultLocale;
+async function detectLocale() {
+	const [headersList, cookieStore] = await Promise.all([headers(), cookies()]);
 
-export const generateMetadata = () => notFoundTitle(DEFAULT_LOCALE);
+	const intlLocale = headersList.get("x-next-intl-locale");
+	if (hasLocale(LOCALES, intlLocale)) return intlLocale;
 
-export default async function GlobalNotFound() {
-	setRequestLocale(DEFAULT_LOCALE);
-	const [t, messages] = await Promise.all([
-		getTranslations({ locale: DEFAULT_LOCALE, namespace: "a11y" }),
-		getMessages({ locale: DEFAULT_LOCALE }),
-	]);
+	const cookieLocale = cookieStore.get(LOCALE_COOKIE)?.value;
+	if (hasLocale(LOCALES, cookieLocale)) return cookieLocale;
+
+	return resolveLocale(localeFromAcceptLanguage(headersList.get("accept-language")));
+}
+
+const LocalizedNotFound = async () => {
+	const locale = await detectLocale();
+	setRequestLocale(locale);
+	const [t, messages] = await Promise.all([getTranslations({ locale, namespace: "a11y" }), getMessages({ locale })]);
 
 	return (
-		<html lang={DEFAULT_LOCALE} suppressHydrationWarning>
+		<>
+			<HtmlLangSync locale={locale} />
+			<SkipToContent label={t("skipToMainContent")} />
+			<NextIntlClientProvider messages={clientMessagesOf(messages)}>
+				<AppThemeProvider>
+					<LazyMotionProvider>
+						<NotFoundContent locale={locale} />
+					</LazyMotionProvider>
+				</AppThemeProvider>
+			</NextIntlClientProvider>
+		</>
+	);
+};
+
+export default function GlobalNotFound() {
+	return (
+		<html lang={routing.defaultLocale} suppressHydrationWarning>
 			<body className={DOCUMENT_BODY_CLASS}>
-				<SkipToContent label={t("skipToMainContent")} />
-				<NextIntlClientProvider locale={DEFAULT_LOCALE} messages={clientMessagesOf(messages)}>
-					<AppThemeProvider>
-						<LazyMotionProvider>
-							<div className="min-h-screen flex flex-col text-foreground bg-background">
-								<Header />
-								<NotFoundContent locale={DEFAULT_LOCALE} />
-								<Footer />
-								<QuickStart locale={DEFAULT_LOCALE} />
-							</div>
-						</LazyMotionProvider>
-					</AppThemeProvider>
-				</NextIntlClientProvider>
+				<Suspense fallback={null}>
+					<LocalizedNotFound />
+				</Suspense>
 			</body>
 		</html>
 	);

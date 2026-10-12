@@ -14,18 +14,10 @@ of the conditions below was met and which was not.
 not cosmetic on this host; it picks the runtime, and the Node.js one loses request-header edits. That
 amendment is the last section of this file.
 
-**Amended 2026-10-12: the global 404 is static, and the locale comes from the URL.**
-[ADR 0024](./0024-unknown-urls-answer-from-a-catch-all-under-the-locale.md) answers every unknown URL a locale claims
-from a catch-all under `[locale]` and prerenders `global-not-found.tsx` once, in the default language, reading no
-header or cookie. The *Context* below rejects a statically prerendered 404 because it gave up the server-side locale
-detection; nothing is detected now, so that reason is gone, and the page rendered at request time on an unknown path
-is the catch-all's. The citations below of the 404's spec name its current path,
-`e2e/[locale]/(marketing)/not-found.spec.ts`, and `e2e/global-not-found.spec.ts` covers the global page.
-
 ## Context
 
 Next 16.3.0 landed in `81222a48` together with TypeScript 7, and from that commit onward every pull request
-failed the same tests in `e2e/[locale]/(marketing)/not-found.spec.ts`: an unknown path answered **500**, serving
+failed the same tests in `e2e/[locale]/not-found.spec.ts`: an unknown path answered **500**, serving
 Cloudflare's **Error 1101 (Worker threw exception)** page instead of the app's own 404. Nothing else on the
 site was affected, and the failure never showed locally.
 
@@ -58,7 +50,7 @@ reproduction is possible (`cf:build` fails on the maintainer's Windows machine) 
 was never pulled from the tail consumer, so any patch would be a guess at a fault whose shape is unknown.
 Making the 404 statically prerendered was rejected because it removes server-side locale detection from that
 page, trading a real user-facing behaviour for a toolchain convenience. Deleting `global-not-found.tsx` so
-a route-level `not-found.tsx` inside `[locale]` takes over does not work at all: with no root layout in a
+the route-level `[locale]/not-found.tsx` takes over does not work at all: with no root layout in a
 `[locale]`-only app, Next falls back to its built-in "This page could not be found".
 
 TypeScript is dragged along because it cannot move independently. TypeScript 7 ships the Go compiler and no
@@ -82,7 +74,7 @@ The pin lifts on either of these, and both are things somebody does rather than 
    preview, from `wrangler tail` or the `forever-pto-tail` consumer, and either land the fix upstream or
    patch against a fault whose shape is known. This is the one that closes the question rather than deferring
    it, and it is the last Consequence below.
-2. **A preview on the candidate Next version runs the `e2e` suite green**, `e2e/[locale]/(marketing)/not-found.spec.ts`
+2. **A preview on the candidate Next version runs the `e2e` suite green**, `e2e/[locale]/not-found.spec.ts`
    included. That is a per-version result and not a general clearance: a green 16.3.2 says nothing about
    16.3.3, so record the version the run covered alongside the bump.
 
@@ -137,7 +129,7 @@ suite and the contract suite both green, and `pnpm build` producing a full Next 
 build with `partialPrefetching` and `cacheComponents` both on.
 
 **What was not verified, and it is the bar this ADR set:** condition 2, a green `e2e` run against a preview
-on the candidate version, including `e2e/[locale]/(marketing)/not-found.spec.ts`. The preview deploy cannot authenticate
+on the candidate version, including `e2e/[locale]/not-found.spec.ts`. The preview deploy cannot authenticate
 until `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` reach the `web-*`/`docs-*` environments, which
 is recorded in [`AGENTS.md`](../../AGENTS.md) as the one outstanding settings item. Condition 1, the captured
 Worker stack trace, was not attempted either: the exception is still unknown, and if 16.3.3 with 1.20.3

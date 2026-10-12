@@ -1,6 +1,5 @@
 import { clientMessagesOf } from "@infrastructure/i18n/clientMessages";
 import { LOCALES } from "@infrastructure/i18n/locales";
-import { resolveLocale } from "@infrastructure/i18n/utils/url";
 import { BonesProvider } from "@ui/modules/providers/BonesProvider";
 import { StripePreload } from "@ui/modules/providers/StripePreload";
 import { CookieConsentClient } from "@ui/modules/shared/cookie-consent/CookieConsentClient";
@@ -13,22 +12,25 @@ import { SkipToContent } from "@ui/modules/layout/SkipToContent";
 import { AppThemeProvider } from "@ui/modules/providers/AppThemeProvider";
 import { Analytics } from "@ui/modules/tracking/Analytics";
 import { BetterStackTracking } from "@ui/modules/tracking/BetterStackTracking";
-import { NextIntlClientProvider } from "next-intl";
+import { notFound } from "next/navigation";
+import { hasLocale, type Locale, NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 
 interface LayoutProps {
 	children: ReactNode;
-	params: Promise<{ locale: string }>;
+	params: Promise<{ locale: Locale }>;
 }
 
 export function generateStaticParams() {
 	return LOCALES.map((locale) => ({ locale }));
 }
 
-export const dynamicParams = false;
-
 const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
-	const locale = resolveLocale((await params).locale);
+	const { locale } = await params;
+
+	if (!hasLocale(LOCALES, locale)) {
+		notFound();
+	}
 	setRequestLocale(locale);
 	const [t, messages] = await Promise.all([getTranslations("a11y"), getMessages()]);
 

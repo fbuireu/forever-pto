@@ -1,4 +1,4 @@
-import { EN, ES } from "@infrastructure/i18n/locales";
+import { EN, ES, LOCALES } from "@infrastructure/i18n/locales";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockSetRequestLocale = vi.fn();
@@ -29,10 +29,21 @@ vi.mock("@ui/modules/pages/homepage/sections/Faq", () => ({ Faq: MockFaq }));
 vi.mock("@ui/modules/pages/homepage/sections/HomepageCta", () => ({ HomepageCta: MockHomepageCta }));
 vi.mock("@ui/modules/shared/donate/DonateClient", () => ({ DonateClient: MockDonateClient }));
 
-const { default: HomePage } = await import("./page");
+const { default: HomePage, generateStaticParams } = await import("./page");
 
 describe("(marketing)/page", () => {
 	beforeEach(() => vi.clearAllMocks());
+
+	describe("generateStaticParams", () => {
+		it("returns one entry per locale", () => {
+			expect(generateStaticParams()).toHaveLength(LOCALES.length);
+		});
+
+		it("covers all supported locales", () => {
+			const locales = generateStaticParams().map((p) => p.locale);
+			expect(locales).toEqual(expect.arrayContaining([...LOCALES]));
+		});
+	});
 
 	describe("HomePage", () => {
 		it("calls setRequestLocale with the resolved locale", async () => {

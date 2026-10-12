@@ -38,9 +38,6 @@
 		"planner": {
 			"title": "Planer | Forever PTO",
 			"description": "Plane und optimiere deine PTO-Tage. Ein PTO-Kalender, der Feiertage erkennt, Brückentage findet und nach Google Kalender, Outlook und Apple exportiert."
-		},
-		"notFound": {
-			"title": "Seite nicht gefunden | Forever PTO"
 		}
 	},
 	"planner": {

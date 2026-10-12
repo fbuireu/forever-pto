@@ -1,3 +1,4 @@
+import { LOCALES } from "@infrastructure/i18n/locales";
 import { routeMetadata } from "@infrastructure/seo/routeMetadata";
 import { JsonLd } from "@ui/modules/shared/seo/JsonLd";
 import dynamic from "next/dynamic";
@@ -22,6 +23,10 @@ export const generateMetadata = routeMetadata("/planner");
 
 interface PageProps {
 	params: Promise<{ locale: Locale }>;
+}
+
+export function generateStaticParams() {
+	return LOCALES.map((locale) => ({ locale }));
 }
 
 const AppPage = async ({ params }: PageProps) => {

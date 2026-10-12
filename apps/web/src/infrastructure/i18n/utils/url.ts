@@ -19,6 +19,15 @@ export function getLocaleFromPathname(pathname: string) {
 	return resolveLocale(pathname.split("/")[1]);
 }
 
+export function localeFromAcceptLanguage(header: string | null | undefined): Locale | undefined {
+	for (const tag of (header ?? "").split(",")) {
+		const language = tag.split(";")[0].trim().split("-")[0].toLowerCase();
+		if (hasLocale(LOCALES, language)) return language;
+	}
+
+	return undefined;
+}
+
 export function routePathFromPathname(pathname: string): string {
 	const segments = pathname.split("/").filter(Boolean);
 	const withoutLocale = hasLocale(LOCALES, segments[0] ?? "") ? segments.slice(1) : segments;

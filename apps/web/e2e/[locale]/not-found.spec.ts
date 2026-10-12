@@ -1,13 +1,12 @@
 import { LOCALES } from "@infrastructure/i18n/locales";
 import { localePath } from "@infrastructure/i18n/utils/url";
-import { expect, test } from "../../fixtures";
-import { expectLocalizedNotFound } from "../../notFound";
+import { expect, test } from "../fixtures";
 
 const NONEXISTENT = "/this-route-does-not-exist-xyz";
-const NESTED_NONEXISTENT = "/this-route/does-not/exist-xyz";
 const MAIN = "main#main-content";
+const NOT_FOUND_NAMESPACE = "notFound.";
 
-test.describe("(marketing) not-found", () => {
+test.describe("[locale] not-found", () => {
 	test("renders the 404 heading", async ({ page }) => {
 		await page.goto(NONEXISTENT);
 		await expect(page.getByRole("heading", { level: 1 })).toContainText("vacation");
@@ -24,9 +23,16 @@ test.describe("(marketing) not-found", () => {
 	});
 
 	for (const locale of LOCALES) {
-		test(`answers an unknown path in ${locale} with its own 404, inside the shell`, async ({ page }) => {
-			await expectLocalizedNotFound({ page, path: localePath({ locale, path: NONEXISTENT }), locale });
-			await expectLocalizedNotFound({ page, path: localePath({ locale, path: NESTED_NONEXISTENT }), locale });
+		test(`answers 404 in ${locale} with a rendered heading`, async ({ page }) => {
+			const response = await page.goto(localePath({ locale, path: NONEXISTENT }));
+			expect(response?.status()).toBe(404);
+
+			await expect(page.locator("html")).toHaveAttribute("lang", locale);
+
+			const heading = page.locator(MAIN).getByRole("heading", { level: 1 });
+			await expect(heading).toBeVisible();
+			await expect(heading).toHaveText(/\S/);
+			await expect(heading).not.toContainText(NOT_FOUND_NAMESPACE);
 		});
 	}
 });

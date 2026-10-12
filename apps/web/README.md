@@ -67,9 +67,9 @@ pnpm test:e2e         # Playwright, against BASE_URL
 ```
 
 In CI the end-to-end suite runs against a deployed preview; locally, without `BASE_URL`, it starts `next dev`. The
-pages that render per request (the catch-all that answers an unknown path with its 404, `payment/confirmation`) and
-the on-demand `sitemap.xml` are what catch the Worker failing to boot, which is why the smoke set that runs against
-every deploy asks for an unknown path.
+pages that render per request (the global not-found page, `payment/confirmation`) and the on-demand `sitemap.xml`
+are what catch the Worker failing to boot, which is why the smoke set that runs against every deploy asks for an
+unknown path.
 
 ## Releasing
 

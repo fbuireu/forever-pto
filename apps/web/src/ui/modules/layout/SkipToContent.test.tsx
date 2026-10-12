@@ -70,6 +70,8 @@ vi.mock("@ui/modules/core/primitives/Card", () => {
 	};
 });
 vi.mock("@ui/modules/premium/PremiumSessionSync", () => ({ PremiumSessionSync: () => null }));
+vi.mock("@ui/modules/shared/Header", () => ({ Header: () => null }));
+vi.mock("@ui/modules/shared/footer/Footer", () => ({ Footer: () => null }));
 
 const { default: LegalRouteLayout } = await import("@app/[locale]/(marketing)/legal/layout");
 const { default: PaymentConfirmationPage } = await import("@app/[locale]/(app)/payment/confirmation/page");

@@ -13,10 +13,10 @@ an operation from `@infrastructure/api/operations` or an Effect program of their
 
 | Path | Role |
 | --- | --- |
-| `[locale]/layout.tsx` | **The root layout.** There is no layout file at the `src/app` root; this is the only file that renders `<html>`/`<body>` on the normal path, the only `generateStaticParams` for the locales, and it exports `dynamicParams = false` |
+| `[locale]/layout.tsx` | **The root layout.** There is no layout file at the `src/app` root; this is the only file that renders `<html>`/`<body>` on the normal path |
 | `[locale]/(app)/planner/` | The planner screen: sidebar chrome in `layout.tsx`, content in `page.tsx` |
 | `[locale]/(app)/payment/confirmation/` | Post-Stripe landing page; reads `payment_intent` from the query string |
-| `[locale]/(marketing)/` | Homepage (`page.tsx`), its header/footer shell (`layout.tsx`), and the 404 of every locale: `[...rest]/page.tsx` and `not-found.tsx` |
+| `[locale]/(marketing)/` | Homepage (`page.tsx`) and its header/footer shell (`layout.tsx`) |
 | `[locale]/(marketing)/legal/` | Privacy policy, cookie policy, terms of service, legal notice |
 | `api/` | The route handlers; see below |
 | `.well-known/[...slug]/` | Catch-all serving the static JSON documents |
@@ -110,12 +110,8 @@ real cost, not a refactor, so it is written down here instead of being made in p
 URLs carry **no** `/en` prefix while the others do; `localePath` and `localeAlternates` in
 [`src/infrastructure/i18n/utils/url.ts`](../infrastructure/i18n/utils/url.ts) know it.
 
-**`[locale]/layout.tsx` serves the locales its `generateStaticParams` returns and nothing else.** It exports
-`dynamicParams = false`, so a first segment that is not a locale answers 404 at the router, before any layout runs,
-on every prerendered route. The one route that can still hand it a segment no locale claims is the catch-all, reached
-without the proxy by a path with a dot or under `/api`; the layout narrows the segment through `resolveLocale` and
-renders that request in the default language, and the catch-all's page answers 404. The `(marketing)` layout narrows
-the same way, so the shell around that 404 is the default language's too. See *Unknown URLs* below.
+`[locale]/layout.tsx` re-validates the segment with `hasLocale` and calls `notFound()`: the proxy is
+not treated as the only gate, because a statically rendered path can arrive without it.
 
 Every page and layout under `[locale]/` that reads translations **from the request locale** calls
 `setRequestLocale(locale)` first; the `legal/` pages and `payment/confirmation/page.tsx` pass the locale to
@@ -128,18 +124,14 @@ the value `legal/layout.tsx` sets.
 Groups do not affect the URL: `(app)` and `(marketing)` exist purely to give different chromes.
 
 **`(marketing)`** has a group-level `layout.tsx` (header, footer, toaster, and the quick start dialog the header's
-trial action opens, mounted here so one instance serves every trigger on the page), its own `error.tsx` and
-`not-found.tsx`, and `[...rest]/page.tsx`, the catch-all that answers every path under a locale no other page
-claims. Its pages are fully static: they take the locales from the root layout's `generateStaticParams`, and
-indexability comes off `SITE_ROUTES` rather than out of the page: the homepage's row says indexable, every `legal/`
-row says it is not.
+trial action opens, mounted here so one instance serves every trigger on the page) and its own `error.tsx`. Its
+pages are fully static: `page.tsx` declares `generateStaticParams`, and indexability comes off `SITE_ROUTES`
+rather than out of the page: the homepage's row says indexable, every `legal/` row says it is not.
 
 **`(app)`** has *no* group-level layout. The sidebar shell lives one level down in `planner/layout.tsx`,
 so `payment/confirmation/` deliberately renders bare; a Stripe return should not come back into the
-planner chrome. The confirmation route renders per request, as the catch-all does: it reads
-`searchParams`, runs the `confirmation` Effect program and has a `loading.tsx` for the round trip. No page in
-`(app)` calls `notFound()`, so the group has no `not-found.tsx`; a page there that starts calling it needs one
-beside it, or Next draws its built-in 404 inside the root layout.
+planner chrome. The confirmation route renders per request, as `global-not-found.tsx` does: it reads
+`searchParams`, runs the `confirmation` Effect program and has a `loading.tsx` for the round trip.
 
 **`planner/layout.tsx` mounts the app's only `SidebarProvider`, and [`AppSidebar.tsx`](../ui/modules/sidebar/AppSidebar.tsx) mounts
 none**: it returns a fragment and takes the context from here, so every consumer (`SidebarTrigger`, `Logo`,
@@ -340,8 +332,8 @@ offers no `Last-Modified` to bound the guess.
 | `[locale]/(marketing)/error.tsx` | Errors in marketing pages. Renders inside the marketing layout, so it emits bare content: header and footer are already there |
 | `[locale]/error.tsx` | Everything else under `[locale]/`, including the whole `(app)` group, which has no boundary of its own. Wraps its content in a full-height shell because there is no chrome around it |
 | `global-error.tsx` | Failures of the root layout itself. React has unmounted the layout, so this file renders its own `<html>`/`<body>` and re-applies the font variables |
-| `[locale]/(marketing)/not-found.tsx` | `notFound()` raised inside the marketing group, which the catch-all `[...rest]/page.tsx` raises for every unknown path under a locale. Renders the 404 view in the request's locale, inside the marketing shell |
-| `global-not-found.tsx` | URLs no locale claims, so no layout ran: a first segment that is not a locale on a prerendered route (`/missing.txt`). Enabled by `experimental.globalNotFound` in `next.config.ts`; static, in the default language, and it reads nothing off the request |
+| `[locale]/not-found.tsx` | `notFound()` raised inside a matched locale segment |
+| `global-not-found.tsx` | URLs that match no route at all, so no layout ran. Enabled by `experimental.globalNotFound` in `next.config.ts`; it re-detects the locale itself from the `x-next-intl-locale` header, then the locale cookie, then `Accept-Language` |
 
 `global-error.tsx` bundles **only** [`en.json`](../ui/i18n/messages/en.json) and hard-codes `lang="en"` on the document. That is
 deliberate: pulling every catalogue into the root bundle would cost every route roughly 500 KB for a
@@ -350,47 +342,6 @@ importing the others. It still costs every route the whole of `en.json`, about 2
 component's JSON import is bundled whole; sending it `clientMessagesOf` would not help, since the import is the
 cost. Loading the bundle lazily is not the fix either: this page is what renders when a chunk failed to load. A
 subset file derived from `en.json` at build time is the fix, and it needs that build step first.
-
-## Unknown URLs
-
-**Every unknown URL a locale claims is answered by `[locale]/(marketing)/[...rest]/page.tsx`, and that page only
-calls `notFound()`.** A segment's `not-found.tsx` renders only for a `notFound()` thrown inside that segment, and
-`global-not-found.tsx` runs with no layout, no params and no request, so it cannot know a locale; the catch-all is the
-route that matches the URL and throws from inside `[locale]`, and the group's `[locale]/(marketing)/not-found.tsx`
-draws the 404 view inside the marketing shell, in the request's locale. It is `[...rest]`, not `[[...rest]]`, which
-would collide with the group's own `page.tsx`, and it is the one catch-all under `[locale]`; `.well-known/[...slug]`
-sits outside it.
-
-| URL | What answers |
-| --- | --- |
-| `/es/x`, `/de/a/b/c`, `/es/missing.txt` | The catch-all, then `(marketing)/not-found.tsx` in that locale: 404, inside the shell |
-| `/en/x` | The proxy's 307 to `/x`, since English carries no prefix |
-| `/x`, `/xx/x` | The proxy rewrites to `/en/x` and `/en/xx/x`; the catch-all answers in English |
-| `/missing.txt` | No proxy, and `missing.txt` is not a locale, so `dynamicParams = false` answers 404 at the router: `global-not-found.tsx`, static, in English |
-| `/api/x`, `/foo/bar.txt` | No proxy; the catch-all with a segment no locale claims, which both layouts narrow to the default language: English |
-
-**A `notFound()` thrown by a page is drawn by the browser, not by the server.** React renders no error boundary on
-the server, so the render of the catch-all fails its shell, and Next answers 404 with its own error document
-(`<html id="__next_error__">`, the `noindex` meta and the flight data) and the browser renders the not-found boundary
-from that data: `lang`, the title, the view and the shell all arrive once the page's script runs, and none of them is
-in the server HTML. `global-not-found.tsx` is the one 404 whose whole document leaves the server, because the router
-renders it rather than a page's error. [ADR 0024](../../../../docs/adr/0024-unknown-urls-answer-from-a-catch-all-under-the-locale.md)
-records the trade-off and what a server-rendered localised 404 would take.
-
-**The title comes from the catch-all's metadata, since a `not-found.tsx` cannot export any.** Its `generateMetadata` is
-`notFoundMetadata` from `@infrastructure/seo/notFoundMetadata`, which reads `metadata.notFound.title` in the
-segment's locale; `global-not-found.tsx` asks `notFoundTitle` for the same key in the default locale. The page's
-`notFound()` does not stop it: the title travels in the flight data and reaches `<head>` when the browser renders.
-
-**`global-not-found.tsx` reads nothing off the request.** It renders `<html lang>` from `routing.defaultLocale`,
-imports the global stylesheet and the font class, passes that locale to every translation it asks for and to its own
-`NextIntlClientProvider`, and calls `setRequestLocale` with it, so the `Header` and `Footer` it draws around the view,
-which read the request locale as on every page, translate in the default language without a header being read. It
-mounts the quick start beside them, as the marketing layout does, so the header's trial action opens it.
-
-The contract suite holds the three rules: one catch-all under `[locale]` and nothing in it but `notFound()`,
-`dynamicParams = false` on the root layout and no other `generateStaticParams` under `app`, and no `headers()`,
-`cookies()` or `x-next-intl-locale` in `global-not-found.tsx`.
 
 ## Cloudflare request context
 

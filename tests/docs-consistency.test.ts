@@ -186,7 +186,6 @@ const resolveUiSpecifier = (specifier: string) => join(UI_ROOT, specifier.replac
 
 const WEB_SRC = `${WEB}/src`;
 const TEST_FILE = /\.test\.tsx?$/;
-const CATCH_ALL_SEGMENT = /\/\[\[?\.\.\.[^\]/]+\]\]?\//;
 const IMPORT_SPECIFIER =
 	/from\s*["']([^"']+)["']|import\s*\(\s*["'`]([^"'`]+)["'`]\s*\)|(?:^|\n)\s*import\s*["']([^"']+)["']|require\s*\(\s*["']([^"']+)["']\s*\)|vi\.mock\(\s*["']([^"']+)["']/g;
 
@@ -3115,20 +3114,16 @@ describe("the code keeps the mechanical rules CODING_STANDARDS.md hands to this 
 	});
 
 	const ROUTE_METADATA_LINE = /^export const generateMetadata = routeMetadata\("[^"]*"\);$/m;
-	const NOT_FOUND_METADATA_LINE = /^export const generateMetadata = notFoundMetadata;$/m;
 
-	it("declares every page's metadata as one routeMetadata line, the catch-all's as the notFoundMetadata line, with no metadata module beside it", () => {
+	it("declares every page's metadata as one routeMetadata line, with no metadata module beside it", () => {
 		const app = sourceFiles.filter((file) => file.startsWith(`${WEB_SRC}/app/`));
 		const pages = app.filter((file) => file.endsWith("/page.tsx"));
-		const catchAll = pages.filter((file) => CATCH_ALL_SEGMENT.test(file));
-		const metadataLine = (file: string) => (catchAll.includes(file) ? NOT_FOUND_METADATA_LINE : ROUTE_METADATA_LINE);
 		const offenders = [
-			...pages.filter((file) => !metadataLine(file).test(read(file))),
+			...pages.filter((file) => !ROUTE_METADATA_LINE.test(read(file))),
 			...app.filter((file) => /\/metadata\.tsx?$/.test(file)),
 		];
 
 		expect(pages.length).toBeGreaterThan(5);
-		expect(catchAll).toHaveLength(1);
 		expect(offenders).toEqual([]);
 	});
 
@@ -3479,115 +3474,6 @@ describe("the code keeps the mechanical rules CODING_STANDARDS.md hands to this 
 			"synthetic.test.ts:2",
 		]);
 		expect(unitTests.flatMap((path) => issueFreeSafeParses({ path, parsed: parse(path) }))).toEqual([]);
-	});
-});
-
-describe("an unknown URL answers 404 from a route a locale claims, or from the static global page", () => {
-	const APP_DIR = `${WEB_SRC}/app`;
-	const LOCALE_SEGMENT = `${APP_DIR}/[locale]/`;
-	const ROOT_LAYOUT = `${APP_DIR}/[locale]/layout.tsx`;
-	const GLOBAL_NOT_FOUND = `${APP_DIR}/global-not-found.tsx`;
-	const DYNAMIC_PARAMS_OFF = /^export const dynamicParams = false;$/m;
-	const DECLARES_STATIC_PARAMS =
-		/^export (?:async )?function generateStaticParams\b|^export const generateStaticParams\b/m;
-	const REQUEST_READERS = new Set(["headers", "cookies"]);
-
-	const synthetic = (source: string) =>
-		ts.createSourceFile("synthetic.tsx", source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
-
-	const onlyCallsNotFound = (source: ts.SourceFile) => {
-		const exported = source.statements.filter((statement) => !ts.isImportDeclaration(statement));
-		const page = exported.find(
-			(statement): statement is ts.FunctionDeclaration =>
-				ts.isFunctionDeclaration(statement) &&
-				(ts.getCombinedModifierFlags(statement) & ts.ModifierFlags.ExportDefault) === ts.ModifierFlags.ExportDefault,
-		);
-		const [only, ...rest] = page?.body?.statements ?? [];
-
-		return (
-			page?.parameters.length === 0 &&
-			rest.length === 0 &&
-			only !== undefined &&
-			ts.isExpressionStatement(only) &&
-			ts.isCallExpression(only.expression) &&
-			ts.isIdentifier(only.expression.expression) &&
-			only.expression.expression.text === "notFound" &&
-			only.expression.arguments.length === 0 &&
-			exported.length === 2
-		);
-	};
-
-	const requestReads = (source: ts.SourceFile) => {
-		const found: string[] = importsIn(source)
-			.filter(({ specifier }) => specifier === "next/headers")
-			.map(({ specifier }) => specifier);
-		const visit = (node: ts.Node) => {
-			if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && REQUEST_READERS.has(node.expression.text))
-				found.push(`${node.expression.text}()`);
-			if (ts.isStringLiteralLike(node) && node.text === "x-next-intl-locale") found.push(node.text);
-			ts.forEachChild(node, visit);
-		};
-		visit(source);
-		return found;
-	};
-
-	it("answers every path under a locale no page claims from one catch-all, which only calls notFound(), so the 404 renders inside the locale's own layouts", () => {
-		const catchAlls = webProduction.filter((path) => CATCH_ALL_SEGMENT.test(path));
-		const underLocale = catchAlls.filter((path) => path.startsWith(LOCALE_SEGMENT));
-
-		expect(
-			onlyCallsNotFound(
-				synthetic(
-					'import { notFound } from "next/navigation";\nexport const generateMetadata = notFoundMetadata;\nexport default function UnknownPage(): never {\n\tnotFound();\n}\n',
-				),
-			),
-		).toBe(true);
-		expect(
-			[
-				"export default function UnknownPage({ params }) {\n\tnotFound();\n}\nexport const generateMetadata = notFoundMetadata;\n",
-				"export default function UnknownPage() {\n\tif (Math.random()) notFound();\n}\nexport const generateMetadata = notFoundMetadata;\n",
-				"export default function UnknownPage() {\n\tnotFound();\n\treturn null;\n}\nexport const generateMetadata = notFoundMetadata;\n",
-				"export const revalidate = 60;\nexport default function UnknownPage() {\n\tnotFound();\n}\nexport const generateMetadata = notFoundMetadata;\n",
-			].some((source) => onlyCallsNotFound(synthetic(source))),
-		).toBe(false);
-		expect(catchAlls.some((path) => path.startsWith(`${APP_DIR}/.well-known/`))).toBe(true);
-		expect(underLocale.map((path) => basename(path))).toEqual(["page.tsx"]);
-		expect(underLocale.filter((path) => !onlyCallsNotFound(parse(path)))).toEqual([]);
-	});
-
-	it("serves the locales the root layout generates and nothing else, dynamicParams false, and lists them nowhere else", () => {
-		const layouts = webProduction.filter((path) => path.startsWith(`${APP_DIR}/`) && basename(path) === "layout.tsx");
-		const rootLayouts = layouts.filter((path) => read(path).includes("<html"));
-		const declaringParams = webProduction.filter(
-			(path) => path.startsWith(`${APP_DIR}/`) && DECLARES_STATIC_PARAMS.test(read(path)),
-		);
-
-		expect(DYNAMIC_PARAMS_OFF.test("export const dynamicParams = false;\n")).toBe(true);
-		expect(
-			["export const dynamicParams = true;\n", "// export const dynamicParams = false;\n"].some((sample) =>
-				DYNAMIC_PARAMS_OFF.test(sample),
-			),
-		).toBe(false);
-		expect(DECLARES_STATIC_PARAMS.test("export function generateStaticParams() {}")).toBe(true);
-		expect(layouts.length).toBeGreaterThan(3);
-		expect(rootLayouts).toEqual([ROOT_LAYOUT]);
-		expect(DYNAMIC_PARAMS_OFF.test(read(ROOT_LAYOUT))).toBe(true);
-		expect(declaringParams).toEqual([ROOT_LAYOUT]);
-	});
-
-	it("renders the global 404 without reading the request, so it is prerendered once and guesses no locale", () => {
-		const globalPages = webProduction.filter((path) => basename(path) === "global-not-found.tsx");
-
-		expect(
-			requestReads(
-				synthetic(
-					'import { cookies, headers } from "next/headers";\nconst h = await headers();\nconst c = await cookies();\nh.get("x-next-intl-locale");\n',
-				),
-			),
-		).toEqual(["next/headers", "headers()", "cookies()", "x-next-intl-locale"]);
-		expect(requestReads(synthetic('const headers = ["a"];\nexport const shown = headers.length;\n'))).toEqual([]);
-		expect(globalPages).toEqual([GLOBAL_NOT_FOUND]);
-		expect(requestReads(parse(GLOBAL_NOT_FOUND))).toEqual([]);
 	});
 });
 
