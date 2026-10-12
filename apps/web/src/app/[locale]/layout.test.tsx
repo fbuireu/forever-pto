@@ -1,23 +1,17 @@
 import { CA, DE, EN, ES, FR, IT, LOCALES } from "@infrastructure/i18n/locales";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const NOT_FOUND = "NEXT_NOT_FOUND";
-
-const mockNotFound = vi.fn(() => {
-	throw new Error(NOT_FOUND);
-});
 const mockSetRequestLocale = vi.fn();
 const mockGetTranslations = vi.fn().mockResolvedValue((key: string) => key);
 const mockGetMessages = vi.fn().mockResolvedValue({ a11y: { skipToMainContent: "Skip" }, homepage: { title: "Home" } });
 
-vi.mock("next/navigation", () => ({ notFound: mockNotFound }));
 vi.mock("next-intl/server", () => ({
 	getTranslations: mockGetTranslations,
 	getMessages: mockGetMessages,
 	setRequestLocale: mockSetRequestLocale,
 }));
-vi.mock("next-intl", () => ({
-	hasLocale: (locales: string[], locale: unknown) => locales.includes(locale as string),
+vi.mock("next-intl", async (importOriginal) => ({
+	...(await importOriginal<typeof import("next-intl")>()),
 	NextIntlClientProvider: ({ children }: { children: unknown }) => children,
 }));
 const MockStripePreload = vi.fn().mockReturnValue(null);
@@ -39,7 +33,7 @@ vi.mock("@app/fonts", () => ({
 	DOCUMENT_BODY_CLASS: "var-bricolage var-space-grotesk var-instrument-serif var-jetbrains-mono font-sans antialiased",
 }));
 
-const { default: Layout, generateStaticParams } = await import("./layout");
+const { default: Layout, dynamicParams, generateStaticParams } = await import("./layout");
 
 describe("[locale]/layout", () => {
 	beforeEach(() => vi.clearAllMocks());
@@ -53,29 +47,27 @@ describe("[locale]/layout", () => {
 			const locales = generateStaticParams().map((p) => p.locale);
 			expect(locales).toEqual(expect.arrayContaining([CA, IT, EN, ES, FR, DE]));
 		});
+
+		it("serves those locales alone, so a first segment no locale claims answers 404 before the layout runs", () => {
+			expect(dynamicParams).toBe(false);
+		});
 	});
 
 	describe("Layout", () => {
-		it("stops at notFound for an unrecognised locale, before any locale is set", async () => {
-			await expect(Layout({ children: null, params: Promise.resolve({ locale: "xx" as never }) })).rejects.toThrow(
-				NOT_FOUND,
-			);
-			expect(mockNotFound).toHaveBeenCalledOnce();
-			expect(mockSetRequestLocale).not.toHaveBeenCalled();
-		});
+		it("renders a segment no locale claims in the default language, since only the catch-all can hand it one and that page answers 404", async () => {
+			const element = await Layout({ children: null, params: Promise.resolve({ locale: "wp-admin" }) });
 
-		it("does not call notFound for a valid locale", async () => {
-			await Layout({ children: null, params: Promise.resolve({ locale: EN as never }) });
-			expect(mockNotFound).not.toHaveBeenCalled();
+			expect(mockSetRequestLocale).toHaveBeenCalledExactlyOnceWith(EN);
+			expect(element.props.lang).toBe(EN);
 		});
 
 		it("calls setRequestLocale with the resolved locale", async () => {
-			await Layout({ children: null, params: Promise.resolve({ locale: ES as never }) });
+			await Layout({ children: null, params: Promise.resolve({ locale: ES }) });
 			expect(mockSetRequestLocale).toHaveBeenCalledWith(ES);
 		});
 
 		it("sets the lang attribute on the html element", async () => {
-			const element = await Layout({ children: null, params: Promise.resolve({ locale: ES as never }) });
+			const element = await Layout({ children: null, params: Promise.resolve({ locale: ES }) });
 			expect(element.props.lang).toBe(ES);
 		});
 
@@ -86,7 +78,7 @@ describe("[locale]/layout", () => {
 				return [type, ...[props?.children].flat().flatMap(typesIn)];
 			};
 
-			const element = await Layout({ children: null, params: Promise.resolve({ locale: EN as never }) });
+			const element = await Layout({ children: null, params: Promise.resolve({ locale: EN }) });
 
 			expect(typesIn(element)).toContain(MockStripePreload);
 		});
@@ -102,7 +94,7 @@ describe("[locale]/layout", () => {
 				return [props?.children].flat().map(find).find(Boolean);
 			};
 
-			const element = await Layout({ children: null, params: Promise.resolve({ locale: EN as never }) });
+			const element = await Layout({ children: null, params: Promise.resolve({ locale: EN }) });
 
 			expect(find(element)?.props?.messages).toEqual({ a11y: { skipToMainContent: "Skip" } });
 		});

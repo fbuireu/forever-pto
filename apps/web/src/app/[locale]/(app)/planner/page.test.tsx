@@ -1,4 +1,4 @@
-import { EN, ES, LOCALES } from "@infrastructure/i18n/locales";
+import { EN, ES } from "@infrastructure/i18n/locales";
 import { Fragment } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -13,23 +13,12 @@ vi.mock("next/dynamic", () => ({
 
 vi.mock("@ui/modules/shared/seo/JsonLd", () => ({ JsonLd: MockJsonLd }));
 
-const { default: AppPage, generateStaticParams } = await import("./page");
+const { default: AppPage } = await import("./page");
 
 const makeParams = (locale = EN) => ({ params: Promise.resolve({ locale: locale as never }) });
 
 describe("planner/page", () => {
 	beforeEach(() => vi.clearAllMocks());
-
-	describe("generateStaticParams", () => {
-		it("returns one entry per locale", () => {
-			expect(generateStaticParams()).toHaveLength(LOCALES.length);
-		});
-
-		it("covers all supported locales", () => {
-			const locales = generateStaticParams().map((p) => p.locale);
-			expect(locales).toEqual(expect.arrayContaining([...LOCALES]));
-		});
-	});
 
 	describe("AppPage", () => {
 		it("calls setRequestLocale with the resolved locale", async () => {

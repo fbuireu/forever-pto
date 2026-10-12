@@ -6,7 +6,7 @@ vi.mock("../routing", async () => {
 	return { routing: { defaultLocale: EN, locales: L } };
 });
 
-import { getLocaleFromPathname, localeAlternates, localeFromAcceptLanguage, localePath, resolveLocale } from "./url";
+import { getLocaleFromPathname, localeAlternates, localePath, resolveLocale } from "./url";
 
 describe("localePath", () => {
 	it("returns the path as-is for the default locale", () => {
@@ -119,19 +119,4 @@ describe("resolveLocale", () => {
 			expect(resolveLocale(candidate)).toBe("en");
 		},
 	);
-});
-
-describe("localeFromAcceptLanguage", () => {
-	it("takes the first supported language, ignoring quality order it cannot honour", () => {
-		expect(localeFromAcceptLanguage("da, es;q=0.9, en;q=0.8")).toBe("es");
-	});
-
-	it("matches on the primary subtag, so es-419 is Spanish", () => {
-		expect(localeFromAcceptLanguage("es-419,es;q=0.9")).toBe("es");
-	});
-
-	it("answers undefined when nothing matches, leaving the fallback to the caller", () => {
-		expect(localeFromAcceptLanguage("da, ja")).toBeUndefined();
-		expect(localeFromAcceptLanguage(null)).toBeUndefined();
-	});
 });

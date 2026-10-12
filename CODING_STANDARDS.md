@@ -63,7 +63,11 @@ No rule below restates these, and a diff that breaks one fails CI:
     `withConnection`, no `next-intl/server` in a route handler or anything it reaches, Country detection fetching only
     through `noStoreFetch`, a JSON body read only by `parseJsonBody` and raw text only by the Stripe webhook, a
     page's `searchParams` typed as the record Next hands over (a repeated parameter is an array), every page's
-    metadata one `routeMetadata` line with no metadata module beside it, and no `'use cache'` or `cacheComponents`;
+    metadata one `routeMetadata` line, the catch-all's one `notFoundMetadata` line, with no metadata module beside
+    it, and no `'use cache'` or `cacheComponents`;
+  - the 404s: one catch-all under `app/[locale]`, whose page only calls `notFound()`, the root layout exporting
+    `dynamicParams = false` and declaring the only `generateStaticParams` under `app`, and `global-not-found.tsx`
+    reading no `headers()`, `cookies()` or `x-next-intl-locale`, so it is prerendered once in the default language;
   - the UI: `Link`, `useRouter` and `usePathname` taken from `@application/i18n/navigation`, no `'use server'` or
     `next/headers` in `src/ui`, no `type="number"` input (`NumberInput` reads the visitor's own separators), `core/`
     free of stores, translations and fetching, `core/animate/primitives` imported
@@ -395,8 +399,7 @@ No rule below restates these, and a diff that breaks one fails CI:
 - `I7` **hard**: Use `getCloudflareContext({ async: true })` in code that may run outside a request; the sync form
   only inside one.
 - `I8` **hard**: Turn a candidate into a locale only through `resolveLocale` (a check that a value already is one,
-  `isLocale`, and the `Accept-Language` parser excepted), and order a localised option list only through
-  `collateByLabel`.
+  `isLocale`, excepted), and order a localised option list only through `collateByLabel`.
 - `I10` **hard**: Exit every country-detection strategy through `normalizeCountryCode`, so a sentinel (`XX`, `T1`) or
   a malformed code never reaches the week-long `user-country` cookie.
 - `I11` **hard**: Write and read donation metadata only through `provider/metadata.ts`, and payment values through

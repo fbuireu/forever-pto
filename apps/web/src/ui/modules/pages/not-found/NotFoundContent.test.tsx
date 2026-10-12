@@ -17,8 +17,6 @@ vi.mock("next-intl/server", () => ({ getTranslations: mockGetTranslations }));
 vi.mock("@application/i18n/navigation", () => ({
 	Link: ({ children, ...props }: ComponentProps<"a">) => <a {...props}>{children}</a>,
 }));
-vi.mock("@ui/modules/shared/Header", () => ({ Header: vi.fn().mockReturnValue(null) }));
-vi.mock("@ui/modules/shared/footer/Footer", () => ({ Footer: vi.fn().mockReturnValue(null) }));
 
 import { NotFoundContent } from "./NotFoundContent";
 
@@ -54,6 +52,13 @@ beforeEach(() => {
 });
 
 describe("NotFoundContent", () => {
+	it("renders the main landmark alone, so the shell around it draws the header and the footer once", async () => {
+		const { container } = await renderNotFound();
+
+		expect([...container.children].map((child) => child.tagName)).toEqual(["MAIN"]);
+		expect(container.querySelector("nav, footer")).toBeNull();
+	});
+
 	it("reads its copy for the locale it was handed", async () => {
 		await renderNotFound({ locale: "de", messages: deMessages });
 
@@ -99,10 +104,10 @@ describe("NotFoundContent", () => {
 });
 
 describe("NotFoundContent's imports", () => {
-	it("takes nothing from another screen's folder, its header included, which lives in shared/", () => {
+	it("takes nothing from another screen's folder", () => {
 		const source = readFileSync(join(__dirname, "NotFoundContent.tsx"), "utf8");
 
-		expect(source).toContain('from "@ui/modules/shared/Header"');
+		expect(source).toContain('from "@ui/modules/');
 		expect(source).not.toMatch(/@ui\/modules\/pages\/(?!not-found\/)/);
 	});
 });
