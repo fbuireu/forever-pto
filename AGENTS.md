@@ -80,8 +80,10 @@ pnpm verify:changed     # verify:static && test:ut:changed && test:docs; what pr
 
 Coverage has a floor on every metric, one `MIN_THRESHOLD` in [`apps/web/vitest.config.ts`](./apps/web/vitest.config.ts),
 the same shape and number the sibling repositories use; the root [`vitest.config.ts`](./vitest.config.ts) collects the
-contract suite alone and measures no coverage. The Check job's summary therefore shows two Vitest reports, each
-headed by the `summaryLabel` the root config registers.
+contract suite alone and measures no coverage. The Verify job's summary therefore shows two Vitest reports, each
+titled by the `jobSummary` reporter its config declares, which writes nothing for a run that collected no test file
+(a changed-only run with nothing affected). Each config declares its own, the same function the sibling repositories
+use, because the root and `apps/web` resolve separate Vitest instances whose reporter types do not mix.
 
 Husky runs `lint-staged` on `pre-commit`, `commitlint` on `commit-msg` and `verify:changed` on `pre-push`. The hook is
 weaker than the CI `Verify` job on purpose: a changed-only run and the coverage floor cannot both hold, so coverage

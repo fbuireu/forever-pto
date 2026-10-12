@@ -1,7 +1,21 @@
 import { defineConfig } from "vitest/config";
-import { summaryLabel } from "../../vitest.config";
+import { GithubActionsReporter, type Reporter, type TestModule } from "vitest/node";
 
 const MIN_THRESHOLD = 85;
+
+const jobSummary = (titleOf: (testModules: readonly TestModule[]) => string): Reporter => {
+	const github = new GithubActionsReporter();
+
+	return {
+		onInit: (vitest) => github.onInit(vitest),
+		onTestCaseAnnotate: (testCase, annotation) => github.onTestCaseAnnotate(testCase, annotation),
+		onTestRunEnd: (testModules, unhandledErrors) => {
+			if (testModules.length === 0 && unhandledErrors.length === 0) return;
+			github.options.jobSummary.title = titleOf(testModules);
+			github.onTestRunEnd(testModules, unhandledErrors);
+		},
+	};
+};
 
 export default defineConfig({
 	resolve: {
@@ -13,9 +27,7 @@ export default defineConfig({
 	test: {
 		environment: "happy-dom",
 		testTimeout: 20_000,
-		reporters: process.env.GITHUB_ACTIONS
-			? ["default", summaryLabel("Unit suite (forever-pto-web)"), "github-actions"]
-			: ["default"],
+		reporters: process.env.GITHUB_ACTIONS ? ["default", jobSummary(() => "Unit suite (forever-pto-web)")] : ["default"],
 		env: {
 			NEXT_PUBLIC_SITE_URL: "https://forever-pto.com",
 		},
