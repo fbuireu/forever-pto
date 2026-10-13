@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.15.3](https://github.com/fbuireu/forever-pto/compare/web-v1.15.2...web-v1.15.3) (2026-10-13)
+
+
+### Bug Fixes
+
+* **web:** stop blocking _next/static and the noindex pages in robots.txt ([81f4f78](https://github.com/fbuireu/forever-pto/commit/81f4f78401e72fbebf7125ae7209b440a2fb15e1))
+
 # [forever-pto-web-v1.15.2](https://github.com/fbuireu/forever-pto/compare/web-v1.15.1...web-v1.15.2) (2026-10-12)
 
 
