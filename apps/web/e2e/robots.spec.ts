@@ -1,17 +1,6 @@
-import { LOCALES } from "@infrastructure/i18n/locales";
-import { localePath } from "@infrastructure/i18n/utils/url";
-import { privateRoutes } from "@infrastructure/seo/routes";
 import { expect, test } from "./fixtures";
 
 const ROBOTS_URL = "/robots.txt";
-const DISALLOW_PREFIX = "Disallow: ";
-const STATIC_DISALLOW = "/_next/static/";
-
-const disallowedPaths = (body: string): string[] =>
-	body
-		.split(/\r?\n/)
-		.filter((line) => line.startsWith(DISALLOW_PREFIX))
-		.map((line) => line.slice(DISALLOW_PREFIX.length).trim());
 
 test.describe("robots.txt", () => {
 	test("allows all crawlers at root", async ({ request }) => {
@@ -20,24 +9,11 @@ test.describe("robots.txt", () => {
 		expect(body).toMatch(/^Allow:\s*\//im);
 	});
 
-	test("disallows _next/static", async ({ request }) => {
-		const paths = disallowedPaths(await (await request.get(ROBOTS_URL)).text());
-		expect(paths).toContain(STATIC_DISALLOW);
-	});
-
-	test("disallows every private route, fully expanded, for every locale", async ({ request }) => {
-		const paths = disallowedPaths(await (await request.get(ROBOTS_URL)).text());
-		expect(privateRoutes().length).toBeGreaterThan(0);
-		for (const locale of LOCALES) {
-			for (const { path } of privateRoutes()) {
-				expect(paths).toContain(localePath({ locale, path }));
-			}
-		}
-	});
-
-	test("disallows nothing beyond _next/static and the locale-expanded private routes", async ({ request }) => {
-		const paths = disallowedPaths(await (await request.get(ROBOTS_URL)).text());
-		expect(paths).toHaveLength(LOCALES.length * privateRoutes().length + 1);
+	test("disallows nothing, so _next/static stays fetchable and every noindex page stays crawlable", async ({
+		request,
+	}) => {
+		const body = await (await request.get(ROBOTS_URL)).text();
+		expect(body).not.toMatch(/^Disallow:/im);
 	});
 
 	test("includes sitemap URL", async ({ request }) => {

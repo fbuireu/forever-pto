@@ -66,7 +66,5 @@ export const findRoute = (path: string) => SITE_ROUTES.find((route) => route.pat
 
 export const indexableRoutes = (): SiteRoute[] => SITE_ROUTES.filter(({ indexable }) => indexable);
 
-export const privateRoutes = (): SiteRoute[] => SITE_ROUTES.filter(({ indexable }) => !indexable);
-
 export const isIndexable = (path: string): boolean =>
 	SITE_ROUTES.find((route) => route.path === path)?.indexable ?? false;

@@ -414,9 +414,15 @@ a prerendered path is the failure mode to watch for; copying an async one costs 
 **One table says which routes exist, which are public, and what each is called.** `SITE_ROUTES` under
 `@infrastructure/seo` carries a `path`, an `indexable` flag, the sitemap hints and the `metadata.*` message
 keys, and its readers derive from it: `sitemap.ts` emits the cross-product of the locales and
-`indexableRoutes()`, `robots.ts` disallows every locale-expanded `privateRoutes()` path, `buildMetadata`
-resolves `isIndexable(route)` for itself, `buildMarkdownPage` looks the title and description up through
-`findRoute`, and `routeMetadata` builds the whole `generateMetadata` from the row.
+`indexableRoutes()`, `buildMetadata` resolves `isIndexable(route)` for itself and gives a private row
+`noindex, nofollow`, `buildMarkdownPage` looks the title and description up through `findRoute`, and
+`routeMetadata` builds the whole `generateMetadata` from the row.
+
+**`robots.ts` disallows nothing, and that is what keeps the private routes out of the index.** A crawler obeys a
+`Disallow` by never fetching the page, so it never reads the page's `noindex`, and a URL other pages link to can be
+indexed without its content; the `noindex` only works on a page the crawler may fetch. `/_next/static/` stays open
+for the same kind of reason: it holds the scripts and stylesheets every page renders with, and a crawler that cannot
+fetch them cannot render the page. The private routes stay out of the sitemap, and their `noindex` does the rest.
 
 **Adding a route is one row and one line.** A route file is:
 
@@ -440,7 +446,7 @@ alike, and widening them to `string` compiles and fails at runtime with a blank 
 
 `isIndexable` **fails closed** (a path with no row is treated as private), so the failure mode of forgetting
 the table is a page missing from the sitemap, not a private page advertised to crawlers. [`routes.test.ts`](../infrastructure/seo/routes.test.ts)
-pins that, and [`robots.test.ts`](./robots.test.ts) additionally pins that nothing the sitemap advertises is disallowed.
+pins that, and [`robots.test.ts`](./robots.test.ts) pins that `robots.txt` disallows nothing.
 
 Both files resolve the base URL from the Cloudflare env rather than a constant. Only `sitemap.ts` gets the
 host it is actually served from, though: `robots.ts` is prerendered, so it bakes whatever the build resolved;

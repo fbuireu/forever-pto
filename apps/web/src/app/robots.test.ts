@@ -1,6 +1,3 @@
-import { LOCALES } from "@infrastructure/i18n/locales";
-import { localePath } from "@infrastructure/i18n/utils/url";
-import { privateRoutes, SITE_ROUTES } from "@infrastructure/seo/routes";
 import type { MetadataRoute } from "next";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
@@ -31,28 +28,8 @@ describe("robots", () => {
 		expect(rule).toMatchObject({ userAgent: "*", allow: "/" });
 	});
 
-	it("disallows _next/static", () => {
-		expect(rule.disallow).toContain("/_next/static/");
-	});
-
-	it("disallows every private route, in every locale", () => {
-		expect(privateRoutes()).not.toHaveLength(0);
-		for (const locale of LOCALES) {
-			for (const { path } of privateRoutes()) {
-				expect(rule.disallow).toContain(localePath({ locale, path }));
-			}
-		}
-	});
-
-	it("never disallows a route the sitemap advertises", () => {
-		const indexable = SITE_ROUTES.filter((route) => route.indexable);
-		expect(indexable).not.toHaveLength(0);
-
-		for (const locale of LOCALES) {
-			for (const { path } of indexable) {
-				expect(rule.disallow).not.toContain(localePath({ locale, path }));
-			}
-		}
+	it("disallows nothing, so a crawler fetches the scripts and styles a page renders with and reads every noindex", () => {
+		expect(rule.disallow).toBeUndefined();
 	});
 
 	it("includes the sitemap URL", () => {

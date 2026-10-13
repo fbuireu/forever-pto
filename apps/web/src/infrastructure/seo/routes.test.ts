@@ -1,12 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { indexableRoutes, isIndexable, privateRoutes, SITE_ROUTES } from "./routes";
+import { indexableRoutes, isIndexable, SITE_ROUTES } from "./routes";
 
 describe("SITE_ROUTES", () => {
-	it("splits cleanly into indexable and private, with nothing in both or neither", () => {
-		expect(indexableRoutes().length + privateRoutes().length).toBe(SITE_ROUTES.length);
-		expect(indexableRoutes().some((route) => privateRoutes().includes(route))).toBe(false);
-	});
-
 	it("gives every indexable route the hints the sitemap needs", () => {
 		expect(indexableRoutes().length).toBeGreaterThan(0);
 		for (const route of indexableRoutes()) {
