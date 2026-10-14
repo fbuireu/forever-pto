@@ -7,10 +7,11 @@ What a review checks a diff against. The words are the ones [GLOSSARY.md](./GLOS
 weighs against the diff: report it as a question. A rule here outranks the smell baseline; where it endorses
 something a smell would flag, the case is listed under *Deliberate overrides of the smell baseline* at the end.
 
-Every rule carries an id, and a finding cites it with this file: `CODING_STANDARDS.md A3`. A rule applies to
-`apps/web` unless its section names `apps/docs`; `N1` applies to both. A rule marked *check pending* is mechanical,
-and it leaves this body in the commit that lands its check. The process around a change (commit types, one package
-per pull request) is [CONTRIBUTING.md](.github/CONTRIBUTING.md)'s.
+Every rule carries an id, and a finding cites it with this file: `CODING_STANDARDS.md A3`. An id is never reused, so a
+retired rule leaves a gap in its section's numbering. A rule applies to `apps/web` unless its section names `apps/docs`;
+`N1` applies to both. A rule marked *check pending* is mechanical, and it leaves this body in the commit that lands its
+check. The process around a change (commit types, one package per pull request) is
+[CONTRIBUTING.md](.github/CONTRIBUTING.md)'s.
 
 ## Tooling already enforces
 
@@ -83,9 +84,11 @@ No rule below restates these, and a diff that breaks one fails CI:
   - the custom properties: every `var(--x)` read in `apps/web/src`, by a class, a stylesheet or a style key, declared by
     a stylesheet outside `@theme inline`, a style key, an arbitrary property, `setProperty`, a font's `variable`, a Base
     UI `CssVars` module or Tailwind's default theme, except that a CSS module counts none of Tailwind's on-demand
-    theme (its default and a plain `@theme` block) and reads what an `@theme static` block or a token declares;
+    theme (its default and a plain `@theme` block) and reads what an `@theme static` block or a token declares,
+    because an undeclared `var()` resolves to nothing and the property falls back to the inherited value in silence;
   - the shipped stylesheet: built with Tailwind's own compiler and scanner from `index.css`, it scans no test, no
-    end-to-end spec and no Markdown and emits no palette utility;
+    end-to-end spec and no Markdown (the `@source not` lines `index.css` ends with, since Tailwind scans every file
+    under `apps/web` git does not ignore) and emits no palette utility;
   - the code at large: `Temporal` from `temporal-polyfill`, Stripe.js imported through `@stripe/stripe-js/pure` and
     asked for only inside a function (the bare entry injects the script on import and writes a failed load to the
     console, and a module-scope ask runs outside the effect that answers its failure), no
@@ -105,12 +108,13 @@ No rule below restates these, and a diff that breaks one fails CI:
     `safeParse` only in a case that reads the issue;
   - `succeeded` compared as one value in the payments SQL, spelled by no other production module, and
     `PAYMENT_STATUSES` equal to the statuses the installed Stripe SDK knows;
-  - the locale bundles holding exactly `en.json`'s keys, every key in camelCase but the machine codes and every value
-    a string, shouting nothing outside the acronym list, addressing the user informally in German and French, styling
-    no number, date or time argument (`{n, number, percent}`), and naming no concept by a phrase the glossary retires
-    ("days off", "unused days", "manually selected" and their translations, one list per bundle) outside the marketing
-    namespaces and the legal texts, naming in the cookie policy every cookie the app sets, which the consent dialog's
-    catalogue lists too, and never saying the holiday data comes from an API, since the dataset ships inside the app;
+  - the locale bundles holding exactly `en.json`'s keys, every key in camelCase but the machine codes and every value a
+    string, shouting nothing outside the acronym list, addressing the user informally in German and French, styling no
+    number, date or time argument (`{n, number, percent}`, which the precompiled bundles print as a bare `1`), and
+    naming no concept by a phrase the glossary retires ("days off", "unused days", "manually selected" and their
+    translations, one list per bundle) outside the marketing namespaces and the legal texts, naming in the cookie policy
+    every cookie the app sets, which the consent dialog's catalogue lists too, and never saying the holiday data comes
+    from an API, since the dataset ships inside the app;
   - the configuration: `strict` on and `allowJs` off, `cloudflare-env.d.ts` out of the program and out of git,
     `PUBLIC_ENV` classifying exactly the `NEXT_PUBLIC_*` names `environment.d.ts` declares and each wired where it is
     read, the security headers with the sources Stripe.js asks of the CSP, an `X-Frame-Options` that answers framing
@@ -120,11 +124,11 @@ No rule below restates these, and a diff that breaks one fails CI:
     `LOG_LEVEL`'s values), because the logger's lines reach Better Stack only as console output and a stray
     `console.log` must never ship;
   - the workflows: no deploy, build or secret write in a retry wrapper, every deploy's `--message` the one token
-    `<sha>-<event>` the deploying repositories share (`C6`), only scripts a manifest declares, the preview cleanup
-    queued behind the run that deployed it, every gated job under a `Check` aggregate, the toolchain set up through
-    `prepare-env` alone and installed unfiltered, a `working-directory` on the step rather than in a `defaults` block,
-    no flag forwarded after `pnpm run <script> --`, and every `uses:` of another repository pinned to a full commit
-    SHA with its version or branch in a trailing comment;
+    `<sha>-<event>` the deploying repositories share (OpenNext re-spawns wrangler through a shell), only scripts a
+    manifest declares, the preview cleanup queued behind the run that deployed it, every gated job under a `Check`
+    aggregate, the toolchain set up through `prepare-env` alone and installed unfiltered, a `working-directory` on the
+    step rather than in a `defaults` block, no flag forwarded after `pnpm run <script> --`, and every `uses:` of another
+    repository pinned to a full commit SHA with its version or branch in a trailing comment;
   - Playwright running the `chromium` and `webkit` projects alone in both packages, in CI and locally alike, and every
     workflow job that runs it installing both browsers behind a cache keyed on them;
   - every spec of the app taking `test` and `expect` from `apps/web/e2e/fixtures.ts`, which hands the preview's
@@ -140,6 +144,8 @@ No rule below restates these, and a diff that breaks one fails CI:
     release package, and the release commit let past commitlint by its `ignores`, whatever its notes say;
   - the documents: no `BACKLOG.md` anywhere in the tree and no `Known inconsistencies`, `Known defects` or
     `Known breaches` heading in any of them (`G9`);
+  - this file: every rule between this list and the smell overrides opening with its id and its **hard** or
+    **judgement** label, no id carried by two rules, and every id in a section drawn from one letter;
   - the `security.txt` files: one on every site the repository serves, counted under every `public` or `assets`
     folder, with `Contact`, `Expires`, `Preferred-Languages`, `Canonical` and `Policy` in that order, each `Canonical`
     the site's origin (`NEXT_PUBLIC_SITE_URL` under `[env.production.vars]`, the docs site's `site`) plus
@@ -227,29 +233,27 @@ No rule below restates these, and a diff that breaks one fails CI:
   name, `(typeof X)[keyof typeof X]` (`CalendarSelectionMode`, `HolidayFormMode`, `DRAWER_SNAP`); a prop's literal
   union (`side`, `variant`) stays a union.
 - `M16` **hard**: Read a value whose shape the types cannot prove (what arrives over HTTP: a `fetch` answer, a page's
-  `searchParams`, a server action's error code) as `unknown` and check it with a zod schema before reading any field
-  of it, never with a cast, because a cast checks nothing at run time and a malformed value then fails far from its
-  source: through a cast, a malformed answer becomes a wrong outcome rather than the *no* its caller's guide records,
-  and a malformed `/api/check-session` 200 reads as *no session* and revokes a donor's Premium. Name the schema
-  `<concept>Schema` after what it checks, declare it beside its one reader (in `application/dto/*/schema.ts` when
-  several read it or it checks a query string or a body this app's own endpoint answers), and infer the type from
-  it; check with `validate` where the answer is a yes or no, and with `zodParse` where the caller reads the parsed
-  value or the issue. `zodParse` hands the first issue to the response as a `ValidationError`. A lookup that must
-  keep zod out of its bundle narrows through a `typeof` picker instead (`stringField`), `parseJsonBody`'s type
-  argument only names what the use case's `zodParse` checks, and `M7`'s cast is for a shape this app wrote itself.
+  `searchParams`, a server action's error code) as `unknown` and check it with a zod schema before reading any field of
+  it, never with a cast, because a cast checks nothing at run time and a malformed value then fails far from its source:
+  through a cast, a malformed answer becomes a wrong outcome rather than the *no* its caller's guide records, and a
+  malformed `/api/check-session` 200 reads as *no session* and revokes a donor's Premium. Declare the schema beside its
+  one reader (in `application/dto/*/schema.ts` when several read it or it checks a query string or a body this app's own
+  endpoint answers), and infer the type from it; check with `validate` where the answer is a yes or no, and with
+  `zodParse` where the caller reads the parsed value or the issue. `zodParse` hands the first issue to the response as a
+  `ValidationError`. A lookup that must keep zod out of its bundle narrows through a `typeof` picker instead
+  (`stringField`), `parseJsonBody`'s type argument only names what the use case's `zodParse` checks, and `M7`'s cast is
+  for a shape this app wrote itself.
 
 ## Functions and modules
 
-- `F1` **hard**: Pass one argument positionally and two or more as one object, so argument order carries no meaning and
-  no `…Params` type or inline parameter type declares a single field of its own, because a wrapper around one value adds
-  a type and a destructure for nothing. The contract suite reads a declared function or a `const` arrow; a class or
-  object method follows the rule too, which the suite does not read. Name a parameter object after the function that
-  takes it, `<FunctionName>Params`, so a reader landing on the type finds what takes it; a function handed one record
-  keeps that record's type. Sibling functions that take the same input may share one type named for that role
-  (`DatePairParams`, `ObfuscationParams`), and a component takes its props as one object whatever their number, which
-  is React's contract (`…Props`). Only a signature a runtime owns (a route handler, a page's props, a `.sort()`
-  comparator, a library's callback) stays as its owner wrote it, and a rest list of one kind (`cn(...inputs)`) counts as
-  one parameter. A test helper follows the same rule.
+- `F1` **hard**: Hold a class or object method to the one-positional, two-as-one-object rule the contract suite holds
+  declared functions and `const` arrows to, because the suite does not read methods. Name a parameter object after the
+  function that takes it, `<FunctionName>Params`, so a reader landing on the type finds what takes it; a function handed
+  one record keeps that record's type. Sibling functions that take the same input may share one type named for that role
+  (`DatePairParams`, `ObfuscationParams`), and a component takes its props as one object whatever their number, which is
+  React's contract (`…Props`). Only a signature a runtime owns (a route handler, a page's props, a `.sort()` comparator,
+  a library's callback) stays as its owner wrote it, and a rest list of one kind (`cn(...inputs)`) counts as one
+  parameter. A test helper follows the same rule.
 - `F5` **hard**: Add a parameter, a cache key, an interface method or a service-tag method in the same change as its
   first caller, and remove it with its last; a demo in `apps/docs` that renders the component counts as a caller.
 - `F6` **judgement**: Implement a guarantee once and call it from every site that needs it (chronological order in
@@ -465,11 +469,11 @@ No rule below restates these, and a diff that breaks one fails CI:
 - `U14` **hard**: Declare at module scope a motion configuration object that feeds a dependency list, a context or
   `m.create`, and any `MotionSlot` child, so its identity is stable across renders; motion compares an inline
   `initial`, `animate` or `transition` by value, so those may stay inline.
-- `U15` **hard**: Keep what the render reads in state, not a ref; draw a number the visitor types with `NumberInput`,
-  never `type="number"`, and hold it as `number | null`, where `null` is an emptied field or text it cannot read and
-  the owner converts it where it is used (the accrual and salary calculators, the Donation amount), because
-  `NumberInput` keeps the typed text and reads it in the visitor's language, and state that converted every keystroke
-  would write `0` over what is being typed ([ADR 0021](./docs/adr/0021-numbers-a-visitor-types-are-localised-text-fields.md)).
+- `U15` **hard**: Keep what the render reads in state, not a ref; draw a number the visitor types with `NumberInput` and
+  hold it as `number | null`, where `null` is an emptied field or text it cannot read and the owner converts it where it
+  is used (the accrual and salary calculators, the Donation amount), because `NumberInput` keeps the typed text and
+  reads it in the visitor's language, and state that converted every keystroke would write `0` over what is being typed
+  ([ADR 0021](./docs/adr/0021-numbers-a-visitor-types-are-localised-text-fields.md)).
 - `U16` **hard**: Keep a timer's or an animation frame's handle where its cleanup reaches it (the effect that set it,
   or a ref when several callbacks share it) and clear it on close and on unmount.
 - `U17` **hard**: Key selections and list items by the item (the Holiday's id and name, a key built from the date),
@@ -526,13 +530,12 @@ No rule below restates these, and a diff that breaks one fails CI:
 
 ## Styles (`apps/web/src/ui/styles` and component CSS)
 
-- `S1` **hard**: Draw colours, frames and shadows with the tokens in `global/index.css` (`--frame`,
-  `--shadow-brutal-*`, `--color-brand-*`, and a role token such as `--positive` or `--wash-teal` for the rest); a
-  literal is wrong in one of the two themes, so a colour with no token gets one named for its role, declared in both
-  themes and mapped in `theme/index.css`, and a consumer that cannot read a custom property (the Stripe iframe, the
-  PDF, the skeletons, the confetti) takes a named constant from `ui/styles/palette.ts`, and the email templates one
-  from `application/email/palette.ts`, never a literal of its own; `palette.test.ts` holds each constant that repeats
-  a token equal to it.
+- `S1` **hard**: Draw colours, frames and shadows with the tokens in `global/index.css` (`--frame`, `--shadow-brutal-*`,
+  `--color-brand-*`, and a role token such as `--positive` or `--wash-teal` for the rest); a colour with no token gets
+  one named for its role, declared in both themes and mapped in `theme/index.css`, and a consumer that cannot read a
+  custom property (the Stripe iframe, the PDF, the skeletons, the confetti) takes a named constant from
+  `ui/styles/palette.ts`, and the email templates one from `application/email/palette.ts`; `palette.test.ts` holds each
+  constant that repeats a token equal to it.
 - `S2` **hard**, *check pending*: Pair every `hover:-translate-*` with `hit-area-stable`, and a hover rotation with
   `hit-area-stable-tilt`, on the element that receives the pointer, so the hit area holds still under it; a child that
   moves on its parent's `group-hover` needs neither.
@@ -544,17 +547,6 @@ No rule below restates these, and a diff that breaks one fails CI:
   every page layer (the planner drawer, the mobile sidebar), because until it is answered it must stay within reach,
   and below the dialog its own preferences open in.
 - `S6` **judgement**: Restore a body-level lock in the same effect's cleanup, never in an animation callback.
-- `S7` **hard**: Read a custom property only where something declares it: a token in `global/index.css`, a stylesheet,
-  code that sets it (a style key, an arbitrary property, `setProperty`, a font's `variable`) or a library that does (a
-  Base UI `CssVars` module, Tailwind's default theme). A name only an `@theme inline` block declares does not count,
-  because Tailwind inlines it and never emits the property, and a CSS module counts none that Tailwind emits on demand
-  (its default theme and a plain `@theme` block): it never compiles the module, so the variable exists only while some
-  utility uses it. A module reads a token, or a name an `@theme static` block declares (`--spacing` and the `--text-*`
-  and `--shadow-lg` scale steps `legend.module.css` takes). An undeclared `var()` resolves to nothing and the property
-  falls back to the inherited value in silence, so a typo or a deleted token ships unnoticed.
-- `S8` **hard**: Keep what the app does not ship out of its stylesheet: `index.css` ends with the `@source not` lines for
-  the test files, the `e2e` folder and the Markdown, because Tailwind scans every file under `apps/web` that git does
-  not ignore, and a class that only a fixture or an example spells becomes a rule in the shipped CSS.
 
 ## Message bundles (`apps/web/src/ui/i18n`)
 
@@ -566,8 +558,7 @@ No rule below restates these, and a diff that breaks one fails CI:
 - `L3` **hard**: Pass amounts, large numbers, decimals and percentages in already formatted (`amountFormatter`,
   `useCurrencyFormatter`, `format.number`), never abbreviated or rounded by hand (`toFixed`, a `%` or `x` glued on),
   because five of the six locales write the decimal with a comma. A message takes the formatted value as `{n}` or a
-  count as `{n, number}`, never with a style (`{pct, number, percent}`): production precompiles the bundles, and the
-  precompiled runtime knows no named format, so the argument would print a bare `1`.
+  count as `{n, number}`.
 - `L4` **hard**: Keep in the `a11y` namespace every screen-reader announcement and the accessible names several
   features share; a name one feature alone uses stays in that feature's namespace, whichever component renders it.
 - `L6` **hard**: Add the key for a user-visible code in the same change as the code; a feature's `errors` carries
@@ -578,8 +569,7 @@ No rule below restates these, and a diff that breaks one fails CI:
   bundle check counts keys and not the items inside a value. The homepage marquee is the exception:
   `homepage.marquee.items` is one string split on ` · `, since the strip is decorative (`aria-hidden`), loops, and no
   item's place in it means anything.
-- `L10` **hard**: Address the user informally in every locale (du, tu, tú); the Spanish, Catalan and Italian bundles
-  have no scan behind them.
+- `L10` **hard**: Address the user informally in the Spanish, Catalan and Italian bundles (tú, tu), which no scan reads.
 - `L11` **judgement**: Name the component that draws an icon when copy describes it, and check every bundle when the
   icon changes.
 - `L12` **judgement**: Add a namespace that only server components read to `SERVER_ONLY_NAMESPACES`; every namespace
@@ -595,8 +585,7 @@ No rule below restates these, and a diff that breaks one fails CI:
   to report `premium_activated` on the move into Premium, and only while the one-shot proof the activation route sets
   (`ACTIVATION_COOKIE`) is unspent; the store spends it in the same task as the report, so a reload during the call
   reports once and a reload after it, a revisit, a history entry the payer left early and returned to, a restored
-  session or a visitor whose `localStorage` was cleared reports nothing. The one `track()` inside an effect counts a
-  view rather than an interaction: the contact form a `#contact` link opens.
+  session or a visitor whose `localStorage` was cleared reports nothing.
 - `P2` **hard**: Send ids and machine codes in events (a `PremiumFeatureId`, an `ApiError` code), never translated
   strings, dates, Manual Days, Custom Holiday names or a salary.
 - `P3` **hard**: Read consent per service through `consent.ts` (`acceptedService`), and give a new service its own
@@ -629,7 +618,7 @@ No rule below restates these, and a diff that breaks one fails CI:
   `next-intl/server` double handed `createTranslator`, whose overloads `vi.fn<typeof …>` cannot express. A double
   built from the code's reading of the API agrees with the bug.
 - `T3` **hard**: Assert through the real helper (`noStore`, the real DTO over a fixture source), not a mock that
-  re-implements it; a unit test mocks no DTO module, whatever it returns.
+  re-implements it.
 - `T4` **hard**: Give an assertion of absence, or a loop over results, a positive control: assert the list is
   non-empty, or that the suite can make the selector appear, because an assertion over an empty set passes whatever
   the code does.
@@ -704,8 +693,8 @@ No rule below restates these, and a diff that breaks one fails CI:
   between two readings of the real clock passes whatever the code computed in between and a year read off it moves
   the expected value every January.
 - `T34` **hard**: Undo in an `afterEach` (an `afterAll` for a change made once for the whole file), or a `finally`
-  around the change, whatever a test changes outside itself (a spy, a stubbed global or environment variable, fake
-  timers, an element appended to `document.body`, a module-level double's state), because a line at the end of a
+  around the change, whatever else a test changes outside itself (an element appended to `document.body`, a
+  module-level double's state), because a line at the end of a
   test body never runs once an assertion above it fails and the change leaks into every later test in the file. A
   store or a module-level double needs no undo of its own where a `beforeEach` sets it back for every case (`T35`,
   `ManagementBar.test.tsx`) or every case that reads it arranges it first (`AllowPastDays.test.tsx`).
@@ -719,20 +708,10 @@ No rule below restates these, and a diff that breaks one fails CI:
   and answering.
 - `C4` **hard**: Add a job that must gate a merge to its workflow's `check` aggregate.
 - `C5` **hard**: Gate a path-filtered deploy on every path its bundle is built from.
-- `C6` **hard**: Pass `wrangler deploy --message` a single token with no spaces or parentheses; OpenNext re-spawns
-  wrangler through a shell.
 - `C7` **hard**: Ship Worker secrets with `wrangler deploy --secrets-file`, written under `$RUNNER_TEMP` and removed
   in an `if: always()` step.
-- `C10` **hard**: Every `uses:` names a full commit SHA with its version in a trailing comment, or its branch for a pin
-  that follows one, and the two move together: the SHA is what runs, the comment is the only thing that makes it
-  legible, and Renovate maintains both halves. This repository's own actions and workflows (`$/.github/…`) have no
-  SHA to name.
-- `C11` **hard**: YAML carries no explanatory comments; the reason for a line goes in the commit message, the pull
-  request, an ADR or a rule here, and a gotcha an implementer would otherwise trip on goes in the *Gotchas* of
-  [AGENTS.md](./AGENTS.md). The trailing comment on a SHA pin is the one exception. A tool directive
-  (`# zizmor: ignore[...]`, `# yaml-language-server: ...`) counts as a directive, not a comment, and what a bot writes
-  is its output, not ours: the lockfile, and the `# Renovate security update: …` line Renovate adds to
-  `pnpm-workspace.yaml`, whichever versions it names.
+- `C11` **hard**: Put the reason for a line of YAML in the commit message, the pull request, an ADR or a rule here,
+  and a gotcha an implementer would otherwise trip on in the *Gotchas* of [AGENTS.md](./AGENTS.md).
 
 ## Docs site (`apps/docs`)
 
@@ -740,7 +719,7 @@ No rule below restates these, and a diff that breaks one fails CI:
   path the site reaches in `DOCS_PATHS`.
 - `W2` **hard**: Name a file in prose, never a volatile literal: import and interpolate the app's constants, and type
   variant and prop tables as `Record`s so a rename fails `astro check`. The consent service ids are the one set the
-  site repeats on purpose, and the contract suite holds them equal to the app's.
+  site repeats on purpose.
 - `W3` **hard**: Add a provider an app component needs to `Demo.tsx`, not to a single demo.
 - `W5` **hard**: Draw diagrams as Mermaid fences, rendered at build time.
 - `W6` **judgement**: Prefer a fenced block; write a raw `<pre>` only for content interpolated from app constants.
