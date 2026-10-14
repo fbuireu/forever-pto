@@ -767,6 +767,9 @@ No rule below restates these, and a diff that breaks one fails CI:
   every release configuration to the shared one) in `tests/docs-consistency.test.ts` is byte for byte the same in
   biancafiore, contribKit, forever-pto and github-star-tracker, so a change to it is made in all four; only the
   shapes declared above it, which name each repository's files, differ.
+- **Duplicated Code**: the id rule (the `describe` that gives every rule of this file an id a finding can cite) in
+  `tests/docs-consistency.test.ts` is the same in biancafiore, contribKit, forever-pto and github-star-tracker, so a
+  change to it is made in all four; only the floor its census holds and the call that reads this file differ.
 - **Duplicated Code**: the four smoke cases are word for word the same in every repository that deploys, and in
   both packages here, so a difference between them is drift, not a variant.
 - **Duplicated Code**: `contactSenderKey` and `normalizeEmail` stay two normalisers: one keys the contact guard, the
