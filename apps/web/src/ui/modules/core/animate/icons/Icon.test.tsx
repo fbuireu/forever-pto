@@ -2,18 +2,18 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import type { ComponentProps, ComponentType, ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-type MotionSpanProps = ComponentProps<"span"> & {
+interface MotionSpanProps extends ComponentProps<"span"> {
 	animate?: unknown;
 	transition?: unknown;
 	initial?: unknown;
 	exit?: unknown;
-};
+}
 
-type MotionSlotMockProps = ComponentProps<"div"> & {
+interface MotionSlotMockProps extends ComponentProps<"div"> {
 	animate?: unknown;
 	transition?: unknown;
 	children: ReactNode;
-};
+}
 
 const inView = vi.hoisted(() => ({ value: false }));
 

@@ -56,7 +56,7 @@ to invent a zeroed object.
 declares `metrics?` because the generators produce one without Metrics; this pipeline never does, on
 either branch. Saying so in the type is what lets the stores and the whole planner screen read
 `suggestion.metrics.totalEffectiveDays` rather than `metrics?.x ?? 0`, where a genuine regression would show
-as a silent zero instead of a type error. `MeasuredSuggestion` is `Suggestion & { metrics: Metrics }` and it
+as a silent zero instead of a type error. `MeasuredSuggestion` extends `Suggestion` with `metrics: Metrics` and it
 travels: the worker's wire type requires `metrics`, `deserializeSuggestion` returns one, and `HolidaysState`
 holds them. The one place that has to earn it is rehydration: `onRehydrateStorage` drops a persisted
 Suggestion with no Metrics rather than pretending, because a stored blob is the only input the type cannot

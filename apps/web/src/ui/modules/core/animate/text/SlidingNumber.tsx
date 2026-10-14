@@ -36,12 +36,12 @@ function getDecimalSeparator(locale: string): string {
 	return separator;
 }
 
-type SlidingNumberDisplayProps = {
+interface SlidingNumberDisplayProps {
 	motionValue: MotionValue<number>;
 	number: number;
 	height: number;
 	transition: SpringOptions;
-};
+}
 
 function SlidingNumberDisplay({ motionValue, number, height, transition }: Readonly<SlidingNumberDisplayProps>) {
 	const y = useTransform(motionValue, (latest) => {
@@ -69,12 +69,12 @@ function SlidingNumberDisplay({ motionValue, number, height, transition }: Reado
 	);
 }
 
-type SlidingNumberRollerProps = {
+interface SlidingNumberRollerProps {
 	prevValue: number;
 	value: number;
 	place: number;
 	transition: SpringOptions;
-};
+}
 
 function SlidingNumberRoller({ prevValue, value, place, transition }: Readonly<SlidingNumberRollerProps>) {
 	const startNumber = Math.floor(prevValue / place) % 10;
@@ -107,7 +107,7 @@ function SlidingNumberRoller({ prevValue, value, place, transition }: Readonly<S
 	);
 }
 
-type SlidingNumberProps = ComponentProps<"span"> & {
+interface SlidingNumberProps extends ComponentProps<"span"> {
 	number: number | string;
 	inView?: boolean;
 	inViewMargin?: UseInViewOptions["margin"];
@@ -116,7 +116,7 @@ type SlidingNumberProps = ComponentProps<"span"> & {
 	decimalSeparator?: string;
 	decimalPlaces?: number;
 	transition?: SpringOptions;
-};
+}
 
 function SlidingNumber({
 	ref,

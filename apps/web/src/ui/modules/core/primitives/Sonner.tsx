@@ -3,7 +3,9 @@
 import { useTheme } from "next-themes";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 
-type ToasterOwnProps = ToasterProps & { closeLabel?: string };
+interface ToasterOwnProps extends ToasterProps {
+	closeLabel?: string;
+}
 
 const Toaster = ({ closeLabel = "Close toast", ...props }: ToasterOwnProps) => {
 	const { theme = "system" } = useTheme();

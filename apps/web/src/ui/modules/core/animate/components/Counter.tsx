@@ -8,7 +8,7 @@ import { SlidingNumber } from "../text/SlidingNumber";
 
 type CounterButtonProps = Omit<ComponentProps<"button">, "onClick" | "children">;
 
-type CounterProps = Omit<HTMLMotionProps<"div">, "children"> & {
+interface CounterProps extends Omit<HTMLMotionProps<"div">, "children"> {
 	number: number;
 	setNumber: (number: number) => void;
 	decrementLabel: string;
@@ -19,7 +19,7 @@ type CounterProps = Omit<HTMLMotionProps<"div">, "children"> & {
 	decrementButtonProps?: CounterButtonProps;
 	incrementButtonProps?: CounterButtonProps;
 	transition?: Transition;
-};
+}
 
 function Counter({
 	number,

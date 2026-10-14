@@ -1,15 +1,15 @@
 import type { ReactNode } from "react";
 
-type FaqItem = {
+interface FaqItem {
 	id: string;
 	question: string;
 	answer: string | ReactNode;
-};
+}
 
-type FaqSection = {
+interface FaqSection {
 	id: string;
 	title: string;
 	items: FaqItem[];
-};
+}
 
 export type FaqData = FaqSection[];

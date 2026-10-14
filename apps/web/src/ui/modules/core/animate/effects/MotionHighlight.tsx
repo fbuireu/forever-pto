@@ -25,14 +25,14 @@ import {
 
 type MotionHighlightMode = "children" | "parent";
 
-type Bounds = {
+interface Bounds {
 	top: number;
 	left: number;
 	width: number;
 	height: number;
-};
+}
 
-type MotionHighlightContextType<T extends string> = {
+interface MotionHighlightContextType<T extends string> {
 	mode: MotionHighlightMode;
 	activeValue: T | null;
 	setActiveValue: (value: T | null) => void;
@@ -48,7 +48,7 @@ type MotionHighlightContextType<T extends string> = {
 	enabled?: boolean;
 	exitDelay?: number;
 	forceUpdateBounds?: boolean;
-};
+}
 
 const DEFAULT_TRANSITION: Transition = { type: "spring", stiffness: 350, damping: 35 };
 
@@ -63,7 +63,7 @@ function useMotionHighlight<T extends string>(): MotionHighlightContextType<T> {
 	return context as unknown as MotionHighlightContextType<T>;
 }
 
-type BaseMotionHighlightProps<T extends string> = {
+interface BaseMotionHighlightProps<T extends string> {
 	mode?: MotionHighlightMode;
 	value?: T | null;
 	defaultValue?: T | null;
@@ -74,41 +74,43 @@ type BaseMotionHighlightProps<T extends string> = {
 	disabled?: boolean;
 	enabled?: boolean;
 	exitDelay?: number;
-};
+}
 
-type ParentModeMotionHighlightProps = {
+interface ParentModeMotionHighlightProps {
 	boundsOffset?: Partial<Bounds>;
 	containerClassName?: string;
 	forceUpdateBounds?: boolean;
-};
+}
 
-type ControlledParentModeMotionHighlightProps<T extends string> = BaseMotionHighlightProps<T> &
-	ParentModeMotionHighlightProps & {
-		mode: "parent";
-		controlledItems: true;
-		children: ReactNode;
-	};
+interface ControlledParentModeMotionHighlightProps<T extends string>
+	extends BaseMotionHighlightProps<T>,
+		ParentModeMotionHighlightProps {
+	mode: "parent";
+	controlledItems: true;
+	children: ReactNode;
+}
 
-type ControlledChildrenModeMotionHighlightProps<T extends string> = BaseMotionHighlightProps<T> & {
+interface ControlledChildrenModeMotionHighlightProps<T extends string> extends BaseMotionHighlightProps<T> {
 	mode?: "children";
 	controlledItems: true;
 	children: ReactNode;
-};
+}
 
-type UncontrolledParentModeMotionHighlightProps<T extends string> = BaseMotionHighlightProps<T> &
-	ParentModeMotionHighlightProps & {
-		mode: "parent";
-		controlledItems?: false;
-		itemsClassName?: string;
-		children: ReactElement | ReactElement[];
-	};
+interface UncontrolledParentModeMotionHighlightProps<T extends string>
+	extends BaseMotionHighlightProps<T>,
+		ParentModeMotionHighlightProps {
+	mode: "parent";
+	controlledItems?: false;
+	itemsClassName?: string;
+	children: ReactElement | ReactElement[];
+}
 
-type UncontrolledChildrenModeMotionHighlightProps<T extends string> = BaseMotionHighlightProps<T> & {
+interface UncontrolledChildrenModeMotionHighlightProps<T extends string> extends BaseMotionHighlightProps<T> {
 	mode?: "children";
 	controlledItems?: false;
 	itemsClassName?: string;
 	children: ReactElement | ReactElement[];
-};
+}
 
 type MotionHighlightProps<T extends string> = ComponentProps<"div"> &
 	(
@@ -330,7 +332,7 @@ function getNonOverridingDataAttributes({ element, dataAttributes }: GetNonOverr
 	}, {});
 }
 
-type ExtendedChildProps = ComponentProps<"div"> & {
+interface ExtendedChildProps extends Omit<ComponentProps<"div">, "ref"> {
 	id?: string;
 	ref?: Ref<HTMLElement>;
 	"data-active"?: string;
@@ -338,9 +340,9 @@ type ExtendedChildProps = ComponentProps<"div"> & {
 	"data-disabled"?: boolean;
 	"data-highlight"?: boolean;
 	"data-slot"?: string;
-};
+}
 
-type MotionHighlightItemProps = ComponentProps<"div"> & {
+interface MotionHighlightItemProps extends ComponentProps<"div"> {
 	children: ReactElement;
 	id?: string;
 	value?: string;
@@ -351,7 +353,7 @@ type MotionHighlightItemProps = ComponentProps<"div"> & {
 	exitDelay?: number;
 	asChild?: boolean;
 	forceUpdateBounds?: boolean;
-};
+}
 
 function MotionHighlightItem({
 	ref,

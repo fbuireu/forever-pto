@@ -23,29 +23,29 @@ export const ACTIVATION_PARAM = "activation";
 export const ACTIVATION_FAILED = "failed";
 export const ACTIVATION_COOKIE = "premium-activation";
 
-export type DiscountInfo = {
+export interface DiscountInfo {
 	type: "percent" | "fixed";
 	value: number;
 	originalAmount: number;
 	finalAmount: number;
 	couponId: string;
 	couponName: string | null;
-};
+}
 
-type CreatePaymentSuccess = {
+interface CreatePaymentSuccess {
 	success: true;
 	clientSecret: string;
 	discountInfo?: DiscountInfo;
-};
+}
 
-type CreatePaymentError = {
+interface CreatePaymentError {
 	success: false;
 	error?: string;
 	isPromoCodeError?: boolean;
 	stripeError?: Stripe.StripeRawError;
 	code?: string;
 	type?: string;
-};
+}
 
 export type CreatePaymentResult = CreatePaymentSuccess | CreatePaymentError;
 

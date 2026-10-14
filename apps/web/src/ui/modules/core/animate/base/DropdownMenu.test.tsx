@@ -2,14 +2,14 @@ import { render } from "@testing-library/react";
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-type MotionDivProps = ComponentProps<"div"> & {
+interface MotionDivProps extends ComponentProps<"div"> {
 	initial?: unknown;
 	animate?: unknown;
 	exit?: unknown;
 	transition?: unknown;
 	layout?: unknown;
 	whileTap?: unknown;
-};
+}
 
 vi.mock("motion/react", async () => {
 	const { createElement, Fragment } = await import("react");
@@ -35,13 +35,19 @@ const positioned = vi.hoisted((): { sideOffset?: number; align?: string }[] => [
 
 vi.mock("@base-ui/react/menu", async () => {
 	const { createElement, cloneElement, isValidElement } = await import("react");
-	type RootProps = ComponentProps<"div"> & {
+	interface RootProps extends ComponentProps<"div"> {
 		onOpenChange?: (open: boolean) => void;
 		open?: boolean;
 		defaultOpen?: boolean;
-	};
-	type WithRender = ComponentProps<"div"> & { render?: ReactElement; keepMounted?: boolean };
-	type ItemProps = ComponentProps<"div"> & { render?: ReactElement; disabled?: boolean };
+	}
+	interface WithRender extends ComponentProps<"div"> {
+		render?: ReactElement;
+		keepMounted?: boolean;
+	}
+	interface ItemProps extends ComponentProps<"div"> {
+		render?: ReactElement;
+		disabled?: boolean;
+	}
 	const Menu = {
 		Root: ({ children, onOpenChange: _oc, open: _o, defaultOpen: _do, ...props }: RootProps) =>
 			createElement("div", props, children),

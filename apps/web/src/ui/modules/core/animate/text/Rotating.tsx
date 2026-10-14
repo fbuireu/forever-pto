@@ -4,13 +4,13 @@ import { cn } from "@ui/utils/cn";
 import { AnimatePresence, type HTMLMotionProps, m, type Transition } from "motion/react";
 import { useEffect, useState } from "react";
 
-type RotatingTextProps = {
+interface RotatingTextProps extends HTMLMotionProps<"div"> {
 	text: string | string[];
 	duration?: number;
 	transition?: Transition;
 	y?: number;
 	containerClassName?: string;
-} & HTMLMotionProps<"div">;
+}
 
 function RotatingText({
 	text,

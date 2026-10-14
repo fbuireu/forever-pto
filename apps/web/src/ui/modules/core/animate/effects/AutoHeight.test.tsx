@@ -2,19 +2,19 @@ import { render } from "@testing-library/react";
 import type { ComponentProps, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-type MotionDivProps = ComponentProps<"div"> & {
+interface MotionDivProps extends ComponentProps<"div"> {
 	animate?: unknown;
 	transition?: unknown;
 	initial?: unknown;
 	exit?: unknown;
 	layout?: unknown;
-};
+}
 
-type MotionSlotMockProps = ComponentProps<"div"> & {
+interface MotionSlotMockProps extends ComponentProps<"div"> {
 	animate?: unknown;
 	transition?: unknown;
 	children: ReactNode;
-};
+}
 
 const { measuredRef } = vi.hoisted(() => ({
 	measuredRef: { current: null as HTMLElement | null },

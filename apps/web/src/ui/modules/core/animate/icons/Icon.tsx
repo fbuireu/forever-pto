@@ -56,7 +56,7 @@ type StaticAnimations = keyof typeof staticAnimations;
 type TriggerProp<T = string> = boolean | StaticAnimations | T;
 type Trigger = TriggerProp<string>;
 
-type AnimateIconContextValue = {
+interface AnimateIconContextValue {
 	controls: ReturnType<typeof useAnimation> | undefined;
 	animation: StaticAnimations | string;
 	loop: boolean;
@@ -67,9 +67,9 @@ type AnimateIconContextValue = {
 	completeOnStop?: boolean;
 	persistOnAnimateEnd?: boolean;
 	delay?: number;
-};
+}
 
-type DefaultIconProps<T = string> = {
+interface DefaultIconProps<T = string> {
 	animate?: TriggerProp<T>;
 	animateOnHover?: TriggerProp<T>;
 	animateOnTap?: TriggerProp<T>;
@@ -83,24 +83,22 @@ type DefaultIconProps<T = string> = {
 	completeOnStop?: boolean;
 	persistOnAnimateEnd?: boolean;
 	delay?: number;
-};
+}
 
-type AnimateIconProps<T = string> = WithAsChild<
-	HTMLMotionProps<"span"> &
-		DefaultIconProps<T> & {
-			children: ReactNode;
-			asChild?: boolean;
-		}
->;
+interface AnimateIconBaseProps<T = string> extends Omit<HTMLMotionProps<"span">, "animate">, DefaultIconProps<T> {
+	children: ReactNode;
+	asChild?: boolean;
+}
 
-type IconProps<T> = DefaultIconProps<T> &
-	Omit<SVGMotionProps<SVGSVGElement>, "animate"> & {
-		size?: number;
-	};
+type AnimateIconProps<T = string> = WithAsChild<AnimateIconBaseProps<T>>;
 
-type IconWrapperProps<T> = IconProps<T> & {
+interface IconProps<T> extends DefaultIconProps<T>, Omit<SVGMotionProps<SVGSVGElement>, "animate"> {
+	size?: number;
+}
+
+interface IconWrapperProps<T> extends IconProps<T> {
 	icon: ComponentType<IconProps<T>>;
-};
+}
 
 const AnimateIconContext = createContext<AnimateIconContextValue | null>(null);
 
@@ -141,12 +139,12 @@ interface StartAnimParams {
 
 type PointerHandler = (event: PointerEvent<unknown>) => void;
 
-type ChildPointerHandlers = {
+interface ChildPointerHandlers {
 	onPointerEnter?: PointerHandler;
 	onPointerLeave?: PointerHandler;
 	onPointerDown?: PointerHandler;
 	onPointerUp?: PointerHandler;
-};
+}
 
 function AnimateIcon({
 	asChild = false,

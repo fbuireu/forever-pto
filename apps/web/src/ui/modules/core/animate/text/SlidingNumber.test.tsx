@@ -3,7 +3,10 @@ import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ComponentProps, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-type MotionSpanProps = ComponentProps<"span"> & { style?: unknown; transition?: unknown };
+interface MotionSpanProps extends Omit<ComponentProps<"span">, "style"> {
+	style?: unknown;
+	transition?: unknown;
+}
 
 const springStarts = vi.hoisted((): number[] => []);
 

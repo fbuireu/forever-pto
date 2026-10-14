@@ -8,6 +8,7 @@ import {
 	createContext,
 	isValidElement,
 	type ReactElement,
+	type ReactNode,
 	use,
 	useCallback,
 	useEffect,
@@ -16,11 +17,11 @@ import {
 } from "react";
 import { MotionHighlight, MotionHighlightItem } from "../effects/MotionHighlight";
 
-type DropdownMenuContextType = {
+interface DropdownMenuContextType {
 	isOpen: boolean;
 	highlightTransition: Transition;
 	animateOnHover: boolean;
-};
+}
 
 const HIGHLIGHT_TRANSITION: Transition = { type: "spring", stiffness: 350, damping: 35 };
 
@@ -34,10 +35,10 @@ const useDropdownMenu = () => {
 	return context;
 };
 
-type DropdownMenuProps = ComponentProps<typeof DropdownMenuPrimitive.Root> & {
+interface DropdownMenuProps extends ComponentProps<typeof DropdownMenuPrimitive.Root> {
 	transition?: Transition;
 	animateOnHover?: boolean;
-};
+}
 
 function DropdownMenu({
 	children,
@@ -73,7 +74,9 @@ function DropdownMenu({
 	);
 }
 
-type DropdownMenuTriggerProps = ComponentProps<typeof DropdownMenuPrimitive.Trigger> & { asChild?: boolean };
+interface DropdownMenuTriggerProps extends ComponentProps<typeof DropdownMenuPrimitive.Trigger> {
+	asChild?: boolean;
+}
 
 function DropdownMenuTrigger({ asChild, children, ...props }: DropdownMenuTriggerProps) {
 	if (asChild && isValidElement(children)) {
@@ -88,12 +91,14 @@ function DropdownMenuTrigger({ asChild, children, ...props }: DropdownMenuTrigge
 	);
 }
 
-type DropdownMenuContentProps = Omit<ComponentProps<typeof DropdownMenuPrimitive.Popup>, "render"> &
-	HTMLMotionProps<"div"> & {
-		transition?: Transition;
-		sideOffset?: number;
-		align?: "start" | "center" | "end";
-	};
+interface DropdownMenuContentProps
+	extends Omit<ComponentProps<typeof DropdownMenuPrimitive.Popup>, "render" | keyof HTMLMotionProps<"div">>,
+		HTMLMotionProps<"div"> {
+	children?: ReactNode;
+	transition?: Transition;
+	sideOffset?: number;
+	align?: "start" | "center" | "end";
+}
 
 const DROPDOWN_MENU_CONTENT_DEFAULTS = {
 	sideOffset: 4,
@@ -154,11 +159,13 @@ function DropdownMenuContent({
 	);
 }
 
-type DropdownMenuItemProps = Omit<ComponentProps<typeof DropdownMenuPrimitive.Item>, "render"> &
-	HTMLMotionProps<"div"> & {
-		inset?: boolean;
-		variant?: "default" | "destructive";
-	};
+interface DropdownMenuItemProps
+	extends Omit<ComponentProps<typeof DropdownMenuPrimitive.Item>, "render" | keyof HTMLMotionProps<"div">>,
+		HTMLMotionProps<"div"> {
+	children?: ReactNode;
+	inset?: boolean;
+	variant?: "default" | "destructive";
+}
 
 function DropdownMenuItem({
 	className,

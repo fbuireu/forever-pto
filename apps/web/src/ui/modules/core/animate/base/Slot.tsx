@@ -9,10 +9,10 @@ import {
 	type RefObject,
 } from "react";
 
-type SlotProps = HTMLAttributes<HTMLElement> & {
+interface SlotProps extends HTMLAttributes<HTMLElement> {
 	children?: ReactNode;
 	ref?: Ref<HTMLElement>;
-};
+}
 
 function Slot({ children, ref: forwardedRef, ...slotProps }: SlotProps) {
 	if (!isValidElement(children)) return null;

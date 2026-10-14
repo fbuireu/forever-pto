@@ -22,12 +22,12 @@ import {
 import { AutoHeight } from "../effects/AutoHeight";
 import { MotionHighlight, MotionHighlightItem } from "../effects/MotionHighlight";
 
-type TabsContextType = {
+interface TabsContextType {
 	activeValue: string;
 	handleValueChange: (value: string) => void;
 	triggerId: (value: string) => string;
 	panelId: (value: string) => string;
-};
+}
 
 interface NextTabIndexParams {
 	key: string;
@@ -81,11 +81,11 @@ function useTabs() {
 	return ctx;
 }
 
-type TabsProps = ComponentProps<"div"> & {
+interface TabsProps extends ComponentProps<"div"> {
 	value?: string;
 	defaultValue?: string;
 	onValueChange?: (value: string) => void;
-};
+}
 
 function Tabs({ defaultValue, value, onValueChange, children, className, ...props }: TabsProps) {
 	const [internalValue, setInternalValue] = useState(defaultValue ?? "");
@@ -121,11 +121,11 @@ function Tabs({ defaultValue, value, onValueChange, children, className, ...prop
 	);
 }
 
-type TabsHighlightProps = {
+interface TabsHighlightProps {
 	children: ReactNode;
 	activeClassName?: string;
 	transition?: Transition;
-};
+}
 
 function TabsHighlight({ children, activeClassName, transition = HIGHLIGHT_TRANSITION }: Readonly<TabsHighlightProps>) {
 	const { activeValue } = useTabs();
@@ -161,11 +161,11 @@ function TabsList({ children, className, ...props }: TabsListProps) {
 	);
 }
 
-type TabsHighlightItemProps = {
+interface TabsHighlightItemProps {
 	value: string;
 	children: ReactElement;
 	className?: string;
-};
+}
 
 function TabsHighlightItem({ value, children, className }: Readonly<TabsHighlightItemProps>) {
 	return (
@@ -175,7 +175,9 @@ function TabsHighlightItem({ value, children, className }: Readonly<TabsHighligh
 	);
 }
 
-type TabsTriggerProps = HTMLMotionProps<"button"> & { value: string };
+interface TabsTriggerProps extends HTMLMotionProps<"button"> {
+	value: string;
+}
 
 function TabsTrigger({ ref, value, children, className, onKeyDown, ...props }: TabsTriggerProps) {
 	const { activeValue, handleValueChange, triggerId, panelId } = useTabs();
@@ -212,11 +214,11 @@ function TabsTrigger({ ref, value, children, className, onKeyDown, ...props }: T
 	);
 }
 
-type TabsContentsProps = Omit<HTMLMotionProps<"div">, "children" | "transition"> & {
+interface TabsContentsProps extends Omit<HTMLMotionProps<"div">, "children" | "transition"> {
 	children?: ReactNode;
 	mode?: "auto-height" | "layout";
 	transition?: Transition;
-};
+}
 
 function TabsContents({
 	children,
@@ -258,10 +260,10 @@ function TabsContents({
 	);
 }
 
-type TabsContentProps = Omit<HTMLMotionProps<"div">, "value"> & {
+interface TabsContentProps extends Omit<HTMLMotionProps<"div">, "value"> {
 	value: string;
 	transition?: Transition;
-};
+}
 
 function TabsContent({
 	value,

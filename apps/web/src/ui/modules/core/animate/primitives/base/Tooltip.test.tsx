@@ -2,12 +2,12 @@ import { render, screen } from "@testing-library/react";
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-type MotionDivProps = ComponentProps<"div"> & {
+interface MotionDivProps extends ComponentProps<"div"> {
 	initial?: unknown;
 	animate?: unknown;
 	exit?: unknown;
 	transition?: unknown;
-};
+}
 
 vi.mock("motion/react", async () => {
 	const { createElement, Fragment } = await import("react");
@@ -24,12 +24,15 @@ vi.mock("motion/react", async () => {
 
 vi.mock("@base-ui/react/popover", async () => {
 	const { createElement, cloneElement, Fragment } = await import("react");
-	type TriggerProps = ComponentProps<"button"> & {
+	interface TriggerProps extends ComponentProps<"button"> {
 		render?: ReactElement;
 		openOnHover?: boolean;
 		delay?: number;
-	};
-	type RenderableProps = ComponentProps<"div"> & { render?: ReactElement; keepMounted?: boolean };
+	}
+	interface RenderableProps extends ComponentProps<"div"> {
+		render?: ReactElement;
+		keepMounted?: boolean;
+	}
 	const renderable =
 		(slot: string) =>
 		({ render: renderProp, children, keepMounted: _k, ...props }: RenderableProps) =>

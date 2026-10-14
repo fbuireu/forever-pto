@@ -38,7 +38,8 @@
 				"noReExportAll": "error"
 			},
 			"style": {
-				"noDefaultExport": "error"
+				"noDefaultExport": "error",
+				"useConsistentTypeDefinitions": { "level": "error", "options": { "style": "interface" } }
 			},
 			"suspicious": {
 				"noConsole": "error"

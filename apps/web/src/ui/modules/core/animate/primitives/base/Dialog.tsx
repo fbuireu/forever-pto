@@ -4,12 +4,12 @@ import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { useControlledState } from "@ui/hooks/useControlledState";
 import { getStrictContext } from "@ui/utils/context";
 import { AnimatePresence, type HTMLMotionProps, m } from "motion/react";
-import { type ComponentProps, isValidElement, useMemo } from "react";
+import { type ComponentProps, isValidElement, type ReactNode, useMemo } from "react";
 
-type DialogContextType = {
+interface DialogContextType {
 	isOpen: boolean;
 	setIsOpen: DialogProps["onOpenChange"];
-};
+}
 
 const [DialogProvider, useDialog] = getStrictContext<DialogContextType>("DialogContext");
 
@@ -29,7 +29,9 @@ function Dialog(props: DialogProps) {
 	);
 }
 
-type DialogTriggerProps = ComponentProps<typeof DialogPrimitive.Trigger> & { asChild?: boolean };
+interface DialogTriggerProps extends ComponentProps<typeof DialogPrimitive.Trigger> {
+	asChild?: boolean;
+}
 function DialogTrigger({ asChild, children, ...props }: DialogTriggerProps) {
 	if (asChild && isValidElement(children)) {
 		return <DialogPrimitive.Trigger data-slot="dialog-trigger" render={children} {...props} />;
@@ -51,7 +53,11 @@ function DialogPortal(props: DialogPortalProps) {
 	);
 }
 
-type DialogBackdropProps = Omit<ComponentProps<typeof DialogPrimitive.Backdrop>, "render"> & HTMLMotionProps<"div">;
+interface DialogBackdropProps
+	extends Omit<ComponentProps<typeof DialogPrimitive.Backdrop>, "render" | keyof HTMLMotionProps<"div">>,
+		HTMLMotionProps<"div"> {
+	children?: ReactNode;
+}
 function DialogBackdrop({ transition = { duration: 0.2, ease: "easeInOut" }, ...props }: DialogBackdropProps) {
 	return (
 		<DialogPrimitive.Backdrop
@@ -70,7 +76,11 @@ function DialogBackdrop({ transition = { duration: 0.2, ease: "easeInOut" }, ...
 	);
 }
 
-type DialogPopupProps = Omit<ComponentProps<typeof DialogPrimitive.Popup>, "render"> & HTMLMotionProps<"div">;
+interface DialogPopupProps
+	extends Omit<ComponentProps<typeof DialogPrimitive.Popup>, "render" | keyof HTMLMotionProps<"div">>,
+		HTMLMotionProps<"div"> {
+	children?: ReactNode;
+}
 
 function DialogPopup({
 	initialFocus,

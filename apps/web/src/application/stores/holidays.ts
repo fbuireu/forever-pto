@@ -80,7 +80,7 @@ interface HolidaysActions {
 	trimManualDays: (maxPtoDays: number) => void;
 }
 
-type HolidaysStore = HolidaysState & HolidaysActions;
+interface HolidaysStore extends HolidaysState, HolidaysActions {}
 
 const STORAGE_NAME = HOLIDAYS_STORAGE_NAME;
 

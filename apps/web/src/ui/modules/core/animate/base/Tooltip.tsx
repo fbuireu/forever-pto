@@ -16,13 +16,18 @@ import {
 
 export const TOOLTIP_DELAY_MS = 200;
 
-type TooltipProviderProps = TooltipProviderPrimitiveProps & { delayDuration?: number };
+interface TooltipProviderProps extends TooltipProviderPrimitiveProps {
+	delayDuration?: number;
+}
 function TooltipProvider({ delay = TOOLTIP_DELAY_MS, delayDuration, ...props }: TooltipProviderProps) {
 	const resolvedDelay = delayDuration ?? delay;
 	return <TooltipProviderPrimitive delay={resolvedDelay} {...props} />;
 }
 
-type TooltipProps = TooltipPrimitiveProps & { delay?: number; delayDuration?: number };
+interface TooltipProps extends TooltipPrimitiveProps {
+	delay?: number;
+	delayDuration?: number;
+}
 function Tooltip({ delay, delayDuration, ...props }: TooltipProps) {
 	const explicitDelay = delayDuration ?? delay;
 
@@ -40,7 +45,9 @@ function TooltipTrigger({ ...props }: TooltipTriggerProps) {
 	return <TooltipTriggerPrimitive {...props} />;
 }
 
-type TooltipContentProps = TooltipPositionerPrimitiveProps & TooltipPopupPrimitiveProps;
+interface TooltipContentProps
+	extends Omit<TooltipPositionerPrimitiveProps, "className" | "style" | "children">,
+		Pick<TooltipPopupPrimitiveProps, "className" | "style" | "children"> {}
 function TooltipContent({ className, sideOffset = 4, children, style, ...props }: TooltipContentProps) {
 	return (
 		<TooltipPortalPrimitive>
@@ -60,7 +67,10 @@ function TooltipContent({ className, sideOffset = 4, children, style, ...props }
 	);
 }
 
-type TooltipInfoTriggerProps = Omit<TooltipTriggerProps, "children"> & { className?: string; "aria-label": string };
+interface TooltipInfoTriggerProps extends Omit<TooltipTriggerProps, "children"> {
+	className?: string;
+	"aria-label": string;
+}
 function TooltipInfoTrigger({ className, ...props }: TooltipInfoTriggerProps) {
 	return (
 		<TooltipTriggerPrimitive

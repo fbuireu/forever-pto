@@ -6,13 +6,13 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("@ui/hooks/useMobile", () => ({ useIsMobile: () => false }));
 vi.mock("@ui/utils/cookie", () => ({ setCookie: vi.fn().mockResolvedValue(undefined) }));
 
-type MotionDivProps = ComponentProps<"div"> & {
+interface MotionDivProps extends ComponentProps<"div"> {
 	initial?: unknown;
 	animate?: unknown;
 	exit?: unknown;
 	transition?: unknown;
 	layout?: unknown;
-};
+}
 
 vi.mock("motion/react", async () => {
 	const { createElement, Fragment } = await import("react");

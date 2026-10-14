@@ -7,10 +7,11 @@ import { Button } from "@ui/modules/core/primitives/Button";
 import type { ComponentProps, ReactNode } from "react";
 import { PLANNER_PATH } from "./utils/helpers";
 
-type QuickStartTriggerProps = Pick<ComponentProps<typeof Button>, "children" | "className" | "size" | "variant"> & {
+interface QuickStartTriggerProps
+	extends Pick<ComponentProps<typeof Button>, "children" | "className" | "size" | "variant"> {
 	source: QuickStartSource;
 	resumeLabel?: ReactNode;
-};
+}
 
 export const QuickStartTrigger = ({
 	children,

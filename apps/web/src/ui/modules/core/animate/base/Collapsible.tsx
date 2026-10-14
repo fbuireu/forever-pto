@@ -3,7 +3,13 @@
 import { Collapsible as CollapsiblePrimitive } from "@base-ui/react/collapsible";
 import { cn } from "@ui/utils/cn";
 import { type HTMLMotionProps, m, type Transition } from "motion/react";
-import { type ComponentProps, type ComponentPropsWithoutRef, isValidElement, type ReactElement } from "react";
+import {
+	type ComponentProps,
+	type ComponentPropsWithoutRef,
+	isValidElement,
+	type ReactElement,
+	type ReactNode,
+} from "react";
 
 type CollapsibleProps = ComponentProps<typeof CollapsiblePrimitive.Root>;
 
@@ -15,7 +21,9 @@ function Collapsible({ children, ...props }: CollapsibleProps) {
 	);
 }
 
-type CollapsibleTriggerProps = ComponentProps<typeof CollapsiblePrimitive.Trigger> & { asChild?: boolean };
+interface CollapsibleTriggerProps extends ComponentProps<typeof CollapsiblePrimitive.Trigger> {
+	asChild?: boolean;
+}
 
 function CollapsibleTrigger({ asChild, children, className, ...props }: CollapsibleTriggerProps) {
 	if (asChild && isValidElement(children)) {
@@ -41,10 +49,12 @@ function CollapsibleTrigger({ asChild, children, className, ...props }: Collapsi
 	);
 }
 
-type CollapsibleContentProps = Omit<ComponentProps<typeof CollapsiblePrimitive.Panel>, "render"> &
-	HTMLMotionProps<"div"> & {
-		transition?: Transition;
-	};
+interface CollapsibleContentProps
+	extends Omit<ComponentProps<typeof CollapsiblePrimitive.Panel>, "render" | keyof HTMLMotionProps<"div">>,
+		HTMLMotionProps<"div"> {
+	children?: ReactNode;
+	transition?: Transition;
+}
 
 function CollapsibleContent({
 	className,

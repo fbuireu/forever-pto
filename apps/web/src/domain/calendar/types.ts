@@ -14,7 +14,9 @@ export interface Suggestion {
 	metrics?: Metrics;
 }
 
-export type MeasuredSuggestion = Suggestion & { metrics: Metrics };
+export interface MeasuredSuggestion extends Suggestion {
+	metrics: Metrics;
+}
 
 export const Strategy = {
 	GROUPED: "grouped",

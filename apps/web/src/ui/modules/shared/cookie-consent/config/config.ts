@@ -11,12 +11,14 @@ type CookieDuration = Extract<CookiesKey, "minutes" | "hours" | "days" | "weeks"
 
 type CookieExpiry = { expiryKey: Extract<CookiesKey, "session"> } | { expiryKey: CookieDuration; expiryCount: number };
 
-export type CookieEntry = CookieExpiry & {
+interface CookieDetails {
 	name: string;
 	descriptionKey: CookiesKey;
 	provider: string;
 	learnMoreUrl?: string;
-};
+}
+
+export type CookieEntry = CookieExpiry & CookieDetails;
 
 export interface CookieService {
 	id: string;

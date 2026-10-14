@@ -6,7 +6,9 @@ import { getStrictContext } from "@ui/utils/context";
 import { type HTMLMotionProps, m } from "motion/react";
 import { type ComponentProps, type ReactNode, useMemo } from "react";
 
-type ProgressContextType = { value: number };
+interface ProgressContextType {
+	value: number;
+}
 const [ProgressProvider, useProgressContext] = getStrictContext<ProgressContextType>("ProgressContext");
 
 type ProgressProps = ComponentProps<typeof ProgressPrimitive.Root>;
@@ -24,10 +26,10 @@ function Progress({ value, children, ...props }: ProgressProps) {
 
 const MotionIndicator = m.create(ProgressPrimitive.Indicator);
 
-type ProgressTrackProps = ComponentProps<typeof ProgressPrimitive.Track> & {
+interface ProgressTrackProps extends ComponentProps<typeof ProgressPrimitive.Track> {
 	indicatorClassName?: string;
 	transition?: HTMLMotionProps<"div">["transition"];
-};
+}
 
 function ProgressTrack({
 	className,
@@ -57,12 +59,12 @@ function ProgressTrack({
 	);
 }
 
-type ProgressOverlayLabelProps = {
+interface ProgressOverlayLabelProps {
 	children: ReactNode;
 	className?: string;
 	overlayClassName?: string;
 	transition?: HTMLMotionProps<"div">["transition"];
-};
+}
 
 function ProgressOverlayLabel({
 	children,

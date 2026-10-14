@@ -2,25 +2,25 @@ import { act, fireEvent, render } from "@testing-library/react";
 import { type ComponentProps, StrictMode, Suspense } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-type MotionDivProps = ComponentProps<"div"> & {
+interface MotionDivProps extends ComponentProps<"div"> {
 	initial?: unknown;
 	animate?: unknown;
 	transition?: unknown;
 	style?: Record<string, unknown>;
-};
+}
 
-type MotionButtonProps = ComponentProps<"button"> & {
+interface MotionButtonProps extends ComponentProps<"button"> {
 	initial?: unknown;
 	animate?: unknown;
 	transition?: unknown;
 	variants?: unknown;
 	whileTap?: unknown;
-};
+}
 
-type MotionSpanProps = ComponentProps<"span"> & {
+interface MotionSpanProps extends ComponentProps<"span"> {
 	variants?: unknown;
 	transition?: unknown;
-};
+}
 
 vi.mock("motion/react", async () => {
 	const { createElement } = await import("react");

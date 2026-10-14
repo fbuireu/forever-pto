@@ -4,7 +4,10 @@ import { describe, expect, it } from "vitest";
 import type { IconProps } from "../animate/icons/Icon";
 import { Banner } from "./Banner";
 
-type IconStubProps = { className?: string; "aria-hidden"?: ComponentProps<"svg">["aria-hidden"] };
+interface IconStubProps {
+	className?: string;
+	"aria-hidden"?: ComponentProps<"svg">["aria-hidden"];
+}
 
 const IconStub = ({ className, "aria-hidden": ariaHidden }: IconStubProps) => (
 	<svg data-testid="banner-icon" className={className} aria-hidden={ariaHidden} />

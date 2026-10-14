@@ -51,7 +51,9 @@ function makeRequest({ pathname, accept = "", search = "", extraHeaders = {} }: 
 	} as unknown as NextRequest;
 }
 
-type HeaderInit = { request: { headers: Headers } };
+interface HeaderInit {
+	request: { headers: Headers };
+}
 
 const rewrittenRequestHeaders = (spy: ReturnType<typeof vi.spyOn>): Headers =>
 	(spy.mock.calls[0][1] as HeaderInit).request.headers;

@@ -1,7 +1,9 @@
 import { cn } from "@ui/utils/cn";
 import type { ComponentProps } from "react";
 
-type LabelProps = Omit<ComponentProps<"label">, "htmlFor"> & { htmlFor: string };
+interface LabelProps extends Omit<ComponentProps<"label">, "htmlFor"> {
+	htmlFor: string;
+}
 
 function Label({ className, htmlFor, children, ...props }: LabelProps) {
 	return (

@@ -21,8 +21,11 @@ function PopoverTrigger(props: PopoverTriggerProps) {
 	return <PopoverTriggerPrimitive {...props} />;
 }
 
-type PopoverContentProps = PopoverPositionerPrimitiveProps &
-	PopoverPopupPrimitiveProps & { positionerClassName?: string };
+interface PopoverContentProps
+	extends Omit<PopoverPositionerPrimitiveProps, "className" | "style" | "children">,
+		Pick<PopoverPopupPrimitiveProps, "className" | "style" | "children" | "initialFocus" | "finalFocus"> {
+	positionerClassName?: string;
+}
 function PopoverContent({
 	className,
 	positionerClassName,

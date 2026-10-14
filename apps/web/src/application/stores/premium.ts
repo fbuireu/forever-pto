@@ -65,7 +65,7 @@ interface PremiumActions {
 	resetPremiumStore: () => void;
 }
 
-type PremiumStore = PremiumState & PremiumActions;
+interface PremiumStore extends PremiumState, PremiumActions {}
 
 const STORAGE_NAME = "premium-store";
 const STORAGE_VERSION = 1;

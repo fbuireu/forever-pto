@@ -4,21 +4,23 @@ import { fireEvent, render } from "@testing-library/react";
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-type MotionButtonProps = ComponentProps<"button"> & {
+interface MotionButtonProps extends ComponentProps<"button"> {
 	whileTap?: unknown;
 	whileHover?: unknown;
 	initial?: unknown;
 	animate?: unknown;
 	exit?: unknown;
 	transition?: unknown;
-};
-type MotionSvgProps = ComponentProps<"svg"> & {
+}
+interface MotionSvgProps extends ComponentProps<"svg"> {
 	initial?: unknown;
 	animate?: unknown;
 	exit?: unknown;
 	transition?: unknown;
-};
-type MotionPathProps = ComponentProps<"path"> & { variants?: unknown };
+}
+interface MotionPathProps extends ComponentProps<"path"> {
+	variants?: unknown;
+}
 
 vi.mock("motion/react", async () => {
 	const { createElement, Fragment, forwardRef } = await import("react");
@@ -41,14 +43,14 @@ vi.mock("motion/react", async () => {
 
 vi.mock("@base-ui/react/checkbox", async () => {
 	const { createElement, forwardRef } = await import("react");
-	type RootProps = ComponentProps<"button"> & {
+	interface RootProps extends ComponentProps<"button"> {
 		onCheckedChange?: (checked: boolean, details: Record<string, unknown>) => void;
 		checked?: boolean;
 		defaultChecked?: boolean;
 		render?: ReactElement;
 		keepMounted?: boolean;
 		nativeButton?: boolean;
-	};
+	}
 	const Root = forwardRef<HTMLButtonElement, RootProps>(
 		(
 			{ children, onCheckedChange, checked, defaultChecked: _dc, render: _r, keepMounted: _km, nativeButton, ...props },

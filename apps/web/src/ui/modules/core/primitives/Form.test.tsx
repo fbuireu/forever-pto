@@ -3,7 +3,9 @@ import { useForm } from "react-hook-form";
 import { describe, expect, it } from "vitest";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./Form";
 
-type Values = { email: string };
+interface Values {
+	email: string;
+}
 
 interface HarnessProps {
 	description?: boolean;

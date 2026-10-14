@@ -14,28 +14,31 @@ import {
 } from "motion/react";
 import { type ComponentProps, createContext, isValidElement, type ReactNode, use, useMemo } from "react";
 
-type TooltipContextType = {
+interface TooltipContextType {
 	isOpen: boolean;
 	x: MotionValue<number>;
 	y: MotionValue<number>;
 	followCursor?: boolean | "x" | "y";
 	followCursorSpringOptions?: SpringOptions;
-};
+}
 const [LocalTooltipProvider, useTooltip] = getStrictContext<TooltipContextType>("TooltipContext");
 
 const TooltipDelayContext = createContext(0);
 
 const FOLLOW_CURSOR_SPRING: SpringOptions = { stiffness: 200, damping: 17 };
 
-type TooltipProviderProps = { delay?: number; children?: ReactNode };
+interface TooltipProviderProps {
+	delay?: number;
+	children?: ReactNode;
+}
 function TooltipProvider({ delay = 0, children }: TooltipProviderProps) {
 	return <TooltipDelayContext value={delay}>{children}</TooltipDelayContext>;
 }
 
-type TooltipProps = ComponentProps<typeof PopoverPrimitive.Root> & {
+interface TooltipProps extends ComponentProps<typeof PopoverPrimitive.Root> {
 	followCursor?: boolean | "x" | "y";
 	followCursorSpringOptions?: SpringOptions;
-};
+}
 function Tooltip({ followCursor = false, followCursorSpringOptions = FOLLOW_CURSOR_SPRING, ...props }: TooltipProps) {
 	const [isOpen, setIsOpen] = useControlledState({
 		value: props?.open,
@@ -55,7 +58,9 @@ function Tooltip({ followCursor = false, followCursorSpringOptions = FOLLOW_CURS
 	);
 }
 
-type TooltipTriggerProps = ComponentProps<typeof PopoverPrimitive.Trigger> & { asChild?: boolean };
+interface TooltipTriggerProps extends ComponentProps<typeof PopoverPrimitive.Trigger> {
+	asChild?: boolean;
+}
 function TooltipTrigger({ onMouseMove, asChild, children, openOnHover = true, delay, ...props }: TooltipTriggerProps) {
 	const providerDelay = use(TooltipDelayContext);
 	const { x, y, followCursor } = useTooltip();
@@ -105,7 +110,11 @@ function TooltipPositioner(props: TooltipPositionerProps) {
 	return <PopoverPrimitive.Positioner data-slot="tooltip-positioner" {...props} />;
 }
 
-type TooltipPopupProps = Omit<ComponentProps<typeof PopoverPrimitive.Popup>, "render"> & HTMLMotionProps<"div">;
+interface TooltipPopupProps
+	extends Omit<ComponentProps<typeof PopoverPrimitive.Popup>, "render" | keyof HTMLMotionProps<"div">>,
+		HTMLMotionProps<"div"> {
+	children?: ReactNode;
+}
 function TooltipPopup({
 	transition = { type: "spring", stiffness: 300, damping: 25 },
 	style,

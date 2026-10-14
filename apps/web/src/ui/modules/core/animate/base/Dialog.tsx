@@ -41,7 +41,10 @@ function DialogBackdrop({ className, ...props }: DialogBackdropProps) {
 	);
 }
 
-type DialogPopupProps = DialogPopupPrimitiveProps & { showCloseButton?: boolean; closeLabel?: string };
+interface DialogPopupProps extends DialogPopupPrimitiveProps {
+	showCloseButton?: boolean;
+	closeLabel?: string;
+}
 function DialogPopup({
 	className,
 	children,

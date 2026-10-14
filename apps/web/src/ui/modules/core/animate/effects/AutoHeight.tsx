@@ -5,12 +5,12 @@ import { type HTMLMotionProps, m, type TargetAndTransition } from "motion/react"
 import type { DependencyList, ReactNode } from "react";
 import { MotionSlot, type WithAsChild } from "../primitives/animate/MotionSlot";
 
-type AutoHeightProps = WithAsChild<
-	{
-		children: ReactNode;
-		deps?: DependencyList;
-	} & Omit<HTMLMotionProps<"div">, "children">
->;
+interface AutoHeightBaseProps extends Omit<HTMLMotionProps<"div">, "children"> {
+	children: ReactNode;
+	deps?: DependencyList;
+}
+
+type AutoHeightProps = WithAsChild<AutoHeightBaseProps>;
 
 function isTargetAnimation(animate: HTMLMotionProps<"div">["animate"]): animate is TargetAndTransition {
 	return typeof animate === "object" && animate !== null && !Array.isArray(animate) && !("start" in animate);

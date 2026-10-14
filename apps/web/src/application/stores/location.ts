@@ -15,7 +15,7 @@ interface LocationActions {
 	fetchRegions: (countryCode: string) => Promise<void>;
 }
 
-type LocationStore = LocationState & LocationActions;
+interface LocationStore extends LocationState, LocationActions {}
 
 type PersistedLocationState = Partial<LocationState>;
 

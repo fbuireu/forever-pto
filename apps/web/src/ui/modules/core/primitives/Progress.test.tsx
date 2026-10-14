@@ -2,7 +2,11 @@ import { render, screen } from "@testing-library/react";
 import type { ComponentType, ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-type MotionProps = Record<string, unknown> & { initial?: unknown; animate?: unknown; transition?: unknown };
+interface MotionProps extends Record<string, unknown> {
+	initial?: unknown;
+	animate?: unknown;
+	transition?: unknown;
+}
 
 vi.mock("motion/react", async () => {
 	const { createElement } = await import("react");

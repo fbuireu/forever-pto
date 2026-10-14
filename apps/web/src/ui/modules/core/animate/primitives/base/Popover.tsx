@@ -4,9 +4,12 @@ import { Popover as PopoverPrimitive } from "@base-ui/react/popover";
 import { useControlledState } from "@ui/hooks/useControlledState";
 import { getStrictContext } from "@ui/utils/context";
 import { AnimatePresence, type HTMLMotionProps, m } from "motion/react";
-import { type ComponentProps, isValidElement, useMemo } from "react";
+import { type ComponentProps, isValidElement, type ReactNode, useMemo } from "react";
 
-type PopoverContextType = { isOpen: boolean; setIsOpen: PopoverProps["onOpenChange"] };
+interface PopoverContextType {
+	isOpen: boolean;
+	setIsOpen: PopoverProps["onOpenChange"];
+}
 const [PopoverProvider, usePopover] = getStrictContext<PopoverContextType>("PopoverContext");
 
 type PopoverProps = ComponentProps<typeof PopoverPrimitive.Root>;
@@ -24,7 +27,9 @@ function Popover(props: PopoverProps) {
 	);
 }
 
-type PopoverTriggerProps = ComponentProps<typeof PopoverPrimitive.Trigger> & { asChild?: boolean };
+interface PopoverTriggerProps extends ComponentProps<typeof PopoverPrimitive.Trigger> {
+	asChild?: boolean;
+}
 function PopoverTrigger({ asChild, children, ...props }: PopoverTriggerProps) {
 	if (asChild && isValidElement(children)) {
 		return <PopoverPrimitive.Trigger data-slot="popover-trigger" render={children} {...props} />;
@@ -51,7 +56,11 @@ function PopoverPositioner(props: PopoverPositionerProps) {
 	return <PopoverPrimitive.Positioner data-slot="popover-positioner" {...props} />;
 }
 
-type PopoverPopupProps = Omit<ComponentProps<typeof PopoverPrimitive.Popup>, "render"> & HTMLMotionProps<"div">;
+interface PopoverPopupProps
+	extends Omit<ComponentProps<typeof PopoverPrimitive.Popup>, "render" | keyof HTMLMotionProps<"div">>,
+		HTMLMotionProps<"div"> {
+	children?: ReactNode;
+}
 function PopoverPopup({
 	initialFocus,
 	finalFocus,

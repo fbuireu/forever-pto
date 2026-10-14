@@ -47,13 +47,13 @@ const runFlip = ({ code, amount }: RunFlipParams) =>
 		),
 	);
 
-type PromoCodeOverrides = Partial<{
-	active: boolean;
-	expires_at: number | null;
-	max_redemptions: number | null;
-	times_redeemed: number;
-	restrictions: { minimum_amount: number | null; minimum_amount_currency: string | null };
-}>;
+interface PromoCodeOverrides {
+	active?: boolean;
+	expires_at?: number | null;
+	max_redemptions?: number | null;
+	times_redeemed?: number;
+	restrictions?: { minimum_amount: number | null; minimum_amount_currency: string | null };
+}
 
 const makePromoCode = (overrides: PromoCodeOverrides = {}) => ({
 	id: "promo_abc",

@@ -31,7 +31,7 @@ const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 const HIGHLIGHT_TRANSITION: Transition = { type: "spring", stiffness: 350, damping: 35 };
 
-type SidebarContextProps = {
+interface SidebarContextProps {
 	state: "expanded" | "collapsed";
 	open: boolean;
 	setOpen: (open: boolean) => void;
@@ -39,7 +39,7 @@ type SidebarContextProps = {
 	setOpenMobile: (open: boolean) => void;
 	isMobile: boolean;
 	toggleSidebar: () => void;
-};
+}
 
 const SidebarContext = createContext<SidebarContextProps | null>(null);
 
@@ -52,11 +52,11 @@ function useSidebar() {
 	return context;
 }
 
-type SidebarProviderProps = ComponentProps<"div"> & {
+interface SidebarProviderProps extends ComponentProps<"div"> {
 	defaultOpen?: boolean;
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
-};
+}
 
 function SidebarProvider({
 	defaultOpen = true,
@@ -156,7 +156,7 @@ function SidebarProvider({
 	);
 }
 
-type SidebarProps = ComponentProps<"div"> & {
+interface SidebarProps extends ComponentProps<"div"> {
 	side?: "left" | "right";
 	variant?: "sidebar" | "floating" | "inset";
 	collapsible?: "offcanvas" | "icon" | "none";
@@ -164,7 +164,7 @@ type SidebarProps = ComponentProps<"div"> & {
 	animateOnHover?: boolean;
 	transition?: Transition;
 	landmarkLabel?: string;
-};
+}
 
 function Sidebar({
 	side = "left",
@@ -330,7 +330,9 @@ function Sidebar({
 	);
 }
 
-type SidebarTriggerProps = ComponentProps<typeof Button> & { label?: string };
+interface SidebarTriggerProps extends ComponentProps<typeof Button> {
+	label?: string;
+}
 
 function SidebarTrigger({ className, onClick, label = "Toggle Sidebar", ...props }: SidebarTriggerProps) {
 	const { toggleSidebar } = useSidebar();
@@ -428,9 +430,9 @@ function SidebarGroup({ className, ...props }: SidebarGroupProps) {
 	);
 }
 
-type SidebarGroupLabelProps = ComponentProps<"div"> & {
+interface SidebarGroupLabelProps extends ComponentProps<"div"> {
 	asChild?: boolean;
-};
+}
 
 function SidebarGroupLabel({ className, asChild = false, ...props }: SidebarGroupLabelProps) {
 	const Comp = asChild ? Slot : "div";
@@ -511,11 +513,11 @@ const sidebarMenuButtonActiveVariants = cva("", {
 	},
 });
 
-type SidebarMenuButtonProps = ComponentProps<"button"> & {
+interface SidebarMenuButtonProps extends ComponentProps<"button">, VariantProps<typeof sidebarMenuButtonVariants> {
 	asChild?: boolean;
 	isActive?: boolean;
 	tooltip?: string | ComponentProps<typeof TooltipContent>;
-} & VariantProps<typeof sidebarMenuButtonVariants>;
+}
 
 function SidebarMenuButton({
 	asChild = false,

@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import type { ComponentProps, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-type MotionDivProps = ComponentProps<"div"> & {
+interface MotionDivProps extends ComponentProps<"div"> {
 	initial?: unknown;
 	animate?: unknown;
 	exit?: unknown;
@@ -10,11 +10,11 @@ type MotionDivProps = ComponentProps<"div"> & {
 	transition?: unknown;
 	variants?: unknown;
 	custom?: unknown;
-};
+}
 
-type MotionButtonProps = ComponentProps<"button"> & {
+interface MotionButtonProps extends ComponentProps<"button"> {
 	whileTap?: unknown;
-};
+}
 
 vi.mock("motion/react", async () => {
 	const { createElement, Fragment } = await import("react");

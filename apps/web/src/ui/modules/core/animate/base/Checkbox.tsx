@@ -7,9 +7,11 @@ import { type ComponentProps, useCallback, useEffect, useState } from "react";
 
 type CheckboxAccessibleName = { id: string } | { "aria-label": string } | { "aria-labelledby": string };
 
-type CheckboxProps = Omit<ComponentProps<typeof CheckboxPrimitive.Root>, "render" | "nativeButton"> & {
+interface CheckboxBaseProps extends Omit<ComponentProps<typeof CheckboxPrimitive.Root>, "render" | "nativeButton"> {
 	motionProps?: HTMLMotionProps<"button">;
-} & CheckboxAccessibleName;
+}
+
+type CheckboxProps = CheckboxBaseProps & CheckboxAccessibleName;
 
 function Checkbox({ className, onCheckedChange, motionProps, ...props }: CheckboxProps) {
 	const [isChecked, setIsChecked] = useState(props?.checked ?? props?.defaultChecked ?? false);

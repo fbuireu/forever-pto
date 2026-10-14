@@ -15,10 +15,10 @@ import {
 	useState,
 } from "react";
 
-type AccordionItemContextType = {
+interface AccordionItemContextType {
 	isOpen: boolean;
 	setIsOpen: (open: boolean) => void;
-};
+}
 
 const AccordionItemContext = createContext<AccordionItemContextType | undefined>(undefined);
 
@@ -36,9 +36,9 @@ function Accordion(props: Readonly<AccordionProps>) {
 	return <AccordionPrimitive.Root data-slot="accordion" {...props} />;
 }
 
-type AccordionItemProps = ComponentProps<typeof AccordionPrimitive.Item> & {
+interface AccordionItemProps extends ComponentProps<typeof AccordionPrimitive.Item> {
 	children: ReactNode;
-};
+}
 
 function AccordionItem({ className, children, ...props }: AccordionItemProps) {
 	const [isOpen, setIsOpen] = useState(false);
@@ -58,10 +58,10 @@ function AccordionItem({ className, children, ...props }: AccordionItemProps) {
 	);
 }
 
-type AccordionTriggerProps = ComponentProps<typeof AccordionPrimitive.Trigger> & {
+interface AccordionTriggerProps extends ComponentProps<typeof AccordionPrimitive.Trigger> {
 	transition?: Transition;
 	chevron?: boolean;
-};
+}
 
 function AccordionTrigger({
 	ref,
@@ -128,10 +128,10 @@ function AccordionTrigger({
 	);
 }
 
-type AccordionPanelProps = ComponentProps<typeof AccordionPrimitive.Panel> & {
+interface AccordionPanelProps extends ComponentProps<typeof AccordionPrimitive.Panel> {
 	motionProps?: HTMLMotionProps<"div">;
 	transition?: Transition;
-};
+}
 
 function AccordionPanel({
 	className,

@@ -19,8 +19,9 @@ No rule below restates these, and a diff that breaks one fails CI:
 
 - Biome ([`biome.json`](./biome.json)) over both packages: formatting, import order, the recommended rules,
   `noConsole` everywhere but [`logger.ts`](./apps/web/src/infrastructure/logging/logger.ts), no barrel or `export *`
-  module, and no default export outside the Next file conventions, the `next-intl` request config, the Playwright
-  global setup and the tools' config files.
+  module, no default export outside the Next file conventions, the `next-intl` request config, the Playwright
+  global setup and the tools' config files, and every object shape declared an `interface`, never a `type` alias of an
+  object literal (`useConsistentTypeDefinitions`).
 - Strict `tsc` over the root program and `apps/web` ([`apps/web/tsconfig.json`](./apps/web/tsconfig.json)), and
   `astro check` over `apps/docs`, which types every demo against the app's real props.
 - commitlint ([`commitlint.config.ts`](./commitlint.config.ts)): the commit format, on the commit and on the pull
@@ -146,6 +147,11 @@ No rule below restates these, and a diff that breaks one fails CI:
     `Known breaches` heading in any of them (`G9`);
   - this file: every rule between this list and the smell overrides opening with its id and its **hard** or
     **judgement** label, no id carried by two rules, and every id in a section drawn from one letter;
+  - no object literal in a type alias but as a member of its union or beside the primitive it brands, nor one wrapped in
+    `Readonly`, `Partial` or `Required`, so a shape built on others is an `interface` that `extends` them: `extends`
+    reports a field the shapes disagree on where it is declared, where `&` folds it into `never` in silence, and the
+    compiler caches an interface's relations by name and names it in an error, where it recomputes an intersection and
+    spells it out;
   - the `security.txt` files: one on every site the repository serves, counted under every `public` or `assets`
     folder, with `Contact`, `Expires`, `Preferred-Languages`, `Canonical` and `Policy` in that order, each `Canonical`
     the site's origin (`NEXT_PUBLIC_SITE_URL` under `[env.production.vars]`, the docs site's `site`) plus
@@ -243,6 +249,15 @@ No rule below restates these, and a diff that breaks one fails CI:
   `ValidationError`. A lookup that must keep zod out of its bundle narrows through a `typeof` picker instead
   (`stringField`), `parseJsonBody`'s type argument only names what the use case's `zodParse` checks, and `M7`'s cast is
   for a shape this app wrote itself.
+- `M17` **hard**: Compose object shapes declared elsewhere as `interface X extends A, B`, never `type X = A & B`, which
+  no check tells from an intersection with a union, because that takes the types. Keep `&` for a member an interface
+  cannot extend (a union, a type parameter, a conditional type), and `type` for what an interface cannot say: a union, a
+  mapped or conditional type, an alias of a primitive, a tuple or a function, and a computed type on its own (`z.infer`,
+  `Pick`, `M15`'s `(typeof X)[keyof typeof X]`).
+- `M18` **hard**: Give an interface a name no other interface in its scope carries, because two declarations of one name
+  merge in silence; merging is for an augmentation of a global or a vendor's module made on purpose, in a declaration
+  file or a `declare global` or `declare module` block (next-intl's `AppConfig` and `Window` in
+  `apps/web/environment.d.ts`, the consent globals in the docs site's `consent.ts`).
 
 ## Functions and modules
 
@@ -770,6 +785,9 @@ No rule below restates these, and a diff that breaks one fails CI:
 - **Duplicated Code**: the id rule (the `describe` that gives every rule of this file an id a finding can cite) in
   `tests/docs-consistency.test.ts` is the same in biancafiore, contribKit, forever-pto and github-star-tracker, so a
   change to it is made in all four; only the floor its census holds and the call that reads this file differ.
+- **Duplicated Code**: the shape rule (the `describe` that keeps every object shape an interface) in
+  `tests/docs-consistency.test.ts` is the same in biancafiore, contribKit, forever-pto and github-star-tracker, so a
+  change to it is made in all four; only the floor its census holds and the files it reads differ.
 - **Duplicated Code**: the four smoke cases are word for word the same in every repository that deploys, and in
   both packages here, so a difference between them is drift, not a variant.
 - **Duplicated Code**: `contactSenderKey` and `normalizeEmail` stay two normalisers: one keys the contact guard, the

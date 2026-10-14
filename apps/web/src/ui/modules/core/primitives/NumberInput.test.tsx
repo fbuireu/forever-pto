@@ -9,10 +9,10 @@ import { NumberInput, type NumberInputProps } from "./NumberInput";
 
 const ROLE_DESCRIPTION = "Number field";
 
-type ControlledProps = Partial<Omit<NumberInputProps, "value" | "onValueChange">> & {
+interface ControlledProps extends Partial<Omit<NumberInputProps, "value" | "onValueChange">> {
 	initial?: number | null;
 	onValueChange?: (value: number | null) => void;
-};
+}
 
 const Controlled = ({ initial = null, onValueChange, ...props }: ControlledProps) => {
 	const [value, setValue] = useState<number | null>(initial);

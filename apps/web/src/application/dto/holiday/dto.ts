@@ -6,11 +6,11 @@ import { compareAsc, isoDateTime } from "@application/shared/utils/dates";
 import { isInPlanningWindow, MAX_CARRY_OVER_MONTHS, planningWindowInterval } from "@domain/calendar/window";
 import { type HolidayDTO, HolidayVariant, type RawHoliday } from "./types";
 
-type HolidayDTOParams = {
+interface HolidayDTOParams {
 	year: number;
 	carryOverMonths: number;
 	regions: RegionDTO[];
-};
+}
 
 export interface CreateCustomHolidayParams {
 	name: string;
@@ -19,9 +19,9 @@ export interface CreateCustomHolidayParams {
 	carryOverMonths: number;
 }
 
-type HolidayDTOShape = BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> & {
+interface HolidayDTOShape extends BaseDTO<RawHoliday[], HolidayDTO[], HolidayDTOParams> {
 	createCustom: (params: CreateCustomHolidayParams) => HolidayDTO;
-};
+}
 
 export const holidayDTO: HolidayDTOShape = {
 	create: ({ raw, params }) => {

@@ -2,7 +2,10 @@ import { render } from "@testing-library/react";
 import type { ComponentProps, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-type MockProps = { children?: ReactNode; className?: string };
+interface MockProps {
+	children?: ReactNode;
+	className?: string;
+}
 
 vi.mock("../primitives/base/Dialog", () => ({
 	Dialog: ({ children, ...props }: ComponentProps<"div">) => (

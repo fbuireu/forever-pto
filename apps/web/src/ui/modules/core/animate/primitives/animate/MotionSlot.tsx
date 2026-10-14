@@ -14,17 +14,18 @@ import {
 
 type AnyProps = Record<string, unknown>;
 
-type DOMMotionProps<T extends HTMLElement = HTMLElement> = Omit<HTMLMotionProps<keyof HTMLElementTagNameMap>, "ref"> & {
+interface DOMMotionProps<T extends HTMLElement = HTMLElement>
+	extends Omit<HTMLMotionProps<keyof HTMLElementTagNameMap>, "ref"> {
 	ref?: Ref<T>;
-};
+}
 
 type WithAsChild<Base extends object> =
 	| (Base & { asChild: true; children: ReactElement })
 	| (Base & { asChild?: false });
 
-type MotionSlotProps<T extends HTMLElement = HTMLElement> = {
+interface MotionSlotProps<T extends HTMLElement = HTMLElement> extends DOMMotionProps<T> {
 	children: ReactElement;
-} & DOMMotionProps<T>;
+}
 
 function mergeRefs<T>(...refs: (Ref<T> | undefined)[]): RefCallback<T> {
 	return (node) => {

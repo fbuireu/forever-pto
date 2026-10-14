@@ -28,7 +28,7 @@ interface FilterActions {
 	resetToDefaults: () => void;
 }
 
-type FiltersStore = FiltersState & FilterActions;
+interface FiltersStore extends FiltersState, FilterActions {}
 
 const STORAGE_NAME = "filters-store";
 const STORAGE_VERSION = 2;

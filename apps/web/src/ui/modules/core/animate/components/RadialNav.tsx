@@ -5,29 +5,29 @@ import { type LucideIcon, MousePointer2 } from "lucide-react";
 import { m, type SVGMotionProps, type Transition, type Variants } from "motion/react";
 import { type ComponentType, useCallback, useState } from "react";
 
-type RadialNavProps = {
+interface RadialNavProps {
 	size?: number;
 	items: RadialNavItem[];
 	menuButtonConfig?: MenuButtonConfig;
 	defaultActiveId?: number;
 	onActiveChange?: (id: number) => void;
 	"aria-label"?: string;
-};
+}
 
-type RadialNavItem = {
+interface RadialNavItem {
 	id: number;
 	icon: LucideIcon | ComponentType<SVGMotionProps<SVGSVGElement>>;
 	label: string;
 	angle: number;
 	badgeClass?: string;
 	className?: string;
-};
+}
 
-type MenuButtonConfig = {
+interface MenuButtonConfig {
 	iconSize?: number;
 	buttonSize?: number;
 	buttonPadding?: number;
-};
+}
 
 const defaultMenuButtonConfig: Required<MenuButtonConfig> = {
 	iconSize: 20,
@@ -132,12 +132,12 @@ function useShortestRotation(target: number) {
 	return rotation.angle;
 }
 
-type MenuButtonProps = Readonly<{
-	item: RadialNavItem;
-	isActive?: boolean;
-	onActivate?: () => void;
-	menuButtonConfig: Required<MenuButtonConfig>;
-}>;
+interface MenuButtonProps {
+	readonly item: RadialNavItem;
+	readonly isActive?: boolean;
+	readonly onActivate?: () => void;
+	readonly menuButtonConfig: Required<MenuButtonConfig>;
+}
 
 function MenuButton({ item, isActive, onActivate, menuButtonConfig }: MenuButtonProps) {
 	const { icon: Icon, label, badgeClass } = item;

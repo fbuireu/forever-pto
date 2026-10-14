@@ -3,12 +3,12 @@
 import { m, useMotionValue, useSpring, useTransform } from "motion/react";
 import type { MouseEvent } from "react";
 
-type CtaShapesClientProps = {
+interface CtaShapesClientProps {
 	byeMonday: string;
 	bossOff: string;
 	doNotDisturb: string;
 	zeroRegrets: string;
-};
+}
 
 const SHAPE_SPAN = "font-display font-black text-[var(--color-brand-ink)] leading-tight text-center px-1";
 const SHAPE_BASE =

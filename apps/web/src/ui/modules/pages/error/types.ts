@@ -1,4 +1,4 @@
-export type ErrorBoundaryProps = Readonly<{
-	error: Error & { digest?: string };
-	reset: () => void;
-}>;
+export interface ErrorBoundaryProps {
+	readonly error: Error & { digest?: string };
+	readonly reset: () => void;
+}

@@ -11,11 +11,11 @@ import {
 	type TargetAndTransition,
 	type VariantLabels,
 } from "motion/react";
-import { type ComponentProps, useMemo, useState } from "react";
+import { type ComponentProps, type ReactNode, useMemo, useState } from "react";
 
-type SwitchContextType = {
+interface SwitchContextType {
 	isPressed: boolean;
-};
+}
 
 const [SwitchProvider, useSwitch] = getStrictContext<SwitchContextType>("SwitchContext");
 
@@ -97,10 +97,12 @@ function Switch({
 	);
 }
 
-type SwitchThumbProps = Omit<ComponentProps<typeof SwitchPrimitives.Thumb>, "render"> &
-	HTMLMotionProps<"div"> & {
-		pressedAnimation?: TargetAndTransition | VariantLabels | boolean | LegacyAnimationControls;
-	};
+interface SwitchThumbProps
+	extends Omit<ComponentProps<typeof SwitchPrimitives.Thumb>, "render" | keyof HTMLMotionProps<"div">>,
+		HTMLMotionProps<"div"> {
+	children?: ReactNode;
+	pressedAnimation?: TargetAndTransition | VariantLabels | boolean | LegacyAnimationControls;
+}
 
 function SwitchThumb({
 	pressedAnimation,

@@ -11,15 +11,15 @@ import {
 } from "@ui/modules/core/animate/components/Tabs";
 import { type ReactNode, useState } from "react";
 
-type TabSection = {
+interface TabSection {
 	id: string;
 	title: string;
 	content: ReactNode;
-};
+}
 
-type FaqTabsProps = {
+interface FaqTabsProps {
 	tabs: TabSection[];
-};
+}
 
 export const FaqTabs = ({ tabs }: FaqTabsProps) => {
 	const [active, setActive] = useState(tabs[0]?.id ?? "");

@@ -2,13 +2,13 @@ import { fireEvent, render } from "@testing-library/react";
 import type { ComponentProps, ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-type MotionDivProps = ComponentProps<"div"> & {
+interface MotionDivProps extends ComponentProps<"div"> {
 	layoutId?: string;
 	animate?: unknown;
 	transition?: unknown;
 	initial?: unknown;
 	exit?: unknown;
-};
+}
 
 vi.mock("motion/react", async () => {
 	const { createElement, Fragment } = await import("react");

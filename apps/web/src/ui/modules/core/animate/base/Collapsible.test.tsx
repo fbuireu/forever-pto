@@ -2,13 +2,13 @@ import { fireEvent, render } from "@testing-library/react";
 import type { ComponentProps, ComponentPropsWithoutRef, ReactElement, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-type MotionDivProps = ComponentProps<"div"> & {
+interface MotionDivProps extends ComponentProps<"div"> {
 	initial?: unknown;
 	animate?: unknown;
 	exit?: unknown;
 	transition?: unknown;
 	layout?: unknown;
-};
+}
 
 vi.mock("motion/react", async () => {
 	const { createElement, Fragment } = await import("react");
@@ -31,16 +31,18 @@ vi.mock("motion/react", async () => {
 
 vi.mock("@base-ui/react/collapsible", async () => {
 	const { createElement, cloneElement, isValidElement } = await import("react");
-	type RootProps = ComponentProps<"div"> & {
+	interface RootProps extends ComponentProps<"div"> {
 		onOpenChange?: (open: boolean) => void;
 		open?: boolean;
 		defaultOpen?: boolean;
-	};
-	type TriggerProps = ComponentProps<"button"> & { render?: ReactElement };
-	type PanelProps = ComponentProps<"div"> & {
+	}
+	interface TriggerProps extends ComponentProps<"button"> {
+		render?: ReactElement;
+	}
+	interface PanelProps extends ComponentProps<"div"> {
 		render?: (props: ComponentPropsWithoutRef<"div"> & { hidden?: boolean }, state: { open: boolean }) => ReactNode;
 		keepMounted?: boolean;
-	};
+	}
 	return {
 		Collapsible: {
 			Root: ({ children, onOpenChange, open, defaultOpen, ...props }: RootProps) =>

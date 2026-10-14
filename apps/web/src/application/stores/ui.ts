@@ -37,7 +37,7 @@ interface UIActions {
 	setQuickStartOpen: (isOpen: boolean) => void;
 }
 
-type UIStore = UIState & UIActions;
+interface UIStore extends UIState, UIActions {}
 
 const uiInitialState: UIState = {
 	donatePopoverOpen: false,

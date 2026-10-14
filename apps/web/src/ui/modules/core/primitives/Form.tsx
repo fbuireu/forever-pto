@@ -16,20 +16,20 @@ import { Label } from "./Label";
 
 const Form = FormProvider;
 
-type FormFieldContextValue<
+interface FormFieldContextValue<
 	TFieldValues extends FieldValues = FieldValues,
 	TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> = {
+> {
 	name: TName;
-};
+}
 
 const FormFieldContext = createContext<FormFieldContextValue>({} as FormFieldContextValue);
 
-type FormItemContextValue = {
+interface FormItemContextValue {
 	id: string;
 	hasDescription: boolean;
 	registerDescription: (present: boolean) => void;
-};
+}
 
 const FormItemContext = createContext<FormItemContextValue>({} as FormItemContextValue);
 

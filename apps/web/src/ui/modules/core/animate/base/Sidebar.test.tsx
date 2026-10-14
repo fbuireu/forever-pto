@@ -10,7 +10,7 @@ const viewport = vi.hoisted(() => ({ isMobile: false }));
 vi.mock("@ui/hooks/useMobile", () => ({ useIsMobile: () => viewport.isMobile }));
 vi.mock("@ui/utils/cookie", () => ({ setCookie: vi.fn<typeof setCookie>().mockResolvedValue(undefined) }));
 
-type MotionDivProps = ComponentProps<"div"> & {
+interface MotionDivProps extends ComponentProps<"div"> {
 	initial?: unknown;
 	animate?: unknown;
 	exit?: unknown;
@@ -18,7 +18,7 @@ type MotionDivProps = ComponentProps<"div"> & {
 	layout?: unknown;
 	whileTap?: unknown;
 	whileHover?: unknown;
-};
+}
 
 vi.mock("motion/react", async () => {
 	const { createElement, Fragment } = await import("react");
