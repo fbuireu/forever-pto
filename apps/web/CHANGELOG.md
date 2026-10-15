@@ -1,3 +1,12 @@
+# [forever-pto-web-v1.15.6](https://github.com/fbuireu/forever-pto/compare/web-v1.15.5...web-v1.15.6) (2026-10-15)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @tursodatabase/serverless to v1.4.1 ([#426](https://github.com/fbuireu/forever-pto/issues/426)) ([eda86c3](https://github.com/fbuireu/forever-pto/commit/eda86c35ffa8c80117341d830a4f8d14966bd54f))
+* **deps:** update dependency next-intl to v4.14.9 ([#427](https://github.com/fbuireu/forever-pto/issues/427)) ([f030b80](https://github.com/fbuireu/forever-pto/commit/f030b80a6eb5185c75a2c381cc0a6013cccc75c4))
+* **deps:** update dependency react-email to v6.11.1 ([#428](https://github.com/fbuireu/forever-pto/issues/428)) ([b3de51e](https://github.com/fbuireu/forever-pto/commit/b3de51e6f0939ed32893ad477086dff639672fad))
+
 # [forever-pto-web-v1.15.5](https://github.com/fbuireu/forever-pto/compare/web-v1.15.4...web-v1.15.5) (2026-10-15)
 
 
