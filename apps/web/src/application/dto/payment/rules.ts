@@ -6,7 +6,8 @@ const NOT_CHARGED_STATUSES: ReadonlySet<ReportedPaymentStatus> = new Set<Payment
 	"canceled",
 ]);
 
-export const hasSucceeded = (confirmation: PaymentConfirmationDTO) => confirmation.status === PAYMENT_SUCCEEDED;
+export const hasSucceeded = (confirmation: PaymentConfirmationDTO): boolean =>
+	confirmation.status === PAYMENT_SUCCEEDED;
 
-export const wasCharged = (confirmation: PaymentConfirmationDTO | null) =>
+export const wasCharged = (confirmation: PaymentConfirmationDTO | null): boolean =>
 	!confirmation || !NOT_CHARGED_STATUSES.has(confirmation.status);

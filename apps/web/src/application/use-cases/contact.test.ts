@@ -1,6 +1,9 @@
+import type { SQLOutputValue, StatementResultingChanges } from "node:sqlite";
 import type { ContactFormData } from "@application/dto/contact/schema";
+import type { TursoService } from "@infrastructure/clients/db/turso/service";
 import { ResendService } from "@infrastructure/clients/email/resend/service";
 import { DatabaseError, DuplicateContactError, EmailError, ValidationError } from "@infrastructure/errors";
+import type { LogParams } from "@infrastructure/logging/logger";
 import { LoggerService } from "@infrastructure/logging/service";
 import { createContactsFixture } from "@infrastructure/services/contact/fixture";
 import { type Context, Effect, Either, Layer } from "effect";
@@ -24,7 +27,7 @@ const mockSend = vi.fn<Context.Tag.Service<typeof ResendService>["send"]>();
 
 let contacts = createContactsFixture();
 
-const services = () =>
+const services = (): Layer.Layer<LoggerService | ResendService | TursoService> =>
 	Layer.mergeAll(
 		Layer.succeed(LoggerService, mockLogger),
 		Layer.succeed(ResendService, { send: mockSend }),
@@ -33,8 +36,9 @@ const services = () =>
 
 type ContactR = Layer.Layer.Success<ReturnType<typeof services>>;
 
-const run = <A, E>(eff: Effect.Effect<A, E, ContactR>) => Effect.runPromise(eff.pipe(Effect.provide(services())));
-const runFail = <A, E>(eff: Effect.Effect<A, E, ContactR>) =>
+const run = <A, E>(eff: Effect.Effect<A, E, ContactR>): Promise<A> =>
+	Effect.runPromise(eff.pipe(Effect.provide(services())));
+const runFail = <A, E>(eff: Effect.Effect<A, E, ContactR>): Promise<E> =>
 	Effect.runPromise(Effect.flip(eff).pipe(Effect.provide(services())));
 
 const VALID_DATA: ContactFormData = {
@@ -45,9 +49,13 @@ const VALID_DATA: ContactFormData = {
 };
 const CONFIG = { siteUrl: "https://example.com", contactEmail: "contact@example.com" };
 
-const submit = (data: ContactFormData = VALID_DATA) => sendContactEmail({ data, config: CONFIG });
+type Submission = ReturnType<typeof sendContactEmail>;
 
-const submitTogether = (submissions: ContactFormData[]) =>
+const submit = (data: ContactFormData = VALID_DATA): Submission => sendContactEmail({ data, config: CONFIG });
+
+const submitTogether = (
+	submissions: ContactFormData[],
+): Promise<Either.Either<Effect.Effect.Success<Submission>, Effect.Effect.Error<Submission>>[]> =>
 	run(
 		Effect.all(
 			submissions.map((data) => Effect.either(submit(data))),
@@ -55,11 +63,12 @@ const submitTogether = (submissions: ContactFormData[]) =>
 		),
 	);
 
-const completeAfterResponse = async (outcomes: Awaited<ReturnType<typeof submitTogether>>) => {
+const completeAfterResponse = async (outcomes: Awaited<ReturnType<typeof submitTogether>>): Promise<void> => {
 	for (const outcome of outcomes) if (Either.isRight(outcome)) await run(outcome.right.deferred);
 };
 
-const storedRows = () => contacts.database.prepare("SELECT email, message, message_id FROM contacts").all();
+const storedRows = (): Record<string, SQLOutputValue>[] =>
+	contacts.database.prepare("SELECT email, message, message_id FROM contacts").all();
 
 interface SeedParams {
 	email: string;
@@ -67,7 +76,7 @@ interface SeedParams {
 	age: string;
 }
 
-const seed = ({ email, message, age }: SeedParams) =>
+const seed = ({ email, message, age }: SeedParams): StatementResultingChanges =>
 	contacts.database
 		.prepare(
 			`INSERT INTO contacts (id, email, name, subject, message, message_id, origin, created_date, updated_at)
@@ -75,7 +84,7 @@ const seed = ({ email, message, age }: SeedParams) =>
 		)
 		.run(crypto.randomUUID(), email, message, age, age);
 
-const refusalLog = (reason: "cooldown" | "repeated") => [
+const refusalLog = (reason: "cooldown" | "repeated"): LogParams[] => [
 	{ message: "Contact refused before sending", context: { reason, emailDomain: "example.com" } },
 ];
 

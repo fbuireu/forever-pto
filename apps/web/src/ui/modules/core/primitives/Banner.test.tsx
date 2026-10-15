@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import type { ComponentProps, ComponentType } from "react";
 import { describe, expect, it } from "vitest";
 import type { IconProps } from "../animate/icons/Icon";
@@ -15,7 +15,7 @@ const IconStub = ({ className, "aria-hidden": ariaHidden }: IconStubProps) => (
 
 const Icon = IconStub as ComponentType<IconProps<never>>;
 
-const renderBanner = (overrides: Partial<ComponentProps<typeof Banner>> = {}) =>
+const renderBanner = (overrides: Partial<ComponentProps<typeof Banner>> = {}): RenderResult =>
 	render(
 		<Banner icon={Icon} title="Heads up" colorScheme="orange" {...overrides}>
 			Your plan is out of date

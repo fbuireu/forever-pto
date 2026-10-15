@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { resolveSelectedDays } from "./selection";
 
-const d = (isoDate: string) => new Date(`${isoDate}T00:00:00`);
-const iso = (dates: Date[]) =>
+const d = (isoDate: string): Date => new Date(`${isoDate}T00:00:00`);
+const iso = (dates: Date[]): string[] =>
 	dates.map(
 		(date) =>
 			`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`,

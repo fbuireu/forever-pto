@@ -6,7 +6,7 @@ import enMessages from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import { createTranslator, type Locale } from "next-intl";
 import type { ComponentProps } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -36,12 +36,15 @@ interface RenderNotFoundParams {
 	messages?: typeof enMessages;
 }
 
-const renderNotFound = async ({ locale = "en", messages = enMessages }: RenderNotFoundParams = {}) => {
+const renderNotFound = async ({
+	locale = "en",
+	messages = enMessages,
+}: RenderNotFoundParams = {}): Promise<RenderResult> => {
 	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "notFound" }));
 	return render(await NotFoundContent({ locale }));
 };
 
-const hrefOf = (label: string) =>
+const hrefOf = (label: string): string | null | undefined =>
 	screen
 		.getAllByRole("link")
 		.find((link) => link.textContent?.includes(label))

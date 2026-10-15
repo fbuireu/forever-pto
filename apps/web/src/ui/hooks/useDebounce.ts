@@ -8,7 +8,11 @@ interface UseDebounceParams<T> {
 	callback?: (value: T) => void;
 }
 
-export const useDebounce = <T>({ value, delay, callback }: UseDebounceParams<T>) => {
+export const useDebounce = <T>({
+	value,
+	delay,
+	callback,
+}: UseDebounceParams<T>): readonly [T, (newValue: T) => void] => {
 	const [localValue, setLocalValue] = useState(value);
 	const [previousValue, setPreviousValue] = useState(value);
 	const timeoutRef = useRef<NodeJS.Timeout>(undefined);

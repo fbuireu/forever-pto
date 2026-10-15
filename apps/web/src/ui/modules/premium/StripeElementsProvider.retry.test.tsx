@@ -1,5 +1,5 @@
 import enMessages from "@i18n/messages/en.json";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen, waitFor } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -26,7 +26,7 @@ import { StripeElementsProvider } from "./StripeElementsProvider";
 const stripe = { confirmPayment: vi.fn() };
 const copy = enMessages.checkout;
 
-const open = () =>
+const open = (): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={enMessages}>
 			<StripeElementsProvider options={{ clientSecret: "cs_test" }} onCancel={vi.fn()}>

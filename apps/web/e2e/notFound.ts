@@ -21,7 +21,7 @@ export const NOT_FOUND_BUNDLES = {
 const MAIN = "main#main-content";
 const NOINDEX = /<meta name="robots" content="[^"]*noindex/;
 
-const headingText = (locale: LocaleCode) =>
+const headingText = (locale: LocaleCode): string =>
 	createTranslator({ locale, messages: NOT_FOUND_BUNDLES[locale], namespace: "notFound" }).markup("title", {
 		highlight: (chunks) => chunks,
 		em: (chunks) => chunks,
@@ -33,7 +33,11 @@ export interface ExpectLocalizedNotFoundParams {
 	locale: LocaleCode;
 }
 
-export const expectLocalizedNotFound = async ({ page, path, locale }: ExpectLocalizedNotFoundParams) => {
+export const expectLocalizedNotFound = async ({
+	page,
+	path,
+	locale,
+}: ExpectLocalizedNotFoundParams): Promise<string> => {
 	const messages = NOT_FOUND_BUNDLES[locale];
 	const response = await page.goto(path);
 	const html = (await response?.text()) ?? "";

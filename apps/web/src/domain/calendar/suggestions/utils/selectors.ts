@@ -34,7 +34,8 @@ interface CappedRunParams {
 	cap: number;
 }
 
-const cappedRun = ({ runLength, cap }: CappedRunParams) => Math.min(runLength, cap) - Math.max(0, runLength - cap);
+const cappedRun = ({ runLength, cap }: CappedRunParams): number =>
+	Math.min(runLength, cap) - Math.max(0, runLength - cap);
 
 const OPTIMIZED_OBJECTIVE: Objective = {
 	floor: PTO_CONSTANTS.EFFICIENCY.MINIMUM,
@@ -76,7 +77,7 @@ export const STRATEGY_OBJECTIVE: Record<Strategy, Objective> = {
 	},
 };
 
-export const objectiveFor = (strategy: Strategy) =>
+export const objectiveFor = (strategy: Strategy): Objective =>
 	STRATEGY_OBJECTIVE[strategy] ?? STRATEGY_OBJECTIVE[Strategy.GROUPED];
 
 interface OutranksParams {
@@ -84,7 +85,7 @@ interface OutranksParams {
 	rival: number[];
 }
 
-export const outranks = ({ rank, rival }: OutranksParams) => {
+export const outranks = ({ rank, rival }: OutranksParams): boolean => {
 	for (let index = 0; index < rank.length; index++) {
 		const difference = (rank[index] as number) - (rival[index] ?? 0);
 		if (Math.abs(difference) > PTO_CONSTANTS.SELECTION.RANK_TOLERANCE) return difference > 0;
@@ -138,7 +139,7 @@ interface CountDaysParams {
 	isCounted: (day: number) => boolean;
 }
 
-const countDays = ({ span: { start, end }, isCounted }: CountDaysParams) => {
+const countDays = ({ span: { start, end }, isCounted }: CountDaysParams): number => {
 	let count = 0;
 	for (let day = start; day <= end; day++) if (isCounted(day)) count++;
 	return count;
@@ -154,6 +155,11 @@ export interface SelectBridgesParams {
 	alreadyOff: Date[];
 }
 
+export interface BridgeSelection {
+	days: Date[];
+	bridges: Bridge[];
+}
+
 export const selectBridges = ({
 	bridges,
 	targetPtoDays,
@@ -162,7 +168,7 @@ export const selectBridges = ({
 	preferredMonths = [],
 	workdays,
 	alreadyOff,
-}: SelectBridgesParams) => {
+}: SelectBridgesParams): BridgeSelection => {
 	const forbidden = new Set(forbiddenDays.map(dayIndex));
 	const preferred = new Set(preferredMonths);
 	const pool = bridges
@@ -345,5 +351,5 @@ interface SelectBridgesForStrategyParams extends Omit<SelectBridgesParams, "obje
 	strategy: Strategy;
 }
 
-export const selectBridgesForStrategy = ({ strategy, ...params }: SelectBridgesForStrategyParams) =>
+export const selectBridgesForStrategy = ({ strategy, ...params }: SelectBridgesForStrategyParams): BridgeSelection =>
 	selectBridges({ ...params, objective: objectiveFor(strategy) });

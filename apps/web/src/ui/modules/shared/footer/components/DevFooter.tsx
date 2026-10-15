@@ -41,7 +41,7 @@ const SOCIAL_NETWORKS = {
 	},
 } as const;
 
-const getRandomEmoji = () => EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+const getRandomEmoji = (): string => EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
 
 export const DevFooter = () => {
 	const t = useTranslations("devFooter");

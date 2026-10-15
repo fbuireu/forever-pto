@@ -5,7 +5,7 @@ import en from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ComponentType } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -59,7 +59,7 @@ const range = vi.hoisted(() => ({ value: undefined as unknown }));
 
 const { WorkdayCounter } = (await import("./WorkdayCounter")) as { WorkdayCounter: ComponentType };
 
-const day = (isoDate: string) => new Date(`${isoDate}T00:00:00`);
+const day = (isoDate: string): Date => new Date(`${isoDate}T00:00:00`);
 
 const holiday = (isoDate: string): HolidayDTO => ({
 	id: isoDate,
@@ -83,7 +83,7 @@ interface RenderCounterParams {
 	messages?: typeof en;
 }
 
-const renderCounter = ({ locale = "en", messages = en }: RenderCounterParams = {}) =>
+const renderCounter = ({ locale = "en", messages = en }: RenderCounterParams = {}): RenderResult =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<WorkdayCounter />
@@ -95,16 +95,16 @@ interface PickParams {
 	to: string;
 }
 
-const pick = ({ from, to }: PickParams) => {
+const pick = ({ from, to }: PickParams): void => {
 	range.value = { from: day(from), to: day(to) };
 	fireEvent.click(screen.getByRole("button", { name: "pick" }));
 };
 
 const unknownYearsWarning = /Holidays are only known for/;
 
-const readout = () => document.body.textContent ?? "";
+const readout = (): string => document.body.textContent ?? "";
 
-const counts = () =>
+const counts = (): Record<string, string | undefined> =>
 	Object.fromEntries(
 		(["workdays", "days", "weekendDays", "holidays"] as const).map((key) => [
 			key,

@@ -13,7 +13,12 @@ const PERSISTED_STORES = [
 	{ name: "premium", store: usePremiumStore },
 ] as const;
 
-export const useStoresReady = () => {
+interface StoresReadiness {
+	areStoresReady: boolean;
+	hydrationStatus: Record<string, boolean>;
+}
+
+export const useStoresReady = (): StoresReadiness => {
 	const [hydrationStatus, setHydrationStatus] = useState<Record<string, boolean>>(() =>
 		Object.fromEntries(PERSISTED_STORES.map(({ name }) => [name, false])),
 	);

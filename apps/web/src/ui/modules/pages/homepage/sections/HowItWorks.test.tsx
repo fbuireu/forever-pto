@@ -34,13 +34,16 @@ interface RenderHowItWorksParams {
 	messages?: typeof enMessages;
 }
 
-const renderHowItWorks = async ({ locale = "en", messages = enMessages }: RenderHowItWorksParams = {}) => {
+const renderHowItWorks = async ({
+	locale = "en",
+	messages = enMessages,
+}: RenderHowItWorksParams = {}): Promise<HTMLElement> => {
 	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "homepage" }));
 	const { container } = render(await HowItWorks());
 	return container;
 };
 
-const cardsOf = (container: HTMLElement) =>
+const cardsOf = (container: HTMLElement): HTMLElement[] =>
 	[...(container.querySelector(".md\\:grid-cols-3")?.children ?? [])] as HTMLElement[];
 
 describe("HowItWorks", () => {

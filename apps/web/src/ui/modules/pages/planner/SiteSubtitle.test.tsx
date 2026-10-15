@@ -4,7 +4,7 @@ import en from "@i18n/messages/en.json";
 import es from "@i18n/messages/es.json";
 import fr from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -19,7 +19,7 @@ interface RenderSubtitleParams {
 	messages?: typeof en;
 }
 
-const renderSubtitle = ({ locale = "en", messages = en }: RenderSubtitleParams = {}) =>
+const renderSubtitle = ({ locale = "en", messages = en }: RenderSubtitleParams = {}): RenderResult =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<SiteSubtitle />

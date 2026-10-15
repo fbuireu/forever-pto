@@ -7,7 +7,7 @@ interface SlotParams {
 	name: string;
 }
 
-const slot = ({ container, name }: SlotParams) =>
+const slot = ({ container, name }: SlotParams): HTMLElement | null =>
 	container.querySelector(`[data-slot="${name}"]`) as HTMLElement | null;
 
 describe("Card", () => {

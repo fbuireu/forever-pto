@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { type RenderResult, render } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ComponentProps, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -35,10 +35,10 @@ interface RenderInParams {
 	children: ReactNode;
 }
 
-const renderIn = ({ locale, children }: RenderInParams) =>
+const renderIn = ({ locale, children }: RenderInParams): RenderResult =>
 	render(<NextIntlClientProvider locale={locale}>{children}</NextIntlClientProvider>);
 
-const separatorOf = (container: HTMLElement) =>
+const separatorOf = (container: HTMLElement): string =>
 	container.querySelector('[data-slot="sliding-number"]')?.textContent ?? "";
 
 describe("SlidingNumber", () => {

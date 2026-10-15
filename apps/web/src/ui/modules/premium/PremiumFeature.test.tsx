@@ -1,8 +1,8 @@
 import deMessages from "@i18n/messages/de.json";
 import enMessages from "@i18n/messages/en.json";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
 const premiumState = {
 	premiumKey: null as string | null,
@@ -24,7 +24,7 @@ interface RenderGateParams {
 	origin?: PremiumOrigin;
 }
 
-const renderGate = ({ locale, messages, origin = PremiumOrigin.PLANNER }: RenderGateParams) =>
+const renderGate = ({ locale, messages, origin = PremiumOrigin.PLANNER }: RenderGateParams): RenderResult =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<PremiumFeature feature={PremiumFeatureId.CALENDAR_EXPORT} origin={origin}>
@@ -44,7 +44,12 @@ afterEach(() => {
 
 const DESCRIPTION = "Add holidays your company closes for.";
 
-const renderDescribedGate = () => {
+interface DescribedGateRender extends RenderResult {
+	errors: Mock<typeof console.error>;
+	lock: HTMLElement;
+}
+
+const renderDescribedGate = (): DescribedGateRender => {
 	const errors = vi.spyOn(console, "error");
 	const view = render(
 		<NextIntlClientProvider locale="en" messages={enMessages}>

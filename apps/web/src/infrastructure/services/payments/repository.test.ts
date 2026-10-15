@@ -18,10 +18,10 @@ const MockTursoLayer = Layer.succeed(TursoService, {
 	query: mockQuery,
 });
 
-const runEffect = <A>(effect: Effect.Effect<A, DatabaseError, TursoService>) =>
+const runEffect = <A>(effect: Effect.Effect<A, DatabaseError, TursoService>): Promise<A> =>
 	Effect.runPromise(effect.pipe(Effect.provide(MockTursoLayer)));
 
-const runFlipEffect = (effect: Effect.Effect<unknown, DatabaseError, TursoService>) =>
+const runFlipEffect = (effect: Effect.Effect<unknown, DatabaseError, TursoService>): Promise<DatabaseError> =>
 	Effect.runPromise(effect.pipe(Effect.provide(MockTursoLayer), Effect.flip));
 
 const BASE_PAYMENT = {
@@ -99,7 +99,7 @@ beforeEach(() => {
 	mockQuery.mockReturnValue(Effect.succeed([]));
 });
 
-const insertedColumns = (sql: string) => {
+const insertedColumns = (sql: string): string[] => {
 	const list = sql.slice(sql.indexOf("(") + 1, sql.indexOf(") VALUES"));
 	return list
 		.split(",")
@@ -107,7 +107,7 @@ const insertedColumns = (sql: string) => {
 		.filter((column) => column !== "created_at" && column !== "updated_at");
 };
 
-const updatedColumns = (sql: string) => [
+const updatedColumns = (sql: string): string[] => [
 	...sql
 		.slice(0, sql.indexOf("WHERE"))
 		.matchAll(/(\w+) = \?/g)
@@ -120,7 +120,7 @@ interface BoundRowParams {
 	args: unknown[];
 }
 
-const boundRow = ({ columns, args }: BoundRowParams) =>
+const boundRow = ({ columns, args }: BoundRowParams): Record<string, unknown> =>
 	Object.fromEntries(columns.map((column, index) => [column, args[index]]));
 
 describe("savePayment", () => {

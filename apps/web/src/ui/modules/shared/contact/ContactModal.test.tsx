@@ -31,7 +31,7 @@ interface SubmitMessageParams {
 	onClose?: () => void;
 }
 
-const submitMessage = async ({ messages, onClose = vi.fn() }: SubmitMessageParams) => {
+const submitMessage = async ({ messages, onClose = vi.fn() }: SubmitMessageParams): Promise<void> => {
 	render(
 		<NextIntlClientProvider locale="en" messages={messages}>
 			<ContactModal open onClose={onClose} />

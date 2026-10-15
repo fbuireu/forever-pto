@@ -40,11 +40,19 @@ interface SelectionInputOfParams {
 	preferredMonths?: number[];
 }
 
+interface SelectionInput {
+	bridges: Bridge[];
+	targetPtoDays: number;
+	preferredMonths: number[] | undefined;
+	workdays: Date[];
+	alreadyOff: Date[];
+}
+
 export const selectionInputOf = ({
 	candidates: { bridges, availableWorkdays, alreadyOff },
 	ptoDays,
 	preferredMonths,
-}: SelectionInputOfParams) => ({
+}: SelectionInputOfParams): SelectionInput => ({
 	bridges,
 	targetPtoDays: ptoDays,
 	preferredMonths,

@@ -1,16 +1,21 @@
 import type { HolidayDTO } from "@application/dto/holiday/types";
 import { fromStoredInstant } from "@application/shared/utils/dateIntake";
 import type { Bridge, MeasuredSuggestion } from "@domain/calendar/types";
-import type { SerializedBridge, SerializedHolidayDTO, SerializedSuggestion } from "@infrastructure/workers/types";
+import type {
+	CalculateSuggestionsResultPayload,
+	SerializedBridge,
+	SerializedHolidayDTO,
+	SerializedSuggestion,
+} from "@infrastructure/workers/types";
 
-export function serializeHolidays(holidays: HolidayDTO[]) {
+export function serializeHolidays(holidays: HolidayDTO[]): SerializedHolidayDTO[] {
 	return holidays.map((holiday) => ({
 		...holiday,
 		date: holiday.date.toISOString(),
 	}));
 }
 
-function serializeBridge(bridge: Bridge) {
+function serializeBridge(bridge: Bridge): SerializedBridge {
 	return {
 		...bridge,
 		startDate: bridge.startDate.toISOString(),
@@ -24,14 +29,17 @@ export interface SerializeSuggestionResultParams {
 	alternatives: MeasuredSuggestion[];
 }
 
-export function serializeSuggestionResult({ suggestion, alternatives }: SerializeSuggestionResultParams) {
+export function serializeSuggestionResult({
+	suggestion,
+	alternatives,
+}: SerializeSuggestionResultParams): CalculateSuggestionsResultPayload {
 	return {
 		suggestion: serializeSuggestion(suggestion),
 		alternatives: alternatives.map(serializeSuggestion),
 	};
 }
 
-function serializeSuggestion(suggestion: MeasuredSuggestion) {
+function serializeSuggestion(suggestion: MeasuredSuggestion): SerializedSuggestion {
 	return {
 		...suggestion,
 		days: suggestion.days.map((day) => day.toISOString()),
@@ -39,7 +47,7 @@ function serializeSuggestion(suggestion: MeasuredSuggestion) {
 	};
 }
 
-function deserializeBridge(bridge: SerializedBridge) {
+function deserializeBridge(bridge: SerializedBridge): Bridge {
 	return {
 		...bridge,
 		startDate: fromStoredInstant(bridge.startDate),
@@ -57,7 +65,7 @@ export function deserializeSuggestion(serialized: SerializedSuggestion): Measure
 	};
 }
 
-export function deserializeHolidays(holidays: SerializedHolidayDTO[]) {
+export function deserializeHolidays(holidays: SerializedHolidayDTO[]): HolidayDTO[] {
 	return holidays.map((holiday) => ({
 		...holiday,
 		date: fromStoredInstant(holiday.date),

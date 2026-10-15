@@ -4,7 +4,7 @@ import enMessages from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import { createTranslator, type Locale, NextIntlClientProvider } from "next-intl";
 import type { ComponentProps } from "react";
 import { renderToString } from "react-dom/server";
@@ -62,7 +62,7 @@ const footerTree = async ({ locale = "en", messages = enMessages }: RenderFooter
 	);
 };
 
-const renderFooter = async (params: RenderFooterParams = {}) => render(await footerTree(params));
+const renderFooter = async (params: RenderFooterParams = {}): Promise<RenderResult> => render(await footerTree(params));
 
 describe("Footer", () => {
 	beforeEach(() => {

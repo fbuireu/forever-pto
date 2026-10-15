@@ -1,7 +1,7 @@
 import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
 import type { generateMetrics } from "@domain/calendar/metrics/generateMetrics";
 import type { runPlanningPipeline } from "@domain/calendar/pipeline";
-import { type MeasuredSuggestion, Strategy } from "@domain/calendar/types";
+import { type Bridge, type MeasuredSuggestion, Strategy } from "@domain/calendar/types";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useFiltersStore } from "./filters";
 import { type HolidaysState, useHolidaysStore } from "./holidays";
@@ -72,7 +72,7 @@ interface MakeBridgeParams {
 	ptoDays: Date[];
 }
 
-const makeBridge = ({ start, end, ptoDays }: MakeBridgeParams) => ({
+const makeBridge = ({ start, end, ptoDays }: MakeBridgeParams): Bridge => ({
 	startDate: start,
 	endDate: end,
 	ptoDaysNeeded: ptoDays.length,

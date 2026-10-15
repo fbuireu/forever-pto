@@ -25,9 +25,14 @@ interface IsFreeDayParams {
 	holidaySet: Set<string>;
 }
 
-const isFreeDay = ({ date, holidaySet }: IsFreeDayParams) => isWeekend(date) || holidaySet.has(getKey(date));
+const isFreeDay = ({ date, holidaySet }: IsFreeDayParams): boolean => isWeekend(date) || holidaySet.has(getKey(date));
 
-const expandThroughFreeDays = ({ first, last, holidaySet }: ExpandThroughFreeDaysParams) => {
+interface FreeDayRange {
+	start: Date;
+	end: Date;
+}
+
+const expandThroughFreeDays = ({ first, last, holidaySet }: ExpandThroughFreeDaysParams): FreeDayRange => {
 	let start = first;
 	let end = last;
 
@@ -51,7 +56,7 @@ export interface CompareByEfficiencyParams {
 	b: Bridge;
 }
 
-export const compareByEfficiency = ({ a, b }: CompareByEfficiencyParams) => {
+export const compareByEfficiency = ({ a, b }: CompareByEfficiencyParams): number => {
 	const difference = b.efficiency - a.efficiency;
 
 	if (Math.abs(difference) > PTO_CONSTANTS.BRIDGE_GENERATION.EFFICIENCY_COMPARISON_THRESHOLD) {
@@ -73,7 +78,7 @@ export function getAvailableWorkdays({
 	holidays,
 	allowPastDays,
 	removedDays = [],
-}: GetAvailableWorkdaysParams) {
+}: GetAvailableWorkdaysParams): Date[] {
 	const todayTime = startOfToday().getTime();
 
 	const holidaySet = createHolidaySet(holidays);
@@ -110,7 +115,7 @@ interface AnalyzeRunParams {
 	days: Date[];
 }
 
-export const findBridges = ({ availableWorkdays, holidays }: FindBridgesParams) => {
+export const findBridges = ({ availableWorkdays, holidays }: FindBridgesParams): Bridge[] => {
 	if (availableWorkdays.length === 0) return [];
 	const { MAX_MULTI_DAY_SIZE, MIN_MULTI_DAY_SIZE } = PTO_CONSTANTS.BRIDGE_SEARCH;
 	const { BLOCK_MINIMUM } = PTO_CONSTANTS.EFFICIENCY;
@@ -181,7 +186,7 @@ interface FreeDaysAroundParams {
 	holidays: HolidayDTO[];
 }
 
-export const freeDaysAround = ({ days, holidays }: FreeDaysAroundParams) => {
+export const freeDaysAround = ({ days, holidays }: FreeDaysAroundParams): Date[] => {
 	const holidaySet = createHolidaySet(holidays);
 
 	return days.flatMap((day) => {

@@ -10,6 +10,6 @@ configureBoneyard({
 	transition: true,
 });
 
-export function BonesProvider() {
+export function BonesProvider(): null {
 	return null;
 }

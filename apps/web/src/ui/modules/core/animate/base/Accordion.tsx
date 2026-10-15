@@ -22,7 +22,7 @@ interface AccordionItemContextType {
 
 const AccordionItemContext = createContext<AccordionItemContextType | undefined>(undefined);
 
-const useAccordionItem = () => {
+const useAccordionItem = (): AccordionItemContextType => {
 	const context = use(AccordionItemContext);
 	if (!context) {
 		throw new Error("useAccordionItem must be used within an AccordionItem");

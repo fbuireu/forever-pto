@@ -1,11 +1,16 @@
-import { createContext, type ReactNode, use } from "react";
+import { createContext, type ReactElement, type ReactNode, use } from "react";
 
-export function getStrictContext<T>(name?: string) {
+interface StrictProviderProps<T> {
+	value: T;
+	children?: ReactNode;
+}
+
+export function getStrictContext<T>(
+	name?: string,
+): readonly [(props: StrictProviderProps<T>) => ReactElement, () => T] {
 	const Context = createContext<T | undefined>(undefined);
 
-	const Provider = ({ value, children }: { value: T; children?: ReactNode }) => (
-		<Context value={value}>{children}</Context>
-	);
+	const Provider = ({ value, children }: StrictProviderProps<T>) => <Context value={value}>{children}</Context>;
 
 	const useSafeContext = () => {
 		const ctx = use(Context);

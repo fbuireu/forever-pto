@@ -34,7 +34,7 @@ interface CookieConsentDialogProps {
 	onSave: () => void;
 }
 
-const switchId = (id: string) => `cookie-consent-${id}`;
+const switchId = (id: string): string => `cookie-consent-${id}`;
 
 export const CookieConsentDialog = ({
 	open,

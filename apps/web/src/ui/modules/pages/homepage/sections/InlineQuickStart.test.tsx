@@ -4,7 +4,7 @@ import enMessages from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import { createTranslator, type Locale } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -36,7 +36,7 @@ const BUNDLES: Record<Locale, typeof enMessages> = {
 
 const COUNTRIES = [{ value: "ES", label: "Spain", flag: "es" }];
 
-const renderSection = async (locale: Locale = "en") => {
+const renderSection = async (locale: Locale = "en"): Promise<RenderResult> => {
 	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages: BUNDLES[locale], namespace: "homepage" }));
 	return render(await InlineQuickStart({ locale }));
 };

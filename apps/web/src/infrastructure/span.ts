@@ -1,6 +1,10 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
-const tracing = () => {
+interface TracingApi {
+	enterSpan<T>(name: string, run: () => Promise<T>): Promise<T>;
+}
+
+const tracing = (): TracingApi | undefined => {
 	try {
 		return getCloudflareContext().ctx.tracing;
 	} catch {

@@ -133,21 +133,21 @@ interface FmtDayParams {
 	locale: string;
 }
 
-const fmtDay = ({ date, locale }: FmtDayParams) => formatDate({ date, locale, format: "EE, MMM d" });
+const fmtDay = ({ date, locale }: FmtDayParams): string => formatDate({ date, locale, format: "EE, MMM d" });
 
 interface FmtMonthParams {
 	date: Date;
 	locale: string;
 }
 
-const fmtMonth = ({ date, locale }: FmtMonthParams) => formatDate({ date, locale, format: "LLLL yyyy" });
+const fmtMonth = ({ date, locale }: FmtMonthParams): string => formatDate({ date, locale, format: "LLLL yyyy" });
 
 interface FmtDateParams {
 	date: Date;
 	locale: string;
 }
 
-const fmtDate = ({ date, locale }: FmtDateParams) => formatDate({ date, locale, format: "MMMM d, yyyy" });
+const fmtDate = ({ date, locale }: FmtDateParams): string => formatDate({ date, locale, format: "MMMM d, yyyy" });
 
 interface GroupByMonthParams<T> {
 	items: T[];
@@ -155,8 +155,13 @@ interface GroupByMonthParams<T> {
 	locale: string;
 }
 
-function groupByMonth<T>({ items, getDate, locale }: GroupByMonthParams<T>) {
-	const map = new Map<string, { month: string; items: T[] }>();
+interface MonthGroup<T> {
+	month: string;
+	items: T[];
+}
+
+function groupByMonth<T>({ items, getDate, locale }: GroupByMonthParams<T>): MonthGroup<T>[] {
+	const map = new Map<string, MonthGroup<T>>();
 
 	for (const item of items) {
 		const d = getDate(item);

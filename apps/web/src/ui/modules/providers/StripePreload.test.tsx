@@ -33,7 +33,12 @@ vi.mock("@ui/modules/core/animate/icons/Icon", () => ({
 const PUBLISHABLE_KEY = "pk_test_123";
 const stripe = { confirmPayment: vi.fn() };
 
-const freshModules = async () => {
+interface FreshModules {
+	StripePreload: typeof import("./StripePreload").StripePreload;
+	StripeElementsProvider: typeof import("@ui/modules/premium/StripeElementsProvider").StripeElementsProvider;
+}
+
+const freshModules = async (): Promise<FreshModules> => {
 	vi.resetModules();
 	const [{ StripePreload }, { StripeElementsProvider }] = await Promise.all([
 		import("./StripePreload"),
@@ -43,12 +48,12 @@ const freshModules = async () => {
 	return { StripePreload, StripeElementsProvider };
 };
 
-const settled = () => new Promise((resolve) => setTimeout(resolve, 0));
+const settled = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
 
 let consoleError: ReturnType<typeof vi.spyOn>;
 let consoleWarn: ReturnType<typeof vi.spyOn>;
 let unhandled: unknown[];
-const onUnhandled = (reason: unknown) => unhandled.push(reason);
+const onUnhandled = (reason: unknown): number => unhandled.push(reason);
 
 beforeEach(() => {
 	vi.stubEnv("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY", PUBLISHABLE_KEY);

@@ -44,14 +44,20 @@ const COPY = {
 
 const RECT = { left: 0, top: 0, width: 200, height: 100 } as DOMRect;
 
-const renderShapes = (rect: DOMRect = RECT) => {
+const renderShapes = (rect: DOMRect = RECT): HTMLElement => {
 	const { container } = render(<CtaShapesClient {...COPY} />);
 	const surface = container.firstElementChild as HTMLElement;
 	vi.spyOn(surface, "getBoundingClientRect").mockReturnValue(rect);
 	return surface;
 };
 
-const offsets = () => shapes.styles.slice(-4).map(({ x, y }) => ({ x: Math.round(x.get()), y: Math.round(y.get()) }));
+interface Offset {
+	x: number;
+	y: number;
+}
+
+const offsets = (): Offset[] =>
+	shapes.styles.slice(-4).map(({ x, y }) => ({ x: Math.round(x.get()), y: Math.round(y.get()) }));
 
 const CENTRED = [
 	{ x: 0, y: 0 },
@@ -60,7 +66,7 @@ const CENTRED = [
 	{ x: 0, y: 0 },
 ];
 
-const settle = () => act(() => new Promise<void>((resolve) => setTimeout(resolve, 50)));
+const settle = (): Promise<void> => act(() => new Promise<void>((resolve) => setTimeout(resolve, 50)));
 
 beforeEach(() => {
 	shapes.styles.length = 0;

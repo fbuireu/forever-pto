@@ -5,7 +5,7 @@ export interface NoStoreParams {
 	init?: ResponseInit;
 }
 
-export function noStore({ body, init }: NoStoreParams) {
+export function noStore({ body, init }: NoStoreParams): NextResponse<object> {
 	const response = NextResponse.json(body, init);
 	response.headers.set("Cache-Control", "no-store");
 	return response;

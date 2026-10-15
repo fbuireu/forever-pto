@@ -1,5 +1,5 @@
 import en from "@i18n/messages/en.json";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ServiceChangeParams } from "./CookieConsentDialog";
@@ -70,24 +70,25 @@ const { CookieConsent } = await import("./CookieConsent");
 
 const gtag = vi.fn();
 
-const renderConsent = () =>
+const renderConsent = (): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
 			<CookieConsent />
 		</NextIntlClientProvider>,
 	);
 
-const press = (name: string) => fireEvent.click(screen.getByRole("button", { name }));
+const press = (name: string): boolean => fireEvent.click(screen.getByRole("button", { name }));
 
-const dialog = () => screen.getByTestId("dialog");
+const dialog = (): HTMLElement => screen.getByTestId("dialog");
 
-const services = () => JSON.parse(screen.getByTestId("services").textContent ?? "{}") as Record<string, boolean>;
+const services = (): Record<string, boolean> =>
+	JSON.parse(screen.getByTestId("services").textContent ?? "{}") as Record<string, boolean>;
 
-const acceptedServices = () => lib.acceptService.mock.calls.at(-1)?.[0] as string[];
+const acceptedServices = (): string[] => lib.acceptService.mock.calls.at(-1)?.[0] as string[];
 
-const consentCalls = () => gtag.mock.calls.filter(([command]) => command === "consent");
+const consentCalls = (): unknown[][] => gtag.mock.calls.filter(([command]) => command === "consent");
 
-const grantedByLastConsent = () =>
+const grantedByLastConsent = (): string | undefined =>
 	(consentCalls().at(-1)?.[2] as { analytics_storage: string } | undefined)?.analytics_storage;
 
 beforeEach(() => {

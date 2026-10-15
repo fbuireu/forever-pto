@@ -6,7 +6,7 @@ import enMessages from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import { createTranslator, type Locale } from "next-intl";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -56,13 +56,13 @@ const BUNDLES: Record<string, typeof enMessages> = {
 	fr: frMessages,
 };
 
-const mountPricing = async ({ locale, messages }: RenderPricingParams) => {
+const mountPricing = async ({ locale, messages }: RenderPricingParams): Promise<RenderResult> => {
 	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "homepage" }));
 	mockGetLocale.mockResolvedValue(locale);
 	return render(await Pricing());
 };
 
-const renderPricing = async (params: RenderPricingParams) => {
+const renderPricing = async (params: RenderPricingParams): Promise<string> => {
 	const { container } = await mountPricing(params);
 	return (container.textContent ?? "").replace(NON_BREAKING_SPACES, " ");
 };

@@ -3,7 +3,7 @@
 import { usePremiumStore } from "@application/stores/premium";
 import { useEffect, useRef } from "react";
 
-export function PremiumSessionSync() {
+export function PremiumSessionSync(): null {
 	const confirmActivation = usePremiumStore((state) => state.confirmActivation);
 	const hasSynced = useRef(false);
 

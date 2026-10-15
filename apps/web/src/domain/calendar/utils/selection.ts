@@ -4,7 +4,11 @@ interface ResolveSelectedDaysParams {
 	removedSuggestedDays?: Date[];
 }
 
-export function resolveSelectedDays({ days, manualDays = [], removedSuggestedDays = [] }: ResolveSelectedDaysParams) {
+export function resolveSelectedDays({
+	days,
+	manualDays = [],
+	removedSuggestedDays = [],
+}: ResolveSelectedDaysParams): Date[] {
 	if (manualDays.length === 0 && removedSuggestedDays.length === 0) return days;
 
 	const removed = new Set(removedSuggestedDays.map((day) => day.toDateString()));

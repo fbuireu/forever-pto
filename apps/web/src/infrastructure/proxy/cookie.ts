@@ -8,7 +8,7 @@ export interface SetLocationCookieParams {
 	country: string;
 }
 
-export function setLocationCookie({ response, country }: SetLocationCookieParams) {
+export function setLocationCookie({ response, country }: SetLocationCookieParams): void {
 	response.cookies.set(USER_COUNTRY_COOKIE, country, {
 		httpOnly: false,
 		secure: true,

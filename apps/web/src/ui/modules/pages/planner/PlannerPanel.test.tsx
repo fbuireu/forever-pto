@@ -1,10 +1,11 @@
+import type { MeasuredSuggestion } from "@domain/calendar/types";
 import caMessages from "@i18n/messages/ca.json";
 import de from "@i18n/messages/de.json";
 import en from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactElement } from "react";
@@ -63,7 +64,7 @@ interface SuggestionOfParams {
 	efficiency: number;
 }
 
-const suggestionOf = ({ effectiveDays, efficiency }: SuggestionOfParams) =>
+const suggestionOf = ({ effectiveDays, efficiency }: SuggestionOfParams): MeasuredSuggestion =>
 	({
 		days: [new Date(2026, 0, 5)],
 		bridges: [],
@@ -93,14 +94,14 @@ const StoreHost = () => {
 	);
 };
 
-const renderPanel = (ui: ReactElement) =>
+const renderPanel = (ui: ReactElement): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
 			{ui}
 		</NextIntlClientProvider>,
 	);
 
-const optionReadout = (container: HTMLElement) =>
+const optionReadout = (container: HTMLElement): string =>
 	container.querySelector('[data-tutorial="alternatives-manager"]')?.textContent ?? "";
 
 describe("PlannerPanel Alternatives", () => {
@@ -430,7 +431,7 @@ interface RenderInParams {
 	selectedIndex?: number;
 }
 
-const renderIn = ({ locale, messages, selectedIndex = 0 }: RenderInParams) =>
+const renderIn = ({ locale, messages, selectedIndex = 0 }: RenderInParams): RenderResult =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<PlannerPanel {...panelProps} selectedIndex={selectedIndex} />

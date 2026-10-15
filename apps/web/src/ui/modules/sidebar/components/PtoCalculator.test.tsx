@@ -4,7 +4,7 @@ import en from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
@@ -73,7 +73,7 @@ interface RenderCalculatorParams {
 	messages?: typeof en;
 }
 
-const renderCalculator = ({ locale = "en", messages = en }: RenderCalculatorParams = {}) =>
+const renderCalculator = ({ locale = "en", messages = en }: RenderCalculatorParams = {}): RenderResult =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<PtoCalculator />
@@ -85,7 +85,7 @@ interface SetDaysPerMonthParams {
 	value: string;
 }
 
-const setDaysPerMonth = async ({ user, value }: SetDaysPerMonthParams) => {
+const setDaysPerMonth = async ({ user, value }: SetDaysPerMonthParams): Promise<void> => {
 	const input = screen.getByRole("textbox");
 	await user.clear(input);
 	await user.type(input, value);
@@ -98,15 +98,15 @@ interface CalculateParams {
 	messages?: typeof en;
 }
 
-const calculate = async ({ user, days, month, messages = en }: CalculateParams) => {
+const calculate = async ({ user, days, month, messages = en }: CalculateParams): Promise<void> => {
 	await setDaysPerMonth({ user, value: days });
 	await user.selectOptions(screen.getByLabelText("month"), month);
 	await user.click(screen.getByRole("button", { name: messages.ptoCalculator.calculate }));
 };
 
-const apply = () => screen.getByRole("button", { name: en.ptoCalculator.applyToPtoDays });
+const apply = (): HTMLElement => screen.getByRole("button", { name: en.ptoCalculator.applyToPtoDays });
 
-const breakdownOf = (container: HTMLElement) =>
+const breakdownOf = (container: HTMLElement): string =>
 	container.querySelector(".bg-muted p")?.textContent?.replace(/\s+/g, " ").trim() ?? "";
 
 beforeEach(() => {

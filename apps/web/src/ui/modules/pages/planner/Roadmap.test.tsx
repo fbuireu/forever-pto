@@ -1,6 +1,6 @@
 import en from "@i18n/messages/en.json";
 import es from "@i18n/messages/es.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import { describe, expect, it, vi } from "vitest";
@@ -56,16 +56,16 @@ interface RenderRoadmapParams {
 	messages?: typeof en;
 }
 
-const renderRoadmap = ({ locale = "en", messages = en }: RenderRoadmapParams = {}) =>
+const renderRoadmap = ({ locale = "en", messages = en }: RenderRoadmapParams = {}): RenderResult =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<Roadmap />
 		</NextIntlClientProvider>,
 	);
 
-const listed = () => Array.from(screen.getByTestId("features").querySelectorAll("li"));
+const listed = (): HTMLLIElement[] => Array.from(screen.getByTestId("features").querySelectorAll("li"));
 
-const pick = (label: string) => userEvent.click(screen.getByRole("button", { name: label }));
+const pick = (label: string): Promise<void> => userEvent.click(screen.getByRole("button", { name: label }));
 
 describe("Roadmap", () => {
 	it("opens on the finished work, labelled as such beside the dial", () => {

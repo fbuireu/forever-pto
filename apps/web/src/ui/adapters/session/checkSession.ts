@@ -1,9 +1,10 @@
 import { ACTIVATION_COOKIE } from "@application/dto/payment/types";
 import type { PremiumSession } from "@application/dto/premium/schema";
 
-const loadSchemas = () => import("@application/dto/premium/schema");
+const loadSchemas = (): Promise<typeof import("@application/dto/premium/schema")> =>
+	import("@application/dto/premium/schema");
 
-export async function verifyPremiumEmail(email: string) {
+export async function verifyPremiumEmail(email: string): Promise<Pick<PremiumSession, "premiumKey"> | null> {
 	const response = await fetch("/api/check-session", {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },

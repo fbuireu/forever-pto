@@ -21,7 +21,7 @@ interface MeasurePlanParams {
 
 type CoveredSetOfParams = Pick<MeasurePlanParams, "plan" | "alreadyOff">;
 
-const coveredSetOf = ({ plan: { days, bridges = [] }, alreadyOff }: CoveredSetOfParams) => {
+const coveredSetOf = ({ plan: { days, bridges = [] }, alreadyOff }: CoveredSetOfParams): Set<number> => {
 	const covered = new Set([...days, ...alreadyOff].map(dayIndex));
 	for (const bridge of bridges) {
 		for (let day = dayIndex(bridge.startDate); day <= dayIndex(bridge.endDate); day++) covered.add(day);

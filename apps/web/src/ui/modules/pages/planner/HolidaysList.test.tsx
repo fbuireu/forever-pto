@@ -1,6 +1,6 @@
 import { HolidayVariant } from "@application/dto/holiday/types";
 import en from "@i18n/messages/en.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
@@ -39,14 +39,14 @@ vi.mock("./holidays/HolidaysTable", () => ({
 
 const { HolidaysList } = await import("./HolidaysList");
 
-const renderList = () =>
+const renderList = (): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
 			<HolidaysList />
 		</NextIntlClientProvider>,
 	);
 
-const table = () => screen.getByTestId("table");
+const table = (): HTMLElement => screen.getByTestId("table");
 
 beforeEach(() => {
 	holidaysState.holidays = [{ variant: HolidayVariant.NATIONAL }];

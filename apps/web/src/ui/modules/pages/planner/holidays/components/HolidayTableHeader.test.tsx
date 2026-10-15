@@ -2,12 +2,12 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { HolidayDTO } from "@application/dto/holiday/types";
 import en from "@i18n/messages/en.json";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { describe, expect, it, vi } from "vitest";
 import { HolidayTableHeader } from "./HolidayTableHeader";
 
-const renderHeader = (onSort: (key: keyof HolidayDTO) => void) =>
+const renderHeader = (onSort: (key: keyof HolidayDTO) => void): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
 			<table>

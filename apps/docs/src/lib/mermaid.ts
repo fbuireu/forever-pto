@@ -1,7 +1,7 @@
 const SELECTOR = "figure.mermaid";
 const EXPANDED = "mermaid-expanded";
 
-const toggleExpanded = (figure: HTMLElement) => {
+const toggleExpanded = (figure: HTMLElement): void => {
 	const expanded = figure.classList.toggle(EXPANDED);
 	for (const svg of figure.querySelectorAll("svg")) {
 		svg.style.maxWidth = expanded ? "none" : "";
@@ -9,7 +9,7 @@ const toggleExpanded = (figure: HTMLElement) => {
 	}
 };
 
-export const startMermaidZoom = () => {
+export const startMermaidZoom = (): void => {
 	document.addEventListener("click", (event) => {
 		const figure = (event.target as Element | null)?.closest<HTMLElement>(SELECTOR);
 		if (figure) toggleExpanded(figure);

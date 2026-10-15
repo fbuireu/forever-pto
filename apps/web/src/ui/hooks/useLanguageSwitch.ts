@@ -3,11 +3,19 @@
 import { usePathname, useRouter } from "@application/i18n/navigation";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import type { LocaleCode } from "@infrastructure/i18n/locales";
-import { useLocale, useTranslations } from "next-intl";
+import { type Locale, useLocale, useTranslations } from "next-intl";
 import { useCallback, useMemo } from "react";
-import { useLanguages } from "./useLanguages";
+import { type Language, useLanguages } from "./useLanguages";
 
-export const useLanguageSwitch = () => {
+interface LanguageSwitch {
+	locale: Locale;
+	languages: Language[];
+	currentLanguage: Language | undefined;
+	selectLanguage: (newLocale: LocaleCode) => void;
+	switcherLabel: string;
+}
+
+export const useLanguageSwitch = (): LanguageSwitch => {
 	const locale = useLocale();
 	const { push } = useRouter();
 	const pathname = usePathname();

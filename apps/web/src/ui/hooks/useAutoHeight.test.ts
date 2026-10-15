@@ -8,7 +8,7 @@ const observe = vi.fn();
 const resizeCallbacks: (() => void)[] = [];
 const attached: HTMLElement[] = [];
 
-function MockResizeObserver(this: object, cb: () => void) {
+function MockResizeObserver(this: object, cb: () => void): void {
 	Object.assign(this, { observe, disconnect, _cb: cb });
 	resizeCallbacks.push(cb);
 }
@@ -40,7 +40,7 @@ interface AttachRefParams {
 	rectHeight?: number;
 }
 
-const attachRef = ({ result, rectHeight = 0 }: AttachRefParams) => {
+const attachRef = ({ result, rectHeight = 0 }: AttachRefParams): HTMLDivElement => {
 	const el = document.createElement("div");
 	document.body.appendChild(el);
 	attached.push(el);
@@ -49,7 +49,7 @@ const attachRef = ({ result, rectHeight = 0 }: AttachRefParams) => {
 	return el;
 };
 
-const stubBox = (boxSizing: string) => {
+const stubBox = (boxSizing: string): void => {
 	vi.stubGlobal(
 		"getComputedStyle",
 		vi.fn(() => ({

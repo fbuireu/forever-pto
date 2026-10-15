@@ -2,7 +2,7 @@ import { MAX_PTO_DAYS, MIN_PTO_DAYS } from "@application/stores/filters";
 import enMessages from "@i18n/messages/en.json";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, type Mock, vi } from "vitest";
 import { QuickStartPtoDaysStep } from "./QuickStartPtoDaysStep";
 
 const ptoDaysMessages = enMessages.ptoDays;
@@ -12,7 +12,7 @@ interface RenderStepParams {
 	year?: number;
 }
 
-const renderStep = ({ ptoDays = 22, year = 2026 }: RenderStepParams = {}) => {
+const renderStep = ({ ptoDays = 22, year = 2026 }: RenderStepParams = {}): Mock => {
 	const onChange = vi.fn();
 
 	render(

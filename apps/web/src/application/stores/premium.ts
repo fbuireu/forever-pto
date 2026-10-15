@@ -73,7 +73,7 @@ const STORAGE_VERSION = 1;
 let sessionCheckInFlight: Promise<void> | null = null;
 let activationInFlight: Promise<void> | null = null;
 
-const reportActivation = () => track({ event: "premium_activated", properties: { plan: "premium" } });
+const reportActivation = (): void => track({ event: "premium_activated", properties: { plan: "premium" } });
 
 const premiumInitialState: PremiumState = {
 	premiumKey: null,

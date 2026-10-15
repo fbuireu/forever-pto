@@ -81,7 +81,7 @@ const searchParams = Promise.resolve({ payment_intent: "pi_test_123" });
 
 const CONFIRMATION = { id: "pi_test_123", status: "succeeded", amount: 10, currency: "USD" };
 
-const landmarks = (tree: RenderResult) => tree.container.querySelectorAll(`#${MAIN_CONTENT_ID}`).length;
+const landmarks = (tree: RenderResult): number => tree.container.querySelectorAll(`#${MAIN_CONTENT_ID}`).length;
 
 describe("skip to content", () => {
 	beforeEach(() => {

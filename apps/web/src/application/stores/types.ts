@@ -17,7 +17,7 @@ export interface FetchHolidaysParams extends Pick<FiltersState, "year" | "countr
 	locale: Locale;
 }
 
-export const holidaysKeyOf = ({ year, country, region, carryOverMonths, locale }: FetchHolidaysParams) =>
+export const holidaysKeyOf = ({ year, country, region, carryOverMonths, locale }: FetchHolidaysParams): string =>
 	[country, region, year, carryOverMonths, locale].join("|");
 
 export interface SetCalculationResultParams {

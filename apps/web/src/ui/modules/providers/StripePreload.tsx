@@ -3,7 +3,7 @@
 import { getStripeClientInstance } from "@infrastructure/clients/payments/stripe/client";
 import { useEffect } from "react";
 
-export function StripePreload() {
+export function StripePreload(): null {
 	useEffect(() => {
 		Promise.resolve()
 			.then(() => getStripeClientInstance().getStripePromise())

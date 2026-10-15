@@ -1,5 +1,5 @@
 import en from "@i18n/messages/en.json";
-import { render, screen, within } from "@testing-library/react";
+import { type RenderResult, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import type { ComponentProps, ReactNode } from "react";
@@ -32,16 +32,16 @@ vi.mock("@ui/modules/core/animate/icons/Sun", () => ({ Sun: () => <svg /> }));
 
 const { ThemeSelector } = await import("./ThemeSelector");
 
-const renderSelector = (buttonClassName?: string) =>
+const renderSelector = (buttonClassName?: string): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
 			<ThemeSelector buttonClassName={buttonClassName} />
 		</NextIntlClientProvider>,
 	);
 
-const trigger = () => screen.getByRole("button", { name: en.theme.toggleTheme });
+const trigger = (): HTMLElement => screen.getByRole("button", { name: en.theme.toggleTheme });
 
-const item = (label: string) => within(screen.getByTestId("menu")).getByRole("button", { name: label });
+const item = (label: string): HTMLElement => within(screen.getByTestId("menu")).getByRole("button", { name: label });
 
 beforeEach(() => {
 	theme.theme = "dark";

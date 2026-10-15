@@ -1,9 +1,13 @@
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, type Mock, vi } from "vitest";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "./Command";
 
-const renderPalette = () => {
+interface PaletteRender extends RenderResult {
+	onSelect: Mock;
+}
+
+const renderPalette = (): PaletteRender => {
 	const onSelect = vi.fn();
 	const view = render(
 		<Command>
@@ -24,7 +28,7 @@ const renderPalette = () => {
 	return { ...view, onSelect };
 };
 
-const options = () => screen.getAllByRole("option").map((option) => option.textContent);
+const options = (): string[] => screen.getAllByRole("option").map((option) => option.textContent);
 
 describe("Command", () => {
 	it("lists every item until something is typed", () => {

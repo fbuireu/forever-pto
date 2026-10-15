@@ -1,6 +1,25 @@
 import pkg from "../../../package.json";
 
-export function mcpServerCard(baseUrl: string) {
+interface McpServerInfo {
+	name: string;
+	version: string;
+	description: string;
+	url: string;
+}
+
+interface McpServerCapabilities {
+	resources: boolean;
+	tools: boolean;
+	prompts: boolean;
+}
+
+interface McpServerCard {
+	schemaVersion: string;
+	serverInfo: McpServerInfo;
+	capabilities: McpServerCapabilities;
+}
+
+export function mcpServerCard(baseUrl: string): McpServerCard {
 	return {
 		schemaVersion: "v1",
 		serverInfo: {

@@ -1,5 +1,6 @@
 import { ACTIVATION_COOKIE, ACTIVATION_PARAM } from "@application/dto/payment/types";
-import { render } from "@testing-library/react";
+import type { TrackParams } from "@infrastructure/clients/logging/better-stack/tracking";
+import { type RenderResult, render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const { track, getExistingSession } = vi.hoisted(() => ({
@@ -27,23 +28,28 @@ interface OpenParams {
 	storage: Storage;
 }
 
-const reported = () => track.mock.calls.map(([params]) => params);
+const reported = (): TrackParams[] => track.mock.calls.map(([params]) => params);
 
-const settled = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+const settled = (): Promise<void> => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
-const setCookie = (cookie: string) => {
+const setCookie = (cookie: string): void => {
 	// biome-ignore lint/suspicious/noDocumentCookie: the test plays the browser that receives the activation route's Set-Cookie
 	document.cookie = cookie;
 };
 
-const hasProof = () => document.cookie.split("; ").some((row) => row.startsWith(`${ACTIVATION_COOKIE}=`));
+const hasProof = (): boolean => document.cookie.split("; ").some((row) => row.startsWith(`${ACTIVATION_COOKIE}=`));
 
-const landFromTheIssuer = () => {
+const landFromTheIssuer = (): string => {
 	setCookie(`${ACTIVATION_COOKIE}=1; path=/`);
 	return LANDING;
 };
 
-const open = async ({ address, storage }: OpenParams) => {
+interface OpenedPage {
+	page: RenderResult;
+	usePremiumStore: typeof import("@application/stores/premium").usePremiumStore;
+}
+
+const open = async ({ address, storage }: OpenParams): Promise<OpenedPage> => {
 	window.history.replaceState(null, "", address);
 	if (storage === "cleared") localStorage.clear();
 	vi.resetModules();
@@ -56,7 +62,10 @@ const open = async ({ address, storage }: OpenParams) => {
 	return { page, usePremiumStore };
 };
 
-const visit = async ({ address, storage }: OpenParams) => {
+const visit = async ({
+	address,
+	storage,
+}: OpenParams): Promise<ReturnType<OpenedPage["usePremiumStore"]["getState"]>> => {
 	const { page, usePremiumStore } = await open({ address, storage });
 	await settled();
 	page.unmount();
@@ -64,7 +73,7 @@ const visit = async ({ address, storage }: OpenParams) => {
 	return usePremiumStore.getState();
 };
 
-const leaveBeforeTheCallSettles = async ({ address, storage }: OpenParams) => {
+const leaveBeforeTheCallSettles = async ({ address, storage }: OpenParams): Promise<string> => {
 	getExistingSession.mockReturnValueOnce(new Promise(() => {}));
 	const { page } = await open({ address, storage });
 	const entry = window.location.href;

@@ -28,7 +28,7 @@ const detectCountryFromCDNEffect = Effect.gen(function* () {
 const reasonOf = (failure: Error): string =>
 	failure instanceof Cause.UnknownException && failure.error instanceof Error ? failure.error.message : failure.message;
 
-export async function detectCountryFromCDN() {
+export async function detectCountryFromCDN(): Promise<string> {
 	return Effect.runPromise(
 		detectCountryFromCDNEffect.pipe(
 			Effect.catchAll((failure) => {
@@ -39,7 +39,7 @@ export async function detectCountryFromCDN() {
 	);
 }
 
-export function detectCountryFromHeaders(request: NextRequest) {
+export function detectCountryFromHeaders(request: NextRequest): string {
 	return normalizeCountryCode(request.headers.get(CLOUDFLARE_COUNTRY_HEADER));
 }
 
@@ -65,6 +65,6 @@ const detectCountryFromEgressIPEffect = Effect.gen(function* () {
 	return normalizeCountryCode(stringField({ body: geoBody, field: "country" }));
 });
 
-export async function detectCountryFromEgressIP() {
+export async function detectCountryFromEgressIP(): Promise<string> {
 	return Effect.runPromise(detectCountryFromEgressIPEffect.pipe(Effect.orElse(() => Effect.succeed(""))));
 }

@@ -16,7 +16,7 @@ interface InPreferredMonthsParams {
 	preferredMonths: ReadonlySet<number>;
 }
 
-export const inPreferredMonths = ({ months, preferredMonths }: InPreferredMonthsParams) =>
+export const inPreferredMonths = ({ months, preferredMonths }: InPreferredMonthsParams): boolean =>
 	preferredMonths.size === 0 || months.every((month) => preferredMonths.has(month));
 
 export interface PlanningWindow {
@@ -29,10 +29,10 @@ interface PlanningWindowInterval {
 	end: Date;
 }
 
-export const windowMonthCount = ({ carryOverMonths }: Pick<PlanningWindow, "carryOverMonths">) =>
+export const windowMonthCount = ({ carryOverMonths }: Pick<PlanningWindow, "carryOverMonths">): number =>
 	MONTHS_IN_YEAR + carryOverMonths;
 
-export const windowQuarterCount = (window: Pick<PlanningWindow, "carryOverMonths">) =>
+export const windowQuarterCount = (window: Pick<PlanningWindow, "carryOverMonths">): number =>
 	Math.ceil(windowMonthCount(window) / MONTHS_IN_QUARTER);
 
 export const planningWindowMonths = (window: PlanningWindow): Date[] => {
@@ -61,14 +61,14 @@ export const reachableMonths = ({
 	);
 };
 
-export const monthKeyOf = (date: Date) => date.getFullYear() * MONTHS_IN_YEAR + date.getMonth();
+export const monthKeyOf = (date: Date): number => date.getFullYear() * MONTHS_IN_YEAR + date.getMonth();
 
 export interface PreferredMonthKeysParams {
 	year: number;
 	preferredMonths: readonly number[];
 }
 
-export const preferredMonthKeys = ({ year, preferredMonths }: PreferredMonthKeysParams) =>
+export const preferredMonthKeys = ({ year, preferredMonths }: PreferredMonthKeysParams): number[] =>
 	preferredMonths.map((position) => year * MONTHS_IN_YEAR + position);
 
 export interface ReachablePreferredMonthsParams {
@@ -76,7 +76,7 @@ export interface ReachablePreferredMonthsParams {
 	reachable: ReadonlySet<number>;
 }
 
-export const reachablePreferredMonths = ({ preferredMonths, reachable }: ReachablePreferredMonthsParams) =>
+export const reachablePreferredMonths = ({ preferredMonths, reachable }: ReachablePreferredMonthsParams): number[] =>
 	preferredMonths.filter((month) => reachable.has(month));
 
 export const planningWindowInterval = ({ year, carryOverMonths }: PlanningWindow): PlanningWindowInterval => ({

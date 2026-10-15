@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import enMessages from "@i18n/messages/en.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import { createTranslator } from "next-intl";
 import type { ComponentProps, ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -39,7 +39,7 @@ import { Header } from "./Header";
 
 const nav = enMessages.homepage.nav;
 
-const renderHeader = async () => {
+const renderHeader = async (): Promise<RenderResult> => {
 	mockGetTranslations.mockResolvedValue(
 		createTranslator({ locale: "en", messages: enMessages, namespace: "homepage" }),
 	);

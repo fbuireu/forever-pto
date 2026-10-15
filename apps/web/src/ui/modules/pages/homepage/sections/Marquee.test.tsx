@@ -11,7 +11,7 @@ import { Marquee } from "./Marquee";
 
 const ITEMS = enMessages.homepage.marquee.items.split(" · ");
 
-const renderMarquee = async () => {
+const renderMarquee = async (): Promise<HTMLElement> => {
 	mockGetTranslations.mockResolvedValue(
 		createTranslator({ locale: "en", messages: enMessages, namespace: "homepage" }),
 	);
@@ -19,7 +19,7 @@ const renderMarquee = async () => {
 	return container;
 };
 
-const phrasesOf = (container: HTMLElement) =>
+const phrasesOf = (container: HTMLElement): string[] =>
 	[...container.querySelectorAll("span.inline-flex")].map((span) => (span.textContent ?? "").replace("★", "").trim());
 
 describe("Marquee", () => {

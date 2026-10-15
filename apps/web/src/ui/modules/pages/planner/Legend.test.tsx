@@ -1,5 +1,5 @@
 import enMessages from "@i18n/messages/en.json";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { describe, expect, it, vi } from "vitest";
 
@@ -7,7 +7,7 @@ vi.mock("./legend.module.css", () => ({ default: {} }));
 
 const { Legend } = await import("./Legend");
 
-const renderLegend = () =>
+const renderLegend = (): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={enMessages}>
 			<Legend />

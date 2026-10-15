@@ -1,5 +1,5 @@
 import enMessages from "@i18n/messages/en.json";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { describe, expect, it, vi } from "vitest";
 
@@ -28,7 +28,7 @@ vi.mock("@application/stores/premium", () => ({
 
 import { AllowPastDays } from "./AllowPastDays";
 
-const renderField = () =>
+const renderField = (): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={enMessages}>
 			<AllowPastDays />

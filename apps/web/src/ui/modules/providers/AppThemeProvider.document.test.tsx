@@ -2,7 +2,7 @@ import { BONES_COLORS } from "@styles/palette";
 import { act, render, waitFor } from "@testing-library/react";
 import { Skeleton } from "boneyard-js/react";
 import { useTheme } from "next-themes";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, type VitestUtils, vi } from "vitest";
 
 vi.mock("@ui/modules/bones/registry", () => ({}));
 
@@ -13,7 +13,7 @@ await import("./BonesProvider");
 const THEME_KEY = "theme";
 const PROBE_BONES = { name: "probe", viewportWidth: 1000, width: 1000, height: 100, bones: [[0, 0, 50, 50, 8]] };
 
-const html = () => document.documentElement;
+const html = (): HTMLElement => document.documentElement;
 
 const ToggleTheme = () => {
 	const { resolvedTheme, setTheme } = useTheme();
@@ -24,19 +24,19 @@ const ToggleTheme = () => {
 	);
 };
 
-const runInlineScript = (container: HTMLElement) => {
+const runInlineScript = (container: HTMLElement): void => {
 	const script = container.ownerDocument.querySelector("script");
 	new Function(script?.textContent ?? "")();
 };
 
-const resetDocument = () => {
+const resetDocument = (): void => {
 	html().removeAttribute("class");
 	html().removeAttribute("data-theme");
 	html().removeAttribute("style");
 	localStorage.clear();
 };
 
-const systemPrefersDark = (dark: boolean) =>
+const systemPrefersDark = (dark: boolean): VitestUtils =>
 	vi.stubGlobal("matchMedia", (query: string) => ({
 		matches: dark && query.includes("dark"),
 		media: query,

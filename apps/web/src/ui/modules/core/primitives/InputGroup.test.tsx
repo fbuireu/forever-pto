@@ -1,10 +1,10 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ComponentProps } from "react";
 import { describe, expect, it } from "vitest";
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "./InputGroup";
 
-const renderGroup = (align?: ComponentProps<typeof InputGroupAddon>["align"]) =>
+const renderGroup = (align?: ComponentProps<typeof InputGroupAddon>["align"]): RenderResult =>
 	render(
 		<InputGroup>
 			<InputGroupAddon align={align}>
@@ -15,8 +15,8 @@ const renderGroup = (align?: ComponentProps<typeof InputGroupAddon>["align"]) =>
 		</InputGroup>,
 	);
 
-const addon = () => screen.getByText("€").parentElement as HTMLElement;
-const input = () => screen.getByRole("textbox", { name: "Amount" });
+const addon = (): HTMLElement => screen.getByText("€").parentElement as HTMLElement;
+const input = (): HTMLElement => screen.getByRole("textbox", { name: "Amount" });
 
 describe("InputGroup", () => {
 	it("groups the control with its addon under one group role", () => {

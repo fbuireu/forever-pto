@@ -44,9 +44,9 @@ vi.mock("@ui/modules/core/animate/icons/Check", () => ({ Check: () => <svg data-
 
 const { LanguageSelector } = await import("./LanguageSelector");
 
-const trigger = () => screen.getByRole("button", { name: languageSwitch.switcherLabel });
+const trigger = (): HTMLElement => screen.getByRole("button", { name: languageSwitch.switcherLabel });
 
-const item = (label: string) => within(screen.getByTestId("menu")).getByRole("button", { name: label });
+const item = (label: string): HTMLElement => within(screen.getByTestId("menu")).getByRole("button", { name: label });
 
 beforeEach(() => {
 	languageSwitch.locale = "en";

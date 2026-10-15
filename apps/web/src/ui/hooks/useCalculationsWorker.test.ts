@@ -122,9 +122,9 @@ const lastRequest = (): CalculateSuggestionsRequest => {
 	return request as CalculateSuggestionsRequest;
 };
 
-const lastPayload = () => lastRequest().payload;
+const lastPayload = (): CalculateSuggestionsRequest["payload"] => lastRequest().payload;
 
-const deliverResultFor = (requestId: string) => {
+const deliverResultFor = (requestId: string): void => {
 	act(() => {
 		workerInstance.onmessage?.({
 			data: {
@@ -136,7 +136,7 @@ const deliverResultFor = (requestId: string) => {
 	});
 };
 
-const deliverResult = () => deliverResultFor(lastRequest().requestId);
+const deliverResult = (): void => deliverResultFor(lastRequest().requestId);
 
 beforeEach(() => {
 	vi.clearAllMocks();

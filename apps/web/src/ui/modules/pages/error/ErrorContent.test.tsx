@@ -4,7 +4,7 @@ import en from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { version } from "../../../../../package.json";
@@ -25,7 +25,7 @@ const { ErrorContent } = await import("./ErrorContent");
 const LINE_COUNT = 40;
 const LINE_DELAY_MS = 130;
 
-const boom = (message = "palm tree overflow") => {
+const boom = (message = "palm tree overflow"): ErrorBoundaryProps["error"] => {
 	const error = new Error(message) as Error & { digest?: string };
 	error.digest = "digest-1234";
 	error.stack = "Error: palm tree overflow\n    at handler (api/bridges.ts:31:9)";
@@ -46,7 +46,16 @@ interface RenderErrorParams extends Partial<ErrorBoundaryProps> {
 	messages?: typeof en;
 }
 
-const renderError = ({ error = boom(), reset = vi.fn(), locale = "en", messages = en }: RenderErrorParams = {}) => {
+interface ErrorRender extends RenderResult {
+	reset: ErrorBoundaryProps["reset"];
+}
+
+const renderError = ({
+	error = boom(),
+	reset = vi.fn(),
+	locale = "en",
+	messages = en,
+}: RenderErrorParams = {}): ErrorRender => {
 	const view = render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<ErrorContent error={error} reset={reset} />
@@ -55,7 +64,7 @@ const renderError = ({ error = boom(), reset = vi.fn(), locale = "en", messages 
 	return { ...view, reset };
 };
 
-const revealEverything = () => {
+const revealEverything = (): void => {
 	for (let line = 0; line < LINE_COUNT; line++) {
 		act(() => {
 			vi.advanceTimersByTime(LINE_DELAY_MS);
@@ -63,7 +72,7 @@ const revealEverything = () => {
 	}
 };
 
-const terminal = () => document.querySelector("pre") as HTMLElement;
+const terminal = (): HTMLElement => document.querySelector("pre") as HTMLElement;
 
 beforeEach(() => {
 	logClientError.mockClear();

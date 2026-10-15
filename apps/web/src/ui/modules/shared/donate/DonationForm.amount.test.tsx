@@ -12,6 +12,7 @@ import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
 import { render, screen, waitFor } from "@testing-library/react";
+import type { UserEvent } from "@testing-library/user-event";
 import userEvent from "@testing-library/user-event";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import { useForm } from "react-hook-form";
@@ -64,7 +65,7 @@ const Harness = ({ locale }: HarnessProps) => {
 	);
 };
 
-const open = (locale: string) => {
+const open = (locale: string): HTMLInputElement => {
 	render(<Harness locale={locale} />);
 
 	return screen.getByRole<HTMLInputElement>("textbox", {
@@ -72,7 +73,7 @@ const open = (locale: string) => {
 	});
 };
 
-const typeAmount = async ({ amount, text }: { amount: HTMLInputElement; text: string }) => {
+const typeAmount = async ({ amount, text }: { amount: HTMLInputElement; text: string }): Promise<UserEvent> => {
 	const user = userEvent.setup();
 	await user.clear(amount);
 	if (text !== "") await user.type(amount, text);
@@ -85,15 +86,15 @@ interface SubmitParams {
 	user: ReturnType<typeof userEvent.setup>;
 }
 
-const submit = async ({ locale, user }: SubmitParams) => {
+const submit = async ({ locale, user }: SubmitParams): Promise<void> => {
 	await user.click(
 		screen.getByRole("button", { name: (BUNDLES[locale] as typeof enMessages).donationForm.continueToPayment }),
 	);
 };
 
-const preset = (euros: number) => screen.getByRole("button", { name: new RegExp(`^${euros}\\s?€$`) });
+const preset = (euros: number): HTMLElement => screen.getByRole("button", { name: new RegExp(`^${euros}\\s?€$`) });
 
-const donated = () => onSubmit.mock.calls.map(([data]) => data.amount);
+const donated = (): number[] => onSubmit.mock.calls.map(([data]) => data.amount);
 
 beforeEach(() => {
 	onSubmit.mockClear();

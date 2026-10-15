@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { Slider } from "./Slider";
 
-const control = () => screen.getByRole("slider", { name: "PTO days" }) as HTMLInputElement;
+const control = (): HTMLInputElement => screen.getByRole("slider", { name: "PTO days" }) as HTMLInputElement;
 
 describe("Slider", () => {
 	it("names the real control, the range input under the thumb, with the label", () => {

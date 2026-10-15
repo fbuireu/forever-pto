@@ -1,7 +1,7 @@
 import { isWeekendIndex } from "@application/shared/utils/dates";
 import { type DaySpan, spanLength } from "./spans";
 
-const onlyWeekendBetween = ({ start, end }: DaySpan) => {
+const onlyWeekendBetween = ({ start, end }: DaySpan): boolean => {
 	for (let day = start + 1; day < end; day++) {
 		if (!isWeekendIndex(day)) return false;
 	}
@@ -29,7 +29,7 @@ interface LongestWorkStretchParams {
 	off: Set<number>;
 }
 
-export const longestWorkStretch = ({ workdays, off }: LongestWorkStretchParams) =>
+export const longestWorkStretch = ({ workdays, off }: LongestWorkStretchParams): number =>
 	workStretchesOf(workdays.filter((day) => !off.has(day))).reduce(
 		(longest, stretch) => Math.max(longest, spanLength(stretch)),
 		0,

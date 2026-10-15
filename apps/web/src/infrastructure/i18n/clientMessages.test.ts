@@ -17,7 +17,7 @@ const FILES = sourceFiles(SRC).map((path) => ({
 	path: relative(SRC, path).split(sep).join("/"),
 	source: readFileSync(path, "utf8"),
 }));
-const rootOf = (key: string) => key.split(".")[0] ?? key;
+const rootOf = (key: string): string => key.split(".")[0] ?? key;
 
 const TRANSLATION_CALL = /useTranslations\(([^)]*)\)/g;
 const NON_LITERAL_CALLERS = [

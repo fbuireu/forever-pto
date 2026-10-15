@@ -16,8 +16,9 @@ const mockTurso = { query: vi.fn(), execute: vi.fn(() => Effect.succeed(1)) };
 const TestLayer = Layer.mergeAll(Layer.succeed(LoggerService, mockLogger), Layer.succeed(TursoService, mockTurso));
 
 type R = LoggerService | TursoService;
-const run = <E>(eff: Effect.Effect<void, E, R>) => Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
-const runFail = <E>(eff: Effect.Effect<void, E, R>) =>
+const run = <E>(eff: Effect.Effect<void, E, R>): Promise<void> =>
+	Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
+const runFail = <E>(eff: Effect.Effect<void, E, R>): Promise<E> =>
 	Effect.runPromise(Effect.flip(eff).pipe(Effect.provide(TestLayer)));
 
 const EVENT: PaymentFailedEvent = {

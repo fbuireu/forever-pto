@@ -4,9 +4,9 @@ import type { HolidaysState } from "@application/stores/holidays";
 import type { Suggestion } from "@domain/calendar/types";
 import type { FromTo } from "../calendar/Calendar";
 
-const daySetOf = (dates: Date[]) => new Set(dates.map(dayIndex));
+const daySetOf = (dates: Date[]): Set<number> => new Set(dates.map(dayIndex));
 
-export const isHoliday = (holidays: HolidaysState["holidays"]) => {
+export const isHoliday = (holidays: HolidaysState["holidays"]): ((date: Date) => boolean) => {
 	const days = daySetOf(holidays.map(({ date }) => date));
 	return (date: Date) => days.has(dayIndex(date));
 };
@@ -16,7 +16,7 @@ export interface IsPastParams {
 	today: Date | null;
 }
 
-export const isPast = ({ allowPastDays, today }: IsPastParams) => {
+export const isPast = ({ allowPastDays, today }: IsPastParams): ((date: Date) => boolean) => {
 	if (allowPastDays || !today) {
 		return () => false;
 	}
@@ -26,7 +26,7 @@ export const isPast = ({ allowPastDays, today }: IsPastParams) => {
 	return (date: Date) => isBefore({ date, dateToCompare: todayStart });
 };
 
-export const isToday = (today: Date | null) => {
+export const isToday = (today: Date | null): ((date: Date) => boolean) => {
 	const todayIndex = today ? dayIndex(today) : null;
 	return (date: Date) => todayIndex !== null && dayIndex(date) === todayIndex;
 };
@@ -36,7 +36,10 @@ export interface IsSuggestionParams {
 	removedSuggestedDays?: Date[];
 }
 
-export const isSuggestion = ({ currentSelection, removedSuggestedDays = [] }: IsSuggestionParams) => {
+export const isSuggestion = ({
+	currentSelection,
+	removedSuggestedDays = [],
+}: IsSuggestionParams): ((date: Date) => boolean) => {
 	if (!currentSelection) return () => false;
 
 	const removed = daySetOf(removedSuggestedDays);
@@ -48,7 +51,7 @@ export const isSuggestion = ({ currentSelection, removedSuggestedDays = [] }: Is
 	};
 };
 
-export const isManual = (manualDays: Date[]) => {
+export const isManual = (manualDays: Date[]): ((date: Date) => boolean) => {
 	const days = daySetOf(manualDays);
 	return (date: Date) => days.has(dayIndex(date));
 };
@@ -65,7 +68,7 @@ export const isAlternative = ({
 	suggestion,
 	previewAlternativeIndex,
 	currentSelection,
-}: IsAlternativeParams) => {
+}: IsAlternativeParams): ((date: Date) => boolean) => {
 	const targetSuggestion = previewAlternativeIndex === 0 ? suggestion : alternatives[previewAlternativeIndex - 1];
 	if (!targetSuggestion?.days) return () => false;
 
@@ -78,36 +81,42 @@ export const isAlternative = ({
 	};
 };
 
-export const isCustom = (holidays: HolidayDTO[]) => {
+export const isCustom = (holidays: HolidayDTO[]): ((date: Date) => boolean) => {
 	const days = daySetOf(holidays.filter(({ variant }) => variant === HolidayVariant.CUSTOM).map(({ date }) => date));
 	return (date: Date) => days.has(dayIndex(date));
 };
 
-export const isSelected = (selectedDates: Date[]) => {
+export const isSelected = (selectedDates: Date[]): ((date: Date) => boolean) => {
 	const days = daySetOf(selectedDates);
 	return (date: Date) => days.has(dayIndex(date));
 };
 
 export const isInRange =
-	({ from, to }: Partial<FromTo>) =>
+	({ from, to }: Partial<FromTo>): ((date: Date) => boolean) =>
 	(date: Date) => {
 		if (!from || !to) return false;
 		return date >= from && date <= to;
 	};
 
-export const isRangeStart = (range?: Partial<FromTo>) => (date: Date) => {
-	if (!range?.from) return false;
-	return isSameDay({ a: date, b: range.from });
-};
+export const isRangeStart =
+	(range?: Partial<FromTo>): ((date: Date) => boolean) =>
+	(date: Date) => {
+		if (!range?.from) return false;
+		return isSameDay({ a: date, b: range.from });
+	};
 
-export const isRangeEnd = (range?: Partial<FromTo>) => (date: Date) => {
-	if (!range?.to) return false;
-	return isSameDay({ a: date, b: range.to });
-};
+export const isRangeEnd =
+	(range?: Partial<FromTo>): ((date: Date) => boolean) =>
+	(date: Date) => {
+		if (!range?.to) return false;
+		return isSameDay({ a: date, b: range.to });
+	};
 
-export const isRangeSelected = (range?: Partial<FromTo>) => (date: Date) => {
-	return isRangeStart(range)(date) || isRangeEnd(range)(date);
-};
+export const isRangeSelected =
+	(range?: Partial<FromTo>): ((date: Date) => boolean) =>
+	(date: Date) => {
+		return isRangeStart(range)(date) || isRangeEnd(range)(date);
+	};
 
 interface GetPreviewRangeParams {
 	range?: Partial<FromTo>;
@@ -116,7 +125,7 @@ interface GetPreviewRangeParams {
 }
 
 export const getPreviewRange =
-	({ range, isSelectingTo, hoverDate }: GetPreviewRangeParams) =>
+	({ range, isSelectingTo, hoverDate }: GetPreviewRangeParams): ((date: Date) => boolean) =>
 	(date: Date) => {
 		if (!range?.from || !isSelectingTo || !hoverDate) return false;
 

@@ -45,14 +45,14 @@ const getPromotionCodeValidationError = ({
 	return null;
 };
 
-const toCents = (value: number) => Math.round(value * 100) / 100;
+const toCents = (value: number): number => Math.round(value * 100) / 100;
 
 interface CalculateFinalAmountParams {
 	coupon: Stripe.Coupon;
 	amount: number;
 }
 
-const calculateFinalAmount = ({ coupon, amount }: CalculateFinalAmountParams) => {
+const calculateFinalAmount = ({ coupon, amount }: CalculateFinalAmountParams): number => {
 	if (coupon.percent_off) return toCents(amount * (1 - coupon.percent_off / 100));
 	if (coupon.amount_off) return toCents(amount - coupon.amount_off / 100);
 	return amount;

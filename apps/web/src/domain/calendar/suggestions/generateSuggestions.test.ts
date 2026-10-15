@@ -4,7 +4,7 @@ import { Strategy } from "@domain/calendar/types";
 import { clearDateKeyCache, clearHolidayCache } from "@domain/calendar/utils/cache";
 import { findPlanningCandidates } from "@domain/calendar/utils/candidates";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { generateSuggestions } from "./generateSuggestions";
+import { generateSuggestions, type StrategySelection } from "./generateSuggestions";
 import { selectBridgesForStrategy } from "./utils/selectors";
 
 interface PlanSuggestionsParams {
@@ -16,7 +16,14 @@ interface PlanSuggestionsParams {
 	removedDays?: Date[];
 }
 
-const planSuggestions = ({ ptoDays, holidays, allowPastDays, months, strategy, removedDays }: PlanSuggestionsParams) =>
+const planSuggestions = ({
+	ptoDays,
+	holidays,
+	allowPastDays,
+	months,
+	strategy,
+	removedDays,
+}: PlanSuggestionsParams): StrategySelection =>
 	generateSuggestions({
 		ptoDays,
 		strategy,
@@ -36,9 +43,9 @@ interface MakeDateParams {
 	day: number;
 }
 
-const makeDate = ({ year, month, day }: MakeDateParams) => new Date(year, month - 1, day);
+const makeDate = ({ year, month, day }: MakeDateParams): Date => new Date(year, month - 1, day);
 
-const makeHoliday = (date: Date) => ({
+const makeHoliday = (date: Date): HolidayDTO => ({
 	id: `h-${date.toISOString()}`,
 	date,
 	name: "Test Holiday",

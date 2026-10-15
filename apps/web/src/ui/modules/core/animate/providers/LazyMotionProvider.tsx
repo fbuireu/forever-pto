@@ -1,9 +1,9 @@
 "use client";
 
-import { LazyMotion, MotionConfig } from "motion/react";
+import { type FeatureBundle, LazyMotion, MotionConfig } from "motion/react";
 import type { ReactNode } from "react";
 
-const loadFeatures = () => import("motion/react").then((res) => res.domAnimation);
+const loadFeatures = (): Promise<FeatureBundle> => import("motion/react").then((res) => res.domAnimation);
 
 export function LazyMotionProvider({ children }: Readonly<{ children: ReactNode }>) {
 	return (

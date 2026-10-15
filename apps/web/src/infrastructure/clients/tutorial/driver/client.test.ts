@@ -1,5 +1,5 @@
 import { createElement } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
 const {
 	mockDrive,
@@ -123,7 +123,15 @@ const mockIconContainer = { style: {} as CSSStyleDeclaration, appendChild: vi.fn
 
 const CLOSE_ICON = createElement("span");
 
-function getCallbacks(clientConfig: ConstructorParameters<typeof DriverClient>[0] = { closeIcon: CLOSE_ICON }) {
+interface DriverCallbacks {
+	client: InstanceType<typeof DriverClient>;
+	onPopoverRender: (popover: unknown, options: unknown) => void;
+	onDestroyStarted: (el: unknown, step: unknown, opts: unknown) => void;
+}
+
+function getCallbacks(
+	clientConfig: ConstructorParameters<typeof DriverClient>[0] = { closeIcon: CLOSE_ICON },
+): DriverCallbacks {
 	const client = new DriverClient(clientConfig);
 	client.start();
 	const config = mockDriverFn.mock.calls[0][0] as {
@@ -138,7 +146,12 @@ interface MakePopoverParams {
 	nextButton?: unknown;
 }
 
-function makePopover({ closeButton = null, nextButton = null }: MakePopoverParams = {}) {
+interface PopoverDouble {
+	wrapper: { querySelector: Mock };
+	nextButton: unknown;
+}
+
+function makePopover({ closeButton = null, nextButton = null }: MakePopoverParams = {}): PopoverDouble {
 	return { wrapper: { querySelector: vi.fn().mockReturnValue(closeButton) }, nextButton };
 }
 

@@ -14,7 +14,7 @@ interface LabelsParams {
 	messages: typeof enMessages;
 }
 
-const labels = ({ locale, messages }: LabelsParams) =>
+const labels = ({ locale, messages }: LabelsParams): ((feature: PremiumFeatureId) => string) =>
 	renderHook(() => usePremiumFeatureLabel(), {
 		wrapper: ({ children }: { children: ReactNode }) => (
 			<NextIntlClientProvider locale={locale} messages={messages}>

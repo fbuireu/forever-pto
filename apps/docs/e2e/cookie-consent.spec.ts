@@ -1,13 +1,14 @@
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
 const BANNER = "#cc-main .cm";
 const CONSENT_COOKIE = "cc_cookie";
 const GA_COOKIE = /^_ga/;
 
-const cookieNames = async (page: Page) => (await page.context().cookies()).map((cookie) => cookie.name);
+const cookieNames = async (page: Page): Promise<string[]> =>
+	(await page.context().cookies()).map((cookie) => cookie.name);
 
-const betterStackScripts = (page: Page) => page.locator('script[src*="betterstack.net/b.js"]');
+const betterStackScripts = (page: Page): Locator => page.locator('script[src*="betterstack.net/b.js"]');
 
 const ACCEPT_ALL_BY_PAGE = [
 	["/", "Accept all"],

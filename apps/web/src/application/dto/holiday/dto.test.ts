@@ -18,7 +18,7 @@ const makeRaw = (overrides: Partial<RawHoliday> & { date: string; name: string }
 
 const BASE_PARAMS = { year: 2024, carryOverMonths: 0, regions: REGIONS };
 
-const calendarDay = (date: Date) =>
+const calendarDay = (date: Date): string =>
 	`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
 describe("holidayDTO", () => {

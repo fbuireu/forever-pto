@@ -1,5 +1,5 @@
 import en from "@i18n/messages/en.json";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -26,16 +26,16 @@ vi.mock("@ui/modules/premium/PremiumFeature", () => ({
 
 const { CarryOverMonths } = await import("./CarryOverMonths");
 
-const renderField = () =>
+const renderField = (): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
 			<CarryOverMonths />
 		</NextIntlClientProvider>,
 	);
 
-const slider = () => screen.getByRole("slider", { name: en.sidebar.carryOverMonths.title });
+const slider = (): HTMLElement => screen.getByRole("slider", { name: en.sidebar.carryOverMonths.title });
 
-const nudgeUp = () => fireEvent.keyDown(slider(), { key: "ArrowRight" });
+const nudgeUp = (): boolean => fireEvent.keyDown(slider(), { key: "ArrowRight" });
 
 beforeEach(() => {
 	store.carryOverMonths = 1;

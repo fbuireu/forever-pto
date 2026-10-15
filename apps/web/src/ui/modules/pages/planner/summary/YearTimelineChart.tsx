@@ -20,7 +20,7 @@ interface GetDaysInMonthParams {
 	year: number;
 }
 
-function getDaysInMonth({ month, year }: GetDaysInMonthParams) {
+function getDaysInMonth({ month, year }: GetDaysInMonthParams): number {
 	return Temporal.PlainYearMonth.from({ year, month: month + 1 }).daysInMonth;
 }
 
@@ -30,7 +30,7 @@ interface SegPosParams {
 	monthCount: number;
 }
 
-function segPos({ date, year, monthCount }: SegPosParams) {
+function segPos({ date, year, monthCount }: SegPosParams): number {
 	const day = getDayOfMonth(date);
 	const daysInMonth = getDaysInMonth({ month: getMonth(date), year: getYear(date) });
 	return (windowMonthIndex({ date, window: { year } }) + (day - 1) / daysInMonth) / monthCount;
@@ -43,7 +43,7 @@ interface SegWidthParams {
 	monthCount: number;
 }
 
-function segWidth({ start, end, year, monthCount }: SegWidthParams) {
+function segWidth({ start, end, year, monthCount }: SegWidthParams): number {
 	const daysInMonth = getDaysInMonth({ month: getMonth(end), year: getYear(end) });
 	const endFrac = (windowMonthIndex({ date: end, window: { year } }) + getDayOfMonth(end) / daysInMonth) / monthCount;
 	return Math.max(endFrac - segPos({ date: start, year, monthCount }), 0.005);
@@ -54,7 +54,7 @@ interface GroupDatesParams {
 	maxGapDays: number;
 }
 
-function groupDates({ dates, maxGapDays }: GroupDatesParams) {
+function groupDates({ dates, maxGapDays }: GroupDatesParams): Seg[] {
 	if (!dates.length) return [];
 	const sorted = dates.toSorted((a, b) => a.getTime() - b.getTime());
 	const out: Seg[] = [];

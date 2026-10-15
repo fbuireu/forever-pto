@@ -13,13 +13,13 @@ import { isSessionConfigurationError } from "@infrastructure/services/premium/se
 import { traced } from "@infrastructure/span";
 import { Effect } from "effect";
 import { cookies } from "next/headers";
-import type { NextRequest } from "next/server";
+import type { NextRequest, NextResponse } from "next/server";
 
-export async function GET(_request: NextRequest) {
+export async function GET(_request: NextRequest): Promise<NextResponse<object>> {
 	return traced({ name: "verifySession", run: readPremiumSession });
 }
 
-async function readPremiumSession() {
+async function readPremiumSession(): Promise<NextResponse<object>> {
 	const cookieStore = await cookies();
 	const token = cookieStore.get(PREMIUM_COOKIE)?.value;
 
@@ -51,7 +51,7 @@ async function readPremiumSession() {
 	return response;
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<NextResponse<object>> {
 	const outcome = await activatePremiumRequest({
 		context: { ipAddress: resolveClientIp(request.headers) },
 		program: Effect.gen(function* () {

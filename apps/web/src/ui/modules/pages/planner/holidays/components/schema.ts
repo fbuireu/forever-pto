@@ -6,7 +6,9 @@ interface HolidaySchemaMessages {
 	invalidDate: string;
 }
 
-export const createHolidaySchema = (messages: HolidaySchemaMessages) =>
+export const createHolidaySchema = (
+	messages: HolidaySchemaMessages,
+): z.ZodObject<{ name: z.ZodString; date: z.ZodDate }> =>
 	z.object({
 		name: z.string().min(1, { message: messages.nameRequired }).max(100, { message: messages.nameMax }),
 		date: z.date({ message: messages.invalidDate }),

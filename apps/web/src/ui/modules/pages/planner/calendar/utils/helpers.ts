@@ -63,7 +63,7 @@ export const getDayClassNames = ({
 	disabled = false,
 	showOutsideDays,
 	modifiers,
-}: GetDayClassNamesParams) => {
+}: GetDayClassNamesParams): string => {
 	const classes: string[] = [];
 	const isOutsideMonth = !isSameMonth({ a: date, b: month });
 	const shouldShowAsPast = modifiers.disabled?.(date) ?? false;

@@ -20,7 +20,7 @@ class StripeClient {
 
 let stripeClientInstance: StripeClient | null = null;
 
-export const getStripeClientInstance = () => {
+export const getStripeClientInstance = (): StripeClient => {
 	if (!stripeClientInstance) {
 		const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 

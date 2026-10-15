@@ -32,7 +32,7 @@ vi.mock("@ui/modules/stores/StoresInitializer", () => ({ StoresInitializer: Mock
 
 const { default: AppLayout } = await import("./layout");
 
-const makeParams = (locale = EN) => ({
+const makeParams = (locale = EN): Parameters<typeof AppLayout>[0] => ({
 	children: "planner-content",
 	params: Promise.resolve({ locale: locale as never }),
 });

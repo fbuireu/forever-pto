@@ -13,7 +13,7 @@ interface StoresInitializerProps {
 	countries: CountryDTO[];
 }
 
-export const StoresInitializer = ({ countries }: StoresInitializerProps) => {
+export const StoresInitializer = ({ countries }: StoresInitializerProps): null => {
 	use(browser());
 	const { areStoresReady } = useStoresReady();
 	const userCountry = getUserCountryFromCookie();

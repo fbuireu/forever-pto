@@ -1,5 +1,5 @@
 import type { detectCountry } from "@infrastructure/services/location/detectCountry";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
 const { mockDetectCountry } = vi.hoisted(() => ({
 	mockDetectCountry: vi.fn<typeof detectCountry>(),
@@ -25,7 +25,20 @@ interface MakeParamsParams {
 	cookieValue?: string;
 }
 
-function makeParams({ country = "", cookieValue }: MakeParamsParams = {}) {
+interface RequestDouble {
+	cookies: { get: Mock };
+}
+
+interface ResponseDouble {
+	cookies: { set: Mock };
+}
+
+interface LocationDoubles {
+	request: RequestDouble;
+	response: ResponseDouble;
+}
+
+function makeParams({ country = "", cookieValue }: MakeParamsParams = {}): LocationDoubles {
 	mockDetectCountry.mockResolvedValue(country);
 	const response = { cookies: { set: vi.fn() } };
 	const request = {

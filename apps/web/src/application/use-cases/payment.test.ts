@@ -65,10 +65,11 @@ const TestLayer = Layer.mergeAll(
 );
 
 type PaymentR = LoggerService | TursoService | StripeServerService;
-const run = <A, E>(eff: Effect.Effect<A, E, PaymentR>) => Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
-const runFail = <A, E>(eff: Effect.Effect<A, E, PaymentR>) =>
+const run = <A, E>(eff: Effect.Effect<A, E, PaymentR>): Promise<A> =>
+	Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
+const runFail = <A, E>(eff: Effect.Effect<A, E, PaymentR>): Promise<E> =>
 	Effect.runPromise(Effect.flip(eff).pipe(Effect.provide(TestLayer)));
-const runDeferred = (deferred: Effect.Effect<void, never, TursoService>) =>
+const runDeferred = (deferred: Effect.Effect<void, never, TursoService>): Promise<void> =>
 	Effect.runPromise(deferred.pipe(Effect.provide(TestLayer)));
 
 const PARAMS = { amount: 999, email: "buyer@example.com", promoCode: undefined };

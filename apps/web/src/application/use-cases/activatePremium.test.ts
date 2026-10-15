@@ -66,10 +66,11 @@ const TestLayer = Layer.mergeAll(
 );
 
 type PremiumR = LoggerService | TursoService | StripeServerService;
-const run = <A, E>(eff: Effect.Effect<A, E, PremiumR>) => Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
-const runFail = <A, E>(eff: Effect.Effect<A, E, PremiumR>) =>
+const run = <A, E>(eff: Effect.Effect<A, E, PremiumR>): Promise<A> =>
+	Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
+const runFail = <A, E>(eff: Effect.Effect<A, E, PremiumR>): Promise<E> =>
 	Effect.runPromise(Effect.flip(eff).pipe(Effect.provide(TestLayer)));
-const runDeferred = (deferred: Effect.Effect<void, never, TursoService>) =>
+const runDeferred = (deferred: Effect.Effect<void, never, TursoService>): Promise<void> =>
 	Effect.runPromise(deferred.pipe(Effect.provide(TestLayer)));
 
 beforeEach(() => vi.clearAllMocks());

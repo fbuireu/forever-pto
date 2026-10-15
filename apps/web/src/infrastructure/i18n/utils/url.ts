@@ -1,4 +1,4 @@
-import { LOCALES } from "@infrastructure/i18n/locales";
+import { LOCALES, type LocaleCode } from "@infrastructure/i18n/locales";
 import { routing } from "@infrastructure/i18n/routing";
 import { hasLocale, type Locale } from "next-intl";
 
@@ -7,7 +7,7 @@ export interface LocalePathParams {
 	path?: string;
 }
 
-export function localePath({ locale, path = "" }: LocalePathParams) {
+export function localePath({ locale, path = "" }: LocalePathParams): string {
 	return locale === routing.defaultLocale ? path || "/" : `/${locale}${path}`;
 }
 
@@ -15,7 +15,7 @@ export function resolveLocale(candidate: string | null | undefined): Locale {
 	return hasLocale(LOCALES, candidate) ? candidate : routing.defaultLocale;
 }
 
-export function getLocaleFromPathname(pathname: string) {
+export function getLocaleFromPathname(pathname: string): LocaleCode {
 	return resolveLocale(pathname.split("/")[1]);
 }
 

@@ -45,7 +45,7 @@ interface MergePropsParams<T extends HTMLElement> {
 	slotProps: DOMMotionProps<T>;
 }
 
-function mergeProps<T extends HTMLElement>({ childProps, slotProps }: MergePropsParams<T>) {
+function mergeProps<T extends HTMLElement>({ childProps, slotProps }: MergePropsParams<T>): AnyProps {
 	const merged: AnyProps = { ...childProps, ...slotProps };
 
 	if (childProps.className || slotProps.className) {

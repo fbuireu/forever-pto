@@ -19,7 +19,7 @@ interface RawParams {
 	type?: string;
 }
 
-const raw = ({ date, name, type = "public" }: RawParams) => ({ date, name, type }) as RawHoliday;
+const raw = ({ date, name, type = "public" }: RawParams): RawHoliday => ({ date, name, type }) as RawHoliday;
 
 const CALENDAR = {
 	national: [

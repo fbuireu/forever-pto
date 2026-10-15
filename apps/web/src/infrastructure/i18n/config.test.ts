@@ -19,11 +19,13 @@ vi.mock("@i18n/messages/de.json", () => ({ default: { key: "de-value" } }));
 
 await import("./config");
 
-const call = (requestLocale: string | undefined) =>
-	capturedCallback?.({ requestLocale: Promise.resolve(requestLocale) }) as Promise<{
-		locale: string;
-		messages: Record<string, string>;
-	}>;
+interface ResolvedRequestConfig {
+	locale: string;
+	messages: Record<string, string>;
+}
+
+const call = (requestLocale: string | undefined): Promise<ResolvedRequestConfig> =>
+	capturedCallback?.({ requestLocale: Promise.resolve(requestLocale) }) as Promise<ResolvedRequestConfig>;
 
 describe("config", () => {
 	it("uses the requested locale when it is valid", async () => {

@@ -2,7 +2,7 @@ import { HolidayVariant } from "@application/dto/holiday/types";
 import { describe, expect, it } from "vitest";
 import { planDistance } from "./alternatives/utils/helpers";
 import { PTO_CONSTANTS } from "./const";
-import { runPlanningPipeline } from "./pipeline";
+import { type PlanningResult, runPlanningPipeline } from "./pipeline";
 import { type MeasuredSuggestion, Strategy } from "./types";
 import { measurePlan } from "./utils/measures";
 
@@ -37,7 +37,7 @@ interface PlanParams {
 	maxAlternatives?: number;
 }
 
-const plan = ({ strategy, carryOverMonths = 0, maxAlternatives = 4 }: PlanParams) =>
+const plan = ({ strategy, carryOverMonths = 0, maxAlternatives = 4 }: PlanParams): PlanningResult =>
 	runPlanningPipeline({
 		window: { year: 2026, carryOverMonths },
 		ptoDays: BUDGET,
@@ -56,9 +56,9 @@ const PLANS = Object.fromEntries(Object.values(Strategy).map((strategy) => [stra
 	ReturnType<typeof plan>
 >;
 
-const suggestionOf = (strategy: Strategy) => PLANS[strategy].suggestion;
+const suggestionOf = (strategy: Strategy): MeasuredSuggestion => PLANS[strategy].suggestion;
 
-const spanUnion = (plan: MeasuredSuggestion) =>
+const spanUnion = (plan: MeasuredSuggestion): number =>
 	measurePlan({ plan, alreadyOff: [], manualDays: [], workdays: [], preferredMonths: [] }).covered;
 
 describe("the Strategies over a real calendar", () => {

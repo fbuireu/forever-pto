@@ -15,7 +15,9 @@ export const NAME_MIN_LENGTH = 2;
 export const SUBJECT_MIN_LENGTH = 5;
 export const MESSAGE_MIN_LENGTH = 10;
 
-export const createContactSchema = (messages: ContactSchemaMessages) =>
+export const createContactSchema = (
+	messages: ContactSchemaMessages,
+): z.ZodObject<{ email: z.ZodEmail; name: z.ZodString; subject: z.ZodString; message: z.ZodString }> =>
 	z.object({
 		email: z.email(messages.invalidEmail).min(1, messages.emailRequired),
 		name: z.string().min(NAME_MIN_LENGTH, messages.nameMin).max(100, messages.nameMax),

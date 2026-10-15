@@ -25,13 +25,13 @@ afterAll(() => {
 
 const { Analytics } = await import("./Analytics");
 
-const scriptsOf = (container: HTMLElement) => [...container.querySelectorAll("script")];
+const scriptsOf = (container: HTMLElement): HTMLScriptElement[] => [...container.querySelectorAll("script")];
 interface ScriptNamedParams {
 	container: HTMLElement;
 	id: string;
 }
 
-const scriptNamed = ({ container, id }: ScriptNamedParams) => {
+const scriptNamed = ({ container, id }: ScriptNamedParams): HTMLScriptElement => {
 	const script = scriptsOf(container).find((candidate) => candidate.getAttribute("data-testid") === id);
 	if (!script) throw new Error(`script ${id} not rendered`);
 	return script;

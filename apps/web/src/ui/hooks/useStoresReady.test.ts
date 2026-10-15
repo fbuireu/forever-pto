@@ -1,7 +1,17 @@
 import { act, renderHook } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
-const makeStoreMock = (hydrated: boolean) => {
+interface PersistDouble {
+	hasHydrated: Mock<() => boolean>;
+	onFinishHydration: Mock<(cb: () => void) => () => void>;
+}
+
+interface StoreDouble {
+	persist: PersistDouble;
+	_finish: () => void;
+}
+
+const makeStoreMock = (hydrated: boolean): StoreDouble => {
 	const listeners: (() => void)[] = [];
 	return {
 		persist: {

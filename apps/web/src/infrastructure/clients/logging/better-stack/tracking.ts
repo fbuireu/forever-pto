@@ -33,7 +33,7 @@ type TrackEventName =
 	| "tool_used"
 	| "contact_opened";
 
-interface TrackProperties {
+export interface TrackProperties {
 	[key: string]: unknown;
 }
 
@@ -42,7 +42,7 @@ export interface TrackParams {
 	properties?: TrackProperties;
 }
 
-export const track = ({ event, properties }: TrackParams) => {
+export const track = ({ event, properties }: TrackParams): void => {
 	if (globalThis.window === undefined) return;
 	globalThis.window.betterstack?.("track", event, properties);
 	globalThis.window.gtag?.("event", event, properties);
@@ -60,7 +60,7 @@ export interface IdentifyUserParams {
 	plan: "premium" | "free";
 }
 
-export const identifyUser = ({ email, plan }: IdentifyUserParams) => {
+export const identifyUser = ({ email, plan }: IdentifyUserParams): void => {
 	if (globalThis.window === undefined) return;
 	globalThis.window.betterstack?.("user", { email, plan });
 	globalThis.window.gtag?.("set", "user_properties", { plan });

@@ -13,12 +13,12 @@ import { COOKIE_SECTIONS, type CookieEntry } from "./config";
 
 const SECONDS_IN: Record<string, number> = { minutes: 60, hours: 3600, days: 86400, weeks: 604800 };
 
-const lifetimeInSeconds = (entry: CookieEntry | undefined) =>
+const lifetimeInSeconds = (entry: CookieEntry | undefined): number | undefined =>
 	entry === undefined || entry.expiryKey === "session"
 		? undefined
 		: entry.expiryCount * (SECONDS_IN[entry.expiryKey] ?? Number.NaN);
 
-const entryOf = (name: string) =>
+const entryOf = (name: string): CookieEntry | undefined =>
 	COOKIE_SECTIONS.flatMap(({ cookies = [] }) => cookies).find((cookie) => cookie.name === name);
 
 describe("the consent catalogue's first-party cookies", () => {

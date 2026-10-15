@@ -11,11 +11,11 @@ import { Effect } from "effect";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<NextResponse> {
 	return traced({ name: "processWebhookEvent", run: () => handleStripeWebhook(request) });
 }
 
-async function handleStripeWebhook(request: NextRequest) {
+async function handleStripeWebhook(request: NextRequest): Promise<NextResponse> {
 	const [body, headersList] = await Promise.all([request.text(), headers()]);
 	const signature = headersList.get("stripe-signature");
 

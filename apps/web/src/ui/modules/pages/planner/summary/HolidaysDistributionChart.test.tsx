@@ -5,7 +5,7 @@ import en from "@i18n/messages/en.json";
 import es from "@i18n/messages/es.json";
 import fr from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -75,15 +75,20 @@ interface RenderChartParams {
 
 const BUNDLES = { en, es, ca, it: itMessages, de, fr };
 
-const renderChart = ({ ptoDays, holidays = [], locale = "en", messages = en }: RenderChartParams) =>
+const renderChart = ({ ptoDays, holidays = [], locale = "en", messages = en }: RenderChartParams): RenderResult =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<HolidaysDistributionChart ptoDays={ptoDays} holidays={holidays} />
 		</NextIntlClientProvider>,
 	);
 
-const slices = () =>
-	JSON.parse(screen.getByTestId("slices").textContent ?? "[]") as { name: string; value: number; color: string }[];
+interface Slice {
+	name: string;
+	value: number;
+	color: string;
+}
+
+const slices = (): Slice[] => JSON.parse(screen.getByTestId("slices").textContent ?? "[]") as Slice[];
 
 const oneOfEach = [
 	holiday({ variant: HolidayVariant.NATIONAL, id: "1" }),

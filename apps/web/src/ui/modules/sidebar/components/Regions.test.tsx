@@ -1,5 +1,5 @@
 import en from "@i18n/messages/en.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import type { ComponentProps, ReactNode } from "react";
@@ -35,14 +35,14 @@ vi.mock("@ui/modules/core/animate/base/Popover", () => ({
 
 const { Regions } = await import("./Regions");
 
-const renderRegions = () =>
+const renderRegions = (): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
 			<Regions />
 		</NextIntlClientProvider>,
 	);
 
-const picker = () => screen.getByRole("button", { name: en.sidebar.region.title });
+const picker = (): HTMLElement => screen.getByRole("button", { name: en.sidebar.region.title });
 
 beforeEach(() => {
 	filters.country = "ES";

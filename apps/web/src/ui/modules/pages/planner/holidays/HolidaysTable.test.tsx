@@ -1,9 +1,9 @@
-import { HolidayVariant } from "@application/dto/holiday/types";
+import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
 import deMessages from "@i18n/messages/de.json";
 import enMessages from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
-import { fireEvent, render } from "@testing-library/react";
+import { fireEvent, type RenderResult, render } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -122,7 +122,7 @@ interface HolidayParams {
 	isInPlanningWindow?: boolean;
 }
 
-const holiday = ({ id, name, date, type, location, isInPlanningWindow = true }: HolidayParams) => ({
+const holiday = ({ id, name, date, type, location, isInPlanningWindow = true }: HolidayParams): HolidayDTO => ({
 	id,
 	name,
 	date,
@@ -132,7 +132,7 @@ const holiday = ({ id, name, date, type, location, isInPlanningWindow = true }: 
 	isInPlanningWindow,
 });
 
-const renderTable = () => {
+const renderTable = (): RenderResult => {
 	const view = render(
 		<NextIntlClientProvider locale="en" messages={enMessages}>
 			<HolidaysTable title="National holidays" variant={HolidayVariant.NATIONAL} open />
@@ -149,9 +149,9 @@ interface HolidayCheckboxParams {
 	name: string;
 }
 
-const desktopRow = ({ view, name }: HolidayCheckboxParams) =>
+const desktopRow = ({ view, name }: HolidayCheckboxParams): HTMLInputElement =>
 	view.getAllByLabelText(`Select ${name}`)[0] as HTMLInputElement;
-const mobileCard = ({ view, name }: HolidayCheckboxParams) =>
+const mobileCard = ({ view, name }: HolidayCheckboxParams): HTMLInputElement =>
 	view.getAllByLabelText(`Select ${name}`)[1] as HTMLInputElement;
 
 beforeEach(() => {
@@ -258,20 +258,21 @@ interface SelectAllBoxesParams {
 	label: string;
 }
 
-const selectAllBoxes = ({ view, label }: SelectAllBoxesParams) => view.getAllByLabelText(label) as HTMLInputElement[];
+const selectAllBoxes = ({ view, label }: SelectAllBoxesParams): HTMLInputElement[] =>
+	view.getAllByLabelText(label) as HTMLInputElement[];
 
-const names = (view: View) => view.queryByTestId("delete-modal")?.getAttribute("data-names") ?? null;
+const names = (view: View): string | null => view.queryByTestId("delete-modal")?.getAttribute("data-names") ?? null;
 
 const DELETE_ANY = /Delete \(\d+\)/;
 
-const openDelete = (view: View) => fireEvent.click(view.getByRole("button", { name: DELETE_ANY }));
+const openDelete = (view: View): boolean => fireEvent.click(view.getByRole("button", { name: DELETE_ANY }));
 
 interface SearchParams {
 	view: View;
 	term: string;
 }
 
-const search = ({ view, term }: SearchParams) =>
+const search = ({ view, term }: SearchParams): boolean =>
 	fireEvent.change(view.getByPlaceholderText(enMessages.holidaysTable.searchPlaceholder), {
 		target: { value: term },
 	});
@@ -375,7 +376,7 @@ describe("HolidaysTable clears the selection when a modal is done with it", () =
 	});
 });
 
-const renderCustomTable = () => {
+const renderCustomTable = (): RenderResult => {
 	holidaysState.holidays = [
 		{ ...holiday({ id: "custom-1", name: "Shutdown", date: new Date(2026, 0, 2) }), variant: HolidayVariant.CUSTOM },
 	];
@@ -393,7 +394,7 @@ interface PressParams {
 	name: RegExp;
 }
 
-const press = ({ view, name }: PressParams) => fireEvent.click(view.getByRole("button", { name }));
+const press = ({ view, name }: PressParams): boolean => fireEvent.click(view.getByRole("button", { name }));
 
 const ADD = new RegExp(enMessages.holidaysTable.addHoliday);
 const EDIT = new RegExp(enMessages.holidaysTable.editHoliday);
@@ -509,7 +510,7 @@ describe("HolidaysTable follows its tab", () => {
 	});
 });
 
-const rowOrder = (view: View) =>
+const rowOrder = (view: View): (string | undefined)[] =>
 	view
 		.getAllByLabelText(/^Select (?!all$)/)
 		.slice(0, holidaysState.holidays.length)

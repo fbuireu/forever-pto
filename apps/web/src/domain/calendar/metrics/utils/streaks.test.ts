@@ -2,7 +2,7 @@ import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types"
 import { describe, expect, it } from "vitest";
 import { freeStreaks } from "./streaks";
 
-const JAN = (day: number) => new Date(2025, 0, day);
+const JAN = (day: number): Date => new Date(2025, 0, day);
 
 const holiday = (day: number): HolidayDTO => ({
 	id: `h-${day}`,

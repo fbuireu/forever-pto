@@ -3,14 +3,14 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { BONES_COLORS, STRIPE_DARK_PALETTE, STRIPE_LIGHT_PALETTE } from "./palette";
 
-const read = (file: string) => readFileSync(join(__dirname, file), "utf8");
+const read = (file: string): string => readFileSync(join(__dirname, file), "utf8");
 
 const LIGHT_BLOCK = /^:root\s*\{([\s\S]*?)^\}/m;
 const DARK_BLOCK = /^\[data-theme="dark"\]\s*\{([\s\S]*?)^\}/m;
 const DECLARATION = /^\s*(--[\w-]+)\s*:\s*([^;]+);/gm;
 const VARIABLE_REFERENCE = /^var\((--[\w-]+)\)$/;
 
-const declarationsOf = (block: string) =>
+const declarationsOf = (block: string): Map<string, string> =>
 	new Map([...block.matchAll(DECLARATION)].map(([, name, value]) => [name, value.trim()]));
 
 const tokens = read("global/index.css");
@@ -64,7 +64,7 @@ const BONES_TOKENS = {
 } as const;
 
 const HEX_COLOUR = /#[0-9a-f]{3,8}\b/i;
-const lowercased = <T extends Record<string, string>>(record: T) =>
+const lowercased = <T extends Record<string, string>>(record: T): Record<string, string> =>
 	Object.fromEntries(Object.entries(record).map(([key, value]) => [key, value.toLowerCase()]));
 
 describe("the palette module", () => {

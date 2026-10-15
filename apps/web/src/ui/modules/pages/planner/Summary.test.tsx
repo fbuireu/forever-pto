@@ -5,7 +5,7 @@ import enMessages from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { render } from "@testing-library/react";
+import { type RenderResult, render } from "@testing-library/react";
 import type { Locale } from "next-intl";
 import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
@@ -20,9 +20,12 @@ const { locationState, premiumState, loaders } = vi.hoisted(() => ({
 	loaders: [] as (() => Promise<{ default: unknown }>)[],
 }));
 
-const JAN = (day: number) => new Date(2025, 0, day);
+const JAN = (day: number): Date => new Date(2025, 0, day);
 
-const initialFilters = () => ({
+const initialFilters = (): Pick<
+	FiltersState,
+	"ptoDays" | "country" | "region" | "strategy" | "year" | "carryOverMonths"
+> => ({
 	ptoDays: 3,
 	country: "ES",
 	region: "",
@@ -31,7 +34,17 @@ const initialFilters = () => ({
 	carryOverMonths: 0,
 });
 
-const initialHolidays = () => ({
+interface HolidaysStateDouble {
+	suggestion: unknown;
+	holidays: unknown[];
+	alternatives: unknown[];
+	currentSelection: unknown;
+	manualDays: Date[];
+	removedSuggestedDays: Date[];
+	planKey: string | null | undefined;
+}
+
+const initialHolidays = (): HolidaysStateDouble => ({
 	suggestion: null as unknown,
 	holidays: [] as unknown[],
 	alternatives: [] as unknown[],
@@ -97,6 +110,8 @@ vi.mock("@ui/modules/core/animate/text/SlidingNumber", async () => {
 });
 vi.mock("@ui/modules/core/animate/text/Rotating", () => ({ RotatingText: () => null }));
 
+import type { FiltersState } from "@application/stores/filters";
+import type { MeasuredSuggestion } from "@domain/calendar/types";
 import { Summary } from "./Summary";
 
 const METRICS = {
@@ -120,7 +135,7 @@ interface RenderSummaryParams {
 	messages?: object;
 }
 
-const renderSummary = ({ locale = "en", messages = enMessages }: RenderSummaryParams = {}) => {
+const renderSummary = ({ locale = "en", messages = enMessages }: RenderSummaryParams = {}): RenderResult => {
 	if (holidaysState.planKey === undefined) {
 		holidaysState.planKey = holidaysKeyOf({
 			...filtersState,
@@ -230,14 +245,14 @@ interface PlanOfParams {
 	totalEffectiveDays?: number;
 }
 
-const planOf = ({ days, totalEffectiveDays = 5 }: PlanOfParams) => ({
+const planOf = ({ days, totalEffectiveDays = 5 }: PlanOfParams): MeasuredSuggestion => ({
 	days,
 	bridges: [],
 	strategy: "grouped",
 	metrics: { ...METRICS, totalEffectiveDays },
 });
 
-const resetPlan = () => {
+const resetPlan = (): void => {
 	filtersState.ptoDays = 3;
 	holidaysState.suggestion = planOf({ days: [JAN(6), JAN(7), JAN(8)] });
 	holidaysState.currentSelection = null;
@@ -365,7 +380,15 @@ interface HolidayOfParams {
 	isInPlanningWindow?: boolean;
 }
 
-const holidayOf = ({ variant, day, isInPlanningWindow = true }: HolidayOfParams) => ({
+interface HolidayDouble {
+	id: string;
+	date: Date;
+	name: string;
+	variant: string;
+	isInPlanningWindow: boolean;
+}
+
+const holidayOf = ({ variant, day, isInPlanningWindow = true }: HolidayOfParams): HolidayDouble => ({
 	id: `${variant}-${day}`,
 	date: JAN(day),
 	name: `Holiday ${day}`,

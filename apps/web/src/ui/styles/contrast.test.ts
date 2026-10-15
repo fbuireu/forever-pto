@@ -22,12 +22,12 @@ type Theme = (typeof DAY_STATES_BY_THEME)[number];
 type Colour = [number, number, number];
 
 const tokens = readFileSync(join(__dirname, "global/index.css"), "utf8");
-const declarationsOf = (block: string) =>
+const declarationsOf = (block: string): Map<string, string> =>
 	new Map([...block.matchAll(DECLARATION)].map(([, name, value]) => [name as string, (value as string).trim()]));
 const light = declarationsOf(tokens.match(LIGHT_BLOCK)?.[1] ?? "");
 const dark = declarationsOf(tokens.match(DARK_BLOCK)?.[1] ?? "");
 
-const topLevelParts = (list: string) => {
+const topLevelParts = (list: string): string[] => {
 	const parts: string[] = [];
 	let depth = 0;
 	let start = 0;
@@ -85,19 +85,20 @@ const coloursOf = ({ theme, value }: ColoursOfParams): Colour[] => {
 	throw new Error(`no colour to read in ${text}`);
 };
 
-const linear = (channel: number) => {
+const linear = (channel: number): number => {
 	const share = channel / 255;
 	return share <= 0.03928 ? share / 12.92 : ((share + 0.055) / 1.055) ** 2.4;
 };
 
-const luminance = ([red, green, blue]: Colour) => 0.2126 * linear(red) + 0.7152 * linear(green) + 0.0722 * linear(blue);
+const luminance = ([red, green, blue]: Colour): number =>
+	0.2126 * linear(red) + 0.7152 * linear(green) + 0.0722 * linear(blue);
 
 interface ContrastParams {
 	foreground: Colour;
 	background: Colour;
 }
 
-const contrast = ({ foreground, background }: ContrastParams) => {
+const contrast = ({ foreground, background }: ContrastParams): number => {
 	const [lighter = 0, darker = 0] = [luminance(foreground), luminance(background)].sort((a, b) => b - a);
 	return (lighter + 0.05) / (darker + 0.05);
 };
@@ -116,7 +117,7 @@ const overlaid = ({ theme, base, stripe }: OverlaidParams): Colour => {
 	return base.map((channel, at) => channel * (1 - alpha) + Number(match[at + 1]) * alpha) as Colour;
 };
 
-const fillOf = (classes: string) => {
+const fillOf = (classes: string): string => {
 	const arbitrary = classes.match(ARBITRARY_FILL)?.[1];
 	if (arbitrary) return arbitrary.replaceAll("_", " ");
 	const named = classes.match(NAMED_FILL)?.[1];

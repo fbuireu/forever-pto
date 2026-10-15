@@ -9,7 +9,7 @@ import { Effect } from "effect";
 import { after } from "next/server";
 import type { ApiOutcome } from "./types";
 
-type ContactBody = { success: true } | { success: false; error: string };
+export type ContactBody = { success: true } | { success: false; error: string };
 
 export interface SendContactRequestParams {
 	input: Effect.Effect<ContactFormData, ValidationError>;

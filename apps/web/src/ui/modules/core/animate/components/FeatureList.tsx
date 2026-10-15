@@ -1,6 +1,6 @@
 "use client";
 
-import { m, type Transition } from "motion/react";
+import { m, type Transition, type Variants } from "motion/react";
 import { Badge } from "../../primitives/Badge";
 
 interface RoadmapFeature {
@@ -22,7 +22,7 @@ const transition: Transition = {
 	damping: 26,
 };
 
-const getCardVariants = (i: number) => ({
+const getCardVariants = (i: number): Variants => ({
 	collapsed: {
 		marginTop: i === 0 ? 0 : -44,
 		scaleX: 1 - i * 0.05,

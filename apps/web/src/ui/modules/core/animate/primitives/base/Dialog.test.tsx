@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -100,7 +100,7 @@ interface RenderDialogParams {
 	asChild?: boolean;
 }
 
-const renderDialog = ({ open, defaultOpen, onOpenChange, asChild }: RenderDialogParams = {}) =>
+const renderDialog = ({ open, defaultOpen, onOpenChange, asChild }: RenderDialogParams = {}): RenderResult =>
 	render(
 		<Dialog open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
 			<DialogTrigger asChild={asChild}>{asChild ? <a href="/settings">settings</a> : "settings"}</DialogTrigger>
@@ -119,8 +119,9 @@ const renderDialog = ({ open, defaultOpen, onOpenChange, asChild }: RenderDialog
 		</Dialog>,
 	);
 
-const body = () => screen.queryByText("Body");
-const slot = (name: string) => document.querySelector(`[data-slot="${name}"]`) as HTMLElement | null;
+const body = (): HTMLElement | null => screen.queryByText("Body");
+const slot = (name: string): HTMLElement | null =>
+	document.querySelector(`[data-slot="${name}"]`) as HTMLElement | null;
 
 describe("Dialog", () => {
 	afterEach(() => {

@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { intlLocaleOf, readLocalizedNumber } from "./localizedNumber";
 
-const read = (locale: string) => (text: string) => readLocalizedNumber({ text, locale });
+const read =
+	(locale: string): ((text: string) => number | null) =>
+	(text: string) =>
+		readLocalizedNumber({ text, locale });
 
 describe("readLocalizedNumber in a language that groups with a comma and writes decimals with a point", () => {
 	const en = read("en");

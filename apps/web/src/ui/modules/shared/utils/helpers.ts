@@ -24,7 +24,7 @@ interface MessageFromParams {
 	values: Record<string, number> | undefined;
 }
 
-const messageFrom = ({ translator, key, values }: MessageFromParams) => {
+const messageFrom = ({ translator, key, values }: MessageFromParams): string | undefined => {
 	if (!translator.has(key as never)) return undefined;
 
 	if (typeof translator.raw(key as never) !== "string") return undefined;
@@ -32,7 +32,7 @@ const messageFrom = ({ translator, key, values }: MessageFromParams) => {
 	return translator(key as never, values as never);
 };
 
-export const resolveApiErrorMessage = ({ code, t, shared, fallback, values }: ResolveApiErrorMessageParams) => {
+export const resolveApiErrorMessage = ({ code, t, shared, fallback, values }: ResolveApiErrorMessageParams): string => {
 	if (!code) return fallback;
 
 	const codeValues = values?.get(code);
@@ -45,7 +45,7 @@ export const resolveApiErrorMessage = ({ code, t, shared, fallback, values }: Re
 	return MACHINE_CODE.test(code) ? fallback : code;
 };
 
-export const getViewBoxFromSvg = (svg: string) => {
+export const getViewBoxFromSvg = (svg: string): string => {
 	const VIEWBOX_REGEX = /viewBox="([^"]*)"/;
 	const DEFAULT_VIEWBOX = "0 0 24 24";
 	const viewBoxMatch = RegExp(VIEWBOX_REGEX).exec(svg);

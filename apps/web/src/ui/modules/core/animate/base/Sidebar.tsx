@@ -43,7 +43,7 @@ interface SidebarContextProps {
 
 const SidebarContext = createContext<SidebarContextProps | null>(null);
 
-function useSidebar() {
+function useSidebar(): SidebarContextProps {
 	const context = use(SidebarContext);
 	if (!context) {
 		throw new Error("useSidebar must be used within a SidebarProvider.");

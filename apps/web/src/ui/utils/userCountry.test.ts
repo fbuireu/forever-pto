@@ -1,5 +1,5 @@
 import { USER_COUNTRY_COOKIE } from "@infrastructure/proxy/cookie";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, type Mock, vi } from "vitest";
 import { getUserCountryFromCookie } from "./userCountry";
 
 vi.mock("@infrastructure/proxy/cookie", async (importOriginal) => ({
@@ -7,7 +7,7 @@ vi.mock("@infrastructure/proxy/cookie", async (importOriginal) => ({
 	USER_COUNTRY_COOKIE: "visitor-country",
 }));
 
-const withCookie = (value: string) => vi.spyOn(document, "cookie", "get").mockReturnValue(value);
+const withCookie = (value: string): Mock<() => string> => vi.spyOn(document, "cookie", "get").mockReturnValue(value);
 
 afterEach(() => {
 	vi.restoreAllMocks();

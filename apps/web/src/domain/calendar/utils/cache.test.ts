@@ -1,4 +1,4 @@
-import { HolidayVariant } from "@application/dto/holiday/types";
+import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
 import { beforeEach, describe, expect, it } from "vitest";
 import { clearDateKeyCache, clearHolidayCache, createHolidaySet, getCombinationKey, getKey } from "./cache";
 
@@ -8,9 +8,9 @@ interface MakeDateParams {
 	day: number;
 }
 
-const makeDate = ({ year, month, day }: MakeDateParams) => new Date(year, month - 1, day);
+const makeDate = ({ year, month, day }: MakeDateParams): Date => new Date(year, month - 1, day);
 
-const makeHoliday = (date: Date) => ({
+const makeHoliday = (date: Date): HolidayDTO => ({
 	id: `h-${date.toISOString()}`,
 	date,
 	name: "Test Holiday",

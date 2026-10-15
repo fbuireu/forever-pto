@@ -17,7 +17,7 @@ const LABEL_KEY = {
 	[PremiumFeatureId.CALENDAR_EXPORT]: "calendarExport.title",
 } as const satisfies Record<PremiumFeatureId, string>;
 
-export const usePremiumFeatureLabel = () => {
+export const usePremiumFeatureLabel = (): ((feature: PremiumFeatureId) => string) => {
 	const t = useTranslations();
 
 	return (feature: PremiumFeatureId) => t(LABEL_KEY[feature]);

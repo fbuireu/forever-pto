@@ -323,7 +323,10 @@ interface GetNonOverridingDataAttributesParams {
 	dataAttributes: Record<string, unknown>;
 }
 
-function getNonOverridingDataAttributes({ element, dataAttributes }: GetNonOverridingDataAttributesParams) {
+function getNonOverridingDataAttributes({
+	element,
+	dataAttributes,
+}: GetNonOverridingDataAttributesParams): Record<string, unknown> {
 	return Object.keys(dataAttributes).reduce<Record<string, unknown>>((acc, key) => {
 		if ((element.props as Record<string, unknown>)[key] === undefined) {
 			acc[key] = dataAttributes[key];

@@ -1,5 +1,5 @@
 import enMessages from "@i18n/messages/en.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import { createTranslator } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -9,7 +9,7 @@ vi.mock("next-intl/server", () => ({ getTranslations: mockGetTranslations }));
 
 import { LegalLayout } from "./LegalLayout";
 
-const renderLayout = async () => {
+const renderLayout = async (): Promise<RenderResult> => {
 	mockGetTranslations.mockResolvedValue(createTranslator({ locale: "en", messages: enMessages, namespace: "legal" }));
 	return render(
 		await LegalLayout({

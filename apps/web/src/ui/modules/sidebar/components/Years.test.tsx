@@ -1,9 +1,9 @@
 import en from "@i18n/messages/en.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import type { ComponentProps, ReactNode } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, type VitestUtils, vi } from "vitest";
 
 const store = vi.hoisted(() => ({ year: 2026, setYear: vi.fn() }));
 const stores = vi.hoisted(() => ({ ready: true }));
@@ -28,18 +28,19 @@ vi.mock("@ui/modules/core/animate/base/Popover", () => ({
 
 const { Years } = await import("./Years");
 
-const renderYears = (serverYear = 2026) =>
+const renderYears = (serverYear = 2026): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
 			<Years serverYear={serverYear} />
 		</NextIntlClientProvider>,
 	);
 
-const visitorClockAt = (year: number) => vi.useFakeTimers({ now: new Date(year, 5, 15), toFake: ["Date"] });
+const visitorClockAt = (year: number): VitestUtils =>
+	vi.useFakeTimers({ now: new Date(year, 5, 15), toFake: ["Date"] });
 
-const offeredYears = () => screen.getAllByRole("option").map((option) => option.textContent?.trim());
+const offeredYears = (): string[] => screen.getAllByRole("option").map((option) => option.textContent?.trim());
 
-const trigger = () => screen.getByRole("button", { name: en.sidebar.years.title });
+const trigger = (): HTMLElement => screen.getByRole("button", { name: en.sidebar.years.title });
 
 beforeEach(() => {
 	store.year = 2026;

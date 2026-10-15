@@ -1,7 +1,7 @@
 import type { NextResponse } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-function makeMockResponse() {
+function makeMockResponse(): NextResponse {
 	return { cookies: { set: vi.fn(), delete: vi.fn() } } as unknown as NextResponse;
 }
 

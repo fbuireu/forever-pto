@@ -27,7 +27,7 @@ export const amountFormatter = (locale: Locale): Intl.NumberFormat => {
 	return formatter;
 };
 
-export const useCurrencyFormatter = () => {
+export const useCurrencyFormatter = (): ((value: number) => string) => {
 	const format = useFormatter();
 
 	return useCallback(

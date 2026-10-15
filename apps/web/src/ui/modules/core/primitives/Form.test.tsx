@@ -41,9 +41,9 @@ const Harness = ({ description = false, message }: HarnessProps) => {
 	);
 };
 
-const control = () => screen.getByLabelText("Email") as HTMLInputElement;
+const control = (): HTMLInputElement => screen.getByLabelText("Email") as HTMLInputElement;
 
-const press = async (name: string) => {
+const press = async (name: string): Promise<void> => {
 	await act(async () => {
 		screen.getByRole("button", { name }).click();
 	});

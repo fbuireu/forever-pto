@@ -214,7 +214,7 @@ const language = (): Language => LANGUAGES.find((code) => document.documentEleme
 const isServiceConsented = (serviceId: string): boolean =>
 	CookieConsentLib.acceptedService(serviceId, ANALYTICS_CATEGORY);
 
-const updateGoogleConsent = () => {
+const updateGoogleConsent = (): void => {
 	const granted = isServiceConsented(GOOGLE_ANALYTICS_SERVICE_ID);
 
 	window.gtag?.("consent", "update", { analytics_storage: granted ? "granted" : "denied" });
@@ -223,7 +223,7 @@ const updateGoogleConsent = () => {
 
 let betterStackLoaded = false;
 
-const loadBetterStack = () => {
+const loadBetterStack = (): void => {
 	if (betterStackLoaded || !TRACKING_TOKEN || !isServiceConsented(BETTER_STACK_SERVICE_ID)) return;
 
 	betterStackLoaded = true;
@@ -245,12 +245,12 @@ const loadBetterStack = () => {
 	window.betterstack("init", { environment: trackingStage(window.location.hostname) });
 };
 
-const applyConsent = () => {
+const applyConsent = (): void => {
 	updateGoogleConsent();
 	loadBetterStack();
 };
 
-export const startCookieConsent = () => {
+export const startCookieConsent = (): void => {
 	CookieConsentLib.run({
 		guiOptions: {
 			consentModal: { layout: "box", position: "bottom right" },

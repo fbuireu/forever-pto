@@ -3,11 +3,11 @@
 import { hasStoredPlan } from "@application/stores/storedPlan";
 import { useSyncExternalStore } from "react";
 
-const subscribe = (callback: () => void) => {
+const subscribe = (callback: () => void): (() => void) => {
 	globalThis.addEventListener("storage", callback);
 	return () => globalThis.removeEventListener("storage", callback);
 };
 
-const getServerSnapshot = () => false;
+const getServerSnapshot = (): boolean => false;
 
-export const useHasStoredPlan = () => useSyncExternalStore(subscribe, hasStoredPlan, getServerSnapshot);
+export const useHasStoredPlan = (): boolean => useSyncExternalStore(subscribe, hasStoredPlan, getServerSnapshot);

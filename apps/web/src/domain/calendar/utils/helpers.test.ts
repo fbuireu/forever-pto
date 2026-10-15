@@ -1,4 +1,4 @@
-import { HolidayVariant } from "@application/dto/holiday/types";
+import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
 import { PTO_CONSTANTS } from "@domain/calendar/const";
 import { STRATEGY_OBJECTIVE } from "@domain/calendar/suggestions/utils/selectors";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -11,9 +11,9 @@ interface MakeDateParams {
 	day: number;
 }
 
-const makeDate = ({ year, month, day }: MakeDateParams) => new Date(year, month - 1, day);
+const makeDate = ({ year, month, day }: MakeDateParams): Date => new Date(year, month - 1, day);
 
-const makeHoliday = (date: Date) => ({
+const makeHoliday = (date: Date): HolidayDTO => ({
 	id: `h-${date.toISOString()}`,
 	date,
 	name: "Test Holiday",

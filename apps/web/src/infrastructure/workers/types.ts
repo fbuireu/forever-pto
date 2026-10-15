@@ -70,7 +70,7 @@ export interface CalculateSuggestionsRequest {
 	payload: CalculateSuggestionsPayload;
 }
 
-interface CalculateSuggestionsResultPayload {
+export interface CalculateSuggestionsResultPayload {
 	suggestion: SerializedSuggestion;
 	alternatives: SerializedSuggestion[];
 }

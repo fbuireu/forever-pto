@@ -2,9 +2,9 @@
 
 import { useHolidaysStore } from "@application/stores/holidays";
 import type { GenerateSuggestionsParams } from "@application/stores/types";
-import type { MeasuredSuggestion } from "@domain/calendar/types";
+import type { MeasuredSuggestion, Strategy } from "@domain/calendar/types";
 import { measureBudget } from "@domain/calendar/utils/budget";
-import { track } from "@infrastructure/clients/logging/better-stack/tracking";
+import { type TrackProperties, track } from "@infrastructure/clients/logging/better-stack/tracking";
 import {
 	type CalculateSuggestionsRequest,
 	WORKER_MESSAGE_TYPE,
@@ -20,7 +20,28 @@ interface PlannerGeneratedPropertiesParams {
 	alternatives: readonly unknown[];
 }
 
-function plannerGeneratedProperties({ params, measured, alternatives }: PlannerGeneratedPropertiesParams) {
+interface PlannerGeneratedProperties extends TrackProperties {
+	ptoDays: number;
+	strategy: Strategy;
+	preferredMonths: string;
+	year: number;
+	carryOverMonths: number;
+	allowPastDays: boolean;
+	alternatives: number;
+	averageEfficiency: number;
+	totalEffectiveDays: number;
+	bonusDays: number;
+	longWeekends: number;
+	restBlocks: number;
+	longestVacation: number;
+	maxWorkStreak: number;
+}
+
+function plannerGeneratedProperties({
+	params,
+	measured,
+	alternatives,
+}: PlannerGeneratedPropertiesParams): PlannerGeneratedProperties {
 	const { metrics } = measured;
 
 	return {
@@ -41,7 +62,11 @@ function plannerGeneratedProperties({ params, measured, alternatives }: PlannerG
 	};
 }
 
-export function useCalculationsWorker() {
+interface CalculationsWorker {
+	triggerCalculation: (params: GenerateSuggestionsParams) => void;
+}
+
+export function useCalculationsWorker(): CalculationsWorker {
 	const workerRef = useRef<Worker | null>(null);
 	const lastRequestIdRef = useRef(0);
 	const inFlightRequestIdRef = useRef<string | null>(null);

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { planDistance } from "./helpers";
 
-const jan = (day: number) => new Date(2025, 0, day);
+const jan = (day: number): Date => new Date(2025, 0, day);
 
 describe("planDistance", () => {
 	it("is zero for the same plan, whatever the order of its days", () => {

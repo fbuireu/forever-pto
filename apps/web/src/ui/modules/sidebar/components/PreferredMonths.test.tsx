@@ -1,5 +1,5 @@
 import en from "@i18n/messages/en.json";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen, within } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -26,7 +26,7 @@ vi.mock("@application/stores/filters", () => ({
 
 const { PreferredMonths } = await import("./PreferredMonths");
 
-const renderMonths = () =>
+const renderMonths = (): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
 			<PreferredMonths />

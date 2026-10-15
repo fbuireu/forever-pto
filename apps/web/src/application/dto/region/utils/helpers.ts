@@ -5,7 +5,7 @@ export interface GetRegionNameParams {
 	regions: RegionDTO[];
 }
 
-export function getRegionName({ regionCode, regions }: GetRegionNameParams) {
+export function getRegionName({ regionCode, regions }: GetRegionNameParams): string {
 	if (!regionCode) return "";
 	const region = regions.find((r) => r.value.toLowerCase() === regionCode.toLowerCase());
 	return region?.label ?? regionCode;

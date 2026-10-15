@@ -4,7 +4,7 @@ import enMessages from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import { createTranslator, type Locale } from "next-intl";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -33,15 +33,18 @@ interface RenderTestimonialsParams {
 	messages?: typeof enMessages;
 }
 
-const renderTestimonials = async ({ locale = "en", messages = enMessages }: RenderTestimonialsParams = {}) => {
+const renderTestimonials = async ({
+	locale = "en",
+	messages = enMessages,
+}: RenderTestimonialsParams = {}): Promise<RenderResult> => {
 	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "homepage" }));
 	return render(await Testimonials({ locale }));
 };
 
-const cardsOf = (container: HTMLElement) =>
+const cardsOf = (container: HTMLElement): HTMLElement[] =>
 	[...(container.querySelectorAll(".md\\:grid-cols-3")[0]?.children ?? [])] as HTMLElement[];
 
-const avatarClassOf = (card: HTMLElement) => card.querySelector(".rounded-full")?.className ?? "";
+const avatarClassOf = (card: HTMLElement): string => card.querySelector(".rounded-full")?.className ?? "";
 
 beforeEach(() => {
 	vi.clearAllMocks();

@@ -1,5 +1,5 @@
 import en from "@i18n/messages/en.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -29,16 +29,16 @@ vi.mock("@ui/hooks/usePlanReadout", () => ({
 
 const { PtoDays } = await import("./PtoDays");
 
-const renderField = () =>
+const renderField = (): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
 			<PtoDays />
 		</NextIntlClientProvider>,
 	);
 
-const decrease = () => screen.getByRole("button", { name: en.ptoDays.decrease });
+const decrease = (): HTMLElement => screen.getByRole("button", { name: en.ptoDays.decrease });
 
-const increase = () => screen.getByRole("button", { name: en.ptoDays.increase });
+const increase = (): HTMLElement => screen.getByRole("button", { name: en.ptoDays.increase });
 
 beforeEach(() => {
 	filters.ptoDays = 23;

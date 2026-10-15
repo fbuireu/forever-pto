@@ -1,4 +1,4 @@
-import type { PlanningResult, runPlanningPipeline } from "@domain/calendar/pipeline";
+import type { PlanningResult, RunPlanningPipelineParams, runPlanningPipeline } from "@domain/calendar/pipeline";
 import { type MeasuredSuggestion, type Metrics, Strategy } from "@domain/calendar/types";
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { CalculateSuggestionsRequest } from "./types";
@@ -60,7 +60,7 @@ afterAll(() => {
 
 await import("./worker");
 
-const sendMessage = (payload: Partial<CalculateSuggestionsRequest["payload"]> = {}) => {
+const sendMessage = (payload: Partial<CalculateSuggestionsRequest["payload"]> = {}): void => {
 	const message: CalculateSuggestionsRequest = {
 		type: WORKER_MESSAGE_TYPE.CALCULATE_SUGGESTIONS,
 		requestId: "req-1",
@@ -90,7 +90,7 @@ const sendMessage = (payload: Partial<CalculateSuggestionsRequest["payload"]> = 
 	} as MessageEvent<CalculateSuggestionsRequest>);
 };
 
-const planningInput = () => mockRunPlanningPipeline.mock.lastCall?.[0];
+const planningInput = (): RunPlanningPipelineParams | undefined => mockRunPlanningPipeline.mock.lastCall?.[0];
 
 describe("worker onmessage", () => {
 	beforeEach(() => {

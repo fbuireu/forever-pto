@@ -1,6 +1,6 @@
 import { type HolidayOutcome, HolidayRefusal } from "@application/stores/types";
 import en from "@i18n/messages/en.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -51,7 +51,7 @@ interface RenderModalParams {
 	onClose?: () => void;
 }
 
-const renderModal = ({ onCommit, withDefaults = true, onClose = vi.fn() }: RenderModalParams) =>
+const renderModal = ({ onCommit, withDefaults = true, onClose = vi.fn() }: RenderModalParams): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
 			<HolidayFormModal
@@ -67,7 +67,7 @@ const renderModal = ({ onCommit, withDefaults = true, onClose = vi.fn() }: Rende
 		</NextIntlClientProvider>,
 	);
 
-const submit = () => userEvent.click(screen.getByRole("button", { name: en.modals.addHoliday.submit }));
+const submit = (): Promise<void> => userEvent.click(screen.getByRole("button", { name: en.modals.addHoliday.submit }));
 
 beforeEach(() => vi.clearAllMocks());
 

@@ -8,12 +8,12 @@ import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 import { PremiumRequiredModal } from "./PremiumRequiredModal";
 
 const AUTO_CLOSE_MS = 5000;
 
-const renderModal = (onVerifyEmail: (email: string) => Promise<boolean>) => {
+const renderModal = (onVerifyEmail: (email: string) => Promise<boolean>): Mock => {
 	const onClose = vi.fn();
 
 	render(
@@ -31,7 +31,7 @@ const renderModal = (onVerifyEmail: (email: string) => Promise<boolean>) => {
 	return onClose;
 };
 
-const submitEmail = async () => {
+const submitEmail = async (): Promise<void> => {
 	fireEvent.change(screen.getByPlaceholderText(enMessages.premiumModal.emailPlaceholder), {
 		target: { value: "donor@example.com" },
 	});

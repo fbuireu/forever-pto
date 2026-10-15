@@ -1,6 +1,6 @@
 import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
 import en from "@i18n/messages/en.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -41,16 +41,16 @@ const SHUTDOWN: HolidayDTO = {
 	isInPlanningWindow: true,
 };
 
-const renderModal = () =>
+const renderModal = (): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
 			<EditHolidayModal open onClose={vi.fn()} locale="en" holiday={SHUTDOWN} />
 		</NextIntlClientProvider>,
 	);
 
-const save = () => userEvent.click(screen.getByRole("button", { name: en.modals.editHoliday.submit }));
+const save = (): Promise<void> => userEvent.click(screen.getByRole("button", { name: en.modals.editHoliday.submit }));
 
-const rename = async (name: string) => {
+const rename = async (name: string): Promise<void> => {
 	const field = screen.getByLabelText(en.modals.addHoliday.nameLabel);
 	await userEvent.clear(field);
 	await userEvent.type(field, name);

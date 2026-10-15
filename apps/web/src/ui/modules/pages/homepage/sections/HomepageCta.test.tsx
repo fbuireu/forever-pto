@@ -4,7 +4,7 @@ import enMessages from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import { createTranslator, type Locale } from "next-intl";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -49,7 +49,7 @@ interface RenderCtaParams {
 	messages?: typeof enMessages;
 }
 
-const renderCta = async ({ locale = "en", messages = enMessages }: RenderCtaParams = {}) => {
+const renderCta = async ({ locale = "en", messages = enMessages }: RenderCtaParams = {}): Promise<RenderResult> => {
 	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "homepage" }));
 	return render(await HomepageCta());
 };

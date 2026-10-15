@@ -1,8 +1,8 @@
 "use client";
 
-import { type DependencyList, useCallback, useLayoutEffect, useRef, useState } from "react";
+import { type DependencyList, type RefObject, useCallback, useLayoutEffect, useRef, useState } from "react";
 
-const borderBoxExtra = (element: HTMLElement) => {
+const borderBoxExtra = (element: HTMLElement): number => {
 	const style = getComputedStyle(element);
 
 	if (style.boxSizing !== "border-box") return 0;
@@ -15,7 +15,14 @@ const borderBoxExtra = (element: HTMLElement) => {
 	return paddingY + borderY;
 };
 
-export function useAutoHeight<T extends HTMLElement = HTMLDivElement>(deps: DependencyList = []) {
+interface AutoHeightMeasurement<T extends HTMLElement> {
+	readonly ref: RefObject<T | null>;
+	readonly height: number;
+}
+
+export function useAutoHeight<T extends HTMLElement = HTMLDivElement>(
+	deps: DependencyList = [],
+): AutoHeightMeasurement<T> {
 	const ref = useRef<T | null>(null);
 	const roRef = useRef<ResizeObserver | null>(null);
 	const [height, setHeight] = useState(0);

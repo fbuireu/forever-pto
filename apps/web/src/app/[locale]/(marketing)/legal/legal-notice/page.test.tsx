@@ -32,7 +32,9 @@ vi.mock("next-intl/server", () => ({
 
 const { default: LegalNoticePage } = await import("./page");
 
-const makeParams = (locale = EN) => ({ params: Promise.resolve({ locale: locale as never }) });
+const makeParams = (locale = EN): Parameters<typeof LegalNoticePage>[0] => ({
+	params: Promise.resolve({ locale: locale as never }),
+});
 
 describe("legal-notice/page", () => {
 	beforeEach(() => {

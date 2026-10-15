@@ -1,5 +1,5 @@
 import enMessages from "@i18n/messages/en.json";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import type { ComponentProps } from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -7,7 +7,7 @@ import { FormButtons } from "./FormButtons";
 
 const labels = enMessages.formButtons;
 
-const renderButtons = (props: Partial<ComponentProps<typeof FormButtons>> = {}) =>
+const renderButtons = (props: Partial<ComponentProps<typeof FormButtons>> = {}): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={enMessages}>
 			<FormButtons pending={false} {...props} />

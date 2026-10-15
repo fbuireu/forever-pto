@@ -1,11 +1,11 @@
-import { render } from "@testing-library/react";
+import { type RenderResult, render } from "@testing-library/react";
 import { hasReducedMotionListener, prefersReducedMotion, useReducedMotionConfig } from "motion/react";
 import { describe, expect, it } from "vitest";
 import { LazyMotionProvider } from "./LazyMotionProvider";
 
 const Probe = () => <span data-testid="probe">{String(useReducedMotionConfig())}</span>;
 
-const renderWithSystemPreference = (reduce: boolean) => {
+const renderWithSystemPreference = (reduce: boolean): RenderResult => {
 	hasReducedMotionListener.current = true;
 	prefersReducedMotion.current = reduce;
 

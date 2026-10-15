@@ -5,10 +5,10 @@ import { getDayClassNames, MODIFIERS_CLASS_NAMES } from "./helpers";
 const MONTH = new Date(2025, 0, 1);
 const DAY = new Date(2025, 0, 15);
 
-const always = () => true;
-const never = () => false;
+const always = (): boolean => true;
+const never = (): boolean => false;
 
-const classesFor = (overrides: Partial<Parameters<typeof getDayClassNames>[0]> = {}) =>
+const classesFor = (overrides: Partial<Parameters<typeof getDayClassNames>[0]> = {}): string =>
 	getDayClassNames({
 		date: DAY,
 		month: MONTH,
@@ -23,7 +23,7 @@ interface HasParams {
 	name: keyof typeof MODIFIERS_CLASS_NAMES;
 }
 
-const has = ({ classes, name }: HasParams) => classes.includes(MODIFIERS_CLASS_NAMES[name]);
+const has = ({ classes, name }: HasParams): boolean => classes.includes(MODIFIERS_CLASS_NAMES[name]);
 
 describe("getDayClassNames precedence", () => {
 	it("paints a Holiday when nothing outranks it", () => {

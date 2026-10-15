@@ -23,7 +23,7 @@ vi.mock("@application/stores/filters", () => ({
 
 const { usePlanReadout } = await import("./usePlanReadout");
 
-const day = (n: number) => new Date(2026, 4, n);
+const day = (n: number): Date => new Date(2026, 4, n);
 
 beforeEach(() => {
 	holidaysState.current = {

@@ -1,3 +1,4 @@
+import type { SQLOutputValue, StatementResultingChanges } from "node:sqlite";
 import { contactCooldownStart } from "@application/dto/contact/rules";
 import type { ContactData } from "@application/dto/contact/types";
 import type { TursoService } from "@infrastructure/clients/db/turso/service";
@@ -13,10 +14,10 @@ beforeEach(() => {
 	contacts = createContactsFixture();
 });
 
-const run = <A>(effect: Effect.Effect<A, DatabaseError, TursoService>) =>
+const run = <A>(effect: Effect.Effect<A, DatabaseError, TursoService>): Promise<A> =>
 	Effect.runPromise(effect.pipe(Effect.provide(contacts.layer)));
 
-const runFail = <A>(effect: Effect.Effect<A, DatabaseError, TursoService>) =>
+const runFail = <A>(effect: Effect.Effect<A, DatabaseError, TursoService>): Promise<DatabaseError> =>
 	Effect.runPromise(Effect.flip(effect).pipe(Effect.provide(contacts.layer)));
 
 const SINCE = contactCooldownStart({ now: new Date("2026-10-02T13:40:00Z") });
@@ -37,7 +38,7 @@ interface SeedParams {
 	createdDate: string;
 }
 
-const seed = ({ email, message, createdDate }: SeedParams) =>
+const seed = ({ email, message, createdDate }: SeedParams): StatementResultingChanges =>
 	contacts.database
 		.prepare(
 			`INSERT INTO contacts (id, email, name, subject, message, message_id, origin, created_date, updated_at)
@@ -45,10 +46,11 @@ const seed = ({ email, message, createdDate }: SeedParams) =>
 		)
 		.run(crypto.randomUUID(), email, message, createdDate, createdDate);
 
-const reserve = (contact: ContactData = CONTACT) =>
+const reserve = (contact: ContactData = CONTACT): Effect.Effect<string | null, DatabaseError, TursoService> =>
 	reserveContactSlot({ senderKey: SENDER_KEY, since: SINCE, contact });
 
-const storedRows = () => contacts.database.prepare("SELECT id, email, message, message_id FROM contacts").all();
+const storedRows = (): Record<string, SQLOutputValue>[] =>
+	contacts.database.prepare("SELECT id, email, message, message_id FROM contacts").all();
 
 describe("reserveContactSlot over a real SQLite", () => {
 	it("takes the slot when the sender has never written, and answers the new row's id", async () => {

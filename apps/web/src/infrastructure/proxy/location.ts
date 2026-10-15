@@ -7,7 +7,7 @@ interface LocationParams {
 	response: NextResponse;
 }
 
-export async function location({ request, response }: LocationParams) {
+export async function location({ request, response }: LocationParams): Promise<NextResponse> {
 	const knownCountry = request.cookies.get(USER_COUNTRY_COOKIE)?.value;
 
 	if (knownCountry) {

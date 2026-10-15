@@ -4,7 +4,7 @@ import en from "@i18n/messages/en.json";
 import es from "@i18n/messages/es.json";
 import fr from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import { type ComponentType, lazy, Suspense } from "react";
@@ -47,14 +47,14 @@ interface RenderContactParams {
 	messages?: typeof en;
 }
 
-const renderContact = ({ locale = "en", messages = en }: RenderContactParams = {}) =>
+const renderContact = ({ locale = "en", messages = en }: RenderContactParams = {}): RenderResult =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<Contact />
 		</NextIntlClientProvider>,
 	);
 
-const modalState = async () => (await screen.findByTestId("contact-modal")).dataset.open;
+const modalState = async (): Promise<string | undefined> => (await screen.findByTestId("contact-modal")).dataset.open;
 
 afterEach(() => {
 	globalThis.location.hash = "";

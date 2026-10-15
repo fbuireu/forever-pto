@@ -19,7 +19,7 @@ interface RequestParams {
 	url?: string;
 }
 
-const request = ({ pathname, url = "http://localhost/api/markdown" }: RequestParams = {}) =>
+const request = ({ pathname, url = "http://localhost/api/markdown" }: RequestParams = {}): Request =>
 	new Request(url, { headers: pathname === undefined ? {} : { [MARKDOWN_PATH_HEADER]: pathname } });
 
 beforeEach(() => {

@@ -8,7 +8,7 @@ import { type NextRequest, NextResponse } from "next/server";
 
 const SUCCEEDED_REDIRECT_STATUS = "succeeded";
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<NextResponse> {
 	const { searchParams, origin } = request.nextUrl;
 	const paymentIntentId = searchParams.get("payment_intent");
 	const clientSecret = searchParams.get("payment_intent_client_secret");

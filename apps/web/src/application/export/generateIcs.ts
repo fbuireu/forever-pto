@@ -11,9 +11,9 @@ interface BuildEventParams {
 	categories: string;
 }
 
-const toUidToken = (value: string) => value.replace(/[^a-zA-Z0-9-]/g, "");
+const toUidToken = (value: string): string => value.replace(/[^a-zA-Z0-9-]/g, "");
 
-function buildEvent({ uid, stamp, start, summary, categories }: BuildEventParams) {
+function buildEvent({ uid, stamp, start, summary, categories }: BuildEventParams): string {
 	return [
 		"BEGIN:VEVENT",
 		contentLine({ name: "DTSTAMP", value: stamp }),
@@ -48,7 +48,7 @@ export function generateIcs({
 	includePto,
 	country,
 	region,
-}: GenerateIcsParams) {
+}: GenerateIcsParams): string {
 	const events: string[] = [];
 	const stamp = toIcsTimestamp(new Date());
 	const scope = toUidToken([country, region].filter(Boolean).join("-")) || "unknown";

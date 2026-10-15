@@ -51,12 +51,12 @@ import { Faq } from "./Faq";
 
 const sections = enMessages.faq.sections;
 
-const questionsOf = (section: Record<string, string | { question: string }>) =>
+const questionsOf = (section: Record<string, string | { question: string }>): string[] =>
 	Object.values(section)
 		.filter((entry): entry is { question: string } => typeof entry === "object")
 		.map((entry) => entry.question);
 
-const renderFaq = async () => {
+const renderFaq = async (): Promise<HTMLElement> => {
 	mockGetTranslations.mockImplementation(async (namespace: "faq" | "homepage") =>
 		createTranslator({ locale: "en", messages: enMessages, namespace }),
 	);

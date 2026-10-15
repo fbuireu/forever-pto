@@ -1,6 +1,7 @@
-import { HolidayVariant } from "@application/dto/holiday/types";
+import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
+import type { Suggestion } from "@domain/calendar/types";
 import enMessages from "@i18n/messages/en.json";
-import { render } from "@testing-library/react";
+import { type RenderResult, render } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { describe, expect, it } from "vitest";
 import { YearTimelineChart } from "./YearTimelineChart";
@@ -12,7 +13,7 @@ interface MakeHolidayParams {
 	variant?: HolidayVariant;
 }
 
-const makeHoliday = ({ date, variant = HolidayVariant.NATIONAL }: MakeHolidayParams) => ({
+const makeHoliday = ({ date, variant = HolidayVariant.NATIONAL }: MakeHolidayParams): HolidayDTO => ({
 	id: `h-${date.toISOString()}`,
 	date,
 	name: "Test Holiday",
@@ -20,14 +21,14 @@ const makeHoliday = ({ date, variant = HolidayVariant.NATIONAL }: MakeHolidayPar
 	isInPlanningWindow: true,
 });
 
-const renderChart = (props: Partial<Parameters<typeof YearTimelineChart>[0]> = {}) =>
+const renderChart = (props: Partial<Parameters<typeof YearTimelineChart>[0]> = {}): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={enMessages}>
 			<YearTimelineChart year={YEAR} carryOverMonths={0} holidays={[]} suggestion={null} manualDays={[]} {...props} />
 		</NextIntlClientProvider>,
 	);
 
-const leftPercents = (container: HTMLElement) =>
+const leftPercents = (container: HTMLElement): number[] =>
 	Array.from(container.querySelectorAll<HTMLElement>('[style*="left"]')).map((node) =>
 		Number.parseFloat(node.style.left),
 	);
@@ -91,9 +92,9 @@ interface DayParams {
 	date: number;
 }
 
-const day = ({ month, date }: DayParams) => new Date(YEAR, month, date);
+const day = ({ month, date }: DayParams): Date => new Date(YEAR, month, date);
 
-const rowLabels = (container: HTMLElement) =>
+const rowLabels = (container: HTMLElement): string[] =>
 	[...container.querySelectorAll<HTMLElement>(".w-\\[70px\\]")]
 		.map((node) => node.textContent ?? "")
 		.filter((text) => text !== "");
@@ -103,12 +104,12 @@ interface TimelineRowParams {
 	label: string;
 }
 
-const rowFor = ({ container, label }: TimelineRowParams) => {
+const rowFor = ({ container, label }: TimelineRowParams): HTMLElement => {
 	const cell = [...container.querySelectorAll<HTMLElement>(".w-\\[70px\\]")].find((node) => node.textContent === label);
 	return cell?.nextElementSibling as HTMLElement;
 };
 
-const segmentCount = ({ container, label }: TimelineRowParams) =>
+const segmentCount = ({ container, label }: TimelineRowParams): number =>
 	rowFor({ container, label }).querySelectorAll('[style*="left"]').length;
 
 interface SuggestionOfParams {
@@ -116,7 +117,7 @@ interface SuggestionOfParams {
 	bridges?: { startDate: Date; endDate: Date }[];
 }
 
-const suggestionOf = ({ days, bridges = [] }: SuggestionOfParams) => ({ days, bridges }) as never;
+const suggestionOf = ({ days, bridges = [] }: SuggestionOfParams): Suggestion => ({ days, bridges }) as never;
 
 describe("YearTimelineChart rows", () => {
 	it("shows only the rows it has something to draw on", () => {

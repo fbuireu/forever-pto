@@ -1,6 +1,6 @@
 import { Strategy as StrategyName } from "@domain/calendar/types";
 import en from "@i18n/messages/en.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import type { ComponentProps, ReactNode } from "react";
@@ -38,19 +38,20 @@ vi.mock("@ui/modules/core/animate/base/Popover", () => ({
 
 const { Strategy } = await import("./Strategy");
 
-const renderStrategy = () =>
+const renderStrategy = (): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
 			<Strategy />
 		</NextIntlClientProvider>,
 	);
 
-const details = () =>
+const details = (): HTMLElement =>
 	screen.getByRole("button", {
 		name: new RegExp(`${en.sidebar.strategy.showDetails}|${en.sidebar.strategy.hideDetails}`),
 	});
 
-const panel = (container: HTMLElement) => container.querySelector('[data-slot="collapsible-content"]') as HTMLElement;
+const panel = (container: HTMLElement): HTMLElement =>
+	container.querySelector('[data-slot="collapsible-content"]') as HTMLElement;
 
 beforeEach(() => {
 	store.strategy = StrategyName.BALANCED;

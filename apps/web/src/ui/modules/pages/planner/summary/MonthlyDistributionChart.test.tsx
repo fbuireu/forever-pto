@@ -1,6 +1,6 @@
 import en from "@i18n/messages/en.json";
 import es from "@i18n/messages/es.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -50,14 +50,19 @@ interface RenderChartParams {
 	messages?: typeof en;
 }
 
-const renderChart = ({ monthlyDist, year = 2026, locale = "en", messages = en }: RenderChartParams) =>
+const renderChart = ({ monthlyDist, year = 2026, locale = "en", messages = en }: RenderChartParams): RenderResult =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<MonthlyDistributionChart monthlyDist={monthlyDist} year={year} />
 		</NextIntlClientProvider>,
 	);
 
-const points = () => JSON.parse(screen.getByTestId("area-data").textContent ?? "[]") as { mes: string; days: number }[];
+interface ChartPoint {
+	mes: string;
+	days: number;
+}
+
+const points = (): ChartPoint[] => JSON.parse(screen.getByTestId("area-data").textContent ?? "[]") as ChartPoint[];
 
 const evenlySpread = new Array(12).fill(1);
 

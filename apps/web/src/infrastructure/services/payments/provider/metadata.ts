@@ -18,7 +18,8 @@ export interface DonationMetadataParams {
 	discountInfo: DiscountInfo | null;
 }
 
-export const clampMetadata = (value: string | null | undefined) => (value ?? "").slice(0, STRIPE_METADATA_MAX_LENGTH);
+export const clampMetadata = (value: string | null | undefined): string =>
+	(value ?? "").slice(0, STRIPE_METADATA_MAX_LENGTH);
 
 export const donationMetadata = ({
 	email,

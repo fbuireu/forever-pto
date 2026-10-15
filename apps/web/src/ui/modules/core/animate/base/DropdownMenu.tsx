@@ -27,7 +27,7 @@ const HIGHLIGHT_TRANSITION: Transition = { type: "spring", stiffness: 350, dampi
 
 const DropdownMenuContext = createContext<DropdownMenuContextType | undefined>(undefined);
 
-const useDropdownMenu = () => {
+const useDropdownMenu = (): DropdownMenuContextType => {
 	const context = use(DropdownMenuContext);
 	if (!context) {
 		throw new Error("useDropdownMenu must be used within a DropdownMenu");

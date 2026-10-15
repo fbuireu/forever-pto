@@ -4,6 +4,7 @@ import { cn } from "@ui/utils/cn";
 import { type ComponentProps, createContext, use, useEffect, useId, useMemo, useState } from "react";
 import {
 	Controller,
+	type ControllerFieldState,
 	type ControllerProps,
 	type FieldPath,
 	type FieldValues,
@@ -48,7 +49,14 @@ const FormField = <
 	);
 };
 
-const useFormField = () => {
+interface FormFieldState extends FormItemContextValue, ControllerFieldState {
+	name: string;
+	formItemId: string;
+	formDescriptionId: string;
+	formMessageId: string;
+}
+
+const useFormField = (): FormFieldState => {
 	const fieldContext = use(FormFieldContext);
 	const itemContext = use(FormItemContext);
 	const { getFieldState } = useFormContext();

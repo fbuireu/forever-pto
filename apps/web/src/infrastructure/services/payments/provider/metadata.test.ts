@@ -7,7 +7,7 @@ interface IntentParams {
 	receiptEmail?: string | null;
 }
 
-const intent = ({ metadata, receiptEmail = null }: IntentParams) =>
+const intent = ({ metadata, receiptEmail = null }: IntentParams): StripeNode.PaymentIntent =>
 	({ metadata, receipt_email: receiptEmail }) as unknown as StripeNode.PaymentIntent;
 
 describe("readDonationMetadata", () => {

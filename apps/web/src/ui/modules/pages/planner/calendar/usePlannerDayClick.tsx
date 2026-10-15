@@ -11,7 +11,7 @@ import { useCallback } from "react";
 import { toast } from "sonner";
 import { DAY_REFUSAL_COPY } from "./utils/refusals";
 
-export const usePlannerDayClick = (onDayToggle: (date: Date) => DayOutcome) => {
+export const usePlannerDayClick = (onDayToggle: (date: Date) => DayOutcome): ((date: Date) => void) => {
 	const t = useTranslations("toasts");
 	const tPremium = useTranslations("premium");
 	const premiumKey = usePremiumStore((state) => state.premiumKey);

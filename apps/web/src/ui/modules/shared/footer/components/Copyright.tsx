@@ -7,7 +7,7 @@ interface CopyrightProps {
 	serverYear: number;
 }
 
-export const Copyright = ({ serverYear }: CopyrightProps) => {
+export const Copyright = ({ serverYear }: CopyrightProps): string => {
 	const t = useTranslations("footer");
 	const year = useCurrentYear(serverYear);
 

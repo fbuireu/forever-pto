@@ -8,7 +8,7 @@ interface SetCookieParams {
 	sameSite?: "strict" | "lax" | "none";
 }
 
-export async function setCookie({ name, value, path = "/", maxAge, sameSite = "lax" }: SetCookieParams) {
+export async function setCookie({ name, value, path = "/", maxAge, sameSite = "lax" }: SetCookieParams): Promise<void> {
 	if (typeof cookieStore !== "undefined") {
 		await cookieStore.set({
 			name,

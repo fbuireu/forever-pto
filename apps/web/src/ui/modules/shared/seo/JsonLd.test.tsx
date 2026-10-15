@@ -51,10 +51,11 @@ const schemasOf = (container: HTMLElement): Schema[] =>
 		JSON.parse(script.textContent ?? ""),
 	);
 
-const renderJsonLd = async (locale: Locale) => schemasOf(render(await JsonLd({ locale })).container);
-const renderFaqJsonLd = async (locale: Locale) => schemasOf(render(await FaqJsonLd({ locale })).container)[0];
+const renderJsonLd = async (locale: Locale): Promise<Schema[]> => schemasOf(render(await JsonLd({ locale })).container);
+const renderFaqJsonLd = async (locale: Locale): Promise<Schema> =>
+	schemasOf(render(await FaqJsonLd({ locale })).container)[0];
 
-const answeredQuestions = (messages: typeof enMessages) =>
+const answeredQuestions = (messages: typeof enMessages): string[] =>
 	Object.values(messages.faq.sections).flatMap((section) =>
 		Object.values(section)
 			.filter((entry): entry is { question: string; answer: string } => typeof entry === "object" && "answer" in entry)

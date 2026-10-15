@@ -48,7 +48,7 @@ interface RenderCalculatorParams {
 	messages?: typeof en;
 }
 
-const renderCalculator = ({ locale = "en", messages = en }: RenderCalculatorParams = {}) => {
+const renderCalculator = ({ locale = "en", messages = en }: RenderCalculatorParams = {}): HTMLInputElement => {
 	const { container } = render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<PtoSalaryCalculator />
@@ -57,9 +57,9 @@ const renderCalculator = ({ locale = "en", messages = en }: RenderCalculatorPara
 	return container.querySelector<HTMLInputElement>("#annualSalary") as HTMLInputElement;
 };
 
-const unusedDays = () => document.querySelector<HTMLInputElement>("#unusedPTO") as HTMLInputElement;
+const unusedDays = (): HTMLInputElement => document.querySelector<HTMLInputElement>("#unusedPTO") as HTMLInputElement;
 
-const text = () => document.body.textContent ?? "";
+const text = (): string => document.body.textContent ?? "";
 
 beforeEach(() => {
 	intl.locale = "en";

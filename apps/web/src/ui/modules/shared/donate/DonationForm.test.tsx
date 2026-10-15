@@ -32,7 +32,7 @@ const Harness = ({ isPending }: { isPending: boolean }) => {
 	);
 };
 
-const enabledControls = () =>
+const enabledControls = (): HTMLElement[] =>
 	screen
 		.getAllByRole("textbox")
 		.concat(screen.getAllByRole("button"))
@@ -40,7 +40,7 @@ const enabledControls = () =>
 
 const PRESET_LABELS = ["€5", "€10", "€15"];
 
-const chargingControls = () => [
+const chargingControls = (): HTMLElement[] => [
 	screen.getByPlaceholderText(enMessages.donationForm.emailPlaceholder),
 	screen.getByPlaceholderText(enMessages.donationForm.enterAmount),
 	...PRESET_LABELS.map((label) => screen.getByRole("button", { name: label })),

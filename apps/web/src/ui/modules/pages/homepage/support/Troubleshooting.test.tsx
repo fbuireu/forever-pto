@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import en from "@i18n/messages/en.json";
-import { render, screen, waitFor } from "@testing-library/react";
+import { type RenderResult, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -54,14 +54,14 @@ vi.mock("@application/shared/utils/clientLog", () => ({ logClientError: mockLogC
 
 const { Troubleshooting } = await import("./Troubleshooting");
 
-const renderComponent = () =>
+const renderComponent = (): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
 			<Troubleshooting />
 		</NextIntlClientProvider>,
 	);
 
-const clickReset = async () => {
+const clickReset = async (): Promise<void> => {
 	const user = userEvent.setup();
 	await user.click(screen.getByRole("button", { name: en.troubleshooting.resetButton }));
 };

@@ -4,7 +4,7 @@ import enMessages from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { act, fireEvent, render } from "@testing-library/react";
+import { act, fireEvent, type RenderResult, render } from "@testing-library/react";
 import { TUTORIAL_EVENT } from "@ui/modules/tutorial/anchors";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
@@ -93,7 +93,7 @@ interface RenderBarParams {
 	messages: object;
 }
 
-const renderBar = ({ locale, messages }: RenderBarParams) =>
+const renderBar = ({ locale, messages }: RenderBarParams): RenderResult =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<ManagementBar />

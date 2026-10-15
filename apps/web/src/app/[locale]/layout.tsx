@@ -1,5 +1,5 @@
 import { clientMessagesOf } from "@infrastructure/i18n/clientMessages";
-import { LOCALES } from "@infrastructure/i18n/locales";
+import { LOCALES, type LocaleCode } from "@infrastructure/i18n/locales";
 import { resolveLocale } from "@infrastructure/i18n/utils/url";
 import { BonesProvider } from "@ui/modules/providers/BonesProvider";
 import { StripePreload } from "@ui/modules/providers/StripePreload";
@@ -21,7 +21,7 @@ interface LayoutProps {
 	params: Promise<{ locale: string }>;
 }
 
-export function generateStaticParams() {
+export function generateStaticParams(): { locale: LocaleCode }[] {
 	return LOCALES.map((locale) => ({ locale }));
 }
 

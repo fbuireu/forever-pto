@@ -9,7 +9,7 @@ const MESSAGES = {
 
 const schema = createHolidaySchema(MESSAGES);
 
-const firstMessage = (value: unknown) => {
+const firstMessage = (value: unknown): string | null => {
 	const result = schema.safeParse(value);
 
 	return result.success ? null : result.error.issues[0]?.message;

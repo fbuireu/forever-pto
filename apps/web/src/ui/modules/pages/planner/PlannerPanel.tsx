@@ -58,7 +58,7 @@ const STEP_BUTTON_TAP = { filter: "brightness(0.85)" } as const;
 
 const PROGRESS_TRANSITION: Transition = { type: "tween", duration: 0.15, ease: "easeOut" };
 
-const plain = (chunks: ReactNode) => chunks;
+const plain = (chunks: ReactNode): ReactNode => chunks;
 
 interface AlternativesProps {
 	allSuggestions: MeasuredSuggestion[];

@@ -51,7 +51,12 @@ interface RenderModalParams {
 	messages?: typeof en;
 }
 
-const renderModal = ({ holidays, onClose = vi.fn(), locale = "en", messages = en }: RenderModalParams) => {
+const renderModal = ({
+	holidays,
+	onClose = vi.fn(),
+	locale = "en",
+	messages = en,
+}: RenderModalParams): Mock<() => void> => {
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<DeleteHolidayModal open onClose={onClose} locale={locale} holidays={holidays} />
@@ -60,7 +65,8 @@ const renderModal = ({ holidays, onClose = vi.fn(), locale = "en", messages = en
 	return onClose;
 };
 
-const confirm = () => userEvent.click(screen.getByRole("button", { name: en.modals.deleteHoliday.submit }));
+const confirm = (): Promise<void> =>
+	userEvent.click(screen.getByRole("button", { name: en.modals.deleteHoliday.submit }));
 
 beforeEach(() => {
 	mockToastError.mockClear();

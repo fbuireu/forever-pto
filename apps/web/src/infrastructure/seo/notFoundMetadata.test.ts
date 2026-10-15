@@ -28,7 +28,7 @@ vi.mock("next-intl/server", () => ({ getTranslations: mockGetTranslations }));
 
 const { notFoundMetadata, notFoundTitle } = await import("./notFoundMetadata");
 
-const segment = (locale: string) => ({ params: Promise.resolve({ locale }) });
+const segment = (locale: string): Parameters<typeof notFoundMetadata>[0] => ({ params: Promise.resolve({ locale }) });
 
 beforeEach(() => {
 	vi.clearAllMocks();

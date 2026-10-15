@@ -5,7 +5,7 @@ export interface PlanDistanceParams {
 	rival: Date[];
 }
 
-export const planDistance = ({ plan, rival }: PlanDistanceParams) => {
+export const planDistance = ({ plan, rival }: PlanDistanceParams): number => {
 	const planDays = new Set(plan.map(dayIndex));
 	const rivalDays = new Set(rival.map(dayIndex));
 	const union = new Set([...planDays, ...rivalDays]).size;

@@ -15,7 +15,7 @@ interface CachedObservedHolidaysParams {
 	lookup: HolidayLookup;
 }
 
-export const cachedObservedHolidays = ({ source, lookup }: CachedObservedHolidaysParams) => {
+export const cachedObservedHolidays = ({ source, lookup }: CachedObservedHolidaysParams): RawHoliday[] => {
 	const key = [lookup.country, lookup.region ?? "", lookup.year, lookup.locale].join("|");
 	if (lastLookup?.key === key && lastLookup.source === source) return lastLookup.raw;
 

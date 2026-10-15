@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -64,7 +64,7 @@ vi.mock("@base-ui/react/popover", async () => {
 
 import { Tooltip, TooltipPopup, TooltipPortal, TooltipPositioner, TooltipProvider, TooltipTrigger } from "./Tooltip";
 
-const renderTooltip = (ui?: { delay?: number; triggerDelay?: number; defaultOpen?: boolean }) =>
+const renderTooltip = (ui?: { delay?: number; triggerDelay?: number; defaultOpen?: boolean }): RenderResult =>
 	render(
 		<TooltipProvider delay={ui?.delay}>
 			<Tooltip defaultOpen={ui?.defaultOpen}>

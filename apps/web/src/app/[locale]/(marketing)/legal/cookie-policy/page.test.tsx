@@ -36,7 +36,9 @@ vi.mock("next-intl/server", () => ({
 
 const { default: CookiePolicyPage } = await import("./page");
 
-const makeParams = (locale = EN) => ({ params: Promise.resolve({ locale: locale as never }) });
+const makeParams = (locale = EN): Parameters<typeof CookiePolicyPage>[0] => ({
+	params: Promise.resolve({ locale: locale as never }),
+});
 
 const BUNDLES = { ca: caMessages, de: deMessages, en: enMessages, es: esMessages, fr: frMessages, it: itMessages };
 

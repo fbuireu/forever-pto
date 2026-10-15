@@ -1,5 +1,5 @@
 import en from "@i18n/messages/en.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -32,14 +32,14 @@ vi.mock("../../calendar/Calendar", () => ({
 
 const { AddHolidayModal } = await import("./AddHolidayModal");
 
-const renderModal = () =>
+const renderModal = (): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
 			<AddHolidayModal open onClose={vi.fn()} locale="en" />
 		</NextIntlClientProvider>,
 	);
 
-const submit = () => userEvent.click(screen.getByRole("button", { name: en.modals.addHoliday.submit }));
+const submit = (): Promise<void> => userEvent.click(screen.getByRole("button", { name: en.modals.addHoliday.submit }));
 
 beforeEach(() => vi.clearAllMocks());
 

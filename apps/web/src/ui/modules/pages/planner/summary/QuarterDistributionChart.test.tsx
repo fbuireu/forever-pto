@@ -2,7 +2,7 @@ import deMessages from "@i18n/messages/de.json";
 import enMessages from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import itMessages from "@i18n/messages/it.json";
-import { render } from "@testing-library/react";
+import { type RenderResult, render } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -39,7 +39,7 @@ interface RenderChartParams {
 	quarterDist: number[];
 }
 
-const renderChart = ({ locale, messages, quarterDist }: RenderChartParams) =>
+const renderChart = ({ locale, messages, quarterDist }: RenderChartParams): RenderResult =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<QuarterDistributionChart quarterDist={quarterDist} />

@@ -5,7 +5,7 @@ import { selectBridgesForStrategy } from "@domain/calendar/suggestions/utils/sel
 import { Strategy, type Suggestion } from "@domain/calendar/types";
 import { clearDateKeyCache, clearHolidayCache } from "@domain/calendar/utils/cache";
 import { findPlanningCandidates, type PlanningCandidates, selectionInputOf } from "@domain/calendar/utils/candidates";
-import { measurePlan } from "@domain/calendar/utils/measures";
+import { measurePlan, type PlanMeasures } from "@domain/calendar/utils/measures";
 import { beforeEach, describe, expect, it } from "vitest";
 import { generateAlternatives } from "./generateAlternatives";
 import { planDistance } from "./utils/helpers";
@@ -15,7 +15,7 @@ interface MeasureAgainstParams {
 	candidates: PlanningCandidates;
 }
 
-const measureAgainst = ({ plan, candidates }: MeasureAgainstParams) =>
+const measureAgainst = ({ plan, candidates }: MeasureAgainstParams): PlanMeasures =>
 	measurePlan({
 		plan,
 		alreadyOff: candidates.alreadyOff,
@@ -35,6 +35,13 @@ interface PlanAlternativesParams {
 	existingSuggestion?: Suggestion;
 }
 
+interface PlannedAlternatives {
+	greedy: Suggestion;
+	suggestion: Suggestion;
+	candidates: PlanningCandidates;
+	alternatives: Suggestion[];
+}
+
 const planAlternatives = ({
 	ptoDays,
 	holidays,
@@ -44,7 +51,7 @@ const planAlternatives = ({
 	removedDays,
 	maxAlternatives,
 	existingSuggestion,
-}: PlanAlternativesParams) => {
+}: PlanAlternativesParams): PlannedAlternatives => {
 	const candidates = findPlanningCandidates({ holidays, months, allowPastDays, removedDays, manualDays: [] });
 	const greedy = existingSuggestion ?? {
 		...selectBridgesForStrategy({ ...selectionInputOf({ candidates, ptoDays }), strategy }),
@@ -67,9 +74,9 @@ interface MakeDateParams {
 	day: number;
 }
 
-const makeDate = ({ year, month, day }: MakeDateParams) => new Date(year, month - 1, day);
+const makeDate = ({ year, month, day }: MakeDateParams): Date => new Date(year, month - 1, day);
 
-const makeHoliday = (date: Date) => ({
+const makeHoliday = (date: Date): HolidayDTO => ({
 	id: `h-${date.toISOString()}`,
 	date,
 	name: "Test Holiday",
@@ -94,7 +101,7 @@ const BASE = {
 
 const YEAR = { ...BASE, months: FULL_YEAR, holidays: HOLIDAYS, ptoDays: 10, maxAlternatives: 4 };
 
-const toStrings = (days: Date[]) => days.map((day) => day.toDateString());
+const toStrings = (days: Date[]): string[] => days.map((day) => day.toDateString());
 
 describe("generateAlternatives", () => {
 	beforeEach(() => {

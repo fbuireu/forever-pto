@@ -28,9 +28,9 @@ import { RotatingText } from "./Rotating";
 
 const WORDS = ["plan", "bridge", "rest"];
 
-const word = () => screen.getByTestId("rotating");
+const word = (): HTMLElement => screen.getByTestId("rotating");
 
-const advance = (ms: number) => {
+const advance = (ms: number): void => {
 	act(() => {
 		vi.advanceTimersByTime(ms);
 	});

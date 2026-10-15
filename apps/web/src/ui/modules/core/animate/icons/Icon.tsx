@@ -102,7 +102,20 @@ interface IconWrapperProps<T> extends IconProps<T> {
 
 const AnimateIconContext = createContext<AnimateIconContextValue | null>(null);
 
-function useAnimateIconContext() {
+interface AnimateIconContextFallback {
+	controls: undefined;
+	animation: string;
+	loop: undefined;
+	loopDelay: undefined;
+	active: undefined;
+	animate: undefined;
+	initialOnAnimateEnd: undefined;
+	completeOnStop: undefined;
+	persistOnAnimateEnd: undefined;
+	delay: undefined;
+}
+
+function useAnimateIconContext(): AnimateIconContextValue | AnimateIconContextFallback {
 	const context = use(AnimateIconContext);
 	if (!context)
 		return {
@@ -125,7 +138,10 @@ interface ComposeEventHandlersParams<E extends SyntheticEvent<unknown>> {
 	ours?: (event: E) => void;
 }
 
-function composeEventHandlers<E extends SyntheticEvent<unknown>>({ theirs, ours }: ComposeEventHandlersParams<E> = {}) {
+function composeEventHandlers<E extends SyntheticEvent<unknown>>({
+	theirs,
+	ours,
+}: ComposeEventHandlersParams<E> = {}): (event: E) => void {
 	return (event: E) => {
 		theirs?.(event);
 		ours?.(event);

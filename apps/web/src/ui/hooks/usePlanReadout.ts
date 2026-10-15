@@ -2,12 +2,20 @@
 
 import { useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
-import { measureBudget } from "@domain/calendar/utils/budget";
+import type { MeasuredSuggestion } from "@domain/calendar/types";
+import { type BudgetMeasure, measureBudget } from "@domain/calendar/utils/budget";
 import { resolveSelectedDays } from "@domain/calendar/utils/selection";
 import { useMemo, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 
-export const usePlacedPlan = () => {
+interface PlacedPlan {
+	activeSuggestion: MeasuredSuggestion | null;
+	placedDays: Date[];
+	manualDays: Date[];
+	removedSuggestedDays: Date[];
+}
+
+export const usePlacedPlan = (): PlacedPlan => {
 	const { currentSelection, suggestion, manualDays, removedSuggestedDays } = useHolidaysStore(
 		useShallow((state) => ({
 			currentSelection: state.currentSelection,
@@ -31,7 +39,12 @@ export const usePlacedPlan = () => {
 	return { activeSuggestion, placedDays, manualDays, removedSuggestedDays };
 };
 
-export const usePlanReadout = () => {
+interface PlanReadout extends BudgetMeasure {
+	ptoDays: number;
+	hasManualChanges: boolean;
+}
+
+export const usePlanReadout = (): PlanReadout => {
 	const { currentSelection, suggestion, manualDays, removedSuggestedDays, isCalculating } = useHolidaysStore(
 		useShallow((state) => ({
 			currentSelection: state.currentSelection,

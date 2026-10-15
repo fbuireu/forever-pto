@@ -1,4 +1,5 @@
 import { regionDTO } from "@application/dto/region/dto";
+import type { RegionDTO } from "@application/dto/region/types";
 import { collateByLabel } from "@application/shared/utils/collate";
 import { logger } from "@infrastructure/logging/logger";
 import { dateHolidaysSource } from "@infrastructure/services/holidays/source/dateHolidays";
@@ -9,7 +10,7 @@ export interface GetRegionsParams {
 	source?: HolidaySource;
 }
 
-export function getRegions({ countryCode, source = dateHolidaysSource }: GetRegionsParams = {}) {
+export function getRegions({ countryCode, source = dateHolidaysSource }: GetRegionsParams = {}): RegionDTO[] {
 	if (!countryCode) return [];
 
 	try {

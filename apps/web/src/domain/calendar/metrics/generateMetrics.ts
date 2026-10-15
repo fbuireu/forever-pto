@@ -1,5 +1,5 @@
 import type { HolidayDTO } from "@application/dto/holiday/types";
-import type { Suggestion } from "@domain/calendar/types";
+import type { Metrics, Suggestion } from "@domain/calendar/types";
 import { resolveSelectedDays } from "@domain/calendar/utils/selection";
 import type { PlanningWindow } from "@domain/calendar/window";
 import type { Locale } from "next-intl";
@@ -36,7 +36,7 @@ export const generateMetrics = ({
 	allowPastDays,
 	manualDays,
 	removedSuggestedDays,
-}: GenerateMetricsParams) => {
+}: GenerateMetricsParams): Metrics => {
 	const { bridges } = suggestion;
 	const { year } = planningWindow;
 	const days = resolveSelectedDays({ days: suggestion.days, manualDays, removedSuggestedDays });

@@ -1,4 +1,4 @@
-import { PromoCodeErrors } from "@application/dto/payment/types";
+import { type DiscountInfo, PromoCodeErrors } from "@application/dto/payment/types";
 import { type StatementParams, TursoService } from "@infrastructure/clients/db/turso/service";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import { DatabaseError, PaymentError, PromoCodeError } from "@infrastructure/errors";
@@ -29,7 +29,7 @@ interface RunParams {
 	amount: number;
 }
 
-const run = ({ code, amount }: RunParams) =>
+const run = ({ code, amount }: RunParams): Promise<DiscountInfo> =>
 	Effect.runPromise(
 		validatePromoCode({ code, amount }).pipe(Effect.provide(Layer.mergeAll(MockStripeLayer, MockTursoLayer))),
 	);
@@ -39,7 +39,7 @@ interface RunFlipParams {
 	amount: number;
 }
 
-const runFlip = ({ code, amount }: RunFlipParams) =>
+const runFlip = ({ code, amount }: RunFlipParams): Promise<PromoCodeError> =>
 	Effect.runPromise(
 		validatePromoCode({ code, amount }).pipe(
 			Effect.provide(Layer.mergeAll(MockStripeLayer, MockTursoLayer)),
@@ -55,7 +55,11 @@ interface PromoCodeOverrides {
 	restrictions?: { minimum_amount: number | null; minimum_amount_currency: string | null };
 }
 
-const makePromoCode = (overrides: PromoCodeOverrides = {}) => ({
+interface PromoCodeDouble extends Required<PromoCodeOverrides> {
+	id: string;
+}
+
+const makePromoCode = (overrides: PromoCodeOverrides = {}): PromoCodeDouble => ({
 	id: "promo_abc",
 	active: true,
 	expires_at: null,
@@ -64,6 +68,18 @@ const makePromoCode = (overrides: PromoCodeOverrides = {}) => ({
 	restrictions: { minimum_amount: null, minimum_amount_currency: null },
 	...overrides,
 });
+
+interface CouponDouble {
+	id: string;
+	valid: boolean;
+	max_redemptions: number | null;
+	times_redeemed: number;
+	redeem_by: number | null;
+	percent_off: number | null;
+	amount_off: number | null;
+	currency: string | null;
+	name: string | null;
+}
 
 const makeCoupon = (
 	overrides: Partial<{
@@ -76,7 +92,7 @@ const makeCoupon = (
 		currency: string | null;
 		name: string | null;
 	}> = {},
-) => ({
+): CouponDouble => ({
 	id: "coup_abc",
 	valid: true,
 	max_redemptions: null,
@@ -98,7 +114,7 @@ interface SetupMocksParams {
 	promoCodeOverrides?: PromoCodeOverrides;
 }
 
-const setupMocks = ({ coupon, promoCodeOverrides = {} }: SetupMocksParams) => {
+const setupMocks = ({ coupon, promoCodeOverrides = {} }: SetupMocksParams): void => {
 	const promotionCode = makePromoCode(promoCodeOverrides);
 	mockList.mockReturnValue(Effect.succeed({ data: [{ ...promotionCode, promotion: { type: "coupon", coupon } }] }));
 };

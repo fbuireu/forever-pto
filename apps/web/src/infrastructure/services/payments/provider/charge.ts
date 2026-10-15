@@ -3,7 +3,7 @@ import type { PaymentError } from "@infrastructure/errors";
 import { Effect } from "effect";
 import type Stripe from "stripe";
 
-interface ChargeData {
+export interface ChargeData {
 	id: string;
 	receiptUrl: string | null;
 	paymentMethodType: string | null;
@@ -18,7 +18,7 @@ interface ChargeData {
 	netAmount: number | null;
 }
 
-const getSettlement = (charge: Stripe.Charge) => {
+const getSettlement = (charge: Stripe.Charge): Pick<ChargeData, "feeAmount" | "netAmount"> => {
 	const balanceTransaction = charge.balance_transaction;
 	if (!balanceTransaction || typeof balanceTransaction === "string") return { feeAmount: null, netAmount: null };
 	return { feeAmount: balanceTransaction.fee, netAmount: balanceTransaction.net };

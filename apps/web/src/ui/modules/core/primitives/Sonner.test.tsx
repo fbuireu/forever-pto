@@ -6,7 +6,7 @@ import { Toaster } from "./Sonner";
 
 vi.mock("next-themes", () => ({ useTheme: () => ({ theme: "light" }) }));
 
-const showToast = async (closeLabel?: string) => {
+const showToast = async (closeLabel?: string): Promise<void> => {
 	render(<Toaster closeLabel={closeLabel} />);
 	act(() => {
 		toast.success("Plan applied");

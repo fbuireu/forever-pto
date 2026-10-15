@@ -15,7 +15,9 @@ vi.mock("@ui/modules/shared/seo/JsonLd", () => ({ JsonLd: MockJsonLd }));
 
 const { default: AppPage } = await import("./page");
 
-const makeParams = (locale = EN) => ({ params: Promise.resolve({ locale: locale as never }) });
+const makeParams = (locale = EN): Parameters<typeof AppPage>[0] => ({
+	params: Promise.resolve({ locale: locale as never }),
+});
 
 describe("planner/page", () => {
 	beforeEach(() => vi.clearAllMocks());

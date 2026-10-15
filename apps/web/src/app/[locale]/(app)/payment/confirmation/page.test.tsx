@@ -1,6 +1,6 @@
 import { ACTIVATION_FAILED, type PaymentConfirmationDTO } from "@application/dto/payment/types";
 import { DE, EN, ES } from "@infrastructure/i18n/locales";
-import { render } from "@testing-library/react";
+import { type RenderResult, render } from "@testing-library/react";
 import { Effect, Layer } from "effect";
 import { createFormatter, type Locale } from "next-intl";
 import type { ReactNode } from "react";
@@ -63,25 +63,29 @@ interface MakeParamsParams {
 	paymentIntent?: string;
 }
 
-const makeParams = ({ locale = EN, paymentIntent }: MakeParamsParams = {}) => ({
+const makeParams = ({
+	locale = EN,
+	paymentIntent,
+}: MakeParamsParams = {}): Parameters<typeof PaymentConfirmationPage>[0] => ({
 	searchParams: Promise.resolve(paymentIntent ? { payment_intent: paymentIntent } : {}),
 	params: Promise.resolve({ locale: locale as never }),
 });
 
-const makeSuccessParams = () => makeParams({ locale: EN, paymentIntent: PAYMENT_INTENT_ID });
+const makeSuccessParams = (): Parameters<typeof PaymentConfirmationPage>[0] =>
+	makeParams({ locale: EN, paymentIntent: PAYMENT_INTENT_ID });
 
-const renderErrorPage = async () => {
+const renderErrorPage = async (): Promise<RenderResult> => {
 	const element = await PaymentConfirmationPage(makeSuccessParams());
 	const resolved = await (element.type as (props: unknown) => Promise<never>)(element.props);
 	return render(resolved);
 };
 
-const makeStaleMarkerParams = () => ({
+const makeStaleMarkerParams = (): Parameters<typeof PaymentConfirmationPage>[0] => ({
 	searchParams: Promise.resolve({ payment_intent: PAYMENT_INTENT_ID, activation: "fresh" }),
 	params: Promise.resolve({ locale: EN as never }),
 });
 
-const makeFailedActivationParams = () => ({
+const makeFailedActivationParams = (): Parameters<typeof PaymentConfirmationPage>[0] => ({
 	searchParams: Promise.resolve({ payment_intent: PAYMENT_INTENT_ID, activation: ACTIVATION_FAILED }),
 	params: Promise.resolve({ locale: EN as never }),
 });

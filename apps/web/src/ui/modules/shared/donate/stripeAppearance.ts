@@ -1,4 +1,4 @@
-import type { Appearance } from "@stripe/stripe-js";
+import type { Appearance, CssFontSource } from "@stripe/stripe-js";
 import { STRIPE_DARK_PALETTE, STRIPE_LIGHT_PALETTE } from "@styles/palette";
 
 const FONT_SIZE_DESKTOP = "14px";
@@ -7,7 +7,7 @@ const SANS_STACK = '"Space Grotesk", ui-sans-serif, system-ui, -apple-system, "S
 const MONO_STACK = '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const FONTS_STYLESHEET = "/fonts/stripe/fonts.css";
 
-export const stripeFonts = (origin: string) => [{ cssSrc: `${origin}${FONTS_STYLESHEET}` }];
+export const stripeFonts = (origin: string): CssFontSource[] => [{ cssSrc: `${origin}${FONTS_STYLESHEET}` }];
 
 const SHADOW = { XS: 2, MD: 6, BUTTON: 5, BUTTON_HOVER: 7 } as const;
 
@@ -16,7 +16,7 @@ interface ShadowParams {
 	color: string;
 }
 
-const shadow = ({ offset, color }: ShadowParams) => `${offset}px ${offset}px 0 0 ${color}`;
+const shadow = ({ offset, color }: ShadowParams): string => `${offset}px ${offset}px 0 0 ${color}`;
 
 interface FocusRingParams {
 	base: string;
@@ -24,7 +24,8 @@ interface FocusRingParams {
 	ring: string;
 }
 
-const focusRing = ({ base, surface, ring }: FocusRingParams) => `0 0 0 2px ${surface}, 0 0 0 5px ${ring}, ${base}`;
+const focusRing = ({ base, surface, ring }: FocusRingParams): string =>
+	`0 0 0 2px ${surface}, 0 0 0 5px ${ring}, ${base}`;
 
 interface StripeAppearanceParams {
 	isDark: boolean;

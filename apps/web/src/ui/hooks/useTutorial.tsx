@@ -15,7 +15,7 @@ const ANCHOR_MIN_FRAMES = 6;
 const ANCHOR_STABLE_FRAMES = 3;
 const ANCHOR_MAX_FRAMES = 90;
 
-const measure = (selector: string) => {
+const measure = (selector: string): string | null => {
 	const element = document.querySelector(selector);
 	if (!element) return null;
 	const { x, y, width, height } = element.getBoundingClientRect();
@@ -27,7 +27,7 @@ interface WaitForAnchorToSettleParams {
 	frame: RefObject<number | null>;
 }
 
-const waitForAnchorToSettle = ({ selector, frame }: WaitForAnchorToSettleParams) =>
+const waitForAnchorToSettle = ({ selector, frame }: WaitForAnchorToSettleParams): Promise<void> =>
 	new Promise<void>((resolve) => {
 		if (frame.current !== null) cancelAnimationFrame(frame.current);
 
@@ -54,7 +54,11 @@ const waitForAnchorToSettle = ({ selector, frame }: WaitForAnchorToSettleParams)
 		frame.current = requestAnimationFrame(check);
 	});
 
-export const useTutorial = () => {
+interface TutorialControls {
+	startTutorial: () => Promise<void>;
+}
+
+export const useTutorial = (): TutorialControls => {
 	const { open, openMobile, toggleSidebar } = useSidebar();
 	const isMobile = useIsMobile();
 	const t = useTranslations("tutorial.steps");

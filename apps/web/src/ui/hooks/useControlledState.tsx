@@ -8,7 +8,9 @@ interface UseControlledStateParams<T, Rest extends unknown[] = []> {
 	onChange?: (value: T, ...args: Rest) => void;
 }
 
-export function useControlledState<T, Rest extends unknown[] = []>(props: UseControlledStateParams<T, Rest>) {
+export function useControlledState<T, Rest extends unknown[] = []>(
+	props: UseControlledStateParams<T, Rest>,
+): readonly [T, (next: T, ...args: Rest) => void] {
 	const { value, defaultValue, onChange } = props;
 
 	const [state, setInternalState] = useState<T>(value ?? (defaultValue as T));

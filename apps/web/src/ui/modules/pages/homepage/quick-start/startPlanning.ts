@@ -2,7 +2,7 @@ import { useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
 import type { QuickStartDraft } from "./steps";
 
-export function startPlanning(draft: QuickStartDraft) {
+export function startPlanning(draft: QuickStartDraft): void {
 	const filters = useFiltersStore.getState();
 	filters.setCountry(draft.country);
 	filters.setRegion(draft.region);

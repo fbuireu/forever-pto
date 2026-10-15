@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-const read = (file: string) => readFileSync(join(__dirname, file), "utf8");
+const read = (file: string): string => readFileSync(join(__dirname, file), "utf8");
 
 const RELATIVE_IMPORT = /@import\s+["'](\.{1,2}\/[^"']+)["']/g;
 
@@ -13,7 +13,7 @@ const stylesheetsUnder = (folder: string): string[] =>
 		return entry.name.endsWith(".css") ? [path] : [];
 	});
 
-const reachableFrom = (entry: string) => {
+const reachableFrom = (entry: string): Set<string> => {
 	const reached = new Set<string>();
 	const queue = [entry];
 	for (let file = queue.pop(); file !== undefined; file = queue.pop()) {

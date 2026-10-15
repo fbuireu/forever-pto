@@ -1,7 +1,13 @@
-import { describe, expect, it, vi } from "vitest";
+import type { NextResponse } from "next/server";
+import { describe, expect, it, type Mock, vi } from "vitest";
 import { ONE_WEEK, setLocationCookie, USER_COUNTRY_COOKIE } from "./cookie";
 
-function makeResponse() {
+interface ResponseDouble {
+	response: NextResponse;
+	cookiesSet: Mock;
+}
+
+function makeResponse(): ResponseDouble {
 	const cookiesSet = vi.fn();
 	return { response: { cookies: { set: cookiesSet } } as never, cookiesSet };
 }

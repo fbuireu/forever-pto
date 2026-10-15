@@ -1,12 +1,13 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import type { HolidayDTO } from "@application/dto/holiday/types";
 import caMessages from "@i18n/messages/ca.json";
 import deMessages from "@i18n/messages/de.json";
 import en from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { render, screen, waitFor } from "@testing-library/react";
+import { type RenderResult, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
@@ -70,7 +71,7 @@ interface RenderExportParams {
 	messages?: typeof en;
 }
 
-const renderExport = ({ locale = "en", messages = en }: RenderExportParams = {}) =>
+const renderExport = ({ locale = "en", messages = en }: RenderExportParams = {}): RenderResult =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<CalendarExport />
@@ -83,7 +84,11 @@ interface MakeHolidayParams {
 	isInPlanningWindow: boolean;
 }
 
-const makeHoliday = ({ id, date, isInPlanningWindow }: MakeHolidayParams) => ({
+const makeHoliday = ({
+	id,
+	date,
+	isInPlanningWindow,
+}: MakeHolidayParams): Pick<HolidayDTO, "id" | "date" | "name" | "isInPlanningWindow"> => ({
 	id,
 	date: new Date(`${date}T00:00:00`),
 	name: `Holiday ${id}`,
@@ -156,7 +161,7 @@ describe("CalendarExport", () => {
 	});
 });
 
-const downloadPdf = async () => {
+const downloadPdf = async (): Promise<HTMLAnchorElement[]> => {
 	const clicks: HTMLAnchorElement[] = [];
 	const created = document.createElement.bind(document);
 	const spy = vi.spyOn(document, "createElement").mockImplementation((tag: string) => {

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -100,7 +100,7 @@ interface RenderPopoverParams {
 	asChild?: boolean;
 }
 
-const renderPopover = ({ open, defaultOpen, onOpenChange, asChild }: RenderPopoverParams = {}) =>
+const renderPopover = ({ open, defaultOpen, onOpenChange, asChild }: RenderPopoverParams = {}): RenderResult =>
 	render(
 		<Popover open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
 			<PopoverTrigger asChild={asChild}>{asChild ? <a href="/help">help</a> : "help"}</PopoverTrigger>
@@ -117,8 +117,8 @@ const renderPopover = ({ open, defaultOpen, onOpenChange, asChild }: RenderPopov
 		</Popover>,
 	);
 
-const body = () => screen.queryByText("Body");
-const slot = (name: string) => document.querySelector(`[data-slot="${name}"]`);
+const body = (): HTMLElement | null => screen.queryByText("Body");
+const slot = (name: string): Element | null => document.querySelector(`[data-slot="${name}"]`);
 
 describe("Popover", () => {
 	afterEach(() => {

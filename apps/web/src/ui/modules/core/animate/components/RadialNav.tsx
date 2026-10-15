@@ -78,7 +78,12 @@ interface GetPolarCoordinatesParams {
 	r: number;
 }
 
-function getPolarCoordinates({ angleDeg, r }: GetPolarCoordinatesParams) {
+interface Point {
+	x: number;
+	y: number;
+}
+
+function getPolarCoordinates({ angleDeg, r }: GetPolarCoordinatesParams): Point {
 	const rad = ((angleDeg - 90) * Math.PI) / 180;
 	return { x: r * Math.cos(rad), y: r * Math.sin(rad) };
 }
@@ -90,7 +95,7 @@ interface CalculateIconOffsetParams {
 	bias?: number;
 }
 
-function calculateIconOffset({ buttonSize, iconSize, buttonPadding, bias = 0 }: CalculateIconOffsetParams) {
+function calculateIconOffset({ buttonSize, iconSize, buttonPadding, bias = 0 }: CalculateIconOffsetParams): number {
 	const centerOffset = (buttonSize - iconSize) / 2;
 	return centerOffset - buttonPadding + bias;
 }
@@ -100,11 +105,11 @@ interface WithDefaultsParams<T extends Record<string, unknown>> {
 	overrides?: Partial<T>;
 }
 
-function withDefaults<T extends Record<string, unknown>>({ defaults, overrides }: WithDefaultsParams<T>) {
+function withDefaults<T extends Record<string, unknown>>({ defaults, overrides }: WithDefaultsParams<T>): T {
 	return { ...defaults, ...overrides };
 }
 
-function normalizeDeg(a: number) {
+function normalizeDeg(a: number): number {
 	return ((a % 360) + 360) % 360;
 }
 
@@ -113,14 +118,14 @@ interface ToNearestTurnParams {
 	target: number;
 }
 
-function toNearestTurn({ prev, target }: ToNearestTurnParams) {
+function toNearestTurn({ prev, target }: ToNearestTurnParams): number {
 	const b = normalizeDeg(target);
 	if (prev === undefined) return b;
 	const k = Math.round((prev - b) / 360);
 	return b + 360 * k;
 }
 
-function useShortestRotation(target: number) {
+function useShortestRotation(target: number): number {
 	const [rotation, setRotation] = useState(() => ({ target, angle: toNearestTurn({ prev: undefined, target }) }));
 
 	if (rotation.target !== target) {

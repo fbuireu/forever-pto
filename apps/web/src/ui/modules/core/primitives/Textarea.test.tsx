@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { Textarea } from "./Textarea";
 
-const field = () => screen.getByRole("textbox", { name: "Message" }) as HTMLTextAreaElement;
+const field = (): HTMLTextAreaElement => screen.getByRole("textbox", { name: "Message" }) as HTMLTextAreaElement;
 
 describe("Textarea", () => {
 	it("renders a multi-line text box carrying the textarea slot", () => {

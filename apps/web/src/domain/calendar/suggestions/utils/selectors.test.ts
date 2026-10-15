@@ -8,13 +8,13 @@ import { objectiveFor, STRATEGY_OBJECTIVE, selectBridges, selectBridgesForStrate
 
 const NO_CALENDAR = { workdays: [], alreadyOff: [] };
 
-const jan = (day: number) => new Date(2025, 0, day);
+const jan = (day: number): Date => new Date(2025, 0, day);
 interface OnParams {
 	month: number;
 	day: number;
 }
 
-const on = ({ month, day }: OnParams) => new Date(2025, month - 1, day);
+const on = ({ month, day }: OnParams): Date => new Date(2025, month - 1, day);
 
 interface MakeBridgeParams {
 	from: Date;
@@ -41,7 +41,7 @@ interface WeekParams {
 	to: Date;
 }
 
-const week = ({ monday, from, to }: WeekParams) =>
+const week = ({ monday, from, to }: WeekParams): Bridge =>
 	makeBridge({
 		from,
 		to,
@@ -57,7 +57,7 @@ const friday17 = makeBridge({ from: jan(17), to: jan(19), ptoDays: [jan(17)] });
 const friday31 = makeBridge({ from: jan(31), to: on({ month: 2, day: 2 }), ptoDays: [jan(31)] });
 const fridayBeforeHoliday = makeBridge({ from: jan(3), to: jan(6), ptoDays: [jan(3)] });
 
-const toStrings = (days: Date[]) => days.map((day) => day.toDateString());
+const toStrings = (days: Date[]): string[] => days.map((day) => day.toDateString());
 
 interface WorkdaysBetweenParams {
 	from: Date;

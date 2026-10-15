@@ -17,7 +17,7 @@ export interface NoStoreFetchParams {
 	init?: RequestInit;
 }
 
-export const noStoreFetch = ({ url, init }: NoStoreFetchParams) =>
+export const noStoreFetch = ({ url, init }: NoStoreFetchParams): Promise<Response> =>
 	fetch(url, { ...init, cache: "no-store", signal: AbortSignal.timeout(5000) });
 
 export interface StringFieldParams {

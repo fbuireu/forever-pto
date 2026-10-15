@@ -6,7 +6,7 @@ const MODULES = "../modules";
 const BONES_FOLDER = `${MODULES}/bones`;
 const UNWRAPPED = /\[data-boneyard[^\]]*\][^{}]*\{[^}]*display:\s*contents/;
 
-const read = (file: string) => readFileSync(join(__dirname, file), "utf8");
+const read = (file: string): string => readFileSync(join(__dirname, file), "utf8");
 
 const stylesheetsUnder = (folder: string): string[] =>
 	readdirSync(join(__dirname, folder), { withFileTypes: true }).flatMap((entry) => {
@@ -47,7 +47,13 @@ const registered: Registered[] = readdirSync(join(__dirname, BONES_FOLDER))
 	.filter((file) => file.endsWith(".bones.json"))
 	.map((file) => ({ name: file.replace(".bones.json", ""), ...JSON.parse(read(`${BONES_FOLDER}/${file}`)) }));
 
-const breakpointsOf = ({ name, breakpoints }: Registered) =>
+interface ViewportBreakpoint {
+	name: string;
+	viewport: string;
+	breakpoint: RecordedBreakpoint;
+}
+
+const breakpointsOf = ({ name, breakpoints }: Registered): ViewportBreakpoint[] =>
 	Object.entries(breakpoints).map(([viewport, breakpoint]) => ({ name, viewport, breakpoint }));
 
 const EDGE_TOLERANCE = 1;

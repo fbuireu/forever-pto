@@ -6,7 +6,7 @@ interface LabelledOption {
 
 const collators = new Map<string, Intl.Collator>();
 
-const collatorFor = (locale?: Locale) => {
+const collatorFor = (locale?: Locale): Intl.Collator => {
 	const key = locale ?? "";
 	const cached = collators.get(key);
 	if (cached) return cached;

@@ -5,7 +5,7 @@ import { useLocationStore } from "@application/stores/location";
 import { useUIStore } from "@application/stores/ui";
 import { Strategy } from "@domain/calendar/types";
 import enMessages from "@i18n/messages/en.json";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -42,16 +42,16 @@ const REGIONS_BY_COUNTRY: Record<string, { value: string; label: string }[]> = {
 
 const quickStart = enMessages.quickStart;
 
-const renderForm = () =>
+const renderForm = (): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={enMessages}>
 			<QuickStartForm countries={COUNTRIES} currentYear={2026} />
 		</NextIntlClientProvider>,
 	);
 
-const next = () => fireEvent.click(screen.getByRole("button", { name: quickStart.next }));
-const back = () => fireEvent.click(screen.getByRole("button", { name: quickStart.back }));
-const finish = () => fireEvent.click(screen.getByRole("button", { name: quickStart.finish }));
+const next = (): boolean => fireEvent.click(screen.getByRole("button", { name: quickStart.next }));
+const back = (): boolean => fireEvent.click(screen.getByRole("button", { name: quickStart.back }));
+const finish = (): boolean => fireEvent.click(screen.getByRole("button", { name: quickStart.finish }));
 
 beforeEach(() => {
 	router.push.mockClear();

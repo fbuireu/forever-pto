@@ -66,7 +66,7 @@ interface OfTypeParams {
 	type: unknown;
 }
 
-const ofType = ({ tree, type }: OfTypeParams) => nodesIn(tree).filter((node) => node.type === type);
+const ofType = ({ tree, type }: OfTypeParams): Node[] => nodesIn(tree).filter((node) => node.type === type);
 
 beforeEach(() => {
 	vi.clearAllMocks();

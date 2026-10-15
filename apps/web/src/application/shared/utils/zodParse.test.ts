@@ -7,9 +7,9 @@ import { zodParse } from "./zodParse";
 
 const mockLogger = { info: vi.fn(), warn: vi.fn(), error: vi.fn(), logError: vi.fn() };
 const TestLayer = Layer.succeed(LoggerService, mockLogger);
-const run = <A>(eff: Effect.Effect<A, ValidationError, LoggerService>) =>
+const run = <A>(eff: Effect.Effect<A, ValidationError, LoggerService>): Promise<A> =>
 	Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
-const runFail = <A>(eff: Effect.Effect<A, ValidationError, LoggerService>) =>
+const runFail = <A>(eff: Effect.Effect<A, ValidationError, LoggerService>): Promise<ValidationError> =>
 	Effect.runPromise(Effect.flip(eff).pipe(Effect.provide(TestLayer)));
 
 const schema = z.object({ name: z.string().min(2), age: z.number() });

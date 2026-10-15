@@ -18,4 +18,4 @@ export const TUTORIAL_EVENT = {
 
 export type TutorialAnchor = (typeof TUTORIAL_ANCHOR)[keyof typeof TUTORIAL_ANCHOR];
 
-export const tutorialSelector = (anchor: TutorialAnchor) => `[data-tutorial="${anchor}"]`;
+export const tutorialSelector = (anchor: TutorialAnchor): string => `[data-tutorial="${anchor}"]`;

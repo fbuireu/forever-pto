@@ -3,12 +3,12 @@ const NEWLINES = /\r\n|\r|\n/g;
 const OCTET_LIMIT = 75;
 const CONTINUATION = "\r\n ";
 
-const escapeValue = (value: string) =>
+const escapeValue = (value: string): string =>
 	value.replace(ICS_SPECIAL_CHARS, (character) => `\\${character}`).replace(NEWLINES, String.raw`\n`);
 
-const octets = (value: string) => new TextEncoder().encode(value).length;
+const octets = (value: string): number => new TextEncoder().encode(value).length;
 
-const fold = (line: string) => {
+const fold = (line: string): string => {
 	if (octets(line) <= OCTET_LIMIT) return line;
 
 	const segments: string[] = [];
@@ -34,4 +34,4 @@ export interface ContentLineParams {
 	value: string;
 }
 
-export const contentLine = ({ name, value }: ContentLineParams) => fold(`${name}:${escapeValue(value)}`);
+export const contentLine = ({ name, value }: ContentLineParams): string => fold(`${name}:${escapeValue(value)}`);

@@ -46,7 +46,8 @@ const TestLayer = Layer.mergeAll(
 );
 
 type R = LoggerService | TursoService | StripeServerService;
-const run = <E>(eff: Effect.Effect<void, E, R>) => Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
+const run = <E>(eff: Effect.Effect<void, E, R>): Promise<void> =>
+	Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
 
 const EVENT: PaymentSucceededEvent = {
 	paymentId: "pi_test",

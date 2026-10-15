@@ -2,6 +2,6 @@
 
 import "./driver.css";
 
-export function DriverStyles() {
+export function DriverStyles(): null {
 	return null;
 }

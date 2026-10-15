@@ -1,6 +1,6 @@
 import { RateLimitError } from "@infrastructure/errors";
 import { Effect } from "effect";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
 const mockGetCloudflareContext = vi.hoisted(() => vi.fn());
 
@@ -12,7 +12,7 @@ const { checkRateLimit } = await import("./rateLimit");
 
 const mockLimit = vi.fn();
 
-const makeContext = () =>
+const makeContext = (): Mock =>
 	mockGetCloudflareContext.mockResolvedValue({
 		env: { PAYMENT_RATE_LIMITER: { limit: mockLimit } },
 	});

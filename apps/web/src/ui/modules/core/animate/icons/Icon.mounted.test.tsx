@@ -7,7 +7,7 @@ import { AnimateIcon, useAnimateIconContext } from "./Icon";
 const FRAMES = 5;
 const LOOP_DELAY_MS = 10;
 
-const frames = async () => {
+const frames = async (): Promise<void> => {
 	for (let frame = 0; frame < FRAMES; frame++) await new Promise<void>((resolve) => setTimeout(resolve, 0));
 };
 
@@ -18,7 +18,7 @@ const inMotion = (children: ReactNode) => (
 const started = vi.fn<(animation: unknown) => void>();
 const watched = new WeakSet<object>();
 
-const WatchControls = () => {
+const WatchControls = (): null => {
 	const { controls } = useAnimateIconContext();
 	if (controls && !watched.has(controls)) {
 		watched.add(controls);
@@ -32,7 +32,7 @@ const WatchControls = () => {
 };
 
 let unhandled: unknown[];
-const onUnhandled = (reason: unknown) => unhandled.push(reason);
+const onUnhandled = (reason: unknown): number => unhandled.push(reason);
 
 beforeEach(() => {
 	started.mockClear();

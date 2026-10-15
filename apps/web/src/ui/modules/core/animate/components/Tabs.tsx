@@ -55,7 +55,7 @@ interface ActivateSiblingTabParams {
 	key: string;
 }
 
-const activateSiblingTab = ({ from, key }: ActivateSiblingTabParams) => {
+const activateSiblingTab = ({ from, key }: ActivateSiblingTabParams): boolean => {
 	const list = from.closest('[role="tablist"]');
 	if (!list) return false;
 
@@ -75,7 +75,7 @@ const HIGHLIGHT_TRANSITION: Transition = { type: "spring", stiffness: 200, dampi
 
 const TabsContext = createContext<TabsContextType | undefined>(undefined);
 
-function useTabs() {
+function useTabs(): TabsContextType {
 	const ctx = use(TabsContext);
 	if (!ctx) throw new Error("useTabs must be used within a Tabs");
 	return ctx;

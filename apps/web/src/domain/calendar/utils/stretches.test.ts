@@ -2,7 +2,7 @@ import { dayIndex } from "@application/shared/utils/dates";
 import { describe, expect, it } from "vitest";
 import { longestWorkStretch, workStretchesOf } from "./stretches";
 
-const january = (day: number) => dayIndex(new Date(2025, 0, day));
+const january = (day: number): number => dayIndex(new Date(2025, 0, day));
 
 describe("workStretchesOf", () => {
 	it("keeps a weekend inside one stretch of work", () => {

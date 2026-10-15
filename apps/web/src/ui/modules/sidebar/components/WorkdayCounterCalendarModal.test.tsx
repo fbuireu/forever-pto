@@ -1,5 +1,5 @@
 import en from "@i18n/messages/en.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { Locale } from "next-intl";
 import { NextIntlClientProvider } from "next-intl";
@@ -26,7 +26,7 @@ interface RenderModalParams {
 	selectedRange?: { from: Date; to: Date };
 }
 
-const renderModal = ({ open = false, selectedRange }: RenderModalParams = {}) =>
+const renderModal = ({ open = false, selectedRange }: RenderModalParams = {}): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
 			<WorkdayCounterCalendarModal
@@ -40,7 +40,7 @@ const renderModal = ({ open = false, selectedRange }: RenderModalParams = {}) =>
 		</NextIntlClientProvider>,
 	);
 
-const trigger = () => screen.getByRole("button", { name: /Select dates|Jun/ });
+const trigger = (): HTMLElement => screen.getByRole("button", { name: /Select dates|Jun/ });
 
 beforeEach(() => {
 	setOpen.mockClear();

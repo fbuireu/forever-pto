@@ -4,7 +4,7 @@ import enMessages from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import { createFormatter, createTranslator, type Locale } from "next-intl";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -52,14 +52,14 @@ const BUNDLES: Record<string, typeof enMessages> = {
 	fr: frMessages,
 };
 
-const mountHero = async ({ locale, messages }: RenderHeroParams) => {
+const mountHero = async ({ locale, messages }: RenderHeroParams): Promise<RenderResult> => {
 	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "homepage" }));
 	mockGetFormatter.mockResolvedValue(createFormatter({ locale }));
 	mockGetLocale.mockResolvedValue(locale);
 	return render(await Hero());
 };
 
-const renderHero = async (params: RenderHeroParams) => {
+const renderHero = async (params: RenderHeroParams): Promise<string> => {
 	const { container } = await mountHero(params);
 	return (container.textContent ?? "").replace(NON_BREAKING_SPACES, " ");
 };

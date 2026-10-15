@@ -20,7 +20,7 @@ import { PremiumSessionSync } from "./PremiumSessionSync";
 const PAGE = "/payment/confirmation";
 const LANDING = `${PAGE}?payment_intent=pi_probe`;
 
-const flush = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+const flush = (): Promise<void> => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
 beforeEach(() => {
 	confirmActivation.mockReset().mockResolvedValue(undefined);

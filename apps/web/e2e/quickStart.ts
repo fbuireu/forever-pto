@@ -26,7 +26,7 @@ interface FinishQuickStartParams {
 	dialog: Locator;
 }
 
-export const finishQuickStart = async ({ page, dialog }: FinishQuickStartParams) => {
+export const finishQuickStart = async ({ page, dialog }: FinishQuickStartParams): Promise<void> => {
 	await dialog.getByRole("button", { name: enMessages.quickStart.finish }).click();
 	await expect(page).toHaveURL(/\/planner$/, { timeout: PLANNER_NAVIGATION_TIMEOUT });
 };

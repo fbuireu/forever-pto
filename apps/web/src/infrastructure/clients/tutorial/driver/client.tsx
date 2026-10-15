@@ -106,7 +106,7 @@ export class DriverClient {
 
 let driverClientInstance: DriverClient | null = null;
 
-export const getDriverClientInstance = () => {
+export const getDriverClientInstance = (): DriverClient => {
 	driverClientInstance ??= new DriverClient({});
 	return driverClientInstance;
 };

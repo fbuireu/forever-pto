@@ -22,7 +22,7 @@ interface RenderTitleParams {
 	messages: typeof esMessages;
 }
 
-const renderTitle = async ({ locale, messages }: RenderTitleParams) => {
+const renderTitle = async ({ locale, messages }: RenderTitleParams): Promise<string> => {
 	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "planner" }));
 	const { container } = render(await SiteTitle());
 	return container.querySelector("h1")?.textContent ?? "";
@@ -30,7 +30,7 @@ const renderTitle = async ({ locale, messages }: RenderTitleParams) => {
 
 const BUNDLES: Record<string, typeof esMessages> = { en, es: esMessages, ca, it: itMessages, de, fr };
 
-const taglineBadges = async ({ locale, messages }: RenderTitleParams) => {
+const taglineBadges = async ({ locale, messages }: RenderTitleParams): Promise<string[]> => {
 	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "planner" }));
 	const { container } = render(await SiteTitle());
 	return Array.from(container.querySelectorAll("p > span")).map((badge) => badge.textContent);

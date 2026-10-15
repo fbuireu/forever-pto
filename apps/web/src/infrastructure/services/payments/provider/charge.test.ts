@@ -2,6 +2,7 @@ import { StripeServerService } from "@infrastructure/clients/payments/stripe/ser
 import { PaymentError } from "@infrastructure/errors";
 import { Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { ChargeData } from "./charge";
 
 const { retrieveCharge } = await import("./charge");
 
@@ -14,7 +15,8 @@ const MockStripeLayer = Layer.succeed(StripeServerService, {
 	webhooks: { constructEvent: vi.fn() },
 });
 
-const run = (id: string) => Effect.runPromise(retrieveCharge(id).pipe(Effect.provide(MockStripeLayer)));
+const run = (id: string): Promise<ChargeData> =>
+	Effect.runPromise(retrieveCharge(id).pipe(Effect.provide(MockStripeLayer)));
 
 const STRIPE_CHARGE = {
 	id: "ch_abc",

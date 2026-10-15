@@ -14,7 +14,9 @@ export const AMOUNT_MAX = 10000;
 const EMAIL_MAX_LENGTH = 254;
 const PROMO_CODE_MAX_LENGTH = 100;
 
-export const createPaymentSchemaWithMessages = (messages: PaymentSchemaMessages) =>
+export const createPaymentSchemaWithMessages = (
+	messages: PaymentSchemaMessages,
+): z.ZodObject<{ amount: z.ZodNumber; email: z.ZodEmail; promoCode: z.ZodOptional<z.ZodString> }> =>
 	z.object({
 		amount: z
 			.number()
@@ -39,7 +41,13 @@ export type CreatePaymentInput = z.infer<typeof createPaymentSchema>;
 
 export const amountFromField = (amount: number | null): number => amount ?? 0;
 
-export const createDonationFormSchemaWithMessages = (messages: PaymentSchemaMessages) => {
+export const createDonationFormSchemaWithMessages = (
+	messages: PaymentSchemaMessages,
+): z.ZodObject<{
+	email: z.ZodEmail;
+	promoCode: z.ZodOptional<z.ZodString>;
+	amount: z.ZodPipe<z.ZodPipe<z.ZodNullable<z.ZodNumber>, z.ZodTransform<number, number | null>>, z.ZodNumber>;
+}> => {
 	const payment = createPaymentSchemaWithMessages(messages);
 
 	return payment.extend({ amount: z.number().nullable().transform(amountFromField).pipe(payment.shape.amount) });

@@ -12,7 +12,7 @@ export interface SetPremiumCookieParams {
 	token: string;
 }
 
-export function setPremiumCookie({ response, token }: SetPremiumCookieParams) {
+export function setPremiumCookie({ response, token }: SetPremiumCookieParams): void {
 	response.cookies.set(PREMIUM_COOKIE, token, {
 		httpOnly: true,
 		secure: isProd,
@@ -22,7 +22,7 @@ export function setPremiumCookie({ response, token }: SetPremiumCookieParams) {
 	});
 }
 
-export function setActivationCookie(response: NextResponse) {
+export function setActivationCookie(response: NextResponse): void {
 	response.cookies.set(ACTIVATION_COOKIE, ACTIVATION_PROOF, {
 		httpOnly: false,
 		secure: isProd,
@@ -32,6 +32,6 @@ export function setActivationCookie(response: NextResponse) {
 	});
 }
 
-export function clearPremiumCookie(response: NextResponse) {
+export function clearPremiumCookie(response: NextResponse): void {
 	response.cookies.delete(PREMIUM_COOKIE);
 }

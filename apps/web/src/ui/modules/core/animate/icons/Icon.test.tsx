@@ -67,9 +67,10 @@ const Probe = () => {
 	);
 };
 
-const probeOf = (container: HTMLElement) => container.querySelector('[data-testid="probe"]') as HTMLElement;
+const probeOf = (container: HTMLElement): HTMLElement =>
+	container.querySelector('[data-testid="probe"]') as HTMLElement;
 
-const isActive = (container: HTMLElement) => probeOf(container).dataset.active === "true";
+const isActive = (container: HTMLElement): boolean => probeOf(container).dataset.active === "true";
 
 beforeEach(() => {
 	inView.value = false;
@@ -364,9 +365,9 @@ describe("what AnimateIcon passes through", () => {
 	});
 });
 
-const started = () => controls.start.mock.calls.map(([animation]) => animation);
+const started = (): string[] => controls.start.mock.calls.map(([animation]) => animation);
 
-const setTo = () => controls.set.mock.calls.map(([animation]) => animation);
+const setTo = (): string[] => controls.set.mock.calls.map(([animation]) => animation);
 
 describe("what AnimateIcon asks the motion controls to do", () => {
 	it("runs the animation when it is turned on", async () => {
@@ -509,7 +510,8 @@ const VARIANTS = {
 
 const VariantProbe = () => <span data-testid="variants">{JSON.stringify(useVariants(VARIANTS))}</span>;
 
-const readVariants = () => JSON.parse(screen.getByTestId("variants").textContent ?? "{}") as Record<string, unknown>;
+const readVariants = (): Record<string, unknown> =>
+	JSON.parse(screen.getByTestId("variants").textContent ?? "{}") as Record<string, unknown>;
 
 describe("useVariants", () => {
 	it("hands back the default set when nothing names another", () => {

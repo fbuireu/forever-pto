@@ -14,7 +14,7 @@ interface SlotProps extends HTMLAttributes<HTMLElement> {
 	ref?: Ref<HTMLElement>;
 }
 
-function Slot({ children, ref: forwardedRef, ...slotProps }: SlotProps) {
+function Slot({ children, ref: forwardedRef, ...slotProps }: SlotProps): ReactElement | null {
 	if (!isValidElement(children)) return null;
 
 	const { ref: childRef, ...childProps } = children.props as Record<string, unknown> & { ref?: Ref<HTMLElement> };

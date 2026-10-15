@@ -4,7 +4,7 @@ import en from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { act, render, screen } from "@testing-library/react";
+import { act, type RenderResult, render, screen } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -32,14 +32,14 @@ interface RenderFooterParams {
 	messages?: typeof en;
 }
 
-const renderFooter = ({ locale = "en", messages = en }: RenderFooterParams = {}) =>
+const renderFooter = ({ locale = "en", messages = en }: RenderFooterParams = {}): RenderResult =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<DevFooter />
 		</NextIntlClientProvider>,
 	);
 
-const emoji = () => screen.getByTestId("emoji").textContent;
+const emoji = (): string => screen.getByTestId("emoji").textContent;
 
 const ROTATION_MS = 3000;
 

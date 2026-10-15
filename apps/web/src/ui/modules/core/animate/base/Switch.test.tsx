@@ -24,8 +24,8 @@ vi.mock("motion/react", async () => {
 
 const { Switch } = await import("./Switch");
 
-const control = () => screen.getByRole("switch", { name: "Allow past days" });
-const thumb = () => document.querySelector('[data-slot="switch-thumb"]');
+const control = (): HTMLElement => screen.getByRole("switch", { name: "Allow past days" });
+const thumb = (): Element | null => document.querySelector('[data-slot="switch-thumb"]');
 
 describe("Switch", () => {
 	it("runs uncontrolled off defaultChecked and reports the flip", () => {

@@ -1,5 +1,5 @@
 import { Link } from "@application/i18n/navigation";
-import type { ComponentProps, ReactNode } from "react";
+import type { ComponentProps, ReactElement, ReactNode } from "react";
 
 interface RichLinkProps {
 	href: string;
@@ -36,7 +36,7 @@ export interface CreateRichLinkParams {
 	options?: CreateRichLinkOptions;
 }
 
-export function createRichLink({ href, options }: CreateRichLinkParams) {
+export function createRichLink({ href, options }: CreateRichLinkParams): (chunks: ReactNode) => ReactElement {
 	return function RichLinkTag(chunks: ReactNode) {
 		return (
 			<RichLink href={href} className={options?.className} external={options?.external}>

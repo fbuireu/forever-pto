@@ -8,7 +8,8 @@ interface RawParams {
 	location?: string;
 }
 
-const raw = ({ date, name, location }: RawParams) => ({ date, name, type: "public", location }) as RawHoliday;
+const raw = ({ date, name, location }: RawParams): RawHoliday =>
+	({ date, name, type: "public", location }) as RawHoliday;
 
 const NEW_YEAR = raw({ date: "2027-01-01 00:00:00", name: "New Year" });
 const COLUMBUS = raw({ date: "2027-10-11 00:00:00", name: "Columbus Day" });

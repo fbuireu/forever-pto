@@ -60,9 +60,10 @@ const ROUTES_BY_PATH = Object.fromEntries(SITE_ROUTES.map((route) => [route.path
 	[PATH in RoutePath]: Extract<SiteRouteEntry, { path: PATH }>;
 };
 
-export const routeFor = <PATH extends RoutePath>(path: PATH) => ROUTES_BY_PATH[path];
+export const routeFor = <PATH extends RoutePath>(path: PATH): Extract<SiteRouteEntry, { path: PATH }> =>
+	ROUTES_BY_PATH[path];
 
-export const findRoute = (path: string) => SITE_ROUTES.find((route) => route.path === path);
+export const findRoute = (path: string): SiteRouteEntry | undefined => SITE_ROUTES.find((route) => route.path === path);
 
 export const indexableRoutes = (): SiteRoute[] => SITE_ROUTES.filter(({ indexable }) => indexable);
 

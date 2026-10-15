@@ -32,7 +32,7 @@ const wrapper = ({ children }: { children: ReactNode }) => (
 
 const DATE = new Date(2026, 4, 1);
 
-const clickWith = (toggle: (date: Date) => DayOutcome) => {
+const clickWith = (toggle: (date: Date) => DayOutcome): void => {
 	const { result } = renderHook(() => usePlannerDayClick(toggle), { wrapper });
 	result.current(DATE);
 };

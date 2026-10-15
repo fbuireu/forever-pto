@@ -18,22 +18,22 @@ import {
 	isToday,
 } from "./modifiers";
 
-const day = (d: number) => new Date(2026, 5, d);
+const day = (d: number): Date => new Date(2026, 5, d);
 
 const MONDAY = day(1);
 const TUESDAY = day(2);
 const WEDNESDAY = day(3);
 const THURSDAY = day(4);
 
-const suggestionOf = (days: Date[]) => ({ days }) as unknown as Suggestion;
-const measuredOf = (days: Date[]) => ({ days }) as unknown as MeasuredSuggestion;
+const suggestionOf = (days: Date[]): Suggestion => ({ days }) as unknown as Suggestion;
+const measuredOf = (days: Date[]): MeasuredSuggestion => ({ days }) as unknown as MeasuredSuggestion;
 
 interface HolidayOfParams {
 	date: Date;
 	variant: HolidayDTO["variant"];
 }
 
-const holidayOf = ({ date, variant }: HolidayOfParams) => ({ date, variant, name: "A day" }) as HolidayDTO;
+const holidayOf = ({ date, variant }: HolidayOfParams): HolidayDTO => ({ date, variant, name: "A day" }) as HolidayDTO;
 
 describe("isPast", () => {
 	it("refuses to call anything past while past days are allowed", () => {

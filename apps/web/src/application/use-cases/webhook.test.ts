@@ -57,7 +57,8 @@ const TestLayer = Layer.mergeAll(
 );
 
 type WebhookR = LoggerService | TursoService | StripeServerService;
-const run = <E>(eff: Effect.Effect<void, E, WebhookR>) => Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
+const run = <E>(eff: Effect.Effect<void, E, WebhookR>): Promise<void> =>
+	Effect.runPromise(eff.pipe(Effect.provide(TestLayer)));
 
 const STRIPE_CREATED_SECONDS = 1_736_000_000;
 
@@ -73,7 +74,7 @@ const STRIPE_INTENT = {
 	description: "Donation from donor@example.com",
 };
 
-const succeededEvent = (object: Partial<Stripe.PaymentIntent>) =>
+const succeededEvent = (object: Partial<Stripe.PaymentIntent>): Stripe.PaymentIntentSucceededEvent =>
 	({
 		type: "payment_intent.succeeded",
 		data: { object },
@@ -81,7 +82,7 @@ const succeededEvent = (object: Partial<Stripe.PaymentIntent>) =>
 		object: "event",
 	}) as Stripe.PaymentIntentSucceededEvent;
 
-const failedEvent = (object: Partial<Stripe.PaymentIntent>) =>
+const failedEvent = (object: Partial<Stripe.PaymentIntent>): Stripe.PaymentIntentPaymentFailedEvent =>
 	({
 		type: "payment_intent.payment_failed",
 		data: { object },
@@ -89,7 +90,7 @@ const failedEvent = (object: Partial<Stripe.PaymentIntent>) =>
 		object: "event",
 	}) as Stripe.PaymentIntentPaymentFailedEvent;
 
-const unhandledEvent = () =>
+const unhandledEvent = (): Stripe.CustomerCreatedEvent =>
 	({
 		type: "customer.created",
 		data: { object: {} },

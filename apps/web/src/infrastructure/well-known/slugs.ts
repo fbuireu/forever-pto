@@ -10,4 +10,4 @@ export interface WellKnownUrlParams {
 	slug: string;
 }
 
-export const wellKnownUrl = ({ baseUrl, slug }: WellKnownUrlParams) => `${baseUrl}/.well-known/${slug}`;
+export const wellKnownUrl = ({ baseUrl, slug }: WellKnownUrlParams): string => `${baseUrl}/.well-known/${slug}`;

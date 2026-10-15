@@ -5,7 +5,7 @@ import { jwtVerify, SignJWT } from "jose";
 import { PREMIUM_SESSION_LIFETIME_SECONDS } from "./cookie";
 import { MissingJWTSecret, wrapSessionError } from "./sessionErrors";
 
-const getJWTSecret = () => {
+const getJWTSecret = (): Uint8Array<ArrayBuffer> => {
 	const secret = process.env.JWT_SECRET;
 	if (!secret) throw new MissingJWTSecret("JWT_SECRET environment variable is not set");
 	return new TextEncoder().encode(secret);

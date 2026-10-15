@@ -39,8 +39,8 @@ const Controlled = ({ initial = null, onValueChange, ...props }: ControlledProps
 	);
 };
 
-const field = () => screen.getByRole<HTMLInputElement>("textbox", { name: "amount" });
-const held = () => screen.getByTestId("value").textContent;
+const field = (): HTMLInputElement => screen.getByRole<HTMLInputElement>("textbox", { name: "amount" });
+const held = (): string => screen.getByTestId("value").textContent;
 
 let consoleError: ReturnType<typeof vi.spyOn>;
 

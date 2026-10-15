@@ -16,7 +16,7 @@ import { Comparison } from "./Comparison";
 
 const comparison = enMessages.homepage.comparison;
 
-const renderComparison = async () => {
+const renderComparison = async (): Promise<HTMLElement[]> => {
 	mockGetTranslations.mockResolvedValue(
 		createTranslator({ locale: "en", messages: enMessages, namespace: "homepage" }),
 	);
@@ -25,7 +25,7 @@ const renderComparison = async () => {
 	return screen.getAllByRole("list");
 };
 
-const itemsOf = (list: HTMLElement) => [...list.querySelectorAll("li")].map((item) => item.textContent ?? "");
+const itemsOf = (list: HTMLElement): string[] => [...list.querySelectorAll("li")].map((item) => item.textContent ?? "");
 
 describe("Comparison", () => {
 	beforeEach(() => {

@@ -4,12 +4,12 @@ import enMessages from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { render, screen, within } from "@testing-library/react";
+import { type RenderResult, render, screen, within } from "@testing-library/react";
 import { MAIN_CONTENT_ID } from "@ui/modules/layout/SkipToContent";
 import { TUTORIAL_ANCHOR } from "@ui/modules/tutorial/anchors";
 import { createTranslator, type Locale } from "next-intl";
 import type { ComponentProps, ReactNode } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
 interface CollapsibleGroupProps {
 	defaultOpen?: boolean;
@@ -123,12 +123,12 @@ interface TranslateInParams {
 	messages: typeof enMessages;
 }
 
-const translateIn = ({ locale, messages }: TranslateInParams) =>
+const translateIn = ({ locale, messages }: TranslateInParams): Mock =>
 	mockGetTranslations.mockImplementation(async (namespace: "sidebar" | "a11y") =>
 		createTranslator({ locale, messages, namespace }),
 	);
 
-const renderSidebar = async () => {
+const renderSidebar = async (): Promise<RenderResult> => {
 	const element = await AppSidebar({ locale: "en" as Locale, children: <p>page content</p> });
 	return render(element);
 };
@@ -137,7 +137,7 @@ beforeEach(() => {
 	translateIn({ locale: "en", messages: enMessages });
 });
 
-const dynamicProps = (name: string) => {
+const dynamicProps = (name: string): unknown => {
 	const node = document.querySelector(`[data-dynamic="${name}"]`);
 	return JSON.parse(node?.getAttribute("data-props") ?? "null");
 };

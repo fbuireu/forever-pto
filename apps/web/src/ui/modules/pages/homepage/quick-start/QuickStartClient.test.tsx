@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, type RenderResult, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 type Loader = () => Promise<{ default: unknown }>;
@@ -35,14 +35,14 @@ vi.mock("@application/stores/ui", async () => {
 
 const { QuickStartClient } = await import("./QuickStartClient");
 
-const setOpen = (open: boolean) => {
+const setOpen = (open: boolean): void => {
 	act(() => {
 		ui.quickStartOpen = open;
 		for (const listener of ui.listeners) listener();
 	});
 };
 
-const renderClient = () => render(<QuickStartClient countries={[]} serverYear={2026} />);
+const renderClient = (): RenderResult => render(<QuickStartClient countries={[]} serverYear={2026} />);
 
 beforeEach(() => {
 	ui.quickStartOpen = false;

@@ -13,6 +13,6 @@ export interface SetLocaleCookieParams {
 	value: string;
 }
 
-export function setLocaleCookie({ response, value }: SetLocaleCookieParams) {
+export function setLocaleCookie({ response, value }: SetLocaleCookieParams): void {
 	response.cookies.set({ ...LOCALE_COOKIE_POLICY, value });
 }

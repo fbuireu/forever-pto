@@ -26,7 +26,7 @@ interface GetCalendarDaysParams {
 	fixedWeeks: boolean;
 }
 
-export const getCalendarDays = ({ month, weekStartsOn, fixedWeeks }: GetCalendarDaysParams) => {
+export const getCalendarDays = ({ month, weekStartsOn, fixedWeeks }: GetCalendarDaysParams): Date[] => {
 	const monthStart = startOfMonth(month);
 	const monthEnd = endOfMonth(month);
 	const calendarStart = startOfWeek({ date: monthStart, options: { weekStartsOn } });
@@ -53,7 +53,7 @@ export interface DateRangeCountParams {
 	holidays: HolidayDTO[];
 }
 
-export function calculateWorkdays({ range, holidays }: DateRangeCountParams) {
+export function calculateWorkdays({ range, holidays }: DateRangeCountParams): number {
 	const days = eachDayOfInterval({
 		start: range.from,
 		end: range.to,
@@ -69,7 +69,7 @@ export function calculateWorkdays({ range, holidays }: DateRangeCountParams) {
 	}).length;
 }
 
-export function calculateWeekends(range: FromTo) {
+export function calculateWeekends(range: FromTo): number {
 	const weekendDays = eachWeekendOfInterval({
 		start: range.from,
 		end: range.to,
@@ -78,7 +78,7 @@ export function calculateWeekends(range: FromTo) {
 	return weekendDays.length;
 }
 
-export function calculateHolidaysInRange({ range, holidays }: DateRangeCountParams) {
+export function calculateHolidaysInRange({ range, holidays }: DateRangeCountParams): number {
 	const days = eachDayOfInterval({
 		start: range.from,
 		end: range.to,
@@ -96,7 +96,7 @@ interface GetWindowMonthLabelsParams {
 	startYear: number;
 }
 
-export const getWindowMonthLabels = ({ locale, monthCount, startYear }: GetWindowMonthLabelsParams) => {
+export const getWindowMonthLabels = ({ locale, monthCount, startYear }: GetWindowMonthLabelsParams): string[] => {
 	const names = getMonthNames({ locale });
 
 	return Array.from({ length: monthCount }, (_, index) => {

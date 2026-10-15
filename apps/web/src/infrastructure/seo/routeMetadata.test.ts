@@ -1,4 +1,5 @@
 import en from "@i18n/messages/en.json";
+import type { Metadata } from "next";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SITE_ROUTES } from "./routes";
 
@@ -24,7 +25,7 @@ beforeEach(() => {
 	);
 });
 
-const generate = (path: string) =>
+const generate = (path: string): Promise<Metadata> =>
 	routeMetadata(path as Parameters<typeof routeMetadata>[0])({ params: Promise.resolve({ locale: "en" }) });
 
 describe("routeMetadata", () => {

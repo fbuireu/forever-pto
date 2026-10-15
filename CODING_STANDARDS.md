@@ -282,6 +282,10 @@ No rule below restates these, and a diff that breaks one fails CI:
   logic.
 - `F11` **hard**: Sort with `toSorted`; `.sort()` is for an array the function has just built, because a sort in
   place reorders a caller's array.
+- `F12` **hard**: Declare the return type of every function declared at a module's top level, exported or not, so a
+  reader learns what it hands back without reading its body and a wrong return fails in the function rather than at its
+  callers; a component that returns JSX, a nested function and a callback infer theirs. Type every parameter but a
+  callback's, which takes its type from where it is passed.
 
 ## Errors and logging
 

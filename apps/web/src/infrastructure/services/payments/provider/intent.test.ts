@@ -2,6 +2,7 @@ import { StripeServerService } from "@infrastructure/clients/payments/stripe/ser
 import { PaymentError } from "@infrastructure/errors";
 import { PAYMENT_CURRENCY } from "@infrastructure/services/payments/normalForms";
 import { Effect, Layer } from "effect";
+import type Stripe from "stripe";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { donationMetadata } from "./metadata";
 
@@ -18,7 +19,7 @@ const MockStripeLayer = Layer.succeed(StripeServerService, {
 
 const MOCK_INTENT = { id: "pi_123", client_secret: "fixture-client-secret" };
 
-const run = (params: Parameters<typeof createPaymentIntent>[0]) =>
+const run = (params: Parameters<typeof createPaymentIntent>[0]): Promise<Stripe.PaymentIntent> =>
 	Effect.runPromise(createPaymentIntent(params).pipe(Effect.provide(MockStripeLayer)));
 
 beforeEach(() => {

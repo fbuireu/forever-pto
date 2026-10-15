@@ -1,9 +1,9 @@
 import type { Bridge } from "@domain/calendar/types";
 import { monthKeyOf } from "@domain/calendar/window";
 import { describe, expect, it } from "vitest";
-import { measurePlan } from "./measures";
+import { measurePlan, type PlanMeasures } from "./measures";
 
-const jan = (day: number) => new Date(2025, 0, day);
+const jan = (day: number): Date => new Date(2025, 0, day);
 
 const FRIDAY: Bridge = {
 	startDate: jan(10),
@@ -25,7 +25,7 @@ const MONDAY: Bridge = {
 
 const WORKDAYS = [6, 7, 8, 9, 10, 13, 14, 15, 16, 17].map(jan);
 
-const measure = (overrides: Partial<Parameters<typeof measurePlan>[0]> = {}) =>
+const measure = (overrides: Partial<Parameters<typeof measurePlan>[0]> = {}): PlanMeasures =>
 	measurePlan({
 		plan: { days: [jan(10), jan(13)], bridges: [FRIDAY, MONDAY] },
 		alreadyOff: [],

@@ -30,7 +30,9 @@ vi.mock("next-intl/server", () => ({
 
 const { default: TermsOfServicePage } = await import("./page");
 
-const makeParams = (locale = EN) => ({ params: Promise.resolve({ locale: locale as never }) });
+const makeParams = (locale = EN): Parameters<typeof TermsOfServicePage>[0] => ({
+	params: Promise.resolve({ locale: locale as never }),
+});
 
 describe("terms-of-service/page", () => {
 	beforeEach(() => {

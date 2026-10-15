@@ -5,7 +5,7 @@ import enMessages from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import { createFormatter, createTranslator, type Locale } from "next-intl";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -48,14 +48,14 @@ interface RenderFeaturesParams {
 	messages?: typeof enMessages;
 }
 
-const renderFeatures = async ({ locale, messages = enMessages }: RenderFeaturesParams) => {
+const renderFeatures = async ({ locale, messages = enMessages }: RenderFeaturesParams): Promise<RenderResult> => {
 	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "homepage" }));
 	mockGetLocale.mockResolvedValue(locale);
 	mockGetFormatter.mockResolvedValue(createFormatter({ locale }));
 	return render(await Features());
 };
 
-const bridgeCellsOf = async (locale: Locale) => {
+const bridgeCellsOf = async (locale: Locale): Promise<HTMLElement[]> => {
 	const { container } = await renderFeatures({ locale });
 	const grid = container.querySelector(".grid-cols-7");
 	if (!grid) throw new Error("bridge day grid not rendered");

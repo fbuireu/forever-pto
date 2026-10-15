@@ -17,7 +17,7 @@ const SALARY_FRACTION_DIGITS = 2;
 const UNUSED_DAYS_FRACTION_DIGITS = 2;
 const DEFAULT_UNUSED_PTO_DAYS = 5;
 
-const positive = (amount: number | null) => (amount !== null && amount > 0 ? amount : 0);
+const positive = (amount: number | null): number => (amount !== null && amount > 0 ? amount : 0);
 
 interface CurrencyNumberProps {
 	value: number;

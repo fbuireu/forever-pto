@@ -43,7 +43,7 @@ interface StaysBelowParams {
 	ceiling: Scored;
 }
 
-const staysBelow = ({ plan, ceiling }: StaysBelowParams) =>
+const staysBelow = ({ plan, ceiling }: StaysBelowParams): boolean =>
 	plan.covered <= ceiling.covered && plan.efficiency <= ceiling.efficiency;
 
 export function generateAlternatives(params: GenerateAlternativesParams): PlanChoice {

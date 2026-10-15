@@ -1,4 +1,4 @@
-import { HolidayVariant } from "@application/dto/holiday/types";
+import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
 import { PTO_CONSTANTS } from "@domain/calendar/const";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
@@ -24,9 +24,9 @@ interface MakeDateParams {
 	day: number;
 }
 
-const makeDate = ({ year, month, day }: MakeDateParams) => new Date(year, month - 1, day);
+const makeDate = ({ year, month, day }: MakeDateParams): Date => new Date(year, month - 1, day);
 
-const makeHoliday = (date: Date) => ({
+const makeHoliday = (date: Date): HolidayDTO => ({
 	id: `h-${date.toISOString()}`,
 	date,
 	name: "Test Holiday",
@@ -39,7 +39,7 @@ interface EffectiveDaysOfParams {
 	holidays?: ReturnType<typeof makeHoliday>[];
 }
 
-const effectiveDaysOf = ({ days, holidays = [] }: EffectiveDaysOfParams) =>
+const effectiveDaysOf = ({ days, holidays = [] }: EffectiveDaysOfParams): number =>
 	getTotalEffectiveDays(freeStreaks({ placedDays: days, holidays }));
 
 describe("getMonthlyDist", () => {
@@ -627,7 +627,7 @@ describe("getTotalEffectiveDays only counts days that are still free", () => {
 	});
 });
 
-const janDay = (day: number) => new Date(2025, 0, day);
+const janDay = (day: number): Date => new Date(2025, 0, day);
 
 describe("restBlocksOf", () => {
 	it("groups days no further apart than REST_BLOCK_SEPARATION_DAYS, in calendar order", () => {

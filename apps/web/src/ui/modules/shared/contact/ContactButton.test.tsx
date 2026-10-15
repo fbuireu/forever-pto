@@ -1,5 +1,5 @@
 import enMessages from "@i18n/messages/en.json";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { describe, expect, it, vi } from "vitest";
 
@@ -26,14 +26,14 @@ vi.mock("next/dynamic", () => ({
 
 const { ContactButton } = await import("./ContactButton");
 
-const renderButton = () =>
+const renderButton = (): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={enMessages}>
 			<ContactButton />
 		</NextIntlClientProvider>,
 	);
 
-const modalOpen = () => screen.getByTestId("contact-modal").getAttribute("data-open");
+const modalOpen = (): string | null => screen.getByTestId("contact-modal").getAttribute("data-open");
 
 describe("ContactButton", () => {
 	it("does not mount the modal until asked, so the form's code is not loaded for every visitor", () => {

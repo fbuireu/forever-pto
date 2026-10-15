@@ -99,7 +99,8 @@ interface DisplayedParams {
 	renderValue?: (counter: ReactNode) => ReactNode;
 }
 
-const displayed = ({ counter, renderValue }: DisplayedParams) => (renderValue ? renderValue(counter) : counter);
+const displayed = ({ counter, renderValue }: DisplayedParams): ReactNode =>
+	renderValue ? renderValue(counter) : counter;
 
 export const MetricCard = (props: MetricCardProps) => {
 	const { label, value, icon: Icon, colorScheme, renderValue, decimalPlaces = 0, className = "" } = props;

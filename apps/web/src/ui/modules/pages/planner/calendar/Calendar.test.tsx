@@ -1,7 +1,7 @@
 import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
 import en from "@i18n/messages/en.json";
 import es from "@i18n/messages/es.json";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Calendar, CalendarSelectionMode, type FromTo } from "./Calendar";
@@ -17,7 +17,7 @@ const HOLIDAY: HolidayDTO = {
 	isInPlanningWindow: true,
 };
 
-const renderCalendar = (props: Partial<Parameters<typeof Calendar>[0]> = {}) =>
+const renderCalendar = (props: Partial<Parameters<typeof Calendar>[0]> = {}): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
 			<Calendar
@@ -232,11 +232,11 @@ describe("Calendar day state in the accessible tree", () => {
 	});
 });
 
-const june = (day: number) => screen.getByRole("button", { name: new RegExp(`June ${day}, 2026\\b`) });
+const june = (day: number): HTMLElement => screen.getByRole("button", { name: new RegExp(`June ${day}, 2026\\b`) });
 
-const clickJune = (day: number) => fireEvent.click(june(day));
+const clickJune = (day: number): boolean => fireEvent.click(june(day));
 
-const title = (container: HTMLElement) => container.querySelector("h3")?.textContent;
+const title = (container: HTMLElement): string | undefined => container.querySelector("h3")?.textContent;
 
 describe("Calendar picking one date", () => {
 	it("hands the date back and marks it, replacing whatever was picked before", () => {

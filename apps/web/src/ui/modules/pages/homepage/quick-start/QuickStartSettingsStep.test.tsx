@@ -5,7 +5,7 @@ import enMessages from "@i18n/messages/en.json";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
 const gate = vi.hoisted(() => ({ features: [] as string[], origins: [] as (string | undefined)[] }));
 
@@ -35,7 +35,7 @@ const renderStep = ({
 	allowPastDays = false,
 	carryOverMonths = 1,
 	year = 2099,
-}: RenderStepParams = {}) => {
+}: RenderStepParams = {}): Mock => {
 	const onChange = vi.fn();
 
 	render(

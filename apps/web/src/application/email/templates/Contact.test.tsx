@@ -17,19 +17,19 @@ const BASE_PROPS = {
 	baseUrl: SITE_URL,
 };
 
-const getHtml = (props = BASE_PROPS) => render(ContactFormEmail(props));
+const getHtml = (props = BASE_PROPS): Promise<string> => render(ContactFormEmail(props));
 
 const { brand, email: roles } = EMAIL_PALETTE;
 
-const rgbOf = (hex: string) =>
+const rgbOf = (hex: string): string =>
 	`rgb(${[1, 3, 5].map((start) => Number.parseInt(hex.slice(start, start + 2), 16)).join(",")})`;
 
-const declares = ({ html, declaration }: { html: string; declaration: string }) =>
+const declares = ({ html, declaration }: { html: string; declaration: string }): boolean =>
 	[`style="${declaration}`, `;${declaration}`].some((start) => html.includes(start));
 
 const COLOUR_TOKEN = /^(?:#[0-9a-f]{3,8}|rgba?\([^)]*\))$/i;
 
-const topEdgeColourOf = (style: string) =>
+const topEdgeColourOf = (style: string): string | undefined =>
 	style
 		.split(";")
 		.map((declaration) => declaration.split(":"))

@@ -16,7 +16,7 @@ interface ReadingFieldProps {
 	onValueChange: (value: number | null) => void;
 }
 
-function ReadingField({ element, fieldProps, text, value, locale, onValueChange }: ReadingFieldProps) {
+function ReadingField({ element, fieldProps, text, value, locale, onValueChange }: ReadingFieldProps): ReactElement {
 	const report = useEffectEvent((typed: string) => {
 		const read = readLocalizedNumber({ text: typed, locale });
 		if (read !== value) onValueChange(read);

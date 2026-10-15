@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { resolveClientIp } from "./types";
 
-const headers = (entries: Record<string, string>) => new Headers(entries);
+const headers = (entries: Record<string, string>): Headers => new Headers(entries);
 
 describe("resolveClientIp", () => {
 	it("prefers cf-connecting-ip, the only header a client cannot forge behind Cloudflare", () => {

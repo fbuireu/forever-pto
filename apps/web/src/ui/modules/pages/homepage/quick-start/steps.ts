@@ -1,4 +1,6 @@
 import type { FiltersState } from "@application/stores/filters";
+import type { Strategy } from "@domain/calendar/types";
+import type { TrackProperties } from "@infrastructure/clients/logging/better-stack/tracking";
 
 export const QuickStartStep = {
 	LOCATION: "location",
@@ -62,7 +64,18 @@ export function yearOptions({ currentYear, selectedYear }: YearOptionsParams): n
 	return years.includes(selectedYear) ? years : [selectedYear, ...years].sort((a, b) => a - b);
 }
 
-export function trackedDraft(draft: QuickStartDraft) {
+interface TrackedDraft extends TrackProperties {
+	ptoDays: number;
+	country: string;
+	region: string;
+	year: number;
+	strategy: Strategy;
+	preferredMonths: string;
+	allowPastDays: boolean;
+	carryOverMonths: number;
+}
+
+export function trackedDraft(draft: QuickStartDraft): TrackedDraft {
 	return {
 		ptoDays: draft.ptoDays,
 		country: draft.country,

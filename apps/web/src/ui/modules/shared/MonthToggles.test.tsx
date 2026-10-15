@@ -2,7 +2,7 @@ import en from "@i18n/messages/en.json";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import { renderToString } from "react-dom/server";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 import { MonthToggles } from "./MonthToggles";
 
 const YEAR = 2026;
@@ -19,7 +19,7 @@ const renderToggles = ({
 	months = [6, 7],
 	allowPastDays = true,
 	carryOverMonths = 0,
-}: RenderTogglesParams = {}) => {
+}: RenderTogglesParams = {}): Mock => {
 	const onChange = vi.fn();
 
 	render(

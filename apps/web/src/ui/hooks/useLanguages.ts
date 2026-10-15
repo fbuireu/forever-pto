@@ -1,7 +1,12 @@
-import { LOCALES } from "@infrastructure/i18n/locales";
+import { LOCALES, type LocaleCode } from "@infrastructure/i18n/locales";
 import { useTranslations } from "next-intl";
 
-export function useLanguages() {
+export interface Language {
+	code: LocaleCode;
+	label: string;
+}
+
+export function useLanguages(): Language[] {
 	const t = useTranslations("languages");
 
 	return LOCALES.map((code) => ({

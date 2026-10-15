@@ -11,7 +11,7 @@ const OWNER = `Ferran${NBSP}Buireu`;
 const NIF = "46972297H";
 const ADDRESS = ["Carrer", "de", "Loreto", "36,", "5B,", "08029,", "Barcelona,", "Spain"].join(NBSP);
 
-const identity = (element: ReactElement) => render(element).getByRole("img");
+const identity = (element: ReactElement): HTMLElement => render(element).getByRole("img");
 
 describe("legal identity", () => {
 	it("announces the owner rather than the field label", () => {

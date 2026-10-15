@@ -45,7 +45,7 @@ interface MakeRequestParams {
 	headers?: Record<string, string>;
 }
 
-const makeRequest = ({ query, headers = {} }: MakeRequestParams) => {
+const makeRequest = ({ query, headers = {} }: MakeRequestParams): NextRequest => {
 	const url = new URL("https://forever-pto.com/api/payment/activate");
 	for (const [key, value] of Object.entries(query)) url.searchParams.set(key, value);
 	return new NextRequest(url, { headers });
@@ -65,7 +65,7 @@ beforeEach(() => {
 	);
 });
 
-const locationOf = (response: Response) => new URL(response.headers.get("location") ?? "");
+const locationOf = (response: Response): URL => new URL(response.headers.get("location") ?? "");
 
 describe("GET /api/payment/activate", () => {
 	it("sets the premium cookie before the confirmation page renders, which is the whole point of the redirect hop", async () => {

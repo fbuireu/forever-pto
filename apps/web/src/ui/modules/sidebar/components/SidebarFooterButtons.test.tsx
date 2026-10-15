@@ -20,9 +20,9 @@ vi.mock("@ui/modules/shared/ThemeSelector", () => ({ ThemeSelector: () => <div d
 
 const { SidebarFooterButtons } = await import("./SidebarFooterButtons");
 
-const menu = () => screen.getByRole("list");
+const menu = (): HTMLElement => screen.getByRole("list");
 
-const items = () => screen.getAllByRole("listitem");
+const items = (): HTMLElement[] => screen.getAllByRole("listitem");
 
 beforeEach(() => {
 	sidebar.state = "expanded";

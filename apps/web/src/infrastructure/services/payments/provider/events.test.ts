@@ -1,3 +1,4 @@
+import type { PaymentSucceededEvent } from "@domain/payment/events/types";
 import { MissingDonorEmailError } from "@infrastructure/errors";
 import { Effect } from "effect";
 import type Stripe from "stripe";
@@ -16,8 +17,9 @@ const makeIntent = (overrides: Partial<Stripe.PaymentIntent> = {}): Stripe.Payme
 		...overrides,
 	}) as unknown as Stripe.PaymentIntent;
 
-const succeeded = (intent: Stripe.PaymentIntent) => Effect.runSync(createPaymentSucceededEvent(intent));
-const succeededError = (intent: Stripe.PaymentIntent) =>
+const succeeded = (intent: Stripe.PaymentIntent): PaymentSucceededEvent =>
+	Effect.runSync(createPaymentSucceededEvent(intent));
+const succeededError = (intent: Stripe.PaymentIntent): MissingDonorEmailError =>
 	Effect.runSync(createPaymentSucceededEvent(intent).pipe(Effect.flip));
 
 describe("createPaymentSucceededEvent", () => {

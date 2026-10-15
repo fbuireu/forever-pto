@@ -38,7 +38,7 @@ interface RenderStatsParams {
 	messages: typeof enMessages;
 }
 
-const renderStats = async ({ locale, messages }: RenderStatsParams) => {
+const renderStats = async ({ locale, messages }: RenderStatsParams): Promise<string> => {
 	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "homepage" }));
 	mockGetFormatter.mockResolvedValue(createFormatter({ locale }));
 	const { container } = render(await Stats());

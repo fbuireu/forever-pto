@@ -15,6 +15,6 @@ interface GetLastUpdatedDateParams {
 	locale: Locale;
 }
 
-export function getLastUpdatedDate({ page, locale }: GetLastUpdatedDateParams) {
+export function getLastUpdatedDate({ page, locale }: GetLastUpdatedDateParams): string {
 	return formatDate({ date: LAST_UPDATED[page], locale, format: "MMMM d, yyyy" });
 }

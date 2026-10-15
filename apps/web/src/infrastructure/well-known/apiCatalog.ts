@@ -1,4 +1,19 @@
-export function apiCatalog(baseUrl: string) {
+interface ApiCatalogLink {
+	href: string;
+	type?: string;
+}
+
+interface ApiCatalogLinkset {
+	anchor: string;
+	"https://www.iana.org/assignments/link-relations/service-doc": ApiCatalogLink[];
+	"https://www.iana.org/assignments/link-relations/status": ApiCatalogLink[];
+}
+
+interface ApiCatalog {
+	linkset: ApiCatalogLinkset[];
+}
+
+export function apiCatalog(baseUrl: string): ApiCatalog {
 	return {
 		linkset: [
 			{

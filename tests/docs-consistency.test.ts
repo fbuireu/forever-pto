@@ -72,7 +72,7 @@ const PULL_REQUEST_MERGE_REF = `refs/pull/\${{ github.event.pull_request.number 
 const AGGREGATE_NEEDS = /name: Check(?: \(docs\))?\n\s+needs: \[([^\]]+)\]\n\s+if: \$\{\{ always\(\) \}\}/;
 const FONT_VARIABLE = /variable: ["'](--[\w-]+)["']/g;
 
-const retiredTermPattern = (term: string) =>
+const retiredTermPattern = (term: string): RegExp =>
 	new RegExp(
 		`\\b${term
 			.split(/\s+/)
@@ -97,7 +97,7 @@ const githubMarkdown = readdirSync(join(ROOT, GITHUB_DIR))
 	.map((file) => `${GITHUB_DIR}/${file}`);
 const linkedMarkdown = [...authoredMarkdown, ...githubMarkdown];
 const sourceFiles = trackedFiles.filter((path) => SOURCE_FILE.test(path));
-const read = (path: string) => readFileSync(join(ROOT, path), "utf8");
+const read = (path: string): string => readFileSync(join(ROOT, path), "utf8");
 
 const PUBLIC_ENV_NAME = /\bNEXT_PUBLIC_[A-Z0-9_]+/g;
 
@@ -116,10 +116,36 @@ const stepBody = ({ workflow, name }: StepBodyParams): string => {
 
 	return (end < 0 ? rest : rest.slice(0, end)).join("\n");
 };
-const readIfPresent = (path: string) => (existsSync(join(ROOT, path)) ? read(path) : "");
-const readJson = (path: string) => JSON.parse(read(path));
+const readIfPresent = (path: string): string => (existsSync(join(ROOT, path)) ? read(path) : "");
+const readJson = (path: string): unknown => JSON.parse(read(path));
 
-const isGitIgnored = (path: string) => {
+interface PackageManifest {
+	name: string;
+	version: string;
+	private?: boolean;
+	packageManager?: string;
+	engines: { node: string };
+	repository?: { url: string };
+	scripts?: Record<string, string>;
+	dependencies?: Record<string, string>;
+	devDependencies: Record<string, string>;
+}
+
+const readManifest = (path: string): PackageManifest => JSON.parse(read(path));
+
+interface TsconfigCompilerOptions {
+	[option: string]: unknown;
+	paths?: Record<string, string[]>;
+}
+
+interface Tsconfig {
+	compilerOptions: TsconfigCompilerOptions;
+	exclude?: string[];
+}
+
+const readTsconfig = (path: string): Tsconfig => JSON.parse(read(path));
+
+const isGitIgnored = (path: string): boolean => {
 	try {
 		execFileSync("git", ["check-ignore", "--no-index", "-q", "--", path], { cwd: ROOT });
 		return true;
@@ -130,13 +156,13 @@ const isGitIgnored = (path: string) => {
 
 const rootGuide = read("AGENTS.md");
 const webGuide = readIfPresent(`${WEB}/AGENTS.md`);
-const rootManifest = readJson("package.json");
+const rootManifest = readManifest("package.json");
 const rootScripts: Record<string, string> = rootManifest.scripts ?? {};
-const webScripts: Record<string, string> = readJson(`${WEB}/package.json`).scripts ?? {};
-const docsScripts: Record<string, string> = readJson(`${DOCS}/package.json`).scripts ?? {};
+const webScripts: Record<string, string> = readManifest(`${WEB}/package.json`).scripts ?? {};
+const docsScripts: Record<string, string> = readManifest(`${DOCS}/package.json`).scripts ?? {};
 const scriptsByPackageRef = new Map(
 	WORKSPACE_PACKAGES.flatMap((pkg) => {
-		const manifest = readJson(`${pkg}/package.json`);
+		const manifest = readManifest(`${pkg}/package.json`);
 		const scripts = (manifest.scripts ?? {}) as Record<string, string>;
 		return [manifest.name as string, pkg, `./${pkg}`].map((ref) => [ref, scripts] as [string, Record<string, string>]);
 	}),
@@ -172,17 +198,17 @@ const expandScript = ({ citation, seen = new Set<string>() }: ExpandScriptParams
 		),
 	].join("\n");
 };
-const webTsconfig = readJson(`${WEB}/tsconfig.json`);
+const webTsconfig = readTsconfig(`${WEB}/tsconfig.json`);
 const webTsconfigOptions: Record<string, unknown> = webTsconfig.compilerOptions;
 const webTsconfigExclude: string[] = webTsconfig.exclude ?? [];
 const webTsconfigPaths: Record<string, string[]> = webTsconfigOptions.paths as Record<string, string[]>;
 
 const UI_ALIAS = "@ui/*";
 const docsTsconfigPaths: Record<string, string[] | undefined> =
-	readJson(`${DOCS}/tsconfig.json`).compilerOptions?.paths ?? {};
+	readTsconfig(`${DOCS}/tsconfig.json`).compilerOptions?.paths ?? {};
 const UI_ROOT = join(ROOT, DOCS, (docsTsconfigPaths[UI_ALIAS]?.[0] ?? "").replace(ALIAS_WILDCARD_SUFFIX, ""));
 const UI_ROOT_RELATIVE = relative(ROOT, UI_ROOT).replace(/\\/g, "/");
-const resolveUiSpecifier = (specifier: string) => join(UI_ROOT, specifier.replace("@ui/", ""));
+const resolveUiSpecifier = (specifier: string): string => join(UI_ROOT, specifier.replace("@ui/", ""));
 
 const WEB_SRC = `${WEB}/src`;
 const TEST_FILE = /\.test\.tsx?$/;
@@ -278,7 +304,7 @@ const compositeActionFiles = readdirSync(join(ROOT, COMPOSITE_ACTION_DIR)).map(
 	(action) => `${COMPOSITE_ACTION_DIR}/${action}/action.yml`,
 );
 
-const runCommands = (workflow: string) => {
+const runCommands = (workflow: string): string => {
 	const lines = workflow.split(/\r?\n/);
 	const collected: string[] = [];
 
@@ -309,7 +335,7 @@ interface JobBodyParams {
 	job: string;
 }
 
-const jobBody = ({ workflow, job }: JobBodyParams) => {
+const jobBody = ({ workflow, job }: JobBodyParams): string => {
 	const lines = workflow.split(/\r?\n/);
 	const start = lines.indexOf(`  ${job}:`);
 	if (start < 0) return "";
@@ -318,7 +344,7 @@ const jobBody = ({ workflow, job }: JobBodyParams) => {
 	return lines.slice(start + 1, end < 0 ? lines.length : start + 1 + end).join("\n");
 };
 
-const yamlBlock = ({ workflow, key }: YamlBlockParams) => {
+const yamlBlock = ({ workflow, key }: YamlBlockParams): Record<string, string> => {
 	const lines = workflow.split(/\r?\n/);
 	const start = lines.findIndex((line) => line.trim() === `${key}:`);
 	const body: Record<string, string> = {};
@@ -338,7 +364,7 @@ interface TomlSection {
 	entries: Record<string, string>;
 }
 
-const tomlSections = (source: string) => {
+const tomlSections = (source: string): TomlSection[] => {
 	const sections: TomlSection[] = [];
 	let current: TomlSection | undefined;
 
@@ -383,11 +409,11 @@ interface WranglerSectionParams {
 	table: string;
 }
 
-const wranglerSection = ({ environment, table }: WranglerSectionParams) =>
+const wranglerSection = ({ environment, table }: WranglerSectionParams): TomlSection[] =>
 	webWrangler.filter((section) => section.path === (environment ? `${environment}.${table}` : table));
-const wranglerBindingTables = (environment: string) =>
+const wranglerBindingTables = (environment: string): Set<string> =>
 	new Set(WRANGLER_BINDING_TABLES.filter((table) => wranglerSection({ environment, table }).length > 0));
-const wranglerBindings = (environment: string) => {
+const wranglerBindings = (environment: string): Set<string> => {
 	const [vars] = wranglerSection({ environment, table: "vars" });
 	const named = WRANGLER_NAMED_BINDING_TABLES.flatMap((table) => wranglerSection({ environment, table }))
 		.flatMap((section) => [section.entries.binding, section.entries.name, section.entries.service])
@@ -526,7 +552,7 @@ describe("the workspace is shaped the way the guides describe it", () => {
 	});
 
 	it("resolves every repo-relative path biome's includes list excludes", () => {
-		const includes: string[] = readJson("biome.json").files.includes;
+		const includes: string[] = (readJson("biome.json") as { files: { includes: string[] } }).files.includes;
 		const excluded = includes
 			.filter((entry) => entry.startsWith("!") && !entry.includes("*"))
 			.map((entry) => entry.slice(1));
@@ -584,8 +610,10 @@ describe("the workspace is shaped the way the guides describe it", () => {
 		const patched = [...read("pnpm-workspace.yaml").matchAll(/^ {2}"?([^\s:"]+)"?: (patches\/\S+)$/gm)].map(
 			([, name, file]) => ({ name: name.replace(/@[\d.]+$/, ""), file }),
 		);
-		const humanMerged = readJson(".github/renovate.json")
-			.packageRules.filter((rule: { automerge?: boolean }) => rule.automerge === false)
+		const humanMerged = (
+			readJson(".github/renovate.json") as { packageRules: { automerge?: boolean; matchDepNames?: string[] }[] }
+		).packageRules
+			.filter((rule: { automerge?: boolean }) => rule.automerge === false)
 			.flatMap((rule: { matchDepNames?: string[] }) => rule.matchDepNames ?? []);
 
 		expect(patched.map(({ file }) => file).filter((file) => !existsSync(join(ROOT, file)))).toEqual([]);
@@ -601,7 +629,7 @@ describe("the workspace is shaped the way the guides describe it", () => {
 
 	it("pins typescript exactly everywhere, moves the root with the app, and holds the docs on 6", () => {
 		const declared = ["package.json", ...WORKSPACE_PACKAGES.map((pkg) => `${pkg}/package.json`)]
-			.map((file) => [file, readJson(file).devDependencies?.typescript] as const)
+			.map((file) => [file, readManifest(file).devDependencies?.typescript] as const)
 			.filter(([, version]) => Boolean(version));
 
 		expect(declared.length).toBe(3);
@@ -614,8 +642,8 @@ describe("the workspace is shaped the way the guides describe it", () => {
 });
 
 describe("pinned runtimes", () => {
-	const manifest = readJson("package.json");
-	const [packageManagerName, packageManagerVersion] = manifest.packageManager.split("@");
+	const manifest = readManifest("package.json");
+	const [packageManagerName, packageManagerVersion] = manifest.packageManager?.split("@") ?? [];
 
 	it("names every runtime it pins", () => {
 		const named = ["Node", "pnpm"].flatMap((runtime) =>
@@ -641,7 +669,7 @@ describe("pinned runtimes", () => {
 
 	it("pins pnpm once, through packageManager", () => {
 		expect(packageManagerName).toBe("pnpm");
-		expect(WORKSPACE_PACKAGES.filter((pkg) => readJson(`${pkg}/package.json`).packageManager)).toEqual([]);
+		expect(WORKSPACE_PACKAGES.filter((pkg) => readManifest(`${pkg}/package.json`).packageManager)).toEqual([]);
 	});
 
 	it("pins every runtime to an exact version, never a range", () => {
@@ -1692,9 +1720,9 @@ interface CommentsInParams {
 	source: string;
 }
 
-const isShebang = ({ at, text }: Comment) => at === 0 && text.startsWith("#!");
+const isShebang = ({ at, text }: Comment): boolean => at === 0 && text.startsWith("#!");
 
-const scriptKindOf = (file: string) => {
+const scriptKindOf = (file: string): ts.ScriptKind.JS | ts.ScriptKind.TS | ts.ScriptKind.TSX | ts.ScriptKind.JSON => {
 	if (file.endsWith(".tsx") || file.endsWith(".jsx")) return ts.ScriptKind.TSX;
 	if (file.endsWith(".json")) return ts.ScriptKind.JSON;
 	return /\.[cm]?js$/.test(file) ? ts.ScriptKind.JS : ts.ScriptKind.TS;
@@ -1719,7 +1747,7 @@ interface LineAtParams {
 	at: number;
 }
 
-const lineAt = ({ source, at }: LineAtParams) => source.slice(0, at).split("\n").length;
+const lineAt = ({ source, at }: LineAtParams): number => source.slice(0, at).split("\n").length;
 
 const BACKLOG_FILE = "BACKLOG.md";
 const KNOWN_BREACHES_HEADING = /^#{1,6}\s+(?:\d+\.\s+)?Known (?:inconsistencies|defects|breaches)\b/im;
@@ -2530,7 +2558,7 @@ describe("the imports CODING_STANDARDS.md hands to this suite", () => {
 	});
 
 	it("names as a vendor SDK only packages apps/web declares and imports, each of them outside the domain", () => {
-		const declared = Object.keys(readJson(`${WEB}/package.json`).dependencies ?? {});
+		const declared = Object.keys(readManifest(`${WEB}/package.json`).dependencies ?? {});
 		const imported = new Set(breachesElsewhere.map(({ specifier }) => sdkOf(specifier)));
 
 		expect(VENDOR_SDKS.filter((sdk) => !declared.includes(sdk))).toEqual([]);
@@ -4500,7 +4528,9 @@ describe("the docs site keeps the rules CODING_STANDARDS.md hands to this suite"
 			const app = readJson(`${LOCALES_DIR}/${language}.json`);
 			const missing = english.filter((key) => !leaves.has(key)).map((key) => `${language} ${key}: missing`);
 			const differing = BANNER_WORDS_THE_APP_SHARES.flatMap(([bannerKey, appKey]) => {
-				const appWords = appKey.split(".").reduce((value, key) => value?.[key], app);
+				const appWords = appKey
+					.split(".")
+					.reduce<unknown>((value, key) => (value as Record<string, unknown> | undefined)?.[key], app);
 				return leaves.get(bannerKey) === appWords
 					? []
 					: [`${language} ${bannerKey}: "${leaves.get(bannerKey)}", the app's ${appKey} says "${appWords}"`];
@@ -5849,7 +5879,7 @@ const policedNames = ({ declared, runtimes }: PolicedNamesParams): string[] => [
 const declaredIn = (manifests: { dependencies?: object; devDependencies?: object }[]): Set<string> =>
 	new Set(manifests.flatMap((manifest) => Object.keys({ ...manifest.dependencies, ...manifest.devDependencies })));
 const POLICED_NAMES = policedNames({
-	declared: declaredIn(["package.json", ...WORKSPACE_PACKAGES.map((pkg) => `${pkg}/package.json`)].map(readJson)),
+	declared: declaredIn(["package.json", ...WORKSPACE_PACKAGES.map((pkg) => `${pkg}/package.json`)].map(readManifest)),
 	runtimes: ["Node", "Node.js", "pnpm"],
 });
 const STATED_VERSION = statedVersionPattern(POLICED_NAMES);

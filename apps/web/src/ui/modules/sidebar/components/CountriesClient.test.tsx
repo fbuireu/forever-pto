@@ -1,6 +1,6 @@
 import type { CountryDTO } from "@application/dto/country/types";
 import en from "@i18n/messages/en.json";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import type { ComponentProps, ReactNode } from "react";
@@ -38,7 +38,7 @@ const COUNTRIES = [
 	{ value: "FR", label: "France", flag: "fr" },
 ] as CountryDTO[];
 
-const renderCountries = (countries: CountryDTO[] = COUNTRIES) =>
+const renderCountries = (countries: CountryDTO[] = COUNTRIES): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={en}>
 			<CountriesClient countries={countries} />

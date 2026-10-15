@@ -1,7 +1,22 @@
 import pkg from "../../../package.json";
 import { API_CATALOG_SLUG, MCP_SERVER_CARD_SLUG, wellKnownUrl } from "./slugs";
 
-export function agentSkillsIndex(baseUrl: string) {
+interface AgentSkill {
+	name: string;
+	type: string;
+	description: string;
+	url?: string;
+}
+
+interface AgentSkillsIndex {
+	$schema: string;
+	name: string;
+	version: string;
+	description: string;
+	skills: AgentSkill[];
+}
+
+export function agentSkillsIndex(baseUrl: string): AgentSkillsIndex {
 	return {
 		$schema: "https://agentskills.io/schema/v0.2.0/index.json",
 		name: "Forever PTO",

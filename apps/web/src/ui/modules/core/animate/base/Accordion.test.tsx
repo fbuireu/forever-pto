@@ -54,7 +54,7 @@ vi.mock("@base-ui/react/accordion", async () => {
 
 import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from "./Accordion";
 
-const openPrimitive = async (trigger: Element) => {
+const openPrimitive = async (trigger: Element): Promise<void> => {
 	await act(async () => {
 		trigger.setAttribute("data-panel-open", "");
 	});

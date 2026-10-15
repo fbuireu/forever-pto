@@ -8,7 +8,7 @@ type Tool = Parameters<ModelContext["provideContext"]>[0]["tools"][number];
 
 const provideContext = vi.fn<ModelContext["provideContext"]>();
 
-const withModelContext = (value: ModelContext | undefined) => {
+const withModelContext = (value: ModelContext | undefined): void => {
 	Object.defineProperty(navigator, "modelContext", { value, configurable: true, writable: true });
 };
 
@@ -16,7 +16,7 @@ const RETIRED_NAMES = [/vacation days?/i, /bridge days?/i, /days? off/i, /carryo
 
 const registeredTools = (): Tool[] => provideContext.mock.calls[0]?.[0].tools ?? [];
 
-const toolNamed = (name: string) => {
+const toolNamed = (name: string): Tool => {
 	const tool = registeredTools().find((candidate) => candidate.name === name);
 	if (!tool) throw new Error(`tool ${name} was not registered`);
 	return tool;

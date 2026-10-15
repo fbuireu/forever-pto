@@ -1,5 +1,5 @@
 import enMessages from "@i18n/messages/en.json";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import type { ComponentProps } from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -7,7 +7,7 @@ import { StepOutcome, StepOutcomeTone } from "./StepOutcome";
 
 const labels = enMessages.formButtons;
 
-const renderOutcome = (props: Partial<ComponentProps<typeof StepOutcome>> = {}) =>
+const renderOutcome = (props: Partial<ComponentProps<typeof StepOutcome>> = {}): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={enMessages}>
 			<StepOutcome

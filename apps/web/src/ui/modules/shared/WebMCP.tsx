@@ -4,7 +4,7 @@ import { Strategy } from "@domain/calendar/types";
 import { LOCALES } from "@infrastructure/i18n/locales";
 import { useEffect } from "react";
 
-export function WebMCP() {
+export function WebMCP(): null {
 	useEffect(() => {
 		if (!navigator.modelContext?.provideContext) return;
 

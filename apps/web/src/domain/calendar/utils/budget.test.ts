@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { measureBudget, measureGain } from "./budget";
 
-const JAN = (day: number) => new Date(2025, 0, day);
+const JAN = (day: number): Date => new Date(2025, 0, day);
 
 describe("measureBudget", () => {
 	it("reports an untouched plan as spent in full by the days it placed", () => {

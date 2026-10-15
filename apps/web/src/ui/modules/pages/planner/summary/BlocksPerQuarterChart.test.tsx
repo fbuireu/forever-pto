@@ -4,7 +4,7 @@ import enMessages from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { render } from "@testing-library/react";
+import { type RenderResult, render } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -58,7 +58,7 @@ interface RenderChartParams {
 	blocksPerQuarter: number[];
 }
 
-const renderChart = ({ locale, messages, blocksPerQuarter }: RenderChartParams) =>
+const renderChart = ({ locale, messages, blocksPerQuarter }: RenderChartParams): RenderResult =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<BlocksPerQuarterChart blocksPerQuarter={blocksPerQuarter} />

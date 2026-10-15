@@ -3,9 +3,9 @@ import { sendContactRequest } from "@infrastructure/api/operations/contact";
 import { parseJsonBody } from "@infrastructure/api/parseJsonBody";
 import { noStore } from "@infrastructure/api/response";
 import { getRequestPublicEnv } from "@infrastructure/services/env/getRequestPublicEnv";
-import type { NextRequest } from "next/server";
+import type { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<NextResponse<object>> {
 	const { status, body } = await sendContactRequest({
 		input: parseJsonBody<ContactFormData>(request),
 		config: getRequestPublicEnv(),

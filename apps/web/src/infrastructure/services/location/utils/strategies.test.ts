@@ -1,4 +1,5 @@
 import { DE, ES, FR } from "@infrastructure/i18n/locales";
+import type { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@infrastructure/logging/logger", () => ({
@@ -18,7 +19,7 @@ const { logger } = await import("@infrastructure/logging/logger");
 
 const { UNIDENTIFIED_COUNTRY, TOR_COUNTRY } = await import("./normalize");
 
-function makeRequest(country: string | null) {
+function makeRequest(country: string | null): NextRequest {
 	return { headers: { get: (header: string) => (header === CLOUDFLARE_COUNTRY_HEADER ? country : null) } } as never;
 }
 
@@ -27,7 +28,7 @@ interface MakeResponseParams {
 	body: unknown;
 }
 
-function makeResponse({ ok, body }: MakeResponseParams) {
+function makeResponse({ ok, body }: MakeResponseParams): Response {
 	return {
 		ok,
 		text: () => Promise.resolve(body as string),

@@ -105,9 +105,20 @@ const holidaysInitialState: HolidaysState = {
 	planAskedFor: false,
 };
 
-export type PersistedHolidays = ReturnType<typeof partializeHolidays>;
+export type PersistedHolidays = Pick<
+	HolidaysState,
+	| "holidays"
+	| "suggestion"
+	| "maxAlternatives"
+	| "alternatives"
+	| "currentSelection"
+	| "currentSelectionIndex"
+	| "manualDays"
+	| "removedSuggestedDays"
+	| "planKey"
+>;
 
-const partializeHolidays = (state: HolidaysStore) => ({
+const partializeHolidays = (state: HolidaysStore): PersistedHolidays => ({
 	holidays: state.holidays,
 	suggestion: state.suggestion,
 	maxAlternatives: state.maxAlternatives,

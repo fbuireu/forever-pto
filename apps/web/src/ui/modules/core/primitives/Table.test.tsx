@@ -1,8 +1,8 @@
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./Table";
 
-const renderTable = () =>
+const renderTable = (): RenderResult =>
 	render(
 		<Table containerClassName="mt-4" className="text-xs">
 			<TableHeader className="sticky">

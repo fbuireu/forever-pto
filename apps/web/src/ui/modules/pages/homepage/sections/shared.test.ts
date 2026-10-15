@@ -7,7 +7,7 @@ import { COUNTRY_COUNT } from "./shared";
 
 const CALENDAR_YEAR = 2026;
 
-const hasCalendar = (country: string) =>
+const hasCalendar = (country: string): boolean =>
 	observedHolidays({ source: dateHolidaysSource, lookup: { country, year: CALENDAR_YEAR, locale: EN } }).length > 0;
 
 describe("COUNTRY_COUNT", () => {

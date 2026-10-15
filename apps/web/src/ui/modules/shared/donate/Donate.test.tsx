@@ -1,6 +1,6 @@
 import type { DiscountInfo } from "@application/dto/payment/types";
 import enMessages from "@i18n/messages/en.json";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen, waitFor } from "@testing-library/react";
 import type * as Checkout from "@ui/adapters/payments/checkout";
 import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
@@ -101,14 +101,14 @@ import { Donate } from "./Donate";
 
 const stripeLoadsAtImport = getStripePromise.mock.calls.length;
 
-const renderDonate = () =>
+const renderDonate = (): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={enMessages}>
 			<Donate bottomClassName="bottom-4 md:bottom-4" />
 		</NextIntlClientProvider>,
 	);
 
-const trigger = (container: HTMLElement) => container.querySelector(".donate-trigger") as HTMLElement;
+const trigger = (container: HTMLElement): HTMLElement => container.querySelector(".donate-trigger") as HTMLElement;
 
 describe("Donate trigger band", () => {
 	it("lets taps through the fixed band it spans below md", () => {
@@ -128,9 +128,9 @@ describe("Donate trigger band", () => {
 	});
 });
 
-const donate = () => fireEvent.click(screen.getByRole("button", { name: "donate" }));
+const donate = (): boolean => fireEvent.click(screen.getByRole("button", { name: "donate" }));
 
-const trackedEvents = () => track.mock.calls.map(([call]) => (call as { event: string }).event);
+const trackedEvents = (): string[] => track.mock.calls.map(([call]) => (call as { event: string }).event);
 
 beforeEach(() => {
 	getStripePromise.mockClear();

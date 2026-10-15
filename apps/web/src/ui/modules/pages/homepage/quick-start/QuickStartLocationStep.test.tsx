@@ -10,7 +10,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ComponentProps, ReactNode } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, type Mock, vi } from "vitest";
 
 vi.mock("@ui/modules/core/animate/base/Popover", () => ({
 	Popover: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
@@ -53,7 +53,7 @@ const renderStep = ({
 	regions = [],
 	locale = "en",
 	messages = enMessages,
-}: RenderStepParams = {}) => {
+}: RenderStepParams = {}): Mock => {
 	const onChange = vi.fn();
 
 	render(

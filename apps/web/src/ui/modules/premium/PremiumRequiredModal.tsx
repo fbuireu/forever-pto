@@ -40,7 +40,7 @@ interface CreateEmailSchemaParams {
 	required: string;
 }
 
-const createEmailSchema = ({ invalid, required }: CreateEmailSchemaParams) =>
+const createEmailSchema = ({ invalid, required }: CreateEmailSchemaParams): z.ZodObject<{ email: z.ZodEmail }> =>
 	z.object({
 		email: z.email(invalid).min(1, required),
 	});

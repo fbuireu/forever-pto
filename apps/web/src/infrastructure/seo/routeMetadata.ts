@@ -10,7 +10,7 @@ interface RouteSegmentProps {
 }
 
 export const routeMetadata =
-	(path: RoutePath) =>
+	(path: RoutePath): ((segment: RouteSegmentProps) => Promise<Metadata>) =>
 	async ({ params }: RouteSegmentProps): Promise<Metadata> => {
 		const { locale } = await params;
 		const route = routeFor(path);

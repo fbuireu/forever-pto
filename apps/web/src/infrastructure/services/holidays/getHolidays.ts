@@ -24,7 +24,7 @@ export async function getHolidays({
 	locale,
 	carryOverMonths,
 	source = dateHolidaysSource,
-}: GetHolidaysParams) {
+}: GetHolidaysParams): Promise<HolidayDTO[]> {
 	if (!country) return [];
 
 	const regions = getRegions({ countryCode: country, source });

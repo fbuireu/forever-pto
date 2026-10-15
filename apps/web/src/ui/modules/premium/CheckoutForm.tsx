@@ -25,7 +25,7 @@ interface PendingHandBack {
 	handBack: () => void;
 }
 
-async function fireConfetti() {
+async function fireConfetti(): Promise<void> {
 	const confetti = (await import("canvas-confetti")).default;
 	const count = 200;
 	const defaults = {

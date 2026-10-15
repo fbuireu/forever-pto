@@ -48,7 +48,7 @@ vi.mock("../primitives/animate/MotionSlot", async () => {
 
 import { AutoHeight } from "./AutoHeight";
 
-function readAnimate(element: Element | null) {
+function readAnimate(element: Element | null): unknown {
 	return JSON.parse(element?.getAttribute("data-animate") ?? "null");
 }
 

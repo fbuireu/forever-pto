@@ -1,8 +1,8 @@
 import enMessages from "@i18n/messages/en.json";
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, type RenderResult, render, screen, waitFor } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { type ReactNode, useEffect } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
 const { getStripePromise, logClientError } = vi.hoisted(() => ({
 	getStripePromise: vi.fn<() => Promise<unknown>>(),
@@ -35,7 +35,7 @@ vi.mock("@ui/modules/core/animate/icons/Icon", () => ({
 
 import { StripeElementsProvider } from "./StripeElementsProvider";
 
-function Probe({ onMount }: { onMount: () => void }) {
+function Probe({ onMount }: { onMount: () => void }): null {
 	useEffect(() => {
 		onMount();
 	}, [onMount]);
@@ -47,7 +47,7 @@ const stripe = { confirmPayment: vi.fn() };
 const OPTIONS = { clientSecret: "cs_test" };
 const copy = enMessages.checkout;
 
-const renderProvider = (onCancel = vi.fn()) =>
+const renderProvider = (onCancel = vi.fn()): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={enMessages}>
 			<StripeElementsProvider options={OPTIONS} onCancel={onCancel}>
@@ -56,11 +56,12 @@ const renderProvider = (onCancel = vi.fn()) =>
 		</NextIntlClientProvider>,
 	);
 
-const failing = () => getStripePromise.mockRejectedValue(new Error("Failed to load Stripe.js"));
+const failing = (): Mock<() => Promise<unknown>> =>
+	getStripePromise.mockRejectedValue(new Error("Failed to load Stripe.js"));
 
 let consoleError: ReturnType<typeof vi.spyOn>;
 let unhandled: unknown[];
-const onUnhandled = (reason: unknown) => unhandled.push(reason);
+const onUnhandled = (reason: unknown): number => unhandled.push(reason);
 
 beforeEach(() => {
 	getStripePromise.mockReset();

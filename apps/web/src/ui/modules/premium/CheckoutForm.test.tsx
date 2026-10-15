@@ -5,7 +5,7 @@ import { CONFETTI_COLORS } from "@styles/palette";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, type MockedFunction, vi } from "vitest";
 
 const premiumState = { setPremiumStatus: vi.fn() };
 
@@ -86,7 +86,7 @@ interface RenderFormParams {
 	discountInfo?: DiscountInfo | null;
 }
 
-const renderForm = ({ locale, messages, amount, discountInfo = null }: RenderFormParams) => {
+const renderForm = ({ locale, messages, amount, discountInfo = null }: RenderFormParams): string => {
 	const { container } = render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<CheckoutForm
@@ -127,7 +127,7 @@ const messagesWithErrors = {
 	checkout: { ...enMessages.checkout, errors: { internal_error: INTERNAL_ERROR_MESSAGE } },
 };
 
-const submitPayment = async (messages: object) => {
+const submitPayment = async (messages: object): Promise<void> => {
 	const { container } = render(
 		<NextIntlClientProvider locale="en" messages={messages}>
 			<CheckoutForm
@@ -227,7 +227,14 @@ interface RenderCheckoutParams {
 	onCancel?: () => void;
 }
 
-const renderCheckout = ({ onSuccess = vi.fn(), onCancel = vi.fn() }: RenderCheckoutParams = {}) => {
+interface CheckoutRender {
+	container: HTMLElement;
+	submit: () => void;
+	onSuccess: () => void;
+	onCancel: () => void;
+}
+
+const renderCheckout = ({ onSuccess = vi.fn(), onCancel = vi.fn() }: RenderCheckoutParams = {}): CheckoutRender => {
 	const { container } = render(
 		<NextIntlClientProvider locale="en" messages={messagesWithErrors}>
 			<CheckoutForm
@@ -247,7 +254,7 @@ const renderCheckout = ({ onSuccess = vi.fn(), onCancel = vi.fn() }: RenderCheck
 	return { container, submit, onSuccess, onCancel };
 };
 
-const succeeds = () =>
+const succeeds = (): MockedFunction<typeof confirmPayment> =>
 	vi.mocked(confirmPayment).mockResolvedValue({
 		outcome: ConfirmPaymentOutcome.SUCCEEDED,
 		sessionData: { email: "donor@example.com", premiumKey: "key_123" },

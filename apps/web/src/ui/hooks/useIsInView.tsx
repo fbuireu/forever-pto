@@ -16,7 +16,15 @@ export interface UseIsInViewParams<T extends HTMLElement = HTMLElement> {
 	options?: UseIsInViewOptions;
 }
 
-export function useIsInView<T extends HTMLElement = HTMLElement>({ ref, options = {} }: UseIsInViewParams<T>) {
+interface InViewRef<T extends HTMLElement> {
+	ref: RefObject<T | null>;
+	isInView: boolean;
+}
+
+export function useIsInView<T extends HTMLElement = HTMLElement>({
+	ref,
+	options = {},
+}: UseIsInViewParams<T>): InViewRef<T> {
 	const { inView, inViewOnce = false, inViewMargin = "0px" } = options;
 	const localRef = useRef<T>(null);
 	useImperativeHandle(ref, () => localRef.current as T);

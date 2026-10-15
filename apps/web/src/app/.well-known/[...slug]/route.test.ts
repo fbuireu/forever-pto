@@ -12,7 +12,7 @@ vi.mock("@opennextjs/cloudflare", () => ({
 
 const { GET } = await import("./route");
 
-function makeContext(slug: string[]) {
+function makeContext(slug: string[]): Parameters<typeof GET>[1] {
 	return { params: Promise.resolve({ slug }) };
 }
 

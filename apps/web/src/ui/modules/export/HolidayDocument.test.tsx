@@ -1,6 +1,6 @@
 import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
 import { PDF_PALETTE } from "@styles/palette";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -64,7 +64,7 @@ const renderDocument = ({
 	ptoDays = [],
 	includeHolidays = true,
 	includePto = true,
-}: RenderDocumentParams = {}) =>
+}: RenderDocumentParams = {}): RenderResult =>
 	render(
 		<HolidayDocument
 			year={2026}
@@ -77,14 +77,14 @@ const renderDocument = ({
 		/>,
 	);
 
-const monthLabels = () =>
+const monthLabels = (): string[] =>
 	[...document.querySelectorAll('[data-pdf="view"] > [data-pdf="text"]:first-child')]
 		.map((node) => node.textContent ?? "")
 		.filter((text) => /^[A-Z][a-z]+ \d{4}$/.test(text));
 
 const COLOUR_PROPERTY = /color$/i;
 
-const paintedColours = () =>
+const paintedColours = (): string[] =>
 	[...document.querySelectorAll("[data-style]")]
 		.flatMap((node) => [JSON.parse(node.getAttribute("data-style") ?? "null")].flat())
 		.flatMap((style) => Object.entries(style ?? {}))

@@ -43,9 +43,9 @@ interface ClampParams {
 	max: number;
 }
 
-const clamp = ({ value, min, max }: ClampParams) => Math.min(max, Math.max(min, value));
+const clamp = ({ value, min, max }: ClampParams): number => Math.min(max, Math.max(min, value));
 
-const preferredMonthsOf = (months: unknown) =>
+const preferredMonthsOf = (months: unknown): number[] =>
 	isPreferredMonths(months) ? months.toSorted((a, b) => a - b) : [...DEFAULT_PREFERRED_MONTHS];
 
 const initialState: FiltersState = {
@@ -59,7 +59,7 @@ const initialState: FiltersState = {
 	preferredMonths: [...DEFAULT_PREFERRED_MONTHS],
 };
 
-const partializeFilters = (state: FiltersStore) => ({
+const partializeFilters = (state: FiltersStore): PersistedFiltersState => ({
 	ptoDays: state.ptoDays,
 	allowPastDays: state.allowPastDays,
 	country: state.country,
@@ -69,7 +69,7 @@ const partializeFilters = (state: FiltersStore) => ({
 	preferredMonths: state.preferredMonths,
 });
 
-type PersistedFiltersState = ReturnType<typeof partializeFilters>;
+type PersistedFiltersState = Omit<FiltersState, "year">;
 
 export const useFiltersStore = create<FiltersStore>()(
 	devtools(

@@ -1,5 +1,5 @@
 import type { CountryDTO } from "@application/dto/country/types";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import type { Locale } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -27,7 +27,8 @@ const COUNTRIES = [
 	{ value: "FR", label: "France", flag: "fr" },
 ] as CountryDTO[];
 
-const renderQuickStart = async (locale = "en") => render(await QuickStart({ locale: locale as Locale }));
+const renderQuickStart = async (locale = "en"): Promise<RenderResult> =>
+	render(await QuickStart({ locale: locale as Locale }));
 
 beforeEach(() => {
 	getCountries.mockReset();

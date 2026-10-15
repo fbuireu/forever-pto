@@ -16,7 +16,13 @@ const BASE = {
 	description: "Plan your days off",
 };
 
-const ogImage = (metadata: Metadata) => {
+interface OpenGraphImage {
+	url: string | URL;
+	width?: string | number;
+	height?: string | number;
+}
+
+const ogImage = (metadata: Metadata): OpenGraphImage => {
 	const images = metadata.openGraph && "images" in metadata.openGraph ? metadata.openGraph.images : undefined;
 	const [first] = Array.isArray(images) ? images : [images];
 
@@ -25,7 +31,12 @@ const ogImage = (metadata: Metadata) => {
 	return first;
 };
 
-const readPngSize = (url: string) => {
+interface PngSize {
+	width: number;
+	height: number;
+}
+
+const readPngSize = (url: string): PngSize => {
 	const png = readFileSync(join(PUBLIC_DIR, url));
 
 	return { width: png.readUInt32BE(16), height: png.readUInt32BE(20) };

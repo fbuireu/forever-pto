@@ -156,7 +156,7 @@ interface PaymentRow {
 	origin: string | null;
 }
 
-const toDate = (value: string | null) => (value ? new Date(value) : null);
+const toDate = (value: string | null): Date | null => (value ? new Date(value) : null);
 
 const toPaymentData = (row: PaymentRow): PaymentData => ({
 	id: row.id,

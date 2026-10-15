@@ -10,7 +10,7 @@ import {
 	startOfYear,
 } from "@application/shared/utils/dates";
 import { PTO_CONSTANTS } from "@domain/calendar/const";
-import type { Bridge } from "@domain/calendar/types";
+import type { Bridge, FirstLastRestBlock } from "@domain/calendar/types";
 import {
 	MONTHS_IN_QUARTER,
 	MONTHS_IN_YEAR,
@@ -28,7 +28,7 @@ export interface WindowMonthIndexParams {
 	window: Pick<PlanningWindow, "year">;
 }
 
-export const windowMonthIndex = ({ date, window: { year } }: WindowMonthIndexParams) =>
+export const windowMonthIndex = ({ date, window: { year } }: WindowMonthIndexParams): number =>
 	monthKeyOf(date) - year * MONTHS_IN_YEAR;
 
 export interface GetMonthlyDistParams {
@@ -36,7 +36,7 @@ export interface GetMonthlyDistParams {
 	window: PlanningWindow;
 }
 
-export function getMonthlyDist({ days, window }: GetMonthlyDistParams) {
+export function getMonthlyDist({ days, window }: GetMonthlyDistParams): number[] {
 	const monthlyDist = new Array(windowMonthCount(window)).fill(0);
 	days.forEach((date) => {
 		const index = windowMonthIndex({ date, window });
@@ -50,7 +50,7 @@ interface GetLongBlocksPerQuarterParams {
 	window: PlanningWindow;
 }
 
-export function getLongBlocksPerQuarter({ streaks, window }: GetLongBlocksPerQuarterParams) {
+export function getLongBlocksPerQuarter({ streaks, window }: GetLongBlocksPerQuarterParams): number[] {
 	const longBlocksPerQuarter = new Array(windowQuarterCount(window)).fill(0);
 
 	for (const streak of streaks) {
@@ -71,7 +71,7 @@ export interface GetBridgesInUseParams {
 	bridges?: Bridge[];
 }
 
-export function getBridgesInUse({ days, bridges }: GetBridgesInUseParams) {
+export function getBridgesInUse({ days, bridges }: GetBridgesInUseParams): Bridge[] {
 	if (!bridges || bridges.length === 0) return [];
 
 	const daysSet = new Set(days.map(dayKey));
@@ -79,10 +79,10 @@ export function getBridgesInUse({ days, bridges }: GetBridgesInUseParams) {
 	return bridges.filter((bridge) => bridge.ptoDays.some((ptoDay) => daysSet.has(dayKey(ptoDay))));
 }
 
-export const getTotalEffectiveDays = (streaks: FreeStreak[]) =>
+export const getTotalEffectiveDays = (streaks: FreeStreak[]): number =>
 	streaks.filter((streak) => streak.hasPlacedDay).reduce((total, streak) => total + streak.length, 0);
 
-export const restBlocksOf = (dates: Date[]) => {
+export const restBlocksOf = (dates: Date[]): Date[][] => {
 	const blocks: Date[][] = [];
 
 	for (const date of dates.toSorted((a, b) => a.getTime() - b.getTime())) {
@@ -97,7 +97,7 @@ export const restBlocksOf = (dates: Date[]) => {
 	return blocks;
 };
 
-export const calculateRestBlocks = (dates: Date[]) => restBlocksOf(dates).length;
+export const calculateRestBlocks = (dates: Date[]): number => restBlocksOf(dates).length;
 
 interface CalculateMaxWorkStreakParams {
 	ptoDays: Date[];
@@ -106,7 +106,12 @@ interface CalculateMaxWorkStreakParams {
 	allowPastDays: boolean;
 }
 
-export const calculateMaxWorkStreak = ({ ptoDays, holidays, year, allowPastDays }: CalculateMaxWorkStreakParams) => {
+export const calculateMaxWorkStreak = ({
+	ptoDays,
+	holidays,
+	year,
+	allowPastDays,
+}: CalculateMaxWorkStreakParams): number => {
 	const yearStart = startOfYear(new Date(year, 0, 1));
 	const yearEnd = endOfYear(yearStart);
 	const today = startOfToday();
@@ -139,7 +144,7 @@ interface GetFirstLastRestBlockParams {
 	locale: Locale;
 }
 
-export const getFirstLastRestBlock = ({ dates, locale }: GetFirstLastRestBlockParams) => {
+export const getFirstLastRestBlock = ({ dates, locale }: GetFirstLastRestBlockParams): FirstLastRestBlock | null => {
 	if (dates.length === 0) return null;
 
 	const sorted = dates.toSorted((a, b) => a.getTime() - b.getTime());
@@ -157,7 +162,7 @@ export interface CalculateQuarterDistributionParams {
 	window: PlanningWindow;
 }
 
-export const calculateQuarterDistribution = ({ dates, window }: CalculateQuarterDistributionParams) => {
+export const calculateQuarterDistribution = ({ dates, window }: CalculateQuarterDistributionParams): number[] => {
 	const quarters = new Array(windowQuarterCount(window)).fill(0);
 
 	dates?.forEach((date) => {
@@ -174,7 +179,7 @@ interface GetWorkedDaysPerMonthParams {
 	holidays: HolidayDTO[];
 }
 
-export const getWorkedDaysPerMonth = ({ ptoDays, holidays, year }: GetWorkedDaysPerMonthParams) => {
+export const getWorkedDaysPerMonth = ({ ptoDays, holidays, year }: GetWorkedDaysPerMonthParams): number => {
 	const yearStart = startOfYear(new Date(year, 0, 1));
 	const yearEnd = endOfYear(yearStart);
 	const allDaysInYear = eachDayOfInterval({ start: yearStart, end: yearEnd });
@@ -190,10 +195,10 @@ export const getWorkedDaysPerMonth = ({ ptoDays, holidays, year }: GetWorkedDays
 	return Number.parseFloat(avgPerMonth.toFixed(1));
 };
 
-export const calculateLongestVacation = (streaks: FreeStreak[]) =>
+export const calculateLongestVacation = (streaks: FreeStreak[]): number =>
 	streaks.filter((streak) => streak.hasPlacedDay).reduce((longest, streak) => Math.max(longest, streak.length), 0);
 
-export const calculateLongWeekends = (streaks: FreeStreak[]) =>
+export const calculateLongWeekends = (streaks: FreeStreak[]): number =>
 	streaks.filter(
 		(streak) =>
 			streak.length >= PTO_CONSTANTS.METRICS.LONG_WEEKEND_MINIMUM_DAYS && streak.hasWeekend && streak.hasPlacedDay,

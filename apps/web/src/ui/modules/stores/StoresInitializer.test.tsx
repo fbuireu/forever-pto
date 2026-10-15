@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
 const filters = vi.hoisted(() => ({ country: "", setCountry: vi.fn() }));
 
@@ -23,7 +23,7 @@ vi.mock("@ui/hooks/useStoresReady", () => ({
 
 const { StoresInitializer } = await import("./StoresInitializer");
 
-const withCookie = (value: string) => vi.spyOn(document, "cookie", "get").mockReturnValue(value);
+const withCookie = (value: string): Mock<() => string> => vi.spyOn(document, "cookie", "get").mockReturnValue(value);
 
 beforeEach(() => {
 	filters.country = "";

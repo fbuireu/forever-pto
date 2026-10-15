@@ -3,9 +3,9 @@ import { createPaymentRequest } from "@infrastructure/api/operations/payment";
 import { resolveClientIp } from "@infrastructure/api/operations/types";
 import { parseJsonBody } from "@infrastructure/api/parseJsonBody";
 import { noStore } from "@infrastructure/api/response";
-import type { NextRequest } from "next/server";
+import type { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<NextResponse<object>> {
 	const { status, body } = await createPaymentRequest({
 		input: parseJsonBody<CreatePaymentInput>(request),
 		context: {

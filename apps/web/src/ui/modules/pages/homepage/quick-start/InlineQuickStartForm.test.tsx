@@ -3,7 +3,7 @@ import { useFiltersStore } from "@application/stores/filters";
 import { useHolidaysStore } from "@application/stores/holidays";
 import { Strategy } from "@domain/calendar/types";
 import enMessages from "@i18n/messages/en.json";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import type { ComponentProps, ReactNode } from "react";
@@ -31,14 +31,15 @@ const COUNTRIES = [
 
 const quickStart = enMessages.quickStart;
 
-const renderForm = () =>
+const renderForm = (): RenderResult =>
 	render(
 		<NextIntlClientProvider locale="en" messages={enMessages}>
 			<InlineQuickStartForm countries={COUNTRIES} currentYear={2026} />
 		</NextIntlClientProvider>,
 	);
 
-const planButton = () => screen.getByRole("button", { name: quickStart.finish }) as HTMLButtonElement;
+const planButton = (): HTMLButtonElement =>
+	screen.getByRole("button", { name: quickStart.finish }) as HTMLButtonElement;
 
 beforeEach(() => {
 	router.push.mockClear();

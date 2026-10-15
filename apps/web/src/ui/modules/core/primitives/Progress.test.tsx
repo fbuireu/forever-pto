@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import type { ComponentType, ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -26,10 +26,10 @@ vi.mock("motion/react", async () => {
 
 import { Progress, ProgressOverlayLabel, ProgressTrack } from "./Progress";
 
-const animateOf = (element: Element | null) =>
+const animateOf = (element: Element | null): Record<string, string> | null =>
 	JSON.parse(element?.getAttribute("data-animate") ?? "null") as Record<string, string> | null;
 
-const renderProgress = (value: number | null = null) =>
+const renderProgress = (value: number | null = null): RenderResult =>
 	render(
 		<Progress value={value} aria-label="Plan progress">
 			<div className="relative">
@@ -39,8 +39,9 @@ const renderProgress = (value: number | null = null) =>
 		</Progress>,
 	);
 
-const indicator = (container: HTMLElement) => container.querySelector('[data-slot="progress-indicator"]');
-const overlay = (container: HTMLElement) => container.querySelector("span[aria-hidden]");
+const indicator = (container: HTMLElement): Element | null =>
+	container.querySelector('[data-slot="progress-indicator"]');
+const overlay = (container: HTMLElement): Element | null => container.querySelector("span[aria-hidden]");
 
 describe("Progress", () => {
 	afterEach(() => {

@@ -215,7 +215,7 @@ const StateHarness = ({ children }: { children?: ReactNode }) => {
 	);
 };
 
-const readState = (view: ReturnType<typeof render>) => view.getByTestId("state").dataset;
+const readState = (view: ReturnType<typeof render>): DOMStringMap => view.getByTestId("state").dataset;
 
 describe("the rail remembers whether it was collapsed", () => {
 	afterEach(() => {

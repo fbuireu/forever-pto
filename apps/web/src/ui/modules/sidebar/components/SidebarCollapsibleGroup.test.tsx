@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { type RenderResult, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { type ComponentProps, lazy, type ReactNode, Suspense } from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -60,7 +60,7 @@ const renderGroup = ({
 	anchor,
 	expanded = true,
 	icon = <svg data-testid="icon" />,
-}: RenderGroupParams = {}) =>
+}: RenderGroupParams = {}): RenderResult =>
 	render(
 		<SidebarProvider open={expanded}>
 			<SidebarCollapsibleGroup
@@ -75,9 +75,10 @@ const renderGroup = ({
 		</SidebarProvider>,
 	);
 
-const trigger = () => screen.getByRole("button", { name: LABEL });
+const trigger = (): HTMLElement => screen.getByRole("button", { name: LABEL });
 
-const lazyNode = (node: ReactNode) => lazy(() => Promise.resolve({ default: node as never })) as unknown as ReactNode;
+const lazyNode = (node: ReactNode): ReactNode =>
+	lazy(() => Promise.resolve({ default: node as never })) as unknown as ReactNode;
 
 describe("SidebarCollapsibleGroup draws its own trigger", () => {
 	it("is one button, the sidebar's menu button, and holds no other button", () => {

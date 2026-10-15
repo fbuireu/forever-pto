@@ -8,7 +8,7 @@ import itMessages from "@i18n/messages/it.json";
 import { LOCALE_COOKIE } from "@infrastructure/i18n/locales";
 import { USER_COUNTRY_COOKIE } from "@infrastructure/proxy/cookie";
 import { PREMIUM_COOKIE } from "@infrastructure/services/premium/cookie";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import { SIDEBAR_COOKIE_NAME } from "@ui/utils/sidebarCookie";
 import { type Locale, NextIntlClientProvider } from "next-intl";
 import { describe, expect, it, vi } from "vitest";
@@ -53,7 +53,7 @@ interface RenderDialogParams {
 	messages?: typeof en;
 }
 
-const renderDialog = ({ locale = "en", messages = en }: RenderDialogParams = {}) =>
+const renderDialog = ({ locale = "en", messages = en }: RenderDialogParams = {}): RenderResult =>
 	render(
 		<NextIntlClientProvider locale={locale} messages={messages}>
 			<CookieConsentDialog
@@ -72,7 +72,7 @@ const renderDialog = ({ locale = "en", messages = en }: RenderDialogParams = {})
 
 const SERVICES = COOKIE_SECTIONS.flatMap((section) => section.services ?? []);
 
-const openEveryDetailsPanel = (messages = en) => {
+const openEveryDetailsPanel = (messages = en): void => {
 	const triggers = screen.getAllByRole("button", { name: (name) => name.startsWith(messages.cookies.cookieDetails) });
 	for (const trigger of triggers) fireEvent.click(trigger);
 };

@@ -1,5 +1,5 @@
 import type { CountryDTO } from "@application/dto/country/types";
-import { render, screen } from "@testing-library/react";
+import { type RenderResult, render, screen } from "@testing-library/react";
 import type { Locale } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -34,7 +34,7 @@ const COUNTRIES = [
 	{ value: "FR", label: "France", flag: "fr" },
 ] as CountryDTO[];
 
-const renderCountries = (locale = "en") => render(Countries({ locale: locale as Locale }));
+const renderCountries = (locale = "en"): RenderResult => render(Countries({ locale: locale as Locale }));
 
 beforeEach(() => {
 	getCountries.mockReset();

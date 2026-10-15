@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { Input } from "./Input";
 
-const field = () => screen.getByRole("textbox", { name: "Email" }) as HTMLInputElement;
+const field = (): HTMLInputElement => screen.getByRole("textbox", { name: "Email" }) as HTMLInputElement;
 
 describe("Input", () => {
 	it("renders a text box carrying the input slot", () => {

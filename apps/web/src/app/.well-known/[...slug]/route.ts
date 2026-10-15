@@ -8,7 +8,7 @@ interface RouteContext {
 	params: Promise<{ slug: string[] }>;
 }
 
-export async function GET(_request: Request, { params }: RouteContext) {
+export async function GET(_request: Request, { params }: RouteContext): Promise<NextResponse> {
 	const { slug } = await params;
 	const document = lookupWellKnownDocument(slug.join("/"));
 

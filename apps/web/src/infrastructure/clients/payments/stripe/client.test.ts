@@ -20,7 +20,7 @@ afterEach(() => {
 	vi.unstubAllEnvs();
 });
 
-const freshClient = async () => {
+const freshClient = async (): Promise<ReturnType<typeof import("./client").getStripeClientInstance>> => {
 	vi.resetModules();
 	const { getStripeClientInstance: fresh } = await import("./client");
 

@@ -144,12 +144,12 @@ export const getYear = (date: Date): number => toPlainDate(date).year;
 
 export const getDayOfMonth = (date: Date): number => toPlainDate(date).day;
 
-const isoDate = (date: Date) => {
+const isoDate = (date: Date): string => {
 	const pd = toPlainDate(date);
 	return `${pd.year}-${String(pd.month).padStart(2, "0")}-${String(pd.day).padStart(2, "0")}`;
 };
 
-export const isoDateTime = (date: Date) => {
+export const isoDateTime = (date: Date): string => {
 	const base = isoDate(date);
 	const h = String(date.getHours()).padStart(2, "0");
 	const m = String(date.getMinutes()).padStart(2, "0");
