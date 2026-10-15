@@ -39,6 +39,7 @@
 			},
 			"style": {
 				"noDefaultExport": "error",
+				"useAtIndex": "error",
 				"useConsistentTypeDefinitions": { "level": "error", "options": { "style": "interface" } }
 			},
 			"suspicious": {

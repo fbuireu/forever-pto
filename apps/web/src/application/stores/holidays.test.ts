@@ -81,11 +81,16 @@ const makeBridge = ({ start, end, ptoDays }: MakeBridgeParams) => ({
 	ptoDays,
 });
 
-const makeSuggestion = (days: Date[]): MeasuredSuggestion => ({
-	days,
-	bridges: days.length ? [makeBridge({ start: days[0], end: days[days.length - 1], ptoDays: days })] : [],
-	metrics: { totalDays: days.length } as never,
-});
+const makeSuggestion = (days: Date[]): MeasuredSuggestion => {
+	const start = days.at(0);
+	const end = days.at(-1);
+
+	return {
+		days,
+		bridges: start && end ? [makeBridge({ start, end, ptoDays: days })] : [],
+		metrics: { totalDays: days.length } as never,
+	};
+};
 
 beforeEach(() => {
 	useHolidaysStore.setState(useHolidaysStore.getInitialState());

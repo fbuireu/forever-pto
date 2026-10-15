@@ -34,10 +34,11 @@ export const getCalendarDays = ({ month, weekStartsOn, fixedWeeks }: GetCalendar
 
 	const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
-	if (fixedWeeks && days.length < CALENDAR_SIZE) {
+	const lastDay = days.at(-1);
+
+	if (fixedWeeks && lastDay !== undefined && days.length < CALENDAR_SIZE) {
 		const additionalDays = CALENDAR_SIZE - days.length;
 
-		const lastDay = days[days.length - 1];
 		for (let i = 1; i <= additionalDays; i++) {
 			const nextDay = addDays({ date: lastDay, days: i });
 			days.push(nextDay);

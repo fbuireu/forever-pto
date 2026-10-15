@@ -271,7 +271,7 @@ describe("findBridges efficiency floor", () => {
 			date.setDate(date.getDate() + offset);
 			return makeHoliday(date);
 		});
-		const lastFreeDay = shutdown[shutdown.length - 1]?.date as Date;
+		const lastFreeDay = shutdown.at(-1)?.date as Date;
 		const anchor = makeDate({ year: 2025, month: 8, day: 1 });
 
 		const bridges = findBridges({ availableWorkdays: [anchor], holidays: shutdown });

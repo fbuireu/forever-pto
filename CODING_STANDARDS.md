@@ -17,11 +17,11 @@ check. The process around a change (commit types, one package per pull request) 
 
 No rule below restates these, and a diff that breaks one fails CI:
 
-- Biome ([`biome.json`](./biome.json)) over both packages: formatting, import order, the recommended rules,
-  `noConsole` everywhere but [`logger.ts`](./apps/web/src/infrastructure/logging/logger.ts), no barrel or `export *`
-  module, no default export outside the Next file conventions, the `next-intl` request config, the Playwright
-  global setup and the tools' config files, and every object shape declared an `interface`, never a `type` alias of an
-  object literal (`useConsistentTypeDefinitions`).
+- Biome ([`biome.json`](./biome.json)) over both packages: formatting, import order, the recommended rules, `noConsole`
+  everywhere but [`logger.ts`](./apps/web/src/infrastructure/logging/logger.ts), no barrel or `export *` module, no
+  default export outside the Next file conventions, the `next-intl` request config, the Playwright global setup and the
+  tools' config files, every object shape declared an `interface`, never a `type` alias of an object literal
+  (`useConsistentTypeDefinitions`), and every element read from an array's end through `.at()` (`useAtIndex`).
 - Strict `tsc` over the root program and `apps/web` ([`apps/web/tsconfig.json`](./apps/web/tsconfig.json)), and
   `astro check` over `apps/docs`, which types every demo against the app's real props.
 - commitlint ([`commitlint.config.ts`](./commitlint.config.ts)): the commit format, on the commit and on the pull
@@ -280,6 +280,8 @@ No rule below restates these, and a diff that breaks one fails CI:
 - `F10` **judgement**: Name every tunable number of a hook or a utility as a module-level constant (the tour's frame
   counts in `useTutorial.tsx`, the breakpoint in `useMobile.ts`), so a reader finds what to tune without reading the
   logic.
+- `F11` **hard**: Sort with `toSorted`; `.sort()` is for an array the function has just built, because a sort in
+  place reorders a caller's array.
 
 ## Errors and logging
 
@@ -353,8 +355,6 @@ No rule below restates these, and a diff that breaks one fails CI:
   ([ADR 0020](./docs/adr/0020-strategies-are-objectives-over-the-marginal-gain.md)).
 - `D16` **hard**: Answer a ratio over an empty denominator with 0, never `NaN`, and pin it in a test
   (`generateMetrics`, `measures`, `budget`).
-- `D17` **hard**: Sort with `toSorted`; `.sort()` is for an array the function has just built, because a sort in
-  place reorders a caller's array.
 - `D19` **judgement**: Export a boundary predicate beside the default it is paired with, and test that it accepts
   that default (`isHolidayVariant`, the Planning Window's bounds).
 
