@@ -316,6 +316,10 @@ enumerates.
 
 These paths contain a dot, so the proxy matcher excludes them; they never see locale negotiation.
 
+**The folder's leading dot hides it from TypeScript's `**` glob,** so `apps/web/tsconfig.json` names
+`src/app/.well-known/**/*.ts` in its `include`; without that line `pnpm typecheck` and `next build` never type the
+handler or its test.
+
 **`security.txt` is not one of its documents.** `/.well-known/security.txt` is
 [`public/.well-known/security.txt`](../../public/.well-known/security.txt), and the static layer answers it before
 this handler on both targets: `next start` serves the public folder ahead of a dynamic route, and on the Worker,
