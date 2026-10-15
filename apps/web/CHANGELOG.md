@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.15.4](https://github.com/fbuireu/forever-pto/compare/web-v1.15.3...web-v1.15.4) (2026-10-15)
+
+
+### Bug Fixes
+
+* **web:** sit icons on the first line of the label beside them ([8602b93](https://github.com/fbuireu/forever-pto/commit/8602b935c12cd296319015f9a6884ea93122cda9))
+
 # [forever-pto-web-v1.15.3](https://github.com/fbuireu/forever-pto/compare/web-v1.15.2...web-v1.15.3) (2026-10-13)
 
 
