@@ -6015,7 +6015,9 @@ const formatRelease = ({ value, depth }: FormatReleaseParams): string => {
 	}
 
 	if (Array.isArray(value)) {
-		return `[\n${value.map((item) => `${indent}\t${nested(item)}`).join(",\n")}\n${indent}]`;
+		const items = value.map((item) => `${indent}\t${nested(item)}`);
+
+		return `[\n${items.join(",\n")}\n${indent}]`;
 	}
 
 	if (typeof value === "object" && value !== null) {
@@ -6030,7 +6032,9 @@ const formatRelease = ({ value, depth }: FormatReleaseParams): string => {
 describe("every release configuration is the shared one, bar what the repository's shape demands", () => {
 	it("finds each release configuration the repository has, and a shape declared for each", () => {
 		expect(RELEASES.length).toBeGreaterThan(0);
-		expect([...RELEASE_CONFIG_FILES].sort()).toEqual(RELEASES.map((shape) => shape.config).sort());
+		expect(RELEASE_CONFIG_FILES.toSorted((a, b) => a.localeCompare(b))).toEqual(
+			RELEASES.map((shape) => shape.config).toSorted((a, b) => a.localeCompare(b)),
+		);
 	});
 
 	it("declares every package a release configuration names, and semantic-release, in the package.json that runs it, at one version, and no other release package", () => {
@@ -6113,7 +6117,7 @@ describe("the release jobs push one release commit at a time", () => {
 			const body = read(`.github/workflows/${workflow}`);
 			const job = body.slice(body.indexOf("  release-"));
 
-			return job.slice(0, job.indexOf("\n    steps:")).match(/^\s*group:\s*(\S+)$/m)?.[1];
+			return /^[ \t]*group:[ \t]*(\S+)$/m.exec(job.slice(0, job.indexOf("\n    steps:")))?.[1];
 		});
 
 		expect(groups).toEqual(["release", "release"]);
