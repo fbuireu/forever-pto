@@ -351,8 +351,8 @@ importers:
         specifier: 9.15.0
         version: 9.15.0
       '@tursodatabase/serverless':
-        specifier: 1.4.0
-        version: 1.4.0
+        specifier: 1.4.1
+        version: 1.4.1
       boneyard-js:
         specifier: 1.10.0
         version: 1.10.0(react@19.3.0)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.16.9)(yaml@2.9.0))
@@ -3432,8 +3432,8 @@ packages:
   '@tsconfig/node18@18.2.7':
     resolution: {integrity: sha512-UyenTORreCUh8MKh2qbLGGHTRrxjBbSwvX0ZoWs6Jx1jrNS62PXEA3+VaLvmb0YDQrgGU3v3h7zB9Xs/BN1ozg==}
 
-  '@tursodatabase/serverless@1.4.0':
-    resolution: {integrity: sha512-ZU3T76NG/E0NTKULqJ9TggJfbdPgRaChOS4HDOu3Srds7w7fSPie7jbPHzz+CLGrxs2TtMYtYB1lH5Bh6q1w7A==}
+  '@tursodatabase/serverless@1.4.1':
+    resolution: {integrity: sha512-kcbGx0zb0Js4WnIrIF4AlsK3gzryRdTyUQev/9UbxtcH/iyk7u0Rk+l7dWdPC/5Ymu1WlbSyn4oUb02eNbn6Mw==}
 
   '@tybys/wasm-util@0.10.3':
     resolution: {integrity: sha512-F3fo1MYrRJYL3zER0OUOmkutjr1Vp23m7OsSgp7nq4SP6OqX6C/56XFIPAl5bt3zaBRjmW7SGz3u/6LwFpYcOg==}
@@ -11159,7 +11159,7 @@ snapshots:
 
   '@tsconfig/node18@18.2.7': {}
 
-  '@tursodatabase/serverless@1.4.0': {}
+  '@tursodatabase/serverless@1.4.1': {}
 
   '@tybys/wasm-util@0.10.3':
     dependencies:
