@@ -153,7 +153,7 @@ export const HolidayFormModal = ({
 		<Dialog open={open} onOpenChange={handleClose}>
 			<DialogContent className="sm:max-w-sm" closeLabel={tA11y("closeDialog")} initialFocus={false}>
 				<DialogHeader>
-					<DialogTitle className="flex items-center gap-2">
+					<DialogTitle className="flex items-start gap-2 [&>svg]:icon-first-line">
 						{icon}
 						{t("title")}
 					</DialogTitle>
@@ -207,8 +207,8 @@ export const HolidayFormModal = ({
 												disabled={isPending}
 											/>
 											{selectedDate && (
-												<div className="mt-3 p-2 bg-muted rounded text-sm flex align-items-center">
-													<CalendarIcon className="size-4 inline mr-2" />
+												<div className="mt-3 p-2 bg-muted rounded text-sm flex items-start gap-2">
+													<CalendarIcon className="icon-first-line size-4" />
 													{tFields("selectedDate", {
 														date: formatDate({ date: selectedDate, locale, format: "EEEE, MMMM d, yyyy" }),
 													})}

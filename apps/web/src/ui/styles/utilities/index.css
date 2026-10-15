@@ -36,6 +36,10 @@
 	}
 }
 
+@utility icon-first-line {
+	translate: 0 calc((1lh - 100%) / 2);
+}
+
 @utility quiet-link {
 	border: 3px solid transparent;
 	border-radius: 8px;

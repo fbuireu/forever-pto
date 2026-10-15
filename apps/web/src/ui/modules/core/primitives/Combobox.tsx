@@ -95,12 +95,20 @@ export const Combobox = <TValue extends string>({
 						<CommandEmpty>{notFoundText}</CommandEmpty>
 						<CommandGroup>
 							{options.map((option) => (
-								<CommandItem key={option.value} value={option.value} keywords={[option.label]} onSelect={handleSelect}>
-									<div className="flex items-center gap-2">
-										{hasFlag(option) && <FlagIcon code={option.flag} />}
+								<CommandItem
+									key={option.value}
+									value={option.value}
+									keywords={[option.label]}
+									onSelect={handleSelect}
+									className="items-start"
+								>
+									<div className="flex items-start gap-2">
+										{hasFlag(option) && (
+											<FlagIcon code={option.flag} className="icon-first-line h-[1em] leading-[inherit]" />
+										)}
 										<span className="capitalize">{option.label}</span>
 									</div>
-									{value.toLowerCase() === option.value.toLowerCase() && <Check className="ml-auto" />}
+									{value.toLowerCase() === option.value.toLowerCase() && <Check className="icon-first-line ml-auto" />}
 								</CommandItem>
 							))}
 						</CommandGroup>

@@ -26,7 +26,7 @@ interface SidebarFieldLabelProps {
 }
 
 export const SidebarFieldLabel = ({ controlId, icon, title, tooltip, className }: SidebarFieldLabelProps) => {
-	const classes = cn("flex gap-2 my-2 text-sm font-mono font-normal", className);
+	const classes = cn("flex items-start gap-2 my-2 text-sm font-mono font-normal [&>svg]:icon-first-line", className);
 	const body = (
 		<>
 			{icon} {title}

@@ -62,8 +62,8 @@ export const DeleteHolidayModal = ({ open, onClose, locale, holidays }: DeleteHo
 		<Dialog open={open} onOpenChange={onClose}>
 			<DialogContent className="sm:max-w-sm" closeLabel={tA11y("closeDialog")}>
 				<DialogHeader>
-					<DialogTitle className="flex items-center gap-2 text-destructive">
-						<AlertTriangle className="size-5" />
+					<DialogTitle className="flex items-start gap-2 text-destructive">
+						<AlertTriangle className="icon-first-line size-5" />
 						{t("title", { count })}
 					</DialogTitle>
 					<DialogDescription className="sr-only">{t("description", { count })}</DialogDescription>

@@ -26,7 +26,7 @@ fails on a scanned test, e2e spec or Markdown file and on any palette utility in
 | `index.css` | Declares the cascade layer order, imports Tailwind, `tw-animate-css` and every partial below, and ends with the `@source not` exclusions |
 | [`base/index.css`](./base/index.css) | `@layer base`: element defaults: border/outline colour, body background and glow, scrollbar styling, the shared transition on buttons and shadcn slots |
 | [`theme/index.css`](./theme/index.css) | `@theme inline` bridges the design tokens into Tailwind's namespaces; `@theme static` always emits the Tailwind theme variables a CSS module reads (`--spacing`, `--text-xs`, `--text-sm`, `--text-3xl`, `--shadow-lg`, at Tailwind's own values); also the `dark` and `hover` custom variants |
-| [`utilities/index.css`](./utilities/index.css) | `@utility hit-area-stable`, `hit-area-stable-tilt` and `quiet-link` |
+| [`utilities/index.css`](./utilities/index.css) | `@utility hit-area-stable`, `hit-area-stable-tilt`, `icon-first-line` and `quiet-link` |
 | [`animations/index.css`](./animations/index.css) | `@layer animations`: keyframes, the root view-transition, the reduced-motion block |
 | [`global/index.css`](./global/index.css) | The design tokens: `:root` and the `[data-theme="dark"]` overrides. Deliberately unlayered |
 | [`vendor/index.css`](./vendor/index.css) | `@layer vendor`: `flag-icons`, cookie-consent and boneyard-js overrides, `::selection` |
@@ -234,6 +234,11 @@ instead would drop it from `pnpm format:all` and `pnpm lint:all` alike.
 - `--container-8xl` in `theme/index.css` exists for one class, `max-w-8xl` in `planner/page.tsx`.
   Tailwind resolves `max-w-*` from `--max-width-*`, then `--spacing-*`, then `--container-*`, so a
   `--max-width-8xl` beside it would shadow it, and deleting `--container-8xl` would silently drop the class.
+- `icon-first-line` centres an icon on the first line of the label beside it, in a row aligned to the start
+  (`items-start`). `1lh` is the icon's own line height, so an icon beside a label set in another size takes that size
+  (`Banner`'s icon carries the title's `text-[0.72rem]`). It moves the icon with `translate`, not `transform`, so
+  motion's inline `transform` on an animated icon keeps working; a `translate-*` utility writes the same property, so
+  an element that has one takes the utility on a wrapper.
 
 ## Testing
 

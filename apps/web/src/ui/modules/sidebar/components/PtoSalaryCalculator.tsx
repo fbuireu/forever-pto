@@ -95,8 +95,8 @@ export const PtoSalaryCalculator = () => {
 
 	return (
 		<div className="space-y-2 w-full">
-			<div className="flex gap-2 text-sm font-normal">
-				<Euro size={16} /> {t("title")}
+			<div className="flex items-start gap-2 text-sm font-normal">
+				<Euro size={16} className="icon-first-line" /> {t("title")}
 				<SidebarFieldTooltip label={t("tooltipLabel")} className="w-60">
 					{t("tooltip")}
 				</SidebarFieldTooltip>

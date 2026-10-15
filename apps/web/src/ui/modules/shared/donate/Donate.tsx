@@ -234,9 +234,9 @@ export const Donate = ({ bottomClassName }: DonateProps) => {
 						<h2 className="text-lg leading-none font-black tracking-[-0.03em]">{tDonate("supportAndUnblock")}</h2>
 						<p className="text-muted-foreground text-sm">{tDonate("makeDonation")}</p>
 						{premiumKey && (
-							<div className="flex items-center gap-2 rounded-[10px] border-[3px] border-(--frame) bg-wash-green p-2 shadow-(--shadow-brutal-xs)">
+							<div className="flex items-start gap-2 rounded-[10px] border-[3px] border-(--frame) bg-wash-green p-2 shadow-(--shadow-brutal-xs)">
 								<Star
-									className="size-4 text-wash-green-ink"
+									className="icon-first-line size-4 text-sm text-wash-green-ink"
 									fill="currentColor"
 									aria-hidden="true"
 									animateOnView

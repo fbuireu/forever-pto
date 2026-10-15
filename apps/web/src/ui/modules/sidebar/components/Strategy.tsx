@@ -112,7 +112,7 @@ export const Strategy = () => {
 						<Card className="p-4 bg-muted/50 mt-2 text-xs">
 							<div className="space-y-2">
 								<div className="flex items-start gap-3">
-									{CurrentIcon && <CurrentIcon className="size-6 text-primary" />}
+									{CurrentIcon && <CurrentIcon className="icon-first-line size-6 text-primary" />}
 									<div className="flex-1">
 										<h4 className="font-semibold text-xs">{currentStrategy.description}</h4>
 										<CardDescription className="text-xs">{currentStrategy.subtitle}</CardDescription>
@@ -123,9 +123,9 @@ export const Strategy = () => {
 										{currentStrategy.pros.map((pro) => (
 											<span
 												key={pro}
-												className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded border border-positive-base/30 bg-positive-base/10 text-positive-note"
+												className="inline-flex items-start gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded border border-positive-base/30 bg-positive-base/10 text-positive-note"
 											>
-												<CheckCircle2 className="size-2.5 shrink-0" />
+												<CheckCircle2 className="icon-first-line size-2.5 shrink-0" />
 												{pro}
 											</span>
 										))}
@@ -134,9 +134,9 @@ export const Strategy = () => {
 										{currentStrategy.cons.map((con) => (
 											<span
 												key={con}
-												className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded border border-warning-base/30 bg-warning-base/10 text-warning-note"
+												className="inline-flex items-start gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded border border-warning-base/30 bg-warning-base/10 text-warning-note"
 											>
-												<AlertCircle className="size-2.5 shrink-0" />
+												<AlertCircle className="icon-first-line size-2.5 shrink-0" />
 												{con}
 											</span>
 										))}

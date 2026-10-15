@@ -118,8 +118,8 @@ export const PremiumRequiredModal = ({
 		<Dialog open={open} onOpenChange={handleClose}>
 			<DialogContent className="sm:max-w-md" closeLabel={tA11y("closeDialog")} initialFocus={false}>
 				<DialogHeader>
-					<DialogTitle className="flex items-center gap-2">
-						<Crown className="size-5 text-crown" />
+					<DialogTitle className="flex items-start gap-2">
+						<Crown className="icon-first-line size-5 text-crown" />
 						{t("premiumRequired")}
 					</DialogTitle>
 					<Banner icon={Lock} title={t("premiumRequired")} colorScheme="indigo">

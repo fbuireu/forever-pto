@@ -82,8 +82,8 @@ export const PtoCalculator = () => {
 
 	return (
 		<div className="space-y-2 w-full">
-			<div className="flex gap-2 my-2 text-sm font-normal">
-				<Calculator size={16} /> {t("title")}
+			<div className="flex items-start gap-2 my-2 text-sm font-normal">
+				<Calculator size={16} className="icon-first-line" /> {t("title")}
 				<SidebarFieldTooltip label={t("tooltipLabel")} className="w-60">
 					{t("tooltip")}
 				</SidebarFieldTooltip>

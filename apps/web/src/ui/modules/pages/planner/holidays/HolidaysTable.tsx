@@ -81,7 +81,7 @@ const HolidayCard = ({
 							checked={isSelected}
 							onCheckedChange={() => onToggle(holiday)}
 							aria-label={tRow("select", { name: holiday.name })}
-							className="mt-1 shrink-0"
+							className="icon-first-line shrink-0 text-sm leading-tight"
 						/>
 					</PremiumFeature>
 					<div className="flex-1 min-w-0">

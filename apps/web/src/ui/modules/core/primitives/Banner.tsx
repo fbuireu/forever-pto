@@ -52,8 +52,8 @@ export const Banner = ({ icon: Icon, title, children, action, colorScheme, class
 				className,
 			)}
 		>
-			<div className="flex items-center gap-2 mb-2">
-				<Icon aria-hidden="true" className={cn("size-4 shrink-0", colors.icon)} />
+			<div className="flex items-start gap-2 mb-2">
+				<Icon aria-hidden="true" className={cn("icon-first-line size-4 shrink-0 text-[0.72rem]", colors.icon)} />
 				<span className={cn("text-[0.72rem] font-display font-black uppercase tracking-[0.08em]", colors.title)}>
 					{title}
 				</span>

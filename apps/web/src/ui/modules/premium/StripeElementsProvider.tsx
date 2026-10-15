@@ -43,7 +43,7 @@ function StripeUnavailable({ isRetrying, onRetry, onCancel }: Readonly<StripeUna
 				role="alert"
 				className="flex items-start gap-3 rounded-[10px] border-[3px] border-(--frame) bg-[color-mix(in_srgb,var(--destructive)_12%,var(--card)_88%)] p-4 shadow-(--shadow-brutal-sm)"
 			>
-				<AlertCircle className="mt-0.5 size-4 shrink-0 text-destructive" aria-hidden="true" />
+				<AlertCircle className="icon-first-line size-4 shrink-0 text-sm text-destructive" aria-hidden="true" />
 				<div className="flex-1">
 					<h4 className="mb-1 text-sm font-black text-destructive">{t("formUnavailable")}</h4>
 					<p className="text-sm">{t("formUnavailableDescription")}</p>

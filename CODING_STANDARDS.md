@@ -566,6 +566,9 @@ No rule below restates these, and a diff that breaks one fails CI:
   every page layer (the planner drawer, the mobile sidebar), because until it is answered it must stay within reach,
   and below the dialog its own preferences open in.
 - `S6` **judgement**: Restore a body-level lock in the same effect's cleanup, never in an animation callback.
+- `S9` **judgement**: Align an icon beside a label that can wrap with the label's first line, through `icon-first-line`
+  on the icon and a row aligned to the start (`items-start`), never with a hand-tuned margin (`mt-0.5`), because a nudge
+  holds for one font size and one icon size and a centred row moves the icon to the middle of a wrapped label.
 
 ## Message bundles (`apps/web/src/ui/i18n`)
 

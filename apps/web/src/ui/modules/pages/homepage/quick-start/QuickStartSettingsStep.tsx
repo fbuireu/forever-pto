@@ -50,7 +50,7 @@ export const QuickStartSettingsStep = ({ draft, onChange }: QuickStartSettingsSt
 									className="peer sr-only"
 								/>
 								<label htmlFor={id} className={STRATEGY_CARD_CLASS}>
-									<Icon className="mt-0.5 size-5 shrink-0" aria-hidden />
+									<Icon className="icon-first-line size-5 shrink-0 text-sm" aria-hidden />
 									<span className="flex flex-col gap-0.5">
 										<span className="text-sm font-black">{tSidebar(`strategy.${value}.label`)}</span>
 										<span className="text-xs text-muted-foreground">{tSidebar(`strategy.${value}.description`)}</span>

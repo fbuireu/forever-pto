@@ -101,7 +101,7 @@ function AccordionTrigger({
 				ref={triggerRef}
 				data-slot="accordion-trigger"
 				className={cn(
-					"flex flex-1 text-start items-center justify-between py-4 font-semibold cursor-pointer outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2",
+					"flex flex-1 text-start items-start justify-between py-4 font-semibold cursor-pointer outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2",
 					className,
 				)}
 				{...props}
@@ -109,19 +109,21 @@ function AccordionTrigger({
 				{children}
 
 				{chevron && (
-					<m.div
-						data-slot="accordion-trigger-chevron"
-						animate={{ rotate: isOpen ? 45 : 0 }}
-						transition={transition}
-						className={cn(
-							"relative hit-area-stable size-7 flex items-center justify-center shrink-0 rounded-md border-[2.5px] border-(--frame) font-black text-lg leading-none select-none transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-(--shadow-brutal-sm)",
-							isOpen
-								? "bg-(--frame) text-background hover:shadow-(--shadow-brutal-sm-accent)"
-								: "bg-accent text-(--color-brand-ink)",
-						)}
-					>
-						+
-					</m.div>
+					<span className="icon-first-line shrink-0">
+						<m.div
+							data-slot="accordion-trigger-chevron"
+							animate={{ rotate: isOpen ? 45 : 0 }}
+							transition={transition}
+							className={cn(
+								"relative hit-area-stable size-7 flex items-center justify-center rounded-md border-[2.5px] border-(--frame) font-black text-lg leading-none select-none transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-(--shadow-brutal-sm)",
+								isOpen
+									? "bg-(--frame) text-background hover:shadow-(--shadow-brutal-sm-accent)"
+									: "bg-accent text-(--color-brand-ink)",
+							)}
+						>
+							+
+						</m.div>
+					</span>
 				)}
 			</AccordionPrimitive.Trigger>
 		</AccordionPrimitive.Header>
