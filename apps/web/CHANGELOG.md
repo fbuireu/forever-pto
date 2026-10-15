@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.15.5](https://github.com/fbuireu/forever-pto/compare/web-v1.15.4...web-v1.15.5) (2026-10-15)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @opennextjs/cloudflare to v1.20.10 ([#425](https://github.com/fbuireu/forever-pto/issues/425)) ([191cc4d](https://github.com/fbuireu/forever-pto/commit/191cc4d69144fd935166df06cc36ab4d90306ff4))
+
 # [forever-pto-web-v1.15.4](https://github.com/fbuireu/forever-pto/compare/web-v1.15.3...web-v1.15.4) (2026-10-15)
 
 
