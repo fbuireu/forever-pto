@@ -9,7 +9,7 @@ All workflows live in `.github/workflows/`. Repo-wide conventions: every action 
 
 | Workflow | Trigger | Purpose |
 | --- | --- | --- |
-| `ci.yml` | push to `main`, PRs to `main`, manual dispatch | The whole app graph: change detection, one `Verify` job running `pnpm verify`, both deploys, the E2E run, the web release, and a `Check` job that aggregates them all |
+| `ci.yml` | push to `main`, PRs to `main`, manual dispatch | The whole app graph: change detection, one `Verify` job running the checks of `pnpm verify` as parallel steps, both deploys, the E2E run, the web release, and a `Check` job that aggregates them all |
 | `_deploy-web.yml` | `workflow_call` | Reusable OpenNext build + deploy + secret push |
 | `cleanup-development.yml` | PR closed, weekly schedule, manual dispatch | Delete the per-PR preview Workers, and sweep any left behind |
 | `docs.yml` | push to `main`, PRs to `main`, manual dispatch | This site's build, checks and deploy, gated by its own `changes` job and aggregated under `Check (docs)` |

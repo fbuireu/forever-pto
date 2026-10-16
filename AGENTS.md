@@ -66,6 +66,7 @@ pnpm lint:all           # biome lint over both packages (:fix to autofix)
 pnpm format:all         # biome check --write over both packages
 pnpm format:check       # biome check, no writes; what verify runs
 pnpm typecheck          # the root program, then apps/web, then apps/docs (astro check)
+pnpm typecheck:root     # the root program alone, which CI runs beside the two packages' typechecks
 
 pnpm test:ut            # apps/web unit tests, then the contract suite
 pnpm test:docs          # the contract suite alone
@@ -87,10 +88,10 @@ use, because the root and `apps/web` resolve separate Vitest instances whose rep
 
 Husky runs `lint-staged` on `pre-commit`, `commitlint` on `commit-msg` and `verify:changed` on `pre-push`. The hook is
 weaker than the CI `Verify` job on purpose: a changed-only run and the coverage floor cannot both hold, so coverage
-stays in CI, which runs the full `pnpm verify` on the pushed sha. The contract suite runs whole all the same:
-`--changed` picks tests through the import graph and no document is in it, so a push that touched only a guide would
-reach CI unchecked. **`pre-push` also fires inside the release job**, because `@semantic-release/git` pushes and husky
-is installed on the runner, so a broken `test:ut:changed` or contract suite stops a release too.
+stays in CI, which runs every check of `pnpm verify` on the pushed sha, as parallel steps. The contract suite runs whole
+all the same: `--changed` picks tests through the import graph and no document is in it, so a push that touched only a
+guide would reach CI unchecked. **`pre-push` also fires inside the release job**, because `@semantic-release/git` pushes
+and husky is installed on the runner, so a broken `test:ut:changed` or contract suite stops a release too.
 
 `typecheck` ends with `astro check`, which types every docs demo against the app's real props and so puts the
 cross-package seam in front of the author. Run it that way, never as `tsc -p apps/docs`, which reports artefacts of

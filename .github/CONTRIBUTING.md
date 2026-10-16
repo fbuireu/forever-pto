@@ -77,16 +77,17 @@ Everything CI runs, you can run locally, from the repository root:
 pnpm lint:all           # biome lint over both packages (append :fix to autofix)
 pnpm format:all         # biome check --write over both packages
 pnpm typecheck          # the root program, then apps/web, then apps/docs (astro check)
+pnpm typecheck:root     # the root program alone, which CI runs beside the two packages' typechecks
 pnpm test:ut            # apps/web unit tests, then the contract suite
 pnpm test:docs          # the contract suite alone
 pnpm test:e2e           # apps/web playwright
 pnpm verify             # format check, typecheck and coverage: what CI runs
 ```
 
-Husky runs lint-staged on `pre-commit`, commitlint on `commit-msg` and `pnpm verify:changed` on `pre-push`.
-The hook runs the changed-only variant rather than `verify` because the coverage floor and a subset run
-cannot both hold; CI runs the full `pnpm verify` on the pushed sha, so a push whose coverage dropped still
-fails its check. [AGENTS.md](../AGENTS.md) explains the trade.
+Husky runs lint-staged on `pre-commit`, commitlint on `commit-msg` and `pnpm verify:changed` on `pre-push`. The hook
+runs the changed-only variant rather than `verify` because the coverage floor and a subset run cannot both hold; CI runs
+every check of `pnpm verify` on the pushed sha, as parallel steps, so a push whose coverage dropped still fails its
+check. [AGENTS.md](../AGENTS.md) explains the trade.
 
 ## Code conventions
 
