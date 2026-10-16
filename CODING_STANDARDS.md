@@ -23,7 +23,9 @@ No rule below restates these, and a diff that breaks one fails CI:
   tools' config files, every object shape declared an `interface`, never a `type` alias of an object literal
   (`useConsistentTypeDefinitions`), and every element read from an array's end through `.at()` (`useAtIndex`).
 - Strict `tsc` over the root program and `apps/web` ([`apps/web/tsconfig.json`](./apps/web/tsconfig.json)), and
-  `astro check` over `apps/docs`, which types every demo against the app's real props.
+  `astro check` over `apps/docs`, which types every demo against the app's real props; through `lib`, all three reject
+  a built-in the Workers runtime or a stable Safari lacks, so `Temporal` type-checks only where it is imported from
+  `temporal-polyfill`.
 - commitlint ([`commitlint.config.ts`](./commitlint.config.ts)): the commit format, on the commit and on the pull
   request title.
 - The coverage floor ([`apps/web/vitest.config.ts`](./apps/web/vitest.config.ts)).

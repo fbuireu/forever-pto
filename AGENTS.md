@@ -47,6 +47,12 @@ runtime or a framework beside a version.
   refuses to run under 7: the native compiler ships no programmatic API for it to load. The split is asserted, and it
   closes the day Astro supports 7
 - Next with `@opennextjs/cloudflare` ([`apps/web/package.json`](./apps/web/package.json)): they move as a pair
+- The language's own built-ins (`lib` in [`apps/web/tsconfig.json`](./apps/web/tsconfig.json),
+  [`apps/docs/tsconfig.json`](./apps/docs/tsconfig.json) and the root [`tsconfig.json`](./tsconfig.json)): held to the
+  edition both places the code runs implement whole, the Cloudflare Workers runtime and every stable browser, Safari
+  included. An `ESNext` lib would type the global `Temporal`, which neither has, so a file that drops its
+  `temporal-polyfill` import would type-check and throw in production
+  ([ADR 0005](./docs/adr/0005-temporal-polyfill.md)); `lib` moves only once both ship it
   ([ADR 0009](./docs/adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)); the reasoning belongs to the app:
   [`./apps/web/AGENTS.md`](./apps/web/AGENTS.md)
 
