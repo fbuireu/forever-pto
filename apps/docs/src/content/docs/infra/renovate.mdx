@@ -43,6 +43,8 @@ The ruleset on `main` requires no approval, only the checks, so Renovate merges 
 ## Extras
 
 - Node is constrained to even (LTS-track) majors via an `allowedVersions` regex on the `node` dep.
+- `pnpm` updates travel in a `pnpm` group of their own, and `node` in a `node` group, so the installer and the runtime each move in one pull request.
+- **`vaul` never automerges.** It is the one patched dependency, keyed with its version in `pnpm-workspace.yaml`'s `patchedDependencies`, so a bump fails the install until someone reads the upstream diff and regenerates the patch, or drops it once upstream carries the fix; its rule turns `automerge` off and adds a `patched-dependency` label, and the contract suite asserts every patch has such a rule.
 - Assignees and reviewers come from `CODEOWNERS` (`assigneesFromCodeOwners` / `reviewersFromCodeOwners`).
 - The dependency dashboard issue (`:dependencyDashboard`) lists pending/blocked updates.
 

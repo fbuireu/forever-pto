@@ -5,7 +5,7 @@ sidebar:
   order: 7
 ---
 
-This page is self-documenting: it describes the pipeline that published it. The site is a static Astro/Starlight build served as Worker assets (`forever-pto-docs`, configured in `apps/docs/wrangler.toml`), so its CI can be far simpler than the [app's](/infra/workflows/): no runtime secrets, no database, no teardown.
+This page is self-documenting: it describes the pipeline that published it. The site is a static Astro/Starlight build served as Worker assets (`forever-pto-docs`, configured in `apps/docs/wrangler.toml`), so its CI can be far simpler than the [app's](/infra/workflows/): no runtime secrets, no database, no bindings, and a teardown that is one delete.
 
 ## The workflow
 
@@ -16,13 +16,19 @@ config:
   layout: dagre
 ---
 flowchart LR
-  CH[changes: DOCS_PATHS] --> B[build: astro check · astro build · Playwright]
-  B -->|pull_request| PV["preview: deploy --env development --name pr-n-…"]
-  B -->|push to main or dispatch| D[deploy --env production]
+  CH["changes: DOCS_PATHS"] --> PE
+  subgraph B ["build"]
+    PE["prepare-env, Playwright cache"] --> FORK{{"parallel:"}}
+    FORK --> TC["Typecheck: astro check"] & PW["Install Playwright browsers, or their OS dependencies"]
+    TC & PW --> JOIN{{"both settled"}}
+    JOIN --> BLD["Build: astro build"] --> E2E["Run E2E tests"] --> ART["Upload docs-dist"]
+  end
+  ART -->|pull_request| PV["preview: deploy --env development --name pr-n-…"]
+  ART -->|push to main or dispatch| D[deploy --env production]
   D --> S[smoke against DOCS_SITE_URL]
-  S --> R[release-docs]
+  S -->|push only| R[release-docs]
   S -. failed .-> RB[rollback]
-  CH & B & PV & D & S & R --> CK["Check (docs), always"]
+  CH & ART & PV & D & S & R --> CK["Check (docs), always"]
 ```
 
 `.github/workflows/docs.yml` follows the repo's workflow conventions (SHA-pinned actions, `persist-credentials: false`, zizmor-linted). It runs on every push and pull request, and a `changes` job gates `build` on the `DOCS_PATHS` list: `apps/docs/**`, `apps/web/package.json`, all of `apps/web/src/ui/**`, `apps/web/src/domain/calendar/types.ts`, `apps/web/src/domain/calendar/const.ts`, `apps/web/src/infrastructure/i18n/locales.ts`, `pnpm-lock.yaml`, the workflow file and `.github/actions/**`. Unrelated app changes never build the docs; changes to the reused sources do, on purpose, because they can break the demos. The list gates a `changes` job instead of filtering the trigger with `paths:`, because a filtered workflow never reports on a pull request outside its paths, so none of its jobs could be a required check.
@@ -41,6 +47,7 @@ Installs the whole workspace (**unfiltered** `pnpm install`: the demos import ap
 
 - `pnpm typecheck`: `astro check`, which typechecks the demo islands. This is the drift tripwire: demos import real app components via the `@ui` alias with exhaustive `Record<Variant, …>` maps, so renaming a CVA variant in the app breaks this build.
 - `pnpm build`: `astro build`; the resulting `apps/docs/dist` is uploaded as an artifact for the deploy jobs.
+- `pnpm typecheck` and the Playwright browser install run as one `parallel:` block, since neither needs the other; the build waits for both.
 - Playwright (`pnpm test:e2e`) runs against a local preview server: `apps/docs/playwright.config.ts` boots `astro preview` itself via `webServer`, so no deployment is needed to test. Some specs are site-level smoke tests; the rest walk **every** page the build emitted a demo onto, asserting each answers 200, that every `data-demo` frame renders something once scrolled into view, and that, once every island has hydrated, the page raises no `pageerror` and logs no `console.error`. That last assertion is the one that matters: a demo can throw during hydration and still build green, and it throws only once the island hydrates, so the spec waits for that before it asserts.
 
 There is no Biome step here. Both packages are linted in one root pass from the app workflow; a second one over `apps/docs` would duplicate it.
@@ -71,7 +78,7 @@ The app's job in that workflow has to queue behind the CI run, because app E2E d
 
 ## Production deploy
 
-On `main`, the deploy job reuses the build job's `apps/docs/dist` artifact and runs `wrangler deploy` via `wrangler-action`, handing it the wrangler version a step reads out of `apps/docs/package.json` so they never diverge (the `deploy` script in `apps/docs/package.json` is the local one-shot, though it passes no `--env`, so it deploys the top-level config to the production Worker's name without its route block), activating a new version of `forever-pto-docs` on `docs.forever-pto.com` (an infrastructure-as-code `custom_domain` route; see [Cloudflare stack](/infra/cloudflare/)). The only credentials involved are `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; the site has no [runtime secrets](/infra/secrets/) at all.
+On `main`, the deploy job reuses the build job's `apps/docs/dist` artifact and runs `wrangler deploy` via `wrangler-action`, handing it the wrangler version a step reads out of `apps/docs/package.json` so they never diverge (the `deploy` script in `apps/docs/package.json` is the local one-shot, though it passes no `--env`, so it deploys the top-level config to the production Worker's name without its route block), activating a new version of `forever-pto-docs` on `docs.forever-pto.com` (an infrastructure-as-code `custom_domain` route; see [Cloudflare stack](/infra/cloudflare/)). The Worker has no script: Cloudflare serves `dist` as static assets, and `not_found_handling = "404-page"` in `apps/docs/wrangler.toml` answers a path with no file with the site's own `404.html` and a 404 status. The only credentials involved are `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; the site has no [runtime secrets](/infra/secrets/) at all.
 
 ## Accepted cost: docs PRs still run app CI
 

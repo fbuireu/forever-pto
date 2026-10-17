@@ -9,7 +9,7 @@ Each package releases itself. [semantic-release](https://semantic-release.gitboo
 
 | Package | Tags | Writes | Runs in |
 | --- | --- | --- | --- |
-| `apps/web` | `web-vX.Y.Z` | `package.json`, `CHANGELOG.md`, a GitHub Release | `ci.yml`, after the production deploy |
+| `apps/web` | `web-vX.Y.Z` | `package.json`, `CHANGELOG.md`, a GitHub Release | `ci.yml`, after the production deploy and its smoke run |
 | `apps/docs` | `docs-vX.Y.Z` | `package.json`, `CHANGELOG.md`, a GitHub Release | `docs.yml`, after the docs deploy and its smoke run |
 
 ## The flow
@@ -24,7 +24,7 @@ flowchart TD
   PUSH[push to main] --> CI[ci.yml] & DOCS[docs.yml] & ZZ[zizmor.yml]
   subgraph ci [ci.yml]
     CH[changes: did WEB_PATHS move?]
-    V[Verify: format · typecheck · unit + contract suite]
+    V["Verify: format · three typechecks · unit + contract suite, as parallel steps"]
     DP[deploy-production]
     SM[smoke: @smoke against WEB_SITE_URL]
     RB[rollback on a failed smoke]
@@ -35,11 +35,13 @@ flowchart TD
   end
   subgraph docs [docs.yml]
     DCH[changes: did DOCS_PATHS move?]
-    DB[build: typecheck · build · Playwright]
+    DB["build: typecheck beside the browser install, then build · Playwright"]
     DD[deploy]
     DS[smoke against DOCS_SITE_URL]
+    DRB[rollback on a failed smoke]
     RD[release-docs: docs-vX.Y.Z]
     DCH --> DB --> DD --> DS --> RD
+    DS -. failed .-> DRB
   end
   CI --> CH
   DOCS --> DCH
@@ -49,7 +51,7 @@ flowchart TD
 
 `release-web` verifies a `web-v*` tag exists, analyses the commits touching `apps/web`, writes `CHANGELOG.md` and the version bump, commits `chore(web): release x.y.z [skip ci]` and tags. `release-docs` does the same for `apps/docs`, and the shared `release` concurrency group is what keeps their pushes apart.
 
-1. **A release means the version is live.** `release-web` `needs: deploy-production`, so nothing is tagged until the deploy has succeeded. `release-docs` sits behind the docs deploy and its smoke run for the same reason. Both share the concurrency group `release` with `cancel-in-progress: false`, so they queue instead of racing. Queueing alone is not enough: the checkout pins the run's sha, so the second job would hold `main` one release commit behind the remote and semantic-release would stand down, green, on every push that touched both packages. Each release job therefore fast-forwards onto `origin/main` first, whatever landed since, so the sibling's release commit and any merge that arrived mid-run both join the release.
+1. **A release means the version is live and answering.** `release-web` needs `deploy-production` **and** `smoke`, so nothing is tagged until the deploy has succeeded and the live site has passed its smoke run; a failed smoke run rolls the Worker back instead. `release-docs` sits behind the docs deploy and its smoke run for the same reason, with the docs `rollback` beside it. Both share the concurrency group `release` with `cancel-in-progress: false`, so they queue instead of racing. Queueing alone is not enough: the checkout pins the run's sha, so the second job would hold `main` one release commit behind the remote and semantic-release would stand down, green, on every push that touched both packages. Each release job therefore fast-forwards onto `origin/main` first, whatever landed since, so the sibling's release commit and any merge that arrived mid-run both join the release.
 2. **Attribution is by path.** `fix:` → patch, `feat:` → minor, `BREAKING CHANGE` → major; `docs:`, `chore:`, `ci:` and friends produce no release. But the type only decides *how big* the bump is; *which* package it lands in is decided by the files the commit touched.
 3. **`apps/web` runs the full plugin chain**: release notes → `CHANGELOG.md` → version bump in `package.json` (`@semantic-release/npm` with `npmPublish: false`; the package is private, only the version field matters) → a git commit of `package.json` and `CHANGELOG.md` → a GitHub Release. The lockfile is not in the asset list: it lives two levels above the package and nothing in this chain dirties it.
 4. **`apps/docs` runs the same chain**, writing `apps/docs/CHANGELOG.md` and its own `package.json` version and committing both. A second pusher does not race the app's release for the branch: both jobs share the `release` concurrency group named in point 1, which is what serialises them, so leaving the plugins out would buy nothing and cost releases whose notes live only on GitHub beside a `package.json` reading `0.0.0`. The version is read by nothing: the site displays the **app's**.

@@ -79,7 +79,7 @@ pnpm test:docs          # the contract suite alone
 pnpm test:ut:coverage   # apps/web with coverage, then the contract suite without it
 pnpm test:e2e           # apps/web playwright
 pnpm verify:static      # format:check && typecheck: everything verify does but the suites
-pnpm verify             # verify:static && test:ut:coverage; the CI Check job
+pnpm verify             # verify:static && test:ut:coverage; CI's Verify job runs the same checks in parallel
 pnpm verify:changed     # verify:static && test:ut:changed && test:docs; what pre-push runs
 ```
 
@@ -162,25 +162,29 @@ published [release page](./apps/docs/src/content/docs/infra/release.mdx) walks t
 
 ## CI
 
-**[`ci.yml`](.github/workflows/ci.yml) holds the whole app graph**: `changes` and `verify` in parallel, then
-`deploy-production` → `release-web` → `docs-refresh` and `deploy-production` → `smoke` on `main`, or
-`deploy-development` → `comment` / `e2e` on a PR, and a final `check` job that aggregates every one of them. Both
-deploy jobs call the shared [`_deploy-web.yml`](.github/workflows/_deploy-web.yml).
-[`docs.yml`](.github/workflows/docs.yml) holds the docs graph: its own `changes`, then `build`, then `preview` on a
-PR or `deploy` → `smoke` → `release-docs` on `main`, with `rollback` when that smoke run fails, and its own
-aggregate, `Check (docs)`. The rest are
-[`cleanup-development.yml`](.github/workflows/cleanup-development.yml), a
-[`zizmor.yml`](.github/workflows/zizmor.yml) audit,
-[`dependency-review.yml`](.github/workflows/dependency-review.yml),
+**[`ci.yml`](.github/workflows/ci.yml) holds the whole app graph**: `changes` and `verify` in parallel, `verify` running
+the checks `pnpm verify` chains as five `parallel:` steps after one install; then, on `main`, `deploy-production` →
+`smoke` → `release-web` → `docs-refresh`, with `rollback` when the smoke run fails, of which a `workflow_dispatch` runs
+the deploy, the smoke run and the rollback alone; or, on a PR, `deploy-development` → `comment` / `e2e`, with
+`cross-package-notice` beside them; and a final `check` job that aggregates the gated ones: `changes`, `verify`, both
+deploys, `e2e`, `smoke` and `release-web`. Both deploy jobs call the shared
+[`_deploy-web.yml`](.github/workflows/_deploy-web.yml). [`docs.yml`](.github/workflows/docs.yml) holds the docs graph:
+its own `changes`, then `build`, then `preview` on a PR or `deploy` → `smoke` → `release-docs` on `main`, with
+`rollback` when that smoke run fails, and its own aggregate, `Check (docs)`. The rest are
+[`cleanup-development.yml`](.github/workflows/cleanup-development.yml), a [`zizmor.yml`](.github/workflows/zizmor.yml)
+audit, [`dependency-review.yml`](.github/workflows/dependency-review.yml),
 [`commit-message.yml`](.github/workflows/commit-message.yml), which lints the pull request **title** (the commit a
-squash merge lands), and [`dependabot-auto-merge.yml`](.github/workflows/dependabot-auto-merge.yml), which merges
-the security updates GitHub raises; Renovate opens every other update. The published
-[workflows page](./apps/docs/src/content/docs/infra/workflows.mdx) describes each job, and the environments, secrets
-and rulesets behind them are settings, on the [environments](./apps/docs/src/content/docs/infra/environments.mdx) and
-[secrets](./apps/docs/src/content/docs/infra/secrets.mdx) pages.
+squash merge lands), and [`dependabot-auto-merge.yml`](.github/workflows/dependabot-auto-merge.yml), which merges the
+security updates GitHub raises; Renovate opens every other update. The published [workflows
+page](./apps/docs/src/content/docs/infra/workflows.mdx) is the CI/CD guide: each job, the `prepare-env` action, the
+rulesets and required checks, and what forks and Dependabot cannot reach. The environments and the secrets behind them
+are settings, on the [environments](./apps/docs/src/content/docs/infra/environments.mdx) and
+[secrets](./apps/docs/src/content/docs/infra/secrets.mdx) pages, the second with every secret and variable in one
+matrix.
 
-- **`Check` and `Check (docs)` are the contexts the ruleset requires**, each an aggregate under `always()` that fails
-  when a job it needs failed or was cancelled; a job that must gate a merge goes in its `needs`.
+- **`Check` and `Check (docs)` are the aggregates the ruleset requires**, beside `Lint the pull request title`,
+  `Dependency Review` and `zizmor`; each aggregate runs under `always()` and fails when a job it needs failed or was
+  cancelled, so a job that must gate a merge goes in its `needs`.
 - **`verify` runs on every push**, because the contract suite reads `GLOSSARY.md`, `docs/adr/` and every guide; `changes`
   gates only the deploys and the releases.
 - **`smoke` runs the `@smoke` cases in [`apps/web/e2e/smoke.spec.ts`](./apps/web/e2e/smoke.spec.ts) against

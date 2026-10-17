@@ -10,16 +10,16 @@ The app runs as a Cloudflare Worker built with OpenNext. The kinds of environmen
 | Environment | Worker | URL | Access |
 | --- | --- | --- | --- |
 | Production | `forever-pto` | `https://forever-pto.com` (zone route `forever-pto.com/*`) | Public |
-| Development (stable) | `forever-pto-development` | `https://forever-pto-development.fbuireu.workers.dev` | Cloudflare Access |
+| Development (stable) | `forever-pto-development` | `https://forever-pto-development.fbuireu.workers.dev` | Cloudflare Access; deployed by hand only |
 | Per-PR preview | `pr-<n>-forever-pto-development` | `https://pr-<n>-forever-pto-development.fbuireu.workers.dev` | Cloudflare Access |
 
 ## Production
 
-Deployed by the `deploy-production` job of `.github/workflows/ci.yml` on every push to `main`, gated on the `Verify` job passing and on the `changes` job finding an `apps/web` change (see [release](/infra/release/)). The Worker is bound to the `forever-pto.com` zone via a route pattern in `wrangler.toml`, a zone route, not a Workers custom domain. It uses the production R2 incremental-cache bucket, the rate-limiter binding and the Turso database (see [Cloudflare stack](/infra/cloudflare/)).
+Deployed by the `deploy-production` job of `.github/workflows/ci.yml` on every push to `main`, gated on the `Verify` job passing and on the `changes` job finding an `apps/web` change, and on a manual `workflow_dispatch` of the same workflow, which is the only way to redeploy it by hand (see [release](/infra/release/) and [workflows](/infra/workflows/)). The Worker is bound to the `forever-pto.com` zone via a route pattern in `wrangler.toml`, a zone route, not a Workers custom domain. It uses the production R2 incremental-cache bucket, the rate-limiter binding and the Turso database (see [Cloudflare stack](/infra/cloudflare/)).
 
 ## Development (stable)
 
-The `forever-pto-development` Worker is the long-lived development environment. It answers on its `workers.dev` origin, which `wrangler.toml` knows only as the `NEXT_PUBLIC_SITE_URL` var under `[env.development.vars]`; there is no route for it in the file. The whole environment sits behind Cloudflare Zero Trust Access, configured in the dashboard rather than in `wrangler.toml`, so a browser hitting it gets an Access login and CI authenticates with a service token (`CF_ACCESS_CLIENT_ID` / `CF_ACCESS_CLIENT_SECRET`, secrets on the `web-development` GitHub environment).
+The `forever-pto-development` Worker is the long-lived development environment, and **no workflow deploys it**: CI only ever deploys the `development` environment under a `pr-<n>` name. It is updated by hand, from `apps/web`, with `pnpm cf:build` then `pnpm exec wrangler deploy --env development`, which hands off to `opennextjs-cloudflare deploy --env development` like every deploy here, fills the shared development bucket and uploads no secrets, so the Worker keeps the ones it already has. It answers on its `workers.dev` origin, which `wrangler.toml` knows only as the `NEXT_PUBLIC_SITE_URL` var under `[env.development.vars]`; there is no route for it in the file. The whole environment sits behind Cloudflare Zero Trust Access, configured in the dashboard rather than in `wrangler.toml`, so a browser hitting it gets an Access login and CI authenticates with a service token (`CF_ACCESS_CLIENT_ID` / `CF_ACCESS_CLIENT_SECRET`, secrets on the `web-development` GitHub environment).
 
 ## Per-PR previews
 
@@ -38,7 +38,7 @@ The `deploy-development` job of `.github/workflows/ci.yml` fires on `pull_reques
 
 ### What survives
 
-Previews deploy with `--env development`, so they all **share** the development bindings: the dev R2 incremental-cache bucket, the rate-limiter binding and the dev Turso database (all declared under `[env.development]` in `wrangler.toml`). None of that state is cleaned up when a PR closes, and one preview's writes are visible to every other preview.
+Previews deploy with `--env development`, so they all **share** the development bindings: the dev R2 incremental-cache bucket, the rate-limiter binding and the dev Turso database (all declared under `[env.development]` in `wrangler.toml`). None of that state is cleaned up when a PR closes, and one preview's writes are visible to every other preview. Every preview deploy also writes its prerendered pages into that bucket under its own build id, before the Worker is uploaded ([the OpenNext hand-off](/infra/workflows/#what-the-deploy-call-does-the-opennext-hand-off)), and nothing deletes those folders, so the bucket grows by one build per deploy.
 
 ## Lifecycle
 
@@ -49,22 +49,26 @@ config:
   layout: dagre
 ---
 flowchart TD
-  subgraph pr [Pull request]
-    O[opened / synchronized] --> DD[ci.yml: deploy-development]
-    DD --> RW[_deploy-web.yml]
-    RW --> B[cf:build, OpenNext]
+  subgraph pr ["Pull request"]
+    O["opened, reopened or synchronized"] --> DD["ci.yml: deploy-development"]
+    DD --> RW["_deploy-web.yml"]
+    RW --> B["cf:build, OpenNext"]
     B --> W["wrangler deploy --env development<br/>--name pr-n-forever-pto-development<br/>--secrets-file"]
-    W --> C[sticky PR comment with the preview URL]
-    W --> E[e2e: Playwright through an Access service token]
+    W --> POP["opennextjs-cloudflare deploy:<br/>pages into the shared dev bucket"]
+    POP --> C["sticky PR comment with the preview URL"]
+    POP --> E["e2e: Playwright through an Access service token"]
   end
-  subgraph close [Pull request closed]
-    X[cleanup-development.yml, queued behind the CI run] --> DEL[wrangler delete --force]
-    DEL --> GONE[Worker and its secrets gone;<br/>shared dev R2 and Turso untouched]
+  subgraph close ["Pull request closed"]
+    X["cleanup-development.yml, queued behind the CI run"] --> DEL["wrangler delete --force"]
+    DEL --> GONE["Worker and its secrets gone,<br/>shared dev R2 and Turso untouched"]
   end
-  subgraph main [push to main]
-    P[changes + Verify] --> DP[deploy-production] --> RW2[_deploy-web.yml]
-    RW2 --> W2[wrangler deploy --env production] --> LIVE[forever-pto @ forever-pto.com/*]
+  subgraph main ["push to main, or workflow_dispatch"]
+    P["changes + Verify"] --> DP["deploy-production"] --> RW2["_deploy-web.yml"]
+    RW2 --> W2["wrangler deploy --env production"] --> POP2["pages into the production bucket"]
+    POP2 --> LIVE["forever-pto on forever-pto.com/*"]
+    LIVE --> SM["smoke, then release-web on a push,<br/>or rollback when it fails"]
   end
+  HAND["by hand, from apps/web:<br/>wrangler deploy --env development"] --> STABLE["forever-pto-development"]
 ```
 
 ## The docs site's previews

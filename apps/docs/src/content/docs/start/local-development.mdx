@@ -48,14 +48,15 @@ All scripts live in the root `package.json` (which is the source of truth if thi
 | `lint` / `lint:changed` / `lint:all` | Biome lint (base / changed with fixes / whole repo) |
 | `format:check` | Biome check with no writes, the read-only gate `verify` runs |
 | `typecheck` | The root program, then `apps/web`, then `astro check` over `apps/docs` |
+| `typecheck:root` | The root program alone, one of the three typecheck steps CI runs in parallel |
 | `test:ut` / `test:ut:coverage` | `apps/web`'s unit tests then the contract suite / with v8 coverage |
 | `test:ut:changed` | `apps/web`'s unit tests over what changed |
 | `test:docs` | The contract suite alone |
-| `verify` | `format:check` + `typecheck` + `test:ut:coverage`, the gate CI runs |
+| `verify` | `format:check` + `typecheck` + `test:ut:coverage` in sequence; CI's `Verify` job runs the same scripts as parallel steps |
 | `verify:changed` | `format:check` + `typecheck` + `test:ut:changed` + `test:docs`, what `pre-push` runs |
 | `test:e2e` / `test:e2e:ui` | Playwright end-to-end tests / UI mode |
 
-The docs package has its own scripts (`apps/docs/package.json`): `dev`, `build`, `preview`, `deploy`, `upload`, `typecheck`, `test:e2e`.
+The docs package has its own scripts (`apps/docs/package.json`): `dev`, `build`, `preview`, `deploy`, `upload`, `typecheck`, `test:e2e`. Its `deploy` and `upload` pass no `--env`, so they land on the production docs Worker without its route; CI deploys with `--env production`, see [docs CI](/infra/docs-ci/#production-deploy).
 
 :::note[Windows]
 `cf:build` (the OpenNext Cloudflare build) is known not to work on Windows. Use WSL, or rely on CI; deploys run on Linux runners anyway (see [environments](/infra/environments/)).
