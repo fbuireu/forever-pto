@@ -7,12 +7,14 @@ import { describe, expect, it, vi } from "vitest";
 const premiumState = { setEmail: vi.fn(), userEmail: null };
 const sendContactEmailAction = vi.fn();
 const track = vi.hoisted(() => vi.fn());
+const recoverFromStaleDeployment = vi.hoisted(() => vi.fn(() => false));
 
 vi.mock("@application/stores/premium", () => ({
 	usePremiumStore: (selector: (state: typeof premiumState) => unknown) => selector(premiumState),
 }));
 vi.mock("@infrastructure/clients/logging/better-stack/tracking", () => ({ track }));
 vi.mock("@infrastructure/actions/contact", () => ({ sendContactEmailAction }));
+vi.mock("@ui/adapters/navigation/staleDeployment", () => ({ recoverFromStaleDeployment }));
 vi.mock("@application/dto/contact/schema", async (importOriginal) => ({
 	...(await importOriginal<typeof import("@application/dto/contact/schema")>()),
 	SUBJECT_MIN_LENGTH: 6,
@@ -119,6 +121,18 @@ describe("ContactModal failure reporting", () => {
 		await submitMessage({ messages: messagesWithErrors });
 
 		await waitFor(() => expect(screen.getByText(enMessages.contact.failedToSend)).toBeTruthy());
+	});
+
+	it("reloads instead of reporting a failure when the action belongs to a previous deploy", async () => {
+		const stale = new Error("Server Action not found");
+		sendContactEmailAction.mockRejectedValue(stale);
+		recoverFromStaleDeployment.mockReturnValueOnce(true);
+
+		await submitMessage({ messages: messagesWithErrors });
+
+		await waitFor(() => expect(recoverFromStaleDeployment).toHaveBeenCalledWith(stale));
+		expect(screen.queryByText(stale.message)).toBeNull();
+		expect(screen.queryByText(enMessages.contact.errorTitle)).toBeNull();
 	});
 });
 

@@ -10,6 +10,7 @@ import {
 import { usePremiumStore } from "@application/stores/premium";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
+import { recoverFromStaleDeployment } from "@ui/adapters/navigation/staleDeployment";
 import {
 	Dialog,
 	DialogContent,
@@ -111,6 +112,7 @@ export const ContactModal = ({ open, onClose }: ContactModalProps) => {
 					setStep(Step.ERROR);
 				}
 			} catch (error) {
+				if (recoverFromStaleDeployment(error)) return;
 				setErrorMessage(error instanceof Error ? error.message : t("failedToSend"));
 				setStep(Step.ERROR);
 			}

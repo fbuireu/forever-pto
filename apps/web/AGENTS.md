@@ -187,7 +187,9 @@ beside the [`next.config.ts`](./next.config.ts) that rewrites it.
 - **Every build renames every Server Action, so a page from the previous deploy cannot call the current one.** The new
   Worker answers an old id with `NEXT_ACTION_NOT_FOUND` and the action never runs.
   [`recoverFromStaleDeployment`](./src/ui/adapters/navigation/staleDeployment.ts) wraps
-  `unstable_isUnrecognizedActionError` from `next/navigation` and reloads. The closure encryption key also rotates per
+  `unstable_isUnrecognizedActionError` from `next/navigation` and reloads, and every form that calls a Server Action
+  (Donate and the contact form) hands it the failure first, so the visitor gets a fresh page instead of the raw
+  error; a new form that calls one has to do the same. The closure encryption key also rotates per
   build unless `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` pins it: `_deploy-web.yml` passes that secret through optionally,
   and setting it on both `web-*` environments (the same `openssl rand -base64 32` value on both) closes the window,
   which reopens on every deploy for every page served before it.
