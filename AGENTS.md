@@ -91,7 +91,7 @@ pnpm verify:changed     # verify:static && test:ut:changed && test:docs; what pr
 reaches Cloudflare through [`_deploy-web.yml`](.github/workflows/_deploy-web.yml) alone: a push to `main`, or a
 `workflow_dispatch` of `ci.yml` to redeploy production by hand. With no script of that name, the `deploy` command left
 is the package manager's built-in one, which refuses to run on the workspace; the contract suite fails an app script
-that deploys or uploads. The docs package keeps its scripts; its guide says what they do.
+that deploys or uploads. The docs package has none either, for the same reason; its guide says how it deploys.
 
 Coverage has a floor on every metric, one `MIN_THRESHOLD` in [`apps/web/vitest.config.ts`](./apps/web/vitest.config.ts),
 the same shape and number the sibling repositories use; the root [`vitest.config.ts`](./vitest.config.ts) collects the

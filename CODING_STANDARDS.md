@@ -140,8 +140,8 @@ No rule below restates these, and a diff that breaks one fails CI:
     writes into `pnpm-workspace.yaml`, a `#` counting as a comment when removing it leaves the parsed document
     unchanged;
   - the package scripts: no shell substitution, a literal base on every changed-only Vitest or Playwright run, and no
-    script in the root or `apps/web` manifest that deploys or uploads the app, which reaches Cloudflare through
-    `_deploy-web.yml` alone;
+    script in the root, `apps/web` or `apps/docs` manifest that deploys or uploads a package, since each reaches
+    Cloudflare through its workflow alone, with an explicit `--env`;
   - every `.releaserc.json` the release configuration the sibling repositories share, with no key or plugin beyond
     what the repository's shape adds and laid out as Biome lays it out, its release commit
     `chore(<scope>): release ${nextRelease.version} [skip ci]` scoped to the package it releases, and every plugin

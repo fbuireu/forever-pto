@@ -4802,23 +4802,27 @@ describe("workflows and package scripts keep the rules CODING_STANDARDS.md hands
 		}).toEqual({ substituted: [], baseless: [] });
 	});
 
-	const APP_DEPLOY_COMMAND = /\b(?:wrangler|opennextjs-cloudflare)\s+(?:deploy|upload|versions\s+upload)\b/;
+	const PACKAGE_DEPLOY_COMMAND = /\b(?:wrangler|opennextjs-cloudflare)\s+(?:deploy|upload|versions\s+upload)\b/;
 
-	it("gives the app no script that deploys or uploads it, since one without --env ships wrangler.toml's top level onto production's Worker name without its route or its vars", () => {
-		const appScripts = [
-			{ manifest: "package.json", bodies: rootScripts },
-			{ manifest: `${WEB}/package.json`, bodies: webScripts },
-		].flatMap(({ manifest, bodies }) =>
+	it("gives neither package a script that deploys or uploads it, since one without --env ships wrangler.toml's top level onto production's Worker name without its route or its vars", () => {
+		const packageScripts = [
+			{ manifest: "package.json", pkg: null, bodies: rootScripts },
+			{ manifest: `${WEB}/package.json`, pkg: WEB, bodies: webScripts },
+			{ manifest: `${DOCS}/package.json`, pkg: DOCS, bodies: docsScripts },
+		].flatMap(({ manifest, pkg, bodies }) =>
 			Object.keys(bodies).map((name) => ({
 				script: `${manifest} ${name}`,
-				body: expandScript({ citation: { pkg: manifest === "package.json" ? null : WEB, script: name } }),
+				body: expandScript({ citation: { pkg, script: name } }),
 			})),
 		);
 
-		expect(APP_DEPLOY_COMMAND.test("pnpm run cf:build && opennextjs-cloudflare deploy")).toBe(true);
-		expect(APP_DEPLOY_COMMAND.test("astro build && wrangler versions upload")).toBe(true);
-		expect(appScripts.length).toBeGreaterThan(10);
-		expect(appScripts.filter(({ body }) => APP_DEPLOY_COMMAND.test(body)).map(({ script }) => script)).toEqual([]);
+		expect(PACKAGE_DEPLOY_COMMAND.test("pnpm run cf:build && opennextjs-cloudflare deploy")).toBe(true);
+		expect(PACKAGE_DEPLOY_COMMAND.test("astro build && wrangler versions upload")).toBe(true);
+		expect(PACKAGE_DEPLOY_COMMAND.test("astro build && wrangler deploy")).toBe(true);
+		expect(packageScripts.filter(({ script }) => script.startsWith(`${DOCS}/`)).length).toBeGreaterThan(3);
+		expect(packageScripts.filter(({ body }) => PACKAGE_DEPLOY_COMMAND.test(body)).map(({ script }) => script)).toEqual(
+			[],
+		);
 	});
 
 	const FORWARDED_FLAG = /\bpnpm\s+(?:(?:--filter|-F|--dir|-C)(?:\s+|=)\S+\s+)*(?:run\s+)?[a-z][\w:-]*\s+--\s+-/;
