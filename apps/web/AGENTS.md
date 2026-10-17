@@ -41,7 +41,7 @@ repository guide documents; use whichever fits where you are.
 pnpm dev                # next dev --turbopack
 pnpm build              # next build
 pnpm preview            # opennextjs-cloudflare build && preview (real Workers runtime)
-pnpm deploy             # cf:build && opennextjs-cloudflare deploy
+pnpm cf:build           # opennextjs-cloudflare build, the Workers build CI deploys
 pnpm cf:typegen         # regenerate cloudflare-env.d.ts from wrangler.toml (reference only)
 
 pnpm lint:all           # biome lint over this package
@@ -272,6 +272,15 @@ which shares that build path.
 
 **The Worker secrets ride the deploy** through `--secrets-file`, written under `$RUNNER_TEMP` and removed in an
 `if: always()` step. The upload is additive: a secret the file omits is not deleted.
+
+**This package has no `deploy` or `upload` script, so nothing here deploys the top-level config.**
+`opennextjs-cloudflare deploy` with no `--env` fills the top-level R2 bucket, which is production's, from the build on
+disk, then deploys the top level onto production's Worker name, `forever-pto`, with no route and without
+`[env.production.vars]`, so the live Worker loses `TURSO_DATABASE_URL` and `NEXTJS_ENV`. Production deploys through
+`ci.yml`: a push to `main`, or a `workflow_dispatch` to redeploy by hand. The stable `forever-pto-development` Worker,
+which no workflow deploys, is a hand-run `pnpm cf:build` then `pnpm exec wrangler deploy --env development` from this
+folder, which hands off to `opennextjs-cloudflare deploy --env development`; it uploads no secrets, so the Worker
+keeps the ones it has. The contract suite fails an app script that deploys or uploads.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

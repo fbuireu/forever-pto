@@ -94,8 +94,8 @@ pnpm dev
 
 ```bash
 pnpm dev              # Dev server (Turbopack)
-pnpm build            # Production build
-pnpm deploy           # Build + deploy to Cloudflare Workers
+pnpm build            # next build, the Next.js production build
+pnpm cf:build         # The Cloudflare Workers build through OpenNext, the one CI deploys
 pnpm preview          # Local Cloudflare Workers preview
 
 pnpm test:ut          # Unit tests
@@ -105,6 +105,11 @@ pnpm test:e2e         # E2E tests (Playwright)
 pnpm lint:all:fix     # Fix all lint issues
 pnpm format:all       # Format all files
 ```
+
+There is no deploy script. The app deploys from CI alone: a push to `main` builds, deploys, smoke-tests and
+releases it, and a manual run of the [CI workflow](https://github.com/fbuireu/forever-pto/actions/workflows/ci.yml)
+redeploys production. A local `opennextjs-cloudflare deploy` without `--env` would put a laptop build on the
+production Worker without its route or its environment variables; [`AGENTS.md`](AGENTS.md) says why.
 
 ---
 

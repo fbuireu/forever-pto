@@ -41,8 +41,7 @@ All scripts live in the root `package.json` (which is the source of truth if thi
 | `dev` | Next dev server with Turbopack |
 | `build` / `start` | Production Next.js build / serve it locally |
 | `preview` | OpenNext Cloudflare build + local workerd preview |
-| `cf:build` | OpenNext Cloudflare build only |
-| `deploy` / `upload` | Build and deploy to Cloudflare / upload a version without activating it |
+| `cf:build` | OpenNext Cloudflare build only, the build CI deploys; there is no app deploy script, see [workflows](/infra/workflows/) |
 | `cf:typegen` | Generate `cloudflare-env.d.ts` from the wrangler config |
 | `bones:build` / `bones:watch` | Generate skeleton components into `apps/web/src/ui/modules/bones` (boneyard-js, config in `boneyard.config.json`) |
 | `format` / `format:changed` / `format:all` | Biome check with fixes (base / VCS-changed files / whole repo) |

@@ -24,8 +24,6 @@
 		"start": "pnpm --filter forever-pto-web start",
 		"preview": "pnpm --filter forever-pto-web preview",
 		"cf:build": "pnpm --filter forever-pto-web cf:build",
-		"deploy": "pnpm --filter forever-pto-web deploy",
-		"upload": "pnpm --filter forever-pto-web upload",
 		"cf:typegen": "pnpm --filter forever-pto-web cf:typegen",
 		"bones:build": "pnpm --filter forever-pto-web bones:build",
 		"bones:watch": "pnpm --filter forever-pto-web bones:watch",

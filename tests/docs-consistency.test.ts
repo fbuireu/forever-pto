@@ -4769,6 +4769,25 @@ describe("workflows and package scripts keep the rules CODING_STANDARDS.md hands
 		}).toEqual({ substituted: [], baseless: [] });
 	});
 
+	const APP_DEPLOY_COMMAND = /\b(?:wrangler|opennextjs-cloudflare)\s+(?:deploy|upload|versions\s+upload)\b/;
+
+	it("gives the app no script that deploys or uploads it, since one without --env ships wrangler.toml's top level onto production's Worker name without its route or its vars", () => {
+		const appScripts = [
+			{ manifest: "package.json", bodies: rootScripts },
+			{ manifest: `${WEB}/package.json`, bodies: webScripts },
+		].flatMap(({ manifest, bodies }) =>
+			Object.keys(bodies).map((name) => ({
+				script: `${manifest} ${name}`,
+				body: expandScript({ citation: { pkg: manifest === "package.json" ? null : WEB, script: name } }),
+			})),
+		);
+
+		expect(APP_DEPLOY_COMMAND.test("pnpm run cf:build && opennextjs-cloudflare deploy")).toBe(true);
+		expect(APP_DEPLOY_COMMAND.test("astro build && wrangler versions upload")).toBe(true);
+		expect(appScripts.length).toBeGreaterThan(10);
+		expect(appScripts.filter(({ body }) => APP_DEPLOY_COMMAND.test(body)).map(({ script }) => script)).toEqual([]);
+	});
+
 	const FORWARDED_FLAG = /\bpnpm\s+(?:(?:--filter|-F|--dir|-C)(?:\s+|=)\S+\s+)*(?:run\s+)?[a-z][\w:-]*\s+--\s+-/;
 
 	it("passes Playwright flags through pnpm exec, never after pnpm run <script> --, since flags after the -- reach the script as file filters", () => {

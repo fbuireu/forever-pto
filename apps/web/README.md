@@ -36,6 +36,10 @@ pnpm preview          # the real Workers runtime, via OpenNext
 Or from this directory with `pnpm <script>` directly. Copy [`.env.example`](.env.example) to `.env.development` and fill
 it in; Worker secrets for a local run go in `.dev.vars`.
 
+There is no deploy script: the package deploys from CI alone, because a local deploy without a wrangler environment
+would land on the production Worker without its route or its variables. [`AGENTS.md`](./AGENTS.md) has the hand-run
+form for the stable development Worker.
+
 **Both runtimes are pinned exactly and must match:** Node in [`.nvmrc`](../../.nvmrc), mirrored in
 `engines.node`; pnpm, in the root `packageManager`. Next and `@opennextjs/cloudflare` move as a pair, and the
 docs package stays on an older TypeScript line than this one; see

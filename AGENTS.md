@@ -65,7 +65,7 @@ test scripts are root-owned because they span both packages.
 pnpm dev                # apps/web dev server
 pnpm build              # apps/web production build
 pnpm preview            # apps/web on the real Workers runtime
-pnpm deploy             # apps/web build + deploy to Cloudflare
+pnpm cf:build           # apps/web Workers build through OpenNext, the build CI deploys
 pnpm cf:typegen         # regenerate apps/web/cloudflare-env.d.ts (reference only)
 
 pnpm lint:all           # biome lint over both packages (:fix to autofix)
@@ -84,6 +84,14 @@ pnpm verify:changed     # verify:static && test:ut:changed && test:docs; what pr
 ```
 
 `pnpm --filter forever-pto-docs dev` runs the docs site; it has no root passthrough.
+
+**The app has no `deploy` or `upload` script, on purpose.** `opennextjs-cloudflare deploy` without `--env` deploys
+`wrangler.toml`'s top level, which carries production's Worker name and production's R2 bucket but no route and none of
+`[env.production.vars]`, so a laptop build would replace the live Worker with one missing `TURSO_DATABASE_URL`. The app
+reaches Cloudflare through [`_deploy-web.yml`](.github/workflows/_deploy-web.yml) alone: a push to `main`, or a
+`workflow_dispatch` of `ci.yml` to redeploy production by hand. With no script of that name, the `deploy` command left
+is the package manager's built-in one, which refuses to run on the workspace; the contract suite fails an app script
+that deploys or uploads. The docs package keeps its scripts; its guide says what they do.
 
 Coverage has a floor on every metric, one `MIN_THRESHOLD` in [`apps/web/vitest.config.ts`](./apps/web/vitest.config.ts),
 the same shape and number the sibling repositories use; the root [`vitest.config.ts`](./vitest.config.ts) collects the
@@ -292,8 +300,8 @@ one and where to link it from.
   every path on disk, because a stash cycle leaves deleted paths in the index. A workflow is read for its `run:` and
   its `command:` inputs, since `nick-fields/retry` takes its script on `command:`, and split on CRLF as well as LF,
   because a Windows checkout writes CRLF and a `$` anchor would miss the carriage return. A step that names a script
-  is expanded through the chain the script ends in (root `deploy` is `pnpm --filter forever-pto-web deploy`, which is
-  `pnpm run cf:build && opennextjs-cloudflare deploy`), and an unfiltered citation inside a package's own script
+  is expanded through the chain the script ends in (root `cf:build` is `pnpm --filter forever-pto-web cf:build`, which
+  is `opennextjs-cloudflare build`), and an unfiltered citation inside a package's own script
   resolves against that package. The deploy census carries a floor equal to the deploys the repository has, raised
   when one is added. A superseded ADR keeps describing the tree it decided on, so the citation rules skip it.
 - **The no-comment check parses instead of matching delimiters.** JavaScript's lexical grammar is not regular: a URL in
