@@ -22,6 +22,11 @@ Everything under `/api`, Next internals (`/_next`, `/_vercel`) and any path with
 ## The chain, in order
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart TD
   IN[Matched request] --> D1{pathname is /api/markdown?}
   D1 -- yes --> H1[Delete x-markdown-path, pass through]

@@ -10,6 +10,11 @@ import { StrategiesTable } from '../../../components/demos/HowItWorksDemo';
 Two layers cooperate here: an infrastructure service that **fetches** Holidays, and a pure domain engine (`apps/web/src/domain/calendar/`) that **computes** what to do with them. This page is about the first half, up to the moment a `HolidayDTO[]` reaches the store. The [planning algorithm](/how-it-works/planning-algorithm/) page takes over from there.
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart LR
   ST[holidays store<br/>fetchHolidays] -->|dynamic import| GH[getHolidays]
   GH --> OBS[observedHolidays]

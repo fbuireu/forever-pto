@@ -8,6 +8,11 @@ sidebar:
 All core components live in `apps/web/src/ui/modules/core/`, and the rules they follow are in [`CODING_STANDARDS.md`](https://github.com/fbuireu/forever-pto/blob/main/CODING_STANDARDS.md): `data-slot` attributes and CVA only for orthogonal variant axes (`U11`, `U12`), and named exports and no stores, translations or fetching inside a component, which Biome and the contract suite enforce. See [Philosophy](/design-system/foundations/philosophy/) for the visual language.
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart TB
   subgraph deps [Foundations]
     BASE[Base UI: behaviour and ARIA]

@@ -8,6 +8,11 @@ sidebar:
 The [layers](/architecture/layers/) page is organised by folder. This one is organised by **moment**: the same code, asked "when does this run, and on which machine?". Most confusion about the app comes from a value being read at a different time than it is written, so every row names both.
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart LR
   B[Build<br/>GitHub runner] --> D[Deploy<br/>GitHub runner → Cloudflare]
   D --> E[Edge, per request<br/>Cloudflare Worker]

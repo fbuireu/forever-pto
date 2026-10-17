@@ -15,6 +15,11 @@ Each package releases itself. [semantic-release](https://semantic-release.gitboo
 ## The flow
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart TD
   PUSH[push to main] --> CI[ci.yml] & DOCS[docs.yml] & ZZ[zizmor.yml]
   subgraph ci [ci.yml]

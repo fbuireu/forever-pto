@@ -8,6 +8,11 @@ sidebar:
 The [overview](/architecture/overview/) measures the dependency graph; this page walks each node of it. Every layer carries an `AGENTS.md` at its root with its map and gotchas, and the rules a review holds it to are in [`CODING_STANDARDS.md`](https://github.com/fbuireu/forever-pto/blob/main/CODING_STANDARDS.md); this page is the tour, and it links the rules rather than restating them where they are long.
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart TB
   subgraph edge [Runs at the edge]
     APP["app/<br/>routes, layouts, handlers"]

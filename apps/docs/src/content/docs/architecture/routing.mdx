@@ -35,6 +35,11 @@ src/app/
 How a request reaches one of those files:
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart TD
   REQ[Request] --> M{"Matches the proxy?<br/>not /api, /_next, /_vercel, no dot"}
   M -- no --> API["/api/* route handlers<br/>and /.well-known/*"]

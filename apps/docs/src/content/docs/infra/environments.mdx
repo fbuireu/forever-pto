@@ -43,6 +43,11 @@ Previews deploy with `--env development`, so they all **share** the development 
 ## Lifecycle
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart TD
   subgraph pr [Pull request]
     O[opened / synchronized] --> DD[ci.yml: deploy-development]

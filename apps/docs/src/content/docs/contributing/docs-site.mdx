@@ -8,6 +8,11 @@ sidebar:
 This site is the `apps/docs` package: an [Astro Starlight](https://starlight.astro.build) build served as static assets from a Cloudflare Worker. What makes it more than a wiki is that the design-system pages render the app's **own** components, imported straight from `apps/web/src/ui`, styled by the app's own stylesheets, and typed against the app's own props. A renamed export or prop in the app breaks this site's typecheck, and a moved module fails the contract suite, before either can drift. This page is how that works.
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart LR
   subgraph web ["apps/web"]
     UI["src/ui/modules/core/*<br/>Button, Dialog, Tabs …"]
@@ -86,6 +91,20 @@ Two more directives close the loop. `@source` points Tailwind at `apps/web/src/u
 ## Diagrams
 
 Every diagram on this site is a ```mermaid fence in the page's source, **drawn at build time**. Starlight runs on Sätteri, Astro's default Markdown processor, which takes mdast plugins rather than remark ones, so `src/lib/mermaid-plugin.ts` replaces each fence with two `<figure>` elements, one per theme, and `src/lib/mermaid-render.ts` draws them in a single headless Chromium held open for the whole build, with the site's body face, Space Grotesk, loaded so labels are measured against the real glyphs and the palette read out of the app's own token sheet. Results are memoised by content, so a diagram repeated across locales is drawn once.
+
+Every diagram is drawn hand-drawn on the dagre layout. The renderer's config sets both, and every fence repeats them in a frontmatter block, because GitHub draws the same source without this site's config and because a fence's own frontmatter outranks the config:
+
+````md
+```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
+flowchart LR
+  A[changes] --> B[Verify]
+```
+````
 
 What that buys: no Mermaid in the browser bundle, no flash of source text before a draw, a diagram for a reader without JavaScript, and a fence Mermaid cannot parse failing the build with the page named rather than shipping a red frame. The only script a diagram carries is a click-to-enlarge toggle, and which copy shows is decided in CSS from `data-theme`.
 

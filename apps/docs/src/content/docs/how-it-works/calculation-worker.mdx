@@ -14,6 +14,11 @@ This is a Web Worker in the browser, not a Cloudflare Worker. Nothing in that fo
 One request, one reply, correlated by a `requestId`:
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 sequenceDiagram
   autonumber
   participant CL as CalendarList
@@ -52,6 +57,11 @@ The handler is wrapped end to end in `try`/`catch`, so the main thread gets exac
 ## The lifecycle
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 stateDiagram-v2
   [*] --> NoWorker
   NoWorker --> Running: triggerCalculation spawns the worker

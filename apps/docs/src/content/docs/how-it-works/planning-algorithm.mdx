@@ -11,6 +11,11 @@ import { PTO_CONSTANTS, StrategyRanking, TunablesTable } from '../../../componen
 The engine lives in `apps/web/src/domain/calendar/` and is pure: same inputs, same output, no I/O, no clock beyond "today". `runPlanningPipeline` in `apps/web/src/domain/calendar/pipeline.ts` is the one entry point, and every stage below is a function it calls in order. The numbers in this page are interpolated from `PTO_CONSTANTS` in `apps/web/src/domain/calendar/const.ts`, so they are the values the engine runs on.
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart TD
   IN[RunPlanningPipelineParams<br/>window · budget · Holidays · Manual and Removed Days · Strategy · locale]
   CLR[Clear the date-key and Holiday caches]
@@ -51,6 +56,11 @@ The Holiday lookups go through `createHolidaySet` and `getKey` in `apps/web/src/
 A **Bridge** is the unit the engine reasons about: a short run of consecutive Workdays that, once spent, joins the Free Days on either side into one continuous stretch. `findBridges` generates every candidate and ranks them.
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart LR
   subgraph gen [For every Workday]
     S1[Try the day alone]
@@ -84,6 +94,11 @@ The candidates and the Workdays are computed **once** per run, by `findPlanningC
 Take a Monday Holiday on the 25th. The Friday before is a Workday whose next day, Saturday, is free, so it passes adjacency. Expanding backwards from the Friday stops immediately (Thursday is a Workday); expanding forwards absorbs Saturday, Sunday and the Monday Holiday and stops at the Tuesday. The Bridge spans Friday to Monday: four Effective Days for one PTO Day, Efficiency 4.
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 gantt
   dateFormat YYYY-MM-DD
   axisFormat %a %d
@@ -122,6 +137,11 @@ An unknown Strategy string cannot reach this table: `worker.ts` narrows the inbo
 `selectBridges` builds the plan one Bridge at a time. At every step it re-measures each remaining candidate against the days the plan already covers, and takes the best under the objective:
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart TD
   STEP[Next step] --> SPENT{Budget left?}
   SPENT -- no --> DONE[Stop]

@@ -12,6 +12,11 @@ The planner is a browser application with a thin server in front of it. This pag
 There are three places code runs, and they never share memory:
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart TB
   subgraph cf [Cloudflare Worker, at the edge]
     P[Proxy: apps/web/src/middleware.ts]
@@ -52,6 +57,11 @@ flowchart TB
 ## The first request
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 sequenceDiagram
   autonumber
   participant B as Browser
@@ -77,6 +87,11 @@ sequenceDiagram
 Everything after that is one loop, closed inside the browser. `CalendarList` (`apps/web/src/ui/modules/pages/planner/CalendarList.tsx`) owns it: one effect refetches Holidays when the Country, Region, year, Carry-over Months or locale change, and another triggers a calculation when any planning input changes or the store bumps its `planRevision`.
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 sequenceDiagram
   autonumber
   participant SB as Sidebar

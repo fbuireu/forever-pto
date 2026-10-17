@@ -9,6 +9,11 @@ import { APP_LOCALES } from '../../../components/demos/HowItWorksDemo';
 
 The app is localized with `next-intl`. The supported locales are defined once in `apps/web/src/infrastructure/i18n/locales.ts` and imported below directly from that file, so this list cannot drift: <span>{APP_LOCALES.map((locale) => <span key={locale}><code>{locale}</code>{' '}</span>)}</span> ({APP_LOCALES.length} locales).
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart TD
   REQ[Request path] --> PFX{Locale prefix in the URL?}
   PFX -- yes --> USE[Use it]
@@ -59,6 +64,11 @@ Everything imports these from `@application/i18n/navigation`, so hrefs stay loca
 ## The life of a key
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart LR
   EN["en.json, the reference bundle<br/>49 namespaces, ~1,300 leaf keys"] -->|"typeof messages"| T["AppConfig.Messages in environment.d.ts"]
   T -->|"typed t()"| CC["'use client' components<br/>useTranslations(namespace)"]

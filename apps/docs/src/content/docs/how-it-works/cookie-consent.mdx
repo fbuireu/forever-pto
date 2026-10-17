@@ -27,6 +27,11 @@ These categories are registered with the library:
 ## Consent flow
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 stateDiagram-v2
   [*] --> NoDecision: first visit, no cc_cookie
   NoDecision --> Banner: CookieConsent renders the custom banner

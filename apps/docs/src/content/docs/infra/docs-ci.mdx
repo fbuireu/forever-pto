@@ -10,6 +10,11 @@ This page is self-documenting: it describes the pipeline that published it. The 
 ## The workflow
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart LR
   CH[changes: DOCS_PATHS] --> B[build: astro check · astro build · Playwright]
   B -->|pull_request| PV["preview: deploy --env development --name pr-n-…"]

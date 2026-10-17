@@ -7,6 +7,11 @@ sidebar:
 
 All client state lives in Zustand stores under `apps/web/src/application/stores/`. Most of them persist; each is created as `create()(devtools(persist(...)))` with a versioned storage name. The `ui` store is devtools-only. The folder's map and gotchas are in `apps/web/src/application/stores/AGENTS.md`, and the rules a store follows (`A8` to `A10`, `A12`, `A16` to `A18`) in [`CODING_STANDARDS.md`](https://github.com/fbuireu/forever-pto/blob/main/CODING_STANDARDS.md).
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart LR
   subgraph stores [Zustand stores]
     F[filters]

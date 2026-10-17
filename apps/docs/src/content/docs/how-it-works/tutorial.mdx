@@ -7,6 +7,11 @@ sidebar:
 
 The planner ships a guided tour built on `driver.js`. It never auto-starts: it runs **on demand**, when the user clicks the "quick tour" link in the planner subtitle (`apps/web/src/ui/modules/pages/planner/SiteSubtitle.tsx`).
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 sequenceDiagram
   participant U as User
   participant H as useTutorial

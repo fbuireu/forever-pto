@@ -66,7 +66,8 @@ this package's version is cut as `docs-vX.Y.Z` with its own `CHANGELOG.md`, and 
   page sits under its locale's folder with the English filename (`es/` holds the ones translated so far), and anything
   untranslated falls back to English automatically.
 - Diagrams are ```mermaid fences, drawn at build time in the app's palette, once per theme; a fence Mermaid cannot
-  parse fails the build.
+  parse fails the build. Each one opens with a frontmatter block setting `look: handDrawn` and `layout: dagre`
+  under `config:`, which [How this wiki is built](https://docs.forever-pto.com/contributing/docs-site/) shows.
 - How a page is written (prose that names a file, the component page sections, typed tables) is the *Docs site*
   section of [`CODING_STANDARDS.md`](../../CODING_STANDARDS.md).
 - [`tests/docs-consistency.test.ts`](../../tests/docs-consistency.test.ts) checks that every source file these pages cite in backticks still

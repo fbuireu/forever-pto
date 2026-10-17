@@ -13,6 +13,11 @@ Users can take their plan with them as a printable **PDF** or an **ICS** file th
 
 The download buttons, and only the buttons, are wrapped in `PremiumFeature` (`apps/web/src/ui/modules/premium/PremiumFeature.tsx`), so free users see the tool blurred with a lock and get the Premium modal on interaction. See [premium](/how-it-works/premium/).
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart LR
   ST[(holidays + filters stores)] --> SEL[Holidays in the window, and the placed PTO Days<br/>usePlacedPlan]
   SEL --> T{Format}

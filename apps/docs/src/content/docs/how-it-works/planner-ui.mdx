@@ -8,6 +8,11 @@ sidebar:
 The planner is one route, `apps/web/src/app/[locale]/(app)/planner/page.tsx`, whose layout adds the sidebar and whose body stacks seven `dynamic()`-imported sections. Nothing on the screen computes a plan: every section reads the [holidays store](/how-it-works/state-stores/) and one of them, `CalendarList`, is the only thing that asks for a recalculation.
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart TB
   subgraph layout [planner/layout.tsx]
     SB[AppSidebar<br/>inputs and tools]
@@ -60,6 +65,11 @@ Each step carries a `data-tutorial` anchor from `TUTORIAL_ANCHOR`, which is what
 `CalendarList` (`apps/web/src/ui/modules/pages/planner/CalendarList.tsx`) owns four effects (prune, fetch, calculate, clear), and their order is the product's behaviour:
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 sequenceDiagram
   participant F as filters store
   participant CL as CalendarList

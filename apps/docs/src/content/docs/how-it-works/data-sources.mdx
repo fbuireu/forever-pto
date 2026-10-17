@@ -11,6 +11,11 @@ import { APP_LOCALES } from '../../../components/demos/HowItWorksDemo';
 The planner needs surprisingly little data, and most of it never crosses the network to a third party: the Holiday calendars ship with the app as a chunk the browser loads when it first needs one, and the Country list arrives with the server-rendered page. This page lists every source, what reads it, how it is cached and what happens when it fails.
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart TB
   subgraph bundle [Shipped with the app]
     DH[date-holidays<br/>Holiday calendars per Country and Region]

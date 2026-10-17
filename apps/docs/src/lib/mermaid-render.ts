@@ -52,6 +52,7 @@ const configuration = (tokens: Tokens, dark: boolean): MermaidConfig => ({
 	startOnLoad: false,
 	securityLevel: "strict",
 	theme: "base",
+	look: "handDrawn",
 	layout: "dagre",
 	fontFamily: `${FONT_FAMILY}, system-ui, sans-serif`,
 	flowchart: { curve: "basis", padding: 12, htmlLabels: false },

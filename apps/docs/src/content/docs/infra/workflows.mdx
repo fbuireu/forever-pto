@@ -23,6 +23,11 @@ All workflows live in `.github/workflows/`. Repo-wide conventions: every action 
 Runs on pushes to `main` and PRs targeting `main`. `cancel-in-progress` is conditional on `pull_request`: cancelling a superseded PR run is free, cancelling a `main` run would kill a deploy or a release halfway.
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart LR
   CH[changes] --> DP & DD
   V[Verify] --> DP & DD

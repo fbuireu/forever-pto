@@ -7,6 +7,11 @@ sidebar:
 
 Forever PTO has no accounts and no subscriptions. Premium is **donation-based**: donate once through Stripe and the app treats you as premium. The central trick: **the premium key *is* the Stripe PaymentIntent id**. There is no separate license table: Stripe (plus a payments table in Turso) is the source of truth.
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 sequenceDiagram
   autonumber
   participant U as Browser

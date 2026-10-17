@@ -29,6 +29,11 @@ See [cookies](/reference/cookies/) for the full cookie inventory.
 ## The strategies, in order
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart TD
   S[detectCountry] --> H{cf-ipcountry header present?}
   H -->|yes| A["1. detectCountryFromHeaders<br/>XX (unknown) and T1 (Tor) read as empty"]

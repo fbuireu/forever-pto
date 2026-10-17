@@ -7,6 +7,11 @@ sidebar:
 
 Telemetry converges on **Better Stack**, fed from several surfaces: the Cloudflare platform, the server runtime, the browser, plus Google Analytics for product metrics. Nothing in the app opens a connection to it. The server side writes to `console` and Cloudflare exports; the browser side is a tag.
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart LR
   subgraph worker [Cloudflare Worker]
     H[Handler invocation]
@@ -32,6 +37,11 @@ flowchart LR
 ## One request, end to end
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 sequenceDiagram
   autonumber
   participant B as Browser

@@ -15,6 +15,11 @@ Email is deliberately minimal. There is exactly **one** email in the system toda
 ## The contact pipeline
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 sequenceDiagram
   participant U as Contact form
   participant R as /api/contact

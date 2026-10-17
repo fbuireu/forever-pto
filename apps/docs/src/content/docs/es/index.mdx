@@ -25,6 +25,11 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 Lo importante ocurre en el navegador: el edge solo detecta un Country y sirve HTML prerenderizado, y el plan nunca sale del dispositivo.
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart TB
   subgraph edge [Cloudflare Worker]
     PX[Proxy: cookies de locale y Country]

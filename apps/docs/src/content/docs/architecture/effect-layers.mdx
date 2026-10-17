@@ -49,6 +49,11 @@ export const ApplicationLayer = Layer.mergeAll(
 
 Route handlers and server actions provide it exactly once, at the edge of the program: `Effect.runPromise(program.pipe(Effect.provide(ApplicationLayer)))`.
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart LR
   subgraph tags [Context.Tag, the interface]
     T1[TursoService]

@@ -8,6 +8,11 @@ sidebar:
 There is no password to hash here, and no plan to encrypt: the planner keeps everything on the device and the server only ever sees a Donation, a session check and a contact message. What follows is every place the app does apply a primitive, what each one actually protects, and the two places where the honest answer is "nothing, and here is why".
 
 ```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
 flowchart TB
   subgraph browser [Browser]
     PLAN["The plan, filters, Custom Holidays"] -->|"XOR with NEXT_PUBLIC_STORAGE_KEY, base64"| LS[(localStorage)]
