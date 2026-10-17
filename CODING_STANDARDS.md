@@ -168,9 +168,13 @@ No rule below restates these, and a diff that breaks one fails CI:
   - the docs site: every component page's sections in order after its demos and the Live badge on it, every sidebar
     group translated into each locale the site serves, the app's styles brought in through `global.css` and never
     the app's own `index.css`, the consent category and service ids equal to the app's, the consent banner in each
-    locale the site serves with the app's words for the answers the two share, and every Mermaid diagram
-    held to the `layout: dagre` it was drawn with, which the renderer sets for the whole site and no fence
-    overrides, so a renderer that defaults to ELK cannot redraw it.
+    locale the site serves with the app's words for the answers the two share, and the renderer's own config set
+    to `look: "handDrawn"` and `layout: "dagre"`;
+  - every Mermaid diagram in a hand-written Markdown or MDX document opening with frontmatter that declares
+    `look: handDrawn` and `layout: dagre`, so neither GitHub nor a renderer that changes a default can redraw it;
+  - the CI/CD guide, the infra pages of the docs site, naming every workflow, the composite action and every secret
+    and variable a workflow or the action reads, `GITHUB_TOKEN` aside, and describing the verify checks as the
+    parallel steps `ci.yml` runs.
 
 ## Every change
 

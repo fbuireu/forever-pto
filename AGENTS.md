@@ -185,6 +185,10 @@ matrix.
 - **`Check` and `Check (docs)` are the aggregates the ruleset requires**, beside `Lint the pull request title`,
   `Dependency Review` and `zizmor`; each aggregate runs under `always()` and fails when a job it needs failed or was
   cancelled, so a job that must gate a merge goes in its `needs`.
+- **The CI/CD guide is held to the workflows.** The contract suite fails when a workflow file, the `prepare-env`
+  action, or a secret or variable one of them reads (`GITHUB_TOKEN` aside) goes unnamed on the infra pages of the
+  docs site, so a new secret arrives with its row in the
+  [secrets matrix](./apps/docs/src/content/docs/infra/secrets.mdx).
 - **`verify` runs on every push**, because the contract suite reads `GLOSSARY.md`, `docs/adr/` and every guide; `changes`
   gates only the deploys and the releases.
 - **`smoke` runs the `@smoke` cases in [`apps/web/e2e/smoke.spec.ts`](./apps/web/e2e/smoke.spec.ts) against

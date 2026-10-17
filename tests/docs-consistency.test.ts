@@ -4545,43 +4545,76 @@ describe("the docs site keeps the rules CODING_STANDARDS.md hands to this suite"
 	});
 
 	const MERMAID_RENDERER = `${DOCS}/src/lib/mermaid-render.ts`;
-	const MERMAID_FENCE = /```mermaid\n([\s\S]*?)```/g;
-	const MERMAID_FRONTMATTER = /^---\n([\s\S]*?)\n---\n/;
-	const MERMAID_DIRECTIVE = /%%\{([\s\S]*?)\}%%/g;
-	const LAYOUT_SETTING = /\b(?:layout|defaultRenderer)["']?\s*:\s*["']?([\w-]+)/g;
-	const ELK_DIAGRAM = /^\s*flowchart-elk\b/m;
+	const RENDERER_DIAGRAM_SETTINGS = ["look", "layout"];
 
-	const fenceLayouts = (fence: string): string[] => [
-		...[
-			MERMAID_FRONTMATTER.exec(fence)?.[1] ?? "",
-			...[...fence.matchAll(MERMAID_DIRECTIVE)].map(([, body = ""]) => body),
-		].flatMap((settings) => [...settings.matchAll(LAYOUT_SETTING)].map(([, layout = ""]) => layout)),
-		...(ELK_DIAGRAM.test(fence) ? ["elk"] : []),
-	];
-
-	it("holds every Mermaid diagram to the layout: dagre it was drawn with, which the renderer sets and no fence overrides", () => {
-		const rendererLayouts: string[] = [];
+	it("draws with the hand-drawn look on the dagre layout in the renderer's own config, the defaults every fence also declares", () => {
+		const settings: string[][] = [];
 		const collect = (node: ts.Node) => {
-			if (ts.isPropertyAssignment(node) && propertyKey(node.name) === "layout")
-				rendererLayouts.push(node.initializer.getText());
+			if (ts.isPropertyAssignment(node) && RENDERER_DIAGRAM_SETTINGS.includes(propertyKey(node.name)))
+				settings.push([propertyKey(node.name), node.initializer.getText()]);
 			ts.forEachChild(node, collect);
 		};
 		collect(parse(MERMAID_RENDERER));
-		const fences = [...markdownFiles, ...contentFiles].flatMap((file) =>
-			[...read(file).matchAll(MERMAID_FENCE)].map(([, fence = ""]) => ({ file, fence })),
-		);
-		const redrawn = fences.flatMap(({ file, fence }) =>
-			fenceLayouts(fence)
-				.filter((layout) => layout !== "dagre")
-				.map((layout) => `${file}: ${layout}`),
-		);
 
-		expect(fenceLayouts("---\nconfig:\n  layout: elk\n---\nflowchart LR\n  A --> B\n")).toEqual(["elk"]);
-		expect(fenceLayouts('%%{init: {"flowchart": {"defaultRenderer": "elk"}}}%%\nflowchart LR\n')).toEqual(["elk"]);
-		expect(fenceLayouts("flowchart-elk TD\n  subgraph layout [x]\n  end\n")).toEqual(["elk"]);
-		expect(rendererLayouts).toEqual(['"dagre"']);
-		expect(fences.length).toBeGreaterThan(20);
-		expect(redrawn).toEqual([]);
+		expect(settings).toEqual([
+			["look", '"handDrawn"'],
+			["layout", '"dagre"'],
+		]);
+	});
+});
+
+describe("the CI/CD guide names every workflow, action, secret and variable, and every diagram is hand-drawn on dagre", () => {
+	const CI_CD_GUIDES = ["workflows", "secrets", "environments", "release", "docs-ci"].map(
+		(page) => `${DOCS}/src/content/docs/infra/${page}.mdx`,
+	);
+	const MARKDOWN_DOCS = [...new Set([...authoredMarkdown, ...githubMarkdown, ...contentFiles])].filter(
+		(path) => !path.endsWith("CHANGELOG.md"),
+	);
+	const WORKFLOW_FILES = readdirSync(join(ROOT, ".github/workflows")).filter((name) => /\.ya?ml$/.test(name));
+	const ACTION_NAMES = existsSync(join(ROOT, ".github/actions")) ? readdirSync(join(ROOT, ".github/actions")) : [];
+	const AUTOMATION_FILES = [
+		...WORKFLOW_FILES.map((name) => `.github/workflows/${name}`),
+		...ACTION_NAMES.map((name) => `.github/actions/${name}/action.yml`),
+	];
+	const SECRET_OR_VARIABLE = /\$\{\{[^}]*?\b(?:secrets|vars)\.([A-Za-z0-9_]+)/g;
+	const IMPLICIT_SECRETS = new Set(["GITHUB_TOKEN"]);
+	const MERMAID_FENCE = /^([ \t]*)```mermaid[^\n]*\n([\s\S]*?)^\1```/gm;
+	const FRONTMATTER = /^---\n([\s\S]*?)\n---\n/;
+	const guide = (): string => CI_CD_GUIDES.map(read).join("\n");
+
+	it("names every workflow file and composite action in the CI/CD guide", () => {
+		const text = guide();
+		expect(WORKFLOW_FILES.length).toBeGreaterThan(0);
+		expect([...WORKFLOW_FILES, ...ACTION_NAMES].filter((name) => !text.includes(name))).toEqual([]);
+	});
+
+	it("names every secret and variable a workflow or action reads in the CI/CD guide", () => {
+		const text = guide();
+		const used = new Set(
+			AUTOMATION_FILES.flatMap((path) => [...read(path).matchAll(SECRET_OR_VARIABLE)].map(([, name]) => name)),
+		);
+		expect(used.size).toBeGreaterThan(0);
+		expect([...used].filter((name) => !IMPLICIT_SECRETS.has(name) && !text.includes(`\`${name}\``))).toEqual([]);
+	});
+
+	it("describes the verify checks as the parallel steps ci.yml runs", () => {
+		expect(read(".github/workflows/ci.yml")).toMatch(/^\s*- parallel:/m);
+		expect(guide()).toMatch(/\bparallel\b/i);
+	});
+
+	it("draws every Mermaid diagram hand-drawn on the dagre layout", () => {
+		const diagrams = MARKDOWN_DOCS.flatMap((path) =>
+			[...read(path).matchAll(MERMAID_FENCE)].map(([, indent, body]) => ({
+				path,
+				front: FRONTMATTER.exec(body.replaceAll(new RegExp(`^${indent}`, "gm"), ""))?.[1] ?? "",
+			})),
+		);
+		expect(diagrams.length).toBeGreaterThan(0);
+		expect(
+			diagrams
+				.filter(({ front }) => !/^\s*look:\s*handDrawn\s*$/m.test(front) || !/^\s*layout:\s*dagre\s*$/m.test(front))
+				.map(({ path }) => path),
+		).toEqual([]);
 	});
 });
 
