@@ -61,7 +61,7 @@ const DEPLOY_TOOL_COMMAND = /\b(?:wrangler|opennextjs-cloudflare) deploy\b/;
 const SECRET_TOOL_COMMAND = /\bwrangler secret\b/;
 const WRANGLER_ACTION_DEPLOY = /\bcommand:[ \t]*deploy\b/;
 const SHARED_DEPLOY_MESSAGE = /^\$\{\{ github\.sha \}\}-\$\{\{ github\.event_name \}\}$/;
-const DEPLOY_MESSAGE_ARGUMENT = /--message[ =]("?)((?:\$\{\{[^}]*\}\}|[^\s"])+)\1/;
+const DEPLOY_MESSAGE_ARGUMENT = /--message[ =]("?)((?:\$\{\{[^}]*\}\}|\$(?!\{\{)|[^\s"$])+)\1/;
 const SHELL_VARIABLE = /^\$\{?(\w+)\}?$/;
 const ALIAS_WILDCARD_SUFFIX = /\/\*$/;
 const WORKSPACE_PACKAGES_BLOCK = /^packages:\r?\n((?:[ \t]+-.*\r?\n?)+)/m;
@@ -1633,9 +1633,9 @@ const cssComments = (source: string): Comment[] =>
 	);
 
 const ASTRO_FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---/;
-const ASTRO_SCRIPT = /<script\b[^>]*>([\s\S]*?)<\/script>/g;
-const ASTRO_STYLE = /<style\b[^>]*>([\s\S]*?)<\/style>/g;
-const MARKUP_COMMENT = /<!--[\s\S]*?-->|\{\s*\/\*[\s\S]*?\*\/\s*\}/g;
+const ASTRO_SCRIPT = /<script\b[^>]*>([\s\S]*?)<\/script[^>]*>/gi;
+const ASTRO_STYLE = /<style\b[^>]*>([\s\S]*?)<\/style[^>]*>/gi;
+const MARKUP_COMMENT = /<!--[\s\S]*?--!?>|\{\s*\/\*[\s\S]*?\*\/\s*\}/g;
 
 interface EmbeddedCommentsParams {
 	source: string;
@@ -4937,7 +4937,7 @@ describe("the end-to-end browsers", () => {
 			compactCode(PLAYWRIGHT_PROJECTS),
 		);
 		expect(
-			sample(PLAYWRIGHT_PROJECTS.replace("]", `\t{ name: "firefox", use: { ...devices["Desktop Firefox"] } },\n]`)),
+			sample(PLAYWRIGHT_PROJECTS.replace(/\]$/, `\t{ name: "firefox", use: { ...devices["Desktop Firefox"] } },\n]`)),
 		).not.toBe(compactCode(PLAYWRIGHT_PROJECTS));
 		expect(configs).toEqual([`${DOCS}/playwright.config.ts`, `${WEB}/playwright.config.ts`]);
 		expect(
@@ -5305,6 +5305,14 @@ describe("the guides describe the project as it is configured", () => {
 				.filter(({ message }) => !SHARED_DEPLOY_MESSAGE.test(message))
 				.map(({ at, message }) => `${at} (${message})`),
 		).toEqual([]);
+	});
+
+	it("reads a --message argument in linear time, so an unclosed quote around a run of expressions cannot stall the suite", () => {
+		expect(DEPLOY_MESSAGE_ARGUMENT.exec(`--message "${`\${{{{}}}}`.repeat(40)}`)).toBeNull();
+		expect(DEPLOY_MESSAGE_ARGUMENT.exec(`--message "\${{ github.sha }}-\${{ github.event_name }}"`)?.[2]).toBe(
+			`\${{ github.sha }}-\${{ github.event_name }}`,
+		);
+		expect(DEPLOY_MESSAGE_ARGUMENT.exec("--message $DEPLOY_MESSAGE")?.[2]).toBe("$DEPLOY_MESSAGE");
 	});
 
 	it("runs any wrangler secret write without a retry wrapper, whether or not one still exists", () => {
