@@ -1,12 +1,13 @@
 import { logClientError } from "@application/shared/utils/clientLog";
-import { createJSONStorage } from "zustand/middleware";
+import { createJSONStorage, type PersistStorage, type StateStorage } from "zustand/middleware";
+import { onRehydrateFailure } from "./rehydration";
 import { deobfuscate, obfuscate } from "./utils/crypto";
 
 const SECRET_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY;
 const isDev = process.env.NODE_ENV === "development";
 const isClient = globalThis.window !== undefined;
 
-export const obfuscatedStorage = createJSONStorage(() => {
+const textStorage = (): StateStorage => {
 	if (!isClient) {
 		return {
 			getItem: () => null,
@@ -64,4 +65,18 @@ export const obfuscatedStorage = createJSONStorage(() => {
 			}
 		},
 	};
-});
+};
+
+const jsonStorage = createJSONStorage(textStorage);
+
+export const obfuscatedStorage: PersistStorage<unknown> | undefined = jsonStorage && {
+	...jsonStorage,
+	getItem: (name) => {
+		try {
+			return jsonStorage.getItem(name);
+		} catch (error) {
+			onRehydrateFailure({ storeName: name, error, state: undefined });
+			return null;
+		}
+	},
+};

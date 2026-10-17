@@ -18,7 +18,7 @@ The rest of the application layer contract is in [`../AGENTS.md`](../AGENTS.md).
 | [`location.ts`](./location.ts) | `useLocationStore`: the Country and Region option lists |
 | [`premium.ts`](./premium.ts) | `usePremiumStore`: the Premium session and the Premium-required modal |
 | [`ui.ts`](./ui.ts) | `useUIStore`: the donate popover and the homepage quick start. `openDonatePopover` and `openQuickStart` each take the trigger that opened them and report it (`donate_opened`, `quick_start_opened`), the way `showPremiumModal` reports its feature; the one store without `persist` |
-| [`crypto.ts`](./crypto.ts) | `obfuscatedStorage`, the zustand `PersistStorage` the persisted stores share. Not a store |
+| [`crypto.ts`](./crypto.ts) | `obfuscatedStorage`, the zustand `PersistStorage` the persisted stores share, which discards a stored value it cannot read. Not a store |
 | [`rehydration.ts`](./rehydration.ts) | `onRehydrateFailure`, the one thing every persisted store does when a stored blob will not come back. Not a store |
 | [`storedPlan.ts`](./storedPlan.ts) | `HOLIDAYS_STORAGE_NAME`, the holidays store's key, and `hasStoredPlan`, which reads whether that blob exists without rehydrating anything (the quick start's resume label, through `useHasStoredPlan`). Not a store |
 | [`utils/crypto.ts`](./utils/crypto.ts) | `obfuscate` / `deobfuscate` / `base64Encode` / `base64Decode`, plus `TWENTY_FOUR_HOURS` and `BASE64_PATTERN`. Not a store |
@@ -77,6 +77,16 @@ The branches, chosen once at module load:
   not break, so devtools show readable JSON locally and obfuscated blobs in production.
 - **Otherwise**: obfuscated. A failed decode logs and returns `null`, which zustand treats as "nothing
   stored"; the store keeps its initial state rather than crashing.
+
+**A stored value that will not parse is discarded by the storage, in every branch, so the store still
+hydrates.** zustand's `createJSONStorage` parses inside `getItem`, and a parse that throws sends `persist` down a
+path that calls `onRehydrateStorage` with `(undefined, error)` and never marks the store hydrated, which would
+keep `useStoresReady` waiting and the planner on its skeletons until a reload. `obfuscatedStorage` wraps that
+`getItem`: a throw is handed to `onRehydrateFailure`, which logs it and removes the key, and the read answers
+`null`, so the store hydrates on its initial state the same page view. The case that reaches it in production is
+a blob written under a previous `NEXT_PUBLIC_STORAGE_KEY`, which decodes without an error into text that is not
+JSON. A store's own `onRehydrateStorage` still meets a failure that happens after the read, a `migrate` or a
+reviver that throws, and zustand leaves that store unhydrated.
 
 **A write whose value has not changed is skipped, in both storing branches.** zustand's `persist` saves the
 whole partialized slice on every `set`, including the ones that touch only unpersisted fields
@@ -171,13 +181,16 @@ this side's: reading the store and deciding what "nothing to plan" writes to sta
 logs `Error rehydrating <storage key>` (the key rather than a prose label, because the key is what a person
 debugging goes looking for) with `{ storeName, hasState }` context, and removes the key through
 `globalThis.localStorage?.removeItem`, whose guard exists because the callback also runs where `localStorage`
-is absent.
+is absent. `obfuscatedStorage` calls it too, for a value it cannot parse, before the store's callback could see
+an error. zustand calls `onRehydrateStorage` with a state and no error when hydration completes and with an
+error and no state when it fails, never both, so a test drives the listener with one pairing or the other.
 
 - `holidays` and `filters` check the error and return before anything else, so a failed rehydration never
   clamps or revives partial state it is about to throw away; a `filters.test.ts` case sets out-of-range
   values and asserts they are left alone.
-- `premium` deliberately does **not** return: it re-reads `error` further down to raise
-  `needsSessionCheck`. It is the only one that falls through.
+- `premium` returns on the error as well. What raises `needsSessionCheck` after an unreadable blob is the
+  hydration on defaults the storage leaves behind: no `lastVerified`, so the next Premium gate asks
+  `/api/check-session` and the cookie restores Premium.
 - `location` has the error branch and nothing else.
 
 **The store-side error logs go through `logClientError`.** `logClient` is for anything that is *not* an
@@ -475,6 +488,11 @@ real `localStorage`; `vi.mock` on `@infrastructure/logging/logger` stubs the `lo
 `beforeEach` resets with `useXStore.setState(useXStore.getInitialState())`, so no test inherits another's
 `holidaysKey` or `planRevision` and a field the store gains is reset with no test naming it. Tests then drive actions through
 `getState()` and assert on `getState()`.
+
+**[`hydration.test.ts`](./hydration.test.ts) is the one suite that keeps the real storage.** It writes an
+unreadable blob into `localStorage`, imports each persisted store fresh with `vi.resetModules()`, and asserts the
+store reports hydrated, the key is gone and the failure is logged; one case writes a premium blob under one storage
+key and reads it under another, the production shape of the failure.
 
 **A logging assertion has to wait for the dynamic import.** The `vi.mock` still intercepts it, but the spy
 has not been called when the action returns, so the assertion is `await vi.waitFor(() => expect(spy).toHaveBeenCalledWith(…))`.

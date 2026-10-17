@@ -1,4 +1,4 @@
-import { logClient, logClientError } from "@application/shared/utils/clientLog";
+import { logClientError } from "@application/shared/utils/clientLog";
 import { emailDomain } from "@application/shared/utils/redact";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
 import { claimActivationProof, getExistingSession, verifyPremiumEmail } from "@ui/adapters/session/checkSession";
@@ -211,21 +211,10 @@ export const usePremiumStore = create<PremiumStore>()(
 				onRehydrateStorage: () => (state, error) => {
 					if (error) {
 						onRehydrateFailure({ storeName: STORAGE_NAME, error, state });
-					}
-
-					if (!state) {
-						logClient((logger) =>
-							logger.warn({
-								message: "No state to rehydrate in premium store",
-								context: {
-									storeName: STORAGE_NAME,
-								},
-							}),
-						);
 						return;
 					}
 
-					if (error || !state.lastVerified || Date.now() - state.lastVerified > TWENTY_FOUR_HOURS) {
+					if (state && (!state.lastVerified || Date.now() - state.lastVerified > TWENTY_FOUR_HOURS)) {
 						state.needsSessionCheck = true;
 					}
 				},

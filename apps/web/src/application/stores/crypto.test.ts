@@ -80,6 +80,20 @@ describe("dev mode", () => {
 		expect(storage.getItem("test-key")).toBeNull();
 	});
 
+	it("discards a stored value that is not JSON, so the store hydrates on its defaults instead of never hydrating", async () => {
+		mockLocalStorage.getItem.mockReturnValueOnce("{not json");
+
+		expect(storage.getItem("test-key")).toBeNull();
+		expect(mockLocalStorage.removeItem).toHaveBeenCalledWith("test-key");
+		await vi.waitFor(() =>
+			expect(mockLogError).toHaveBeenCalledWith({
+				message: "Error rehydrating test-key",
+				error: expect.any(SyntaxError),
+				context: { storeName: "test-key", hasState: false },
+			}),
+		);
+	});
+
 	it("setItem writes JSON-stringified value to localStorage", () => {
 		storage.setItem("test-key", STATE_VALUE as never);
 		expect(mockLocalStorage.setItem).toHaveBeenCalledWith("test-key", JSON_STATE);
@@ -168,6 +182,21 @@ describe("prod mode with SECRET_KEY", () => {
 				context: {
 					key: "test-key",
 				},
+			}),
+		);
+	});
+
+	it("discards a value that decodes into text that is not JSON, as one written under a previous key does", async () => {
+		mockLocalStorage.getItem.mockReturnValueOnce("obf::written-under-another-key");
+		mockDeobfuscate.mockReturnValueOnce("\u0007garbage");
+
+		expect(storage.getItem("test-key")).toBeNull();
+		expect(mockLocalStorage.removeItem).toHaveBeenCalledWith("test-key");
+		await vi.waitFor(() =>
+			expect(mockLogError).toHaveBeenCalledWith({
+				message: "Error rehydrating test-key",
+				error: expect.any(SyntaxError),
+				context: { storeName: "test-key", hasState: false },
 			}),
 		);
 	});

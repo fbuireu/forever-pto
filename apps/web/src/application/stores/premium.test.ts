@@ -466,37 +466,8 @@ describe("onRehydrateStorage", () => {
 		expect(state?.needsSessionCheck).toBe(false);
 	});
 
-	it("flags a session check when rehydration failed, so the cookie can restore access", () => {
-		const state = runRehydrate({
-			state: { lastVerified: Date.now(), needsSessionCheck: false },
-			error: new Error("deobfuscate failed"),
-		});
-		expect(state?.needsSessionCheck).toBe(true);
-	});
-
-	it("does not throw when there is no state to rehydrate", () => {
-		expect(() => runRehydrate({ state: undefined })).not.toThrow();
-	});
-
-	it("warns when there is no state, without blocking the listener on the logging client", async () => {
-		runRehydrate({ state: undefined });
-
-		expect(mockWarn).not.toHaveBeenCalled();
-		await vi.waitFor(() =>
-			expect(mockWarn).toHaveBeenCalledWith({
-				message: "No state to rehydrate in premium store",
-				context: {
-					storeName: "premium-store",
-				},
-			}),
-		);
-	});
-
-	it("logs a rehydration failure", async () => {
-		runRehydrate({
-			state: { lastVerified: Date.now(), needsSessionCheck: false },
-			error: new Error("deobfuscate failed"),
-		});
+	it("returns after logging a failed rehydration, which zustand reports with no state beside the error", async () => {
+		expect(() => runRehydrate({ state: undefined, error: new Error("migrate failed") })).not.toThrow();
 
 		expect(mockLogError).not.toHaveBeenCalled();
 		await vi.waitFor(() =>
@@ -505,7 +476,7 @@ describe("onRehydrateStorage", () => {
 				error: expect.any(Error),
 				context: {
 					storeName: "premium-store",
-					hasState: true,
+					hasState: false,
 				},
 			}),
 		);
