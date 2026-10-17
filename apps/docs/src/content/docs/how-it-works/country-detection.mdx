@@ -73,3 +73,5 @@ The only strategy that genuinely reflects the end user is **strategy 1**, the `c
 ## Failure behavior
 
 Nothing in this chain ever throws to the user. CDN and IP failures are swallowed (`Effect.catchAll` / `Effect.orElse`) and only the CDN path logs; see [observability](/how-it-works/observability/). If every strategy returns `''`, no cookie is set and the planner falls back to manual country selection backed by the [location store](/how-it-works/state-stores/).
+
+**The wait is bounded, and it only exists where the header is missing.** Each network call carries its own five-second timeout, and the egress lookup makes two in sequence, so without `cf-ipcountry` a request can wait on the trace, then on `api.ipify.org`, then on `ipinfo.io`: fifteen seconds at worst before the page is sent. In production the header is always there and the step costs nothing. A visitor with no detected Country sees the planner with the Country field empty, nothing planned until they pick one, and the lookup runs again on their next navigation, since no cookie was set.

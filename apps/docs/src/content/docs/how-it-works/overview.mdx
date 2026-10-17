@@ -47,7 +47,7 @@ flowchart TB
   R <--> TURSO
   R --> RESEND
   P --> CFAPI
-  UI -->|fetch, Donation and session only| R
+  UI -->|"Server Actions and fetch: Donation, session, contact"| R
 ```
 
 - **The Worker** serves prerendered HTML, runs the [proxy](/architecture/proxy/) on every page request and hosts the API routes. It never sees a plan.
@@ -79,12 +79,12 @@ sequenceDiagram
 ```
 
 1. The [proxy](/architecture/proxy/) runs its chain: Markdown negotiation for agents, the payment-confirmation guard, locale resolution and, last, [country detection](/how-it-works/country-detection/). The result is two cookies and a prerendered page.
-2. The browser rehydrates the five [stores](/how-it-works/state-stores/) from `localStorage`. Every persisted store revives its dates from ISO strings and wipes its own key when the blob is corrupt.
+2. The browser rehydrates the persisted [stores](/how-it-works/state-stores/) from `localStorage`: `filters`, `holidays` and `premium` carry data, `location` persists an empty object and `ui` nothing. Every persisted store revives its dates from ISO strings and wipes its own key when it cannot parse the blob ([rehydration](/how-it-works/state-stores/#rehydration-on-every-page-load)).
 3. `StoresInitializer` (`apps/web/src/ui/modules/stores/StoresInitializer.tsx`) reads the `user-country` cookie and seeds the filters store's Country, only when the user has never chosen one.
 
 ## The planning loop
 
-Everything after that is one loop, closed inside the browser. `CalendarList` (`apps/web/src/ui/modules/pages/planner/CalendarList.tsx`) owns it: one effect refetches Holidays when the Country, Region, year, Carry-over Months or locale change, and another triggers a calculation when any planning input changes or the store bumps its `planRevision`.
+Everything after that is one loop, closed inside the browser: when the visitor changes a date, a Country, the budget or any other planner input, the store changes and the planner asks a Web Worker for the new plan, so the main thread never freezes while it is computed. [Planner recalculation](/how-it-works/calculation-worker/) tells that story step by step. `CalendarList` (`apps/web/src/ui/modules/pages/planner/CalendarList.tsx`) owns it: one effect refetches Holidays when the Country, Region, year, Carry-over Months or locale change, and another triggers a calculation when any planning input changes or the store bumps its `planRevision`.
 
 ```mermaid
 ---
@@ -117,7 +117,7 @@ sequenceDiagram
 ```
 
 - **Holidays** come from the `date-holidays` package, looked up for the chosen year and the next, once for the Country and once for the Region, then filtered to non-working types and shaped into `HolidayDTO`. The [holidays engine](/how-it-works/holidays-engine/) page has the rules; [data sources](/how-it-works/data-sources/) has the provenance.
-- **The worker** is spawned on the first calculation and reused for every one after it, because a warm worker answers several times faster than a cold one. Nothing cancels a run: a request made while one is in flight is held, a later one replaces it, and only the latest reply reaches the store. The [calculation worker](/how-it-works/calculation-worker/) page covers the protocol.
+- **The worker** is spawned on the first calculation and reused for every one after it, because a warm worker answers several times faster than a cold one. Nothing cancels a run: a request made while one is in flight is held, a later one replaces it, and only the latest reply reaches the store. [Planner recalculation](/how-it-works/calculation-worker/) follows one change from the visitor's click to the repainted plan: what triggers it, how a request is held or replaced, what the visitor sees meanwhile and when it fails, and why it is a worker at all.
 - **The engine** is `runPlanningPipeline` in `apps/web/src/domain/calendar/pipeline.ts`: clear the caches, expand the Planning Window into months, fold Manual Days in as pseudo-Holidays, measure the Remaining Budget, find Workdays and Bridges, select under the Strategy, build Alternatives, measure everything. The [planning algorithm](/how-it-works/planning-algorithm/) page walks each stage.
 - **The result** lands in the holidays store, and every planner component reads it back from there: the calendar paints Suggested, Manual and Alternative days, the panel shows the budget and the Alternative switcher, the Summary renders the Metrics. The [planner UI](/how-it-works/planner-ui/) page maps the screen.
 
@@ -129,9 +129,11 @@ sequenceDiagram
 | Store → `localStorage` | Filters, Holidays, the Suggestion, Alternatives, Manual and Removed Days, all dates as ISO strings, [obfuscated](/how-it-works/data-protection/) with a build-time key | The year (it resets on every visit), loading flags |
 | Main thread → worker | `CalculateSuggestionsRequest`: window, budget, serialised Holidays, Strategy, locale, Manual and Removed Days as ISO strings | `Date` objects, store references |
 | Worker → main thread | `WorkerResponse`: a measured Suggestion and its Alternatives, or a stringified error, echoing the `requestId` | Anything for a stale `requestId` (the hook drops it) |
-| Browser → API | A Donation intent, a session check, a contact message | The plan |
+| Browser → server | A Donation intent and a contact message through Server Actions, a session check and an activation through `/api/check-session` | The plan |
 
 The one-way arrows are the design. A plan is never uploaded, so the server cannot lose it, leak it or need an account to attach it to; the cost is that a plan lives in one browser unless the user exports it, which is what the [ICS and PDF exports](/how-it-works/exports/) are for.
+
+**Offline, the loop keeps going as far as its code has arrived.** There is no service worker. Once the page, the Holiday lookup and the worker chunk have loaded, a change still re-plans with no network, because nothing in the loop calls one. A chunk that has not loaded yet fails instead, as [planner recalculation](/how-it-works/calculation-worker/#when-it-fails-or-never-loads) and the [holidays engine](/how-it-works/holidays-engine/#failure) describe, and the Donation, the contact form and the session check fail the way their pages say, each reporting its own error rather than a blank page.
 
 ## Server-side flows
 
@@ -139,9 +141,9 @@ The API routes exist for the parts a browser cannot do alone, and each has its o
 
 | Flow | Entry | Page |
 | --- | --- | --- |
-| Donation and Premium activation | `POST /api/payment`, `GET /api/payment/activate`, `POST /api/webhooks/stripe` | [Premium](/how-it-works/premium/) |
+| Donation and Premium activation | The `createPaymentAction` Server Action (`POST /api/payment` for outside callers), `POST /api/check-session` after an in-page card confirmation, `GET /api/payment/activate` after an issuer redirect, `POST /api/webhooks/stripe` | [Premium](/how-it-works/premium/) |
 | Premium session | `GET`/`POST /api/check-session` | [Premium](/how-it-works/premium/#the-session-premium-token-cookie) |
-| Contact form | `POST /api/contact` | [Emails](/how-it-works/emails/) |
+| Contact form | The `sendContactEmailAction` Server Action (`POST /api/contact` for outside callers) | [Emails](/how-it-works/emails/) |
 | Agent-facing renditions | `Accept: text/markdown`, `/.well-known/*` | [Markdown API](/how-it-works/markdown-api/), [WebMCP](/how-it-works/webmcp/) |
 | Abuse control on the payment routes | The `PAYMENT_RATE_LIMITER` binding | [Rate limiting](/how-it-works/rate-limiting/) |
 | Telemetry: invocation logs, spans, the app's own log lines, the browser tag | The platform export named in `wrangler.toml`; nothing in the app opens a connection | [Observability](/how-it-works/observability/) |

@@ -30,6 +30,42 @@ flowchart LR
   MERGE --> ST
 ```
 
+## When the Holidays load
+
+The Holidays are looked up again whenever the Country, the Region, the year, the Carry-over Months or the language change, and on every page load once a Country is known: the stored list is shown at once, but the store does not persist the key it was fetched for, so the planner waits for a fresh lookup before it plans.
+
+```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
+sequenceDiagram
+  autonumber
+  participant SI as StoresInitializer
+  participant FS as filters store
+  participant CL as CalendarList
+  participant HS as holidays store
+  participant GH as getHolidays
+  SI->>FS: setCountry from the user-country cookie, only when none is stored
+  FS-->>CL: Country, Region, year, Carry-over Months, with the page's locale
+  CL->>HS: fetchHolidays, which takes the next sequence number
+  HS->>GH: dynamic import, the first time a visit needs it
+  GH->>GH: the two-year lookup for Country and Region, cached for the last filters
+  GH-->>HS: HolidayDTO[], or [] after logging an error
+  alt a newer fetchHolidays started meanwhile
+    HS->>HS: drop this answer
+  else this is the latest call
+    HS->>HS: keep the Custom Holidays, drop fetched ones on their dates, sort
+    HS-->>CL: holidays and the holidaysKey of these filters
+    CL->>CL: plan, now that holidaysKey matches the screen
+  end
+```
+
+- **Latest call wins.** Each call takes a number from a module-level counter and gives its answer up if a newer call started while it awaited, so a slow lookup for the previous year cannot overwrite the current one.
+- **What the visitor sees meanwhile**: the calendar keeps painting the previous Holidays, and the plan does not move, until the new list lands; then the calendar repaints the Holidays and the [planner recalculates](/how-it-works/calculation-worker/) once. Changing the Country also clears the Region, and the Region field offers the new Country's Regions, or disables when it has none.
+- **No Country, no lookup.** Until the cookie or the visitor supplies one, nothing is fetched and nothing is planned; the calendar shows the months with their weekends and the panel its skeleton.
+
 ## Fetching
 
 `getHolidays` in `apps/web/src/infrastructure/services/holidays/getHolidays.ts` is the whole public API: `getHolidays({ year, country, carryOverMonths, region, locale })` returns a `Promise<HolidayDTO[]>`. Without a `country` it answers `[]` at once, which is the normal first call rather than an error: the planner renders before a Country has been detected or chosen.
@@ -72,10 +108,15 @@ User-created Holidays never pass through the fetch. The store builds them with `
 
 ## Failure
 
-Errors resolve to an empty array and a log entry, in the service and again in the store, which then keeps only the Custom Holidays. The planner degrades to a calendar with weekends and the user's own Holidays rather than crashing, and the Region field disables when the Country has no Regions to offer.
+Errors resolve to an empty array and a log entry, in the service and again in the store, which then keeps only the Custom Holidays and still records the `holidaysKey`, so the planner is not left waiting. The same happens when the lookup cannot even load, because the visitor went offline before the `date-holidays` chunk arrived or a deploy replaced the chunk the page was built against: the dynamic `import()` rejects inside the store's own `try`. What the visitor sees follows from what is left:
+
+- **Custom Holidays survive**, so the calendar shows weekends and the visitor's own Holidays, and the planner plans around them.
+- **Nothing survives**, because the visitor has no Custom Holiday: the planner has no Holiday to plan against, so it clears the plan on screen, announces *No plan to show yet* and hides the panel, and plans again once a later lookup succeeds; on a first visit, with no plan to clear, the panel stays on its skeleton.
+
+The Region field disables when the Country has no Regions to offer.
 
 ## From here to the engine
 
-The store hands the merged list to the [calculation worker](/how-it-works/calculation-worker/) as `SerializedHolidayDTO[]`, dates as ISO strings, and the worker deserialises them for `runPlanningPipeline`. What the engine does with them, Bridge by Bridge, is the [planning algorithm](/how-it-works/planning-algorithm/) page; the Strategies it can apply are:
+The store hands the merged list to the [calculation worker](/how-it-works/calculation-worker/) whenever the planner recalculates as `SerializedHolidayDTO[]`, dates as ISO strings, and the worker deserialises them for `runPlanningPipeline`. What the engine does with them, Bridge by Bridge, is the [planning algorithm](/how-it-works/planning-algorithm/) page; the Strategies it can apply are:
 
 <StrategiesTable />

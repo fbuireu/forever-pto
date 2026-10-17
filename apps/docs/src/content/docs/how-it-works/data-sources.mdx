@@ -108,7 +108,7 @@ The server touches data only for a Donation, a Premium session and the contact f
 
 | Service | What it holds | Read by | Written by |
 | --- | --- | --- | --- |
-| **Stripe** | The PaymentIntent, which **is** the Premium key; promotion codes | Activation, session recovery, promo validation | `POST /api/payment` |
+| **Stripe** | The PaymentIntent, which **is** the Premium key; promotion codes | Activation, session recovery, promo validation | The `createPaymentAction` Server Action, or `POST /api/payment` |
 | **Turso** (libSQL over HTTP) | A payments table mirroring succeeded intents by email; contact submissions | `activateWithEmail` on a new device | Deferred `after()` writes, with the Stripe webhook as the fallback that converges the table if the deferred write died |
 | **Resend** | Nothing stored; transactional email | Nothing | The contact form ([emails](/how-it-works/emails/)) |
 | **`PAYMENT_RATE_LIMITER`** | A sliding counter per client IP, ten requests per minute, inside Cloudflare's rate-limiting binding | Every payment route before it does anything else | The binding itself |

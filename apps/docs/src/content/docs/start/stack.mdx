@@ -14,13 +14,13 @@ Exact versions are pinned in `package.json` (the repo uses exact pins, via `save
 | Next.js (App Router) | Framework | Server Components, prerendered per locale through `generateStaticParams`; Cache Components are deliberately off, see [caching](/architecture/caching/) |
 | React | UI runtime | Required by Next; concurrent features (`use`, transitions) are used throughout |
 | TypeScript | Language | `strict: true`; typed boundaries between layers are load-bearing (see the drift-guard pattern in the docs demos) |
-| Tailwind CSS | Styling | v4 CSS-first config, with no `tailwind.config` file; theme lives in CSS under `apps/web/src/ui/styles/` |
+| Tailwind CSS | Styling | CSS-first config, with no `tailwind.config` file; theme lives in CSS under `apps/web/src/ui/styles/` |
 | Base UI | Headless primitives | Accessible behavior (tooltips, popovers, dialogs) without imposed styling, so the neo-brutalist skin stays in our CSS |
 | Motion | Animation | `LazyMotion` keeps the animation runtime out of the initial bundle; see the design-system animation pages |
 | Zustand | Client state | Small store-per-concern model (`filters`, `holidays`, `location`, `premium`, `ui`) with persistence, accessed via `useShallow` selectors |
 | Effect | Server flows | Typed, composable error handling for the payment/premium pipeline: the services are declared in `apps/web/src/infrastructure/` and composed by the use cases in `apps/web/src/application/use-cases/`, with no try/catch pyramids |
 | next-intl | i18n | Locale routing plus namespaced messages for the locales in `apps/web/src/ui/i18n/messages/` |
-| boneyard-js | Loading skeletons | Generates skeleton components from real rendered output into `apps/web/src/ui/modules/bones` instead of hand-maintaining them (patched; see [repo structure](/start/repo-structure/)) |
+| boneyard-js | Loading skeletons | Generates skeleton components from real rendered output into `apps/web/src/ui/modules/bones` instead of hand-maintaining them |
 | driver.js | Onboarding | Lightweight product-tour overlay with no framework coupling |
 
 ## Services
@@ -38,7 +38,7 @@ Exact versions are pinned in `package.json` (the repo uses exact pins, via `save
 | --- | --- | --- |
 | Biome | Lint + format | One fast tool instead of ESLint + Prettier; single config at the repo root covers app and docs |
 | Vitest | Unit tests | Vite-native, first-class TS paths support, happy-dom environment |
-| Playwright | E2E tests | Runs against real preview deployments in CI, cross-browser locally |
+| Playwright | E2E tests | Chromium and WebKit, against each pull request's preview in CI, against production after each deploy for the `@smoke` cases, and against `next dev` locally |
 | semantic-release | Releases | Versions, changelog and GitHub releases derived from conventional commits; see [conventions](/contributing/conventions/) |
 
 More detail on those in [tooling](/contributing/tooling/) and [testing](/contributing/testing/).

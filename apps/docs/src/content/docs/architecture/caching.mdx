@@ -7,6 +7,36 @@ sidebar:
 
 Caching happens at separate levels: an R2-backed incremental cache at the OpenNext/Workers level, and plain `Cache-Control` headers for the hashed build assets and the agent-facing markdown surface. Next's Cache Components are deliberately not another.
 
+## What answers a request, and from where
+
+```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
+flowchart TD
+  REQ["a request to forever-pto.com"] --> SA{"a file in .open-next/assets?"}
+  SA -- "yes" --> STATIC["Workers Static Assets, before the Worker runs:<br/>_next/static immutable for a year, fonts/stripe for a week,<br/>.well-known/security.txt"]
+  SA -- "no" --> W["the Worker, .open-next/worker.js"]
+  W --> MW{"does the proxy matcher admit it?"}
+  MW -- "a page path, or /api/markdown" --> PX["proxy: Markdown rewrite, payment guard, locale, Country cookie"]
+  MW -- "/api/*, /_next/*, a dotted path" --> RH
+  PX --> PAGE{"which route"}
+  PAGE -- "a page under a locale" --> SSG["prerendered at build,<br/>served from the R2 incremental cache"]
+  PAGE -- "payment/confirmation, an unknown path, sitemap.xml" --> DYN["rendered on this request"]
+  PAGE -- "Accept: text/markdown" --> MD["the Markdown twin: an hour when found, no-store on a miss"]
+  RH["route handlers and the .well-known catch-all"] --> HDR["check-session, payment, contact: no-store<br/>the activation redirect: no-store<br/>.well-known documents: a day"]
+  SSG & DYN --> HTML["HTML with the security headers"]
+  HTML --> ISL["client islands through dynamic():<br/>the calendar, the management bar, the Summary,<br/>the sidebar fields, Donate, the premium modal"]
+  ISL --> WRK["the calculation Web Worker chunk, on the first plan"]
+```
+
+- **The static layer answers first.** A path that matches a file OpenNext copied into `.open-next/assets` never reaches the Worker, which is why `apps/web/public/_headers` is the only place that can give those files a cache policy, and why `/.well-known/security.txt` is served from the file even though a `.well-known` route exists.
+- **Every page is prerendered, bar three.** The `[locale]` pages are built once per deploy and read back from R2 on each request; the payment confirmation, the catch-all that answers an unknown path with its 404, and `sitemap.xml` render on the request. A path no locale claims and the proxy does not admit reaches `global-not-found.tsx`, prerendered once in English ([error pages](/architecture/error-pages/)).
+- **The planner's interactive parts are client islands**, loaded through `dynamic()` after the HTML, so the first paint is the prerendered shell with skeletons, and the planner fills in as the islands and the stores arrive ([what runs where](/architecture/when-and-where/)).
+- **The R2 entries are written at deploy time**, before the Worker is uploaded, under the build's own id, so the version being served always finds its own pages and a rollback finds the previous version's ([the OpenNext hand-off](/infra/workflows/#what-the-deploy-call-does-the-opennext-hand-off)).
+
 ## Cache Components are off
 
 `next.config.ts` sets `cacheComponents: false`, and no file carries a `'use cache'` directive. The flag stays off because it hangs requests on the Workers runtime: with it on, and `cacheLife('days')` sites in `getCurrentYear`, `getPublicEnv` and the `Testimonials` section, production logs Next's *cannot guarantee that Cache Components will run as expected due to the current runtime's implementation of `setTimeout()`* warning followed by the runtime cancelling the request as hung, and the same thing reproduces locally on workerd. With it off every route answers in under a second with no errors. The evidence, the alternative that did not build and the cost are in [ADR 0015](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0015-cache-components-stay-off-on-the-workers-runtime.md).
@@ -26,7 +56,7 @@ export default defineCloudflareConfig({
 });
 ```
 
-At runtime this is backed by the R2 bucket bound as `NEXT_INC_CACHE_R2_BUCKET` in `wrangler.toml`, with separate buckets per environment (see [environments](/infra/environments/)). Everything Next.js would put in its incremental cache (prerendered pages, fetch cache) is persisted there, so cache entries survive Worker isolate recycling and are shared across the fleet.
+At runtime this is backed by the R2 bucket bound as `NEXT_INC_CACHE_R2_BUCKET` in `wrangler.toml`, with separate buckets per environment (see [environments](/infra/environments/)). Everything Next.js would put in its incremental cache (prerendered pages, fetch cache) is persisted there, so cache entries survive Worker isolate recycling and are shared across the fleet. The prerendered pages are not written by the Worker: `opennextjs-cloudflare deploy` writes them during the deploy, under `incremental-cache/<build id>/`, and fails the deploy when it cannot.
 
 Next keys each entry by the route that owns it (`/route-cache/<kind>/<hash of the app entry>/$/<path>`), and OpenNext seeds the bucket from the build's prerendered pages under the key it computes, so the two have to agree. When they do not, every prerendered page misses, and because the root layout sets `dynamicParams = false`, Next answers that miss with its 404, on every page. That is why Next and the adapter move as a pair ([ADR 0009](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md)), and why the preview's `e2e` run is where a mismatch shows: `next start` reads Next's own file-system cache and cannot.
 

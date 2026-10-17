@@ -46,14 +46,14 @@ sequenceDiagram
   autonumber
   participant B as Browser
   participant W as Worker runtime
-  participant R as Route handler + operation
+  participant R as Server Action or route handler + operation
   participant UC as Use case
   participant X as Stripe / Turso / Resend
   participant CF as Cloudflare observability
   participant BS as Better Stack
-  B->>W: POST /api/payment
+  B->>W: POST, the createPaymentAction Server Action
   W->>W: open the invocation span, head-sample the request
-  W->>R: run the handler
+  W->>R: run the action
   R->>R: traced({ name: "createPayment" }): a child span named after the use case
   R->>UC: Effect program, provided with ApplicationLayer
   UC->>X: fetch (instrumented by the runtime: one span per call)

@@ -29,7 +29,7 @@ config:
 ---
 flowchart TD
   IN[Matched request] --> D1{pathname is /api/markdown?}
-  D1 -- yes --> H1[Delete x-markdown-path, pass through]
+  D1 -- yes --> H1["Set x-markdown-path to an empty string, pass through"]
   D1 -- no --> D2{Accept contains text/markdown?}
   D2 -- yes --> H2[Set x-markdown-path = pathname<br/>rewrite to /api/markdown]
   D2 -- no --> D3{ends with /payment/confirmation<br/>without payment_intent?}
@@ -41,7 +41,7 @@ flowchart TD
 
 Only the last branch reaches country detection; the three early returns skip it, which is why a Markdown rendition or a bounced confirmation URL never carries a fresh `user-country` cookie.
 
-1. **Direct hits on `/api/markdown` strip the path header.** The request passes through with `x-markdown-path` **deleted** and nothing else changed. Without this branch a direct request carrying `Accept: text/markdown` would match the next rule and rewrite the route onto itself; deleting the header is what stops a caller driving the route by hand.
+1. **Direct hits on `/api/markdown` neutralise the path header.** The request passes through with `x-markdown-path` **overwritten with an empty string** (`NEUTRALISED_MARKDOWN_PATH`) and nothing else changed, so a value the caller sent is never read. Without this branch a direct request carrying `Accept: text/markdown` would match the next rule and rewrite the route onto itself; the route reads only a path that starts with `/`, so the empty value answers 404, which is what stops a caller driving the route by hand.
 
 2. **Markdown content negotiation.** A request carrying `Accept: text/markdown` is rewritten to `/api/markdown`, with the pathname set on the `x-markdown-path` **request header** (`MARKDOWN_PATH_HEADER`, exported from `apps/web/src/infrastructure/markdown/twin.ts`). A rewrite does not change what the handler reads from the URL, so a query string never reached it. The proxy states **no** cache policy at all: it runs before the lookup, and the module that knows whether the page was found owns the headers; see the [Markdown API](/how-it-works/markdown-api/) page.
 

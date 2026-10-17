@@ -40,6 +40,33 @@ flowchart LR
   VER --> HDR["Header version chip"]
 ```
 
+## A page, from the build to the reader
+
+```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
+flowchart TD
+  subgraph build ["astro build, in docs.yml's build job"]
+    MDX["src/content/docs/**/*.mdx"] --> HTML["static HTML per page and locale"]
+    MDX --> MER["every Mermaid fence drawn twice, light and dark, in headless Chromium"]
+    DEM["demos: the app's components through @ui"] --> SSR["rendered to HTML once, at build"]
+    MER & SSR --> HTML
+  end
+  HTML --> ART["docs-dist artifact"] --> DEP["wrangler deploy: static assets only, no script"]
+  READ["a reader asks for a page"] --> CF{"a file in dist?"}
+  DEP -.-> CF
+  CF -- "yes" --> PAGE["the page, with the CSP and headers public/_headers sets"]
+  CF -- "no" --> NF["404.html with a 404 status"]
+  PAGE --> HYD["each demo hydrates when it scrolls into view"]
+  PAGE --> CON["the consent banner; the analytics tags load only after consent"]
+  PAGE --> ZOOM["diagrams are already SVG; a click enlarges one"]
+```
+
+A reader never waits on a server: Cloudflare answers every path from the built files, and a path with no file gets the site's own 404 page, through `not_found_handling = "404-page"` in `apps/docs/wrangler.toml`. The demos arrive as HTML and become interactive island by island, as they scroll into view, so a page with ten demos downloads the code of the ones the reader reaches. A demo that throws while hydrating stays as its server-rendered HTML, inert, and logs to the console; the Playwright suite fails the build before such a page can ship, as *What keeps it honest* below describes.
+
 ## Two packages, one install
 
 `apps/web` and `apps/docs` are sibling workspace packages. The docs site never lists the app as a dependency; it compiles the app's **source files** directly. That is why the install has to be unfiltered: a demo imports `Button.tsx`, which imports `class-variance-authority` bare, and a bare import resolves from the `node_modules` of the package the *importing file* sits in, which is `apps/web`. A `--filter forever-pto-docs` install leaves that folder empty and the build fails on a dependency the docs package never declared. The `prepare-env` composite action in CI installs the whole workspace for this reason.

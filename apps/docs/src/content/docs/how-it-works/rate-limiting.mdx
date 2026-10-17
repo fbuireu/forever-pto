@@ -5,7 +5,7 @@ sidebar:
   order: 14
 ---
 
-Three routes can cost money or grant Premium on an unauthenticated request: `POST /api/payment` creates a Stripe PaymentIntent, `GET /api/payment/activate` is Stripe's `return_url` and mints a session, and `POST /api/check-session` grants Premium from an email address. Each is rate-limited by client address before it does anything else. The counting is done by the platform, not the app: the source holds no limit, no window and no counter.
+Three entry points can cost money or grant Premium on an unauthenticated request: `POST /api/payment`, and the `createPaymentAction` Server Action the Donate popover calls, create a Stripe PaymentIntent, `GET /api/payment/activate` is Stripe's `return_url` and mints a session, and `POST /api/check-session` grants Premium from an email address. Each is rate-limited by client address before it does anything else. The counting is done by the platform, not the app: the source holds no limit, no window and no counter.
 
 ## How it works
 
@@ -60,6 +60,7 @@ A read-modify-write over a KV namespace does not hold. Workers KV offers neither
 
 - **Counters are per Cloudflare location, not global.** A client whose requests land on two colos gets two counters. That is the documented behaviour of the binding, and it is acceptable here: the threat is a burst from one place, and a burst from one place hits one colo.
 - **The window is not sliding to the millisecond.** The platform counts within its period at a granularity it does not promise, so a burst straddling a boundary can exceed ten. The bound is a ceiling on the order of magnitude, not an exact quota.
+- **Every stage shares one namespace.** `wrangler.toml` gives the binding `namespace_id = "1001"` at the top level and in both environments, so the production Worker, the stable development Worker and every preview count against the same per-address counters in a location: a tester hammering a preview spends their own production allowance too.
 - **It counts requests, not outcomes.** A refused request still counts, so a client that keeps retrying a 429 stays refused.
 
 ## Fail-open by design

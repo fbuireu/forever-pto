@@ -24,7 +24,7 @@ Both tools take no input (`inputSchema: { type: 'object', properties: {} }`) and
 | Path | Builder | What it serves |
 | --- | --- | --- |
 | `/.well-known/api-catalog` | `apiCatalog.ts` | An RFC 9727 API catalog (`application/linkset+json`) pointing `service-doc` and `status` relations at `/api/health`. |
-| `/.well-known/mcp/server-card.json` | `mcpServerCard.ts` | An MCP server card (SEP-1649): server name, description, the app version read from the root `package.json`, and capability flags (currently all `false`, since the site is not a remote MCP server and tools are browser-side only). |
+| `/.well-known/mcp/server-card.json` | `mcpServerCard.ts` | An MCP server card (SEP-1649): server name, description, the app version read from `apps/web/package.json` (the root manifest stays at `0.0.0`), and capability flags (currently all `false`, since the site is not a remote MCP server and tools are browser-side only). |
 | `/.well-known/agent-skills/index.json` | `agentSkillsIndex.ts` | An agentskills.io-schema index advertising the agent-facing features as named skills: `markdown-negotiation`, `api-catalog`, `mcp-server-card` and `webmcp`, each with a `SKILL.md` URL. |
 
 ## Why this shape
