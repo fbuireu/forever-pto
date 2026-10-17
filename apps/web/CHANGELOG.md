@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.15.7](https://github.com/fbuireu/forever-pto/compare/web-v1.15.6...web-v1.15.7) (2026-10-17)
+
+
+### Bug Fixes
+
+* **web:** reload the contact form when its Server Action belongs to a previous deploy ([8b4fc5a](https://github.com/fbuireu/forever-pto/commit/8b4fc5a5d583980815e6cdd99fed98ae361002cc))
+
 # [forever-pto-web-v1.15.6](https://github.com/fbuireu/forever-pto/compare/web-v1.15.5...web-v1.15.6) (2026-10-15)
 
 
