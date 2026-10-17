@@ -41,7 +41,7 @@ Persisted stores share `obfuscatedStorage` from `apps/web/src/application/stores
 - On the server it is a no-op storage, so SSR never touches `localStorage`.
 - Both storing branches skip a write whose value has not changed. `persist` saves the whole partialized slice on every `set`, including the ones that touch only unpersisted fields (`setCalculating`, the Alternative preview), so without the skip the holidays store would rewrite and re-obfuscate roughly 50 KB three times per calculation. The obfuscated branch remembers what it last wrote or read per key and skips a repeat only while storage still holds that blob, so another tab's write is never mistaken for its own.
 
-Every persisted store implements the same `onRehydrateStorage` pattern: on error, log to Better Stack and `localStorage.removeItem(STORAGE_NAME)` so a corrupt blob cannot survive into the next visit.
+A stored value that does not parse never reaches a store: `obfuscatedStorage` catches the failed parse, hands it to `onRehydrateFailure`, which logs to Better Stack and removes the key, and answers `null`, so the store hydrates on its defaults the same page view. Every persisted store's `onRehydrateStorage` calls the same function for a failure after the read, so a corrupt blob cannot survive into the next visit.
 
 ## Rehydration, on every page load
 
@@ -63,8 +63,11 @@ sequenceDiagram
     OS-->>ST: null, so the store keeps its defaults
   else a blob that does not decode
     OS-->>ST: null after logging, so the store keeps its defaults
-  else a decoded string
-    OS-->>ST: the string, which persist parses as JSON
+  else text that is not JSON, as a blob written under a previous key decodes to
+    OS->>LS: remove the key, after logging the failed parse
+    OS-->>ST: null, so the store keeps its defaults
+  else a JSON blob
+    OS-->>ST: the parsed state
     ST->>ST: migrate an older version, merge, then onRehydrateStorage revives the dates
   end
   ST-->>UI: hasHydrated, through useStoresReady
@@ -77,7 +80,7 @@ sequenceDiagram
 | --- | --- | --- |
 | First visit | Nothing stored; every store starts at its defaults | The planner with the cookie's Country, or none |
 | The blob does not decode (it is not the obfuscation's base64) | `getItem` logs and answers `null` | A fresh planner; the next write replaces the blob |
-| The blob decodes but is not JSON: the storage key changed in a later build, or the blob was edited by hand | The decode succeeds into garbage and the JSON parse fails, so `onRehydrateStorage` receives the error, logs it and removes the key. Zustand reports the store as never hydrated for that page view | The planner sections stay on their skeletons for that visit; a reload starts from the defaults |
+| The blob decodes but is not JSON: the storage key changed in a later build, or the blob was edited by hand | The decode succeeds into garbage and the JSON parse fails inside the storage, which logs it, removes the key and answers `null`, so the store hydrates on its defaults | A fresh planner on the same page view, the Country back from the cookie; a donor's Premium returns at the next Premium gate, because the defaults carry no last check and the session cookie still verifies |
 | A write fails (storage full, or refused) | The obfuscated branch, which production runs, catches and logs it; the state lives on in memory for the visit and is not saved. The plain branch, used in development or by a build without a key, catches nothing, so the store action throws | In production, nothing until the next visit, which finds the last saved state |
 | The premium store's last check is older than 24 hours, or it has none | `needsSessionCheck` is raised and the next Premium gate asks `GET /api/check-session` | Premium features keep their stored state until the answer arrives |
 

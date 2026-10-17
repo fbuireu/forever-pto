@@ -44,7 +44,7 @@ Three branches, chosen once at module load:
 | Development, or the key missing | Plain `localStorage`, so devtools show readable JSON while you work |
 | Otherwise | Obfuscated |
 
-A value that fails to decode logs and returns `null`, which Zustand treats as nothing stored, so the store starts from its defaults. A blob written under a previous key decodes without an error into text that is not JSON, so it fails one step later, in the JSON parse: the store's rehydration handler logs it and removes the key, the planner stays on its skeletons for that page view, and the next load starts from the defaults ([state stores](/how-it-works/state-stores/#rehydration-on-every-page-load)). Never put anything confidential behind this, and never call it encryption in code, in a log line or on a page.
+A value that fails to decode logs and returns `null`, which Zustand treats as nothing stored, so the store starts from its defaults. A blob written under a previous key decodes without an error into text that is not JSON, so it fails one step later, in the JSON parse, which the storage catches as well: it logs the failure, removes the key and answers `null`, and the store starts from its defaults on the same page view ([state stores](/how-it-works/state-stores/#rehydration-on-every-page-load)). Never put anything confidential behind this, and never call it encryption in code, in a log line or on a page.
 
 ## The session token is signed
 
