@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.15.8](https://github.com/fbuireu/forever-pto/compare/web-v1.15.7...web-v1.15.8) (2026-10-17)
+
+
+### Bug Fixes
+
+* **web:** hydrate a persisted store on its defaults when its stored state does not parse ([9c05384](https://github.com/fbuireu/forever-pto/commit/9c05384b5cb82cc3b3ddb6032aea43b083a03664))
+
 # [forever-pto-web-v1.15.7](https://github.com/fbuireu/forever-pto/compare/web-v1.15.6...web-v1.15.7) (2026-10-17)
 
 
