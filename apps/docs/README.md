@@ -54,8 +54,13 @@ The rules a review holds the site to are the *Docs site* section of
 
 ## Deploying
 
-- **main** → `deploy --env production` → docs.forever-pto.com
+- **main** → `deploy --env production` → docs.forever-pto.com → the smoke run against it → `release-docs`, which
+  tags `docs-vX.Y.Z`; a smoke run that fails rolls the site back instead and tags nothing
 - **a pull request** → its own Worker, `pr-<n>-forever-pto-docs-development`, deleted when the PR closes
+
+**Do not run this package's `deploy` script to publish.** It passes no `--env`, so it deploys the top-level config
+onto the production Worker's name without its route; CI runs `wrangler deploy --env production` from the build it
+tested, and a manual run of the Docs workflow redeploys without a commit.
 
 Previews never touch the production Worker. The site displays the **app's** version, not its own:
 this package's version is cut as `docs-vX.Y.Z` with its own `CHANGELOG.md`, and nothing reads it.

@@ -78,7 +78,8 @@ every deploy asks for an unknown path.
 ## Releasing
 
 This package versions itself: tags are `web-vX.Y.Z`, and a commit belongs to it if it touches
-`apps/web/`. The release runs after the production deploy, so a tag means the version is live. See
+`apps/web/`. The release runs after the production deploy and its smoke run, so a tag means the version is live and
+answering; a smoke run that fails rolls production back instead and tags nothing. See
 [ADR 0011](../../docs/adr/0011-per-package-versioning-with-a-bridge-tag.md).
 
 `version` in [`package.json`](./package.json) is read at runtime by source files across the app to render the footer, the hero, the

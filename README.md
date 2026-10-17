@@ -43,7 +43,7 @@ Given your country, region, year, and number of PTO days, Forever PTO suggests t
 
 ## Wiki
 
-The full wiki lives at **[docs.forever-pto.com](https://docs.forever-pto.com)**: architecture, runtime flows (country detection, premium, holidays engine…), the design system with live component demos, and the complete CI/CD and environments lifecycle.
+The full wiki lives at **[docs.forever-pto.com](https://docs.forever-pto.com)**: architecture, runtime flows (planner recalculation, holidays, premium, country detection…), the design system with live component demos, and the CI/CD guide, which starts at [workflows](https://docs.forever-pto.com/infra/workflows/) and covers every job, the environments, the secrets and variables, the rulesets and the releases.
 
 This repo is a workspace holding the app in [`apps/web/`](apps/web) (`forever-pto-web`) and the docs site in [`apps/docs/`](apps/docs) (`forever-pto-docs`, Astro Starlight), which reuses the app's real components and tokens and deploys independently. Each versions itself: a commit is attributed to whichever package its paths fall under, so keep a pull request to one package.
 
@@ -66,7 +66,7 @@ pnpm --filter forever-pto-docs dev   # docs dev server
 | Payments | Stripe |
 | Email | Resend |
 | Premium session | `jose`: a signed, HTTP-only JWT cookie; there are no accounts |
-| Deployment | Cloudflare Workers via OpenNextJS |
+| Deployment | Cloudflare Workers via OpenNext (`@opennextjs/cloudflare`) |
 | Monitoring | BetterStack |
 | Testing | Vitest + Playwright |
 | Linting | Biome |
@@ -115,15 +115,23 @@ production Worker without its route or its environment variables; [`AGENTS.md`](
 
 ## Environment variables
 
-See [`apps/web/.env.example`](apps/web/.env.example) for the full list. Key variables:
+Copy [`apps/web/.env.example`](apps/web/.env.example) to `apps/web/.env.development` for `pnpm dev`.
+`pnpm preview` runs the real Workers runtime, which reads the server-side values from `apps/web/.dev.vars`
+instead: same keys, gitignored.
 
-| Variable | Description |
-| --- | --- |
-| `TURSO_DATABASE_URL` | Turso database URL |
-| `TURSO_AUTH_TOKEN` | Turso auth token |
-| `STRIPE_SECRET_KEY` | Stripe secret key |
-| `RESEND_API_KEY` | Resend API key |
-| `JWT_SECRET` | JWT signing secret |
+| Variable | Deployed as | What it is |
+| --- | --- | --- |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | GitHub environment variable, inlined at build | Stripe's publishable key; a production build refuses one that does not start with `pk_` |
+| `NEXT_PUBLIC_STORAGE_KEY` | GitHub environment variable, inlined at build | The key the stores obfuscate `localStorage` with; a production build refuses an empty one |
+| `STRIPE_SECRET_KEY` | Worker secret | Stripe's secret key |
+| `STRIPE_WEBHOOK_SECRET` | Worker secret | Verifies the Stripe webhook's signature |
+| `RESEND_API_KEY` | Worker secret | Sends the contact email |
+| `JWT_SECRET` | Worker secret | Signs the Premium session cookie |
+| `TURSO_AUTH_TOKEN` | Worker secret | Turso's auth token |
+| `TURSO_DATABASE_URL` | A `wrangler.toml` var per environment, not a secret | The Turso database for that environment |
+
+Every secret and variable CI reads, with where it lives and what breaks without it, is the
+[secrets matrix](https://docs.forever-pto.com/infra/secrets/).
 
 ---
 
@@ -132,6 +140,8 @@ See [`apps/web/.env.example`](apps/web/.env.example) for the full list. Key vari
 | Document | What it answers |
 | --- | --- |
 | [`AGENTS.md`](AGENTS.md) | How the repository is put together, and what a change has to carry. Start here |
+| [The wiki's architecture overview](https://docs.forever-pto.com/architecture/overview/) | How the app is layered, measured from the imports, and where each request goes; there is no `ARCHITECTURE.md` |
+| [The CI/CD guide](https://docs.forever-pto.com/infra/workflows/) | Every workflow, deploy, check and release, the secrets matrix and the rulesets |
 | [`CODING_STANDARDS.md`](CODING_STANDARDS.md) | How code here is written: the rules a review holds a diff to |
 | [`apps/web/README.md`](apps/web/README.md) | The planner: what it does, how to run it, how it releases |
 | [`apps/docs/README.md`](apps/docs/README.md) | The wiki: how to run it, and how to write a page |
