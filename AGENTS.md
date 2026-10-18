@@ -224,9 +224,9 @@ matrix.
 
 Both packages deploy to Cloudflare Workers through wrangler, each from its own `wrangler.toml`. Wrangler discovers the
 config by walking up from the working directory and resolves every path in it relative to that file, which is why the
-deploy steps `cd` into the package first. Each package previews one Worker per pull request, deleted when it closes.
-The app's bindings, environments and the `NEXT_PUBLIC_SITE_URL` resolution are in
-[`./apps/web/AGENTS.md`](./apps/web/AGENTS.md).
+deploy steps `cd` into the package first. Each package previews one Worker per pull request that changes what it is
+built from (`WEB_PATHS` for the app, `DOCS_PATHS` for the docs site), deleted when the pull request closes. The app's
+bindings, environments and the `NEXT_PUBLIC_SITE_URL` resolution are in [`./apps/web/AGENTS.md`](./apps/web/AGENTS.md).
 
 ## Maintenance contract
 

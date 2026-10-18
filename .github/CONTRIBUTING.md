@@ -109,10 +109,19 @@ you choose is the version bump you get.
 | `feat` | minor | `feat(web): suggest a second bridge when the first is full` |
 | `fix` | patch | `fix(web): keep the PTO budget after a locale switch` |
 | `perf` | patch | `perf(web): memoise the effective-day count` |
-| `revert` | patch | `revert: feat(web): suggest a second bridge` |
+| `revert` | patch, only with git's `This reverts commit <sha>.` line in the body | `revert: feat(web): suggest a second bridge` |
 | `docs`, `style`, `refactor`, `test`, `chore`, `ci`, `build` | none | `docs: correct the bridge definition` |
 
 Breaking changes take a `!` after the type or a `BREAKING CHANGE:` footer, and bump the major.
+
+**A revert releases only through its body.** The commit analyzer counts a commit as a revert when its header is
+`revert: …` or `Revert "…"` and its message goes on to `This reverts commit <sha>.`, the line `git revert` writes;
+the type alone cuts nothing. A squash merge's body is the pull request's description, so that line survives only
+if the description carries it. GitHub's **Revert** button titles its pull request `Revert "…"`, which commitlint
+ignores and the title lint therefore passes, and describes it as `Reverts <owner>/<repo>#<n>`, so merged as it
+comes it releases nothing. Paste the line into the description, or title the pull request `fix(web): …`, which
+always cuts a patch. A revert whose target has not been released yet cancels it: both are left out of the
+analysis, and neither releases.
 
 A scope is optional and unconstrained; naming the package (`web` or `docs`) is the usual choice.
 
