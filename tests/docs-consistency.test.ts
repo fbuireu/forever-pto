@@ -70,6 +70,8 @@ const GITHUB_WORKFLOW_EXPRESSION = /\$\{\{\s*github\.workflow\s*\}\}/;
 const GITHUB_REF_EXPRESSION = /\$\{\{\s*github\.ref\s*\}\}/;
 const PULL_REQUEST_MERGE_REF = `refs/pull/\${{ github.event.pull_request.number }}/merge`;
 const AGGREGATE_NEEDS = /name: Check(?: \(docs\))?\n\s+needs: \[([^\]]+)\]\n\s+if: \$\{\{ always\(\) \}\}/;
+const JOB_NEEDS = /^ {4}needs: \[([^\]]*)\]/m;
+const JOB_CONDITION = /^ {4}if: (.+)$/m;
 const FONT_VARIABLE = /variable: ["'](--[\w-]+)["']/g;
 
 const retiredTermPattern = (term: string): RegExp =>
@@ -5382,6 +5384,25 @@ describe("the guides describe the project as it is configured", () => {
 
 		expect(needs).toEqual(expect.arrayContaining(gated));
 	});
+
+	it.each([
+		["ci.yml", "deploy-development", ["changes", "verify"], "needs.changes.outputs.web == 'true'"],
+		["ci.yml", "deploy-production", ["changes", "verify"], "needs.changes.outputs.web == 'true'"],
+		["docs.yml", "build", ["changes"], "needs.changes.outputs.docs == 'true'"],
+		["docs.yml", "preview", ["build"], "github.event_name == 'pull_request'"],
+		["ci.yml", "docs-refresh", ["release-web"], "needs.release-web.outputs.released == 'true'"],
+	])(
+		"runs %s's %s behind the jobs and the condition the infra pages state, so a preview exists only for a verified range that changed its package and the docs rebuild only follows a cut tag",
+		(file, job, needed, condition) => {
+			const body = jobBody({ workflow: read(`${WORKFLOW_DIR}/${file}`), job });
+			const needs = (JOB_NEEDS.exec(body)?.[1] ?? "").split(",").map((name) => name.trim());
+
+			expect({
+				missing: needed.filter((name) => !needs.includes(name)),
+				gated: JOB_CONDITION.exec(body)?.[1]?.includes(condition) ?? false,
+			}).toEqual({ missing: [], gated: true });
+		},
+	);
 
 	it("resolves every filtered pnpm citation against the package it names", () => {
 		const sources = [
