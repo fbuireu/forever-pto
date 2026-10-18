@@ -45,8 +45,11 @@ sequenceDiagram
     alt a request is held
       HK->>WK: drop this reply and post the held request
     else the reply is the latest
-      HK->>HS: setCalculationResult, then setCalculating(false)
-      HS-->>V: calendar, budget readout, panel and Summary repaint
+      HK->>HS: setCalculating(false): the calendar is clickable again
+      opt a CALCULATE_SUGGESTIONS_RESULT
+        HK->>HS: setCalculationResult
+        HS-->>V: calendar, budget readout, panel and Summary repaint
+      end
     end
   end
 ```
@@ -126,7 +129,7 @@ sequenceDiagram
   PL->>PL: clear the caches, window, pseudo-Holidays, budget, Bridges, Strategy, Alternatives, Metrics
   PL-->>WK: PlanningResult, planned or unplanned, always measured
   alt the run returns
-    WK-->>HK: CALCULATE_SUGGESTIONS_RESULT { requestId, suggestion, alternatives }
+    WK-->>HK: CALCULATE_SUGGESTIONS_RESULT { requestId, payload: { suggestion, alternatives } }
   else the run throws
     WK-->>HK: WORKER_ERROR { requestId, error: String(err) }
   end

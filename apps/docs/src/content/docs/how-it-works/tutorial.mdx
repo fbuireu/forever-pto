@@ -23,7 +23,8 @@ sequenceDiagram
     H->>H: import DriverStyles (driver.css in @layer tutorial)
   end
   H->>SB: open if closed, wait for the first anchor to stop moving
-  H->>D: drive(steps from TUTORIAL_ANCHOR + tutorial.steps copy)
+  H->>D: start({ steps from TUTORIAL_ANCHOR + tutorial.steps copy, overrides })
+  D->>D: driver.js drive()
   D-->>U: highlight step 1 … n, done button on the last
   U->>D: close
   D->>D: unmount the React roots it mounted into popovers

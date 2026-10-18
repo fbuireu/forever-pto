@@ -15,29 +15,33 @@ config:
 ---
 flowchart TB
   subgraph deps [Foundations]
-    BASE[Base UI: behaviour and ARIA]
-    MOTION[Motion: m.* and AnimatePresence]
-    CVA[CVA: variants]
-    TOKENS[Design tokens: colours, shadows, frame]
+    BASE["Base UI: behaviour and ARIA"]
+    MOTION["Motion: m.* and AnimatePresence"]
+    CVA["CVA: variants"]
+    TOKENS["Design tokens: colours, shadows, frame"]
   end
-  subgraph core [apps/web/src/ui/modules/core]
-    PRIM[primitives/<br/>Button · Badge · Banner · Card · Input · Textarea · Label · Separator · Table · InputGroup · Progress · Slider · Command]
-    ABASE[animate/base/<br/>Accordion · Checkbox · Collapsible · Dialog · Drawer · DropdownMenu · Popover · Switch · Tooltip · Sidebar · Slot]
-    ACOMP[animate/components/<br/>Tabs · Counter · FeatureList · RadialNav]
-    AEFF[animate/effects/<br/>AutoHeight · MotionHighlight]
-    AICON[animate/icons/ and animate/text/]
-    APRIM[animate/primitives/<br/>the unstyled motion layer]
+  subgraph core ["apps/web/src/ui/modules/core"]
+    PRIM["primitives/<br/>Button · Badge · Banner · Card · Input · Textarea · Label · Separator · Table · InputGroup · Progress · Slider · Command<br/>and Bone · Combobox · FlagIcon · Form · NumberInput · RichLink · Sonner"]
+    ABASE["animate/base/<br/>Accordion · Checkbox · Collapsible · Dialog · Drawer · DropdownMenu · Popover · Switch · Tooltip · Sidebar · Slot"]
+    ACOMP["animate/components/<br/>Tabs · Counter · FeatureList · RadialNav"]
+    AEFF["animate/effects/<br/>AutoHeight · MotionHighlight"]
+    AICON["animate/icons/ and animate/text/"]
+    APRIM["animate/primitives/<br/>the unstyled motion layer"]
   end
   BASE --> PRIM & ABASE & APRIM
-  MOTION --> APRIM & ACOMP & AEFF & AICON
-  CVA --> PRIM
+  MOTION --> APRIM & ABASE & ACOMP & AEFF & AICON & PRIM
+  CVA --> PRIM & ABASE
   TOKENS --> PRIM & ABASE & ACOMP
-  APRIM --> ABASE
+  APRIM --> ABASE & AEFF & AICON
   AEFF --> ACOMP & ABASE
-  FEAT[Feature modules: sidebar, planner, homepage, shared] --> PRIM & ABASE & ACOMP
+  ABASE -->|Slot, Popover| PRIM
+  PRIM -->|Button, in Sidebar| ABASE
+  AICON --> PRIM & ACOMP
+  PRIM -->|Badge, in FeatureList| ACOMP
+  FEAT["Feature modules: sidebar, planner, homepage, shared"] --> PRIM & ABASE & ACOMP
 ```
 
-
+An arrow points from what is imported to what imports it. `primitives/` and `animate/base/` import each other: the primitives take `Slot` and `Popover` from `animate/base/`, and its `Sidebar` takes `Button` back.
 
 These docs import the real components through the `@ui` alias and render them as Astro islands. Portability determines what a page can show:
 

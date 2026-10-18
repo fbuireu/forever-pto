@@ -21,14 +21,15 @@ flowchart TB
     DH[date-holidays<br/>Holiday calendars per Country and Region]
     ISO[i18n-iso-countries<br/>Country names in every locale]
   end
-  subgraph edge [Read at the edge, per request]
+  subgraph edge [Read at the edge, when the request carries no user-country cookie]
     TRACE["/cdn-cgi/trace"]
     HDR[cf-ipcountry header]
     IPAPI[ipify + ipinfo]
   end
-  subgraph browser [Browser storage]
+  subgraph browser [Browser]
     LS[(obfuscated localStorage)]
     CK[(cookies)]
+    MEM[(location store, in memory)]
   end
   subgraph server [Server-side services]
     STRIPE[(Stripe)]
@@ -36,15 +37,18 @@ flowchart TB
     RESEND[Resend]
     RL[Rate limiter binding]
   end
-  DH --> HOL[Holidays + Regions]
-  ISO --> CTRY[Countries]
+  DH --> HOL[Holidays]
+  DH --> REG[Regions]
+  ISO --> CTRY["Countries, rendered with the page"]
   TRACE & HDR & IPAPI --> LOC[Detected Country]
   LOC --> CK
-  HOL & CTRY --> LS
+  HOL --> LS
+  REG & CTRY --> MEM
   STRIPE <--> PAY[Donation + Premium]
   TURSO <--> PAY
   RL --> PAY
   RESEND --> MAIL[Contact form]
+  TURSO <--> MAIL
 ```
 
 ## Holidays
@@ -96,7 +100,7 @@ Everything the user configures or the engine produces lives in the browser, in `
 | --- | --- | --- |
 | `filters` | Everything except the year | The year resets to the current one on every visit |
 | `holidays` | Holidays, the Suggestion, Alternatives, the applied index, Manual and Removed Days | Dates round-trip as ISO strings |
-| `location` | Country and Region lists plus the fetch timestamp | Loading flags are not persisted |
+| `location` | Nothing: it persists an empty object | The Country list arrives with the page and the Region list is looked up again for each Country |
 | `premium` | The Premium key, email, last verification time | Mirrors the server session; re-verified after 24 hours |
 | `ui` | Nothing | Ephemeral popover and currency state |
 

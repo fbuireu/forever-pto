@@ -37,20 +37,20 @@ stateDiagram-v2
   NoDecision --> Banner: CookieConsent renders the custom banner
   Banner --> Accepted: accept all
   Banner --> Rejected: reject all
-  Banner --> Custom: save preferences per service
+  Banner --> Dialog: manage preferences
   Accepted --> Dialog: cc:showPreferences from the footer
   Rejected --> Dialog
   Custom --> Dialog
-  Dialog --> Accepted
-  Dialog --> Rejected
-  Dialog --> Custom
+  Dialog --> Accepted: accept all
+  Dialog --> Rejected: reject all
+  Dialog --> Custom: save preferences per service
   state Accepted {
     [*] --> ga4_on
     [*] --> betterStack_on
   }
 ```
 
-Every transition ends in `acceptService`, and the two tags react to the resulting events rather than to the UI:
+Every answer, from the banner or from the dialog, ends in `acceptService`, and the two tags react to the resulting events rather than to the UI:
 
 Accepting or saving preferences calls `CookieConsentLib.acceptService(enabledServices, 'analytics')`, then:
 
@@ -61,7 +61,7 @@ On a revisit, `onConsent` restores per-service state from `CookieConsentLib.getU
 
 ## What this means in practice
 
-No analytics code runs until the user opts in; rejecting all is a first-class, equally prominent action. Everything the app strictly needs to function (locale, country, premium session, payment) is in the necessary bucket and never blocked by consent.
+No analytics cookie is set and no Better Stack code loads until the user opts in; `gtag.js` loads on every page of a build that carries a measurement id, but in Consent Mode with `analytics_storage` denied until the user grants it. Rejecting all is a first-class, equally prominent action. Everything the app strictly needs to function (locale, country, premium session, payment) is in the necessary bucket and never blocked by consent.
 
 ## This wiki has its own, and shares only the vocabulary
 

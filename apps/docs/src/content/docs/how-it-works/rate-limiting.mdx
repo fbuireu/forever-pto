@@ -21,18 +21,21 @@ sequenceDiagram
   participant OP as operations/*
   participant L as PAYMENT_RATE_LIMITER
   participant S as Stripe
-  C->>R: POST /api/payment
-  R->>OP: createPaymentRequest(input as an Effect)
-  OP->>OP: resolveClientIp: cf-connecting-ip → x-forwarded-for → x-real-ip → "unknown"
-  OP->>L: limit({ key: ip })
+  C->>R: POST /api/payment, or the createPaymentAction Server Action
+  R->>R: resolveClientIp: cf-connecting-ip → x-forwarded-for → x-real-ip, else null
+  R->>OP: createPaymentRequest(input as an Effect, the address)
+  OP->>L: limit({ key: the address, or "unknown" })
   alt over the bound
     L-->>OP: success = false
     OP-->>R: RateLimitError → 429 { error: "rate_limit_exceeded" }
-    Note over OP: the request body is never read
-  else allowed, or the binding errored
+    Note over OP: on POST /api/payment the request body is never read
+  else allowed
     L-->>OP: success = true
     OP->>OP: parse the body, validate, promo code
     OP->>S: paymentIntents.create
+  else the binding throws
+    OP->>OP: fail open: the request is treated as allowed
+    OP->>S: paymentIntents.create, after the same checks
   end
 ```
 

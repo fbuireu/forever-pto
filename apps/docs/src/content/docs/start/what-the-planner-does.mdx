@@ -71,33 +71,35 @@ flowchart TB
     S[Strategy]
     H[Custom Holidays]
   end
-  subgraph engine [Planning engine, in a Web Worker]
+  subgraph main [Main thread, the holidays store]
     F[Holidays for the window]
+  end
+  subgraph engine [Planning engine, in a Web Worker]
     WD[Workdays]
     BR[Bridges]
     SEL[Selection under the Strategy]
-    ALT[Alternatives]
+    ALT["Alternatives: the best plan<br/>becomes the Suggestion"]
     MET[Metrics]
   end
   subgraph out [What the user sees]
     CAL[Calendar with Suggested Days]
     PANEL[Budget readout + Alternative switcher]
-    SUM[Summary: metric cards and charts]
-    EXP[PDF / ICS export]
+    SUM["Summary: metric cards and charts"]
+    EXP["PDF / ICS export"]
   end
   C --> F
   H --> F
+  W --> F
   W --> WD
-  F --> WD
+  F -->|ISO strings| WD
   B --> SEL
   S --> SEL
   WD --> BR --> SEL --> ALT
-  SEL --> MET
   ALT --> MET
   MET --> SUM
-  SEL --> CAL
+  ALT -->|the Suggestion| CAL
   ALT --> PANEL
-  SEL --> EXP
+  ALT -->|the placed days| EXP
 ```
 
 The Metrics answer the questions a user asks of a plan: how many Effective Days did the budget buy, how many Bonus Days came free, how many Long Weekends and Rest Blocks it produced, the Longest Vacation, the Max Work Streak left standing, and how the time off distributes across months and Quarters. The [Summary](/how-it-works/planner-ui/#summary) renders them as cards and charts.

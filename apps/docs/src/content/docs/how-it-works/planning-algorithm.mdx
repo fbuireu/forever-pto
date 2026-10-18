@@ -25,8 +25,8 @@ flowchart TD
   WD[getAvailableWorkdays]
   BR[findBridges]
   ANY{Any Bridge?}
-  SEL[selectBridges under the Strategy's objective → Suggestion]
-  ALT[generateAlternatives]
+  SEL[selectBridges under the Strategy's objective → the greedy plan]
+  ALT["generateAlternatives: re-runs the Strategy,<br/>keeps the best plan as the Suggestion, offers the rest"]
   MET[generateMetrics, once per plan]
   EMPTY[Empty Suggestion, measured]
   IN --> CLR --> WIN --> PSEUDO --> BUD
@@ -34,7 +34,6 @@ flowchart TD
   BUD -- yes --> WD --> BR --> ANY
   ANY -- no --> EMPTY
   ANY -- yes --> SEL --> ALT --> MET
-  SEL --> MET
 ```
 
 ## Stage 0: the window and the budget
@@ -151,16 +150,20 @@ flowchart TD
   FIT -- yes --> GAIN["marginal = days it adds ÷ PTO Days"]
   GAIN --> FLOOR{marginal ≥ the objective's floor?}
   FLOOR -- no --> SKIP
-  FLOOR -- yes --> RANK[Rank it under the objective]
+  FLOOR -- yes --> ADM{"Admitted by the stage?<br/>Main Vacation's first: in the Preferred Months,<br/>starting or joining the block"}
+  ADM -- no --> SKIP
+  ADM -- yes --> RANK[Rank it under the objective]
   RANK --> BEST{Any candidate left?}
   SKIP --> BEST
-  BEST -- no --> DONE
-  BEST -- yes --> TAKE[Take the best: cover its span, spend its cost] --> STEP
+  BEST -- no --> NEXT{"Does the objective have a next stage?"}
+  NEXT -- "yes, Main Vacation's Optimized stage" --> SWITCH[Switch to it] --> STEP
+  NEXT -- no --> DONE
+  BEST -- yes --> TAKE["Take the best: cover its span, spend its cost"] --> STEP
 ```
 
 **The marginal gain is what keeps the selector honest.** Ranking every Bridge by the Efficiency it has on its own and walking that list once would let a Friday and the Monday after it each look like three days for one, and the plan would pay for their shared weekend twice: over a Spanish 2026 calendar it would believe it had eighty Effective Days where the calendar holds fifty-five. Measured against what is already covered, the Monday adds one day, falls under the floor and is left for a better one. What the selector believes it gained is what the Metrics measure, and the engine's tests assert the two are equal.
 
-A Bridge that would overspend is skipped, not truncated, and budget can be left unspent when nothing that remains clears the floor: a day that adds less than the floor is worse than keeping the day. The result is the sorted list of dates, the Bridges behind them and the Strategy that produced them: a **Suggestion**.
+A Bridge that would overspend is skipped, not truncated, and budget can be left unspent when nothing that remains clears the floor: a day that adds less than the floor is worse than keeping the day. The result is the sorted list of dates, the Bridges behind them and the Strategy that produced them: the greedy plan, which becomes the **Suggestion** unless a re-run of the same Strategy in Stage 5 finds a better one.
 
 ## Stage 5: Alternatives
 

@@ -34,7 +34,7 @@ sequenceDiagram
   D->>S: confirmPayment, redirect if_required
   alt confirmed in the page, the usual card path
     S-->>D: the PaymentIntent
-    D->>CS: POST { email, premiumKey }
+    D->>CS: POST { email, premiumKey }, rate-limited by IP
     CS->>S: retrieve, require succeeded and the donor email
     CS-->>D: premium-token cookie and { premiumKey, email }, via activateWithClaimedPayment
     CS--)DB: after(): upsert the payment row
@@ -43,7 +43,7 @@ sequenceDiagram
     S-->>V: redirect to /api/payment/activate with the intent, its secret and redirect_status
     V->>ACT: GET, rate-limited
     ACT->>S: activateWithPayment: retrieve, compare the client secret, require succeeded
-    ACT-->>V: 302, no-store, premium-token and the one-shot premium-activation proof
+    ACT-->>V: 307, no-store, premium-token and the one-shot premium-activation proof
     ACT--)DB: after(): upsert the payment row
     V->>CP: GET /payment/confirmation?payment_intent=…
     CP->>S: retrieve the intent for the card

@@ -15,7 +15,7 @@ config:
 ---
 flowchart TB
   subgraph browser [Browser]
-    PLAN["The plan, filters, Custom Holidays"] -->|"XOR with NEXT_PUBLIC_STORAGE_KEY, base64"| LS[(localStorage)]
+    PLAN["The plan, filters, Custom Holidays,<br/>the Premium key and email"] -->|"XOR with NEXT_PUBLIC_STORAGE_KEY, base64"| LS[(localStorage)]
     TOK["premium-token cookie"]
   end
   subgraph edge [Cloudflare Worker]
@@ -29,7 +29,7 @@ flowchart TB
   end
   CS --> STRIPE
   WH --> DB
-  JWT --> DB
+  DB -->|"a succeeded payment row, on email recovery"| JWT
 ```
 
 ## Browser storage is obfuscated, not encrypted

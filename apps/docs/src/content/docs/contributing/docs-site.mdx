@@ -61,7 +61,7 @@ flowchart TD
   CF -- "yes" --> PAGE["the page, with the CSP and headers public/_headers sets"]
   CF -- "no" --> NF["404.html with a 404 status"]
   PAGE --> HYD["each demo hydrates when it scrolls into view"]
-  PAGE --> CON["the consent banner; the analytics tags load only after consent"]
+  PAGE --> CON["the consent banner; gtag.js loads with Consent Mode denied,<br/>Better Stack's tag only after consent"]
   PAGE --> ZOOM["diagrams are already SVG; a click enlarges one"]
 ```
 

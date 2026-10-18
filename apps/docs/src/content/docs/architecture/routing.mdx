@@ -42,12 +42,18 @@ config:
 ---
 flowchart TD
   REQ[Request] --> M{"Matches the proxy?<br/>not /api, /_next, /_vercel, no dot"}
-  M -- no --> API["/api/* route handlers<br/>and /.well-known/*"]
-  M -- "no, a dot in the path" --> DOT{"First segment<br/>a locale?"}
-  M -- yes --> PX[Proxy chain<br/>markdown · payment guard · locale · country]
-  PX -->|Accept: text/markdown| MD["/api/markdown"]
+  M -- "no, under /api" --> API["/api/* route handlers"]
+  M -- "no, a dot in the path" --> OWN{"A route of its own?"}
+  OWN -- "/.well-known/*" --> WK["the .well-known catch-all"]
+  OWN -- "robots.txt, sitemap.xml, favicon.ico" --> META["metadata routes<br/>robots.ts, sitemap.ts, favicon.ico"]
+  OWN -- no --> DOT{"First segment<br/>a locale?"}
+  M -- yes --> PX["Proxy chain<br/>markdown · payment guard · locale · country"]
+  PX -->|"Accept: text/markdown"| MD["/api/markdown"]
   PX --> LOC{Locale prefix?}
-  LOC -->|none| EN["[locale] = en, no prefix"]
+  LOC -->|none| NEG{"NEXT_LOCALE, else Accept-Language,<br/>picks a locale other than en?"}
+  NEG -- no --> EN["[locale] = en, no prefix"]
+  NEG -- yes --> RD["307 to that locale's prefix"]
+  LOC -->|"/en"| ST["307 to the unprefixed path"]
   LOC -->|"/es, /ca, /it, /fr, /de"| L["[locale]"]
   EN & L --> G{Route group}
   G --> MK["(marketing): homepage, legal/*"]
@@ -57,6 +63,8 @@ flowchart TD
   DOT -- "no, one segment" --> GNF[global-not-found.tsx]
   DOT -- "no, more segments" --> CA
 ```
+
+A file under `apps/web/public` (`/.well-known/security.txt` among them) never gets this far: Workers Static Assets answers it before the Worker runs ([caching](/architecture/caching/)).
 
 ## Route groups
 

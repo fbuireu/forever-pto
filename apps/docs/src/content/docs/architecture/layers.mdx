@@ -17,14 +17,14 @@ flowchart TB
   subgraph edge [Runs at the edge]
     APP["app/<br/>routes, layouts, handlers"]
     MW["middleware.ts<br/>the proxy"]
-    INFS["infrastructure/ server half<br/>clients, actions, api, proxy, seo, markdown, well-known"]
+    INFS["infrastructure/ server half<br/>clients, actions, api, proxy, seo, markdown, well-known, countries"]
     APPS["application/ server half<br/>use-cases, email, schemas"]
     DP["domain/payment<br/>event types, pure"]
   end
   subgraph browser [Runs in the browser]
     UI["ui/<br/>modules, hooks, styles, messages"]
     APPB["application/ browser half<br/>stores, export, navigation"]
-    INFB["infrastructure/ browser half<br/>holidays, countries, regions, workers"]
+    INFB["infrastructure/ browser half<br/>holidays, regions, workers"]
     DC["domain/calendar<br/>the engine, pure"]
   end
   APP --> UI & INFS
@@ -110,7 +110,7 @@ Not a layer but a single file at the root of `src`, kept at the pre-Next-16 name
 | Folder | Contents | Runs |
 | --- | --- | --- |
 | `clients/` | One folder per SDK: `db/turso`, `payments/stripe`, `email/resend` as Effect services (a `Context.Tag` plus a Live `Layer`), and the modules that are deliberately not services: the browser Stripe loader, the Better Stack tracking tag, the driver.js tutorial client | Server, except the last three |
-| `services/` | Everything with a purpose but no SDK of its own: `holidays/`, `countries/`, `regions/`, `location/`, `payments/`, `premium/`, `contact/`, `env/` | `holidays`, `countries` and `regions` in the browser; the rest at the edge |
+| `services/` | Everything with a purpose but no SDK of its own: `holidays/`, `countries/`, `regions/`, `location/`, `payments/`, `premium/`, `contact/`, `env/` | `holidays` and `regions` in the browser; `countries` on the server, in the components that render the Country list; the rest at the edge |
 | `api/` | The wire vocabulary: `errors.ts` (`ApiError` and `describeFailure`, the one tag-to-status table), `response.ts` (`noStore`), `parseJsonBody.ts`, and `operations/`, where a flow behind two transports is terminated once | Server |
 | `actions/` | The `'use server'` entry points, `payment.ts` and `contact.ts`, thin wrappers over the operations | Server |
 | `workers/` | The calculations Web Worker and its message contract; see [calculation worker](/how-it-works/calculation-worker/) | Browser, worker thread |

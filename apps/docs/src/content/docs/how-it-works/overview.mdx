@@ -20,7 +20,7 @@ config:
 flowchart TB
   subgraph cf [Cloudflare Worker, at the edge]
     P[Proxy: apps/web/src/middleware.ts]
-    R[Route handlers: /api/*]
+    R["Route handlers /api/* and Server Actions"]
     SSG[Prerendered pages, one per locale]
   end
   subgraph main [Browser, main thread]
@@ -35,7 +35,8 @@ flowchart TB
     STRIPE[Stripe]
     TURSO[Turso]
     RESEND[Resend]
-    CFAPI[Cloudflare trace / cf-ipcountry]
+    CFAPI["Cloudflare: cf-ipcountry, /cdn-cgi/trace"]
+    IPAPI["ipify → ipinfo, the egress-IP lookup"]
   end
   P -->|HTML + cookies| UI
   SSG --> UI
@@ -46,7 +47,8 @@ flowchart TB
   R <--> STRIPE
   R <--> TURSO
   R --> RESEND
-  P --> CFAPI
+  P -->|no user-country cookie| CFAPI
+  P -.->|no cf-ipcountry and no trace answer| IPAPI
   UI -->|"Server Actions and fetch: Donation, session, contact"| R
 ```
 
@@ -66,19 +68,31 @@ sequenceDiagram
   autonumber
   participant B as Browser
   participant P as Proxy (edge)
-  participant CF as Cloudflare
+  participant CF as Cloudflare trace
+  participant IP as ipify and ipinfo
   participant S as Stores
   B->>P: GET /planner
   P->>P: markdown negotiation? payment guard?
-  P->>P: next-intl resolves the locale, sets NEXT_LOCALE
-  P->>CF: cf-ipcountry, or without it /cdn-cgi/trace, then IP lookup
-  CF-->>P: country code
-  P-->>B: HTML + NEXT_LOCALE + user-country cookies
+  P->>P: next-intl resolves the locale, writes NEXT_LOCALE only when it changes
+  alt the request carries user-country
+    P->>P: re-set it as it is, nothing detected
+  else no user-country cookie
+    P->>P: read cf-ipcountry, final whenever present
+    opt no cf-ipcountry header, as in local development
+      P->>CF: GET /cdn-cgi/trace
+      CF-->>P: the loc= line, or nothing
+      opt still no country
+        P->>IP: the egress IP, then its country
+        IP-->>P: a country code, or nothing
+      end
+    end
+  end
+  P-->>B: HTML, with user-country when a country is known and NEXT_LOCALE when it was written
   B->>S: rehydrate from obfuscated localStorage
   S->>S: StoresInitializer reads user-country, sets Country if none is stored
 ```
 
-1. The [proxy](/architecture/proxy/) runs its chain: Markdown negotiation for agents, the payment-confirmation guard, locale resolution and, last, [country detection](/how-it-works/country-detection/). The result is two cookies and a prerendered page.
+1. The [proxy](/architecture/proxy/) runs its chain: Markdown negotiation for agents, the payment-confirmation guard, locale resolution and, last, [country detection](/how-it-works/country-detection/). The result is a prerendered page with the `user-country` cookie whenever a Country is known, and with `NEXT_LOCALE` only when the navigation changed the locale.
 2. The browser rehydrates the persisted [stores](/how-it-works/state-stores/) from `localStorage`: `filters`, `holidays` and `premium` carry data, `location` persists an empty object and `ui` nothing. Every persisted store revives its dates from ISO strings and wipes its own key when it cannot parse the blob ([rehydration](/how-it-works/state-stores/#rehydration-on-every-page-load)).
 3. `StoresInitializer` (`apps/web/src/ui/modules/stores/StoresInitializer.tsx`) reads the `user-country` cookie and seeds the filters store's Country, only when the user has never chosen one.
 
@@ -111,9 +125,12 @@ sequenceDiagram
   WK->>EN: deserialise, then run
   EN->>EN: Workdays → Bridges → Strategy selection → Alternatives → Metrics
   EN-->>WK: PlanningResult
-  WK-->>CL: CALCULATE_SUGGESTIONS_RESULT (or WORKER_ERROR)
-  CL->>HS: setCalculationResult, preserving the applied Alternative index
-  HS-->>SB: budget readout, calendar, summary repaint
+  WK-->>CL: CALCULATE_SUGGESTIONS_RESULT, or WORKER_ERROR
+  CL->>HS: setCalculating(false)
+  opt a CALCULATE_SUGGESTIONS_RESULT
+    CL->>HS: setCalculationResult, preserving the applied Alternative index
+    HS-->>SB: budget readout, calendar, summary repaint
+  end
 ```
 
 - **Holidays** come from the `date-holidays` package, looked up for the chosen year and the next, once for the Country and once for the Region, then filtered to non-working types and shaped into `HolidayDTO`. The [holidays engine](/how-it-works/holidays-engine/) page has the rules; [data sources](/how-it-works/data-sources/) has the provenance.

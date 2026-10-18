@@ -28,15 +28,17 @@ config:
   layout: dagre
 ---
 flowchart TD
-  IN[Matched request] --> D1{pathname is /api/markdown?}
+  IN[Matched request] --> D1{"pathname is /api/markdown?"}
   D1 -- yes --> H1["Set x-markdown-path to an empty string, pass through"]
-  D1 -- no --> D2{Accept contains text/markdown?}
-  D2 -- yes --> H2[Set x-markdown-path = pathname<br/>rewrite to /api/markdown]
-  D2 -- no --> D3{ends with /payment/confirmation<br/>without payment_intent?}
+  D1 -- no --> D2{"Accept contains text/markdown?"}
+  D2 -- yes --> H2["Set x-markdown-path = pathname<br/>rewrite to /api/markdown"]
+  D2 -- no --> D3{"ends with /payment/confirmation<br/>without payment_intent?"}
   D3 -- yes --> H3[Redirect to the locale home]
-  D3 -- no --> I18N[next-intl resolves the locale<br/>re-sets NEXT_LOCALE with LOCALE_COOKIE_POLICY]
-  I18N --> GEO[location: detectCountry → user-country cookie]
-  GEO --> OUT[Response]
+  D3 -- no --> I18N["next-intl resolves the locale<br/>if it wrote NEXT_LOCALE, re-set it with LOCALE_COOKIE_POLICY"]
+  I18N --> GEO{"location: the request carries user-country?"}
+  GEO -- yes --> RS["Re-set it as it is, renewing its week"]
+  GEO -- no --> DET["detectCountry, then set user-country<br/>only if a country came back"]
+  RS & DET --> OUT[Response]
 ```
 
 Only the last branch reaches country detection; the three early returns skip it, which is why a Markdown rendition or a bounced confirmation URL never carries a fresh `user-country` cookie.
@@ -47,7 +49,7 @@ Only the last branch reaches country detection; the three early returns skip it,
 
 3. **Payment-confirmation guard.** Any path ending in `/payment/confirmation` without a `payment_intent` search param is redirected to the locale home. The guard only asks whether the param is there, so an empty or repeated one passes it; the confirmation page checks the query again and redirects the same way (`apps/web/src/app/AGENTS.md` says why).
 
-4. **i18n.** `createMiddleware(routing)` from `next-intl/middleware` resolves the locale (routing config in `apps/web/src/infrastructure/i18n/routing.ts`). If next-intl set the locale cookie (`LOCALE_COOKIE`, exported from `apps/web/src/infrastructure/i18n/locales.ts`), the proxy re-sets it via `setLocaleCookie` from `apps/web/src/infrastructure/i18n/cookie.ts`, which applies `LOCALE_COOKIE_POLICY`. That is the **same object** `routing.ts` hands next-intl, which is the point: the client-side language switcher writes this cookie too, so the two writers have to agree on its attributes. Cookie details are catalogued in the [cookies reference](/reference/cookies/).
+4. **i18n.** `createMiddleware(routing)` from `next-intl/middleware` resolves the locale (routing config in `apps/web/src/infrastructure/i18n/routing.ts`). If next-intl set the locale cookie (`LOCALE_COOKIE`, exported from `apps/web/src/infrastructure/i18n/locales.ts`), which it does only on a page navigation that changes the locale ([i18n](/how-it-works/i18n/)), the proxy re-sets it via `setLocaleCookie` from `apps/web/src/infrastructure/i18n/cookie.ts`, which applies `LOCALE_COOKIE_POLICY`. That is the **same object** `routing.ts` hands next-intl, which is the point: the client-side language switcher writes this cookie too, so the two writers have to agree on its attributes. Cookie details are catalogued in the [cookies reference](/reference/cookies/).
 
 5. **Country detection: always last.** The i18n response is passed through `location()` from `apps/web/src/infrastructure/proxy/location.ts`, which runs `detectCountry(request)` and, when a country is found, sets the `USER_COUNTRY_COOKIE` cookie via `apps/web/src/infrastructure/proxy/cookie.ts`. This cookie is intentionally readable from client JS: the location store uses it to preselect the user's country. A request that already carries the cookie skips detection and has it re-set as it is. The detection strategy chain (the `cf-ipcountry` header, final whenever present, and only without it the Cloudflare trace and then the egress IP lookup) is documented in [country detection](/how-it-works/country-detection/).
 

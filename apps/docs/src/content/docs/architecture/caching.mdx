@@ -24,9 +24,9 @@ flowchart TD
   MW -- "/api/*, /_next/*, a dotted path" --> RH
   PX --> PAGE{"which route"}
   PAGE -- "a page under a locale" --> SSG["prerendered at build,<br/>served from the R2 incremental cache"]
-  PAGE -- "payment/confirmation, an unknown path, sitemap.xml" --> DYN["rendered on this request"]
+  PAGE -- "payment/confirmation, an unknown path" --> DYN["rendered on this request"]
   PAGE -- "Accept: text/markdown" --> MD["the Markdown twin: an hour when found, no-store on a miss"]
-  RH["route handlers and the .well-known catch-all"] --> HDR["check-session, payment, contact: no-store<br/>the activation redirect: no-store<br/>.well-known documents: a day"]
+  RH["route handlers: sitemap.xml rendered on this request,<br/>robots.txt prerendered, the .well-known catch-all"] --> HDR["check-session, payment, contact: no-store<br/>the activation redirect: no-store<br/>.well-known documents: a day"]
   SSG & DYN --> HTML["HTML with the security headers"]
   HTML --> ISL["client islands through dynamic():<br/>the calendar, the management bar, the Summary,<br/>the sidebar fields, Donate, the premium modal"]
   ISL --> WRK["the calculation Web Worker chunk, on the first plan"]

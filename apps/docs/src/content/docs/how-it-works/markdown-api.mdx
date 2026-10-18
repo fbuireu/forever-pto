@@ -27,7 +27,7 @@ sequenceDiagram
   A->>P: GET /planner, Accept: text/markdown
   P->>P: set x-markdown-path = /planner
   P->>R: rewrite (URL unchanged for the agent)
-  R->>R: header present? else 404
+  R->>R: x-markdown-path starts with "/"? else 404
   R->>B: buildMarkdownPage(baseUrl, "/planner")
   B-->>R: Markdown, or null for an unlisted path
   R-->>A: 200 text/markdown with Cache-Control, or 404
