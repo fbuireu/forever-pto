@@ -30,7 +30,8 @@ flowchart TD
     RB[rollback on a failed smoke]
     RW[release-web: web-vX.Y.Z]
     DR[docs-refresh: dispatch docs.yml]
-    CH & V --> DP --> SM --> RW --> DR
+    CH & V --> DP --> SM --> RW
+    RW -->|a web-v tag was cut| DR
     SM -. failed .-> RB
   end
   subgraph docs [docs.yml]
@@ -40,7 +41,8 @@ flowchart TD
     DS[smoke against DOCS_SITE_URL]
     DRB[rollback on a failed smoke]
     RD[release-docs: docs-vX.Y.Z]
-    DCH --> DB --> DD --> DS --> RD
+    DCH --> DB --> DD --> DS
+    DS -->|push only, never a dispatch| RD
     DS -. failed .-> DRB
   end
   CI --> CH
@@ -55,7 +57,7 @@ flowchart TD
 2. **Attribution is by path.** `fix:` → patch, `feat:` → minor, `BREAKING CHANGE` → major; `docs:`, `chore:`, `ci:` and friends produce no release. But the type only decides *how big* the bump is; *which* package it lands in is decided by the files the commit touched.
 3. **`apps/web` runs the full plugin chain**: release notes → `CHANGELOG.md` → version bump in `package.json` (`@semantic-release/npm` with `npmPublish: false`; the package is private, only the version field matters) → a git commit of `package.json` and `CHANGELOG.md` → a GitHub Release. The lockfile is not in the asset list: it lives two levels above the package and nothing in this chain dirties it.
 4. **`apps/docs` runs the same chain**, writing `apps/docs/CHANGELOG.md` and its own `package.json` version and committing both. A second pusher does not race the app's release for the branch: both jobs share the `release` concurrency group named in point 1, which is what serialises them, so leaving the plugins out would buy nothing and cost releases whose notes live only on GitHub beside a `package.json` reading `0.0.0`. The version is read by nothing: the site displays the **app's**.
-5. **`docs-refresh` closes the loop.** The release commit carries `[skip ci]`, so nothing would otherwise rebuild the wiki after an app version bump, and the published header would keep showing the previous one.
+5. **`docs-refresh` closes the loop.** The release commit carries `[skip ci]`, so nothing would otherwise rebuild the wiki after an app version bump, and the published header would keep showing the previous one. It runs only when `release-web` reports `released` as `true`, because semantic-release cut a `web-v*` tag: a push whose commits release nothing (a `docs:` or `chore:` change under `apps/web`) ends after `release-web`. The run it dispatches builds, deploys and smoke-tests the docs site, and releases nothing, because `release-docs` runs on a push alone.
 6. **A commit landing on `main` mid-release joins that release.** `@semantic-release/git` pushes the version bump as `HEAD:main` from the branch the job holds, and the checkout pins the run's sha, so without the fast-forward a commit that reached `main` in the meantime would make the push a non-fast-forward: the job would fail after the deploy and the smoke run passed, no tag would be left behind, and a re-run would stand down because the branch it held was behind the remote. The fast-forward in point 1 prevents that: the version covers every commit on `main` when the job runs, and the run those commits queued has nothing left to publish. A tag can therefore precede the deploy of the commits it absorbed by a few minutes. The two cases that still stand a job down, `main` rewritten under the run or a merge in the seconds between the fast-forward and the push, write no tag, so the run the newer head queued cuts the release over everything since the last one.
 
 The `[skip ci]` marker is load-bearing: without it, the version-bump push to `main` re-triggers the whole graph.

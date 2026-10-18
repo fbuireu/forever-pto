@@ -38,7 +38,7 @@ Exact versions are pinned in `package.json` (the repo uses exact pins, via `save
 | --- | --- | --- |
 | Biome | Lint + format | One fast tool instead of ESLint + Prettier; single config at the repo root covers app and docs |
 | Vitest | Unit tests | Vite-native, first-class TS paths support, happy-dom environment |
-| Playwright | E2E tests | Chromium and WebKit, against each pull request's preview in CI, against production after each deploy for the `@smoke` cases, and against `next dev` locally |
+| Playwright | E2E tests | Chromium and WebKit, against the preview of each pull request that changes the app, in CI, against production after each deploy for the `@smoke` cases, and against `next dev` locally |
 | semantic-release | Releases | Versions, changelog and GitHub releases derived from conventional commits; see [conventions](/contributing/conventions/) |
 
 More detail on those in [tooling](/contributing/tooling/) and [testing](/contributing/testing/).

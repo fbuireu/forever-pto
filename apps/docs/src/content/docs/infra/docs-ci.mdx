@@ -52,9 +52,9 @@ Installs the whole workspace (**unfiltered** `pnpm install`: the demos import ap
 
 There is no Biome step here. Both packages are linted in one root pass from the app workflow; a second one over `apps/docs` would duplicate it.
 
-## PR previews: one Worker per pull request
+## PR previews (ephemeral environments)
 
-Both packages preview the same way. The preview job downloads the build artifact the `build` job already produced and deploys it as its own Worker:
+A docs preview is an **ephemeral environment**, one Worker per pull request, the way the [app's](/infra/environments/#per-pr-previews-ephemeral-environments) are. It exists only for a pull request whose range touches `DOCS_PATHS`: `changes` gates `build`, and the `preview` job needs `build`, so a preview is deployed only once the typecheck, the build and the whole Playwright suite have passed against the local build, and a pull request that changes nothing the site is built from gets none. The preview job downloads the build artifact the `build` job already produced and deploys it as its own Worker, in the `docs-development` environment, through `cloudflare/wrangler-action` on the wrangler version `apps/docs/package.json` pins:
 
 ```bash
 wrangler deploy --env development --name pr-<n>-forever-pto-docs-development
@@ -70,9 +70,21 @@ The `development` environment carries no custom domain, so a preview cannot answ
 
 What the docs preview does *not* need is what separates it from the app's: no bindings, no `--secrets-file` on the deploy, no `--var` override, and no second build; it ships the `docs-dist` artifact.
 
+### The URL comment
+
+After the deploy, the same job upserts one sticky comment, found again by its hidden `<!-- docs-preview -->` marker, holding the preview URL, the branch and the head commit, beside the app's own preview comment when the pull request has both.
+
+### Behind Cloudflare Access
+
+The docs previews sit behind the same Zero Trust Access application as the app's, a setting of the Zero Trust dashboard that nothing in the repository declares; their hostname pattern, `pr-*-forever-pto-docs-development`, is a destination of its own on that application, and the [Cloudflare stack](/infra/cloudflare/) page says why leaving it out would let crawlers index a copy of the site.
+
+### No E2E against the preview
+
+The docs Playwright suite runs in the `build` job against `astro preview` serving the same `dist` the preview ships, before the preview Worker exists, so nothing runs against the deployed preview and the job needs no Access service token. A failing suite fails `build`, which skips the preview and fails `Check (docs)`.
+
 ### Teardown
 
-`cleanup-development.yml` deletes the Worker when the pull request closes, in a `cleanup-docs` job beside the app's. A per-PR Worker that nothing tears down accumulates forever.
+`cleanup-development.yml` deletes the Worker when the pull request closes, in a `cleanup-docs` job beside the app's, retried and counted as done when the Worker does not exist, since a pull request that never touched the site never had one. A per-PR Worker that nothing tears down accumulates forever, so the same workflow's weekly `sweep`, every Monday at 03:00 UTC and on a manual dispatch, also deletes any `pr-<n>-forever-pto-docs-development` whose pull request is closed. Nothing survives a docs preview: it has no bindings, so the Worker is all the state it ever had.
 
 The app's job in that workflow has to queue behind the CI run, because app E2E drives the per-PR Worker over the network and deleting it mid-run turns every remaining spec into a placeholder. The jobs carry a concurrency group each: `cleanup-web` on `CI-…`, `cleanup-docs` on `docs-…`, the group of the workflow that deployed the Worker each one deletes. They do not share one workflow-level group: it would be `ci.yml`'s, so `cleanup-docs` would wait on a run that has nothing to do with its Worker while the `preview` job that does own it could still be mid-deploy. The docs Playwright suite genuinely needs no wait, since it runs against the build artifact in the `build` job before the preview Worker exists at all; the deploy it must not race is the preview deploy itself.
 

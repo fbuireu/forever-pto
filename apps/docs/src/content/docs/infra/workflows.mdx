@@ -45,7 +45,7 @@ flowchart TD
     SM -. "failed" .-> RB["rollback: wrangler rollback --env production"]
   end
   subgraph pushonly ["main: push only"]
-    RW["release-web: web-vX.Y.Z"] --> DR["docs-refresh: dispatch docs.yml"]
+    RW["release-web: web-vX.Y.Z"] -- "a tag was cut" --> DR["docs-refresh: dispatch docs.yml"]
   end
   subgraph onpr ["pull_request"]
     DD["deploy-development, via _deploy-web.yml"] --> CM["comment: preview URL"] & E2E["e2e: Chromium and WebKit through Access"]
@@ -68,7 +68,7 @@ Runs on pushes to `main` and PRs targeting `main`. `cancel-in-progress` is condi
 
 - **changes**: derives from `git diff` whether `apps/web` (or anything the app build depends on, `WEB_PATHS`) was touched, and whether the range touches both packages, and exposes both as outputs. It uses `git diff` rather than a filter action because every third-party action here is SHA-pinned and an unpinnable one trips zizmor. It fails open: with no usable base commit it answers `web=true`.
 - **Verify**: `prepare-env`, then one `parallel:` block of five steps, the scripts `pnpm verify` chains: `Format` (`pnpm format:check`, Biome with no writes), `Typecheck (root)` (`pnpm typecheck:root`), `Typecheck (web)` (`pnpm --filter forever-pto-web typecheck`), `Typecheck (docs)` (`pnpm --filter forever-pto-docs typecheck`, which is `astro check`) and `Unit tests` (`pnpm test:ut:coverage`: `apps/web`'s Vitest run with coverage, then the contract suite). After the block, under `if: ${{ !cancelled() }}`, the coverage upload to Codecov from `apps/web/coverage/lcov.info` runs whether the checks passed or not, with `fail_ci_if_error: false`, so a Codecov outage never blocks CI. `pre-push` runs the weaker `pnpm verify:changed`, since the coverage floor cannot hold over a changed-only subset, so a green push is not a promise of a green `Verify`.
-- **deploy-production → smoke → release-web → docs-refresh** on a push to `main`, with **smoke → rollback** when the smoke run fails; a dispatch runs the first two and the rollback. **deploy-development → comment / e2e** on a PR. `cross-package-notice` hangs off `changes` on a pull request whose range touches both packages, and upserts an advisory comment.
+- **deploy-production → smoke → release-web → docs-refresh** on a push to `main`, with **smoke → rollback** when the smoke run fails; a dispatch runs the first two and the rollback. `docs-refresh` runs only when `release-web` cut a `web-v*` tag, which a push of commits that release nothing does not. **deploy-development → comment / e2e** on a pull request whose range touches `WEB_PATHS`, after `Verify`. `cross-package-notice` hangs off `changes` on a pull request whose range touches both packages, and upserts an advisory comment.
 - **smoke**: the only job that requests `https://forever-pto.com` itself. `e2e` runs against a per-PR preview and only on `pull_request`, so without this job a push to `main` would deploy production and cut a tag without a single request to the live site. It runs Playwright with `--grep "@smoke"`, no Cloudflare Access headers (production is public) and no `environment:` of its own. The tagged cases all live in `apps/web/e2e/smoke.spec.ts`: the homepage, the 404 route, `robots.txt` and `/.well-known/security.txt`, which has to answer as plain text with a contact and an `Expires` still ahead. That last case also wants the body byte for byte the file in the package's `public/`: a `security.txt` the Cloudflare zone serves itself answers before the Worker, and the case is what notices one standing in for the repository's. It is the same set every sibling repository runs, and the docs site's `smoke` job runs it against `DOCS_SITE_URL`, so a difference between them is drift. They are kept in one file because a failing smoke case rolls production back, so the set that holds that power has to be readable in one place. `/sitemap.xml` and `/api/health` stay out of the set: they answer 403 to a GitHub runner while a browser gets the expected response, so a case on either would revert a deploy that was fine. A case whose result depends on the caller's address is evidence about the caller, not about the deploy. The step passes no `--pass-with-no-tests` on purpose, so a grep that stops matching fails rather than passing quietly, and `release-web` needs this job as well as the deploy, so a tag means the version is live and answering. An empty `WEB_SITE_URL` fails the job's first step, which then rolls back a deploy that was fine, because Playwright would otherwise fall back to `localhost` and pass.
 - **rollback**: runs `wrangler rollback --env production` from `apps/web` when the deploy succeeded and `smoke` failed, so a version that does not answer stops serving rather than only going untagged. Unlike `smoke` it declares `environment: web-production`, because rolling back needs the Cloudflare credentials. The previous version still finds its pages in the R2 cache, because every build writes under its own build id (see below). Nothing runs after a failed rollback: production keeps serving the version that failed its smoke run until someone runs the same command by hand or a fix reaches `main`.
 
@@ -107,7 +107,7 @@ sequenceDiagram
   CI->>DW: deploy-production, after changes and Verify
   DW->>DW: prepare-env, then cf:build with the NEXT_PUBLIC_* variables
   DW->>DW: Collect the Worker secrets into RUNNER_TEMP, or fail here
-  DW->>WR: wrangler deploy --env production --message sha-event --secrets-file
+  DW->>WR: wrangler deploy --env production --message sha-event --secrets-file --var NEXT_PUBLIC_SITE_URL:WEB_SITE_URL
   WR->>ON: an OpenNext project, so hand off with the same arguments
   ON->>R2: populate the remote cache: every prerendered page under incremental-cache/buildId
   alt the bucket write fails
@@ -118,8 +118,8 @@ sequenceDiagram
   end
   DW->>DW: remove the secrets file, always
   CI->>SM: the @smoke cases against WEB_SITE_URL
-  alt smoke passes on a push
-    SM-->>CI: release-web tags web-vX.Y.Z, then docs-refresh dispatches docs.yml
+  alt smoke passes on a push (a workflow_dispatch stops here)
+    SM-->>CI: release-web runs semantic-release, and if it cut web-vX.Y.Z, docs-refresh dispatches docs.yml
   else smoke fails
     SM-->>CI: rollback runs wrangler rollback --env production
   end
@@ -131,7 +131,7 @@ sequenceDiagram
 
 ### The deploy jobs
 
-`deploy-development` calls `_deploy-web.yml` with the `pr-<n>-forever-pto-development` name override, then `comment` upserts a sticky preview-URL comment keyed on a hidden HTML marker and `e2e` runs Playwright in Chromium and WebKit against the live preview through a Cloudflare Access service token that reaches the preview's origin alone, uploading its report as an artifact. The workflow's concurrency group cancels in progress on a `pull_request` event only, so rapid pushes deploy just the latest commit while a `main` run is never killed halfway. The full lifecycle is on the [environments](/infra/environments/) page.
+`deploy-development`, on a pull request whose range touches `WEB_PATHS` and once `Verify` has passed, calls `_deploy-web.yml` with the `pr-<n>-forever-pto-development` name override, then `comment` upserts a sticky preview-URL comment keyed on a hidden HTML marker and `e2e` runs Playwright in Chromium and WebKit against the live preview through a Cloudflare Access service token that reaches the preview's origin alone, uploading its report as an artifact. The workflow's concurrency group cancels in progress on a `pull_request` event only, so rapid pushes deploy just the latest commit while a `main` run is never killed halfway. The full lifecycle of these ephemeral environments is on the [environments](/infra/environments/#per-pr-previews-ephemeral-environments) page.
 
 `ci.yml` also answers `workflow_dispatch`: a manual dispatch on `main` runs `deploy-production` with `smoke` behind it, which is how a rotated credential reaches what actually runs. Every one of them is read at build or deploy time (Worker secrets through `--secrets-file`, public variables inlined by the build), so rotating a value changes no file and matches no path filter; without the dispatch the old value stays live until an unrelated commit comes along. The Better Stack credentials are the exception and need no dispatch: they live on the Cloudflare export destination rather than on the Worker. A dispatch cuts no release: `release-web` stays push-gated, since redeploying the same sha versions nothing, and a release the push-triggered job stood down on is cut by the run for `main`'s next head, see [release](/infra/release/). The push-triggered jobs keep their gates. It is also the only way to deploy production by hand: the app has no deploy script, because one without `--env` would ship the top-level config.
 
@@ -147,10 +147,10 @@ config:
 ---
 flowchart TD
   PUSH["pull request opened or pushed"] --> CIW & DOCW & TITLE & DEPR & ZZ
-  CIW["ci.yml: changes, Verify"] --> DD["deploy-development: the pr-n app preview Worker"]
+  CIW["ci.yml: changes, Verify"] -->|"a WEB_PATHS change"| DD["deploy-development: the pr-n app preview Worker"]
   DD --> CMT["comment: the preview URL"]
   DD --> E2E["e2e: Playwright through the Access token"]
-  DOCW["docs.yml: changes, build"] --> DPV["preview: the pr-n docs preview Worker and its comment"]
+  DOCW["docs.yml: changes, build"] -->|"a DOCS_PATHS change"| DPV["preview: the pr-n docs preview Worker and its comment"]
   TITLE["commit-message.yml: Lint the pull request title"]
   DEPR["dependency-review.yml"]
   ZZ["zizmor.yml"]
