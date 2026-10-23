@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.15.9](https://github.com/fbuireu/forever-pto/compare/web-v1.15.8...web-v1.15.9) (2026-10-23)
+
+
+### Bug Fixes
+
+* **deps:** update dependency zod to v4.6.6 [security] ([#430](https://github.com/fbuireu/forever-pto/issues/430)) ([613a8b2](https://github.com/fbuireu/forever-pto/commit/613a8b2d84b2df11c8c3caac085f9799334cc854))
+
 # [forever-pto-web-v1.15.8](https://github.com/fbuireu/forever-pto/compare/web-v1.15.7...web-v1.15.8) (2026-10-17)
 
 
