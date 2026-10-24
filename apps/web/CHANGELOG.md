@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.15.12](https://github.com/fbuireu/forever-pto/compare/web-v1.15.11...web-v1.15.12) (2026-10-24)
+
+
+### Bug Fixes
+
+* **web:** show a pointer over the sidebar's Steps and Calculators triggers ([fe4d3cb](https://github.com/fbuireu/forever-pto/commit/fe4d3cbb1c5496e04bd5eceac792757b7b89ba2b))
+
 # [forever-pto-web-v1.15.11](https://github.com/fbuireu/forever-pto/compare/web-v1.15.10...web-v1.15.11) (2026-10-24)
 
 
