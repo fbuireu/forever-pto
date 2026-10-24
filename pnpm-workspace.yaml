@@ -13,10 +13,3 @@ minimumReleaseAge: 4320
 blockExoticSubdeps: true
 patchedDependencies:
   vaul@1.1.2: patches/vaul@1.1.2.patch
-minimumReleaseAgeExclude:
-  # Renovate security update: sharp@0.35.5
-  - sharp@0.35.5
-  # Renovate security update: zod@4.6.6
-  - zod@4.6.6
-  # Renovate security update: happy-dom@21.0.4
-  - happy-dom@21.0.4
