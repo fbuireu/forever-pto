@@ -27,6 +27,11 @@ detection; nothing is detected now, so that reason is gone, and the page rendere
 is the catch-all's. The citations below of the 404's spec name its current path,
 `e2e/[locale]/(marketing)/not-found.spec.ts`, and `e2e/global-not-found.spec.ts` covers the global page.
 
+**Amended 2026-10-24: Next 16.4 needs `@opennextjs/cloudflare` 1.20.12.** Next 16.4.1 arrived as a security update
+with the adapter left at 1.20.10, built and deployed green, and answered 500 on every route of the preview. The
+amendment *Next 16.4 reads a manifest the adapter did not inline* at the end of this file says why, and what was
+verified.
+
 ## Context
 
 Next 16.3.0 landed in `81222a48` together with TypeScript 7, and from that commit onward every pull request
@@ -273,3 +278,34 @@ from the cache with `dynamicParams = false`, and every row of ADR 0024's URL tab
 **What this adds to the pairing rule.** A Next release can change what the adapter has to mirror without changing
 anything the adapter's peer range says: 1.20.6 admitted 16.3.8. The check that would have caught it is the preview's
 `e2e` run, which the direct push to `main` skipped; `next start` cannot catch it, since its cache is Next's own.
+
+## Amendment, 2026-10-24: Next 16.4 reads a manifest the adapter did not inline
+
+**Next 16.4.1 reached a pull request as a security update ([#429](https://github.com/fbuireu/forever-pto/pull/429)),
+with the adapter left at 1.20.10** (`@opennextjs/aws` 4.1.9). The install, the build and the deploy were green; the
+preview's `e2e` run failed 182 cases, every page answering 500 and every API route, `robots.txt` and `sitemap.xml`
+answering the error page instead of their own content type. 1.20.10's peer range, `>=15.5.27 <16 || >=16.3.8`, admits
+16.4.1, so nothing before the preview objected.
+
+**The exception, captured on workerd** with `opennextjs-cloudflare build` and `preview` over that pair, is
+`Error: Unexpected loadManifest(/.next/server/preview-props.json) call!`, thrown from `NextNodeServer.getPreviewProps`
+while the server is constructed, before any route is matched, so every request fails the same way. OpenNext swaps
+Next's `loadManifest` for the manifests it inlines at build time and throws on any other path; Next 16.4 reads
+`preview-props.json` through it, 1.20.10 does not inline that file, and 16.3.8 never asked for it there.
+
+**1.20.12 is the first release that inlines it** (`fix(patches): include preview-props.json in loadManifest build-time
+inlining`), and it carries `@opennextjs/aws` 4.1.11, whose release notes add support for Next 16.4. Its peer range moved
+to `>=15.5.28 <16 || >=16.4.1`: a range that *requires*, which the amendment of 2026-08-29 counts as the signal that a
+range that only admits is not. The adapter is **1.20.12**, not 1.20.13: 1.20.13 was published 2026-10-21 and clears
+neither pnpm's three days nor Renovate's four on the day of this bump.
+
+**Verified locally, on this tree:** `pnpm verify` green, then `opennextjs-cloudflare build` and `preview` on workerd and
+the `e2e` suite against that preview on Chromium: 110 passed and 5 failed, the same 5 that fail against `main`'s own
+pair built and run the same way, because a local preview has no Turso or Stripe secret (the two `check-session` cases
+and the Stripe webhook's signature case) and its sitemap names the `development` host. The pair from #429, built the
+same way, answered 500 on every path. **Not verified here:** the preview's own `e2e` run and WebKit, which the pull
+request's CI provides.
+
+**What this adds to the pairing rule.** The amendment of 2026-10-12 found a Next release changing what the adapter has
+to mirror without its peer range saying so; this is the same shape, a file Next reads that the adapter has to inline.
+The preview's `e2e` run is still the check that catches it, and it did, before `main`.
