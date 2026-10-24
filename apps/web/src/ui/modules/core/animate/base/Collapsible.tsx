@@ -28,7 +28,12 @@ interface CollapsibleTriggerProps extends ComponentProps<typeof CollapsiblePrimi
 function CollapsibleTrigger({ asChild, children, className, ...props }: CollapsibleTriggerProps) {
 	if (asChild && isValidElement(children)) {
 		return (
-			<CollapsiblePrimitive.Trigger data-slot="collapsible-trigger" render={children as ReactElement} {...props} />
+			<CollapsiblePrimitive.Trigger
+				data-slot="collapsible-trigger"
+				render={children as ReactElement}
+				className={className}
+				{...props}
+			/>
 		);
 	}
 	return (

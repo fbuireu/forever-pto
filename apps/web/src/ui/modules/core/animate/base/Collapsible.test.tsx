@@ -141,4 +141,18 @@ describe("CollapsibleTrigger", () => {
 		);
 		expect(getByTestId("custom-trigger")).toBeTruthy();
 	});
+
+	it("hands its className to the primitive when asChild=true", () => {
+		const { getByTestId } = render(
+			<Collapsible>
+				<CollapsibleTrigger asChild className="cursor-pointer">
+					<button type="button" data-testid="custom-trigger">
+						toggle
+					</button>
+				</CollapsibleTrigger>
+			</Collapsible>,
+		);
+
+		expect(getByTestId("custom-trigger").classList).toContain("cursor-pointer");
+	});
 });

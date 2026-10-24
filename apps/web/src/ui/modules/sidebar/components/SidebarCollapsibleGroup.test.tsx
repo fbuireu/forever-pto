@@ -89,6 +89,13 @@ describe("SidebarCollapsibleGroup draws its own trigger", () => {
 		expect(container.querySelector("button button")).toBeNull();
 	});
 
+	it("shows a pointer over it, beside the menu button's own classes", () => {
+		renderGroup();
+
+		expect(trigger().classList).toContain("cursor-pointer");
+		expect(trigger().classList).toContain("peer/menu-button");
+	});
+
 	it("puts the icon, the label and the chevron inside it, in that order", () => {
 		renderGroup();
 

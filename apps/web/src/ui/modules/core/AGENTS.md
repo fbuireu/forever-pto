@@ -134,7 +134,9 @@ pass it, because Base UI's checkbox and switch default to a `<span>` and log an 
 
 **`CollapsibleTrigger asChild` clones only a valid element.** [`animate/base/Collapsible.tsx`](./animate/base/Collapsible.tsx)
 hands `children` to Base UI as `render` when `isValidElement(children)` holds and otherwise draws its own styled
-`<button>` around them. A node a server component builds and passes down as a prop can reach the client component as a
+`<button>` around them. The trigger's `className` goes to Base UI with it, which joins it with the element's own, so a
+caller styles the element it hands in from either side; dropped there, `SidebarCollapsibleGroup`'s `cursor-pointer`
+never reached its menu button. A node a server component builds and passes down as a prop can reach the client component as a
 lazy reference, which is not a valid element, so the first client pass wraps a `SidebarMenuButton` in a second button
 that the server's markup does not have: nested buttons and a hydration mismatch, intermittent because the chunk may or
 may not have arrived. Build the trigger in the client module that renders the `Collapsible` and give that module the
