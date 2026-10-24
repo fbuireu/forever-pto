@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.15.10](https://github.com/fbuireu/forever-pto/compare/web-v1.15.9...web-v1.15.10) (2026-10-24)
+
+
+### Bug Fixes
+
+* **deps:** update next to 16.4.1 [security] with @opennextjs/cloudflare 1.20.12, the first adapter that serves it ([#432](https://github.com/fbuireu/forever-pto/issues/432)) ([d08a821](https://github.com/fbuireu/forever-pto/commit/d08a821e0fec17793b551f1e5ecf6e2f02de0fae))
+
 # [forever-pto-web-v1.15.9](https://github.com/fbuireu/forever-pto/compare/web-v1.15.8...web-v1.15.9) (2026-10-23)
 
 
