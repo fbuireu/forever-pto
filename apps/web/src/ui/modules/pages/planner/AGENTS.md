@@ -241,8 +241,10 @@ Strategies' plans carry their own value there (see *Invariants and traps* in the
 [engine guide](../../../../domain/calendar/AGENTS.md)). The engine never hands out an Alternative ahead of the
 Suggestion, so the banner speaks up only when the plan on screen is behind one: after a hand edit, or when the
 applied Alternative is itself a weaker one. The header badge and the summary sentence name the Strategy of the
-plan on screen (its own `strategy`, narrowed with `isStrategy`). The banner's button links to `#calendar`,
-the `id` `CalendarList.tsx` gives its grid.
+plan on screen (its own `strategy`, narrowed with `isStrategy`). For a Premium reader the banner's action links to
+`#calendar`, the `id` `CalendarList.tsx` gives its grid. Without Premium its label offers Premium, so it is a
+`button` that calls `showPremiumModal` with `ADVANCED_METRICS` and `origin: planner`, the feature and origin the
+metric cards beside it gate on; a link to the calendar there opened nothing the label promised.
 
 **`Summary.tsx` measures against different denominators.** `ptoDays` here is the budget, read from the filters
 store; the engine's Metrics are computed against the days the plan placed (`days.length` in

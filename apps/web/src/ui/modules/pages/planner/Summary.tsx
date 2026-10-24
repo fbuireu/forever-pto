@@ -57,6 +57,9 @@ const YearTimelineChart = dynamic(() =>
 	})),
 );
 
+const BANNER_ACTION_CLASS =
+	"hit-area-stable inline-flex cursor-pointer items-center justify-center gap-2 rounded-[8px] border-[3px] border-[var(--frame)] bg-[var(--color-brand-orange)] px-4 py-2 text-sm font-black text-[var(--color-brand-ink)] shadow-[var(--shadow-brutal-btn)] transition-[transform,box-shadow] duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)]";
+
 function BoldText(chunks: ReactNode) {
 	return <strong className="inline-flex items-baseline gap-x-1">{chunks}</strong>;
 }
@@ -91,9 +94,10 @@ export const Summary = () => {
 			regions: state.regions,
 		})),
 	);
-	const { premiumKey } = usePremiumStore(
+	const { premiumKey, showPremiumModal } = usePremiumStore(
 		useShallow((state) => ({
 			premiumKey: state.premiumKey,
+			showPremiumModal: state.showPremiumModal,
 		})),
 	);
 
@@ -392,14 +396,21 @@ export const Summary = () => {
 								title={t("notifications.canImprove.title")}
 								colorScheme="orange"
 								action={
-									<Link
-										href="#calendar"
-										className="hit-area-stable inline-flex items-center justify-center gap-2 rounded-[8px] border-[3px] border-[var(--frame)] bg-[var(--color-brand-orange)] px-4 py-2 text-sm font-black text-[var(--color-brand-ink)] shadow-[var(--shadow-brutal-btn)] transition-[transform,box-shadow] duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)]"
-									>
-										{premiumKey
-											? t("notifications.canImprove.reviewOptions")
-											: t("notifications.canImprove.considerPremium")}
-									</Link>
+									premiumKey ? (
+										<Link href="#calendar" className={BANNER_ACTION_CLASS}>
+											{t("notifications.canImprove.reviewOptions")}
+										</Link>
+									) : (
+										<button
+											type="button"
+											className={BANNER_ACTION_CLASS}
+											onClick={() =>
+												showPremiumModal({ feature: PremiumFeatureId.ADVANCED_METRICS, origin: PremiumOrigin.PLANNER })
+											}
+										>
+											{t("notifications.canImprove.considerPremium")}
+										</button>
+									)
 								}
 							>
 								{t.rich("notifications.canImprove.message", {

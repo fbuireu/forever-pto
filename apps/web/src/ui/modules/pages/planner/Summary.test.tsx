@@ -5,7 +5,7 @@ import enMessages from "@i18n/messages/en.json";
 import esMessages from "@i18n/messages/es.json";
 import frMessages from "@i18n/messages/fr.json";
 import itMessages from "@i18n/messages/it.json";
-import { type RenderResult, render } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import type { Locale } from "next-intl";
 import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
@@ -16,7 +16,7 @@ const { locationState, premiumState, loaders } = vi.hoisted(() => ({
 		countries: [] as { value: string; label: string; flag: string }[],
 		regions: [] as { value: string; label: string }[],
 	},
-	premiumState: { premiumKey: "key" as string | null },
+	premiumState: { premiumKey: "key" as string | null, showPremiumModal: vi.fn() },
 	loaders: [] as (() => Promise<{ default: unknown }>)[],
 }));
 
@@ -64,6 +64,7 @@ beforeEach(() => {
 	locationState.countries = [];
 	locationState.regions = [];
 	premiumState.premiumKey = "key";
+	premiumState.showPremiumModal.mockClear();
 });
 
 vi.mock("@application/stores/filters", () => ({
@@ -567,6 +568,35 @@ describe("the banner that says a better plan exists, for a reader without Premiu
 
 		expect(container.textContent).toContain(enMessages.summary.notifications.canImprove.considerPremium);
 		expect(container.textContent).not.toContain(enMessages.summary.notifications.canImprove.reviewOptions);
+	});
+
+	it("opens the Premium modal on Advanced metrics, from the planner, when the offer is pressed", () => {
+		resetPlan();
+		premiumState.premiumKey = null;
+		holidaysState.alternatives = [planOf({ days: [JAN(6)], totalEffectiveDays: 7 })];
+
+		renderSummary();
+		fireEvent.click(screen.getByRole("button", { name: enMessages.summary.notifications.canImprove.considerPremium }));
+
+		expect(premiumState.showPremiumModal).toHaveBeenCalledExactlyOnceWith({
+			feature: "advancedMetrics",
+			origin: "planner",
+		});
+	});
+});
+
+describe("the banner that says a better plan exists, for a reader with Premium", () => {
+	it("points at the calendar and opens no Premium modal", () => {
+		resetPlan();
+		holidaysState.alternatives = [planOf({ days: [JAN(6)], totalEffectiveDays: 7 })];
+
+		const { container } = renderSummary();
+
+		expect(container.textContent).toContain(enMessages.summary.notifications.canImprove.reviewOptions);
+		expect(
+			screen.queryByRole("button", { name: enMessages.summary.notifications.canImprove.reviewOptions }),
+		).toBeNull();
+		expect(premiumState.showPremiumModal).not.toHaveBeenCalled();
 	});
 });
 
