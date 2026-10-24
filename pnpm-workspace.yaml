@@ -14,8 +14,6 @@ blockExoticSubdeps: true
 patchedDependencies:
   vaul@1.1.2: patches/vaul@1.1.2.patch
 minimumReleaseAgeExclude:
-  # Renovate security update: next@16.3.6 || 16.3.8
-  - next@16.3.6 || 16.3.8
   # Renovate security update: sharp@0.35.5
   - sharp@0.35.5
   # Renovate security update: zod@4.6.6
