@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.15.11](https://github.com/fbuireu/forever-pto/compare/web-v1.15.10...web-v1.15.11) (2026-10-24)
+
+
+### Bug Fixes
+
+* **web:** open the Premium modal from the better-plan banner's offer of Premium ([8b01bb8](https://github.com/fbuireu/forever-pto/commit/8b01bb8a15cd589a10c3b8e60d1a3df3b1d9337b)), closes [#calendar](https://github.com/fbuireu/forever-pto/issues/calendar)
+
 # [forever-pto-web-v1.15.10](https://github.com/fbuireu/forever-pto/compare/web-v1.15.9...web-v1.15.10) (2026-10-24)
 
 
