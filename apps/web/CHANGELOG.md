@@ -1,3 +1,11 @@
+# [forever-pto-web-v1.15.16](https://github.com/fbuireu/forever-pto/compare/web-v1.15.15...web-v1.15.16) (2026-11-01)
+
+
+### Bug Fixes
+
+* **deps:** update dependency jose to v6.2.13 ([#443](https://github.com/fbuireu/forever-pto/issues/443)) ([0d60e6c](https://github.com/fbuireu/forever-pto/commit/0d60e6c5f9b75d8cf2152904177907af50ee9f88))
+* **deps:** update dependency next to v16.4.3 ([#444](https://github.com/fbuireu/forever-pto/issues/444)) ([c9736d2](https://github.com/fbuireu/forever-pto/commit/c9736d2880adf194f558a7ea36a8996c455c8058))
+
 # [forever-pto-web-v1.15.15](https://github.com/fbuireu/forever-pto/compare/web-v1.15.14...web-v1.15.15) (2026-11-01)
 
 
