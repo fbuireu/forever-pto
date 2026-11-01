@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.15.13](https://github.com/fbuireu/forever-pto/compare/web-v1.15.12...web-v1.15.13) (2026-11-01)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @hookform/resolvers to v5.9.2 ([#438](https://github.com/fbuireu/forever-pto/issues/438)) ([7900282](https://github.com/fbuireu/forever-pto/commit/79002823605b45ef9bd87e3ae8104201ca276ff2))
+
 # [forever-pto-web-v1.15.12](https://github.com/fbuireu/forever-pto/compare/web-v1.15.11...web-v1.15.12) (2026-10-24)
 
 
