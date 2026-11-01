@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.15.15](https://github.com/fbuireu/forever-pto/compare/web-v1.15.14...web-v1.15.15) (2026-11-01)
+
+
+### Bug Fixes
+
+* **deps:** update dependency effect to v3.22.4 ([#442](https://github.com/fbuireu/forever-pto/issues/442)) ([c459d7c](https://github.com/fbuireu/forever-pto/commit/c459d7cd339fffa3c2599dedfd2dc53ab7ff2bdd))
+
 # [forever-pto-web-v1.15.14](https://github.com/fbuireu/forever-pto/compare/web-v1.15.13...web-v1.15.14) (2026-11-01)
 
 
