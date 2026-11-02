@@ -23,8 +23,8 @@ flowchart LR
     TC & PW --> JOIN{{"both settled"}}
     JOIN --> BLD["Build: astro build"] --> E2E["Run E2E tests"] --> ART["Upload docs-dist"]
   end
-  ART -->|pull_request| PV["preview: deploy --env development --name pr-n-…"]
-  ART -->|push to main or dispatch| D[deploy --env production]
+  ART -->|pull_request| PV["preview: prepare-env, deploy --env development --name pr-n-…"]
+  ART -->|push to main or dispatch| D["deploy: prepare-env, deploy --env production"]
   D --> S[smoke against DOCS_SITE_URL]
   S -->|push only| R[release-docs]
   S -. failed .-> RB[rollback]
@@ -54,7 +54,7 @@ There is no Biome step here. Both packages are linted in one root pass from the 
 
 ## PR previews (ephemeral environments)
 
-A docs preview is an **ephemeral environment**, one Worker per pull request, the way the [app's](/infra/environments/#per-pr-previews-ephemeral-environments) are. It exists only for a pull request whose range touches `DOCS_PATHS`: `changes` gates `build`, and the `preview` job needs `build`, so a preview is deployed only once the typecheck, the build and the whole Playwright suite have passed against the local build, and a pull request that changes nothing the site is built from gets none. The preview job downloads the build artifact the `build` job already produced and deploys it as its own Worker, in the `docs-development` environment, through `cloudflare/wrangler-action` on the wrangler version `apps/docs/package.json` pins:
+A docs preview is an **ephemeral environment**, one Worker per pull request, the way the [app's](/infra/environments/#per-pr-previews-ephemeral-environments) are. It exists only for a pull request whose range touches `DOCS_PATHS`: `changes` gates `build`, and the `preview` job needs `build`, so a preview is deployed only once the typecheck, the build and the whole Playwright suite have passed against the local build, and a pull request that changes nothing the site is built from gets none. The preview job runs `prepare-env`, downloads the build artifact the `build` job already produced and deploys it as its own Worker, in the `docs-development` environment, through `cloudflare/wrangler-action` on the wrangler version `apps/docs/package.json` pins:
 
 ```bash
 wrangler deploy --env development --name pr-<n>-forever-pto-docs-development
@@ -69,6 +69,8 @@ https://pr-<n>-forever-pto-docs-development.fbuireu.workers.dev
 The `development` environment carries no custom domain, so a preview cannot answer on docs.forever-pto.com however it is deployed. Every push to the PR redeploys the same name, so the link the job posts once stays valid for the PR's whole life.
 
 What the docs preview does *not* need is what separates it from the app's: no bindings, no `--secrets-file` on the deploy, no `--var` override, and no second build; it ships the `docs-dist` artifact.
+
+It installs the workspace all the same, and so does the production deploy, because both run Node without building anything: the step that reads the wrangler pin is `node -p`, and `wrangler-action` starts wrangler on whatever Node the runner's `PATH` holds. Without `prepare-env` that is the Node the runner image ships, not the one `.nvmrc` pins, and the action installs its own wrangler with npm; with it, both run on the pinned Node, and the action finds the pinned wrangler already in `apps/docs/node_modules` and installs nothing.
 
 ### The URL comment
 
@@ -90,7 +92,7 @@ The app's job in that workflow has to queue behind the CI run, because app E2E d
 
 ## Production deploy
 
-On `main`, the deploy job reuses the build job's `apps/docs/dist` artifact and runs `wrangler deploy` via `wrangler-action`, handing it the wrangler version a step reads out of `apps/docs/package.json` so they never diverge, activating a new version of `forever-pto-docs` on `docs.forever-pto.com` (an infrastructure-as-code `custom_domain` route; see [Cloudflare stack](/infra/cloudflare/)). The Worker has no script: Cloudflare serves `dist` as static assets, and `not_found_handling = "404-page"` in `apps/docs/wrangler.toml` answers a path with no file with the site's own `404.html` and a 404 status. The only credentials involved are `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; the site has no [runtime secrets](/infra/secrets/) at all. The package carries no deploy script, because one without `--env` would deploy the top-level config onto the production Worker's name without its route: a manual run of the workflow is the way to redeploy without a commit.
+On `main`, the deploy job runs `prepare-env`, reuses the build job's `apps/docs/dist` artifact and runs `wrangler deploy` via `wrangler-action`, handing it the wrangler version a step reads out of `apps/docs/package.json` so they never diverge, activating a new version of `forever-pto-docs` on `docs.forever-pto.com` (an infrastructure-as-code `custom_domain` route; see [Cloudflare stack](/infra/cloudflare/)). The Worker has no script: Cloudflare serves `dist` as static assets, and `not_found_handling = "404-page"` in `apps/docs/wrangler.toml` answers a path with no file with the site's own `404.html` and a 404 status. The only credentials involved are `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; the site has no [runtime secrets](/infra/secrets/) at all. The package carries no deploy script, because one without `--env` would deploy the top-level config onto the production Worker's name without its route: a manual run of the workflow is the way to redeploy without a commit.
 
 ## Accepted cost: docs PRs still run app CI
 
