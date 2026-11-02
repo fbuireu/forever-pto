@@ -17,16 +17,11 @@ const fromCodePoints = (points: ArrayLike<number>): string => {
 };
 
 export function base64Encode(str: string): string {
-	return btoa(fromCodePoints(new TextEncoder().encode(str)));
+	return new TextEncoder().encode(str).toBase64();
 }
 
 export function base64Decode(str: string): string {
-	const binaryString = atob(str);
-	const bytes = new Uint8Array(binaryString.length);
-	for (let i = 0; i < binaryString.length; i++) {
-		bytes[i] = binaryString.codePointAt(i) ?? 0;
-	}
-	return new TextDecoder().decode(bytes);
+	return new TextDecoder().decode(Uint8Array.fromBase64(str));
 }
 
 const xorWithKey = ({ text, key }: ObfuscationParams): string => {

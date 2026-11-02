@@ -133,7 +133,7 @@ export const findBridges = ({ availableWorkdays, holidays }: FindBridgesParams):
 	const workdayAt = new Map<number, Date>();
 	for (const workday of sortedWorkdays) {
 		const index = dayIndex(workday);
-		if (!workdayAt.has(index)) workdayAt.set(index, workday);
+		workdayAt.getOrInsert(index, workday);
 	}
 
 	const analyzeRun = ({ first, days }: AnalyzeRunParams) => {

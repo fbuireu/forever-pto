@@ -6,15 +6,8 @@ interface LabelledOption {
 
 const collators = new Map<string, Intl.Collator>();
 
-const collatorFor = (locale?: Locale): Intl.Collator => {
-	const key = locale ?? "";
-	const cached = collators.get(key);
-	if (cached) return cached;
-
-	const collator = new Intl.Collator(locale);
-	collators.set(key, collator);
-	return collator;
-};
+const collatorFor = (locale?: Locale): Intl.Collator =>
+	collators.getOrInsertComputed(locale ?? "", () => new Intl.Collator(locale));
 
 export interface CollateByLabelParams<T extends LabelledOption> {
 	options: T[];

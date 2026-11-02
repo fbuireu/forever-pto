@@ -28,12 +28,10 @@ const NO_TARGET: RefObject<HTMLSpanElement | null> = { current: null };
 const decimalSeparatorCache = new Map<string, string>();
 
 function getDecimalSeparator(locale: string): string {
-	let separator = decimalSeparatorCache.get(locale);
-	if (!separator) {
-		separator = new Intl.NumberFormat(locale).formatToParts(1.1).find(({ type }) => type === "decimal")?.value ?? ".";
-		decimalSeparatorCache.set(locale, separator);
-	}
-	return separator;
+	return decimalSeparatorCache.getOrInsertComputed(
+		locale,
+		() => new Intl.NumberFormat(locale).formatToParts(1.1).find(({ type }) => type === "decimal")?.value ?? ".",
+	);
 }
 
 interface SlidingNumberDisplayProps {

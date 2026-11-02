@@ -33,6 +33,23 @@ describe("base64Encode / base64Decode", () => {
 	it("decodes a known base64 value", () => {
 		expect(base64Decode("aGVsbG8=")).toBe("hello");
 	});
+
+	const btoaEncode = (text: string): string =>
+		btoa(Array.from(new TextEncoder().encode(text), (byte) => String.fromCodePoint(byte)).join(""));
+	const atobDecode = (encoded: string): string =>
+		new TextDecoder().decode(Uint8Array.from(atob(encoded), (char) => char.codePointAt(0) ?? 0));
+
+	it.each([
+		["plain ASCII", "hello world"],
+		["accents and emoji", "café 日本語 🎉"],
+		["the + and / of the standard alphabet, and its padding", "~~~???~"],
+		["a payload longer than one chunk", JSON.stringify({ days: Array.from({ length: 3000 }, (_, i) => i) })],
+		["an empty string", ""],
+	])("writes and reads the padded standard alphabet btoa and atob did, for %s", (_, text) => {
+		expect(base64Encode(text)).toBe(btoaEncode(text));
+		expect(base64Decode(btoaEncode(text))).toBe(text);
+		expect(atobDecode(base64Encode(text))).toBe(text);
+	});
 });
 
 describe("obfuscate / deobfuscate", () => {
@@ -88,6 +105,25 @@ describe("obfuscate / deobfuscate", () => {
 			expect(obfuscate({ text, key: secret })).toBe(referenceObfuscate({ text, key: secret }));
 		},
 	);
+
+	it.each([
+		["plain ASCII", "some payload"],
+		["accents and emoji", '{"name":"café 🎉","n":42}'],
+		["a payload longer than one chunk", JSON.stringify({ days: Array.from({ length: 3000 }, (_, i) => i) })],
+	])("reads what the previous implementation wrote, for %s, so stored blobs still open", (_, text) => {
+		expect(deobfuscate({ text: referenceObfuscate({ text, key }), key })).toBe(text);
+	});
+
+	it("opens a blob the btoa-based implementation stored", () => {
+		const stored =
+			"F00QFQ1ZFlZVCUMXF0gGDAwBJAYYThdRFw4UwohH8KaepElJWwkCAggAD0lWDhwAJwBVCggJAApNAgNAUVhNAhMCA0gZFxwIIgwPGEUAVlUpVEtTAVw4BEBNFQQeXhobAVBbVBg=";
+		const persisted = {
+			state: { premiumKey: "café 🎉", email: "ana@example.com", preferredMonths: [5, 6, 7] },
+			version: 3,
+		};
+
+		expect(deobfuscate({ text: stored, key: "local-storage-key" })).toBe(JSON.stringify(persisted));
+	});
 
 	it("round-trips a payload longer than one chunk", () => {
 		const text = JSON.stringify({ days: Array.from({ length: 3000 }, (_, i) => `2026-01-${i}`) });

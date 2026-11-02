@@ -166,8 +166,7 @@ function groupByMonth<T>({ items, getDate, locale }: GroupByMonthParams<T>): Mon
 	for (const item of items) {
 		const d = getDate(item);
 		const key = `${getYear(d)}-${String(getMonth(d)).padStart(2, "0")}`;
-		if (!map.has(key)) map.set(key, { month: fmtMonth({ date: d, locale }), items: [] });
-		map.get(key)?.items.push(item);
+		map.getOrInsertComputed(key, () => ({ month: fmtMonth({ date: d, locale }), items: [] })).items.push(item);
 	}
 
 	return [...map.entries()].toSorted(([a], [b]) => a.localeCompare(b)).map(([, g]) => g);

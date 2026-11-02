@@ -9,16 +9,11 @@ export const clearHolidayCache = (): void => {
 	holidaySetMemo = null;
 };
 
-export const getKey = (date: Date): string => {
-	const time = date.getTime();
-	const cached = DATE_KEY_CACHE.get(time);
-
-	if (cached !== undefined) return cached;
-
-	const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-	DATE_KEY_CACHE.set(time, key);
-	return key;
-};
+export const getKey = (date: Date): string =>
+	DATE_KEY_CACHE.getOrInsertComputed(
+		date.getTime(),
+		() => `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`,
+	);
 
 export const getCombinationKey = (days: Date[]): string => {
 	return days

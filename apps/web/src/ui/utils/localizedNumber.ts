@@ -21,34 +21,24 @@ interface Symbols {
 const localesByRequest = new Map<string, string>();
 const symbolsByLocale = new Map<string, Symbols>();
 
-export const intlLocaleOf = (locale: string): string => {
-	const known = localesByRequest.get(locale);
-	if (known) return known;
-
-	let resolved = FALLBACK_LOCALE;
+const resolveIntlLocale = (locale: string): string => {
 	try {
-		resolved = new Intl.NumberFormat(locale).resolvedOptions().locale;
+		return new Intl.NumberFormat(locale).resolvedOptions().locale;
 	} catch {
-		resolved = FALLBACK_LOCALE;
+		return FALLBACK_LOCALE;
 	}
-	localesByRequest.set(locale, resolved);
-
-	return resolved;
 };
 
-const symbolsOf = (locale: string): Symbols => {
-	const known = symbolsByLocale.get(locale);
-	if (known) return known;
+export const intlLocaleOf = (locale: string): string => localesByRequest.getOrInsertComputed(locale, resolveIntlLocale);
 
-	const parts = new Intl.NumberFormat(locale).formatToParts(FORMAT_SAMPLE);
-	const symbols = {
-		group: parts.find((part) => part.type === "group")?.value ?? "",
-		decimal: parts.find((part) => part.type === "decimal")?.value ?? ".",
-	};
-	symbolsByLocale.set(locale, symbols);
-
-	return symbols;
-};
+const symbolsOf = (locale: string): Symbols =>
+	symbolsByLocale.getOrInsertComputed(locale, () => {
+		const parts = new Intl.NumberFormat(locale).formatToParts(FORMAT_SAMPLE);
+		return {
+			group: parts.find((part) => part.type === "group")?.value ?? "",
+			decimal: parts.find((part) => part.type === "decimal")?.value ?? ".",
+		};
+	});
 
 interface Split {
 	integer: string;

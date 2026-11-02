@@ -199,16 +199,11 @@ interface DateFormatterParams {
 	format: IntlDateFormat;
 }
 
-const dateFormatter = ({ locale, format }: DateFormatterParams): Intl.DateTimeFormat => {
-	const key = `${locale}-${format}`;
-	let fmt = dateFormatCache.get(key);
-	if (!fmt) {
-		fmt = new Intl.DateTimeFormat(locale, INTL_FORMAT_MAP[format]);
-		dateFormatCache.set(key, fmt);
-	}
-
-	return fmt;
-};
+const dateFormatter = ({ locale, format }: DateFormatterParams): Intl.DateTimeFormat =>
+	dateFormatCache.getOrInsertComputed(
+		`${locale}-${format}`,
+		() => new Intl.DateTimeFormat(locale, INTL_FORMAT_MAP[format]),
+	);
 
 export const formatDate = ({ date, locale, format }: FormatDateParams): string => {
 	if (format === ISO_DATE) return isoDate(date);

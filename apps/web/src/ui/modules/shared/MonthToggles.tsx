@@ -50,9 +50,9 @@ export const MonthToggles = ({
 		planningWindowMonths({ year, carryOverMonths }).forEach((date, position) => {
 			const month = date.getMonth();
 			const monthYear = date.getFullYear();
-			const months = byYear.get(monthYear) ?? [];
-			months.push({ position, short: shortNames[month] ?? "", long: `${longNames[month]} ${monthYear}` });
-			byYear.set(monthYear, months);
+			byYear
+				.getOrInsertComputed(monthYear, () => [])
+				.push({ position, short: shortNames[month] ?? "", long: `${longNames[month]} ${monthYear}` });
 		});
 
 		return [...byYear].map(([groupYear, months]) => ({ year: groupYear, months }));

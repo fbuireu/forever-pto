@@ -10,22 +10,17 @@ export const DEFAULT_CURRENCY_SYMBOL = "€";
 
 const formatterCache = new Map<string, Intl.NumberFormat>();
 
-export const amountFormatter = (locale: Locale): Intl.NumberFormat => {
-	const cached = formatterCache.get(locale);
-
-	if (cached) return cached;
-
-	const formatter = new Intl.NumberFormat(locale, {
-		style: CURRENCY_PART,
-		currency: DEFAULT_CURRENCY,
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	});
-
-	formatterCache.set(locale, formatter);
-
-	return formatter;
-};
+export const amountFormatter = (locale: Locale): Intl.NumberFormat =>
+	formatterCache.getOrInsertComputed(
+		locale,
+		() =>
+			new Intl.NumberFormat(locale, {
+				style: CURRENCY_PART,
+				currency: DEFAULT_CURRENCY,
+				minimumFractionDigits: 0,
+				maximumFractionDigits: 0,
+			}),
+	);
 
 export const useCurrencyFormatter = (): ((value: number) => string) => {
 	const format = useFormatter();

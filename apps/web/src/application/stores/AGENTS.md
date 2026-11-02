@@ -93,9 +93,11 @@ whole partialized slice on every `set`, including the ones that touch only unper
 (`setCalculating`, the Alternative preview), so without the skip every calculation would re-obfuscate the
 holidays blob several times. The obfuscated branch remembers the last value it wrote or read per key and skips
 a write of the same value while storage still holds what it wrote, so another tab's write is never mistaken
-for its own; the plain branch compares with what is stored. The obfuscation itself works on code units in
-chunks rather than one string per character, and its output is byte for byte what the per-character version
-wrote, which `utils/crypto.test.ts` pins against that version, so every blob already stored still reads.
+for its own; the plain branch compares with what is stored. The XOR works on code units in chunks rather than
+one string per character, and the base64 is the platform's own, `Uint8Array`'s `toBase64` and `fromBase64` on the
+standard alphabet with its padding, which is what `btoa` and `atob` wrote and read. The output is byte for byte what
+the per-character version wrote, and `utils/crypto.test.ts` pins both directions against the code they replace and
+opens a blob the `btoa` version stored, so every blob already stored still reads.
 
 **`partialize` is the whole persistence contract.** A field absent from it is browser-session state by
 design, and some of those omissions are load-bearing:
