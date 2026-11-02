@@ -8,6 +8,8 @@ Accepted. Amended 2026-10-02: `biome.json` keeps one exclusion, [`next-env.d.ts`
 
 Amended 2026-10-11: the decisions live in `docs/adr/`, the path every sibling repository uses. The root `docs/` this decision kept them out of was the docs package, which is `apps/docs` now, so a root `docs/` names nothing else and the reason for lifting them to the root is gone. The consistency suite stays in `tests/`.
 
+Amended 2026-11-02: nothing the site builds reaches `temporal-polyfill`, so [`apps/docs/package.json`](../../apps/docs/package.json) no longer declares it, and of the two packages the consequence below names it declares `react-use-measure` alone. The rule stands: the docs package declares what its `@ui` closure reaches, and nothing it does not. With `temporal-polyfill` unresolvable from either package, `astro check` and the docs build both pass.
+
 ## Context
 
 The repository held a pair of deliverables and treated only one of them as a package. [`pnpm-workspace.yaml`](../../pnpm-workspace.yaml) listed `./` and `docs`, so the workspace root **was** the app: its dependencies, its scripts, its [`tsconfig.json`](../../tsconfig.json), its `wrangler.toml` and its `src/` all sat at the top level, and the documentation site was the only thing with a directory of its own.
