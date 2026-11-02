@@ -25,7 +25,7 @@ test("the core @source still generates the utilities only the app names", async 
 	await expect(button).toBeVisible();
 
 	await expect(button, `${probe} is the probe, so it has to be on the element`).toHaveClass(
-		new RegExp(probe.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
+		new RegExp(RegExp.escape(probe)),
 	);
 
 	const letterSpacing = await button.evaluate((element) => getComputedStyle(element).letterSpacing);

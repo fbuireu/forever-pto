@@ -131,10 +131,8 @@ export interface RenderedDiagram {
 
 export const renderMermaid = (source: string): Promise<RenderedDiagram> => {
 	const key = createHash("sha1").update(source).digest("hex").slice(0, 12);
-	const cached = rendered.get(key);
-	if (cached) return cached;
 
-	const job = (async () => {
+	return rendered.getOrInsertComputed(key, async () => {
 		const tab = await renderer();
 		const tokens = readTokens();
 		const draw = (theme: "light" | "dark") =>
@@ -149,8 +147,5 @@ export const renderMermaid = (source: string): Promise<RenderedDiagram> => {
 			);
 
 		return { light: await draw("light"), dark: await draw("dark") };
-	})();
-
-	rendered.set(key, job);
-	return job;
+	});
 };
