@@ -78,7 +78,7 @@ const retiredTermPattern = (term: string): RegExp =>
 	new RegExp(
 		`\\b${term
 			.split(/\s+/)
-			.map((word) => `${escapeForRegExp(word)}s?`)
+			.map((word) => `${RegExp.escape(word)}s?`)
 			.join("\\s+")}\\b`,
 		"gi",
 	);
@@ -229,14 +229,11 @@ const aliasTargets = Object.entries(webTsconfigPaths).map(
 const webProduction = sourceFiles.filter((path) => path.startsWith(`${WEB_SRC}/`) && !TEST_FILE.test(path));
 
 const parsedSources = new Map<string, ts.SourceFile>();
-const parse = (path: string): ts.SourceFile => {
-	const cached = parsedSources.get(path);
-	if (cached) return cached;
-	const kind = path.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
-	const parsed = ts.createSourceFile(path, read(path), ts.ScriptTarget.Latest, true, kind);
-	parsedSources.set(path, parsed);
-	return parsed;
-};
+const parse = (path: string): ts.SourceFile =>
+	parsedSources.getOrInsertComputed(path, () => {
+		const kind = path.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
+		return ts.createSourceFile(path, read(path), ts.ScriptTarget.Latest, true, kind);
+	});
 
 interface ModuleImport {
 	specifier: string;
@@ -5244,7 +5241,7 @@ describe("the guides describe the project as it is configured", () => {
 			const rootGuide = read("AGENTS.md");
 			const wiki = read(`${DOCS}/src/content/docs/infra/workflows.mdx`);
 
-			const linked = new RegExp(String.raw`\]\([^)]*\.github/workflows/${escapeForRegExp(name)}\)`);
+			const linked = new RegExp(String.raw`\]\([^)]*\.github/workflows/${RegExp.escape(name)}\)`);
 
 			expect({ rootGuide: linked.test(rootGuide), wiki: wiki.includes(`## \`${name}\``) }).toEqual({
 				rootGuide: true,
