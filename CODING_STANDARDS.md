@@ -226,9 +226,14 @@ No rule below restates these, and a diff that breaks one fails CI:
   cast on the narrowed payload hides a relabelled case.
 - `M7` **hard**: Cast a stored or wire shape to a live one once, by name, at the seam (`Stored<T>` in
   `dateIntake.ts`), so every type downstream tells the truth.
-- `M8` **hard**: Declare an exhaustive map over a union with `satisfies Record<Union, …>`, or with a
-  `Record<Union, …>` annotation when no literal types are needed (`STRATEGY_OBJECTIVE`), and a literal table whose
-  literal types feed a typed API as `as const satisfies`, so a missing or mistyped key fails to compile.
+- `M8` **hard**: Type a literal table by how it is read, because an annotation forgets the keys a literal spells and
+  lets a misspelled one through. One read by its own keys or walked whole (`MODIFIERS_CLASS_NAMES`) takes `satisfies`,
+  and `as const satisfies` when its literal values are read as types, with a template literal type where a value has a
+  format (`` `/${string}` ``); one over a closed union is `satisfies Record<Union, …>`, or a `Record<Union, …>`
+  annotation when no literal types are needed, so a missing member fails as well (`LABEL_KEY`, `STRATEGY_OBJECTIVE`);
+  one that holds some members of a union and is looked up by any of them is a `Partial<Record<Union, …>>` annotation,
+  whose lookup answers `… | undefined` (`LOCALE_FLAG`); and a `Record<string, …>` annotation is for a map looked up by
+  a key nothing fixes in advance (the `animation` `Sun.tsx` builds key by key).
 - `M9` **hard**: Declare a list whose members become a type (`LOCALES`) `as const`, or the derived type widens to
   `string`.
 - `M10` **judgement**: Narrow a field only where the value is proved: a `TEXT` column read back stays `string`, and

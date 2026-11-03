@@ -1,6 +1,6 @@
 import { getWeekdayNames } from "@application/shared/utils/dates";
 import { QuickStartSource } from "@application/stores/ui";
-import { LOCALES } from "@infrastructure/i18n/locales";
+import { LOCALES, type LocaleCode } from "@infrastructure/i18n/locales";
 import { Badge } from "@ui/modules/core/primitives/Badge";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { FlagIcon } from "@ui/modules/core/primitives/FlagIcon";
@@ -12,7 +12,7 @@ import type { ReactNode } from "react";
 import { version } from "../../../../../../package.json";
 import { CAL_ENTRIES, type DayType, SHOWCASE_EFFICIENCY, SHOWCASE_PLAN } from "./shared";
 
-const LOCALE_FLAG: Record<string, string> = { en: "gb", ca: "es-ct" };
+const LOCALE_FLAG: Partial<Record<LocaleCode, string>> = { en: "gb", ca: "es-ct" };
 
 const HERO_DAY_CLASS: Record<DayType, string> = {
 	work: "bg-card border-[2px] border-[var(--frame)]/15 rounded-lg",
