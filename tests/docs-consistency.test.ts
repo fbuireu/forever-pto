@@ -1505,7 +1505,7 @@ describe("documentation does not point at things that are gone", () => {
 	const FENCED_BLOCK = /```[\s\S]*?```/g;
 	const CODE_SPAN = /`[^`\n]*`/g;
 	const QUOTED_PHRASE = /"[^"\n]*"|“[^”\n]*”/g;
-	const HISTORY_MARKERS: Record<string, RegExp> = {
+	const HISTORY_MARKERS = {
 		"used to": /(?<=\w\s+)(?<!\b(?:is|are|was|were|be|been|being|get|gets|got|and|or)\s+)\bused\s+to\b/gi,
 		"no longer": /\bno\s+longer\b(?!\s+exists?\b)/gi,
 		"any more": /\banymore\b|\bany\s+more(?=\s*[.,;:)])/gi,
@@ -1516,7 +1516,7 @@ describe("documentation does not point at things that are gone", () => {
 		"was … until": /\b(?:was|were)\b[^.;:!?]{0,100}?\buntil\b/gi,
 		"a change narrated":
 			/\b(?:was|were|has\s+been|have\s+been)\s+(?:weighed|tried|rejected|rewritten|reverted|retired|superseded|dropped|replaced|renamed)\b/gi,
-	};
+	} satisfies Record<string, RegExp>;
 
 	const proseOf = (source: string) =>
 		[FENCED_BLOCK, CODE_SPAN, QUOTED_PHRASE].reduce(
@@ -1548,7 +1548,7 @@ describe("documentation does not point at things that are gone", () => {
 	});
 
 	it("reads every history marker in prose, and none in a code span, a fence, a quotation or a participle", () => {
-		const TELLS_HISTORY: Record<string, string[]> = {
+		const TELLS_HISTORY = {
 			"used to": ["It used to centre on phones.", "the list\nused to be a filter", "values that used to be cached"],
 			"no longer": ["so the type no longer has to compensate", "No longer reachable."],
 			"any more": ["It does not exist any more: the platform", "not anymore.", "are not any\nmore, they"],
@@ -1558,7 +1558,7 @@ describe("documentation does not point at things that are gone", () => {
 			"a dated event": ["so on 2026-08-29 they reverted", "(2026-09-12)"],
 			"was … until": ["The flag was on, with sites, until it was found", "they were,\nuntil both packages"],
 			"a change narrated": ["that was weighed and rejected", "has been replaced by", "was tried and"],
-		};
+		} satisfies Record<string, string[]>;
 		const TELLS_NONE = [
 			"a code, used to pre-select the calendar",
 			"Used to pre-select the calendar",
@@ -1972,7 +1972,7 @@ describe("the hand-written source carries no explanatory comments", () => {
 		...huskyHooks,
 		...DOTFILE_CONFIGS.filter((path) => existsSync(join(ROOT, path))),
 	];
-	const areas: Record<string, string[]> = {
+	const areas = {
 		"the contract suite": commentedFiles.filter((path) => path.startsWith("tests/") && SCRIPT_FILE.test(path)),
 		"the app's TypeScript": commentedFiles.filter((path) => path.startsWith(`${WEB}/src/`) && SCRIPT_FILE.test(path)),
 		"the app's e2e specs and configs": commentedFiles.filter(
@@ -1992,7 +1992,7 @@ describe("the hand-written source carries no explanatory comments", () => {
 		"the Worker configs, env examples and headers": commentedFiles.filter((path) => HASH_COMMENTED_FILE.test(path)),
 		"the Husky hooks": huskyHooks,
 		"the configs under a dotfile name": commentedFiles.filter((path) => DOTFILE_CONFIGS.includes(path)),
-	};
+	} satisfies Record<string, string[]>;
 
 	it("has hand-written sources of every kind to check", () => {
 		expect(
@@ -5934,7 +5934,7 @@ describe("translation bundles stay in step", () => {
 	});
 });
 
-const VERSIONED_DEPENDENCIES: Record<string, string[]> = {
+const VERSIONED_DEPENDENCIES = {
 	astro: ["Astro"],
 	"@astrojs/starlight": ["Starlight"],
 	effect: ["Effect"],
@@ -5945,7 +5945,7 @@ const VERSIONED_DEPENDENCIES: Record<string, string[]> = {
 	typescript: ["TypeScript"],
 	wrangler: ["wrangler", "Wrangler"],
 	zod: ["Zod", "zod"],
-};
+} satisfies Record<string, string[]>;
 const statedVersionPattern = (names: string[]): RegExp =>
 	new RegExp(`\\b(?:${names.map(RegExp.escape).join("|")})\\s+(?:v|@)?\\d+(?:\\.\\d+)*\\b`, "g");
 interface PolicedNamesParams {
