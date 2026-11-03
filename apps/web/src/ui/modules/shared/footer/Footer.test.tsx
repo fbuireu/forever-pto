@@ -39,14 +39,14 @@ import { Footer } from "./Footer";
 
 const footer = enMessages.footer;
 
-const BUNDLES: Record<string, typeof enMessages> = {
+const BUNDLES = {
 	en: enMessages,
 	es: esMessages,
 	ca: caMessages,
 	it: itMessages,
 	de: deMessages,
 	fr: frMessages,
-};
+} satisfies Record<Locale, typeof enMessages>;
 
 interface RenderFooterParams {
 	locale?: Locale;

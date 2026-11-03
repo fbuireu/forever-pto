@@ -28,7 +28,7 @@ const renderTitle = async ({ locale, messages }: RenderTitleParams): Promise<str
 	return container.querySelector("h1")?.textContent ?? "";
 };
 
-const BUNDLES: Record<string, typeof esMessages> = { en, es: esMessages, ca, it: itMessages, de, fr };
+const BUNDLES = { en, es: esMessages, ca, it: itMessages, de, fr } satisfies Record<Locale, typeof esMessages>;
 
 const taglineBadges = async ({ locale, messages }: RenderTitleParams): Promise<string[]> => {
 	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "planner" }));

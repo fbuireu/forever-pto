@@ -32,14 +32,14 @@ const boom = (message = "palm tree overflow"): ErrorBoundaryProps["error"] => {
 	return error;
 };
 
-const BUNDLES: Record<string, typeof en> = {
+const BUNDLES = {
 	en,
 	es: esMessages,
 	ca: caMessages,
 	it: itMessages,
 	de: deMessages,
 	fr: frMessages,
-};
+} satisfies Record<Locale, typeof en>;
 
 interface RenderErrorParams extends Partial<ErrorBoundaryProps> {
 	locale?: Locale;

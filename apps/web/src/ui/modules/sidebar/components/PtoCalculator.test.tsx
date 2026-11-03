@@ -59,7 +59,7 @@ vi.mock("@ui/modules/core/animate/icons/Icon", () => ({
 
 const { PtoCalculator } = await import("./PtoCalculator");
 
-const BUNDLES: Record<string, typeof en> = {
+const BUNDLES: Record<Locale, typeof en> = {
 	en,
 	es: esMessages,
 	ca: caMessages,
@@ -318,10 +318,10 @@ describe("the days-per-month field in the visitor's own language", () => {
 		["it", "2,5"],
 		["de", "2,5"],
 		["fr", "2,5"],
-	])("reads %s %j as two and a half days a month", async (locale, days) => {
+	] as const)("reads %s %j as two and a half days a month", async (locale, days) => {
 		const user = userEvent.setup();
-		const messages = BUNDLES[locale] as typeof en;
-		const { container } = renderCalculator({ locale: locale as Locale, messages });
+		const messages = BUNDLES[locale];
+		const { container } = renderCalculator({ locale, messages });
 
 		await calculate({ user, days, month: "5", messages });
 		await user.click(apply(messages));
@@ -334,10 +334,10 @@ describe("the days-per-month field in the visitor's own language", () => {
 		["es", "2.5"],
 		["de", "2.5"],
 		["en", "2,5"],
-	])("reads %s %j, the other language's decimal separator, as two and a half too", async (locale, days) => {
+	] as const)("reads %s %j, the other language's decimal separator, as two and a half too", async (locale, days) => {
 		const user = userEvent.setup();
-		const messages = BUNDLES[locale] as typeof en;
-		const { container } = renderCalculator({ locale: locale as Locale, messages });
+		const messages = BUNDLES[locale];
+		const { container } = renderCalculator({ locale, messages });
 
 		await calculate({ user, days, month: "5", messages });
 
@@ -348,11 +348,11 @@ describe("the days-per-month field in the visitor's own language", () => {
 		["es", "2,5"],
 		["de", "2,5"],
 		["en", "2.5"],
-	])(
+	] as const)(
 		"shows %s %j as the visitor typed it, and as the language writes it once the field is left",
 		async (locale, days) => {
 			const user = userEvent.setup();
-			renderCalculator({ locale: locale as Locale, messages: BUNDLES[locale] as typeof en });
+			renderCalculator({ locale, messages: BUNDLES[locale] });
 
 			await setDaysPerMonth({ user, value: days });
 			await user.tab();

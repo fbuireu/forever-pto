@@ -56,7 +56,7 @@ const BUTTON_MOTION_CONFIG = {
 	transition: { type: "spring", stiffness: 200, damping: 25 },
 } as const;
 
-const LABEL_VARIANTS: Variants = {
+const LABEL_VARIANTS = {
 	rest: { opacity: 0, x: 4 },
 	hover: {
 		opacity: 1,
@@ -65,7 +65,7 @@ const LABEL_VARIANTS: Variants = {
 		width: "auto",
 	},
 	tap: { opacity: 1, x: 0, visibility: "visible", width: "auto" },
-};
+} satisfies Variants;
 
 const LABEL_TRANSITION: Transition = {
 	type: "spring",

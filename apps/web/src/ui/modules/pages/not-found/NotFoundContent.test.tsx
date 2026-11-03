@@ -22,14 +22,14 @@ import { NotFoundContent } from "./NotFoundContent";
 
 const notFound = enMessages.notFound;
 
-const BUNDLES: Record<string, typeof enMessages> = {
+const BUNDLES = {
 	en: enMessages,
 	es: esMessages,
 	ca: caMessages,
 	it: itMessages,
 	de: deMessages,
 	fr: frMessages,
-};
+} satisfies Record<Locale, typeof enMessages>;
 
 interface RenderNotFoundParams {
 	locale?: Locale;

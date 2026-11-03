@@ -19,7 +19,7 @@ import { useForm } from "react-hook-form";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DonationForm } from "./DonationForm";
 
-const BUNDLES: Record<string, typeof enMessages> = {
+const BUNDLES: Record<Locale, typeof enMessages> = {
 	en: enMessages,
 	es: esMessages,
 	ca: caMessages,
@@ -34,7 +34,7 @@ const AMOUNT_TOO_HIGH = "the amount is above the maximum";
 const onSubmit = vi.fn<(data: CreatePaymentInput) => void>();
 
 interface HarnessProps {
-	locale: string;
+	locale: Locale;
 }
 
 const Harness = ({ locale }: HarnessProps) => {
@@ -51,12 +51,12 @@ const Harness = ({ locale }: HarnessProps) => {
 	});
 
 	return (
-		<NextIntlClientProvider locale={locale as Locale} messages={BUNDLES[locale] as typeof enMessages}>
+		<NextIntlClientProvider locale={locale} messages={BUNDLES[locale]}>
 			<DonationForm
 				form={form}
 				onSubmit={onSubmit}
 				currentAmount={amountFromField(form.watch("amount"))}
-				locale={locale as Locale}
+				locale={locale}
 				currency="EUR"
 				currencySymbol="€"
 				isPending={false}
@@ -65,11 +65,11 @@ const Harness = ({ locale }: HarnessProps) => {
 	);
 };
 
-const open = (locale: string): HTMLInputElement => {
+const open = (locale: Locale): HTMLInputElement => {
 	render(<Harness locale={locale} />);
 
 	return screen.getByRole<HTMLInputElement>("textbox", {
-		name: (BUNDLES[locale] as typeof enMessages).donationForm.donationAmount,
+		name: BUNDLES[locale].donationForm.donationAmount,
 	});
 };
 
@@ -82,14 +82,12 @@ const typeAmount = async ({ amount, text }: { amount: HTMLInputElement; text: st
 };
 
 interface SubmitParams {
-	locale: string;
+	locale: Locale;
 	user: ReturnType<typeof userEvent.setup>;
 }
 
 const submit = async ({ locale, user }: SubmitParams): Promise<void> => {
-	await user.click(
-		screen.getByRole("button", { name: (BUNDLES[locale] as typeof enMessages).donationForm.continueToPayment }),
-	);
+	await user.click(screen.getByRole("button", { name: BUNDLES[locale].donationForm.continueToPayment }));
 };
 
 const preset = (euros: number): HTMLElement => screen.getByRole("button", { name: new RegExp(`^${euros}\\s?€$`) });
@@ -108,7 +106,7 @@ describe("the Donation amount in the visitor's own language", () => {
 		["it", "2,5"],
 		["de", "2,5"],
 		["fr", "2,5"],
-	])("reads %s %j as two and a half", async (locale, text) => {
+	] as const)("reads %s %j as two and a half", async (locale, text) => {
 		const amount = open(locale);
 		const user = await typeAmount({ amount, text });
 
@@ -123,7 +121,7 @@ describe("the Donation amount in the visitor's own language", () => {
 		["de", "1.500"],
 		["it", "1.500"],
 		["fr", "1 500"],
-	])("reads %s %j as fifteen hundred", async (locale, text) => {
+	] as const)("reads %s %j as fifteen hundred", async (locale, text) => {
 		const amount = open(locale);
 		const user = await typeAmount({ amount, text });
 
@@ -136,7 +134,7 @@ describe("the Donation amount in the visitor's own language", () => {
 		["en", "10,000"],
 		["es", "10.000"],
 		["de", "10.000"],
-	])("accepts %s %j, which is the maximum itself", async (locale, text) => {
+	] as const)("accepts %s %j, which is the maximum itself", async (locale, text) => {
 		const amount = open(locale);
 		const user = await typeAmount({ amount, text });
 
@@ -149,7 +147,7 @@ describe("the Donation amount in the visitor's own language", () => {
 		["en", "30,000"],
 		["es", "30.000"],
 		["de", "30.000"],
-	])("reads %s %j as thirty thousand, which is past the maximum, and not as thirty", async (locale, text) => {
+	] as const)("reads %s %j as thirty thousand, which is past the maximum, and not as thirty", async (locale, text) => {
 		const amount = open(locale);
 		const user = await typeAmount({ amount, text });
 
@@ -162,7 +160,7 @@ describe("the Donation amount in the visitor's own language", () => {
 	it.each([
 		["en", "10,001"],
 		["es", "10.001"],
-	])(
+	] as const)(
 		"refuses %s %j, one past the maximum, with the maximum's own message, and does not clamp it",
 		async (locale, text) => {
 			const amount = open(locale);
@@ -181,7 +179,7 @@ describe("the Donation amount in the visitor's own language", () => {
 		["en", "0"],
 		["es", "0,5"],
 		["de", "0,99"],
-	])("refuses %s %j, below the minimum, with the minimum's own message", async (locale, text) => {
+	] as const)("refuses %s %j, below the minimum, with the minimum's own message", async (locale, text) => {
 		const amount = open(locale);
 		const user = await typeAmount({ amount, text });
 
@@ -194,7 +192,7 @@ describe("the Donation amount in the visitor's own language", () => {
 	it.each([
 		["en", "-5"],
 		["es", "-5"],
-	])("refuses %s %j, a negative amount, with the minimum's own message", async (locale, text) => {
+	] as const)("refuses %s %j, a negative amount, with the minimum's own message", async (locale, text) => {
 		const amount = open(locale);
 		const user = await typeAmount({ amount, text });
 
@@ -207,7 +205,7 @@ describe("the Donation amount in the visitor's own language", () => {
 	it.each([
 		["en", "1"],
 		["es", "1"],
-	])("accepts %s %j, which is the minimum itself", async (locale, text) => {
+	] as const)("accepts %s %j, which is the minimum itself", async (locale, text) => {
 		const amount = open(locale);
 		const user = await typeAmount({ amount, text });
 
@@ -224,7 +222,7 @@ describe("a Donation amount written with the other language's separator", () => 
 		["de", "2.5"],
 		["en", "2,5"],
 		["en", "2,50"],
-	])("reads %s %j as two and a half, never as twenty-five or two hundred and fifty", async (locale, text) => {
+	] as const)("reads %s %j as two and a half, never as twenty-five or two hundred and fifty", async (locale, text) => {
 		const amount = open(locale);
 		const user = await typeAmount({ amount, text });
 
@@ -245,14 +243,17 @@ describe("a Donation amount written with the other language's separator", () => 
 	it.each([
 		["es", "1.234"],
 		["en", "1,234"],
-	])("keeps %s %j, a separator before exactly three digits, as the language's grouping", async (locale, text) => {
-		const amount = open(locale);
-		const user = await typeAmount({ amount, text });
+	] as const)(
+		"keeps %s %j, a separator before exactly three digits, as the language's grouping",
+		async (locale, text) => {
+			const amount = open(locale);
+			const user = await typeAmount({ amount, text });
 
-		await submit({ locale, user });
+			await submit({ locale, user });
 
-		await waitFor(() => expect(donated()).toEqual([1234]));
-	});
+			await waitFor(() => expect(donated()).toEqual([1234]));
+		},
+	);
 });
 
 describe("a Donation amount that is empty or cannot be read", () => {
@@ -268,16 +269,19 @@ describe("a Donation amount that is empty or cannot be read", () => {
 		expect(amount.value).toBe("");
 	});
 
-	it.each(["en", "es", "de"])("fails an empty submit in %s on the minimum's own message, not Zod's", async (locale) => {
-		const amount = open(locale);
-		const user = await typeAmount({ amount, text: "" });
+	it.each(["en", "es", "de"] as const)(
+		"fails an empty submit in %s on the minimum's own message, not Zod's",
+		async (locale) => {
+			const amount = open(locale);
+			const user = await typeAmount({ amount, text: "" });
 
-		await submit({ locale, user });
+			await submit({ locale, user });
 
-		expect(await screen.findByText(AMOUNT_TOO_LOW)).toBeDefined();
-		expect(screen.queryByText(/expected number/i)).toBeNull();
-		expect(donated()).toEqual([]);
-	});
+			expect(await screen.findByText(AMOUNT_TOO_LOW)).toBeDefined();
+			expect(screen.queryByText(/expected number/i)).toBeNull();
+			expect(donated()).toEqual([]);
+		},
+	);
 
 	it.each([
 		["en", "."],
@@ -285,7 +289,7 @@ describe("a Donation amount that is empty or cannot be read", () => {
 		["es", "1.2.3"],
 		["de", "1.2.3"],
 		["en", "1,2,3"],
-	])("fails %s %j on the minimum's own message, as an emptied field does", async (locale, text) => {
+	] as const)("fails %s %j on the minimum's own message, as an emptied field does", async (locale, text) => {
 		const amount = open(locale);
 		const user = await typeAmount({ amount, text });
 

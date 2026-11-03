@@ -30,14 +30,14 @@ const REGIONS = [{ value: "CT", label: "Catalonia" }] as RegionDTO[];
 const location = enMessages.quickStart.location;
 const REGION_LABEL = "Region (optional)";
 
-const BUNDLES: Record<string, typeof enMessages> = {
+const BUNDLES = {
 	en: enMessages,
 	es: esMessages,
 	ca: caMessages,
 	it: itMessages,
 	de: deMessages,
 	fr: frMessages,
-};
+} satisfies Record<Locale, typeof enMessages>;
 
 interface RenderStepParams {
 	country?: string;

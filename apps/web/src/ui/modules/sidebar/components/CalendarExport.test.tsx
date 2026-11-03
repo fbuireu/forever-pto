@@ -55,14 +55,14 @@ vi.mock("@ui/modules/export/HolidayDocument", () => ({ HolidayDocument: () => nu
 
 const { CalendarExport } = await import("./CalendarExport");
 
-const BUNDLES: Record<string, typeof en> = {
+const BUNDLES = {
 	en,
 	es: esMessages,
 	ca: caMessages,
 	it: itMessages,
 	de: deMessages,
 	fr: frMessages,
-};
+} satisfies Record<Locale, typeof en>;
 
 const copy = en.calendarExport;
 

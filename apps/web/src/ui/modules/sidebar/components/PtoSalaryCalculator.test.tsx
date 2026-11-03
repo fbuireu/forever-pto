@@ -32,7 +32,7 @@ vi.mock("./SidebarFieldLabel", () => ({
 
 const { PtoSalaryCalculator } = await import("./PtoSalaryCalculator");
 
-const BUNDLES: Record<string, typeof en> = {
+const BUNDLES: Record<Locale, typeof en> = {
 	en,
 	es: esMessages,
 	ca: caMessages,
@@ -170,9 +170,9 @@ describe("PtoSalaryCalculator", () => {
 });
 
 describe("the salary calculator's fields in the visitor's own language", () => {
-	const inLocale = (locale: string) => {
+	const inLocale = (locale: Locale) => {
 		intl.locale = locale;
-		return renderCalculator({ locale: locale as Locale, messages: BUNDLES[locale] as typeof en });
+		return renderCalculator({ locale, messages: BUNDLES[locale] });
 	};
 
 	it.each([
@@ -182,7 +182,7 @@ describe("the salary calculator's fields in the visitor's own language", () => {
 		["it", "50.400", "1000€", "200€", "25.00€"],
 		["de", "50.400", "1000€", "200€", "25.00€"],
 		["fr", "50 400", "1000€", "200€", "25.00€"],
-	])(
+	] as const)(
 		"reads the salary %s %j as fifty thousand four hundred",
 		async (locale, typed, unusedValue, dailyRate, hourlyRate) => {
 			const user = userEvent.setup();
@@ -200,7 +200,7 @@ describe("the salary calculator's fields in the visitor's own language", () => {
 		["en", "2.5"],
 		["es", "2,5"],
 		["de", "2,5"],
-	])("reads %s %j unused days as two and a half, which the effective rate shows", async (locale, days) => {
+	] as const)("reads %s %j unused days as two and a half, which the effective rate shows", async (locale, days) => {
 		const user = userEvent.setup();
 		const input = inLocale(locale);
 		await user.type(input, locale === "en" ? "50,400" : "50.400");
@@ -218,7 +218,7 @@ describe("the salary calculator's fields in the visitor's own language", () => {
 		["it", "2,5", "2,5 giorni extra"],
 		["de", "2,5", "2,5 zusätzlichen"],
 		["fr", "2,5", "2,5 jours supplémentaires"],
-	])("echoes %s unused days %j with the language's own decimal mark", async (locale, days, echoed) => {
+	] as const)("echoes %s unused days %j with the language's own decimal mark", async (locale, days, echoed) => {
 		const user = userEvent.setup();
 		const input = inLocale(locale);
 		await user.type(input, locale === "en" ? "50,400" : locale === "fr" ? "50 400" : "50.400");

@@ -69,14 +69,14 @@ const holiday = (isoDate: string): HolidayDTO => ({
 	isInPlanningWindow: true,
 });
 
-const BUNDLES: Record<string, typeof en> = {
+const BUNDLES = {
 	en,
 	es: esMessages,
 	ca: caMessages,
 	it: itMessages,
 	de: deMessages,
 	fr: frMessages,
-};
+} satisfies Record<Locale, typeof en>;
 
 interface RenderCounterParams {
 	locale?: Locale;

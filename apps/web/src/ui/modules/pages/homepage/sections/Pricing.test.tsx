@@ -47,14 +47,14 @@ interface RenderPricingParams {
 	messages: typeof enMessages;
 }
 
-const BUNDLES: Record<string, typeof enMessages> = {
+const BUNDLES = {
 	en: enMessages,
 	es: esMessages,
 	ca: caMessages,
 	it: itMessages,
 	de: deMessages,
 	fr: frMessages,
-};
+} satisfies Record<Locale, typeof enMessages>;
 
 const mountPricing = async ({ locale, messages }: RenderPricingParams): Promise<RenderResult> => {
 	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "homepage" }));

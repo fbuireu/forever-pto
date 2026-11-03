@@ -20,14 +20,14 @@ import { HowItWorks } from "./HowItWorks";
 
 const how = enMessages.homepage.how;
 
-const BUNDLES: Record<string, typeof enMessages> = {
+const BUNDLES = {
 	en: enMessages,
 	es: esMessages,
 	ca: caMessages,
 	it: itMessages,
 	de: deMessages,
 	fr: frMessages,
-};
+} satisfies Record<Locale, typeof enMessages>;
 
 interface RenderHowItWorksParams {
 	locale?: Locale;

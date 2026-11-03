@@ -24,14 +24,14 @@ vi.mock("./shared", async (importOriginal) => ({
 import { Stats } from "./Stats";
 import { COUNTRY_COUNT } from "./shared";
 
-const BUNDLES: Record<string, typeof enMessages> = {
+const BUNDLES = {
 	en: enMessages,
 	es: esMessages,
 	ca: caMessages,
 	it: itMessages,
 	de: deMessages,
 	fr: frMessages,
-};
+} satisfies Record<Locale, typeof enMessages>;
 
 interface RenderStatsParams {
 	locale: Locale;

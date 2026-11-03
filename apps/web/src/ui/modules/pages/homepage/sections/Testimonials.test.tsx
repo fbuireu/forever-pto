@@ -19,14 +19,14 @@ vi.mock("@ui/modules/core/primitives/Badge", () => ({
 
 import { Testimonials } from "./Testimonials";
 
-const BUNDLES: Record<string, typeof enMessages> = {
+const BUNDLES = {
 	en: enMessages,
 	es: esMessages,
 	ca: caMessages,
 	it: itMessages,
 	de: deMessages,
 	fr: frMessages,
-};
+} satisfies Record<Locale, typeof enMessages>;
 
 interface RenderTestimonialsParams {
 	locale?: Locale;

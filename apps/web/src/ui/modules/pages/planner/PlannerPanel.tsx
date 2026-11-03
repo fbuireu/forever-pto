@@ -33,11 +33,11 @@ const STAT_CARD_MOTION_CONFIG = {
 	transition: { type: "spring", stiffness: 250, damping: 25 },
 } as const;
 
-const LABEL_VARIANTS: Variants = {
+const LABEL_VARIANTS = {
 	rest: { opacity: 0, x: 4 },
 	hover: { opacity: 1, x: 0, visibility: "visible" },
 	tap: { opacity: 1, x: 0, visibility: "visible" },
-};
+} satisfies Variants;
 
 const LABEL_TRANSITION: Transition = {
 	type: "spring",
@@ -45,14 +45,14 @@ const LABEL_TRANSITION: Transition = {
 	damping: 25,
 };
 
-const BADGE_VARIANTS: Variants = {
+const BADGE_VARIANTS = {
 	initial: { scale: 0, opacity: 0 },
 	animate: {
 		scale: 1,
 		opacity: 1,
 		transition: { type: "spring", stiffness: 200, damping: 20, delay: 0.2 },
 	},
-};
+} satisfies Variants;
 
 const STEP_BUTTON_TAP = { filter: "brightness(0.85)" } as const;
 

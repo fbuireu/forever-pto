@@ -43,14 +43,14 @@ interface RenderHeroParams {
 	messages: typeof enMessages;
 }
 
-const BUNDLES: Record<string, typeof enMessages> = {
+const BUNDLES = {
 	en: enMessages,
 	es: esMessages,
 	ca: caMessages,
 	it: itMessages,
 	de: deMessages,
 	fr: frMessages,
-};
+} satisfies Record<Locale, typeof enMessages>;
 
 const mountHero = async ({ locale, messages }: RenderHeroParams): Promise<RenderResult> => {
 	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "homepage" }));

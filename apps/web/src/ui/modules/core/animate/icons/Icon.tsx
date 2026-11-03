@@ -39,7 +39,7 @@ const staticAnimations = {
 				ease: "easeInOut",
 			},
 		},
-	} as Variants,
+	} satisfies Variants,
 	"path-loop": {
 		initial: { pathLength: 1 },
 		animate: {
@@ -49,7 +49,7 @@ const staticAnimations = {
 				ease: "easeInOut",
 			},
 		},
-	} as Variants,
+	} satisfies Variants,
 } as const;
 
 type StaticAnimations = keyof typeof staticAnimations;
@@ -661,7 +661,7 @@ function useVariants<V extends { default: T; [key: string]: T }, T extends Recor
 	let result: T;
 
 	if (animationType in staticAnimations) {
-		const variant = staticAnimations[animationType as StaticAnimations];
+		const variant: Variants = staticAnimations[animationType as StaticAnimations];
 		result = {} as T;
 		for (const key in animations.default) {
 			if ((animationType === "path" || animationType === "path-loop") && key.includes("group")) continue;

@@ -109,14 +109,14 @@ vi.mock("./components/SidebarCollapsibleGroup", () => ({
 
 const { AppSidebar } = await import("./AppSidebar");
 
-const BUNDLES: Record<string, typeof enMessages> = {
+const BUNDLES = {
 	en: enMessages,
 	es: esMessages,
 	ca: caMessages,
 	it: itMessages,
 	de: deMessages,
 	fr: frMessages,
-};
+} satisfies Record<Locale, typeof enMessages>;
 
 interface TranslateInParams {
 	locale: Locale;

@@ -18,14 +18,14 @@ vi.mock("../../Icon", () => ({ Icon: () => <svg role="presentation" /> }));
 
 const { DevFooter } = await import("./DevFooter");
 
-const BUNDLES: Record<string, typeof en> = {
+const BUNDLES = {
 	en,
 	es: esMessages,
 	ca: caMessages,
 	it: itMessages,
 	de: deMessages,
 	fr: frMessages,
-};
+} satisfies Record<Locale, typeof en>;
 
 interface RenderFooterParams {
 	locale?: Locale;
