@@ -30,7 +30,7 @@ export type ActivationOutcome =
 	| { status: 400 | 429 | 500; token: null; email: null; premiumKey: null; error: string };
 
 const failureContext = (failure: ActivationFailure): Record<string, unknown> => {
-	const { _tag, ...fields } = failure as unknown as Record<string, unknown>;
+	const { _tag, ...fields } = failure;
 
 	return { tag: failure._tag, ...fields, ...(failure.message ? { reason: failure.message } : {}) };
 };
@@ -78,7 +78,7 @@ const activatePremiumProgram = ({
 						logger.warn({ message: "Premium activation refused", context: failureContext(failure) });
 					}
 
-					return refused({ status: status as 400 | 429 | 500, error });
+					return refused({ status, error });
 				}),
 			),
 			Effect.provide(ApplicationLayer),

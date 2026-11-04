@@ -69,6 +69,16 @@ describe("describeFailure", () => {
 		},
 	);
 
+	it.each(["toString", "constructor", "hasOwnProperty"])(
+		"falls back to 500 for %s, a tag every object inherits, rather than calling the inherited function",
+		(tag) => {
+			expect(describeFailure({ _tag: tag } as never)).toEqual({
+				status: 500,
+				error: ApiError.INTERNAL_ERROR,
+			});
+		},
+	);
+
 	it("falls back to 500 for a value whose tag is not in the table, so the safety net survives", () => {
 		expect(describeFailure({ _tag: "SomethingElse" } as never)).toEqual({
 			status: 500,

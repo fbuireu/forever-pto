@@ -34,14 +34,16 @@ export type TaggedFailure =
 	| DatabaseError;
 
 export interface FailureDescriptor {
-	status: number;
+	status: 400 | 429 | 500;
 	error: string;
 }
+
+type FailureByTag = { [FAILURE in TaggedFailure as FAILURE["_tag"]]: FAILURE };
 
 const OPAQUE: FailureDescriptor = { status: 500, error: ApiError.INTERNAL_ERROR };
 
 const FAILURE_RESPONSES: {
-	[TAG in TaggedFailure["_tag"]]: (failure: Extract<TaggedFailure, { _tag: TAG }>) => FailureDescriptor;
+	[TAG in TaggedFailure["_tag"]]: (failure: FailureByTag[TAG]) => FailureDescriptor;
 } = {
 	RateLimitError: () => ({ status: 429, error: ApiError.RATE_LIMIT_EXCEEDED }),
 	DuplicateContactError: () => ({ status: 429, error: ApiError.CONTACT_ALREADY_RECEIVED }),
@@ -54,7 +56,13 @@ const FAILURE_RESPONSES: {
 	DatabaseError: () => OPAQUE,
 };
 
-export const describeFailure = (failure: TaggedFailure): FailureDescriptor => {
-	const describe = FAILURE_RESPONSES[failure._tag] as ((failure: TaggedFailure) => FailureDescriptor) | undefined;
-	return describe ? describe(failure) : OPAQUE;
-};
+interface RespondToParams<TAG extends TaggedFailure["_tag"]> {
+	tag: TAG;
+	failure: FailureByTag[TAG];
+}
+
+const respondTo = <TAG extends TaggedFailure["_tag"]>({ tag, failure }: RespondToParams<TAG>): FailureDescriptor =>
+	FAILURE_RESPONSES[tag](failure);
+
+export const describeFailure = (failure: TaggedFailure): FailureDescriptor =>
+	Object.hasOwn(FAILURE_RESPONSES, failure._tag) ? respondTo({ tag: failure._tag, failure }) : OPAQUE;
