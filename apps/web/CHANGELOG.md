@@ -1,3 +1,11 @@
+# [forever-pto-web-v1.15.17](https://github.com/fbuireu/forever-pto/compare/web-v1.15.16...web-v1.15.17) (2026-11-04)
+
+
+### Bug Fixes
+
+* **web:** fail a Form part outside its FormField or FormItem instead of rendering undefined ids ([022ce2f](https://github.com/fbuireu/forever-pto/commit/022ce2f785e1d83dcaa6e832e765b883dd873cdf))
+* **web:** fall back to an icon's default animation for a name every object inherits ([73904d8](https://github.com/fbuireu/forever-pto/commit/73904d8b0386eec3b1828814d9ca9cb4f64403f0))
+
 # [forever-pto-web-v1.15.16](https://github.com/fbuireu/forever-pto/compare/web-v1.15.15...web-v1.15.16) (2026-11-01)
 
 
