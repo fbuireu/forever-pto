@@ -554,6 +554,19 @@ describe("useVariants", () => {
 		expect(Object.keys(readVariants())).toStrictEqual(["path"]);
 		expect(readVariants().path).toMatchObject({ initial: { pathLength: 1 } });
 	});
+
+	it.each(["toString", "constructor", "hasOwnProperty"])(
+		"takes %s, a name every object inherits, as a name it does not know rather than a built-in animation",
+		(name) => {
+			render(
+				<AnimateIcon animate={name}>
+					<VariantProbe />
+				</AnimateIcon>,
+			);
+
+			expect(readVariants()).toStrictEqual(VARIANTS.default);
+		},
+	);
 });
 
 const PLAIN_ICON_CLASS = "[&_[stroke-dasharray='1px_1px']]:![stroke-dasharray:1px_0px]";

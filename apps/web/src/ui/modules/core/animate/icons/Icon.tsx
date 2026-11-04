@@ -655,23 +655,25 @@ function IconWrapper<T extends string>({
 	);
 }
 
-function useVariants<V extends { default: T; [key: string]: T }, T extends Record<string, Variants>>(animations: V): T {
+const isStaticAnimation = (animation: string): animation is StaticAnimations =>
+	Object.hasOwn(staticAnimations, animation);
+
+function useVariants<T extends Record<string, Variants>>(animations: { default: T; [key: string]: T }): T {
 	const { animation: animationType } = useAnimateIconContext();
 
-	let result: T;
-
-	if (animationType in staticAnimations) {
-		const variant: Variants = staticAnimations[animationType as StaticAnimations];
-		result = {} as T;
-		for (const key in animations.default) {
-			if ((animationType === "path" || animationType === "path-loop") && key.includes("group")) continue;
-			result[key] = variant as T[Extract<keyof T, string>];
-		}
-	} else {
-		result = (animations[animationType as keyof V] as T) ?? animations.default;
+	if (!isStaticAnimation(animationType)) {
+		return Object.hasOwn(animations, animationType) ? animations[animationType] : animations.default;
 	}
 
-	return result;
+	const variant = staticAnimations[animationType];
+	const skipsGroups = animationType === "path" || animationType === "path-loop";
+	const result: Record<string, Variants> = {};
+	for (const key in animations.default) {
+		if (skipsGroups && key.includes("group")) continue;
+		result[key] = variant;
+	}
+
+	return result as T;
 }
 
 export { AnimateIcon, type IconProps, IconWrapper, useAnimateIconContext, useVariants };
