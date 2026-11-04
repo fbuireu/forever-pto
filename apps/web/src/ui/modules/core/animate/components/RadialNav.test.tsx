@@ -6,7 +6,6 @@ interface MotionDivProps extends ComponentProps<"div"> {
 	initial?: unknown;
 	animate?: unknown;
 	transition?: unknown;
-	style?: Record<string, unknown>;
 }
 
 interface MotionButtonProps extends ComponentProps<"button"> {

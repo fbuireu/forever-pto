@@ -8,7 +8,6 @@ interface MotionDivProps extends ComponentProps<"div"> {
 	whileTap?: unknown;
 	transition?: unknown;
 	variants?: unknown;
-	style?: Record<string, unknown>;
 }
 
 interface MotionSpanProps extends ComponentProps<"span"> {
