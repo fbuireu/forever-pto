@@ -2,15 +2,7 @@
 
 import { cn } from "@ui/utils/cn";
 import { type HTMLMotionProps, isMotionComponent, m } from "motion/react";
-import {
-	type CSSProperties,
-	type ElementType,
-	isValidElement,
-	type ReactElement,
-	type Ref,
-	type RefCallback,
-	useMemo,
-} from "react";
+import { type ElementType, isValidElement, type ReactElement, type Ref, type RefCallback, useMemo } from "react";
 
 type AnyProps = Record<string, unknown>;
 
@@ -45,18 +37,21 @@ interface MergePropsParams<T extends HTMLElement> {
 	slotProps: DOMMotionProps<T>;
 }
 
+const objectOrUndefined = (value: unknown): object | undefined =>
+	typeof value === "object" && value !== null ? value : undefined;
+
 function mergeProps<T extends HTMLElement>({ childProps, slotProps }: MergePropsParams<T>): AnyProps {
 	const merged: AnyProps = { ...childProps, ...slotProps };
 
 	if (childProps.className || slotProps.className) {
-		merged.className = cn(childProps.className as string, slotProps.className as string);
+		merged.className = cn(
+			typeof childProps.className === "string" ? childProps.className : undefined,
+			slotProps.className,
+		);
 	}
 
 	if (childProps.style || slotProps.style) {
-		merged.style = {
-			...(childProps.style as CSSProperties),
-			...(slotProps.style as CSSProperties),
-		};
+		merged.style = { ...objectOrUndefined(childProps.style), ...slotProps.style };
 	}
 
 	return merged;

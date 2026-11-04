@@ -83,7 +83,9 @@ its error channel `never`. What the boundary does is pinned by
 
 Env: copy [`.env.example`](.env.example). Local Worker secrets go in `.dev.vars`. The typed surface the build uses is
 [`environment.d.ts`](./environment.d.ts) and nothing else; it hand-declares both `ProcessEnv` and the global
-`CloudflareEnv` the Cloudflare context is read through, and it is tracked.
+`CloudflareEnv` the Cloudflare context is read through, and it is tracked. It also augments two vendors' types: React's
+`CSSProperties` with the `--*` keys a `style` object sets a custom property through, and next-intl's `AppConfig` with
+the locales and the English bundle.
 
 **A `NEXT_PUBLIC_*` is inlined at build time, and `PUBLIC_ENV` in [`next.config.ts`](./next.config.ts) is what fails
 the build on a wrong one.** Each name maps to a zod schema, or to the `RUNTIME_ONLY` sentinel for the ones never

@@ -542,6 +542,9 @@ No rule below restates these, and a diff that breaks one fails CI:
 - `U30` **hard**: Read a context a component cannot work without through a `use…` hook that throws outside its
   provider, so a missing provider fails at the first render instead of rendering defaults: `getStrictContext`
   (`Form`, `Switch`), never a `createContext` whose default is `{}` cast to the shape.
+- `U31` **hard**: Set a CSS custom property in a `style` object as a plain key (`"--sidebar-width"`), with no cast:
+  `environment.d.ts` types every `--*` key on React's `CSSProperties`, and a cast to `CSSProperties` would let a
+  misspelled standard property beside it through as well.
 
 ## Accessibility
 

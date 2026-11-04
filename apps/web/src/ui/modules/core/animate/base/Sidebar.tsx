@@ -9,7 +9,6 @@ import { cva } from "class-variance-authority";
 import { AnimatePresence, m, type Transition } from "motion/react";
 import {
 	type ComponentProps,
-	type CSSProperties,
 	createContext,
 	type MouseEvent,
 	use,
@@ -139,13 +138,11 @@ function SidebarProvider({
 			<TooltipProvider>
 				<div
 					data-slot="sidebar-wrapper"
-					style={
-						{
-							"--sidebar-width": SIDEBAR_WIDTH,
-							"--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
-							...style,
-						} as CSSProperties
-					}
+					style={{
+						"--sidebar-width": SIDEBAR_WIDTH,
+						"--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
+						...style,
+					}}
 					className={cn(" group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex min-h-svh w-full", className)}
 					{...props}
 				>
@@ -254,7 +251,7 @@ function Sidebar({
 								"bg-sidebar text-sidebar-foreground fixed inset-y-0 z-51 flex h-full flex-col border-[3px] border-(--frame) shadow-(--shadow-brutal-xl) outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-inset",
 								side === "right" ? "right-0 rounded-l-[14px]" : "left-0 rounded-r-[14px]",
 							)}
-							style={{ "--sidebar-width": SIDEBAR_WIDTH_MOBILE, width: "var(--sidebar-width)" } as CSSProperties}
+							style={{ "--sidebar-width": SIDEBAR_WIDTH_MOBILE, width: "var(--sidebar-width)" }}
 							initial={{ x: side === "right" ? "100%" : "-100%" }}
 							animate={{ x: 0 }}
 							exit={{ x: side === "right" ? "100%" : "-100%" }}

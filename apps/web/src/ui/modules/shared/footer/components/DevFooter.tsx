@@ -6,7 +6,7 @@ import { githubIcon } from "@ui/assets/icons/github";
 import { linkedinIcon } from "@ui/assets/icons/linkedin";
 import { RotatingText } from "@ui/modules/core/animate/text/Rotating";
 import { useTranslations } from "next-intl";
-import { type CSSProperties, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Icon } from "../../Icon";
 import { Me } from "../../legal-identity/Me";
 
@@ -83,7 +83,7 @@ export const DevFooter = () => {
 						rel="noopener noreferrer"
 						aria-label={`Visit my ${key.toLowerCase().replaceAll("_", " ")} profile`}
 						className="inline-flex items-center justify-center min-w-11 min-h-11 transition-transform duration-200 hover:scale-110"
-						style={{ "--hover-color": network.COLOR } as CSSProperties & { "--hover-color": string }}
+						style={{ "--hover-color": network.COLOR }}
 					>
 						<Icon icon={network.ICON} size={24} className="transition-colors duration-200 hover:text-(--hover-color)" />
 					</a>

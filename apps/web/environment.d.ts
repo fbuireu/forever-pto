@@ -44,6 +44,12 @@ declare global {
 	}
 }
 
+declare module "react" {
+	interface CSSProperties {
+		[customProperty: `--${string}`]: string | number;
+	}
+}
+
 declare module "next-intl" {
 	interface AppConfig {
 		Locale: (typeof routing.locales)[number];
