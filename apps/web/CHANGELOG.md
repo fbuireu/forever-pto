@@ -1,3 +1,11 @@
+# [forever-pto-web-v1.15.18](https://github.com/fbuireu/forever-pto/compare/web-v1.15.17...web-v1.15.18) (2026-11-04)
+
+
+### Bug Fixes
+
+* **web:** answer 500 for a failure tag every object inherits instead of calling the inherited function ([2389c4d](https://github.com/fbuireu/forever-pto/commit/2389c4d6104453ec5c57da422a1ae40061e30790))
+* **web:** follow the system in the toaster for a theme sonner does not know ([35bd093](https://github.com/fbuireu/forever-pto/commit/35bd0936d277f5e7df18f1abf7a9b11bbd3425aa))
+
 # [forever-pto-web-v1.15.17](https://github.com/fbuireu/forever-pto/compare/web-v1.15.16...web-v1.15.17) (2026-11-04)
 
 
