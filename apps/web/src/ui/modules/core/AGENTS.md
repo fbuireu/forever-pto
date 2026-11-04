@@ -60,8 +60,8 @@ dependency added in this folder is a dependency added to the client bundle of ev
 Coupling back into the rest of the app is small, but it is not zero. The complete list:
 
 - `@ui/hooks/*` and the generic `@ui/utils` helpers: [`useControlledState.tsx`](../../hooks/useControlledState.tsx), [`useIsInView.tsx`](../../hooks/useIsInView.tsx), [`useAutoHeight.tsx`](../../hooks/useAutoHeight.tsx),
-  [`useMobile.ts`](../../hooks/useMobile.ts), `cn` and [`context.tsx`](../../utils/context.tsx)'s `getStrictContext` (`Switch`, `Progress` and
-  the three `animate/primitives/base` wrappers). None of them holds product state.
+  [`useMobile.ts`](../../hooks/useMobile.ts), `cn` and [`context.tsx`](../../utils/context.tsx)'s `getStrictContext` (`Switch`, `Progress`, `Form`
+  and the three `animate/primitives/base` wrappers). None of them holds product state.
 - `animate/base/Sidebar.tsx` writes the `sidebar_state` cookie through [`@ui/utils/cookie`](../../utils/cookie.ts), swallowing a
   failed write, and reads it back from `document.cookie` after mount. No server layout passes a `defaultOpen`,
   so the rail renders expanded and collapses once that effect runs. The cookie's name and life,

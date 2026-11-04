@@ -1,7 +1,8 @@
 "use client";
 
 import { cn } from "@ui/utils/cn";
-import { type ComponentProps, createContext, use, useEffect, useId, useMemo, useState } from "react";
+import { getStrictContext } from "@ui/utils/context";
+import { type ComponentProps, useEffect, useId, useMemo, useState } from "react";
 import {
 	Controller,
 	type ControllerFieldState,
@@ -24,7 +25,7 @@ interface FormFieldContextValue<
 	name: TName;
 }
 
-const FormFieldContext = createContext<FormFieldContextValue>({} as FormFieldContextValue);
+const [FormFieldProvider, useFormFieldContext] = getStrictContext<FormFieldContextValue>("<FormField>");
 
 interface FormItemContextValue {
 	id: string;
@@ -32,7 +33,7 @@ interface FormItemContextValue {
 	registerDescription: (present: boolean) => void;
 }
 
-const FormItemContext = createContext<FormItemContextValue>({} as FormItemContextValue);
+const [FormItemProvider, useFormItemContext] = getStrictContext<FormItemContextValue>("<FormItem>");
 
 const FormField = <
 	TFieldValues extends FieldValues = FieldValues,
@@ -43,9 +44,9 @@ const FormField = <
 }: ControllerProps<TFieldValues, TName, TTransformedValues>) => {
 	const fieldContextValue = useMemo(() => ({ name: props.name }), [props.name]);
 	return (
-		<FormFieldContext value={fieldContextValue}>
+		<FormFieldProvider value={fieldContextValue}>
 			<Controller {...props} />
-		</FormFieldContext>
+		</FormFieldProvider>
 	);
 };
 
@@ -57,15 +58,11 @@ interface FormFieldState extends FormItemContextValue, ControllerFieldState {
 }
 
 const useFormField = (): FormFieldState => {
-	const fieldContext = use(FormFieldContext);
-	const itemContext = use(FormItemContext);
+	const fieldContext = useFormFieldContext();
+	const itemContext = useFormItemContext();
 	const { getFieldState } = useFormContext();
 	const formState = useFormState({ name: fieldContext.name });
 	const fieldState = getFieldState(fieldContext.name, formState);
-
-	if (!fieldContext) {
-		throw new Error("useFormField should be used within <FormField>");
-	}
 
 	const { id, hasDescription, registerDescription } = itemContext;
 
@@ -90,9 +87,9 @@ function FormItem({ className, ...props }: ComponentProps<"div">) {
 		[id, hasDescription],
 	);
 	return (
-		<FormItemContext value={itemContextValue}>
+		<FormItemProvider value={itemContextValue}>
 			<div data-slot="form-item" className={cn("grid gap-2", className)} {...props} />
-		</FormItemContext>
+		</FormItemProvider>
 	);
 }
 

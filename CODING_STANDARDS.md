@@ -540,7 +540,8 @@ No rule below restates these, and a diff that breaks one fails CI:
   calendar export read `usePlacedPlan`, which leaves out `isCalculating`, so a calculation does not redraw every chart
   twice.
 - `U30` **hard**: Read a context a component cannot work without through a `use…` hook that throws outside its
-  provider, so a missing provider fails at the first render instead of rendering defaults.
+  provider, so a missing provider fails at the first render instead of rendering defaults: `getStrictContext`
+  (`Form`, `Switch`), never a `createContext` whose default is `{}` cast to the shape.
 
 ## Accessibility
 

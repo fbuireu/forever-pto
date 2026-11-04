@@ -1,6 +1,6 @@
 import { act, render, screen } from "@testing-library/react";
 import { useForm } from "react-hook-form";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from "vitest";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./Form";
 
 interface Values {
@@ -112,5 +112,47 @@ describe("Form", () => {
 		await press("fail");
 
 		expect(screen.getByRole("alert").textContent).toBe("Enter an address");
+	});
+});
+
+const PartWithoutItem = () => {
+	const form = useForm<Values>({ defaultValues: { email: "" } });
+
+	return (
+		<Form {...form}>
+			<FormField control={form.control} name="email" render={() => <FormLabel>Email</FormLabel>} />
+		</Form>
+	);
+};
+
+const PartWithoutField = () => {
+	const form = useForm<Values>({ defaultValues: { email: "" } });
+
+	return (
+		<Form {...form}>
+			<FormItem>
+				<FormLabel>Email</FormLabel>
+			</FormItem>
+		</Form>
+	);
+};
+
+describe("a Form part outside the providers it reads", () => {
+	let consoleError: MockInstance<typeof console.error>;
+
+	beforeEach(() => {
+		consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+	});
+
+	afterEach(() => {
+		consoleError.mockRestore();
+	});
+
+	it("fails outside a FormField rather than naming its control after nothing", () => {
+		expect(() => render(<PartWithoutField />)).toThrow("<FormField>");
+	});
+
+	it("fails outside a FormItem rather than giving its control an undefined id", () => {
+		expect(() => render(<PartWithoutItem />)).toThrow("<FormItem>");
 	});
 });
