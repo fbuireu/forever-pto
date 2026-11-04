@@ -4,7 +4,9 @@ import { toast } from "sonner";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Toaster } from "./Sonner";
 
-vi.mock("next-themes", () => ({ useTheme: () => ({ theme: "light" }) }));
+const nextTheme = vi.hoisted(() => ({ current: "light" }));
+
+vi.mock("next-themes", () => ({ useTheme: () => ({ theme: nextTheme.current }) }));
 
 const showToast = async (closeLabel?: string): Promise<void> => {
 	render(<Toaster closeLabel={closeLabel} />);
@@ -15,6 +17,7 @@ const showToast = async (closeLabel?: string): Promise<void> => {
 };
 
 afterEach(() => {
+	nextTheme.current = "light";
 	act(() => {
 		toast.dismiss();
 	});
@@ -31,6 +34,25 @@ describe("Toaster", () => {
 		await showToast();
 
 		expect(screen.getAllByRole("button", { name: "Close toast" }).length).toBeGreaterThan(0);
+	});
+});
+
+describe("Toaster theme", () => {
+	const sonnerTheme = (): string | null =>
+		document.querySelector("[data-sonner-toaster]")?.getAttribute("data-sonner-theme") ?? null;
+
+	it("takes the theme next-themes reports when sonner knows it", async () => {
+		nextTheme.current = "dark";
+		await showToast();
+
+		expect(sonnerTheme()).toBe("dark");
+	});
+
+	it("follows the system for a theme sonner does not know, rather than handing sonner a name it cannot style", async () => {
+		nextTheme.current = "sepia";
+		await showToast();
+
+		expect(sonnerTheme()).toBe("light");
 	});
 });
 

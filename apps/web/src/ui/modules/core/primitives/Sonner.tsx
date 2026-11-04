@@ -7,12 +7,17 @@ interface ToasterOwnProps extends ToasterProps {
 	closeLabel?: string;
 }
 
+type ToasterTheme = NonNullable<ToasterProps["theme"]>;
+
+const isToasterTheme = (theme: string): theme is ToasterTheme =>
+	theme === "light" || theme === "dark" || theme === "system";
+
 const Toaster = ({ closeLabel = "Close toast", ...props }: ToasterOwnProps) => {
 	const { theme = "system" } = useTheme();
 
 	return (
 		<Sonner
-			theme={theme as ToasterProps["theme"]}
+			theme={isToasterTheme(theme) ? theme : "system"}
 			className="toaster group"
 			closeButton
 			position={props.position ?? "bottom-center"}
