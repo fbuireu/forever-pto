@@ -65,6 +65,22 @@ describe("RadialNav", () => {
 		expect(queryByRole("menuitem")).toBeNull();
 	});
 
+	it("asks the icon of an item that animates on hover to animate, and passes nothing to one that does not", () => {
+		const HoverProbe = ({ animateOnHover }: { animateOnHover?: boolean }) => (
+			<svg data-testid="probe" data-animate-on-hover={String(animateOnHover)} />
+		);
+		const { getAllByTestId } = render(
+			<RadialNav
+				items={[
+					{ id: 1, icon: HoverProbe, animateOnHover: true, label: "Animated", angle: 0 },
+					{ id: 2, icon: HoverProbe, label: "Still", angle: 180 },
+				]}
+			/>,
+		);
+
+		expect(getAllByTestId("probe").map((probe) => probe.dataset.animateOnHover)).toEqual(["true", "undefined"]);
+	});
+
 	it("renders a button for each item", () => {
 		const { getAllByRole } = render(<RadialNav items={ITEMS} />);
 		expect(getAllByRole("button")).toHaveLength(3);

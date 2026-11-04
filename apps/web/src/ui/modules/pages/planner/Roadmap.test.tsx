@@ -6,7 +6,7 @@ import { type Locale, NextIntlClientProvider } from "next-intl";
 import { describe, expect, it, vi } from "vitest";
 
 interface RadialNavMockProps {
-	items: { id: number; label: string }[];
+	items: { id: number; label: string; animateOnHover?: boolean }[];
 	onActiveChange?: (id: number) => void;
 	"aria-label"?: string;
 }
@@ -23,7 +23,12 @@ vi.mock("@ui/modules/core/animate/components/RadialNav", () => ({
 	RadialNav: ({ items, onActiveChange, ...rest }: RadialNavMockProps) => (
 		<nav aria-label={rest["aria-label"]}>
 			{items.map((item) => (
-				<button key={item.id} type="button" onClick={() => onActiveChange?.(item.id)}>
+				<button
+					key={item.id}
+					type="button"
+					data-animate-on-hover={String(item.animateOnHover ?? false)}
+					onClick={() => onActiveChange?.(item.id)}
+				>
 					{item.label}
 				</button>
 			))}
@@ -107,6 +112,17 @@ describe("Roadmap", () => {
 		expect(screen.getByTestId("features").dataset.category).toBe("Features");
 		expect(listed().map((item) => item.textContent)).toContain(en.roadmap.features.corePtoCalculator);
 		expect(screen.queryByText(en.roadmap.selected)).toBeNull();
+	});
+
+	it("animates the finished and in-progress icons on hover, the two the dial draws with animated icons", () => {
+		renderRoadmap();
+
+		const animated = screen
+			.getAllByRole("button")
+			.filter((button) => button.dataset.animateOnHover === "true")
+			.map((button) => button.textContent);
+
+		expect(animated).toEqual([en.roadmap.completed, en.roadmap.inProgress]);
 	});
 
 	it("names the dial for assistive tech", () => {

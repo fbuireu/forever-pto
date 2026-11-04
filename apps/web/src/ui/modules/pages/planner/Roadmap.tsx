@@ -36,6 +36,7 @@ export function Roadmap() {
 			{
 				id: 1,
 				icon: CircleCheckBig,
+				animateOnHover: true,
 				label: t("completed"),
 				angle: 0,
 				status: CategoryStatus.COMPLETED,
@@ -45,6 +46,7 @@ export function Roadmap() {
 			{
 				id: 2,
 				icon: Clock,
+				animateOnHover: true,
 				label: t("inProgress"),
 				angle: 90,
 				status: CategoryStatus.IN_PROGRESS,

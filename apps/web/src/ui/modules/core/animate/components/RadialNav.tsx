@@ -23,6 +23,7 @@ interface RadialNavIconProps {
 interface RadialNavItem {
 	id: number;
 	icon: ComponentType<RadialNavIconProps>;
+	animateOnHover?: boolean;
 	label: string;
 	angle: number;
 	badgeClass?: string;
@@ -151,7 +152,7 @@ interface MenuButtonProps {
 }
 
 function MenuButton({ item, isActive, onActivate, menuButtonConfig }: MenuButtonProps) {
-	const { icon: Icon, label, badgeClass } = item;
+	const { icon: Icon, animateOnHover, label, badgeClass } = item;
 	const { iconSize, buttonSize, buttonPadding } = menuButtonConfig;
 
 	const translateX = calculateIconOffset({
@@ -185,7 +186,7 @@ function MenuButton({ item, isActive, onActivate, menuButtonConfig }: MenuButton
 					width: iconSize,
 					transform: `translateX(${translateX}px)`,
 				}}
-				{...("animateOnHover" in Icon ? { animateOnHover: true } : {})}
+				animateOnHover={animateOnHover}
 			/>
 			<m.span
 				variants={LABEL_VARIANTS}
