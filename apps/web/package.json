@@ -46,7 +46,7 @@
 		"format:all": "pnpm format .",
 		"format:changed": "pnpm format --changed",
 		"format:check": "biome check --no-errors-on-unmatched .",
-		"typecheck": "tsc --project . --noEmit",
+		"typecheck": "tsc --project . --noEmit --incremental false",
 		"test:ut": "vitest run --logHeapUsage",
 		"test:ut:watch": "vitest --logHeapUsage",
 		"test:ut:coverage": "vitest run --coverage",

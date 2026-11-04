@@ -45,7 +45,8 @@ pnpm cf:build           # opennextjs-cloudflare build, the Workers build CI depl
 pnpm cf:typegen         # regenerate cloudflare-env.d.ts from wrangler.toml (reference only)
 
 pnpm lint:all           # biome lint over this package
-pnpm typecheck          # tsc --noEmit
+pnpm typecheck          # tsc --noEmit, never from the incremental cache, which misses an augmentation
+                        # edited in environment.d.ts
 
 pnpm test:ut            # vitest run
 pnpm test:ut:coverage   # vitest run --coverage
