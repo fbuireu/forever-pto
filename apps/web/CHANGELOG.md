@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.15.19](https://github.com/fbuireu/forever-pto/compare/web-v1.15.18...web-v1.15.19) (2026-11-04)
+
+
+### Bug Fixes
+
+* **web:** animate the roadmap's animated icons on hover again ([a3a905c](https://github.com/fbuireu/forever-pto/commit/a3a905cbc86d8a641dd091243271fb5220213281))
+
 # [forever-pto-web-v1.15.18](https://github.com/fbuireu/forever-pto/compare/web-v1.15.17...web-v1.15.18) (2026-11-04)
 
 
