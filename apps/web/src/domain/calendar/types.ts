@@ -29,7 +29,7 @@ export type Strategy = (typeof Strategy)[keyof typeof Strategy];
 
 export const DEFAULT_STRATEGY: Strategy = Strategy.GROUPED;
 
-export const isStrategy = (value: unknown): value is Strategy => Object.values(Strategy).includes(value as Strategy);
+export const isStrategy = (value: unknown): value is Strategy => Object.values<unknown>(Strategy).includes(value);
 
 export interface FirstLastRestBlock {
 	first: string;

@@ -1,15 +1,14 @@
 "use client";
 
 import { FeatureList } from "@ui/modules/core/animate/components/FeatureList";
-import { RadialNav, type RadialNavProps } from "@ui/modules/core/animate/components/RadialNav";
+import { RadialNav } from "@ui/modules/core/animate/components/RadialNav";
 import { CircleCheckBig } from "@ui/modules/core/animate/icons/CircleCheckBig";
 import { Clock } from "@ui/modules/core/animate/icons/Clock";
 import { Badge } from "@ui/modules/core/primitives/Badge";
 import { cn } from "@ui/utils/cn";
 import { Circle, Sparkles } from "lucide-react";
-import type { SVGMotionProps } from "motion/react";
 import { useTranslations } from "next-intl";
-import { type ComponentType, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 interface RoadmapFeature {
 	id: string;
@@ -36,7 +35,7 @@ export function Roadmap() {
 		() => [
 			{
 				id: 1,
-				icon: CircleCheckBig as ComponentType<SVGMotionProps<SVGSVGElement>>,
+				icon: CircleCheckBig,
 				label: t("completed"),
 				angle: 0,
 				status: CategoryStatus.COMPLETED,
@@ -45,7 +44,7 @@ export function Roadmap() {
 			},
 			{
 				id: 2,
-				icon: Clock as ComponentType<SVGMotionProps<SVGSVGElement>>,
+				icon: Clock,
 				label: t("inProgress"),
 				angle: 90,
 				status: CategoryStatus.IN_PROGRESS,
@@ -54,7 +53,7 @@ export function Roadmap() {
 			},
 			{
 				id: 3,
-				icon: Circle as ComponentType<SVGMotionProps<SVGSVGElement>>,
+				icon: Circle,
 				label: t("planned"),
 				angle: 180,
 				status: CategoryStatus.PLANNED,
@@ -63,7 +62,7 @@ export function Roadmap() {
 			},
 			{
 				id: 4,
-				icon: Sparkles as ComponentType<SVGMotionProps<SVGSVGElement>>,
+				icon: Sparkles,
 				label: t("future"),
 				angle: 270,
 				status: CategoryStatus.FUTURE,
@@ -200,7 +199,7 @@ export function Roadmap() {
 				<div className="lg:sticky lg:top-8 flex flex-col items-center w-full lg:w-auto">
 					<div className="relative size-80 flex items-center justify-center">
 						<RadialNav
-							items={roadmapCategories as unknown as RadialNavProps["items"]}
+							items={roadmapCategories}
 							onActiveChange={(id) => setSelectedCategory(id)}
 							defaultActiveId={selectedCategory}
 							aria-label={tA11y("radialNavigation")}

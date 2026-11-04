@@ -129,12 +129,11 @@ export const getDayClassNames = ({
 
 export const isFromToObject = (obj: unknown): obj is FromTo => {
 	return (
-		obj !== null &&
 		typeof obj === "object" &&
-		obj !== undefined &&
+		obj !== null &&
 		"from" in obj &&
 		"to" in obj &&
-		(obj as FromTo).from instanceof Date &&
-		(obj as FromTo).to instanceof Date
+		obj.from instanceof Date &&
+		obj.to instanceof Date
 	);
 };

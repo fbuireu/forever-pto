@@ -37,7 +37,7 @@ export async function getHolidays({
 	).pipe(
 		Effect.catchAll((error) => {
 			logger.logError({ message: "Error in getHolidays", error, context: { country, region, year } });
-			return Effect.succeed([] as HolidayDTO[]);
+			return Effect.succeed<HolidayDTO[]>([]);
 		}),
 	);
 

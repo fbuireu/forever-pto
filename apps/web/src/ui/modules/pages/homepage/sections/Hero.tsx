@@ -8,7 +8,6 @@ import { MODIFIERS_CLASS_NAMES } from "@ui/modules/pages/planner/calendar/utils/
 import { QuickStartTrigger } from "@ui/modules/shared/QuickStartTrigger";
 import { cn } from "@ui/utils/cn";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
-import type { ReactNode } from "react";
 import { version } from "../../../../../../package.json";
 import { CAL_ENTRIES, type DayType, SHOWCASE_EFFICIENCY, SHOWCASE_PLAN } from "./shared";
 
@@ -100,25 +99,23 @@ export const Hero = async () => {
 						</div>
 						<div className="p-[22px] bg-card">
 							<div className="grid grid-cols-2 gap-3.5 mb-4">
-								{(
-									[
-										{
-											label: t("hero.mockupFieldPto"),
-											value: <span>{SHOWCASE_PLAN.ptoDays}</span>,
-											unit: t("hero.mockupFieldPtoUnit"),
-										},
-										{
-											label: t("hero.mockupFieldCountry"),
-											value: (
-												<span className="flex items-center gap-1.5">
-													<FlagIcon code={LOCALE_FLAG[locale] ?? locale} />
-													<span>{locale.toUpperCase()}</span>
-												</span>
-											),
-											unit: t("hero.mockupFieldHolidays", { count: SHOWCASE_PLAN.holidays }),
-										},
-									] as { label: string; value: ReactNode; unit: string }[]
-								).map(({ label, value, unit }) => (
+								{[
+									{
+										label: t("hero.mockupFieldPto"),
+										value: <span>{SHOWCASE_PLAN.ptoDays}</span>,
+										unit: t("hero.mockupFieldPtoUnit"),
+									},
+									{
+										label: t("hero.mockupFieldCountry"),
+										value: (
+											<span className="flex items-center gap-1.5">
+												<FlagIcon code={LOCALE_FLAG[locale] ?? locale} />
+												<span>{locale.toUpperCase()}</span>
+											</span>
+										),
+										unit: t("hero.mockupFieldHolidays", { count: SHOWCASE_PLAN.holidays }),
+									},
+								].map(({ label, value, unit }) => (
 									<div
 										key={label}
 										className="border-[3px] border-[var(--frame)] rounded-[8px] px-3 py-2.5 bg-[var(--background)]"
@@ -165,9 +162,9 @@ export const Hero = async () => {
 							<div className="flex gap-x-4 gap-y-2 mt-3 flex-wrap">
 								{(
 									[
-										{ type: "pto" as DayType, label: t("hero.mockupLegendPto") },
-										{ type: "holiday" as DayType, label: t("hero.mockupLegendHoliday") },
-										{ type: "weekend" as DayType, label: t("hero.mockupLegendWeekend") },
+										{ type: "pto", label: t("hero.mockupLegendPto") },
+										{ type: "holiday", label: t("hero.mockupLegendHoliday") },
+										{ type: "weekend", label: t("hero.mockupLegendWeekend") },
 									] as const
 								).map(({ type, label }) => (
 									<div key={label} className="flex items-center gap-2 text-[11px]">

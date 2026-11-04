@@ -1,9 +1,9 @@
 "use client";
 
 import { cn } from "@ui/utils/cn";
-import { type LucideIcon, MousePointer2 } from "lucide-react";
-import { m, type SVGMotionProps, type Transition, type Variants } from "motion/react";
-import { type ComponentType, useCallback, useState } from "react";
+import { MousePointer2 } from "lucide-react";
+import { m, type Transition, type Variants } from "motion/react";
+import { type ComponentType, type CSSProperties, useCallback, useState } from "react";
 
 interface RadialNavProps {
 	size?: number;
@@ -14,9 +14,15 @@ interface RadialNavProps {
 	"aria-label"?: string;
 }
 
+interface RadialNavIconProps {
+	className?: string;
+	style?: CSSProperties;
+	animateOnHover?: boolean;
+}
+
 interface RadialNavItem {
 	id: number;
-	icon: LucideIcon | ComponentType<SVGMotionProps<SVGSVGElement>>;
+	icon: ComponentType<RadialNavIconProps>;
 	label: string;
 	angle: number;
 	badgeClass?: string;

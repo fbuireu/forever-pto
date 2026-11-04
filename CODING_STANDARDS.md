@@ -269,8 +269,17 @@ No rule below restates these, and a diff that breaks one fails CI:
   `Pick`, `M15`'s `(typeof X)[keyof typeof X]`).
 - `M18` **hard**: Give an interface a name no other interface in its scope carries, because two declarations of one name
   merge in silence; merging is for an augmentation of a global or a vendor's module made on purpose, in a declaration
-  file or a `declare global` or `declare module` block (next-intl's `AppConfig` and `Window` in
-  `apps/web/environment.d.ts`, the consent globals in the docs site's `consent.ts`).
+  file or a `declare global` or `declare module` block (next-intl's `AppConfig`, React's `CSSProperties` and `Window`
+  in `apps/web/environment.d.ts`, the consent globals in the docs site's `consent.ts`).
+- `M19` **hard**: Type a value by narrowing it, never by casting it, because a cast checks nothing at run time and a
+  wrong one compiles. A literal takes an annotation or `satisfies` (`M8`), never `as`: `"pto" as DayType` is a bare
+  `"pto"`, and `[] as HolidayDTO[]` is `Effect.succeed<HolidayDTO[]>([])`. A value a check can prove is narrowed by
+  the check (`typeof`, `in`, `instanceof`, `Object.hasOwn` or a `value is T` guard such as `isHolidayVariant`), props
+  are typed as the element they are spread on (`Counter`'s buttons are `HTMLMotionProps<"button">`), a component
+  slot takes the props its owner passes (`RadialNav`'s `icon`), and `as unknown as` is never written. A cast stays
+  only where no check can follow the value: `M7`'s seam, the type argument `M16` allows, a DOM lookup, a key list
+  `Object.keys` widens, an object a generic builds key by key (`useVariants`) and a library's polymorphic props;
+  widening to a supertype (`LOCALES as readonly string[]`) checks the value and is not a cast that lies.
 
 ## Functions and modules
 

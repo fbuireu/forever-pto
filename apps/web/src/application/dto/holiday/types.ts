@@ -23,4 +23,4 @@ export const HolidayVariant = {
 export type HolidayVariant = (typeof HolidayVariant)[keyof typeof HolidayVariant];
 
 export const isHolidayVariant = (value: unknown): value is HolidayVariant =>
-	Object.values(HolidayVariant).includes(value as HolidayVariant);
+	Object.values<unknown>(HolidayVariant).includes(value);

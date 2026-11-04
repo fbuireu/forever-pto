@@ -37,9 +37,9 @@ export const Testimonials = async ({ locale }: TestimonialsProps) => {
 
 			<div className="max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
 				{TESTIMONIAL_KEYS.map((key, idx) => {
-					const text = t(`testimonials.items.${key}.text` as Parameters<typeof t>[0]);
-					const name = t(`testimonials.items.${key}.name` as Parameters<typeof t>[0]);
-					const role = t(`testimonials.items.${key}.role` as Parameters<typeof t>[0]);
+					const text = t(`testimonials.items.${key}.text`);
+					const name = t(`testimonials.items.${key}.name`);
+					const role = t(`testimonials.items.${key}.role`);
 					const { avatarBg, rotate, hoverRotate } = CARD_STYLES[idx];
 
 					return (

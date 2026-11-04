@@ -60,7 +60,7 @@ function useMotionHighlight<T extends string>(): MotionHighlightContextType<T> {
 	if (!context) {
 		throw new Error("useMotionHighlight must be used within a MotionHighlightProvider");
 	}
-	return context as unknown as MotionHighlightContextType<T>;
+	return context;
 }
 
 interface BaseMotionHighlightProps<T extends string> {

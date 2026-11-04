@@ -87,7 +87,7 @@ interface OutranksParams {
 
 export const outranks = ({ rank, rival }: OutranksParams): boolean => {
 	for (let index = 0; index < rank.length; index++) {
-		const difference = (rank[index] as number) - (rival[index] ?? 0);
+		const difference = (rank[index] ?? 0) - (rival[index] ?? 0);
 		if (Math.abs(difference) > PTO_CONSTANTS.SELECTION.RANK_TOLERANCE) return difference > 0;
 	}
 	return false;

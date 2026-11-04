@@ -84,7 +84,7 @@ export const MonthlyDistributionChart = memo(function MonthlyDistributionChart({
 								itemStyle={{ color: "var(--primary-foreground)" }}
 								cursor={{ fill: "color-mix(in srgb, var(--frame) 8%, transparent)" }}
 								labelStyle={{ color: "var(--primary-foreground)", fontWeight: 700 }}
-								labelFormatter={(label) => monthLabelMap.get(label as string) ?? (label as string)}
+								labelFormatter={(label) => (typeof label === "string" ? (monthLabelMap.get(label) ?? label) : label)}
 							/>
 						</AreaChart>
 					</ResponsiveContainer>

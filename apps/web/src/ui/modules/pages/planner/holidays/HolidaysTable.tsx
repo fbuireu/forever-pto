@@ -166,7 +166,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 
 				let comparison = 0;
 				if (sortKey === "date") {
-					comparison = new Date(aValue as Date).getTime() - new Date(bValue as Date).getTime();
+					comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
 				} else if (typeof aValue === "string" && typeof bValue === "string") {
 					comparison = aValue.localeCompare(bValue);
 				} else {

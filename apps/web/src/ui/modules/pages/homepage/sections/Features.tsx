@@ -9,9 +9,9 @@ const BEST_EFFICIENCY = 3.5;
 
 const FEATURED_COUNTRIES = ["es", "it", "de", "fr", "gb", "us"] as const;
 
-const BRIDGE_WEEK = (["work", "work", "work", "holiday", "pto", "weekend", "weekend"] as DayType[]).map(
-	(type, index) => ({ id: `bridge-day-${index}`, type, index }),
-);
+const BRIDGE_WEEK_TYPES: readonly DayType[] = ["work", "work", "work", "holiday", "pto", "weekend", "weekend"];
+
+const BRIDGE_WEEK = BRIDGE_WEEK_TYPES.map((type, index) => ({ id: `bridge-day-${index}`, type, index }));
 
 export const Features = async () => {
 	const [t, locale, format] = await Promise.all([getTranslations("homepage"), getLocale(), getFormatter()]);

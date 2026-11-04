@@ -33,7 +33,7 @@ function Slider({
 	const handleValueChange = useCallback(
 		(val: number | readonly number[]) => {
 			if (!onValueChange) return;
-			const normalized = Array.isArray(val) ? [...val] : [val as number];
+			const normalized = typeof val === "number" ? [val] : [...val];
 			onValueChange(normalized);
 		},
 		[onValueChange],
@@ -42,7 +42,7 @@ function Slider({
 	const handleValueCommitted = useCallback(
 		(val: number | readonly number[]) => {
 			if (!onValueCommitted) return;
-			const normalized = Array.isArray(val) ? [...val] : [val as number];
+			const normalized = typeof val === "number" ? [val] : [...val];
 			onValueCommitted(normalized);
 		},
 		[onValueCommitted],

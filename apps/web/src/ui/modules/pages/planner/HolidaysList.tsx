@@ -1,6 +1,6 @@
 "use client";
 
-import { HolidayVariant } from "@application/dto/holiday/types";
+import { HolidayVariant, isHolidayVariant } from "@application/dto/holiday/types";
 import { useHolidaysStore } from "@application/stores/holidays";
 import { PremiumFeatureId, PremiumOrigin } from "@application/stores/premium";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
@@ -31,8 +31,8 @@ export const HolidaysList = () => {
 	);
 	const hasRegionalHolidays = areStoresReady && regionalHolidays.length > 0;
 
-	const handleTabChange = (value: string) => {
-		const variant = value as HolidayVariant;
+	const handleTabChange = (variant: string) => {
+		if (!isHolidayVariant(variant)) return;
 		if (variant === HolidayVariant.REGIONAL && !hasRegionalHolidays) return;
 		setActiveTab(variant);
 		track({ event: "holiday_tab_changed", properties: { variant } });

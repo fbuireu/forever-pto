@@ -25,6 +25,9 @@ const LEVEL_COLORS: Record<LogLevel, string> = {
 	OK: "var(--color-brand-green)",
 };
 
+const isLogLevel = (value: string | undefined): value is LogLevel =>
+	value !== undefined && Object.hasOwn(LEVEL_COLORS, value);
+
 const LOG_LINE_REGEX = /^(\[\d{2}:\d{2}:\d{2}\])\s+(INFO|WARN|ERROR|OK)\s+(.*)$/;
 
 interface TerminalLineProps {
@@ -38,7 +41,10 @@ function TerminalLine({ line }: TerminalLineProps) {
 		return (
 			<div>
 				<span className="text-terminal-dim">{ts} </span>
-				<span className="font-bold inline-block min-w-[3.5em]" style={{ color: LEVEL_COLORS[level as LogLevel] }}>
+				<span
+					className="font-bold inline-block min-w-[3.5em]"
+					style={{ color: isLogLevel(level) ? LEVEL_COLORS[level] : undefined }}
+				>
 					{level}
 				</span>
 				{rest}
