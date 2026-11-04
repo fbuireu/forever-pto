@@ -48,7 +48,8 @@ flowchart TD
     RW["release-web: web-vX.Y.Z"] -- "a tag was cut" --> DR["docs-refresh: dispatch docs.yml"]
   end
   subgraph onpr ["pull_request"]
-    DD["deploy-development, via _deploy-web.yml"] --> CM["comment: preview URL"] & E2E["e2e: Chromium and WebKit through Access"]
+    DD["deploy-development, via _deploy-web.yml"] -- "not Dependabot" --> CM["comment: preview URL"] & E2E["e2e: Chromium and WebKit through Access"]
+    DD -. "Dependabot: deploy false" .-> BO["the Worker built, nothing shipped"]
     XN["cross-package-notice"]
   end
   CH -- "web" --> DP & DD
@@ -147,21 +148,23 @@ config:
 ---
 flowchart TD
   PUSH["pull request opened or pushed"] --> CIW & DOCW & TITLE & DEPR & ZZ
-  CIW["ci.yml: changes, Verify"] -->|"a WEB_PATHS change"| DD["deploy-development: the pr-n app preview Worker"]
+  CIW["ci.yml: changes, Verify"] -->|"a WEB_PATHS change"| BOT{"run started by Dependabot?"}
+  BOT -- "no" --> DD["deploy-development: the pr-n app preview Worker"]
+  BOT -- "yes" --> BUILD["deploy-development with deploy: false: the Worker built, nothing deployed"]
   DD --> CMT["comment: the preview URL"]
   DD --> E2E["e2e: Playwright through the Access token"]
-  DOCW["docs.yml: changes, build"] -->|"a DOCS_PATHS change"| DPV["preview: the pr-n docs preview Worker and its comment"]
+  DOCW["docs.yml: changes, build"] -->|"a DOCS_PATHS change, not Dependabot"| DPV["preview: the pr-n docs preview Worker and its comment"]
   TITLE["commit-message.yml: Lint the pull request title"]
   DEPR["dependency-review.yml"]
   ZZ["zizmor.yml"]
-  CIW & E2E --> CK["Check"]
+  CIW & E2E & BUILD --> CK["Check"]
   DOCW & DPV --> CKD["Check (docs)"]
   CK & CKD & TITLE & DEPR & ZZ --> REQ{"every required check green?"}
   REQ -- "no" --> FIX["push a fix: the PR run in progress is cancelled, the same Worker names are redeployed"]
   FIX --> PUSH
   REQ -- "yes" --> MERGE["squash merge: the title is the commit"]
   MERGE --> MAIN["push to main: deploy, smoke, release"]
-  MERGE & CLOSED["closed without merging"] --> CLEAN["cleanup-development.yml: cleanup-web and cleanup-docs, queued behind the PR's runs"]
+  MERGE & CLOSED["closed without merging"] --> CLEAN["cleanup-development.yml: cleanup-web and cleanup-docs, queued behind the PR's runs, skipped on a Dependabot run"]
   SWEEP["weekly sweep, and on dispatch"] -.-> CLEAN
 ```
 
