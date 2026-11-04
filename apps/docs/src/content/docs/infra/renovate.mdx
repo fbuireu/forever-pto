@@ -5,7 +5,7 @@ sidebar:
   order: 4
 ---
 
-Renovate is the repo's dependency bot, configured in `.github/renovate.json`. A `dependabot-auto-merge.yml` workflow also exists, and it fires: there is no `dependabot.yml`, so Dependabot opens no version-update PRs, but GitHub's security updates need no config file and that workflow merges them. See [workflows](/infra/workflows/).
+Renovate is the repo's dependency bot, configured in `.github/renovate.json`, and the only one that opens pull requests. Dependabot opens none: there is no `dependabot.yml`, so it raises no version updates, and its security updates are off in the repository settings. Only its alerts stay on, and Renovate reads them (`vulnerabilityAlerts`) to open the security updates itself. See [workflows](/infra/workflows/#limits-forks-and-dependabot).
 
 ## Schedule and pacing
 

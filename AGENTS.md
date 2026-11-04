@@ -174,13 +174,13 @@ deploys, `e2e`, `smoke` and `release-web`. Both deploy jobs call the shared
 its own `changes`, then `build`, then `preview` on a PR or `deploy` → `smoke` → `release-docs` on `main`, with
 `rollback` when that smoke run fails, and its own aggregate, `Check (docs)`. The rest are
 [`cleanup-development.yml`](.github/workflows/cleanup-development.yml), a [`zizmor.yml`](.github/workflows/zizmor.yml)
-audit, [`dependency-review.yml`](.github/workflows/dependency-review.yml),
+audit, [`dependency-review.yml`](.github/workflows/dependency-review.yml) and
 [`commit-message.yml`](.github/workflows/commit-message.yml), which lints the pull request **title** (the commit a
-squash merge lands), and [`dependabot-auto-merge.yml`](.github/workflows/dependabot-auto-merge.yml), which merges the
-security updates GitHub raises; Renovate opens every other update. The published [workflows
-page](./apps/docs/src/content/docs/infra/workflows.mdx) is the CI/CD guide: each job, the `prepare-env` action, the
-rulesets and required checks, and what forks and Dependabot cannot reach. The environments and the secrets behind them
-are settings, on the [environments](./apps/docs/src/content/docs/infra/environments.mdx) and
+squash merge lands). Renovate opens every dependency update, and reads Dependabot's alerts to open the security ones;
+Dependabot itself opens no pull requests, its security updates being off in the repository settings. The published
+[workflows page](./apps/docs/src/content/docs/infra/workflows.mdx) is the CI/CD guide: each job, the `prepare-env`
+action, the rulesets and required checks, and what forks and Dependabot cannot reach. The environments and the
+secrets behind them are settings, on the [environments](./apps/docs/src/content/docs/infra/environments.mdx) and
 [secrets](./apps/docs/src/content/docs/infra/secrets.mdx) pages, the second with every secret and variable in one
 matrix.
 
@@ -296,10 +296,10 @@ one and where to link it from.
   every patch has that rule.
 - **`minimumReleaseAge` is declared twice**: `pnpm-workspace.yaml` in minutes (`4320` is three days),
   `.github/renovate.json` in days, and Renovate's has to stay the stricter, because the installer re-checks the age
-  on every install. A security update is the case that hits it, since `dependabot-auto-merge.yml` merges one the hour
-  its advisory lands: the escape hatch is an exact `name@version` in `minimumReleaseAgeExclude`, deleted once the
-  release ages past the floor. A second fix for the same package before that joins the entry as
-  `name@version || version`, and the install accepts the union.
+  on every install. A security update is the case that hits it, since Renovate opens one as soon as it reads the
+  alert, outside its schedule and its own age floor: the escape hatch is an exact `name@version` in
+  `minimumReleaseAgeExclude`, deleted once the release ages past the floor. A second fix for the same package before
+  that joins the entry as `name@version || version`, and the install accepts the union.
 - **Renovate writes a comment into `pnpm-workspace.yaml`, and it stays.** When it exempts a security fix from
   `minimumReleaseAge`, renovate[bot] adds a `# Renovate security update: <pkg>@<version>` line beside the entry and
   never reads it back; on a union entry the line repeats the union, `<pkg>@<version> || <version>`. It is bot output,

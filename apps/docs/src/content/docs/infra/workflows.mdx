@@ -18,7 +18,6 @@ This page is the CI/CD guide's hub. The secrets and variables every job reads ar
 | `zizmor.yml` | push to `main`, all PRs | Workflow security linting |
 | `dependency-review.yml` | all PRs | Fails a PR that introduces a dependency with a known vulnerability |
 | `commit-message.yml` | PR opened/edited/reopened/synchronize | commitlint on the **pull request title**, the string a squash merge commits |
-| `dependabot-auto-merge.yml` | Dependabot PRs | Fires for security updates; Renovate handles version updates |
 | `.github/actions/prepare-env` | `uses:` in every job that installs | The composite action: checks `.nvmrc`, sets up pnpm and Node, installs the whole workspace |
 
 ## The pipeline
@@ -168,7 +167,7 @@ flowchart TD
   SWEEP["weekly sweep, and on dispatch"] -.-> CLEAN
 ```
 
-A docs-only pull request takes the same path with the app's deploy, comment and E2E skipped by `changes`, and an app-only one skips the docs `build` and `preview`; the two aggregates report either way. Renovate's pull requests are branches of this repository, so they get every secret and preview like any other; Dependabot's and a fork's do not, see [limits](#limits-forks-and-dependabot).
+A docs-only pull request takes the same path with the app's deploy, comment and E2E skipped by `changes`, and an app-only one skips the docs `build` and `preview`; the two aggregates report either way. Renovate's pull requests are branches of this repository, so they get every secret and preview like any other; a fork's does not, and neither would a Dependabot one, see [limits](#limits-forks-and-dependabot).
 
 ## `cleanup-development.yml`: Cleanup - Development
 
@@ -193,10 +192,6 @@ Fails a PR that introduces a dependency with a known vulnerability, reading the 
 ## `zizmor.yml`: Security Analysis with zizmor
 
 Runs the zizmor GitHub Actions security linter on pushes to `main` and every PR, reporting to GitHub code scanning (`security-events: write` is its only permission). This is what makes the SHA-pinning and `persist-credentials: false` conventions stick: any new workflow (including docs ones) gets linted too. It reads the `parallel:` blocks in `ci.yml` and `docs.yml` as well; zizmor marks its support for them experimental, and it finds nothing in them.
-
-## `dependabot-auto-merge.yml`
-
-Approves and auto-squash-merges Dependabot patch and minor PRs, plus an indirect or dev dependency that `fetch-metadata` gives no update type. A major is never merged here, whatever the dependency: it is commented on and labelled `review-required`. Every PR is labelled by update type. **It is not dormant.** There is no `.github/dependabot.yml`, so Dependabot opens no version-update PRs here, which is Renovate's job. But the **security** updates GitHub raises from its own vulnerability alerts need no config file, they arrive as `dependabot[bot]`, and `fetch-metadata` reports them with the same `version-update:semver-patch` and `-minor` types the auto-merge branch accepts. So the guard does match, and this is the repository's only unattended auto-merge path: it runs `gh pr review --approve` and `gh pr merge --auto --squash` under `secrets.PAT`. Do not read it as safe to ignore, and see [limits](#limits-forks-and-dependabot) for the secrets a Dependabot run can see.
 
 ## Secrets and variables
 
@@ -228,5 +223,6 @@ The required checks on `main` are `Check`, `Check (docs)`, `Lint the pull reques
 ## Limits: forks and Dependabot
 
 - **A pull request from a fork gets no repository or environment secrets**, and a read-only `GITHUB_TOKEN`. Its `Verify` runs, but `deploy-development` fails before anything is deployed, at the secrets guard if not sooner, because every runtime secret it checks is empty, so `Check` is red, and the docs `preview` cannot authenticate to Cloudflare, so `Check (docs)` is too. A fork's change lands by being pushed to a branch of this repository and opened from there.
-- **A run Dependabot triggers sees Dependabot secrets only**, never the repository's or an environment's Actions secrets. `PAT` therefore has to be stored as a Dependabot secret as well as an Actions one, or `dependabot-auto-merge.yml` fails at its approve-and-merge step. The preview path holds no deploy secret for it: on a run Dependabot triggers (`github.actor != 'dependabot[bot]'`), `deploy-development` calls `_deploy-web.yml` with `deploy: false`, so it builds the Worker as a preview would and ships nothing, the docs `preview` is skipped, and so are the `comment` and the E2E; `Check` reports on `Verify` and that build, `Check (docs)` on the docs `build`, and a bump that breaks either build is red before the auto-merge can land; `cleanup-web` and `cleanup-docs` skip the same runs, which have no preview to delete and no token to delete one with. A push to a Dependabot branch by anyone else starts a run of theirs, with every secret, so that run deploys the preview and runs the E2E. Repository settings are not readable from the tree, so which of them are stored there is the owner's to check.
+- **Dependabot opens no pull requests here.** Its security updates are off in the repository settings, which are not readable from the tree; only its alerts stay on, and [Renovate](/infra/renovate/) reads them to open the security updates itself.
+- **A run Dependabot triggers sees Dependabot secrets only**, never the repository's or an environment's Actions secrets, and no workflow reads a Dependabot secret, so `PAT` is an Actions secret only. Should a Dependabot pull request ever be opened, the preview path holds no deploy secret for its run: on a run Dependabot triggers (`github.actor != 'dependabot[bot]'`), `deploy-development` calls `_deploy-web.yml` with `deploy: false`, so it builds the Worker as a preview would and ships nothing, the docs `preview` is skipped, and so are the `comment` and the E2E; `Check` reports on `Verify` and that build, `Check (docs)` on the docs `build`, and a bump that breaks either build is red before it can be merged; `cleanup-web` and `cleanup-docs` skip the same runs, which have no preview to delete and no token to delete one with. A push to a Dependabot branch by anyone else starts a run of theirs, with every secret, so that run deploys the preview and runs the E2E.
 - **Renovate is not limited**: its pull requests are branches of this repository, opened by the Renovate app, so they run with every secret, preview and check.
