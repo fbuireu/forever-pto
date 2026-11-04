@@ -5,6 +5,12 @@ import { fileURLToPath } from "node:url";
 import { type Browser, chromium, type Page } from "@playwright/test";
 import type { MermaidConfig } from "mermaid";
 
+declare global {
+	interface Window {
+		mermaid?: typeof import("mermaid").default;
+	}
+}
+
 const require = createRequire(import.meta.url);
 
 const APP_TOKENS = fileURLToPath(new URL("../../../web/src/ui/styles/global/index.css", import.meta.url));
@@ -138,7 +144,8 @@ export const renderMermaid = (source: string): Promise<RenderedDiagram> => {
 		const draw = (theme: "light" | "dark") =>
 			tab.evaluate(
 				async ({ source, config, id }) => {
-					const mermaid = (window as unknown as { mermaid: typeof import("mermaid").default }).mermaid;
+					const { mermaid } = window;
+					if (!mermaid) throw new Error("The mermaid bundle did not load in the render page");
 					mermaid.initialize(config);
 					const { svg } = await mermaid.render(id, source);
 					return svg;
