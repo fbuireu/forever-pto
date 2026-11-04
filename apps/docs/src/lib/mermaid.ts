@@ -11,7 +11,7 @@ const toggleExpanded = (figure: HTMLElement): void => {
 
 export const startMermaidZoom = (): void => {
 	document.addEventListener("click", (event) => {
-		const figure = (event.target as Element | null)?.closest<HTMLElement>(SELECTOR);
+		const figure = event.target instanceof Element ? event.target.closest<HTMLElement>(SELECTOR) : null;
 		if (figure) toggleExpanded(figure);
 	});
 };
