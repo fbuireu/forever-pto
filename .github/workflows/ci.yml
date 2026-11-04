@@ -292,9 +292,10 @@ jobs:
   deploy-development:
     name: Deploy to development
     needs: [changes, verify]
-    if: ${{ github.event_name == 'pull_request' && needs.changes.outputs.web == 'true' && github.actor != 'dependabot[bot]' }}
+    if: ${{ github.event_name == 'pull_request' && needs.changes.outputs.web == 'true' }}
     uses: $/.github/workflows/_deploy-web.yml
     with:
+      deploy: ${{ github.actor != 'dependabot[bot]' }}
       environment: web-development
       worker_name: pr-${{ github.event.pull_request.number }}-forever-pto-development
       url: https://pr-${{ github.event.pull_request.number }}-forever-pto-development.fbuireu.workers.dev
@@ -311,7 +312,7 @@ jobs:
   comment:
     name: Post preview URL
     needs: [deploy-development]
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -347,7 +348,7 @@ jobs:
   e2e:
     name: E2E (preview)
     needs: [deploy-development]
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: web-development

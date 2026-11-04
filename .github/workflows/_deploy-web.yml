@@ -17,6 +17,13 @@ on:
         required: false
         type: string
         description: Override the worker name (for per-PR preview deployments)
+      deploy:
+        required: false
+        type: boolean
+        default: true
+        description: >-
+          Deploy the build. A caller passes false for a run that holds no deploy secret (one
+          Dependabot triggers), which then builds as a deploy would and ships nothing.
     secrets:
       CLOUDFLARE_API_TOKEN:
         required: true
@@ -48,7 +55,7 @@ jobs:
     timeout-minutes: 20
     environment:
       name: ${{ inputs.environment }}
-      url: ${{ inputs.url }}
+      url: ${{ inputs.deploy && inputs.url || '' }}
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -72,6 +79,7 @@ jobs:
           NEXT_PUBLIC_STORAGE_KEY: ${{ vars.NEXT_PUBLIC_STORAGE_KEY }}
         run: pnpm run cf:build
       - name: Collect the Worker secrets
+        if: ${{ inputs.deploy }}
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
@@ -90,6 +98,7 @@ jobs:
           require('node:fs').writeFileSync(process.env.SECRETS_FILE, body, { mode: 0o600 });
           "
       - name: Deploy to Cloudflare Workers
+        if: ${{ inputs.deploy }}
         working-directory: apps/web
         env:
           INPUTS_WORKER_NAME: ${{ inputs.worker_name }}
