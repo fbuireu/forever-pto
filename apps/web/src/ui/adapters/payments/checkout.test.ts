@@ -187,7 +187,9 @@ describe("confirmPayment", () => {
 		const result = await confirmPayment(BASE_CONFIRM_PARAMS);
 
 		expect(result).toEqual({ outcome: ConfirmPaymentOutcome.FAILED_AFTER_CHARGE, error: "session activation failed" });
-		await vi.waitFor(() => expect(mockLoggerError).toHaveBeenCalled());
+		await vi.waitFor(() => expect(mockLoggerError).toHaveBeenCalled(), {
+			message: "logger.error records the failed activation",
+		});
 	});
 
 	it.each([
@@ -253,7 +255,9 @@ describe("confirmPayment", () => {
 
 		expect(result).toEqual({ outcome: ConfirmPaymentOutcome.HANDED_OFF_TO_ISSUER });
 		expect(mockFetch).not.toHaveBeenCalled();
-		await vi.waitFor(() => expect(mockLoggerWarn).toHaveBeenCalled());
+		await vi.waitFor(() => expect(mockLoggerWarn).toHaveBeenCalled(), {
+			message: "logger.warn records the hand-off to the issuer",
+		});
 	});
 
 	it("returns failure via catchAll when an unexpected error is thrown", async () => {
@@ -262,7 +266,9 @@ describe("confirmPayment", () => {
 		const result = await confirmPayment(BASE_CONFIRM_PARAMS);
 
 		expect(result.outcome).toBe(ConfirmPaymentOutcome.REFUSED_BEFORE_CHARGE);
-		await vi.waitFor(() => expect(mockLogError).toHaveBeenCalled());
+		await vi.waitFor(() => expect(mockLogError).toHaveBeenCalled(), {
+			message: "logger.logError records the unexpected error",
+		});
 	});
 });
 
@@ -286,7 +292,9 @@ describe("confirmPayment's logs", () => {
 		(mockStripe.confirmPayment as ReturnType<typeof vi.fn>).mockResolvedValue({});
 
 		await confirmPayment(BASE_CONFIRM_PARAMS);
-		await vi.waitFor(() => expect(mockLoggerWarn).toHaveBeenCalled());
+		await vi.waitFor(() => expect(mockLoggerWarn).toHaveBeenCalled(), {
+			message: "logger.warn records the hand-off to the issuer",
+		});
 		const [{ context }] = mockLoggerWarn.mock.lastCall ?? [];
 		const line = await writtenByTheLogger(context);
 
@@ -298,7 +306,9 @@ describe("confirmPayment's logs", () => {
 		(mockElements.submit as ReturnType<typeof vi.fn>).mockRejectedValue(new Error("network timeout"));
 
 		await confirmPayment(BASE_CONFIRM_PARAMS);
-		await vi.waitFor(() => expect(mockLogError).toHaveBeenCalled());
+		await vi.waitFor(() => expect(mockLogError).toHaveBeenCalled(), {
+			message: "logger.logError records the unexpected error",
+		});
 		const [{ context }] = mockLogError.mock.lastCall ?? [];
 		const line = await writtenByTheLogger(context);
 

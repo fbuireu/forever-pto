@@ -125,7 +125,7 @@ describe("useTutorial", () => {
 
 		unmount();
 
-		await vi.waitFor(() => expect(mockDestroy).toHaveBeenCalled());
+		await vi.waitFor(() => expect(mockDestroy).toHaveBeenCalled(), { message: "the unmount destroys the tour" });
 	});
 
 	const anchors: HTMLElement[] = [];
@@ -253,7 +253,7 @@ describe("useTutorial's wait for the first anchor", () => {
 		const { result, unmount } = renderHook(() => useTutorial());
 
 		void result.current.startTutorial();
-		await vi.waitFor(() => expect(frames.size).toBe(1));
+		await vi.waitFor(() => expect(frames.size).toBe(1), { message: "startTutorial queues a frame on the anchor" });
 		unmount();
 		runQueuedFrames();
 		await act(async () => {});
@@ -267,7 +267,9 @@ describe("useTutorial's wait for the first anchor", () => {
 
 		void result.current.startTutorial();
 		void result.current.startTutorial();
-		await vi.waitFor(() => expect(mockToggleSidebar).toHaveBeenCalledTimes(2));
+		await vi.waitFor(() => expect(mockToggleSidebar).toHaveBeenCalledTimes(2), {
+			message: "both startTutorial calls open the sidebar",
+		});
 
 		expect(frames.size).toBe(1);
 		unmount();

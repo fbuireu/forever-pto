@@ -22,5 +22,6 @@ export default defineConfig({
 		reporters: process.env.GITHUB_ACTIONS
 			? ["default", jobSummary(() => "Contract suite (tests/docs-consistency.test.ts)")]
 			: ["default"],
+		experimental: { traceTimeline: true },
 	},
 });
