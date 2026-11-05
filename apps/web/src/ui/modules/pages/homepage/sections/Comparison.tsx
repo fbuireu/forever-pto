@@ -45,10 +45,7 @@ export const Comparison = async () => {
 						VS
 					</div>
 				</div>
-				<div
-					className={cn(brutCard, "p-7 rotate-[1deg] text-[var(--color-brand-ink)]")}
-					style={{ background: "var(--color-brand-green)" }}
-				>
+				<div className={cn(brutCard, "p-7 rotate-[1deg] bg-[var(--color-brand-green)] text-[var(--color-brand-ink)]")}>
 					<h3 className="font-display font-semibold text-[22px] mb-4">{t("comparison.withTitle")}</h3>
 					<ul className="list-none">
 						{(

@@ -17,8 +17,7 @@ const HERO_DAY_CLASS: Record<DayType, string> = {
 	work: "bg-card border-[2px] border-[var(--frame)]/15 rounded-lg",
 	pto: MODIFIERS_CLASS_NAMES.suggested,
 	holiday: MODIFIERS_CLASS_NAMES.holiday,
-	weekend:
-		"rounded-lg bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,var(--card)_82%)] text-muted-foreground border-[2px] border-[var(--frame)]/20",
+	weekend: "rounded-lg bg-day-weekend text-day-weekend-ink",
 };
 
 const SOCIAL_PROOF_RATING = 4.9;

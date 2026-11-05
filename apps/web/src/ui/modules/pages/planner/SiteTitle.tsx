@@ -13,18 +13,12 @@ export const SiteTitle = async () => {
 			<p className="font-display font-semibold text-[clamp(28px,4vw,52px)] leading-none tracking-[-0.03em] flex items-center gap-4 flex-wrap justify-center">
 				{t.rich("titleHighlight", {
 					first: (chunks) => (
-						<span
-							className="inline-block bg-[var(--accent)] text-[var(--color-brand-ink)] px-3 pb-1 border-[4px] border-[var(--frame)] rounded-[10px] shadow-[var(--shadow-brutal-btn)]"
-							style={{ transform: "rotate(-4deg)" }}
-						>
+						<span className="inline-block bg-[var(--accent)] text-[var(--color-brand-ink)] px-3 pb-1 border-[4px] border-[var(--frame)] rounded-[10px] shadow-[var(--shadow-brutal-btn)] rotate-[-4deg]">
 							{chunks}
 						</span>
 					),
 					second: (chunks) => (
-						<span
-							className="inline-block bg-[var(--color-brand-sky)] text-[var(--color-brand-ink)] px-3 pb-1 border-[4px] border-[var(--frame)] rounded-[10px] shadow-[var(--shadow-brutal-btn)]"
-							style={{ transform: "rotate(4deg)" }}
-						>
+						<span className="inline-block bg-[var(--color-brand-sky)] text-[var(--color-brand-ink)] px-3 pb-1 border-[4px] border-[var(--frame)] rounded-[10px] shadow-[var(--shadow-brutal-btn)] rotate-[4deg]">
 							{chunks}
 						</span>
 					),

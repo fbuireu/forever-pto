@@ -20,8 +20,6 @@
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
 	--color-sidebar-accent: var(--sidebar-accent);
-	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-	--color-sidebar-primary: var(--sidebar-primary);
 	--color-sidebar-foreground: var(--sidebar-foreground);
 	--color-sidebar: var(--sidebar);
 	--color-ring: var(--ring);
@@ -111,7 +109,13 @@
 	--color-wash-green-ink: var(--wash-green-ink);
 	--color-wash-green-message: var(--wash-green-message);
 	--color-day-alternative: var(--day-alternative);
-	--color-day-custom: var(--day-custom);
+	--color-day-holiday: var(--day-holiday);
+	--color-day-holiday-ink: var(--day-holiday-ink);
+	--color-day-custom-ring: var(--day-custom-ring);
+	--color-day-weekend: var(--day-weekend);
+	--color-day-weekend-ink: var(--day-weekend-ink);
+	--color-highlighter: var(--highlighter);
+	--color-highlighter-ink: var(--highlighter-ink);
 	--color-wash-emerald: var(--wash-emerald);
 	--color-wash-emerald-icon: var(--wash-emerald-icon);
 	--color-wash-emerald-title: var(--wash-emerald-title);

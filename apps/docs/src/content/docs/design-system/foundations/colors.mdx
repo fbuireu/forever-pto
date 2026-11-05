@@ -96,7 +96,7 @@ The planner's own series have their own family: `--efficiency`, `--suggested` (S
 
 ## Washes
 
-A brand hue tinted into a surface, toward white in light and toward black in dark, with the ink that reads on it. `Banner`, `MetricCard`, the planner's stat cards and the calendar's day fills draw with them (`bg-wash-teal`, `text-wash-teal-icon`):
+A brand hue tinted into a surface, toward white in light and toward black in dark, with the ink that reads on it. `Banner`, `MetricCard` and the planner's stat cards draw with them (`bg-wash-teal`, `text-wash-teal-icon`):
 
 <TokenSwatch tokens={[
   '--wash-teal',
@@ -108,8 +108,28 @@ A brand hue tinted into a surface, toward white in light and toward black in dar
   '--wash-cyan',
   '--wash-violet',
   '--wash-rose',
+]} />
+
+## Calendar days
+
+The fills the calendar paints its days with, and the numerals on them. A Holiday is an ink tile with white numerals in light and a cream tile with ink numerals in dark; a Custom Holiday is the same tile with a `--day-custom-ring` dashed ring inside it; a weekend sits on `--muted` with `--muted-foreground` numerals; an Alternative preview is a yellow wash. Suggested and Manual Days are the brand teal. The Legend's swatches, the homepage mock-ups (`dayCell`, the hero) and the Summary's year timeline read the same tokens, so a day looks the same wherever it is drawn:
+
+<TokenSwatch tokens={[
+  '--day-holiday',
+  '--day-holiday-ink',
+  '--day-custom-ring',
+  '--day-weekend',
+  '--day-weekend-ink',
   '--day-alternative',
-  '--day-custom',
+]} />
+
+## The highlighter
+
+`--highlighter` and `--highlighter-ink` are a yellow marker band and the ink on it, one value in both themes. The `highlighter` utility in `apps/web/src/ui/styles/utilities/index.css` draws the band behind a phrase (the emphasised word of each sidebar step title), and `Calendar` lays `bg-highlighter` under every stretch of Effective Days:
+
+<TokenSwatch tokens={[
+  '--highlighter',
+  '--highlighter-ink',
 ]} />
 
 ## Fixed colors and overlays
@@ -140,15 +160,14 @@ The app sidebar has its own token family (same naming scheme, `--sidebar-*`) so 
 
 ## Gradients and effects
 
-A few tokens hold full gradient values rather than single colors:
+Two tokens hold full gradient values rather than single colors:
 
 <TokenSwatch tokens={[
-  '--brand-gradient',
   '--page-glow',
   '--grid-color',
 ]} />
 
-`--brand-gradient` is the brand sweep used for decorative strips; `--page-glow` is the set of faint radial gradients painted behind the page body (`apps/web/src/ui/styles/base/index.css` sets it as a fixed `background-image`); `--grid-color` is the near-transparent ink used for background grids.
+`--page-glow` is the set of faint radial gradients painted behind the page body (`apps/web/src/ui/styles/base/index.css` sets it as a fixed `background-image`); `--grid-color` is the near-transparent ink used for background grids.
 
 ## How the semantic layer maps to Tailwind
 

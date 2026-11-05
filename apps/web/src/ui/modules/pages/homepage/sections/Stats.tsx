@@ -1,3 +1,4 @@
+import { cn } from "@ui/utils/cn";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { COUNTRY_COUNT, SHOWCASE_EFFICIENCY, SHOWCASE_PLAN } from "./shared";
 
@@ -15,24 +16,26 @@ export const Stats = async () => {
 							ratio: format.number(SHOWCASE_EFFICIENCY, { maximumFractionDigits: 1 }),
 						}),
 						label: t("stats.efficiencyLabel"),
-						bg: "var(--color-brand-yellow)",
+						bg: "bg-[var(--color-brand-yellow)]",
 					},
 					{
 						num: format.number(SHOWCASE_PLAN.effectiveDays),
 						label: t("stats.daysLabel", { days: SHOWCASE_PLAN.ptoDays }),
-						bg: "var(--color-brand-teal)",
+						bg: "bg-[var(--color-brand-teal)]",
 					},
-					{ num: format.number(COUNTRY_COUNT), label: t("stats.countriesLabel"), bg: "var(--color-brand-orange)" },
+					{ num: format.number(COUNTRY_COUNT), label: t("stats.countriesLabel"), bg: "bg-[var(--color-brand-orange)]" },
 					{
 						num: t("stats.plansValue", { value: format.number(PLANS_GENERATED, { notation: "compact" }) }),
 						label: t("stats.plansLabel"),
-						bg: "var(--color-brand-purple)",
+						bg: "bg-[var(--color-brand-purple)]",
 					},
 				].map(({ num, label, bg }) => (
 					<div
 						key={label}
-						className="px-6 py-8 md:border-r-[4px] md:border-[var(--frame)] md:last:border-r-0 [contain:layout]"
-						style={{ background: bg }}
+						className={cn(
+							"px-6 py-8 md:border-r-[4px] md:border-[var(--frame)] md:last:border-r-0 [contain:layout]",
+							bg,
+						)}
 					>
 						<div className="font-display font-extrabold text-[56px] leading-none tracking-[-0.04em] mb-1.5 text-[var(--color-brand-ink)]">
 							{num}

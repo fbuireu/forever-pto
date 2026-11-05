@@ -26,7 +26,7 @@ fails on a scanned test, e2e spec or Markdown file and on any palette utility in
 | `index.css` | Declares the cascade layer order, imports Tailwind, `tw-animate-css` and every partial below, and ends with the `@source not` exclusions |
 | [`base/index.css`](./base/index.css) | `@layer base`: element defaults: border/outline colour, body background and glow, scrollbar styling, the shared transition on buttons and shadcn slots |
 | [`theme/index.css`](./theme/index.css) | `@theme inline` bridges the design tokens into Tailwind's namespaces; `@theme static` always emits the Tailwind theme variables a CSS module reads (`--spacing`, `--text-xs`, `--text-sm`, `--text-3xl`, `--shadow-lg`, at Tailwind's own values); also the `dark` and `hover` custom variants |
-| [`utilities/index.css`](./utilities/index.css) | `@utility hit-area-stable`, `hit-area-stable-tilt`, `icon-first-line` and `quiet-link` |
+| [`utilities/index.css`](./utilities/index.css) | `@utility hit-area-stable`, `hit-area-stable-tilt`, `icon-first-line`, `quiet-link` and `highlighter` |
 | [`animations/index.css`](./animations/index.css) | `@layer animations`: keyframes, the root view-transition, the reduced-motion block |
 | [`global/index.css`](./global/index.css) | The design tokens: `:root` and the `[data-theme="dark"]` overrides. Deliberately unlayered |
 | [`vendor/index.css`](./vendor/index.css) | `@layer vendor`: `flag-icons`, cookie-consent and boneyard-js overrides, `::selection` |
@@ -78,8 +78,8 @@ the components render.
 
 All tokens live in `global/index.css`, in tiers:
 
-1. **Brand palette**: `--color-brand-*` raw hex, plus `--brand-gradient`, `--frame` (the neo-brutalist
-   outline colour) and the `--surface-panel*` set.
+1. **Brand palette**: `--color-brand-*` raw hex, plus `--frame` (the neo-brutalist outline colour) and the
+   `--surface-panel*` set.
 2. **Semantic shadcn/ui tokens**: `--background`, `--foreground`, `--card`, `--popover`, `--primary`,
    `--secondary`, `--muted`, `--destructive`, `--border`, `--input`, `--ring`, the `--sidebar-*` set
    and `--radius`.
@@ -93,8 +93,10 @@ All tokens live in `global/index.css`, in tiers:
 | Fixed | `--on-fill`, `--shade`, `--success`, `--success-hover`, `--star`, `--crown`, `--live`, `--terminal-*` | White on any solid fill; black taken at an alpha for scrims, hairlines and shadows; the success `Button` green, which the tour's Done button casts; the rating star, the crown and the pulsing dot; the error page's console, dark in both themes |
 | Tones | `--positive`, `--positive-strong`, `--positive-note`, `--positive-base`, `--positive-action`, `--negative`, `--unused-value`, `--caution`, `--caution-note`, `--caution-base`, `--effective-rate`, `--warning-note`, `--warning-base`, `--comparison-neutral` | Text, icon and tinted border of a figure by what it says: the bare name for an icon or a label, `-strong` for a headline figure, `-note` for small print, `-base` for the shade that takes an alpha |
 | Series | `--efficiency*`, `--suggested*`, `--manual*`, `--info-*`, `--workday-*` | The planner's own colours: efficiency, Suggested Days, Manual Days, the information box and the workday badge |
-| Washes | `--wash-<hue>` with its `-chip`, `-card`, `-badge`, `-panel`, `-icon`, `-title`, `-message`, `-ink`, `-figure`, `-caption` and `-badge-ink` parts, `--day-alternative`, `--day-custom` | A brand hue tinted into a surface, toward white in light and toward black in dark, and the ink that reads on it; `Banner`, `MetricCard`, the stat cards and the calendar's day fills draw with them |
-| Overlays | `--divider`, `--dialog-scrim`, `--shadow-drawer`, `--stripe-*`, `--holiday-fill` | The hairline between list rows on a themed surface (black at 15 % in light, the frame at 15 % in dark, where black vanished on the dark panel; a brand-coloured card does not flip, so its rows keep `border-shade/15`), the dialog's backdrop, the drawer's shadow, the hatching on alternative, custom and manual days, and the holiday gradient |
+| Washes | `--wash-<hue>` with its `-chip`, `-card`, `-badge`, `-panel`, `-icon`, `-title`, `-message`, `-ink`, `-figure`, `-caption` and `-badge-ink` parts | A brand hue tinted into a surface, toward white in light and toward black in dark, and the ink that reads on it; `Banner`, `MetricCard` and the stat cards draw with them |
+| Days | `--day-holiday` and `--day-holiday-ink`, `--day-custom-ring`, `--day-weekend` and `--day-weekend-ink`, `--day-alternative` | The calendar's day fills and the numerals on them: a Holiday is an ink tile in light and a cream one in dark, a Custom Holiday adds the yellow dashed ring, a weekend sits on `--muted` with `--muted-foreground`; the Legend, the homepage mock-ups and the Summary's timeline read the same tokens |
+| Highlighter | `--highlighter`, `--highlighter-ink` | The yellow marker band and the ink on it, one value in both themes: the `highlighter` utility behind the sidebar's step titles, and the band `Calendar` lays under a stretch of Effective Days |
+| Overlays | `--divider`, `--dialog-scrim`, `--shadow-drawer`, `--stripe-*` | The hairline between list rows on a themed surface (black at 15 % in light, the frame at 15 % in dark, where black vanished on the dark panel; a brand-coloured card does not flip, so its rows keep `border-shade/15`), the dialog's backdrop, the drawer's shadow, and the ink hatching on alternative and manual days |
 | Networks | `--social-github`, `--social-linkedin`, `--social-bluesky`, `--social-coffee` | The footer icons' hover colours, which are the networks' own |
 
 `theme/index.css` maps every role token that is a single colour (all but the gradients, the stripes and the networks), so

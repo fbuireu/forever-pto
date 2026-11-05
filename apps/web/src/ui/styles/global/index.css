@@ -13,14 +13,6 @@
 	--color-brand-orange-deep: #c2410c;
 	--color-brand-purple-deep: #7c3aed;
 	--color-brand-yellow-deep: #d4a017;
-	--brand-gradient: linear-gradient(
-		90deg,
-		var(--color-brand-yellow) 0%,
-		var(--color-brand-teal) 20%,
-		var(--color-brand-orange) 50%,
-		var(--color-brand-purple) 80%,
-		var(--color-brand-yellow) 100%
-	);
 	--accent: #ffd93d;
 	--accent-foreground: #0e0e0e;
 	--grid-color: rgba(14, 14, 14, 0.06);
@@ -78,8 +70,6 @@
 	--ring: var(--color-brand-orange);
 	--sidebar: var(--color-brand-cream);
 	--sidebar-foreground: #0e0e0e;
-	--sidebar-primary: #0e0e0e;
-	--sidebar-primary-foreground: #fffaf0;
 	--sidebar-accent: #fff0c6;
 	--sidebar-accent-foreground: #0e0e0e;
 	--sidebar-border: #0e0e0e;
@@ -95,10 +85,8 @@
 	--terminal-faint: #444444;
 	--star: #ffb800;
 	--crown: oklch(79.5% 0.184 86.047);
-	--holiday-fill: linear-gradient(135deg, var(--color-brand-yellow), #facc15);
-	--stripe-alternative: rgba(249, 115, 22, 0.65);
-	--stripe-custom: rgba(168, 85, 247, 0.62);
-	--stripe-manual: rgba(255, 255, 255, 0.24);
+	--stripe-alternative: rgba(14, 14, 14, 0.14);
+	--stripe-manual: rgba(14, 14, 14, 0.16);
 	--social-github: #24292f;
 	--social-linkedin: #0077b5;
 	--social-bluesky: #0085ff;
@@ -163,8 +151,14 @@
 	--wash-green: color-mix(in srgb, var(--color-brand-green) 18%, white 82%);
 	--wash-green-ink: #3f6212;
 	--wash-green-message: var(--color-brand-ink);
-	--day-alternative: color-mix(in srgb, var(--color-brand-orange) 32%, white 68%);
-	--day-custom: color-mix(in srgb, var(--color-brand-purple) 28%, white 72%);
+	--highlighter: var(--color-brand-yellow);
+	--highlighter-ink: var(--color-brand-ink);
+	--day-holiday: var(--color-brand-ink);
+	--day-holiday-ink: #ffffff;
+	--day-custom-ring: var(--color-brand-yellow);
+	--day-weekend: var(--muted);
+	--day-weekend-ink: var(--muted-foreground);
+	--day-alternative: color-mix(in srgb, var(--color-brand-yellow) 45%, white 55%);
 	--wash-emerald: oklch(95% 0.052 163.051);
 	--wash-emerald-icon: oklch(69.6% 0.17 162.48);
 	--wash-emerald-title: oklch(50.8% 0.118 165.612);
@@ -215,8 +209,6 @@
 	--input: #181410;
 	--sidebar: #141008;
 	--sidebar-foreground: #fff5e1;
-	--sidebar-primary: #fff5e1;
-	--sidebar-primary-foreground: #0e0e0e;
 	--sidebar-accent: #2b241e;
 	--sidebar-accent-foreground: #fff5e1;
 	--sidebar-border: #fff5e1;
@@ -270,6 +262,11 @@
 	--wash-green: color-mix(in srgb, var(--color-brand-green) 16%, black 84%);
 	--wash-green-ink: var(--color-brand-green);
 	--wash-green-message: oklch(96.2% 0.044 156.743);
+	--day-holiday: var(--color-brand-cream);
+	--day-holiday-ink: var(--color-brand-ink);
+	--day-weekend: var(--muted);
+	--day-weekend-ink: var(--muted-foreground);
+	--day-alternative: color-mix(in srgb, var(--color-brand-yellow) 70%, black 30%);
 	--wash-emerald: oklch(37.8% 0.077 168.94 / 20%);
 	--wash-emerald-title: oklch(84.5% 0.143 164.978);
 	--wash-emerald-badge: oklch(37.8% 0.077 168.94 / 30%);

@@ -20,7 +20,7 @@
 }
 
 .donate-brutal .donate-brutal-btn {
-	background: linear-gradient(135deg, var(--accent) 0%, var(--color-brand-orange) 100%);
+	background: var(--accent);
 	border: 3px solid var(--frame);
 	border-radius: 8px;
 	box-shadow: var(--shadow-brutal-btn);
@@ -35,7 +35,7 @@
 .donate-brutal .donate-brutal-btn:hover {
 	transform: translate(-2px, -2px);
 	box-shadow: var(--shadow-brutal-btn-hover);
-	background: linear-gradient(135deg, var(--accent) 0%, var(--color-brand-orange) 100%);
+	background: var(--accent);
 	filter: none;
 }
 

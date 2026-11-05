@@ -41,10 +41,9 @@ export const CAL_ENTRIES = CAL_PATTERN.map((type, i) => ({ id: `d${i + 1}`, type
 
 export const dayCell: Record<DayType, string> = {
 	work: "rounded-lg bg-card text-foreground border-[2px] border-[var(--frame)]/15",
-	holiday:
-		"rounded-lg bg-[image:var(--holiday-fill)] text-[var(--color-brand-ink)] font-black border-[2px] border-[var(--frame)]",
-	pto: "rounded-lg bg-[var(--color-brand-teal)] text-[var(--color-brand-ink)] font-black border-[2px] border-[var(--frame)]",
-	weekend: "rounded-lg bg-[var(--surface-panel-soft)] text-muted-foreground border-[2px] border-[var(--frame)]/15",
+	holiday: "rounded-lg bg-day-holiday text-day-holiday-ink font-black",
+	pto: "rounded-lg bg-[var(--color-brand-teal)] text-[var(--color-brand-ink)] font-black",
+	weekend: "rounded-lg bg-day-weekend text-day-weekend-ink",
 };
 
 export const brutCard =

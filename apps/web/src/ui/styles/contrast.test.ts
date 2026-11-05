@@ -9,7 +9,7 @@ const DECLARATION = /^\s*(--[\w-]+)\s*:\s*([^;]+);/gm;
 const ARBITRARY_FILL = /(?<![\w-])bg-\[(?:image:|color:)?([^\]]+)\]/;
 const NAMED_FILL = /(?<![\w-])bg-(day-[\w-]+)/;
 const STRIPE = /var\((--stripe-[\w-]+)\)/;
-const INK_CLASS = /(?<![\w-])text-\[var\((--[\w-]+)\)\]/;
+const INK_CLASS = /(?<![\w-])text-(?:\[var\((--[\w-]+)\)\]|(day-[\w-]+-ink))/;
 const MIX = /^color-mix\(in srgb,\s*(.+?)\s+(\d+)%,\s*(.+?)\s+(\d+)%\)$/;
 const FUNCTION_RGBA = /^rgba?\(\s*(\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\s*\)$/;
 const GRADIENT = /^linear-gradient\((.+)\)$/;
@@ -117,6 +117,21 @@ const overlaid = ({ theme, base, stripe }: OverlaidParams): Colour => {
 	return base.map((channel, at) => channel * (1 - alpha) + Number(match[at + 1]) * alpha) as Colour;
 };
 
+const inkOf = (classes: string): string => {
+	const match = classes.match(INK_CLASS);
+	const token = match?.[1] ?? (match?.[2] ? `--${match[2]}` : undefined);
+	if (!token) throw new Error(`no ink in ${classes}`);
+	return token;
+};
+
+const INK_BY_DAY: Record<(typeof BRAND_FILLED)[number], string> = {
+	holiday: "--day-holiday-ink",
+	suggested: "--color-brand-ink",
+	alternative: "--color-brand-ink",
+	custom: "--day-holiday-ink",
+	manual: "--color-brand-ink",
+};
+
 const fillOf = (classes: string): string => {
 	const arbitrary = classes.match(ARBITRARY_FILL)?.[1];
 	if (arbitrary) return arbitrary.replaceAll("_", " ");
@@ -138,17 +153,21 @@ describe("the ink on a brand-filled day", () => {
 		expect(brand.filter((name) => dark.has(name))).toEqual([]);
 	});
 
-	it.each(BRAND_FILLED)("reads a %s day in a token that is the ink", (name) => {
-		const token = MODIFIERS_CLASS_NAMES[name].match(INK_CLASS)?.[1];
+	it.each(BRAND_FILLED)("reads a %s day in the ink its fill pairs with", (name) => {
+		expect(inkOf(MODIFIERS_CLASS_NAMES[name])).toBe(INK_BY_DAY[name]);
+	});
 
-		expect(token).toBe("--color-brand-ink");
+	it("declares the holiday ink in both themes, since the holiday fill flips with them", () => {
+		expect(light.has("--day-holiday-ink")).toBe(true);
+		expect(dark.has("--day-holiday-ink")).toBe(true);
+		expect(dark.has("--day-holiday")).toBe(true);
 	});
 
 	it.each(DAY_STATES_BY_THEME.flatMap((theme) => BRAND_FILLED.map((name) => [theme, name] as const)))(
 		"reads at AA on a %s-theme %s day, stripes included",
 		(theme, name) => {
 			const classes = MODIFIERS_CLASS_NAMES[name];
-			const [ink = [0, 0, 0] as Colour] = coloursOf({ theme, value: "var(--color-brand-ink)" });
+			const [ink = [0, 0, 0] as Colour] = coloursOf({ theme, value: `var(${inkOf(classes)})` });
 			const fills = coloursOf({ theme, value: fillOf(classes) });
 			const stripe = classes.match(STRIPE)?.[1];
 			const painted = stripe ? [...fills, ...fills.map((base) => overlaid({ theme, base, stripe }))] : fills;

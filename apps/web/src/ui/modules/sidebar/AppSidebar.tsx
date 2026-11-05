@@ -40,7 +40,7 @@ const CalendarExport = dynamic(() => import("./components/CalendarExport").then(
 const STEP_CARD_CLASS =
 	"bg-sidebar border-[3px] border-[var(--frame)] rounded-[14px] shadow-[var(--shadow-brutal-md)] p-[18px]";
 
-const stepTitleEmphasis = (chunks: ReactNode) => <em className="font-serif italic font-normal">{chunks}</em>;
+const stepTitleEmphasis = (chunks: ReactNode) => <em className="highlighter not-italic">{chunks}</em>;
 
 interface AppSidebarProps {
 	children: ReactNode;

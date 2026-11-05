@@ -56,7 +56,7 @@ render as their generic error. A refusal added without an entry is a compile err
 ## Day classification
 
 `utils/modifiers.ts` exports curried predicates (`isHoliday`, `isCustom`, `isSuggestion`, `isManual`,
-`isAlternative`, `isPast`, `isToday`, and the selection and range family). `Calendar` builds them into one
+`isAlternative`, `isPast`, `isToday`, `isEffectiveStretch`, and the selection and range family). `Calendar` builds them into one
 `modifiers` object and hands it to `getDayClassNames`, which looks each name up in `MODIFIERS_CLASS_NAMES`.
 Adding a day state means an edit in each place: the predicate, the entry in `modifiers`, the class-name entry
 under the same key and, for a state a reader should hear, a row in `DAY_STATE_LABELS`, which appends it to the
@@ -87,7 +87,21 @@ author. A class entry under that key would paint every past day.
 [`calendar/utils/helpers.test.ts`](./calendar/utils/helpers.test.ts) drives the fade through the real `isPast`.
 
 `MODIFIERS_CLASS_NAMES` is `as const satisfies Record<string, string>`, so its keys stay literal and a mistyped
-lookup is a compile error; the `Legend` swatches read the same record.
+lookup is a compile error; the `Legend` swatches read the same record, the Effective Days one aside. No entry
+carries a drop shadow (the day cell's lift arrives on hover, from the cell's own classes), so a swatch, which is a
+key and not a control, stands flat.
+
+**The Effective Days band is a modifier with no class entry.** `isEffectiveStretch({ isOff, isPlaced })` answers
+whether a day belongs to a run of consecutive Free Days and placed PTO Days that holds at least one Suggested or
+Manual Day: the stretch the Effective Days count. `Calendar` builds `isOff` and `isPlaced`
+from the same `holidays` and `dayStates` the cells are painted with, so the band follows a hand edit with no second
+source, and the predicate caches each run it walks by day index, reaching at most `STRETCH_REACH` days either way.
+`MODIFIERS_CLASS_NAMES` has no `effective` key, so `getDayClassNames` paints nothing for it. The render draws a
+`bg-highlighter` span (`data-slot="effective-stretch"`) behind each member day, joined to its neighbours within a
+week row and rounded where the row or the run ends, and turns a member that is neither placed nor a Holiday (a
+weekend) transparent so the band shows through it. `DAY_STATE_LABELS` carries the state, so the day's accessible
+name ends in the Legend's *Effective days*, and the Legend draws its swatch with the same `bg-highlighter`.
+`utils/modifiers.test.ts` pins the predicate and `calendar/Calendar.test.tsx` the bands and the names.
 
 `isAlternative` returns `false` for any date already in `currentSelection`, a required parameter: an
 Alternative is painted only where it differs from the applied Suggestion.

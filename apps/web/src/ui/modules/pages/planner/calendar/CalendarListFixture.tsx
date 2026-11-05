@@ -11,10 +11,7 @@ const DAY_KEYS = Array.from({ length: 42 }, (_, i) => `d${i + 1}`);
 export const CalendarListFixture = () => (
 	<div className="grid [grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))] gap-5 mx-auto w-full">
 		{MONTH_KEYS.map((month) => (
-			<div
-				key={month}
-				className="p-3 select-none rounded-[14px] border-[3px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-md)]"
-			>
+			<div key={month} className="p-3 select-none rounded-[14px] border-2 border-[var(--frame)] bg-card">
 				<div className="flex justify-center items-center mb-4">
 					<Bone className="h-5 w-28" />
 				</div>
