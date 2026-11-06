@@ -37,9 +37,8 @@ import {
 	isSelected,
 	isToday,
 } from "../utils/modifiers";
+import { EffectiveDaysBand } from "./EffectiveDaysBand";
 import { getDayClassNames, getDayStateLabelKeys, isFromToObject } from "./utils/helpers";
-
-const DAYS_IN_WEEK = 7;
 
 export interface FromTo {
 	from: Date;
@@ -402,8 +401,6 @@ export const Calendar = memo(function Calendar({
 					}
 
 					const isStretchDay = stretchDays[position] === true;
-					const joinsPrevious = position % DAYS_IN_WEEK !== 0 && stretchDays[position - 1] === true;
-					const joinsNext = position % DAYS_IN_WEEK !== DAYS_IN_WEEK - 1 && stretchDays[position + 1] === true;
 					const holidayName = holidaysMap.get(date.toDateString());
 					const isTodayDay = modifiers.today?.(date) ?? false;
 					const dayName = [
@@ -425,17 +422,7 @@ export const Calendar = memo(function Calendar({
 
 					return (
 						<div key={date.toISOString()} className="relative isolate size-8 p-0">
-							{isStretchDay && (
-								<span
-									aria-hidden="true"
-									data-slot="effective-stretch"
-									className={cn(
-										"pointer-events-none absolute -inset-y-[3px] bg-highlighter",
-										joinsPrevious ? "-left-1" : "-left-[3px] rounded-l-[11px]",
-										joinsNext ? "-right-1" : "-right-[3px] rounded-r-[11px]",
-									)}
-								/>
-							)}
+							<EffectiveDaysBand stretch={stretchDays} position={position} />
 							<ConditionalWrapper
 								doWrap={!!holidayName}
 								wrapper={(children) => (

@@ -25,13 +25,15 @@ Note the **deliberate 4px border**: core primitives like [Button](/design-system
 
 ## dayCell
 
-`dayCell` is a `Record<DayType, string>` mapping each calendar day type to its cell classes. `Hero` and `Features` use it together with `CAL_ENTRIES`, a 28-entry fake month exported from the same file, to render the illustrative mini-calendars:
+`dayCell` is a `Record<DayType, string>` mapping each calendar day type to its cell classes. `Features` draws its Bridge week with it, and the demo below lays out `CAL_ENTRIES`, a 28-entry fake month exported from the same file, with it:
 
 <DayCellsDemo client:visible />
 
 <VariantsTable rows={DAY_TYPE_ROWS} />
 
 The visual language matches the real planner, from the same day tokens: a Holiday is the solid ink tile with white numerals (`bg-day-holiday text-day-holiday-ink`, a cream tile in dark), PTO Days the brand teal with ink numerals, weekends recede onto the muted wash (`bg-day-weekend text-day-weekend-ink`), and plain work days sit on the card background with a faint 15%-opacity border.
+
+`Hero`'s mock-up draws the same `CAL_ENTRIES` the way the planner draws a month, not with `dayCell`: every day carries its number, its fill comes from the calendar's own `MODIFIERS_CLASS_NAMES`, and `EffectiveDaysBand` lays the highlighter under each stretch `isEffectiveStretch` finds, with an *Effective days* entry in its legend under the planner Legend's own label. The mock-up is the calendar it advertises, so a change to how the planner paints a day reaches it without an edit here.
 
 ## SHOWCASE_PLAN
 

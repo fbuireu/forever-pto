@@ -52,12 +52,27 @@ const BUNDLES = {
 	fr: frMessages,
 } satisfies Record<Locale, typeof enMessages>;
 
-const mountHero = async ({ locale, messages }: RenderHeroParams): Promise<RenderResult> => {
-	mockGetTranslations.mockResolvedValue(createTranslator({ locale, messages, namespace: "homepage" }));
+const serveTranslations = ({ locale, messages }: RenderHeroParams) => {
+	mockGetTranslations.mockImplementation(async (namespace: "homepage" | "legend") =>
+		createTranslator({ locale, messages, namespace }),
+	);
 	mockGetFormatter.mockResolvedValue(createFormatter({ locale }));
 	mockGetLocale.mockResolvedValue(locale);
+};
+
+const mountHero = async (params: RenderHeroParams): Promise<RenderResult> => {
+	serveTranslations(params);
 	return render(await Hero());
 };
+
+const mockupDays = (container: HTMLElement): HTMLElement[] => [
+	...container.querySelectorAll<HTMLElement>(".aspect-square"),
+];
+
+const bandedDays = (container: HTMLElement): string[] =>
+	[...container.querySelectorAll('[data-slot="effective-stretch"]')].map(
+		(band) => band.parentElement?.textContent ?? "",
+	);
 
 const renderHero = async (params: RenderHeroParams): Promise<string> => {
 	const { container } = await mountHero(params);
@@ -98,15 +113,63 @@ describe("Hero social proof", () => {
 	});
 
 	it("names the hero as the source of the quick start it opens", async () => {
-		mockGetTranslations.mockResolvedValue(
-			createTranslator({ locale: "en", messages: enMessages, namespace: "homepage" }),
-		);
-		mockGetFormatter.mockResolvedValue(createFormatter({ locale: "en" }));
-		mockGetLocale.mockResolvedValue("en");
-		const { container } = render(await Hero());
+		const { container } = await mountHero({ locale: "en", messages: enMessages });
 
 		expect(container.querySelector("[data-source]")?.getAttribute("data-source")).toBe("hero");
 	});
+});
+
+describe("Hero calendar mockup", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it("numbers every day of the mock month, as the planner calendar does, and draws no icon in place of a number", async () => {
+		const { container } = await mountHero({ locale: "en", messages: enMessages });
+
+		expect(mockupDays(container).map((cell) => cell.textContent)).toEqual(
+			Array.from({ length: 28 }, (_, index) => String(index + 1)),
+		);
+	});
+
+	it("lays the Effective Days band under each stretch that holds a PTO Day, and under no other day off", async () => {
+		const { container } = await mountHero({ locale: "en", messages: enMessages });
+
+		expect(bandedDays(container)).toEqual(["4", "5", "6", "7", "13", "14", "15", "16", "25", "26", "27", "28"]);
+	});
+
+	it("rounds the band where the week row ends, even though the stretch carries on into the next row", async () => {
+		const { container } = await mountHero({ locale: "en", messages: enMessages });
+		const bandUnder = (day: string) =>
+			[...container.querySelectorAll('[data-slot="effective-stretch"]')].find(
+				(band) => band.parentElement?.textContent === day,
+			);
+
+		expect(bandUnder("14")?.className).toContain("rounded-r-[11px]");
+		expect(bandUnder("15")?.className).toContain("rounded-l-[11px]");
+		expect(bandUnder("5")?.className).not.toMatch(/rounded-[lr]-/);
+	});
+
+	it("lets the band show through a weekend inside a stretch and keeps the weekend fill on one outside it", async () => {
+		const { container } = await mountHero({ locale: "en", messages: enMessages });
+		const tileOf = (day: string) =>
+			mockupDays(container)
+				.find((cell) => cell.textContent === day)
+				?.querySelector("div");
+
+		expect(tileOf("6")?.className).toContain("bg-transparent");
+		expect(tileOf("20")?.className).toContain("bg-day-weekend");
+		expect(tileOf("20")?.className).not.toContain("bg-transparent");
+	});
+
+	it.each(Object.entries(BUNDLES))(
+		"names the band in the %s legend with the planner Legend's own label",
+		async (locale, messages) => {
+			const text = await renderHero({ locale: locale as Locale, messages });
+
+			expect(text).toContain(messages.legend.effective);
+		},
+	);
 });
 
 describe("Hero title", () => {

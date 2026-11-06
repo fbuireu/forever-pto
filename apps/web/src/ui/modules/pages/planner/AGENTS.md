@@ -32,7 +32,7 @@ rendered with (`serverYear`) until the stores are ready.
 
 | Directory | Contents |
 | --- | --- |
-| `calendar/` | [`calendar/Calendar.tsx`](./calendar/Calendar.tsx): one month grid and its selection modes, and nothing that knows what a planner is; [`calendar/usePlannerDayClick.tsx`](./calendar/usePlannerDayClick.tsx): the planner's click policy; [`calendar/utils/helpers.ts`](./calendar/utils/helpers.ts): `MODIFIERS_CLASS_NAMES`, `getDayClassNames`, `getDayStateLabelKeys` and `isFromToObject`; [`calendar/utils/refusals.ts`](./calendar/utils/refusals.ts); [`calendar/CalendarListFixture.tsx`](./calendar/CalendarListFixture.tsx) |
+| `calendar/` | [`calendar/Calendar.tsx`](./calendar/Calendar.tsx): one month grid and its selection modes, and nothing that knows what a planner is; `calendar/EffectiveDaysBand.tsx`: the highlighter under a stretch of Effective Days, which the homepage hero draws too; [`calendar/usePlannerDayClick.tsx`](./calendar/usePlannerDayClick.tsx): the planner's click policy; [`calendar/utils/helpers.ts`](./calendar/utils/helpers.ts): `MODIFIERS_CLASS_NAMES`, `getDayClassNames`, `getDayStateLabelKeys` and `isFromToObject`; [`calendar/utils/refusals.ts`](./calendar/utils/refusals.ts); [`calendar/CalendarListFixture.tsx`](./calendar/CalendarListFixture.tsx) |
 | `holidays/` | `holidays/HolidaysTable.tsx` plus [`holidays/components/`](./holidays/components): [`HolidayRow.tsx`](./holidays/components/HolidayRow.tsx), [`HolidayTableHeader.tsx`](./holidays/components/HolidayTableHeader.tsx), [`HolidayFormModal.tsx`](./holidays/components/HolidayFormModal.tsx) and the two callers that configure it, [`DeleteHolidayModal.tsx`](./holidays/components/DeleteHolidayModal.tsx), and the Zod factory in [`holidays/components/schema.ts`](./holidays/components/schema.ts) |
 | `summary/` | The charts, [`summary/MetricCard.tsx`](./summary/MetricCard.tsx), [`summary/SummaryFixture.tsx`](./summary/SummaryFixture.tsx) and [`summary/const.ts`](./summary/const.ts) |
 | `utils/` | [`utils/helpers.ts`](./utils/helpers.ts): the month grid (`getCalendarDays`), the range counters (`calculateWorkdays`, `calculateWeekends`, `calculateHolidaysInRange`) and the Planning Window's month labels (`getWindowMonthLabels`); [`utils/modifiers.ts`](./utils/modifiers.ts): the day predicates |
@@ -96,10 +96,12 @@ whether a day belongs to a run of consecutive Free Days and placed PTO Days that
 Manual Day: the stretch the Effective Days count. `Calendar` builds `isOff` and `isPlaced`
 from the same `holidays` and `dayStates` the cells are painted with, so the band follows a hand edit with no second
 source, and the predicate caches each run it walks by day index, reaching at most `STRETCH_REACH` days either way.
-`MODIFIERS_CLASS_NAMES` has no `effective` key, so `getDayClassNames` paints nothing for it. The render draws a
-`bg-highlighter` span (`data-slot="effective-stretch"`) behind each member day, joined to its neighbours within a
-week row and rounded where the row or the run ends, and turns a member that is neither placed nor a Holiday (a
-weekend) transparent so the band shows through it. `DAY_STATE_LABELS` carries the state, so the day's accessible
+`MODIFIERS_CLASS_NAMES` has no `effective` key, so `getDayClassNames` paints nothing for it.
+[`calendar/EffectiveDaysBand.tsx`](./calendar/EffectiveDaysBand.tsx) draws a `bg-highlighter` span
+(`data-slot="effective-stretch"`) behind each member day, joined to its neighbours within a week row and rounded
+where the row or the run ends, and the render turns a member that is neither placed nor a Holiday (a weekend)
+transparent so the band shows through it. The day it sits behind has to be positioned, as the day `Button` is, or
+the band paints over the day. `DAY_STATE_LABELS` carries the state, so the day's accessible
 name ends in the Legend's *Effective days*, and the Legend draws its swatch with the same `bg-highlighter`.
 `utils/modifiers.test.ts` pins the predicate and `calendar/Calendar.test.tsx` the bands and the names.
 
@@ -388,8 +390,10 @@ Premium toast and by [`pages/homepage/sections/Pricing.tsx`](../homepage/section
 
 Two sets of imports reach into this folder from outside it:
 
-- [`pages/homepage/sections/Hero.tsx`](../homepage/sections/Hero.tsx) reads `MODIFIERS_CLASS_NAMES` from
-  `calendar/utils/helpers.ts`, the one import from another screen.
+- [`pages/homepage/sections/Hero.tsx`](../homepage/sections/Hero.tsx) draws its mock-up month as this calendar draws
+  one: the day fills from `MODIFIERS_CLASS_NAMES` in `calendar/utils/helpers.ts`, the band from
+  `calendar/EffectiveDaysBand.tsx`, and which days the band covers from `isEffectiveStretch` in `utils/modifiers.ts`.
+  These are the imports from another screen, so a change to a day's look or to the band is a change to the hero.
 - The sidebar belongs to this screen: [`sidebar/components/WorkdayCounter.tsx`](../../sidebar/components/WorkdayCounter.tsx)
   imports `FromTo`, `isFromToObject` and the range counters in `utils/helpers.ts`, and
   `WorkdayCounterCalendarModal.tsx` renders `Calendar` in range mode. A change to those signatures is a change to
