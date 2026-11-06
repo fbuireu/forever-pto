@@ -22,12 +22,12 @@ describe("setCookie", () => {
 		expect(mockCookieStoreSet).toHaveBeenCalledWith(expect.objectContaining({ name: "foo", value: "bar" }));
 	});
 
-	it("defaults path to /", async () => {
+	it("sets path to /", async () => {
 		await setCookie({ name: "foo", value: "bar" });
 		expect(mockCookieStoreSet).toHaveBeenCalledWith(expect.objectContaining({ path: "/" }));
 	});
 
-	it("defaults sameSite to lax", async () => {
+	it("sets sameSite to lax", async () => {
 		await setCookie({ name: "foo", value: "bar" });
 		expect(mockCookieStoreSet).toHaveBeenCalledWith(expect.objectContaining({ sameSite: "lax" }));
 	});
@@ -44,16 +44,6 @@ describe("setCookie", () => {
 	it("sets expires to undefined when maxAge is not provided", async () => {
 		await setCookie({ name: "foo", value: "bar" });
 		expect(mockCookieStoreSet).toHaveBeenCalledWith(expect.objectContaining({ expires: undefined }));
-	});
-
-	it("respects a custom sameSite option", async () => {
-		await setCookie({ name: "foo", value: "bar", sameSite: "strict" });
-		expect(mockCookieStoreSet).toHaveBeenCalledWith(expect.objectContaining({ sameSite: "strict" }));
-	});
-
-	it("respects a custom path option", async () => {
-		await setCookie({ name: "foo", value: "bar", path: "/admin" });
-		expect(mockCookieStoreSet).toHaveBeenCalledWith(expect.objectContaining({ path: "/admin" }));
 	});
 
 	it("does not include a secure property (handled automatically by the browser)", async () => {

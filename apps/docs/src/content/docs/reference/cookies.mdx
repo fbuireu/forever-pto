@@ -39,7 +39,7 @@ Named by the `ACTIVATION_COOKIE` export in `apps/web/src/application/dto/payment
 
 ## <code>{SIDEBAR_COOKIE_NAME}</code>
 
-The only client-set cookie in the table. `apps/web/src/ui/utils/sidebarCookie.ts` declares `SIDEBAR_COOKIE_NAME` (interpolated on this page) and `SIDEBAR_COOKIE_MAX_AGE`, 7 days, and nothing else, so the consent catalogue reads the name without loading the sidebar; `apps/web/src/ui/modules/core/animate/base/Sidebar.tsx` writes `true`/`false` under them through the `setCookie()` helper in `apps/web/src/ui/utils/cookie.ts`, which uses the CookieStore API with a `sameSite: 'lax'` default. Being set from the browser it cannot be `httpOnly`.
+The only client-set cookie in the table. `apps/web/src/ui/utils/sidebarCookie.ts` declares `SIDEBAR_COOKIE_NAME` (interpolated on this page) and `SIDEBAR_COOKIE_MAX_AGE`, 7 days, and nothing else, so the consent catalogue reads the name without loading the sidebar; `apps/web/src/ui/modules/core/animate/base/Sidebar.tsx` writes `true`/`false` under them through the `setCookie()` helper in `apps/web/src/ui/utils/cookie.ts`, which uses the CookieStore API with `sameSite: 'lax'`. Being set from the browser it cannot be `httpOnly`.
 
 ## Third-party cookies
 

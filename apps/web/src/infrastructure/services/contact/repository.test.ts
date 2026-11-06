@@ -20,7 +20,7 @@ const run = <A>(effect: Effect.Effect<A, DatabaseError, TursoService>): Promise<
 const runFail = <A>(effect: Effect.Effect<A, DatabaseError, TursoService>): Promise<DatabaseError> =>
 	Effect.runPromise(Effect.flip(effect).pipe(Effect.provide(contacts.layer)));
 
-const SINCE = contactCooldownStart({ now: new Date("2026-10-02T13:40:00Z") });
+const SINCE = contactCooldownStart(new Date("2026-10-02T13:40:00Z"));
 const SENDER_KEY = "user@example.com";
 
 const CONTACT: ContactData = {

@@ -43,7 +43,7 @@ export const sendContactEmail = ({
 
 		const slot = yield* reserveContactSlot({
 			senderKey,
-			since: contactCooldownStart({ now: new Date() }),
+			since: contactCooldownStart(new Date()),
 			contact: {
 				email: validated.email,
 				name: validated.name,

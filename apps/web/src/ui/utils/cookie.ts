@@ -3,19 +3,17 @@ import { Temporal } from "temporal-polyfill";
 interface SetCookieParams {
 	name: string;
 	value: string;
-	path?: string;
 	maxAge?: number;
-	sameSite?: "strict" | "lax" | "none";
 }
 
-export async function setCookie({ name, value, path = "/", maxAge, sameSite = "lax" }: SetCookieParams): Promise<void> {
+export async function setCookie({ name, value, maxAge }: SetCookieParams): Promise<void> {
 	if (typeof cookieStore !== "undefined") {
 		await cookieStore.set({
 			name,
 			value,
-			path,
+			path: "/",
 			expires: maxAge === undefined ? undefined : Temporal.Now.instant().add({ seconds: maxAge }).epochMilliseconds,
-			sameSite,
+			sameSite: "lax",
 		});
 		return;
 	}
@@ -24,8 +22,8 @@ export async function setCookie({ name, value, path = "/", maxAge, sameSite = "l
 
 	const attributes = [
 		`${name}=${encodeURIComponent(value)}`,
-		`path=${path}`,
-		`samesite=${sameSite}`,
+		"path=/",
+		"samesite=lax",
 		...(maxAge === undefined ? [] : [`max-age=${maxAge}`]),
 		...(typeof location !== "undefined" && location.protocol === "https:" ? ["secure"] : []),
 	];
