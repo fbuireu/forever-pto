@@ -13,7 +13,6 @@ interface FormButtonsProps {
 	cancelText?: string;
 	hideCancel?: boolean;
 	submitClassName?: string;
-	cancelClassName?: string;
 	submitVariant?: ComponentProps<typeof Button>["variant"];
 	pending: boolean;
 }
@@ -25,7 +24,6 @@ export const FormButtons = ({
 	cancelText,
 	hideCancel = false,
 	submitClassName,
-	cancelClassName,
 	submitVariant = "success",
 	pending: isPending,
 }: FormButtonsProps) => {
@@ -47,7 +45,7 @@ export const FormButtons = ({
 				)}
 			</Button>
 			{!hideCancel && onCancel && (
-				<Button type="button" variant="destructive" onClick={onCancel} disabled={isPending} className={cancelClassName}>
+				<Button type="button" variant="destructive" onClick={onCancel} disabled={isPending}>
 					{resolvedCancelText}
 				</Button>
 			)}

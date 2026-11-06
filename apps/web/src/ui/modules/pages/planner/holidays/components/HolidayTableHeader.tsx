@@ -5,7 +5,6 @@ import { ArrowDown } from "@ui/modules/core/animate/icons/ArrowDown";
 import { ArrowUp } from "@ui/modules/core/animate/icons/ArrowUp";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
 import { TableHeader as BaseTableHeader, TableHead, TableRow } from "@ui/modules/core/primitives/Table";
-import { cn } from "@ui/utils/cn";
 import { ArrowUpDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { memo, type ReactNode } from "react";
@@ -24,16 +23,15 @@ interface TableHeaderProps {
 	sortKey: keyof HolidayDTO;
 	currentSort: { key: keyof HolidayDTO | null; direction: "asc" | "desc" };
 	onSort: (key: keyof HolidayDTO) => void;
-	className?: string;
 }
 
-const TableHeader = ({ children, sortKey, currentSort, onSort, className = "" }: TableHeaderProps) => {
+const TableHeader = ({ children, sortKey, currentSort, onSort }: TableHeaderProps) => {
 	const isActive = currentSort.key === sortKey;
 	const Icon = isActive ? (currentSort.direction === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
 
 	return (
 		<TableHead
-			className={cn("select-none p-0", className)}
+			className="select-none p-0"
 			aria-sort={isActive ? (currentSort.direction === "asc" ? "ascending" : "descending") : "none"}
 		>
 			<AnimateIcon animateOnHover asChild>

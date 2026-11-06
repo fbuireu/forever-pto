@@ -24,7 +24,6 @@ interface MetricCardBaseProps {
 				} & Omit<SVGMotionProps<SVGSVGElement>, "animate">
 		  >;
 	colorScheme: keyof typeof COLOR_SCHEMES;
-	className?: string;
 	renderValue?: (counter: ReactNode) => ReactNode;
 	decimalPlaces?: number;
 }
@@ -103,7 +102,7 @@ const displayed = ({ counter, renderValue }: DisplayedParams): ReactNode =>
 	renderValue ? renderValue(counter) : counter;
 
 export const MetricCard = (props: MetricCardProps) => {
-	const { label, value, icon: Icon, colorScheme, renderValue, decimalPlaces = 0, className = "" } = props;
+	const { label, value, icon: Icon, colorScheme, renderValue, decimalPlaces = 0 } = props;
 	const colors = COLOR_SCHEMES[colorScheme];
 
 	if (props.size === MetricCardSize.COMPACT) {
@@ -115,7 +114,6 @@ export const MetricCard = (props: MetricCardProps) => {
 					"p-3",
 					colors.bg,
 					"rounded-[10px] border-[3px] border-[var(--frame)] text-center flex flex-col justify-between items-center shadow-[var(--shadow-brutal-sm)] [contain:layout]",
-					className,
 				)}
 			>
 				<Icon className={cn("size-4", colors.icon, "mx-auto mb-1")} />
@@ -145,7 +143,6 @@ export const MetricCard = (props: MetricCardProps) => {
 				"items-center p-4",
 				colors.bg,
 				"rounded-[10px] border-[3px] border-[var(--frame)] flex flex-col justify-between items-center shadow-[var(--shadow-brutal-sm)] [contain:layout]",
-				className,
 			)}
 		>
 			<span className={cn("mb-1 text-[0.72rem] font-display font-black uppercase tracking-[0.08em]", colors.text)}>
