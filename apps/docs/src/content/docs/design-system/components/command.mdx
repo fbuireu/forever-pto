@@ -8,8 +8,7 @@ sidebar:
     variant: success
 ---
 
-import { COMMAND_PROP_ROWS, CommandDemo } from '../../../../components/demos/CommandDemo';
-import { PropsTable } from '../../../../components/PropsTable';
+import { CommandDemo } from '../../../../components/demos/CommandDemo';
 
 Source: `apps/web/src/ui/modules/core/primitives/Command.tsx`. A styled wrapper around [cmdk](https://cmdk.paco.me): type in the input and the list filters, ranks and keyboard-navigates automatically. `CommandInput` wraps its search icon in `AnimateIcon animateOnHover` (see [animated icons](/design-system/animation/icons/)), which is why demos need a `LazyMotionProvider` ancestor.
 
@@ -19,18 +18,14 @@ Exports: `Command`, `CommandInput`, `CommandList`, `CommandEmpty`, `CommandGroup
 
 ## How it works
 
-- All filtering, scoring and arrow-key navigation come from cmdk; this module only applies the brutal skin. Each sub-component forwards the full cmdk prop surface (`value`, `onSelect`, `disabled`, `heading`, `shouldFilter` on the root, and so on).
+- All filtering, scoring and arrow-key navigation come from cmdk; this module only applies the brutal skin. Each sub-component forwards its cmdk counterpart's props; the app sets `value`, `keywords` and `onSelect` on an item and a `placeholder` on the input.
 - `CommandInput` renders inside a wrapper row with a 2px bottom border and the animated `SearchIcon` from `apps/web/src/ui/modules/core/animate/icons/Search.tsx`; hovering the row plays the icon's draw animation.
-- `CommandList` caps at `max-h-[300px]` with vertical scroll; `CommandGroup` headings render as small black-weight uppercase labels (styled via CSS, per the no-uppercase-strings convention); selected items get `bg-accent` through cmdk's `data-selected` attribute.
+- `CommandList` caps at `max-h-[300px]` with vertical scroll; selected items get `bg-accent` through cmdk's `data-selected` attribute.
 - The root has no border of its own: in the app it lives inside a [Popover](/design-system/components/popover/) (see `apps/web/src/ui/modules/core/primitives/Combobox.tsx`, the country/region picker, which is app-coupled and documented separately). Standalone use adds its own frame, as the demo above does.
 
 ## Props
 
-`Command` forwards cmdk's root props; the ones worth knowing:
-
-<PropsTable rows={COMMAND_PROP_ROWS} />
-
-`CommandInput`, `CommandList`, `CommandEmpty`, `CommandGroup` and `CommandItem` forward their cmdk counterparts' props unchanged.
+`Command`, `CommandInput`, `CommandList`, `CommandEmpty`, `CommandGroup` and `CommandItem` forward their cmdk counterparts' props unchanged and add none.
 
 ## Usage
 
@@ -41,8 +36,8 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
   <CommandInput placeholder='Search a country…' />
   <CommandList>
     <CommandEmpty>No results found.</CommandEmpty>
-    <CommandGroup heading='Countries'>
-      <CommandItem onSelect={(value) => select(value)}>Spain</CommandItem>
+    <CommandGroup>
+      <CommandItem value='ES' keywords={['Spain']} onSelect={(value) => select(value)}>Spain</CommandItem>
     </CommandGroup>
   </CommandList>
 </Command>
@@ -56,7 +51,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 ## Accessibility
 
 - cmdk wires the ARIA combobox pattern: the input is `role='combobox'` controlling a `role='listbox'`, each `CommandItem` is an option, and `aria-activedescendant` tracks the highlighted one so focus never leaves the input.
-- Keyboard: arrow keys move the highlight, Enter selects, Escape is left to the surrounding popover. Give `CommandInput` a `placeholder` or an `aria-label`, and put a `heading` on each `CommandGroup` so groups announce.
+- Keyboard: arrow keys move the highlight, Enter selects, Escape is left to the surrounding popover. Give `CommandInput` a `placeholder` or an `aria-label`.
 - `CommandEmpty` is announced when the filter matches nothing; keep its text meaningful ("No country found") rather than decorative.
 
 ## In the app

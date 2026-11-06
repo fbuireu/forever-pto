@@ -21,7 +21,7 @@ flowchart TB
     TOKENS["Design tokens: colours, shadows, frame"]
   end
   subgraph core ["apps/web/src/ui/modules/core"]
-    PRIM["primitives/<br/>Button · Badge · Banner · Card · Input · Textarea · Label · Separator · Table · InputGroup · Progress · Slider · Command<br/>and Bone · Combobox · FlagIcon · Form · NumberInput · RichLink · Sonner"]
+    PRIM["primitives/<br/>Button · Badge · Banner · Card · Input · Textarea · Label · Table · InputGroup · Progress · Slider · Command<br/>and Bone · Combobox · FlagIcon · Form · NumberInput · RichLink · Sonner"]
     ABASE["animate/base/<br/>Accordion · Checkbox · Collapsible · Dialog · Drawer · DropdownMenu · Popover · Switch · Tooltip · Sidebar · Slot"]
     ACOMP["animate/components/<br/>Tabs · Counter · FeatureList · RadialNav"]
     AEFF["animate/effects/<br/>AutoHeight · MotionHighlight"]
@@ -54,13 +54,12 @@ These docs import the real components through the `@ui` alias and render them as
 | Component | Purpose | Portability |
 | --- | --- | --- |
 | [Button](/design-system/components/button/) | Primary interactive element; CVA variants and sizes, `asChild` | Live |
-| [Badge](/design-system/components/badge/) | Uppercase status pill; lifts on hover only as a link | Live |
+| [Badge](/design-system/components/badge/) | Uppercase status pill | Live |
 | [Banner](/design-system/components/banner/) | Icon + title callout with brand color schemes | Live |
 | [Card](/design-system/components/card/) | Surface container with Header/Title/Description/Content | Live |
 | [Input](/design-system/components/input/) | Single-line field with shadow-driven states | Live |
 | [Textarea](/design-system/components/textarea/) | Auto-growing multi-line field | Live |
-| [Label](/design-system/components/label/) | Field caption with peer-disabled dimming | Live |
-| [Separator](/design-system/components/separator/) | Hairline divider, horizontal or vertical | Live |
+| [Label](/design-system/components/label/) | Field caption bound to its control | Live |
 | [Table](/design-system/components/table/) | Framed, scrollable data table with striped rows | Live |
 | [InputGroup](/design-system/components/input-group/) | Input plus addons sharing one frame | Live |
 | [Accordion](/design-system/components/accordion/) | Expandable sections with animated height and rotating chevron | Live (motion) |

@@ -22,12 +22,10 @@ Source: `apps/web/src/ui/modules/core/primitives/Card.tsx`. A `bg-card` column w
 | Part | Role |
 | --- | --- |
 | `Card` | Container: vertical flex, `gap-6`, `py-6`, clips overflow. |
-| `CardHeader` | Grid with a `@container/card-header` container query; reserves a second column when a `data-slot='card-action'` child is present. |
+| `CardHeader` | Grid with a `@container/card-header` container query. |
 | `CardTitle` | `font-black` heading text, tight tracking. |
 | `CardDescription` | Muted small text. |
 | `CardContent` | Body area, horizontal padding matching the header. |
-
-Only these are exported. The source also defines `_CardAction` and `_CardFooter`, currently private, so check `apps/web/src/ui/modules/core/primitives/Card.tsx` before reaching for them.
 
 ## Props
 
@@ -57,7 +55,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/m
 
 ## Accessibility
 
-- No landmark and no role: a Card is a visual grouping. When it is a section of the page, render `CardTitle` with `as='h2'` (or the level the outline needs) so the heading tree stays navigable.
+- No landmark and no role: a Card is a visual grouping. When it is a section of the page, render `CardTitle` with `as='h1'` when it is the page's one heading, as the legal pages do, so the heading tree stays navigable.
 - Nothing inside is interactive by default; a clickable card should wrap its content in a link or a button rather than putting a handler on the container.
 
 ## In the app

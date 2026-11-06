@@ -35,9 +35,9 @@ export const CardPartsDemo = () => (
 
 export const CARD_TITLE_PROP_ROWS = propRows<OwnProps<ComponentProps<typeof CardTitle>, ComponentProps<"div">>>({
 	as: {
-		type: '"div" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6"',
+		type: '"div" | "h1"',
 		defaultValue: '"div"',
 		description:
-			"The element the title renders as. Pick a heading level when the card is a section of the page, so the outline stays meaningful.",
+			"The element the title renders as. h1 for a card that is the page's one heading, as the legal pages' is, so the outline stays meaningful.",
 	},
 });

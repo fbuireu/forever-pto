@@ -374,7 +374,7 @@ function Status() {
 							indicatorClassName="rounded-full border-r-[3px] border-[var(--frame)]"
 							transition={PROGRESS_TRANSITION}
 						/>
-						<ProgressOverlayLabel overlayClassName="text-[var(--color-brand-ink)]" transition={PROGRESS_TRANSITION}>
+						<ProgressOverlayLabel overlayClassName="text-[var(--color-brand-ink)]">
 							{t("usedDays", {
 								used: usedDays,
 								total: ptoDays,
@@ -390,7 +390,7 @@ function Status() {
 							indicatorClassName="rounded-full border-r-[3px] border-[var(--frame)] bg-[var(--color-brand-teal)]"
 							transition={PROGRESS_TRANSITION}
 						/>
-						<ProgressOverlayLabel overlayClassName="text-[var(--color-brand-ink)]" transition={PROGRESS_TRANSITION}>
+						<ProgressOverlayLabel overlayClassName="text-[var(--color-brand-ink)]">
 							{t("remainingDays", { remaining, pct: format.number(remainingPct / 100, { style: "percent" }) })}
 						</ProgressOverlayLabel>
 					</div>

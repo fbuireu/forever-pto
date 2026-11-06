@@ -31,14 +31,12 @@ import { Label } from '@ui/modules/core/primitives/Label';
 
 ## Conventions
 
-- `peer-disabled:` styles dim the label and switch the cursor when a sibling control marked `peer` is disabled. The control must precede the label in the DOM for Tailwind's peer selector to apply, so reorder visually with CSS (`order-*`) if the label should appear first.
 - The app's form layer (`apps/web/src/ui/modules/core/primitives/Form.tsx`, reference-only here) wraps this same component as `FormLabel` and adds error coloring plus automatic `htmlFor` wiring.
 - Pair with [Input](/design-system/components/input/) and [Textarea](/design-system/components/textarea/).
 
 ## Accessibility
 
 - The association is the native one: `htmlFor` pointing at the control's `id`, which the type makes mandatory. Clicking the label focuses the control, and a screen reader announces the label when the control is focused.
-- `peer-disabled:` styles dim the label when the sibling control carries the `peer` class and is disabled, so the caption follows the field's state without JavaScript.
 
 ## In the app
 

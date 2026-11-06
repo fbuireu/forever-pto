@@ -22,15 +22,12 @@ const buttonVariants = cva(
 					"bg-secondary text-secondary-foreground shadow-[var(--shadow-brutal-btn)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-secondary/85 hover:shadow-[var(--shadow-brutal-btn-hover)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[var(--shadow-brutal-btn-active)] data-[popup-open]:-translate-x-0.5 data-[popup-open]:-translate-y-0.5 data-[popup-open]:shadow-[var(--shadow-brutal-btn-hover)]",
 				ghost:
 					"border-transparent shadow-none hover:bg-[var(--surface-panel-alt)] hover:text-foreground active:bg-[var(--surface-panel-inset)]",
-				link: "border-transparent text-primary underline-offset-4 hover:underline",
 			},
 			size: {
 				default: "h-11 px-5 py-2.5 has-[>svg]:px-4",
 				sm: "h-9 gap-1.5 px-3.5 has-[>svg]:px-3",
 				lg: "h-12 px-6 has-[>svg]:px-5",
 				icon: "size-11",
-				"icon-sm": "size-9",
-				"icon-lg": "size-12",
 			},
 		},
 		defaultVariants: {
@@ -55,4 +52,4 @@ function Button({
 	return <Comp data-slot="button" className={cn(buttonVariants({ variant, size, className }))} {...props} />;
 }
 
-export { Button, buttonVariants };
+export { Button };

@@ -52,10 +52,10 @@ describe("Banner", () => {
 	});
 
 	it("paints the scheme it was asked for and none of the others", () => {
-		renderBanner({ colorScheme: "green" });
+		renderBanner({ colorScheme: "blue" });
 
 		const note = screen.getByRole("note");
-		expect(note.className).toContain("bg-wash-green");
+		expect(note.className).toContain("bg-wash-teal");
 		expect(note.className).not.toContain("bg-wash-orange");
 	});
 

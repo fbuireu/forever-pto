@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { Button, buttonVariants } from "./Button";
+import { Button } from "./Button";
 
 describe("Button", () => {
 	it("renders a real button carrying the slot and the default variant and size", () => {
@@ -15,14 +15,14 @@ describe("Button", () => {
 
 	it("swaps variant and size classes independently of each other", () => {
 		render(
-			<Button variant="ghost" size="icon-sm">
+			<Button variant="ghost" size="icon">
 				Menu
 			</Button>,
 		);
 
 		const button = screen.getByRole("button", { name: "Menu" });
 		expect(button.className).toContain("border-transparent");
-		expect(button.className).toContain("size-9");
+		expect(button.className).toContain("size-11");
 		expect(button.className).not.toContain("bg-primary");
 	});
 
@@ -53,14 +53,14 @@ describe("Button", () => {
 
 	it("renders the child in its place when asChild is set, so a link can look like a button without nesting one", () => {
 		render(
-			<Button asChild variant="link">
+			<Button asChild variant="outline">
 				<a href="/planner">Open the planner</a>
 			</Button>,
 		);
 
 		const link = screen.getByRole("link", { name: "Open the planner" });
 		expect(link.dataset.slot).toBe("button");
-		expect(link.className).toContain("underline-offset-4");
+		expect(link.className).toContain("rounded-[8px]");
 		expect(screen.queryByRole("button")).toBeNull();
 	});
 
@@ -70,9 +70,5 @@ describe("Button", () => {
 		const button = screen.getByRole("button", { name: "Short" });
 		expect(button.className).toContain("h-8");
 		expect(button.className).not.toContain("h-11");
-	});
-
-	it("exposes buttonVariants so something that is not a Button can be styled as one", () => {
-		expect(buttonVariants({ variant: "destructive" })).toContain("bg-destructive");
 	});
 });

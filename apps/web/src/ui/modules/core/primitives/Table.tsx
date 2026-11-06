@@ -12,7 +12,7 @@ function Table({ className, containerClassName, ...props }: ComponentProps<"tabl
 				containerClassName,
 			)}
 		>
-			<table data-slot="table" className={cn("w-full caption-bottom text-sm", className)} {...props} />
+			<table data-slot="table" className={cn("w-full text-sm", className)} {...props} />
 		</div>
 	);
 }
@@ -39,7 +39,7 @@ function TableRow({ className, ...props }: ComponentProps<"tr">) {
 		<tr
 			data-slot="table-row"
 			className={cn(
-				"border-b-[2px] border-[var(--frame)]/18 transition-colors odd:bg-[var(--surface-panel-soft)] hover:bg-[var(--surface-panel-alt)] data-[state=selected]:bg-[var(--surface-panel-alt)]",
+				"border-b-[2px] border-[var(--frame)]/18 transition-colors odd:bg-[var(--surface-panel-soft)] hover:bg-[var(--surface-panel-alt)]",
 				className,
 			)}
 			{...props}

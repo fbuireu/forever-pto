@@ -61,28 +61,16 @@ function ProgressTrack({
 
 interface ProgressOverlayLabelProps {
 	children: ReactNode;
-	className?: string;
 	overlayClassName?: string;
-	transition?: HTMLMotionProps<"div">["transition"];
 }
 
-function ProgressOverlayLabel({
-	children,
-	className,
-	overlayClassName,
-	transition = { type: "tween", duration: 0.15, ease: "easeOut" },
-}: ProgressOverlayLabelProps) {
+function ProgressOverlayLabel({ children, overlayClassName }: ProgressOverlayLabelProps) {
 	const { value } = useProgressContext();
 	const clipped = Math.max(0, 100 - Math.min(value, 100));
 
 	return (
 		<>
-			<span
-				className={cn(
-					"pointer-events-none absolute inset-0 grid place-items-center font-mono text-[11px] font-bold uppercase text-foreground",
-					className,
-				)}
-			>
+			<span className="pointer-events-none absolute inset-0 grid place-items-center font-mono text-[11px] font-bold uppercase text-foreground">
 				{children}
 			</span>
 			<m.span
@@ -92,7 +80,7 @@ function ProgressOverlayLabel({
 				)}
 				initial={{ clipPath: "inset(0 100% 0 0)" }}
 				animate={{ clipPath: `inset(0 ${clipped}% 0 0)` }}
-				transition={transition}
+				transition={{ type: "tween", duration: 0.15, ease: "easeOut" }}
 				aria-hidden
 			>
 				{children}

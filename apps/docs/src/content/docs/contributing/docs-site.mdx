@@ -101,7 +101,7 @@ Prose names a file, never a volatile literal (`W2`). Where the app exports a con
 
 | Guard | Type it is exhaustive over | What breaks it |
 | --- | --- | --- |
-| `VariantsTable` rows | `VariantProps<typeof buttonVariants>` | A variant added, renamed or removed in the app |
+| `VariantsTable` rows | The component's own `variant` and `size` props | A variant added, renamed or removed in the app |
 | `PropsTable` rows | `OwnProps<ComponentProps<typeof X>, Base>`: the component's keys minus the element or primitive it wraps | A prop the app adds, renames or removes |
 | `StrategiesTable` | `Record<Strategy, string>` | A Strategy added or renamed in `types.ts` |
 | `TunablesTable` | Every leaf of `PTO_CONSTANTS`, by a recursive key type | A tunable added, renamed or removed in `const.ts` |

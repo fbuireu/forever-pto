@@ -3,8 +3,8 @@
 import { useTheme } from "next-themes";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 
-interface ToasterOwnProps extends ToasterProps {
-	closeLabel?: string;
+interface ToasterOwnProps {
+	closeLabel: string;
 }
 
 type ToasterTheme = NonNullable<ToasterProps["theme"]>;
@@ -12,7 +12,7 @@ type ToasterTheme = NonNullable<ToasterProps["theme"]>;
 const isToasterTheme = (theme: string): theme is ToasterTheme =>
 	theme === "light" || theme === "dark" || theme === "system";
 
-const Toaster = ({ closeLabel = "Close toast", ...props }: ToasterOwnProps) => {
+const Toaster = ({ closeLabel }: ToasterOwnProps) => {
 	const { theme = "system" } = useTheme();
 
 	return (
@@ -20,7 +20,7 @@ const Toaster = ({ closeLabel = "Close toast", ...props }: ToasterOwnProps) => {
 			theme={isToasterTheme(theme) ? theme : "system"}
 			className="toaster group"
 			closeButton
-			position={props.position ?? "bottom-center"}
+			position="bottom-center"
 			duration={5000}
 			toastOptions={{
 				closeButtonAriaLabel: closeLabel,
@@ -45,7 +45,6 @@ const Toaster = ({ closeLabel = "Close toast", ...props }: ToasterOwnProps) => {
 						"hit-area-stable !rounded-[8px] !border-[3px] !border-[var(--frame)] !bg-[var(--surface-panel)] !text-foreground !opacity-100 !size-7 [&_svg]:!size-4 !shadow-[var(--shadow-brutal-xs)] !transition-all !duration-75 hover:!-translate-x-0.5 hover:!-translate-y-0.5 hover:!shadow-[var(--shadow-brutal-sm)]",
 				},
 			}}
-			{...props}
 		/>
 	);
 };

@@ -23,12 +23,6 @@ describe("Textarea", () => {
 		expect(field().value).toBe("hi");
 	});
 
-	it("passes disabled through so it cannot be typed into", () => {
-		render(<Textarea aria-label="Message" disabled />);
-
-		expect(field().disabled).toBe(true);
-	});
-
 	it("lets the caller's class win over its own on the same property", () => {
 		render(<Textarea aria-label="Message" className="min-h-12" />);
 

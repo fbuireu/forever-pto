@@ -12,9 +12,8 @@ export const InputStatesDemo = () => (
 
 export const InputTypesDemo = () => (
 	<Demo className="flex-col items-stretch">
+		<Input type="text" placeholder="Holiday name" aria-label="Holiday name" />
 		<Input type="email" defaultValue="you@example.com" aria-label="Email" />
-		<Input type="date" aria-label="Custom holiday date" />
-		<Input type="file" aria-label="File input" />
 	</Demo>
 );
 
@@ -22,7 +21,7 @@ export const INPUT_PROP_ROWS = propRows({
 	type: {
 		type: "string",
 		defaultValue: '"text"',
-		description: "Any native input type. File inputs get their own file: pseudo-element styling.",
+		description: "The app sets text and email.",
 	},
 	"aria-invalid": {
 		type: "boolean",

@@ -37,10 +37,10 @@ describe("Card", () => {
 		expect(screen.getByText("Summary").tagName).toBe("DIV");
 	});
 
-	it("renders the title at the heading level the caller names", () => {
-		render(<CardTitle as="h2">Summary</CardTitle>);
+	it("renders the title as the page heading when the caller asks for it", () => {
+		render(<CardTitle as="h1">Summary</CardTitle>);
 
-		expect(screen.getByRole("heading", { level: 2, name: "Summary" })).toBeDefined();
+		expect(screen.getByRole("heading", { level: 1, name: "Summary" })).toBeDefined();
 	});
 
 	it("merges the caller's className on every part, its own winning on the same property", () => {

@@ -32,7 +32,7 @@ The planner panel (`apps/web/src/ui/modules/pages/planner/PlannerPanel.tsx`) res
 
 ## Props
 
-`Progress` forwards Base UI's root props; the ones that matter:
+`Progress` forwards Base UI's root props; the one the app sets:
 
 <PropsTable rows={PROGRESS_PROP_ROWS} />
 
@@ -60,7 +60,7 @@ import { Progress, ProgressOverlayLabel, ProgressTrack } from '@ui/modules/core/
 ## Conventions
 
 - `data-slot` hooks: `progress`, `progress-track`, `progress-indicator`.
-- The label typography is fixed to mono, 11px, bold, uppercase (via CSS, per the no-uppercase-strings rule); pass `className`/`overlayClassName` to recolor rather than restyle.
+- The label typography is fixed to mono, 11px, bold, uppercase (via CSS, per the no-uppercase-strings rule); pass `overlayClassName` to recolor the clipped copy rather than restyle.
 
 ## Accessibility
 

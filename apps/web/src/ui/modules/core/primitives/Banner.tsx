@@ -31,12 +31,6 @@ const COLOR_SCHEMES = {
 		title: "text-wash-purple-title",
 		message: "text-wash-purple-message",
 	},
-	green: {
-		bg: "bg-wash-green",
-		icon: "text-wash-green-ink",
-		title: "text-wash-green-ink",
-		message: "text-wash-green-message",
-	},
 };
 
 export const Banner = ({ icon: Icon, title, children, action, colorScheme, className = "" }: BannerProps) => {

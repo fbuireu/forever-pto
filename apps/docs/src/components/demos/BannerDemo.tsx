@@ -1,6 +1,6 @@
 import { Banner } from "@ui/modules/core/primitives/Banner";
 import { Button } from "@ui/modules/core/primitives/Button";
-import { Check, Info, Lightbulb, type LucideIcon, Sparkles } from "lucide-react";
+import { Info, Lightbulb, type LucideIcon, Sparkles } from "lucide-react";
 import type { ComponentProps } from "react";
 import { Demo } from "../Demo";
 import { propRows } from "../PropsTable";
@@ -12,7 +12,6 @@ const SCHEME_EXAMPLES: Record<BannerColorScheme, { icon: LucideIcon; title: stri
 	orange: { icon: Lightbulb, title: "Tip", message: "Two PTO days around a Thursday holiday unlock a 5-day break." },
 	blue: { icon: Info, title: "Heads up", message: "Regional holidays depend on the selected region." },
 	indigo: { icon: Sparkles, title: "Premium", message: "Multi-year planning is a premium feature." },
-	green: { icon: Check, title: "Saved", message: "Your custom holiday was added to the calendar." },
 };
 
 const SCHEMES = Object.keys(SCHEME_EXAMPLES) as BannerColorScheme[];
