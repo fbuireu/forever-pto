@@ -125,6 +125,14 @@ describe("Roadmap", () => {
 		expect(animated).toEqual([en.roadmap.completed, en.roadmap.inProgress]);
 	});
 
+	it("keeps the dial still while the feature list beside it grows on hover, anchored to the row's top and never pinned to the viewport", () => {
+		renderRoadmap();
+		const dialColumn = screen.getByRole("navigation", { name: en.a11y.radialNavigation }).parentElement?.parentElement;
+
+		expect(dialColumn?.parentElement?.className).toContain("lg:items-start");
+		expect(dialColumn?.className).not.toContain("sticky");
+	});
+
 	it("names the dial for assistive tech", () => {
 		renderRoadmap();
 
