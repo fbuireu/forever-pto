@@ -135,6 +135,15 @@ do.
 that resolve every lazy chunk of a page are slow under that load. `pool: 'vmThreads'` or `isolate: false` would
 build the DOM once per worker instead; neither has been measured against this suite.
 
+**A failing test prints the timeline of its waits.** [`vitest.config.ts`](./vitest.config.ts) sets
+`experimental.traceTimeline`, as the root config does for the contract suite, so a failure lists each `vi.waitFor`,
+`vi.waitUntil` and `expect.poll` the test ran, by its `message`, and how long it took.
+
+**`fakeTimers.fakeNodeBuiltins` stays off.** React's `act` settles an async callback through
+`require("timers").setImmediate`, and the option fakes that module under `vi.useFakeTimers()`, so an
+`await act(async () => …)` in a test on fake timers waits on a timer nothing advances and times out. Vitest's next major
+turns the option on by default, so that upgrade sets it to `false` here or moves those tests off fake timers.
+
 **Next owns [`next-env.d.ts`](./next-env.d.ts), and it flaps**: a production build points its route import at
 `.next/types/`, a dev run at `.next/dev/types/`. Leave whichever version is committed alone.
 

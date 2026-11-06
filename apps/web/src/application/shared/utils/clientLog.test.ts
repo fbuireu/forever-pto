@@ -48,8 +48,8 @@ describe("a client log never fails its caller", () => {
 		});
 
 		expect(() => logClientError({ message: "boom", error: new Error("x") })).not.toThrow();
-		await vi.waitFor(() => {
-			expect(mockLoggerModule).toHaveBeenCalled();
+		await vi.waitFor(() => expect(mockLoggerModule).toHaveBeenCalled(), {
+			message: "logClientError reaches the logger module",
 		});
 	});
 
@@ -61,8 +61,8 @@ describe("a client log never fails its caller", () => {
 				throw new Error("write failed");
 			}),
 		).not.toThrow();
-		await vi.waitFor(() => {
-			expect(mockLoggerModule).toHaveBeenCalled();
+		await vi.waitFor(() => expect(mockLoggerModule).toHaveBeenCalled(), {
+			message: "logClient reaches the logger module",
 		});
 	});
 });

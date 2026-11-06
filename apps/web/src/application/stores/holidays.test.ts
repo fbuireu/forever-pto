@@ -917,7 +917,9 @@ describe("fetchHolidays", () => {
 		);
 
 		const first = useHolidaysStore.getState().fetchHolidays(FETCH_PARAMS);
-		await vi.waitFor(() => expect(mockGetHolidays).toHaveBeenCalledOnce());
+		await vi.waitFor(() => expect(mockGetHolidays).toHaveBeenCalledOnce(), {
+			message: "the first fetch reaches getHolidays",
+		});
 		await useHolidaysStore.getState().fetchHolidays({ ...FETCH_PARAMS, year: 2027 });
 		older.resolve([makeHoliday({ id: "older", dateStr: "2026-06-01" })]);
 		await first;

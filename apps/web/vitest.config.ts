@@ -27,6 +27,7 @@ export default defineConfig({
 	test: {
 		environment: "happy-dom",
 		testTimeout: 20_000,
+		experimental: { traceTimeline: true },
 		reporters: process.env.GITHUB_ACTIONS ? ["default", jobSummary(() => "Unit suite (forever-pto-web)")] : ["default"],
 		env: {
 			NEXT_PUBLIC_SITE_URL: "https://forever-pto.com",

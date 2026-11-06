@@ -208,7 +208,9 @@ describe("prod mode with SECRET_KEY", () => {
 		});
 		storage.getItem("test-key");
 		expect(mockLogError).not.toHaveBeenCalled();
-		await vi.waitFor(() => expect(mockLogError).toHaveBeenCalledTimes(1));
+		await vi.waitFor(() => expect(mockLogError).toHaveBeenCalledTimes(1), {
+			message: "the deferred import logs the failed read once",
+		});
 	});
 
 	it("setItem obfuscates and writes to localStorage", () => {
