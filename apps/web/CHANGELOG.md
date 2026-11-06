@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.16.0](https://github.com/fbuireu/forever-pto/compare/web-v1.15.19...web-v1.16.0) (2026-11-06)
+
+
+### Features
+
+* band the calendar's effective days and restyle its day states ([#446](https://github.com/fbuireu/forever-pto/issues/446)) ([38ed14a](https://github.com/fbuireu/forever-pto/commit/38ed14a2cea7f07e114692b0673403b0c2f26430)), closes [#123](https://github.com/fbuireu/forever-pto/issues/123)
+
 # [forever-pto-web-v1.15.19](https://github.com/fbuireu/forever-pto/compare/web-v1.15.18...web-v1.15.19) (2026-11-04)
 
 
