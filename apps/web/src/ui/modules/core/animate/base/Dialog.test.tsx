@@ -85,24 +85,28 @@ describe("DialogTrigger", () => {
 });
 
 describe("DialogContent (DialogPopup)", () => {
-	it("renders the close button by default", () => {
-		const { container } = render(<DialogContent>body</DialogContent>);
+	it("renders the close button, named by the label the caller translated", () => {
+		const { container } = render(<DialogContent closeLabel="Cerrar">body</DialogContent>);
 		expect(container.querySelector('[data-testid="x-icon"]')).not.toBeNull();
-	});
-
-	it("hides the close button when showCloseButton=false", () => {
-		const { container } = render(<DialogContent showCloseButton={false}>body</DialogContent>);
-		expect(container.querySelector('[data-testid="x-icon"]')).toBeNull();
+		expect(container.textContent).toContain("Cerrar");
 	});
 
 	it("merges className onto the popup", () => {
-		const { container } = render(<DialogContent className="custom-class">body</DialogContent>);
+		const { container } = render(
+			<DialogContent closeLabel="Close" className="custom-class">
+				body
+			</DialogContent>,
+		);
 		const popup = container.querySelector('[data-primitive="dialog-popup"]');
 		expect(popup?.className).toContain("custom-class");
 	});
 
 	it("never outgrows the screen, and scrolls inside itself, because an open dialog locks the page's own scroll", () => {
-		const { container } = render(<DialogContent className="sm:max-w-xl">body</DialogContent>);
+		const { container } = render(
+			<DialogContent closeLabel="Close" className="sm:max-w-xl">
+				body
+			</DialogContent>,
+		);
 		const classes = container.querySelector('[data-primitive="dialog-popup"]')?.className.split(" ") ?? [];
 
 		expect(classes).toEqual(

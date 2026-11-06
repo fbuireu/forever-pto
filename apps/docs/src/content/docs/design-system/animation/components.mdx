@@ -11,7 +11,7 @@ Source: `apps/web/src/ui/modules/core/animate/components/`. Composite motion com
 
 ## Counter
 
-`Counter` (`Counter.tsx`) is a stepper: minus and plus `m.button`s flanking a [SlidingNumber](/design-system/animation/text/) inside a brutal-framed pill, with `layout` animation so the pill resizes smoothly as digit count changes. The layout is keyed on the number with `layoutDependency`, so Motion measures the pill only when the value moves rather than on every render of whatever hosts it. It is controlled: pass `number` and `setNumber`. **`decrementLabel` and `incrementLabel` are required**: the two buttons render a glyph and nothing else, so without them a screen reader announces "button, button". Optional props: `label` (small caption under the number), `slidingNumberProps`, `buttonProps` / `decrementButtonProps` / `incrementButtonProps` (e.g. to `disable` a bound), and `transition`.
+`Counter` (`Counter.tsx`) is a stepper: minus and plus `m.button`s flanking a [SlidingNumber](/design-system/animation/text/) inside a brutal-framed pill, with `layout` animation so the pill resizes smoothly as digit count changes. The layout is keyed on the number with `layoutDependency`, so Motion measures the pill only when the value moves rather than on every render of whatever hosts it. It is controlled: pass `number` and `setNumber`. **`decrementLabel` and `incrementLabel` are required**: the two buttons render a glyph and nothing else, so without them a screen reader announces "button, button". Also required: `label` (the small caption under the number) and `decrementButtonProps` / `incrementButtonProps`, each carrying the `disabled` flag that stops the number at a bound.
 
 <CounterDemo client:visible />
 
@@ -23,11 +23,11 @@ Source: `apps/web/src/ui/modules/core/animate/components/`. Composite motion com
 
 ## RadialNav
 
-`RadialNav` (`RadialNav.tsx`) is a circular menu: items are placed by polar coordinates on a ring (`size`, default 180 px diameter), and a central `MousePointer2` cursor rotates to the active item along the shortest arc (spring `stiffness: 220, damping: 26`). The active button expands from a 40 px circle to reveal its uppercase label.
+`RadialNav` (`RadialNav.tsx`) is a circular menu: items are placed by polar coordinates on a ring of 180 px diameter, and a central `MousePointer2` cursor rotates to the active item along the shortest arc (spring `stiffness: 220, damping: 26`). The active button expands from a 40 px circle to reveal its uppercase label.
 
 <RadialNavDemo client:visible />
 
-Props: `items: { id, icon, label, angle, animateOnHover?, badgeClass?, className? }[]`, where `icon` is any component that takes the `className` and `style` the button gives it: a Lucide icon or one of the [animated icons](/design-system/animation/icons/). `animateOnHover` asks an animated icon to play when the pointer is over it; set it on an animated icon only, since a Lucide icon would hand it to its `<svg>` as an unknown attribute. An item that leaves it out passes its icon no `animateOnHover` at all, not an undefined one, so a Lucide icon there renders without that warning. `badgeClass` recolors the active state (default `bg-accent`). Plus `menuButtonConfig { iconSize, buttonSize, buttonPadding }`, `defaultActiveId` and `onActiveChange`. The active item is found by its `id`, so ids need only be unique.
+Props: `items: { id, icon, label, angle, animateOnHover?, badgeClass?, className? }[]`, where `icon` is any component that takes the `className` and `style` the button gives it: a Lucide icon or one of the [animated icons](/design-system/animation/icons/). `animateOnHover` asks an animated icon to play when the pointer is over it; set it on an animated icon only, since a Lucide icon would hand it to its `<svg>` as an unknown attribute. An item that leaves it out passes its icon no `animateOnHover` at all, not an undefined one, so a Lucide icon there renders without that warning. `badgeClass` recolors the active state (default `bg-accent`). Plus `defaultActiveId`, `onActiveChange` and `aria-label`, all required: the nav is a `fieldset` named by the caller, since the component cannot translate. The active item is found by its `id`, so ids need only be unique.
 
 ## Usage
 
@@ -42,6 +42,8 @@ import { RadialNav } from '@ui/modules/core/animate/components/RadialNav';
   label='PTO days'
   decrementLabel='One PTO day fewer'
   incrementLabel='One more PTO day'
+  decrementButtonProps={{ disabled: days <= MIN_DAYS }}
+  incrementButtonProps={{ disabled: days >= MAX_DAYS }}
 />
 
 <FeatureList features={roadmap} categoryLabel='Roadmap' detailedViewLabel='Detailed view' />
@@ -50,6 +52,7 @@ import { RadialNav } from '@ui/modules/core/animate/components/RadialNav';
   items={[{ id: 1, icon: Calendar, label: 'Calendar', angle: 0 }]}
   defaultActiveId={1}
   onActiveChange={setSection}
+  aria-label='Roadmap categories'
 />
 ```
 

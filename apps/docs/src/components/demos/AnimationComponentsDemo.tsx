@@ -1,8 +1,8 @@
 import { Counter } from "@ui/modules/core/animate/components/Counter";
 import { FeatureList } from "@ui/modules/core/animate/components/FeatureList";
-import { RadialNav, type RadialNavProps } from "@ui/modules/core/animate/components/RadialNav";
+import { RadialNav } from "@ui/modules/core/animate/components/RadialNav";
 import { Calendar, Settings, Star, Users } from "lucide-react";
-import { useState } from "react";
+import { type ComponentProps, useState } from "react";
 import { Demo } from "../Demo";
 
 export const CounterDemo = () => {
@@ -16,6 +16,8 @@ export const CounterDemo = () => {
 				label="PTO days"
 				decrementLabel="One PTO day fewer"
 				incrementLabel="One more PTO day"
+				decrementButtonProps={{ disabled: days <= 0 }}
+				incrementButtonProps={{ disabled: days >= 40 }}
 			/>
 		</Demo>
 	);
@@ -50,7 +52,7 @@ export const FeatureListDemo = () => (
 	</Demo>
 );
 
-const NAV_ITEMS: RadialNavProps["items"] = [
+const NAV_ITEMS: ComponentProps<typeof RadialNav>["items"] = [
 	{ id: 1, icon: Calendar, label: "Calendar", angle: 0 },
 	{ id: 2, icon: Star, label: "Favorites", angle: 90, badgeClass: "bg-[var(--color-brand-teal)]" },
 	{ id: 3, icon: Settings, label: "Settings", angle: 180 },
@@ -60,7 +62,12 @@ const NAV_ITEMS: RadialNavProps["items"] = [
 export const RadialNavDemo = () => (
 	<Demo>
 		<div className="mx-auto px-24 py-14">
-			<RadialNav items={NAV_ITEMS} defaultActiveId={1} />
+			<RadialNav
+				items={NAV_ITEMS}
+				defaultActiveId={1}
+				onActiveChange={() => undefined}
+				aria-label="Roadmap categories"
+			/>
 		</div>
 	</Demo>
 );

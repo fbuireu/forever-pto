@@ -8,7 +8,7 @@ sidebar:
     variant: success
 ---
 
-import { ACCORDION_PANEL_PROP_ROWS, ACCORDION_PROP_ROWS, ACCORDION_TRIGGER_PROP_ROWS, AccordionDemo, AccordionNoChevronDemo } from '../../../../components/demos/AccordionDemo';
+import { ACCORDION_PROP_ROWS, AccordionDemo } from '../../../../components/demos/AccordionDemo';
 import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/animate/base/Accordion.tsx`. Built on the Base UI accordion with Motion (`m.*`) as the visual layer, so any consumer must sit under `LazyMotionProvider` (`apps/web/src/ui/modules/core/animate/providers/LazyMotionProvider.tsx`); the app mounts it in the locale layout.
@@ -19,27 +19,17 @@ Exports: `Accordion`, `AccordionItem`, `AccordionTrigger`, `AccordionPanel`.
 
 ## How it works
 
-- The panel animates `height`, `opacity` and a custom `--mask-stop` CSS variable that drives a `linear-gradient` mask, so content fades in top-down while the height springs open (default spring `stiffness: 150, damping: 22`, overridable via the `transition` prop on trigger and panel).
+- The panel animates `height`, `opacity` and a custom `--mask-stop` CSS variable that drives a `linear-gradient` mask, so content fades in top-down while the height springs open (a spring, `stiffness: 150, damping: 22`).
 - Open state is not owned by React alone: `AccordionTrigger` attaches a `MutationObserver` to its own button and watches the `data-panel-open` attribute Base UI stamps on it. That keeps the Motion chevron and the `AnimatePresence`-gated panel in sync with Base UI's internal state, whichever side toggles it.
-- The chevron is a square "+" badge that rotates 45° when open and flips from `bg-accent` to the frame color. Pass `chevron={false}` on `AccordionTrigger` to remove it. It uses the `hit-area-stable` utility so the hover lift does not shift the pointer target; see [Button](/design-system/components/button/) for the same pattern.
-
-<AccordionNoChevronDemo client:visible />
+- The chevron is a square "+" badge that rotates 45° when open and flips from `bg-accent` to the frame color. It uses the `hit-area-stable` utility so the hover lift does not shift the pointer target; see [Button](/design-system/components/button/) for the same pattern.
 
 ## Props
 
-`Accordion` forwards Base UI's root props; the ones that matter:
+`Accordion` forwards Base UI's root props; the one the app sets:
 
 <PropsTable rows={ACCORDION_PROP_ROWS} />
 
-`AccordionTrigger` adds two on top of Base UI's trigger:
-
-<PropsTable rows={ACCORDION_TRIGGER_PROP_ROWS} />
-
-`AccordionPanel` adds two on top of Base UI's panel:
-
-<PropsTable rows={ACCORDION_PANEL_PROP_ROWS} />
-
-`AccordionItem` takes Base UI's item props and requires `children`.
+`AccordionTrigger`, `AccordionPanel` and `AccordionItem` take Base UI's trigger, panel and item props and add none; `AccordionItem` requires `children`.
 
 ## Usage
 
@@ -54,7 +44,7 @@ import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from '@ui/
 </Accordion>
 ```
 
-Root props are the Base UI accordion root props (e.g. `multiple`, `defaultValue`); the homepage FAQ (`apps/web/src/ui/modules/pages/homepage/sections/Faq.tsx`) uses `multiple` inside [Tabs](/design-system/components/tabs/).
+Root props are the Base UI accordion root props (the app sets `multiple`); the homepage FAQ (`apps/web/src/ui/modules/pages/homepage/sections/Faq.tsx`) uses `multiple` inside [Tabs](/design-system/components/tabs/).
 
 ## Conventions
 
@@ -66,7 +56,7 @@ Root props are the Base UI accordion root props (e.g. `multiple`, `defaultValue`
 
 - Base UI renders each trigger as a `<button>` inside a heading (`AccordionPrimitive.Header`), with `aria-expanded` and `aria-controls` pointing at its panel, so the pattern matches the WAI-ARIA accordion.
 - Keyboard: Enter and Space toggle, Arrow Up and Arrow Down move between triggers, Home and End jump to the first and last. Closed panels are hidden from the accessibility tree.
-- The rotating + is decorative; the open state is announced through `aria-expanded`, so `chevron={false}` loses nothing for a screen reader.
+- The rotating + is decorative; the open state is announced through `aria-expanded`.
 
 ## In the app
 

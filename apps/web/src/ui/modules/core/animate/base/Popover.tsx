@@ -23,36 +23,16 @@ function PopoverTrigger(props: PopoverTriggerProps) {
 
 interface PopoverContentProps
 	extends Omit<PopoverPositionerPrimitiveProps, "className" | "style" | "children">,
-		Pick<PopoverPopupPrimitiveProps, "className" | "style" | "children" | "initialFocus" | "finalFocus"> {
-	positionerClassName?: string;
-}
-function PopoverContent({
-	className,
-	positionerClassName,
-	align = "center",
-	sideOffset = 4,
-	initialFocus,
-	finalFocus,
-	style,
-	children,
-	...props
-}: PopoverContentProps) {
+		Pick<PopoverPopupPrimitiveProps, "className" | "children"> {}
+function PopoverContent({ className, children, ...props }: PopoverContentProps) {
 	return (
 		<PopoverPortalPrimitive>
-			<PopoverPositionerPrimitive
-				align={align}
-				sideOffset={sideOffset}
-				className={cn("z-210", positionerClassName)}
-				{...props}
-			>
+			<PopoverPositionerPrimitive align="center" sideOffset={4} className="z-210" {...props}>
 				<PopoverPopupPrimitive
-					initialFocus={initialFocus}
-					finalFocus={finalFocus}
 					className={cn(
 						"bg-popover text-popover-foreground w-72 rounded-[12px] border-[3px] border-(--frame) p-4 shadow-(--shadow-brutal-md) outline-hidden origin-(--transform-origin)",
 						className,
 					)}
-					style={style}
 				>
 					{children}
 				</PopoverPopupPrimitive>

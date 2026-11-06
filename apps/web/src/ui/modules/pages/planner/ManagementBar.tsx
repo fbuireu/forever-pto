@@ -146,7 +146,7 @@ export const ManagementBar = () => {
 					open={!openMobile}
 					dismissible={false}
 				>
-					<DrawerContent overlay={false} role="region" className="h-[100dvh] max-h-none">
+					<DrawerContent role="region" className="h-[100dvh] max-h-none">
 						<DrawerTitle>{tPlanner("heading")}</DrawerTitle>
 						<div data-tutorial={TUTORIAL_ANCHOR.PLANNER_DRAWER} className="px-4 pt-2 pb-3 shrink-0">
 							{isReady ? (

@@ -6,9 +6,6 @@ vi.mock("vaul", () => ({
 	Drawer: {
 		Root: ({ children, ...props }: ComponentProps<"div">) => <div {...props}>{children}</div>,
 		Portal: ({ children }: { children: ReactNode }) => <>{children}</>,
-		Overlay: ({ className, ...props }: ComponentProps<"div">) => (
-			<div data-testid="drawer-overlay" className={className} {...props} />
-		),
 		Content: ({ children, ...props }: ComponentProps<"div">) => <div {...props}>{children}</div>,
 		Handle: (props: ComponentProps<"div">) => <div {...props} />,
 		Title: ({ children, className, ...props }: ComponentProps<"div">) => (
@@ -33,14 +30,9 @@ describe("Drawer", () => {
 });
 
 describe("DrawerContent", () => {
-	it("renders the overlay by default", () => {
-		const { getByTestId } = render(<DrawerContent />);
-		expect(getByTestId("drawer-overlay")).toBeTruthy();
-	});
-
-	it("does not render the overlay when overlay=false", () => {
-		const { container } = render(<DrawerContent overlay={false} />);
-		expect(container.querySelector('[data-testid="drawer-overlay"]')).toBeNull();
+	it("draws no overlay behind the sheet, because the planner stays usable around it", () => {
+		const { container } = render(<DrawerContent />);
+		expect(container.querySelector('[data-slot="drawer-overlay"]')).toBeNull();
 	});
 
 	it('renders with data-slot="drawer-content"', () => {

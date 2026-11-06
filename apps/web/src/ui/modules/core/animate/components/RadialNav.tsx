@@ -6,12 +6,10 @@ import { m, type Transition, type Variants } from "motion/react";
 import { type ComponentType, type CSSProperties, useCallback, useState } from "react";
 
 interface RadialNavProps {
-	size?: number;
 	items: RadialNavItem[];
-	menuButtonConfig?: MenuButtonConfig;
-	defaultActiveId?: number;
-	onActiveChange?: (id: number) => void;
-	"aria-label"?: string;
+	defaultActiveId: number;
+	onActiveChange: (id: number) => void;
+	"aria-label": string;
 }
 
 interface RadialNavIconProps {
@@ -30,17 +28,11 @@ interface RadialNavItem {
 	className?: string;
 }
 
-interface MenuButtonConfig {
-	iconSize?: number;
-	buttonSize?: number;
-	buttonPadding?: number;
-}
-
-const defaultMenuButtonConfig: Required<MenuButtonConfig> = {
-	iconSize: 20,
-	buttonSize: 40,
-	buttonPadding: 8,
-};
+const ICON_SIZE = 20;
+const BUTTON_SIZE = 40;
+const BUTTON_PADDING = 8;
+const ICON_OFFSET_BIAS = -3;
+const RING_SIZE = 180;
 
 const POINTER_BASE_DEG = 45;
 
@@ -95,27 +87,6 @@ function getPolarCoordinates({ angleDeg, r }: GetPolarCoordinatesParams): Point 
 	return { x: r * Math.cos(rad), y: r * Math.sin(rad) };
 }
 
-interface CalculateIconOffsetParams {
-	buttonSize: number;
-	iconSize: number;
-	buttonPadding: number;
-	bias?: number;
-}
-
-function calculateIconOffset({ buttonSize, iconSize, buttonPadding, bias = 0 }: CalculateIconOffsetParams): number {
-	const centerOffset = (buttonSize - iconSize) / 2;
-	return centerOffset - buttonPadding + bias;
-}
-
-interface WithDefaultsParams<T extends Record<string, unknown>> {
-	defaults: T;
-	overrides?: Partial<T>;
-}
-
-function withDefaults<T extends Record<string, unknown>>({ defaults, overrides }: WithDefaultsParams<T>): T {
-	return { ...defaults, ...overrides };
-}
-
 function normalizeDeg(a: number): number {
 	return ((a % 360) + 360) % 360;
 }
@@ -148,17 +119,12 @@ interface MenuButtonProps {
 	readonly item: RadialNavItem;
 	readonly isActive?: boolean;
 	readonly onActivate?: () => void;
-	readonly menuButtonConfig: Required<MenuButtonConfig>;
 }
 
-function MenuButton({ item, isActive, onActivate, menuButtonConfig }: MenuButtonProps) {
+function MenuButton({ item, isActive, onActivate }: MenuButtonProps) {
 	const { icon: Icon, animateOnHover, label, badgeClass } = item;
-	const { iconSize, buttonSize, buttonPadding } = menuButtonConfig;
 
-	const translateX = calculateIconOffset({
-		...menuButtonConfig,
-		bias: -3,
-	});
+	const translateX = (BUTTON_SIZE - ICON_SIZE) / 2 - BUTTON_PADDING + ICON_OFFSET_BIAS;
 
 	return (
 		<m.button
@@ -170,9 +136,9 @@ function MenuButton({ item, isActive, onActivate, menuButtonConfig }: MenuButton
 				isActive && (badgeClass ?? "bg-accent"),
 			)}
 			style={{
-				height: buttonSize,
-				minWidth: buttonSize,
-				padding: buttonPadding,
+				height: BUTTON_SIZE,
+				minWidth: BUTTON_SIZE,
+				padding: BUTTON_PADDING,
 			}}
 			onClick={onActivate}
 			type="button"
@@ -182,8 +148,8 @@ function MenuButton({ item, isActive, onActivate, menuButtonConfig }: MenuButton
 			<Icon
 				className="shrink-0"
 				style={{
-					height: iconSize,
-					width: iconSize,
+					height: ICON_SIZE,
+					width: ICON_SIZE,
 					transform: `translateX(${translateX}px)`,
 				}}
 				{...(animateOnHover !== undefined && { animateOnHover })}
@@ -199,21 +165,14 @@ function MenuButton({ item, isActive, onActivate, menuButtonConfig }: MenuButton
 	);
 }
 
-function RadialNav({
-	size = 180,
-	items,
-	menuButtonConfig,
-	defaultActiveId,
-	onActiveChange,
-	"aria-label": ariaLabel = "Radial navigation",
-}: RadialNavProps) {
-	const orbitRadius = size / 2 - 0.5;
-	const [activeId, setActiveId] = useState<number | null>(defaultActiveId ?? null);
+function RadialNav({ items, defaultActiveId, onActiveChange, "aria-label": ariaLabel }: RadialNavProps) {
+	const orbitRadius = RING_SIZE / 2 - 0.5;
+	const [activeId, setActiveId] = useState<number>(defaultActiveId);
 
 	const handleActivate = useCallback(
 		(id: number) => {
 			setActiveId(id);
-			onActiveChange?.(id);
+			onActiveChange(id);
 		},
 		[onActiveChange],
 	);
@@ -222,12 +181,10 @@ function RadialNav({
 	const baseAngle = (activeItem?.angle ?? 0) + POINTER_BASE_DEG;
 	const rotateAngle = useShortestRotation(baseAngle);
 
-	const resolvedMenuButtonConfig = withDefaults({ defaults: defaultMenuButtonConfig, overrides: menuButtonConfig });
-
 	return (
 		<fieldset
 			className="relative flex items-center justify-center rounded-full border-[3px] border-(--frame) min-w-0"
-			style={{ width: size, height: size }}
+			style={{ width: RING_SIZE, height: RING_SIZE }}
 			aria-label={ariaLabel}
 		>
 			<m.div
@@ -253,12 +210,7 @@ function RadialNav({
 							transform: "translate(-50%, -50%)",
 						}}
 					>
-						<MenuButton
-							item={item}
-							isActive={activeId === id}
-							onActivate={() => handleActivate(id)}
-							menuButtonConfig={resolvedMenuButtonConfig}
-						/>
+						<MenuButton item={item} isActive={activeId === id} onActivate={() => handleActivate(id)} />
 					</div>
 				);
 			})}
@@ -266,4 +218,4 @@ function RadialNav({
 	);
 }
 
-export { RadialNav, type RadialNavProps };
+export { RadialNav };

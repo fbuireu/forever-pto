@@ -23,22 +23,17 @@ Each icon file (e.g. `apps/web/src/ui/modules/core/animate/icons/Check.tsx`) fol
 2. An inner component draws the SVG with `m.*` elements, wiring each part to `useVariants(animations)` and the shared `controls` from `useAnimateIconContext`.
 3. The export wraps it in `IconWrapper`, which connects the icon to the nearest `AnimateIcon` context, or creates one on the fly when trigger props are passed directly to the icon.
 
-On top of the per-icon animations, `Icon.tsx` defines static animations available to every icon: `path` and `path-loop`, which redraw the strokes via `pathLength`.
-
 ## Trigger API
 
 `AnimateIcon` wraps arbitrary children (an `m.span`, or the child itself with `asChild`) and drives all descendant icons through context. The context value is memoised over the props and state it carries, so a parent re-rendering does not re-render every icon beneath it. The same props are accepted directly on any icon. From `Icon.tsx`:
 
 | Prop | What it does |
 | --- | --- |
-| `animate` | Imperative trigger: `true`/`false`, or an animation name to play immediately. |
-| `animateOnHover` | Play while the pointer is over the wrapper (mouse only); pass a name to pick the animation. |
+| `animate` | Imperative trigger: `true`/`false`, which the Combobox sets from its open state. |
+| `animateOnHover` | Play while the pointer is over the wrapper (mouse only). |
 | `animateOnTap` | Play while pressed (`pointerdown` → `pointerup`). |
-| `animateOnView` | Play when scrolled into view; tune with `animateOnViewMargin` and `animateOnViewOnce`. |
-| `animation` | Which animation the triggers play: `default`, an icon-specific key, or the static `path` / `path-loop`. |
-| `loop`, `loopDelay` | Restart the animation when it finishes, optionally waiting `loopDelay` ms between runs. |
-| `delay` | Delay (ms) before a trigger actually starts the animation. |
-| `initialOnAnimateEnd`, `persistOnAnimateEnd`, `completeOnStop` | End-state control: snap back to the initial frame after finishing, keep the final frame when the trigger ends, or let an in-flight run finish before stopping. |
+| `animateOnView` | Play when scrolled into view; `animateOnViewOnce` plays it only the first time. |
+| `loop` | Restart the animation when it finishes. |
 
 <IconTriggersDemo client:visible />
 

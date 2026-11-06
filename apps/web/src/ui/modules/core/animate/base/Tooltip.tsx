@@ -14,30 +14,14 @@ import {
 	type TooltipTriggerProps as TooltipTriggerPrimitiveProps,
 } from "../primitives/base/Tooltip";
 
-export const TOOLTIP_DELAY_MS = 200;
-
-interface TooltipProviderProps extends TooltipProviderPrimitiveProps {
-	delayDuration?: number;
-}
-function TooltipProvider({ delay = TOOLTIP_DELAY_MS, delayDuration, ...props }: TooltipProviderProps) {
-	const resolvedDelay = delayDuration ?? delay;
-	return <TooltipProviderPrimitive delay={resolvedDelay} {...props} />;
+type TooltipProviderProps = TooltipProviderPrimitiveProps;
+function TooltipProvider(props: TooltipProviderProps) {
+	return <TooltipProviderPrimitive delay={200} {...props} />;
 }
 
-interface TooltipProps extends TooltipPrimitiveProps {
-	delay?: number;
-	delayDuration?: number;
-}
-function Tooltip({ delay, delayDuration, ...props }: TooltipProps) {
-	const explicitDelay = delayDuration ?? delay;
-
-	if (explicitDelay === undefined) return <TooltipPrimitive {...props} />;
-
-	return (
-		<TooltipProvider delay={explicitDelay}>
-			<TooltipPrimitive {...props} />
-		</TooltipProvider>
-	);
+type TooltipProps = TooltipPrimitiveProps;
+function Tooltip(props: TooltipProps) {
+	return <TooltipPrimitive {...props} />;
 }
 
 type TooltipTriggerProps = TooltipTriggerPrimitiveProps;
@@ -47,17 +31,16 @@ function TooltipTrigger({ ...props }: TooltipTriggerProps) {
 
 interface TooltipContentProps
 	extends Omit<TooltipPositionerPrimitiveProps, "className" | "style" | "children">,
-		Pick<TooltipPopupPrimitiveProps, "className" | "style" | "children"> {}
-function TooltipContent({ className, sideOffset = 4, children, style, ...props }: TooltipContentProps) {
+		Pick<TooltipPopupPrimitiveProps, "className" | "children"> {}
+function TooltipContent({ className, children, ...props }: TooltipContentProps) {
 	return (
 		<TooltipPortalPrimitive>
-			<TooltipPositionerPrimitive sideOffset={sideOffset} className="z-220" {...props}>
+			<TooltipPositionerPrimitive sideOffset={4} className="z-220" {...props}>
 				<TooltipPopupPrimitive
 					className={cn(
 						"bg-primary text-primary-foreground w-fit origin-(--transform-origin) rounded-[8px] border-[3px] border-(--frame) px-3 py-2 text-xs font-bold text-balance shadow-(--shadow-brutal-3-accent)",
 						className,
 					)}
-					style={style}
 				>
 					{children}
 					<TooltipArrowPrimitive className="bg-primary fill-primary z-50 size-2.5 border-[3px] border-(--frame) data-[side='bottom']:-top-1 data-[side='right']:-left-1 data-[side='left']:-right-1 data-[side='inline-start']:-right-1 data-[side='inline-end']:-left-1 rotate-45 rounded-xs" />
@@ -67,17 +50,13 @@ function TooltipContent({ className, sideOffset = 4, children, style, ...props }
 	);
 }
 
-interface TooltipInfoTriggerProps extends Omit<TooltipTriggerProps, "children"> {
-	className?: string;
+interface TooltipInfoTriggerProps extends Omit<TooltipTriggerProps, "children" | "className"> {
 	"aria-label": string;
 }
-function TooltipInfoTrigger({ className, ...props }: TooltipInfoTriggerProps) {
+function TooltipInfoTrigger(props: TooltipInfoTriggerProps) {
 	return (
 		<TooltipTriggerPrimitive
-			className={cn(
-				"ml-auto hit-area-stable cursor-help shrink-0 size-5 grid place-items-center rounded-[5px] border-2 border-(--frame) bg-accent text-(--color-brand-ink) shadow-(--shadow-brutal-xs) hover:-translate-x-px hover:-translate-y-px hover:shadow-(--shadow-brutal-3) active:translate-x-px active:translate-y-px active:shadow-(--shadow-brutal-btn-active) transition-[transform,box-shadow] duration-75",
-				className,
-			)}
+			className="ml-auto hit-area-stable cursor-help shrink-0 size-5 grid place-items-center rounded-[5px] border-2 border-(--frame) bg-accent text-(--color-brand-ink) shadow-(--shadow-brutal-xs) hover:-translate-x-px hover:-translate-y-px hover:shadow-(--shadow-brutal-3) active:translate-x-px active:translate-y-px active:shadow-(--shadow-brutal-btn-active) transition-[transform,box-shadow] duration-75"
 			{...props}
 		>
 			<span className="text-[11px] font-black font-mono leading-none" aria-hidden="true">

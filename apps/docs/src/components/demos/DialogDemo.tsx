@@ -21,7 +21,7 @@ export const DialogDemo = () => {
 				<DialogTrigger asChild>
 					<Button>Open dialog</Button>
 				</DialogTrigger>
-				<DialogContent>
+				<DialogContent closeLabel="Close dialog">
 					<DialogHeader>
 						<DialogTitle>Reset your plan?</DialogTitle>
 						<DialogDescription>
@@ -42,41 +42,22 @@ export const DialogDemo = () => {
 	);
 };
 
-export const DialogNoCloseButtonDemo = () => (
-	<Demo>
-		<Dialog>
-			<DialogTrigger asChild>
-				<Button variant="outline">Without close button</Button>
-			</DialogTrigger>
-			<DialogContent showCloseButton={false}>
-				<DialogHeader>
-					<DialogTitle>No X in the corner</DialogTitle>
-					<DialogDescription>Dismiss with Esc or by clicking the backdrop.</DialogDescription>
-				</DialogHeader>
-			</DialogContent>
-		</Dialog>
-	</Demo>
-);
-
 export const DIALOG_PROP_ROWS = propRows({
 	open: { type: "boolean", description: "Controlled state." },
-	defaultOpen: { type: "boolean", defaultValue: "false", description: "Uncontrolled initial state." },
 	onOpenChange: {
 		type: "(open: boolean, details) => void",
 		description: "Fires on trigger, close button, Esc and backdrop click.",
 	},
-	modal: { type: "boolean", defaultValue: "true", description: "Whether the rest of the page is inert while open." },
 });
 
 export const DIALOG_CONTENT_PROP_ROWS = propRows({
-	showCloseButton: {
-		type: "boolean",
-		defaultValue: "true",
-		description: "Whether the top-right X renders. Off, Esc and the backdrop still dismiss.",
-	},
 	closeLabel: {
 		type: "string",
-		defaultValue: '"Close"',
-		description: "Screen-reader text of the X. Pass a translated string; the default is English.",
+		description: "Screen-reader text of the X. Required, and a translated string: the component cannot translate.",
+	},
+	initialFocus: {
+		type: "boolean",
+		description:
+			"Passed to the popup as Base UI's initial-focus setting; the app passes false where focus on open would scroll or pop a keyboard.",
 	},
 });

@@ -53,15 +53,6 @@ describe("SlidingNumber", () => {
 		expect(separatorOf(container)).not.toContain(",");
 	});
 
-	it("honours an explicit decimalSeparator over the locale default", () => {
-		const { container } = renderIn({
-			locale: "es",
-			children: <SlidingNumber number={2.4} decimalPlaces={1} decimalSeparator="·" />,
-		});
-		expect(separatorOf(container)).toContain("·");
-		expect(separatorOf(container)).not.toContain(",");
-	});
-
 	it("renders no separator when there are no decimals", () => {
 		const { container } = renderIn({ locale: "de", children: <SlidingNumber number={2026} /> });
 		expect(separatorOf(container)).not.toContain(",");

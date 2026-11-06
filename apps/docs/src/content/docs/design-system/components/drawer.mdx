@@ -8,7 +8,7 @@ sidebar:
     variant: success
 ---
 
-import { DRAWER_CONTENT_PROP_ROWS, DRAWER_PROP_ROWS, DrawerDemo } from '../../../../components/demos/DrawerDemo';
+import { DRAWER_PROP_ROWS, DrawerDemo } from '../../../../components/demos/DrawerDemo';
 import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/animate/base/Drawer.tsx`. A thin skin over [vaul](https://vaul.emilkowal.ski)'s drawer: vaul handles the drag-to-dismiss gesture and slide animation itself (no Motion `m.*` here, so no `LazyMotionProvider` needed, which is the exception in `animate/base/`).
@@ -19,19 +19,17 @@ Exports: `Drawer`, `DrawerContent`, `DrawerTitle`. There is intentionally no `Dr
 
 ## How it works
 
-- `Drawer` wraps `vaul`'s root with `shouldScaleBackground` defaulting to `false` (the app's brutal layout should not zoom out behind the sheet). All other vaul root props (`open`, `onOpenChange`, `dismissible`, snap points…) pass through.
-- `DrawerContent` renders the portal, an optional overlay of `--shade` at 50% (`overlay` prop, default `true`), and the sheet itself: fixed to the bottom edge, `rounded-t-[14px]`, 3px frame border on top and sides, `bg-card`, capped at `max-h-[85dvh]`. A pill-shaped vaul `Handle` is always rendered above your content for drag affordance.
+- `Drawer` wraps `vaul`'s root with `shouldScaleBackground` fixed to `false` (the app's brutal layout should not zoom out behind the sheet). Every other vaul root prop (`open`, `modal`, `dismissible`, snap points…) passes through.
+- `DrawerContent` renders the portal and the sheet itself, with no overlay, since the page behind stays usable: fixed to the bottom edge, `rounded-t-[14px]`, 3px frame border on top and sides, `bg-card`, capped at `max-h-[85dvh]`. A pill-shaped vaul `Handle` is always rendered above your content for drag affordance.
 - `DrawerTitle` is visually hidden (`sr-only`) by default, and vaul warns when a drawer has no accessible title, so always include one and override the class only if you want it visible.
 
 ## Props
 
-`Drawer` forwards vaul's root props; the ones that matter:
+`Drawer` forwards vaul's root props; the ones the app sets:
 
 <PropsTable rows={DRAWER_PROP_ROWS} />
 
-`DrawerContent` adds one on top of vaul's content:
-
-<PropsTable rows={DRAWER_CONTENT_PROP_ROWS} />
+`DrawerContent` takes vaul's content props and adds none.
 
 ## Usage
 
@@ -41,25 +39,25 @@ import { Drawer, DrawerContent, DrawerTitle } from '@ui/modules/core/animate/bas
 const [open, setOpen] = useState(false);
 
 <Button onClick={() => setOpen(true)}>Preferences</Button>
-<Drawer open={open} onOpenChange={setOpen}>
-  <DrawerContent>
+<Drawer open={open} modal={false} dismissible={false}>
+  <DrawerContent role='region'>
     <DrawerTitle>Cookie preferences</DrawerTitle>
     <div className='p-6'>…</div>
   </DrawerContent>
 </Drawer>
 ```
 
-For desktop-centric confirmations prefer [Dialog](/design-system/components/dialog/). The planner's management bar (`apps/web/src/ui/modules/pages/planner/ManagementBar.tsx`) is the reference consumer: it renders inline on desktop and switches to a full-height Drawer (`overlay={false}`, `max-h-none`) on mobile via the `useIsMobile` hook.
+For desktop-centric confirmations prefer [Dialog](/design-system/components/dialog/). The planner's management bar (`apps/web/src/ui/modules/pages/planner/ManagementBar.tsx`) is the reference consumer: it renders inline on desktop and switches to a full-height Drawer (`max-h-none`) on mobile via the `useIsMobile` hook.
 
 ## Conventions
 
-- `data-slot` hooks: `drawer`, `drawer-portal`, `drawer-overlay`, `drawer-content`, `drawer-title`.
-- Content sits at `z-51` above a `z-50` overlay, below dialogs (`z-200`) by design, and below every transient overlay (popover and menu at `z-210`, tooltip at `z-220`), so a field inside it can still open one.
+- `data-slot` hooks: `drawer`, `drawer-portal`, `drawer-content`, `drawer-title`.
+- Content sits at `z-51`, below dialogs (`z-200`) by design, and below every transient overlay (popover and menu at `z-210`, tooltip at `z-220`), so a field inside it can still open one.
 
 ## Accessibility
 
-- vaul renders the sheet as `role='dialog'` with focus management and Escape to close, like Dialog. `DrawerTitle` is rendered `sr-only` by default and is what names the sheet, so always include one.
-- The drag handle is decorative; the gesture has a keyboard equivalent in Escape, and the overlay click closes it for pointer users who cannot drag.
+- vaul renders the sheet as `role='dialog'` with focus management, like Dialog, though the app's sheet is not modal and not dismissible. `DrawerTitle` is rendered `sr-only` by default and is what names the sheet, so always include one.
+- The drag handle is decorative: the sheet moves between its snap points and never closes by dragging.
 - The sheet is capped at `85dvh`, so the page behind stays reachable and the sheet scrolls inside itself when its content is taller.
 
 ## In the app

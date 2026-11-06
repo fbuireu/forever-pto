@@ -51,9 +51,7 @@ vi.mock("@ui/modules/core/animate/base/Drawer", () => ({
 			{children}
 		</div>
 	),
-	DrawerContent: ({ children, overlay: _overlay, ...rest }: { children: ReactNode; overlay?: boolean }) => (
-		<div {...rest}>{children}</div>
-	),
+	DrawerContent: ({ children, ...rest }: { children: ReactNode }) => <div {...rest}>{children}</div>,
 	DrawerTitle: ({ children }: { children: ReactNode }) => <h2 data-testid="drawer-title">{children}</h2>,
 }));
 vi.mock("boneyard-js/react", () => ({ Skeleton: ({ children }: { children: ReactNode }) => <div>{children}</div> }));

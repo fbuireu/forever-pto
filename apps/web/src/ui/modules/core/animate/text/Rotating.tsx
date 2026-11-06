@@ -1,51 +1,24 @@
 "use client";
 
-import { cn } from "@ui/utils/cn";
-import { AnimatePresence, type HTMLMotionProps, m, type Transition } from "motion/react";
-import { useEffect, useState } from "react";
+import { AnimatePresence, m, type Transition } from "motion/react";
 
-interface RotatingTextProps extends HTMLMotionProps<"div"> {
-	text: string | string[];
-	duration?: number;
+interface RotatingTextProps {
+	text: string;
 	transition?: Transition;
-	y?: number;
-	containerClassName?: string;
 }
 
-function RotatingText({
-	text,
-	y = -50,
-	duration = 2000,
-	transition = { duration: 0.3, ease: "easeOut" },
-	containerClassName,
-	...props
-}: RotatingTextProps) {
-	const [index, setIndex] = useState(0);
-
-	useEffect(() => {
-		if (!Array.isArray(text)) return;
-
-		const interval = setInterval(() => {
-			setIndex((prevIndex) => (prevIndex + 1) % text.length);
-		}, duration);
-
-		return () => clearInterval(interval);
-	}, [text, duration]);
-
-	const currentText = Array.isArray(text) ? text[index] : text;
-
+function RotatingText({ text, transition = { duration: 0.3, ease: "easeOut" } }: RotatingTextProps) {
 	return (
-		<div className={cn("overflow-hidden py-1", containerClassName)}>
+		<div className="overflow-hidden py-1">
 			<AnimatePresence mode="wait">
 				<m.div
-					key={currentText}
+					key={text}
 					transition={transition}
-					initial={{ opacity: 0, y: -y }}
+					initial={{ opacity: 0, y: 50 }}
 					animate={{ opacity: 1, y: 0 }}
-					exit={{ opacity: 0, y }}
-					{...props}
+					exit={{ opacity: 0, y: -50 }}
 				>
-					{currentText}
+					{text}
 				</m.div>
 			</AnimatePresence>
 		</div>

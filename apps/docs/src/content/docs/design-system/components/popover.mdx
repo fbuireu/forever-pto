@@ -20,17 +20,16 @@ Exports: `Popover`, `PopoverTrigger`, `PopoverContent`.
 ## How it works
 
 - The popup enters with `opacity 0 → 1` and `scale 0.5 → 1` on a spring (`stiffness: 300, damping: 25` in the motion primitive), growing out of the trigger thanks to `origin-(--transform-origin)`; Base UI computes the transform origin from the anchor side.
-- `PopoverContent` bundles portal + positioner + popup: a `w-72`, `rounded-[12px]`, 3px-frame-border panel with `shadow-brutal-md`. Positioning props go on it directly, namely `align` (default `'center'`) and `sideOffset` (default 4), and `positionerClassName` styles the positioner (default `z-210`, above a dialog's `z-200`, so a Combobox opened inside a modal floats over it) separately from the panel.
-- Focus management passes through: `initialFocus` / `finalFocus` forward to the Base UI popup.
+- `PopoverContent` bundles portal + positioner + popup: a `w-72`, `rounded-[12px]`, 3px-frame-border panel with `shadow-brutal-md`. The panel is centred on the trigger, 4px away from it, and the positioner sits at `z-210`, above a dialog's `z-200`, so a Combobox opened inside a modal floats over it.
 - `PopoverTrigger asChild` renders your element as the trigger via Base UI's `render`.
 
 ## Props
 
-`Popover` forwards Base UI's root props; the ones that matter:
+`Popover` forwards Base UI's root props; the ones the app sets:
 
 <PropsTable rows={POPOVER_PROP_ROWS} />
 
-`PopoverContent` passes Base UI's positioner props to the positioner and `className`, `style`, `initialFocus` and `finalFocus` to the popup, and adds one:
+`PopoverContent` passes Base UI's positioner props to the positioner and `className` to the popup; the one the app sets:
 
 <PropsTable rows={POPOVER_CONTENT_PROP_ROWS} />
 
@@ -43,7 +42,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@ui/modules/core/animat
   <PopoverTrigger asChild>
     <Button variant='outline'>Filters</Button>
   </PopoverTrigger>
-  <PopoverContent align='start' className='w-80'>
+  <PopoverContent className='w-80'>
     …
   </PopoverContent>
 </Popover>
@@ -58,7 +57,7 @@ Related surfaces: [DropdownMenu](/design-system/components/dropdown-menu/) for a
 
 ## Accessibility
 
-- Base UI renders the popup with `role='dialog'` (non-modal), moves focus into it on open, closes on Escape and outside click, and returns focus to the trigger; `initialFocus` and `finalFocus` override both ends.
+- Base UI renders the popup with `role='dialog'` (non-modal), moves focus into it on open, closes on Escape and outside click, and returns focus to the trigger.
 - Give the panel a name: an `aria-label` on `PopoverContent`, or a heading inside referenced by `aria-labelledby`.
 - The panel is not modal, so the page behind stays interactive; use [Dialog](/design-system/components/dialog/) when the user must answer before continuing.
 

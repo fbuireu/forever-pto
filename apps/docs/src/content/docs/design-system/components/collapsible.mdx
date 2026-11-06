@@ -8,7 +8,7 @@ sidebar:
     variant: success
 ---
 
-import { COLLAPSIBLE_CONTENT_PROP_ROWS, COLLAPSIBLE_PROP_ROWS, COLLAPSIBLE_TRIGGER_PROP_ROWS, CollapsibleAsChildDemo, CollapsibleDemo } from '../../../../components/demos/CollapsibleDemo';
+import { COLLAPSIBLE_PROP_ROWS, COLLAPSIBLE_TRIGGER_PROP_ROWS, CollapsibleDemo } from '../../../../components/demos/CollapsibleDemo';
 import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/animate/base/Collapsible.tsx`. Base UI collapsible with a Motion-animated panel; requires a `LazyMotionProvider` ancestor. Where [Accordion](/design-system/components/accordion/) manages a list of exclusive folds, Collapsible is a single independent one.
@@ -19,15 +19,13 @@ Exports: `Collapsible`, `CollapsibleTrigger`, `CollapsibleContent`.
 
 ## How it works
 
-- `CollapsibleContent` animates `height: 0 ↔ 'auto'` plus opacity with a spring (default `stiffness: 150, damping: 22`, `transition` prop to override). The panel is `keepMounted` and rendered through Base UI's `render` callback, which the component uses to strip DOM drag handlers that would collide with Motion's gesture props.
+- `CollapsibleContent` animates `height: 0 ↔ 'auto'` plus opacity with a spring (`stiffness: 150, damping: 22`). The panel is `keepMounted` and rendered through Base UI's `render` callback, which the component uses to strip DOM drag handlers that would collide with Motion's gesture props.
 - The default `CollapsibleTrigger` is a full-width brutal button: 3px frame border, `shadow-brutal-btn`, hover lift, and, the distinctive bit, `aria-expanded` keeps the trigger in the lifted "pressed" style while the panel is open, so open state reads at a glance.
 - `CollapsibleTrigger asChild` swaps in your own element via Base UI's `render`, skipping the default styling entirely. It takes the element only when `isValidElement` holds: a node a server component built and handed down as a prop can arrive as a lazy reference, which is not one, and the default trigger then draws its own `<button>` around it. Build the trigger in the client module that renders the `Collapsible`, as the sidebar group does.
 
-<CollapsibleAsChildDemo client:visible />
-
 ## Props
 
-`Collapsible` forwards Base UI's root props; the ones that matter:
+`Collapsible` forwards Base UI's root props; the ones the app sets:
 
 <PropsTable rows={COLLAPSIBLE_PROP_ROWS} />
 
@@ -35,22 +33,20 @@ Exports: `Collapsible`, `CollapsibleTrigger`, `CollapsibleContent`.
 
 <PropsTable rows={COLLAPSIBLE_TRIGGER_PROP_ROWS} />
 
-`CollapsibleContent` adds one on top of Base UI's panel:
-
-<PropsTable rows={COLLAPSIBLE_CONTENT_PROP_ROWS} />
+`CollapsibleContent` takes Base UI's panel props and adds none.
 
 ## Usage
 
 ```tsx
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/modules/core/animate/base/Collapsible';
 
-<Collapsible defaultOpen>
+<Collapsible open={open} onOpenChange={setOpen}>
   <CollapsibleTrigger>Advanced options</CollapsibleTrigger>
   <CollapsibleContent>…</CollapsibleContent>
 </Collapsible>
 ```
 
-Controlled mode works through the Base UI root props (`open`, `onOpenChange`); the root mirrors them into context for the animation.
+The state is always controlled, through the Base UI root props `open` and `onOpenChange`; every caller in the app owns it.
 
 ## Conventions
 

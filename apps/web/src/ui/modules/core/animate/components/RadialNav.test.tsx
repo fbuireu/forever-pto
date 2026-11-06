@@ -57,9 +57,11 @@ const ITEMS = [
 	{ id: 3, icon: MockIcon, label: "Item 3", angle: 240 },
 ];
 
+const NAV = { "aria-label": "Radial navigation", defaultActiveId: 1, onActiveChange: () => {} };
+
 describe("RadialNav", () => {
 	it("is a named group, not a menu it never implemented", () => {
-		const { getByRole, queryByRole } = render(<RadialNav items={ITEMS} aria-label="Feature navigation" />);
+		const { getByRole, queryByRole } = render(<RadialNav {...NAV} items={ITEMS} aria-label="Feature navigation" />);
 		expect(getByRole("group", { name: "Feature navigation" })).toBeTruthy();
 		expect(queryByRole("menu")).toBeNull();
 		expect(queryByRole("menuitem")).toBeNull();
@@ -75,6 +77,7 @@ describe("RadialNav", () => {
 		);
 		const { getAllByTestId } = render(
 			<RadialNav
+				{...NAV}
 				items={[
 					{ id: 1, icon: HoverProbe, animateOnHover: true, label: "Animated", angle: 0 },
 					{ id: 2, icon: HoverProbe, label: "Still", angle: 180 },
@@ -92,7 +95,7 @@ describe("RadialNav", () => {
 		const StaticIcon = (props: { className?: string }) => <svg data-testid="static" {...props} />;
 
 		try {
-			render(<RadialNav items={[{ id: 1, icon: StaticIcon, label: "Still", angle: 0 }]} />);
+			render(<RadialNav {...NAV} items={[{ id: 1, icon: StaticIcon, label: "Still", angle: 0 }]} />);
 
 			expect(errors.mock.calls.flat().join(" ")).not.toContain("animateOnHover");
 		} finally {
@@ -101,12 +104,12 @@ describe("RadialNav", () => {
 	});
 
 	it("renders a button for each item", () => {
-		const { getAllByRole } = render(<RadialNav items={ITEMS} />);
+		const { getAllByRole } = render(<RadialNav {...NAV} items={ITEMS} />);
 		expect(getAllByRole("button")).toHaveLength(3);
 	});
 
 	it("renders each item with its aria-label", () => {
-		const { getByRole } = render(<RadialNav items={ITEMS} />);
+		const { getByRole } = render(<RadialNav {...NAV} items={ITEMS} />);
 		expect(getByRole("button", { name: "Item 1" })).toBeTruthy();
 		expect(getByRole("button", { name: "Item 2" })).toBeTruthy();
 		expect(getByRole("button", { name: "Item 3" })).toBeTruthy();
@@ -114,38 +117,31 @@ describe("RadialNav", () => {
 
 	it("calls onActiveChange with the item id when clicked", () => {
 		const onActiveChange = vi.fn();
-		const { getByRole } = render(<RadialNav items={ITEMS} onActiveChange={onActiveChange} />);
+		const { getByRole } = render(<RadialNav {...NAV} items={ITEMS} onActiveChange={onActiveChange} />);
 		fireEvent.click(getByRole("button", { name: "Item 2" }));
 		expect(onActiveChange).toHaveBeenCalledWith(2);
 	});
 
 	it("marks the defaultActiveId item as active", () => {
-		const { getByRole } = render(<RadialNav items={ITEMS} defaultActiveId={1} />);
+		const { getByRole } = render(<RadialNav {...NAV} items={ITEMS} defaultActiveId={1} />);
 		expect(getByRole("button", { name: "Item 1" }).className).toContain("bg-accent");
 	});
 
-	it("does not mark any item as active when defaultActiveId is not set", () => {
-		const { getAllByRole } = render(<RadialNav items={ITEMS} />);
-		for (const btn of getAllByRole("button")) {
-			expect(btn.className).not.toContain("bg-accent");
-		}
-	});
-
 	it("activates the clicked item", () => {
-		const { getByRole } = render(<RadialNav items={ITEMS} />);
+		const { getByRole } = render(<RadialNav {...NAV} items={ITEMS} />);
 		fireEvent.click(getByRole("button", { name: "Item 3" }));
 		expect(getByRole("button", { name: "Item 3" }).className).toContain("bg-accent");
 	});
 
 	it("deactivates the previous item after clicking another", () => {
-		const { getByRole } = render(<RadialNav items={ITEMS} defaultActiveId={1} />);
+		const { getByRole } = render(<RadialNav {...NAV} items={ITEMS} defaultActiveId={1} />);
 		fireEvent.click(getByRole("button", { name: "Item 2" }));
 		expect(getByRole("button", { name: "Item 1" }).className).not.toContain("bg-accent");
 		expect(getByRole("button", { name: "Item 2" }).className).toContain("bg-accent");
 	});
 
 	it("says which item is selected, rather than only colouring it", () => {
-		const { getByRole } = render(<RadialNav items={ITEMS} defaultActiveId={1} />);
+		const { getByRole } = render(<RadialNav {...NAV} items={ITEMS} defaultActiveId={1} />);
 
 		expect(getByRole("button", { name: "Item 1" }).getAttribute("aria-pressed")).toBe("true");
 		expect(getByRole("button", { name: "Item 2" }).getAttribute("aria-pressed")).toBe("false");
@@ -156,13 +152,13 @@ describe("RadialNav", () => {
 			{ id: 10, icon: MockIcon, label: "Done", angle: 0, className: "text-teal-500" },
 			{ id: 20, icon: MockIcon, label: "Next", angle: 180, className: "text-sky-500" },
 		];
-		const { container } = render(<RadialNav items={items} defaultActiveId={20} />);
+		const { container } = render(<RadialNav {...NAV} items={items} defaultActiveId={20} />);
 
 		expect(container.querySelector('[aria-hidden="true"]')?.className).toContain("text-sky-500");
 	});
 
 	it("moves the selected state with the click", () => {
-		const { getByRole } = render(<RadialNav items={ITEMS} defaultActiveId={1} />);
+		const { getByRole } = render(<RadialNav {...NAV} items={ITEMS} defaultActiveId={1} />);
 
 		fireEvent.click(getByRole("button", { name: "Item 3" }));
 
@@ -196,7 +192,7 @@ describe("RadialNav pointer", () => {
 		const { container, getByRole } = render(
 			<StrictMode>
 				<Suspense fallback={null}>
-					<RadialNav items={AROUND} defaultActiveId={1} />
+					<RadialNav {...NAV} items={AROUND} defaultActiveId={1} />
 				</Suspense>
 			</StrictMode>,
 		);

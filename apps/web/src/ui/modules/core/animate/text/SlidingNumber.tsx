@@ -1,29 +1,12 @@
 "use client";
 
 import { cn } from "@ui/utils/cn";
-import {
-	type MotionValue,
-	m,
-	type SpringOptions,
-	type UseInViewOptions,
-	useInView,
-	useSpring,
-	useTransform,
-} from "motion/react";
+import { type MotionValue, m, type SpringOptions, useSpring, useTransform } from "motion/react";
 import { useLocale } from "next-intl";
-import {
-	type ComponentProps,
-	type RefObject,
-	useCallback,
-	useEffect,
-	useImperativeHandle,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import useMeasure from "react-use-measure";
 
-const NO_TARGET: RefObject<HTMLSpanElement | null> = { current: null };
+const TRANSITION: SpringOptions = { stiffness: 200, damping: 20, mass: 0.4 };
 
 const decimalSeparatorCache = new Map<string, string>();
 
@@ -98,60 +81,34 @@ function SlidingNumberRoller({ prevValue, value, place, transition }: Readonly<S
 					motionValue={animatedValue}
 					number={digit}
 					height={height}
-					transition={transition}
+					transition={TRANSITION}
 				/>
 			))}
 		</span>
 	);
 }
 
-interface SlidingNumberProps extends ComponentProps<"span"> {
+interface SlidingNumberProps {
 	number: number | string;
-	inView?: boolean;
-	inViewMargin?: UseInViewOptions["margin"];
-	inViewOnce?: boolean;
+	className?: string;
 	padStart?: boolean;
-	decimalSeparator?: string;
 	decimalPlaces?: number;
-	transition?: SpringOptions;
+	"aria-hidden"?: "true";
 }
 
 function SlidingNumber({
-	ref,
 	number,
 	className,
-	inView = false,
-	inViewMargin = "0px",
-	inViewOnce = true,
 	padStart = false,
-	decimalSeparator,
 	decimalPlaces = 0,
-	transition = {
-		stiffness: 200,
-		damping: 20,
-		mass: 0.4,
-	},
-	...props
+	"aria-hidden": ariaHidden,
 }: SlidingNumberProps) {
-	const locale = useLocale();
-	const separator = decimalSeparator ?? getDecimalSeparator(locale);
+	const separator = getDecimalSeparator(useLocale());
 
-	const localRef = useRef<HTMLSpanElement>(null);
-	useImperativeHandle(ref, () => {
-		if (!localRef.current) throw new Error("SlidingNumber ref not mounted");
-		return localRef.current;
-	});
-
-	const inViewResult = useInView(inView ? localRef : NO_TARGET, {
-		once: inViewOnce,
-		margin: inViewMargin,
-	});
-	const isInView = !inView || inViewResult;
-
-	const effectiveNumber = useMemo(() => (!isInView ? 0 : Math.abs(Number(number))), [number, isInView]);
+	const effectiveNumber = Math.abs(Number(number));
 	const [shown, setShown] = useState({ number: effectiveNumber, previous: 0 });
 
-	if (isInView && shown.number !== effectiveNumber) {
+	if (shown.number !== effectiveNumber) {
 		setShown({ number: effectiveNumber, previous: shown.number });
 	}
 
@@ -196,8 +153,8 @@ function SlidingNumber({
 	const prevDecValue = adjustedPrevDec ? Number.parseInt(adjustedPrevDec, 10) : 0;
 
 	return (
-		<span ref={localRef} data-slot="sliding-number" className={cn("flex items-center", className)} {...props}>
-			{isInView && Number(number) < 0 && <span className="mr-1">-</span>}
+		<span data-slot="sliding-number" className={cn("flex items-center", className)} aria-hidden={ariaHidden}>
+			{Number(number) < 0 && <span className="mr-1">-</span>}
 
 			{intPlaces.map((place) => (
 				<SlidingNumberRoller
@@ -205,7 +162,7 @@ function SlidingNumber({
 					prevValue={Number.parseInt(adjustedPrevInt, 10)}
 					value={Number.parseInt(newIntStr ?? "0", 10)}
 					place={place}
-					transition={transition}
+					transition={TRANSITION}
 				/>
 			))}
 
@@ -218,7 +175,7 @@ function SlidingNumber({
 							prevValue={prevDecValue}
 							value={newDecValue}
 							place={place}
-							transition={transition}
+							transition={TRANSITION}
 						/>
 					))}
 				</>
@@ -227,4 +184,4 @@ function SlidingNumber({
 	);
 }
 
-export { SlidingNumber, type SlidingNumberProps };
+export { SlidingNumber };

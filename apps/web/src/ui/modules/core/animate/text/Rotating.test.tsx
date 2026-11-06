@@ -1,6 +1,6 @@
-import { act, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import type { ComponentProps, ReactNode } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 interface MotionDivProps extends ComponentProps<"div"> {
 	initial?: { y?: number };
@@ -26,87 +26,45 @@ vi.mock("motion/react", async () => {
 
 import { RotatingText } from "./Rotating";
 
-const WORDS = ["plan", "bridge", "rest"];
-
-const word = (): HTMLElement => screen.getByTestId("rotating");
-
-const advance = (ms: number): void => {
-	act(() => {
-		vi.advanceTimersByTime(ms);
-	});
-};
-
-beforeEach(() => {
-	vi.useFakeTimers();
-});
-
-afterEach(() => {
-	vi.useRealTimers();
-});
+const word = (): HTMLElement => screen.getByText("plan");
 
 describe("RotatingText", () => {
-	it("shows a single string as it is and starts no clock for it", () => {
-		render(<RotatingText text="plan" data-testid="rotating" />);
+	it("shows the text it is given", () => {
+		render(<RotatingText text="plan" />);
 
-		expect(word().textContent).toBe("plan");
-		expect(vi.getTimerCount()).toBe(0);
-	});
-
-	it("steps through the list every two seconds by default and wraps round", () => {
-		render(<RotatingText text={WORDS} data-testid="rotating" />);
-		expect(word().textContent).toBe("plan");
-
-		advance(2000);
-		expect(word().textContent).toBe("bridge");
-
-		advance(2000);
-		expect(word().textContent).toBe("rest");
-
-		advance(2000);
 		expect(word().textContent).toBe("plan");
 	});
 
-	it("takes its pace from duration", () => {
-		render(<RotatingText text={WORDS} duration={500} data-testid="rotating" />);
+	it("starts no clock of its own, since the caller changes the text", () => {
+		vi.useFakeTimers();
+		try {
+			render(<RotatingText text="plan" />);
 
-		advance(499);
-		expect(word().textContent).toBe("plan");
-
-		advance(1);
-		expect(word().textContent).toBe("bridge");
+			expect(vi.getTimerCount()).toBe(0);
+		} finally {
+			vi.useRealTimers();
+		}
 	});
 
-	it("stops the clock when it leaves the tree", () => {
-		const { unmount } = render(<RotatingText text={WORDS} data-testid="rotating" />);
-		expect(vi.getTimerCount()).toBe(1);
+	it("swaps to the next text when the caller changes it", () => {
+		const { rerender } = render(<RotatingText text="plan" />);
 
-		unmount();
+		rerender(<RotatingText text="bridge" />);
 
-		expect(vi.getTimerCount()).toBe(0);
+		expect(screen.getByText("bridge")).toBeTruthy();
+		expect(screen.queryByText("plan")).toBeNull();
 	});
 
 	it("enters from the side opposite the one it leaves to, so the words scroll one way", () => {
-		render(<RotatingText text="plan" data-testid="rotating" />);
+		render(<RotatingText text="plan" />);
 
 		expect(word().dataset.enterY).toBe("50");
 		expect(word().dataset.exitY).toBe("-50");
 	});
 
-	it("lets y flip the direction", () => {
-		render(<RotatingText text="plan" y={30} data-testid="rotating" />);
+	it("clips its words to its own frame", () => {
+		const { container } = render(<RotatingText text="plan" />);
 
-		expect(word().dataset.enterY).toBe("-30");
-		expect(word().dataset.exitY).toBe("30");
-	});
-
-	it("keeps the clipping frame's class apart from the text's", () => {
-		const { container } = render(
-			<RotatingText text="plan" containerClassName="h-8" className="font-bold" data-testid="rotating" />,
-		);
-
-		const frame = container.firstElementChild as HTMLElement;
-		expect(frame.className).toContain("overflow-hidden");
-		expect(frame.className).toContain("h-8");
-		expect(word().className).toBe("font-bold");
+		expect((container.firstElementChild as HTMLElement).className).toContain("overflow-hidden");
 	});
 });

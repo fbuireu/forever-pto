@@ -73,19 +73,14 @@ describe("PopoverContent", () => {
 		expect(container.querySelector('[data-primitive="popover-popup"]')?.className).toContain("custom-class");
 	});
 
-	it("passes align to the positioner (default center)", () => {
+	it("centres the panel on its trigger", () => {
 		const { container } = render(<PopoverContent>content</PopoverContent>);
 		expect(container.querySelector<HTMLElement>('[data-primitive="popover-positioner"]')?.dataset.align).toBe("center");
 	});
 
-	it("passes sideOffset to the positioner (default 4)", () => {
+	it("keeps the panel four pixels from its trigger", () => {
 		const { container } = render(<PopoverContent>content</PopoverContent>);
 		expect(container.querySelector<HTMLElement>('[data-primitive="popover-positioner"]')?.dataset.sideOffset).toBe("4");
-	});
-
-	it("respects a custom align", () => {
-		const { container } = render(<PopoverContent align="start">content</PopoverContent>);
-		expect(container.querySelector<HTMLElement>('[data-primitive="popover-positioner"]')?.dataset.align).toBe("start");
 	});
 
 	it("floats the positioner above a dialog, so a Combobox opened inside a modal is not hidden behind it", () => {
@@ -93,10 +88,5 @@ describe("PopoverContent", () => {
 		const layer = container.querySelector('[data-primitive="popover-positioner"]')?.className.match(/\bz-(\d+)\b/);
 
 		expect(Number(layer?.[1])).toBeGreaterThan(DIALOG_LAYER);
-	});
-
-	it("applies positionerClassName to the positioner", () => {
-		const { container } = render(<PopoverContent positionerClassName="positioner-class">content</PopoverContent>);
-		expect(container.querySelector('[data-primitive="popover-positioner"]')?.className).toContain("positioner-class");
 	});
 });

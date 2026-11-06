@@ -4,33 +4,17 @@ import { cn } from "@ui/utils/cn";
 import type { ComponentProps } from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
 
-function Drawer({ shouldScaleBackground = false, ...props }: ComponentProps<typeof DrawerPrimitive.Root>) {
-	return <DrawerPrimitive.Root shouldScaleBackground={shouldScaleBackground} data-slot="drawer" {...props} />;
+function Drawer(props: ComponentProps<typeof DrawerPrimitive.Root>) {
+	return <DrawerPrimitive.Root shouldScaleBackground={false} data-slot="drawer" {...props} />;
 }
 
 function DrawerPortal(props: ComponentProps<typeof DrawerPrimitive.Portal>) {
 	return <DrawerPrimitive.Portal data-slot="drawer-portal" {...props} />;
 }
 
-function DrawerOverlay({ className, ...props }: ComponentProps<typeof DrawerPrimitive.Overlay>) {
-	return (
-		<DrawerPrimitive.Overlay
-			data-slot="drawer-overlay"
-			className={cn("fixed inset-0 z-50 bg-shade/50", className)}
-			{...props}
-		/>
-	);
-}
-
-function DrawerContent({
-	className,
-	children,
-	overlay = true,
-	...props
-}: ComponentProps<typeof DrawerPrimitive.Content> & { overlay?: boolean }) {
+function DrawerContent({ className, children, ...props }: ComponentProps<typeof DrawerPrimitive.Content>) {
 	return (
 		<DrawerPortal>
-			{overlay && <DrawerOverlay />}
 			<DrawerPrimitive.Content
 				data-slot="drawer-content"
 				className={cn(

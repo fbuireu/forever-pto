@@ -2,7 +2,7 @@
 
 import { Collapsible as CollapsiblePrimitive } from "@base-ui/react/collapsible";
 import { cn } from "@ui/utils/cn";
-import { type HTMLMotionProps, m, type Transition } from "motion/react";
+import { m } from "motion/react";
 import {
 	type ComponentProps,
 	type ComponentPropsWithoutRef,
@@ -54,19 +54,11 @@ function CollapsibleTrigger({ asChild, children, className, ...props }: Collapsi
 	);
 }
 
-interface CollapsibleContentProps
-	extends Omit<ComponentProps<typeof CollapsiblePrimitive.Panel>, "render" | keyof HTMLMotionProps<"div">>,
-		HTMLMotionProps<"div"> {
+interface CollapsibleContentProps extends Omit<ComponentProps<typeof CollapsiblePrimitive.Panel>, "render"> {
 	children?: ReactNode;
-	transition?: Transition;
 }
 
-function CollapsibleContent({
-	className,
-	children,
-	transition = { type: "spring", stiffness: 150, damping: 22 },
-	...props
-}: CollapsibleContentProps) {
+function CollapsibleContent({ className, children, ...props }: CollapsibleContentProps) {
 	return (
 		<CollapsiblePrimitive.Panel
 			keepMounted
@@ -92,7 +84,7 @@ function CollapsibleContent({
 						layout
 						animate={state.open ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
 						initial={false}
-						transition={transition}
+						transition={{ type: "spring", stiffness: 150, damping: 22 }}
 						aria-hidden={!state.open || undefined}
 						className={cn("overflow-hidden", panelClassName, className)}
 						style={{ display: "block", ...style }}
@@ -101,7 +93,7 @@ function CollapsibleContent({
 					</m.div>
 				);
 			}}
-			{...(props as ComponentProps<typeof CollapsiblePrimitive.Panel>)}
+			{...props}
 		/>
 	);
 }

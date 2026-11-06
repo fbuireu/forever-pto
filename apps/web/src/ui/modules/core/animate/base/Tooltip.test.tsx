@@ -39,45 +39,17 @@ vi.mock("../primitives/base/Tooltip", () => ({
 	TooltipArrow: (props: ComponentProps<"div">) => <div data-primitive="tooltip-arrow" {...props} />,
 }));
 
-import {
-	TOOLTIP_DELAY_MS,
-	Tooltip,
-	TooltipContent,
-	TooltipInfoTrigger,
-	TooltipProvider,
-	TooltipTrigger,
-} from "./Tooltip";
+import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipProvider, TooltipTrigger } from "./Tooltip";
 
 describe("TooltipProvider", () => {
-	it("defaults delay to the shared tooltip delay, so no call site repeats it", () => {
+	it("opens a tooltip after the shared delay, so no call site repeats it", () => {
 		const { container } = render(<TooltipProvider />);
-		expect(container.querySelector<HTMLElement>('[data-primitive="tooltip-provider"]')?.dataset.delay).toBe(
-			String(TOOLTIP_DELAY_MS),
-		);
-	});
-
-	it("passes delayDuration as delay to the primitive", () => {
-		const { container } = render(<TooltipProvider delayDuration={500} />);
-		expect(container.querySelector<HTMLElement>('[data-primitive="tooltip-provider"]')?.dataset.delay).toBe("500");
-	});
-
-	it("delayDuration takes precedence over delay", () => {
-		const { container } = render(<TooltipProvider delay={100} delayDuration={300} />);
-		expect(container.querySelector<HTMLElement>('[data-primitive="tooltip-provider"]')?.dataset.delay).toBe("300");
+		expect(container.querySelector<HTMLElement>('[data-primitive="tooltip-provider"]')?.dataset.delay).toBe("200");
 	});
 });
 
 describe("Tooltip", () => {
-	it("wraps content in a TooltipProvider with the resolved delay", () => {
-		const { container } = render(
-			<Tooltip delayDuration={200}>
-				<span />
-			</Tooltip>,
-		);
-		expect(container.querySelector<HTMLElement>('[data-primitive="tooltip-provider"]')?.dataset.delay).toBe("200");
-	});
-
-	it("mints no provider of its own when given no delay, so the ambient one survives", () => {
+	it("mints no provider of its own, so the ambient one survives", () => {
 		const { container } = render(
 			<Tooltip>
 				<span />
@@ -88,7 +60,7 @@ describe("Tooltip", () => {
 
 	it("leaves an enclosing provider as the nearest one", () => {
 		const { container } = render(
-			<TooltipProvider delayDuration={200}>
+			<TooltipProvider>
 				<Tooltip>
 					<span />
 				</Tooltip>
@@ -120,7 +92,7 @@ describe("TooltipContent", () => {
 		expect(Number(layer?.[1])).toBeGreaterThan(DIALOG_LAYER);
 	});
 
-	it("passes sideOffset to the positioner (default 4)", () => {
+	it("keeps the bubble four pixels from its trigger", () => {
 		const { container } = render(<TooltipContent>tip</TooltipContent>);
 		expect(container.querySelector<HTMLElement>('[data-primitive="tooltip-positioner"]')?.dataset.sideOffset).toBe("4");
 	});
@@ -137,18 +109,15 @@ describe("TooltipInfoTrigger", () => {
 		expect(getByText("i")).toBeTruthy();
 	});
 
-	it("applies additional className", () => {
-		const { container } = render(<TooltipInfoTrigger className="extra" aria-label="About Efficiency" />);
-		expect(container.querySelector('[data-primitive="tooltip-trigger"]')?.className).toContain("extra");
+	it("sits at the end of its row", () => {
+		const { container } = render(<TooltipInfoTrigger aria-label="About Efficiency" />);
+		expect(container.querySelector('[data-primitive="tooltip-trigger"]')?.className).toContain("ml-auto");
 	});
 });
 
 type Assignable<TCandidate, TTarget> = TCandidate extends TTarget ? true : false;
 
-const NAMELESS_INFO_TRIGGER_IS_REJECTED: Assignable<
-	{ className: string },
-	ComponentProps<typeof TooltipInfoTrigger>
-> = false;
+const NAMELESS_INFO_TRIGGER_IS_REJECTED: Assignable<{ id: string }, ComponentProps<typeof TooltipInfoTrigger>> = false;
 
 describe("TooltipInfoTrigger's name", () => {
 	it("requires one, since the i it draws is hidden from assistive tech", () => {

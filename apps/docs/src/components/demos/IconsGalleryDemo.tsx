@@ -71,25 +71,25 @@ const TILE_CLASS =
 
 export const IconTriggersDemo = () => (
 	<Demo>
-		<AnimateIcon animate loop loopDelay={1200}>
-			<span className={TILE_CLASS}>
-				<Clock size={28} />
-				<code className="text-[11px] leading-none">animate loop</code>
-			</span>
-		</AnimateIcon>
-		<AnimateIcon animateOnHover animation="path">
+		<AnimateIcon animateOnHover>
 			<span className={`${TILE_CLASS} cursor-pointer`}>
 				<Settings size={28} />
-				<code className="text-[11px] leading-none">hover, path</code>
+				<code className="text-[11px] leading-none">animateOnHover</code>
 			</span>
 		</AnimateIcon>
-		<AnimateIcon animateOnTap>
+		<AnimateIcon animateOnHover animateOnTap>
 			<span className={`${TILE_CLASS} cursor-pointer`}>
 				<Star size={28} />
 				<code className="text-[11px] leading-none">animateOnTap</code>
 			</span>
 		</AnimateIcon>
-		<AnimateIcon animateOnView animateOnViewOnce={false} delay={300}>
+		<AnimateIcon animateOnView animateOnViewOnce loop>
+			<span className={TILE_CLASS}>
+				<Clock size={28} />
+				<code className="text-[11px] leading-none">animateOnView loop</code>
+			</span>
+		</AnimateIcon>
+		<AnimateIcon animateOnView animateOnViewOnce>
 			<span className={TILE_CLASS}>
 				<MapPin size={28} />
 				<code className="text-[11px] leading-none">animateOnView</code>

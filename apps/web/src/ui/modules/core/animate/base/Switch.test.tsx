@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("motion/react", async () => {
 	const { createElement, forwardRef } = await import("react");
 	const strip = (props: Record<string, unknown>) => {
-		const { whileTap, initial, animate, transition, onTapStart, onTapCancel, onTap, children, ...rest } = props;
+		const { whileTap, initial, animate, transition, children, ...rest } = props;
 		return { rest, children, animate };
 	};
 	return {
@@ -28,19 +28,7 @@ const control = (): HTMLElement => screen.getByRole("switch", { name: "Allow pas
 const thumb = (): Element | null => document.querySelector('[data-slot="switch-thumb"]');
 
 describe("Switch", () => {
-	it("runs uncontrolled off defaultChecked and reports the flip", () => {
-		const onCheckedChange = vi.fn();
-		render(<Switch defaultChecked onCheckedChange={onCheckedChange} aria-label="Allow past days" />);
-
-		expect(control().getAttribute("aria-checked")).toBe("true");
-
-		fireEvent.click(control());
-
-		expect(onCheckedChange).toHaveBeenCalledWith(false, expect.anything());
-		expect(control().getAttribute("aria-checked")).toBe("false");
-	});
-
-	it("stays where the caller put it once checked is supplied, and still reports the intent", () => {
+	it("stays where the caller put it, and reports the intent", () => {
 		const onCheckedChange = vi.fn();
 		render(<Switch checked={false} onCheckedChange={onCheckedChange} aria-label="Allow past days" />);
 
@@ -50,20 +38,30 @@ describe("Switch", () => {
 		expect(control().getAttribute("aria-checked")).toBe("false");
 	});
 
-	it("renders a thumb without being asked, because every call site wants one", () => {
-		render(<Switch aria-label="Allow past days" />);
+	it("shows the state it was given", () => {
+		render(<Switch checked onCheckedChange={vi.fn()} aria-label="Allow past days" />);
 
-		expect(thumb()).not.toBeNull();
+		expect(control().getAttribute("aria-checked")).toBe("true");
 	});
 
-	it("lets a caller replace the thumb rather than adding to it", () => {
-		render(
-			<Switch aria-label="Allow past days">
-				<span data-testid="custom" />
-			</Switch>,
-		);
+	it("names itself through an id a visible label points at", () => {
+		render(<Switch checked={false} onCheckedChange={vi.fn()} id="allow-past-days" />);
 
-		expect(screen.getByTestId("custom")).toBeDefined();
-		expect(thumb()).toBeNull();
+		expect(document.querySelector("#allow-past-days")).not.toBeNull();
+	});
+
+	it("does not react to a click while disabled", () => {
+		const onCheckedChange = vi.fn();
+		render(<Switch checked={false} onCheckedChange={onCheckedChange} disabled aria-label="Allow past days" />);
+
+		fireEvent.click(control());
+
+		expect(onCheckedChange).not.toHaveBeenCalled();
+	});
+
+	it("renders a thumb, because every call site wants one", () => {
+		render(<Switch checked={false} onCheckedChange={vi.fn()} aria-label="Allow past days" />);
+
+		expect(thumb()).not.toBeNull();
 	});
 });

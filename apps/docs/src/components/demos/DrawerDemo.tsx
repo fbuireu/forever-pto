@@ -10,14 +10,13 @@ export const DrawerDemo = () => {
 	return (
 		<Demo>
 			<Button onClick={() => setOpen(true)}>Open drawer</Button>
-			<Drawer open={open} onOpenChange={setOpen}>
-				<DrawerContent>
+			<Drawer open={open} modal={false} dismissible={false}>
+				<DrawerContent role="region">
 					<DrawerTitle>Demo drawer</DrawerTitle>
 					<div className="mx-auto w-full max-w-md space-y-3 p-6 pb-10 text-sm">
 						<p className="m-0 font-bold">A vaul bottom sheet</p>
 						<p className="m-0 text-muted-foreground">
-							Drag the handle down or tap the overlay to dismiss. On the app it hosts mobile-friendly flows like the
-							cookie preferences.
+							The app uses it for the mobile planner panel: not modal, not dismissible, resting at snap points.
 						</p>
 						<Button variant="outline" onClick={() => setOpen(false)}>
 							Close
@@ -31,18 +30,20 @@ export const DrawerDemo = () => {
 
 export const DRAWER_PROP_ROWS = propRows({
 	open: { type: "boolean", description: "Controlled state; there is no trigger export, so this is how it opens." },
-	onOpenChange: { type: "(open: boolean) => void", description: "Fires on drag-to-dismiss, Esc and overlay click." },
-	shouldScaleBackground: {
-		type: "boolean",
-		defaultValue: "false",
-		description: "vaul's page-scaling effect, off here because the planner's sticky bar sits behind it.",
-	},
-});
-
-export const DRAWER_CONTENT_PROP_ROWS = propRows({
-	overlay: {
+	modal: {
 		type: "boolean",
 		defaultValue: "true",
-		description: "Whether the dimmed overlay renders behind the sheet.",
+		description: "The app passes false, so the page behind the sheet stays reachable.",
+	},
+	dismissible: {
+		type: "boolean",
+		defaultValue: "true",
+		description: "The app passes false: the sheet moves between snap points and never closes by dragging.",
+	},
+	snapPoints: { type: "number[]", description: "The heights the sheet rests at, as fractions of the viewport." },
+	activeSnapPoint: { type: "number | null", description: "Controlled snap point." },
+	setActiveSnapPoint: {
+		type: "(snap: number | null) => void",
+		description: "Fires when a drag settles on a snap point.",
 	},
 });

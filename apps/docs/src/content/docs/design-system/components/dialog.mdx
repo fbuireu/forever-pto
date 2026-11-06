@@ -8,7 +8,7 @@ sidebar:
     variant: success
 ---
 
-import { DIALOG_CONTENT_PROP_ROWS, DIALOG_PROP_ROWS, DialogDemo, DialogNoCloseButtonDemo } from '../../../../components/demos/DialogDemo';
+import { DIALOG_CONTENT_PROP_ROWS, DIALOG_PROP_ROWS, DialogDemo } from '../../../../components/demos/DialogDemo';
 import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/animate/base/Dialog.tsx`, a styling layer over the Motion dialog primitive at `apps/web/src/ui/modules/core/animate/primitives/base/Dialog.tsx` (Base UI dialog + `AnimatePresence`). Import from `animate/base/Dialog`, which is what the demo on this page does; the inner layer is an implementation detail. Needs a `LazyMotionProvider` ancestor.
@@ -23,19 +23,17 @@ Exports: `Dialog`, `DialogTrigger`, `DialogContent`, `DialogHeader`, `DialogTitl
 - `DialogHeader` is left-aligned at every width: centred on phones, it would put a long description in the middle while the text under it stays on the left.
 - The popup never outgrows the screen. It is capped at `100dvh` less a `2rem` gutter and scrolls inside itself, with `overscroll-contain` so reaching the end does not chain to the page. That is the only way to reach content past the fold, because Base UI locks the page's scroll while a modal is open; a caller adds no `max-h` or `overflow` of its own. The close button scrolls with the content, so a header row that runs under it keeps the room clear itself.
 - The backdrop is a fixed vertical gradient of near-black ink with `backdrop-blur-[2px]`, at `z-200` together with the popup.
-- `showCloseButton` (default `true`) controls the top-right X, a brutal mini-button with `hit-area-stable` and hover lift. With it off, Esc and backdrop click still dismiss.
-- The root supports uncontrolled and controlled use (`open` / `onOpenChange`); the motion layer gates the portal behind `AnimatePresence` with `keepMounted` so exit animations complete before unmount.
+- The top-right X is a brutal mini-button with `hit-area-stable` and hover lift; Esc and backdrop click dismiss as well.
+- The root is controlled through `open` and `onOpenChange`, as every modal in the app is; the motion layer gates the portal behind `AnimatePresence` with `keepMounted` so exit animations complete before unmount.
 - `DialogTrigger` supports `asChild` (via Base UI's `render`) so a [Button](/design-system/components/button/) can be the trigger without nesting buttons.
-
-<DialogNoCloseButtonDemo client:visible />
 
 ## Props
 
-`Dialog` forwards Base UI's root props; the ones that matter:
+`Dialog` forwards Base UI's root props; the ones the app sets:
 
 <PropsTable rows={DIALOG_PROP_ROWS} />
 
-`DialogContent` adds two on top of Base UI's popup:
+`DialogContent` adds one on top of Base UI's popup, and the app also sets one of Base UI's own:
 
 <PropsTable rows={DIALOG_CONTENT_PROP_ROWS} />
 
@@ -48,7 +46,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
   <DialogTrigger asChild>
     <Button>Open</Button>
   </DialogTrigger>
-  <DialogContent showCloseButton={false}>
+  <DialogContent closeLabel='Close dialog'>
     <DialogHeader>
       <DialogTitle>Reset your plan?</DialogTitle>
       <DialogDescription>This cannot be undone.</DialogDescription>
@@ -70,7 +68,7 @@ For a mobile-first bottom sheet use [Drawer](/design-system/components/drawer/);
 
 - Base UI renders `role='dialog'` with `aria-modal`, traps focus inside while open, closes on Escape and returns focus to the trigger on close.
 - `DialogTitle` becomes the `aria-labelledby` target and `DialogDescription` the `aria-describedby` one, which is why both should always be present, even visually hidden.
-- The close button's only text is `closeLabel`, rendered `sr-only`; pass the translated string, since the default is English.
+- The close button's only text is `closeLabel`, rendered `sr-only`; it is required and a translated string, since the component cannot translate.
 
 ## In the app
 

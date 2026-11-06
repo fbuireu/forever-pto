@@ -2,18 +2,18 @@
 
 import { Checkbox as CheckboxPrimitive } from "@base-ui/react/checkbox";
 import { cn } from "@ui/utils/cn";
-import { type HTMLMotionProps, m } from "motion/react";
+import { m } from "motion/react";
 import { type ComponentProps, useCallback, useEffect, useState } from "react";
 
-type CheckboxAccessibleName = { id: string } | { "aria-label": string } | { "aria-labelledby": string };
-
-interface CheckboxBaseProps extends Omit<ComponentProps<typeof CheckboxPrimitive.Root>, "render" | "nativeButton"> {
-	motionProps?: HTMLMotionProps<"button">;
+interface CheckboxAccessibleName {
+	"aria-label": string;
 }
 
-type CheckboxProps = CheckboxBaseProps & CheckboxAccessibleName;
+interface CheckboxProps
+	extends Omit<ComponentProps<typeof CheckboxPrimitive.Root>, "render" | "nativeButton" | "aria-label">,
+		CheckboxAccessibleName {}
 
-function Checkbox({ className, onCheckedChange, motionProps, ...props }: CheckboxProps) {
+function Checkbox({ className, onCheckedChange, ...props }: CheckboxProps) {
 	const [isChecked, setIsChecked] = useState(props?.checked ?? props?.defaultChecked ?? false);
 
 	useEffect(() => {
@@ -39,7 +39,7 @@ function Checkbox({ className, onCheckedChange, motionProps, ...props }: Checkbo
 			{...props}
 			onCheckedChange={handleCheckedChange}
 			nativeButton
-			render={<m.button whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.05 }} {...motionProps} />}
+			render={<m.button whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.05 }} />}
 		>
 			<CheckboxPrimitive.Indicator
 				keepMounted

@@ -119,17 +119,12 @@ describe("Checkbox", () => {
 
 	it("does not accept a nameless props object, because it renders a button that has none of its own", () => {
 		expect(NAMELESS_PROPS_ARE_REJECTED).toBe(false);
-		expect(readFileSync(join(__dirname, "Checkbox.tsx"), "utf8")).toContain("& CheckboxAccessibleName");
+		expect(readFileSync(join(__dirname, "Checkbox.tsx"), "utf8")).toContain("CheckboxAccessibleName");
 	});
 
 	it("tells Base UI its root is a native button, which is what it renders, so development logs no error", () => {
 		const { container } = render(<Checkbox aria-label="Select Christmas Day" />);
 
 		expect(container.querySelector('[data-slot="checkbox"]')?.getAttribute("data-native-button")).toBe("true");
-	});
-
-	it("accepts an id as the name, on the same terms as Switch", () => {
-		const { container } = render(<Checkbox id="select-all" checked={false} />);
-		expect(container.querySelector("#select-all")).not.toBeNull();
 	});
 });

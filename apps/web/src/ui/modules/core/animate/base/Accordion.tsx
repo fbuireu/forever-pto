@@ -2,7 +2,7 @@
 
 import { Accordion as AccordionPrimitive } from "@base-ui/react/accordion";
 import { cn } from "@ui/utils/cn";
-import { AnimatePresence, type HTMLMotionProps, m, type Transition } from "motion/react";
+import { AnimatePresence, m } from "motion/react";
 import {
 	type ComponentProps,
 	createContext,
@@ -58,19 +58,9 @@ function AccordionItem({ className, children, ...props }: AccordionItemProps) {
 	);
 }
 
-interface AccordionTriggerProps extends ComponentProps<typeof AccordionPrimitive.Trigger> {
-	transition?: Transition;
-	chevron?: boolean;
-}
+type AccordionTriggerProps = ComponentProps<typeof AccordionPrimitive.Trigger>;
 
-function AccordionTrigger({
-	ref,
-	className,
-	children,
-	transition = { type: "spring", stiffness: 150, damping: 22 },
-	chevron = true,
-	...props
-}: AccordionTriggerProps) {
+function AccordionTrigger({ ref, className, children, ...props }: AccordionTriggerProps) {
 	const triggerRef = useRef<HTMLButtonElement | null>(null);
 	useImperativeHandle(ref, () => triggerRef.current as HTMLButtonElement);
 	const { isOpen, setIsOpen } = useAccordionItem();
@@ -108,40 +98,29 @@ function AccordionTrigger({
 			>
 				{children}
 
-				{chevron && (
-					<span className="icon-first-line shrink-0">
-						<m.div
-							data-slot="accordion-trigger-chevron"
-							animate={{ rotate: isOpen ? 45 : 0 }}
-							transition={transition}
-							className={cn(
-								"relative hit-area-stable size-7 flex items-center justify-center rounded-md border-[2.5px] border-(--frame) font-black text-lg leading-none select-none transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-(--shadow-brutal-sm)",
-								isOpen
-									? "bg-(--frame) text-background hover:shadow-(--shadow-brutal-sm-accent)"
-									: "bg-accent text-(--color-brand-ink)",
-							)}
-						>
-							+
-						</m.div>
-					</span>
-				)}
+				<span className="icon-first-line shrink-0">
+					<m.div
+						data-slot="accordion-trigger-chevron"
+						animate={{ rotate: isOpen ? 45 : 0 }}
+						transition={{ type: "spring", stiffness: 150, damping: 22 }}
+						className={cn(
+							"relative hit-area-stable size-7 flex items-center justify-center rounded-md border-[2.5px] border-(--frame) font-black text-lg leading-none select-none transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-(--shadow-brutal-sm)",
+							isOpen
+								? "bg-(--frame) text-background hover:shadow-(--shadow-brutal-sm-accent)"
+								: "bg-accent text-(--color-brand-ink)",
+						)}
+					>
+						+
+					</m.div>
+				</span>
 			</AccordionPrimitive.Trigger>
 		</AccordionPrimitive.Header>
 	);
 }
 
-interface AccordionPanelProps extends ComponentProps<typeof AccordionPrimitive.Panel> {
-	motionProps?: HTMLMotionProps<"div">;
-	transition?: Transition;
-}
+type AccordionPanelProps = ComponentProps<typeof AccordionPrimitive.Panel>;
 
-function AccordionPanel({
-	className,
-	children,
-	transition = { type: "spring", stiffness: 150, damping: 22 },
-	motionProps,
-	...props
-}: AccordionPanelProps) {
+function AccordionPanel({ className, children, ...props }: AccordionPanelProps) {
 	const { isOpen } = useAccordionItem();
 
 	return (
@@ -157,13 +136,12 @@ function AccordionPanel({
 							initial={{ height: 0, opacity: 0, "--mask-stop": "0%" }}
 							animate={{ height: "auto", opacity: 1, "--mask-stop": "100%" }}
 							exit={{ height: 0, opacity: 0, "--mask-stop": "0%" }}
-							transition={transition}
+							transition={{ type: "spring", stiffness: 150, damping: 22 }}
 							style={{
 								maskImage: "linear-gradient(var(--shade) var(--mask-stop), transparent var(--mask-stop))",
 								WebkitMaskImage: "linear-gradient(var(--shade) var(--mask-stop), transparent var(--mask-stop))",
 							}}
 							className="overflow-hidden"
-							{...motionProps}
 						>
 							<div className={cn("pb-4 pt-0 text-sm", className)}>{children}</div>
 						</m.div>

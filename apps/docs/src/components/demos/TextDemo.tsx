@@ -9,16 +9,11 @@ export const SlidingNumberDemo = () => {
 
 	return (
 		<Demo>
-			<Button
-				size="icon-sm"
-				variant="outline"
-				aria-label="Subtract 7"
-				onClick={() => setValue((v) => Math.max(0, v - 7))}
-			>
+			<Button size="icon" variant="outline" aria-label="Subtract 7" onClick={() => setValue((v) => Math.max(0, v - 7))}>
 				−
 			</Button>
 			<SlidingNumber number={value} className="font-display text-4xl font-black" />
-			<Button size="icon-sm" variant="outline" aria-label="Add 7" onClick={() => setValue((v) => v + 7)}>
+			<Button size="icon" variant="outline" aria-label="Add 7" onClick={() => setValue((v) => v + 7)}>
 				+
 			</Button>
 			<span className="ml-6 flex items-baseline gap-2 text-muted-foreground">
@@ -31,15 +26,18 @@ export const SlidingNumberDemo = () => {
 
 const ROTATING_WORDS = ["vacations", "holidays", "long weekends", "bridge days"];
 
-export const RotatingTextDemo = () => (
-	<Demo>
-		<div className="flex items-center gap-2 text-xl font-semibold">
-			Maximize your
-			<RotatingText
-				text={ROTATING_WORDS}
-				duration={2000}
-				className="font-display font-black text-[var(--color-brand-teal)]"
-			/>
-		</div>
-	</Demo>
-);
+export const RotatingTextDemo = () => {
+	const [index, setIndex] = useState(0);
+
+	return (
+		<Demo>
+			<div className="flex items-center gap-2 text-xl font-semibold">
+				Maximize your
+				<RotatingText text={ROTATING_WORDS[index]} />
+			</div>
+			<Button size="sm" variant="outline" onClick={() => setIndex((current) => (current + 1) % ROTATING_WORDS.length)}>
+				Next word
+			</Button>
+		</Demo>
+	);
+};
