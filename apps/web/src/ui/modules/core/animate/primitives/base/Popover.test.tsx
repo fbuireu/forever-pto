@@ -72,26 +72,11 @@ vi.mock("@base-ui/react/popover", async () => {
 				createElement(Fragment, null, children),
 			Positioner: renderable("base-positioner"),
 			Popup: renderable("base-popup"),
-			Backdrop: renderable("base-backdrop"),
-			Title: renderable("base-title"),
-			Description: renderable("base-description"),
-			Close: ({ children, ...props }: ComponentProps<"button">) =>
-				createElement("button", { type: "button", ...props }, children),
 		},
 	};
 });
 
-import {
-	Popover,
-	PopoverBackdrop,
-	PopoverClose,
-	PopoverDescription,
-	PopoverPopup,
-	PopoverPortal,
-	PopoverPositioner,
-	PopoverTitle,
-	PopoverTrigger,
-} from "./Popover";
+import { Popover, PopoverPopup, PopoverPortal, PopoverPositioner, PopoverTrigger } from "./Popover";
 
 interface RenderPopoverParams {
 	open?: boolean;
@@ -105,13 +90,8 @@ const renderPopover = ({ open, defaultOpen, onOpenChange, asChild }: RenderPopov
 		<Popover open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
 			<PopoverTrigger asChild={asChild}>{asChild ? <a href="/help">help</a> : "help"}</PopoverTrigger>
 			<PopoverPortal>
-				<PopoverBackdrop />
 				<PopoverPositioner>
-					<PopoverPopup className="panel">
-						<PopoverTitle>Title</PopoverTitle>
-						<PopoverDescription>Body</PopoverDescription>
-						<PopoverClose>close</PopoverClose>
-					</PopoverPopup>
+					<PopoverPopup className="panel">Body</PopoverPopup>
 				</PopoverPositioner>
 			</PopoverPortal>
 		</Popover>,
@@ -207,19 +187,10 @@ describe("Popover", () => {
 		expect(JSON.parse((slot("popover-popup") as HTMLElement).dataset.transition ?? "{}")).toEqual({ duration: 0.1 });
 	});
 
-	it("marks backdrop, positioner, title, description and close with their slots", () => {
+	it("marks the positioner with its slot", () => {
 		renderPopover({ defaultOpen: true });
 
-		for (const name of [
-			"popover-backdrop",
-			"popover-positioner",
-			"popover-title",
-			"popover-description",
-			"popover-close",
-		]) {
-			expect(slot(name)).not.toBeNull();
-		}
-		expect(screen.getByRole("button", { name: "close" }).dataset.slot).toBe("popover-close");
+		expect(slot("popover-positioner")).not.toBeNull();
 	});
 
 	it("refuses a portal outside Popover, since it has no open state to read", () => {

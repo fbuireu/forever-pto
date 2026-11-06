@@ -86,38 +86,14 @@ function PopoverPopup({
 	);
 }
 
-type PopoverBackdropProps = ComponentProps<typeof PopoverPrimitive.Backdrop>;
-function PopoverBackdrop(props: PopoverBackdropProps) {
-	return <PopoverPrimitive.Backdrop data-slot="popover-backdrop" {...props} />;
-}
-
-type PopoverTitleProps = ComponentProps<typeof PopoverPrimitive.Title>;
-function PopoverTitle(props: PopoverTitleProps) {
-	return <PopoverPrimitive.Title data-slot="popover-title" {...props} />;
-}
-
-type PopoverDescriptionProps = ComponentProps<typeof PopoverPrimitive.Description>;
-function PopoverDescription(props: PopoverDescriptionProps) {
-	return <PopoverPrimitive.Description data-slot="popover-description" {...props} />;
-}
-
-type PopoverCloseProps = ComponentProps<typeof PopoverPrimitive.Close>;
-function PopoverClose(props: PopoverCloseProps) {
-	return <PopoverPrimitive.Close data-slot="popover-close" {...props} />;
-}
-
 export {
 	Popover,
-	PopoverBackdrop,
-	PopoverClose,
-	PopoverDescription,
 	PopoverPopup,
 	type PopoverPopupProps,
 	PopoverPortal,
 	PopoverPositioner,
 	type PopoverPositionerProps,
 	type PopoverProps,
-	PopoverTitle,
 	PopoverTrigger,
 	type PopoverTriggerProps,
 };
