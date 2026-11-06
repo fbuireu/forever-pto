@@ -1,102 +1,65 @@
 "use client";
 
 import { m, type Variants } from "motion/react";
-import { type IconProps, IconWrapper, useAnimateIconContext, useVariants } from "./Icon";
+import { type IconProps, IconWrapper, useAnimateIconContext } from "./Icon";
 
-type UsersProps = IconProps<keyof typeof animations>;
+type UsersProps = IconProps;
 
-const animations = {
-	default: {
-		path1: {
-			initial: {
-				y: 0,
-			},
-			animate: {
-				y: [0, 2, -2, 0],
-				transition: {
-					duration: 0.6,
-					ease: "easeInOut",
-					delay: 0.1,
-				},
+const variants = {
+	path1: {
+		initial: {
+			y: 0,
+		},
+		animate: {
+			y: [0, 2, -2, 0],
+			transition: {
+				duration: 0.6,
+				ease: "easeInOut",
+				delay: 0.1,
 			},
 		},
-		path2: {
-			initial: {
-				y: 0,
-			},
-			animate: {
-				y: [0, 4, -2, 0],
-				transition: {
-					duration: 0.6,
-					ease: "easeInOut",
-				},
+	},
+	path2: {
+		initial: {
+			y: 0,
+		},
+		animate: {
+			y: [0, 4, -2, 0],
+			transition: {
+				duration: 0.6,
+				ease: "easeInOut",
 			},
 		},
-		path3: {
-			initial: {
-				y: 0,
-			},
-			animate: {
-				y: [0, 2, -2, 0],
-				transition: {
-					duration: 0.6,
-					ease: "easeInOut",
-				},
+	},
+	path3: {
+		initial: {
+			y: 0,
+		},
+		animate: {
+			y: [0, 2, -2, 0],
+			transition: {
+				duration: 0.6,
+				ease: "easeInOut",
 			},
 		},
-		circle: {
-			initial: {
-				y: 0,
-			},
-			animate: {
-				y: [0, 4, -2, 0],
-				transition: {
-					duration: 0.6,
-					ease: "easeInOut",
-					delay: 0.1,
-				},
+	},
+	circle: {
+		initial: {
+			y: 0,
+		},
+		animate: {
+			y: [0, 4, -2, 0],
+			transition: {
+				duration: 0.6,
+				ease: "easeInOut",
+				delay: 0.1,
 			},
 		},
-	} satisfies Record<string, Variants>,
-	appear: {
-		path1: {},
-		path2: {
-			initial: {
-				x: -6,
-				opacity: 0,
-			},
-			animate: {
-				x: 0,
-				opacity: 1,
-				transition: {
-					type: "spring",
-					stiffness: 100,
-					damping: 10,
-				},
-			},
-		},
-		path3: {
-			initial: {
-				x: -6,
-				opacity: 0,
-			},
-			animate: {
-				x: 0,
-				opacity: 1,
-				transition: {
-					type: "spring",
-					stiffness: 100,
-					damping: 10,
-				},
-			},
-		},
-		circle: {},
-	} satisfies Record<string, Variants>,
-} as const;
+	},
+} satisfies Record<string, Variants>;
 
 function IconComponent({ size, ...props }: UsersProps) {
 	const { controls } = useAnimateIconContext();
-	const variants = useVariants(animations);
 
 	return (
 		<m.svg

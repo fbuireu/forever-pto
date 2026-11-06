@@ -280,9 +280,8 @@ No rule below restates these, and a diff that breaks one fails CI:
   slot takes the props its owner passes (`RadialNav`'s `icon`), and a page global is declared on `Window` (`M18`)
   rather than cast out of it. A cast stays only where no check can follow the value: `M7`'s seam, the one place
   `as unknown as` is written (the rehydrating store read as the stored shape it still holds, in `holidays.ts`), the
-  type argument `M16` allows, a DOM lookup, a key list `Object.keys` widens, an object a generic builds key by key
-  (`useVariants`) and a library's polymorphic props; widening to a supertype (`LOCALES as readonly string[]`) checks
-  the value and is not a cast that lies.
+  type argument `M16` allows, a DOM lookup, a key list `Object.keys` widens and a library's polymorphic props;
+  widening to a supertype (`LOCALES as readonly string[]`) checks the value and is not a cast that lies.
 
 ## Functions and modules
 

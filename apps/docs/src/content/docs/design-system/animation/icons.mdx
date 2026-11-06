@@ -7,7 +7,7 @@ sidebar:
 
 import { IconsGalleryDemo, IconTriggersDemo, ICON_COUNT } from '../../../../components/demos/IconsGalleryDemo';
 
-Source: `apps/web/src/ui/modules/core/animate/icons/`. The directory holds {ICON_COUNT} icon components plus the shared machinery in `Icon.tsx` (`AnimateIcon`, `IconWrapper`, `useAnimateIconContext`, `useVariants`). Every icon draws itself with `m.svg`/`m.path` from Motion, so any subtree that renders one needs a `LazyMotionProvider` ancestor; `Demo.tsx` provides one for every demo.
+Source: `apps/web/src/ui/modules/core/animate/icons/`. The directory holds {ICON_COUNT} icon components plus the shared machinery in `Icon.tsx` (`AnimateIcon`, `IconWrapper`, `useAnimateIconContext`). Every icon draws itself with `m.svg`/`m.path` from Motion, so any subtree that renders one needs a `LazyMotionProvider` ancestor; `Demo.tsx` provides one for every demo.
 
 ## Gallery
 
@@ -19,27 +19,27 @@ Hover a tile to play its animation. The gallery imports every icon by its real e
 
 Each icon file (e.g. `apps/web/src/ui/modules/core/animate/icons/Check.tsx`) follows one pattern:
 
-1. An `animations` object maps animation names (`default`, and for the directional icons also `default-loop`) to Motion `Variants` per SVG part.
-2. An inner component draws the SVG with `m.*` elements, wiring each part to `useVariants(animations)` and the shared `controls` from `useAnimateIconContext`.
+1. A `variants` object maps each SVG part to its Motion `Variants` (`initial` and `animate`).
+2. An inner component draws the SVG with `m.*` elements, wiring each part to its entry in `variants` and to the shared `controls` from `useAnimateIconContext`.
 3. The export wraps it in `IconWrapper`, which connects the icon to the nearest `AnimateIcon` context, or creates one on the fly when trigger props are passed directly to the icon.
 
 ## Trigger API
 
-`AnimateIcon` wraps arbitrary children (an `m.span`, or the child itself with `asChild`) and drives all descendant icons through context. The context value is memoised over the props and state it carries, so a parent re-rendering does not re-render every icon beneath it. The same props are accepted directly on any icon. From `Icon.tsx`:
+`AnimateIcon` wraps arbitrary children (an `m.span`, or the child itself with `asChild`) and drives all descendant icons through context. The context value is memoised over the props and state it carries, so a parent re-rendering does not re-render every icon beneath it. Any icon also accepts `animateOnHover`, `animateOnView` and `loop` directly. From `Icon.tsx`:
 
 | Prop | What it does |
 | --- | --- |
 | `animate` | Imperative trigger: `true`/`false`, which the Combobox sets from its open state. |
 | `animateOnHover` | Play while the pointer is over the wrapper (mouse only). |
 | `animateOnTap` | Play while pressed (`pointerdown` → `pointerup`). |
-| `animateOnView` | Play when scrolled into view; `animateOnViewOnce` plays it only the first time. |
+| `animateOnView` | Play when scrolled into view, the first time only. |
 | `loop` | Restart the animation when it finishes. |
 
 <IconTriggersDemo client:visible />
 
 ## Context propagation
 
-Because triggers travel through context, one `AnimateIcon` can animate icons buried inside composed children. That is how `Combobox` (`apps/web/src/ui/modules/core/primitives/Combobox.tsx`) animates the `ChevronUpDown` inside its trigger button: the wrapper toggles `animateOnHover={!open} animate={open}` and the icon simply sits in the button. Individual icons can override any inherited prop; the override wins over the parent context.
+Because triggers travel through context, one `AnimateIcon` can animate icons buried inside composed children. That is how `Combobox` (`apps/web/src/ui/modules/core/primitives/Combobox.tsx`) animates the `ChevronUpDown` inside its trigger button: the wrapper toggles `animateOnHover={!open} animate={open}` and the icon simply sits in the button. An icon that carries `animateOnHover`, `animateOnView` or `loop` of its own gets its own `AnimateIcon`; the override wins over the parent context.
 
 ## Usage
 

@@ -1,49 +1,25 @@
 "use client";
 
 import { m, type Variants } from "motion/react";
-import { type IconProps, IconWrapper, useAnimateIconContext, useVariants } from "./Icon";
+import { type IconProps, IconWrapper, useAnimateIconContext } from "./Icon";
 
-type StarProps = IconProps<keyof typeof animations>;
+type StarProps = IconProps;
 
-const animations = {
-	default: {
-		group: {
-			initial: {
-				scale: 1,
-			},
-			animate: {
-				scale: [1, 0.9, 1.2, 1],
-				transition: { duration: 0.6, ease: "easeInOut" },
-			},
+const variants = {
+	group: {
+		initial: {
+			scale: 1,
 		},
-		path: {},
-	} satisfies Record<string, Variants>,
-	fill: {
-		group: {
-			initial: {
-				scale: 1,
-			},
-			animate: {
-				scale: [1, 0.9, 1.2, 1],
-				transition: { duration: 0.6, ease: "easeInOut" },
-			},
+		animate: {
+			scale: [1, 0.9, 1.2, 1],
+			transition: { duration: 0.6, ease: "easeInOut" },
 		},
-		path: {
-			initial: {
-				fill: "currentColor",
-				fillOpacity: 0,
-			},
-			animate: {
-				fillOpacity: 1,
-				transition: { delay: 0.2 },
-			},
-		},
-	} satisfies Record<string, Variants>,
-} as const;
+	},
+	path: {},
+} satisfies Record<string, Variants>;
 
 function IconComponent({ size, ...props }: StarProps) {
 	const { controls } = useAnimateIconContext();
-	const variants = useVariants(animations);
 
 	return (
 		<m.svg

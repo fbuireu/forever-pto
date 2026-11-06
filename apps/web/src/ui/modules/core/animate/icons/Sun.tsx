@@ -1,38 +1,35 @@
 "use client";
 
 import { m, type Variants } from "motion/react";
-import { type IconProps, IconWrapper, useAnimateIconContext, useVariants } from "./Icon";
+import { type IconProps, IconWrapper, useAnimateIconContext } from "./Icon";
 
-type SunProps = IconProps<keyof typeof animations>;
+type SunProps = IconProps;
 
-const animations = {
-	default: (() => {
-		const animation: Record<string, Variants> = {
-			circle: {},
-		};
+const variants = (() => {
+	const animation: Record<string, Variants> = {
+		circle: {},
+	};
 
-		for (let i = 1; i <= 8; i++) {
-			animation[`line${i}`] = {
-				initial: { opacity: 1, scale: 1 },
-				animate: {
-					opacity: [0, 1],
-					pathLength: [0, 1],
-					transition: {
-						duration: 0.6,
-						ease: "easeInOut",
-						delay: (i - 1) * 0.15,
-					},
+	for (let i = 1; i <= 8; i++) {
+		animation[`line${i}`] = {
+			initial: { opacity: 1, scale: 1 },
+			animate: {
+				opacity: [0, 1],
+				pathLength: [0, 1],
+				transition: {
+					duration: 0.6,
+					ease: "easeInOut",
+					delay: (i - 1) * 0.15,
 				},
-			};
-		}
+			},
+		};
+	}
 
-		return animation;
-	})() satisfies Record<string, Variants>,
-} as const;
+	return animation;
+})() satisfies Record<string, Variants>;
 
 function IconComponent({ size, ...props }: SunProps) {
 	const { controls } = useAnimateIconContext();
-	const variants = useVariants(animations);
 
 	return (
 		<m.svg

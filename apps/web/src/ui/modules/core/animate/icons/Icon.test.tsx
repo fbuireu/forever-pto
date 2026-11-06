@@ -1,6 +1,6 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { ComponentProps, ComponentType, ReactNode } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 interface MotionSpanProps extends ComponentProps<"span"> {
 	animate?: unknown;
@@ -45,32 +45,21 @@ vi.mock("../primitives/animate/MotionSlot", async () => {
 	};
 });
 
-import { AnimateIcon, type IconProps, IconWrapper, useAnimateIconContext, useVariants } from "./Icon";
-
-const PersistProbe = () => {
-	const { persistOnAnimateEnd } = useAnimateIconContext();
-	return <span data-testid="persist">{String(persistOnAnimateEnd)}</span>;
-};
-
-const EndStateProbe = () => {
-	const { persistOnAnimateEnd, initialOnAnimateEnd } = useAnimateIconContext();
-	return <span data-testid="end-state">{`persist:${persistOnAnimateEnd} initial:${initialOnAnimateEnd}`}</span>;
-};
+import { AnimateIcon, type IconProps, IconWrapper, useAnimateIconContext } from "./Icon";
 
 const Probe = () => {
-	const { active, animation, loop, loopDelay } = useAnimateIconContext();
+	const { controls } = useAnimateIconContext();
 
-	return (
-		<span data-testid="probe" data-active={String(active)} data-animation={animation} data-loop={String(loop)}>
-			{loopDelay}
-		</span>
-	);
+	return <span data-testid="probe" data-has-controls={String(controls !== undefined)} />;
 };
 
-const probeOf = (container: HTMLElement): HTMLElement =>
-	container.querySelector('[data-testid="probe"]') as HTMLElement;
+const hoverTarget = (container: HTMLElement): HTMLElement => container.firstElementChild as HTMLElement;
 
-const isActive = (container: HTMLElement): boolean => probeOf(container).dataset.active === "true";
+const started = (): string[] => controls.start.mock.calls.map(([animation]) => animation);
+
+const setTo = (): string[] => controls.set.mock.calls.map(([animation]) => animation);
+
+const lastStarted = (): string | undefined => started().at(-1);
 
 beforeEach(() => {
 	inView.value = false;
@@ -79,275 +68,139 @@ beforeEach(() => {
 	controls.set.mockReset();
 });
 
-afterEach(() => {
-	vi.useRealTimers();
-});
-
-describe("AnimateIcon", () => {
-	it("exposes persistOnAnimateEnd to its own children", () => {
-		const { getByTestId } = render(
-			<AnimateIcon persistOnAnimateEnd>
-				<PersistProbe />
-			</AnimateIcon>,
-		);
-
-		expect(getByTestId("persist").textContent).toBe("true");
-	});
-
-	it("propagates persistOnAnimateEnd to a nested icon that inherits the parent animation", () => {
-		const { getByTestId } = render(
-			<AnimateIcon persistOnAnimateEnd>
-				<IconWrapper icon={PersistProbe} />
-			</AnimateIcon>,
-		);
-
-		expect(getByTestId("persist").textContent).toBe("true");
-	});
-
-	it("propagates persistOnAnimateEnd to a nested icon that overrides another prop", () => {
-		const { getByTestId } = render(
-			<AnimateIcon persistOnAnimateEnd>
-				<IconWrapper icon={PersistProbe} loop />
-			</AnimateIcon>,
-		);
-
-		expect(getByTestId("persist").textContent).toBe("true");
-	});
-});
-
 describe("what AnimateIcon starts out doing", () => {
-	it("sits still when nobody asked it to animate", () => {
-		const { container } = render(
+	it("sits still when nobody asked it to animate", async () => {
+		render(
 			<AnimateIcon>
 				<Probe />
 			</AnimateIcon>,
 		);
 
-		expect(isActive(container)).toBe(false);
+		await waitFor(() => expect(lastStarted()).toBe("initial"));
+		expect(started()).not.toContain("animate");
 	});
 
-	it("sits still when told not to animate", () => {
-		const { container } = render(
+	it("sits still when told not to animate", async () => {
+		render(
 			<AnimateIcon animate={false}>
 				<Probe />
 			</AnimateIcon>,
 		);
 
-		expect(isActive(container)).toBe(false);
+		await waitFor(() => expect(lastStarted()).toBe("initial"));
+		expect(started()).not.toContain("animate");
 	});
 
-	it("animates straight away when told to, with no delay to wait out", () => {
-		const { container } = render(
+	it("animates straight away when told to", async () => {
+		render(
 			<AnimateIcon animate>
 				<Probe />
 			</AnimateIcon>,
 		);
 
-		expect(isActive(container)).toBe(true);
+		await waitFor(() => expect(started()).toContain("animate"));
 	});
 
-	it("takes the named animation from the trigger rather than the default", () => {
-		const { container } = render(
-			<AnimateIcon animate="path-loop">
+	it("hands the controls to the icons inside it", () => {
+		const { getByTestId } = render(
+			<AnimateIcon>
 				<Probe />
 			</AnimateIcon>,
 		);
 
-		expect(probeOf(container).dataset.animation).toBe("path-loop");
-		expect(isActive(container)).toBe(true);
-	});
-
-	it("passes the loop settings down as it was given them", () => {
-		const { container } = render(
-			<AnimateIcon loop loopDelay={250}>
-				<Probe />
-			</AnimateIcon>,
-		);
-
-		expect(probeOf(container).dataset.loop).toBe("true");
-		expect(probeOf(container).textContent).toBe("250");
-	});
-});
-
-describe("a delayed animation", () => {
-	it("waits the delay out before it starts", () => {
-		vi.useFakeTimers();
-
-		const { container } = render(
-			<AnimateIcon animate delay={300}>
-				<Probe />
-			</AnimateIcon>,
-		);
-
-		expect(isActive(container)).toBe(false);
-
-		act(() => {
-			vi.advanceTimersByTime(300);
-		});
-
-		expect(isActive(container)).toBe(true);
-	});
-
-	it("is called off by a stop that lands inside the delay", () => {
-		vi.useFakeTimers();
-
-		const { container, rerender } = render(
-			<AnimateIcon animate delay={300}>
-				<Probe />
-			</AnimateIcon>,
-		);
-
-		rerender(
-			<AnimateIcon animate={false} delay={300}>
-				<Probe />
-			</AnimateIcon>,
-		);
-
-		act(() => {
-			vi.advanceTimersByTime(300);
-		});
-
-		expect(isActive(container)).toBe(false);
+		expect(getByTestId("probe").dataset.hasControls).toBe("true");
 	});
 });
 
 describe("an animation driven by a prop", () => {
-	it("starts when the prop turns on and stops when it turns off", () => {
-		const { container, rerender } = render(
+	it("starts when the prop turns on and stops when it turns off", async () => {
+		const { rerender } = render(
 			<AnimateIcon animate={false}>
 				<Probe />
 			</AnimateIcon>,
 		);
-		expect(isActive(container)).toBe(false);
+		await waitFor(() => expect(lastStarted()).toBe("initial"));
+		controls.start.mockClear();
 
 		rerender(
 			<AnimateIcon animate>
 				<Probe />
 			</AnimateIcon>,
 		);
-		expect(isActive(container)).toBe(true);
+		await waitFor(() => expect(started()).toContain("animate"));
+		controls.start.mockClear();
 
 		rerender(
 			<AnimateIcon animate={false}>
 				<Probe />
 			</AnimateIcon>,
 		);
-		expect(isActive(container)).toBe(false);
+		await waitFor(() => expect(started()).toStrictEqual(["initial"]));
 	});
 });
 
 describe("an animation driven by the pointer", () => {
-	const hoverTarget = (container: HTMLElement) => container.firstElementChild as HTMLElement;
-
-	it("runs while a mouse is over it and stops when the mouse leaves", () => {
+	it("runs while a mouse is over it and stops when the mouse leaves", async () => {
 		const { container } = render(
 			<AnimateIcon animateOnHover>
 				<Probe />
 			</AnimateIcon>,
 		);
+		await waitFor(() => expect(lastStarted()).toBe("initial"));
+		controls.start.mockClear();
 
 		fireEvent.pointerEnter(hoverTarget(container), { pointerType: "mouse" });
-		expect(isActive(container)).toBe(true);
+		await waitFor(() => expect(started()).toContain("animate"));
+		controls.start.mockClear();
 
 		fireEvent.pointerLeave(hoverTarget(container), { pointerType: "mouse" });
-		expect(isActive(container)).toBe(false);
+		await waitFor(() => expect(started()).toStrictEqual(["initial"]));
 	});
 
-	it("ignores a touch, which has no hover to speak of", () => {
+	it("ignores a touch, which has no hover to speak of", async () => {
 		const { container } = render(
 			<AnimateIcon animateOnHover>
 				<Probe />
 			</AnimateIcon>,
 		);
+		await waitFor(() => expect(lastStarted()).toBe("initial"));
+		controls.start.mockClear();
 
 		fireEvent.pointerEnter(hoverTarget(container), { pointerType: "touch" });
 
-		expect(isActive(container)).toBe(false);
+		expect(started()).toStrictEqual([]);
 	});
 
-	it("runs while it is pressed and stops on release", () => {
+	it("runs while it is pressed and stops on release", async () => {
 		const { container } = render(
 			<AnimateIcon animateOnTap>
 				<Probe />
 			</AnimateIcon>,
 		);
+		await waitFor(() => expect(lastStarted()).toBe("initial"));
+		controls.start.mockClear();
 
 		fireEvent.pointerDown(hoverTarget(container));
-		expect(isActive(container)).toBe(true);
+		await waitFor(() => expect(started()).toContain("animate"));
+		controls.start.mockClear();
 
 		fireEvent.pointerUp(hoverTarget(container));
-		expect(isActive(container)).toBe(false);
+		await waitFor(() => expect(started()).toStrictEqual(["initial"]));
 	});
 
-	it("stays still under a pointer it was not told to react to", () => {
+	it("stays still under a pointer it was not told to react to", async () => {
 		const { container } = render(
 			<AnimateIcon>
 				<Probe />
 			</AnimateIcon>,
 		);
+		await waitFor(() => expect(lastStarted()).toBe("initial"));
+		controls.start.mockClear();
 
 		fireEvent.pointerEnter(hoverTarget(container), { pointerType: "mouse" });
 		fireEvent.pointerDown(hoverTarget(container));
 
-		expect(isActive(container)).toBe(false);
-	});
-
-	it("takes the animation the trigger names", () => {
-		const { container } = render(
-			<AnimateIcon animateOnHover="path-loop">
-				<Probe />
-			</AnimateIcon>,
-		);
-
-		fireEvent.pointerEnter(hoverTarget(container), { pointerType: "mouse" });
-
-		expect(probeOf(container).dataset.animation).toBe("path-loop");
-	});
-});
-
-describe("an animation driven by the viewport", () => {
-	it("runs once the icon is in view", () => {
-		inView.value = true;
-
-		const { container } = render(
-			<AnimateIcon animateOnView>
-				<Probe />
-			</AnimateIcon>,
-		);
-
-		expect(isActive(container)).toBe(true);
-	});
-
-	it("stays still while the icon is out of view", () => {
-		const { container } = render(
-			<AnimateIcon animateOnView>
-				<Probe />
-			</AnimateIcon>,
-		);
-
-		expect(isActive(container)).toBe(false);
-	});
-});
-
-describe("what AnimateIcon passes through", () => {
-	it("stamps its own data attributes onto the child it wraps", () => {
-		const { container } = render(
-			<AnimateIcon data-tutorial="calendar-list">
-				<span data-testid="probe" />
-			</AnimateIcon>,
-		);
-
-		expect(probeOf(container).dataset.tutorial).toBe("calendar-list");
-	});
-
-	it("leaves a child alone when it carries no data attributes to pass on", () => {
-		const { container } = render(
-			<AnimateIcon>
-				<span data-testid="probe" />
-			</AnimateIcon>,
-		);
-
-		expect(probeOf(container).dataset.tutorial).toBeUndefined();
+		expect(started()).toStrictEqual([]);
 	});
 
 	it("keeps the child's own pointer handler beside the one it adds", () => {
@@ -359,15 +212,58 @@ describe("what AnimateIcon passes through", () => {
 			</AnimateIcon>,
 		);
 
-		fireEvent.pointerEnter(container.firstElementChild as HTMLElement, { pointerType: "mouse" });
+		fireEvent.pointerEnter(hoverTarget(container), { pointerType: "mouse" });
 
 		expect(onPointerEnter).toHaveBeenCalledOnce();
 	});
 });
 
-const started = (): string[] => controls.start.mock.calls.map(([animation]) => animation);
+describe("what AnimateIcon passes through", () => {
+	it("hands the props a trigger gives it on to the element it renders", () => {
+		const { container } = render(
+			<AnimateIcon aria-expanded="true">
+				<Probe />
+			</AnimateIcon>,
+		);
 
-const setTo = (): string[] => controls.set.mock.calls.map(([animation]) => animation);
+		expect(hoverTarget(container).getAttribute("aria-expanded")).toBe("true");
+	});
+
+	it("hands them on to the child it slots into", () => {
+		const { container } = render(
+			<AnimateIcon asChild aria-expanded="true">
+				<Probe />
+			</AnimateIcon>,
+		);
+
+		expect(hoverTarget(container).getAttribute("aria-expanded")).toBe("true");
+	});
+});
+
+describe("an animation driven by the viewport", () => {
+	it("runs once the icon is in view", async () => {
+		inView.value = true;
+
+		render(
+			<AnimateIcon animateOnView>
+				<Probe />
+			</AnimateIcon>,
+		);
+
+		await waitFor(() => expect(started()).toContain("animate"));
+	});
+
+	it("stays still while the icon is out of view", async () => {
+		render(
+			<AnimateIcon animateOnView>
+				<Probe />
+			</AnimateIcon>,
+		);
+
+		await waitFor(() => expect(lastStarted()).toBe("initial"));
+		expect(started()).not.toContain("animate");
+	});
+});
 
 describe("what AnimateIcon asks the motion controls to do", () => {
 	it("runs the animation when it is turned on", async () => {
@@ -397,42 +293,16 @@ describe("what AnimateIcon asks the motion controls to do", () => {
 
 		await waitFor(() => expect(started()).toStrictEqual(["initial"]));
 	});
-
-	it("leaves it where the animation ended when it is told to persist", async () => {
-		const { rerender } = render(
-			<AnimateIcon animate persistOnAnimateEnd>
-				<Probe />
-			</AnimateIcon>,
-		);
-		await waitFor(() => expect(started()).toContain("animate"));
-		controls.start.mockClear();
-
-		rerender(
-			<AnimateIcon animate={false} persistOnAnimateEnd>
-				<Probe />
-			</AnimateIcon>,
-		);
-
-		await waitFor(() => expect(isActive(document.body)).toBe(false));
-		expect(started()).not.toContain("initial");
-	});
-
-	it("snaps back to the resting state after the animation, rather than animating back", async () => {
-		render(
-			<AnimateIcon animate initialOnAnimateEnd>
-				<Probe />
-			</AnimateIcon>,
-		);
-
-		await waitFor(() => expect(setTo()).toContain("initial"));
-		expect(started()).not.toContain("initial");
-	});
 });
 
 describe("an animation that loops", () => {
+	beforeEach(() => {
+		controls.start.mockImplementation(() => new Promise<void>((resolve) => setTimeout(resolve, 0)));
+	});
+
 	it("resets to the start before each pass, so the second one is not a no-op", async () => {
 		render(
-			<AnimateIcon animate loop loopDelay={300}>
+			<AnimateIcon animate loop>
 				<Probe />
 			</AnimateIcon>,
 		);
@@ -441,171 +311,101 @@ describe("an animation that loops", () => {
 		expect(setTo()).toContain("initial");
 	});
 
-	it("waits the loop delay out before going round again", async () => {
-		vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
-
-		render(
-			<AnimateIcon animate loop loopDelay={300}>
-				<Probe />
-			</AnimateIcon>,
-		);
-		await act(async () => {});
-		expect(started().filter((animation) => animation === "animate")).toHaveLength(1);
-
-		await act(async () => {
-			vi.advanceTimersByTime(300);
-		});
-
-		expect(started().filter((animation) => animation === "animate")).toHaveLength(2);
-	});
-
-	it("stops going round when the animation is called off mid-delay", async () => {
-		vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
-
+	it("goes round again until it is called off", async () => {
 		const { rerender } = render(
-			<AnimateIcon animate loop loopDelay={300}>
+			<AnimateIcon animate loop>
 				<Probe />
 			</AnimateIcon>,
 		);
-		await act(async () => {});
+
+		await waitFor(() => expect(started().filter((animation) => animation === "animate").length).toBeGreaterThan(2));
 
 		rerender(
-			<AnimateIcon animate={false} loop loopDelay={300}>
+			<AnimateIcon animate={false} loop>
 				<Probe />
 			</AnimateIcon>,
 		);
+		await waitFor(() => expect(lastStarted()).toBe("initial"));
 		controls.start.mockClear();
+		await new Promise<void>((resolve) => setTimeout(resolve, 20));
 
-		await act(async () => {
-			vi.advanceTimersByTime(300);
-		});
-
-		expect(started()).not.toContain("animate");
+		expect(started()).toStrictEqual([]);
 	});
 
-	it("stops going round when the icon goes away mid-delay", async () => {
-		vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
-
-		const { unmount } = render(
-			<AnimateIcon animate loop loopDelay={300}>
+	it("does not set the icon back to the start when it only plays once", async () => {
+		render(
+			<AnimateIcon animate>
 				<Probe />
 			</AnimateIcon>,
 		);
-		await act(async () => {});
-		unmount();
-		controls.start.mockClear();
 
-		await act(async () => {
-			vi.advanceTimersByTime(300);
-		});
-
-		expect(started()).not.toContain("animate");
+		await waitFor(() => expect(started()).toContain("animate"));
+		expect(setTo()).toStrictEqual([]);
 	});
 });
-
-const VARIANTS = {
-	default: { group: { initial: { x: 0 }, animate: { x: 1 } }, path: { initial: { y: 0 }, animate: { y: 1 } } },
-	nod: { group: { initial: { x: 2 }, animate: { x: 3 } }, path: { initial: { y: 2 }, animate: { y: 3 } } },
-};
-
-const VariantProbe = () => <span data-testid="variants">{JSON.stringify(useVariants(VARIANTS))}</span>;
-
-const readVariants = (): Record<string, unknown> =>
-	JSON.parse(screen.getByTestId("variants").textContent ?? "{}") as Record<string, unknown>;
-
-describe("useVariants", () => {
-	it("hands back the default set when nothing names another", () => {
-		render(
-			<AnimateIcon>
-				<VariantProbe />
-			</AnimateIcon>,
-		);
-
-		expect(readVariants()).toStrictEqual(VARIANTS.default);
-	});
-
-	it("hands back the named set when the trigger names one", () => {
-		render(
-			<AnimateIcon animate="nod">
-				<VariantProbe />
-			</AnimateIcon>,
-		);
-
-		expect(readVariants()).toStrictEqual(VARIANTS.nod);
-	});
-
-	it("falls back to the default rather than nothing for a name it does not know", () => {
-		render(
-			<AnimateIcon animate="does-not-exist">
-				<VariantProbe />
-			</AnimateIcon>,
-		);
-
-		expect(readVariants()).toStrictEqual(VARIANTS.default);
-	});
-
-	it("gives every part the same stroke animation for the built-in path animation", () => {
-		render(
-			<AnimateIcon animate="path">
-				<VariantProbe />
-			</AnimateIcon>,
-		);
-
-		expect(Object.keys(readVariants())).toStrictEqual(["path"]);
-		expect(readVariants().path).toMatchObject({ initial: { pathLength: 1 } });
-	});
-
-	it.each(["toString", "constructor", "hasOwnProperty"])(
-		"takes %s, a name every object inherits, as a name it does not know rather than a built-in animation",
-		(name) => {
-			render(
-				<AnimateIcon animate={name}>
-					<VariantProbe />
-				</AnimateIcon>,
-			);
-
-			expect(readVariants()).toStrictEqual(VARIANTS.default);
-		},
-	);
-});
-
-const PLAIN_ICON_CLASS = "[&_[stroke-dasharray='1px_1px']]:![stroke-dasharray:1px_0px]";
 
 const PlainIcon = ({ className }: { className?: string }) => <span data-testid="plain" className={className} />;
 
-const plainIcon = PlainIcon as ComponentType<IconProps<string>>;
+const plainIcon = PlainIcon as ComponentType<IconProps>;
 
 describe("an icon with no AnimateIcon above it", () => {
-	it("mints its own when it carries a trigger of its own", () => {
+	it("mints its own when it carries a trigger of its own", async () => {
 		const { container } = render(<IconWrapper icon={Probe} animateOnHover />);
+		await waitFor(() => expect(lastStarted()).toBe("initial"));
+		controls.start.mockClear();
 
-		fireEvent.pointerEnter(container.firstElementChild as HTMLElement, { pointerType: "mouse" });
+		fireEvent.pointerEnter(hoverTarget(container), { pointerType: "mouse" });
 
-		expect(isActive(container)).toBe(true);
+		await waitFor(() => expect(started()).toContain("animate"));
 	});
 
-	it("keeps the end state it was given in the AnimateIcon it mints", () => {
-		render(<IconWrapper icon={EndStateProbe} animateOnHover persistOnAnimateEnd initialOnAnimateEnd />);
+	it("loops in the AnimateIcon it mints when it is told to", async () => {
+		controls.start.mockImplementation(() => new Promise<void>((resolve) => setTimeout(resolve, 0)));
+		inView.value = true;
 
-		expect(screen.getByTestId("end-state").textContent).toBe("persist:true initial:true");
+		render(<IconWrapper icon={Probe} animateOnView loop />);
+
+		await waitFor(() => expect(setTo()).toContain("initial"));
 	});
 
 	it("renders flat when nothing asks it to animate", () => {
 		const { container } = render(<IconWrapper icon={Probe} />);
 
-		expect(isActive(container)).toBe(false);
-		expect(probeOf(container)).toBeTruthy();
+		expect(controls.start).not.toHaveBeenCalled();
+		expect(container.querySelector('[data-testid="probe"]')).toBeTruthy();
 	});
 
-	it("marks the icon for the stroke animation, which is a class rather than a variant", () => {
-		render(<IconWrapper icon={plainIcon} animation="path" />);
+	it("passes its class and size on to the icon", () => {
+		render(<IconWrapper icon={plainIcon} className="size-4" />);
 
-		expect(screen.getByTestId("plain").className).toContain(PLAIN_ICON_CLASS);
+		expect(screen.getByTestId("plain").className).toBe("size-4");
+	});
+});
+
+describe("an icon inside an AnimateIcon", () => {
+	it("shares the controls of the AnimateIcon above it when it carries no trigger of its own", () => {
+		const { getByTestId } = render(
+			<AnimateIcon animateOnHover>
+				<IconWrapper icon={Probe} />
+			</AnimateIcon>,
+		);
+
+		expect(getByTestId("probe").dataset.hasControls).toBe("true");
 	});
 
-	it("leaves that class off an icon animating any other way", () => {
-		render(<IconWrapper icon={plainIcon} animation="nod" />);
+	it("runs on its own trigger when it carries one", async () => {
+		const { container } = render(
+			<AnimateIcon>
+				<IconWrapper icon={Probe} animateOnHover />
+			</AnimateIcon>,
+		);
+		await waitFor(() => expect(lastStarted()).toBe("initial"));
+		controls.start.mockClear();
 
-		expect(screen.getByTestId("plain").className).not.toContain(PLAIN_ICON_CLASS);
+		fireEvent.pointerEnter(container.querySelector('[data-slot="motion-slot"]') as HTMLElement, {
+			pointerType: "mouse",
+		});
+
+		await waitFor(() => expect(started()).toContain("animate"));
 	});
 });

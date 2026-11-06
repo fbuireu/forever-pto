@@ -434,7 +434,7 @@ export const HolidaysTable = ({ title, variant, open }: HolidaysTableProps) => {
 											);
 										})
 									) : (
-										<AnimateIcon animateOnView animateOnViewOnce asChild>
+										<AnimateIcon animateOnView asChild>
 											<TableRow>
 												<TableCell colSpan={6} className="h-24 text-center">
 													<div className="flex flex-col items-center gap-y-2 text-muted-foreground">

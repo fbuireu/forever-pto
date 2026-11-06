@@ -1,107 +1,27 @@
 "use client";
 
 import { m, type Variants } from "motion/react";
-import { type IconProps, IconWrapper, useAnimateIconContext, useVariants } from "./Icon";
+import { type IconProps, IconWrapper, useAnimateIconContext } from "./Icon";
 
-type ArrowDownProps = IconProps<keyof typeof animations>;
+type ArrowDownProps = IconProps;
 
-const animations = {
-	default: {
-		group: {
-			initial: {
-				y: 0,
-				transition: { ease: "easeInOut", duration: 0.3 },
-			},
-			animate: {
-				y: "25%",
-				transition: { ease: "easeInOut", duration: 0.3 },
-			},
+const variants = {
+	group: {
+		initial: {
+			y: 0,
+			transition: { ease: "easeInOut", duration: 0.3 },
 		},
-		path1: {},
-		path2: {},
-	} satisfies Record<string, Variants>,
-	"default-loop": {
-		group: {
-			initial: {
-				y: 0,
-			},
-			animate: {
-				y: [0, "25%", 0],
-				transition: { ease: "easeInOut", duration: 0.6 },
-			},
+		animate: {
+			y: "25%",
+			transition: { ease: "easeInOut", duration: 0.3 },
 		},
-		path1: {},
-		path2: {},
-	} satisfies Record<string, Variants>,
-	pointing: {
-		group: {},
-		path1: {
-			initial: {
-				d: "M12 5v14",
-				transition: { ease: "easeInOut", duration: 0.3 },
-			},
-			animate: {
-				d: "M12 5v10",
-				transition: { ease: "easeInOut", duration: 0.3 },
-			},
-		},
-		path2: {
-			initial: {
-				d: "m19 12-7 7-7-7",
-				transition: { ease: "easeInOut", duration: 0.3 },
-			},
-			animate: {
-				d: "m19 8.5-7 7-7-7",
-				transition: { ease: "easeInOut", duration: 0.3 },
-			},
-		},
-	} satisfies Record<string, Variants>,
-	"pointing-loop": {
-		group: {},
-		path1: {
-			initial: {
-				d: "M12 5v14",
-			},
-			animate: {
-				d: ["M12 5v14", "M12 5v10", "M12 5v14"],
-				transition: { ease: "easeInOut", duration: 0.6 },
-			},
-		},
-		path2: {
-			initial: {
-				d: "m19 12-7 7-7-7",
-			},
-			animate: {
-				d: ["m19 12-7 7-7-7", "m19 8.5-7 7-7-7", "m19 12-7 7-7-7"],
-				transition: { ease: "easeInOut", duration: 0.6 },
-			},
-		},
-	} satisfies Record<string, Variants>,
-	out: {
-		group: {
-			initial: {
-				y: 0,
-			},
-			animate: {
-				y: [0, "150%", "-150%", 0],
-				transition: {
-					default: { ease: "easeInOut", duration: 0.6 },
-					y: {
-						ease: "easeInOut",
-						duration: 0.6,
-						times: [0, 0.5, 0.5, 1],
-					},
-				},
-			},
-		},
-		path1: {},
-		path2: {},
-	} satisfies Record<string, Variants>,
-} as const;
+	},
+	path1: {},
+	path2: {},
+} satisfies Record<string, Variants>;
 
 function IconComponent({ size, ...props }: ArrowDownProps) {
 	const { controls } = useAnimateIconContext();
-	const variants = useVariants(animations);
 
 	return (
 		<m.svg

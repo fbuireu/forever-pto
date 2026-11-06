@@ -1,35 +1,32 @@
 "use client";
 
 import { m, type Variants } from "motion/react";
-import { type IconProps, IconWrapper, useAnimateIconContext, useVariants } from "./Icon";
+import { type IconProps, IconWrapper, useAnimateIconContext } from "./Icon";
 
-type CircleCheckBigProps = IconProps<keyof typeof animations>;
+type CircleCheckBigProps = IconProps;
 
-const animations = {
-	default: {
-		path1: {},
-		path2: {
-			initial: {
-				pathLength: 1,
-				opacity: 1,
-				scale: 1,
-			},
-			animate: {
-				pathLength: [0, 1],
-				opacity: [0, 1],
-				scale: [1, 1.1, 1],
-				transition: {
-					duration: 0.6,
-					ease: "easeInOut",
-				},
+const variants = {
+	path1: {},
+	path2: {
+		initial: {
+			pathLength: 1,
+			opacity: 1,
+			scale: 1,
+		},
+		animate: {
+			pathLength: [0, 1],
+			opacity: [0, 1],
+			scale: [1, 1.1, 1],
+			transition: {
+				duration: 0.6,
+				ease: "easeInOut",
 			},
 		},
-	} satisfies Record<string, Variants>,
-} as const;
+	},
+} satisfies Record<string, Variants>;
 
 function IconComponent({ size, ...props }: CircleCheckBigProps) {
 	const { controls } = useAnimateIconContext();
-	const variants = useVariants(animations);
 
 	return (
 		<m.svg

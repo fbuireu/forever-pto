@@ -1,103 +1,42 @@
 "use client";
 
 import { m, type Variants } from "motion/react";
-import { type IconProps, IconWrapper, useAnimateIconContext, useVariants } from "./Icon";
+import { type IconProps, IconWrapper, useAnimateIconContext } from "./Icon";
 
-type LockProps = IconProps<keyof typeof animations>;
+type LockProps = IconProps;
 
-const animations = {
-	default: {
-		group: {
-			initial: {
-				rotate: 0,
-				scale: 1,
-			},
-			animate: {
-				rotate: [0, -5, 7, 0],
-				scale: [1, 0.9, 1, 1],
-				transition: {
-					duration: 1.2,
-					ease: "easeInOut",
-				},
+const variants = {
+	group: {
+		initial: {
+			rotate: 0,
+			scale: 1,
+		},
+		animate: {
+			rotate: [0, -5, 7, 0],
+			scale: [1, 0.9, 1, 1],
+			transition: {
+				duration: 1.2,
+				ease: "easeInOut",
 			},
 		},
-		path: {
-			initial: {
-				pathLength: 1,
-			},
-			animate: {
-				pathLength: [1, 0.8, 1, 1],
-				transition: {
-					duration: 1.2,
-					ease: "easeInOut",
-				},
+	},
+	path: {
+		initial: {
+			pathLength: 1,
+		},
+		animate: {
+			pathLength: [1, 0.8, 1, 1],
+			transition: {
+				duration: 1.2,
+				ease: "easeInOut",
 			},
 		},
-		rect: {},
-	} satisfies Record<string, Variants>,
-	unlock: {
-		group: {
-			initial: {
-				rotate: 0,
-				scale: 1,
-			},
-			animate: {
-				rotate: [0, -5, 0],
-				scale: [1, 0.9, 1],
-				transition: {
-					duration: 0.6,
-					ease: "easeInOut",
-				},
-			},
-		},
-		path: {
-			initial: {
-				pathLength: 1,
-			},
-			animate: {
-				pathLength: 0.8,
-				transition: {
-					duration: 0.4,
-					ease: "easeInOut",
-				},
-			},
-		},
-		rect: {},
-	} satisfies Record<string, Variants>,
-	lock: {
-		group: {
-			initial: {
-				rotate: 0,
-				scale: 1,
-			},
-			animate: {
-				rotate: [0, 7, 0],
-				scale: [1, 0.9, 1],
-				transition: {
-					duration: 0.6,
-					ease: "easeInOut",
-				},
-			},
-		},
-		path: {
-			initial: {
-				pathLength: 0.8,
-			},
-			animate: {
-				pathLength: 1,
-				transition: {
-					duration: 0.4,
-					ease: "easeInOut",
-				},
-			},
-		},
-		rect: {},
-	} satisfies Record<string, Variants>,
-} as const;
+	},
+	rect: {},
+} satisfies Record<string, Variants>;
 
 function IconComponent({ size, ...props }: LockProps) {
 	const { controls } = useAnimateIconContext();
-	const variants = useVariants(animations);
 
 	return (
 		<m.svg

@@ -1,76 +1,35 @@
 "use client";
 
 import { m, type Variants } from "motion/react";
-import { type IconProps, IconWrapper, useAnimateIconContext, useVariants } from "./Icon";
+import { type IconProps, IconWrapper, useAnimateIconContext } from "./Icon";
 
-type PlusProps = IconProps<keyof typeof animations>;
+type PlusProps = IconProps;
 
-const animations = {
-	default: {
-		line1: {
-			initial: {
-				rotate: 0,
-				transition: { ease: "easeInOut", duration: 0.4, delay: 0.1 },
-			},
-			animate: {
-				rotate: 90,
-				transition: { ease: "easeInOut", duration: 0.4, delay: 0.1 },
-			},
+const variants = {
+	line1: {
+		initial: {
+			rotate: 0,
+			transition: { ease: "easeInOut", duration: 0.4, delay: 0.1 },
 		},
-		line2: {
-			initial: {
-				rotate: 0,
-				transition: { ease: "easeInOut", duration: 0.4 },
-			},
-			animate: {
-				rotate: 90,
-				transition: { ease: "easeInOut", duration: 0.4 },
-			},
+		animate: {
+			rotate: 90,
+			transition: { ease: "easeInOut", duration: 0.4, delay: 0.1 },
 		},
-	} satisfies Record<string, Variants>,
-	x: {
-		line1: {
-			initial: {
-				rotate: 0,
-				x1: 12,
-				y1: 19,
-				x2: 12,
-				y2: 5,
-				transition: { ease: "easeInOut", duration: 0.3, delay: 0.1 },
-			},
-			animate: {
-				rotate: 45,
-				x1: 12,
-				y1: 20.5,
-				x2: 12,
-				y2: 3.5,
-				transition: { ease: "easeInOut", duration: 0.3, delay: 0.1 },
-			},
+	},
+	line2: {
+		initial: {
+			rotate: 0,
+			transition: { ease: "easeInOut", duration: 0.4 },
 		},
-		line2: {
-			initial: {
-				rotate: 0,
-				x1: 5,
-				y1: 12,
-				x2: 19,
-				y2: 12,
-				transition: { ease: "easeInOut", duration: 0.3 },
-			},
-			animate: {
-				rotate: 45,
-				x1: 3.5,
-				y1: 12,
-				x2: 20.5,
-				y2: 12,
-				transition: { ease: "easeInOut", duration: 0.3 },
-			},
+		animate: {
+			rotate: 90,
+			transition: { ease: "easeInOut", duration: 0.4 },
 		},
-	} satisfies Record<string, Variants>,
-} as const;
+	},
+} satisfies Record<string, Variants>;
 
 function IconComponent({ size, ...props }: PlusProps) {
 	const { controls } = useAnimateIconContext();
-	const variants = useVariants(animations);
 
 	return (
 		<m.svg

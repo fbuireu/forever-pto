@@ -77,23 +77,19 @@ export const IconTriggersDemo = () => (
 				<code className="text-[11px] leading-none">animateOnHover</code>
 			</span>
 		</AnimateIcon>
-		<AnimateIcon animateOnHover animateOnTap>
+		<AnimateIcon animateOnTap>
 			<span className={`${TILE_CLASS} cursor-pointer`}>
-				<Star size={28} />
+				<Plus size={28} />
 				<code className="text-[11px] leading-none">animateOnTap</code>
 			</span>
 		</AnimateIcon>
-		<AnimateIcon animateOnView animateOnViewOnce loop>
-			<span className={TILE_CLASS}>
-				<Clock size={28} />
-				<code className="text-[11px] leading-none">animateOnView loop</code>
-			</span>
-		</AnimateIcon>
-		<AnimateIcon animateOnView animateOnViewOnce>
-			<span className={TILE_CLASS}>
-				<MapPin size={28} />
-				<code className="text-[11px] leading-none">animateOnView</code>
-			</span>
-		</AnimateIcon>
+		<span className={TILE_CLASS}>
+			<Star size={28} animateOnView loop />
+			<code className="text-[11px] leading-none">animateOnView loop</code>
+		</span>
+		<span className={TILE_CLASS}>
+			<CircleCheckBig size={28} animateOnView />
+			<code className="text-[11px] leading-none">animateOnView</code>
+		</span>
 	</Demo>
 );

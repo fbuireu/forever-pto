@@ -1,41 +1,38 @@
 "use client";
 
 import { m, type Variants } from "motion/react";
-import { type IconProps, IconWrapper, useAnimateIconContext, useVariants } from "./Icon";
+import { type IconProps, IconWrapper, useAnimateIconContext } from "./Icon";
 
-type ClockProps = IconProps<keyof typeof animations>;
+type ClockProps = IconProps;
 
-const animations = {
-	default: {
-		circle: {},
-		line1: {
-			initial: {
-				rotate: 0,
-				transition: { ease: "easeInOut", duration: 0.6 },
-			},
-			animate: {
-				transformOrigin: "top left",
-				rotate: [0, 20, 0],
-				transition: { ease: "easeInOut", duration: 0.6 },
-			},
+const variants = {
+	circle: {},
+	line1: {
+		initial: {
+			rotate: 0,
+			transition: { ease: "easeInOut", duration: 0.6 },
 		},
-		line2: {
-			initial: {
-				rotate: 0,
-				transition: { ease: "easeInOut", duration: 0.6 },
-			},
-			animate: {
-				transformOrigin: "bottom left",
-				rotate: 360,
-				transition: { ease: "easeInOut", duration: 0.6 },
-			},
+		animate: {
+			transformOrigin: "top left",
+			rotate: [0, 20, 0],
+			transition: { ease: "easeInOut", duration: 0.6 },
 		},
-	} satisfies Record<string, Variants>,
-} as const;
+	},
+	line2: {
+		initial: {
+			rotate: 0,
+			transition: { ease: "easeInOut", duration: 0.6 },
+		},
+		animate: {
+			transformOrigin: "bottom left",
+			rotate: 360,
+			transition: { ease: "easeInOut", duration: 0.6 },
+		},
+	},
+} satisfies Record<string, Variants>;
 
 function IconComponent({ size, ...props }: ClockProps) {
 	const { controls } = useAnimateIconContext();
-	const variants = useVariants(animations);
 
 	return (
 		<m.svg

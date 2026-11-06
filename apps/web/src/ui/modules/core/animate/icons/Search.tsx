@@ -1,45 +1,27 @@
 "use client";
 
 import { m, type Variants } from "motion/react";
-import { type IconProps, IconWrapper, useAnimateIconContext, useVariants } from "./Icon";
+import { type IconProps, IconWrapper, useAnimateIconContext } from "./Icon";
 
-type SearchProps = IconProps<keyof typeof animations>;
+type SearchProps = IconProps;
 
-const animations = {
-	default: {
-		group: {
-			initial: {
-				rotate: 0,
-			},
-			animate: {
-				transformOrigin: "bottom right",
-				rotate: [0, 17, -10, 5, -1, 0],
-				transition: { duration: 0.8, ease: "easeInOut" },
-			},
+const variants = {
+	group: {
+		initial: {
+			rotate: 0,
 		},
-		path: {},
-		circle: {},
-	} satisfies Record<string, Variants>,
-	find: {
-		group: {
-			initial: {
-				x: 0,
-				y: 0,
-			},
-			animate: {
-				x: [0, "-15%", 0, 0],
-				y: [0, 0, "-15%", 0],
-				transition: { duration: 1, ease: "easeInOut" },
-			},
+		animate: {
+			transformOrigin: "bottom right",
+			rotate: [0, 17, -10, 5, -1, 0],
+			transition: { duration: 0.8, ease: "easeInOut" },
 		},
-		path: {},
-		circle: {},
-	} satisfies Record<string, Variants>,
-} as const;
+	},
+	path: {},
+	circle: {},
+} satisfies Record<string, Variants>;
 
 function IconComponent({ size, ...props }: SearchProps) {
 	const { controls } = useAnimateIconContext();
-	const variants = useVariants(animations);
 
 	return (
 		<m.svg

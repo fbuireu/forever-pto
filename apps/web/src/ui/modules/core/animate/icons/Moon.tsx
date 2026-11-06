@@ -1,53 +1,32 @@
 "use client";
 
 import { m, type Variants } from "motion/react";
-import { type IconProps, IconWrapper, useAnimateIconContext, useVariants } from "./Icon";
+import { type IconProps, IconWrapper, useAnimateIconContext } from "./Icon";
 
-type MoonProps = IconProps<keyof typeof animations>;
+type MoonProps = IconProps;
 
-const animations = {
-	default: {
-		path: {
-			initial: {
-				rotate: 0,
-				transition: {
-					duration: 0.5,
-					ease: "easeInOut",
-				},
-			},
-			animate: {
-				rotate: [0, -30, 400, 360],
-				transition: {
-					duration: 1.2,
-					times: [0, 0.25, 0.75, 1],
-					ease: ["easeInOut", "easeInOut", "easeInOut"],
-				},
+const variants = {
+	path: {
+		initial: {
+			rotate: 0,
+			transition: {
+				duration: 0.5,
+				ease: "easeInOut",
 			},
 		},
-	} satisfies Record<string, Variants>,
-	balancing: {
-		path: {
-			initial: {
-				rotate: 0,
-				transition: {
-					duration: 0.5,
-					ease: "easeInOut",
-				},
-			},
-			animate: {
-				rotate: [0, -30, 25, -15, 10, -5, 0],
-				transition: {
-					duration: 1.2,
-					ease: "easeInOut",
-				},
+		animate: {
+			rotate: [0, -30, 400, 360],
+			transition: {
+				duration: 1.2,
+				times: [0, 0.25, 0.75, 1],
+				ease: ["easeInOut", "easeInOut", "easeInOut"],
 			},
 		},
-	} satisfies Record<string, Variants>,
-} as const;
+	},
+} satisfies Record<string, Variants>;
 
 function IconComponent({ size, ...props }: MoonProps) {
 	const { controls } = useAnimateIconContext();
-	const variants = useVariants(animations);
 
 	return (
 		<m.svg

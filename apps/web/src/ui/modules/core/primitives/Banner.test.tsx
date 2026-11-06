@@ -13,7 +13,7 @@ const IconStub = ({ className, "aria-hidden": ariaHidden }: IconStubProps) => (
 	<svg data-testid="banner-icon" className={className} aria-hidden={ariaHidden} />
 );
 
-const Icon = IconStub as ComponentType<IconProps<never>>;
+const Icon = IconStub as ComponentType<IconProps>;
 
 const renderBanner = (overrides: Partial<ComponentProps<typeof Banner>> = {}): RenderResult =>
 	render(

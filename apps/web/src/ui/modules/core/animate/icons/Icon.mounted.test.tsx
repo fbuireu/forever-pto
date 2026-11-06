@@ -5,7 +5,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AnimateIcon, useAnimateIconContext } from "./Icon";
 
 const FRAMES = 5;
-const LOOP_DELAY_MS = 10;
 
 const frames = async (): Promise<void> => {
 	for (let frame = 0; frame < FRAMES; frame++) await new Promise<void>((resolve) => setTimeout(resolve, 0));
@@ -26,6 +25,21 @@ const WatchControls = (): null => {
 		controls.start = (...args: Parameters<typeof controls.start>) => {
 			started(args[0]);
 			return start(...args);
+		};
+	}
+	return null;
+};
+
+const slowed = new WeakSet<object>();
+
+const SlowControls = (): null => {
+	const { controls } = useAnimateIconContext();
+	if (controls && !slowed.has(controls)) {
+		slowed.add(controls);
+		const start = controls.start.bind(controls);
+		controls.start = async (...args: Parameters<typeof controls.start>) => {
+			await start(...args);
+			await new Promise<void>((resolve) => setTimeout(resolve, FRAMES));
 		};
 	}
 	return null;
@@ -63,8 +77,8 @@ describe("AnimateIcon against motion's own controls", () => {
 	it("starts nothing on an icon that unmounted mid-loop", async () => {
 		const { unmount } = render(
 			inMotion(
-				<AnimateIcon animate loop loopDelay={LOOP_DELAY_MS}>
-					<span />
+				<AnimateIcon animate loop>
+					<SlowControls />
 				</AnimateIcon>,
 			),
 		);

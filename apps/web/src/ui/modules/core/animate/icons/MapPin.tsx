@@ -1,67 +1,34 @@
 "use client";
 
 import { m, type Variants } from "motion/react";
-import { type IconProps, IconWrapper, useAnimateIconContext, useVariants } from "./Icon";
+import { type IconProps, IconWrapper, useAnimateIconContext } from "./Icon";
 
-type MapPinProps = IconProps<keyof typeof animations>;
+type MapPinProps = IconProps;
 
-const animations = {
-	default: {
-		group: {
-			initial: {
-				scale: 1,
-				rotate: 0,
-				x: 0,
-				y: 0,
-				transformOrigin: "bottom center",
-			},
-			animate: {
-				scale: [1, 0.75, 1, 1],
-				rotate: [0, 30, -15, 0],
-				x: [0, 0, 0, 0],
-				y: [0, -6, 0, 0],
-				transformOrigin: "bottom center",
-				transition: { ease: "easeInOut", duration: 1 },
-			},
+const variants = {
+	group: {
+		initial: {
+			scale: 1,
+			rotate: 0,
+			x: 0,
+			y: 0,
+			transformOrigin: "bottom center",
 		},
-		circle: {},
-		path: {},
-	} satisfies Record<string, Variants>,
-	wiggle: {
-		group: {
-			initial: {
-				rotate: 0,
-				transformOrigin: "bottom center",
-			},
-			animate: {
-				rotate: [0, 12, -10, 0],
-				transformOrigin: "bottom center",
-				transition: { ease: "easeInOut", duration: 1 },
-			},
+		animate: {
+			scale: [1, 0.75, 1, 1],
+			rotate: [0, 30, -15, 0],
+			x: [0, 0, 0, 0],
+			y: [0, -6, 0, 0],
+			transformOrigin: "bottom center",
+			transition: { ease: "easeInOut", duration: 1 },
 		},
-		circle: {},
-		path: {},
-	} satisfies Record<string, Variants>,
-	rotate: {
-		group: {
-			initial: {
-				transform: "rotate3d(0, 1, 0, 0deg)",
-				perspective: 600,
-			},
-			animate: {
-				transform: "rotate3d(0, 1, 0, 360deg)",
-				perspective: 600,
-				transition: { ease: "easeInOut", duration: 0.7 },
-			},
-		},
-		circle: {},
-		path: {},
-	} satisfies Record<string, Variants>,
-} as const;
+	},
+	circle: {},
+	path: {},
+} satisfies Record<string, Variants>;
 
 function IconComponent({ size, ...props }: MapPinProps) {
 	const { controls } = useAnimateIconContext();
-	const variants = useVariants(animations);
 
 	return (
 		<m.svg

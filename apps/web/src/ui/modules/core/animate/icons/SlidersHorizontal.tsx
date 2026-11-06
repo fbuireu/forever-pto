@@ -1,134 +1,63 @@
 "use client";
 
 import { m, type Variants } from "motion/react";
-import { type IconProps, IconWrapper, useAnimateIconContext, useVariants } from "./Icon";
+import { type IconProps, IconWrapper, useAnimateIconContext } from "./Icon";
 
-type SlidersHorizontalProps = IconProps<keyof typeof animations>;
+type SlidersHorizontalProps = IconProps;
 
-const animations = {
-	default: {
-		line1: {
-			initial: { x2: 10 },
-			animate: { x2: 4, transition: { ease: "easeInOut", duration: 0.4 } },
+const variants = {
+	line1: {
+		initial: { x2: 10 },
+		animate: { x2: 4, transition: { ease: "easeInOut", duration: 0.4 } },
+	},
+	line2: {
+		initial: { x1: 14, x2: 14 },
+		animate: {
+			x1: 8,
+			x2: 8,
+			transition: { ease: "easeInOut", duration: 0.4 },
 		},
-		line2: {
-			initial: { x1: 14, x2: 14 },
-			animate: {
-				x1: 8,
-				x2: 8,
-				transition: { ease: "easeInOut", duration: 0.4 },
-			},
+	},
+	line3: {
+		initial: { x1: 14 },
+		animate: { x1: 8, transition: { ease: "easeInOut", duration: 0.4 } },
+	},
+	line4: {
+		initial: { x2: 8 },
+		animate: { x2: 16, transition: { ease: "easeInOut", duration: 0.4 } },
+	},
+	line5: {
+		initial: { x1: 8, x2: 8 },
+		animate: {
+			x1: 16,
+			x2: 16,
+			transition: { ease: "easeInOut", duration: 0.4 },
 		},
-		line3: {
-			initial: { x1: 14 },
-			animate: { x1: 8, transition: { ease: "easeInOut", duration: 0.4 } },
+	},
+	line6: {
+		initial: { x1: 12 },
+		animate: { x1: 20, transition: { ease: "easeInOut", duration: 0.4 } },
+	},
+	line7: {
+		initial: { x2: 12 },
+		animate: { x2: 7, transition: { ease: "easeInOut", duration: 0.4 } },
+	},
+	line8: {
+		initial: { x1: 16, x2: 16 },
+		animate: {
+			x1: 11,
+			x2: 11,
+			transition: { ease: "easeInOut", duration: 0.4 },
 		},
-		line4: {
-			initial: { x2: 8 },
-			animate: { x2: 16, transition: { ease: "easeInOut", duration: 0.4 } },
-		},
-		line5: {
-			initial: { x1: 8, x2: 8 },
-			animate: {
-				x1: 16,
-				x2: 16,
-				transition: { ease: "easeInOut", duration: 0.4 },
-			},
-		},
-		line6: {
-			initial: { x1: 12 },
-			animate: { x1: 20, transition: { ease: "easeInOut", duration: 0.4 } },
-		},
-		line7: {
-			initial: { x2: 12 },
-			animate: { x2: 7, transition: { ease: "easeInOut", duration: 0.4 } },
-		},
-		line8: {
-			initial: { x1: 16, x2: 16 },
-			animate: {
-				x1: 11,
-				x2: 11,
-				transition: { ease: "easeInOut", duration: 0.4 },
-			},
-		},
-		line9: {
-			initial: { x1: 16 },
-			animate: { x1: 11, transition: { ease: "easeInOut", duration: 0.4 } },
-		},
-	} satisfies Record<string, Variants>,
-	"default-loop": {
-		line1: {
-			initial: { x2: 10 },
-			animate: {
-				x2: [10, 4, 10],
-				transition: { ease: "easeInOut", duration: 0.8 },
-			},
-		},
-		line2: {
-			initial: { x1: 14, x2: 14 },
-			animate: {
-				x1: [14, 8, 14],
-				x2: [14, 8, 14],
-				transition: { ease: "easeInOut", duration: 0.8 },
-			},
-		},
-		line3: {
-			initial: { x1: 14 },
-			animate: {
-				x1: [14, 8, 14],
-				transition: { ease: "easeInOut", duration: 0.8 },
-			},
-		},
-		line4: {
-			initial: { x2: 8 },
-			animate: {
-				x2: [8, 16, 8],
-				transition: { ease: "easeInOut", duration: 0.8 },
-			},
-		},
-		line5: {
-			initial: { x1: 8, x2: 8 },
-			animate: {
-				x1: [8, 16, 8],
-				x2: [8, 16, 8],
-				transition: { ease: "easeInOut", duration: 0.8 },
-			},
-		},
-		line6: {
-			initial: { x1: 12 },
-			animate: {
-				x1: [12, 20, 12],
-				transition: { ease: "easeInOut", duration: 0.8 },
-			},
-		},
-		line7: {
-			initial: { x2: 12 },
-			animate: {
-				x2: [12, 7, 12],
-				transition: { ease: "easeInOut", duration: 0.8 },
-			},
-		},
-		line8: {
-			initial: { x1: 16, x2: 16 },
-			animate: {
-				x1: [16, 11, 16],
-				x2: [16, 11, 16],
-				transition: { ease: "easeInOut", duration: 0.8 },
-			},
-		},
-		line9: {
-			initial: { x1: 16 },
-			animate: {
-				x1: [16, 11, 16],
-				transition: { ease: "easeInOut", duration: 0.8 },
-			},
-		},
-	} satisfies Record<string, Variants>,
-} as const;
+	},
+	line9: {
+		initial: { x1: 16 },
+		animate: { x1: 11, transition: { ease: "easeInOut", duration: 0.4 } },
+	},
+} satisfies Record<string, Variants>;
 
 function IconComponent({ size, ...props }: SlidersHorizontalProps) {
 	const { controls } = useAnimateIconContext();
-	const variants = useVariants(animations);
 
 	return (
 		<m.svg

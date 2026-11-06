@@ -1,39 +1,25 @@
 "use client";
 
 import { m, type Variants } from "motion/react";
-import { type IconProps, IconWrapper, useAnimateIconContext, useVariants } from "./Icon";
+import { type IconProps, IconWrapper, useAnimateIconContext } from "./Icon";
 
-type ChevronLeftProps = IconProps<keyof typeof animations>;
+type ChevronLeftProps = IconProps;
 
-const animations = {
-	default: {
-		path: {
-			initial: {
-				x: 0,
-				transition: { duration: 0.3, ease: "easeInOut" },
-			},
-			animate: {
-				x: -4,
-				transition: { duration: 0.3, ease: "easeInOut" },
-			},
+const variants = {
+	path: {
+		initial: {
+			x: 0,
+			transition: { duration: 0.3, ease: "easeInOut" },
 		},
-	} satisfies Record<string, Variants>,
-	"default-loop": {
-		path: {
-			initial: {
-				x: 0,
-			},
-			animate: {
-				x: [0, -4, 0],
-				transition: { duration: 0.6, ease: "easeInOut" },
-			},
+		animate: {
+			x: -4,
+			transition: { duration: 0.3, ease: "easeInOut" },
 		},
-	} satisfies Record<string, Variants>,
-} as const;
+	},
+} satisfies Record<string, Variants>;
 
 function IconComponent({ size, ...props }: ChevronLeftProps) {
 	const { controls } = useAnimateIconContext();
-	const variants = useVariants(animations);
 
 	return (
 		<m.svg

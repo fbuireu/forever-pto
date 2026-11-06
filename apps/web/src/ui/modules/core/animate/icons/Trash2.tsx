@@ -1,70 +1,67 @@
 "use client";
 
 import { m, type Variants } from "motion/react";
-import { type IconProps, IconWrapper, useAnimateIconContext, useVariants } from "./Icon";
+import { type IconProps, IconWrapper, useAnimateIconContext } from "./Icon";
 
-type Trash2Props = IconProps<keyof typeof animations>;
+type Trash2Props = IconProps;
 
-const animations = {
-	default: {
-		group: {
-			initial: {
-				y: 0,
-			},
-			animate: {
-				y: -1,
-				transition: {
-					duration: 0.3,
-					ease: "easeInOut",
-				},
+const variants = {
+	group: {
+		initial: {
+			y: 0,
+		},
+		animate: {
+			y: -1,
+			transition: {
+				duration: 0.3,
+				ease: "easeInOut",
 			},
 		},
-		path1: {},
-		path2: {},
-		path3: {
-			initial: {
-				y: 0,
-				d: "M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6",
-			},
-			animate: {
-				y: 1,
-				d: "M19 8v12c0 1-1 2-2 2H7c-1 0-2-1-2-2V8",
-				transition: {
-					duration: 0.3,
-					ease: "easeInOut",
-				},
+	},
+	path1: {},
+	path2: {},
+	path3: {
+		initial: {
+			y: 0,
+			d: "M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6",
+		},
+		animate: {
+			y: 1,
+			d: "M19 8v12c0 1-1 2-2 2H7c-1 0-2-1-2-2V8",
+			transition: {
+				duration: 0.3,
+				ease: "easeInOut",
 			},
 		},
-		line1: {
-			initial: {
-				y: 0,
-			},
-			animate: {
-				y: 1,
-				transition: {
-					duration: 0.3,
-					ease: "easeInOut",
-				},
+	},
+	line1: {
+		initial: {
+			y: 0,
+		},
+		animate: {
+			y: 1,
+			transition: {
+				duration: 0.3,
+				ease: "easeInOut",
 			},
 		},
-		line2: {
-			initial: {
-				y: 0,
-			},
-			animate: {
-				y: 1,
-				transition: {
-					duration: 0.3,
-					ease: "easeInOut",
-				},
+	},
+	line2: {
+		initial: {
+			y: 0,
+		},
+		animate: {
+			y: 1,
+			transition: {
+				duration: 0.3,
+				ease: "easeInOut",
 			},
 		},
-	} satisfies Record<string, Variants>,
-} as const;
+	},
+} satisfies Record<string, Variants>;
 
 function IconComponent({ size, ...props }: Trash2Props) {
 	const { controls } = useAnimateIconContext();
-	const variants = useVariants(animations);
 
 	return (
 		<m.svg

@@ -1,29 +1,26 @@
 "use client";
 
 import { m, type Variants } from "motion/react";
-import { type IconProps, IconWrapper, useAnimateIconContext, useVariants } from "./Icon";
+import { type IconProps, IconWrapper, useAnimateIconContext } from "./Icon";
 
-type PanelLeftProps = IconProps<keyof typeof animations>;
+type PanelLeftProps = IconProps;
 
-const animations = {
-	default: {
-		rect: {},
-		line: {
-			initial: { x1: 9, y1: 3, x2: 9, y2: 21 },
-			animate: {
-				x1: 7,
-				y1: 3,
-				x2: 7,
-				y2: 21,
-				transition: { type: "spring", damping: 20, stiffness: 200 },
-			},
+const variants = {
+	rect: {},
+	line: {
+		initial: { x1: 9, y1: 3, x2: 9, y2: 21 },
+		animate: {
+			x1: 7,
+			y1: 3,
+			x2: 7,
+			y2: 21,
+			transition: { type: "spring", damping: 20, stiffness: 200 },
 		},
-	} satisfies Record<string, Variants>,
-} as const;
+	},
+} satisfies Record<string, Variants>;
 
 function IconComponent({ size, ...props }: PanelLeftProps) {
 	const { controls } = useAnimateIconContext();
-	const variants = useVariants(animations);
 
 	return (
 		<m.svg

@@ -4,7 +4,7 @@ import type { ComponentType, ReactNode } from "react";
 import type { IconProps } from "../animate/icons/Icon";
 
 interface BannerProps {
-	icon: LucideIcon | ComponentType<IconProps<never>>;
+	icon: LucideIcon | ComponentType<IconProps>;
 	title: string;
 	children: ReactNode;
 	action?: ReactNode;
