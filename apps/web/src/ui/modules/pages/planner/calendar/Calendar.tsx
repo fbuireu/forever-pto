@@ -27,6 +27,7 @@ import { getCalendarDays } from "../utils/helpers";
 import {
 	getPreviewRange,
 	isCustom as isCustomFn,
+	isEffectiveStretch,
 	isHoliday,
 	isInRange,
 	isPast,
@@ -36,6 +37,7 @@ import {
 	isSelected,
 	isToday,
 } from "../utils/modifiers";
+import { EffectiveDaysBand } from "./EffectiveDaysBand";
 import { getDayClassNames, getDayStateLabelKeys, isFromToObject } from "./utils/helpers";
 
 export interface FromTo {
@@ -147,6 +149,9 @@ export const Calendar = memo(function Calendar({
 		const isSelectedModifier =
 			mode === CalendarSelectionMode.RANGE ? isRangeSelected(rangeSelection) : isSelected(selectedDates);
 
+		const isPlacedFn = (date: Date) => (dayStates.suggested?.(date) ?? false) || (dayStates.manual?.(date) ?? false);
+		const isOffFn = (date: Date) => isWeekend(date) || holidayFn(date) || isPlacedFn(date);
+
 		const baseModifiers = {
 			weekend: isWeekend,
 			holiday: holidayFn,
@@ -157,6 +162,7 @@ export const Calendar = memo(function Calendar({
 			disabled: isPastFn,
 			selected: isSelectedModifier,
 			manual: dayStates.manual,
+			effective: isEffectiveStretch({ isOff: isOffFn, isPlaced: isPlacedFn }),
 		};
 
 		return {
@@ -186,6 +192,14 @@ export const Calendar = memo(function Calendar({
 	const calendarDays = useMemo(
 		() => getCalendarDays({ month: currentMonth, weekStartsOn, fixedWeeks }),
 		[currentMonth, weekStartsOn, fixedWeeks],
+	);
+
+	const stretchDays = useMemo(
+		() =>
+			calendarDays.map(
+				(day) => (showOutsideDays || isSameMonth({ a: day, b: currentMonth })) && modifiers.effective(day),
+			),
+		[calendarDays, showOutsideDays, currentMonth, modifiers],
 	);
 
 	const holidaysMap = useMemo(() => {
@@ -294,12 +308,12 @@ export const Calendar = memo(function Calendar({
 	return (
 		<div
 			className={cn(
-				"calendar-container w-fit select-none bg-card z-1 rounded-[14px] border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-md)] overflow-hidden [content-visibility:auto] [contain-intrinsic-block-size:340px]",
+				"calendar-container w-fit select-none bg-card z-1 rounded-[14px] border-2 border-[var(--frame)] overflow-hidden [content-visibility:auto] [contain-intrinsic-block-size:340px]",
 				className,
 			)}
 			{...props}
 		>
-			<div className="flex items-center justify-between border-b-[3px] border-[var(--frame)] bg-[var(--surface-panel-alt)] px-3 py-2">
+			<div className="flex items-center justify-between border-b-2 border-[var(--frame)] bg-[var(--surface-panel-alt)] px-3 py-2">
 				<div className="flex items-center gap-3">
 					{showNavigation && (
 						<AnimateIcon animateOnHover>
@@ -308,7 +322,7 @@ export const Calendar = memo(function Calendar({
 								type="button"
 								size="sm"
 								onClick={handlePreviousMonth}
-								className="size-8 p-0 bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-xs)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+								className="size-8 p-0 bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] border-2 border-[var(--frame)] shadow-[var(--shadow-brutal-xs)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
 								aria-label={tCalendar("previousMonth")}
 							>
 								<ChevronLeft className="size-4" />
@@ -318,7 +332,7 @@ export const Calendar = memo(function Calendar({
 					<h3 className="text-sm font-semibold">
 						{monthParts.map(({ type, value }) =>
 							type === "year" ? (
-								<span key={`${type}:${value}`} className="font-serif">
+								<span key={`${type}:${value}`} className="font-normal text-muted-foreground">
 									{value}
 								</span>
 							) : (
@@ -351,7 +365,7 @@ export const Calendar = memo(function Calendar({
 									type="button"
 									size="sm"
 									onClick={handleNextMonth}
-									className="size-8 p-0 bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] border-[3px] border-[var(--frame)] shadow-[var(--shadow-brutal-xs)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+									className="size-8 p-0 bg-[var(--color-brand-yellow)] text-[var(--color-brand-ink)] border-2 border-[var(--frame)] shadow-[var(--shadow-brutal-xs)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-sm)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
 									aria-label={tCalendar("nextMonth")}
 								>
 									<ChevronRight className="size-4" />
@@ -374,7 +388,7 @@ export const Calendar = memo(function Calendar({
 			</div>
 
 			<div className="grid grid-cols-7 gap-2 px-4 pb-4">
-				{calendarDays.map((date) => {
+				{calendarDays.map((date, position) => {
 					const isPastDay = modifiers.disabled(date);
 					const isManualDay = modifiers.manual?.(date) ?? false;
 					const isSuggestedDay = modifiers.suggested?.(date) ?? false;
@@ -386,6 +400,7 @@ export const Calendar = memo(function Calendar({
 						return <div key={date.toISOString()} className="size-8" />;
 					}
 
+					const isStretchDay = stretchDays[position] === true;
 					const holidayName = holidaysMap.get(date.toDateString());
 					const isTodayDay = modifiers.today?.(date) ?? false;
 					const dayName = [
@@ -406,7 +421,8 @@ export const Calendar = memo(function Calendar({
 					});
 
 					return (
-						<div key={date.toISOString()} className="relative size-8 p-0">
+						<div key={date.toISOString()} className="relative isolate size-8 p-0">
+							<EffectiveDaysBand stretch={stretchDays} position={position} />
 							<ConditionalWrapper
 								doWrap={!!holidayName}
 								wrapper={(children) => (
@@ -420,7 +436,14 @@ export const Calendar = memo(function Calendar({
 							>
 								<Button
 									type="button"
-									className={cn(baseClasses)}
+									className={cn(
+										baseClasses,
+										isStretchDay &&
+											!isSuggestedDay &&
+											!isManualDay &&
+											!modifiers.holiday(date) &&
+											"bg-transparent text-[var(--highlighter-ink)]",
+									)}
 									variant="ghost"
 									onClick={() => handleDayClick(date)}
 									onMouseEnter={() => handleDayHover(date)}

@@ -92,12 +92,12 @@ describe("Calendar header", () => {
 		},
 	);
 
-	it("sets the year apart in the serif face, and nothing else", () => {
+	it("sets the year apart in the muted regular weight, and nothing else", () => {
 		const { container } = renderCalendar({ locale: "es" });
 
-		const serif = container.querySelectorAll("h3 .font-serif");
+		const year = container.querySelectorAll("h3 .font-normal");
 
-		expect(Array.from(serif).map((node) => node.textContent)).toEqual(["2026"]);
+		expect(Array.from(year).map((node) => node.textContent)).toEqual(["2026"]);
 	});
 
 	it("lets showNavigation decide only whether the month controls render", () => {
@@ -183,6 +183,28 @@ describe("Calendar day states", () => {
 	});
 });
 
+describe("Calendar effective stretch", () => {
+	const isTheFifth = (date: Date) => date.getDate() === 5 && date.getMonth() === 5;
+
+	it("lays one highlighter band under each Free Day of a stretch a placed day reaches, joined across the row", () => {
+		const { container } = renderCalendar({ dayStates: { suggested: isTheFifth } });
+
+		const bands = Array.from(container.querySelectorAll('[data-slot="effective-stretch"]'));
+
+		expect(bands).toHaveLength(3);
+		expect(bands[0]?.className).toContain("rounded-l-[11px]");
+		expect(bands[0]?.className).toContain("-right-1");
+		expect(bands[2]?.className).toContain("-left-1");
+		expect(bands.every((band) => band.getAttribute("aria-hidden") === "true")).toBe(true);
+	});
+
+	it("lays no band when nothing is placed", () => {
+		const { container } = renderCalendar({});
+
+		expect(container.querySelectorAll('[data-slot="effective-stretch"]')).toHaveLength(0);
+	});
+});
+
 describe("Calendar day state in the accessible tree", () => {
 	const isTheFifth = (date: Date) => date.getDate() === 5 && date.getMonth() === 5;
 	const isTheEighth = (date: Date) => date.getDate() === 8 && date.getMonth() === 5;
@@ -194,8 +216,12 @@ describe("Calendar day state in the accessible tree", () => {
 	it("names the plan state the colour carries, so a Suggestion is not a teal square and nothing else", () => {
 		renderCalendar({ dayStates: { suggested: isTheFifth, manual: isTheEighth } });
 
-		expect(screen.getByRole("button", { name: `Friday, June 5, 2026, ${en.legend.suggested}` })).toBeTruthy();
-		expect(screen.getByRole("button", { name: `Monday, June 8, 2026, ${en.legend.manual}` })).toBeTruthy();
+		expect(
+			screen.getByRole("button", { name: `Friday, June 5, 2026, ${en.legend.suggested}, ${en.legend.effective}` }),
+		).toBeTruthy();
+		expect(
+			screen.getByRole("button", { name: `Monday, June 8, 2026, ${en.legend.manual}, ${en.legend.effective}` }),
+		).toBeTruthy();
 	});
 
 	it("appends the state after the Holiday name rather than replacing it", () => {

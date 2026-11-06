@@ -186,7 +186,7 @@ function MenuButton({ item, isActive, onActivate, menuButtonConfig }: MenuButton
 					width: iconSize,
 					transform: `translateX(${translateX}px)`,
 				}}
-				animateOnHover={animateOnHover}
+				{...(animateOnHover !== undefined && { animateOnHover })}
 			/>
 			<m.span
 				variants={LABEL_VARIANTS}

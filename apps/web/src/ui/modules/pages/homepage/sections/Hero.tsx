@@ -1,10 +1,12 @@
-import { getWeekdayNames } from "@application/shared/utils/dates";
+import { dayIndex, fromDayIndex, getWeekdayNames } from "@application/shared/utils/dates";
 import { QuickStartSource } from "@application/stores/ui";
 import { LOCALES, type LocaleCode } from "@infrastructure/i18n/locales";
 import { Badge } from "@ui/modules/core/primitives/Badge";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { FlagIcon } from "@ui/modules/core/primitives/FlagIcon";
+import { EffectiveDaysBand } from "@ui/modules/pages/planner/calendar/EffectiveDaysBand";
 import { MODIFIERS_CLASS_NAMES } from "@ui/modules/pages/planner/calendar/utils/helpers";
+import { isEffectiveStretch } from "@ui/modules/pages/planner/utils/modifiers";
 import { QuickStartTrigger } from "@ui/modules/shared/QuickStartTrigger";
 import { cn } from "@ui/utils/cn";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
@@ -14,19 +16,35 @@ import { CAL_ENTRIES, type DayType, SHOWCASE_EFFICIENCY, SHOWCASE_PLAN } from ".
 const LOCALE_FLAG: Partial<Record<LocaleCode, string>> = { en: "gb", ca: "es-ct" };
 
 const HERO_DAY_CLASS: Record<DayType, string> = {
-	work: "bg-card border-[2px] border-[var(--frame)]/15 rounded-lg",
+	work: "text-foreground",
 	pto: MODIFIERS_CLASS_NAMES.suggested,
 	holiday: MODIFIERS_CLASS_NAMES.holiday,
-	weekend:
-		"rounded-lg bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,var(--card)_82%)] text-muted-foreground border-[2px] border-[var(--frame)]/20",
+	weekend: MODIFIERS_CLASS_NAMES.weekend,
 };
+
+const entryOn = (date: Date) => CAL_ENTRIES[dayIndex(date)];
+
+const inEffectiveStretch = isEffectiveStretch({
+	isOff: (date) => {
+		const type = entryOn(date)?.type;
+		return type !== undefined && type !== "work";
+	},
+	isPlaced: (date) => entryOn(date)?.type === "pto",
+});
+
+const HERO_STRETCH = CAL_ENTRIES.map((_, position) => inEffectiveStretch(fromDayIndex(position)));
 
 const SOCIAL_PROOF_RATING = 4.9;
 const SOCIAL_PROOF_USERS = 12847;
 
 export const Hero = async () => {
-	const [t, locale, format] = await Promise.all([getTranslations("homepage"), getLocale(), getFormatter()]);
-	const DAY_HEADERS = getWeekdayNames({ locale, weekStartsOn: 1, format: "narrow" }).map((label, index) => ({
+	const [t, tLegend, locale, format] = await Promise.all([
+		getTranslations("homepage"),
+		getTranslations("legend"),
+		getLocale(),
+		getFormatter(),
+	]);
+	const DAY_HEADERS = getWeekdayNames({ locale, weekStartsOn: 1 }).map((label, index) => ({
 		id: `day-${index}`,
 		label,
 	}));
@@ -123,9 +141,9 @@ export const Hero = async () => {
 										<div className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-1">
 											{label}
 										</div>
-										<div className="font-display font-extrabold text-[28px] leading-none flex items-center gap-1">
+										<div className="font-display font-extrabold text-[28px] leading-none flex flex-wrap items-center gap-x-2 gap-y-1">
 											{value}
-											<span className="text-[14px] font-semibold text-muted-foreground ml-1">{unit}</span>
+											<span className="text-[14px] font-semibold text-muted-foreground whitespace-nowrap">{unit}</span>
 										</div>
 									</div>
 								))}
@@ -141,21 +159,27 @@ export const Hero = async () => {
 								<div className="mt-2 font-serif italic text-[18px]">{t("hero.mockupQuote")}</div>
 							</div>
 
-							<div className="mt-4 grid grid-cols-7 gap-1">
+							<div className="mt-4 grid grid-cols-7 gap-2">
 								{DAY_HEADERS.map(({ id, label }) => (
-									<div key={id} className="text-center font-mono text-[10px] font-bold py-1 text-muted-foreground">
+									<div
+										key={id}
+										className="py-1 text-center text-[0.68rem] font-black uppercase tracking-[0.08em] text-muted-foreground"
+									>
 										{label}
 									</div>
 								))}
-								{CAL_ENTRIES.map(({ id, type }) => (
-									<div
-										key={id}
-										className={cn(
-											HERO_DAY_CLASS[type],
-											"aspect-square flex items-center justify-center font-mono text-[11px] font-bold shadow-none",
-										)}
-									>
-										{type === "pto" ? "✈" : type === "holiday" ? "★" : ""}
+								{CAL_ENTRIES.map(({ id, type }, position) => (
+									<div key={id} className="relative isolate aspect-square">
+										<EffectiveDaysBand stretch={HERO_STRETCH} position={position} />
+										<div
+											className={cn(
+												"relative flex size-full items-center justify-center rounded-lg font-medium text-sm tabular-nums",
+												HERO_DAY_CLASS[type],
+												HERO_STRETCH[position] && type === "weekend" && "bg-transparent text-[var(--highlighter-ink)]",
+											)}
+										>
+											{position + 1}
+										</div>
 									</div>
 								))}
 							</div>
@@ -172,6 +196,10 @@ export const Hero = async () => {
 										<span>{label}</span>
 									</div>
 								))}
+								<div className="flex items-center gap-2 text-[11px]">
+									<div className="size-8 shrink-0 rounded-[11px] bg-highlighter" />
+									<span>{tLegend("effective")}</span>
+								</div>
 							</div>
 						</div>
 					</div>

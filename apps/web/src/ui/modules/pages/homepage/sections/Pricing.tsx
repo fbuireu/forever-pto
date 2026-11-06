@@ -69,9 +69,8 @@ export const Pricing = async () => {
 				<div
 					className={cn(
 						brutCard,
-						"p-8 relative hit-area-stable-tilt rotate-[-1deg] transition-all duration-75 hover:rotate-0 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-9)]",
+						"p-8 relative hit-area-stable-tilt rotate-[-1deg] transition-all duration-75 hover:rotate-0 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-9)] bg-[var(--accent)] text-[var(--color-brand-ink)]",
 					)}
-					style={{ background: "var(--accent)", color: "var(--color-brand-ink)" }}
 				>
 					<div className="absolute -top-4 right-[22px] bg-[var(--frame)] text-[var(--background)] font-mono font-bold text-[12px] uppercase tracking-[0.08em] px-3 py-1.5 rounded-[6px] rotate-[4deg]">
 						{t("pricing.popularBadge")}

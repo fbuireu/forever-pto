@@ -33,9 +33,8 @@ export const Features = async () => {
 				<div
 					className={cn(
 						brutCard,
-						"md:col-span-4 p-7 hit-area-stable transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]",
+						"md:col-span-4 p-7 hit-area-stable transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)] bg-[var(--accent)] text-[var(--color-brand-ink)]",
 					)}
-					style={{ background: "var(--accent)", color: "var(--color-brand-ink)" }}
 				>
 					<span className="inline-block px-2.5 py-1 bg-[var(--surface-panel)] text-foreground border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold uppercase tracking-[0.08em] shadow-[var(--shadow-brutal-xs)]">
 						{t("features.bridgeTag")}
@@ -77,9 +76,8 @@ export const Features = async () => {
 				<div
 					className={cn(
 						brutCard,
-						"md:col-span-2 p-7 hit-area-stable transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]",
+						"md:col-span-2 p-7 hit-area-stable transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)] bg-[var(--color-brand-teal)]",
 					)}
-					style={{ background: "var(--color-brand-teal)" }}
 				>
 					<span className="inline-block px-2.5 py-1 bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[6px] text-[12px] font-semibold uppercase tracking-[0.08em] shadow-[var(--shadow-brutal-xs)]">
 						{t("features.syncTag")}
@@ -119,11 +117,10 @@ export const Features = async () => {
 						].map(({ key, alert }) => (
 							<span
 								key={key}
-								className="border-[2.5px] border-[var(--frame)] rounded-[6px] px-2 py-1 font-mono text-[12px] font-semibold"
-								style={{
-									background: alert ? "var(--destructive)" : "var(--background)",
-									color: alert ? "var(--on-fill)" : "inherit",
-								}}
+								className={cn(
+									"border-[2.5px] border-[var(--frame)] rounded-[6px] px-2 py-1 font-mono text-[12px] font-semibold",
+									alert ? "bg-[var(--destructive)] text-on-fill" : "bg-[var(--background)]",
+								)}
 							>
 								{t(key)}
 							</span>
@@ -134,9 +131,8 @@ export const Features = async () => {
 				<div
 					className={cn(
 						brutCard,
-						"md:col-span-2 p-7 hit-area-stable transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]",
+						"md:col-span-2 p-7 hit-area-stable transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)] bg-[var(--color-brand-orange)]",
 					)}
-					style={{ background: "var(--color-brand-orange)" }}
 				>
 					<span className="inline-block px-2.5 py-1 bg-[var(--surface-panel)] border-[3px] border-[var(--frame)] rounded-[6px] font-mono text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--frame)] shadow-[var(--shadow-brutal-xs)]">
 						{t("features.countriesTag", { count: COUNTRY_COUNT })}
@@ -164,9 +160,8 @@ export const Features = async () => {
 				<div
 					className={cn(
 						brutCard,
-						"md:col-span-6 p-7 hit-area-stable transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)]",
+						"md:col-span-6 p-7 hit-area-stable transition-all duration-75 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-brutal-btn-hover)] bg-[var(--frame)] text-[var(--background)]",
 					)}
-					style={{ background: "var(--frame)", color: "var(--background)" }}
 				>
 					<span className="inline-block px-2.5 py-1 bg-[var(--accent)] border-[2.5px] border-[var(--background)] rounded-[6px] font-mono text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--color-brand-ink)] shadow-[var(--shadow-brutal-xs-inverted)]">
 						{t("features.privacyTag")}

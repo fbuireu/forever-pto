@@ -6,6 +6,7 @@ import {
 	getPreviewRange,
 	isAlternative,
 	isCustom,
+	isEffectiveStretch,
 	isHoliday,
 	isInRange,
 	isManual,
@@ -184,5 +185,54 @@ describe("the range family", () => {
 			false,
 		);
 		expect(getPreviewRange({ range: { from: TUESDAY }, isSelectingTo: true })(WEDNESDAY)).toBe(false);
+	});
+});
+
+describe("isEffectiveStretch", () => {
+	const day = (date: number) => new Date(2027, 2, date);
+	const isWeekend = (date: Date) => date.getDay() === 0 || date.getDay() === 6;
+	const holiday = day(26);
+	const placed = [day(22), day(23), day(24), day(25)];
+	const isPlaced = (date: Date) => placed.some((pto) => pto.getTime() === date.getTime());
+	const isOff = (date: Date) => isWeekend(date) || date.getTime() === holiday.getTime() || isPlaced(date);
+
+	it("marks every Free Day of a stretch that holds a placed day, the weekends around it included", () => {
+		const isEffective = isEffectiveStretch({ isOff, isPlaced });
+
+		expect([20, 21, 22, 23, 24, 25, 26, 27, 28].map((date) => isEffective(day(date)))).toEqual(
+			Array.from({ length: 9 }, () => true),
+		);
+	});
+
+	it("leaves a Workday, and a weekend no placed day reaches, unmarked", () => {
+		const isEffective = isEffectiveStretch({ isOff, isPlaced });
+
+		expect(isEffective(day(19))).toBe(false);
+		expect(isEffective(day(29))).toBe(false);
+		expect(isEffective(day(13))).toBe(false);
+		expect(isEffective(day(14))).toBe(false);
+	});
+
+	it("answers a later day of a stretch it has already walked without walking it again", () => {
+		const reads: number[] = [];
+		const isEffective = isEffectiveStretch({
+			isOff: (date) => {
+				reads.push(date.getDate());
+				return isOff(date);
+			},
+			isPlaced,
+		});
+
+		isEffective(day(22));
+		const walked = reads.length;
+		isEffective(day(27));
+
+		expect(reads.length).toBe(walked);
+	});
+
+	it("marks nothing when no day is placed", () => {
+		const isEffective = isEffectiveStretch({ isOff: isWeekend, isPlaced: () => false });
+
+		expect(isEffective(day(20))).toBe(false);
 	});
 });

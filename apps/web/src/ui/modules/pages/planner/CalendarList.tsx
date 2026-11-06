@@ -165,7 +165,7 @@ export const CalendarList = () => {
 					<Calendar
 						key={month.toISOString()}
 						mode={CalendarSelectionMode.NONE}
-						className="rounded-[14px] border-[3px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-md)] [content-visibility:auto] [contain-intrinsic-block-size:310px]"
+						className="rounded-[14px] border-2 border-[var(--frame)] bg-card [content-visibility:auto] [contain-intrinsic-block-size:310px]"
 						initialMonth={month}
 						weekStartsOn={1}
 						locale={locale}

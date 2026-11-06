@@ -45,6 +45,10 @@ export const LegendItems = ({ className, itemClassName }: LegendItemsProps) => {
 				<div className={cn("mr-2 size-8", MODIFIERS_CLASS_NAMES.custom)} />
 				<span>{t("custom")}</span>
 			</div>
+			<div className={cn("flex items-center", itemClassName)}>
+				<div className="mr-2 size-8 rounded-[11px] bg-highlighter" />
+				<span>{t("effective")}</span>
+			</div>
 		</div>
 	);
 };

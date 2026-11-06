@@ -90,12 +90,13 @@ interface TimelineRowData {
 }
 
 const ROW_COLOR = {
-	national: "bg-[var(--color-brand-yellow)]",
-	regional: "bg-[var(--color-brand-yellow)]",
-	custom: "bg-day-custom",
+	national: "bg-day-holiday",
+	regional: "bg-day-holiday",
+	custom: "bg-day-holiday outline-2 outline-dashed outline-day-custom-ring -outline-offset-2",
 	pto: "bg-[var(--color-brand-teal)]",
-	bridges: "bg-[var(--color-brand-orange)]",
-	manual: "bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,var(--color-brand-teal)_82%)]",
+	bridges: "bg-highlighter",
+	manual:
+		"bg-[var(--color-brand-teal)] [background-image:repeating-linear-gradient(-45deg,transparent,transparent_3px,var(--stripe-manual)_3px,var(--stripe-manual)_6px)]",
 } satisfies Record<TimelineRow, string>;
 
 export const YearTimelineChart = memo(function YearTimelineChart({

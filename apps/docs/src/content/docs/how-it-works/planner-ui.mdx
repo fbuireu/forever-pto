@@ -112,15 +112,19 @@ Every day cell is painted from one table, `MODIFIERS_CLASS_NAMES` in `apps/web/s
 
 | State | Predicate | Colour language |
 | --- | --- | --- |
-| Weekend | `isWeekend` | Soft panel, faint frame |
-| Holiday | `isHoliday` | Brand yellow gradient, hard shadow |
-| Custom Holiday | `isCustom` | Purple hatch |
-| Suggested Day | `isSuggestion`, minus Removed Days | Brand teal |
-| Alternative preview | `isAlternative` for the previewed index | Orange hatch, pulsing |
-| Manual Day | `isManual` | Teal-purple hatch |
-| Today | `isToday` | Ink, flips to yellow on hover |
+| Weekend | `isWeekend` | The muted wash, muted numerals |
+| Holiday | `isHoliday` | Solid ink tile, white numerals (a cream tile with ink numerals in dark) |
+| Custom Holiday | `isCustom` | The Holiday tile with a yellow dashed inner ring |
+| Suggested Day | `isSuggestion`, minus Removed Days | Brand teal, ink numerals |
+| Alternative preview | `isAlternative` for the previewed index | Yellow wash, ink hatch, dashed ink border, pulsing |
+| Manual Day | `isManual` | Brand teal with an inset ink ring and ink hatch |
+| Today | `isToday` | The card face with an inset frame ring, flips to yellow on hover |
 
-Each cell also carries `aria-label` text built from `DAY_STATE_LABELS`, so a screen reader hears "suggested" or "manual" where a sighted user sees a colour.
+A day cell has no border and no shadow at rest; the shadow arrives on hover, because a day is something the user can press. The month's name is set in the heading weight and its year in the regular weight and the muted foreground. The Legend's swatches read the same classes, so they stand flat too: a swatch is a key, not a control.
+
+Over the cells, `Calendar` lays the **highlighter** under every stretch of Effective Days: a run of consecutive Free Days and placed PTO Days that holds at least one Suggested or Manual Day. `isEffectiveStretch` in `apps/web/src/ui/modules/pages/planner/utils/modifiers.ts` decides membership from the same predicates the cells are painted with, so the band follows a hand edit the moment it lands. `EffectiveDaysBand` (`apps/web/src/ui/modules/pages/planner/calendar/EffectiveDaysBand.tsx`) draws a `bg-highlighter` span (`data-slot="effective-stretch"`) behind each member day's button, joined to its neighbours across a week row and rounded where the row or the stretch ends; a weekend inside the stretch turns transparent so the band shows through it, while Holidays and PTO Days keep their own fills on top. The Legend carries an *Effective days* entry for it. The homepage hero's mock-up draws its showcase month the same way, with the same component, the same `isEffectiveStretch` and the same day classes, so the screen it advertises is the screen the planner shows.
+
+Each cell also carries `aria-label` text built from `DAY_STATE_LABELS`, so a screen reader hears "suggested", "manual" or "effective days" where a sighted user sees a colour or the band.
 
 ## The sticky panel
 

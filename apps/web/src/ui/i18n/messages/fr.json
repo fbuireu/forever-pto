@@ -377,7 +377,8 @@
 		"suggested": "Suggérés",
 		"alternatives": "Alternatives",
 		"manual": "Manuel",
-		"custom": "Personnalisés"
+		"custom": "Personnalisés",
+		"effective": "Jours effectifs"
 	},
 	"calendarExport": {
 		"title": "Exporter le calendrier",

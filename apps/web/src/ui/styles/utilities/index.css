@@ -52,3 +52,11 @@
 		color: var(--accent-foreground);
 	}
 }
+
+@utility highlighter {
+	color: var(--highlighter-ink);
+	background-image: linear-gradient(transparent 12%, var(--highlighter) 12%, var(--highlighter) 90%, transparent 90%);
+	padding-inline: 0.08em;
+	box-decoration-break: clone;
+	-webkit-box-decoration-break: clone;
+}

@@ -377,7 +377,8 @@
 		"suggested": "Vorgeschlagen",
 		"alternatives": "Alternativen",
 		"manual": "Manuell",
-		"custom": "Eigene"
+		"custom": "Eigene",
+		"effective": "Effektive Tage"
 	},
 	"calendarExport": {
 		"title": "Kalender exportieren",

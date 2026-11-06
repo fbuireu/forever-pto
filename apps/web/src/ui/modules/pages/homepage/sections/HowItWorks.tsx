@@ -8,24 +8,24 @@ export const HowItWorks = async () => {
 	const steps = [
 		{
 			num: "1",
-			bg: "var(--color-brand-yellow)",
-			iconBg: "var(--color-brand-orange)",
+			bg: "bg-[var(--color-brand-yellow)]",
+			iconBg: "bg-[var(--color-brand-orange)]",
 			icon: "📥",
 			title: t("how.inputDaysTitle"),
 			desc: t("how.inputDaysDescription"),
 		},
 		{
 			num: "2",
-			bg: "var(--color-brand-teal)",
-			iconBg: "var(--color-brand-sky)",
+			bg: "bg-[var(--color-brand-teal)]",
+			iconBg: "bg-[var(--color-brand-sky)]",
 			icon: "🧮",
 			title: t("how.engineTitle"),
 			desc: t("how.engineDescription"),
 		},
 		{
 			num: "3",
-			bg: "var(--color-brand-purple)",
-			iconBg: "var(--color-brand-pink)",
+			bg: "bg-[var(--color-brand-purple)]",
+			iconBg: "bg-[var(--color-brand-pink)]",
 			icon: "📤",
 			title: t("how.exportTitle"),
 			desc: t("how.exportDescription"),
@@ -54,14 +54,18 @@ export const HowItWorks = async () => {
 						)}
 					>
 						<div
-							className="absolute -top-7 left-[22px] size-14 border-[4px] border-[var(--frame)] rounded-full grid place-items-center font-display font-extrabold text-[26px] shadow-[var(--shadow-brutal-sm)] text-[var(--color-brand-ink)]"
-							style={{ background: bg }}
+							className={cn(
+								"absolute -top-7 left-[22px] size-14 border-[4px] border-[var(--frame)] rounded-full grid place-items-center font-display font-extrabold text-[26px] shadow-[var(--shadow-brutal-sm)] text-[var(--color-brand-ink)]",
+								bg,
+							)}
 						>
 							{num}
 						</div>
 						<div
-							className="size-16 border-[3px] border-[var(--frame)] rounded-[10px] grid place-items-center text-[32px] mb-4 mt-4 shadow-[var(--shadow-brutal-3)]"
-							style={{ background: iconBg }}
+							className={cn(
+								"size-16 border-[3px] border-[var(--frame)] rounded-[10px] grid place-items-center text-[32px] mb-4 mt-4 shadow-[var(--shadow-brutal-3)]",
+								iconBg,
+							)}
 						>
 							{icon}
 						</div>

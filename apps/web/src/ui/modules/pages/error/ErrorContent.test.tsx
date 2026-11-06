@@ -176,7 +176,9 @@ describe("the terminal the page types out", () => {
 		renderError();
 
 		revealEverything();
-		const levels = [...terminal().querySelectorAll("span[style]")].map((span) => span.textContent?.trim());
+		const levels = [...terminal().querySelectorAll("span[data-level]")]
+			.filter((span) => /(?<![\w-])text-\[var\(--[\w-]+\)\]/.test(span.className))
+			.map((span) => span.textContent?.trim());
 
 		expect(levels).toContain("WARN");
 		expect(levels).toContain("ERROR");

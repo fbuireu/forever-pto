@@ -4,6 +4,7 @@ import { logClientError } from "@application/shared/utils/clientLog";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { MAIN_CONTENT_ID } from "@ui/modules/layout/SkipToContent";
 import { LazyContactModal } from "@ui/modules/shared/contact/LazyContactModal";
+import { cn } from "@ui/utils/cn";
 import { ArrowUpRight, RotateCcw } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
@@ -18,15 +19,15 @@ type ErrorContentProps = ErrorBoundaryProps;
 
 type LogLevel = "INFO" | "WARN" | "ERROR" | "OK";
 
-const LEVEL_COLORS: Record<LogLevel, string> = {
-	INFO: "var(--color-brand-teal)",
-	WARN: "var(--color-brand-yellow)",
-	ERROR: "var(--color-brand-red)",
-	OK: "var(--color-brand-green)",
+const LEVEL_CLASS: Record<LogLevel, string> = {
+	INFO: "text-[var(--color-brand-teal)]",
+	WARN: "text-[var(--color-brand-yellow)]",
+	ERROR: "text-[var(--color-brand-red)]",
+	OK: "text-[var(--color-brand-green)]",
 };
 
 const isLogLevel = (value: string | undefined): value is LogLevel =>
-	value !== undefined && Object.hasOwn(LEVEL_COLORS, value);
+	value !== undefined && Object.hasOwn(LEVEL_CLASS, value);
 
 const LOG_LINE_REGEX = /^(\[\d{2}:\d{2}:\d{2}\])\s+(INFO|WARN|ERROR|OK)\s+(.*)$/;
 
@@ -42,8 +43,8 @@ function TerminalLine({ line }: TerminalLineProps) {
 			<div>
 				<span className="text-terminal-dim">{ts} </span>
 				<span
-					className="font-bold inline-block min-w-[3.5em]"
-					style={{ color: isLogLevel(level) ? LEVEL_COLORS[level] : undefined }}
+					data-level={level}
+					className={cn("font-bold inline-block min-w-[3.5em]", isLogLevel(level) && LEVEL_CLASS[level])}
 				>
 					{level}
 				</span>
@@ -147,15 +148,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
 			<main
 				id={MAIN_CONTENT_ID}
 				data-testid="error-boundary"
-				className="flex-1 py-[60px]"
-				style={{
-					background: [
-						"linear-gradient(0deg, transparent 95%, var(--grid-color) 95%)",
-						"linear-gradient(90deg, transparent 95%, var(--grid-color) 95%)",
-						"var(--background)",
-					].join(", "),
-					backgroundSize: "32px 32px",
-				}}
+				className="flex-1 py-[60px] bg-background bg-[linear-gradient(0deg,transparent_95%,var(--grid-color)_95%),linear-gradient(90deg,transparent_95%,var(--grid-color)_95%)] bg-size-[32px_32px]"
 			>
 				<div className="max-w-[1320px] mx-auto grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-[60px] px-7 items-center">
 					<div className="flex flex-col">

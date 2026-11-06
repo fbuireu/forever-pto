@@ -66,8 +66,12 @@ describe("RadialNav", () => {
 	});
 
 	it("asks the icon of an item that animates on hover to animate, and passes nothing to one that does not", () => {
-		const HoverProbe = ({ animateOnHover }: { animateOnHover?: boolean }) => (
-			<svg data-testid="probe" data-animate-on-hover={String(animateOnHover)} />
+		const HoverProbe = (props: { animateOnHover?: boolean }) => (
+			<svg
+				data-testid="probe"
+				data-animate-on-hover={String(props.animateOnHover)}
+				data-has-prop={String("animateOnHover" in props)}
+			/>
 		);
 		const { getAllByTestId } = render(
 			<RadialNav
@@ -77,8 +81,23 @@ describe("RadialNav", () => {
 				]}
 			/>,
 		);
+		const probes = getAllByTestId("probe");
 
-		expect(getAllByTestId("probe").map((probe) => probe.dataset.animateOnHover)).toEqual(["true", "undefined"]);
+		expect(probes.map((probe) => probe.dataset.animateOnHover)).toEqual(["true", "undefined"]);
+		expect(probes.map((probe) => probe.dataset.hasProp)).toEqual(["true", "false"]);
+	});
+
+	it("hands a static icon no animateOnHover, so React has no unknown prop to warn about on its svg", () => {
+		const errors = vi.spyOn(console, "error").mockImplementation(() => {});
+		const StaticIcon = (props: { className?: string }) => <svg data-testid="static" {...props} />;
+
+		try {
+			render(<RadialNav items={[{ id: 1, icon: StaticIcon, label: "Still", angle: 0 }]} />);
+
+			expect(errors.mock.calls.flat().join(" ")).not.toContain("animateOnHover");
+		} finally {
+			errors.mockRestore();
+		}
 	});
 
 	it("renders a button for each item", () => {

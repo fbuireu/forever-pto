@@ -1,5 +1,5 @@
 import { type HolidayDTO, HolidayVariant } from "@application/dto/holiday/types";
-import { dayIndex, isBefore, isSameDay, startOfDay } from "@application/shared/utils/dates";
+import { dayIndex, fromDayIndex, isBefore, isSameDay, startOfDay } from "@application/shared/utils/dates";
 import type { HolidaysState } from "@application/stores/holidays";
 import type { Suggestion } from "@domain/calendar/types";
 import type { FromTo } from "../calendar/Calendar";
@@ -137,3 +137,40 @@ export const getPreviewRange =
 
 		return date >= minDate && date <= maxDate;
 	};
+
+const STRETCH_REACH = 31;
+
+interface IsEffectiveStretchParams {
+	isOff: (date: Date) => boolean;
+	isPlaced: (date: Date) => boolean;
+}
+
+export const isEffectiveStretch = ({ isOff, isPlaced }: IsEffectiveStretchParams): ((date: Date) => boolean) => {
+	const known = new Map<number, boolean>();
+
+	return (date: Date) => {
+		const index = dayIndex(date);
+		const cached = known.get(index);
+		if (cached !== undefined) return cached;
+
+		if (!isOff(date)) {
+			known.set(index, false);
+			return false;
+		}
+
+		const stretch: number[] = [index];
+		let placed = isPlaced(date);
+		for (const direction of [-1, 1]) {
+			for (let step = 1; step <= STRETCH_REACH; step += 1) {
+				const neighbour = index + direction * step;
+				const day = fromDayIndex(neighbour);
+				if (!isOff(day)) break;
+				stretch.push(neighbour);
+				placed ||= isPlaced(day);
+			}
+		}
+
+		for (const member of stretch) known.set(member, placed);
+		return placed;
+	};
+};

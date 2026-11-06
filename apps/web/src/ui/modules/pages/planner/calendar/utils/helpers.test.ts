@@ -122,9 +122,11 @@ describe("getDayClassNames month and past-day handling", () => {
 });
 
 describe("the text of a day on a brand fill", () => {
-	const BRAND_FILLED = ["holiday", "suggested", "alternative", "custom", "manual"] as const;
+	const BRAND_FILLED = ["suggested", "alternative", "manual"] as const;
+	const HOLIDAY_FILLED = ["holiday", "custom"] as const;
 	const INK = "text-[var(--color-brand-ink)]";
-	const TEXT_COLOUR = /(?<![\w-])text-\[var\(--[\w-]+\)\]/g;
+	const HOLIDAY_INK = "text-day-holiday-ink";
+	const TEXT_COLOUR = /(?<![\w-])text-(?:\[var\(--[\w-]+\)\]|day-[\w-]+)/g;
 
 	it.each(BRAND_FILLED)(
 		"reads a %s day in the ink token, which both themes keep, whatever colour the page inherits",
@@ -132,6 +134,10 @@ describe("the text of a day on a brand fill", () => {
 			expect(MODIFIERS_CLASS_NAMES[name].match(TEXT_COLOUR)).toEqual([INK]);
 		},
 	);
+
+	it.each(HOLIDAY_FILLED)("reads a %s day in the holiday ink, which flips with the holiday fill", (name) => {
+		expect(MODIFIERS_CLASS_NAMES[name].match(TEXT_COLOUR)).toEqual([HOLIDAY_INK]);
+	});
 
 	it("gives every brand-filled day the same ink, so a Manual Day reads like a Suggested one", () => {
 		const inks = BRAND_FILLED.map((name) => MODIFIERS_CLASS_NAMES[name].match(TEXT_COLOUR)?.[0]);

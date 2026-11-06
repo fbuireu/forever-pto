@@ -76,7 +76,7 @@ export const PremiumFeature = ({
 					}
 				}}
 			>
-				<div style={{ filter: "blur(4px)" }} aria-hidden="true" inert>
+				<div className="blur-[4px]" aria-hidden="true" inert>
 					{children}
 				</div>
 				<div

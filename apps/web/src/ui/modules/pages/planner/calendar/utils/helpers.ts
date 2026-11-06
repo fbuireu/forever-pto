@@ -11,22 +11,21 @@ interface GetDayClassNamesParams {
 }
 
 export const MODIFIERS_CLASS_NAMES = {
-	weekend:
-		"rounded-lg text-muted-foreground bg-[var(--surface-panel-soft)] hover:bg-[var(--surface-panel-alt)] transition-colors border-[2px] border-[var(--frame)]/15 shadow-[var(--shadow-brutal-xs)]",
+	weekend: "rounded-lg bg-day-weekend text-day-weekend-ink transition-colors",
 	holiday:
-		"rounded-lg bg-[image:var(--holiday-fill)] text-[var(--color-brand-ink)] hover:brightness-105 font-black transition-[background-color,box-shadow] duration-200 border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)]",
+		"rounded-lg bg-day-holiday text-day-holiday-ink font-black transition-[background-color,box-shadow] duration-200",
 	suggested:
-		"rounded-lg bg-[var(--color-brand-teal)] hover:brightness-105 text-[var(--color-brand-ink)] font-black transition-[background-color,box-shadow] duration-200 border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)]",
+		"rounded-lg bg-[var(--color-brand-teal)] text-[var(--color-brand-ink)] font-black transition-[background-color,box-shadow] duration-200",
 	alternative:
-		"rounded-lg bg-day-alternative text-[var(--color-brand-ink)] font-black animate-pulse border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] transition-[background-color,box-shadow,opacity] duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_4px,var(--stripe-alternative)_4px,var(--stripe-alternative)_8px)]",
+		"rounded-lg bg-day-alternative text-[var(--color-brand-ink)] font-black animate-pulse border-2 border-dashed border-[var(--color-brand-ink)] transition-[background-color,box-shadow,opacity] duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_4px,var(--stripe-alternative)_4px,var(--stripe-alternative)_8px)]",
 	custom:
-		"rounded-lg bg-day-custom text-[var(--color-brand-ink)] font-black border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] transition-[background-color,box-shadow,opacity] duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_4px,var(--stripe-custom)_4px,var(--stripe-custom)_8px)]",
+		"rounded-lg bg-day-holiday text-day-holiday-ink font-black outline-2 outline-dashed outline-day-custom-ring -outline-offset-4 transition-[background-color,box-shadow,opacity] duration-200",
 	manual:
-		"rounded-lg bg-[color-mix(in_srgb,var(--color-brand-purple)_18%,var(--color-brand-teal)_82%)] text-[var(--color-brand-ink)] font-black border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] transition-[background-color,box-shadow,opacity] duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_4px,var(--stripe-manual)_4px,var(--stripe-manual)_8px)]",
+		"rounded-lg bg-[var(--color-brand-teal)] text-[var(--color-brand-ink)] font-black shadow-[inset_0_0_0_2px_var(--color-brand-ink)] transition-[background-color,box-shadow,opacity] duration-200 [background-image:repeating-linear-gradient(-45deg,transparent,transparent_4px,var(--stripe-manual)_4px,var(--stripe-manual)_8px)]",
 	selected:
-		"rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground font-black border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] transition-[background-color,box-shadow] duration-200",
+		"rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground font-black transition-[background-color,box-shadow] duration-200",
 	today:
-		"rounded-lg bg-[var(--color-brand-ink)] hover:bg-[var(--color-brand-yellow)] text-on-fill hover:text-[var(--color-brand-ink)] font-black border-[2px] border-[var(--frame)] shadow-[var(--shadow-brutal-sm)] ring-offset-1 ring-offset-background transition-[background-color,box-shadow] duration-200",
+		"rounded-lg bg-card text-foreground hover:bg-[var(--color-brand-yellow)] hover:text-[var(--color-brand-ink)] font-black shadow-[inset_0_0_0_2px_var(--frame)] transition-[background-color,box-shadow] duration-200",
 	inRange: "rounded-lg bg-primary/12",
 	rangeStart:
 		"rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground font-black",
@@ -44,6 +43,7 @@ export const DAY_STATE_LABELS = [
 	{ modifier: "suggested", labelKey: "suggested" },
 	{ modifier: "alternative", labelKey: "alternatives" },
 	{ modifier: "custom", labelKey: "custom" },
+	{ modifier: "effective", labelKey: "effective" },
 ] as const;
 
 export type DayStateLabelKey = (typeof DAY_STATE_LABELS)[number]["labelKey"];

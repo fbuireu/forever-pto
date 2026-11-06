@@ -377,7 +377,8 @@
 		"suggested": "Suggerits",
 		"alternatives": "Alternatives",
 		"manual": "Manual",
-		"custom": "Personalitzat"
+		"custom": "Personalitzat",
+		"effective": "Dies efectius"
 	},
 	"calendarExport": {
 		"title": "Exporta el calendari",
