@@ -362,8 +362,7 @@ payment, because it does neither itself: that ordering lives in the operation an
 
 Every module with behaviour has a co-located `.test.ts`, with these exceptions: types and constants only
 ([`workers/types.ts`](./workers/types.ts), [`services/holidays/source/types.ts`](./services/holidays/source/types.ts));
-a test double ([`services/holidays/source/fixture.ts`](./services/holidays/source/fixture.ts), the second adapter
-at the `HolidaySource` seam, exercised by every test that uses it); and modules exercised only through a
+and modules exercised only through a
 neighbour's test: [`logging/contract.ts`](./logging/contract.ts) through `logger.test.ts`,
 [`services/holidays/source/observedHolidays.ts`](./services/holidays/source/observedHolidays.ts) and
 [`services/holidays/source/cachedObservedHolidays.ts`](./services/holidays/source/cachedObservedHolidays.ts)

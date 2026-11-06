@@ -58,7 +58,7 @@ describe("fetchRegions", () => {
 		vi.mocked(getRegions).mockReturnValueOnce(MOCK_REGIONS);
 
 		await useLocationStore.getState().fetchRegions("ES");
-		expect(getRegions).toHaveBeenCalledWith({ countryCode: "ES" });
+		expect(getRegions).toHaveBeenCalledWith("ES");
 		expect(useLocationStore.getState().regions).toEqual(MOCK_REGIONS);
 	});
 

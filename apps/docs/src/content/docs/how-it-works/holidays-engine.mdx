@@ -18,9 +18,7 @@ config:
 flowchart LR
   ST[holidays store<br/>fetchHolidays] -->|dynamic import| GH[getHolidays]
   GH --> OBS[observedHolidays]
-  OBS --> SRC{HolidaySource}
-  SRC -->|production| DH[dateHolidaysSource<br/>new Holidays country, region]
-  SRC -->|tests| FX[createFixtureHolidaySource]
+  OBS --> DH[dateHolidaysSource<br/>new Holidays country, region]
   DH --> RAW[national + regional RawHoliday, year and year + 1]
   RAW --> NW[keepNonWorking<br/>type ∈ public, bank]
   NW --> STAMP[stampRegion on the regional list]
@@ -70,19 +68,19 @@ sequenceDiagram
 
 `getHolidays` in `apps/web/src/infrastructure/services/holidays/getHolidays.ts` is the whole public API: `getHolidays({ year, country, carryOverMonths, region, locale })` returns a `Promise<HolidayDTO[]>`. Without a `country` it answers `[]` at once, which is the normal first call rather than an error: the planner renders before a Country has been detected or chosen.
 
-The production adapter, `dateHolidaysSource` in `apps/web/src/infrastructure/services/holidays/source/dateHolidays.ts`, is the **only** place in the app that constructs the `date-holidays` package. It looks up the chosen year **and the next one**, because Carry-over Months reach into it, and it does so twice: once for the Country alone and once for the Country plus Region. The locale is passed as `languages: [locale]`, so the names come back translated where the package has a translation.
+The source, `dateHolidaysSource` in `apps/web/src/infrastructure/services/holidays/source/dateHolidays.ts`, is the **only** place in the app that constructs the `date-holidays` package. It looks up the chosen year **and the next one**, because Carry-over Months reach into it, and it does so twice: once for the Country alone and once for the Country plus Region. The locale is passed as `languages: [locale]`, so the names come back translated where the package has a translation.
 
 It runs in the browser. The only caller is `fetchHolidays` in the [holidays store](/how-it-works/state-stores/), through a dynamic `import()`, so the package and its data ship in the client bundle and a lookup is a synchronous library call, offline-capable and free of any network round trip. That is a consequence of [ADR 0001](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0001-planner-runs-in-the-browser.md), and it means nothing in this folder may touch a Node or Cloudflare API.
 
-## The rules, above the seam
+## The rules, above the source
 
-The adapter returns raw lookups and nothing else; the rules run **above** it, in `observedHolidays` (`apps/web/src/infrastructure/services/holidays/source/observedHolidays.ts`), so the test adapter goes through exactly the same ones:
+The source returns raw lookups and nothing else; the rules run **above** it, in `observedHolidays` (`apps/web/src/infrastructure/services/holidays/source/observedHolidays.ts`):
 
 1. **Only days the user does not work count.** The package classifies every entry with a `type`, and only `public` and `bank` mean the user does not work (`keepNonWorking` in `apps/web/src/infrastructure/services/holidays/source/utils/nonWorking.ts`). Observances, school holidays and optional days are discarded here and never reach the planner.
 2. **Regional entries are stamped.** `stampRegion` writes the Region code onto each entry of the regional lookup as `location`, which is what later tells National from Regional.
 3. **The Region overrides the Country.** `resolveObservedHolidays` (`apps/web/src/infrastructure/services/holidays/source/utils/observed.ts`) lets a Region's calendar add Holidays the Country does not have **and drop** national ones it does not observe, which is the difference between "Region as a filter" and "Region as a calendar".
 
-The rules run above the seam, so the fixture adapter goes through them too: a rule inside the production adapter alone would leave the fixture hand-writing the filtered shape, and deleting the rule would leave the end-to-end test green.
+The rules run above the source, so a test that swaps plain data in for it still goes through them: a rule inside the source would leave the fixture hand-writing the filtered shape, and deleting the rule would leave the end-to-end test green.
 
 ## The shape
 

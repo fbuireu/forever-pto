@@ -5,8 +5,6 @@ import { getRegions } from "@infrastructure/services/regions/getRegions";
 import { Effect } from "effect";
 import type { Locale } from "next-intl";
 import { cachedObservedHolidays } from "./source/cachedObservedHolidays";
-import { dateHolidaysSource } from "./source/dateHolidays";
-import type { HolidaySource } from "./source/types";
 
 export interface GetHolidaysParams {
 	year: number;
@@ -14,7 +12,6 @@ export interface GetHolidaysParams {
 	carryOverMonths: number;
 	region?: string;
 	locale: Locale;
-	source?: HolidaySource;
 }
 
 export async function getHolidays({
@@ -23,15 +20,14 @@ export async function getHolidays({
 	region,
 	locale,
 	carryOverMonths,
-	source = dateHolidaysSource,
 }: GetHolidaysParams): Promise<HolidayDTO[]> {
 	if (!country) return [];
 
-	const regions = getRegions({ countryCode: country, source });
+	const regions = getRegions(country);
 
 	const program = Effect.try(() =>
 		holidayDTO.create({
-			raw: cachedObservedHolidays({ source, lookup: { country, region, year, locale } }),
+			raw: cachedObservedHolidays({ country, region, year, locale }),
 			params: { year, carryOverMonths, regions },
 		}),
 	).pipe(

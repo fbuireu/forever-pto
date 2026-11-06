@@ -1,6 +1,5 @@
 import { EN, LOCALES } from "@infrastructure/i18n/locales";
 import { getCountries } from "@infrastructure/services/countries/getCountries";
-import { dateHolidaysSource } from "@infrastructure/services/holidays/source/dateHolidays";
 import { observedHolidays } from "@infrastructure/services/holidays/source/observedHolidays";
 import { describe, expect, it } from "vitest";
 import { COUNTRY_COUNT } from "./shared";
@@ -8,7 +7,7 @@ import { COUNTRY_COUNT } from "./shared";
 const CALENDAR_YEAR = 2026;
 
 const hasCalendar = (country: string): boolean =>
-	observedHolidays({ source: dateHolidaysSource, lookup: { country, year: CALENDAR_YEAR, locale: EN } }).length > 0;
+	observedHolidays({ country, year: CALENDAR_YEAR, locale: EN }).length > 0;
 
 describe("COUNTRY_COUNT", () => {
 	it("is the number of Countries the selector offers that the Holiday source has a calendar for, so a library update that moves either list fails here", () => {

@@ -1,25 +1,19 @@
 import type { RawHoliday } from "@application/dto/holiday/types";
 import { observedHolidays } from "./observedHolidays";
-import type { HolidayLookup, HolidaySource } from "./types";
+import type { HolidayLookup } from "./types";
 
 interface LastLookup {
 	key: string;
-	source: HolidaySource;
 	raw: RawHoliday[];
 }
 
 let lastLookup: LastLookup | null = null;
 
-interface CachedObservedHolidaysParams {
-	source: HolidaySource;
-	lookup: HolidayLookup;
-}
-
-export const cachedObservedHolidays = ({ source, lookup }: CachedObservedHolidaysParams): RawHoliday[] => {
+export const cachedObservedHolidays = (lookup: HolidayLookup): RawHoliday[] => {
 	const key = [lookup.country, lookup.region ?? "", lookup.year, lookup.locale].join("|");
-	if (lastLookup?.key === key && lastLookup.source === source) return lastLookup.raw;
+	if (lastLookup?.key === key) return lastLookup.raw;
 
-	const raw = observedHolidays({ source, lookup });
-	lastLookup = { key, source, raw };
+	const raw = observedHolidays(lookup);
+	lastLookup = { key, raw };
 	return raw;
 };

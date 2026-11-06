@@ -2,16 +2,37 @@ import type { RawHoliday } from "@application/dto/holiday/types";
 import { EN } from "@infrastructure/i18n/locales";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { GetHolidaysParams } from "./getHolidays";
-import { createFixtureHolidaySource } from "./source/fixture";
-import type { HolidaySource } from "./source/types";
+import type { HolidayLookup } from "./source/types";
 
-const { mockLogError } = vi.hoisted(() => ({ mockLogError: vi.fn() }));
+const { mockLogError, source } = vi.hoisted(() => ({
+	mockLogError: vi.fn(),
+	source: {
+		rawHolidays: vi.fn<(lookup: HolidayLookup) => { national: RawHoliday[]; regional: RawHoliday[] }>(),
+		regionsOf: vi.fn<(country: string) => Record<string, string> | null>(),
+	},
+}));
 
 vi.mock("@infrastructure/logging/logger", () => ({
 	logger: { logError: mockLogError },
 }));
 
-const { getHolidays } = await import("./getHolidays");
+vi.mock("./source/dateHolidays", () => ({ dateHolidaysSource: source }));
+
+interface FixtureCalendar {
+	national?: RawHoliday[];
+	regional?: Record<string, RawHoliday[]>;
+	regions?: Record<string, Record<string, string>>;
+}
+
+const useCalendar = (calendar: FixtureCalendar): void => {
+	source.rawHolidays.mockImplementation(({ region }) => ({
+		national: calendar.national ?? [],
+		regional: (region ? calendar.regional?.[region] : undefined) ?? [],
+	}));
+	source.regionsOf.mockImplementation((country) => calendar.regions?.[country] ?? null);
+};
+
+const loadGetHolidays = async () => (await import("./getHolidays")).getHolidays;
 
 interface RawParams {
 	date: string;
@@ -43,11 +64,12 @@ const BASE_PARAMS: GetHolidaysParams = {
 	region: "",
 	locale: EN,
 	carryOverMonths: 1,
-	source: createFixtureHolidaySource(CALENDAR),
 };
 
 beforeEach(() => {
 	vi.clearAllMocks();
+	vi.resetModules();
+	useCalendar(CALENDAR);
 });
 
 afterEach(() => {
@@ -56,11 +78,11 @@ afterEach(() => {
 
 describe("getHolidays", () => {
 	it("returns an empty calendar when no Country has been chosen yet", async () => {
-		expect(await getHolidays({ ...BASE_PARAMS, country: undefined })).toEqual([]);
+		expect(await (await loadGetHolidays())({ ...BASE_PARAMS, country: undefined })).toEqual([]);
 	});
 
 	it("maps the source through the DTO into the glossary shape", async () => {
-		const holidays = await getHolidays(BASE_PARAMS);
+		const holidays = await (await loadGetHolidays())(BASE_PARAMS);
 
 		expect(holidays.map(({ name }) => name)).toEqual(["New Year", "Independence Day", "Columbus Day"]);
 		expect(holidays[0].variant).toBe("national");
@@ -68,77 +90,70 @@ describe("getHolidays", () => {
 	});
 
 	it("drops a National Holiday the selected Region does not observe", async () => {
-		const holidays = await getHolidays({ ...BASE_PARAMS, region: "CA" });
+		const holidays = await (await loadGetHolidays())({ ...BASE_PARAMS, region: "CA" });
 
 		expect(holidays.map(({ name }) => name)).not.toContain("Columbus Day");
 		expect(holidays.map(({ name }) => name)).toContain("Cesar Chavez Day");
 	});
 
 	it("keeps only the classifications that mean the office is shut", async () => {
-		const names = (await getHolidays(BASE_PARAMS)).map(({ name }) => name);
+		const names = (await (await loadGetHolidays())(BASE_PARAMS)).map(({ name }) => name);
 
 		expect(names).toContain("Independence Day");
 		expect(names).not.toContain("Valentine's Day");
 	});
 
 	it("stamps the Region onto the regional entries, which the fixture never says itself", async () => {
-		const holidays = await getHolidays({ ...BASE_PARAMS, region: "CA" });
+		const holidays = await (await loadGetHolidays())({ ...BASE_PARAMS, region: "CA" });
 		const regional = holidays.find(({ name }) => name === "Cesar Chavez Day");
 
 		expect(regional?.variant).toBe("regional");
 	});
 
 	it("resolves the Region label from the same source, with no caller supplying one", async () => {
-		const holidays = await getHolidays({ ...BASE_PARAMS, region: "CA" });
+		const holidays = await (await loadGetHolidays())({ ...BASE_PARAMS, region: "CA" });
 		const regional = holidays.find(({ name }) => name === "Cesar Chavez Day");
 
 		expect(regional?.location).toBe("California");
 	});
 
 	it("keeps the National entry when both lookups name the same date", async () => {
-		const holidays = await getHolidays({ ...BASE_PARAMS, region: "CA" });
+		const holidays = await (await loadGetHolidays())({ ...BASE_PARAMS, region: "CA" });
 		const newYear = holidays.find(({ name }) => name === "New Year");
 
 		expect(newYear?.variant).toBe("national");
 	});
 
 	it("looks the calendar up once when only the Carry-over Months change, and re-flags the window", async () => {
-		const source = createFixtureHolidaySource({
+		useCalendar({
 			...CALENDAR,
 			national: [...CALENDAR.national, raw({ date: "2028-01-06 00:00:00", name: "Epiphany" })],
 		});
-		const lookup = vi.spyOn(source, "rawHolidays");
-		const inWindow = (holidays: Awaited<ReturnType<typeof getHolidays>>) =>
+		const inWindow = (holidays: Awaited<ReturnType<Awaited<ReturnType<typeof loadGetHolidays>>>>) =>
 			holidays.find(({ name }) => name === "Epiphany")?.isInPlanningWindow;
 
-		const narrow = await getHolidays({ ...BASE_PARAMS, source, carryOverMonths: 0 });
-		const wide = await getHolidays({ ...BASE_PARAMS, source, carryOverMonths: 12 });
+		const narrow = await (await loadGetHolidays())({ ...BASE_PARAMS, carryOverMonths: 0 });
+		const wide = await (await loadGetHolidays())({ ...BASE_PARAMS, carryOverMonths: 12 });
 
-		expect(lookup).toHaveBeenCalledOnce();
+		expect(source.rawHolidays).toHaveBeenCalledOnce();
 		expect(wide.map(({ id }) => id)).toEqual(narrow.map(({ id }) => id));
 		expect(inWindow(narrow)).toBe(false);
 		expect(inWindow(wide)).toBe(true);
 	});
 
 	it("looks the calendar up again for another year", async () => {
-		const source = createFixtureHolidaySource(CALENDAR);
-		const lookup = vi.spyOn(source, "rawHolidays");
+		await (await loadGetHolidays())(BASE_PARAMS);
+		await (await loadGetHolidays())({ ...BASE_PARAMS, year: 2028 });
 
-		await getHolidays({ ...BASE_PARAMS, source });
-		await getHolidays({ ...BASE_PARAMS, source, year: 2028 });
-
-		expect(lookup).toHaveBeenCalledTimes(2);
+		expect(source.rawHolidays).toHaveBeenCalledTimes(2);
 	});
 
 	it("returns an empty calendar and logs when the source throws", async () => {
-		const brokenSource: HolidaySource = {
-			rawHolidays: () => {
-				throw new Error("date-holidays failure");
-			},
-			regionsOf: () => null,
-		};
+		source.rawHolidays.mockImplementation(() => {
+			throw new Error("date-holidays failure");
+		});
 
-		const holidays = await getHolidays({ ...BASE_PARAMS, source: brokenSource });
+		const holidays = await (await loadGetHolidays())(BASE_PARAMS);
 
 		expect(holidays).toEqual([]);
 		expect(mockLogError).toHaveBeenCalledWith({

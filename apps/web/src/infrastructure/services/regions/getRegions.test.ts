@@ -25,26 +25,26 @@ beforeEach(() => {
 
 describe("getRegions", () => {
 	it("returns empty array when no countryCode is provided", () => {
-		expect(getRegions()).toEqual([]);
+		expect(getRegions("")).toEqual([]);
 		expect(MockHolidays).not.toHaveBeenCalled();
 	});
 
 	it("returns empty array when getStates returns null", () => {
 		mockGetStates.mockReturnValue(null);
 
-		expect(getRegions({ countryCode: ES })).toEqual([]);
+		expect(getRegions(ES)).toEqual([]);
 	});
 
 	it("returns empty array when getStates returns an empty object", () => {
 		mockGetStates.mockReturnValue({});
 
-		expect(getRegions({ countryCode: ES })).toEqual([]);
+		expect(getRegions(ES)).toEqual([]);
 	});
 
 	it("passes countryCode to Holidays constructor", () => {
 		mockGetStates.mockReturnValue({ CAT: "Catalonia" });
 
-		getRegions({ countryCode: "ES" });
+		getRegions("ES");
 
 		expect(MockHolidays).toHaveBeenCalledWith("ES");
 	});
@@ -52,7 +52,7 @@ describe("getRegions", () => {
 	it("calls getStates with lowercased countryCode", () => {
 		mockGetStates.mockReturnValue({ CAT: "Catalonia" });
 
-		getRegions({ countryCode: "ES" });
+		getRegions("ES");
 
 		expect(mockGetStates).toHaveBeenCalledWith("es");
 	});
@@ -60,7 +60,7 @@ describe("getRegions", () => {
 	it("offers each region the source holds as a value, its code, and a label, its name", () => {
 		mockGetStates.mockReturnValue({ CAT: "Catalonia", MAD: "Madrid" });
 
-		expect(getRegions({ countryCode: ES })).toEqual([
+		expect(getRegions(ES)).toEqual([
 			{ value: "CAT", label: "Catalonia" },
 			{ value: "MAD", label: "Madrid" },
 		]);
@@ -69,7 +69,7 @@ describe("getRegions", () => {
 	it("returns regions sorted alphabetically by label", () => {
 		mockGetStates.mockReturnValue({ MAD: "Madrid", CAT: "Catalonia", AND: "Andalucia" });
 
-		const result = getRegions({ countryCode: ES });
+		const result = getRegions(ES);
 
 		expect(result.map(({ label }) => label)).toEqual(["Andalucia", "Catalonia", "Madrid"]);
 	});
@@ -79,7 +79,7 @@ describe("getRegions", () => {
 			throw new Error("holidays failure");
 		});
 
-		const result = getRegions({ countryCode: ES });
+		const result = getRegions(ES);
 
 		expect(result).toEqual([]);
 		expect(mockLogError).toHaveBeenCalledWith({

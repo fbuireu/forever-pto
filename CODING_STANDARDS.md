@@ -453,8 +453,8 @@ No rule below restates these, and a diff that breaks one fails CI:
 - `I11` **hard**: Write and read donation metadata only through `provider/metadata.ts`, and payment values through
   `normalForms.ts`.
 - `I12` **hard**: Round money to cents where it is computed.
-- `I13` **judgement**: Compose a new Holiday rule in `observedHolidays`, above the `HolidaySource` seam, so the
-  fixture adapter runs it too.
+- `I13` **judgement**: Compose a new Holiday rule in `observedHolidays`, above `dateHolidaysSource`, so a test that
+  swaps plain data in for the source runs it too.
 - `I14` **hard**: Guard the lookup, not the work, in a wrapper with a fallback (`traced` in `span.ts`), so the work
   runs exactly once.
 - `I15` **judgement**: Scope a batching transport to the request that armed it; workerd refuses I/O on behalf of

@@ -39,7 +39,7 @@ export const useLocationStore = create<LocationStore>()(
 
 				fetchRegions: async (countryCode: string) => {
 					const { getRegions } = await import("@infrastructure/services/regions/getRegions");
-					set({ regions: getRegions({ countryCode }) });
+					set({ regions: getRegions(countryCode) });
 				},
 			}),
 			{

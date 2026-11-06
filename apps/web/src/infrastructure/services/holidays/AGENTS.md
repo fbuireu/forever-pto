@@ -14,38 +14,34 @@ are not non-working days, tags and hands over.
 | File | Role |
 | --- | --- |
 | [`getHolidays.ts`](./getHolidays.ts) | Asks the Holiday source what is observed (through `cachedObservedHolidays`), derives the Region list from the same source, and maps both through `holidayDTO` |
-| [`source/types.ts`](./source/types.ts) | `HolidaySource`, the seam: `rawHolidays(lookup)` and `regionsOf(country)`, and nothing else |
-| [`source/dateHolidays.ts`](./source/dateHolidays.ts) | The production adapter. The **only** place in the app that constructs `Holidays` |
-| [`source/fixture.ts`](./source/fixture.ts) | `createFixtureHolidaySource(calendar)`: the test adapter, plain data in |
-| [`source/observedHolidays.ts`](./source/observedHolidays.ts) | `observedHolidays({ source, lookup })`: the rules, composed **above** the seam so both adapters go through them |
-| [`source/cachedObservedHolidays.ts`](./source/cachedObservedHolidays.ts) | `cachedObservedHolidays`: the last lookup, kept in one slot keyed on Country, Region, year, locale and the source, so a Carry-over Months change re-runs only the mapping |
+| [`source/types.ts`](./source/types.ts) | `HolidayLookup`, the Country, Region, year and locale one lookup asks for |
+| [`source/dateHolidays.ts`](./source/dateHolidays.ts) | `dateHolidaysSource`, the **only** place in the app that constructs `Holidays`: `rawHolidays(lookup)` and `regionsOf(country)`, and nothing else |
+| [`source/observedHolidays.ts`](./source/observedHolidays.ts) | `observedHolidays(lookup)`: the rules, composed **above** the source so they run over whatever it returns |
+| [`source/cachedObservedHolidays.ts`](./source/cachedObservedHolidays.ts) | `cachedObservedHolidays`: the last lookup, kept in one slot keyed on Country, Region, year and locale, so a Carry-over Months change re-runs only the mapping |
 | [`source/utils/observed.ts`](./source/utils/observed.ts) | `resolveObservedHolidays`: the Region-over-Country rule, pure |
 | [`source/utils/nonWorking.ts`](./source/utils/nonWorking.ts) | `keepNonWorking` (the `public`/`bank` filter) and `stampRegion` (the `location` stamp), pure |
 
-## The seam is the source, not the mapper
+## The source is not the mapper
 
 The DTO translates *shape*; it never decides what a Holiday is. The rules (what counts as a non-working day,
 the Region that removes a National day, the stamp that tells the two apart) sit in `observedHolidays`, which
-composes them **above** the seam, and there is an adapter on each side below it, which is what makes it a real
-seam rather than a hypothetical one:
+composes them **above** `dateHolidaysSource`. The source owns the `Holidays` constructor and the two-year fetch and
+**nothing else**: it returns the raw lookups and lets the rules run over them. There is one source, and a test that
+wants plain data in its place replaces the `source/dateHolidays` module, as `getHolidays.test.ts` does to run the
+**real** DTO over fixture data, so the whole path is asserted end to end, rules included.
 
-- `dateHolidaysSource` in production. It owns the `Holidays` constructor and the two-year fetch and
-  **nothing else**: it returns the raw lookups and lets the rules run over them.
-- `createFixtureHolidaySource` in tests. `getHolidays.test.ts` uses it to run the **real** DTO over
-  fixture data, so the whole path is asserted end to end, rules included.
-
-`getRegions.ts` under `services/regions/` calls `regionsOf` on the same adapter rather than constructing its
+`getRegions.ts` under `services/regions/` calls `regionsOf` on the same source rather than constructing its
 own `Holidays`. It stays in its own folder because a Region list is a location concern.
 
 ## Public API
 
-`getHolidays({ year, country, carryOverMonths, region, locale, source? })` → `Promise<HolidayDTO[]>`.
+`getHolidays({ year, country, carryOverMonths, region, locale })` → `Promise<HolidayDTO[]>`.
 
 - **No `country` → `[]`, immediately.** That is the normal first call, not an error: the planner renders
   before a Country has been detected or chosen.
 - **The Region *list* is derived here, from the same `source`, and is not a parameter.** The DTO needs it
   only to render a region code as a label. `getRegions` is a pure synchronous function of the Country over this
-  same adapter; read from the location store instead, the label would stay the raw code (`CA` instead of
+  same source; read from the location store instead, the label would stay the raw code (`CA` instead of
   `California`) whenever this ran first.
 - `region` must be a key from `getRegions.ts` (`getStates()` output), because that is what
   `new Holidays(country, region)` expects. An unusable code never surfaces as an exception; see the
@@ -135,7 +131,7 @@ anything.
 
 ## Testing
 
-`getHolidays.test.ts` runs the **real** DTO over `createFixtureHolidaySource`. The fixture's regional entries
+`getHolidays.test.ts` runs the **real** DTO over a fixture it swaps in for `dateHolidaysSource`. The fixture's regional entries
 carry no `location` of their own and one national entry is an `observance`, so the stamp and the filter are
 proved rather than performed by the fixture. [`dateHolidays.test.ts`](./source/dateHolidays.test.ts) asserts how
 the package is asked, never what it returns, since the version bundled is the version shipped

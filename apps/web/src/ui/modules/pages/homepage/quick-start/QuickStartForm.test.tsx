@@ -58,7 +58,7 @@ beforeEach(() => {
 	track.mockClear();
 	cookie.country = undefined;
 	getRegions.mockReset();
-	getRegions.mockImplementation(({ countryCode }: { countryCode: string }) => REGIONS_BY_COUNTRY[countryCode] ?? []);
+	getRegions.mockImplementation((countryCode: string) => REGIONS_BY_COUNTRY[countryCode] ?? []);
 	useFiltersStore.getState().resetToDefaults();
 	useLocationStore.setState(useLocationStore.getInitialState());
 	useHolidaysStore.setState({ planAskedFor: false });
@@ -86,7 +86,7 @@ describe("QuickStartForm", () => {
 		renderForm();
 
 		expect(screen.getByLabelText(quickStart.location.country).textContent).toContain("Spain");
-		await vi.waitFor(() => expect(getRegions).toHaveBeenCalledWith({ countryCode: "es" }));
+		await vi.waitFor(() => expect(getRegions).toHaveBeenCalledWith("es"));
 		expect((screen.getByRole("button", { name: quickStart.next }) as HTMLButtonElement).disabled).toBe(false);
 	});
 
