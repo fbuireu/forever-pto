@@ -258,8 +258,6 @@ function MotionHighlightItem({ ref, children, value, className, activeClassName,
 
 	const dataAttributes = {
 		"data-active": isActive ? "true" : "false",
-		"data-selected": isActive ? "true" : "false",
-		"data-disabled": false,
 		"data-value": childValue,
 		"data-highlight": true,
 	};
