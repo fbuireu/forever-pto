@@ -70,14 +70,14 @@ interface GetAvailableWorkdaysParams {
 	months: Date[];
 	holidays: HolidayDTO[];
 	allowPastDays: boolean;
-	removedDays?: Date[];
+	removedDays: Date[];
 }
 
 export function getAvailableWorkdays({
 	months,
 	holidays,
 	allowPastDays,
-	removedDays = [],
+	removedDays,
 }: GetAvailableWorkdaysParams): Date[] {
 	const todayTime = startOfToday().getTime();
 

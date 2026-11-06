@@ -38,7 +38,16 @@ const COLLIDING_REGIONS = [
 
 describe("Combobox", () => {
 	it("sizes the list to the control it opens from and to the room under it, rather than a fixed width", () => {
-		const { container } = render(<Combobox options={COUNTRIES} onChange={vi.fn()} />);
+		const { container } = render(
+			<Combobox
+				className="w-full"
+				placeholder="Pick"
+				options={COUNTRIES}
+				value=""
+				onChange={vi.fn()}
+				searchPlaceholder="Search"
+			/>,
+		);
 		const panel = container.querySelector('[data-primitive="popover-content"]')?.className ?? "";
 
 		expect(panel).toContain("w-(--anchor-width)");
@@ -47,7 +56,16 @@ describe("Combobox", () => {
 	});
 
 	it("flips above the control when the room under it runs out, but never jumps to its side", () => {
-		const { container } = render(<Combobox options={COUNTRIES} onChange={vi.fn()} />);
+		const { container } = render(
+			<Combobox
+				className="w-full"
+				placeholder="Pick"
+				options={COUNTRIES}
+				value=""
+				onChange={vi.fn()}
+				searchPlaceholder="Search"
+			/>,
+		);
 		const panel = container.querySelector<HTMLElement>('[data-primitive="popover-content"]');
 
 		expect(panel?.dataset.sideMode).toBe("flip");
@@ -56,7 +74,16 @@ describe("Combobox", () => {
 
 	it("hands back the option that was clicked, keyed by value rather than by label", async () => {
 		const onChange = vi.fn();
-		render(<Combobox options={COLLIDING_REGIONS} value="" onChange={onChange} />);
+		render(
+			<Combobox
+				className="w-full"
+				placeholder="Pick"
+				options={COLLIDING_REGIONS}
+				value=""
+				onChange={onChange}
+				searchPlaceholder="Search"
+			/>,
+		);
 
 		await userEvent.click(screen.getAllByRole("option")[1]);
 
@@ -65,7 +92,16 @@ describe("Combobox", () => {
 
 	it("hands back the option value unchanged rather than lower-casing it", async () => {
 		const onChange = vi.fn();
-		render(<Combobox options={COUNTRIES} value="" onChange={onChange} />);
+		render(
+			<Combobox
+				className="w-full"
+				placeholder="Pick"
+				options={COUNTRIES}
+				value=""
+				onChange={onChange}
+				searchPlaceholder="Search"
+			/>,
+		);
 
 		await userEvent.click(screen.getAllByRole("option")[0]);
 
@@ -74,7 +110,16 @@ describe("Combobox", () => {
 
 	it("does not fire onChange when the clicked option is already the selected one, whatever its casing", async () => {
 		const onChange = vi.fn();
-		render(<Combobox options={COUNTRIES} value="es" onChange={onChange} />);
+		render(
+			<Combobox
+				className="w-full"
+				placeholder="Pick"
+				options={COUNTRIES}
+				value="es"
+				onChange={onChange}
+				searchPlaceholder="Search"
+			/>,
+		);
 
 		await userEvent.click(screen.getAllByRole("option")[0]);
 
@@ -82,7 +127,16 @@ describe("Combobox", () => {
 	});
 
 	it("still filters on the option label once the item is keyed by value", async () => {
-		render(<Combobox options={COUNTRIES} value="" onChange={vi.fn()} searchPlaceholder="Search" />);
+		render(
+			<Combobox
+				className="w-full"
+				placeholder="Pick"
+				options={COUNTRIES}
+				value=""
+				onChange={vi.fn()}
+				searchPlaceholder="Search"
+			/>,
+		);
 
 		await userEvent.type(screen.getByPlaceholderText("Search"), "Spain");
 
@@ -90,7 +144,16 @@ describe("Combobox", () => {
 	});
 
 	it("opens a listbox under an id of its own, which is never the hard-coded combobox-listbox", async () => {
-		const { container } = render(<Combobox options={COUNTRIES} value="" onChange={vi.fn()} />);
+		const { container } = render(
+			<Combobox
+				className="w-full"
+				placeholder="Pick"
+				options={COUNTRIES}
+				value=""
+				onChange={vi.fn()}
+				searchPlaceholder="Search"
+			/>,
+		);
 
 		await userEvent.click(screen.getByRole("button"));
 		const listbox = screen.getByRole("listbox");

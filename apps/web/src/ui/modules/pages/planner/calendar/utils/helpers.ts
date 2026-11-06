@@ -5,7 +5,7 @@ interface GetDayClassNamesParams {
 	date: Date;
 	month: Date;
 	isSelected: boolean;
-	disabled?: boolean;
+	disabled: boolean;
 	showOutsideDays: boolean;
 	modifiers: Record<string, ((date: Date) => boolean) | undefined>;
 }
@@ -60,7 +60,7 @@ export const getDayClassNames = ({
 	date,
 	month,
 	isSelected,
-	disabled = false,
+	disabled,
 	showOutsideDays,
 	modifiers,
 }: GetDayClassNamesParams): string => {

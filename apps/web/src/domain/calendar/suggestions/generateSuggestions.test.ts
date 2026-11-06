@@ -22,7 +22,7 @@ const planSuggestions = ({
 	allowPastDays,
 	months,
 	strategy,
-	removedDays,
+	removedDays = [],
 }: PlanSuggestionsParams): StrategySelection =>
 	generateSuggestions({
 		ptoDays,

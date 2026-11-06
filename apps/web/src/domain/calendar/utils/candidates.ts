@@ -13,7 +13,7 @@ interface FindPlanningCandidatesParams {
 	holidays: HolidayDTO[];
 	months: Date[];
 	allowPastDays: boolean;
-	removedDays?: Date[];
+	removedDays: Date[];
 	manualDays: Date[];
 }
 

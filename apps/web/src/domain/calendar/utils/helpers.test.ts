@@ -32,6 +32,7 @@ describe("getAvailableWorkdays", () => {
 			months: [makeDate({ year: 2025, month: 1, day: 1 })],
 			holidays: [],
 			allowPastDays: true,
+			removedDays: [],
 		});
 		expect(workdays.length).toBeGreaterThan(0);
 		for (const day of workdays) {
@@ -45,6 +46,7 @@ describe("getAvailableWorkdays", () => {
 			months: [makeDate({ year: 2025, month: 1, day: 1 })],
 			holidays: [],
 			allowPastDays: true,
+			removedDays: [],
 		});
 		expect(workdays).toHaveLength(23);
 	});
@@ -54,6 +56,7 @@ describe("getAvailableWorkdays", () => {
 			months: [makeDate({ year: 2025, month: 1, day: 1 })],
 			holidays: [makeHoliday(makeDate({ year: 2025, month: 1, day: 6 }))],
 			allowPastDays: true,
+			removedDays: [],
 		});
 		expect(workdays).toHaveLength(22);
 		expect(workdays.some((w) => w.toDateString() === makeDate({ year: 2025, month: 1, day: 6 }).toDateString())).toBe(
@@ -66,6 +69,7 @@ describe("getAvailableWorkdays", () => {
 			months: [makeDate({ year: 2025, month: 1, day: 1 })],
 			holidays: [makeHoliday(makeDate({ year: 2025, month: 1, day: 4 }))],
 			allowPastDays: true,
+			removedDays: [],
 		});
 		expect(workdays).toHaveLength(23);
 	});
@@ -75,6 +79,7 @@ describe("getAvailableWorkdays", () => {
 			months: [makeDate({ year: 2020, month: 1, day: 1 })],
 			holidays: [],
 			allowPastDays: false,
+			removedDays: [],
 		});
 		expect(workdays).toHaveLength(0);
 	});
@@ -84,6 +89,7 @@ describe("getAvailableWorkdays", () => {
 			months: [makeDate({ year: 2020, month: 1, day: 1 })],
 			holidays: [],
 			allowPastDays: true,
+			removedDays: [],
 		});
 		expect(workdays.length).toBeGreaterThan(0);
 	});
@@ -124,16 +130,19 @@ describe("getAvailableWorkdays", () => {
 			months: [makeDate({ year: 2025, month: 1, day: 1 })],
 			holidays: [],
 			allowPastDays: true,
+			removedDays: [],
 		});
 		const feb = getAvailableWorkdays({
 			months: [makeDate({ year: 2025, month: 2, day: 1 })],
 			holidays: [],
 			allowPastDays: true,
+			removedDays: [],
 		});
 		const both = getAvailableWorkdays({
 			months: [makeDate({ year: 2025, month: 1, day: 1 }), makeDate({ year: 2025, month: 2, day: 1 })],
 			holidays: [],
 			allowPastDays: true,
+			removedDays: [],
 		});
 		expect(both).toHaveLength(jan.length + feb.length);
 	});
@@ -201,6 +210,7 @@ describe("findBridges", () => {
 			months: [makeDate({ year: 2025, month: 1, day: 1 })],
 			holidays: [],
 			allowPastDays: true,
+			removedDays: [],
 		});
 		const bridges = findBridges({ availableWorkdays: workdays, holidays: [] });
 		const keys = bridges.map((b) =>

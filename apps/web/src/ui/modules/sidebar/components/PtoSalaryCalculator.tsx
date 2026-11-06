@@ -21,12 +21,12 @@ const positive = (amount: number | null): number => (amount !== null && amount >
 
 interface CurrencyNumberProps {
 	value: number;
-	decimalPlaces?: number;
+	decimalPlaces: number;
 	currencyPosition: "before" | "after";
 	currencySymbol: string;
 }
 
-const CurrencyNumber = ({ value, decimalPlaces = 0, currencyPosition, currencySymbol }: CurrencyNumberProps) => (
+const CurrencyNumber = ({ value, decimalPlaces, currencyPosition, currencySymbol }: CurrencyNumberProps) => (
 	<ConditionalWrapper
 		doWrap={currencyPosition === "after"}
 		wrapper={(children) => (

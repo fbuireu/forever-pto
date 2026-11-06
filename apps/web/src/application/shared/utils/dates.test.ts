@@ -343,7 +343,7 @@ describe("getMonthNames", () => {
 
 describe("getWeekdayNames", () => {
 	it("returns 7 names", () => {
-		const names = getWeekdayNames({ locale: EN });
+		const names = getWeekdayNames({ locale: EN, weekStartsOn: 0 });
 		expect(names).toHaveLength(7);
 	});
 

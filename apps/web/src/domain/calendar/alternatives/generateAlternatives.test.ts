@@ -48,7 +48,7 @@ const planAlternatives = ({
 	allowPastDays,
 	months,
 	strategy,
-	removedDays,
+	removedDays = [],
 	maxAlternatives,
 	existingSuggestion,
 }: PlanAlternativesParams): PlannedAlternatives => {

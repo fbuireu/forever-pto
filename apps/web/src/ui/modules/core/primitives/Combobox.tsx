@@ -19,22 +19,21 @@ interface ComboboxOption<TValue extends string> {
 
 interface ComboboxProps<TValue extends string> {
 	id?: string;
-	className?: string;
+	className: string;
 	disabled?: boolean;
-	placeholder?: string;
-	searchPlaceholder?: string;
+	placeholder: string;
+	searchPlaceholder: string;
 	notFoundText?: string;
-	options?: ComboboxOption<TValue>[];
-	value?: string;
+	options: ComboboxOption<TValue>[];
+	value: string;
 	onChange: (value: TValue) => void;
 }
 
-const EMPTY_OPTIONS: ComboboxOption<never>[] = [];
 const COLLISION_AVOIDANCE = { side: "flip", fallbackAxisSide: "none" } as const;
 
 export const Combobox = <TValue extends string>({
-	value = "",
-	options = EMPTY_OPTIONS,
+	value,
+	options,
 	placeholder,
 	searchPlaceholder,
 	notFoundText,

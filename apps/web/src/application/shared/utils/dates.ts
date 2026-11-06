@@ -223,11 +223,11 @@ const WEEKDAY_FORMAT = {
 
 export interface GetWeekdayNamesParams {
 	locale: string;
-	weekStartsOn?: Day;
+	weekStartsOn: Day;
 	format?: keyof typeof WEEKDAY_FORMAT;
 }
 
-export const getWeekdayNames = ({ locale, weekStartsOn = 0, format = "short" }: GetWeekdayNamesParams): string[] => {
+export const getWeekdayNames = ({ locale, weekStartsOn, format = "short" }: GetWeekdayNamesParams): string[] => {
 	const anchor = new Date(2023, 0, 2);
 	const weekStart = startOfWeek({ date: anchor, options: { weekStartsOn } });
 

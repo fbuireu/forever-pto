@@ -13,6 +13,7 @@ const classesFor = (overrides: Partial<Parameters<typeof getDayClassNames>[0]> =
 		date: DAY,
 		month: MONTH,
 		isSelected: false,
+		disabled: false,
 		showOutsideDays: true,
 		modifiers: {},
 		...overrides,
