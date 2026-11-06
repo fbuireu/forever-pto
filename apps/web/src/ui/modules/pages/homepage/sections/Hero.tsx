@@ -141,9 +141,9 @@ export const Hero = async () => {
 										<div className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-1">
 											{label}
 										</div>
-										<div className="font-display font-extrabold text-[28px] leading-none flex items-center gap-1">
+										<div className="font-display font-extrabold text-[28px] leading-none flex flex-wrap items-center gap-x-2 gap-y-1">
 											{value}
-											<span className="text-[14px] font-semibold text-muted-foreground ml-1">{unit}</span>
+											<span className="text-[14px] font-semibold text-muted-foreground whitespace-nowrap">{unit}</span>
 										</div>
 									</div>
 								))}

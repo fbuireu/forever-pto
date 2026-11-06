@@ -27,7 +27,7 @@ Source: `apps/web/src/ui/modules/core/animate/components/`. Composite motion com
 
 <RadialNavDemo client:visible />
 
-Props: `items: { id, icon, label, angle, animateOnHover?, badgeClass?, className? }[]`, where `icon` is any component that takes the `className` and `style` the button gives it: a Lucide icon or one of the [animated icons](/design-system/animation/icons/). `animateOnHover` asks an animated icon to play when the pointer is over it; set it on an animated icon only, since a Lucide icon would hand it to its `<svg>` as an unknown attribute. `badgeClass` recolors the active state (default `bg-accent`). Plus `menuButtonConfig { iconSize, buttonSize, buttonPadding }`, `defaultActiveId` and `onActiveChange`. The active item is found by its `id`, so ids need only be unique.
+Props: `items: { id, icon, label, angle, animateOnHover?, badgeClass?, className? }[]`, where `icon` is any component that takes the `className` and `style` the button gives it: a Lucide icon or one of the [animated icons](/design-system/animation/icons/). `animateOnHover` asks an animated icon to play when the pointer is over it; set it on an animated icon only, since a Lucide icon would hand it to its `<svg>` as an unknown attribute. An item that leaves it out passes its icon no `animateOnHover` at all, not an undefined one, so a Lucide icon there renders without that warning. `badgeClass` recolors the active state (default `bg-accent`). Plus `menuButtonConfig { iconSize, buttonSize, buttonPadding }`, `defaultActiveId` and `onActiveChange`. The active item is found by its `id`, so ids need only be unique.
 
 ## Usage
 

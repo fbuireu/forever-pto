@@ -197,7 +197,7 @@ export function Roadmap() {
 				</h2>
 				<p className="text-muted-foreground text-[17px]">{t("subtitle")}</p>
 			</div>
-			<div className="flex flex-col lg:flex-row gap-8 items-center mt-4">
+			<div className="flex flex-col lg:flex-row gap-8 items-center lg:items-start mt-4">
 				<div className="lg:sticky lg:top-8 flex flex-col items-center w-full lg:w-auto">
 					<div className="relative size-80 flex items-center justify-center">
 						<RadialNav
