@@ -73,7 +73,7 @@ supplies none. A caller that omits `dayStates` paints no plan state.
 
 Precedence inside `getDayClassNames` is not the object order:
 
-1. The loop is skipped when the day is selected (single or multiple mode) or disabled; `selected` is appended
+1. The loop is skipped when the day is selected (single mode) or disabled; `selected` is appended
    at the end instead, so it wins outright.
 2. `today` short-circuits the loop: when it matches, no other modifier class is applied.
 3. Otherwise every matching modifier contributes, in object-key order, except `inRange`, `rangeStart` and

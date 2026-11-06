@@ -84,7 +84,7 @@ vi.mock("./calendar/Calendar", () => ({
 		capturedDayToggle.current = onDayToggle;
 		return null;
 	},
-	CalendarSelectionMode: { MULTIPLE: "multiple" },
+	CalendarSelectionMode: { NONE: "none" },
 }));
 
 vi.mock("./calendar/CalendarListFixture", () => ({ CalendarListFixture: () => null }));

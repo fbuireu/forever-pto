@@ -96,7 +96,7 @@ sequenceDiagram
 
 ## The calendar grid
 
-`Calendar` (`apps/web/src/ui/modules/pages/planner/calendar/Calendar.tsx`) renders one month and knows nothing about planning. It has four selection modes, `SINGLE`, `MULTIPLE`, `RANGE` and `NONE`, and three callers use it, with no caller for `MULTIPLE`: the planner picks days out of a plan, the Holiday form picks one date, and the Workday counter picks a range. In `NONE` mode it hands each click to `onDayToggle` and does nothing with the answer.
+`Calendar` (`apps/web/src/ui/modules/pages/planner/calendar/Calendar.tsx`) renders one month and knows nothing about planning. It has three selection modes, `SINGLE`, `RANGE` and `NONE`, one for each of its three callers: the planner picks days out of a plan, the Holiday form picks one date, and the Workday counter picks a range. In `NONE` mode it hands each click to `onDayToggle` and does nothing with the answer.
 
 The **planner's click policy** lives in `usePlannerDayClick` (`apps/web/src/ui/modules/pages/planner/calendar/usePlannerDayClick.tsx`) rather than in the grid. It has four branches: no Premium (a toast offering Premium), applied, a refusal with copy, a refusal without. The refusals themselves come from the store's `toggleDaySelection` as a `DayRefusal`:
 

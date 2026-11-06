@@ -8,7 +8,6 @@ import {
 	formatDate,
 	formatDateParts,
 	getWeekdayNames,
-	isSameDay,
 	isSameMonth,
 	isWeekend,
 	subMonths,
@@ -47,7 +46,6 @@ export interface FromTo {
 
 export const CalendarSelectionMode = {
 	SINGLE: "single",
-	MULTIPLE: "multiple",
 	RANGE: "range",
 	NONE: "none",
 } as const;
@@ -66,17 +64,16 @@ type DayStateName = "suggested" | "alternative" | "manual";
 export type DayStates = Partial<Record<DayStateName, (date: Date) => boolean>>;
 
 interface CalendarProps {
-	mode?: CalendarSelectionMode;
-	initialSelected?: Date | Date[] | FromTo;
-	onSelect?: (date: Date | Date[] | FromTo | undefined) => void;
+	mode: CalendarSelectionMode;
+	initialSelected?: Date | FromTo;
+	onSelect?: (date: Date | FromTo | undefined) => void;
 	initialMonth?: Date;
 	showNavigation?: boolean;
-	className?: string;
+	className: string;
 	weekStartsOn?: Day;
 	fixedWeeks?: boolean;
 	locale: Locale;
 	disabled?: boolean;
-	showOutsideDays?: boolean;
 	holidays: HolidayDTO[];
 	allowPastDays: boolean;
 	dayStates?: DayStates;
@@ -92,7 +89,7 @@ interface RangeState {
 const NO_DAY_STATES: DayStates = {};
 
 export const Calendar = memo(function Calendar({
-	mode = CalendarSelectionMode.SINGLE,
+	mode,
 	initialSelected,
 	onSelect,
 	initialMonth,
@@ -102,12 +99,10 @@ export const Calendar = memo(function Calendar({
 	fixedWeeks = false,
 	locale,
 	disabled = false,
-	showOutsideDays = true,
 	holidays,
-	allowPastDays = true,
+	allowPastDays,
 	dayStates = NO_DAY_STATES,
 	onDayToggle,
-	...props
 }: Readonly<CalendarProps>) {
 	const tCalendar = useTranslations("calendar");
 	const tLegend = useTranslations("legend");
@@ -131,8 +126,6 @@ export const Calendar = memo(function Calendar({
 
 	const [selectedDates, setSelectedDates] = useState<Date[]>(() => {
 		switch (mode) {
-			case CalendarSelectionMode.MULTIPLE:
-				return Array.isArray(initialSelected) ? initialSelected : [];
 			case CalendarSelectionMode.SINGLE:
 				return initialSelected instanceof Date ? [initialSelected] : [];
 			case CalendarSelectionMode.RANGE:
@@ -194,13 +187,7 @@ export const Calendar = memo(function Calendar({
 		[currentMonth, weekStartsOn, fixedWeeks],
 	);
 
-	const stretchDays = useMemo(
-		() =>
-			calendarDays.map(
-				(day) => (showOutsideDays || isSameMonth({ a: day, b: currentMonth })) && modifiers.effective(day),
-			),
-		[calendarDays, showOutsideDays, currentMonth, modifiers],
-	);
+	const stretchDays = useMemo(() => calendarDays.map((day) => modifiers.effective(day)), [calendarDays, modifiers]);
 
 	const holidaysMap = useMemo(() => {
 		const map = new Map<string, string>();
@@ -229,17 +216,6 @@ export const Calendar = memo(function Calendar({
 			}
 
 			switch (mode) {
-				case CalendarSelectionMode.MULTIPLE: {
-					const isSelected = selectedDates.some((d) => isSameDay({ a: d, b: date }));
-					const newSelection = isSelected
-						? selectedDates.filter((d) => !isSameDay({ a: d, b: date }))
-						: [...selectedDates, date];
-
-					setSelectedDates(newSelection);
-					onSelect?.(newSelection);
-					break;
-				}
-
 				case CalendarSelectionMode.SINGLE: {
 					setSelectedDates([date]);
 					onSelect?.(date);
@@ -274,7 +250,7 @@ export const Calendar = memo(function Calendar({
 				}
 			}
 		},
-		[disabled, mode, selectedDates, onSelect, rangeSelection, onDayToggle],
+		[disabled, mode, onSelect, rangeSelection, onDayToggle],
 	);
 
 	const handleDayHover = useCallback(
@@ -311,7 +287,6 @@ export const Calendar = memo(function Calendar({
 				"calendar-container w-fit select-none bg-card z-1 rounded-[14px] border-2 border-[var(--frame)] overflow-hidden [content-visibility:auto] [contain-intrinsic-block-size:340px]",
 				className,
 			)}
-			{...props}
 		>
 			<div className="flex items-center justify-between border-b-2 border-[var(--frame)] bg-[var(--surface-panel-alt)] px-3 py-2">
 				<div className="flex items-center gap-3">
@@ -394,11 +369,6 @@ export const Calendar = memo(function Calendar({
 					const isSuggestedDay = modifiers.suggested?.(date) ?? false;
 
 					const isDisabled = disabled || (isPastDay && !isManualDay && !isSuggestedDay);
-					const isOutsideMonth = !isSameMonth({ a: date, b: currentMonth });
-
-					if (!showOutsideDays && isOutsideMonth) {
-						return <div key={date.toISOString()} className="size-8" />;
-					}
 
 					const isStretchDay = stretchDays[position] === true;
 					const holidayName = holidaysMap.get(date.toDateString());
@@ -416,7 +386,6 @@ export const Calendar = memo(function Calendar({
 						month: currentMonth,
 						isSelected: mode !== CalendarSelectionMode.RANGE && (modifiers.selected?.(date) ?? false),
 						disabled: isDisabled,
-						showOutsideDays,
 						modifiers,
 					});
 

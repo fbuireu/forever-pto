@@ -6,7 +6,6 @@ interface GetDayClassNamesParams {
 	month: Date;
 	isSelected: boolean;
 	disabled: boolean;
-	showOutsideDays: boolean;
 	modifiers: Record<string, ((date: Date) => boolean) | undefined>;
 }
 
@@ -56,14 +55,7 @@ interface GetDayStateLabelKeysParams {
 export const getDayStateLabelKeys = ({ date, modifiers }: GetDayStateLabelKeysParams): DayStateLabelKey[] =>
 	DAY_STATE_LABELS.filter(({ modifier }) => modifiers[modifier]?.(date) ?? false).map(({ labelKey }) => labelKey);
 
-export const getDayClassNames = ({
-	date,
-	month,
-	isSelected,
-	disabled,
-	showOutsideDays,
-	modifiers,
-}: GetDayClassNamesParams): string => {
+export const getDayClassNames = ({ date, month, isSelected, disabled, modifiers }: GetDayClassNamesParams): string => {
 	const classes: string[] = [];
 	const isOutsideMonth = !isSameMonth({ a: date, b: month });
 	const shouldShowAsPast = modifiers.disabled?.(date) ?? false;
@@ -109,7 +101,7 @@ export const getDayClassNames = ({
 		const opacity = isOutsideMonth ? "!opacity-20" : "!opacity-40";
 		classes.push(opacity, "cursor-not-allowed pointer-events-none text-muted-foreground");
 	} else {
-		const outsideMonthClass = showOutsideDays ? "text-muted-foreground opacity-50" : "invisible";
+		const outsideMonthClass = "text-muted-foreground opacity-50";
 
 		if (isOutsideMonth) {
 			classes.push(outsideMonthClass);

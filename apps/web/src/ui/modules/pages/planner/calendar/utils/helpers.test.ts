@@ -14,7 +14,6 @@ const classesFor = (overrides: Partial<Parameters<typeof getDayClassNames>[0]> =
 		month: MONTH,
 		isSelected: false,
 		disabled: false,
-		showOutsideDays: true,
 		modifiers: {},
 		...overrides,
 	});
@@ -87,14 +86,9 @@ describe("getDayClassNames precedence", () => {
 });
 
 describe("getDayClassNames month and past-day handling", () => {
-	it("fades a day outside the month when outside days are shown", () => {
-		const classes = classesFor({ date: new Date(2025, 1, 3), showOutsideDays: true });
+	it("fades a day outside the month", () => {
+		const classes = classesFor({ date: new Date(2025, 1, 3) });
 		expect(classes).toContain("opacity-50");
-	});
-
-	it("hides it entirely when they are not", () => {
-		const classes = classesFor({ date: new Date(2025, 1, 3), showOutsideDays: false });
-		expect(classes).toContain("invisible");
 	});
 
 	it("fades a past day through the same predicate the click handler binds, not a second copy of the rule", () => {

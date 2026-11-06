@@ -173,7 +173,6 @@ export const CalendarList = () => {
 						allowPastDays={allowPastDays}
 						dayStates={dayStates}
 						onDayToggle={handleDayToggle}
-						showOutsideDays
 						fixedWeeks
 					/>
 				))}

@@ -26,7 +26,7 @@ const renderCalendar = (props: Partial<Parameters<typeof Calendar>[0]> = {}): Re
 				locale="en"
 				holidays={[HOLIDAY]}
 				allowPastDays
-				showOutsideDays
+				className="w-full"
 				{...props}
 			/>
 		</NextIntlClientProvider>,
@@ -135,6 +135,7 @@ describe("Calendar header", () => {
 						locale={locale}
 						holidays={[...holidays]}
 						allowPastDays
+						className="w-full"
 					/>
 				</NextIntlClientProvider>,
 			);
@@ -281,30 +282,6 @@ describe("Calendar picking one date", () => {
 		renderCalendar({ mode: CalendarSelectionMode.SINGLE, initialSelected: new Date(2026, 5, 12) });
 
 		expect(june(12).className).toContain(MODIFIERS_CLASS_NAMES.selected);
-	});
-});
-
-describe("Calendar picking several dates", () => {
-	it("adds a date to the selection and takes it back out on a second click", () => {
-		const onSelect = vi.fn();
-		renderCalendar({ mode: CalendarSelectionMode.MULTIPLE, onSelect });
-
-		clickJune(5);
-		clickJune(9);
-		expect(onSelect).toHaveBeenLastCalledWith([new Date(2026, 5, 5), new Date(2026, 5, 9)]);
-
-		clickJune(5);
-		expect(onSelect).toHaveBeenLastCalledWith([new Date(2026, 5, 9)]);
-	});
-
-	it("starts from the dates it was given", () => {
-		renderCalendar({
-			mode: CalendarSelectionMode.MULTIPLE,
-			initialSelected: [new Date(2026, 5, 3), new Date(2026, 5, 4)],
-		});
-
-		expect(june(3).className).toContain(MODIFIERS_CLASS_NAMES.selected);
-		expect(june(4).className).toContain(MODIFIERS_CLASS_NAMES.selected);
 	});
 });
 
@@ -470,16 +447,8 @@ describe("Calendar month navigation", () => {
 });
 
 describe("Calendar outside days", () => {
-	it("leaves the neighbouring months' days blank when asked to hide them, keeping the grid's shape", () => {
-		const { container } = renderCalendar({ showOutsideDays: false });
-
-		expect(screen.queryByRole("button", { name: /July 1, 2026/ })).toBeNull();
-		expect(screen.getAllByRole("button")).toHaveLength(30);
-		expect(container.querySelectorAll(".grid-cols-7.gap-2 > div")).toHaveLength(35);
-	});
-
-	it("shows them, named in full, when it is not", () => {
-		renderCalendar({ showOutsideDays: true });
+	it("shows the neighbouring months' days, named in full", () => {
+		renderCalendar();
 
 		expect(screen.getByRole("button", { name: "Wednesday, July 1, 2026" })).toBeTruthy();
 	});
@@ -503,7 +472,14 @@ describe("Calendar with no month of its own", () => {
 describe("Calendar's mount-only props", () => {
 	const rerenderWith = (props: Partial<Parameters<typeof Calendar>[0]>) => (
 		<NextIntlClientProvider locale="en" messages={en}>
-			<Calendar mode={CalendarSelectionMode.NONE} locale="en" holidays={[HOLIDAY]} allowPastDays {...props} />
+			<Calendar
+				mode={CalendarSelectionMode.NONE}
+				locale="en"
+				holidays={[HOLIDAY]}
+				allowPastDays
+				className="w-full"
+				{...props}
+			/>
 		</NextIntlClientProvider>
 	);
 
