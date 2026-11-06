@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-	BASE64_PATTERN,
 	base64Decode,
 	base64Encode,
 	deobfuscate,
@@ -26,8 +25,8 @@ describe("base64Encode / base64Decode", () => {
 		expect(base64Decode(base64Encode(text))).toBe(text);
 	});
 
-	it("encodes to a non-empty base64 string", () => {
-		expect(base64Encode("test")).toMatch(BASE64_PATTERN);
+	it("encodes to a base64 string", () => {
+		expect(base64Encode("test")).toBe("dGVzdA==");
 	});
 
 	it("decodes a known base64 value", () => {

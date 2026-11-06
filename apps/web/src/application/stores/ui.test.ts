@@ -38,13 +38,6 @@ describe("donate popover", () => {
 		expect(useUIStore.getState().donatePopoverOpen).toBe(true);
 	});
 
-	it("closeDonatePopover sets both flags to false", () => {
-		useUIStore.setState({ donatePopoverOpen: true, donatePopoverIsOpening: true });
-		useUIStore.getState().closeDonatePopover();
-		expect(useUIStore.getState().donatePopoverOpen).toBe(false);
-		expect(useUIStore.getState().donatePopoverIsOpening).toBe(false);
-	});
-
 	it("setDonatePopoverOpen(true) opens and clears isOpening", () => {
 		useUIStore.getState().setDonatePopoverOpen(true);
 		expect(useUIStore.getState().donatePopoverOpen).toBe(true);

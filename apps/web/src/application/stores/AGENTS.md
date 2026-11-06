@@ -21,7 +21,7 @@ The rest of the application layer contract is in [`../AGENTS.md`](../AGENTS.md).
 | [`crypto.ts`](./crypto.ts) | `obfuscatedStorage`, the zustand `PersistStorage` the persisted stores share, which discards a stored value it cannot read. Not a store |
 | [`rehydration.ts`](./rehydration.ts) | `onRehydrateFailure`, the one thing every persisted store does when a stored blob will not come back. Not a store |
 | [`storedPlan.ts`](./storedPlan.ts) | `HOLIDAYS_STORAGE_NAME`, the holidays store's key, and `hasStoredPlan`, which reads whether that blob exists without rehydrating anything (the quick start's resume label, through `useHasStoredPlan`). Not a store |
-| [`utils/crypto.ts`](./utils/crypto.ts) | `obfuscate` / `deobfuscate` / `base64Encode` / `base64Decode`, plus `TWENTY_FOUR_HOURS` and `BASE64_PATTERN`. Not a store |
+| [`utils/crypto.ts`](./utils/crypto.ts) | `obfuscate` / `deobfuscate` / `base64Encode` / `base64Decode`, plus `TWENTY_FOUR_HOURS`. Not a store |
 | [`utils/holidaysMigration.ts`](./utils/holidaysMigration.ts) | `migrateHolidays`, the holidays store's `migrate`: what a stored blob of each older `STORAGE_VERSION` becomes. Not a store |
 | [`types.ts`](./types.ts) | The action parameter objects shared between the stores and their callers (`GenerateSuggestionsParams`, `FetchHolidaysParams`, `SetCalculationResultParams`, `ToggleDaySelectionParams`, `AddHolidayParams`, `EditHolidayParams`, `AlternativeSelectionBaseParams`, `AlternativePreviewParams`), `holidaysKeyOf`, and the outcomes the actions answer with: `DayRefusal`/`DayChange`/`DayOutcome` and `HolidayRefusal`/`HolidayOutcome` |
 

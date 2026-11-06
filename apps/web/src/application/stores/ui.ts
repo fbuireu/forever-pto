@@ -29,7 +29,6 @@ interface UIState {
 
 interface UIActions {
 	openDonatePopover: (source: DonateSource) => void;
-	closeDonatePopover: () => void;
 	setDonatePopoverOpen: (isOpen: boolean) => void;
 	clearDonatePopoverOpening: () => void;
 	openQuickStart: (source: QuickStartSource) => void;
@@ -54,10 +53,6 @@ export const useUIStore = create<UIStore>()(
 				set({ donatePopoverOpen: true, donatePopoverIsOpening: true });
 				track({ event: "donate_opened", properties: { source } });
 				setTimeout(() => set({ donatePopoverIsOpening: false }), 0);
-			},
-
-			closeDonatePopover: () => {
-				set({ donatePopoverOpen: false, donatePopoverIsOpening: false });
 			},
 
 			setDonatePopoverOpen: (isOpen: boolean) => {

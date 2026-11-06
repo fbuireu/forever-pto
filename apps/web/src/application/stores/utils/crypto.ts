@@ -1,5 +1,4 @@
 export const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
-export const BASE64_PATTERN = /^[A-Za-z0-9+/=]+$/;
 
 export interface ObfuscationParams {
 	text: string;
