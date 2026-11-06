@@ -123,4 +123,4 @@ Premium session mirror: `premiumKey`, `userEmail`, `lastVerified`, `needsSession
 
 ## `ui` (`useUIStore`, not persisted)
 
-Ephemeral UI state: the Donate popover open/opening flags and the currency derived from the locale (`getCurrencyFromLocale`, defaults in `apps/web/src/ui/utils/currencies.ts`).
+Ephemeral UI state: the Donate popover open/opening flags and whether the quick start dialog is open. `openDonatePopover` and `openQuickStart` take the source that opened them and fire the `donate_opened` and `quick_start_opened` [analytics events](/how-it-works/observability/) with it.

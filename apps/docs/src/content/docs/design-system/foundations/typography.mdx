@@ -26,7 +26,7 @@ The role tokens are mapped in `apps/web/src/ui/styles/theme/index.css` under `@t
 
 The role mapping targets raw per-family variables (`--font-bricolage`, `--font-space-grotesk`, `--font-instrument-serif`, `--font-jetbrains-mono`), and *who defines those variables* differs by host:
 
-- **The app** loads each family through `next/font/google` in `apps/web/src/app/fonts.ts`. Each export sets its `variable` name, and the root layouts attach the generated classes, so Next.js self-hosts the files and injects the `@font-face` rules at build time.
+- **The app** loads each family through `next/font/google` in `apps/web/src/app/fonts.ts`. Each family sets its `variable` name, `fonts.ts` joins the generated classes into one `DOCUMENT_BODY_CLASS` that the root layouts attach, so Next.js self-hosts the files and injects the `@font-face` rules at build time.
 - **These docs** cannot use `next/font` (no Next.js), so `apps/docs/src/styles/global.css` imports the same families from `@fontsource-variable/*` / `@fontsource/*` packages and points the identical raw variables at the self-hosted faces.
 
 Because both pipelines feed the same variables, the specimens above and every component demo render with production-accurate type.

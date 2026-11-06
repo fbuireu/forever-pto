@@ -47,7 +47,7 @@ Core exports by name, as the rest of the app does, and Biome fails a default exp
 
 ## No business logic in core
 
-Core components are presentational, and the contract suite holds them to it: no store access, no API calls, no data fetching, and no translation keys, since components accept strings and `useTranslations` lives in the feature modules that render them. The components that reach app code (`Combobox` with its DTO props, `RichLink` with the next-intl `Link`, `Toaster` with `next-themes`) are exactly the ones these docs cannot render live, so they are documented reference-only.
+Core components are presentational, and the contract suite holds them to it: no store access, no API calls, no data fetching, and no translation keys, since components accept strings and `useTranslations` lives in the feature modules that render them. The components that reach app code (`Combobox` with its DTO-typed flag helper, `RichLink` with the next-intl `Link`, `Toaster` with `next-themes`) are exactly the ones these docs cannot render live, so they are documented reference-only.
 
 ## `cn()`
 

@@ -13,7 +13,7 @@ Most core components are framework-clean and get live demos elsewhere in this se
 
 `apps/web/src/ui/modules/core/primitives/RichLink.tsx` is the locale-aware link. Internal links render through the `next-intl` navigation `Link`, so hrefs are automatically prefixed with the active locale; `external` switches to a plain `<a target='_blank' rel='noopener noreferrer'>`.
 
-- **API**: `href`, `className` (defaults to `text-primary hover:underline`), `external`, `children`. Plus the `createRichLink({ href, options: { className, external } })` factory, which returns a chunk-rendering function for `next-intl` rich-text tags (`t.rich('key', { link: createRichLink({ href: '/pricing' }) })`).
+- **API**: `href`, `className` (defaults to `text-primary hover:underline`), `external`, `children`. Plus the `createRichLink({ href, options: { className, external } })` factory, which returns a chunk-rendering function for `next-intl` rich-text tags (`t.rich('key', { link: createRichLink({ href: '/legal/privacy-policy' }) })`).
 - **Coupling**: `import { Link } from '@application/i18n/navigation'` (next-intl's locale router).
 
 ## Sonner (Toaster)
@@ -25,10 +25,10 @@ Most core components are framework-clean and get live demos elsewhere in this se
 
 ## Combobox
 
-`apps/web/src/ui/modules/core/primitives/Combobox.tsx` is the searchable select used for country, region and strategy pickers. Composes `Popover` + `Command` (cmdk) + `Button` + `FlagIcon`, with an `AnimateIcon`-driven `ChevronUpDown` that animates on hover and while open.
+`apps/web/src/ui/modules/core/primitives/Combobox.tsx` is the searchable select used for the country, region, strategy and month pickers. Composes `Popover` + `Command` (cmdk) + `Button` + `FlagIcon`, with an `AnimateIcon`-driven `ChevronUpDown` that animates on hover and while open.
 
-- **API**: `options?: CountryDTO[] | RegionDTO[]`, `value?`, `onChange: (value: Strategy) => void`, `placeholder`, `searchPlaceholder`, `notFoundText`, `disabled`, `id`. Options with a flag render a `FlagIcon` next to the label.
-- **Coupling**: type imports from `@application/dto/country/types`, `@application/dto/region/types` and `@domain/calendar/types` (`Strategy`) tie it to the app's DTO layer.
+- **API**: `options: { value, label, flag? }[]`, `value`, `onChange: (value) => void` (called with the chosen option's `value`, typed by the options), `className`, `placeholder` and `searchPlaceholder`, all required, plus the optional `notFoundText`, `disabled` and `id`. Options with a flag render a `FlagIcon` next to the label.
+- **Coupling**: its `hasFlag` helper (`primitives/utils/helpers.ts`) type-imports `CountryDTO` and `RegionDTO` from `@application/dto/country/types` and `@application/dto/region/types`, which ties it to the app's DTO layer.
 - **Sizing**: the list is as wide as the control it opens from (Base UI's `--anchor-width`, with a 200px floor) and no taller than the room under it (`--available-height`), so a full-width control in a dialog or the sidebar gets a full-width list that scrolls. When even that does not fit below, the list flips above the control; it never falls back to the side, where a 200px list would land inside a dialog.
 
 ## Sidebar
@@ -40,14 +40,14 @@ Most core components are framework-clean and get live demos elsewhere in this se
 
 ## Form
 
-`apps/web/src/ui/modules/core/primitives/Form.tsx` is the shadcn-style `react-hook-form` glue. `Form` is `FormProvider`; `FormField` wraps RHF's `Controller` and publishes the field name through context; `FormItem` mints an id; `FormLabel`, `FormControl` (a `Slot`) and `FormMessage` consume both contexts to wire `htmlFor`, `aria-describedby` and `aria-invalid` automatically, with `FormMessage` rendering the field error.
+`apps/web/src/ui/modules/core/primitives/Form.tsx` is the shadcn-style `react-hook-form` glue. `Form` is `FormProvider`; `FormField` wraps RHF's `Controller` and publishes the field name through context; `FormItem` mints an id; `FormLabel`, `FormControl` (a `Slot`), `FormDescription` and `FormMessage` consume both contexts to wire `htmlFor`, `aria-describedby` and `aria-invalid` automatically, with `FormMessage` rendering the field error. `FormDescription` registers itself with its `FormItem`, so `FormControl` names it in `aria-describedby` only while it is on the page; `FormHeading` is a `<p>` styled like the label, for a field with no single control to point a `<label>` at.
 
-- **API**: `Form`, `FormField` (takes RHF `ControllerProps`: `control`, `name`, `render`), `FormItem`, `FormLabel`, `FormControl`, `FormMessage`.
+- **API**: `Form`, `FormField` (takes RHF `ControllerProps`: `control`, `name`, `render`), `FormItem`, `FormLabel`, `FormHeading`, `FormControl`, `FormDescription`, `FormMessage`.
 - **Coupling**: `react-hook-form` (`Controller`, `FormProvider`, `useFormContext`, `useFormState`), a runtime dependency the docs site intentionally does not install.
 
 ## FlagIcon
 
-`apps/web/src/ui/modules/core/primitives/FlagIcon.tsx` renders a country flag as `<span class='fi fi-{code}' aria-hidden='true'>`. The component itself is dependency-free (only `cn()`), but the visuals come entirely from the `flag-icons` stylesheet.
+`apps/web/src/ui/modules/core/primitives/FlagIcon.tsx` renders a country flag as `<span class='fi fi-{code} rounded-sm overflow-hidden shrink-0 inline-block' aria-hidden='true'>`. The component itself is dependency-free (only `cn()`), but the visuals come entirely from the `flag-icons` stylesheet.
 
 - **API**: `code` (ISO country code, lowercase; returns `null` when empty), `className`.
 - **Coupling**: requires the `flag-icons` CSS, which the app imports in `apps/web/src/ui/styles/vendor/index.css`. The docs stylesheet deliberately loads only the app's theme and utility layers, so flags would render as empty squares here.
