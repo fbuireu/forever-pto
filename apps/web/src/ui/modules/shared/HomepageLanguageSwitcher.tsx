@@ -15,12 +15,12 @@ export const HomepageLanguageSwitcher = () => {
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
+			<DropdownMenuTrigger>
 				<Button variant="outline" size="sm" className="focus-visible:ring-1" aria-label={switcherLabel}>
 					<span className="capitalize">{currentLanguage?.label}</span>
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent align="end">
+			<DropdownMenuContent>
 				{languages.map((language) => (
 					<DropdownMenuItem
 						key={language.code}

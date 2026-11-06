@@ -2,11 +2,10 @@
 
 import { Menu as DropdownMenuPrimitive } from "@base-ui/react/menu";
 import { cn } from "@ui/utils/cn";
-import { AnimatePresence, type HTMLMotionProps, m, type Transition } from "motion/react";
+import { AnimatePresence, type HTMLMotionProps, m } from "motion/react";
 import {
 	type ComponentProps,
 	createContext,
-	isValidElement,
 	type ReactElement,
 	type ReactNode,
 	use,
@@ -19,11 +18,7 @@ import { MotionHighlight, MotionHighlightItem } from "../effects/MotionHighlight
 
 interface DropdownMenuContextType {
 	isOpen: boolean;
-	highlightTransition: Transition;
-	animateOnHover: boolean;
 }
-
-const HIGHLIGHT_TRANSITION: Transition = { type: "spring", stiffness: 350, damping: 35 };
 
 const DropdownMenuContext = createContext<DropdownMenuContextType | undefined>(undefined);
 
@@ -35,17 +30,9 @@ const useDropdownMenu = (): DropdownMenuContextType => {
 	return context;
 };
 
-interface DropdownMenuProps extends ComponentProps<typeof DropdownMenuPrimitive.Root> {
-	transition?: Transition;
-	animateOnHover?: boolean;
-}
+type DropdownMenuProps = ComponentProps<typeof DropdownMenuPrimitive.Root>;
 
-function DropdownMenu({
-	children,
-	transition = HIGHLIGHT_TRANSITION,
-	animateOnHover = true,
-	...props
-}: DropdownMenuProps) {
+function DropdownMenu({ children, ...props }: DropdownMenuProps) {
 	const [isOpen, setIsOpen] = useState(props?.open ?? props?.defaultOpen ?? false);
 
 	useEffect(() => {
@@ -60,10 +47,7 @@ function DropdownMenu({
 		[props.onOpenChange],
 	);
 
-	const contextValue = useMemo(
-		() => ({ isOpen, highlightTransition: transition, animateOnHover }),
-		[isOpen, transition, animateOnHover],
-	);
+	const contextValue = useMemo(() => ({ isOpen }), [isOpen]);
 
 	return (
 		<DropdownMenuContext value={contextValue}>
@@ -74,57 +58,28 @@ function DropdownMenu({
 	);
 }
 
-interface DropdownMenuTriggerProps extends ComponentProps<typeof DropdownMenuPrimitive.Trigger> {
-	asChild?: boolean;
+interface DropdownMenuTriggerProps extends Omit<ComponentProps<typeof DropdownMenuPrimitive.Trigger>, "render"> {
+	children: ReactElement;
 }
 
-function DropdownMenuTrigger({ asChild, children, ...props }: DropdownMenuTriggerProps) {
-	if (asChild && isValidElement(children)) {
-		return (
-			<DropdownMenuPrimitive.Trigger data-slot="dropdown-menu-trigger" render={children as ReactElement} {...props} />
-		);
-	}
-	return (
-		<DropdownMenuPrimitive.Trigger data-slot="dropdown-menu-trigger" {...props}>
-			{children}
-		</DropdownMenuPrimitive.Trigger>
-	);
+function DropdownMenuTrigger({ children, ...props }: DropdownMenuTriggerProps) {
+	return <DropdownMenuPrimitive.Trigger data-slot="dropdown-menu-trigger" render={children} {...props} />;
 }
 
 interface DropdownMenuContentProps
 	extends Omit<ComponentProps<typeof DropdownMenuPrimitive.Popup>, "render" | keyof HTMLMotionProps<"div">>,
 		HTMLMotionProps<"div"> {
 	children?: ReactNode;
-	transition?: Transition;
-	sideOffset?: number;
-	align?: "start" | "center" | "end";
 }
 
-const DROPDOWN_MENU_CONTENT_DEFAULTS = {
-	sideOffset: 4,
-	align: "start",
-} as const satisfies Pick<DropdownMenuContentProps, "sideOffset" | "align">;
-
-function DropdownMenuContent({
-	className,
-	children,
-	sideOffset = DROPDOWN_MENU_CONTENT_DEFAULTS.sideOffset,
-	align = DROPDOWN_MENU_CONTENT_DEFAULTS.align,
-	transition = { duration: 0.2 },
-	...props
-}: DropdownMenuContentProps) {
-	const { isOpen, highlightTransition, animateOnHover } = useDropdownMenu();
+function DropdownMenuContent({ className, children, ...props }: DropdownMenuContentProps) {
+	const { isOpen } = useDropdownMenu();
 
 	return (
 		<AnimatePresence>
 			{isOpen && (
 				<DropdownMenuPrimitive.Portal keepMounted data-slot="dropdown-menu-portal">
-					<DropdownMenuPrimitive.Positioner
-						sideOffset={sideOffset}
-						align={align}
-						positionMethod="fixed"
-						className="z-210"
-					>
+					<DropdownMenuPrimitive.Positioner sideOffset={4} align="end" positionMethod="fixed" className="z-210">
 						<DropdownMenuPrimitive.Popup
 							render={
 								<m.div
@@ -137,7 +92,7 @@ function DropdownMenuContent({
 									initial={{ opacity: 0, scale: 0.95 }}
 									animate={{ opacity: 1, scale: 1 }}
 									exit={{ opacity: 0, scale: 0.95 }}
-									transition={transition}
+									transition={{ duration: 0.2 }}
 									{...(props as HTMLMotionProps<"div">)}
 								/>
 							}
@@ -145,9 +100,7 @@ function DropdownMenuContent({
 							<MotionHighlight
 								hover
 								className="rounded-[8px]"
-								controlledItems
-								transition={highlightTransition}
-								enabled={animateOnHover}
+								transition={{ type: "spring", stiffness: 350, damping: 35 }}
 							>
 								{children}
 							</MotionHighlight>
@@ -163,39 +116,19 @@ interface DropdownMenuItemProps
 	extends Omit<ComponentProps<typeof DropdownMenuPrimitive.Item>, "render" | keyof HTMLMotionProps<"div">>,
 		HTMLMotionProps<"div"> {
 	children?: ReactNode;
-	inset?: boolean;
-	variant?: "default" | "destructive";
 }
 
-function DropdownMenuItem({
-	className,
-	children,
-	inset,
-	disabled,
-	variant = "default",
-	...props
-}: DropdownMenuItemProps) {
+function DropdownMenuItem({ className, children, ...props }: DropdownMenuItemProps) {
 	return (
-		<MotionHighlightItem
-			activeClassName={cn(
-				variant === "default" && "bg-accent",
-				variant === "destructive" && "bg-destructive/10 dark:bg-destructive/20",
-			)}
-			disabled={disabled}
-		>
+		<MotionHighlightItem activeClassName="bg-accent">
 			<DropdownMenuPrimitive.Item
 				{...(props as ComponentProps<typeof DropdownMenuPrimitive.Item>)}
-				disabled={disabled}
 				render={
 					<m.div
 						data-slot="dropdown-menu-item"
-						data-inset={inset}
-						data-variant={variant}
-						data-disabled={disabled}
 						whileTap={{ scale: 0.97 }}
 						className={cn(
-							"[&:not([data-highlight])]:focus:bg-accent focus:text-accent-foreground data-[active=true]:text-accent-foreground data-[active=true]:[&_svg:not([class*='text-'])]:text-accent-foreground data-[variant=destructive]:text-destructive [&:not([data-highlight])]:data-[variant=destructive]:focus:bg-destructive/10 dark:[&:not([data-highlight])]:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:text-destructive! [&_svg:not([class*='text-'])]:text-muted-foreground relative z-1 flex cursor-default select-none items-center gap-2 rounded-[8px] border border-transparent px-3 py-2 text-sm font-medium outline-none transition-colors focus-visible:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-							inset && "pl-8",
+							"[&:not([data-highlight])]:focus:bg-accent focus:text-accent-foreground data-[active=true]:text-accent-foreground data-[active=true]:[&_svg:not([class*='text-'])]:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative z-1 flex cursor-default select-none items-center gap-2 rounded-[8px] border border-transparent px-3 py-2 text-sm font-medium outline-none transition-colors focus-visible:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
 							className,
 						)}
 					/>
@@ -207,4 +140,4 @@ function DropdownMenuItem({
 	);
 }
 
-export { DROPDOWN_MENU_CONTENT_DEFAULTS, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger };
+export { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger };

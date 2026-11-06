@@ -8,13 +8,17 @@ import { Demo } from "../Demo";
 
 const STRATEGIES = Object.values(Strategy).map((strategy) => en.sidebar.strategy[strategy].label);
 
+const SPRING = { type: "spring", stiffness: 350, damping: 35 } as const;
+
 export const MotionHighlightChildrenDemo = () => (
 	<Demo>
-		<MotionHighlight hover className="rounded-lg border-2 border-[var(--frame)] bg-accent">
+		<MotionHighlight hover className="rounded-lg border-2 border-[var(--frame)] bg-accent" transition={SPRING}>
 			{STRATEGIES.map((label) => (
-				<button key={label} type="button" className="cursor-pointer px-4 py-2 text-sm font-semibold">
-					{label}
-				</button>
+				<MotionHighlightItem key={label} value={label}>
+					<button type="button" className="cursor-pointer px-4 py-2 text-sm font-semibold">
+						{label}
+					</button>
+				</MotionHighlightItem>
 			))}
 		</MotionHighlight>
 	</Demo>
@@ -27,21 +31,24 @@ const TABS = [
 ];
 
 export const MotionHighlightParentDemo = () => {
-	const [active, setActive] = useState<string | null>("calendar");
+	const [active, setActive] = useState<string>("calendar");
 
 	return (
 		<Demo>
 			<MotionHighlight
 				mode="parent"
-				controlledItems
 				value={active}
-				onValueChange={setActive}
+				transition={SPRING}
 				className="rounded-lg border-2 border-[var(--frame)] bg-accent"
 				containerClassName="flex gap-1 rounded-xl border-[3px] border-[var(--frame)] bg-[var(--surface-panel-soft)] p-1"
 			>
 				{TABS.map(({ value, label }) => (
 					<MotionHighlightItem key={value} value={value}>
-						<button type="button" className="cursor-pointer px-4 py-1.5 text-sm font-semibold">
+						<button
+							type="button"
+							onClick={() => setActive(value)}
+							className="cursor-pointer px-4 py-1.5 text-sm font-semibold"
+						>
 							{label}
 						</button>
 					</MotionHighlightItem>
@@ -66,6 +73,7 @@ export const AutoHeightDemo = () => {
 				</Button>
 				<AutoHeight
 					deps={[expanded]}
+					transition={{ type: "spring", stiffness: 300, damping: 30, bounce: 0, restDelta: 0.01 }}
 					className="w-80 overflow-hidden rounded-xl border-[3px] border-[var(--frame)] bg-card shadow-[var(--shadow-brutal-xs)]"
 				>
 					<p className="p-4 text-sm">{expanded ? LONG_TEXT : SHORT_TEXT}</p>

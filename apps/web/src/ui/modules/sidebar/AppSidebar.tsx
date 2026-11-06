@@ -56,7 +56,7 @@ export const AppSidebar = async ({ locale, children }: AppSidebarProps) => {
 
 	return (
 		<>
-			<Sidebar collapsible="icon" variant="inset" landmarkLabel={tA11y("sidebarLandmark")}>
+			<Sidebar landmarkLabel={tA11y("sidebarLandmark")}>
 				<SidebarHeader className="group-data-[collapsible=icon]:p-0 mb-2.5">
 					<SidebarMenu>
 						<SidebarMenuItem>

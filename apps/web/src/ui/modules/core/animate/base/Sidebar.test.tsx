@@ -77,6 +77,7 @@ import { Sidebar, SidebarMenuButton, SidebarProvider, SidebarTrigger, useSidebar
 
 afterEach(() => {
 	viewport.isMobile = false;
+	vi.restoreAllMocks();
 });
 
 describe("useSidebar", () => {
@@ -98,11 +99,9 @@ describe("SidebarProvider", () => {
 		expect(result.current.state).toBe("expanded");
 	});
 
-	it('provides state="collapsed" when defaultOpen=false', () => {
-		const collapsedWrapper = ({ children }: { children: ReactNode }) => (
-			<SidebarProvider defaultOpen={false}>{children}</SidebarProvider>
-		);
-		const { result } = renderHook(() => useSidebar(), { wrapper: collapsedWrapper });
+	it('provides state="collapsed" when the cookie says the rail was collapsed', () => {
+		vi.spyOn(document, "cookie", "get").mockReturnValue("sidebar_state=false");
+		const { result } = renderHook(() => useSidebar(), { wrapper });
 		expect(result.current.state).toBe("collapsed");
 		expect(result.current.open).toBe(false);
 	});
@@ -152,7 +151,7 @@ describe("Sidebar body styles", () => {
 
 const MobileHarness = () => (
 	<SidebarProvider>
-		<SidebarTrigger label="Toggle sidebar" />
+		<SidebarTrigger className="trigger" label="Toggle sidebar" />
 		<Sidebar landmarkLabel="Planner controls">
 			<button type="button">Country</button>
 		</Sidebar>
@@ -257,18 +256,6 @@ describe("the rail remembers whether it was collapsed", () => {
 
 		expect(readState(view).state).toBe("expanded");
 	});
-
-	it("leaves a caller that owns the state alone, cookie or no cookie", () => {
-		vi.spyOn(document, "cookie", "get").mockReturnValue("sidebar_state=false");
-
-		const view = render(
-			<SidebarProvider open onOpenChange={vi.fn()}>
-				<StateHarness />
-			</SidebarProvider>,
-		);
-
-		expect(readState(view).state).toBe("expanded");
-	});
 });
 
 describe("the keyboard shortcut", () => {
@@ -321,21 +308,6 @@ describe("the keyboard shortcut", () => {
 		expect(readState(view).state).toBe("expanded");
 	});
 
-	it("tells a caller that owns the state instead of writing its own", () => {
-		const onOpenChange = vi.fn();
-		render(
-			<SidebarProvider open onOpenChange={onOpenChange}>
-				<StateHarness />
-			</SidebarProvider>,
-		);
-
-		act(() => {
-			fireEvent.keyDown(window, { key: "b", metaKey: true });
-		});
-
-		expect(onOpenChange).toHaveBeenCalledExactlyOnceWith(false);
-	});
-
 	it("stops listening once the provider goes away", () => {
 		const { unmount } = renderShortcutHarness();
 
@@ -346,10 +318,17 @@ describe("the keyboard shortcut", () => {
 });
 
 describe("a menu button in a collapsed rail", () => {
-	const renderMenu = ({ defaultOpen = true, tooltip }: { defaultOpen?: boolean; tooltip?: string } = {}) => {
+	const renderMenu = ({
+		defaultOpen = true,
+		tooltip = "Countries",
+	}: {
+		defaultOpen?: boolean;
+		tooltip?: string;
+	} = {}) => {
 		const onClick = vi.fn();
+		if (!defaultOpen) vi.spyOn(document, "cookie", "get").mockReturnValue("sidebar_state=false");
 		const view = render(
-			<SidebarProvider defaultOpen={defaultOpen}>
+			<SidebarProvider>
 				<StateHarness />
 				<SidebarMenuButton tooltip={tooltip} onClick={onClick}>
 					Countries

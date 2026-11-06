@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import type { ComponentProps, ReactNode } from "react";
+import { type ComponentProps, type ReactNode, useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 interface MotionDivProps extends ComponentProps<"div"> {
@@ -49,7 +49,30 @@ vi.mock("../effects/MotionHighlight", () => ({
 	MotionHighlightItem: ({ children }: { children?: ReactNode }) => <>{children}</>,
 }));
 
-import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from "./Tabs";
+import { Tabs as ControlledTabs, TabsContent, TabsContents, TabsList, TabsTrigger } from "./Tabs";
+
+interface TabsHarnessProps {
+	defaultValue?: string;
+	value?: string;
+	onValueChange?: (value: string) => void;
+	children?: ReactNode;
+}
+
+const Tabs = ({ defaultValue = "", value, onValueChange, children }: TabsHarnessProps) => {
+	const [own, setOwn] = useState(defaultValue);
+
+	return (
+		<ControlledTabs
+			value={value ?? own}
+			onValueChange={(next) => {
+				setOwn(next);
+				onValueChange?.(next);
+			}}
+		>
+			{children}
+		</ControlledTabs>
+	);
+};
 
 describe("Tabs", () => {
 	it('renders with data-slot="tabs"', () => {
@@ -59,15 +82,6 @@ describe("Tabs", () => {
 			</Tabs>,
 		);
 		expect(container.querySelector('[data-slot="tabs"]')).not.toBeNull();
-	});
-
-	it("applies custom className", () => {
-		const { container } = render(
-			<Tabs className="my-tabs">
-				<span />
-			</Tabs>,
-		);
-		expect(container.querySelector('[data-slot="tabs"]')?.className).toContain("my-tabs");
 	});
 });
 
@@ -153,7 +167,7 @@ describe("TabsTrigger", () => {
 		expect((getByText("A") as HTMLElement).dataset.state).toBe("inactive");
 	});
 
-	it("respects controlled value prop", () => {
+	it("follows the value it is given", () => {
 		const { getAllByRole } = render(
 			<Tabs value="b">
 				<TabsList>

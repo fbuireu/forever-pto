@@ -33,7 +33,7 @@ export function SidebarCollapsibleGroup({
 			data-tutorial={dataTutorial}
 		>
 			<CollapsibleTrigger asChild className="cursor-pointer w-full">
-				<SidebarMenuButton variant="outline" tooltip={tooltip}>
+				<SidebarMenuButton tooltip={tooltip}>
 					{icon}
 					<span className="group-data-[collapsible=icon]:hidden">{label}</span>
 					<ChevronDown className="ml-auto -rotate-90 transition-transform group-data-[open]/collapsible:rotate-0 group-data-[collapsible=icon]:hidden" />

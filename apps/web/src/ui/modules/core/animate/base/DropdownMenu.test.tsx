@@ -80,13 +80,7 @@ vi.mock("../effects/MotionHighlight", () => ({
 	MotionHighlightItem: ({ children }: { children?: ReactNode }) => <>{children}</>,
 }));
 
-import {
-	DROPDOWN_MENU_CONTENT_DEFAULTS,
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "./DropdownMenu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./DropdownMenu";
 
 describe("DropdownMenu", () => {
 	it('renders with data-slot="dropdown-menu"', () => {
@@ -118,7 +112,7 @@ describe("DropdownMenu", () => {
 });
 
 describe("DropdownMenuContent", () => {
-	it("places the menu by the defaults it publishes when the caller sets none", () => {
+	it("places the menu four pixels from its trigger, aligned to the trigger's end", () => {
 		positioned.length = 0;
 		render(
 			<DropdownMenu defaultOpen>
@@ -126,20 +120,7 @@ describe("DropdownMenuContent", () => {
 			</DropdownMenu>,
 		);
 
-		expect(positioned.at(-1)).toEqual(DROPDOWN_MENU_CONTENT_DEFAULTS);
-	});
-
-	it("places the menu where the caller asks", () => {
-		positioned.length = 0;
-		render(
-			<DropdownMenu defaultOpen>
-				<DropdownMenuContent sideOffset={12} align="end">
-					item
-				</DropdownMenuContent>
-			</DropdownMenu>,
-		);
-
-		expect(positioned.at(-1)).toEqual({ sideOffset: 12, align: "end" });
+		expect(positioned.at(-1)).toEqual({ sideOffset: 4, align: "end" });
 	});
 
 	it("throws when rendered outside DropdownMenu", () => {
@@ -153,7 +134,9 @@ describe("DropdownMenuTrigger", () => {
 	it('renders with data-slot="dropdown-menu-trigger"', () => {
 		const { container } = render(
 			<DropdownMenu>
-				<DropdownMenuTrigger>open</DropdownMenuTrigger>
+				<DropdownMenuTrigger>
+					<button type="button">open</button>
+				</DropdownMenuTrigger>
 			</DropdownMenu>,
 		);
 		expect(container.querySelector('[data-slot="dropdown-menu-trigger"]')).not.toBeNull();

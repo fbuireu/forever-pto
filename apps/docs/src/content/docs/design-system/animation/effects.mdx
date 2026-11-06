@@ -15,30 +15,29 @@ Source: `apps/web/src/ui/modules/core/animate/effects/`. Reusable motion behavio
 
 ### Modes
 
-**`mode='children'`** (default): each item renders its own absolutely-positioned background `m.div` sharing a `layoutId`, so Motion morphs the pill between items as the active one changes. Hover an item below and the pill travels with the pointer:
+**`mode='children'`** (default, as in `DropdownMenu`): each item renders its own absolutely-positioned background `m.div` sharing a `layoutId`, so Motion morphs the pill between items as the active one changes. Hover an item below and the pill travels with the pointer:
 
 <MotionHighlightChildrenDemo client:visible />
 
-**`mode='parent'`**: a single `m.div` lives in the container and animates `top/left/width/height` to the measured bounds of the active item (recomputed on container scroll, or continuously with `forceUpdateBounds`). Use it when items live in a scrollable or oddly-nested layout where per-item `layoutId` morphing misbehaves:
+**`mode='parent'`** (as in `Tabs` and `Sidebar`): a single `m.div` lives in the container and animates `top/left/width/height` to the measured bounds of the active item (recomputed on container scroll and on every render). Use it when items live in a scrollable or oddly-nested layout where per-item `layoutId` morphing misbehaves:
 
 <MotionHighlightParentDemo client:visible />
 
-### Controlled vs uncontrolled items
+### Items
 
-- **Uncontrolled** (`controlledItems` unset): pass plain elements as children and `MotionHighlight` wraps each one in a `MotionHighlightItem` automatically, keyed by an internal id. Combine with `hover` for pointer-following highlights.
-- **Controlled** (`controlledItems`): you place `MotionHighlightItem` yourself and give each a `value`. Drive the active item with `value`/`onValueChange` (or seed with `defaultValue`). This is what `Tabs` and `Sidebar` do; the parent-mode demo above is controlled.
+Every caller in the app places `MotionHighlightItem` itself and gives each a `value`; `MotionHighlight` takes a `value` of its own when something outside drives the active item, as `Tabs` does. Pass `hover` and the active item follows the pointer, as in `DropdownMenu` and `Sidebar`.
 
 ### Key props
 
-`hover` switches activation from click to pointer-enter; `transition` (spring `stiffness: 350, damping: 35` by default) and `exitDelay` shape the movement; `className` styles the pill itself while `containerClassName` (parent mode) styles the wrapper; `enabled`/`disabled` switch the whole effect off; `boundsOffset` nudges the parent-mode pill. Items expose `data-active`, `data-value` and `data-highlight` attributes for CSS hooks.
+`hover` switches activation from click to pointer-enter; `transition` is required (`DropdownMenu` and `Sidebar` use a spring of `stiffness: 350, damping: 35`); `className` styles the pill itself while `containerClassName` (parent mode) styles the wrapper. Items take `value`, `className` and `activeClassName`, and expose `data-active`, `data-value` and `data-highlight` attributes for CSS hooks.
 
 ## AutoHeight
 
-`AutoHeight` animates a container's height to match its content. It measures the inner content with a `ResizeObserver` (via `useAutoHeight` in `apps/web/src/ui/hooks/useAutoHeight.tsx`) and springs the outer `m.div` to the new height. Pass `deps` to force a re-measure when content changes for reasons the observer cannot see:
+`AutoHeight` animates a container's height to match its content. It measures the inner content with a `ResizeObserver` (via `useAutoHeight` in `apps/web/src/ui/hooks/useAutoHeight.tsx`) and springs the outer `m.div` to the new height. It takes `deps` and a `transition`, and forwards the other Motion props of a `div`. `deps` forces a re-measure when content changes for reasons the observer cannot see:
 
 <AutoHeightDemo client:visible />
 
-`TabsContents` (`apps/web/src/ui/modules/core/animate/components/Tabs.tsx`) uses it in its default `auto-height` mode so panels of different heights cross-fade without layout jumps. Supports `asChild` through `MotionSlot`, and a custom `transition` (default spring `stiffness: 300, damping: 30, bounce: 0`).
+`TabsContents` (`apps/web/src/ui/modules/core/animate/components/Tabs.tsx`) uses it so panels of different heights cross-fade without layout jumps, with a spring of `stiffness: 200, damping: 25`.
 
 ## Usage
 
@@ -46,14 +45,18 @@ Source: `apps/web/src/ui/modules/core/animate/effects/`. Reusable motion behavio
 import { MotionHighlight, MotionHighlightItem } from '@ui/modules/core/animate/effects/MotionHighlight';
 import { AutoHeight } from '@ui/modules/core/animate/effects/AutoHeight';
 
-// Hover pill across plain children
-<MotionHighlight hover className='rounded-lg bg-accent'>
-  <button type='button'>Grouped</button>
-  <button type='button'>Optimized</button>
+// Hover pill across items
+<MotionHighlight hover className='rounded-lg bg-accent' transition={{ type: 'spring', stiffness: 350, damping: 35 }}>
+  <MotionHighlightItem value='grouped'>
+    <button type='button'>Grouped</button>
+  </MotionHighlightItem>
+  <MotionHighlightItem value='optimized'>
+    <button type='button'>Optimized</button>
+  </MotionHighlightItem>
 </MotionHighlight>
 
 // Animated container height, re-measured when `expanded` flips
-<AutoHeight deps={[expanded]} className='overflow-hidden'>
+<AutoHeight deps={[expanded]} transition={{ type: 'spring', stiffness: 300, damping: 30 }} className='overflow-hidden'>
   {expanded ? <LongContent /> : <ShortContent />}
 </AutoHeight>
 ```

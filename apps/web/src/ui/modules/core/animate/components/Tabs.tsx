@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@ui/utils/cn";
-import { AnimatePresence, type HTMLMotionProps, m, type Transition } from "motion/react";
+import { AnimatePresence, m } from "motion/react";
 import {
 	Children,
 	type ComponentProps,
@@ -12,12 +12,8 @@ import {
 	type ReactElement,
 	type ReactNode,
 	use,
-	useCallback,
 	useId,
-	useImperativeHandle,
 	useMemo,
-	useRef,
-	useState,
 } from "react";
 import { AutoHeight } from "../effects/AutoHeight";
 import { MotionHighlight, MotionHighlightItem } from "../effects/MotionHighlight";
@@ -71,8 +67,6 @@ const activateSiblingTab = ({ from, key }: ActivateSiblingTabParams): boolean =>
 	return true;
 };
 
-const HIGHLIGHT_TRANSITION: Transition = { type: "spring", stiffness: 200, damping: 25 };
-
 const TabsContext = createContext<TabsContextType | undefined>(undefined);
 
 function useTabs(): TabsContextType {
@@ -81,40 +75,28 @@ function useTabs(): TabsContextType {
 	return ctx;
 }
 
-interface TabsProps extends ComponentProps<"div"> {
-	value?: string;
-	defaultValue?: string;
-	onValueChange?: (value: string) => void;
+interface TabsProps {
+	value: string;
+	onValueChange: (value: string) => void;
+	children: ReactNode;
 }
 
-function Tabs({ defaultValue, value, onValueChange, children, className, ...props }: TabsProps) {
-	const [internalValue, setInternalValue] = useState(defaultValue ?? "");
-	const isControlled = value !== undefined;
-	const activeValue = isControlled ? value : internalValue;
-
-	const handleValueChange = useCallback(
-		(val: string) => {
-			if (!isControlled) setInternalValue(val);
-			onValueChange?.(val);
-		},
-		[isControlled, onValueChange],
-	);
-
+function Tabs({ value, onValueChange, children }: TabsProps) {
 	const baseId = useId();
 
 	const contextValue = useMemo(
 		() => ({
-			activeValue,
-			handleValueChange,
+			activeValue: value,
+			handleValueChange: onValueChange,
 			triggerId: (val: string) => `${baseId}tab-${val}`,
 			panelId: (val: string) => `${baseId}panel-${val}`,
 		}),
-		[activeValue, handleValueChange, baseId],
+		[value, onValueChange, baseId],
 	);
 
 	return (
 		<TabsContext value={contextValue}>
-			<div data-slot="tabs" className={cn("flex flex-col gap-2", className)} {...props}>
+			<div data-slot="tabs" className="flex flex-col gap-2">
 				{children}
 			</div>
 		</TabsContext>
@@ -123,20 +105,17 @@ function Tabs({ defaultValue, value, onValueChange, children, className, ...prop
 
 interface TabsHighlightProps {
 	children: ReactNode;
-	activeClassName?: string;
-	transition?: Transition;
 }
 
-function TabsHighlight({ children, activeClassName, transition = HIGHLIGHT_TRANSITION }: Readonly<TabsHighlightProps>) {
+function TabsHighlight({ children }: Readonly<TabsHighlightProps>) {
 	const { activeValue } = useTabs();
 
 	return (
 		<MotionHighlight
-			controlledItems
 			mode="parent"
-			className={cn("rounded-md bg-accent border-2 border-(--frame) shadow-(--shadow-brutal-xs)", activeClassName)}
+			className="rounded-md bg-accent border-2 border-(--frame) shadow-(--shadow-brutal-xs)"
 			value={activeValue}
-			transition={transition}
+			transition={{ type: "spring", stiffness: 200, damping: 25 }}
 		>
 			{children}
 		</MotionHighlight>
@@ -164,35 +143,32 @@ function TabsList({ children, className, ...props }: TabsListProps) {
 interface TabsHighlightItemProps {
 	value: string;
 	children: ReactElement;
-	className?: string;
 }
 
-function TabsHighlightItem({ value, children, className }: Readonly<TabsHighlightItemProps>) {
+function TabsHighlightItem({ value, children }: Readonly<TabsHighlightItemProps>) {
 	return (
-		<MotionHighlightItem value={value} className={cn("size-full", className)}>
+		<MotionHighlightItem value={value} className="size-full">
 			{children}
 		</MotionHighlightItem>
 	);
 }
 
-interface TabsTriggerProps extends HTMLMotionProps<"button"> {
+interface TabsTriggerProps {
 	value: string;
+	children: ReactNode;
+	disabled?: boolean;
 }
 
-function TabsTrigger({ ref, value, children, className, onKeyDown, ...props }: TabsTriggerProps) {
+function TabsTrigger({ value, children, disabled }: TabsTriggerProps) {
 	const { activeValue, handleValueChange, triggerId, panelId } = useTabs();
-	const localRef = useRef<HTMLButtonElement>(null);
-	useImperativeHandle(ref, () => localRef.current as HTMLButtonElement);
 	const isActive = activeValue === value;
 
 	const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
 		if (activateSiblingTab({ from: event.currentTarget, key: event.key })) event.preventDefault();
-		onKeyDown?.(event);
 	};
 
 	return (
 		<m.button
-			ref={localRef}
 			data-slot="tabs-trigger"
 			role="tab"
 			id={triggerId(value)}
@@ -202,76 +178,47 @@ function TabsTrigger({ ref, value, children, className, onKeyDown, ...props }: T
 			whileTap={{ scale: 0.95 }}
 			onClick={() => handleValueChange(value)}
 			onKeyDown={handleKeyDown}
+			disabled={disabled}
 			data-state={isActive ? "active" : "inactive"}
-			className={cn(
-				"inline-flex cursor-pointer items-center size-full justify-center whitespace-nowrap rounded-sm px-2 py-1 text-sm font-medium transition-all duration-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-accent-foreground data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground z-1",
-				className,
-			)}
-			{...props}
+			className="inline-flex cursor-pointer items-center size-full justify-center whitespace-nowrap rounded-sm px-2 py-1 text-sm font-medium transition-all duration-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-accent-foreground data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground z-1"
 		>
 			{children}
 		</m.button>
 	);
 }
 
-interface TabsContentsProps extends Omit<HTMLMotionProps<"div">, "children" | "transition"> {
-	children?: ReactNode;
-	mode?: "auto-height" | "layout";
-	transition?: Transition;
+interface TabsContentsProps {
+	children: ReactNode;
+	className?: string;
 }
 
-function TabsContents({
-	children,
-	className,
-	mode = "auto-height",
-	transition = { type: "spring", stiffness: 200, damping: 25 },
-	...props
-}: TabsContentsProps) {
+function TabsContents({ children, className }: TabsContentsProps) {
 	const { activeValue } = useTabs();
 	const activeChild = Children.toArray(children).find(
 		(child): child is ReactElement<TabsContentProps> =>
 			isValidElement<TabsContentProps>(child) && child.props.value === activeValue,
 	);
 
-	const content = (
-		<AnimatePresence initial={false} mode="wait">
-			{activeChild ? cloneElement(activeChild, { key: activeValue }) : null}
-		</AnimatePresence>
-	);
-
-	if (mode === "layout") {
-		return (
-			<m.div data-slot="tabs-contents" layout className={cn(className)} transition={transition} {...props}>
-				{content}
-			</m.div>
-		);
-	}
-
 	return (
 		<AutoHeight
 			data-slot="tabs-contents"
-			className={cn(className)}
+			className={className}
 			deps={[activeValue]}
-			transition={transition}
-			{...props}
+			transition={{ type: "spring", stiffness: 200, damping: 25 }}
 		>
-			{content}
+			<AnimatePresence initial={false} mode="wait">
+				{activeChild ? cloneElement(activeChild, { key: activeValue }) : null}
+			</AnimatePresence>
 		</AutoHeight>
 	);
 }
 
-interface TabsContentProps extends Omit<HTMLMotionProps<"div">, "value"> {
+interface TabsContentProps {
 	value: string;
-	transition?: Transition;
+	children: ReactNode;
 }
 
-function TabsContent({
-	value,
-	children,
-	className,
-	transition = { duration: 0.22, ease: "easeOut" },
-	...props
-}: TabsContentProps) {
+function TabsContent({ value, children }: TabsContentProps) {
 	const { triggerId, panelId } = useTabs();
 
 	return (
@@ -283,9 +230,8 @@ function TabsContent({
 			initial={{ opacity: 0, filter: "blur(4px)" }}
 			animate={{ opacity: 1, filter: "blur(0px)" }}
 			exit={{ opacity: 0, filter: "blur(4px)" }}
-			transition={transition}
-			className={cn("outline-none", className)}
-			{...props}
+			transition={{ duration: 0.22, ease: "easeOut" }}
+			className="outline-none"
 		>
 			{children}
 		</m.div>

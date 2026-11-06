@@ -19,7 +19,7 @@ export const LanguageSelector = () => {
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
+			<DropdownMenuTrigger>
 				<AnimateIcon animateOnHover asChild>
 					<Button
 						variant="outline"
@@ -31,7 +31,7 @@ export const LanguageSelector = () => {
 					</Button>
 				</AnimateIcon>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent align="end">
+			<DropdownMenuContent>
 				{languages.map((language) => (
 					<DropdownMenuItem
 						key={language.code}

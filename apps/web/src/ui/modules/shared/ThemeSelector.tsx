@@ -25,7 +25,7 @@ export const ThemeSelector = ({ buttonClassName }: ThemeSelectorProps) => {
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
+			<DropdownMenuTrigger>
 				<AnimateIcon animateOnHover asChild>
 					<Button variant="outline" size="icon" className={buttonClassName ?? "w-full !h-11 focus-visible:ring-1"}>
 						<Sun className="size-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
@@ -34,7 +34,7 @@ export const ThemeSelector = ({ buttonClassName }: ThemeSelectorProps) => {
 					</Button>
 				</AnimateIcon>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent align="end">
+			<DropdownMenuContent>
 				{themes.map((theme) => (
 					<DropdownMenuItem
 						key={theme}

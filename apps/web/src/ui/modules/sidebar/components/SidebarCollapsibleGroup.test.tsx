@@ -1,6 +1,6 @@
 import { type RenderResult, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { type ComponentProps, lazy, type ReactNode, Suspense } from "react";
+import { type ComponentProps, lazy, type ReactNode, Suspense, useEffect } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@ui/hooks/useMobile", () => ({ useIsMobile: () => false }));
@@ -42,8 +42,23 @@ vi.mock("@ui/modules/core/animate/base/Tooltip", () => ({
 	TooltipTrigger: ({ children }: { children?: ReactNode }) => <>{children}</>,
 }));
 
-import { SidebarProvider } from "@ui/modules/core/animate/base/Sidebar";
+import { SidebarProvider, useSidebar } from "@ui/modules/core/animate/base/Sidebar";
 import { SidebarCollapsibleGroup } from "./SidebarCollapsibleGroup";
+
+interface RailProps {
+	expanded: boolean;
+	children: ReactNode;
+}
+
+const Rail = ({ expanded, children }: RailProps) => {
+	const { setOpen } = useSidebar();
+
+	useEffect(() => {
+		setOpen(expanded);
+	}, [expanded, setOpen]);
+
+	return children;
+};
 
 const LABEL = "Steps";
 const TOOLTIP = "Your steps";
@@ -62,16 +77,18 @@ const renderGroup = ({
 	icon = <svg data-testid="icon" />,
 }: RenderGroupParams = {}): RenderResult =>
 	render(
-		<SidebarProvider open={expanded}>
-			<SidebarCollapsibleGroup
-				defaultOpen={defaultOpen}
-				icon={icon}
-				label={LABEL}
-				tooltip={TOOLTIP}
-				data-tutorial={anchor}
-			>
-				<p>body</p>
-			</SidebarCollapsibleGroup>
+		<SidebarProvider>
+			<Rail expanded={expanded}>
+				<SidebarCollapsibleGroup
+					defaultOpen={defaultOpen}
+					icon={icon}
+					label={LABEL}
+					tooltip={TOOLTIP}
+					data-tutorial={anchor}
+				>
+					<p>body</p>
+				</SidebarCollapsibleGroup>
+			</Rail>
 		</SidebarProvider>,
 	);
 
@@ -183,10 +200,12 @@ describe("SidebarCollapsibleGroup folds", () => {
 
 	it("comes back open once the rail expands again, since the collapse did not change its own state", () => {
 		const group = (expanded: boolean) => (
-			<SidebarProvider open={expanded}>
-				<SidebarCollapsibleGroup defaultOpen icon={<svg />} label={LABEL} tooltip={TOOLTIP}>
-					<p>body</p>
-				</SidebarCollapsibleGroup>
+			<SidebarProvider>
+				<Rail expanded={expanded}>
+					<SidebarCollapsibleGroup defaultOpen icon={<svg />} label={LABEL} tooltip={TOOLTIP}>
+						<p>body</p>
+					</SidebarCollapsibleGroup>
+				</Rail>
 			</SidebarProvider>
 		);
 		const { rerender } = render(group(false));

@@ -18,7 +18,7 @@ code, so a component from Animate UI is ported by hand rather than added over a 
 
 | Folder | Contents |
 | --- | --- |
-| `primitives/` | The plain layer: [`Button.tsx`](./primitives/Button.tsx), [`Card.tsx`](./primitives/Card.tsx), [`Badge.tsx`](./primitives/Badge.tsx), [`Input.tsx`](./primitives/Input.tsx), [`Textarea.tsx`](./primitives/Textarea.tsx), [`Label.tsx`](./primitives/Label.tsx), [`Table.tsx`](./primitives/Table.tsx), [`Separator.tsx`](./primitives/Separator.tsx), [`Banner.tsx`](./primitives/Banner.tsx), [`Form.tsx`](./primitives/Form.tsx) (react-hook-form context), [`InputGroup.tsx`](./primitives/InputGroup.tsx), [`NumberInput.tsx`](./primitives/NumberInput.tsx) (Base UI's `NumberField` drawn as an `Input`), [`Command.tsx`](./primitives/Command.tsx) (cmdk), [`Combobox.tsx`](./primitives/Combobox.tsx), [`FlagIcon.tsx`](./primitives/FlagIcon.tsx), [`Progress.tsx`](./primitives/Progress.tsx), [`Slider.tsx`](./primitives/Slider.tsx), [`Sonner.tsx`](./primitives/Sonner.tsx) (the toaster), [`RichLink.tsx`](./primitives/RichLink.tsx), [`Bone.tsx`](./primitives/Bone.tsx) (the placeholder block every `*Fixture.tsx` draws with). Plus [`primitives/utils/helpers.ts`](./primitives/utils/helpers.ts): one predicate, `hasFlag` |
+| `primitives/` | The plain layer: [`Button.tsx`](./primitives/Button.tsx), [`Card.tsx`](./primitives/Card.tsx), [`Badge.tsx`](./primitives/Badge.tsx), [`Input.tsx`](./primitives/Input.tsx), [`Textarea.tsx`](./primitives/Textarea.tsx), [`Label.tsx`](./primitives/Label.tsx), [`Table.tsx`](./primitives/Table.tsx), [`Banner.tsx`](./primitives/Banner.tsx), [`Form.tsx`](./primitives/Form.tsx) (react-hook-form context), [`InputGroup.tsx`](./primitives/InputGroup.tsx), [`NumberInput.tsx`](./primitives/NumberInput.tsx) (Base UI's `NumberField` drawn as an `Input`), [`Command.tsx`](./primitives/Command.tsx) (cmdk), [`Combobox.tsx`](./primitives/Combobox.tsx), [`FlagIcon.tsx`](./primitives/FlagIcon.tsx), [`Progress.tsx`](./primitives/Progress.tsx), [`Slider.tsx`](./primitives/Slider.tsx), [`Sonner.tsx`](./primitives/Sonner.tsx) (the toaster), [`RichLink.tsx`](./primitives/RichLink.tsx), [`Bone.tsx`](./primitives/Bone.tsx) (the placeholder block every `*Fixture.tsx` draws with). Plus [`primitives/utils/helpers.ts`](./primitives/utils/helpers.ts): one predicate, `hasFlag` |
 | `animate/primitives/` | Unstyled wrappers, the bottom of the animated stack and internal to `animate/`: [`animate/primitives/base/Dialog.tsx`](./animate/primitives/base/Dialog.tsx) and `Popover.tsx` over `@base-ui/react`, `Tooltip.tsx` over Base UI's popover so a tap opens it as well as a hover; [`animate/primitives/animate/MotionSlot.tsx`](./animate/primitives/animate/MotionSlot.tsx) |
 | `animate/base/` | The styled, motion-aware components built on the layer above or directly on `@base-ui/react`: [`Accordion.tsx`](./animate/base/Accordion.tsx), [`Checkbox.tsx`](./animate/base/Checkbox.tsx), [`Collapsible.tsx`](./animate/base/Collapsible.tsx), `Dialog.tsx`, [`DropdownMenu.tsx`](./animate/base/DropdownMenu.tsx), [`Popover.tsx`](./animate/base/Popover.tsx), [`Switch.tsx`](./animate/base/Switch.tsx), [`Tooltip.tsx`](./animate/base/Tooltip.tsx), [`Sidebar.tsx`](./animate/base/Sidebar.tsx), plus [`animate/base/Drawer.tsx`](./animate/base/Drawer.tsx) (vaul) and [`animate/base/Slot.tsx`](./animate/base/Slot.tsx) |
 | `animate/components/` | Compositions with their own behaviour: [`Counter.tsx`](./animate/components/Counter.tsx), [`Tabs.tsx`](./animate/components/Tabs.tsx), [`FeatureList.tsx`](./animate/components/FeatureList.tsx), [`RadialNav.tsx`](./animate/components/RadialNav.tsx) |
@@ -34,15 +34,14 @@ There is no `Switch` or `Dialog` in `primitives/`: both live in `animate/base/`.
 - **`RichLink` replaces a received `className`** rather than merging it through `cn()` (`@ui/utils/cn`): a
   `className` replaces its `text-primary hover:underline` default.
 - **`animate/base/Slot.tsx` is the `asChild` mechanism**: it merges props with `mergeProps` from
-  `@base-ui/react/merge-props` and composes refs. `Button`, `Badge`, `FormControl` and the sidebar's group
-  label and menu button use it; `MotionSlot` is the motion equivalent.
+  `@base-ui/react/merge-props` and composes refs. `Button` and `FormControl` use it; `MotionSlot` is the
+  motion equivalent.
 - The 3px frames (`border-[3px] border-[var(--frame)]`), the `--shadow-brutal-*` scale and `--color-brand-*`
   are defined in [`src/ui/styles/global/index.css`](../../styles/global/index.css); `hit-area-stable` is a
   Tailwind `@utility` in [`src/ui/styles/utilities/index.css`](../../styles/utilities/index.css). See
   [`styles/AGENTS.md`](../../styles/AGENTS.md).
 
-Only `Button.tsx`, `Badge.tsx`, `InputGroup.tsx` and `animate/base/Sidebar.tsx` use
-`class-variance-authority`, and only `buttonVariants` and `badgeVariants` are exported. `Banner.tsx` and the
+Only `Button.tsx` and `Badge.tsx` use `class-variance-authority`, and neither exports its variants object. `Banner.tsx` and the
 planner's `MetricCard` take a `colorScheme` key into a local `COLOR_SCHEMES` record instead.
 
 ## Layer rules
@@ -63,7 +62,7 @@ Coupling back into the rest of the app is small, but it is not zero. The complet
   [`useMobile.ts`](../../hooks/useMobile.ts), `cn` and [`context.tsx`](../../utils/context.tsx)'s `getStrictContext` (`Switch`, `Progress`, `Form`
   and the three `animate/primitives/base` wrappers). None of them holds product state.
 - `animate/base/Sidebar.tsx` writes the `sidebar_state` cookie through [`@ui/utils/cookie`](../../utils/cookie.ts), swallowing a
-  failed write, and reads it back from `document.cookie` after mount. No server layout passes a `defaultOpen`,
+  failed write, and reads it back from `document.cookie` after mount. The provider takes no `defaultOpen`,
   so the rail renders expanded and collapses once that effect runs. The cookie's name and life,
   `SIDEBAR_COOKIE_NAME` and `SIDEBAR_COOKIE_MAX_AGE`, live in [`@ui/utils/sidebarCookie`](../../utils/sidebarCookie.ts) and not here,
   because the consent catalogue lists the cookie and importing this module would load the sidebar and Motion
@@ -84,18 +83,17 @@ the docs build. A new file under `animate/icons/` also goes into
 `pnpm test:docs` fails; the gallery imports each icon by its export name, and `PanelLeft.tsx` exports
 `PanelLeftIcon` while `Search.tsx` also exports `SearchIcon`.
 
-**A component here cannot translate, so every accessible name is a prop.** Five props keep an English
-default for a caller that passes nothing: `closeLabel` on `DialogContent` and on `Toaster` (sonner's own close
-button is named in English), `label` on `SidebarTrigger`, `landmarkLabel` on `Sidebar` and `aria-label` on
-`RadialNav`; every app caller passes a string from the `a11y` namespace, see
-[`../../i18n/AGENTS.md`](../../i18n/AGENTS.md). Where the component would render a nameless control the name is
-required and the compiler is the check:
+**A component here cannot translate, so every accessible name is a required prop, with no English default behind it.**
+`closeLabel` on `DialogContent` and on `Toaster` (sonner's own close button is named in English), `label` on
+`SidebarTrigger`, `landmarkLabel` on `Sidebar` and `aria-label` on `RadialNav` are strings every app caller passes
+from the `a11y` namespace, see [`../../i18n/AGENTS.md`](../../i18n/AGENTS.md). Where the component would render a
+nameless control the compiler is the check:
 
 - [`primitives/Label.tsx`](./primitives/Label.tsx) takes `htmlFor: string`, not the optional one `ComponentProps<'label'>` carries. It
   renders `children` itself rather than through the spread: spread children trip Biome's `noLabelWithoutControl`.
-- [`animate/base/Switch.tsx`](./animate/base/Switch.tsx) and [`animate/base/Checkbox.tsx`](./animate/base/Checkbox.tsx) take `{ id } | { 'aria-label' } | { 'aria-labelledby' }`,
+- [`animate/base/Switch.tsx`](./animate/base/Switch.tsx) and [`animate/base/Checkbox.tsx`](./animate/base/Checkbox.tsx) take, respectively, `{ id } | { 'aria-label' }` and `{ 'aria-label' }`,
   intersected with their other props, because Base UI renders each as a `<button role>` with no name of its own.
-  `Checkbox.test.tsx` pins the union with a type assignment, so loosening it fails `pnpm typecheck`. `id` names
+  `Checkbox.test.tsx` pins the type with an assignment, so loosening it fails `pnpm typecheck`. `id` names
   something only when a `<label htmlFor>` points at it.
 - [`primitives/Slider.tsx`](./primitives/Slider.tsx) takes `label: string` and puts it on `Slider.Thumb`, which is where Base UI's
   real control, a nested `<input type='range'>`, lives. It takes no `id`: `Slider.Root` renders a `<div>`, so a
@@ -114,12 +112,11 @@ so it declares no `menu` role, and Biome's `useSemanticElements` wants the eleme
 
 ## Gotchas
 
-**`Tooltip` mints a `TooltipProvider` only when it is given `delay` or `delayDuration`.** `TooltipTrigger` reads
-its delay from the nearest provider, so an inner provider would shadow the one the caller set; any component here
-that wraps its subtree in a context provider has the same question to answer. There is no app-wide tooltip
-provider: `SidebarProvider`, `PremiumFeature`, `SidebarFieldLabel` and the planner calendar each mount the styled
-one, whose default is `TOOLTIP_DELAY_MS` (200 ms), and a tooltip under none of them opens at once.
-`Tooltip.test.tsx` pins both halves.
+**`Tooltip` mints no `TooltipProvider` of its own.** `TooltipTrigger` reads its delay from the nearest provider, so an
+inner provider would shadow the one the caller set; any component here that wraps its subtree in a context provider
+has the same question to answer. There is no app-wide tooltip provider: `SidebarProvider`, `PremiumFeature`,
+`SidebarFieldLabel` and the planner calendar each mount the styled one, whose delay is 200 ms, and a tooltip under
+none of them opens at once. `Tooltip.test.tsx` pins both halves.
 
 **`TooltipTrigger` is Base UI's popover trigger, so `asChild` must hand it a `<button>` or say it is none.** It
 expects a native button and logs an error in development on anything else. A trigger that is only a hover target

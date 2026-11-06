@@ -8,33 +8,24 @@ sidebar:
     variant: success
 ---
 
-import { DROPDOWN_MENU_CONTENT_PROP_ROWS, DROPDOWN_MENU_PROP_ROWS, DropdownMenuDemo } from '../../../../components/demos/DropdownMenuDemo';
-import { PropsTable } from '../../../../components/PropsTable';
+import { DropdownMenuDemo } from '../../../../components/demos/DropdownMenuDemo';
 
 Source: `apps/web/src/ui/modules/core/animate/base/DropdownMenu.tsx`. Base UI menu plus Motion; needs a `LazyMotionProvider` ancestor.
 
-Public exports: `DropdownMenu`, `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`. The file also contains underscore-prefixed sub/checkbox/radio/label/separator/shortcut variants that are deliberately unexported until something needs them, so check the source before reinventing one.
+Exports: `DropdownMenu`, `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`.
 
 <DropdownMenuDemo client:visible />
 
 ## How it works
 
-- `DropdownMenuContent` gates the portal behind `AnimatePresence` and renders the popup as an `m.div` scaling `0.95 → 1` with a fade (default `transition={{ duration: 0.2 }}`). The panel is the standard brutal popover surface: 3px frame border, `rounded-xl`, `shadow-brutal-md`, positioned at `z-210`, above a dialog's `z-200`, with `sideOffset` (default 4) and `align` (default `'start'`).
-- Hover highlighting is not per-item CSS: the content wraps children in `MotionHighlight` (`apps/web/src/ui/modules/core/animate/effects/MotionHighlight.tsx`), a single accent pill that glides between items. The spring (default `stiffness: 350, damping: 35`) and the effect itself are configured on the root via `transition` and `animateOnHover`. The same effect powers [Tabs](/design-system/components/tabs/) and the sidebar.
-- `DropdownMenuItem` renders as an `m.div` with `whileTap` scale 0.97 and accepts `variant: 'default' | 'destructive'` (destructive tints the highlight and text red) plus `inset` for left padding alignment.
-- `DropdownMenuTrigger asChild` composes with [Button](/design-system/components/button/) via Base UI's `render`.
+- `DropdownMenuContent` gates the portal behind `AnimatePresence` and renders the popup as an `m.div` scaling `0.95 → 1` with a fade (a 0.2s transition). The panel is the standard brutal popover surface: 3px frame border, `rounded-xl`, `shadow-brutal-md`, positioned at `z-210`, above a dialog's `z-200`, 4px from the trigger and aligned to its end.
+- Hover highlighting is not per-item CSS: the content wraps children in `MotionHighlight` (`apps/web/src/ui/modules/core/animate/effects/MotionHighlight.tsx`), a single accent pill that glides between items. The pill is a spring (`stiffness: 350, damping: 35`). The same effect powers [Tabs](/design-system/components/tabs/) and the sidebar.
+- `DropdownMenuItem` renders as an `m.div` with `whileTap` scale 0.97.
+- `DropdownMenuTrigger` takes the single element it wraps, such as a [Button](/design-system/components/button/), and renders it in place through Base UI's `render`.
 
 ## Props
 
-`DropdownMenu` adds two props on top of Base UI's menu root:
-
-<PropsTable rows={DROPDOWN_MENU_PROP_ROWS} />
-
-`DropdownMenuContent` forwards Base UI's positioner and popup props; the ones worth setting:
-
-<PropsTable rows={DROPDOWN_MENU_CONTENT_PROP_ROWS} />
-
-`DropdownMenuTrigger` accepts `asChild`; `DropdownMenuItem` forwards Base UI's item props.
+`DropdownMenu` forwards Base UI's menu root props, `DropdownMenuTrigger` and `DropdownMenuItem` forward the trigger's and the item's, and `DropdownMenuContent` forwards the Motion props of a `div`. None adds a prop of its own: placement and the hover pill are fixed.
 
 ## Usage
 
@@ -42,12 +33,12 @@ Public exports: `DropdownMenu`, `DropdownMenuTrigger`, `DropdownMenuContent`, `D
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/modules/core/animate/base/DropdownMenu';
 
 <DropdownMenu>
-  <DropdownMenuTrigger asChild>
+  <DropdownMenuTrigger>
     <Button variant='outline'>Actions</Button>
   </DropdownMenuTrigger>
-  <DropdownMenuContent align='end'>
+  <DropdownMenuContent>
     <DropdownMenuItem onClick={edit}>Edit holiday</DropdownMenuItem>
-    <DropdownMenuItem variant='destructive' onClick={remove}>Delete</DropdownMenuItem>
+    <DropdownMenuItem onClick={remove}>Delete</DropdownMenuItem>
   </DropdownMenuContent>
 </DropdownMenu>
 ```
@@ -56,14 +47,14 @@ For free-form anchored content (forms, explanations) use [Popover](/design-syste
 
 ## Conventions
 
-- `data-slot` hooks: `dropdown-menu`, `dropdown-menu-trigger`, `dropdown-menu-content`, `dropdown-menu-item` (plus `data-variant`/`data-inset` on items).
+- `data-slot` hooks: `dropdown-menu`, `dropdown-menu-trigger`, `dropdown-menu-content`, `dropdown-menu-item`.
 - Content height is capped to Base UI's `--available-height` so long menus scroll instead of overflowing the viewport.
 
 ## Accessibility
 
 - Base UI renders `role='menu'` and `role='menuitem'`, moves focus into the menu on open, supports arrow keys, Home and End, typeahead by first letter, and closes on Escape or on selecting an item, returning focus to the trigger.
 - The hover pill follows the focused item as well as the hovered one, so keyboard users see the same highlight.
-- A trigger with `asChild` must be a button, or carry `role='button'` and `aria-haspopup='menu'`, which Base UI adds when it renders the button itself.
+- The element the trigger wraps must be a button, or carry `role='button'` and `aria-haspopup='menu'`, which Base UI adds when it renders the button itself.
 
 ## In the app
 
