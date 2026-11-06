@@ -178,7 +178,7 @@ const ISO_DATE_TIME = "yyyy-MM-dd HH:mm:ss";
 
 type IntlDateFormat = keyof typeof INTL_FORMAT_MAP;
 
-export type DateFormat = IntlDateFormat | typeof ISO_DATE | typeof ISO_DATE_TIME;
+type DateFormat = IntlDateFormat | typeof ISO_DATE | typeof ISO_DATE_TIME;
 
 export interface FormatDateParams {
 	date: Date;

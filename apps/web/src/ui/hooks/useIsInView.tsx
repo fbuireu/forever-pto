@@ -3,7 +3,7 @@
 import { type UseInViewOptions, useInView } from "motion/react";
 import { type Ref, type RefObject, useImperativeHandle, useRef } from "react";
 
-export interface UseIsInViewOptions {
+interface UseIsInViewOptions {
 	inView?: boolean;
 	inViewOnce?: boolean;
 	inViewMargin?: UseInViewOptions["margin"];

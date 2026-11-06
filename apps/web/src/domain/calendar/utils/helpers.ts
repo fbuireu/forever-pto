@@ -51,12 +51,12 @@ const expandThroughFreeDays = ({ first, last, holidaySet }: ExpandThroughFreeDay
 	return { start, end };
 };
 
-export interface CompareByEfficiencyParams {
+interface CompareByEfficiencyParams {
 	a: Bridge;
 	b: Bridge;
 }
 
-export const compareByEfficiency = ({ a, b }: CompareByEfficiencyParams): number => {
+const compareByEfficiency = ({ a, b }: CompareByEfficiencyParams): number => {
 	const difference = b.efficiency - a.efficiency;
 
 	if (Math.abs(difference) > PTO_CONSTANTS.BRIDGE_GENERATION.EFFICIENCY_COMPARISON_THRESHOLD) {

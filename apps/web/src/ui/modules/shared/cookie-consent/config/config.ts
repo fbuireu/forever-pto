@@ -20,7 +20,7 @@ interface CookieDetails {
 
 export type CookieEntry = CookieExpiry & CookieDetails;
 
-export interface CookieService {
+interface CookieService {
 	id: string;
 	labelKey: CookiesKey;
 	cookies: CookieEntry[];

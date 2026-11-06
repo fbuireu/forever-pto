@@ -34,11 +34,11 @@ export const MODIFIERS_CLASS_NAMES = {
 	previewRange: "rounded-lg bg-primary/10",
 } as const satisfies Record<string, string>;
 
-export type DayStateClass = keyof typeof MODIFIERS_CLASS_NAMES;
+type DayStateClass = keyof typeof MODIFIERS_CLASS_NAMES;
 
 const RANGE_KEYS: string[] = ["inRange", "rangeStart", "rangeEnd"];
 
-export const DAY_STATE_LABELS = [
+const DAY_STATE_LABELS = [
 	{ modifier: "manual", labelKey: "manual" },
 	{ modifier: "suggested", labelKey: "suggested" },
 	{ modifier: "alternative", labelKey: "alternatives" },
@@ -46,7 +46,7 @@ export const DAY_STATE_LABELS = [
 	{ modifier: "effective", labelKey: "effective" },
 ] as const;
 
-export type DayStateLabelKey = (typeof DAY_STATE_LABELS)[number]["labelKey"];
+type DayStateLabelKey = (typeof DAY_STATE_LABELS)[number]["labelKey"];
 
 interface GetDayStateLabelKeysParams {
 	date: Date;

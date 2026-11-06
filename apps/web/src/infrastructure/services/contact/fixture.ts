@@ -1,6 +1,6 @@
 import { createFixtureTurso, type FixtureTurso } from "@infrastructure/clients/db/turso/fixture";
 
-export const CONTACTS_TABLE = `CREATE TABLE contacts (
+const CONTACTS_TABLE = `CREATE TABLE contacts (
   id TEXT PRIMARY KEY,
   email TEXT NOT NULL,
   name TEXT NOT NULL,

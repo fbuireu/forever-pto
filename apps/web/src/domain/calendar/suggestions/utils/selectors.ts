@@ -9,7 +9,7 @@ import { inPreferredMonths, monthKeyOf } from "@domain/calendar/window";
 
 const NO_NEIGHBOUR = Number.MAX_SAFE_INTEGER;
 
-export interface Candidate {
+interface Candidate {
 	bridge: Bridge;
 	marginalEfficiency: number;
 	runLength: number;

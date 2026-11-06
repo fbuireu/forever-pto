@@ -7,7 +7,7 @@ export interface HolidayLookup {
 	locale: string;
 }
 
-export interface RawLookupResult {
+interface RawLookupResult {
 	national: RawHoliday[];
 	regional: RawHoliday[];
 }

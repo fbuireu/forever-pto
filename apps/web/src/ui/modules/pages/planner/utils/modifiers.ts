@@ -11,7 +11,7 @@ export const isHoliday = (holidays: HolidaysState["holidays"]): ((date: Date) =>
 	return (date: Date) => days.has(dayIndex(date));
 };
 
-export interface IsPastParams {
+interface IsPastParams {
 	allowPastDays: boolean;
 	today: Date | null;
 }
@@ -31,7 +31,7 @@ export const isToday = (today: Date | null): ((date: Date) => boolean) => {
 	return (date: Date) => todayIndex !== null && dayIndex(date) === todayIndex;
 };
 
-export interface IsSuggestionParams {
+interface IsSuggestionParams {
 	currentSelection: Suggestion | null;
 	removedSuggestedDays?: Date[];
 }

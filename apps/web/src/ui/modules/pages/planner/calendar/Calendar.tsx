@@ -61,7 +61,7 @@ const RangeSelection = {
 
 type RangeSelection = (typeof RangeSelection)[keyof typeof RangeSelection];
 
-export type DayStateName = "suggested" | "alternative" | "manual";
+type DayStateName = "suggested" | "alternative" | "manual";
 
 export type DayStates = Partial<Record<DayStateName, (date: Date) => boolean>>;
 
