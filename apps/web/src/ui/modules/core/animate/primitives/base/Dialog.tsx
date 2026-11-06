@@ -58,7 +58,7 @@ interface DialogBackdropProps
 		HTMLMotionProps<"div"> {
 	children?: ReactNode;
 }
-function DialogBackdrop({ transition = { duration: 0.2, ease: "easeInOut" }, ...props }: DialogBackdropProps) {
+function DialogBackdrop(props: DialogBackdropProps) {
 	return (
 		<DialogPrimitive.Backdrop
 			data-slot="dialog-backdrop"
@@ -68,7 +68,7 @@ function DialogBackdrop({ transition = { duration: 0.2, ease: "easeInOut" }, ...
 					initial={{ opacity: 0, filter: "blur(4px)" }}
 					animate={{ opacity: 1, filter: "blur(0px)" }}
 					exit={{ opacity: 0, filter: "blur(4px)" }}
-					transition={transition}
+					transition={{ duration: 0.2, ease: "easeInOut" }}
 					{...props}
 				/>
 			}
@@ -77,21 +77,15 @@ function DialogBackdrop({ transition = { duration: 0.2, ease: "easeInOut" }, ...
 }
 
 interface DialogPopupProps
-	extends Omit<ComponentProps<typeof DialogPrimitive.Popup>, "render" | keyof HTMLMotionProps<"div">>,
+	extends Omit<ComponentProps<typeof DialogPrimitive.Popup>, "render" | "finalFocus" | keyof HTMLMotionProps<"div">>,
 		HTMLMotionProps<"div"> {
 	children?: ReactNode;
 }
 
-function DialogPopup({
-	initialFocus,
-	finalFocus,
-	transition = { duration: 0.2, ease: "easeInOut" },
-	...props
-}: DialogPopupProps) {
+function DialogPopup({ initialFocus, ...props }: DialogPopupProps) {
 	return (
 		<DialogPrimitive.Popup
 			initialFocus={initialFocus}
-			finalFocus={finalFocus}
 			render={
 				<m.div
 					key="dialog-popup"
@@ -99,7 +93,7 @@ function DialogPopup({
 					initial={{ opacity: 0, scale: 0.95 }}
 					animate={{ opacity: 1, scale: 1 }}
 					exit={{ opacity: 0, scale: 0.95 }}
-					transition={transition}
+					transition={{ duration: 0.2, ease: "easeInOut" }}
 					{...props}
 				/>
 			}

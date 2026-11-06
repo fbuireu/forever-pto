@@ -28,7 +28,7 @@ Exports: `Tooltip`, `TooltipTrigger`, `TooltipContent`, `TooltipProvider`, `Tool
 
 ## Props
 
-`Tooltip` and `TooltipProvider` forward Base UI's root and provider props and add none. `TooltipContent` passes Base UI's positioner props to the positioner and `className` to the popup; the app sets two of them:
+`Tooltip` forwards Base UI's root props and adds none; `TooltipProvider` takes only its children, its 200 ms delay being fixed. `TooltipContent` passes Base UI's positioner props to the positioner and `className` to the popup; the app sets two of them:
 
 <PropsTable rows={TOOLTIP_CONTENT_PROP_ROWS} />
 

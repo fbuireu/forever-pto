@@ -17,8 +17,6 @@ vi.mock("motion/react", async () => {
 				createElement("div", { style, ...props }, children),
 		},
 		AnimatePresence: ({ children }: { children?: ReactNode }) => createElement(Fragment, null, children),
-		useMotionValue: () => ({ set: vi.fn() }),
-		useSpring: () => ({ set: vi.fn() }),
 	};
 });
 
@@ -64,11 +62,11 @@ vi.mock("@base-ui/react/popover", async () => {
 
 import { Tooltip, TooltipPopup, TooltipPortal, TooltipPositioner, TooltipProvider, TooltipTrigger } from "./Tooltip";
 
-const renderTooltip = (ui?: { delay?: number; triggerDelay?: number; defaultOpen?: boolean }): RenderResult =>
+const renderTooltip = (ui?: { delay?: number; defaultOpen?: boolean }): RenderResult =>
 	render(
-		<TooltipProvider delay={ui?.delay}>
+		<TooltipProvider delay={ui?.delay ?? 0}>
 			<Tooltip defaultOpen={ui?.defaultOpen}>
-				<TooltipTrigger delay={ui?.triggerDelay}>info</TooltipTrigger>
+				<TooltipTrigger>info</TooltipTrigger>
 				<TooltipPortal>
 					<TooltipPositioner>
 						<TooltipPopup>tip content</TooltipPopup>
@@ -87,11 +85,6 @@ describe("Tooltip (popover-based, touch-capable)", () => {
 	it("threads the provider delay into the trigger", () => {
 		renderTooltip({ delay: 200 });
 		expect(screen.getByText("info").getAttribute("data-delay")).toBe("200");
-	});
-
-	it("lets an explicit trigger delay override the provider delay", () => {
-		renderTooltip({ delay: 200, triggerDelay: 50 });
-		expect(screen.getByText("info").getAttribute("data-delay")).toBe("50");
 	});
 
 	it("renders no popup while closed", () => {

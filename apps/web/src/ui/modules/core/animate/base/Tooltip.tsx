@@ -14,7 +14,7 @@ import {
 	type TooltipTriggerProps as TooltipTriggerPrimitiveProps,
 } from "../primitives/base/Tooltip";
 
-type TooltipProviderProps = TooltipProviderPrimitiveProps;
+type TooltipProviderProps = Omit<TooltipProviderPrimitiveProps, "delay">;
 function TooltipProvider(props: TooltipProviderProps) {
 	return <TooltipProviderPrimitive delay={200} {...props} />;
 }

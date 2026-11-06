@@ -57,20 +57,16 @@ function PopoverPositioner(props: PopoverPositionerProps) {
 }
 
 interface PopoverPopupProps
-	extends Omit<ComponentProps<typeof PopoverPrimitive.Popup>, "render" | keyof HTMLMotionProps<"div">>,
+	extends Omit<
+			ComponentProps<typeof PopoverPrimitive.Popup>,
+			"render" | "initialFocus" | "finalFocus" | keyof HTMLMotionProps<"div">
+		>,
 		HTMLMotionProps<"div"> {
 	children?: ReactNode;
 }
-function PopoverPopup({
-	initialFocus,
-	finalFocus,
-	transition = { type: "spring", stiffness: 300, damping: 25 },
-	...props
-}: PopoverPopupProps) {
+function PopoverPopup(props: PopoverPopupProps) {
 	return (
 		<PopoverPrimitive.Popup
-			initialFocus={initialFocus}
-			finalFocus={finalFocus}
 			render={
 				<m.div
 					key="popover-popup"
@@ -78,7 +74,7 @@ function PopoverPopup({
 					initial={{ opacity: 0, scale: 0.5 }}
 					animate={{ opacity: 1, scale: 1 }}
 					exit={{ opacity: 0, scale: 0.5 }}
-					transition={transition}
+					transition={{ type: "spring", stiffness: 300, damping: 25 }}
 					{...props}
 				/>
 			}
