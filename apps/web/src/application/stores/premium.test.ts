@@ -135,23 +135,6 @@ describe("setEmail", () => {
 	});
 });
 
-describe("resetPremiumStore", () => {
-	it("resets all state to initial values", () => {
-		usePremiumStore.setState({
-			premiumKey: "key",
-			userEmail: "user@example.com",
-			modalOpen: true,
-			currentFeature: PremiumFeatureId.CALENDAR_EXPORT,
-		});
-		usePremiumStore.getState().resetPremiumStore();
-		const state = usePremiumStore.getState();
-		expect(state.premiumKey).toBeNull();
-		expect(state.userEmail).toBeNull();
-		expect(state.modalOpen).toBe(false);
-		expect(state.currentFeature).toBeNull();
-	});
-});
-
 describe("verifyEmail", () => {
 	it("returns true and sets premium status on success", async () => {
 		const { verifyPremiumEmail } = await import("@ui/adapters/session/checkSession");
@@ -416,25 +399,6 @@ describe("which ways into Premium report premium_activated", () => {
 
 		expect(usePremiumStore.getState().premiumKey).toBe(SESSION.premiumKey);
 		expect(await tracked()).toStrictEqual([]);
-	});
-});
-
-describe("refreshPremiumStatus", () => {
-	it("calls verifyEmail with the stored email", async () => {
-		const { verifyPremiumEmail } = await import("@ui/adapters/session/checkSession");
-		vi.mocked(verifyPremiumEmail).mockResolvedValueOnce({ premiumKey: "refreshed" });
-		usePremiumStore.setState({ userEmail: "refresh@example.com" });
-
-		await usePremiumStore.getState().refreshPremiumStatus();
-		expect(verifyPremiumEmail).toHaveBeenCalledWith("refresh@example.com");
-	});
-
-	it("does nothing when userEmail is null", async () => {
-		const { verifyPremiumEmail } = await import("@ui/adapters/session/checkSession");
-		usePremiumStore.setState({ userEmail: null });
-
-		await usePremiumStore.getState().refreshPremiumStatus();
-		expect(verifyPremiumEmail).not.toHaveBeenCalled();
 	});
 });
 

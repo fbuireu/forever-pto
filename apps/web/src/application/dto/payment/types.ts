@@ -1,5 +1,4 @@
 import type { ReportedPaymentStatus } from "@domain/payment/events/types";
-import type Stripe from "stripe";
 
 export interface PaymentConfirmationDTO {
 	id: string;
@@ -42,9 +41,6 @@ interface CreatePaymentError {
 	success: false;
 	error?: string;
 	isPromoCodeError?: boolean;
-	stripeError?: Stripe.StripeRawError;
-	code?: string;
-	type?: string;
 }
 
 export type CreatePaymentResult = CreatePaymentSuccess | CreatePaymentError;

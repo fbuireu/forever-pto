@@ -333,11 +333,11 @@ store *and* on the filters store; clearing only the first would leave a corrupt 
 place while telling the user all data had been reset, which is precisely the state the button exists to escape.
 It then re-reads the filters through `getState()` rather than the values captured before the reset, and
 skips the re-fetch entirely when the default empty Country is what it finds; fetching against `''` would
-plan a year with no Holidays in it. `usePremiumStore.resetPremiumStore` is **not** called and must not be:
+plan a year with no Holidays in it. The Premium store is **not** reset and must not be:
 Premium is derived from the payment record and access is never revoked from a donor
 ([ADR 0008](../../../../../docs/adr/0008-premium-derived-from-payment.md)), so a troubleshooting button that
-logged a paying user out would be a defect, not a more thorough reset. That action having no caller is the
-correct state, not dead code to wire up.
+logged a paying user out would be a defect, not a more thorough reset. The store has no reset action for that
+reason.
 
 **The pipeline's rules on these inputs live in `runPlanningPipeline`, once.** They are documented here
 because they are what the pipeline does with what this store hands it, and getting the *inputs* wrong still
@@ -465,12 +465,6 @@ Premium spends it without reporting, and an answer with no session leaves it for
 this module-level promise even when the page has unmounted.
 Concurrent calls share one check and one report through a module-level promise, the way `checkExistingSession` shares
 its request. Every other check, `PremiumFeature`'s included, stays silent.
-
-`refreshPremiumStatus` is the action that guard was written for, and it currently has **no caller** outside
-its own test: nothing re-verifies the stored email on a later visit, so `setPremiumStatus` is reached only
-from the checkout and the "I already donated" modal. Treat it as an entry point that is wired up but unused,
-not as live behaviour, and keep the guard, because the moment anything calls it on mount the double-count
-is back.
 
 **`holidays.ts` reads `useFiltersStore.getState()` inside actions**, which is not reactive: an action sees whatever
 was in the other store at call time. `fetchHolidays` does not read `useLocationStore` for the Region labels: that

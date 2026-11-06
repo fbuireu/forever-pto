@@ -15,5 +15,3 @@ const WELL_KNOWN_DOCUMENTS = new Map<string, WellKnownDocument>([
 ]);
 
 export const lookupWellKnownDocument = (slug: string): WellKnownDocument | undefined => WELL_KNOWN_DOCUMENTS.get(slug);
-
-export const wellKnownSlugs = (): string[] => [...WELL_KNOWN_DOCUMENTS.keys()];

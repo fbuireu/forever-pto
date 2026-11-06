@@ -47,8 +47,8 @@ describe("agentSkillsIndex", () => {
 
 describe("the advertised urls and the served slugs are one list", () => {
 	it("never advertises a url the catch-all route has no key for", async () => {
-		const { wellKnownSlugs } = await import("./documents");
-		const served = new Set(wellKnownSlugs().map((slug) => `${BASE_URL}/.well-known/${slug}`));
+		const { lookupWellKnownDocument } = await import("./documents");
+		const prefix = `${BASE_URL}/.well-known/`;
 
 		const advertised = agentSkillsIndex(BASE_URL)
 			.skills.map((skill) => ("url" in skill ? skill.url : undefined))
@@ -56,7 +56,8 @@ describe("the advertised urls and the served slugs are one list", () => {
 
 		expect(advertised.length).toBeGreaterThan(0);
 		for (const url of advertised) {
-			expect(served).toContain(url);
+			expect(url.startsWith(prefix)).toBe(true);
+			expect(lookupWellKnownDocument(url.slice(prefix.length))).toBeDefined();
 		}
 	});
 });

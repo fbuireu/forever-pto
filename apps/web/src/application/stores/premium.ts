@@ -60,9 +60,7 @@ interface PremiumActions {
 	showPremiumModal: (params: ShowPremiumModalParams) => void;
 	closeModal: () => void;
 	setPremiumStatus: ({ email, premiumKey }: SetPremiumStatusParams) => void;
-	refreshPremiumStatus: () => Promise<void>;
 	setEmail: (email: string) => void;
-	resetPremiumStore: () => void;
 }
 
 interface PremiumStore extends PremiumState, PremiumActions {}
@@ -176,17 +174,6 @@ export const usePremiumStore = create<PremiumStore>()(
 					});
 
 					if (!wasPremium && premiumKey) reportActivation();
-				},
-
-				resetPremiumStore: () => {
-					set({ ...premiumInitialState });
-				},
-
-				refreshPremiumStatus: async () => {
-					const { userEmail } = get();
-					if (userEmail) {
-						await get().verifyEmail(userEmail);
-					}
 				},
 
 				showPremiumModal: ({ feature, origin }: ShowPremiumModalParams) => {

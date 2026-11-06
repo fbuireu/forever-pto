@@ -855,8 +855,8 @@ No rule below restates these, and a diff that breaks one fails CI:
   out of a bundle.
 - **Speculative Generality**: every use-case export ends in `Effect.withSpan`, which nothing consumes today; it marks
   the boundary a tracer would attach to ([ADR 0017](./docs/adr/0017-observability-is-the-platform-export.md)).
-- **Speculative Generality**: `refreshPremiumStatus` keeps its transition guard with no caller, and the
-  promotion-code expiry branches stay as guards although the API filters most of what they test.
+- **Speculative Generality**: the promotion-code expiry branches stay as guards although the API filters most of what
+  they test.
 - **Repeated Switches**: `processWebhookEvent` switches on the Stripe event type; there is no dispatcher and no event
   bus ([ADR 0014](./docs/adr/0014-ddd-where-it-pays.md)).
 - **Mysterious Name**: `repository.ts` keeps its name for a table gateway

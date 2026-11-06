@@ -311,8 +311,8 @@ valid cookie, is told Premium is active, and finds every feature blurred.
 `lookupWellKnownDocument` for an exact key (`api-catalog`, `mcp/server-card.json`, `agent-skills/index.json`),
 each backed by [`apiCatalog.ts`](../infrastructure/well-known/apiCatalog.ts), [`mcpServerCard.ts`](../infrastructure/well-known/mcpServerCard.ts) or [`agentSkillsIndex.ts`](../infrastructure/well-known/agentSkillsIndex.ts) in `@infrastructure/well-known`. Anything
 else is a 404. The table is a `Map` behind `lookupWellKnownDocument(slug)` in
-[`documents.ts`](../infrastructure/well-known/documents.ts), and `wellKnownSlugs()` is what the agent-skills test
-enumerates.
+[`documents.ts`](../infrastructure/well-known/documents.ts), and the agent-skills test looks every url the index
+advertises up through it.
 
 These paths contain a dot, so the proxy matcher excludes them; they never see locale negotiation.
 
