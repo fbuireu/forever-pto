@@ -42,30 +42,30 @@ config:
   look: handDrawn
   layout: dagre
   sequence:
-    wrap: true
-    width: 110
-    actorMargin: 20
+    wrap: false
+    width: 80
+    actorMargin: 0
 ---
 sequenceDiagram
   autonumber
   participant B as Browser
-  participant W as Worker runtime
-  participant R as Action + operation
-  participant UC as Use case
-  participant X as Stripe / Turso / Resend
+  participant W as Worker<br/>runtime
+  participant R as Action +<br/>operation
+  participant UC as Use<br/>case
+  participant X as Stripe /<br/>Turso /<br/>Resend
   participant CF as Cloudflare
-  B->>W: createPaymentAction
-  W->>W: open the invocation span,<br/>head-sample
+  B->>W: createPayment<br/>Action
+  Note right of W: open the<br/>invocation<br/>span,<br/>head-sample
   W->>R: run the action
-  R->>R: traced(): child span<br/>named after the use case
+  Note right of R: traced():<br/>child span<br/>named after<br/>the use case
   R->>UC: Effect program
-  UC->>X: fetch, one span per call
-  UC->>UC: logger.info: JSON line<br/>tagged with the span
+  UC->>X: fetch, one<br/>span per call
+  Note right of UC: logger.info:<br/>JSON line<br/>tagged with<br/>the span
   X-->>UC: response
-  UC-->>R: result or tagged failure
+  UC-->>R: result or<br/>tagged<br/>failure
   R-->>B: status and body
   W->>CF: logs + spans, batched
-  CF->>CF: OTLP export to the stage's<br/>Better Stack destinations
+  Note left of CF: OTLP export to<br/>the stage's<br/>Better Stack<br/>destinations
 ```
 
 Nothing in the app opens a connection to a telemetry backend. The runtime instruments the handler, the outbound `fetch` calls and the binding calls on its own; `traced` in `apps/web/src/infrastructure/span.ts`, called by each operation under `apps/web/src/infrastructure/api/operations/`, adds one named span per entry point (`createPayment`, `sendContactEmail`, `activatePremium`) so a trace reads the operation rather than `POST`; `logger` writes one JSON line per call to `console`; and the platform ships all of it to the destinations `wrangler.toml` names. The browser side is a tag, loaded only after consent.

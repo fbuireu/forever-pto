@@ -99,7 +99,7 @@ sequenceDiagram
   participant ON as OpenNext
   participant R2
   participant CF as Workers
-  DW->>DW: cf:build, secrets file
+  Note right of DW: cf:build, secrets file
   DW->>ON: wrangler deploy hands off
   ON->>R2: write pages
   alt write fails
@@ -108,7 +108,7 @@ sequenceDiagram
     ON->>CF: wrangler deploy
     CF-->>DW: version live
   end
-  DW->>DW: remove secrets file
+  Note right of DW: remove secrets file
 ```
 
 - **The cache population is part of the deploy.** `opennextjs-cloudflare deploy` provisions the bucket bound as `NEXT_INC_CACHE_R2_BUCKET` in the chosen environment if it does not exist, then writes every prerendered page into it under `incremental-cache/<build id>/`. A failed write throws, so the job fails before any version is uploaded and the live Worker is untouched. The pages the Worker serves come from this step: when the keys it writes and the keys Next reads disagree, every page answers 404 ([caching](/architecture/caching/)).

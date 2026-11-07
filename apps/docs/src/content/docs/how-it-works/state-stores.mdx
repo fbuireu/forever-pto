@@ -12,17 +12,18 @@ config:
   look: handDrawn
   layout: dagre
 ---
-flowchart TB
+flowchart LR
   subgraph stores [Zustand stores]
     F[filters]
     H[holidays]
     L[location]
     P[premium]
     U[ui]
-    F ~~~ H ~~~ L ~~~ P ~~~ U
   end
   LS[("localStorage:<br/>obfuscated JSON")]
-  F & H & P <-->|"persist + partialize"| LS
+  F <-->|"persist + partialize"| LS
+  H <-->|"persist + partialize"| LS
+  P <-->|"persist + partialize"| LS
   L -.->|"an empty object"| LS
 ```
 
@@ -57,14 +58,14 @@ sequenceDiagram
   else the blob does not decode
     OS-->>ST: null after logging, defaults
   else decodes to text that is not JSON
-    OS->>OS: log, remove the key
+    Note right of OS: log, remove the key
     OS-->>ST: null, defaults
   else a JSON blob
     OS-->>ST: the parsed state
-    ST->>ST: migrate, merge, revive dates
+    Note right of ST: migrate, merge, revive dates
   end
   ST-->>UI: hasHydrated (useStoresReady)
-  UI->>UI: skeletons give way to the sections
+  Note left of UI: skeletons give way to the sections
 ```
 
 `useStoresReady` (`apps/web/src/ui/hooks/useStoresReady.ts`) waits for all four persisted stores, and every planner section renders its generated skeleton until they report, so nothing paints twice. What can go wrong, and what the visitor sees:

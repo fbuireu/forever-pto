@@ -51,9 +51,9 @@ config:
   look: handDrawn
   layout: dagre
   sequence:
-    wrap: true
-    width: 110
-    actorMargin: 20
+    wrap: false
+    width: 90
+    actorMargin: 10
 ---
 sequenceDiagram
   autonumber
@@ -62,12 +62,12 @@ sequenceDiagram
   participant CF as Cloudflare trace
   participant IP as ipify, ipinfo
   B->>P: GET /planner
-  P->>P: Markdown? payment guard?
-  P->>P: next-intl resolves the locale
+  Note right of P: Markdown? payment guard?
+  Note right of P: next-intl resolves the locale
   alt the request carries user-country
-    P->>P: re-set it, detect nothing
+    Note right of P: re-set it, detect nothing
   else no user-country cookie
-    P->>P: cf-ipcountry, final if present
+    Note right of P: cf-ipcountry, final if present
     opt no cf-ipcountry (local development)
       P->>CF: GET /cdn-cgi/trace
       CF-->>P: loc= line, or nothing
@@ -78,7 +78,7 @@ sequenceDiagram
     end
   end
   P-->>B: HTML, user-country if known,<br/>NEXT_LOCALE if written
-  B->>B: stores rehydrate from localStorage,<br/>StoresInitializer seeds the Country
+  Note over B,P: stores rehydrate from localStorage,<br/>StoresInitializer seeds the Country
 ```
 
 1. The [proxy](/architecture/proxy/) runs its chain: Markdown negotiation for agents, the payment-confirmation guard, locale resolution and, last, [country detection](/how-it-works/country-detection/). The result is a prerendered page with the `user-country` cookie whenever a Country is known, and with `NEXT_LOCALE` only when the navigation changed the locale.
@@ -95,9 +95,9 @@ config:
   look: handDrawn
   layout: dagre
   sequence:
-    wrap: true
-    width: 110
-    actorMargin: 20
+    wrap: false
+    width: 90
+    actorMargin: 10
 ---
 sequenceDiagram
   autonumber
@@ -106,14 +106,14 @@ sequenceDiagram
   participant HS as holidays store
   participant WK as Web Worker
   FS-->>CL: a planner input changed
-  CL->>HS: fetchHolidays, when the Country, Region,<br/>year, Carry-over Months or locale changed
-  HS-->>CL: HolidayDTO[] merged with Custom Holidays
-  CL->>WK: triggerCalculation, one reused worker,<br/>the latest request wins
+  CL->>HS: fetchHolidays, when the<br/>Country, Region, year,<br/>Carry-over Months<br/>or locale changed
+  HS-->>CL: HolidayDTO[] merged<br/>with Custom Holidays
+  CL->>WK: triggerCalculation,<br/>one reused worker,<br/>the latest request wins
   Note over CL,WK: CALCULATE_SUGGESTIONS with a requestId,<br/>every Date as an ISO string
-  WK->>WK: runPlanningPipeline: Workdays, Bridges,<br/>Strategy, Alternatives, Metrics
-  WK-->>CL: CALCULATE_SUGGESTIONS_RESULT or WORKER_ERROR
-  CL->>HS: setCalculating(false), then<br/>setCalculationResult on a result
-  HS-->>FS: calendar, budget readout and Summary repaint
+  Note left of WK: runPlanningPipeline:<br/>Workdays, Bridges,<br/>Strategy, Alternatives,<br/>Metrics
+  WK-->>CL: CALCULATE_SUGGESTIONS_RESULT<br/>or WORKER_ERROR
+  CL->>HS: setCalculating(false), then<br/>setCalculationResult<br/>on a result
+  HS-->>FS: calendar, budget readout<br/>and Summary repaint
 ```
 
 - **Holidays** come from the `date-holidays` package, looked up for the chosen year and the next, once for the Country and once for the Region, then filtered to non-working types and shaped into `HolidayDTO`. The [holidays engine](/how-it-works/holidays-engine/) page has the rules; [data sources](/how-it-works/data-sources/) has the provenance.

@@ -22,9 +22,9 @@ config:
   look: handDrawn
   layout: dagre
   sequence:
-    wrap: true
-    width: 110
-    actorMargin: 20
+    wrap: false
+    width: 80
+    actorMargin: 10
 ---
 sequenceDiagram
   autonumber
@@ -33,17 +33,17 @@ sequenceDiagram
   participant SA as Server Action
   participant DB as Turso
   participant RS as Resend
-  V->>M: name, email, subject, message
-  M->>M: zod in the form
+  V->>M: name, email,<br/>subject, message
+  Note right of M: zod in the form
   M->>SA: sendContactEmailAction
-  SA->>SA: zod contactSchema again
+  Note right of SA: zod contactSchema<br/>again
   SA->>DB: reserveContactSlot,<br/>one conditional INSERT
-  alt cooldown, or message already sent
+  alt cooldown, or message<br/>already sent
     DB-->>SA: nothing inserted
-    SA-->>M: DuplicateContactError, 429
-    M-->>V: error step: already heard from you
+    SA-->>M: DuplicateContactError,<br/>429
+    M-->>V: error step:<br/>already heard from you
   else slot is free
-    SA->>RS: send, replyTo the visitor
+    SA->>RS: send, replyTo<br/>the visitor
     alt accepted
       RS-->>SA: messageId
       SA-->>M: success

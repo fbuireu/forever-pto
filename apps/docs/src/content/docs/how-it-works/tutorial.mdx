@@ -13,8 +13,8 @@ config:
   layout: dagre
   sequence:
     wrap: true
-    width: 140
-    actorMargin: 30
+    width: 110
+    actorMargin: 20
 ---
 sequenceDiagram
   participant U as User
@@ -23,14 +23,14 @@ sequenceDiagram
   participant D as DriverClient
   U->>H: click "quick tour"
   par lazy
-    H->>H: import the driver client
-    H->>H: import DriverStyles
+    Note right of H: import the driver client
+    Note right of H: import DriverStyles
   end
   H->>SB: open it if closed, wait<br/>for the first anchor to settle
   H->>D: start({ steps, overrides })
   D-->>U: highlight step 1 ... n,<br/>done button on the last
   U->>D: close
-  D->>D: unmount the React roots<br/>it mounted into popovers
+  Note left of D: unmount the<br/>React roots it mounted<br/>into popovers
 ```
 
 

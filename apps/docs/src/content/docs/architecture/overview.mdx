@@ -37,8 +37,11 @@ The same graph drawn: every arrow is an `imports` edge, weighted by the import c
 config:
   look: handDrawn
   layout: dagre
+  flowchart:
+    nodeSpacing: 30
+    rankSpacing: 40
 ---
-flowchart LR
+flowchart TB
   APP[app]
   UI[ui]
   APPL[application]

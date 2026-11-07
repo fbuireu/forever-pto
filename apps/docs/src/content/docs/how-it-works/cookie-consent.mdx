@@ -31,6 +31,9 @@ These categories are registered with the library:
 config:
   look: handDrawn
   layout: dagre
+  state:
+    nodeSpacing: 90
+    rankSpacing: 110
 ---
 stateDiagram-v2
   [*] --> NoDecision: first visit, no cc_cookie
@@ -38,7 +41,7 @@ stateDiagram-v2
   Banner --> Accepted: accept all
   Banner --> Rejected: reject all
   Banner --> Dialog: manage preferences
-  Accepted --> Dialog: cc:showPreferences from the footer
+  Accepted --> Dialog: cc:showPreferences<br/>from the footer
   Rejected --> Dialog
   Custom --> Dialog
   Dialog --> Accepted: accept all

@@ -17,9 +17,10 @@ config:
   look: handDrawn
   layout: dagre
   sequence:
-    wrap: true
-    width: 110
-    actorMargin: 20
+    wrap: false
+    width: 80
+    actorMargin: 10
+    messageMargin: 36
 ---
 sequenceDiagram
   autonumber
@@ -30,24 +31,24 @@ sequenceDiagram
   participant WK as worker.ts
   V->>CL: changes an input
   opt a Holiday input changed
-    CL->>HS: fetchHolidays, latest call wins
+    CL->>HS: fetchHolidays,<br/>latest call wins
     HS-->>CL: Holidays + holidaysKey
   end
-  CL->>CL: plan only when budget, Holidays<br/>and months exist and the key matches
+  Note right of CL: plan only when<br/>budget, Holidays<br/>and months exist<br/>and the key matches
   CL->>HK: triggerCalculation
   alt a request is in flight
-    HK->>HK: hold this one, replacing any held
+    Note right of HK: hold this one,<br/>replacing any held
   else idle
     HK->>HS: setCalculating(true)
-    HK->>WK: CALCULATE_SUGGESTIONS + requestId
-    WK-->>HK: RESULT or WORKER_ERROR
+    HK->>WK: CALCULATE_<br/>SUGGESTIONS<br/>+ requestId
+    WK-->>HK: RESULT or<br/>WORKER_ERROR
     alt a request is held
-      HK->>WK: drop this reply, post the held one
+      HK->>WK: drop this reply,<br/>post the held one
     else the reply is the latest
       HK->>HS: setCalculating(false)
       opt a result
         HK->>HS: setCalculationResult
-        HS-->>V: calendar, panel, Summary repaint
+        HS-->>V: calendar, panel,<br/>Summary repaint
       end
     end
   end
@@ -85,6 +86,9 @@ A run is tens of milliseconds for a year, so most visitors never notice the busy
 config:
   look: handDrawn
   layout: dagre
+  state:
+    nodeSpacing: 100
+    rankSpacing: 120
 ---
 stateDiagram-v2
   [*] --> NoWorker
@@ -116,9 +120,10 @@ config:
   look: handDrawn
   layout: dagre
   sequence:
-    wrap: true
-    width: 110
-    actorMargin: 20
+    wrap: false
+    width: 80
+    actorMargin: 10
+    messageMargin: 36
 ---
 sequenceDiagram
   autonumber
@@ -126,8 +131,8 @@ sequenceDiagram
   participant WK as worker.ts
   participant PL as runPlanningPipeline
   HK->>WK: CALCULATE_SUGGESTIONS<br/>{ requestId, payload }
-  WK->>WK: drop any other message type
-  WK->>WK: deserialise and narrow:<br/>isStrategy, isPreferredMonths, isLocale
+  Note right of WK: drop any other message type
+  Note right of WK: deserialise and narrow:<br/>isStrategy, isPreferredMonths, isLocale
   WK->>PL: RunPlanningPipelineParams
   PL-->>WK: PlanningResult, always measured
   alt the run returns

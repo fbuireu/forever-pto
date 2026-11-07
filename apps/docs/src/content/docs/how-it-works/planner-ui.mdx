@@ -12,6 +12,8 @@ The planner is one route, `apps/web/src/app/[locale]/(app)/planner/page.tsx`, wh
 config:
   look: handDrawn
   layout: dagre
+  flowchart:
+    nodeSpacing: 30
 ---
 flowchart TB
   FS[(filters store)] --> SB["AppSidebar:<br/>inputs and tools"]
@@ -65,25 +67,25 @@ config:
   look: handDrawn
   layout: dagre
   sequence:
-    wrap: true
-    width: 110
-    actorMargin: 20
+    wrap: false
+    width: 80
+    actorMargin: 10
 ---
 sequenceDiagram
   participant F as filters store
   participant CL as CalendarList
   participant H as holidays store
   participant W as worker hook
-  F-->>CL: year or carryOverMonths changed
+  F-->>CL: year or carryOverMonths<br/>changed
   CL->>H: pruneDaysOutsideWindow
-  F-->>CL: country, region, year,<br/>carryOverMonths or locale changed
+  F-->>CL: country, region, year,<br/>carryOverMonths or<br/>locale changed
   CL->>H: fetchHolidays
   H-->>CL: holidays + holidaysKey
-  Note over CL: canCalculate: budget > 0, Holidays,<br/>months. holidaysAreCurrent: key matches
-  CL->>W: triggerCalculation when both hold<br/>(also when planRevision bumps)
+  Note over CL: canCalculate: budget > 0,<br/>Holidays, months.<br/>holidaysAreCurrent:<br/>key matches
+  CL->>W: triggerCalculation<br/>when both hold<br/>(also when planRevision bumps)
   W-->>H: setCalculationResult
-  H-->>CL: repaint, status reads "plan updated"
-  Note over CL,H: canCalculate false with a Suggestion<br/>on screen: clearCalculation
+  H-->>CL: repaint, status reads<br/>"plan updated"
+  Note over CL,H: canCalculate false with<br/>a Suggestion on screen:<br/>clearCalculation
 ```
 
 `planRevision` is a counter the store bumps when a user action should re-plan without any input having changed: applying an Alternative, or resetting the hand edits. The effect lists it as a dependency and never reads it, which is the one place in the file Biome is told to look away.

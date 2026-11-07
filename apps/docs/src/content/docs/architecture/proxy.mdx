@@ -28,16 +28,18 @@ Everything under `/api`, Next internals (`/_next`, `/_vercel`) and any path with
 config:
   look: handDrawn
   layout: dagre
+  flowchart:
+    nodeSpacing: 30
 ---
 flowchart TD
-  IN[Matched request] --> D1{"pathname is /api/markdown?"}
+  IN[Matched request] --> D1{"pathname is<br/>/api/markdown?"}
   D1 -- yes --> H1["Set x-markdown-path to an empty string, pass through"]
-  D1 -- no --> D2{"Accept contains text/markdown?"}
+  D1 -- no --> D2{"Accept contains<br/>text/markdown?"}
   D2 -- yes --> H2["Set x-markdown-path = pathname<br/>rewrite to /api/markdown"]
   D2 -- no --> D3{"ends with /payment/confirmation<br/>without payment_intent?"}
   D3 -- yes --> H3[Redirect to the locale home]
-  D3 -- no --> I18N["next-intl resolves the locale<br/>if it wrote NEXT_LOCALE, re-set it with LOCALE_COOKIE_POLICY"]
-  I18N --> GEO{"location: the request carries user-country?"}
+  D3 -- no --> I18N["next-intl resolves the locale<br/>if it wrote NEXT_LOCALE,<br/>re-set it with<br/>LOCALE_COOKIE_POLICY"]
+  I18N --> GEO{"location: the request<br/>carries user-country?"}
   GEO -- yes --> RS["Re-set it as it is, renewing its week"]
   GEO -- no --> DET["detectCountry, then set user-country<br/>only if a country came back"]
   RS & DET --> OUT[Response]

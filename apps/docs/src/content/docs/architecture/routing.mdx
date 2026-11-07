@@ -40,13 +40,15 @@ A request reaches one of those files in two steps. First, which part of the app 
 config:
   look: handDrawn
   layout: dagre
+  flowchart:
+    nodeSpacing: 30
 ---
 flowchart TD
   REQ[Request] --> M{"Does the proxy<br/>matcher admit it?"}
   M -- "a page path,<br/>or /api/markdown" --> PX["Proxy chain"]
   M -- "under /api" --> API["/api/* route handlers"]
   M -- "a dotted path" --> OWN{"A route<br/>of its own?"}
-  OWN -- "/.well-known/*, robots.txt,<br/>sitemap.xml, favicon.ico" --> WK["That route"]
+  OWN -- "/.well-known/*,<br/>robots.txt,<br/>sitemap.xml,<br/>favicon.ico" --> WK["That route"]
   OWN -- no --> SEG{"First segment<br/>a locale?"}
   PX -->|"Accept:<br/>text/markdown"| MD["/api/markdown"]
   PX --> LOC["Locale routing<br/>(next diagram)"]

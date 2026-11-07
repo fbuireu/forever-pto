@@ -64,6 +64,9 @@ A **Suggestion**: the set of dates to spend the budget on, the Bridges that moti
 config:
   look: handDrawn
   layout: dagre
+  flowchart:
+    nodeSpacing: 30
+    rankSpacing: 70
 ---
 flowchart TB
   IN["Inputs: Country + Region, Planning Window,<br/>PTO budget, Strategy, Custom Holidays"]
@@ -72,10 +75,11 @@ flowchart TB
   subgraph engine [Planning engine, in a Web Worker]
     WD[Workdays] --> BR[Bridges] --> SEL["Selection under<br/>the Strategy"] --> ALT["Alternatives: the best plan<br/>becomes the Suggestion"] --> MET[Metrics]
   end
-  ALT -->|Suggestion| CAL["Calendar with<br/>Suggested Days"]
+  ALT --> CAL["Calendar with<br/>Suggested Days"]
   ALT --> PANEL["Budget readout +<br/>Alternative switcher"]
   MET --> SUM["Summary: cards<br/>and charts"]
-  ALT -->|placed days| EXP["PDF / ICS export"]
+  ALT --> EXP["PDF / ICS export<br/>of the placed days"]
+  CAL ~~~ PANEL ~~~ EXP
 ```
 
 The Metrics answer the questions a user asks of a plan: how many Effective Days did the budget buy, how many Bonus Days came free, how many Long Weekends and Rest Blocks it produced, the Longest Vacation, the Max Work Streak left standing, and how the time off distributes across months and Quarters. The [Summary](/how-it-works/planner-ui/#summary) renders them as cards and charts.

@@ -33,17 +33,21 @@ See [cookies](/reference/cookies/) for the full cookie inventory.
 config:
   look: handDrawn
   layout: dagre
+  flowchart:
+    wrappingWidth: 320
+    rankSpacing: 90
+    nodeSpacing: 70
 ---
 flowchart TD
   S[detectCountry] --> H{cf-ipcountry header present?}
+  H -->|no, as in local development| B[2. GET<br/>NEXT_PUBLIC_SITE_URL/cdn-cgi/trace<br/>parse loc=, no-store, 5 s timeout]
   H -->|yes| A["1. detectCountryFromHeaders<br/>XX (unknown) and T1 (Tor) read as empty"]
-  A -->|country| OK[Lowercased alpha-2 code → user-country cookie]
-  A -->|empty, and final| NONE[No cookie; the user picks a Country]
-  H -->|no, as in local development| B[2. GET NEXT_PUBLIC_SITE_URL/cdn-cgi/trace<br/>parse loc=, no-store, 5 s timeout]
-  B -->|country| OK
   B -->|empty or error, logged| C[3. api.ipify.org → ipinfo.io<br/>no-store, 5 s timeouts]
-  C -->|country| OK
+  A -->|empty, and final| NONE[No cookie; the user picks a Country]
   C -->|empty or error| NONE
+  A -->|country| OK[Lowercased alpha-2 code → user-country cookie]
+  B -->|country| OK
+  C -->|country| OK
 ```
 
 Every strategy leaves through `normalizeCountryCode` (`apps/web/src/infrastructure/services/location/utils/normalize.ts`), the one exit rule: trim, lower-case, reject anything that is not two ASCII letters, and reject the sentinels `XX` (`UNIDENTIFIED_COUNTRY`) and `T1` (`TOR_COUNTRY`, Tor exit nodes). Both network strategies fetch through `noStoreFetch` beside it, which owns `cache: 'no-store'` and the 5-second `AbortSignal.timeout`.

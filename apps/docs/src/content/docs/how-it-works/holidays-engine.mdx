@@ -37,26 +37,26 @@ config:
   look: handDrawn
   layout: dagre
   sequence:
-    wrap: true
-    width: 110
-    actorMargin: 20
+    wrap: false
+    width: 90
+    actorMargin: 10
 ---
 sequenceDiagram
   autonumber
-  participant SI as StoresInitializer
+  participant SI as Stores<br/>Initializer
   participant CL as CalendarList
   participant HS as holidays store
   participant GH as getHolidays
   SI->>CL: Country from the cookie,<br/>only when none is stored
-  CL->>HS: fetchHolidays (next sequence number)
+  CL->>HS: fetchHolidays<br/>(next sequence number)
   HS->>GH: dynamic import, then the<br/>two-year lookup
-  GH-->>HS: HolidayDTO[], or [] after logging
+  GH-->>HS: HolidayDTO[], or []<br/>after logging
   alt a newer fetch started
-    HS->>HS: drop this answer
+    Note right of HS: drop this answer
   else the latest call
-    HS->>HS: keep Custom Holidays, sort
+    Note right of HS: keep Custom<br/>Holidays, sort
     HS-->>CL: holidays + holidaysKey
-    CL->>CL: plan, now the key matches
+    Note right of CL: plan, now the key matches
   end
 ```
 

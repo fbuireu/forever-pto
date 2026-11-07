@@ -12,28 +12,28 @@ config:
   look: handDrawn
   layout: dagre
   sequence:
-    wrap: true
-    width: 110
-    actorMargin: 20
+    wrap: false
+    width: 80
+    actorMargin: 10
 ---
 sequenceDiagram
   autonumber
   actor V as Visitor
-  participant D as Donate / CheckoutForm
-  participant SA as createPaymentAction
+  participant D as Donate /<br/>CheckoutForm
+  participant SA as createPayment<br/>Action
   participant S as Stripe
   participant DB as Turso
-  V->>D: amount, email, promo code?
+  V->>D: amount, email,<br/>promo code?
   D->>SA: Server Action
-  SA->>SA: rate limit, zod, promo code
+  Note right of SA: rate limit, zod,<br/>promo code
   SA->>S: paymentIntents.create
   S-->>SA: clientSecret
-  SA-->>D: clientSecret, discountInfo
-  SA--)DB: after(): savePayment (may fail)
-  V->>D: card details in Stripe Elements
-  D->>S: confirmPayment, redirect if_required
+  SA-->>D: clientSecret,<br/>discountInfo
+  SA--)DB: after(): savePayment<br/>(may fail)
+  V->>D: card details in<br/>Stripe Elements
+  D->>S: confirmPayment,<br/>redirect if_required
   Note over D,S: the in-page and issuer-redirect<br/>paths are the next diagram
-  S-)DB: webhook payment_intent.succeeded:<br/>create the row if it is missing
+  S-)DB: webhook payment_intent.<br/>succeeded: create the row<br/>if it is missing
 ```
 
 Once the card is confirmed, Premium is activated one of two ways:
@@ -44,27 +44,27 @@ config:
   look: handDrawn
   layout: dagre
   sequence:
-    wrap: true
-    width: 110
-    actorMargin: 20
+    wrap: false
+    width: 80
+    actorMargin: 10
 ---
 sequenceDiagram
   autonumber
   participant V as Visitor
-  participant D as CheckoutForm
+  participant D as Checkout<br/>Form
   participant S as Stripe
-  participant CS as /api/check-session
-  participant ACT as /api/payment/activate
-  participant CP as /payment/confirmation
+  participant CS as /api/<br/>check-session
+  participant ACT as /api/payment/<br/>activate
+  participant CP as /payment/<br/>confirmation
   alt confirmed in the page, the usual card path
     D->>CS: POST { email, premiumKey }
-    CS->>S: retrieve, require succeeded + donor email
+    CS->>S: retrieve, require<br/>succeeded +<br/>donor email
     CS-->>D: premium-token cookie
-    D-->>V: Premium at once, toast, confetti
+    D-->>V: Premium at once,<br/>toast, confetti
   else the issuer takes over
-    S-->>V: redirect to /api/payment/activate
+    S-->>V: redirect to<br/>/api/payment/activate
     V->>ACT: GET, rate-limited
-    ACT->>S: retrieve, compare client secret
+    ACT->>S: retrieve, compare<br/>client secret
     ACT-->>V: 307, premium-token +<br/>premium-activation proof
     V->>CP: GET ?payment_intent=...
     CP-->>V: success card, PremiumSessionSync<br/>checks the session

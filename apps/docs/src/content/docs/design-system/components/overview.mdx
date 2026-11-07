@@ -7,6 +7,23 @@ sidebar:
 
 All core components live in `apps/web/src/ui/modules/core/`, and the rules they follow are in [`CODING_STANDARDS.md`](https://github.com/fbuireu/forever-pto/blob/main/CODING_STANDARDS.md): `data-slot` attributes and CVA only for orthogonal variant axes (`U11`, `U12`), and named exports and no stores, translations or fetching inside a component, which Biome and the contract suite enforce. See [Philosophy](/design-system/foundations/philosophy/) for the visual language.
 
+Each foundation feeds some of the folders of `apps/web/src/ui/modules/core`:
+
+```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
+flowchart LR
+  BASE["Base UI: behaviour and ARIA"] --> B["primitives/<br/>animate/base/<br/>animate/primitives/"]
+  MOTION["Motion: m.* and AnimatePresence"] --> M["animate/primitives/<br/>animate/base/<br/>animate/components/<br/>animate/effects/<br/>animate/icons/ and animate/text/<br/>primitives/"]
+  CVA["CVA: variants"] --> C["primitives/<br/>animate/base/"]
+  TOKENS["Design tokens: colours, shadows, frame"] --> T["primitives/<br/>animate/base/<br/>animate/components/"]
+```
+
+Between those folders, and from the feature modules into them, the imports run like this:
+
 ```mermaid
 ---
 config:
@@ -14,31 +31,20 @@ config:
   layout: dagre
 ---
 flowchart TB
-  subgraph deps [Foundations]
-    BASE["Base UI: behaviour and ARIA"]
-    MOTION["Motion: m.* and AnimatePresence"]
-    CVA["CVA: variants"]
-    TOKENS["Design tokens: colours, shadows, frame"]
-  end
-  subgraph core ["apps/web/src/ui/modules/core"]
-    PRIM["primitives/<br/>Button · Badge · Banner · Card · Input · Textarea · Label · Table · InputGroup · Progress · Slider · Command<br/>and Bone · Combobox · FlagIcon · Form · NumberInput · RichLink · Sonner"]
-    ABASE["animate/base/<br/>Accordion · Checkbox · Collapsible · Dialog · Drawer · DropdownMenu · Popover · Switch · Tooltip · Sidebar · Slot"]
-    ACOMP["animate/components/<br/>Tabs · Counter · FeatureList · RadialNav"]
-    AEFF["animate/effects/<br/>AutoHeight · MotionHighlight"]
-    AICON["animate/icons/ and animate/text/"]
-    APRIM["animate/primitives/<br/>the unstyled motion layer"]
-  end
-  BASE --> PRIM & ABASE & APRIM
-  MOTION --> APRIM & ABASE & ACOMP & AEFF & AICON & PRIM
-  CVA --> PRIM & ABASE
-  TOKENS --> PRIM & ABASE & ACOMP
+  FEAT["Feature modules:<br/>sidebar, planner,<br/>homepage, shared"]
+  PRIM["primitives/<br/>Button · Badge · Banner · Card<br/>Input · Textarea · Label · Table<br/>InputGroup · Progress · Slider<br/>Command · Bone · Combobox<br/>FlagIcon · Form · NumberInput<br/>RichLink · Sonner"]
+  ABASE["animate/base/<br/>Accordion · Checkbox<br/>Collapsible · Dialog · Drawer<br/>DropdownMenu · Popover<br/>Switch · Tooltip · Sidebar · Slot"]
+  ACOMP["animate/components/<br/>Tabs · Counter<br/>FeatureList · RadialNav"]
+  AEFF["animate/effects/<br/>AutoHeight<br/>MotionHighlight"]
+  AICON["animate/icons/ and<br/>animate/text/"]
+  APRIM["animate/primitives/<br/>the unstyled motion layer"]
   APRIM --> ABASE & AEFF & AICON
   AEFF --> ACOMP & ABASE
   ABASE -->|Slot, Popover| PRIM
   PRIM -->|Button, in Sidebar| ABASE
   AICON --> PRIM & ACOMP
   PRIM -->|Badge, in FeatureList| ACOMP
-  FEAT["Feature modules: sidebar, planner, homepage, shared"] --> PRIM & ABASE & ACOMP
+  FEAT --> PRIM & ABASE & ACOMP
 ```
 
 An arrow points from what is imported to what imports it. `primitives/` and `animate/base/` import each other: the primitives take `Slot` and `Popover` from `animate/base/`, and its `Sidebar` takes `Button` back.

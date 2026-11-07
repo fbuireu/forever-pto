@@ -15,30 +15,30 @@ config:
   look: handDrawn
   layout: dagre
   sequence:
-    wrap: true
-    width: 110
-    actorMargin: 20
+    wrap: false
+    width: 80
+    actorMargin: 10
 ---
 sequenceDiagram
   participant C as Client
   participant R as Route or action
   participant OP as operation
-  participant L as PAYMENT_RATE_LIMITER
+  participant L as PAYMENT_<br/>RATE_LIMITER
   participant S as Stripe
-  C->>R: POST /api/payment or the action
-  R->>R: resolveClientIp:<br/>cf-connecting-ip, x-forwarded-for,<br/>x-real-ip, else null
-  R->>OP: createPaymentRequest(input, ip)
-  OP->>L: limit({ key: ip or "unknown" })
+  C->>R: POST /api/payment<br/>or the action
+  Note right of R: resolveClientIp:<br/>cf-connecting-ip,<br/>x-forwarded-for,<br/>x-real-ip, else null
+  R->>OP: createPayment<br/>Request(input, ip)
+  OP->>L: limit({ key: ip<br/>or "unknown" })
   alt over the bound
     L-->>OP: success = false
     OP-->>R: RateLimitError, 429<br/>(the body is never read)
   else allowed
     L-->>OP: success = true
-    OP->>OP: parse, validate, promo code
+    Note right of OP: parse, validate,<br/>promo code
     OP->>S: paymentIntents.create
   else the binding throws
-    OP->>OP: fail open: treated as allowed
-    OP->>S: same checks, then create
+    Note right of OP: fail open:<br/>treated as allowed
+    OP->>S: same checks,<br/>then create
   end
 ```
 

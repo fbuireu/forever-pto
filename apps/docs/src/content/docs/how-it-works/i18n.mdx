@@ -17,11 +17,11 @@ config:
 flowchart TD
   REQ[Request path] --> PFX{Locale prefix?}
   PFX -- "/es /ca /it /fr /de" --> USE[Use it]
-  PFX -- "/en" --> STRIP["Use it, redirect to<br/>the unprefixed path"]
+  PFX -- "/en" --> STRIP["Use it, redirect<br/>to the unprefixed<br/>path"]
   PFX -- none --> CK{"NEXT_LOCALE<br/>holds a locale?"}
-  CK -- yes --> USE2["Use it, redirect to<br/>its prefix if not en"]
+  CK -- yes --> USE2["Use it, redirect<br/>to its prefix<br/>if not en"]
   CK -- no --> AL{"Accept-Language<br/>matches?"}
-  AL -- yes --> USE3["Use it, redirect to<br/>its prefix if not en"]
+  AL -- yes --> USE3["Use it, redirect<br/>to its prefix<br/>if not en"]
   AL -- no --> DEF["Default: en"]
   USE & STRIP & USE2 & USE3 & DEF --> CHG{"Page navigation whose locale<br/>differs from the cookie or<br/>the Accept-Language match?"}
   CHG -- yes --> SET["next-intl writes NEXT_LOCALE,<br/>the proxy re-sets it"]
@@ -75,11 +75,14 @@ config:
 ---
 flowchart TB
   EN["en.json, the reference<br/>49 namespaces, ~1,300 leaf keys"] -->|"typeof messages"| T["AppConfig.Messages"]
-  T -->|"typed t()"| CC["Client components:<br/>useTranslations"]
-  T -->|"typed t()"| SC["Server components, metadata:<br/>getTranslations"]
-  T -->|createTranslator| MD["Markdown twin:<br/>bundles imported statically"]
   ES["es, ca, it, de, fr"] -.->|"same key set, asserted"| EN
-  REQ["Request locale"] -->|"dynamic import in config.ts"| CC & SC
+  T -->|createTranslator| MD["Markdown twin:<br/>bundles imported statically"]
+  T --> TT["typed t()"]
+  REQ["Request locale"] --> DI["dynamic import<br/>in config.ts"]
+  TT --> CC["Client components:<br/>useTranslations"]
+  TT --> SC["Server components, metadata:<br/>getTranslations"]
+  DI --> CC
+  DI --> SC
 ```
 
 1. **`en.json` is the reference.** `environment.d.ts` augments next-intl's `AppConfig` with `Messages: typeof messages` read off the English bundle, so every `t('...')` call is typed against it: a key that does not exist is a compile error, and so is a namespace that does not.

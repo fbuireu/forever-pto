@@ -155,9 +155,9 @@ flowchart TD
   ADM -- yes --> RANK[Rank it under the objective]
   RANK --> BEST{Any candidate left?}
   SKIP --> BEST
-  BEST -- no --> NEXT{"Does the objective have a next stage?"}
-  NEXT -- "yes, Main Vacation's Optimized stage" --> SWITCH[Switch to it] --> STEP
+  BEST -- no --> NEXT{"Does the objective<br/>have a next stage?"}
   NEXT -- no --> DONE
+  NEXT -- yes --> SWITCH["Switch to it: Main Vacation's<br/>Optimized stage"] --> STEP
   BEST -- yes --> TAKE["Take the best: cover its span, spend its cost"] --> STEP
 ```
 

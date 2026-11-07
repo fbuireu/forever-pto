@@ -30,6 +30,9 @@ Lo importante ocurre en el navegador: el edge solo detecta un Country y sirve HT
 config:
   look: handDrawn
   layout: dagre
+  flowchart:
+    nodeSpacing: 25
+    rankSpacing: 50
 ---
 flowchart TB
   subgraph edge [Cloudflare Worker]
@@ -45,8 +48,8 @@ flowchart TB
   PX -->|HTML + cookies| UI
   UI <--> ST
   ST --> HOL --> ST
-  ST -->|cadenas ISO| WK -->|Suggestion + Alternatives + Metrics| ST
-  UI -->|Server Actions y fetch| API
+  ST -->|cadenas<br/>ISO| WK -->|Suggestion +<br/>Alternatives +<br/>Metrics| ST
+  UI -->|Server Actions<br/>y fetch| API
 ```
 
 <CardGrid stagger>

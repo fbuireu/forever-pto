@@ -54,6 +54,9 @@ Whatever runs a program provides it exactly once, at the edge of that program: `
 config:
   look: handDrawn
   layout: dagre
+  flowchart:
+    nodeSpacing: 30
+    rankSpacing: 40
 ---
 flowchart LR
   subgraph tags [Context.Tag, the interface]
@@ -70,7 +73,7 @@ flowchart LR
   end
   AL[ApplicationLayer<br/>Layer.mergeAll]
   L1 & L2 & L3 & L4 --> AL
-  UC[Use case: Effect.gen<br/>declares T1..T4 as requirements] -->|Effect.provide at the route| AL
+  UC[Use case: Effect.gen<br/>declares T1..T4 as requirements] -->|Effect.provide<br/>at the route| AL
   TEST[Test: mock Layers] -.->|substitutes| T1 & T2 & T3 & T4
   AL --> RUN[Effect.runPromise]
 ```

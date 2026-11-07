@@ -19,20 +19,20 @@ config:
   look: handDrawn
   layout: dagre
   sequence:
-    wrap: true
-    width: 110
-    actorMargin: 20
+    wrap: false
+    width: 90
+    actorMargin: 10
 ---
 sequenceDiagram
   participant A as Agent
   participant P as Proxy
-  participant R as /api/markdown
-  participant B as buildMarkdownPage
+  participant R as /api/<br/>markdown
+  participant B as build<br/>MarkdownPage
   A->>P: GET /planner<br/>Accept: text/markdown
   P->>R: rewrite, with x-markdown-path<br/>set to /planner
-  R->>R: header starts with "/"?<br/>else 404
-  R->>B: buildMarkdownPage(baseUrl, path)
-  B-->>R: Markdown, or null if unlisted
+  Note right of R: header starts with "/"?<br/>else 404
+  R->>B: buildMarkdownPage<br/>(baseUrl, path)
+  B-->>R: Markdown, or null<br/>if unlisted
   R-->>A: 200 text/markdown, or 404
 ```
 
