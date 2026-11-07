@@ -5,10 +5,15 @@ import {
 	DropdownMenuTrigger,
 } from "@ui/modules/core/animate/base/DropdownMenu";
 import { Button } from "@ui/modules/core/primitives/Button";
+import { Check, Sun } from "lucide-react";
 import { useState } from "react";
 import { Demo } from "../Demo";
 
-const THEMES = ["light", "dark", "system"];
+const THEMES = [
+	{ id: "light", label: "Light" },
+	{ id: "dark", label: "Dark" },
+	{ id: "system", label: "System" },
+];
 
 export const DropdownMenuDemo = () => {
 	const [theme, setTheme] = useState("system");
@@ -17,18 +22,20 @@ export const DropdownMenuDemo = () => {
 		<Demo>
 			<DropdownMenu>
 				<DropdownMenuTrigger>
-					<Button variant="outline">Theme</Button>
+					<Button variant="outline" size="icon">
+						<Sun />
+						<span className="sr-only">Toggle theme</span>
+					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent>
-					{THEMES.map((option) => (
-						<DropdownMenuItem key={option} className="flex justify-between" onClick={() => setTheme(option)}>
-							{option}
-							{theme === option && <span aria-hidden="true">✓</span>}
+					{THEMES.map(({ id, label }) => (
+						<DropdownMenuItem key={id} className="flex justify-between" onClick={() => setTheme(id)}>
+							{label}
+							{theme === id && <Check className="size-4" />}
 						</DropdownMenuItem>
 					))}
 				</DropdownMenuContent>
 			</DropdownMenu>
-			<p className="m-0 font-mono text-sm">Selected: {theme}</p>
 		</Demo>
 	);
 };

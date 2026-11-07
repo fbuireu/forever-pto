@@ -2,7 +2,7 @@
 title: Textarea
 description: Multi-line text field that auto-grows with its content via CSS field-sizing.
 sidebar:
-  order: 22
+  order: 21
   badge:
     text: Live
     variant: success
@@ -28,7 +28,7 @@ Sizing is handled by CSS alone: `field-sizing-content` lets the field grow with 
 ```tsx
 import { Textarea } from '@ui/modules/core/primitives/Textarea';
 
-<Textarea placeholder='Notes for this holiday…' value={notes} onChange={handleChange} />
+<Textarea placeholder='Tell us what you need...' value={message} onChange={handleChange} />
 
 <Textarea aria-invalid={Boolean(error)} />
 ```

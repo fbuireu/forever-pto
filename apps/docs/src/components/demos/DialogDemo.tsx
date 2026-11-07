@@ -5,7 +5,6 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@ui/modules/core/animate/base/Dialog";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { useState } from "react";
@@ -17,23 +16,23 @@ export const DialogDemo = () => {
 
 	return (
 		<Demo>
+			<Button variant="destructive" onClick={() => setOpen(true)}>
+				Delete holiday
+			</Button>
 			<Dialog open={open} onOpenChange={setOpen}>
-				<DialogTrigger asChild>
-					<Button>Open dialog</Button>
-				</DialogTrigger>
-				<DialogContent closeLabel="Close dialog">
+				<DialogContent className="sm:max-w-sm" closeLabel="Close">
 					<DialogHeader>
-						<DialogTitle>Reset your plan?</DialogTitle>
+						<DialogTitle className="text-destructive">Delete holiday</DialogTitle>
 						<DialogDescription>
-							This clears every manually edited suggestion and recalculates from scratch.
+							Are you sure you want to delete this holiday? This action cannot be undone.
 						</DialogDescription>
 					</DialogHeader>
 					<DialogFooter>
-						<Button variant="outline" onClick={() => setOpen(false)}>
-							Cancel
+						<Button variant="destructive" className="flex-1" onClick={() => setOpen(false)}>
+							Delete
 						</Button>
-						<Button variant="destructive" onClick={() => setOpen(false)}>
-							Reset plan
+						<Button variant="destructive" className="flex-1" onClick={() => setOpen(false)}>
+							Cancel
 						</Button>
 					</DialogFooter>
 				</DialogContent>
@@ -46,7 +45,7 @@ export const DIALOG_PROP_ROWS = propRows({
 	open: { type: "boolean", description: "Controlled state." },
 	onOpenChange: {
 		type: "(open: boolean, details) => void",
-		description: "Fires on trigger, close button, Esc and backdrop click.",
+		description: "Fires on the close button, Esc and a backdrop click.",
 	},
 });
 

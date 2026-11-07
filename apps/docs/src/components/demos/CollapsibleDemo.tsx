@@ -1,22 +1,28 @@
 import type { Collapsible as CollapsiblePrimitive } from "@base-ui/react/collapsible";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@ui/modules/core/animate/base/Collapsible";
-import type { ComponentProps } from "react";
+import { Input } from "@ui/modules/core/primitives/Input";
+import { Label } from "@ui/modules/core/primitives/Label";
+import { type ComponentProps, useState } from "react";
 import { Demo } from "../Demo";
 import { type OwnProps, propRows } from "../PropsTable";
 
-export const CollapsibleDemo = () => (
-	<Demo>
-		<Collapsible className="w-full max-w-md">
-			<CollapsibleTrigger>Advanced options</CollapsibleTrigger>
-			<CollapsibleContent>
-				<div className="space-y-2 px-3 py-4 text-sm text-muted-foreground">
-					<p className="m-0">Carryover months, past months and other knobs live behind this fold.</p>
-					<p className="m-0">While open, the trigger keeps its lifted pressed style via aria-expanded.</p>
-				</div>
-			</CollapsibleContent>
-		</Collapsible>
-	</Demo>
-);
+export const CollapsibleDemo = () => {
+	const [open, setOpen] = useState(false);
+
+	return (
+		<Demo>
+			<Collapsible open={open} onOpenChange={setOpen} className="w-full max-w-md">
+				<CollapsibleTrigger>Have a promo code?</CollapsibleTrigger>
+				<CollapsibleContent className="px-0.5 pt-2 pb-1">
+					<div className="grid gap-2">
+						<Label htmlFor="collapsible-demo-promo">Promo code</Label>
+						<Input id="collapsible-demo-promo" placeholder="You wish it was that easy" />
+					</div>
+				</CollapsibleContent>
+			</Collapsible>
+		</Demo>
+	);
+};
 
 export const COLLAPSIBLE_PROP_ROWS = propRows({
 	open: { type: "boolean", description: "Controlled state." },

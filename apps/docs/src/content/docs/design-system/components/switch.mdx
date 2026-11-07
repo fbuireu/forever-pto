@@ -2,7 +2,7 @@
 title: Switch
 description: 60x32 brutal toggle pill, a Base UI switch rendered as a Motion button.
 sidebar:
-  order: 19
+  order: 18
   badge:
     text: Live
     variant: success
@@ -32,8 +32,7 @@ Exports: `Switch` (the thumb is an internal sub-component, rendered automaticall
 ```tsx
 import { Switch } from '@ui/modules/core/animate/base/Switch';
 
-<Switch id='carryover' checked={enabled} onCheckedChange={(next) => setEnabled(next)} />
-<Label htmlFor='carryover'>Enable carryover</Label>
+<Switch aria-label='Allow past days' checked={allowPastDays} onCheckedChange={setAllowPastDays} />
 ```
 
 Use Switch for immediate on/off settings; use [Checkbox](/design-system/components/checkbox/) for form selections that are submitted later.
@@ -55,4 +54,4 @@ Use Switch for immediate on/off settings; use [Checkbox](/design-system/componen
 
 ## In the app
 
-The *Allow past days* toggle in `AllowPastDays.tsx` and the per-service toggles of the consent dialog (`CookieConsentDialog.tsx`).
+The *Allow past days* toggle in `AllowPastDays.tsx`, the quick start's settings step (`QuickStartSettingsStep.tsx`) and the category and per-service toggles of the consent dialog (`CookieConsentDialog.tsx`).

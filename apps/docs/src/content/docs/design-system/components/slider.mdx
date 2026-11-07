@@ -2,7 +2,7 @@
 title: Slider
 description: Base UI slider with an accent thumb and number-to-array value normalization.
 sidebar:
-  order: 18
+  order: 17
   badge:
     text: Live
     variant: success
@@ -33,16 +33,14 @@ Exports: `Slider`.
 import { Slider } from '@ui/modules/core/primitives/Slider';
 
 <Slider
-  label="PTO days"
-  value={[ptoDays]}
-  min={0}
-  max={30}
+  label='Carry-over months'
+  value={[months]}
+  min={1}
+  max={12}
   step={1}
-  onValueChange={([days]) => setPtoDays(days)}
+  onValueChange={([next]) => setMonths(next)}
 />
 ```
-
-For discrete numeric stepping the app also has the animated `Counter` (`apps/web/src/ui/modules/core/animate/components/Counter.tsx`).
 
 ## Conventions
 
@@ -57,4 +55,4 @@ For discrete numeric stepping the app also has the animated `Counter` (`apps/web
 
 ## In the app
 
-The Carry-over Months control in `CarryOverMonths.tsx`.
+The Carry-over months control in `CarryOverMonths.tsx` and the quick start's settings step (`QuickStartSettingsStep.tsx`).

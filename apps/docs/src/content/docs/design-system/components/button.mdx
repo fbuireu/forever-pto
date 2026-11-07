@@ -50,14 +50,15 @@ import { Button } from '@ui/modules/core/primitives/Button';
 ## Conventions
 
 - `data-slot='button'` is set for CSS containment hooks (the shared transition block targets it).
-- Icons inside get `pointer-events: none` and a default `size-4` automatically.
+- Icons inside get `pointer-events: none` and a default `size-4` unless they carry their own `size-*` class.
+- A button that opens a Base UI popup (`data-popup-open`) stays in its lifted style while the popup is open.
 
 ## Accessibility
 
 - A native `<button>` unless `asChild` hands the classes to a child, in which case the child's semantics are what ships: an `<a>` stays a link, with a link's keyboard behaviour.
 - Focus is visible through a 3px ring offset from the background (`focus-visible:ring-[3px]`), which is the one state the hover lift does not cover.
-- `disabled` drops pointer events, the shadow and the lift, so a disabled button reads flat; it stays in the tab order as native buttons do not, so prefer `aria-disabled` plus a no-op handler when the button must remain reachable.
-- Icons inside are `pointer-events: none` and sized `size-4`, but they are **not** hidden from assistive technology: an icon-only button needs an `aria-label`.
+- `disabled` drops pointer events, the shadow and the lift, so a disabled button reads flat; it leaves the tab order, as a native disabled button does, so prefer `aria-disabled` plus a no-op handler when the button must remain reachable.
+- Icons are not hidden from assistive technology: an icon-only button needs an `aria-label` or a `sr-only` text child.
 
 ## In the app
 

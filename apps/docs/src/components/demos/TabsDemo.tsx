@@ -8,16 +8,17 @@ import {
 	TabsTrigger,
 } from "@ui/modules/core/animate/components/Tabs";
 import { useState } from "react";
-import { Strategy } from "../../../../web/src/domain/calendar/types";
 import en from "../../../../web/src/ui/i18n/messages/en.json";
 import { Demo } from "../Demo";
 import { propRows } from "../PropsTable";
 
-const TABS = Object.values(Strategy).map((id) => ({
-	id,
-	label: en.sidebar.strategy[id].label,
-	content: en.sidebar.strategy[id].subtitle,
-}));
+const { holidaysTable } = en;
+
+const TABS = [
+	{ id: "national", label: holidaysTable.nationalTab, content: holidaysTable.nationalTitle, disabled: false },
+	{ id: "regional", label: holidaysTable.regionalTab, content: holidaysTable.regionalTitle, disabled: true },
+	{ id: "custom", label: holidaysTable.customTab, content: holidaysTable.customTitle, disabled: false },
+];
 
 export const TabsDemo = () => {
 	const [active, setActive] = useState<string>(TABS[0].id);
@@ -29,7 +30,9 @@ export const TabsDemo = () => {
 					<TabsList>
 						{TABS.map((tab) => (
 							<TabsHighlightItem key={tab.id} value={tab.id}>
-								<TabsTrigger value={tab.id}>{tab.label}</TabsTrigger>
+								<TabsTrigger value={tab.id} disabled={tab.disabled}>
+									{tab.label}
+								</TabsTrigger>
 							</TabsHighlightItem>
 						))}
 					</TabsList>

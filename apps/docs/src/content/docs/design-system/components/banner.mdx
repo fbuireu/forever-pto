@@ -1,6 +1,6 @@
 ---
 title: Banner
-description: Inline callout with icon, uppercase title and brand-tinted color schemes for tips, notices and confirmations.
+description: Inline callout with icon, uppercase title and brand-tinted colour schemes for the Summary's hints and notices.
 sidebar:
   order: 4
   badge:
@@ -16,7 +16,7 @@ Source: `apps/web/src/ui/modules/core/primitives/Banner.tsx`. A bordered, shadow
 
 ## Color schemes
 
-`colorScheme` is not a CVA axis: it indexes a `COLOR_SCHEMES` lookup object in the source file that derives background, icon, title and message colors from the brand CSS variables via `color-mix()`, with separate light and dark recipes.
+`colorScheme` is not a CVA axis: it indexes a `COLOR_SCHEMES` lookup object in the source file that maps each scheme to four `wash-*` utilities (background, icon, title, message). The tokens behind them are in `apps/web/src/ui/styles/global/index.css`: a `color-mix()` of the brand colour, with separate light and dark values. The app uses `orange` for an improvement it found, `indigo` for the Premium notice and the user's manual edits, and `blue` for hints about the user's region and custom holidays.
 
 <BannerSchemesDemo client:visible />
 
@@ -24,7 +24,7 @@ Source: `apps/web/src/ui/modules/core/primitives/Banner.tsx`. A bordered, shadow
 
 ## Icon and action
 
-`icon` accepts either a Lucide icon or one of the animated icon components from `apps/web/src/ui/modules/core/animate/icons/` (they share the same call signature). The optional `action` slot renders any node below the message with top margin, typically a small [Button](/design-system/components/button/).
+`icon` accepts either a Lucide icon or one of the animated icon components from `apps/web/src/ui/modules/core/animate/icons/` (they share the same call signature). The optional `action` slot renders any node below the message with top margin. The Summary's *You can improve* banner passes a link or button drawn like a small [Button](/design-system/components/button/) in the banner's own colour.
 
 <BannerActionDemo client:visible />
 
@@ -36,10 +36,10 @@ Source: `apps/web/src/ui/modules/core/primitives/Banner.tsx`. A bordered, shadow
 
 ```tsx
 import { Banner } from '@ui/modules/core/primitives/Banner';
-import { Lightbulb } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 
-<Banner colorScheme='orange' icon={Lightbulb} title='Tip'>
-  Two PTO days around a Thursday holiday unlock a 5-day break.
+<Banner colorScheme='blue' icon={MapPin} title='Add your region'>
+  Select your region in the sidebar to include regional holidays.
 </Banner>
 ```
 
@@ -53,8 +53,8 @@ import { Lightbulb } from 'lucide-react';
 
 - `role='note'` with `aria-label` set to the `title`, so the box announces as a note named by its heading and its body is read as content.
 - The icon is `aria-hidden`; the colour scheme carries no meaning on its own, which is why `title` is required.
-- The optional `action` is a real control inside the note; keep it a `Button` so it is reachable by keyboard.
+- The optional `action` is a real control inside the note; make it a link or a `<button>` so it is reachable by keyboard.
 
 ## In the app
 
-The Summary's Region hint (`Summary.tsx`) and the Premium explanation in `PremiumRequiredModal.tsx`.
+The Summary's notices (`Summary.tsx`: the region hint, the *You can improve* tip, manual adjustments and custom holidays) and the Premium explanation in `PremiumRequiredModal.tsx`.

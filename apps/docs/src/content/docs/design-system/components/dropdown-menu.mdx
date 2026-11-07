@@ -34,11 +34,15 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 <DropdownMenu>
   <DropdownMenuTrigger>
-    <Button variant='outline'>Actions</Button>
+    <Button variant='outline' size='icon'>
+      <Sun />
+      <span className='sr-only'>Toggle theme</span>
+    </Button>
   </DropdownMenuTrigger>
   <DropdownMenuContent>
-    <DropdownMenuItem onClick={edit}>Edit holiday</DropdownMenuItem>
-    <DropdownMenuItem onClick={remove}>Delete</DropdownMenuItem>
+    <DropdownMenuItem onClick={() => setTheme('light')}>Light</DropdownMenuItem>
+    <DropdownMenuItem onClick={() => setTheme('dark')}>Dark</DropdownMenuItem>
+    <DropdownMenuItem onClick={() => setTheme('system')}>System</DropdownMenuItem>
   </DropdownMenuContent>
 </DropdownMenu>
 ```
@@ -58,4 +62,4 @@ For free-form anchored content (forms, explanations) use [Popover](/design-syste
 
 ## In the app
 
-The language switchers (`LanguageSelector.tsx` in the sidebar, `HomepageLanguageSwitcher.tsx` on the homepage) and the theme picker (`ThemeSelector.tsx`).
+The language switchers (`LanguageSelector.tsx` in the sidebar, `HomepageLanguageSwitcher.tsx` on the homepage) and the theme picker (`ThemeSelector.tsx`), each opened from a `Button` that the trigger wraps.

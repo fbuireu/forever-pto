@@ -9,7 +9,7 @@ export const SliderDemo = () => {
 
 	return (
 		<Demo className="flex-col items-stretch">
-			<Slider label="Carry-over months" value={value} onValueChange={setValue} min={0} max={6} step={1} />
+			<Slider label="Carry-over months" value={value} onValueChange={setValue} min={1} max={12} step={1} />
 			<p className="m-0 font-mono text-sm font-bold">{value[0]} months</p>
 		</Demo>
 	);

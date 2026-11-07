@@ -1,6 +1,6 @@
 ---
 title: Drawer
-description: vaul bottom sheet with a drag handle, the mobile counterpart to Dialog.
+description: vaul bottom sheet with a drag handle, which holds the planner panel on mobile.
 sidebar:
   order: 10
   badge:
@@ -36,18 +36,24 @@ Exports: `Drawer`, `DrawerContent`, `DrawerTitle`. There is intentionally no `Dr
 ```tsx
 import { Drawer, DrawerContent, DrawerTitle } from '@ui/modules/core/animate/base/Drawer';
 
-const [open, setOpen] = useState(false);
+const [snap, setSnap] = useState<number | string | null>(0.15);
 
-<Button onClick={() => setOpen(true)}>Preferences</Button>
-<Drawer open={open} modal={false} dismissible={false}>
-  <DrawerContent role='region'>
-    <DrawerTitle>Cookie preferences</DrawerTitle>
-    <div className='p-6'>…</div>
+<Drawer
+  snapPoints={[0.15, 0.85]}
+  activeSnapPoint={snap}
+  setActiveSnapPoint={setSnap}
+  modal={false}
+  open
+  dismissible={false}
+>
+  <DrawerContent role='region' className='h-[100dvh] max-h-none'>
+    <DrawerTitle>Planner</DrawerTitle>
+    <div className='px-4 pb-6'>…</div>
   </DrawerContent>
 </Drawer>
 ```
 
-For desktop-centric confirmations prefer [Dialog](/design-system/components/dialog/). The planner's management bar (`apps/web/src/ui/modules/pages/planner/ManagementBar.tsx`) is the reference consumer: it renders inline on desktop and switches to a full-height Drawer (`max-h-none`) on mobile via the `useIsMobile` hook.
+The planner's management bar (`apps/web/src/ui/modules/pages/planner/ManagementBar.tsx`) is the only consumer: it renders inline on desktop and, on mobile (`useIsMobile`), a full-height Drawer (`h-[100dvh] max-h-none`) that rests at 15% and 85% of the viewport. For a modal flow use [Dialog](/design-system/components/dialog/).
 
 ## Conventions
 
@@ -58,8 +64,8 @@ For desktop-centric confirmations prefer [Dialog](/design-system/components/dial
 
 - vaul renders the sheet as `role='dialog'` with focus management, like Dialog, though the app's sheet is not modal and not dismissible. `DrawerTitle` is rendered `sr-only` by default and is what names the sheet, so always include one.
 - The drag handle is decorative: the sheet moves between its snap points and never closes by dragging.
-- The sheet is capped at `85dvh`, so the page behind stays reachable and the sheet scrolls inside itself when its content is taller.
+- `modal={false}` is what keeps the page behind the sheet reachable; the sheet scrolls inside itself when its content is taller than the cap.
 
 ## In the app
 
-The mobile rendering of the planner panel in `ManagementBar.tsx`, where the Alternative switcher and the Legend share one sheet.
+The mobile planner panel in `ManagementBar.tsx`, where the Alternative switcher, the PTO budget meters and the Legend share one sheet.

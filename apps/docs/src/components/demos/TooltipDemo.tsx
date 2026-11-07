@@ -1,27 +1,41 @@
-import { Tooltip, TooltipContent, TooltipInfoTrigger, TooltipTrigger } from "@ui/modules/core/animate/base/Tooltip";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipInfoTrigger,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@ui/modules/core/animate/base/Tooltip";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { Demo } from "../Demo";
 import { propRows } from "../PropsTable";
 
 export const TooltipDemo = () => (
 	<Demo>
-		<Tooltip>
-			<TooltipTrigger asChild>
-				<Button variant="outline">Hover me</Button>
-			</TooltipTrigger>
-			<TooltipContent>Springs in from scale 0.5 with a rotated square arrow.</TooltipContent>
-		</Tooltip>
+		<TooltipProvider>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<Button variant="outline" size="icon" className="size-8">
+						25
+					</Button>
+				</TooltipTrigger>
+				<TooltipContent>Christmas Day</TooltipContent>
+			</Tooltip>
+		</TooltipProvider>
 	</Demo>
 );
 
 export const TooltipInfoTriggerDemo = () => (
 	<Demo>
-		<div className="flex items-center gap-2 text-sm font-semibold">
-			Efficiency score
-			<Tooltip>
-				<TooltipInfoTrigger aria-label="About the Efficiency score" />
-				<TooltipContent>Effective days gained per PTO day spent.</TooltipContent>
-			</Tooltip>
+		<div className="flex items-center gap-2 font-mono text-sm">
+			Carry-over months
+			<TooltipProvider>
+				<Tooltip>
+					<TooltipInfoTrigger aria-label="More information about carry-over months" />
+					<TooltipContent className="w-50 text-pretty">
+						Extend the planning window into the following year to find more bridge opportunities.
+					</TooltipContent>
+				</Tooltip>
+			</TooltipProvider>
 		</div>
 	</Demo>
 );

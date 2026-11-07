@@ -13,7 +13,7 @@ import { PropsTable } from '../../../../components/PropsTable';
 
 Source: `apps/web/src/ui/modules/core/animate/base/Dialog.tsx`, a styling layer over the Motion dialog primitive at `apps/web/src/ui/modules/core/animate/primitives/base/Dialog.tsx` (Base UI dialog + `AnimatePresence`). Import from `animate/base/Dialog`, which is what the demo on this page does; the inner layer is an implementation detail. Needs a `LazyMotionProvider` ancestor.
 
-Exports: `Dialog`, `DialogTrigger`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogFooter`.
+Exports: `Dialog`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogFooter` and `DialogTrigger`, which no caller uses: the app opens every modal from state in a button's `onClick`.
 
 <DialogDemo client:visible />
 
@@ -25,7 +25,6 @@ Exports: `Dialog`, `DialogTrigger`, `DialogContent`, `DialogHeader`, `DialogTitl
 - The backdrop is a fixed vertical gradient of near-black ink with `backdrop-blur-[2px]`, at `z-200` together with the popup.
 - The top-right X is a brutal mini-button with `hit-area-stable` and hover lift; Esc and backdrop click dismiss as well.
 - The root is controlled through `open` and `onOpenChange`, as every modal in the app is; the motion layer gates the portal behind `AnimatePresence` with `keepMounted` so exit animations complete before unmount.
-- `DialogTrigger` supports `asChild` (via Base UI's `render`) so a [Button](/design-system/components/button/) can be the trigger without nesting buttons.
 
 ## Props
 
@@ -40,23 +39,21 @@ Exports: `Dialog`, `DialogTrigger`, `DialogContent`, `DialogHeader`, `DialogTitl
 ## Usage
 
 ```tsx
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@ui/modules/core/animate/base/Dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@ui/modules/core/animate/base/Dialog';
 
+<Button onClick={() => setOpen(true)}>Delete holiday</Button>
 <Dialog open={open} onOpenChange={setOpen}>
-  <DialogTrigger asChild>
-    <Button>Open</Button>
-  </DialogTrigger>
-  <DialogContent closeLabel='Close dialog'>
+  <DialogContent closeLabel='Close'>
     <DialogHeader>
-      <DialogTitle>Reset your plan?</DialogTitle>
-      <DialogDescription>This cannot be undone.</DialogDescription>
+      <DialogTitle>Delete holiday</DialogTitle>
+      <DialogDescription>This action cannot be undone.</DialogDescription>
     </DialogHeader>
     <DialogFooter>…</DialogFooter>
   </DialogContent>
 </Dialog>
 ```
 
-For a mobile-first bottom sheet use [Drawer](/design-system/components/drawer/); for non-modal anchored content use [Popover](/design-system/components/popover/).
+For a bottom sheet use [Drawer](/design-system/components/drawer/); for non-modal anchored content use [Popover](/design-system/components/popover/).
 
 ## Conventions
 
@@ -72,4 +69,4 @@ For a mobile-first bottom sheet use [Drawer](/design-system/components/drawer/);
 
 ## In the app
 
-Every modal in the app: the Holiday form and delete confirmation (`HolidayFormModal.tsx`, `DeleteHolidayModal.tsx`), the Premium modal (`PremiumRequiredModal.tsx`), the contact form (`ContactModal.tsx`), the consent preferences (`CookieConsentDialog.tsx`) and the Workday counter's range picker (`WorkdayCounterCalendarModal.tsx`).
+Every modal in the app: the Holiday form and delete confirmation (`HolidayFormModal.tsx`, `DeleteHolidayModal.tsx`), the Premium modal (`PremiumRequiredModal.tsx`), the contact form (`ContactModal.tsx`), the consent preferences (`CookieConsentDialog.tsx`), the Workday counter's range picker (`WorkdayCounterCalendarModal.tsx`) and the quick start (`QuickStartDialog.tsx`, with its header and footer parts in `QuickStartForm.tsx`).
