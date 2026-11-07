@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-The repository is a pnpm workspace with sibling packages under `apps/`, the Next.js app and this wiki, declared in `pnpm-workspace.yaml` by the glob `apps/*`. The root is the workspace root and nothing else: `forever-pto-monorepo`, private, `0.0.0`, with no dependencies of its own.
+The repository is a pnpm workspace whose packages are the Next.js app and this wiki, both under `apps/` (the glob `apps/*` in `pnpm-workspace.yaml`). The root is the workspace root and nothing else: `forever-pto-monorepo`, private, `0.0.0`, with no dependencies of its own.
 
 ```
 forever-pto/
@@ -24,11 +24,11 @@ forever-pto/
 └── biome.json            # lint and format, shared by both packages
 ```
 
-There is no `packages/` tier; one is added the day a real shared package exists. See ADR 0010.
+There is no `packages/` tier; one is added the day a real shared package exists ([ADR 0010](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0010-apps-web-and-apps-docs-monorepo-layout.md)).
 
 ## `apps/web/src/` layers
 
-The app follows a layered architecture: each directory has an `AGENTS.md` with its map and gotchas, the rules a review holds the code to are in the root `CODING_STANDARDS.md`, and the details are covered in the [architecture overview](/architecture/overview/).
+Each directory has an `AGENTS.md` with its map and gotchas, the root `CODING_STANDARDS.md` holds the rules a review applies, and the [architecture overview](/architecture/overview/) covers the dependency direction between the layers.
 
 | Directory | Role |
 | --- | --- |
@@ -36,17 +36,17 @@ The app follows a layered architecture: each directory has an `AGENTS.md` with i
 | `apps/web/src/application/` | Use-cases, DTOs and Zustand stores: orchestration between UI and domain |
 | `apps/web/src/domain/` | Pure business logic: the calendar suggestion engine, payment domain events |
 | `apps/web/src/infrastructure/` | External-world adapters: DB and API clients, services, i18n config, proxy helpers |
-| `apps/web/src/ui/` | Components, styles, hooks, utils and i18n messages |
-| `apps/web/src/middleware.ts` | The proxy, kept at the `middleware` file name so it stays on the edge runtime (ADR 0009): i18n routing, locale cookie hardening, country detection, markdown rewrites |
+| `apps/web/src/ui/` | Components, hooks, styles, adapters to the app's own endpoints, utils and the i18n message catalogs |
+| `apps/web/src/middleware.ts` | The [proxy](/architecture/proxy/), kept at the `middleware` file name so it stays on the edge runtime: Markdown rewrite, payment-confirmation guard, locale routing and cookie, Country detection |
 
 ## `apps/web/e2e/`
 
-End-to-end Playwright specs (`*.spec.ts`) whose folder structure mirrors the app routes (`apps/web/e2e/[locale]/(app)/planner/…`, `apps/web/e2e/api/…`). Every spec takes `test` and `expect` from `apps/web/e2e/fixtures.ts`, which hands the preview's Cloudflare Access token to the preview's origin alone. The docs site has its own smaller suite in `apps/docs/e2e/`. See [testing](/contributing/testing/).
+End-to-end Playwright specs (`*.spec.ts`) whose folders mirror the app routes (`apps/web/e2e/[locale]/(app)/planner/…`, `apps/web/e2e/api/…`). Every spec takes `test` and `expect` from `apps/web/e2e/fixtures.ts`, which sends the Cloudflare Access headers a pull-request preview requires to that preview's origin alone. The wiki has its own suite in `apps/docs/e2e/`. See [testing](/contributing/testing/).
 
 ## `patches/`
 
-pnpm patches, wired through the `patchedDependencies` section of `pnpm-workspace.yaml`. `patches/vaul@1.1.2.patch` patches the drawer library; `apps/web/src/ui/modules/core/AGENTS.md` says what it changes and why.
+pnpm patches, listed under `patchedDependencies` in `pnpm-workspace.yaml`. The one patch today is for `vaul`, the drawer library; `apps/web/src/ui/modules/core/AGENTS.md` says what it changes and why.
 
 ## `apps/docs/`
 
-This site. It has its own `package.json`, `astro.config.ts`, `wrangler.toml`, Playwright config and CI workflow (`.github/workflows/docs.yml`), but shares the root Biome config and imports app components from `apps/web/src/ui` via the `@ui` alias, which resolves to `../web/src/ui` from the package.
+This site. It has its own `package.json`, `astro.config.ts`, `wrangler.toml`, Playwright config and CI workflow (`.github/workflows/docs.yml`), shares the root Biome config, and imports app components from `apps/web/src/ui` through the `@ui` alias. See [how this wiki is built](/contributing/docs-site/).

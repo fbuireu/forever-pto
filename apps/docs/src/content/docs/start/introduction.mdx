@@ -1,11 +1,11 @@
 ---
 title: Introduction
-description: What Forever PTO is and how this wiki is organized.
+description: What Forever PTO is, how it turns a PTO budget into long stretches off, and where each section of this wiki starts.
 sidebar:
   order: 0
 ---
 
-Forever PTO is a PTO optimization tool. You tell it where you live, how many PTO Days you have and which Strategy you prefer, and it suggests which days to spend so that weekends and public holidays combine into the longest possible stretches off. The core idea is the **Bridge**: a small run of PTO Days that connects a weekend to a holiday (or two holidays to each other), turning one or two of them into four or more consecutive Effective Days. See the [glossary](/reference/glossary/) for the exact terminology.
+Forever PTO turns a fixed budget of PTO Days into the longest possible stretches off. You give it a Country, the number of PTO Days you have and a Strategy, and it suggests which days to spend so that weekends and Holidays join into long stretches off. The core idea is the **Bridge**: a short run of PTO Days that joins a weekend to a Holiday (or two Holidays to each other), so that one or two PTO Days yield four or more consecutive Effective Days. The [glossary](/reference/glossary/) defines every capitalised term in this wiki.
 
 The app runs at [forever-pto.com](https://forever-pto.com) as a Cloudflare Worker.
 
@@ -18,11 +18,9 @@ The app runs at [forever-pto.com](https://forever-pto.com) as a Cloudflare Worke
 | [How it works](/how-it-works/overview/) | One request end to end, then the [planning algorithm](/how-it-works/planning-algorithm/), the Holiday sources, the [Web Worker](/how-it-works/calculation-worker/), the [planner screen](/how-it-works/planner-ui/), [data sources](/how-it-works/data-sources/), stores, Country detection, Premium and the rest |
 | [Design system](/design-system/components/overview/) | Foundations, components with props and accessibility notes, animation and patterns, with live demos |
 | [Infrastructure & CI/CD](/infra/environments/) | Cloudflare environments, deploy pipelines, releases |
-| Reference | [Cookies](/reference/cookies/), [glossary](/reference/glossary/) and other lookup tables |
+| Reference | [Cookies](/reference/cookies/) and the [glossary](/reference/glossary/) |
 | [Contributing](/contributing/conventions/) | Commit and code conventions, tooling, testing, and [how this wiki is built](/contributing/docs-site/) |
 
 ## How this site is built
 
-This wiki is itself part of the repository: an Astro Starlight site living in the `apps/docs/` workspace package. It is not a parallel re-implementation of the app's UI: the design-system pages import the **actual app components** through the `@ui` alias (mapped to `apps/web/src/ui` in `apps/docs/tsconfig.json`, which `apps/docs/astro.config.ts` derives its Vite alias from) and render them as React islands.
-
-Demos are typed against the real component variant definitions (see the drift-guard pattern in `apps/docs/src/components/demos/ButtonDemo.tsx`): if a variant is added, renamed or removed in the app, `astro check` fails in the docs build. The same principle applies to prose: where the app exports a constant, the docs import it instead of copying the value. The [Button page](/design-system/components/button/) is the reference example.
+This wiki is an Astro Starlight site in the `apps/docs/` workspace package. Its design-system pages render the **actual app components** as React islands, imported through the `@ui` alias, and type their demos against the app's own variant definitions, so a variant renamed in the app fails `astro check` here. Prose follows the same rule: where the app exports a constant, the page imports it instead of copying the value. The [Button page](/design-system/components/button/) is the reference example, and [how this wiki is built](/contributing/docs-site/) covers the mechanics.
