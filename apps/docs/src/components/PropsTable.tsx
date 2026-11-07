@@ -19,12 +19,12 @@ interface PropsTableProps {
 
 export const PropsTable = ({ rows, extends: base }: PropsTableProps) => (
 	<>
-		<table style={{ tableLayout: "fixed" }}>
+		<table className="min-[50rem]:table-fixed">
 			<colgroup>
-				<col style={{ width: "17%" }} />
-				<col style={{ width: "21%" }} />
-				<col style={{ width: "19%" }} />
-				<col style={{ width: "43%" }} />
+				<col className="min-[50rem]:w-[17%]" />
+				<col className="min-[50rem]:w-[21%]" />
+				<col className="min-[50rem]:w-[19%]" />
+				<col className="min-[50rem]:w-[43%]" />
 			</colgroup>
 			<thead>
 				<tr>

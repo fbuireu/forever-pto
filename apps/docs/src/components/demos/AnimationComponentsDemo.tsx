@@ -100,7 +100,7 @@ const NAV_ITEMS: ComponentProps<typeof RadialNav>["items"] = [
 
 export const RadialNavDemo = () => (
 	<Demo>
-		<div className="mx-auto px-24 py-14">
+		<div className="relative mx-auto flex aspect-square w-full max-w-80 items-center justify-center">
 			<RadialNav
 				items={NAV_ITEMS}
 				defaultActiveId={1}

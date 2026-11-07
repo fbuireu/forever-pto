@@ -53,7 +53,7 @@
 }
 
 :root {
-	--sl-text-h1: 2.75rem;
+	--sl-text-h1: clamp(2rem, 1.25rem + 3vw, 2.75rem);
 }
 
 button[data-slot],
@@ -239,6 +239,10 @@ figure.mermaid.mermaid-expanded > svg {
 	letter-spacing: -0.03em;
 }
 
+.sl-markdown-content :is(h2, h3, h4) code {
+	font-size: 0.85em;
+}
+
 .content-panel + .content-panel {
 	border-top: 0;
 }
@@ -268,13 +272,13 @@ starlight-toc li > a:hover {
 	color: var(--foreground);
 }
 
-starlight-toc li > a[aria-current="true"],
-starlight-toc li > a[aria-current="true"]:hover {
+:is(starlight-toc, mobile-starlight-toc) li > a[aria-current="true"],
+:is(starlight-toc, mobile-starlight-toc) li > a[aria-current="true"]:hover {
 	color: var(--foreground);
 	font-weight: 700;
 }
 
-starlight-toc li > a[aria-current="true"] span {
+:is(starlight-toc, mobile-starlight-toc) li > a[aria-current="true"] span {
 	background: var(--highlighter);
 	border-radius: 3px;
 	box-decoration-break: clone;
@@ -344,14 +348,15 @@ figure.mermaid:focus-visible {
 	border-bottom: 0;
 }
 
-.sl-markdown-content td code:not(:where(.not-content *)) {
-	overflow-wrap: anywhere;
+.sl-markdown-content table:has(> colgroup) :is(td, th) code {
+	font-size: 0.78em;
+	padding-inline: 0.3em;
 }
 
-.sl-markdown-content table[style*="fixed"] :is(td, th) code {
-	font-size: 0.78em;
-	overflow-wrap: anywhere;
-	padding-inline: 0.3em;
+@media (min-width: 50rem) {
+	.sl-markdown-content td code:not(:where(.not-content *)) {
+		overflow-wrap: anywhere;
+	}
 }
 
 @media (max-width: 50rem) {
@@ -359,19 +364,30 @@ figure.mermaid:focus-visible {
 		display: block;
 		overflow-x: auto;
 	}
+
+	.sl-markdown-content td:not(:where(.not-content *)) {
+		min-width: 10rem;
+	}
 }
 
 .starlight-aside {
 	border: 3px solid var(--frame);
-	border-inline-start-width: 3px;
-	border-radius: 12px;
+	border-radius: 10px;
 	box-shadow: var(--shadow-brutal-sm);
+}
+
+.starlight-aside--note {
+	--sl-color-asides-text-accent: var(--wash-teal-title);
+	background-color: var(--wash-teal);
+	color: var(--wash-teal-message);
 }
 
 .starlight-aside__title {
 	font-family: var(--font-bricolage), var(--sl-font);
-	font-weight: 800;
-	letter-spacing: -0.01em;
+	font-size: 0.72rem;
+	font-weight: 900;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
 }
 
 .sl-markdown-content pre:not(:where(.expressive-code *, .not-content *)) {
@@ -513,6 +529,71 @@ site-search > button {
 	border: 2px solid var(--frame);
 	border-radius: 8px;
 	box-shadow: var(--shadow-brutal-xs);
+}
+
+site-search dialog {
+	background-color: var(--card);
+	border: 3px solid var(--frame);
+	box-shadow: var(--shadow-brutal-xl);
+}
+
+site-search dialog::backdrop {
+	backdrop-filter: blur(2px);
+	background: var(--dialog-scrim);
+}
+
+@media (min-width: 50rem) {
+	site-search dialog {
+		border-radius: 14px;
+	}
+}
+
+#starlight__search {
+	--pagefind-ui-background: var(--surface-panel);
+	--pagefind-ui-border: var(--frame);
+	--pagefind-ui-border-width: 3px;
+}
+
+#starlight__search .pagefind-ui__result-inner {
+	border: 2px solid var(--frame);
+	border-radius: 10px;
+	box-shadow: var(--shadow-brutal-xs);
+	gap: 0;
+	overflow: hidden;
+}
+
+#starlight__search .pagefind-ui__result-nested {
+	border-top: 1.5px solid color-mix(in srgb, var(--frame) 18%, transparent);
+}
+
+#starlight__search :is(.pagefind-ui__result-title, .pagefind-ui__result-nested):hover {
+	background-color: var(--surface-panel-alt);
+	outline: 0;
+}
+
+#starlight__search :is(.pagefind-ui__result-title, .pagefind-ui__result-nested):focus-within {
+	background-color: var(--accent);
+	outline: 0;
+}
+
+#starlight__search
+	:is(.pagefind-ui__result-title, .pagefind-ui__result-nested):focus-within
+	:is(.pagefind-ui__result-link, .pagefind-ui__result-excerpt) {
+	color: var(--color-brand-ink);
+}
+
+#starlight__search mark {
+	background: var(--highlighter);
+	border-radius: 3px;
+	color: var(--highlighter-ink);
+	padding-inline: 0.15em;
+}
+
+mobile-starlight-toc .dropdown {
+	background-color: var(--card);
+	border: 0;
+	border-bottom: 3px solid var(--frame);
+	box-shadow: var(--shadow-brutal-sm);
 }
 
 .pagination-links a {

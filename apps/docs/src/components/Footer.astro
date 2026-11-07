@@ -1,12 +1,26 @@
 ---
 import Default from "@astrojs/starlight/components/Footer.astro";
+import ca from "../../../web/src/ui/i18n/messages/ca.json";
+import de from "../../../web/src/ui/i18n/messages/de.json";
 import en from "../../../web/src/ui/i18n/messages/en.json";
+import es from "../../../web/src/ui/i18n/messages/es.json";
+import fr from "../../../web/src/ui/i18n/messages/fr.json";
+import it from "../../../web/src/ui/i18n/messages/it.json";
 import { APP_VERSION } from "../lib/app-version";
 
+const MESSAGES = new Map<string, typeof en>([
+	["ca", ca],
+	["de", de],
+	["en", en],
+	["es", es],
+	["fr", fr],
+	["it", it],
+]);
 const LIVE_MARK = /<live>(.*)<\/live>/;
 
-const [versionLine = "", liveMark = ""] = en.footer.version.replace("{version}", APP_VERSION).split(LIVE_MARK);
-const copyright = en.footer.copyright.replace("{year}", String(new Date().getFullYear()));
+const { footer } = MESSAGES.get(Astro.locals.starlightRoute.lang) ?? en;
+const [versionLine = "", liveMark = ""] = footer.version.replace("{version}", APP_VERSION).split(LIVE_MARK);
+const copyright = footer.copyright.replace("{year}", String(new Date().getFullYear()));
 ---
 
 <Default />

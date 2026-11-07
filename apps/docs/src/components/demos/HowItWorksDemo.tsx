@@ -15,10 +15,10 @@ const STRATEGY_DESCRIPTIONS: Record<Strategy, string> = {
 };
 
 export const StrategiesTable = () => (
-	<table style={{ tableLayout: "fixed" }}>
+	<table className="min-[50rem]:table-fixed">
 		<colgroup>
-			<col style={{ width: "16%" }} />
-			<col style={{ width: "84%" }} />
+			<col className="min-[50rem]:w-[16%]" />
+			<col className="min-[50rem]:w-[84%]" />
 		</colgroup>
 		<thead>
 			<tr>

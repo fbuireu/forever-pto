@@ -54,12 +54,12 @@ export const TunablesTable = () => {
 	const keys = Object.keys(TUNABLE_DESCRIPTIONS) as TunableKey[];
 
 	return (
-		<table style={{ tableLayout: "fixed" }}>
+		<table className="min-[50rem]:table-fixed">
 			<colgroup>
-				<col style={{ width: "18%" }} />
-				<col style={{ width: "26%" }} />
-				<col style={{ width: "10%" }} />
-				<col style={{ width: "46%" }} />
+				<col className="min-[50rem]:w-[18%]" />
+				<col className="min-[50rem]:w-[26%]" />
+				<col className="min-[50rem]:w-[10%]" />
+				<col className="min-[50rem]:w-[46%]" />
 			</colgroup>
 			<thead>
 				<tr>

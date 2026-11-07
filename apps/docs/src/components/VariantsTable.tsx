@@ -7,12 +7,12 @@ export interface VariantRow {
 
 export const VariantsTable = ({ rows }: { rows: VariantRow[] }) => {
 	return (
-		<table style={{ tableLayout: "fixed" }}>
+		<table className="min-[50rem]:table-fixed">
 			<colgroup>
-				<col style={{ width: "14%" }} />
-				<col style={{ width: "36%" }} />
-				<col style={{ width: "14%" }} />
-				<col style={{ width: "36%" }} />
+				<col className="min-[50rem]:w-[14%]" />
+				<col className="min-[50rem]:w-[36%]" />
+				<col className="min-[50rem]:w-[14%]" />
+				<col className="min-[50rem]:w-[36%]" />
 			</colgroup>
 			<thead>
 				<tr>
