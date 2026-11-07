@@ -9,9 +9,20 @@ const toggleExpanded = (figure: HTMLElement): void => {
 	}
 };
 
+const ACTIVATION_KEYS = new Set(["Enter", " "]);
+
+const figureFrom = (target: EventTarget | null): HTMLElement | null =>
+	target instanceof Element ? target.closest<HTMLElement>(SELECTOR) : null;
+
 export const startMermaidZoom = (): void => {
 	document.addEventListener("click", (event) => {
-		const figure = event.target instanceof Element ? event.target.closest<HTMLElement>(SELECTOR) : null;
+		const figure = figureFrom(event.target);
 		if (figure) toggleExpanded(figure);
+	});
+	document.addEventListener("keydown", (event) => {
+		const figure = figureFrom(event.target);
+		if (!figure || event.target !== figure || !ACTIVATION_KEYS.has(event.key)) return;
+		event.preventDefault();
+		toggleExpanded(figure);
 	});
 };

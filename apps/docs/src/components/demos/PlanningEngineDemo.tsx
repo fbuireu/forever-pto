@@ -94,7 +94,7 @@ export const StrategyRanking = () => {
 	const { GROUPED_MAX_BLOCK_DAYS, BALANCED_MAX_BLOCK_DAYS, MAIN_VACATION_BLOCK_DAYS } = PTO_CONSTANTS.SELECTION;
 
 	return (
-		<pre>
+		<pre className="whitespace-pre-wrap">
 			<code>
 				{"marginal     = days the Bridge adds to the plan ÷ its PTO Days\n"}
 				{

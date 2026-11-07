@@ -71,6 +71,74 @@ button[data-slot],
 		color 120ms ease;
 }
 
+starlight-lang-select svg {
+	display: none;
+}
+
+.social-icons .sl-flex {
+	align-items: center;
+	background: var(--surface-panel);
+	border: 2px solid var(--frame);
+	border-radius: 8px;
+	box-shadow: var(--shadow-brutal-xs);
+	color: var(--foreground);
+	height: 2.5rem;
+	justify-content: center;
+	padding: 0;
+	transition:
+		translate 80ms linear,
+		box-shadow 80ms linear;
+	width: 2.5rem;
+}
+
+.social-icons .sl-flex:hover {
+	box-shadow: var(--shadow-brutal-sm);
+	color: var(--foreground);
+	opacity: 1;
+	translate: -1px -1px;
+}
+
+.social-icons svg {
+	height: 1.15rem;
+	width: 1.15rem;
+}
+
+starlight-lang-select > label {
+	background: var(--surface-panel);
+	border: 2px solid var(--frame);
+	border-radius: 8px;
+	box-shadow: var(--shadow-brutal-xs);
+	color: var(--foreground);
+	font-weight: 700;
+	padding-inline: 0.5rem;
+	transition:
+		translate 80ms linear,
+		box-shadow 80ms linear;
+}
+
+starlight-lang-select > label:hover {
+	box-shadow: var(--shadow-brutal-sm);
+	translate: -1px -1px;
+}
+
+starlight-lang-select > label:focus-within {
+	background: var(--accent);
+	color: var(--color-brand-ink);
+}
+
+starlight-lang-select select {
+	color: inherit;
+	font-weight: 700;
+	padding-block: 0.45rem;
+	padding-inline: 0.4rem;
+	text-align: center;
+}
+
+starlight-lang-select select option {
+	background: var(--surface-panel);
+	color: var(--foreground);
+}
+
 figure.mermaid {
 	background: var(--surface-panel);
 	background-image: var(--page-glow);
@@ -192,54 +260,26 @@ figure.mermaid.mermaid-expanded > svg {
 	color: var(--highlighter-ink);
 }
 
-starlight-toc a {
+starlight-toc li > a {
 	color: var(--muted-foreground);
 }
 
-starlight-toc a:hover {
+starlight-toc li > a:hover {
 	color: var(--foreground);
 }
 
-starlight-toc a[aria-current="true"],
-starlight-toc a[aria-current="true"]:hover {
+starlight-toc li > a[aria-current="true"],
+starlight-toc li > a[aria-current="true"]:hover {
 	color: var(--foreground);
 	font-weight: 700;
 }
 
-starlight-toc a[aria-current="true"] span {
+starlight-toc li > a[aria-current="true"] span {
 	background: var(--highlighter);
 	border-radius: 3px;
 	box-decoration-break: clone;
 	color: var(--highlighter-ink);
 	padding-inline: 0.25em;
-}
-
-.social-icons a {
-	align-items: center;
-	background: var(--surface-panel);
-	border: 2px solid var(--frame);
-	border-radius: 8px;
-	box-shadow: var(--shadow-brutal-xs);
-	color: var(--foreground);
-	height: 2.5rem;
-	justify-content: center;
-	padding: 0;
-	transition:
-		translate 80ms linear,
-		box-shadow 80ms linear;
-	width: 2.5rem;
-}
-
-.social-icons a:hover {
-	box-shadow: var(--shadow-brutal-sm);
-	color: var(--foreground);
-	opacity: 1;
-	translate: -1px -1px;
-}
-
-.social-icons a svg {
-	height: 1.15rem;
-	width: 1.15rem;
 }
 
 .sl-markdown-content code:not(:where(pre *, .not-content *, a *)) {
@@ -270,6 +310,17 @@ starlight-toc a[aria-current="true"] span {
 	white-space: nowrap;
 }
 
+.sl-markdown-content thead th code:not(:where(.not-content *)) {
+	background: color-mix(in srgb, var(--color-brand-ink) 8%, transparent);
+	border-color: color-mix(in srgb, var(--color-brand-ink) 40%, transparent);
+	color: var(--color-brand-ink);
+}
+
+figure.mermaid:focus-visible {
+	outline: 3px solid var(--accent);
+	outline-offset: 3px;
+}
+
 .sl-markdown-content :is(th, td):not(:where(.not-content *)) {
 	border: 0;
 	border-bottom: 2px solid var(--sl-color-hairline);
@@ -293,8 +344,8 @@ starlight-toc a[aria-current="true"] span {
 	border-bottom: 0;
 }
 
-.sl-markdown-content table:not([style*="fixed"]) td:first-child code:not(:where(.not-content *)) {
-	white-space: nowrap;
+.sl-markdown-content td code:not(:where(.not-content *)) {
+	overflow-wrap: anywhere;
 }
 
 .sl-markdown-content table[style*="fixed"] :is(td, th) code {
@@ -308,46 +359,6 @@ starlight-toc a[aria-current="true"] span {
 		display: block;
 		overflow-x: auto;
 	}
-}
-
-starlight-lang-select > label {
-	background: var(--surface-panel);
-	border: 2px solid var(--frame);
-	border-radius: 8px;
-	box-shadow: var(--shadow-brutal-xs);
-	color: var(--foreground);
-	font-weight: 700;
-	padding-inline: 0.5rem;
-	transition:
-		translate 80ms linear,
-		box-shadow 80ms linear;
-}
-
-starlight-lang-select > label:hover {
-	box-shadow: var(--shadow-brutal-sm);
-	translate: -1px -1px;
-}
-
-starlight-lang-select > label:focus-within {
-	background: var(--accent);
-	color: var(--color-brand-ink);
-}
-
-starlight-lang-select select {
-	color: inherit;
-	font-weight: 700;
-	padding-block: 0.45rem;
-	padding-inline: 0.4rem;
-	text-align: center;
-}
-
-starlight-lang-select svg {
-	display: none;
-}
-
-starlight-lang-select select option {
-	background: var(--surface-panel);
-	color: var(--foreground);
 }
 
 .starlight-aside {
