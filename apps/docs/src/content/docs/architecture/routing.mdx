@@ -1,6 +1,6 @@
 ---
 title: Routing
-description: The app/[locale] route tree, covering marketing and app route groups, API routes, the .well-known catch-all and the error surfaces.
+description: The app/[locale] route tree, covering the marketing and app route groups, the API routes, the .well-known catch-all and how a request is matched to a file.
 sidebar:
   order: 4
 ---
@@ -13,7 +13,7 @@ All user-facing routes live under `apps/web/src/app/[locale]/`. The locale segme
 src/app/
 ├── [locale]/
 │   ├── layout.tsx              # root layout: fonts, providers, analytics;
-│   │                           # the locales, dynamicParams = false
+│   │                           # generateStaticParams over the locales, dynamicParams = false
 │   ├── error.tsx               # locale-scoped error boundary
 │   ├── (marketing)/
 │   │   ├── page.tsx            # homepage
@@ -32,7 +32,8 @@ src/app/
 ├── global-not-found.tsx        # static 404 for a URL no locale claims
 ├── robots.ts / sitemap.ts / favicon.ico / fonts.ts
 ```
-How a request reaches one of those files:
+
+A request reaches one of those files in two steps. First, which part of the app answers it:
 
 ```mermaid
 ---
@@ -41,27 +42,38 @@ config:
   layout: dagre
 ---
 flowchart TD
-  REQ[Request] --> M{"Matches the proxy?<br/>not /api, /_next, /_vercel, no dot"}
-  M -- "no, under /api" --> API["/api/* route handlers"]
-  M -- "no, a dot in the path" --> OWN{"A route of its own?"}
-  OWN -- "/.well-known/*" --> WK["the .well-known catch-all"]
-  OWN -- "robots.txt, sitemap.xml, favicon.ico" --> META["metadata routes<br/>robots.ts, sitemap.ts, favicon.ico"]
-  OWN -- no --> DOT{"First segment<br/>a locale?"}
-  M -- yes --> PX["Proxy chain<br/>markdown · payment guard · locale · country"]
-  PX -->|"Accept: text/markdown"| MD["/api/markdown"]
-  PX --> LOC{Locale prefix?}
+  REQ[Request] --> M{"Does the proxy<br/>matcher admit it?"}
+  M -- "a page path,<br/>or /api/markdown" --> PX["Proxy chain"]
+  M -- "under /api" --> API["/api/* route handlers"]
+  M -- "a dotted path" --> OWN{"A route<br/>of its own?"}
+  OWN -- "/.well-known/*, robots.txt,<br/>sitemap.xml, favicon.ico" --> WK["That route"]
+  OWN -- no --> SEG{"First segment<br/>a locale?"}
+  PX -->|"Accept:<br/>text/markdown"| MD["/api/markdown"]
+  PX --> LOC["Locale routing<br/>(next diagram)"]
+  SEG -- yes --> LOC
+  SEG -- "no, one segment" --> GNF["global-not-found.tsx"]
+  SEG -- "no, more<br/>segments" --> CA["catch-all 404,<br/>in English"]
+```
+
+Then, for a page path, which locale and route group:
+
+```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
+flowchart TD
+  IN[Path] --> LOC{Locale prefix?}
   LOC -->|none| NEG{"NEXT_LOCALE, else Accept-Language,<br/>picks a locale other than en?"}
   NEG -- no --> EN["[locale] = en, no prefix"]
   NEG -- yes --> RD["307 to that locale's prefix"]
   LOC -->|"/en"| ST["307 to the unprefixed path"]
   LOC -->|"/es, /ca, /it, /fr, /de"| L["[locale]"]
   EN & L --> G{Route group}
-  G --> MK["(marketing): homepage, legal/*"]
-  G --> AP["(app): planner, payment/confirmation"]
-  G --> CA["(marketing)/[...rest]: notFound()<br/>then (marketing)/not-found.tsx"]
-  DOT -- yes --> G
-  DOT -- "no, one segment" --> GNF[global-not-found.tsx]
-  DOT -- "no, more segments" --> CA
+  G --> MK["(marketing):<br/>homepage, legal/*"]
+  G --> AP["(app):<br/>planner, payment/confirmation"]
+  G --> CA["(marketing)/[...rest]:<br/>notFound(), then not-found.tsx"]
 ```
 
 A file under `apps/web/public` (`/.well-known/security.txt` among them) never gets this far: Workers Static Assets answers it before the Worker runs ([caching](/architecture/caching/)).
@@ -87,19 +99,19 @@ API routes live outside `[locale]` and are excluded from the proxy matcher (exce
 | `GET /api/markdown` | `apps/web/src/app/api/markdown/route.ts` | Markdown rendition of a listed page. Only reachable, and only drivable, through the proxy rewrite |
 | `GET /api/health` | `apps/web/src/app/api/health/route.ts` | Liveness only: answers `{ status: "ok", timestamp }`, `no-store`, and checks no dependency, so it says the Worker runs, not that Stripe, Turso or Resend answer |
 
-`GET /api/payment/activate` is the one that grants an entitlement, so it carries guards: the Stripe client secret is required and compared against the retrieved intent's own in constant time, `redirect_status` short-circuits before Stripe is called at all, the request is rate-limited on `cf-connecting-ip`, and the redirect is explicitly `no-store` because it carries a `Set-Cookie`. The redirect carries `activation=failed` when activation failed and no `activation` parameter when it succeeded, so a failure never lets the confirmation page claim Premium is active; telling a first arrival from a reload is the one-shot `premium-activation` cookie's job, not the address's. Only the redirect path reaches this route: a card confirmed in the page activates through `POST /api/check-session` ([premium](/how-it-works/premium/)).
+`GET /api/payment/activate` grants an entitlement, so it is guarded: it requires the Stripe client secret and compares it in constant time, rate-limits on `cf-connecting-ip`, and answers `no-store` because the redirect carries a `Set-Cookie`. The redirect adds `activation=failed` when activation failed, so a failure never lets the confirmation page claim Premium is active. Only the issuer-redirect path reaches this route; a card confirmed in the page activates through `POST /api/check-session`. [Premium](/how-it-works/premium/#the-redirect-get-apipaymentactivate) has the whole flow.
 
 ## The `.well-known` catch-all
 
 `apps/web/src/app/.well-known/[...slug]/route.ts` is a lookup table, not a router. It joins the slug segments and asks `lookupWellKnownDocument` (`apps/web/src/infrastructure/well-known/documents.ts`) for one of its exact keys (`api-catalog`, `mcp/server-card.json` and `agent-skills/index.json`), and anything else is a 404. That table is a `Map`: as a plain object it would answer `/.well-known/constructor` with an inherited `Object.prototype` function, which passes the presence guard and is then called as a handler.
 
-**The document modules return plain objects; the route owns the envelope.** Each builder takes the base URL from the Cloudflare environment (`getCloudflareContext`) and returns a value; the route serialises it and sets the per-document `Content-Type` and the shared `WELL_KNOWN_CACHE_CONTROL` (`apps/web/src/infrastructure/well-known/slugs.ts`). A fourth document is a fourth entry in the map and nothing else. Together with the markdown rewrite in the proxy, this is the app's agent-facing surface.
+**The document modules return plain objects; the route owns the envelope.** Each builder takes the base URL from the Cloudflare environment (`getCloudflareContext`) and returns a value; the route serialises it and sets the per-document `Content-Type` and the shared `WELL_KNOWN_CACHE_CONTROL` (`apps/web/src/infrastructure/well-known/slugs.ts`). A new document is a new entry in the map and nothing else. With the Markdown rewrite in the proxy, this is the app's agent-facing surface ([WebMCP and .well-known](/how-it-works/webmcp/)).
 
 **`/.well-known/security.txt` never reaches the catch-all.** It is a static file, `apps/web/public/.well-known/security.txt`, and the static layer answers it first on both targets: `next start` serves the public folder ahead of a dynamic route, and on the Worker, Workers Static Assets answers a path that matches a file in `.open-next/assets` before the Worker runs. The handler would answer that slug with its JSON 404.
 
 ## Error and not-found surfaces
 
-There are per-locale boundaries (`apps/web/src/app/[locale]/error.tsx`, and `apps/web/src/app/[locale]/(marketing)/error.tsx` and `apps/web/src/app/[locale]/(marketing)/not-found.tsx` inside the marketing shell) plus root-level `apps/web/src/app/global-error.tsx` and `apps/web/src/app/global-not-found.tsx`. The latter requires `experimental.globalNotFound: true` in `next.config.ts`, is prerendered once in the default language and handles a URL no locale claims, such as `/missing.txt`. All of them render the shared brutal designs; see [error pages](/architecture/error-pages/) for the full breakdown and the table of which URL each 404 answers.
+Each locale has an error boundary (`apps/web/src/app/[locale]/error.tsx`), the marketing group has its own `error.tsx` and `not-found.tsx`, and the app root has `global-error.tsx` and `global-not-found.tsx`. [Error pages](/architecture/error-pages/) covers each surface and which URL every 404 answers.
 
 ## Everything else at the app root
 

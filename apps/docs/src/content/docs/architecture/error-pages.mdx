@@ -1,11 +1,11 @@
 ---
 title: Error pages
-description: The error/not-found surfaces, the experimental globalNotFound flag and the brutal 500/404 designs in ErrorContent and NotFoundContent.
+description: The five error and not-found boundaries, which URL each 404 answers, the experimental globalNotFound flag, and what ErrorContent and NotFoundContent show.
 sidebar:
   order: 8
 ---
 
-Failures are handled by boundary files that all funnel into shared UI modules: `ErrorContent` (`apps/web/src/ui/modules/pages/error/ErrorContent.tsx`) for runtime errors and `NotFoundContent` (`apps/web/src/ui/modules/pages/not-found/NotFoundContent.tsx`) for 404s. The boundaries differ only in how much scaffolding they must rebuild.
+Five boundary files handle failures, and all of them render one of two shared UI modules: `ErrorContent` (`apps/web/src/ui/modules/pages/error/ErrorContent.tsx`) for runtime errors and `NotFoundContent` (`apps/web/src/ui/modules/pages/not-found/NotFoundContent.tsx`) for 404s. They differ only in how much surrounding scaffolding they must rebuild.
 
 ## The surfaces
 
@@ -42,18 +42,17 @@ Every one of them carries `noindex`. A `notFound()` thrown by a page is drawn by
 
 ## ErrorContent: the brutal 500
 
-`ErrorContent` is a client component that leans fully into the design system's neobrutalism (see [philosophy](/design-system/foundations/philosophy/)):
+`ErrorContent` is a client component in the design system's neobrutalist style (see [philosophy](/design-system/foundations/philosophy/)). It shows:
 
-- **Giant "500"**: digit blocks with thick `--frame` borders, brand-color backgrounds and `--shadow-brutal-xl` hard shadows.
-- **A fake terminal**: a styled window (traffic-light dots, `server.log: pty/0` title) that streams a staged log trace line by line on a timer, mixing playful `calc-engine` lines with the *real* `error.message` and stack trace, and ends on a blinking-cursor prompt. Log levels are color-coded via brand CSS variables.
-- **Real observability**: on mount it reports the error (including `error.digest`) through `logClientError`, which reaches the app logger over a dynamic import; the kicker badge interpolates the app `version` imported from `package.json`.
-- **Recovery actions**: a retry button wired to the boundary's `reset()`, plus links to the status page, the GitHub releases changelog, a prefilled bug-report issue, and a lazily-loaded `ContactModal`.
+- **A "500" in digit blocks**, and a kicker badge carrying the app `version` from `package.json`.
+- **A fake terminal** (`server.log: pty/0`) that streams a staged log trace line by line, mixing playful `calc-engine` lines with the *real* `error.message` and stack trace.
+- **Recovery actions**: a retry button wired to the boundary's `reset()`, links to the status page, the GitHub releases and a prefilled bug-report issue, and a lazily loaded `ContactModal`.
 
-All copy comes from the `error` translation namespace, so the page is localised like any other.
+On mount it reports the error, `error.digest` included, through `logClientError`, which reaches the app logger over a dynamic import. All copy comes from the `error` translation namespace.
 
 ## NotFoundContent: the brutal 404
 
-`NotFoundContent` is a server component that carries the content alone, its `main` landmark: the same brutal digit-block treatment for "404", CTAs back to the homepage and `/planner` (via the localised `Link` from `apps/web/src/application/i18n/navigation.ts`), and a grid of suggested homepage anchors (`/#how`, `/#features`, `/#pricing`, `/#faq`). The marketing layout draws the `Header` and `Footer` around it, and `global-not-found.tsx` draws the same two itself. Copy comes from the `notFound` namespace via `getTranslations` with an explicit locale, which is why every boundary passes `locale` down to it; the page title is `metadata.notFound.title`, from the catch-all's metadata or the global page's.
+`NotFoundContent` is a server component that renders the content alone, as the page's `main` landmark: a "404" in the same digit blocks, links back to the homepage and `/planner` (through the localised `Link` from `apps/web/src/application/i18n/navigation.ts`), and a grid of homepage anchors (`/#how`, `/#features`, `/#pricing`, `/#faq`). The marketing layout draws the `Header` and `Footer` around it, and `global-not-found.tsx` draws the same two itself. Copy comes from the `notFound` namespace via `getTranslations` with an explicit locale, which is why every boundary passes `locale` down to it; the page title is `metadata.notFound.title`, from the catch-all's metadata or the global page's.
 
 ## Testing
 

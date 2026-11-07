@@ -5,7 +5,7 @@ sidebar:
   order: 6
 ---
 
-Every server-side flow that touches an external system (database, Stripe, email, logging) is written with [Effect](https://effect.website). The payoff is twofold: **typed errors** that route handlers can exhaustively map to HTTP statuses, and **dependency injection** that lets tests swap real SDKs for mock layers without module mocking.
+Every server-side flow that touches an external system (database, Stripe, email, logging) is written with [Effect](https://effect.website). The payoff is twofold: **typed errors** that map exhaustively to HTTP statuses, and **dependency injection** that lets tests swap real SDKs for mock layers without module mocking.
 
 ## The service pattern
 
@@ -47,7 +47,8 @@ export const ApplicationLayer = Layer.mergeAll(
 );
 ```
 
-Route handlers and server actions provide it exactly once, at the edge of the program: `Effect.runPromise(program.pipe(Effect.provide(ApplicationLayer)))`.
+Whatever runs a program provides it exactly once, at the edge of that program: `Effect.runPromise(program.pipe(Effect.provide(ApplicationLayer)))`.
+
 ```mermaid
 ---
 config:
@@ -74,28 +75,26 @@ flowchart LR
   AL --> RUN[Effect.runPromise]
 ```
 
-
 ## Where Effect runs
 
 - **Use-cases** (`apps/web/src/application/use-cases/`): `Effect.gen` pipelines that declare their dependencies in the type signature. `createPayment` in `apps/web/src/application/use-cases/payment.ts` is the canonical example: it validates with zod (`zodParse`), optionally applies a promo code, creates the Stripe PaymentIntent and returns typed failures (`ValidationError | PaymentError | PromoCodeError`).
-- **Route handlers**: `apps/web/src/app/api/payment/route.ts`, `apps/web/src/app/api/check-session/route.ts`, `apps/web/src/app/api/contact/route.ts` and `apps/web/src/app/api/webhooks/stripe/route.ts` map typed errors to responses through `describeFailure`, the one tag-to-status table in `apps/web/src/infrastructure/api/errors.ts` (e.g. `RateLimitError` → 429, `ValidationError` → 400, `PaymentError` → 500), with a final `Effect.catchAll` safety net; a branch local to one route (the webhook's `WebhookError`, the `SessionError` of check-session's `GET`) stays an `Effect.catchTag` there.
-- **Server actions**: `apps/web/src/infrastructure/actions/payment.ts` and `apps/web/src/infrastructure/actions/contact.ts` are thin `'use server'` wrappers around the same use-cases, returning discriminated-union results instead of HTTP responses.
+- **Operations** (`apps/web/src/infrastructure/api/operations/`): `payment.ts`, `contact.ts` and `activatePremium.ts` each run one flow that has two transports. An operation takes its input as an Effect, checks the rate limit first where the flow reaches Stripe or grants Premium, runs the use case, provides `ApplicationLayer` and schedules the deferred write. It maps every failure through `describeFailure`, the one tag-to-status table in `apps/web/src/infrastructure/api/errors.ts` (for example `RateLimitError` → 429, `ValidationError` → 400, `PaymentError` → 500), with a final `Effect.catchAll` so it never rejects, and returns `{ status, body }`.
+- **Route handlers**: `POST /api/payment`, `POST /api/contact`, `POST /api/check-session` and `GET /api/payment/activate` call an operation and wrap its outcome in `noStore`. `GET /api/check-session` and `POST /api/webhooks/stripe` run their own program against `ApplicationLayer`; a branch local to one route (the webhook's `WebhookError`, the `SessionError` of check-session's `GET`) stays an `Effect.catchTag` there.
+- **Server actions**: `apps/web/src/infrastructure/actions/payment.ts` and `apps/web/src/infrastructure/actions/contact.ts` are thin `'use server'` wrappers around the same operations, returning the body alone instead of an HTTP response.
 - **Webhook handlers**: `handlePaymentSucceeded` (`apps/web/src/application/use-cases/paymentSucceeded.ts`) and `handlePaymentFailed` (`apps/web/src/application/use-cases/paymentFailed.ts`) are use cases too, called by `processWebhookEvent`; they consume `TursoService`, `LoggerService` and, for the charge, `StripeServerService` through context like every other one. The domain imports no Effect at all.
 
 ## Deferred database writes with `after()`
 
-Writes that must not block the response are returned by use-cases as an unexecuted `deferred` Effect and scheduled with `after()` from `next/server`, which runs once the response has been sent:
+Writes that must not block the response are returned by use-cases as an unexecuted `deferred` Effect. The operation schedules it with `after()` from `next/server`, which runs once the response has been sent:
 
 ```ts
-const { clientSecret, discountInfo, deferred } = yield* createPayment(body, context);
+const { clientSecret, discountInfo, deferred } = yield* createPayment({ params: body, context });
 
-yield* Effect.sync(() => after(() => Effect.runPromise(deferred.pipe(Effect.provide(ApplicationLayer)))));
-
-return NextResponse.json({ success: true, clientSecret, discountInfo });
+after(() => Effect.runPromise(deferred.pipe(Effect.provide(ApplicationLayer))));
 ```
 
-This pattern appears in `apps/web/src/app/api/payment/route.ts`, `apps/web/src/app/api/check-session/route.ts`, `apps/web/src/app/api/contact/route.ts` and both server actions. The deferred Effect swallows its own failures into a warning log; for payments, the Stripe webhook (`apps/web/src/app/api/webhooks/stripe/route.ts`) recreates the row if the deferred save never landed, so the database converges either way.
+All three operations do this, so the routes and the server actions share it. The deferred Effect swallows its own failures into a warning log; for payments, the Stripe webhook (`apps/web/src/app/api/webhooks/stripe/route.ts`) recreates the row if the deferred save never landed, so the database converges either way.
 
 ## Testing
 
-Because dependencies are tags, unit tests provide mock layers instead of the Live ones, so the SDKs are never called in tests (see `apps/web/src/infrastructure/clients/AGENTS.md`). This is why the pattern lives in infrastructure rather than being ad-hoc per route.
+Because dependencies are tags, unit tests provide mock layers instead of the Live ones, so no test calls an SDK (see `apps/web/src/infrastructure/clients/AGENTS.md`).

@@ -5,7 +5,9 @@ sidebar:
   order: 5
 ---
 
-`apps/web/src/middleware.ts` is the single per-request entry point. Next calls this artefact the proxy and would have it at `proxy.ts`; the older file name is kept deliberately, because the name is what picks the runtime. `proxy.ts` always runs on Node.js, and OpenNext's Node middleware bundling is experimental: under it the header edits this chain makes never reach the route. `middleware.ts` keeps the chain on the edge runtime, where it works. [ADR 0009](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) carries the evidence. The old `/architecture/middleware/` address redirects here, and this page keeps the proxy address because the concept is Next's, not the file's. It runs a short, strictly ordered chain and returns as early as it can. Each step delegates to a focused helper; the proxy file itself is orchestration only.
+`apps/web/src/middleware.ts` is the single per-request entry point: a short, strictly ordered chain that returns as early as it can. Each step delegates to a helper, so the file itself is orchestration only.
+
+Next calls this artefact the proxy and would have it at `proxy.ts`; the file keeps the older name deliberately, because the name picks the runtime. `proxy.ts` always runs on Node.js, and OpenNext's Node middleware bundling is experimental: under it the header edits this chain makes never reach the route. `middleware.ts` keeps the chain on the edge runtime, where it works ([ADR 0009](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0009-next-16-2-pinned-by-the-cloudflare-adapter.md) has the evidence).
 
 ## The matcher
 
@@ -41,11 +43,11 @@ flowchart TD
   RS & DET --> OUT[Response]
 ```
 
-Only the last branch reaches country detection; the three early returns skip it, which is why a Markdown rendition or a bounced confirmation URL never carries a fresh `user-country` cookie.
+Only the last branch reaches Country detection. The three early returns skip it, so a Markdown rendition or a bounced confirmation URL never carries a fresh `user-country` cookie.
 
 1. **Direct hits on `/api/markdown` neutralise the path header.** The request passes through with `x-markdown-path` **overwritten with an empty string** (`NEUTRALISED_MARKDOWN_PATH`) and nothing else changed, so a value the caller sent is never read. Without this branch a direct request carrying `Accept: text/markdown` would match the next rule and rewrite the route onto itself; the route reads only a path that starts with `/`, so the empty value answers 404, which is what stops a caller driving the route by hand.
 
-2. **Markdown content negotiation.** A request carrying `Accept: text/markdown` is rewritten to `/api/markdown`, with the pathname set on the `x-markdown-path` **request header** (`MARKDOWN_PATH_HEADER`, exported from `apps/web/src/infrastructure/markdown/twin.ts`). A rewrite does not change what the handler reads from the URL, so a query string never reached it. The proxy states **no** cache policy at all: it runs before the lookup, and the module that knows whether the page was found owns the headers; see the [Markdown API](/how-it-works/markdown-api/) page.
+2. **Markdown content negotiation.** A request carrying `Accept: text/markdown` is rewritten to `/api/markdown`, with the pathname set on the `x-markdown-path` **request header** (`MARKDOWN_PATH_HEADER`, exported from `apps/web/src/infrastructure/markdown/twin.ts`). The proxy states **no** cache policy: it runs before the lookup, and the module that knows whether the page was found owns the headers. The [Markdown API](/how-it-works/markdown-api/) page covers the route and why the path travels in a header.
 
 3. **Payment-confirmation guard.** Any path ending in `/payment/confirmation` without a `payment_intent` search param is redirected to the locale home. The guard only asks whether the param is there, so an empty or repeated one passes it; the confirmation page checks the query again and redirects the same way (`apps/web/src/app/AGENTS.md` says why).
 
@@ -53,8 +55,6 @@ Only the last branch reaches country detection; the three early returns skip it,
 
 5. **Country detection: always last.** The i18n response is passed through `location()` from `apps/web/src/infrastructure/proxy/location.ts`, which runs `detectCountry(request)` and, when a country is found, sets the `USER_COUNTRY_COOKIE` cookie via `apps/web/src/infrastructure/proxy/cookie.ts`. This cookie is intentionally readable from client JS: the location store uses it to preselect the user's country. A request that already carries the cookie skips detection and has it re-set as it is. The detection strategy chain (the `cf-ipcountry` header, final whenever present, and only without it the Cloudflare trace and then the egress IP lookup) is documented in [country detection](/how-it-works/country-detection/).
 
-Running country detection last matters, but note it only ever decorates the **i18n response**: the markdown branches and the payment-confirmation guard `return` early and skip it entirely, so those responses never carry a fresh `user-country` cookie.
+## Where the logic lives
 
-## Why proxy helpers live in infrastructure
-
-The proxy imports nothing framework-agnostic itself; the actual logic (`detectCountry`, cookie writers) lives under `apps/web/src/infrastructure/proxy/` and `apps/web/src/infrastructure/services/location/`, keeping `apps/web/src/middleware.ts` a readable table of contents for the request pipeline and keeping the helpers unit-testable (`apps/web/src/middleware.test.ts` covers the orchestration).
+`apps/web/src/middleware.ts` imports only from `@infrastructure/*`. The Country logic (`detectCountry`, the cookie writers) lives under `apps/web/src/infrastructure/proxy/` and `apps/web/src/infrastructure/services/location/`, which keeps the file a readable table of contents and the helpers unit-testable; `apps/web/src/middleware.test.ts` covers the orchestration.
