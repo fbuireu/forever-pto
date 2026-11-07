@@ -1,0 +1,217 @@
+---
+import { LinkButton } from "@astrojs/starlight/components";
+import type { StarlightRouteData } from "@astrojs/starlight/route-data";
+
+type SidebarEntry = StarlightRouteData["sidebar"][number];
+
+const PAGE_TITLE_ID = "_top";
+
+const linksIn = (entry: SidebarEntry): Extract<SidebarEntry, { type: "link" }>[] =>
+	entry.type === "link" ? [entry] : entry.entries.flatMap(linksIn);
+
+const { entry, sidebar } = Astro.locals.starlightRoute;
+const { title = entry.data.title, tagline, actions = [] } = entry.data.hero ?? {};
+
+const sections = sidebar.flatMap((group) => {
+	const links = linksIn(group);
+	const first = links[0];
+	return group.type === "group" && first ? [{ label: group.label, href: first.href, count: links.length }] : [];
+});
+---
+
+<div class="hero">
+  <div class="hero-copy">
+    <h1 id={PAGE_TITLE_ID} data-page-title set:html={title} />
+    {tagline && <div class="tagline" set:html={tagline} />}
+    {
+      actions.length > 0 && (
+        <div class="actions">
+          {actions.map(({ attrs: { class: className, ...attrs } = {}, icon, link: href, text, variant }) => (
+            <LinkButton {href} {variant} icon={icon?.name} class:list={[className]} {...attrs}>
+              {text}
+              {icon?.html && <Fragment set:html={icon.html} />}
+            </LinkButton>
+          ))}
+        </div>
+      )
+    }
+  </div>
+  <div class="hero-window not-content">
+    <div class="hero-window-bar">
+      <span class="dot dot-red"></span>
+      <span class="dot dot-yellow"></span>
+      <span class="dot dot-green"></span>
+      <span class="hero-window-url">docs.forever-pto.com</span>
+    </div>
+    <ol class="hero-window-sections">
+      {
+        sections.map(({ label, href, count }) => (
+          <li>
+            <a href={href}>
+              <span>{label}</span>
+              <span class="hero-window-count">{count}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</div>
+
+<style>
+  .hero {
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+    padding-block: clamp(2rem, calc(1rem + 6vmin), 5rem);
+  }
+
+  .hero-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  h1 {
+    color: var(--foreground);
+    font-family: var(--font-bricolage), var(--sl-font);
+    font-size: clamp(2.75rem, calc(1rem + 5vw), 5.25rem);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1;
+  }
+
+  h1 :global(.hero-highlight) {
+    background: var(--accent);
+    border: 4px solid var(--frame);
+    border-radius: 10px;
+    box-shadow: var(--shadow-brutal-btn);
+    color: var(--color-brand-ink);
+    display: inline-block;
+    margin-inline: 0.1em;
+    padding: 0 0.18em 0.06em;
+    rotate: -1.5deg;
+  }
+
+  .tagline {
+    color: var(--foreground);
+    font-size: clamp(1.1rem, calc(0.9rem + 0.6vw), 1.3rem);
+    line-height: 1.5;
+    max-width: 34rem;
+  }
+
+  .tagline :global(em) {
+    font-family: var(--font-instrument-serif), var(--sl-font);
+    font-size: 1.08em;
+    font-style: italic;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .hero-window {
+    background: var(--card);
+    border: 5px solid var(--frame);
+    border-radius: 14px;
+    box-shadow: var(--shadow-brutal-xl);
+    overflow: hidden;
+    rotate: 1.2deg;
+    transition: rotate 250ms ease-out;
+  }
+
+  .hero-window:hover {
+    rotate: 0deg;
+  }
+
+  .hero-window-bar {
+    align-items: center;
+    background: var(--frame);
+    display: flex;
+    gap: 0.6rem;
+    padding: 0.6rem 1rem;
+  }
+
+  .dot {
+    border: 1.5px solid var(--shade);
+    border-radius: 999px;
+    height: 0.75rem;
+    width: 0.75rem;
+  }
+
+  .dot-red {
+    background: var(--color-brand-red);
+  }
+
+  .dot-yellow {
+    background: var(--color-brand-yellow);
+  }
+
+  .dot-green {
+    background: var(--color-brand-green);
+  }
+
+  .hero-window-url {
+    color: color-mix(in srgb, var(--background) 75%, transparent);
+    font-family: var(--sl-font-mono);
+    font-size: 0.75rem;
+    margin-inline: auto;
+  }
+
+  .hero-window-sections {
+    display: grid;
+    gap: 0.6rem;
+    list-style: none;
+    margin: 0;
+    padding: 1.25rem;
+  }
+
+  .hero-window-sections a {
+    align-items: center;
+    background: var(--background);
+    border: 3px solid var(--frame);
+    border-radius: 8px;
+    color: var(--foreground);
+    display: flex;
+    font-family: var(--font-bricolage), var(--sl-font);
+    font-size: 1.05rem;
+    font-weight: 700;
+    gap: 1rem;
+    justify-content: space-between;
+    letter-spacing: -0.01em;
+    padding: 0.6rem 0.9rem;
+    text-decoration: none;
+    transition:
+      translate 80ms linear,
+      box-shadow 80ms linear,
+      background-color 120ms ease;
+  }
+
+  .hero-window-sections a:hover {
+    background: var(--accent);
+    box-shadow: var(--shadow-brutal-sm);
+    color: var(--color-brand-ink);
+    translate: -2px -2px;
+  }
+
+  .hero-window-count {
+    background: var(--surface-panel);
+    border: 2px solid var(--frame);
+    border-radius: 999px;
+    color: var(--foreground);
+    font-family: var(--sl-font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0.3em 0.6em;
+  }
+
+  @media (min-width: 50rem) {
+    .hero {
+      grid-template-columns: 1.1fr 1fr;
+    }
+  }
+</style>

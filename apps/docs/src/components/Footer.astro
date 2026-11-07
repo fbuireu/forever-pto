@@ -1,0 +1,48 @@
+---
+import Default from "@astrojs/starlight/components/Footer.astro";
+import en from "../../../web/src/ui/i18n/messages/en.json";
+import { APP_VERSION } from "../lib/app-version";
+
+const LIVE_MARK = /<live>(.*)<\/live>/;
+
+const [versionLine = "", liveMark = ""] = en.footer.version.replace("{version}", APP_VERSION).split(LIVE_MARK);
+const copyright = en.footer.copyright.replace("{year}", String(new Date().getFullYear()));
+---
+
+<Default />
+<div class="app-footer">
+  <span>{versionLine}<span class="live" aria-hidden="true">{liveMark}</span></span>
+  <span>{copyright}</span>
+</div>
+
+<style>
+  .app-footer {
+    border-top: 2px dashed color-mix(in srgb, var(--frame) 18%, transparent);
+    color: var(--muted-foreground);
+    display: flex;
+    flex-wrap: wrap;
+    font-family: var(--sl-font-mono);
+    font-size: 0.7rem;
+    gap: 0.5rem 1.5rem;
+    justify-content: space-between;
+    margin-top: 2rem;
+    padding-top: 1rem;
+  }
+
+  .live {
+    animation: live-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    color: var(--live);
+  }
+
+  @keyframes live-pulse {
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .live {
+      animation: none;
+    }
+  }
+</style>

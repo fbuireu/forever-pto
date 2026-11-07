@@ -158,17 +158,88 @@ figure.mermaid.mermaid-expanded > svg {
 	--sl-color-hairline: color-mix(in srgb, var(--frame) 18%, transparent);
 	--sl-color-hairline-light: color-mix(in srgb, var(--frame) 28%, transparent);
 	--sl-color-bg-inline-code: var(--surface-panel-alt);
+	--sl-color-text-accent: var(--foreground);
 }
 
-.sl-markdown-content :is(h1, h2, h3, h4) {
+:root[data-theme="dark"] {
+	--sl-color-text-accent: var(--foreground);
+}
+
+:is(.sl-markdown-content, .content-panel) :is(h1, h2, h3, h4) {
 	font-family: var(--font-bricolage), var(--sl-font);
-	font-weight: 800;
-	letter-spacing: -0.02em;
+	font-weight: 600;
+	letter-spacing: -0.03em;
 }
 
-.sl-markdown-content h2:not(:where(.not-content *)) {
-	border-bottom: 3px solid var(--frame);
-	padding-bottom: 0.3em;
+.content-panel + .content-panel {
+	border-top: 0;
+}
+
+.sl-markdown-content a:not(:where(.not-content *, .card *, .sl-link-button)) {
+	border-radius: 3px;
+	color: var(--foreground);
+	font-weight: 600;
+	text-decoration-color: var(--frame);
+	text-decoration-thickness: 2px;
+	text-underline-offset: 3px;
+	transition:
+		background-color 75ms linear,
+		color 75ms linear;
+}
+
+.sl-markdown-content a:not(:where(.not-content *, .card *, .sl-link-button)):hover {
+	background: var(--highlighter);
+	color: var(--highlighter-ink);
+}
+
+starlight-toc a {
+	color: var(--muted-foreground);
+}
+
+starlight-toc a:hover {
+	color: var(--foreground);
+}
+
+starlight-toc a[aria-current="true"],
+starlight-toc a[aria-current="true"]:hover {
+	color: var(--foreground);
+	font-weight: 700;
+}
+
+starlight-toc a[aria-current="true"] span {
+	background: var(--highlighter);
+	border-radius: 3px;
+	box-decoration-break: clone;
+	color: var(--highlighter-ink);
+	padding-inline: 0.25em;
+}
+
+.social-icons a {
+	align-items: center;
+	background: var(--surface-panel);
+	border: 2px solid var(--frame);
+	border-radius: 8px;
+	box-shadow: var(--shadow-brutal-xs);
+	color: var(--foreground);
+	height: 2.5rem;
+	justify-content: center;
+	padding: 0;
+	transition:
+		translate 80ms linear,
+		box-shadow 80ms linear;
+	width: 2.5rem;
+}
+
+.social-icons a:hover {
+	box-shadow: var(--shadow-brutal-sm);
+	color: var(--foreground);
+	opacity: 1;
+	translate: -1px -1px;
+}
+
+.social-icons a svg {
+	height: 1.15rem;
+	width: 1.15rem;
 }
 
 .sl-markdown-content code:not(:where(pre *, .not-content *, a *)) {
@@ -222,6 +293,10 @@ figure.mermaid.mermaid-expanded > svg {
 	border-bottom: 0;
 }
 
+.sl-markdown-content table:not([style*="fixed"]) td:first-child code:not(:where(.not-content *)) {
+	white-space: nowrap;
+}
+
 .sl-markdown-content table[style*="fixed"] :is(td, th) code {
 	font-size: 0.78em;
 	overflow-wrap: anywhere;
@@ -235,7 +310,6 @@ figure.mermaid.mermaid-expanded > svg {
 	}
 }
 
-starlight-theme-select > label,
 starlight-lang-select > label {
 	background: var(--surface-panel);
 	border: 2px solid var(--frame);
@@ -249,26 +323,28 @@ starlight-lang-select > label {
 		box-shadow 80ms linear;
 }
 
-starlight-theme-select > label:hover,
 starlight-lang-select > label:hover {
 	box-shadow: var(--shadow-brutal-sm);
 	translate: -1px -1px;
 }
 
-starlight-theme-select > label:focus-within,
 starlight-lang-select > label:focus-within {
 	background: var(--accent);
 	color: var(--color-brand-ink);
 }
 
-starlight-theme-select select,
 starlight-lang-select select {
 	color: inherit;
 	font-weight: 700;
-	padding-block: 0.3rem;
+	padding-block: 0.45rem;
+	padding-inline: 0.4rem;
+	text-align: center;
 }
 
-starlight-theme-select select option,
+starlight-lang-select svg {
+	display: none;
+}
+
 starlight-lang-select select option {
 	background: var(--surface-panel);
 	color: var(--foreground);
@@ -301,19 +377,6 @@ starlight-lang-select select option {
 
 .expressive-code .frame {
 	box-shadow: var(--shadow-brutal-sm);
-}
-
-.hero h1 {
-	font-family: var(--font-bricolage), var(--sl-font);
-	font-weight: 900;
-	letter-spacing: -0.03em;
-}
-
-.hero .tagline {
-	font-family: var(--font-instrument-serif), var(--sl-font);
-	font-size: clamp(1.25rem, 2.4vw, 1.6rem);
-	font-style: italic;
-	line-height: 1.35;
 }
 
 .sl-link-button {
@@ -398,17 +461,41 @@ starlight-lang-select select option {
 }
 
 .sl-badge {
-	border-radius: 999px;
-	border-width: 2px;
-	font-weight: 900;
-	letter-spacing: 0.06em;
+	border-radius: 4px;
+	border-width: 0;
+	font-family: var(--sl-font-mono);
+	font-weight: 800;
+	letter-spacing: 0.08em;
 	text-transform: uppercase;
 }
 
 .sl-badge.success {
-	--sl-badge-success-border: var(--frame);
-	--sl-badge-success-bg: var(--color-brand-teal);
+	--sl-badge-success-border: transparent;
+	--sl-badge-success-bg: var(--accent);
 	--sl-badge-success-text: var(--color-brand-ink);
+}
+
+.sidebar-content a[aria-current="page"] .sl-badge {
+	background: var(--color-brand-ink);
+	color: var(--color-brand-cream);
+}
+
+button.sl-menu-button,
+mobile-starlight-toc .toggle {
+	background: var(--surface-panel);
+	border: 2px solid var(--frame);
+	border-radius: 8px;
+	box-shadow: var(--shadow-brutal-xs);
+	color: var(--foreground);
+}
+
+button.sl-menu-button {
+	height: 2.5rem;
+	width: 2.5rem;
+}
+
+mobile-starlight-toc .toggle {
+	font-weight: 700;
 }
 
 site-search > button {

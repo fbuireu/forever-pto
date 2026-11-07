@@ -1,0 +1,104 @@
+---
+import Default from "@astrojs/starlight/components/ThemeSelect.astro";
+---
+
+<div class="theme-toggle">
+  <svg
+    class="theme-icon theme-icon-sun"
+    aria-hidden="true"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <circle cx="12" cy="12" r="4"></circle>
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
+    ></path>
+  </svg>
+  <svg
+    class="theme-icon theme-icon-moon"
+    aria-hidden="true"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+  </svg>
+  <Default />
+</div>
+
+<style>
+  .theme-toggle {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: var(--surface-panel);
+    border: 2px solid var(--frame);
+    border-radius: 8px;
+    box-shadow: var(--shadow-brutal-xs);
+    color: var(--foreground);
+    transition:
+      translate 80ms linear,
+      box-shadow 80ms linear,
+      background-color 120ms ease;
+  }
+
+  .theme-toggle:hover {
+    box-shadow: var(--shadow-brutal-sm);
+    translate: -1px -1px;
+  }
+
+  .theme-toggle:focus-within {
+    background: var(--accent);
+    color: var(--color-brand-ink);
+  }
+
+  .theme-icon {
+    grid-area: 1 / 1;
+    width: 1.2rem;
+    height: 1.2rem;
+    transition:
+      rotate 200ms ease,
+      scale 200ms ease;
+  }
+
+  .theme-icon-moon {
+    rotate: 90deg;
+    scale: 0;
+  }
+
+  :global(:root[data-theme="dark"]) .theme-icon-sun {
+    rotate: -90deg;
+    scale: 0;
+  }
+
+  :global(:root[data-theme="dark"]) .theme-icon-moon {
+    rotate: 0deg;
+    scale: 1;
+  }
+
+  .theme-toggle :global(starlight-theme-select) {
+    position: absolute;
+    inset: 0;
+  }
+
+  .theme-toggle :global(starlight-theme-select > label) {
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+  }
+
+  .theme-toggle :global(starlight-theme-select select) {
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+</style>

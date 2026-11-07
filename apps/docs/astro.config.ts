@@ -29,7 +29,6 @@ export default defineConfig({
 		starlight({
 			title: "Forever PTO",
 			description: "Documentation and internal wiki for Forever PTO, the PTO optimization tool.",
-			logo: { src: "./src/assets/forever-pto-logo.png", alt: "Forever PTO" },
 			favicon: "/favicon.ico",
 			head: [
 				{
@@ -42,7 +41,14 @@ export default defineConfig({
 				},
 			],
 			customCss: ["./src/styles/global.css"],
-			components: { Head: "./src/components/Head.astro", SiteTitle: "./src/components/SiteTitle.astro" },
+			components: {
+				Footer: "./src/components/Footer.astro",
+				Head: "./src/components/Head.astro",
+				Hero: "./src/components/Hero.astro",
+				PageTitle: "./src/components/PageTitle.astro",
+				SiteTitle: "./src/components/SiteTitle.astro",
+				ThemeSelect: "./src/components/ThemeSelect.astro",
+			},
 			defaultLocale: "root",
 			locales: {
 				root: { label: "English", lang: "en" },
