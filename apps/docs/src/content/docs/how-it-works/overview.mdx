@@ -78,7 +78,7 @@ sequenceDiagram
     end
   end
   P-->>B: HTML, user-country if known,<br/>NEXT_LOCALE if written
-  Note over B,P: stores rehydrate from localStorage,<br/>StoresInitializer seeds the Country
+  Note over B,P: stores rehydrate<br/>from localStorage,<br/>StoresInitializer<br/>seeds the Country
 ```
 
 1. The [proxy](/architecture/proxy/) runs its chain: Markdown negotiation for agents, the payment-confirmation guard, locale resolution and, last, [country detection](/how-it-works/country-detection/). The result is a prerendered page with the `user-country` cookie whenever a Country is known, and with `NEXT_LOCALE` only when the navigation changed the locale.

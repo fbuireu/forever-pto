@@ -21,7 +21,7 @@ flowchart TD
     PE["prepare-env, Playwright cache"] --> PAR["parallel: Typecheck (astro check) beside the Playwright install"]
     PAR --> BLD["Build: astro build"] --> E2E["Run E2E tests"] --> ART["Upload docs-dist"]
   end
-  ART -->|pull_request| PV["preview: deploy --env development --name pr-n-..."]
+  ART -->|pull_request| PV["preview: deploy<br/>--env development<br/>--name pr-n-forever-<br/>pto-docs-development"]
   ART -->|"push to main or dispatch"| D["deploy: deploy --env production"]
   D --> S["smoke on DOCS_SITE_URL"]
   S -->|push only| R["release-docs"]

@@ -126,7 +126,7 @@ flowchart LR
 ```
 ````
 
-What that buys: no Mermaid in the browser bundle, no flash of source text before a draw, a diagram for a reader without JavaScript, and a fence Mermaid cannot parse failing the build with the page named rather than shipping a red frame. An asterisk in a quoted label is escaped before Mermaid reads it, because Mermaid parses SVG labels as Markdown and two asterisks would put an `<em>` inside the SVG, which the browser treats as HTML and which closes the drawing early; a drawing that still carries an HTML element fails the build. The only script a diagram carries is a click-to-enlarge toggle, and which copy shows is decided in CSS from `data-theme`.
+What that buys: no Mermaid in the browser bundle, no flash of source text before a draw, a diagram for a reader without JavaScript, and a fence Mermaid cannot parse failing the build with the page named rather than shipping a red frame. An asterisk in a quoted label is escaped before Mermaid reads it, because Mermaid parses SVG labels as Markdown and two asterisks would put an `<em>` inside the SVG, which the browser treats as HTML and which closes the drawing early; a drawing that still carries an HTML element fails the build. The figures reach the page as HTML nodes that the Markdown processor leaves alone, so a label reads exactly as written: `--env` stays two hyphens rather than becoming a dash. Labels stay legible where a line crosses them, and a gantt draws its days in the planner calendar's colours. The only script a diagram carries is a click-to-enlarge toggle, and which copy shows is decided in CSS from `data-theme`.
 
 ## What keeps it honest
 

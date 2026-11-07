@@ -88,7 +88,7 @@ config:
   layout: dagre
   state:
     nodeSpacing: 100
-    rankSpacing: 120
+    rankSpacing: 150
 ---
 stateDiagram-v2
   [*] --> NoWorker
@@ -97,9 +97,8 @@ stateDiagram-v2
   Running --> Holding: trigger while in flight
   Holding --> Holding: a later request<br/>replaces the held one
   Holding --> Running: reply dropped,<br/>held request posted
-  Running --> Idle: RESULT or WORKER_ERROR<br/>with the current id
+  Running --> Idle: a reply with the current id,<br/>or onmessageerror
   Running --> Running: stale id ignored
-  Running --> Idle: onmessageerror
   Running --> NoWorker: onerror drops the worker
   Idle --> [*]: unmount terminates it
 ```

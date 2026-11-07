@@ -27,8 +27,8 @@ export const mermaidPlugin: MdastPlugin = {
 
 		const source = encodeURIComponent(node.value);
 		const figure = (svg: string, theme: "light" | "dark") => ({
-			raw: `<figure class="${MERMAID_LANG} mermaid-${theme}" data-mermaid="${source}" tabindex="0">${svg}</figure>`,
-			mdxExpressions: false,
+			type: "html" as const,
+			value: `<figure class="${MERMAID_LANG} mermaid-${theme}" data-mermaid="${source}" tabindex="0">${svg}</figure>`,
 		});
 
 		context.replaceNode(node, [figure(drawn.light, "light"), figure(drawn.dark, "dark")]);
