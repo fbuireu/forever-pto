@@ -1,9 +1,14 @@
 import { Counter } from "@ui/modules/core/animate/components/Counter";
 import { FeatureList } from "@ui/modules/core/animate/components/FeatureList";
 import { RadialNav } from "@ui/modules/core/animate/components/RadialNav";
-import { Calendar, Settings, Star, Users } from "lucide-react";
+import { CircleCheckBig } from "@ui/modules/core/animate/icons/CircleCheckBig";
+import { Clock } from "@ui/modules/core/animate/icons/Clock";
+import { Circle, Sparkles } from "lucide-react";
 import { type ComponentProps, useState } from "react";
+import en from "../../../../web/src/ui/i18n/messages/en.json";
 import { Demo } from "../Demo";
+
+const { features: ROADMAP_FEATURES } = en.roadmap;
 
 export const CounterDemo = () => {
 	const [days, setDays] = useState(23);
@@ -13,11 +18,11 @@ export const CounterDemo = () => {
 			<Counter
 				number={days}
 				setNumber={setDays}
-				label="PTO days"
-				decrementLabel="One PTO day fewer"
-				incrementLabel="One more PTO day"
+				label={en.ptoDays.days}
+				decrementLabel={en.ptoDays.decrease}
+				incrementLabel={en.ptoDays.increase}
 				decrementButtonProps={{ disabled: days <= 0 }}
-				incrementButtonProps={{ disabled: days >= 40 }}
+				incrementButtonProps={{ disabled: days >= 60 }}
 			/>
 		</Demo>
 	);
@@ -25,38 +30,72 @@ export const CounterDemo = () => {
 
 const FEATURES = [
 	{
-		id: "carryover",
-		title: "Carryover months",
-		description: "Stretch unused PTO into the first months of the next year.",
-		quarter: "Q1",
+		id: "1",
+		title: ROADMAP_FEATURES.corePtoCalculator,
+		description: ROADMAP_FEATURES.corePtoCalculatorDescription,
+		quarter: "Q3 2025",
 	},
 	{
-		id: "custom-weekends",
-		title: "Custom weekends",
-		description: "Support working patterns other than Monday to Friday.",
-		quarter: "Q2",
+		id: "2",
+		title: ROADMAP_FEATURES.multipleCountries,
+		description: ROADMAP_FEATURES.multipleCountriesDescription,
+		quarter: "Q3 2025",
 	},
 	{
-		id: "calendar-subscription",
-		title: "Calendar subscription",
-		description: "Subscribe to your optimized plan from any calendar app.",
-		quarter: "Q3",
+		id: "4",
+		title: ROADMAP_FEATURES.customHolidays,
+		description: ROADMAP_FEATURES.customHolidaysDescription,
+		quarter: "Q4 2025",
 	},
 ];
 
 export const FeatureListDemo = () => (
 	<Demo>
 		<div className="w-full max-w-sm">
-			<FeatureList features={FEATURES} categoryLabel="Roadmap" detailedViewLabel="Detailed view" />
+			<FeatureList
+				features={FEATURES}
+				categoryLabel={en.roadmap.completed}
+				detailedViewLabel={en.roadmap.detailedView}
+			/>
 		</div>
 	</Demo>
 );
 
 const NAV_ITEMS: ComponentProps<typeof RadialNav>["items"] = [
-	{ id: 1, icon: Calendar, label: "Calendar", angle: 0 },
-	{ id: 2, icon: Star, label: "Favorites", angle: 90, badgeClass: "bg-[var(--color-brand-teal)]" },
-	{ id: 3, icon: Settings, label: "Settings", angle: 180 },
-	{ id: 4, icon: Users, label: "Team", angle: 270 },
+	{
+		id: 1,
+		icon: CircleCheckBig,
+		animateOnHover: true,
+		label: en.roadmap.completed,
+		angle: 0,
+		className: "text-positive-base",
+		badgeClass: "bg-[var(--color-brand-green)] text-[var(--color-brand-ink)] border-[var(--frame)]",
+	},
+	{
+		id: 2,
+		icon: Clock,
+		animateOnHover: true,
+		label: en.roadmap.inProgress,
+		angle: 90,
+		className: "text-info-base",
+		badgeClass: "bg-[var(--color-brand-sky)] text-[var(--color-brand-ink)] border-[var(--frame)]",
+	},
+	{
+		id: 3,
+		icon: Circle,
+		label: en.roadmap.planned,
+		angle: 180,
+		className: "text-warning-base",
+		badgeClass: "bg-[var(--color-brand-orange)] text-[var(--color-brand-ink)] border-[var(--frame)]",
+	},
+	{
+		id: 4,
+		icon: Sparkles,
+		label: en.roadmap.future,
+		angle: 270,
+		className: "text-efficiency-base",
+		badgeClass: "bg-[var(--color-brand-purple)] text-on-fill border-[var(--frame)]",
+	},
 ];
 
 export const RadialNavDemo = () => (
@@ -66,7 +105,7 @@ export const RadialNavDemo = () => (
 				items={NAV_ITEMS}
 				defaultActiveId={1}
 				onActiveChange={() => undefined}
-				aria-label="Roadmap categories"
+				aria-label="Feature navigation"
 			/>
 		</div>
 	</Demo>

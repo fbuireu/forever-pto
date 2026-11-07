@@ -2,18 +2,17 @@ import { AutoHeight } from "@ui/modules/core/animate/effects/AutoHeight";
 import { MotionHighlight, MotionHighlightItem } from "@ui/modules/core/animate/effects/MotionHighlight";
 import { Button } from "@ui/modules/core/primitives/Button";
 import { useState } from "react";
-import { Strategy } from "../../../../web/src/domain/calendar/types";
 import en from "../../../../web/src/ui/i18n/messages/en.json";
 import { Demo } from "../Demo";
 
-const STRATEGIES = Object.values(Strategy).map((strategy) => en.sidebar.strategy[strategy].label);
+const THEMES = [en.theme.light, en.theme.dark, en.theme.system];
 
 const SPRING = { type: "spring", stiffness: 350, damping: 35 } as const;
 
 export const MotionHighlightChildrenDemo = () => (
 	<Demo>
 		<MotionHighlight hover className="rounded-lg border-2 border-[var(--frame)] bg-accent" transition={SPRING}>
-			{STRATEGIES.map((label) => (
+			{THEMES.map((label) => (
 				<MotionHighlightItem key={label} value={label}>
 					<button type="button" className="cursor-pointer px-4 py-2 text-sm font-semibold">
 						{label}
@@ -24,14 +23,16 @@ export const MotionHighlightChildrenDemo = () => (
 	</Demo>
 );
 
+const { holidaysTable } = en;
+
 const TABS = [
-	{ value: "calendar", label: "Calendar" },
-	{ value: "summary", label: "Summary" },
-	{ value: "charts", label: "Charts" },
+	{ value: "national", label: holidaysTable.nationalTab },
+	{ value: "regional", label: holidaysTable.regionalTab },
+	{ value: "custom", label: holidaysTable.customTab },
 ];
 
 export const MotionHighlightParentDemo = () => {
-	const [active, setActive] = useState<string>("calendar");
+	const [active, setActive] = useState<string>("national");
 
 	return (
 		<Demo>

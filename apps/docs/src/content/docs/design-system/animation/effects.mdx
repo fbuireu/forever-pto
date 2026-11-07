@@ -47,11 +47,11 @@ import { AutoHeight } from '@ui/modules/core/animate/effects/AutoHeight';
 
 // Hover pill across items
 <MotionHighlight hover className='rounded-lg bg-accent' transition={{ type: 'spring', stiffness: 350, damping: 35 }}>
-  <MotionHighlightItem value='grouped'>
-    <button type='button'>Grouped</button>
+  <MotionHighlightItem value='light'>
+    <button type='button'>Light</button>
   </MotionHighlightItem>
-  <MotionHighlightItem value='optimized'>
-    <button type='button'>Optimized</button>
+  <MotionHighlightItem value='dark'>
+    <button type='button'>Dark</button>
   </MotionHighlightItem>
 </MotionHighlight>
 
@@ -66,3 +66,7 @@ import { AutoHeight } from '@ui/modules/core/animate/effects/AutoHeight';
 - Never hand-roll a moving highlight in a new component; compose `MotionHighlight` like `DropdownMenu`, `Sidebar` and `Tabs` do.
 - The pill defaults to `bg-muted rounded-md`; pass `className` to restyle it (the app usually uses the accent with a 2px frame).
 - Related: [animated components](/design-system/animation/components/), [animated icons](/design-system/animation/icons/).
+
+## In the app
+
+`MotionHighlight` is composed by `DropdownMenu.tsx`, `Sidebar.tsx` and `Tabs.tsx` and by nothing else; `AutoHeight` only by `Tabs.tsx`.

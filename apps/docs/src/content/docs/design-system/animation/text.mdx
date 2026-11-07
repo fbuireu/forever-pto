@@ -17,11 +17,11 @@ Source: `apps/web/src/ui/modules/core/animate/text/`. Both components are client
 
 Props beyond `number`: `className`, `padStart`, which zero-pads single-digit integers, and `decimalPlaces`, which sets the fraction digits; the separator is the active locale's. Negative numbers render a leading minus sign.
 
-This is the number display inside [Counter](/design-system/animation/components/), which the sidebar uses for the PTO-days stepper (`apps/web/src/ui/modules/sidebar/components/PtoDays.tsx`).
+This is the number display inside [Counter](/design-system/animation/components/).
 
 ## RotatingText
 
-`RotatingText` (`apps/web/src/ui/modules/core/animate/text/Rotating.tsx`) animates a string in and out through `AnimatePresence` in `wait` mode whenever the `text` it receives changes: the old text slides up and fades out, the new one slides in from below. The caller owns the changing, as the dev footer's emoji and the Summary's first and last rest blocks do; an optional `transition` overrides the default 0.3 s ease-out.
+`RotatingText` (`apps/web/src/ui/modules/core/animate/text/Rotating.tsx`) animates a string in and out through `AnimatePresence` in `wait` mode whenever the `text` it receives changes: the old text slides up and fades out, the new one slides in from below. The caller owns the changing; an optional `transition` overrides the default 0.3 s ease-out. The demo is the Summary's first rest block, whose month changes when the plan does.
 
 <RotatingTextDemo client:visible />
 
@@ -33,7 +33,7 @@ import { RotatingText } from '@ui/modules/core/animate/text/Rotating';
 
 <SlidingNumber number={efficiency} decimalPlaces={1} />
 
-<RotatingText text={currentWord} />
+<RotatingText text={firstRestBlock} />
 ```
 
 ## Conventions
@@ -44,3 +44,7 @@ import { RotatingText } from '@ui/modules/core/animate/text/Rotating';
  the HTML parser closes the paragraph before the `div`, and React fails the hydration (error #418).
 - Both components expose `data-slot` attributes (`sliding-number`, `sliding-number-roller`, `sliding-number-display`) for CSS containment hooks.
 - Related: [animated components](/design-system/animation/components/), [effects](/design-system/animation/effects/).
+
+## In the app
+
+`SlidingNumber` draws the figures of the sidebar (`PtoDays.tsx`, `CarryOverMonths.tsx`, `PtoCalculator.tsx`, `PtoSalaryCalculator.tsx`, `WorkdayCounter.tsx`, `SiteTitleYear.tsx`) and of the planner's `PlannerPanel.tsx`, `Summary.tsx` and `MetricCard.tsx`. `RotatingText` shows the Summary's first and last rest block (`Summary.tsx`) and the emoji of the dev footer (`DevFooter.tsx`).

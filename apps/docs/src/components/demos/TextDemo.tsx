@@ -24,19 +24,25 @@ export const SlidingNumberDemo = () => {
 	);
 };
 
-const ROTATING_WORDS = ["vacations", "holidays", "long weekends", "bridge days"];
+const FIRST_REST_BLOCKS = ["January", "March", "July", "December"];
 
 export const RotatingTextDemo = () => {
 	const [index, setIndex] = useState(0);
 
 	return (
 		<Demo>
-			<div className="flex items-center gap-2 text-xl font-semibold">
-				Maximize your
-				<RotatingText text={ROTATING_WORDS[index]} />
+			<div className="text-center">
+				<div className="text-sm text-muted-foreground">First rest block</div>
+				<div className="flex justify-center font-display text-lg font-bold">
+					<RotatingText text={FIRST_REST_BLOCKS[index]} />
+				</div>
 			</div>
-			<Button size="sm" variant="outline" onClick={() => setIndex((current) => (current + 1) % ROTATING_WORDS.length)}>
-				Next word
+			<Button
+				size="sm"
+				variant="outline"
+				onClick={() => setIndex((current) => (current + 1) % FIRST_REST_BLOCKS.length)}
+			>
+				Pick another plan
 			</Button>
 		</Demo>
 	);
