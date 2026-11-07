@@ -16,7 +16,7 @@ Source: `apps/web/src/ui/modules/core/primitives/Banner.tsx`. A bordered, shadow
 
 ## Color schemes
 
-`colorScheme` is not a CVA axis: it indexes a `COLOR_SCHEMES` lookup object in the source file that maps each scheme to four `wash-*` utilities (background, icon, title, message). The tokens behind them are in `apps/web/src/ui/styles/global/index.css`: a `color-mix()` of the brand colour, with separate light and dark values. The app uses `orange` for an improvement it found, `indigo` for the Premium notice and the user's manual edits, and `blue` for hints about the user's region and custom holidays.
+`colorScheme` is not a CVA axis: it indexes a `COLOR_SCHEMES` lookup object in the source file that maps each scheme to four `wash-*` utilities (background, icon, title, message). The tokens behind them are in `apps/web/src/ui/styles/global/index.css`: a `color-mix()` of the brand colour, with separate light and dark values; the light title mixes the scheme's deep shade with ink so it reads at AA on its wash, which `apps/web/src/ui/styles/contrast.test.ts` asserts for every scheme in both themes. The app uses `orange` for an improvement it found, `indigo` for the Premium notice and the user's manual edits, and `blue` for hints about the user's region and custom holidays.
 
 <BannerSchemesDemo client:visible />
 

@@ -20,7 +20,7 @@ const HOLIDAYS = [
 
 export const TableDemo = () => (
 	<Demo>
-		<Table>
+		<Table tabIndex={0} aria-label="Holidays">
 			<TableHeader>
 				<TableRow>
 					<TableHead>Holiday</TableHead>

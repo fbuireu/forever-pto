@@ -55,7 +55,7 @@ The state is always controlled, through the Base UI root props `open` and `onOpe
 
 ## Accessibility
 
-- The trigger carries `aria-expanded` and `aria-controls` from Base UI, and the panel sets `aria-hidden` while closed so its content leaves the accessibility tree.
+- The trigger carries `aria-expanded` and `aria-controls` from Base UI, and the panel is `aria-hidden` and `inert` while closed, so its content leaves the accessibility tree and the tab order: it stays mounted to animate, and a keyboard would otherwise reach a field nobody can see.
 - Enter and Space toggle; there is no arrow-key navigation, because a Collapsible is a single fold rather than a set.
 - With `asChild`, the child element receives the aria attributes; keep it a button or an element with `role='button'`.
 
