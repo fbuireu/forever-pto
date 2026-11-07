@@ -7,7 +7,7 @@ sidebar:
 
 import { SIDEBAR_COOKIE_NAME } from '@ui/utils/sidebarCookie';
 
-The app sets its first-party cookies. The sidebar cookie name below is imported from the app source, so it cannot drift; the other names are set in infrastructure modules (not importable into this site) and are quoted as written in code, with the defining file cited.
+The sidebar cookie name below is imported from the app source, so it cannot drift. The other names are defined in modules this site cannot import, so they are quoted as written in code, with the defining file cited.
 
 | Cookie | Purpose | httpOnly | Secure | SameSite | Max age |
 | --- | --- | --- | --- | --- | --- |
@@ -27,7 +27,7 @@ Exported as `USER_COUNTRY_COOKIE` in `apps/web/src/infrastructure/proxy/cookie.t
 
 The locale cookie used by next-intl, named by the `LOCALE_COOKIE` export in `apps/web/src/infrastructure/i18n/locales.ts`. The next-intl middleware writes it during locale negotiation only when a page navigation changes the locale (it differs from the cookie the request carries or, with none, from the `Accept-Language` match), so a visitor whose browser language is the one the URL serves never gets it; when next-intl writes it, `apps/web/src/middleware.ts` immediately re-sets it via `setLocaleCookie()` (`apps/web/src/infrastructure/i18n/cookie.ts`), which applies `LOCALE_COOKIE_POLICY`: `secure`, `sameSite: 'lax'`, `path: '/'`. No `maxAge` is set, so it is a session cookie.
 
-It is deliberately **not** `httpOnly`, and that is the same object `routing.ts` hands next-intl. The client-side language switcher writes this cookie too, from `document.cookie`, so both writers have to agree: adding `httpOnly` here silently broke every soft locale switch.
+It is deliberately **not** `httpOnly`: the client-side language switcher writes this cookie too, from `document.cookie`, and an `httpOnly` cookie would refuse that write. `routing.ts` hands next-intl the same policy object, so both writers agree.
 
 ## `premium-token`
 

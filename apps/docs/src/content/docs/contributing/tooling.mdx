@@ -9,14 +9,15 @@ sidebar:
 
 A single `biome.json` at the repo root lints and formats the whole workspace, `apps/docs/` included. Highlights:
 
-- Formatter: 120-char lines, LF, tabs, double quotes, trailing commas everywhere, Biome's own defaults bar the line width. The config declares no `javascript.formatter` block at all, which is what keeps it identical to the sibling repos'.
+- Formatter: 120-char lines, LF, tabs, double quotes, trailing commas everywhere, Biome's own defaults bar the line width. The config declares no `javascript.formatter` block.
 - `assist.actions.source.organizeImports: on`, so import sorting is automated. Don't hand-sort.
 - Recommended rules plus `suspicious.noConsole` as an **error** with no allowlist: no `console` at any level. Log through [`apps/web/src/infrastructure/logging`](https://github.com/fbuireu/forever-pto/tree/main/apps/web/src/infrastructure/logging) instead. The one exception is scoped in `overrides` rather than hidden in a suppression comment, and it is the logger itself, `logger.ts`: `console` is what it writes to, because the Cloudflare platform is what exports it ([ADR 0018](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0018-the-platform-is-the-log-transport.md)). It is an exemption for the sink, not a licence anywhere else.
 - `performance.noBarrelFile`, `performance.noReExportAll` and `style.noDefaultExport` are errors too, so there is no re-export module and no default export; one `overrides` entry turns the last off for the files a framework or tool reads a default from: the Next file conventions under `apps/web/src/app`, the `next-intl` request config, the Playwright global setup and the `*.config.*` files.
+- `style.useConsistentTypeDefinitions` requires `interface` for an object shape, and `style.useAtIndex` requires `.at()` to read from an array's end.
 - Every stylesheet in both packages is formatted and linted, since `css.parser.tailwindDirectives` teaches the parser Tailwind's at-rules; `files.includes` excludes only `apps/web/next-env.d.ts`, which Next writes. `*.d.ts` files are excluded from linting, and `*.astro` files lose `noUnusedImports` and `noUnusedVariables` through an `overrides` entry, because Biome parses only an Astro file's frontmatter, so every import used in the template body would read as unused. `astro check` covers those files instead.
 - VCS integration is on (`useIgnoreFile`, default branch `main`), which is what powers the `--changed` script variants.
 
-Run `pnpm format:changed` before pushing if you bypassed the hooks; CI's `Verify` job runs the checks `pnpm verify` chains, `format:check` among them, as parallel steps, and `pre-push` runs `pnpm verify:changed`.
+Run `pnpm format:changed` before pushing if you bypassed the hooks. CI's `Verify` job runs `format:check` with the rest of the checks `pnpm verify` chains.
 
 ## Git hooks (husky)
 
@@ -26,7 +27,7 @@ Installed by the `prepare` script on `pnpm install`. The hooks in `.husky/`:
 | --- | --- | --- |
 | `pre-commit` | `pnpm lint-staged` | Format + lint staged files |
 | `commit-msg` | `pnpm exec commitlint --edit` | Enforce conventional commits (see [conventions](/contributing/conventions/)) |
-| `pre-push` | `pnpm verify:changed` | `format:check`, `typecheck` across both packages, the unit tests over what changed and the whole contract suite, which a changed-only run never selects because it reads documents rather than importing them. CI's `Verify` job runs every check of `pnpm verify` as parallel steps, coverage included, because the coverage floor cannot hold over a changed-only subset |
+| `pre-push` | `pnpm verify:changed` | `format:check`, `typecheck` over the root program and both packages, the unit tests over what changed and the whole contract suite, which a changed-only run never selects because it reads documents rather than importing them. Coverage stays in CI's `Verify` job, because the floor cannot hold over a changed-only subset |
 
 ### lint-staged
 
@@ -34,11 +35,11 @@ The active config is [`.lintstagedrc.json`](https://github.com/fbuireu/forever-p
 
 ## CI-side scanners
 
-- **zizmor** (`.github/workflows/zizmor.yml`): lints the GitHub Actions workflows themselves for security issues and reports to code scanning. This is why every action in the repo is SHA-pinned with `persist-credentials: false`; follow that pattern when touching workflows.
+- **zizmor** (`.github/workflows/zizmor.yml`): lints the GitHub Actions workflows themselves for security issues and reports to code scanning. This is why every action in the repo is SHA-pinned and every checkout sets `persist-credentials: false`; follow that pattern when touching workflows.
 - **Codecov**: `ci.yml`'s `Verify` job uploads `apps/web`'s Vitest coverage (`apps/web/coverage/lcov.info`) on every push and PR, after its parallel checks and whether or not they passed, without ever failing the job. See [testing](/contributing/testing/).
-- **CodeQL**: code scanning runs from GitHub's repository-level default setup, not from a workflow in the tree. There is deliberately no `codeql.yml` here: they cannot coexist, and the default setup is what every repo in the family uses.
+- **CodeQL**: code scanning runs from GitHub's repository-level default setup, not from a workflow in the tree. There is deliberately no `codeql.yml`, because the two cannot coexist.
 - **Dependency Review** (`.github/workflows/dependency-review.yml`): fails a PR that introduces dependencies with known vulnerabilities.
 
 ## Dependency management
 
-Renovate (`.github/renovate.json`) pins everything (including action SHAs), runs twice a month and automerges patch/minor updates once the required checks pass; no approval is required, so no workflow has to approve them first. pnpm policy lives in `pnpm-workspace.yaml`: an `allowBuilds` whitelist for postinstall scripts, a minimum release age for new versions, and `patchedDependencies` for the `vaul` patch, the only one.
+Renovate (`.github/renovate.json`) pins everything (including action SHAs), runs twice a month and automerges pin, digest, patch, minor and lockfile updates once the required checks pass; see [Renovate](/infra/renovate/). pnpm policy lives in `pnpm-workspace.yaml`: an `allowBuilds` whitelist for postinstall scripts, a minimum release age for new versions, and `patchedDependencies` for the `vaul` patch, the only one.

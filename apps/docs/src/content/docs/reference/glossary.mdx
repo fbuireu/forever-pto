@@ -1,25 +1,25 @@
 ---
 title: Glossary
-description: The domain vocabulary used across the app and this wiki.
+description: The suggestion-engine terms the planner is written in, defined where the code defines them.
 sidebar:
   order: 2
 ---
 
-The suggestion-engine terms below are defined in code in `apps/web/src/domain/calendar/types.ts` and explained in depth in `apps/web/src/domain/calendar/AGENTS.md`.
+The suggestion-engine terms below are defined in code in `apps/web/src/domain/calendar/types.ts` and explained in depth in `apps/web/src/domain/calendar/AGENTS.md`. The full vocabulary, with the names it retires, is `GLOSSARY.md` at the repository root.
 
-### PTO Day
+## PTO Day
 
 One day from the user's annual PTO budget: a unit of budget, not a date on the calendar, until a Suggestion places it (`ptoDays` in the filters store, `apps/web/src/application/stores/filters.ts`). Everything the engine does is about spending this budget as efficiently as possible.
 
-### Bridge
+## Bridge
 
 A block of PTO days that connects weekends and public holidays into one contiguous stretch off. A single PTO day on a Monday before a Tuesday holiday "bridges" the weekend to the holiday, yielding four Effective Days for one PTO Day spent. Modeled by the `Bridge` interface: `ptoDaysNeeded`, `effectiveDays`, `efficiency` and the concrete `ptoDays` dates. A Bridge is the unit the planner reasons about; the individual dates inside it are PTO Days, and there is no separate name for them.
 
-### Effective Day
+## Effective Day
 
 One day of the continuous stretch off a Bridge or Suggestion produces. The total counts PTO days plus the weekends and holidays they lean on, each once, however many Bridges reach it. **Efficiency** is `effectiveDays / ptoDaysNeeded`; each Strategy refuses a Bridge whose marginal Efficiency, the days it adds to the plan so far per PTO Day, falls under its floor (tunables in `apps/web/src/domain/calendar/const.ts`).
 
-### Strategy
+## Strategy
 
 The rule that decides which Bridges make it into a Suggestion when the budget cannot cover them all. Its values, exported as the `Strategy` const object in `apps/web/src/domain/calendar/types.ts`:
 
@@ -28,18 +28,18 @@ The rule that decides which Bridges make it into a Suggestion when the budget ca
 - **`balanced`** keeps every stretch of work short: a long weekend every few weeks, placed where the longest stretches without rest are. The shortest Max Work Streak for the budget.
 - **`mainVacation`** builds one block of up to two weeks inside the Preferred Months first, then spends the rest like `optimized`. The trip you actually want, plus the best bridges.
 
-### Suggestion
+## Suggestion
 
 The engine's output for a given budget, calendar and strategy: the set of recommended PTO dates plus the bridges and metrics behind them (`Suggestion` interface, seeded by `apps/web/src/domain/calendar/suggestions/generateSuggestions.ts` and chosen by `apps/web/src/domain/calendar/alternatives/generateAlternatives.ts`, which keeps the best plan the Strategy finds). Users can hand-edit the suggested days afterwards.
 
-### Alternative
+## Alternative
 
 A genuinely distinct plan for the same inputs, produced by `apps/web/src/domain/calendar/alternatives/generateAlternatives.ts` from the other Strategies and from the chosen one re-run without one of the Suggestion's Rest Blocks, each far enough from every other plan to be a real choice and never with more Effective Days or a higher Efficiency than the Suggestion, so the user can compare plans rather than accept a single answer.
 
-### Carry-over Months
+## Carry-over Months
 
-Months of the following year included in the planning window (`carryOverMonths` in the filters store). It lets a plan spill unused PTO past the year boundary, for example bridging the winter holidays into January.
+How many months past the end of the planning year the user may still spend PTO Days in (`carryOverMonths` in the filters store). It lets a plan spill past the year boundary, for example bridging the winter holidays into January.
 
-### Premium
+## Premium
 
-The tier unlocked by a Donation. Its key is the Stripe PaymentIntent id, surfaced as `premiumKey` (see `apps/web/src/application/use-cases/activatePremium.ts` and the premium store `apps/web/src/application/stores/premium.ts`). The active session itself is carried by the `premium-token` JWT cookie; see [cookies](/reference/cookies/).
+The tier unlocked by a Donation, covering the advanced metrics and manual editing of a Suggestion. Its key is the Stripe PaymentIntent id, surfaced as `premiumKey` (see `apps/web/src/application/use-cases/activatePremium.ts` and the premium store `apps/web/src/application/stores/premium.ts`). The active session itself is carried by the `premium-token` JWT cookie; see [cookies](/reference/cookies/).
