@@ -135,7 +135,15 @@ export interface RenderedDiagram {
 	dark: string;
 }
 
-export const renderMermaid = (source: string): Promise<RenderedDiagram> => {
+const QUOTED_LABEL = /"[^"\n]*"/g;
+const LITERAL_ASTERISK = /\*/g;
+const ESCAPED_ASTERISK = "\\*";
+
+const withLiteralAsterisks = (written: string): string =>
+	written.replace(QUOTED_LABEL, (label) => label.replace(LITERAL_ASTERISK, ESCAPED_ASTERISK));
+
+export const renderMermaid = (written: string): Promise<RenderedDiagram> => {
+	const source = withLiteralAsterisks(written);
 	const key = createHash("sha1").update(source).digest("hex").slice(0, 12);
 
 	return rendered.getOrInsertComputed(key, async () => {
