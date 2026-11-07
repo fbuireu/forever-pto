@@ -31,31 +31,29 @@ config:
   layout: dagre
 ---
 flowchart TD
-  EVT["push to main, pull_request or workflow_dispatch"] --> CH & PE
-  CH["changes: did WEB_PATHS move? fails open"]
-  subgraph verify ["Verify"]
-    PE["prepare-env"] --> FORK{{"parallel:"}}
-    FORK --> FMT["Format"] & TR["Typecheck (root)"] & TW["Typecheck (web)"] & TDOC["Typecheck (docs)"] & UT["Unit tests"]
-    FMT & TR & TW & TDOC & UT --> JOIN{{"all five settled"}}
-    JOIN --> CC["Upload coverage to Codecov, if not cancelled"]
-  end
-  subgraph onmain ["main: push or workflow_dispatch"]
-    DP["deploy-production, via _deploy-web.yml"] --> SM["smoke: @smoke against WEB_SITE_URL"]
-    SM -. "failed" .-> RB["rollback: wrangler rollback --env production"]
-  end
-  subgraph pushonly ["main: push only"]
-    RW["release-web: web-vX.Y.Z"] -- "a tag was cut" --> DR["docs-refresh: dispatch docs.yml"]
-  end
-  subgraph onpr ["pull_request"]
-    DD["deploy-development, via _deploy-web.yml"] -- "not Dependabot" --> CM["comment: preview URL"] & E2E["e2e: Chromium and WebKit through Access"]
-    DD -. "Dependabot: deploy false" .-> BO["the Worker built, nothing shipped"]
-    XN["cross-package-notice"]
-  end
-  CH -- "web" --> DP & DD
-  CC --> DP & DD
-  SM -- "passed" --> RW
-  CH -- "cross_package" --> XN
-  CH & CC & DD & E2E & DP & SM & RW --> CK["Check, always()"]
+  EVT["push to main or workflow_dispatch"] --> CH["changes: WEB_PATHS moved?"] & V["Verify: five parallel steps"]
+  V --> CC["Codecov upload"]
+  CH & CC --> DP["deploy-production"]
+  DP --> SM["smoke: @smoke on WEB_SITE_URL"]
+  SM -. failed .-> RB["rollback"]
+  SM -->|"push only"| RW["release-web: web-vX.Y.Z"]
+  RW -->|"a tag was cut"| DR["docs-refresh: dispatch docs.yml"]
+```
+
+On a pull request the same two jobs feed the preview path:
+
+```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
+flowchart TD
+  PR["pull_request"] --> CH["changes"] & V["Verify"]
+  CH & V --> DD["deploy-development"]
+  CH -->|"both packages"| XN["cross-package-notice"]
+  DD -->|"not Dependabot"| CM["comment"] & E2E["e2e: Chromium and WebKit"]
+  DD -. "Dependabot: deploy false" .-> BO["built, nothing shipped"]
 ```
 
 - **The checks are steps, not jobs.** One checkout and one install feed all five, and each reports its own log and status inside the job; `Verify` fails when any of them fails. `pnpm verify` runs the same scripts one after another for a local run.
@@ -66,21 +64,21 @@ flowchart TD
 
 Runs on pushes to `main` and PRs targeting `main`. `cancel-in-progress` is conditional on `pull_request`: cancelling a superseded PR run is free, cancelling a `main` run would kill a deploy or a release halfway.
 
-- **changes**: derives from `git diff` whether `apps/web` (or anything the app build depends on, `WEB_PATHS`) was touched, and whether the range touches both packages, and exposes both as outputs. It uses `git diff` rather than a filter action because every third-party action here is SHA-pinned and an unpinnable one trips zizmor. It fails open: with no usable base commit it answers `web=true`.
-- **Verify**: `prepare-env`, then one `parallel:` block of five steps, the scripts `pnpm verify` chains: `Format` (`pnpm format:check`, Biome with no writes), `Typecheck (root)` (`pnpm typecheck:root`), `Typecheck (web)` (`pnpm --filter forever-pto-web typecheck`), `Typecheck (docs)` (`pnpm --filter forever-pto-docs typecheck`, which is `astro check`) and `Unit tests` (`pnpm test:ut:coverage`: `apps/web`'s Vitest run with coverage, then the contract suite). After the block, under `if: ${{ !cancelled() }}`, the coverage upload to Codecov from `apps/web/coverage/lcov.info` runs whether the checks passed or not, with `fail_ci_if_error: false`, so a Codecov outage never blocks CI. `pre-push` runs the weaker `pnpm verify:changed`, since the coverage floor cannot hold over a changed-only subset, so a green push is not a promise of a green `Verify`.
+- **changes**: derives from `git diff` whether `apps/web` (or anything the app build depends on, `WEB_PATHS`) was touched and whether the range touches both packages, and exposes both as outputs. It uses `git diff` rather than a filter action because every third-party action here is SHA-pinned and an unpinnable one trips zizmor. It fails open: with no usable base commit it answers `web=true`.
+- **Verify**: `prepare-env`, then one `parallel:` block of five steps, the scripts `pnpm verify` chains: `Format` (`pnpm format:check`, Biome with no writes), `Typecheck (root)` (`pnpm typecheck:root`), `Typecheck (web)` (`pnpm --filter forever-pto-web typecheck`), `Typecheck (docs)` (`pnpm --filter forever-pto-docs typecheck`, which is `astro check`) and `Unit tests` (`pnpm test:ut:coverage`: `apps/web`'s Vitest run with coverage, then the contract suite). Afterwards, under `if: ${{ !cancelled() }}`, the coverage in `apps/web/coverage/lcov.info` goes to Codecov whether the checks passed or not, with `fail_ci_if_error: false`, so a Codecov outage never blocks CI. `pre-push` runs the weaker `pnpm verify:changed`, because the coverage floor cannot hold over a changed-only subset; a green push is not a promise of a green `Verify`.
 - **deploy-production → smoke → release-web → docs-refresh** on a push to `main`, with **smoke → rollback** when the smoke run fails; a dispatch runs the first two and the rollback. `docs-refresh` runs only when `release-web` cut a `web-v*` tag, which a push of commits that release nothing does not. **deploy-development → comment / e2e** on a pull request whose range touches `WEB_PATHS`, after `Verify`. `cross-package-notice` hangs off `changes` on a pull request whose range touches both packages, and upserts an advisory comment.
-- **smoke**: the only job that requests `https://forever-pto.com` itself. `e2e` runs against a per-PR preview and only on `pull_request`, so without this job a push to `main` would deploy production and cut a tag without a single request to the live site. It runs Playwright with `--grep "@smoke"`, no Cloudflare Access headers (production is public) and no `environment:` of its own. The tagged cases all live in `apps/web/e2e/smoke.spec.ts`: the homepage, the 404 route, `robots.txt` and `/.well-known/security.txt`, which has to answer as plain text with a contact and an `Expires` still ahead. That last case also wants the body byte for byte the file in the package's `public/`: a `security.txt` the Cloudflare zone serves itself answers before the Worker, and the case is what notices one standing in for the repository's. It is the same set every sibling repository runs, and the docs site's `smoke` job runs it against `DOCS_SITE_URL`, so a difference between them is drift. They are kept in one file because a failing smoke case rolls production back, so the set that holds that power has to be readable in one place. `/sitemap.xml` and `/api/health` stay out of the set: they answer 403 to a GitHub runner while a browser gets the expected response, so a case on either would revert a deploy that was fine. A case whose result depends on the caller's address is evidence about the caller, not about the deploy. The step passes no `--pass-with-no-tests` on purpose, so a grep that stops matching fails rather than passing quietly, and `release-web` needs this job as well as the deploy, so a tag means the version is live and answering. An empty `WEB_SITE_URL` fails the job's first step, which then rolls back a deploy that was fine, because Playwright would otherwise fall back to `localhost` and pass.
+- **smoke**: the only job that requests `https://forever-pto.com` itself. `e2e` runs against a per-PR preview and only on `pull_request`, so without this job a push to `main` would deploy production and cut a tag without a single request to the live site. It runs Playwright with `--grep "@smoke"`, no Cloudflare Access headers (production is public) and no `environment:` of its own. Four cases carry the tag, all in `apps/web/e2e/smoke.spec.ts`: the homepage, the 404 route, `robots.txt` and `/.well-known/security.txt`. The last has to answer as plain text with a contact and an `Expires` still ahead, and its body has to match the package's `public/` file byte for byte, because a `security.txt` the Cloudflare zone serves itself answers before the Worker and would otherwise stand in for the repository's. The docs site's `smoke` job runs the same four cases against `DOCS_SITE_URL`, so a difference between the two specs is drift. `/sitemap.xml` and `/api/health` stay out of the set: they answer 403 to a GitHub runner while a browser gets the expected response, and a case whose result depends on the caller's address says nothing about the deploy but could roll back one that was fine. The step passes no `--pass-with-no-tests`, so a grep that stops matching fails instead of passing quietly. `release-web` needs this job as well as the deploy, so a tag means the version is live and answering. An empty `WEB_SITE_URL` fails the job's first step, which then rolls back a deploy that was fine, because Playwright would otherwise fall back to `localhost` and pass.
 - **rollback**: runs `wrangler rollback --env production` from `apps/web` when the deploy succeeded and `smoke` failed, so a version that does not answer stops serving rather than only going untagged. Unlike `smoke` it declares `environment: web-production`, because rolling back needs the Cloudflare credentials. The previous version still finds its pages in the R2 cache, because every build writes under its own build id (see below). Nothing runs after a failed rollback: production keeps serving the version that failed its smoke run until someone runs the same command by hand or a fix reaches `main`.
 
-`Check` is what the ruleset gates PRs on, and it is an aggregate: it runs under `always()` and fails when any job it needs failed or was cancelled, while a job skipped by its own `if:` counts as success. That is what makes the preview E2E run a gate without naming it, which could not be done: every job is conditional on the event, and a required check that never reports blocks the merge forever. `Verify` runs unconditionally, because the contract suite reads `GLOSSARY.md`, `docs/adr/` and every guide, so a markdown-only change must not slip past it; only the deploy and release jobs consult `changes`, and deploying is gated on `Verify` too, so a tag means the version is live. Package scoping uses step-level `working-directory`, because a job-level default would not reach a `uses:` step, which is why the two `nick-fields/retry` commands left in the tree, both in `cleanup-development.yml`, begin with an explicit `cd`.
+`Check` is what the ruleset gates PRs on, and it is an aggregate: it runs under `always()` and fails when any job it needs failed or was cancelled, while a job skipped by its own `if:` counts as success. That is how the preview E2E run becomes a gate without being a required check itself: every job is conditional on the event, and a required check that never reports blocks the merge forever. `Verify` runs unconditionally, because the contract suite reads `GLOSSARY.md`, `docs/adr/` and every guide, so a markdown-only change must not slip past it; only the deploy and release jobs consult `changes`. Package scoping uses step-level `working-directory`, because a job-level default would not reach a `uses:` step, which is why the two `nick-fields/retry` commands in the tree, both in `cleanup-development.yml`, begin with an explicit `cd`.
 
 **When a deploy step fails**, `smoke`, `rollback` and `release-web` are skipped, `Check` is red, and production keeps serving the version it had: nothing is activated until wrangler's own deploy succeeds.
 
 ## `_deploy-web.yml`: Deploy web (reusable)
 
-A `workflow_call` workflow shared by both deploy entry points. Inputs: `environment` (GitHub environment name, `web-<stage>`; the wrangler `--env` is its stage half, derived in the workflow so a caller cannot pair `web-production` with `development`), optional `url` (shown on the PR/deployments UI, and passed to the Worker as `NEXT_PUBLIC_SITE_URL`) optional `worker_name` (the per-PR override) and `deploy` (default `true`; `false` builds as a deploy would and ships nothing, and shows no `url`). Steps:
+A `workflow_call` workflow shared by both deploy entry points. Inputs: `environment` (GitHub environment name, `web-<stage>`; the wrangler `--env` is its stage half, derived in the workflow so a caller cannot pair `web-production` with `development`), optional `url` (shown on the PR/deployments UI, and passed to the Worker as `NEXT_PUBLIC_SITE_URL`), optional `worker_name` (the per-PR override) and `deploy` (default `true`; `false` builds as a deploy would and ships nothing, and shows no `url`). Steps:
 
-1. `prepare-env`, then build with `pnpm run cf:build` (OpenNext). The build step receives four GitHub *variables*: `NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_STORAGE_KEY` and `GOOGLE_ANALYTICS_ID` as `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID`. These are baked into the client bundle at build time, and `PUBLIC_ENV` in `next.config.ts` fails the build on a missing storage key or a Stripe key that does not start with `pk_`. It is a plain `run:` step: a build fails deterministically, so wrapping it in `nick-fields/retry` only burned three identical attempts before reporting the same type error.
+1. `prepare-env`, then build with `pnpm run cf:build` (OpenNext). The build step receives four GitHub *variables*: `NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_STORAGE_KEY` and `GOOGLE_ANALYTICS_ID` as `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID`. These are baked into the client bundle at build time, and `PUBLIC_ENV` in `next.config.ts` fails the build on a missing storage key or a Stripe key that does not start with `pk_`. It is a plain `run:` step: a build fails deterministically, so a retry wrapper would only repeat the same type error.
 2. With `deploy` set, a Node guard fails the job if any required runtime secret is missing, rather than deploying a half-configured Worker, and writes them, plus `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` when it is set, as JSON to a file under `$RUNNER_TEMP`. See [secrets](/infra/secrets/).
 3. With `deploy` set, `pnpm exec wrangler deploy --env <stage> --message <sha>-<event> --secrets-file <file>`, adding `--name <worker_name>` and `--var NEXT_PUBLIC_SITE_URL:<url>` when set; the name override is what creates a fresh per-PR Worker. The secrets ride the deploy, so they land on the same Worker version as the code that reads them, where a separate `wrangler secret bulk` call would make a second version and leave a window in which the new code runs against the old values.
 4. An `if: always()` step removes the file.
@@ -97,32 +95,20 @@ config:
 ---
 sequenceDiagram
   autonumber
-  participant CI as ci.yml on main
-  participant DW as _deploy-web.yml
-  participant WR as wrangler deploy
-  participant ON as opennextjs-cloudflare deploy
-  participant R2 as R2 incremental cache
-  participant CF as Cloudflare Workers
-  participant SM as smoke
-  CI->>DW: deploy-production, after changes and Verify
-  DW->>DW: prepare-env, then cf:build with the NEXT_PUBLIC_* variables
-  DW->>DW: Collect the Worker secrets into RUNNER_TEMP, or fail here
-  DW->>WR: wrangler deploy --env production --message sha-event --secrets-file --var NEXT_PUBLIC_SITE_URL:WEB_SITE_URL
-  WR->>ON: an OpenNext project, so hand off with the same arguments
-  ON->>R2: populate the remote cache: every prerendered page under incremental-cache/buildId
-  alt the bucket write fails
-    ON-->>DW: non-zero exit, nothing uploaded, production untouched
-  else the cache is populated
-    ON->>CF: wrangler deploy again with OPEN_NEXT_DEPLOY set, re-spawned through a shell
-    CF-->>DW: a new version of forever-pto, live on forever-pto.com/*
+  participant DW as deploy-web
+  participant ON as OpenNext
+  participant R2
+  participant CF as Workers
+  DW->>DW: cf:build, secrets file
+  DW->>ON: wrangler deploy hands off
+  ON->>R2: write pages
+  alt write fails
+    ON-->>DW: exit 1, no upload
+  else cache populated
+    ON->>CF: wrangler deploy
+    CF-->>DW: version live
   end
-  DW->>DW: remove the secrets file, always
-  CI->>SM: the @smoke cases against WEB_SITE_URL
-  alt smoke passes on a push (a workflow_dispatch stops here)
-    SM-->>CI: release-web runs semantic-release, and if it cut web-vX.Y.Z, docs-refresh dispatches docs.yml
-  else smoke fails
-    SM-->>CI: rollback runs wrangler rollback --env production
-  end
+  DW->>DW: remove secrets file
 ```
 
 - **The cache population is part of the deploy.** `opennextjs-cloudflare deploy` provisions the bucket bound as `NEXT_INC_CACHE_R2_BUCKET` in the chosen environment if it does not exist, then writes every prerendered page into it under `incremental-cache/<build id>/`. A failed write throws, so the job fails before any version is uploaded and the live Worker is untouched. The pages the Worker serves come from this step: when the keys it writes and the keys Next reads disagree, every page answers 404 ([caching](/architecture/caching/)).
@@ -146,25 +132,13 @@ config:
   layout: dagre
 ---
 flowchart TD
-  PUSH["pull request opened or pushed"] --> CIW & DOCW & TITLE & DEPR & ZZ
-  CIW["ci.yml: changes, Verify"] -->|"a WEB_PATHS change"| BOT{"run started by Dependabot?"}
-  BOT -- "no" --> DD["deploy-development: the pr-n app preview Worker"]
-  BOT -- "yes" --> BUILD["deploy-development with deploy: false: the Worker built, nothing deployed"]
-  DD --> CMT["comment: the preview URL"]
-  DD --> E2E["e2e: Playwright through the Access token"]
-  DOCW["docs.yml: changes, build"] -->|"a DOCS_PATHS change, not Dependabot"| DPV["preview: the pr-n docs preview Worker and its comment"]
-  TITLE["commit-message.yml: Lint the pull request title"]
-  DEPR["dependency-review.yml"]
-  ZZ["zizmor.yml"]
-  CIW & E2E & BUILD --> CK["Check"]
-  DOCW & DPV --> CKD["Check (docs)"]
-  CK & CKD & TITLE & DEPR & ZZ --> REQ{"every required check green?"}
-  REQ -- "no" --> FIX["push a fix: the PR run in progress is cancelled, the same Worker names are redeployed"]
+  PUSH["pull request opened or pushed"] --> CIW["ci.yml and docs.yml: previews, checks"]
+  CIW --> REQ{"required checks green?"}
+  REQ -- "no" --> FIX["push a fix"]
   FIX --> PUSH
-  REQ -- "yes" --> MERGE["squash merge: the title is the commit"]
+  REQ -- "yes" --> MERGE["squash merge"]
   MERGE --> MAIN["push to main: deploy, smoke, release"]
-  MERGE & CLOSED["closed without merging"] --> CLEAN["cleanup-development.yml: cleanup-web and cleanup-docs, queued behind the PR's runs, skipped on a Dependabot run"]
-  SWEEP["weekly sweep, and on dispatch"] -.-> CLEAN
+  MERGE & CLOSED["closed unmerged"] --> CLEAN["cleanup deletes both Workers"]
 ```
 
 A docs-only pull request takes the same path with the app's deploy, comment and E2E skipped by `changes`, and an app-only one skips the docs `build` and `preview`; the two aggregates report either way. Renovate's pull requests are branches of this repository, so they get every secret and preview like any other; a fork's does not, and neither would a Dependabot one, see [limits](#limits-forks-and-dependabot).
@@ -177,7 +151,7 @@ Each job declares its **own** group, with `cancel-in-progress: false`, spelled f
 
 ## `docs.yml`: Docs
 
-CI/CD for this documentation site. It runs on every push and pull request, like `ci.yml`, and a `changes` job of its own gates `build` on `DOCS_PATHS`: `apps/docs/**` plus everything the site reaches into the app for, `apps/web/src/ui/**`, `apps/web/package.json` (the version the site displays), `apps/web/src/domain/calendar/types.ts`, `apps/web/src/domain/calendar/const.ts` and `apps/web/src/infrastructure/i18n/locales.ts`. It is not path-filtered on that list, because a filtered workflow does not report on a pull request outside its paths and so could never be a required check; a `Check (docs)` aggregate reports on every pull request and is what the ruleset names. Its `build` job runs a `parallel:` block of its own: the typecheck beside the Playwright browser install. It also answers `workflow_dispatch`, which is how `ci.yml`'s `docs-refresh` job rebuilds the site after a web release: the release commit carries `[skip ci]`, so without the dispatch the published site keeps advertising the previous version. It also carries `release-docs`, which runs after the docs deploy **and** its `smoke` job, so a `docs-v*` tag only exists once the site is live and answering, and `rollback`, which reverts the Worker when that smoke run fails. Build & test, versioned PR previews and production deploy of the `forever-pto-docs` Worker; the full walkthrough and its diagram are on [docs CI](/infra/docs-ci/).
+CI/CD for this documentation site: build and test, a versioned PR preview, the production deploy, its smoke run, the rollback and the release of the `forever-pto-docs` Worker. It runs on every push and pull request, and its own `changes` job gates `build` on `DOCS_PATHS`: `apps/docs/**` plus everything the site reaches into the app for (`apps/web/src/ui/**`, `apps/web/package.json`, the version the site displays, `apps/web/src/domain/calendar/types.ts`, `apps/web/src/domain/calendar/const.ts` and `apps/web/src/infrastructure/i18n/locales.ts`), `pnpm-lock.yaml`, `docs.yml` itself and `.github/actions/`. The workflow is not path-filtered, because a filtered workflow does not report on a pull request outside its paths and so could never be a required check; the `Check (docs)` aggregate reports on every pull request and is what the ruleset names. It also answers `workflow_dispatch`, which treats the run as a docs change and is how `ci.yml`'s `docs-refresh` rebuilds the site after a web release. `release-docs` runs after the docs deploy **and** its `smoke` job, so a `docs-v*` tag only exists once the site is live and answering, and `rollback` reverts the Worker when that smoke run fails. The full walkthrough and its diagram are on [docs CI](/infra/docs-ci/).
 
 ## `commit-message.yml`: Commit Message
 
@@ -206,7 +180,7 @@ The composite action every job that installs dependencies calls first, after its
 3. **Setup Node.js** with `actions/setup-node`, `node-version-file: .nvmrc` and the pnpm store cache.
 4. **Install dependencies** with `pnpm install --frozen-lockfile`, **unfiltered**: the docs demos compile app sources whose bare imports resolve from `apps/web/node_modules`, so a filtered install breaks the docs build. The contract suite holds it to being the only setup step with an unfiltered install.
 
-Jobs call it as `uses: $/.github/actions/prepare-env`, and `ci.yml` calls the reusable deploy as `uses: $/.github/workflows/_deploy-web.yml`. The `$/` prefix names a path in the repository the workflow itself runs from, at the commit being run, which is GitHub's self-repository reference: it resolves without depending on the checkout, where the older `./` form is relative to the job's workspace and needs the checkout step to have run, into the default path, first. A change under `.github/actions/` matches both `WEB_PATHS` and `DOCS_PATHS`, so it rebuilds and redeploys both packages.
+Jobs call it as `uses: $/.github/actions/prepare-env`, and `ci.yml` calls the reusable deploy as `uses: $/.github/workflows/_deploy-web.yml`. The `$/` prefix names a path in the repository the workflow itself runs from, at the commit being run, which is GitHub's self-repository reference: it resolves without depending on the checkout, where the `./` form is relative to the job's workspace and needs the checkout step to have run first. A change under `.github/actions/` matches both `WEB_PATHS` and `DOCS_PATHS`, so it rebuilds and redeploys both packages.
 
 ## Rulesets and required checks
 

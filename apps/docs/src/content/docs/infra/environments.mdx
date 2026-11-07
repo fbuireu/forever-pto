@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-The app runs as a Cloudflare Worker built with OpenNext. The kinds of environment are all defined by the `[env.*]` blocks in `wrangler.toml`: previews are not a wrangler environment of their own, they are the `development` environment deployed under a different Worker name.
+The app runs as a Cloudflare Worker built with OpenNext. The `[env.*]` blocks in `wrangler.toml` define two wrangler environments, `development` and `production`. A preview is not an environment of its own: it is the `development` environment deployed under a different Worker name.
 
 | Environment | Worker | URL | Access |
 | --- | --- | --- | --- |
@@ -15,7 +15,7 @@ The app runs as a Cloudflare Worker built with OpenNext. The kinds of environmen
 
 ## Production
 
-Deployed by the `deploy-production` job of `.github/workflows/ci.yml` on every push to `main`, gated on the `Verify` job passing and on the `changes` job finding an `apps/web` change, and on a manual `workflow_dispatch` of the same workflow, which is the only way to redeploy it by hand (see [release](/infra/release/) and [workflows](/infra/workflows/)). The Worker is bound to the `forever-pto.com` zone via a route pattern in `wrangler.toml`, a zone route, not a Workers custom domain. It uses the production R2 incremental-cache bucket, the rate-limiter binding and the Turso database (see [Cloudflare stack](/infra/cloudflare/)).
+The `deploy-production` job of `.github/workflows/ci.yml` deploys it on every push to `main` that passes `Verify` and where `changes` finds an `apps/web` change. A manual `workflow_dispatch` of the same workflow is the only way to redeploy it by hand (see [workflows](/infra/workflows/)). The Worker is bound to the `forever-pto.com` zone via a route pattern in `wrangler.toml`, a zone route, not a Workers custom domain. It uses the production R2 incremental-cache bucket, the rate-limiter binding and the Turso database (see [Cloudflare stack](/infra/cloudflare/)).
 
 ## Development (stable)
 
@@ -37,7 +37,7 @@ The `comment` job runs once the deploy has succeeded and upserts one sticky comm
 
 ### Behind Cloudflare Access
 
-Every preview answers only through Cloudflare Zero Trust Access, an application configured **in the Zero Trust dashboard, not in `wrangler.toml`** or in any workflow, so a browser gets an Access login first and nothing crawls a preview. The repository holds only the service token CI uses to get through (`CF_ACCESS_CLIENT_ID` / `CF_ACCESS_CLIENT_SECRET`, secrets on the `web-development` environment); the hostname patterns the application covers are on the [Cloudflare stack](/infra/cloudflare/) page.
+Every preview answers only through Cloudflare Zero Trust Access, an application configured in the Zero Trust dashboard, not in `wrangler.toml` or any workflow. A browser gets an Access login first, so nothing crawls a preview. The repository holds only the service token CI uses to get through (`CF_ACCESS_CLIENT_ID` / `CF_ACCESS_CLIENT_SECRET`, secrets on the `web-development` environment); the [Cloudflare stack](/infra/cloudflare/) page lists the hostname patterns the application covers.
 
 ### E2E against the preview
 
@@ -45,7 +45,7 @@ The `e2e` job runs once the deploy has succeeded, in the `web-development` envir
 
 ### Destroyed
 
-`.github/workflows/cleanup-development.yml` fires on `pull_request: closed` (merged or not) and its `cleanup-web` job runs `wrangler delete pr-<n>-forever-pto-development --force`, retried up to five times, with an answer that the Worker does not exist counted as done, since a pull request that never touched the app never had one. That single command is the entirety of teardown: the Worker and its attached secrets disappear. It queues behind the pull request's own CI run, in the concurrency group `CI-refs/pull/<n>/merge` that `ci.yml` computes for it, so the E2E job is never left driving a Worker that no longer exists.
+`.github/workflows/cleanup-development.yml` fires on `pull_request: closed` (merged or not) and its `cleanup-web` job runs `wrangler delete pr-<n>-forever-pto-development --force`, retried up to five times, counting *does not exist* as done, since a pull request that never touched the app never had one. That single command is the entirety of teardown: the Worker and its attached secrets disappear. It queues behind the pull request's own CI run, in the concurrency group `CI-refs/pull/<n>/merge` that `ci.yml` computes for it, so the E2E job is never left driving a Worker that no longer exists.
 
 ### The weekly sweep
 
@@ -64,31 +64,44 @@ config:
   layout: dagre
 ---
 flowchart TD
-  subgraph pr ["Pull request"]
-    O["opened, reopened or synchronized"] --> GATE{"changes: a WEB_PATHS path in the range,<br/>and Verify passed?"}
-    GATE -- no --> NONE["no app preview:<br/>deploy-development, comment and e2e skipped"]
-    GATE -- yes --> DD["ci.yml: deploy-development"]
-    DD --> RW["_deploy-web.yml"]
-    RW --> B["cf:build, OpenNext"]
-    B --> W["wrangler deploy --env development<br/>--name pr-n-forever-pto-development<br/>--secrets-file"]
-    W --> POP["opennextjs-cloudflare deploy:<br/>pages into the shared dev bucket"]
-    POP --> C["sticky PR comment with the preview URL"]
-    POP --> E["e2e: Playwright through an Access service token"]
-  end
-  subgraph close ["Pull request closed"]
-    X["cleanup-development.yml: cleanup-web, queued behind the CI run"] --> DEL["wrangler delete --force"]
-    DEL --> GONE["Worker and its secrets gone,<br/>shared dev R2 and Turso untouched"]
-  end
-  SWEEP["sweep: Mondays at 03:00 UTC, or on dispatch"] -.->|"a preview whose pull request is closed"| DEL
-  subgraph main ["push to main, or workflow_dispatch"]
-    P["changes + Verify"] --> DP["deploy-production"] --> RW2["_deploy-web.yml"]
-    RW2 --> W2["wrangler deploy --env production"] --> POP2["pages into the production bucket"]
-    POP2 --> LIVE["forever-pto on forever-pto.com/*"]
-    LIVE --> SM["smoke, then release-web on a push,<br/>or rollback when it fails"]
-  end
-  HAND["by hand, from apps/web:<br/>wrangler deploy --env development"] --> STABLE["forever-pto-development"]
+  O["opened, reopened or synchronized"] --> GATE{"a WEB_PATHS path in the range,<br/>and Verify passed?"}
+  GATE -- no --> NONE["no app preview"]
+  GATE -- yes --> DD["deploy-development via _deploy-web.yml"]
+  DD --> W["wrangler deploy --env development<br/>--name pr-n-forever-pto-development"]
+  W --> POP["pages into the shared dev bucket"]
+  POP --> C["PR comment"] & E["e2e through Access"]
+```
+
+When the pull request closes, the Worker goes and the shared bindings stay:
+
+```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
+flowchart TD
+  X["cleanup-development.yml: cleanup-web, queued behind the CI run"] --> DEL["wrangler delete --force"]
+  SWEEP["sweep: Mondays 03:00 UTC, or dispatch"] -.->|"closed pull request"| DEL
+  DEL --> GONE["Worker and secrets gone, shared R2 and Turso untouched"]
+```
+
+Production and the stable development Worker deploy as follows:
+
+```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+---
+flowchart TD
+  P["push to main or workflow_dispatch: changes + Verify"] --> DP["deploy-production"]
+  DP --> W2["wrangler deploy --env production"] --> POP2["pages into the production bucket"]
+  POP2 --> LIVE["forever-pto on forever-pto.com/*"]
+  LIVE --> SM["smoke, then release-web on a push, or rollback"]
+  HAND["by hand from apps/web:<br/>wrangler deploy --env development"] --> STABLE["forever-pto-development"]
 ```
 
 ## The docs site's previews (ephemeral environments)
 
-This documentation site previews the same way, as an ephemeral environment of its own: one Worker per pull request that changes a `DOCS_PATHS` path, named `pr-<n>-forever-pto-docs-development`, behind the same Access application, deleted by its own `cleanup-docs` job when the pull request closes and caught by the same weekly sweep. What differs is what it does *not* need: no bindings, no `--secrets-file`, no `--var` override, and no second build, since it ships the `docs-dist` artifact the `build` job already produced and tested, so no E2E runs against the preview itself. [Docs CI](/infra/docs-ci/#pr-previews-ephemeral-environments) has each step.
+This documentation site previews the same way: one Worker per pull request that changes a `DOCS_PATHS` path, named `pr-<n>-forever-pto-docs-development`, behind the same Access application, deleted by its own `cleanup-docs` job when the pull request closes and caught by the same weekly sweep. What differs is what it does *not* need: no bindings, no `--secrets-file`, no `--var` override, and no second build, since it ships the `docs-dist` artifact the `build` job already produced and tested, so no E2E runs against the preview itself. [Docs CI](/infra/docs-ci/#pr-previews-ephemeral-environments) has each step.
