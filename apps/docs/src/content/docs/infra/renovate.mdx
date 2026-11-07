@@ -10,7 +10,7 @@ Renovate is the repo's dependency bot, configured in `.github/renovate.json`, an
 ## Schedule and pacing
 
 - Updates run **on the 1st and 15th of the month**, giving predictable batches instead of a constant PR drizzle.
-- `minimumReleaseAge` (currently a few days, see the config) skips freshly published versions, buying time for upstream regressions and supply-chain attacks to surface. The pnpm workspace applies its own, independent `minimumReleaseAge` at install time in `pnpm-workspace.yaml`.
+- `minimumReleaseAge` (4 days) skips freshly published versions, buying time for upstream regressions and supply-chain attacks to surface. The pnpm workspace applies its own, independent `minimumReleaseAge` at install time in `pnpm-workspace.yaml`.
 - Vulnerability alerts are exempt from the schedule (`"at any time"`) and get `security` / `vulnerability` labels.
 
 ## Pin everything
@@ -34,7 +34,7 @@ A GitHub Actions update also carries `ci`, beside its update-type label, so a pi
 
 Automerge uses squash (`automergeStrategy: squash`), which matters for [releases](/infra/release/): Renovate's PR titles are conventional (`chore(deps): …` / `fix(deps): …`), set explicitly with `semanticCommits: enabled` rather than left to its detection, so most dependency merges do not cut a release.
 
-The ruleset on `main` requires no approval, only the checks, so Renovate merges through GitHub's auto-merge on its own once they are green, and no workflow submits an approval first. Automerged updates still pass the full lint/typecheck/test gauntlet, the preview E2E run, and get a [preview deploy](/infra/environments/).
+The ruleset on `main` requires no approval, only the checks, so Renovate merges through GitHub's auto-merge on its own once they are green, and no workflow submits an approval first. An automerged update still passes the full checks and the preview E2E run, and gets a [preview deploy](/infra/environments/).
 
 ## Lockfile maintenance
 
@@ -45,7 +45,8 @@ The ruleset on `main` requires no approval, only the checks, so Renovate merges 
 - Node is constrained to even (LTS-track) majors via an `allowedVersions` regex on the `node` dep.
 - `pnpm` updates travel in a `pnpm` group of their own, and `node` in a `node` group, so the installer and the runtime each move in one pull request.
 - **`vaul` never automerges.** It is the one patched dependency, keyed with its version in `pnpm-workspace.yaml`'s `patchedDependencies`, so a bump fails the install until someone reads the upstream diff and regenerates the patch, or drops it once upstream carries the fix; its rule turns `automerge` off and adds a `patched-dependency` label, and the contract suite asserts every patch has such a rule.
+- **A docs dependency bump is typed `docs`.** A rule on `apps/docs/package.json` sets `semanticCommitType: docs` and the `docs` label, so the pull request title says what attribution already books: a change to `apps/docs`.
 - Assignees and reviewers come from `CODEOWNERS` (`assigneesFromCodeOwners` / `reviewersFromCodeOwners`).
 - The dependency dashboard issue (`:dependencyDashboard`) lists pending/blocked updates.
 
-Since `apps/docs/` joined the pnpm workspace, Renovate also manages this site's dependencies under the same policy, and a docs dependency PR runs docs CI through the `DOCS_PATHS` gate in `docs.yml`'s `changes` job (see [docs CI](/infra/docs-ci/)).
+Renovate manages this site's dependencies under the same policy. A docs dependency PR runs docs CI through the `DOCS_PATHS` gate in `docs.yml`'s `changes` job (see [docs CI](/infra/docs-ci/)).
