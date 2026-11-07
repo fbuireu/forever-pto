@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.16.1](https://github.com/fbuireu/forever-pto/compare/web-v1.16.0...web-v1.16.1) (2026-11-07)
+
+
+### Bug Fixes
+
+* **web:** name the planner's progress bars, keep a closed collapsible out of the tab order and lift banner titles to AA ([622ac61](https://github.com/fbuireu/forever-pto/commit/622ac613a3f69ebc4bd1a3fbe8d254ec91c676ba))
+
 # [forever-pto-web-v1.16.0](https://github.com/fbuireu/forever-pto/compare/web-v1.15.19...web-v1.16.0) (2026-11-06)
 
 
