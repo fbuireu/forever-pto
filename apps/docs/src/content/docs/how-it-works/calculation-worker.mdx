@@ -16,39 +16,38 @@ This is a Web Worker in the browser, not a Cloudflare Worker. Nothing in that fo
 config:
   look: handDrawn
   layout: dagre
+  sequence:
+    wrap: true
+    width: 110
+    actorMargin: 20
 ---
 sequenceDiagram
   autonumber
   actor V as Visitor
-  participant SB as Sidebar or Holiday table
-  participant FS as filters store
   participant CL as CalendarList
   participant HS as holidays store
-  participant HK as useCalculationsWorker
+  participant HK as worker hook
   participant WK as worker.ts
-  V->>SB: changes the budget, a Country, the year, the Strategy …
-  SB->>FS: setPtoDays, setCountry, setYear, setStrategy …
-  FS-->>CL: re-render with the new inputs
-  opt Country, Region, year, Carry-over Months or locale changed
-    CL->>HS: fetchHolidays, the latest call wins
-    HS-->>CL: Holidays and the holidaysKey they were fetched for
+  V->>CL: changes an input
+  opt a Holiday input changed
+    CL->>HS: fetchHolidays, latest call wins
+    HS-->>CL: Holidays + holidaysKey
   end
-  CL->>CL: plan only when a budget, Holidays and months exist and holidaysKey matches the screen
-  CL->>HK: triggerCalculation(params)
+  CL->>CL: plan only when budget, Holidays<br/>and months exist and the key matches
+  CL->>HK: triggerCalculation
   alt a request is in flight
-    HK->>HK: hold this one, replacing any held before it
-  else nothing is running
-    HK->>HS: setCalculating(true): the calendar goes busy
-    HK->>WK: CALCULATE_SUGGESTIONS with a new requestId, every Date as an ISO string
-    WK->>WK: runPlanningPipeline, synchronously, off the main thread
-    WK-->>HK: CALCULATE_SUGGESTIONS_RESULT, or WORKER_ERROR
+    HK->>HK: hold this one, replacing any held
+  else idle
+    HK->>HS: setCalculating(true)
+    HK->>WK: CALCULATE_SUGGESTIONS + requestId
+    WK-->>HK: RESULT or WORKER_ERROR
     alt a request is held
-      HK->>WK: drop this reply and post the held request
+      HK->>WK: drop this reply, post the held one
     else the reply is the latest
-      HK->>HS: setCalculating(false): the calendar is clickable again
-      opt a CALCULATE_SUGGESTIONS_RESULT
+      HK->>HS: setCalculating(false)
+      opt a result
         HK->>HS: setCalculationResult
-        HS-->>V: calendar, budget readout, panel and Summary repaint
+        HS-->>V: calendar, panel, Summary repaint
       end
     end
   end
@@ -89,19 +88,19 @@ config:
 ---
 stateDiagram-v2
   [*] --> NoWorker
-  NoWorker --> Running: triggerCalculation spawns the worker
-  Idle --> Running: triggerCalculation reuses it
-  Running --> Holding: triggerCalculation while a run is in flight
-  Holding --> Holding: a later request replaces the held one
-  Holding --> Running: the reply arrives and is dropped, the held request is posted
-  Running --> Idle: RESULT or WORKER_ERROR with the current requestId
-  Running --> Running: a message with a stale requestId is ignored
-  Running --> Idle: onmessageerror, the reply could not be read
-  Running --> NoWorker: onerror terminates and drops the worker
-  Idle --> [*]: unmount terminates the worker
+  NoWorker --> Running: trigger spawns it
+  Idle --> Running: trigger reuses it
+  Running --> Holding: trigger while in flight
+  Holding --> Holding: a later request<br/>replaces the held one
+  Holding --> Running: reply dropped,<br/>held request posted
+  Running --> Idle: RESULT or WORKER_ERROR<br/>with the current id
+  Running --> Running: stale id ignored
+  Running --> Idle: onmessageerror
+  Running --> NoWorker: onerror drops the worker
+  Idle --> [*]: unmount terminates it
 ```
 
-**One worker, reused, and the latest request wins.** The hook spawns the worker on its first calculation, with `new Worker(new URL('../../infrastructure/workers/worker', import.meta.url))`, the shape the bundler detects statically to emit a worker chunk, and keeps it for the life of the hook. It does not terminate the in-flight worker and spawn a fresh one on every trigger. The handler is fully synchronous, so a reused worker cannot be preempted and `terminate()` is the only thing that cancels a run, but cancelling costs more than it saves: a fresh worker starts cold, without its JIT or its cached `Intl` formatters, and measured over the real bundle it answers in about 270 ms where a warm one answers in about 60, so every recalculation would pay the difference.
+**One worker, reused, and the latest request wins.** The hook spawns the worker on its first calculation, with `new Worker(new URL('../../infrastructure/workers/worker', import.meta.url))`, the shape the bundler detects statically to emit a worker chunk, and keeps it for the life of the hook. It does not terminate the in-flight worker and spawn a fresh one on every trigger. The handler is fully synchronous, so a reused worker cannot be preempted and `terminate()` is the only thing that cancels a run, but cancelling costs more than it saves: a fresh worker starts cold, without its JIT or its cached `Intl` formatters, so every recalculation would pay the difference.
 
 So nothing cancels a run, and the hook limits how many start instead. A request made while one is in flight is **held**, and a later one replaces it, so dragging the PTO slider through a dozen values runs the first and the last and nothing in between. When the in-flight reply arrives with a request waiting, the reply is dropped and the waiting request is posted, so only the reply to the latest request ever reaches the store. `requestId` is a counter rather than a timestamp, because the replies of a reused worker are told apart by their id alone. A worker whose `onerror` fires is terminated and dropped, and the next request, a held one included, spawns a fresh one.
 
@@ -116,22 +115,25 @@ One request, one reply, correlated by the `requestId`:
 config:
   look: handDrawn
   layout: dagre
+  sequence:
+    wrap: true
+    width: 110
+    actorMargin: 20
 ---
 sequenceDiagram
   autonumber
-  participant HK as useCalculationsWorker
+  participant HK as worker hook
   participant WK as worker.ts
   participant PL as runPlanningPipeline
-  HK->>WK: CALCULATE_SUGGESTIONS { requestId, payload }
+  HK->>WK: CALCULATE_SUGGESTIONS<br/>{ requestId, payload }
   WK->>WK: drop any other message type
-  WK->>WK: deserialise: fromStoredInstant, isStrategy, isPreferredMonths, isLocale
+  WK->>WK: deserialise and narrow:<br/>isStrategy, isPreferredMonths, isLocale
   WK->>PL: RunPlanningPipelineParams
-  PL->>PL: clear the caches, window, pseudo-Holidays, budget, Bridges, Strategy, Alternatives, Metrics
-  PL-->>WK: PlanningResult, planned or unplanned, always measured
+  PL-->>WK: PlanningResult, always measured
   alt the run returns
-    WK-->>HK: CALCULATE_SUGGESTIONS_RESULT { requestId, payload: { suggestion, alternatives } }
+    WK-->>HK: RESULT { requestId,<br/>suggestion, alternatives }
   else the run throws
-    WK-->>HK: WORKER_ERROR { requestId, error: String(err) }
+    WK-->>HK: WORKER_ERROR { requestId, error }
   end
 ```
 

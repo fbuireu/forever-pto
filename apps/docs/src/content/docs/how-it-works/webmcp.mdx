@@ -1,7 +1,6 @@
 ---
 title: WebMCP and .well-known
 description: Browser-side Model Context tools via navigator.modelContext, plus the .well-known endpoints for the API catalog, MCP server card and agent-skills index.
-
 sidebar:
   order: 13
 ---
@@ -19,15 +18,14 @@ Both tools take no input (`inputSchema: { type: 'object', properties: {} }`) and
 
 ## `.well-known` endpoints
 
-`apps/web/src/app/.well-known/[...slug]/route.ts` is a catch-all GET handler with an explicit route table; unknown slugs get a 404. `/.well-known/security.txt` is not in the table: it is a static file in `apps/web/public/`, answered as `text/plain` before the handler runs. Each handler lives in `apps/web/src/infrastructure/well-known/` and receives the base URL from the Cloudflare context (`NEXT_PUBLIC_SITE_URL`). All of them respond with `Cache-Control: public, max-age=86400`.
+`apps/web/src/app/.well-known/[...slug]/route.ts` is a catch-all GET handler with an explicit route table; unknown slugs get a 404. `/.well-known/security.txt` is not in the table: it is a static file in `apps/web/public/`, answered as `text/plain` before the handler runs. Each builder lives in `apps/web/src/infrastructure/well-known/` and receives the base URL from the Cloudflare context (`NEXT_PUBLIC_SITE_URL`). All of them respond with `Cache-Control: public, max-age=86400`.
 
 | Path | Builder | What it serves |
 | --- | --- | --- |
 | `/.well-known/api-catalog` | `apiCatalog.ts` | An RFC 9727 API catalog (`application/linkset+json`) pointing `service-doc` and `status` relations at `/api/health`. |
 | `/.well-known/mcp/server-card.json` | `mcpServerCard.ts` | An MCP server card (SEP-1649): server name, description, the app version read from `apps/web/package.json` (the root manifest stays at `0.0.0`), and capability flags (currently all `false`, since the site is not a remote MCP server and tools are browser-side only). |
-| `/.well-known/agent-skills/index.json` | `agentSkillsIndex.ts` | An agentskills.io-schema index advertising the agent-facing features as named skills: `markdown-negotiation`, `api-catalog`, `mcp-server-card` and `webmcp`, each with a `SKILL.md` URL. |
+| `/.well-known/agent-skills/index.json` | `agentSkillsIndex.ts` | An agentskills.io-schema index advertising the agent-facing features as named entries: the skills `markdown-negotiation`, `api-catalog`, `mcp-server-card` and `webmcp`, and the feature `calendar-export`. The `api-catalog` and `mcp-server-card` entries link to their documents. |
 
 ## Why this shape
 
-The documents make the site self-describing: an agent that lands anywhere can walk `/.well-known/` to discover that Markdown renditions exist, that health is machine-checkable, and that in-page tools are available, without any of it being hard-coded into the agent.
- Version numbers in the payloads come from `package.json` at build time, so they track releases automatically.
+The documents make the site self-describing: an agent that lands anywhere can walk `/.well-known/` to discover that Markdown renditions exist, that health is machine-checkable and that in-page tools are available. Version numbers in the payloads come from `apps/web/package.json` at build time.

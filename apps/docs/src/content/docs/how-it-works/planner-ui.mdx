@@ -14,28 +14,23 @@ config:
   layout: dagre
 ---
 flowchart TB
-  subgraph layout [planner/layout.tsx]
-    SB[AppSidebar<br/>inputs and tools]
-    TITLE[SiteTitle + SiteSubtitle<br/>year, quick tour]
-    subgraph page [planner/page.tsx, in render order]
-      HL[HolidaysList<br/>tabs per Holiday Variant]
-      MB[ManagementBar, sticky<br/>PlannerPanel inline or in a drawer]
-      CL[CalendarList<br/>one Calendar per window month]
-      LG[Legend]
-      SM[Summary<br/>metric cards + charts]
-      RM[Roadmap]
-      CT[Contact]
-    end
-    DN[Donate popover]
-    PM[PremiumRequiredModal]
-  end
-  FS[(filters store)] --> SB
+  FS[(filters store)] --> SB["AppSidebar:<br/>inputs and tools"]
   SB --> FS
   FS --> CL
-  CL -->|fetchHolidays · triggerCalculation| HS[(holidays store)]
+  subgraph page [planner/page.tsx, in render order]
+    HL["HolidaysList:<br/>tab per Holiday Variant"]
+    MB["ManagementBar, sticky:<br/>PlannerPanel"]
+    CL["CalendarList:<br/>a Calendar per month"]
+    LG[Legend]
+    SM["Summary:<br/>cards + charts"]
+    RM[Roadmap]
+    CT[Contact]
+    HL ~~~ MB ~~~ CL ~~~ LG ~~~ SM ~~~ RM ~~~ CT
+  end
+  CL -->|"fetchHolidays,<br/>triggerCalculation"| HS[(holidays store)]
   HS --> HL & MB & CL & SM
-  PS[(premium store)] --> PM
-  PS --> HL & SM
+  PS[(premium store)] --> HL & SM
+  PS --> PM[PremiumRequiredModal]
 ```
 
 ## The sidebar
@@ -69,23 +64,26 @@ Each step carries a `data-tutorial` anchor from `TUTORIAL_ANCHOR`, which is what
 config:
   look: handDrawn
   layout: dagre
+  sequence:
+    wrap: true
+    width: 110
+    actorMargin: 20
 ---
 sequenceDiagram
   participant F as filters store
   participant CL as CalendarList
   participant H as holidays store
-  participant W as useCalculationsWorker
-  F-->>CL: year / carryOverMonths changed
-  CL->>H: pruneDaysOutsideWindow, so a Manual Day outside the new window is dropped
-  F-->>CL: country / region / year / carryOverMonths / locale changed
+  participant W as worker hook
+  F-->>CL: year or carryOverMonths changed
+  CL->>H: pruneDaysOutsideWindow
+  F-->>CL: country, region, year,<br/>carryOverMonths or locale changed
   CL->>H: fetchHolidays
-  H-->>CL: holidays and holidaysKey updated
-  Note over CL: canCalculate = ptoDays > 0 ∧ holidays.length > 0 ∧ months.length > 0
-  Note over CL: holidaysAreCurrent = holidaysKey names the filters on screen
-  CL->>W: triggerCalculation when both hold (also when planRevision bumps)
+  H-->>CL: holidays + holidaysKey
+  Note over CL: canCalculate: budget > 0, Holidays,<br/>months. holidaysAreCurrent: key matches
+  CL->>W: triggerCalculation when both hold<br/>(also when planRevision bumps)
   W-->>H: setCalculationResult
-  H-->>CL: repaint, and the a11y status reads "plan updated"
-  Note over CL,H: canCalculate false while a Suggestion exists → clearCalculation
+  H-->>CL: repaint, status reads "plan updated"
+  Note over CL,H: canCalculate false with a Suggestion<br/>on screen: clearCalculation
 ```
 
 `planRevision` is a counter the store bumps when a user action should re-plan without any input having changed: applying an Alternative, or resetting the hand edits. The effect lists it as a dependency and never reads it, which is the one place in the file Biome is told to look away.
@@ -145,16 +143,18 @@ Each row shows the date, the localised name and whether it is a Weekday Holiday 
 
 ## Summary
 
-`Summary` (`apps/web/src/ui/modules/pages/planner/Summary.tsx`) renders the Metrics of the applied plan. Four headline cards are free: PTO Days, Holidays in the window, Effective Days and Gain. The rest are Premium, each wrapped in `PremiumFeature` with its own `PremiumFeatureId` so the Premium modal can name the feature that was clicked:
+`Summary` (`apps/web/src/ui/modules/pages/planner/Summary.tsx`) renders the Metrics of the applied plan. PTO Days, Holidays in the window, Effective Days, Gain, Efficiency, Worked Days per month, Longest Vacation and the year timeline are free. The rest is Premium, each piece wrapped in `PremiumFeature` with its own `PremiumFeatureId` so the Premium modal can name the feature that was clicked:
 
-| Card or chart | Metric | Component |
+| Card or chart | Metric | Gate (`PremiumFeatureId`) |
 | --- | --- | --- |
-| Long Weekends, Rest Blocks, Efficiency, Bridges used, Worked Days per month | The scalar Metrics | `MetricCard` |
-| Year timeline | Every Free Day and PTO Day across the window | `YearTimelineChart.tsx` |
-| Composition | PTO Days vs National, Regional and Custom Holidays | `HolidaysDistributionChart.tsx`, a pie |
-| Quarter distribution | PTO Days per Quarter | `QuarterDistributionChart.tsx` |
-| Long Blocks per Quarter | Rest Blocks of three days or more per Quarter | `BlocksPerQuarterChart.tsx` |
-| Monthly distribution | PTO Days per window month | `MonthlyDistributionChart.tsx` |
+| Long Weekends, Rest Blocks, Bridges used | Scalar Metrics, as `MetricCard` | `advancedMetrics` |
+| First break, last break, Max Work Streak, Bonus Days | The year summary panel | `yearSummary` |
+| Composition | PTO Days vs National, Regional and Custom Holidays, a pie (`HolidaysDistributionChart.tsx`) | `daysOffComposition` |
+| Quarter distribution | PTO Days per Quarter (`QuarterDistributionChart.tsx`) | `quarterDistribution` |
+| Long Blocks per Quarter | Rest Blocks of three days or more per Quarter (`BlocksPerQuarterChart.tsx`) | `longBlocks` |
+| Monthly distribution | PTO Days per window month (`MonthlyDistributionChart.tsx`) | `annualTimeline` |
+
+The year timeline (`YearTimelineChart.tsx`) shows every Free Day and PTO Day across the window.
 
 The charts are Recharts wrapped in the design system's frame; their colour cycle is `COLOR_SCHEMES` in `apps/web/src/ui/modules/pages/planner/summary/const.ts`, four brand tokens, so a chart and a swatch on the [colors page](/design-system/foundations/colors/) are the same value. The [charts pattern](/design-system/patterns/charts/) page covers the conventions.
 

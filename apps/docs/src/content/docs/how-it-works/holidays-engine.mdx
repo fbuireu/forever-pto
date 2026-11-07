@@ -15,16 +15,15 @@ config:
   look: handDrawn
   layout: dagre
 ---
-flowchart LR
-  ST[holidays store<br/>fetchHolidays] -->|dynamic import| GH[getHolidays]
+flowchart TB
+  ST["holidays store:<br/>fetchHolidays"] -->|dynamic import| GH[getHolidays]
   GH --> OBS[observedHolidays]
-  OBS --> DH[dateHolidaysSource<br/>new Holidays country, region]
-  DH --> RAW[national + regional RawHoliday, year and year + 1]
-  RAW --> NW[keepNonWorking<br/>type ∈ public, bank]
-  NW --> STAMP[stampRegion on the regional list]
-  STAMP --> RES[resolveObservedHolidays<br/>Region overrides Country]
-  RES --> DTO[holidayDTO.create<br/>id · variant · location · isInPlanningWindow]
-  DTO --> MERGE[Merge with Custom Holidays, dedupe by date, sort]
+  OBS --> DH["dateHolidaysSource:<br/>Country and Region lookups,<br/>year and year + 1"]
+  DH --> NW["keepNonWorking:<br/>type is public or bank"]
+  NW --> STAMP["stampRegion on the<br/>regional list"]
+  STAMP --> RES["resolveObservedHolidays:<br/>Region overrides Country"]
+  RES --> DTO["holidayDTO.create:<br/>id, variant, location,<br/>isInPlanningWindow"]
+  DTO --> MERGE["merge with Custom Holidays,<br/>dedupe by date, sort"]
   MERGE --> ST
 ```
 
@@ -37,26 +36,27 @@ The Holidays are looked up again whenever the Country, the Region, the year, the
 config:
   look: handDrawn
   layout: dagre
+  sequence:
+    wrap: true
+    width: 110
+    actorMargin: 20
 ---
 sequenceDiagram
   autonumber
   participant SI as StoresInitializer
-  participant FS as filters store
   participant CL as CalendarList
   participant HS as holidays store
   participant GH as getHolidays
-  SI->>FS: setCountry from the user-country cookie, only when none is stored
-  FS-->>CL: Country, Region, year, Carry-over Months, with the page's locale
-  CL->>HS: fetchHolidays, which takes the next sequence number
-  HS->>GH: dynamic import, the first time a visit needs it
-  GH->>GH: the two-year lookup for Country and Region, cached for the last filters
-  GH-->>HS: HolidayDTO[], or [] after logging an error
-  alt a newer fetchHolidays started meanwhile
+  SI->>CL: Country from the cookie,<br/>only when none is stored
+  CL->>HS: fetchHolidays (next sequence number)
+  HS->>GH: dynamic import, then the<br/>two-year lookup
+  GH-->>HS: HolidayDTO[], or [] after logging
+  alt a newer fetch started
     HS->>HS: drop this answer
-  else this is the latest call
-    HS->>HS: keep the Custom Holidays, drop fetched ones on their dates, sort
-    HS-->>CL: holidays and the holidaysKey of these filters
-    CL->>CL: plan, now that holidaysKey matches the screen
+  else the latest call
+    HS->>HS: keep Custom Holidays, sort
+    HS-->>CL: holidays + holidaysKey
+    CL->>CL: plan, now the key matches
   end
 ```
 

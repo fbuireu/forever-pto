@@ -18,19 +18,22 @@ curl -H 'Accept: text/markdown' https://forever-pto.com/planner
 config:
   look: handDrawn
   layout: dagre
+  sequence:
+    wrap: true
+    width: 110
+    actorMargin: 20
 ---
 sequenceDiagram
   participant A as Agent
   participant P as Proxy
   participant R as /api/markdown
   participant B as buildMarkdownPage
-  A->>P: GET /planner, Accept: text/markdown
-  P->>P: set x-markdown-path = /planner
-  P->>R: rewrite (URL unchanged for the agent)
-  R->>R: x-markdown-path starts with "/"? else 404
-  R->>B: buildMarkdownPage(baseUrl, "/planner")
-  B-->>R: Markdown, or null for an unlisted path
-  R-->>A: 200 text/markdown with Cache-Control, or 404
+  A->>P: GET /planner<br/>Accept: text/markdown
+  P->>R: rewrite, with x-markdown-path<br/>set to /planner
+  R->>R: header starts with "/"?<br/>else 404
+  R->>B: buildMarkdownPage(baseUrl, path)
+  B-->>R: Markdown, or null if unlisted
+  R-->>A: 200 text/markdown, or 404
 ```
 
 Markdown negotiation is the **first** thing `apps/web/src/middleware.ts` decides, and the matcher is what keeps it safe: `/api/*` and every dotted path (so all of `/.well-known/*`) never reach the proxy at all, which is why the rewrite branch carries no exclusion list of its own.

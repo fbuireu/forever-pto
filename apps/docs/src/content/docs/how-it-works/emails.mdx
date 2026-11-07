@@ -21,41 +21,38 @@ The visitor opens the contact dialog from the planner's feedback prompt, the foo
 config:
   look: handDrawn
   layout: dagre
+  sequence:
+    wrap: true
+    width: 110
+    actorMargin: 20
 ---
 sequenceDiagram
   autonumber
   actor V as Visitor
   participant M as ContactModal
-  participant SA as sendContactEmailAction
-  participant UC as sendContactEmail
+  participant SA as Server Action
   participant DB as Turso
   participant RS as Resend
   V->>M: name, email, subject, message
-  M->>M: zod in the form, with the copy in the visitor's language
-  M->>SA: Server Action call, the module imported on the first send
-  SA->>UC: sendContactRequest with the site URL and contact address
-  UC->>UC: zod contactSchema again
-  UC->>DB: reserveContactSlot: one conditional INSERT
-  alt the sender wrote within the cooldown, or sent this message before
-    DB-->>UC: nothing inserted
-    UC-->>SA: DuplicateContactError, 429 contact_already_received
-    SA-->>M: { success: false, error }
-    M-->>V: the error step, in words: they already heard from you
-  else the slot is free
-    DB-->>UC: the reserved row's id
-    UC->>UC: render ContactFormEmail to HTML
-    UC->>RS: send from and to the contact address, replyTo the visitor
-    alt Resend accepts it
-      RS-->>UC: messageId
-      UC-->>SA: { success: true }
-      SA-->>M: { success: true }
-      M-->>V: the success step, and the address remembered for next time
-      SA--)DB: after(): recordContactMessageId, failure only logs
-    else Resend fails
-      UC->>DB: release the reserved row
-      UC-->>SA: EmailError, 500 internal_error
-      SA-->>M: { success: false, error }
-      M-->>V: the error step, with try again
+  M->>M: zod in the form
+  M->>SA: sendContactEmailAction
+  SA->>SA: zod contactSchema again
+  SA->>DB: reserveContactSlot,<br/>one conditional INSERT
+  alt cooldown, or message already sent
+    DB-->>SA: nothing inserted
+    SA-->>M: DuplicateContactError, 429
+    M-->>V: error step: already heard from you
+  else slot is free
+    SA->>RS: send, replyTo the visitor
+    alt accepted
+      RS-->>SA: messageId
+      SA-->>M: success
+      M-->>V: success step
+      SA--)DB: after(): record messageId
+    else fails
+      SA->>DB: release the reserved row
+      SA-->>M: EmailError, 500
+      M-->>V: error step, try again
     end
   end
 ```

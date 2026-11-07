@@ -12,23 +12,23 @@ config:
   look: handDrawn
   layout: dagre
 ---
-flowchart LR
+flowchart TB
   subgraph worker [Cloudflare Worker]
     H[Handler invocation]
-    F[Outbound fetch: Stripe, Turso, Resend]
-    BND[Bindings: R2 cache, rate limiter]
-    LOG[logger → console, one JSON line]
+    F["Outbound fetch:<br/>Stripe, Turso, Resend"]
+    BND["Bindings: R2 cache,<br/>rate limiter"]
+    LOG["logger: one JSON line<br/>on console"]
+    H ~~~ F ~~~ BND ~~~ LOG
   end
-  subgraph platform [Cloudflare platform]
-    OBS[observability.logs + traces<br/>head-sampled, query strings redacted]
-    DEST[destinations, one pair per stage]
-  end
+  OBS["Platform observability:<br/>head-sampled logs + traces,<br/>query strings redacted"]
+  DEST["destinations,<br/>one pair per stage"]
   subgraph browser [Browser]
-    RUM[Better Stack RUM tag<br/>after analytics consent]
-    GA[gtag, Consent Mode]
+    RUM["Better Stack RUM tag,<br/>after consent"]
+    GA["gtag, Consent Mode"]
+    RUM ~~~ GA
   end
   H & F & BND & LOG --> OBS --> DEST
-  DEST -->|OTLP, trace id on every log| BS[(Better Stack)]
+  DEST -->|"OTLP, trace id on every log"| BS[(Better Stack)]
   RUM --> BS
   GA --> GA4[(Google Analytics)]
 ```
@@ -41,28 +41,31 @@ flowchart LR
 config:
   look: handDrawn
   layout: dagre
+  sequence:
+    wrap: true
+    width: 110
+    actorMargin: 20
 ---
 sequenceDiagram
   autonumber
   participant B as Browser
   participant W as Worker runtime
-  participant R as Server Action or route handler + operation
+  participant R as Action + operation
   participant UC as Use case
   participant X as Stripe / Turso / Resend
-  participant CF as Cloudflare observability
-  participant BS as Better Stack
-  B->>W: POST, the createPaymentAction Server Action
-  W->>W: open the invocation span, head-sample the request
+  participant CF as Cloudflare
+  B->>W: createPaymentAction
+  W->>W: open the invocation span,<br/>head-sample
   W->>R: run the action
-  R->>R: traced({ name: "createPayment" }): a child span named after the use case
-  R->>UC: Effect program, provided with ApplicationLayer
-  UC->>X: fetch (instrumented by the runtime: one span per call)
-  UC->>UC: logger.info(...) → one JSON line on console, tagged with the active span
+  R->>R: traced(): child span<br/>named after the use case
+  R->>UC: Effect program
+  UC->>X: fetch, one span per call
+  UC->>UC: logger.info: JSON line<br/>tagged with the span
   X-->>UC: response
-  UC-->>R: result or a tagged failure
+  UC-->>R: result or tagged failure
   R-->>B: status and body
-  W->>CF: invocation log + spans + console lines, batched
-  CF->>BS: OTLP export to the stage's destinations, trace id on every log record
+  W->>CF: logs + spans, batched
+  CF->>CF: OTLP export to the stage's<br/>Better Stack destinations
 ```
 
 Nothing in the app opens a connection to a telemetry backend. The runtime instruments the handler, the outbound `fetch` calls and the binding calls on its own; `traced` in `apps/web/src/infrastructure/span.ts`, called by each operation under `apps/web/src/infrastructure/api/operations/`, adds one named span per entry point (`createPayment`, `sendContactEmail`, `activatePremium`) so a trace reads the operation rather than `POST`; `logger` writes one JSON line per call to `console`; and the platform ships all of it to the destinations `wrangler.toml` names. The browser side is a tag, loaded only after consent.
@@ -90,7 +93,7 @@ Three things about it are deliberate. The caller's context is spread **first**, 
 
 There is no `debug` level and no request-scoped transport: the levels are `info`, `warn` and `error`, indexed by the contract's own union so a level `console` has no method for fails to compile, and the line reaches the sink through the platform rather than through a batcher the Worker owns.
 
-The production build keeps exactly those levels. `compiler.removeConsole` in `apps/web/next.config.ts` deletes every other `console` call from the app's code at build time and excludes `LOG_LEVEL`'s values, so a stray `console.log` never ships while the logger's lines always do, and a level the contract gains is kept with no second edit. The contract suite loads the production config and holds that list equal to `LOG_LEVEL`. [ADR 0018](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0018-the-platform-is-the-log-transport.md) records why the batcher went: as a module-level instance it delivered request B's lines from a timer armed in request A, which workerd refuses as I/O on behalf of a different request.
+The production build keeps exactly those levels. `compiler.removeConsole` in `apps/web/next.config.ts` deletes every other `console` call from the app's code at build time and excludes `LOG_LEVEL`'s values, so a stray `console.log` never ships while the logger's lines always do, and a level the contract gains is kept with no second edit. The contract suite loads the production config and holds that list equal to `LOG_LEVEL`. [ADR 0018](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0018-the-platform-is-the-log-transport.md) records why the logger has no batcher: a module-level one would deliver one request's lines from a timer armed in another, which workerd refuses as I/O on behalf of a different request.
 
 ## Where the configuration lives
 
@@ -130,7 +133,7 @@ A privacy convention runs through all call sites: log the email **domain**, ids 
 
 ## Browser analytics: typed `track()`
 
-`apps/web/src/infrastructure/clients/logging/better-stack/tracking.ts` exposes `track({ event, properties })` and `identifyUser({ email, plan })` over `window.betterstack`. Event names are a closed union (`TrackEventName`): `payment_started`, `payment_completed`, `payment_failed`, `promo_code_applied`, `premium_activated`, `upgrade_modal_opened`, `feature_unlocked`, `planner_generated`, `contact_form_submitted`, the four `quick_start_*` events and the planner set below, so a typo or ad-hoc event is a compile error. Both functions fan out to two destinations: the Better Stack script, where an event sits next to the logs and the errors of the same release, and Google Analytics through `gtag`, where the same event name and properties feed funnel and path explorations, key events and audiences. Each no-ops on its own when its script is absent (SSR, consent denied); GA's consent mode decides on its side what a denied visitor's event becomes. The email goes to Better Stack only; GA receives the plan as a user property and nothing that identifies the person. `upgrade_modal_opened` carries the gate's `feature` and an `origin`, `planner` for a gate in the planner and `quick_start` for one in the homepage quick start; every gate names its own. `premium_activated` carries `plan: premium` and marks a device's move from free to Premium, once: in the checkout, through the "I already donated" form, or on the payment confirmation page when the issuer redirected the payer, and never for a session a page load restores.
+`apps/web/src/infrastructure/clients/logging/better-stack/tracking.ts` exposes `track({ event, properties })` and `identifyUser({ email, plan })` over `window.betterstack`. Event names are a closed union (`TrackEventName`): `payment_started`, `payment_completed`, `payment_failed`, `payment_activation_failed`, `promo_code_applied`, `premium_activated`, `upgrade_modal_opened`, `feature_unlocked`, `planner_generated`, `contact_form_submitted`, the four `quick_start_*` events and the planner set below, so a typo or ad-hoc event is a compile error. Both functions fan out to two destinations: the Better Stack script, where an event sits next to the logs and the errors of the same release, and Google Analytics through `gtag`, where the same event name and properties feed funnel and path explorations, key events and audiences. Each no-ops on its own when its script is absent (SSR, consent denied); GA's consent mode decides on its side what a denied visitor's event becomes. The email goes to Better Stack only; GA receives the plan as a user property and nothing that identifies the person. `upgrade_modal_opened` carries the gate's `feature` and an `origin`, `planner` for a gate in the planner and `quick_start` for one in the homepage quick start; every gate names its own. `premium_activated` carries `plan: premium` and marks a device's move from free to Premium, once: in the checkout, through the "I already donated" form, or on the payment confirmation page when the issuer redirected the payer, and never for a session a page load restores.
 
 The script itself is injected by `apps/web/src/ui/modules/tracking/BetterStackTracking.tsx`, mounted in the root layout but rendering nothing until the analytics [consent category](/how-it-works/cookie-consent/) is accepted and `NEXT_PUBLIC_BETTER_STACK_TRACKING_TOKEN` is set. Once consented, premium users are identified with `identifyUser({ email, plan })`, where `plan` is `'premium' | 'free'`.
 

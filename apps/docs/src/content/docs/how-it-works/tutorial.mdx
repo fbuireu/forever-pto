@@ -11,6 +11,10 @@ The planner ships a guided tour built on `driver.js`. It never auto-starts: it r
 config:
   look: handDrawn
   layout: dagre
+  sequence:
+    wrap: true
+    width: 140
+    actorMargin: 30
 ---
 sequenceDiagram
   participant U as User
@@ -19,15 +23,14 @@ sequenceDiagram
   participant D as DriverClient
   U->>H: click "quick tour"
   par lazy
-    H->>H: import driver client
-    H->>H: import DriverStyles (driver.css in @layer tutorial)
+    H->>H: import the driver client
+    H->>H: import DriverStyles
   end
-  H->>SB: open if closed, wait for the first anchor to stop moving
-  H->>D: start({ steps from TUTORIAL_ANCHOR + tutorial.steps copy, overrides })
-  D->>D: driver.js drive()
-  D-->>U: highlight step 1 … n, done button on the last
+  H->>SB: open it if closed, wait<br/>for the first anchor to settle
+  H->>D: start({ steps, overrides })
+  D-->>U: highlight step 1 ... n,<br/>done button on the last
   U->>D: close
-  D->>D: unmount the React roots it mounted into popovers
+  D->>D: unmount the React roots<br/>it mounted into popovers
 ```
 
 

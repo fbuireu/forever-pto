@@ -15,18 +15,18 @@ config:
   layout: dagre
 ---
 flowchart TD
-  REQ[Request path] --> PFX{Locale prefix in the URL?}
-  PFX -- "/es, /ca, /it, /fr, /de" --> USE[Use it]
-  PFX -- "/en" --> STRIP[Use it, redirect to the unprefixed path]
-  PFX -- no --> CK{NEXT_LOCALE cookie holds a locale?}
-  CK -- yes --> USE2[Use it, redirect to its prefix if not en]
-  CK -- no --> AL{Accept-Language matches a locale?}
-  AL -- yes --> USE3[Use it, redirect to its prefix if not en]
-  AL -- no --> DEF["Default: en, no prefix"]
-  USE & STRIP & USE2 & USE3 & DEF --> CHG{"A page navigation whose locale differs from the cookie,<br/>or, with no cookie, from the Accept-Language match?"}
-  CHG -- yes --> SET["next-intl writes NEXT_LOCALE<br/>the proxy re-sets it with LOCALE_COOKIE_POLICY"]
+  REQ[Request path] --> PFX{Locale prefix?}
+  PFX -- "/es /ca /it /fr /de" --> USE[Use it]
+  PFX -- "/en" --> STRIP["Use it, redirect to<br/>the unprefixed path"]
+  PFX -- none --> CK{"NEXT_LOCALE<br/>holds a locale?"}
+  CK -- yes --> USE2["Use it, redirect to<br/>its prefix if not en"]
+  CK -- no --> AL{"Accept-Language<br/>matches?"}
+  AL -- yes --> USE3["Use it, redirect to<br/>its prefix if not en"]
+  AL -- no --> DEF["Default: en"]
+  USE & STRIP & USE2 & USE3 & DEF --> CHG{"Page navigation whose locale<br/>differs from the cookie or<br/>the Accept-Language match?"}
+  CHG -- yes --> SET["next-intl writes NEXT_LOCALE,<br/>the proxy re-sets it"]
   CHG -- no --> MSG
-  SET --> MSG["Load the locale's message bundle<br/>apps/web/src/ui/i18n/messages"]
+  SET --> MSG["Load the locale's<br/>message bundle"]
 ```
 
 The cookie is written only when it would change something: a visitor whose browser language is the one the URL serves gets no `NEXT_LOCALE` at all, and a request resolved from the cookie writes nothing, because its locale already is the cookie's.
@@ -37,7 +37,7 @@ The cookie is written only when it would change something: a visitor whose brows
 
 - `locales: LOCALES`, `defaultLocale: EN`.
 - `localePrefix: 'as-needed'`. English lives at `/`, every other locale gets a prefix (`/es/...`, `/ca/...`).
-- `localeCookie: { secure: true, sameSite: 'lax' }`.
+- `localeCookie: LOCALE_COOKIE_POLICY`, the policy object `apps/web/src/infrastructure/i18n/cookie.ts` states once for every writer.
 
 The `next-intl` middleware (`createMiddleware(routing)` in `apps/web/src/middleware.ts`) resolves the locale per request. The root layout's `generateStaticParams` returns every locale and it exports `dynamicParams = false`, so a first segment that is not a locale never reaches a prerendered layout as a locale: the proxy treats the path as one with no prefix and rewrites it to `/en/…`, or redirects it to the prefix the cookie or the browser language picks, and the catch-all answers it with that language's 404, as it answers an unknown path under a locale ([error pages](/architecture/error-pages/)).
 
@@ -73,12 +73,12 @@ config:
   look: handDrawn
   layout: dagre
 ---
-flowchart LR
-  EN["en.json, the reference bundle<br/>49 namespaces, ~1,300 leaf keys"] -->|"typeof messages"| T["AppConfig.Messages in environment.d.ts"]
-  T -->|"typed t()"| CC["'use client' components<br/>useTranslations(namespace)"]
-  T -->|"typed t()"| SC["Server components and metadata<br/>getTranslations({ locale, namespace })"]
-  T -->|"createTranslator"| MD["The Markdown twin<br/>every bundle imported statically"]
-  ES["es.json · ca.json · it.json · de.json · fr.json"] -.->|"same key set, asserted"| EN
+flowchart TB
+  EN["en.json, the reference<br/>49 namespaces, ~1,300 leaf keys"] -->|"typeof messages"| T["AppConfig.Messages"]
+  T -->|"typed t()"| CC["Client components:<br/>useTranslations"]
+  T -->|"typed t()"| SC["Server components, metadata:<br/>getTranslations"]
+  T -->|createTranslator| MD["Markdown twin:<br/>bundles imported statically"]
+  ES["es, ca, it, de, fr"] -.->|"same key set, asserted"| EN
   REQ["Request locale"] -->|"dynamic import in config.ts"| CC & SC
 ```
 
@@ -86,7 +86,7 @@ flowchart LR
 2. **A component reads one namespace at a time.** `useTranslations('sidebar')` in a client component, `getTranslations({ locale, namespace })` in a server one; a component that needs two namespaces calls the hook twice rather than reaching across. Namespaces map to a surface, not to a component tree, so `pages/planner/Contact.tsx` reads `roadmap` and the contact form reads `contact`.
 3. **`core/` components never translate.** They may not call `useTranslations`, so every accessible name a primitive needs (`closeDialog`, `toggleSidebar`, `closeToast`) is a prop the caller supplies out of the `a11y` namespace, the one namespace that holds names rather than copy.
 4. **The bundle for a request is loaded once**, by `apps/web/src/infrastructure/i18n/config.ts`: it validates the locale with `hasLocale`, falls back to the default, and dynamically imports the matching JSON. The Markdown twin cannot do that (it runs where `next-intl/server` is unavailable) and imports every bundle statically into a `Record<LocaleCode, …>`, so a seventh locale without a row fails to compile.
-5. **The browser is sent the catalogue minus what only the server reads.** The locale layout and `global-not-found.tsx` hand `NextIntlClientProvider` `clientMessagesOf(await getMessages())` (`apps/web/src/infrastructure/i18n/clientMessages.ts`), which drops `SERVER_ONLY_NAMESPACES`: the homepage, the FAQ, the legal pages, the metadata, the not-found page and the payment confirmation, all rendered on the server. That took about 25 KB compressed off every page's HTML. The list names what to leave out rather than what to send, so forgetting a namespace there costs bytes, never a blank string, and `clientMessages.test.ts` beside it scans every `useTranslations` call and fails when client code reads a namespace the client is not sent.
+5. **The browser is sent the catalogue minus what only the server reads.** The locale layout and `global-not-found.tsx` hand `NextIntlClientProvider` `clientMessagesOf(await getMessages())` (`apps/web/src/infrastructure/i18n/clientMessages.ts`), which drops `SERVER_ONLY_NAMESPACES`: the homepage, the FAQ, the legal pages, the metadata, the not-found page and the payment confirmation, all rendered on the server. The list names what to leave out rather than what to send, so forgetting a namespace there costs bytes, never a blank string, and `clientMessages.test.ts` beside it scans every `useTranslations` call and fails when client code reads a namespace the client is not sent.
 6. **Every other bundle must have exactly the keys `en.json` has.** `tests/docs-consistency.test.ts` compares key sets in both directions, so a key added to English and forgotten in Catalan fails the app's own CI. It compares *sets*, not values, so a stale translation is invisible to it; and it separately fails on any string written in capitals outside a named acronym allow-list, because uppercase is a CSS class here, never copy.
 7. **Machine-code keys stay snake_case.** `toasts.promoCodeErrors.*` mirrors Stripe's promotion-code error codes and `contact.errors.*` mirrors `ApiError`, looked up by a value that arrives from elsewhere; a missing key falls back to the namespace's generic message, which is why adding a reachable code means adding its key in the same change.
 

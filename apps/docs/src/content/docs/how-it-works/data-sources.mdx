@@ -16,39 +16,33 @@ config:
   look: handDrawn
   layout: dagre
 ---
-flowchart TB
+flowchart LR
   subgraph bundle [Shipped with the app]
-    DH[date-holidays<br/>Holiday calendars per Country and Region]
-    ISO[i18n-iso-countries<br/>Country names in every locale]
+    DH["date-holidays:<br/>Holiday calendars"]
+    ISO["i18n-iso-countries:<br/>Country names"]
   end
-  subgraph edge [Read at the edge, when the request carries no user-country cookie]
+  subgraph edge [Edge, without a user-country cookie]
+    HDR[cf-ipcountry]
     TRACE["/cdn-cgi/trace"]
-    HDR[cf-ipcountry header]
     IPAPI[ipify + ipinfo]
   end
   subgraph browser [Browser]
-    LS[(obfuscated localStorage)]
+    LS[(obfuscated<br/>localStorage)]
     CK[(cookies)]
-    MEM[(location store, in memory)]
+    MEM[(location store)]
   end
   subgraph server [Server-side services]
     STRIPE[(Stripe)]
     TURSO[(Turso)]
     RESEND[Resend]
-    RL[Rate limiter binding]
+    RL[Rate limiter]
   end
-  DH --> HOL[Holidays]
-  DH --> REG[Regions]
-  ISO --> CTRY["Countries, rendered with the page"]
-  TRACE & HDR & IPAPI --> LOC[Detected Country]
-  LOC --> CK
-  HOL --> LS
-  REG & CTRY --> MEM
-  STRIPE <--> PAY[Donation + Premium]
-  TURSO <--> PAY
-  RL --> PAY
-  RESEND --> MAIL[Contact form]
-  TURSO <--> MAIL
+  DH --> HOL[Holidays] --> LS
+  DH --> REG[Regions] --> MEM
+  ISO --> CTRY[Countries] --> MEM
+  HDR & TRACE & IPAPI --> LOC[Detected Country] --> CK
+  STRIPE & TURSO & RL <--> PAY[Donation + Premium]
+  RESEND & TURSO <--> MAIL[Contact form]
 ```
 
 ## Holidays
@@ -102,7 +96,7 @@ Everything the user configures or the engine produces lives in the browser, in `
 | `holidays` | Holidays, the Suggestion, Alternatives, the applied index, Manual and Removed Days | Dates round-trip as ISO strings |
 | `location` | Nothing: it persists an empty object | The Country list arrives with the page and the Region list is looked up again for each Country |
 | `premium` | The Premium key, email, last verification time | Mirrors the server session; re-verified after 24 hours |
-| `ui` | Nothing | Ephemeral popover and currency state |
+| `ui` | Nothing | Ephemeral Donate popover and quick-start dialog state |
 
 The values are obfuscated with a build-time key before they hit storage (XOR plus base64), which keeps casual tampering out and is not cryptography ([data protection](/how-it-works/data-protection/) has every primitive the app does apply); [ADR 0007](https://github.com/fbuireu/forever-pto/blob/main/docs/adr/0007-persisted-client-state-is-obfuscated-not-encrypted.md) explains why that is the right amount. Details on the [state stores](/how-it-works/state-stores/) page.
 

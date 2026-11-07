@@ -5,30 +5,25 @@ sidebar:
   order: 6
 ---
 
-All client state lives in Zustand stores under `apps/web/src/application/stores/`. Four are created as `create()(devtools(persist(...)))` with a versioned storage name, and three of those persist data: `filters`, `holidays` and `premium`. `location` goes through `persist` only to clear what older versions stored, and persists an empty object; the `ui` store is devtools-only. The folder's map and gotchas are in `apps/web/src/application/stores/AGENTS.md`, and the rules a store follows (`A8` to `A10`, `A12`, `A16` to `A18`) in [`CODING_STANDARDS.md`](https://github.com/fbuireu/forever-pto/blob/main/CODING_STANDARDS.md).
+All client state lives in Zustand stores under `apps/web/src/application/stores/`. Four are created as `create()(devtools(persist(...)))` with a versioned storage name, and three of those persist data: `filters`, `holidays` and `premium`. `location` goes through `persist` only to clear what older versions stored, and persists an empty object; the `ui` store is devtools-only. The stores load `getHolidays`, `getRegions` and `runPlanningPipeline` through dynamic imports, so none of them is in the first load. The folder's map and gotchas are in `apps/web/src/application/stores/AGENTS.md`, and the rules a store follows (`A8` to `A10`, `A12`, `A16` to `A18`) in [`CODING_STANDARDS.md`](https://github.com/fbuireu/forever-pto/blob/main/CODING_STANDARDS.md).
 ```mermaid
 ---
 config:
   look: handDrawn
   layout: dagre
 ---
-flowchart LR
+flowchart TB
   subgraph stores [Zustand stores]
     F[filters]
     H[holidays]
     L[location]
     P[premium]
     U[ui]
+    F ~~~ H ~~~ L ~~~ P ~~~ U
   end
-  LS[("localStorage<br/>obfuscated JSON, dates as ISO strings")]
-  F & H & P <-->|persist + partialize| LS
-  L -.->|persists an empty object| LS
-  H -->|dynamic import| GH[getHolidays]
-  H -->|dynamic import, main-thread path| PIPE[runPlanningPipeline]
-  W[useCalculationsWorker] -->|setCalculationResult| H
-  L -->|dynamic import| GC[getRegions]
-  P -->|fetch| CS["/api/check-session"]
-  CK[user-country cookie] -->|StoresInitializer| F
+  LS[("localStorage:<br/>obfuscated JSON")]
+  F & H & P <-->|"persist + partialize"| LS
+  L -.->|"an empty object"| LS
 ```
 
 
@@ -39,7 +34,7 @@ Persisted stores share `obfuscatedStorage` from `apps/web/src/application/stores
 - In production with `NEXT_PUBLIC_STORAGE_KEY` set, values are obfuscated (XOR + base64, `obfuscate`/`deobfuscate` in `apps/web/src/application/stores/utils/crypto.ts`) before hitting `localStorage`. That key ships in the client bundle, so this is obfuscation and never cryptography: it keeps casual tampering out, nothing more. See [data protection](/how-it-works/data-protection/).
 - In development, or when the key is missing, it falls back to plain `localStorage`.
 - On the server it is a no-op storage, so SSR never touches `localStorage`.
-- Both storing branches skip a write whose value has not changed. `persist` saves the whole partialized slice on every `set`, including the ones that touch only unpersisted fields (`setCalculating`, the Alternative preview), so without the skip the holidays store would rewrite and re-obfuscate roughly 50 KB three times per calculation. The obfuscated branch remembers what it last wrote or read per key and skips a repeat only while storage still holds that blob, so another tab's write is never mistaken for its own.
+- Both storing branches skip a write whose value has not changed. `persist` saves the whole partialized slice on every `set`, including the ones that touch only unpersisted fields (`setCalculating`, the Alternative preview), so without the skip the holidays store would rewrite and re-obfuscate its whole blob several times per calculation. The obfuscated branch remembers what it last wrote or read per key and skips a repeat only while storage still holds that blob, so another tab's write is never mistaken for its own.
 
 A stored value that does not parse never reaches a store: `obfuscatedStorage` catches the failed parse, hands it to `onRehydrateFailure`, which logs to Better Stack and removes the key, and answers `null`, so the store hydrates on its defaults the same page view. Every persisted store's `onRehydrateStorage` calls the same function for a failure after the read, so a corrupt blob cannot survive into the next visit.
 
@@ -53,25 +48,23 @@ config:
 ---
 sequenceDiagram
   autonumber
-  participant ST as a persisted store
+  participant ST as persisted store
   participant OS as obfuscatedStorage
-  participant LS as localStorage
   participant UI as planner sections
-  ST->>OS: getItem(storage name), as the store is created in the browser
-  OS->>LS: read the blob
+  ST->>OS: getItem(storage name)
   alt nothing stored
-    OS-->>ST: null, so the store keeps its defaults
-  else a blob that does not decode
-    OS-->>ST: null after logging, so the store keeps its defaults
-  else text that is not JSON, as a blob written under a previous key decodes to
-    OS->>LS: remove the key, after logging the failed parse
-    OS-->>ST: null, so the store keeps its defaults
+    OS-->>ST: null, defaults
+  else the blob does not decode
+    OS-->>ST: null after logging, defaults
+  else decodes to text that is not JSON
+    OS->>OS: log, remove the key
+    OS-->>ST: null, defaults
   else a JSON blob
     OS-->>ST: the parsed state
-    ST->>ST: migrate an older version, merge, then onRehydrateStorage revives the dates
+    ST->>ST: migrate, merge, revive dates
   end
-  ST-->>UI: hasHydrated, through useStoresReady
-  UI->>UI: swap the generated skeletons for the real sections
+  ST-->>UI: hasHydrated (useStoresReady)
+  UI->>UI: skeletons give way to the sections
 ```
 
 `useStoresReady` (`apps/web/src/ui/hooks/useStoresReady.ts`) waits for all four persisted stores, and every planner section renders its generated skeleton until they report, so nothing paints twice. What can go wrong, and what the visitor sees:

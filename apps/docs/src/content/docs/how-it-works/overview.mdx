@@ -5,7 +5,7 @@ sidebar:
   order: 0
 ---
 
-The planner is a browser application with a thin server in front of it. This page is the map: which piece runs where, in what order, and what crosses each boundary. Every step links to the page that covers it in depth.
+The planner is a browser application with a thin server in front of it. This page is the map: which piece runs where, in what order, and what crosses each boundary. Each step links to the page that covers it in depth.
 
 ## The runtimes
 
@@ -18,38 +18,25 @@ config:
   layout: dagre
 ---
 flowchart TB
-  subgraph cf [Cloudflare Worker, at the edge]
-    P[Proxy: apps/web/src/middleware.ts]
-    R["Route handlers /api/* and Server Actions"]
-    SSG[Prerendered pages, one per locale]
+  subgraph cf [Edge: Cloudflare Worker]
+    P["Proxy +<br/>prerendered pages"]
+    R["Route handlers,<br/>Server Actions"]
   end
-  subgraph main [Browser, main thread]
-    ST[Zustand stores<br/>filters · holidays · location · premium · ui]
-    UI[Planner screen]
-    HF[Holiday fetch: date-holidays, bundled]
-  end
-  subgraph worker [Browser, Web Worker]
-    ENG[Planning engine<br/>apps/web/src/domain/calendar]
+  subgraph browser [Browser]
+    UI["Planner screen"]
+    ST["Stores +<br/>Holiday lookup"]
+    ENG["Planning engine<br/>(Web Worker)"]
   end
   subgraph ext [External services]
-    STRIPE[Stripe]
-    TURSO[Turso]
-    RESEND[Resend]
-    CFAPI["Cloudflare: cf-ipcountry, /cdn-cgi/trace"]
-    IPAPI["ipify → ipinfo, the egress-IP lookup"]
+    PAY["Stripe, Turso,<br/>Resend"]
+    GEO["Cloudflare trace,<br/>ipify, ipinfo"]
   end
-  P -->|HTML + cookies| UI
-  SSG --> UI
+  P -->|"HTML + cookies"| UI
   UI <--> ST
-  ST --> HF
-  ST -->|postMessage, ISO strings| ENG
-  ENG -->|postMessage, ISO strings| ST
-  R <--> STRIPE
-  R <--> TURSO
-  R --> RESEND
-  P -->|no user-country cookie| CFAPI
-  P -.->|no cf-ipcountry and no trace answer| IPAPI
-  UI -->|"Server Actions and fetch: Donation, session, contact"| R
+  ST <-->|"ISO strings"| ENG
+  UI -->|"Donation, session,<br/>contact"| R
+  R <--> PAY
+  P -.->|"no user-country<br/>cookie"| GEO
 ```
 
 - **The Worker** serves prerendered HTML, runs the [proxy](/architecture/proxy/) on every page request and hosts the API routes. It never sees a plan.
@@ -63,33 +50,35 @@ flowchart TB
 config:
   look: handDrawn
   layout: dagre
+  sequence:
+    wrap: true
+    width: 110
+    actorMargin: 20
 ---
 sequenceDiagram
   autonumber
   participant B as Browser
   participant P as Proxy (edge)
   participant CF as Cloudflare trace
-  participant IP as ipify and ipinfo
-  participant S as Stores
+  participant IP as ipify, ipinfo
   B->>P: GET /planner
-  P->>P: markdown negotiation? payment guard?
-  P->>P: next-intl resolves the locale, writes NEXT_LOCALE only when it changes
+  P->>P: Markdown? payment guard?
+  P->>P: next-intl resolves the locale
   alt the request carries user-country
-    P->>P: re-set it as it is, nothing detected
+    P->>P: re-set it, detect nothing
   else no user-country cookie
-    P->>P: read cf-ipcountry, final whenever present
-    opt no cf-ipcountry header, as in local development
+    P->>P: cf-ipcountry, final if present
+    opt no cf-ipcountry (local development)
       P->>CF: GET /cdn-cgi/trace
-      CF-->>P: the loc= line, or nothing
+      CF-->>P: loc= line, or nothing
       opt still no country
-        P->>IP: the egress IP, then its country
-        IP-->>P: a country code, or nothing
+        P->>IP: egress IP, then its country
+        IP-->>P: country code, or nothing
       end
     end
   end
-  P-->>B: HTML, with user-country when a country is known and NEXT_LOCALE when it was written
-  B->>S: rehydrate from obfuscated localStorage
-  S->>S: StoresInitializer reads user-country, sets Country if none is stored
+  P-->>B: HTML, user-country if known,<br/>NEXT_LOCALE if written
+  B->>B: stores rehydrate from localStorage,<br/>StoresInitializer seeds the Country
 ```
 
 1. The [proxy](/architecture/proxy/) runs its chain: Markdown negotiation for agents, the payment-confirmation guard, locale resolution and, last, [country detection](/how-it-works/country-detection/). The result is a prerendered page with the `user-country` cookie whenever a Country is known, and with `NEXT_LOCALE` only when the navigation changed the locale.
@@ -98,43 +87,37 @@ sequenceDiagram
 
 ## The planning loop
 
-Everything after that is one loop, closed inside the browser: when the visitor changes a date, a Country, the budget or any other planner input, the store changes and the planner asks a Web Worker for the new plan, so the main thread never freezes while it is computed. [Planner recalculation](/how-it-works/calculation-worker/) tells that story step by step. `CalendarList` (`apps/web/src/ui/modules/pages/planner/CalendarList.tsx`) owns it: one effect refetches Holidays when the Country, Region, year, Carry-over Months or locale change, and another triggers a calculation when any planning input changes or the store bumps its `planRevision`.
+Everything after that is one loop, closed inside the browser: when the visitor changes a Country, the budget or any other planner input, the store changes and the planner asks a Web Worker for the new plan, so the main thread never freezes while it is computed. `CalendarList` (`apps/web/src/ui/modules/pages/planner/CalendarList.tsx`) owns it: one effect refetches Holidays when the Country, Region, year, Carry-over Months or locale change, and another triggers a calculation when any planning input changes or the store bumps its `planRevision`.
 
 ```mermaid
 ---
 config:
   look: handDrawn
   layout: dagre
+  sequence:
+    wrap: true
+    width: 110
+    actorMargin: 20
 ---
 sequenceDiagram
   autonumber
-  participant SB as Sidebar
   participant FS as filters store
   participant CL as CalendarList
   participant HS as holidays store
-  participant GH as getHolidays
   participant WK as Web Worker
-  participant EN as runPlanningPipeline
-  SB->>FS: setCountry / setPtoDays / setStrategy …
-  FS-->>CL: re-render with new inputs
-  CL->>HS: fetchHolidays({ year, country, region, carryOverMonths, locale })
-  HS->>GH: dynamic import, then the two-year lookup
-  GH-->>HS: HolidayDTO[] (National, Regional), merged with Custom Holidays
-  CL->>WK: triggerCalculation → one reused worker, the latest request wins
-  Note over CL,WK: CALCULATE_SUGGESTIONS with a requestId, every Date as an ISO string
-  WK->>EN: deserialise, then run
-  EN->>EN: Workdays → Bridges → Strategy selection → Alternatives → Metrics
-  EN-->>WK: PlanningResult
-  WK-->>CL: CALCULATE_SUGGESTIONS_RESULT, or WORKER_ERROR
-  CL->>HS: setCalculating(false)
-  opt a CALCULATE_SUGGESTIONS_RESULT
-    CL->>HS: setCalculationResult, preserving the applied Alternative index
-    HS-->>SB: budget readout, calendar, summary repaint
-  end
+  FS-->>CL: a planner input changed
+  CL->>HS: fetchHolidays, when the Country, Region,<br/>year, Carry-over Months or locale changed
+  HS-->>CL: HolidayDTO[] merged with Custom Holidays
+  CL->>WK: triggerCalculation, one reused worker,<br/>the latest request wins
+  Note over CL,WK: CALCULATE_SUGGESTIONS with a requestId,<br/>every Date as an ISO string
+  WK->>WK: runPlanningPipeline: Workdays, Bridges,<br/>Strategy, Alternatives, Metrics
+  WK-->>CL: CALCULATE_SUGGESTIONS_RESULT or WORKER_ERROR
+  CL->>HS: setCalculating(false), then<br/>setCalculationResult on a result
+  HS-->>FS: calendar, budget readout and Summary repaint
 ```
 
 - **Holidays** come from the `date-holidays` package, looked up for the chosen year and the next, once for the Country and once for the Region, then filtered to non-working types and shaped into `HolidayDTO`. The [holidays engine](/how-it-works/holidays-engine/) page has the rules; [data sources](/how-it-works/data-sources/) has the provenance.
-- **The worker** is spawned on the first calculation and reused for every one after it, because a warm worker answers several times faster than a cold one. Nothing cancels a run: a request made while one is in flight is held, a later one replaces it, and only the latest reply reaches the store. [Planner recalculation](/how-it-works/calculation-worker/) follows one change from the visitor's click to the repainted plan: what triggers it, how a request is held or replaced, what the visitor sees meanwhile and when it fails, and why it is a worker at all.
+- **The worker** is spawned on the first calculation and reused for every one after it. A request made while one is in flight is held, a later one replaces it, and only the latest reply reaches the store. [Planner recalculation](/how-it-works/calculation-worker/) follows one change from the click to the repainted plan, including what the visitor sees meanwhile and when it fails.
 - **The engine** is `runPlanningPipeline` in `apps/web/src/domain/calendar/pipeline.ts`: clear the caches, expand the Planning Window into months, fold Manual Days in as pseudo-Holidays, measure the Remaining Budget, find Workdays and Bridges, select under the Strategy, build Alternatives, measure everything. The [planning algorithm](/how-it-works/planning-algorithm/) page walks each stage.
 - **The result** lands in the holidays store, and every planner component reads it back from there: the calendar paints Suggested, Manual and Alternative days, the panel shows the budget and the Alternative switcher, the Summary renders the Metrics. The [planner UI](/how-it-works/planner-ui/) page maps the screen.
 

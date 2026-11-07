@@ -14,22 +14,16 @@ config:
   layout: dagre
 ---
 flowchart TB
-  subgraph browser [Browser]
-    PLAN["The plan, filters, Custom Holidays,<br/>the Premium key and email"] -->|"XOR with NEXT_PUBLIC_STORAGE_KEY, base64"| LS[(localStorage)]
-    TOK["premium-token cookie"]
-  end
+  PLAN["Plan, filters, Custom Holidays,<br/>Premium key and email"] -->|"XOR with the storage key,<br/>base64"| LS[(localStorage)]
   subgraph edge [Cloudflare Worker]
-    JWT["JWT: jose, HS256, JWT_SECRET"] --> TOK
-    CS["Client secret: constant-time compare"]
-    WH["Webhook: Stripe signature over the raw body"]
+    JWT["JWT: jose, HS256"]
+    CS["Client secret:<br/>constant-time compare"]
+    WH["Webhook: Stripe signature<br/>over the raw body"]
   end
-  subgraph stores [Stored elsewhere]
-    STRIPE[("Stripe: the PaymentIntent")]
-    DB[("Turso: payment and contact rows, in the clear")]
-  end
-  CS --> STRIPE
-  WH --> DB
-  DB -->|"a succeeded payment row, on email recovery"| JWT
+  JWT --> TOK["premium-token cookie"]
+  CS --> STRIPE[("Stripe")]
+  WH --> DB[("Turso, in the clear")]
+  DB -->|"succeeded payment,<br/>email recovery"| JWT
 ```
 
 ## Browser storage is obfuscated, not encrypted
@@ -102,4 +96,4 @@ Each site serves a `security.txt` at `/.well-known/security.txt`, naming the con
 | `NEXT_LOCALE` | The resolved locale | no, the switcher writes it | `lax` | session |
 | The sidebar cookie | Whether the sidebar is expanded | no, the browser writes it | `lax` | 7 days |
 
-The ones the server sets without `httpOnly` are deliberate and documented at the [cookies reference](/reference/cookies/): each has a browser-side writer or reader, and adding the flag silently broke the locale switch once.
+The ones the server sets without `httpOnly` are deliberate and documented at the [cookies reference](/reference/cookies/): each has a browser-side writer or reader, and adding the flag would break the locale switch.

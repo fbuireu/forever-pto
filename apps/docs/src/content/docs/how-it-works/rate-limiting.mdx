@@ -14,28 +14,31 @@ Three entry points can cost money or grant Premium on an unauthenticated request
 config:
   look: handDrawn
   layout: dagre
+  sequence:
+    wrap: true
+    width: 110
+    actorMargin: 20
 ---
 sequenceDiagram
   participant C as Client
-  participant R as Route or server action
-  participant OP as operations/*
+  participant R as Route or action
+  participant OP as operation
   participant L as PAYMENT_RATE_LIMITER
   participant S as Stripe
-  C->>R: POST /api/payment, or the createPaymentAction Server Action
-  R->>R: resolveClientIp: cf-connecting-ip → x-forwarded-for → x-real-ip, else null
-  R->>OP: createPaymentRequest(input as an Effect, the address)
-  OP->>L: limit({ key: the address, or "unknown" })
+  C->>R: POST /api/payment or the action
+  R->>R: resolveClientIp:<br/>cf-connecting-ip, x-forwarded-for,<br/>x-real-ip, else null
+  R->>OP: createPaymentRequest(input, ip)
+  OP->>L: limit({ key: ip or "unknown" })
   alt over the bound
     L-->>OP: success = false
-    OP-->>R: RateLimitError → 429 { error: "rate_limit_exceeded" }
-    Note over OP: on POST /api/payment the request body is never read
+    OP-->>R: RateLimitError, 429<br/>(the body is never read)
   else allowed
     L-->>OP: success = true
-    OP->>OP: parse the body, validate, promo code
+    OP->>OP: parse, validate, promo code
     OP->>S: paymentIntents.create
   else the binding throws
-    OP->>OP: fail open: the request is treated as allowed
-    OP->>S: paymentIntents.create, after the same checks
+    OP->>OP: fail open: treated as allowed
+    OP->>S: same checks, then create
   end
 ```
 
@@ -46,7 +49,7 @@ sequenceDiagram
 
 ## Where it runs
 
-The check is the **first** thing each operation under `apps/web/src/infrastructure/api/operations/` yields, before the request body is read or validated, before a promo code is looked up and before any Stripe call. That ordering is what the folder exists to own, and it is assertable because an operation takes its input as an Effect: `operations/payment.test.ts` asserts that a refused request never evaluates the body, verified by moving the limiter after the parse and watching the case go red.
+The check is the **first** thing the payment and activation operations under `apps/web/src/infrastructure/api/operations/` yield, before the request body is read or validated, before a promo code is looked up and before any Stripe call. That ordering is what the folder exists to own, and it is assertable because an operation takes its input as an Effect: `operations/payment.test.ts` asserts that a refused request never evaluates the body, verified by moving the limiter after the parse and watching the case go red.
 
 | Operation | Transports | Reaches |
 | --- | --- | --- |

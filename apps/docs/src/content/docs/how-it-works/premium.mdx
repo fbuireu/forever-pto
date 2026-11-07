@@ -11,46 +11,64 @@ Forever PTO has no accounts and no subscriptions. Premium is **donation-based**:
 config:
   look: handDrawn
   layout: dagre
+  sequence:
+    wrap: true
+    width: 110
+    actorMargin: 20
 ---
 sequenceDiagram
   autonumber
   actor V as Visitor
-  participant D as Donate and CheckoutForm
+  participant D as Donate / CheckoutForm
   participant SA as createPaymentAction
+  participant S as Stripe
+  participant DB as Turso
+  V->>D: amount, email, promo code?
+  D->>SA: Server Action
+  SA->>SA: rate limit, zod, promo code
+  SA->>S: paymentIntents.create
+  S-->>SA: clientSecret
+  SA-->>D: clientSecret, discountInfo
+  SA--)DB: after(): savePayment (may fail)
+  V->>D: card details in Stripe Elements
+  D->>S: confirmPayment, redirect if_required
+  Note over D,S: the in-page and issuer-redirect<br/>paths are the next diagram
+  S-)DB: webhook payment_intent.succeeded:<br/>create the row if it is missing
+```
+
+Once the card is confirmed, Premium is activated one of two ways:
+
+```mermaid
+---
+config:
+  look: handDrawn
+  layout: dagre
+  sequence:
+    wrap: true
+    width: 110
+    actorMargin: 20
+---
+sequenceDiagram
+  autonumber
+  participant V as Visitor
+  participant D as CheckoutForm
   participant S as Stripe
   participant CS as /api/check-session
   participant ACT as /api/payment/activate
   participant CP as /payment/confirmation
-  participant DB as Turso
-  participant WH as /api/webhooks/stripe
-  V->>D: amount, email, promo code?
-  D->>SA: Server Action call, through initializePayment
-  SA->>SA: rate limit by IP, zod, promo code
-  SA->>S: paymentIntents.create, metadata email, ip, ua
-  S-->>SA: clientSecret
-  SA-->>D: clientSecret and discountInfo
-  SA--)DB: after(): savePayment, may fail
-  V->>D: card details in Stripe Elements
-  D->>S: confirmPayment, redirect if_required
   alt confirmed in the page, the usual card path
-    S-->>D: the PaymentIntent
-    D->>CS: POST { email, premiumKey }, rate-limited by IP
-    CS->>S: retrieve, require succeeded and the donor email
-    CS-->>D: premium-token cookie and { premiumKey, email }, via activateWithClaimedPayment
-    CS--)DB: after(): upsert the payment row
-    D-->>V: Premium at once, a toast and confetti, the popover closes
-  else the issuer takes over, a redirect payment method or bank
-    S-->>V: redirect to /api/payment/activate with the intent, its secret and redirect_status
+    D->>CS: POST { email, premiumKey }
+    CS->>S: retrieve, require succeeded + donor email
+    CS-->>D: premium-token cookie
+    D-->>V: Premium at once, toast, confetti
+  else the issuer takes over
+    S-->>V: redirect to /api/payment/activate
     V->>ACT: GET, rate-limited
-    ACT->>S: activateWithPayment: retrieve, compare the client secret, require succeeded
-    ACT-->>V: 307, no-store, premium-token and the one-shot premium-activation proof
-    ACT--)DB: after(): upsert the payment row
-    V->>CP: GET /payment/confirmation?payment_intent=…
-    CP->>S: retrieve the intent for the card
-    CP-->>V: the success card, then PremiumSessionSync checks the session and spends the proof
+    ACT->>S: retrieve, compare client secret
+    ACT-->>V: 307, premium-token +<br/>premium-activation proof
+    V->>CP: GET ?payment_intent=...
+    CP-->>V: success card, PremiumSessionSync<br/>checks the session
   end
-  S-)WH: payment_intent.succeeded
-  WH->>DB: create the row if the deferred save never landed
 ```
 
 The browser never posts the Donation to a REST route. `initializePayment` in `apps/web/src/ui/adapters/payments/checkout.ts` calls the **Server Action** `createPaymentAction` (`apps/web/src/infrastructure/actions/payment.ts`), which Next carries as a `POST` to the current page with the action's id in a header. `POST /api/payment` runs the same operation, `createPaymentRequest`, for callers outside the page; the two answer alike because the operation is shared and only the transport differs.

@@ -60,7 +60,7 @@ config:
   look: handDrawn
   layout: dagre
 ---
-flowchart LR
+flowchart TB
   subgraph gen [For every Workday]
     S1[Try the day alone]
     S2["Try it plus the next 1 … MAX_MULTI_DAY_SIZE − 1 Workdays<br/>(consecutive only; a gap stops the run)"]
@@ -97,19 +97,19 @@ Take a Monday Holiday on the 25th. The Friday before is a Workday whose next day
 config:
   look: handDrawn
   layout: dagre
+  gantt:
+    useWidth: 800
 ---
 gantt
   dateFormat YYYY-MM-DD
   axisFormat %a %d
   section Calendar
   Workdays          :2026-05-18, 4d
-  PTO Day (Friday)  :active, 2026-05-22, 1d
+  PTO Day           :active, 2026-05-22, 1d
   Weekend           :done, 2026-05-23, 2d
-  Holiday (Monday)  :crit, 2026-05-25, 1d
-  Workdays          :2026-05-26, 4d
+  Holiday           :crit, 2026-05-25, 1d
   section Bridge
-  startDate → endDate, 4 Effective Days :milestone, 2026-05-22, 0d
-  effectiveDays = 4  :active, 2026-05-22, 4d
+  4 Effective Days  :active, 2026-05-22, 4d
 ```
 
 The Tuesday to Friday after that Holiday form a second candidate: a four-day run whose previous day is the Holiday, expanding backwards over Monday, Sunday and Saturday and forwards over the next weekend. Nine Effective Days for four PTO Days, Efficiency 2.25: kept. Taken together with the Friday the two share Saturday, Sunday and the Monday Holiday, which is exactly the double count Stage 4 exists to refuse: on their own they are worth four and nine, together they are worth ten.
@@ -161,7 +161,7 @@ flowchart TD
   BEST -- yes --> TAKE["Take the best: cover its span, spend its cost"] --> STEP
 ```
 
-**The marginal gain is what keeps the selector honest.** Ranking every Bridge by the Efficiency it has on its own and walking that list once would let a Friday and the Monday after it each look like three days for one, and the plan would pay for their shared weekend twice: over a Spanish 2026 calendar it would believe it had eighty Effective Days where the calendar holds fifty-five. Measured against what is already covered, the Monday adds one day, falls under the floor and is left for a better one. What the selector believes it gained is what the Metrics measure, and the engine's tests assert the two are equal.
+**The marginal gain is what keeps the selector honest.** Ranking every Bridge by the Efficiency it has on its own and walking that list once would let a Friday and the Monday after it each look like three days for one, and the plan would pay for their shared weekend twice: it would count every shared weekend twice and believe it had more Effective Days than the calendar holds. Measured against what is already covered, the Monday adds one day, falls under the floor and is left for a better one. What the selector believes it gained is what the Metrics measure, and the engine's tests assert the two are equal.
 
 A Bridge that would overspend is skipped, not truncated, and budget can be left unspent when nothing that remains clears the floor: a day that adds less than the floor is worse than keeping the day. The result is the sorted list of dates, the Bridges behind them and the Strategy that produced them: the greedy plan, which becomes the **Suggestion** unless a re-run of the same Strategy in Stage 5 finds a better one.
 
@@ -197,7 +197,7 @@ Every Alternative is stamped with the Strategy that found it: the other Strategi
 | Bridges used | The plan's Bridges with at least one PTO Day still placed, so a Bridge that lost one of its days but still leads into a weekend is still counted |
 | First and last break | The first and last placed dates, formatted for the locale |
 
-Two details keep the Metrics honest across a hand-edited plan. **Free streaks** (`freeStreaks` in `apps/web/src/domain/calendar/metrics/utils/streaks.ts`) scan from `STREAK_SCAN_MARGIN_DAYS` ({PTO_CONSTANTS.METRICS.STREAK_SCAN_MARGIN_DAYS}) days before the first relevant date to as many after the last, so a stretch that begins on a weekend outside the placed days is measured whole. And every Metric that reads Holidays and placed days together builds its set through one helper, `closedDayKeys` in `apps/web/src/domain/calendar/metrics/utils/closedDays.ts`, because Manual Days appear in both lists by construction and a Metric that subtracted them independently counted each one twice. `getWorkedDaysPerMonth` did exactly that once.
+Two details keep the Metrics honest across a hand-edited plan. **Free streaks** (`freeStreaks` in `apps/web/src/domain/calendar/metrics/utils/streaks.ts`) scan from `STREAK_SCAN_MARGIN_DAYS` ({PTO_CONSTANTS.METRICS.STREAK_SCAN_MARGIN_DAYS}) days before the first relevant date to as many after the last, so a stretch that begins on a weekend outside the placed days is measured whole. And every Metric that reads Holidays and placed days together builds its set through one helper, `closedDayKeys` in `apps/web/src/domain/calendar/metrics/utils/closedDays.ts`, because Manual Days appear in both lists by construction, and a Metric that subtracted them independently would count each one twice.
 
 ## The tunables
 
@@ -207,7 +207,7 @@ Every constant the engine reads, with its live value. The table is exhaustive ov
 
 ## Complexity and cost
 
-For a window of *m* months there are roughly 21·*m* Workdays; each spawns at most {PTO_CONSTANTS.BRIDGE_SEARCH.MAX_MULTI_DAY_SIZE} candidates and each candidate expands over at most a few days, so generation is linear in the window. Selection costs one pass over the candidates per Bridge taken, with the gain, the stretch and the distance kept up to date incrementally rather than recomputed. Alternatives add a bounded number of further selections. The loops that run per day count in **day indexes**, the integer form `dayIndex` gives a date, rather than in `Date` or Temporal objects: the Bridge search tests a neighbour with `isWeekendIndex` and a set of Holiday indexes, and the selector keeps each candidate's first and last Workday position computed once instead of per step. That rewrite cut the average run to about 17 ms, against about 58 ms for the heuristics this engine replaced, and left the plans of all 864 benchmarked configurations identical. The whole run for a year is tens of milliseconds on a laptop, which is fast enough to feel instant and slow enough to stutter a slider drag if it ran on the main thread; that, and nothing about the algorithm, is why it runs in a [Web Worker](/how-it-works/calculation-worker/).
+For a window of *m* months there are roughly 21·*m* Workdays; each spawns at most {PTO_CONSTANTS.BRIDGE_SEARCH.MAX_MULTI_DAY_SIZE} candidates and each candidate expands over at most a few days, so generation is linear in the window. Selection costs one pass over the candidates per Bridge taken, with the gain, the stretch and the distance kept up to date incrementally rather than recomputed. Alternatives add a bounded number of further selections. The loops that run per day count in **day indexes**, the integer form `dayIndex` gives a date, rather than in `Date` or Temporal objects: the Bridge search tests a neighbour with `isWeekendIndex` and a set of Holiday indexes, and the selector keeps each candidate's first and last Workday position computed once instead of per step. A run for a year takes tens of milliseconds: instant for one change, but enough to stutter a slider drag if it ran on the main thread, which is why it runs in a [Web Worker](/how-it-works/calculation-worker/).
 
 ## Where to read next
 
