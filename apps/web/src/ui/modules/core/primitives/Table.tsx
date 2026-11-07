@@ -21,10 +21,7 @@ function TableHeader({ className, ...props }: ComponentProps<"thead">) {
 	return (
 		<thead
 			data-slot="table-header"
-			className={cn(
-				"[&_tr]:border-b-[2.5px] [&_tr]:border-[var(--frame)] [&_tr]:bg-primary [&_tr]:text-primary-foreground",
-				className,
-			)}
+			className={cn("[&_tr]:border-b-[2.5px] [&_tr]:border-[var(--frame)]", className)}
 			{...props}
 		/>
 	);

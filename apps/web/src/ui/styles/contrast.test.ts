@@ -13,6 +13,8 @@ const INK_CLASS = /(?<![\w-])text-(?:\[var\((--[\w-]+)\)\]|(day-[\w-]+-ink))/;
 const MIX = /^color-mix\(in srgb,\s*(.+?)\s+(\d+)%,\s*(.+?)\s+(\d+)%\)$/;
 const FUNCTION_RGBA = /^rgba?\(\s*(\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\s*\)$/;
 const GRADIENT = /^linear-gradient\((.+)\)$/;
+const OKLCH = /^oklch\(([\d.]+)%\s+([\d.]+)\s+([\d.]+)\)$/;
+const BANNER_SCHEME = /bg:\s*"bg-(wash-[\w-]+)",[\s\S]*?title:\s*"text-(wash-[\w-]+)"/g;
 
 const AA = 4.5;
 const BRAND_FILLED = ["holiday", "suggested", "alternative", "custom", "manual"] as const;
@@ -42,6 +44,30 @@ const topLevelParts = (list: string): string[] => {
 	return [...parts, list.slice(start).trim()];
 };
 
+const encoded = (channel: number): number => {
+	const clamped = Math.min(1, Math.max(0, channel));
+	return 255 * (clamped <= 0.0031308 ? 12.92 * clamped : 1.055 * clamped ** (1 / 2.4) - 0.055);
+};
+
+interface OklchParams {
+	lightness: number;
+	chroma: number;
+	hue: number;
+}
+
+const oklchToColour = ({ lightness, chroma, hue }: OklchParams): Colour => {
+	const a = chroma * Math.cos((hue * Math.PI) / 180);
+	const b = chroma * Math.sin((hue * Math.PI) / 180);
+	const l = (lightness + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+	const m = (lightness - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+	const s = (lightness - 0.0894841775 * a - 1.291485548 * b) ** 3;
+	return [
+		encoded(4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s),
+		encoded(-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s),
+		encoded(-0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s),
+	];
+};
+
 const hexToColour = (hex: string): Colour => {
 	const digits = hex.slice(1);
 	return [0, 2, 4].map((at) => Number.parseInt(digits.slice(at, at + 2), 16)) as Colour;
@@ -63,6 +89,10 @@ const coloursOf = ({ theme, value }: ColoursOfParams): Colour[] => {
 	if (text === "white") return [[255, 255, 255]];
 	if (text === "black") return [[0, 0, 0]];
 	if (text.startsWith("#")) return [hexToColour(text)];
+
+	const oklch = text.match(OKLCH);
+	if (oklch)
+		return [oklchToColour({ lightness: Number(oklch[1]) / 100, chroma: Number(oklch[2]), hue: Number(oklch[3]) })];
 
 	const gradient = text.match(GRADIENT)?.[1];
 	if (gradient)
@@ -184,4 +214,24 @@ describe("the ink on a brand-filled day", () => {
 		expect(fills).toHaveLength(1);
 		expect(fills.map((background) => contrast({ foreground: cream, background }) < AA)).toEqual([true]);
 	});
+});
+
+const bannerSchemes = [
+	...readFileSync(join(__dirname, "../modules/core/primitives/Banner.tsx"), "utf8").matchAll(BANNER_SCHEME),
+].map(([, wash, title]) => [wash as string, title as string] as const);
+
+describe("the title on a Banner's wash", () => {
+	it("reads every colour scheme out of Banner.tsx", () => {
+		expect(bannerSchemes.length).toBeGreaterThanOrEqual(3);
+	});
+
+	it.each(DAY_STATES_BY_THEME.flatMap((theme) => bannerSchemes.map(([wash, title]) => [theme, title, wash] as const)))(
+		"reads at AA in the %s theme: %s on %s",
+		(theme, title, wash) => {
+			const [foreground = [0, 0, 0] as Colour] = coloursOf({ theme, value: `var(--${title})` });
+			const [background = [0, 0, 0] as Colour] = coloursOf({ theme, value: `var(--${wash})` });
+
+			expect(contrast({ foreground, background })).toBeGreaterThanOrEqual(AA);
+		},
+	);
 });

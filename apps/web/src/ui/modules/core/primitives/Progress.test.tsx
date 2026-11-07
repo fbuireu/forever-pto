@@ -31,7 +31,7 @@ const animateOf = (element: Element | null): Record<string, string> | null =>
 
 const renderProgress = (value: number | null = null): RenderResult =>
 	render(
-		<Progress value={value} aria-label="Plan progress">
+		<Progress value={value}>
 			<div className="relative">
 				<ProgressTrack />
 				<ProgressOverlayLabel>{value}%</ProgressOverlayLabel>
@@ -48,10 +48,20 @@ describe("Progress", () => {
 		vi.restoreAllMocks();
 	});
 
-	it("exposes the value as a progressbar", () => {
+	it("exposes the value as a progressbar named by its overlay label", () => {
 		renderProgress(40);
 
-		expect(screen.getByRole("progressbar", { name: "Plan progress" }).getAttribute("aria-valuenow")).toBe("40");
+		expect(screen.getByRole("progressbar", { name: "40%" }).getAttribute("aria-valuenow")).toBe("40");
+	});
+
+	it("takes its name from aria-label when it carries no overlay label", () => {
+		render(
+			<Progress value={40} aria-label="Plan progress">
+				<ProgressTrack />
+			</Progress>,
+		);
+
+		expect(screen.getByRole("progressbar", { name: "Plan progress" })).toBeTruthy();
 	});
 
 	it("drives the indicator to the value as a width", () => {

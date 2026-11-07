@@ -29,6 +29,8 @@ vi.mock("motion/react", async () => {
 	};
 });
 
+const panelState = vi.hoisted(() => ({ open: true }));
+
 vi.mock("@base-ui/react/collapsible", async () => {
 	const { createElement, cloneElement, isValidElement } = await import("react");
 	interface RootProps extends ComponentProps<"div"> {
@@ -62,7 +64,7 @@ vi.mock("@base-ui/react/collapsible", async () => {
 					: createElement("button", props, children),
 			Panel: ({ children, render: renderFn, keepMounted: _km, ...props }: PanelProps) => {
 				if (typeof renderFn === "function") {
-					return renderFn({ hidden: false, style: {}, className: "" }, { open: true });
+					return renderFn({ hidden: false, style: {}, className: "" }, { open: panelState.open });
 				}
 				return createElement("div", props, children);
 			},
@@ -70,7 +72,7 @@ vi.mock("@base-ui/react/collapsible", async () => {
 	};
 });
 
-import { Collapsible, CollapsibleTrigger } from "./Collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./Collapsible";
 
 describe("Collapsible", () => {
 	it('renders with data-slot="collapsible"', () => {
@@ -154,5 +156,32 @@ describe("CollapsibleTrigger", () => {
 		);
 
 		expect(getByTestId("custom-trigger").classList).toContain("cursor-pointer");
+	});
+});
+
+describe("CollapsibleContent", () => {
+	const renderPanel = (open: boolean) => {
+		panelState.open = open;
+		const { getByTestId } = render(
+			<CollapsibleContent>
+				<input data-testid="field" />
+			</CollapsibleContent>,
+		);
+		panelState.open = true;
+		return getByTestId("field").parentElement;
+	};
+
+	it("makes the closed panel inert, so the keyboard cannot reach a field the reader cannot see", () => {
+		const panel = renderPanel(false);
+
+		expect(panel?.hasAttribute("inert")).toBe(true);
+		expect(panel?.getAttribute("aria-hidden")).toBe("true");
+	});
+
+	it("leaves the open panel reachable", () => {
+		const panel = renderPanel(true);
+
+		expect(panel?.hasAttribute("inert")).toBe(false);
+		expect(panel?.hasAttribute("aria-hidden")).toBe(false);
 	});
 });

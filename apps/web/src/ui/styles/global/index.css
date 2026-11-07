@@ -126,13 +126,13 @@
 	--wash-teal-chip: color-mix(in srgb, var(--color-brand-teal) 18%, white 82%);
 	--wash-teal-badge: color-mix(in srgb, var(--color-brand-teal) 30%, white 70%);
 	--wash-teal-icon: var(--color-brand-teal-deep);
-	--wash-teal-title: var(--color-brand-teal-deep);
+	--wash-teal-title: color-mix(in srgb, var(--color-brand-teal-deep) 70%, var(--color-brand-ink) 30%);
 	--wash-teal-message: var(--color-brand-ink);
 	--wash-orange: color-mix(in srgb, var(--color-brand-orange) 18%, white 82%);
 	--wash-orange-card: color-mix(in srgb, var(--color-brand-orange) 20%, white 80%);
 	--wash-orange-badge: color-mix(in srgb, var(--color-brand-orange) 32%, white 68%);
 	--wash-orange-icon: var(--color-brand-orange-deep);
-	--wash-orange-title: var(--color-brand-orange-deep);
+	--wash-orange-title: color-mix(in srgb, var(--color-brand-orange-deep) 90%, var(--color-brand-ink) 10%);
 	--wash-orange-message: var(--color-brand-ink);
 	--wash-purple: color-mix(in srgb, var(--color-brand-purple) 20%, white 80%);
 	--wash-purple-chip: color-mix(in srgb, var(--color-brand-purple) 18%, white 82%);

@@ -86,6 +86,7 @@ function CollapsibleContent({ className, children, ...props }: CollapsibleConten
 						initial={false}
 						transition={{ type: "spring", stiffness: 150, damping: 22 }}
 						aria-hidden={!state.open || undefined}
+						inert={!state.open || undefined}
 						className={cn("overflow-hidden", panelClassName, className)}
 						style={{ display: "block", ...style }}
 					>

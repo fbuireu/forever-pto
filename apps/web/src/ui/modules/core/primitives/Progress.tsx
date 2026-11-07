@@ -70,9 +70,9 @@ function ProgressOverlayLabel({ children, overlayClassName }: ProgressOverlayLab
 
 	return (
 		<>
-			<span className="pointer-events-none absolute inset-0 grid place-items-center font-mono text-[11px] font-bold uppercase text-foreground">
+			<ProgressPrimitive.Label className="pointer-events-none absolute inset-0 grid place-items-center font-mono text-[11px] font-bold uppercase text-foreground">
 				{children}
-			</span>
+			</ProgressPrimitive.Label>
 			<m.span
 				className={cn(
 					"pointer-events-none absolute inset-0 grid place-items-center font-mono text-[11px] font-bold uppercase text-primary-foreground",
