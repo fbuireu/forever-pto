@@ -160,3 +160,5 @@ A premium session is a JWT (jose, HS256, signed with `JWT_SECRET`, 30-day expiry
 ## Gating features
 
 `apps/web/src/ui/modules/premium/PremiumFeature.tsx` wraps premium-only UI: for free users it blurs the children, overlays a lock icon and opens `PremiumRequiredModal` via the store's `showPremiumModal({ feature, origin })`, which takes a `PremiumFeatureId` rather than a display string. Current premium surfaces include [calendar exports](/how-it-works/exports/) and advanced metrics.
+
+The lock sits over what it gates. In the holiday list the gate wraps a lone checkbox, so below `lg`, where the list is cards, the lock is smaller and centred on the checkbox, which keeps it off the holiday's name; from `lg`, where the list is a table with a column for the checkbox, it keeps its full size. A gate with a `description` puts it in a hint on the lock, which opens on hover; a press on the lock, a tap on a phone included, opens the modal alone, since a hint opened by the same tap would sit over it.

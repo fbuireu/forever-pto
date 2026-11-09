@@ -25,7 +25,7 @@ The demo is the Holiday table's tab set. Its Regional tab is disabled, as it is 
 - The active-tab pill is `MotionHighlight` in parent mode (`apps/web/src/ui/modules/core/animate/effects/MotionHighlight.tsx`): a single accent rectangle (`border-2`, `shadow-brutal-xs`) animated to the bounds of the active item with a spring (`stiffness: 200, damping: 25`). That is why the list needs the extra wrapper pair: `TabsHighlight` around `TabsList`, and each `TabsTrigger` inside a `TabsHighlightItem` keyed by the same `value`.
 - `TabsContents` renders only the active `TabsContent` inside `AnimatePresence mode='wait'`. It animates the container height to the new panel via `AutoHeight` (`apps/web/src/ui/modules/core/animate/effects/AutoHeight.tsx`).
 - Each `TabsContent` enters with an opacity + `blur(4px) → 0` transition, so panel swaps read as a focus pull rather than a hard cut.
-- `TabsTrigger` is an `m.button` with `whileTap` scale 0.95 and the `role='tab'` / `aria-selected` / `aria-controls` attributes; Arrow Left, Arrow Right, Home and End move between tabs and activate them (`activateSiblingTab`), which the accessibility section below spells out.
+- `TabsTrigger` is an `m.button` with `whileTap` scale 0.95 and the `role='tab'` / `aria-selected` / `aria-controls` attributes. It is `relative z-1` on its own, because it takes no `className` and so never receives the one `TabsHighlightItem` adds to lift its child, and without it the pill paints over the active label; Arrow Left, Arrow Right, Home and End move between tabs and activate them (`activateSiblingTab`), which the accessibility section below spells out.
 
 ## Props
 
