@@ -391,9 +391,13 @@ holds its label.
 [`premium/PremiumFeature.test.tsx`](./premium/PremiumFeature.test.tsx) clicks the gate in en and in de and
 asserts the store receives the same value both times.
 
-**The gate's lock is centred on what it gates, and its hint never opens on a press.** The `stack`
-variant wraps a lone checkbox in the holiday list, so its lock box is padded `p-1` instead of `p-2`, which
-keeps it inside the 36px gate: the larger box spilled past the checkbox onto the holiday's name. The
+**The `stack` gate draws its lock two ways, at the holiday list's own breakpoint, and the gate's hint
+never opens on a press.** The `stack` variant wraps a lone checkbox in the holiday list. Below `lg`,
+where the list is cards, its lock box is padded `p-1` and centred, which keeps it inside the 36px gate:
+the larger box, aligned to the start, spilled past the checkbox onto Select all and the holiday's name.
+From `lg`, where the list is a table with a column of its own for the checkbox, the lock keeps its full
+size, aligned to the start. The `lg` is `HolidaysTable.tsx`'s switch between the two layouts, so move both
+together. The
 described lock is a tooltip trigger, and Base UI opens a popover on a press, so the gate cancels that
 handler with `preventBaseUIHandler()`: a tap on a phone, which has no hover, opens the Premium modal alone
 rather than the modal under a hint. `PremiumFeature.test.tsx` presses the lock and asserts no hint renders.

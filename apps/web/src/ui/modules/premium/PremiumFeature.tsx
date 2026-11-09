@@ -56,7 +56,7 @@ export const PremiumFeature = ({
 		return <>{children}</>;
 	}
 
-	const lockPadding = variant === PremiumFeatureVariant.STACK ? "p-1" : "p-2";
+	const lockPadding = variant === PremiumFeatureVariant.STACK ? "p-1 lg:p-2" : "p-2";
 
 	return (
 		<AnimateIcon animateOnHover asChild>
@@ -81,7 +81,12 @@ export const PremiumFeature = ({
 				<div className="blur-[4px]" aria-hidden="true" inert>
 					{children}
 				</div>
-				<div className="absolute inset-0 flex items-center justify-center">
+				<div
+					className={cn(
+						"absolute inset-0 flex items-center justify-center",
+						variant === PremiumFeatureVariant.STACK && "lg:justify-start lg:-translate-x-1",
+					)}
+				>
 					{description && !inlineDescription ? (
 						<TooltipProvider>
 							<Tooltip>
