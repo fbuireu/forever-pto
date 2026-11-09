@@ -117,6 +117,19 @@ describe("TabsTrigger", () => {
 		expect(getByRole("tab")).toBeTruthy();
 	});
 
+	it("stacks itself above the highlight, since it takes no className for the highlight item to add", () => {
+		const { getByRole } = render(
+			<Tabs>
+				<TabsList>
+					<TabsTrigger value="a">A</TabsTrigger>
+				</TabsList>
+			</Tabs>,
+		);
+
+		expect(getByRole("tab").classList).toContain("relative");
+		expect(getByRole("tab").classList).toContain("z-1");
+	});
+
 	it('has data-state="active" when it matches the default value', () => {
 		const { getByRole } = render(
 			<Tabs defaultValue="a">
