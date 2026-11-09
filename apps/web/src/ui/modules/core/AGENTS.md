@@ -195,6 +195,13 @@ to `step` ([ADR 0021](../../../../../../docs/adr/0021-numbers-a-visitor-types-ar
 `number | readonly number[]`; every caller wants a mutable `number[]`, so the wrapper copies the array or boxes
 the lone number before calling back, and no caller forks on the shape.
 
+**`primitives/Slider.tsx` draws its own track, split around the handle.** Base UI's `Indicator` sets its own
+inline width, which cannot leave a gap before the thumb, so the wrapper computes the value's percentage with
+Base UI's linear mapping and draws two `aria-hidden` segments, each pinned by both insets, 8px clear of the
+handle's centre. Pinning by both insets is what lets a segment vanish at either bound without a branch, and it
+keeps the geometry readable in jsdom, which drops a `max()` width. The thumb stays centred on the value
+(`thumbAlignment` left at `center`), because the segments' percentages assume it.
+
 **`primitives/Combobox.tsx` keys its `CommandItem` by `option.value` and carries the label in `keywords`, and
 both halves are one decision.** cmdk hands `onSelect` the item's own `value`, which is the only thing
 identifying the clicked row, so options sharing a label (Regions can) stay apart; cmdk also filters on `value`,

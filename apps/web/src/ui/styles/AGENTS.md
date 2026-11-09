@@ -178,7 +178,7 @@ pins the hit area while the box moves, using a transparent `::after` at `inset: 
 `:active` (`inset: -8px 0 0 -8px`, mirrored because the press moves the box the other way).
 
 Its users include [`Button.tsx`](../modules/core/primitives/Button.tsx),
-[`Badge.tsx`](../modules/core/primitives/Badge.tsx), [`Slider.tsx`](../modules/core/primitives/Slider.tsx), the animate primitives ([`Accordion.tsx`](../modules/core/animate/base/Accordion.tsx), [`Collapsible.tsx`](../modules/core/animate/base/Collapsible.tsx), [`Dialog.tsx`](../modules/core/animate/base/Dialog.tsx),
+[`Badge.tsx`](../modules/core/primitives/Badge.tsx), the animate primitives ([`Accordion.tsx`](../modules/core/animate/base/Accordion.tsx), [`Collapsible.tsx`](../modules/core/animate/base/Collapsible.tsx), [`Dialog.tsx`](../modules/core/animate/base/Dialog.tsx),
 [`Sidebar.tsx`](../modules/core/animate/base/Sidebar.tsx), [`Tooltip.tsx`](../modules/core/animate/base/Tooltip.tsx)), the planner calendar day cells and the homepage sections.
 
 `hit-area-stable-tilt` is the variant for elements that *rotate* on hover rather than translate
