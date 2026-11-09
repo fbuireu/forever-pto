@@ -1,3 +1,12 @@
+# [forever-pto-web-v1.17.1](https://github.com/fbuireu/forever-pto/compare/web-v1.17.0...web-v1.17.1) (2026-11-09)
+
+
+### Bug Fixes
+
+* **web:** keep the active tab's label above its highlight ([5f789cf](https://github.com/fbuireu/forever-pto/commit/5f789cf7340686a3741df1e4b56147df7fb9112b))
+* **web:** keep the holiday list's lock off the holiday's name and open no hint on a tap ([abfe982](https://github.com/fbuireu/forever-pto/commit/abfe98224cd645499d664852a6bbcb310302faa2))
+* **web:** keep the holiday table's lock as it was and shrink it only in the cards ([a3660b5](https://github.com/fbuireu/forever-pto/commit/a3660b56f9cd76a017a4f5c1ef704af0da6be7f8))
+
 # [forever-pto-web-v1.17.0](https://github.com/fbuireu/forever-pto/compare/web-v1.16.1...web-v1.17.0) (2026-11-09)
 
 
