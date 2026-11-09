@@ -65,6 +65,7 @@ import { AutoHeight } from '@ui/modules/core/animate/effects/AutoHeight';
 
 - Never hand-roll a moving highlight in a new component; compose `MotionHighlight` like `DropdownMenu`, `Sidebar` and `Tabs` do.
 - The pill defaults to `bg-muted rounded-md`; pass `className` to restyle it (the app usually uses the accent with a 2px frame).
+- `MotionHighlightItem` lifts its child above the pill by adding `relative z-[1]` to the child's `className`, so the child must hand `className` on to its element. A component that takes no `className`, as `TabsTrigger` does, positions itself instead, or the pill paints over its label.
 - Related: [animated components](/design-system/animation/components/), [animated icons](/design-system/animation/icons/).
 
 ## In the app
