@@ -391,6 +391,13 @@ holds its label.
 [`premium/PremiumFeature.test.tsx`](./premium/PremiumFeature.test.tsx) clicks the gate in en and in de and
 asserts the store receives the same value both times.
 
+**The gate's lock is centred on what it gates, and its hint never opens on a press.** The `stack`
+variant wraps a lone checkbox in the holiday list, so its lock box is padded `p-1` instead of `p-2`, which
+keeps it inside the 36px gate: the larger box spilled past the checkbox onto the holiday's name. The
+described lock is a tooltip trigger, and Base UI opens a popover on a press, so the gate cancels that
+handler with `preventBaseUIHandler()`: a tap on a phone, which has no hover, opens the Premium modal alone
+rather than the modal under a hint. `PremiumFeature.test.tsx` presses the lock and asserts no hint renders.
+
 The label map is the one place where an id and a message path meet, and it resolves through a
 **namespace-less** `useTranslations()` because the labels live in different namespaces.
 `satisfies Record<PremiumFeatureId, string>` is what makes a new id a compile error rather than a blank

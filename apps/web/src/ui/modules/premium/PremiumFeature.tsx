@@ -56,6 +56,8 @@ export const PremiumFeature = ({
 		return <>{children}</>;
 	}
 
+	const lockPadding = variant === PremiumFeatureVariant.STACK ? "p-1" : "p-2";
+
 	return (
 		<AnimateIcon animateOnHover asChild>
 			{/* biome-ignore lint/a11y/useSemanticElements: children may render as <button>, avoiding invalid nested button HTML */}
@@ -79,20 +81,18 @@ export const PremiumFeature = ({
 				<div className="blur-[4px]" aria-hidden="true" inert>
 					{children}
 				</div>
-				<div
-					className={cn(
-						"absolute inset-0 flex items-center",
-						variant === PremiumFeatureVariant.STACK ? "justify-start -translate-x-1" : "justify-center",
-					)}
-				>
+				<div className="absolute inset-0 flex items-center justify-center">
 					{description && !inlineDescription ? (
 						<TooltipProvider>
 							<Tooltip>
-								<TooltipTrigger asChild>
+								<TooltipTrigger asChild onClick={(event) => event.preventBaseUIHandler()}>
 									<button
 										type="button"
 										tabIndex={-1}
-										className="relative inline-flex cursor-pointer items-center justify-center rounded-[8px] border-[3px] border-[var(--frame)] bg-background p-2 rotate-[-4deg] shadow-[var(--shadow-brutal-3)]"
+										className={cn(
+											"relative inline-flex cursor-pointer items-center justify-center rounded-[8px] border-[3px] border-[var(--frame)] bg-background rotate-[-4deg] shadow-[var(--shadow-brutal-3)]",
+											lockPadding,
+										)}
 									>
 										<Lock className={cn(iconSize, "text-foreground")} />
 										<span className="absolute -top-2.5 -right-2.5 size-4 inline-flex items-center justify-center rounded-[4px] border-[2px] border-[var(--frame)] bg-[var(--accent)] text-[var(--color-brand-ink)] font-mono font-black text-[10px] leading-none">
@@ -105,7 +105,12 @@ export const PremiumFeature = ({
 						</TooltipProvider>
 					) : (
 						<div className="flex flex-col items-center gap-2 text-center px-4">
-							<div className="inline-flex items-center justify-center rounded-[8px] border-[3px] border-[var(--frame)] bg-background p-2 rotate-[-4deg] shadow-[var(--shadow-brutal-3)]">
+							<div
+								className={cn(
+									"inline-flex items-center justify-center rounded-[8px] border-[3px] border-[var(--frame)] bg-background rotate-[-4deg] shadow-[var(--shadow-brutal-3)]",
+									lockPadding,
+								)}
+							>
 								<Lock className={cn(iconSize, "text-foreground")} />
 							</div>
 							{inlineDescription && (

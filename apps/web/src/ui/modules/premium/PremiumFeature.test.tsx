@@ -83,6 +83,14 @@ describe("PremiumFeature's lock, the one that carries the description", () => {
 		expect(stops.map((el) => el.getAttribute("aria-label"))).toEqual([DESCRIPTION]);
 	});
 
+	it("opens no hint when the lock is pressed, which on a phone would sit over the modal it opens", () => {
+		const { lock } = renderDescribedGate();
+
+		fireEvent.click(lock);
+
+		expect(screen.queryByText(DESCRIPTION)).toBeNull();
+	});
+
 	it("opens the modal once when the lock is clicked", () => {
 		const { lock } = renderDescribedGate();
 
