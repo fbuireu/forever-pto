@@ -1,6 +1,6 @@
 ---
 title: Slider
-description: Base UI slider with an accent thumb and number-to-array value normalization.
+description: Base UI slider with a track split around a bar handle, and number-to-array value normalization.
 sidebar:
   order: 17
   badge:
@@ -11,7 +11,7 @@ sidebar:
 import { SLIDER_PROP_ROWS, SliderDemo } from '../../../../components/demos/SliderDemo';
 import { PropsTable } from '../../../../components/PropsTable';
 
-Source: `apps/web/src/ui/modules/core/primitives/Slider.tsx`. A Base UI slider under a brutal skin. No Motion here (the thumb's hover lift is plain CSS transition), so it works without `LazyMotionProvider`.
+Source: `apps/web/src/ui/modules/core/primitives/Slider.tsx`. A Base UI slider under a brutal skin. No Motion here (the handle's narrowing on a drag is a CSS transition), so it works without `LazyMotionProvider`.
 
 Exports: `Slider`.
 
@@ -21,7 +21,9 @@ Exports: `Slider`.
 
 - **Value normalization is the whole point of the wrapper.** Base UI emits `number` for single-thumb sliders and `readonly number[]` for ranges; consumers always want a mutable `number[]`. The component wraps `onValueChange` so it always receives `number[]`, and `value` is an array too.
 - `onValueChange` fires continuously while dragging.
-- Anatomy: `Root > Control > Track (surface-panel-alt, 3px frame border) > Indicator (frame-colored fill)` plus a `size-7` accent thumb with `hit-area-stable` and the standard hover lift (translate -0.5, shadow grows), same mechanics as [Button](/design-system/components/button/).
+- Anatomy: `Root > Control > Track` holding two framed segments, then the thumb. The handle is a 6px bar in the frame colour, taller than the track, and the track stops short of it on both sides: the accent fill (`slider-range`) ends 8px before the value's position and the panel rest (`slider-rest`), which carries a stop dot at its far end, starts 8px after it. Each segment has a round outer end and a 4px inner one, so the gap reads as a cut rather than a seam.
+- The wrapper computes the value's percentage itself, with the same linear mapping Base UI uses to place the thumb, and pins each segment by both insets. At the minimum the fill's insets cross and it draws nothing, and at the maximum the rest does the same, so neither end needs a special case. The frame is an inset shadow rather than a border, because a border would leave 6px of segment standing where the width is zero.
+- The handle narrows from 6px to 4px while it is dragged (`data-dragging`), which is the slider's whole press feedback: a 6px bar has no room for the hover lift the framed controls use, so it carries no `hit-area-stable`.
 
 ## Props
 
@@ -50,7 +52,8 @@ import { Slider } from '@ui/modules/core/primitives/Slider';
 ## Accessibility
 
 - Base UI renders each thumb as `role='slider'` with `aria-valuenow`, `aria-valuemin` and `aria-valuemax`; the required `label` prop becomes the thumb's `aria-label`, which is why it is not optional.
-- Keyboard: arrow keys move by `step`, Page Up and Page Down by a larger step, Home and End to the bounds. The thumb is `size-7`, above the 24px minimum target, and `touch-none` stops the page from scrolling while dragging on touch screens.
+- Keyboard: arrow keys move by `step`, Page Up and Page Down by a larger step, Home and End to the bounds. The visible bar is 6px wide but the thumb's box is 24 by 32px, so the target meets the 24px minimum; a press anywhere on the track moves the value there too, and `touch-none` stops the page from scrolling while dragging on touch screens.
+- Focus lands on Base UI's hidden range input inside the thumb, so the focus outline hangs off the thumb's `:has(:focus-visible)` and is drawn around the bar itself, 2px out.
 - `onValueChange` fires on every pixel of a drag, so debounce anything expensive in the callback.
 
 ## In the app
