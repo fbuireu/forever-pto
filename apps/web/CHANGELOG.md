@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.17.0](https://github.com/fbuireu/forever-pto/compare/web-v1.16.1...web-v1.17.0) (2026-11-09)
+
+
+### Features
+
+* **web:** split the slider's track around a bar handle ([f9c46e5](https://github.com/fbuireu/forever-pto/commit/f9c46e531b4d15be12374592abacd6d66895377a))
+
 # [forever-pto-web-v1.16.1](https://github.com/fbuireu/forever-pto/compare/web-v1.16.0...web-v1.16.1) (2026-11-07)
 
 
