@@ -1,3 +1,12 @@
+# [forever-pto-web-v1.17.2](https://github.com/fbuireu/forever-pto/compare/web-v1.17.1...web-v1.17.2) (2026-11-13)
+
+
+### Bug Fixes
+
+* **web:** give the Summary cards' text and badges 4.5:1 on their washes ([09902cc](https://github.com/fbuireu/forever-pto/commit/09902cc1a6bca79dd533eb230a21f01c7e2dafbd)), closes [#448](https://github.com/fbuireu/forever-pto/issues/448)
+* **web:** keep the locked Custom tab a tab of the holiday list ([a29edf8](https://github.com/fbuireu/forever-pto/commit/a29edf89b3523409527ace2b77d601a2ad59aa1a)), closes [#450](https://github.com/fbuireu/forever-pto/issues/450)
+* **web:** tell outside-month and past days apart without fading them ([f725e00](https://github.com/fbuireu/forever-pto/commit/f725e0060ed95c91c6e7554c77a09c262117dcc9)), closes [#449](https://github.com/fbuireu/forever-pto/issues/449)
+
 # [forever-pto-web-v1.17.1](https://github.com/fbuireu/forever-pto/compare/web-v1.17.0...web-v1.17.1) (2026-11-09)
 
 
