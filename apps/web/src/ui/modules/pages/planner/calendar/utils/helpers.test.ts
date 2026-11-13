@@ -86,26 +86,48 @@ describe("getDayClassNames precedence", () => {
 });
 
 describe("getDayClassNames month and past-day handling", () => {
-	it("fades a day outside the month", () => {
-		const classes = classesFor({ date: new Date(2025, 1, 3) });
-		expect(classes).toContain("opacity-50");
+	it("sets a day outside the month back in the muted ink at the regular weight, never by fading it", () => {
+		const classes = classesFor({ date: new Date(2025, 1, 3) }).split(" ");
+
+		expect(classes).toEqual(expect.arrayContaining(["text-muted-foreground", "font-normal"]));
+		expect(classes.filter((name) => name.includes("opacity"))).toEqual([]);
 	});
 
-	it("fades a past day through the same predicate the click handler binds, not a second copy of the rule", () => {
+	it("keeps the fill's own ink on a filled day outside the month, so only its weight changes", () => {
+		const classes = classesFor({ date: new Date(2025, 1, 3), modifiers: { suggested: always } }).split(" ");
+
+		expect(classes).toContain("font-normal");
+		expect(classes).not.toContain("text-muted-foreground");
+	});
+
+	it("strikes a past day through the same predicate the click handler binds, not a second copy of the rule", () => {
 		const today = new Date(2025, 0, 20);
 
-		expect(classesFor({ modifiers: { disabled: isPast({ allowPastDays: false, today }) } })).toContain("opacity-60");
-		expect(classesFor({ modifiers: { disabled: isPast({ allowPastDays: true, today }) } })).not.toContain("opacity-60");
+		expect(classesFor({ modifiers: { disabled: isPast({ allowPastDays: false, today }) } })).toContain("line-through");
+		expect(classesFor({ modifiers: { disabled: isPast({ allowPastDays: true, today }) } })).not.toContain(
+			"line-through",
+		);
 		expect(classesFor({ modifiers: { disabled: isPast({ allowPastDays: false, today: null }) } })).not.toContain(
-			"opacity-60",
+			"line-through",
 		);
 	});
 
-	it("leaves a future day unfaded even while the past is excluded", () => {
+	it("strikes a disabled past day in the muted ink, and overrides the button's own fade", () => {
+		const today = new Date(2025, 0, 20);
+		const classes = classesFor({
+			disabled: true,
+			modifiers: { disabled: isPast({ allowPastDays: false, today }) },
+		}).split(" ");
+
+		expect(classes).toEqual(expect.arrayContaining(["line-through", "text-muted-foreground", "disabled:opacity-100"]));
+		expect(classes.filter((name) => name.includes("opacity") && name !== "disabled:opacity-100")).toEqual([]);
+	});
+
+	it("leaves a future day unmarked even while the past is excluded", () => {
 		const today = new Date(2025, 0, 1);
 
 		expect(classesFor({ modifiers: { disabled: isPast({ allowPastDays: false, today }) } })).not.toContain(
-			"opacity-60",
+			"line-through",
 		);
 	});
 

@@ -35,6 +35,14 @@ export const MODIFIERS_CLASS_NAMES = {
 
 type DayStateClass = keyof typeof MODIFIERS_CLASS_NAMES;
 
+const FILLED_STATES: DayStateClass[] = ["holiday", "suggested", "alternative", "custom", "manual"];
+
+const RECEDING_INK = "text-muted-foreground";
+
+const OUTSIDE_MONTH_WEIGHT = "font-normal";
+
+const PAST_MARK = "line-through decoration-1";
+
 const RANGE_KEYS: string[] = ["inRange", "rangeStart", "rangeEnd"];
 
 const DAY_STATE_LABELS = [
@@ -98,16 +106,22 @@ export const getDayClassNames = ({ date, month, isSelected, disabled, modifiers 
 	}
 
 	if (disabled) {
-		const opacity = isOutsideMonth ? "!opacity-20" : "!opacity-40";
-		classes.push(opacity, "cursor-not-allowed pointer-events-none text-muted-foreground");
+		classes.push("cursor-not-allowed pointer-events-none disabled:opacity-100", RECEDING_INK);
+		if (isOutsideMonth) classes.push(OUTSIDE_MONTH_WEIGHT);
+		if (shouldShowAsPast) classes.push(PAST_MARK);
 	} else {
-		const outsideMonthClass = "text-muted-foreground opacity-50";
-
 		if (isOutsideMonth) {
-			classes.push(outsideMonthClass);
-		} else if (shouldShowAsPast) {
-			classes.push("text-muted-foreground opacity-60");
+			const isFilled =
+				isSelected ||
+				isTodayActive ||
+				isRangeStartDay ||
+				isRangeEndDay ||
+				FILLED_STATES.some((name) => modifiers[name]?.(date) ?? false);
+
+			classes.push(OUTSIDE_MONTH_WEIGHT);
+			if (!isFilled) classes.push(RECEDING_INK);
 		}
+		if (shouldShowAsPast) classes.push(PAST_MARK);
 
 		if (!isSelected && !modifiers.today?.(date) && !isRangeStartDay && !isRangeEndDay) {
 			classes.push(

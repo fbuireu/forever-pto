@@ -78,13 +78,16 @@ Precedence inside `getDayClassNames` is not the object order:
 2. `today` short-circuits the loop: when it matches, no other modifier class is applied.
 3. Otherwise every matching modifier contributes, in object-key order, except `inRange`, `rangeStart` and
    `rangeEnd`, which are appended afterwards so a range boundary paints over a Holiday.
-4. A disabled day (the calendar's `disabled`, or a past day the plan does not hold) then adds `!opacity-20` /
-   `!opacity-40`, which beats everything above.
+4. A disabled day (the calendar's `disabled`, or a past day the plan does not hold) then takes the muted ink and
+   `disabled:opacity-100`, which cancels the fade `Button` gives every disabled button. A day outside the month
+   takes the regular weight, and the muted ink unless a state fills it; a past day takes `line-through`, on top of
+   whatever fill it has. Nothing here fades a day with `opacity`: a faded numeral falls below 4.5:1, and the weight
+   and the strike tell the three kinds of day apart without it.
 
 `disabled`, the bound `isPast({ allowPastDays, today })`, carries no class of its own: the render reads it for
-each cell's `disabled` attribute and `getDayClassNames` reads it for the past-day fade, so the rule has one
+each cell's `disabled` attribute and `getDayClassNames` reads it for the past-day strike, so the rule has one
 author. A class entry under that key would paint every past day.
-[`calendar/utils/helpers.test.ts`](./calendar/utils/helpers.test.ts) drives the fade through the real `isPast`.
+[`calendar/utils/helpers.test.ts`](./calendar/utils/helpers.test.ts) drives the strike through the real `isPast`.
 
 `MODIFIERS_CLASS_NAMES` is `as const satisfies Record<string, string>`, so its keys stay literal and a mistyped
 lookup is a compile error; the `Legend` swatches read the same record, the Effective Days one aside. No entry
