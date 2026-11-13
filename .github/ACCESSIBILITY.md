@@ -21,8 +21,13 @@ tested, how to report a barrier, and what a pull request has to keep working.
   so it is read once.
 - **Six languages.** The planner, and everything a screen reader announces in it, is in Catalan, English, French,
   German, Italian and Spanish, and each page declares its language.
-- **Contrast checked by a test.** A unit test measures the text on the calendar's coloured days and on every
-  banner's tinted background, in both themes, and fails below a 4.5:1 contrast ratio.
+- **Contrast checked by a test.** A unit test measures the text on the calendar's coloured days, on every
+  banner's tinted background and on the Summary's cards and their badges, in both themes, and fails below a 4.5:1
+  contrast ratio.
+- **Days told apart without fading.** A day of the neighbouring month is set in a lighter weight and a day already
+  gone is struck through, so every date keeps its contrast.
+- **Locked features stay in place.** A Premium feature the visitor has not unlocked is still announced where it
+  sits, as unavailable, with a description saying it is Premium, and pressing it opens the Premium dialog.
 - **Less motion.** Animations follow your system's reduce-motion setting.
 
 The documentation site is built with [Starlight](https://starlight.astro.build), which provides its skip link,

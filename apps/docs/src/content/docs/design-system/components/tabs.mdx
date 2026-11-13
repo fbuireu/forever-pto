@@ -69,6 +69,7 @@ Reference consumers: the planner's holidays list (`apps/web/src/ui/modules/pages
 
 - Hand-rolled, so the ARIA is explicit: `TabsList` is `role='tablist'`, each trigger `role='tab'` with `aria-selected` and `aria-controls`, each panel `role='tabpanel'` with `aria-labelledby`, and the ids are generated with `useId` so several tab sets on one page do not collide.
 - Keyboard: Arrow Left and Arrow Right move focus between tabs and activate them, Home and End jump to the ends, all handled in the trigger's `onKeyDown` through `activateSiblingTab`. Disabled tabs are skipped.
+- A `locked` trigger stays a tab of the list for a feature the visitor cannot open yet. It takes `aria-disabled` and an `aria-describedby` pointing at the text that says why, the arrow keys move focus onto it without activating it, and a click, Enter or Space runs its `onActivate` instead of switching panels. The Custom Holidays tab uses it for Premium.
 - Only the active panel is rendered, so hidden content is out of the tab order and the accessibility tree without any `aria-hidden` bookkeeping.
 
 ## In the app

@@ -96,7 +96,7 @@ The planner's own series have their own family: `--efficiency`, `--suggested` (S
 
 ## Washes
 
-A brand hue tinted into a surface, toward white in light and toward black in dark, with the ink that reads on it. `Banner`, `MetricCard` and the planner's stat cards draw with them (`bg-wash-teal`, `text-wash-teal-icon`):
+A brand hue tinted into a surface, toward white in light and toward black in dark, with the ink that reads on it. `Banner`, `MetricCard` and the planner's stat cards draw with them (`bg-wash-teal`, `text-wash-teal-icon`). A wash's `-title` and `-badge-ink` are the text that sits on it and on its `-badge`, each at 4.5:1 or better in both themes, which `contrast.test.ts` asserts for every scheme `Banner` and `MetricCard` use:
 
 <TokenSwatch tokens={[
   '--wash-teal',
