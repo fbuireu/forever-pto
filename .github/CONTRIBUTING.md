@@ -32,7 +32,9 @@ under `apps/web/src/ui/i18n/messages` and the docs site's pages under `apps/docs
 pull request can fix either; if you would rather not open one, use the
 [content issue template](ISSUE_TEMPLATE/content_issue.yml) and say which language it is in.
 
-Security issues go through the [Security Policy](./SECURITY.md), never a public issue.
+Security issues go through the [Security Policy](./SECURITY.md), never a public issue. A barrier for someone
+using a keyboard, a screen reader, zoom or reduced motion is a bug like any other;
+[ACCESSIBILITY.md](./ACCESSIBILITY.md) lists what helps in the report.
 
 ### Suggesting features
 
