@@ -1,14 +1,14 @@
 import { HolidayVariant } from "@application/dto/holiday/types";
 import en from "@i18n/messages/en.json";
-import { type RenderResult, render, screen } from "@testing-library/react";
+import { fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
-import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { holidaysState, readyState } = vi.hoisted(() => ({
+const { holidaysState, readyState, gateState } = vi.hoisted(() => ({
 	holidaysState: { holidays: [] as { variant: string }[] },
 	readyState: { areStoresReady: true },
+	gateState: { isLocked: false, unlock: vi.fn(), calls: [] as unknown[] },
 }));
 
 const track = vi.hoisted(() => vi.fn());
@@ -22,12 +22,11 @@ vi.mock("@application/stores/premium", () => ({
 	PremiumOrigin: { PLANNER: "planner" },
 }));
 vi.mock("@ui/hooks/useStoresReady", () => ({ useStoresReady: () => readyState }));
-vi.mock("@ui/modules/premium/PremiumFeature", () => ({
-	PremiumFeature: ({ children, feature, origin }: { children: ReactNode; feature: string; origin: string }) => (
-		<div data-testid="premium-gate" data-feature={feature} data-origin={origin}>
-			{children}
-		</div>
-	),
+vi.mock("@ui/hooks/usePremiumGate", () => ({
+	usePremiumGate: (gate: unknown) => {
+		gateState.calls.push(gate);
+		return { isLocked: gateState.isLocked, unlock: gateState.unlock };
+	},
 }));
 vi.mock("./holidays/HolidaysTable", () => ({
 	HolidaysTable: ({ variant, title, open }: { variant: string; title: string; open: boolean }) => (
@@ -51,6 +50,9 @@ const table = (): HTMLElement => screen.getByTestId("table");
 beforeEach(() => {
 	holidaysState.holidays = [{ variant: HolidayVariant.NATIONAL }];
 	readyState.areStoresReady = true;
+	gateState.isLocked = false;
+	gateState.unlock.mockClear();
+	gateState.calls = [];
 });
 
 describe("HolidaysList", () => {
@@ -92,17 +94,59 @@ describe("HolidaysList", () => {
 		expect(table().dataset.variant).toBe(HolidayVariant.REGIONAL);
 	});
 
-	it("puts the custom tab behind the Premium gate for custom holidays", async () => {
+	it("gates the custom tab on the Premium feature for custom holidays, asked from the planner", () => {
 		renderList();
 
-		const gate = screen.getByTestId("premium-gate");
-		expect(gate.dataset.feature).toBe("customHolidays");
-		expect(gate.dataset.origin).toBe("planner");
-		expect(gate.querySelector('[role="tab"]')?.textContent).toBe(en.holidaysTable.customTab);
+		expect(gateState.calls).toContainEqual({ feature: "customHolidays", origin: "planner" });
+	});
+
+	it("opens the custom table on click once Premium is unlocked", async () => {
+		renderList();
 
 		await userEvent.click(screen.getByRole("tab", { name: en.holidaysTable.customTab }));
 
 		expect(await screen.findByText(en.holidaysTable.customTitle)).toBeTruthy();
+	});
+
+	it("keeps the locked custom tab a tab of the list, unavailable and described, with the lock as a mark only", () => {
+		gateState.isLocked = true;
+		renderList();
+
+		const custom = screen.getByRole("tab", { name: en.holidaysTable.customTab });
+		const hint = document.getElementById(custom.getAttribute("aria-describedby") ?? "");
+
+		expect(screen.getAllByRole("tab")).toHaveLength(3);
+		expect(custom.getAttribute("aria-disabled")).toBe("true");
+		expect(hint?.textContent).toBe(
+			en.premium.unlockFeature.replace("{feature}", en.holidaysTable.customHolidaysFeature),
+		);
+		expect(hint?.closest('[role="tablist"]')).toBeNull();
+		expect(custom.querySelector("button, [role='button'], [tabindex]")).toBeNull();
+		expect(custom.querySelector('[data-slot="premium-lock"]')?.getAttribute("aria-hidden")).toBe("true");
+	});
+
+	it("asks for Premium instead of switching panels when the locked custom tab is pressed", async () => {
+		gateState.isLocked = true;
+		renderList();
+
+		await userEvent.click(screen.getByRole("tab", { name: en.holidaysTable.customTab }));
+
+		expect(gateState.unlock).toHaveBeenCalledOnce();
+		expect(table().dataset.variant).toBe(HolidayVariant.NATIONAL);
+	});
+
+	it("moves focus onto the locked custom tab from the keyboard without asking for Premium", () => {
+		gateState.isLocked = true;
+		holidaysState.holidays = [{ variant: HolidayVariant.NATIONAL }, { variant: HolidayVariant.REGIONAL }];
+		renderList();
+		const national = screen.getByRole("tab", { name: en.holidaysTable.nationalTab });
+		national.focus();
+
+		fireEvent.keyDown(national, { key: "End" });
+
+		expect(document.activeElement).toBe(screen.getByRole("tab", { name: en.holidaysTable.customTab }));
+		expect(gateState.unlock).not.toHaveBeenCalled();
+		expect(table().dataset.variant).toBe(HolidayVariant.NATIONAL);
 	});
 
 	it("renders no table until the stores are ready, and treats regional holidays as absent until then", () => {

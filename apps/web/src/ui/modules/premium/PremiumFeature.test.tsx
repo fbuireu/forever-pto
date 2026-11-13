@@ -75,6 +75,12 @@ describe("PremiumFeature's lock, the one that carries the description", () => {
 		expect(errors.mock.calls.flat().join(" ")).not.toContain("Base UI");
 	});
 
+	it("is hidden from assistive technology, so it is no control nested inside the gate's own", () => {
+		const { lock } = renderDescribedGate();
+
+		expect(lock.getAttribute("aria-hidden")).toBe("true");
+	});
+
 	it("stays out of the tab order, so the gate is the one stop and the one name a keyboard meets", () => {
 		const { container, lock } = renderDescribedGate();
 		const stops = [...container.querySelectorAll<HTMLElement>("button, [tabindex]")].filter((el) => el.tabIndex >= 0);

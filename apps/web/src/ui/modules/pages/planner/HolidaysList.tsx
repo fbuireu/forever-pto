@@ -4,6 +4,7 @@ import { HolidayVariant, isHolidayVariant } from "@application/dto/holiday/types
 import { useHolidaysStore } from "@application/stores/holidays";
 import { PremiumFeatureId, PremiumOrigin } from "@application/stores/premium";
 import { track } from "@infrastructure/clients/logging/better-stack/tracking";
+import { usePremiumGate } from "@ui/hooks/usePremiumGate";
 import { useStoresReady } from "@ui/hooks/useStoresReady";
 import {
 	Tabs,
@@ -14,14 +15,19 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@ui/modules/core/animate/components/Tabs";
-import { PremiumFeature } from "@ui/modules/premium/PremiumFeature";
+import { usePremiumFeatureLabel } from "@ui/modules/premium/featureLabels";
+import { PremiumLock } from "@ui/modules/premium/PremiumLock";
 import { TUTORIAL_ANCHOR } from "@ui/modules/tutorial/anchors";
 import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { HolidaysTable } from "./holidays/HolidaysTable";
 
 export const HolidaysList = () => {
 	const t = useTranslations("holidaysTable");
+	const tPremium = useTranslations("premium");
+	const featureLabel = usePremiumFeatureLabel();
+	const customGate = usePremiumGate({ feature: PremiumFeatureId.CUSTOM_HOLIDAYS, origin: PremiumOrigin.PLANNER });
+	const customLockHintId = useId();
 	const { areStoresReady } = useStoresReady();
 	const holidays = useHolidaysStore((state) => state.holidays);
 	const [activeTab, setActiveTab] = useState<HolidayVariant>(HolidayVariant.NATIONAL);
@@ -51,18 +57,32 @@ export const HolidaysList = () => {
 								{t("regionalTab")}
 							</TabsTrigger>
 						</TabsHighlightItem>
-						<PremiumFeature
-							feature={PremiumFeatureId.CUSTOM_HOLIDAYS}
-							origin={PremiumOrigin.PLANNER}
-							description={t("customHolidaysDescription")}
-							className="p-0"
-						>
-							<TabsHighlightItem value={HolidayVariant.CUSTOM}>
-								<TabsTrigger value={HolidayVariant.CUSTOM}>{t("customTab")}</TabsTrigger>
-							</TabsHighlightItem>
-						</PremiumFeature>
+						<TabsHighlightItem value={HolidayVariant.CUSTOM}>
+							<TabsTrigger
+								value={HolidayVariant.CUSTOM}
+								locked={
+									customGate.isLocked ? { descriptionId: customLockHintId, onActivate: customGate.unlock } : undefined
+								}
+							>
+								{customGate.isLocked ? (
+									<>
+										<span className="blur-[4px]">{t("customTab")}</span>
+										<span className="absolute inset-0 flex items-center justify-center">
+											<PremiumLock className="p-2" />
+										</span>
+									</>
+								) : (
+									t("customTab")
+								)}
+							</TabsTrigger>
+						</TabsHighlightItem>
 					</TabsList>
 				</TabsHighlight>
+				{customGate.isLocked && (
+					<span id={customLockHintId} className="sr-only">
+						{tPremium("unlockFeature", { feature: featureLabel(PremiumFeatureId.CUSTOM_HOLIDAYS) })}
+					</span>
+				)}
 				<TabsContents className="mx-1 mb-1 rounded-sm bg-background py-4">
 					<TabsContent value={HolidayVariant.NATIONAL}>
 						{areStoresReady && <HolidaysTable variant={HolidayVariant.NATIONAL} title={t("nationalTitle")} open />}

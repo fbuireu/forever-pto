@@ -63,7 +63,7 @@ const activateSiblingTab = ({ from, key }: ActivateSiblingTabParams): boolean =>
 	if (target === null) return false;
 
 	tabs[target].focus();
-	tabs[target].click();
+	if (tabs[target].getAttribute("aria-disabled") !== "true") tabs[target].click();
 	return true;
 };
 
@@ -153,13 +153,19 @@ function TabsHighlightItem({ value, children }: Readonly<TabsHighlightItemProps>
 	);
 }
 
+interface TabsTriggerLock {
+	descriptionId: string;
+	onActivate: () => void;
+}
+
 interface TabsTriggerProps {
 	value: string;
 	children: ReactNode;
 	disabled?: boolean;
+	locked?: TabsTriggerLock;
 }
 
-function TabsTrigger({ value, children, disabled }: TabsTriggerProps) {
+function TabsTrigger({ value, children, disabled, locked }: TabsTriggerProps) {
 	const { activeValue, handleValueChange, triggerId, panelId } = useTabs();
 	const isActive = activeValue === value;
 
@@ -176,9 +182,11 @@ function TabsTrigger({ value, children, disabled }: TabsTriggerProps) {
 			aria-controls={isActive ? panelId(value) : undefined}
 			tabIndex={isActive ? 0 : -1}
 			whileTap={{ scale: 0.95 }}
-			onClick={() => handleValueChange(value)}
+			onClick={() => (locked ? locked.onActivate() : handleValueChange(value))}
 			onKeyDown={handleKeyDown}
 			disabled={disabled}
+			aria-disabled={locked ? true : undefined}
+			aria-describedby={locked?.descriptionId}
 			data-state={isActive ? "active" : "inactive"}
 			className="inline-flex cursor-pointer items-center size-full justify-center whitespace-nowrap rounded-sm px-2 py-1 text-sm font-medium transition-all duration-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-accent-foreground data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground relative z-1"
 		>

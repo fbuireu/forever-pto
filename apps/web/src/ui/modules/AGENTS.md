@@ -283,7 +283,7 @@ beside it.
 **`focus:outline-none` kills the focus ring too.** `:focus-visible` is a subset of `:focus`, so no
 `focus-visible:ring-*` written after it brings the ring back. A panel that is only focused programmatically
 (`core/animate/base/Drawer.tsx`'s content) goes without a ring because nothing tabs onto it.
-`premium/PremiumFeature.tsx` (on every gated chart, Holiday row, the Custom tab and the export) and
+`premium/PremiumFeature.tsx` (on every gated chart, Holiday row and the export) and
 `shared/Logo.tsx` (the first focusable element in the planner sidebar) carry the
 `focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2` treatment, and their tests pin
 the ring.
@@ -401,6 +401,9 @@ together. The
 described lock is a tooltip trigger, and Base UI opens a popover on a press, so the gate cancels that
 handler with `preventBaseUIHandler()`: a tap on a phone, which has no hover, opens the Premium modal alone
 rather than the modal under a hint. `PremiumFeature.test.tsx` presses the lock and asserts no hint renders.
+The lock button is `aria-hidden`, so it is no control nested inside the gate's own: the gate is the one stop and
+the one name. The Custom Holidays tab cannot be wrapped at all, because a tab list owns tabs alone; it reads
+`usePremiumGate` and hands `TabsTrigger` a `locked` prop instead, and draws `premium/PremiumLock.tsx` inside it.
 
 The label map is the one place where an id and a message path meet, and it resolves through a
 **namespace-less** `useTranslations()` because the labels live in different namespaces.

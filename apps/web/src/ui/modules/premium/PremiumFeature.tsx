@@ -1,15 +1,15 @@
 "use client";
 
 import type { PremiumFeatureId, PremiumOrigin } from "@application/stores/premium";
-import { usePremiumStore } from "@application/stores/premium";
+import { usePremiumGate } from "@ui/hooks/usePremiumGate";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@ui/modules/core/animate/base/Tooltip";
 import { AnimateIcon } from "@ui/modules/core/animate/icons/Icon";
 import { Lock } from "@ui/modules/core/animate/icons/Lock";
 import { cn } from "@ui/utils/cn";
 import { useTranslations } from "next-intl";
-import { type ReactNode, useEffect } from "react";
-import { useShallow } from "zustand/react/shallow";
+import type { ReactNode } from "react";
 import { usePremiumFeatureLabel } from "./featureLabels";
+import { PremiumLock } from "./PremiumLock";
 
 export const PremiumFeatureVariant = {
 	DEFAULT: "default",
@@ -41,18 +41,9 @@ export const PremiumFeature = ({
 }: PremiumFeatureProps) => {
 	const t = useTranslations("premium");
 	const featureLabel = usePremiumFeatureLabel();
-	const { premiumKey, showPremiumModal, checkExistingSession } = usePremiumStore(
-		useShallow((state) => ({
-			premiumKey: state.premiumKey,
-			showPremiumModal: state.showPremiumModal,
-			checkExistingSession: state.checkExistingSession,
-		})),
-	);
-	useEffect(() => {
-		checkExistingSession();
-	}, [checkExistingSession]);
+	const { isLocked, unlock } = usePremiumGate({ feature, origin });
 
-	if (premiumKey) {
+	if (!isLocked) {
 		return <>{children}</>;
 	}
 
@@ -70,11 +61,11 @@ export const PremiumFeature = ({
 					className,
 				)}
 				aria-label={description ?? t("unlockFeature", { feature: featureLabel(feature) })}
-				onClick={() => showPremiumModal({ feature, origin })}
+				onClick={unlock}
 				onKeyDown={(e) => {
 					if (e.key === "Enter" || e.key === " ") {
 						e.preventDefault();
-						showPremiumModal({ feature, origin });
+						unlock();
 					}
 				}}
 			>
@@ -94,6 +85,7 @@ export const PremiumFeature = ({
 									<button
 										type="button"
 										tabIndex={-1}
+										aria-hidden="true"
 										className={cn(
 											"relative inline-flex cursor-pointer items-center justify-center rounded-[8px] border-[3px] border-[var(--frame)] bg-background rotate-[-4deg] shadow-[var(--shadow-brutal-3)]",
 											lockPadding,
@@ -110,14 +102,7 @@ export const PremiumFeature = ({
 						</TooltipProvider>
 					) : (
 						<div className="flex flex-col items-center gap-2 text-center px-4">
-							<div
-								className={cn(
-									"inline-flex items-center justify-center rounded-[8px] border-[3px] border-[var(--frame)] bg-background rotate-[-4deg] shadow-[var(--shadow-brutal-3)]",
-									lockPadding,
-								)}
-							>
-								<Lock className={cn(iconSize, "text-foreground")} />
-							</div>
+							<PremiumLock className={lockPadding} iconSize={iconSize} />
 							{inlineDescription && (
 								<div className="text-sm text-foreground dark:[text-shadow:0_2px_4px_var(--shade)]">{description}</div>
 							)}
