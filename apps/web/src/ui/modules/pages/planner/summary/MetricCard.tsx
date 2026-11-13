@@ -47,25 +47,25 @@ const COLOR_SCHEMES = {
 		bg: "bg-wash-teal",
 		icon: "text-wash-teal-icon",
 		text: "text-wash-teal-title",
-		badge: "bg-wash-teal-badge text-[var(--color-brand-teal-deep)]",
+		badge: "bg-wash-teal-badge text-wash-teal-badge-ink",
 	},
 	green: {
 		bg: "bg-wash-yellow",
 		icon: "text-wash-yellow-icon",
 		text: "text-wash-yellow-title",
-		badge: "bg-wash-yellow-badge text-[var(--color-brand-yellow-deep)]",
+		badge: "bg-wash-yellow-badge text-wash-yellow-badge-ink",
 	},
 	purple: {
 		bg: "bg-wash-purple",
 		icon: "text-wash-purple-icon",
 		text: "text-wash-purple-title",
-		badge: "bg-wash-purple-badge text-[var(--color-brand-purple-deep)]",
+		badge: "bg-wash-purple-badge text-wash-purple-badge-ink",
 	},
 	amber: {
 		bg: "bg-wash-orange-card",
 		icon: "text-wash-orange-icon",
 		text: "text-wash-orange-title",
-		badge: "bg-wash-orange-badge text-[var(--color-brand-orange-deep)]",
+		badge: "bg-wash-orange-badge text-wash-orange-badge-ink",
 	},
 	emerald: {
 		bg: "bg-wash-emerald",
@@ -130,7 +130,7 @@ export const MetricCard = (props: MetricCardProps) => {
 					})}
 				</div>
 				<div className={cn("text-xs", colors.text)}>{label}</div>
-				{hint && <div className={cn("text-[0.65rem] opacity-70", colors.text)}>{hint}</div>}
+				{hint && <div className={cn("text-[0.65rem]", colors.text)}>{hint}</div>}
 			</div>
 		);
 	}

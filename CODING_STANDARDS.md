@@ -37,7 +37,7 @@ No rule below restates these, and a diff that breaks one fails CI:
   (`Dialog.test.tsx`), the overlay layers (`Popover.test.tsx`, `Tooltip.test.tsx`), `BLOCK_MINIMUM` as the lowest
   floor any Strategy applies (`utils/helpers.test.ts`), what each Strategy means over a real calendar
   (`strategies.test.ts`), a new obfuscation writing what the old one wrote (`utils/crypto.test.ts`), the ink on every
-  brand-filled calendar day at AA in both themes (`contrast.test.ts`), the theme written to `<html>` as `data-theme` and
+  brand-filled calendar day, `Banner` wash and `MetricCard` wash at AA in both themes (`contrast.test.ts`), the theme written to `<html>` as `data-theme` and
   as the class a skeleton reads (`AppThemeProvider.document.test.tsx`), one button in the sidebar group whichever way
   its icon arrives (`SidebarCollapsibleGroup.test.tsx`), an animated icon that asks its controls for nothing while it is
   unmounted (`Icon.mounted.test.tsx`) and `premium_activated` reported from the activation redirect alone

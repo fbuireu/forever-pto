@@ -13,8 +13,10 @@ const INK_CLASS = /(?<![\w-])text-(?:\[var\((--[\w-]+)\)\]|(day-[\w-]+-ink))/;
 const MIX = /^color-mix\(in srgb,\s*(.+?)\s+(\d+)%,\s*(.+?)\s+(\d+)%\)$/;
 const FUNCTION_RGBA = /^rgba?\(\s*(\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\s*\)$/;
 const GRADIENT = /^linear-gradient\((.+)\)$/;
-const OKLCH = /^oklch\(([\d.]+)%\s+([\d.]+)\s+([\d.]+)\)$/;
+const OKLCH = /^oklch\(([\d.]+)%\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+)%)?\)$/;
 const BANNER_SCHEME = /bg:\s*"bg-(wash-[\w-]+)",[\s\S]*?title:\s*"text-(wash-[\w-]+)"/g;
+const METRIC_CARD_SCHEME =
+	/(\w+):\s*\{\s*bg:\s*"bg-(wash-[\w-]+)",[^}]*?text:\s*"text-(wash-[\w-]+)",\s*badge:\s*"bg-(wash-[\w-]+) text-(wash-[\w-]+)"/g;
 
 const AA = 4.5;
 const BRAND_FILLED = ["holiday", "suggested", "alternative", "custom", "manual"] as const;
@@ -76,35 +78,41 @@ const hexToColour = (hex: string): Colour => {
 interface ColoursOfParams {
 	theme: Theme;
 	value: string;
+	backdrop?: Colour;
 }
 
-const coloursOf = ({ theme, value }: ColoursOfParams): Colour[] => {
+const coloursOf = ({ theme, value, backdrop }: ColoursOfParams): Colour[] => {
 	const text = value.trim();
 	const reference = text.match(/^var\((--[\w-]+)\)$/)?.[1];
 	if (reference) {
 		const resolved = (theme === "dark" ? dark.get(reference) : undefined) ?? light.get(reference);
 		if (resolved === undefined) throw new Error(`${reference} is declared in neither theme`);
-		return coloursOf({ theme, value: resolved });
+		return coloursOf({ theme, value: resolved, backdrop });
 	}
 	if (text === "white") return [[255, 255, 255]];
 	if (text === "black") return [[0, 0, 0]];
 	if (text.startsWith("#")) return [hexToColour(text)];
 
 	const oklch = text.match(OKLCH);
-	if (oklch)
-		return [oklchToColour({ lightness: Number(oklch[1]) / 100, chroma: Number(oklch[2]), hue: Number(oklch[3]) })];
+	if (oklch) {
+		const solid = oklchToColour({ lightness: Number(oklch[1]) / 100, chroma: Number(oklch[2]), hue: Number(oklch[3]) });
+		if (oklch[4] === undefined) return [solid];
+		if (!backdrop) throw new Error(`${text} is translucent and needs a backdrop`);
+		const alpha = Number(oklch[4]) / 100;
+		return [solid.map((channel, at) => channel * alpha + backdrop[at] * (1 - alpha)) as Colour];
+	}
 
 	const gradient = text.match(GRADIENT)?.[1];
 	if (gradient)
 		return topLevelParts(gradient)
 			.slice(1)
-			.flatMap((stop) => coloursOf({ theme, value: stop }));
+			.flatMap((stop) => coloursOf({ theme, value: stop, backdrop }));
 
 	const mix = text.match(MIX);
 	if (mix) {
 		const [, first, firstShare, second, secondShare] = mix as unknown as [string, string, string, string, string];
-		const [a] = coloursOf({ theme, value: first });
-		const [b] = coloursOf({ theme, value: second });
+		const [a] = coloursOf({ theme, value: first, backdrop });
+		const [b] = coloursOf({ theme, value: second, backdrop });
 		const total = Number(firstShare) + Number(secondShare);
 		return [
 			(a as Colour).map(
@@ -234,4 +242,45 @@ describe("the title on a Banner's wash", () => {
 			expect(contrast({ foreground, background })).toBeGreaterThanOrEqual(AA);
 		},
 	);
+});
+
+const metricCardSchemes = [
+	...readFileSync(join(__dirname, "../modules/pages/planner/summary/MetricCard.tsx"), "utf8").matchAll(
+		METRIC_CARD_SCHEME,
+	),
+].map(([, scheme, wash, text, badge, badgeInk]) => ({
+	scheme: scheme as string,
+	pairs: [
+		[text as string, wash as string],
+		[badgeInk as string, badge as string],
+	] as const,
+}));
+
+describe("the text and the badge on a MetricCard's wash", () => {
+	it("reads every colour scheme out of MetricCard.tsx", () => {
+		expect(metricCardSchemes.map(({ scheme }) => scheme)).toEqual([
+			"blue",
+			"green",
+			"purple",
+			"amber",
+			"emerald",
+			"cyan",
+			"violet",
+			"rose",
+		]);
+	});
+
+	it.each(
+		DAY_STATES_BY_THEME.flatMap((theme) =>
+			metricCardSchemes.flatMap(({ scheme, pairs }) =>
+				pairs.map(([ink, surface]) => [theme, scheme, ink, surface] as const),
+			),
+		),
+	)("reads at AA in the %s theme, %s scheme: %s on %s", (theme, _scheme, ink, surface) => {
+		const [card = [0, 0, 0] as Colour] = coloursOf({ theme, value: "var(--card)" });
+		const [background = [0, 0, 0] as Colour] = coloursOf({ theme, value: `var(--${surface})`, backdrop: card });
+		const [foreground = [0, 0, 0] as Colour] = coloursOf({ theme, value: `var(--${ink})`, backdrop: background });
+
+		expect(contrast({ foreground, background })).toBeGreaterThanOrEqual(AA);
+	});
 });

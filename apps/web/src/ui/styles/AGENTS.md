@@ -32,7 +32,7 @@ fails on a scanned test, e2e spec or Markdown file and on any palette utility in
 | [`vendor/index.css`](./vendor/index.css) | `@layer vendor`: `flag-icons`, cookie-consent and boneyard-js overrides, `::selection` |
 | [`palette.ts`](./palette.ts) | The tokens' JS twin: the colours a consumer that cannot read a custom property takes by value (the Stripe iframe, the skeletons, the PDF, the confetti) |
 | [`palette.test.ts`](./palette.test.ts) | Holds `palette.ts` equal to the tokens it repeats, and keeps every colour out of `boneyard.config.json` and the registry generated from it |
-| [`contrast.test.ts`](./contrast.test.ts) | Evaluates the fill, the stripe and the ink of every brand-filled calendar day in both themes and holds the ink at WCAG AA |
+| [`contrast.test.ts`](./contrast.test.ts) | Evaluates the fill, the stripe and the ink of every brand-filled calendar day in both themes and holds the ink at WCAG AA, and does the same for the title on every `Banner` wash and the text and badge on every `MetricCard` wash |
 | [`index.test.ts`](./index.test.ts) | Reads the stylesheets as text and guards the invariants a reader is most likely to "tidy away" |
 
 ## The cascade layer order
@@ -249,8 +249,8 @@ pins the things that look like tidy-ups and are not: the design tokens stay unla
 layer statement reserves no slot for them, the `tutorial` slot stays reserved, `theme/index.css`
 keeps `--container-8xl` without a `--max-width-8xl` mirror, and `index.css` reaches every stylesheet in the
 folder, so one that a single component imports fails until it moves beside that component. `palette.test.ts` holds
-the palette module to the tokens, `contrast.test.ts` holds the ink on every brand-filled calendar day at AA in both
-themes, and the contract suite (`tests/docs-consistency.test.ts`) holds every other file of `apps/web/src` free of a
+the palette module to the tokens, `contrast.test.ts` holds the ink on every brand-filled calendar day, every
+`Banner` wash and every `MetricCard` wash at AA in both themes, and the contract suite (`tests/docs-consistency.test.ts`) holds every other file of `apps/web/src` free of a
 literal colour, a hex, a colour function, a palette class or a `white` or `black`, holds every custom property read
 there to a declaration, and builds the shipped stylesheet to fail on a scanned fixture or a palette utility.
 

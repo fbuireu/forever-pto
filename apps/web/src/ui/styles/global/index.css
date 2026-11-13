@@ -127,12 +127,14 @@
 	--wash-teal-badge: color-mix(in srgb, var(--color-brand-teal) 30%, white 70%);
 	--wash-teal-icon: var(--color-brand-teal-deep);
 	--wash-teal-title: color-mix(in srgb, var(--color-brand-teal-deep) 70%, var(--color-brand-ink) 30%);
+	--wash-teal-badge-ink: color-mix(in srgb, var(--color-brand-teal-deep) 65%, var(--color-brand-ink) 35%);
 	--wash-teal-message: var(--color-brand-ink);
 	--wash-orange: color-mix(in srgb, var(--color-brand-orange) 18%, white 82%);
 	--wash-orange-card: color-mix(in srgb, var(--color-brand-orange) 20%, white 80%);
 	--wash-orange-badge: color-mix(in srgb, var(--color-brand-orange) 32%, white 68%);
 	--wash-orange-icon: var(--color-brand-orange-deep);
 	--wash-orange-title: color-mix(in srgb, var(--color-brand-orange-deep) 90%, var(--color-brand-ink) 10%);
+	--wash-orange-badge-ink: color-mix(in srgb, var(--color-brand-orange-deep) 85%, var(--color-brand-ink) 15%);
 	--wash-orange-message: var(--color-brand-ink);
 	--wash-purple: color-mix(in srgb, var(--color-brand-purple) 20%, white 80%);
 	--wash-purple-chip: color-mix(in srgb, var(--color-brand-purple) 18%, white 82%);
@@ -140,6 +142,7 @@
 	--wash-purple-badge: color-mix(in srgb, var(--color-brand-purple) 32%, white 68%);
 	--wash-purple-icon: var(--color-brand-purple-deep);
 	--wash-purple-title: var(--color-brand-purple-deep);
+	--wash-purple-badge-ink: color-mix(in srgb, var(--color-brand-purple-deep) 90%, var(--color-brand-ink) 10%);
 	--wash-purple-message: var(--color-brand-ink);
 	--wash-purple-figure: color-mix(in srgb, var(--color-brand-purple) 85%, black 15%);
 	--wash-purple-caption: var(--color-brand-purple);
@@ -147,7 +150,8 @@
 	--wash-yellow-badge: color-mix(in srgb, var(--color-brand-yellow) 40%, white 60%);
 	--wash-yellow-chip: color-mix(in srgb, var(--color-brand-yellow) 28%, white 72%);
 	--wash-yellow-icon: var(--color-brand-yellow-deep);
-	--wash-yellow-title: var(--color-brand-yellow-deep);
+	--wash-yellow-title: color-mix(in srgb, var(--color-brand-yellow-deep) 55%, var(--color-brand-ink) 45%);
+	--wash-yellow-badge-ink: var(--wash-yellow-title);
 	--wash-green: color-mix(in srgb, var(--color-brand-green) 18%, white 82%);
 	--wash-green-ink: #3f6212;
 	--wash-green-message: var(--color-brand-ink);
@@ -163,22 +167,22 @@
 	--wash-emerald-icon: oklch(69.6% 0.17 162.48);
 	--wash-emerald-title: oklch(50.8% 0.118 165.612);
 	--wash-emerald-badge: oklch(90.5% 0.093 164.15);
-	--wash-emerald-badge-ink: oklch(50.8% 0.118 165.612);
+	--wash-emerald-badge-ink: color-mix(in srgb, var(--wash-emerald-title) 90%, var(--color-brand-ink) 10%);
 	--wash-cyan: oklch(95.6% 0.045 203.388);
 	--wash-cyan-icon: oklch(71.5% 0.143 215.221);
 	--wash-cyan-title: oklch(52% 0.105 223.128);
 	--wash-cyan-badge: oklch(91.7% 0.08 205.041);
-	--wash-cyan-badge-ink: oklch(52% 0.105 223.128);
+	--wash-cyan-badge-ink: color-mix(in srgb, var(--wash-cyan-title) 90%, var(--color-brand-ink) 10%);
 	--wash-violet: oklch(94.3% 0.029 294.588);
 	--wash-violet-icon: oklch(60.6% 0.25 292.717);
 	--wash-violet-title: oklch(49.1% 0.27 292.581);
 	--wash-violet-badge: oklch(89.4% 0.057 293.283);
-	--wash-violet-badge-ink: oklch(49.1% 0.27 292.581);
+	--wash-violet-badge-ink: var(--wash-violet-title);
 	--wash-rose: oklch(94.1% 0.03 12.58);
 	--wash-rose-icon: oklch(64.5% 0.246 16.439);
 	--wash-rose-title: oklch(51.4% 0.222 16.935);
 	--wash-rose-badge: oklch(89.2% 0.058 10.001);
-	--wash-rose-badge-ink: oklch(51.4% 0.222 16.935);
+	--wash-rose-badge-ink: color-mix(in srgb, var(--wash-rose-title) 90%, var(--color-brand-ink) 10%);
 }
 
 [data-theme="dark"] {
@@ -239,12 +243,14 @@
 	--wash-teal-badge: color-mix(in srgb, var(--color-brand-teal) 22%, black 78%);
 	--wash-teal-icon: oklch(85.5% 0.138 181.071);
 	--wash-teal-title: oklch(91% 0.096 180.426);
+	--wash-teal-badge-ink: var(--wash-teal-title);
 	--wash-teal-message: oklch(95.3% 0.051 180.801);
 	--wash-orange: color-mix(in srgb, var(--color-brand-orange) 16%, black 84%);
 	--wash-orange-card: color-mix(in srgb, var(--color-brand-orange) 18%, black 82%);
 	--wash-orange-badge: color-mix(in srgb, var(--color-brand-orange) 22%, black 78%);
 	--wash-orange-icon: oklch(83.7% 0.128 66.29);
 	--wash-orange-title: oklch(90.1% 0.076 70.697);
+	--wash-orange-badge-ink: var(--wash-orange-title);
 	--wash-orange-message: oklch(95.4% 0.038 75.164);
 	--wash-purple: color-mix(in srgb, var(--color-brand-purple) 16%, black 84%);
 	--wash-purple-chip: color-mix(in srgb, var(--color-brand-purple) 25%, black 75%);
@@ -252,6 +258,7 @@
 	--wash-purple-badge: color-mix(in srgb, var(--color-brand-purple) 22%, black 78%);
 	--wash-purple-icon: oklch(82.7% 0.119 306.383);
 	--wash-purple-title: oklch(90.2% 0.063 306.703);
+	--wash-purple-badge-ink: var(--wash-purple-title);
 	--wash-purple-message: oklch(94.6% 0.033 307.174);
 	--wash-purple-figure: color-mix(in srgb, var(--color-brand-purple) 70%, white 30%);
 	--wash-purple-caption: color-mix(in srgb, var(--color-brand-purple) 60%, white 40%);
@@ -270,13 +277,16 @@
 	--wash-emerald: oklch(37.8% 0.077 168.94 / 20%);
 	--wash-emerald-title: oklch(84.5% 0.143 164.978);
 	--wash-emerald-badge: oklch(37.8% 0.077 168.94 / 30%);
+	--wash-emerald-badge-ink: var(--wash-emerald-title);
 	--wash-cyan: oklch(39.8% 0.07 227.392 / 20%);
 	--wash-cyan-title: oklch(86.5% 0.127 207.078);
 	--wash-cyan-badge: oklch(39.8% 0.07 227.392 / 30%);
+	--wash-cyan-badge-ink: var(--wash-cyan-title);
 	--wash-violet: oklch(38% 0.189 293.745 / 20%);
 	--wash-violet-title: oklch(81.1% 0.111 293.571);
 	--wash-violet-badge: oklch(38% 0.189 293.745 / 30%);
 	--wash-rose: oklch(41% 0.159 10.272 / 20%);
 	--wash-rose-title: oklch(81% 0.117 11.638);
 	--wash-rose-badge: oklch(41% 0.159 10.272 / 30%);
+	--wash-rose-badge-ink: var(--wash-rose-title);
 }

@@ -84,12 +84,14 @@
 	--color-wash-teal-badge: var(--wash-teal-badge);
 	--color-wash-teal-icon: var(--wash-teal-icon);
 	--color-wash-teal-title: var(--wash-teal-title);
+	--color-wash-teal-badge-ink: var(--wash-teal-badge-ink);
 	--color-wash-teal-message: var(--wash-teal-message);
 	--color-wash-orange: var(--wash-orange);
 	--color-wash-orange-card: var(--wash-orange-card);
 	--color-wash-orange-badge: var(--wash-orange-badge);
 	--color-wash-orange-icon: var(--wash-orange-icon);
 	--color-wash-orange-title: var(--wash-orange-title);
+	--color-wash-orange-badge-ink: var(--wash-orange-badge-ink);
 	--color-wash-orange-message: var(--wash-orange-message);
 	--color-wash-purple: var(--wash-purple);
 	--color-wash-purple-chip: var(--wash-purple-chip);
@@ -97,6 +99,7 @@
 	--color-wash-purple-badge: var(--wash-purple-badge);
 	--color-wash-purple-icon: var(--wash-purple-icon);
 	--color-wash-purple-title: var(--wash-purple-title);
+	--color-wash-purple-badge-ink: var(--wash-purple-badge-ink);
 	--color-wash-purple-message: var(--wash-purple-message);
 	--color-wash-purple-figure: var(--wash-purple-figure);
 	--color-wash-purple-caption: var(--wash-purple-caption);
@@ -105,6 +108,7 @@
 	--color-wash-yellow-chip: var(--wash-yellow-chip);
 	--color-wash-yellow-icon: var(--wash-yellow-icon);
 	--color-wash-yellow-title: var(--wash-yellow-title);
+	--color-wash-yellow-badge-ink: var(--wash-yellow-badge-ink);
 	--color-wash-green: var(--wash-green);
 	--color-wash-green-ink: var(--wash-green-ink);
 	--color-wash-green-message: var(--wash-green-message);
