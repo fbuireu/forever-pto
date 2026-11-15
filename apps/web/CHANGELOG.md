@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.17.6](https://github.com/fbuireu/forever-pto/compare/web-v1.17.5...web-v1.17.6) (2026-11-15)
+
+
+### Bug Fixes
+
+* **deps:** update react monorepo to v19.3.1 ([#463](https://github.com/fbuireu/forever-pto/issues/463)) ([7d311b2](https://github.com/fbuireu/forever-pto/commit/7d311b2c63344b02a1f086c9435fe9860c0ca96a))
+
 # [forever-pto-web-v1.17.5](https://github.com/fbuireu/forever-pto/compare/web-v1.17.4...web-v1.17.5) (2026-11-15)
 
 
