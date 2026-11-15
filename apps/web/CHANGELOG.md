@@ -1,3 +1,11 @@
+# [forever-pto-web-v1.17.5](https://github.com/fbuireu/forever-pto/compare/web-v1.17.4...web-v1.17.5) (2026-11-15)
+
+
+### Bug Fixes
+
+* **deps:** update dependency react-email to v6.11.11 ([#460](https://github.com/fbuireu/forever-pto/issues/460)) ([b5d6bee](https://github.com/fbuireu/forever-pto/commit/b5d6bee89b7f52bb19557ef79b7d7825bca85d3f))
+* **deps:** update dependency temporal-polyfill to v1.0.8 ([#461](https://github.com/fbuireu/forever-pto/issues/461)) ([d303d64](https://github.com/fbuireu/forever-pto/commit/d303d645d5c40111829844c210ebc022f2740afd))
+
 # [forever-pto-web-v1.17.4](https://github.com/fbuireu/forever-pto/compare/web-v1.17.3...web-v1.17.4) (2026-11-15)
 
 
