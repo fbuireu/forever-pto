@@ -1,3 +1,10 @@
+# [forever-pto-docs-v1.7.1](https://github.com/fbuireu/forever-pto/compare/docs-v1.7.0...docs-v1.7.1) (2026-11-15)
+
+
+### Bug Fixes
+
+* **deps:** update react monorepo to v19.3.1 ([#463](https://github.com/fbuireu/forever-pto/issues/463)) ([7d311b2](https://github.com/fbuireu/forever-pto/commit/7d311b2c63344b02a1f086c9435fe9860c0ca96a))
+
 # [forever-pto-docs-v1.7.0](https://github.com/fbuireu/forever-pto/compare/docs-v1.6.2...docs-v1.7.0) (2026-11-06)
 
 
