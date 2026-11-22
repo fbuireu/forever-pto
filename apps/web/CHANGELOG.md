@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.18.1](https://github.com/fbuireu/forever-pto/compare/web-v1.18.0...web-v1.18.1) (2026-11-22)
+
+
+### Bug Fixes
+
+* **web:** keep the planner column inside the viewport beside the rail ([#466](https://github.com/fbuireu/forever-pto/issues/466)) ([2be4a02](https://github.com/fbuireu/forever-pto/commit/2be4a021b070a6a75523658a10c14174b3730eca)), closes [#123](https://github.com/fbuireu/forever-pto/issues/123) [#464](https://github.com/fbuireu/forever-pto/issues/464) [#464](https://github.com/fbuireu/forever-pto/issues/464)
+
 # [forever-pto-web-v1.18.0](https://github.com/fbuireu/forever-pto/compare/web-v1.17.7...web-v1.18.0) (2026-11-22)
 
 
