@@ -18,7 +18,7 @@ Most core components are framework-clean and get live demos elsewhere in this se
 
 ## Sonner (Toaster)
 
-`apps/web/src/ui/modules/core/primitives/Sonner.tsx` is the toast host, a brutal-styled wrapper over `sonner`'s `Toaster`. Fixed settings: `position='bottom-center'`, `duration={5000}`, `closeButton`. Per-type classes (success, warning, error, info) restyle toasts through a `--toast-bg` variable onto the brand colors, with 3px frames and hard shadows; the close button gets the standard hover lift.
+`apps/web/src/ui/modules/core/primitives/Sonner.tsx` is the toast host, a brutal-styled wrapper over `sonner`'s `Toaster`. Fixed settings: `position='bottom-center'`, `duration={5000}`, `closeButton`, and `offset` and `mobileOffset` that keep the toasts at `max(24px, inset)` from the bottom and sides (`16px` on phones), so they clear the home indicator and a landscape notch. Per-type classes (success, warning, error, info) restyle toasts through a `--toast-bg` variable onto the brand colors, with 3px frames and hard shadows; the close button gets the standard hover lift.
 
 - **API**: one required prop, `closeLabel`, the translated name of the close button; fire toasts with `toast(...)` from `sonner` anywhere below it.
 - **Coupling**: `import { useTheme } from 'next-themes'`, which reads the active theme to keep toasts in sync with dark mode.
