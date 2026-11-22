@@ -133,6 +133,14 @@ describe("Roadmap", () => {
 		expect(dialColumn?.className).not.toContain("sticky");
 	});
 
+	it("lets the feature list beside the dial shrink to the room left, so the row fits the planner's column with the rail open", () => {
+		renderRoadmap();
+
+		expect(screen.getByTestId("features").parentElement?.className.split(" ")).toEqual(
+			expect.arrayContaining(["flex-1", "min-w-0"]),
+		);
+	});
+
 	it("names the dial for assistive tech", () => {
 		renderRoadmap();
 

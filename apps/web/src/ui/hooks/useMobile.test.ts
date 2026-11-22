@@ -17,7 +17,7 @@ const makeMediaQueryList = (matches: boolean): MediaQueryListDouble => ({
 beforeEach(() => {
 	vi.stubGlobal(
 		"matchMedia",
-		vi.fn((query: string) => makeMediaQueryList(query.includes("767px") || query.includes("max-width: 767px"))),
+		vi.fn((query: string) => makeMediaQueryList(query.includes("max-width: 1023px"))),
 	);
 });
 
@@ -41,6 +41,16 @@ describe("useIsMobile", () => {
 			vi.fn(() => makeMediaQueryList(true)),
 		);
 		const { result } = renderHook(() => useIsMobile());
+		expect(result.current).toBe(true);
+	});
+
+	it("answers true below lg, the width the sidebar's lg classes start drawing the rail at", () => {
+		const matchMedia = vi.fn((query: string) => makeMediaQueryList(query === "(max-width: 1023px)"));
+		vi.stubGlobal("matchMedia", matchMedia);
+
+		const { result } = renderHook(() => useIsMobile());
+
+		expect(matchMedia).toHaveBeenCalledWith("(max-width: 1023px)");
 		expect(result.current).toBe(true);
 	});
 

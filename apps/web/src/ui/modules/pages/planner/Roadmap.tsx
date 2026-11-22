@@ -214,7 +214,7 @@ export function Roadmap() {
 						</div>
 					)}
 				</div>
-				<div className="flex-1 space-y-4 z-1">
+				<div className="flex-1 min-w-0 space-y-4 z-1">
 					<FeatureList
 						features={features}
 						categoryLabel={selectedNavItem?.label ?? "Features"}

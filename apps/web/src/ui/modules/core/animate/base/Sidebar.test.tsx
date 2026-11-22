@@ -73,7 +73,7 @@ vi.mock("./Tooltip", () => ({
 	),
 }));
 
-import { Sidebar, SidebarMenuButton, SidebarProvider, SidebarTrigger, useSidebar } from "./Sidebar";
+import { Sidebar, SidebarInset, SidebarMenuButton, SidebarProvider, SidebarTrigger, useSidebar } from "./Sidebar";
 
 afterEach(() => {
 	viewport.isMobile = false;
@@ -164,6 +164,41 @@ describe("Sidebar landmarks", () => {
 		const { getByRole } = render(<MobileHarness />);
 
 		expect(getByRole("complementary", { name: "Planner controls" })).toBeDefined();
+	});
+});
+
+const classesOf = (element: Element | null): string[] => element?.className.split(" ") ?? [];
+
+const mdClassesOf = (element: Element | null): string[] => classesOf(element).filter((name) => name.startsWith("md:"));
+
+describe("the main column beside the rail", () => {
+	it("grows into the room the rail leaves and shrinks to it too, so its widest child cannot push the page past the viewport", () => {
+		const { getByRole } = render(<SidebarInset className="outline-none">content</SidebarInset>);
+
+		expect(classesOf(getByRole("main"))).toEqual(expect.arrayContaining(["flex-1", "min-w-0"]));
+	});
+
+	it("takes its inset frame from lg, where the rail it is framed against appears", () => {
+		const { getByRole } = render(<SidebarInset className="outline-none">content</SidebarInset>);
+		const main = getByRole("main");
+
+		expect(classesOf(main)).toEqual(
+			expect.arrayContaining(["lg:peer-data-[variant=inset]:ml-0", "lg:peer-data-[variant=inset]:border-[3px]"]),
+		);
+		expect(mdClassesOf(main)).toEqual([]);
+	});
+});
+
+describe("the rail's breakpoint", () => {
+	it("draws the desktop rail from lg, the width useIsMobile stops answering true at, so the two never disagree", () => {
+		viewport.isMobile = false;
+		const { getByRole } = render(<MobileHarness />);
+		const panel = getByRole("complementary", { name: "Planner controls" });
+		const rail = panel.parentElement;
+
+		expect(classesOf(rail)).toEqual(expect.arrayContaining(["hidden", "lg:block"]));
+		expect(classesOf(panel)).toEqual(expect.arrayContaining(["hidden", "lg:flex"]));
+		expect([...mdClassesOf(rail), ...mdClassesOf(panel)]).toEqual([]);
 	});
 });
 

@@ -204,7 +204,7 @@ function Sidebar({ children, landmarkLabel }: SidebarProps) {
 
 	return (
 		<div
-			className="group peer text-sidebar-foreground hidden md:block"
+			className="group peer text-sidebar-foreground hidden lg:block"
 			data-state={state}
 			data-collapsible={state === "collapsed" ? "icon" : ""}
 			data-variant="inset"
@@ -217,7 +217,7 @@ function Sidebar({ children, landmarkLabel }: SidebarProps) {
 			<aside
 				data-slot="sidebar-container"
 				aria-label={landmarkLabel}
-				className="fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-400 ease-[cubic-bezier(0.75,0,0.25,1)] md:flex left-0 p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]"
+				className="fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-400 ease-[cubic-bezier(0.75,0,0.25,1)] lg:flex left-0 p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]"
 			>
 				<MotionHighlight hover mode="parent" containerClassName="w-full h-full" transition={HIGHLIGHT_TRANSITION}>
 					<div
@@ -264,8 +264,8 @@ function SidebarInset({ className, ...props }: SidebarInsetProps) {
 		<main
 			data-slot="sidebar-inset"
 			className={cn(
-				"bg-background relative flex min-h-svh flex-1 flex-col",
-				"peer-data-[variant=inset]:min-h-[calc(100svh-(--spacing(4)))] md:peer-data-[variant=inset]:m-2.25 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-3 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-[14px] md:peer-data-[variant=inset]:border-[3px] md:peer-data-[variant=inset]:border-(--frame) md:peer-data-[variant=inset]:shadow-(--shadow-brutal-lg)",
+				"bg-background relative flex min-h-svh min-w-0 flex-1 flex-col",
+				"peer-data-[variant=inset]:min-h-[calc(100svh-(--spacing(4)))] lg:peer-data-[variant=inset]:m-2.25 lg:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-3 lg:peer-data-[variant=inset]:ml-0 lg:peer-data-[variant=inset]:rounded-[14px] lg:peer-data-[variant=inset]:border-[3px] lg:peer-data-[variant=inset]:border-(--frame) lg:peer-data-[variant=inset]:shadow-(--shadow-brutal-lg)",
 				className,
 			)}
 			{...props}

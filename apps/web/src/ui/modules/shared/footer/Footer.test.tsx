@@ -80,6 +80,14 @@ describe("Footer", () => {
 		expect(screen.getByRole("navigation", { name: footer.legalNavigation })).toBeDefined();
 	});
 
+	it("wraps the legal links once they share a row, since one row of them is wider than the planner's column beside the rail", async () => {
+		await renderFooter();
+
+		expect(screen.getByRole("navigation", { name: footer.legalNavigation }).className.split(" ")).toEqual(
+			expect.arrayContaining(["sm:flex-row", "sm:flex-wrap"]),
+		);
+	});
+
 	it("links every legal page and the planner by their translated names", async () => {
 		await renderFooter();
 		const hrefOf = (name: string) => screen.getByRole("link", { name }).getAttribute("href");

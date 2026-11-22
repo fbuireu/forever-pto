@@ -123,4 +123,21 @@ describe("planner/layout", () => {
 
 		expect(donate.props.bottomClassName).toContain(`bottom-[calc(${Math.round(DRAWER_SNAP.COLLAPSED * 100)}dvh+8px)]`);
 	});
+
+	it("returns the donate button to the corner from lg, where the rail replaces the drawer it clears", async () => {
+		const element = await AppLayout(makeParams());
+		const sidebarProviderChildren = [element.props.children].flat();
+		const appSidebarEl = sidebarProviderChildren.find(
+			(c: unknown) => (c as { type?: unknown })?.type === MockAppSidebar,
+		);
+		const innerChildren = [(appSidebarEl as { props: { children: unknown } }).props.children].flat();
+		const donate = innerChildren.find((c: unknown) => (c as { type?: unknown })?.type === MockDonateClient) as {
+			props: { bottomClassName?: string };
+		};
+
+		const classes = donate.props.bottomClassName?.split(" ") ?? [];
+
+		expect(classes).toContain("lg:bottom-4");
+		expect(classes.filter((name) => name.startsWith("md:"))).toEqual([]);
+	});
 });
