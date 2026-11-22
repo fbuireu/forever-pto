@@ -34,7 +34,7 @@ async function PaymentError({ charged, locale }: PaymentErrorProps) {
 
 	if (charged) {
 		return (
-			<main id={MAIN_CONTENT_ID} className="min-h-screen flex items-center justify-center p-4 bg-background">
+			<main id={MAIN_CONTENT_ID} className="min-h-screen flex items-center justify-center p-safe-4 bg-background">
 				<Card className="w-full max-w-md border-caution-base/50">
 					<CardHeader className="text-center">
 						<div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-caution-base/10">
@@ -54,7 +54,7 @@ async function PaymentError({ charged, locale }: PaymentErrorProps) {
 	}
 
 	return (
-		<main id={MAIN_CONTENT_ID} className="min-h-screen flex items-center justify-center p-4 bg-background">
+		<main id={MAIN_CONTENT_ID} className="min-h-screen flex items-center justify-center p-safe-4 bg-background">
 			<Card className="w-full max-w-md border-destructive/50">
 				<CardHeader className="text-center">
 					<div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-destructive/10">
@@ -115,7 +115,7 @@ export default async function PaymentConfirmationPage({
 	});
 
 	return (
-		<main id={MAIN_CONTENT_ID} className="min-h-screen flex items-center justify-center p-4 bg-background m-auto">
+		<main id={MAIN_CONTENT_ID} className="min-h-screen flex items-center justify-center p-safe-4 bg-background m-auto">
 			<Card className="w-full max-w-md border-positive-base/50">
 				<CardHeader className="text-center">
 					<div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-positive-base/10">

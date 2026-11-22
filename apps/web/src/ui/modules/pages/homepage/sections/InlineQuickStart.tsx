@@ -16,7 +16,7 @@ export const InlineQuickStart = async ({ locale }: InlineQuickStartProps) => {
 	const [t, serverYear] = await Promise.all([getTranslations("homepage"), getCurrentYear()]);
 
 	return (
-		<section className="px-7 pb-20" id="plan" aria-labelledby={TITLE_ID}>
+		<section className="px-safe-7 pb-20" id="plan" aria-labelledby={TITLE_ID}>
 			<div className={cn(brutCard, "max-w-[1240px] mx-auto p-6 md:p-8")}>
 				<h2
 					id={TITLE_ID}

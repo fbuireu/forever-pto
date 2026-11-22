@@ -12,6 +12,18 @@ type ToasterTheme = NonNullable<ToasterProps["theme"]>;
 const isToasterTheme = (theme: string): theme is ToasterTheme =>
 	theme === "light" || theme === "dark" || theme === "system";
 
+const OFFSET = {
+	bottom: "max(24px,env(safe-area-inset-bottom))",
+	left: "max(24px,env(safe-area-inset-left))",
+	right: "max(24px,env(safe-area-inset-right))",
+};
+
+const MOBILE_OFFSET = {
+	bottom: "max(16px,env(safe-area-inset-bottom))",
+	left: "max(16px,env(safe-area-inset-left))",
+	right: "max(16px,env(safe-area-inset-right))",
+};
+
 const Toaster = ({ closeLabel }: ToasterOwnProps) => {
 	const { theme = "system" } = useTheme();
 
@@ -21,6 +33,8 @@ const Toaster = ({ closeLabel }: ToasterOwnProps) => {
 			className="toaster group"
 			closeButton
 			position="bottom-center"
+			offset={OFFSET}
+			mobileOffset={MOBILE_OFFSET}
 			duration={5000}
 			toastOptions={{
 				closeButtonAriaLabel: closeLabel,

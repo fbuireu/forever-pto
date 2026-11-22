@@ -40,7 +40,7 @@ const HomePage = async ({ params }: PageProps) => {
 			<Faq />
 			<FaqJsonLd locale={locale} />
 			<HomepageCta />
-			<DonateClient bottomClassName="bottom-3 md:bottom-4" />
+			<DonateClient bottomClassName="bottom-[max(0.75rem,env(safe-area-inset-bottom))] md:bottom-[max(1rem,env(safe-area-inset-bottom))]" />
 		</main>
 	);
 };

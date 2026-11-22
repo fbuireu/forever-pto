@@ -13,6 +13,7 @@ import { SkipToContent } from "@ui/modules/layout/SkipToContent";
 import { AppThemeProvider } from "@ui/modules/providers/AppThemeProvider";
 import { Analytics } from "@ui/modules/tracking/Analytics";
 import { BetterStackTracking } from "@ui/modules/tracking/BetterStackTracking";
+import type { Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 
@@ -26,6 +27,8 @@ export function generateStaticParams(): { locale: LocaleCode }[] {
 }
 
 export const dynamicParams = false;
+
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 const Layout = async ({ children, params }: Readonly<LayoutProps>) => {
 	const locale = resolveLocale((await params).locale);

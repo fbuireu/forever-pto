@@ -67,5 +67,18 @@ describe("(marketing)/page", () => {
 			expect(types).toContain(MockHomepageCta);
 			expect(types).toContain(MockDonateClient);
 		});
+
+		it("keeps the donate button above the home indicator at both breakpoints", async () => {
+			const element = await HomePage({ params: Promise.resolve({ locale: EN as never }) });
+			const children: unknown[] = [element.props.children].flat();
+			const donate = children.find((c) => (c as { type?: unknown })?.type === MockDonateClient) as {
+				props: { bottomClassName: string };
+			};
+
+			expect(donate.props.bottomClassName.split(" ")).toEqual([
+				"bottom-[max(0.75rem,env(safe-area-inset-bottom))]",
+				"md:bottom-[max(1rem,env(safe-area-inset-bottom))]",
+			]);
+		});
 	});
 });

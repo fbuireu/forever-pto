@@ -487,6 +487,15 @@ the other way out). [`api/health/route.test.ts`](./api/health/route.test.ts) run
 
 ## Gotchas
 
+- **The root layout and the 404 document opt into `viewport-fit=cover`, and each element pinned to an edge pays for it.**
+  `[locale]/layout.tsx` and `global-not-found.tsx`, the two files that render `<html>` through a layout or a
+  convention Next reads a `viewport` from, export `viewport: { width: "device-width", initialScale: 1, viewportFit:
+  "cover" }`; Next's own default is the first two, and the export replaces it, so they are spelled out. A page drawn
+  under the notch with no inset on its pinned elements puts text beneath it, so a new `fixed` or `sticky` element, or
+  a full-width band, takes `env(safe-area-inset-...)` as the sidebar, drawer, toaster and banner do (see
+  [`../ui/modules/AGENTS.md`](../ui/modules/AGENTS.md)). `layout.test.tsx` and `global-not-found.test.tsx` pin the export.
+  `global-error.tsx` is a client component, which cannot export `viewport`, so its document keeps Next's default and
+  its insets stay 0; the shared `ErrorContent` it renders is padded with the same `env()` terms and is unaffected.
 - **Every route shell owes the skip link a landmark.** `[locale]/layout.tsx` renders `SkipToContent` on
   every page, and its `href` is built from `MAIN_CONTENT_ID` in
   [`../ui/modules/layout/SkipToContent.tsx`](../ui/modules/layout/SkipToContent.tsx). The shells carry that

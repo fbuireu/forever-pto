@@ -150,7 +150,7 @@ export function ErrorContent({ error, reset }: ErrorContentProps) {
 				data-testid="error-boundary"
 				className="flex-1 py-[60px] bg-background bg-[linear-gradient(0deg,transparent_95%,var(--grid-color)_95%),linear-gradient(90deg,transparent_95%,var(--grid-color)_95%)] bg-size-[32px_32px]"
 			>
-				<div className="max-w-[1320px] mx-auto grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-[60px] px-7 items-center">
+				<div className="max-w-[1320px] mx-auto grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-[60px] px-safe-7 items-center">
 					<div className="flex flex-col">
 						<div className="flex items-start gap-[10px] mb-[26px] font-display font-extrabold tracking-[-0.06em] leading-[0.82] text-[clamp(90px,13vw,200px)]">
 							<span className="inline-block bg-[var(--color-brand-orange)] text-on-fill border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[var(--shadow-brutal-xl)] leading-[0.85]">

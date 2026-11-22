@@ -42,7 +42,7 @@ bg-size-[4rem_4rem]"
 				<SiteSubtitle />
 				{children}
 				<Toaster closeLabel={tA11y("closeToast")} />
-				<DonateClient bottomClassName="bottom-[calc(15dvh+8px)] md:bottom-4" />
+				<DonateClient bottomClassName="bottom-[calc(15dvh+8px)] md:bottom-[max(1rem,env(safe-area-inset-bottom))]" />
 				<PremiumModal />
 				<Footer />
 			</AppSidebar>

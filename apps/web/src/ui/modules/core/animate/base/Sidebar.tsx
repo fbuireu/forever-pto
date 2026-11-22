@@ -185,8 +185,11 @@ function Sidebar({ children, landmarkLabel }: SidebarProps) {
 							aria-modal="false"
 							aria-label={landmarkLabel}
 							data-slot="sidebar"
-							className="bg-sidebar text-sidebar-foreground fixed inset-y-0 z-51 flex h-full flex-col border-[3px] border-(--frame) shadow-(--shadow-brutal-xl) outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-inset left-0 rounded-r-[14px]"
-							style={{ "--sidebar-width": SIDEBAR_WIDTH_MOBILE, width: "var(--sidebar-width)" }}
+							className="bg-sidebar text-sidebar-foreground fixed inset-y-0 z-51 flex h-full flex-col border-[3px] border-(--frame) shadow-(--shadow-brutal-xl) outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-inset left-0 rounded-r-[14px] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]"
+							style={{
+								"--sidebar-width": SIDEBAR_WIDTH_MOBILE,
+								width: "calc(var(--sidebar-width) + env(safe-area-inset-left))",
+							}}
 							initial={{ x: "-100%" }}
 							animate={{ x: 0 }}
 							exit={{ x: "-100%" }}
@@ -212,12 +215,12 @@ function Sidebar({ children, landmarkLabel }: SidebarProps) {
 		>
 			<div
 				data-slot="sidebar-gap"
-				className="relative w-(--sidebar-width) bg-transparent transition-[width] duration-400 ease-[cubic-bezier(0.7,-0.15,0.25,1.15)] group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4)))]"
+				className="relative w-[calc(var(--sidebar-width)+max(0px,env(safe-area-inset-left)-0.5rem))] bg-transparent transition-[width] duration-400 ease-[cubic-bezier(0.7,-0.15,0.25,1.15)] group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+max(0px,env(safe-area-inset-left)-0.5rem))]"
 			/>
 			<aside
 				data-slot="sidebar-container"
 				aria-label={landmarkLabel}
-				className="fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-400 ease-[cubic-bezier(0.75,0,0.25,1)] md:flex left-0 p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]"
+				className="fixed inset-y-0 z-10 hidden h-svh w-[calc(var(--sidebar-width)+max(0px,env(safe-area-inset-left)-0.5rem))] transition-[left,right,width] duration-400 ease-[cubic-bezier(0.75,0,0.25,1)] md:flex left-0 pt-[max(0.5rem,env(safe-area-inset-top))] pr-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px+max(0px,env(safe-area-inset-left)-0.5rem))]"
 			>
 				<MotionHighlight hover mode="parent" containerClassName="w-full h-full" transition={HIGHLIGHT_TRANSITION}>
 					<div
@@ -264,8 +267,8 @@ function SidebarInset({ className, ...props }: SidebarInsetProps) {
 		<main
 			data-slot="sidebar-inset"
 			className={cn(
-				"bg-background relative flex min-h-svh flex-1 flex-col",
-				"peer-data-[variant=inset]:min-h-[calc(100svh-(--spacing(4)))] md:peer-data-[variant=inset]:m-2.25 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-3 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-[14px] md:peer-data-[variant=inset]:border-[3px] md:peer-data-[variant=inset]:border-(--frame) md:peer-data-[variant=inset]:shadow-(--shadow-brutal-lg)",
+				"bg-background relative flex min-h-svh flex-1 flex-col pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]",
+				"peer-data-[variant=inset]:min-h-[calc(100svh-(--spacing(4)))] md:peer-data-[variant=inset]:min-h-[calc(100svh-(--spacing(4))-max(0px,env(safe-area-inset-top)-0.5625rem)-max(0px,env(safe-area-inset-bottom)-0.5625rem))] md:peer-data-[variant=inset]:mt-[max(0.5625rem,env(safe-area-inset-top))] md:peer-data-[variant=inset]:mr-[max(0.5625rem,env(safe-area-inset-right))] md:peer-data-[variant=inset]:mb-[max(0.5625rem,env(safe-area-inset-bottom))] md:peer-data-[variant=inset]:p-0 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-3 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-[14px] md:peer-data-[variant=inset]:border-[3px] md:peer-data-[variant=inset]:border-(--frame) md:peer-data-[variant=inset]:shadow-(--shadow-brutal-lg)",
 				className,
 			)}
 			{...props}

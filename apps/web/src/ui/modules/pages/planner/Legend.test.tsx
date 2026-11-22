@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import enMessages from "@i18n/messages/en.json";
 import { fireEvent, type RenderResult, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
@@ -39,5 +41,15 @@ describe("Legend disclosure", () => {
 
 		expect(controls).not.toBeNull();
 		expect(container.querySelector(`#${controls}`)).not.toBeNull();
+	});
+});
+
+describe("Legend safe areas", () => {
+	it("pads its sticky container by the home indicator, so the card stuck at the bottom clears it", () => {
+		const source = readFileSync(join(__dirname, "legend.module.css"), "utf8");
+		const rule = source.match(/\.sticky_container \{[^}]*\}/)?.[0] ?? "";
+
+		expect(rule).toContain("bottom: 0;");
+		expect(rule).toContain("padding-bottom: env(safe-area-inset-bottom);");
 	});
 });

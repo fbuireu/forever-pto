@@ -11,6 +11,13 @@ describe("payment/confirmation/loading", () => {
 		expect(spinner?.getAttribute("class")).toContain("animate-spin");
 	});
 
+	it("keeps its spinner clear of every inset, as padding around the full-screen box", () => {
+		const { container } = render(<Loading />);
+		const classes = (container.firstElementChild?.className ?? "").split(" ");
+
+		expect(classes).toContain("p-safe-4");
+	});
+
 	it("says nothing in text while the confirmation is pending", () => {
 		const { container } = render(<Loading />);
 

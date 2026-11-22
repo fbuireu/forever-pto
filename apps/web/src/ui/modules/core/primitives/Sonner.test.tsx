@@ -31,6 +31,27 @@ describe("Toaster", () => {
 	});
 });
 
+describe("Toaster safe areas", () => {
+	const offset = (name: string): string =>
+		(document.querySelector("[data-sonner-toaster]") as HTMLElement).style.getPropertyValue(name);
+
+	it("keeps clear of the home indicator and both landscape notches on a desktop-width screen", async () => {
+		await showToast();
+
+		expect(offset("--offset-bottom")).toBe("max(24px,env(safe-area-inset-bottom))");
+		expect(offset("--offset-left")).toBe("max(24px,env(safe-area-inset-left))");
+		expect(offset("--offset-right")).toBe("max(24px,env(safe-area-inset-right))");
+	});
+
+	it("keeps clear of them on a phone too, where sonner reads its own mobile offsets", async () => {
+		await showToast();
+
+		expect(offset("--mobile-offset-bottom")).toBe("max(16px,env(safe-area-inset-bottom))");
+		expect(offset("--mobile-offset-left")).toBe("max(16px,env(safe-area-inset-left))");
+		expect(offset("--mobile-offset-right")).toBe("max(16px,env(safe-area-inset-right))");
+	});
+});
+
 describe("Toaster theme", () => {
 	const sonnerTheme = (): string | null =>
 		document.querySelector("[data-sonner-toaster]")?.getAttribute("data-sonner-theme") ?? null;

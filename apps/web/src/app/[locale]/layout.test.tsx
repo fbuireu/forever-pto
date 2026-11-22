@@ -33,7 +33,7 @@ vi.mock("@app/fonts", () => ({
 	DOCUMENT_BODY_CLASS: "var-bricolage var-space-grotesk var-instrument-serif var-jetbrains-mono font-sans antialiased",
 }));
 
-const { default: Layout, dynamicParams, generateStaticParams } = await import("./layout");
+const { default: Layout, dynamicParams, generateStaticParams, viewport } = await import("./layout");
 
 describe("[locale]/layout", () => {
 	beforeEach(() => vi.clearAllMocks());
@@ -50,6 +50,16 @@ describe("[locale]/layout", () => {
 
 		it("serves those locales alone, so a first segment no locale claims answers 404 before the layout runs", () => {
 			expect(dynamicParams).toBe(false);
+		});
+	});
+
+	describe("viewport", () => {
+		it("draws under the notch and the home indicator, since every pinned element carries its own inset", () => {
+			expect(viewport.viewportFit).toBe("cover");
+		});
+
+		it("keeps the width and the scale Next sets by default", () => {
+			expect(viewport).toMatchObject({ width: "device-width", initialScale: 1 });
 		});
 	});
 

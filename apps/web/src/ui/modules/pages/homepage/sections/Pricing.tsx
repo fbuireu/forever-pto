@@ -17,7 +17,10 @@ export const Pricing = async () => {
 	const money = amountFormatter(locale);
 
 	return (
-		<section className="px-7 py-24 bg-[var(--surface-panel-alt)] border-y-[4px] border-[var(--frame)]" id="pricing">
+		<section
+			className="px-safe-7 py-24 bg-[var(--surface-panel-alt)] border-y-[4px] border-[var(--frame)]"
+			id="pricing"
+		>
 			<div className="max-w-[900px] mx-auto mb-14 text-center">
 				<div className="flex justify-center mb-4">
 					<Badge variant="outline">{t("pricing.badge")}</Badge>
