@@ -43,7 +43,7 @@ vi.mock("./fonts", () => ({
 }));
 vi.mock("@styles/index.css", () => ({}));
 
-const { default: GlobalNotFound, generateMetadata } = await import("./global-not-found");
+const { default: GlobalNotFound, generateMetadata, viewport } = await import("./global-not-found");
 
 interface TranslationsRequest {
 	locale: Locale;
@@ -77,6 +77,10 @@ beforeEach(() => {
 });
 
 describe("global-not-found", () => {
+	it("draws under the notch and the home indicator, with the width and scale Next sets by default", () => {
+		expect(viewport).toEqual({ width: "device-width", initialScale: 1, viewportFit: "cover" });
+	});
+
 	it("renders its own document, because no layout runs above it", async () => {
 		const element = await GlobalNotFound();
 		const [body] = ofType({ tree: element, type: "body" });

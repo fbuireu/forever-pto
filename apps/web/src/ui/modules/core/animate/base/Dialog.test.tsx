@@ -110,8 +110,19 @@ describe("DialogContent (DialogPopup)", () => {
 		const classes = container.querySelector('[data-primitive="dialog-popup"]')?.className.split(" ") ?? [];
 
 		expect(classes).toEqual(
-			expect.arrayContaining(["max-h-[calc(100dvh-2rem)]", "overflow-y-auto", "overscroll-contain"]),
+			expect.arrayContaining([
+				"max-h-[calc(100dvh-2rem-2*max(env(safe-area-inset-top),env(safe-area-inset-bottom)))]",
+				"overflow-y-auto",
+				"overscroll-contain",
+			]),
 		);
+	});
+
+	it("keeps clear of the landscape notch on its width, as it does on its height", () => {
+		const { container } = render(<DialogContent closeLabel="Close">body</DialogContent>);
+		const classes = container.querySelector('[data-primitive="dialog-popup"]')?.className.split(" ") ?? [];
+
+		expect(classes).toContain("max-w-[calc(100%-2rem-2*max(env(safe-area-inset-left),env(safe-area-inset-right)))]");
 	});
 });
 

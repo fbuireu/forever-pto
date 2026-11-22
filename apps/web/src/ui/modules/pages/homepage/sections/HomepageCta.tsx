@@ -7,7 +7,7 @@ export const HomepageCta = async () => {
 	const t = await getTranslations("homepage");
 
 	return (
-		<section className="px-7 py-24 bg-[var(--frame)] text-[var(--background)] border-t-[4px] border-[var(--frame)] relative overflow-hidden">
+		<section className="px-safe-7 py-24 bg-[var(--frame)] text-[var(--background)] border-t-[4px] border-[var(--frame)] relative overflow-hidden">
 			<CtaShapesClient
 				byeMonday={t("closing.shapes.byeMonday")}
 				bossOff={t("closing.shapes.bossOff")}

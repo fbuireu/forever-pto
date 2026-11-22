@@ -50,7 +50,7 @@ function DialogPopup({ className, children, closeLabel, ...props }: DialogPopupP
 			<DialogBackdrop />
 			<DialogPopupPrimitive
 				className={cn(
-					"bg-card fixed top-[50%] left-[50%] z-200 grid max-h-[calc(100dvh-2rem)] w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 overflow-y-auto overscroll-contain rounded-[14px] border-[3px] border-(--frame) p-6 shadow-(--shadow-brutal-xl) sm:max-w-lg",
+					"bg-card fixed top-[50%] left-[50%] z-200 grid max-h-[calc(100dvh-2rem-2*max(env(safe-area-inset-top),env(safe-area-inset-bottom)))] w-full max-w-[calc(100%-2rem-2*max(env(safe-area-inset-left),env(safe-area-inset-right)))] translate-x-[-50%] translate-y-[-50%] gap-4 overflow-y-auto overscroll-contain rounded-[14px] border-[3px] border-(--frame) p-6 shadow-(--shadow-brutal-xl) sm:max-w-lg",
 					className,
 				)}
 				{...props}

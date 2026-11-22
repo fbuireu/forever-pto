@@ -172,6 +172,32 @@ it must stay within reach until it is answered, and below the dialog its prefere
 whatever surface is under it, so it clears the highest one; `Popover.test.tsx` and `Tooltip.test.tsx` assert the
 positioner beats `200`.
 
+**Safe areas: the app draws under the notch and the home indicator, and everything pinned to an edge carries its own
+inset.** The root layouts opt in with `viewportFit: "cover"`; with every inset at 0 (desktop, a phone with no cutout)
+each term below resolves to the distance it replaced. An element that already keeps a distance from an edge takes
+`max(<distance>, env(safe-area-inset-<edge>))` (the symmetric gutters are the `px-safe-*` and `p-safe-*` utilities); one flush with an edge keeps its place and takes the inset as inner
+padding, so its background still reaches the edge. In this folder:
+- The **desktop sidebar** is the `fixed inset-y-0 h-svh` rail plus `sidebar-gap`, the spacer that keeps the page beside
+  it. The rail is a transparent column around the card, so its padding is `max(0.5rem, env(...))` on the top, bottom
+  and left, and **both** widths grow by `max(0px, env(safe-area-inset-left) - 0.5rem)`, the part of the left inset the
+  padding does not already cover, so the card keeps its width and the spacer ends where the rail does. Change one of
+  the three and the page and the rail stop lining up in landscape. An iPhone in landscape is narrower than `lg`, so it
+  gets the sheet and `SidebarInset`'s padding; the rail's terms hold for any wider screen with a left inset.
+- **`SidebarInset`** is padded by all four insets below `lg`, where nothing sits beside it, and from `lg` up swaps that
+  padding for `max(0.5625rem, env(...))` margins on the top, right and bottom (its `ml` is the rail's), with its
+  `min-h` reduced by whatever the margins gained over the inset-free value, so a short page does not scroll. The
+  floating `SidebarTrigger` is `fixed` with no offsets, so it sits where it would flow, inside this padding or margin.
+- The **mobile sheet** is `fixed inset-y-0 left-0`, so it keeps that and pads its top, bottom and left, and its inline
+  width adds the left inset to `--sidebar-width`.
+- **`DrawerContent`** (`fixed inset-x-0 bottom-0`) pads its bottom, left and right. The planner's drawer is
+  `100dvh` tall and translated mostly off-screen, so only its top 15dvh is on screen when collapsed.
+- **`Toaster`** hands sonner `offset` and `mobileOffset` objects of `max(<its default>, env(...))` for the bottom, left
+  and right, which sonner writes to its own `--offset-*` and `--mobile-offset-*` variables; do not restyle the toaster
+  in CSS. **`DialogContent`** subtracts the larger of the two vertical insets, twice, from its height cap, and the
+  larger horizontal one from its width cap, so it stays centred and clear of both.
+`Sidebar.test.tsx`, `Drawer.test.tsx`, `Sonner.test.tsx` and `Dialog.test.tsx` pin the terms. A popover or dropdown
+positioned by Base UI is not covered: its collision padding takes pixels, not an `env()`.
+
 **`vaul` is patched to forward `modal` to the Radix `Dialog.Root` it wraps**
 ([`patches/vaul@1.1.2.patch`](../../../../../../patches/vaul@1.1.2.patch)). Unpatched, every drawer mounts a modal Radix
 dialog, which sets `pointer-events: none` and `aria-hidden` on everything outside it; `ManagementBar` mounts its

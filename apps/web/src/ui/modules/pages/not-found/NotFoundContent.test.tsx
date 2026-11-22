@@ -114,3 +114,12 @@ describe("NotFoundContent's imports", () => {
 		expect(source).not.toMatch(/@ui\/modules\/pages\/(?!not-found\/)/);
 	});
 });
+
+describe("NotFoundContent safe areas", () => {
+	it("keeps its columns off the landscape notch", async () => {
+		await renderNotFound();
+		const classes = (document.querySelector("main > div")?.className ?? "").split(" ");
+
+		expect(classes).toContain("px-safe-7");
+	});
+});

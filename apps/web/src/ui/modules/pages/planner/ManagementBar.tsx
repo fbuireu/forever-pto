@@ -122,7 +122,7 @@ export const ManagementBar = () => {
 	const efficiency = previewSuggestion?.metrics.averageEfficiency ?? 0;
 
 	return (
-		<div className="col-span-full sticky top-3 z-10">
+		<div className="col-span-full sticky top-[max(0.75rem,env(safe-area-inset-top))] z-10">
 			<span role="status" className="sr-only">
 				{isSettledEmpty ? tA11y("noPlan") : ""}
 			</span>

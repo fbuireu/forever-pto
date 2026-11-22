@@ -55,3 +55,16 @@ describe("Comparison", () => {
 		expect(screen.getByRole("heading", { level: 3, name: comparison.withTitle })).toBeDefined();
 	});
 });
+
+describe("Comparison safe areas", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it("keeps its gutters, or the landscape notch where that is wider, so no text sits under the cutout", async () => {
+		await renderComparison();
+		const classes = (document.querySelector("section")?.className ?? "").split(" ");
+
+		expect(classes).toContain("px-safe-7");
+	});
+});

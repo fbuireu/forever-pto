@@ -1,3 +1,10 @@
+# [forever-pto-web-v1.18.0](https://github.com/fbuireu/forever-pto/compare/web-v1.17.7...web-v1.18.0) (2026-11-22)
+
+
+### Features
+
+* **web:** draw edge to edge and keep the content out of the notch ([#464](https://github.com/fbuireu/forever-pto/issues/464)) ([6e7239f](https://github.com/fbuireu/forever-pto/commit/6e7239f9568eb8b37745d65250c71bc8a1418150)), closes [#123](https://github.com/fbuireu/forever-pto/issues/123)
+
 # [forever-pto-web-v1.17.7](https://github.com/fbuireu/forever-pto/compare/web-v1.17.6...web-v1.17.7) (2026-11-15)
 
 

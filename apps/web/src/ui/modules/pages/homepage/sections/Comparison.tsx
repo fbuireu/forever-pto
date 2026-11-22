@@ -7,7 +7,10 @@ export const Comparison = async () => {
 	const [t, format] = await Promise.all([getTranslations("homepage"), getFormatter()]);
 
 	return (
-		<section className="px-7 py-24 bg-[var(--surface-panel-alt)] border-y-[4px] border-[var(--frame)]" id="compare">
+		<section
+			className="px-safe-7 py-24 bg-[var(--surface-panel-alt)] border-y-[4px] border-[var(--frame)]"
+			id="compare"
+		>
 			<div className="max-w-[900px] mx-auto mb-14 text-center">
 				<div className="flex justify-center mb-4">
 					<Badge variant="outline">{t("comparison.badge")}</Badge>

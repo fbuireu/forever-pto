@@ -267,6 +267,19 @@ alias and a relative path to the same file are one mock.
 
 ## Gotchas
 
+**Everything pinned to a screen edge, and every full-width band, carries its safe-area inset** (the root layouts set
+`viewportFit: "cover"`; the term-by-term rules for the sidebar, drawer, toaster and dialog are in
+[`core/AGENTS.md`](./core/AGENTS.md)). Out here: the cookie banner (`shared/cookie-consent/CookieConsent.tsx`) is
+`bottom`, `left` and `right` of `max(1rem, env(...))`; the donate button (`shared/donate/Donate.tsx`) pads its
+full-width band by the side insets below `md` and takes `md:right-[max(1rem,env(safe-area-inset-right))]` above, and
+its callers pass `bottomClassName` as `max(<distance>, env(safe-area-inset-bottom))`; the marketing `Header` is
+`sticky top-0` and pads its own top by the status bar, so its background reaches the edge. Every full-bleed band
+(the homepage sections, the footer rows, `NotFoundContent`, `ErrorContent`, `LegalLayout`, the payment confirmation
+pages) keeps its background full width and swaps its `px-7` or `p-4` for `px-safe-7`, `px-safe-4` or `p-safe-4`
+(the utilities in [`../styles/utilities/index.css`](../styles/utilities/index.css)). **The footer opts back out inside the planner** (`in-data-[slot=sidebar-inset]:pl-7` and its
+siblings), because `SidebarInset` already clears the insets and a second pass would pad twice. A new fixed, sticky or
+full-bleed element states its inset the same way; each component's test pins the utility or the `env(safe-area-inset-...)` term.
+
 **The skip link and every landmark it can reach read one const.** `layout/SkipToContent.tsx` exports
 `MAIN_CONTENT_ID` and builds its own `href` from it; each route shell interpolates the same const onto its
 landmark. A shell that forgets it leaves a promise to a screen reader that never resolves: Tab then Enter does
@@ -515,8 +528,9 @@ caller passes a narrower child. A `fixed` element at `z-50` spanning the viewpor
 construction rather than by measurement.
 
 **`Donate` takes its bottom offset from its caller and holds none of its own.** `bottomClassName` is required:
-the marketing page passes `bottom-3 md:bottom-4`, and the planner layout passes `bottom-[calc(15dvh+8px)] lg:bottom-4`,
-the mobile drawer's collapsed snap point (`DRAWER_SNAP.COLLAPSED`, `0.15`, in
+the marketing page passes `bottom-[max(0.75rem,env(safe-area-inset-bottom))] md:bottom-[max(1rem,env(safe-area-inset-bottom))]`,
+and the planner layout passes `bottom-[calc(15dvh+8px)] lg:bottom-[max(1rem,env(safe-area-inset-bottom))]`: the
+mobile drawer's collapsed snap point (`DRAWER_SNAP.COLLAPSED`, `0.15`, in
 [`pages/planner/ManagementBar.tsx`](./pages/planner/ManagementBar.tsx)) written out as a class, since Tailwind
 reads literals only, up to `lg`, where the rail replaces the drawer (see [`core/AGENTS.md`](./core/AGENTS.md)). The
 planner layout's test fails when the snap point and the class drift apart, or when the corner offset leaves `lg`.

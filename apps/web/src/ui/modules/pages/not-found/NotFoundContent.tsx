@@ -21,7 +21,7 @@ export const NotFoundContent = async ({ locale }: NotFoundContentProps) => {
 
 	return (
 		<main id={MAIN_CONTENT_ID} className="flex-1 py-[60px]">
-			<div className="max-w-[1320px] mx-auto grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-[60px] px-7 items-center">
+			<div className="max-w-[1320px] mx-auto grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-[60px] px-safe-7 items-center">
 				<div className="flex items-start justify-center">
 					<div className="flex items-start gap-[10px] font-display font-extrabold tracking-[-0.06em] leading-[0.82] text-[clamp(120px,18vw,280px)]">
 						<span className="inline-block bg-[var(--accent)] border-[5px] border-[var(--frame)] rounded-[18px] px-[0.2em] pb-[0.17em] pt-[0.03em] shadow-[var(--shadow-brutal-xl)] leading-[0.85]">

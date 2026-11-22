@@ -381,6 +381,12 @@ mobile: `EXPAND_DRAWER` when the `ALTERNATIVES_MANAGER` step is highlighted, `CO
 loose on purpose, so the tutorial imports no planner state, and a search for the listener's caller finds
 nothing. Applying an Alternative collapses the drawer too.
 
+**The sticky management bar and the Legend clear the insets too.** `ManagementBar` sticks at
+`top-[max(0.75rem,env(safe-area-inset-top))]`, so it stops below a status bar instead of under it. The Legend's
+`.sticky_container` keeps `bottom: 0` and takes `padding-bottom: env(safe-area-inset-bottom)`, which lifts the stuck
+card above an iPad's home indicator without changing the container's height rule above, since the ghost copy is in the
+same padded box. `Legend.test.tsx` reads the stylesheet for it.
+
 **`DRAWER_SNAP.EXPANDED` is 0.85 and must stay below 1.** The drawer is `h-[100dvh] max-h-none`, so a snap point
 is the fraction of the viewport showing: vaul translates the element down by `innerHeight - snap * innerHeight`.
 At exactly 1 it covers the screen, and with `dismissible={false}`, `overlay={false}` and no close button nothing

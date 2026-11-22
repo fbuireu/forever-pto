@@ -18,7 +18,7 @@ export const Features = async () => {
 	const weekdayLabels = getWeekdayNames({ locale, weekStartsOn: 1, format: "narrow" });
 
 	return (
-		<section className="px-7 py-24" id="features">
+		<section className="px-safe-7 py-24" id="features">
 			<div className="max-w-[900px] mx-auto mb-14 text-center">
 				<div className="flex justify-center mb-4">
 					<Badge variant="outline">{t("features.badge")}</Badge>

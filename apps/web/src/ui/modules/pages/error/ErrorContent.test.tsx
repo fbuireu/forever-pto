@@ -224,3 +224,12 @@ describe("what the reader can do about it", () => {
 		expect(status.getAttribute("target")).toBe("_blank");
 	});
 });
+
+describe("ErrorContent safe areas", () => {
+	it("keeps its columns off the landscape notch", () => {
+		renderError();
+		const classes = (document.querySelector("main > div")?.className ?? "").split(" ");
+
+		expect(classes).toContain("px-safe-7");
+	});
+});

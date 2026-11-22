@@ -137,7 +137,7 @@ describe("planner/layout", () => {
 
 		const classes = donate.props.bottomClassName?.split(" ") ?? [];
 
-		expect(classes).toContain("lg:bottom-4");
+		expect(classes).toContain("lg:bottom-[max(1rem,env(safe-area-inset-bottom))]");
 		expect(classes.filter((name) => name.startsWith("md:"))).toEqual([]);
 	});
 });

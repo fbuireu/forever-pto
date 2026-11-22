@@ -143,6 +143,15 @@ describe("the first visit", () => {
 		expect(Number(layer?.[1])).toBeLessThan(DIALOG_LAYER);
 	});
 
+	it("keeps its distance from each edge, or the inset where that is larger, so it never sits under the home indicator or a notch", () => {
+		renderConsent();
+		const classes = screen.getByRole("region", { name: en.cookies.title }).className.split(" ");
+
+		expect(classes).toContain("bottom-[max(1rem,env(safe-area-inset-bottom))]");
+		expect(classes).toContain("left-[max(1rem,env(safe-area-inset-left))]");
+		expect(classes).toContain("right-[max(1rem,env(safe-area-inset-right))]");
+	});
+
 	it("asks the library not to show its own banner, since this one replaces it", () => {
 		renderConsent();
 

@@ -50,7 +50,7 @@ export const Hero = async () => {
 	}));
 
 	return (
-		<header className="relative px-7 pt-20 pb-24 overflow-hidden" id="hero">
+		<header className="relative px-safe-7 pt-20 pb-24 overflow-hidden" id="hero">
 			<div className="max-w-[1240px] mx-auto grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-14 items-center">
 				<div>
 					<div className="flex gap-2.5 items-center mb-6 flex-wrap">

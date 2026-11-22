@@ -361,3 +361,11 @@ describe("ManagementBar hands the panel's choices to the store", () => {
 		expect(container.textContent).not.toContain("Alternativa");
 	});
 });
+
+describe("ManagementBar safe areas", () => {
+	it("sticks below the status bar, or its own distance where that is larger", () => {
+		const { container } = renderBar({ locale: "es", messages: esMessages });
+
+		expect(container.firstElementChild?.className).toContain("top-[max(0.75rem,env(safe-area-inset-top))]");
+	});
+});

@@ -126,3 +126,16 @@ describe("Faq", () => {
 		expect(item.querySelector('[data-testid="troubleshooting"]')).not.toBeNull();
 	});
 });
+
+describe("Faq safe areas", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it("keeps its gutters, or the landscape notch where that is wider, so no text sits under the cutout", async () => {
+		await renderFaq();
+		const classes = (document.querySelector("section")?.className ?? "").split(" ");
+
+		expect(classes).toContain("px-safe-7");
+	});
+});

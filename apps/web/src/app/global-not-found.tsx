@@ -9,12 +9,14 @@ import { NotFoundContent } from "@ui/modules/pages/not-found/NotFoundContent";
 import { AppThemeProvider } from "@ui/modules/providers/AppThemeProvider";
 import { Footer } from "@ui/modules/shared/footer/Footer";
 import { Header } from "@ui/modules/shared/Header";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { DOCUMENT_BODY_CLASS } from "./fonts";
 
 const DEFAULT_LOCALE = routing.defaultLocale;
+
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 export const generateMetadata = (): Promise<Metadata> => notFoundTitle(DEFAULT_LOCALE);
 

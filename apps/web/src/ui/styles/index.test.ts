@@ -1,4 +1,5 @@
 import { readdirSync, readFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
 
@@ -81,5 +82,46 @@ describe("what this folder holds", () => {
 
 		expect(stylesheets.length).toBeGreaterThan(5);
 		expect(stylesheets.filter((file) => !reached.has(file))).toEqual([]);
+	});
+});
+
+describe("the safe-area utilities", () => {
+	const tailwind = createRequire(
+		createRequire(join(__dirname, "../../../package.json")).resolve("@tailwindcss/postcss"),
+	);
+	const { compile } = tailwind("@tailwindcss/node");
+
+	const built = async (candidates: string[]): Promise<string> => {
+		const css = `@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+${read("utilities/index.css")}`;
+		const compiler = await compile(css, { base: __dirname, onDependency() {} });
+		return compiler.build(candidates) as string;
+	};
+
+	it("pads both sides by the spacing step or the side inset, whichever is larger", async () => {
+		const css = await built(["px-safe-7", "px-safe-4"]);
+
+		expect(css).toContain("padding-left: max(calc(var(--spacing) * 7), env(safe-area-inset-left));");
+		expect(css).toContain("padding-right: max(calc(var(--spacing) * 7), env(safe-area-inset-right));");
+		expect(css).toContain("padding-left: max(calc(var(--spacing) * 4), env(safe-area-inset-left));");
+	});
+
+	it("pads all four sides the same way", async () => {
+		const css = await built(["p-safe-4"]);
+
+		for (const side of ["top", "right", "bottom", "left"])
+			expect(css).toContain(`padding-${side}: max(calc(var(--spacing) * 4), env(safe-area-inset-${side}));`);
+	});
+
+	it("emits nothing for a step that is not an integer", async () => {
+		expect(await built(["px-safe-foo"])).not.toContain("safe-area-inset");
+	});
+
+	it("leaves a variant override of the same side after the utility, so it wins", async () => {
+		const css = await built(["px-safe-7", "in-data-[slot=sidebar-inset]:pl-7"]);
+
+		expect(css.indexOf("env(safe-area-inset-left)")).toBeLessThan(css.indexOf("data-slot"));
 	});
 });

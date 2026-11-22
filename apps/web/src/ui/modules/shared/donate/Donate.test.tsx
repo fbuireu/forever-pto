@@ -387,3 +387,20 @@ describe("a donation that never starts", () => {
 		expect(logClientError).not.toHaveBeenCalled();
 	});
 });
+
+describe("Donate safe areas", () => {
+	it("pads the full-width band by the side insets below md, so the button clears a notch", () => {
+		const { container } = renderDonate();
+		const classes = trigger(container).className.split(" ");
+
+		expect(classes).toContain("pl-[env(safe-area-inset-left)]");
+		expect(classes).toContain("pr-[env(safe-area-inset-right)]");
+		expect(classes).toContain("md:p-0");
+	});
+
+	it("keeps its distance from the right edge from md up, or the inset where that is larger", () => {
+		const { container } = renderDonate();
+
+		expect(trigger(container).className.split(" ")).toContain("md:right-[max(1rem,env(safe-area-inset-right))]");
+	});
+});

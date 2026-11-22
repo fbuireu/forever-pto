@@ -45,3 +45,12 @@ describe("LegalLayout", () => {
 		expect(container.querySelector(".prose")?.textContent).toBe("the terms themselves");
 	});
 });
+
+describe("LegalLayout safe areas", () => {
+	it("keeps the document off the landscape notch, with its own gutter as the floor", async () => {
+		const { container } = await renderLayout();
+		const classes = (container.firstElementChild?.className ?? "").split(" ");
+
+		expect(classes).toContain("px-safe-4");
+	});
+});

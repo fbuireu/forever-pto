@@ -168,7 +168,7 @@ export const Faq = async () => {
 	}));
 
 	return (
-		<section className="px-7 py-24" id="faq">
+		<section className="px-safe-7 py-24" id="faq">
 			<div className="max-w-[900px] mx-auto mb-14 text-center">
 				<div className="flex justify-center mb-4">
 					<Badge variant="outline">{tLanding("faq.badge")}</Badge>

@@ -18,7 +18,7 @@ function DrawerContent({ className, children, ...props }: ComponentProps<typeof 
 			<DrawerPrimitive.Content
 				data-slot="drawer-content"
 				className={cn(
-					"fixed inset-x-0 bottom-0 z-51 flex flex-col rounded-t-[14px] border-t-[3px] border-x-[3px] border-(--frame) bg-card focus:outline-none max-h-[85dvh] shadow-[var(--shadow-drawer)]",
+					"fixed inset-x-0 bottom-0 z-51 flex flex-col pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] rounded-t-[14px] border-t-[3px] border-x-[3px] border-(--frame) bg-card focus:outline-none max-h-[85dvh] shadow-[var(--shadow-drawer)]",
 					className,
 				)}
 				{...props}

@@ -202,6 +202,64 @@ describe("the rail's breakpoint", () => {
 	});
 });
 
+describe("Sidebar safe areas", () => {
+	it("widens the spacer and the rail by the left inset beyond their gutter, so the main content starts where the rail ends", () => {
+		viewport.isMobile = false;
+		const { container } = render(<MobileHarness />);
+		const gap = container.querySelector('[data-slot="sidebar-gap"]');
+		const rail = container.querySelector('[data-slot="sidebar-container"]');
+		const widened = "max(0px,env(safe-area-inset-left)-0.5rem)";
+
+		expect(gap?.className).toContain(`w-[calc(var(--sidebar-width)+${widened})]`);
+		expect(gap?.className).toContain(`(--spacing(4))+${widened})]`);
+		expect(rail?.className).toContain(`w-[calc(var(--sidebar-width)+${widened})]`);
+		expect(rail?.className).toContain(`2px+${widened})]`);
+	});
+
+	it("keeps the rail's card clear of every inset while its column still reaches the edge", () => {
+		viewport.isMobile = false;
+		const { container } = render(<MobileHarness />);
+		const classes = container.querySelector('[data-slot="sidebar-container"]')?.className ?? "";
+
+		expect(classes).toContain("inset-y-0");
+		expect(classes).toContain("pt-[max(0.5rem,env(safe-area-inset-top))]");
+		expect(classes).toContain("pb-[max(0.5rem,env(safe-area-inset-bottom))]");
+		expect(classes).toContain("pl-[max(0.5rem,env(safe-area-inset-left))]");
+	});
+
+	it("pads the mobile sheet by every inset it touches and widens it by the left one, so its controls clear the notch", () => {
+		viewport.isMobile = true;
+		const { getByRole } = render(<MobileHarness />);
+
+		fireEvent.click(getByRole("button", { name: "Toggle sidebar" }));
+		const sheet = getByRole("dialog", { name: "Planner controls" });
+
+		expect(sheet.className).toContain("inset-y-0");
+		expect(sheet.className).toContain("pt-[env(safe-area-inset-top)]");
+		expect(sheet.className).toContain("pb-[env(safe-area-inset-bottom)]");
+		expect(sheet.className).toContain("pl-[env(safe-area-inset-left)]");
+		expect(sheet.style.width).toContain("env(safe-area-inset-left)");
+	});
+
+	it("keeps the inset page off every inset, as padding on a phone and as margin beside the rail", () => {
+		const { getByTestId } = render(
+			<SidebarProvider>
+				<SidebarInset data-testid="inset" />
+			</SidebarProvider>,
+		);
+		const classes = getByTestId("inset").className;
+
+		expect(classes).toContain("pt-[env(safe-area-inset-top)]");
+		expect(classes).toContain("pr-[env(safe-area-inset-right)]");
+		expect(classes).toContain("pb-[env(safe-area-inset-bottom)]");
+		expect(classes).toContain("pl-[env(safe-area-inset-left)]");
+		expect(classes).toContain("lg:peer-data-[variant=inset]:p-0");
+		expect(classes).toContain("lg:peer-data-[variant=inset]:mt-[max(0.5625rem,env(safe-area-inset-top))]");
+		expect(classes).toContain("lg:peer-data-[variant=inset]:mr-[max(0.5625rem,env(safe-area-inset-right))]");
+		expect(classes).toContain("lg:peer-data-[variant=inset]:mb-[max(0.5625rem,env(safe-area-inset-bottom))]");
+	});
+});
+
 describe("Sidebar mobile drawer focus", () => {
 	it("moves focus into the drawer it just opened, rather than leaving it on the trigger behind", () => {
 		viewport.isMobile = true;
