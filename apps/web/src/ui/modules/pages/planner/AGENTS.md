@@ -249,6 +249,13 @@ pages through Alternatives. Any state inside it is discarded on every Alternativ
 takes an index and `ManagementBar` hands the store `{ index }` (`AlternativePreviewParams`);
 `onSelectionChange` passes the Suggestion too, because `setCurrentAlternativeSelection` applies it.
 
+**Every section fits the column beside an expanded rail, about 680px wide at `lg`, where the rail starts; below it
+the column is the viewport.** The rule and the reason are in [`core/AGENTS.md`](../../core/AGENTS.md), under the
+rail's breakpoint. `Roadmap.tsx` sets the 320px dial beside the feature
+list from `lg`, which leaves the list about 330px at 1024px with the rail open, so the list's column carries `min-w-0`:
+without it the German feature cards hold the column wider than that and the page scrolls sideways.
+`Roadmap.test.tsx` pins it.
+
 **`Contact.tsx` reads the `roadmap` namespace, not `contact`**, which belongs to the modal in `shared/contact/`.
 It imports [`contact.css`](./contact.css), global CSS rather than a module, so `.dashed-card` is visible to the
 whole app. It opens the modal on arrival when the address carries `#contact`, the `id` it renders; no link in
@@ -356,7 +363,7 @@ with a default of `false`, so `disabled ?? (…)` would never reach the past-day
 `planKey` with `holidaysKeyOf` over the Country, Region, year, Carry-over Months and locale, and renders nothing
 until they match; the Skeleton keeps its place. A change to the budget or the Strategy keeps the key, so the
 charts do not blank while those recalculate. The Country and Region badges read the location store, which
-`StoresInitializer` fills from the layout, not the sidebar: on a phone the sidebar mounts its controls only while
+`StoresInitializer` fills from the layout, not the sidebar: below `lg` the sidebar mounts its controls only while
 the drawer is open.
 
 **The Summary counts Holidays inside the Planning Window only.** The store holds two years, so the Holidays card,

@@ -60,7 +60,7 @@ export const Legend = () => {
 	const [isExpanded, setIsExpanded] = useState(false);
 
 	return (
-		<div className={cn(styles.sticky_container, "hidden md:grid")}>
+		<div className={cn(styles.sticky_container, "hidden lg:grid")}>
 			<div className={cn(styles.section, styles.ghost)} aria-hidden inert>
 				<Card className={styles.card}>
 					<CardHeader className={styles.card_header}>

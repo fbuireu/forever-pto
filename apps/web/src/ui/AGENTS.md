@@ -66,7 +66,7 @@ Logging stays fire-and-forget (nothing awaits the import), so a component never 
 
 **[`StoresInitializer.tsx`](./modules/stores/StoresInitializer.tsx) and [`modules/tracking/BetterStackTracking.tsx`](./modules/tracking/BetterStackTracking.tsx) opt out of the server render with `use(browser())`**, `browser()` from `react-dom`, which suspends on the server and resolves on the client. Both are rendered inside a `<Suspense fallback={null}>` in the layout above them, which is not optional: a component that suspends with no boundary above it takes the server render down with it.
 
-**`useMobile.ts` is the deliberate refusal.** It is the exact `useSyncExternalStore` server-snapshot shape React's own notes offer `use(browser())` as the replacement for, and taking that offer here would be a downgrade: `useIsMobile` is read by [`Sidebar.tsx`](./modules/core/animate/base/Sidebar.tsx), so suspending on it empties the whole planner shell out of the server HTML to decide a breakpoint. The fixed `false` server snapshot renders the desktop layout and hydration corrects a phone, which costs one client-side correction and keeps the shell in the HTML. Leave it.
+**`useMobile.ts` is the deliberate refusal.** It is the exact `useSyncExternalStore` server-snapshot shape React's own notes offer `use(browser())` as the replacement for, and taking that offer here would be a downgrade: `useIsMobile` is read by [`Sidebar.tsx`](./modules/core/animate/base/Sidebar.tsx), so suspending on it empties the whole planner shell out of the server HTML to decide a breakpoint. The fixed `false` server snapshot renders the desktop layout and hydration corrects a viewport narrower than `lg`, a phone or a tablet, which costs one client-side correction and keeps the shell in the HTML. Leave it.
 
 **Server components live here too.** Around a third of the components have no `'use client'`. [`Countries.tsx`](./modules/sidebar/components/Countries.tsx) is a server component that reads the Country list on the server and hands it to a dynamically imported client child; [`JsonLd.tsx`](./modules/shared/seo/JsonLd.tsx) reads public env.
 
@@ -153,7 +153,7 @@ it measures the thing that actually matters.
 **The same hook reads the sidebar flag that matches the viewport, and destroys the tour on
 unmount.** `useSidebar()` exposes independent flags: `open` for the desktop rail and `openMobile` for
 the drawer. `open` defaults to `true` and mobile never writes it, so the hook picks the flag by
-`useIsMobile()`; reading `open` alone never opens the drawer on a phone, and the opening steps, all anchored
+`useIsMobile()`; reading `open` alone never opens the drawer below `lg`, and the opening steps, all anchored
 inside `AppSidebar`, land on driver.js's dummy-element fallback with nothing highlighted. The driver client is
 a module-level singleton, so without the `destroy()` on unmount its overlay and window listeners survive a
 client-side navigation away from the planner.

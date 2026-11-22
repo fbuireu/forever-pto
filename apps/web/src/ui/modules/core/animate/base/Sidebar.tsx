@@ -207,7 +207,7 @@ function Sidebar({ children, landmarkLabel }: SidebarProps) {
 
 	return (
 		<div
-			className="group peer text-sidebar-foreground hidden md:block"
+			className="group peer text-sidebar-foreground hidden lg:block"
 			data-state={state}
 			data-collapsible={state === "collapsed" ? "icon" : ""}
 			data-variant="inset"
@@ -220,7 +220,7 @@ function Sidebar({ children, landmarkLabel }: SidebarProps) {
 			<aside
 				data-slot="sidebar-container"
 				aria-label={landmarkLabel}
-				className="fixed inset-y-0 z-10 hidden h-svh w-[calc(var(--sidebar-width)+max(0px,env(safe-area-inset-left)-0.5rem))] transition-[left,right,width] duration-400 ease-[cubic-bezier(0.75,0,0.25,1)] md:flex left-0 pt-[max(0.5rem,env(safe-area-inset-top))] pr-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px+max(0px,env(safe-area-inset-left)-0.5rem))]"
+				className="fixed inset-y-0 z-10 hidden h-svh w-[calc(var(--sidebar-width)+max(0px,env(safe-area-inset-left)-0.5rem))] transition-[left,right,width] duration-400 ease-[cubic-bezier(0.75,0,0.25,1)] lg:flex left-0 pt-[max(0.5rem,env(safe-area-inset-top))] pr-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px+max(0px,env(safe-area-inset-left)-0.5rem))]"
 			>
 				<MotionHighlight hover mode="parent" containerClassName="w-full h-full" transition={HIGHLIGHT_TRANSITION}>
 					<div
@@ -267,8 +267,8 @@ function SidebarInset({ className, ...props }: SidebarInsetProps) {
 		<main
 			data-slot="sidebar-inset"
 			className={cn(
-				"bg-background relative flex min-h-svh flex-1 flex-col pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]",
-				"peer-data-[variant=inset]:min-h-[calc(100svh-(--spacing(4)))] md:peer-data-[variant=inset]:min-h-[calc(100svh-(--spacing(4))-max(0px,env(safe-area-inset-top)-0.5625rem)-max(0px,env(safe-area-inset-bottom)-0.5625rem))] md:peer-data-[variant=inset]:mt-[max(0.5625rem,env(safe-area-inset-top))] md:peer-data-[variant=inset]:mr-[max(0.5625rem,env(safe-area-inset-right))] md:peer-data-[variant=inset]:mb-[max(0.5625rem,env(safe-area-inset-bottom))] md:peer-data-[variant=inset]:p-0 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-3 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-[14px] md:peer-data-[variant=inset]:border-[3px] md:peer-data-[variant=inset]:border-(--frame) md:peer-data-[variant=inset]:shadow-(--shadow-brutal-lg)",
+				"bg-background relative flex min-h-svh min-w-0 flex-1 flex-col pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]",
+				"peer-data-[variant=inset]:min-h-[calc(100svh-(--spacing(4)))] lg:peer-data-[variant=inset]:min-h-[calc(100svh-(--spacing(4))-max(0px,env(safe-area-inset-top)-0.5625rem)-max(0px,env(safe-area-inset-bottom)-0.5625rem))] lg:peer-data-[variant=inset]:mt-[max(0.5625rem,env(safe-area-inset-top))] lg:peer-data-[variant=inset]:mr-[max(0.5625rem,env(safe-area-inset-right))] lg:peer-data-[variant=inset]:mb-[max(0.5625rem,env(safe-area-inset-bottom))] lg:peer-data-[variant=inset]:p-0 lg:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-3 lg:peer-data-[variant=inset]:ml-0 lg:peer-data-[variant=inset]:rounded-[14px] lg:peer-data-[variant=inset]:border-[3px] lg:peer-data-[variant=inset]:border-(--frame) lg:peer-data-[variant=inset]:shadow-(--shadow-brutal-lg)",
 				className,
 			)}
 			{...props}

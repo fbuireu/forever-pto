@@ -306,6 +306,12 @@ name from its config key** with `replaceAll("_", " ")`: `replace` with a string 
 only, and `BUY_ME_A_COFFEE` would announce as *buy me_a_coffee*;
 [`DevFooter.test.tsx`](./shared/footer/components/DevFooter.test.tsx) asks for each link **by name**.
 
+**[`shared/footer/Footer.tsx`](./shared/footer/Footer.tsx)'s legal links share one row from `sm` and wrap onto more.**
+The eight entries in one row are wider than the planner's column beside the rail at `lg` in every bundle, and wider
+than a tablet's viewport in German and French, where there is no rail at all. A row that cannot wrap squeezes its labels onto two
+lines and then pushes the page past the viewport, on the marketing pages as inside the planner's `SidebarInset`, whose
+rule is in [`core/AGENTS.md`](./core/AGENTS.md). `Footer.test.tsx` pins `sm:flex-wrap` beside `sm:flex-row`.
+
 **In `shared/donate/DonationForm.tsx`, `FormControl` sits inside `InputGroup`, around `NumberInput`**, so
 the amount label's `for` and the `aria-describedby` land on the input rather than on the `role="group"`
 wrapper: `NumberInput` hands the `id` to Base UI's field root and every other prop to the `<input>`. Its wrapper
@@ -444,7 +450,8 @@ iframe fetches them from Stripe's origin, which is why `public/_headers` gives t
 `Access-Control-Allow-Origin`. `CheckoutForm.tsx` pins the Payment Element to `layout: 'accordion'`, because
 the two layouts share the `.TabIcon--selected` rule: an ink selected tab wants a light icon, a cream accordion
 card a dark one, and the rule and `colorIconTabSelected` are the frame colour the accordion needs. The input
-text is 16px on phones, read from `useIsMobile`, because the browser zooms into anything smaller.
+text is 16px wherever `useIsMobile` answers true, below `lg`, because a phone's or a tablet's browser zooms into
+anything smaller.
 
 **[`sidebar/components/SidebarFieldLabel.tsx`](./sidebar/components/SidebarFieldLabel.tsx) is how a sidebar control is
 labelled.** `SidebarFieldLabel` (icon, title, optional tooltip, optional `controlId`) renders a `<label for>`
@@ -521,7 +528,9 @@ caller passes a narrower child. A `fixed` element at `z-50` spanning the viewpor
 construction rather than by measurement.
 
 **`Donate` takes its bottom offset from its caller and holds none of its own.** `bottomClassName` is required:
-the marketing page passes `bottom-3 md:bottom-4`, and the planner layout passes `bottom-[calc(15dvh+8px)] md:bottom-4`,
-the mobile drawer's collapsed snap point (`DRAWER_SNAP.COLLAPSED`, `0.15`, in
+the marketing page passes `bottom-[max(0.75rem,env(safe-area-inset-bottom))] md:bottom-[max(1rem,env(safe-area-inset-bottom))]`,
+and the planner layout passes `bottom-[calc(15dvh+8px)] lg:bottom-[max(1rem,env(safe-area-inset-bottom))]`: the
+mobile drawer's collapsed snap point (`DRAWER_SNAP.COLLAPSED`, `0.15`, in
 [`pages/planner/ManagementBar.tsx`](./pages/planner/ManagementBar.tsx)) written out as a class, since Tailwind
-reads literals only. The planner layout's test fails when the two drift apart.
+reads literals only, up to `lg`, where the rail replaces the drawer (see [`core/AGENTS.md`](./core/AGENTS.md)). The
+planner layout's test fails when the snap point and the class drift apart, or when the corner offset leaves `lg`.

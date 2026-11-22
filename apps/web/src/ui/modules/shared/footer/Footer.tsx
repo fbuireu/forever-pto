@@ -44,7 +44,7 @@ export const Footer = async () => {
 				<DevFooter />
 				<nav
 					aria-label={t("legalNavigation")}
-					className={`flex flex-col sm:flex-row justify-center items-center gap-3 py-5 ${SAFE_X} border-t-[2px] border-dashed border-[var(--frame)]/18`}
+					className={`flex flex-col sm:flex-row sm:flex-wrap justify-center items-center gap-3 py-5 ${SAFE_X} border-t-[2px] border-dashed border-[var(--frame)]/18`}
 				>
 					<Link href="/planner" className="text-sm font-semibold px-1.5 py-0.5 quiet-link">
 						{t("planner")}

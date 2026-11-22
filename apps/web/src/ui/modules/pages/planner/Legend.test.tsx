@@ -16,6 +16,14 @@ const renderLegend = (): RenderResult =>
 		</NextIntlClientProvider>,
 	);
 
+describe("Legend placement", () => {
+	it("shows from lg, where the inline panel takes over from the mobile drawer that carries the legend below it", () => {
+		const { container } = renderLegend();
+
+		expect(container.firstElementChild?.className.split(" ")).toEqual(expect.arrayContaining(["hidden", "lg:grid"]));
+	});
+});
+
 describe("Legend disclosure", () => {
 	it("is a named button, not a nameless checkbox sitting invisibly in the tab order", () => {
 		const { container } = renderLegend();

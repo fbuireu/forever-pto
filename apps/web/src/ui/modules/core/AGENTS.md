@@ -145,6 +145,21 @@ inside it would give its subtree an independent `open` state that no other consu
 walks every `.tsx` under `src/` to assert the single mount site; it is the one test here that reads the rest of
 the app, because the defect cannot be seen from inside this folder.
 
+**The rail shows from `lg`, and `SidebarInset` shrinks to the room it leaves.** The breakpoint is written twice:
+`MOBILE_BREAKPOINT` (1024) in [`useMobile.ts`](../../hooks/useMobile.ts), behind `useIsMobile`, which swaps the rail
+for the drawer here and the planner's inline panel for its drawer in `ManagementBar`, and the `lg:` variants on the
+rail, on `SidebarInset`, on the planner's `Legend` and on the donate button's offset in the planner layout, which draw
+the desktop layout. They move together; `useMobile.test.ts`, `Sidebar.test.tsx`, `Legend.test.tsx` and the planner
+layout's test each pin their side. It is `lg` and not `md` because the rail takes `SIDEBAR_WIDTH`, 20rem, off the
+column, while the planner's sections choose their layout by the viewport: at `md` the column is about 430px, narrower
+than a 600px phone's, and the Summary still draws four metric cards and its timeline into it. From `lg` the column is
+about 680px or more, and below it the column is the viewport, a phone held sideways (852×393) and a tablet included.
+`SidebarInset` is the wrapper's `flex-1` item and carries `min-w-0`, because a flex item is otherwise never narrower
+than its content: one row that does not wrap would widen the column past the room, the page would scroll sideways, and
+a mobile browser zooms the whole page out to fit it. `min-w-0` stops the column growing and nothing more, so a row
+inside it wraps and a `flex-1` that holds text carries a `min-w-0` of its own, as the footer's legal links and the
+Roadmap's feature list do.
+
 **`animate/base/Sidebar.tsx` writes nothing to `document.body`, and `Sidebar.test.tsx` fails on any
 `document.body.style` in it.** The mobile drawer blocks the pointer with its own `fixed inset-0` backdrop. `vaul`
 sets `document.body.style.pointerEvents = 'auto'` whenever a `modal={false}` drawer mounts (`pages/planner/ManagementBar.tsx`
@@ -166,9 +181,9 @@ padding, so its background still reaches the edge. In this folder:
   it. The rail is a transparent column around the card, so its padding is `max(0.5rem, env(...))` on the top, bottom
   and left, and **both** widths grow by `max(0px, env(safe-area-inset-left) - 0.5rem)`, the part of the left inset the
   padding does not already cover, so the card keeps its width and the spacer ends where the rail does. Change one of
-  the three and the page and the rail stop lining up in landscape. An iPhone in landscape is wider than `md`, so this
-  desktop rail, not the sheet, is what sits against the notch.
-- **`SidebarInset`** is padded by all four insets below `md`, where nothing sits beside it, and from `md` up swaps that
+  the three and the page and the rail stop lining up in landscape. An iPhone in landscape is narrower than `lg`, so it
+  gets the sheet and `SidebarInset`'s padding; the rail's terms hold for any wider screen with a left inset.
+- **`SidebarInset`** is padded by all four insets below `lg`, where nothing sits beside it, and from `lg` up swaps that
   padding for `max(0.5625rem, env(...))` margins on the top, right and bottom (its `ml` is the rail's), with its
   `min-h` reduced by whatever the margins gained over the inset-free value, so a short page does not scroll. The
   floating `SidebarTrigger` is `fixed` with no offsets, so it sits where it would flow, inside this padding or margin.
