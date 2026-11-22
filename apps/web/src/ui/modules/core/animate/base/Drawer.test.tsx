@@ -35,6 +35,16 @@ describe("DrawerContent", () => {
 		expect(container.querySelector('[data-slot="drawer-overlay"]')).toBeNull();
 	});
 
+	it("keeps its content clear of the home indicator and the landscape notch while its background reaches both", () => {
+		const { container } = render(<DrawerContent />);
+		const classes = container.querySelector('[data-slot="drawer-content"]')?.className ?? "";
+
+		expect(classes).toContain("bottom-0");
+		expect(classes).toContain("pb-[env(safe-area-inset-bottom)]");
+		expect(classes).toContain("pl-[env(safe-area-inset-left)]");
+		expect(classes).toContain("pr-[env(safe-area-inset-right)]");
+	});
+
 	it('renders with data-slot="drawer-content"', () => {
 		const { container } = render(<DrawerContent />);
 		expect(container.querySelector('[data-slot="drawer-content"]')).not.toBeNull();

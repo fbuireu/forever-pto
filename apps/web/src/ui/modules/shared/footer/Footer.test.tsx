@@ -146,3 +146,26 @@ describe("Footer", () => {
 		expect(landmark.contains(screen.getByTestId("contact"))).toBe(true);
 	});
 });
+
+describe("Footer safe areas", () => {
+	it("keeps each row off the landscape notch, except inside the planner page, which already clears it", async () => {
+		const { container } = await renderFooter();
+		const rows = [...container.querySelectorAll("footer > div > *")];
+
+		expect(rows).toHaveLength(3);
+		for (const row of rows) {
+			const classes = row.className.split(" ");
+			expect(classes).toContain("px-safe-7");
+			expect(classes).toContain("in-data-[slot=sidebar-inset]:pl-7");
+			expect(classes).toContain("in-data-[slot=sidebar-inset]:pr-7");
+		}
+	});
+
+	it("lifts the last row above the home indicator", async () => {
+		const { container } = await renderFooter();
+		const classes = (container.querySelector("footer > div > :last-child")?.className ?? "").split(" ");
+
+		expect(classes).toContain("pb-[max(0.75rem,env(safe-area-inset-bottom))]");
+		expect(classes).toContain("in-data-[slot=sidebar-inset]:pb-3");
+	});
+});

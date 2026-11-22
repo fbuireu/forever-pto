@@ -60,3 +60,15 @@
 	box-decoration-break: clone;
 	-webkit-box-decoration-break: clone;
 }
+
+@utility px-safe-* {
+	padding-left: max(--spacing(--value(integer)), env(safe-area-inset-left));
+	padding-right: max(--spacing(--value(integer)), env(safe-area-inset-right));
+}
+
+@utility p-safe-* {
+	padding-top: max(--spacing(--value(integer)), env(safe-area-inset-top));
+	padding-right: max(--spacing(--value(integer)), env(safe-area-inset-right));
+	padding-bottom: max(--spacing(--value(integer)), env(safe-area-inset-bottom));
+	padding-left: max(--spacing(--value(integer)), env(safe-area-inset-left));
+}

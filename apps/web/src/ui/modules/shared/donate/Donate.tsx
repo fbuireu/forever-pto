@@ -215,7 +215,7 @@ export const Donate = ({ bottomClassName }: DonateProps) => {
 		<Popover open={isOpen} onOpenChange={handleOpenChange}>
 			<div
 				className={cn(
-					"donate-trigger pointer-events-none fixed w-full right-0 md:w-auto md:right-4 z-50",
+					"donate-trigger pointer-events-none fixed w-full right-0 pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] md:w-auto md:right-[max(1rem,env(safe-area-inset-right))] md:p-0 z-50",
 					bottomClassName,
 				)}
 			>

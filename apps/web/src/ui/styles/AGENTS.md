@@ -26,7 +26,7 @@ fails on a scanned test, e2e spec or Markdown file and on any palette utility in
 | `index.css` | Declares the cascade layer order, imports Tailwind, `tw-animate-css` and every partial below, and ends with the `@source not` exclusions |
 | [`base/index.css`](./base/index.css) | `@layer base`: element defaults: border/outline colour, body background and glow, scrollbar styling, the shared transition on buttons and shadcn slots |
 | [`theme/index.css`](./theme/index.css) | `@theme inline` bridges the design tokens into Tailwind's namespaces; `@theme static` always emits the Tailwind theme variables a CSS module reads (`--spacing`, `--text-xs`, `--text-sm`, `--text-3xl`, `--shadow-lg`, at Tailwind's own values); also the `dark` and `hover` custom variants |
-| [`utilities/index.css`](./utilities/index.css) | `@utility hit-area-stable`, `hit-area-stable-tilt`, `icon-first-line`, `quiet-link` and `highlighter` |
+| [`utilities/index.css`](./utilities/index.css) | `@utility hit-area-stable`, `hit-area-stable-tilt`, `icon-first-line`, `quiet-link`, `highlighter`, and the functional `px-safe-*` and `p-safe-*` |
 | [`animations/index.css`](./animations/index.css) | `@layer animations`: keyframes, the root view-transition, the reduced-motion block |
 | [`global/index.css`](./global/index.css) | The design tokens: `:root` and the `[data-theme="dark"]` overrides. Deliberately unlayered |
 | [`vendor/index.css`](./vendor/index.css) | `@layer vendor`: `flag-icons`, cookie-consent and boneyard-js overrides, `::selection` |
@@ -34,6 +34,12 @@ fails on a scanned test, e2e spec or Markdown file and on any palette utility in
 | [`palette.test.ts`](./palette.test.ts) | Holds `palette.ts` equal to the tokens it repeats, and keeps every colour out of `boneyard.config.json` and the registry generated from it |
 | [`contrast.test.ts`](./contrast.test.ts) | Evaluates the fill, the stripe and the ink of every brand-filled calendar day in both themes and holds the ink at WCAG AA, and does the same for the title on every `Banner` wash and the text and badge on every `MetricCard` wash |
 | [`index.test.ts`](./index.test.ts) | Reads the stylesheets as text and guards the invariants a reader is most likely to "tidy away" |
+
+**`px-safe-<n>` and `p-safe-<n>` are the safe-area gutters.** `n` is a step of the spacing scale: `px-safe-7` is
+`padding-left` and `padding-right` of `max(--spacing(7), env(safe-area-inset-left|right))`, `p-safe-4` the same on all
+four sides. With every inset at 0 they equal `px-7` and `p-4`. Both are declared in `utilities/index.css` and are
+declarations of one `@utility` each, so a variant override such as the footer's `in-data-[slot=sidebar-inset]:pl-7`
+still beats them. `index.test.ts` compiles the file and asserts the declarations.
 
 ## The cascade layer order
 

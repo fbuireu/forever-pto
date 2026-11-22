@@ -12,7 +12,7 @@ export const LegalLayout = async ({ title, lastUpdatedDate, children }: LegalLay
 	const t = await getTranslations("legal");
 
 	return (
-		<div className="container mx-auto px-4 py-8 max-w-4xl z-1">
+		<div className="container mx-auto px-safe-4 py-8 max-w-4xl z-1">
 			<Card>
 				<CardHeader>
 					<CardTitle as="h1" className="text-3xl font-bold">

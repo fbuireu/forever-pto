@@ -10,8 +10,8 @@ export const Header = async () => {
 	const t = await getTranslations("homepage");
 
 	return (
-		<nav className="sticky top-0 z-50 bg-[var(--background)] border-b-[4px] border-[var(--frame)]">
-			<div className="max-w-[1320px] mx-auto flex items-center justify-between px-7 py-[14px]">
+		<nav className="sticky top-0 z-50 pt-[env(safe-area-inset-top)] bg-[var(--background)] border-b-[4px] border-[var(--frame)]">
+			<div className="max-w-[1320px] mx-auto flex items-center justify-between px-safe-7 py-[14px]">
 				<Link
 					href="/"
 					aria-label="Forever PTO"

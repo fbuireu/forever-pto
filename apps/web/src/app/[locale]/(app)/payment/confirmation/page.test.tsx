@@ -168,6 +168,14 @@ describe("payment/confirmation page", () => {
 			expect(container.textContent).not.toContain("t:description");
 		});
 
+		it("keeps the failure card clear of every inset", async () => {
+			mockConfirmation.mockReturnValueOnce(Effect.succeed(null));
+			const { container } = await renderErrorPage();
+			const classes = (container.querySelector("main")?.className ?? "").split(" ");
+
+			expect(classes).toContain("p-safe-4");
+		});
+
 		it("does not claim the payer was spared when the Stripe read itself failed", async () => {
 			mockConfirmation.mockReturnValueOnce(Effect.succeed(null));
 			const { container } = await renderErrorPage();
@@ -195,6 +203,13 @@ describe("payment/confirmation page", () => {
 		it("returns a main landmark on success", async () => {
 			const element = await PaymentConfirmationPage(makeSuccessParams());
 			expect(element.type).toBe("main");
+		});
+
+		it("keeps the success card clear of every inset", async () => {
+			const element = await PaymentConfirmationPage(makeSuccessParams());
+			const classes = (element.props.className as string).split(" ");
+
+			expect(classes).toContain("p-safe-4");
 		});
 
 		it("success landmark has m-auto class", async () => {

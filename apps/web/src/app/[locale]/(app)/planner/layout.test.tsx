@@ -122,5 +122,6 @@ describe("planner/layout", () => {
 		};
 
 		expect(donate.props.bottomClassName).toContain(`bottom-[calc(${Math.round(DRAWER_SNAP.COLLAPSED * 100)}dvh+8px)]`);
+		expect(donate.props.bottomClassName).toContain("md:bottom-[max(1rem,env(safe-area-inset-bottom))]");
 	});
 });

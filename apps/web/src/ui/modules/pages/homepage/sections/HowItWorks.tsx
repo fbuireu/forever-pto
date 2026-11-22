@@ -33,7 +33,7 @@ export const HowItWorks = async () => {
 	];
 
 	return (
-		<section className="px-7 py-24" id="how">
+		<section className="px-safe-7 py-24" id="how">
 			<div className="max-w-[900px] mx-auto mb-14 text-center">
 				<div className="flex justify-center mb-4">
 					<Badge variant="outline">{t("how.badge", { steps: steps.length })}</Badge>

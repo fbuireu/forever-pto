@@ -8,13 +8,18 @@ import { CookieButton } from "./components/CookieButton";
 import { Copyright } from "./components/Copyright";
 import { DevFooter } from "./components/DevFooter";
 
+const SAFE_X = "px-safe-7 in-data-[slot=sidebar-inset]:pl-7 in-data-[slot=sidebar-inset]:pr-7";
+const SAFE_BOTTOM = "pb-[max(0.75rem,env(safe-area-inset-bottom))] in-data-[slot=sidebar-inset]:pb-3";
+
 export const Footer = async () => {
 	const [t, year] = await Promise.all([getTranslations("footer"), getCurrentYear()]);
 
 	return (
 		<footer className="w-full bg-background border-t-[3px] border-[var(--frame)] relative z-10">
 			<div className="max-w-[1320px] mx-auto">
-				<div className="flex items-center justify-between flex-wrap gap-3 px-7 pt-5 pb-4 border-b-[2px] border-[var(--frame)]/18">
+				<div
+					className={`flex items-center justify-between flex-wrap gap-3 ${SAFE_X} pt-5 pb-4 border-b-[2px] border-[var(--frame)]/18`}
+				>
 					<Link
 						href="/"
 						aria-label="Forever PTO"
@@ -39,7 +44,7 @@ export const Footer = async () => {
 				<DevFooter />
 				<nav
 					aria-label={t("legalNavigation")}
-					className="flex flex-col sm:flex-row justify-center items-center gap-3 py-5 px-7 border-t-[2px] border-dashed border-[var(--frame)]/18"
+					className={`flex flex-col sm:flex-row justify-center items-center gap-3 py-5 ${SAFE_X} border-t-[2px] border-dashed border-[var(--frame)]/18`}
 				>
 					<Link href="/planner" className="text-sm font-semibold px-1.5 py-0.5 quiet-link">
 						{t("planner")}
@@ -68,7 +73,9 @@ export const Footer = async () => {
 					<ContactButton />
 				</nav>
 
-				<div className="px-7 py-3 border-t-[2px] border-dashed border-[var(--frame)]/18 flex justify-center">
+				<div
+					className={`${SAFE_X} pt-3 ${SAFE_BOTTOM} border-t-[2px] border-dashed border-[var(--frame)]/18 flex justify-center`}
+				>
 					<span className="font-mono text-[11px] text-muted-foreground text-center">
 						<Copyright serverYear={year} />
 					</span>

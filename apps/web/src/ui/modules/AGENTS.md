@@ -267,6 +267,19 @@ alias and a relative path to the same file are one mock.
 
 ## Gotchas
 
+**Everything pinned to a screen edge, and every full-width band, carries its safe-area inset** (the root layouts set
+`viewportFit: "cover"`; the term-by-term rules for the sidebar, drawer, toaster and dialog are in
+[`core/AGENTS.md`](./core/AGENTS.md)). Out here: the cookie banner (`shared/cookie-consent/CookieConsent.tsx`) is
+`bottom`, `left` and `right` of `max(1rem, env(...))`; the donate button (`shared/donate/Donate.tsx`) pads its
+full-width band by the side insets below `md` and takes `md:right-[max(1rem,env(safe-area-inset-right))]` above, and
+its callers pass `bottomClassName` as `max(<distance>, env(safe-area-inset-bottom))`; the marketing `Header` is
+`sticky top-0` and pads its own top by the status bar, so its background reaches the edge. Every full-bleed band
+(the homepage sections, the footer rows, `NotFoundContent`, `ErrorContent`, `LegalLayout`, the payment confirmation
+pages) keeps its background full width and swaps its `px-7` or `p-4` for `px-safe-7`, `px-safe-4` or `p-safe-4`
+(the utilities in [`../styles/utilities/index.css`](../styles/utilities/index.css)). **The footer opts back out inside the planner** (`in-data-[slot=sidebar-inset]:pl-7` and its
+siblings), because `SidebarInset` already clears the insets and a second pass would pad twice. A new fixed, sticky or
+full-bleed element states its inset the same way; each component's test pins the utility or the `env(safe-area-inset-...)` term.
+
 **The skip link and every landmark it can reach read one const.** `layout/SkipToContent.tsx` exports
 `MAIN_CONTENT_ID` and builds its own `href` from it; each route shell interpolates the same const onto its
 landmark. A shell that forgets it leaves a promise to a screen reader that never resolves: Tab then Enter does

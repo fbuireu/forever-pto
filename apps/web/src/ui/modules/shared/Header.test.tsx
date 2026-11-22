@@ -89,3 +89,21 @@ describe("Header's imports", () => {
 		expect(source).not.toMatch(/modules\/pages\/|\.\.\/pages\//);
 	});
 });
+
+describe("Header safe areas", () => {
+	it("pads its own top by the status bar while it sticks, so its background reaches the edge and its controls clear it", async () => {
+		const { container } = await renderHeader();
+		const nav = container.querySelector("nav");
+
+		expect(nav?.className).toContain("sticky");
+		expect(nav?.className).toContain("top-0");
+		expect(nav?.className).toContain("pt-[env(safe-area-inset-top)]");
+	});
+
+	it("keeps its row off the landscape notch", async () => {
+		const { container } = await renderHeader();
+		const classes = (container.querySelector("nav > div")?.className ?? "").split(" ");
+
+		expect(classes).toContain("px-safe-7");
+	});
+});

@@ -127,3 +127,16 @@ describe("Pricing", () => {
 		expect(lifetime).toEqual(Object.values(pricing.lifetimeFeatures));
 	});
 });
+
+describe("Pricing safe areas", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it("keeps its gutters, or the landscape notch where that is wider, so no text sits under the cutout", async () => {
+		await mountPricing({ locale: "en", messages: enMessages });
+		const classes = (document.querySelector("section")?.className ?? "").split(" ");
+
+		expect(classes).toContain("px-safe-7");
+	});
+});
